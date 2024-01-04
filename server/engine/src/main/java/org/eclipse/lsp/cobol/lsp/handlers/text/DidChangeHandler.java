@@ -16,8 +16,8 @@ package org.eclipse.lsp.cobol.lsp.handlers.text;
 
 import com.google.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.lsp.cobol.lsp.AsyncAnalysisService;
 import org.eclipse.lsp.cobol.lsp.WorkspaceDocumentGraph;
+import org.eclipse.lsp.cobol.lsp.analysis.AsyncAnalysisService;
 import org.eclipse.lsp.cobol.lsp.handlers.HandlerUtility;
 import org.eclipse.lsp.cobol.service.UriDecodeService;
 import org.eclipse.lsp4j.DidChangeTextDocumentParams;

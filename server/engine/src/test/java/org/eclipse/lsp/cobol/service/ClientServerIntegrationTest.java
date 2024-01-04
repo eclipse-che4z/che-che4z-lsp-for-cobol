@@ -14,6 +14,7 @@
  */
 package org.eclipse.lsp.cobol.service;
 
+import static java.util.Collections.emptyList;
 import static org.eclipse.lsp.cobol.test.engine.UseCaseUtils.DOCUMENT_URI;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -35,10 +36,15 @@ import org.eclipse.lsp.cobol.ConfigurableTest;
 import org.eclipse.lsp.cobol.common.LanguageEngineFacade;
 import org.eclipse.lsp.cobol.domain.modules.DatabusModule;
 import org.eclipse.lsp.cobol.lsp.CobolTextDocumentService;
+import org.eclipse.lsp.cobol.lsp.CobolWorkspaceServiceImpl;
 import org.eclipse.lsp.cobol.lsp.DisposableLSPStateService;
+import org.eclipse.lsp.cobol.lsp.LspEventConsumer;
 import org.eclipse.lsp.cobol.lsp.LspMessageBroker;
+import org.eclipse.lsp.cobol.lsp.events.queries.CodeActionQuery;
+import org.eclipse.lsp.cobol.lsp.handlers.text.CodeActionHandler;
 import org.eclipse.lsp.cobol.service.mocks.MockLanguageClient;
 import org.eclipse.lsp4j.*;
+import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.eclipse.lsp4j.services.TextDocumentService;
 import org.junit.jupiter.api.*;
 
@@ -84,13 +90,13 @@ public class ClientServerIntegrationTest extends ConfigurableTest {
   @Inject
   LspMessageBroker lspMessageBroker;
   @Inject MockLanguageClient client;
+  @Inject LspEventConsumer lspEventConsumer;
   @Inject
   DisposableLSPStateService stateService;
 
   @BeforeAll
   void setup() {
-    //TODO: correct me
-//    lspMessageBroker.startEventLoop();
+    lspEventConsumer.startConsumer();
   }
   @AfterAll
   void tearDown() throws InterruptedException {
@@ -157,16 +163,17 @@ public class ClientServerIntegrationTest extends ConfigurableTest {
     LspMessageBroker lspMessageBroker = injector.getInstance(LspMessageBroker.class);
     TextDocumentService textService = injector.getInstance(TextDocumentService.class);
     AnalysisService analysisService = injector.getInstance(AnalysisService.class);
+    LspEventConsumer lspEventConsumer = injector.getInstance(LspEventConsumer.class);
     analysisService.setExtensionConfig(ImmutableList.of());
 
-    //TODO: check me
-//    lspMessageBroker.startEventLoop();
+    lspEventConsumer.startConsumer();
 
     textService.didOpen(
         new DidOpenTextDocumentParams(new TextDocumentItem(DOCUMENT_URI, LANGUAGE, 1, TEXT)));
     List<? extends Location> locations = invokeReferencesRequest(TEST_COPYBOOK1, true, textService);
-
-    this.lspMessageBroker.stop();
+    CompletableFuture<List<Either<Command, CodeAction>>> waitingQuery = waitingQuery(lspMessageBroker);
+    waitingQuery.join();
+    lspMessageBroker.stop();
     assertEquals(4, locations.size());
 
     assertContainsRange(locations, range(20, 12, COPY_LENGTH));
@@ -180,15 +187,15 @@ public class ClientServerIntegrationTest extends ConfigurableTest {
     AnalysisService analysisService = injector.getInstance(AnalysisService.class);
     TextDocumentService textService = injector.getInstance(TextDocumentService.class);
     LspMessageBroker lspMessageBroker = injector.getInstance(LspMessageBroker.class);
+    LspEventConsumer lspEventConsumer = injector.getInstance(LspEventConsumer.class);
+    lspEventConsumer.startConsumer();
     analysisService.setExtensionConfig(ImmutableList.of());
-    //TODO: check me
-//    CompletableFuture<Void> done = lspMessageBroker.startEventLoop();
-    CompletableFuture<Void> done = CompletableFuture.completedFuture(null);
+    CompletableFuture<List<Either<Command, CodeAction>>> waitingQuery = waitingQuery(lspMessageBroker);
     textService.didOpen(
         new DidOpenTextDocumentParams(new TextDocumentItem(DOCUMENT_URI, LANGUAGE, 1, TEXT)));
     List<? extends Location> locations = invokeReferencesRequest(TEST_COPYBOOK2, true, textService);
+    waitingQuery.join();
     lspMessageBroker.stop();
-    done.join();
     assertEquals(3, locations.size());
 
     assertContainsRange(locations, range(21, 12, COPY_LENGTH));
@@ -203,6 +210,7 @@ public class ClientServerIntegrationTest extends ConfigurableTest {
           protected void configure() {
             bind(LanguageEngineFacade.class).to(ClientServerIntegrationTestImpl.class);
             bind(TextDocumentService.class).to(CobolTextDocumentService.class);
+            bind(LspEventConsumer.class).to(CobolWorkspaceServiceImpl.class);
           }
         });
   }
@@ -223,5 +231,14 @@ public class ClientServerIntegrationTest extends ConfigurableTest {
     referenceParams.setPosition(position);
     referenceParams.setTextDocument(new TextDocumentIdentifier(DOCUMENT_URI));
     return textService.references(referenceParams).get();
+  }
+
+  private static CompletableFuture<List<Either<Command, CodeAction>>> waitingQuery(LspMessageBroker lspMessageBroker) {
+    CodeActionParams params = mock(CodeActionParams.class);
+    CodeActionHandler codeActionHandler = mock(CodeActionHandler.class);
+    when(codeActionHandler.codeAction(params)).thenReturn(emptyList());
+    CodeActionQuery codeActionQuery = new CodeActionQuery(params, codeActionHandler);
+    lspMessageBroker.query(codeActionQuery);
+    return codeActionQuery.getResult();
   }
 }

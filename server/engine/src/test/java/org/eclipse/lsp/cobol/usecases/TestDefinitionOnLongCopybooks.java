@@ -75,7 +75,7 @@ class TestDefinitionOnLongCopybooks {
             new Range(new Position(), new Position()));
     DefinedAndUsedStructure ctx = mock(DefinedAndUsedStructure.class);
     when(ctx.getDefinitions()).thenReturn(Collections.singletonList(expectedDef));
-    WorkspaceDocumentGraph documentGraph = spy(WorkspaceDocumentGraph.class);
+    WorkspaceDocumentGraph documentGraph = mock(WorkspaceDocumentGraph.class);
     when(documentGraph.isCopybook(anyString())).thenReturn(false);
 
     try (MockedStatic mocked = mockStatic(SymbolsRepository.class)) {

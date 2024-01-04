@@ -17,7 +17,6 @@ package org.eclipse.lsp.cobol.service.delegates.hover;
 import static org.eclipse.lsp.cobol.test.engine.UseCaseUtils.DOCUMENT_URI;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
@@ -25,7 +24,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.lsp.WorkspaceDocumentGraph;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
-import org.eclipse.lsp.cobol.service.UriDecodeService;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.eclipse.lsp4j.*;
 import org.junit.jupiter.api.BeforeEach;
@@ -34,12 +32,12 @@ import org.junit.jupiter.api.Test;
 /** Test {@link VariableHover} */
 class VariableHoverTest {
     private final UriDecodeService uriDecodeService = mock(UriDecodeService.class);
-    private final VariableHover variableHover = new VariableHover();
+    private final VariableHover variableHover = new VariableHover(uriDecodeService);
     WorkspaceDocumentGraph documentGraph;
 
   @BeforeEach
   void setUp() {
-    this.documentGraph = spy(WorkspaceDocumentGraph.class);
+    this.documentGraph = mock(WorkspaceDocumentGraph.class);
     when(documentGraph.isCopybook(anyString())).thenReturn(false);
     }
 
