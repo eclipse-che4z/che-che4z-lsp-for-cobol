@@ -46,22 +46,18 @@ public class AnalysisService {
 
   private final DocumentModelService documentService;
 
-  private final DocumentContentCache contentCache;
-
   @Inject
   AnalysisService(
       LanguageEngineFacade engine,
       ConfigurationService configurationService,
       @Named("combinedStrategy") CopybookIdentificationService copybookIdentificationService,
       CopybookService copybookService,
-      DocumentModelService documentService,
-      DocumentContentCache contentCache) {
+      DocumentModelService documentService) {
     this.engine = engine;
     this.configurationService = configurationService;
     this.copybookIdentificationService = copybookIdentificationService;
     this.copybookService = copybookService;
     this.documentService = documentService;
-    this.contentCache = contentCache;
   }
 
   /**
@@ -116,19 +112,6 @@ public class AnalysisService {
     if (!isCopybook(uri, text)) {
       LOG.debug(logPrefix + uri + " treated as a program, start analyzing");
       analyzeDocumentWithCopybooks(uri, text, processingMode);
-    }
-  }
-
-  /**
-   * Update cache
-   * @param uri - document uri
-   * @param text - document text
-   * @param isNew - Is document just opened, or it's reanalyse request
-   */
-  public void updateCache(String uri, String text, boolean isNew) {
-    contentCache.store(uri, text);
-    if (!isNew) {
-      documentService.updateDocument(uri, text);
     }
   }
 

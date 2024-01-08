@@ -107,7 +107,7 @@ public class WorkspaceDocumentGraph implements AnalysisStateListener {
     for (CopyNode copyNode : copyNodes) {
       String parentUri = copyNode.getLocality().getUri();
       NodeV copyNodeV = getNode(copyNode, eventSource);
-      if (!copyNodeV.isDirty){
+      if (!copyNodeV.isDirty) {
         objectRef.computeIfPresent(
             copyNode.getUri(),
             (k, v) -> {
@@ -162,13 +162,24 @@ public class WorkspaceDocumentGraph implements AnalysisStateListener {
         });
   }
 
-  private String getContent(String uri) {
+  /**
+   * Get content for a passed uri
+   * @param uri
+   * @return content
+   */
+  public String getContent(String uri) {
     if (ImplicitCodeUtils.isImplicit(uri)) {
       return null;
     }
+    return Optional.ofNullable(objectRef.get(uri))
+        .map(NodeV::getContent)
+        .orElse(getFileContent(uri));
+  }
+
+  private String getFileContent(String uri) {
     return Optional.ofNullable(fileService.getPathFromURI(uri))
-        .map(fileService::getContentByPath)
-        .orElse(null);
+            .map(fileService::getContentByPath)
+            .orElse(null);
   }
 
   private NodeV getNode(CopyNode copyNode, EventSource eventSource) {
@@ -176,20 +187,12 @@ public class WorkspaceDocumentGraph implements AnalysisStateListener {
     String uri = null;
     boolean isDirty = true;
     ArrayList<Location> references = Lists.newArrayList(copyNode.getNameLocation());
-    if (copyNode.getUri() != null)
-    {
+    if (copyNode.getUri() != null) {
       content = getContent(copyNode.getUri());
       uri = copyNode.getUri();
       isDirty = false;
     }
-    return new NodeV(
-        uri,
-        eventSource,
-            references,
-        true,
-        isDirty,
-        content,
-        false);
+    return new NodeV(uri, eventSource, references, true, isDirty, content, false);
   }
 
   /**
@@ -213,6 +216,7 @@ public class WorkspaceDocumentGraph implements AnalysisStateListener {
     List<String> result = new ArrayList<>();
     List<String> linkedUris =
         documentGraphIndexedByCopybook.getOrDefault(uri, Collections.emptyList());
+    linkedUris.remove(uri);
     for (String linkedUri : linkedUris) {
       if (documentGraphIndexedByCopybook.containsKey(linkedUri)) {
         result.addAll(getAllAssociatedFilesForACopybook(linkedUri));
@@ -231,7 +235,21 @@ public class WorkspaceDocumentGraph implements AnalysisStateListener {
   public synchronized void updateContent(String uri) {
     if (objectRef.containsKey(uri)) {
       NodeV nodeV = objectRef.get(uri);
-      nodeV.setContent(getContent(uri));
+      nodeV.setContent(getFileContent(uri));
+    }
+  }
+
+  /**
+   * Update the graph with the passed content
+   *
+   * @param uri
+   * @param content
+   * @return
+   */
+  public synchronized void updateContent(String uri, String content) {
+    if (objectRef.containsKey(uri)) {
+      NodeV nodeV = objectRef.get(uri);
+      nodeV.setContent(content);
     }
   }
 
@@ -245,14 +263,15 @@ public class WorkspaceDocumentGraph implements AnalysisStateListener {
       documentGraph
           .get(uri)
           .forEach(
-              node -> {
-                List<String> strings = documentGraphIndexedByCopybook.get(node.uri);
-                strings.remove(uri);
-                if (strings.isEmpty()) {
-                  documentGraphIndexedByCopybook.remove(node.uri);
-                  objectRef.remove(node.uri);
-                }
-              });
+              node -> Optional.ofNullable(documentGraphIndexedByCopybook.get(node.uri))
+                  .ifPresent(
+                      strings -> {
+                        strings.remove(uri);
+                        if (strings.isEmpty()) {
+                          documentGraphIndexedByCopybook.remove(node.uri);
+                          updateReferences(uri, node);
+                        }
+                      }));
       documentGraph.remove(uri);
       if (documentGraph.isEmpty()) {
         documentGraphIndexedByCopybook.clear();
@@ -260,6 +279,15 @@ public class WorkspaceDocumentGraph implements AnalysisStateListener {
       }
     }
     Optional.ofNullable(objectRef.get(uri)).ifPresent(node -> node.setOpenInIde(false));
+  }
+
+  private void updateReferences(String uri, NodeV node) {
+    NodeV nodeV = objectRef.get(node.getUri());
+    List<Location> updatedReferences =
+        nodeV.getReferencedLocation().stream()
+            .filter(loc -> !loc.getUri().equals(uri))
+            .collect(Collectors.toList());
+    nodeV.setReferencedLocation(updatedReferences);
   }
 
   /**
@@ -270,7 +298,7 @@ public class WorkspaceDocumentGraph implements AnalysisStateListener {
    */
   public String getCopyNodeContent(CopyNode node) {
     return Optional.ofNullable(objectRef.get(node.getUri()))
-        .map(node1 -> node1.content)
+        .map(node1 -> node1.getContent())
         .orElse(null);
   }
 
@@ -317,7 +345,8 @@ public class WorkspaceDocumentGraph implements AnalysisStateListener {
   }
 
   /**
-   * Nodes in the {@link WorkspaceDocumentGraph} representing document and their links in a workspace
+   * Nodes in the {@link WorkspaceDocumentGraph} representing document and their links in a
+   * workspace
    */
   @AllArgsConstructor
   @EqualsAndHashCode(onlyExplicitlyIncluded = true)
@@ -325,16 +354,14 @@ public class WorkspaceDocumentGraph implements AnalysisStateListener {
   public class NodeV {
     @EqualsAndHashCode.Include private String uri;
     @Setter private EventSource lastUpdatedBy;
-    @EqualsAndHashCode.Include private List<Location> referencedLocation;
+    @Setter private List<Location> referencedLocation;
     private boolean isCopybook;
     @Setter private boolean isDirty;
     @Setter private String content;
     @Setter private boolean isOpenInIde;
   }
 
-  /**
-   * Represent different source for event for the LSP server
-   */
+  /** Represent different source for event for the LSP server */
   public enum EventSource {
     FILE_SYSTEM,
     IDE;
