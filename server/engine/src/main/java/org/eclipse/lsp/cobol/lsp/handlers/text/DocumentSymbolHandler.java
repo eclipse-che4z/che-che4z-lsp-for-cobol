@@ -73,7 +73,7 @@ public class DocumentSymbolHandler {
    * @return LspNotification.
    */
   public LspQuery<List<Either<SymbolInformation, DocumentSymbol>>> createEvent(DocumentSymbolParams params) {
-    return new DocumentSymbolQuery(params, this);
+    return new DocumentSymbolQuery(params, this, uriDecodeService);
   }
 
   /**
