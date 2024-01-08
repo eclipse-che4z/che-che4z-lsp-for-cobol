@@ -63,6 +63,10 @@ public class DidCloseHandler {
     }
     String uri = uriDecodeService.decode(params.getTextDocument().getUri());
     LOG.info(format("Document closing invoked on URI %s", uri));
+    if (!workspaceDocumentGraph.isFileOpened(uri)) {
+      LOG.info(format("Ignoring document closing invoked on URI %s", uri));
+      return;
+    }
     watcherService.removeRuntimeWatchers(uri);
     documentModelService.closeDocument(uri);
     workspaceDocumentGraph.remove(uri);
