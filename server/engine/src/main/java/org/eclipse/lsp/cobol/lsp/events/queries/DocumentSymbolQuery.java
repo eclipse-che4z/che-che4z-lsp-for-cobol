@@ -20,7 +20,7 @@ import org.eclipse.lsp.cobol.lsp.LspEventCancelCondition;
 import org.eclipse.lsp.cobol.lsp.LspEventDependency;
 import org.eclipse.lsp.cobol.lsp.LspQuery;
 import org.eclipse.lsp.cobol.lsp.handlers.text.DocumentSymbolHandler;
-import org.eclipse.lsp.cobol.service.utils.UriHelper;
+import org.eclipse.lsp.cobol.service.UriDecodeService;
 import org.eclipse.lsp4j.DocumentSymbol;
 import org.eclipse.lsp4j.DocumentSymbolParams;
 import org.eclipse.lsp4j.SymbolInformation;
@@ -36,9 +36,9 @@ public class DocumentSymbolQuery implements LspQuery<List<Either<SymbolInformati
   private final DocumentSymbolParams params;
 
   public DocumentSymbolQuery(
-      DocumentSymbolParams params, DocumentSymbolHandler documentSymbolHandler) {
+          DocumentSymbolParams params, DocumentSymbolHandler documentSymbolHandler, UriDecodeService uriDecodeService) {
     this.params = params;
-    uri = UriHelper.decode(params.getTextDocument().getUri());
+    uri = uriDecodeService.decode(params.getTextDocument().getUri());
     this.documentSymbolHandler = documentSymbolHandler;
     result = new CompletableFuture<>();
   }

@@ -40,6 +40,7 @@ public class DidCloseHandler {
   private final WatcherService watcherService;
   private final CopybookService copybookService;
   private final UriDecodeService uriDecodeService;
+  private final WorkspaceDocumentGraph workspaceDocumentGraph;
 
   @Inject
   public DidCloseHandler(DisposableLSPStateService disposableLSPStateService,

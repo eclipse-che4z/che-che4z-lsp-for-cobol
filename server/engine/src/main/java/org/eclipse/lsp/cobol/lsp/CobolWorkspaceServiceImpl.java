@@ -26,7 +26,7 @@ import org.eclipse.lsp.cobol.lsp.analysis.AsyncAnalysisService;
 import org.eclipse.lsp.cobol.lsp.events.queries.ExecuteCommandQuery;
 import org.eclipse.lsp.cobol.lsp.handlers.workspace.DidChangeConfigurationHandler;
 import org.eclipse.lsp.cobol.lsp.handlers.workspace.ExecuteCommandHandler;
-import org.eclipse.lsp.cobol.service.utils.UriHelper;
+import org.eclipse.lsp.cobol.service.UriDecodeService;
 import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.services.WorkspaceService;
 
@@ -42,19 +42,21 @@ public class CobolWorkspaceServiceImpl extends LspEventConsumer implements Works
   private final WorkspaceDocumentGraph workspaceDocumentGraph;
   private final DidChangeConfigurationHandler didChangeConfigurationHandler;
   private final AsyncAnalysisService asyncAnalysisService;
+  private final UriDecodeService uriDecodeService;
 
   @Inject
   public CobolWorkspaceServiceImpl(
-      LspMessageBroker lspMessageBroker,
-      ExecuteCommandHandler executeCommandHandler,
-      WorkspaceDocumentGraph workspaceDocumentGraph,
-      DidChangeConfigurationHandler didChangeConfigurationHandler,
-      AsyncAnalysisService asyncAnalysisService) {
+          LspMessageBroker lspMessageBroker,
+          ExecuteCommandHandler executeCommandHandler,
+          WorkspaceDocumentGraph workspaceDocumentGraph,
+          DidChangeConfigurationHandler didChangeConfigurationHandler,
+          AsyncAnalysisService asyncAnalysisService, UriDecodeService uriDecodeService) {
     super(lspMessageBroker);
     this.executeCommandHandler = executeCommandHandler;
     this.workspaceDocumentGraph = workspaceDocumentGraph;
     this.didChangeConfigurationHandler = didChangeConfigurationHandler;
     this.asyncAnalysisService = asyncAnalysisService;
+    this.uriDecodeService = uriDecodeService;
   }
 
   /**
@@ -95,11 +97,11 @@ public class CobolWorkspaceServiceImpl extends LspEventConsumer implements Works
     Set<FileEvent> changedFiles = new HashSet<>(params.getChanges());
     changedFiles.forEach(
         file -> {
-          String uri = UriHelper.decode(file.getUri());
+          String uri = uriDecodeService.decode(file.getUri());
           workspaceDocumentGraph.updateContent(uri);
           if (!workspaceDocumentGraph.isFileOpened(uri)) {
             List<String> uris =
-                workspaceDocumentGraph.getAllAssociatedFilesForACopybook(UriHelper.decode(uri));
+                workspaceDocumentGraph.getAllAssociatedFilesForACopybook(uriDecodeService.decode(uri));
             asyncAnalysisService.reanalyseCopybooksAssociatedPrograms(
                 uris, uri, workspaceDocumentGraph.getContent(uri), WorkspaceDocumentGraph.EventSource.FILE_SYSTEM);
           }
