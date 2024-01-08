@@ -21,7 +21,6 @@ import org.eclipse.lsp.cobol.lsp.WorkspaceDocumentGraph;
 import org.eclipse.lsp.cobol.lsp.analysis.AsyncAnalysisService;
 import org.eclipse.lsp.cobol.lsp.handlers.HandlerUtility;
 import org.eclipse.lsp.cobol.service.UriDecodeService;
-import org.eclipse.lsp.cobol.service.utils.UriHelper;
 import org.eclipse.lsp4j.DidChangeTextDocumentParams;
 
 /**
