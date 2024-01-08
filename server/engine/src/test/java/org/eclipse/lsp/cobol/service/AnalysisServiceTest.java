@@ -60,8 +60,8 @@ class AnalysisServiceTest {
             new AnalysisService(engine,
                     configurationService,
                     copybookIdentificationService,
-                    copybookService, documentService,
-                    contentCache);
+                    copybookService, documentService
+            );
     service.setExtensionConfig(ImmutableList.of());
   }
 
@@ -71,8 +71,8 @@ class AnalysisServiceTest {
             new AnalysisService(engine,
                     configurationService,
                     copybookIdentificationService,
-                    copybookService, documentService,
-                    contentCache);
+                    copybookService, documentService
+            );
 
     CompletableFuture.supplyAsync(() -> service.isCopybook("", ""));
 
@@ -118,7 +118,6 @@ class AnalysisServiceTest {
     when(copybookIdentificationService.isCopybook(any(), any(), any())).thenReturn(true);
 
     service.analyzeDocument(uri, text, false);
-    verify(documentService, times(0)).updateDocument(uri, text);
     verify(engine, times(0)).analyze(any(), any(), any());
   }
 
@@ -130,7 +129,6 @@ class AnalysisServiceTest {
     when(engine.analyze(any(), any(), any())).thenReturn(prepareAnalysisResult());
 
     service.analyzeDocument(uri, text, false);
-    verify(documentService, times(0)).updateDocument(uri, text);
     verify(engine, times(1)).analyze(any(), any(), any());
   }
 

@@ -95,13 +95,13 @@ public class CobolWorkspaceServiceImpl extends LspEventConsumer implements Works
     Set<FileEvent> changedFiles = new HashSet<>(params.getChanges());
     changedFiles.forEach(
         file -> {
-          String uri = file.getUri();
+          String uri = UriHelper.decode(file.getUri());
           workspaceDocumentGraph.updateContent(uri);
           if (!workspaceDocumentGraph.isFileOpened(uri)) {
             List<String> uris =
                 workspaceDocumentGraph.getAllAssociatedFilesForACopybook(UriHelper.decode(uri));
-            asyncAnalysisService.reanalyseOpenedPrograms(
-                uris, uri, WorkspaceDocumentGraph.EventSource.FILE_SYSTEM);
+            asyncAnalysisService.reanalyseCopybooksAssociatedPrograms(
+                uris, uri, workspaceDocumentGraph.getContent(uri), WorkspaceDocumentGraph.EventSource.FILE_SYSTEM);
           }
         });
   }

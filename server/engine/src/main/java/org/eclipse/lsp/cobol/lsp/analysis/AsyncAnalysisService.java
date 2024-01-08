@@ -18,7 +18,6 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import java.util.*;
 import java.util.concurrent.*;
-import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.common.SubroutineService;
 import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
@@ -119,7 +118,6 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
       notifyAllListeners(AnalysisState.SKIPPED, documentModelService.get(uri), eventSource);
       return analysisResults.get(id);
     }
-    handleRelatedDocuments(uri, text, open, force);
     Executor analysisExecutor = getExecutor(uri);
     CompletableFuture<CobolDocumentModel> value = CompletableFuture.supplyAsync(() -> {
       if (currentRevision < analysisResultsRevisions.get(uri) && !force) {
@@ -157,23 +155,6 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
     return null;
   }
 
-  private void handleRelatedDocuments(String uri, String text, boolean isNew, boolean force) {
-    if (!force) analysisService.updateCache(uri, text, isNew);
-    Set<String> affectedDocumentsForCopybook = documentModelService.findAffectedDocumentsForCopybook(uri, d -> !d.getUri().equals(uri) && d.isOpened());
-    if (!affectedDocumentsForCopybook.isEmpty() && !isNew) {
-      List<CobolDocumentModel> affectedCobolDocumentModels = documentModelService.getAllOpened().stream()
-              .filter(d -> affectedDocumentsForCopybook.contains(d.getUri()) && !analysisService.isCopybook(d.getUri(), d.getText()))
-              .collect(Collectors.toList());
-
-      affectedCobolDocumentModels.forEach(
-          doc -> {
-            LOG.debug("[reanalyzeDocument] Document " + doc.getUri());
-            scheduleAnalysis(
-                doc.getUri(), doc.getText(), analysisResultsRevisions.get(doc.getUri()), false, true, WorkspaceDocumentGraph.EventSource.IDE);
-          });
-    }
-  }
-
   private Executor getExecutor(String uri) {
     synchronized (analysisExecutors) {
       ExecutorService analysisExecutor = analysisExecutors.computeIfAbsent(uri, u -> Executors.newSingleThreadExecutor(THREAD_FACTORY));
@@ -205,17 +186,24 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
    * Trigger reanalyse for the passed document uri's.
    * @param uris
    * @param copybookUri
+   * @param copybookContent
    * @param eventSource
    */
-  public void reanalyseOpenedPrograms(List<String> uris, String copybookUri, WorkspaceDocumentGraph.EventSource eventSource) {
+  public void reanalyseCopybooksAssociatedPrograms(List<String> uris, String copybookUri, String copybookContent, WorkspaceDocumentGraph.EventSource eventSource) {
+    documentModelService.removeDocumentDiagnostics(copybookUri);
     for (String uri : uris) {
       //TODO: update cache directly from workspace document graph
       if (copybookService instanceof CopybookServiceImpl) {
         CopybookServiceImpl copybookServiceImpl = (CopybookServiceImpl) copybookService;
         copybookServiceImpl.getCopybookUsage(uri).stream()
+                .filter(model -> Objects.nonNull(model.getUri()))
                 .filter(model -> model.getUri().equals(copybookUri))
                 .forEach(
-                        copybookModel -> copybookServiceImpl.invalidateCache(copybookModel.getCopybookId()));
+                        copybookModel -> {
+                          copybookServiceImpl.invalidateCache(copybookModel.getCopybookId());
+                          copybookModel.setContent(copybookContent);
+                          copybookServiceImpl.store(copybookModel, true);
+                        });
       }
       subroutineService.invalidateCache();
       LOG.info("Cache invalidated");
