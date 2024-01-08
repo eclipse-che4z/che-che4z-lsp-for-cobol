@@ -26,7 +26,9 @@ import org.eclipse.lsp.cobol.common.AnalysisConfig;
 import org.eclipse.lsp.cobol.common.AnalysisResult;
 import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
+import org.eclipse.lsp.cobol.lsp.WorkspaceDocumentGraph;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
+import org.eclipse.lsp.cobol.service.UriDecodeService;
 import org.eclipse.lsp.cobol.service.delegates.hover.HoverProvider;
 import org.eclipse.lsp.cobol.service.delegates.hover.VariableHover;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
@@ -205,14 +207,14 @@ class TestFileDescriptor {
   private void assertHover(AnalysisResult result) {
     UriDecodeService uriDecodeService = mock(UriDecodeService.class);
     when(uriDecodeService.decode(DOCUMENT_URI)).thenReturn(DOCUMENT_URI);
-    WorkspaceDocumentGraph documentGraph = spy(WorkspaceDocumentGraph.class);
-    HoverProvider provider = new VariableHover(documentGraph, uriDecodeService);
+    WorkspaceDocumentGraph documentGraph = mock(WorkspaceDocumentGraph.class);
+    HoverProvider provider = new VariableHover(uriDecodeService);
     when(documentGraph.isCopybook(anyString())).thenReturn(false);
     final Hover actual =
         provider.getHover(
             new CobolDocumentModel("", "", result),
             new TextDocumentPositionParams(
-                new TextDocumentIdentifier(DOCUMENT_URI), new Position(6, 24)));
+                new TextDocumentIdentifier(DOCUMENT_URI), new Position(6, 24)), documentGraph);
 
     Hover expected = new Hover(ImmutableList.of(Either.forRight(new MarkedString("cobol", HOVER))));
     assertEquals(expected, actual);
