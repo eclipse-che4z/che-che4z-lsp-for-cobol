@@ -106,16 +106,14 @@ class CobolTextDocumentServiceTest {
 
     DidOpenHandler didOpenHandler = new DidOpenHandler(asyncAnalysisService, watcherService, uriDecodeService);
     DidCloseHandler didCloseHandler = new DidCloseHandler(disposableLSPStateService, asyncAnalysisService, documentModelService, watcherService, copybookService, uriDecodeService);
-    DidChangeHandler didChangeHandler = new DidChangeHandler(asyncAnalysisService, uriDecodeService);
+    DidChangeHandler didChangeHandler = new DidChangeHandler(asyncAnalysisService, documentGraph, uriDecodeService);
     DefinitionHandler definitionHandler = new DefinitionHandler(asyncAnalysisService, documentModelService, occurrences, uriDecodeService);
     DocumentSymbolHandler documentSymbolHandler = new DocumentSymbolHandler(asyncAnalysisService, analysisService, documentModelService, uriDecodeService);
     DocumentHighlightHandler documentHighlightHandler = new DocumentHighlightHandler(asyncAnalysisService, occurrences, documentModelService, uriDecodeService);
     ReferencesHandler referencesHandler = new ReferencesHandler(asyncAnalysisService, occurrences, documentModelService, uriDecodeService);
-    HoverHandler hoverHandler = new HoverHandler(asyncAnalysisService, hoverProvider, documentModelService, uriDecodeService);
+    HoverHandler hoverHandler = new HoverHandler(asyncAnalysisService, hoverProvider, documentModelService, documentGraph, uriDecodeService);
     FoldingRangeHandler foldingRangeHandler = new FoldingRangeHandler(documentModelService, asyncAnalysisService, uriDecodeService);
 
-
-//    lspMessageBroker.startEventLoop();
     service = new CobolTextDocumentService(
             lspMessageBroker,
             completionHandler,

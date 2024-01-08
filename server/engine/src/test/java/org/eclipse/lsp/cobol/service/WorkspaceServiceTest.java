@@ -395,9 +395,9 @@ class WorkspaceServiceTest {
     when(localeStore.notifyLocaleStore()).thenReturn(e -> {});
 
     workspaceService.didChangeConfiguration(new DidChangeConfigurationParams(new Object()));
-    CompletableFuture<List<Either<Command, CodeAction>>> waitingedQuery =
+    CompletableFuture<List<Either<Command, CodeAction>>> waitingQuery =
         waitingQuery(lspMessageBroker);
-    waitingedQuery.join();
+    waitingQuery.join();
     lspMessageBroker.stop();
 
     verify(watchingService).addWatchers(emptyList());

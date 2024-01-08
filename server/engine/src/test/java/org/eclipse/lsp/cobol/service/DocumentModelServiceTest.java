@@ -14,20 +14,18 @@
  */
 package org.eclipse.lsp.cobol.service;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import org.eclipse.lsp.cobol.common.AnalysisResult;
 import org.eclipse.lsp.cobol.common.model.tree.RootNode;
 import org.eclipse.lsp4j.Diagnostic;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.mock;
 
 /**
  * Test for DocumentModelService
@@ -37,7 +35,7 @@ class DocumentModelServiceTest {
 
   @BeforeEach
   void init() {
-    service = new DocumentModelService(mock(CopybookReferenceRepo.class));
+    service = new DocumentModelService();
   }
 
   @Test
@@ -108,12 +106,12 @@ class DocumentModelServiceTest {
     CobolDocumentModel documentModel = service.get(uri);
     assertNotNull(documentModel);
 
-    service.updateDocument(uri, UUID.randomUUID().toString());
+    service.removeDocumentDiagnostics(uri);
     diagnostics = service.getOpenedDiagnostic();
     assertEquals(0, diagnostics.get(uri).size());
 
     documentModel = service.get(uri);
-    assertNull(documentModel.getAnalysisResult());
+    assertNotNull(documentModel.getAnalysisResult());
   }
 
   @Test
@@ -134,8 +132,10 @@ class DocumentModelServiceTest {
     service.openDocument(uri, text);
     assertNotNull(service.get(uri));
 
-    service.removeDocument(uri);
-    assertNull(service.get(uri));
+    service.removeDocumentDiagnostics(uri);
+    Map<String, List<Diagnostic>> diagnostics = service.getOpenedDiagnostic();
+    assertEquals(0, diagnostics.get(uri).size());
+    assertNotNull(service.get(uri));
   }
 
 }

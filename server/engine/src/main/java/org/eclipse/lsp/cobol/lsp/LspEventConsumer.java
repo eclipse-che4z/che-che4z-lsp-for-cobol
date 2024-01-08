@@ -28,6 +28,10 @@ public class LspEventConsumer {
   @Getter private final LspMessageBroker lspMessageBroker;
   private final ExecutorService singleThreadExecutor =
       Executors.newSingleThreadExecutor(r -> new Thread(r, "LSP Event Consumer"));
+  private final ExecutorService notificationThreadExecutor =
+          Executors.newSingleThreadExecutor(r -> new Thread(r, "LSP Notification Consumer"));
+  private final ExecutorService queryThreadExecutor =
+          Executors.newSingleThreadExecutor(r -> new Thread(r, "LSP Query Consumer"));
 
   protected LspEventConsumer(LspMessageBroker lspMessageBroker) {
     this.lspMessageBroker = lspMessageBroker;
@@ -40,11 +44,11 @@ public class LspEventConsumer {
    */
   private void handle(LspEvent event) {
     if (event instanceof LspNotification) {
-      ((LspNotification) event).execute();
+      CompletableFuture.runAsync(((LspNotification) event)::execute, notificationThreadExecutor);
       return;
     }
     if (event instanceof LspQuery) {
-      handle((LspQuery<?>) event);
+      CompletableFuture.runAsync(() -> handle((LspQuery<?>) event), queryThreadExecutor);
     }
   }
 
@@ -91,6 +95,7 @@ public class LspEventConsumer {
           } catch (InterruptedException e) {
             throw new RuntimeException(e);
           } finally {
+            LOG.info("LSP Consumer shutting down");
             singleThreadExecutor.shutdown();
           }
           return null;
