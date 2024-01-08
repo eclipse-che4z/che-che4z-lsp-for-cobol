@@ -50,8 +50,6 @@ class AnalysisServiceTest {
   @Mock
   private DocumentModelService documentService;
   @Mock
-  private DocumentContentCache contentCache;
-  @Mock
   private CopybookService copybookService;
 
   @BeforeEach

@@ -364,6 +364,6 @@ public class WorkspaceDocumentGraph implements AnalysisStateListener {
   /** Represent different source for event for the LSP server */
   public enum EventSource {
     FILE_SYSTEM,
-    IDE;
+    IDE
   }
 }

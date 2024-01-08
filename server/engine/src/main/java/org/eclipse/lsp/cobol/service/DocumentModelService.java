@@ -185,15 +185,4 @@ public class DocumentModelService {
 
     return result;
   }
-
-  /**
-   * Collects all documents with given uri list
-   *
-   * @param programs - the uri list
-   * @return a list of documents
-   */
-  @Synchronized
-  public List<CobolDocumentModel> getAll(Set<String> programs) {
-    return programs.stream().map(docs::get).filter(Objects::nonNull).collect(Collectors.toList());
-  }
 }

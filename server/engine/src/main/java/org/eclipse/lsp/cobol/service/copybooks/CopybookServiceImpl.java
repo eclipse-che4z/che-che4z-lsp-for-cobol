@@ -43,7 +43,6 @@ import org.eclipse.lsp.cobol.common.utils.ThreadInterruptionUtil;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
 import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
 import org.eclipse.lsp.cobol.lsp.jrpc.CobolLanguageClient;
-import org.eclipse.lsp.cobol.service.DocumentContentCache;
 
 /**
  * This service processes copybook requests and returns content by its name. The service also caches
@@ -70,8 +69,7 @@ public class CopybookServiceImpl implements CopybookService {
   public CopybookServiceImpl(Provider<CobolLanguageClient> clientProvider,
       FileSystemService files,
       TextPreprocessor preprocessor,
-      CopybookCache copybookCache,
-      DocumentContentCache contentCache) {
+      CopybookCache copybookCache) {
     this.files = files;
     this.clientProvider = clientProvider;
     this.preprocessor = preprocessor;
