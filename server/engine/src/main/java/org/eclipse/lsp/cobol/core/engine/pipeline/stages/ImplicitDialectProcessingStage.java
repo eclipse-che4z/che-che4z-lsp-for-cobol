@@ -31,7 +31,7 @@ import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.core.engine.analysis.AnalysisContext;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectService;
-import org.eclipse.lsp.cobol.core.engine.pipeline.PipelineResult;
+import org.eclipse.lsp.cobol.core.engine.pipeline.StageResult;
 import org.eclipse.lsp.cobol.core.engine.pipeline.Stage;
 import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
 import org.eclipse.lsp4j.Location;
@@ -42,12 +42,12 @@ public class ImplicitDialectProcessingStage implements Stage<DialectOutcome, Cop
   private final DialectService dialectService;
 
   @Override
-  public PipelineResult<DialectOutcome> run(
-      AnalysisContext context, PipelineResult<CopybooksRepository> prevPipelineResult) {
+  public StageResult<DialectOutcome> run(
+      AnalysisContext context, StageResult<CopybooksRepository> prevStageResult) {
     // Implicit dialect processing
-    DialectOutcome dialectOutcome = processImplicitDialects(context, prevPipelineResult.getData());
-    context.setCopybooksRepository(prevPipelineResult.getData());
-    return new PipelineResult<>(dialectOutcome, dialectOutcome.isDialectMissed());
+    DialectOutcome dialectOutcome = processImplicitDialects(context, prevStageResult.getData());
+    context.setCopybooksRepository(prevStageResult.getData());
+    return new StageResult<>(dialectOutcome, dialectOutcome.isDialectMissed());
   }
 
   @Override

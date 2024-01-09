@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Broadcom.
+ * Copyright (c) 2024 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -14,35 +14,18 @@
  */
 package org.eclipse.lsp.cobol.core.engine.pipeline;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.Value;
+import org.eclipse.lsp.cobol.core.engine.analysis.Timing;
+
+import java.util.Map;
 
 /**
- * Processing Pipeline Stage Result
+ * A class to store the pipeline execution results
  */
 @Value
-@AllArgsConstructor
-public class PipelineResult<T> {
-  T data;
-  boolean stopProcessing;
-
-  public PipelineResult(T data) {
-    this.data = data;
-    stopProcessing = false;
-  }
-  /**
-   * Creates an empty stage processing result
-   * @return an empty stage processing result
-   */
-  public static PipelineResult<?> empty() {
-    return new PipelineResult<Void>(null);
-  }
-
-  /**
-   * Indicates if pipeline needs to be stopped after current processing stage
-   * @return true if processing needs to be stopped and false otherwise
-   */
-  public boolean stopProcessing() {
-    return stopProcessing;
-  }
+@RequiredArgsConstructor
+public class PipelineResult {
+  Map<String, Timing> timings;
+  StageResult<?> lastStageResult;
 }

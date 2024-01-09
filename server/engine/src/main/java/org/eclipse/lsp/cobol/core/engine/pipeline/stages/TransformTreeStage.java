@@ -35,7 +35,7 @@ import org.eclipse.lsp.cobol.common.utils.RangeUtils;
 import org.eclipse.lsp.cobol.core.CobolParser;
 import org.eclipse.lsp.cobol.core.engine.analysis.AnalysisContext;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectService;
-import org.eclipse.lsp.cobol.core.engine.pipeline.PipelineResult;
+import org.eclipse.lsp.cobol.core.engine.pipeline.StageResult;
 import org.eclipse.lsp.cobol.core.engine.pipeline.Stage;
 import org.eclipse.lsp.cobol.core.engine.processor.AstProcessor;
 import org.eclipse.lsp.cobol.core.engine.processors.*;
@@ -62,20 +62,20 @@ public class TransformTreeStage implements Stage<ProcessingResult, ParserStageRe
   private final AstProcessor astProcessor;
 
   @Override
-  public PipelineResult<ProcessingResult> run(AnalysisContext context, PipelineResult<ParserStageResult> prevPipelineResult) {
+  public StageResult<ProcessingResult> run(AnalysisContext context, StageResult<ParserStageResult> prevStageResult) {
     // Transform parsed tree to AST
     List<Node> syntaxTree = transformAST(
             context,
             context.getCopybooksRepository(),
-            prevPipelineResult.getData().getTokens(),
-            prevPipelineResult.getData().getTree());
+            prevStageResult.getData().getTokens(),
+            prevStageResult.getData().getTree());
 
     SymbolAccumulatorService symbolAccumulatorService = new SymbolAccumulatorService();
     Node rootNode = processSyntaxTree(context.getConfig(), symbolAccumulatorService, context, syntaxTree);
 
     symbolsRepository.updateSymbols(symbolAccumulatorService.getProgramSymbols());
 
-    return new PipelineResult<>(new ProcessingResult(symbolAccumulatorService.getProgramSymbols(), rootNode));
+    return new StageResult<>(new ProcessingResult(symbolAccumulatorService.getProgramSymbols(), rootNode));
   }
 
   @Override

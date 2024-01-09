@@ -19,6 +19,7 @@ import com.google.inject.AbstractModule;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.Multibinder;
 import com.google.inject.name.Names;
+import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.eclipse.lsp.cobol.cfg.CFASTBuilder;
 import org.eclipse.lsp.cobol.cfg.CFASTBuilderImpl;
 import org.eclipse.lsp.cobol.cli.modules.CliClientProvider;
@@ -49,6 +50,7 @@ import org.eclipse.lsp.cobol.core.preprocessor.delegates.transformer.CobolLinesT
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.transformer.ContinuationLineTransformation;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.writer.CobolLineWriter;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.writer.CobolLineWriterImpl;
+import org.eclipse.lsp.cobol.core.visitor.InterruptingTreeListener;
 import org.eclipse.lsp.cobol.lsp.DisposableLSPStateService;
 import org.eclipse.lsp.cobol.lsp.jrpc.CobolLanguageClient;
 import org.eclipse.lsp.cobol.service.CobolLSPServerStateService;
@@ -93,7 +95,7 @@ public class CliModule extends AbstractModule {
     bind(LocaleStore.class).to(LocaleStoreImpl.class);
     bind(ConfigurationService.class).to(CachingConfigurationService.class);
     bind(CopybookNameService.class).to(CopybookNameServiceImpl.class);
-
+    bind(ParseTreeListener.class).to(InterruptingTreeListener.class);
     bind(String.class)
         .annotatedWith(named("resourceFileLocation"))
         .toInstance("resourceBundles/messages");

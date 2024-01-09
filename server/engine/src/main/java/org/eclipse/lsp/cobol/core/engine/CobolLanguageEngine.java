@@ -37,8 +37,9 @@ import org.eclipse.lsp.cobol.core.engine.analysis.AnalysisContext;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectService;
 import org.eclipse.lsp.cobol.core.engine.errors.ErrorFinalizerService;
 import org.eclipse.lsp.cobol.core.engine.pipeline.Pipeline;
-import org.eclipse.lsp.cobol.core.engine.pipeline.stages.*;
 import org.eclipse.lsp.cobol.core.engine.pipeline.PipelineResult;
+import org.eclipse.lsp.cobol.core.engine.pipeline.stages.*;
+import org.eclipse.lsp.cobol.core.engine.pipeline.StageResult;
 import org.eclipse.lsp.cobol.core.engine.processor.AstProcessor;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolsRepository;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
@@ -170,7 +171,9 @@ public class CobolLanguageEngine {
     AnalysisContext ctx = new AnalysisContext(new ExtendedDocument(resultWithErrors.getResult(), text), analysisConfig);
     ctx.getAccumulatedErrors().addAll(resultWithErrors.getErrors());
 
-    PipelineResult<?> result = pipeline.run(ctx);
+    PipelineResult pipelineResult = pipeline.run(ctx);
+    StageResult<?> result = pipelineResult.getLastStageResult();
+    PerformanceMeasurementUtils.logTiming(pipelineResult.getTimings(), ctx);
 
     if (result.stopProcessing() || !(result.getData() instanceof ProcessingResult)) {
       return toAnalysisResult(new ResultWithErrors<>(

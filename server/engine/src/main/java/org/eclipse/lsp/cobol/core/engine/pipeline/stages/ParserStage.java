@@ -25,7 +25,7 @@ import org.eclipse.lsp.cobol.core.CobolParser;
 import org.eclipse.lsp.cobol.core.AstBuilder;
 import org.eclipse.lsp.cobol.core.SplitParser;
 import org.eclipse.lsp.cobol.core.engine.analysis.AnalysisContext;
-import org.eclipse.lsp.cobol.core.engine.pipeline.PipelineResult;
+import org.eclipse.lsp.cobol.core.engine.pipeline.StageResult;
 import org.eclipse.lsp.cobol.core.engine.pipeline.Stage;
 import org.eclipse.lsp.cobol.core.strategy.CobolErrorStrategy;
 import org.eclipse.lsp.cobol.core.visitor.ParserListener;
@@ -40,11 +40,11 @@ public class ParserStage implements Stage<ParserStageResult, DialectOutcome> {
   private final ParseTreeListener treeListener;
 
   @Override
-  public PipelineResult<ParserStageResult> run(AnalysisContext context, PipelineResult<DialectOutcome> prevPipelineResult) {
+  public StageResult<ParserStageResult> run(AnalysisContext context, StageResult<DialectOutcome> prevStageResult) {
     // Run parser;
     context.setDialectNodes(ImmutableList.<Node>builder()
             .addAll(context.getDialectNodes())
-            .addAll(prevPipelineResult.getData().getDialectNodes())
+            .addAll(prevStageResult.getData().getDialectNodes())
             .build());
     ParserListener listener = new ParserListener(context.getExtendedDocument(), context.getCopybooksRepository());
     AstBuilder parser = new SplitParser(CharStreams.fromString(context.getExtendedDocument().toString()),
@@ -53,7 +53,7 @@ public class ParserStage implements Stage<ParserStageResult, DialectOutcome> {
             treeListener);
     CobolParser.StartRuleContext tree = parser.runParser();
     context.getAccumulatedErrors().addAll(listener.getErrors());
-    return new PipelineResult<>(new ParserStageResult(parser.getTokens(), tree));
+    return new StageResult<>(new ParserStageResult(parser.getTokens(), tree));
   }
 
   @Override
