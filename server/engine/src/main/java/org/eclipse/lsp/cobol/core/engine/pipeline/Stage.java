@@ -23,10 +23,10 @@ public interface Stage<T, R> {
   /**
    * Runs a processing stage
    * @param context - pipeline processing context
-   * @param prevPipelineResult - previous stage result
+   * @param prevStageResult - previous stage result
    * @return the result of the current stage processing
    */
-  PipelineResult<T> run(AnalysisContext context, PipelineResult<R> prevPipelineResult);
+  StageResult<T> run(AnalysisContext context, StageResult<R> prevStageResult);
 
   /**
    * Returns the name of the stage

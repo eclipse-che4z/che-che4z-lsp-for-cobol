@@ -22,7 +22,7 @@ import org.eclipse.lsp.cobol.core.CompilerDirectivesParser;
 import org.eclipse.lsp.cobol.core.engine.analysis.AnalysisContext;
 import org.eclipse.lsp.cobol.core.engine.directives.CompilerDirectivesErrorListener;
 import org.eclipse.lsp.cobol.core.engine.directives.CompilerDirectivesVisitor;
-import org.eclipse.lsp.cobol.core.engine.pipeline.PipelineResult;
+import org.eclipse.lsp.cobol.core.engine.pipeline.StageResult;
 import org.eclipse.lsp.cobol.core.engine.pipeline.Stage;
 import org.eclipse.lsp.cobol.core.strategy.CobolErrorStrategy;
 import org.eclipse.lsp4j.Position;
@@ -45,7 +45,7 @@ public class CompilerDirectivesStage implements Stage<Void, Void> {
   }
 
   @Override
-  public PipelineResult<Void> run(AnalysisContext ctx, PipelineResult<Void> prevPipelineResult) {
+  public StageResult<Void> run(AnalysisContext ctx, StageResult<Void> prevStageResult) {
     String text = ctx.getExtendedDocument().getCurrentText().toString();
 
     String[] lines = NEW_LINE_PATTERN.split(text);
@@ -63,7 +63,7 @@ public class CompilerDirectivesStage implements Stage<Void, Void> {
       ctx.getExtendedDocument().replace(range, newText);
     }
 
-    return new PipelineResult<>(null);
+    return new StageResult<>(null);
   }
 
   private void process(String directives, AnalysisContext ctx, Position startPosition) {

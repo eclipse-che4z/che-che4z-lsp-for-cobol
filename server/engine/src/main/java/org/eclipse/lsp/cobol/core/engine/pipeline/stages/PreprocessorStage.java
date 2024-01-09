@@ -23,7 +23,7 @@ import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
 import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.core.engine.analysis.AnalysisContext;
-import org.eclipse.lsp.cobol.core.engine.pipeline.PipelineResult;
+import org.eclipse.lsp.cobol.core.engine.pipeline.StageResult;
 import org.eclipse.lsp.cobol.core.engine.pipeline.Stage;
 import org.eclipse.lsp.cobol.core.preprocessor.CopybookHierarchy;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.GrammarPreprocessor;
@@ -38,14 +38,14 @@ public class PreprocessorStage implements Stage<CopybooksRepository, DialectOutc
   private final GrammarPreprocessor grammarPreprocessor;
 
   @Override
-  public PipelineResult<CopybooksRepository> run(AnalysisContext context, PipelineResult<DialectOutcome> prevPipelineResult) {
+  public StageResult<CopybooksRepository> run(AnalysisContext context, StageResult<DialectOutcome> prevStageResult) {
     // Preprocessor (replacement, copybooks)
     CopybooksRepository copybooksRepository = runPreprocessor(context.getExtendedDocument().getUri(), context);
-    applyDialectCopybooks(copybooksRepository, prevPipelineResult.getData().getDialectNodes());
+    applyDialectCopybooks(copybooksRepository, prevStageResult.getData().getDialectNodes());
 
-    context.setDialectNodes(prevPipelineResult.getData().getDialectNodes());
+    context.setDialectNodes(prevStageResult.getData().getDialectNodes());
     context.setCopybooksRepository(copybooksRepository);
-    return new PipelineResult<>(copybooksRepository);
+    return new StageResult<>(copybooksRepository);
   }
 
   @Override

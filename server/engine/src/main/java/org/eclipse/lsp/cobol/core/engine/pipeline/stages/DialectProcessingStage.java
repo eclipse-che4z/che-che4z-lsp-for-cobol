@@ -22,7 +22,7 @@ import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.core.engine.analysis.AnalysisContext;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectService;
-import org.eclipse.lsp.cobol.core.engine.pipeline.PipelineResult;
+import org.eclipse.lsp.cobol.core.engine.pipeline.StageResult;
 import org.eclipse.lsp.cobol.core.engine.pipeline.Stage;
 
 /**
@@ -34,11 +34,11 @@ public class DialectProcessingStage implements Stage<DialectOutcome, Void> {
   private final DialectService dialectService;
 
   @Override
-  public PipelineResult<DialectOutcome> run(AnalysisContext context, PipelineResult<Void> prevPipelineResult) {
+  public StageResult<DialectOutcome> run(AnalysisContext context, StageResult<Void> prevStageResult) {
     // Dialect processing
     dialectService.updateDialects(context.getConfig().getDialectRegistry());
     DialectOutcome dialectOutcome = processDialects(context);
-    return new PipelineResult<>(dialectOutcome, dialectOutcome.isDialectMissed());
+    return new StageResult<>(dialectOutcome, dialectOutcome.isDialectMissed());
   }
 
   @Override
