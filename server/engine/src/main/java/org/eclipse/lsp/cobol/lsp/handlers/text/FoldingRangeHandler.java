@@ -55,10 +55,7 @@ public class FoldingRangeHandler {
    */
   public List<FoldingRange> foldingRange(FoldingRangeRequestParams params) {
     String uri = uriDecodeService.decode(params.getTextDocument().getUri());
-    Node rootNode =
-        documentService.isDocumentSynced(uri)
-            ? documentService.get(uri).getAnalysisResult().getRootNode()
-            : null;
+    Node rootNode = documentService.get(uri).getAnalysisResult().getRootNode();
     return new ArrayList<>(DocumentServiceHelper.getFoldingRange(rootNode, uri));
   }
 
@@ -71,8 +68,9 @@ public class FoldingRangeHandler {
   public LspEvent<List<FoldingRange>> createEvent(FoldingRangeRequestParams params) {
     String uri = uriDecodeService.decode(params.getTextDocument().getUri());
     return new LspEvent<List<FoldingRange>>() {
-      final List<LspEventDependency> lspEventDependencies = ImmutableList.of(
-              asyncAnalysisService.createDependencyOn(uri));
+      final List<LspEventDependency> lspEventDependencies = ImmutableList.of(() ->
+              documentService.get(uri).getAnalysisResult() != null
+                      && documentService.get(uri).getAnalysisResult().getRootNode() != null);
       final ImmutableList<LspEventCancelCondition> lspEventCancelConditions = ImmutableList.of(
               asyncAnalysisService.createCancelConditionOnClose(uri));
 
