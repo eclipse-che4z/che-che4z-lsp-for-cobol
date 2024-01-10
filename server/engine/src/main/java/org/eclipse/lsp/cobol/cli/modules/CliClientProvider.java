@@ -19,10 +19,7 @@ import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import lombok.Setter;
 import org.eclipse.lsp.cobol.lsp.jrpc.CobolLanguageClient;
-import org.eclipse.lsp4j.MessageActionItem;
-import org.eclipse.lsp4j.MessageParams;
-import org.eclipse.lsp4j.PublishDiagnosticsParams;
-import org.eclipse.lsp4j.ShowMessageRequestParams;
+import org.eclipse.lsp4j.*;
 
 import java.io.File;
 import java.net.URI;
@@ -70,6 +67,11 @@ public class CliClientProvider implements Provider<CobolLanguageClient> {
     @Override
     public CompletableFuture<MessageActionItem> showMessageRequest(ShowMessageRequestParams requestParams) {
       throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public CompletableFuture<List<Object>> configuration(ConfigurationParams configurationParams) {
+      return CompletableFuture.completedFuture(null);
     }
 
     @Override
