@@ -51,7 +51,6 @@ import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.eclipse.lsp4j.services.WorkspaceService;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
@@ -321,7 +320,8 @@ class WorkspaceServiceTest {
     String path = "foo/bar";
     arr.add(new JsonPrimitive(path));
 
-    when(copybookNameService.copybookLocalFolders(null)).thenReturn(completedFuture(emptyList()));
+    CompletableFuture<List<String>> copybookFuture = completedFuture(emptyList());
+    when(copybookNameService.copybookLocalFolders(null)).thenReturn(copybookFuture);
     when(settingsService.fetchConfiguration(LOCALE.label))
         .thenReturn(completedFuture(singletonList("LOCALE")));
     when(settingsService.fetchConfiguration(LOGGING_LEVEL.label))
@@ -330,6 +330,7 @@ class WorkspaceServiceTest {
     when(localeStore.notifyLocaleStore()).thenReturn(e -> {});
 
     workspaceService.didChangeConfiguration(new DidChangeConfigurationParams(localeStore));
+    copybookFuture.join();
     CompletableFuture<List<Either<Command, CodeAction>>> waitingQuery =
         waitingQuery(lspMessageBroker);
     waitingQuery.join();
@@ -352,7 +353,6 @@ class WorkspaceServiceTest {
 
   /** Test no watchers added or removed when the path is empty */
   @Test
-  @Disabled("fails intermittently, need investigation")
   void testChangeConfigurationNoPathToRegister() throws InterruptedException {
     SettingsService settingsService = mock(SettingsService.class);
     WatcherService watchingService = mock(WatcherService.class);
@@ -389,19 +389,20 @@ class WorkspaceServiceTest {
             asyncAnalysisService, uriDecodeService);
     ((LspEventConsumer) workspaceService).startConsumer();
 
-    when(copybookNameService.copybookLocalFolders(null)).thenReturn(completedFuture(emptyList()));
-    CompletableFuture<List<Object>> listCompletableFuture = completedFuture(singletonList("LOCALE"));
+    CompletableFuture<List<String>> copybookFuture = completedFuture(emptyList());
+    when(copybookNameService.copybookLocalFolders(null)).thenReturn(copybookFuture);
     when(settingsService.fetchConfiguration(LOCALE.label))
-        .thenReturn(listCompletableFuture);
+        .thenReturn(completedFuture(singletonList("LOCALE")));
     when(settingsService.fetchConfiguration(LOGGING_LEVEL.label))
         .thenReturn(completedFuture(singletonList("INFO")));
     when(watchingService.getWatchingFolders()).thenReturn(emptyList());
     when(localeStore.notifyLocaleStore()).thenReturn(e -> {});
 
     workspaceService.didChangeConfiguration(new DidChangeConfigurationParams(new Object()));
+    copybookFuture.join();
     CompletableFuture<List<Either<Command, CodeAction>>> waitingQuery =
         waitingQuery(lspMessageBroker);
-    listCompletableFuture.join();
+    CompletableFuture.<List<Object>>completedFuture(singletonList("LOCALE")).join();
     waitingQuery.join();
     lspMessageBroker.stop();
 

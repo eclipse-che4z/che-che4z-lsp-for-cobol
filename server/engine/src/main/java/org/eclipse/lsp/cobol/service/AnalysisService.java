@@ -131,13 +131,13 @@ public class AnalysisService {
                   uri, CopybookProcessingMode.ENABLED);
       AnalysisConfig config = configurationService.getConfig(uri, copybookProcessingMode);
       AnalysisResult result = engine.analyze(uri, text, config);
-      documentService.processAnalysisResult(uri, result);
+      documentService.processAnalysisResult(uri, result, text);
       ThreadInterruptionUtil.checkThreadInterrupted();
       copybookService.sendCopybookDownloadRequest(
               uri, DocumentServiceHelper.extractCopybookUris(result), copybookProcessingMode);
       LOG.debug("[doAnalysis] Document " + uri + " analyzed: " + result.getDiagnostics());
     } catch (Exception e) {
-      documentService.processAnalysisResult(uri, AnalysisResult.builder().build());
+      documentService.processAnalysisResult(uri, AnalysisResult.builder().build(), text);
       LOG.debug(format("An exception thrown while applying %s for %s:", "analysis", uri));
       LOG.error(format("An exception thrown while applying %s for %s:", "analysis", uri), e);
       throw e;
