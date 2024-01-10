@@ -90,7 +90,7 @@ class AnalysisServiceTest {
     when(copybookIdentificationService.isCopybook(any(), any(), any())).thenReturn(true);
 
     service.analyzeDocument(uri, text, true);
-    verify(documentService, times(0)).processAnalysisResult(eq(uri), any());
+    verify(documentService, times(0)).processAnalysisResult(eq(uri), any(), anyString());
     verify(engine, times(0)).analyze(any(), any(), any());
   }
 
@@ -105,7 +105,7 @@ class AnalysisServiceTest {
     when(engine.analyze(any(), any(), any())).thenReturn(result);
 
     service.analyzeDocument(uri, text, true);
-    verify(documentService, times(1)).processAnalysisResult(eq(uri), any());
+    verify(documentService, times(1)).processAnalysisResult(eq(uri), any(), anyString());
     verify(engine, times(1)).analyze(any(), any(), any());
   }
 
