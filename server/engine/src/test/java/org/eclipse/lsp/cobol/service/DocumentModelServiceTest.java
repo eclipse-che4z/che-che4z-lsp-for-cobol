@@ -72,7 +72,7 @@ class DocumentModelServiceTest {
     service.openDocument(uri, UUID.randomUUID().toString());
     assertFalse(service.isDocumentSynced(uri));
 
-    service.processAnalysisResult(uri, AnalysisResult.builder().build());
+    service.processAnalysisResult(uri, AnalysisResult.builder().build(), "text");
     assertTrue(service.isDocumentSynced(uri));
   }
 
@@ -81,10 +81,10 @@ class DocumentModelServiceTest {
     String uri1 = UUID.randomUUID().toString();
     String uri2 = UUID.randomUUID().toString();
     service.openDocument(uri1, UUID.randomUUID().toString());
-    service.processAnalysisResult(uri1, createAnalysisResult(uri1));
+    service.processAnalysisResult(uri1, createAnalysisResult(uri1), "text");
 
     service.openDocument(uri2, UUID.randomUUID().toString());
-    service.processAnalysisResult(uri2, createAnalysisResult(uri2));
+    service.processAnalysisResult(uri2, createAnalysisResult(uri2), "text");
 
     service.closeDocument(uri1);
     Map<String, List<Diagnostic>> diagnostics = service.getOpenedDiagnostic();
@@ -98,7 +98,7 @@ class DocumentModelServiceTest {
   void testInvalidate() {
     String uri = UUID.randomUUID().toString();
     service.openDocument(uri, UUID.randomUUID().toString());
-    service.processAnalysisResult(uri, createAnalysisResult(uri));
+    service.processAnalysisResult(uri, createAnalysisResult(uri), "text");
 
     Map<String, List<Diagnostic>> diagnostics = service.getOpenedDiagnostic();
     assertEquals(1, diagnostics.get(uri).size());
@@ -119,7 +119,7 @@ class DocumentModelServiceTest {
     String uri = UUID.randomUUID().toString();
     String text = UUID.randomUUID().toString();
     service.openDocument(uri, text);
-    service.processAnalysisResult(uri, createAnalysisResult(uri));
+    service.processAnalysisResult(uri, createAnalysisResult(uri), text);
 
     assertTrue(service.isDocumentSynced(uri));
   }
