@@ -42,7 +42,7 @@ public class DirtyCacheHandlerService {
   private LspEvent<Object> getLspEvent() {
     return new LspEvent<Object>() {
       @Override
-      public Object execute() {
+      public Object execute() throws InterruptedException {
         cacheIsDirty.compareAndSet(true, false);
         asyncAnalysisService.reanalyseOpenedPrograms();
         return null;
