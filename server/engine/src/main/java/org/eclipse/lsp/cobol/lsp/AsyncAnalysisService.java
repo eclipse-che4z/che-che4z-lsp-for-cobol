@@ -178,12 +178,23 @@ public class AsyncAnalysisService {
   /**
    * Trigger reanalyse of opened programs.
    */
-  public void reanalyseOpenedPrograms() {
+  public void reanalyseOpenedPrograms() throws InterruptedException {
+    List<CobolDocumentModel> openDocuments = documentModelService.getAllOpened()
+            .stream().filter(d -> !analysisService.isCopybook(d.getUri(), d.getText())).collect(Collectors.toList());
+    boolean analysisInProgress;
+    do {
+      analysisInProgress = openDocuments.stream()
+              .filter(model -> model.getLastAnalysisResult() != null)
+              .map(model -> makeId(model.getUri(), analysisResultsRevisions.get(model.getUri())))
+              .anyMatch(id -> !analysisResults.get(id).isDone());
+      LOG.debug(" re-analysis is waiting for prev analysis to finish");
+      TimeUnit.MILLISECONDS.sleep(100);
+    } while (analysisInProgress);
+
     copybookService.invalidateCache();
     subroutineService.invalidateCache();
     LOG.info("Cache invalidated");
-    documentModelService.getAllOpened()
-            .stream().filter(d -> !analysisService.isCopybook(d.getUri(), d.getText()))
+    openDocuments
             .forEach(doc -> scheduleAnalysis(doc.getUri(), doc.getText(), analysisResultsRevisions.get(doc.getUri()), false, true));
   }
 

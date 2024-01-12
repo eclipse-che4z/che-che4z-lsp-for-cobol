@@ -15,6 +15,7 @@
 package org.eclipse.lsp.cobol.lsp.handlers.workspace;
 
 import com.google.inject.Inject;
+import java.util.List;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.lsp.AsyncAnalysisService;
@@ -22,8 +23,6 @@ import org.eclipse.lsp.cobol.lsp.DisposableLSPStateService;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookNameService;
 import org.eclipse.lsp4j.DidChangeWatchedFilesParams;
 import org.eclipse.lsp4j.FileEvent;
-
-import java.util.List;
 
 /**
  * LSP DidChangeWatchedFiles Handler
@@ -47,7 +46,7 @@ public class DidChangeWatchedFilesHandler {
    *
    * @param params DidChangeWatchedFilesParams
    */
-  public void didChangeWatchedFiles(@NonNull DidChangeWatchedFilesParams params) {
+  public void didChangeWatchedFiles(@NonNull DidChangeWatchedFilesParams params) throws InterruptedException {
     if (disposableLSPStateService.isServerShutdown()) return;
     if (isRelevant(params.getChanges())) {
       copybookNameService.collectLocalCopybookNames();

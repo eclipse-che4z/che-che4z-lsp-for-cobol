@@ -14,7 +14,12 @@
  */
 package org.eclipse.lsp.cobol.lsp.handlers.workspace;
 
+import static java.util.stream.Collectors.toList;
+import static org.eclipse.lsp.cobol.service.settings.SettingsParametersEnum.LOCALE;
+import static org.eclipse.lsp.cobol.service.settings.SettingsParametersEnum.LOGGING_LEVEL;
+
 import com.google.inject.Inject;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.common.message.LocaleStore;
 import org.eclipse.lsp.cobol.common.message.MessageService;
@@ -26,12 +31,6 @@ import org.eclipse.lsp.cobol.service.copybooks.CopybookNameService;
 import org.eclipse.lsp.cobol.service.delegates.completions.Keywords;
 import org.eclipse.lsp.cobol.service.settings.SettingsService;
 import org.eclipse.lsp4j.DidChangeConfigurationParams;
-
-import java.util.List;
-
-import static java.util.stream.Collectors.toList;
-import static org.eclipse.lsp.cobol.service.settings.SettingsParametersEnum.LOCALE;
-import static org.eclipse.lsp.cobol.service.settings.SettingsParametersEnum.LOGGING_LEVEL;
 
 /**
  * LSP DidChangeConfiguration Handler
@@ -76,7 +75,17 @@ public class DidChangeConfigurationHandler {
     }
 
     messageService.reloadMessages();
-    copybookNameService.copybookLocalFolders(null).thenAccept(this::acceptSettingsChange);
+    copybookNameService
+        .copybookLocalFolders(null)
+        .thenAccept(
+            localFolders -> {
+              try {
+                acceptSettingsChange(localFolders);
+              } catch (InterruptedException e) {
+                LOG.error("InterruptedException while accepting settings changes");
+                Thread.currentThread().interrupt();
+              }
+            });
 
     settingsService.fetchConfiguration(LOCALE.label).thenAccept(localeStore.notifyLocaleStore());
     settingsService.fetchConfiguration(LOGGING_LEVEL.label).thenAccept(LogLevelUtils.updateLogLevel());
@@ -84,7 +93,7 @@ public class DidChangeConfigurationHandler {
     keywords.updateStorage();
   }
 
-  private void acceptSettingsChange(List<String> localFolders) {
+  private void acceptSettingsChange(List<String> localFolders) throws InterruptedException {
     List<String> watchingFolders = watchingService.getWatchingFolders();
 
     updateWatchers(localFolders, watchingFolders);
