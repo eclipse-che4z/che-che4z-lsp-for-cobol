@@ -59,7 +59,8 @@ public class DefinitionHandler {
    */
   public Either<List<? extends Location>, List<? extends LocationLink>> definition(DefinitionParams params) throws ExecutionException, InterruptedException {
     CobolDocumentModel doc = documentModelService.get(uriDecodeService.decode(params.getTextDocument().getUri()));
-    return Either.forLeft(occurrences.findDefinitions(doc, params));
+    List<Location> definitions = occurrences.findDefinitions(doc, params);
+    return Either.forLeft(HandlerUtility.mapToOriginalLocation(definitions, uriDecodeService));
   }
 
   /**
