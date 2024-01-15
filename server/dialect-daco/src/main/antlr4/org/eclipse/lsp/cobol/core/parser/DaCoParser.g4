@@ -16,7 +16,19 @@ parser grammar DaCoParser;
 options {tokenVocab = DaCoLexer;  superClass = MessageServiceParser;}
 
 startRule: .*? dacoRules* EOF;
-dacoRules: dacoStatements .*?;
+dacoRules: (dacoStatements | dacoSections) .*?;
+
+dacoSections
+    : dacoControlSection
+    ;
+
+dacoControlSection
+    : DACO_CONTROL SECTION DOT_FS dacoControlSectionParagraph
+    ;
+
+dacoControlSectionParagraph
+    : ROW BUFFER qualifiedDataName IS YES DOT_FS
+    ;
 
 dacoStatements
     : readTransactionStatement
