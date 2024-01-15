@@ -14,14 +14,13 @@
  */
 package org.eclipse.lsp.cobol.service.delegates.hover;
 
+import com.google.common.collect.ImmutableList;
 import javax.annotation.Nullable;
 import lombok.NonNull;
-import org.eclipse.lsp.cobol.lsp.WorkspaceDocumentGraph;
+import org.eclipse.lsp.cobol.lsp.SourceUnitGraph;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
-import org.eclipse.lsp4j.Hover;
-import org.eclipse.lsp4j.MarkupContent;
-import org.eclipse.lsp4j.MarkupKind;
-import org.eclipse.lsp4j.TextDocumentPositionParams;
+import org.eclipse.lsp4j.*;
+import org.eclipse.lsp4j.jsonrpc.messages.Either;
 
 /**
  * This class provides Hover information for some particular position in text.
@@ -36,7 +35,7 @@ public interface HoverProvider {
    * @return the hover example or null if hover is no available
    */
   @Nullable
-  Hover getHover(@Nullable CobolDocumentModel document, @NonNull TextDocumentPositionParams position, WorkspaceDocumentGraph documentGraph);
+  Hover getHover(@Nullable CobolDocumentModel document, @NonNull TextDocumentPositionParams position, SourceUnitGraph documentGraph);
 
   /**
    * Get the passed content as {@link Hover}
@@ -45,6 +44,10 @@ public interface HoverProvider {
    */
   @Nullable
   default Hover getHover(@NonNull String content) {
-    return new Hover(new MarkupContent(MarkupKind.MARKDOWN, content));
+    return new Hover(
+            ImmutableList.of(
+                    Either.forRight(
+                            // Hover coloring didn't work if the language is "COBOL" (our language ID)
+                            new MarkedString("cobol", content))));
   }
 }

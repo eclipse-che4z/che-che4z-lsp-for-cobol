@@ -17,7 +17,7 @@ package org.eclipse.lsp.cobol.lsp.handlers.text;
 import com.google.inject.Inject;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.lsp.cobol.lsp.WorkspaceDocumentGraph;
+import org.eclipse.lsp.cobol.lsp.SourceUnitGraph;
 import org.eclipse.lsp.cobol.lsp.analysis.AsyncAnalysisService;
 import org.eclipse.lsp.cobol.lsp.handlers.HandlerUtility;
 import org.eclipse.lsp.cobol.service.UriDecodeService;
@@ -29,14 +29,14 @@ import org.eclipse.lsp4j.DidChangeTextDocumentParams;
 @Slf4j
 public class DidChangeHandler {
   private final AsyncAnalysisService asyncAnalysisService;
-  private final WorkspaceDocumentGraph workspaceDocumentGraph;
+  private final SourceUnitGraph sourceUnitGraph;
   private final UriDecodeService uriDecodeService;
 
   @Inject
   public DidChangeHandler(
-      AsyncAnalysisService asyncAnalysisService, WorkspaceDocumentGraph workspaceDocumentGraph, UriDecodeService uriDecodeService) {
+          AsyncAnalysisService asyncAnalysisService, SourceUnitGraph sourceUnitGraph, UriDecodeService uriDecodeService) {
     this.asyncAnalysisService = asyncAnalysisService;
-    this.workspaceDocumentGraph = workspaceDocumentGraph;
+    this.sourceUnitGraph = sourceUnitGraph;
     this.uriDecodeService = uriDecodeService;
   }
 
@@ -47,16 +47,16 @@ public class DidChangeHandler {
    * @param eventSource
    */
   public void didChange(
-      DidChangeTextDocumentParams params, WorkspaceDocumentGraph.EventSource eventSource) {
+      DidChangeTextDocumentParams params, SourceUnitGraph.EventSource eventSource) {
     String uri = uriDecodeService.decode(params.getTextDocument().getUri());
     if (!HandlerUtility.isUriSupported(uri)) {
       return;
     }
     String text = params.getContentChanges().get(0).getText();
-    if (workspaceDocumentGraph.isCopybook(uri)) {
-      workspaceDocumentGraph.updateContent(uri, text);
-      List<String> allAssociatedFilesForACopybook = workspaceDocumentGraph.getAllAssociatedFilesForACopybook(uri);
-      asyncAnalysisService.reanalyseCopybooksAssociatedPrograms(allAssociatedFilesForACopybook, uri, text, WorkspaceDocumentGraph.EventSource.IDE);
+    if (sourceUnitGraph.isCopybook(uri)) {
+      sourceUnitGraph.updateContent(uri, text);
+      List<String> allAssociatedFilesForACopybook = sourceUnitGraph.getAllAssociatedFilesForACopybook(uri);
+      asyncAnalysisService.reanalyseCopybooksAssociatedPrograms(allAssociatedFilesForACopybook, uri, text, SourceUnitGraph.EventSource.IDE);
       return;
     }
     asyncAnalysisService.scheduleAnalysis(

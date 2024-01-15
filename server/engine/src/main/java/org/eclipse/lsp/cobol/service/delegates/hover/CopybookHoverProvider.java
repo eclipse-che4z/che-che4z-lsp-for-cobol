@@ -16,14 +16,13 @@ package org.eclipse.lsp.cobol.service.delegates.hover;
 
 import com.google.inject.Inject;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import javax.annotation.Nullable;
 import lombok.NonNull;
 import org.eclipse.lsp.cobol.common.AnalysisResult;
 import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.common.utils.RangeUtils;
-import org.eclipse.lsp.cobol.lsp.WorkspaceDocumentGraph;
+import org.eclipse.lsp.cobol.lsp.SourceUnitGraph;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp.cobol.service.UriDecodeService;
 import org.eclipse.lsp4j.Hover;
@@ -43,11 +42,11 @@ public class CopybookHoverProvider implements HoverProvider {
 
   @Nullable
   @Override
-  public Hover getHover(@Nullable CobolDocumentModel document, @NonNull TextDocumentPositionParams position, WorkspaceDocumentGraph documentGraph) {
+  public Hover getHover(@Nullable CobolDocumentModel document, @NonNull TextDocumentPositionParams position, SourceUnitGraph documentGraph) {
     String uri = uriDecodeService.decode(position.getTextDocument().getUri());
     Position hoverPosition = position.getPosition();
     if (documentGraph.isCopybook(uri)) {
-      List<WorkspaceDocumentGraph.NodeV> containedCopybookNode = documentGraph.getInjectedCopybookNode(uri, hoverPosition);
+      List<SourceUnitGraph.NodeV> containedCopybookNode = documentGraph.getInjectedCopybookNode(uri, hoverPosition);
       if (!containedCopybookNode.isEmpty()) {
         return getHover(containedCopybookNode.get(0).getContent());
       }
@@ -58,8 +57,8 @@ public class CopybookHoverProvider implements HoverProvider {
             .flatMap(root -> RangeUtils.findNodeByPosition(root, uri, hoverPosition))
             .filter(CopyNode.class::isInstance)
             .map(CopyNode.class::cast)
+            .filter(node -> node.getUri() != null)
             .map(documentGraph::getCopyNodeContent)
-            .filter(Objects::nonNull)
             .map(this::getHover)
             .orElse(null);
   }

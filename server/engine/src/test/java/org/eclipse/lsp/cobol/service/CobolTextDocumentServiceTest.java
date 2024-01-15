@@ -77,7 +77,7 @@ class CobolTextDocumentServiceTest {
   protected Set<HoverProvider> hoverProvider;
 
   @Mock
-  protected WorkspaceDocumentGraph documentGraph;
+  protected SourceUnitGraph documentGraph;
 
   @Mock
   LspMessageBroker lspMessageBroker;

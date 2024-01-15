@@ -21,7 +21,7 @@ import java.util.concurrent.ExecutionException;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.lsp.LspEventDependency;
 import org.eclipse.lsp.cobol.lsp.LspQuery;
-import org.eclipse.lsp.cobol.lsp.WorkspaceDocumentGraph;
+import org.eclipse.lsp.cobol.lsp.SourceUnitGraph;
 import org.eclipse.lsp.cobol.lsp.analysis.AsyncAnalysisService;
 import org.eclipse.lsp.cobol.lsp.events.queries.HoverLspQuery;
 import org.eclipse.lsp.cobol.service.DocumentModelService;
@@ -38,11 +38,11 @@ public class HoverHandler {
   private final AsyncAnalysisService asyncAnalysisService;
   private final Set<HoverProvider> hoverProvider;
   private final DocumentModelService documentModelService;
-  private final WorkspaceDocumentGraph documentGraph;
+  private final SourceUnitGraph documentGraph;
   private final UriDecodeService uriDecodeService;
 
   @Inject
-  public HoverHandler(AsyncAnalysisService asyncAnalysisService, Set<HoverProvider> hoverProvider, DocumentModelService documentModelService, WorkspaceDocumentGraph documentGraph, UriDecodeService uriDecodeService) {
+  public HoverHandler(AsyncAnalysisService asyncAnalysisService, Set<HoverProvider> hoverProvider, DocumentModelService documentModelService, SourceUnitGraph documentGraph, UriDecodeService uriDecodeService) {
     this.asyncAnalysisService = asyncAnalysisService;
     this.hoverProvider = hoverProvider;
     this.documentModelService = documentModelService;

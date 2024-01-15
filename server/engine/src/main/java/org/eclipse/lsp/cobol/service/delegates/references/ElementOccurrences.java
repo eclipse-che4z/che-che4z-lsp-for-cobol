@@ -25,7 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.common.AnalysisResult;
 import org.eclipse.lsp.cobol.common.model.DefinedAndUsedStructure;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolsRepository;
-import org.eclipse.lsp.cobol.lsp.WorkspaceDocumentGraph;
+import org.eclipse.lsp.cobol.lsp.SourceUnitGraph;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp.cobol.service.UriDecodeService;
 import org.eclipse.lsp4j.*;
@@ -36,19 +36,19 @@ import org.eclipse.lsp4j.*;
 @Slf4j
 public class ElementOccurrences implements Occurrences {
   private final UriDecodeService uriDecodeService;
-  private final WorkspaceDocumentGraph workspaceDocumentGraph;
+  private final SourceUnitGraph sourceUnitGraph;
 
   @Inject
-  public ElementOccurrences(WorkspaceDocumentGraph workspaceDocumentGraph, UriDecodeService uriDecodeService) {
+  public ElementOccurrences(SourceUnitGraph sourceUnitGraph, UriDecodeService uriDecodeService) {
     this.uriDecodeService = uriDecodeService;
-    this.workspaceDocumentGraph = workspaceDocumentGraph;
+    this.sourceUnitGraph = sourceUnitGraph;
   }
 
   @Override
   public @NonNull List<Location> findDefinitions(
       @NonNull CobolDocumentModel document, @NonNull TextDocumentPositionParams position) {
     String uri = uriDecodeService.decode(position.getTextDocument().getUri());
-    if (workspaceDocumentGraph.isCopybook(uri)) {
+    if (sourceUnitGraph.isCopybook(uri)) {
       return getCopybookLocation(position, uri);
     }
     return SymbolsRepository.findElementByPosition(uri,
@@ -59,9 +59,9 @@ public class ElementOccurrences implements Occurrences {
 
   private List<Location> getCopybookLocation(TextDocumentPositionParams position, String uri) {
     List<Location> result =  new ArrayList<>();
-    List<WorkspaceDocumentGraph.NodeV> injectedCopybookNode =
-        workspaceDocumentGraph.getInjectedCopybookNode(uri, position.getPosition());
-    for (WorkspaceDocumentGraph.NodeV nodeV : injectedCopybookNode) {
+    List<SourceUnitGraph.NodeV> injectedCopybookNode =
+        sourceUnitGraph.getInjectedCopybookNode(uri, position.getPosition());
+    for (SourceUnitGraph.NodeV nodeV : injectedCopybookNode) {
       Location location = new Location(nodeV.getUri(), new Range(new Position(0, 0), new Position(0, 0)));
       result.add(location);
     }

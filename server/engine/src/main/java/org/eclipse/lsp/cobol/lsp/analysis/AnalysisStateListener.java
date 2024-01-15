@@ -14,7 +14,7 @@
  */
 package org.eclipse.lsp.cobol.lsp.analysis;
 
-import org.eclipse.lsp.cobol.lsp.WorkspaceDocumentGraph;
+import org.eclipse.lsp.cobol.lsp.SourceUnitGraph;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 
 /**
@@ -27,5 +27,5 @@ public interface AnalysisStateListener {
      * @param model
      * @param eventSource
      */
-    void notifyState(AnalysisState state, CobolDocumentModel model, WorkspaceDocumentGraph.EventSource eventSource);
+    void notifyState(AnalysisState state, CobolDocumentModel model, SourceUnitGraph.EventSource eventSource);
 }

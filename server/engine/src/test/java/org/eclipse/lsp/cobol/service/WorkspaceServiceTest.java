@@ -78,7 +78,7 @@ class WorkspaceServiceTest {
     CopybookNameService copybookNameService = mock(CopybookNameService.class);
     MessageService messageService = mock(MessageService.class);
     AsyncAnalysisService asyncAnalysisService = mock(AsyncAnalysisService.class);
-    WorkspaceDocumentGraph documentGraph = mock(WorkspaceDocumentGraph.class);
+    SourceUnitGraph documentGraph = mock(SourceUnitGraph.class);
     LspMessageBroker messageDispatcher = mock(LspMessageBroker.class);
 
     DidChangeConfigurationHandler didChangeConfigurationHandler = new DidChangeConfigurationHandler(stateService,
@@ -138,7 +138,7 @@ class WorkspaceServiceTest {
     ExecuteCommandHandler executeCommandHandler = new ExecuteCommandHandler(stateService, asyncAnalysisService);
 
     LspMessageBroker lspMessageBroker = new LspMessageBroker();
-    WorkspaceDocumentGraph documentGraph = mock(WorkspaceDocumentGraph.class);
+    SourceUnitGraph documentGraph = mock(SourceUnitGraph.class);
     WorkspaceService service = new CobolWorkspaceServiceImpl(
             lspMessageBroker,
             executeCommandHandler,
@@ -183,7 +183,7 @@ class WorkspaceServiceTest {
         new ExecuteCommandHandler(stateService, asyncAnalysisService);
 
     LspMessageBroker lspMessageBroker = new LspMessageBroker();
-    WorkspaceDocumentGraph documentGraph = mock(WorkspaceDocumentGraph.class);
+    SourceUnitGraph documentGraph = mock(SourceUnitGraph.class);
     WorkspaceService workspaceService =
         new CobolWorkspaceServiceImpl(
             lspMessageBroker,
@@ -245,7 +245,7 @@ class WorkspaceServiceTest {
         new ExecuteCommandHandler(stateService, asyncAnalysisService);
 
     LspMessageBroker lspMessageBroker = new LspMessageBroker();
-    WorkspaceDocumentGraph documentGraph = mock(WorkspaceDocumentGraph.class);
+    SourceUnitGraph documentGraph = mock(SourceUnitGraph.class);
     WorkspaceService workspaceService =
         new CobolWorkspaceServiceImpl(
             lspMessageBroker,
@@ -305,7 +305,7 @@ class WorkspaceServiceTest {
         new ExecuteCommandHandler(stateService, asyncAnalysisService);
 
     LspMessageBroker lspMessageBroker = new LspMessageBroker();
-    WorkspaceDocumentGraph documentGraph = mock(WorkspaceDocumentGraph.class);
+    SourceUnitGraph documentGraph = mock(SourceUnitGraph.class);
     WorkspaceService workspaceService =
         new CobolWorkspaceServiceImpl(
             lspMessageBroker,
@@ -379,7 +379,7 @@ class WorkspaceServiceTest {
         new ExecuteCommandHandler(stateService, asyncAnalysisService);
 
     LspMessageBroker lspMessageBroker = new LspMessageBroker();
-    WorkspaceDocumentGraph documentGraph = mock(WorkspaceDocumentGraph.class);
+    SourceUnitGraph documentGraph = mock(SourceUnitGraph.class);
     WorkspaceService workspaceService =
         new CobolWorkspaceServiceImpl(
             lspMessageBroker,
@@ -460,7 +460,7 @@ class WorkspaceServiceTest {
         new ExecuteCommandHandler(stateService, asyncAnalysisService);
 
     LspMessageBroker lspMessageBroker = new LspMessageBroker();
-    WorkspaceDocumentGraph documentGraph = mock(WorkspaceDocumentGraph.class);
+    SourceUnitGraph documentGraph = mock(SourceUnitGraph.class);
     WorkspaceService service =
         new CobolWorkspaceServiceImpl(
             lspMessageBroker,

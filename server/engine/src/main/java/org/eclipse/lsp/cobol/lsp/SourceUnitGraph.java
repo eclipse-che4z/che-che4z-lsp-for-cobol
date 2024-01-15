@@ -34,14 +34,16 @@ import org.eclipse.lsp.cobol.lsp.analysis.AnalysisState;
 import org.eclipse.lsp.cobol.lsp.analysis.AnalysisStateListener;
 import org.eclipse.lsp.cobol.lsp.analysis.AsyncAnalysisService;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
+import org.eclipse.lsp.cobol.service.UriDecodeService;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 
 /** Workspace document graph object */
 @Singleton
 @Slf4j
-public class WorkspaceDocumentGraph implements AnalysisStateListener {
+public class SourceUnitGraph implements AnalysisStateListener {
   private final WorkspaceFileService fileService;
+  private final UriDecodeService uriDecodeService;
 
   // doc-a-uri --> copy-a Node. copy-b node, copy-c node
   // doc-1-uri --> copy-a Node. copy-2 node, copy-3 node
@@ -56,9 +58,10 @@ public class WorkspaceDocumentGraph implements AnalysisStateListener {
       new ConcurrentHashMap<>();
 
   @Inject
-  public WorkspaceDocumentGraph(
-      WorkspaceFileService fileService, AsyncAnalysisService asyncAnalysisService) {
+  public SourceUnitGraph(
+          WorkspaceFileService fileService, AsyncAnalysisService asyncAnalysisService, UriDecodeService uriDecodeService) {
     this.fileService = fileService;
+    this.uriDecodeService = uriDecodeService;
     asyncAnalysisService.register(ImmutableList.of(this));
   }
 
@@ -84,7 +87,7 @@ public class WorkspaceDocumentGraph implements AnalysisStateListener {
   }
 
   private String getContent(CobolDocumentModel model) {
-    return Optional.ofNullable(model.getText()).orElse(getContent(model.getUri()));
+    return Optional.ofNullable(model.getText()).orElseGet(() -> getContent(model.getUri()));
   }
 
   private synchronized void updateDocumentGraphUponCompletion(
@@ -298,7 +301,7 @@ public class WorkspaceDocumentGraph implements AnalysisStateListener {
    */
   public String getCopyNodeContent(CopyNode node) {
     return Optional.ofNullable(objectRef.get(node.getUri()))
-        .map(node1 -> node1.getContent())
+        .map(NodeV::getContent)
         .orElse(null);
   }
 
@@ -345,7 +348,7 @@ public class WorkspaceDocumentGraph implements AnalysisStateListener {
   }
 
   /**
-   * Nodes in the {@link WorkspaceDocumentGraph} representing document and their links in a
+   * Nodes in the {@link SourceUnitGraph} representing document and their links in a
    * workspace
    */
   @AllArgsConstructor
