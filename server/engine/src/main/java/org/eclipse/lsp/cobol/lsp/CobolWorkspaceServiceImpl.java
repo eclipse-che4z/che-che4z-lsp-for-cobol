@@ -39,7 +39,7 @@ import org.eclipse.lsp4j.services.WorkspaceService;
 @Slf4j
 public class CobolWorkspaceServiceImpl extends LspEventConsumer implements WorkspaceService {
   private final ExecuteCommandHandler executeCommandHandler;
-  private final WorkspaceDocumentGraph workspaceDocumentGraph;
+  private final SourceUnitGraph sourceUnitGraph;
   private final DidChangeConfigurationHandler didChangeConfigurationHandler;
   private final AsyncAnalysisService asyncAnalysisService;
   private final UriDecodeService uriDecodeService;
@@ -48,12 +48,12 @@ public class CobolWorkspaceServiceImpl extends LspEventConsumer implements Works
   public CobolWorkspaceServiceImpl(
           LspMessageBroker lspMessageBroker,
           ExecuteCommandHandler executeCommandHandler,
-          WorkspaceDocumentGraph workspaceDocumentGraph,
+          SourceUnitGraph sourceUnitGraph,
           DidChangeConfigurationHandler didChangeConfigurationHandler,
           AsyncAnalysisService asyncAnalysisService, UriDecodeService uriDecodeService) {
     super(lspMessageBroker);
     this.executeCommandHandler = executeCommandHandler;
-    this.workspaceDocumentGraph = workspaceDocumentGraph;
+    this.sourceUnitGraph = sourceUnitGraph;
     this.didChangeConfigurationHandler = didChangeConfigurationHandler;
     this.asyncAnalysisService = asyncAnalysisService;
     this.uriDecodeService = uriDecodeService;
@@ -98,12 +98,12 @@ public class CobolWorkspaceServiceImpl extends LspEventConsumer implements Works
     changedFiles.forEach(
         file -> {
           String uri = uriDecodeService.decode(file.getUri());
-          workspaceDocumentGraph.updateContent(uri);
-          if (!workspaceDocumentGraph.isFileOpened(uri)) {
+          sourceUnitGraph.updateContent(uri);
+          if (!sourceUnitGraph.isFileOpened(uri)) {
             List<String> uris =
-                workspaceDocumentGraph.getAllAssociatedFilesForACopybook(uriDecodeService.decode(uri));
+                sourceUnitGraph.getAllAssociatedFilesForACopybook(uriDecodeService.decode(uri));
             asyncAnalysisService.reanalyseCopybooksAssociatedPrograms(
-                uris, uri, workspaceDocumentGraph.getContent(uri), WorkspaceDocumentGraph.EventSource.FILE_SYSTEM);
+                uris, uri, sourceUnitGraph.getContent(uri), SourceUnitGraph.EventSource.FILE_SYSTEM);
           }
         });
   }

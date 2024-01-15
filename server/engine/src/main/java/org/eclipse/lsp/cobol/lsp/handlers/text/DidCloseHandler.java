@@ -21,7 +21,7 @@ import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.common.copybook.CopybookService;
 import org.eclipse.lsp.cobol.lsp.DisposableLSPStateService;
-import org.eclipse.lsp.cobol.lsp.WorkspaceDocumentGraph;
+import org.eclipse.lsp.cobol.lsp.SourceUnitGraph;
 import org.eclipse.lsp.cobol.lsp.analysis.AsyncAnalysisService;
 import org.eclipse.lsp.cobol.service.DocumentModelService;
 import org.eclipse.lsp.cobol.service.UriDecodeService;
@@ -40,18 +40,18 @@ public class DidCloseHandler {
   private final WatcherService watcherService;
   private final CopybookService copybookService;
   private final UriDecodeService uriDecodeService;
-  private final WorkspaceDocumentGraph workspaceDocumentGraph;
+  private final SourceUnitGraph sourceUnitGraph;
 
   @Inject
   public DidCloseHandler(DisposableLSPStateService disposableLSPStateService,
-                         AsyncAnalysisService asyncAnalysisService, DocumentModelService documentModelService, WatcherService watcherService, CopybookService copybookService, WorkspaceDocumentGraph workspaceDocumentGraph, UriDecodeService uriDecodeService) {
+                         AsyncAnalysisService asyncAnalysisService, DocumentModelService documentModelService, WatcherService watcherService, CopybookService copybookService, SourceUnitGraph sourceUnitGraph, UriDecodeService uriDecodeService) {
     this.disposableLSPStateService = disposableLSPStateService;
     this.asyncAnalysisService = asyncAnalysisService;
     this.documentModelService = documentModelService;
     this.watcherService = watcherService;
     this.copybookService = copybookService;
     this.uriDecodeService = uriDecodeService;
-    this.workspaceDocumentGraph = workspaceDocumentGraph;
+    this.sourceUnitGraph = sourceUnitGraph;
   }
 
   /**
@@ -64,14 +64,14 @@ public class DidCloseHandler {
     }
     String uri = uriDecodeService.decode(params.getTextDocument().getUri());
     LOG.info(format("Document closing invoked on URI %s", uri));
-    if (!workspaceDocumentGraph.isFileOpened(uri)) {
+    if (!sourceUnitGraph.isFileOpened(uri)) {
       LOG.info(format("Ignoring document closing invoked on URI %s", uri));
       return;
     }
     watcherService.removeRuntimeWatchers(uri);
     documentModelService.closeDocument(uri);
-    workspaceDocumentGraph.remove(uri);
-    //TODO: check if workspaceDocumentGraph could be used update copybook cache
+    sourceUnitGraph.remove(uri);
+    //TODO: check if sourceUnitGraph could be used update copybook cache
     if (copybookService instanceof CopybookServiceImpl) {
       CopybookServiceImpl copybookServiceImpl = (CopybookServiceImpl) copybookService;
       copybookServiceImpl.getCopybookUsage(uri).stream()

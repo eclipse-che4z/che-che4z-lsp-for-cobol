@@ -102,7 +102,7 @@ class CobolLanguageServerTest {
     MessageService messageService = mock(MessageService.class);
     Keywords keywords = mock(Keywords.class);
     ExecuteCommandHandler executeCommandHandler = mock(ExecuteCommandHandler.class);
-    WorkspaceDocumentGraph workspaceDocumentGraph = mock(WorkspaceDocumentGraph.class);
+    SourceUnitGraph sourceUnitGraph = mock(SourceUnitGraph.class);
     DidChangeConfigurationHandler didChangeConfigurationHandler = mock(DidChangeConfigurationHandler.class);
     AsyncAnalysisService asyncAnalysisService = mock(AsyncAnalysisService.class);
 
@@ -113,7 +113,7 @@ class CobolLanguageServerTest {
     prepareSettingsService(settingsService, localeStore);
 
     LspMessageBroker lspMessageBroker = new LspMessageBroker();
-    CobolWorkspaceServiceImpl lspEventConsumer = new CobolWorkspaceServiceImpl(lspMessageBroker, executeCommandHandler, workspaceDocumentGraph, didChangeConfigurationHandler, asyncAnalysisService, uriDecodeService);
+    CobolWorkspaceServiceImpl lspEventConsumer = new CobolWorkspaceServiceImpl(lspMessageBroker, executeCommandHandler, sourceUnitGraph, didChangeConfigurationHandler, asyncAnalysisService, uriDecodeService);
 
     lspEventConsumer.startConsumer();
     CobolLanguageServer server =
@@ -178,7 +178,7 @@ class CobolLanguageServerTest {
     AnalysisService analysisService = mock(AnalysisService.class);
     MessageService messageService = mock(MessageService.class);
     ExecuteCommandHandler executeCommandHandler = mock(ExecuteCommandHandler.class);
-    WorkspaceDocumentGraph workspaceDocumentGraph = mock(WorkspaceDocumentGraph.class);
+    SourceUnitGraph sourceUnitGraph = mock(SourceUnitGraph.class);
     DidChangeConfigurationHandler didChangeConfigurationHandler = mock(DidChangeConfigurationHandler.class);
     AsyncAnalysisService asyncAnalysisService = mock(AsyncAnalysisService.class);
 
@@ -189,7 +189,7 @@ class CobolLanguageServerTest {
     prepareSettingsService(settingsService, localeStore);
 
     LspMessageBroker lspMessageBroker = new LspMessageBroker();
-    CobolWorkspaceServiceImpl lspEventConsumer = new CobolWorkspaceServiceImpl(lspMessageBroker, executeCommandHandler, workspaceDocumentGraph, didChangeConfigurationHandler, asyncAnalysisService, uriDecodeService);
+    CobolWorkspaceServiceImpl lspEventConsumer = new CobolWorkspaceServiceImpl(lspMessageBroker, executeCommandHandler, sourceUnitGraph, didChangeConfigurationHandler, asyncAnalysisService, uriDecodeService);
 
     lspEventConsumer.startConsumer();
     CobolLanguageServer server =
@@ -231,11 +231,11 @@ class CobolLanguageServerTest {
 
   private void testServerInitialization(InitializeParams initializeParams) {
     ExecuteCommandHandler executeCommandHandler = mock(ExecuteCommandHandler.class);
-    WorkspaceDocumentGraph workspaceDocumentGraph = mock(WorkspaceDocumentGraph.class);
+    SourceUnitGraph sourceUnitGraph = mock(SourceUnitGraph.class);
     DidChangeConfigurationHandler didChangeConfigurationHandler = mock(DidChangeConfigurationHandler.class);
     AsyncAnalysisService asyncAnalysisService = mock(AsyncAnalysisService.class);
     LspMessageBroker lspMessageBroker = new LspMessageBroker();
-    CobolWorkspaceServiceImpl lspEventConsumer = new CobolWorkspaceServiceImpl(lspMessageBroker, executeCommandHandler, workspaceDocumentGraph, didChangeConfigurationHandler, asyncAnalysisService, uriDecodeService);
+    CobolWorkspaceServiceImpl lspEventConsumer = new CobolWorkspaceServiceImpl(lspMessageBroker, executeCommandHandler, sourceUnitGraph, didChangeConfigurationHandler, asyncAnalysisService, uriDecodeService);
     lspEventConsumer.startConsumer();
     CobolLanguageServer server =
             new CobolLanguageServer(
@@ -291,11 +291,11 @@ class CobolLanguageServerTest {
   void shutdown() {
     TextDocumentService textDocumentService = mock(CobolTextDocumentService.class);
     ExecuteCommandHandler executeCommandHandler = mock(ExecuteCommandHandler.class);
-    WorkspaceDocumentGraph workspaceDocumentGraph = mock(WorkspaceDocumentGraph.class);
+    SourceUnitGraph sourceUnitGraph = mock(SourceUnitGraph.class);
     DidChangeConfigurationHandler didChangeConfigurationHandler = mock(DidChangeConfigurationHandler.class);
     AsyncAnalysisService asyncAnalysisService = mock(AsyncAnalysisService.class);
     LspMessageBroker lspMessageBroker = new LspMessageBroker();
-    CobolWorkspaceServiceImpl lspEventConsumer = new CobolWorkspaceServiceImpl(lspMessageBroker, executeCommandHandler, workspaceDocumentGraph, didChangeConfigurationHandler, asyncAnalysisService, uriDecodeService);
+    CobolWorkspaceServiceImpl lspEventConsumer = new CobolWorkspaceServiceImpl(lspMessageBroker, executeCommandHandler, sourceUnitGraph, didChangeConfigurationHandler, asyncAnalysisService, uriDecodeService);
     lspEventConsumer.startConsumer();
 
     CobolLanguageServer server =

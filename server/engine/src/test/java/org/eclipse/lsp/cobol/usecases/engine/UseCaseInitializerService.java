@@ -41,7 +41,7 @@ import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessorImpl;
 import org.eclipse.lsp.cobol.domain.modules.DatabusModule;
 import org.eclipse.lsp.cobol.domain.modules.EngineModule;
 import org.eclipse.lsp.cobol.lsp.DisposableLSPStateService;
-import org.eclipse.lsp.cobol.lsp.WorkspaceDocumentGraph;
+import org.eclipse.lsp.cobol.lsp.SourceUnitGraph;
 import org.eclipse.lsp.cobol.lsp.jrpc.CobolLanguageClient;
 import org.eclipse.lsp.cobol.service.CobolLSPServerStateService;
 import org.eclipse.lsp.cobol.service.SubroutineServiceImpl;
@@ -89,7 +89,7 @@ public class UseCaseInitializerService implements UseCaseInitializer {
                 bind(WatcherService.class).to(WatcherServiceImpl.class);
                 bind(DialectDiscoveryService.class).to(DialectDiscoveryFolderService.class);
                 bind(CodeActions.class);
-                bind(WorkspaceDocumentGraph.class);
+                bind(SourceUnitGraph.class);
                 bind(CopybookIdentificationService.class)
                         .annotatedWith(Names.named("contentStrategy"))
                         .to(CopybookIdentificationServiceBasedOnContent.class);

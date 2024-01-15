@@ -26,7 +26,7 @@ import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
 import org.eclipse.lsp.cobol.common.AnalysisResult;
 import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
-import org.eclipse.lsp.cobol.lsp.WorkspaceDocumentGraph;
+import org.eclipse.lsp.cobol.lsp.SourceUnitGraph;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp.cobol.service.UriDecodeService;
 import org.eclipse.lsp.cobol.service.delegates.hover.HoverProvider;
@@ -77,7 +77,7 @@ class Test88ThruHover {
     when(uriDecodeService.decode(DOCUMENT_URI)).thenReturn(DOCUMENT_URI);
     HoverProvider provider = new VariableHover(uriDecodeService);
 
-    WorkspaceDocumentGraph documentGraph = mock(WorkspaceDocumentGraph.class);
+    SourceUnitGraph documentGraph = mock(SourceUnitGraph.class);
     when(documentGraph.isCopybook(anyString())).thenReturn(false);
     final Hover actual =
         provider.getHover(

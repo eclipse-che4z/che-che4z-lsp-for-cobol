@@ -24,7 +24,7 @@ import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
 import org.eclipse.lsp.cobol.common.copybook.CopybookService;
 import org.eclipse.lsp.cobol.lsp.LspEventCancelCondition;
 import org.eclipse.lsp.cobol.lsp.LspEventDependency;
-import org.eclipse.lsp.cobol.lsp.WorkspaceDocumentGraph;
+import org.eclipse.lsp.cobol.lsp.SourceUnitGraph;
 import org.eclipse.lsp.cobol.service.AnalysisService;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp.cobol.service.DocumentModelService;
@@ -82,7 +82,7 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
    * @return document model with analysis result
    */
   public synchronized CompletableFuture<CobolDocumentModel> scheduleAnalysis(String uri, String text, boolean open) {
-    return scheduleAnalysis(uri, text, analysisResultsRevisions.getOrDefault(uri, 0), open, WorkspaceDocumentGraph.EventSource.IDE);
+    return scheduleAnalysis(uri, text, analysisResultsRevisions.getOrDefault(uri, 0), open, SourceUnitGraph.EventSource.IDE);
   }
 
   /**
@@ -95,7 +95,7 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
    * @param eventSource source of the event
    * @return document model with analysis result
    */
-  public synchronized CompletableFuture<CobolDocumentModel> scheduleAnalysis(String uri, String text, Integer currentRevision, boolean open, WorkspaceDocumentGraph.EventSource eventSource) {
+  public synchronized CompletableFuture<CobolDocumentModel> scheduleAnalysis(String uri, String text, Integer currentRevision, boolean open, SourceUnitGraph.EventSource eventSource) {
     return scheduleAnalysis(uri, text, currentRevision, open, false, eventSource);
   }
 
@@ -110,7 +110,7 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
    * @param eventSource source of the event
    * @return document model with analysis result
    */
-  public synchronized CompletableFuture<CobolDocumentModel> scheduleAnalysis(String uri, String text, Integer currentRevision, boolean open, boolean force, WorkspaceDocumentGraph.EventSource eventSource) {
+  public synchronized CompletableFuture<CobolDocumentModel> scheduleAnalysis(String uri, String text, Integer currentRevision, boolean open, boolean force, SourceUnitGraph.EventSource eventSource) {
     notifyAllListeners(AnalysisState.SCHEDULED, documentModelService.get(uri), eventSource);
     String id = makeId(uri, currentRevision);
     Integer prevId = analysisResultsRevisions.put(uri, currentRevision);
@@ -179,7 +179,7 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
     LOG.info("Cache invalidated");
     documentModelService.getAllOpened()
             .stream().filter(d -> !analysisService.isCopybook(d.getUri(), d.getText()))
-            .forEach(doc -> scheduleAnalysis(doc.getUri(), doc.getText(), analysisResultsRevisions.get(doc.getUri()), false, true, WorkspaceDocumentGraph.EventSource.IDE));
+            .forEach(doc -> scheduleAnalysis(doc.getUri(), doc.getText(), analysisResultsRevisions.get(doc.getUri()), false, true, SourceUnitGraph.EventSource.IDE));
   }
 
   /**
@@ -189,7 +189,7 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
    * @param copybookContent
    * @param eventSource
    */
-  public void reanalyseCopybooksAssociatedPrograms(List<String> uris, String copybookUri, String copybookContent, WorkspaceDocumentGraph.EventSource eventSource) {
+  public void reanalyseCopybooksAssociatedPrograms(List<String> uris, String copybookUri, String copybookContent, SourceUnitGraph.EventSource eventSource) {
     documentModelService.removeDocumentDiagnostics(copybookUri);
     for (String uri : uris) {
       //TODO: update cache directly from workspace document graph
@@ -281,7 +281,7 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
   }
 
   @Override
-  public void notifyAllListeners(AnalysisState state, CobolDocumentModel model, WorkspaceDocumentGraph.EventSource eventSource) {
+  public void notifyAllListeners(AnalysisState state, CobolDocumentModel model, SourceUnitGraph.EventSource eventSource) {
     SINGLE_THREAD_EXECUTOR
             .execute(() -> this.analysisStateListeners.forEach(lis -> lis.notifyState(state, model, eventSource)));
   }

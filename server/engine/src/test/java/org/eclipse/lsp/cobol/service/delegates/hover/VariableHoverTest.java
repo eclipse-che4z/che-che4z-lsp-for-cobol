@@ -22,7 +22,7 @@ import static org.mockito.Mockito.when;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import org.eclipse.lsp.cobol.lsp.WorkspaceDocumentGraph;
+import org.eclipse.lsp.cobol.lsp.SourceUnitGraph;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp.cobol.service.UriDecodeService;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
@@ -34,11 +34,11 @@ import org.junit.jupiter.api.Test;
 class VariableHoverTest {
     private final UriDecodeService uriDecodeService = mock(UriDecodeService.class);
     private final VariableHover variableHover = new VariableHover(uriDecodeService);
-    WorkspaceDocumentGraph documentGraph;
+    SourceUnitGraph documentGraph;
 
   @BeforeEach
   void setUp() {
-    this.documentGraph = mock(WorkspaceDocumentGraph.class);
+    this.documentGraph = mock(SourceUnitGraph.class);
     when(documentGraph.isCopybook(anyString())).thenReturn(false);
     }
 

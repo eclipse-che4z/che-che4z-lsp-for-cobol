@@ -23,7 +23,7 @@ import lombok.NonNull;
 import org.eclipse.lsp.cobol.common.AnalysisResult;
 import org.eclipse.lsp.cobol.common.model.Describable;
 import org.eclipse.lsp.cobol.common.utils.RangeUtils;
-import org.eclipse.lsp.cobol.lsp.WorkspaceDocumentGraph;
+import org.eclipse.lsp.cobol.lsp.SourceUnitGraph;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp.cobol.service.UriDecodeService;
 import org.eclipse.lsp4j.Hover;
@@ -45,7 +45,7 @@ public class VariableHover implements HoverProvider {
   @Nullable
   @Override
   public Hover getHover(
-      @Nullable CobolDocumentModel document, @NonNull TextDocumentPositionParams position, WorkspaceDocumentGraph documentGraph) {
+      @Nullable CobolDocumentModel document, @NonNull TextDocumentPositionParams position, SourceUnitGraph documentGraph) {
     return Optional.ofNullable(document)
         .map(CobolDocumentModel::getAnalysisResult)
         .map(AnalysisResult::getRootNode)

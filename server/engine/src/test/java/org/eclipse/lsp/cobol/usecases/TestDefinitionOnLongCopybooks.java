@@ -27,7 +27,7 @@ import java.util.Optional;
 import org.eclipse.lsp.cobol.common.AnalysisResult;
 import org.eclipse.lsp.cobol.common.model.DefinedAndUsedStructure;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolsRepository;
-import org.eclipse.lsp.cobol.lsp.WorkspaceDocumentGraph;
+import org.eclipse.lsp.cobol.lsp.SourceUnitGraph;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp.cobol.service.UriDecodeService;
 import org.eclipse.lsp.cobol.service.delegates.references.ElementOccurrences;
@@ -75,7 +75,7 @@ class TestDefinitionOnLongCopybooks {
             new Range(new Position(), new Position()));
     DefinedAndUsedStructure ctx = mock(DefinedAndUsedStructure.class);
     when(ctx.getDefinitions()).thenReturn(Collections.singletonList(expectedDef));
-    WorkspaceDocumentGraph documentGraph = mock(WorkspaceDocumentGraph.class);
+    SourceUnitGraph documentGraph = mock(SourceUnitGraph.class);
     when(documentGraph.isCopybook(anyString())).thenReturn(false);
 
     try (MockedStatic mocked = mockStatic(SymbolsRepository.class)) {
