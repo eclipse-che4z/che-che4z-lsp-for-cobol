@@ -61,6 +61,12 @@ public class DaCoVisitor extends DaCoParserBaseVisitor<List<Node>> {
   }
 
   @Override
+  public List<Node> visitDacoSections(DaCoParser.DacoSectionsContext ctx) {
+    addReplacementContext(ctx);
+    return visitChildren(ctx);
+  }
+
+  @Override
   public List<Node> visitSortTableStatement(DaCoParser.SortTableStatementContext ctx) {
     return addTreeNode(ctx, SortTableNode::new);
   }
