@@ -54,7 +54,8 @@ public class ReferencesHandler {
    */
   public List<? extends Location> references(ReferenceParams params) throws ExecutionException, InterruptedException {
     String uri = uriDecodeService.decode(params.getTextDocument().getUri());
-    return occurrences.findReferences(documentModelService.get(uri), params, params.getContext());
+    List<Location> references = occurrences.findReferences(documentModelService.get(uri), params, params.getContext());
+    return HandlerUtility.mapToOriginalLocation(references, uriDecodeService);
   }
 
   /**
