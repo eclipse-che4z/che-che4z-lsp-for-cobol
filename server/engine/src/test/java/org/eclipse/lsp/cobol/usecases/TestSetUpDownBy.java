@@ -87,8 +87,8 @@ class TestSetUpDownBy {
             "3",
             new Diagnostic(
                 new Range(),
-                "Extraneous input 'IND3'",
-                DiagnosticSeverity.Error,
+                    "Extraneous input 'IND3'",
+                    DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()),
             "4",
             new Diagnostic(

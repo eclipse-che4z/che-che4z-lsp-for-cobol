@@ -21,7 +21,7 @@ import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.junit.jupiter.api.Test;
 
 /** Check that GO TO statement works according to the specification */
-class TestGoToRules {
+class TestGoToGrammarRule {
   private static final String TEXT =
       "       IDENTIFICATION DIVISION.\n"
           + "        PROGRAM-ID. test1.\n"

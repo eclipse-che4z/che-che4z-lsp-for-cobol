@@ -171,7 +171,7 @@ public abstract class MessageServiceParser extends Parser {
     int value = Integer.parseInt(input);
     if (!(value > min && value < max)) {
       notifyError(
-          "paser.validValueMsg", input, String.format("in range %d to %d", min + 1, max - 1));
+          "parsers.validValueMsg", input, String.format("in range %d to %d", min + 1, max - 1));
     }
   }
 
@@ -184,7 +184,7 @@ public abstract class MessageServiceParser extends Parser {
   protected void validate34or16(String input) {
     int value = Integer.parseInt(input);
     if (!(value == 34 || value == 16)) {
-      notifyError("paser.validValueMsg", input, "34 or 16");
+      notifyError("parsers.validValueMsg", input, "34 or 16");
     }
   }
 
@@ -196,7 +196,7 @@ public abstract class MessageServiceParser extends Parser {
   @VisibleForTesting
   protected void validateLevel(String input) {
     if (!(input.equals("1") || input.equals("ANY"))) {
-      notifyError("paser.validValueMsg", input, "1 or ANY");
+      notifyError("parsers.validValueMsg", input, "1 or ANY");
     }
   }
 

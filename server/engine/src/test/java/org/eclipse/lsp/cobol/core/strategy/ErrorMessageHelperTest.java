@@ -73,7 +73,7 @@ class ErrorMessageHelperTest {
 
     when(token.getType()).thenReturn(-1);
 
-    errorMessageHelper.getUnwantedTokenMessage(recognizer, token);
+    errorMessageHelper.getUnwantedTokenMessage(recognizer, token, "'" + token.getText() + "'");
     verify(messageService).getMessage(END_OF_FILE_MESSAGE);
   }
 
@@ -90,8 +90,8 @@ class ErrorMessageHelperTest {
     when(recognizer.getContext()).thenReturn(parserRuleContext);
     when(parserRuleContext.getRuleIndex()).thenReturn(CobolParser.RULE_performInlineStatement);
 
-    errorMessageHelper.getUnwantedTokenMessage(recognizer, token);
-    verify(messageService).getMessage(PERFORM_MISSING_END, "'EXEC SQL'");
+    errorMessageHelper.getUnwantedTokenMessage(recognizer, token, "'" + token.getText() + "'");
+    verify(messageService).getMessage(PERFORM_MISSING_END, "'EXEC_SQL'");
   }
 
   @Test
@@ -111,8 +111,8 @@ class ErrorMessageHelperTest {
     when(recognizer.getExpectedTokens()).thenReturn(interval);
     when(interval.toString(any(Vocabulary.class))).thenReturn("INTERVAL");
 
-    errorMessageHelper.getUnwantedTokenMessage(recognizer, token);
-    verify(messageService).getMessage(REPORT_UNWANTED_TOKEN, "'EXEC SQL'");
+    errorMessageHelper.getUnwantedTokenMessage(recognizer, token, "'" + token.getText() + "'");
+    verify(messageService).getMessage(REPORT_UNWANTED_TOKEN, "'EXEC_SQL'");
   }
 
   @Test

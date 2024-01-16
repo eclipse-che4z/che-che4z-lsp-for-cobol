@@ -21,6 +21,7 @@ import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.eclipse.lsp.cobol.common.dialects.DialectOutcome;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
+import org.eclipse.lsp.cobol.core.AntlrCobolParser;
 import org.eclipse.lsp.cobol.core.CobolParser;
 import org.eclipse.lsp.cobol.core.AstBuilder;
 import org.eclipse.lsp.cobol.core.SplitParser;
@@ -35,7 +36,7 @@ import org.eclipse.lsp.cobol.core.visitor.ParserListener;
  */
 @RequiredArgsConstructor
 public class ParserStage implements Stage<ParserStageResult, DialectOutcome> {
-
+  private static final String WH_PARSER = "hw.parser";
   private final MessageService messageService;
   private final ParseTreeListener treeListener;
 
@@ -47,10 +48,12 @@ public class ParserStage implements Stage<ParserStageResult, DialectOutcome> {
             .addAll(prevStageResult.getData().getDialectNodes())
             .build());
     ParserListener listener = new ParserListener(context.getExtendedDocument(), context.getCopybooksRepository());
-    AstBuilder parser = new SplitParser(CharStreams.fromString(context.getExtendedDocument().toString()),
-            listener,
-            new CobolErrorStrategy(messageService),
-            treeListener);
+    CobolErrorStrategy errorStrategy = new CobolErrorStrategy(messageService);
+    AstBuilder parser = System.getProperty("WH_PARSER") == null
+            ? new AntlrCobolParser(CharStreams.fromString(context.getExtendedDocument().toString()),
+                listener, errorStrategy, treeListener)
+            : new SplitParser(CharStreams.fromString(context.getExtendedDocument().toString()),
+                listener, errorStrategy, treeListener);
     CobolParser.StartRuleContext tree = parser.runParser();
     context.getAccumulatedErrors().addAll(listener.getErrors());
     return new StageResult<>(new ParserStageResult(parser.getTokens(), tree));
