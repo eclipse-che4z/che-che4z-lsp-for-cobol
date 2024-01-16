@@ -32,15 +32,15 @@
         <maven.compiler.target>8</maven.compiler.target>
         <maven.antlr4.plugin.version>4.7</maven.antlr4.plugin.version>
         <antlr.version>4.7.1</antlr.version>
-        <lombok.version>1.18.22</lombok.version>
+        <lombok.version>1.18.30</lombok.version>
         <maven.resources.plugin.version>3.0.2</maven.resources.plugin.version>
         <maven.checkstyle.plugin.version>3.1.1</maven.checkstyle.plugin.version>
         <junit-jupiter.version>5.6.0</junit-jupiter.version>
         <junit.platform.version>1.6.0</junit.platform.version>
-        <mockito.core.version>4.6.1</mockito.core.version>
+        <mockito.core.version>5.10.0</mockito.core.version>
         <maven.cobertura.plugin.version>2.7</maven.cobertura.plugin.version>
         <maven.coveralls.plugin.version>4.3.0</maven.coveralls.plugin.version>
-        <maven.jacoco.plugin.version>0.8.8</maven.jacoco.plugin.version>
+        <maven.jacoco.plugin.version>0.8.11</maven.jacoco.plugin.version>
         <maven.surefire.plugin.version>3.0.0-M3</maven.surefire.plugin.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -145,7 +145,7 @@
                 <version>${maven.surefire.plugin.version}</version>
                 <configuration>
                     <parallel>all</parallel>
-                    <systemProperties>
+                    <systemPropertyVariables>
                         <property>
                             <name>filesToTestPath</name>
                             <!--suppress UnresolvedMavenProperty -->
@@ -156,7 +156,7 @@
                             <!--suppress UnresolvedMavenProperty -->
                             <value>${listingSnap}</value>
                         </property>
-                    </systemProperties>
+                    </systemPropertyVariables>
                 </configuration>
             </plugin>
             <plugin>

@@ -21,8 +21,11 @@ import org.antlr.v4.runtime.BaseErrorListener;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.DefaultErrorStrategy;
+import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.eclipse.lsp.cobol.common.utils.ThreadInterruptionUtil;
+import org.eclipse.lsp.cobol.core.cst.SourceUnit;
+import org.eclipse.lsp.cobol.core.hw.AntlrAdapter;
 
 /**
  * COBOL parser class.
@@ -30,27 +33,25 @@ import org.eclipse.lsp.cobol.common.utils.ThreadInterruptionUtil;
 public class SplitParser implements AstBuilder {
   @Getter
   private final CommonTokenStream tokens;
-  private final CobolParser antlrParser;
 
+  org.eclipse.lsp.cobol.core.CobolParser.StartRuleContext root;
   public SplitParser(CharStream input, BaseErrorListener listener, DefaultErrorStrategy errorStrategy, ParseTreeListener treeListener) {
-    CobolLexer antlrLexer = new CobolLexer(input);
-    antlrLexer.removeErrorListeners();
-    antlrLexer.addErrorListener(listener);
-    tokens = new CommonTokenStream(antlrLexer);
-    antlrParser = new CobolParser(tokens);
-    antlrParser.removeErrorListeners();
-    antlrParser.addErrorListener(listener);
-    antlrParser.setErrorHandler(errorStrategy);
-    antlrParser.addParseListener(treeListener);
+    org.eclipse.lsp.cobol.core.hw.CobolLexer lexer = new org.eclipse.lsp.cobol.core.hw.CobolLexer(
+            input.getText(Interval.of(0, input.size())));
+    SourceUnit su = new org.eclipse.lsp.cobol.core.hw.CobolParser(lexer).parse().getSourceUnit();
+    AntlrAdapter antlrAdapter = new AntlrAdapter(listener, errorStrategy, treeListener);
+    root = antlrAdapter.sourceUnitToStartRule(su);
+    tokens = antlrAdapter.adaptTokens(su);
   }
 
   /**
    * Produce AST of the source
+   *
    * @return the AST root node
    */
   @Override
   public CobolParser.StartRuleContext runParser() {
     ThreadInterruptionUtil.checkThreadInterrupted();
-    return antlrParser.startRule();
+    return root;
   }
 }

@@ -72,12 +72,13 @@ public class ErrorMessageHelper {
    *
    * @param recognizer Parser reference
    * @param currentToken current token
+   * @param display a symbol to display in the report
    * @return error message string
    */
-  public String getUnwantedTokenMessage(Parser recognizer, Token currentToken) {
+  public String getUnwantedTokenMessage(Parser recognizer, Token currentToken, String display) {
     return currentToken.getType() == EOF
         ? messageService.getMessage(END_OF_FILE_MESSAGE)
-        : createMessage(recognizer, currentToken);
+        : createMessage(recognizer, display);
   }
 
   /**
@@ -120,8 +121,8 @@ public class ErrorMessageHelper {
     return interval.size() > 1 ? String.format("{%s}", newMessage) : newMessage;
   }
 
-  private String createMessage(Parser recognizer, Token t) {
-    String tokenName = SPECIAL_TOKEN_MAPPING.getOrDefault(t.getText(), t.getText());
+  private String createMessage(Parser recognizer, String t) {
+    String tokenName = SPECIAL_TOKEN_MAPPING.getOrDefault(t, t);
     return recognizer.getContext().getRuleIndex() == CobolParser.RULE_performInlineStatement
         ? messageService.getMessage(PERFORM_MISSING_END, tokenName)
         : messageService.getMessage(REPORT_UNWANTED_TOKEN, tokenName);

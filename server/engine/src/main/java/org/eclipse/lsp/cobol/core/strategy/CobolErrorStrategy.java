@@ -31,11 +31,15 @@ import org.eclipse.lsp.cobol.common.message.MessageServiceProvider;
 @NoArgsConstructor
 public class CobolErrorStrategy extends DefaultErrorStrategy implements MessageServiceProvider {
   private static final String REPORT_NO_VIABLE_ALTERNATIVE =
-      "ErrorStrategy.reportNoViableAlternative";
+          "ErrorStrategy.reportNoViableAlternative";
   private static final String REPORT_MISSING_TOKEN = "ErrorStrategy.reportMissingToken";
 
-  @Getter @Setter private MessageService messageService;
-  @Getter @Setter private ErrorMessageHelper errorMessageHelper;
+  @Getter
+  @Setter
+  private MessageService messageService;
+  @Getter
+  @Setter
+  private ErrorMessageHelper errorMessageHelper;
 
   public CobolErrorStrategy(MessageService messageService) {
     this.messageService = messageService;
@@ -77,7 +81,7 @@ public class CobolErrorStrategy extends DefaultErrorStrategy implements MessageS
   protected void reportInputMismatch(Parser recognizer, InputMismatchException e) {
     Token token = e.getOffendingToken();
     String msg =
-        errorMessageHelper.getInputMismatchMessage(recognizer, e, token, getOffendingToken(e));
+            errorMessageHelper.getInputMismatchMessage(recognizer, e, token, getOffendingToken(e));
     recognizer.notifyErrorListeners(token, msg, e);
   }
 
@@ -95,7 +99,7 @@ public class CobolErrorStrategy extends DefaultErrorStrategy implements MessageS
     }
     beginErrorCondition(recognizer);
     Token currentToken = recognizer.getCurrentToken();
-    String msg = errorMessageHelper.getUnwantedTokenMessage(recognizer, currentToken);
+    String msg = errorMessageHelper.getUnwantedTokenMessage(recognizer, currentToken, getTokenErrorDisplay(currentToken));
     recognizer.notifyErrorListeners(currentToken, msg, null);
   }
 
@@ -106,10 +110,10 @@ public class CobolErrorStrategy extends DefaultErrorStrategy implements MessageS
     }
     beginErrorCondition(recognizer);
     String msg =
-        messageService.getMessage(
-            REPORT_MISSING_TOKEN,
-            errorMessageHelper.getExpectedText(recognizer),
-            ErrorMessageHelper.getRule(recognizer));
+            messageService.getMessage(
+                    REPORT_MISSING_TOKEN,
+                    errorMessageHelper.getExpectedText(recognizer),
+                    ErrorMessageHelper.getRule(recognizer));
     recognizer.notifyErrorListeners(getPreviousToken(recognizer), msg, null);
   }
 

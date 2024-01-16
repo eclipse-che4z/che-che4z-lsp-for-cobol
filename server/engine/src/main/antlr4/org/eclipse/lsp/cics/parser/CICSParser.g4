@@ -1143,7 +1143,7 @@ basis
 commaClause : COMMACHAR;
 
 invalidInput
-    :  {notifyError("cicsParser.invalidInput", _input.LT(1).getText());} notExec
+    :  {notifyError("cicsParser.invalidInput", "'" + _input.LT(1).getText() + "'");} notExec
     ;
 
 //notExec: (~ END_EXEC)+;

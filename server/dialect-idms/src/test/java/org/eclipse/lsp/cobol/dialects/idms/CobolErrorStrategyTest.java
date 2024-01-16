@@ -87,7 +87,7 @@ class CobolErrorStrategyTest {
     Parser parser = mock(Parser.class);
 
     service.reportError(parser, prepareInputMismatchException(parser));
-    verify(messageService, times(1)).getMessage(any(), any());
+    verify(messageService, times(1)).getMessage(any(), any(), any());
   }
 
   @Test
@@ -128,7 +128,7 @@ class CobolErrorStrategyTest {
     Parser parser = mock(Parser.class);
     service.reportInputMismatch(parser, prepareInputMismatchException(parser));
 
-    verify(messageService, times(1)).getMessage(any(), any());
+    verify(messageService, times(1)).getMessage(any(), any(), any());
   }
 
   @Test
@@ -152,7 +152,7 @@ class CobolErrorStrategyTest {
 
     service.reportMissingToken(parser);
 
-    verify(messageService, times(1)).getMessage(any(), any());
+    verify(messageService, times(1)).getMessage(any(), any(), any());
   }
 
 }

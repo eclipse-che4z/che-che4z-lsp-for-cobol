@@ -43,7 +43,7 @@
         <junit-jupiter.version>5.6.0</junit-jupiter.version>
         <junit.platform.version>1.6.0</junit.platform.version>
         <logback.classic.version>1.3.14</logback.classic.version>
-        <lombok.version>1.18.22</lombok.version>
+        <lombok.version>1.18.30</lombok.version>
         <lsp4j.version>0.14.0</lsp4j.version>
         <picocli.version>4.7.5</picocli.version>
         <maven.antlr4.plugin.version>4.7</maven.antlr4.plugin.version>
@@ -51,10 +51,10 @@
         <maven.cobertura.plugin.version>2.7</maven.cobertura.plugin.version>
         <maven.compiler.plugin.version>3.7.0</maven.compiler.plugin.version>
         <maven.coveralls.plugin.version>4.3.0</maven.coveralls.plugin.version>
-        <maven.jacoco.plugin.version>0.8.8</maven.jacoco.plugin.version>
+        <maven.jacoco.plugin.version>0.8.11</maven.jacoco.plugin.version>
         <maven.resources.plugin.version>3.0.2</maven.resources.plugin.version>
         <maven.surefire.plugin.version>3.0.0-M3</maven.surefire.plugin.version>
-        <mockito.core.version>4.6.1</mockito.core.version>
+        <mockito.core.version>5.10.0</mockito.core.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <slf4j.api.version>2.0.9</slf4j.api.version>
@@ -276,7 +276,7 @@
                 <configuration>
                     <parallel>all</parallel>
                     <argLine>${argLine} -Dperformance.log.path=${project.build.directory}/perf.csv</argLine>
-                    <systemProperties>
+                    <systemPropertyVariables>
                         <property>
                             <name>filesToTestPath</name>
                             <!--suppress UnresolvedMavenProperty -->
@@ -287,7 +287,7 @@
                             <!--suppress UnresolvedMavenProperty -->
                             <value>${listingSnap}</value>
                         </property>
-                    </systemProperties>
+                    </systemPropertyVariables>
                     <excludes>
                         <exclude>**/org/eclipse/lsp/cobol/dialects/**/*</exclude>
                     </excludes>

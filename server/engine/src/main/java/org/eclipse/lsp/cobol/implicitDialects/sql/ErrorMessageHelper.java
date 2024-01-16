@@ -34,9 +34,9 @@ import static org.antlr.v4.runtime.Recognizer.EOF;
 /** This is a utility class to fetch error messages encountered while parsing CICS dialect. */
 public class ErrorMessageHelper {
   private final MessageService messageService;
-  static final String REPORT_UNWANTED_TOKEN = "ErrorStrategy.reportUnwantedToken";
   static final String END_OF_FILE_MESSAGE = "ErrorStrategy.endOfLine";
   static final String REPORT_INPUT_MISMATCH = "ErrorStrategy.reportInputMismatch";
+  static final String REPORT_UNWANTED_TOKEN = "ErrorStrategy.reportUnwantedToken";
   private static final String MSG_DELIMITER = ", ";
   private static final String MSG_PREFIX = "{";
   private static final String MSG_SUFFIX = "}";

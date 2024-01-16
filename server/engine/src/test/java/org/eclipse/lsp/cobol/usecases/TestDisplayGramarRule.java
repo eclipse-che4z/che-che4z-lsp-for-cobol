@@ -21,7 +21,7 @@ import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.junit.jupiter.api.Test;
 
 /** Check that DISPLAY works according to the specification */
-class TestDisplayRules {
+class TestDisplayGramarRule {
   private static final String TEXT =
       "       IDENTIFICATION DIVISION.\n"
           + "        PROGRAM-ID. test1.\n"
