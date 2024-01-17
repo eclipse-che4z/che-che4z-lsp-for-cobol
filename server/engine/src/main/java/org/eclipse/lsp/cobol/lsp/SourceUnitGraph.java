@@ -15,7 +15,7 @@
 package org.eclipse.lsp.cobol.lsp;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import java.util.*;
@@ -59,7 +59,9 @@ public class SourceUnitGraph implements AnalysisStateListener {
 
   @Inject
   public SourceUnitGraph(
-          WorkspaceFileService fileService, AsyncAnalysisService asyncAnalysisService, UriDecodeService uriDecodeService) {
+      WorkspaceFileService fileService,
+      AsyncAnalysisService asyncAnalysisService,
+      UriDecodeService uriDecodeService) {
     this.fileService = fileService;
     this.uriDecodeService = uriDecodeService;
     asyncAnalysisService.register(ImmutableList.of(this));
@@ -93,11 +95,14 @@ public class SourceUnitGraph implements AnalysisStateListener {
   private synchronized void updateDocumentGraphUponCompletion(
       CobolDocumentModel model, EventSource eventSource) {
     updateGraphNodes(model, eventSource);
-
+    invalidateGraphLinks(model.getUri());
     if (isCopybook(model.getUri()) || model.getAnalysisResult() == null) {
       return;
     }
+    updateGraphLink(model, eventSource);
+  }
 
+  private void updateGraphLink(CobolDocumentModel model, EventSource eventSource) {
     List<CopyNode> copyNodes =
         model
             .getAnalysisResult()
@@ -114,7 +119,7 @@ public class SourceUnitGraph implements AnalysisStateListener {
         objectRef.computeIfPresent(
             copyNode.getUri(),
             (k, v) -> {
-              List<Location> referencedLocation = v.getReferencedLocation();
+              Set<Location> referencedLocation = v.getReferencedLocation();
               referencedLocation.add(copyNode.getNameLocation());
               return v;
             });
@@ -130,6 +135,35 @@ public class SourceUnitGraph implements AnalysisStateListener {
     }
     documentGraph.remove(model.getUri());
     documentGraph.put(model.getUri(), references);
+  }
+
+  private void invalidateGraphLinks(String uri) {
+    if (documentGraph.containsKey(uri)) {
+      List<NodeV> prevLinks = documentGraph.get(uri);
+      for (NodeV prevLink : prevLinks) {
+        invalidateCopybookIndexedCache(uri, prevLink.getUri());
+        Optional.ofNullable(objectRef.get(prevLink.getUri()))
+            .ifPresent(
+                nodeV -> {
+                  Optional.ofNullable(nodeV.getReferencedLocation())
+                      .ifPresent(val -> val.removeAll(prevLink.getReferencedLocation()));
+                  if (nodeV.getReferencedLocation() == null
+                      || nodeV.getReferencedLocation().isEmpty()) {
+                    objectRef.remove(prevLink.getUri());
+                  }
+                });
+      }
+      documentGraph.remove(uri);
+    }
+  }
+
+  private void invalidateCopybookIndexedCache(String referUri, String copybookUri) {
+    documentGraphIndexedByCopybook.computeIfPresent(
+        copybookUri,
+        (k, v) -> {
+          v.remove(referUri);
+          return v;
+        });
   }
 
   /**
@@ -149,7 +183,7 @@ public class SourceUnitGraph implements AnalysisStateListener {
         new NodeV(
             model.getUri(),
             eventSource,
-            Lists.newArrayList(location),
+            Sets.newConcurrentHashSet(Sets.newHashSet(location)),
             false,
             false,
             getContent(model),
@@ -181,15 +215,16 @@ public class SourceUnitGraph implements AnalysisStateListener {
 
   private String getFileContent(String uri) {
     return Optional.ofNullable(fileService.getPathFromURI(uri))
-            .map(fileService::getContentByPath)
-            .orElse(null);
+        .map(fileService::getContentByPath)
+        .orElse(null);
   }
 
   private NodeV getNode(CopyNode copyNode, EventSource eventSource) {
     String content = null;
     String uri = null;
     boolean isDirty = true;
-    ArrayList<Location> references = Lists.newArrayList(copyNode.getNameLocation());
+    Set<Location> references =
+        Sets.newConcurrentHashSet(Sets.newHashSet(copyNode.getNameLocation()));
     if (copyNode.getUri() != null) {
       content = getContent(copyNode.getUri());
       uri = copyNode.getUri();
@@ -247,7 +282,6 @@ public class SourceUnitGraph implements AnalysisStateListener {
    *
    * @param uri
    * @param content
-   * @return
    */
   public synchronized void updateContent(String uri, String content) {
     if (objectRef.containsKey(uri)) {
@@ -266,15 +300,16 @@ public class SourceUnitGraph implements AnalysisStateListener {
       documentGraph
           .get(uri)
           .forEach(
-              node -> Optional.ofNullable(documentGraphIndexedByCopybook.get(node.uri))
-                  .ifPresent(
-                      strings -> {
-                        strings.remove(uri);
-                        if (strings.isEmpty()) {
-                          documentGraphIndexedByCopybook.remove(node.uri);
-                          updateReferences(uri, node);
-                        }
-                      }));
+              node ->
+                  Optional.ofNullable(documentGraphIndexedByCopybook.get(node.uri))
+                      .ifPresent(
+                          strings -> {
+                            strings.remove(uri);
+                            if (strings.isEmpty()) {
+                              documentGraphIndexedByCopybook.remove(node.uri);
+                              updateReferences(uri, node);
+                            }
+                          }));
       documentGraph.remove(uri);
       if (documentGraph.isEmpty()) {
         documentGraphIndexedByCopybook.clear();
@@ -286,10 +321,10 @@ public class SourceUnitGraph implements AnalysisStateListener {
 
   private void updateReferences(String uri, NodeV node) {
     NodeV nodeV = objectRef.get(node.getUri());
-    List<Location> updatedReferences =
+    Set<Location> updatedReferences =
         nodeV.getReferencedLocation().stream()
             .filter(loc -> !loc.getUri().equals(uri))
-            .collect(Collectors.toList());
+            .collect(Collectors.toSet());
     nodeV.setReferencedLocation(updatedReferences);
   }
 
@@ -300,9 +335,7 @@ public class SourceUnitGraph implements AnalysisStateListener {
    * @return content of a copyNode
    */
   public String getCopyNodeContent(CopyNode node) {
-    return Optional.ofNullable(objectRef.get(node.getUri()))
-        .map(NodeV::getContent)
-        .orElse(null);
+    return Optional.ofNullable(objectRef.get(node.getUri())).map(NodeV::getContent).orElse(null);
   }
 
   /**
@@ -320,8 +353,10 @@ public class SourceUnitGraph implements AnalysisStateListener {
             .filter(enn -> enn.getValue().contains(uri))
             .collect(Collectors.toList());
     for (Map.Entry<String, List<String>> entry : containedCopybook) {
-      NodeV nodeV = objectRef.get(entry.getKey());
-      if (isContainedInside(usage, nodeV)) result.add(nodeV);
+      if (objectRef.containsKey(entry.getKey())) {
+        NodeV nodeV = objectRef.get(entry.getKey());
+        if (isContainedInside(usage, nodeV)) result.add(nodeV);
+      }
     }
     if (cobolDocLinks != null) {
       Optional<NodeV> linkedNode =
@@ -335,7 +370,7 @@ public class SourceUnitGraph implements AnalysisStateListener {
 
   private static boolean isContainedInside(Position usage, NodeV nodeV) {
     boolean isContained;
-    List<Location> referencedLocations = nodeV.referencedLocation;
+    Set<Location> referencedLocations = nodeV.referencedLocation;
     for (Location referencedLocation : referencedLocations) {
       Position start = referencedLocation.getRange().getStart();
       Position end = referencedLocation.getRange().getEnd();
@@ -347,17 +382,14 @@ public class SourceUnitGraph implements AnalysisStateListener {
     return false;
   }
 
-  /**
-   * Nodes in the {@link SourceUnitGraph} representing document and their links in a
-   * workspace
-   */
+  /** Nodes in the {@link SourceUnitGraph} representing document and their links in a workspace */
   @AllArgsConstructor
   @EqualsAndHashCode(onlyExplicitlyIncluded = true)
   @Getter
   public class NodeV {
     @EqualsAndHashCode.Include private String uri;
     @Setter private EventSource lastUpdatedBy;
-    @Setter private List<Location> referencedLocation;
+    @Setter private Set<Location> referencedLocation;
     private boolean isCopybook;
     @Setter private boolean isDirty;
     @Setter private String content;
