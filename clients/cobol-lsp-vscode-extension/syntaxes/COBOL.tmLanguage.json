@@ -152,14 +152,6 @@
     "cobol-preprocessor-keywords": {
       "match": "(?<![\\-\\w])(?i:CBL|CONTROL|COPY|BY|CR|DB|ENTER|EXEC|FILE|FUNCTION|IDMS|IN|INCLUDE|LEADING|LINKAGE|PROCEDURE|DIVISION|LIST|MAID|MAP|MAP-CONTROL|MODULE|NO|NOLIST|NOMAP|NOSOURCE|OF|OFF|PIC|PICTURE|RECORD|REDEFINES|REPLACING|REPLACE|TITLE|TRAILING|SECTION|SOURCE|SQL|SUPPRESS|VERSION|WORKING-STORAGE|IS)(?![\\-\\w])",
       "name": "keyword.cobol"
-    },
-    "cics-translator-keywords": {
-      "match": "(?<![\\-\\w])(?i:APOST|CBLCARD|CICS|COBOL2|COBOL3|CPSM|DBCS|DEBUG|DLI|EDF|EXCI|FEPI|LENGTH|LINKAGE|NATLANG|NOCBLCARD|NOCPSM|NODEBUG|NOEDF|NOFEPI|NOLENGTH|NOLINKAGE|NONUM|NOOPTIONS|NOSEQ|NOSPIE|NOVBREF|NUM|OPTIONS|QUOTE|SEQ|SP|SPIE|SYSEIB|VBREF|XOPTS)(?![\\-\\w])",
-      "name": "keyword.cobol"
-    },
-    "technical-keywords": {
-      "match": "(?<![\\-\\w])(?i:)(?![\\-\\w])",
-      "name": "keyword.cobol"
     }
   }
 }
