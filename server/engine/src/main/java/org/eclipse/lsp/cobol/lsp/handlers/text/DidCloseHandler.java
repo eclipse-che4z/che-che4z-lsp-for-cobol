@@ -70,7 +70,7 @@ public class DidCloseHandler {
     }
     watcherService.removeRuntimeWatchers(uri);
     documentModelService.closeDocument(uri);
-    sourceUnitGraph.remove(uri);
+    // sourceUnitGraph.remove(uri);
     //TODO: check if sourceUnitGraph could be used update copybook cache
     if (copybookService instanceof CopybookServiceImpl) {
       CopybookServiceImpl copybookServiceImpl = (CopybookServiceImpl) copybookService;
