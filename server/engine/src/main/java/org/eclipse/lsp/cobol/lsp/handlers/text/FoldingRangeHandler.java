@@ -17,6 +17,7 @@ package org.eclipse.lsp.cobol.lsp.handlers.text;
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
@@ -60,7 +61,8 @@ public class FoldingRangeHandler {
             documentService.isDocumentSynced(uri)
                     ? documentService.get(uri).getAnalysisResult().getRootNode()
                     : null;
-    return new ArrayList<>(DocumentServiceHelper.getFoldingRange(rootNode, uri));
+    return rootNode == null ? Collections.emptyList() :
+            new ArrayList<>(DocumentServiceHelper.getFoldingRange(rootNode, uri));
   }
 
   /**
