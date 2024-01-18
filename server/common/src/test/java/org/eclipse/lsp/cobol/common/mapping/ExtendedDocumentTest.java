@@ -52,7 +52,6 @@ class ExtendedDocumentTest {
     copybookUri = UUID.randomUUID().toString();
     document = new ExtendedDocument(TEXT, documentUri);
     copybook = new ExtendedText(COPYBOOK, copybookUri);
-    document2 = new ExtendedDocument(copybook, documentUri);
   }
 
   @Test
