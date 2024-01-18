@@ -67,9 +67,9 @@ class SourceUnitGraphTest {
 
   @Test
   void testLinksBetweenCopybookAndSourceCode() {
-    String COPY1_URI = "file://copy1.cpy";
-    String COPY2_URI = "file://copy2.cpy";
-    String COPY3_URI = "file://copy3.cpy";
+    String copy1Uri = "file://copy1.cpy";
+    String copy2Uri = "file://copy2.cpy";
+    String copy3Uri = "file://copy3.cpy";
     SourceUnitGraph sourceUnitGraph =
         new SourceUnitGraph(fileService, asyncAnalysisService, uriDecodeService);
     Node rootNode = mock(Node.class);
@@ -83,19 +83,19 @@ class SourceUnitGraphTest {
             Locality.builder().uri(URI).build(),
             new Location(URI, new Range(new Position(2, 7), new Position(2, 14))),
             "COPY1",
-            COPY1_URI);
+            copy1Uri);
     CopyNode copyNode2 =
         new CopyNode(
-            Locality.builder().uri(COPY1_URI).build(),
-            new Location(COPY1_URI, new Range(new Position(0, 7), new Position(0, 14))),
+            Locality.builder().uri(copy1Uri).build(),
+            new Location(copy1Uri, new Range(new Position(0, 7), new Position(0, 14))),
             "COPY2",
-            COPY2_URI);
+            copy2Uri);
     CopyNode copyNode3 =
         new CopyNode(
-            Locality.builder().uri(COPY2_URI).build(),
-            new Location(COPY2_URI, new Range(new Position(0, 7), new Position(0, 16))),
+            Locality.builder().uri(copy2Uri).build(),
+            new Location(copy2Uri, new Range(new Position(0, 7), new Position(0, 16))),
             "COPY3",
-            COPY3_URI);
+            copy3Uri);
     when(rootNode.getDepthFirstStream()).thenReturn(Stream.of(copyNode1, copyNode2, copyNode3));
     AnalysisResult analysisResult = AnalysisResult.builder().rootNode(rootNode).build();
     CobolDocumentModel model = new CobolDocumentModel(URI, "text", analysisResult);
@@ -103,17 +103,17 @@ class SourceUnitGraphTest {
         AnalysisState.COMPLETED, model, SourceUnitGraph.EventSource.FILE_SYSTEM);
 
     assertEquals("COPY 3 TEXT", sourceUnitGraph.getCopyNodeContent(copyNode3));
-    assertTrue(sourceUnitGraph.isCopybook(COPY1_URI));
-    assertTrue(sourceUnitGraph.isCopybook(COPY2_URI));
-    assertTrue(sourceUnitGraph.isCopybook(COPY3_URI));
+    assertTrue(sourceUnitGraph.isCopybook(copy1Uri));
+    assertTrue(sourceUnitGraph.isCopybook(copy2Uri));
+    assertTrue(sourceUnitGraph.isCopybook(copy3Uri));
     assertFalse(sourceUnitGraph.isCopybook(URI));
 
     List<SourceUnitGraph.NodeV> injectedCopybookNode =
         sourceUnitGraph.getInjectedCopybookNode(URI, new Position(2, 9));
     assertEquals(1, injectedCopybookNode.size());
-    assertEquals(COPY1_URI, injectedCopybookNode.get(0).getUri());
+    assertEquals(copy1Uri, injectedCopybookNode.get(0).getUri());
     List<String> allAssociatedFilesForACopybook =
-        sourceUnitGraph.getAllAssociatedFilesForACopybook(COPY3_URI);
+        sourceUnitGraph.getAllAssociatedFilesForACopybook(copy3Uri);
     assertEquals(1, allAssociatedFilesForACopybook.size());
     assertEquals(URI, allAssociatedFilesForACopybook.get(0));
   }

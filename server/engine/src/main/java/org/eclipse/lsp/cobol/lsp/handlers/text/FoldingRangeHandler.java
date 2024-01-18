@@ -61,8 +61,8 @@ public class FoldingRangeHandler {
             documentService.isDocumentSynced(uri)
                     ? documentService.get(uri).getAnalysisResult().getRootNode()
                     : null;
-    return rootNode == null ? Collections.emptyList() :
-            new ArrayList<>(DocumentServiceHelper.getFoldingRange(rootNode, uri));
+    return rootNode == null ? Collections.emptyList()
+            : new ArrayList<>(DocumentServiceHelper.getFoldingRange(rootNode, uri));
   }
 
   /**
