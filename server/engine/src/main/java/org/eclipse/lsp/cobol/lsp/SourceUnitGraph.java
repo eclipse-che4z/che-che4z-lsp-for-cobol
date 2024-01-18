@@ -361,6 +361,7 @@ public class SourceUnitGraph implements AnalysisStateListener {
     if (cobolDocLinks != null) {
       Optional<NodeV> linkedNode =
           cobolDocLinks.stream()
+              .filter(node -> !result.contains(node))
               .filter(node -> isContainedInside(usage, node) && !node.isDirty)
               .findFirst();
       linkedNode.ifPresent(result::add);
