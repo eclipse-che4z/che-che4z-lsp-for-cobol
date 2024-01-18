@@ -43,7 +43,7 @@ class ExtendedDocumentTest {
 
   private String documentUri;
   private String copybookUri;
-  private ExtendedDocument document, document2;
+  private ExtendedDocument document;
   private ExtendedText copybook;
 
   @BeforeEach
