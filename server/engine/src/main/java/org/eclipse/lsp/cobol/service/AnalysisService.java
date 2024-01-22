@@ -98,24 +98,12 @@ public class AnalysisService {
    * @param isNew Is document just opened, or it's reanalyse request.
    */
   public void analyzeDocument(String uri, String text, boolean isNew) {
-    analyzeDocument(uri, text, isNew, null);
-  }
-
-  /**
-   * Analyze document
-   *
-   * @param uri Source URI
-   * @param text Content
-   * @param isNew Is document just opened, or it's reanalyse request.
-   * @param processingMode copybook processing mode
-   */
-  public void analyzeDocument(String uri, String text, boolean isNew, CopybookProcessingMode processingMode) {
     String logPrefix = isNew ? "[analyzeDocument] Document " : "[reanalyzeDocument] Document ";
     LOG.debug(logPrefix + uri + " opened");
 
     if (!isCopybook(uri, text)) {
       LOG.debug(logPrefix + uri + " treated as a program, start analyzing");
-      analyzeDocumentWithCopybooks(uri, text, processingMode);
+      analyzeDocumentWithCopybooks(uri, text);
     }
   }
 
@@ -137,15 +125,10 @@ public class AnalysisService {
    *
    * @param uri - document uri
    * @param text - document text
-   * @param processingMode - Copybook processing mode
    */
-  private void analyzeDocumentWithCopybooks(String uri, String text, CopybookProcessingMode processingMode) {
+  private void analyzeDocumentWithCopybooks(String uri, String text) {
     try {
-      CopybookProcessingMode copybookProcessingMode =
-          processingMode != null
-              ? CopybookProcessingMode.getCopybookProcessingMode(uri, processingMode)
-              : CopybookProcessingMode.getCopybookProcessingMode(
-                  uri, CopybookProcessingMode.ENABLED);
+      CopybookProcessingMode copybookProcessingMode = CopybookProcessingMode.getCopybookProcessingMode(uri, CopybookProcessingMode.ENABLED);
       AnalysisConfig config = configurationService.getConfig(uri, copybookProcessingMode);
       AnalysisResult result = engine.analyze(uri, text, config);
       documentService.processAnalysisResult(uri, result);

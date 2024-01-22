@@ -24,7 +24,6 @@ import {
   INVALID_CREDENTIALS_ERROR_MSG,
   PATHS_USS,
   PATHS_ZOWE,
-  PROCESS_DOWNLOAD_ERROR_MSG,
   PROFILE_NAME_PLACEHOLDER,
   PROVIDE_PROFILE_MSG,
   SETTINGS_CPY_SECTION,
@@ -56,12 +55,6 @@ export class CopybookDownloadService implements vscode.Disposable {
 
   private static completedDownload: number = 0;
   private static totalDownload: number = 0;
-
-  private static createErrorMessageForCopybooks(datasets: Set<string>) {
-    CopybookDownloadService.processDownloadError(
-      PROCESS_DOWNLOAD_ERROR_MSG + Array.from(datasets),
-    );
-  }
 
   private static processDownloadError(title: string) {
     const actionSettings = "Change settings";
@@ -398,11 +391,6 @@ export class CopybookDownloadService implements vscode.Disposable {
     ];
 
     if (!CopybookDownloadService.isEligibleForCopybookDownload(dialects)) {
-      if (!quiet) {
-        CopybookDownloadService.createErrorMessageForCopybooks(
-          new Set<string>(copybookNames.map((c) => c.name)),
-        );
-      }
       return;
     }
     const explorerAPI = await Utils.getZoweExplorerAPI();
@@ -494,8 +482,7 @@ export class CopybookDownloadService implements vscode.Disposable {
     {
       await this.handleQueue(element, errors, progress);
 
-      if (!element.quiet && this.queue.length === 0 && errors.size > 0) {
-        CopybookDownloadService.createErrorMessageForCopybooks(errors);
+      if (this.queue.length === 0 && errors.size > 0) {
         errors.clear();
       }
 
