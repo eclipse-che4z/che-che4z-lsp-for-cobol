@@ -379,25 +379,6 @@ describe("Test downloadCopybook user interaction", () => {
     Utils.getZoweExplorerAPI = getZoweExplorerMock();
   });
 
-  test("check download fails and pass message when download parameters are not provided", async () => {
-    (CopybookDownloadService as any).checkWorkspace = jest
-      .fn()
-      .mockReturnValue(false);
-    (CopybookDownloadService as any).isEligibleForCopybookDownload = jest
-      .fn()
-      .mockReturnValue(false);
-    await copybooksDownloadService.downloadCopybooks(
-      "fileName",
-      [new CopybookName("copybook", "dialect")],
-      false,
-    );
-    expect(vscode.window.showErrorMessage).toBeCalledWith(
-      "Some copybooks could not be located. Ensure your configuration contains correct paths to copybooks, including nested copybooks. Missing copybooks: copybook",
-      "Change settings",
-    );
-    expect(queuePush).not.toBeCalled();
-  });
-
   it("test zowe install is required for copybook download", async () => {
     Utils.getZoweExplorerAPI = jest.fn().mockResolvedValue(undefined);
     (CopybookDownloadService as any).checkWorkspace = jest
@@ -597,7 +578,6 @@ describe("Test copybook download process", () => {
     errors.add("test");
     await (cbd as any).process(progress, copybookProfile, errors, 1234);
     expect(handleQueue).toBeCalledWith(copybookProfile, errors, progress);
-    expect(createErrorMessageForCopybooks).toBeCalledWith(errors);
     expect(telemetryMessage).toBeCalled();
     expect(telementryRegisterEvent).toBeCalledWith(
       "Download copybooks from MF",

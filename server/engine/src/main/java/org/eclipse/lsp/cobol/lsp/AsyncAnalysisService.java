@@ -21,7 +21,6 @@ import java.util.concurrent.*;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.common.SubroutineService;
-import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
 import org.eclipse.lsp.cobol.common.copybook.CopybookService;
 import org.eclipse.lsp.cobol.service.AnalysisService;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
@@ -118,7 +117,7 @@ public class AsyncAnalysisService {
 
       try {
         communications.notifyProgressBegin(uri);
-        analysisService.analyzeDocument(uri, text, open, getProcessingMode(force));
+        analysisService.analyzeDocument(uri, text, open);
         CobolDocumentModel documentModel = documentModelService.get(uri);
         analysisResults.remove(id).complete(documentModel);
         return documentModel;
@@ -136,12 +135,6 @@ public class AsyncAnalysisService {
     return value;
   }
 
-  private CopybookProcessingMode getProcessingMode(boolean force) {
-    if (force) {
-      return CopybookProcessingMode.ENABLED_VERBOSE;
-    }
-    return null;
-  }
 
   private void handleRelatedDocuments(String uri, String text, boolean isNew, boolean force) {
     if (!force) analysisService.updateCache(uri, text, isNew);

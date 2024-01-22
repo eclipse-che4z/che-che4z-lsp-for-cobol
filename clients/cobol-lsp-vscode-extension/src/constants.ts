@@ -39,8 +39,6 @@ export const PROFILE_NAME_PLACEHOLDER = "<profilename>";
 export const DOWNLOAD_QUEUE_LOCKED_ERROR_MSG = `Invalid credentials for profile: ${PROFILE_NAME_PLACEHOLDER}. Copybook retrieval is blocked. Ensure the profile contains correct credentials.`;
 export const UNLOCK_DOWNLOAD_QUEUE_MSG = "Unblock and retry";
 export const INVALID_CREDENTIALS_ERROR_MSG = `Incorrect credentials in Zowe profile ${PROFILE_NAME_PLACEHOLDER}.`;
-export const PROCESS_DOWNLOAD_ERROR_MSG =
-  "Some copybooks could not be located. Ensure your configuration contains correct paths to copybooks, including nested copybooks. Missing copybooks: ";
 export const PROVIDE_PROFILE_MSG =
   "Please specify a valid Zowe Explorer profile to download copybooks from the mainframe.";
 export const SEGMENT_PLACEHOLDER = "<segment>";
