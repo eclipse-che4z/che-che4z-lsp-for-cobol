@@ -45,7 +45,7 @@ public class VariableUsageUtils {
   public static List<VariableNode> findVariablesForUsage(
       Multimap<String, VariableNode> definedVariables, List<VariableUsageNode> usageNodes) {
     Map<VariableNode, Integer> variableToStepCountsToMatchParentsMap =
-        definedVariables.get(usageNodes.get(0).getName()).stream()
+        findDefinedVariable(usageNodes.get(0).getName(), definedVariables).stream()
             .map(
                 it ->
                     mapVariableToStepCountsToMatchParents(
@@ -66,6 +66,23 @@ public class VariableUsageUtils {
     return exactHierarchyMatchedVariables.isEmpty()
         ? new ArrayList<>(variableToStepCountsToMatchParentsMap.keySet())
         : exactHierarchyMatchedVariables;
+  }
+
+  private Collection<VariableNode> findDefinedVariable(String name, Multimap<String, VariableNode> definedVariables) {
+    Collection<VariableNode> foundVariable =  definedVariables.get(name);
+    if (foundVariable.size() > 0) {
+      return foundVariable;
+    }
+    Optional<VariableNode> node = definedVariables.values()
+            .stream().flatMap(Node::getDepthFirstStream)
+            .filter(VariableNode.class::isInstance)
+            .map(VariableNode.class::cast)
+            .filter(var -> var.getName().equals(name))
+            .findFirst();
+    if (node.isPresent()) {
+      foundVariable.add(node.get());
+    }
+    return foundVariable;
   }
 
   private static Map<VariableNode, Integer> mapVariableToStepCountsToMatchParents(
