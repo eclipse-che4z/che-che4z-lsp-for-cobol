@@ -17,14 +17,14 @@ package org.eclipse.lsp.cobol.common.dialects;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import java.util.*;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
 import org.eclipse.lsp.cobol.common.ResultWithErrors;
 import org.eclipse.lsp.cobol.common.action.CodeActionProvider;
 import org.eclipse.lsp.cobol.common.copybook.CopybookModel;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
+import org.eclipse.lsp.cobol.common.model.tree.CompilerDirectiveNode;
 import org.eclipse.lsp.cobol.common.processor.ProcessorDescription;
-
-import java.util.*;
 
 /** A COBOL dialect */
 public interface CobolDialect {
@@ -130,6 +130,15 @@ public interface CobolDialect {
    * @return a list of {@link CopybookModel}
    */
   default List<CopybookModel> getPredefinedCopybook(AnalysisConfig ctx) {
+    return ImmutableList.of();
+  }
+
+  /**
+   * Returns the list of {@link CompilerDirectiveNode} specific to the dialect
+   * @param context is a DialectProcessingContext class with all needed data for dialect processing
+   * @return a list of {@link CompilerDirectiveNode}
+   */
+  default List<CompilerDirectiveNode> getCompilerDirectives(DialectProcessingContext context) {
     return ImmutableList.of();
   }
 }
