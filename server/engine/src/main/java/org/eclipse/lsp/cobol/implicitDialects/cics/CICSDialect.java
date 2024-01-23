@@ -16,6 +16,9 @@
 package org.eclipse.lsp.cobol.implicitDialects.cics;
 
 import com.google.common.collect.ImmutableList;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -26,6 +29,7 @@ import org.eclipse.lsp.cobol.common.dialects.DialectOutcome;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.message.MessageService;
+import org.eclipse.lsp.cobol.common.model.tree.CompilerDirectiveNode;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
 import org.eclipse.lsp.cobol.common.model.tree.SectionNode;
@@ -35,9 +39,6 @@ import org.eclipse.lsp.cobol.implicitDialects.cics.nodes.ExecCicsNode;
 import org.eclipse.lsp.cobol.implicitDialects.cics.processor.CICSExecBlockProcessor;
 import org.eclipse.lsp.cobol.implicitDialects.cics.processor.CICSImplicitVariablesProcessor;
 import org.eclipse.lsp.cobol.implicitDialects.cics.processor.CICSTranslateMandatorySectionProcess;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /** CICS dialect */
 @Slf4j
@@ -99,6 +100,23 @@ public class CICSDialect implements CobolDialect {
             new CICSExecBlockProcessor(messageService)));
   }
 
+  @Override
+  public List<CompilerDirectiveNode> getCompilerDirectives(DialectProcessingContext context) {
+    CICSVisitor cicsVisitor = new CICSVisitor(context, messageService);
+    List<SyntaxError> parseError = new ArrayList<>();
+    // parse the document text to get parseTree
+    CICSParser.CompilerDirectiveContext compilerDirectiveContext =
+        parseCICSDirective(
+            context.getExtendedDocument().toString(),
+            context.getExtendedDocument().getUri(),
+            parseError);
+
+    // Traverse the parse tree to generate dialect specific nodes
+    List<Node> nodes = new ArrayList<>(cicsVisitor.visitCompilerDirective(compilerDirectiveContext));
+
+    return nodes.stream().filter(CompilerDirectiveNode.class::isInstance).map(CompilerDirectiveNode.class::cast).collect(Collectors.toList());
+  }
+
   private CICSParser.StartRuleContext parseCICS(
       String text, String programDocumentUri, List<SyntaxError> errors) {
     CICSLexer lexer = new CICSLexer(CharStreams.fromString(text));
@@ -114,5 +132,22 @@ public class CICSDialect implements CobolDialect {
     CICSParser.StartRuleContext result = parser.startRule();
     errors.addAll(listener.getErrors());
     return result;
+  }
+
+  private CICSParser.CompilerDirectiveContext parseCICSDirective(
+          String text, String programDocumentUri, List<SyntaxError> errors) {
+    CICSLexer lexer = new CICSLexer(CharStreams.fromString(text));
+    CommonTokenStream tokens = new CommonTokenStream(lexer);
+    CICSParser parser = new CICSParser(tokens);
+    CICSErrorListener listener = new CICSErrorListener(programDocumentUri);
+    lexer.removeErrorListeners();
+    lexer.addErrorListener(listener);
+    parser.removeErrorListeners();
+    parser.addErrorListener(listener);
+    parser.setErrorHandler(new CICSErrorStrategy(messageService));
+
+    CICSParser.CompilerDirectiveContext compilerDirectiveContext = parser.compilerDirective();
+    errors.addAll(listener.getErrors());
+    return compilerDirectiveContext;
   }
 }

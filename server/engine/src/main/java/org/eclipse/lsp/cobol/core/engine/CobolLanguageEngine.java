@@ -14,19 +14,26 @@
  */
 package org.eclipse.lsp.cobol.core.engine;
 
+import static java.util.Collections.emptyList;
+import static java.util.stream.Collectors.toList;
+import static org.eclipse.lsp.cobol.common.error.ErrorSource.WORKSPACE_SETTINGS;
+import static org.eclipse.lsp.cobol.common.model.NodeType.COPY;
+import static org.eclipse.lsp.cobol.common.model.tree.Node.hasType;
+
 import com.google.common.collect.ImmutableMap;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.*;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.eclipse.lsp.cobol.common.*;
+import org.eclipse.lsp.cobol.common.error.ErrorCodes;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
-import org.eclipse.lsp.cobol.common.error.ErrorCodes;
-import org.eclipse.lsp.cobol.common.mapping.OriginalLocation;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedText;
+import org.eclipse.lsp.cobol.common.mapping.OriginalLocation;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
@@ -38,8 +45,8 @@ import org.eclipse.lsp.cobol.core.engine.dialects.DialectService;
 import org.eclipse.lsp.cobol.core.engine.errors.ErrorFinalizerService;
 import org.eclipse.lsp.cobol.core.engine.pipeline.Pipeline;
 import org.eclipse.lsp.cobol.core.engine.pipeline.PipelineResult;
-import org.eclipse.lsp.cobol.core.engine.pipeline.stages.*;
 import org.eclipse.lsp.cobol.core.engine.pipeline.StageResult;
+import org.eclipse.lsp.cobol.core.engine.pipeline.stages.*;
 import org.eclipse.lsp.cobol.core.engine.processor.AstProcessor;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolsRepository;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
@@ -51,14 +58,6 @@ import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
-
-import java.util.*;
-
-import static java.util.Collections.emptyList;
-import static java.util.stream.Collectors.toList;
-import static org.eclipse.lsp.cobol.common.error.ErrorSource.WORKSPACE_SETTINGS;
-import static org.eclipse.lsp.cobol.common.model.NodeType.COPY;
-import static org.eclipse.lsp.cobol.common.model.tree.Node.hasType;
 
 /**
  * This class is responsible for run the syntax and semantic analysis of an input cobol document.
@@ -92,6 +91,7 @@ public class CobolLanguageEngine {
     this.errorFinalizerService = errorFinalizerService;
 
     this.pipeline = new Pipeline();
+    this.pipeline.add(new DialectCompilerDirectiveStage(dialectService));
     this.pipeline.add(new CompilerDirectivesStage(messageService));
     this.pipeline.add(new DialectProcessingStage(dialectService));
     this.pipeline.add(new PreprocessorStage(grammarPreprocessor));
