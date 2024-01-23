@@ -175,6 +175,7 @@ public class Db2ImplicitVariablesGenerator {
     addElement(variable, 5, "SQLCA-DB-VRS", "X(2)");
     addElement(variable, 5, "SQLCA-DB-RLS", "X(2)");
     addElement(variable, 5, "SQLCA-LUWID", "X(8)");
+    addElement(variable, 5, "SQLCODE", "S9(9)", UsageFormat.COMP_5);
     variable.addChild(new ElementaryItemNode(LOCALITY, 5, "SQLCA-SQLCODE", false, "S9(9)",
             null, UsageFormat.COMP, false, false, false));
 
