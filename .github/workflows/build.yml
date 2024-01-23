@@ -125,14 +125,6 @@ jobs:
         run: |
           npm ci
           npm run test
-      - name: SonarQube Scan
-        if: github.ref == 'refs/heads/development'
-        uses: kitabisa/sonarqube-action@v1.2.0
-        with:
-          projectBaseDir: ${{ github.workspace }}
-          projectKey: "eclipse-che4z_che-che4z-lsp-for-cobol"
-          host: https://sonarcloud.io
-          login: ${{ secrets.SONAR_TOKEN }}
       - name: Package IDMS vsix
         working-directory: clients/idms-dialect-support
         run: |
@@ -159,6 +151,11 @@ jobs:
           if-no-files-found: warn
           name: vsix-daco-dialect
           path: 'cobol-language-support-for-daco*.vsix'
+      - name: SonarCloud Scan
+        if: github.ref == 'refs/heads/development'
+        uses: sonarsource/sonarcloud-github-action@49e6cd3b187936a73b8280d59ffd9da69df63ec9
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
   buildNative:
     strategy:
