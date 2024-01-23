@@ -20,7 +20,7 @@ import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.junit.jupiter.api.Test;
 
 /**
- * Tests the toleration of CICS EXCI LINK statement toleration. Ref:
+ * Tests the CICS EXCI LINK statement. Ref:
  * https://www.ibm.com/docs/en/cics-ts/6.1?topic=interface-exec-cics-link-command-exci
  */
 public class TestCicsLinkExciStatementToleration {

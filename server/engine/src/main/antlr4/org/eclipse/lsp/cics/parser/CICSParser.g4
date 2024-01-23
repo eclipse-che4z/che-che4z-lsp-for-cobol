@@ -14,8 +14,8 @@
 parser grammar CICSParser;
 options {tokenVocab = CICSLexer; superClass = MessageServiceParser;}
 
-startRule: (.*? compilerXOpts)* .*? ((cicsExecBlock | cicsDfhRespLiteral | cicsDfhValueLiteral) .*?) * EOF;
-
+startRule: .*? ((cicsExecBlock | cicsDfhRespLiteral | cicsDfhValueLiteral) .*?) * EOF;
+compilerDirective: (.*? compilerXOpts)* EOF;
 cicsExecBlock: EXEC CICS allCicsRule END_EXEC DOT?
              | EXEC CICS (allCicsRule | invalidInput)+ END_EXEC DOT?
              | EXEC CICS END_EXEC DOT?
@@ -35,8 +35,13 @@ allCicsRule: cics_send | cics_receive | cics_add | cics_address | cics_allocate 
                        cics_soapfault | cics_spoolclose | cics_spoolopen | cics_spoolread | cics_spoolwrite | cics_start |
                        cics_startbr | cics_startbrowse | cics_suspend | cics_syncpoint | cics_test | cics_transform | cics_unlock |
                        cics_update | cics_verify | cics_wait | cics_waitcics | cics_web | cics_write | cics_writeq | cics_wsacontext |
-                       cics_wsaepr | cics_xctl | cics_converse | cics_abend | cics_acquire | cics_exci_link
+                       cics_wsaepr | cics_xctl | cics_converse | cics_abend | cics_acquire | allExciRules
                       ;
+
+// exci rules
+allExciRules: cics_exci_link | cics_exci_delete | cics_exci_delete_container | cics_exci_endbrowse_container |
+              cics_exci_get_container | cics_exci_get_next_container | cics_exci_move_container |
+              cics_exci_put_container | cics_exci_query_channel | cics_exci_startbrowse_container ;
 
 // compiler options
 compilerXOpts
@@ -577,6 +582,40 @@ cics_link_program_exci: PROGRAM cics_name
                         | cics_handle_response
                      )+;
 
+/** EXCI DELETE, ref: https://www.ibm.com/docs/en/cics-ts/6.1?topic=interface-exec-cics-delete-channel-command-exci*/
+cics_exci_delete: DELETE CHANNEL cics_data_value RETCODE cics_data_area;
+
+/** EXCI DELETE CONTAINER, ref: https://www.ibm.com/docs/en/cics-ts/6.1?topic=interface-exec-cics-delete-container-command-exci*/
+cics_exci_delete_container: DELETE CONTAINER cics_data_value CHANNEL cics_data_value RETCODE cics_data_area;
+
+/** EXCI ENDBROWSE, ref: https://www.ibm.com/docs/en/cics-ts/6.1?topic=interface-exec-cics-endbrowse-container-command-exci*/
+cics_exci_endbrowse_container: ENDBROWSE CONTAINER BROWSETOKEN cics_data_value RETCODE cics_data_area;
+
+/** EXCI GET CONTAINER, ref: https://www.ibm.com/docs/en/cics-ts/6.1?topic=interface-exec-cics-get-container-command-exci*/
+cics_exci_get_container: GET CONTAINER cics_data_value CHANNEL cics_data_value (exci_data_area | cics_exci_ref | (NODATA FLENGTH cics_data_value))
+                            ((INTOCCSID cics_data_value)
+                            | (INTOCODEPAGE cics_data_value)
+                            | (CONVERTST cics_cvda (CCSID cics_data_area)?))?
+                            RETCODE cics_data_area;
+exci_data_area: INTO cics_data_area (FLENGTH cics_data_area (BYTEOFFSET cics_data_area)?)?;
+cics_exci_ref: SET cics_ref FLENGTH cics_data_area (BYTEOFFSET cics_data_area)?;
+
+/** EXCI GETNEXT CONTAINER, ref: https://www.ibm.com/docs/en/cics-ts/6.1?topic=interface-exec-cics-getnext-container-command-exci*/
+cics_exci_get_next_container: GETNEXT CONTAINER cics_data_area BROWSETOKEN cics_data_value RETCODE cics_data_area;
+
+/** EXCI CICS MOVE CONTAINER< ref: https://www.ibm.com/docs/en/cics-ts/6.1?topic=interface-exec-cics-move-container-command-exci*/
+cics_exci_move_container: MOVE CONTAINER cics_data_value AS cics_data_value CHANNEL cics_data_value TOCHANNEL cics_data_value RETCODE cics_data_area;
+
+/** EXCI CICS PUT CONTAINER, ref: https://www.ibm.com/docs/en/cics-ts/6.1?topic=interface-exec-cics-put-container-command-exci */
+cics_exci_put_container: PUT CONTAINER cics_data_value CHANNEL cics_data_value FROM cics_data_area (FLENGTH cics_data_value)?
+                        (BIT | DATATYPE cics_cvda | CHAR)? (FROMCCSID cics_data_value | FROMCODEPAGE cics_data_value)? APPEND?
+                        RETCODE cics_data_area;
+
+/** EXCI QUERY CHANNEL, ref: https://www.ibm.com/docs/en/cics-ts/6.1?topic=interface-exec-cics-query-channel-command-exci*/
+cics_exci_query_channel: QUERY CHANNEL cics_data_value CONTAINERCNT cics_data_area RETCODE cics_data_area;
+
+/** EXCI STARTBROWSE CONTAINER (EXCI), ref: https://www.ibm.com/docs/en/cics-ts/6.1?topic=interface-exec-cics-startbrowse-container-command-exci */
+cics_exci_startbrowse_container: STARTBROWSE CONTAINER CHANNEL cics_data_value BROWSETOKEN cics_data_area RETCODE cics_data_area;
 
 /** LOAD */
 cics_load: LOAD (PROGRAM cics_name | SET cics_ref | LENGTH cics_data_area | FLENGTH cics_data_area | ENTRY cics_ref | HOLD | cics_handle_response)*;
