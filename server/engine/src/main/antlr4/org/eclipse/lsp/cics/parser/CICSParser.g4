@@ -489,7 +489,7 @@ cics_ignore: IGNORE CONDITION (cics_conditions | cicsWord | cics_handle_response
 
 /** INQUIRE ACTIVITYID / CONTAINER / EVENT / PROCESS / TIMER */
 cics_inquire: INQUIRE (cics_inquire_activityid | cics_inquire_container | cics_inquire_event | cics_inquire_process |
-              cics_inquire_timer);
+              cics_inquire_timer | cics_inquire_urimap);
 cics_inquire_activityid: ACTIVITYID cics_data_value (ABCODE cics_data_area | ABPROGRAM cics_data_area |
                          ACTIVITY cics_data_area | COMPSTATUS cics_cvda | EVENT cics_data_area | MODE cics_cvda |
                          PROCESS cics_data_area | PROCESSTYPE cics_data_area | PROGRAM cics_data_area |
@@ -501,6 +501,17 @@ cics_inquire_event: EVENT cics_data_value (ACTIVITYID cics_data_value | EVENTTYP
 cics_inquire_process: PROCESS cics_data_value (PROCESSTYPE cics_data_value | ACTIVITYID cics_data_area | cics_handle_response)+;
 cics_inquire_timer: TIMER cics_data_value (ACTIVITYID cics_data_value | EVENT cics_data_area | STATUS cics_cvda |
                     ABSTIME cics_data_area | cics_handle_response)*;
+
+/** Ref: https://www.ibm.com/docs/en/cics-ts/6.1?topic=commands-inquire-urimap */
+cics_inquire_urimap: URIMAP cics_data_value (cics_inquire_urimap_data_val_args | cics_inquire_urimap_data_area_args | cics_inquire_urimap_data_cvda_args)*;
+cics_inquire_urimap_data_val_args:(APPLICATION | APPLMAJORVER | APPLMINORVER | APPLMICROVER | OPERATION | PLATFORM) cics_data_value;
+cics_inquire_urimap_data_area_args:(ATOMSERVICE | CERTIFICATE | CHANGEAGREL | CHANGETIME | CHANGEUSRID | CHARACTERSET |
+                                CIPHERS | CONVERTER | DEFINESOURCE | DEFINETIME | HFSFILE | HOST | HOSTCODEPAGE |
+                                INSTALLTIME | INSTALLUSRID | IPRESOLVED | LOCATION | MEDIATYPE | NUMCIPHERS | PATH |
+                                PIPELINE | PORT | PROGRAM | SOCKETCLOSE | SOCKPOOLSIZE | TCPIPSERVICE | TEMPLATENAME |
+                                TRANSACTION | USERID | WEBSERVICE) cics_data_area;
+cics_inquire_urimap_data_cvda_args: (ANALYZERSTAT | AUTHENTICATE | AVAILSTATUS | CHANGEAGENT | ENABLESTATUS | HOSTTYPE |
+                                 INSTALLAGENT | IPFAMILY | REDIRECTTYPE | SCHEME | USAGE) cics_cvda;
 
 /** INVOKE SERVICE */
 cics_invoke: INVOKE (SERVICE cics_data_value | CHANNEL cics_data_value | OPERATION cics_data_value | URI cics_data_value |
