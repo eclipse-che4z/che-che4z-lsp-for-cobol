@@ -56,6 +56,7 @@ public enum NodeType {
   SECTION,
   SECTION_NAME_NODE,
   SENTENCE,
+  SORT,
   START_STATEMENT,
   STATEMENT,
   STOP,
