@@ -11,10 +11,11 @@
  * DAF Trucks NV – implementation of DaCo COBOL statements
  * and DAF development standards
  */
-package org.eclipse.lsp.cobol.common.model.tree;
+package org.eclipse.lsp.cobol.dialects.daco.nodes;
 
 import lombok.ToString;
 import org.eclipse.lsp.cobol.common.model.Locality;
+import org.eclipse.lsp.cobol.common.model.tree.ObsoleteNode;
 
 /** The class represents the Sort Table Node. **/
 @ToString(callSuper = true)
