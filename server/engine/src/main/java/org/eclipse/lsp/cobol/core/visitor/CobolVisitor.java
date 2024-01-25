@@ -59,6 +59,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
@@ -1014,6 +1015,25 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   @Override
   public List<Node> visitAtEndPhrase(AtEndPhraseContext ctx) {
     return addTreeNode(ctx, AtEndNode::new);
+  }
+
+  @Override
+  public List<Node> visitSortStatement(CobolParser.SortStatementContext ctx) {
+    List<Node> children = visitChildren(ctx);
+    boolean ascending = false;
+    if (ctx.sortOnKeyClause() != null) {
+      ascending = ctx.sortOnKeyClause().stream()
+          .map(s -> s.ASCENDING() != null)
+          .filter(b -> b)
+          .findAny()
+          .orElse(false);
+    }
+    Locality locality = retrieveLocality(ctx).orElse(null);
+    SortNode sortNode = new SortNode(locality);
+    sortNode.setAscending(ascending);
+
+    children.forEach(sortNode::addChild);
+    return ImmutableList.of(sortNode);
   }
 
   private Pair<String, String> getPerformItemName(List<CobolParser.ProcedureNameContext> procedureNames, int index) {
