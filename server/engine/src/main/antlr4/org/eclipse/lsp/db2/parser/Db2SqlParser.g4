@@ -40,7 +40,7 @@ procedureDivisionRules: ((dbs_allocate | dbs_alter | dbs_associate | dbs_call | 
           dbs_revoke | dbs_rollback | dbs_savepoint | dbs_select | dbs_set | dbs_signal | dbs_transfer | dbs_truncate |
           dbs_update | dbs_values) dbs_semicolon_end?)+;
 
-rulesAllowedInDataDivisionAndProcedureDivision: ((dbs_declare_cursor | dbs_whenever | dbs_declare_table | dbs_include) dbs_semicolon_end?)+;
+rulesAllowedInDataDivisionAndProcedureDivision: ((dbs_declare_cursor | dbs_whenever | dbs_declare_table | dbs_include | DECLARE dbs_declare_statement) dbs_semicolon_end?)+;
 
 rulesAllowedInWorkingStorageAndLinkageSection: ((dbs_begin | dbs_end | dbs_include_sqlca | dbs_include_sqlda) dbs_semicolon_end?)+;
 
@@ -552,7 +552,7 @@ dbs_create_view: VIEW dbs_view_name column_loop? AS tbl_expr_loop?  dbs_fullsele
 tbl_expr_loop: WITH dbs_select_statement_common_table_expression dbs_comma_separator dbs_select_statement_common_table_expression*;
 
 /*DECLARE (all) */
-dbs_declare: DECLARE (dbs_declare_global | dbs_declare_statement);
+dbs_declare: DECLARE dbs_declare_global;
 
 dbs_declare_cursor: DECLARE dbs_cursor_name ((NO|ASENSITIVE|INSENSITIVE|SENSITIVE (DYNAMIC|STATIC)?) SCROLL)? CURSOR ((WITH|WITHOUT) HOLD |
                     (WITHOUT RETURN|WITH RETURN TO (CALLER|CLIENT)) | (WITH|WITHOUT) ROWSET POSITIONING)* /*random ordering req*/
@@ -1799,4 +1799,4 @@ dbs_integer_max: INTEGERLITERAL  {validateValue($INTEGERLITERAL.text, "214748364
 dbs_char_a: NONNUMERICLITERAL  {validateValue($NONNUMERICLITERAL.text, "A");};
 dbs_char_n: NONNUMERICLITERAL  {validateValue($NONNUMERICLITERAL.text, "N");};
 dbs_char_r: NONNUMERICLITERAL  {validateValue($NONNUMERICLITERAL.text, "R");};
-/////// End Variables /////////////
+/////

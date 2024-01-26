@@ -17,12 +17,11 @@ package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import java.util.stream.Stream;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-
-import java.util.stream.Stream;
 
 /**
  * This PARAMETERIZED test checks if all below sql DECLARE statements works correctly.
@@ -107,13 +106,36 @@ class TestSqlAllDeclareStatements {
           + "             DECLARE :{$AMBER} VARIABLE CCSID UNICODE;\n"
           + "           END-EXEC.";
 
+  public static final String DECLARE_STATEMENT_IN_WORKING_STORAGE =
+      "       IDENTIFICATION DIVISION.\n"
+          + "       PROGRAM-ID. HELLO-SQL.\n"
+          + "       DATA DIVISION.\n"
+          + "       WORKING-STORAGE SECTION.\n"
+          + "           EXEC SQL\n"
+          + "              declare asasa statement\n"
+          + "             END-EXEC.\n"
+          + "       PROCEDURE DIVISION.";
+
+  public static final String DECLARE_STATEMENT_IN_LINKAGE_SECTION =
+      "       IDENTIFICATION DIVISION.\n"
+          + "       PROGRAM-ID. HELLO-SQL.\n"
+          + "       DATA DIVISION.\n"
+          + "       WORKING-STORAGE SECTION.\n"
+          + "       LINKAGE SECTION.\n"
+          + "           EXEC SQL\n"
+          + "              declare asasa statement\n"
+          + "             END-EXEC.\n"
+          + "       PROCEDURE DIVISION.";
+
   private static Stream<String> textsToTest() {
     return Stream.of(
         DECLARE_CURSOR,
         DECLARE_GLOBAL_TEMP_TABLE,
         DECLARE_TABLE,
         DECLARE_STATEMENT,
-        DECLARE_VARIABLE);
+        DECLARE_VARIABLE,
+        DECLARE_STATEMENT_IN_WORKING_STORAGE,
+        DECLARE_STATEMENT_IN_LINKAGE_SECTION);
   }
 
   @ParameterizedTest
