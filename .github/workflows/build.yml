@@ -326,6 +326,11 @@ jobs:
         with:
           name: lib
           path: clients/cobol-dialect-api
+      - name: update version for PR
+        working-directory: clients/cobol-lsp-vscode-extension
+        if: github.event_name == 'pull_request'
+        run: |
+          node -e "const fs=require('fs');const fileName='./package.json';var content=require(fileName);content.version=content.version+'\+pr-'+${{ github.event.pull_request.number }};fs.writeFileSync(fileName,JSON.stringify(content,null,2));"
       - name: Build COBOL LS extension 
         run: npm ci
         working-directory: clients/cobol-lsp-vscode-extension
