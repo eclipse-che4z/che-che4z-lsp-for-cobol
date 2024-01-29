@@ -179,6 +179,7 @@ public class AsyncAnalysisService {
       analysisInProgress = openDocuments.stream()
               .filter(model -> model.getLastAnalysisResult() != null)
               .map(model -> makeId(model.getUri(), analysisResultsRevisions.get(model.getUri())))
+              .filter(analysisResults::containsKey)
               .anyMatch(id -> !analysisResults.get(id).isDone());
       LOG.debug(" re-analysis is waiting for prev analysis to finish");
       TimeUnit.MILLISECONDS.sleep(100);
