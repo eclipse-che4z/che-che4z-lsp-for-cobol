@@ -7,6 +7,10 @@ All notable changes to the COBOL Language Support extension are documented in th
 
 #### Fixed
 - Miscellaneous bug fixes
+- Fix new tab for COBOL code in Explorer for Endevor
+
+#### Changed
+- Folding support added to conditional statements
 
 ## [2.1.0](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/compare/2.0.3...2.1.0) (2023-12-20)
 #### Fixed
