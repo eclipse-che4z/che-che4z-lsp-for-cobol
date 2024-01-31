@@ -191,7 +191,7 @@
         },
         "cobol-lsp.cpy-manager.copybook-extensions": {
           "type": "array",
-          "$comment": "Items is converted to an array instead of simple string, to disable the vscode rendering the form for extensions setting, instead shows an hyper link to settings.xml for editing.This is done as empty string is not supported by vscode yet",
+          "$comment": "Items is converted to an array instead of simple string, to disable the vscode rendering the form for extensions setting, instead shows an hyper link to settings.xml for editing. This is done as empty string is not supported by vscode yet",
           "items": {
             "type": [
               "string"
@@ -365,10 +365,10 @@
             "ALL"
           ],
           "enumDescriptions": [
-            "ERROR level logs error events which may or not be fatal to the application",
+            "ERROR level logs error events which might be fatal to the application",
             "WARN level logs potentially harmful situations",
-            "INFO level logs informational messages highlighting overall progress of the application",
-            "DEBUG level logs informational events of very low importance",
+            "INFO level logs informational messages which describe overall progress of the application",
+            "DEBUG level logs informational events of low importance",
             "TRACE level logs informational events of very low importance",
             "ALL level is used to turn on all logging"
           ],
@@ -387,7 +387,7 @@
             "DATACOM_SERVER - CA DATACOM Server",
             "NONE"
           ],
-          "description": "The target SQL backend server which will be used in mainframe"
+          "description": "The target SQL backend server which is used on the mainframe"
         },
         "cobol-lsp.dialects": {
           "type": "array",
