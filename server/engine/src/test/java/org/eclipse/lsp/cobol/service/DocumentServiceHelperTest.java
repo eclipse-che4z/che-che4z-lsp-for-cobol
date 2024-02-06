@@ -18,14 +18,10 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.Set;
 import org.eclipse.lsp.cobol.common.model.Locality;
-import org.eclipse.lsp.cobol.common.model.tree.EvaluateNode;
-import org.eclipse.lsp.cobol.common.model.tree.EvaluateWhenNode;
-import org.eclipse.lsp.cobol.common.model.tree.ExitNode;
-import org.eclipse.lsp.cobol.common.model.tree.IfNode;
-import org.eclipse.lsp.cobol.common.model.tree.Node;
-import org.eclipse.lsp.cobol.common.model.tree.RootNode;
+import org.eclipse.lsp.cobol.common.model.tree.*;
 import org.eclipse.lsp.cobol.common.model.tree.variable.QualifiedReferenceNode;
 import org.eclipse.lsp4j.FoldingRange;
+import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Disabled;
@@ -91,12 +87,31 @@ class DocumentServiceHelperTest {
     ifNode.addChild(new QualifiedReferenceNode(Locality.builder()
             .range(new Range(new Position(3, 0), new Position(4, 10)))
             .uri(DOCUMENT_URI).build()));
+    CopyNode copyNode = new CopyNode(
+            Locality.builder()
+                    .range(new Range(new Position(5, 0), new Position(5, 10)))
+                    .uri(DOCUMENT_URI)
+                    .build(),
+            new Location(),
+            "",
+            "");
+    PerformNode performNode = new PerformNode(Locality.builder()
+            .range(new Range(new Position(0, 0), new Position(12, 10)))
+            .uri("file:///c:/workspace/copy.cpy")
+            .build());
+    copyNode.addChild(performNode);
+    ifNode.addChild(performNode);
+    ifNode.addChild(copyNode);
     evaluateWhenNode.addChild(ifNode);
     evaluateNode.addChild(evaluateWhenNode);
     evaluateNode.addChild(evaluateWhenNode2);
     rootNode.addChild(evaluateNode);
     Set<FoldingRange> foldingRange = DocumentServiceHelper.getFoldingRange(rootNode, DOCUMENT_URI);
     assertEquals(4, foldingRange.size());
+    assertTrue(foldingRange.contains(new FoldingRange(5, 6))); // evaluateWhenNode2
+    assertTrue(foldingRange.contains(new FoldingRange(0, 10))); // evaluateNode
+    assertTrue(foldingRange.contains(new FoldingRange(3, 5))); // if node
+    assertTrue(foldingRange.contains(new FoldingRange(2, 4))); // evaluateWhenNode
   }
 
   private static Node getRootNode() {
