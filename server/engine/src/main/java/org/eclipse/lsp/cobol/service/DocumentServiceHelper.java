@@ -19,6 +19,7 @@ import static org.eclipse.lsp.cobol.common.model.NodeType.*;
 import static org.eclipse.lsp.cobol.common.model.tree.Node.hasType;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.IntSummaryStatistics;
@@ -74,7 +75,7 @@ public class DocumentServiceHelper {
             node ->
                 node.getLocality().getRange().getStart().getLine()
                     != node.getLocality().getRange().getEnd().getLine())
-        .map(DocumentServiceHelper::getFoldingRange)
+        .map(node -> DocumentServiceHelper.getFoldingRanges(node, uri))
         .flatMap(List::stream)
         .collect(Collectors.toSet());
   }
@@ -91,34 +92,38 @@ public class DocumentServiceHelper {
     return new FoldingRange(start.getMin(), end.getMax());
   }
 
-  private static List<FoldingRange> getFoldingRange(IfNode node) {
+  private static List<FoldingRange> getFoldingRange(IfNode node, String uri) {
     List<Node> ifThenStatements =
-        node.getChildren().stream().filter(n -> !(n instanceof IfElseNode)).collect(toList());
-    return ImmutableList.of(getFoldingRange(ifThenStatements));
+        node.getChildren().stream()
+            .filter(n -> !(n instanceof IfElseNode))
+            .filter(nod -> nod.getLocality().getUri().equals(uri))
+            .collect(toList());
+    return Lists.newArrayList(getFoldingRange(ifThenStatements));
   }
 
-  private static List<FoldingRange> getFoldingRange(EvaluateNode node) {
+  private static List<FoldingRange> getFoldingRange(EvaluateNode node, String uri) {
     Map<Node, List<Node>> accumulator = new HashMap<>();
     Node lastEvaluateNode = null;
     for (Node child : node.getChildren()) {
       if (child instanceof EvaluateWhenNode || child instanceof EvaluateWhenOtherNode) {
-        lastEvaluateNode =  child;
+        lastEvaluateNode = child;
         accumulator.putIfAbsent(lastEvaluateNode, new ArrayList<>());
       }
       if (lastEvaluateNode == null) continue;
-      accumulator.get(lastEvaluateNode).add(child);
+      if (child.getLocality().getUri().equals(uri)) accumulator.get(lastEvaluateNode).add(child);
     }
     return accumulator.values().stream()
-        .map(DocumentServiceHelper::getFoldingRange)
-        .collect(toList());
+            .map(DocumentServiceHelper::getFoldingRange)
+            .collect(toList());
   }
 
-  private static List<FoldingRange> getFoldingRange(Node node) {
+  private static List<FoldingRange> getFoldingRanges(Node node, String uri) {
     if (node instanceof IfNode) {
-      return getFoldingRange((IfNode) node);
+      return getFoldingRange((IfNode) node, uri);
     }
     if (node instanceof EvaluateNode) {
-      List<FoldingRange> foldingRange = getFoldingRange((EvaluateNode) node);
+      List<FoldingRange> foldingRange = getFoldingRange((EvaluateNode) node, uri);
+
       foldingRange.add(getFoldingRangeFromNode(node));
       return foldingRange;
     }
