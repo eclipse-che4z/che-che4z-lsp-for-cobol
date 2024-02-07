@@ -14,12 +14,15 @@
  */
 package org.eclipse.lsp.cobol.service;
 
+import static org.eclipse.lsp.cobol.common.model.NodeType.STATEMENT;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.Set;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.tree.*;
 import org.eclipse.lsp.cobol.common.model.tree.variable.QualifiedReferenceNode;
+import org.eclipse.lsp.cobol.implicitDialects.cics.CICSDialect;
+import org.eclipse.lsp.cobol.implicitDialects.cics.nodes.ExecCicsNode;
 import org.eclipse.lsp4j.FoldingRange;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
@@ -108,10 +111,49 @@ class DocumentServiceHelperTest {
     rootNode.addChild(evaluateNode);
     Set<FoldingRange> foldingRange = DocumentServiceHelper.getFoldingRange(rootNode, DOCUMENT_URI);
     assertEquals(4, foldingRange.size());
-    assertTrue(foldingRange.contains(new FoldingRange(5, 6))); // evaluateWhenNode2
+    assertTrue(foldingRange.contains(new FoldingRange(5, 9))); // evaluateWhenNode2
     assertTrue(foldingRange.contains(new FoldingRange(0, 10))); // evaluateNode
     assertTrue(foldingRange.contains(new FoldingRange(3, 5))); // if node
     assertTrue(foldingRange.contains(new FoldingRange(2, 4))); // evaluateWhenNode
+  }
+
+  @Test
+  void getFoldingRange_whenEvaluateStatementHasADialectNode() {
+    RootNode rootNode = new RootNode(LOCALITY);
+    EvaluateNode evaluateNode = new EvaluateNode(Locality.builder()
+            .range(new Range(new Position(0, 0), new Position(10, 10)))
+            .uri(DOCUMENT_URI).build());
+    EvaluateWhenNode evaluateWhenNode = new EvaluateWhenNode(Locality.builder()
+            .range(new Range(new Position(2, 0), new Position(2, 10)))
+            .uri(DOCUMENT_URI).build());
+    EvaluateWhenNode evaluateWhenNode2 = new EvaluateWhenNode(Locality.builder()
+            .range(new Range(new Position(5, 0), new Position(5, 10)))
+            .uri(DOCUMENT_URI).build());
+    EvaluateWhenOtherNode evaluateWhenOtherNode = new EvaluateWhenOtherNode(Locality.builder()
+            .range(new Range(new Position(7, 0), new Position(7, 10)))
+            .uri(DOCUMENT_URI).build());
+    IfNode ifNode = new IfNode(Locality.builder()
+            .range(new Range(new Position(3, 0), new Position(4, 10)))
+            .uri(DOCUMENT_URI).build());
+    ifNode.addChild(new QualifiedReferenceNode(Locality.builder()
+            .range(new Range(new Position(3, 0), new Position(4, 10)))
+            .uri(DOCUMENT_URI).build()));
+    ExecCicsNode execCicsNode = new ExecCicsNode(Locality.builder()
+            .range(new Range(new Position(6, 0), new Position(6, 10)))
+            .uri(DOCUMENT_URI).build(), STATEMENT, CICSDialect.DIALECT_NAME);
+    evaluateWhenNode.addChild(ifNode);
+    evaluateNode.addChild(evaluateWhenNode);
+    evaluateNode.addChild(evaluateWhenNode2);
+    evaluateNode.addChild(evaluateWhenOtherNode);
+    evaluateNode.addChild(execCicsNode);
+    rootNode.addChild(evaluateNode);
+    Set<FoldingRange> foldingRange = DocumentServiceHelper.getFoldingRange(rootNode, DOCUMENT_URI);
+    assertEquals(5, foldingRange.size());
+    assertTrue(foldingRange.contains(new FoldingRange(3, 4))); // if node -> 3,4
+    assertTrue(foldingRange.contains(new FoldingRange(0, 10))); // evaluate -> 0, 10
+    assertTrue(foldingRange.contains(new FoldingRange(2, 4))); // 1st when node -> 2, 4
+    assertTrue(foldingRange.contains(new FoldingRange(5, 6))); // 2nd when node -> 5, 6
+    assertTrue(foldingRange.contains(new FoldingRange(7, 9))); // when other -> 7, 9
   }
 
   private static Node getRootNode() {
