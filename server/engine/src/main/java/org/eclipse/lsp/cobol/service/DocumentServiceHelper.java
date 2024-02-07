@@ -21,10 +21,8 @@ import static org.eclipse.lsp.cobol.common.model.tree.Node.hasType;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.IntSummaryStatistics;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.NonNull;
@@ -102,19 +100,30 @@ public class DocumentServiceHelper {
   }
 
   private static List<FoldingRange> getFoldingRange(EvaluateNode node, String uri) {
-    Map<Node, List<Node>> accumulator = new HashMap<>();
-    Node lastEvaluateNode = null;
-    for (Node child : node.getChildren()) {
-      if (child instanceof EvaluateWhenNode || child instanceof EvaluateWhenOtherNode) {
-        lastEvaluateNode = child;
-        accumulator.putIfAbsent(lastEvaluateNode, new ArrayList<>());
-      }
-      if (lastEvaluateNode == null) continue;
-      if (child.getLocality().getUri().equals(uri)) accumulator.get(lastEvaluateNode).add(child);
-    }
-    return accumulator.values().stream()
-            .map(DocumentServiceHelper::getFoldingRange)
+    List<Node> evaluateDirectChildNodes =
+        node.getChildren().stream()
+            .filter(child -> child.getLocality().getUri().equals(uri))
+            .filter(
+                child ->
+                    child instanceof EvaluateWhenNode || child instanceof EvaluateWhenOtherNode)
             .collect(toList());
+    List<FoldingRange> rangeBetweenWhenClause = new ArrayList<>();
+    for (int i = 0; i < evaluateDirectChildNodes.size(); i++) {
+      Node whenNode = evaluateDirectChildNodes.get(i);
+      if (evaluateDirectChildNodes.size() == 1 || (i == evaluateDirectChildNodes.size() - 1)) {
+        rangeBetweenWhenClause.add(
+            new FoldingRange(
+                whenNode.getLocality().getRange().getStart().getLine(),
+                node.getLocality().getRange().getEnd().getLine() - 1));
+      } else {
+        Node nextNode = evaluateDirectChildNodes.get(i + 1);
+        rangeBetweenWhenClause.add(
+            new FoldingRange(
+                whenNode.getLocality().getRange().getStart().getLine(),
+                nextNode.getLocality().getRange().getStart().getLine() - 1));
+      }
+    }
+    return rangeBetweenWhenClause;
   }
 
   private static List<FoldingRange> getFoldingRanges(Node node, String uri) {
