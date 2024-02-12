@@ -15,13 +15,19 @@
 
 package org.eclipse.lsp.cobol.implicitDialects.cics.nodes;
 
+import lombok.Getter;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.NodeType;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 
 /** EXEC CICS block node */
 public class ExecCicsNode extends Node {
-  public ExecCicsNode(Locality location, NodeType nodeType, String dialect) {
+
+  @Getter
+  private final boolean stopRun;
+
+  public ExecCicsNode(Locality location, NodeType nodeType, String dialect, boolean stopRun) {
     super(location, nodeType, dialect);
+    this.stopRun = stopRun;
   }
 }

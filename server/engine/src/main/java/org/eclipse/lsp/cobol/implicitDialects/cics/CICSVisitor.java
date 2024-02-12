@@ -79,7 +79,9 @@ class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
   public List<Node> visitCicsExecBlock(CICSParser.CicsExecBlockContext ctx) {
     areaBWarning(ctx);
     addReplacementContext(ctx);
-    return addTreeNode(ctx, locality -> new ExecCicsNode(locality, STATEMENT, CICSDialect.DIALECT_NAME));
+
+    boolean stopRun = (ctx.allCicsRule() != null && ctx.allCicsRule().size() > 0 && ctx.allCicsRule().get(0).cics_return() != null);
+    return addTreeNode(ctx, locality -> new ExecCicsNode(locality, STATEMENT, CICSDialect.DIALECT_NAME, stopRun));
   }
 
   @Override

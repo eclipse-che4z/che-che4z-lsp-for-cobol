@@ -18,6 +18,7 @@ import org.eclipse.lsp.cobol.common.model.tree.*;
 import org.eclipse.lsp.cobol.common.model.tree.statements.StatementNode;
 import org.eclipse.lsp.cobol.common.model.variables.DivisionType;
 import org.eclipse.lsp.cobol.core.model.extendedapi.*;
+import org.eclipse.lsp.cobol.implicitDialects.cics.nodes.ExecCicsNode;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
@@ -107,6 +108,11 @@ public class CFASTBuilderImpl implements CFASTBuilder {
       addChild(parent, new CFASTNode(CFASTNodeType.EXIT.getValue(), convertLocation(node)));
     } else if (node instanceof GoBackNode) {
       addChild(parent, new CFASTNode(CFASTNodeType.GOBACK.getValue(), convertLocation(node)));
+    } else if (node instanceof ExecCicsNode) {
+      ExecCicsNode execCicsNode = (ExecCicsNode) node;
+      if (execCicsNode.isStopRun()) {
+        addChild(parent, new CFASTNode(CFASTNodeType.STOP.getValue(), convertLocation(node)));
+      }
     } else if (node instanceof StopNode) {
       addChild(parent, new CFASTNode(CFASTNodeType.STOP.getValue(), convertLocation(node)));
     } else if (node instanceof ParagraphsNode || node instanceof ProcedureDivisionBodyNode) {
