@@ -25,6 +25,8 @@ public enum CFASTNodeType {
   GOTO("goto"),
   PERFORM("perform"),
   SECTION("section"),
+  SORT("sort"),
+  END_SORT("endsort"),
   STOP("stop"),
   EXIT("exit"),
   EXIT_SECTION("exitsection"),

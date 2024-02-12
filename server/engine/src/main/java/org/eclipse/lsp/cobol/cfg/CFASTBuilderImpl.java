@@ -121,6 +121,9 @@ public class CFASTBuilderImpl implements CFASTBuilder {
       addChild(parent, new CFASTNode(CFASTNodeType.AT_END.getValue(), convertLocation(node)));
       node.getChildren().forEach(child -> traverse(parent, child));
       addChild(parent, new CFASTNode(CFASTNodeType.AT_END_EXIT.getValue(), convertLocation(node)));
+    } else if (node instanceof SortNode) {
+      Location location = convertLocation(node);
+      //addChild(parent, new Sort(location, ));
     }
   }
 
