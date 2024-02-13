@@ -16,7 +16,11 @@
  */
 package org.eclipse.lsp.cobol.core;
 
+import com.google.common.collect.ImmutableList;
 import org.antlr.v4.runtime.CommonTokenStream;
+import org.eclipse.lsp.cobol.core.hw.Diagnostic;
+
+import java.util.List;
 
 /**
  * A Cobol Parser Abstraction.
@@ -35,4 +39,12 @@ public interface AstBuilder {
    * @return Token stream.
    */
   CommonTokenStream getTokens();
+
+  /**
+   * Diagnostics while producing AST
+   * @return List of {@link Diagnostic} encountered while parsing
+   */
+  default List<Diagnostic> diagnostics() {
+    return ImmutableList.of();
+  }
 }

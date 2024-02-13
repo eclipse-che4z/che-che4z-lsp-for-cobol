@@ -16,17 +16,14 @@
  */
 package org.eclipse.lsp.cobol.core.hw;
 
-import java.util.List;
-import lombok.AllArgsConstructor;
-import lombok.Value;
-import org.eclipse.lsp.cobol.core.cst.SourceUnit;
+import lombok.Data;
+import org.eclipse.lsp4j.Range;
 
 /**
- * Parsing result container
+ * Diagnostic
  */
-@Value
-@AllArgsConstructor
-public class ParseResult {
-  SourceUnit sourceUnit;
-  List<Diagnostic> diagnostics;
+@Data
+public class Diagnostic {
+    private final Range range;
+    private final String message;
 }

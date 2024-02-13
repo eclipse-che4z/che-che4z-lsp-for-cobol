@@ -26,6 +26,10 @@ import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.eclipse.lsp.cobol.common.utils.ThreadInterruptionUtil;
 import org.eclipse.lsp.cobol.core.cst.SourceUnit;
 import org.eclipse.lsp.cobol.core.hw.AntlrAdapter;
+import org.eclipse.lsp.cobol.core.hw.Diagnostic;
+import org.eclipse.lsp.cobol.core.hw.ParseResult;
+
+import java.util.List;
 
 /**
  * COBOL parser class.
@@ -33,12 +37,15 @@ import org.eclipse.lsp.cobol.core.hw.AntlrAdapter;
 public class SplitParser implements AstBuilder {
   @Getter
   private final CommonTokenStream tokens;
+  private final List<Diagnostic> diagnostics;
 
   org.eclipse.lsp.cobol.core.CobolParser.StartRuleContext root;
   public SplitParser(CharStream input, BaseErrorListener listener, DefaultErrorStrategy errorStrategy, ParseTreeListener treeListener) {
     org.eclipse.lsp.cobol.core.hw.CobolLexer lexer = new org.eclipse.lsp.cobol.core.hw.CobolLexer(
             input.getText(Interval.of(0, input.size())));
-    SourceUnit su = new org.eclipse.lsp.cobol.core.hw.CobolParser(lexer).parse().getSourceUnit();
+    ParseResult parseResult = new org.eclipse.lsp.cobol.core.hw.CobolParser(lexer).parse();
+    SourceUnit su = parseResult.getSourceUnit();
+    diagnostics = parseResult.getDiagnostics();
     AntlrAdapter antlrAdapter = new AntlrAdapter(listener, errorStrategy, treeListener);
     root = antlrAdapter.sourceUnitToStartRule(su);
     tokens = antlrAdapter.adaptTokens(su);
@@ -53,5 +60,10 @@ public class SplitParser implements AstBuilder {
   public CobolParser.StartRuleContext runParser() {
     ThreadInterruptionUtil.checkThreadInterrupted();
     return root;
+  }
+
+  @Override
+  public List<Diagnostic> diagnostics() {
+    return diagnostics;
   }
 }

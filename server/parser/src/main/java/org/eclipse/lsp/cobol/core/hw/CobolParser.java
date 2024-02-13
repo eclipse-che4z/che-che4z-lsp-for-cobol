@@ -16,13 +16,14 @@
  */
 package org.eclipse.lsp.cobol.core.hw;
 
-import lombok.extern.slf4j.Slf4j;
-import org.eclipse.lsp.cobol.common.error.SyntaxError;
-import org.eclipse.lsp.cobol.core.cst.*;
-import org.eclipse.lsp.cobol.core.cst.base.CstNode;
-import org.eclipse.lsp.cobol.core.cst.IdentificationDivision;
-
 import java.util.*;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.text.similarity.JaroWinklerSimilarity;
+import org.eclipse.lsp.cobol.core.cst.*;
+import org.eclipse.lsp.cobol.core.cst.IdentificationDivision;
+import org.eclipse.lsp.cobol.core.cst.base.CstNode;
+import org.eclipse.lsp4j.Position;
+import org.eclipse.lsp4j.Range;
 
 /**
  * Cobol parser
@@ -30,7 +31,9 @@ import java.util.*;
 @Slf4j
 public class CobolParser {
   private final ParsingContext ctx;
-  private final List<SyntaxError> diagnostics = new ArrayList<>();
+  private final List<Diagnostic> diagnostics = new ArrayList<>();
+  private final JaroWinklerSimilarity sim = new JaroWinklerSimilarity();
+  private static final double SIMILARITY_THRESHOLD = 0.85;
 
   public CobolParser(CobolLexer lexer) {
     ctx = new ParsingContext(lexer);
@@ -111,7 +114,7 @@ public class CobolParser {
   private boolean match(String... lexemes) {
     Token token = ctx.getLexer().peek(ctx.peek().getRule()).get(0);
     for (String l : lexemes) {
-      if (sameLexeme(token.getLexeme(), l)) {
+      if (sameLexeme(token, l)) {
         return true;
       }
     }
@@ -275,7 +278,7 @@ public class CobolParser {
       return false;
     }
     for (int i = 0; i < tokens.size(); i++) {
-      if (!sameLexeme(tokens.get(i).getLexeme(), lexemes[i])) {
+      if (!sameLexeme(tokens.get(i), lexemes[i])) {
         return false;
       }
     }
@@ -293,7 +296,7 @@ public class CobolParser {
   private void consume(String expectedLexeme) {
     GrammarRule rule = ctx.peek().getRule();
     Token token = ctx.getLexer().peek(rule).get(0);
-    if (!sameLexeme(token.getLexeme(), expectedLexeme)) {
+    if (!sameLexeme(token, expectedLexeme)) {
       error(token, "Unexpected token: '" + token.getLexeme() + "'. Expect: '" + expectedLexeme + "'");
     }
     List<Token> forward = ctx.getLexer().forward(rule);
@@ -311,7 +314,7 @@ public class CobolParser {
       return;
     }
     for (String content : expectedTokens) {
-      if (sameLexeme(next.get(0).getLexeme(), content)) {
+      if (sameLexeme(next.get(0), content)) {
         List<Token> id = ctx.getLexer().forward(ctx.peek().getRule());
         ctx.peek().getChildren().add(id.get(0));
         return;
@@ -320,8 +323,24 @@ public class CobolParser {
     error(next.get(0), "Unexpected token: '" + next.get(0).getLexeme() + "'. Expected: " + String.join(",", expectedTokens));
   }
 
-  boolean sameLexeme(String lexeme1, String lexeme2) {
-    return lexeme1 != null && lexeme2 != null && Objects.equals(lexeme1.toUpperCase(), lexeme2.toUpperCase());
+  boolean sameLexeme(Token lexemeToken, String expectedLexeme) {
+    if (lexemeToken == null || lexemeToken.getLexeme() == null || expectedLexeme == null) {
+      return false;
+    }
+    Double apply = sim.apply(lexemeToken.getLexeme().toUpperCase(), expectedLexeme.toUpperCase());
+    if (apply == 1) {
+      return true;
+    }
+    if (apply > SIMILARITY_THRESHOLD) {
+      diagnostics.add(getSimilarKeywordPassedSyntaxError(lexemeToken, expectedLexeme));
+      return true;
+    }
+    return false;
+  }
+
+  private Diagnostic getSimilarKeywordPassedSyntaxError(Token lexemeToken, String expectedLexeme) {
+    return new Diagnostic(getTokenRange(lexemeToken),
+            String.format("provided %s but expected %s", lexemeToken.getLexeme(), expectedLexeme));
   }
 
   private void spaces() {
@@ -334,10 +353,13 @@ public class CobolParser {
   }
 
   private void error(Token token, String message) {
-    SyntaxError syntaxError = SyntaxError.syntaxError()
-            .suggestion(message)
-            .build();
+    Diagnostic syntaxError = new Diagnostic(getTokenRange(token), message);
     diagnostics.add(syntaxError);
     throw new ParseError(message);
+  }
+
+  private static Range getTokenRange(Token token) {
+    return new Range(new Position(token.getLine(), token.getStartPositionInLine()), new Position(token.getLine(),
+            token.getStartPositionInLine() + token.getLexeme().length()));
   }
 }
