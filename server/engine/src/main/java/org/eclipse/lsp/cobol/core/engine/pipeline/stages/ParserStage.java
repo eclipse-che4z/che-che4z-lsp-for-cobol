@@ -19,6 +19,10 @@ import lombok.RequiredArgsConstructor;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.eclipse.lsp.cobol.common.dialects.DialectOutcome;
+import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
+import org.eclipse.lsp.cobol.common.error.ErrorSource;
+import org.eclipse.lsp.cobol.common.error.SyntaxError;
+import org.eclipse.lsp.cobol.common.mapping.OriginalLocation;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.core.AntlrCobolParser;
@@ -30,6 +34,9 @@ import org.eclipse.lsp.cobol.core.engine.pipeline.StageResult;
 import org.eclipse.lsp.cobol.core.engine.pipeline.Stage;
 import org.eclipse.lsp.cobol.core.strategy.CobolErrorStrategy;
 import org.eclipse.lsp.cobol.core.visitor.ParserListener;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Parser stage
@@ -49,14 +56,24 @@ public class ParserStage implements Stage<ParserStageResult, DialectOutcome> {
             .build());
     ParserListener listener = new ParserListener(context.getExtendedDocument(), context.getCopybooksRepository());
     CobolErrorStrategy errorStrategy = new CobolErrorStrategy(messageService);
-    AstBuilder parser = System.getProperty("WH_PARSER") == null
+    AstBuilder parser = System.getProperty(WH_PARSER) == null
             ? new AntlrCobolParser(CharStreams.fromString(context.getExtendedDocument().toString()),
                 listener, errorStrategy, treeListener)
             : new SplitParser(CharStreams.fromString(context.getExtendedDocument().toString()),
                 listener, errorStrategy, treeListener);
     CobolParser.StartRuleContext tree = parser.runParser();
     context.getAccumulatedErrors().addAll(listener.getErrors());
+    context.getAccumulatedErrors().addAll(getParsingError(context, parser));
     return new StageResult<>(new ParserStageResult(parser.getTokens(), tree));
+  }
+
+  private static List<SyntaxError> getParsingError(AnalysisContext context, AstBuilder parser) {
+    return parser.diagnostics().stream().map(diagnostic -> SyntaxError.syntaxError()
+            .errorSource(ErrorSource.PARSING)
+            .severity(ErrorSeverity.ERROR)
+            .location(new OriginalLocation(context.getExtendedDocument().mapLocation(diagnostic.getRange()), null))
+            .suggestion(diagnostic.getMessage())
+            .build()).collect(Collectors.toList());
   }
 
   @Override

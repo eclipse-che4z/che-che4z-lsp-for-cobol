@@ -21,6 +21,7 @@
         <dialect.api.version>1.0.3</dialect.api.version>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
+        <commons.text.version>1.10.0</commons.text.version>
     </properties>
 
     <repositories>
