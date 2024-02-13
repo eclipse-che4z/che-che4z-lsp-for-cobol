@@ -20,6 +20,7 @@ import org.eclipse.lsp.cobol.core.cst.*;
 import org.eclipse.lsp.cobol.core.cst.IdentificationDivision;
 import org.eclipse.lsp.cobol.core.hw.CobolLexer;
 import org.eclipse.lsp.cobol.core.hw.CobolParser;
+import org.eclipse.lsp.cobol.core.hw.ParserSettings;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -38,7 +39,7 @@ class HwDivisionsTest {
             + "AUTHOR.\n"
             + "SECURITY.\n"
             + "    NONE.";
-    CobolParser cobolParser = new CobolParser(new CobolLexer(source));
+    CobolParser cobolParser = new CobolParser(new CobolLexer(source), new ParserSettings());
     SourceUnit su = cobolParser.parse().getSourceUnit();
     assertFalse(su.getChildren().isEmpty());
     ProgramUnit pu = (ProgramUnit) su.getChildren().get(0);
@@ -62,7 +63,7 @@ class HwDivisionsTest {
             + "    SELECT PRINT-FILE ASSIGN TO\n"
             + "    XXXXX035.\n";
     final String source = "ID DIVISION. PROGRAM-ID. Pr1.\n" + edSource;
-    CobolParser cobolParser = new CobolParser(new CobolLexer(source));
+    CobolParser cobolParser = new CobolParser(new CobolLexer(source), new ParserSettings());
     SourceUnit su = cobolParser.parse().getSourceUnit();
     assertFalse(su.getChildren().isEmpty());
     ProgramUnit pu = (ProgramUnit) su.getChildren().get(0);
@@ -80,7 +81,7 @@ class HwDivisionsTest {
             + "77  PASSWORD1 PIC X(10) VALUE XXXXX012.\n";
 
     final String source = "ID DIVISION. PROGRAM-ID. Pr1.\n" + ddSource;
-    CobolParser cobolParser = new CobolParser(new CobolLexer(source));
+    CobolParser cobolParser = new CobolParser(new CobolLexer(source), new ParserSettings());
     SourceUnit su = cobolParser.parse().getSourceUnit();
     assertFalse(su.getChildren().isEmpty());
     ProgramUnit pu = (ProgramUnit) su.getChildren().get(0);
@@ -109,7 +110,7 @@ class HwDivisionsTest {
             + "    E-PARA.";
 
     final String source = "ID DIVISION. PROGRAM-ID. Pr1.\n" + pdSource;
-    CobolParser cobolParser = new CobolParser(new CobolLexer(source));
+    CobolParser cobolParser = new CobolParser(new CobolLexer(source), new ParserSettings());
     SourceUnit su = cobolParser.parse().getSourceUnit();
     assertFalse(su.getChildren().isEmpty());
     ProgramUnit pu = (ProgramUnit) su.getChildren().get(0);

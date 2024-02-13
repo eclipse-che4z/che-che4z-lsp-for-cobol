@@ -38,6 +38,7 @@ import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.NodeType;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
+import org.eclipse.lsp.cobol.core.ParserUtils;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectService;
 import org.eclipse.lsp.cobol.core.engine.errors.ErrorFinalizerService;
 import org.eclipse.lsp.cobol.core.engine.processor.AstProcessor;
@@ -123,18 +124,26 @@ class CobolLanguageEngineTest {
 
     when(grammarPreprocessor.preprocess(any())).thenReturn(new ResultWithErrors<>(new CopybooksRepository(), ImmutableList.of()));
 
-    Range programRange = new Range(new Position(0, 7), new Position(0, 31));
+    Range sourceRange = ParserUtils.isHwParserEnabled()
+            ? new Range(new Position(0, 0), new Position(0, 32))
+            : new Range(new Position(0, 7), new Position(0, 31));
+    Range programRange = ParserUtils.isHwParserEnabled()
+            ? new Range(new Position(0, 7), new Position(0, 32))
+            : new Range(new Position(0, 7), new Position(0, 31));
+    Range divisionRange = ParserUtils.isHwParserEnabled()
+            ? new Range(new Position(0, 7), new Position(0, 31))
+            : new Range(new Position(0, 7), new Position(0, 31));
     AnalysisResult actual = engine.run(URI, TEXT, AnalysisConfig.defaultConfig(ENABLED));
     Node root = actual.getRootNode();
     Node program = root.getChildren().get(0);
     Node division = program.getChildren().get(0);
 
     assertEquals(NodeType.ROOT, root.getNodeType());
-    assertEquals(programRange, root.getLocality().getRange());
+    assertEquals(sourceRange, root.getLocality().getRange());
     assertEquals(NodeType.PROGRAM, program.getNodeType());
     assertEquals(programRange, program.getLocality().getRange());
     assertEquals(NodeType.DIVISION, division.getNodeType());
-    assertEquals(programRange, division.getLocality().getRange());
+    assertEquals(divisionRange, division.getLocality().getRange());
     assertEquals(0, division.getChildren().size());
   }
 

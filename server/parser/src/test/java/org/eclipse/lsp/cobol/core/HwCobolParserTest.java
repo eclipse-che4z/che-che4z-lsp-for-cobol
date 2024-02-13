@@ -24,6 +24,7 @@ import org.eclipse.lsp.cobol.core.hw.CobolParser;
 import static org.junit.jupiter.api.Assertions.*;
 
 import org.eclipse.lsp.cobol.core.hw.ParseResult;
+import org.eclipse.lsp.cobol.core.hw.ParserSettings;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
@@ -35,7 +36,7 @@ class HwCobolParserTest {
 
   @Test
   void testEmptyProgram() {
-    CobolParser cobolParser = new CobolParser(new CobolLexer(""));
+    CobolParser cobolParser = new CobolParser(new CobolLexer(""), new ParserSettings());
     SourceUnit su = cobolParser.parse().getSourceUnit();
     assertNotNull(su);
   }
@@ -43,7 +44,7 @@ class HwCobolParserTest {
   @Test
   void oneProgram() {
     final String source = "ID DIVISION. PROGRAM-ID. Pr1.";
-    CobolParser cobolParser = new CobolParser(new CobolLexer(source));
+    CobolParser cobolParser = new CobolParser(new CobolLexer(source), new ParserSettings());
     SourceUnit su = cobolParser.parse().getSourceUnit();
     assertFalse(su.getChildren().isEmpty());
     ProgramUnit pu = (ProgramUnit) su.getChildren().get(0);
@@ -58,7 +59,7 @@ class HwCobolParserTest {
                     + "END PROGRAM Pr1.\n"
                     + "ID DIVISION. PROGRAM-ID. Pr2.\n"
                     + "END PROGRAM Pr2.\n";
-    CobolParser cobolParser = new CobolParser(new CobolLexer(source));
+    CobolParser cobolParser = new CobolParser(new CobolLexer(source), new ParserSettings());
     SourceUnit su = cobolParser.parse().getSourceUnit();
     assertEquals(2, su.getChildren().size());
     ProgramUnit pu1 = (ProgramUnit) su.getChildren().get(0);
@@ -76,7 +77,7 @@ class HwCobolParserTest {
                     + "END PROGRAM Pr1.\n"
                     + "ID DIVISION. PROGRAM-ID. Pr2.\n"
                     + "END PROGRAM Pr2.\n";
-    CobolParser cobolParser = new CobolParser(new CobolLexer(source));
+    CobolParser cobolParser = new CobolParser(new CobolLexer(source), new ParserSettings());
     ParseResult parseResult = cobolParser.parse();
     assertEquals(Collections.emptyList(), parseResult.getDiagnostics());
     SourceUnit su = parseResult.getSourceUnit();
@@ -96,15 +97,11 @@ class HwCobolParserTest {
                     + "END PROGRAM Pr1.\n"
                     + "ID DIVISION. PROGRAM-ID. Pr2 IS PROGRAM.\n"
                     + "END PROGRAM Pr2.\n";
-    CobolParser cobolParser = new CobolParser(new CobolLexer(source));
+    CobolParser cobolParser = new CobolParser(new CobolLexer(source), new ParserSettings());
     SourceUnit su = cobolParser.parse().getSourceUnit();
-    assertEquals(6, su.getChildren().size());
+    assertEquals(7, su.getChildren().size());
     ProgramUnit pu1 = (ProgramUnit) su.getChildren().get(0);
     assertEquals("Pr1", pu1.getName());
-    // FIXME: don't expect to recover 2nd program jet
-//    ProgramUnit pu2 = (ProgramUnit) su.getChildren().get(1);
-//    assertEquals("Pr2", pu2.getName());
-
     assertEquals(source, su.toText());
   }
 
@@ -116,7 +113,7 @@ class HwCobolParserTest {
                     + "ID DIVISION. PROGRAM-ID. Pr2.\n"
                     + "END PROGRAM Pr2.\n"
                     + "END PROGRAM Pr1.\n";
-    CobolParser cobolParser = new CobolParser(new CobolLexer(source));
+    CobolParser cobolParser = new CobolParser(new CobolLexer(source), new ParserSettings());
     ParseResult parseResult = cobolParser.parse();
     SourceUnit su = parseResult.getSourceUnit();
     assertEquals(Collections.emptyList(), parseResult.getDiagnostics());

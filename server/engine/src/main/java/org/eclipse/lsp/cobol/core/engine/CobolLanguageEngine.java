@@ -185,7 +185,7 @@ public class CobolLanguageEngine {
               documentUri);
     } else {
       ProcessingResult processingResult = (ProcessingResult) result.getData();
-      errorFinalizerService.processLateErrors(ctx, ctx.getCopybooksRepository());
+       errorFinalizerService.processLateErrors(ctx, ctx.getCopybooksRepository());
 
       return toAnalysisResult(new ResultWithErrors<>(
           AnalysisResult.builder()

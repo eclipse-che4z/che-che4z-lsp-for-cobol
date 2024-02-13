@@ -37,10 +37,7 @@ import org.eclipse.lsp.cobol.common.model.*;
 import org.eclipse.lsp.cobol.common.model.tree.*;
 import org.eclipse.lsp.cobol.common.model.tree.variable.*;
 import org.eclipse.lsp.cobol.common.utils.StringUtils;
-import org.eclipse.lsp.cobol.core.CobolDataDivisionParser;
-import org.eclipse.lsp.cobol.core.CobolIdentificationDivisionParser;
-import org.eclipse.lsp.cobol.core.CobolParser;
-import org.eclipse.lsp.cobol.core.CobolParserBaseVisitor;
+import org.eclipse.lsp.cobol.core.*;
 import org.eclipse.lsp.cobol.common.model.tree.statements.SetToBooleanStatement;
 import org.eclipse.lsp.cobol.common.model.tree.statements.SetToOnOffStatement;
 import org.eclipse.lsp.cobol.common.model.tree.statements.SetUpDownByStatement;
@@ -78,7 +75,8 @@ import static org.eclipse.lsp.cobol.core.visitor.VisitorHelper.*;
 @Slf4j
 public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
 
-  @Getter private final List<SyntaxError> errors = new ArrayList<>();
+  @Getter
+  private final List<SyntaxError> errors = new ArrayList<>();
   private final CopybooksRepository copybooks;
   private final CommonTokenStream tokenStream;
   private final ExtendedDocument extendedDocument;
@@ -541,10 +539,37 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
 
   @Override
   public List<Node> visitStatement(StatementContext ctx) {
-    areaBWarning(ctx);
+    if (!ParserUtils.isHwParserEnabled() || expectedInAriaA(ctx)) {
+      areaBWarning(ctx);
+    }
     throwWarning(ctx.getStart());
     return visitChildren(ctx);
   }
+
+  private boolean expectedInAriaA(ParserRuleContext ctx) {
+    // https://www.ibm.com/docs/en/cobol-zos/6.4?topic=format-area
+    //    Certain items must begin in Area A:
+    //    Division headers
+    if (ctx instanceof IdentificationDivisionContext) {
+      return true;
+    }
+    if (ctx instanceof EnvironmentDivisionContext) {
+      return true;
+    }
+    if (ctx instanceof DataDivisionContext) {
+      return true;
+    }
+    if (ctx instanceof ProcedureDeclarativeContext) {
+      return true;
+    }
+    //    Section headers
+    //    Paragraph headers or paragraph names
+    //    Level indicators or level-numbers (01 and 77)
+    //    DECLARATIVES and END DECLARATIVES
+    //    End program, end class, and end method markers
+    return false;
+  }
+
   @Override
   public List<Node> visitIfThen(IfThenContext ctx) {
     throwWarning(ctx.getStart());
@@ -993,10 +1018,16 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   public List<Node> visitChildren(RuleNode node) {
     checkInterruption();
     if (node.getClass().getEnclosingClass() == CobolIdentificationDivisionParser.class) {
-      return new CobolIdentificationDivisionVisitor(extendedDocument, copybooks).visit(node);
+      CobolIdentificationDivisionVisitor cobolIdentificationDivisionVisitor = new CobolIdentificationDivisionVisitor(extendedDocument, copybooks);
+      List<Node> nodes = cobolIdentificationDivisionVisitor.visit(node);
+      errors.addAll(cobolIdentificationDivisionVisitor.getErrors());
+      return nodes;
     }
     if (node.getClass().getEnclosingClass() == CobolDataDivisionParser.class) {
-      return new CobolDataDivisionVisitor(extendedDocument, copybooks, fileControls).visit(node);
+      CobolDataDivisionVisitor cobolDataDivisionVisitor = new CobolDataDivisionVisitor(extendedDocument, copybooks, messageService, fileControls);
+      List<Node> nodes = cobolDataDivisionVisitor.visit(node);
+      errors.addAll(cobolDataDivisionVisitor.getErrors());
+      return nodes;
     }
     return super.visitChildren(node);
   }

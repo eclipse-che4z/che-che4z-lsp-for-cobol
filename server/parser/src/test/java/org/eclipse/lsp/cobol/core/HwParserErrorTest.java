@@ -20,6 +20,7 @@ import org.eclipse.lsp.cobol.core.cst.SourceUnit;
 import org.eclipse.lsp.cobol.core.hw.CobolLexer;
 import org.eclipse.lsp.cobol.core.hw.CobolParser;
 import org.eclipse.lsp.cobol.core.hw.ParseResult;
+import org.eclipse.lsp.cobol.core.hw.ParserSettings;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -32,25 +33,25 @@ class HwParserErrorTest {
   @Test
   void testIdDivisionMissingDot() {
     final String source = "ID DIVISION PROGRAM-ID. Pr1."; // It should have '.' after ID DIVISION
-    CobolParser cobolParser = new CobolParser(new CobolLexer(source));
+    CobolParser cobolParser = new CobolParser(new CobolLexer(source), new ParserSettings());
     ParseResult parseResult = cobolParser.parse();
     SourceUnit su = parseResult.getSourceUnit();
     // One error for '.' and one fot unknown input after '.'
     // TODO: better recovery for IDENTIFICATION DIVISION
     assertEquals(2, parseResult.getDiagnostics().size());
-    assertEquals(3, su.getChildren().size());
+    assertEquals(4, su.getChildren().size());
     assertEquals(source, su.toText());
   }
 
   @Test
   void testTwoProgramsIdDivisionMissingDot() {
     final String source = "ID DIVISION PROGRAM-ID. Pr1.\nID DIVISION. PROGRAM-ID. Pr1.\n"; // It should have '.' after ID DIVISION
-    CobolParser cobolParser = new CobolParser(new CobolLexer(source));
+    CobolParser cobolParser = new CobolParser(new CobolLexer(source), new ParserSettings());
     ParseResult parseResult = cobolParser.parse();
     SourceUnit su = parseResult.getSourceUnit();
 
     //    assertEquals(2, parseResult.getDiagnostics().size());
-    assertEquals(5, su.getChildren().size());
+    assertEquals(6, su.getChildren().size());
     assertEquals(source, su.toText());
   }
 }

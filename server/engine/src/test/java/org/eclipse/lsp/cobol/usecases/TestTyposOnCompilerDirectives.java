@@ -17,11 +17,15 @@ package org.eclipse.lsp.cobol.usecases;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
+import org.eclipse.lsp.cobol.core.ParserUtils;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.eclipse.lsp4j.Range;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assumptions.assumeFalse;
 
 /** This test checks that the compiler directives that contain typos processed as usual lines */
 class TestTyposOnCompilerDirectives {
@@ -45,6 +49,11 @@ class TestTyposOnCompilerDirectives {
 
   private static final String DATA_ERROR_MESSAGE =
       "Syntax error on 'DDATA'";
+
+  @BeforeAll
+  public static void beforeMethod() {
+    assumeFalse(ParserUtils.isHwParserEnabled());
+  }
 
   @Test
   void testProcessWithoutNumbersWithTypo() {
