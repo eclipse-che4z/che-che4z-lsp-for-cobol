@@ -140,7 +140,7 @@ class DocumentServiceHelperTest {
             .uri(DOCUMENT_URI).build()));
     ExecCicsNode execCicsNode = new ExecCicsNode(Locality.builder()
             .range(new Range(new Position(6, 0), new Position(6, 10)))
-            .uri(DOCUMENT_URI).build(), STATEMENT, CICSDialect.DIALECT_NAME);
+            .uri(DOCUMENT_URI).build(), STATEMENT, CICSDialect.DIALECT_NAME, false);
     evaluateWhenNode.addChild(ifNode);
     evaluateNode.addChild(evaluateWhenNode);
     evaluateNode.addChild(evaluateWhenNode2);
