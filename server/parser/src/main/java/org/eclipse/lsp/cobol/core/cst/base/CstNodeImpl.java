@@ -27,17 +27,17 @@ import java.util.List;
  */
 @Getter
 public class CstNodeImpl implements CstNode {
-    private final List<CstNode> children = new ArrayList<>();
+  private final List<CstNode> children = new ArrayList<>();
 
-    @Override
-    public GrammarRule getRule() {
-        return null;
-    }
+  @Override
+  public GrammarRule getRule() {
+    return null;
+  }
 
-    @Override
-    public String toText() {
-        StringBuilder sb = new StringBuilder();
-        children.forEach(c -> sb.append(c.toText()));
-        return sb.toString();
-    }
+  @Override
+  public String toText() {
+    StringBuilder sb = new StringBuilder();
+    children.forEach(c -> sb.append(c.toText()));
+    return sb.toString();
+  }
 }

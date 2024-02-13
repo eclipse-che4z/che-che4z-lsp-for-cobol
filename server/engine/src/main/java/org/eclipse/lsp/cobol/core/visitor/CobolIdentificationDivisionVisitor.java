@@ -15,13 +15,13 @@
 package org.eclipse.lsp.cobol.core.visitor;
 
 import com.google.common.collect.ImmutableList;
+import lombok.Getter;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.RuleContext;
+import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
 import org.eclipse.lsp.cobol.common.model.Locality;
-import org.eclipse.lsp.cobol.common.model.tree.DivisionNode;
-import org.eclipse.lsp.cobol.common.model.tree.Node;
-import org.eclipse.lsp.cobol.common.model.tree.ProgramIdNode;
+import org.eclipse.lsp.cobol.common.model.tree.*;
 import org.eclipse.lsp.cobol.common.model.variables.DivisionType;
 import org.eclipse.lsp.cobol.common.utils.StringUtils;
 import org.eclipse.lsp.cobol.core.CobolIdentificationDivisionParser;
@@ -35,8 +35,7 @@ import java.util.Optional;
 import java.util.function.Function;
 
 import static java.util.Optional.ofNullable;
-import static org.eclipse.lsp.cobol.core.visitor.VisitorHelper.constructNode;
-import static org.eclipse.lsp.cobol.core.visitor.VisitorHelper.retrieveRangeLocality;
+import static org.eclipse.lsp.cobol.core.visitor.VisitorHelper.*;
 
 /**
  * Visitor for Identification Division ANTLR parser results
@@ -45,7 +44,8 @@ import static org.eclipse.lsp.cobol.core.visitor.VisitorHelper.retrieveRangeLoca
 public class CobolIdentificationDivisionVisitor extends CobolIdentificationDivisionParserBaseVisitor<List<Node>> {
   private final ExtendedDocument extendedDocument;
   private final CopybooksRepository copybooks;
-
+  @Getter
+  private final List<SyntaxError> errors = new ArrayList<>();
   public CobolIdentificationDivisionVisitor(ExtendedDocument extendedDocument, CopybooksRepository copybooks) {
     this.extendedDocument = extendedDocument;
     this.copybooks = copybooks;
@@ -69,6 +69,11 @@ public class CobolIdentificationDivisionVisitor extends CobolIdentificationDivis
                             retrieveLocality(ctx)
                                     .ifPresent(locality -> result.add(new ProgramIdNode(locality, name))));
     return result;
+  }
+
+  @Override
+  public List<Node> visitRemarksParagraph(CobolIdentificationDivisionParser.RemarksParagraphContext ctx) {
+    return addTreeNode(ctx, RemarksNode::new);
   }
 
   private List<Node> addTreeNode(ParserRuleContext ctx, Function<Locality, Node> nodeConstructor) {

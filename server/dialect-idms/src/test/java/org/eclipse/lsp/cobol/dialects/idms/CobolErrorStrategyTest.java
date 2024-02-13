@@ -135,7 +135,6 @@ class CobolErrorStrategyTest {
   void testReportNoViableAlternative() {
     Parser parser = mock(Parser.class);
     service.reportNoViableAlternative(parser, mock(NoViableAltException.class));
-
     verify(messageService, times(1)).getMessage(any(), any());
   }
 

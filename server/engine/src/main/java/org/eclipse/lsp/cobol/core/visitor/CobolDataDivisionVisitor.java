@@ -15,12 +15,19 @@
 package org.eclipse.lsp.cobol.core.visitor;
 
 import com.google.common.collect.ImmutableList;
+import lombok.Getter;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.RuleNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
+import org.eclipse.lsp.cobol.common.dialects.CobolDialect;
+import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
+import org.eclipse.lsp.cobol.common.error.ErrorSource;
+import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
+import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.SectionType;
 import org.eclipse.lsp.cobol.common.model.tree.DivisionNode;
@@ -49,20 +56,24 @@ import static org.eclipse.lsp.cobol.core.visitor.VisitorHelper.*;
 public class CobolDataDivisionVisitor extends CobolDataDivisionParserBaseVisitor<List<Node>> {
   private final ExtendedDocument extendedDocument;
   private final CopybooksRepository copybooks;
+  private final MessageService messageService;
   private final Map<String, CobolParser.FileControlEntryContext> fileControls;
-
+  @Getter
+  private final List<SyntaxError> errors = new ArrayList<>();
   public CobolDataDivisionVisitor(
           ExtendedDocument extendedDocument,
           CopybooksRepository copybooks,
+          MessageService messageService,
           Map<String, CobolParser.FileControlEntryContext> fileControls) {
     this.extendedDocument = extendedDocument;
     this.copybooks = copybooks;
+    this.messageService = messageService;
     this.fileControls = fileControls;
   }
 
   @Override
   public List<Node> visitDataDivision(CobolDataDivisionParser.DataDivisionContext ctx) {
-    // FIXME: areaAWarning(ctx.getStart());
+    areaAWarning(ctx.getStart());
     return addTreeNode(ctx, location -> new DivisionNode(location, DivisionType.DATA_DIVISION));
   }
 
@@ -78,7 +89,7 @@ public class CobolDataDivisionVisitor extends CobolDataDivisionParserBaseVisitor
 
   @Override
   public List<Node> visitDataDivisionSection(CobolDataDivisionParser.DataDivisionSectionContext ctx) {
-    // FIXME: areaAWarning(ctx.getStart());
+    areaAWarning(ctx.getStart());
     return visitChildren(ctx);
   }
 
@@ -142,7 +153,8 @@ public class CobolDataDivisionVisitor extends CobolDataDivisionParserBaseVisitor
     if (ctx.fileDescriptionEntryClauses() == null) {
       return ImmutableList.of();
     }
-    // FIXME: enable areaAWarning(ctx.getStart());
+
+    areaAWarning(ctx.getStart());
     String fileControlClause = "";
     String fileName = getName(ctx.fileDescriptionEntryClauses().cobolWord());
     if (fileControls.containsKey(fileName)) {
@@ -393,9 +405,37 @@ public class CobolDataDivisionVisitor extends CobolDataDivisionParserBaseVisitor
   private boolean isVariableDefinitionMandatory(CobolDataDivisionParser.VariableUsageNameContext ctx) {
     Boolean isDataRecordClause = ofNullable(ctx.getParent())
             .map(ParserRuleContext::getParent)
-            .map(CobolParser.DataRecordsClauseContext.class::isInstance)
+            .map(CobolDataDivisionParser.DataRecordsClauseContext.class::isInstance)
             .orElse(false);
     return !isDataRecordClause;
+  }
+  private void areaAWarning(Token token) {
+    // skip area A check for cics and sql block
+    if (token.getText().startsWith("EXEC")) {
+      return;
+    }
+    getLocality(token)
+            .filter(it -> it.getRange().getStart().getCharacter() > AREA_A_FINISH)
+            .ifPresent(
+                    it ->
+                            throwException(
+                                    token.getText(),
+                                    it,
+                                    messageService.getMessage("CobolVisitor.AreaAWarningMsg")));
+  }
+  private void throwException(String wrongToken, @NonNull Locality locality, String message) {
+    SyntaxError error =
+            SyntaxError.syntaxError()
+                    .errorSource(ErrorSource.PARSING)
+                    .location(locality.toOriginalLocation())
+                    .suggestion(message + wrongToken)
+                    .severity(ErrorSeverity.WARNING)
+                    .build();
+
+    LOG.debug("Syntax error by CobolVisitor#throwException: {}", error);
+    if (!errors.contains(error) && !wrongToken.equals(CobolDialect.FILLER)) {
+      errors.add(error);
+    }
   }
 
 }

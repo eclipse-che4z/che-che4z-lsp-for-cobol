@@ -50,10 +50,10 @@ public class CobolLexer {
    */
   public List<Token> forward(GrammarRule rule) {
     if (position.getIndex() == source.length()) {
-      return Collections.singletonList(new Token("", position.getLine(), position.getCharacter(), TokenType.EOF));
+      return Collections.singletonList(new Token("", position.getLine(), position.getCharacter(), position.getIndex(), TokenType.EOF));
     }
     String lexeme = scan(rule, false);
-    Token token = new Token(lexeme, lastTokenStartPosition.getLine(), lastTokenStartPosition.getCharacter(), detectType(rule, lexeme));
+    Token token = new Token(lexeme, lastTokenStartPosition.getLine(), lastTokenStartPosition.getCharacter(), position.getIndex(), detectType(rule, lexeme));
     return Collections.singletonList(token);
   }
 
@@ -64,10 +64,10 @@ public class CobolLexer {
    */
   public List<Token> peek(GrammarRule rule) {
     if (position.getIndex() == source.length()) {
-      return Collections.singletonList(new Token("", position.getLine(), position.getCharacter(), TokenType.EOF));
+      return Collections.singletonList(new Token("", position.getLine(), position.getCharacter(), position.getIndex(), TokenType.EOF));
     }
     String lexeme = scan(rule, true);
-    Token token = new Token(lexeme, lastTokenStartPosition.getLine(), lastTokenStartPosition.getCharacter(), detectType(rule, lexeme));
+    Token token = new Token(lexeme, lastTokenStartPosition.getLine(), lastTokenStartPosition.getCharacter(), position.getIndex(), detectType(rule, lexeme));
     return Collections.singletonList(token);
   }
 

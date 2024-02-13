@@ -25,7 +25,8 @@ import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.eclipse.lsp.cobol.common.utils.ThreadInterruptionUtil;
 import org.eclipse.lsp.cobol.core.cst.SourceUnit;
-import org.eclipse.lsp.cobol.core.hw.AntlrAdapter;
+import org.eclipse.lsp.cobol.core.hw.ParserSettings;
+import org.eclipse.lsp.cobol.core.hw.antlradapter.AntlrAdapter;
 import org.eclipse.lsp.cobol.core.hw.Diagnostic;
 import org.eclipse.lsp.cobol.core.hw.ParseResult;
 
@@ -43,7 +44,8 @@ public class SplitParser implements AstBuilder {
   public SplitParser(CharStream input, BaseErrorListener listener, DefaultErrorStrategy errorStrategy, ParseTreeListener treeListener) {
     org.eclipse.lsp.cobol.core.hw.CobolLexer lexer = new org.eclipse.lsp.cobol.core.hw.CobolLexer(
             input.getText(Interval.of(0, input.size())));
-    ParseResult parseResult = new org.eclipse.lsp.cobol.core.hw.CobolParser(lexer).parse();
+    ParserSettings settings = new ParserSettings();
+    ParseResult parseResult = new org.eclipse.lsp.cobol.core.hw.CobolParser(lexer, settings).parse();
     SourceUnit su = parseResult.getSourceUnit();
     diagnostics = parseResult.getDiagnostics();
     AntlrAdapter antlrAdapter = new AntlrAdapter(listener, errorStrategy, treeListener);

@@ -14,12 +14,18 @@
  *    and DAF development standards
  *
  */
-package org.eclipse.lsp.cobol.core.cst;
-
-import org.eclipse.lsp.cobol.core.cst.base.CstNodeImpl;
+package org.eclipse.lsp.cobol.core;
 
 /**
- * AntlrIsland node
+ * Parser related utils.
  */
-public class AntlrIsland extends CstNodeImpl {
+public final class ParserUtils {
+  private ParserUtils() {
+    // no-op
+  }
+  private static final String HW_PARSER = "hw.parser";
+
+  public static boolean isHwParserEnabled() {
+    return System.getenv(HW_PARSER) != null ||  System.getProperty(HW_PARSER) != null;
+  }
 }

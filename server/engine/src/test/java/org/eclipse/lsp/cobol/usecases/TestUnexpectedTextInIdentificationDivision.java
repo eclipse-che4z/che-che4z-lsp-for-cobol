@@ -18,6 +18,7 @@ package org.eclipse.lsp.cobol.usecases;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
+import org.eclipse.lsp.cobol.core.ParserUtils;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
@@ -33,9 +34,13 @@ class TestUnexpectedTextInIdentificationDivision {
           + "       {DISPLAY|1} \"HELLO\".\n"
           + "       data division.\n"
           + "       working-storage section.\n"
-          + "       01 VARNAME PIC X(3) VALUE \"ABC\".\n"
+              + (ParserUtils.isHwParserEnabled()
+              ? "       01 {$*VARNAME} PIC X(3) VALUE \"ABC\".\n"
+              : "       01 VARNAME PIC X(3) VALUE \"ABC\".\n")
           + "       procedure division.\n"
-          + "           DISPLAY VARNAME.";
+              + (ParserUtils.isHwParserEnabled()
+              ? "           DISPLAY {$VARNAME}."
+              : "           DISPLAY VARNAME.");
 
   @Test
   void test() {

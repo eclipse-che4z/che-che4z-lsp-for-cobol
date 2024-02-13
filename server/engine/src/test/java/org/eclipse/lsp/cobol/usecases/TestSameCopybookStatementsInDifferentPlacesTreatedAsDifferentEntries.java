@@ -18,12 +18,15 @@ package org.eclipse.lsp.cobol.usecases;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
+import org.eclipse.lsp.cobol.core.ParserUtils;
 import org.eclipse.lsp.cobol.test.CobolText;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assumptions.assumeFalse;
 
 /**
  * Test several copy statements treated as different entries, so if one of them contains a syntax
@@ -32,32 +35,36 @@ import org.junit.jupiter.api.Test;
  */
 class TestSameCopybookStatementsInDifferentPlacesTreatedAsDifferentEntries {
   private static final String TEXT =
-      "       IDENTIFICATION DIVISION.\n"
-          + "       PROGRAM-ID. TESTREPL.\n"
-          + "       {_COPY {~REPL}.|1_}\n"
-          + "       {_COPY {~REPL}.|1_}\n";
+          "       IDENTIFICATION DIVISION.\n"
+                  + "       PROGRAM-ID. TESTREPL.\n"
+                  + "       {_COPY {~REPL}.|1_}\n"
+                  + "       {_COPY {~REPL}.|1_}\n";
   private static final String REPL = "       {DATA|2} DIVISION.\n";
   private static final String REPL_NAME = "REPL";
 
   @Test
   void test() {
+    assumeFalse(ParserUtils.isHwParserEnabled());
     UseCaseEngine.runTest(
-        TEXT,
-        ImmutableList.of(new CobolText(REPL_NAME, REPL)),
-        ImmutableMap.of(
-            "1",
-            new Diagnostic(
-                new Range(),
-                "Errors inside the copybook",
-                DiagnosticSeverity.Error,
-                ErrorSource.COPYBOOK.getText(),
-                null),
-            "2",
-            new Diagnostic(
-                new Range(),
-                "Syntax error on 'DATA'",
-                DiagnosticSeverity.Error,
-                ErrorSource.PARSING.getText(),
-                null)));
+            TEXT,
+            ImmutableList.of(new CobolText(REPL_NAME, REPL)),
+            ImmutableMap.of(
+                    "1",
+                    new Diagnostic(
+                            new Range(),
+                            "Errors inside the copybook",
+                            DiagnosticSeverity.Error,
+                            ErrorSource.COPYBOOK.getText(),
+                            null),
+                    "2",
+                    new Diagnostic(
+                            new Range(),
+                            ParserUtils.isHwParserEnabled()
+                                    ? "Unknown input: 'DATA'"
+                                    :
+                                    "Syntax error on 'DATA'",
+                            DiagnosticSeverity.Error,
+                            ErrorSource.PARSING.getText(),
+                            null)));
   }
 }

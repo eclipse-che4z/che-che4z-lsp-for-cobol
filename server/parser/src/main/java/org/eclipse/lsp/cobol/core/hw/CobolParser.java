@@ -17,6 +17,7 @@
 package org.eclipse.lsp.cobol.core.hw;
 
 import java.util.*;
+
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.text.similarity.JaroWinklerSimilarity;
 import org.eclipse.lsp.cobol.core.cst.*;
@@ -31,16 +32,19 @@ import org.eclipse.lsp4j.Range;
 @Slf4j
 public class CobolParser {
   private final ParsingContext ctx;
+  private final ParserSettings settings;
   private final List<Diagnostic> diagnostics = new ArrayList<>();
   private final JaroWinklerSimilarity sim = new JaroWinklerSimilarity();
-  private static final double SIMILARITY_THRESHOLD = 0.85;
+  private static final int SIZE_THRESHOLD = 4;
 
-  public CobolParser(CobolLexer lexer) {
+  public CobolParser(CobolLexer lexer, ParserSettings settings) {
+    this.settings = settings;
     ctx = new ParsingContext(lexer);
   }
 
   /**
    * Create the CST
+   *
    * @return Concrete Syntax Tree
    */
   public ParseResult parse() {
@@ -58,7 +62,7 @@ public class CobolParser {
     while (ctx.getLexer().hasMore()) {
       try {
         spaces();
-        if (match("ID", "IDENTIFICATION")) {
+        if (matchSeq("IDENTIFICATION", "DIVISION") || matchSeq("ID", "DIVISION")) {
           parseProgram();
         } else {
           Token token = ctx.getLexer().forward(GrammarRule.SourceUnit).get(0);
@@ -114,7 +118,7 @@ public class CobolParser {
   private boolean match(String... lexemes) {
     Token token = ctx.getLexer().peek(ctx.peek().getRule()).get(0);
     for (String l : lexemes) {
-      if (sameLexeme(token, l)) {
+      if (sameLexeme(token, l, 1.0)) {
         return true;
       }
     }
@@ -144,8 +148,10 @@ public class CobolParser {
         if (match("IS")) {
           consume("IS");
           spaces();
-          or("RECURSIVE", "INITIAL");
+          or("RECURSIVE", "INITIAL", "COMMON");
           spaces();
+          optional("INITIAL");
+          optional("COMMON");
           optional("PROGRAM");
         } else if (match("RECURSIVE", "INITIAL")) {
           spaces();
@@ -185,23 +191,10 @@ public class CobolParser {
         consume(); // programId
         consume(".");
         spaces();
-        ctx.popAndAttach();
-        return;
       }
-
+    } finally {
       ctx.popAndAttach();
-    } catch (ParseError error) {
-      CstNode node = ctx.pop();
-      Skipped s = new Skipped();
-      s.getChildren().addAll(node.getChildren());
-      ctx.peek().getChildren().add(s);
-      skipToken();
-      throw error;
     }
-  }
-
-  private void skipToken() {
-    skip(ctx.getLexer().forward(ctx.peek().getRule()).get(0));
   }
 
   private void procedureDivisionContent() {
@@ -277,12 +270,26 @@ public class CobolParser {
     if (tokens.size() != lexemes.length) {
       return false;
     }
-    for (int i = 0; i < tokens.size(); i++) {
-      if (!sameLexeme(tokens.get(i), lexemes[i])) {
-        return false;
+    if (settings.getFuzzyMatchThreshold() < 1) {
+      double d = calcDistance(tokens, lexemes);
+      return d > settings.getFuzzyMatchThreshold();
+    } else {
+      for (int i = 0; i < tokens.size(); i++) {
+        if (!sameLexeme(tokens.get(i), lexemes[i], 1.0)) {
+          return false;
+        }
       }
+      return true;
     }
-    return true;
+  }
+
+  private double calcDistance(List<Token> tokens, String[] lexemes) {
+    Double d = 0.0;
+    for (int i = 0; i < tokens.size(); i++) {
+      Token lexemeToken = tokens.get(i);
+      d += sim.apply(lexemeToken.getLexeme().toUpperCase(), lexemes[i].toUpperCase());
+    }
+    return d / tokens.size();
   }
 
   private void optional(String lexeme) {
@@ -296,7 +303,7 @@ public class CobolParser {
   private void consume(String expectedLexeme) {
     GrammarRule rule = ctx.peek().getRule();
     Token token = ctx.getLexer().peek(rule).get(0);
-    if (!sameLexeme(token, expectedLexeme)) {
+    if (!sameLexeme(token, expectedLexeme, 1.0)) {
       error(token, "Unexpected token: '" + token.getLexeme() + "'. Expect: '" + expectedLexeme + "'");
     }
     List<Token> forward = ctx.getLexer().forward(rule);
@@ -306,6 +313,7 @@ public class CobolParser {
   private void consume() {
     List<Token> forward = ctx.getLexer().forward(ctx.peek().getRule());
     ctx.peek().getChildren().add(forward.get(0));
+    skipSkipToken();
   }
 
   private void or(String... expectedTokens) {
@@ -314,7 +322,7 @@ public class CobolParser {
       return;
     }
     for (String content : expectedTokens) {
-      if (sameLexeme(next.get(0), content)) {
+      if (sameLexeme(next.get(0), content, null)) {
         List<Token> id = ctx.getLexer().forward(ctx.peek().getRule());
         ctx.peek().getChildren().add(id.get(0));
         return;
@@ -323,15 +331,22 @@ public class CobolParser {
     error(next.get(0), "Unexpected token: '" + next.get(0).getLexeme() + "'. Expected: " + String.join(",", expectedTokens));
   }
 
-  boolean sameLexeme(Token lexemeToken, String expectedLexeme) {
+  boolean sameLexeme(Token lexemeToken, String expectedLexeme, Double threshold) {
+    threshold = threshold == null ? settings.getFuzzyMatchThreshold() : threshold;
     if (lexemeToken == null || lexemeToken.getLexeme() == null || expectedLexeme == null) {
       return false;
+    }
+    /*
+     * It's not clear what heuristic to use here, but for short lexemes SIMILARITY_THRESHOLD gives false errors.
+     */
+    if (threshold == 1.0 || expectedLexeme.length() < SIZE_THRESHOLD) {
+      return Objects.equals(lexemeToken.getLexeme().toUpperCase(), expectedLexeme.toUpperCase());
     }
     Double apply = sim.apply(lexemeToken.getLexeme().toUpperCase(), expectedLexeme.toUpperCase());
     if (apply == 1) {
       return true;
     }
-    if (apply > SIMILARITY_THRESHOLD) {
+    if (apply > threshold) {
       diagnostics.add(getSimilarKeywordPassedSyntaxError(lexemeToken, expectedLexeme));
       return true;
     }
@@ -343,11 +358,23 @@ public class CobolParser {
             String.format("provided %s but expected %s", lexemeToken.getLexeme(), expectedLexeme));
   }
 
+  private void skipSkipToken() {
+    if (match("SKIP1")
+            || match("SKIP2")
+            || match("SKIP3")) {
+      consume();
+      if (match(".")) {
+        consume();
+      }
+    }
+  }
+
   private void spaces() {
     Token token = ctx.getLexer().peek(ctx.peek().getRule()).get(0);
     while (token.getType() != TokenType.EOF
             && (token.getType() == TokenType.WHITESPACE || token.getType() == TokenType.NEW_LINE)) {
       ctx.peek().getChildren().add(ctx.getLexer().forward(ctx.peek().getRule()).get(0));
+      skipSkipToken();
       token = ctx.getLexer().peek(ctx.peek().getRule()).get(0);
     }
   }

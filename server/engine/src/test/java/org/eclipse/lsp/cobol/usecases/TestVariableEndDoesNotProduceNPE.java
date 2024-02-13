@@ -18,11 +18,15 @@ package org.eclipse.lsp.cobol.usecases;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
+import org.eclipse.lsp.cobol.core.ParserUtils;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.eclipse.lsp4j.Range;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assumptions.assumeFalse;
 
 /** Variable with name "END" should not produce any exceptions */
 class TestVariableEndDoesNotProduceNPE {
@@ -33,6 +37,11 @@ class TestVariableEndDoesNotProduceNPE {
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
           + "       {01|1}  {END|2|3}{|4}";
+
+  @BeforeAll
+  public static void beforeMethod() {
+    assumeFalse(ParserUtils.isHwParserEnabled());
+  }
 
   @Test
   void test() {

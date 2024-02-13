@@ -129,7 +129,9 @@ public class ExtendedText {
   public void insert(Range copyStatementRange, ExtendedText copybook) {
     Location location = mapLocation(copyStatementRange);
     clear(copyStatementRange);
-    insert(copyStatementRange.getStart().getLine(), copybook, location);
+    // Add content of the copybook after copy statement
+    addLineBreak(copyStatementRange.getStart());
+    insert(copyStatementRange.getStart().getLine() + 1, copybook, location);
   }
 
   /**

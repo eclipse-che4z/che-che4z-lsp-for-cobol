@@ -26,13 +26,15 @@ import org.eclipse.lsp.cobol.core.cst.base.CstNodeImpl;
 public class Token extends CstNodeImpl {
   private final int line;
   private final int startPositionInLine;
+  private final int index;
   private final String lexeme;
   private final TokenType type;
 
-  public Token(String lexeme, int line, int startPositionInLine, TokenType type) {
+  public Token(String lexeme, int line, int startPositionInLine, int index, TokenType type) {
     this.line = line;
     this.lexeme = lexeme;
     this.startPositionInLine = startPositionInLine;
+    this.index = index;
     this.type = type;
   }
 

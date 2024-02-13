@@ -41,6 +41,8 @@ class ExtendedDocumentTest {
       + "        COPYBOOK LINE 2\n"
       + "        COPYBOOK LINE 3\n";
 
+  private static final String ONE_LINE_COPY = "        COPYBOOK LINE 0";
+
   private String documentUri;
   private String copybookUri;
   private ExtendedDocument document;
@@ -63,6 +65,23 @@ class ExtendedDocumentTest {
   }
 
   @Test
+  void testOneLineCopybook() {
+    copybook = new ExtendedText(ONE_LINE_COPY, copybookUri);
+
+    Range statementRange = new Range(new Position(4, 8), new Position(4, 15));
+    document.insertCopybook(statementRange, copybook);
+    assertEquals("        IDENTIFICATION DIVISION.\n"
+        + "        PROGRAM-ID. test1.\n"
+        + "        DATA DIVISION.\n"
+        + "        WORKING-STORAGE SECTION.\n"
+        + "        \n"
+        + "        COPYBOOK LINE 0\n"
+        + "        .\n"
+        + "        PROCEDURE DIVISION.",
+        document.getCurrentText().toString());
+  }
+
+  @Test
   void testInsertCopybookFromStatement() {
     Range statementRange = new Range(new Position(4, 8), new Position(4, 15));
     document.insertCopybook(statementRange, copybook);
@@ -71,12 +90,12 @@ class ExtendedDocumentTest {
     document.commitTransformations();
     assertFalse(document.isDirty());
 
-    Location location = document.mapLocation(new Range(new Position(5, 8), new Position(5, 16)));
+    Location location = document.mapLocation(new Range(new Position(6, 8), new Position(6, 16)));
     assertEquals(new Range(new Position(1, 8), new Position(1, 16)).toString(), location.getRange().toString());
     assertEquals(copybookUri, location.getUri());
 
-    location = document.mapLocation(new Range(new Position(8, 8), new Position(8, 16)));
-    assertEquals(new Range(new Position(4, 8), new Position(4, 16)).toString(), location.getRange().toString());
+    location = document.mapLocation(new Range(new Position(10, 8), new Position(10, 16)));
+    assertEquals(new Range(new Position(5, 8), new Position(5, 16)).toString(), location.getRange().toString());
     assertEquals(documentUri, location.getUri());
   }
 
