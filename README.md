@@ -179,10 +179,8 @@ You can store your copybooks locally in folders in your workspace and specify th
    - You can use [Glob](https://www.npmjs.com/package/glob) wildcards, such as * to substitute one whole level of the path. For example, specifying the path `*/copybooks` searches all subfolders named "copybooks" in  subfolders of your workspace root, while the path `copybooks/*` searches all subfolders one level below the `copybooks` folder in the workspace root. For more information on available wildcards, see the [Glob Primer](https://www.npmjs.com/package/glob#Glob-Primer)
    - The folders are searched in the order they are listed, or in alphabetical order if multiple paths are indexed by a wildcard. If two folders contain a copybook with the same file name, the one from the folder higher on the list is used.
 4. (Optional) Under **Cpy-manager: Copybook-extensions**, specify the file extensions used for your copybooks. The default supported file extensions are `.cpy` and `.copy`.
-5. (Optional) Under **Cpy-manager: Copybook-file-encoding**, specify the file encoding used in your copybooks.
-6. Open a program or project.  
+5. Open a program or project.  
    Copybook support features are now enabled.
-
 
 If you specify your copybook folders using absolute paths or paths containing `../` or `./`, the copybook folders are not watched for changes. You might need to resolve names of recently added copybooks in your code manually.
 
@@ -199,7 +197,7 @@ You can also set up automatic copybook retrieval from the mainframe to download 
 5. Under **Cpy-manager: Paths-uss**, list absolute paths of directories on USS subsystems to search for copybooks. The directories are searched in the order they are listed, so if two directories contain a copybook with the same member name, the one from the directory higher on the list is downloaded. If copybooks with the same name are found in both a mainframe data set and a USS directory, the one from the mainframe data set is downloaded.
 6. Under **Cpy-manager: Profiles**, enter the name of your Zowe Explorer profile.
 7. (Optional) Under **Cpy-manager: Copybook-extensions**, specify the file extensions used for your copybooks. The default supported file extensions are `.cpy` and `.copy`.
-8. (Optional) Under **Cpy-manager: Copybook-file-encoding**, specify the file encoding used in your copybooks.
+8. (Optional) Under **Cpy-manager: Copybook-file-encoding**, specify the file encoding used in your copybooks. COBOL Language Support converts copybooks that it downloads from the mainframe from the specified encoding to UTF-8.
 9. Open a program or project.  
    All copybooks used in the program or project which are not stored locally are downloaded from the mainframe data sets and USS directories that you specified in steps 4 and 5.  
    Copybook support features are now enabled.
