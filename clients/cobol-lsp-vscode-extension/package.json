@@ -209,7 +209,7 @@
         },
         "cobol-lsp.cpy-manager.copybook-file-encoding": {
           "type": "string",
-          "markdownDescription": "The encoding for the copybooks. Alternatively edit in .vscode\\settings.json. Other supported encodings can be found at [supported encodings](https://github.com/ashtuchkin/iconv-lite/wiki/Supported-Encodings) ",
+          "markdownDescription": "The file encoding for copybooks stored in mainframe or USS data sets. You can also edit this parameter in .vscode\\settings.json. Other supported encodings can be found at [supported encodings](https://github.com/ashtuchkin/iconv-lite/wiki/Supported-Encodings) ",
           "enum": [
             "utf8",
             "ucs2",
