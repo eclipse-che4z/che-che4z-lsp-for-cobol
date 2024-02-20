@@ -70,7 +70,7 @@ public class DaCoMaidProcessor {
           Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
   private final Pattern copyMaidPattern =
       Pattern.compile(
-          "^(?<indent>\\s*)(?<level>\\d{1,2})?\\s*COPY\\s+MAID\\s+(?<layoutId>[a-zA-Z\\d]*-?[a-zA-Z\\d]{0,3})\\s*(?<layoutUsage>[a-zA-Z]{3,6})?\\s*\\.?$",
+          "^(?<indent>\\s*)(?<level>\\d{1,2})?\\s*COPY\\s+MAID\\s+(?<layoutId>[a-zA-Z\\d]*-?[a-zA-Z\\d]{0,3})\\s*(?<layoutUsage>[a-zA-Z]{3,6})?\\s*\\.?\\s*(?<floatingComment>\\s+\\*\\>\\s?.*)?$",
           Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
   private final CopybookService copybookService;
   private final ParseTreeListener treeListener;
