@@ -16,6 +16,7 @@ package org.eclipse.lsp.cobol.common.model;
 
 /** Enumeration of Node types. */
 public enum NodeType {
+  ALTER,
   AT_END,
   CODE_BLOCK_PARENT,
   CODE_BLOCK_USAGE,
@@ -39,6 +40,7 @@ public enum NodeType {
   JSON_GENERATE,
   JSON_PARSE,
   LITERAL,
+  MERGE,
   OBSOLETE,
   OPEN_STATEMENT,
   PARAGRAPH,
@@ -56,6 +58,9 @@ public enum NodeType {
   SECTION,
   SECTION_NAME_NODE,
   SENTENCE,
+  SORT,
+  SORT_INPUT,
+  SORT_OUTPUT,
   START_STATEMENT,
   STATEMENT,
   STOP,

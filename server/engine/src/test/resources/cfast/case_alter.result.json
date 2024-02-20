@@ -1,0 +1,90 @@
+[
+  {
+    "name": "TEST1",
+    "type": "program",
+    "location": {
+      "uri": "fake/path",
+      "start": {
+        "line": 3,
+        "character": 8
+      },
+      "end": {
+        "line": 7,
+        "character": 13
+      }
+    },
+    "children": [
+      {
+        "from": {
+          "name": "PAR1",
+          "inSection": "SEC1"
+        },
+        "to": {
+          "name": "PAR2"
+        },
+        "type": "alter",
+        "location": {
+          "uri": "fake/path",
+          "start": {
+            "line": 4,
+            "character": 12
+          },
+          "end": {
+            "line": 4,
+            "character": 49
+          }
+        }
+      },
+      {
+        "name": "SEC1",
+        "snippet": "SEC1 SECTION.\r\n       PAR1.\r\n       PAR2.",
+        "type": "section",
+        "location": {
+          "uri": "fake/path",
+          "start": {
+            "line": 5,
+            "character": 8
+          },
+          "end": {
+            "line": 7,
+            "character": 13
+          }
+        },
+        "children": [
+          {
+            "snippet": "PAR1.",
+            "name": "PAR1",
+            "type": "paragraph",
+            "location": {
+              "uri": "fake/path",
+              "start": {
+                "line": 6,
+                "character": 8
+              },
+              "end": {
+                "line": 6,
+                "character": 13
+              }
+            }
+          },
+          {
+            "snippet": "PAR2.",
+            "name": "PAR2",
+            "type": "paragraph",
+            "location": {
+              "uri": "fake/path",
+              "start": {
+                "line": 7,
+                "character": 8
+              },
+              "end": {
+                "line": 7,
+                "character": 13
+              }
+            }
+          }
+        ]
+      }
+    ]
+  }
+]

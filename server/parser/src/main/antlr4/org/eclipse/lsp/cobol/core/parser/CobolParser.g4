@@ -1310,7 +1310,7 @@ inspectBeforeAfter
 // merge statement
 
 mergeStatement
-   : MERGE fileName mergeOnKeyClause+ mergeCollatingSequencePhrase? mergeUsing* mergeOutputProcedurePhrase? mergeGivingPhrase*
+   : MERGE fileName mergeOnKeyClause+ mergeCollatingSequencePhrase? mergeUsing* outputProcedurePhrase? mergeGivingPhrase*
    ;
 
 mergeOnKeyClause
@@ -1331,14 +1331,6 @@ mergeCollatingNational
 
 mergeUsing
    : USING fileName+
-   ;
-
-mergeOutputProcedurePhrase
-   : OUTPUT PROCEDURE IS? procedureName mergeOutputThrough?
-   ;
-
-mergeOutputThrough
-   : (THROUGH | THRU) procedureName
    ;
 
 mergeGivingPhrase
@@ -1438,7 +1430,7 @@ performInlineStatement
    ;
 
 performProcedureStatement
-   : procedureName ((THROUGH | THRU) procedureName)? performType?
+   : procedureName through? performType?
    ;
 
 performType
@@ -1693,7 +1685,7 @@ serviceReloadStatement
 // sort statement
 
 sortStatement
-   : SORT fileName sortOnKeyClause+ sortDuplicatesPhrase? sortCollatingSequencePhrase? sortInputProcedurePhrase? sortUsing* sortOutputProcedurePhrase? sortGivingPhrase*
+   : SORT fileName sortOnKeyClause+ sortDuplicatesPhrase? sortCollatingSequencePhrase? inputProcedurePhrase? sortUsing* outputProcedurePhrase? sortGivingPhrase*
    ;
 
 sortOnKeyClause
@@ -1716,11 +1708,11 @@ sortCollatingNational
    : FOR? NATIONAL IS? alphabetName
    ;
 
-sortInputProcedurePhrase
-   : INPUT PROCEDURE IS? procedureName sortInputThrough?
+inputProcedurePhrase
+   : INPUT PROCEDURE IS? procedureName through?
    ;
 
-sortInputThrough
+through
    : (THROUGH | THRU) procedureName
    ;
 
@@ -1728,12 +1720,8 @@ sortUsing
    : USING fileName+?
    ;
 
-sortOutputProcedurePhrase
-   : OUTPUT PROCEDURE IS? procedureName sortOutputThrough?
-   ;
-
-sortOutputThrough
-   : (THROUGH | THRU) procedureName
+outputProcedurePhrase
+   : OUTPUT PROCEDURE IS? procedureName through?
    ;
 
 sortGivingPhrase
@@ -1941,7 +1929,7 @@ writeNotAtEndOfPagePhrase
 // xml statement
 
 xmlParseStatement
-   : XML PARSE qualifiedDataName xmlEncoding? xmlNational? xmlValidating? xmlProcessinProcedure xmlThru? onExceptionClause? notOnExceptionClause? END_XML?
+   : XML PARSE qualifiedDataName xmlEncoding? xmlNational? xmlValidating? xmlProcessinProcedure through? onExceptionClause? notOnExceptionClause? END_XML?
    ;
 
 xmlEncoding
@@ -1954,10 +1942,6 @@ xmlNational
 
 xmlValidating
    : VALIDATING WITH? (qualifiedDataName | FILE literal)
-   ;
-
-xmlThru
-   : (THROUGH | THRU) procedureName
    ;
 
 xmlProcessinProcedure

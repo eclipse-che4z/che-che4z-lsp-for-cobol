@@ -5,11 +5,11 @@
     "location": {
       "uri": "fake/path",
       "start": {
-        "line": 3,
+        "line": 15,
         "character": 9
       },
       "end": {
-        "line": 5,
+        "line": 17,
         "character": 21
       }
     }

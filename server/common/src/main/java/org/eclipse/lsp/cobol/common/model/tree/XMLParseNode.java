@@ -19,6 +19,7 @@ import lombok.Getter;
 import lombok.ToString;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.NodeType;
+import org.eclipse.lsp.cobol.common.model.ProcedureName;
 import org.eclipse.lsp.cobol.common.model.tree.statements.StatementNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNameAndLocality;
 
@@ -32,6 +33,8 @@ public class XMLParseNode extends StatementNode {
   private final VariableNameAndLocality identifier1;
   private final VariableNameAndLocality xmlValidatingContext;
   private final VariableNameAndLocality xmlNationalContext;
+  private final ProcedureName processingProcedureName;
+  private final ProcedureName thruProcedureName;
 
   public XMLParseNode(
       Locality location,
@@ -39,12 +42,16 @@ public class XMLParseNode extends StatementNode {
       VariableNameAndLocality identifier2,
       VariableNameAndLocality encodingLocality,
       VariableNameAndLocality xmlValidatingContext,
-      VariableNameAndLocality xmlNationalContext) {
+      VariableNameAndLocality xmlNationalContext,
+      ProcedureName processingProcedureName,
+      ProcedureName thruProcedureName) {
     super(location, NodeType.XML_PARSE);
     this.identifier1 = identifier1;
     this.identifier2 = identifier2;
     this.encodingLocality = encodingLocality;
     this.xmlValidatingContext = xmlValidatingContext;
     this.xmlNationalContext = xmlNationalContext;
+    this.processingProcedureName = processingProcedureName;
+    this.thruProcedureName = thruProcedureName;
   }
 }

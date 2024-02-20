@@ -20,11 +20,18 @@ import lombok.Getter;
 /** Control Flow Nodes type constant collection. */
 @AllArgsConstructor
 public enum CFASTNodeType {
+  ALTER("alter"),
   PROGRAM("program"),
   PARAGRAPH("paragraph"),
   GOTO("goto"),
   PERFORM("perform"),
   SECTION("section"),
+  SORT("sort"),
+  INPUT("input"),
+  OUTPUT("output"),
+  END_SORT("endsort"),
+  MERGE("merge"),
+  END_MERGE("endmerge"),
   STOP("stop"),
   EXIT("exit"),
   EXIT_SECTION("exitsection"),
@@ -40,6 +47,7 @@ public enum CFASTNodeType {
   INLINE_PERFORM("inlineperform"),
   END_INLINE_PERFORM("endinlineperform"),
   AT_END("atEnd"),
-  AT_END_EXIT("atEndExit");
+  AT_END_EXIT("atEndExit"),
+  XML_PARSE("xmlparse");
   @Getter final String value;
 }

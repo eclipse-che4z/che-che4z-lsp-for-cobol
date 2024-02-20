@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Broadcom.
+ * Copyright (c) 2022 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -21,27 +21,18 @@ import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.NodeType;
 import org.eclipse.lsp.cobol.common.model.ProcedureName;
 
-/** The class represents perform in COBOL. */
-@ToString(callSuper = true)
+/**
+ * Represents ALTER statement
+ */
 @Getter
+@ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-public class PerformNode extends Node {
-  ProcedureName target;
-  ProcedureName thru;
-
-  public PerformNode(Locality location) {
-    super(location, NodeType.PERFORM);
-    this.target = null;
-    this.thru = null;
-  }
-
-  public PerformNode(Locality location, ProcedureName target, ProcedureName thru) {
-    super(location, NodeType.PERFORM);
-    this.target = target;
-    this.thru = thru;
-  }
-
-  public boolean isInline() {
-    return target == null;
+public class AlterNode extends Node {
+  private final ProcedureName from;
+  private final ProcedureName to;
+  public AlterNode(Locality location, ProcedureName from, ProcedureName to) {
+    super(location, NodeType.ALTER);
+    this.from = from;
+    this.to = to;
   }
 }

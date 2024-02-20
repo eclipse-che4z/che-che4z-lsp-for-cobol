@@ -79,6 +79,11 @@ public class CFASTBuilderImpl implements CFASTBuilder {
       addChild(parent, new CFASTNode(CFASTNodeType.ENDIF.getValue(), convertLocation(node)));
     } else if (node instanceof SentenceNode) {
       node.getChildren().forEach(child -> traverse(parent, child));
+    } else if (node instanceof XMLParseNode) {
+      XMLParseNode xmlParseNode = (XMLParseNode) node;
+      addChild(parent, new XmlParse(xmlParseNode.getProcessingProcedureName(),
+          xmlParseNode.getThruProcedureName(),
+          convertLocation(node)));
     } else if (node instanceof StatementNode) {
       node.getChildren().forEach(child -> traverse(parent, child));
     } else if (node instanceof IfElseNode) {
@@ -93,10 +98,8 @@ public class CFASTBuilderImpl implements CFASTBuilder {
         PerformNode performNode = ((PerformNode) node);
         addChild(
             parent,
-            new Perform(performNode.getTargetName(),
-                performNode.getTargetSectionName(),
-                performNode.getThruName(),
-                performNode.getThruSectionName(),
+            new Perform(performNode.getTarget(),
+                performNode.getThru(),
                 convertLocation(node)
             ));
       }
@@ -111,7 +114,7 @@ public class CFASTBuilderImpl implements CFASTBuilder {
     } else if (node instanceof ExecCicsNode) {
       ExecCicsNode execCicsNode = (ExecCicsNode) node;
       if (execCicsNode.isStopRun()) {
-        addChild(parent, new CFASTNode(CFASTNodeType.STOP.getValue(), convertLocation(node)));
+        addChild(parent, new CFASTNode(CFASTNodeType.GOBACK.getValue(), convertLocation(node)));
       }
     } else if (node instanceof StopNode) {
       addChild(parent, new CFASTNode(CFASTNodeType.STOP.getValue(), convertLocation(node)));
@@ -121,6 +124,23 @@ public class CFASTBuilderImpl implements CFASTBuilder {
       addChild(parent, new CFASTNode(CFASTNodeType.AT_END.getValue(), convertLocation(node)));
       node.getChildren().forEach(child -> traverse(parent, child));
       addChild(parent, new CFASTNode(CFASTNodeType.AT_END_EXIT.getValue(), convertLocation(node)));
+    } else if (node instanceof MergeNode) {
+      addChild(parent, new CFASTNode(CFASTNodeType.MERGE.getValue(), convertLocation(node)));
+      node.getChildren().forEach(child -> traverse(parent, child));
+      addChild(parent, new CFASTNode(CFASTNodeType.END_MERGE.getValue(), convertLocation(node)));
+    } else if (node instanceof SortNode) {
+      addChild(parent, new CFASTNode(CFASTNodeType.SORT.getValue(), convertLocation(node)));
+      node.getChildren().forEach(child -> traverse(parent, child));
+      addChild(parent, new CFASTNode(CFASTNodeType.END_SORT.getValue(), convertLocation(node)));
+    } else if (node instanceof InputNode) {
+      InputNode inputNode = (InputNode) node;
+      addChild(parent, new Input(inputNode.getTarget(), inputNode.getThru(), convertLocation(node)));
+    } else if (node instanceof OutputNode) {
+      OutputNode outputNode = (OutputNode) node;
+      addChild(parent, new Output(outputNode.getTarget(), outputNode.getThru(), convertLocation(node)));
+    } else if (node instanceof AlterNode) {
+      AlterNode alterNode = (AlterNode) node;
+      addChild(parent, new Alter(alterNode.getFrom(), alterNode.getTo(), convertLocation(node)));
     }
   }
 
