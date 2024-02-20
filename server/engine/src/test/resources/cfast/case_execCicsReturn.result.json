@@ -5,25 +5,25 @@
     "location": {
       "uri": "fake/path",
       "start": {
-        "line": 3,
+        "line": 15,
         "character": 9
       },
       "end": {
-        "line": 4,
+        "line": 16,
         "character": 30
       }
     },
     "children": [
       {
-        "type": "stop",
+        "type": "goback",
         "location": {
           "uri": "fake/path",
           "start": {
-            "line": 4,
+            "line": 16,
             "character": 13
           },
           "end": {
-            "line": 4,
+            "line": 16,
             "character": 29
           }
         }

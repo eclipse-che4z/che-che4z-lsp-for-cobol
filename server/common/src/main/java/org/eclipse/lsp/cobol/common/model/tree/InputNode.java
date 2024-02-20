@@ -15,22 +15,23 @@
 package org.eclipse.lsp.cobol.common.model.tree;
 
 import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.NodeType;
+import org.eclipse.lsp.cobol.common.model.ProcedureName;
 
 /**
  * The class represents SORT statement in COBOL.
  * <a href="https://www.ibm.com/docs/en/cobol-zos/6.4?topic=statements-sort-statement">...</a>
  */
-@Getter
 @ToString(callSuper = true)
-public class SortNode extends Node {
-  boolean ascending;
-  String key;
-  public SortNode(Locality location, boolean ascending, String key) {
-    super(location, NodeType.SORT);
-    this.ascending = ascending;
-    this.key = key;
+@Getter
+@Setter
+public class InputNode extends Node {
+  ProcedureName target;
+  ProcedureName thru;
+  public InputNode(Locality location) {
+    super(location, NodeType.SORT_INPUT);
   }
 }

@@ -1,0 +1,70 @@
+[
+  {
+    "name": "TDXMLTST",
+    "type": "program",
+    "location": {
+      "uri": "fake/path",
+      "start": {
+        "line": 21,
+        "character": 8
+      },
+      "end": {
+        "line": 32,
+        "character": 43
+      }
+    },
+    "children": [
+      {
+        "snippet": "MAINLINE.\r\n             DISPLAY \u0027XML-DOCUMENT\u003d\u0027 XML-STRING(EZ-PTR)\r\n             XML PARSE XML-STRING(EZ-PTR) RETURNING NATIONAL\r\n                                PROCESSING PROCEDURE XML-HANDLER\r\n               ON EXCEPTION\r\n                 DISPLAY \u0027XML DOCUMENT ERROR \u0027 XML-CODE\r\n               NOT ON EXCEPTION\r\n                 DISPLAY \u0027XML DOCUMENT SUCCESSFULLY PARSED\u0027\r\n              END-XML.",
+        "name": "MAINLINE",
+        "type": "paragraph",
+        "location": {
+          "uri": "fake/path",
+          "start": {
+            "line": 22,
+            "character": 11
+          },
+          "end": {
+            "line": 30,
+            "character": 23
+          }
+        },
+        "children": [
+          {
+            "processingName": {
+              "name": "XML-HANDLER"
+            },
+            "type": "xmlparse",
+            "location": {
+              "uri": "fake/path",
+              "start": {
+                "line": 24,
+                "character": 14
+              },
+              "end": {
+                "line": 30,
+                "character": 22
+              }
+            }
+          }
+        ]
+      },
+      {
+        "snippet": "XML-HANDLER.\r\n           DISPLAY \u0027XML-EVENT\u003d\u0027 XML-EVENT.",
+        "name": "XML-HANDLER",
+        "type": "paragraph",
+        "location": {
+          "uri": "fake/path",
+          "start": {
+            "line": 31,
+            "character": 8
+          },
+          "end": {
+            "line": 32,
+            "character": 43
+          }
+        }
+      }
+    ]
+  }
+]

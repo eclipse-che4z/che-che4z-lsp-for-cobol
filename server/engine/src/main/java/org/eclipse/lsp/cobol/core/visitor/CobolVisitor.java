@@ -23,10 +23,10 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.RuleNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp.cobol.common.dialects.CobolDialect;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
@@ -59,7 +59,6 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
@@ -292,6 +291,14 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
                     new VariableNameAndLocality(ctx2.integerLiteral().getText(), retrieveLocality(ctx2).orElse(null)))
             .orElse(null);
 
+    ProcedureName procName = parseProcedureName(Optional.ofNullable(ctx.xmlProcessinProcedure())
+        .map(XmlProcessinProcedureContext::procedureName)
+        .orElse(null));
+
+    ProcedureName thru = parseProcedureName(Optional.ofNullable(ctx.through())
+        .map(ThroughContext::procedureName)
+        .orElse(null));
+
     return addTreeNode(
             ctx,
             locality ->
@@ -301,8 +308,10 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
                             identifier2,
                             encodingLocality,
                             xmlValidatingContext,
-                            xmlNationalContext
-                    ));
+                            xmlNationalContext,
+                            procName,
+                            thru)
+                    );
   }
 
   /**
@@ -646,10 +655,11 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
 
   @Override
   public List<Node> visitPerformProcedureStatement(PerformProcedureStatementContext ctx) {
-    final Pair<String, String> targetName = getPerformItemName(ctx.procedureName(), 0);
-    final Pair<String, String> thruName = getPerformItemName(ctx.procedureName(), 1);
-    return addTreeNode(ctx, locality -> new PerformNode(locality, targetName.getLeft(), targetName.getRight(),
-            thruName.getLeft(), thruName.getRight()));
+    final ProcedureName targetName = parseProcedureName(ctx.procedureName());
+    final ProcedureName thruName = parseProcedureName(Optional.ofNullable(ctx.through())
+        .map(ThroughContext::procedureName)
+        .orElse(null));
+    return addTreeNode(ctx, locality -> new PerformNode(locality, targetName, thruName));
   }
 
   @Override
@@ -1019,35 +1029,125 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
 
   @Override
   public List<Node> visitSortStatement(CobolParser.SortStatementContext ctx) {
-    List<Node> children = visitChildren(ctx);
-    boolean ascending = false;
+    boolean ascending;
+    String key;
     if (ctx.sortOnKeyClause() != null) {
       ascending = ctx.sortOnKeyClause().stream()
           .map(s -> s.ASCENDING() != null)
           .filter(b -> b)
           .findAny()
           .orElse(false);
-    }
-    Locality locality = retrieveLocality(ctx).orElse(null);
-    SortNode sortNode = new SortNode(locality);
-    sortNode.setAscending(ascending);
 
-    children.forEach(sortNode::addChild);
-    return ImmutableList.of(sortNode);
+      key = ctx.sortOnKeyClause().stream()
+          .map(SortOnKeyClauseContext::KEY)
+          .filter(Objects::nonNull)
+          .map(ParseTree::getText)
+          .findFirst()
+          .orElse("");
+    } else {
+      ascending = false;
+      key = "";
+    }
+
+    return addTreeNode(ctx, locality -> new SortNode(locality, ascending, key));
   }
 
-  private Pair<String, String> getPerformItemName(List<CobolParser.ProcedureNameContext> procedureNames, int index) {
-    if (index >= procedureNames.size()) {
-      return Pair.of(null, null);
-    }
-    ProcedureNameContext procedureNameContext = procedureNames.get(index);
+  @Override
+  public List<Node> visitMergeStatement(CobolParser.MergeStatementContext ctx) {
+    boolean ascending;
+    String key;
+    if (ctx.mergeOnKeyClause() != null) {
+      ascending = ctx.mergeOnKeyClause().stream()
+          .map(s -> s.ASCENDING() != null)
+          .filter(b -> b)
+          .findAny()
+          .orElse(false);
 
+      key = ctx.mergeOnKeyClause().stream()
+          .map(MergeOnKeyClauseContext::KEY)
+          .filter(Objects::nonNull)
+          .map(ParseTree::getText)
+          .findFirst()
+          .orElse("");
+    } else {
+      ascending = false;
+      key = "";
+    }
+
+    return addTreeNode(ctx, locality -> new MergeNode(locality, ascending, key));
+  }
+
+  @Override
+  public List<Node> visitInputProcedurePhrase(CobolParser.InputProcedurePhraseContext ctx) {
+    final ProcedureName procName = parseProcedureName(ctx.procedureName());
+    final ProcedureName thru = parseProcedureName(Optional.ofNullable(ctx.through())
+        .map(ThroughContext::procedureName)
+        .orElse(null));
+
+    Locality locality = retrieveLocality(ctx).orElse(null);
+    InputNode node = new InputNode(locality);
+    node.setTarget(procName);
+    node.setThru(thru);
+
+    visitChildren(ctx).forEach(node::addChild);
+    return ImmutableList.of(node);
+  }
+
+  @Override
+  public List<Node> visitOutputProcedurePhrase(CobolParser.OutputProcedurePhraseContext ctx) {
+    final ProcedureName procName = parseProcedureName(ctx.procedureName());
+    final ProcedureName thru = parseProcedureName(Optional.ofNullable(ctx.through())
+        .map(ThroughContext::procedureName)
+        .orElse(null));
+
+    Locality locality = retrieveLocality(ctx).orElse(null);
+    OutputNode node = new OutputNode(locality);
+    node.setTarget(procName);
+    node.setThru(thru);
+
+    visitChildren(ctx).forEach(node::addChild);
+    return ImmutableList.of(node);
+  }
+
+  @Override public List<Node> visitAlterStatement(CobolParser.AlterStatementContext ctx) {
+    if (ctx.alterProceedTo() != null && ctx.alterProceedTo().size() > 0) {
+      CobolParser.AlterProceedToContext alter = ctx.alterProceedTo().get(0);
+      if (alter.procedureName() != null && alter.procedureName().size() == 2) {
+        CobolParser.ProcedureNameContext from = alter.procedureName(0);
+        CobolParser.ProcedureNameContext to = alter.procedureName(1);
+
+        String name = Optional.ofNullable(from.paragraphName()).map(RuleContext::getText).orElse(null);
+        String inSection = Optional.ofNullable(from.inSection())
+            .map(InSectionContext::sectionName)
+            .map(RuleContext::getText).orElse(null);
+        ProcedureName alterFrom = new ProcedureName(name, inSection);
+
+        name = Optional.ofNullable(to.paragraphName()).map(RuleContext::getText).orElse(null);
+        inSection = Optional.ofNullable(to.inSection())
+            .map(InSectionContext::sectionName)
+            .map(RuleContext::getText).orElse(null);
+        ProcedureName alterTo = new ProcedureName(name, inSection);
+
+        Locality locality = retrieveLocality(ctx).orElse(null);
+        AlterNode node = new AlterNode(locality, alterFrom, alterTo);
+        visitChildren(ctx).forEach(node::addChild);
+
+        return ImmutableList.of(node);
+      }
+    }
+    return visitChildren(ctx);
+  }
+
+  private ProcedureName parseProcedureName(CobolParser.ProcedureNameContext procedureNameContext) {
+    if (procedureNameContext == null) {
+      return null;
+    }
     final String sectionName =
             procedureNameContext.inSection() != null
                     ? procedureNameContext.inSection().sectionName().getText()
                     : null;
     final String targetName = procedureNameContext.paragraphName().getText();
-    return Pair.of(targetName, sectionName);
+    return new ProcedureName(targetName, sectionName);
   }
 
   private void throwException(String wrongToken, @NonNull Locality locality, String message) {

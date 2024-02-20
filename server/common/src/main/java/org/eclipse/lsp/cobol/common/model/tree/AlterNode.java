@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Broadcom.
+ * Copyright (c) 2022 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -14,23 +14,25 @@
  */
 package org.eclipse.lsp.cobol.common.model.tree;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.NodeType;
+import org.eclipse.lsp.cobol.common.model.ProcedureName;
 
 /**
- * The class represents SORT statement in COBOL.
- * <a href="https://www.ibm.com/docs/en/cobol-zos/6.4?topic=statements-sort-statement">...</a>
+ * Represents ALTER statement
  */
 @Getter
 @ToString(callSuper = true)
-public class SortNode extends Node {
-  boolean ascending;
-  String key;
-  public SortNode(Locality location, boolean ascending, String key) {
-    super(location, NodeType.SORT);
-    this.ascending = ascending;
-    this.key = key;
+@EqualsAndHashCode(callSuper = true)
+public class AlterNode extends Node {
+  private final ProcedureName from;
+  private final ProcedureName to;
+  public AlterNode(Locality location, ProcedureName from, ProcedureName to) {
+    super(location, NodeType.ALTER);
+    this.from = from;
+    this.to = to;
   }
 }

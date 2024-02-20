@@ -23,7 +23,7 @@ import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
-import org.eclipse.lsp.cobol.common.model.tree.SortTableNode;
+import org.eclipse.lsp.cobol.dialects.daco.nodes.SortTableNode;
 import org.eclipse.lsp.cobol.dialects.daco.DaCoParser.DacoStatementsContext;
 import org.eclipse.lsp.cobol.dialects.daco.DaCoParser.QualifiedDataNameContext;
 import org.eclipse.lsp.cobol.dialects.daco.DaCoParser.VariableUsageNameContext;

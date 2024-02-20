@@ -30,7 +30,6 @@ public class VariableConstants {
   public static final int LEVEL_77 = 77;
   public static final int LEVEL_88 = 88;
   public static final int AREA_A_FINISH = 10;
-
   public static final String FD_WITHOUT_FILE_CONTROL = "semantics.noFileControl";
   public static final String EMPTY_STRUCTURE_MSG = "semantics.emptyStructure";
   public static final String TOO_MANY_CLAUSES_MSG = "semantics.tooManyClauses";

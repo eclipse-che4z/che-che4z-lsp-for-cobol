@@ -19,34 +19,29 @@ import lombok.Getter;
 import lombok.ToString;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.NodeType;
+import org.eclipse.lsp.cobol.common.model.ProcedureName;
 
 /** The class represents perform in COBOL. */
 @ToString(callSuper = true)
 @Getter
 @EqualsAndHashCode(callSuper = true)
 public class PerformNode extends Node {
-  String targetName;
-  String targetSectionName;
-  String thruName;
-  String thruSectionName;
+  ProcedureName target;
+  ProcedureName thru;
 
   public PerformNode(Locality location) {
     super(location, NodeType.PERFORM);
-    this.targetName = null;
-    this.targetSectionName = null;
-    this.thruName = null;
-    this.thruSectionName = null;
+    this.target = null;
+    this.thru = null;
   }
 
-  public PerformNode(Locality location, String targetName, String targetSectionName, String thruName, String thruSectionName) {
+  public PerformNode(Locality location, ProcedureName target, ProcedureName thru) {
     super(location, NodeType.PERFORM);
-    this.targetName = targetName;
-    this.targetSectionName = targetSectionName;
-    this.thruName = thruName;
-    this.thruSectionName = thruSectionName;
+    this.target = target;
+    this.thru = thru;
   }
 
   public boolean isInline() {
-    return targetName == null && targetSectionName == null;
+    return target == null;
   }
 }

@@ -62,10 +62,10 @@ class TestPerformClose {
         .map(PerformNode.class::cast)
         .orElseThrow(RuntimeException::new);
 
-    assertEquals("BP", perform.getTargetName());
-    assertEquals("SEC1", perform.getTargetSectionName());
-    assertEquals("EP", perform.getThruName());
-    assertEquals("SEC2", perform.getThruSectionName());
+    assertEquals("BP", perform.getTarget().getName());
+    assertEquals("SEC1", perform.getTarget().getInSection());
+    assertEquals("EP", perform.getThru().getName());
+    assertEquals("SEC2", perform.getThru().getInSection());
   }
 
 }

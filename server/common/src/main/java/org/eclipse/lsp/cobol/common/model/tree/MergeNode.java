@@ -20,16 +20,16 @@ import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.NodeType;
 
 /**
- * The class represents SORT statement in COBOL.
- * <a href="https://www.ibm.com/docs/en/cobol-zos/6.4?topic=statements-sort-statement">...</a>
+ * The class represents MERGE statement in COBOL.
+ * <a href="https://www.ibm.com/docs/en/cobol-zos/6.1?topic=statements-merge-statement">...</a>
  */
 @Getter
 @ToString(callSuper = true)
-public class SortNode extends Node {
+public class MergeNode extends Node {
   boolean ascending;
   String key;
-  public SortNode(Locality location, boolean ascending, String key) {
-    super(location, NodeType.SORT);
+  public MergeNode(Locality location, boolean ascending, String key) {
+    super(location, NodeType.MERGE);
     this.ascending = ascending;
     this.key = key;
   }
