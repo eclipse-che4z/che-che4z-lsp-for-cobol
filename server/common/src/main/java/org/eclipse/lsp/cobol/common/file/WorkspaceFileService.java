@@ -15,11 +15,6 @@
 package org.eclipse.lsp.cobol.common.file;
 
 import com.google.common.collect.ImmutableList;
-import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
-import org.eclipse.lsp.cobol.common.utils.ImplicitCodeUtils;
-
-import javax.annotation.Nullable;
 import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -37,6 +32,10 @@ import java.util.function.BiPredicate;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import javax.annotation.Nullable;
+import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
+import org.eclipse.lsp.cobol.common.utils.ImplicitCodeUtils;
 
 /**
  * This service implements API for low-level file systems access. It mainly oriented to work with
@@ -94,7 +93,11 @@ public class WorkspaceFileService implements FileSystemService {
   @Nullable
   public Path getPathFromURI(@NonNull String uri) {
     try {
-      return Paths.get(new URI(uri).normalize());
+      Path path = Paths.get(new URI(uri).normalize());
+      if (path.startsWith("\\") || path.startsWith("/")) {
+        path = Paths.get(new URI(uri).getPath()); //
+      }
+      return path;
     } catch (URISyntaxException e) {
       LOG.error("Cannot find file by given URI: {}", uri, e);
       return null;
@@ -165,5 +168,9 @@ public class WorkspaceFileService implements FileSystemService {
 
   private String uriWithReplacedPlaceholdersToAsterisks(String uri) {
     return uri.replaceAll("\\$\\{.*\\}", "*");
+  }
+
+  public static String getUriFromUNCPath(String uri) {
+    return ("file:" + new File(new File(uri.substring(5)).toURI().getPath())).replace("\\", "/");
   }
 }
