@@ -15,6 +15,9 @@
 package org.eclipse.lsp.cobol.common.model.tree;
 
 import com.google.common.collect.ImmutableList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Optional;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
@@ -22,10 +25,6 @@ import org.eclipse.lsp.cobol.common.model.*;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
-
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
 
 /** The class represents the copyBookNode. */
 @ToString(callSuper = true)
@@ -54,7 +53,8 @@ public class CopyNode extends Node implements DefinedAndUsedStructure {
 
   @Override
   public List<Location> getDefinitions() {
-    return Optional.ofNullable(uri).map(u -> ImmutableList.of(new Location(u, new Range(new Position(), new Position()))))
+    return Optional.ofNullable(uri)
+        .map(u -> ImmutableList.of(new Location(u, new Range(new Position(), new Position()))))
         .orElse(ImmutableList.of());
   }
 

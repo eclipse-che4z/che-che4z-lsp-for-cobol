@@ -44,7 +44,7 @@ class TestMissedDialect {
         ImmutableList.of(),
         ImmutableMap.of(
             "1",
-            new Diagnostic(new Range(), "TESTDIALECT dialect is missing (required for file:///c:/workspace/document.cbl)", DiagnosticSeverity.Error, ErrorSource.DIALECT.getText())),
+            new Diagnostic(new Range(), "TESTDIALECT dialect is missing (required for file:c:/workspace/document.cbl)", DiagnosticSeverity.Error, ErrorSource.DIALECT.getText())),
         ImmutableList.of(),
         new AnalysisConfig(CopybookProcessingMode.ENABLED,
             ImmutableList.of("TESTDIALECT"), false, ImmutableList.of(), ImmutableMap.of()));
