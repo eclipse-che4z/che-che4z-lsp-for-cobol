@@ -63,7 +63,7 @@ suite("Tests with USER1.cbl", function () {
     );
     assert.strictEqual(result.length, 1);
     assert.ok(
-      result[0].uri.fsPath === editor.document.fileName &&
+      result[0].uri.fsPath.includes(editor.document.fileName) &&
         result[0].range.start.line === 31 &&
         result[0].range.start.character === 7,
       "Checks behavior of go to definition action",
@@ -78,7 +78,7 @@ suite("Tests with USER1.cbl", function () {
     );
     assert.ok(
       result.length === 3 &&
-        result[0].uri.fsPath === editor.document.fileName &&
+        result[0].uri.fsPath.includes(editor.document.fileName) &&
         result[0].range.start.line === 20 &&
         result[1].range.start.line === 34 &&
         result[2].range.start.line === 42,
@@ -94,7 +94,7 @@ suite("Tests with USER1.cbl", function () {
     );
     assert.ok(
       result.length === 3 &&
-        result[0].uri.fsPath === editor.document.fileName &&
+        result[0].uri.fsPath.includes(editor.document.fileName) &&
         result[0].range.start.line === 20 &&
         result[1].range.start.line === 34 &&
         result[2].range.start.line === 42,

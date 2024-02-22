@@ -18,7 +18,9 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.io.IOException;
 import java.net.URI;
+import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
@@ -128,9 +130,9 @@ public class SourceUnitGraph implements AnalysisStateListener {
             });
         objectRef.putIfAbsent(copyNode.getUri(), copyNodeV);
         references.add(copyNodeV);
-
-        documentGraphIndexedByCopybook.putIfAbsent(copyNode.getUri(), new ArrayList<>());
-        List<String> strings = documentGraphIndexedByCopybook.get(copyNode.getUri());
+        String decodedUri = uriDecodeService.decode(copyNode.getUri());
+        documentGraphIndexedByCopybook.putIfAbsent(decodedUri, new ArrayList<>());
+        List<String> strings = documentGraphIndexedByCopybook.get(decodedUri);
         if (!strings.contains(parentUri)) {
           strings.add(parentUri);
         }
@@ -176,7 +178,16 @@ public class SourceUnitGraph implements AnalysisStateListener {
    * @return true if copybook, false otherwise.
    */
   public boolean isCopybook(String uri) {
-    return documentGraphIndexedByCopybook.containsKey(uri);
+    return documentGraphIndexedByCopybook.keySet().stream().anyMatch(copyUri -> {
+      try {
+        String decodeUri = uri.replace(" ", "%20");
+        copyUri = copyUri.replace(" ", "%20");
+        return new URL(decodeUri).sameFile(new URL(copyUri));
+      } catch (IOException e) {
+        LOG.error("IOException encountered while comparing paths {} and {}", copyUri, uri);
+        return false;
+      }
+    });
   }
 
   private void updateGraphNodes(CobolDocumentModel model, EventSource eventSource) {

@@ -41,6 +41,7 @@ jest.mock("vscode", () => ({
     file: jest.fn().mockImplementation((str: string) => {
       return {
         fsPath: str,
+        toString: jest.fn().mockReturnValue(str),
       };
     }),
   },

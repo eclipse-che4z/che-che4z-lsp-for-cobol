@@ -20,6 +20,7 @@ import * as urlUtil from "url";
 import { SettingsUtils } from "./SettingsUtils";
 import { Uri } from "vscode";
 import * as vscode from "vscode";
+import { Utils } from "./Utils";
 
 /**
  * This method is responsible to return a valid URI without extension if the extension is not provided or an URI
@@ -89,20 +90,16 @@ export function searchCopybookInWorkspace(
   copybookFolders: string[] | undefined,
   extensions: string[] | undefined,
 ): string | undefined {
-  for (const workspaceFolderPath of SettingsUtils.getWorkspaceFoldersPath()) {
+  for (const workspaceFolderPath of SettingsUtils.getWorkspaceFoldersPath(
+    true,
+  )) {
     if (!copybookFolders || !extensions) return undefined;
     const workspaceFolder = cleanWorkspaceFolder(workspaceFolderPath);
     for (const p of copybookFolders) {
       for (const ext of extensions) {
         const searchResult = globSearch(workspaceFolder, p, copybookName, ext);
         if (searchResult) {
-          const root = path.parse(searchResult).root;
-          const urlPath = searchResult
-            .substring(root.length)
-            .split(path.sep)
-            .map((s) => encodeURIComponent(s))
-            .join(path.sep);
-          return new urlUtil.URL("file://" + root + urlPath).href;
+          return vscode.Uri.file(searchResult).toString();
         }
       }
     }
@@ -144,7 +141,7 @@ function globSearch(
     .replace(backwardSlashRegex, "/");
   const normalizePathName = pathName.replace(backwardSlashRegex, "/");
   let pattern =
-    normalizePathName === cwd
+    normalizePathName === cwd && !Utils.isUNCPath(normalizePathName)
       ? ""
       : normalizePathName.replace(cwd.endsWith("/") ? cwd : cwd + "/", "");
   const suffix =

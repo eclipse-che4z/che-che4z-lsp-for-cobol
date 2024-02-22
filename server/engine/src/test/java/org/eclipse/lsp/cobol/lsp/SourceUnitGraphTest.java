@@ -43,7 +43,7 @@ class SourceUnitGraphTest {
   public static final String URI = "file://document.cbl";
   @Mock private WorkspaceFileService fileService;
   @Mock private AsyncAnalysisService asyncAnalysisService;
-  @Mock private UriDecodeService uriDecodeService;
+  private final UriDecodeService uriDecodeService = new UriDecodeService();
 
   @Test
   void testNotifyState() {

@@ -28,6 +28,14 @@ export class Utils {
     return content === null || content === undefined;
   }
 
+  /**
+   * Based on below refrences
+   *  Ref : https://stackoverflow.com/questions/6344936/validation-of-unc-path-using-javascript
+   *  Ref : https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-dtyp/62e862f4-2a51-452e-8eeb-dc4ff5ee33cc?redirectedfrom=MSDN
+   */
+  private static UNC_PATH_REGEX =
+    /^\\\\([^\\:\|\[\]\/";<>+=,?* _]+)\\([\u0020-\u0021\u0023-\u0029\u002D-\u002E\u0030-\u0039\u0040-\u005A\u005E-\u007B\u007E-\u00FF]{1,80})(((?:\\[\u0020-\u0021\u0023-\u0029\u002D-\u002E\u0030-\u0039\u0040-\u005A\u005E-\u007B\u007E-\u00FF]{1,255})+?|)(?:\\((?:[\u0020-\u0021\u0023-\u0029\u002B-\u002E\u0030-\u0039\u003B\u003D\u0040-\u005B\u005D-\u007B]{1,255}){1}(?:\:(?=[\u0001-\u002E\u0030-\u0039\u003B-\u005B\u005D-\u00FF]|\:)(?:([\u0001-\u002E\u0030-\u0039\u003B-\u005B\u005D-\u00FF]+(?!\:)|[\u0001-\u002E\u0030-\u0039\u003B-\u005B\u005D-\u00FF]*)(?:\:([\u0001-\u002E\u0030-\u0039\u003B-\u005B\u005D-\u00FF]+)|))|)))|)$/;
+
   public static async getZoweExplorerAPI(): Promise<IApiRegisterClient> {
     const ext = vscode.extensions.getExtension(
       "Zowe.vscode-extension-for-zowe",
@@ -39,5 +47,14 @@ export class Utils {
     }
     await ext.activate();
     return ext.exports as any;
+  }
+
+  /**
+   * Checks is a path is a UNC path
+   * @param path to be checked
+   * @returns true if passed path is UNC path, false otherwise
+   */
+  public static isUNCPath(path: string) {
+    return this.UNC_PATH_REGEX.test(path);
   }
 }
