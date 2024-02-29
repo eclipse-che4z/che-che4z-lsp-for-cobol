@@ -26,6 +26,7 @@ import org.eclipse.lsp.cobol.service.WatcherService;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookNameService;
 import org.eclipse.lsp.cobol.service.delegates.completions.Keywords;
 import org.eclipse.lsp.cobol.service.settings.SettingsService;
+import org.eclipse.lsp.cobol.service.settings.layout.CodeLayoutStore;
 import org.eclipse.lsp4j.InitializedParams;
 
 /**
@@ -37,6 +38,7 @@ public class InitializedHandler {
   private final Keywords keywords;
   private final SettingsService settingsService;
   private final LocaleStore localeStore;
+  private final CodeLayoutStore codeLayoutStore;
   private final AnalysisService analysisService;
   private final MessageService messageService;
 
@@ -47,7 +49,8 @@ public class InitializedHandler {
                             SettingsService settingsService,
                             LocaleStore localeStore,
                             AnalysisService analysisService,
-                            MessageService messageService) {
+                            MessageService messageService,
+                            CodeLayoutStore codeLayoutStore) {
     this.watchingService = watchingService;
     this.copybookNameService = copybookNameService;
     this.keywords = keywords;
@@ -55,6 +58,7 @@ public class InitializedHandler {
     this.localeStore = localeStore;
     this.analysisService = analysisService;
     this.messageService = messageService;
+    this.codeLayoutStore = codeLayoutStore;
   }
 
   /**
@@ -65,11 +69,17 @@ public class InitializedHandler {
     watchingService.watchConfigurationChange();
     getLocaleFromClient();
     getLogLevelFromClient();
+    getCobolProgramLayout();
     copybookNameService.collectLocalCopybookNames();
     keywords.updateStorage();
     messageService.reloadMessages();
     notifyConfiguredCopybookExtensions();
   }
+
+  private void getCobolProgramLayout() {
+    settingsService.fetchConfiguration(COBOL_PROGRAM_LAYOUT.label).thenAccept(codeLayoutStore.updateCodeLayout());
+  }
+
   private void getLocaleFromClient() {
     settingsService.fetchConfiguration(LOCALE.label).thenAccept(localeStore.notifyLocaleStore());
   }

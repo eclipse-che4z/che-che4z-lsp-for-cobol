@@ -14,9 +14,16 @@
  */
 package org.eclipse.lsp.cobol.core.preprocessor.delegates.reader;
 
+import static java.util.Optional.ofNullable;
+import static org.eclipse.lsp.cobol.common.error.ErrorSeverity.ERROR;
+import static org.eclipse.lsp.cobol.core.model.CobolLineTypeEnum.*;
+
 import com.google.common.collect.ImmutableMap;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -25,19 +32,12 @@ import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.model.Locality;
-import org.eclipse.lsp.cobol.core.preprocessor.CobolLine;
 import org.eclipse.lsp.cobol.core.model.*;
-import org.eclipse.lsp.cobol.core.preprocessor.ProcessingConstants;
+import org.eclipse.lsp.cobol.core.preprocessor.CobolLine;
+import org.eclipse.lsp.cobol.service.settings.layout.CobolProgramLayout;
+import org.eclipse.lsp.cobol.service.settings.layout.CodeLayoutStore;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
-
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import static java.util.Optional.ofNullable;
-import static org.eclipse.lsp.cobol.common.error.ErrorSeverity.ERROR;
-import static org.eclipse.lsp.cobol.core.model.CobolLineTypeEnum.*;
 
 /**
  * Preprocessor, which converts strings with COBOL code into a specific entity; analyzes and
@@ -48,13 +48,11 @@ import static org.eclipse.lsp.cobol.core.model.CobolLineTypeEnum.*;
 @Slf4j
 @Singleton
 public class CobolLineReaderImpl implements CobolLineReader {
-  private static final int INDICATOR_AREA_INDEX = 6;
-  private static final int MAX_LINE_LENGTH = 80;
-  private static final Pattern COBOL_LINE_PATTERN =
-      Pattern.compile(
-          "^(?<sequence>.{0,6})(?<indicator>.?)(?<contentA>.{0,4})(?<contentB>.{0,61})(?<comment>.{0,8})(?<extra>.*)$");
+  //TODO: check directive rules for HP tandem/GNU
   private static final Pattern COMPILER_DIRECTIVE_LINE =
       Pattern.compile("(?i)(.{0,6} +|\\s*+)(?<directives>(CBL|PROCESS) .+)");
+
+  // TODO: check these for GNU and HP. Also make it customizable
   private static final Map<String, CobolLineTypeEnum> INDICATORS =
       new ImmutableMap.Builder<String, CobolLineTypeEnum>()
           .put("*", COMMENT)
@@ -68,10 +66,12 @@ public class CobolLineReaderImpl implements CobolLineReader {
           .build();
 
   private final MessageService messageService;
+  private final CodeLayoutStore layoutStore;
 
   @Inject
-  public CobolLineReaderImpl(MessageService messageService) {
+  public CobolLineReaderImpl(MessageService messageService, CodeLayoutStore layoutStore) {
     this.messageService = messageService;
+    this.layoutStore = layoutStore;
   }
 
   @NonNull
@@ -106,7 +106,7 @@ public class CobolLineReaderImpl implements CobolLineReader {
     List<SyntaxError> errors = new ArrayList<>();
     CobolLine cobolLine;
 
-    Matcher usualLine = COBOL_LINE_PATTERN.matcher(line);
+    Matcher usualLine = layoutStore.getCodeLayout().getCobolLinePattern().matcher(line);
     Matcher directivesLine = COMPILER_DIRECTIVE_LINE.matcher(line);
     if (directivesLine.matches()) {
       cobolLine =
@@ -155,13 +155,15 @@ public class CobolLineReaderImpl implements CobolLineReader {
 
   private String cleanupString(@NonNull String line, int contentStart) {
     String lineWithoutSequence = StringUtils.repeat(' ', contentStart) + line;
-    return lineWithoutSequence.length() > 72
-        ? lineWithoutSequence.substring(0, 72)
+    CobolProgramLayout codeLayout = layoutStore.getCodeLayout();
+    return lineWithoutSequence.length() > codeLayout.getSourceCodeLength()
+        ? lineWithoutSequence.substring(0, codeLayout.getSourceCodeLength())
         : lineWithoutSequence;
   }
 
   private ResultWithErrors<CobolLineTypeEnum> determineType(
       String indicatorArea, String uri, int lineNumber) {
+    CobolProgramLayout codeLayout = layoutStore.getCodeLayout();
     return ofNullable(INDICATORS.get(indicatorArea))
         .map(it -> new ResultWithErrors<>(it, Collections.emptyList()))
         .orElseGet(
@@ -173,22 +175,22 @@ public class CobolLineReaderImpl implements CobolLineReader {
                             uri,
                             messageService.getMessage("CobolLineReaderImpl.incorrectLineFormat"),
                             lineNumber,
-                            INDICATOR_AREA_INDEX,
-                            INDICATOR_AREA_INDEX + 1))));
+                            codeLayout.getSequenceLength(), codeLayout.getSequenceLength() + 1))));
   }
 
   @NonNull
   private Optional<SyntaxError> checkLineLength(
       @NonNull String line, @NonNull String uri, int lineNumber) {
-    if (line.length() <= 80) {
+    int maxLineLength = layoutStore.getCodeLayout().getMaxLineLength();
+    if (line.length() <= maxLineLength) {
       return Optional.empty();
     }
     return Optional.of(
         createError(
             uri,
-            messageService.getMessage("CobolLineReaderImpl.longLineMsg"),
+            messageService.getMessage("CobolLineReaderImpl.longLineMsg", maxLineLength),
             lineNumber,
-            MAX_LINE_LENGTH,
+            maxLineLength,
             line.length()));
   }
 
@@ -208,7 +210,8 @@ public class CobolLineReaderImpl implements CobolLineReader {
 
   private boolean isSequenceNumberFormatCorrect(String line, int contentStart) {
     // issue error the sequence must start with a number.
-    return contentStart < ProcessingConstants.INDICATOR_AREA
+    CobolProgramLayout codeLayout = layoutStore.getCodeLayout();
+    return contentStart < (codeLayout.getIndicatorLength() + codeLayout.getSequenceLength())
         || StringUtils.isBlank(line.substring(0, contentStart))
         || Character.isDigit(line.charAt(0));
   }

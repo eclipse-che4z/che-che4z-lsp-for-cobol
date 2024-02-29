@@ -15,13 +15,15 @@
 
 package org.eclipse.lsp.cobol.core.preprocessor.delegates.util;
 
-import org.eclipse.lsp.cobol.core.preprocessor.CobolLine;
-import lombok.experimental.UtilityClass;
-
-import lombok.NonNull;
+import static org.eclipse.lsp.cobol.core.preprocessor.ProcessingConstants.WS;
 
 import java.util.Arrays;
 import java.util.stream.Stream;
+import lombok.NonNull;
+import lombok.experimental.UtilityClass;
+import org.apache.commons.lang3.StringUtils;
+import org.eclipse.lsp.cobol.core.preprocessor.CobolLine;
+import org.eclipse.lsp.cobol.service.settings.layout.CobolProgramLayout;
 
 /** The utility class for CobolLine operations, e.g. copy in different ways */
 @UtilityClass
@@ -32,14 +34,15 @@ public class CobolLineUtils {
    *
    * @param contentArea - content to put
    * @param line - line to be copied.
+   * @param layout - cobol code layout
    * @return a new line with a given content and the rest fields from the given line
    */
   @NonNull
   public static CobolLine copyCobolLineWithContentArea(
-      @NonNull String contentArea, @NonNull CobolLine line) {
+      @NonNull String contentArea, @NonNull CobolLine line, @NonNull CobolProgramLayout layout) {
     CobolLine cobolLine = copyCobolLine(line);
-    cobolLine.setContentAreaA(extractContentAreaA(contentArea));
-    cobolLine.setContentAreaB(extractContentAreaB(contentArea));
+    cobolLine.setContentAreaA(extractContentAreaA(contentArea, layout));
+    cobolLine.setContentAreaB(extractContentAreaB(contentArea, layout));
     return cobolLine;
   }
   /**
@@ -48,18 +51,25 @@ public class CobolLineUtils {
    * @param indicatorArea - a new indicator area for the resulting line
    * @param contentArea - content to put
    * @param line - line to be copied.
+   * @param layout - cobol code layout
    * @return a new line with a given content and the indicator area and the rest fields from the
    *     given line
    */
   @NonNull
   public CobolLine copyCobolLineWithIndicatorAndContentArea(
-      @NonNull String indicatorArea, @NonNull String contentArea, @NonNull CobolLine line) {
+      @NonNull String indicatorArea, @NonNull String contentArea, @NonNull CobolLine line, @NonNull CobolProgramLayout layout) {
     CobolLine cobolLine = copyCobolLine(line);
-    cobolLine.setIndicatorArea(indicatorArea);
-    cobolLine.setContentAreaA(extractContentAreaA(contentArea));
-    cobolLine.setContentAreaB(extractContentAreaB(contentArea));
+    cobolLine.setIndicatorArea(extractIndicatorArea(indicatorArea, layout));
+    cobolLine.setContentAreaA(extractContentAreaA(contentArea, layout));
+    cobolLine.setContentAreaB(extractContentAreaB(contentArea, layout));
     return cobolLine;
   }
+
+  private static String extractIndicatorArea(String indicatorArea, CobolProgramLayout layout) {
+    return indicatorArea.length() > layout.getIndicatorLength() ? indicatorArea.substring(0, layout.getIndicatorLength())
+            : (indicatorArea + StringUtils.repeat(WS, (layout.getIndicatorLength() - indicatorArea.length())));
+  }
+
   /**
    * Copy a given CobolLine and put there the given indicator area
    *
@@ -91,13 +101,15 @@ public class CobolLineUtils {
   }
 
   @NonNull
-  private String extractContentAreaA(@NonNull String contentArea) {
-    return contentArea.length() > 4 ? contentArea.substring(0, 4) : contentArea;
+  private String extractContentAreaA(@NonNull String contentArea, @NonNull CobolProgramLayout layout) {
+    return contentArea.length() > layout.getAreaALength() ? contentArea.substring(0, layout.getAreaALength()) : contentArea;
   }
 
   @NonNull
-  private String extractContentAreaB(@NonNull String contentArea) {
-    return contentArea.length() > 4 ? contentArea.substring(4) : "";
+  private String extractContentAreaB(@NonNull String contentArea, @NonNull CobolProgramLayout layout) {
+    return contentArea.length() > layout.getAreaALength()
+        ? contentArea.substring(layout.getAreaALength())
+        : "";
   }
 
   /**

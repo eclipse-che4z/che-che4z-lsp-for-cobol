@@ -177,6 +177,9 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
               .map(model -> makeId(model.getUri(), analysisResultsRevisions.get(model.getUri())))
               .filter(analysisResults::containsKey)
               .anyMatch(id -> !analysisResults.get(id).isDone());
+      if (analysisInProgress) {
+        cancelRunningAnalysis(openDocuments);
+      }
       LOG.debug(" re-analysis is waiting for prev analysis to finish");
       TimeUnit.MILLISECONDS.sleep(100);
     } while (analysisInProgress);
@@ -186,6 +189,15 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
     LOG.info("Cache invalidated");
     openDocuments
             .forEach(doc -> scheduleAnalysis(doc.getUri(), doc.getText(), analysisResultsRevisions.get(doc.getUri()), false, true, SourceUnitGraph.EventSource.IDE));
+  }
+
+  private void cancelRunningAnalysis(List<CobolDocumentModel> openDocuments) {
+    openDocuments.stream()
+            .filter(model -> model.getLastAnalysisResult() != null)
+            .map(model -> makeId(model.getUri(), analysisResultsRevisions.get(model.getUri())))
+            .filter(analysisResults::containsKey)
+            .map(analysisResults::get)
+            .forEach(future -> future.cancel(true));
   }
 
   /**

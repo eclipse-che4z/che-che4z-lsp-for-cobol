@@ -55,6 +55,7 @@ import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.GrammarPreprocessor;
 import org.eclipse.lsp.cobol.lsp.handlers.HandlerUtility;
 import org.eclipse.lsp.cobol.service.settings.CachingConfigurationService;
+import org.eclipse.lsp.cobol.service.settings.layout.CodeLayoutStore;
 import org.eclipse.lsp.cobol.service.utils.ServerTypeUtil;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.Location;
@@ -89,7 +90,8 @@ public class CobolLanguageEngine {
       AstProcessor astProcessor,
       SymbolsRepository symbolsRepository,
       ErrorFinalizerService errorFinalizerService,
-      BenchmarkService benchmarkService) {
+      BenchmarkService benchmarkService,
+      CodeLayoutStore codeLayoutStore) {
     this.preprocessor = preprocessor;
     this.messageService = messageService;
     this.errorFinalizerService = errorFinalizerService;
@@ -109,7 +111,8 @@ public class CobolLanguageEngine {
             subroutineService,
             cachingConfigurationService,
             dialectService,
-            astProcessor));
+            astProcessor,
+            codeLayoutStore));
   }
 
   private static AnalysisResult toAnalysisResult(

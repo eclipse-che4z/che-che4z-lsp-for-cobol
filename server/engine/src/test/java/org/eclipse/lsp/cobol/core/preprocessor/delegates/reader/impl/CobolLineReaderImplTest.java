@@ -14,7 +14,15 @@
  */
 package org.eclipse.lsp.cobol.core.preprocessor.delegates.reader.impl;
 
+import static java.util.stream.IntStream.range;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.hasToString;
+
 import com.google.common.collect.Lists;
+import java.util.ArrayList;
+import java.util.List;
 import org.eclipse.lsp.cobol.common.ResultWithErrors;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.core.AbstractCobolLinePreprocessorTest;
@@ -22,15 +30,6 @@ import org.eclipse.lsp.cobol.core.preprocessor.CobolLine;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import static java.util.stream.IntStream.range;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.hasToString;
 
 /**
  * This test checks the line preprocessing logic. Notice, that if there are less than 6 symbols in a
@@ -56,6 +55,25 @@ class CobolLineReaderImplTest extends AbstractCobolLinePreprocessorTest {
     assertThat(
         error.getLocation().getLocation().getRange(),
         is(new Range(new Position(10, 6), new Position(10, 7))));
+  }
+
+  @Test
+  void testAllIndicatorsForNoSequenceLayout() {
+    List<String> lines = creatTextWithNoSequenceArea();
+    String text = reduceLines(lines);
+
+    ResultWithErrors<List<CobolLine>> processed = processTextWithNoSequenceArea(text);
+
+    assertThat(processed.getResult(), hasSize(lines.size()));
+    range(0, lines.size())
+            .forEach(i -> assertThat(processed.getResult().get(i), hasToString(lines.get(i))));
+
+    assertThat(processed.getErrors(), hasSize(1));
+
+    SyntaxError error = processed.getErrors().get(0);
+    assertThat(
+            error.getLocation().getLocation().getRange(),
+            is(new Range(new Position(10, 0), new Position(10, 1))));
   }
 
   /** Empty string should not be processed. */
@@ -145,6 +163,22 @@ class CobolLineReaderImplTest extends AbstractCobolLinePreprocessorTest {
     lines.add("000080 CONFIGURATION SECTION.                                           22221112");
     lines.add("000090$SOURCE-COMPUTER. pc.");
     lines.add("000090pSOURCE-COMPUTER. pc.");
+    return lines;
+  }
+
+  private List<String> creatTextWithNoSequenceArea() {
+    List<String> lines = new ArrayList<>();
+    lines.add(" IDENTIFICATION DIVISION.                                         23323232");
+    lines.add(" PROGRAM-ID. test1.                                               23323232");
+    lines.add("* AUTHOR. .                                                       23323232");
+    lines.add("dINSTALLATION. where.                                             dsfsd");
+    lines.add("/DATE-WRITTEN. 07/02/2019.                                        qqwe");
+    lines.add(" DATE-COMPILED.07/02/2019.                                        1111");
+    lines.add("DSECURITY.                                                        15  1");
+    lines.add("-    ENVIRONMENT DIVISION.");
+    lines.add(" CONFIGURATION SECTION.                                           22221112");
+    lines.add("$SOURCE-COMPUTER. pc.");
+    lines.add("pSOURCE-COMPUTER. pc.");
     return lines;
   }
 }

@@ -72,14 +72,14 @@ class AnalysisServiceTest {
                     copybookService, documentService
             );
 
-    CompletableFuture.supplyAsync(() -> service.isCopybook("", ""));
+    CompletableFuture<Boolean> booleanCompletableFuture = CompletableFuture.supplyAsync(() -> service.isCopybook("", ""));
 
     Thread.sleep(10);
     verify(copybookIdentificationService, times(0)).isCopybook(any(), any(), any());
 
     service.setExtensionConfig(ImmutableList.of());
 
-    Thread.sleep(10);
+    booleanCompletableFuture.join();
     verify(copybookIdentificationService, times(1)).isCopybook(any(), any(), any());
   }
 

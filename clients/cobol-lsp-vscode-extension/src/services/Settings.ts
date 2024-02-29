@@ -32,6 +32,7 @@ import {
   SETTINGS_SQL_BACKEND,
   SETTINGS_COMPILE_OPTIONS,
   DIALECT_LIBS,
+  COBOL_PRGM_LAYOUT,
 } from "../constants";
 import cobolSnippets = require("../services/snippetcompletion/cobolSnippets.json");
 import { DialectRegistry, DIALECT_REGISTRY_SECTION } from "./DialectRegistry";
@@ -45,6 +46,7 @@ import {
   loadProcessorGroupSqlBackendConfig,
 } from "./ProcessorGroups";
 import { getProgramNameFromUri } from "./util/FSUtils";
+import { integer } from "vscode-languageclient";
 
 /**
  * New file (e.g .gitignore) will be created or edited if exits, under project folder
@@ -339,6 +341,18 @@ export class SettingsService {
    */
   public static serverRuntime(): string | undefined {
     return vscode.workspace.getConfiguration().get(SERVER_RUNTIME);
+  }
+
+  public static getCobolProgramLayout():
+    | {
+        sequence_length?: integer;
+        indicator_length?: integer;
+        area_a_length?: integer;
+        area_b_length?: integer;
+        comment_area?: integer;
+      }
+    | undefined {
+    return vscode.workspace.getConfiguration().get(COBOL_PRGM_LAYOUT);
   }
 
   private static evaluateVariable(
