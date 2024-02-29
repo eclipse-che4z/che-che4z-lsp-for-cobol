@@ -49,6 +49,8 @@ import org.eclipse.lsp.cobol.service.copybooks.CopybookNameService;
 import org.eclipse.lsp.cobol.service.delegates.completions.Keywords;
 import org.eclipse.lsp.cobol.service.settings.SettingsService;
 import org.eclipse.lsp.cobol.service.settings.SettingsServiceImpl;
+import org.eclipse.lsp.cobol.service.settings.layout.CobolProgramLayout;
+import org.eclipse.lsp.cobol.service.settings.layout.CodeLayoutStore;
 import org.eclipse.lsp4j.ClientCapabilities;
 import org.eclipse.lsp4j.ClientInfo;
 import org.eclipse.lsp4j.CodeAction;
@@ -162,6 +164,8 @@ class CobolLanguageServerTest {
             .thenReturn(completedFuture(ImmutableList.of("cpy")));
     when(settingsService.fetchConfiguration("dialect"))
             .thenReturn(completedFuture(singletonList(arr)));
+    when(settingsService.fetchConfiguration(COBOL_PROGRAM_LAYOUT.label))
+        .thenReturn(completedFuture(ImmutableList.of(new CobolProgramLayout())));
   }
 
   @Test
@@ -174,6 +178,7 @@ class CobolLanguageServerTest {
     CobolTextDocumentService textService = mock(CobolTextDocumentService.class);
     AnalysisService analysisService = mock(AnalysisService.class);
     MessageService messageService = mock(MessageService.class);
+    CodeLayoutStore layoutStore = mock(CodeLayoutStore.class);
     ExecuteCommandHandler executeCommandHandler = mock(ExecuteCommandHandler.class);
     SourceUnitGraph sourceUnitGraph = mock(SourceUnitGraph.class);
     DidChangeConfigurationHandler didChangeConfigurationHandler = mock(DidChangeConfigurationHandler.class);
@@ -188,6 +193,9 @@ class CobolLanguageServerTest {
     LspMessageBroker lspMessageBroker = new LspMessageBroker();
     CobolWorkspaceServiceImpl lspEventConsumer = new CobolWorkspaceServiceImpl(lspMessageBroker, executeCommandHandler, sourceUnitGraph, didChangeConfigurationHandler, asyncAnalysisService, uriDecodeService);
 
+    when(layoutStore.getCodeLayout()).thenReturn(new CobolProgramLayout());
+    when(layoutStore.updateCodeLayout()).thenReturn(mock -> {});
+
     lspEventConsumer.startConsumer();
     CobolLanguageServer server =
             new CobolLanguageServer(
@@ -197,7 +205,7 @@ class CobolLanguageServerTest {
                     new ExitHandler(stateService),
                     new ShutdownHandler(stateService, lspMessageBroker),
                     new InitializeHandler(watchingService),
-                    new InitializedHandler(watchingService, copybookNameService, keywords, settingsService, localeStore, analysisService, messageService),
+                    new InitializedHandler(watchingService, copybookNameService, keywords, settingsService, localeStore, analysisService, messageService, layoutStore),
                     lspEventConsumer);
 
     server.initialized(new InitializedParams());
@@ -242,7 +250,7 @@ class CobolLanguageServerTest {
                     new ExitHandler(stateService),
                     new ShutdownHandler(stateService, lspMessageBroker),
                     new InitializeHandler(mock(WatcherServiceImpl.class)),
-                    new InitializedHandler(mock(WatcherServiceImpl.class), null, null, null, null, null, null),
+                    new InitializedHandler(mock(WatcherServiceImpl.class), null, null, null, null, null, null, null),
                     lspEventConsumer);
 
     try {
@@ -303,7 +311,7 @@ class CobolLanguageServerTest {
                     new ExitHandler(stateService),
                     new ShutdownHandler(stateService, lspMessageBroker),
                     new InitializeHandler(null),
-                    new InitializedHandler(null, null, null, null, null, null, null),
+                    new InitializedHandler(null, null, null, null, null, null, null, null),
                     lspEventConsumer);
     assertEquals(1, stateService.getExitCode());
     server.shutdown();

@@ -34,7 +34,8 @@ public enum SettingsParametersEnum {
   DIALECTS("dialects"),
   CICS_TRANSLATOR_ENABLED("cics.translator"),
   COMPILER_OPTIONS("compiler.options"),
-  DIALECT_REGISTRY("dialect.registry");
+  DIALECT_REGISTRY("dialect.registry"),
+  COBOL_PROGRAM_LAYOUT("cobol.program.layout");
 
   public final String label;
 

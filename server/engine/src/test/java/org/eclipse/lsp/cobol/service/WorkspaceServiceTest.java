@@ -37,6 +37,8 @@ import org.eclipse.lsp.cobol.lsp.handlers.text.CodeActionHandler;
 import org.eclipse.lsp.cobol.lsp.handlers.workspace.DidChangeConfigurationHandler;
 import org.eclipse.lsp.cobol.lsp.handlers.workspace.ExecuteCommandHandler;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookNameService;
+import org.eclipse.lsp.cobol.service.settings.layout.CobolProgramLayout;
+import org.eclipse.lsp.cobol.service.settings.layout.CodeLayoutStore;
 import org.eclipse.lsp.cobol.test.engine.UseCaseUtils;
 import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
@@ -78,7 +80,7 @@ class WorkspaceServiceTest {
             null,
             null,
             messageService,
-            asyncAnalysisService);
+            asyncAnalysisService, getMockLayoutStore());
     ExecuteCommandHandler executeCommandHandler = new ExecuteCommandHandler(stateService, asyncAnalysisService);
 
     LspMessageBroker lspMessageBroker = new LspMessageBroker();
@@ -122,7 +124,7 @@ class WorkspaceServiceTest {
             null,
             null,
             null,
-            asyncAnalysisService);
+            asyncAnalysisService, getMockLayoutStore());
     ExecuteCommandHandler executeCommandHandler = new ExecuteCommandHandler(stateService, asyncAnalysisService);
 
     LspMessageBroker lspMessageBroker = new LspMessageBroker();
@@ -225,7 +227,7 @@ class WorkspaceServiceTest {
 
     DidChangeConfigurationHandler didChangeConfigurationHandler =
         new DidChangeConfigurationHandler(
-            stateService, null, copybookNameService, null, null, null, null, asyncAnalysisService);
+            stateService, null, copybookNameService, null, null, null, null, asyncAnalysisService, getMockLayoutStore());
 
     ExecuteCommandHandler executeCommandHandler =
         new ExecuteCommandHandler(stateService, asyncAnalysisService);
@@ -247,5 +249,11 @@ class WorkspaceServiceTest {
         waitingQuery(lspMessageBroker);
     waitingQuery.join();
     lspMessageBroker.stop();
+  }
+
+  private CodeLayoutStore getMockLayoutStore() {
+    CodeLayoutStore layoutStore = mock(CodeLayoutStore.class);
+    when(layoutStore.getCodeLayout()).thenReturn(new CobolProgramLayout());
+    return layoutStore;
   }
 }

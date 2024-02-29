@@ -17,12 +17,12 @@ package org.eclipse.lsp.cobol.lsp.handlers.workspace;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static java.util.concurrent.CompletableFuture.completedFuture;
-import static org.eclipse.lsp.cobol.service.settings.SettingsParametersEnum.LOCALE;
-import static org.eclipse.lsp.cobol.service.settings.SettingsParametersEnum.LOGGING_LEVEL;
+import static org.eclipse.lsp.cobol.service.settings.SettingsParametersEnum.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Mockito.*;
 
+import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonPrimitive;
 import java.util.List;
@@ -37,6 +37,8 @@ import org.eclipse.lsp.cobol.service.copybooks.CopybookNameService;
 import org.eclipse.lsp.cobol.service.delegates.completions.Keywords;
 import org.eclipse.lsp.cobol.service.settings.SettingsService;
 import org.eclipse.lsp.cobol.service.settings.SettingsServiceImpl;
+import org.eclipse.lsp.cobol.service.settings.layout.CobolProgramLayout;
+import org.eclipse.lsp.cobol.service.settings.layout.CodeLayoutStore;
 import org.eclipse.lsp4j.DidChangeConfigurationParams;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -66,7 +68,7 @@ class DidChangeConfigurationHandlerTest {
                         localeStore,
                         keywords,
                         messageService,
-                        asyncAnalysisService);
+                        asyncAnalysisService, getMockLayoutStore());
 
 
         when(copybookNameService.copybookLocalFolders(null))
@@ -75,6 +77,8 @@ class DidChangeConfigurationHandlerTest {
                 .thenReturn(completedFuture(singletonList("LOCALE")));
         when(settingsService.fetchConfiguration(LOGGING_LEVEL.label))
                 .thenReturn(completedFuture(singletonList("INFO")));
+        when(settingsService.fetchConfiguration(COBOL_PROGRAM_LAYOUT.label))
+                .thenReturn(completedFuture(ImmutableList.of(new CobolProgramLayout())));
         when(watchingService.getWatchingFolders()).thenReturn(emptyList());
         when(localeStore.notifyLocaleStore()).thenReturn(e -> {});
 
@@ -105,7 +109,8 @@ class DidChangeConfigurationHandlerTest {
                         localeStore,
                         keywords,
                         messageService,
-                        asyncAnalysisService);
+                        asyncAnalysisService,
+                        getMockLayoutStore());
 
         String path = "foo/bar";
 
@@ -115,6 +120,8 @@ class DidChangeConfigurationHandlerTest {
                 .thenReturn(completedFuture(singletonList("LOCALE")));
         when(settingsService.fetchConfiguration(LOGGING_LEVEL.label))
                 .thenReturn(completedFuture(singletonList("INFO")));
+        when(settingsService.fetchConfiguration(COBOL_PROGRAM_LAYOUT.label))
+                .thenReturn(completedFuture(ImmutableList.of(new CobolProgramLayout())));
         when(watchingService.getWatchingFolders()).thenReturn(singletonList(path));
         when(localeStore.notifyLocaleStore()).thenReturn(e -> {});
 
@@ -146,7 +153,8 @@ class DidChangeConfigurationHandlerTest {
                         localeStore,
                         keywords,
                         messageService,
-                        asyncAnalysisService);
+                        asyncAnalysisService,
+                        getMockLayoutStore());
 
         ArgumentCaptor<List<String>> watcherCaptor = forClass(List.class);
         String path = "foo/bar";
@@ -157,6 +165,8 @@ class DidChangeConfigurationHandlerTest {
                 .thenReturn(completedFuture(singletonList("LOCALE")));
         when(settingsService.fetchConfiguration(LOGGING_LEVEL.label))
                 .thenReturn(completedFuture(singletonList("INFO")));
+        when(settingsService.fetchConfiguration(COBOL_PROGRAM_LAYOUT.label))
+                .thenReturn(completedFuture(ImmutableList.of(new CobolProgramLayout())));
         when(watchingService.getWatchingFolders()).thenReturn(emptyList());
         when(localeStore.notifyLocaleStore()).thenReturn(e -> {});
 
@@ -191,7 +201,8 @@ class DidChangeConfigurationHandlerTest {
                         localeStore,
                         keywords,
                         messageService,
-                        asyncAnalysisService);
+                        asyncAnalysisService,
+                        getMockLayoutStore());
         ArgumentCaptor<List<String>> watcherCaptor = forClass(List.class);
         JsonArray arr = new JsonArray();
         String path = "foo/bar";
@@ -205,11 +216,20 @@ class DidChangeConfigurationHandlerTest {
                 .thenReturn(completedFuture(singletonList("INFO")));
         when(watchingService.getWatchingFolders()).thenReturn(singletonList(path));
         when(localeStore.notifyLocaleStore()).thenReturn(e -> {});
+        when(settingsService.fetchConfiguration(COBOL_PROGRAM_LAYOUT.label))
+                .thenReturn(completedFuture(ImmutableList.of(new CobolProgramLayout())));
 
         didChangeConfigurationHandler.didChangeConfiguration(new DidChangeConfigurationParams(localeStore));
         verify(watchingService).addWatchers(emptyList());
         verify(watchingService).removeWatchers(watcherCaptor.capture());
         verify(asyncAnalysisService).reanalyseOpenedPrograms();
         assertEquals(path, watcherCaptor.getValue().get(0));
+    }
+
+    private CodeLayoutStore getMockLayoutStore() {
+        CodeLayoutStore layoutStore = mock(CodeLayoutStore.class);
+        when(layoutStore.getCodeLayout()).thenReturn(new CobolProgramLayout());
+        when(layoutStore.updateCodeLayout()).thenReturn(mock -> {});
+        return layoutStore;
     }
 }

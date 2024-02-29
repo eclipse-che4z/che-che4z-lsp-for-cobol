@@ -14,7 +14,17 @@
  */
 package org.eclipse.lsp.cobol.core.preprocessor.delegates.transformer;
 
+import static java.util.Optional.ofNullable;
+import static org.eclipse.lsp.cobol.common.error.ErrorSeverity.ERROR;
+import static org.eclipse.lsp.cobol.core.preprocessor.delegates.rewriter.CobolLineIndicatorProcessorImpl.FLOATING_COMMENT_LINE;
+
 import com.google.inject.Inject;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.lsp.cobol.common.ResultWithErrors;
@@ -24,21 +34,11 @@ import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.core.model.CobolLineTypeEnum;
 import org.eclipse.lsp.cobol.core.preprocessor.CobolLine;
-import org.eclipse.lsp.cobol.core.preprocessor.ProcessingConstants;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.reader.CompilerDirectives;
+import org.eclipse.lsp.cobol.service.settings.layout.CobolProgramLayout;
+import org.eclipse.lsp.cobol.service.settings.layout.CodeLayoutStore;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Stream;
-
-import static java.util.Optional.ofNullable;
-import static org.eclipse.lsp.cobol.common.error.ErrorSeverity.ERROR;
-import static org.eclipse.lsp.cobol.core.preprocessor.delegates.rewriter.CobolLineIndicatorProcessorImpl.FLOATING_COMMENT_LINE;
 
 /**
  * Process continuation lines. Any sentence, entry, clause, or phrase that requires more than one
@@ -54,12 +54,13 @@ import static org.eclipse.lsp.cobol.core.preprocessor.delegates.rewriter.CobolLi
 public class ContinuationLineTransformation implements CobolLinesTransformation {
   private static final Pattern BLANK_LINE_PATTERN = Pattern.compile("\\s*");
   private static final String PSEUDO_TEXT_DELIMITER = "=";
-  private static final int SEQUENCE_LENGTH = 6;
   private final MessageService messageService;
+  private final CodeLayoutStore codeLayoutStore;
 
   @Inject
-  public ContinuationLineTransformation(MessageService messageService) {
+  public ContinuationLineTransformation(MessageService messageService, CodeLayoutStore codeLayoutStore) {
     this.messageService = messageService;
+    this.codeLayoutStore = codeLayoutStore;
   }
 
   @Override
@@ -108,6 +109,7 @@ public class ContinuationLineTransformation implements CobolLinesTransformation 
   private SyntaxError checkCompilerDirectiveContinued(
       CobolLine cobolLine, String uri, int lineNumber) {
     if (isCompilerDirectiveStatement(cobolLine)) {
+      CobolProgramLayout codeLayout = codeLayoutStore.getCodeLayout();
       return SyntaxError.syntaxError()
           .errorSource(ErrorSource.PREPROCESSING)
           .severity(ERROR)
@@ -116,7 +118,7 @@ public class ContinuationLineTransformation implements CobolLinesTransformation 
                   .uri(uri)
                   .range(
                       new Range(
-                          new Position(lineNumber, ProcessingConstants.INDICATOR_AREA),
+                          new Position(lineNumber, (codeLayout.getIndicatorLength() + codeLayout.getSequenceLength())),
                           new Position(lineNumber, cobolLine.toString().length())))
                   .recognizer(ContinuationLineTransformation.class)
                   .build().toOriginalLocation())
@@ -238,7 +240,7 @@ public class ContinuationLineTransformation implements CobolLinesTransformation 
     boolean isMissingSpace = !floatingCommentMatcher.group("validText").endsWith(" ");
     if (isMissingSpace) {
       int floatingCommentIndex = floatingCommentMatcher.start("floatingComment");
-      return (floatingCommentIndex == 0) ? null : (floatingCommentIndex + SEQUENCE_LENGTH);
+      return (floatingCommentIndex == 0) ? null : (floatingCommentIndex + codeLayoutStore.getCodeLayout().getSequenceLength());
     }
     return null;
   }
@@ -316,7 +318,8 @@ public class ContinuationLineTransformation implements CobolLinesTransformation 
   }
 
   private SyntaxError registerContinuationLineError(String uri, int lineNumber, int countingSpace) {
-    int startPosition = ProcessingConstants.INDICATOR_AREA + countingSpace;
+    CobolProgramLayout codeLayout = codeLayoutStore.getCodeLayout();
+    int startPosition = codeLayout.getSequenceLength() + codeLayout.getIndicatorLength() + countingSpace;
     SyntaxError error =
         SyntaxError.syntaxError().errorSource(ErrorSource.PREPROCESSING)
             .location(
@@ -326,7 +329,7 @@ public class ContinuationLineTransformation implements CobolLinesTransformation 
                         new Range(
                             new Position(lineNumber, startPosition),
                             new Position(
-                                lineNumber, ProcessingConstants.START_INDEX_AREA_B)))
+                                lineNumber, (codeLayout.getIndicatorLength() + codeLayout.getSequenceLength() + codeLayout.getAreaALength()))))
                     .recognizer(ContinuationLineTransformation.class)
                     .build().toOriginalLocation())
             .suggestion(

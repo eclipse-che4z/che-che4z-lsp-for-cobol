@@ -18,6 +18,10 @@ import com.google.common.collect.Multimap;
 import com.google.gson.*;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import java.io.File;
+import java.nio.file.Files;
+import java.util.*;
+import java.util.concurrent.Callable;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.eclipse.lsp.cobol.cli.di.CliModule;
@@ -43,13 +47,9 @@ import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.GrammarPreprocessor;
 import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
 import org.eclipse.lsp.cobol.service.settings.CachingConfigurationService;
+import org.eclipse.lsp.cobol.service.settings.layout.CodeLayoutStore;
 import org.eclipse.lsp4j.Location;
 import picocli.CommandLine;
-
-import java.io.File;
-import java.nio.file.Files;
-import java.util.*;
-import java.util.concurrent.Callable;
 
 /**
  * The Cli class represents a Command Line Interface (CLI) for interacting with the application.
@@ -172,6 +172,7 @@ public class Cli implements Callable<Integer> {
     SubroutineService subroutineService = diCtx.getInstance(SubroutineService.class);
     CachingConfigurationService cachingConfigurationService = diCtx.getInstance(CachingConfigurationService.class);
     AstProcessor astProcessor = diCtx.getInstance(AstProcessor.class);
+    CodeLayoutStore layoutStore = diCtx.getInstance(CodeLayoutStore.class);
 
     Pipeline pipeline = new Pipeline();
     pipeline.add(new CompilerDirectivesStage(messageService));
@@ -180,7 +181,7 @@ public class Cli implements Callable<Integer> {
     if (action == Action.analysis) {
       pipeline.add(new ImplicitDialectProcessingStage(dialectService));
       pipeline.add(new ParserStage(messageService, parseTreeListener));
-      pipeline.add(new TransformTreeStage(symbolsRepository, messageService, subroutineService, cachingConfigurationService, dialectService, astProcessor));
+      pipeline.add(new TransformTreeStage(symbolsRepository, messageService, subroutineService, cachingConfigurationService, dialectService, astProcessor, layoutStore));
     }
     return pipeline;
   }

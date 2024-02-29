@@ -15,8 +15,7 @@
 package org.eclipse.lsp.cobol.lsp.handlers.workspace;
 
 import static java.util.stream.Collectors.toList;
-import static org.eclipse.lsp.cobol.service.settings.SettingsParametersEnum.LOCALE;
-import static org.eclipse.lsp.cobol.service.settings.SettingsParametersEnum.LOGGING_LEVEL;
+import static org.eclipse.lsp.cobol.service.settings.SettingsParametersEnum.*;
 
 import com.google.inject.Inject;
 import java.util.List;
@@ -30,6 +29,7 @@ import org.eclipse.lsp.cobol.service.WatcherService;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookNameService;
 import org.eclipse.lsp.cobol.service.delegates.completions.Keywords;
 import org.eclipse.lsp.cobol.service.settings.SettingsService;
+import org.eclipse.lsp.cobol.service.settings.layout.CodeLayoutStore;
 import org.eclipse.lsp4j.DidChangeConfigurationParams;
 
 /**
@@ -45,6 +45,7 @@ public class DidChangeConfigurationHandler {
   private final Keywords keywords;
   private final MessageService messageService;
   private final AsyncAnalysisService asyncAnalysisService;
+  private final CodeLayoutStore codeLayoutStore;
 
   @Inject
   public DidChangeConfigurationHandler(DisposableLSPStateService disposableLSPStateService,
@@ -54,7 +55,8 @@ public class DidChangeConfigurationHandler {
                                        LocaleStore localeStore,
                                        Keywords keywords,
                                        MessageService messageService,
-                                       AsyncAnalysisService asyncAnalysisService) {
+                                       AsyncAnalysisService asyncAnalysisService,
+                                       CodeLayoutStore codeLayoutStore) {
     this.disposableLSPStateService = disposableLSPStateService;
     this.settingsService = settingsService;
     this.copybookNameService = copybookNameService;
@@ -63,6 +65,7 @@ public class DidChangeConfigurationHandler {
     this.keywords = keywords;
     this.messageService = messageService;
     this.asyncAnalysisService = asyncAnalysisService;
+    this.codeLayoutStore = codeLayoutStore;
   }
 
   /**
@@ -89,6 +92,7 @@ public class DidChangeConfigurationHandler {
 
     settingsService.fetchConfiguration(LOCALE.label).thenAccept(localeStore.notifyLocaleStore());
     settingsService.fetchConfiguration(LOGGING_LEVEL.label).thenAccept(LogLevelUtils.updateLogLevel());
+    settingsService.fetchConfiguration(COBOL_PROGRAM_LAYOUT.label).thenAccept(codeLayoutStore.updateCodeLayout());
     copybookNameService.collectLocalCopybookNames();
     keywords.updateStorage();
   }

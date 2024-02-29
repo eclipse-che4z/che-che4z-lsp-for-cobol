@@ -48,6 +48,7 @@ import org.eclipse.lsp.cobol.core.preprocessor.delegates.GrammarPreprocessor;
 import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
 import org.eclipse.lsp.cobol.core.strategy.CobolErrorStrategy;
 import org.eclipse.lsp.cobol.core.strategy.ErrorMessageHelper;
+import org.eclipse.lsp.cobol.service.settings.layout.CodeLayoutStore;
 import org.eclipse.lsp.cobol.usecases.DialectConfigs;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
@@ -81,11 +82,12 @@ class CobolLanguageEngineTest {
     cobolErrorStrategy.setErrorMessageHelper(mockErrUtil);
     AstProcessor astProcessor = mock(AstProcessor.class);
     SymbolsRepository symbolsRepository = mock(SymbolsRepository.class);
+    CodeLayoutStore codeLayoutStore = mock(CodeLayoutStore.class);
 
     CobolLanguageEngine engine =
             new CobolLanguageEngine(
                     preprocessor, grammarPreprocessor, mockMessageService, treeListener, mock(SubroutineService.class), null,
-                    dialectService, astProcessor, symbolsRepository, mock(ErrorFinalizerService.class));
+                    dialectService, astProcessor, symbolsRepository, mock(ErrorFinalizerService.class), codeLayoutStore);
     when(mockMessageService.getMessage(anyString(), anyString(), anyString())).thenReturn("");
     Locality locality =
             Locality.builder()
@@ -153,10 +155,11 @@ class CobolLanguageEngineTest {
     cobolErrorStrategy.setErrorMessageHelper(mockErrUtil);
     when(mockMessageService.getMessage("workspaceError.ServerType")).thenReturn(ERROR_MSG);
     System.setProperty("serverType", "NATIVE");
+    CodeLayoutStore codeLayoutStore = mock(CodeLayoutStore.class);
     CobolLanguageEngine engine =
             new CobolLanguageEngine(
                     preprocessor, grammarPreprocessor, mockMessageService, treeListener, mock(SubroutineService.class), null,
-                    dialectService, astProcessor, symbolsRepository, mock(ErrorFinalizerService.class));
+                    dialectService, astProcessor, symbolsRepository, mock(ErrorFinalizerService.class), codeLayoutStore);
 
     AnalysisResult actual = engine.run(URI, TEXT, DialectConfigs.getDaCoAnalysisConfig());
     Assertions.assertEquals(1, actual.getDiagnostics().size());

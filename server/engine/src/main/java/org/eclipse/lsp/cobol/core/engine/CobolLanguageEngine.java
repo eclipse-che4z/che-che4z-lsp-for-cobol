@@ -53,6 +53,7 @@ import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.GrammarPreprocessor;
 import org.eclipse.lsp.cobol.lsp.handlers.HandlerUtility;
 import org.eclipse.lsp.cobol.service.settings.CachingConfigurationService;
+import org.eclipse.lsp.cobol.service.settings.layout.CodeLayoutStore;
 import org.eclipse.lsp.cobol.service.utils.ServerTypeUtil;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.Location;
@@ -85,7 +86,7 @@ public class CobolLanguageEngine {
           DialectService dialectService,
           AstProcessor astProcessor,
           SymbolsRepository symbolsRepository,
-          ErrorFinalizerService errorFinalizerService) {
+          ErrorFinalizerService errorFinalizerService, CodeLayoutStore codeLayoutStore) {
     this.preprocessor = preprocessor;
     this.messageService = messageService;
     this.errorFinalizerService = errorFinalizerService;
@@ -97,7 +98,7 @@ public class CobolLanguageEngine {
     this.pipeline.add(new PreprocessorStage(grammarPreprocessor));
     this.pipeline.add(new ImplicitDialectProcessingStage(dialectService));
     this.pipeline.add(new ParserStage(messageService, treeListener));
-    this.pipeline.add(new TransformTreeStage(symbolsRepository, messageService, subroutineService, cachingConfigurationService, dialectService, astProcessor));
+    this.pipeline.add(new TransformTreeStage(symbolsRepository, messageService, subroutineService, cachingConfigurationService, dialectService, astProcessor, codeLayoutStore));
   }
 
   private static AnalysisResult toAnalysisResult(ResultWithErrors<AnalysisResult> result, String uri) {
