@@ -15,6 +15,12 @@
 
 package org.eclipse.lsp.cobol.core.preprocessor;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+
+import java.util.ArrayList;
+import java.util.List;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.reader.CobolLineReader;
@@ -25,14 +31,10 @@ import org.eclipse.lsp.cobol.core.preprocessor.delegates.transformer.CobolLinesT
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.transformer.ContinuationLineTransformation;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.writer.CobolLineWriter;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.writer.CobolLineWriterImpl;
+import org.eclipse.lsp.cobol.service.settings.layout.CobolProgramLayout;
+import org.eclipse.lsp.cobol.service.settings.layout.CodeLayoutStore;
 import org.junit.jupiter.api.Test;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.mock;
+import org.mockito.Mockito;
 
 /** This test checks multiple comment entries are parsed and cleaned up correctly */
 class TestCommentLines {
@@ -61,10 +63,12 @@ class TestCommentLines {
   void test() {
     List<SyntaxError> accumulatedErrors = new ArrayList<>();
     MessageService messageService = mock(MessageService.class);
-    CobolLineReader reader = new CobolLineReaderImpl(messageService);
-    CobolLineWriter writer = new CobolLineWriterImpl();
-    CobolLinesTransformation transformation = new ContinuationLineTransformation(messageService);
-    CobolLineReWriter indicatorProcessor = new CobolLineIndicatorProcessorImpl();
+    CodeLayoutStore layoutStore = mock(CodeLayoutStore.class);
+    Mockito.when(layoutStore.getCodeLayout()).thenReturn(new CobolProgramLayout());
+    CobolLineReader reader = new CobolLineReaderImpl(messageService, layoutStore);
+    CobolLineWriter writer = new CobolLineWriterImpl(layoutStore);
+    CobolLinesTransformation transformation = new ContinuationLineTransformation(messageService, layoutStore);
+    CobolLineReWriter indicatorProcessor = new CobolLineIndicatorProcessorImpl(layoutStore);
 
     TextPreprocessor textPreprocessor =
         new TextPreprocessorImpl(reader, writer, transformation, indicatorProcessor);

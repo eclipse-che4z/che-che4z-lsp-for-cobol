@@ -102,6 +102,7 @@ public class CobolWorkspaceServiceImpl extends LspEventConsumer implements Works
           if (!sourceUnitGraph.isFileOpened(uri)) {
             List<String> uris =
                 sourceUnitGraph.getAllAssociatedFilesForACopybook(uriDecodeService.decode(uri));
+            if (!uris.isEmpty())
             asyncAnalysisService.reanalyseCopybooksAssociatedPrograms(
                 uris, uri, sourceUnitGraph.getContent(uri), SourceUnitGraph.EventSource.FILE_SYSTEM);
           }

@@ -14,22 +14,32 @@
  */
 package org.eclipse.lsp.cobol.core.preprocessor.delegates.writer;
 
-import org.apache.commons.lang3.StringUtils;
-import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
-import org.eclipse.lsp.cobol.core.model.CobolLineTypeEnum;
-import org.eclipse.lsp.cobol.core.preprocessor.CobolLine;
-import org.eclipse.lsp.cobol.core.preprocessor.ProcessingConstants;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.rewriter.CobolLineReWriter;
-import org.eclipse.lsp4j.Position;
-import org.eclipse.lsp4j.Range;
+import static org.eclipse.lsp.cobol.core.preprocessor.ProcessingConstants.NEWLINE;
+import static org.eclipse.lsp.cobol.core.preprocessor.ProcessingConstants.WS;
 
+import com.google.inject.Inject;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.apache.commons.lang3.StringUtils;
+import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
+import org.eclipse.lsp.cobol.core.model.CobolLineTypeEnum;
+import org.eclipse.lsp.cobol.core.preprocessor.CobolLine;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.rewriter.CobolLineReWriter;
+import org.eclipse.lsp.cobol.service.settings.layout.CodeLayoutStore;
+import org.eclipse.lsp4j.Position;
+import org.eclipse.lsp4j.Range;
 
 /** This class serializes a list of COBOL lines into a String */
 public class CobolLineWriterImpl implements CobolLineWriter {
+
+  private final CodeLayoutStore layoutStore;
+
+  @Inject
+  public CobolLineWriterImpl(CodeLayoutStore layoutStore) {
+    this.layoutStore = layoutStore;
+  }
 
   @Override
   public ExtendedDocument serialize(final List<CobolLine> lines, String documentUri) {
@@ -82,7 +92,7 @@ public class CobolLineWriterImpl implements CobolLineWriter {
 
   private void process(StringBuilder sb, CobolLine line) {
     if (line.getNumber() > 0) {
-      sb.append(ProcessingConstants.NEWLINE);
+      sb.append(NEWLINE);
     }
     sb.append(lineString(line));
   }
@@ -90,7 +100,8 @@ public class CobolLineWriterImpl implements CobolLineWriter {
   private String lineString(CobolLine line) {
     StringBuilder sb = new StringBuilder();
     if (line.getType() != CobolLineTypeEnum.PREPROCESSED) {
-      sb.append(ProcessingConstants.BLANK_SEQUENCE_AREA);
+      String blankSequenceArea = StringUtils.repeat(WS, layoutStore.getCodeLayout().getSequenceLength());
+      sb.append(blankSequenceArea);
     }
     sb.append(line.getIndicatorArea());
     sb.append(line.getContentArea());

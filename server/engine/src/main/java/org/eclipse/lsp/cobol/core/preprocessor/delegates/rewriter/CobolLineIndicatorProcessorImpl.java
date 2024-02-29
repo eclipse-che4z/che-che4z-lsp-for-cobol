@@ -14,20 +14,22 @@
  */
 package org.eclipse.lsp.cobol.core.preprocessor.delegates.rewriter;
 
-import org.apache.commons.lang3.StringUtils;
-import org.eclipse.lsp.cobol.core.preprocessor.CobolLine;
-import org.eclipse.lsp.cobol.core.model.CobolLineTypeEnum;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.CobolLineUtils;
+import static org.eclipse.lsp.cobol.core.model.CobolLineTypeEnum.*;
+import static org.eclipse.lsp.cobol.core.preprocessor.ProcessingConstants.WS;
 
+import com.google.inject.Inject;
 import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
-
-import static org.eclipse.lsp.cobol.core.model.CobolLineTypeEnum.*;
-import static org.eclipse.lsp.cobol.core.preprocessor.ProcessingConstants.WS;
+import org.apache.commons.lang3.StringUtils;
+import org.eclipse.lsp.cobol.core.model.CobolLineTypeEnum;
+import org.eclipse.lsp.cobol.core.preprocessor.CobolLine;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.CobolLineUtils;
+import org.eclipse.lsp.cobol.service.settings.layout.CobolProgramLayout;
+import org.eclipse.lsp.cobol.service.settings.layout.CodeLayoutStore;
 
 /**
  * This class processes the indicator area of COBOL lines checking if some operations should be
@@ -40,6 +42,13 @@ public class CobolLineIndicatorProcessorImpl implements CobolLineReWriter {
   private static final String SINGLE_QUOTE_LITERAL = "'([^']|''|\"\")*+'";
   public static final Pattern FLOATING_COMMENT_LINE =
       Pattern.compile("(?<validText>.*?)(?<floatingComment>\\*>.*)?");
+
+  private final CodeLayoutStore layoutStore;
+
+  @Inject
+  public CobolLineIndicatorProcessorImpl(CodeLayoutStore layoutStore) {
+    this.layoutStore = layoutStore;
+  }
 
   /**
    * Normalizes the lines by stripping the sequence number and line indicator, and interpreting the
@@ -57,8 +66,9 @@ public class CobolLineIndicatorProcessorImpl implements CobolLineReWriter {
 
   private CobolLine processLine(final CobolLine line) {
     CobolLineTypeEnum type = line.getType();
+    CobolProgramLayout codeLayout = layoutStore.getCodeLayout();
     if (type == COMMENT || type == COMPILER_DIRECTIVE) {
-      return CobolLineUtils.copyCobolLineWithIndicatorAndContentArea(WS, EMPTY_STRING, line);
+      return CobolLineUtils.copyCobolLineWithIndicatorAndContentArea(WS, EMPTY_STRING, line, codeLayout);
     }
 
     String trimmedContentArea = conditionalRightTrimContentArea(line);
@@ -68,15 +78,16 @@ public class CobolLineIndicatorProcessorImpl implements CobolLineReWriter {
 
     Matcher matchedLine = FLOATING_COMMENT_LINE.matcher(trimmedContentArea);
     return matchedLine.matches()
-            ? CobolLineUtils.copyCobolLineWithIndicatorAndContentArea(WS, matchedLine.group("validText"), line)
-            : CobolLineUtils.copyCobolLineWithIndicatorAndContentArea(WS, trimmedContentArea, line);
+            ? CobolLineUtils.copyCobolLineWithIndicatorAndContentArea(WS, matchedLine.group("validText"), line, codeLayout)
+            : CobolLineUtils.copyCobolLineWithIndicatorAndContentArea(WS, trimmedContentArea, line, codeLayout);
   }
 
   private CobolLine processContinuationLine(CobolLine line, String conditionalRightTrimmedContentArea) {
     CobolLine result;
     final String trimmedContentArea = trimLeadingWhitespace(conditionalRightTrimmedContentArea);
+    CobolProgramLayout codeLayout = layoutStore.getCodeLayout();
     if (StringUtils.isBlank(conditionalRightTrimmedContentArea)) {
-      result = CobolLineUtils.copyCobolLineWithIndicatorAndContentArea(WS, EMPTY_STRING, line);
+      result = CobolLineUtils.copyCobolLineWithIndicatorAndContentArea(WS, EMPTY_STRING, line, codeLayout);
     }
     /*
      If a line, which is continued on the next line, ends in column 72 with a quotation mark as
@@ -96,7 +107,7 @@ public class CobolLineIndicatorProcessorImpl implements CobolLineReWriter {
         */
         result =
             CobolLineUtils.copyCobolLineWithIndicatorAndContentArea(
-                WS, trimLeadingChar(trimmedContentArea), line);
+                WS, trimLeadingChar(trimmedContentArea), line, codeLayout);
       }
       /*
        However there are non-compliant parsers out there without the two consecutive quotation
@@ -106,7 +117,7 @@ public class CobolLineIndicatorProcessorImpl implements CobolLineReWriter {
         /* ... where we simply remove leading whitespace. */
         result =
             CobolLineUtils.copyCobolLineWithIndicatorAndContentArea(
-                WS, trimLeadingWhitespace(conditionalRightTrimmedContentArea), line);
+                WS, trimLeadingWhitespace(conditionalRightTrimmedContentArea), line, codeLayout);
       }
     }
     /* If we are ending with an open literal ... */
@@ -119,11 +130,11 @@ public class CobolLineIndicatorProcessorImpl implements CobolLineReWriter {
       */
         result =
             CobolLineUtils.copyCobolLineWithIndicatorAndContentArea(
-                WS, conditionalRightTrimmedContentArea, line);
+                WS, conditionalRightTrimmedContentArea, line, codeLayout);
     } else {
       result =
           CobolLineUtils.copyCobolLineWithIndicatorAndContentArea(
-                  WS, conditionalRightTrimmedContentArea, line);
+                  WS, conditionalRightTrimmedContentArea, line, codeLayout);
     }
     return result;
   }

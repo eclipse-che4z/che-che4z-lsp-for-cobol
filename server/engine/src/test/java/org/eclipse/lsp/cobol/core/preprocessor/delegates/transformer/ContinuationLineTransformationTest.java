@@ -14,17 +14,19 @@
  */
 package org.eclipse.lsp.cobol.core.preprocessor.delegates.transformer;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import java.util.ArrayList;
+import java.util.List;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.core.AbstractCobolLinePreprocessorTest;
 import org.eclipse.lsp.cobol.core.preprocessor.CobolLine;
+import org.eclipse.lsp.cobol.service.settings.layout.CobolProgramLayout;
+import org.eclipse.lsp.cobol.service.settings.layout.CodeLayoutStore;
 import org.junit.jupiter.api.Test;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.mock;
 
 /** This test checks the continuation line transformation logic. */
 class ContinuationLineTransformationTest extends AbstractCobolLinePreprocessorTest {
@@ -105,8 +107,14 @@ class ContinuationLineTransformationTest extends AbstractCobolLinePreprocessorTe
   private List<SyntaxError> runTransformation(String text) {
     List<CobolLine> lines = convertToCobolLines(text);
     MessageService mockMessageService = mock(MessageService.class);
-    ContinuationLineTransformation transformation = new ContinuationLineTransformation(mockMessageService);
+    ContinuationLineTransformation transformation = new ContinuationLineTransformation(mockMessageService, getMockLayoutStore());
     return transformation.transformLines("", lines).getErrors();
+  }
+
+  private CodeLayoutStore getMockLayoutStore() {
+    CodeLayoutStore layoutStore = mock(CodeLayoutStore.class);
+    when(layoutStore.getCodeLayout()).thenReturn(new CobolProgramLayout());
+    return layoutStore;
   }
 
   private List<CobolLine> convertToCobolLines(String text) {

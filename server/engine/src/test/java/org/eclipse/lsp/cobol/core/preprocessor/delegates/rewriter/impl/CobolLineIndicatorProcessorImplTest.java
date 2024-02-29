@@ -14,17 +14,20 @@
  */
 package org.eclipse.lsp.cobol.core.preprocessor.delegates.rewriter.impl;
 
+import static org.eclipse.lsp.cobol.core.model.CobolLineTypeEnum.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import com.google.common.collect.ImmutableList;
+import java.util.List;
 import lombok.val;
 import org.eclipse.lsp.cobol.core.preprocessor.CobolLine;
 import org.eclipse.lsp.cobol.core.preprocessor.ProcessingConstants;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.rewriter.CobolLineIndicatorProcessorImpl;
+import org.eclipse.lsp.cobol.service.settings.layout.CobolProgramLayout;
+import org.eclipse.lsp.cobol.service.settings.layout.CodeLayoutStore;
 import org.junit.jupiter.api.Test;
-
-import java.util.List;
-
-import static org.eclipse.lsp.cobol.core.model.CobolLineTypeEnum.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /** Testing that the cobol lines formatted correctly before being used for token analysis */
 class CobolLineIndicatorProcessorImplTest {
@@ -40,13 +43,20 @@ class CobolLineIndicatorProcessorImplTest {
     debugLine.setContentAreaA("    ");
     debugLine.setContentAreaB("     DEBUG LINE HERE      ");
 
-    CobolLineIndicatorProcessorImpl processor = new CobolLineIndicatorProcessorImpl();
+    CodeLayoutStore layoutStore = getMockLayoutStore();
+    CobolLineIndicatorProcessorImpl processor = new CobolLineIndicatorProcessorImpl(layoutStore);
     List<CobolLine> outcome = processor.processLines(ImmutableList.of(debugLine));
     CobolLine actual = outcome.get(0);
 
     assertEquals(
         ProcessingConstants.WS + "         DEBUG LINE HERE",
         actual.getIndicatorArea() + actual.getContentArea());
+  }
+
+  private CodeLayoutStore getMockLayoutStore() {
+    CodeLayoutStore layoutStore = mock(CodeLayoutStore.class);
+    when(layoutStore.getCodeLayout()).thenReturn(new CobolProgramLayout());
+    return layoutStore;
   }
 
   /** Testing normal lines pre-formatting for Token analysis */
@@ -58,13 +68,33 @@ class CobolLineIndicatorProcessorImplTest {
     normalLine.setContentAreaA("    ");
     normalLine.setContentAreaB("         RANDOM TEXT ,  ");
 
-    CobolLineIndicatorProcessorImpl processor = new CobolLineIndicatorProcessorImpl();
+    CobolLineIndicatorProcessorImpl processor =
+        new CobolLineIndicatorProcessorImpl(getMockLayoutStore());
 
     List<CobolLine> outcome = processor.processLines(ImmutableList.of(normalLine));
     CobolLine actual = outcome.get(0);
 
     assertEquals(
         ProcessingConstants.WS + "             RANDOM TEXT , ",
+        actual.getIndicatorArea() + actual.getContentArea());
+  }
+
+  @Test
+  void normalLineTest_whenCodeLayoutIsDifferent_thenProcessingHappensAsPerLayout() {
+    val normalLine = new CobolLine();
+    normalLine.setType(NORMAL);
+    normalLine.setIndicatorArea(ProcessingConstants.WS);
+    normalLine.setContentAreaA("  ");
+    normalLine.setContentAreaB("   RANDOM TEXT ,  ");
+    CodeLayoutStore layoutStore = mock(CodeLayoutStore.class);
+    when(layoutStore.getCodeLayout()).thenReturn(new CobolProgramLayout(3, 1, 3, 40, 0));
+    CobolLineIndicatorProcessorImpl processor = new CobolLineIndicatorProcessorImpl(layoutStore);
+
+    List<CobolLine> outcome = processor.processLines(ImmutableList.of(normalLine));
+    CobolLine actual = outcome.get(0);
+
+    assertEquals(
+        ProcessingConstants.WS + "     RANDOM TEXT , ",
         actual.getIndicatorArea() + actual.getContentArea());
   }
 
@@ -77,7 +107,8 @@ class CobolLineIndicatorProcessorImplTest {
     compilerDirectiveLine.setContentAreaA("    ");
     compilerDirectiveLine.setContentAreaB("DEFINE");
 
-    CobolLineIndicatorProcessorImpl processor = new CobolLineIndicatorProcessorImpl();
+    CobolLineIndicatorProcessorImpl processor =
+        new CobolLineIndicatorProcessorImpl(getMockLayoutStore());
     List<CobolLine> outcome = processor.processLines(ImmutableList.of(compilerDirectiveLine));
     CobolLine actual = outcome.get(0);
 
@@ -94,7 +125,8 @@ class CobolLineIndicatorProcessorImplTest {
     commentLine.setContentAreaA("    ");
     commentLine.setContentAreaB("THIS IS A COMMENT        ");
 
-    CobolLineIndicatorProcessorImpl processor = new CobolLineIndicatorProcessorImpl();
+    CobolLineIndicatorProcessorImpl processor =
+        new CobolLineIndicatorProcessorImpl(getMockLayoutStore());
 
     List<CobolLine> outcome = processor.processLines(ImmutableList.of(commentLine));
     CobolLine actual = outcome.get(0);
@@ -112,7 +144,8 @@ class CobolLineIndicatorProcessorImplTest {
     commentLine.setContentAreaA("PROGRAM-ID. comments  *> Floating");
     commentLine.setContentAreaB(" comment");
 
-    CobolLineIndicatorProcessorImpl processor = new CobolLineIndicatorProcessorImpl();
+    CobolLineIndicatorProcessorImpl processor =
+        new CobolLineIndicatorProcessorImpl(getMockLayoutStore());
 
     List<CobolLine> outcome = processor.processLines(ImmutableList.of(commentLine));
     CobolLine actual = outcome.get(0);
@@ -148,18 +181,15 @@ class CobolLineIndicatorProcessorImplTest {
 
     List<CobolLine> listOfLines =
         ImmutableList.of(startContinuationLine, middleContinuationLine, lastContinuationLine);
-    CobolLineIndicatorProcessorImpl processor = new CobolLineIndicatorProcessorImpl();
+    CobolLineIndicatorProcessorImpl processor =
+        new CobolLineIndicatorProcessorImpl(getMockLayoutStore());
     List<CobolLine> outcomeList = processor.processLines(listOfLines);
 
     assertEquals(
         ProcessingConstants.WS + "           \"RANDOM TEXT   ",
         outcomeList.get(0).getIndicatorArea() + outcomeList.get(0).getContentArea());
-    assertEquals(
-            "        \"RANDOM TEXT   ",
-        outcomeList.get(1).getContentAreaB());
-    assertEquals(
-            "        \"CONTINUED LINE ENDS HERE\"",
-        outcomeList.get(2).getContentAreaB());
+    assertEquals("        \"RANDOM TEXT   ", outcomeList.get(1).getContentAreaB());
+    assertEquals("        \"CONTINUED LINE ENDS HERE\"", outcomeList.get(2).getContentAreaB());
   }
 
   /** Testing empty continuation line pre-formatting for Token analysis */
@@ -180,7 +210,8 @@ class CobolLineIndicatorProcessorImplTest {
     continuationLine.setSuccessor(emptyContinuationLine);
 
     final List<CobolLine> listOfLines = ImmutableList.of(continuationLine, emptyContinuationLine);
-    CobolLineIndicatorProcessorImpl processor = new CobolLineIndicatorProcessorImpl();
+    CobolLineIndicatorProcessorImpl processor =
+        new CobolLineIndicatorProcessorImpl(getMockLayoutStore());
     List<CobolLine> outcomeList = processor.processLines(listOfLines);
 
     assertEquals(
@@ -211,7 +242,8 @@ class CobolLineIndicatorProcessorImplTest {
 
     List<CobolLine> listOfLines =
         ImmutableList.of(startContinuationLine, trailingCommaContinuationLine);
-    CobolLineIndicatorProcessorImpl processor = new CobolLineIndicatorProcessorImpl();
+    CobolLineIndicatorProcessorImpl processor =
+        new CobolLineIndicatorProcessorImpl(getMockLayoutStore());
     List<CobolLine> outcomeList = processor.processLines(listOfLines);
 
     assertEquals(
@@ -248,7 +280,8 @@ class CobolLineIndicatorProcessorImplTest {
     startContinuationLine.setSuccessor(quoteContinuationLine);
     quoteContinuationLine.setSuccessor(lastContinuationLine);
 
-    CobolLineIndicatorProcessorImpl processor = new CobolLineIndicatorProcessorImpl();
+    CobolLineIndicatorProcessorImpl processor =
+        new CobolLineIndicatorProcessorImpl(getMockLayoutStore());
 
     List<CobolLine> outcome = processor.processLines(ImmutableList.of(lastContinuationLine));
     CobolLine actual = outcome.get(0);
@@ -284,7 +317,8 @@ class CobolLineIndicatorProcessorImplTest {
     startContinuationLine.setSuccessor(quoteContinuationLine);
     quoteContinuationLine.setSuccessor(lastContinuationLine);
 
-    CobolLineIndicatorProcessorImpl processor = new CobolLineIndicatorProcessorImpl();
+    CobolLineIndicatorProcessorImpl processor =
+        new CobolLineIndicatorProcessorImpl(getMockLayoutStore());
 
     List<CobolLine> outcome = processor.processLines(ImmutableList.of(lastContinuationLine));
     val actual = outcome.get(0);
@@ -306,7 +340,8 @@ class CobolLineIndicatorProcessorImplTest {
     notFormattedLine.setSequenceArea(" P-ADD");
     notFormattedLine.setType(CONTINUATION);
 
-    CobolLineIndicatorProcessorImpl processor = new CobolLineIndicatorProcessorImpl();
+    CobolLineIndicatorProcessorImpl processor =
+        new CobolLineIndicatorProcessorImpl(getMockLayoutStore());
     List<CobolLine> outcome = processor.processLines(ImmutableList.of(notFormattedLine));
     val actual = outcome.get(0);
 

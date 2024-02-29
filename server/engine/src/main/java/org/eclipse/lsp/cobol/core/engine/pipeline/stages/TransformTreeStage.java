@@ -35,8 +35,8 @@ import org.eclipse.lsp.cobol.common.utils.RangeUtils;
 import org.eclipse.lsp.cobol.core.CobolParser;
 import org.eclipse.lsp.cobol.core.engine.analysis.AnalysisContext;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectService;
-import org.eclipse.lsp.cobol.core.engine.pipeline.StageResult;
 import org.eclipse.lsp.cobol.core.engine.pipeline.Stage;
+import org.eclipse.lsp.cobol.core.engine.pipeline.StageResult;
 import org.eclipse.lsp.cobol.core.engine.processor.AstProcessor;
 import org.eclipse.lsp.cobol.core.engine.processors.*;
 import org.eclipse.lsp.cobol.core.engine.processors.implicit.ImplicitVariablesProcessor;
@@ -45,6 +45,7 @@ import org.eclipse.lsp.cobol.core.engine.symbols.SymbolsRepository;
 import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
 import org.eclipse.lsp.cobol.core.visitor.CobolVisitor;
 import org.eclipse.lsp.cobol.service.settings.CachingConfigurationService;
+import org.eclipse.lsp.cobol.service.settings.layout.CodeLayoutStore;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Range;
 
@@ -60,6 +61,7 @@ public class TransformTreeStage implements Stage<ProcessingResult, ParserStageRe
   private final CachingConfigurationService cachingConfigurationService;
   private final DialectService dialectService;
   private final AstProcessor astProcessor;
+  private final CodeLayoutStore codeLayoutStore;
 
   @Override
   public StageResult<ProcessingResult> run(AnalysisContext context, StageResult<ParserStageResult> prevStageResult) {
@@ -111,7 +113,7 @@ public class TransformTreeStage implements Stage<ProcessingResult, ParserStageRe
                                   CobolParser.StartRuleContext tree) {
     CobolVisitor visitor =
         new CobolVisitor(copybooksRepository, tokens, ctx.getExtendedDocument(),
-            messageService, subroutineService, cachingConfigurationService);
+            messageService, subroutineService, cachingConfigurationService, codeLayoutStore);
     List<Node> syntaxTree = visitor.visit(tree);
     ctx.getAccumulatedErrors().addAll(visitor.getErrors());
     return syntaxTree;

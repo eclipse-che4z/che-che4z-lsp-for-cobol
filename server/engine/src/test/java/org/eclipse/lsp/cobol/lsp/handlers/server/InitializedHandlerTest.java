@@ -33,6 +33,8 @@ import org.eclipse.lsp.cobol.service.copybooks.CopybookNameService;
 import org.eclipse.lsp.cobol.service.delegates.completions.Keywords;
 import org.eclipse.lsp.cobol.service.settings.SettingsService;
 import org.eclipse.lsp.cobol.service.settings.SettingsServiceImpl;
+import org.eclipse.lsp.cobol.service.settings.layout.CobolProgramLayout;
+import org.eclipse.lsp.cobol.service.settings.layout.CodeLayoutStore;
 import org.eclipse.lsp4j.InitializedParams;
 import org.junit.jupiter.api.Test;
 
@@ -54,6 +56,10 @@ class InitializedHandlerTest {
     when(settingsService.fetchTextConfiguration(anyString())).thenCallRealMethod();
     prepareSettingsService(settingsService, localeStore);
 
+    CodeLayoutStore codeLayoutStore = mock(CodeLayoutStore.class);
+    when(codeLayoutStore.getCodeLayout()).thenReturn(new CobolProgramLayout());
+    when(codeLayoutStore.updateCodeLayout()).thenReturn(mock -> {});
+
     InitializedHandler initializedHandler =
         new InitializedHandler(
             watchingService,
@@ -62,7 +68,7 @@ class InitializedHandlerTest {
             settingsService,
             localeStore,
             mock(AnalysisService.class),
-            messageService);
+            messageService, codeLayoutStore);
     initializedHandler.initialized(new InitializedParams());
     verify(watchingService).watchConfigurationChange();
     verify(settingsService).fetchConfiguration(LOCALE.label);
@@ -89,5 +95,7 @@ class InitializedHandlerTest {
         .thenReturn(completedFuture(ImmutableList.of("cpy")));
     when(settingsService.fetchConfiguration("dialect"))
         .thenReturn(completedFuture(singletonList(arr)));
+    when(settingsService.fetchConfiguration(COBOL_PROGRAM_LAYOUT.label))
+        .thenReturn(completedFuture(ImmutableList.of(new CobolProgramLayout())));
   }
 }

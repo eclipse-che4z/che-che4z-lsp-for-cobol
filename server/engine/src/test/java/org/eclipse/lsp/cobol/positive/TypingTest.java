@@ -15,7 +15,15 @@
 
 package org.eclipse.lsp.cobol.positive;
 
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import com.google.common.util.concurrent.SimpleTimeLimiter;
+import java.util.List;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.eclipse.lsp.cobol.common.ResultWithErrors;
@@ -27,17 +35,13 @@ import org.eclipse.lsp.cobol.core.preprocessor.delegates.reader.CobolLineReaderI
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.rewriter.CobolLineIndicatorProcessorImpl;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.transformer.ContinuationLineTransformation;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.writer.CobolLineWriterImpl;
+import org.eclipse.lsp.cobol.service.settings.layout.CobolProgramLayout;
+import org.eclipse.lsp.cobol.service.settings.layout.CodeLayoutStore;
 import org.eclipse.lsp.cobol.test.CobolText;
 import org.eclipse.lsp.cobol.test.engine.UseCase;
 import org.eclipse.lsp.cobol.test.engine.UseCaseUtils;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-
-import java.util.List;
-import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 /**
  * This test checks that the files in the positive test set don't produce any {@link
@@ -75,12 +79,14 @@ class TypingTest extends FileBasedTest {
   }
 
   private String getCleanText(CobolText cobolText) {
+    CodeLayoutStore layoutStore = mock(CodeLayoutStore.class);
+    when(layoutStore.getCodeLayout()).thenReturn(new CobolProgramLayout());
     TextPreprocessor preprocessor =
         new TextPreprocessorImpl(
-            new CobolLineReaderImpl(null),
-            new CobolLineWriterImpl(),
-            new ContinuationLineTransformation(null),
-            new CobolLineIndicatorProcessorImpl());
+            new CobolLineReaderImpl(null, layoutStore),
+            new CobolLineWriterImpl(layoutStore),
+            new ContinuationLineTransformation(null, layoutStore),
+            new CobolLineIndicatorProcessorImpl(layoutStore));
     ResultWithErrors<ExtendedText> cleanTextResult =
         preprocessor.cleanUpCode(cobolText.getFileName(), cobolText.getFullText());
     for (SyntaxError error : cleanTextResult.getErrors()) LOG.error(error.toString());
