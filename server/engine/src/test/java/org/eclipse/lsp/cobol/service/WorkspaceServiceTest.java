@@ -176,6 +176,7 @@ class WorkspaceServiceTest {
             didChangeConfigurationHandler,
             asyncAnalysisService, uriDecodeService);
     ((LspEventConsumer) workspaceService).startConsumer();
+    doNothing().when(didChangeConfigurationHandler).didChangeConfiguration(any(DidChangeConfigurationParams.class));
     DidChangeConfigurationParams didChangeConfigurationParams = new DidChangeConfigurationParams(new Object());
     workspaceService.didChangeConfiguration(didChangeConfigurationParams);
     waitingQuery(lspMessageBroker).join();
