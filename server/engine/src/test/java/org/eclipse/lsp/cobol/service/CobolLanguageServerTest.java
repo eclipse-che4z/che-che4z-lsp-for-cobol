@@ -98,7 +98,6 @@ class CobolLanguageServerTest {
   @Test
   void initialized() throws InterruptedException {
     SettingsService settingsService = mock(SettingsServiceImpl.class);
-//    WatcherService watchingService = mock(WatcherService.class);
     LocaleStore localeStore = mock(LocaleStore.class);
     CopybookNameService copybookNameService = mock(CopybookNameService.class);
     MessageService messageService = mock(MessageService.class);
