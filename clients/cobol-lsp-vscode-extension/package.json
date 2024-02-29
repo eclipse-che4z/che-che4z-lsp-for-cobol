@@ -415,28 +415,28 @@
           ],
           "description": "COBOL LS server runtime."
         },
-        "cobol-lsp.cobol.program.layout" : {
+        "cobol-lsp.cobol.program.layout": {
           "type": "object",
           "additionalProperties": false,
           "properties": {
             "sequence_length": {
-              "type" : "integer",
+              "type": "integer",
               "default": 6
             },
             "indicator_length": {
-              "type" : "integer",
+              "type": "integer",
               "default": 1
             },
             "area_a_length": {
-              "type" : "integer",
+              "type": "integer",
               "default": 4
             },
             "area_b_length": {
-              "type" : "integer",
+              "type": "integer",
               "default": 61
             },
             "comment_area": {
-              "type" : "integer",
+              "type": "integer",
               "default": 8
             }
           }

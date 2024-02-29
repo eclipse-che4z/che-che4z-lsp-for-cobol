@@ -17,23 +17,33 @@ import { SettingsService } from "../services/Settings";
 import { integer } from "vscode-languageclient";
 
 export function updateCobolEditorRuler() {
-    const configuration = vscode.workspace.getConfiguration()
+  const configuration = vscode.workspace.getConfiguration();
 
-    const rulers = SettingsService.getCobolProgramLayout();
-    const seqLen = (rulers && rulers.sequence_length) || 6;
-    const indcatorLen = (rulers && rulers.indicator_length) || 1;
-    const areaA = (rulers && rulers.area_a_length) || 1;
-    const areaB = (rulers && rulers.area_b_length) || 61;
-    const commentLen = (rulers && rulers.comment_area) || 61;
-    const rulerIndex = [seqLen,
-        seqLen + indcatorLen,
-        seqLen + indcatorLen + areaA,
-        seqLen + indcatorLen + areaA + areaB,
-        seqLen + indcatorLen + areaA + areaB + commentLen
-    ];
-    const updatedRules = {
-        ...configuration.get("[cobol]") as { 'editor.guides.indentation': integer, 'editor.rulers': integer[], 'editor.wordSeparators': string },
-        'editor.rulers': rulerIndex
-    };
-    configuration.update("[cobol]", updatedRules, vscode.ConfigurationTarget.Workspace, true);
+  const rulers = SettingsService.getCobolProgramLayout();
+  const seqLen = (rulers && rulers.sequence_length) || 6;
+  const indcatorLen = (rulers && rulers.indicator_length) || 1;
+  const areaA = (rulers && rulers.area_a_length) || 4;
+  const areaB = (rulers && rulers.area_b_length) || 61;
+  const commentLen = (rulers && rulers.comment_area) || 8;
+  const rulerIndex = [
+    seqLen,
+    seqLen + indcatorLen,
+    seqLen + indcatorLen + areaA,
+    seqLen + indcatorLen + areaA + areaB,
+    seqLen + indcatorLen + areaA + areaB + commentLen,
+  ];
+  const updatedRules = {
+    ...(configuration.get("[cobol]") as {
+      "editor.guides.indentation": integer;
+      "editor.rulers": integer[];
+      "editor.wordSeparators": string;
+    }),
+    "editor.rulers": rulerIndex,
+  };
+  configuration.update(
+    "[cobol]",
+    updatedRules,
+    vscode.ConfigurationTarget.Workspace,
+    true,
+  );
 }

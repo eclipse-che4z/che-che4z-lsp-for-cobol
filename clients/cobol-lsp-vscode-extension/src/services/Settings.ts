@@ -96,11 +96,11 @@ export class TabRule {
     public stops: number[],
     public maxPosition: number,
     public regex: string | undefined = undefined,
-  ) { }
+  ) {}
 }
 
 export class TabSettings {
-  public constructor(public rules: TabRule[], public defaultRule: TabRule) { }
+  public constructor(public rules: TabRule[], public defaultRule: TabRule) {}
 }
 
 export function configHandler(request: any): Array<any> {
@@ -168,7 +168,6 @@ export function configHandler(request: any): Array<any> {
  * SettingsService provides read/write configurstion settings functionality
  */
 export class SettingsService {
-
   public static readonly DEFAULT_DIALECT = "COBOL";
   /**
    * Get list of local subroutine path
@@ -215,9 +214,9 @@ export class SettingsService {
     return documentUri === undefined
       ? global
       : loadProcessorGroupCopybookExtensionsConfig(
-        { scopeUri: documentUri },
-        global!,
-      );
+          { scopeUri: documentUri },
+          global!,
+        );
   }
 
   /**
@@ -344,8 +343,16 @@ export class SettingsService {
     return vscode.workspace.getConfiguration().get(SERVER_RUNTIME);
   }
 
-  public static getCobolProgramLayout(): { sequence_length?: integer, indicator_length?: integer, area_a_length?: integer, area_b_length?: integer, comment_area?: integer } | undefined {
-    return vscode.workspace.getConfiguration().get(COBOL_PRGM_LAYOUT)
+  public static getCobolProgramLayout():
+    | {
+        sequence_length?: integer;
+        indicator_length?: integer;
+        area_a_length?: integer;
+        area_b_length?: integer;
+        comment_area?: integer;
+      }
+    | undefined {
+    return vscode.workspace.getConfiguration().get(COBOL_PRGM_LAYOUT);
   }
 
   private static evaluateVariable(
