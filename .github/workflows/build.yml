@@ -215,6 +215,8 @@ jobs:
           ## uncomment me if you need native image job reports
           # native-image-job-reports: 'true'
           cache: 'maven'
+      - uses: ilammy/msvc-dev-cmd@v1
+        if: matrix.os == 'windows-latest'
       - name: Retrieve native build configurations
         uses: actions/download-artifact@v3
         with:
