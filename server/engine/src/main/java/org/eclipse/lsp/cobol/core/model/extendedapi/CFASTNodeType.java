@@ -29,6 +29,9 @@ public enum CFASTNodeType {
   SORT("sort"),
   INPUT("input"),
   OUTPUT("output"),
+  ON_EXCEPTION("onexception"),
+  ON_NOT_EXCEPTION("onnotexception"),
+  END_ON("endon"),
   END_SORT("endsort"),
   MERGE("merge"),
   END_MERGE("endmerge"),
@@ -48,6 +51,8 @@ public enum CFASTNodeType {
   END_INLINE_PERFORM("endinlineperform"),
   AT_END("atEnd"),
   AT_END_EXIT("atEndExit"),
-  XML_PARSE("xmlparse");
+  XML_PARSE("xmlparse"),
+  END_XML("endxml");
+
   @Getter final String value;
 }

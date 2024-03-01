@@ -23,12 +23,12 @@ import org.eclipse.lsp.cobol.common.model.ProcedureName;
 @Value
 @EqualsAndHashCode(callSuper = true)
 public class XmlParse extends CFASTNode {
-  ProcedureName processingName;
-  ProcedureName thruName;
+  ProcedureName target;
+  ProcedureName thru;
 
   public XmlParse(ProcedureName processingName, ProcedureName thruName, Location location) {
     super(CFASTNodeType.XML_PARSE.getValue(), location);
-    this.processingName = processingName;
-    this.thruName = thruName;
+    this.target = processingName;
+    this.thru = thruName;
   }
 }

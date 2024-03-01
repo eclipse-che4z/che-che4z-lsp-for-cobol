@@ -81,9 +81,9 @@ public class CFASTBuilderImpl implements CFASTBuilder {
       node.getChildren().forEach(child -> traverse(parent, child));
     } else if (node instanceof XMLParseNode) {
       XMLParseNode xmlParseNode = (XMLParseNode) node;
-      addChild(parent, new XmlParse(xmlParseNode.getProcessingProcedureName(),
-          xmlParseNode.getThruProcedureName(),
-          convertLocation(node)));
+      addChild(parent, new XmlParse(xmlParseNode.getProcessingProcedureName(), xmlParseNode.getThruProcedureName(), convertLocation(node)));
+      node.getChildren().forEach(child -> traverse(parent, child));
+      addChild(parent, new CFASTNode(CFASTNodeType.END_XML.getValue(), convertLocation(node)));
     } else if (node instanceof StatementNode) {
       node.getChildren().forEach(child -> traverse(parent, child));
     } else if (node instanceof IfElseNode) {
@@ -141,6 +141,14 @@ public class CFASTBuilderImpl implements CFASTBuilder {
     } else if (node instanceof AlterNode) {
       AlterNode alterNode = (AlterNode) node;
       addChild(parent, new Alter(alterNode.getFrom(), alterNode.getTo(), convertLocation(node)));
+    } else if (node instanceof OnExceptionNode) {
+      addChild(parent, new CFASTNode(CFASTNodeType.ON_EXCEPTION.getValue(), convertLocation(node)));
+      node.getChildren().forEach(child -> traverse(parent, child));
+      addChild(parent, new CFASTNode(CFASTNodeType.END_ON.getValue(), convertLocation(node)));
+    } else if (node instanceof OnNotExceptionNode) {
+      addChild(parent, new CFASTNode(CFASTNodeType.ON_NOT_EXCEPTION.getValue(), convertLocation(node)));
+      node.getChildren().forEach(child -> traverse(parent, child));
+      addChild(parent, new CFASTNode(CFASTNodeType.END_ON.getValue(), convertLocation(node)));
     }
   }
 

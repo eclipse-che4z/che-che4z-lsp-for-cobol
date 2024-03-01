@@ -9,13 +9,13 @@
         "character": 8
       },
       "end": {
-        "line": 32,
+        "line": 34,
         "character": 43
       }
     },
     "children": [
       {
-        "snippet": "MAINLINE.\r\n             DISPLAY \u0027XML-DOCUMENT\u003d\u0027 XML-STRING(EZ-PTR)\r\n             XML PARSE XML-STRING(EZ-PTR) RETURNING NATIONAL\r\n                                PROCESSING PROCEDURE XML-HANDLER\r\n               ON EXCEPTION\r\n                 DISPLAY \u0027XML DOCUMENT ERROR \u0027 XML-CODE\r\n               NOT ON EXCEPTION\r\n                 DISPLAY \u0027XML DOCUMENT SUCCESSFULLY PARSED\u0027\r\n              END-XML.",
+        "snippet": "MAINLINE.\r\n             DISPLAY \u0027XML-DOCUMENT\u003d\u0027 XML-STRING(EZ-PTR)\r\n             XML PARSE XML-STRING(EZ-PTR) RETURNING NATIONAL\r\n                                PROCESSING PROCEDURE XML-HANDLER\r\n               ON EXCEPTION\r\n                 GO TO ABEND\r\n               NOT ON EXCEPTION\r\n                 DISPLAY \u0027XML DOCUMENT SUCCESSFULLY PARSED\u0027\r\n              END-XML.",
         "name": "MAINLINE",
         "type": "paragraph",
         "location": {
@@ -31,10 +31,97 @@
         },
         "children": [
           {
-            "processingName": {
+            "target": {
               "name": "XML-HANDLER"
             },
             "type": "xmlparse",
+            "location": {
+              "uri": "fake/path",
+              "start": {
+                "line": 24,
+                "character": 14
+              },
+              "end": {
+                "line": 30,
+                "character": 22
+              }
+            }
+          },
+          {
+            "type": "onexception",
+            "location": {
+              "uri": "fake/path",
+              "start": {
+                "line": 26,
+                "character": 16
+              },
+              "end": {
+                "line": 27,
+                "character": 29
+              }
+            }
+          },
+          {
+            "targetName": [
+              "ABEND"
+            ],
+            "type": "goto",
+            "location": {
+              "uri": "fake/path",
+              "start": {
+                "line": 27,
+                "character": 18
+              },
+              "end": {
+                "line": 27,
+                "character": 29
+              }
+            }
+          },
+          {
+            "type": "endon",
+            "location": {
+              "uri": "fake/path",
+              "start": {
+                "line": 26,
+                "character": 16
+              },
+              "end": {
+                "line": 27,
+                "character": 29
+              }
+            }
+          },
+          {
+            "type": "onnotexception",
+            "location": {
+              "uri": "fake/path",
+              "start": {
+                "line": 28,
+                "character": 16
+              },
+              "end": {
+                "line": 29,
+                "character": 60
+              }
+            }
+          },
+          {
+            "type": "endon",
+            "location": {
+              "uri": "fake/path",
+              "start": {
+                "line": 28,
+                "character": 16
+              },
+              "end": {
+                "line": 29,
+                "character": 60
+              }
+            }
+          },
+          {
+            "type": "endxml",
             "location": {
               "uri": "fake/path",
               "start": {
@@ -61,6 +148,22 @@
           },
           "end": {
             "line": 32,
+            "character": 43
+          }
+        }
+      },
+      {
+        "snippet": "ABEND.\r\n           DISPLAY \u0027XML-EVENT\u003d\u0027 XML-EVENT.",
+        "name": "ABEND",
+        "type": "paragraph",
+        "location": {
+          "uri": "fake/path",
+          "start": {
+            "line": 33,
+            "character": 8
+          },
+          "end": {
+            "line": 34,
             "character": 43
           }
         }

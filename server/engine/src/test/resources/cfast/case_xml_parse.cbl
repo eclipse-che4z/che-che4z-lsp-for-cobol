@@ -24,9 +24,11 @@
              XML PARSE XML-STRING(EZ-PTR) RETURNING NATIONAL
                                 PROCESSING PROCEDURE XML-HANDLER
                ON EXCEPTION
-                 DISPLAY 'XML DOCUMENT ERROR ' XML-CODE
+                 GO TO ABEND
                NOT ON EXCEPTION
                  DISPLAY 'XML DOCUMENT SUCCESSFULLY PARSED'
               END-XML.
        XML-HANDLER.
+           DISPLAY 'XML-EVENT=' XML-EVENT.
+       ABEND.
            DISPLAY 'XML-EVENT=' XML-EVENT.
