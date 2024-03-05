@@ -15,17 +15,23 @@
 package org.eclipse.lsp.cobol.common.model.tree;
 
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.ToString;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.NodeType;
+import org.eclipse.lsp.cobol.common.model.ProcedureName;
 
 /**
- * Represents USE statement
+ * Represents USE FOR DEBUGGING statement
  */
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-public class UseNode extends Node {
-  protected UseNode(Locality location) {
+@Getter
+public class UseForDebuggingNode extends Node {
+
+  private final ProcedureName target;
+  protected UseForDebuggingNode(Locality location, ProcedureName target) {
     super(location, NodeType.STATEMENT);
+    this.target = target;
   }
 }
