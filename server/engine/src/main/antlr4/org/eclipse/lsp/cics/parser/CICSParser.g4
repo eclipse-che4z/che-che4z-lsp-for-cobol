@@ -314,8 +314,9 @@ cics_define_at: AT (HOURS cics_data_value | MINUTES cics_data_value | SECONDS ci
 cics_define_on: ON YEAR cics_data_value (MONTH cics_data_value DAYOFMONTH cics_data_value | DAYOFYEAR cics_data_value) cics_handle_response?;
 
 /** DELAY */
-cics_delay: DELAY (INTERVAL cics_zero_digit | INTERVAL cics_hhmmss | TIME cics_hhmmss | cics_delay_for | REQID cics_name | cics_handle_response)+;
-cics_delay_for: (FOR | UNTIL) (HOURS cics_data_value | MINUTES cics_data_value | SECONDS cics_data_value)+;
+cics_delay: DELAY (INTERVAL cics_zero_digit | INTERVAL cics_hhmmss | TIME cics_hhmmss | cics_delay_for | cics_dealy_until | REQID cics_name | cics_handle_response)+;
+cics_delay_for: FOR (HOURS cics_data_value | MINUTES cics_data_value | SECONDS cics_data_value | MILLISECS cics_data_value)+;
+cics_dealy_until: UNTIL (HOURS cics_data_value | MINUTES cics_data_value | SECONDS cics_data_value)+;
 
 /** DELETE (all of them) */
 cics_delete: DELETE (cics_delete_file | ACTIVITY cics_data_value | cics_delete_container | cics_delete_counter |
