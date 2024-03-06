@@ -18,7 +18,12 @@ import org.eclipse.lsp.cobol.common.model.tree.*;
 import org.eclipse.lsp.cobol.common.model.tree.statements.StatementNode;
 import org.eclipse.lsp.cobol.common.model.variables.DivisionType;
 import org.eclipse.lsp.cobol.core.model.extendedapi.*;
+import org.eclipse.lsp.cobol.implicitDialects.cics.nodes.ExecCicsHandleNode;
 import org.eclipse.lsp.cobol.implicitDialects.cics.nodes.ExecCicsNode;
+import org.eclipse.lsp.cobol.implicitDialects.cics.nodes.ExecCicsReturnNode;
+import org.eclipse.lsp.cobol.implicitDialects.sql.node.Db2DataAndProcedureDivisionNode;
+import org.eclipse.lsp.cobol.implicitDialects.sql.node.ExecSqlNode;
+import org.eclipse.lsp.cobol.implicitDialects.sql.node.ExecSqlWheneverNode;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
@@ -62,6 +67,8 @@ public class CFASTBuilderImpl implements CFASTBuilder {
               convertLocation(node));
       addChild(parent, section);
       node.getChildren().forEach(child -> traverse(section, child));
+    } else if (node instanceof Db2DataAndProcedureDivisionNode) {
+      node.getChildren().forEach(child -> traverse(parent, child));
     } else if (node instanceof GoToNode) {
       addChild(parent, new GoTo(((GoToNode) node).getTargets(), convertLocation(node)));
     } else if (node instanceof EvaluateNode) {
@@ -84,8 +91,6 @@ public class CFASTBuilderImpl implements CFASTBuilder {
       addChild(parent, new XmlParse(xmlParseNode.getProcessingProcedureName(), xmlParseNode.getThruProcedureName(), convertLocation(node)));
       node.getChildren().forEach(child -> traverse(parent, child));
       addChild(parent, new CFASTNode(CFASTNodeType.END_XML.getValue(), convertLocation(node)));
-    } else if (node instanceof StatementNode) {
-      node.getChildren().forEach(child -> traverse(parent, child));
     } else if (node instanceof IfElseNode) {
       addChild(parent, new CFASTNode(CFASTNodeType.ELSE.getValue(), convertLocation(node)));
       node.getChildren().forEach(child -> traverse(parent, child));
@@ -112,10 +117,27 @@ public class CFASTBuilderImpl implements CFASTBuilder {
     } else if (node instanceof GoBackNode) {
       addChild(parent, new CFASTNode(CFASTNodeType.GOBACK.getValue(), convertLocation(node)));
     } else if (node instanceof ExecCicsNode) {
-      ExecCicsNode execCicsNode = (ExecCicsNode) node;
-      if (execCicsNode.isStopRun()) {
-        addChild(parent, new CFASTNode(CFASTNodeType.GOBACK.getValue(), convertLocation(node)));
-      }
+      addChild(parent, new CFASTNode(CFASTNodeType.EXEC_CICS.getValue(), convertLocation(node)));
+      node.getChildren().forEach(child -> traverse(parent, child));
+      addChild(parent, new CFASTNode(CFASTNodeType.END_EXEC.getValue(), convertLocation(node)));
+    } else if (node instanceof ExecCicsReturnNode) {
+      addChild(parent, new CFASTNode(CFASTNodeType.GOBACK.getValue(), convertLocation(node)));
+    } else if (node instanceof UseNode) {
+      addChild(parent, new CFASTNode(CFASTNodeType.USE.getValue(), convertLocation(node)));
+    } else if (node instanceof UseForDebuggingNode) {
+      addChild(parent, new CFASTNode(CFASTNodeType.USE_FOR_DEBUGGING.getValue(), convertLocation(node)));
+    } else if (node instanceof ExecCicsHandleNode) {
+      addChild(parent, new CFASTNode(CFASTNodeType.EXEC_CICS_HANDLE.getValue(), convertLocation(node)));
+      node.getChildren().forEach(child -> traverse(parent, child));
+      addChild(parent, new CFASTNode(CFASTNodeType.END_EXEC.getValue(), convertLocation(node)));
+    } else if (node instanceof ExecSqlNode) {
+      addChild(parent, new CFASTNode(CFASTNodeType.EXEC_SQL.getValue(), convertLocation(node)));
+      node.getChildren().forEach(child -> traverse(parent, child));
+      addChild(parent, new CFASTNode(CFASTNodeType.END_EXEC.getValue(), convertLocation(node)));
+    } else if (node instanceof ExecSqlWheneverNode) {
+      addChild(parent, new CFASTNode(CFASTNodeType.EXEC_SQL_WHENEVER.getValue(), convertLocation(node)));
+      node.getChildren().forEach(child -> traverse(parent, child));
+      addChild(parent, new CFASTNode(CFASTNodeType.END_EXEC.getValue(), convertLocation(node)));
     } else if (node instanceof StopNode) {
       addChild(parent, new CFASTNode(CFASTNodeType.STOP.getValue(), convertLocation(node)));
     } else if (node instanceof ParagraphsNode || node instanceof ProcedureDivisionBodyNode) {
@@ -149,6 +171,8 @@ public class CFASTBuilderImpl implements CFASTBuilder {
       addChild(parent, new CFASTNode(CFASTNodeType.ON_NOT_EXCEPTION.getValue(), convertLocation(node)));
       node.getChildren().forEach(child -> traverse(parent, child));
       addChild(parent, new CFASTNode(CFASTNodeType.END_ON.getValue(), convertLocation(node)));
+    } else if (node instanceof StatementNode) {
+      node.getChildren().forEach(child -> traverse(parent, child));
     }
   }
 

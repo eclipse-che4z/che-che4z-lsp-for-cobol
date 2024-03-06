@@ -18,7 +18,6 @@ package org.eclipse.lsp.cobol.implicitDialects.cics;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static org.antlr.v4.runtime.Lexer.HIDDEN;
-import static org.eclipse.lsp.cobol.common.model.NodeType.STATEMENT;
 
 import com.google.common.collect.ImmutableList;
 import java.util.*;
@@ -49,11 +48,18 @@ import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.model.tree.StopNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.QualifiedReferenceNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableUsageNode;
+import org.eclipse.lsp.cobol.implicitDialects.cics.nodes.ExecCicsHandleNode;
 import org.eclipse.lsp.cobol.implicitDialects.cics.nodes.ExecCicsNode;
+import org.eclipse.lsp.cobol.implicitDialects.cics.nodes.ExecCicsReturnNode;
 import org.eclipse.lsp.cobol.implicitDialects.cics.utility.VisitorUtility;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
+
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * This visitor analyzes the parser tree for CICS and returns its semantic context as a syntax tree
@@ -77,12 +83,15 @@ class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
     areaBWarning(ctx);
     addReplacementContext(ctx);
 
-    boolean stopRun =
-        (ctx.allCicsRule() != null
-            && ctx.allCicsRule().size() > 0
-            && ctx.allCicsRule().get(0).cics_return() != null);
-    return addTreeNode(
-        ctx, locality -> new ExecCicsNode(locality, STATEMENT, CICSDialect.DIALECT_NAME, stopRun));
+    boolean isReturn = (ctx.allCicsRule() != null && ctx.allCicsRule().size() > 0 && ctx.allCicsRule().get(0).cics_return() != null);
+    boolean isHandle = (ctx.allCicsRule() != null && ctx.allCicsRule().size() > 0 && ctx.allCicsRule().get(0).cics_handle() != null);
+
+    if (isReturn) {
+      return addTreeNode(ctx, ExecCicsReturnNode::new);
+    } else if (isHandle) {
+      return addTreeNode(ctx, ExecCicsHandleNode::new);
+    }
+    return addTreeNode(ctx, ExecCicsNode::new);
   }
 
   @Override

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Broadcom.
+ * Copyright (c) 2024 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -13,7 +13,7 @@
  *
  */
 
-package org.eclipse.lsp.cobol.implicitDialects.cics.nodes;
+package org.eclipse.lsp.cobol.implicitDialects.sql.node;
 
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -25,9 +25,9 @@ import org.eclipse.lsp.cobol.implicitDialects.sql.Db2SqlDialect;
 /** EXEC CICS block node */
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-public class ExecCicsNode extends Node {
+public class ExecSqlNode extends Node {
 
-  public ExecCicsNode(Locality location) {
+  public ExecSqlNode(Locality location) {
     super(location, NodeType.STATEMENT, Db2SqlDialect.DIALECT_NAME);
   }
 }

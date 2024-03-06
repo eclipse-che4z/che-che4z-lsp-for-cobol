@@ -36,6 +36,11 @@ public enum CFASTNodeType {
   MERGE("merge"),
   END_MERGE("endmerge"),
   STOP("stop"),
+  EXEC_CICS("execcics"),
+  EXEC_CICS_HANDLE("execcicshandle"),
+  EXEC_SQL("execsql"),
+  EXEC_SQL_WHENEVER("execwhenever"),
+  END_EXEC("endexec"),
   EXIT("exit"),
   EXIT_SECTION("exitsection"),
   EXIT_PARAGRAPH("exitparagraph"),
@@ -52,7 +57,9 @@ public enum CFASTNodeType {
   AT_END("atEnd"),
   AT_END_EXIT("atEndExit"),
   XML_PARSE("xmlparse"),
-  END_XML("endxml");
+  END_XML("endxml"),
+  USE("use"),
+  USE_FOR_DEBUGGING("usefordebugging");
 
   @Getter final String value;
 }

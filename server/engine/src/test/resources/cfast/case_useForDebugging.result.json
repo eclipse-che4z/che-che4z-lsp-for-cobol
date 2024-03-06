@@ -1,0 +1,67 @@
+[
+  {
+    "name": "CBACT01C",
+    "type": "program",
+    "location": {
+      "uri": "fake/path",
+      "start": {
+        "line": 15,
+        "character": 9
+      },
+      "end": {
+        "line": 24,
+        "character": 36
+      }
+    },
+    "children": [
+      {
+        "name": "INPUT-PROBLEM",
+        "snippet": "INPUT-PROBLEM SECTION.\r\n            Use For Debugging On Some-Routine.\r\n            DISPLAY \"EXCEPTION\".",
+        "type": "section",
+        "location": {
+          "uri": "fake/path",
+          "start": {
+            "line": 18,
+            "character": 9
+          },
+          "end": {
+            "line": 20,
+            "character": 33
+          }
+        },
+        "children": [
+          {
+            "type": "usefordebugging",
+            "location": {
+              "uri": "fake/path",
+              "start": {
+                "line": 19,
+                "character": 13
+              },
+              "end": {
+                "line": 19,
+                "character": 46
+              }
+            }
+          }
+        ]
+      },
+      {
+        "snippet": "Some-Routine.\r\n            DISPLAY \"SOME-ROUTINE\".",
+        "name": "SOME-ROUTINE",
+        "type": "paragraph",
+        "location": {
+          "uri": "fake/path",
+          "start": {
+            "line": 23,
+            "character": 9
+          },
+          "end": {
+            "line": 24,
+            "character": 36
+          }
+        }
+      }
+    ]
+  }
+]

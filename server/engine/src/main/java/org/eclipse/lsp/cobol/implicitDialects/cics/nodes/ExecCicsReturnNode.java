@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Broadcom.
+ * Copyright (c) 2024 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -22,12 +22,12 @@ import org.eclipse.lsp.cobol.common.model.NodeType;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.implicitDialects.sql.Db2SqlDialect;
 
-/** EXEC CICS block node */
+/** EXEC CICS RETURN node */
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-public class ExecCicsNode extends Node {
+public class ExecCicsReturnNode extends Node {
 
-  public ExecCicsNode(Locality location) {
+  public ExecCicsReturnNode(Locality location) {
     super(location, NodeType.STATEMENT, Db2SqlDialect.DIALECT_NAME);
   }
 }

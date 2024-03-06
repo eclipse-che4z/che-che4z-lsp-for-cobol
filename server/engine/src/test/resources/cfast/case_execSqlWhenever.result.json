@@ -1,0 +1,63 @@
+[
+  {
+    "name": "CBACT01C",
+    "type": "program",
+    "location": {
+      "uri": "fake/path",
+      "start": {
+        "line": 15,
+        "character": 9
+      },
+      "end": {
+        "line": 19,
+        "character": 31
+      }
+    },
+    "children": [
+      {
+        "type": "execwhenever",
+        "location": {
+          "uri": "fake/path",
+          "start": {
+            "line": 16,
+            "character": 22
+          },
+          "end": {
+            "line": 16,
+            "character": 49
+          }
+        }
+      },
+      {
+        "type": "endexec",
+        "location": {
+          "uri": "fake/path",
+          "start": {
+            "line": 16,
+            "character": 22
+          },
+          "end": {
+            "line": 16,
+            "character": 49
+          }
+        }
+      },
+      {
+        "snippet": "HANDLER.\r\n            DISPLAY \"HANDLER\".",
+        "name": "HANDLER",
+        "type": "paragraph",
+        "location": {
+          "uri": "fake/path",
+          "start": {
+            "line": 18,
+            "character": 9
+          },
+          "end": {
+            "line": 19,
+            "character": 31
+          }
+        }
+      }
+    ]
+  }
+]
