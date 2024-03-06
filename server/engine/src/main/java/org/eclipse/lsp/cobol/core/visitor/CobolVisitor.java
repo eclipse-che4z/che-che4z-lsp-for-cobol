@@ -322,6 +322,15 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
     return addTreeNode(ctx, OnNotExceptionNode::new);
   }
 
+  @Override
+  public List<Node> visitUseStatement(CobolParser.UseStatementContext ctx) {
+    return ctx.useDebugClause() != null
+        ?
+        addTreeNode(ctx, l -> new UseForDebuggingNode(l, null))
+        :
+        addTreeNode(ctx, UseNode::new);
+  }
+
   /**
    * In this method, first condition is checking if there is any other element present on the same
    * line as DECLARATIVES token and throws an error if the condition is true; In the PROCEDURE

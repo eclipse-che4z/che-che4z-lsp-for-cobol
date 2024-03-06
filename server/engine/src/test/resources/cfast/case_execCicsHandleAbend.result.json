@@ -12,6 +12,36 @@
         "line": 17,
         "character": 21
       }
-    }
+    },
+    "children": [
+      {
+        "type": "execcicshandle",
+        "location": {
+          "uri": "fake/path",
+          "start": {
+            "line": 16,
+            "character": 12
+          },
+          "end": {
+            "line": 17,
+            "character": 21
+          }
+        }
+      },
+      {
+        "type": "endexec",
+        "location": {
+          "uri": "fake/path",
+          "start": {
+            "line": 16,
+            "character": 12
+          },
+          "end": {
+            "line": 17,
+            "character": 21
+          }
+        }
+      }
+    ]
   }
 ]

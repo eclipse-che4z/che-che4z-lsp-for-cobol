@@ -14,15 +14,13 @@
  */
 package org.eclipse.lsp.cobol.service;
 
-import static org.eclipse.lsp.cobol.common.model.NodeType.STATEMENT;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.Set;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.tree.*;
 import org.eclipse.lsp.cobol.common.model.tree.variable.QualifiedReferenceNode;
-import org.eclipse.lsp.cobol.implicitDialects.cics.CICSDialect;
-import org.eclipse.lsp.cobol.implicitDialects.cics.nodes.ExecCicsNode;
+import org.eclipse.lsp.cobol.implicitDialects.cics.nodes.ExecCicsReturnNode;
 import org.eclipse.lsp4j.FoldingRange;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
@@ -138,9 +136,9 @@ class DocumentServiceHelperTest {
     ifNode.addChild(new QualifiedReferenceNode(Locality.builder()
             .range(new Range(new Position(3, 0), new Position(4, 10)))
             .uri(DOCUMENT_URI).build()));
-    ExecCicsNode execCicsNode = new ExecCicsNode(Locality.builder()
+    ExecCicsReturnNode execCicsNode = new ExecCicsReturnNode(Locality.builder()
             .range(new Range(new Position(6, 0), new Position(6, 10)))
-            .uri(DOCUMENT_URI).build(), STATEMENT, CICSDialect.DIALECT_NAME, true);
+            .uri(DOCUMENT_URI).build());
     evaluateWhenNode.addChild(ifNode);
     evaluateNode.addChild(evaluateWhenNode);
     evaluateNode.addChild(evaluateWhenNode2);

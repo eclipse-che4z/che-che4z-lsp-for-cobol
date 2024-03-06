@@ -30,7 +30,7 @@ import org.eclipse.lsp.cobol.common.model.ProcedureName;
 public class UseForDebuggingNode extends Node {
 
   private final ProcedureName target;
-  protected UseForDebuggingNode(Locality location, ProcedureName target) {
+  public UseForDebuggingNode(Locality location, ProcedureName target) {
     super(location, NodeType.STATEMENT);
     this.target = target;
   }

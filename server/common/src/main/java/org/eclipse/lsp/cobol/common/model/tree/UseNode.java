@@ -25,7 +25,7 @@ import org.eclipse.lsp.cobol.common.model.NodeType;
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 public class UseNode extends Node {
-  protected UseNode(Locality location) {
+  public UseNode(Locality location) {
     super(location, NodeType.STATEMENT);
   }
 }

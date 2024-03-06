@@ -42,10 +42,7 @@ import org.eclipse.lsp.cobol.common.model.tree.variable.QualifiedReferenceNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableUsageNode;
 import org.eclipse.lsp.cobol.common.utils.RangeUtils;
 import org.eclipse.lsp.cobol.core.visitor.VisitorHelper;
-import org.eclipse.lsp.cobol.implicitDialects.sql.node.Db2DataAndProcedureDivisionNode;
-import org.eclipse.lsp.cobol.implicitDialects.sql.node.Db2DeclareVariableNode;
-import org.eclipse.lsp.cobol.implicitDialects.sql.node.Db2ProcedureDivisionNode;
-import org.eclipse.lsp.cobol.implicitDialects.sql.node.Db2WorkingAndLinkageSectionNode;
+import org.eclipse.lsp.cobol.implicitDialects.sql.node.*;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
@@ -143,6 +140,11 @@ class Db2SqlVisitor extends Db2SqlParserBaseVisitor<List<Node>> {
   @Override
   public List<Node> visitProcedureDivisionRules(Db2SqlParser.ProcedureDivisionRulesContext ctx) {
     return addTreeNode(ctx, Db2ProcedureDivisionNode::new);
+  }
+
+  @Override
+  public List<Node> visitDbs_whenever(Db2SqlParser.Dbs_wheneverContext ctx) {
+    return addTreeNode(ctx, ExecSqlWheneverNode::new);
   }
 
   @Override
