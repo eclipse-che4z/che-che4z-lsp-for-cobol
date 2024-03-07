@@ -19,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
+import org.eclipse.lsp.cobol.common.benchmark.BenchmarkSession;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
@@ -31,11 +32,13 @@ import java.util.*;
  */
 @RequiredArgsConstructor
 @Slf4j
+@Getter
 public class AnalysisContext {
-  @Getter private final ExtendedDocument extendedDocument;
-  @Getter private final AnalysisConfig config;
-  @Getter private final List<SyntaxError> accumulatedErrors = new ArrayList<>();
+  private final ExtendedDocument extendedDocument;
+  private final AnalysisConfig config;
+  private final List<SyntaxError> accumulatedErrors = new ArrayList<>();
+  private final BenchmarkSession benchmarkSession;
 
-  private @Getter @Setter List<Node> dialectNodes;
-  private @Getter @Setter CopybooksRepository copybooksRepository;
+  private @Setter List<Node> dialectNodes;
+  private @Setter CopybooksRepository copybooksRepository;
 }

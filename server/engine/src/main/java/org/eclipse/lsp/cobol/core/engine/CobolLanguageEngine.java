@@ -28,6 +28,8 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.eclipse.lsp.cobol.common.*;
+import org.eclipse.lsp.cobol.common.benchmark.BenchmarkService;
+import org.eclipse.lsp.cobol.common.benchmark.BenchmarkSession;
 import org.eclipse.lsp.cobol.common.error.ErrorCodes;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
@@ -72,23 +74,26 @@ public class CobolLanguageEngine {
   private final TextPreprocessor preprocessor;
   private final MessageService messageService;
   private final ErrorFinalizerService errorFinalizerService;
+  private final BenchmarkService benchmarkService;
   private final Pipeline pipeline;
 
   @Inject
   public CobolLanguageEngine(
-          TextPreprocessor preprocessor,
-          GrammarPreprocessor grammarPreprocessor,
-          MessageService messageService,
-          ParseTreeListener treeListener,
-          SubroutineService subroutineService,
-          CachingConfigurationService cachingConfigurationService,
-          DialectService dialectService,
-          AstProcessor astProcessor,
-          SymbolsRepository symbolsRepository,
-          ErrorFinalizerService errorFinalizerService) {
+      TextPreprocessor preprocessor,
+      GrammarPreprocessor grammarPreprocessor,
+      MessageService messageService,
+      ParseTreeListener treeListener,
+      SubroutineService subroutineService,
+      CachingConfigurationService cachingConfigurationService,
+      DialectService dialectService,
+      AstProcessor astProcessor,
+      SymbolsRepository symbolsRepository,
+      ErrorFinalizerService errorFinalizerService,
+      BenchmarkService benchmarkService) {
     this.preprocessor = preprocessor;
     this.messageService = messageService;
     this.errorFinalizerService = errorFinalizerService;
+    this.benchmarkService = benchmarkService;
 
     this.pipeline = new Pipeline();
     this.pipeline.add(new DialectCompilerDirectiveStage(dialectService));
@@ -97,30 +102,37 @@ public class CobolLanguageEngine {
     this.pipeline.add(new PreprocessorStage(grammarPreprocessor));
     this.pipeline.add(new ImplicitDialectProcessingStage(dialectService));
     this.pipeline.add(new ParserStage(messageService, treeListener));
-    this.pipeline.add(new TransformTreeStage(symbolsRepository, messageService, subroutineService, cachingConfigurationService, dialectService, astProcessor));
+    this.pipeline.add(
+        new TransformTreeStage(
+            symbolsRepository,
+            messageService,
+            subroutineService,
+            cachingConfigurationService,
+            dialectService,
+            astProcessor));
   }
 
-  private static AnalysisResult toAnalysisResult(ResultWithErrors<AnalysisResult> result, String uri) {
+  private static AnalysisResult toAnalysisResult(
+      ResultWithErrors<AnalysisResult> result, String uri) {
     Node rootNode = result.getResult().getRootNode();
 
-    List<String> copyUriList = rootNode
-        .getDepthFirstStream()
-        .filter(hasType(COPY))
-        .map(CopyNode.class::cast)
-        .map(CopyNode::getDefinitions)
-        .flatMap(Collection::stream)
-        .map(Location::getUri)
-        .filter(it -> !ImplicitCodeUtils.isImplicit(it))
-        .distinct()
-        .collect(toList());
+    List<String> copyUriList =
+        rootNode
+            .getDepthFirstStream()
+            .filter(hasType(COPY))
+            .map(CopyNode.class::cast)
+            .map(CopyNode::getDefinitions)
+            .flatMap(Collection::stream)
+            .map(Location::getUri)
+            .filter(it -> !ImplicitCodeUtils.isImplicit(it))
+            .distinct()
+            .collect(toList());
 
     return AnalysisResult.builder()
         .symbolTableMap(result.getResult().getSymbolTableMap())
         .diagnostics(
             collectDiagnosticsForAffectedDocuments(
-                HandlerUtility.convertErrors(result.getErrors()),
-                copyUriList,
-                uri))
+                HandlerUtility.convertErrors(result.getErrors()), copyUriList, uri))
         .rootNode(rootNode)
         .build();
   }
@@ -136,7 +148,7 @@ public class CobolLanguageEngine {
    * @return map with file URI as a key, and lists of diagnostics as values
    */
   private static Map<String, List<Diagnostic>> collectDiagnosticsForAffectedDocuments(
-          Map<String, List<Diagnostic>> diagnostics, List<String> copybookUris, String uri) {
+      Map<String, List<Diagnostic>> diagnostics, List<String> copybookUris, String uri) {
     Map<String, List<Diagnostic>> result = new HashMap<>(diagnostics);
     copybookUris.forEach(it -> result.putIfAbsent(it, emptyList()));
     result.putIfAbsent(uri, emptyList());
@@ -163,37 +175,50 @@ public class CobolLanguageEngine {
     }
 
     if (ServerTypeUtil.isInCompatibleServerTypeRegistered(analysisConfig)) {
-      return toAnalysisResult(getErrorForIncompatibleServerTypeAndDialects(documentUri), documentUri);
+      return toAnalysisResult(
+          getErrorForIncompatibleServerTypeAndDialects(documentUri), documentUri);
     }
 
     // Cleaning up
     ResultWithErrors<ExtendedText> resultWithErrors = preprocessor.cleanUpCode(documentUri, text);
-    AnalysisContext ctx = new AnalysisContext(new ExtendedDocument(resultWithErrors.getResult(), text), analysisConfig);
+    BenchmarkSession session = benchmarkService.startSession();
+    AnalysisContext ctx =
+        new AnalysisContext(
+            new ExtendedDocument(resultWithErrors.getResult(), text), analysisConfig, session);
     ctx.getAccumulatedErrors().addAll(resultWithErrors.getErrors());
 
     PipelineResult pipelineResult = pipeline.run(ctx);
     StageResult<?> result = pipelineResult.getLastStageResult();
-    PerformanceMeasurementUtils.logTiming(pipelineResult.getTimings(), ctx);
 
+    session.attr("uri", ctx.getExtendedDocument().getUri());
+    session.attr("size", String.valueOf(ctx.getExtendedDocument().toString().length()));
+    session.attr("result", result.stopProcessing() ? "stopped" : "done");
+    benchmarkService.logTiming();
     if (result.stopProcessing() || !(result.getData() instanceof ProcessingResult)) {
-      return toAnalysisResult(new ResultWithErrors<>(
-          AnalysisResult.builder()
-              .rootNode(new RootNode())
-              .symbolTableMap(ImmutableMap.of())
-              .build(),
-          ctx.getAccumulatedErrors().stream().map(errorFinalizerService::localizeErrorMessage).collect(toList())),
-              documentUri);
+      return toAnalysisResult(
+          new ResultWithErrors<>(
+              AnalysisResult.builder()
+                  .rootNode(new RootNode())
+                  .symbolTableMap(ImmutableMap.of())
+                  .build(),
+              ctx.getAccumulatedErrors().stream()
+                  .map(errorFinalizerService::localizeErrorMessage)
+                  .collect(toList())),
+          documentUri);
     } else {
       ProcessingResult processingResult = (ProcessingResult) result.getData();
-       errorFinalizerService.processLateErrors(ctx, ctx.getCopybooksRepository());
+      errorFinalizerService.processLateErrors(ctx, ctx.getCopybooksRepository());
 
-      return toAnalysisResult(new ResultWithErrors<>(
-          AnalysisResult.builder()
-              .rootNode(processingResult.getRootNode())
-              .symbolTableMap(processingResult.getSymbolTableMap())
-              .build(),
-          ctx.getAccumulatedErrors().stream().map(errorFinalizerService::localizeErrorMessage).collect(toList())),
-              documentUri);
+      return toAnalysisResult(
+          new ResultWithErrors<>(
+              AnalysisResult.builder()
+                  .rootNode(processingResult.getRootNode())
+                  .symbolTableMap(processingResult.getSymbolTableMap())
+                  .build(),
+              ctx.getAccumulatedErrors().stream()
+                  .map(errorFinalizerService::localizeErrorMessage)
+                  .collect(toList())),
+          documentUri);
     }
   }
 
@@ -207,17 +232,21 @@ public class CobolLanguageEngine {
     return text.length() <= FIRST_LINE_SEQ_AND_EXTRA_OP;
   }
 
-  private ResultWithErrors<AnalysisResult> getErrorForIncompatibleServerTypeAndDialects(String documentUri) {
-    return new ResultWithErrors<>(AnalysisResult.builder().build(),
-            Collections.singletonList(SyntaxError.syntaxError()
-                    .severity(ErrorSeverity.ERROR)
-                    .suggestion(messageService.getMessage("workspaceError.ServerType"))
-                    .errorSource(WORKSPACE_SETTINGS)
-                    .errorCode(ErrorCodes.INCOMPATIBLE_SERVER_TYPE)
-                    .location(new OriginalLocation(
-                            new Location(documentUri,
-                                    new Range(new Position(0, 0), new Position(0, 6))),
-                            null)).build()
-            ));
+  private ResultWithErrors<AnalysisResult> getErrorForIncompatibleServerTypeAndDialects(
+      String documentUri) {
+    return new ResultWithErrors<>(
+        AnalysisResult.builder().build(),
+        Collections.singletonList(
+            SyntaxError.syntaxError()
+                .severity(ErrorSeverity.ERROR)
+                .suggestion(messageService.getMessage("workspaceError.ServerType"))
+                .errorSource(WORKSPACE_SETTINGS)
+                .errorCode(ErrorCodes.INCOMPATIBLE_SERVER_TYPE)
+                .location(
+                    new OriginalLocation(
+                        new Location(
+                            documentUri, new Range(new Position(0, 0), new Position(0, 6))),
+                        null))
+                .build()));
   }
 }
