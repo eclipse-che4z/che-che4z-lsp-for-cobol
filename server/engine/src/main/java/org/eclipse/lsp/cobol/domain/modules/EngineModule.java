@@ -19,6 +19,7 @@ import static com.google.inject.name.Names.named;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
+import com.google.inject.name.Names;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.eclipse.lsp.cobol.common.benchmark.BenchmarkService;
 import org.eclipse.lsp.cobol.common.benchmark.BenchmarkServiceImpl;
@@ -34,15 +35,19 @@ import org.eclipse.lsp.cobol.core.preprocessor.delegates.GrammarPreprocessorImpl
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.GrammarPreprocessorListenerFactory;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.reader.CobolLineReader;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.reader.CobolLineReaderImpl;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.reader.HPCobolLineReaderImpl;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.replacement.ReplacePreprocessorFactory;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.replacement.ReplacingService;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.replacement.ReplacingServiceImpl;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.rewriter.CobolLineIndicatorProcessorImpl;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.rewriter.CobolLineReWriter;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.rewriter.HpCobolLineIndicatorProcessorImpl;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.transformer.CobolContinuationLineTransformation;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.transformer.CobolLinesTransformation;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.transformer.ContinuationLineTransformation;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.transformer.HPContinuationLineTransformation;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.writer.CobolLineWriter;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.writer.CobolLineWriterImpl;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.writer.HPCobolLineWriterImpl;
 import org.eclipse.lsp.cobol.core.visitor.InterruptingTreeListener;
 import org.eclipse.lsp.cobol.lsp.CobolWorkspaceServiceImpl;
 import org.eclipse.lsp.cobol.lsp.LspEventConsumer;
@@ -64,10 +69,20 @@ public class EngineModule extends AbstractModule {
     install(new FactoryModuleBuilder().build(GrammarPreprocessorListenerFactory.class));
     install(new FactoryModuleBuilder().build(ReplacePreprocessorFactory.class));
     bind(ReplacingService.class).to(ReplacingServiceImpl.class);
-    bind(CobolLineReader.class).to(CobolLineReaderImpl.class);
-    bind(CobolLineWriter.class).to(CobolLineWriterImpl.class);
-    bind(CobolLinesTransformation.class).to(ContinuationLineTransformation.class);
-    bind(CobolLineReWriter.class).to(CobolLineIndicatorProcessorImpl.class);
+
+    bind(CobolLineReader.class).annotatedWith(Names.named("hpcobol")).to(HPCobolLineReaderImpl.class);
+    bind(CobolLineReader.class).annotatedWith(Names.named("cobol")).to(CobolLineReaderImpl.class);
+
+    bind(CobolLineWriter.class).annotatedWith(Names.named("cobol")).to(CobolLineWriterImpl.class);
+    bind(CobolLineWriter.class).annotatedWith(Names.named("hpcobol")).to(HPCobolLineWriterImpl.class);
+
+    bind(CobolLinesTransformation.class).annotatedWith(Names.named("hpcobol")).to(HPContinuationLineTransformation.class);
+    bind(CobolLinesTransformation.class).annotatedWith(Names.named("cobol")).to(CobolContinuationLineTransformation.class);
+
+    bind(CobolLineReWriter.class).annotatedWith(Names.named("cobol")).to(CobolLineIndicatorProcessorImpl.class);
+    bind(CobolLineReWriter.class).annotatedWith(Names.named("hpcobol")).to(HpCobolLineIndicatorProcessorImpl.class);
+
+
     bind(MessageService.class).to(PropertiesMessageService.class);
     bind(LocaleStore.class).to(LocaleStoreImpl.class);
     bind(Communications.class).to(ServerCommunications.class);

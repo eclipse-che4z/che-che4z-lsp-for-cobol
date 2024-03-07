@@ -218,6 +218,7 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
             .map(CobolDocumentModel::getUri)
             .collect(Collectors.toList());
     for (String uri : openedUris) {
+        String languageId = documentModelService.get(uri).getLanguageId();
       //TODO: update cache directly from workspace document graph
       if (copybookService instanceof CopybookServiceImpl) {
         CopybookServiceImpl copybookServiceImpl = (CopybookServiceImpl) copybookService;
@@ -229,14 +230,14 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
                   copybookServiceImpl.invalidateCache(copybookModel.getCopybookId());
                   if (copybookContent != null) {
                     copybookModel.setContent(copybookContent);
-                    copybookServiceImpl.store(copybookModel, true);
+                    copybookServiceImpl.store(copybookModel, languageId, true);
                   }
                 });
       }
       subroutineService.invalidateCache();
       LOG.info("Cache invalidated");
-      CobolDocumentModel model = documentModelService.get(uri);
-      scheduleAnalysis(uri, model.getText(), analysisResultsRevisions.get(model.getUri()), false, true, eventSource);
+      CobolDocumentModel document = documentModelService.get(uri);
+      scheduleAnalysis(uri, document.getText(), analysisResultsRevisions.get(document.getUri()), false, true, eventSource);
     }
   }
 
@@ -296,11 +297,12 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
   /**
    * Mark document as opened
    *
-   * @param uri  of document
-   * @param text content od document.
+   * @param uri        of document
+   * @param text       content od document.
+   * @param languageId
    */
-  public void openDocument(String uri, String text) {
-    documentModelService.openDocument(uri, text);
+  public void openDocument(String uri, String text, String languageId) {
+    documentModelService.openDocument(uri, text, languageId);
   }
 
   @Override

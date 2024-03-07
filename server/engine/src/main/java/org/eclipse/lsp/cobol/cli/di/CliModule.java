@@ -15,6 +15,9 @@
 
 package org.eclipse.lsp.cobol.cli.di;
 
+import static com.google.inject.multibindings.Multibinder.newSetBinder;
+import static com.google.inject.name.Names.named;
+
 import com.google.inject.AbstractModule;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.Multibinder;
@@ -47,8 +50,8 @@ import org.eclipse.lsp.cobol.core.preprocessor.delegates.reader.CobolLineReaderI
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.replacement.ReplacePreprocessorFactory;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.replacement.ReplacingService;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.replacement.ReplacingServiceImpl;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.rewriter.CobolLineIndicatorProcessorImpl;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.rewriter.CobolLineReWriter;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.rewriter.LineIndicatorProcessor;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.transformer.CobolLinesTransformation;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.transformer.ContinuationLineTransformation;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.writer.CobolLineWriter;
@@ -79,9 +82,6 @@ import org.eclipse.lsp.cobol.service.settings.ConfigurationService;
 import org.eclipse.lsp.cobol.service.settings.SettingsService;
 import org.eclipse.lsp.cobol.service.settings.SettingsServiceImpl;
 
-import static com.google.inject.multibindings.Multibinder.newSetBinder;
-import static com.google.inject.name.Names.named;
-
 /** This module provides DI bindings for COBOL language engine part. */
 public class CliModule extends AbstractModule {
   @Override
@@ -94,7 +94,7 @@ public class CliModule extends AbstractModule {
     bind(CobolLineReader.class).to(CobolLineReaderImpl.class);
     bind(CobolLineWriter.class).to(CobolLineWriterImpl.class);
     bind(CobolLinesTransformation.class).to(ContinuationLineTransformation.class);
-    bind(CobolLineReWriter.class).to(CobolLineIndicatorProcessorImpl.class);
+    bind(CobolLineReWriter.class).to(LineIndicatorProcessor.class);
     bind(MessageService.class).to(PropertiesMessageService.class);
     bind(LocaleStore.class).to(LocaleStoreImpl.class);
     bind(ConfigurationService.class).to(CachingConfigurationService.class);

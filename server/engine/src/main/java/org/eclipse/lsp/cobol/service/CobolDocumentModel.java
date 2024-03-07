@@ -38,6 +38,7 @@ public class CobolDocumentModel {
   private String text;
   private final String uri;
   @Setter private volatile boolean opened = true;
+  @Setter private String languageId;
   private volatile AnalysisResult analysisResult;
   private volatile AnalysisResult lastAnalysisResult;
   @Setter private volatile List<DocumentSymbol> outlineResult;

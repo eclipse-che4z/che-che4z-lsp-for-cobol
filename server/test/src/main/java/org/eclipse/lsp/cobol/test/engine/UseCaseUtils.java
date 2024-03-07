@@ -104,6 +104,17 @@ public class UseCaseUtils {
    * @return the entire analysis result
    */
   public static AnalysisResult analyze(UseCase useCase) {
+    return analyze(useCase, "cobol");
+  }
+  /**
+   * Analyze the given text using a real language engine providing copybooks required for the
+   * analysis with the required sync type
+   *
+   * @param useCase       use case instance to analyze
+   * @param languageId language Id
+   * @return the entire analysis result
+   */
+  public static AnalysisResult analyze(UseCase useCase, String languageId) {
 
     ServiceLoader<UseCaseInitializer> loader = ServiceLoader.load(UseCaseInitializer.class);
     Injector injector = StreamSupport.stream(loader.spliterator(), false).findFirst()
@@ -114,7 +125,7 @@ public class UseCaseUtils {
 
     CopybookService copybookService = injector.getInstance(CopybookService.class);
     PredefinedCopybookUtils.loadPredefinedCopybooks(useCase.getSqlBackend(), useCase.getCopybooks(), useCase.documentUri)
-        .forEach(pc -> copybookService.store(pc, true));
+        .forEach(pc -> copybookService.store(pc, languageId, true));
 
     useCase.getCopybooks()
         .forEach(cobolText -> {
@@ -126,7 +137,7 @@ public class UseCaseUtils {
           }
 
           cobolText = new CobolText(cobolText.getFileName().toUpperCase(), cobolText.getDialectType(), copybookText);
-          copybookService.store(UseCaseUtils.toCopybookModel(cobolText, useCase.documentUri), true);
+          copybookService.store(UseCaseUtils.toCopybookModel(cobolText, useCase.documentUri), languageId, true);
         });
 
     SubroutineService subroutines = injector.getInstance(SubroutineService.class);

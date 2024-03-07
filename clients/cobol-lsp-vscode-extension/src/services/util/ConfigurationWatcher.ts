@@ -13,10 +13,9 @@
  */
 
 import * as vscode from "vscode";
-import { COBOL_PRGM_LAYOUT, SERVER_RUNTIME } from "../../constants";
+import { SERVER_RUNTIME } from "../../constants";
 import { TelemetryService } from "../reporter/TelemetryService";
 import { SettingsService } from "../Settings";
-import { updateCobolEditorRuler } from "../../commands/UpdateCobolProgramRuler";
 
 export class ConfigurationWatcher {
   private static async restartVsCode() {
@@ -51,10 +50,6 @@ export class ConfigurationWatcher {
     vscode.workspace.onDidChangeConfiguration(async (event) => {
       if (event.affectsConfiguration(SERVER_RUNTIME)) {
         await this.handleServerRuntimeConfigurationChange();
-      }
-      if (event.affectsConfiguration(COBOL_PRGM_LAYOUT)) {
-        updateCobolEditorRuler();
-        //TODO: call method to update coloring
       }
     });
   }
