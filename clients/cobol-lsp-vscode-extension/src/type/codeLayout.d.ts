@@ -16,9 +16,9 @@
  * Type for a cobol code layout
  */
 interface LayoutStructure {
-    sequence_length?: integer;
-    indicator_length?: integer;
-    area_a_length?: integer;
-    area_b_length?: integer;
-    comment_area?: integer;
+  sequence_length?: integer;
+  indicator_length?: integer;
+  area_a_length?: integer;
+  area_b_length?: integer;
+  comment_area?: integer;
 }
