@@ -14,10 +14,10 @@
  */
 package org.eclipse.lsp.cobol.core.preprocessor.delegates.transformer;
 
+import java.util.List;
 import org.eclipse.lsp.cobol.common.ResultWithErrors;
 import org.eclipse.lsp.cobol.core.preprocessor.CobolLine;
-
-import java.util.List;
+import org.eclipse.lsp.cobol.service.settings.layout.CobolProgramLayout;
 
 /**
  * Performs transformation operations on the given CobolLines. Requires FormatListener to raise or
@@ -33,4 +33,11 @@ public interface CobolLinesTransformation {
    * @return the transformation result
    */
   ResultWithErrors<List<CobolLine>> transformLines(String documentURI, List<CobolLine> lines);
+
+  /**
+   * gives layout of the program which would get transformed.
+   *
+   * @return {@link CobolProgramLayout}
+   */
+  CobolProgramLayout getCodeLayout();
 }

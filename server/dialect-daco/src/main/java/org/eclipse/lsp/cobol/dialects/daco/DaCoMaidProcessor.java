@@ -14,7 +14,12 @@
  */
 package org.eclipse.lsp.cobol.dialects.daco;
 
+import static org.eclipse.lsp.cobol.common.error.ErrorSeverity.ERROR;
+
 import com.google.common.collect.ImmutableList;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.CharStreams;
@@ -29,10 +34,10 @@ import org.eclipse.lsp.cobol.common.copybook.CopybookService;
 import org.eclipse.lsp.cobol.common.dialects.CobolDialect;
 import org.eclipse.lsp.cobol.common.dialects.DialectOutcome;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
+import org.eclipse.lsp.cobol.common.error.ErrorCodes;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
-import org.eclipse.lsp.cobol.common.error.ErrorCodes;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
@@ -42,12 +47,6 @@ import org.eclipse.lsp.cobol.dialects.daco.nodes.DaCoCopyNode;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
-
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import static org.eclipse.lsp.cobol.common.error.ErrorSeverity.ERROR;
 
 /** Handles copy maid logic */
 @Slf4j
@@ -212,7 +211,7 @@ public class DaCoMaidProcessor {
             copybookName,
             context.getExtendedDocument().getUri(),
             context.getExtendedDocument().getUri(),
-            true);
+            true, context.getLanguageId());
     CopybookModel copybookModel = resolvedCopybook.getResult();
 
     DaCoCopyNode cbNode =

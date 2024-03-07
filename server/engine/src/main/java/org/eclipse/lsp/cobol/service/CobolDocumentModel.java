@@ -14,17 +14,16 @@
  */
 package org.eclipse.lsp.cobol.service;
 
-import lombok.*;
-import org.eclipse.lsp.cobol.common.AnalysisResult;
-import lombok.extern.slf4j.Slf4j;
-import org.eclipse.lsp4j.DocumentSymbol;
-import org.eclipse.lsp4j.Position;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import lombok.*;
+import lombok.extern.slf4j.Slf4j;
+import org.eclipse.lsp.cobol.common.AnalysisResult;
+import org.eclipse.lsp4j.DocumentSymbol;
+import org.eclipse.lsp4j.Position;
 
 /**
  * This class stores a COBOL program text to be processed. Provides a list of lines and text tokens
@@ -38,6 +37,8 @@ public class CobolDocumentModel {
   @Getter private String text;
   @Getter private final String uri;
   @Getter @Setter private boolean opened = true;
+  @Getter @Setter private String languageId;
+
   @Getter private AnalysisResult analysisResult;
   @Getter private AnalysisResult lastAnalysisResult;
   @Getter @Setter private List<DocumentSymbol> outlineResult;

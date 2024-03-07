@@ -90,7 +90,7 @@ class IdmsCopybookVisitor extends IdmsCopyParserBaseVisitor<List<Node>> {
             copybookName,
             programDocumentUri,
             documentUri,
-            true);
+            true, "cobol");
     CopybookModel copybookModel = resolvedCopybook.getResult();
     Locality locality = IdmsParserHelper.buildNameRangeLocality(optionsContext, copybookName.getDisplayName(), documentUri);
     errors.addAll(resolvedCopybook.getErrors());

@@ -22,8 +22,8 @@ import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.core.engine.analysis.AnalysisContext;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectService;
-import org.eclipse.lsp.cobol.core.engine.pipeline.StageResult;
 import org.eclipse.lsp.cobol.core.engine.pipeline.Stage;
+import org.eclipse.lsp.cobol.core.engine.pipeline.StageResult;
 
 /**
  * Dialect Processing Stage
@@ -47,7 +47,7 @@ public class DialectProcessingStage implements Stage<DialectOutcome, Void> {
   }
 
   private DialectOutcome processDialects(AnalysisContext ctx) {
-    dialectService.addDialectPredefinedCopybooks(ctx.getConfig());
+    dialectService.addDialectPredefinedCopybooks(ctx.getConfig(), ctx.getLanguageId());
     DialectProcessingContext dialectProcessingContext =
         DialectProcessingContext.builder()
             .config(ctx.getConfig())

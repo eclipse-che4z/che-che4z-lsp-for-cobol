@@ -113,7 +113,7 @@ public class AnalysisService {
     try {
       CopybookProcessingMode copybookProcessingMode = CopybookProcessingMode.getCopybookProcessingMode(uri, CopybookProcessingMode.ENABLED);
       AnalysisConfig config = configurationService.getConfig(uri, copybookProcessingMode);
-      AnalysisResult result = engine.analyze(uri, text, config);
+      AnalysisResult result = engine.analyze(uri, text, config, documentService.get(uri).getLanguageId());
       documentService.processAnalysisResult(uri, result, text);
       ThreadInterruptionUtil.checkThreadInterrupted();
       copybookService.sendCopybookDownloadRequest(

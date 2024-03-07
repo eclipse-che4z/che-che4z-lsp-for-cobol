@@ -102,11 +102,13 @@ class AnalysisServiceTest {
     String uri = UUID.randomUUID().toString();
     String text = UUID.randomUUID().toString();
     when(copybookIdentificationService.isCopybook(any(), any(), any())).thenReturn(false);
-    when(engine.analyze(any(), any(), any())).thenReturn(result);
-
+    when(engine.analyze(any(), any(), any(), anyString())).thenReturn(result);
+    CobolDocumentModel mockDocModel = mock(CobolDocumentModel.class);
+    when(mockDocModel.getLanguageId()).thenReturn("cobol");
+    when(documentService.get(uri)).thenReturn(mockDocModel);
     service.analyzeDocument(uri, text, true);
     verify(documentService, times(1)).processAnalysisResult(eq(uri), any(), anyString());
-    verify(engine, times(1)).analyze(any(), any(), any());
+    verify(engine, times(1)).analyze(any(), any(), any(), anyString());
   }
 
   @Test
@@ -124,10 +126,13 @@ class AnalysisServiceTest {
     String uri = UUID.randomUUID().toString();
     String text = UUID.randomUUID().toString();
     when(copybookIdentificationService.isCopybook(any(), any(), any())).thenReturn(false);
-    when(engine.analyze(any(), any(), any())).thenReturn(prepareAnalysisResult());
+    when(engine.analyze(any(), any(), any(), anyString())).thenReturn(prepareAnalysisResult());
+    CobolDocumentModel mockDocModel = mock(CobolDocumentModel.class);
+    when(mockDocModel.getLanguageId()).thenReturn("cobol");
+    when(documentService.get(uri)).thenReturn(mockDocModel);
 
     service.analyzeDocument(uri, text, false);
-    verify(engine, times(1)).analyze(any(), any(), any());
+    verify(engine, times(1)).analyze(any(), any(), any(), anyString());
   }
 
   private AnalysisResult prepareAnalysisResult() {

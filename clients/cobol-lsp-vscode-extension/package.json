@@ -92,6 +92,20 @@
         ],
         "configuration": "./syntaxes/lang-config.json",
         "firstLine": "^[0-9 ]{6}([*].*|[ Dd] *([Ii][Dd]([Ee][Nn][Tt][Ii][Ff][Ii][Cc][Aa][Tt][Ii][Oo][Nn])? +[Dd][Ii][Vv][Ii][Ss][Ii][Oo][Nn][. ]|[0-9][0-9] +[@#$A-Z][-A-Z0-9]*[. ]|[*](CBL|PROCESS) ).*)$|^([0-9].{5})?[ ]*(CBL|PROCESS) "
+      },
+      {
+        "id": "hpcobol",
+        "extensions": [
+          ".hpcbl",
+          ".hpcobol",
+          ".hp",
+          "ecobol"
+        ],
+        "aliases": [
+          "HP-COBOL"
+        ],
+        "configuration": "./syntaxes/lang-config-hp.json",
+        "firstLine": "^[ ]( *([Ii][Dd]([Ee][Nn][Tt][Ii][Ff][Ii][Cc][Aa][Tt][Ii][Oo][Nn])? +[Dd][Ii][Vv][Ii][Ss][Ii][Oo][Nn][.].*?)$|^\\?.*"
       }
     ],
     "grammars": [
@@ -119,6 +133,14 @@
         "injectTo": [
           "source.cobol"
         ]
+      },
+      {
+        "language": "hpcobol",
+        "scopeName": "source.hpcobol",
+        "path": "./syntaxes/HP.COBOL.tmLanguage.json",
+        "embeddedLanguages": {
+          "meta.embedded.block.html": "html"
+        }
       }
     ],
     "configuration": {
@@ -414,32 +436,6 @@
             "NATIVE - Use platform binary"
           ],
           "description": "COBOL LS server runtime."
-        },
-        "cobol-lsp.cobol.program.layout": {
-          "type": "object",
-          "additionalProperties": false,
-          "properties": {
-            "sequence_length": {
-              "type": "integer",
-              "default": 6
-            },
-            "indicator_length": {
-              "type": "integer",
-              "default": 1
-            },
-            "area_a_length": {
-              "type": "integer",
-              "default": 4
-            },
-            "area_b_length": {
-              "type": "integer",
-              "default": 61
-            },
-            "comment_area": {
-              "type": "integer",
-              "default": 8
-            }
-          }
         }
       }
     },
@@ -451,6 +447,15 @@
           11,
           72,
           80
+        ],
+        "editor.wordSeparators": "!\"#$%&'()*+,./:;<=>?@[\\]^`{|}~"
+      },
+      "[hpcobol]": {
+        "editor.guides.indentation": false,
+        "editor.rulers": [
+          1,
+          5,
+          132
         ],
         "editor.wordSeparators": "!\"#$%&'()*+,./:;<=>?@[\\]^`{|}~"
       }

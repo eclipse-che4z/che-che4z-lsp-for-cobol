@@ -19,6 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.eclipse.lsp.cobol.core.model.CobolLineTypeEnum;
 import org.eclipse.lsp.cobol.core.preprocessor.CobolLine;
+import org.eclipse.lsp.cobol.lsp.CobolLanguageId;
 import org.eclipse.lsp.cobol.service.settings.layout.CobolProgramLayout;
 import org.junit.jupiter.api.Test;
 
@@ -50,7 +51,7 @@ class CobolLineUtilsTest {
     expected.setType(CobolLineTypeEnum.COMMENT);
 
     CobolLine actual =
-        CobolLineUtils.copyCobolLineWithContentArea("", line, new CobolProgramLayout());
+        CobolLineUtils.copyCobolLineWithContentArea("", line, CobolLanguageId.COBOL.getLayout());
 
     assertEquals(expected, actual);
   }
@@ -99,7 +100,8 @@ class CobolLineUtilsTest {
     expected.setContentAreaB("56");
 
     CobolLine actual =
-        CobolLineUtils.copyCobolLineWithContentArea("123456", line, new CobolProgramLayout());
+        CobolLineUtils.copyCobolLineWithContentArea(
+            "123456", line, CobolLanguageId.COBOL.getLayout());
 
     assertEquals(expected, actual);
   }
@@ -120,7 +122,7 @@ class CobolLineUtilsTest {
 
     CobolLine actual =
         CobolLineUtils.copyCobolLineWithIndicatorAndContentArea(
-            "-", "123456", line, new CobolProgramLayout());
+            "-", "123456", line, CobolLanguageId.COBOL.getLayout());
 
     assertEquals(expected, actual);
   }
