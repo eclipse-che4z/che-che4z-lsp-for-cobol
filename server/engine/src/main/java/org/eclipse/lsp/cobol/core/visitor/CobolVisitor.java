@@ -50,9 +50,6 @@ import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.model.*;
 import org.eclipse.lsp.cobol.common.model.SectionType;
 import org.eclipse.lsp.cobol.common.model.tree.*;
-import org.eclipse.lsp.cobol.common.model.tree.variable.*;
-import org.eclipse.lsp.cobol.common.utils.StringUtils;
-import org.eclipse.lsp.cobol.core.*;
 import org.eclipse.lsp.cobol.common.model.tree.statements.SetToBooleanStatement;
 import org.eclipse.lsp.cobol.common.model.tree.statements.SetToOnOffStatement;
 import org.eclipse.lsp.cobol.common.model.tree.statements.SetUpDownByStatement;
@@ -61,6 +58,7 @@ import org.eclipse.lsp.cobol.common.model.tree.variable.VariableDefinitionNode.B
 import org.eclipse.lsp.cobol.common.model.variables.DivisionType;
 import org.eclipse.lsp.cobol.common.utils.ImplicitCodeUtils;
 import org.eclipse.lsp.cobol.common.utils.StringUtils;
+import org.eclipse.lsp.cobol.core.*;
 import org.eclipse.lsp.cobol.core.CobolDataDivisionParser;
 import org.eclipse.lsp.cobol.core.CobolIdentificationDivisionParser;
 import org.eclipse.lsp.cobol.core.CobolParser;
