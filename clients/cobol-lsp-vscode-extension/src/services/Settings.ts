@@ -95,11 +95,11 @@ export class TabRule {
     public stops: number[],
     public maxPosition: number,
     public regex: string | undefined = undefined,
-  ) { }
+  ) {}
 }
 
 export class TabSettings {
-  public constructor(public rules: TabRule[], public defaultRule: TabRule) { }
+  public constructor(public rules: TabRule[], public defaultRule: TabRule) {}
 }
 
 export function configHandler(request: any): Array<any> {
@@ -154,7 +154,7 @@ export function configHandler(request: any): Array<any> {
           result.push(cfg);
         }
       } else if (item.section === COBOL_PRGM_LAYOUT) {
-        result.push(SettingsService.getCobolProgramLayout())
+        result.push(SettingsService.getCobolProgramLayout());
       } else {
         result.push(vscode.workspace.getConfiguration().get(item.section));
       }
@@ -215,9 +215,9 @@ export class SettingsService {
     return documentUri === undefined
       ? global
       : loadProcessorGroupCopybookExtensionsConfig(
-        { scopeUri: documentUri },
-        global!,
-      );
+          { scopeUri: documentUri },
+          global!,
+        );
   }
 
   /**
@@ -388,4 +388,3 @@ export class SettingsService {
     );
   }
 }
-

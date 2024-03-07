@@ -141,7 +141,7 @@ class CobolLanguageEngineTest {
     Range divisionRange = ParserUtils.isHwParserEnabled()
             ? new Range(new Position(0, 7), new Position(0, 31))
             : new Range(new Position(0, 7), new Position(0, 31));
-    AnalysisResult actual = engine.run(URI, TEXT, AnalysisConfig.defaultConfig(ENABLED));
+    AnalysisResult actual = engine.run(URI, TEXT, AnalysisConfig.defaultConfig(ENABLED), CobolLanguageId.COBOL);
     Node root = actual.getRootNode();
     Node program = root.getChildren().get(0);
     Node division = program.getChildren().get(0);
