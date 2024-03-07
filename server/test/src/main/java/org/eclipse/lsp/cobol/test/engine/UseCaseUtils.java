@@ -14,28 +14,27 @@
  */
 package org.eclipse.lsp.cobol.test.engine;
 
+import static java.util.Collections.emptyList;
+import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.toList;
+
 import com.google.inject.Injector;
+import java.util.List;
+import java.util.ServiceLoader;
+import java.util.stream.StreamSupport;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.common.AnalysisResult;
 import org.eclipse.lsp.cobol.common.CleanerPreprocessor;
+import org.eclipse.lsp.cobol.common.LanguageEngineFacade;
+import org.eclipse.lsp.cobol.common.SubroutineService;
 import org.eclipse.lsp.cobol.common.copybook.CopybookModel;
 import org.eclipse.lsp.cobol.common.copybook.CopybookName;
 import org.eclipse.lsp.cobol.common.copybook.CopybookService;
-import org.eclipse.lsp.cobol.common.SubroutineService;
-import org.eclipse.lsp.cobol.common.LanguageEngineFacade;
 import org.eclipse.lsp.cobol.test.CobolText;
 import org.eclipse.lsp.cobol.test.UseCaseInitializer;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
-
-import java.util.List;
-import java.util.ServiceLoader;
-import java.util.stream.StreamSupport;
-
-import static java.util.Collections.emptyList;
-import static java.util.Optional.ofNullable;
-import static java.util.stream.Collectors.toList;
 
 /**
  * This utility class provides methods to run use cases with COBOL code examples.
@@ -103,6 +102,17 @@ public class UseCaseUtils {
    * @return the entire analysis result
    */
   public static AnalysisResult analyze(UseCase useCase) {
+    return analyze(useCase, "cobol");
+  }
+  /**
+   * Analyze the given text using a real language engine providing copybooks required for the
+   * analysis with the required sync type
+   *
+   * @param useCase       use case instance to analyze
+   * @param languageId language Id
+   * @return the entire analysis result
+   */
+  public static AnalysisResult analyze(UseCase useCase, String languageId) {
 
     ServiceLoader<UseCaseInitializer> loader = ServiceLoader.load(UseCaseInitializer.class);
     Injector injector = StreamSupport.stream(loader.spliterator(), false).findFirst()
@@ -113,7 +123,7 @@ public class UseCaseUtils {
 
     CopybookService copybookService = injector.getInstance(CopybookService.class);
     PredefinedCopybookUtils.loadPredefinedCopybooks(useCase.getSqlBackend(), useCase.getCopybooks(), useCase.documentUri)
-        .forEach(pc -> copybookService.store(pc, true));
+        .forEach(pc -> copybookService.store(pc, languageId, true));
 
     useCase.getCopybooks()
         .forEach(cobolText -> {
@@ -125,7 +135,7 @@ public class UseCaseUtils {
           }
 
           cobolText = new CobolText(cobolText.getFileName().toUpperCase(), cobolText.getDialectType(), copybookText);
-          copybookService.store(UseCaseUtils.toCopybookModel(cobolText, useCase.documentUri), true);
+          copybookService.store(UseCaseUtils.toCopybookModel(cobolText, useCase.documentUri), languageId, true);
         });
 
     SubroutineService subroutines = injector.getInstance(SubroutineService.class);

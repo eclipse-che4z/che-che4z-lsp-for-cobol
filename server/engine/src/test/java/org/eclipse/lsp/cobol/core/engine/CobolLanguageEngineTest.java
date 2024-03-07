@@ -48,6 +48,7 @@ import org.eclipse.lsp.cobol.core.preprocessor.delegates.GrammarPreprocessor;
 import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
 import org.eclipse.lsp.cobol.core.strategy.CobolErrorStrategy;
 import org.eclipse.lsp.cobol.core.strategy.ErrorMessageHelper;
+import org.eclipse.lsp.cobol.lsp.CobolLanguageId;
 import org.eclipse.lsp.cobol.service.settings.layout.CodeLayoutStore;
 import org.eclipse.lsp.cobol.usecases.DialectConfigs;
 import org.eclipse.lsp4j.Position;
@@ -75,6 +76,7 @@ class CobolLanguageEngineTest {
   private final DialectService dialectService = mock(DialectService.class);
   private final AstProcessor astProcessor = mock(AstProcessor.class);
   private final SymbolsRepository symbolsRepository = mock(SymbolsRepository.class);
+  private final CodeLayoutStore store = mock(CodeLayoutStore.class);
 
   @Test
   void testLanguageEngineRun() {
@@ -82,12 +84,11 @@ class CobolLanguageEngineTest {
     cobolErrorStrategy.setErrorMessageHelper(mockErrUtil);
     AstProcessor astProcessor = mock(AstProcessor.class);
     SymbolsRepository symbolsRepository = mock(SymbolsRepository.class);
-    CodeLayoutStore codeLayoutStore = mock(CodeLayoutStore.class);
 
     CobolLanguageEngine engine =
             new CobolLanguageEngine(
                     preprocessor, grammarPreprocessor, mockMessageService, treeListener, mock(SubroutineService.class), null,
-                    dialectService, astProcessor, symbolsRepository, mock(ErrorFinalizerService.class), codeLayoutStore);
+                    dialectService, astProcessor, symbolsRepository, mock(ErrorFinalizerService.class), store);
     when(mockMessageService.getMessage(anyString(), anyString(), anyString())).thenReturn("");
     Locality locality =
             Locality.builder()
@@ -121,7 +122,7 @@ class CobolLanguageEngineTest {
             .thenReturn(new ResultWithErrors<>(new DialectOutcome(context), ImmutableList.of()));
     when(dialectService.processImplicitDialects(any(), anyList(), any()))
             .thenReturn(new ResultWithErrors<>(new DialectOutcome(context), ImmutableList.of()));
-    when(preprocessor.cleanUpCode(URI, TEXT))
+    when(preprocessor.cleanUpCode(URI, TEXT, CobolLanguageId.COBOL))
             .thenReturn(new ResultWithErrors<>(new ExtendedText(TEXT, URI), ImmutableList.of()));
 
     when(grammarPreprocessor.preprocess(any())).thenReturn(new ResultWithErrors<>(new CopybooksRepository(), ImmutableList.of()));
@@ -141,11 +142,11 @@ class CobolLanguageEngineTest {
     Node division = program.getChildren().get(0);
 
     assertEquals(NodeType.ROOT, root.getNodeType());
-    assertEquals(sourceRange, root.getLocality().getRange());
+    assertEquals(programRange, root.getLocality().getRange());
     assertEquals(NodeType.PROGRAM, program.getNodeType());
     assertEquals(programRange, program.getLocality().getRange());
     assertEquals(NodeType.DIVISION, division.getNodeType());
-    assertEquals(divisionRange, division.getLocality().getRange());
+    assertEquals(programRange, division.getLocality().getRange());
     assertEquals(0, division.getChildren().size());
   }
 
@@ -155,13 +156,12 @@ class CobolLanguageEngineTest {
     cobolErrorStrategy.setErrorMessageHelper(mockErrUtil);
     when(mockMessageService.getMessage("workspaceError.ServerType")).thenReturn(ERROR_MSG);
     System.setProperty("serverType", "NATIVE");
-    CodeLayoutStore codeLayoutStore = mock(CodeLayoutStore.class);
     CobolLanguageEngine engine =
             new CobolLanguageEngine(
                     preprocessor, grammarPreprocessor, mockMessageService, treeListener, mock(SubroutineService.class), null,
-                    dialectService, astProcessor, symbolsRepository, mock(ErrorFinalizerService.class), codeLayoutStore);
+                    dialectService, astProcessor, symbolsRepository, mock(ErrorFinalizerService.class), store);
 
-    AnalysisResult actual = engine.run(URI, TEXT, DialectConfigs.getDaCoAnalysisConfig());
+    AnalysisResult actual = engine.run(URI, TEXT, DialectConfigs.getDaCoAnalysisConfig(), CobolLanguageId.COBOL);
     Assertions.assertEquals(1, actual.getDiagnostics().size());
     Assertions.assertEquals(ERROR_MSG, actual.getDiagnostics().get(URI).get(0).getMessage());
   }

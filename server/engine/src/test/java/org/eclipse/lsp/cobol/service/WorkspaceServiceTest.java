@@ -23,6 +23,7 @@ import static org.mockito.Mockito.*;
 import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonPrimitive;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import lombok.extern.slf4j.Slf4j;
@@ -37,7 +38,6 @@ import org.eclipse.lsp.cobol.lsp.handlers.text.CodeActionHandler;
 import org.eclipse.lsp.cobol.lsp.handlers.workspace.DidChangeConfigurationHandler;
 import org.eclipse.lsp.cobol.lsp.handlers.workspace.ExecuteCommandHandler;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookNameService;
-import org.eclipse.lsp.cobol.service.settings.layout.CobolProgramLayout;
 import org.eclipse.lsp.cobol.service.settings.layout.CodeLayoutStore;
 import org.eclipse.lsp.cobol.test.engine.UseCaseUtils;
 import org.eclipse.lsp4j.*;
@@ -253,7 +253,7 @@ class WorkspaceServiceTest {
 
   private CodeLayoutStore getMockLayoutStore() {
     CodeLayoutStore layoutStore = mock(CodeLayoutStore.class);
-    when(layoutStore.getCodeLayout()).thenReturn(new CobolProgramLayout());
+    when(layoutStore.getCodeLayout()).thenReturn(Optional.empty());
     return layoutStore;
   }
 }

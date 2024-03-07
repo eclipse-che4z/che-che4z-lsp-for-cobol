@@ -18,13 +18,14 @@ import com.google.common.collect.ImmutableList;
 import org.eclipse.lsp.cobol.common.ResultWithErrors;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedText;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
+import org.eclipse.lsp.cobol.lsp.CobolLanguageId;
 
 /**
  * Mock Text Processor class
  */
 public class MockTextPreprocessor implements TextPreprocessor {
   @Override
-  public ResultWithErrors<ExtendedText> cleanUpCode(String documentUri, String cobolCode) {
+  public ResultWithErrors<ExtendedText> cleanUpCode(String documentUri, String cobolCode, CobolLanguageId languageId) {
     return new ResultWithErrors<>(new ExtendedText(cobolCode, documentUri), ImmutableList.of());
   }
 }

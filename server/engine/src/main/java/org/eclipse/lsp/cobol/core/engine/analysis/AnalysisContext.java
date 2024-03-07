@@ -14,6 +14,7 @@
  */
 package org.eclipse.lsp.cobol.core.engine.analysis;
 
+import java.util.*;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -23,8 +24,7 @@ import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
-
-import java.util.*;
+import org.eclipse.lsp.cobol.lsp.CobolLanguageId;
 
 /**
  * Contains related to analysis state
@@ -35,6 +35,7 @@ public class AnalysisContext {
   @Getter private final ExtendedDocument extendedDocument;
   @Getter private final AnalysisConfig config;
   @Getter private final List<SyntaxError> accumulatedErrors = new ArrayList<>();
+  @Getter private final CobolLanguageId languageId;
 
   private @Getter @Setter List<Node> dialectNodes;
   private @Getter @Setter CopybooksRepository copybooksRepository;

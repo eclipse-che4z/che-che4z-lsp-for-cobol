@@ -16,6 +16,7 @@ package org.eclipse.lsp.cobol.core.preprocessor;
 
 import org.eclipse.lsp.cobol.common.ResultWithErrors;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedText;
+import org.eclipse.lsp.cobol.lsp.CobolLanguageId;
 
 /**
  * This interface describes the text preprocessor which prepares the given string for analysis by
@@ -27,9 +28,10 @@ public interface TextPreprocessor {
    * Check and clean of the code as per cobol program structure.
    *
    * @param documentUri unique resource identifier of the processed document
-   * @param cobolCode the content of the document that should be processed
+   * @param cobolCode   the content of the document that should be processed
+   * @param languageId
    * @return modified code wrapped object and list of syntax error that might send back to the
-   *     client
+   * client
    */
-  ResultWithErrors<ExtendedText> cleanUpCode(String documentUri, String cobolCode);
+  ResultWithErrors<ExtendedText> cleanUpCode(String documentUri, String cobolCode, CobolLanguageId languageId);
 }

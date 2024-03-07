@@ -46,7 +46,6 @@ import {
   loadProcessorGroupSqlBackendConfig,
 } from "./ProcessorGroups";
 import { getProgramNameFromUri } from "./util/FSUtils";
-import { integer } from "vscode-languageclient";
 
 /**
  * New file (e.g .gitignore) will be created or edited if exits, under project folder
@@ -96,11 +95,11 @@ export class TabRule {
     public stops: number[],
     public maxPosition: number,
     public regex: string | undefined = undefined,
-  ) {}
+  ) { }
 }
 
 export class TabSettings {
-  public constructor(public rules: TabRule[], public defaultRule: TabRule) {}
+  public constructor(public rules: TabRule[], public defaultRule: TabRule) { }
 }
 
 export function configHandler(request: any): Array<any> {
@@ -154,6 +153,8 @@ export function configHandler(request: any): Array<any> {
         } else {
           result.push(cfg);
         }
+      } else if (item.section === COBOL_PRGM_LAYOUT) {
+        result.push(SettingsService.getCobolProgramLayout())
       } else {
         result.push(vscode.workspace.getConfiguration().get(item.section));
       }
@@ -214,9 +215,9 @@ export class SettingsService {
     return documentUri === undefined
       ? global
       : loadProcessorGroupCopybookExtensionsConfig(
-          { scopeUri: documentUri },
-          global!,
-        );
+        { scopeUri: documentUri },
+        global!,
+      );
   }
 
   /**
@@ -343,15 +344,7 @@ export class SettingsService {
     return vscode.workspace.getConfiguration().get(SERVER_RUNTIME);
   }
 
-  public static getCobolProgramLayout():
-    | {
-        sequence_length?: integer;
-        indicator_length?: integer;
-        area_a_length?: integer;
-        area_b_length?: integer;
-        comment_area?: integer;
-      }
-    | undefined {
+  public static getCobolProgramLayout() {
     return vscode.workspace.getConfiguration().get(COBOL_PRGM_LAYOUT);
   }
 
@@ -395,3 +388,4 @@ export class SettingsService {
     );
   }
 }
+

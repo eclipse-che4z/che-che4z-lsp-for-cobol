@@ -72,7 +72,7 @@ class IdmsCopybookVisitorTest {
     IdmsCopyParser.CopyIdmsSourceContext sourceContext = mock(IdmsCopyParser.CopyIdmsSourceContext.class);
     CopybookName expectedCopybookName = new CopybookName("copybook", "IDMS");
     when(copybookService.resolve(any(CopybookId.class), any(CopybookName.class), anyString(), anyString(),
-            anyBoolean()))
+            anyBoolean(), "cobol"))
             .thenReturn(
                     new ResultWithErrors<>(
                             new CopybookModel(expectedCopybookName.toCopybookId(PROGRAM_DOCUMENT_URI), expectedCopybookName, null, null),

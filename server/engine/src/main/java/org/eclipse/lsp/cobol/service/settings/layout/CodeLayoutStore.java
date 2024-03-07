@@ -23,7 +23,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.lsp.cobol.core.preprocessor.ProcessingConstants;
 
 /** Stores the Cobol Program layout */
 @Slf4j
@@ -33,12 +32,14 @@ public class CodeLayoutStore {
 
   /**
    * updates the store with the passed layout
+   *
    * @return void
    */
   public Consumer<? super List<Object>> updateCodeLayout() {
     return layout -> {
       if (Objects.nonNull(layout)) {
-        this.layout = parseLayout(Iterables.getFirst(layout, new CobolProgramLayout()));
+        CobolProgramLayout layoutSetting = parseLayout(Iterables.getFirst(layout, null));
+        if (layoutSetting != null) this.layout = layoutSetting;
       }
     };
   }
@@ -48,8 +49,8 @@ public class CodeLayoutStore {
    *
    * @return a {@link CobolProgramLayout} instance
    */
-  public CobolProgramLayout getCodeLayout() {
-    return Optional.ofNullable(layout).orElse(new CobolProgramLayout());
+  public Optional<CobolProgramLayout> getCodeLayout() {
+    return Optional.ofNullable(layout);
   }
 
   /**
@@ -59,31 +60,27 @@ public class CodeLayoutStore {
    * @return {@link CobolProgramLayout}
    */
   private static CobolProgramLayout parseLayout(Object jsonElements) {
+    if (Objects.isNull(jsonElements)) return null;
+    CobolProgramLayout.CobolProgramLayoutBuilder layoutBuilder = CobolProgramLayout.builder();
     if (jsonElements instanceof JsonObject) {
       JsonObject element = (JsonObject) jsonElements;
-      int sequenceLength =
-          Optional.ofNullable(element.get("sequence_length"))
-              .map(JsonElement::getAsInt)
-              .orElse(ProcessingConstants.SEQUENCE_LENGTH);
-      int indicatorLength =
-          Optional.ofNullable(element.get("indicator_length"))
-              .map(JsonElement::getAsInt)
-              .orElse(ProcessingConstants.INDICATOR_LENGTH);
-      int areaALength =
-          Optional.ofNullable(element.get("area_a_length"))
-              .map(JsonElement::getAsInt)
-              .orElse(ProcessingConstants.AREA_A_LENGTH);
-      int areaBLength =
-          Optional.ofNullable(element.get("area_b_length"))
-              .map(JsonElement::getAsInt)
-              .orElse(ProcessingConstants.AREA_B_LENGTH);
-      int commentArea =
-          Optional.ofNullable(element.get("comment_area"))
-              .map(JsonElement::getAsInt)
-              .orElse(ProcessingConstants.COMMENT_AREA);
-      return new CobolProgramLayout(
-          sequenceLength, indicatorLength, areaALength, areaBLength, commentArea);
+      Optional.ofNullable(element.get("sequence_length"))
+          .map(JsonElement::getAsInt)
+          .ifPresent(layoutBuilder::sequenceLength);
+      Optional.ofNullable(element.get("indicator_length"))
+          .map(JsonElement::getAsInt)
+          .ifPresent(layoutBuilder::indicatorLength);
+      Optional.ofNullable(element.get("area_a_length"))
+          .map(JsonElement::getAsInt)
+          .ifPresent(layoutBuilder::commentAreaLength);
+      Optional.ofNullable(element.get("area_b_length"))
+          .map(JsonElement::getAsInt)
+          .ifPresent(layoutBuilder::areaBLength);
+      Optional.ofNullable(element.get("comment_area"))
+          .map(JsonElement::getAsInt)
+          .ifPresent(layoutBuilder::commentAreaLength);
+      return layoutBuilder.build();
     }
-    return new CobolProgramLayout();
+    return layoutBuilder.build();
   }
 }

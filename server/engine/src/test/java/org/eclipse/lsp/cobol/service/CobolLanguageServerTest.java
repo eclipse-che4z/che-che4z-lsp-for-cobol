@@ -27,6 +27,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonPrimitive;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -49,7 +50,6 @@ import org.eclipse.lsp.cobol.service.copybooks.CopybookNameService;
 import org.eclipse.lsp.cobol.service.delegates.completions.Keywords;
 import org.eclipse.lsp.cobol.service.settings.SettingsService;
 import org.eclipse.lsp.cobol.service.settings.SettingsServiceImpl;
-import org.eclipse.lsp.cobol.service.settings.layout.CobolProgramLayout;
 import org.eclipse.lsp.cobol.service.settings.layout.CodeLayoutStore;
 import org.eclipse.lsp4j.ClientCapabilities;
 import org.eclipse.lsp4j.ClientInfo;
@@ -165,7 +165,7 @@ class CobolLanguageServerTest {
     when(settingsService.fetchConfiguration("dialect"))
             .thenReturn(completedFuture(singletonList(arr)));
     when(settingsService.fetchConfiguration(COBOL_PROGRAM_LAYOUT.label))
-        .thenReturn(completedFuture(ImmutableList.of(new CobolProgramLayout())));
+        .thenReturn(completedFuture(ImmutableList.of(CobolLanguageId.COBOL.getLayout())));
   }
 
   @Test
@@ -193,7 +193,7 @@ class CobolLanguageServerTest {
     LspMessageBroker lspMessageBroker = new LspMessageBroker();
     CobolWorkspaceServiceImpl lspEventConsumer = new CobolWorkspaceServiceImpl(lspMessageBroker, executeCommandHandler, sourceUnitGraph, didChangeConfigurationHandler, asyncAnalysisService, uriDecodeService);
 
-    when(layoutStore.getCodeLayout()).thenReturn(new CobolProgramLayout());
+    when(layoutStore.getCodeLayout()).thenReturn(Optional.of(CobolLanguageId.COBOL.getLayout()));
     when(layoutStore.updateCodeLayout()).thenReturn(mock -> {});
 
     lspEventConsumer.startConsumer();

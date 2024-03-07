@@ -68,7 +68,6 @@ import org.eclipse.lsp.cobol.core.CobolParserBaseVisitor;
 import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
 import org.eclipse.lsp.cobol.service.settings.CachingConfigurationService;
 import org.eclipse.lsp.cobol.service.settings.layout.CobolProgramLayout;
-import org.eclipse.lsp.cobol.service.settings.layout.CodeLayoutStore;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
@@ -89,11 +88,11 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   private final ExtendedDocument extendedDocument;
   private final MessageService messageService;
   private final SubroutineService subroutineService;
+  private final CobolProgramLayout programLayout;
 
   private Map<String, FileControlEntryContext> fileControls = null;
   private final Map<String, SubroutineDefinition> subroutineDefinitionMap = new HashMap<>();
   private final CachingConfigurationService cachingConfigurationService;
-  private final CodeLayoutStore codeLayoutStore;
 
   public CobolVisitor(
           @NonNull CopybooksRepository copybooks,
@@ -101,14 +100,14 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
           @NonNull ExtendedDocument extendedDocument,
           MessageService messageService,
           SubroutineService subroutineService,
-          CachingConfigurationService cachingConfigurationService, CodeLayoutStore codeLayoutStore) {
+          CachingConfigurationService cachingConfigurationService, CobolProgramLayout programLayout) {
     this.copybooks = copybooks;
     this.tokenStream = tokenStream;
     this.extendedDocument = extendedDocument;
     this.messageService = messageService;
     this.subroutineService = subroutineService;
     this.cachingConfigurationService = cachingConfigurationService;
-    this.codeLayoutStore = codeLayoutStore;
+    this.programLayout = programLayout;
   }
 
   @Override
@@ -1269,8 +1268,12 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
     if (token.getText().startsWith("EXEC")) {
       return;
     }
+    int areaBStartIndex =
+            programLayout.getSequenceLength()
+                    + programLayout.getIndicatorLength()
+                    + programLayout.getAreaALength() - 1;
     getLocality(token)
-            .filter(it -> it.getRange().getStart().getCharacter() > AREA_A_FINISH)
+            .filter(it -> it.getRange().getStart().getCharacter() > areaBStartIndex)
             .ifPresent(
                     it ->
                             throwException(
@@ -1302,10 +1305,15 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
 
   private Predicate<Locality> startsInAreaA(Token token) {
     return it -> {
-      CobolProgramLayout codeLayout = codeLayoutStore.getCodeLayout();
+      // TODO: UPdate this
       int charPosition = it.getRange().getStart().getCharacter();
-      int areaBStartIndex = codeLayout.getSequenceLength() + codeLayout.getIndicatorLength() + codeLayout.getAreaALength();
-      return charPosition > codeLayout.getSequenceLength() && charPosition < areaBStartIndex && token.getChannel() != HIDDEN;
+      int areaBStartIndex =
+              programLayout.getSequenceLength()
+              + programLayout.getIndicatorLength()
+              + programLayout.getAreaALength();
+      return charPosition > programLayout.getSequenceLength()
+          && charPosition < areaBStartIndex
+          && token.getChannel() != HIDDEN;
     };
   }
 

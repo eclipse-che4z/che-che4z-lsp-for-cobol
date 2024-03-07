@@ -15,11 +15,13 @@
 
 package org.eclipse.lsp.cobol.positive;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.google.common.util.concurrent.SimpleTimeLimiter;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
@@ -32,10 +34,15 @@ import org.eclipse.lsp.cobol.common.mapping.ExtendedText;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessorImpl;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.reader.CobolLineReaderImpl;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.reader.CobolLineReaderService;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.rewriter.CobolLineIndicatorProcessorImpl;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.rewriter.CobolLineReWriterService;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.transformer.CobolContinuationLineTransformation;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.transformer.CobolLineTransformationService;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.transformer.ContinuationLineTransformation;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.writer.CobolLineWriterImpl;
-import org.eclipse.lsp.cobol.service.settings.layout.CobolProgramLayout;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.writer.CobolLineWriterService;
+import org.eclipse.lsp.cobol.lsp.CobolLanguageId;
 import org.eclipse.lsp.cobol.service.settings.layout.CodeLayoutStore;
 import org.eclipse.lsp.cobol.test.CobolText;
 import org.eclipse.lsp.cobol.test.engine.UseCase;
@@ -80,15 +87,29 @@ class TypingTest extends FileBasedTest {
 
   private String getCleanText(CobolText cobolText) {
     CodeLayoutStore layoutStore = mock(CodeLayoutStore.class);
-    when(layoutStore.getCodeLayout()).thenReturn(new CobolProgramLayout());
+    when(layoutStore.getCodeLayout()).thenReturn(Optional.of(CobolLanguageId.COBOL.getLayout()));
+    CobolLineReaderService readerService = mock(CobolLineReaderService.class);
+    CobolLineWriterService writerService = mock(CobolLineWriterService.class);
+    CobolLineTransformationService transformationService = mock(CobolLineTransformationService.class);
+    CobolLineReWriterService indicatorProcessorService = mock(CobolLineReWriterService.class);
+    CobolLineReaderImpl cobolLineReader = new CobolLineReaderImpl(null, null);
+    CobolLineWriterImpl cobolLineWriter = new CobolLineWriterImpl(null);
+    ContinuationLineTransformation continuationLineTransformation = new CobolContinuationLineTransformation(null, null);
+    CobolLineIndicatorProcessorImpl cobolLineIndicatorProcessor = new CobolLineIndicatorProcessorImpl(null);
+
+    when(readerService.getCobolLineReader(any())).thenReturn(cobolLineReader);
+    when(writerService.getCobolLineWriter(any())).thenReturn(cobolLineWriter);
+    when(transformationService.getTransformer(any())).thenReturn(continuationLineTransformation);
+    when(indicatorProcessorService.getLineReWriter(any())).thenReturn(cobolLineIndicatorProcessor);
+
     TextPreprocessor preprocessor =
         new TextPreprocessorImpl(
-            new CobolLineReaderImpl(null, layoutStore),
-            new CobolLineWriterImpl(layoutStore),
-            new ContinuationLineTransformation(null, layoutStore),
-            new CobolLineIndicatorProcessorImpl(layoutStore));
+            readerService,
+            writerService,
+            transformationService,
+            indicatorProcessorService);
     ResultWithErrors<ExtendedText> cleanTextResult =
-        preprocessor.cleanUpCode(cobolText.getFileName(), cobolText.getFullText());
+        preprocessor.cleanUpCode(cobolText.getFileName(), cobolText.getFullText(), CobolLanguageId.COBOL);
     for (SyntaxError error : cleanTextResult.getErrors()) LOG.error(error.toString());
     return cleanTextResult.getResult().toString();
   }

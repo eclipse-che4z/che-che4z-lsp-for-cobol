@@ -23,8 +23,8 @@ import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
 import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.core.engine.analysis.AnalysisContext;
-import org.eclipse.lsp.cobol.core.engine.pipeline.StageResult;
 import org.eclipse.lsp.cobol.core.engine.pipeline.Stage;
+import org.eclipse.lsp.cobol.core.engine.pipeline.StageResult;
 import org.eclipse.lsp.cobol.core.preprocessor.CopybookHierarchy;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.GrammarPreprocessor;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.PreprocessorContext;
@@ -69,7 +69,7 @@ public class PreprocessorStage implements Stage<CopybooksRepository, DialectOutc
     ExtendedDocument extendedDocument = ctx.getExtendedDocument();
     CopybooksRepository copybooks =
         grammarPreprocessor.preprocess(new PreprocessorContext(programDocumentUri, extendedDocument,
-                ctx.getConfig().getCopybookProcessingMode(), new CopybookHierarchy(), new CopybooksRepository()))
+                ctx.getConfig().getCopybookProcessingMode(), new CopybookHierarchy(), new CopybooksRepository(), ctx.getLanguageId()))
             .unwrap(preprocessorErrors::addAll);
     extendedDocument.commitTransformations();
 
