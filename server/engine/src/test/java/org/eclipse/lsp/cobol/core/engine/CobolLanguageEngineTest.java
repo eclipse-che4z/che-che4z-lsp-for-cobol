@@ -28,6 +28,8 @@ import org.eclipse.lsp.cobol.common.AnalysisConfig;
 import org.eclipse.lsp.cobol.common.AnalysisResult;
 import org.eclipse.lsp.cobol.common.ResultWithErrors;
 import org.eclipse.lsp.cobol.common.SubroutineService;
+import org.eclipse.lsp.cobol.common.benchmark.BenchmarkService;
+import org.eclipse.lsp.cobol.common.benchmark.BenchmarkSession;
 import org.eclipse.lsp.cobol.common.dialects.DialectOutcome;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
@@ -82,10 +84,13 @@ class CobolLanguageEngineTest {
     AstProcessor astProcessor = mock(AstProcessor.class);
     SymbolsRepository symbolsRepository = mock(SymbolsRepository.class);
 
+    BenchmarkService benchmarkService = mock(BenchmarkService.class);
+    when(benchmarkService.startSession()).thenReturn(new BenchmarkSession());
     CobolLanguageEngine engine =
             new CobolLanguageEngine(
                     preprocessor, grammarPreprocessor, mockMessageService, treeListener, mock(SubroutineService.class), null,
-                    dialectService, astProcessor, symbolsRepository, mock(ErrorFinalizerService.class));
+                    dialectService, astProcessor, symbolsRepository, mock(ErrorFinalizerService.class),
+                    benchmarkService);
     when(mockMessageService.getMessage(anyString(), anyString(), anyString())).thenReturn("");
     Locality locality =
             Locality.builder()
@@ -153,10 +158,13 @@ class CobolLanguageEngineTest {
     cobolErrorStrategy.setErrorMessageHelper(mockErrUtil);
     when(mockMessageService.getMessage("workspaceError.ServerType")).thenReturn(ERROR_MSG);
     System.setProperty("serverType", "NATIVE");
+    BenchmarkService benchmarkService = mock(BenchmarkService.class);
+    when(benchmarkService.startSession()).thenReturn(mock(BenchmarkSession.class));
     CobolLanguageEngine engine =
             new CobolLanguageEngine(
                     preprocessor, grammarPreprocessor, mockMessageService, treeListener, mock(SubroutineService.class), null,
-                    dialectService, astProcessor, symbolsRepository, mock(ErrorFinalizerService.class));
+                    dialectService, astProcessor, symbolsRepository,
+                    mock(ErrorFinalizerService.class), benchmarkService);
 
     AnalysisResult actual = engine.run(URI, TEXT, DialectConfigs.getDaCoAnalysisConfig());
     Assertions.assertEquals(1, actual.getDiagnostics().size());

@@ -118,13 +118,26 @@ public class AntlrAdapter {
       // All programs should be adapted to this point
       return ((AntlrAdapted) cstNode.getChildren().get(0)).getRuleContext();
     } else if (cstNode instanceof DataDivision) {
-      return antlrDataDivisionParser(cstNode).dataDivision();
+      long startTime = System.currentTimeMillis();
+      CobolDataDivisionParser.DataDivisionContext dataDivisionContext = antlrDataDivisionParser(cstNode).dataDivision();
+      System.out.println("> DataDivision: " + (System.currentTimeMillis() - startTime));
+      return dataDivisionContext;
     } else if (cstNode instanceof IdentificationDivision) {
-      return antlrIdDivisionParser(cstNode).identificationDivision();
+      long startTime = System.currentTimeMillis();
+      CobolIdentificationDivisionParser.IdentificationDivisionContext identificationDivisionContext = antlrIdDivisionParser(cstNode).identificationDivision();
+      System.out.println("> IdentificationDivision: " + (System.currentTimeMillis() - startTime));
+      return identificationDivisionContext;
     } else if (cstNode instanceof EnvironmentDivision) {
-      return antlrParser(cstNode).environmentDivision();
+      long startTime = System.currentTimeMillis();
+      CobolParser.EnvironmentDivisionContext environmentDivisionContext = antlrParser(cstNode).environmentDivision();
+      System.out.println("> EnvironmentDivision: " + (System.currentTimeMillis() - startTime));
+      return environmentDivisionContext;
     } else if (cstNode instanceof ProcedureDivision) {
-      return antlrParser(cstNode).procedureDivision();
+      CobolProcedureDivisionParser cobolProcedureDivisionParser = antlrProcedureDivisionParser(cstNode);
+      long startTime = System.currentTimeMillis();
+      CobolProcedureDivisionParser.ProcedureDivisionContext procedureDivisionContext = cobolProcedureDivisionParser.procedureDivision();
+      System.out.println("> ProcedureDivision: " + (System.currentTimeMillis() - startTime));
+      return procedureDivisionContext;
     } else {
       return null;
     }
@@ -164,6 +177,21 @@ public class AntlrAdapter {
     antlrLexer.addErrorListener(errorListener);
     CommonTokenStream tokens = new CommonTokenStream(antlrLexer);
     CobolDataDivisionParser antlrParser = new CobolDataDivisionParser(tokens);
+    antlrParser.removeErrorListeners();
+    antlrParser.addErrorListener(errorListener);
+    antlrParser.setErrorHandler(errorStrategy);
+    antlrParser.addParseListener(treeListener);
+    return antlrParser;
+  }
+
+  private CobolProcedureDivisionParser antlrProcedureDivisionParser(CstNode node) {
+    org.eclipse.lsp.cobol.core.hw.Token startToken = findStartToken(node).get();
+    String input = generatePrefix(startToken.getLine(), startToken.getStartPositionInLine()) + node.toText();
+    CobolProcedureDivisionLexer antlrLexer = new CobolProcedureDivisionLexer(CharStreams.fromString(input));
+    antlrLexer.removeErrorListeners();
+    antlrLexer.addErrorListener(errorListener);
+    CommonTokenStream tokens = new CommonTokenStream(antlrLexer);
+    CobolProcedureDivisionParser antlrParser = new CobolProcedureDivisionParser(tokens);
     antlrParser.removeErrorListeners();
     antlrParser.addErrorListener(errorListener);
     antlrParser.setErrorHandler(errorStrategy);

@@ -20,6 +20,8 @@ import static com.google.inject.name.Names.named;
 import com.google.inject.AbstractModule;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
+import org.eclipse.lsp.cobol.common.benchmark.BenchmarkService;
+import org.eclipse.lsp.cobol.common.benchmark.BenchmarkServiceImpl;
 import org.eclipse.lsp.cobol.common.message.LocaleStore;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.core.engine.CobolLanguageEngine;
@@ -56,6 +58,7 @@ public class EngineModule extends AbstractModule {
   @Override
   protected void configure() {
     bind(CobolLanguageEngine.class);
+    bind(BenchmarkService.class).to(BenchmarkServiceImpl.class);
     bind(TextPreprocessor.class).to(TextPreprocessorImpl.class);
     bind(GrammarPreprocessor.class).to(GrammarPreprocessorImpl.class);
     install(new FactoryModuleBuilder().build(GrammarPreprocessorListenerFactory.class));

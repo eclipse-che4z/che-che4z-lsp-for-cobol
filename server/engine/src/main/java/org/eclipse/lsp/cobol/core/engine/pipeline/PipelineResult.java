@@ -16,9 +16,6 @@ package org.eclipse.lsp.cobol.core.engine.pipeline;
 
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
-import org.eclipse.lsp.cobol.core.engine.analysis.Timing;
-
-import java.util.Map;
 
 /**
  * A class to store the pipeline execution results
@@ -26,6 +23,5 @@ import java.util.Map;
 @Value
 @RequiredArgsConstructor
 public class PipelineResult {
-  Map<String, Timing> timings;
   StageResult<?> lastStageResult;
 }

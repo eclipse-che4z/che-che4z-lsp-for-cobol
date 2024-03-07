@@ -46,22 +46,24 @@ public class ParserStage implements Stage<ParserStageResult, DialectOutcome> {
 
   @Override
   public StageResult<ParserStageResult> run(AnalysisContext context, StageResult<DialectOutcome> prevStageResult) {
-    // Run parser;
-    context.setDialectNodes(ImmutableList.<Node>builder()
-            .addAll(context.getDialectNodes())
-            .addAll(prevStageResult.getData().getDialectNodes())
-            .build());
-    ParserListener listener = new ParserListener(context.getExtendedDocument(), context.getCopybooksRepository());
-    CobolErrorStrategy errorStrategy = new CobolErrorStrategy(messageService);
-    AstBuilder parser = ParserUtils.isHwParserEnabled()
-            ? new SplitParser(CharStreams.fromString(context.getExtendedDocument().toString()),
+    return context.getBenchmarkSession().measure("pipeline.parser", () -> {
+      // Run parser;
+      context.setDialectNodes(ImmutableList.<Node>builder()
+              .addAll(context.getDialectNodes())
+              .addAll(prevStageResult.getData().getDialectNodes())
+              .build());
+      ParserListener listener = new ParserListener(context.getExtendedDocument(), context.getCopybooksRepository());
+      CobolErrorStrategy errorStrategy = new CobolErrorStrategy(messageService);
+      AstBuilder parser = ParserUtils.isHwParserEnabled()
+              ? new SplitParser(CharStreams.fromString(context.getExtendedDocument().toString()),
               listener, errorStrategy, treeListener)
-            : new AntlrCobolParser(CharStreams.fromString(context.getExtendedDocument().toString()),
+              : new AntlrCobolParser(CharStreams.fromString(context.getExtendedDocument().toString()),
               listener, errorStrategy, treeListener);
-    CobolParser.StartRuleContext tree = parser.runParser();
-    context.getAccumulatedErrors().addAll(listener.getErrors());
-    context.getAccumulatedErrors().addAll(getParsingError(context, parser));
-    return new StageResult<>(new ParserStageResult(parser.getTokens(), tree));
+      CobolParser.StartRuleContext tree = parser.runParser();
+      context.getAccumulatedErrors().addAll(listener.getErrors());
+      context.getAccumulatedErrors().addAll(getParsingError(context, parser));
+      return new StageResult<>(new ParserStageResult(parser.getTokens(), tree));
+    });
   }
 
   private List<SyntaxError> getParsingError(AnalysisContext context, AstBuilder parser) {

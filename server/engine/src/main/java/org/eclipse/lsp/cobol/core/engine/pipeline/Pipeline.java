@@ -16,7 +16,6 @@ package org.eclipse.lsp.cobol.core.engine.pipeline;
 
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.core.engine.analysis.AnalysisContext;
-import org.eclipse.lsp.cobol.core.engine.analysis.Timing;
 
 import java.util.*;
 
@@ -26,8 +25,7 @@ import java.util.*;
 @Slf4j
 public class Pipeline {
   private final List<Stage<?, ?>> stages = new LinkedList<>();
-
-  /**
+    /**
    * Adds a new stage to the pipeline
    *
    * @param stage - pipeline processing stage
@@ -43,17 +41,15 @@ public class Pipeline {
    * @return - a final result of the pipeline processing
    */
   public PipelineResult run(AnalysisContext context) {
-    Map<String, Timing> timing = new LinkedHashMap<>();
     StageResult<?> result = StageResult.empty();
 
     for (Stage stage : stages) {
       StageResult<?> prevResult = result;
-      result = timing.computeIfAbsent(stage.getName(), a -> new Timing()).measure(() -> stage.run(context, prevResult));
-
+      result = context.getBenchmarkSession().measure(stage.getName(), () -> stage.run(context, prevResult));
       if (result.stopProcessing()) {
-        return new PipelineResult(timing, result);
+        return new PipelineResult(result);
       }
     }
-    return new PipelineResult(timing, result);
+    return new PipelineResult(result);
   }
 }
