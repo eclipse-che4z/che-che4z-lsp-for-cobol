@@ -15,6 +15,7 @@
         <module>dialect-idms</module>
         <module>dialect-daco</module>
         <module>test</module>
+        <module>common</module>
     </modules>
 
     <properties>
