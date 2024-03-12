@@ -133,14 +133,19 @@ public class AntlrAdapter {
       System.out.println("> EnvironmentDivision: " + (System.currentTimeMillis() - startTime));
       return environmentDivisionContext;
     } else if (cstNode instanceof ProcedureDivision) {
-      CobolProcedureDivisionParser cobolProcedureDivisionParser = antlrProcedureDivisionParser(cstNode);
-      long startTime = System.currentTimeMillis();
-      CobolProcedureDivisionParser.ProcedureDivisionContext procedureDivisionContext = cobolProcedureDivisionParser.procedureDivision();
-      System.out.println("> ProcedureDivision: " + (System.currentTimeMillis() - startTime));
-      return procedureDivisionContext;
+      return processProcedureDivisionContext(cstNode);
     } else {
       return null;
     }
+  }
+
+  private CobolProcedureDivisionParser.ProcedureDivisionContext processProcedureDivisionContext(CstNode cstNode) {
+
+    CobolProcedureDivisionParser cobolProcedureDivisionParser = antlrProcedureDivisionParser(cstNode);
+    long startTime = System.currentTimeMillis();
+    CobolProcedureDivisionParser.ProcedureDivisionContext procedureDivisionContext = cobolProcedureDivisionParser.procedureDivision();
+    System.out.println("> ProcedureDivision: " + (System.currentTimeMillis() - startTime));
+    return procedureDivisionContext;
   }
 
   void processChildNodes(CstNode cstNode, ParserRuleContext parent) {

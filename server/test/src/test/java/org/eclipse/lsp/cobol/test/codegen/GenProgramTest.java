@@ -27,11 +27,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class GenProgramTest {
   @Test
   void test() {
-    CobolCodeGenerator generator = new CobolCodeGenerator(new GeneratorSettings());
+    GeneratorSettings settings = new GeneratorSettings();
+    settings.setStatementCount(100);
+    CobolCodeGenerator generator = new CobolCodeGenerator(settings);
     String code = generator.generate();
     assertFalse(code.isEmpty());
     assertTrue(code.contains("DIVISION"));
     assertTrue(code.contains("ID"));
-    System.out.println(code.length());
   }
 }

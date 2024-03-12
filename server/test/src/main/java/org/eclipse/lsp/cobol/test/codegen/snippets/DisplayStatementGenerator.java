@@ -14,21 +14,20 @@
  *    and DAF development standards
  *
  */
-package org.eclipse.lsp.cobol.test.codegen.statements;
+package org.eclipse.lsp.cobol.test.codegen.snippets;
 
 import org.eclipse.lsp.cobol.test.codegen.CobolCodeGenerator;
 import org.eclipse.lsp.cobol.test.codegen.GeneratorContext;
 
 /**
- * Open statement generator.
+ * Display statement generator
  */
-public class OpenStatementGenerator implements SnippetGenerator {
+public class DisplayStatementGenerator implements SnippetGenerator {
   @Override
   public String generate(GeneratorContext ctx) {
     StringBuilder sb = new StringBuilder();
-    sb.append("OPEN").append(CobolCodeGenerator.space());
-    sb.append("INPUT").append(CobolCodeGenerator.space());
-    sb.append("file-name-1");
+    sb.append("DISPLAY").append(CobolCodeGenerator.space());
+    sb.append("iteral-1");
     return sb.toString();
   }
 }
