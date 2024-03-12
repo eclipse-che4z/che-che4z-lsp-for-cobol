@@ -16,6 +16,10 @@
  */
 package org.eclipse.lsp.cobol.test.codegen;
 
+import org.eclipse.lsp.cobol.test.codegen.snippets.ParagraphGenerator;
+import org.eclipse.lsp.cobol.test.codegen.snippets.SectionGenerator;
+import org.eclipse.lsp.cobol.test.codegen.snippets.SnippetGenerator;
+
 import java.util.Random;
 
 /**
@@ -74,37 +78,24 @@ public class CobolCodeGenerator {
 
   private String generateProcedureDivisionContent() {
     StringBuilder sb = new StringBuilder();
-    if (RANDOM.nextBoolean()) sb.append(generateSection());
-    if (RANDOM.nextBoolean()) sb.append(generateParagraph());
     for (int i = 0; i < settings.statementCount; i++) {
       sb.append(indent());
-      sb.append("    ");
-      sb.append(GeneratorSettings.statements.get(RANDOM.nextInt(GeneratorSettings.statements.size())).generate(ctx));
+      SnippetGenerator snippetGenerator = selectNextStatement();
+      if (!(snippetGenerator instanceof SectionGenerator
+              || snippetGenerator instanceof ParagraphGenerator)) {
+        sb.append("    ");
+      }
+      sb.append(snippetGenerator.generate(ctx));
       sb.append(".");
       sb.append(newLine());
     }
     return sb.toString();
   }
 
-  private String generateParagraph() {
-    StringBuilder sb = new StringBuilder();
-    sb.append(indent());
-    sb.append(space());
-    sb.append(ctx.generateIdentifier(IdentifierType.PARAGRAPH_NAME));
-    sb.append(".");
-    sb.append(newLine());
-    return sb.toString();
+  private static SnippetGenerator selectNextStatement() {
+    return GeneratorSettings.pickStatement(RANDOM.nextDouble());
   }
 
-  private String generateSection() {
-    StringBuilder sb = new StringBuilder();
-    sb.append(indent());
-    sb.append(ctx.generateIdentifier(IdentifierType.SECTION_NAME));
-    sb.append(space());
-    sb.append("SECTION.");
-    sb.append(newLine());
-    return sb.toString();
-  }
 
   private String generateDataDivision() {
     return "";

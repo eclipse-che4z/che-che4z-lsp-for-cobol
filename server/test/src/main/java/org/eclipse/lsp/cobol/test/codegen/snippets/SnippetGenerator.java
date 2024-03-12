@@ -14,7 +14,7 @@
  *    and DAF development standards
  *
  */
-package org.eclipse.lsp.cobol.test.codegen.statements;
+package org.eclipse.lsp.cobol.test.codegen.snippets;
 
 import org.eclipse.lsp.cobol.test.codegen.GeneratorContext;
 
