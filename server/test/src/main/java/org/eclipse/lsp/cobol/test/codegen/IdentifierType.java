@@ -21,4 +21,6 @@ package org.eclipse.lsp.cobol.test.codegen;
  */
 public enum IdentifierType {
   PROGRAM_NAME,
+  SECTION_NAME,
+  PARAGRAPH_NAME
 }

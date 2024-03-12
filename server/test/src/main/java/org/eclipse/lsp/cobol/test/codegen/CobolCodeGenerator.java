@@ -74,6 +74,8 @@ public class CobolCodeGenerator {
 
   private String generateProcedureDivisionContent() {
     StringBuilder sb = new StringBuilder();
+    if (RANDOM.nextBoolean()) sb.append(generateSection());
+    if (RANDOM.nextBoolean()) sb.append(generateParagraph());
     for (int i = 0; i < settings.statementCount; i++) {
       sb.append(indent());
       sb.append("    ");
@@ -81,6 +83,26 @@ public class CobolCodeGenerator {
       sb.append(".");
       sb.append(newLine());
     }
+    return sb.toString();
+  }
+
+  private String generateParagraph() {
+    StringBuilder sb = new StringBuilder();
+    sb.append(indent());
+    sb.append(space());
+    sb.append(ctx.generateIdentifier(IdentifierType.PARAGRAPH_NAME));
+    sb.append(".");
+    sb.append(newLine());
+    return sb.toString();
+  }
+
+  private String generateSection() {
+    StringBuilder sb = new StringBuilder();
+    sb.append(indent());
+    sb.append(ctx.generateIdentifier(IdentifierType.SECTION_NAME));
+    sb.append(space());
+    sb.append("SECTION.");
+    sb.append(newLine());
     return sb.toString();
   }
 
