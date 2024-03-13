@@ -14,12 +14,16 @@
  *    and DAF development standards
  *
  */
-package org.eclipse.lsp.cobol.core.cst;
+package org.eclipse.lsp.cobol.core.cst.procedure;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.eclipse.lsp.cobol.core.cst.base.CstNodeImpl;
 
 /**
- * ProcedureDivision node.
+ * Section node
  */
-public class ProcedureDivision extends CstNodeImpl {
+@Getter @Setter
+public class Section extends CstNodeImpl {
+  String name;
 }

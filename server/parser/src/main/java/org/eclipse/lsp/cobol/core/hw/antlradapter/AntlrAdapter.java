@@ -25,6 +25,7 @@ import org.eclipse.lsp.cobol.core.CobolParser;
 import org.eclipse.lsp.cobol.core.cst.*;
 import org.eclipse.lsp.cobol.core.cst.base.CstNode;
 import org.eclipse.lsp.cobol.core.cst.IdentificationDivision;
+import org.eclipse.lsp.cobol.core.cst.procedure.ProcedureDivision;
 import org.eclipse.lsp.cobol.core.hw.TokenType;
 
 import java.util.*;

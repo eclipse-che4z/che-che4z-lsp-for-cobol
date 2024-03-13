@@ -18,6 +18,7 @@ package org.eclipse.lsp.cobol.core;
 
 import org.eclipse.lsp.cobol.core.cst.*;
 import org.eclipse.lsp.cobol.core.cst.IdentificationDivision;
+import org.eclipse.lsp.cobol.core.cst.procedure.ProcedureDivision;
 import org.eclipse.lsp.cobol.core.hw.CobolLexer;
 import org.eclipse.lsp.cobol.core.hw.CobolParser;
 import org.eclipse.lsp.cobol.core.hw.ParserSettings;

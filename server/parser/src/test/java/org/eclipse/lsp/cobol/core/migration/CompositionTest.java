@@ -32,12 +32,19 @@ import static org.mockito.Mockito.mock;
 /**
  * Test antlr composition
  */
-class ProgramsTest {
+class CompositionTest {
   private static final String NESTED_PROGRAM = "ID DIVISION. PROGRAM-ID. Pr2.\n" + "END PROGRAM Pr2.\n";
   private static final String PROGRAM = "ID DIVISION. PROGRAM-ID. Pr1.\n" + NESTED_PROGRAM + "END PROGRAM Pr1.\n";
+  private static final String PROGRAM_PARA = "ID DIVISION. PROGRAM-ID. str1.\n"
+          + "PROCEDURE DIVISION.\n"
+          + "           DISPLAY 'OUT'.\n"
+          + "       PARAG1.\n"
+          + "           DISPLAY 'PARAG1'.\n"
+          + "       PARAG2.\n"
+          + "           DISPLAY 'PARAG2'.\n";
 
   @Test
-  void test() {
+  void nestedPrograms() {
     SourceUnit su = new CobolParser(new CobolLexer(PROGRAM), new ParserSettings()).parse().getSourceUnit();
     org.eclipse.lsp.cobol.core.CobolParser.StartRuleContext migrated = new AntlrAdapter(mock(BaseErrorListener.class), mock(DefaultErrorStrategy.class), mock(ParseTreeListener.class)).sourceUnitToStartRule(su);
     org.eclipse.lsp.cobol.core.CobolParser.StartRuleContext antlr = antlrParse(PROGRAM);
@@ -61,5 +68,10 @@ class ProgramsTest {
     antlrParser.removeErrorListeners();
     antlrParser.addErrorListener(listener);
     return antlrParser.startRule();
+  }
+
+  @Test
+  void paragraphTest() {
+    SourceUnit su = new CobolParser(new CobolLexer(PROGRAM_PARA), new ParserSettings()).parse().getSourceUnit();
   }
 }
