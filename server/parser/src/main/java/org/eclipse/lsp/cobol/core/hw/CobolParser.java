@@ -23,6 +23,10 @@ import org.apache.commons.text.similarity.JaroWinklerSimilarity;
 import org.eclipse.lsp.cobol.core.cst.*;
 import org.eclipse.lsp.cobol.core.cst.IdentificationDivision;
 import org.eclipse.lsp.cobol.core.cst.base.CstNode;
+import org.eclipse.lsp.cobol.core.cst.procedure.Paragraph;
+import org.eclipse.lsp.cobol.core.cst.procedure.ProcedureDivision;
+import org.eclipse.lsp.cobol.core.cst.procedure.Section;
+import org.eclipse.lsp.cobol.core.cst.procedure.Statement;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
@@ -207,11 +211,74 @@ public class CobolParser {
     spaces();
     try {
       while (!isNextDivisionEofOrEop()) {
-        consume();
+        if (isParagraph()) {
+          paragraph();
+        } else if (isSection()) {
+          section();
+        } else {
+          statement();
+        }
+        spaces();
       }
     } finally {
       ctx.popAndAttach();
     }
+  }
+
+  private void section() {
+    spaces();
+    ctx.push(new Section());
+    consume();
+    spaces();
+    consume("SECTION");
+    spaces();
+    consume(".");
+    spaces();
+    try {
+      while (!isNextDivisionEofOrEop() && !isParagraph() && !isSection()) {
+        statement();
+        spaces();
+      }
+    } finally {
+      ctx.popAndAttach();
+    }
+  }
+
+  private boolean isSection() {
+    return matchSeq(null, "SECTION", ".");
+  }
+
+  private void paragraph() {
+    spaces();
+    ctx.push(new Paragraph());
+    consume();
+    spaces();
+    consume(".");
+    spaces();
+    try {
+      while (!isNextDivisionEofOrEop() && !isParagraph() && !isSection()) {
+        statement();
+        spaces();
+      }
+    } finally {
+      ctx.popAndAttach();
+    }
+  }
+
+  private void statement() {
+    ctx.push(new Statement());
+    try {
+      while (!match(".") && ctx.getLexer().hasMore()) {
+        consume();
+      }
+      optional(".");
+    } finally {
+      ctx.popAndAttach();
+    }
+  }
+
+  private boolean isParagraph() {
+    return matchSeq(null, ".");
   }
 
   private void dataDivisionContent() {
@@ -333,7 +400,11 @@ public class CobolParser {
 
   boolean sameLexeme(Token lexemeToken, String expectedLexeme, Double threshold) {
     threshold = threshold == null ? settings.getFuzzyMatchThreshold() : threshold;
-    if (lexemeToken == null || lexemeToken.getLexeme() == null || expectedLexeme == null) {
+    // TODO: better matchers, for now it's ANY token when it's null
+    if (expectedLexeme == null) {
+      return true;
+    }
+    if (lexemeToken.getLexeme() == null || expectedLexeme == null) {
       return false;
     }
     /*
