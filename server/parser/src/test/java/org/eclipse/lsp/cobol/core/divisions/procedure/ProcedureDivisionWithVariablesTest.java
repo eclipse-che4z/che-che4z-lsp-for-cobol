@@ -10,11 +10,9 @@
  *
  * Contributors:
  *    Broadcom, Inc. - initial API and implementation
- *    DAF Trucks NV – implementation of DaCo COBOL statements
- *    and DAF development standards
  *
  */
-package org.eclipse.lsp.cobol.core.divisions;
+package org.eclipse.lsp.cobol.core.divisions.procedure;
 
 import org.eclipse.lsp.cobol.core.hw.CobolLexer;
 import org.eclipse.lsp.cobol.core.hw.CobolParser;
@@ -23,20 +21,21 @@ import org.eclipse.lsp.cobol.core.hw.ParserSettings;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Parser test for identification division
+ * Procedure Division With Variables Test
  */
-class IdentificationDivisionTests {
-  //  https://www.ibm.com/docs/en/cobol-zos/6.4?topic=division-program-id-paragraph
+class ProcedureDivisionWithVariablesTest {
   @Test
   void test() {
-    String source = "IDENTIFICATION DIVISION.\n"
-            + "PROGRAM-ID. PRG IS COMMON.";
-    CobolParser cobolParser = new CobolParser(new CobolLexer(source), new ParserSettings());
-    ParseResult parseResult = cobolParser.parse();
-    String reconstructed = parseResult.getSourceUnit().toText();
-    assertEquals(0, parseResult.getDiagnostics().size(), parseResult.getDiagnostics().toString());
-    assertEquals(source, reconstructed);
+    String source =
+        "       IDENTIFICATION DIVISION.\n"
+            + "          PROGRAM-ID. TEST1.\n"
+            + "          PROCEDURE DIVISION USING var1, var2,\n"
+            + "           var3, var4.";
+    ParseResult parseResult = new CobolParser(new CobolLexer(source), new ParserSettings()).parse();
+    assertTrue(parseResult.getDiagnostics().isEmpty());
+    assertEquals(source, parseResult.getSourceUnit().toText());
   }
 }

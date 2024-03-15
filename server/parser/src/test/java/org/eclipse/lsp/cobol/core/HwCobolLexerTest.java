@@ -48,18 +48,30 @@ class HwCobolLexerTest {
   @Test
   void newLine() {
     CobolLexer lexer = new CobolLexer("A \n B");
-    assertToken(lexer.forward(GrammarRule.ProgramUnit).get(0), "A", 0, 0);
-    assertToken(lexer.forward(GrammarRule.ProgramUnit).get(0), " ", 0, 1);
-    assertToken(lexer.forward(GrammarRule.ProgramUnit).get(0), "\n", 0, 2);
-    assertToken(lexer.forward(GrammarRule.ProgramUnit).get(0), " ", 1, 0);
-    assertToken(lexer.forward(GrammarRule.ProgramUnit).get(0), "B", 1, 1);
+    assertToken(lexer.forward(GrammarRule.ProgramUnit).get(0), "A", 0, 0, 0);
+    assertToken(lexer.forward(GrammarRule.ProgramUnit).get(0), " ", 0, 1, 1);
+    assertToken(lexer.forward(GrammarRule.ProgramUnit).get(0), "\n", 0, 2, 2);
+    assertToken(lexer.forward(GrammarRule.ProgramUnit).get(0), " ", 1, 0, 3);
+    assertToken(lexer.forward(GrammarRule.ProgramUnit).get(0), "B", 1, 1, 4);
     assertFalse(lexer.hasMore());
   }
 
-  private static void assertToken(Token token, String lexeme, int line, int charPos) {
-    assertEquals(lexeme, token.getLexeme());
-    assertEquals(line, token.getLine());
-    assertEquals(charPos, token.getStartPositionInLine());
+  @Test
+  void peekTest() {
+    CobolLexer lexer = new CobolLexer("Aa\n  B");
+    assertToken(lexer.peek(GrammarRule.ProgramUnit).get(0), "Aa", 0, 0, 0);
+    assertToken(lexer.peek(GrammarRule.ProgramUnit).get(0), "Aa", 0, 0, 0);
+    assertToken(lexer.forward(GrammarRule.ProgramUnit).get(0), "Aa", 0, 0, 0);
+    assertToken(lexer.peek(GrammarRule.ProgramUnit).get(0), "\n", 0, 2, 2);
+    assertToken(lexer.forward(GrammarRule.ProgramUnit).get(0), "\n", 0, 2, 2);
+    assertToken(lexer.peek(GrammarRule.ProgramUnit).get(0), "  ", 0, 0, 3);
+  }
+
+  private static void assertToken(Token token, String lexeme, int line, int charPos, int index) {
+    assertEquals(lexeme, token.getLexeme(), "lexeme");
+    assertEquals(line, token.getLine(), "line");
+    assertEquals(charPos, token.getStartPositionInLine(), "char in line position");
+    assertEquals(index, token.getIndex(), "index");
   }
 
   private static String tokenContent(CobolLexer lexer) {

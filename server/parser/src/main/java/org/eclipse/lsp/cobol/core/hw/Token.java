@@ -50,4 +50,16 @@ public class Token extends CstNodeImpl {
   public String toText() {
     return lexeme;
   }
+
+  @Override
+  public String toString() {
+    return "Token{"
+            + "line=" + line
+            + ", startPositionInLine="
+            + startPositionInLine
+            + ", lexeme='" + lexeme + '\''
+            + ", index=" + index
+            + ", type=" + type
+            + '}';
+  }
 }

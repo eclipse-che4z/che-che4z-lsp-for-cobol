@@ -93,14 +93,14 @@ class HwCobolParserTest {
   @Test
   void twoProgramsIsRecursive() {
     final String source =
-            "ID DIVISION. PROGRAM-ID Pr1 IS RECURSIVE PROGRAM\n"
-                    + "END PROGRAM Pr1.\n"
-                    + "ID DIVISION. PROGRAM-ID. Pr2 IS PROGRAM.\n"
-                    + "END PROGRAM Pr2.\n";
+            "        ID DIVISION. PROGRAM-ID Pr1 IS RECURSIVE PROGRAM\n"
+                    + "       END PROGRAM Pr1.\n"
+                    + "       ID DIVISION. PROGRAM-ID. Pr2 IS PROGRAM.\n"
+                    + "       END PROGRAM Pr2.\n";
     CobolParser cobolParser = new CobolParser(new CobolLexer(source), new ParserSettings());
     SourceUnit su = cobolParser.parse().getSourceUnit();
-    assertEquals(7, su.getChildren().size());
-    ProgramUnit pu1 = (ProgramUnit) su.getChildren().get(0);
+    assertEquals(9, su.getChildren().size());
+    ProgramUnit pu1 = (ProgramUnit) su.getChildren().get(01);
     assertEquals("Pr1", pu1.getName());
     assertEquals(source, su.toText());
   }
@@ -109,18 +109,18 @@ class HwCobolParserTest {
   @Test
   void nestedPrograms() {
     final String source =
-            "ID DIVISION. PROGRAM-ID. Pr1.\n"
-                    + "ID DIVISION. PROGRAM-ID. Pr2.\n"
-                    + "END PROGRAM Pr2.\n"
-                    + "END PROGRAM Pr1.\n";
+            "       ID DIVISION. PROGRAM-ID. Pr1.\n"
+                    + "       ID DIVISION. PROGRAM-ID. Pr2.\n"
+                    + "       END PROGRAM Pr2.\n"
+                    + "       END PROGRAM Pr1.\n";
     CobolParser cobolParser = new CobolParser(new CobolLexer(source), new ParserSettings());
     ParseResult parseResult = cobolParser.parse();
     SourceUnit su = parseResult.getSourceUnit();
     assertEquals(Collections.emptyList(), parseResult.getDiagnostics());
-    assertEquals(1, su.getChildren().size());
-    ProgramUnit pu = (ProgramUnit) su.getChildren().get(0);
+    assertEquals(2, su.getChildren().size());
+    ProgramUnit pu = (ProgramUnit) su.getChildren().get(1);
     assertEquals("Pr1", pu.getName());
-    ProgramUnit npu = (ProgramUnit) pu.getChildren().get(2); // TODO: find program node
+    ProgramUnit npu = (ProgramUnit) pu.getChildren().get(1); // TODO: find program node
     assertEquals("Pr2", npu.getName());
 
     assertEquals(source, su.toText());
