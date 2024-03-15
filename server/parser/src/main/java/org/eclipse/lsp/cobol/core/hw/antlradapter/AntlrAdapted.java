@@ -18,6 +18,7 @@ package org.eclipse.lsp.cobol.core.hw.antlradapter;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.eclipse.lsp.cobol.core.cst.base.CstNodeImpl;
+import org.eclipse.lsp.cobol.core.hw.Token;
 
 /**
  * AntlrIsland node

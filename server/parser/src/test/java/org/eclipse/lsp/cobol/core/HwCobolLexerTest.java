@@ -48,18 +48,19 @@ class HwCobolLexerTest {
   @Test
   void newLine() {
     CobolLexer lexer = new CobolLexer("A \n B");
-    assertToken(lexer.forward(GrammarRule.ProgramUnit).get(0), "A", 0, 0);
-    assertToken(lexer.forward(GrammarRule.ProgramUnit).get(0), " ", 0, 1);
-    assertToken(lexer.forward(GrammarRule.ProgramUnit).get(0), "\n", 0, 2);
-    assertToken(lexer.forward(GrammarRule.ProgramUnit).get(0), " ", 1, 0);
-    assertToken(lexer.forward(GrammarRule.ProgramUnit).get(0), "B", 1, 1);
+    assertToken(lexer.forward(GrammarRule.ProgramUnit).get(0), "A", 0, 0, 0);
+    assertToken(lexer.forward(GrammarRule.ProgramUnit).get(0), " ", 0, 1, 1);
+    assertToken(lexer.forward(GrammarRule.ProgramUnit).get(0), "\n", 0, 2, 2);
+    assertToken(lexer.forward(GrammarRule.ProgramUnit).get(0), " ", 1, 0, 3);
+    assertToken(lexer.forward(GrammarRule.ProgramUnit).get(0), "B", 1, 1, 4);
     assertFalse(lexer.hasMore());
   }
 
-  private static void assertToken(Token token, String lexeme, int line, int charPos) {
+  private static void assertToken(Token token, String lexeme, int line, int charPos, int index) {
     assertEquals(lexeme, token.getLexeme());
     assertEquals(line, token.getLine());
     assertEquals(charPos, token.getStartPositionInLine());
+    assertEquals(index, token.getIndex());
   }
 
   private static String tokenContent(CobolLexer lexer) {

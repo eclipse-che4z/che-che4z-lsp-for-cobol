@@ -186,7 +186,7 @@ public class CobolParser {
         parseProgram();
       }
 
-      if (matchSeq("END", "PROGRAM")) {
+      if (isEndOfProgram()) {
         spaces();
         consume("END");
         spaces();
@@ -201,6 +201,10 @@ public class CobolParser {
     }
   }
 
+  private boolean isEndOfProgram() {
+    return matchSeq("END", "PROGRAM");
+  }
+
   private void procedureDivisionContent() {
     spaces();
     ctx.push(new ProcedureDivision());
@@ -209,8 +213,9 @@ public class CobolParser {
     consume("DIVISION");
     optional(".");
     spaces();
+    ((ProcedureDivision)ctx.peek()).setBodyStartToken(ctx.getLexer().peek(null).get(0));
     try {
-      while (!isNextDivisionEofOrEop()) {
+      while (!isNextDivisionEofOrEop() && !isEndOfProgram()) {
         if (isParagraph()) {
           paragraph();
         } else if (isSection()) {
@@ -234,8 +239,9 @@ public class CobolParser {
     spaces();
     consume(".");
     spaces();
+    ((Section)ctx.peek()).setBodyStartToken(ctx.getLexer().peek(null).get(0));
     try {
-      while (!isNextDivisionEofOrEop() && !isParagraph() && !isSection()) {
+      while (!isNextDivisionEofOrEop() && !isParagraph() && !isSection() && !isEndOfProgram()) {
         statement();
         spaces();
       }
@@ -256,7 +262,7 @@ public class CobolParser {
     consume(".");
     spaces();
     try {
-      while (!isNextDivisionEofOrEop() && !isParagraph() && !isSection()) {
+      while (!isNextDivisionEofOrEop() && !isParagraph() && !isSection() && !isEndOfProgram()) {
         statement();
         spaces();
       }
@@ -327,7 +333,7 @@ public class CobolParser {
             || matchSeq("ID", "DIVISION", ".")
             || matchSeq("DATA", "DIVISION", ".")
             || matchSeq("PROCEDURE", "DIVISION")
-            || matchSeq("END", "PROGRAM")
+            || isEndOfProgram()
             || isEOF(ctx.getLexer().peek(ctx.peek().getRule()).get(0));
   }
 

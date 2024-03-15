@@ -26,6 +26,7 @@ public final class ParserUtils {
   private static final String HW_PARSER = "hw.parser";
 
   public static boolean isHwParserEnabled() {
-    return System.getenv(HW_PARSER) != null ||  System.getProperty(HW_PARSER) != null;
+    return true;
+//    return System.getenv(HW_PARSER) != null ||  System.getProperty(HW_PARSER) != null;
   }
 }
