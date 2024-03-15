@@ -125,18 +125,6 @@ public class TransformTreeStage implements Stage<ProcessingResult, ParserStageRe
     return syntaxTree;
   }
 
-  private void addEmbeddedNodes(Node rootNode, List<Node> embeddedNodes) {
-    for (Node dialectNode : embeddedNodes) {
-      Optional<Node> nodeByPosition =
-          RangeUtils.findNodeByPosition(
-              rootNode,
-              dialectNode.getLocality().getUri(),
-              dialectNode.getLocality().getRange().getStart());
-
-      nodeByPosition.orElse(rootNode).addChild(dialectNode);
-    }
-  }
-
   private Node processSyntaxTree(AnalysisConfig analysisConfig, SymbolAccumulatorService symbolAccumulatorService, AnalysisContext ctx, List<Node> syntaxTree) {
     Node rootNode = syntaxTree.get(0);
     addCopyNodes(ctx, rootNode);

@@ -19,7 +19,7 @@ package org.eclipse.lsp.cobol.core.divisions.procedure;
 import org.eclipse.lsp.cobol.core.cst.ProgramUnit;
 import org.eclipse.lsp.cobol.core.cst.procedure.Paragraph;
 import org.eclipse.lsp.cobol.core.cst.procedure.ProcedureDivision;
-import org.eclipse.lsp.cobol.core.cst.procedure.Section;
+import org.eclipse.lsp.cobol.core.cst.procedure.Statement;
 import org.eclipse.lsp.cobol.core.hw.CobolLexer;
 import org.eclipse.lsp.cobol.core.hw.CobolParser;
 import org.eclipse.lsp.cobol.core.hw.ParseResult;
@@ -30,30 +30,30 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Test that HW parser can understand sections.
+ * Test that HW parser can understand end of program.
  */
-class SectionTest {
+class EndProgramTest {
   @Test
   void test() {
-    String source = "IDENTIFICATION DIVISION.\n"
-            + "       PROGRAM-ID.  SECTST.\n"
+    String source = "ID DIVISION. PROGRAM-ID. str1.\n"
             + "       PROCEDURE DIVISION.\n"
             + "           DISPLAY 'OUT'.\n"
-            + "           GO TO PARAG1.\n"
-            + "       SECT1 SECTION.\n"
-            + "           DISPLAY 'SECT1'.\n"
             + "       PARAG1.\n"
             + "           DISPLAY 'PARAG1'.\n"
-            + "           PERFORM PARAG2 OF SECT2.\n"
-            + "       SECT2 SECTION.\n"
             + "       PARAG2.\n"
-            + "           DISPLAY 'PARAG2'.";
+            + "           DISPLAY 'PARAG2'.\n"
+            + "       END PROGRAM str1.\n";
+
     ParseResult parseResult = new CobolParser(new CobolLexer(source), new ParserSettings()).parse();
     assertTrue(parseResult.getDiagnostics().isEmpty());
     ProgramUnit pu = (ProgramUnit) parseResult.getSourceUnit().getChildren().get(0);
     ProcedureDivision pd = (ProcedureDivision) pu.getChildren().get(1);
     assertEquals(2, pd.getChildren().stream().filter(Paragraph.class::isInstance).count());
-    assertEquals(2, pd.getChildren().stream().filter(Section.class::isInstance).count());
+    Paragraph p1 = (Paragraph) pd.getChildren().get(9);
+    Paragraph p2 = (Paragraph) pd.getChildren().get(10);
+    assertEquals(1, pd.getChildren().stream().filter(Statement.class::isInstance).count());
+    assertEquals(1, p1.getChildren().stream().filter(Statement.class::isInstance).count());
+    assertEquals(1, p2.getChildren().stream().filter(Statement.class::isInstance).count());
     // TODO: check if everything is in the place
 
     assertEquals(source, parseResult.getSourceUnit().toText());

@@ -53,7 +53,7 @@ public class CobolLexer {
       return Collections.singletonList(new Token("", position.getLine(), position.getCharacter(), position.getIndex(), TokenType.EOF));
     }
     String lexeme = scan(rule, false);
-    Token token = new Token(lexeme, lastTokenStartPosition.getLine(), lastTokenStartPosition.getCharacter(), position.getIndex(), detectType(rule, lexeme));
+    Token token = new Token(lexeme, lastTokenStartPosition.getLine(), lastTokenStartPosition.getCharacter(), position.getIndex() - lexeme.length(), detectType(rule, lexeme));
     return Collections.singletonList(token);
   }
 
@@ -67,7 +67,7 @@ public class CobolLexer {
       return Collections.singletonList(new Token("", position.getLine(), position.getCharacter(), position.getIndex(), TokenType.EOF));
     }
     String lexeme = scan(rule, true);
-    Token token = new Token(lexeme, lastTokenStartPosition.getLine(), lastTokenStartPosition.getCharacter(), position.getIndex(), detectType(rule, lexeme));
+    Token token = new Token(lexeme, lastTokenStartPosition.getLine(), position.getCharacter(), position.getIndex(), detectType(rule, lexeme));
     return Collections.singletonList(token);
   }
 

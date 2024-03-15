@@ -28,6 +28,7 @@ import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.message.MessageServiceProvider;
 import org.eclipse.lsp.cobol.core.CobolLexer;
 import org.eclipse.lsp.cobol.core.CobolParser;
+import org.eclipse.lsp.cobol.core.MessageServiceParser;
 
 /**
  * This implementation of the error strategy customizes error messages that are extracted from the
@@ -284,7 +285,7 @@ public class CobolErrorStrategy extends DefaultErrorStrategy implements MessageS
       ttype = recognizer.getInputStream().LA(1);
     }
     if (skipTokenCount > 0) {
-      CobolParser cobolParser = (CobolParser) recognizer;
+      MessageServiceParser cobolParser = (MessageServiceParser) recognizer;
       ANTLRErrorListener errorListenerDispatch = cobolParser.getErrorListenerDispatch();
       CommonToken offendingToken = new CommonToken(sToken);
       Token lastToken = recognizer.getInputStream().LT(-1);

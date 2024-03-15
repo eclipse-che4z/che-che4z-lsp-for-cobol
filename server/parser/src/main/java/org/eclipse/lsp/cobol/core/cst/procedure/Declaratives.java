@@ -16,16 +16,10 @@
  */
 package org.eclipse.lsp.cobol.core.cst.procedure;
 
-import lombok.Getter;
-import lombok.Setter;
 import org.eclipse.lsp.cobol.core.cst.base.CstNodeImpl;
-import org.eclipse.lsp.cobol.core.hw.Token;
 
 /**
- * ProcedureDivision node.
+ *  Declaratives.
  */
-public class ProcedureDivision extends CstNodeImpl {
-  // TODO: im now sure that keeping a start token of procedure division body is a good idea.
-  @Getter @Setter
-  Token bodyStartToken;
+public class Declaratives extends CstNodeImpl {
 }
