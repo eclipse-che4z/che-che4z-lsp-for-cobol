@@ -39,7 +39,7 @@ class TestMappingMultilineVariable {
       + "006600                                                                  NC2054.2\n"
       + "006700     X(10)                                                   VALUENC2054.2\n"
       + "006900     \"ABCDE12345\".                                                NC2054.2\n"
-      + "007100 77  {$*SPACING-RECEIVE|1}    {PICTUREQ|2}                                  NC2054.2\n";
+      + "007100 77  {$*SPACING-RECEIVE|1}    {PICTUREQ|2|3}                                  NC2054.2\n";
 
   @Test
   void test() {
@@ -56,9 +56,15 @@ class TestMappingMultilineVariable {
             "2",
             new Diagnostic(
                 new Range(),
-                "Syntax error on 'PICTUREQ'",
+                "Extraneous input 'PICTUREQ'",
                 Error,
-                    ErrorSource.PARSING.getText())
+                    ErrorSource.PARSING.getText()),
+                "3",
+                new Diagnostic(
+                        new Range(),
+                        "A period was assumed before \"PICTUREQ\".",
+                        Error,
+                        ErrorSource.PARSING.getText())
         ),
         ImmutableList.of(),
         AnalysisConfig.defaultConfig(CopybookProcessingMode.DISABLED));

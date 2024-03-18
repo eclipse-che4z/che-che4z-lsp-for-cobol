@@ -31,7 +31,7 @@ class TestOccursToDoesNotProduceExceptions {
           + "       PROGRAM-ID.    MNEM.\n"
           + "       DATA DIVISION.\n"
           + "       working-storage section.\n"
-          + "       01 {$*ABCD} OCCURS 5 TO{|1}";
+          + "       01 {$*ABCD} OCCURS 5 TO{|1|2}";
 
   @Test
   void test() {
@@ -41,6 +41,15 @@ class TestOccursToDoesNotProduceExceptions {
         ImmutableMap.of(
             "1",
             new Diagnostic(
-                new Range(), "Unexpected end of file", DiagnosticSeverity.Error,  ErrorSource.PARSING.getText())));
+                new Range(),
+                "Unexpected end of file",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()),
+            "2",
+            new Diagnostic(
+                new Range(),
+                "A period was assumed before \"<EOF>\".",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
   }
 }

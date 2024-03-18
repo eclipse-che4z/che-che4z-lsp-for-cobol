@@ -41,13 +41,15 @@ class TestSyntaxErrorTraversedThroughHierarchy {
           + "       WORKING-STORAGE SECTION.\n"
           + "       PROCEDURE DIVISION.\n"
           + "       {_COPY {~CONT}.|1_}\n"
-          + "       {#*MAINLINE}. \n"
+          //              + "       {#*MAINLINE}. \n"
+          + "       MAINLINE. \n"
           + "           GOBACK. ";
 
   private static final String CONT = "       {_COPY {~REPL}.|1_}";
   private static final String CONT_NAME = "CONT";
 
-  private static final String REPL = "       {@*05} {@*TAG-ID|3} {PIC|4} 9.\n";
+  //  private static final String REPL = "       {@*05} {@*TAG-ID|3} {PIC|4|5} 9.\n";
+  private static final String REPL = "       {#*05} {#*TAG-ID|3} {PIC|4|5} 9.\n";
   private static final String REPL_NAME = "REPL";
 
   @Test
@@ -66,14 +68,17 @@ class TestSyntaxErrorTraversedThroughHierarchy {
             "3",
             new Diagnostic(
                 new Range(),
-                "Syntax error on 'TAG-ID'",
+                "A period was assumed before \"TAG-ID\".",
                 Error,
                 ErrorSource.PARSING.getText(),
                 null),
             "4",
             new Diagnostic(
+                new Range(), "Syntax error on 'PIC'", Error, ErrorSource.PARSING.getText(), null),
+            "5",
+            new Diagnostic(
                 new Range(),
-                "Syntax error on 'PIC'",
+                "A period was assumed before \"PIC\".",
                 Error,
                 ErrorSource.PARSING.getText(),
                 null)));

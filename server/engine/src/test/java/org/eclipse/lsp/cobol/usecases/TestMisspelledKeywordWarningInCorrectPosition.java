@@ -38,8 +38,10 @@ class TestMisspelledKeywordWarningInCorrectPosition {
           + "4       COPY {~STRUC1}. \n"
           + "5      Procedure Division.\n"
           + "6      {#*000-Main-Logic}.\n"
-          + "7          {@*DISPLA|misspelled|area} {\"hello\"|hello}.\n"
-          + "8          DISPLAY {$CHILD1} OF {$PARENT1}.\n"
+          //          + "7          {@*DISPLA|area} {\"hello\"|hello|dot}.\n"
+          + "7          {#*DISPLA|area} {\"hello\"|hello|dot}.\n"
+          //          + "8          DISPLAY {$CHILD1} OF {$PARENT1}.\n"
+          + "8          DISPLAY CHILD1 OF PARENT1.\n"
           + "9      End program ProgramId.";
 
   private static final String STRUC1 =
@@ -56,12 +58,6 @@ class TestMisspelledKeywordWarningInCorrectPosition {
         TEXT,
         ImmutableList.of(new CobolText(STRUC1_NAME, STRUC1)),
         ImmutableMap.of(
-            "misspelled",
-            new Diagnostic(
-                new Range(),
-                "A misspelled word, maybe you want to put DISPLAY",
-                Warning,
-                ErrorSource.PARSING.getText()),
             "area",
             new Diagnostic(
                 new Range(),
@@ -70,6 +66,12 @@ class TestMisspelledKeywordWarningInCorrectPosition {
                 ErrorSource.PARSING.getText()),
             "hello",
             new Diagnostic(
-                new Range(), "Syntax error on '\"hello\"'", Error, ErrorSource.PARSING.getText())));
+                new Range(), "Syntax error on '\"hello\"'", Error, ErrorSource.PARSING.getText()),
+            "dot",
+            new Diagnostic(
+                new Range(),
+                "A period was assumed before \"\"hello\"\".",
+                Error,
+                ErrorSource.PARSING.getText())));
   }
 }
