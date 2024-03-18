@@ -32,7 +32,7 @@ import static org.junit.jupiter.api.Assumptions.assumeFalse;
 class TestSemicolonNotAllowedInIdentificationDivision {
   private static final String TEXT =
       "       IDENTIFICATION DIVISION;\n"
-          + "       {PROGRAM-ID|1}{.|2} TEST1.\n"
+          + "       {PROGRAM-ID|1}. TEST1.\n"
           + "       DATA DIVISION.\n"
           + "       working-storage section.\n"
           + "       01 {$*LINE-SPACING} PIC 9.\n"
@@ -53,13 +53,7 @@ class TestSemicolonNotAllowedInIdentificationDivision {
             "1",
             new Diagnostic(
                 new Range(),
-                    "Extraneous input 'PROGRAM-ID'",
-                DiagnosticSeverity.Error,
-                ErrorSource.PARSING.getText()),
-            "2",
-            new Diagnostic(
-                new Range(),
-                "Missing token PROGRAM-ID at programIdParagraph",
+                "A period was assumed before \"PROGRAM-ID\".",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())));
   }

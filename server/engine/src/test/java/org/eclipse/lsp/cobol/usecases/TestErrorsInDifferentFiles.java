@@ -41,11 +41,14 @@ class TestErrorsInDifferentFiles {
           + "4      Procedure Division.\n"
           + "5      {#*000-Main-Logic}.\n"
           + "6      {_COPY {~ASDASD}.|error_} \n"
-          + "7          DISPLAY {CHILD1|invalid}.\n"
+          + "7          DISPLAY CHILD1.\n"
           + "8      End program ProgramId.";
 
+//  private static final String ASDASD =
+//      "           {@*03|areaA11}  {@*CHILD1|child11|areaA22}         {PIC|pic1|dot} 9   VALUE IS '0'.";
+
   private static final String ASDASD =
-      "           {@*03|areaA11}  {@*CHILD1|child11|areaA22}         {PIC|pic1} 9   VALUE IS '0'.";
+          "           {#*03|areaA11}  {#*CHILD1|child11|areaA22}         {PIC|pic1|dot} 9   VALUE IS '0'.";
 
   private static final String ASDASD_NAME = "ASDASD";
 
@@ -56,36 +59,25 @@ class TestErrorsInDifferentFiles {
         ImmutableList.of(new CobolText(ASDASD_NAME, ASDASD)),
         new ImmutableMap.Builder<String, Diagnostic>()
             .put(
-                "invalid",
-                new Diagnostic(
-                    new Range(),
-                    "Variable CHILD1 is not defined",
-                    Error,
-                    ErrorSource.PARSING.getText()))
-            .put(
                 "pic",
                 new Diagnostic(
-                    new Range(),
-                    "Syntax error on 'PIC'",
-                    Error,
-                    ErrorSource.COPYBOOK.getText())).put(
+                    new Range(), "Syntax error on 'PIC'", Error, ErrorSource.COPYBOOK.getText()))
+            .put(
                 "pic1",
                 new Diagnostic(
-                    new Range(),
-                    "Syntax error on 'PIC'",
-                    Error,
-                    ErrorSource.PARSING.getText()))
+                    new Range(), "Syntax error on 'PIC'", Error, ErrorSource.PARSING.getText()))
             .put(
                 "child1",
                 new Diagnostic(
                     new Range(),
-                    "Syntax error on 'CHILD1'",
+                    "A period was assumed before \"CHILD1\".",
                     Error,
-                    ErrorSource.COPYBOOK.getText())).put(
+                    ErrorSource.COPYBOOK.getText()))
+            .put(
                 "child11",
                 new Diagnostic(
                     new Range(),
-                    "Syntax error on 'CHILD1'",
+                    "A period was assumed before \"CHILD1\".",
                     Error,
                     ErrorSource.PARSING.getText()))
             .put(
@@ -94,7 +86,8 @@ class TestErrorsInDifferentFiles {
                     new Range(),
                     "The following token must start in Area A: 03",
                     Warning,
-                    ErrorSource.COPYBOOK.getText())) .put(
+                    ErrorSource.COPYBOOK.getText()))
+            .put(
                 "areaA11",
                 new Diagnostic(
                     new Range(),
@@ -108,12 +101,19 @@ class TestErrorsInDifferentFiles {
                     "Errors inside the copybook",
                     Error,
                     ErrorSource.COPYBOOK.getText()))
-                .put(
+            .put(
                 "areaA22",
                 new Diagnostic(
                     new Range(),
                     "The following token must start in Area A: CHILD1",
                     Warning,
+                    ErrorSource.PARSING.getText()))
+            .put(
+                "dot",
+                new Diagnostic(
+                    new Range(),
+                    "A period was assumed before \"PIC\".",
+                        Error,
                     ErrorSource.PARSING.getText()))
             .build());
   }

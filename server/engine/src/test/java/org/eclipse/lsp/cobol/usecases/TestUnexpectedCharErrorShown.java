@@ -31,13 +31,13 @@ import static org.junit.jupiter.api.Assumptions.assumeFalse;
 class TestUnexpectedCharErrorShown {
 
   private static final String TEXT =
-      "        IDENTIFICATION DIVISION{?|typo}.\r\n"
+      "        IDENTIFICATION DIVISION{?|typo|dot}.\r\n"
           + "        PROGRAM-ID. test1.\r\n"
           + "        DATA DIVISION.\r\n"
           + "        PROCEDURE DIVISION.\r\n"
-          + "        END PROGRAM test1.";
+          + "        END PROGRAM {test1|1}.";
 
-  private static final String MESSAGE = "Extraneous input '?'";
+  private static final String MESSAGE = "Syntax error on '?'";
 
   @BeforeAll
   public static void beforeMethod() {
@@ -51,6 +51,19 @@ class TestUnexpectedCharErrorShown {
         ImmutableList.of(),
         ImmutableMap.of(
             "typo",
-            new Diagnostic(new Range(), MESSAGE, DiagnosticSeverity.Error, ErrorSource.PARSING.getText())));
+            new Diagnostic(
+                new Range(), MESSAGE, DiagnosticSeverity.Error, ErrorSource.PARSING.getText()),
+            "dot",
+            new Diagnostic(
+                new Range(),
+                "A period was assumed before \"?\".",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()),
+                "1",
+                new Diagnostic(
+                        new Range(),
+                        "There is an issue with PROGRAM-ID paragraph",
+                        DiagnosticSeverity.Warning,
+                        ErrorSource.PARSING.getText())));
   }
 }
