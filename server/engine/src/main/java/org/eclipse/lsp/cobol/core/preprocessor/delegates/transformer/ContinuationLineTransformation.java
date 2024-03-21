@@ -16,9 +16,8 @@ package org.eclipse.lsp.cobol.core.preprocessor.delegates.transformer;
 
 import static java.util.Optional.ofNullable;
 import static org.eclipse.lsp.cobol.common.error.ErrorSeverity.ERROR;
-import static org.eclipse.lsp.cobol.core.preprocessor.delegates.rewriter.CobolLineIndicatorProcessorImpl.FLOATING_COMMENT_LINE;
+import static org.eclipse.lsp.cobol.core.preprocessor.delegates.rewriter.LineIndicatorProcessor.FLOATING_COMMENT_LINE;
 
-import com.google.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -36,7 +35,6 @@ import org.eclipse.lsp.cobol.core.model.CobolLineTypeEnum;
 import org.eclipse.lsp.cobol.core.preprocessor.CobolLine;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.reader.CompilerDirectives;
 import org.eclipse.lsp.cobol.service.settings.layout.CobolProgramLayout;
-import org.eclipse.lsp.cobol.service.settings.layout.CodeLayoutStore;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
@@ -51,16 +49,13 @@ import org.eclipse.lsp4j.Range;
  * the preceding line is assumed to be followed by a space.
  */
 @Slf4j
-public class ContinuationLineTransformation implements CobolLinesTransformation {
+public abstract class ContinuationLineTransformation implements CobolLinesTransformation {
   private static final Pattern BLANK_LINE_PATTERN = Pattern.compile("\\s*");
   private static final String PSEUDO_TEXT_DELIMITER = "=";
   private final MessageService messageService;
-  private final CodeLayoutStore codeLayoutStore;
 
-  @Inject
-  public ContinuationLineTransformation(MessageService messageService, CodeLayoutStore codeLayoutStore) {
+  public ContinuationLineTransformation(MessageService messageService) {
     this.messageService = messageService;
-    this.codeLayoutStore = codeLayoutStore;
   }
 
   @Override
@@ -109,7 +104,7 @@ public class ContinuationLineTransformation implements CobolLinesTransformation 
   private SyntaxError checkCompilerDirectiveContinued(
       CobolLine cobolLine, String uri, int lineNumber) {
     if (isCompilerDirectiveStatement(cobolLine)) {
-      CobolProgramLayout codeLayout = codeLayoutStore.getCodeLayout();
+      CobolProgramLayout codeLayout = getCodeLayout();
       return SyntaxError.syntaxError()
           .errorSource(ErrorSource.PREPROCESSING)
           .severity(ERROR)
@@ -240,7 +235,7 @@ public class ContinuationLineTransformation implements CobolLinesTransformation 
     boolean isMissingSpace = !floatingCommentMatcher.group("validText").endsWith(" ");
     if (isMissingSpace) {
       int floatingCommentIndex = floatingCommentMatcher.start("floatingComment");
-      return (floatingCommentIndex == 0) ? null : (floatingCommentIndex + codeLayoutStore.getCodeLayout().getSequenceLength());
+      return (floatingCommentIndex == 0) ? null : (floatingCommentIndex + getCodeLayout().getSequenceLength());
     }
     return null;
   }
@@ -318,7 +313,7 @@ public class ContinuationLineTransformation implements CobolLinesTransformation 
   }
 
   private SyntaxError registerContinuationLineError(String uri, int lineNumber, int countingSpace) {
-    CobolProgramLayout codeLayout = codeLayoutStore.getCodeLayout();
+    CobolProgramLayout codeLayout = getCodeLayout();
     int startPosition = codeLayout.getSequenceLength() + codeLayout.getIndicatorLength() + countingSpace;
     SyntaxError error =
         SyntaxError.syntaxError().errorSource(ErrorSource.PREPROCESSING)

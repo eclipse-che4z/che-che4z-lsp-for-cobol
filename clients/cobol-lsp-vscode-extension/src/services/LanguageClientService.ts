@@ -25,7 +25,7 @@ import {
   LanguageClientOptions,
   StreamInfo,
 } from "vscode-languageclient/node";
-import { LANGUAGE_ID } from "../constants";
+import { HP_LANGUAGE_ID, LANGUAGE_ID } from "../constants";
 import { JavaCheck } from "./JavaCheck";
 import { NativeExecutableService } from "./nativeLanguageClient/nativeExecutableService";
 import { TelemetryService } from "./reporter/TelemetryService";
@@ -130,7 +130,7 @@ export class LanguageClientService {
 
   private createClientOptions(): LanguageClientOptions {
     return {
-      documentSelector: [LANGUAGE_ID],
+      documentSelector: [LANGUAGE_ID, HP_LANGUAGE_ID],
       outputChannel: this.outputChannel,
       synchronize: {
         fileEvents: [

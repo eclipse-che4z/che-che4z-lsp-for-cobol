@@ -26,6 +26,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonPrimitive;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import org.eclipse.lsp.cobol.common.message.LocaleStore;
 import org.eclipse.lsp.cobol.common.message.MessageService;
@@ -37,7 +38,6 @@ import org.eclipse.lsp.cobol.service.copybooks.CopybookNameService;
 import org.eclipse.lsp.cobol.service.delegates.completions.Keywords;
 import org.eclipse.lsp.cobol.service.settings.SettingsService;
 import org.eclipse.lsp.cobol.service.settings.SettingsServiceImpl;
-import org.eclipse.lsp.cobol.service.settings.layout.CobolProgramLayout;
 import org.eclipse.lsp.cobol.service.settings.layout.CodeLayoutStore;
 import org.eclipse.lsp4j.DidChangeConfigurationParams;
 import org.junit.jupiter.api.Test;
@@ -78,7 +78,7 @@ class DidChangeConfigurationHandlerTest {
         when(settingsService.fetchConfiguration(LOGGING_LEVEL.label))
                 .thenReturn(completedFuture(singletonList("INFO")));
         when(settingsService.fetchConfiguration(COBOL_PROGRAM_LAYOUT.label))
-                .thenReturn(completedFuture(ImmutableList.of(new CobolProgramLayout())));
+                .thenReturn(completedFuture(ImmutableList.of(CobolLanguageId.COBOL.getLayout())));
         when(watchingService.getWatchingFolders()).thenReturn(emptyList());
         when(localeStore.notifyLocaleStore()).thenReturn(e -> {});
 
@@ -121,7 +121,7 @@ class DidChangeConfigurationHandlerTest {
         when(settingsService.fetchConfiguration(LOGGING_LEVEL.label))
                 .thenReturn(completedFuture(singletonList("INFO")));
         when(settingsService.fetchConfiguration(COBOL_PROGRAM_LAYOUT.label))
-                .thenReturn(completedFuture(ImmutableList.of(new CobolProgramLayout())));
+                .thenReturn(completedFuture(ImmutableList.of(CobolLanguageId.COBOL.getLayout())));
         when(watchingService.getWatchingFolders()).thenReturn(singletonList(path));
         when(localeStore.notifyLocaleStore()).thenReturn(e -> {});
 
@@ -166,7 +166,7 @@ class DidChangeConfigurationHandlerTest {
         when(settingsService.fetchConfiguration(LOGGING_LEVEL.label))
                 .thenReturn(completedFuture(singletonList("INFO")));
         when(settingsService.fetchConfiguration(COBOL_PROGRAM_LAYOUT.label))
-                .thenReturn(completedFuture(ImmutableList.of(new CobolProgramLayout())));
+                .thenReturn(completedFuture(ImmutableList.of(CobolLanguageId.COBOL.getLayout())));
         when(watchingService.getWatchingFolders()).thenReturn(emptyList());
         when(localeStore.notifyLocaleStore()).thenReturn(e -> {});
 
@@ -217,7 +217,7 @@ class DidChangeConfigurationHandlerTest {
         when(watchingService.getWatchingFolders()).thenReturn(singletonList(path));
         when(localeStore.notifyLocaleStore()).thenReturn(e -> {});
         when(settingsService.fetchConfiguration(COBOL_PROGRAM_LAYOUT.label))
-                .thenReturn(completedFuture(ImmutableList.of(new CobolProgramLayout())));
+                .thenReturn(completedFuture(ImmutableList.of(CobolLanguageId.COBOL.getLayout())));
 
         didChangeConfigurationHandler.didChangeConfiguration(new DidChangeConfigurationParams(localeStore));
         verify(watchingService).addWatchers(emptyList());
@@ -228,7 +228,7 @@ class DidChangeConfigurationHandlerTest {
 
     private CodeLayoutStore getMockLayoutStore() {
         CodeLayoutStore layoutStore = mock(CodeLayoutStore.class);
-        when(layoutStore.getCodeLayout()).thenReturn(new CobolProgramLayout());
+        when(layoutStore.getCodeLayout()).thenReturn(Optional.ofNullable(CobolLanguageId.COBOL.getLayout()));
         when(layoutStore.updateCodeLayout()).thenReturn(mock -> {});
         return layoutStore;
     }

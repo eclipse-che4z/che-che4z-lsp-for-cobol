@@ -15,6 +15,7 @@
 package org.eclipse.lsp.cobol.dialects.idms;
 
 import com.google.common.collect.ImmutableList;
+import java.util.*;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.apache.commons.lang3.tuple.Pair;
@@ -35,8 +36,6 @@ import org.eclipse.lsp.cobol.common.utils.KeywordsUtils;
 import org.eclipse.lsp.cobol.common.utils.RangeUtils;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
-
-import java.util.*;
 
 /** Process the text according to the IDMS rules */
 public final class IdmsDialect implements CobolDialect {
@@ -84,7 +83,7 @@ public final class IdmsDialect implements CobolDialect {
             copybookName,
             programDocumentUri,
             currentUri,
-            true);
+            true, "cobol");
     CopybookModel copybookModel = resolvedCopybook.getResult();
 
     if (copybookModel.getUri() == null || copybookModel.getContent() == null) {

@@ -32,6 +32,7 @@ import org.junit.jupiter.api.Test;
  */
 class DocumentModelServiceTest {
   private DocumentModelService service;
+  private String languageId = "cobol";
 
   @BeforeEach
   void init() {
@@ -42,7 +43,7 @@ class DocumentModelServiceTest {
   void testOpenDocument() {
     String uri = UUID.randomUUID().toString();
     String text = UUID.randomUUID().toString();
-    service.openDocument(uri, text);
+    service.openDocument(uri, text, "cobol");
 
     assertTrue(service.get(uri).isOpened());
   }
@@ -59,8 +60,8 @@ class DocumentModelServiceTest {
   void testGetAllOpened() {
     String uri1 = UUID.randomUUID().toString();
     String uri2 = UUID.randomUUID().toString();
-    service.openDocument(uri1, UUID.randomUUID().toString());
-    service.openDocument(uri2, UUID.randomUUID().toString());
+    service.openDocument(uri1, UUID.randomUUID().toString(), languageId);
+    service.openDocument(uri2, UUID.randomUUID().toString(), languageId);
     service.closeDocument(uri1);
 
     assertEquals(uri2, service.getAllOpened().get(0).getUri());
@@ -69,7 +70,7 @@ class DocumentModelServiceTest {
   @Test
   void testIsDocumentSynced() {
     String uri = UUID.randomUUID().toString();
-    service.openDocument(uri, UUID.randomUUID().toString());
+    service.openDocument(uri, UUID.randomUUID().toString(), languageId);
     assertFalse(service.isDocumentSynced(uri));
 
     service.processAnalysisResult(uri, AnalysisResult.builder().build(), "text");
@@ -80,10 +81,10 @@ class DocumentModelServiceTest {
   void testGetOpenedDiagnostic() {
     String uri1 = UUID.randomUUID().toString();
     String uri2 = UUID.randomUUID().toString();
-    service.openDocument(uri1, UUID.randomUUID().toString());
+    service.openDocument(uri1, UUID.randomUUID().toString(), languageId);
     service.processAnalysisResult(uri1, createAnalysisResult(uri1), "text");
 
-    service.openDocument(uri2, UUID.randomUUID().toString());
+    service.openDocument(uri2, UUID.randomUUID().toString(), languageId);
     service.processAnalysisResult(uri2, createAnalysisResult(uri2), "text");
 
     service.closeDocument(uri1);
@@ -97,7 +98,7 @@ class DocumentModelServiceTest {
   @Test
   void testInvalidate() {
     String uri = UUID.randomUUID().toString();
-    service.openDocument(uri, UUID.randomUUID().toString());
+    service.openDocument(uri, UUID.randomUUID().toString(), languageId);
     service.processAnalysisResult(uri, createAnalysisResult(uri), "text");
 
     Map<String, List<Diagnostic>> diagnostics = service.getOpenedDiagnostic();
@@ -118,7 +119,7 @@ class DocumentModelServiceTest {
   void testProcessAnalysis() {
     String uri = UUID.randomUUID().toString();
     String text = UUID.randomUUID().toString();
-    service.openDocument(uri, text);
+    service.openDocument(uri, text, languageId);
     service.processAnalysisResult(uri, createAnalysisResult(uri), text);
 
     assertTrue(service.isDocumentSynced(uri));
@@ -129,7 +130,7 @@ class DocumentModelServiceTest {
     String uri = UUID.randomUUID().toString();
     String text = UUID.randomUUID().toString();
 
-    service.openDocument(uri, text);
+    service.openDocument(uri, text, languageId);
     assertNotNull(service.get(uri));
 
     service.removeDocumentDiagnostics(uri);

@@ -44,8 +44,11 @@ import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulatorService;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolsRepository;
 import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
 import org.eclipse.lsp.cobol.core.visitor.CobolVisitor;
+import org.eclipse.lsp.cobol.lsp.CobolLanguageId;
 import org.eclipse.lsp.cobol.service.settings.CachingConfigurationService;
+import org.eclipse.lsp.cobol.service.settings.layout.CobolProgramLayout;
 import org.eclipse.lsp.cobol.service.settings.layout.CodeLayoutStore;
+import org.eclipse.lsp.cobol.service.settings.layout.CodeLayoutUtil;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Range;
 
@@ -61,7 +64,7 @@ public class TransformTreeStage implements Stage<ProcessingResult, ParserStageRe
   private final CachingConfigurationService cachingConfigurationService;
   private final DialectService dialectService;
   private final AstProcessor astProcessor;
-  private final CodeLayoutStore codeLayoutStore;
+  private final CodeLayoutStore layoutStore;
 
   @Override
   public StageResult<ProcessingResult> run(AnalysisContext context, StageResult<ParserStageResult> prevStageResult) {
@@ -111,9 +114,12 @@ public class TransformTreeStage implements Stage<ProcessingResult, ParserStageRe
   private List<Node> transformAST(AnalysisContext ctx,
                                   CopybooksRepository copybooksRepository, CommonTokenStream tokens,
                                   CobolParser.StartRuleContext tree) {
+    CobolProgramLayout cobolProgramLayout = layoutStore.getCodeLayout()
+            .map(lay -> CodeLayoutUtil.mergeLayout(ctx.getLanguageId().getLayout(), lay))
+            .orElse(ctx.getLanguageId().getLayout());
     CobolVisitor visitor =
         new CobolVisitor(copybooksRepository, tokens, ctx.getExtendedDocument(),
-            messageService, subroutineService, cachingConfigurationService, codeLayoutStore);
+            messageService, subroutineService, cachingConfigurationService, cobolProgramLayout);
     List<Node> syntaxTree = visitor.visit(tree);
     ctx.getAccumulatedErrors().addAll(visitor.getErrors());
     return syntaxTree;
@@ -138,7 +144,7 @@ public class TransformTreeStage implements Stage<ProcessingResult, ParserStageRe
 
     ProcessingContext processingContext =
             new ProcessingContext(new ArrayList<>(), symbolAccumulatorService, getCompilerDirectiveContext(analysisConfig), ctx.getConfig().getDialectsSettings());
-    registerProcessors(analysisConfig, processingContext, symbolAccumulatorService);
+    registerProcessors(analysisConfig, processingContext, symbolAccumulatorService, ctx.getLanguageId());
     ctx.getAccumulatedErrors().addAll(astProcessor.processSyntaxTree(processingContext, rootNode));
     return rootNode;
   }
@@ -159,7 +165,7 @@ public class TransformTreeStage implements Stage<ProcessingResult, ParserStageRe
             .findFirst();
   }
 
-  private void registerProcessors(AnalysisConfig analysisConfig, ProcessingContext ctx, SymbolAccumulatorService symbolAccumulatorService) {
+  private void registerProcessors(AnalysisConfig analysisConfig, ProcessingContext ctx, SymbolAccumulatorService symbolAccumulatorService, CobolLanguageId languageId) {
     // Phase TRANSFORMATION
     ProcessingPhase t = ProcessingPhase.TRANSFORMATION;
     ctx.register(t, ProgramIdNode.class, new ProgramIdProcess());
@@ -192,7 +198,7 @@ public class TransformTreeStage implements Stage<ProcessingResult, ParserStageRe
 
     // Phase VALIDATION
     ProcessingPhase v = ProcessingPhase.VALIDATION;
-    ctx.register(v, VariableWithLevelNode.class, new VariableWithLevelCheck());
+    ctx.register(v, VariableWithLevelNode.class, new VariableWithLevelCheck(CodeLayoutUtil.getProgramLayout(languageId, layoutStore)));
     ctx.register(v, StatementNode.class, new StatementValidate());
     ctx.register(v, ElementaryNode.class, new ElementaryNodeCheck());
     ctx.register(v, GroupItemNode.class, new GroupItemCheck());

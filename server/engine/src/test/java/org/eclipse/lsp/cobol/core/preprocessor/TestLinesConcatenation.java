@@ -21,18 +21,23 @@ import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedText;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.reader.CobolLineReader;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.reader.CobolLineReaderImpl;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.reader.CobolLineReaderService;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.rewriter.CobolLineIndicatorProcessorImpl;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.rewriter.CobolLineReWriter;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.rewriter.CobolLineReWriterService;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.transformer.CobolContinuationLineTransformation;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.transformer.CobolLineTransformationService;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.transformer.CobolLinesTransformation;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.transformer.ContinuationLineTransformation;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.writer.CobolLineWriter;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.writer.CobolLineWriterImpl;
-import org.eclipse.lsp.cobol.service.settings.layout.CobolProgramLayout;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.writer.CobolLineWriterService;
+import org.eclipse.lsp.cobol.lsp.CobolLanguageId;
 import org.eclipse.lsp.cobol.service.settings.layout.CodeLayoutStore;
 import org.junit.jupiter.api.Test;
 
@@ -67,17 +72,28 @@ class TestLinesConcatenation {
   void test() {
     List<SyntaxError> accumulatedErrors = new ArrayList<>();
     MessageService messageService = mock(MessageService.class);
-    CodeLayoutStore layoutStore = mock(CodeLayoutStore.class);
-    when(layoutStore.getCodeLayout()).thenReturn(new CobolProgramLayout());
-    when(layoutStore.updateCodeLayout()).thenReturn(l -> {});
+    CodeLayoutStore store = mock(CodeLayoutStore.class);
+    when(store.getCodeLayout()).thenReturn(Optional.empty());
 
-    CobolLineReader reader = new CobolLineReaderImpl(messageService, layoutStore);
-    CobolLineWriter writer = new CobolLineWriterImpl(layoutStore);
-    CobolLinesTransformation transformation = new ContinuationLineTransformation(messageService, layoutStore);
-    CobolLineReWriter indicatorProcessor = new CobolLineIndicatorProcessorImpl(layoutStore);
+    CobolLineReader reader = new CobolLineReaderImpl(messageService, store);
+    CobolLineWriter writer = new CobolLineWriterImpl(store);
+    CobolLinesTransformation transformation = new CobolContinuationLineTransformation(messageService, store);
+    CobolLineReWriter indicatorProcessor = new CobolLineIndicatorProcessorImpl(store);
 
-    TextPreprocessor textPreprocessor = new TextPreprocessorImpl(reader, writer, transformation, indicatorProcessor);
-    ExtendedText extendedText = textPreprocessor.cleanUpCode(DOCUMENT_URI, TEXT).unwrap(accumulatedErrors::addAll);
+    CobolLineReaderService cobolLineReaderService = mock(CobolLineReaderService.class);
+    when(cobolLineReaderService.getCobolLineReader(any())).thenReturn(reader);
+
+    CobolLineWriterService writerService = mock(CobolLineWriterService.class);
+    when(writerService.getCobolLineWriter(any())).thenReturn(writer);
+
+    CobolLineTransformationService transformationService = mock(CobolLineTransformationService.class);
+    when(transformationService.getTransformer(any())).thenReturn(transformation);
+
+    CobolLineReWriterService indicatorProcessorService = mock(CobolLineReWriterService.class);
+    when(indicatorProcessorService.getLineReWriter(any())).thenReturn(indicatorProcessor);
+
+    TextPreprocessor textPreprocessor = new TextPreprocessorImpl(cobolLineReaderService, writerService, transformationService, indicatorProcessorService);
+    ExtendedText extendedText = textPreprocessor.cleanUpCode(DOCUMENT_URI, TEXT, CobolLanguageId.COBOL).unwrap(accumulatedErrors::addAll);
     assertEquals(EXPECTED, extendedText.toString());
     assertTrue(accumulatedErrors.isEmpty());
   }

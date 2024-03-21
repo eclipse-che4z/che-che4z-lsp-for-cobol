@@ -20,11 +20,11 @@ import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.core.AbstractCobolLinePreprocessorTest;
 import org.eclipse.lsp.cobol.core.preprocessor.CobolLine;
-import org.eclipse.lsp.cobol.service.settings.layout.CobolProgramLayout;
 import org.eclipse.lsp.cobol.service.settings.layout.CodeLayoutStore;
 import org.junit.jupiter.api.Test;
 
@@ -107,14 +107,10 @@ class ContinuationLineTransformationTest extends AbstractCobolLinePreprocessorTe
   private List<SyntaxError> runTransformation(String text) {
     List<CobolLine> lines = convertToCobolLines(text);
     MessageService mockMessageService = mock(MessageService.class);
-    ContinuationLineTransformation transformation = new ContinuationLineTransformation(mockMessageService, getMockLayoutStore());
+    CodeLayoutStore store = mock(CodeLayoutStore.class);
+    when(store.getCodeLayout()).thenReturn(Optional.empty());
+    ContinuationLineTransformation transformation = new CobolContinuationLineTransformation(mockMessageService, store);
     return transformation.transformLines("", lines).getErrors();
-  }
-
-  private CodeLayoutStore getMockLayoutStore() {
-    CodeLayoutStore layoutStore = mock(CodeLayoutStore.class);
-    when(layoutStore.getCodeLayout()).thenReturn(new CobolProgramLayout());
-    return layoutStore;
   }
 
   private List<CobolLine> convertToCobolLines(String text) {

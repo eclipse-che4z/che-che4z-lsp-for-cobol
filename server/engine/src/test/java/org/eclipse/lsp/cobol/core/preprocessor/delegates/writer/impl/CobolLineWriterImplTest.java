@@ -19,12 +19,12 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
+import java.util.Optional;
 import org.eclipse.lsp.cobol.common.ResultWithErrors;
 import org.eclipse.lsp.cobol.core.AbstractCobolLinePreprocessorTest;
 import org.eclipse.lsp.cobol.core.preprocessor.CobolLine;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.writer.CobolLineWriter;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.writer.CobolLineWriterImpl;
-import org.eclipse.lsp.cobol.service.settings.layout.CobolProgramLayout;
 import org.eclipse.lsp.cobol.service.settings.layout.CodeLayoutStore;
 import org.junit.jupiter.api.Test;
 
@@ -53,9 +53,9 @@ class CobolLineWriterImplTest extends AbstractCobolLinePreprocessorTest {
   @Test
   void test() {
     ResultWithErrors<List<CobolLine>> result = super.processText(TEXT_TO_TEST);
-    CodeLayoutStore layoutStore = mock(CodeLayoutStore.class);
-    when(layoutStore.getCodeLayout()).thenReturn(new CobolProgramLayout());
-    CobolLineWriter writer = new CobolLineWriterImpl(layoutStore);
+    CodeLayoutStore store = mock(CodeLayoutStore.class);
+    when(store.getCodeLayout()).thenReturn(Optional.empty());
+    CobolLineWriter writer = new CobolLineWriterImpl(store);
     assertEquals(EXPECTED, writer.serialize(result.getResult(), "").toString());
     assertEquals(0, result.getErrors().size());
   }
