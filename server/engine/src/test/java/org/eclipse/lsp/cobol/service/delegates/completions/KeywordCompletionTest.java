@@ -15,8 +15,17 @@
 
 package org.eclipse.lsp.cobol.service.delegates.completions;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import java.util.List;
+import java.util.Optional;
 import org.eclipse.lsp.cobol.common.AnalysisResult;
 import org.eclipse.lsp.cobol.common.dialects.CobolDialect;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectService;
@@ -27,16 +36,6 @@ import org.eclipse.lsp4j.CompletionItemKind;
 import org.eclipse.lsp4j.MarkupContent;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.util.List;
-import java.util.Optional;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 /**
  * This test {@link KeywordCompletion} asserts that filtration and preparing the keyword completion
@@ -85,16 +84,16 @@ class KeywordCompletionTest {
 
     Keywords keywords = new Keywords(mock(SettingsService.class), dialectService);
     List<String> dialectType = ImmutableList.of();
-    assertEquals(2344, keywords.getDataMap(dialectType).size());
-
-    dialectType = ImmutableList.of("IDMS");
-    assertEquals(2345, keywords.getDataMap(dialectType).size());
-
-    dialectType = ImmutableList.of("DaCo");
     assertEquals(2346, keywords.getDataMap(dialectType).size());
 
-    dialectType = ImmutableList.of("DaCo", "IDMS");
+    dialectType = ImmutableList.of("IDMS");
     assertEquals(2347, keywords.getDataMap(dialectType).size());
+
+    dialectType = ImmutableList.of("DaCo");
+    assertEquals(2348, keywords.getDataMap(dialectType).size());
+
+    dialectType = ImmutableList.of("DaCo", "IDMS");
+    assertEquals(2349, keywords.getDataMap(dialectType).size());
   }
 
   @Test
