@@ -89,7 +89,9 @@ export function searchCopybookInWorkspace(
   copybookFolders: string[] | undefined,
   extensions: string[] | undefined,
 ): string | undefined {
-  for (const workspaceFolderPath of SettingsUtils.getWorkspaceFoldersPath()) {
+  for (const workspaceFolderPath of SettingsUtils.getWorkspaceFoldersPath(
+    true,
+  )) {
     if (!copybookFolders || !extensions) return undefined;
     const workspaceFolder = cleanWorkspaceFolder(workspaceFolderPath);
     for (const p of copybookFolders) {
