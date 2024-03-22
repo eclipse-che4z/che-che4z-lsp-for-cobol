@@ -1,6 +1,16 @@
 # Changelog
 All notable changes to the COBOL Language Support extension are documented in this file.
 
+## [2.1.2](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/compare/2.1.1...2.2.0) (2024-04-03)
+#### Added
+- Support EXCI command in CICS
+
+#### Fixed
+- Miscellaneous bug fixes
+- Fix folding for evaluate block
+- Fix folding when IfNode has a copynode child
+- Update CICS delay statement
+
 ## [2.1.1](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/compare/2.1.0...2.1.1) (2024-01-30)
 #### Added
 - Support for CICS INQUIRE URIMAP statement
