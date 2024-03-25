@@ -17,6 +17,7 @@ package org.eclipse.lsp.cobol.service;
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Singleton;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import lombok.Synchronized;
@@ -31,7 +32,7 @@ import org.eclipse.lsp4j.Diagnostic;
 @Singleton
 @Slf4j
 public class DocumentModelService {
-  private final Map<String, CobolDocumentModel> docs = new HashMap<>();
+  private final Map<String, CobolDocumentModel> docs = new ConcurrentHashMap<>();
   private final Map<String, List<Diagnostic>> diagnosticRepo = Collections.synchronizedMap(new HashMap<>());
 
   /**

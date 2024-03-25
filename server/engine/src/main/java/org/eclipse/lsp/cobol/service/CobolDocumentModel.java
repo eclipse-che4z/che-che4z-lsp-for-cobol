@@ -14,17 +14,19 @@
  */
 package org.eclipse.lsp.cobol.service;
 
-import lombok.*;
-import org.eclipse.lsp.cobol.common.AnalysisResult;
-import lombok.extern.slf4j.Slf4j;
-import org.eclipse.lsp4j.DocumentSymbol;
-import org.eclipse.lsp4j.Position;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+import lombok.*;
+import lombok.extern.slf4j.Slf4j;
+import org.eclipse.lsp.cobol.common.AnalysisResult;
+import org.eclipse.lsp4j.DocumentSymbol;
+import org.eclipse.lsp4j.Position;
 
 /**
  * This class stores a COBOL program text to be processed. Provides a list of lines and text tokens
@@ -38,9 +40,13 @@ public class CobolDocumentModel {
   @Getter private String text;
   @Getter private final String uri;
   @Getter @Setter private boolean opened = true;
-  @Getter private AnalysisResult analysisResult;
+  private AnalysisResult analysisResult;
   @Getter private AnalysisResult lastAnalysisResult;
   @Getter @Setter private List<DocumentSymbol> outlineResult;
+
+  private final ReadWriteLock analysisResultReadWriteLock = new ReentrantReadWriteLock();
+  private final Lock analysisResulReadLock = analysisResultReadWriteLock.readLock();
+  private final Lock analysisResulWriteLock = analysisResultReadWriteLock.writeLock();
 
   public CobolDocumentModel(String uri, String text, AnalysisResult analysisResult) {
     this.uri = uri;
@@ -50,6 +56,20 @@ public class CobolDocumentModel {
     parse(text);
   }
 
+  /**
+   * Returns {@link AnalysisResult} of this CobolDocument.
+   *
+   * @return a {@link AnalysisResult} of this Cobol document.
+   */
+  public AnalysisResult getAnalysisResult() {
+    analysisResulReadLock.lock();
+    try {
+      return analysisResult;
+    } finally {
+      analysisResulReadLock.unlock();
+    }
+  }
+
   public CobolDocumentModel(String uri, String text) {
     this.text = text;
     this.uri = uri;
@@ -57,9 +77,8 @@ public class CobolDocumentModel {
   }
 
   public boolean isDocumentSynced() {
-    return (analysisResult != null && outlineResult != null);
+    return (getAnalysisResult() != null && outlineResult != null);
   }
-
 
   Line getLine(int number) {
     return lines.stream().filter(line -> line.getNumber() == number).findFirst().orElse(null);
@@ -81,24 +100,36 @@ public class CobolDocumentModel {
 
   /**
    * Assign analysis result to the document.
+   *
    * @param analysisResult the analysis result.
    */
   public void setAnalysisResult(AnalysisResult analysisResult) {
     LOG.debug("setAnalysisResult: " + uri);
-    if (analysisResult != null) {
+    if (getAnalysisResult() != null) {
       this.lastAnalysisResult = analysisResult;
     }
-    this.analysisResult = analysisResult;
+    analysisResulWriteLock.lock();
+    try {
+      this.analysisResult = analysisResult;
+    } finally {
+      analysisResulWriteLock.unlock();
+    }
   }
 
   /**
    * Update CobolDocumentModel with a new text
+   *
    * @param text - the new document text
    */
   public void update(String text) {
     this.text = text;
     parse(text);
-    analysisResult = null;
+    analysisResulWriteLock.lock();
+    try {
+      analysisResult = null;
+    } finally {
+      analysisResulWriteLock.unlock();
+    }
   }
 
   String getFullTokenAtPosition(Position position) {
@@ -173,5 +204,4 @@ public class CobolDocumentModel {
       this.text = text;
     }
   }
-
 }
