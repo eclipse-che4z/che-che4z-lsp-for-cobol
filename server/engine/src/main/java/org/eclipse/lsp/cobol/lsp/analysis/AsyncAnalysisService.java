@@ -129,6 +129,7 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
       notifyAllListeners(AnalysisState.STARTED, documentModelService.get(uri), eventSource);
       try {
         communications.notifyProgressBegin(uri);
+        documentModelService.get(uri).setOutlineResult(null);
         analysisService.analyzeDocument(uri, text, open);
         CobolDocumentModel documentModel = documentModelService.get(uri);
         analysisResults.remove(id).complete(documentModel);
@@ -188,7 +189,7 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
     subroutineService.invalidateCache();
     LOG.info("Cache invalidated");
     openDocuments
-            .forEach(doc -> scheduleAnalysis(doc.getUri(), doc.getText(), analysisResultsRevisions.get(doc.getUri()), false, true, SourceUnitGraph.EventSource.IDE));
+            .forEach(doc -> scheduleAnalysis(doc.getUri(), doc.getText(), analysisResultsRevisions.getOrDefault(doc.getUri(), 0), false, true, SourceUnitGraph.EventSource.IDE));
   }
 
   private void cancelRunningAnalysis(List<CobolDocumentModel> openDocuments) {
@@ -214,14 +215,16 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
       if (copybookService instanceof CopybookServiceImpl) {
         CopybookServiceImpl copybookServiceImpl = (CopybookServiceImpl) copybookService;
         copybookServiceImpl.getCopybookUsage(uri).stream()
-                .filter(model -> Objects.nonNull(model.getUri()))
-                .filter(model -> model.getUri().equals(copybookUri))
-                .forEach(
-                        copybookModel -> {
-                          copybookServiceImpl.invalidateCache(copybookModel.getCopybookId());
-                          copybookModel.setContent(copybookContent);
-                          copybookServiceImpl.store(copybookModel, true);
-                        });
+            .filter(model -> Objects.nonNull(model.getUri()))
+            .filter(model -> model.getUri().equals(copybookUri))
+            .forEach(
+                copybookModel -> {
+                  copybookServiceImpl.invalidateCache(copybookModel.getCopybookId());
+                  if (copybookContent != null) {
+                    copybookModel.setContent(copybookContent);
+                    copybookServiceImpl.store(copybookModel, true);
+                  }
+                });
       }
       subroutineService.invalidateCache();
       LOG.info("Cache invalidated");

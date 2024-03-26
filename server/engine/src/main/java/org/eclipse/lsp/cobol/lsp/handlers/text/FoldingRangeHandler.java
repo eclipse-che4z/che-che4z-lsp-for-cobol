@@ -26,6 +26,7 @@ import org.eclipse.lsp.cobol.lsp.LspEventDependency;
 import org.eclipse.lsp.cobol.lsp.LspQuery;
 import org.eclipse.lsp.cobol.lsp.analysis.AsyncAnalysisService;
 import org.eclipse.lsp.cobol.lsp.events.queries.FoldingQuery;
+import org.eclipse.lsp.cobol.service.AnalysisService;
 import org.eclipse.lsp.cobol.service.DocumentModelService;
 import org.eclipse.lsp.cobol.service.DocumentServiceHelper;
 import org.eclipse.lsp.cobol.service.UriDecodeService;
@@ -41,12 +42,14 @@ public class FoldingRangeHandler {
   private final DocumentModelService documentService;
   private final AsyncAnalysisService asyncAnalysisService;
   private final UriDecodeService uriDecodeService;
+  private final AnalysisService analysisService;
 
   @Inject
-  public FoldingRangeHandler(DocumentModelService documentService, AsyncAnalysisService asyncAnalysisService, UriDecodeService uriDecodeService) {
+  public FoldingRangeHandler(DocumentModelService documentService, AsyncAnalysisService asyncAnalysisService, UriDecodeService uriDecodeService, AnalysisService analysisService) {
     this.documentService = documentService;
     this.asyncAnalysisService = asyncAnalysisService;
     this.uriDecodeService = uriDecodeService;
+    this.analysisService = analysisService;
   }
 
   /**
@@ -82,7 +85,8 @@ public class FoldingRangeHandler {
    */
   public List<LspEventDependency> getDependencies(String uri) {
     return ImmutableList.of(
-            asyncAnalysisService.createDependencyOn(uri));
+        asyncAnalysisService.createDependencyOn(uri),
+        () -> documentService.isDocumentSynced(uri));
   }
 
   /**
@@ -92,6 +96,7 @@ public class FoldingRangeHandler {
    */
   public List<LspEventCancelCondition> getCancelConditions(String uri) {
    return ImmutableList.of(
-            asyncAnalysisService.createCancelConditionOnClose(uri));
+            asyncAnalysisService.createCancelConditionOnClose(uri),
+           () -> analysisService.isCopybook(uri, documentService.get(uri).getText()));
   }
 }
