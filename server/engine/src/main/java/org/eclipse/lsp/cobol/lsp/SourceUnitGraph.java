@@ -18,6 +18,9 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.net.URI;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -201,6 +204,7 @@ public class SourceUnitGraph implements AnalysisStateListener {
 
   /**
    * Get content for a passed uri
+   *
    * @param uri
    * @return content
    */
@@ -381,6 +385,23 @@ public class SourceUnitGraph implements AnalysisStateListener {
       if (isContained) return true;
     }
     return false;
+  }
+
+  /**
+   * Gives a list of all the copybooks contained inside a parent dir.
+   *
+   * @param parentFolder parent directory
+   * @return List of copybooks contained inside a parent directory
+   */
+  public List<String> getCopybookUriInsideFolder(String parentFolder) {
+    List<String> result = new ArrayList<>();
+    Path parentPath = Paths.get(URI.create(parentFolder));
+    Set<String> allCopybooks = documentGraphIndexedByCopybook.keySet();
+    for (String copybookUri : allCopybooks) {
+      Path copybookPath = Paths.get(URI.create(copybookUri));
+      if (copybookPath.startsWith(parentPath)) result.add(copybookUri);
+    }
+    return result;
   }
 
   /** Nodes in the {@link SourceUnitGraph} representing document and their links in a workspace */

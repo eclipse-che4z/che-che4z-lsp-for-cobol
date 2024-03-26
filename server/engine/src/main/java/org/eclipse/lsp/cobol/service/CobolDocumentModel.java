@@ -14,33 +14,33 @@
  */
 package org.eclipse.lsp.cobol.service;
 
-import lombok.*;
-import org.eclipse.lsp.cobol.common.AnalysisResult;
-import lombok.extern.slf4j.Slf4j;
-import org.eclipse.lsp4j.DocumentSymbol;
-import org.eclipse.lsp4j.Position;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import lombok.*;
+import lombok.extern.slf4j.Slf4j;
+import org.eclipse.lsp.cobol.common.AnalysisResult;
+import org.eclipse.lsp4j.DocumentSymbol;
+import org.eclipse.lsp4j.Position;
 
 /**
  * This class stores a COBOL program text to be processed. Provides a list of lines and text tokens
  * by position.
  */
+@Getter
 @RequiredArgsConstructor
 @Slf4j
 public class CobolDocumentModel {
   private static final String DELIMITER = "[ .\\[\\]()<>,*\"']+";
-  @Getter private final List<Line> lines = new CopyOnWriteArrayList<>();
-  @Getter private String text;
-  @Getter private final String uri;
-  @Getter @Setter private boolean opened = true;
-  @Getter private AnalysisResult analysisResult;
-  @Getter private AnalysisResult lastAnalysisResult;
-  @Getter @Setter private List<DocumentSymbol> outlineResult;
+  private final List<Line> lines = new CopyOnWriteArrayList<>();
+  private String text;
+  private final String uri;
+  @Setter private volatile boolean opened = true;
+  private volatile AnalysisResult analysisResult;
+  private volatile AnalysisResult lastAnalysisResult;
+  @Setter private volatile List<DocumentSymbol> outlineResult;
 
   public CobolDocumentModel(String uri, String text, AnalysisResult analysisResult) {
     this.uri = uri;
@@ -59,7 +59,6 @@ public class CobolDocumentModel {
   public boolean isDocumentSynced() {
     return (analysisResult != null && outlineResult != null);
   }
-
 
   Line getLine(int number) {
     return lines.stream().filter(line -> line.getNumber() == number).findFirst().orElse(null);
@@ -81,6 +80,7 @@ public class CobolDocumentModel {
 
   /**
    * Assign analysis result to the document.
+   *
    * @param analysisResult the analysis result.
    */
   public void setAnalysisResult(AnalysisResult analysisResult) {
@@ -93,6 +93,7 @@ public class CobolDocumentModel {
 
   /**
    * Update CobolDocumentModel with a new text
+   *
    * @param text - the new document text
    */
   public void update(String text) {
@@ -173,5 +174,4 @@ public class CobolDocumentModel {
       this.text = text;
     }
   }
-
 }

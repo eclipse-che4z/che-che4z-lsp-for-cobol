@@ -112,7 +112,7 @@ class CobolTextDocumentServiceTest {
     DocumentHighlightHandler documentHighlightHandler = new DocumentHighlightHandler(asyncAnalysisService, occurrences, documentModelService, uriDecodeService);
     ReferencesHandler referencesHandler = new ReferencesHandler(asyncAnalysisService, occurrences, documentModelService, uriDecodeService);
     HoverHandler hoverHandler = new HoverHandler(asyncAnalysisService, hoverProvider, documentModelService, documentGraph, uriDecodeService);
-    FoldingRangeHandler foldingRangeHandler = new FoldingRangeHandler(documentModelService, asyncAnalysisService, uriDecodeService);
+    FoldingRangeHandler foldingRangeHandler = new FoldingRangeHandler(documentModelService, asyncAnalysisService, uriDecodeService, analysisService);
 
     service = new CobolTextDocumentService(
             lspMessageBroker,
