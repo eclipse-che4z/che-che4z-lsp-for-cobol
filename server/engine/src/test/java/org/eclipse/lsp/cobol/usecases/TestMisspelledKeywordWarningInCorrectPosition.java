@@ -15,6 +15,9 @@
 
 package org.eclipse.lsp.cobol.usecases;
 
+import static org.eclipse.lsp4j.DiagnosticSeverity.Error;
+import static org.eclipse.lsp4j.DiagnosticSeverity.Warning;
+
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
@@ -23,9 +26,6 @@ import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
-
-import static org.eclipse.lsp4j.DiagnosticSeverity.Error;
-import static org.eclipse.lsp4j.DiagnosticSeverity.Warning;
 
 /** This test checks that a misspelled keyword after a copybook usage is in the correct position */
 class TestMisspelledKeywordWarningInCorrectPosition {
@@ -38,7 +38,8 @@ class TestMisspelledKeywordWarningInCorrectPosition {
           + "4       COPY {~STRUC1}. \n"
           + "5      Procedure Division.\n"
           + "6      {#*000-Main-Logic}.\n"
-          + "7          {@*DISPLA|misspelled|area} {\"hello\"|hello}.\n"
+          //          + "7          {@*DISPLA|area} {\"hello\"|hello|dot}.\n"
+          + "7          {#*DISPLA|area} {\"hello\"|hello|dot}.\n"
           + "8          DISPLAY {$CHILD1} OF {$PARENT1}.\n"
           + "9      End program ProgramId.";
 
@@ -56,12 +57,6 @@ class TestMisspelledKeywordWarningInCorrectPosition {
         TEXT,
         ImmutableList.of(new CobolText(STRUC1_NAME, STRUC1)),
         ImmutableMap.of(
-            "misspelled",
-            new Diagnostic(
-                new Range(),
-                "A misspelled word, maybe you want to put DISPLAY",
-                Warning,
-                ErrorSource.PARSING.getText()),
             "area",
             new Diagnostic(
                 new Range(),
@@ -70,6 +65,12 @@ class TestMisspelledKeywordWarningInCorrectPosition {
                 ErrorSource.PARSING.getText()),
             "hello",
             new Diagnostic(
-                new Range(), "Syntax error on '\"hello\"'", Error, ErrorSource.PARSING.getText())));
+                new Range(), "Encountered invalid token. Analysis skipped to the next verb or period.", Error, ErrorSource.PARSING.getText()),
+            "dot",
+            new Diagnostic(
+                new Range(),
+                "A period was assumed before \"\"hello\"\".",
+                Error,
+                ErrorSource.PARSING.getText())));
   }
 }

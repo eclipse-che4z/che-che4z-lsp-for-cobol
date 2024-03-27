@@ -14,17 +14,17 @@
  */
 package org.eclipse.lsp.cobol.usecases;
 
+import static org.eclipse.lsp4j.DiagnosticSeverity.Error;
+
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.eclipse.lsp.cobol.common.AnalysisConfig;
 import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
-import org.eclipse.lsp.cobol.common.AnalysisConfig;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
-
-import static org.eclipse.lsp4j.DiagnosticSeverity.Error;
 
 /** Test for multiline variable definition **/
 class TestMappingMultilineVariable {
@@ -39,7 +39,7 @@ class TestMappingMultilineVariable {
       + "006600                                                                  NC2054.2\n"
       + "006700     X(10)                                                   VALUENC2054.2\n"
       + "006900     \"ABCDE12345\".                                                NC2054.2\n"
-      + "007100 77  {$*SPACING-RECEIVE|1}    {PICTUREQ|2}                                  NC2054.2\n";
+      + "007100 77  {$*SPACING-RECEIVE|1}    {PICTUREQ|2}{|3}                                  NC2054.2\n";
 
   @Test
   void test() {
@@ -52,14 +52,19 @@ class TestMappingMultilineVariable {
                 new Range(),
                 "A \"PICTURE\" or \"USAGE INDEX\" clause was not found for elementary item SPACING-RECEIVE",
                 Error,
-                    ErrorSource.PARSING.getText()),
+                ErrorSource.PARSING.getText()),
             "2",
             new Diagnostic(
                 new Range(),
-                "Syntax error on 'PICTUREQ'",
+                "Encountered invalid token. Analysis skipped to the next verb or period.",
                 Error,
-                    ErrorSource.PARSING.getText())
-        ),
+                ErrorSource.PARSING.getText()),
+            "3",
+            new Diagnostic(
+                new Range(),
+                "A period was assumed before \"<EOF>\".",
+                Error,
+                ErrorSource.PARSING.getText())),
         ImmutableList.of(),
         AnalysisConfig.defaultConfig(CopybookProcessingMode.DISABLED));
   }

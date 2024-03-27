@@ -28,7 +28,7 @@ commaSeparator: COMMACHAR | COMMASEPARATOR;
 // --- identification division --------------------------------------------------------------------
 
 identificationDivision
-   : (IDENTIFICATION | ID) DIVISION DOT_FS programIdParagraph identificationDivisionBody*
+   : (IDENTIFICATION | ID) DIVISION dot_fs programIdParagraph identificationDivisionBody*
    ;
 
 identificationDivisionBody
@@ -86,7 +86,7 @@ optionalParagraphTermination
 // --- environment division --------------------------------------------------------------------
 
 environmentDivision
-   : ENVIRONMENT DIVISION DOT_FS environmentDivisionBody*
+   : ENVIRONMENT DIVISION dot_fs environmentDivisionBody*
    ;
 
 environmentDivisionBody
@@ -96,7 +96,7 @@ environmentDivisionBody
 // -- configuration section ----------------------------------
 
 configurationSection
-   : CONFIGURATION SECTION DOT_FS configurationSectionParagraph*
+   : CONFIGURATION SECTION dot_fs configurationSectionParagraph*
    ;
 
 // - configuration section paragraph ----------------------------------
@@ -127,13 +127,13 @@ intrinsicClause
 // - source computer paragraph ----------------------------------
 
 sourceComputerParagraph
-   : SOURCE_COMPUTER DOT_FS (computerName (WITH? DEBUGGING MODE)? DOT_FS)?
+   : SOURCE_COMPUTER dot_fs (computerName (WITH? DEBUGGING MODE)? dot_fs)?
    ;
 
 // - object computer paragraph ----------------------------------
 
 objectComputerParagraph
-   : OBJECT_COMPUTER DOT_FS (computerName objectComputerClause* DOT_FS)?
+   : OBJECT_COMPUTER dot_fs (computerName objectComputerClause* dot_fs)?
    ;
 
 objectComputerClause
@@ -165,13 +165,12 @@ segmentLimitClause
    ;
 
 characterSetClause
-   : CHARACTER SET DOT_FS
-   ;
+   : CHARACTER SET dot_fs   ;
 
 // - special names paragraph ----------------------------------
 
 specialNamesParagraph
-   : SPECIAL_NAMES DOT_FS (specialNameClause+ DOT_FS)?
+   : SPECIAL_NAMES dot_fs (specialNameClause+ dot_fs)?
    ;
 
 specialNameClause
@@ -264,7 +263,7 @@ symbolicCharacters
 // -- input output section ----------------------------------
 
 inputOutputSection
-   : INPUT_OUTPUT SECTION DOT_FS inputOutputSectionParagraph*
+   : INPUT_OUTPUT SECTION dot_fs inputOutputSectionParagraph*
    ;
 
 // - input output section paragraph ----------------------------------
@@ -276,12 +275,11 @@ inputOutputSectionParagraph
 // - file control paragraph ----------------------------------
 
 fileControlParagraph
-   : FILE_CONTROL DOT_FS fileControlEntry*
+   : FILE_CONTROL dot_fs fileControlEntry*
    ;
 
 fileControlEntry
-   : selectClause fileControlClauses DOT_FS
-   ;
+   : selectClause fileControlClauses dot_fs   ;
 
 fileControlClauses
    : fileControlClause*
@@ -346,7 +344,7 @@ relativeKeyClause
 // - io control paragraph ----------------------------------
 
 ioControlParagraph
-   : I_O_CONTROL DOT_FS (fileName DOT_FS)? (ioControlClause+ DOT_FS)?
+   : I_O_CONTROL dot_fs (fileName dot_fs)? (ioControlClause+ dot_fs)?
    ;
 
 ioControlClause
@@ -396,7 +394,7 @@ endClause
 // --- data division --------------------------------------------------------------------
 
 dataDivision
-   : DATA DIVISION DOT_FS dataDivisionSection*
+   : DATA DIVISION dot_fs dataDivisionSection*
    ;
 
 dataDivisionSection
@@ -411,7 +409,7 @@ dialectSection
 // -- file section ----------------------------------
 
 fileSection
-   : FILE SECTION DOT_FS fileDescriptionEntry*
+   : FILE SECTION dot_fs fileDescriptionEntry*
    ;
 
 fileDescriptionEntry
@@ -419,8 +417,7 @@ fileDescriptionEntry
    ;
 
 fileDescriptionEntryClauses
-   : (FD | SD) cobolWord (DOT_FS? fileDescriptionEntryClause)* DOT_FS
-   ;
+   : (FD | SD) cobolWord (DOT_FS? fileDescriptionEntryClause)* dot_fs   ;
 
 fileDescriptionEntryClause
    : externalClause | globalClause | blockContainsClause | recordContainsClause | labelRecordsClause | valueOfClause | dataRecordsClause | linageClause | codeSetClause | reportClause | recordingModeClause
@@ -517,18 +514,18 @@ reportClause
 // -- working storage section ----------------------------------
 
 workingStorageSection
-   : WORKING_STORAGE SECTION DOT_FS  dataDescriptionEntryForWorkingStorageSection*
+   : WORKING_STORAGE SECTION dot_fs dataDescriptionEntryForWorkingStorageSection*
    ;
 // -- linkage section ----------------------------------
 
 linkageSection
-   : LINKAGE SECTION DOT_FS dataDescriptionEntryForWorkingStorageAndLinkageSection*
+   : LINKAGE SECTION dot_fs dataDescriptionEntryForWorkingStorageAndLinkageSection*
    ;
 
 // -- local storage section ----------------------------------
 
 localStorageSection
-   : LOCAL_STORAGE SECTION DOT_FS dataDescriptionEntryForLocalStorageSection*
+   : LOCAL_STORAGE SECTION dot_fs dataDescriptionEntryForLocalStorageSection*
    ;
 
 dataDescriptionEntryForLocalStorageSection
@@ -556,8 +553,7 @@ dataDescriptionEntryFormat1
    | dataGlobalClause | dataPictureClause | dataUsageClause | dataValueClause
    | dataOccursClause | dataSignClause | dataSynchronizedClause
    | dataJustifiedClause | dataBlankWhenZeroClause | dataDynamicLengthClause | dataVolatileClause)*
-   DOT_FS
-   ;
+   dot_fs   ;
 
 levelNumber
    : LEVEL_NUMBER
@@ -565,21 +561,18 @@ levelNumber
 
 
 dataDescriptionEntryFormat2
-   : LEVEL_NUMBER_66 entryName? dataRenamesClause DOT_FS
-   ;
+   : LEVEL_NUMBER_66 entryName? dataRenamesClause dot_fs   ;
 
 dataDescriptionEntryFormat1Level77
    : LEVEL_NUMBER_77 entryName? (dataGroupUsageClause | dataRedefinesClause | dataExternalClause
      | dataGlobalClause | dataPictureClause | dataUsageClause | dataValueClause
      | dataOccursClause | dataSignClause | dataSynchronizedClause
      | dataJustifiedClause | dataBlankWhenZeroClause | dataDynamicLengthClause | dataVolatileClause)*
-     DOT_FS
-   ;
+     dot_fs   ;
 
 
 dataDescriptionEntryFormat3
-   : LEVEL_NUMBER_88 entryName? dataValueClause DOT_FS
-   ;
+   : LEVEL_NUMBER_88 entryName? dataValueClause dot_fs   ;
 
 dialectDescriptionEntry
    : dialectNodeFiller
@@ -731,7 +724,7 @@ thruToken
 // --- procedure division --------------------------------------------------------------------
 
 procedureDivision
-   : PROCEDURE DIVISION procedureDivisionUsingClause? procedureDivisionGivingClause? DOT_FS procedureDeclaratives? procedureDivisionBody
+   : PROCEDURE DIVISION procedureDivisionUsingClause? procedureDivisionGivingClause? dot_fs procedureDeclaratives? procedureDivisionBody
    ;
 
 procedureDivisionUsingClause
@@ -747,11 +740,10 @@ procedureDivisionUsingParameter
    ;
 
 procedureDeclaratives
-   : DECLARATIVES DOT_FS procedureDeclarative+ END DECLARATIVES DOT_FS
-   ;
+   : DECLARATIVES dot_fs procedureDeclarative+ END DECLARATIVES dot_fs   ;
 
 procedureDeclarative
-   : procedureSectionHeader DOT_FS (useStatement DOT_FS) paragraphs
+   : procedureSectionHeader dot_fs (useStatement dot_fs) paragraphs
    ;
 
 procedureSectionHeader
@@ -765,19 +757,19 @@ procedureDivisionBody
 // -- procedure section ----------------------------------
 
 procedureSection
-   : procedureSectionHeader DOT_FS paragraphs
-   ;
-
-paragraphs
-   : sentence* paragraph*
-   ;
-
-paragraph
-   : paragraphDefinitionName DOT_FS (alteredGoTo | sentence*)
+   : procedureSectionHeader dot_fs paragraphs
    ;
 
 sentence
    : statement * (endClause | dialectStatement)
+   ;
+
+paragraph
+   : paragraphDefinitionName dot_fs (alteredGoTo | sentence*)
+   ;
+
+paragraphs
+   : (sentence | paragraph)*
    ;
 
 conditionalStatementCall
@@ -2242,4 +2234,8 @@ cobolKeywords
 
 dialectNodeFiller
     : ZERO_WIDTH_SPACE+
+    ;
+
+dot_fs
+    : DOT_FS | {notifyError("missing.period", _input.LT(1).getText());}
     ;
