@@ -210,7 +210,14 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
    */
   public void reanalyseCopybooksAssociatedPrograms(List<String> uris, String copybookUri, String copybookContent, SourceUnitGraph.EventSource eventSource) {
     documentModelService.removeDocumentDiagnostics(copybookUri);
-    for (String uri : uris) {
+    Optional.ofNullable(documentModelService.get(copybookUri)).ifPresent(model -> model.update(copybookContent));
+    List<String> openedUris =
+        documentModelService.getAllOpened().stream()
+            .filter(model -> uris.contains(model.getUri()))
+            .filter(model -> !analysisService.isCopybook(model.getUri(), model.getText()))
+            .map(CobolDocumentModel::getUri)
+            .collect(Collectors.toList());
+    for (String uri : openedUris) {
       //TODO: update cache directly from workspace document graph
       if (copybookService instanceof CopybookServiceImpl) {
         CopybookServiceImpl copybookServiceImpl = (CopybookServiceImpl) copybookService;
