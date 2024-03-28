@@ -14,6 +14,13 @@
  */
 package org.eclipse.lsp.cobol.lsp.analysis;
 
+import static org.mockito.Mockito.*;
+
+import com.google.common.collect.ImmutableList;
+import java.lang.reflect.Field;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.eclipse.lsp.cobol.common.SubroutineService;
 import org.eclipse.lsp.cobol.lsp.SourceUnitGraph;
 import org.eclipse.lsp.cobol.service.AnalysisService;
@@ -26,13 +33,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.lang.reflect.Field;
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import static org.mockito.Mockito.*;
 
 /**
  *  Test {@link AsyncAnalysisService}
@@ -83,7 +83,11 @@ class AsyncAnalysisServiceTest {
         List<String> uris = Stream.of("URI1", "URI2").collect(Collectors.toList());
         SourceUnitGraph.EventSource eventSource = mock(SourceUnitGraph.EventSource.class);
         CobolDocumentModel cobolDocumentModel = mock(CobolDocumentModel.class);
+        when(cobolDocumentModel.getUri()).thenReturn("URI1");
+        when(cobolDocumentModel.getText()).thenReturn("code");
+        when(documentModelService.getAllOpened()).thenReturn(ImmutableList.of(cobolDocumentModel));
         when(documentModelService.get(any())).thenReturn(cobolDocumentModel);
+        when(analysisService.isCopybook(anyString(), anyString())).thenReturn(false);
         when(analysisResultsRevisionsMock.get(cobolDocumentModel.getUri())).thenReturn(1);
         asyncAnalysisService.reanalyseCopybooksAssociatedPrograms(uris, "copybookUri", "copybookContent", eventSource);
 
