@@ -475,7 +475,7 @@
   },
   "dependencies": {
     "@code4z/cobol-dialect-api": "file:../cobol-dialect-api",
-    "glob": "10.2.7",
+    "glob": "10.3.10",
     "iconv-lite": "^0.6.3",
     "micromatch": "4.0.5",
     "@vscode/extension-telemetry": "^0.8.2",
@@ -504,5 +504,8 @@
     "ts-jest": "^29.0.1",
     "tslint": "^5.18.0",
     "typescript": "^4.9.4"
+  },
+  "overrides": {
+    "isexe": "^3.1.1"
   }
 }

@@ -110,6 +110,10 @@ public class CobolWorkspaceServiceImpl extends LspEventConsumer implements Works
               path = path.getParent();
             }
             String uriString = uriDecodeService.decode(path.toUri().toString());
+            if (sourceUnitGraph.isFileOpened(uriString)) {
+              // opened files are taken care by textChange events
+              return;
+            }
             boolean isDirectory = Files.isDirectory(path);
             if (!isDirectory) {
               triggerAnalysisForChangedFile(uriString);
