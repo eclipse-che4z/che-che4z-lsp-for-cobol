@@ -84,16 +84,16 @@ class KeywordCompletionTest {
 
     Keywords keywords = new Keywords(mock(SettingsService.class), dialectService);
     List<String> dialectType = ImmutableList.of();
-    assertEquals(2346, keywords.getDataMap(dialectType).size());
-
-    dialectType = ImmutableList.of("IDMS");
     assertEquals(2347, keywords.getDataMap(dialectType).size());
 
-    dialectType = ImmutableList.of("DaCo");
+    dialectType = ImmutableList.of("IDMS");
     assertEquals(2348, keywords.getDataMap(dialectType).size());
 
-    dialectType = ImmutableList.of("DaCo", "IDMS");
+    dialectType = ImmutableList.of("DaCo");
     assertEquals(2349, keywords.getDataMap(dialectType).size());
+
+    dialectType = ImmutableList.of("DaCo", "IDMS");
+    assertEquals(2350, keywords.getDataMap(dialectType).size());
   }
 
   @Test
