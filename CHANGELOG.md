@@ -1,6 +1,25 @@
 # Changelog
 All notable changes to the COBOL Language Support extension are documented in this file.
 
+## [2.1.2](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/compare/2.1.1...2.2.0) (2024-04-03)
+
+### Bug Fixes
+* Add benchmark service ([a313cc2](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/a313cc20340e819a6b4d079740b123f1ac65eb74))
+* Apply matching threshold while parsing different divisions of COBOL code ([4f20ce9](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/4f20ce9c11661321ad33058f01bbb0af658d7ac0))
+* Fix folding for evaluate block ([70a752d](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/70a752de324b560277af9ea4fa45aa04615bb8d0))
+* Fix folding when IfNode has a copynode child ([0c9717d](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/0c9717d161dd7c3c7f595c35c0a8b2be6e533aca))
+* Hardware parser tests ([cb98e83](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/cb98e83740c60fe48a41663b098d47896d9feca9))
+* Update CICS delay statement as per doc ([3aed670](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/3aed670a8ff661d3e958c6b30ad0f3288ae3643c))
+* Update new keywords introduced by CICS EXCI grammar ([f9a8e91](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/f9a8e91e16b3b4624acdbb1147c79d32016c30fd))
+
+### Features
+* Add CCF support for CICS RETURN statement ([#2229](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/issues/2229)) ([cbcd098](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/cbcd09873b34b3e841efc72b29ece7aaefcc3196))
+* Add CCF support for not supported statements ([#2242](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/issues/2242)) ([dcb5de5](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/dcb5de5483e3740e193de818bee870241d85e51c))
+* Add CCF support for the 'XML PARSE' statement ([#2237](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/issues/2237)) ([3c09a11](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/3c09a11fda5bd1f1ffabfc21e8d14e45a3748381))
+* Allow floating comments in DaCo COPY MAID statements ([deb5811](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/deb581168bd5c6c05ef9c791b1a8ca2ff73cd5c9))
+* Make COBOL code layout configurable ([26b3388](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/26b3388a9237b46f9fd8b62e831380c8317827fb))
+* Support EXCI command in CICS ([3dcd0f5](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/3dcd0f5a80f26d8de88cc07992d481916194c0ca))
+
 ## [2.1.1](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/compare/2.1.0...2.1.1) (2024-01-30)
 ### Bug Fixes
 * Add grammar for the CICS INQUIRE URIMAP statement ([f45d384](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/f45d38410a5f08d785ee8a9ddc2dd6fde8862846))

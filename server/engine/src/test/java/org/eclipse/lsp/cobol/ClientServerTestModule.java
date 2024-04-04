@@ -35,7 +35,6 @@ import org.eclipse.lsp.cobol.core.engine.dialects.DialectDiscoveryFolderService;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectDiscoveryService;
 import org.eclipse.lsp.cobol.core.messages.LocaleStoreImpl;
 import org.eclipse.lsp.cobol.core.messages.PropertiesMessageService;
-import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
 import org.eclipse.lsp.cobol.lsp.CobolWorkspaceServiceImpl;
 import org.eclipse.lsp.cobol.lsp.DisposableLSPStateService;
 import org.eclipse.lsp.cobol.lsp.jrpc.CobolLanguageClient;
@@ -62,7 +61,6 @@ import org.eclipse.lsp.cobol.service.delegates.references.ElementOccurrences;
 import org.eclipse.lsp.cobol.service.delegates.references.Occurrences;
 import org.eclipse.lsp.cobol.service.mocks.MockLanguageClient;
 import org.eclipse.lsp.cobol.service.mocks.MockLanguageServer;
-import org.eclipse.lsp.cobol.service.mocks.MockTextPreprocessor;
 import org.eclipse.lsp.cobol.service.settings.CachingConfigurationService;
 import org.eclipse.lsp.cobol.service.settings.ConfigurationService;
 import org.eclipse.lsp.cobol.service.settings.SettingsService;
@@ -102,7 +100,6 @@ public class ClientServerTestModule extends AbstractModule {
     bind(SubroutineService.class).to(SubroutineServiceImpl.class);
     bind(Occurrences.class).to(ElementOccurrences.class);
     bind(CFASTBuilder.class).to(CFASTBuilderImpl.class);
-    bind(TextPreprocessor.class).to(MockTextPreprocessor.class);
     bind(CopybookIdentificationService.class)
             .annotatedWith(Names.named("contentStrategy"))
             .to(CopybookIdentificationServiceBasedOnContent.class);

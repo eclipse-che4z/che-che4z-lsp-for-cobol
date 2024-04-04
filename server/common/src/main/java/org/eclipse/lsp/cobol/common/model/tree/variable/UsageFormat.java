@@ -50,6 +50,7 @@ public enum UsageFormat {
   POINTER_32,
   PROCEDURE_POINTER,
   FUNCTION_POINTER,
+  SQL,
   UNDEFINED;
 
   private static final Map<String, UsageFormat> MAP;

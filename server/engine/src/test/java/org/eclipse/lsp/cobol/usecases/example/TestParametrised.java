@@ -17,6 +17,7 @@ package org.eclipse.lsp.cobol.usecases.example;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
+import org.eclipse.lsp.cobol.core.ParserUtils;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
@@ -54,7 +55,7 @@ class TestParametrised {
             "eof",
             new Diagnostic(
                 new Range(),
-                "Unexpected end of file",
+                    ParserUtils.isHwParserEnabled() ? "Unexpected end of file" : "A period was assumed before \"<EOF>\".",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())));
   }

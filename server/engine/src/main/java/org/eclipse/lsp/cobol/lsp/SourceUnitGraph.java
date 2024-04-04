@@ -18,6 +18,11 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URL;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -125,9 +130,9 @@ public class SourceUnitGraph implements AnalysisStateListener {
             });
         objectRef.putIfAbsent(copyNode.getUri(), copyNodeV);
         references.add(copyNodeV);
-
-        documentGraphIndexedByCopybook.putIfAbsent(copyNode.getUri(), new ArrayList<>());
-        List<String> strings = documentGraphIndexedByCopybook.get(copyNode.getUri());
+        String decodedUri = uriDecodeService.decode(copyNode.getUri());
+        documentGraphIndexedByCopybook.putIfAbsent(decodedUri, new ArrayList<>());
+        List<String> strings = documentGraphIndexedByCopybook.get(decodedUri);
         if (!strings.contains(parentUri)) {
           strings.add(parentUri);
         }
@@ -173,7 +178,16 @@ public class SourceUnitGraph implements AnalysisStateListener {
    * @return true if copybook, false otherwise.
    */
   public boolean isCopybook(String uri) {
-    return documentGraphIndexedByCopybook.containsKey(uri);
+    return documentGraphIndexedByCopybook.keySet().stream().anyMatch(copyUri -> {
+      try {
+        String decodeUri = uri.replace(" ", "%20");
+        copyUri = copyUri.replace(" ", "%20");
+        return new URL(decodeUri).sameFile(new URL(copyUri));
+      } catch (IOException e) {
+        LOG.error("IOException encountered while comparing paths {} and {}", copyUri, uri);
+        return false;
+      }
+    });
   }
 
   private void updateGraphNodes(CobolDocumentModel model, EventSource eventSource) {
@@ -201,6 +215,7 @@ public class SourceUnitGraph implements AnalysisStateListener {
 
   /**
    * Get content for a passed uri
+   *
    * @param uri
    * @return content
    */
@@ -381,6 +396,23 @@ public class SourceUnitGraph implements AnalysisStateListener {
       if (isContained) return true;
     }
     return false;
+  }
+
+  /**
+   * Gives a list of all the copybooks contained inside a parent dir.
+   *
+   * @param parentFolder parent directory
+   * @return List of copybooks contained inside a parent directory
+   */
+  public List<String> getCopybookUriInsideFolder(String parentFolder) {
+    List<String> result = new ArrayList<>();
+    Path parentPath = Paths.get(URI.create(parentFolder));
+    Set<String> allCopybooks = documentGraphIndexedByCopybook.keySet();
+    for (String copybookUri : allCopybooks) {
+      Path copybookPath = Paths.get(URI.create(copybookUri));
+      if (copybookPath.startsWith(parentPath)) result.add(copybookUri);
+    }
+    return result;
   }
 
   /** Nodes in the {@link SourceUnitGraph} representing document and their links in a workspace */

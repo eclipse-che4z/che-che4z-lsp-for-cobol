@@ -24,16 +24,17 @@ import static org.mockito.Mockito.verify;
 import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonPrimitive;
+import java.util.Optional;
 import org.eclipse.lsp.cobol.common.message.LocaleStore;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectService;
+import org.eclipse.lsp.cobol.common.dialects.CobolLanguageId;
 import org.eclipse.lsp.cobol.service.AnalysisService;
 import org.eclipse.lsp.cobol.service.WatcherService;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookNameService;
 import org.eclipse.lsp.cobol.service.delegates.completions.Keywords;
 import org.eclipse.lsp.cobol.service.settings.SettingsService;
 import org.eclipse.lsp.cobol.service.settings.SettingsServiceImpl;
-import org.eclipse.lsp.cobol.service.settings.layout.CobolProgramLayout;
 import org.eclipse.lsp.cobol.service.settings.layout.CodeLayoutStore;
 import org.eclipse.lsp4j.InitializedParams;
 import org.junit.jupiter.api.Test;
@@ -57,7 +58,7 @@ class InitializedHandlerTest {
     prepareSettingsService(settingsService, localeStore);
 
     CodeLayoutStore codeLayoutStore = mock(CodeLayoutStore.class);
-    when(codeLayoutStore.getCodeLayout()).thenReturn(new CobolProgramLayout());
+    when(codeLayoutStore.getCodeLayout()).thenReturn(Optional.of(CobolLanguageId.COBOL.getLayout()));
     when(codeLayoutStore.updateCodeLayout()).thenReturn(mock -> {});
 
     InitializedHandler initializedHandler =
@@ -96,6 +97,6 @@ class InitializedHandlerTest {
     when(settingsService.fetchConfiguration("dialect"))
         .thenReturn(completedFuture(singletonList(arr)));
     when(settingsService.fetchConfiguration(COBOL_PROGRAM_LAYOUT.label))
-        .thenReturn(completedFuture(ImmutableList.of(new CobolProgramLayout())));
+        .thenReturn(completedFuture(ImmutableList.of(Optional.of(CobolLanguageId.COBOL.getLayout()))));
   }
 }

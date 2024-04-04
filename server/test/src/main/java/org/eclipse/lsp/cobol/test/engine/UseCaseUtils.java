@@ -14,28 +14,26 @@
  */
 package org.eclipse.lsp.cobol.test.engine;
 
+import static java.util.Collections.emptyList;
+import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.toList;
+
 import com.google.inject.Injector;
+import java.util.List;
+import java.util.ServiceLoader;
+import java.util.stream.StreamSupport;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.lsp.cobol.common.AnalysisResult;
-import org.eclipse.lsp.cobol.common.CleanerPreprocessor;
+import org.eclipse.lsp.cobol.common.*;
 import org.eclipse.lsp.cobol.common.copybook.CopybookModel;
 import org.eclipse.lsp.cobol.common.copybook.CopybookName;
 import org.eclipse.lsp.cobol.common.copybook.CopybookService;
-import org.eclipse.lsp.cobol.common.SubroutineService;
-import org.eclipse.lsp.cobol.common.LanguageEngineFacade;
+import org.eclipse.lsp.cobol.common.dialects.CobolLanguageId;
+import org.eclipse.lsp.cobol.common.dialects.TrueDialectService;
 import org.eclipse.lsp.cobol.test.CobolText;
 import org.eclipse.lsp.cobol.test.UseCaseInitializer;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
-
-import java.util.List;
-import java.util.ServiceLoader;
-import java.util.stream.StreamSupport;
-
-import static java.util.Collections.emptyList;
-import static java.util.Optional.ofNullable;
-import static java.util.stream.Collectors.toList;
 
 /**
  * This utility class provides methods to run use cases with COBOL code examples.
@@ -43,11 +41,11 @@ import static java.util.stream.Collectors.toList;
 @Slf4j
 @UtilityClass
 public class UseCaseUtils {
-  public static final String DOCUMENT_URI = "file:///c:/workspace/document.cbl";
-  public static final String DOCUMENT2_URI = "file:///c:/workspace/document2.cbl";
+  public static final String DOCUMENT_URI = "file:c:/workspace/document.cbl";
+  public static final String DOCUMENT2_URI = "file:c:/workspace/document2.cbl";
 
-  public static final String COPYBOOK_URI = "file///c:/copybooks/copybook.cpy";
-  private static final String CPY_URI_PREFIX = "file:///c:/workspace/.c4z/.copybooks/";
+  public static final String COPYBOOK_URI = "file:c:/copybooks/copybook.cpy";
+  private static final String CPY_URI_PREFIX = "c:/workspace/.c4z/.copybooks/";
   private static final String CPY_URI_SUFFIX = ".cpy";
 
   /**
@@ -58,14 +56,16 @@ public class UseCaseUtils {
    * @return the URI
    */
   public static String toURI(String name, String dialect) {
-    StringBuilder sb = new StringBuilder(CPY_URI_PREFIX);
+    StringBuilder sb = new StringBuilder();
+    String currentWorkingDir = System.getProperty("user.dir");
+    sb.append("file:").append(currentWorkingDir).append(System.getProperty("file.separator")).append(CPY_URI_PREFIX);
     if (dialect != null) {
       sb.append(dialect);
       sb.append("/");
     }
     sb.append(name);
     sb.append(CPY_URI_SUFFIX);
-    return sb.toString();
+    return sb.toString().replace("\\", "/");
   }
 
   /**
@@ -103,29 +103,36 @@ public class UseCaseUtils {
    * @return the entire analysis result
    */
   public static AnalysisResult analyze(UseCase useCase) {
+    return analyze(useCase, "cobol");
+  }
+  /**
+   * Analyze the given text using a real language engine providing copybooks required for the
+   * analysis with the required sync type
+   *
+   * @param useCase       use case instance to analyze
+   * @param languageId language Id
+   * @return the entire analysis result
+   */
+  public static AnalysisResult analyze(UseCase useCase, String languageId) {
 
     ServiceLoader<UseCaseInitializer> loader = ServiceLoader.load(UseCaseInitializer.class);
     Injector injector = StreamSupport.stream(loader.spliterator(), false).findFirst()
         .map(UseCaseInitializer::createInjector)
         .orElseThrow(() -> new RuntimeException("UseCase initializer not found"));
 
-    CleanerPreprocessor preprocessor = injector.getInstance(CleanerPreprocessor.class);
+    TrueDialectService dialectService = injector.getInstance(TrueDialectService.class);
 
     CopybookService copybookService = injector.getInstance(CopybookService.class);
     PredefinedCopybookUtils.loadPredefinedCopybooks(useCase.getSqlBackend(), useCase.getCopybooks(), useCase.documentUri)
-        .forEach(pc -> copybookService.store(pc, true));
+        .forEach(pc -> copybookService.store(pc, dialectService.getPreprocessor(CobolLanguageId.COBOL)));
 
     useCase.getCopybooks()
         .forEach(cobolText -> {
 
           String copybookText = cobolText.getFullText();
-          if (cobolText.isPreprocess()) {
-            copybookText = preprocessor.cleanUpCode("uri", cobolText.getFullText())
-                .getResult().toString();
-          }
 
           cobolText = new CobolText(cobolText.getFileName().toUpperCase(), cobolText.getDialectType(), copybookText);
-          copybookService.store(UseCaseUtils.toCopybookModel(cobolText, useCase.documentUri), true);
+          copybookService.store(UseCaseUtils.toCopybookModel(cobolText, useCase.documentUri), dialectService.getPreprocessor(CobolLanguageId.COBOL));
         });
 
     SubroutineService subroutines = injector.getInstance(SubroutineService.class);

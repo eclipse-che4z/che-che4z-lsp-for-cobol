@@ -4,7 +4,7 @@
   "description": "Autocomplete, highlighting and diagnostics for COBOL code and copybooks.",
   "author": "Broadcom",
   "license": "EPL-2.0",
-  "version": "2.1.1",
+  "version": "2.1.2",
   "preview": false,
   "publisher": "BroadcomMFD",
   "engines": {
@@ -92,6 +92,20 @@
         ],
         "configuration": "./syntaxes/lang-config.json",
         "firstLine": "^[0-9 ]{6}([*].*|[ Dd] *([Ii][Dd]([Ee][Nn][Tt][Ii][Ff][Ii][Cc][Aa][Tt][Ii][Oo][Nn])? +[Dd][Ii][Vv][Ii][Ss][Ii][Oo][Nn][. ]|[0-9][0-9] +[@#$A-Z][-A-Z0-9]*[. ]|[*](CBL|PROCESS) ).*)$|^([0-9].{5})?[ ]*(CBL|PROCESS) "
+      },
+      {
+        "id": "hpcobol",
+        "extensions": [
+          ".hpcbl",
+          ".hpcobol",
+          ".hp",
+          "ecobol"
+        ],
+        "aliases": [
+          "HP-COBOL"
+        ],
+        "configuration": "./syntaxes/lang-config-hp.json",
+        "firstLine": "^[ ]( *([Ii][Dd]([Ee][Nn][Tt][Ii][Ff][Ii][Cc][Aa][Tt][Ii][Oo][Nn])? +[Dd][Ii][Vv][Ii][Ss][Ii][Oo][Nn][.].*?)$|^\\?.*"
       }
     ],
     "grammars": [
@@ -119,6 +133,14 @@
         "injectTo": [
           "source.cobol"
         ]
+      },
+      {
+        "language": "hpcobol",
+        "scopeName": "source.hpcobol",
+        "path": "./syntaxes/HP.COBOL.tmLanguage.json",
+        "embeddedLanguages": {
+          "meta.embedded.block.html": "html"
+        }
       }
     ],
     "configuration": {
@@ -427,6 +449,15 @@
           80
         ],
         "editor.wordSeparators": "!\"#$%&'()*+,./:;<=>?@[\\]^`{|}~"
+      },
+      "[hpcobol]": {
+        "editor.guides.indentation": false,
+        "editor.rulers": [
+          1,
+          5,
+          132
+        ],
+        "editor.wordSeparators": "!\"#$%&'()*+,./:;<=>?@[\\]^`{|}~"
       }
     },
     "keybindings": [
@@ -475,7 +506,7 @@
   },
   "dependencies": {
     "@code4z/cobol-dialect-api": "file:../cobol-dialect-api",
-    "glob": "10.2.7",
+    "glob": "10.3.10",
     "iconv-lite": "^0.6.3",
     "micromatch": "4.0.5",
     "@vscode/extension-telemetry": "^0.8.2",
@@ -504,5 +535,8 @@
     "ts-jest": "^29.0.1",
     "tslint": "^5.18.0",
     "typescript": "^4.9.4"
+  },
+  "overrides": {
+    "isexe": "^3.1.1"
   }
 }

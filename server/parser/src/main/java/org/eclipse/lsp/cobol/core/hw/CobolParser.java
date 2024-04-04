@@ -23,10 +23,7 @@ import org.apache.commons.text.similarity.JaroWinklerSimilarity;
 import org.eclipse.lsp.cobol.core.cst.*;
 import org.eclipse.lsp.cobol.core.cst.IdentificationDivision;
 import org.eclipse.lsp.cobol.core.cst.base.CstNode;
-import org.eclipse.lsp.cobol.core.cst.procedure.Paragraph;
-import org.eclipse.lsp.cobol.core.cst.procedure.ProcedureDivision;
-import org.eclipse.lsp.cobol.core.cst.procedure.Section;
-import org.eclipse.lsp.cobol.core.cst.procedure.Statement;
+import org.eclipse.lsp.cobol.core.cst.procedure.*;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
@@ -177,6 +174,7 @@ public class CobolParser {
       }
 
       if (matchSeq("PROCEDURE", "DIVISION")) {
+        spaces();
         procedureDivisionContent();
       }
 
@@ -186,7 +184,7 @@ public class CobolParser {
         parseProgram();
       }
 
-      if (matchSeq("END", "PROGRAM")) {
+      if (isEndOfProgram()) {
         spaces();
         consume("END");
         spaces();
@@ -201,16 +199,19 @@ public class CobolParser {
     }
   }
 
+  private boolean isEndOfProgram() {
+    return matchSeq("END", "PROGRAM");
+  }
+
   private void procedureDivisionContent() {
-    spaces();
     ctx.push(new ProcedureDivision());
-    consume("PROCEDURE");
-    spaces();
-    consume("DIVISION");
-    optional(".");
-    spaces();
+    procedureDivisionHeader();
+    ((ProcedureDivision) ctx.peek()).setBodyStartToken(ctx.getLexer().peek(null).get(0));
     try {
-      while (!isNextDivisionEofOrEop()) {
+      while (!isNextDivisionEofOrEop() && !isEndOfProgram()) {
+        if (isDeclaratives()) {
+          declaratives();
+        }
         if (isParagraph()) {
           paragraph();
         } else if (isSection()) {
@@ -225,6 +226,39 @@ public class CobolParser {
     }
   }
 
+  private void procedureDivisionHeader() {
+    consume("PROCEDURE");
+    spaces();
+    consume("DIVISION");
+    spaces();
+    while (!match(".")) {
+      consume();
+    }
+    consume(".");
+    spaces();
+  }
+
+  private void declaratives() {
+    spaces();
+    ctx.push(new Declaratives());
+    consume("DECLARATIVES");
+    spaces();
+    consume(".");
+    spaces();
+    try {
+      while (!isDeclarativesEnd()) {
+        consume();
+        spaces();
+      }
+    } finally {
+      ctx.popAndAttach();
+    }
+  }
+
+  private boolean isDeclarativesEnd() {
+    return matchSeq("END", "DECLARATIVES", ".");
+  }
+
   private void section() {
     spaces();
     ctx.push(new Section());
@@ -234,8 +268,9 @@ public class CobolParser {
     spaces();
     consume(".");
     spaces();
+    ((Section) ctx.peek()).setBodyStartToken(ctx.getLexer().peek(null).get(0));
     try {
-      while (!isNextDivisionEofOrEop() && !isParagraph() && !isSection()) {
+      while (!isNextDivisionEofOrEop() && !isParagraph() && !isSection() && !isEndOfProgram()) {
         statement();
         spaces();
       }
@@ -245,18 +280,18 @@ public class CobolParser {
   }
 
   private boolean isSection() {
-    return matchSeq(null, "SECTION", ".");
+    return matchSeq(null, "SECTION", ".") && isInAriaA(ctx.getLexer().peek(null).get(0));
   }
 
   private void paragraph() {
     spaces();
     ctx.push(new Paragraph());
-    consume();
+    ((Paragraph) ctx.peek()).setName(consume().get(0).getLexeme());
     spaces();
     consume(".");
     spaces();
     try {
-      while (!isNextDivisionEofOrEop() && !isParagraph() && !isSection()) {
+      while (!isNextDivisionEofOrEop() && !isParagraph() && !isSection() && !isEndOfProgram()) {
         statement();
         spaces();
       }
@@ -268,7 +303,7 @@ public class CobolParser {
   private void statement() {
     ctx.push(new Statement());
     try {
-      while (!match(".") && ctx.getLexer().hasMore()) {
+      while (!match(".") && !isNextDivisionEofOrEop() && !isParagraph() && !isSection() && !isEndOfProgram()) {
         consume();
       }
       optional(".");
@@ -278,7 +313,24 @@ public class CobolParser {
   }
 
   private boolean isParagraph() {
-    return matchSeq(null, ".");
+    Token nameToken = ctx.getLexer().peek(null).get(0);
+    if (!matchSeq(null, ".")) {
+      return false;
+    }
+    if ("DECLARATIVES".equalsIgnoreCase(nameToken.getLexeme())) {
+      return false;
+    }
+    if (!isInAriaA(nameToken)) {
+      return false;
+    }
+    return  true;
+  }
+  private boolean isDeclaratives() {
+    return matchSeq("DECLARATIVES", ".") && isInAriaA(ctx.getLexer().peek(null).get(0));
+  }
+
+  private boolean isInAriaA(Token token) {
+    return token.getStartPositionInLine() >= 7 && token.getStartPositionInLine() <= 10;
   }
 
   private void dataDivisionContent() {
@@ -322,13 +374,27 @@ public class CobolParser {
   }
 
   private boolean isNextDivisionEofOrEop() {
-    return matchSeq("ENVIRONMENT", "DIVISION", ".")
-            || matchSeq("IDENTIFICATION", "DIVISION", ".")
-            || matchSeq("ID", "DIVISION", ".")
-            || matchSeq("DATA", "DIVISION", ".")
-            || matchSeq("PROCEDURE", "DIVISION")
-            || matchSeq("END", "PROGRAM")
-            || isEOF(ctx.getLexer().peek(ctx.peek().getRule()).get(0));
+    if (isEOF(ctx.getLexer().peek(ctx.peek().getRule()).get(0))) {
+      return true;
+    }
+    if (isEndOfProgram()) {
+      return true;
+    }
+
+    boolean inAriaA = isInAriaA(ctx.getLexer().peek(null).get(0));
+    if (matchSeq("ID", "DIVISION", ".") && inAriaA) {
+      return true;
+    }
+    if (matchSeq("IDENTIFICATION", "DIVISION", ".") && inAriaA) {
+      return true;
+    }
+    if (matchSeq("ENVIRONMENT", "DIVISION", ".") && inAriaA) {
+      return true;
+    }
+    if (matchSeq("DATA", "DIVISION", ".") && inAriaA) {
+      return true;
+    }
+    return matchSeq("PROCEDURE", "DIVISION") && inAriaA;
   }
 
   private boolean matchSeq(String... lexemes) {
@@ -377,10 +443,11 @@ public class CobolParser {
     ctx.peek().getChildren().add(forward.get(0));
   }
 
-  private void consume() {
+  private List<Token> consume() {
     List<Token> forward = ctx.getLexer().forward(ctx.peek().getRule());
     ctx.peek().getChildren().add(forward.get(0));
     skipSkipToken();
+    return forward;
   }
 
   private void or(String... expectedTokens) {

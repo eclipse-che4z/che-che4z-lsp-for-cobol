@@ -38,6 +38,5 @@ class IdentificationDivisionTests {
     String reconstructed = parseResult.getSourceUnit().toText();
     assertEquals(0, parseResult.getDiagnostics().size(), parseResult.getDiagnostics().toString());
     assertEquals(source, reconstructed);
-
   }
 }

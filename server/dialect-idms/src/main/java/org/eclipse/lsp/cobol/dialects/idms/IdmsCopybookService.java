@@ -24,6 +24,7 @@ import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
+import org.eclipse.lsp.cobol.common.CleanerPreprocessor;
 import org.eclipse.lsp.cobol.common.ResultWithErrors;
 import org.eclipse.lsp.cobol.common.copybook.CopybookModel;
 import org.eclipse.lsp.cobol.common.copybook.CopybookName;
@@ -44,6 +45,7 @@ class IdmsCopybookService {
 
   private final String programDocumentUri;
   private final CopybookService copybookService;
+  private final CleanerPreprocessor preprocessor;
   private final CopybookProcessingMode copybookProcessingMode;
   private final ParseTreeListener treeListener;
   private final MessageService messageService;
@@ -95,7 +97,7 @@ class IdmsCopybookService {
     parser.setErrorHandler(new CobolErrorStrategy(messageService));
     parser.addParseListener(treeListener);
 
-    IdmsCopybookVisitor visitor = new IdmsCopybookVisitor(copybookService, copybookProcessingMode, treeListener, messageService,
+    IdmsCopybookVisitor visitor = new IdmsCopybookVisitor(copybookService, preprocessor, copybookProcessingMode, treeListener, messageService,
         programDocumentUri, copybookModel.getUri(), parentLevel, processedCopybooks);
 
     ParserRuleContext node = parser.startRule();

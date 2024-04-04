@@ -60,12 +60,16 @@ public class CobolLSPropertiesResourceBundle extends ResourceBundle {
 
   private Properties load(DialectRegistryItem dialectRegistryItem, Locale locale) throws IOException {
     Properties properties = new Properties();
-    List<String> resourceName = toSuspectedBundleNames(locale);
-    Collections.reverse(resourceName);
-    LOG.debug("URI for dialect jar:" + dialectRegistryItem.getUri());
-    InputStream validResources =
-        getDialectResources(resourceName, dialectRegistryItem.getUri());
-    properties.load(validResources);
+    try {
+      List<String> resourceName = toSuspectedBundleNames(locale);
+      Collections.reverse(resourceName);
+      LOG.debug("URI for dialect jar:" + dialectRegistryItem.getUri());
+      InputStream validResources =
+              getDialectResources(resourceName, dialectRegistryItem.getUri());
+      properties.load(validResources);
+    } catch (Exception e) {
+
+    }
     return properties;
   }
 

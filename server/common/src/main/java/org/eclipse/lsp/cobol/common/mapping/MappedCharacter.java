@@ -28,7 +28,7 @@ import java.util.UUID;
  */
 @Data
 @AllArgsConstructor
-class MappedCharacter {
+public class MappedCharacter {
   private final UUID id = UUID.randomUUID();
   private char character;
   private Position originalPosition;

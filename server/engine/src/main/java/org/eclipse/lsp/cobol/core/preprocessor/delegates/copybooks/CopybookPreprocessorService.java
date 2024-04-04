@@ -23,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.apache.commons.lang3.tuple.Pair;
+import org.eclipse.lsp.cobol.common.CleanerPreprocessor;
 import org.eclipse.lsp.cobol.common.ResultWithErrors;
 import org.eclipse.lsp.cobol.common.copybook.*;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
@@ -67,19 +68,21 @@ class CopybookPreprocessorService {
   private final CopybookHierarchy hierarchy;
   private final ReplacingService replacingService;
   private final CopybookErrorService copybookErrorService;
+  private final CleanerPreprocessor preprocessor;
 
   private static final String HYPHEN = "-";
   private static final String UNDERSCORE = "_";
 
   CopybookPreprocessorService(String programDocumentUri,
-                                     GrammarPreprocessor grammarPreprocessor,
-                                     ExtendedDocument currentDocument,
-                                     CopybookService copybookService,
-                                     CopybookProcessingMode copybookConfig,
-                                     CopybooksRepository copybooks,
-                                     CopybookHierarchy hierarchy,
-                                     MessageService messageService,
-                                     ReplacingService replacingService) {
+                              GrammarPreprocessor grammarPreprocessor,
+                              ExtendedDocument currentDocument,
+                              CopybookService copybookService,
+                              CopybookProcessingMode copybookConfig,
+                              CopybooksRepository copybooks,
+                              CopybookHierarchy hierarchy,
+                              MessageService messageService,
+                              ReplacingService replacingService,
+                              CleanerPreprocessor preprocessor) {
     this.programDocumentUri = programDocumentUri;
     this.grammarPreprocessor = grammarPreprocessor;
     this.currentDocument = currentDocument;
@@ -89,6 +92,7 @@ class CopybookPreprocessorService {
     this.hierarchy = hierarchy;
     this.replacingService = replacingService;
     this.copybookErrorService = new CopybookErrorService(messageService);
+    this.preprocessor = preprocessor;
   }
 
   void addCopybook(ParserRuleContext ctx, CobolPreprocessor.CopySourceContext copySource,
@@ -163,7 +167,7 @@ class CopybookPreprocessorService {
 
     PreprocessorContext copybookContext = new PreprocessorContext(programDocumentUri, copybookDocument, copybookConfig, hierarchy, copybooks);
     List<SyntaxError> copybookErrors = new LinkedList<>();
-    grammarPreprocessor.preprocess(copybookContext).unwrap(copybookErrors::addAll);
+    grammarPreprocessor.preprocess(copybookContext, preprocessor).unwrap(copybookErrors::addAll);
 
     errors.addAll(copybookErrors);
     List<SyntaxError> distinct = errors.stream().distinct().collect(Collectors.toList());
@@ -237,7 +241,7 @@ class CopybookPreprocessorService {
             copybookName,
             programDocumentUri,
             documentUri,
-            true);
+            preprocessor);
     CopybookModel copybookModel = resolvedCopybook.getResult();
     if (copybookModel.getContent() == null) {
       return null;

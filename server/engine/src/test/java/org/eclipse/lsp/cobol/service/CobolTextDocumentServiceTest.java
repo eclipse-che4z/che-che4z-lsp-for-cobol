@@ -22,6 +22,7 @@ import java.util.Set;
 import org.eclipse.lsp.cobol.cfg.CFASTBuilder;
 import org.eclipse.lsp.cobol.common.SubroutineService;
 import org.eclipse.lsp.cobol.common.copybook.CopybookService;
+import org.eclipse.lsp.cobol.common.dialects.TrueDialectService;
 import org.eclipse.lsp.cobol.lsp.*;
 import org.eclipse.lsp.cobol.lsp.analysis.AsyncAnalysisService;
 import org.eclipse.lsp.cobol.lsp.events.notifications.DidChangeNotification;
@@ -96,7 +97,7 @@ class CobolTextDocumentServiceTest {
     DisposableLSPStateService disposableLSPStateService = new CobolLSPServerStateService();
     CopybookService copybookService = mock(CopybookService.class);
     SubroutineService subroutineService = mock(SubroutineService.class);
-    AsyncAnalysisService asyncAnalysisService = new AsyncAnalysisService(documentModelService, analysisService, copybookService, subroutineService, communications);
+    AsyncAnalysisService asyncAnalysisService = new AsyncAnalysisService(mock(TrueDialectService.class), documentModelService, analysisService, copybookService, subroutineService, communications);
 
     CompletionHandler completionHandler = new CompletionHandler(asyncAnalysisService, completions, documentModelService, uriDecodeService);
     FormattingHandler formattingHandler = new FormattingHandler(documentModelService, formations, asyncAnalysisService, uriDecodeService);
@@ -112,7 +113,7 @@ class CobolTextDocumentServiceTest {
     DocumentHighlightHandler documentHighlightHandler = new DocumentHighlightHandler(asyncAnalysisService, occurrences, documentModelService, uriDecodeService);
     ReferencesHandler referencesHandler = new ReferencesHandler(asyncAnalysisService, occurrences, documentModelService, uriDecodeService);
     HoverHandler hoverHandler = new HoverHandler(asyncAnalysisService, hoverProvider, documentModelService, documentGraph, uriDecodeService);
-    FoldingRangeHandler foldingRangeHandler = new FoldingRangeHandler(documentModelService, asyncAnalysisService, uriDecodeService);
+    FoldingRangeHandler foldingRangeHandler = new FoldingRangeHandler(documentModelService, asyncAnalysisService, uriDecodeService, analysisService);
 
     service = new CobolTextDocumentService(
             lspMessageBroker,

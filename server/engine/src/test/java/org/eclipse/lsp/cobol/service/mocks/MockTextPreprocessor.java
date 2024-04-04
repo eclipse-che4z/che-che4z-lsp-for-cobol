@@ -15,14 +15,14 @@
 package org.eclipse.lsp.cobol.service.mocks;
 
 import com.google.common.collect.ImmutableList;
+import org.eclipse.lsp.cobol.common.CleanerPreprocessor;
 import org.eclipse.lsp.cobol.common.ResultWithErrors;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedText;
-import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
 
 /**
  * Mock Text Processor class
  */
-public class MockTextPreprocessor implements TextPreprocessor {
+public class MockTextPreprocessor implements CleanerPreprocessor {
   @Override
   public ResultWithErrors<ExtendedText> cleanUpCode(String documentUri, String cobolCode) {
     return new ResultWithErrors<>(new ExtendedText(cobolCode, documentUri), ImmutableList.of());
