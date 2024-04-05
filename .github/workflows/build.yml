@@ -95,7 +95,7 @@ jobs:
           cache: 'maven'
       - name: Build Server and Dialects Jars
         working-directory: server
-        run: mvn clean package --no-transfer-progress
+        run: mvn clean verify --no-transfer-progress
       - name: Upload performance data
         uses: actions/upload-artifact@v3
         with:
