@@ -250,6 +250,18 @@
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <version>${maven.jacoco.plugin.version}</version>
+                <configuration>
+                    <excludes>
+                        <exclude>**/org/eclipse/lsp/cobol/common/model/**/*</exclude>
+                        <exclude>**/org/eclipse/lsp/cobol/common/symbols/**/*</exclude>
+                        <exclude>**/org/eclipse/lsp/cobol/common/copybook/**/*</exclude>
+                        <exclude>**/org/eclipse/lsp/cobol/common/error/**/*</exclude>
+                        <exclude>**/org/eclipse/lsp/cobol/common/message/**/*</exclude>
+                        <exclude>**/org/eclipse/lsp/cobol/common/processor/ProcessingPhase.class</exclude>
+                        <exclude>**/org/eclipse/lsp/cobol/common/processor/Processor.class</exclude>
+                        <exclude>**/org/eclipse/lsp/cobol/common/dialects/CobolDialect.class</exclude>
+                    </excludes>
+                </configuration>
                 <executions>
                     <execution>
                         <id>coverage-prepare-agent</id>
