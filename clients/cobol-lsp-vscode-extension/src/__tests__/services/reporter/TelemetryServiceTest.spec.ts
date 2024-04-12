@@ -18,6 +18,16 @@ import { TelemetryReporterImpl } from "../../../services/reporter/TelemetryRepor
 import { TelemetryService } from "../../../services/reporter/TelemetryService";
 import { TelemetryEventMeasurements } from "../../../services/reporter/model/TelemetryEvent";
 
+jest.mock("vscode-languageclient/node", () => ({
+  LanguageClient: jest.fn(),
+  DidCloseTextDocumentNotification: {
+    type: jest.fn(),
+  },
+  DidOpenTextDocumentNotification: {
+    type: jest.fn(),
+  },
+}));
+
 const USERNAME: string = "usernameToAnonymize";
 const FAKE_ROOT_PATH: string = path.join(
   "C:",

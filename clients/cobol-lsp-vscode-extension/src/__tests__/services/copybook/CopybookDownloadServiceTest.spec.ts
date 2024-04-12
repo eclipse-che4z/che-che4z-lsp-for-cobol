@@ -62,7 +62,15 @@ vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
   get: jest.fn().mockReturnValue(undefined),
 });
 (vscode.ProgressLocation as any) = { Notification: "notify" };
-
+jest.mock("vscode-languageclient/node", () => ({
+  LanguageClient: jest.fn(),
+  DidCloseTextDocumentNotification: {
+    type: jest.fn(),
+  },
+  DidOpenTextDocumentNotification: {
+    type: jest.fn(),
+  },
+}));
 Utils.getZoweExplorerAPI = jest.fn();
 const getContentMock = jest.fn();
 const getUSSContentsMock = jest.fn();

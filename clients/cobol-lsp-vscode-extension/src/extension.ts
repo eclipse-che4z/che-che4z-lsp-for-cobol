@@ -90,6 +90,12 @@ export async function activate(
     ),
   );
 
+  context.subscriptions.push(
+    vscode.window.tabGroups.onDidChangeTabs(
+      languageClientService.listenToTabsChanges.bind(languageClientService),
+    ),
+  );
+
   configurationWatcher.watchConfigurationChanges();
 
   try {
@@ -126,9 +132,7 @@ export async function activate(
     "workspace/configuration",
     configHandler,
   );
-
   await languageClientService.start();
-
   // 'export' public api-surface
   return {
     v1: {

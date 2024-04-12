@@ -17,7 +17,15 @@ import { CopybookURI } from "../../../services/copybook/CopybookURI";
 import { Utils } from "../../../services/util/Utils";
 
 Utils.getZoweExplorerAPI = jest.fn();
-
+jest.mock("vscode-languageclient/node", () => ({
+  LanguageClient: jest.fn(),
+  DidCloseTextDocumentNotification: {
+    type: jest.fn(),
+  },
+  DidOpenTextDocumentNotification: {
+    type: jest.fn(),
+  },
+}));
 describe("CopybooksPathGenerator tests", () => {
   const fsPath = "/projects";
   const profile = "profile";

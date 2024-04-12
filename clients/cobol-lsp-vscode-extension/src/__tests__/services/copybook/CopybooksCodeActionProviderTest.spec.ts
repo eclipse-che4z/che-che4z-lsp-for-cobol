@@ -17,6 +17,16 @@ import { CopybooksCodeActionProvider } from "../../../services/copybook/Copybook
 import { TelemetryService } from "../../../services/reporter/TelemetryService";
 import { Utils } from "../../../services/util/Utils";
 
+jest.mock("vscode-languageclient/node", () => ({
+  LanguageClient: jest.fn(),
+  DidCloseTextDocumentNotification: {
+    type: jest.fn(),
+  },
+  DidOpenTextDocumentNotification: {
+    type: jest.fn(),
+  },
+}));
+
 describe("Test Copybook code action provider", () => {
   const copybooksCodeAction = new CopybooksCodeActionProvider();
   const doc = { uri: { fsPath: "ws-path" }, fileName: "testFile" } as any;

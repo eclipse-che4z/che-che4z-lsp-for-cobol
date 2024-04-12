@@ -22,6 +22,15 @@ import { Utils } from "../../services/util/Utils";
 
 jest.mock("../../services/reporter/TelemetryService");
 jest.mock("../../services/copybook/CopybookDownloadService");
+jest.mock("vscode-languageclient/node", () => ({
+  LanguageClient: jest.fn(),
+  DidCloseTextDocumentNotification: {
+    type: jest.fn(),
+  },
+  DidOpenTextDocumentNotification: {
+    type: jest.fn(),
+  },
+}));
 Utils.getZoweExplorerAPI = jest.fn();
 
 const copybookDownloadService: CopybookDownloadService =

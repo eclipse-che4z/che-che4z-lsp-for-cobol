@@ -13,6 +13,12 @@
  */
 
 import * as vscode from "vscode";
+import {
+  DidCloseTextDocumentNotification,
+  DidOpenTextDocumentNotification,
+  LanguageClient,
+} from "vscode-languageclient/node";
+import { LANGUAGE_ID } from "../../constants";
 
 /**
  * This class collects utility methods for general purpose activities
@@ -39,5 +45,88 @@ export class Utils {
     }
     await ext.activate();
     return ext.exports as any;
+  }
+
+  /**
+   * Handles changes in the closed vscode tabs.
+   * This method explicitly fires a 'textDocument/didClose' Notification to the LSP server.
+   *
+   * @param closedTabs closed tabs
+   * @param languageClient Language server client
+   */
+  public static handleTabClose(
+    closedTabs: readonly vscode.Tab[],
+    languageClient: LanguageClient,
+  ) {
+    closedTabs.forEach(async (tab) => {
+      const closedTab = tab.input;
+      if (Utils.isTextDocument(closedTab)) {
+        const closedTabUri = (closedTab as { uri: vscode.Uri }).uri;
+        if (!Utils.isUriActiveInAontherTabGroup(closedTabUri.toString()))
+          await languageClient.sendNotification(
+            DidCloseTextDocumentNotification.type,
+            {
+              textDocument: {
+                uri: closedTabUri.toString(),
+              },
+            },
+          );
+      }
+    });
+  }
+
+  /**
+   * Handles changes in the opened vscode tabs.
+   * This method explicitly fires a 'textDocument/didOpen' Notification to the LSP server.
+   *
+   * @param openedTabs opened tabs
+   * @param languageClient Language server client
+   */
+  public static handleTabsOpen(
+    openedTabs: readonly vscode.Tab[],
+    languageClient: LanguageClient,
+  ) {
+    openedTabs.forEach(async (tab) => {
+      const openedTab = tab.input;
+      if (Utils.isTextDocument(openedTab)) {
+        const openedTabUri = (openedTab as { uri: vscode.Uri }).uri;
+        if (!Utils.isUriActiveInAontherTabGroup(openedTabUri.toString())) {
+          let doc = await vscode.workspace.openTextDocument(openedTabUri);
+          await languageClient.sendNotification(
+            DidOpenTextDocumentNotification.type,
+            {
+              textDocument: {
+                uri: openedTabUri.toString(),
+                languageId: LANGUAGE_ID,
+                version: doc.version,
+                text: doc.getText(),
+              },
+            },
+          );
+        }
+      }
+    });
+  }
+
+  /**
+   * Checks if the passed object is a valid Text document based on whether it has an uri attribute.
+   * @param openedTab object to be analysed
+   * @returns a boolean
+   */
+  public static isTextDocument(openedTab: unknown) {
+    return (
+      openedTab != null && typeof openedTab === "object" && "uri" in openedTab
+    );
+  }
+
+  private static isUriActiveInAontherTabGroup(closedTabUri: string) {
+    const found = vscode.window.tabGroups.all
+      .map((group) => group.tabs)
+      .reduce((a, b) => a.concat(b), [])
+      .map((tab) => tab.input)
+      .filter((input) => Utils.isTextDocument(input))
+      .map((input) => (input as { uri: vscode.Uri }).uri.toString())
+      .find((input) => input === closedTabUri);
+    return typeof found !== "undefined";
   }
 }

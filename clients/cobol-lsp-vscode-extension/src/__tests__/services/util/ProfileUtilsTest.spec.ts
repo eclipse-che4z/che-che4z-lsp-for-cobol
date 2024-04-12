@@ -17,6 +17,16 @@ import * as vscode from "vscode";
 import { ProfileUtils } from "../../../services/util/ProfileUtils";
 import { Utils } from "../../../services/util/Utils";
 
+jest.mock("vscode-languageclient/node", () => ({
+  LanguageClient: jest.fn(),
+  DidCloseTextDocumentNotification: {
+    type: jest.fn(),
+  },
+  DidOpenTextDocumentNotification: {
+    type: jest.fn(),
+  },
+}));
+
 const getZoweExplorerMock = () => {
   return jest.fn().mockReturnValue({
     getExplorerExtenderApi: jest.fn().mockReturnValue({

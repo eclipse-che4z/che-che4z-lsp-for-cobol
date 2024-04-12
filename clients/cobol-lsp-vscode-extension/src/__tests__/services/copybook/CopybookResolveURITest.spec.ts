@@ -46,7 +46,15 @@ jest.mock("vscode", () => ({
   },
   workspace: {},
 }));
-
+jest.mock("vscode-languageclient/node", () => ({
+  LanguageClient: jest.fn(),
+  DidCloseTextDocumentNotification: {
+    type: jest.fn(),
+  },
+  DidOpenTextDocumentNotification: {
+    type: jest.fn(),
+  },
+}));
 SettingsUtils.getWorkspaceFoldersPath = jest.fn().mockReturnValue([__dirname]);
 vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
   get: jest.fn().mockReturnValue(undefined),

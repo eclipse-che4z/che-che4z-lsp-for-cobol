@@ -77,6 +77,9 @@ jest.mock("vscode", () => ({
     createOutputChannel: jest.fn().mockReturnValue({
       appendLine: jest.fn(),
     }),
+    tabGroups: {
+      onDidChangeTabs: jest.fn(),
+    },
   },
   workspace: {
     getConfiguration: jest.fn().mockReturnValue({
@@ -158,6 +161,9 @@ describe("Check plugin extension for cobol fails.", () => {
         addRequestHandler: jest.fn(),
         retrieveAnalysis: jest.fn(),
         start: jest.fn(),
+        listenToTabsChanges: {
+          bind: jest.fn(),
+        },
       };
     });
   });

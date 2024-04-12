@@ -22,6 +22,15 @@ jest.mock("vscode", () => ({
     executeCommand: jest.fn(),
   },
 }));
+jest.mock("vscode-languageclient/node", () => ({
+  LanguageClient: jest.fn(),
+  DidCloseTextDocumentNotification: {
+    type: jest.fn(),
+  },
+  DidOpenTextDocumentNotification: {
+    type: jest.fn(),
+  },
+}));
 
 test("check gotoCopybookSettings calls telemetry services and vscode execute command with right parameters.", () => {
   expect(gotoCopybookSettings).toBeTruthy();

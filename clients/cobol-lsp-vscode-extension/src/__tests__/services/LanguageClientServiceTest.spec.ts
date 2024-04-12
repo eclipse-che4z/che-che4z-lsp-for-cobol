@@ -16,7 +16,10 @@ import * as fs from "fs";
 import * as os from "os";
 import { join } from "path";
 import * as vscode from "vscode";
-import { LanguageClient } from "vscode-languageclient/node";
+import {
+  DidCloseTextDocumentNotification,
+  LanguageClient,
+} from "vscode-languageclient/node";
 import { JavaCheck } from "../../services/JavaCheck";
 import { LanguageClientService } from "../../services/LanguageClientService";
 import { NativeExecutableService } from "../../services/nativeLanguageClient/nativeExecutableService";
@@ -33,9 +36,17 @@ jest.mock("vscode", () => ({
     getConfiguration: jest.fn().mockReturnValue({
       get: jest.fn().mockReturnValue(0),
     }),
+    openTextDocument: jest.fn().mockReturnValue({
+      version: 1,
+      getText: jest.fn().mockReturnValue("dummy text"),
+    }),
   },
   window: {
     createOutputChannel: jest.fn(),
+    tabGroups: {
+      onDidChangeTabs: jest.fn(),
+      all: [],
+    },
   },
   Uri: {
     file: jest.fn().mockReturnValue({
@@ -45,6 +56,12 @@ jest.mock("vscode", () => ({
 }));
 jest.mock("vscode-languageclient/node", () => ({
   LanguageClient: jest.fn(),
+  DidCloseTextDocumentNotification: {
+    type: jest.fn(),
+  },
+  DidOpenTextDocumentNotification: {
+    type: jest.fn(),
+  },
 }));
 jest.mock("fs", () => ({
   fs: jest.fn(),
@@ -228,6 +245,26 @@ describe("LanguageClientService positive scenario", () => {
       languageClientService as any
     ).executableService.getNativeLanguageClient();
     expect(executable).toBeFalsy();
+  });
+
+  test("LanguageClientServer watches events for a closed tabs", async () => {
+    languageClientService = new LanguageClientService(jest.fn() as any);
+    (languageClientService as any).languageClient = jest.fn();
+    (languageClientService as any).languageClient.sendNotification = jest.fn();
+    (languageClientService as any).listenToTabsChanges({
+      closed: [
+        {
+          input: {
+            uri: "dummy-uri",
+          },
+        },
+      ],
+    });
+    expect(
+      (languageClientService as any).languageClient.sendNotification,
+    ).toHaveBeenCalledWith(DidCloseTextDocumentNotification.type, {
+      textDocument: { uri: "dummy-uri" },
+    });
   });
 });
 

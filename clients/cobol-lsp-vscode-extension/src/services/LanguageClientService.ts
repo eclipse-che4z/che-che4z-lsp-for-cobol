@@ -30,6 +30,7 @@ import { JavaCheck } from "./JavaCheck";
 import { NativeExecutableService } from "./nativeLanguageClient/nativeExecutableService";
 import { TelemetryService } from "./reporter/TelemetryService";
 import { SettingsService } from "./Settings";
+import { Utils } from "./util/Utils";
 
 const extensionId = "BroadcomMFD.cobol-language-support";
 
@@ -105,6 +106,15 @@ export class LanguageClientService {
     const languageClient = this.getLanguageClient();
     await languageClient.start();
     this.initHandlers();
+  }
+
+  public listenToTabsChanges(event: vscode.TabChangeEvent) {
+    if (this.languageClient) {
+      if (event.closed?.length > 0)
+        Utils.handleTabClose(event.closed, this.languageClient!);
+      if (event.opened?.length > 0)
+        Utils.handleTabsOpen(event.opened, this.languageClient!);
+    }
   }
 
   private initHandlers() {

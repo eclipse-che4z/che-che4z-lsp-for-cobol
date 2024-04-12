@@ -16,7 +16,15 @@ import * as vscode from "vscode";
 import { SettingsService } from "../../../services/Settings";
 import { ConfigurationWatcher } from "../../../services/util/ConfigurationWatcher";
 jest.mock("../../../services/reporter/TelemetryService");
-
+jest.mock("vscode-languageclient/node", () => ({
+  LanguageClient: jest.fn(),
+  DidCloseTextDocumentNotification: {
+    type: jest.fn(),
+  },
+  DidOpenTextDocumentNotification: {
+    type: jest.fn(),
+  },
+}));
 jest.mock("vscode", () => ({
   commands: {
     executeCommand: jest.fn(),

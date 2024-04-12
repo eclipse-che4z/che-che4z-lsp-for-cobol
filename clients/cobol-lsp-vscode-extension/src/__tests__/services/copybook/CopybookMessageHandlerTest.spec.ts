@@ -22,7 +22,15 @@ import { Utils } from "../../../services/util/Utils";
 vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
   get: jest.fn().mockReturnValue("testProfile"),
 });
-
+jest.mock("vscode-languageclient/node", () => ({
+  LanguageClient: jest.fn(),
+  DidCloseTextDocumentNotification: {
+    type: jest.fn(),
+  },
+  DidOpenTextDocumentNotification: {
+    type: jest.fn(),
+  },
+}));
 Utils.getZoweExplorerAPI = jest.fn();
 
 describe("Test the copybook message handler", () => {
