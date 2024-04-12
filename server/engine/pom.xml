@@ -51,9 +51,7 @@
         <maven.cobertura.plugin.version>2.7</maven.cobertura.plugin.version>
         <maven.compiler.plugin.version>3.7.0</maven.compiler.plugin.version>
         <maven.coveralls.plugin.version>4.3.0</maven.coveralls.plugin.version>
-        <maven.jacoco.plugin.version>0.8.11</maven.jacoco.plugin.version>
         <maven.resources.plugin.version>3.0.2</maven.resources.plugin.version>
-        <maven.surefire.plugin.version>3.0.0-M3</maven.surefire.plugin.version>
         <mockito.core.version>5.10.0</mockito.core.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -269,30 +267,6 @@
                     </execution>
                 </executions>
             </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>${maven.surefire.plugin.version}</version>
-                <configuration>
-                    <parallel>all</parallel>
-                    <argLine>${argLine} -Dperformance.log.path=${project.build.directory}/perf.csv</argLine>
-                    <systemPropertyVariables>
-                        <property>
-                            <name>filesToTestPath</name>
-                            <!--suppress UnresolvedMavenProperty -->
-                            <value>${filesToTestPath}</value>
-                        </property>
-                        <property>
-                            <name>listingSnap</name>
-                            <!--suppress UnresolvedMavenProperty -->
-                            <value>${listingSnap}</value>
-                        </property>
-                    </systemPropertyVariables>
-                    <excludes>
-                        <exclude>**/org/eclipse/lsp/cobol/dialects/**/*</exclude>
-                    </excludes>
-                </configuration>
-            </plugin>
 
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
@@ -314,35 +288,6 @@
                 <groupId>org.eluder.coveralls</groupId>
                 <artifactId>coveralls-maven-plugin</artifactId>
                 <version>${maven.coveralls.plugin.version}</version>
-            </plugin>
-
-            <plugin>
-                <groupId>org.jacoco</groupId>
-                <artifactId>jacoco-maven-plugin</artifactId>
-                <version>${maven.jacoco.plugin.version}</version>
-                <configuration>
-                    <excludes>
-                        <exclude>**/generated-sources/**/*</exclude>
-                        <exclude>**/generated-test-sources/**/*</exclude>
-                        <exclude>**/org/eclipse/lsp/cobol/core/parser/**/*</exclude>
-                        <exclude>**/org/eclipse/lsp/cobol/domain/modules/**/*</exclude>
-                    </excludes>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>coverage-prepare-agent</id>
-                        <goals>
-                            <goal>prepare-agent</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>coverage-report</id>
-                        <phase>test</phase>
-                        <goals>
-                            <goal>report</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
 
             <plugin>
