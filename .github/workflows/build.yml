@@ -155,6 +155,7 @@ jobs:
         uses: sonarsource/sonarcloud-github-action@49e6cd3b187936a73b8280d59ffd9da69df63ec9
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          BRANCH: ${{github.event.pull_request.head.ref}}
 
   buildNative:
     strategy:

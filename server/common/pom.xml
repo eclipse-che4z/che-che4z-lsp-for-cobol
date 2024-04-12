@@ -18,6 +18,12 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
+    <parent>
+        <groupId>org.eclipse.lsp.cobol</groupId>
+        <artifactId>server</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+
     <modelVersion>4.0.0</modelVersion>
     <artifactId>common</artifactId>
     <groupId>org.eclipse.lsp.cobol</groupId>
@@ -250,18 +256,18 @@
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <version>${maven.jacoco.plugin.version}</version>
-                <configuration>
-                    <excludes>
-                        <exclude>**/org/eclipse/lsp/cobol/common/model/**/*</exclude>
-                        <exclude>**/org/eclipse/lsp/cobol/common/symbols/**/*</exclude>
-                        <exclude>**/org/eclipse/lsp/cobol/common/copybook/**/*</exclude>
-                        <exclude>**/org/eclipse/lsp/cobol/common/error/**/*</exclude>
-                        <exclude>**/org/eclipse/lsp/cobol/common/message/**/*</exclude>
-                        <exclude>**/org/eclipse/lsp/cobol/common/processor/ProcessingPhase.class</exclude>
-                        <exclude>**/org/eclipse/lsp/cobol/common/processor/Processor.class</exclude>
-                        <exclude>**/org/eclipse/lsp/cobol/common/dialects/CobolDialect.class</exclude>
-                    </excludes>
-                </configuration>
+<!--                <configuration>-->
+<!--                    <excludes>-->
+<!--                        <exclude>**/org/eclipse/lsp/cobol/common/model/**/*</exclude>-->
+<!--                        <exclude>**/org/eclipse/lsp/cobol/common/symbols/**/*</exclude>-->
+<!--                        <exclude>**/org/eclipse/lsp/cobol/common/copybook/**/*</exclude>-->
+<!--                        <exclude>**/org/eclipse/lsp/cobol/common/error/**/*</exclude>-->
+<!--                        <exclude>**/org/eclipse/lsp/cobol/common/message/**/*</exclude>-->
+<!--                        <exclude>**/org/eclipse/lsp/cobol/common/processor/ProcessingPhase.class</exclude>-->
+<!--                        <exclude>**/org/eclipse/lsp/cobol/common/processor/Processor.class</exclude>-->
+<!--                        <exclude>**/org/eclipse/lsp/cobol/common/dialects/CobolDialect.class</exclude>-->
+<!--                    </excludes>-->
+<!--                </configuration>-->
                 <executions>
                     <execution>
                         <id>coverage-prepare-agent</id>
