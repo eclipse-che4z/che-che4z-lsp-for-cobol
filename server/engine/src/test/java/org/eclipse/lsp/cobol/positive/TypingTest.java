@@ -64,7 +64,7 @@ class TypingTest extends FileBasedTest {
 
   @ParameterizedTest
   @MethodSource("getSourceFolder")
-  void typingTest(String testFolder) {
+  void typingTest(String testFolder) throws InterruptedException {
     cobolTextRegistry = retrieveTextsRegistry(testFolder);
     if (!Boolean.TRUE.toString().equals(TEST_MODE)) return;
     List<CobolText> textsToTest = getTextsToTest(cobolTextRegistry);
@@ -114,7 +114,7 @@ class TypingTest extends FileBasedTest {
     return cleanTextResult.getResult().toString();
   }
 
-  private void analyze(String name, String fullText) {
+  private void analyze(String name, String fullText) throws InterruptedException {
     AtomicInteger position = new AtomicInteger();
     ScheduledExecutorService scheduled = Executors.newScheduledThreadPool(1);
     int textSize = fullText.length();

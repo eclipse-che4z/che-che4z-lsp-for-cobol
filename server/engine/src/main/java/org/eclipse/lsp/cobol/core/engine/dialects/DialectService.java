@@ -40,6 +40,7 @@ import org.eclipse.lsp.cobol.common.message.MessageTemplate;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.processor.ProcessorDescription;
 import org.eclipse.lsp.cobol.core.engine.analysis.AnalysisContext;
+import org.eclipse.lsp.cobol.core.engine.dialects.hp.HpDialect;
 import org.eclipse.lsp.cobol.implicitDialects.cics.CICSDialect;
 import org.eclipse.lsp.cobol.implicitDialects.sql.Db2SqlDialect;
 import org.eclipse.lsp.cobol.lsp.CobolLanguageId;
@@ -320,6 +321,8 @@ public class DialectService {
                               return dialect;
                             })
                         .orElse(null)));
+    changed.set(true);
+    dialectSuppliers.put("HP", new HpDialect(copybookService, messageService));
     return changed.get();
   }
 
