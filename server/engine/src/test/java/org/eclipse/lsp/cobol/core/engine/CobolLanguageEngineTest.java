@@ -50,6 +50,7 @@ import org.eclipse.lsp.cobol.core.preprocessor.delegates.GrammarPreprocessor;
 import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
 import org.eclipse.lsp.cobol.core.strategy.CobolErrorStrategy;
 import org.eclipse.lsp.cobol.core.strategy.ErrorMessageHelper;
+import org.eclipse.lsp.cobol.dialects.TrueDialectService;
 import org.eclipse.lsp.cobol.lsp.CobolLanguageId;
 import org.eclipse.lsp.cobol.service.settings.layout.CodeLayoutStore;
 import org.eclipse.lsp.cobol.usecases.DialectConfigs;
@@ -89,11 +90,15 @@ class CobolLanguageEngineTest {
 
     BenchmarkService benchmarkService = mock(BenchmarkService.class);
     when(benchmarkService.startSession()).thenReturn(new BenchmarkSession());
+
+    TrueDialectService trueDialectService = new TrueDialectService(preprocessor, grammarPreprocessor, mockMessageService, treeListener, mock(SubroutineService.class),
+        null,
+        dialectService, astProcessor, symbolsRepository, store);
     CobolLanguageEngine engine =
-            new CobolLanguageEngine(
-                    preprocessor, grammarPreprocessor, mockMessageService, treeListener, mock(SubroutineService.class), null,
-                    dialectService, astProcessor, symbolsRepository, mock(ErrorFinalizerService.class),
-                    benchmarkService, store);
+            new CobolLanguageEngine(trueDialectService,
+                mockMessageService,
+                mock(ErrorFinalizerService.class),
+                benchmarkService);
     when(mockMessageService.getMessage(anyString(), anyString(), anyString())).thenReturn("");
     Locality locality =
             Locality.builder()
@@ -164,11 +169,15 @@ class CobolLanguageEngineTest {
     CodeLayoutStore codeLayoutStore = mock(CodeLayoutStore.class);
     BenchmarkService benchmarkService = mock(BenchmarkService.class);
     when(benchmarkService.startSession()).thenReturn(mock(BenchmarkSession.class));
+
+    TrueDialectService trueDialectService = new TrueDialectService(preprocessor, grammarPreprocessor, mockMessageService, treeListener, mock(SubroutineService.class),
+        null,
+        dialectService, astProcessor, symbolsRepository, store);
     CobolLanguageEngine engine =
-            new CobolLanguageEngine(
-                    preprocessor, grammarPreprocessor, mockMessageService, treeListener, mock(SubroutineService.class), null,
-                    dialectService, astProcessor, symbolsRepository,
-                    mock(ErrorFinalizerService.class), benchmarkService, codeLayoutStore);
+        new CobolLanguageEngine(trueDialectService,
+            mockMessageService,
+            mock(ErrorFinalizerService.class),
+            benchmarkService);
 
     AnalysisResult actual = engine.run(URI, TEXT, DialectConfigs.getDaCoAnalysisConfig(), CobolLanguageId.COBOL);
     Assertions.assertEquals(1, actual.getDiagnostics().size());

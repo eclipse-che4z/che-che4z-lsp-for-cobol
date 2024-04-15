@@ -116,7 +116,7 @@ public class Cli implements Callable<Integer> {
         new AnalysisContext(
             new ExtendedDocument(resultWithErrors.getResult(), text),
             createAnalysisConfiguration(),
-            benchmarkService.startSession(), CobolLanguageId.COBOL);
+            benchmarkService.startSession(), documentUri, text, CobolLanguageId.COBOL);
     ctx.getAccumulatedErrors().addAll(resultWithErrors.getErrors());
     PipelineResult pipelineResult = pipeline.run(ctx);
     Gson gson = new GsonBuilder().setPrettyPrinting().create();
