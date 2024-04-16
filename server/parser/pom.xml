@@ -40,7 +40,6 @@
         <maven.resources.plugin.version>3.0.2</maven.resources.plugin.version>
         <maven.antlr4.plugin.version>4.7</maven.antlr4.plugin.version>
         <maven.compiler.plugin.version>3.7.0</maven.compiler.plugin.version>
-        <maven.cobertura.plugin.version>2.7</maven.cobertura.plugin.version>
         <maven.checkstyle.plugin.version>3.1.1</maven.checkstyle.plugin.version>
         <maven.jacoco.plugin.version>0.8.11</maven.jacoco.plugin.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -240,20 +239,4 @@
             </plugins>
         </pluginManagement>
     </build>
-    <reporting>
-        <plugins>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>cobertura-maven-plugin</artifactId>
-                <version>${maven.cobertura.plugin.version}</version>
-                <reportSets>
-                    <reportSet>
-                        <reports>
-                            <report>cobertura</report>
-                        </reports>
-                    </reportSet>
-                </reportSets>
-            </plugin>
-        </plugins>
-    </reporting>
 </project>

@@ -39,8 +39,6 @@
         <junit-jupiter.version>5.6.0</junit-jupiter.version>
         <junit.platform.version>1.6.0</junit.platform.version>
         <mockito.core.version>5.10.0</mockito.core.version>
-        <maven.cobertura.plugin.version>2.7</maven.cobertura.plugin.version>
-        <maven.coveralls.plugin.version>4.3.0</maven.coveralls.plugin.version>
         <maven.jacoco.plugin.version>0.8.11</maven.jacoco.plugin.version>
         <maven.surefire.plugin.version>3.0.0-M3</maven.surefire.plugin.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -238,28 +236,6 @@
                     </execution>
                 </executions>
             </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>cobertura-maven-plugin</artifactId>
-                <version>${maven.cobertura.plugin.version}</version>
-                <configuration>
-                    <format>xml</format>
-                    <maxmem>256m</maxmem>
-                    <aggregate>true</aggregate>
-                    <instrumentation>
-                        <includes>
-                            <include>org/eclipse/lsp/**/*.class</include>
-                        </includes>
-                    </instrumentation>
-                    <check/>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.eluder.coveralls</groupId>
-                <artifactId>coveralls-maven-plugin</artifactId>
-                <version>${maven.coveralls.plugin.version}</version>
-            </plugin>
-
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
