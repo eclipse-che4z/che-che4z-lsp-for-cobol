@@ -82,7 +82,6 @@ public class EngineModule extends AbstractModule {
     bind(CobolLineReWriter.class).annotatedWith(Names.named("cobol")).to(CobolLineIndicatorProcessorImpl.class);
     bind(CobolLineReWriter.class).annotatedWith(Names.named("hpcobol")).to(HpCobolLineIndicatorProcessorImpl.class);
 
-
     bind(MessageService.class).to(PropertiesMessageService.class);
     bind(LocaleStore.class).to(LocaleStoreImpl.class);
     bind(Communications.class).to(ServerCommunications.class);

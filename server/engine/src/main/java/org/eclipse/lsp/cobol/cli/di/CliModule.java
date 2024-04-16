@@ -47,15 +47,21 @@ import org.eclipse.lsp.cobol.core.preprocessor.delegates.GrammarPreprocessorImpl
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.GrammarPreprocessorListenerFactory;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.reader.CobolLineReader;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.reader.CobolLineReaderImpl;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.reader.HPCobolLineReaderImpl;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.replacement.ReplacePreprocessorFactory;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.replacement.ReplacingService;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.replacement.ReplacingServiceImpl;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.rewriter.CobolLineIndicatorProcessorImpl;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.rewriter.CobolLineReWriter;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.rewriter.HpCobolLineIndicatorProcessorImpl;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.rewriter.LineIndicatorProcessor;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.transformer.CobolContinuationLineTransformation;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.transformer.CobolLinesTransformation;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.transformer.ContinuationLineTransformation;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.transformer.HPContinuationLineTransformation;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.writer.CobolLineWriter;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.writer.CobolLineWriterImpl;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.writer.HPCobolLineWriterImpl;
 import org.eclipse.lsp.cobol.core.visitor.InterruptingTreeListener;
 import org.eclipse.lsp.cobol.lsp.DisposableLSPStateService;
 import org.eclipse.lsp.cobol.lsp.jrpc.CobolLanguageClient;
@@ -87,6 +93,17 @@ public class CliModule extends AbstractModule {
   @Override
   protected void configure() {
     bind(TextPreprocessor.class).to(TextPreprocessorImpl.class);
+    bind(CobolLineReader.class).annotatedWith(Names.named("hpcobol")).to(HPCobolLineReaderImpl.class);
+    bind(CobolLineReader.class).annotatedWith(Names.named("cobol")).to(CobolLineReaderImpl.class);
+
+    bind(CobolLineWriter.class).annotatedWith(Names.named("cobol")).to(CobolLineWriterImpl.class);
+    bind(CobolLineWriter.class).annotatedWith(Names.named("hpcobol")).to(HPCobolLineWriterImpl.class);
+
+    bind(CobolLinesTransformation.class).annotatedWith(Names.named("hpcobol")).to(HPContinuationLineTransformation.class);
+    bind(CobolLinesTransformation.class).annotatedWith(Names.named("cobol")).to(CobolContinuationLineTransformation.class);
+
+    bind(CobolLineReWriter.class).annotatedWith(Names.named("cobol")).to(CobolLineIndicatorProcessorImpl.class);
+    bind(CobolLineReWriter.class).annotatedWith(Names.named("hpcobol")).to(HpCobolLineIndicatorProcessorImpl.class);
     bind(GrammarPreprocessor.class).to(GrammarPreprocessorImpl.class);
     install(new FactoryModuleBuilder().build(GrammarPreprocessorListenerFactory.class));
     install(new FactoryModuleBuilder().build(ReplacePreprocessorFactory.class));
