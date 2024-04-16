@@ -54,10 +54,8 @@ import org.eclipse.lsp.cobol.core.preprocessor.delegates.replacement.ReplacingSe
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.rewriter.CobolLineIndicatorProcessorImpl;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.rewriter.CobolLineReWriter;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.rewriter.HpCobolLineIndicatorProcessorImpl;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.rewriter.LineIndicatorProcessor;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.transformer.CobolContinuationLineTransformation;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.transformer.CobolLinesTransformation;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.transformer.ContinuationLineTransformation;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.transformer.HPContinuationLineTransformation;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.writer.CobolLineWriter;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.writer.CobolLineWriterImpl;
@@ -110,8 +108,6 @@ public class CliModule extends AbstractModule {
     bind(ReplacingService.class).to(ReplacingServiceImpl.class);
     bind(CobolLineReader.class).to(CobolLineReaderImpl.class);
     bind(CobolLineWriter.class).to(CobolLineWriterImpl.class);
-    bind(CobolLinesTransformation.class).to(ContinuationLineTransformation.class);
-    bind(CobolLineReWriter.class).to(LineIndicatorProcessor.class);
     bind(MessageService.class).to(PropertiesMessageService.class);
     bind(LocaleStore.class).to(LocaleStoreImpl.class);
     bind(ConfigurationService.class).to(CachingConfigurationService.class);
