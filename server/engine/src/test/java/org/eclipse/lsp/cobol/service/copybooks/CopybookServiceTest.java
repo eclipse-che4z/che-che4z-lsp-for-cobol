@@ -69,8 +69,8 @@ class CopybookServiceTest {
   private final TextPreprocessor preprocessor = mock(TextPreprocessor.class);
   private final Path cpyPath = mock(Path.class);
   private final Path parentPath = mock(Path.class);
-  private UriDecodeService uriDecodeService = new UriDecodeService();
-  private String languageId = "cobol";
+  private final UriDecodeService uriDecodeService = new UriDecodeService();
+  private final String languageId = "cobol";
 
   @BeforeEach
   void setupMocks() throws IOException {
