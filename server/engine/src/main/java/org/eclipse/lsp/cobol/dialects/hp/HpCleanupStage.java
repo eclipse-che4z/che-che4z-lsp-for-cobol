@@ -14,22 +14,22 @@
  */
 package org.eclipse.lsp.cobol.dialects.hp;
 
+import org.eclipse.lsp.cobol.common.CleanerPreprocessor;
 import org.eclipse.lsp.cobol.common.ResultWithErrors;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedText;
 import org.eclipse.lsp.cobol.core.engine.analysis.AnalysisContext;
 import org.eclipse.lsp.cobol.core.engine.pipeline.Stage;
 import org.eclipse.lsp.cobol.core.engine.pipeline.StageResult;
-import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
 
 /**
  * Cleanup preprocessor pipeline stage
  */
 public class HpCleanupStage implements Stage<Void, Void> {
 
-  private final TextPreprocessor preprocessor;
+  private final CleanerPreprocessor preprocessor;
 
-  public HpCleanupStage(TextPreprocessor preprocessor) {
+  public HpCleanupStage(CleanerPreprocessor preprocessor) {
     this.preprocessor = preprocessor;
   }
 
@@ -37,8 +37,7 @@ public class HpCleanupStage implements Stage<Void, Void> {
   public StageResult<Void> run(AnalysisContext context, StageResult<Void> prevStageResult) {
     ResultWithErrors<ExtendedText> resultWithErrors = preprocessor.cleanUpCode(
         context.getDocumentUri(),
-        context.getText(),
-        context.getLanguageId());
+        context.getText());
 
     context.getAccumulatedErrors().addAll(resultWithErrors.getErrors());
     context.setExtendedDocument(new ExtendedDocument(resultWithErrors.getResult(), context.getText()));

@@ -27,6 +27,7 @@ import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.eclipse.lsp.cobol.cli.di.CliModule;
 import org.eclipse.lsp.cobol.cli.modules.CliClientProvider;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
+import org.eclipse.lsp.cobol.common.CleanerPreprocessor;
 import org.eclipse.lsp.cobol.common.ResultWithErrors;
 import org.eclipse.lsp.cobol.common.SubroutineService;
 import org.eclipse.lsp.cobol.common.benchmark.BenchmarkService;
@@ -45,9 +46,9 @@ import org.eclipse.lsp.cobol.core.engine.pipeline.StageResult;
 import org.eclipse.lsp.cobol.core.engine.pipeline.stages.*;
 import org.eclipse.lsp.cobol.core.engine.processor.AstProcessor;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolsRepository;
-import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.GrammarPreprocessor;
 import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
+import org.eclipse.lsp.cobol.dialects.ibm.IbmTextPreprocessor;
 import org.eclipse.lsp.cobol.lsp.CobolLanguageId;
 import org.eclipse.lsp.cobol.service.settings.CachingConfigurationService;
 import org.eclipse.lsp.cobol.service.settings.layout.CodeLayoutStore;
@@ -102,7 +103,7 @@ public class Cli implements Callable<Integer> {
     cliClientProvider.setCpyExt(Arrays.asList(cpyExt));
 
     // Cleaning up
-    TextPreprocessor preprocessor = diCtx.getInstance(TextPreprocessor.class);
+    CleanerPreprocessor preprocessor = diCtx.getInstance(IbmTextPreprocessor.class);
     BenchmarkService benchmarkService = diCtx.getInstance(BenchmarkService.class);
 
     if (src == null) {
@@ -111,7 +112,7 @@ public class Cli implements Callable<Integer> {
     }
     String documentUri = src.toURI().toString();
     String text = new String(Files.readAllBytes(src.toPath()));
-    ResultWithErrors<ExtendedText> resultWithErrors = preprocessor.cleanUpCode(documentUri, text, CobolLanguageId.COBOL);
+    ResultWithErrors<ExtendedText> resultWithErrors = preprocessor.cleanUpCode(documentUri, text);
     AnalysisContext ctx =
         new AnalysisContext(
             new ExtendedDocument(resultWithErrors.getResult(), text),
@@ -193,6 +194,7 @@ public class Cli implements Callable<Integer> {
     DialectService dialectService = diCtx.getInstance(DialectService.class);
     MessageService messageService = diCtx.getInstance(MessageService.class);
     GrammarPreprocessor grammarPreprocessor = diCtx.getInstance(GrammarPreprocessor.class);
+    CleanerPreprocessor preprocessor = diCtx.getInstance(IbmTextPreprocessor.class);
     ParseTreeListener parseTreeListener = diCtx.getInstance(ParseTreeListener.class);
     SymbolsRepository symbolsRepository = diCtx.getInstance(SymbolsRepository.class);
     SubroutineService subroutineService = diCtx.getInstance(SubroutineService.class);
@@ -203,8 +205,8 @@ public class Cli implements Callable<Integer> {
 
     Pipeline pipeline = new Pipeline();
     pipeline.add(new CompilerDirectivesStage(messageService));
-    pipeline.add(new DialectProcessingStage(dialectService));
-    pipeline.add(new PreprocessorStage(grammarPreprocessor));
+    pipeline.add(new DialectProcessingStage(dialectService, preprocessor));
+    pipeline.add(new PreprocessorStage(grammarPreprocessor, preprocessor));
     if (action == Action.analysis) {
       pipeline.add(new ImplicitDialectProcessingStage(dialectService));
       pipeline.add(new ParserStage(messageService, parseTreeListener));

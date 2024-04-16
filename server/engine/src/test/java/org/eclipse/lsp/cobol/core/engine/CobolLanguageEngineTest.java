@@ -24,10 +24,7 @@ import static org.mockito.Mockito.when;
 
 import com.google.common.collect.ImmutableList;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
-import org.eclipse.lsp.cobol.common.AnalysisConfig;
-import org.eclipse.lsp.cobol.common.AnalysisResult;
-import org.eclipse.lsp.cobol.common.ResultWithErrors;
-import org.eclipse.lsp.cobol.common.SubroutineService;
+import org.eclipse.lsp.cobol.common.*;
 import org.eclipse.lsp.cobol.common.benchmark.BenchmarkService;
 import org.eclipse.lsp.cobol.common.benchmark.BenchmarkSession;
 import org.eclipse.lsp.cobol.common.dialects.DialectOutcome;
@@ -45,7 +42,6 @@ import org.eclipse.lsp.cobol.core.engine.dialects.DialectService;
 import org.eclipse.lsp.cobol.core.engine.errors.ErrorFinalizerService;
 import org.eclipse.lsp.cobol.core.engine.processor.AstProcessor;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolsRepository;
-import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.GrammarPreprocessor;
 import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
 import org.eclipse.lsp.cobol.core.strategy.CobolErrorStrategy;
@@ -62,7 +58,7 @@ import org.junit.jupiter.api.Test;
 
 /**
  * This test checks the logic of {@link CobolLanguageEngine}. It should first run {@link
- * TextPreprocessor} to clean up the given COBOL text, then apply syntax and semantic analysis. If
+ * CleanerPreprocessor} to clean up the given COBOL text, then apply syntax and semantic analysis. If
  * the text doesn't have any semantic elements, it should return an empty {@link Node}
  */
 class CobolLanguageEngineTest {
@@ -70,7 +66,7 @@ class CobolLanguageEngineTest {
 
   private static final String TEXT = "       IDENTIFICATION DIVISION.";
   private static final String URI = "document.cbl";
-  private final TextPreprocessor preprocessor = mock(TextPreprocessor.class);
+  private final CleanerPreprocessor preprocessor = mock(CleanerPreprocessor.class);
   private final GrammarPreprocessor grammarPreprocessor = mock(GrammarPreprocessor.class);
   private final MessageService mockMessageService = mock(MessageService.class);
   private final ErrorMessageHelper mockErrUtil = mock(ErrorMessageHelper.class);
@@ -91,7 +87,7 @@ class CobolLanguageEngineTest {
     BenchmarkService benchmarkService = mock(BenchmarkService.class);
     when(benchmarkService.startSession()).thenReturn(new BenchmarkSession());
 
-    TrueDialectService trueDialectService = new TrueDialectService(preprocessor, grammarPreprocessor, mockMessageService, treeListener, mock(SubroutineService.class),
+    TrueDialectService trueDialectService = new TrueDialectService(preprocessor, preprocessor, grammarPreprocessor, mockMessageService, treeListener, mock(SubroutineService.class),
         null,
         dialectService, astProcessor, symbolsRepository, store);
     CobolLanguageEngine engine =
@@ -132,10 +128,10 @@ class CobolLanguageEngineTest {
             .thenReturn(new ResultWithErrors<>(new DialectOutcome(context), ImmutableList.of()));
     when(dialectService.processImplicitDialects(any(), anyList(), any()))
             .thenReturn(new ResultWithErrors<>(new DialectOutcome(context), ImmutableList.of()));
-    when(preprocessor.cleanUpCode(URI, TEXT, CobolLanguageId.COBOL))
+    when(preprocessor.cleanUpCode(URI, TEXT))
             .thenReturn(new ResultWithErrors<>(new ExtendedText(TEXT, URI), ImmutableList.of()));
 
-    when(grammarPreprocessor.preprocess(any())).thenReturn(new ResultWithErrors<>(new CopybooksRepository(), ImmutableList.of()));
+    when(grammarPreprocessor.preprocess(any(), any())).thenReturn(new ResultWithErrors<>(new CopybooksRepository(), ImmutableList.of()));
 
     Range sourceRange = ParserUtils.isHwParserEnabled()
             ? new Range(new Position(0, 0), new Position(0, 32))
@@ -170,7 +166,7 @@ class CobolLanguageEngineTest {
     BenchmarkService benchmarkService = mock(BenchmarkService.class);
     when(benchmarkService.startSession()).thenReturn(mock(BenchmarkSession.class));
 
-    TrueDialectService trueDialectService = new TrueDialectService(preprocessor, grammarPreprocessor, mockMessageService, treeListener, mock(SubroutineService.class),
+    TrueDialectService trueDialectService = new TrueDialectService(preprocessor, preprocessor, grammarPreprocessor, mockMessageService, treeListener, mock(SubroutineService.class),
         null,
         dialectService, astProcessor, symbolsRepository, store);
     CobolLanguageEngine engine =

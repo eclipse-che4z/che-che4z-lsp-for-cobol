@@ -22,6 +22,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
+import org.eclipse.lsp.cobol.common.CleanerPreprocessor;
 import org.eclipse.lsp.cobol.common.ResultWithErrors;
 import org.eclipse.lsp.cobol.common.copybook.*;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
@@ -46,6 +47,8 @@ class IdmsCopybookServiceTest {
   private ParseTreeListener treeListener;
   @Mock
   private MessageService messageService;
+  @Mock
+  private CleanerPreprocessor preprocessor;
 
   private Set<CopybookName> processedCopybooks;
   private IdmsCopybookService service;
@@ -53,7 +56,8 @@ class IdmsCopybookServiceTest {
   @BeforeEach
   void init() {
     processedCopybooks = new HashSet<>();
-    service = new IdmsCopybookService("uri", copybookService, CopybookProcessingMode.ENABLED,
+    service = new IdmsCopybookService("uri", copybookService, preprocessor,
+        CopybookProcessingMode.ENABLED,
         treeListener, messageService, processedCopybooks);
   }
 

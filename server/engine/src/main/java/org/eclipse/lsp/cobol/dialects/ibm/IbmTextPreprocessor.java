@@ -12,7 +12,7 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package org.eclipse.lsp.cobol.core.preprocessor;
+package org.eclipse.lsp.cobol.dialects.ibm;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -24,6 +24,7 @@ import org.eclipse.lsp.cobol.common.ResultWithErrors;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedText;
+import org.eclipse.lsp.cobol.core.preprocessor.CobolLine;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.reader.CobolLineReaderService;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.rewriter.CobolLineReWriterService;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.transformer.CobolLineTransformationService;
@@ -37,14 +38,14 @@ import org.eclipse.lsp.cobol.lsp.CobolLanguageId;
  */
 @Slf4j
 @Singleton
-public class TextPreprocessorImpl implements TextPreprocessor, CleanerPreprocessor {
+public class IbmTextPreprocessor implements CleanerPreprocessor {
   private final CobolLineReaderService readerService;
   private final CobolLineWriterService writerService;
   private final CobolLineTransformationService transformationService;
   private final CobolLineReWriterService indicatorProcessorService;
 
   @Inject
-  public TextPreprocessorImpl(
+  public IbmTextPreprocessor(
       CobolLineReaderService readerService,
       CobolLineWriterService writerService,
       CobolLineTransformationService transformationService,
@@ -56,18 +57,13 @@ public class TextPreprocessorImpl implements TextPreprocessor, CleanerPreprocess
   }
 
   @Override
-  public ResultWithErrors<ExtendedText> cleanUpCode(String documentUri, String cobolCode, CobolLanguageId languageId) {
-    List<SyntaxError> errors = new ArrayList<>();
-    List<CobolLine> lines = readerService.getCobolLineReader(languageId).processLines(documentUri, cobolCode).unwrap(errors::addAll);
-    List<CobolLine> transformedLines = transformationService.getTransformer(languageId).transformLines(documentUri, lines).unwrap(errors::addAll);
-    List<CobolLine> rewrittenLines = indicatorProcessorService.getLineReWriter(languageId).processLines(transformedLines);
-
-    ExtendedDocument code = writerService.getCobolLineWriter(languageId).serialize(rewrittenLines, documentUri);
-    return new ResultWithErrors<>(code.getCurrentText(), errors);
-  }
-
-  @Override
   public ResultWithErrors<ExtendedText> cleanUpCode(String documentUri, String cobolCode) {
-    return cleanUpCode(documentUri, cobolCode, CobolLanguageId.COBOL);
+    List<SyntaxError> errors = new ArrayList<>();
+    List<CobolLine> lines = readerService.getCobolLineReader(CobolLanguageId.COBOL).processLines(documentUri, cobolCode).unwrap(errors::addAll);
+    List<CobolLine> transformedLines = transformationService.getTransformer(CobolLanguageId.COBOL).transformLines(documentUri, lines).unwrap(errors::addAll);
+    List<CobolLine> rewrittenLines = indicatorProcessorService.getLineReWriter(CobolLanguageId.COBOL).processLines(transformedLines);
+
+    ExtendedDocument code = writerService.getCobolLineWriter(CobolLanguageId.COBOL).serialize(rewrittenLines, documentUri);
+    return new ResultWithErrors<>(code.getCurrentText(), errors);
   }
 }

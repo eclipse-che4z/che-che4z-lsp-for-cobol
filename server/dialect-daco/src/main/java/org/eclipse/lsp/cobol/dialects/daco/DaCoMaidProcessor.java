@@ -211,7 +211,7 @@ public class DaCoMaidProcessor {
             copybookName,
             context.getExtendedDocument().getUri(),
             context.getExtendedDocument().getUri(),
-            true, context.getLanguageId());
+            context.getPreprocessor());
     CopybookModel copybookModel = resolvedCopybook.getResult();
 
     DaCoCopyNode cbNode =

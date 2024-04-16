@@ -125,19 +125,15 @@ public class UseCaseUtils {
 
     CopybookService copybookService = injector.getInstance(CopybookService.class);
     PredefinedCopybookUtils.loadPredefinedCopybooks(useCase.getSqlBackend(), useCase.getCopybooks(), useCase.documentUri)
-        .forEach(pc -> copybookService.store(pc, languageId, true));
+        .forEach(pc -> copybookService.store(pc, preprocessor));
 
     useCase.getCopybooks()
         .forEach(cobolText -> {
 
           String copybookText = cobolText.getFullText();
-          if (cobolText.isPreprocess()) {
-            copybookText = preprocessor.cleanUpCode("uri", cobolText.getFullText())
-                .getResult().toString();
-          }
 
           cobolText = new CobolText(cobolText.getFileName().toUpperCase(), cobolText.getDialectType(), copybookText);
-          copybookService.store(UseCaseUtils.toCopybookModel(cobolText, useCase.documentUri), languageId, true);
+          copybookService.store(UseCaseUtils.toCopybookModel(cobolText, useCase.documentUri), preprocessor);
         });
 
     SubroutineService subroutines = injector.getInstance(SubroutineService.class);

@@ -35,8 +35,8 @@ import org.eclipse.lsp.cobol.common.copybook.CopybookService;
 import org.eclipse.lsp.cobol.common.file.FileSystemService;
 import org.eclipse.lsp.cobol.common.file.WorkspaceFileService;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectDiscoveryService;
-import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
-import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessorImpl;
+import org.eclipse.lsp.cobol.dialects.hp.HpTextPreprocessor;
+import org.eclipse.lsp.cobol.dialects.ibm.IbmTextPreprocessor;
 import org.eclipse.lsp.cobol.domain.modules.DatabusModule;
 import org.eclipse.lsp.cobol.domain.modules.EngineModule;
 import org.eclipse.lsp.cobol.lsp.DisposableLSPStateService;
@@ -81,8 +81,11 @@ public class UseCaseInitializerService implements UseCaseInitializer {
                 bind(FileSystemService.class).toInstance(new WorkspaceFileService());
                 bind(CobolLanguageClient.class).toInstance(languageClient);
                 bind(SubroutineService.class).to(SubroutineServiceImpl.class);
-                bind(TextPreprocessor.class).to(TextPreprocessorImpl.class);
-                bind(CleanerPreprocessor.class).to(TextPreprocessorImpl.class);
+
+                bind(CleanerPreprocessor.class).annotatedWith(Names.named("cobol")).to(IbmTextPreprocessor.class);
+                bind(CleanerPreprocessor.class).annotatedWith(Names.named("hpcobol")).to(HpTextPreprocessor.class);
+
+                bind(CleanerPreprocessor.class).to(IbmTextPreprocessor.class);
                 bind(WatcherService.class).to(WatcherServiceImpl.class);
                 bind(DialectDiscoveryService.class).to(ExplicitDialectDiscoveryService.class);
                 bind(CopybookIdentificationService.class)

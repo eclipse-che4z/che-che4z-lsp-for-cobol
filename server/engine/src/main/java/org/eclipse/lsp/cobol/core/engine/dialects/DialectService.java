@@ -23,6 +23,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
+import org.eclipse.lsp.cobol.common.CleanerPreprocessor;
 import org.eclipse.lsp.cobol.common.DialectRegistryItem;
 import org.eclipse.lsp.cobol.common.ResultWithErrors;
 import org.eclipse.lsp.cobol.common.copybook.CopybookModel;
@@ -43,7 +44,6 @@ import org.eclipse.lsp.cobol.core.engine.analysis.AnalysisContext;
 import org.eclipse.lsp.cobol.core.engine.dialects.hp.HpDialect;
 import org.eclipse.lsp.cobol.implicitDialects.cics.CICSDialect;
 import org.eclipse.lsp.cobol.implicitDialects.sql.Db2SqlDialect;
-import org.eclipse.lsp.cobol.lsp.CobolLanguageId;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
@@ -369,15 +369,15 @@ public class DialectService {
    * Add pre-defined copybooks from dialects to the copybook repository.
    *
    * @param config     {@link AnalysisConfig}
-   * @param languageId
+   * @param preprocessor - dialect specific preprocessor
    */
-  public void addDialectPredefinedCopybooks(AnalysisConfig config, CobolLanguageId languageId) {
+  public void addDialectPredefinedCopybooks(AnalysisConfig config, CleanerPreprocessor preprocessor) {
     List<CobolDialect> dialects = new ArrayList<>();
     config.getDialects().forEach(dialect -> getDialectByName(dialect).ifPresent(dialects::add));
     dialects.addAll(getActiveImplicitDialects(config));
     for (CobolDialect dialect : dialects) {
       List<CopybookModel> predefinedCopybook = dialect.getPredefinedCopybook(config);
-      predefinedCopybook.forEach(model -> copybookService.store(model, languageId.getId(), true));
+      predefinedCopybook.forEach(model -> copybookService.store(model, preprocessor));
     }
   }
 }

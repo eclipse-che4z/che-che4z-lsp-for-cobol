@@ -79,11 +79,11 @@ public final class IdmsDialect implements CobolDialect {
                                   Deque<String> copybookStack) {
     CopybookName copybookName = new CopybookName(cb.getName(), IdmsDialect.NAME);
     ResultWithErrors<CopybookModel> resolvedCopybook = copybookService.resolve(
-            copybookName.toCopybookId(programDocumentUri),
-            copybookName,
-            programDocumentUri,
-            currentUri,
-            true, "cobol");
+        copybookName.toCopybookId(programDocumentUri),
+        copybookName,
+        programDocumentUri,
+        currentUri,
+        ctx.getPreprocessor());
     CopybookModel copybookModel = resolvedCopybook.getResult();
 
     if (copybookModel.getUri() == null || copybookModel.getContent() == null) {

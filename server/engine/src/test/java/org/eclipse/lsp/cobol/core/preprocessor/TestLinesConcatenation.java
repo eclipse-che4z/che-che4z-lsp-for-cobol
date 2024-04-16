@@ -22,6 +22,8 @@ import static org.mockito.Mockito.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+import org.eclipse.lsp.cobol.common.CleanerPreprocessor;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedText;
 import org.eclipse.lsp.cobol.common.message.MessageService;
@@ -37,7 +39,7 @@ import org.eclipse.lsp.cobol.core.preprocessor.delegates.transformer.CobolLinesT
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.writer.CobolLineWriter;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.writer.CobolLineWriterImpl;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.writer.CobolLineWriterService;
-import org.eclipse.lsp.cobol.lsp.CobolLanguageId;
+import org.eclipse.lsp.cobol.dialects.ibm.IbmTextPreprocessor;
 import org.eclipse.lsp.cobol.service.settings.layout.CodeLayoutStore;
 import org.junit.jupiter.api.Test;
 
@@ -92,8 +94,8 @@ class TestLinesConcatenation {
     CobolLineReWriterService indicatorProcessorService = mock(CobolLineReWriterService.class);
     when(indicatorProcessorService.getLineReWriter(any())).thenReturn(indicatorProcessor);
 
-    TextPreprocessor textPreprocessor = new TextPreprocessorImpl(cobolLineReaderService, writerService, transformationService, indicatorProcessorService);
-    ExtendedText extendedText = textPreprocessor.cleanUpCode(DOCUMENT_URI, TEXT, CobolLanguageId.COBOL).unwrap(accumulatedErrors::addAll);
+    CleanerPreprocessor textPreprocessor = new IbmTextPreprocessor(cobolLineReaderService, writerService, transformationService, indicatorProcessorService);
+    ExtendedText extendedText = textPreprocessor.cleanUpCode(DOCUMENT_URI, TEXT).unwrap(accumulatedErrors::addAll);
     assertEquals(EXPECTED, extendedText.toString());
     assertTrue(accumulatedErrors.isEmpty());
   }
