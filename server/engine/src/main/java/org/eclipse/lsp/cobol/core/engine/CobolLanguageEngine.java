@@ -26,15 +26,12 @@ import com.google.inject.Singleton;
 import java.util.*;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.eclipse.lsp.cobol.common.*;
 import org.eclipse.lsp.cobol.common.benchmark.BenchmarkService;
 import org.eclipse.lsp.cobol.common.benchmark.BenchmarkSession;
 import org.eclipse.lsp.cobol.common.error.ErrorCodes;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
-import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
-import org.eclipse.lsp.cobol.common.mapping.ExtendedText;
 import org.eclipse.lsp.cobol.common.mapping.OriginalLocation;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
@@ -43,19 +40,14 @@ import org.eclipse.lsp.cobol.common.model.tree.RootNode;
 import org.eclipse.lsp.cobol.common.utils.ImplicitCodeUtils;
 import org.eclipse.lsp.cobol.common.utils.ThreadInterruptionUtil;
 import org.eclipse.lsp.cobol.core.engine.analysis.AnalysisContext;
-import org.eclipse.lsp.cobol.core.engine.dialects.DialectService;
 import org.eclipse.lsp.cobol.core.engine.errors.ErrorFinalizerService;
 import org.eclipse.lsp.cobol.core.engine.pipeline.Pipeline;
 import org.eclipse.lsp.cobol.core.engine.pipeline.PipelineResult;
 import org.eclipse.lsp.cobol.core.engine.pipeline.StageResult;
 import org.eclipse.lsp.cobol.core.engine.pipeline.stages.*;
-import org.eclipse.lsp.cobol.core.engine.processor.AstProcessor;
-import org.eclipse.lsp.cobol.core.engine.symbols.SymbolsRepository;
-import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.GrammarPreprocessor;
+import org.eclipse.lsp.cobol.dialects.TrueDialectService;
+import org.eclipse.lsp.cobol.lsp.CobolLanguageId;
 import org.eclipse.lsp.cobol.lsp.handlers.HandlerUtility;
-import org.eclipse.lsp.cobol.service.settings.CachingConfigurationService;
-import org.eclipse.lsp.cobol.service.settings.layout.CodeLayoutStore;
 import org.eclipse.lsp.cobol.service.utils.ServerTypeUtil;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.Location;
@@ -72,47 +64,21 @@ import org.eclipse.lsp4j.Range;
 public class CobolLanguageEngine {
   private static final int FIRST_LINE_SEQ_AND_EXTRA_OP = 8;
 
-  private final TextPreprocessor preprocessor;
   private final MessageService messageService;
   private final ErrorFinalizerService errorFinalizerService;
   private final BenchmarkService benchmarkService;
-  private final Pipeline pipeline;
+  private final TrueDialectService trueDialectService;
 
   @Inject
   public CobolLanguageEngine(
-      TextPreprocessor preprocessor,
-      GrammarPreprocessor grammarPreprocessor,
+      TrueDialectService trueDialectService,
       MessageService messageService,
-      ParseTreeListener treeListener,
-      SubroutineService subroutineService,
-      CachingConfigurationService cachingConfigurationService,
-      DialectService dialectService,
-      AstProcessor astProcessor,
-      SymbolsRepository symbolsRepository,
       ErrorFinalizerService errorFinalizerService,
-      BenchmarkService benchmarkService,
-      CodeLayoutStore codeLayoutStore) {
-    this.preprocessor = preprocessor;
+      BenchmarkService benchmarkService) {
     this.messageService = messageService;
     this.errorFinalizerService = errorFinalizerService;
     this.benchmarkService = benchmarkService;
-
-    this.pipeline = new Pipeline();
-    this.pipeline.add(new DialectCompilerDirectiveStage(dialectService));
-    this.pipeline.add(new CompilerDirectivesStage(messageService));
-    this.pipeline.add(new DialectProcessingStage(dialectService));
-    this.pipeline.add(new PreprocessorStage(grammarPreprocessor));
-    this.pipeline.add(new ImplicitDialectProcessingStage(dialectService));
-    this.pipeline.add(new ParserStage(messageService, treeListener));
-    this.pipeline.add(
-        new TransformTreeStage(
-            symbolsRepository,
-            messageService,
-            subroutineService,
-            cachingConfigurationService,
-            dialectService,
-            astProcessor,
-            codeLayoutStore));
+    this.trueDialectService = trueDialectService;
   }
 
   private static AnalysisResult toAnalysisResult(
@@ -142,7 +108,7 @@ public class CobolLanguageEngine {
 
   /**
    * Collect diagnostics for each document, used in the analysis - the main COBOL file and all the
-   * copybooks. If there were no errors for some URI, then provide an empty list to clean-up the
+   * copybooks. If there were no errors for some URI, then provide an empty list to clean up the
    * errors after the previous analysis.
    *
    * @param diagnostics - list of found syntax and semantic errors
@@ -161,17 +127,18 @@ public class CobolLanguageEngine {
   /**
    * Perform syntax and semantic analysis for the given text document
    *
-   * @param documentUri unique resource identifier of the processed document
-   * @param text the content of the document that should be processed
+   * @param documentUri    unique resource identifier of the processed document
+   * @param text           the content of the document that should be processed
    * @param analysisConfig contains analysis processing features info and copybook config with
-   *     following information: target backend sql server, copybook processing mode which reflect
-   *     the sync status of the document (DID_OPEN|DID_CHANGE)
+   *                       following information: target backend sql server, copybook processing mode which reflect
+   *                       the sync status of the document (DID_OPEN|DID_CHANGE)
+   * @param languageId     language identifier
    * @return Semantic information wrapper object and list of syntax error that might send back to
-   *     the client
+   * the client
    */
   @NonNull
   public AnalysisResult run(
-      @NonNull String documentUri, @NonNull String text, @NonNull AnalysisConfig analysisConfig) {
+          @NonNull String documentUri, @NonNull String text, @NonNull AnalysisConfig analysisConfig, CobolLanguageId languageId) {
     ThreadInterruptionUtil.checkThreadInterrupted();
     if (isEmpty(text)) {
       return AnalysisResult.builder().build();
@@ -182,13 +149,10 @@ public class CobolLanguageEngine {
           getErrorForIncompatibleServerTypeAndDialects(documentUri), documentUri);
     }
 
-    // Cleaning up
-    ResultWithErrors<ExtendedText> resultWithErrors = preprocessor.cleanUpCode(documentUri, text);
     BenchmarkSession session = benchmarkService.startSession();
-    AnalysisContext ctx =
-        new AnalysisContext(
-            new ExtendedDocument(resultWithErrors.getResult(), text), analysisConfig, session);
-    ctx.getAccumulatedErrors().addAll(resultWithErrors.getErrors());
+    AnalysisContext ctx = new AnalysisContext(analysisConfig, session, documentUri, text, languageId);
+
+    Pipeline pipeline = trueDialectService.getPipeline(languageId);
 
     PipelineResult pipelineResult = pipeline.run(ctx);
     StageResult<?> result = pipelineResult.getLastStageResult();

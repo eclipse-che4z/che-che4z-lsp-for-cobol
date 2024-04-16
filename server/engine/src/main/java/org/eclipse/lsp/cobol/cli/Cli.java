@@ -48,6 +48,7 @@ import org.eclipse.lsp.cobol.core.engine.symbols.SymbolsRepository;
 import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.GrammarPreprocessor;
 import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
+import org.eclipse.lsp.cobol.lsp.CobolLanguageId;
 import org.eclipse.lsp.cobol.service.settings.CachingConfigurationService;
 import org.eclipse.lsp.cobol.service.settings.layout.CodeLayoutStore;
 import org.eclipse.lsp4j.Location;
@@ -110,12 +111,12 @@ public class Cli implements Callable<Integer> {
     }
     String documentUri = src.toURI().toString();
     String text = new String(Files.readAllBytes(src.toPath()));
-    ResultWithErrors<ExtendedText> resultWithErrors = preprocessor.cleanUpCode(documentUri, text);
+    ResultWithErrors<ExtendedText> resultWithErrors = preprocessor.cleanUpCode(documentUri, text, CobolLanguageId.COBOL);
     AnalysisContext ctx =
         new AnalysisContext(
             new ExtendedDocument(resultWithErrors.getResult(), text),
             createAnalysisConfiguration(),
-            benchmarkService.startSession());
+            benchmarkService.startSession(), documentUri, text, CobolLanguageId.COBOL);
     ctx.getAccumulatedErrors().addAll(resultWithErrors.getErrors());
     PipelineResult pipelineResult = pipeline.run(ctx);
     Gson gson = new GsonBuilder().setPrettyPrinting().create();

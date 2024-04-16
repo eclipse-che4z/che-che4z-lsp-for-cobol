@@ -75,7 +75,8 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
         context.getCopybooksRepository(),
         context.getHierarchy(),
         messageService,
-        replacingService);
+        replacingService,
+        context.getLanguageId());
     this.replacingService = replacingService;
   }
 

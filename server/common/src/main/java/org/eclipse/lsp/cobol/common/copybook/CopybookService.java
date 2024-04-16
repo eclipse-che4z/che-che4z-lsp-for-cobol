@@ -14,10 +14,9 @@
  */
 package org.eclipse.lsp.cobol.common.copybook;
 
+import java.util.Collection;
 import lombok.NonNull;
 import org.eclipse.lsp.cobol.common.ResultWithErrors;
-
-import java.util.Collection;
 
 /**
  * Provide API definition to search for copybooks files. The service also caches copybook to reduce
@@ -32,20 +31,21 @@ public interface CopybookService {
    * Retrieve and return the copybook by its name.
    * Returns a CopybookModel and preprocessed errors for the resolved copybook wrapped inside {@link ResultWithErrors}.
    *
-   * @param copybookId - the id of the copybook to be retrieved
-   * @param copybookName - the name of the copybook to be retrieved
+   * @param copybookId         - the id of the copybook to be retrieved
+   * @param copybookName       - the name of the copybook to be retrieved
    * @param programDocumentUri - the currently processing program document
-   * @param documentUri - the currently processing document that contains the copy statement
-   * @param preprocess - indicates if copybook needs to be preprocessed after resolving
+   * @param documentUri        - the currently processing document that contains the copy statement
+   * @param preprocess         - indicates if copybook needs to be preprocessed after resolving
+   * @param languageId
    * @return a CopybookModel wrapped inside {@link ResultWithErrors} which contains copybook name, its URI and the content.
-   *         Wrapped errors are preprocessed errors for the returned CopybookModel.
+   * Wrapped errors are preprocessed errors for the returned CopybookModel.
    */
   ResultWithErrors<CopybookModel> resolve(
-      @NonNull CopybookId copybookId,
-      @NonNull CopybookName copybookName,
-      @NonNull String programDocumentUri,
-      @NonNull String documentUri,
-      boolean preprocess);
+          @NonNull CopybookId copybookId,
+          @NonNull CopybookName copybookName,
+          @NonNull String programDocumentUri,
+          @NonNull String documentUri,
+          boolean preprocess, String languageId);
 
   /**
    * Store the copybookModel in cache. Copybook depends on a document from where it is imported.
@@ -58,9 +58,10 @@ public interface CopybookService {
    * Store the copybookModel in cache. Copybook depends on a document from where it is imported.
    *
    * @param copybookModel the copybook model
+   * @param languageId languageId of the source code
    * @param doCleanUp is copybook clean up required before storing copybookModel.
    */
-  void store(CopybookModel copybookModel, boolean doCleanUp);
+  void store(CopybookModel copybookModel, String languageId, boolean doCleanUp);
 
   /**
    * Send downloading requests to the Client for copybooks not presented locally, if any.

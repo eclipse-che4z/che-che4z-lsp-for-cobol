@@ -17,10 +17,10 @@ package org.eclipse.lsp.cobol.service;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
-import org.eclipse.lsp.cobol.common.error.ErrorSource;
-import org.eclipse.lsp.cobol.test.CobolText;
 import org.eclipse.lsp.cobol.common.AnalysisResult;
 import org.eclipse.lsp.cobol.common.LanguageEngineFacade;
+import org.eclipse.lsp.cobol.common.error.ErrorSource;
+import org.eclipse.lsp.cobol.test.CobolText;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
@@ -32,6 +32,11 @@ import org.eclipse.lsp4j.Range;
 public class ClientServerIntegrationTestImpl implements LanguageEngineFacade {
   @Override
   public AnalysisResult analyze(String uri, String text, AnalysisConfig analysisConfig) {
+    return analyze(uri, text, analysisConfig, "cobol");
+  }
+
+  @Override
+  public AnalysisResult analyze(String uri, String text, AnalysisConfig analysisConfig, String languageId) {
     final String copybook1 = "       {_COPY {~CPYBK1}.|1_}";
     final String copybook2 = "       {_COPY {~CPYBK2}.|2_}";
 
