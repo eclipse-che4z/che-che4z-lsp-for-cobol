@@ -22,6 +22,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.eclipse.lsp.cobol.common.SubroutineService;
+import org.eclipse.lsp.cobol.dialects.TrueDialectService;
 import org.eclipse.lsp.cobol.lsp.SourceUnitGraph;
 import org.eclipse.lsp.cobol.service.AnalysisService;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
@@ -54,8 +55,8 @@ class AsyncAnalysisServiceTest {
 
     @BeforeEach
     void setUp() {
-        asyncAnalysisService = new AsyncAnalysisService(documentModelService, analysisService, copybookService,
-                subroutineService, communication);
+        asyncAnalysisService = new AsyncAnalysisService(mock(TrueDialectService.class),
+            documentModelService, analysisService, copybookService, subroutineService, communication);
     }
 
     @Test

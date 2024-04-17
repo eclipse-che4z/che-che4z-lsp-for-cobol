@@ -79,7 +79,7 @@ public class HpDialect implements CobolDialect {
     CopybookName copybookName = new CopybookName(descriptor.getName());
     CopybookModel model = copybookService.resolve(copybookName.toCopybookId(context.getProgramDocumentUri()),
             copybookName, context.getProgramDocumentUri(),
-            context.getExtendedDocument().getUri(), false, "hp-cobol")
+            context.getExtendedDocument().getUri(), null)
         .unwrap(errors::addAll);
 
     Location nameLocation = new Location(context.getExtendedDocument().getUri(), descriptor.getNameRange());

@@ -26,6 +26,7 @@ import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.eclipse.lsp.cobol.cfg.CFASTBuilder;
 import org.eclipse.lsp.cobol.cfg.CFASTBuilderImpl;
 import org.eclipse.lsp.cobol.cli.modules.CliClientProvider;
+import org.eclipse.lsp.cobol.common.CleanerPreprocessor;
 import org.eclipse.lsp.cobol.common.LanguageEngineFacade;
 import org.eclipse.lsp.cobol.common.SubroutineService;
 import org.eclipse.lsp.cobol.common.action.CodeActionProvider;
@@ -40,8 +41,8 @@ import org.eclipse.lsp.cobol.core.engine.dialects.DialectDiscoveryFolderService;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectDiscoveryService;
 import org.eclipse.lsp.cobol.core.messages.LocaleStoreImpl;
 import org.eclipse.lsp.cobol.core.messages.PropertiesMessageService;
-import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
-import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessorImpl;
+import org.eclipse.lsp.cobol.dialects.hp.HpTextPreprocessor;
+import org.eclipse.lsp.cobol.dialects.ibm.IbmTextPreprocessor;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.GrammarPreprocessor;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.GrammarPreprocessorImpl;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.GrammarPreprocessorListenerFactory;
@@ -90,7 +91,8 @@ import org.eclipse.lsp.cobol.service.settings.SettingsServiceImpl;
 public class CliModule extends AbstractModule {
   @Override
   protected void configure() {
-    bind(TextPreprocessor.class).to(TextPreprocessorImpl.class);
+    bind(CleanerPreprocessor.class).annotatedWith(Names.named("cobol")).to(IbmTextPreprocessor.class);
+    bind(CleanerPreprocessor.class).annotatedWith(Names.named("hpcobol")).to(HpTextPreprocessor.class);
     bind(CobolLineReader.class).annotatedWith(Names.named("hpcobol")).to(HPCobolLineReaderImpl.class);
     bind(CobolLineReader.class).annotatedWith(Names.named("cobol")).to(CobolLineReaderImpl.class);
 

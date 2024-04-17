@@ -32,6 +32,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.lsp.cobol.common.CleanerPreprocessor;
 import org.eclipse.lsp.cobol.common.ResultWithErrors;
 import org.eclipse.lsp.cobol.common.copybook.*;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
@@ -40,9 +41,7 @@ import org.eclipse.lsp.cobol.common.mapping.ExtendedText;
 import org.eclipse.lsp.cobol.common.mapping.OriginalLocation;
 import org.eclipse.lsp.cobol.common.utils.ImplicitCodeUtils;
 import org.eclipse.lsp.cobol.common.utils.ThreadInterruptionUtil;
-import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
 import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
-import org.eclipse.lsp.cobol.lsp.CobolLanguageId;
 import org.eclipse.lsp.cobol.lsp.jrpc.CobolLanguageClient;
 import org.eclipse.lsp.cobol.service.UriDecodeService;
 
@@ -60,7 +59,6 @@ public class CopybookServiceImpl implements CopybookService {
   private final Provider<CobolLanguageClient> clientProvider;
   private final UriDecodeService uriDecodeService;
   private final FileSystemService files;
-  public final TextPreprocessor preprocessor;
   private static final String COBOL = "COBOL";
 
   private final Map<String, Set<CopybookName>> copybooksForDownloading =
@@ -71,12 +69,10 @@ public class CopybookServiceImpl implements CopybookService {
   @Inject
   public CopybookServiceImpl(Provider<CobolLanguageClient> clientProvider,
       FileSystemService files,
-      TextPreprocessor preprocessor,
       CopybookCache copybookCache,
       UriDecodeService uriDecodeService) {
     this.files = files;
     this.clientProvider = clientProvider;
-    this.preprocessor = preprocessor;
     this.copybookCache = copybookCache;
     this.uriDecodeService = uriDecodeService;
   }
@@ -93,7 +89,7 @@ public class CopybookServiceImpl implements CopybookService {
 
   /**
    * Removes cache for the passed {@link CopybookId}
-   * @param copybookId
+   * @param copybookId is a copybook identifier
    */
   public void invalidateCache(CopybookId copybookId) {
     copybookCache.invalidate(copybookId);
@@ -113,8 +109,7 @@ public class CopybookServiceImpl implements CopybookService {
    * @param copybookName       - the name of the copybook to be retrieved
    * @param programDocumentUri - the currently processing program document
    * @param documentUri        - the currently processing document that contains the copy statement
-   * @param preprocess         - indicates if copybook needs to be preprocessed after resolving
-   * @param languageId
+   * @param preprocessor       - Cleanup preprocessor that will be used for new copybooks or null
    * @return a CopybookModel wrapped inside {@link ResultWithErrors} which contains copybook name, its URI and the content
    */
   public ResultWithErrors<CopybookModel> resolve(
@@ -122,12 +117,11 @@ public class CopybookServiceImpl implements CopybookService {
           @NonNull CopybookName copybookName,
           @NonNull String programDocumentUri,
           @NonNull String documentUri,
-          boolean preprocess, String languageId) {
+          CleanerPreprocessor preprocessor) {
     try {
       ThreadInterruptionUtil.checkThreadInterrupted();
 
-      CopybookModel copybookModel = getFromCache(programDocumentUri, copybookId, copybookName,
-              preprocess, CobolLanguageId.MAPPER.get(languageId));
+      CopybookModel copybookModel = getFromCache(programDocumentUri, copybookId, copybookName, preprocessor);
       copybookUsage.computeIfAbsent(programDocumentUri, k -> new HashSet<>()).add(copybookModel);
 
       List<SyntaxError> errors = Optional.ofNullable(copybookModel.getUri())
@@ -142,11 +136,11 @@ public class CopybookServiceImpl implements CopybookService {
   }
 
   private CopybookModel getFromCache(String programDocumentUri, CopybookId copybookId,
-                                     CopybookName copybookName, boolean preprocess, CobolLanguageId languageId) throws ExecutionException {
+                                     CopybookName copybookName, CleanerPreprocessor preprocessor) throws ExecutionException {
     return copybookCache.get(copybookId, () -> {
       CopybookModel copybookModel = resolveSync(copybookName, programDocumentUri);
-      if (preprocess && copybookModel.getUri() != null) {
-        ResultWithErrors<CopybookModel> copybookModelResultWithErrors = cleanupCopybook(copybookModel, languageId);
+      if (preprocessor != null && copybookModel.getUri() != null) {
+        ResultWithErrors<CopybookModel> copybookModelResultWithErrors = cleanupCopybook(copybookModel, preprocessor);
         copybookModel = copybookModelResultWithErrors.getResult();
         preprocessCopybookErrors.put(copybookModel.getUri(), copybookModelResultWithErrors.getErrors());
       }
@@ -160,9 +154,9 @@ public class CopybookServiceImpl implements CopybookService {
   }
 
   @Override
-  public void store(CopybookModel copybookModel, String languageId, boolean doCleanUp) {
-    if (doCleanUp) {
-      ResultWithErrors<CopybookModel> processedCopybook = cleanupCopybook(copybookModel, CobolLanguageId.MAPPER.get(languageId));
+  public void store(CopybookModel copybookModel, CleanerPreprocessor preprocessor) {
+    if (preprocessor != null) {
+      ResultWithErrors<CopybookModel> processedCopybook = cleanupCopybook(copybookModel, preprocessor);
       copybookModel = processedCopybook.getResult();
       preprocessCopybookErrors.put(copybookModel.getUri(), processedCopybook.getErrors());
     }
@@ -196,8 +190,8 @@ public class CopybookServiceImpl implements CopybookService {
     }
   }
 
-  private ResultWithErrors<CopybookModel> cleanupCopybook(CopybookModel dirtyCopybook, CobolLanguageId languageId) {
-    ResultWithErrors<ExtendedText> textTransformationsResultWithErrors = preprocessor.cleanUpCode(dirtyCopybook.getUri(), dirtyCopybook.getContent(), languageId);
+  private ResultWithErrors<CopybookModel> cleanupCopybook(CopybookModel dirtyCopybook, CleanerPreprocessor preprocessor) {
+    ResultWithErrors<ExtendedText> textTransformationsResultWithErrors = preprocessor.cleanUpCode(dirtyCopybook.getUri(), dirtyCopybook.getContent());
     String cleanText = CharMatcher.whitespace().trimTrailingFrom(textTransformationsResultWithErrors.getResult().toString());
     CopybookModel copybookModel = new CopybookModel(dirtyCopybook.getCopybookId(), dirtyCopybook.getCopybookName(), dirtyCopybook.getUri(), cleanText);
     return new ResultWithErrors<>(copybookModel, adjustErrorLocation(dirtyCopybook, textTransformationsResultWithErrors.getErrors()));
@@ -302,7 +296,7 @@ public class CopybookServiceImpl implements CopybookService {
    * Get the list of copybook used by a document
    *
    * @param documentUri  current document uri.
-   * @return List of all the {@link CopybookModel} used by the passed document
+   * @return Set of all the {@link CopybookModel} used by the passed document
    */
   public Set<CopybookModel> getCopybookUsage(String documentUri) {
     return Collections.unmodifiableSet(copybookUsage.getOrDefault(documentUri, ImmutableSet.of()));

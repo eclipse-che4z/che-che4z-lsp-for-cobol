@@ -17,6 +17,7 @@ package org.eclipse.lsp.cobol.core.engine.pipeline.stages;
 import java.util.HashSet;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
+import org.eclipse.lsp.cobol.common.CleanerPreprocessor;
 import org.eclipse.lsp.cobol.common.dialects.DialectOutcome;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
@@ -32,6 +33,7 @@ import org.eclipse.lsp.cobol.core.engine.pipeline.StageResult;
 public class DialectProcessingStage implements Stage<DialectOutcome, Void> {
 
   private final DialectService dialectService;
+  private final CleanerPreprocessor preprocessor;
 
   @Override
   public StageResult<DialectOutcome> run(AnalysisContext context, StageResult<Void> prevStageResult) {
@@ -47,12 +49,13 @@ public class DialectProcessingStage implements Stage<DialectOutcome, Void> {
   }
 
   private DialectOutcome processDialects(AnalysisContext ctx) {
-    dialectService.addDialectPredefinedCopybooks(ctx.getConfig(), ctx.getLanguageId());
+    dialectService.addDialectPredefinedCopybooks(ctx.getConfig(), preprocessor);
     DialectProcessingContext dialectProcessingContext =
         DialectProcessingContext.builder()
             .config(ctx.getConfig())
             .programDocumentUri(ctx.getExtendedDocument().getUri())
             .extendedDocument(ctx.getExtendedDocument())
+            .preprocessor(preprocessor)
             .build();
     dialectProcessingContext.getExtendedDocument().commitTransformations();
 

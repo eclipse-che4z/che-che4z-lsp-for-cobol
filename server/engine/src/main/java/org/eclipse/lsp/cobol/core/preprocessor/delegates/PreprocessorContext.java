@@ -20,7 +20,6 @@ import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
 import org.eclipse.lsp.cobol.core.preprocessor.CopybookHierarchy;
 import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
-import org.eclipse.lsp.cobol.lsp.CobolLanguageId;
 
 /**
  * Preprocessor context
@@ -32,5 +31,4 @@ public class PreprocessorContext {
   @NonNull CopybookProcessingMode copybookProcessingMode;
   @NonNull CopybookHierarchy hierarchy;
   @NonNull CopybooksRepository copybooksRepository;
-  @NonNull CobolLanguageId languageId;
 }

@@ -17,6 +17,7 @@ package org.eclipse.lsp.cobol.core.engine.pipeline.stages;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.eclipse.lsp.cobol.common.CleanerPreprocessor;
 import org.eclipse.lsp.cobol.common.dialects.DialectOutcome;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
@@ -36,6 +37,7 @@ import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
 @RequiredArgsConstructor
 public class PreprocessorStage implements Stage<CopybooksRepository, DialectOutcome> {
   private final GrammarPreprocessor grammarPreprocessor;
+  private final CleanerPreprocessor preprocessor;
 
   @Override
   public StageResult<CopybooksRepository> run(AnalysisContext context, StageResult<DialectOutcome> prevStageResult) {
@@ -67,9 +69,10 @@ public class PreprocessorStage implements Stage<CopybooksRepository, DialectOutc
   private CopybooksRepository runPreprocessor(String programDocumentUri, AnalysisContext ctx) {
     List<SyntaxError> preprocessorErrors = new ArrayList<>();
     ExtendedDocument extendedDocument = ctx.getExtendedDocument();
-    CopybooksRepository copybooks =
-        grammarPreprocessor.preprocess(new PreprocessorContext(programDocumentUri, extendedDocument,
-                ctx.getConfig().getCopybookProcessingMode(), new CopybookHierarchy(), new CopybooksRepository(), ctx.getLanguageId()))
+    PreprocessorContext context = new PreprocessorContext(programDocumentUri, extendedDocument,
+        ctx.getConfig().getCopybookProcessingMode(), new CopybookHierarchy(), new CopybooksRepository());
+
+    CopybooksRepository copybooks = grammarPreprocessor.preprocess(context, preprocessor)
             .unwrap(preprocessorErrors::addAll);
     extendedDocument.commitTransformations();
 

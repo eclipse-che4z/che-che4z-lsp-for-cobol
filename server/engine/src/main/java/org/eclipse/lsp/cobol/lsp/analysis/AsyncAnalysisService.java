@@ -22,13 +22,14 @@ import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.common.SubroutineService;
 import org.eclipse.lsp.cobol.common.copybook.CopybookService;
+import org.eclipse.lsp.cobol.dialects.TrueDialectService;
+import org.eclipse.lsp.cobol.lsp.CobolLanguageId;
 import org.eclipse.lsp.cobol.lsp.LspEventCancelCondition;
 import org.eclipse.lsp.cobol.lsp.LspEventDependency;
 import org.eclipse.lsp.cobol.lsp.SourceUnitGraph;
 import org.eclipse.lsp.cobol.service.AnalysisService;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp.cobol.service.DocumentModelService;
-import org.eclipse.lsp.cobol.service.copybooks.CopybookServiceImpl;
 import org.eclipse.lsp.cobol.service.delegates.communications.Communications;
 
 /**
@@ -38,6 +39,7 @@ import org.eclipse.lsp.cobol.service.delegates.communications.Communications;
 @Singleton
 public class AsyncAnalysisService implements AnalysisStateNotifier {
   private static final ExecutorService SINGLE_THREAD_EXECUTOR = Executors.newSingleThreadExecutor(r -> new Thread(r, "LSP workspace service"));
+  private final TrueDialectService dialectService;
   private final DocumentModelService documentModelService;
   private final AnalysisService analysisService;
   private final CopybookService copybookService;
@@ -60,11 +62,13 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
 
 
   @Inject
-  public AsyncAnalysisService(DocumentModelService documentModelService,
+  public AsyncAnalysisService(TrueDialectService dialectService,
+                              DocumentModelService documentModelService,
                               AnalysisService analysisService,
                               CopybookService copybookService,
                               SubroutineService subroutineService,
                               Communications communications) {
+    this.dialectService = dialectService;
     this.documentModelService = documentModelService;
     this.analysisService = analysisService;
     this.copybookService = copybookService;
@@ -220,20 +224,18 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
     for (String uri : openedUris) {
         String languageId = documentModelService.get(uri).getLanguageId();
       //TODO: update cache directly from workspace document graph
-      if (copybookService instanceof CopybookServiceImpl) {
-        CopybookServiceImpl copybookServiceImpl = (CopybookServiceImpl) copybookService;
-        copybookServiceImpl.getCopybookUsage(uri).stream()
-            .filter(model -> Objects.nonNull(model.getUri()))
-            .filter(model -> model.getUri().equals(copybookUri))
-            .forEach(
-                copybookModel -> {
-                  copybookServiceImpl.invalidateCache(copybookModel.getCopybookId());
-                  if (copybookContent != null) {
-                    copybookModel.setContent(copybookContent);
-                    copybookServiceImpl.store(copybookModel, languageId, true);
-                  }
-                });
-      }
+      copybookService.getCopybookUsage(uri).stream()
+          .filter(model -> Objects.nonNull(model.getUri()))
+          .filter(model -> model.getUri().equals(copybookUri))
+          .forEach(
+              copybookModel -> {
+                copybookService.invalidateCache(copybookModel.getCopybookId());
+                if (copybookContent != null) {
+                  copybookModel.setContent(copybookContent);
+                  copybookService.store(copybookModel, dialectService.getPreprocessor(CobolLanguageId.MAPPER.get(languageId)));
+                }
+              });
+
       subroutineService.invalidateCache();
       LOG.info("Cache invalidated");
       CobolDocumentModel document = documentModelService.get(uri);
