@@ -12,7 +12,7 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package org.eclipse.lsp.cobol.core.engine.pipeline.stages;
+package org.eclipse.lsp.cobol.dialects.ibm;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -23,14 +23,14 @@ import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.core.engine.analysis.AnalysisContext;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectService;
-import org.eclipse.lsp.cobol.core.engine.pipeline.Stage;
-import org.eclipse.lsp.cobol.core.engine.pipeline.StageResult;
+import org.eclipse.lsp.cobol.common.pipeline.Stage;
+import org.eclipse.lsp.cobol.common.pipeline.StageResult;
 
 /**
  * Dialect Processing Stage
  */
 @RequiredArgsConstructor
-public class DialectProcessingStage implements Stage<DialectOutcome, Void> {
+public class DialectProcessingStage implements Stage<AnalysisContext, DialectOutcome, Void> {
 
   private final DialectService dialectService;
   private final CleanerPreprocessor preprocessor;

@@ -32,9 +32,11 @@ import org.eclipse.lsp.cobol.common.LanguageEngineFacade;
 import org.eclipse.lsp.cobol.common.SubroutineService;
 import org.eclipse.lsp.cobol.common.action.CodeActionProvider;
 import org.eclipse.lsp.cobol.common.copybook.CopybookService;
+import org.eclipse.lsp.cobol.common.dialects.TrueDialectService;
 import org.eclipse.lsp.cobol.common.file.FileSystemService;
 import org.eclipse.lsp.cobol.common.file.WorkspaceFileService;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectDiscoveryService;
+import org.eclipse.lsp.cobol.dialects.TrueDialectServiceImpl;
 import org.eclipse.lsp.cobol.dialects.ibm.IbmTextPreprocessor;
 import org.eclipse.lsp.cobol.domain.modules.DatabusModule;
 import org.eclipse.lsp.cobol.domain.modules.EngineModule;
@@ -75,6 +77,7 @@ public class UseCaseInitializerService implements UseCaseInitializer {
             new AbstractModule() {
               @Override
               protected void configure() {
+                bind(TrueDialectService.class).to(TrueDialectServiceImpl.class);
                 bind(LanguageEngineFacade.class).to(CobolLanguageEngineFacade.class);
                 bind(CopybookService.class).to(CopybookServiceImpl.class);
                 bind(SettingsService.class).toInstance(mockSettingsService);

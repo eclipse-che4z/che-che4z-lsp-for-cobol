@@ -16,7 +16,8 @@ package org.eclipse.lsp.cobol.service.settings.layout;
 
 import java.util.Optional;
 import lombok.experimental.UtilityClass;
-import org.eclipse.lsp.cobol.lsp.CobolLanguageId;
+import org.eclipse.lsp.cobol.common.dialects.CobolLanguageId;
+import org.eclipse.lsp.cobol.common.dialects.CobolProgramLayout;
 
 /** Utility class for code layout */
 @UtilityClass

@@ -12,7 +12,7 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package org.eclipse.lsp.cobol.core.engine.pipeline.stages;
+package org.eclipse.lsp.cobol.dialects.ibm;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,14 +22,14 @@ import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.model.tree.CompilerDirectiveNode;
 import org.eclipse.lsp.cobol.core.engine.analysis.AnalysisContext;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectService;
-import org.eclipse.lsp.cobol.core.engine.pipeline.Stage;
-import org.eclipse.lsp.cobol.core.engine.pipeline.StageResult;
+import org.eclipse.lsp.cobol.common.pipeline.Stage;
+import org.eclipse.lsp.cobol.common.pipeline.StageResult;
 
 /**
  * Stage to process dialect nodes
  */
 @RequiredArgsConstructor
-public class DialectCompilerDirectiveStage implements Stage<List<CompilerDirectiveNode>, Void> {
+public class DialectCompilerDirectiveStage implements Stage<AnalysisContext, List<CompilerDirectiveNode>, Void> {
   private final DialectService dialectService;
 
   @Override

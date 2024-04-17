@@ -12,21 +12,21 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package org.eclipse.lsp.cobol.core.engine.pipeline;
+package org.eclipse.lsp.cobol.common.pipeline;
 
-import org.eclipse.lsp.cobol.core.engine.analysis.AnalysisContext;
+import org.eclipse.lsp.cobol.common.benchmark.BenchmarkSessionProvider;
 
 /**
  * Processing Pipeline Stage
  */
-public interface Stage<T, R> {
+public interface Stage<C extends BenchmarkSessionProvider, T, R> {
   /**
    * Runs a processing stage
    * @param context - pipeline processing context
    * @param prevStageResult - previous stage result
    * @return the result of the current stage processing
    */
-  StageResult<T> run(AnalysisContext context, StageResult<R> prevStageResult);
+  StageResult<T> run(C context, StageResult<R> prevStageResult);
 
   /**
    * Returns the name of the stage

@@ -24,11 +24,13 @@ import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.eclipse.lsp.cobol.common.CleanerPreprocessor;
 import org.eclipse.lsp.cobol.common.benchmark.BenchmarkService;
 import org.eclipse.lsp.cobol.common.benchmark.BenchmarkServiceImpl;
+import org.eclipse.lsp.cobol.common.dialects.TrueDialectService;
 import org.eclipse.lsp.cobol.common.message.LocaleStore;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.core.engine.CobolLanguageEngine;
 import org.eclipse.lsp.cobol.core.messages.LocaleStoreImpl;
 import org.eclipse.lsp.cobol.core.messages.PropertiesMessageService;
+import org.eclipse.lsp.cobol.dialects.TrueDialectServiceImpl;
 import org.eclipse.lsp.cobol.dialects.hp.HpTextPreprocessor;
 import org.eclipse.lsp.cobol.dialects.ibm.IbmTextPreprocessor;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.GrammarPreprocessor;
@@ -65,6 +67,7 @@ public class EngineModule extends AbstractModule {
   protected void configure() {
     bind(CobolLanguageEngine.class);
     bind(BenchmarkService.class).to(BenchmarkServiceImpl.class);
+    bind(TrueDialectService.class).to(TrueDialectServiceImpl.class);
     bind(CleanerPreprocessor.class).annotatedWith(Names.named("cobol")).to(IbmTextPreprocessor.class);
     bind(CleanerPreprocessor.class).annotatedWith(Names.named("hpcobol")).to(HpTextPreprocessor.class);
 

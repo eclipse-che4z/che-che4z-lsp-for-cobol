@@ -24,8 +24,8 @@ import java.util.regex.Pattern;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.core.model.*;
-import org.eclipse.lsp.cobol.lsp.CobolLanguageId;
-import org.eclipse.lsp.cobol.service.settings.layout.CobolProgramLayout;
+import org.eclipse.lsp.cobol.common.dialects.CobolLanguageId;
+import org.eclipse.lsp.cobol.common.dialects.CobolProgramLayout;
 import org.eclipse.lsp.cobol.service.settings.layout.CodeLayoutStore;
 import org.eclipse.lsp.cobol.service.settings.layout.CodeLayoutUtil;
 

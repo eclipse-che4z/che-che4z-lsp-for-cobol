@@ -12,11 +12,10 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package org.eclipse.lsp.cobol.lsp;
+package org.eclipse.lsp.cobol.common.dialects;
 
 import java.util.*;
 import java.util.stream.Collectors;
-import org.eclipse.lsp.cobol.service.settings.layout.CobolProgramLayout;
 
 /** Enum of supported Cobol language id's */
 public enum CobolLanguageId {

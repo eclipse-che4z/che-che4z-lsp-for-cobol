@@ -21,11 +21,12 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
 import org.eclipse.lsp.cobol.common.benchmark.BenchmarkSession;
+import org.eclipse.lsp.cobol.common.benchmark.BenchmarkSessionProvider;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
-import org.eclipse.lsp.cobol.lsp.CobolLanguageId;
+import org.eclipse.lsp.cobol.common.dialects.CobolLanguageId;
 
 /**
  * Contains related to analysis state
@@ -33,7 +34,7 @@ import org.eclipse.lsp.cobol.lsp.CobolLanguageId;
 @Slf4j
 @Getter
 @RequiredArgsConstructor
-public class AnalysisContext {
+public class AnalysisContext implements BenchmarkSessionProvider {
   private @Setter ExtendedDocument extendedDocument;
   private final AnalysisConfig config;
   private final List<SyntaxError> accumulatedErrors = new ArrayList<>();

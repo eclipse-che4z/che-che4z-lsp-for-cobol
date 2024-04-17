@@ -12,10 +12,10 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package org.eclipse.lsp.cobol.core.engine.pipeline;
+package org.eclipse.lsp.cobol.common.pipeline;
 
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.lsp.cobol.core.engine.analysis.AnalysisContext;
+import org.eclipse.lsp.cobol.common.benchmark.BenchmarkSessionProvider;
 
 import java.util.*;
 
@@ -23,14 +23,14 @@ import java.util.*;
  * Processing pipeline functionality
  */
 @Slf4j
-public class Pipeline {
-  private final List<Stage<?, ?>> stages = new LinkedList<>();
+public class Pipeline<C extends BenchmarkSessionProvider> {
+  private final List<Stage<C, ?, ?>> stages = new LinkedList<>();
     /**
    * Adds a new stage to the pipeline
    *
    * @param stage - pipeline processing stage
    */
-  public void add(Stage<?, ?> stage) {
+  public void add(Stage<C , ?, ?> stage) {
     stages.add(stage);
   }
 
@@ -40,7 +40,7 @@ public class Pipeline {
    * @param context - pipeline context
    * @return - a final result of the pipeline processing
    */
-  public PipelineResult run(AnalysisContext context) {
+  public PipelineResult run(C context) {
     StageResult<?> result = StageResult.empty();
 
     for (Stage stage : stages) {

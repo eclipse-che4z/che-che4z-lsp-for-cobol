@@ -20,7 +20,7 @@ import org.eclipse.lsp.cobol.common.AnalysisConfig;
 import org.eclipse.lsp.cobol.common.AnalysisResult;
 import org.eclipse.lsp.cobol.common.LanguageEngineFacade;
 import org.eclipse.lsp.cobol.core.engine.CobolLanguageEngine;
-import org.eclipse.lsp.cobol.lsp.CobolLanguageId;
+import org.eclipse.lsp.cobol.common.dialects.CobolLanguageId;
 import org.eclipse.lsp4j.Diagnostic;
 
 /**

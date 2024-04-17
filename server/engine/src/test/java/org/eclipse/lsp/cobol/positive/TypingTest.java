@@ -42,7 +42,7 @@ import org.eclipse.lsp.cobol.core.preprocessor.delegates.transformer.CobolLineTr
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.transformer.ContinuationLineTransformation;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.writer.CobolLineWriterImpl;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.writer.CobolLineWriterService;
-import org.eclipse.lsp.cobol.lsp.CobolLanguageId;
+import org.eclipse.lsp.cobol.common.dialects.CobolLanguageId;
 import org.eclipse.lsp.cobol.service.settings.layout.CodeLayoutStore;
 import org.eclipse.lsp.cobol.test.CobolText;
 import org.eclipse.lsp.cobol.test.engine.UseCase;

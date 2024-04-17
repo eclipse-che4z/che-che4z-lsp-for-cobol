@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Broadcom.
+ * Copyright (c) 2024 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -12,19 +12,11 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package org.eclipse.lsp.cobol.core.engine.pipeline.stages;
-
-import lombok.Value;
-import org.eclipse.lsp.cobol.common.model.tree.Node;
-import org.eclipse.lsp.cobol.common.symbols.SymbolTable;
-
-import java.util.Map;
+package org.eclipse.lsp.cobol.common.benchmark;
 
 /**
- * Final processing result
+ * Provides BenchmarkSession object
  */
-@Value
-public class ProcessingResult {
-  Map<String, SymbolTable> symbolTableMap;
-  Node rootNode;
+public interface BenchmarkSessionProvider {
+  BenchmarkSession getBenchmarkSession();
 }

@@ -33,6 +33,7 @@ import org.eclipse.lsp.cobol.common.action.CodeActionProvider;
 import org.eclipse.lsp.cobol.common.benchmark.BenchmarkService;
 import org.eclipse.lsp.cobol.common.benchmark.BenchmarkServiceImpl;
 import org.eclipse.lsp.cobol.common.copybook.CopybookService;
+import org.eclipse.lsp.cobol.common.dialects.TrueDialectService;
 import org.eclipse.lsp.cobol.common.file.FileSystemService;
 import org.eclipse.lsp.cobol.common.file.WorkspaceFileService;
 import org.eclipse.lsp.cobol.common.message.LocaleStore;
@@ -41,6 +42,7 @@ import org.eclipse.lsp.cobol.core.engine.dialects.DialectDiscoveryFolderService;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectDiscoveryService;
 import org.eclipse.lsp.cobol.core.messages.LocaleStoreImpl;
 import org.eclipse.lsp.cobol.core.messages.PropertiesMessageService;
+import org.eclipse.lsp.cobol.dialects.TrueDialectServiceImpl;
 import org.eclipse.lsp.cobol.dialects.hp.HpTextPreprocessor;
 import org.eclipse.lsp.cobol.dialects.ibm.IbmTextPreprocessor;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.GrammarPreprocessor;
@@ -91,6 +93,8 @@ import org.eclipse.lsp.cobol.service.settings.SettingsServiceImpl;
 public class CliModule extends AbstractModule {
   @Override
   protected void configure() {
+    bind(TrueDialectService.class).to(TrueDialectServiceImpl.class);
+
     bind(CleanerPreprocessor.class).annotatedWith(Names.named("cobol")).to(IbmTextPreprocessor.class);
     bind(CleanerPreprocessor.class).annotatedWith(Names.named("hpcobol")).to(HpTextPreprocessor.class);
     bind(CobolLineReader.class).annotatedWith(Names.named("hpcobol")).to(HPCobolLineReaderImpl.class);

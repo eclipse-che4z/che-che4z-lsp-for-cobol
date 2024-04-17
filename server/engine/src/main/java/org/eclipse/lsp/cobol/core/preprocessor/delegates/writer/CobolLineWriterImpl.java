@@ -16,8 +16,8 @@ package org.eclipse.lsp.cobol.core.preprocessor.delegates.writer;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import org.eclipse.lsp.cobol.lsp.CobolLanguageId;
-import org.eclipse.lsp.cobol.service.settings.layout.CobolProgramLayout;
+import org.eclipse.lsp.cobol.common.dialects.CobolLanguageId;
+import org.eclipse.lsp.cobol.common.dialects.CobolProgramLayout;
 import org.eclipse.lsp.cobol.service.settings.layout.CodeLayoutStore;
 import org.eclipse.lsp.cobol.service.settings.layout.CodeLayoutUtil;
 

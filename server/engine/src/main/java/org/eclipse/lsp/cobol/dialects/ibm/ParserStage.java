@@ -12,7 +12,7 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package org.eclipse.lsp.cobol.core.engine.pipeline.stages;
+package org.eclipse.lsp.cobol.dialects.ibm;
 
 import com.google.common.collect.ImmutableList;
 import lombok.RequiredArgsConstructor;
@@ -27,8 +27,8 @@ import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.core.*;
 import org.eclipse.lsp.cobol.core.engine.analysis.AnalysisContext;
-import org.eclipse.lsp.cobol.core.engine.pipeline.StageResult;
-import org.eclipse.lsp.cobol.core.engine.pipeline.Stage;
+import org.eclipse.lsp.cobol.common.pipeline.StageResult;
+import org.eclipse.lsp.cobol.common.pipeline.Stage;
 import org.eclipse.lsp.cobol.core.strategy.CobolErrorStrategy;
 import org.eclipse.lsp.cobol.core.visitor.ParserListener;
 import org.eclipse.lsp4j.Location;
@@ -40,7 +40,7 @@ import java.util.stream.Collectors;
  * Parser stage
  */
 @RequiredArgsConstructor
-public class ParserStage implements Stage<ParserStageResult, DialectOutcome> {
+public class ParserStage implements Stage<AnalysisContext, ParserStageResult, DialectOutcome> {
   private final MessageService messageService;
   private final ParseTreeListener treeListener;
 
