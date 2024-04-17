@@ -12,7 +12,7 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package org.eclipse.lsp.cobol.core.preprocessor.delegates.rewriter.impl;
+package org.eclipse.lsp.cobol.dialects.ibm;
 
 import static org.eclipse.lsp.cobol.core.model.CobolLineTypeEnum.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -25,7 +25,6 @@ import java.util.Optional;
 import lombok.val;
 import org.eclipse.lsp.cobol.core.preprocessor.CobolLine;
 import org.eclipse.lsp.cobol.core.preprocessor.ProcessingConstants;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.rewriter.CobolLineIndicatorProcessorImpl;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.rewriter.LineIndicatorProcessor;
 import org.eclipse.lsp.cobol.service.settings.layout.CodeLayoutStore;
 import org.junit.jupiter.api.BeforeEach;
@@ -51,7 +50,7 @@ class CobolLineIndicatorProcessorImplTest {
     debugLine.setContentAreaA("    ");
     debugLine.setContentAreaB("     DEBUG LINE HERE      ");
 
-    LineIndicatorProcessor processor = new CobolLineIndicatorProcessorImpl(store);
+    LineIndicatorProcessor processor = new IbmCobolLineIndicatorProcessor(store);
     List<CobolLine> outcome = processor.processLines(ImmutableList.of(debugLine));
     CobolLine actual = outcome.get(0);
 
@@ -71,7 +70,7 @@ class CobolLineIndicatorProcessorImplTest {
     normalLine.setContentAreaB("         RANDOM TEXT ,  ");
 
     LineIndicatorProcessor processor =
-        new CobolLineIndicatorProcessorImpl(store);
+        new IbmCobolLineIndicatorProcessor(store);
 
     List<CobolLine> outcome = processor.processLines(ImmutableList.of(normalLine));
     CobolLine actual = outcome.get(0);
@@ -88,7 +87,7 @@ class CobolLineIndicatorProcessorImplTest {
     normalLine.setIndicatorArea(ProcessingConstants.WS);
     normalLine.setContentAreaA("  ");
     normalLine.setContentAreaB("   RANDOM TEXT ,  ");
-    LineIndicatorProcessor processor = new CobolLineIndicatorProcessorImpl(store);
+    LineIndicatorProcessor processor = new IbmCobolLineIndicatorProcessor(store);
 
     List<CobolLine> outcome = processor.processLines(ImmutableList.of(normalLine));
     CobolLine actual = outcome.get(0);
@@ -108,7 +107,7 @@ class CobolLineIndicatorProcessorImplTest {
     compilerDirectiveLine.setContentAreaB("DEFINE");
 
     LineIndicatorProcessor processor =
-        new CobolLineIndicatorProcessorImpl(store);
+        new IbmCobolLineIndicatorProcessor(store);
     List<CobolLine> outcome = processor.processLines(ImmutableList.of(compilerDirectiveLine));
     CobolLine actual = outcome.get(0);
 
@@ -126,7 +125,7 @@ class CobolLineIndicatorProcessorImplTest {
     commentLine.setContentAreaB("THIS IS A COMMENT        ");
 
     LineIndicatorProcessor processor =
-        new CobolLineIndicatorProcessorImpl(null);
+        new IbmCobolLineIndicatorProcessor(null);
 
     List<CobolLine> outcome = processor.processLines(ImmutableList.of(commentLine));
     CobolLine actual = outcome.get(0);
@@ -145,7 +144,7 @@ class CobolLineIndicatorProcessorImplTest {
     commentLine.setContentAreaB(" comment");
 
     LineIndicatorProcessor processor =
-        new CobolLineIndicatorProcessorImpl(null);
+        new IbmCobolLineIndicatorProcessor(null);
 
     List<CobolLine> outcome = processor.processLines(ImmutableList.of(commentLine));
     CobolLine actual = outcome.get(0);
@@ -182,7 +181,7 @@ class CobolLineIndicatorProcessorImplTest {
     List<CobolLine> listOfLines =
         ImmutableList.of(startContinuationLine, middleContinuationLine, lastContinuationLine);
     LineIndicatorProcessor processor =
-        new CobolLineIndicatorProcessorImpl(null);
+        new IbmCobolLineIndicatorProcessor(null);
     List<CobolLine> outcomeList = processor.processLines(listOfLines);
 
     assertEquals(
@@ -211,7 +210,7 @@ class CobolLineIndicatorProcessorImplTest {
 
     final List<CobolLine> listOfLines = ImmutableList.of(continuationLine, emptyContinuationLine);
     LineIndicatorProcessor processor =
-        new CobolLineIndicatorProcessorImpl(null);
+        new IbmCobolLineIndicatorProcessor(null);
     List<CobolLine> outcomeList = processor.processLines(listOfLines);
 
     assertEquals(
@@ -243,7 +242,7 @@ class CobolLineIndicatorProcessorImplTest {
     List<CobolLine> listOfLines =
         ImmutableList.of(startContinuationLine, trailingCommaContinuationLine);
     LineIndicatorProcessor processor =
-        new CobolLineIndicatorProcessorImpl(null);
+        new IbmCobolLineIndicatorProcessor(null);
     List<CobolLine> outcomeList = processor.processLines(listOfLines);
 
     assertEquals(
@@ -281,7 +280,7 @@ class CobolLineIndicatorProcessorImplTest {
     quoteContinuationLine.setSuccessor(lastContinuationLine);
 
     LineIndicatorProcessor processor =
-        new CobolLineIndicatorProcessorImpl(null);
+        new IbmCobolLineIndicatorProcessor(null);
 
     List<CobolLine> outcome = processor.processLines(ImmutableList.of(lastContinuationLine));
     CobolLine actual = outcome.get(0);
@@ -318,7 +317,7 @@ class CobolLineIndicatorProcessorImplTest {
     quoteContinuationLine.setSuccessor(lastContinuationLine);
 
     LineIndicatorProcessor processor =
-        new CobolLineIndicatorProcessorImpl(null);
+        new IbmCobolLineIndicatorProcessor(null);
 
     List<CobolLine> outcome = processor.processLines(ImmutableList.of(lastContinuationLine));
     val actual = outcome.get(0);
@@ -341,7 +340,7 @@ class CobolLineIndicatorProcessorImplTest {
     notFormattedLine.setType(CONTINUATION);
 
     LineIndicatorProcessor processor =
-        new CobolLineIndicatorProcessorImpl(null);
+        new IbmCobolLineIndicatorProcessor(null);
     List<CobolLine> outcome = processor.processLines(ImmutableList.of(notFormattedLine));
     val actual = outcome.get(0);
 

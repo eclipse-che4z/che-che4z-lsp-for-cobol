@@ -27,7 +27,6 @@ import com.google.inject.Injector;
 import com.google.inject.multibindings.Multibinder;
 import com.google.inject.name.Names;
 import java.util.concurrent.CompletableFuture;
-import org.eclipse.lsp.cobol.common.CleanerPreprocessor;
 import org.eclipse.lsp.cobol.common.LanguageEngineFacade;
 import org.eclipse.lsp.cobol.common.SubroutineService;
 import org.eclipse.lsp.cobol.common.action.CodeActionProvider;
@@ -37,7 +36,6 @@ import org.eclipse.lsp.cobol.common.file.FileSystemService;
 import org.eclipse.lsp.cobol.common.file.WorkspaceFileService;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectDiscoveryService;
 import org.eclipse.lsp.cobol.dialects.TrueDialectServiceImpl;
-import org.eclipse.lsp.cobol.dialects.ibm.IbmTextPreprocessor;
 import org.eclipse.lsp.cobol.domain.modules.DatabusModule;
 import org.eclipse.lsp.cobol.domain.modules.EngineModule;
 import org.eclipse.lsp.cobol.lsp.DisposableLSPStateService;
@@ -84,7 +82,6 @@ public class UseCaseInitializerService implements UseCaseInitializer {
                 bind(FileSystemService.class).toInstance(new WorkspaceFileService());
                 bind(CobolLanguageClient.class).toInstance(languageClient);
                 bind(SubroutineService.class).to(SubroutineServiceImpl.class);
-                bind(CleanerPreprocessor.class).to(IbmTextPreprocessor.class);
                 bind(WatcherService.class).to(WatcherServiceImpl.class);
                 bind(DialectDiscoveryService.class).to(ExplicitDialectDiscoveryService.class);
                 bind(CopybookIdentificationService.class)

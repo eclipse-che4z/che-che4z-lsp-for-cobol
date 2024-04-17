@@ -15,7 +15,6 @@
 
 package org.eclipse.lsp.cobol.positive;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -32,16 +31,8 @@ import org.eclipse.lsp.cobol.common.CleanerPreprocessor;
 import org.eclipse.lsp.cobol.common.ResultWithErrors;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedText;
+import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.dialects.ibm.IbmTextPreprocessor;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.reader.CobolLineReaderImpl;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.reader.CobolLineReaderService;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.rewriter.CobolLineIndicatorProcessorImpl;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.rewriter.CobolLineReWriterService;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.transformer.CobolContinuationLineTransformation;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.transformer.CobolLineTransformationService;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.transformer.ContinuationLineTransformation;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.writer.CobolLineWriterImpl;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.writer.CobolLineWriterService;
 import org.eclipse.lsp.cobol.common.dialects.CobolLanguageId;
 import org.eclipse.lsp.cobol.service.settings.layout.CodeLayoutStore;
 import org.eclipse.lsp.cobol.test.CobolText;
@@ -88,26 +79,13 @@ class TypingTest extends FileBasedTest {
   private String getCleanText(CobolText cobolText) {
     CodeLayoutStore layoutStore = mock(CodeLayoutStore.class);
     when(layoutStore.getCodeLayout()).thenReturn(Optional.of(CobolLanguageId.COBOL.getLayout()));
-    CobolLineReaderService readerService = mock(CobolLineReaderService.class);
-    CobolLineWriterService writerService = mock(CobolLineWriterService.class);
-    CobolLineTransformationService transformationService = mock(CobolLineTransformationService.class);
-    CobolLineReWriterService indicatorProcessorService = mock(CobolLineReWriterService.class);
-    CobolLineReaderImpl cobolLineReader = new CobolLineReaderImpl(null, null);
-    CobolLineWriterImpl cobolLineWriter = new CobolLineWriterImpl(null);
-    ContinuationLineTransformation continuationLineTransformation = new CobolContinuationLineTransformation(null, null);
-    CobolLineIndicatorProcessorImpl cobolLineIndicatorProcessor = new CobolLineIndicatorProcessorImpl(null);
 
-    when(readerService.getCobolLineReader(any())).thenReturn(cobolLineReader);
-    when(writerService.getCobolLineWriter(any())).thenReturn(cobolLineWriter);
-    when(transformationService.getTransformer(any())).thenReturn(continuationLineTransformation);
-    when(indicatorProcessorService.getLineReWriter(any())).thenReturn(cobolLineIndicatorProcessor);
+    MessageService messageService = mock(MessageService.class);
 
     CleanerPreprocessor preprocessor =
         new IbmTextPreprocessor(
-            readerService,
-            writerService,
-            transformationService,
-            indicatorProcessorService);
+            messageService,
+            layoutStore);
     ResultWithErrors<ExtendedText> cleanTextResult =
         preprocessor.cleanUpCode(cobolText.getFileName(), cobolText.getFullText());
     for (SyntaxError error : cleanTextResult.getErrors()) LOG.error(error.toString());

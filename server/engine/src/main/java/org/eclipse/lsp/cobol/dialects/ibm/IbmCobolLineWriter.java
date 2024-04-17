@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Broadcom.
+ * Copyright (c) 2020 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -12,24 +12,23 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package org.eclipse.lsp.cobol.core.preprocessor.delegates.writer;
+package org.eclipse.lsp.cobol.dialects.ibm;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
 import org.eclipse.lsp.cobol.common.dialects.CobolLanguageId;
 import org.eclipse.lsp.cobol.common.dialects.CobolProgramLayout;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.writer.CobolLineWriter;
 import org.eclipse.lsp.cobol.service.settings.layout.CodeLayoutStore;
 import org.eclipse.lsp.cobol.service.settings.layout.CodeLayoutUtil;
 
 /**
- * {@link CobolLineWriter} for "hpcobol"
+ * {@link CobolLineWriter} for "cobol" languageId . This class serializes a list of COBOL lines into
+ * a String
  */
-@Singleton
-public class HPCobolLineWriterImpl extends CobolLineWriter {
-  private CodeLayoutStore layoutStore;
+class IbmCobolLineWriter extends CobolLineWriter {
 
-  @Inject
-  public HPCobolLineWriterImpl(CodeLayoutStore layoutStore) {
+  private final CodeLayoutStore layoutStore;
+
+  IbmCobolLineWriter(CodeLayoutStore layoutStore) {
     this.layoutStore = layoutStore;
   }
 
@@ -37,7 +36,7 @@ public class HPCobolLineWriterImpl extends CobolLineWriter {
   protected CobolProgramLayout getLayout() {
     return layoutStore
         .getCodeLayout()
-        .map(layout -> CodeLayoutUtil.mergeLayout(CobolLanguageId.HP_COBOL.getLayout(), layout))
-        .orElse(CobolLanguageId.HP_COBOL.getLayout());
+        .map(layout -> CodeLayoutUtil.mergeLayout(CobolLanguageId.COBOL.getLayout(), layout))
+        .orElse(CobolLanguageId.COBOL.getLayout());
   }
 }

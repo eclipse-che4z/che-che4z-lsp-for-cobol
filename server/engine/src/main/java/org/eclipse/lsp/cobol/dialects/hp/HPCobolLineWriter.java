@@ -12,32 +12,26 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package org.eclipse.lsp.cobol.core.preprocessor.delegates.transformer;
+package org.eclipse.lsp.cobol.dialects.hp;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
-import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.dialects.CobolLanguageId;
 import org.eclipse.lsp.cobol.common.dialects.CobolProgramLayout;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.writer.CobolLineWriter;
 import org.eclipse.lsp.cobol.service.settings.layout.CodeLayoutStore;
 import org.eclipse.lsp.cobol.service.settings.layout.CodeLayoutUtil;
 
 /**
- * {@link ContinuationLineTransformation} for "hpcobol"
+ * {@link CobolLineWriter} for "hpcobol"
  */
-@Singleton
-public class HPContinuationLineTransformation extends ContinuationLineTransformation {
-  private CodeLayoutStore layoutStore;
+class HPCobolLineWriter extends CobolLineWriter {
+  private final CodeLayoutStore layoutStore;
 
-  @Inject
-  public HPContinuationLineTransformation(
-      MessageService messageService, CodeLayoutStore layoutStore) {
-    super(messageService);
+  HPCobolLineWriter(CodeLayoutStore layoutStore) {
     this.layoutStore = layoutStore;
   }
 
   @Override
-  public CobolProgramLayout getCodeLayout() {
+  protected CobolProgramLayout getLayout() {
     return layoutStore
         .getCodeLayout()
         .map(layout -> CodeLayoutUtil.mergeLayout(CobolLanguageId.HP_COBOL.getLayout(), layout))

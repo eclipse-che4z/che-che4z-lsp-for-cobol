@@ -12,22 +12,21 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package org.eclipse.lsp.cobol.core.preprocessor.delegates.rewriter;
+package org.eclipse.lsp.cobol.dialects.hp;
 
-import com.google.inject.Inject;
 import org.eclipse.lsp.cobol.common.dialects.CobolLanguageId;
 import org.eclipse.lsp.cobol.common.dialects.CobolProgramLayout;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.rewriter.LineIndicatorProcessor;
 import org.eclipse.lsp.cobol.service.settings.layout.CodeLayoutStore;
 import org.eclipse.lsp.cobol.service.settings.layout.CodeLayoutUtil;
 
 /**
  * {@link LineIndicatorProcessor} for "hpcobol" languageId
  */
-public class HpCobolLineIndicatorProcessorImpl extends LineIndicatorProcessor {
+class HpCobolLineIndicatorProcessor extends LineIndicatorProcessor {
     private final CodeLayoutStore layoutStore;
 
-    @Inject
-    public HpCobolLineIndicatorProcessorImpl(CodeLayoutStore layoutStore) {
+    HpCobolLineIndicatorProcessor(CodeLayoutStore layoutStore) {
         this.layoutStore = layoutStore;
     }
 
