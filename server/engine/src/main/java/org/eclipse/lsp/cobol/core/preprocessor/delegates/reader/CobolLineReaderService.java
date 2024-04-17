@@ -21,7 +21,7 @@ import java.util.List;
 import lombok.NonNull;
 import org.eclipse.lsp.cobol.common.ResultWithErrors;
 import org.eclipse.lsp.cobol.core.preprocessor.CobolLine;
-import org.eclipse.lsp.cobol.lsp.CobolLanguageId;
+import org.eclipse.lsp.cobol.common.dialects.CobolLanguageId;
 
 /** This service returns a {@link CobolLineReader} based on the languageId */
 @Singleton

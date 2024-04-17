@@ -12,7 +12,7 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package org.eclipse.lsp.cobol.core.engine.pipeline.stages;
+package org.eclipse.lsp.cobol.dialects.ibm;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -31,14 +31,14 @@ import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.core.engine.analysis.AnalysisContext;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectService;
-import org.eclipse.lsp.cobol.core.engine.pipeline.StageResult;
-import org.eclipse.lsp.cobol.core.engine.pipeline.Stage;
+import org.eclipse.lsp.cobol.common.pipeline.StageResult;
+import org.eclipse.lsp.cobol.common.pipeline.Stage;
 import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
 import org.eclipse.lsp4j.Location;
 
 /** Implicit dialects processing stage */
 @RequiredArgsConstructor
-public class ImplicitDialectProcessingStage implements Stage<DialectOutcome, CopybooksRepository> {
+public class ImplicitDialectProcessingStage implements Stage<AnalysisContext, DialectOutcome, CopybooksRepository> {
   private final DialectService dialectService;
 
   @Override

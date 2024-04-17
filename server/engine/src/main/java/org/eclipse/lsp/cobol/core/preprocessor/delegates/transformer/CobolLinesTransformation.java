@@ -17,7 +17,7 @@ package org.eclipse.lsp.cobol.core.preprocessor.delegates.transformer;
 import java.util.List;
 import org.eclipse.lsp.cobol.common.ResultWithErrors;
 import org.eclipse.lsp.cobol.core.preprocessor.CobolLine;
-import org.eclipse.lsp.cobol.service.settings.layout.CobolProgramLayout;
+import org.eclipse.lsp.cobol.common.dialects.CobolProgramLayout;
 
 /**
  * Performs transformation operations on the given CobolLines. Requires FormatListener to raise or

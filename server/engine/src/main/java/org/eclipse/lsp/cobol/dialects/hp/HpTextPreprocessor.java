@@ -27,7 +27,7 @@ import org.eclipse.lsp.cobol.core.preprocessor.delegates.reader.CobolLineReaderS
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.rewriter.CobolLineReWriterService;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.transformer.CobolLineTransformationService;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.writer.CobolLineWriterService;
-import org.eclipse.lsp.cobol.lsp.CobolLanguageId;
+import org.eclipse.lsp.cobol.common.dialects.CobolLanguageId;
 
 import java.util.ArrayList;
 import java.util.List;

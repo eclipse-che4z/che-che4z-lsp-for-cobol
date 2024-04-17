@@ -29,7 +29,7 @@ import org.eclipse.lsp.cobol.core.preprocessor.delegates.reader.CobolLineReaderS
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.rewriter.CobolLineReWriterService;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.transformer.CobolLineTransformationService;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.writer.CobolLineWriterService;
-import org.eclipse.lsp.cobol.lsp.CobolLanguageId;
+import org.eclipse.lsp.cobol.common.dialects.CobolLanguageId;
 
 /**
  * This class re-writes the content of the analyzing file to simplify the processing by the grammar,

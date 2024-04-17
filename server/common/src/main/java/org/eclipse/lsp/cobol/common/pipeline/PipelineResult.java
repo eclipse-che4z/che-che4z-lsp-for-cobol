@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Broadcom.
+ * Copyright (c) 2024 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -12,17 +12,16 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package org.eclipse.lsp.cobol.core.engine.pipeline.stages;
+package org.eclipse.lsp.cobol.common.pipeline;
 
+import lombok.RequiredArgsConstructor;
 import lombok.Value;
-import org.antlr.v4.runtime.CommonTokenStream;
-import org.eclipse.lsp.cobol.core.CobolParser;
 
 /**
- * Parser stage result
+ * A class to store the pipeline execution results
  */
 @Value
-public class ParserStageResult {
-  CommonTokenStream tokens;
-  CobolParser.StartRuleContext tree;
+@RequiredArgsConstructor
+public class PipelineResult {
+  StageResult<?> lastStageResult;
 }

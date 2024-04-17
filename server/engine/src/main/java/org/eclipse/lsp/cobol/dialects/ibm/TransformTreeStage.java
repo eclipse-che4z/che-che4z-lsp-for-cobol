@@ -12,7 +12,7 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package org.eclipse.lsp.cobol.core.engine.pipeline.stages;
+package org.eclipse.lsp.cobol.dialects.ibm;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -35,8 +35,8 @@ import org.eclipse.lsp.cobol.common.utils.RangeUtils;
 import org.eclipse.lsp.cobol.core.CobolParser;
 import org.eclipse.lsp.cobol.core.engine.analysis.AnalysisContext;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectService;
-import org.eclipse.lsp.cobol.core.engine.pipeline.Stage;
-import org.eclipse.lsp.cobol.core.engine.pipeline.StageResult;
+import org.eclipse.lsp.cobol.common.pipeline.Stage;
+import org.eclipse.lsp.cobol.common.pipeline.StageResult;
 import org.eclipse.lsp.cobol.core.engine.processor.AstProcessor;
 import org.eclipse.lsp.cobol.core.engine.processors.*;
 import org.eclipse.lsp.cobol.core.engine.processors.implicit.ImplicitVariablesProcessor;
@@ -44,9 +44,9 @@ import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulatorService;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolsRepository;
 import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
 import org.eclipse.lsp.cobol.core.visitor.CobolVisitor;
-import org.eclipse.lsp.cobol.lsp.CobolLanguageId;
+import org.eclipse.lsp.cobol.common.dialects.CobolLanguageId;
 import org.eclipse.lsp.cobol.service.settings.CachingConfigurationService;
-import org.eclipse.lsp.cobol.service.settings.layout.CobolProgramLayout;
+import org.eclipse.lsp.cobol.common.dialects.CobolProgramLayout;
 import org.eclipse.lsp.cobol.service.settings.layout.CodeLayoutStore;
 import org.eclipse.lsp.cobol.service.settings.layout.CodeLayoutUtil;
 import org.eclipse.lsp4j.Location;
@@ -56,7 +56,7 @@ import org.eclipse.lsp4j.Range;
  * Transform Tree Stage
  */
 @RequiredArgsConstructor
-public class TransformTreeStage implements Stage<ProcessingResult, ParserStageResult> {
+public class TransformTreeStage implements Stage<AnalysisContext, ProcessingResult, ParserStageResult> {
 
   private final SymbolsRepository symbolsRepository;
   private final MessageService messageService;

@@ -12,7 +12,7 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package org.eclipse.lsp.cobol.service.settings.layout;
+package org.eclipse.lsp.cobol.common.dialects;
 
 import java.util.regex.Pattern;
 import lombok.Builder;

@@ -29,6 +29,7 @@ import org.eclipse.lsp.cobol.common.benchmark.BenchmarkService;
 import org.eclipse.lsp.cobol.common.benchmark.BenchmarkSession;
 import org.eclipse.lsp.cobol.common.dialects.DialectOutcome;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
+import org.eclipse.lsp.cobol.common.dialects.TrueDialectService;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
@@ -46,8 +47,8 @@ import org.eclipse.lsp.cobol.core.preprocessor.delegates.GrammarPreprocessor;
 import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
 import org.eclipse.lsp.cobol.core.strategy.CobolErrorStrategy;
 import org.eclipse.lsp.cobol.core.strategy.ErrorMessageHelper;
-import org.eclipse.lsp.cobol.dialects.TrueDialectService;
-import org.eclipse.lsp.cobol.lsp.CobolLanguageId;
+import org.eclipse.lsp.cobol.common.dialects.CobolLanguageId;
+import org.eclipse.lsp.cobol.dialects.TrueDialectServiceImpl;
 import org.eclipse.lsp.cobol.service.settings.layout.CodeLayoutStore;
 import org.eclipse.lsp.cobol.usecases.DialectConfigs;
 import org.eclipse.lsp4j.Position;
@@ -87,7 +88,7 @@ class CobolLanguageEngineTest {
     BenchmarkService benchmarkService = mock(BenchmarkService.class);
     when(benchmarkService.startSession()).thenReturn(new BenchmarkSession());
 
-    TrueDialectService trueDialectService = new TrueDialectService(preprocessor, preprocessor, grammarPreprocessor, mockMessageService, treeListener, mock(SubroutineService.class),
+    TrueDialectService trueDialectService = new TrueDialectServiceImpl(preprocessor, preprocessor, grammarPreprocessor, mockMessageService, treeListener, mock(SubroutineService.class),
         null,
         dialectService, astProcessor, symbolsRepository, store);
     CobolLanguageEngine engine =
@@ -166,7 +167,7 @@ class CobolLanguageEngineTest {
     BenchmarkService benchmarkService = mock(BenchmarkService.class);
     when(benchmarkService.startSession()).thenReturn(mock(BenchmarkSession.class));
 
-    TrueDialectService trueDialectService = new TrueDialectService(preprocessor, preprocessor, grammarPreprocessor, mockMessageService, treeListener, mock(SubroutineService.class),
+    TrueDialectService trueDialectService = new TrueDialectServiceImpl(preprocessor, preprocessor, grammarPreprocessor, mockMessageService, treeListener, mock(SubroutineService.class),
         null,
         dialectService, astProcessor, symbolsRepository, store);
     CobolLanguageEngine engine =

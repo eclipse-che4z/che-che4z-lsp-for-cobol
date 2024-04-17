@@ -19,13 +19,13 @@ import org.eclipse.lsp.cobol.common.ResultWithErrors;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedText;
 import org.eclipse.lsp.cobol.core.engine.analysis.AnalysisContext;
-import org.eclipse.lsp.cobol.core.engine.pipeline.Stage;
-import org.eclipse.lsp.cobol.core.engine.pipeline.StageResult;
+import org.eclipse.lsp.cobol.common.pipeline.Stage;
+import org.eclipse.lsp.cobol.common.pipeline.StageResult;
 
 /**
  * Cleanup preprocessor pipeline stage
  */
-public class HpCleanupStage implements Stage<Void, Void> {
+public class HpCleanupStage implements Stage<AnalysisContext, Void, Void> {
 
   private final CleanerPreprocessor preprocessor;
 

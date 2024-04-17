@@ -12,7 +12,7 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package org.eclipse.lsp.cobol.core.engine.pipeline.stages;
+package org.eclipse.lsp.cobol.dialects.ibm;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,8 +24,8 @@ import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
 import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.core.engine.analysis.AnalysisContext;
-import org.eclipse.lsp.cobol.core.engine.pipeline.Stage;
-import org.eclipse.lsp.cobol.core.engine.pipeline.StageResult;
+import org.eclipse.lsp.cobol.common.pipeline.Stage;
+import org.eclipse.lsp.cobol.common.pipeline.StageResult;
 import org.eclipse.lsp.cobol.core.preprocessor.CopybookHierarchy;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.GrammarPreprocessor;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.PreprocessorContext;
@@ -35,7 +35,7 @@ import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
  * Preprocessor stage
  */
 @RequiredArgsConstructor
-public class PreprocessorStage implements Stage<CopybooksRepository, DialectOutcome> {
+public class PreprocessorStage implements Stage<AnalysisContext, CopybooksRepository, DialectOutcome> {
   private final GrammarPreprocessor grammarPreprocessor;
   private final CleanerPreprocessor preprocessor;
 

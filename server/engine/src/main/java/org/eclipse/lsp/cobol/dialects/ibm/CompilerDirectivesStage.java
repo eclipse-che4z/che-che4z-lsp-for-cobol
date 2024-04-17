@@ -12,7 +12,7 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package org.eclipse.lsp.cobol.core.engine.pipeline.stages;
+package org.eclipse.lsp.cobol.dialects.ibm;
 
 import java.util.List;
 import java.util.regex.Matcher;
@@ -27,8 +27,8 @@ import org.eclipse.lsp.cobol.core.CompilerDirectivesParser;
 import org.eclipse.lsp.cobol.core.engine.analysis.AnalysisContext;
 import org.eclipse.lsp.cobol.core.engine.directives.CompilerDirectivesErrorListener;
 import org.eclipse.lsp.cobol.core.engine.directives.CompilerDirectivesVisitor;
-import org.eclipse.lsp.cobol.core.engine.pipeline.Stage;
-import org.eclipse.lsp.cobol.core.engine.pipeline.StageResult;
+import org.eclipse.lsp.cobol.common.pipeline.Stage;
+import org.eclipse.lsp.cobol.common.pipeline.StageResult;
 import org.eclipse.lsp.cobol.core.strategy.CobolErrorStrategy;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
@@ -36,7 +36,7 @@ import org.eclipse.lsp4j.Range;
 /**
  * Process compiler options statements in the source file and substitute them with empty lines.
  */
-public class CompilerDirectivesStage implements Stage<Void, List<CompilerDirectiveNode>> {
+public class CompilerDirectivesStage implements Stage<AnalysisContext, Void, List<CompilerDirectiveNode>> {
   private static final Pattern COMPILER_DIRECTIVE_LINE =
           Pattern.compile("(?i)(\\d.{5}.*|\\s*+)\\*?(CBL|PROCESS)\\s+(?<directives>.+)");
   private static final Pattern NEW_LINE_PATTERN = Pattern.compile("\n\r?");

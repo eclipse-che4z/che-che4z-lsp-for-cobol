@@ -17,7 +17,7 @@ package org.eclipse.lsp.cobol.core.preprocessor.delegates.writer;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
-import org.eclipse.lsp.cobol.lsp.CobolLanguageId;
+import org.eclipse.lsp.cobol.common.dialects.CobolLanguageId;
 
 /** service class which gives {@link CobolLineWriter} based on the languageId */
 @Singleton

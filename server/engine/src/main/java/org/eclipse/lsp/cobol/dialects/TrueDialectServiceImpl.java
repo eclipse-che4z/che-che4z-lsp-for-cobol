@@ -20,16 +20,17 @@ import com.google.inject.name.Named;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.eclipse.lsp.cobol.common.CleanerPreprocessor;
 import org.eclipse.lsp.cobol.common.SubroutineService;
+import org.eclipse.lsp.cobol.common.dialects.TrueDialectService;
 import org.eclipse.lsp.cobol.common.message.MessageService;
+import org.eclipse.lsp.cobol.core.engine.analysis.AnalysisContext;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectService;
-import org.eclipse.lsp.cobol.core.engine.pipeline.Pipeline;
-import org.eclipse.lsp.cobol.core.engine.pipeline.stages.*;
+import org.eclipse.lsp.cobol.common.pipeline.Pipeline;
 import org.eclipse.lsp.cobol.core.engine.processor.AstProcessor;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolsRepository;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.GrammarPreprocessor;
 import org.eclipse.lsp.cobol.dialects.hp.HpCleanupStage;
-import org.eclipse.lsp.cobol.dialects.ibm.IbmCleanupStage;
-import org.eclipse.lsp.cobol.lsp.CobolLanguageId;
+import org.eclipse.lsp.cobol.dialects.ibm.*;
+import org.eclipse.lsp.cobol.common.dialects.CobolLanguageId;
 import org.eclipse.lsp.cobol.service.settings.CachingConfigurationService;
 import org.eclipse.lsp.cobol.service.settings.layout.CodeLayoutStore;
 
@@ -40,14 +41,14 @@ import java.util.Map;
  * Dialect Service provides available dialects pipeline for the given language od
  */
 @Singleton
-public class TrueDialectService {
+public class TrueDialectServiceImpl implements TrueDialectService<AnalysisContext> {
 
-  private final Map<CobolLanguageId, Pipeline> pipelineMap;
+  private final Map<CobolLanguageId, Pipeline<AnalysisContext>> pipelineMap;
 
   private final Map<CobolLanguageId, CleanerPreprocessor> preprocessorMap;
 
   @Inject
-  public TrueDialectService(@Named("hpcobol") CleanerPreprocessor hpPreprocessor,
+  public TrueDialectServiceImpl(@Named("hpcobol") CleanerPreprocessor hpPreprocessor,
                             @Named("cobol") CleanerPreprocessor ibmPreprocessor,
                             GrammarPreprocessor grammarPreprocessor,
                             MessageService messageService,
@@ -64,7 +65,7 @@ public class TrueDialectService {
 
     pipelineMap = new HashMap<>();
 
-    Pipeline ibmPipeline = new Pipeline();
+    Pipeline<AnalysisContext> ibmPipeline = new Pipeline<>();
     ibmPipeline.add(new IbmCleanupStage(ibmPreprocessor));
     ibmPipeline.add(new DialectCompilerDirectiveStage(dialectService));
     ibmPipeline.add(new CompilerDirectivesStage(messageService));
@@ -84,7 +85,7 @@ public class TrueDialectService {
 
     pipelineMap.put(CobolLanguageId.COBOL, ibmPipeline);
 
-    Pipeline hpPipeline = new Pipeline();
+    Pipeline<AnalysisContext> hpPipeline = new Pipeline<>();
     hpPipeline.add(new HpCleanupStage(hpPreprocessor));
     hpPipeline.add(new DialectCompilerDirectiveStage(dialectService));
     hpPipeline.add(new CompilerDirectivesStage(messageService));
@@ -110,7 +111,7 @@ public class TrueDialectService {
    * @param languageId a language id of a dialect
    * @return the pipeline for a dialect
    */
-  public Pipeline getPipeline(CobolLanguageId languageId) {
+  public Pipeline<AnalysisContext> getPipeline(CobolLanguageId languageId) {
     return pipelineMap.get(languageId);
   }
 

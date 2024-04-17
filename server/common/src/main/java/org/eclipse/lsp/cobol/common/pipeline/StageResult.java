@@ -12,7 +12,7 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package org.eclipse.lsp.cobol.core.engine.pipeline;
+package org.eclipse.lsp.cobol.common.pipeline;
 
 import lombok.AllArgsConstructor;
 import lombok.Value;
