@@ -37,13 +37,13 @@ import java.util.List;
  * details.
  */
 @Slf4j
-public class HpTextPreprocessor implements CleanerPreprocessor {
+class HpTextPreprocessor implements CleanerPreprocessor {
   private final CobolLineReader reader;
   private final CobolLineWriter writer;
   private final CobolLinesTransformation transformation;
   private final CobolLineReWriter indicatorProcessor;
 
-  public HpTextPreprocessor(MessageService messageService, CodeLayoutStore layoutStore) {
+  HpTextPreprocessor(MessageService messageService, CodeLayoutStore layoutStore) {
     this.reader = new HPCobolLineReader(messageService, layoutStore);
     this.writer = new HPCobolLineWriter(layoutStore);
     this.transformation = new HPContinuationLineTransformation(messageService, layoutStore);
