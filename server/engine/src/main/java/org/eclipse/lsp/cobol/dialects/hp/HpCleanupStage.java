@@ -25,11 +25,11 @@ import org.eclipse.lsp.cobol.common.pipeline.StageResult;
 /**
  * Cleanup preprocessor pipeline stage
  */
-public class HpCleanupStage implements Stage<AnalysisContext, Void, Void> {
+class HpCleanupStage implements Stage<AnalysisContext, Void, Void> {
 
   private final CleanerPreprocessor preprocessor;
 
-  public HpCleanupStage(CleanerPreprocessor preprocessor) {
+  HpCleanupStage(CleanerPreprocessor preprocessor) {
     this.preprocessor = preprocessor;
   }
 

@@ -27,8 +27,7 @@ import org.eclipse.lsp.cobol.common.pipeline.Pipeline;
 import org.eclipse.lsp.cobol.core.engine.processor.AstProcessor;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolsRepository;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.GrammarPreprocessor;
-import org.eclipse.lsp.cobol.dialects.hp.HpCleanupStage;
-import org.eclipse.lsp.cobol.dialects.hp.HpTextPreprocessor;
+import org.eclipse.lsp.cobol.dialects.hp.HpTrueCobolDialect;
 import org.eclipse.lsp.cobol.dialects.ibm.*;
 import org.eclipse.lsp.cobol.common.dialects.CobolLanguageId;
 import org.eclipse.lsp.cobol.service.settings.CachingConfigurationService;
@@ -36,6 +35,7 @@ import org.eclipse.lsp.cobol.service.settings.layout.CodeLayoutStore;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Dialect Service provides available dialects pipeline for the given language od
@@ -43,9 +43,7 @@ import java.util.Map;
 @Singleton
 public class TrueDialectServiceImpl implements TrueDialectService<AnalysisContext> {
 
-  private final Map<CobolLanguageId, Pipeline<AnalysisContext>> pipelineMap;
-
-  private final Map<CobolLanguageId, CleanerPreprocessor> preprocessorMap;
+  private final Map<CobolLanguageId, TrueCobolDialect> dialects;
 
   @Inject
   public TrueDialectServiceImpl(
@@ -58,51 +56,14 @@ public class TrueDialectServiceImpl implements TrueDialectService<AnalysisContex
                             AstProcessor astProcessor,
                             SymbolsRepository symbolsRepository,
                             CodeLayoutStore codeLayoutStore) {
-    preprocessorMap = new HashMap<>();
-    preprocessorMap.put(CobolLanguageId.COBOL, new IbmTextPreprocessor(messageService, codeLayoutStore));
-    preprocessorMap.put(CobolLanguageId.HP_COBOL, new HpTextPreprocessor(messageService, codeLayoutStore));
+    dialects = new HashMap<>();
+    dialects.put(CobolLanguageId.COBOL, new IbmTrueCobolDialect(grammarPreprocessor,
+        messageService, treeListener, subroutineService, cachingConfigurationService, dialectService,
+        astProcessor, symbolsRepository, codeLayoutStore));
 
-    pipelineMap = new HashMap<>();
-
-    Pipeline<AnalysisContext> ibmPipeline = new Pipeline<>();
-    ibmPipeline.add(new IbmCleanupStage(preprocessorMap.get(CobolLanguageId.COBOL)));
-    ibmPipeline.add(new DialectCompilerDirectiveStage(dialectService));
-    ibmPipeline.add(new CompilerDirectivesStage(messageService));
-    ibmPipeline.add(new DialectProcessingStage(dialectService, preprocessorMap.get(CobolLanguageId.COBOL)));
-    ibmPipeline.add(new PreprocessorStage(grammarPreprocessor, preprocessorMap.get(CobolLanguageId.COBOL)));
-    ibmPipeline.add(new ImplicitDialectProcessingStage(dialectService));
-    ibmPipeline.add(new ParserStage(messageService, treeListener));
-    ibmPipeline.add(
-        new TransformTreeStage(
-            symbolsRepository,
-            messageService,
-            subroutineService,
-            cachingConfigurationService,
-            dialectService,
-            astProcessor,
-            codeLayoutStore));
-
-    pipelineMap.put(CobolLanguageId.COBOL, ibmPipeline);
-
-    Pipeline<AnalysisContext> hpPipeline = new Pipeline<>();
-    hpPipeline.add(new HpCleanupStage(preprocessorMap.get(CobolLanguageId.HP_COBOL)));
-    hpPipeline.add(new DialectCompilerDirectiveStage(dialectService));
-    hpPipeline.add(new CompilerDirectivesStage(messageService));
-    hpPipeline.add(new DialectProcessingStage(dialectService, preprocessorMap.get(CobolLanguageId.HP_COBOL)));
-    hpPipeline.add(new PreprocessorStage(grammarPreprocessor, preprocessorMap.get(CobolLanguageId.HP_COBOL)));
-    hpPipeline.add(new ImplicitDialectProcessingStage(dialectService));
-    hpPipeline.add(new ParserStage(messageService, treeListener));
-    hpPipeline.add(
-        new TransformTreeStage(
-            symbolsRepository,
-            messageService,
-            subroutineService,
-            cachingConfigurationService,
-            dialectService,
-            astProcessor,
-            codeLayoutStore));
-
-    pipelineMap.put(CobolLanguageId.HP_COBOL, hpPipeline);
+    dialects.put(CobolLanguageId.HP_COBOL, new HpTrueCobolDialect(grammarPreprocessor,
+        messageService, treeListener, subroutineService, cachingConfigurationService, dialectService,
+        astProcessor, symbolsRepository, codeLayoutStore));
   }
 
   /**
@@ -111,7 +72,9 @@ public class TrueDialectServiceImpl implements TrueDialectService<AnalysisContex
    * @return the pipeline for a dialect
    */
   public Pipeline<AnalysisContext> getPipeline(CobolLanguageId languageId) {
-    return pipelineMap.get(languageId);
+    return Optional.ofNullable(dialects.get(languageId))
+        .map(TrueCobolDialect::getPipeline)
+        .orElseThrow(() -> new RuntimeException("Dialect " + languageId.name() + "not found"));
   }
 
   /**
@@ -120,6 +83,8 @@ public class TrueDialectServiceImpl implements TrueDialectService<AnalysisContex
    * @return the cleanup preprocessor
    */
   public CleanerPreprocessor getPreprocessor(CobolLanguageId languageId) {
-    return preprocessorMap.get(languageId);
+    return Optional.ofNullable(dialects.get(languageId))
+        .map(TrueCobolDialect::getPreprocessor)
+        .orElseThrow(() -> new RuntimeException("Dialect " + languageId.name() + "not found"));
   }
 }
