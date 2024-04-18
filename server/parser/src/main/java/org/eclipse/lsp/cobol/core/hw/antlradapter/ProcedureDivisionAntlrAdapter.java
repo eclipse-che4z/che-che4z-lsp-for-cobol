@@ -99,7 +99,7 @@ public class ProcedureDivisionAntlrAdapter {
 
       if (node instanceof Statement) {
         assureParagraphsCtx(genStack, pdbCtx, node);
-        ParserRuleContext s = parseStatement((Statement) node);
+        ParserRuleContext s = parseSentence((Statement) node);
         lastToken = (CommonToken) s.stop;
         s.setParent(genStack.peek());
         genStack.peek().addChild(s);
@@ -199,7 +199,7 @@ public class ProcedureDivisionAntlrAdapter {
     genStack.push(paragraphsContext);
   }
 
-  private ParserRuleContext parseStatement(Statement node) {
+  private ParserRuleContext parseSentence(Statement node) {
     Token startToken = findStartToken(node).get();
     String input = generatePrefix(charStream, startToken) + node.toText();
     CobolProcedureDivisionLexer antlrLexer =

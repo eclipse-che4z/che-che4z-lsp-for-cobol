@@ -55,7 +55,7 @@ public class ParserStage implements Stage<AnalysisContext, ParserStageResult, Di
       ParserListener listener = new ParserListener(context.getExtendedDocument(), context.getCopybooksRepository());
       CobolErrorStrategy errorStrategy = new CobolErrorStrategy(messageService);
       AstBuilder parser = ParserUtils.isHwParserEnabled()
-              ? new SplitParser(CharStreams.fromString(context.getExtendedDocument().toString().replace('\u200B', ' ')),
+              ? new SplitParser(CharStreams.fromString(context.getExtendedDocument().toString()),
               listener, errorStrategy, treeListener)
               : new AntlrCobolParser(CharStreams.fromString(context.getExtendedDocument().toString()),
               listener, errorStrategy, treeListener);
