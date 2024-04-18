@@ -14,8 +14,6 @@
  */
 package org.eclipse.lsp.cobol.dialects.ibm;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
@@ -24,12 +22,13 @@ import org.eclipse.lsp.cobol.common.ResultWithErrors;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedText;
+import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.core.preprocessor.CobolLine;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.reader.CobolLineReaderService;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.rewriter.CobolLineReWriterService;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.transformer.CobolLineTransformationService;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.writer.CobolLineWriterService;
-import org.eclipse.lsp.cobol.common.dialects.CobolLanguageId;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.reader.CobolLineReader;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.rewriter.CobolLineReWriter;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.transformer.CobolLinesTransformation;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.writer.CobolLineWriter;
+import org.eclipse.lsp.cobol.service.settings.layout.CodeLayoutStore;
 
 /**
  * This class re-writes the content of the analyzing file to simplify the processing by the grammar,
@@ -37,33 +36,27 @@ import org.eclipse.lsp.cobol.common.dialects.CobolLanguageId;
  * details.
  */
 @Slf4j
-@Singleton
 public class IbmTextPreprocessor implements CleanerPreprocessor {
-  private final CobolLineReaderService readerService;
-  private final CobolLineWriterService writerService;
-  private final CobolLineTransformationService transformationService;
-  private final CobolLineReWriterService indicatorProcessorService;
+  private final CobolLineReader reader;
+  private final CobolLineWriter writer;
+  private final CobolLinesTransformation transformation;
+  private final CobolLineReWriter indicatorProcessor;
 
-  @Inject
-  public IbmTextPreprocessor(
-      CobolLineReaderService readerService,
-      CobolLineWriterService writerService,
-      CobolLineTransformationService transformationService,
-      CobolLineReWriterService indicatorProcessorService) {
-    this.readerService = readerService;
-    this.writerService = writerService;
-    this.transformationService = transformationService;
-    this.indicatorProcessorService = indicatorProcessorService;
+  public IbmTextPreprocessor(MessageService messageService, CodeLayoutStore layoutStore) {
+    this.reader = new IbmCobolLineReader(messageService, layoutStore);
+    this.writer = new IbmCobolLineWriter(layoutStore);
+    this.transformation = new IbmCobolContinuationLineTransformation(messageService, layoutStore);
+    this.indicatorProcessor = new IbmCobolLineIndicatorProcessor(layoutStore);
   }
 
   @Override
   public ResultWithErrors<ExtendedText> cleanUpCode(String documentUri, String cobolCode) {
     List<SyntaxError> errors = new ArrayList<>();
-    List<CobolLine> lines = readerService.getCobolLineReader(CobolLanguageId.COBOL).processLines(documentUri, cobolCode).unwrap(errors::addAll);
-    List<CobolLine> transformedLines = transformationService.getTransformer(CobolLanguageId.COBOL).transformLines(documentUri, lines).unwrap(errors::addAll);
-    List<CobolLine> rewrittenLines = indicatorProcessorService.getLineReWriter(CobolLanguageId.COBOL).processLines(transformedLines);
+    List<CobolLine> lines = reader.processLines(documentUri, cobolCode).unwrap(errors::addAll);
+    List<CobolLine> transformedLines = transformation.transformLines(documentUri, lines).unwrap(errors::addAll);
+    List<CobolLine> rewrittenLines = indicatorProcessor.processLines(transformedLines);
 
-    ExtendedDocument code = writerService.getCobolLineWriter(CobolLanguageId.COBOL).serialize(rewrittenLines, documentUri);
+    ExtendedDocument code = writer.serialize(rewrittenLines, documentUri);
     return new ResultWithErrors<>(code.getCurrentText(), errors);
   }
 }

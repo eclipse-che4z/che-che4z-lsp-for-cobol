@@ -24,13 +24,12 @@ import java.util.ServiceLoader;
 import java.util.stream.StreamSupport;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.lsp.cobol.common.AnalysisResult;
-import org.eclipse.lsp.cobol.common.CleanerPreprocessor;
-import org.eclipse.lsp.cobol.common.LanguageEngineFacade;
-import org.eclipse.lsp.cobol.common.SubroutineService;
+import org.eclipse.lsp.cobol.common.*;
 import org.eclipse.lsp.cobol.common.copybook.CopybookModel;
 import org.eclipse.lsp.cobol.common.copybook.CopybookName;
 import org.eclipse.lsp.cobol.common.copybook.CopybookService;
+import org.eclipse.lsp.cobol.common.dialects.CobolLanguageId;
+import org.eclipse.lsp.cobol.common.dialects.TrueDialectService;
 import org.eclipse.lsp.cobol.test.CobolText;
 import org.eclipse.lsp.cobol.test.UseCaseInitializer;
 import org.eclipse.lsp4j.Diagnostic;
@@ -121,11 +120,11 @@ public class UseCaseUtils {
         .map(UseCaseInitializer::createInjector)
         .orElseThrow(() -> new RuntimeException("UseCase initializer not found"));
 
-    CleanerPreprocessor preprocessor = injector.getInstance(CleanerPreprocessor.class);
+    TrueDialectService dialectService = injector.getInstance(TrueDialectService.class);
 
     CopybookService copybookService = injector.getInstance(CopybookService.class);
     PredefinedCopybookUtils.loadPredefinedCopybooks(useCase.getSqlBackend(), useCase.getCopybooks(), useCase.documentUri)
-        .forEach(pc -> copybookService.store(pc, preprocessor));
+        .forEach(pc -> copybookService.store(pc, dialectService.getPreprocessor(CobolLanguageId.COBOL)));
 
     useCase.getCopybooks()
         .forEach(cobolText -> {
@@ -133,7 +132,7 @@ public class UseCaseUtils {
           String copybookText = cobolText.getFullText();
 
           cobolText = new CobolText(cobolText.getFileName().toUpperCase(), cobolText.getDialectType(), copybookText);
-          copybookService.store(UseCaseUtils.toCopybookModel(cobolText, useCase.documentUri), preprocessor);
+          copybookService.store(UseCaseUtils.toCopybookModel(cobolText, useCase.documentUri), dialectService.getPreprocessor(CobolLanguageId.COBOL));
         });
 
     SubroutineService subroutines = injector.getInstance(SubroutineService.class);

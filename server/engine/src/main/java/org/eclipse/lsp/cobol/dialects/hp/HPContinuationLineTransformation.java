@@ -12,34 +12,32 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package org.eclipse.lsp.cobol.core.preprocessor.delegates.transformer;
+package org.eclipse.lsp.cobol.dialects.hp;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.dialects.CobolLanguageId;
 import org.eclipse.lsp.cobol.common.dialects.CobolProgramLayout;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.transformer.ContinuationLineTransformation;
 import org.eclipse.lsp.cobol.service.settings.layout.CodeLayoutStore;
 import org.eclipse.lsp.cobol.service.settings.layout.CodeLayoutUtil;
 
-/** {@link ContinuationLineTransformation} class for "cobol" languageId. */
-@Singleton
-public class CobolContinuationLineTransformation extends ContinuationLineTransformation {
+/**
+ * {@link ContinuationLineTransformation} for "hpcobol"
+ */
+class HPContinuationLineTransformation extends ContinuationLineTransformation {
+  private final CodeLayoutStore layoutStore;
 
-  @Inject
-  public CobolContinuationLineTransformation(
+  HPContinuationLineTransformation(
       MessageService messageService, CodeLayoutStore layoutStore) {
     super(messageService);
     this.layoutStore = layoutStore;
   }
 
-  private CodeLayoutStore layoutStore;
-
   @Override
   public CobolProgramLayout getCodeLayout() {
     return layoutStore
         .getCodeLayout()
-        .map(layout -> CodeLayoutUtil.mergeLayout(CobolLanguageId.COBOL.getLayout(), layout))
-        .orElse(CobolLanguageId.COBOL.getLayout());
+        .map(layout -> CodeLayoutUtil.mergeLayout(CobolLanguageId.HP_COBOL.getLayout(), layout))
+        .orElse(CobolLanguageId.HP_COBOL.getLayout());
   }
 }

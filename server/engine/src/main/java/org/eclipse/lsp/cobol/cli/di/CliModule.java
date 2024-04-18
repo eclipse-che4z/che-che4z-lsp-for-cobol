@@ -26,7 +26,6 @@ import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.eclipse.lsp.cobol.cfg.CFASTBuilder;
 import org.eclipse.lsp.cobol.cfg.CFASTBuilderImpl;
 import org.eclipse.lsp.cobol.cli.modules.CliClientProvider;
-import org.eclipse.lsp.cobol.common.CleanerPreprocessor;
 import org.eclipse.lsp.cobol.common.LanguageEngineFacade;
 import org.eclipse.lsp.cobol.common.SubroutineService;
 import org.eclipse.lsp.cobol.common.action.CodeActionProvider;
@@ -43,26 +42,12 @@ import org.eclipse.lsp.cobol.core.engine.dialects.DialectDiscoveryService;
 import org.eclipse.lsp.cobol.core.messages.LocaleStoreImpl;
 import org.eclipse.lsp.cobol.core.messages.PropertiesMessageService;
 import org.eclipse.lsp.cobol.dialects.TrueDialectServiceImpl;
-import org.eclipse.lsp.cobol.dialects.hp.HpTextPreprocessor;
-import org.eclipse.lsp.cobol.dialects.ibm.IbmTextPreprocessor;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.GrammarPreprocessor;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.GrammarPreprocessorImpl;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.GrammarPreprocessorListenerFactory;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.reader.CobolLineReader;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.reader.CobolLineReaderImpl;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.reader.HPCobolLineReaderImpl;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.replacement.ReplacePreprocessorFactory;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.replacement.ReplacingService;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.replacement.ReplacingServiceImpl;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.rewriter.CobolLineIndicatorProcessorImpl;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.rewriter.CobolLineReWriter;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.rewriter.HpCobolLineIndicatorProcessorImpl;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.transformer.CobolContinuationLineTransformation;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.transformer.CobolLinesTransformation;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.transformer.HPContinuationLineTransformation;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.writer.CobolLineWriter;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.writer.CobolLineWriterImpl;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.writer.HPCobolLineWriterImpl;
 import org.eclipse.lsp.cobol.core.visitor.InterruptingTreeListener;
 import org.eclipse.lsp.cobol.lsp.DisposableLSPStateService;
 import org.eclipse.lsp.cobol.lsp.jrpc.CobolLanguageClient;
@@ -95,25 +80,10 @@ public class CliModule extends AbstractModule {
   protected void configure() {
     bind(TrueDialectService.class).to(TrueDialectServiceImpl.class);
 
-    bind(CleanerPreprocessor.class).annotatedWith(Names.named("cobol")).to(IbmTextPreprocessor.class);
-    bind(CleanerPreprocessor.class).annotatedWith(Names.named("hpcobol")).to(HpTextPreprocessor.class);
-    bind(CobolLineReader.class).annotatedWith(Names.named("hpcobol")).to(HPCobolLineReaderImpl.class);
-    bind(CobolLineReader.class).annotatedWith(Names.named("cobol")).to(CobolLineReaderImpl.class);
-
-    bind(CobolLineWriter.class).annotatedWith(Names.named("cobol")).to(CobolLineWriterImpl.class);
-    bind(CobolLineWriter.class).annotatedWith(Names.named("hpcobol")).to(HPCobolLineWriterImpl.class);
-
-    bind(CobolLinesTransformation.class).annotatedWith(Names.named("hpcobol")).to(HPContinuationLineTransformation.class);
-    bind(CobolLinesTransformation.class).annotatedWith(Names.named("cobol")).to(CobolContinuationLineTransformation.class);
-
-    bind(CobolLineReWriter.class).annotatedWith(Names.named("cobol")).to(CobolLineIndicatorProcessorImpl.class);
-    bind(CobolLineReWriter.class).annotatedWith(Names.named("hpcobol")).to(HpCobolLineIndicatorProcessorImpl.class);
     bind(GrammarPreprocessor.class).to(GrammarPreprocessorImpl.class);
     install(new FactoryModuleBuilder().build(GrammarPreprocessorListenerFactory.class));
     install(new FactoryModuleBuilder().build(ReplacePreprocessorFactory.class));
     bind(ReplacingService.class).to(ReplacingServiceImpl.class);
-    bind(CobolLineReader.class).to(CobolLineReaderImpl.class);
-    bind(CobolLineWriter.class).to(CobolLineWriterImpl.class);
     bind(MessageService.class).to(PropertiesMessageService.class);
     bind(LocaleStore.class).to(LocaleStoreImpl.class);
     bind(ConfigurationService.class).to(CachingConfigurationService.class);

@@ -12,7 +12,7 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package org.eclipse.lsp.cobol.core.preprocessor.delegates.transformer;
+package org.eclipse.lsp.cobol.dialects.ibm;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -23,8 +23,8 @@ import java.util.List;
 import java.util.Optional;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.message.MessageService;
-import org.eclipse.lsp.cobol.core.AbstractCobolLinePreprocessorTest;
 import org.eclipse.lsp.cobol.core.preprocessor.CobolLine;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.transformer.ContinuationLineTransformation;
 import org.eclipse.lsp.cobol.service.settings.layout.CodeLayoutStore;
 import org.junit.jupiter.api.Test;
 
@@ -109,7 +109,7 @@ class ContinuationLineTransformationTest extends AbstractCobolLinePreprocessorTe
     MessageService mockMessageService = mock(MessageService.class);
     CodeLayoutStore store = mock(CodeLayoutStore.class);
     when(store.getCodeLayout()).thenReturn(Optional.empty());
-    ContinuationLineTransformation transformation = new CobolContinuationLineTransformation(mockMessageService, store);
+    ContinuationLineTransformation transformation = new IbmCobolContinuationLineTransformation(mockMessageService, store);
     return transformation.transformLines("", lines).getErrors();
   }
 

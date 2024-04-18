@@ -34,6 +34,7 @@ import org.eclipse.lsp.cobol.common.benchmark.BenchmarkService;
 import org.eclipse.lsp.cobol.common.benchmark.BenchmarkSession;
 import org.eclipse.lsp.cobol.common.benchmark.Measurement;
 import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
+import org.eclipse.lsp.cobol.common.dialects.TrueDialectService;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedText;
@@ -93,7 +94,7 @@ public class Cli implements Callable<Integer> {
   @Override
   public Integer call() throws Exception {
     Injector diCtx = Guice.createInjector(new CliModule());
-    Pipeline pipeline = setupPipeline(diCtx, action);
+    Pipeline<AnalysisContext> pipeline = setupPipeline(diCtx, action);
 
     CliClientProvider cliClientProvider = diCtx.getInstance(CliClientProvider.class);
     if (cpyPaths != null) {
@@ -102,7 +103,7 @@ public class Cli implements Callable<Integer> {
     cliClientProvider.setCpyExt(Arrays.asList(cpyExt));
 
     // Cleaning up
-    CleanerPreprocessor preprocessor = diCtx.getInstance(IbmTextPreprocessor.class);
+    CleanerPreprocessor preprocessor = diCtx.getInstance(TrueDialectService.class).getPreprocessor(CobolLanguageId.COBOL);
     BenchmarkService benchmarkService = diCtx.getInstance(BenchmarkService.class);
 
     if (src == null) {
@@ -189,11 +190,10 @@ public class Cli implements Callable<Integer> {
     return AnalysisConfig.defaultConfig(CopybookProcessingMode.ENABLED);
   }
 
-  private static Pipeline setupPipeline(Injector diCtx, Action action) {
+  private static Pipeline<AnalysisContext> setupPipeline(Injector diCtx, Action action) {
     DialectService dialectService = diCtx.getInstance(DialectService.class);
     MessageService messageService = diCtx.getInstance(MessageService.class);
     GrammarPreprocessor grammarPreprocessor = diCtx.getInstance(GrammarPreprocessor.class);
-    CleanerPreprocessor preprocessor = diCtx.getInstance(IbmTextPreprocessor.class);
     ParseTreeListener parseTreeListener = diCtx.getInstance(ParseTreeListener.class);
     SymbolsRepository symbolsRepository = diCtx.getInstance(SymbolsRepository.class);
     SubroutineService subroutineService = diCtx.getInstance(SubroutineService.class);
@@ -202,7 +202,9 @@ public class Cli implements Callable<Integer> {
     AstProcessor astProcessor = diCtx.getInstance(AstProcessor.class);
     CodeLayoutStore layoutStore = diCtx.getInstance(CodeLayoutStore.class);
 
-    Pipeline pipeline = new Pipeline();
+    CleanerPreprocessor preprocessor = diCtx.getInstance(TrueDialectService.class).getPreprocessor(CobolLanguageId.COBOL);
+
+    Pipeline<AnalysisContext> pipeline = new Pipeline<>();
     pipeline.add(new CompilerDirectivesStage(messageService));
     pipeline.add(new DialectProcessingStage(dialectService, preprocessor));
     pipeline.add(new PreprocessorStage(grammarPreprocessor, preprocessor));

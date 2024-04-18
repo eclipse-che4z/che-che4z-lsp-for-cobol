@@ -12,7 +12,7 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package org.eclipse.lsp.cobol.core;
+package org.eclipse.lsp.cobol.dialects.ibm;
 
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.matches;
@@ -25,7 +25,6 @@ import org.eclipse.lsp.cobol.common.ResultWithErrors;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.core.preprocessor.CobolLine;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.reader.CobolLineReader;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.reader.CobolLineReaderImpl;
 import org.eclipse.lsp.cobol.common.dialects.CobolProgramLayout;
 import org.eclipse.lsp.cobol.service.settings.layout.CodeLayoutStore;
 
@@ -33,7 +32,7 @@ public abstract class AbstractCobolLinePreprocessorTest {
 
   protected ResultWithErrors<List<CobolLine>> processText(String text) {
     MessageService mockMessageService = mock(MessageService.class);
-    CobolLineReader reader = new CobolLineReaderImpl(mockMessageService, null);
+    CobolLineReader reader = new IbmCobolLineReader(mockMessageService, null);
     when(mockMessageService.getMessage(matches("CobolLineReaderImpl.incorrectLineFormat")))
         .thenReturn("Unexpected indicator area content");
     when(mockMessageService.getMessage(matches("CobolLineReaderImpl.longLineMsg"), anyInt()))
@@ -45,7 +44,7 @@ public abstract class AbstractCobolLinePreprocessorTest {
     MessageService mockMessageService = mock(MessageService.class);
     CodeLayoutStore store = mock(CodeLayoutStore.class);
     when(store.getCodeLayout()).thenReturn(Optional.of(new CobolProgramLayout(0, 1, 4, 61, 8)));
-    CobolLineReader reader = new CobolLineReaderImpl(mockMessageService, store);
+    CobolLineReader reader = new IbmCobolLineReader(mockMessageService, store);
     when(mockMessageService.getMessage(matches("CobolLineReaderImpl.incorrectLineFormat")))
         .thenReturn("Unexpected indicator area content");
     when(mockMessageService.getMessage(matches("CobolLineReaderImpl.longLineMsg")))

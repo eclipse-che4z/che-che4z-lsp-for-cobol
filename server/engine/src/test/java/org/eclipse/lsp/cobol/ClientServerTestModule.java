@@ -24,7 +24,6 @@ import com.google.inject.multibindings.Multibinder;
 import com.google.inject.name.Names;
 import org.eclipse.lsp.cobol.cfg.CFASTBuilder;
 import org.eclipse.lsp.cobol.cfg.CFASTBuilderImpl;
-import org.eclipse.lsp.cobol.common.CleanerPreprocessor;
 import org.eclipse.lsp.cobol.common.SubroutineService;
 import org.eclipse.lsp.cobol.common.action.CodeActionProvider;
 import org.eclipse.lsp.cobol.common.copybook.CopybookService;
@@ -62,7 +61,6 @@ import org.eclipse.lsp.cobol.service.delegates.references.ElementOccurrences;
 import org.eclipse.lsp.cobol.service.delegates.references.Occurrences;
 import org.eclipse.lsp.cobol.service.mocks.MockLanguageClient;
 import org.eclipse.lsp.cobol.service.mocks.MockLanguageServer;
-import org.eclipse.lsp.cobol.service.mocks.MockTextPreprocessor;
 import org.eclipse.lsp.cobol.service.settings.CachingConfigurationService;
 import org.eclipse.lsp.cobol.service.settings.ConfigurationService;
 import org.eclipse.lsp.cobol.service.settings.SettingsService;
@@ -102,7 +100,6 @@ public class ClientServerTestModule extends AbstractModule {
     bind(SubroutineService.class).to(SubroutineServiceImpl.class);
     bind(Occurrences.class).to(ElementOccurrences.class);
     bind(CFASTBuilder.class).to(CFASTBuilderImpl.class);
-    bind(CleanerPreprocessor.class).to(MockTextPreprocessor.class);
     bind(CopybookIdentificationService.class)
             .annotatedWith(Names.named("contentStrategy"))
             .to(CopybookIdentificationServiceBasedOnContent.class);

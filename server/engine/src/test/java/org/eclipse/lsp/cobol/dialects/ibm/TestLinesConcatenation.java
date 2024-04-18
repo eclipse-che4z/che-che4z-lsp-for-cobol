@@ -13,7 +13,7 @@
  *
  */
 
-package org.eclipse.lsp.cobol.core.preprocessor;
+package org.eclipse.lsp.cobol.dialects.ibm;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -27,19 +27,6 @@ import org.eclipse.lsp.cobol.common.CleanerPreprocessor;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedText;
 import org.eclipse.lsp.cobol.common.message.MessageService;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.reader.CobolLineReader;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.reader.CobolLineReaderImpl;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.reader.CobolLineReaderService;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.rewriter.CobolLineIndicatorProcessorImpl;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.rewriter.CobolLineReWriter;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.rewriter.CobolLineReWriterService;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.transformer.CobolContinuationLineTransformation;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.transformer.CobolLineTransformationService;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.transformer.CobolLinesTransformation;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.writer.CobolLineWriter;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.writer.CobolLineWriterImpl;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.writer.CobolLineWriterService;
-import org.eclipse.lsp.cobol.dialects.ibm.IbmTextPreprocessor;
 import org.eclipse.lsp.cobol.service.settings.layout.CodeLayoutStore;
 import org.junit.jupiter.api.Test;
 
@@ -77,24 +64,7 @@ class TestLinesConcatenation {
     CodeLayoutStore store = mock(CodeLayoutStore.class);
     when(store.getCodeLayout()).thenReturn(Optional.empty());
 
-    CobolLineReader reader = new CobolLineReaderImpl(messageService, store);
-    CobolLineWriter writer = new CobolLineWriterImpl(store);
-    CobolLinesTransformation transformation = new CobolContinuationLineTransformation(messageService, store);
-    CobolLineReWriter indicatorProcessor = new CobolLineIndicatorProcessorImpl(store);
-
-    CobolLineReaderService cobolLineReaderService = mock(CobolLineReaderService.class);
-    when(cobolLineReaderService.getCobolLineReader(any())).thenReturn(reader);
-
-    CobolLineWriterService writerService = mock(CobolLineWriterService.class);
-    when(writerService.getCobolLineWriter(any())).thenReturn(writer);
-
-    CobolLineTransformationService transformationService = mock(CobolLineTransformationService.class);
-    when(transformationService.getTransformer(any())).thenReturn(transformation);
-
-    CobolLineReWriterService indicatorProcessorService = mock(CobolLineReWriterService.class);
-    when(indicatorProcessorService.getLineReWriter(any())).thenReturn(indicatorProcessor);
-
-    CleanerPreprocessor textPreprocessor = new IbmTextPreprocessor(cobolLineReaderService, writerService, transformationService, indicatorProcessorService);
+    CleanerPreprocessor textPreprocessor = new IbmTextPreprocessor(messageService, store);
     ExtendedText extendedText = textPreprocessor.cleanUpCode(DOCUMENT_URI, TEXT).unwrap(accumulatedErrors::addAll);
     assertEquals(EXPECTED, extendedText.toString());
     assertTrue(accumulatedErrors.isEmpty());

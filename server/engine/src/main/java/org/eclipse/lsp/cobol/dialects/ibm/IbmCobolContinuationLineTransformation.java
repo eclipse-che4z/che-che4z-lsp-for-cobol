@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Broadcom.
+ * Copyright (c) 2024 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -12,31 +12,28 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package org.eclipse.lsp.cobol.core.preprocessor.delegates.writer;
+package org.eclipse.lsp.cobol.dialects.ibm;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
+import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.dialects.CobolLanguageId;
 import org.eclipse.lsp.cobol.common.dialects.CobolProgramLayout;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.transformer.ContinuationLineTransformation;
 import org.eclipse.lsp.cobol.service.settings.layout.CodeLayoutStore;
 import org.eclipse.lsp.cobol.service.settings.layout.CodeLayoutUtil;
 
-/**
- * {@link CobolLineWriter} for "cobol" languageId . This class serializes a list of COBOL lines into
- * a String
- */
-@Singleton
-public class CobolLineWriterImpl extends CobolLineWriter {
+/** {@link ContinuationLineTransformation} class for "cobol" languageId. */
+class IbmCobolContinuationLineTransformation extends ContinuationLineTransformation {
 
-  private CodeLayoutStore layoutStore;
-
-  @Inject
-  public CobolLineWriterImpl(CodeLayoutStore layoutStore) {
+  IbmCobolContinuationLineTransformation(
+      MessageService messageService, CodeLayoutStore layoutStore) {
+    super(messageService);
     this.layoutStore = layoutStore;
   }
 
+  private final CodeLayoutStore layoutStore;
+
   @Override
-  protected CobolProgramLayout getLayout() {
+  public CobolProgramLayout getCodeLayout() {
     return layoutStore
         .getCodeLayout()
         .map(layout -> CodeLayoutUtil.mergeLayout(CobolLanguageId.COBOL.getLayout(), layout))

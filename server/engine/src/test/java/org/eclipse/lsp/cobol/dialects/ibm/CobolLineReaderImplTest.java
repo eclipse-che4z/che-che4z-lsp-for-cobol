@@ -12,7 +12,7 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package org.eclipse.lsp.cobol.core.preprocessor.delegates.reader.impl;
+package org.eclipse.lsp.cobol.dialects.ibm;
 
 import static java.util.stream.IntStream.range;
 import static org.hamcrest.CoreMatchers.is;
@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import java.util.List;
 import org.eclipse.lsp.cobol.common.ResultWithErrors;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
-import org.eclipse.lsp.cobol.core.AbstractCobolLinePreprocessorTest;
 import org.eclipse.lsp.cobol.core.preprocessor.CobolLine;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
