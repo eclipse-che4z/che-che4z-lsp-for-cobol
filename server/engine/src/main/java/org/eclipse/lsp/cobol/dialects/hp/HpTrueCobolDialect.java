@@ -17,6 +17,7 @@ package org.eclipse.lsp.cobol.dialects.hp;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.eclipse.lsp.cobol.common.CleanerPreprocessor;
 import org.eclipse.lsp.cobol.common.SubroutineService;
+import org.eclipse.lsp.cobol.common.copybook.CopybookService;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.pipeline.Pipeline;
 import org.eclipse.lsp.cobol.core.engine.analysis.AnalysisContext;
@@ -45,14 +46,15 @@ public class HpTrueCobolDialect implements TrueCobolDialect {
                             DialectService dialectService,
                             AstProcessor astProcessor,
                             SymbolsRepository symbolsRepository,
-                            CodeLayoutStore codeLayoutStore) {
+                            CodeLayoutStore codeLayoutStore,
+                            CopybookService copybookService) {
     preprocessor = new HpTextPreprocessor(messageService, codeLayoutStore);
 
     pipeline = new Pipeline<>();
     pipeline.add(new HpCleanupStage(preprocessor));
     pipeline.add(new DialectCompilerDirectiveStage(dialectService));
     pipeline.add(new CompilerDirectivesStage(messageService));
-    pipeline.add(new DialectProcessingStage(dialectService, preprocessor));
+    pipeline.add(new HpCopybookProcessingStage(messageService, copybookService));
     pipeline.add(new PreprocessorStage(grammarPreprocessor, preprocessor));
     pipeline.add(new ImplicitDialectProcessingStage(dialectService));
     pipeline.add(new ParserStage(messageService, treeListener));

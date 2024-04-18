@@ -579,7 +579,11 @@ dialectDescriptionEntry
    ;
 
 entryName
-   : (FILLER | { validateLength(_input.LT(1).getText(), "Variable name", 30);} dataName)
+   : (FILLER | { validateLength(_input.LT(1).getText(), "Variable name", 30);
+    validateAllowedVariableName(_input.LT(1).getText(), "DATA", "DATE", "EXTERNAL",
+    "INSERT", "BIT", "CONDITION", "COPY", "CURSOR", "ENTER", "QUEUE", "QUOTE",
+    "REPLACE", "SERVICE", "TERMINAL", "TEST", "TEXT", "TIME", "TITLE", "TYPE");}
+    dataName)
    ;
 
 dataGroupUsageClause
@@ -2229,7 +2233,7 @@ cobolKeywords
    | DISK | KEYBOARD | PORT | READER | REMOTE | VIRTUAL | LIBRARY | DEFINITION | PARSE | BOOL | ESCAPE | INITIALIZED
    | LOC | BYTITLE | BYFUNCTION | ABORT | ORDERLY | ASSOCIATED_DATA | ASSOCIATED_DATA_LENGTH | CLOSE | CURRENCY
    | DATA | DBCS | EXIT | EXTEND | INITIAL | NATIONAL | OBJECT | OFF | QUOTE | SEPARATE | SEQUENCE
-   | SERVICE | STANDARD | SUPPRESS | TERMINAL | TEST | VOLATILE
+   | SERVICE | STANDARD | SUPPRESS | TERMINAL | TEST | VOLATILE | EXTERNAL
    ;
 
 dialectNodeFiller

@@ -41,7 +41,6 @@ import org.eclipse.lsp.cobol.common.message.MessageTemplate;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.processor.ProcessorDescription;
 import org.eclipse.lsp.cobol.core.engine.analysis.AnalysisContext;
-import org.eclipse.lsp.cobol.core.engine.dialects.hp.HpDialect;
 import org.eclipse.lsp.cobol.implicitDialects.cics.CICSDialect;
 import org.eclipse.lsp.cobol.implicitDialects.sql.Db2SqlDialect;
 import org.eclipse.lsp4j.Location;
@@ -140,7 +139,7 @@ public class DialectService {
    * @param ctx a {@link AnalysisContext} class
    * @param dialectProcessingContext is a DialectProcessingContext class with all needed data for
    *     dialect processing
-   * @return a error while extending the document
+   * @return an error while extending the document
    */
   public List<SyntaxError> extendImplicitDialects(
       AnalysisContext ctx, DialectProcessingContext dialectProcessingContext) {
@@ -263,7 +262,7 @@ public class DialectService {
    * Returns dialect object by name
    *
    * @param dialectName is a dialect name
-   * @return a dialect is it's possible
+   * @return a dialect if it is possible
    */
   public Optional<CobolDialect> getDialectByName(String dialectName) {
     return Optional.ofNullable(dialectSuppliers.get(dialectName));
@@ -321,8 +320,6 @@ public class DialectService {
                               return dialect;
                             })
                         .orElse(null)));
-    changed.set(true);
-    dialectSuppliers.put("HP", new HpDialect(copybookService, messageService));
     return changed.get();
   }
 

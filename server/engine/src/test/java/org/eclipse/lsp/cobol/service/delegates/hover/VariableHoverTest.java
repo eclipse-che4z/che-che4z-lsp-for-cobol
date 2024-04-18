@@ -49,7 +49,7 @@ class VariableHoverTest {
           + "       Working-Storage Section.\n";
 
   private static final String FULL_TEXT = HEADER
-      + "       01 {$*TEST} PIC 9.\n"
+      + "       01 {$*TEST1} PIC 9.\n"
       + "       01 {$*TOP}.\n"
       + "           05 {$*MIDDLE-1}.\n"
       + "           10 {$*LEAF-1} PIC 9.\n"
@@ -81,7 +81,7 @@ class VariableHoverTest {
     assertNotNull(hover);
     MarkedString markedString = hover.getContents().getLeft().get(0).getRight();
     assertEquals("cobol", markedString.getLanguage());
-    assertEquals("01 TEST PIC 9.", markedString.getValue());
+    assertEquals("01 TEST1 PIC 9.", markedString.getValue());
   }
 
   @Test
