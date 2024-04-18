@@ -303,7 +303,7 @@ public class CobolParser {
   private void statement() {
     ctx.push(new Statement());
     try {
-      while (!match(".") && ctx.getLexer().hasMore()) {
+      while (!match(".") && !isNextDivisionEofOrEop() && !isParagraph() && !isSection() && !isEndOfProgram()) {
         consume();
       }
       optional(".");
