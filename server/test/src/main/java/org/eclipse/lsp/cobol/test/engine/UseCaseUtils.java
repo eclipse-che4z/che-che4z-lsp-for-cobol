@@ -103,7 +103,7 @@ public class UseCaseUtils {
    * @return the entire analysis result
    */
   public static AnalysisResult analyze(UseCase useCase) {
-    return analyze(useCase, "cobol");
+    return analyze(useCase, CobolLanguageId.COBOL);
   }
   /**
    * Analyze the given text using a real language engine providing copybooks required for the
@@ -113,7 +113,7 @@ public class UseCaseUtils {
    * @param languageId language Id
    * @return the entire analysis result
    */
-  public static AnalysisResult analyze(UseCase useCase, String languageId) {
+  public static AnalysisResult analyze(UseCase useCase, CobolLanguageId languageId) {
 
     ServiceLoader<UseCaseInitializer> loader = ServiceLoader.load(UseCaseInitializer.class);
     Injector injector = StreamSupport.stream(loader.spliterator(), false).findFirst()
@@ -123,8 +123,9 @@ public class UseCaseUtils {
     TrueDialectService dialectService = injector.getInstance(TrueDialectService.class);
 
     CopybookService copybookService = injector.getInstance(CopybookService.class);
+    CleanerPreprocessor preprocessor = dialectService.getPreprocessor(languageId);
     PredefinedCopybookUtils.loadPredefinedCopybooks(useCase.getSqlBackend(), useCase.getCopybooks(), useCase.documentUri)
-        .forEach(pc -> copybookService.store(pc, dialectService.getPreprocessor(CobolLanguageId.COBOL)));
+        .forEach(pc -> copybookService.store(pc, preprocessor));
 
     useCase.getCopybooks()
         .forEach(cobolText -> {
@@ -132,7 +133,7 @@ public class UseCaseUtils {
           String copybookText = cobolText.getFullText();
 
           cobolText = new CobolText(cobolText.getFileName().toUpperCase(), cobolText.getDialectType(), copybookText);
-          copybookService.store(UseCaseUtils.toCopybookModel(cobolText, useCase.documentUri), dialectService.getPreprocessor(CobolLanguageId.COBOL));
+          copybookService.store(UseCaseUtils.toCopybookModel(cobolText, useCase.documentUri), preprocessor);
         });
 
     SubroutineService subroutines = injector.getInstance(SubroutineService.class);
@@ -140,7 +141,7 @@ public class UseCaseUtils {
 
     return injector
         .getInstance(LanguageEngineFacade.class)
-        .analyze(useCase.getDocumentUri(), useCase.getText(), useCase.getAnalysisConfig());
+        .analyze(useCase.getDocumentUri(), useCase.getText(), useCase.getAnalysisConfig(), languageId.getId());
   }
   /**
    * Convert CobolText to CopybookModel
