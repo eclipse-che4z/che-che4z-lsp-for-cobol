@@ -68,7 +68,8 @@ public class UsageFormatUtils {
           COMP_1,
           COMP_2,
           COMPUTATIONAL_1,
-          COMPUTATIONAL_2);
+          COMPUTATIONAL_2,
+          SQL);
   private final String picAndUsageConflict = "semantics.picAndUsageConflict";
   private final List<EffectiveDataType> numericDataTypes = ImmutableList.of(REAL, INTEGER);
   private final Function<ElementaryNode, List<SyntaxError>> checkStringUsage =

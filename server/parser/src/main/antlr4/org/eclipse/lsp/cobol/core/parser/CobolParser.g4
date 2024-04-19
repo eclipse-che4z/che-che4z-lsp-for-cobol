@@ -683,6 +683,7 @@ usageFormat
    | POINTER_32
    | PROCEDURE_POINTER
    | FUNCTION_POINTER
+   | SQL sqlDataTypesCaluse
    ;
 
 dataValueClause
@@ -721,6 +722,13 @@ thruToken
    : (THROUGH | THRU)
    ;
 
+sqlDataTypesCaluse
+   : TYPE IS sqlDataTypes LPARENCHAR integerLiteral RPARENCHAR
+   ;
+
+sqlDataTypes
+    : (CLOB | VARCHAR)
+    ;
 // --- procedure division --------------------------------------------------------------------
 
 procedureDivision
