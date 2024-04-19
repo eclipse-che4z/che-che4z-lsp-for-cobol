@@ -19,6 +19,7 @@ import com.google.inject.Singleton;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.eclipse.lsp.cobol.common.CleanerPreprocessor;
 import org.eclipse.lsp.cobol.common.SubroutineService;
+import org.eclipse.lsp.cobol.common.copybook.CopybookService;
 import org.eclipse.lsp.cobol.common.dialects.TrueDialectService;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.core.engine.analysis.AnalysisContext;
@@ -55,7 +56,8 @@ public class TrueDialectServiceImpl implements TrueDialectService<AnalysisContex
                             DialectService dialectService,
                             AstProcessor astProcessor,
                             SymbolsRepository symbolsRepository,
-                            CodeLayoutStore codeLayoutStore) {
+                            CodeLayoutStore codeLayoutStore,
+                            CopybookService copybookService) {
     dialects = new HashMap<>();
     dialects.put(CobolLanguageId.COBOL, new IbmTrueCobolDialect(grammarPreprocessor,
         messageService, treeListener, subroutineService, cachingConfigurationService, dialectService,
@@ -63,7 +65,7 @@ public class TrueDialectServiceImpl implements TrueDialectService<AnalysisContex
 
     dialects.put(CobolLanguageId.HP_COBOL, new HpTrueCobolDialect(grammarPreprocessor,
         messageService, treeListener, subroutineService, cachingConfigurationService, dialectService,
-        astProcessor, symbolsRepository, codeLayoutStore));
+        astProcessor, symbolsRepository, codeLayoutStore, copybookService));
   }
 
   /**

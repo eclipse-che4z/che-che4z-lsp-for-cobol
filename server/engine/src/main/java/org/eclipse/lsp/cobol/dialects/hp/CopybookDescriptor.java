@@ -12,7 +12,7 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package org.eclipse.lsp.cobol.core.engine.dialects.hp;
+package org.eclipse.lsp.cobol.dialects.hp;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

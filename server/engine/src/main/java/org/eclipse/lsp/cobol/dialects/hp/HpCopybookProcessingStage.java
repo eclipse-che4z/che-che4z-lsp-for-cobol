@@ -12,25 +12,28 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package org.eclipse.lsp.cobol.core.engine.dialects.hp;
+package org.eclipse.lsp.cobol.dialects.hp;
 
 import com.google.common.collect.ImmutableList;
-import org.eclipse.lsp.cobol.common.ResultWithErrors;
+import lombok.RequiredArgsConstructor;
 import org.eclipse.lsp.cobol.common.copybook.CopybookModel;
 import org.eclipse.lsp.cobol.common.copybook.CopybookName;
 import org.eclipse.lsp.cobol.common.copybook.CopybookService;
-import org.eclipse.lsp.cobol.common.dialects.CobolDialect;
 import org.eclipse.lsp.cobol.common.dialects.DialectOutcome;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.error.ErrorCodes;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
+import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedText;
 import org.eclipse.lsp.cobol.common.mapping.MappedCharacter;
 import org.eclipse.lsp.cobol.common.mapping.OriginalLocation;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
+import org.eclipse.lsp.cobol.common.pipeline.Stage;
+import org.eclipse.lsp.cobol.common.pipeline.StageResult;
+import org.eclipse.lsp.cobol.core.engine.analysis.AnalysisContext;
 import org.eclipse.lsp4j.Location;
 
 import java.util.HashSet;
@@ -41,48 +44,41 @@ import java.util.Set;
 import static org.eclipse.lsp.cobol.common.error.ErrorSeverity.ERROR;
 
 /**
- * HP Dialect support
+ * Resolving and inserting copybooks into the extended source stage
  */
-public class HpDialect implements CobolDialect {
+@RequiredArgsConstructor
+class HpCopybookProcessingStage implements Stage<AnalysisContext, DialectOutcome, Void> {
 
-  private final CopybookService copybookService;
   private final MessageService messageService;
-
-  public HpDialect(CopybookService copybookService, MessageService messageService) {
-    this.copybookService = copybookService;
-    this.messageService = messageService;
-  }
+  private final CopybookService copybookService;
 
   @Override
-  public String getName() {
-    return "HP";
-  }
-
-  @Override
-  public List<SyntaxError> extend(DialectProcessingContext context) {
+  public StageResult<DialectOutcome> run(AnalysisContext context, StageResult<Void> prevStageResult) {
     List<SyntaxError> errors = new LinkedList<>();
 
     List<CopybookDescriptor> cbs = CopybookParser.parseAndCleanup(context.getExtendedDocument());
     cbs.forEach(cb -> {
-      String currentUri = context.getExtendedDocument().getUri();
-      insertHpCopybook(context, cb, errors);
+      List<CopyNode> copybookNodes = insertHpCopybook(context.getDocumentUri(), context.getExtendedDocument(), cb, errors);
+      context.getDialectNodes().addAll(copybookNodes);
     });
-    return errors;
+
+    DialectOutcome outcome = new DialectOutcome(context.getDialectNodes(), DialectProcessingContext.builder().build());
+    return new StageResult<>(outcome);
   }
 
   @Override
-  public ResultWithErrors<DialectOutcome> processText(DialectProcessingContext context) {
-    return new ResultWithErrors<>(new DialectOutcome(context.getDialectNodes(), context), ImmutableList.of());
+  public String getName() {
+    return "Copybook processing";
   }
 
-  private void insertHpCopybook(DialectProcessingContext context, CopybookDescriptor descriptor, List<SyntaxError> errors) {
+  private List<CopyNode> insertHpCopybook(String programUri, ExtendedDocument extendedDocument, CopybookDescriptor descriptor, List<SyntaxError> errors) {
     CopybookName copybookName = new CopybookName(descriptor.getName());
-    CopybookModel model = copybookService.resolve(copybookName.toCopybookId(context.getProgramDocumentUri()),
-            copybookName, context.getProgramDocumentUri(),
-            context.getExtendedDocument().getUri(), null)
+    CopybookModel model = copybookService.resolve(copybookName.toCopybookId(extendedDocument.getUri()),
+            copybookName, programUri,
+            extendedDocument.getUri(), null)
         .unwrap(errors::addAll);
 
-    Location nameLocation = new Location(context.getExtendedDocument().getUri(), descriptor.getNameRange());
+    Location nameLocation = new Location(extendedDocument.getUri(), descriptor.getNameRange());
     if (model.getUri() == null) {
       errors.add(SyntaxError.syntaxError()
           .errorSource(ErrorSource.DIALECT)
@@ -94,7 +90,7 @@ public class HpDialect implements CobolDialect {
           .errorCode(ErrorCodes.MISSING_COPYBOOK)
           .location(new OriginalLocation(nameLocation, null))
           .build());
-      return;
+      return ImmutableList.of();
     }
 
     String text = model.getContent();
@@ -111,15 +107,16 @@ public class HpDialect implements CobolDialect {
         }
     );
 
-    context.getExtendedDocument().insertCopybook(descriptor.getStatementRange(), copybook);
+    extendedDocument.insertCopybook(descriptor.getStatementRange(), copybook);
 
     Locality statementLocality = Locality.builder()
-        .copybookId(copybookName.toCopybookId(context.getProgramDocumentUri()).toString())
+        .copybookId(copybookName.toCopybookId(programUri).toString())
         .range(descriptor.getStatementRange())
-        .uri(context.getExtendedDocument().getUri())
+        .uri(extendedDocument.getUri())
         .build();
 
     CopyNode copyNode = new CopyNode(statementLocality, nameLocation, descriptor.getName(), model.getUri());
-    context.getDialectNodes().add(copyNode);
+    return ImmutableList.of(copyNode);
   }
+
 }
