@@ -27,6 +27,7 @@ import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.eclipse.lsp.cobol.common.*;
 import org.eclipse.lsp.cobol.common.benchmark.BenchmarkService;
 import org.eclipse.lsp.cobol.common.benchmark.BenchmarkSession;
+import org.eclipse.lsp.cobol.common.copybook.CopybookService;
 import org.eclipse.lsp.cobol.common.dialects.DialectOutcome;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.dialects.TrueDialectService;
@@ -78,6 +79,7 @@ class CobolLanguageEngineTest {
   private final SymbolsRepository symbolsRepository = mock(SymbolsRepository.class);
   private final CleanerPreprocessor preprocessor = mock(CleanerPreprocessor.class);
   private final CodeLayoutStore store = mock(CodeLayoutStore.class);
+  private final CopybookService copybookService = mock(CopybookService.class);
 
   @Test
   void testLanguageEngineRun() {
@@ -91,7 +93,7 @@ class CobolLanguageEngineTest {
 
     TrueDialectService<AnalysisContext> trueDialectService = new TrueDialectServiceImpl(grammarPreprocessor, mockMessageService, treeListener, mock(SubroutineService.class),
         null,
-        dialectService, astProcessor, symbolsRepository, store);
+        dialectService, astProcessor, symbolsRepository, store, copybookService);
     CobolLanguageEngine engine =
             new CobolLanguageEngine(trueDialectService,
                 mockMessageService,
@@ -169,7 +171,7 @@ class CobolLanguageEngineTest {
 
     TrueDialectService<AnalysisContext> trueDialectService = new TrueDialectServiceImpl(grammarPreprocessor, mockMessageService, treeListener, mock(SubroutineService.class),
         null,
-        dialectService, astProcessor, symbolsRepository, store);
+        dialectService, astProcessor, symbolsRepository, store, copybookService);
     CobolLanguageEngine engine =
         new CobolLanguageEngine(trueDialectService,
             mockMessageService,
