@@ -15,4 +15,3 @@
         PROCEDURE DIVISION.
            EXEC CICS HANDLE ABEND
            END-EXEC.
-.

@@ -762,6 +762,7 @@ procedureSection
 
 sentence
    : statement * (endClause | dialectStatement)
+   | dialectStatement
    ;
 
 paragraph
@@ -2207,7 +2208,7 @@ literal
    : NONNUMERICLITERAL | figurativeConstant | numericLiteral | booleanLiteral | charString | dialectLiteral | utfLiteral | hexadecimalUtfLiteral
    ;
 
-dialectLiteral: dialectNodeFiller+;
+dialectLiteral: dialectNodeFiller+ DOT_FS?;
 
 utfLiteral: U_CHAR NONNUMERICLITERAL;
 
@@ -2244,7 +2245,7 @@ power
    ;
 
 basis
-   : dialectNodeFiller | generalIdentifier | literal | LPARENCHAR arithmeticExpression RPARENCHAR
+   : (dialectNodeFiller DOT_FS?) | generalIdentifier | literal | LPARENCHAR arithmeticExpression RPARENCHAR
    ;
 
 cobolWord
@@ -2263,7 +2264,7 @@ cobolKeywords
    ;
 
 dialectNodeFiller
-    : ZERO_WIDTH_SPACE+
+    : ZERO_WIDTH_SPACE+ DOT_FS? EOF?
     ;
 
 dot_fs
