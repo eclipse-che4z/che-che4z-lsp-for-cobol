@@ -38,6 +38,7 @@ import org.eclipse.lsp.cobol.common.AnalysisConfig;
 import org.eclipse.lsp.cobol.common.AnalysisResult;
 import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
 import org.eclipse.lsp.cobol.common.copybook.SQLBackend;
+import org.eclipse.lsp.cobol.common.dialects.CobolLanguageId;
 import org.eclipse.lsp.cobol.common.model.DefinedAndUsedStructure;
 import org.eclipse.lsp.cobol.common.model.NodeType;
 import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
@@ -135,15 +136,18 @@ public class UseCaseEngine {
    * @return analysis result object
    */
   public AnalysisResult runTest(
-          String text, List<CobolText> copybooks, Map<String, Diagnostic> expectedDiagnostics, String languageId) {
+      String text,
+      List<CobolText> copybooks,
+      Map<String, Diagnostic> expectedDiagnostics,
+      CobolLanguageId languageId) {
     return runTest(text, copybooks, expectedDiagnostics, ImmutableList.of(), languageId);
   }
 
   /**
-   * Check if the language engine applies required syntax and semantic checks. All the semantic
-   * elements in the given text, as well as syntax errors, should be wrapped with according tags.
-   * The same extraction operation applied also for the given copybooks. Copybooks processing
-   * enabled.
+   * Check if the language engine applies required syntax and semantic checks for "cobol"
+   * language id. All the semantic elements in the given text, as well as
+   * syntax errors, should be wrapped with according tags. The same extraction operation applied
+   * also for the given copybooks. Copybooks processing enabled.
    *
    * <p>Expected diagnostics should contain the full of list of syntax and semantic
    * errors/warnings/info messages for the document and copybooks. Existing positions, if they are,
@@ -158,14 +162,14 @@ public class UseCaseEngine {
    */
   public AnalysisResult runTest(
       String text, List<CobolText> copybooks, Map<String, Diagnostic> expectedDiagnostics) {
-    return runTest(text, copybooks, expectedDiagnostics, ImmutableList.of(), "cobol");
+    return runTest(text, copybooks, expectedDiagnostics, ImmutableList.of(), CobolLanguageId.COBOL);
   }
 
   /**
-   * Check if the language engine applies required syntax and semantic checks for "cobol" languageId. All the semantic
-   * elements in the given text, as well as syntax errors, should be wrapped with according tags.
-   * The same extraction operation applied also for the given copybooks. The copybook processing
-   * mode relies on processingMode parameter.
+   * Check if the language engine applies required syntax and semantic checks for "cobol"
+   * languageId. All the semantic elements in the given text, as well as syntax errors, should be
+   * wrapped with according tags. The same extraction operation applied also for the given
+   * copybooks. The copybook processing mode relies on processingMode parameter.
    *
    * <p>Expected diagnostics should contain the full of list of syntax and semantic
    * errors/warnings/info messages for the document and copybooks. Existing positions, if they are,
@@ -180,12 +184,13 @@ public class UseCaseEngine {
    * @return analysis result object
    */
   public AnalysisResult runTest(
-          String text,
-          List<CobolText> copybooks,
-          Map<String, Diagnostic> expectedDiagnostics,
-          List<String> subroutineNames) {
-    return runTest(text, copybooks, expectedDiagnostics, subroutineNames, "cobol");
+      String text,
+      List<CobolText> copybooks,
+      Map<String, Diagnostic> expectedDiagnostics,
+      List<String> subroutineNames) {
+    return runTest(text, copybooks, expectedDiagnostics, subroutineNames, CobolLanguageId.COBOL);
   }
+
   /**
    * Check if the language engine applies required syntax and semantic checks. All the semantic
    * elements in the given text, as well as syntax errors, should be wrapped with according tags.
@@ -210,14 +215,14 @@ public class UseCaseEngine {
       List<CobolText> copybooks,
       Map<String, Diagnostic> expectedDiagnostics,
       List<String> subroutineNames,
-      String languageId) {
+      CobolLanguageId languageId) {
     return runTest(
         text,
         copybooks,
         expectedDiagnostics,
         subroutineNames,
         AnalysisConfig.defaultConfig(CopybookProcessingMode.ENABLED),
-            languageId);
+        languageId);
   }
 
   /**
@@ -242,48 +247,45 @@ public class UseCaseEngine {
    * @return analysis result object
    */
   public AnalysisResult runTest(
-          String text,
-          List<CobolText> copybooks,
-          Map<String, Diagnostic> expectedDiagnostics,
-          List<String> subroutineNames,
-          AnalysisConfig analysisConfig,
-          String languageId) {
+      String text,
+      List<CobolText> copybooks,
+      Map<String, Diagnostic> expectedDiagnostics,
+      List<String> subroutineNames,
+      AnalysisConfig analysisConfig,
+      CobolLanguageId languageId) {
 
-    SQLBackend sqlBackendSetting = Optional.ofNullable(analysisConfig.getDialectsSettings()
-                    .get("target-sql-backend"))
+    SQLBackend sqlBackendSetting =
+        Optional.ofNullable(analysisConfig.getDialectsSettings().get("target-sql-backend"))
             .map(JsonElement::getAsString)
             .map(SQLBackend::valueOf)
             .orElse(SQLBackend.DB2_SERVER);
     PreprocessedDocument document =
-            AnnotatedDocumentCleaning.prepareDocument(
-                    text,
-                    copybooks,
-                    subroutineNames,
-                    expectedDiagnostics,
-                    sqlBackendSetting);
+        AnnotatedDocumentCleaning.prepareDocument(
+            text, copybooks, subroutineNames, expectedDiagnostics, sqlBackendSetting);
     AnalysisResult actual =
-            analyze(
-                    UseCase.builder()
-                            .documentUri(DOCUMENT_URI)
-                            .text(document.getText())
-                            .copybooks(document.getCopybooks())
-                            .subroutines(subroutineNames)
-                            .cicsTranslator(analysisConfig.isCicsTranslatorEnabled())
-                            .copybookProcessingMode(
-                                    analysisConfig.getCopybookProcessingMode())
-                            .dialects(analysisConfig.getDialects())
-                            .sqlBackend(sqlBackendSetting)
-                            .dialectsSettings(analysisConfig.getDialectsSettings())
-                            .compilerOptions(analysisConfig.getCompilerOptions())
-                            .build(), languageId);
+        analyze(
+            UseCase.builder()
+                .documentUri(DOCUMENT_URI)
+                .text(document.getText())
+                .copybooks(document.getCopybooks())
+                .subroutines(subroutineNames)
+                .cicsTranslator(analysisConfig.isCicsTranslatorEnabled())
+                .copybookProcessingMode(analysisConfig.getCopybookProcessingMode())
+                .dialects(analysisConfig.getDialects())
+                .sqlBackend(sqlBackendSetting)
+                .dialectsSettings(analysisConfig.getDialectsSettings())
+                .compilerOptions(analysisConfig.getCompilerOptions())
+                .build(),
+            languageId);
     assertResultEquals(actual, document.getTestData());
     return actual;
   }
+
   /**
-   * Check if the language engine applies required syntax and semantic checks for "cobol". All the semantic
-   * elements in the given text, as well as syntax errors, should be wrapped with according tags.
-   * The same extraction operation applied also for the given copybooks. The copybook configuration
-   * is built from processingMode and sqlBackend parameters.
+   * Check if the language engine applies required syntax and semantic checks for "cobol". All the
+   * semantic elements in the given text, as well as syntax errors, should be wrapped with according
+   * tags. The same extraction operation applied also for the given copybooks. The copybook
+   * configuration is built from processingMode and sqlBackend parameters.
    *
    * <p>Expected diagnostics should contain the full of list of syntax and semantic
    * errors/warnings/info messages for the document and copybooks. Existing positions, if they are,
@@ -305,11 +307,18 @@ public class UseCaseEngine {
       Map<String, Diagnostic> expectedDiagnostics,
       List<String> subroutineNames,
       AnalysisConfig analysisConfig) {
-    return runTest(text, copybooks, expectedDiagnostics, subroutineNames, analysisConfig, "cobol");
+    return runTest(
+        text,
+        copybooks,
+        expectedDiagnostics,
+        subroutineNames,
+        analysisConfig,
+        CobolLanguageId.COBOL);
   }
 
   /**
    * Run test and check only diagnostic, other errors will be ignored
+   *
    * @param text - COBOL text to analyse. It will be cleaned up before analysis to exclude all the
    *     technical tokens and collect syntax and semantic elements
    * @param copybooks - list of the copybooks used in the document
@@ -320,23 +329,21 @@ public class UseCaseEngine {
    *     analysis
    * @return analysis result object
    */
-  public AnalysisResult runTestForDiagnostics(String text,
-                                    List<CobolText> copybooks,
-                                    Map<String, Diagnostic> expectedDiagnostics,
-                                    List<String> subroutineNames,
-                                    AnalysisConfig analysisConfig) {
-    SQLBackend sqlBackendSetting = Optional.ofNullable(analysisConfig.getDialectsSettings().get("target-sql-backend"))
+  public AnalysisResult runTestForDiagnostics(
+      String text,
+      List<CobolText> copybooks,
+      Map<String, Diagnostic> expectedDiagnostics,
+      List<String> subroutineNames,
+      AnalysisConfig analysisConfig) {
+    SQLBackend sqlBackendSetting =
+        Optional.ofNullable(analysisConfig.getDialectsSettings().get("target-sql-backend"))
             .map(JsonElement::getAsString)
             .map(SQLBackend::valueOf)
             .orElse(SQLBackend.DB2_SERVER);
 
     PreprocessedDocument document =
         AnnotatedDocumentCleaning.prepareDocument(
-            text,
-            copybooks,
-            subroutineNames,
-            expectedDiagnostics,
-                sqlBackendSetting);
+            text, copybooks, subroutineNames, expectedDiagnostics, sqlBackendSetting);
     AnalysisResult actual =
         analyze(
             UseCase.builder()
@@ -345,8 +352,7 @@ public class UseCaseEngine {
                 .copybooks(document.getCopybooks())
                 .subroutines(subroutineNames)
                 .cicsTranslator(analysisConfig.isCicsTranslatorEnabled())
-                .copybookProcessingMode(
-                    analysisConfig.getCopybookProcessingMode())
+                .copybookProcessingMode(analysisConfig.getCopybookProcessingMode())
                 .dialects(analysisConfig.getDialects())
                 .dialectsSettings(analysisConfig.getDialectsSettings())
                 .build());
@@ -414,18 +420,18 @@ public class UseCaseEngine {
       Function<DefinedAndUsedStructure, List<Location>> extractor) {
 
     return result
-            .getRootNode()
-            .getDepthFirstStream()
-            .filter(hasType(PROGRAM))
-            .map(ProgramNode.class::cast)
-            .map(p -> result.getSymbolTableMap().get(SymbolTable.generateKey(p)))
-            .filter(Objects::nonNull)
-            .map(SymbolTable::getVariables)
-            .map(Multimap::values)
-            .flatMap(Collection::stream)
-            .filter(it -> !FILLER_NAME.equals(it.getName()))
-            .filter(predicate)
-            .collect(toMap(extractor, PROGRAM));
+        .getRootNode()
+        .getDepthFirstStream()
+        .filter(hasType(PROGRAM))
+        .map(ProgramNode.class::cast)
+        .map(p -> result.getSymbolTableMap().get(SymbolTable.generateKey(p)))
+        .filter(Objects::nonNull)
+        .map(SymbolTable::getVariables)
+        .map(Multimap::values)
+        .flatMap(Collection::stream)
+        .filter(it -> !FILLER_NAME.equals(it.getName()))
+        .filter(predicate)
+        .collect(toMap(extractor, PROGRAM));
   }
 
   private Map<String, List<Location>> extractDefinitions(AnalysisResult result, NodeType nodeType) {
@@ -439,7 +445,11 @@ public class UseCaseEngine {
   }
 
   private Map<String, List<Location>> extractUsages(AnalysisResult result, NodeType nodeType) {
-    return extract(result, nodeType, DefinedAndUsedStructure::getUsages, context -> !context.getUsages().isEmpty());
+    return extract(
+        result,
+        nodeType,
+        DefinedAndUsedStructure::getUsages,
+        context -> !context.getUsages().isEmpty());
   }
 
   private Map<String, List<Location>> extract(
@@ -457,7 +467,7 @@ public class UseCaseEngine {
   }
 
   private Collector<DefinedAndUsedStructure, ?, Map<String, List<Location>>> toMap(
-          Function<DefinedAndUsedStructure, List<Location>> extractor, NodeType nodeType) {
+      Function<DefinedAndUsedStructure, List<Location>> extractor, NodeType nodeType) {
     return Collectors.toMap(
         ctx -> {
           if (nodeType != COPY) {
