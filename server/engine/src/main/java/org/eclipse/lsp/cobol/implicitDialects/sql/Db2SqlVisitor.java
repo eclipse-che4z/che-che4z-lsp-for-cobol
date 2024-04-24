@@ -21,6 +21,8 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -57,6 +59,7 @@ class Db2SqlVisitor extends Db2SqlParserBaseVisitor<List<Node>> {
 
   private final DialectProcessingContext context;
   private final MessageService messageService;
+  private static final Pattern DOUBLE_DASH_SQL_COMMENT = Pattern.compile("--\\s[^\\r\\n]*", Pattern.MULTILINE);
 
   @Getter private final List<SyntaxError> errors = new LinkedList<>();
 
@@ -122,9 +125,41 @@ class Db2SqlVisitor extends Db2SqlParserBaseVisitor<List<Node>> {
   @Override
   public List<Node> visitSqlCode(Db2SqlParser.SqlCodeContext ctx) {
     //    String intervalText = VisitorHelper.getIntervalText(ctx);
-    List<Node> nodes = this.visitStartSqlRule(parseSQL(ctx));
+    String sqlCode = preProcessSqlComment(ctx);
+    List<Node> nodes = this.visitStartSqlRule(parseSQL(sqlCode, ctx));
     Db2SqlVisitorHelper.adjustNodeLocations(ctx, context, nodes);
     return nodes;
+  }
+
+  private String preProcessSqlComment(Db2SqlParser.SqlCodeContext ctx) {
+    String sqlCode = VisitorHelper.getIntervalText(ctx);
+    Matcher matcher = DOUBLE_DASH_SQL_COMMENT.matcher(sqlCode);
+    while (matcher.find()) {
+      Position start = findPosition(sqlCode, matcher.start());
+      Position end = findPosition(sqlCode, matcher.end() - 1);
+      String replace = StringUtils.repeat(CobolDialect.FILLER, matcher.end() - matcher.start() - 1);
+      start = Db2SqlVisitorHelper.getAdjustedStartPosition(ctx, start);
+      end = Db2SqlVisitorHelper.getAdjustedEndPosition(ctx, end);
+      context.getExtendedDocument().replace(new Range(start, end), replace);
+    }
+    sqlCode = matcher.replaceAll("");
+    return sqlCode;
+  }
+
+  private static Position findPosition(String text, int pos) {
+    int c = 1;
+    int line = 0;
+    int col = 1;
+    while (c <= pos) {
+      if (text.charAt(c) == '\n') {
+        ++line;
+        col = 1;
+      } else {
+        ++col;
+      }
+      c++;
+    }
+    return new Position(line, col);
   }
 
   @Override
@@ -152,8 +187,7 @@ class Db2SqlVisitor extends Db2SqlParserBaseVisitor<List<Node>> {
     return addTreeNode(ctx, Db2DataAndProcedureDivisionNode::new);
   }
 
-  private Db2SqlParser.StartSqlRuleContext parseSQL(Db2SqlParser.SqlCodeContext sqlCodeContext) {
-    String sqlCode = VisitorHelper.getIntervalText(sqlCodeContext);
+  private Db2SqlParser.StartSqlRuleContext parseSQL(String sqlCode, Db2SqlParser.SqlCodeContext sqlCodeContext) {
     Db2SqlLexer lexer = new Db2SqlLexer(CharStreams.fromString(sqlCode));
     CommonTokenStream tokens = new CommonTokenStream(lexer);
     Db2SqlParser parser = new Db2SqlParser(tokens);
