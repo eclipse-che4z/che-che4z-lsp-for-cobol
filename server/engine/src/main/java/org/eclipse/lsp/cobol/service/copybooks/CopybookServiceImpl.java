@@ -78,13 +78,17 @@ public class CopybookServiceImpl implements CopybookService {
   }
 
   @Override
-  public void invalidateCache() {
+  public void invalidateCache(boolean onlyNonImplicit) {
     LOG.debug("Copybooks for downloading: {}", copybooksForDownloading);
     LOG.debug("Copybook cache: {}", copybookCache);
     LOG.debug("Cache invalidated");
     copybookUsage.clear();
     copybooksForDownloading.clear();
-    copybookCache.invalidateAll();
+    if (onlyNonImplicit) {
+      copybookCache.invalidateAllNonImplicit();
+    } else {
+      copybookCache.invalidateAll();
+    }
   }
 
   /**
@@ -180,9 +184,10 @@ public class CopybookServiceImpl implements CopybookService {
   }
 
   private Optional<CopybookModel> tryResolvePredefinedCopybook(CopybookName copybookName) {
-    CopybookId copybookId = copybookName.toCopybookId(ImplicitCodeUtils.createFullUrl(copybookName.getDisplayName()));
+    CopybookName predefineCopybookName = new CopybookName(copybookName.getDisplayName().toUpperCase(), copybookName.getDialectType(), copybookName.getExtension());
+    CopybookId copybookId = predefineCopybookName.toCopybookId(ImplicitCodeUtils.createFullUrl(predefineCopybookName.getDisplayName()));
     try {
-      CopybookModel copybookModel = copybookCache.get(copybookId, () -> new CopybookModel(copybookId, copybookName, null, null));
+      CopybookModel copybookModel = copybookCache.get(copybookId, () -> new CopybookModel(copybookId, predefineCopybookName, null, null));
       if (copybookModel.getContent() == null || copybookModel.getUri() == null) return Optional.empty();
       return Optional.of(copybookModel);
     } catch (ExecutionException e) {
@@ -271,7 +276,6 @@ public class CopybookServiceImpl implements CopybookService {
     LOG.debug("Copybooks expecting downloading: {}", copybooksForDownloading);
     Set<String> uris = new HashSet<>(copybookUris);
     uris.add(documentUri);
-    String document = files.getNameFromURI(documentUri);
 
     if (processingMode.download) {
       List<CopybookName> copybooksToDownload =
@@ -283,8 +287,7 @@ public class CopybookServiceImpl implements CopybookService {
               .collect(toList());
       LOG.debug("Copybooks to download: {}", copybooksToDownload);
       if (!copybooksToDownload.isEmpty()) {
-        clientProvider.get().downloadCopybooks(
-            document,
+        clientProvider.get().downloadCopybooks(documentUri,
             copybooksToDownload.stream().map(CopybookName::getQualifiedName).collect(toList()),
             Optional.ofNullable(copybooksToDownload.stream().findFirst().get().getDialectType()).orElse(COBOL), //NOSONAR
             !processingMode.userInteraction);

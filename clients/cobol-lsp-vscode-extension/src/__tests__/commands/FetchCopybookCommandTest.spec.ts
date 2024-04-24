@@ -21,25 +21,27 @@ import { TelemetryService } from "../../services/reporter/TelemetryService";
 import { Utils } from "../../services/util/Utils";
 
 jest.mock("../../services/reporter/TelemetryService");
-jest.mock("../../services/copybook/CopybookDownloadService");
-Utils.getZoweExplorerAPI = jest.fn();
+Utils.getZoweExplorerAPI = jest.fn().mockReturnValue({ api: {} });
 
-const copybookDownloadService: CopybookDownloadService =
-  new CopybookDownloadService();
 const copybook: string = "cobyBookTest";
 const progName: string = "progNameTest";
 
-test("Test fetchCopybookCommand calls telementry services and coprbook download service with proper input", () => {
+test("Test fetchCopybookCommand calls telementry services and copybook download service with proper input", async () => {
+  const copybookDownloadService: CopybookDownloadService =
+    new CopybookDownloadService(
+      "./storage-path",
+      {} as any as IApiRegisterClient,
+    );
+  copybookDownloadService.downloadCopybooks = jest.fn();
   expect(fetchCopybookCommand).toBeTruthy();
   fetchCopybookCommand(copybook, copybookDownloadService, progName);
-  expect(TelemetryService.registerEvent).toBeCalledWith(
+  expect(TelemetryService.registerEvent).toHaveBeenCalledWith(
     "Fetch copybook",
     ["COBOL", "copybook", "quickfix"],
     "The user tries to resolve a copybook that is not currently found",
   );
-  expect(copybookDownloadService.downloadCopybooks).toBeCalledWith(
+  expect(copybookDownloadService.downloadCopybooks).toHaveBeenCalledWith(
     progName,
     [new CopybookName(copybook, "COBOL")],
-    false,
   );
 });

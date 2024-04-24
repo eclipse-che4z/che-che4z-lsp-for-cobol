@@ -36,6 +36,9 @@
           "include": "#picture"
         },
         {
+          "include": "#db2-host-var-definition"
+        },
+        {
           "include": "#cobol-keywords"
         },
         {
@@ -142,6 +145,21 @@
       "endCaptures": {
         "0": {
           "name": "string.quoted.cics.cobol"
+        }
+      }
+    },
+    "db2-host-var-definition": {
+      "name": "sql.embedded.code",
+      "begin": "(?i:\\s+SQL\\s+TYPE\\s+IS)",
+      "beginCaptures": {
+        "0": {
+          "name": "keyword.cobol"
+        }
+      },
+      "end": "\\.",
+      "endCaptures": {
+        "0": {
+          "name": "source.cobol"
         }
       }
     },

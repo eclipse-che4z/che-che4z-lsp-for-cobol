@@ -16,6 +16,7 @@ package org.eclipse.lsp.cobol.cfg;
 
 import org.eclipse.lsp.cobol.common.model.tree.*;
 import org.eclipse.lsp.cobol.common.model.tree.statements.StatementNode;
+import org.eclipse.lsp.cobol.common.model.tree.variable.VariableUsageNode;
 import org.eclipse.lsp.cobol.common.model.variables.DivisionType;
 import org.eclipse.lsp.cobol.core.model.extendedapi.*;
 import org.eclipse.lsp.cobol.implicitDialects.cics.nodes.ExecCicsHandleNode;
@@ -31,8 +32,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static java.util.stream.Collectors.toList;
+import static org.eclipse.lsp.cobol.common.model.NodeType.*;
 import static org.eclipse.lsp.cobol.common.model.tree.Node.hasType;
-import static org.eclipse.lsp.cobol.common.model.NodeType.PROGRAM;
 
 /** CF tree builder implementation */
 public class CFASTBuilderImpl implements CFASTBuilder {
@@ -127,7 +128,30 @@ public class CFASTBuilderImpl implements CFASTBuilder {
     } else if (node instanceof UseForDebuggingNode) {
       addChild(parent, new CFASTNode(CFASTNodeType.USE_FOR_DEBUGGING.getValue(), convertLocation(node)));
     } else if (node instanceof ExecCicsHandleNode) {
-      addChild(parent, new CFASTNode(CFASTNodeType.EXEC_CICS_HANDLE.getValue(), convertLocation(node)));
+      ExecCicsHandleNode.HandleAbendType type = ((ExecCicsHandleNode) node).getType();
+      String value;
+
+      switch (type) {
+        case PROGRAM:
+          value = node.getDepthFirstStream().filter(n -> n.getNodeType() == VARIABLE_USAGE)
+              .findFirst()
+              .map(VariableUsageNode.class::cast)
+              .map(VariableUsageNode::getName)
+              .orElse(null);
+          break;
+        case LABEL:
+          value = node.getDepthFirstStream().filter(n -> n.getNodeType() == CODE_BLOCK_USAGE)
+              .findFirst()
+              .map(CodeBlockUsageNode.class::cast)
+              .map(CodeBlockUsageNode::getName)
+              .orElse(null);
+          break;
+        default:
+          value = null;
+          break;
+      }
+
+      addChild(parent, new HandleAbend(convertLocation(node), type.toString(), value));
       node.getChildren().forEach(child -> traverse(parent, child));
       addChild(parent, new CFASTNode(CFASTNodeType.END_EXEC.getValue(), convertLocation(node)));
     } else if (node instanceof ExecSqlNode) {
@@ -135,7 +159,13 @@ public class CFASTBuilderImpl implements CFASTBuilder {
       node.getChildren().forEach(child -> traverse(parent, child));
       addChild(parent, new CFASTNode(CFASTNodeType.END_EXEC.getValue(), convertLocation(node)));
     } else if (node instanceof ExecSqlWheneverNode) {
-      addChild(parent, new CFASTNode(CFASTNodeType.EXEC_SQL_WHENEVER.getValue(), convertLocation(node)));
+      ExecSqlWheneverNode wheneverNode = (ExecSqlWheneverNode) node;
+      SqlWhenever cfastNode = new SqlWhenever(convertLocation(node),
+          wheneverNode.getWheneverConditionType().name(),
+          wheneverNode.getWheneverType().name(),
+          wheneverNode.getValue());
+
+      addChild(parent, cfastNode);
       node.getChildren().forEach(child -> traverse(parent, child));
       addChild(parent, new CFASTNode(CFASTNodeType.END_EXEC.getValue(), convertLocation(node)));
     } else if (node instanceof StopNode) {

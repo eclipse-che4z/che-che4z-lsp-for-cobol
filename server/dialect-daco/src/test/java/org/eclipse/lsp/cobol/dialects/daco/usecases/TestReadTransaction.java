@@ -24,7 +24,7 @@ import org.junit.jupiter.api.Test;
 class TestReadTransaction {
   private static final String TEXT =
       "       IDENTIFICATION DIVISION.\n"
-          + "       PROGRAM-ID.    TEST.\n"
+          + "       PROGRAM-ID.    TEST1.\n"
           + "       PROCEDURE DIVISION.\n"
           + "       {#*FOO}.\n"
           + "       READ TRANSACTION\n"

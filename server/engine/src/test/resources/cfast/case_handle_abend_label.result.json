@@ -1,0 +1,65 @@
+[
+  {
+    "name": "CBACT01C",
+    "type": "program",
+    "location": {
+      "uri": "fake/path",
+      "start": {
+        "line": 19,
+        "character": 9
+      },
+      "end": {
+        "line": 22,
+        "character": 22
+      }
+    },
+    "children": [
+      {
+        "handleType": "LABEL",
+        "value": "SEC1",
+        "type": "execcicshandle",
+        "location": {
+          "uri": "fake/path",
+          "start": {
+            "line": 20,
+            "character": 12
+          },
+          "end": {
+            "line": 21,
+            "character": 21
+          }
+        }
+      },
+      {
+        "type": "endexec",
+        "location": {
+          "uri": "fake/path",
+          "start": {
+            "line": 20,
+            "character": 12
+          },
+          "end": {
+            "line": 21,
+            "character": 21
+          }
+        }
+      },
+      {
+        "name": "SEC1",
+        "snippet": "SEC1 SECTION.",
+        "type": "section",
+        "location": {
+          "uri": "fake/path",
+          "start": {
+            "line": 22,
+            "character": 9
+          },
+          "end": {
+            "line": 22,
+            "character": 22
+          }
+        }
+      }
+    ]
+  }
+]

@@ -17,15 +17,15 @@ package org.eclipse.lsp.cobol.dialects.idms.usecases;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.dialects.idms.utils.DialectConfigs;
-import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.eclipse.lsp.cobol.dialects.idms.utils.Fixtures;
+import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.junit.jupiter.api.Test;
 
 /** This test checks that the IDMS READY statement is parsed correctly after the IF statement */
 class TestIdmsReadyAfterIfNotProducesError {
   private static final String TEXT =
       "       identification division.\n"
-          + "       program-id. test.\n"
+          + "       program-id. test1.\n"
           + "       data division.\n"
           + "       working-storage section.\n"
           + "       01 {$*AN-IDMS-AREA}     USAGE IS POINTER.\n"

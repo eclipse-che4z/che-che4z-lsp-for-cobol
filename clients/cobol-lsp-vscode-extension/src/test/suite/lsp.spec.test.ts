@@ -554,7 +554,7 @@ suite("Integration Test Suite", function () {
     await helper.showDocument(copybookPath);
 
     await helper.waitFor(
-      () => vscode.languages.getDiagnostics(copybookUri).length === 1,
+      () => vscode.languages.getDiagnostics(copybookUri).length === 2,
     );
     copyDiagnostics = vscode.languages.getDiagnostics(copybookUri);
     assert.strictEqual(
@@ -686,7 +686,7 @@ suite("Integration Test Suite", function () {
     const extSrcPath = path.join("testing", "REPLERR");
     await helper.showDocument(extSrcPath);
     await helper.waitFor(
-      () => vscode.languages.getDiagnostics(editor.document.uri).length > 1,
+      () => vscode.languages.getDiagnostics(editor.document.uri).length === 1,
     );
     const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
     helper.assertRangeIsEqual(

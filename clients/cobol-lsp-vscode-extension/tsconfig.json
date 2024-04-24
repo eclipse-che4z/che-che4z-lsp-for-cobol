@@ -14,7 +14,7 @@
 
 {
   "compilerOptions": {
-    "types": ["node", "jest", "mocha"],
+    "types": ["node", "jest", "mocha", "assert"],
     "target": "ES2017",
     "skipLibCheck": true,
     "strictNullChecks": true,
@@ -25,12 +25,12 @@
     "strictPropertyInitialization": true,
     "alwaysStrict": true,
     "strict": true,
-    "lib": ["es6"],
+    "lib": ["es6", "es2020"],
     "module": "commonjs",
     "moduleResolution": "node",
     "outDir": "out",
     "sourceMap": true,
     "resolveJsonModule": true
   },
-  "exclude": ["node_modules", "server", ".vscode-test"]
+  "exclude": ["node_modules", "server", ".vscode-test", ".vscode-test-web"]
 }

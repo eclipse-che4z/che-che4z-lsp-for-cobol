@@ -189,7 +189,7 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
       TimeUnit.MILLISECONDS.sleep(100);
     } while (analysisInProgress);
 
-    copybookService.invalidateCache();
+    copybookService.invalidateCache(true);
     subroutineService.invalidateCache();
     LOG.info("Cache invalidated");
     openDocuments

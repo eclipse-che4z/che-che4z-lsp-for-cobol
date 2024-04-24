@@ -393,6 +393,7 @@ WS : [ \t\f]+ -> channel(HIDDEN);
 COMPILERLINE : DOUBLEMORETHANCHAR ~('\n' | '\r')* -> channel(HIDDEN);
 // period full stopPosition
 DOT_FS : '.' EOF?;
+DOT : '.';
 
 LEVEL_NUMBER : ([1-9])|([0][1-9])|([1234][0-9]);
 LEVEL_NUMBER_66 : '66';

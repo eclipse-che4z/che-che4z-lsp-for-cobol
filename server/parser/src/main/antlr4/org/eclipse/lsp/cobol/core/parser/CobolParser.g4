@@ -417,7 +417,7 @@ fileDescriptionEntry
    ;
 
 fileDescriptionEntryClauses
-   : (FD | SD) cobolWord (DOT_FS? fileDescriptionEntryClause)* dot_fs   ;
+   : (FD | SD) cobolWord fileDescriptionEntryClause* dot_fs   ;
 
 fileDescriptionEntryClause
    : externalClause | globalClause | blockContainsClause | recordContainsClause | labelRecordsClause | valueOfClause | dataRecordsClause | linageClause | codeSetClause | reportClause | recordingModeClause
@@ -762,6 +762,7 @@ procedureSection
 
 sentence
    : statement * (endClause | dialectStatement)
+   | dialectStatement
    ;
 
 paragraph
@@ -783,8 +784,35 @@ statement
     initiateStatement | inspectStatement | mergeStatement | moveStatement | multiplyStatement | openStatement | performStatement | purgeStatement |
     readStatement | readyResetTraceStatement | receiveStatement | releaseStatement | returnStatement | rewriteStatement | searchStatement | sendStatement |
     serviceReloadStatement | serviceLabelStatement | setStatement | sortStatement | startStatement | stopStatement | stringStatement | subtractStatement |
-    terminateStatement | unstringStatement | writeStatement | xmlParseStatement | jsonStatement
+    terminateStatement | unstringStatement | writeStatement | xmlParseStatement | jsonStatement | xmlGenerate
    ;
+
+xmlGenerate
+    : XML GENERATE xmlGenIdentifier1 FROM xmlGenIdentifier2
+    (COUNT IN? xmlGenIdentifier3)?
+    (WITH? ENCODING integerLiteral)? (WITH? XML_DECLARATION)? (WITH? ATTRIBUTES)?
+    (NAMESPACE IS? (xmlGenIdentifier4 | literal))? (NAMESPACE_PREFIX IS? (xmlGenIdentifier5 | literal))?
+    (NAME OF? (xmlGenIdentifier6 IS? literal)+)?
+    (TYPE OF? (xmlGenIdentifier7 IS? (ATTRIBUTE | ELEMENT | CONTENT))+)?
+    (SUPPRESS ((xmlGenIdentifier8 when_phrase?) | generic_suppression_phrase)+)?
+    onExceptionClause? notOnExceptionClause? END_XML?
+    ;
+
+xmlGenIdentifier1: qualifiedDataName;
+
+xmlGenIdentifier2: qualifiedDataName;
+
+xmlGenIdentifier3: qualifiedDataName;
+
+xmlGenIdentifier4: qualifiedDataName;
+
+xmlGenIdentifier5: qualifiedDataName;
+
+xmlGenIdentifier6: qualifiedDataName;
+
+xmlGenIdentifier7: qualifiedDataName;
+
+xmlGenIdentifier8: qualifiedDataName;
 
 jsonStatement
     : jsonParse | jsonGenerate
@@ -837,7 +865,9 @@ jsonGenIdentifier6: qualifiedDataName;
 
 when_phrase: WHEN  json_phrases (OR? (json_phrases))*;
 
-generic_suppression_phrase: (EVERY (NUMERIC | NONNUMERIC))? when_phrase;
+generic_suppression_phrase: (EVERY ((NUMERIC generic_suppression_arguments?) | (NONNUMERIC generic_suppression_arguments?) |  generic_suppression_arguments))? when_phrase;
+
+generic_suppression_arguments : ATTRIBUTE | CONTENT | ELEMENT;
 
 json_phrases: ZERO | ZEROES | ZEROS | SPACE | SPACES | LOW_VALUE | LOW_VALUES | HIGH_VALUE | HIGH_VALUES;
 
@@ -2178,7 +2208,7 @@ literal
    : NONNUMERICLITERAL | figurativeConstant | numericLiteral | booleanLiteral | charString | dialectLiteral | utfLiteral | hexadecimalUtfLiteral
    ;
 
-dialectLiteral: dialectNodeFiller+;
+dialectLiteral: dialectNodeFiller+ DOT_FS?;
 
 utfLiteral: U_CHAR NONNUMERICLITERAL;
 
@@ -2215,25 +2245,25 @@ power
    ;
 
 basis
-   : dialectNodeFiller | generalIdentifier | literal | LPARENCHAR arithmeticExpression RPARENCHAR
+   : (dialectNodeFiller DOT_FS?) | generalIdentifier | literal | LPARENCHAR arithmeticExpression RPARENCHAR
    ;
 
 cobolWord
-   : IDENTIFIER | SYMBOL | INTEGER | CHANNEL | PROCESS | REMOVE | WAIT | ANY | LIST | NAME | THREAD | U_CHAR
-   | cobolKeywords
+   : IDENTIFIER | SYMBOL | INTEGER | ELEMENT | CHANNEL | PROCESS | REMOVE | WAIT | NAMESPACE_PREFIX | NAMESPACE
+   | ATTRIBUTES | ATTRIBUTE | ANY | LIST | NAME | THREAD | U_CHAR | TYPE
+   | allowedCobolKeywords
    ;
 
-cobolKeywords
-   : ADDRESS | BOTTOM | COUNT | CR | FIELD | FIRST | MMDDYYYY | PRINTER | DAY | TIME | DATE | DAY_OF_WEEK
-   | REMARKS | RESUME | TIMER | TODAYS_DATE | TODAYS_NAME | TOP | YEAR | YYYYDDD | YYYYMMDD | WHEN_COMPILED
+allowedCobolKeywords
+   : CR | FIELD | MMDDYYYY | PRINTER | DAY_OF_WEEK
+   | REMARKS | RESUME | TIMER | TODAYS_DATE | TODAYS_NAME | YEAR | YYYYDDD | YYYYMMDD | WHEN_COMPILED
    | DISK | KEYBOARD | PORT | READER | REMOTE | VIRTUAL | LIBRARY | DEFINITION | PARSE | BOOL | ESCAPE | INITIALIZED
-   | LOC | BYTITLE | BYFUNCTION | ABORT | ORDERLY | ASSOCIATED_DATA | ASSOCIATED_DATA_LENGTH | CLOSE | CURRENCY
-   | DATA | DBCS | EXIT | EXTEND | INITIAL | NATIONAL | OBJECT | OFF | QUOTE | SEPARATE | SEQUENCE
-   | SERVICE | STANDARD | SUPPRESS | TERMINAL | TEST | VOLATILE
+   | LOC | BYTITLE | BYFUNCTION | ABORT | ORDERLY | ASSOCIATED_DATA | ASSOCIATED_DATA_LENGTH
+   | VOLATILE
    ;
 
 dialectNodeFiller
-    : ZERO_WIDTH_SPACE+
+    : ZERO_WIDTH_SPACE+ DOT_FS? EOF?
     ;
 
 dot_fs

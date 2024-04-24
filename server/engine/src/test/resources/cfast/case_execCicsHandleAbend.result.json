@@ -15,6 +15,7 @@
     },
     "children": [
       {
+        "handleType": "CANCEL",
         "type": "execcicshandle",
         "location": {
           "uri": "fake/path",

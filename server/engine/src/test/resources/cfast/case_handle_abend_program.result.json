@@ -1,0 +1,49 @@
+[
+  {
+    "name": "CBACT01C",
+    "type": "program",
+    "location": {
+      "uri": "fake/path",
+      "start": {
+        "line": 19,
+        "character": 9
+      },
+      "end": {
+        "line": 22,
+        "character": 8
+      }
+    },
+    "children": [
+      {
+        "handleType": "PROGRAM",
+        "value": "PRG",
+        "type": "execcicshandle",
+        "location": {
+          "uri": "fake/path",
+          "start": {
+            "line": 20,
+            "character": 12
+          },
+          "end": {
+            "line": 21,
+            "character": 21
+          }
+        }
+      },
+      {
+        "type": "endexec",
+        "location": {
+          "uri": "fake/path",
+          "start": {
+            "line": 20,
+            "character": 12
+          },
+          "end": {
+            "line": 21,
+            "character": 21
+          }
+        }
+      }
+    ]
+  }
+]

@@ -157,16 +157,42 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
+  buildWeb:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Unit Test COBOL LS Web extension
+        working-directory: clients/cobol-lsp-vscode-extension
+        run: |
+          npm ci
+          npm run test:web
+      - name: Package COBOL LS vsix for Web
+        working-directory: clients/cobol-lsp-vscode-extension
+        run: |
+          npm ci
+          npm run package:web
+          cp *.vsix ../../.
+      - name: Upload Web vsix
+        uses: actions/upload-artifact@v3
+        with:
+          if-no-files-found: warn
+          name: vsix-cobol-language-support-web
+          path: 'cobol-language-support-web*.vsix'
+
   buildNative:
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-latest, macos-11, ubuntu-latest]
+        os: [windows-latest, ubuntu-latest]
         arch: [x64, arm64]
         include:
           - os: ubuntu-latest
             arch: x64
             container: alpine:3.17
+          - os: macos-14-large
+            arch: x64
+          - os: macos-14-xlarge
+            arch: arm64
     runs-on: ${{ matrix.os }}
     needs: [generateNativeConfig]
     steps:
@@ -175,18 +201,18 @@ jobs:
         if: matrix.os == 'windows-latest'
         run: echo "target=win32-${{ matrix.arch }}" >> $env:GITHUB_ENV
       - shell: sh
-        if: matrix.os == 'macos-11'
+        if: startsWith( matrix.os, 'macos-14')
         run: echo "target=darwin-${{ matrix.arch }}" >> $GITHUB_ENV
       - shell: sh
         if: matrix.os == 'ubuntu-latest'
         run: echo "target=linux-${{ matrix.arch }}" >> $GITHUB_ENV
 
       # Setup envierment
-      - name: switch xcode to 12.5.1
-        if: matrix.os == 'macos-11'
-        run: |
-          sudo xcode-select -s /Applications/Xcode_12.5.1.app/Contents/Developer
-          xcodebuild -version
+#      - name: switch xcode to 12.5.1
+#        if: matrix.os == 'macos-11'
+#        run: |
+#          sudo xcode-select -s /Applications/Xcode_12.5.1.app/Contents/Developer
+#          xcodebuild -version
       - uses: al-cheb/configure-pagefile-action@v1.2
         if: matrix.os == 'windows-latest'
         with:
@@ -261,12 +287,16 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-latest, macos-11, ubuntu-latest]
+        os: [windows-latest, ubuntu-latest]
         arch: [x64, arm64]
         include:
           - os: ubuntu-latest
             arch: x64
             container: alpine:3.17
+          - os: macos-14-large
+            arch: x64
+          - os: macos-14-xlarge
+            arch: arm64
     runs-on: ${{ matrix.os }}
     needs: [buildNative,buildPlatformIndependedPart]
     steps:
@@ -275,7 +305,7 @@ jobs:
         if: matrix.os == 'windows-latest'
         run: echo "target=win32-${{ matrix.arch }}" >> $env:GITHUB_ENV
       - shell: sh
-        if: matrix.os == 'macos-11'
+        if: startsWith( matrix.os, 'macos-14')
         run: echo "target=darwin-${{ matrix.arch }}" >> $GITHUB_ENV
       - shell: sh
         if: matrix.os == 'ubuntu-latest'

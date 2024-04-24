@@ -20,7 +20,7 @@ import { globSync } from "glob";
 import { Uri } from "vscode";
 import {
   backwardSlashRegex,
-  cleanWorkspaceFolder,
+  cleanWorkspaceFolderName,
   normalizePath,
 } from "./util/FSUtils";
 
@@ -52,7 +52,7 @@ export function loadProcessorGroupCopybookPathsConfig(
     .map((folder) =>
       globSync(
         config.map((ele) => ele.replace(backwardSlashRegex, "/")),
-        { cwd: cleanWorkspaceFolder(folder) },
+        { cwd: cleanWorkspaceFolderName(folder) },
       ).map((s) => normalizePath(s)),
     )
     .reduce((acc, curVal) => {

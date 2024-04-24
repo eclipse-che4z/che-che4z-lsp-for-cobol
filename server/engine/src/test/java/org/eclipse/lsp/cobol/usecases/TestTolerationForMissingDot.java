@@ -43,7 +43,7 @@ public class TestTolerationForMissingDot {
           + "       {DATA|8} DIVISION\n"
           + "        {FILE|9} SECTION\n"
           + "        {WORKING-STORAGE|10} SECTION\n"
-          + "        {01|11} {$*test}.\n"
+          + "        {01|11} {$*test1}.\n"
           + "           05 {$*testa} pic x\n"
           + "        {LINKAGE|12} SECTION\n"
           + "       {PROCEDURE|13} DIVISION\n"

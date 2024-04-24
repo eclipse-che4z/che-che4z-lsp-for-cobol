@@ -14,7 +14,15 @@
  */
 package org.eclipse.lsp.cobol.core.visitor;
 
+import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.toList;
+import static org.eclipse.lsp.cobol.common.OutlineNodeNames.FILLER_NAME;
+import static org.eclipse.lsp.cobol.core.CobolDataDivisionParser.*;
+
 import com.google.common.collect.ImmutableList;
+import java.util.*;
+import java.util.function.Function;
+import javax.annotation.Nonnull;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.RuleContext;
@@ -24,21 +32,12 @@ import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
-import org.eclipse.lsp.cobol.core.CobolDataDivisionParser;
-import org.eclipse.lsp.cobol.common.model.tree.variable.ValueInterval;
 import org.eclipse.lsp.cobol.common.model.tree.variable.UsageFormat;
+import org.eclipse.lsp.cobol.common.model.tree.variable.ValueInterval;
+import org.eclipse.lsp.cobol.core.CobolDataDivisionParser;
 import org.eclipse.lsp.cobol.core.CobolParser;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
-
-import javax.annotation.Nonnull;
-import java.util.*;
-import java.util.function.Function;
-
-import static java.util.Optional.ofNullable;
-import static java.util.stream.Collectors.toList;
-import static org.eclipse.lsp.cobol.core.CobolDataDivisionParser.*;
-import static org.eclipse.lsp.cobol.common.OutlineNodeNames.FILLER_NAME;
 
 /** Utility class for visitor and delegates classes with useful methods */
 @Slf4j
@@ -86,7 +85,7 @@ public class VisitorHelper {
    * @param stop is end position
    * @return Locality with interval position
    */
-  static Locality getIntervalPosition(Locality start, Locality stop) {
+  public static Locality getIntervalPosition(Locality start, Locality stop) {
     return Locality.builder()
         .uri(start.getUri())
         .range(new Range(start.getRange().getStart(), stop.getRange().getEnd()))
@@ -290,8 +289,8 @@ public class VisitorHelper {
    * @param children list of child nodes of the parser rule
    * @return a node for semantic analysis
    */
-  static Function<Locality, List<Node>> constructNode(
-      Function<Locality, Node> nodeConstructor, List<Node> children) {
+  public static Function<Locality, List<Node>> constructNode(
+          Function<Locality, Node> nodeConstructor, List<Node> children) {
     return locality -> {
       Node node = nodeConstructor.apply(locality);
       children.forEach(node::addChild);
@@ -304,7 +303,7 @@ public class VisitorHelper {
    * specific exception
    */
   public static void checkInterruption() {
-    if (Thread.interrupted()) {
+    if (Thread.currentThread().isInterrupted()) {
       LOG.debug("Parsing interrupted by user");
       throw new ParseCancellationException("Parsing interrupted by user");
     }

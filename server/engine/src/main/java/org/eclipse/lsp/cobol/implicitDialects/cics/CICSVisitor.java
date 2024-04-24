@@ -21,6 +21,10 @@ import static org.antlr.v4.runtime.Lexer.HIDDEN;
 
 import com.google.common.collect.ImmutableList;
 import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -48,6 +52,7 @@ import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.model.tree.StopNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.QualifiedReferenceNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableUsageNode;
+import org.eclipse.lsp.cobol.common.utils.ThreadInterruptionUtil;
 import org.eclipse.lsp.cobol.implicitDialects.cics.nodes.ExecCicsHandleNode;
 import org.eclipse.lsp.cobol.implicitDialects.cics.nodes.ExecCicsNode;
 import org.eclipse.lsp.cobol.implicitDialects.cics.nodes.ExecCicsReturnNode;
@@ -55,11 +60,6 @@ import org.eclipse.lsp.cobol.implicitDialects.cics.utility.VisitorUtility;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
-
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
 
 /**
  * This visitor analyzes the parser tree for CICS and returns its semantic context as a syntax tree
@@ -89,7 +89,36 @@ class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
     if (isReturn) {
       return addTreeNode(ctx, ExecCicsReturnNode::new);
     } else if (isHandle) {
-      return addTreeNode(ctx, ExecCicsHandleNode::new);
+      boolean isProgram = Optional.ofNullable(ctx.allCicsRule().get(0).cics_handle())
+          .map(CICSParser.Cics_handleContext::cics_handle_abend)
+          .map(CICSParser.Cics_handle_abendContext::PROGRAM)
+          .filter(s -> s.size() > 0)
+          .isPresent();
+
+      boolean isLabel = Optional.ofNullable(ctx.allCicsRule().get(0).cics_handle())
+          .map(CICSParser.Cics_handleContext::cics_handle_abend)
+          .map(CICSParser.Cics_handle_abendContext::LABEL)
+          .filter(s -> s.size() > 0)
+          .isPresent();
+
+      boolean isReset = Optional.ofNullable(ctx.allCicsRule().get(0).cics_handle())
+          .map(CICSParser.Cics_handleContext::cics_handle_abend)
+          .map(CICSParser.Cics_handle_abendContext::RESET)
+          .filter(s -> s.size() > 0)
+          .isPresent();
+
+      ExecCicsHandleNode.HandleAbendType type;
+      if (isProgram) {
+        type = ExecCicsHandleNode.HandleAbendType.PROGRAM;
+      } else if (isLabel) {
+        type = ExecCicsHandleNode.HandleAbendType.LABEL;
+      } else if (isReset) {
+        type = ExecCicsHandleNode.HandleAbendType.RESET;
+      } else {
+        type = ExecCicsHandleNode.HandleAbendType.CANCEL;
+      }
+
+      return addTreeNode(ctx, (location) -> new ExecCicsHandleNode(location, type));
     }
     return addTreeNode(ctx, ExecCicsNode::new);
   }
@@ -166,6 +195,7 @@ class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
 
   @Override
   public List<Node> visitChildren(RuleNode node) {
+    ThreadInterruptionUtil.checkThreadInterrupted();
     return super.visitChildren(node);
   }
 

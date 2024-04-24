@@ -12,27 +12,26 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
-import * as path from "path";
 import * as vscode from "vscode";
 import { SettingsService } from "../Settings";
-import { Utils } from "./Utils";
 
 export class ProfileUtils {
-  public static async getProfileNameForCopybook(
+  public static getProfileNameForCopybook(
     cobolFileName: string,
-  ): Promise<string | undefined> {
-    const zoweExplorerApi = await Utils.getZoweExplorerAPI();
+    zoweExplorerApi: IApiRegisterClient | undefined,
+  ): string | undefined {
     if (!zoweExplorerApi) {
       return undefined;
     }
     return ProfileUtils.getValidProfileForCopybookDownload(
       cobolFileName,
-      ProfileUtils.getAvailableProfiles(zoweExplorerApi),
+      zoweExplorerApi,
     );
   }
 
   public static getAvailableProfiles(zoweExplorerApi: IApiRegisterClient) {
     let availableProfiles: string[] = [];
+    if (!zoweExplorerApi) return availableProfiles;
     zoweExplorerApi.registeredApiTypes().forEach((profileType) => {
       availableProfiles = availableProfiles.concat(
         zoweExplorerApi
@@ -46,12 +45,12 @@ export class ProfileUtils {
   }
 
   private static getValidProfileForCopybookDownload(
-    programName: string,
-    availableProfiles: string[],
+    programUri: string,
+    zoweExplorerApi: IApiRegisterClient | undefined,
   ): string | undefined {
     const profileFromDoc = ProfileUtils.getProfileFromDocument(
-      programName,
-      availableProfiles,
+      programUri,
+      zoweExplorerApi,
     );
     const passedProfile = SettingsService.getProfileName();
     if (!passedProfile && profileFromDoc) {
@@ -60,37 +59,28 @@ export class ProfileUtils {
     return passedProfile;
   }
 
-  private static getProfileFromDocument(
-    programName: string,
-    availableProfiles: string[],
+  public static getProfileFromDocument(
+    programUri: string,
+    zoweExplorerApi: IApiRegisterClient | undefined,
   ): string | undefined {
-    for (const doc of vscode.workspace.textDocuments) {
-      const openName = path.basename(doc.fileName);
-      if (unescape(programName) === openName) {
-        const profile = ProfileUtils.tryGetProfileFromDocumentPath(
-          doc.fileName,
-          availableProfiles,
-        );
-        if (profile) {
-          return profile;
-        }
-      }
+    const uri = vscode.Uri.parse(programUri);
+    if (uri.scheme === "zowe-ds" || uri.scheme === "zowe-uss") {
+      const profile = uri.path.split("/")[1];
+      if (!profile) return undefined;
+      return profile;
     }
-    return undefined;
-  }
 
-  private static tryGetProfileFromDocumentPath(
-    docPath: string,
-    availableProfiles: string[],
-  ): string | undefined {
-    const segments: string[] = docPath.split(path.sep);
-    if (segments.length < 2) {
-      return undefined;
-    }
-    const profileName = segments[segments.length - 2];
-    if (availableProfiles.indexOf(profileName) >= 0) {
-      return profileName;
-    }
-    return undefined;
+    if (uri.scheme !== "file") return;
+
+    if (!zoweExplorerApi) return;
+    const eeApi = zoweExplorerApi.getExplorerExtenderApi();
+
+    const fsPath = uri.fsPath;
+
+    const openedFile =
+      eeApi.ussFileProvider.openFiles[fsPath] ||
+      eeApi.datasetProvider.openFiles[fsPath];
+
+    return openedFile?.profile.name;
   }
 }

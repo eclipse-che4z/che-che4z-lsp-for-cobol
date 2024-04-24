@@ -56,7 +56,7 @@ public interface CobolLanguageClient extends LanguageClient {
    * The copybook/download request is sent from the server to the client to
    * download remote copybook
    *
-   * @param cobolFilename the name of cobol program
+   * @param cobolFileUri Uri of the cobol program
    * @param copybookNames list of copybooks to download
    * @param dialectType the name of copybook dialect
    * @param quietMode the name of copybook dialect
@@ -64,7 +64,7 @@ public interface CobolLanguageClient extends LanguageClient {
    */
   @JsonRequest("copybook/download")
   default CompletableFuture<Void> downloadCopybooks(
-      String cobolFilename,
+      String cobolFileUri,
       List<String> copybookNames,
       String dialectType,
       boolean quietMode) {

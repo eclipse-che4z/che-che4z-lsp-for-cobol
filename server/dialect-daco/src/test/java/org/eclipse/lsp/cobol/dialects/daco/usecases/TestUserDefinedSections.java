@@ -32,7 +32,7 @@ import org.junit.jupiter.api.Test;
 class TestUserDefinedSections {
   private static final String TEXT_GOTO =
       "       IDENTIFICATION DIVISION.\n"
-          + "       PROGRAM-ID.    TEST.\n"
+          + "       PROGRAM-ID.    TEST1.\n"
           + "        ENVIRONMENT DIVISION.\n"
           + "        IDMS-CONTROL SECTION.\n"
           + "            PROTOCOL. MODE ABC.\n"

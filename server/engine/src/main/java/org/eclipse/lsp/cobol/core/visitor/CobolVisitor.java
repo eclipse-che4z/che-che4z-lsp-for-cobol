@@ -15,23 +15,8 @@
 
 package org.eclipse.lsp.cobol.core.visitor;
 
-import static java.util.Collections.emptyList;
-import static java.util.Optional.ofNullable;
-import static java.util.stream.Collectors.toList;
-import static org.antlr.v4.runtime.Lexer.HIDDEN;
-import static org.eclipse.lsp.cobol.common.OutlineNodeNames.FILLER_NAME;
-import static org.eclipse.lsp.cobol.common.VariableConstants.*;
-import static org.eclipse.lsp.cobol.core.CobolParser.*;
-import static org.eclipse.lsp.cobol.core.visitor.VisitorHelper.*;
-
 import com.google.common.collect.ImmutableList;
-import java.util.*;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-import lombok.Getter;
 import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.RuleContext;
@@ -42,13 +27,13 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.eclipse.lsp.cobol.common.SubroutineService;
 import org.eclipse.lsp.cobol.common.dialects.CobolDialect;
+import org.eclipse.lsp.cobol.common.dialects.CobolProgramLayout;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.model.*;
-import org.eclipse.lsp.cobol.common.model.SectionType;
 import org.eclipse.lsp.cobol.common.model.tree.*;
 import org.eclipse.lsp.cobol.common.model.tree.statements.SetToBooleanStatement;
 import org.eclipse.lsp.cobol.common.model.tree.statements.SetToOnOffStatement;
@@ -59,16 +44,29 @@ import org.eclipse.lsp.cobol.common.model.variables.DivisionType;
 import org.eclipse.lsp.cobol.common.utils.ImplicitCodeUtils;
 import org.eclipse.lsp.cobol.common.utils.StringUtils;
 import org.eclipse.lsp.cobol.core.*;
-import org.eclipse.lsp.cobol.core.CobolDataDivisionParser;
-import org.eclipse.lsp.cobol.core.CobolIdentificationDivisionParser;
-import org.eclipse.lsp.cobol.core.CobolParser;
-import org.eclipse.lsp.cobol.core.CobolParserBaseVisitor;
 import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
+import org.eclipse.lsp.cobol.dialects.ibm.experimental.visitors.CobolDataDivisionVisitor;
+import org.eclipse.lsp.cobol.dialects.ibm.experimental.visitors.CobolIdentificationDivisionVisitor;
+import org.eclipse.lsp.cobol.dialects.ibm.experimental.visitors.CobolProcedureDivisionVisitor;
 import org.eclipse.lsp.cobol.service.settings.CachingConfigurationService;
-import org.eclipse.lsp.cobol.common.dialects.CobolProgramLayout;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
+import org.slf4j.Logger;
+
+import java.util.*;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+
+import static java.util.Collections.emptyList;
+import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.toList;
+import static org.antlr.v4.runtime.Lexer.HIDDEN;
+import static org.eclipse.lsp.cobol.common.OutlineNodeNames.FILLER_NAME;
+import static org.eclipse.lsp.cobol.common.VariableConstants.*;
+import static org.eclipse.lsp.cobol.core.CobolParser.*;
+import static org.eclipse.lsp.cobol.core.visitor.VisitorHelper.*;
 
 /**
  * This extension of {@link CobolParserBaseVisitor} applies the semantic analysis based on the
@@ -76,21 +74,20 @@ import org.eclipse.lsp4j.Range;
  * elements to add the usages or throw a warning on an invalid definition. If there is a misspelled
  * keyword, the visitor finds it and throws a warning.
  */
-@Slf4j
 public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
 
-  @Getter
-  private final List<SyntaxError> errors = new ArrayList<>();
-  private final CopybooksRepository copybooks;
-  private final CommonTokenStream tokenStream;
-  private final ExtendedDocument extendedDocument;
-  private final MessageService messageService;
-  private final SubroutineService subroutineService;
-  private final CobolProgramLayout programLayout;
+  private static final Logger LOG = org.slf4j.LoggerFactory.getLogger(CobolVisitor.class);
+  protected final List<SyntaxError> errors = new ArrayList<>();
+  protected final CopybooksRepository copybooks;
+  protected final CommonTokenStream tokenStream;
+  protected final ExtendedDocument extendedDocument;
+  protected final MessageService messageService;
+  protected final SubroutineService subroutineService;
+  protected final CobolProgramLayout programLayout;
 
-  private Map<String, FileControlEntryContext> fileControls = null;
+  protected Map<String, FileControlEntryContext> fileControls = null;
   private final Map<String, SubroutineDefinition> subroutineDefinitionMap = new HashMap<>();
-  private final CachingConfigurationService cachingConfigurationService;
+  protected final CachingConfigurationService cachingConfigurationService;
 
   public CobolVisitor(
           @NonNull CopybooksRepository copybooks,
@@ -296,12 +293,12 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
             .orElse(null);
 
     ProcedureName procName = parseProcedureName(Optional.ofNullable(ctx.xmlProcessinProcedure())
-        .map(XmlProcessinProcedureContext::procedureName)
-        .orElse(null));
+            .map(XmlProcessinProcedureContext::procedureName)
+            .orElse(null));
 
     ProcedureName thru = parseProcedureName(Optional.ofNullable(ctx.through())
-        .map(ThroughContext::procedureName)
-        .orElse(null));
+            .map(ThroughContext::procedureName)
+            .orElse(null));
 
     return addTreeNode(
             ctx,
@@ -315,7 +312,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
                             xmlNationalContext,
                             procName,
                             thru)
-                    );
+    );
   }
 
   @Override
@@ -331,10 +328,10 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   @Override
   public List<Node> visitUseStatement(CobolParser.UseStatementContext ctx) {
     return ctx.useDebugClause() != null
-        ?
-        addTreeNode(ctx, l -> new UseForDebuggingNode(l, null))
-        :
-        addTreeNode(ctx, UseNode::new);
+            ?
+            addTreeNode(ctx, l -> new UseForDebuggingNode(l, null))
+            :
+            addTreeNode(ctx, UseNode::new);
   }
 
   /**
@@ -380,6 +377,58 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
                                             new DeclarativeProcedureSectionNode(
                                                     locality, name, getIntervalText(ctx), def)))
             .orElseGet(() -> visitChildren(ctx));
+  }
+
+  @Override
+  public List<Node> visitXmlGenerate(XmlGenerateContext ctx) {
+    VariableNameAndLocality identifier1 = new VariableNameAndLocality(
+            ctx.xmlGenIdentifier1().getText(), retrieveLocality(ctx.xmlGenIdentifier1()).orElse(null));
+
+    VariableNameAndLocality identifier2 = new VariableNameAndLocality(
+            ctx.xmlGenIdentifier2().getText(), retrieveLocality(ctx.xmlGenIdentifier2()).orElse(null));
+
+    VariableNameAndLocality identifier3 = ofNullable(ctx.xmlGenIdentifier3()).map(iden3 -> new VariableNameAndLocality(
+            iden3.getText(), retrieveLocality(iden3).orElse(null))).orElse(null);
+
+    VariableNameAndLocality identifier4 = ofNullable(ctx.xmlGenIdentifier4()).map(iden4 -> new VariableNameAndLocality(
+            iden4.getText(), retrieveLocality(iden4).orElse(null))).orElse(null);
+
+    VariableNameAndLocality identifier5 = ofNullable(ctx.xmlGenIdentifier5()).map(iden5 -> new VariableNameAndLocality(
+            iden5.getText(), retrieveLocality(iden5).orElse(null))).orElse(null);
+
+    List<VariableNameAndLocality> identifier6 = ctx.xmlGenIdentifier6().isEmpty()
+            ? null
+            : ctx.xmlGenIdentifier6().stream()
+            .map(iden6 -> new VariableNameAndLocality(iden6.getText(), retrieveLocality(iden6).orElse(null)))
+            .collect(Collectors.toList());
+
+    List<VariableNameAndLocality> identifier7 = ctx.xmlGenIdentifier7().isEmpty()
+            ? null
+            : ctx.xmlGenIdentifier7().stream()
+            .map(iden7 -> new VariableNameAndLocality(iden7.getText(), retrieveLocality(iden7).orElse(null)))
+            .collect(Collectors.toList());
+
+    List<VariableNameAndLocality> identifier8 = ctx.xmlGenIdentifier6().isEmpty()
+            ? null
+            : ctx.xmlGenIdentifier8().stream()
+            .map(iden8 -> new VariableNameAndLocality(iden8.getText(), retrieveLocality(iden8).orElse(null)))
+            .collect(Collectors.toList());
+
+    return addTreeNode(
+            ctx,
+            locality ->
+                    new XmlGenerateNode(
+                            locality,
+                            identifier1,
+                            identifier2,
+                            identifier3,
+                            identifier4,
+                            identifier5,
+                            identifier6,
+                            identifier7,
+                            identifier8
+                    ));
+
   }
 
   @Override
@@ -564,14 +613,12 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
 
   @Override
   public List<Node> visitStatement(StatementContext ctx) {
-    if (!ParserUtils.isHwParserEnabled() || expectedInAriaA(ctx)) {
-      areaBWarning(ctx);
-    }
+    areaBWarning(ctx);
     throwWarning(ctx.getStart());
     return visitChildren(ctx);
   }
 
-  private boolean expectedInAriaA(ParserRuleContext ctx) {
+  protected boolean expectedInAriaA(ParserRuleContext ctx) {
     // https://www.ibm.com/docs/en/cobol-zos/6.4?topic=format-area
     //    Certain items must begin in Area A:
     //    Division headers
@@ -707,8 +754,8 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   public List<Node> visitPerformProcedureStatement(PerformProcedureStatementContext ctx) {
     final ProcedureName targetName = parseProcedureName(ctx.procedureName());
     final ProcedureName thruName = parseProcedureName(Optional.ofNullable(ctx.through())
-        .map(ThroughContext::procedureName)
-        .orElse(null));
+            .map(ThroughContext::procedureName)
+            .orElse(null));
     return addTreeNode(ctx, locality -> new PerformNode(locality, targetName, thruName));
   }
 
@@ -998,7 +1045,15 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
 
   @Override
   public List<Node> visitProcedureDivisionBody(ProcedureDivisionBodyContext ctx) {
-    return addTreeNode(ctx, ProcedureDivisionBodyNode::new);
+
+    ParserRuleContext context = new ParserRuleContext();
+    context.start = ctx.getParent().start;
+    context.stop = ctx.stop;
+
+    List<Node> children = visitChildren(ctx);
+    return retrieveLocality(context)
+            .map(constructNode(ProcedureDivisionBodyNode::new, children))
+            .orElse(children);
   }
 
   @Override
@@ -1103,17 +1158,17 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
     String key;
     if (ctx.sortOnKeyClause() != null) {
       ascending = ctx.sortOnKeyClause().stream()
-          .map(s -> s.ASCENDING() != null)
-          .filter(b -> b)
-          .findAny()
-          .orElse(false);
+              .map(s -> s.ASCENDING() != null)
+              .filter(b -> b)
+              .findAny()
+              .orElse(false);
 
       key = ctx.sortOnKeyClause().stream()
-          .map(SortOnKeyClauseContext::KEY)
-          .filter(Objects::nonNull)
-          .map(ParseTree::getText)
-          .findFirst()
-          .orElse("");
+              .map(SortOnKeyClauseContext::KEY)
+              .filter(Objects::nonNull)
+              .map(ParseTree::getText)
+              .findFirst()
+              .orElse("");
     } else {
       ascending = false;
       key = "";
@@ -1128,17 +1183,17 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
     String key;
     if (ctx.mergeOnKeyClause() != null) {
       ascending = ctx.mergeOnKeyClause().stream()
-          .map(s -> s.ASCENDING() != null)
-          .filter(b -> b)
-          .findAny()
-          .orElse(false);
+              .map(s -> s.ASCENDING() != null)
+              .filter(b -> b)
+              .findAny()
+              .orElse(false);
 
       key = ctx.mergeOnKeyClause().stream()
-          .map(MergeOnKeyClauseContext::KEY)
-          .filter(Objects::nonNull)
-          .map(ParseTree::getText)
-          .findFirst()
-          .orElse("");
+              .map(MergeOnKeyClauseContext::KEY)
+              .filter(Objects::nonNull)
+              .map(ParseTree::getText)
+              .findFirst()
+              .orElse("");
     } else {
       ascending = false;
       key = "";
@@ -1151,8 +1206,8 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   public List<Node> visitInputProcedurePhrase(CobolParser.InputProcedurePhraseContext ctx) {
     final ProcedureName procName = parseProcedureName(ctx.procedureName());
     final ProcedureName thru = parseProcedureName(Optional.ofNullable(ctx.through())
-        .map(ThroughContext::procedureName)
-        .orElse(null));
+            .map(ThroughContext::procedureName)
+            .orElse(null));
 
     Locality locality = retrieveLocality(ctx).orElse(null);
     InputNode node = new InputNode(locality);
@@ -1167,8 +1222,8 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   public List<Node> visitOutputProcedurePhrase(CobolParser.OutputProcedurePhraseContext ctx) {
     final ProcedureName procName = parseProcedureName(ctx.procedureName());
     final ProcedureName thru = parseProcedureName(Optional.ofNullable(ctx.through())
-        .map(ThroughContext::procedureName)
-        .orElse(null));
+            .map(ThroughContext::procedureName)
+            .orElse(null));
 
     Locality locality = retrieveLocality(ctx).orElse(null);
     OutputNode node = new OutputNode(locality);
@@ -1179,7 +1234,8 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
     return ImmutableList.of(node);
   }
 
-  @Override public List<Node> visitAlterStatement(CobolParser.AlterStatementContext ctx) {
+  @Override
+  public List<Node> visitAlterStatement(CobolParser.AlterStatementContext ctx) {
     if (ctx.alterProceedTo() != null && ctx.alterProceedTo().size() > 0) {
       CobolParser.AlterProceedToContext alter = ctx.alterProceedTo().get(0);
       if (alter.procedureName() != null && alter.procedureName().size() == 2) {
@@ -1188,14 +1244,14 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
 
         String name = Optional.ofNullable(from.paragraphName()).map(RuleContext::getText).orElse(null);
         String inSection = Optional.ofNullable(from.inSection())
-            .map(InSectionContext::sectionName)
-            .map(RuleContext::getText).orElse(null);
+                .map(InSectionContext::sectionName)
+                .map(RuleContext::getText).orElse(null);
         ProcedureName alterFrom = new ProcedureName(name, inSection);
 
         name = Optional.ofNullable(to.paragraphName()).map(RuleContext::getText).orElse(null);
         inSection = Optional.ofNullable(to.inSection())
-            .map(InSectionContext::sectionName)
-            .map(RuleContext::getText).orElse(null);
+                .map(InSectionContext::sectionName)
+                .map(RuleContext::getText).orElse(null);
         ProcedureName alterTo = new ProcedureName(name, inSection);
 
         Locality locality = retrieveLocality(ctx).orElse(null);
@@ -1252,7 +1308,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
     errors.add(error);
   }
 
-  private void throwWarning(Token token) {
+  protected void throwWarning(Token token) {
     String tokenText = token.getText().toUpperCase();
     if (MisspelledKeywordDistance.KEYWORDS.getSuggestions().contains(tokenText)) return;
     MisspelledKeywordDistance.calculateDistance(tokenText)
@@ -1294,12 +1350,11 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
                                     messageService.getMessage("CobolVisitor.AreaAWarningMsg")));
   }
 
-  private void areaBWarning(ParserRuleContext ctx) {
+  protected void areaBWarning(ParserRuleContext ctx) {
     final int start = ctx.getStart().getTokenIndex();
     final int stop = ctx.getStop().getTokenIndex();
 
-    areaBWarning(
-            start < stop ? tokenStream.getTokens(start, stop) : ImmutableList.of(ctx.getStart()));
+    areaBWarning(start < stop ? tokenStream.getTokens(start, stop) : ImmutableList.of(ctx.getStart()));
   }
 
   private void areaBWarning(@NonNull List<Token> tokenList) {
@@ -1321,11 +1376,11 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
       int charPosition = it.getRange().getStart().getCharacter();
       int areaBStartIndex =
               programLayout.getSequenceLength()
-              + programLayout.getIndicatorLength()
-              + programLayout.getAreaALength();
+                      + programLayout.getIndicatorLength()
+                      + programLayout.getAreaALength();
       return charPosition > programLayout.getSequenceLength()
-          && charPosition < areaBStartIndex
-          && token.getChannel() != HIDDEN;
+              && charPosition < areaBStartIndex
+              && token.getChannel() != HIDDEN;
     };
   }
 
@@ -1424,5 +1479,9 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
             .uri(location.getUri())
             .copybookId(copybooks.getCopybookIdByUri(location.getUri()))
             .build();
+  }
+
+  public List<SyntaxError> getErrors() {
+    return this.errors;
   }
 }

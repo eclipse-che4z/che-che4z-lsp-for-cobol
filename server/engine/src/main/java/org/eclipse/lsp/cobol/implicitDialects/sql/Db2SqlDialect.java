@@ -36,6 +36,7 @@ import org.eclipse.lsp.cobol.common.model.tree.SectionNode;
 import org.eclipse.lsp.cobol.common.processor.ProcessingPhase;
 import org.eclipse.lsp.cobol.common.processor.ProcessorDescription;
 import org.eclipse.lsp.cobol.common.utils.ImplicitCodeUtils;
+import org.eclipse.lsp.cobol.common.utils.KeywordsUtils;
 import org.eclipse.lsp.cobol.common.utils.PredefinedCopybooks;
 import org.eclipse.lsp.cobol.implicitDialects.sql.node.Db2DataAndProcedureDivisionNode;
 import org.eclipse.lsp.cobol.implicitDialects.sql.node.Db2DeclareVariableNode;
@@ -63,8 +64,13 @@ public class Db2SqlDialect implements CobolDialect {
   }
 
   @Override
+  public Map<String, String> getKeywords() {
+    return KeywordsUtils.getKeywords(Db2SqlDialect.class.getClassLoader(), "LanguageKeywords_sql.txt");
+  }
+
+  @Override
   public ResultWithErrors<DialectOutcome> processText(DialectProcessingContext context) {
-    Db2SqlVisitor db2SqlVisitor = new Db2SqlVisitor(context, messageService);
+    Db2SqlVisitor db2SqlVisitor = new Db2SqlVisitor(context, messageService, copybookService);
 
     List<SyntaxError> parseError = new ArrayList<>();
 
@@ -108,7 +114,7 @@ public class Db2SqlDialect implements CobolDialect {
             new ImplicitDb2VariablesProcessor()),
         new ProcessorDescription(
             Db2DataAndProcedureDivisionNode.class,
-            ProcessingPhase.POST_DEFINITION,
+            ProcessingPhase.VALIDATION,
             new Db2DataAndProcedureDivisionProcessor(messageService)),
         new ProcessorDescription(
             Db2DeclareVariableNode.class,

@@ -13,11 +13,9 @@
  */
 
 import { SettingsService } from "../Settings";
-import { searchCopybookInWorkspace } from "../util/FSUtils";
+import { searchCopybookInExtensionFolder } from "../util/FSUtils";
 import { CopybookURI } from "./CopybookURI";
 import { CopybookName } from "./CopybookDownloadService";
-import { Uri } from "vscode";
-import * as path from "path";
 
 enum CopybookFolderKind {
   "local",
@@ -25,45 +23,28 @@ enum CopybookFolderKind {
   "downloaded-uss",
 }
 
-export async function resolveCopybookHandler(
+export async function searchCopybook(
   documentUri: string,
   copybookName: string,
   dialectType: string,
-): Promise<string | undefined> {
-  let result: string | undefined;
-  result = searchCopybook(documentUri, copybookName, dialectType);
-  // check in subfolders under .copybooks (copybook downloaded from MF)
-  if (!result) {
-    result = searchCopybookInWorkspace(
-      copybookName,
-      await CopybookURI.createPathForCopybookDownloaded(
-        documentUri,
-        dialectType,
-      ),
-      SettingsService.getCopybookExtension(documentUri),
-    );
-  }
-  return result;
-}
-
-function searchCopybook(
-  documentUri: string,
-  copybookName: string,
-  dialectType: string,
+  storagePath: string,
 ) {
   let result: string | undefined;
+
   for (let i = 0; i < Object.values(CopybookFolderKind).length; i++) {
     const folderKind = Object.values(CopybookFolderKind)[i];
     const targetFolder = getTargetFolderForCopybook(
       folderKind,
       documentUri,
       dialectType,
+      storagePath,
     );
     const allowedExtensions = resolveAllowedExtensions(folderKind, documentUri);
-    result = searchCopybookInWorkspace(
+    result = searchCopybookInExtensionFolder(
       copybookName,
       targetFolder,
       allowedExtensions,
+      storagePath,
     );
     if (result) {
       return result;
@@ -76,6 +57,7 @@ function getTargetFolderForCopybook(
   folderKind: string | CopybookFolderKind,
   documentUri: string,
   dialectType: string,
+  storagePath: string,
 ) {
   let result: string[] = [];
   const profile = SettingsService.getProfileName()!;
@@ -85,12 +67,14 @@ function getTargetFolderForCopybook(
       break;
     case CopybookFolderKind[CopybookFolderKind["downloaded-dsn"]]:
       result = SettingsService.getDsnPath(documentUri, dialectType).map(
-        (dnsPath) => CopybookURI.createDatasetPath(profile, dnsPath),
+        (dnsPath) =>
+          CopybookURI.createDatasetPath(profile, dnsPath, storagePath),
       );
       break;
     case CopybookFolderKind[CopybookFolderKind["downloaded-uss"]]:
       result = SettingsService.getUssPath(documentUri, dialectType).map(
-        (dnsPath) => CopybookURI.createDatasetPath(profile, dnsPath),
+        (dnsPath) =>
+          CopybookURI.createDatasetPath(profile, dnsPath, storagePath),
       );
       break;
   }
@@ -108,19 +92,4 @@ function resolveAllowedExtensions(
     default:
       return SettingsService.getCopybookExtension(documentUri);
   }
-}
-export function downloadCopybookHandler(
-  this: any,
-  cobolFileName: string,
-  copybookNames: string[],
-  dialectType: string,
-  quietMode: boolean,
-): string {
-  return this.downloadCopybooks(
-    cobolFileName,
-    copybookNames.map(
-      (copybookName) => new CopybookName(copybookName, dialectType),
-    ),
-    quietMode,
-  );
 }

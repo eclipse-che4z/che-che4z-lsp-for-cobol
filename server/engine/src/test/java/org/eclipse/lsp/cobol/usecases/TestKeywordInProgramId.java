@@ -26,11 +26,11 @@ class TestKeywordInProgramId {
           + "        PROGRAM-ID. AND.\n"
           + "       END PROGRAM AND.\n"
           + "        IDENTIFICATION DIVISION.\n"
-          + "        PROGRAM-ID. TEST.\n"
-          + "       END PROGRAM TEST.\n"
+          + "        PROGRAM-ID. TEST1.\n"
+          + "       END PROGRAM TEST1.\n"
           + "        IDENTIFICATION DIVISION.\n"
-          + "        PROGRAM-ID. ADDRESS.\n"
-          + "       END PROGRAM ADDRESS.\n";
+          + "        PROGRAM-ID. ADDRES1.\n"
+          + "       END PROGRAM ADDRES1.\n";
 
   @Test
   void test() {

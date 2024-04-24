@@ -202,5 +202,5 @@ cobolWord
    ;
 
 dialectNodeFiller
-    : ZERO_WIDTH_SPACE+
+    : ZERO_WIDTH_SPACE+ DOT_FS? EOF?
     ;

@@ -131,6 +131,7 @@ local.properties
 out
 *.vsix
 .vscode-test
+.vscode-test-web
 node_modules
 tools
 logs/app.log

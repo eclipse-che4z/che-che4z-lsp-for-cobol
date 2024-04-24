@@ -31,7 +31,6 @@ jest.mock("../services/copybook/CopybookDownloadService");
 jest.mock("../commands/ClearCopybookCacheCommand");
 
 jest.mock("../services/Settings", () => ({
-  createFileWithGivenPath: jest.fn(),
   initializeSettings: jest.fn(),
   SettingsService: {
     serverRuntime: jest
@@ -44,6 +43,9 @@ jest.mock("../services/Settings", () => ({
 }));
 
 Utils.getZoweExplorerAPI = jest.fn();
+jest.mock("../services/copybook/E4ECopybookService", () => ({
+  getE4EAPI: jest.fn(),
+}));
 jest.mock("vscode", () => ({
   commands: {
     registerCommand: jest
@@ -87,6 +89,12 @@ jest.mock("vscode", () => ({
       .fn()
       .mockReturnValue("onDidChangeConfiguration"),
     workspaceFolders: [{ uri: { fsPath: "ws-path" } } as any],
+    fs: {
+      createDirectory: jest.fn(),
+    },
+  },
+  Uri: {
+    file: jest.fn().mockReturnValue("workspaceFolder2"),
   },
 }));
 
@@ -94,13 +102,10 @@ jest.mock("vscode-languageclient", () => ({
   LanguageClient: jest.fn(),
 }));
 jest.mock("../services/reporter/TelemetryService");
-jest.mock("../services/copybook/CopybookMessageHandler", () => ({
-  resolveCopybookHandler: jest.fn(),
-  downloadCopybookHandler: jest.fn(),
-}));
 
 const context: any = {
   subscriptions: [],
+  globalStorageUri: { fsPath: "/storagePath" },
 };
 
 beforeEach(() => {
@@ -117,7 +122,7 @@ describe("Check plugin extension for cobol starts successfully.", () => {
       "Extension activation event was triggered",
     );
 
-    expect(vscode.commands.registerCommand).toBeCalledTimes(9);
+    expect(vscode.commands.registerCommand).toBeCalledTimes(10);
 
     expect(fetchCopybookCommand).toHaveBeenCalled();
     expect(gotoCopybookSettings).toHaveBeenCalled();

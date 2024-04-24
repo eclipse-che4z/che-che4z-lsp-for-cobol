@@ -24,19 +24,21 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
 import org.eclipse.lsp.cobol.common.SubroutineService;
 import org.eclipse.lsp.cobol.common.dialects.CobolDialect;
+import org.eclipse.lsp.cobol.common.dialects.CobolLanguageId;
+import org.eclipse.lsp.cobol.common.dialects.CobolProgramLayout;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.tree.*;
 import org.eclipse.lsp.cobol.common.model.tree.statements.StatementNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.*;
 import org.eclipse.lsp.cobol.common.model.tree.variables.FileDescriptionNode;
+import org.eclipse.lsp.cobol.common.pipeline.Stage;
+import org.eclipse.lsp.cobol.common.pipeline.StageResult;
 import org.eclipse.lsp.cobol.common.processor.*;
 import org.eclipse.lsp.cobol.common.utils.RangeUtils;
 import org.eclipse.lsp.cobol.core.CobolParser;
 import org.eclipse.lsp.cobol.core.engine.analysis.AnalysisContext;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectService;
-import org.eclipse.lsp.cobol.common.pipeline.Stage;
-import org.eclipse.lsp.cobol.common.pipeline.StageResult;
 import org.eclipse.lsp.cobol.core.engine.processor.AstProcessor;
 import org.eclipse.lsp.cobol.core.engine.processors.*;
 import org.eclipse.lsp.cobol.core.engine.processors.implicit.ImplicitVariablesProcessor;
@@ -44,9 +46,7 @@ import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulatorService;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolsRepository;
 import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
 import org.eclipse.lsp.cobol.core.visitor.CobolVisitor;
-import org.eclipse.lsp.cobol.common.dialects.CobolLanguageId;
 import org.eclipse.lsp.cobol.service.settings.CachingConfigurationService;
-import org.eclipse.lsp.cobol.common.dialects.CobolProgramLayout;
 import org.eclipse.lsp.cobol.service.settings.layout.CodeLayoutStore;
 import org.eclipse.lsp.cobol.service.settings.layout.CodeLayoutUtil;
 import org.eclipse.lsp4j.Location;
@@ -58,13 +58,13 @@ import org.eclipse.lsp4j.Range;
 @RequiredArgsConstructor
 public class TransformTreeStage implements Stage<AnalysisContext, ProcessingResult, ParserStageResult> {
 
-  private final SymbolsRepository symbolsRepository;
-  private final MessageService messageService;
-  private final SubroutineService subroutineService;
-  private final CachingConfigurationService cachingConfigurationService;
-  private final DialectService dialectService;
-  private final AstProcessor astProcessor;
-  private final CodeLayoutStore layoutStore;
+  protected final SymbolsRepository symbolsRepository;
+  protected final MessageService messageService;
+  protected final SubroutineService subroutineService;
+  protected final CachingConfigurationService cachingConfigurationService;
+  protected final DialectService dialectService;
+  protected final AstProcessor astProcessor;
+  protected final CodeLayoutStore layoutStore;
 
   @Override
   public StageResult<ProcessingResult> run(AnalysisContext context, StageResult<ParserStageResult> prevStageResult) {
@@ -111,7 +111,7 @@ public class TransformTreeStage implements Stage<AnalysisContext, ProcessingResu
     }
   }
 
-  private List<Node> transformAST(AnalysisContext ctx,
+  protected List<Node> transformAST(AnalysisContext ctx,
                                   CopybooksRepository copybooksRepository, CommonTokenStream tokens,
                                   CobolParser.StartRuleContext tree) {
     CobolProgramLayout cobolProgramLayout = layoutStore.getCodeLayout()
@@ -161,6 +161,7 @@ public class TransformTreeStage implements Stage<AnalysisContext, ProcessingResu
     ctx.register(t, FileEntryNode.class, new FileEntryProcess());
     ctx.register(t, FileDescriptionNode.class, new FileDescriptionProcess(symbolAccumulatorService));
     ctx.register(t, DeclarativeProcedureSectionNode.class, new DeclarativeProcedureSectionRegister(symbolAccumulatorService));
+    ctx.register(t, RootNode.class, new RootNodeUpdateCopyNodesByPositionInTree());
 
     // Phase DEFINITION
     ProcessingPhase d = ProcessingPhase.DEFINITION;
@@ -175,7 +176,6 @@ public class TransformTreeStage implements Stage<AnalysisContext, ProcessingResu
     // Phase USAGE
     ProcessingPhase u = ProcessingPhase.USAGE;
     ctx.register(u, CodeBlockUsageNode.class, new CodeBlockUsage(symbolAccumulatorService));
-    ctx.register(u, RootNode.class, new RootNodeUpdateCopyNodesByPositionInTree());
     ctx.register(u, QualifiedReferenceNode.class, new QualifiedReferenceUpdateVariableUsage(symbolAccumulatorService));
 
     // ENRICHMENT
@@ -197,6 +197,7 @@ public class TransformTreeStage implements Stage<AnalysisContext, ProcessingResu
     ctx.register(v, JsonGenerateNode.class, new JsonGenerateProcess(symbolAccumulatorService));
     ctx.register(v, XMLParseNode.class, new XMLParseProcess(symbolAccumulatorService));
     ctx.register(v, FileOperationStatementNode.class, new FileOperationProcess());
+    ctx.register(v, XmlGenerateNode.class, new XmlGenerateProcess(symbolAccumulatorService));
 
     // Implicit Dialects
     dialectService.getActiveImplicitDialects(analysisConfig)
