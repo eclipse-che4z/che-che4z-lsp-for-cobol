@@ -14,11 +14,20 @@
  */
 package org.eclipse.lsp.cobol.dialects.hp;
 
+import static org.eclipse.lsp.cobol.common.error.ErrorSeverity.ERROR;
+
 import com.google.common.collect.ImmutableList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.eclipse.lsp.cobol.common.copybook.CopybookModel;
 import org.eclipse.lsp.cobol.common.copybook.CopybookName;
 import org.eclipse.lsp.cobol.common.copybook.CopybookService;
+import org.eclipse.lsp.cobol.common.dialects.CobolLanguageId;
 import org.eclipse.lsp.cobol.common.dialects.DialectOutcome;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.error.ErrorCodes;
@@ -36,13 +45,6 @@ import org.eclipse.lsp.cobol.common.pipeline.StageResult;
 import org.eclipse.lsp.cobol.core.engine.analysis.AnalysisContext;
 import org.eclipse.lsp4j.Location;
 
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-
-import static org.eclipse.lsp.cobol.common.error.ErrorSeverity.ERROR;
-
 /**
  * Resolving and inserting copybooks into the extended source stage
  */
@@ -57,12 +59,22 @@ class HpCopybookProcessingStage implements Stage<AnalysisContext, DialectOutcome
     List<SyntaxError> errors = new LinkedList<>();
 
     List<CopybookDescriptor> cbs = CopybookParser.parseAndCleanup(context.getExtendedDocument());
-    cbs.forEach(cb -> {
-      List<CopyNode> copybookNodes = insertHpCopybook(context.getDocumentUri(), context.getExtendedDocument(), cb, errors);
-      context.getDialectNodes().addAll(copybookNodes);
-    });
+    cbs.forEach(
+        cb -> {
+          List<CopyNode> copybookNodes =
+              insertHpCopybook(context.getDocumentUri(), context.getExtendedDocument(), cb, errors);
+          context.getDialectNodes().addAll(copybookNodes);
+        });
 
-    DialectOutcome outcome = new DialectOutcome(context.getDialectNodes(), DialectProcessingContext.builder().build());
+    DialectOutcome outcome =
+        new DialectOutcome(
+            Optional.ofNullable(context.getDialectNodes()).orElse(Collections.emptyList()),
+            DialectProcessingContext.builder()
+                .languageId(CobolLanguageId.HP_COBOL.getId())
+                .config(context.getConfig())
+                .programDocumentUri(context.getExtendedDocument().getUri())
+                .extendedDocument(context.getExtendedDocument())
+                .build());
     return new StageResult<>(outcome);
   }
 

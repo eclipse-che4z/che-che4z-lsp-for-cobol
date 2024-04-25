@@ -94,6 +94,21 @@
         "firstLine": "^[0-9 ]{6}([*].*|[ Dd] *([Ii][Dd]([Ee][Nn][Tt][Ii][Ff][Ii][Cc][Aa][Tt][Ii][Oo][Nn])? +[Dd][Ii][Vv][Ii][Ss][Ii][Oo][Nn][. ]|[0-9][0-9] +[@#$A-Z][-A-Z0-9]*[. ]|[*](CBL|PROCESS) ).*)$|^([0-9].{5})?[ ]*(CBL|PROCESS) "
       },
       {
+        "id": "expcobol",
+        "extensions": [
+          ".cbl",
+          ".cob",
+          ".cobol",
+          ".cpy",
+          ".copy"
+        ],
+        "aliases": [
+          "EXP-COBOL"
+        ],
+        "configuration": "./syntaxes/lang-config.json",
+        "firstLine": "^[0-9 ]{6}([*].*|[ Dd] *([Ii][Dd]([Ee][Nn][Tt][Ii][Ff][Ii][Cc][Aa][Tt][Ii][Oo][Nn])? +[Dd][Ii][Vv][Ii][Ss][Ii][Oo][Nn][. ]|[0-9][0-9] +[@#$A-Z][-A-Z0-9]*[. ]|[*](CBL|PROCESS) ).*)$|^([0-9].{5})?[ ]*(CBL|PROCESS) "
+      },
+      {
         "id": "hpcobol",
         "extensions": [
           ".hpcbl",
