@@ -80,17 +80,17 @@ import org.eclipse.lsp4j.Range;
 public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
 
   @Getter
-  private final List<SyntaxError> errors = new ArrayList<>();
-  private final CopybooksRepository copybooks;
-  private final CommonTokenStream tokenStream;
-  private final ExtendedDocument extendedDocument;
-  private final MessageService messageService;
-  private final SubroutineService subroutineService;
-  private final CobolProgramLayout programLayout;
+  protected final List<SyntaxError> errors = new ArrayList<>();
+  protected final CopybooksRepository copybooks;
+  protected final CommonTokenStream tokenStream;
+  protected final ExtendedDocument extendedDocument;
+  protected final MessageService messageService;
+  protected final SubroutineService subroutineService;
+  protected final CobolProgramLayout programLayout;
 
-  private Map<String, FileControlEntryContext> fileControls = null;
+  protected Map<String, FileControlEntryContext> fileControls = null;
   private final Map<String, SubroutineDefinition> subroutineDefinitionMap = new HashMap<>();
-  private final CachingConfigurationService cachingConfigurationService;
+  protected final CachingConfigurationService cachingConfigurationService;
 
   public CobolVisitor(
           @NonNull CopybooksRepository copybooks,
@@ -564,14 +564,12 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
 
   @Override
   public List<Node> visitStatement(StatementContext ctx) {
-    if (!ParserUtils.isHwParserEnabled() || expectedInAriaA(ctx)) {
-      areaBWarning(ctx);
-    }
+    areaBWarning(ctx);
     throwWarning(ctx.getStart());
     return visitChildren(ctx);
   }
 
-  private boolean expectedInAriaA(ParserRuleContext ctx) {
+  protected boolean expectedInAriaA(ParserRuleContext ctx) {
     // https://www.ibm.com/docs/en/cobol-zos/6.4?topic=format-area
     //    Certain items must begin in Area A:
     //    Division headers
@@ -1252,7 +1250,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
     errors.add(error);
   }
 
-  private void throwWarning(Token token) {
+  protected void throwWarning(Token token) {
     String tokenText = token.getText().toUpperCase();
     if (MisspelledKeywordDistance.KEYWORDS.getSuggestions().contains(tokenText)) return;
     MisspelledKeywordDistance.calculateDistance(tokenText)
@@ -1294,7 +1292,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
                                     messageService.getMessage("CobolVisitor.AreaAWarningMsg")));
   }
 
-  private void areaBWarning(ParserRuleContext ctx) {
+  protected void areaBWarning(ParserRuleContext ctx) {
     final int start = ctx.getStart().getTokenIndex();
     final int stop = ctx.getStop().getTokenIndex();
 

@@ -63,6 +63,10 @@ public class TrueDialectServiceImpl implements TrueDialectService<AnalysisContex
         messageService, treeListener, subroutineService, cachingConfigurationService, dialectService,
         astProcessor, symbolsRepository, codeLayoutStore));
 
+    dialects.put(CobolLanguageId.EXPERIMENTAL_COBOL, new HwIbmTrueCobolDialect(grammarPreprocessor,
+        messageService, treeListener, subroutineService, cachingConfigurationService, dialectService,
+        astProcessor, symbolsRepository, codeLayoutStore));
+
     dialects.put(CobolLanguageId.HP_COBOL, new HpTrueCobolDialect(grammarPreprocessor,
         messageService, treeListener, subroutineService, cachingConfigurationService, dialectService,
         astProcessor, symbolsRepository, codeLayoutStore, copybookService));
