@@ -19,11 +19,14 @@ package org.eclipse.lsp.cobol.core.hw;
 import lombok.Getter;
 import org.eclipse.lsp.cobol.core.cst.base.CstNodeImpl;
 
+import java.util.Objects;
+
 /**
  * Token node.
  */
 @Getter
 public class Token extends CstNodeImpl {
+  public static final int PRIME = 31;
   private final int line;
   private final int startPositionInLine;
   private final int index;
@@ -61,5 +64,25 @@ public class Token extends CstNodeImpl {
             + ", index=" + index
             + ", type=" + type
             + '}';
+  }
+
+  /* FIXME: Lexer should not create new instances of tokens even if it's a peek call */
+  @Override
+  public final boolean equals(Object o) {
+    if (this == o) return true;
+    if (!(o instanceof Token)) return false;
+
+    Token token = (Token) o;
+    return line == token.line && startPositionInLine == token.startPositionInLine && index == token.index && Objects.equals(lexeme, token.lexeme) && type == token.type;
+  }
+
+  @Override
+  public int hashCode() {
+    int result = line;
+    result = PRIME * result + startPositionInLine;
+    result = PRIME * result + index;
+    result = PRIME * result + Objects.hashCode(lexeme);
+    result = PRIME * result + Objects.hashCode(type);
+    return result;
   }
 }

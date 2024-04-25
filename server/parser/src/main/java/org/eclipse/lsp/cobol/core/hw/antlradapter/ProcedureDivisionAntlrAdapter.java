@@ -17,6 +17,7 @@
 package org.eclipse.lsp.cobol.core.hw.antlradapter;
 
 import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.antlr.v4.runtime.tree.TerminalNodeImpl;
 import org.eclipse.lsp.cobol.core.CobolProcedureDivisionLexer;
@@ -29,6 +30,7 @@ import org.eclipse.lsp.cobol.core.hw.Token;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -56,19 +58,29 @@ public class ProcedureDivisionAntlrAdapter {
   }
 
   ProcedureDivisionContext processProcedureDivisionContext(ProcedureDivision cstNode) {
-    ProcedureDivisionContext pdCtx =
-            initNode(cstNode, new ProcedureDivisionContext(null, 0), charStream);
-    TerminalNodeImpl tNode = new TerminalNodeImpl(new CommonToken(0, ""));
-    pdCtx.addChild(tNode);
-    pdCtx.addChild(tNode);
-    pdCtx.addChild(tNode);
-    pdCtx.addChild(createProcedureDivisionBodyContext(cstNode));
+    ProcedureDivisionContext pdCtx = parseProcedureDivision(cstNode);
+    createProcedureDivisionBodyContext(pdCtx, cstNode);
+    // Remove EOF token if eny
+    ParseTree lastChild = pdCtx.children.get(pdCtx.children.size() - 1);
+    if (lastChild instanceof TerminalNodeImpl
+            && ((TerminalNodeImpl) lastChild).getSymbol().getType() == org.antlr.v4.runtime.Token.EOF) {
+      pdCtx.removeLastChild();
+    }
     return pdCtx;
   }
 
-  private ProcedureDivisionBodyContext createProcedureDivisionBodyContext(ProcedureDivision cstNode) {
-    ProcedureDivisionBodyContext pdbCtx = initNode(cstNode, new ProcedureDivisionBodyContext(null, 0), charStream);
-    pdbCtx.start = toAntlrToken(cstNode.getBodyStartToken(), charStream);
+  private ProcedureDivisionBodyContext createProcedureDivisionBodyContext(ProcedureDivisionContext pdCtx, ProcedureDivision cstNode) {
+    Optional<ParseTree> opt = findChild(pdCtx, ProcedureDivisionBodyContext.class);
+    ProcedureDivisionBodyContext pdbCtx;
+    pdCtx.stop = findStopToken(cstNode, true).map(token -> toAntlrToken(token, charStream)).orElse(null);
+    if (opt.isPresent()) {
+      pdbCtx = (ProcedureDivisionBodyContext) opt.get();
+      pdbCtx.children = new ArrayList<>();
+    } else {
+      pdbCtx = initNode(cstNode, new ProcedureDivisionBodyContext(null, 0), charStream);
+      pdCtx.addChild(pdbCtx);
+      pdbCtx.start = toAntlrToken(cstNode.getBodyStartToken(), charStream);
+    }
 
     LinkedList<ParserRuleContext> genStack = new LinkedList<>();
     genStack.push(pdbCtx);
@@ -115,6 +127,10 @@ public class ProcedureDivisionAntlrAdapter {
     }
     return pdbCtx;
 
+  }
+
+  private Optional<ParseTree> findChild(ProcedureDivisionContext pdCtx, Class<?> expectedClass) {
+    return pdCtx.children.stream().filter(c -> c.getClass() == expectedClass).findFirst();
   }
 
   private void handleDeclaratives(LinkedList<ParserRuleContext> genStack, Declaratives node) {
@@ -213,6 +229,40 @@ public class ProcedureDivisionAntlrAdapter {
     antlrParser.setErrorHandler(errorStrategy);
     antlrParser.addParseListener(treeListener);
     return antlrParser.sentence();
+  }
+
+  private ProcedureDivisionContext parseProcedureDivision(ProcedureDivision node) {
+    StringBuilder sb = new StringBuilder();
+    for (CstNode c : node.getChildren()) {
+      if (hasToken(c, node.getBodyStartToken())) {
+        break;
+      }
+      sb.append(c.toText());
+    }
+    String input = generatePrefix(charStream, findStartToken(node).get()) + sb;
+    CobolProcedureDivisionLexer antlrLexer =
+            new CobolProcedureDivisionLexer(CharStreams.fromString(input));
+    antlrLexer.removeErrorListeners();
+    antlrLexer.addErrorListener(errorListener);
+    CommonTokenStream tokens = new CommonTokenStream(antlrLexer);
+    CobolProcedureDivisionParser antlrParser = new CobolProcedureDivisionParser(tokens);
+    antlrParser.removeErrorListeners();
+    antlrParser.addErrorListener(errorListener);
+    antlrParser.setErrorHandler(errorStrategy);
+    antlrParser.addParseListener(treeListener);
+    return antlrParser.procedureDivision();
+  }
+
+  private boolean hasToken(CstNode node, Token token) {
+    if (node.equals(token)) {
+      return true;
+    }
+    for (CstNode c : node.getChildren()) {
+      if (hasToken(c, token)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   private ProcedureSectionHeaderContext createSectionHeader(CstNode node, Token name, Token section) {
