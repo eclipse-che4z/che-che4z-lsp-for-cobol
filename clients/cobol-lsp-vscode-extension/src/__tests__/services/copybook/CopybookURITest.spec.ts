@@ -39,7 +39,7 @@ describe("CopybooksPathGenerator tests", () => {
         ".copybooks",
         "profile",
         "dataset",
-        "copybook.cpy",
+        "copybook",
       ),
     );
   });

@@ -273,7 +273,7 @@ export class SettingsService {
    * Return the code page for the copybook file encoding supplied by user
    * @returns string
    */
-  public static getCopybookFileEncoding() {
+  public static getCopybookFileEncoding(): string | undefined {
     return vscode.workspace
       .getConfiguration(SETTINGS_CPY_SECTION)
       .get("copybook-file-encoding");
