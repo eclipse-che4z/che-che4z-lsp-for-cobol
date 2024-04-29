@@ -36,6 +36,7 @@ export const C4Z_FOLDER: string = ".c4z";
 export const COPYBOOKS_FOLDER: string = ".copybooks";
 export const GITIGNORE_FILE: string = ".gitignore";
 export const LANGUAGE_ID = "cobol";
+export const EXP_LANGUAGE_ID = "expcobol";
 export const HP_LANGUAGE_ID = "hpcobol";
 export const PROFILE_NAME_PLACEHOLDER = "<profilename>";
 export const DOWNLOAD_QUEUE_LOCKED_ERROR_MSG = `Invalid credentials for profile: ${PROFILE_NAME_PLACEHOLDER}. Copybook retrieval is blocked. Ensure the profile contains correct credentials.`;
