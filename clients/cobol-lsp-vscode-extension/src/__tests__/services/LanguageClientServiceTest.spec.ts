@@ -22,7 +22,7 @@ import { LanguageClientService } from "../../services/LanguageClientService";
 import { NativeExecutableService } from "../../services/nativeLanguageClient/nativeExecutableService";
 import { TelemetryService } from "../../services/reporter/TelemetryService";
 import { Utils } from "../../services/util/Utils";
-import { HP_LANGUAGE_ID } from "../../constants";
+import { EXP_LANGUAGE_ID, HP_LANGUAGE_ID } from "../../constants";
 
 jest.mock("../../services/reporter/TelemetryService");
 jest.mock("../../services/copybook/CopybookURI");
@@ -141,7 +141,7 @@ describe("LanguageClientService positive scenario", () => {
         options: { detached: false },
       },
       {
-        documentSelector: [SERVER_ID, HP_LANGUAGE_ID],
+        documentSelector: [SERVER_ID, EXP_LANGUAGE_ID, HP_LANGUAGE_ID],
         outputChannel: expect.any(Function),
         synchronize: {
           fileEvents: [undefined, undefined],
@@ -164,7 +164,7 @@ describe("LanguageClientService positive scenario", () => {
       SERVER_DESC,
       expect.any(Function),
       {
-        documentSelector: [SERVER_ID, HP_LANGUAGE_ID],
+        documentSelector: [SERVER_ID, EXP_LANGUAGE_ID, HP_LANGUAGE_ID],
 
         outputChannel: expect.any(Function),
         synchronize: {
