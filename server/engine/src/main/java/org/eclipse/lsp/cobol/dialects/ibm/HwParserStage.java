@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Broadcom.
+ * Copyright (c) 2024 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -40,7 +40,7 @@ import java.util.stream.Collectors;
  * Parser stage
  */
 @RequiredArgsConstructor
-public class ParserStage implements Stage<AnalysisContext, ParserStageResult, DialectOutcome> {
+class HwParserStage implements Stage<AnalysisContext, ParserStageResult, DialectOutcome> {
   private final MessageService messageService;
   private final ParseTreeListener treeListener;
 
@@ -49,13 +49,13 @@ public class ParserStage implements Stage<AnalysisContext, ParserStageResult, Di
     return context.getBenchmarkSession().measure("pipeline.parser", () -> {
       // Run parser;
       context.setDialectNodes(ImmutableList.<Node>builder()
-              .addAll(context.getDialectNodes())
-              .addAll(prevStageResult.getData().getDialectNodes())
-              .build());
+          .addAll(context.getDialectNodes())
+          .addAll(prevStageResult.getData().getDialectNodes())
+          .build());
       ParserListener listener = new ParserListener(context.getExtendedDocument(), context.getCopybooksRepository());
       CobolErrorStrategy errorStrategy = new CobolErrorStrategy(messageService);
-      AstBuilder parser = new AntlrCobolParser(CharStreams.fromString(context.getExtendedDocument().toString()),
-              listener, errorStrategy, treeListener);
+      AstBuilder parser = new SplitParser(CharStreams.fromString(context.getExtendedDocument().toString()),
+          listener, errorStrategy, treeListener);
       CobolParser.StartRuleContext tree = parser.runParser();
       context.getAccumulatedErrors().addAll(listener.getErrors());
       context.getAccumulatedErrors().addAll(getParsingError(context, parser));
@@ -68,16 +68,16 @@ public class ParserStage implements Stage<AnalysisContext, ParserStageResult, Di
       Location location = context.getExtendedDocument().mapLocation(diagnostic.getRange());
       String copybookId = context.getCopybooksRepository().getCopybookIdByUri(location.getUri());
       return SyntaxError.syntaxError()
-              .errorSource(ErrorSource.PARSING)
-              .severity(ErrorSeverity.ERROR)
-              .location(new OriginalLocation(location, copybookId))
-              .suggestion(diagnostic.getMessage())
-              .build();
+          .errorSource(ErrorSource.PARSING)
+          .severity(ErrorSeverity.ERROR)
+          .location(new OriginalLocation(location, copybookId))
+          .suggestion(diagnostic.getMessage())
+          .build();
     }).collect(Collectors.toList());
   }
 
   @Override
   public String getName() {
-    return "Parsing stage";
+    return "Parsing stage (hw)";
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Broadcom.
+ * Copyright (c) 2024 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -23,20 +23,24 @@ import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.eclipse.lsp4j.Range;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-/** This test checks that the semicolons are not allowed outside the PROCEDURE DIVISION. */
-class TestSemicolonNotAllowedInIdentificationDivision {
+/** This test checks that unexpected text in ID DIVISION is flagged */
+class TestHwUnexpectedTextInIdentificationDivision {
+
   private static final String TEXT =
-      "       IDENTIFICATION DIVISION;\n"
-          + "       {PROGRAM-ID|1}. TEST1.\n"
-          + "       DATA DIVISION.\n"
+      "       identification division.\n"
+          + "       program-id. test.\n"
+          + "       {DISPLAY|1} \"HELLO\".\n"
+          + "       data division.\n"
           + "       working-storage section.\n"
-          + "       01 {$*LINE-SPACING} PIC 9.\n"
+          + "       01 {$*VARNAME} PIC X(3) VALUE \"ABC\".\n"
           + "       procedure division.\n"
-          + "           MOVE 2 TO {$LINE-SPACING}.\n";
+          + "           DISPLAY {$VARNAME}.";
 
   @Test
+  @Disabled("Hw parser")
   void test() {
     UseCaseEngine.runTest(
         TEXT,
@@ -45,9 +49,9 @@ class TestSemicolonNotAllowedInIdentificationDivision {
             "1",
             new Diagnostic(
                 new Range(),
-                "A period was assumed before \"PROGRAM-ID\".",
+                "Syntax error on 'DISPLAY'",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())),
-        CobolLanguageId.COBOL);
+        CobolLanguageId.EXPERIMENTAL_COBOL);
   }
 }

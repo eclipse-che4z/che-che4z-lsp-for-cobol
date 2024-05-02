@@ -140,6 +140,7 @@ public class ServerCommunications implements Communications {
 
   private void notifyWorkProgress(String uri) {
     WorkDoneProgressReport workDoneProgressReport = new WorkDoneProgressReport();
+    workDoneProgressReport.setCancellable(true);
     ProgressParams params = new ProgressParams(Either.forLeft(uri), Either.forLeft(workDoneProgressReport));
     getClient().notifyProgress(params);
   }
@@ -155,6 +156,7 @@ public class ServerCommunications implements Communications {
     workDoneProgressBegin.setTitle(messageService.getMessage(
             "Communications.syntaxAnalysisInProgressTitle",
             files.getNameFromURI(uri)));
+    workDoneProgressBegin.setCancellable(true);
     params.setValue(Either.forLeft(workDoneProgressBegin));
     getClient().notifyProgress(params);
   }

@@ -49,8 +49,8 @@ public class SplitParser implements AstBuilder {
     SourceUnit su = parseResult.getSourceUnit();
     diagnostics = parseResult.getDiagnostics();
     AntlrAdapter antlrAdapter = new AntlrAdapter(listener, errorStrategy, treeListener);
-    root = antlrAdapter.sourceUnitToStartRule(su);
     tokens = antlrAdapter.adaptTokens(su);
+    root = antlrAdapter.sourceUnitToStartRule(su);
   }
 
   /**

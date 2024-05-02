@@ -16,8 +16,8 @@ package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.eclipse.lsp.cobol.common.dialects.CobolLanguageId;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
-import org.eclipse.lsp.cobol.core.ParserUtils;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
@@ -30,9 +30,9 @@ class TestIndicatorAreaError {
   private static final String TEXT = "qwerty{u|1}{iop|2}";
 
   private static final String MESSAGE_1 = "Unexpected indicator area content";
-  private static final String MESSAGE_2 = ParserUtils.isHwParserEnabled()
-          ? "Unknown input: 'iop'"
-          :  "Syntax error on 'iop'";
+  private static final String MESSAGE_2 = "Syntax error on 'iop'";
+
+  private static final String MESSAGE_2_HW = "Unknown input: 'iop'";
 
   @Test
   void test() {
@@ -45,6 +45,23 @@ class TestIndicatorAreaError {
                 new Range(), MESSAGE_1, DiagnosticSeverity.Error, ErrorSource.PREPROCESSING.getText()),
             "2",
             new Diagnostic(
-                new Range(), MESSAGE_2, DiagnosticSeverity.Error, ErrorSource.PARSING.getText())));
+                new Range(), MESSAGE_2, DiagnosticSeverity.Error, ErrorSource.PARSING.getText())),
+        CobolLanguageId.COBOL);
   }
+
+  @Test
+  void testHw() {
+    UseCaseEngine.runTest(
+        TEXT,
+        ImmutableList.of(),
+        ImmutableMap.of(
+            "1",
+            new Diagnostic(
+                new Range(), MESSAGE_1, DiagnosticSeverity.Error, ErrorSource.PREPROCESSING.getText()),
+            "2",
+            new Diagnostic(
+                new Range(), MESSAGE_2_HW, DiagnosticSeverity.Error, ErrorSource.PARSING.getText())),
+        CobolLanguageId.EXPERIMENTAL_COBOL);
+  }
+
 }

@@ -16,13 +16,12 @@
 package org.eclipse.lsp.cobol.usecases;
 
 import org.eclipse.lsp.cobol.common.AnalysisResult;
-import org.eclipse.lsp.cobol.core.ParserUtils;
+import org.eclipse.lsp.cobol.common.dialects.CobolLanguageId;
 import org.eclipse.lsp.cobol.test.engine.UseCase;
 import org.eclipse.lsp.cobol.test.engine.UseCaseUtils;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assumptions.assumeFalse;
 
 /** This test verifies if the margins respected and warnings thrown */
 class TestMarginAB {
@@ -162,8 +161,7 @@ class TestMarginAB {
 
   @Test
   void checkForAreaB() {
-    assumeFalse(ParserUtils.isHwParserEnabled());
-    AnalysisResult result = UseCaseUtils.analyze(UseCase.builder().text(TEXT_AREA_B).build());
+    AnalysisResult result = UseCaseUtils.analyze(UseCase.builder().text(TEXT_AREA_B).build(), CobolLanguageId.COBOL);
     assertEquals(5, result.getDiagnostics().get(UseCaseUtils.DOCUMENT_URI).size());
   }
 

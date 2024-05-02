@@ -20,9 +20,11 @@ import java.util.concurrent.CompletableFuture;
 import javax.annotation.Nullable;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.lsp.cobol.lsp.events.notifications.CancelProgressNotification;
 import org.eclipse.lsp.cobol.lsp.events.notifications.InitializedNotification;
 import org.eclipse.lsp.cobol.lsp.events.queries.InitializeQuery;
 import org.eclipse.lsp.cobol.lsp.events.queries.ShutdownQuery;
+import org.eclipse.lsp.cobol.lsp.handlers.server.CancelProgressHandler;
 import org.eclipse.lsp.cobol.lsp.handlers.server.ExitHandler;
 import org.eclipse.lsp.cobol.lsp.handlers.server.InitializeHandler;
 import org.eclipse.lsp.cobol.lsp.handlers.server.InitializedHandler;
@@ -48,6 +50,7 @@ public class CobolLanguageServer implements LanguageServer {
   private final ShutdownHandler shutdownHandler;
   private final InitializeHandler initializeHandler;
   private final InitializedHandler initializedHandler;
+  private final CancelProgressHandler cancelProgressHandler;
 
   @Inject
   @SuppressWarnings("squid:S107")
@@ -59,7 +62,8 @@ public class CobolLanguageServer implements LanguageServer {
           ShutdownHandler shutdownHandler,
           InitializeHandler initializeHandler,
           InitializedHandler initializedHandler,
-          LspEventConsumer lspEventConsumer) {
+          LspEventConsumer lspEventConsumer,
+          CancelProgressHandler cancelProgressHandler) {
     this.lspMessageBroker = lspMessageBroker;
     this.textService = textService;
     this.workspaceService = workspaceService;
@@ -68,6 +72,7 @@ public class CobolLanguageServer implements LanguageServer {
     this.initializeHandler = initializeHandler;
     this.initializedHandler = initializedHandler;
     this.lspEventConsumer = lspEventConsumer;
+    this.cancelProgressHandler = cancelProgressHandler;
   }
 
   @Override
@@ -112,5 +117,10 @@ public class CobolLanguageServer implements LanguageServer {
   public void exit() {
     // Kill the server (loop should be already stopped at this time)
     exitHandler.exit();
+  }
+
+  @Override
+  public void cancelProgress(WorkDoneProgressCancelParams params) {
+    lspMessageBroker.notify(new CancelProgressNotification(params.getToken().getLeft(), cancelProgressHandler));
   }
 }

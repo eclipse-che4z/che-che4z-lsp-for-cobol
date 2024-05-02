@@ -365,9 +365,7 @@ public class CobolProcedureDivisionVisitor extends CobolProcedureDivisionParserB
 
   @Override
   public List<Node> visitStatement(StatementContext ctx) {
-    if (!ParserUtils.isHwParserEnabled()) {
-      areaBWarning(ctx);
-    }
+    areaBWarning(ctx);
     throwWarning(ctx.getStart());
     return visitChildren(ctx);
   }
@@ -870,7 +868,7 @@ public class CobolProcedureDivisionVisitor extends CobolProcedureDivisionParserB
     errors.add(error);
   }
 
-  private void throwWarning(Token token) {
+  protected void throwWarning(Token token) {
     String tokenText = token.getText().toUpperCase();
     if (MisspelledKeywordDistance.KEYWORDS.getSuggestions().contains(tokenText)) return;
     MisspelledKeywordDistance.calculateDistance(tokenText)
