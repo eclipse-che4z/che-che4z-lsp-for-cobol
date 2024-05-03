@@ -40,7 +40,7 @@ public class DialectConfigs {
             ImmutableList.of(DaCoDialect.NAME, IdmsDialect.NAME), true,
             ImmutableList.of(),
             createPredefinedSectionsConfig(ImmutableList.of("S930", "S940", "S950",
-                "S990", "S991", "S997", "S999")));
+                "S990", "S991", "S997", "S999")), false);
   }
 
   /**
@@ -51,7 +51,7 @@ public class DialectConfigs {
    */
   public AnalysisConfig getDaCoAnalysisConfig(CopybookProcessingMode copybookProcessingMode, List<String> predefinedSections) {
     return new AnalysisConfig(copybookProcessingMode, ImmutableList.of(DaCoDialect.NAME, IdmsDialect.NAME),
-        true, ImmutableList.of(), createPredefinedSectionsConfig(predefinedSections));
+        true, ImmutableList.of(), createPredefinedSectionsConfig(predefinedSections), false);
   }
 
   private Map<String, JsonElement> createPredefinedSectionsConfig(List<String> predefinedSections) {

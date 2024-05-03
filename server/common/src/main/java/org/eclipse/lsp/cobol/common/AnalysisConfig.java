@@ -36,6 +36,7 @@ public class AnalysisConfig {
   List<DialectRegistryItem> dialectRegistry;
   Map<String, JsonElement> dialectsSettings;
   List<String> compilerOptions = new ArrayList<>();
+  boolean stdSqlEnabled;
 
   /**
    * Create the default language features config, containing all features and the given copybook
@@ -50,6 +51,7 @@ public class AnalysisConfig {
         ImmutableList.of(),
         true,
         ImmutableList.of(),
-        ImmutableMap.of("target-sql-backend", new Gson().toJsonTree(SQLBackend.DB2_SERVER)));
+        ImmutableMap.of("target-sql-backend", new Gson().toJsonTree(SQLBackend.DB2_SERVER)),
+            false);
   }
 }

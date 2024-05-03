@@ -51,7 +51,8 @@ public class CachingConfigurationService implements ConfigurationService {
         SUBROUTINE_LOCAL_PATHS.label,
         CICS_TRANSLATOR_ENABLED.label,
         DIALECT_REGISTRY.label,
-        COMPILER_OPTIONS.label));
+        COMPILER_OPTIONS.label,
+        STDSQL_ENABLED.label));
 
     List<String> dialectsSections = Stream.concat(
             dialectService.getSettingsSections().stream(),
@@ -127,7 +128,8 @@ public class CachingConfigurationService implements ConfigurationService {
             ConfigHelper.parseCicsTranslatorOption((JsonElement) clientConfig.get(2)),
             ConfigHelper.parseDialectRegistry((JsonArray) clientConfig.get(3)),
             ConfigHelper.parseCompilerOptions(clientConfig.get(4)),
-        getDialectsSettings(clientConfig.subList(5, 5 + dialectsSections.size()).toArray(), dialectsSections.toArray())
+            ConfigHelper.parseStdSqlOption((JsonElement) clientConfig.get(5)),
+        getDialectsSettings(clientConfig.subList(6, 6 + dialectsSections.size()).toArray(), dialectsSections.toArray())
         );
   }
 

@@ -31,7 +31,7 @@ public class DialectConfigs {
             CopybookProcessingMode.DISABLED,
         ImmutableList.of("IDMS"), true,
         ImmutableList.of(),
-        ImmutableMap.of());
+        ImmutableMap.of(), false);
   }
 
   /**
@@ -46,6 +46,6 @@ public class DialectConfigs {
             ImmutableList.of("DaCo", "IDMS"), true,
             ImmutableList.of(),
             ImmutableMap.of("daco.predefined-sections", new Gson().toJsonTree(list),
-                    "target-sql-backend", new Gson().toJsonTree(SQLBackend.DB2_SERVER)));
+                    "target-sql-backend", new Gson().toJsonTree(SQLBackend.DB2_SERVER)), false);
   }
 }

@@ -454,6 +454,11 @@
           "default": "true",
           "description": "Enable CICS translator"
         },
+        "cobol-lsp.stdsql": {
+          "type": "boolean",
+          "default": "false",
+          "description": "Enable SQL standard language"
+        },
         "cobol-lsp.serverRuntime": {
           "type": "string",
           "enum": [

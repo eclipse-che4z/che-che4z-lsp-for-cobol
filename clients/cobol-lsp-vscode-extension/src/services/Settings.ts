@@ -33,6 +33,7 @@ import {
   SETTINGS_COMPILE_OPTIONS,
   DIALECT_LIBS,
   COBOL_PRGM_LAYOUT,
+  SETTINGS_STDSQL,
 } from "../constants";
 import cobolSnippets = require("../services/snippetcompletion/cobolSnippets.json");
 import { DialectRegistry, DIALECT_REGISTRY_SECTION } from "./DialectRegistry";
@@ -44,6 +45,7 @@ import {
   loadProcessorGroupCopybookPathsConfig,
   loadProcessorGroupDialectConfig,
   loadProcessorGroupSqlBackendConfig,
+  loadProcessorGroupStdSqlConfig,
 } from "./ProcessorGroups";
 import { getProgramNameFromUri } from "./util/FSUtils";
 
@@ -137,6 +139,9 @@ export function configHandler(request: any): Array<any> {
             item,
             cfg as string,
           );
+          result.push(object);
+        } else if (item.section === SETTINGS_STDSQL) {
+          const object = loadProcessorGroupStdSqlConfig(item, cfg as string);
           result.push(object);
         } else if (item.section === SETTINGS_CPY_FILE_ENCODING) {
           const object = loadProcessorGroupCopybookEncodingConfig(

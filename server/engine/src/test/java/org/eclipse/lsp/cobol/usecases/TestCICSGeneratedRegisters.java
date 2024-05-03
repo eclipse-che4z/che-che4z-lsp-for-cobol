@@ -27,7 +27,7 @@ import org.junit.jupiter.api.Test;
 
 /**
  * Tests the usage of special registers implicitly introduced by CICS translator. Check {@link
- * org.eclipse.lsp.cobol.core.model.tree.logic.implicit.SRImplicitVariablesGenerator} for complete
+ * org.eclipse.lsp.cobol.core.engine.processors.implicit.SRImplicitVariablesGenerator} for complete
  * list of implicit registers.
  */
 public class TestCICSGeneratedRegisters {
@@ -74,7 +74,8 @@ public class TestCICSGeneratedRegisters {
             ImmutableList.of(),
             false,
             ImmutableList.of(),
-            ImmutableMap.of());
+            ImmutableMap.of(),
+            false);
 
     UseCaseEngine.runTest(
         TEXT2,

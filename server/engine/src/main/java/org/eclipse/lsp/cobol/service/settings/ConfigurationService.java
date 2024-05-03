@@ -79,6 +79,7 @@ public interface ConfigurationService {
     List<DialectRegistryItem> dialectRegistry;
     List<String> compilerOptions;
 //    CobolProgramLayout layout;
+    boolean stdSqlEnabled;
     Map<String, JsonElement> dialectsSettings;
 
     public ConfigurationEntity() {
@@ -87,6 +88,7 @@ public interface ConfigurationService {
       cicsTranslatorEnabled = true;
       dialectRegistry = ImmutableList.of();
       compilerOptions = ImmutableList.of();
+      stdSqlEnabled = false;
       dialectsSettings = ImmutableMap.of();
 //      layout = new CobolProgramLayout();
     }

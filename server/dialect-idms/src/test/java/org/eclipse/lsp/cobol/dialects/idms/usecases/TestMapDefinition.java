@@ -68,7 +68,7 @@ class TestMapDefinition {
                 CopybookProcessingMode.ENABLED,
                 ImmutableList.of(IdmsDialect.NAME), true,
                 ImmutableList.of(),
-                ImmutableMap.of()));
+                ImmutableMap.of(), false));
     SourceUnitGraph documentGraph = mock(SourceUnitGraph.class);
     when(documentGraph.isCopybook(anyString())).thenReturn(false);
     final Hover mapHover =

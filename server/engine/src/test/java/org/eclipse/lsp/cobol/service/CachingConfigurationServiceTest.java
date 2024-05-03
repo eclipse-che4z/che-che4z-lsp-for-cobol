@@ -51,7 +51,7 @@ class CachingConfigurationServiceTest {
         new AnalysisConfig(
                 CopybookProcessingMode.ENABLED,
             ImmutableList.of(),
-            true, ImmutableList.of(), ImmutableMap.of()),
+            true, ImmutableList.of(), ImmutableMap.of(), false),
         configuration.getConfig(null, CopybookProcessingMode.ENABLED));
   }
 
@@ -75,6 +75,7 @@ class CachingConfigurationServiceTest {
             new JsonPrimitive("true"),
             new JsonArray(),
             new JsonArray(),
+            new JsonPrimitive("true"),
             predefinedParagraphs);
 
     when(settingsService.fetchConfigurations("",
@@ -84,6 +85,7 @@ class CachingConfigurationServiceTest {
                 CICS_TRANSLATOR_ENABLED.label,
                 DIALECT_REGISTRY.label,
                 COMPILER_OPTIONS.label,
+                STDSQL_ENABLED.label,
                 "dialect")))
         .thenReturn(supplyAsync(() -> clientConfig));
 
@@ -94,7 +96,8 @@ class CachingConfigurationServiceTest {
                 CopybookProcessingMode.DISABLED,
             ImmutableList.of("Dialect"),
             true, ImmutableList.of(),
-            ImmutableMap.of("dialect", predefinedParagraphs)),
+            ImmutableMap.of("dialect", predefinedParagraphs),
+            true),
         configuration.getConfig("", CopybookProcessingMode.DISABLED));
   }
 
@@ -114,9 +117,10 @@ class CachingConfigurationServiceTest {
         Arrays.asList(
             dialectSettings,
             subroutineSettings,
-            new JsonNull(),
+            JsonNull.INSTANCE,
             new JsonArray(),
              new JsonArray(),
+             JsonNull.INSTANCE,
             dialectsSettings);
     when(settingsService.fetchConfigurations("",
             Arrays.asList(
@@ -125,6 +129,7 @@ class CachingConfigurationServiceTest {
                 CICS_TRANSLATOR_ENABLED.label,
                 DIALECT_REGISTRY.label,
                 COMPILER_OPTIONS.label,
+                STDSQL_ENABLED.label,
                 "dialect")))
         .thenReturn(supplyAsync(() -> clientConfig));
 
@@ -136,7 +141,8 @@ class CachingConfigurationServiceTest {
             ImmutableList.of("Dialect"),
             false,
             ImmutableList.of(),
-            ImmutableMap.of("dialect", dialectsSettings)),
+            ImmutableMap.of("dialect", dialectsSettings),
+            false),
         configuration.getConfig("", CopybookProcessingMode.DISABLED));
   }
 

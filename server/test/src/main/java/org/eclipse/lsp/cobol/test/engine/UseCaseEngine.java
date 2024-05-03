@@ -261,7 +261,7 @@ public class UseCaseEngine {
             .orElse(SQLBackend.DB2_SERVER);
     PreprocessedDocument document =
         AnnotatedDocumentCleaning.prepareDocument(
-            text, copybooks, subroutineNames, expectedDiagnostics, sqlBackendSetting);
+            text, copybooks, subroutineNames, expectedDiagnostics, sqlBackendSetting, analysisConfig.isStdSqlEnabled());
     AnalysisResult actual =
         analyze(
             UseCase.builder()
@@ -275,6 +275,7 @@ public class UseCaseEngine {
                 .sqlBackend(sqlBackendSetting)
                 .dialectsSettings(analysisConfig.getDialectsSettings())
                 .compilerOptions(analysisConfig.getCompilerOptions())
+                .stdSqlEnabled(analysisConfig.isStdSqlEnabled())
                 .build(),
             languageId);
     assertResultEquals(actual, document.getTestData());
@@ -343,7 +344,7 @@ public class UseCaseEngine {
 
     PreprocessedDocument document =
         AnnotatedDocumentCleaning.prepareDocument(
-            text, copybooks, subroutineNames, expectedDiagnostics, sqlBackendSetting);
+            text, copybooks, subroutineNames, expectedDiagnostics, sqlBackendSetting, analysisConfig.isStdSqlEnabled());
     AnalysisResult actual =
         analyze(
             UseCase.builder()

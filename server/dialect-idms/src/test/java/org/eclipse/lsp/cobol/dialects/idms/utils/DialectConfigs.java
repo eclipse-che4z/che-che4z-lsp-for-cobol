@@ -29,6 +29,6 @@ public class DialectConfigs {
             CopybookProcessingMode.DISABLED,
         ImmutableList.of(IdmsDialect.NAME), true,
         ImmutableList.of(),
-        ImmutableMap.of());
+        ImmutableMap.of(), false);
   }
 }

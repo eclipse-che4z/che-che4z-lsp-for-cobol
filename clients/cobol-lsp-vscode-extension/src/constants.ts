@@ -19,6 +19,7 @@ export const SETTINGS_CPY_EXTENSIONS: string =
 export const SETTINGS_CPY_FILE_ENCODING: string =
   "cobol-lsp.cpy-manager.copybook-file-encoding";
 export const SETTINGS_SQL_BACKEND: string = "cobol-lsp.target-sql-backend";
+export const SETTINGS_STDSQL: string = "cobol-lsp.stdsql";
 export const SETTINGS_DIALECT = "cobol-lsp.dialects";
 export const SETTINGS_COMPILE_OPTIONS = "cobol-lsp.compiler.options";
 export const SETTINGS_SUBROUTINE_LOCAL_KEY =

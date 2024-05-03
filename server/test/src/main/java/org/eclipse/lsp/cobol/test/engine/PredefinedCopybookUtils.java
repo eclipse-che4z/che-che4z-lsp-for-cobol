@@ -44,11 +44,11 @@ class PredefinedCopybookUtils {
    * @param sqlBackend backend to retrieve the correct coopybook URI
    * @return mapper from copybook name to {@link CobolText}
    */
-  Function<String, CobolText> toCobolText(SQLBackend sqlBackend) {
+  Function<String, CobolText> toCobolText(SQLBackend sqlBackend, boolean stdSqlEnabled) {
     return name ->
         new CobolText(
             name,
-            files.readImplicitCode(retrieveRealName(name, sqlBackend)));
+            convertToStdSql(files.readImplicitCode(retrieveRealName(name, sqlBackend)), sqlBackend, stdSqlEnabled));
   }
 
   /**
@@ -58,9 +58,10 @@ class PredefinedCopybookUtils {
    * @param programUri uri of the program
    * @return list of models for predefined copybooks
    */
-  List<CopybookModel> loadPredefinedCopybooks(SQLBackend sqlBackend, List<CobolText> copybooks, String programUri) {
+  List<CopybookModel> loadPredefinedCopybooks(SQLBackend sqlBackend, List<CobolText> copybooks, String programUri,
+                                              boolean stdSqlEnabled) {
     return PredefinedCopybooks.getNames().stream()
-        .map(name -> retrieveModel(new CopybookName(name, findDialect(name, copybooks)), programUri, sqlBackend))
+        .map(name -> retrieveModel(new CopybookName(name, findDialect(name, copybooks)), programUri, sqlBackend, stdSqlEnabled))
         .collect(Collectors.toList());
   }
 
@@ -72,7 +73,8 @@ class PredefinedCopybookUtils {
         .orElse(null);
   }
 
-  private CopybookModel retrieveModel(CopybookName copybookName, String programUri, SQLBackend sqlBackend) {
+  private CopybookModel retrieveModel(CopybookName copybookName, String programUri, SQLBackend sqlBackend,
+                                      boolean isStdSqlEnabled) {
     final String name = retrieveRealName(copybookName.getDisplayName(), sqlBackend);
 
     String content = files.readImplicitCode(name);
@@ -83,12 +85,21 @@ class PredefinedCopybookUtils {
             ImmutableList.of(),
             ImmutableList.of(),
             ImmutableMap.of(),
-            sqlBackend);
+            sqlBackend,
+            isStdSqlEnabled);
     String fullUrl = ImplicitCodeUtils.createFullUrl(name);
     return new CopybookModel(copybookName.toCopybookId(programUri), copybookName, fullUrl, cleanCopybook.getText());
   }
 
   private String retrieveRealName(String name, SQLBackend sqlBackend) {
     return PredefinedCopybooks.forName(name).nameForBackend(sqlBackend);
+  }
+
+  private String convertToStdSql(String content, SQLBackend sqlBackend, boolean stdSqlEnabled) {
+    if (sqlBackend.equals(SQLBackend.DB2_SERVER) && stdSqlEnabled) {
+      return content.replace("SQLCODE", "SQLCADE")
+              .replace("SQLSTATE", "SQLSTAT");
+    }
+    return content;
   }
 }

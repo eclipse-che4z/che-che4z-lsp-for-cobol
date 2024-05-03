@@ -111,6 +111,19 @@ public class ConfigHelper {
   }
 
   /**
+   * Parse STDSQL client configuration to {@link Boolean}
+   * @param options STDSQL client configuration
+   * @return True if checked or false
+   */
+  public boolean parseStdSqlOption(JsonElement options) {
+    if (options instanceof JsonNull) {
+      return false;
+    } else {
+      return options.getAsBoolean();
+    }
+  }
+
+  /**
    * Parse dialect client configurations to {@link String}
    * @param dialects dialects client configuration
    * @return List of configured dialects

@@ -208,7 +208,8 @@ public abstract class FileBasedTest extends ConfigurableTest {
           ImmutableList.of("IDMS"),
           true,
           ImmutableList.of(),
-          ImmutableMap.of("target-sql-backend", new Gson().toJsonTree(SQLBackend.DB2_SERVER)));
+          ImmutableMap.of("target-sql-backend", new Gson().toJsonTree(SQLBackend.DB2_SERVER)),
+          false);
     }
     return AnalysisConfig.defaultConfig(ENABLED);
   }

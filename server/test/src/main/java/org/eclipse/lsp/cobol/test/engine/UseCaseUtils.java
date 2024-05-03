@@ -124,8 +124,8 @@ public class UseCaseUtils {
 
     CopybookService copybookService = injector.getInstance(CopybookService.class);
     CleanerPreprocessor preprocessor = dialectService.getPreprocessor(languageId);
-    PredefinedCopybookUtils.loadPredefinedCopybooks(useCase.getSqlBackend(), useCase.getCopybooks(), useCase.documentUri)
-        .forEach(pc -> copybookService.store(pc, preprocessor));
+    PredefinedCopybookUtils.loadPredefinedCopybooks(useCase.getSqlBackend(), useCase.getCopybooks(), useCase.documentUri,
+                    useCase.isStdSqlEnabled()).forEach(pc -> copybookService.store(pc, preprocessor));
 
     useCase.getCopybooks()
         .forEach(cobolText -> {

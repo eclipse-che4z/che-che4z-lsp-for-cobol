@@ -105,6 +105,18 @@ export function loadProcessorGroupSqlBackendConfig(
   );
 }
 
+export function loadProcessorGroupStdSqlConfig(
+  item: { scopeUri: string },
+  configObject: string,
+): string {
+  return loadProcessorGroupSettings(
+    item.scopeUri,
+    "stdsql",
+    configObject,
+    "SQL",
+  );
+}
+
 export function loadProcessorGroupDialectConfig(
   item: { scopeUri: string; section: string },
   configObject: unknown,

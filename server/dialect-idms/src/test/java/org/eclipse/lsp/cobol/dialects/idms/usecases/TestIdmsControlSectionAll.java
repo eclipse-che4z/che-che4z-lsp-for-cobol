@@ -115,7 +115,7 @@ class TestIdmsControlSectionAll {
                 CopybookProcessingMode.ENABLED,
             ImmutableList.of(IdmsDialect.NAME), true,
             ImmutableList.of(),
-            ImmutableMap.of()));
+            ImmutableMap.of(), false));
   }
 
 }

@@ -93,7 +93,7 @@ public class Db2SqlDialect implements CobolDialect {
         .map(CopybookName::new)
         .collect(Collectors.toList())
         .stream()
-        .map(copybook -> tryResolvePredefinedCopybook(copybook, ctx.getDialectsSettings()))
+        .map(copybook -> tryResolvePredefinedCopybook(copybook, ctx.getDialectsSettings(), ctx.isStdSqlEnabled()))
         .filter(Optional::isPresent)
         .map(Optional::get)
         .collect(Collectors.toList());
@@ -155,7 +155,7 @@ public class Db2SqlDialect implements CobolDialect {
    * @return optional model of a predefined copybook if it exists
    */
   private Optional<CopybookModel> tryResolvePredefinedCopybook(
-      CopybookName copybookName, Map<String, JsonElement> dialectsSettings) {
+      CopybookName copybookName, Map<String, JsonElement> dialectsSettings, boolean stdSqlEnabled) {
     SQLBackend sqlBackend =
         Optional.ofNullable(dialectsSettings.get("target-sql-backend"))
             .map(JsonElement::getAsString)
@@ -169,7 +169,9 @@ public class Db2SqlDialect implements CobolDialect {
             .map(
                 c -> {
                   String name = c.nameForBackend(sqlBackend);
-                  String content = new WorkspaceFileService().readImplicitCode(name);
+                  String content = convertToStdSql(
+                          new WorkspaceFileService().readImplicitCode(name),
+                          sqlBackend, stdSqlEnabled);
                   return new CopybookModel(
                       copybookName.toCopybookId(ImplicitCodeUtils.createFullUrl(c.name())),
                       copybookName,
@@ -179,5 +181,13 @@ public class Db2SqlDialect implements CobolDialect {
 
     LOG.debug("Db2 Predefined copybook: {}", copybookModel);
     return copybookModel;
+  }
+
+  private String convertToStdSql(String content, SQLBackend sqlBackend, boolean stdSqlEnabled) {
+    if (sqlBackend.equals(SQLBackend.DB2_SERVER) && stdSqlEnabled) {
+      return content.replace("SQLCODE", "SQLCADE")
+              .replace("SQLSTATE", "SQLSTAT");
+    }
+    return content;
   }
 }

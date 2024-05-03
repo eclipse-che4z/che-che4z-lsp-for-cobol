@@ -65,6 +65,7 @@ public class UseCase {
   @Builder.Default List<String> compilerOptions = Collections.emptyList();
 
   @Builder.Default boolean cicsTranslator = true;
+  @Builder.Default boolean stdSqlEnabled = false;
 
   /**
    * Get the {@link AnalysisConfig} using the specified processing mode and the {@link SQLBackend}
@@ -75,7 +76,7 @@ public class UseCase {
   public AnalysisConfig getAnalysisConfig() {
     AnalysisConfig analysisConfig =
         new AnalysisConfig(
-            copybookProcessingMode, dialects, cicsTranslator, ImmutableList.of(), dialectsSettings);
+            copybookProcessingMode, dialects, cicsTranslator, ImmutableList.of(), dialectsSettings, stdSqlEnabled);
     analysisConfig.getCompilerOptions().addAll(compilerOptions);
     return analysisConfig;
   }
