@@ -10,17 +10,14 @@
  *
  * Contributors:
  *    Broadcom, Inc. - initial API and implementation
- *    DAF Trucks NV – implementation of DaCo COBOL statements
- *    and DAF development standards
- *
  */
 package org.eclipse.lsp.cobol.core;
 
-import org.eclipse.lsp.cobol.core.hw.CobolLexer;
-import org.eclipse.lsp.cobol.core.hw.CobolParser;
-import org.eclipse.lsp.cobol.core.hw.ParserSettings;
-import org.eclipse.lsp.cobol.test.codegen.CobolCodeGenerator;
-import org.eclipse.lsp.cobol.test.codegen.GeneratorSettings;
+import org.eclipse.lsp.cobol.codegen.CobolCodeGenerator;
+import org.eclipse.lsp.cobol.parser.hw.CobolLexer;
+import org.eclipse.lsp.cobol.parser.hw.CobolParser;
+import org.eclipse.lsp.cobol.parser.hw.ParserSettings;
+import org.eclipse.lsp.cobol.codegen.GeneratorSettings;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.params.ParameterizedTest;

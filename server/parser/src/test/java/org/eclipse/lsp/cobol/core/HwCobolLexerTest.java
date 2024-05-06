@@ -16,12 +16,12 @@
  */
 package org.eclipse.lsp.cobol.core;
 
-import org.eclipse.lsp.cobol.core.hw.CobolLexer;
+import org.eclipse.lsp.cobol.parser.hw.CobolLexer;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import org.eclipse.lsp.cobol.core.hw.GrammarRule;
-import org.eclipse.lsp.cobol.core.hw.Token;
+import org.eclipse.lsp.cobol.parser.hw.GrammarRule;
+import org.eclipse.lsp.cobol.parser.hw.Token;
 import org.junit.jupiter.api.Test;
 
 /**
