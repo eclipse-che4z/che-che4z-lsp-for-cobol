@@ -31,6 +31,8 @@ import org.eclipse.lsp.cobol.common.pipeline.StageResult;
 import org.eclipse.lsp.cobol.common.pipeline.Stage;
 import org.eclipse.lsp.cobol.core.strategy.CobolErrorStrategy;
 import org.eclipse.lsp.cobol.core.visitor.ParserListener;
+import org.eclipse.lsp.cobol.parser.AstBuilder;
+import org.eclipse.lsp.cobol.parser.SplitParser;
 import org.eclipse.lsp4j.Location;
 
 import java.util.List;

@@ -16,13 +16,13 @@
  */
 package org.eclipse.lsp.cobol.core.divisions.procedure;
 
-import org.eclipse.lsp.cobol.core.cst.procedure.Paragraph;
-import org.eclipse.lsp.cobol.core.cst.procedure.ProcedureDivision;
-import org.eclipse.lsp.cobol.core.cst.ProgramUnit;
-import org.eclipse.lsp.cobol.core.hw.CobolLexer;
-import org.eclipse.lsp.cobol.core.hw.CobolParser;
-import org.eclipse.lsp.cobol.core.hw.ParseResult;
-import org.eclipse.lsp.cobol.core.hw.ParserSettings;
+import org.eclipse.lsp.cobol.cst.procedure.Paragraph;
+import org.eclipse.lsp.cobol.cst.procedure.ProcedureDivision;
+import org.eclipse.lsp.cobol.cst.ProgramUnit;
+import org.eclipse.lsp.cobol.parser.hw.CobolLexer;
+import org.eclipse.lsp.cobol.parser.hw.CobolParser;
+import org.eclipse.lsp.cobol.parser.hw.ParseResult;
+import org.eclipse.lsp.cobol.parser.hw.ParserSettings;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
