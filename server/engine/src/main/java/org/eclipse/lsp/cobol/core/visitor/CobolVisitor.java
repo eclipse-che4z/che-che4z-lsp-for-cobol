@@ -1048,7 +1048,15 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
 
   @Override
   public List<Node> visitProcedureDivisionBody(ProcedureDivisionBodyContext ctx) {
-    return addTreeNode(ctx, ProcedureDivisionBodyNode::new);
+
+    ParserRuleContext context = new ParserRuleContext();
+    context.start = ctx.getParent().start;
+    context.stop = ctx.stop;
+
+    List<Node> children = visitChildren(ctx);
+    return retrieveLocality(context)
+        .map(constructNode(ProcedureDivisionBodyNode::new, children))
+        .orElse(children);
   }
 
   @Override

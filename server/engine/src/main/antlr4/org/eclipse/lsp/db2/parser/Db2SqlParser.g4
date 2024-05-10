@@ -21,7 +21,7 @@ startRule: .*? (execRule .*?) * EOF;
 execRule: EXEC SQL sqlCode END_EXEC
          | EXEC SQL END_EXEC
          | EXEC SQLIMS sqlCode END_EXEC // TODO: check when should this grammar be activated. Probably based on some compiler directives
-         | {notifyError("cobolParser.missingEndExec");} EXEC SQL sqlCode EOF
+         | {notifyError("cobolParser.missingEndExec");} EXEC SQL sqlCode DOT_FS? EOF
          | {notifyError("cobolParser.missingEndExec");} EXEC SQL;
 
 sqlCode
