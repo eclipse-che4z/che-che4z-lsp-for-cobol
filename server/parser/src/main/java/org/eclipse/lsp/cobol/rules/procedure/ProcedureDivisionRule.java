@@ -24,44 +24,46 @@ import org.eclipse.lsp.cobol.rules.LanguageRule;
  * COBOL language grammar rule class.
  */
 public class ProcedureDivisionRule implements LanguageRule {
-    @Override
-    public void parse(ParsingContext ctx, CobolLanguage language) {
+  @Override
+  public void parse(ParsingContext ctx, CobolLanguage language) {
+    ctx.spaces();
+    ctx.push(new ProcedureDivision());
+    procedureDivisionHeader(ctx);
+    ((ProcedureDivision) ctx.peek()).setBodyStartToken(ctx.getLexer().peek(null).get(0));
+    try {
+      if (language.tryParseRule(DeclarativesRule.class, ctx).isPresent()) {
         ctx.spaces();
-        ctx.push(new ProcedureDivision());
-        procedureDivisionHeader(ctx);
-        ((ProcedureDivision) ctx.peek()).setBodyStartToken(ctx.getLexer().peek(null).get(0));
-        try {
-            while (!CobolLanguageUtils.isNextDivisionEofOrEop(ctx) && !CobolLanguageUtils.isEndOfProgram(ctx)) {
-                language.tryParseRule(DeclarativesRule.class, ctx);
-                if (language.tryMatchRule(ParagraphRule.class, ctx)) {
-                    language.parseRule(ParagraphRule.class, ctx);
-                } else if (language.tryMatchRule(SectionRule.class, ctx)) {
-                    language.tryParseRule(SectionRule.class, ctx);
-                } else {
-                    language.tryParseRule(StatementRule.class, ctx);
-                }
-                ctx.spaces();
-            }
-        } finally {
-            ctx.popAndAttach();
+      }
+      while (!CobolLanguageUtils.isNextDivisionEofOrEop(ctx) && !CobolLanguageUtils.isEndOfProgram(ctx)) {
+        if (language.tryMatchRule(ParagraphRule.class, ctx)) {
+          language.parseRule(ParagraphRule.class, ctx);
+        } else if (language.tryMatchRule(SectionRule.class, ctx)) {
+          language.tryParseRule(SectionRule.class, ctx);
+        } else {
+          language.tryParseRule(StatementRule.class, ctx);
         }
-    }
-
-    private void procedureDivisionHeader(ParsingContext ctx) {
-        ctx.consume("PROCEDURE");
         ctx.spaces();
-        ctx.consume("DIVISION");
-        ctx.spaces();
-        while (!ctx.match(".")) {
-            ctx.consume();
-        }
-        ctx.consume(".");
-        ctx.spaces();
+      }
+    } finally {
+      ctx.popAndAttach();
     }
+  }
+
+  private void procedureDivisionHeader(ParsingContext ctx) {
+    ctx.consume("PROCEDURE");
+    ctx.spaces();
+    ctx.consume("DIVISION");
+    ctx.spaces();
+    while (!ctx.match(".")) {
+      ctx.consume();
+    }
+    ctx.consume(".");
+    ctx.spaces();
+  }
 
 
-    @Override
-    public boolean tryMatch(ParsingContext ctx, CobolLanguage language) {
-        return ctx.matchSeq("PROCEDURE", "DIVISION");
-    }
+  @Override
+  public boolean tryMatch(ParsingContext ctx, CobolLanguage language) {
+    return ctx.matchSeq("PROCEDURE", "DIVISION");
+  }
 }

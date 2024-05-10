@@ -37,6 +37,12 @@ public class DeclarativesRule implements LanguageRule {
         ctx.consume();
         ctx.spaces();
       }
+      ctx.spaces();
+      ctx.consume("END");
+      ctx.spaces();
+      ctx.consume("DECLARATIVES");
+      ctx.spaces();
+      ctx.consume(".");
     } finally {
       ctx.popAndAttach();
     }
