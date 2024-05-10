@@ -98,20 +98,6 @@ public class AntlrAdapter {
     return start;
   }
 
-  private AntlrAdapted findAntlrNode(CstNode cstNode) {
-    for (CstNode node : cstNode.getChildren()) {
-      if (node instanceof AntlrAdapted) {
-        return (AntlrAdapted) node;
-      } else {
-        AntlrAdapted a = findAntlrNode(node);
-        if (a != null) {
-          return a;
-        }
-      }
-    }
-    return null;
-  }
-
   private CobolParser.ProgramUnitContext convertProgramNode(CstNode programUnit) {
     CobolParser.ProgramUnitContext program = new CobolParser.ProgramUnitContext(null, 0);
     Utils.initNode(programUnit, program, charStream);
@@ -138,17 +124,25 @@ public class AntlrAdapter {
       // All programs should be adapted to this point
       return ((AntlrAdapted) cstNode.getChildren().get(0)).getRuleContext();
     } else if (cstNode instanceof DataDivision) {
-      return antlrDataDivisionParser(cstNode).dataDivision();
+      CobolDataDivisionParser.DataDivisionContext dataDivisionContext = antlrDataDivisionParser(cstNode).dataDivision();
+      Utils.removeEofNode(dataDivisionContext);
+      return dataDivisionContext;
     } else if (cstNode instanceof IdentificationDivision) {
-      return antlrIdDivisionParser(cstNode).identificationDivision();
+      CobolIdentificationDivisionParser.IdentificationDivisionContext identificationDivisionContext = antlrIdDivisionParser(cstNode).identificationDivision();
+      Utils.removeEofNode(identificationDivisionContext);
+      return identificationDivisionContext;
     } else if (cstNode instanceof EnvironmentDivision) {
-      return antlrParser(cstNode).environmentDivision();
+      CobolParser.EnvironmentDivisionContext environmentDivisionContext = antlrParser(cstNode).environmentDivision();
+      Utils.removeEofNode(environmentDivisionContext);
+      return environmentDivisionContext;
     } else if (cstNode instanceof ProcedureDivision) {
       ProcedureDivisionAntlrAdapter adapter = new ProcedureDivisionAntlrAdapter(charStream,
               errorListener,
               errorStrategy,
               treeListener);
-      return adapter.processProcedureDivisionContext((ProcedureDivision) cstNode);
+      CobolProcedureDivisionParser.ProcedureDivisionContext procedureDivisionContext = adapter.processProcedureDivisionContext((ProcedureDivision) cstNode);
+      Utils.removeEofNode(procedureDivisionContext);
+      return procedureDivisionContext;
     } else {
       return null;
     }
@@ -175,7 +169,6 @@ public class AntlrAdapter {
     CobolIdentificationDivisionParser antlrParser = new CobolIdentificationDivisionParser(tokens);
     antlrParser.removeErrorListeners();
     antlrParser.addErrorListener(errorListener);
-    antlrParser.setErrorHandler(errorStrategy);
     antlrParser.addParseListener(treeListener);
     return antlrParser;
   }
@@ -220,7 +213,6 @@ public class AntlrAdapter {
     List<CstNode> tokens = new ArrayList<>();
     collectTokens(su, tokens);
     CommonTokenStream commonTokenStream = new CommonTokenStream(new ListTokenSource(tokens.stream()
-            .filter(t -> ((org.eclipse.lsp.cobol.parser.hw.Token) t).getType() != TokenType.WHITESPACE)
             .map(org.eclipse.lsp.cobol.parser.hw.Token.class::cast)
             .map(token -> Utils.toAntlrToken(token, charStream)).collect(Collectors.toList())));
     commonTokenStream.fill();

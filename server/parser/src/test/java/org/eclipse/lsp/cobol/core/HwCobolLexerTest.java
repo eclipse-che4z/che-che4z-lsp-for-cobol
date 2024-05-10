@@ -57,6 +57,42 @@ class HwCobolLexerTest {
   }
 
   @Test
+  void quotes() {
+    CobolLexer lexer = new CobolLexer("A '\n B'");
+    assertToken(lexer.forward(GrammarRule.ProgramUnit).get(0), "A", 0, 0, 0);
+    assertToken(lexer.forward(GrammarRule.ProgramUnit).get(0), " ", 0, 1, 1);
+    assertToken(lexer.forward(GrammarRule.ProgramUnit).get(0), "'\n B'", 0, 2, 2);
+    assertFalse(lexer.hasMore());
+  }
+
+  @Test
+  void quotesEscape() {
+    CobolLexer lexer = new CobolLexer("A '''\n B'");
+    assertToken(lexer.forward(GrammarRule.ProgramUnit).get(0), "A", 0, 0, 0);
+    assertToken(lexer.forward(GrammarRule.ProgramUnit).get(0), " ", 0, 1, 1);
+    assertToken(lexer.forward(GrammarRule.ProgramUnit).get(0), "'''\n B'", 0, 2, 2);
+    assertFalse(lexer.hasMore());
+  }
+
+  @Test
+  void doubleQuotes() {
+    CobolLexer lexer = new CobolLexer("A \"\n B\"");
+    assertToken(lexer.forward(GrammarRule.ProgramUnit).get(0), "A", 0, 0, 0);
+    assertToken(lexer.forward(GrammarRule.ProgramUnit).get(0), " ", 0, 1, 1);
+    assertToken(lexer.forward(GrammarRule.ProgramUnit).get(0), "\"\n B\"", 0, 2, 2);
+    assertFalse(lexer.hasMore());
+  }
+
+  @Test
+  void doubleQuotesEscape() {
+    CobolLexer lexer = new CobolLexer("A \"\"\"\n B\"");
+    assertToken(lexer.forward(GrammarRule.ProgramUnit).get(0), "A", 0, 0, 0);
+    assertToken(lexer.forward(GrammarRule.ProgramUnit).get(0), " ", 0, 1, 1);
+    assertToken(lexer.forward(GrammarRule.ProgramUnit).get(0), "\"\"\"\n B\"", 0, 2, 2);
+    assertFalse(lexer.hasMore());
+  }
+
+  @Test
   void peekTest() {
     CobolLexer lexer = new CobolLexer("Aa\n  B");
     assertToken(lexer.peek(GrammarRule.ProgramUnit).get(0), "Aa", 0, 0, 0);

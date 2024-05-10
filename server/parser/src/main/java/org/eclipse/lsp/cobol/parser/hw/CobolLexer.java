@@ -21,6 +21,7 @@ import lombok.Data;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Predicate;
 
 /**
@@ -37,6 +38,7 @@ public class CobolLexer {
 
   /**
    * Check if we have more tokens.
+   *
    * @return true if there are more tokens.
    */
   public boolean hasMore() {
@@ -45,6 +47,7 @@ public class CobolLexer {
 
   /**
    * Return one token and move forward.
+   *
    * @param rule current syntax rule.
    * @return list of possible tokens (at least one).
    */
@@ -59,6 +62,7 @@ public class CobolLexer {
 
   /**
    * Return one token but don't move forward.
+   *
    * @param rule current syntax rule.
    * @return list of possible tokens (at least one).
    */
@@ -80,23 +84,66 @@ public class CobolLexer {
 
   private String scan(GrammarRule rule, boolean look) {
     if (isWhitespace(source.charAt(position.getIndex()))) {
-      return consumeUntil(c -> !isWhitespace(c), look);
+      return consumeUntil(c -> !isWhitespace(source.charAt(c.getIndex())), look);
     }
     if (isNewLine(source.charAt(position.getIndex()))) {
-      return consumeUntil(c -> !isNewLine(c), look);
+      return consumeUntil(c -> !isNewLine(source.charAt(c.getIndex())), look);
     }
     if (isSeparator(source.charAt(position.getIndex()))) {
-      return consumeUntil(c -> !isSeparator(c), look);
+      return consumeUntil(c -> !isSeparator(source.charAt(c.getIndex())), look);
     }
-    return consumeUntil(c -> isSeparator(c) || isWhitespace(c) || isNewLine(c), look);
+    if (isLiteral(source.charAt(position.getIndex()))) {
+      return processLiteral(source, look);
+    }
+    return consumeUntil(c -> isSeparator(source.charAt(c.getIndex()))
+            || isWhitespace(source.charAt(c.getIndex()))
+            || isNewLine(source.charAt(c.getIndex())), look);
   }
 
-  private String consumeUntil(Predicate<Character> predicate, boolean look) {
+  private String processLiteral(String source, boolean look) {
+    // https://www.ibm.com/docs/en/cobol-zos/6.4?topic=literals-basic-alphanumeric
+    char quoteSymbol = source.charAt(position.getIndex());
+
+    // Those flags are to include quoteSymbol into the lexeme.
+    AtomicBoolean isFirst = new AtomicBoolean(true);
+    AtomicBoolean isLast = new AtomicBoolean(false);
+
+    AtomicBoolean wasEscaped = new AtomicBoolean(false);
+
+    return consumeUntil(pos -> {
+      if (isFirst.get()) {
+        isFirst.set(false);
+        return false;
+      }
+      if (pos.getIndex() + 1 < source.length() && source.charAt(pos.getIndex()) == quoteSymbol && source.charAt(pos.getIndex() + 1) == quoteSymbol) {
+        wasEscaped.set(true);
+        return false;
+      }
+      if (wasEscaped.get()) {
+        wasEscaped.set(false);
+        return false;
+      }
+      if (isLast.get()) {
+        return true;
+      }
+      if (source.charAt(pos.getIndex()) != quoteSymbol) {
+        return false;
+      }
+
+      if (source.charAt(pos.getIndex()) == quoteSymbol) {
+        isLast.set(true);
+        return false;
+      }
+      return true;
+    }, look);
+  }
+
+  private String consumeUntil(Predicate<Position> predicate, boolean look) {
     StringBuilder sb = new StringBuilder();
     Position localPos = new Position(position);
     while (localPos.getIndex() < source.length()) {
       char charAt = source.charAt(localPos.getIndex());
-      if (predicate.test(charAt)) {
+      if (predicate.test(localPos)) {
         break;
       }
       sb.append(charAt);
@@ -113,6 +160,10 @@ public class CobolLexer {
     return c == '.';
   }
 
+  private boolean isLiteral(char c) {
+    return c == '"' || c == '\'';
+  }
+
   private boolean isWhitespace(char c) {
     return c == ' ' || c == '\t';
   }
@@ -123,9 +174,10 @@ public class CobolLexer {
 
   /**
    * Find a sequence of tokens ignoring one that passes skip predicate.
-   * @param rule current syntax rule.
+   *
+   * @param rule  current syntax rule.
    * @param count how many tokens to take.
-   * @param skip predicate to ignore tokens.
+   * @param skip  predicate to ignore tokens.
    * @return a list of tokens.
    */
   // TODO: it should return a list of lists
@@ -158,8 +210,10 @@ class Position {
     line = position.line;
     character = position.character;
   }
+
   Position() {
   }
+
   void updateLinePosition(char charAt) {
     index++;
     if (charAt == '\n') {

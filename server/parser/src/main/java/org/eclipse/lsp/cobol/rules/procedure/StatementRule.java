@@ -25,27 +25,27 @@ import org.eclipse.lsp.cobol.rules.LanguageRule;
  */
 public class StatementRule implements LanguageRule {
 
-    @Override
-    public void parse(ParsingContext ctx, CobolLanguage language) {
-        ctx.push(new Statement());
-        try {
-            while (!ctx.match(".")
-                    && !CobolLanguageUtils.isNextDivisionEofOrEop(ctx)
-                    && !language.tryMatchRule(ParagraphRule.class, ctx)
-                    && !language.tryMatchRule(SectionRule.class, ctx)
-                    && !CobolLanguageUtils.isEndOfProgram(ctx)) {
-                ctx.consume();
-            }
-            ctx.optional(".");
-        } finally {
-            ctx.popAndAttach();
-        }
-
+  @Override
+  public void parse(ParsingContext ctx, CobolLanguage language) {
+    ctx.push(new Statement());
+    try {
+      while (!ctx.match(".")
+              && !CobolLanguageUtils.isNextDivisionEofOrEop(ctx)
+              && !language.tryMatchRule(ParagraphRule.class, ctx)
+              && !language.tryMatchRule(SectionRule.class, ctx)
+              && !CobolLanguageUtils.isEndOfProgram(ctx)) {
+        ctx.consume();
+      }
+      ctx.optional(".");
+    } finally {
+      ctx.popAndAttach();
     }
 
-    @Override
-    public boolean tryMatch(ParsingContext ctx, CobolLanguage language) {
-        // For now, it can be anything.
-        return true;
-    }
+  }
+
+  @Override
+  public boolean tryMatch(ParsingContext ctx, CobolLanguage language) {
+    // For now, it can be anything.
+    return true;
+  }
 }

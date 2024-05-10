@@ -57,12 +57,6 @@ public class ProcedureDivisionAntlrAdapter {
   ProcedureDivisionContext processProcedureDivisionContext(ProcedureDivision cstNode) {
     ProcedureDivisionContext pdCtx = parseProcedureDivision(cstNode);
     createProcedureDivisionBodyContext(pdCtx, cstNode);
-    // Remove EOF token if eny
-    ParseTree lastChild = pdCtx.children.get(pdCtx.children.size() - 1);
-    if (lastChild instanceof TerminalNodeImpl
-            && ((TerminalNodeImpl) lastChild).getSymbol().getType() == org.antlr.v4.runtime.Token.EOF) {
-      pdCtx.removeLastChild();
-    }
     return pdCtx;
   }
 
@@ -82,7 +76,7 @@ public class ProcedureDivisionAntlrAdapter {
     LinkedList<ParserRuleContext> genStack = new LinkedList<>();
     genStack.push(pdbCtx);
 
-    // make a free flat
+    // make a tree flat
     List<CstNode> nodes = cstNode.getChildren().stream()
             .flatMap(m -> (m instanceof Section) ? Stream.concat(Stream.of(m), m.getChildren().stream()) : Stream.of(m))
             .flatMap(m -> (m instanceof Paragraph) ? Stream.concat(Stream.of(m), m.getChildren().stream()) : Stream.of(m))
@@ -143,7 +137,9 @@ public class ProcedureDivisionAntlrAdapter {
     antlrParser.addErrorListener(errorListener);
     antlrParser.setErrorHandler(errorStrategy);
     antlrParser.addParseListener(treeListener);
-    genStack.peek().addChild(antlrParser.procedureDeclaratives());
+    ProcedureDeclarativesContext declaratives = antlrParser.procedureDeclaratives();
+    Utils.removeEofNode(declaratives);
+    genStack.peek().addChild(declaratives);
   }
 
   private void assureParagraphsCtx(LinkedList<ParserRuleContext> genStack, ProcedureDivisionBodyContext pdbCtx, CstNode node) {
@@ -225,7 +221,9 @@ public class ProcedureDivisionAntlrAdapter {
     antlrParser.addErrorListener(errorListener);
     antlrParser.setErrorHandler(errorStrategy);
     antlrParser.addParseListener(treeListener);
-    return antlrParser.sentence();
+    SentenceContext sentence = antlrParser.sentence();
+    Utils.removeEofNode(sentence);
+    return sentence;
   }
 
   private ProcedureDivisionContext parseProcedureDivision(ProcedureDivision node) {
@@ -245,7 +243,6 @@ public class ProcedureDivisionAntlrAdapter {
     CobolProcedureDivisionParser antlrParser = new CobolProcedureDivisionParser(tokens);
     antlrParser.removeErrorListeners();
     antlrParser.addErrorListener(errorListener);
-    antlrParser.setErrorHandler(errorStrategy);
     antlrParser.addParseListener(treeListener);
     return antlrParser.procedureDivision();
   }
