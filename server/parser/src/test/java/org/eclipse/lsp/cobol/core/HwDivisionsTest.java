@@ -16,12 +16,11 @@
  */
 package org.eclipse.lsp.cobol.core;
 
-import org.eclipse.lsp.cobol.core.cst.*;
-import org.eclipse.lsp.cobol.core.cst.IdentificationDivision;
-import org.eclipse.lsp.cobol.core.cst.procedure.ProcedureDivision;
-import org.eclipse.lsp.cobol.core.hw.CobolLexer;
-import org.eclipse.lsp.cobol.core.hw.CobolParser;
-import org.eclipse.lsp.cobol.core.hw.ParserSettings;
+import org.eclipse.lsp.cobol.cst.*;
+import org.eclipse.lsp.cobol.cst.procedure.ProcedureDivision;
+import org.eclipse.lsp.cobol.parser.hw.CobolLexer;
+import org.eclipse.lsp.cobol.parser.hw.CobolParser;
+import org.eclipse.lsp.cobol.parser.hw.ParserSettings;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -53,49 +52,49 @@ class HwDivisionsTest {
 
   @Test
   void testEnvironmentDivision() {
-    final String edSource = "ENVIRONMENT DIVISION.\n"
-            + "CONFIGURATION SECTION.\n"
-            + "SOURCE-COMPUTER.\n"
+    final String edSource = "       ENVIRONMENT DIVISION.\n"
+            + "       CONFIGURATION SECTION.\n"
+            + "       SOURCE-COMPUTER.\n"
             + "    XXXXX023.\n"
-            + "OBJECT-COMPUTER.\n"
+            + "       OBJECT-COMPUTER.\n"
             + "    XXXXX034.\n"
-            + "INPUT-OUTPUT SECTION.\n"
-            + "FILE-CONTROL.\n"
+            + "       INPUT-OUTPUT SECTION.\n"
+            + "       FILE-CONTROL.\n"
             + "    SELECT PRINT-FILE ASSIGN TO\n"
             + "    XXXXX035.\n";
-    final String source = "ID DIVISION. PROGRAM-ID. Pr1.\n" + edSource;
+    final String source = "       ID DIVISION. PROGRAM-ID. Pr1.\n" + edSource;
     CobolParser cobolParser = new CobolParser(new CobolLexer(source), new ParserSettings());
     SourceUnit su = cobolParser.parse().getSourceUnit();
     assertFalse(su.getChildren().isEmpty());
-    ProgramUnit pu = (ProgramUnit) su.getChildren().get(0);
+    ProgramUnit pu = (ProgramUnit) su.getChildren().get(1);
     assertEquals("Pr1", pu.getName());
 
-    EnvironmentDivision ed = (EnvironmentDivision) pu.getChildren().get(2);
-    assertEquals(edSource, ed.toText());
+    EnvironmentDivision ed = (EnvironmentDivision) pu.getChildren().get(1);
+    assertEquals(edSource, "       " + ed.toText());
     assertEquals(source, su.toText());
   }
 
   @Test
   void testDataDivision() {
-    final String ddSource = "DATA DIVISION.\n"
-            + "WORKING-STORAGE SECTION.\n"
-            + "77  PASSWORD1 PIC X(10) VALUE XXXXX012.\n";
+    final String ddSource = "       DATA DIVISION.\n"
+            + "       WORKING-STORAGE SECTION.\n"
+            + "       77  PASSWORD1 PIC X(10) VALUE XXXXX012.\n";
 
-    final String source = "ID DIVISION. PROGRAM-ID. Pr1.\n" + ddSource;
+    final String source = "       ID DIVISION. PROGRAM-ID. Pr1.\n" + ddSource;
     CobolParser cobolParser = new CobolParser(new CobolLexer(source), new ParserSettings());
     SourceUnit su = cobolParser.parse().getSourceUnit();
     assertFalse(su.getChildren().isEmpty());
-    ProgramUnit pu = (ProgramUnit) su.getChildren().get(0);
+    ProgramUnit pu = (ProgramUnit) su.getChildren().get(1);
     assertEquals("Pr1", pu.getName());
 
-    DataDivision dd = (DataDivision) pu.getChildren().get(2);
-    assertEquals(ddSource, dd.toText());
+    DataDivision dd = (DataDivision) pu.getChildren().get(1);
+    assertEquals(ddSource, "       " + dd.toText());
     assertEquals(source, su.toText());
   }
 
   @Test
   void testProcedureDivision() {
-    final String pdSource = "PROCEDURE DIVISION.\n"
+    final String pdSource = "       PROCEDURE DIVISION.\n"
             + "    A-PARA.\n"
             + "    PERFORM DISPLAY 'IN A-PARA'\n"
             + "    END-PERFORM.\n"
@@ -110,15 +109,15 @@ class HwDivisionsTest {
             + "      DISPLAY 'IN D-PARA'.\n"
             + "    E-PARA.";
 
-    final String source = "ID DIVISION. PROGRAM-ID. Pr1.\n" + pdSource;
+    final String source = "       ID DIVISION. PROGRAM-ID. Pr1.\n" + pdSource;
     CobolParser cobolParser = new CobolParser(new CobolLexer(source), new ParserSettings());
     SourceUnit su = cobolParser.parse().getSourceUnit();
     assertFalse(su.getChildren().isEmpty());
-    ProgramUnit pu = (ProgramUnit) su.getChildren().get(0);
+    ProgramUnit pu = (ProgramUnit) su.getChildren().get(1);
     assertEquals("Pr1", pu.getName());
 
-    ProcedureDivision pd = (ProcedureDivision) pu.getChildren().get(2);
-    assertEquals(pdSource, pd.toText());
+    ProcedureDivision pd = (ProcedureDivision) pu.getChildren().get(1);
+    assertEquals(pdSource, "       " + pd.toText());
     assertEquals(source, su.toText());
   }
 }

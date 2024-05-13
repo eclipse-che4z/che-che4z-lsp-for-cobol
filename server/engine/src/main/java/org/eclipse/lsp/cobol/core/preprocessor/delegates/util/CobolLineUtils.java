@@ -23,7 +23,7 @@ import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.lsp.cobol.core.preprocessor.CobolLine;
-import org.eclipse.lsp.cobol.service.settings.layout.CobolProgramLayout;
+import org.eclipse.lsp.cobol.common.dialects.CobolProgramLayout;
 
 /** The utility class for CobolLine operations, e.g. copy in different ways */
 @UtilityClass

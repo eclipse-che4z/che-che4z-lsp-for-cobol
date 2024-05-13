@@ -15,8 +15,13 @@
 
 package org.eclipse.lsp.cobol.dialects.idms.usecases;
 
+import static org.eclipse.lsp4j.DiagnosticSeverity.Warning;
+
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 import org.eclipse.lsp.cobol.common.AnalysisResult;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
@@ -34,12 +39,6 @@ import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import static org.eclipse.lsp4j.DiagnosticSeverity.Warning;
 
 /** Test the variables for IDMS copybooks are not modified if adjusted levels are greater than 48 */
 public class TestCopyIdmsVariablesForNotAllowedLevels {
@@ -113,7 +112,7 @@ public class TestCopyIdmsVariablesForNotAllowedLevels {
         Collections.singletonList(
             new DiagnosticRelatedInformation(
                 new Location(
-                    "file:///c:/workspace/document.cbl",
+                    "file:c:/workspace/document.cbl",
                     new Range(new Position(9, 11), new Position(9, 29))),
                 "Copy IDMS source")));
 

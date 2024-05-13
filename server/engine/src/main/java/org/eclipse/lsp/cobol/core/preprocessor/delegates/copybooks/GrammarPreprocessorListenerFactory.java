@@ -16,6 +16,7 @@
 package org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks;
 
 import lombok.NonNull;
+import org.eclipse.lsp.cobol.common.CleanerPreprocessor;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.PreprocessorContext;
 
 /** A factory for {@link GrammarPreprocessorListener} */
@@ -25,7 +26,8 @@ public interface GrammarPreprocessorListenerFactory {
    * the grammar
    *
    * @param context - preprocessor context
+   * @param preprocessor - dialect specific preprocessor
    * @return a new listener
    */
-  GrammarPreprocessorListenerImpl create(@NonNull PreprocessorContext context);
+  GrammarPreprocessorListenerImpl create(@NonNull PreprocessorContext context, CleanerPreprocessor preprocessor);
 }

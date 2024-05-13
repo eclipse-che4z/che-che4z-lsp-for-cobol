@@ -18,7 +18,12 @@ import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonElement;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
+import org.eclipse.lsp.cobol.common.CleanerPreprocessor;
 import org.eclipse.lsp.cobol.common.DialectRegistryItem;
 import org.eclipse.lsp.cobol.common.ResultWithErrors;
 import org.eclipse.lsp.cobol.common.copybook.CopybookModel;
@@ -41,11 +46,6 @@ import org.eclipse.lsp.cobol.implicitDialects.sql.Db2SqlDialect;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
-
-import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 /** Dialect utility class */
 @Singleton
@@ -139,7 +139,7 @@ public class DialectService {
    * @param ctx a {@link AnalysisContext} class
    * @param dialectProcessingContext is a DialectProcessingContext class with all needed data for
    *     dialect processing
-   * @return a error while extending the document
+   * @return an error while extending the document
    */
   public List<SyntaxError> extendImplicitDialects(
       AnalysisContext ctx, DialectProcessingContext dialectProcessingContext) {
@@ -262,7 +262,7 @@ public class DialectService {
    * Returns dialect object by name
    *
    * @param dialectName is a dialect name
-   * @return a dialect is it's possible
+   * @return a dialect if it is possible
    */
   public Optional<CobolDialect> getDialectByName(String dialectName) {
     return Optional.ofNullable(dialectSuppliers.get(dialectName));
@@ -365,15 +365,16 @@ public class DialectService {
   /**
    * Add pre-defined copybooks from dialects to the copybook repository.
    *
-   * @param config {@link AnalysisConfig}
+   * @param config     {@link AnalysisConfig}
+   * @param preprocessor - dialect specific preprocessor
    */
-  public void addDialectPredefinedCopybooks(AnalysisConfig config) {
+  public void addDialectPredefinedCopybooks(AnalysisConfig config, CleanerPreprocessor preprocessor) {
     List<CobolDialect> dialects = new ArrayList<>();
     config.getDialects().forEach(dialect -> getDialectByName(dialect).ifPresent(dialects::add));
     dialects.addAll(getActiveImplicitDialects(config));
     for (CobolDialect dialect : dialects) {
       List<CopybookModel> predefinedCopybook = dialect.getPredefinedCopybook(config);
-      predefinedCopybook.forEach(model -> copybookService.store(model, true));
+      predefinedCopybook.forEach(model -> copybookService.store(model, preprocessor));
     }
   }
 }

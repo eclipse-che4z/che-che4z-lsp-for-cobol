@@ -54,7 +54,7 @@ public class DidOpenHandler {
       return;
     }
     watcherService.addRuntimeWatchers(uri);
-    asyncAnalysisService.openDocument(uri, params.getTextDocument().getText());
+    asyncAnalysisService.openDocument(uri, params.getTextDocument().getText(), params.getTextDocument().getLanguageId());
     asyncAnalysisService.scheduleAnalysis(uri, params.getTextDocument().getText(), params.getTextDocument().getVersion(), true, eventSource);
   }
 

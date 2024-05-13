@@ -20,6 +20,7 @@ import org.eclipse.lsp.cobol.common.AnalysisConfig;
 import org.eclipse.lsp.cobol.common.AnalysisResult;
 import org.eclipse.lsp.cobol.common.LanguageEngineFacade;
 import org.eclipse.lsp.cobol.core.engine.CobolLanguageEngine;
+import org.eclipse.lsp.cobol.common.dialects.CobolLanguageId;
 import org.eclipse.lsp4j.Diagnostic;
 
 /**
@@ -50,6 +51,22 @@ public class CobolLanguageEngineFacade implements LanguageEngineFacade {
    */
   @Override
   public AnalysisResult analyze(String uri, String text, AnalysisConfig analysisConfig) {
-    return engine.run(uri, text, analysisConfig);
+    return analyze(uri, text, analysisConfig, CobolLanguageId.COBOL.getId());
+  }
+
+  /**
+   * Analyze the document using the COBOL language engine for a specific cobol dialect (language id)
+   * and find syntax/semantic errors, variables, paragraphs etc.
+   *
+   * @param uri - URI of the processing document to define positions and errors properly
+   * @param text of document opened in the client editor
+   * @param analysisConfig contains analysis processing features info and copybook config with
+   *     following information: target backend sql server, copybook processing mode which reflect
+   *     the sync status of the document (DID_OPEN|DID_CHANGE)
+   * @return a model containing full analysis result, e.g. errors and semantic elements
+   */
+  @Override
+  public AnalysisResult analyze(String uri, String text, AnalysisConfig analysisConfig, String languageId) {
+    return engine.run(uri, text, analysisConfig, CobolLanguageId.MAPPER.get(languageId));
   }
 }

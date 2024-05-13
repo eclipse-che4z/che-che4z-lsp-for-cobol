@@ -63,6 +63,7 @@ paragraph
 
 sentence
    : statement * (endClause | dialectStatement)
+   | dialectStatement
    ;
 
 conditionalStatementCall
@@ -1499,5 +1500,5 @@ cobolKeywords
    ;
 
 dialectNodeFiller
-    : ZERO_WIDTH_SPACE+
+    : ZERO_WIDTH_SPACE+ DOT? EOF?
     ;

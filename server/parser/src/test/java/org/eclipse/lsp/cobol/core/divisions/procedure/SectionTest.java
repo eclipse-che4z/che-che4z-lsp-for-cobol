@@ -16,14 +16,14 @@
  */
 package org.eclipse.lsp.cobol.core.divisions.procedure;
 
-import org.eclipse.lsp.cobol.core.cst.ProgramUnit;
-import org.eclipse.lsp.cobol.core.cst.procedure.Paragraph;
-import org.eclipse.lsp.cobol.core.cst.procedure.ProcedureDivision;
-import org.eclipse.lsp.cobol.core.cst.procedure.Section;
-import org.eclipse.lsp.cobol.core.hw.CobolLexer;
-import org.eclipse.lsp.cobol.core.hw.CobolParser;
-import org.eclipse.lsp.cobol.core.hw.ParseResult;
-import org.eclipse.lsp.cobol.core.hw.ParserSettings;
+import org.eclipse.lsp.cobol.cst.ProgramUnit;
+import org.eclipse.lsp.cobol.cst.procedure.Paragraph;
+import org.eclipse.lsp.cobol.cst.procedure.ProcedureDivision;
+import org.eclipse.lsp.cobol.cst.procedure.Section;
+import org.eclipse.lsp.cobol.parser.hw.CobolLexer;
+import org.eclipse.lsp.cobol.parser.hw.CobolParser;
+import org.eclipse.lsp.cobol.parser.hw.ParseResult;
+import org.eclipse.lsp.cobol.parser.hw.ParserSettings;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -37,7 +37,7 @@ class SectionTest {
   void test() {
     String source = "IDENTIFICATION DIVISION.\n"
             + "       PROGRAM-ID.  SECTST.\n"
-            + "PROCEDURE DIVISION.\n"
+            + "       PROCEDURE DIVISION.\n"
             + "           DISPLAY 'OUT'.\n"
             + "           GO TO PARAG1.\n"
             + "       SECT1 SECTION.\n"
@@ -51,7 +51,7 @@ class SectionTest {
     ParseResult parseResult = new CobolParser(new CobolLexer(source), new ParserSettings()).parse();
     assertTrue(parseResult.getDiagnostics().isEmpty());
     ProgramUnit pu = (ProgramUnit) parseResult.getSourceUnit().getChildren().get(0);
-    ProcedureDivision pd = (ProcedureDivision) pu.getChildren().get(2);
+    ProcedureDivision pd = (ProcedureDivision) pu.getChildren().get(1);
     assertEquals(2, pd.getChildren().stream().filter(Paragraph.class::isInstance).count());
     assertEquals(2, pd.getChildren().stream().filter(Section.class::isInstance).count());
     // TODO: check if everything is in the place

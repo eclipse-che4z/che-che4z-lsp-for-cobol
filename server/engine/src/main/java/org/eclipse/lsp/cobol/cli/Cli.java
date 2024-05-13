@@ -27,27 +27,29 @@ import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.eclipse.lsp.cobol.cli.di.CliModule;
 import org.eclipse.lsp.cobol.cli.modules.CliClientProvider;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
+import org.eclipse.lsp.cobol.common.CleanerPreprocessor;
 import org.eclipse.lsp.cobol.common.ResultWithErrors;
 import org.eclipse.lsp.cobol.common.SubroutineService;
 import org.eclipse.lsp.cobol.common.benchmark.BenchmarkService;
 import org.eclipse.lsp.cobol.common.benchmark.BenchmarkSession;
 import org.eclipse.lsp.cobol.common.benchmark.Measurement;
 import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
+import org.eclipse.lsp.cobol.common.dialects.TrueDialectService;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedText;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.core.engine.analysis.AnalysisContext;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectService;
-import org.eclipse.lsp.cobol.core.engine.pipeline.Pipeline;
-import org.eclipse.lsp.cobol.core.engine.pipeline.PipelineResult;
-import org.eclipse.lsp.cobol.core.engine.pipeline.StageResult;
-import org.eclipse.lsp.cobol.core.engine.pipeline.stages.*;
+import org.eclipse.lsp.cobol.common.pipeline.Pipeline;
+import org.eclipse.lsp.cobol.common.pipeline.PipelineResult;
+import org.eclipse.lsp.cobol.common.pipeline.StageResult;
 import org.eclipse.lsp.cobol.core.engine.processor.AstProcessor;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolsRepository;
-import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.GrammarPreprocessor;
 import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
+import org.eclipse.lsp.cobol.dialects.ibm.*;
+import org.eclipse.lsp.cobol.common.dialects.CobolLanguageId;
 import org.eclipse.lsp.cobol.service.settings.CachingConfigurationService;
 import org.eclipse.lsp.cobol.service.settings.layout.CodeLayoutStore;
 import org.eclipse.lsp4j.Location;
@@ -92,7 +94,7 @@ public class Cli implements Callable<Integer> {
   @Override
   public Integer call() throws Exception {
     Injector diCtx = Guice.createInjector(new CliModule());
-    Pipeline pipeline = setupPipeline(diCtx, action);
+    Pipeline<AnalysisContext> pipeline = setupPipeline(diCtx, action);
 
     CliClientProvider cliClientProvider = diCtx.getInstance(CliClientProvider.class);
     if (cpyPaths != null) {
@@ -101,7 +103,7 @@ public class Cli implements Callable<Integer> {
     cliClientProvider.setCpyExt(Arrays.asList(cpyExt));
 
     // Cleaning up
-    TextPreprocessor preprocessor = diCtx.getInstance(TextPreprocessor.class);
+    CleanerPreprocessor preprocessor = diCtx.getInstance(TrueDialectService.class).getPreprocessor(CobolLanguageId.COBOL);
     BenchmarkService benchmarkService = diCtx.getInstance(BenchmarkService.class);
 
     if (src == null) {
@@ -115,7 +117,7 @@ public class Cli implements Callable<Integer> {
         new AnalysisContext(
             new ExtendedDocument(resultWithErrors.getResult(), text),
             createAnalysisConfiguration(),
-            benchmarkService.startSession());
+            benchmarkService.startSession(), documentUri, text, CobolLanguageId.COBOL);
     ctx.getAccumulatedErrors().addAll(resultWithErrors.getErrors());
     PipelineResult pipelineResult = pipeline.run(ctx);
     Gson gson = new GsonBuilder().setPrettyPrinting().create();
@@ -188,7 +190,7 @@ public class Cli implements Callable<Integer> {
     return AnalysisConfig.defaultConfig(CopybookProcessingMode.ENABLED);
   }
 
-  private static Pipeline setupPipeline(Injector diCtx, Action action) {
+  private static Pipeline<AnalysisContext> setupPipeline(Injector diCtx, Action action) {
     DialectService dialectService = diCtx.getInstance(DialectService.class);
     MessageService messageService = diCtx.getInstance(MessageService.class);
     GrammarPreprocessor grammarPreprocessor = diCtx.getInstance(GrammarPreprocessor.class);
@@ -200,10 +202,12 @@ public class Cli implements Callable<Integer> {
     AstProcessor astProcessor = diCtx.getInstance(AstProcessor.class);
     CodeLayoutStore layoutStore = diCtx.getInstance(CodeLayoutStore.class);
 
-    Pipeline pipeline = new Pipeline();
+    CleanerPreprocessor preprocessor = diCtx.getInstance(TrueDialectService.class).getPreprocessor(CobolLanguageId.COBOL);
+
+    Pipeline<AnalysisContext> pipeline = new Pipeline<>();
     pipeline.add(new CompilerDirectivesStage(messageService));
-    pipeline.add(new DialectProcessingStage(dialectService));
-    pipeline.add(new PreprocessorStage(grammarPreprocessor));
+    pipeline.add(new DialectProcessingStage(dialectService, preprocessor));
+    pipeline.add(new PreprocessorStage(grammarPreprocessor, preprocessor));
     if (action == Action.analysis) {
       pipeline.add(new ImplicitDialectProcessingStage(dialectService));
       pipeline.add(new ParserStage(messageService, parseTreeListener));

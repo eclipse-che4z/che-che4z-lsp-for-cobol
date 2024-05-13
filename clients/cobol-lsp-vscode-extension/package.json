@@ -4,7 +4,7 @@
   "description": "Autocomplete, highlighting and diagnostics for COBOL code and copybooks.",
   "author": "Broadcom",
   "license": "EPL-2.0",
-  "version": "2.1.1",
+  "version": "2.1.2",
   "preview": false,
   "publisher": "BroadcomMFD",
   "engines": {
@@ -41,40 +41,52 @@
     "commands": [
       {
         "command": "cobol-lsp.cpy-manager.fetch-copybook",
-        "title": "Fetch copybook"
+        "category": "COBOL",
+        "title": "Fetch Copybook"
       },
       {
         "command": "cobol-lsp.cpy-manager.goto-settings",
-        "title": "Open Copybook location settings"
+        "category": "COBOL",
+        "title": "Open Copybook Location Settings"
       },
       {
         "command": "cobol-lsp.serverRuntime.goto-settings",
-        "title": "Open serverRuntime settings"
+        "category": "COBOL",
+        "title": "Open Server Runtime Settings"
       },
       {
         "command": "cobol-lsp.dialects.goto-settings",
-        "title": "Open Dialects settings"
+        "category": "COBOL",
+        "title": "Open Dialect Settings"
       },
       {
         "command": "cobol-lsp.commentLine.toggle",
+        "category": "COBOL",
         "title": "Toggle COBOL Line Comment"
       },
       {
         "command": "cobol-lsp.commentLine.comment",
-        "title": "Add Cobol Line Comment"
+        "category": "COBOL",
+        "title": "Add COBOL Line Comment"
       },
       {
         "command": "cobol-lsp.commentLine.uncomment",
+        "category": "COBOL",
         "title": "Remove COBOL Line Comment"
       },
       {
         "command": "cobol-lsp.clear.downloaded.copybooks",
-        "title": "Clear downloaded copybooks"
+        "category": "COBOL",
+        "title": "Clear Downloaded Copybooks"
       },
       {
         "command": "cobol-lsp.snippets.insertSnippets",
         "title": "Insert COBOL Snippet",
         "category": "Snippets"
+      },
+      {
+        "command": "cobol-lsp.open.copybook.internalfolder",
+        "title": "Open Copybooks Internal Folder"
       }
     ],
     "languages": [
@@ -92,11 +104,47 @@
         ],
         "configuration": "./syntaxes/lang-config.json",
         "firstLine": "^[0-9 ]{6}([*].*|[ Dd] *([Ii][Dd]([Ee][Nn][Tt][Ii][Ff][Ii][Cc][Aa][Tt][Ii][Oo][Nn])? +[Dd][Ii][Vv][Ii][Ss][Ii][Oo][Nn][. ]|[0-9][0-9] +[@#$A-Z][-A-Z0-9]*[. ]|[*](CBL|PROCESS) ).*)$|^([0-9].{5})?[ ]*(CBL|PROCESS) "
+      },
+      {
+        "id": "expcobol",
+        "extensions": [
+          ".cbl",
+          ".cob",
+          ".cobol",
+          ".cpy",
+          ".copy"
+        ],
+        "aliases": [
+          "EXP-COBOL"
+        ],
+        "configuration": "./syntaxes/lang-config.json"
+      },
+      {
+        "id": "hpcobol",
+        "extensions": [
+          ".hpcbl",
+          ".hpcobol",
+          ".hp",
+          "ecobol"
+        ],
+        "aliases": [
+          "HP-COBOL"
+        ],
+        "configuration": "./syntaxes/lang-config-hp.json",
+        "firstLine": "^[ ]( *([Ii][Dd]([Ee][Nn][Tt][Ii][Ff][Ii][Cc][Aa][Tt][Ii][Oo][Nn])? +[Dd][Ii][Vv][Ii][Ss][Ii][Oo][Nn][.].*?)$|^\\?.*"
       }
     ],
     "grammars": [
       {
         "language": "cobol",
+        "scopeName": "source.cobol",
+        "path": "./syntaxes/COBOL.tmLanguage.json",
+        "embeddedLanguages": {
+          "meta.embedded.block.html": "html"
+        }
+      },
+      {
+        "language": "expcobol",
         "scopeName": "source.cobol",
         "path": "./syntaxes/COBOL.tmLanguage.json",
         "embeddedLanguages": {
@@ -119,6 +167,14 @@
         "injectTo": [
           "source.cobol"
         ]
+      },
+      {
+        "language": "hpcobol",
+        "scopeName": "source.hpcobol",
+        "path": "./syntaxes/HP.COBOL.tmLanguage.json",
+        "embeddedLanguages": {
+          "meta.embedded.block.html": "html"
+        }
       }
     ],
     "configuration": {
@@ -427,6 +483,25 @@
           80
         ],
         "editor.wordSeparators": "!\"#$%&'()*+,./:;<=>?@[\\]^`{|}~"
+      },
+      "[expcobol]": {
+        "editor.guides.indentation": false,
+        "editor.rulers": [
+          7,
+          11,
+          72,
+          80
+        ],
+        "editor.wordSeparators": "!\"#$%&'()*+,./:;<=>?@[\\]^`{|}~"
+      },
+      "[hpcobol]": {
+        "editor.guides.indentation": false,
+        "editor.rulers": [
+          1,
+          5,
+          132
+        ],
+        "editor.wordSeparators": "!\"#$%&'()*+,./:;<=>?@[\\]^`{|}~"
       }
     },
     "keybindings": [
@@ -475,7 +550,7 @@
   },
   "dependencies": {
     "@code4z/cobol-dialect-api": "file:../cobol-dialect-api",
-    "glob": "10.2.7",
+    "glob": "10.3.10",
     "iconv-lite": "^0.6.3",
     "micromatch": "4.0.5",
     "@vscode/extension-telemetry": "^0.8.2",
@@ -504,5 +579,8 @@
     "ts-jest": "^29.0.1",
     "tslint": "^5.18.0",
     "typescript": "^4.9.4"
+  },
+  "overrides": {
+    "isexe": "^3.1.1"
   }
 }

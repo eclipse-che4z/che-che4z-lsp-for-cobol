@@ -19,6 +19,7 @@ import java.util.List;
 import lombok.Builder;
 import lombok.Value;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
+import org.eclipse.lsp.cobol.common.CleanerPreprocessor;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 
@@ -29,5 +30,7 @@ public class DialectProcessingContext {
   AnalysisConfig config;
   String programDocumentUri;
   ExtendedDocument extendedDocument;
+  CleanerPreprocessor preprocessor;
   @Builder.Default List<Node> dialectNodes = new ArrayList<>();
+  @Builder.Default String languageId = "cobol";
 }

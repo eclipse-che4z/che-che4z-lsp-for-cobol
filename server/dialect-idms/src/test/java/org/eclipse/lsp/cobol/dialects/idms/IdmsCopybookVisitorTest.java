@@ -17,7 +17,6 @@ package org.eclipse.lsp.cobol.dialects.idms;
 import static org.eclipse.lsp.cobol.dialects.idms.IdmsCopyParser.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
@@ -25,13 +24,12 @@ import static org.mockito.Mockito.when;
 
 import com.google.common.collect.ImmutableList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.TerminalNode;
+import org.eclipse.lsp.cobol.common.CleanerPreprocessor;
 import org.eclipse.lsp.cobol.common.ResultWithErrors;
 import org.eclipse.lsp.cobol.common.copybook.*;
 import org.eclipse.lsp.cobol.common.model.NodeType;
@@ -55,14 +53,13 @@ class IdmsCopybookVisitorTest {
   private CopybookService copybookService;
   @Mock
   private IdmsCopybookService idmsCopybookService;
+  @Mock
+  private CleanerPreprocessor preprocessor;
   private IdmsCopybookVisitor visitor;
 
   @BeforeEach
   void init() {
-    Set<CopybookName> processedCopybooks = new HashSet<>();
-
-    visitor = new IdmsCopybookVisitor(copybookService, CopybookProcessingMode.ENABLED,
-        idmsCopybookService, PROGRAM_DOCUMENT_URI, "documentUri", 1, processedCopybooks);
+      visitor = new IdmsCopybookVisitor(copybookService, preprocessor, idmsCopybookService, PROGRAM_DOCUMENT_URI, "documentUri", 1);
   }
 
   @Test
@@ -72,7 +69,7 @@ class IdmsCopybookVisitorTest {
     IdmsCopyParser.CopyIdmsSourceContext sourceContext = mock(IdmsCopyParser.CopyIdmsSourceContext.class);
     CopybookName expectedCopybookName = new CopybookName("copybook", "IDMS");
     when(copybookService.resolve(any(CopybookId.class), any(CopybookName.class), anyString(), anyString(),
-            anyBoolean()))
+            any()))
             .thenReturn(
                     new ResultWithErrors<>(
                             new CopybookModel(expectedCopybookName.toCopybookId(PROGRAM_DOCUMENT_URI), expectedCopybookName, null, null),
