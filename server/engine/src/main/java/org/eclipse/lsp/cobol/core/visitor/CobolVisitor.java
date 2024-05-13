@@ -383,6 +383,58 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   }
 
   @Override
+  public List<Node> visitXmlGenerate(XmlGenerateContext ctx) {
+    VariableNameAndLocality identifier1 = new VariableNameAndLocality(
+            ctx.xmlGenIdentifier1().getText(), retrieveLocality(ctx.xmlGenIdentifier1()).orElse(null));
+
+    VariableNameAndLocality identifier2 = new VariableNameAndLocality(
+            ctx.xmlGenIdentifier2().getText(), retrieveLocality(ctx.xmlGenIdentifier2()).orElse(null));
+
+    VariableNameAndLocality identifier3 = ofNullable(ctx.xmlGenIdentifier3()).map(iden3 -> new VariableNameAndLocality(
+            iden3.getText(), retrieveLocality(iden3).orElse(null))).orElse(null);
+
+    VariableNameAndLocality identifier4 = ofNullable(ctx.xmlGenIdentifier4()).map(iden4 -> new VariableNameAndLocality(
+            iden4.getText(), retrieveLocality(iden4).orElse(null))).orElse(null);
+
+    VariableNameAndLocality identifier5 = ofNullable(ctx.xmlGenIdentifier5()).map(iden5 -> new VariableNameAndLocality(
+            iden5.getText(), retrieveLocality(iden5).orElse(null))).orElse(null);
+
+    List<VariableNameAndLocality> identifier6 = ctx.xmlGenIdentifier6().isEmpty()
+            ? null
+            : ctx.xmlGenIdentifier6().stream()
+            .map(iden6 -> new VariableNameAndLocality(iden6.getText(), retrieveLocality(iden6).orElse(null)))
+            .collect(Collectors.toList());
+
+    List<VariableNameAndLocality> identifier7 = ctx.xmlGenIdentifier7().isEmpty()
+            ? null
+            : ctx.xmlGenIdentifier7().stream()
+            .map(iden7 -> new VariableNameAndLocality(iden7.getText(), retrieveLocality(iden7).orElse(null)))
+            .collect(Collectors.toList());
+
+    List<VariableNameAndLocality> identifier8 = ctx.xmlGenIdentifier6().isEmpty()
+            ? null
+            : ctx.xmlGenIdentifier8().stream()
+            .map(iden8 -> new VariableNameAndLocality(iden8.getText(), retrieveLocality(iden8).orElse(null)))
+            .collect(Collectors.toList());
+
+    return addTreeNode(
+            ctx,
+            locality ->
+                    new XmlGenerateNode(
+                            locality,
+                            identifier1,
+                            identifier2,
+                            identifier3,
+                            identifier4,
+                            identifier5,
+                            identifier6,
+                            identifier7,
+                            identifier8
+                            ));
+
+  }
+
+  @Override
   public List<Node> visitEndProgramStatement(EndProgramStatementContext ctx) {
     areaAWarning(ctx.getStart());
     return ofNullable(ctx.programName())
@@ -996,7 +1048,15 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
 
   @Override
   public List<Node> visitProcedureDivisionBody(ProcedureDivisionBodyContext ctx) {
-    return addTreeNode(ctx, ProcedureDivisionBodyNode::new);
+
+    ParserRuleContext context = new ParserRuleContext();
+    context.start = ctx.getParent().start;
+    context.stop = ctx.stop;
+
+    List<Node> children = visitChildren(ctx);
+    return retrieveLocality(context)
+        .map(constructNode(ProcedureDivisionBodyNode::new, children))
+        .orElse(children);
   }
 
   @Override

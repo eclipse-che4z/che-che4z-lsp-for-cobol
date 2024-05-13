@@ -485,7 +485,7 @@ public class JsonParseProcess implements Processor<JsonParseNode> {
                   .severity(ErrorSeverity.ERROR)
                   .location(identifier1Nodes.get(0).getLocality().toOriginalLocation())
                   .messageTemplate(
-                      MessageTemplate.of("jsonParseProcess.identifier1.groupItemError"))
+                      MessageTemplate.of("jsonParseProcess.identifier1.groupItemError", identifier1Nodes.get(0).getName()))
                   .build());
     }
   }

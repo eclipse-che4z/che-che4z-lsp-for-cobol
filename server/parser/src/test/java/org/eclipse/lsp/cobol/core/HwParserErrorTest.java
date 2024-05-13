@@ -16,11 +16,11 @@
  */
 package org.eclipse.lsp.cobol.core;
 
-import org.eclipse.lsp.cobol.core.cst.SourceUnit;
-import org.eclipse.lsp.cobol.core.hw.CobolLexer;
-import org.eclipse.lsp.cobol.core.hw.CobolParser;
-import org.eclipse.lsp.cobol.core.hw.ParseResult;
-import org.eclipse.lsp.cobol.core.hw.ParserSettings;
+import org.eclipse.lsp.cobol.cst.SourceUnit;
+import org.eclipse.lsp.cobol.parser.hw.CobolLexer;
+import org.eclipse.lsp.cobol.parser.hw.CobolParser;
+import org.eclipse.lsp.cobol.parser.hw.ParseResult;
+import org.eclipse.lsp.cobol.parser.hw.ParserSettings;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

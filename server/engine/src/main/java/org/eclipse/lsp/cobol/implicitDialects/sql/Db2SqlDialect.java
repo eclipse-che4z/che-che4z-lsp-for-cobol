@@ -108,7 +108,7 @@ public class Db2SqlDialect implements CobolDialect {
             new ImplicitDb2VariablesProcessor()),
         new ProcessorDescription(
             Db2DataAndProcedureDivisionNode.class,
-            ProcessingPhase.POST_DEFINITION,
+            ProcessingPhase.VALIDATION,
             new Db2DataAndProcedureDivisionProcessor(messageService)),
         new ProcessorDescription(
             Db2DeclareVariableNode.class,
