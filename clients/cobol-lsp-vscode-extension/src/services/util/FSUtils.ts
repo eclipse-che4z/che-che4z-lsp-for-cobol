@@ -19,7 +19,6 @@ import * as urlUtil from "url";
 import { Uri } from "vscode";
 import * as vscode from "vscode";
 import { Utils } from "./Utils";
-
 /**
  * This method scans the list of folders as given input and find the required entity name within the folder.
  * If found returns its URI representation

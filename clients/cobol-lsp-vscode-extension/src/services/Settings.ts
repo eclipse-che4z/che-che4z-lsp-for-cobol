@@ -47,7 +47,6 @@ import {
   loadProcessorGroupSqlBackendConfig,
 } from "./ProcessorGroups";
 import { getProgramNameFromUri } from "./util/FSUtils";
-import { integer } from "vscode-languageclient";
 import { SettingsUtils } from "./util/SettingsUtils";
 
 export class TabRule {
