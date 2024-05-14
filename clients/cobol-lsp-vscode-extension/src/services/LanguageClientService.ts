@@ -41,7 +41,10 @@ export class LanguageClientService {
   private isNativeBuildEnabled: boolean = false;
   private executableService: NativeExecutableService;
 
-  constructor(private outputChannel: vscode.OutputChannel) {
+  constructor(
+    private outputChannel: vscode.OutputChannel,
+    private storagePath: vscode.Uri,
+  ) {
     const ext = vscode.extensions.getExtension(extensionId)!;
     this.executablePath = join(
       ext.extensionPath,
@@ -136,7 +139,9 @@ export class LanguageClientService {
         fileEvents: [
           vscode.workspace.createFileSystemWatcher("**/pgm_conf.json"),
           vscode.workspace.createFileSystemWatcher("**/proc_grps.json"),
-          vscode.workspace.createFileSystemWatcher("**/.copybooks/**/*"),
+          vscode.workspace.createFileSystemWatcher(
+            new vscode.RelativePattern(this.storagePath, "**/*"),
+          ),
         ],
       },
     };

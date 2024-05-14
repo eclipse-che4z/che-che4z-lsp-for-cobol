@@ -17,9 +17,7 @@ import * as iconv from "iconv-lite";
 import * as Path from "node:path";
 import * as vscode from "vscode";
 import {
-  C4Z_FOLDER,
   DOWNLOAD_QUEUE_LOCKED_ERROR_MSG,
-  GITIGNORE_FILE,
   INSTALL_ZOWE,
   INVALID_CREDENTIALS_ERROR_MSG,
   PATHS_USS,
@@ -31,7 +29,7 @@ import {
   ZOWE_EXT_MISSING_MSG,
 } from "../../constants";
 import { TelemetryService } from "../reporter/TelemetryService";
-import { createFileWithGivenPath, SettingsService } from "../Settings";
+import { SettingsService } from "../Settings";
 import { ProfileUtils } from "../util/ProfileUtils";
 import { Utils } from "../util/Utils";
 import { CopybookURI } from "./CopybookURI";
@@ -44,6 +42,7 @@ export class CopybookName {
 
 const experimentTag = "experiment-tag";
 export class CopybookDownloadService implements vscode.Disposable {
+  public constructor(public storagePath: string) {}
   public static checkWorkspace(): boolean {
     const workspaceFolders = vscode.workspace.workspaceFolders!;
     if (workspaceFolders && workspaceFolders.length === 0) {
@@ -86,7 +85,7 @@ export class CopybookDownloadService implements vscode.Disposable {
     return e?.mDetails?.errorCode === 401;
   }
 
-  private static async fetchCopybook(
+  public async fetchCopybook(
     dataset: string,
     copybookProfile: CopybookProfile,
     isUSS: boolean,
@@ -115,11 +114,7 @@ export class CopybookDownloadService implements vscode.Disposable {
       return false;
     }
     copybookProfile.updateCopybook(remoteCopybook);
-    await CopybookDownloadService.downloadCopybookFromMFUsingZowe(
-      dataset,
-      copybookProfile,
-      isUSS,
-    );
+    await this.downloadCopybookFromMFUsingZowe(dataset, copybookProfile, isUSS);
     return true;
   }
 
@@ -167,7 +162,7 @@ export class CopybookDownloadService implements vscode.Disposable {
     return members;
   }
 
-  private static async downloadCopybookFromMFUsingZowe(
+  public async downloadCopybookFromMFUsingZowe(
     dataset: string,
     copybookprofile: CopybookProfile,
     isUSS: boolean,
@@ -176,12 +171,11 @@ export class CopybookDownloadService implements vscode.Disposable {
       copybookprofile.profile,
       dataset,
       copybookprofile.getCopybook(),
+      this.storagePath,
     );
     if (!fs.existsSync(copybookPath)) {
       try {
-        // create .gitignore file within .c4z folder
-        createFileWithGivenPath(C4Z_FOLDER, GITIGNORE_FILE, "/**");
-        await CopybookDownloadService.downloadCopybookContent(
+        await this.downloadCopybookContent(
           dataset,
           copybookprofile.getCopybook(),
           copybookprofile.profile,
@@ -195,7 +189,7 @@ export class CopybookDownloadService implements vscode.Disposable {
     }
   }
 
-  private static async downloadCopybookContent(
+  public async downloadCopybookContent(
     dataset: string,
     copybook: string,
     profileName: string,
@@ -208,7 +202,7 @@ export class CopybookDownloadService implements vscode.Disposable {
       .loadNamedProfile(profileName);
     const downloadBinary = !!SettingsService.getCopybookFileEncoding();
     const filePath = Path.join(
-      CopybookURI.createDatasetPath(profileName, dataset),
+      CopybookURI.createDatasetPath(profileName, dataset, this.storagePath),
       copybook.substring(
         0,
         copybook.indexOf(".") !== -1 ? copybook.indexOf(".") : copybook.length,
@@ -248,11 +242,11 @@ export class CopybookDownloadService implements vscode.Disposable {
     }
   }
 
-  private static async handleCopybooks(
+  public async handleCopybooks(
     toDownload: CopybookProfile[],
     errors: Set<string>,
     progress: vscode.Progress<{ message?: string; increment?: number }>,
-    isUSS: boolean = false,
+    isUSS: boolean,
   ) {
     const promises: Promise<void>[] = [];
     try {
@@ -272,13 +266,7 @@ export class CopybookDownloadService implements vscode.Disposable {
             });
           }
           promises.push(
-            CopybookDownloadService.handleCopybook(
-              progress,
-              dataset,
-              cp,
-              errors,
-              isUSS,
-            ),
+            this.handleCopybook(progress, dataset, cp, errors, isUSS),
           );
         }
       }
@@ -293,7 +281,7 @@ export class CopybookDownloadService implements vscode.Disposable {
     }
   }
 
-  private static async handleCopybook(
+  public async handleCopybook(
     progress: vscode.Progress<{ message?: string; increment?: number }>,
     dataset: string,
     cp: CopybookProfile,
@@ -301,13 +289,9 @@ export class CopybookDownloadService implements vscode.Disposable {
     isUSS: boolean,
   ) {
     try {
-      const fetchResult = await CopybookDownloadService.fetchCopybook(
-        dataset,
-        cp,
-        isUSS,
-      );
+      const fetchResult = await this.fetchCopybook(dataset, cp, isUSS);
       if (fetchResult) {
-        this.updateDownloadProgress(progress, errors, cp);
+        CopybookDownloadService.updateDownloadProgress(progress, errors, cp);
       }
     } catch (e: any) {
       if (CopybookDownloadService.isInvalidCredentials(e)) {
@@ -324,12 +308,12 @@ export class CopybookDownloadService implements vscode.Disposable {
     errors: Set<string>,
     cp: CopybookProfile,
   ) {
-    errors.delete(
-      CopybookDownloadService.getFilenameWithoutExtension(cp.getCopybook()),
-    );
-    this.completedDownload++;
+    errors.delete(this.getFilenameWithoutExtension(cp.getCopybook()));
+    CopybookDownloadService.completedDownload++;
     const downloadPercent = Math.round(
-      (this.completedDownload / this.totalDownload) * 100,
+      (CopybookDownloadService.completedDownload /
+        CopybookDownloadService.totalDownload) *
+        100,
     );
     progress.report({
       increment: downloadPercent,
@@ -533,11 +517,7 @@ export class CopybookDownloadService implements vscode.Disposable {
     CopybookDownloadService.totalDownload = toDownload.length;
     CopybookDownloadService.completedDownload = 0;
     try {
-      await CopybookDownloadService.handleCopybooks(
-        toDownload,
-        errors,
-        progress,
-      );
+      await this.handleCopybooks(toDownload, errors, progress, false);
 
       const toDownloadUSS = toDownload
         .filter((cp) => errors.has(cp.getCopybook()))
@@ -551,12 +531,7 @@ export class CopybookDownloadService implements vscode.Disposable {
         }
       });
       if (toDownloadUSS.length > 0) {
-        await CopybookDownloadService.handleCopybooks(
-          toDownloadUSS,
-          errors,
-          progress,
-          true,
-        );
+        await this.handleCopybooks(toDownloadUSS, errors, progress, true);
       }
     } catch (e: any) {
       let errorMessage = e.toString();
