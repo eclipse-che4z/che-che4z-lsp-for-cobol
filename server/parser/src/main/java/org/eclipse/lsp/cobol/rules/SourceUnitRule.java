@@ -16,6 +16,9 @@ package org.eclipse.lsp.cobol.rules;
 
 import org.eclipse.lsp.cobol.cst.SourceUnit;
 import org.eclipse.lsp.cobol.parser.hw.*;
+import org.eclipse.lsp.cobol.parser.hw.lexer.CobolLexer;
+import org.eclipse.lsp.cobol.parser.hw.lexer.Token;
+import org.eclipse.lsp.cobol.parser.hw.lexer.TokenType;
 
 import java.util.Objects;
 

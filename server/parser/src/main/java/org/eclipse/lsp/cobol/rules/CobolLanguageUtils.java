@@ -18,8 +18,8 @@ import lombok.experimental.UtilityClass;
 import org.eclipse.lsp.cobol.cst.Skipped;
 import org.eclipse.lsp.cobol.cst.base.CstNode;
 import org.eclipse.lsp.cobol.parser.hw.ParsingContext;
-import org.eclipse.lsp.cobol.parser.hw.Token;
-import org.eclipse.lsp.cobol.parser.hw.TokenType;
+import org.eclipse.lsp.cobol.parser.hw.lexer.Token;
+import org.eclipse.lsp.cobol.parser.hw.lexer.TokenType;
 
 
 /**

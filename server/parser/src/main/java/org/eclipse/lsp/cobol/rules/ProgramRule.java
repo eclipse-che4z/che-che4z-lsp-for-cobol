@@ -18,7 +18,7 @@ import org.eclipse.lsp.cobol.cst.IdentificationDivision;
 import org.eclipse.lsp.cobol.cst.ProgramUnit;
 import org.eclipse.lsp.cobol.parser.hw.GrammarRule;
 import org.eclipse.lsp.cobol.parser.hw.ParsingContext;
-import org.eclipse.lsp.cobol.parser.hw.Token;
+import org.eclipse.lsp.cobol.parser.hw.lexer.Token;
 import org.eclipse.lsp.cobol.rules.data.DataDivisionRule;
 import org.eclipse.lsp.cobol.rules.environment.EnvironmentDivisionRule;
 import org.eclipse.lsp.cobol.rules.procedure.ProcedureDivisionRule;

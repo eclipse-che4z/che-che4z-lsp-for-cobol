@@ -16,7 +16,7 @@ package org.eclipse.lsp.cobol.rules.procedure;
 
 import org.eclipse.lsp.cobol.cst.procedure.Paragraph;
 import org.eclipse.lsp.cobol.parser.hw.ParsingContext;
-import org.eclipse.lsp.cobol.parser.hw.Token;
+import org.eclipse.lsp.cobol.parser.hw.lexer.Token;
 import org.eclipse.lsp.cobol.rules.CobolLanguage;
 import org.eclipse.lsp.cobol.rules.CobolLanguageUtils;
 import org.eclipse.lsp.cobol.rules.LanguageRule;
@@ -29,7 +29,7 @@ public class ParagraphRule implements LanguageRule {
   public void parse(ParsingContext ctx, CobolLanguage language) {
     ctx.spaces();
     ctx.push(new Paragraph());
-    ((Paragraph) ctx.peek()).setName(ctx.consume().get(0).getLexeme());
+    ((Paragraph) ctx.peek()).setName(ctx.consume().get(0).toText());
     ctx.spaces();
     ctx.consume(".");
     try {

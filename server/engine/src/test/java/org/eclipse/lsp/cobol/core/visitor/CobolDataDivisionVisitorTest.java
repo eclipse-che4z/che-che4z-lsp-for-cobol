@@ -25,6 +25,7 @@ import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.core.CobolDataDivisionParser.*;
 import org.eclipse.lsp.cobol.core.CobolParser;
 import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
+import org.eclipse.lsp.cobol.dialects.ibm.experimental.visitors.CobolDataDivisionVisitor;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;

@@ -22,6 +22,7 @@ import static org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode.ENABL
 import static org.eclipse.lsp.cobol.positive.CobolTextRegistry.DEFAULT_LISTING_PATH;
 import static org.eclipse.lsp.cobol.positive.CobolTextRegistry.PATH_TO_LISTING_SNAP;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.parallel.ExecutionMode.CONCURRENT;
 
 import java.io.File;
 import java.nio.file.Files;
@@ -47,6 +48,7 @@ import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -57,6 +59,7 @@ import org.junit.jupiter.params.provider.MethodSource;
  * regressions. The complete error description with the file name logged.
  */
 @Slf4j
+@Execution(CONCURRENT)
 class PositiveTest extends ConfigurableTest {
 
   private CobolTextRegistry cobolTextRegistry;
