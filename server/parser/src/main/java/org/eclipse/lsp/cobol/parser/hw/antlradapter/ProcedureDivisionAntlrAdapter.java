@@ -25,6 +25,7 @@ import org.eclipse.lsp.cobol.core.CobolProcedureDivisionParser;
 import org.eclipse.lsp.cobol.core.CobolProcedureDivisionParser.*;
 import org.eclipse.lsp.cobol.cst.base.CstNode;
 import org.eclipse.lsp.cobol.cst.procedure.*;
+import org.eclipse.lsp.cobol.parser.hw.lexer.Token;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -87,7 +88,7 @@ public class ProcedureDivisionAntlrAdapter {
     for (int idx = 0; idx < nodes.size(); idx++) {
       CstNode node = nodes.get(idx);
 
-      if (node instanceof org.eclipse.lsp.cobol.parser.hw.Token) {
+      if (node instanceof Token) {
         continue;
       }
 
@@ -125,7 +126,7 @@ public class ProcedureDivisionAntlrAdapter {
   }
 
   private void handleDeclaratives(LinkedList<ParserRuleContext> genStack, Declaratives node) {
-    org.eclipse.lsp.cobol.parser.hw.Token startToken = Utils.findStartToken(node).get();
+    Token startToken = Utils.findStartToken(node).get();
     String input = Utils.generatePrefix(charStream, startToken) + node.toText();
     CobolProcedureDivisionLexer antlrLexer =
             new CobolProcedureDivisionLexer(CharStreams.fromString(input));
@@ -162,14 +163,14 @@ public class ProcedureDivisionAntlrAdapter {
     genStack.push(context);
     genStack.peek().children = new ArrayList<>();
     genStack.peek().start = Utils.toAntlrToken(Utils.findStartToken(node).get(), charStream);
-    org.eclipse.lsp.cobol.parser.hw.Token name = (org.eclipse.lsp.cobol.parser.hw.Token) node.getChildren().get(0);
+    Token name = (Token) node.getChildren().get(0);
     ParagraphDefinitionNameContext paragraphDefinitionNameContext =
             Utils.initNode(name, new ParagraphDefinitionNameContext(null, 0), charStream);
     TerminalNodeImpl nameTN = new TerminalNodeImpl(Utils.toAntlrToken(name, charStream));
     paragraphDefinitionNameContext.addChild(nameTN);
     paragraphDefinitionNameContext.setParent(genStack.peek());
     genStack.peek().addChild(paragraphDefinitionNameContext);
-    TerminalNodeImpl terminalNode = new TerminalNodeImpl(Utils.toAntlrToken((org.eclipse.lsp.cobol.parser.hw.Token) node.getChildren().get(dotIdx(node.getChildren())), charStream));
+    TerminalNodeImpl terminalNode = new TerminalNodeImpl(Utils.toAntlrToken((Token) node.getChildren().get(dotIdx(node.getChildren())), charStream));
     lastToken = (CommonToken) terminalNode.getSymbol();
     genStack.peek().addChild(terminalNode);
   }
@@ -184,9 +185,9 @@ public class ProcedureDivisionAntlrAdapter {
     if (genStack.peek() instanceof ProcedureSectionContext) {
       genStack.pop().stop = lastToken;
     }
-    org.eclipse.lsp.cobol.parser.hw.Token name = (org.eclipse.lsp.cobol.parser.hw.Token) node.getChildren().get(0);
-    org.eclipse.lsp.cobol.parser.hw.Token section = (org.eclipse.lsp.cobol.parser.hw.Token) node.getChildren().get(2);
-    org.eclipse.lsp.cobol.parser.hw.Token dot = (org.eclipse.lsp.cobol.parser.hw.Token) node.getChildren().get(3);
+    Token name = (Token) node.getChildren().get(0);
+    Token section = (Token) node.getChildren().get(2);
+    Token dot = (Token) node.getChildren().get(3);
 
     ProcedureSectionContext sectionContext =
             Utils.initNode(node, new ProcedureSectionContext(genStack.peek(), 0), charStream);
@@ -209,7 +210,7 @@ public class ProcedureDivisionAntlrAdapter {
   }
 
   private ParserRuleContext parseSentence(Statement node) {
-    org.eclipse.lsp.cobol.parser.hw.Token startToken = Utils.findStartToken(node).get();
+    Token startToken = Utils.findStartToken(node).get();
     String input = Utils.generatePrefix(charStream, startToken) + node.toText();
     CobolProcedureDivisionLexer antlrLexer =
             new CobolProcedureDivisionLexer(CharStreams.fromString(input));
@@ -247,7 +248,7 @@ public class ProcedureDivisionAntlrAdapter {
     return antlrParser.procedureDivision();
   }
 
-  private boolean hasToken(CstNode node, org.eclipse.lsp.cobol.parser.hw.Token token) {
+  private boolean hasToken(CstNode node, Token token) {
     if (node.equals(token)) {
       return true;
     }
@@ -259,7 +260,7 @@ public class ProcedureDivisionAntlrAdapter {
     return false;
   }
 
-  private ProcedureSectionHeaderContext createSectionHeader(CstNode node, org.eclipse.lsp.cobol.parser.hw.Token name, org.eclipse.lsp.cobol.parser.hw.Token section) {
+  private ProcedureSectionHeaderContext createSectionHeader(CstNode node, Token name, Token section) {
     ProcedureSectionHeaderContext headerContext = new ProcedureSectionHeaderContext(null, 0);
     headerContext.start = Utils.findStartToken(node).map(token -> Utils.toAntlrToken(token, charStream)).orElse(null);
     headerContext.stop = Utils.findStopToken(node, true).map(token -> Utils.toAntlrToken(token, charStream)).orElse(null);

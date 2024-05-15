@@ -14,18 +14,14 @@
  *    and DAF development standards
  *
  */
-package org.eclipse.lsp.cobol.cst.procedure;
-
-import lombok.Getter;
-import lombok.Setter;
-import org.eclipse.lsp.cobol.cst.base.CstNodeImpl;
-import org.eclipse.lsp.cobol.parser.hw.lexer.Token;
+package org.eclipse.lsp.cobol.parser.hw.lexer;
 
 /**
- * ProcedureDivision node.
+ * Token types.
  */
-public class ProcedureDivision extends CstNodeImpl {
-  // TODO: im now sure that keeping a start token of procedure division body is a good idea.
-  @Getter @Setter
-  Token bodyStartToken;
+public enum TokenType {
+  WHITESPACE,
+  STRING_LITERAL,
+  NEW_LINE,
+  EOF
 }

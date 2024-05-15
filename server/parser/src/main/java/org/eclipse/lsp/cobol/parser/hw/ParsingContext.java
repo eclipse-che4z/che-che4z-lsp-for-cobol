@@ -19,6 +19,9 @@ package org.eclipse.lsp.cobol.parser.hw;
 import lombok.Getter;
 import org.apache.commons.text.similarity.JaroWinklerSimilarity;
 import org.eclipse.lsp.cobol.cst.base.CstNode;
+import org.eclipse.lsp.cobol.parser.hw.lexer.CobolLexer;
+import org.eclipse.lsp.cobol.parser.hw.lexer.Token;
+import org.eclipse.lsp.cobol.parser.hw.lexer.TokenType;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 

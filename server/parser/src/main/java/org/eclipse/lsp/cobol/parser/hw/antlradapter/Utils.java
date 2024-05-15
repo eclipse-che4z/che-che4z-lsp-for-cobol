@@ -25,8 +25,8 @@ import org.antlr.v4.runtime.misc.Pair;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNodeImpl;
 import org.eclipse.lsp.cobol.cst.base.CstNode;
-import org.eclipse.lsp.cobol.parser.hw.Token;
-import org.eclipse.lsp.cobol.parser.hw.TokenType;
+import org.eclipse.lsp.cobol.parser.hw.lexer.Token;
+import org.eclipse.lsp.cobol.parser.hw.lexer.TokenType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,8 +56,8 @@ public class Utils {
                     source,
                     0,
                     channel,
-                    token.getIndex(),
-                    token.getIndex() + token.getLexeme().length() - 1);
+                    token.getIndexStart(),
+                    token.getIndexStop() - 1);
     commonToken.setLine(token.getLine() + 1);
     commonToken.setCharPositionInLine(token.getStartPositionInLine());
     commonToken.setText(token.toText());
@@ -207,7 +207,7 @@ public class Utils {
   }
 
   static String generatePrefix(CharStream charStream, Token startToken) {
-    String prefix = charStream.getText(Interval.of(0, startToken.getIndex() - 1));
+    String prefix = charStream.getText(Interval.of(0, startToken.getIndexStart() - 1));
     char[] chars = prefix.toCharArray();
     for (int i = 0; i < chars.length; i++) {
       chars[i] = chars[i] != '\n' ? ' ' : '\n';
