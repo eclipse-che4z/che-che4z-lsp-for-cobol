@@ -25,7 +25,7 @@ jest.mock("../../services/copybook/CopybookDownloadService");
 Utils.getZoweExplorerAPI = jest.fn();
 
 const copybookDownloadService: CopybookDownloadService =
-  new CopybookDownloadService();
+  new CopybookDownloadService("/storagePath");
 const copybook: string = "cobyBookTest";
 const progName: string = "progNameTest";
 

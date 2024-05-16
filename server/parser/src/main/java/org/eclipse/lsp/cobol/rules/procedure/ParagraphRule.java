@@ -32,8 +32,8 @@ public class ParagraphRule implements LanguageRule {
     ((Paragraph) ctx.peek()).setName(ctx.consume().get(0).getLexeme());
     ctx.spaces();
     ctx.consume(".");
-    ctx.spaces();
     try {
+      ctx.spaces();
       while (!CobolLanguageUtils.isNextDivisionEofOrEop(ctx)
               && !language.tryMatchRule(ParagraphRule.class, ctx)
               && !language.tryMatchRule(SectionRule.class, ctx)

@@ -909,9 +909,7 @@ public class CobolProcedureDivisionVisitor extends CobolProcedureDivisionParserB
   private void areaBWarning(ParserRuleContext ctx) {
     final int start = ctx.getStart().getTokenIndex();
     final int stop = ctx.getStop().getTokenIndex();
-
-    areaBWarning(
-            start < stop ? tokenStream.getTokens(start, stop) : ImmutableList.of(ctx.getStart()));
+    areaBWarning(start < stop ? tokenStream.getTokens(start, stop) : ImmutableList.of(ctx.getStart()));
   }
 
   private void areaBWarning(@NonNull List<Token> tokenList) {

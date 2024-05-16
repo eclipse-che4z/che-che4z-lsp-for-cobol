@@ -22,6 +22,8 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.TokenSource;
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.Pair;
+import org.antlr.v4.runtime.tree.ParseTree;
+import org.antlr.v4.runtime.tree.TerminalNodeImpl;
 import org.eclipse.lsp.cobol.cst.base.CstNode;
 import org.eclipse.lsp.cobol.parser.hw.Token;
 import org.eclipse.lsp.cobol.parser.hw.TokenType;
@@ -32,28 +34,30 @@ import java.util.Optional;
 
 import static org.antlr.v4.runtime.Token.HIDDEN_CHANNEL;
 
-/** Token related utilities. */
+/**
+ * Token related utilities.
+ */
 public class Utils {
   /**
    * Transform cst token into antlr one.
    *
-   * @param token cst token node.
+   * @param token      cst token node.
    * @param charStream the stream of program characters.
    * @return antlr token.
    */
   public static CommonToken toAntlrToken(Token token, CharStream charStream) {
     Pair<TokenSource, CharStream> source = new Pair<>(null, charStream);
     int channel =
-        token.getType() == TokenType.WHITESPACE || token.getType() == TokenType.NEW_LINE
-            ? HIDDEN_CHANNEL
-            : 0;
+            token.getType() == TokenType.WHITESPACE || token.getType() == TokenType.NEW_LINE
+                    ? HIDDEN_CHANNEL
+                    : 0;
     CommonToken commonToken =
-        new CommonToken(
-            source,
-            0,
-            channel,
-            token.getIndex(),
-            token.getIndex() + token.getLexeme().length() - 1);
+            new CommonToken(
+                    source,
+                    0,
+                    channel,
+                    token.getIndex(),
+                    token.getIndex() + token.getLexeme().length() - 1);
     commonToken.setLine(token.getLine() + 1);
     commonToken.setCharPositionInLine(token.getStartPositionInLine());
     commonToken.setText(token.toText());
@@ -63,7 +67,7 @@ public class Utils {
   /**
    * Find the first token in CST.
    *
-   * @param cstNode a CST node.
+   * @param cstNode           a CST node.
    * @param ignoreWhitespaces set to true if you want to ignore whitespace tokens
    * @return Optionally token.
    */
@@ -90,17 +94,17 @@ public class Utils {
   /**
    * Initialize antlr node by CST node.
    *
-   * @param cstNode the CST node.
-   * @param node tha ANTLR node to set up.
+   * @param cstNode    the CST node.
+   * @param node       tha ANTLR node to set up.
    * @param charStream the stream of program characters.
-   * @param <T> the type of ANTLR node
+   * @param <T>        the type of ANTLR node
    * @return node reference.
    */
   public static <T extends ParserRuleContext> T initNode(
-      CstNode cstNode, T node, CharStream charStream) {
+          CstNode cstNode, T node, CharStream charStream) {
     node.start = findStartToken(cstNode).map(token -> toAntlrToken(token, charStream)).orElse(null);
     node.stop =
-        findStopToken(cstNode, true).map(token -> toAntlrToken(token, charStream)).orElse(null);
+            findStopToken(cstNode, true).map(token -> toAntlrToken(token, charStream)).orElse(null);
     node.children = new ArrayList<>();
     return node;
   }
@@ -121,7 +125,7 @@ public class Utils {
   /**
    * Find the last token in CST.
    *
-   * @param cstNodes a CST node list.
+   * @param cstNodes          a CST node list.
    * @param ignoreWhitespaces set to true if you want to ignore whitespace tokens
    * @return Optionally token.
    */
@@ -145,7 +149,7 @@ public class Utils {
   /**
    * Find the last token in CST.
    *
-   * @param cstNode a CST node.
+   * @param cstNode           a CST node.
    * @param ignoreWhitespaces set to true if you want to ignore whitespace tokens
    * @return Optionally token.
    */
@@ -175,7 +179,7 @@ public class Utils {
   /**
    * Find the last token in CST.
    *
-   * @param cstNodes a list of nodes to check (ignore whitespaces)
+   * @param cstNodes          a list of nodes to check (ignore whitespaces)
    * @param ignoreWhitespaces set to true if you want to ignore whitespace tokens
    * @return possible the end node.
    */
@@ -209,5 +213,21 @@ public class Utils {
       chars[i] = chars[i] != '\n' ? ' ' : '\n';
     }
     return new String(chars);
+  }
+
+  /**
+   * Remove EOF token if eny
+   *
+   * @param parent a node to find a EOF token.
+   */
+  static void removeEofNode(ParserRuleContext parent) {
+    if (parent.children == null) {
+      return;
+    }
+    ParseTree lastChild = parent.children.get(parent.children.size() - 1);
+    if (lastChild instanceof TerminalNodeImpl
+            && ((TerminalNodeImpl) lastChild).getSymbol().getType() == org.antlr.v4.runtime.Token.EOF) {
+      parent.removeLastChild();
+    }
   }
 }

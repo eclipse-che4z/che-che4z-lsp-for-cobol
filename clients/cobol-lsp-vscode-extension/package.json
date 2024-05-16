@@ -83,6 +83,10 @@
         "command": "cobol-lsp.snippets.insertSnippets",
         "title": "Insert COBOL Snippet",
         "category": "Snippets"
+      },
+      {
+        "command": "cobol-lsp.open.copybook.internalfolder",
+        "title": "Open Copybooks Internal Folder"
       }
     ],
     "languages": [

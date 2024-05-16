@@ -40,9 +40,10 @@ jest.mock("vscode", () => ({
   },
   Uri: {
     file: jest.fn().mockReturnValue({
-      fsPath: "path",
+      fsPath: "/storagePath",
     }),
   },
+  RelativePattern: jest.fn().mockReturnValue(undefined),
 }));
 jest.mock("vscode-languageclient/node", () => ({
   LanguageClient: jest.fn(),
@@ -68,7 +69,10 @@ beforeEach(() => {
 const SERVER_STOPPED_MSG = "server stopped";
 describe("LanguageClientService positive scenario", () => {
   beforeEach(() => {
-    languageClientService = new LanguageClientService(jest.fn() as any);
+    languageClientService = new LanguageClientService(
+      jest.fn() as any,
+      vscode.Uri.file("/storagePath"),
+    );
     new JavaCheck().isJavaInstalled = jest.fn().mockResolvedValue(true);
     vscode.workspace.getConfiguration(expect.any(String)).get = jest
       .fn()
@@ -236,7 +240,10 @@ describe("LanguageClientService negative scenario.", () => {
   test("LSP port not defined and jar path doesn't exists", async () => {
     (fs.existsSync as any) = jest.fn().mockReturnValue(false);
     try {
-      await new LanguageClientService(jest.fn() as any).checkPrerequisites();
+      await new LanguageClientService(
+        jest.fn() as any,
+        vscode.Uri.file("/storagePath"),
+      ).checkPrerequisites();
     } catch (error: any) {
       expect(error.toString()).toBe("Error: LSP server for cobol not found");
     }
