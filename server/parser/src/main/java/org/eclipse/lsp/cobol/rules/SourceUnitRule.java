@@ -36,7 +36,7 @@ public class SourceUnitRule implements LanguageRule {
         if (ctx.matchSeq("IDENTIFICATION", "DIVISION") || ctx.matchSeq("ID", "DIVISION")) {
           language.parseRule(ProgramRule.class, ctx);
         } else {
-          Token token = ctx.getLexer().forward(GrammarRule.SourceUnit).get(0);
+          Token token = ctx.getLexer().forward();
           CobolLanguageUtils.skip(ctx, token);
           ctx.error(token, "Unknown input: '" + token.getLexeme() + "'");
         }
@@ -55,11 +55,10 @@ public class SourceUnitRule implements LanguageRule {
 
   private void synchronize(ParsingContext ctx) {
     CobolLexer lexer = ctx.getLexer();
-    GrammarRule rule = ctx.peek().getRule();
-    Token t = lexer.forward(rule).get(0);
+    Token t = lexer.forward();
     while (t.getType() != TokenType.EOF && !isContinuationSymbol(t)) {
       CobolLanguageUtils.skip(ctx, t);
-      t = lexer.forward(rule).get(0);
+      t = lexer.forward();
     }
     if (t.getType() != TokenType.EOF) {
       CobolLanguageUtils.skip(ctx, t);

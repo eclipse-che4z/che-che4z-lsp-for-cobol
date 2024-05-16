@@ -13,8 +13,6 @@
  */
 package org.eclipse.lsp.cobol.lexer;
 
-import org.eclipse.lsp.cobol.parser.hw.lexer.CobolLexer;
-import org.eclipse.lsp.cobol.parser.hw.GrammarRule;
 import org.eclipse.lsp.cobol.parser.hw.lexer.Token;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -42,13 +40,4 @@ public final class LexerTestUtils {
     assertEquals(index + lexeme.length(), token.getIndexStop(), "indexStop");
   }
 
-  /**
-   * Get token text
-   *
-   * @param lexer a lexer
-   * @return a text
-   */
-  public static String tokenContent(CobolLexer lexer) {
-    return lexer.forward(GrammarRule.ProgramUnit).get(0).getLexeme();
-  }
 }

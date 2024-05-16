@@ -29,7 +29,7 @@ public class ParagraphRule implements LanguageRule {
   public void parse(ParsingContext ctx, CobolLanguage language) {
     ctx.spaces();
     ctx.push(new Paragraph());
-    ((Paragraph) ctx.peek()).setName(ctx.consume().get(0).toText());
+    ((Paragraph) ctx.peek()).setName(ctx.consume().toText());
     ctx.spaces();
     ctx.consume(".");
     try {
@@ -48,7 +48,7 @@ public class ParagraphRule implements LanguageRule {
 
   @Override
   public boolean tryMatch(ParsingContext ctx, CobolLanguage language) {
-    Token nameToken = ctx.getLexer().peek(null).get(0);
+    Token nameToken = ctx.getLexer().peek();
     if (!ctx.matchSeq(null, ".")) {
       return false;
     }

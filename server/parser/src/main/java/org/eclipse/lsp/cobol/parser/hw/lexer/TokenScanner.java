@@ -15,7 +15,8 @@ package org.eclipse.lsp.cobol.parser.hw.lexer;
 
 import lombok.Data;
 
-import java.util.Optional;
+import java.util.function.Predicate;
+import java.util.regex.Pattern;
 
 /** Class helps to group characters into tokens (TODO: it will be part of the lexer) */
 public class TokenScanner {
@@ -26,14 +27,24 @@ public class TokenScanner {
     this.source = source;
   }
 
-  private Optional<Character> peek() {
-    return currentPosition.index + 1 < source.length()
-        ? Optional.of(source.charAt(currentPosition.index + 1))
-        : Optional.empty();
+  private boolean peek(char ch) {
+    return peek(c -> c == ch);
   }
 
-  private Character forward() {
-    return currentPosition.forward();
+  private boolean peek(Predicate<Character> predicate) {
+    return peek(predicate, 1);
+  }
+
+  private boolean peek(Predicate<Character> predicate, int shift) {
+    int nextPos = currentPosition.index + shift;
+    if (isAtEnd() || source.length() <= nextPos) {
+      return false;
+    }
+    return predicate.test(source.charAt(nextPos));
+  }
+
+  private void forward() {
+    currentPosition.forward();
   }
 
   /**
@@ -42,70 +53,127 @@ public class TokenScanner {
    * @return the next token.
    */
   public Token next() {
-    if (currentPosition.index == source.length()) {
+    if (isAtEnd()) {
       return currentPosition.produceToken(TokenType.EOF);
     }
+
     Position start = new Position(currentPosition);
-    switch (at()) {
-      case '\'':
-      case '"':
-        // TBD STRING_LITERAL
-        return null;
-      case '\n':
+
+    if (match(' ')) {
+      return whitespace(start);
+    }
+    if (match('\n')) {
+      return newLine(start);
+    }
+    if (match('\'') || match('"')) {
+      return stringLiteral(start);
+    }
+    if (mayBeNumericLiteral()) {
+      return numericLiteral(start);
+    }
+
+    return cobolWord(start);
+  }
+
+  private Token stringLiteral(Position start) {
+    char q = at();
+    do {
+      forward();
+      // skip escape
+      if (match(q) && peek(q)) {
         forward();
-        if (at() != null && at() == '\r') {
-          forward();
-        }
-        return start.produceToken(TokenType.NEW_LINE);
-      case ' ':
-        do {
-          forward();
-        } while (isWhitespace(at()));
-        return start.produceToken(TokenType.WHITESPACE);
-      default:
-        do {
-          forward();
-        } while (!isTerminal(at()));
-        return start.produceToken(null);
+        forward();
+      }
+    } while (!match(q));
+    forward(); // consume q
+    return start.produceToken(TokenType.STRING_LITERAL);
+  }
+
+  private Token numericLiteral(Position start) {
+    do {
+      forward();
+    } while (match(Character::isDigit));
+    if (match('.') && peek(Character::isDigit)) {
+      do {
+        forward();
+      } while (match(Character::isDigit));
+    }
+    if (match('E') && (peek(Character::isDigit) || peek('-') || peek('+'))) {
+      if (peek('-') || peek('+')) {
+        forward();
+      }
+      do {
+        forward();
+      } while (match(Character::isDigit));
+    }
+    return start.produceToken(TokenType.NUMBER_LITERAL);
+  }
+
+  private boolean mayBeNumericLiteral() {
+    if (match(Character::isDigit)) {
+      return true;
+    }
+    if (match('-')) {
+      return peek(Character::isDigit);
+    }
+    if (match('+') || match('.')) {
+      return peek(Character::isDigit);
+    } else {
+      return false;
     }
   }
 
-  private Character at() {
-    if (currentPosition.index == source.length()) {
-      return null;
+  private Token cobolWord(Position start) {
+    do {
+      forward();
+    } while (!isAtEnd() && isCobolWord());
+
+    return start.produceToken(TokenType.COBOL_WORD);
+  }
+
+  private static final Pattern COBOL_WORD_CHAR = Pattern.compile("[-_a-zA-Z0-9]");
+
+  private boolean isCobolWord() {
+    return COBOL_WORD_CHAR.matcher(String.valueOf(source.charAt(currentPosition.index))).matches();
+  }
+
+  private Token newLine(Position start) {
+    forward();
+    if (match('\r')) {
+      forward();
     }
+    return start.produceToken(TokenType.NEW_LINE);
+  }
+
+  private Token whitespace(Position start) {
+    do {
+      forward();
+    } while (match(' ') || match('\t'));
+    return start.produceToken(TokenType.WHITESPACE);
+  }
+
+  private char at() {
     return source.charAt(currentPosition.index);
   }
 
-  private boolean isTerminal(Character character) {
-    if (character == null) {
-      return true;
-    }
-    return isWhitespace(character) || isSeparator(character);
-  }
-
-  private boolean isSeparator(char c) {
-    return c == '.';
-  }
-
-  private boolean isLiteral(Character c) {
-    return c == '"' || c == '\'';
-  }
-
-  private boolean isWhitespace(Character c) {
-    if (c == null) {
+  boolean match(Predicate<Character> predicate) {
+    if (isAtEnd()) {
       return false;
     }
-    return c == ' ' || c == '\t';
+    return predicate.test(source.charAt(currentPosition.index));
   }
 
-  private boolean isNewLine(Character c) {
-    return c == '\n' || c == '\r';
+  boolean match(char ch) {
+    return match(c -> ch == c);
+  }
+
+  public boolean isAtEnd() {
+    return currentPosition.index == source.length();
   }
 
   /** A class to hold position data */
   @Data
-  class Position {
+  private class Position {
     int index = 0;
     int line = 0;
     int character = 0;
@@ -122,7 +190,7 @@ public class TokenScanner {
       return new Token(line, character, index, currentPosition.index, type, source);
     }
 
-    Character forward() {
+    void forward() {
       if (source.charAt(index) == '\n') {
         line++;
         character = 0;
@@ -130,7 +198,6 @@ public class TokenScanner {
         character++;
       }
       index++;
-      return source.charAt(index - 1);
     }
   }
 }

@@ -81,14 +81,14 @@ public class CobolLanguageUtils {
    * @return true if it is the division or eop.
    */
   public boolean isNextDivisionEofOrEop(ParsingContext ctx) {
-    if (ctx.getLexer().peek(ctx.peek().getRule()).get(0).getType() == TokenType.EOF) {
+    if (ctx.getLexer().peek().getType() == TokenType.EOF) {
       return true;
     }
     if (CobolLanguageUtils.isEndOfProgram(ctx)) {
       return true;
     }
 
-    boolean inAriaA = isInAriaA(ctx.getLexer().peek(null).get(0));
+    boolean inAriaA = isInAriaA(ctx.getLexer().peek());
     if (ctx.matchSeq("ID", "DIVISION", ".") && inAriaA) {
       return true;
     }

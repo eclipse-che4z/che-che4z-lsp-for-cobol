@@ -45,7 +45,7 @@ public class Token extends CstNodeImpl {
    * @return size of lexeme
    */
   public int length() {
-    return indexStop - indexStart + 1;
+    return indexStop - indexStart;
   }
 
   @Override

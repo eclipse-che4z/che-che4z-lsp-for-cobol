@@ -16,14 +16,10 @@ package org.eclipse.lsp.cobol.rules;
 
 import org.eclipse.lsp.cobol.cst.IdentificationDivision;
 import org.eclipse.lsp.cobol.cst.ProgramUnit;
-import org.eclipse.lsp.cobol.parser.hw.GrammarRule;
 import org.eclipse.lsp.cobol.parser.hw.ParsingContext;
-import org.eclipse.lsp.cobol.parser.hw.lexer.Token;
 import org.eclipse.lsp.cobol.rules.data.DataDivisionRule;
 import org.eclipse.lsp.cobol.rules.environment.EnvironmentDivisionRule;
 import org.eclipse.lsp.cobol.rules.procedure.ProcedureDivisionRule;
-
-import java.util.List;
 
 /**
  * COBOL language grammar rule class.
@@ -44,9 +40,7 @@ public class ProgramRule implements LanguageRule {
         ctx.consume("PROGRAM-ID");
         ctx.optional(".");
         ctx.spaces();
-
-        List<Token> programName = ctx.getLexer().peek(GrammarRule.ProgramUnit);
-        programUnit.setName(programName.get(0).getLexeme());
+        programUnit.setName(ctx.getLexer().peek().getLexeme());
         ctx.consume();
         ctx.spaces();
         if (ctx.match("IS")) {
