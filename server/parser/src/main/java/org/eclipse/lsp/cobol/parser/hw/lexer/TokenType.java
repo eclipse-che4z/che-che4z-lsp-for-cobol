@@ -22,6 +22,8 @@ package org.eclipse.lsp.cobol.parser.hw.lexer;
 public enum TokenType {
   WHITESPACE,
   STRING_LITERAL,
+  NUMBER_LITERAL,
+  COBOL_WORD,
   NEW_LINE,
   EOF
 }

@@ -16,25 +16,19 @@
  */
 package org.eclipse.lsp.cobol.parser.hw.lexer;
 
-import lombok.Data;
-import org.eclipse.lsp.cobol.parser.hw.GrammarRule;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Predicate;
 
 /** COBOL language lexer. */
 public class CobolLexer {
-  private final String source;
-  private Position position = new Position();
-  private Position lastTokenStartPosition = new Position();
-  private List<Token> tokens = new ArrayList<>();
+  private final List<Token> tokens = new ArrayList<>();
+  private final TokenScanner scanner;
   private int tokenIndex = 0;
 
   public CobolLexer(String source) {
-    this.source = source;
+    this.scanner = new TokenScanner(source);
   }
 
   /**
@@ -43,218 +37,68 @@ public class CobolLexer {
    * @return true if there are more tokens.
    */
   public boolean hasMore() {
-    return position.getIndex() < source.length();
+    return !scanner.isAtEnd();
   }
 
   /**
    * Return one token and move forward.
    *
-   * @param rule current syntax rule.
-   * @return list of possible tokens (at least one).
+   * @return token.
    */
-  public List<Token> forward(GrammarRule rule) {
-    if (position.getIndex() == source.length()) {
-      return Collections.singletonList(
-          new Token(
-              position.getLine(),
-              position.getCharacter(),
-              position.getIndex(),
-              position.getIndex(),
-              TokenType.EOF,
-              source));
+  public Token forward() {
+    if (tokenIndex == tokens.size()) {
+      Token next = scanner.next();
+      tokens.add(next);
+      tokenIndex++;
+      return next;
     }
-    String lexeme = scan(false);
-    Token token =
-        new Token(
-            lastTokenStartPosition.getLine(),
-            lastTokenStartPosition.getCharacter(),
-            position.getIndex() - lexeme.length(),
-            position.getIndex(),
-            detectType(rule, lexeme),
-            source);
-    return Collections.singletonList(token);
+    return tokens.get(tokenIndex++);
   }
 
   /**
    * Return one token but don't move forward.
    *
-   * @param rule current syntax rule.
-   * @return list of possible tokens (at least one).
+   * @return Next token.
    */
-  public List<Token> peek(GrammarRule rule) {
-    if (position.getIndex() == source.length()) {
-      return Collections.singletonList(
-          new Token(
-              position.getLine(),
-              position.getCharacter(),
-              position.getIndex(),
-              position.getIndex(),
-              TokenType.EOF,
-              source));
+  public Token peek() {
+    if (tokenIndex == tokens.size()) {
+      Token next = scanner.next();
+      tokens.add(next);
+      return next;
     }
-    String lexeme = scan(true);
-    Token token =
-        new Token(
-            lastTokenStartPosition.getLine(),
-            position.getCharacter(),
-            position.getIndex(),
-            position.getIndex() + lexeme.length(),
-            detectType(rule, lexeme),
-            source);
-    return Collections.singletonList(token);
-  }
-
-  private TokenType detectType(GrammarRule rule, String lexeme) {
-    if (lexeme.trim().isEmpty()) {
-      return TokenType.WHITESPACE;
-    }
-    return null;
-  }
-
-  private String scan(boolean look) {
-    if (isWhitespace(source.charAt(position.getIndex()))) {
-      return consumeUntil(c -> !isWhitespace(source.charAt(c.getIndex())), look);
-    }
-    if (isNewLine(source.charAt(position.getIndex()))) {
-      return consumeUntil(c -> !isNewLine(source.charAt(c.getIndex())), look);
-    }
-    if (isSeparator(source.charAt(position.getIndex()))) {
-      return consumeUntil(c -> !isSeparator(source.charAt(c.getIndex())), look);
-    }
-    if (isLiteral(source.charAt(position.getIndex()))) {
-      return processLiteral(source, look);
-    }
-    // TODO: number support
-    return consumeUntil(
-        c ->
-            isSeparator(source.charAt(c.getIndex()))
-                || isWhitespace(source.charAt(c.getIndex()))
-                || isNewLine(source.charAt(c.getIndex())),
-        look);
-  }
-
-  private String processLiteral(String source, boolean look) {
-    // https://www.ibm.com/docs/en/cobol-zos/6.4?topic=literals-basic-alphanumeric
-    char quoteSymbol = source.charAt(position.getIndex());
-
-    // Those flags are to include quoteSymbol into the lexeme.
-    AtomicBoolean isFirst = new AtomicBoolean(true);
-    AtomicBoolean isLast = new AtomicBoolean(false);
-
-    AtomicBoolean wasEscaped = new AtomicBoolean(false);
-
-    return consumeUntil(
-        pos -> {
-          if (isFirst.get()) {
-            isFirst.set(false);
-            return false;
-          }
-          if (pos.getIndex() + 1 < source.length()
-              && source.charAt(pos.getIndex()) == quoteSymbol
-              && source.charAt(pos.getIndex() + 1) == quoteSymbol) {
-            wasEscaped.set(true);
-            return false;
-          }
-          if (wasEscaped.get()) {
-            wasEscaped.set(false);
-            return false;
-          }
-          if (isLast.get()) {
-            return true;
-          }
-          if (source.charAt(pos.getIndex()) != quoteSymbol) {
-            return false;
-          }
-
-          if (source.charAt(pos.getIndex()) == quoteSymbol) {
-            isLast.set(true);
-            return false;
-          }
-          return true;
-        },
-        look);
-  }
-
-  private String consumeUntil(Predicate<Position> predicate, boolean look) {
-    StringBuilder sb = new StringBuilder();
-    Position localPos = new Position(position);
-    while (localPos.getIndex() < source.length()) {
-      char charAt = source.charAt(localPos.getIndex());
-      if (predicate.test(localPos)) {
-        break;
-      }
-      sb.append(charAt);
-      localPos.updateLinePosition(charAt);
-    }
-    if (!look) {
-      lastTokenStartPosition = position;
-      position = localPos;
-    }
-    return sb.toString();
-  }
-
-  private boolean isSeparator(char c) {
-    return c == '.';
-  }
-
-  private boolean isLiteral(char c) {
-    return c == '"' || c == '\'';
-  }
-
-  private boolean isWhitespace(char c) {
-    return c == ' ' || c == '\t';
-  }
-
-  private boolean isNewLine(char c) {
-    return c == '\n' || c == '\r';
+    return tokens.get(tokenIndex);
   }
 
   /**
    * Find a sequence of tokens ignoring one that passes skip predicate.
    *
-   * @param rule current syntax rule.
    * @param count how many tokens to take.
    * @param skip predicate to ignore tokens.
    * @return a list of tokens.
    */
-  // TODO: it should return a list of lists
-  public List<Token> peekSeq(GrammarRule rule, int count, Predicate<Token> skip) {
+  public List<Token> peekSeq(int count, Predicate<Token> skip) {
     List<Token> result = new ArrayList<>();
-    Position localPos = new Position(position);
-    while (result.size() < count && position.getIndex() < source.length()) {
-      Token token = forward(rule).get(0);
+    int idx = tokenIndex;
+    if (idx == tokens.size()) {
+      tokens.add(scanner.next());
+    }
+    if (tokens.get(idx).getType() == TokenType.EOF) {
+      return Collections.singletonList(peek());
+    }
+
+    while (result.size() < count) {
+      Token token = tokens.get(idx);
       if (!skip.test(token)) {
         result.add(token);
       }
+      idx++;
+      if (idx == tokens.size()) {
+        tokens.add(scanner.next());
+      }
+      if (tokens.get(idx).getType() == TokenType.EOF) {
+        return result;
+      }
     }
-    position = localPos;
-
     return result;
-  }
-}
-
-/** A class to hold position data */
-@Data
-class Position {
-  int index = 0;
-  int line = 0;
-  int character = 0;
-
-  Position(Position position) {
-    index = position.index;
-    line = position.line;
-    character = position.character;
-  }
-
-  Position() {}
-
-  void updateLinePosition(char charAt) {
-    index++;
-    if (charAt == '\n') {
-      line++;
-      character = 0;
-    } else if (charAt != '\r') {
-      character++;
-    }
   }
 }

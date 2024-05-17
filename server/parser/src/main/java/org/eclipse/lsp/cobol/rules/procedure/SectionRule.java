@@ -34,7 +34,7 @@ public class SectionRule implements LanguageRule {
     ctx.spaces();
     ctx.consume(".");
     ctx.spaces();
-    ((Section) ctx.peek()).setBodyStartToken(ctx.getLexer().peek(null).get(0));
+    ((Section) ctx.peek()).setBodyStartToken(ctx.getLexer().peek());
     try {
       while (!CobolLanguageUtils.isNextDivisionEofOrEop(ctx)
               && !language.tryMatchRule(ParagraphRule.class, ctx)
@@ -52,6 +52,6 @@ public class SectionRule implements LanguageRule {
   @Override
   public boolean tryMatch(ParsingContext ctx, CobolLanguage language) {
     return ctx.matchSeq(null, "SECTION", ".")
-            && CobolLanguageUtils.isInAriaA(ctx.getLexer().peek(null).get(0));
+            && CobolLanguageUtils.isInAriaA(ctx.getLexer().peek());
   }
 }

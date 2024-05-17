@@ -16,8 +16,6 @@
  */
 package org.eclipse.lsp.cobol.cst.base;
 
-import org.eclipse.lsp.cobol.parser.hw.GrammarRule;
-
 import java.util.List;
 
 /**
@@ -29,12 +27,6 @@ public interface CstNode {
      * @return the list of children nodes.
      */
     List<CstNode> getChildren();
-
-    /**
-     * Get the syntax rule associated with the node.
-     * @return rule type.
-     */
-    GrammarRule getRule();
 
     /**
      * Restore suorce code of the node.

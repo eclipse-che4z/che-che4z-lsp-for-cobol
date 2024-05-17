@@ -17,7 +17,6 @@
 package org.eclipse.lsp.cobol.cst.base;
 
 import lombok.Getter;
-import org.eclipse.lsp.cobol.parser.hw.GrammarRule;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,11 +27,6 @@ import java.util.List;
 @Getter
 public class CstNodeImpl implements CstNode {
   private final List<CstNode> children = new ArrayList<>();
-
-  @Override
-  public GrammarRule getRule() {
-    return null;
-  }
 
   @Override
   public String toText() {

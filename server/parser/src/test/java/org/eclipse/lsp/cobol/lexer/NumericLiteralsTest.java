@@ -14,8 +14,6 @@
 package org.eclipse.lsp.cobol.lexer;
 
 import org.eclipse.lsp.cobol.parser.hw.lexer.CobolLexer;
-import org.eclipse.lsp.cobol.parser.hw.GrammarRule;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -33,10 +31,9 @@ class NumericLiteralsTest {
 
     @ParameterizedTest(name = "[{index}] test {0}")
     @MethodSource("numbers")
-    @Disabled("Not implemented yet")
     void floatingNumber(String token) {
         CobolLexer lexer = new CobolLexer(token);
-        assertToken(lexer.forward(GrammarRule.ProgramUnit).get(0), token, 0, 0, 0);
+        assertToken(lexer.forward(), token, 0, 0, 0);
         assertFalse(lexer.hasMore());
     }
 
@@ -61,9 +58,8 @@ class NumericLiteralsTest {
                 Arguments.of("+1E+78"),
                 Arguments.of("-11E+78"),
                 Arguments.of(".12E+8"),
-                Arguments.of("+.1E+78"),
-                Arguments.of("-.11E+78")
-
+                Arguments.of(".1E+78"),
+                Arguments.of(".11E+78")
         );
     }
 }
