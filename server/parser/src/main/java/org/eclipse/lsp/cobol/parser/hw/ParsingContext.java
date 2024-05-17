@@ -147,6 +147,17 @@ public class ParsingContext {
   }
 
   /**
+   * Optionally consume a token
+   *
+   * @param type a token type
+   */
+  public void optional(TokenType type) {
+    if (lexer.peek().getType() == type) {
+      peek().getChildren().add(lexer.forward());
+    }
+  }
+
+  /**
    * Take a look at the top of the stack
    *
    * @return the nedo on the top
