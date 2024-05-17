@@ -58,4 +58,19 @@ class SectionTest {
 
     assertEquals(source, parseResult.getSourceUnit().toText());
   }
+
+  @Test
+  void prioritySection() {
+    String source = "IDENTIFICATION DIVISION.\n"
+            + "       PROGRAM-ID.  SECTST.\n"
+            + "       PROCEDURE DIVISION.\n"
+            + "       SECT1 SECTION 10.\n"
+            + "           DISPLAY 'PARAG2'.";
+    ParseResult parseResult = new CobolParser(new CobolLexer(source), new ParserSettings()).parse();
+    assertTrue(parseResult.getDiagnostics().isEmpty());
+    ProgramUnit pu = (ProgramUnit) parseResult.getSourceUnit().getChildren().get(0);
+    ProcedureDivision pd = (ProcedureDivision) pu.getChildren().get(1);
+    assertEquals(1, pd.getChildren().stream().filter(Section.class::isInstance).count());
+    assertEquals(source, parseResult.getSourceUnit().toText());
+  }
 }

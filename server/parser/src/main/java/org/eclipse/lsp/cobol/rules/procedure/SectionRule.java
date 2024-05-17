@@ -16,6 +16,7 @@ package org.eclipse.lsp.cobol.rules.procedure;
 
 import org.eclipse.lsp.cobol.cst.procedure.Section;
 import org.eclipse.lsp.cobol.parser.hw.ParsingContext;
+import org.eclipse.lsp.cobol.parser.hw.lexer.TokenType;
 import org.eclipse.lsp.cobol.rules.CobolLanguage;
 import org.eclipse.lsp.cobol.rules.CobolLanguageUtils;
 import org.eclipse.lsp.cobol.rules.LanguageRule;
@@ -31,6 +32,8 @@ public class SectionRule implements LanguageRule {
     ctx.consume();
     ctx.spaces();
     ctx.consume("SECTION");
+    ctx.spaces();
+    ctx.optional(TokenType.NUMBER_LITERAL);
     ctx.spaces();
     ctx.consume(".");
     ctx.spaces();
@@ -51,7 +54,8 @@ public class SectionRule implements LanguageRule {
 
   @Override
   public boolean tryMatch(ParsingContext ctx, CobolLanguage language) {
-    return ctx.matchSeq(null, "SECTION", ".")
+    return (ctx.matchSeq(null, "SECTION", ".")
+            || ctx.matchSeq(null, "SECTION", null, "."))
             && CobolLanguageUtils.isInAriaA(ctx.getLexer().peek());
   }
 }
