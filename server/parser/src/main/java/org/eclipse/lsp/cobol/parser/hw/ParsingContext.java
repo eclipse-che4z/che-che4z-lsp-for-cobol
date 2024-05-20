@@ -173,7 +173,8 @@ public class ParsingContext {
    * @return true if we have a match
    */
   public boolean matchSeq(String... lexemes) {
-    List<Token> tokens = lexer.peekSeq(lexemes.length, t -> t.getType() == TokenType.WHITESPACE);
+    List<Token> tokens = lexer.peekSeq(lexemes.length,
+            t -> t.getType() == TokenType.WHITESPACE || t.getType() == TokenType.NEW_LINE);
     if (tokens.size() != lexemes.length) {
       return false;
     }

@@ -58,6 +58,12 @@ public class ParagraphRule implements LanguageRule {
     if (!CobolLanguageUtils.isInAriaA(nameToken)) {
       return false;
     }
+    if (ctx.matchSeq(null, ".", "GO", "TO", ".")) {
+      return false;
+    }
+    if (ctx.matchSeq(null, ".", "GO", ".")) {
+      return false;
+    }
     return  true;
   }
 }

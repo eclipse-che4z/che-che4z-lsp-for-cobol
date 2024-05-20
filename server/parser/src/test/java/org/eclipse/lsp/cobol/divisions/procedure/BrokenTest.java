@@ -10,8 +10,6 @@
  *
  * Contributors:
  *    Broadcom, Inc. - initial API and implementation
- *    DAF Trucks NV – implementation of DaCo COBOL statements
- *    and DAF development standards
  *
  */
 package org.eclipse.lsp.cobol.divisions.procedure;
