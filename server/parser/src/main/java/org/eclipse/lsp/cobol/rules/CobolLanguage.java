@@ -16,6 +16,7 @@ package org.eclipse.lsp.cobol.rules;
 import org.eclipse.lsp.cobol.parser.hw.ParsingContext;
 import org.eclipse.lsp.cobol.rules.data.DataDivisionRule;
 import org.eclipse.lsp.cobol.rules.environment.EnvironmentDivisionRule;
+import org.eclipse.lsp.cobol.rules.identification.IdentificationDivisionRule;
 import org.eclipse.lsp.cobol.rules.procedure.*;
 
 import java.util.HashMap;
@@ -39,6 +40,7 @@ public class CobolLanguage {
     languageRules.put(DeclarativesRule.class, new DeclarativesRule());
 
     languageRules.put(ParagraphRule.class, new ParagraphRule());
+    languageRules.put(IdentificationDivisionRule.class, new IdentificationDivisionRule());
     languageRules.put(SectionRule.class, new SectionRule());
     languageRules.put(StatementRule.class, new StatementRule());
   }

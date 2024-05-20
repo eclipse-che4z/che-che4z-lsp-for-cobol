@@ -182,7 +182,7 @@ public class AntlrAdapter {
 
   private CobolIdentificationDivisionParser antlrIdDivisionParser(CstNode node) {
     org.eclipse.lsp.cobol.parser.hw.lexer.Token startToken = Utils.findStartToken(node).get();
-    String input = Utils.generatePrefix(charStream, startToken) + node.toText();
+    String input = Utils.generatePrefix(charStream, startToken) + node.toText().trim();
     CobolIdentificationDivisionLexer antlrLexer =
         new CobolIdentificationDivisionLexer(CharStreams.fromString(input));
     antlrLexer.removeErrorListeners();

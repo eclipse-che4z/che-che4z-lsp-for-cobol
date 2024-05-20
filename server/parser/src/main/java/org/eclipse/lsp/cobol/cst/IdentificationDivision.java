@@ -16,10 +16,14 @@
  */
 package org.eclipse.lsp.cobol.cst;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.eclipse.lsp.cobol.cst.base.CstNodeImpl;
 
 /**
  * IdentificationDivision node.
  */
 public class IdentificationDivision extends CstNodeImpl {
+    @Getter @Setter
+    String programName;
 }
