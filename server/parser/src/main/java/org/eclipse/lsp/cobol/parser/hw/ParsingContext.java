@@ -29,9 +29,11 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Predicate;
 
 /** Parsing context */
 public class ParsingContext {
+  public static final Predicate<Token> SKIP_WHITESPACE_AND_NEWLINE = t -> t.getType() == TokenType.WHITESPACE || t.getType() == TokenType.NEW_LINE;
   @Getter private final CobolLexer lexer;
   private final JaroWinklerSimilarity sim = new JaroWinklerSimilarity();
   @Getter private final List<Diagnostic> diagnostics = new ArrayList<>();
@@ -173,8 +175,7 @@ public class ParsingContext {
    * @return true if we have a match
    */
   public boolean matchSeq(String... lexemes) {
-    List<Token> tokens = lexer.peekSeq(lexemes.length,
-            t -> t.getType() == TokenType.WHITESPACE || t.getType() == TokenType.NEW_LINE);
+    List<Token> tokens = lexer.peekSeq(lexemes.length, SKIP_WHITESPACE_AND_NEWLINE);
     if (tokens.size() != lexemes.length) {
       return false;
     }

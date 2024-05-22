@@ -120,7 +120,7 @@ class HwCobolParserTest {
     assertEquals(2, su.getChildren().size());
     ProgramUnit pu = (ProgramUnit) su.getChildren().get(1);
     assertEquals("Pr1", pu.getName());
-    ProgramUnit npu = (ProgramUnit) pu.getChildren().get(1); // TODO: find program node
+    ProgramUnit npu = pu.list(ProgramUnit.class).get(0);
     assertEquals("Pr2", npu.getName());
 
     assertEquals(source, su.toText());

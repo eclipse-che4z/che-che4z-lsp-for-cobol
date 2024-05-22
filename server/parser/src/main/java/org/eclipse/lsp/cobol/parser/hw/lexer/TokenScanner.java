@@ -13,10 +13,9 @@
  */
 package org.eclipse.lsp.cobol.parser.hw.lexer;
 
-import lombok.Data;
-
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
+import lombok.Data;
 
 /** Class helps to group characters into tokens (TODO: it will be part of the lexer) */
 public class TokenScanner {
@@ -65,13 +64,33 @@ public class TokenScanner {
     if (match('\n')) {
       return newLine(start);
     }
+    if (match('(') || match(')') || match(',')) {
+      forward();
+      return start.produceToken(TokenType.OTHER);
+    }
     if (match('\'') || match('"')) {
       return stringLiteral(start);
     }
-    if (mayBeNumericLiteral()) {
-      return numericLiteral(start);
+
+    Token num = numericLiteral(start);
+    if (num != null) {
+      return num;
     }
 
+    if (match('-')) {
+      while (match('-')) {
+        forward();
+      }
+      return start.produceToken(TokenType.OTHER);
+    }
+
+    if (match('<') || match('>')) {
+      forward();
+      if (match('=')) {
+        forward();
+      }
+      return start.produceToken(TokenType.OTHER);
+    }
     return cobolWord(start);
   }
 
@@ -90,6 +109,14 @@ public class TokenScanner {
   }
 
   private Token numericLiteral(Position start) {
+    currentPosition.mark();
+    if (match('-') || match('+') || match('.')) {
+      forward();
+    }
+    if (!match(Character::isDigit)) {
+      currentPosition.backToMark();
+      return null;
+    }
     do {
       forward();
     } while (match(Character::isDigit));
@@ -105,6 +132,11 @@ public class TokenScanner {
       do {
         forward();
       } while (match(Character::isDigit));
+    }
+    if (match('-')) {
+      // minus after number is unexpected, unless it's expression (TODO support 1-2-3-4 case)
+      currentPosition.backToMark();
+      return null;
     }
     return start.produceToken(TokenType.NUMBER_LITERAL);
   }
@@ -125,15 +157,26 @@ public class TokenScanner {
 
   private Token cobolWord(Position start) {
     do {
-      forward();
-    } while (!isAtEnd() && isCobolWord());
+      if (match('-')) {
+        currentPosition.mark();
+        while (match('-')) {
+          forward();
+        }
+        if (match(' ')) {
+          currentPosition.backToMark();
+          return start.produceToken(TokenType.COBOL_WORD);
+        }
+      } else {
+        forward();
+      }
+    } while (!isAtEnd() && isCobolWordSymbol());
 
     return start.produceToken(TokenType.COBOL_WORD);
   }
 
   private static final Pattern COBOL_WORD_CHAR = Pattern.compile("[-_a-zA-Z0-9]");
 
-  private boolean isCobolWord() {
+  private boolean isCobolWordSymbol() {
     return COBOL_WORD_CHAR.matcher(String.valueOf(source.charAt(currentPosition.index))).matches();
   }
 
@@ -177,6 +220,7 @@ public class TokenScanner {
     int index = 0;
     int line = 0;
     int character = 0;
+    Position mark;
 
     Position(Position position) {
       index = position.index;
@@ -198,6 +242,16 @@ public class TokenScanner {
         character++;
       }
       index++;
+    }
+
+    void mark() {
+      mark = new Position(this);
+    }
+
+    void backToMark() {
+      this.index = mark.index;
+      this.character = mark.character;
+      this.line = mark.line;
     }
   }
 }

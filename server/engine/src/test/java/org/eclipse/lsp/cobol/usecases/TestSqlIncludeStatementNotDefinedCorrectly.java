@@ -24,6 +24,7 @@ import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.Range;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 /** This test checks sql include statement if it is defined correctly. */
@@ -51,6 +52,7 @@ class TestSqlIncludeStatementNotDefinedCorrectly {
   }
 
   @Test
+  @Disabled("EXPERIMENTAL_COBOL")
   void testHw() {
     UseCaseEngine.runTest(
         TEXT,

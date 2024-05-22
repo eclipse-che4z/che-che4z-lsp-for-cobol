@@ -88,20 +88,19 @@ public class CobolLanguageUtils {
       return true;
     }
 
-    boolean inAriaA = isInAriaA(ctx.getLexer().peek());
-    if (ctx.matchSeq("ID", "DIVISION", ".") && inAriaA) {
+    if (ctx.matchSeq("ID", "DIVISION", ".")) {
       return true;
     }
-    if (ctx.matchSeq("IDENTIFICATION", "DIVISION", ".") && inAriaA) {
+    if (ctx.matchSeq("IDENTIFICATION", "DIVISION", ".")) {
       return true;
     }
-    if (ctx.matchSeq("ENVIRONMENT", "DIVISION", ".") && inAriaA) {
+    if (ctx.matchSeq("ENVIRONMENT", "DIVISION", ".")) {
       return true;
     }
-    if (ctx.matchSeq("DATA", "DIVISION", ".") && inAriaA) {
+    if (ctx.matchSeq("DATA", "DIVISION", ".")) {
       return true;
     }
-    return ctx.matchSeq("PROCEDURE", "DIVISION") && inAriaA;
+    return ctx.matchSeq("PROCEDURE", "DIVISION");
   }
 
 }

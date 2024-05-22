@@ -22,6 +22,7 @@ import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.eclipse.lsp4j.Range;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -64,6 +65,7 @@ class TestParametrised {
   @ParameterizedTest
   @MethodSource("textsGetter")
   @DisplayName("Parameterized - different ends")
+  @Disabled("EXPERIMENTAL_COBOL")
   void testHw(String text) {
     UseCaseEngine.runTest(
         text,

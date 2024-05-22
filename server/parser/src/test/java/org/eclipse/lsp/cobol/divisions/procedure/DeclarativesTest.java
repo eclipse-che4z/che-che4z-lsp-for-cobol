@@ -46,7 +46,7 @@ class DeclarativesTest {
     ParseResult parseResult = new CobolParser(new CobolLexer(source), new ParserSettings()).parse();
     assertTrue(parseResult.getDiagnostics().isEmpty());
     ProgramUnit pu = (ProgramUnit) parseResult.getSourceUnit().getChildren().get(0);
-    ProcedureDivision pd = (ProcedureDivision) pu.getChildren().get(1);
+    ProcedureDivision pd = (ProcedureDivision) pu.list(ProcedureDivision.class).get(0);
 
     assertEquals(Declaratives.class, pd.getChildren().get(6).getClass());
 

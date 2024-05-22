@@ -29,6 +29,8 @@ import org.eclipse.lsp.cobol.parser.hw.ParserSettings;
 import org.eclipse.lsp.cobol.parser.hw.antlradapter.AntlrAdapter;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+
 import static org.eclipse.lsp.cobol.migration.SectionCompositionTest.antlrParse;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -52,8 +54,9 @@ class ElementsOrderTest {
 
     SourceUnit su = new CobolParser(new CobolLexer(source), new ParserSettings()).parse().getSourceUnit();
     ProgramUnit pu = (ProgramUnit) su.getChildren().get(1);
-    Paragraph p1 = (Paragraph) pu.getChildren().get(1).getChildren().get(12);
-    Paragraph p2 = (Paragraph) pu.getChildren().get(1).getChildren().get(13);
+    List<Paragraph> paragraphs = pu.list(Paragraph.class);
+    Paragraph p1 = paragraphs.get(0);
+    Paragraph p2 = paragraphs.get(1);
     assertEquals("PARAG1", p1.getName());
     assertEquals("PARAG2", p2.getName());
 
@@ -98,8 +101,9 @@ class ElementsOrderTest {
 
     SourceUnit su = new CobolParser(new CobolLexer(source), new ParserSettings()).parse().getSourceUnit();
     ProgramUnit pu = (ProgramUnit) su.getChildren().get(1);
-    Paragraph p1 = (Paragraph) pu.getChildren().get(1).getChildren().get(13);
-    Paragraph p2 = (Paragraph) pu.getChildren().get(1).getChildren().get(15);
+    List<Paragraph> paragraphs = pu.list(Paragraph.class);
+    Paragraph p1 = paragraphs.get(0);
+    Paragraph p2 = paragraphs.get(1);
     assertEquals("PARAG1", p1.getName());
     assertEquals("PARAG2", p2.getName());
 
