@@ -40,7 +40,7 @@ class TestHwUnexpectedTextInIdentificationDivision {
           + "           DISPLAY {$VARNAME}.";
 
   @Test
-  @Disabled("Hw parser")
+  @Disabled("EXPERIMENTAL_COBOL")
   void test() {
     UseCaseEngine.runTest(
         TEXT,

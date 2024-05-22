@@ -40,7 +40,7 @@ public class ProcedureDivisionRule implements LanguageRule {
         } else if (language.tryMatchRule(SectionRule.class, ctx)) {
           language.tryParseRule(SectionRule.class, ctx);
         } else {
-          language.tryParseRule(StatementRule.class, ctx);
+          language.tryParseRule(SentenceRule.class, ctx);
         }
         ctx.spaces();
       }

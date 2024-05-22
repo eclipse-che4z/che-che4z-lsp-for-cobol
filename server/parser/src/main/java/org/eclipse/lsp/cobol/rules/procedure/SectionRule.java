@@ -43,7 +43,7 @@ public class SectionRule implements LanguageRule {
               && !language.tryMatchRule(ParagraphRule.class, ctx)
               && !language.tryMatchRule(SectionRule.class, ctx)
               && !CobolLanguageUtils.isEndOfProgram(ctx)) {
-        language.parseRule(StatementRule.class, ctx);
+        language.parseRule(SentenceRule.class, ctx);
         ctx.spaces();
       }
     } finally {

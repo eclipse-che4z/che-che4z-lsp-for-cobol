@@ -21,24 +21,33 @@ import org.eclipse.lsp.cobol.rules.CobolLanguage;
 import org.eclipse.lsp.cobol.rules.CobolLanguageUtils;
 import org.eclipse.lsp.cobol.rules.LanguageRule;
 
-/**
- * COBOL language grammar rule class.
- */
+/** COBOL language grammar rule class. */
 public class ParagraphRule implements LanguageRule {
   @Override
   public void parse(ParsingContext ctx, CobolLanguage language) {
-    ctx.spaces();
-    ctx.push(new Paragraph());
-    ((Paragraph) ctx.peek()).setName(ctx.consume().toText());
-    ctx.spaces();
-    ctx.consume(".");
     try {
       ctx.spaces();
+      ctx.push(new Paragraph());
+      ((Paragraph) ctx.peek()).setName(ctx.consume().toText());
+      ctx.spaces();
+      ctx.consume(".");
+      // Altered GO TO
+      if (ctx.matchSeq("GO", "TO", ".") || ctx.matchSeq("GO", ".")) {
+        ctx.spaces();
+        ctx.consume("GO");
+        ctx.spaces();
+        ctx.optional("TO");
+        ctx.spaces();
+        ctx.consume(".");
+        return;
+      }
+
+      ctx.spaces();
       while (!CobolLanguageUtils.isNextDivisionEofOrEop(ctx)
-              && !language.tryMatchRule(ParagraphRule.class, ctx)
-              && !language.tryMatchRule(SectionRule.class, ctx)
-              && !CobolLanguageUtils.isEndOfProgram(ctx)) {
-        language.parseRule(StatementRule.class, ctx);
+          && !language.tryMatchRule(ParagraphRule.class, ctx)
+          && !language.tryMatchRule(SectionRule.class, ctx)
+          && !CobolLanguageUtils.isEndOfProgram(ctx)) {
+        language.parseRule(SentenceRule.class, ctx);
         ctx.spaces();
       }
     } finally {
@@ -48,6 +57,10 @@ public class ParagraphRule implements LanguageRule {
 
   @Override
   public boolean tryMatch(ParsingContext ctx, CobolLanguage language) {
+    /*
+     * P.226: A user-defined word that identifies a paragraph.
+     * A paragraph-name, because it can be qualified, need not be unique.
+     */
     Token nameToken = ctx.getLexer().peek();
     if (!ctx.matchSeq(null, ".")) {
       return false;
@@ -58,12 +71,9 @@ public class ParagraphRule implements LanguageRule {
     if (!CobolLanguageUtils.isInAriaA(nameToken)) {
       return false;
     }
-    if (ctx.matchSeq(null, ".", "GO", "TO", ".")) {
-      return false;
-    }
-    if (ctx.matchSeq(null, ".", "GO", ".")) {
-      return false;
-    }
-    return  true;
+    return true;
+            // TODO: check if keyword can be paragraph name
+//            language.isUserDefinedWord(
+//        ctx.getLexer().peekSeq(1, ParsingContext.SKIP_WHITESPACE_AND_NEWLINE).get(0).getLexeme());
   }
 }

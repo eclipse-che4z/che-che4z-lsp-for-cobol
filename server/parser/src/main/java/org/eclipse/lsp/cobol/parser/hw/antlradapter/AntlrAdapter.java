@@ -205,7 +205,6 @@ public class AntlrAdapter {
     CobolDataDivisionParser antlrParser = new CobolDataDivisionParser(tokens);
     antlrParser.removeErrorListeners();
     antlrParser.addErrorListener(errorListener);
-    antlrParser.setErrorHandler(errorStrategy);
     antlrParser.addParseListener(treeListener);
     return antlrParser;
   }

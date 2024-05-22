@@ -140,7 +140,7 @@ public class ProcedureDivisionAntlrAdapter {
     antlrParser.addParseListener(treeListener);
     ProcedureDeclarativesContext declaratives = antlrParser.procedureDeclaratives();
     Utils.removeEofNode(declaratives);
-    genStack.peek().addChild(declaratives);
+    genStack.peek().getParent().addChild(declaratives);
   }
 
   private void assureParagraphsCtx(LinkedList<ParserRuleContext> genStack, ProcedureDivisionBodyContext pdbCtx, CstNode node) {

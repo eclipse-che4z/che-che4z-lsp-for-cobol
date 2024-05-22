@@ -16,6 +16,7 @@
  */
 package org.eclipse.lsp.cobol.cst.base;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -33,4 +34,22 @@ public interface CstNode {
      * @return source code string.
      */
     String toText();
+
+    /**
+     * List of all nodes from the current one (this) children.
+     * @param clazz Node class to filter by
+     * @return a list of clazz nodes
+     * @param <T> - node class
+     */
+    default <T extends CstNode> List<T> list(Class<T> clazz) {
+        List<T> result = new ArrayList<>();
+        for (CstNode child : getChildren()) {
+            if (clazz.isInstance(child)) {
+                result.add((T) child);
+            } else {
+                result.addAll(child.list(clazz));
+            }
+        }
+        return result;
+    }
 }

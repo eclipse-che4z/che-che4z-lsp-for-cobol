@@ -47,7 +47,7 @@ class EndProgramTest {
     ParseResult parseResult = new CobolParser(new CobolLexer(source), new ParserSettings()).parse();
     assertTrue(parseResult.getDiagnostics().isEmpty());
     ProgramUnit pu = (ProgramUnit) parseResult.getSourceUnit().getChildren().get(0);
-    ProcedureDivision pd = (ProcedureDivision) pu.getChildren().get(1);
+    ProcedureDivision pd = pu.list(ProcedureDivision.class).get(0);
     assertEquals(2, pd.getChildren().stream().filter(Paragraph.class::isInstance).count());
     Paragraph p1 = (Paragraph) pd.getChildren().get(9);
     Paragraph p2 = (Paragraph) pd.getChildren().get(10);

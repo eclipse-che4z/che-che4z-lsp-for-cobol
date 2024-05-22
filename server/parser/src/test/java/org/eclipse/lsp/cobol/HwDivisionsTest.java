@@ -69,7 +69,7 @@ class HwDivisionsTest {
     ProgramUnit pu = (ProgramUnit) su.getChildren().get(1);
     assertEquals("Pr1", pu.getName());
 
-    EnvironmentDivision ed = (EnvironmentDivision) pu.getChildren().get(1);
+    EnvironmentDivision ed = (EnvironmentDivision) pu.list(EnvironmentDivision.class).get(0);
     assertEquals(edSource, "       " + ed.toText());
     assertEquals(source, su.toText());
   }
@@ -87,7 +87,7 @@ class HwDivisionsTest {
     ProgramUnit pu = (ProgramUnit) su.getChildren().get(1);
     assertEquals("Pr1", pu.getName());
 
-    DataDivision dd = (DataDivision) pu.getChildren().get(1);
+    DataDivision dd = pu.list(DataDivision.class).get(0);
     assertEquals(ddSource, "       " + dd.toText());
     assertEquals(source, su.toText());
   }
@@ -116,7 +116,7 @@ class HwDivisionsTest {
     ProgramUnit pu = (ProgramUnit) su.getChildren().get(1);
     assertEquals("Pr1", pu.getName());
 
-    ProcedureDivision pd = (ProcedureDivision) pu.getChildren().get(1);
+    ProcedureDivision pd = pu.list(ProcedureDivision.class).get(0);
     assertEquals(pdSource, "       " + pd.toText());
     assertEquals(source, su.toText());
   }

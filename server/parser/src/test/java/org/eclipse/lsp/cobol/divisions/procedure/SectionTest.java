@@ -51,7 +51,7 @@ class SectionTest {
     ParseResult parseResult = new CobolParser(new CobolLexer(source), new ParserSettings()).parse();
     assertTrue(parseResult.getDiagnostics().isEmpty());
     ProgramUnit pu = (ProgramUnit) parseResult.getSourceUnit().getChildren().get(0);
-    ProcedureDivision pd = (ProcedureDivision) pu.getChildren().get(1);
+    ProcedureDivision pd = (ProcedureDivision) pu.list(ProcedureDivision.class).get(0);
     assertEquals(2, pd.getChildren().stream().filter(Paragraph.class::isInstance).count());
     assertEquals(2, pd.getChildren().stream().filter(Section.class::isInstance).count());
     // TODO: check if everything is in the place
@@ -69,7 +69,7 @@ class SectionTest {
     ParseResult parseResult = new CobolParser(new CobolLexer(source), new ParserSettings()).parse();
     assertTrue(parseResult.getDiagnostics().isEmpty());
     ProgramUnit pu = (ProgramUnit) parseResult.getSourceUnit().getChildren().get(0);
-    ProcedureDivision pd = (ProcedureDivision) pu.getChildren().get(1);
+    ProcedureDivision pd = (ProcedureDivision) pu.list(ProcedureDivision.class).get(0);
     assertEquals(1, pd.getChildren().stream().filter(Section.class::isInstance).count());
     assertEquals(source, parseResult.getSourceUnit().toText());
   }
