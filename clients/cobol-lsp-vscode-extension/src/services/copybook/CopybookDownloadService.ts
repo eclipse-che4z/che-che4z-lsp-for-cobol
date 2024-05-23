@@ -107,7 +107,7 @@ export class CopybookDownloadService {
     const availableProfiles = ProfileUtils.getAvailableProfiles(
       this.explorerAPI!,
     );
-    if ((!profile || !availableProfiles.includes(profile)) && true) {
+    if (!profile || !availableProfiles.includes(profile)) {
       const message = profile
         ? `${PROVIDE_PROFILE_MSG} Provided invalid profile name: ${profile}`
         : `${PROVIDE_PROFILE_MSG}`;
