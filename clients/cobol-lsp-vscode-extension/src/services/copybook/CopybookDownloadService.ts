@@ -17,7 +17,6 @@ import { DownloadStrategyResolver } from "./downloader/DownloadStrategyResolver"
 import { PROVIDE_PROFILE_MSG } from "../../constants";
 import { ProfileUtils } from "../util/ProfileUtils";
 import { DownloadUtil } from "./downloader/DownloadUtil";
-import { ZoweExplorerDownloader } from "./downloader/ZoweExplorerDownloader";
 
 export class CopybookName {
   constructor(public name: string, public dialect: string) {}
@@ -40,7 +39,12 @@ export class CopybookDownloadService {
     documentUri: string,
     copybookNames: CopybookName[],
   ): Promise<void> {
-    if (!(await this.isPrerequisiteForDownloadSatisfied(documentUri))) {
+    if (
+      !(await this.isPrerequisiteForDownloadSatisfied(
+        documentUri,
+        copybookNames,
+      ))
+    ) {
       return;
     }
     await vscode.window.withProgress(
@@ -89,13 +93,21 @@ export class CopybookDownloadService {
 
   private async isPrerequisiteForDownloadSatisfied(
     documentUri: string,
+    copybookNames: CopybookName[],
   ): Promise<boolean> {
+    if (
+      !DownloadUtil.areCopybookDownloadConfigurationsPresent(
+        documentUri,
+        copybookNames,
+      )
+    )
+      return false;
     if (!this.explorerAPI) return false;
     const profile = await ProfileUtils.getProfileNameForCopybook(documentUri);
     const availableProfiles = ProfileUtils.getAvailableProfiles(
       this.explorerAPI!,
     );
-    if (!profile || !availableProfiles.includes(profile)) {
+    if ((!profile || !availableProfiles.includes(profile)) && true) {
       const message = profile
         ? `${PROVIDE_PROFILE_MSG} Provided invalid profile name: ${profile}`
         : `${PROVIDE_PROFILE_MSG}`;
@@ -103,7 +115,7 @@ export class CopybookDownloadService {
       return false;
     }
     return (
-      (await ZoweExplorerDownloader.checkForLockedProfile(profile)) &&
+      !(await DownloadUtil.isProfileLocked(profile)) &&
       !(await DownloadUtil.checkForInvalidCredProfile(
         profile!,
         this.explorerAPI,

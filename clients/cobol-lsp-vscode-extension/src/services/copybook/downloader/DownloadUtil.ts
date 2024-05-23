@@ -14,10 +14,14 @@
 import * as vscode from "vscode";
 import { TelemetryService } from "../../reporter/TelemetryService";
 import {
+  DOWNLOAD_QUEUE_LOCKED_ERROR_MSG,
   INVALID_CREDENTIALS_ERROR_MSG,
   PROFILE_NAME_PLACEHOLDER,
+  UNLOCK_DOWNLOAD_QUEUE_MSG,
 } from "../../../constants";
 import { ZoweExplorerDownloader } from "./ZoweExplorerDownloader";
+import { CopybookName } from "../CopybookDownloadService";
+import { SettingsService } from "../../Settings";
 
 /**
  * Utility class for downloading copybooks
@@ -118,6 +122,64 @@ export class DownloadUtil {
       ["copybook", "COBOL", "experiment-tag"],
       "There is an issue with zowe api layer",
     );
+  }
+
+  /**
+   * checks if a zowe profile is locked due to invalid credentials
+   * @param profileName
+   * @returns True is zowe profile is locked, false otherwise
+   */
+  public static async isProfileLocked(profileName: string): Promise<boolean> {
+    const profileStatus = ZoweExplorerDownloader.profileStore.get(profileName);
+    if (profileStatus === "valid-profile" || !profileStatus) {
+      return false;
+    }
+
+    const shouldUnlock = await this.showQueueLockedDialog(profileName);
+    if (shouldUnlock) {
+      ZoweExplorerDownloader.profileStore.delete(profileName);
+    }
+
+    return shouldUnlock;
+  }
+
+  /**
+   * checks if copybook download configurations are present
+   * @param documentUri
+   * @param copybookNames
+   * @returns true if if copybook download configurations are present, fasle otherwise
+   */
+  public static areCopybookDownloadConfigurationsPresent(
+    documentUri: string,
+    copybookNames: CopybookName[],
+  ): boolean {
+    const dialects = new Set(
+      copybookNames.map((n) => n.dialect?.toLocaleUpperCase()).filter(Boolean),
+    );
+
+    for (const dialect of dialects) {
+      const dsnPath = SettingsService.getDsnPath(documentUri, dialect);
+      const ussPath = SettingsService.getUssPath(documentUri, dialect);
+      if ((dsnPath?.length ?? 0) > 0 || (ussPath?.length ?? 0) > 0) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  private static async showQueueLockedDialog(
+    profileName: string,
+  ): Promise<boolean> {
+    const action = await vscode.window.showErrorMessage(
+      DOWNLOAD_QUEUE_LOCKED_ERROR_MSG.replace(
+        PROFILE_NAME_PLACEHOLDER,
+        profileName,
+      ),
+      UNLOCK_DOWNLOAD_QUEUE_MSG,
+    );
+
+    return action === UNLOCK_DOWNLOAD_QUEUE_MSG;
   }
 
   private static isInvalidCredentials(e: any) {

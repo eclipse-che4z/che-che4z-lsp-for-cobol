@@ -14,7 +14,6 @@
 
 import { DEFAULT_DIALECT, PROVIDE_PROFILE_MSG } from "../../../constants";
 import { CopybookDownloadService } from "../../../services/copybook/CopybookDownloadService";
-import { ZoweExplorerDownloader } from "../../../services/copybook/downloader/ZoweExplorerDownloader";
 import { ProfileUtils } from "../../../services/util/ProfileUtils";
 import { Utils } from "../../../services/util/Utils";
 import * as vscode from "vscode";
@@ -30,6 +29,9 @@ jest.mock("../../../services/reporter/TelemetryService");
 ];
 Utils.getZoweExplorerAPI = jest.fn().mockReturnValue(zoweExplorerMock);
 describe("Tests copybook download service", () => {
+  DownloadUtil.areCopybookDownloadConfigurationsPresent = jest
+    .fn()
+    .mockReturnValue(true);
   beforeEach(() => {
     jest.clearAllMocks();
   });
@@ -95,13 +97,37 @@ describe("Tests copybook download service", () => {
         .fn()
         .mockReturnValue("profile");
       (downloadService as any).processDownloadError = jest.fn();
-      ZoweExplorerDownloader.checkForLockedProfile = jest
-        .fn()
-        .mockReturnValue(true);
+      DownloadUtil.isProfileLocked = jest.fn().mockReturnValue(false);
       await downloadService.downloadCopybooks("document-uri", [
         { name: "copybook-name", dialect: DEFAULT_DIALECT },
       ]);
       expect(vscode.window.showErrorMessage).toHaveBeenCalledWith(
+        "Incorrect credentials in Zowe profile profile.",
+      );
+    });
+
+    it("checks no profile checks are done when download configurations are not configured", async () => {
+      vscode.window.showErrorMessage = jest.fn();
+      const downloadService = new CopybookDownloadService(
+        "storage-path",
+        zoweExplorerErrorMock,
+      );
+      (ProfileUtils as any).getProfileNameForCopybook = jest
+        .fn()
+        .mockReturnValue("profile");
+      (ProfileUtils as any).getAvailableProfiles = jest
+        .fn()
+        .mockReturnValue("profile");
+      (downloadService as any).processDownloadError = jest.fn();
+      DownloadUtil.areCopybookDownloadConfigurationsPresent = jest
+        .fn()
+        .mockReturnValue(false);
+      expect(
+        await downloadService.downloadCopybooks("document-uri", [
+          { name: "copybook-name", dialect: DEFAULT_DIALECT },
+        ]),
+      ).toBe(undefined);
+      expect(vscode.window.showErrorMessage).not.toHaveBeenCalledWith(
         "Incorrect credentials in Zowe profile profile.",
       );
     });
@@ -117,9 +143,7 @@ describe("Tests copybook download service", () => {
       (ProfileUtils as any).getAvailableProfiles = jest
         .fn()
         .mockReturnValue("profile");
-      ZoweExplorerDownloader.checkForLockedProfile = jest
-        .fn()
-        .mockReturnValue(false);
+      DownloadUtil.isProfileLocked = jest.fn().mockReturnValue(true);
       (downloadService as any).processDownloadError = jest.fn();
       expect(
         await downloadService.downloadCopybooks("document-uri", [
@@ -136,10 +160,11 @@ describe("Tests copybook download service", () => {
     (ProfileUtils as any).getAvailableProfiles = jest
       .fn()
       .mockReturnValue("profile");
-    ZoweExplorerDownloader.checkForLockedProfile = jest
+    DownloadUtil.isProfileLocked = jest.fn().mockReturnValue(false);
+    DownloadUtil.checkForInvalidCredProfile = jest.fn().mockReturnValue(false);
+    DownloadUtil.areCopybookDownloadConfigurationsPresent = jest
       .fn()
       .mockReturnValue(true);
-    DownloadUtil.checkForInvalidCredProfile = jest.fn().mockReturnValue(false);
     const downloadService = new CopybookDownloadService(
       "storage-path",
       {} as any as IApiRegisterClient,

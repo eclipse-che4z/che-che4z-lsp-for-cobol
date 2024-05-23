@@ -16,11 +16,6 @@ import { DownloadUtil } from "./DownloadUtil";
 import * as iconv from "iconv-lite";
 import { SettingsService } from "../../Settings";
 import { CopybookURI } from "../CopybookURI";
-import {
-  DOWNLOAD_QUEUE_LOCKED_ERROR_MSG,
-  PROFILE_NAME_PLACEHOLDER,
-  UNLOCK_DOWNLOAD_QUEUE_MSG,
-} from "../../../constants";
 
 export abstract class ZoweExplorerDownloader {
   public static profileStore: Map<string, "locked-profile" | "valid-profile"> =
@@ -100,34 +95,5 @@ export abstract class ZoweExplorerDownloader {
     }
 
     return false;
-  }
-
-  public static async checkForLockedProfile(
-    profileName: string,
-  ): Promise<boolean> {
-    if (
-      ZoweExplorerDownloader.profileStore.get(profileName) === "locked-profile"
-    ) {
-      return true;
-    }
-    const shouldUnlock = await this.showQueueLockedDialog(profileName);
-    if (shouldUnlock) {
-      ZoweExplorerDownloader.profileStore.delete(profileName);
-    }
-    return shouldUnlock;
-  }
-
-  private static async showQueueLockedDialog(
-    profileName: string,
-  ): Promise<boolean> {
-    const action = await vscode.window.showErrorMessage(
-      DOWNLOAD_QUEUE_LOCKED_ERROR_MSG.replace(
-        PROFILE_NAME_PLACEHOLDER,
-        profileName,
-      ),
-      UNLOCK_DOWNLOAD_QUEUE_MSG,
-    );
-
-    return action === UNLOCK_DOWNLOAD_QUEUE_MSG;
   }
 }
