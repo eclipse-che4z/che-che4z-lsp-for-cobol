@@ -24,6 +24,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 import lombok.NonNull;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -126,8 +127,8 @@ public class CobolWorkspaceServiceImpl extends LspEventConsumer implements Works
 
   @SneakyThrows
   private void triggerAnalysisForChangedFile(String uri) {
-      List<String> uris =
-              sourceUnitGraph.getAllAssociatedFilesForACopybook(uriDecodeService.decode(uri));
+    List<String> uris =
+        sourceUnitGraph.getAllAssociatedFilesForACopybook(uriDecodeService.decode(uri));
     String fileContent = null;
     if (uris.isEmpty()) {
       asyncAnalysisService.reanalyseOpenedPrograms();
@@ -138,15 +139,20 @@ public class CobolWorkspaceServiceImpl extends LspEventConsumer implements Works
       fileContent = sourceUnitGraph.getContent(uri);
     }
     if (!sourceUnitGraph.isFileOpened(uri)) {
-        asyncAnalysisService.reanalyseCopybooksAssociatedPrograms(
-            uris, uri, fileContent, SourceUnitGraph.EventSource.FILE_SYSTEM);
+      asyncAnalysisService.reanalyseCopybooksAssociatedPrograms(
+          uris, uri, fileContent, SourceUnitGraph.EventSource.FILE_SYSTEM);
     }
   }
 
   private void triggerAnalysisForFilesInDirectory(Path path) {
-    // we only care for deleted copybooks as it would impact the diagnostics
-    sourceUnitGraph
-        .getCopybookUriInsideFolder(path.toUri().toString())
-        .forEach(this::triggerAnalysisForChangedFile);
+    // Only care for deleted copybooks as they impact the diagnostics
+    Set<String> affectedPrograms =
+        sourceUnitGraph.getCopybookUriInsideFolder(path.toUri().toString()).stream()
+            .flatMap(
+                copybookUri ->
+                    sourceUnitGraph.getAllAssociatedFilesForACopybook(copybookUri).stream())
+            .collect(Collectors.toSet());
+
+    affectedPrograms.forEach(this::triggerAnalysisForChangedFile);
   }
 }

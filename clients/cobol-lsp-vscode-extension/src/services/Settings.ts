@@ -20,7 +20,7 @@ import {
   COPYBOOK_EXTENSIONS,
   PATHS_LOCAL_KEY,
   PATHS_USS,
-  PATHS_ZOWE,
+  PATHS_DSN,
   SERVER_PORT,
   SERVER_RUNTIME,
   SETTINGS_CPY_EXTENSIONS,
@@ -201,7 +201,7 @@ export class SettingsService {
    */
   public static getDsnPath(documentUri: string, dialectType: string): string[] {
     return SettingsService.getCopybookConfigValues(
-      PATHS_ZOWE,
+      PATHS_DSN,
       documentUri,
       dialectType,
     );
@@ -273,7 +273,7 @@ export class SettingsService {
    * Return the code page for the copybook file encoding supplied by user
    * @returns string
    */
-  public static getCopybookFileEncoding() {
+  public static getCopybookFileEncoding(): string | undefined {
     return vscode.workspace
       .getConfiguration(SETTINGS_CPY_SECTION)
       .get("copybook-file-encoding");

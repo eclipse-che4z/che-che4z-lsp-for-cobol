@@ -27,9 +27,7 @@ export function fetchCopybookCommand(
     ["COBOL", "copybook", "quickfix"],
     "The user tries to resolve a copybook that is not currently found",
   );
-  downloader.downloadCopybooks(
-    programName,
-    [new CopybookName(copybook, "COBOL")],
-    false,
-  );
+  downloader.downloadCopybooks(programName, [
+    new CopybookName(copybook, "COBOL"),
+  ]);
 }

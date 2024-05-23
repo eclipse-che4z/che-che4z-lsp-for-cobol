@@ -16,7 +16,6 @@ import { COPYBOOKS_FOLDER, ZOWE_FOLDER } from "../../constants";
 import { SettingsService } from "../Settings";
 import { getProgramNameFromUri } from "../util/FSUtils";
 import { ProfileUtils } from "../util/ProfileUtils";
-import { Utils } from "../util/Utils";
 
 /**
  * This class is responsible to identify from which source resolve copybooks required by the server.
@@ -35,7 +34,7 @@ export class CopybookURI {
       profileName,
       dataset,
     );
-    return path.join(copybookDirPath, copybook + ".cpy");
+    return path.join(copybookDirPath, copybook);
   }
 
   public static createDatasetPath(

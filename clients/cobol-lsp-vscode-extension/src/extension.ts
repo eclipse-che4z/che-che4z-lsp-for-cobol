@@ -47,6 +47,7 @@ import { resolveSubroutineURI } from "./services/util/SubroutineUtils";
 import { ServerRuntimeCodeActionProvider } from "./services/nativeLanguageClient/serverRuntimeCodeActionProvider";
 import { ConfigurationWatcher } from "./services/util/ConfigurationWatcher";
 import * as path from "node:path";
+import { Utils } from "./services/util/Utils";
 
 interface __AnalysisApi {
   analysis(uri: string, text: string): Promise<any>;
@@ -69,6 +70,7 @@ async function initialize(context: vscode.ExtensionContext) {
   }
   const copyBooksDownloader = new CopybookDownloadService(
     context.globalStorageUri.fsPath,
+    await Utils.getZoweExplorerAPI(),
   );
   languageClientService = new LanguageClientService(
     outputChannel,
@@ -100,12 +102,9 @@ export async function activate(
     ["bootstrap", "experiment-tag"],
     "Extension activation event was triggered",
   );
-  copyBooksDownloader.start();
 
   // Register Commands
   registerCommands(context, copyBooksDownloader);
-
-  context.subscriptions.push(copyBooksDownloader);
 
   registerCodeActions(context);
 
