@@ -29,7 +29,7 @@ class TestUnexpectedTextInIdentificationDivision {
 
   private static final String TEXT =
       "       identification division.\n"
-          + "       program-id. test.\n"
+          + "       program-id. test1.\n"
           + "       {DISPLAY|1} \"HELLO\".\n"
           + "       data division.\n"
           + "       working-storage section.\n"

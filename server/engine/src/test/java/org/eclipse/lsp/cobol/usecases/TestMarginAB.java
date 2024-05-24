@@ -15,13 +15,13 @@
 
 package org.eclipse.lsp.cobol.usecases;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import org.eclipse.lsp.cobol.common.AnalysisResult;
 import org.eclipse.lsp.cobol.common.dialects.CobolLanguageId;
 import org.eclipse.lsp.cobol.test.engine.UseCase;
 import org.eclipse.lsp.cobol.test.engine.UseCaseUtils;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /** This test verifies if the margins respected and warnings thrown */
 class TestMarginAB {
@@ -35,7 +35,7 @@ class TestMarginAB {
           + "        ENVIRONMENT DIVISION.\n"
           + "        INPUT-OUTPUT SECTION.\n"
           + "        FILE-CONTROL.\n"
-          + "             SELECT TRANS-FILE-IN ASSIGN TO TEST \n"
+          + "             SELECT TRANS-FILE-IN ASSIGN TO TEST1 \n"
           + "             ORGANIZATION IS LINE SEQUENTIAL \n"
           + "             ACCESS MODE IS SEQUENTIAL. \n"
           + "           DATA DIVISION.\n" // starting area B instead of A
