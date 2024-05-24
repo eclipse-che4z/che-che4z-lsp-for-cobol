@@ -24,7 +24,7 @@ import org.junit.jupiter.api.Test;
 class TestWithCopybook {
   private static final String TEXT =
       "       IDENTIFICATION DIVISION.\n"
-          + "       PROGRAM-ID.    TEST.\n"
+          + "       PROGRAM-ID.    TEST12.\n"
           + "       ENVIRONMENT DIVISION.\n"
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"

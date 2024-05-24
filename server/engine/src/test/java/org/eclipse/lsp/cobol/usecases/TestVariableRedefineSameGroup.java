@@ -117,7 +117,7 @@ class TestVariableRedefineSameGroup {
           + "           03 {$*SEGX-OVERDUE-IND}         PIC X(1).\n"
           + "           03 {$*SEGX-CUSTOMER-STATUS}     PIC X(10).\n"
           + "           66 {$*SED} RENAMES {$SEGX-CUSTOMER-STATUS}.\n"
-          + "       01  {$*test} REDEFINES {$'XXX'-BALANCE-DUE^NEW-BALANCE-DUE} PIC x(120).";
+          + "       01  {$*test1} REDEFINES {$'XXX'-BALANCE-DUE^NEW-BALANCE-DUE} PIC x(120).";
   private static final String HOWDY_NAME = "HOWDY";
 
   @Test
