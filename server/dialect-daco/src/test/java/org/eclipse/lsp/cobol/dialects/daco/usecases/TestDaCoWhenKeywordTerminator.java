@@ -26,7 +26,7 @@ import org.junit.jupiter.api.Test;
 public class TestDaCoWhenKeywordTerminator {
   private static final String TEXT =
           "       IDENTIFICATION DIVISION.\n"
-                  + "       PROGRAM-ID. TEST.\n"
+                  + "       PROGRAM-ID. TEST1.\n"
                   + "        ENVIRONMENT DIVISION.\n"
                   + "        IDMS-CONTROL SECTION.\n"
                   + "            PROTOCOL. MODE ABC.\n"
