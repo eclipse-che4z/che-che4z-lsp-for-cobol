@@ -417,7 +417,7 @@ fileDescriptionEntry
    ;
 
 fileDescriptionEntryClauses
-   : (FD | SD) cobolWord (DOT_FS? fileDescriptionEntryClause)* dot_fs   ;
+   : (FD | SD) cobolWord fileDescriptionEntryClause* dot_fs   ;
 
 fileDescriptionEntryClause
    : externalClause | globalClause | blockContainsClause | recordContainsClause | labelRecordsClause | valueOfClause | dataRecordsClause | linageClause | codeSetClause | reportClause | recordingModeClause
