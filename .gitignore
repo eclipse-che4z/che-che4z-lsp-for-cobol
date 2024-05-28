@@ -127,6 +127,9 @@ local.properties
 .scala_dependencies
 .worksheet
 
+# Webpack build
+/clients/cobol-vscode-web-extension/dist
+
 # vscode stuff
 out
 *.vsix

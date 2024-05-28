@@ -53,5 +53,11 @@ npm ci
 npm run package
 cd -
 
+# Build COBOL web highlighting extension
+cd clients/cobol-lsp-vscode-web-extension
+npm ci
+npx webpack
+cd -
+
 # Done
 echo "Done building COBOL LS"
