@@ -43,10 +43,6 @@ procedureDivisionBody
 
 commaSeparator: COMMACHAR | COMMASEPARATOR;
 
-endClause
-    : DOT_FS
-    ;
-
 // -- procedure section ----------------------------------
 
 procedureSection
@@ -62,7 +58,7 @@ paragraph
    ;
 
 sentence
-   : statement * (endClause | dialectStatement)
+   : statement + (EOF | DOT_FS | dialectStatement)
    | dialectStatement
    ;
 

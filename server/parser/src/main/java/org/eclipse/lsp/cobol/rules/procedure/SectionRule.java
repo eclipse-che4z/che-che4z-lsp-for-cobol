@@ -16,6 +16,7 @@ package org.eclipse.lsp.cobol.rules.procedure;
 
 import org.eclipse.lsp.cobol.cst.procedure.Section;
 import org.eclipse.lsp.cobol.parser.hw.ParsingContext;
+import org.eclipse.lsp.cobol.parser.hw.lexer.TokenType;
 import org.eclipse.lsp.cobol.rules.CobolLanguage;
 import org.eclipse.lsp.cobol.rules.CobolLanguageUtils;
 import org.eclipse.lsp.cobol.rules.LanguageRule;
@@ -32,15 +33,17 @@ public class SectionRule implements LanguageRule {
     ctx.spaces();
     ctx.consume("SECTION");
     ctx.spaces();
+    ctx.optional(TokenType.NUMBER_LITERAL);
+    ctx.spaces();
     ctx.consume(".");
     ctx.spaces();
-    ((Section) ctx.peek()).setBodyStartToken(ctx.getLexer().peek(null).get(0));
+    ((Section) ctx.peek()).setBodyStartToken(ctx.getLexer().peek());
     try {
       while (!CobolLanguageUtils.isNextDivisionEofOrEop(ctx)
               && !language.tryMatchRule(ParagraphRule.class, ctx)
               && !language.tryMatchRule(SectionRule.class, ctx)
               && !CobolLanguageUtils.isEndOfProgram(ctx)) {
-        language.parseRule(StatementRule.class, ctx);
+        language.parseRule(SentenceRule.class, ctx);
         ctx.spaces();
       }
     } finally {
@@ -51,7 +54,8 @@ public class SectionRule implements LanguageRule {
 
   @Override
   public boolean tryMatch(ParsingContext ctx, CobolLanguage language) {
-    return ctx.matchSeq(null, "SECTION", ".")
-            && CobolLanguageUtils.isInAriaA(ctx.getLexer().peek(null).get(0));
+    return (ctx.matchSeq(null, "SECTION", ".")
+            || ctx.matchSeq(null, "SECTION", null, "."))
+            && CobolLanguageUtils.isInAriaA(ctx.getLexer().peek());
   }
 }

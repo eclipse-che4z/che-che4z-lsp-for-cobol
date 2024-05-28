@@ -29,7 +29,7 @@ public class ProcedureDivisionRule implements LanguageRule {
     ctx.spaces();
     ctx.push(new ProcedureDivision());
     procedureDivisionHeader(ctx);
-    ((ProcedureDivision) ctx.peek()).setBodyStartToken(ctx.getLexer().peek(null).get(0));
+    ((ProcedureDivision) ctx.peek()).setBodyStartToken(ctx.getLexer().peek());
     try {
       if (language.tryParseRule(DeclarativesRule.class, ctx).isPresent()) {
         ctx.spaces();
@@ -40,7 +40,7 @@ public class ProcedureDivisionRule implements LanguageRule {
         } else if (language.tryMatchRule(SectionRule.class, ctx)) {
           language.tryParseRule(SectionRule.class, ctx);
         } else {
-          language.tryParseRule(StatementRule.class, ctx);
+          language.tryParseRule(SentenceRule.class, ctx);
         }
         ctx.spaces();
       }

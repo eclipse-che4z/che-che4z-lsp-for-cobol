@@ -57,7 +57,6 @@ class HpCopybookProcessingStage implements Stage<AnalysisContext, DialectOutcome
   @Override
   public StageResult<DialectOutcome> run(AnalysisContext context, StageResult<Void> prevStageResult) {
     List<SyntaxError> errors = new LinkedList<>();
-
     List<CopybookDescriptor> cbs = CopybookParser.parseAndCleanup(context.getExtendedDocument());
     cbs.forEach(
         cb -> {

@@ -19,7 +19,7 @@ package org.eclipse.lsp.cobol.cst.procedure;
 import lombok.Getter;
 import lombok.Setter;
 import org.eclipse.lsp.cobol.cst.base.CstNodeImpl;
-import org.eclipse.lsp.cobol.parser.hw.Token;
+import org.eclipse.lsp.cobol.parser.hw.lexer.Token;
 
 /**
  * Section node

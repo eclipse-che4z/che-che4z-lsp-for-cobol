@@ -27,7 +27,7 @@ import org.eclipse.lsp.cobol.common.utils.ThreadInterruptionUtil;
 import org.eclipse.lsp.cobol.core.CobolParser;
 import org.eclipse.lsp.cobol.cst.SourceUnit;
 import org.eclipse.lsp.cobol.parser.hw.ParserSettings;
-import org.eclipse.lsp.cobol.parser.hw.CobolLexer;
+import org.eclipse.lsp.cobol.parser.hw.lexer.CobolLexer;
 import org.eclipse.lsp.cobol.parser.hw.antlradapter.AntlrAdapter;
 import org.eclipse.lsp.cobol.parser.hw.Diagnostic;
 import org.eclipse.lsp.cobol.parser.hw.ParseResult;

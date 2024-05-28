@@ -31,6 +31,24 @@ const getZoweExplorerMock = () => {
         ]),
         loadNamedProfile: jest.fn().mockReturnValue("profile"),
       }),
+      ussFileProvider: {
+        openFiles: {
+          "COBOLFI2.cbl": {
+            profile: {
+              name: "profile-1",
+            },
+          },
+        },
+      },
+      datasetProvider: {
+        openFiles: {
+          "COBOLFILE.cbl": {
+            profile: {
+              name: "profile-1",
+            },
+          },
+        },
+      },
     }),
     registeredApiTypes: jest.fn().mockReturnValue(["zosmf"]),
   });
@@ -41,6 +59,7 @@ describe("Test profile Utils", () => {
   const profile = "profile";
   it("checks a profile passed through settings is always given preference over profile from doc path for copybook download", async () => {
     Utils.getZoweExplorerAPI = getZoweExplorerMock();
+    vscode.Uri.parse = jest.fn().mockImplementation((arg) => arg);
     (vscode.workspace.textDocuments as any) = [];
     (vscode.workspace.textDocuments as any).push({
       fileName: path.join(profile, programName),
@@ -56,6 +75,7 @@ describe("Test profile Utils", () => {
 
   it("checks that profile is fetched from the settings if not a ZE downloaded file", async () => {
     Utils.getZoweExplorerAPI = getZoweExplorerMock();
+    vscode.Uri.parse = jest.fn().mockImplementation((arg) => arg);
     (vscode.workspace.textDocuments as any) = [];
     (vscode.workspace.textDocuments as any).push({
       fileName: path.join("profileX", programName),

@@ -16,6 +16,7 @@ package org.eclipse.lsp.cobol.parser.hw;
 import lombok.extern.slf4j.Slf4j;
 
 import org.eclipse.lsp.cobol.cst.*;
+import org.eclipse.lsp.cobol.parser.hw.lexer.CobolLexer;
 import org.eclipse.lsp.cobol.rules.CobolLanguage;
 import org.eclipse.lsp.cobol.rules.SourceUnitRule;
 

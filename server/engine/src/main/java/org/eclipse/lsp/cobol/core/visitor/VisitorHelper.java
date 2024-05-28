@@ -86,7 +86,7 @@ public class VisitorHelper {
    * @param stop is end position
    * @return Locality with interval position
    */
-  static Locality getIntervalPosition(Locality start, Locality stop) {
+  public static Locality getIntervalPosition(Locality start, Locality stop) {
     return Locality.builder()
         .uri(start.getUri())
         .range(new Range(start.getRange().getStart(), stop.getRange().getEnd()))
@@ -290,8 +290,8 @@ public class VisitorHelper {
    * @param children list of child nodes of the parser rule
    * @return a node for semantic analysis
    */
-  static Function<Locality, List<Node>> constructNode(
-      Function<Locality, Node> nodeConstructor, List<Node> children) {
+  public static Function<Locality, List<Node>> constructNode(
+          Function<Locality, Node> nodeConstructor, List<Node> children) {
     return locality -> {
       Node node = nodeConstructor.apply(locality);
       children.forEach(node::addChild);

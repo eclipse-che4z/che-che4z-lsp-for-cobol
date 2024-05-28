@@ -16,17 +16,14 @@
  */
 package org.eclipse.lsp.cobol.parser.hw.antlradapter;
 
-import org.antlr.v4.runtime.CharStream;
-import org.antlr.v4.runtime.CommonToken;
-import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.TokenSource;
+import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.Pair;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNodeImpl;
 import org.eclipse.lsp.cobol.cst.base.CstNode;
-import org.eclipse.lsp.cobol.parser.hw.Token;
-import org.eclipse.lsp.cobol.parser.hw.TokenType;
+import org.eclipse.lsp.cobol.parser.hw.lexer.Token;
+import org.eclipse.lsp.cobol.parser.hw.lexer.TokenType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,30 +31,31 @@ import java.util.Optional;
 
 import static org.antlr.v4.runtime.Token.HIDDEN_CHANNEL;
 
-/**
- * Token related utilities.
- */
+/** Token related utilities. */
 public class Utils {
   /**
    * Transform cst token into antlr one.
    *
-   * @param token      cst token node.
+   * @param token cst token node.
    * @param charStream the stream of program characters.
    * @return antlr token.
    */
   public static CommonToken toAntlrToken(Token token, CharStream charStream) {
     Pair<TokenSource, CharStream> source = new Pair<>(null, charStream);
-    int channel =
-            token.getType() == TokenType.WHITESPACE || token.getType() == TokenType.NEW_LINE
-                    ? HIDDEN_CHANNEL
-                    : 0;
+    int channel = 0;
+    int type = 0;
+    switch (token.getType()) {
+      case EOF:
+        type = IntStream.EOF;
+      case NEW_LINE:
+      case WHITESPACE:
+        channel = HIDDEN_CHANNEL;
+        break;
+      default:
+        break;
+    }
     CommonToken commonToken =
-            new CommonToken(
-                    source,
-                    0,
-                    channel,
-                    token.getIndex(),
-                    token.getIndex() + token.getLexeme().length() - 1);
+        new CommonToken(source, type, channel, token.getIndexStart(), token.getIndexStop() - 1);
     commonToken.setLine(token.getLine() + 1);
     commonToken.setCharPositionInLine(token.getStartPositionInLine());
     commonToken.setText(token.toText());
@@ -67,7 +65,7 @@ public class Utils {
   /**
    * Find the first token in CST.
    *
-   * @param cstNode           a CST node.
+   * @param cstNode a CST node.
    * @param ignoreWhitespaces set to true if you want to ignore whitespace tokens
    * @return Optionally token.
    */
@@ -94,17 +92,17 @@ public class Utils {
   /**
    * Initialize antlr node by CST node.
    *
-   * @param cstNode    the CST node.
-   * @param node       tha ANTLR node to set up.
+   * @param cstNode the CST node.
+   * @param node tha ANTLR node to set up.
    * @param charStream the stream of program characters.
-   * @param <T>        the type of ANTLR node
+   * @param <T> the type of ANTLR node
    * @return node reference.
    */
   public static <T extends ParserRuleContext> T initNode(
-          CstNode cstNode, T node, CharStream charStream) {
+      CstNode cstNode, T node, CharStream charStream) {
     node.start = findStartToken(cstNode).map(token -> toAntlrToken(token, charStream)).orElse(null);
     node.stop =
-            findStopToken(cstNode, true).map(token -> toAntlrToken(token, charStream)).orElse(null);
+        findStopToken(cstNode, true).map(token -> toAntlrToken(token, charStream)).orElse(null);
     node.children = new ArrayList<>();
     return node;
   }
@@ -125,7 +123,7 @@ public class Utils {
   /**
    * Find the last token in CST.
    *
-   * @param cstNodes          a CST node list.
+   * @param cstNodes a CST node list.
    * @param ignoreWhitespaces set to true if you want to ignore whitespace tokens
    * @return Optionally token.
    */
@@ -133,7 +131,10 @@ public class Utils {
     for (int i = cstNodes.size() - 1; i >= 0; i--) {
       CstNode cstNode = cstNodes.get(i);
       if (cstNode instanceof Token) {
-        if (((Token) cstNode).getType() != TokenType.WHITESPACE || !ignoreWhitespaces) {
+        TokenType type = ((Token) cstNode).getType();
+        if ((type != TokenType.WHITESPACE
+                && type != TokenType.NEW_LINE)
+                || !ignoreWhitespaces) {
           return Optional.of((Token) cstNode);
         }
       } else {
@@ -149,7 +150,7 @@ public class Utils {
   /**
    * Find the last token in CST.
    *
-   * @param cstNode           a CST node.
+   * @param cstNode a CST node.
    * @param ignoreWhitespaces set to true if you want to ignore whitespace tokens
    * @return Optionally token.
    */
@@ -163,7 +164,8 @@ public class Utils {
   private static Optional<Token> firstToken(List<CstNode> cstNodes, boolean ignoreWhitespaces) {
     for (CstNode cstNode : cstNodes) {
       if (cstNode instanceof Token) {
-        if (ignoreWhitespaces && ((Token) cstNode).getType() == TokenType.WHITESPACE) {
+        TokenType type = ((Token) cstNode).getType();
+        if (ignoreWhitespaces && (type == TokenType.WHITESPACE || type == TokenType.NEW_LINE)) {
           continue;
         }
         return Optional.of((Token) cstNode);
@@ -179,7 +181,7 @@ public class Utils {
   /**
    * Find the last token in CST.
    *
-   * @param cstNodes          a list of nodes to check (ignore whitespaces)
+   * @param cstNodes a list of nodes to check (ignore whitespaces)
    * @param ignoreWhitespaces set to true if you want to ignore whitespace tokens
    * @return possible the end node.
    */
@@ -191,7 +193,8 @@ public class Utils {
         if (!(n instanceof Token)) {
           break;
         }
-        if (((Token) n).getType() != TokenType.WHITESPACE) {
+        TokenType type = ((Token) n).getType();
+        if (type != TokenType.WHITESPACE && type != TokenType.NEW_LINE) {
           break;
         }
         i++;
@@ -207,7 +210,7 @@ public class Utils {
   }
 
   static String generatePrefix(CharStream charStream, Token startToken) {
-    String prefix = charStream.getText(Interval.of(0, startToken.getIndex() - 1));
+    String prefix = charStream.getText(Interval.of(0, startToken.getIndexStart() - 1));
     char[] chars = prefix.toCharArray();
     for (int i = 0; i < chars.length; i++) {
       chars[i] = chars[i] != '\n' ? ' ' : '\n';
@@ -226,7 +229,7 @@ public class Utils {
     }
     ParseTree lastChild = parent.children.get(parent.children.size() - 1);
     if (lastChild instanceof TerminalNodeImpl
-            && ((TerminalNodeImpl) lastChild).getSymbol().getType() == org.antlr.v4.runtime.Token.EOF) {
+        && ((TerminalNodeImpl) lastChild).getSymbol().getType() == org.antlr.v4.runtime.Token.EOF) {
       parent.removeLastChild();
     }
   }

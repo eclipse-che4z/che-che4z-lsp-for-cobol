@@ -18,8 +18,8 @@ import lombok.experimental.UtilityClass;
 import org.eclipse.lsp.cobol.cst.Skipped;
 import org.eclipse.lsp.cobol.cst.base.CstNode;
 import org.eclipse.lsp.cobol.parser.hw.ParsingContext;
-import org.eclipse.lsp.cobol.parser.hw.Token;
-import org.eclipse.lsp.cobol.parser.hw.TokenType;
+import org.eclipse.lsp.cobol.parser.hw.lexer.Token;
+import org.eclipse.lsp.cobol.parser.hw.lexer.TokenType;
 
 
 /**
@@ -81,27 +81,26 @@ public class CobolLanguageUtils {
    * @return true if it is the division or eop.
    */
   public boolean isNextDivisionEofOrEop(ParsingContext ctx) {
-    if (ctx.getLexer().peek(ctx.peek().getRule()).get(0).getType() == TokenType.EOF) {
+    if (ctx.getLexer().peek().getType() == TokenType.EOF) {
       return true;
     }
     if (CobolLanguageUtils.isEndOfProgram(ctx)) {
       return true;
     }
 
-    boolean inAriaA = isInAriaA(ctx.getLexer().peek(null).get(0));
-    if (ctx.matchSeq("ID", "DIVISION", ".") && inAriaA) {
+    if (ctx.matchSeq("ID", "DIVISION", ".")) {
       return true;
     }
-    if (ctx.matchSeq("IDENTIFICATION", "DIVISION", ".") && inAriaA) {
+    if (ctx.matchSeq("IDENTIFICATION", "DIVISION", ".")) {
       return true;
     }
-    if (ctx.matchSeq("ENVIRONMENT", "DIVISION", ".") && inAriaA) {
+    if (ctx.matchSeq("ENVIRONMENT", "DIVISION", ".")) {
       return true;
     }
-    if (ctx.matchSeq("DATA", "DIVISION", ".") && inAriaA) {
+    if (ctx.matchSeq("DATA", "DIVISION", ".")) {
       return true;
     }
-    return ctx.matchSeq("PROCEDURE", "DIVISION") && inAriaA;
+    return ctx.matchSeq("PROCEDURE", "DIVISION");
   }
 
 }

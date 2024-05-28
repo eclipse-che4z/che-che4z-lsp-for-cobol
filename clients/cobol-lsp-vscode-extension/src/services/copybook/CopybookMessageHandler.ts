@@ -17,7 +17,7 @@ import { searchCopybookInExtensionFolder } from "../util/FSUtils";
 import { CopybookURI } from "./CopybookURI";
 import { CopybookName } from "./CopybookDownloadService";
 import * as path from "path";
-import { ZOWE_FOLDER } from "../../constants";
+import { COPYBOOKS_FOLDER, ZOWE_FOLDER } from "../../constants";
 
 enum CopybookFolderKind {
   "local",
@@ -40,7 +40,7 @@ export async function resolveCopybookHandler(
       await CopybookURI.createPathForCopybookDownloaded(
         documentUri,
         dialectType,
-        path.join(storagePath, ZOWE_FOLDER),
+        path.join(storagePath, ZOWE_FOLDER, COPYBOOKS_FOLDER),
       ),
       SettingsService.getCopybookExtension(documentUri),
       storagePath,

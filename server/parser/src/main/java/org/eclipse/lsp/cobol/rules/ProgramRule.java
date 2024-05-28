@@ -16,67 +16,27 @@ package org.eclipse.lsp.cobol.rules;
 
 import org.eclipse.lsp.cobol.cst.IdentificationDivision;
 import org.eclipse.lsp.cobol.cst.ProgramUnit;
-import org.eclipse.lsp.cobol.parser.hw.GrammarRule;
 import org.eclipse.lsp.cobol.parser.hw.ParsingContext;
-import org.eclipse.lsp.cobol.parser.hw.Token;
 import org.eclipse.lsp.cobol.rules.data.DataDivisionRule;
 import org.eclipse.lsp.cobol.rules.environment.EnvironmentDivisionRule;
+import org.eclipse.lsp.cobol.rules.identification.IdentificationDivisionRule;
 import org.eclipse.lsp.cobol.rules.procedure.ProcedureDivisionRule;
 
-import java.util.List;
-
-/**
- * COBOL language grammar rule class.
- */
+/** COBOL language grammar rule class. */
 public class ProgramRule implements LanguageRule {
   @Override
   public void parse(ParsingContext ctx, CobolLanguage language) {
     try {
       ProgramUnit programUnit = new ProgramUnit();
       ctx.push(programUnit);
-      try {
-        ctx.push(new IdentificationDivision());
-        ctx.or("ID", "IDENTIFICATION");
-        ctx.spaces();
-        ctx.consume("DIVISION");
-        ctx.consume(".");
-        ctx.spaces();
-        ctx.consume("PROGRAM-ID");
-        ctx.optional(".");
-        ctx.spaces();
-
-        List<Token> programName = ctx.getLexer().peek(GrammarRule.ProgramUnit);
-        programUnit.setName(programName.get(0).getLexeme());
-        ctx.consume();
-        ctx.spaces();
-        if (ctx.match("IS")) {
-          ctx.consume("IS");
-          ctx.spaces();
-          ctx.or("RECURSIVE", "INITIAL", "COMMON");
-          ctx.spaces();
-          ctx.optional("INITIAL");
-          ctx.optional("COMMON");
-          ctx.optional("PROGRAM");
-        } else if (ctx.match("RECURSIVE", "INITIAL")) {
-          ctx.spaces();
-          ctx.optional("PROGRAM");
-        }
-        ctx.spaces();
-        ctx.optional(".");
-        // Consume Identification Division Content
-        while (!CobolLanguageUtils.isNextDivisionEofOrEop(ctx)) {
-          ctx.consume();
-        }
-      } finally {
-        ctx.popAndAttach();
-      }
-
+      language.parseRule(IdentificationDivisionRule.class, ctx);
+      programUnit.setName(
+          ((IdentificationDivision) ctx.peek().getChildren().get(0)).getProgramName());
       language.tryParseRule(EnvironmentDivisionRule.class, ctx);
       language.tryParseRule(DataDivisionRule.class, ctx);
       language.tryParseRule(ProcedureDivisionRule.class, ctx);
 
-      if (ctx.matchSeq("ID", "DIVISION", ".")
-              || ctx.matchSeq("IDENTIFICATION", "DIVISION", ".")) {
+      if (ctx.matchSeq("ID", "DIVISION", ".") || ctx.matchSeq("IDENTIFICATION", "DIVISION", ".")) {
         ctx.spaces();
         language.parseRule(ProgramRule.class, ctx);
       }
@@ -94,7 +54,6 @@ public class ProgramRule implements LanguageRule {
     } finally {
       ctx.popAndAttach();
     }
-
   }
 
   @Override

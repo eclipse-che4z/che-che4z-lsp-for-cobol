@@ -27,7 +27,7 @@ import static java.util.Comparator.comparingInt;
  * Levenshtein algorithm.
  */
 @UtilityClass
-class MisspelledKeywordDistance {
+public class MisspelledKeywordDistance {
 
   public static final KeywordSuggestions KEYWORDS = new KeywordSuggestions();
   private static final LevenshteinDistance DISTANCE = LevenshteinDistance.getDefaultInstance();
@@ -38,7 +38,7 @@ class MisspelledKeywordDistance {
    * @param wrongToken - potentially misspelled token to check
    * @return the closest keyword or null if nothing found
    */
-  Optional<String> calculateDistance(String wrongToken) {
+  public Optional<String> calculateDistance(String wrongToken) {
     return KEYWORDS.getSuggestions().stream()
         .map(item -> new Object[] {item, DISTANCE.apply(wrongToken, item)})
         .sorted(comparingInt(o -> (int) o[1]))

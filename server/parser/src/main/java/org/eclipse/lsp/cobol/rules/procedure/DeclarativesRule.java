@@ -51,7 +51,7 @@ public class DeclarativesRule implements LanguageRule {
   @Override
   public boolean tryMatch(ParsingContext ctx, CobolLanguage language) {
     return ctx.matchSeq("DECLARATIVES", ".")
-            && CobolLanguageUtils.isInAriaA(ctx.getLexer().peek(null).get(0));
+            && CobolLanguageUtils.isInAriaA(ctx.getLexer().peek());
   }
 
   private boolean isDeclarativesEnd(ParsingContext ctx) {
