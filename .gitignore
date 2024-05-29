@@ -129,6 +129,7 @@ local.properties
 
 # Webpack build
 /clients/cobol-vscode-web-extension/dist
+/clients/cobol-vscode-web-extension/syntaxes
 
 # vscode stuff
 out

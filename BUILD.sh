@@ -53,8 +53,11 @@ npm ci
 npm run package
 cd -
 
-# Build COBOL web highlighting extension
-cd clients/cobol-lsp-vscode-web-extension
+# Copy syntax files from LSP extension to Web extension
+cp clients/cobol-lsp-vscode-extension/syntaxes/*.json clients/cobol-vscode-web-extension/syntaxes/
+
+# Build COBOL Web extension
+cd clients/cobol-vscode-web-extension
 npm ci
 npx webpack
 cd -
