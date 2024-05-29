@@ -74,7 +74,7 @@ class NonNumericLiteralTest {
 
     @Test
     void operands() {
-        CobolLexer lexer = new CobolLexer("<= >= =< =>");
+        CobolLexer lexer = new CobolLexer("<= >= =< => * **");
         assertToken(lexer.forward(), "<=", 0, 0, 0);
         assertToken(lexer.forward(), " ", 0, 2, 2);
         assertToken(lexer.forward(), ">=", 0, 3, 3);
@@ -84,6 +84,10 @@ class NonNumericLiteralTest {
         assertToken(lexer.forward(), " ", 0, 8, 8);
         assertToken(lexer.forward(), "=", 0, 9, 9);
         assertToken(lexer.forward(), ">", 0, 10, 10);
+        assertToken(lexer.forward(), " ", 0, 11, 11);
+        assertToken(lexer.forward(), "*", 0, 12, 12);
+        assertToken(lexer.forward(), " ", 0, 13, 13);
+        assertToken(lexer.forward(), "**", 0, 14, 14);
     }
 
 }

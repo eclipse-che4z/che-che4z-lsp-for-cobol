@@ -78,26 +78,7 @@ public class ConditionExpressionRule implements LanguageRule {
   }
 
   private void conditionOperand(ParsingContext ctx, CobolLanguage language) {
-    if (ctx.match("(")) {
-      ctx.consume("(");
-      do {
-        conditionOperand(ctx, language);
-      } while (!ctx.match(")"));
-      ctx.consume(")");
-      ctx.spaces();
-      return;
-    }
-    if (ctx.match("FUNCTION")) {
-      functionIdentifier(ctx);
-      return;
-    }
-    identifier(ctx);
-    // p. 267
-    if (ctx.match("+", "-", "*", "/", "**")) {
-      ctx.or("+", "-", "*", "/", "**");
-      ctx.spaces();
-      conditionOperand(ctx, language);
-    }
+    language.parseRule(ArithmeticExpressionRule.class, ctx);
   }
 
   private void compositeCondition(ParsingContext ctx, CobolLanguage language) {
@@ -177,30 +158,36 @@ public class ConditionExpressionRule implements LanguageRule {
     // TODO: optional reference-modifier
   }
 
-  // TODO: move to rule?
-  private void identifier(ParsingContext ctx) {
-    ctx.consume();
-    ctx.spaces();
-    if (ctx.match("(")) {
-      ctx.consume("(");
-      ctx.spaces();
-      do {
-        ctx.consume(); // indexes
-        ctx.spaces();
-      } while (!ctx.match(")"));
-      ctx.consume(")"); // index
-      ctx.spaces();
-    }
-  }
-
   @Override
   public boolean tryMatch(ParsingContext ctx, CobolLanguage language) {
-    // TODO TBD
-    return isClassCondition(ctx);
+    // operand-1
+    // Can be an identifier, literal, function-identifier, arithmetic expression, or index-name.
+    if (language.tryMatchRule(ArithmeticExpressionRule.class, ctx)) {
+      return true;
+    }
+    if (ctx.matchSeq(null, "IS")
+        || ctx.matchSeq(null, "GREATER")
+        || ctx.matchSeq(null, "NOT", "GREATER")
+        || ctx.matchSeq(null, ">")
+        || ctx.matchSeq(null, "NOT", ">")
+        || ctx.matchSeq(null, "<")
+        || ctx.matchSeq(null, "NOT", "<")
+        || ctx.matchSeq(null, "=")
+        || ctx.matchSeq(null, "NOT", "=")
+        || ctx.matchSeq(null, "LESS")
+        || ctx.matchSeq(null, "NOT", "LESS")
+        || ctx.matchSeq(null, "EQUAL")
+        || ctx.matchSeq(null, "NOT", "EQUAL")
+        || ctx.matchSeq(null, "<=")
+        || ctx.matchSeq(null, ">=")) {
+      return true;
+    }
+    return false;
+    //    return isClassCondition(ctx);
   }
 
   // P. 268
-  private boolean isClassCondition(ParsingContext ctx) {
-    return true;
-  }
+  //  private boolean isClassCondition(ParsingContext ctx) {
+  //    return true;
+  //  }
 }
