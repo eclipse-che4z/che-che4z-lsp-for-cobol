@@ -1,6 +1,6 @@
 # Change Log
 
-All notable changes to the "COBOL LSP Web Extension" will be documented in this file.
+All notable changes to the "COBOL Language Highlighting for Web" will be documented in this file.
 
 ## [Unreleased]
 
