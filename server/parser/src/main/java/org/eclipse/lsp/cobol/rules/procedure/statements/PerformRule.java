@@ -18,6 +18,8 @@ import org.eclipse.lsp.cobol.parser.hw.ParsingContext;
 import org.eclipse.lsp.cobol.rules.CobolLanguage;
 import org.eclipse.lsp.cobol.rules.LanguageRule;
 import org.eclipse.lsp.cobol.rules.procedure.ConditionExpressionRule;
+import org.eclipse.lsp.cobol.rules.procedure.IdentifierRule;
+import org.eclipse.lsp.cobol.rules.procedure.SentenceRule;
 
 /** Perform rule at P. 412 */
 public class PerformRule implements LanguageRule {
@@ -30,7 +32,7 @@ public class PerformRule implements LanguageRule {
       ctx.spaces();
 
       // basic inline case
-      if (language.tryMatchRule(ImperativeStatementRule.class, ctx)) {
+      if (language.tryMatchRule(SentenceRule.class, ctx)) {
         consumeUntilEndPerform(ctx);
         return;
       }
@@ -62,7 +64,8 @@ public class PerformRule implements LanguageRule {
       }
 
       if (isTimesPrefix(ctx)) {
-        identifier(ctx); // identifier-1 or integer-1
+        // identifier-1 or integer-1
+        language.parseRule(IdentifierRule.class, ctx);
         ctx.consume("TIMES");
         ctx.spaces();
         ctx.optional(".");
@@ -105,7 +108,8 @@ public class PerformRule implements LanguageRule {
   }
 
   private void inlineTimes(ParsingContext ctx, CobolLanguage language) {
-    identifier(ctx); // identifier-1 or integer-1
+    // identifier-1 or integer-1
+    language.parseRule(IdentifierRule.class, ctx);
     ctx.consume("TIMES");
     ctx.spaces();
   }
@@ -124,22 +128,6 @@ public class PerformRule implements LanguageRule {
     return ctx.match("UNTIL")
         || ctx.matchSeq("TEST", null, "UNTIL")
         || ctx.matchSeq("WITH", "TEST", null, "UNTIL");
-  }
-
-  // TODO: move to rule?
-  private void identifier(ParsingContext ctx) {
-    ctx.consume();
-    ctx.spaces();
-    if (ctx.match("(")) {
-      ctx.consume("(");
-      ctx.spaces();
-      do {
-        ctx.consume(); // indexes
-        ctx.spaces();
-      } while (!ctx.match(")"));
-      ctx.consume(")"); // index
-      ctx.spaces();
-    }
   }
 
   private void procedureName(ParsingContext ctx) {
@@ -184,13 +172,16 @@ public class PerformRule implements LanguageRule {
     withTestBeforeAfter(ctx);
     ctx.consume("VARYING");
     ctx.spaces();
-    identifier(ctx); // identifier-2 or index-name-1
+    // identifier-2 or index-name-1
+    language.parseRule(IdentifierRule.class, ctx);
     ctx.consume("FROM");
     ctx.spaces();
-    identifier(ctx); // identifier-3 or index-name-2 or literal-1
+    // identifier-3 or index-name-2 or literal-1
+    language.parseRule(IdentifierRule.class, ctx);
     ctx.consume("BY");
     ctx.spaces();
-    identifier(ctx); // identifier-4 or literal-2
+    // identifier-4 or literal-2
+    language.parseRule(IdentifierRule.class, ctx);
     ctx.consume("UNTIL");
     ctx.spaces();
     language.parseRule(ConditionExpressionRule.class, ctx); // condition-1

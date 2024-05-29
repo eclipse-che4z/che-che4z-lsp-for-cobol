@@ -10,9 +10,6 @@
  *
  * Contributors:
  *    Broadcom, Inc. - initial API and implementation
- *    DAF Trucks NV – implementation of DaCo COBOL statements
- *    and DAF development standards
- *
  */
 package org.eclipse.lsp.cobol.divisions.procedure;
 
@@ -25,6 +22,8 @@ import org.eclipse.lsp.cobol.parser.hw.CobolParser;
 import org.eclipse.lsp.cobol.parser.hw.ParseResult;
 import org.eclipse.lsp.cobol.parser.hw.ParserSettings;
 import org.junit.jupiter.api.Test;
+
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -49,8 +48,9 @@ class EndProgramTest {
     ProgramUnit pu = (ProgramUnit) parseResult.getSourceUnit().getChildren().get(0);
     ProcedureDivision pd = pu.list(ProcedureDivision.class).get(0);
     assertEquals(2, pd.getChildren().stream().filter(Paragraph.class::isInstance).count());
-    Paragraph p1 = (Paragraph) pd.getChildren().get(9);
-    Paragraph p2 = (Paragraph) pd.getChildren().get(10);
+    List<Paragraph> paragraphs = pd.list(Paragraph.class);
+    Paragraph p1 = paragraphs.get(0);
+    Paragraph p2 = paragraphs.get(1);
     assertEquals(1, pd.getChildren().stream().filter(Statement.class::isInstance).count());
     assertEquals(1, p1.getChildren().stream().filter(Statement.class::isInstance).count());
     assertEquals(1, p2.getChildren().stream().filter(Statement.class::isInstance).count());

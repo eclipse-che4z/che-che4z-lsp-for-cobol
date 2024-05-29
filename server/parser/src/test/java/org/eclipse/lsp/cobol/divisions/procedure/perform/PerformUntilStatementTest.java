@@ -11,7 +11,7 @@
  * Contributors:
  *    Broadcom, Inc. - initial API and implementation
  */
-package org.eclipse.lsp.cobol.divisions.procedure;
+package org.eclipse.lsp.cobol.divisions.procedure.perform;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
