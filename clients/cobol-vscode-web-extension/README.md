@@ -1,6 +1,6 @@
 # Cobol Language Highlighting for Web
 
-COBOL Language Highlighting enhances the COBOL programming experience on Visual Studio Code in the browser. The extension provides syntax highlighting and coloring for COBOL code and copybooks. The web extension also supports COBOL programs which interact with Datacom, CICS, and DB2 SQL.
+COBOL Language Highlighting for Web enhances the COBOL programming experience on Visual Studio Code in the browser. The extension provides syntax highlighting and coloring for COBOL code and copybooks. The web extension also supports COBOL programs which interact with Datacom, CICS, and DB2 SQL.
 
 ## Features
 ### Syntax Highlighting
@@ -12,15 +12,15 @@ There are no client or server-side prerequisites for the web extension.
 
 ## Compatibility
 
-The COBOL Language Highlighting extension is supported on Visual Studio Code for the web.
+The COBOL Language Highlighting for Web extension is supported on Visual Studio Code on the web.
 
 This extension is not compatible with other extensions that provide COBOL. We recommend that you disable all other COBOL-related extensions to ensure that COBOL Language Highlighting functions correctly.
 
-The COBOL Language Highlighting extension only supports IBM Enterprise COBOL. Other versions of COBOL are not supported.
+The COBOL Language Highlighting for Web extension only supports IBM Enterprise COBOL. Other versions of COBOL are not supported.
 
-## Technical Assistance and Support for COBOL Language Highlighting
+## Technical Assistance and Support for COBOL Language Highlighting for Web
 
-The COBOL Language Highlighting extension is made available to customers on the Visual Studio Code Marketplace in accordance with the terms and conditions contained in the provided End-User License Agreement (EULA).
+The COBOL Language Highlighting for Web extension is made available to customers on the Visual Studio Code Marketplace in accordance with the terms and conditions contained in the provided End-User License Agreement (EULA).
 
 If you are on active support for Brightside, you get technical assistance and support in accordance with the terms, guidelines, details, and parameters that are located within the Broadcom [Working with Support](https://support.broadcom.com/external/content/release-announcements/CA-Support-Policies/6933) guide.
 
@@ -40,7 +40,7 @@ The extensions for Visual Studio Code developed by Broadcom Inc., including its 
 
 This data collection uses built-in Microsoft VS Code Telemetry, which can be disabled, at your sole discretion, if you do not want to send Usage Data.
 
-The current release of COBOL Language Highlighting collects anonymous data for the following events:
+The current release of COBOL Language Highlighting for Web collects anonymous data for the following events:
 * Activation of this VS Code extension
 * Problem interaction
 * Quick Fix
@@ -50,4 +50,4 @@ Each such event is logged with the following information:
 * Operating system and version
 * Country or region
 * Anonymous user and session ID
-* Version numbers of Microsoft VS Code and COBOL Language Highlighting
+* Version numbers of Microsoft VS Code and COBOL Language Highlighting for Web
