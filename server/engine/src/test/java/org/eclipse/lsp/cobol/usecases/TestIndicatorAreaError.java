@@ -22,7 +22,6 @@ import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.eclipse.lsp4j.Range;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 /** This use case checks the error shown if there is an unexpected symbol in the indicator area. */
@@ -51,7 +50,6 @@ class TestIndicatorAreaError {
   }
 
   @Test
-  @Disabled("EXPERIMENTAL_COBOL")
   void testHw() {
     UseCaseEngine.runTest(
         TEXT,

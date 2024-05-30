@@ -16,20 +16,19 @@
  */
 package org.eclipse.lsp.cobol.parser.hw.antlradapter;
 
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.antlr.v4.runtime.tree.TerminalNodeImpl;
 import org.eclipse.lsp.cobol.core.*;
 import org.eclipse.lsp.cobol.core.CobolParser;
-import org.eclipse.lsp.cobol.cst.base.CstNode;
 import org.eclipse.lsp.cobol.cst.*;
+import org.eclipse.lsp.cobol.cst.base.CstNode;
 import org.eclipse.lsp.cobol.cst.procedure.ProcedureDivision;
 import org.eclipse.lsp.cobol.parser.hw.lexer.TokenType;
-
-import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 /** Reconstruct the AST */
 public class AntlrAdapter {
@@ -192,6 +191,7 @@ public class AntlrAdapter {
     antlrParser.removeErrorListeners();
     antlrParser.addErrorListener(errorListener);
     antlrParser.addParseListener(treeListener);
+    antlrParser.setErrorHandler(errorStrategy);
     return antlrParser;
   }
 
@@ -206,6 +206,7 @@ public class AntlrAdapter {
     antlrParser.removeErrorListeners();
     antlrParser.addErrorListener(errorListener);
     antlrParser.addParseListener(treeListener);
+    antlrParser.setErrorHandler(errorStrategy);
     return antlrParser;
   }
 

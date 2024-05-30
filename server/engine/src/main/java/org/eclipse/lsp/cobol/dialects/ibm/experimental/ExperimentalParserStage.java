@@ -15,8 +15,11 @@
 package org.eclipse.lsp.cobol.dialects.ibm.experimental;
 
 import com.google.common.collect.ImmutableList;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.DefaultErrorStrategy;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.eclipse.lsp.cobol.common.dialects.DialectOutcome;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
@@ -25,19 +28,16 @@ import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.mapping.OriginalLocation;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
+import org.eclipse.lsp.cobol.common.pipeline.Stage;
+import org.eclipse.lsp.cobol.common.pipeline.StageResult;
 import org.eclipse.lsp.cobol.core.*;
 import org.eclipse.lsp.cobol.core.engine.analysis.AnalysisContext;
-import org.eclipse.lsp.cobol.common.pipeline.StageResult;
-import org.eclipse.lsp.cobol.common.pipeline.Stage;
-import org.eclipse.lsp.cobol.core.strategy.CobolErrorStrategy;
+import org.eclipse.lsp.cobol.core.strategy.BasicCobolErrorHandler;
 import org.eclipse.lsp.cobol.core.visitor.ParserListener;
 import org.eclipse.lsp.cobol.dialects.ibm.ParserStageResult;
 import org.eclipse.lsp.cobol.parser.AstBuilder;
 import org.eclipse.lsp.cobol.parser.SplitParser;
 import org.eclipse.lsp4j.Location;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Parser stage
@@ -56,7 +56,7 @@ class ExperimentalParserStage implements Stage<AnalysisContext, ParserStageResul
           .addAll(prevStageResult.getData().getDialectNodes())
           .build());
       ParserListener listener = new ParserListener(context.getExtendedDocument(), context.getCopybooksRepository());
-      CobolErrorStrategy errorStrategy = new CobolErrorStrategy(messageService);
+      DefaultErrorStrategy errorStrategy = new BasicCobolErrorHandler(messageService);
       AstBuilder parser = new SplitParser(CharStreams.fromString(context.getExtendedDocument().toString()),
           listener, errorStrategy, treeListener);
       CobolParser.StartRuleContext tree = parser.runParser();
