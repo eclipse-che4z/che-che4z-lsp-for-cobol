@@ -36,7 +36,7 @@ copyStatement
 
 // sql include statement
 includeStatement
-   : EXEC SQL INCLUDE copySource END_EXEC DOT_FS
+   : EXEC SQL INCLUDE copySource END_EXEC DOT_FS?
    ;
 
 // ++Include statement
