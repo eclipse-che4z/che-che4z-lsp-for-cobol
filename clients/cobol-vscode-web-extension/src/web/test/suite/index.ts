@@ -1,5 +1,5 @@
 // Imports mocha for the browser, defining the `mocha` global.
-require('mocha/mocha');
+__non_webpack_require__('mocha/mocha');
 
 export function run(): Promise<void> {
 
