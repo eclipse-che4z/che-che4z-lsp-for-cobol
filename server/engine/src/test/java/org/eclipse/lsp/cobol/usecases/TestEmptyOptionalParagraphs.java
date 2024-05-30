@@ -25,7 +25,7 @@ class TestEmptyOptionalParagraphs {
 
   private static final String TEXT =
       "       identification division.\n"
-          + "       program-id. test.\n"
+          + "       program-id. test1.\n"
           + "       AUTHOR.  \n"
           + "       INSTALLATION\n"
           + "       DATE-WRITTEN 02/02/02\n"

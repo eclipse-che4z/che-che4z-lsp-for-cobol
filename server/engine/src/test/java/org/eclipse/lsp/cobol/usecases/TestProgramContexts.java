@@ -31,13 +31,13 @@ import org.junit.jupiter.api.Test;
 class TestProgramContexts {
   private static final String TEXT_SEQUENTIAL_PROGRAMS =
       "       IDENTIFICATION DIVISION.\n"
-          + "       PROGRAM-ID. FIRST.\n"
+          + "       PROGRAM-ID. FIRST1.\n"
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
           + "       01 {$*VARNAME}  PIC X(2).\n"
           + "       Procedure Division.\n"
           + "           move 1 to {$VARNAME}.\n"
-          + "       End program FIRST.\n"
+          + "       End program FIRST1.\n"
           + "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID. SECOND.\n"
           + "       DATA DIVISION.\n"

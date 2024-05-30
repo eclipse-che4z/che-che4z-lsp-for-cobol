@@ -25,7 +25,7 @@ class TestMultilineCommentEntries {
 
   private static final String TEXT =
       "       identification division.\n"
-          + "       program-id. test.\n"
+          + "       program-id. test1.\n"
           + "       AUTHOR. asdfasdf1\n"
           + "             adfasdf2. \n"
           + "             adfasdf2. \n"
