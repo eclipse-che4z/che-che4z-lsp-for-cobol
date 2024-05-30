@@ -107,13 +107,6 @@
       },
       {
         "id": "expcobol",
-        "extensions": [
-          ".cbl",
-          ".cob",
-          ".cobol",
-          ".cpy",
-          ".copy"
-        ],
         "aliases": [
           "EXP-COBOL"
         ],
