@@ -14,18 +14,18 @@
  */
 package org.eclipse.lsp.cobol.dialects.idms.usecases;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import org.eclipse.lsp.cobol.common.model.NodeType;
-import org.eclipse.lsp.cobol.dialects.idms.IdmsDialect;
-import org.eclipse.lsp.cobol.common.model.tree.variable.ElementaryItemNode;
-import org.eclipse.lsp.cobol.test.CobolText;
 import org.eclipse.lsp.cobol.common.AnalysisResult;
+import org.eclipse.lsp.cobol.common.model.NodeType;
+import org.eclipse.lsp.cobol.common.model.tree.variable.ElementaryItemNode;
+import org.eclipse.lsp.cobol.dialects.idms.IdmsDialect;
 import org.eclipse.lsp.cobol.dialects.idms.utils.DialectConfigs;
+import org.eclipse.lsp.cobol.test.CobolText;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * These test for COPY IDMS statements in FILE SECTION, WS/LINKAGE SECTIONS AND PROCEDURE DIVISION
@@ -123,7 +123,7 @@ class TestIdmsCopy {
       "       01  {$*MRB-ABCMAP}.\n" + "            03  {$*MRB-ABCMAP-ID}          PIC X(8).\n";
 
   private static final String CB_NAME5 = "FL002";
-  private static final String CB5 = "       FD {$*EMP-FILE}.\n" + "       RECORD CONTAINS 80.\n";
+  private static final String CB5 = "       FD {$*EMP-FILE}\n" + "       RECORD CONTAINS 80.\n";
   private static final String CB6 =
       "       05  {$*SKILL}.\n"
           + "         10  {$*SKILL-ID-0455}           PIC 9(4).\n";
