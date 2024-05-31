@@ -27,7 +27,8 @@ class TestUsageSQLType {
                     + "        Program-Id. 'TEST'.\n"
                     + "       Data Division.\n"
                     + "       Working-Storage Section.\n"
-                    + "       1 {$*VAR-NAME} USAGE IS SQL TYPE IS CLOB(9).\n";
+                    + "       1 {$*VAR-NAME} USAGE IS SQL TYPE IS CLOB(9).\n"
+                    + "       1 {$*VAR-NAME} USAGE IS SQL TYPE IS RESULT-SET-LOCATOR VARYING.\n";
 
     @Test
     void test() {

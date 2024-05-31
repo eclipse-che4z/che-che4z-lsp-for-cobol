@@ -368,6 +368,7 @@ REPOSITORY             : R E P O S I T O R Y {cobolVerbTokens.add(REPOSITORY);};
 RERUN                  : R E R U N {cobolVerbTokens.add(RERUN);};
 RESERVE                : R E S E R V E {cobolVerbTokens.add(RESERVE);};
 RESET                  : R E S E T {cobolVerbTokens.add(RESET);};
+RESULT_SET_LOCATOR : R E S U L T MINUSCHAR S E T MINUSCHAR L O C A T O R;
 RESUME : R E S U M E;
 RETURN                 : R E T U R N {cobolVerbTokens.add(RETURN);};
 RETURNING              : R E T U R N I N G {cobolVerbTokens.add(RETURNING);};

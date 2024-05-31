@@ -723,7 +723,15 @@ thruToken
    ;
 
 sqlDataTypesCaluse
-   : TYPE IS sqlDataTypes LPARENCHAR integerLiteral RPARENCHAR
+   : TYPE IS (sqlDataTypesCaluseForm1 | sqlDataTypesCaluseForm2)
+   ;
+
+sqlDataTypesCaluseForm1
+   : sqlDataTypes LPARENCHAR integerLiteral RPARENCHAR
+   ;
+
+sqlDataTypesCaluseForm2
+   : RESULT_SET_LOCATOR VARYING
    ;
 
 sqlDataTypes
