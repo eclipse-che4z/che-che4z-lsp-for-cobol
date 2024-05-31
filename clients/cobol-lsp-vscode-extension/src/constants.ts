@@ -29,13 +29,14 @@ export const SERVER_PORT = "cobol-lsp.server.port";
 export const SERVER_RUNTIME = "cobol-lsp.serverRuntime";
 export const DIALECT_LIBS = "cobol-lsp.dialect.libs";
 export const PATHS_LOCAL_KEY = "paths-local";
-export const PATHS_ZOWE = "paths-dsn";
+export const PATHS_DSN = "paths-dsn";
 export const PATHS_USS = "paths-uss";
 export const COBOL_PRGM_LAYOUT = "cobol-lsp.cobol.program.layout";
 export const C4Z_FOLDER: string = ".c4z";
 export const COPYBOOKS_FOLDER: string = ".copybooks";
 export const GITIGNORE_FILE: string = ".gitignore";
 export const LANGUAGE_ID = "cobol";
+export const EXP_LANGUAGE_ID = "expcobol";
 export const HP_LANGUAGE_ID = "hpcobol";
 export const PROFILE_NAME_PLACEHOLDER = "<profilename>";
 export const DOWNLOAD_QUEUE_LOCKED_ERROR_MSG = `Invalid credentials for profile: ${PROFILE_NAME_PLACEHOLDER}. Copybook retrieval is blocked. Ensure the profile contains correct credentials.`;
@@ -67,6 +68,9 @@ export const INSTALL_ZOWE = "Install Zowe Explorer";
 export const DEFAULT_DIALECT = "COBOL";
 export const CLEARING_COPYBOOK_CACHE = "Clearing downloaded copybook cache";
 export const COPYBOOK_CACHE_CLEARED_INFO = "Downloaded copybooks removed";
+export const ZOWE_FOLDER: string = ".zowe";
+export const FAIL_CREATE_COPYBOOK_FOLDER_MSG = `Failed to create copybook internal folder`;
+export const FAIL_CREATE_GLOBAL_STORAGE_MSG = `Failed to create extension global storage folder`;
 
 export enum PUNCH_CARD {
   SEQUENCE_AREA_END_POS = 6,

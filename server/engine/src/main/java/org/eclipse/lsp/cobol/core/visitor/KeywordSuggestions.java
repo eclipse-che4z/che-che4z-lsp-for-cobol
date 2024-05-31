@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 
 /** This class provides keywords that are used for suggestions during the syntax check. */
 @Slf4j
-class KeywordSuggestions {
+public class KeywordSuggestions {
 
   @Getter private Set<String> suggestions;
 

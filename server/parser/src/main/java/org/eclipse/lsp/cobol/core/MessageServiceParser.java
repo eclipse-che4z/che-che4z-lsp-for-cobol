@@ -22,6 +22,7 @@ import java.util.regex.Pattern;
 import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.TokenStream;
 import org.eclipse.lsp.cobol.common.message.MessageServiceProvider;
+import org.eclipse.lsp.cobol.parser.WarningRecognitionException;
 
 /**
  * Provide the support of message externalization for Parser.

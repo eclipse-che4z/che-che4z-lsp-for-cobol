@@ -32,7 +32,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-
 import org.eclipse.lsp.cobol.common.dialects.CobolLanguageId;
 import org.eclipse.lsp.cobol.common.error.ErrorCodes;
 import org.eclipse.lsp.cobol.common.message.LocaleStore;
@@ -41,10 +40,7 @@ import org.eclipse.lsp.cobol.core.engine.dialects.DialectService;
 import org.eclipse.lsp.cobol.lsp.*;
 import org.eclipse.lsp.cobol.lsp.analysis.AsyncAnalysisService;
 import org.eclipse.lsp.cobol.lsp.events.queries.CodeActionQuery;
-import org.eclipse.lsp.cobol.lsp.handlers.server.ExitHandler;
-import org.eclipse.lsp.cobol.lsp.handlers.server.InitializeHandler;
-import org.eclipse.lsp.cobol.lsp.handlers.server.InitializedHandler;
-import org.eclipse.lsp.cobol.lsp.handlers.server.ShutdownHandler;
+import org.eclipse.lsp.cobol.lsp.handlers.server.*;
 import org.eclipse.lsp.cobol.lsp.handlers.text.CodeActionHandler;
 import org.eclipse.lsp.cobol.lsp.handlers.workspace.DidChangeConfigurationHandler;
 import org.eclipse.lsp.cobol.lsp.handlers.workspace.ExecuteCommandHandler;
@@ -87,6 +83,7 @@ class CobolLanguageServerTest {
 
   private DisposableLSPStateService stateService;
   private final UriDecodeService uriDecodeService = mock(UriDecodeService.class);
+  private final CancelProgressHandler cancelProgressHandler = mock(CancelProgressHandler.class);
 
   @BeforeEach
   void getStateService() {
@@ -130,7 +127,8 @@ class CobolLanguageServerTest {
                     new ShutdownHandler(stateService, lspMessageBroker),
                     mock(InitializeHandler.class),
                     initializedHandler,
-                    lspEventConsumer);
+                    lspEventConsumer,
+                    cancelProgressHandler);
 
 
     server.initialized(new InitializedParams());
@@ -208,7 +206,8 @@ class CobolLanguageServerTest {
                     new ShutdownHandler(stateService, lspMessageBroker),
                     new InitializeHandler(watchingService),
                     new InitializedHandler(watchingService, copybookNameService, keywords, settingsService, localeStore, analysisService, messageService, layoutStore),
-                    lspEventConsumer);
+                    lspEventConsumer,
+                    cancelProgressHandler);
 
     server.initialized(new InitializedParams());
     waitingQuery(lspMessageBroker).join();
@@ -253,7 +252,8 @@ class CobolLanguageServerTest {
                     new ShutdownHandler(stateService, lspMessageBroker),
                     new InitializeHandler(mock(WatcherServiceImpl.class)),
                     new InitializedHandler(mock(WatcherServiceImpl.class), null, null, null, null, null, null, null),
-                    lspEventConsumer);
+                    lspEventConsumer,
+                    cancelProgressHandler);
 
     try {
       InitializeResult result = server.initialize(initializeParams).get();
@@ -314,7 +314,8 @@ class CobolLanguageServerTest {
                     new ShutdownHandler(stateService, lspMessageBroker),
                     new InitializeHandler(null),
                     new InitializedHandler(null, null, null, null, null, null, null, null),
-                    lspEventConsumer);
+                    lspEventConsumer,
+                    cancelProgressHandler);
     assertEquals(1, stateService.getExitCode());
     server.shutdown();
     try {

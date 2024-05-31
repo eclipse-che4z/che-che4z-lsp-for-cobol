@@ -58,13 +58,13 @@ import org.eclipse.lsp4j.Range;
 @RequiredArgsConstructor
 public class TransformTreeStage implements Stage<AnalysisContext, ProcessingResult, ParserStageResult> {
 
-  private final SymbolsRepository symbolsRepository;
-  private final MessageService messageService;
-  private final SubroutineService subroutineService;
-  private final CachingConfigurationService cachingConfigurationService;
-  private final DialectService dialectService;
-  private final AstProcessor astProcessor;
-  private final CodeLayoutStore layoutStore;
+  protected final SymbolsRepository symbolsRepository;
+  protected final MessageService messageService;
+  protected final SubroutineService subroutineService;
+  protected final CachingConfigurationService cachingConfigurationService;
+  protected final DialectService dialectService;
+  protected final AstProcessor astProcessor;
+  protected final CodeLayoutStore layoutStore;
 
   @Override
   public StageResult<ProcessingResult> run(AnalysisContext context, StageResult<ParserStageResult> prevStageResult) {
@@ -111,7 +111,7 @@ public class TransformTreeStage implements Stage<AnalysisContext, ProcessingResu
     }
   }
 
-  private List<Node> transformAST(AnalysisContext ctx,
+  protected List<Node> transformAST(AnalysisContext ctx,
                                   CopybooksRepository copybooksRepository, CommonTokenStream tokens,
                                   CobolParser.StartRuleContext tree) {
     CobolProgramLayout cobolProgramLayout = layoutStore.getCodeLayout()
@@ -197,6 +197,7 @@ public class TransformTreeStage implements Stage<AnalysisContext, ProcessingResu
     ctx.register(v, JsonGenerateNode.class, new JsonGenerateProcess(symbolAccumulatorService));
     ctx.register(v, XMLParseNode.class, new XMLParseProcess(symbolAccumulatorService));
     ctx.register(v, FileOperationStatementNode.class, new FileOperationProcess());
+    ctx.register(v, XmlGenerateNode.class, new XmlGenerateProcess(symbolAccumulatorService));
 
     // Implicit Dialects
     dialectService.getActiveImplicitDialects(analysisConfig)

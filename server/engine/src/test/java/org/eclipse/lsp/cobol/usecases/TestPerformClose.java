@@ -14,6 +14,8 @@
  */
 package org.eclipse.lsp.cobol.usecases;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.common.AnalysisResult;
@@ -22,8 +24,6 @@ import org.eclipse.lsp.cobol.common.model.tree.PerformNode;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 /**
  * Paragraph name can be "CLOSE"
  */
@@ -31,8 +31,8 @@ class TestPerformClose {
   private static final String TEXT = "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID. CLOSEPAR.\n"
           + "       PROCEDURE DIVISION.\n"
-          + "           PERFORM {#CLOSE}.\n"
-          + "       {#*CLOSE}.\n"
+          + "           PERFORM {#CLOSE1}.\n"
+          + "       {#*CLOSE1}.\n"
           + "           DISPLAY 'CLOSE'.\n";
 
   private static final String TEXT_THRU = "       IDENTIFICATION DIVISION.\n"

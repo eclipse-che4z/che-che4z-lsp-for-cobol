@@ -15,22 +15,21 @@
 
 package org.eclipse.lsp.cobol.core.strategy;
 
+import static java.util.stream.Collectors.toMap;
+import static java.util.stream.Collectors.toSet;
+
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import lombok.experimental.UtilityClass;
-import org.antlr.v4.runtime.Parser;
-import org.antlr.v4.runtime.ParserRuleContext;
-import org.eclipse.lsp.cobol.core.CobolParser;
-
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
-
-import static java.util.stream.Collectors.toMap;
-import static java.util.stream.Collectors.toSet;
+import lombok.experimental.UtilityClass;
+import org.antlr.v4.runtime.Parser;
+import org.antlr.v4.runtime.ParserRuleContext;
+import org.eclipse.lsp.cobol.core.CobolParser;
 
 /**
  * This class encapsulates the tokens of identifier rules that should be replaced in the error
@@ -41,7 +40,7 @@ class IdentifierReplacing {
 
   private static final String KEYWORD_PATTERN = "[A-Z0-9_]+";
   private static final Map<Class<? extends Parser>, List<Class<? extends ParserRuleContext>>>
-      PARSER_IDENTIFIER_RULES = ImmutableMap.of(CobolParser.class, ImmutableList.of(CobolParser.CobolKeywordsContext.class));
+      PARSER_IDENTIFIER_RULES = ImmutableMap.of(CobolParser.class, ImmutableList.of(CobolParser.AllowedCobolKeywordsContext.class));
 
   /**
    * Retrieve all the tokens from the rules that represent identifiers

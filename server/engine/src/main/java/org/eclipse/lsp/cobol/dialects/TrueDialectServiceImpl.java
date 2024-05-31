@@ -19,6 +19,7 @@ import com.google.inject.Singleton;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.eclipse.lsp.cobol.common.CleanerPreprocessor;
 import org.eclipse.lsp.cobol.common.SubroutineService;
+import org.eclipse.lsp.cobol.common.copybook.CopybookService;
 import org.eclipse.lsp.cobol.common.dialects.TrueDialectService;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.core.engine.analysis.AnalysisContext;
@@ -30,6 +31,7 @@ import org.eclipse.lsp.cobol.core.preprocessor.delegates.GrammarPreprocessor;
 import org.eclipse.lsp.cobol.dialects.hp.HpTrueCobolDialect;
 import org.eclipse.lsp.cobol.dialects.ibm.*;
 import org.eclipse.lsp.cobol.common.dialects.CobolLanguageId;
+import org.eclipse.lsp.cobol.dialects.ibm.experimental.EnterpriseCobol64;
 import org.eclipse.lsp.cobol.service.settings.CachingConfigurationService;
 import org.eclipse.lsp.cobol.service.settings.layout.CodeLayoutStore;
 
@@ -55,15 +57,20 @@ public class TrueDialectServiceImpl implements TrueDialectService<AnalysisContex
                             DialectService dialectService,
                             AstProcessor astProcessor,
                             SymbolsRepository symbolsRepository,
-                            CodeLayoutStore codeLayoutStore) {
+                            CodeLayoutStore codeLayoutStore,
+                            CopybookService copybookService) {
     dialects = new HashMap<>();
     dialects.put(CobolLanguageId.COBOL, new IbmTrueCobolDialect(grammarPreprocessor,
         messageService, treeListener, subroutineService, cachingConfigurationService, dialectService,
         astProcessor, symbolsRepository, codeLayoutStore));
 
-    dialects.put(CobolLanguageId.HP_COBOL, new HpTrueCobolDialect(grammarPreprocessor,
+    dialects.put(CobolLanguageId.EXPERIMENTAL_COBOL, new EnterpriseCobol64(grammarPreprocessor,
         messageService, treeListener, subroutineService, cachingConfigurationService, dialectService,
         astProcessor, symbolsRepository, codeLayoutStore));
+
+    dialects.put(CobolLanguageId.HP_COBOL, new HpTrueCobolDialect(grammarPreprocessor,
+        messageService, treeListener, subroutineService, cachingConfigurationService, dialectService,
+        astProcessor, symbolsRepository, codeLayoutStore, copybookService));
   }
 
   /**

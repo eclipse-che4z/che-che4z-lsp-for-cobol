@@ -27,6 +27,7 @@ import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.eclipse.lsp.cobol.common.*;
 import org.eclipse.lsp.cobol.common.benchmark.BenchmarkService;
 import org.eclipse.lsp.cobol.common.benchmark.BenchmarkSession;
+import org.eclipse.lsp.cobol.common.copybook.CopybookService;
 import org.eclipse.lsp.cobol.common.dialects.DialectOutcome;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.dialects.TrueDialectService;
@@ -38,7 +39,6 @@ import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.NodeType;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
-import org.eclipse.lsp.cobol.core.ParserUtils;
 import org.eclipse.lsp.cobol.core.engine.analysis.AnalysisContext;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectService;
 import org.eclipse.lsp.cobol.core.engine.errors.ErrorFinalizerService;
@@ -78,6 +78,7 @@ class CobolLanguageEngineTest {
   private final SymbolsRepository symbolsRepository = mock(SymbolsRepository.class);
   private final CleanerPreprocessor preprocessor = mock(CleanerPreprocessor.class);
   private final CodeLayoutStore store = mock(CodeLayoutStore.class);
+  private final CopybookService copybookService = mock(CopybookService.class);
 
   @Test
   void testLanguageEngineRun() {
@@ -91,7 +92,7 @@ class CobolLanguageEngineTest {
 
     TrueDialectService<AnalysisContext> trueDialectService = new TrueDialectServiceImpl(grammarPreprocessor, mockMessageService, treeListener, mock(SubroutineService.class),
         null,
-        dialectService, astProcessor, symbolsRepository, store);
+        dialectService, astProcessor, symbolsRepository, store, copybookService);
     CobolLanguageEngine engine =
             new CobolLanguageEngine(trueDialectService,
                 mockMessageService,
@@ -135,15 +136,9 @@ class CobolLanguageEngineTest {
 
     when(grammarPreprocessor.preprocess(any(), any())).thenReturn(new ResultWithErrors<>(new CopybooksRepository(), ImmutableList.of()));
 
-    Range sourceRange = ParserUtils.isHwParserEnabled()
-            ? new Range(new Position(0, 0), new Position(0, 32))
-            : new Range(new Position(0, 7), new Position(0, 31));
-    Range programRange = ParserUtils.isHwParserEnabled()
-            ? new Range(new Position(0, 7), new Position(0, 32))
-            : new Range(new Position(0, 7), new Position(0, 31));
-    Range divisionRange = ParserUtils.isHwParserEnabled()
-            ? new Range(new Position(0, 7), new Position(0, 31))
-            : new Range(new Position(0, 7), new Position(0, 31));
+    Range sourceRange = new Range(new Position(0, 7), new Position(0, 31));
+    Range programRange = new Range(new Position(0, 7), new Position(0, 31));
+    Range divisionRange = new Range(new Position(0, 7), new Position(0, 31));
     AnalysisResult actual = engine.run(URI, TEXT, AnalysisConfig.defaultConfig(ENABLED), CobolLanguageId.COBOL);
     Node root = actual.getRootNode();
     Node program = root.getChildren().get(0);
@@ -169,7 +164,7 @@ class CobolLanguageEngineTest {
 
     TrueDialectService<AnalysisContext> trueDialectService = new TrueDialectServiceImpl(grammarPreprocessor, mockMessageService, treeListener, mock(SubroutineService.class),
         null,
-        dialectService, astProcessor, symbolsRepository, store);
+        dialectService, astProcessor, symbolsRepository, store, copybookService);
     CobolLanguageEngine engine =
         new CobolLanguageEngine(trueDialectService,
             mockMessageService,

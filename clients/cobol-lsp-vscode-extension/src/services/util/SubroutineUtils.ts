@@ -11,8 +11,7 @@
  * Contributors:
  *   Broadcom, Inc. - initial API and implementation
  */
-
-import { searchCopybookInWorkspace } from "./FSUtils";
+import { searchCopybookInExtensionFolder } from "./FSUtils";
 import { COBOL_EXT_ARRAY } from "../../constants";
 import { SettingsService } from "../Settings";
 
@@ -22,8 +21,16 @@ import { SettingsService } from "../Settings";
  * @param name the name of subroutine
  * @return subroutine file URI if it was found or undefined otherwise
  */
-export function resolveSubroutineURI(name: string): string {
+export function resolveSubroutineURI(
+  storagePath: string,
+  name: string,
+): string {
   const folders: string[] | undefined =
     SettingsService.getSubroutineLocalPath();
-  return searchCopybookInWorkspace(name, folders, COBOL_EXT_ARRAY)!;
+  return searchCopybookInExtensionFolder(
+    name,
+    folders,
+    COBOL_EXT_ARRAY,
+    storagePath,
+  )!;
 }
