@@ -38,56 +38,72 @@
   "icon": "resources/logo.png",
   "main": "./dist/extension.js",
   "browser": "./dist/web/extension.js",
+  "capabilities": {
+    "virtualWorkspaces": {
+      "supported": "limited",
+      "description": "In virtual workspaces, only syntax highlighting is supported."
+    }
+  },
   "contributes": {
     "commands": [
       {
         "command": "cobol-lsp.cpy-manager.fetch-copybook",
         "category": "COBOL",
-        "title": "Fetch Copybook"
+        "title": "Fetch Copybook",
+        "when": "!virtualWorkspace"
       },
       {
         "command": "cobol-lsp.cpy-manager.goto-settings",
         "category": "COBOL",
-        "title": "Open Copybook Location Settings"
+        "title": "Open Copybook Location Settings",
+        "when": "!virtualWorkspace"
       },
       {
         "command": "cobol-lsp.serverRuntime.goto-settings",
         "category": "COBOL",
-        "title": "Open Server Runtime Settings"
+        "title": "Open Server Runtime Settings",
+        "when": "!virtualWorkspace"
       },
       {
         "command": "cobol-lsp.dialects.goto-settings",
         "category": "COBOL",
-        "title": "Open Dialect Settings"
+        "title": "Open Dialect Settings",
+        "when": "!virtualWorkspace"
       },
       {
         "command": "cobol-lsp.commentLine.toggle",
         "category": "COBOL",
-        "title": "Toggle COBOL Line Comment"
+        "title": "Toggle COBOL Line Comment",
+        "when": "!virtualWorkspace"
       },
       {
         "command": "cobol-lsp.commentLine.comment",
         "category": "COBOL",
-        "title": "Add COBOL Line Comment"
+        "title": "Add COBOL Line Comment",
+        "when": "!virtualWorkspace"
       },
       {
         "command": "cobol-lsp.commentLine.uncomment",
         "category": "COBOL",
-        "title": "Remove COBOL Line Comment"
+        "title": "Remove COBOL Line Comment",
+        "when": "!virtualWorkspace"
       },
       {
         "command": "cobol-lsp.clear.downloaded.copybooks",
         "category": "COBOL",
-        "title": "Clear Downloaded Copybooks"
+        "title": "Clear Downloaded Copybooks",
+        "when": "!virtualWorkspace"
       },
       {
         "command": "cobol-lsp.snippets.insertSnippets",
         "title": "Insert COBOL Snippet",
-        "category": "Snippets"
+        "category": "Snippets",
+        "when": "!virtualWorkspace"
       },
       {
         "command": "cobol-lsp.open.copybook.internalfolder",
-        "title": "Open Copybooks Internal Folder"
+        "title": "Open Copybooks Internal Folder",
+        "when": "!virtualWorkspace"
       }
     ],
     "languages": [
@@ -531,6 +547,7 @@
     "vscode:prepublish": "npm run -S build -- --minify",
     "postinstall": "node -e \"if (process.env.NODE_ENV === 'production'){process.exit(1)} \" && patch-package || echo skip patching",
     "build": "esbuild src/extension.ts --bundle --sourcemap --platform=node --target=node16.17.1 --outdir=dist --external:vscode --format=cjs",
+    "build:web": "esbuild src/web/extension.ts --bundle --sourcemap --platform=node --target=node16.17.1 --outdir=dist --external:vscode --format=cjs",
     "build:watch": "npm run build -- --watch",
     "test:integration": "npm run compile && node ./out/test/runTest.js",
     "compile": "tsc -p ./",
