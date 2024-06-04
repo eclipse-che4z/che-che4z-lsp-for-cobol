@@ -31,6 +31,8 @@ import org.eclipse.lsp.cobol.common.pipeline.StageResult;
 import org.eclipse.lsp.cobol.common.pipeline.Stage;
 import org.eclipse.lsp.cobol.core.strategy.CobolErrorStrategy;
 import org.eclipse.lsp.cobol.core.visitor.ParserListener;
+import org.eclipse.lsp.cobol.parser.AntlrCobolParser;
+import org.eclipse.lsp.cobol.parser.AstBuilder;
 import org.eclipse.lsp4j.Location;
 
 import java.util.List;
@@ -54,10 +56,7 @@ public class ParserStage implements Stage<AnalysisContext, ParserStageResult, Di
               .build());
       ParserListener listener = new ParserListener(context.getExtendedDocument(), context.getCopybooksRepository());
       CobolErrorStrategy errorStrategy = new CobolErrorStrategy(messageService);
-      AstBuilder parser = ParserUtils.isHwParserEnabled()
-              ? new SplitParser(CharStreams.fromString(context.getExtendedDocument().toString()),
-              listener, errorStrategy, treeListener)
-              : new AntlrCobolParser(CharStreams.fromString(context.getExtendedDocument().toString()),
+      AstBuilder parser = new AntlrCobolParser(CharStreams.fromString(context.getExtendedDocument().toString()),
               listener, errorStrategy, treeListener);
       CobolParser.StartRuleContext tree = parser.runParser();
       context.getAccumulatedErrors().addAll(listener.getErrors());

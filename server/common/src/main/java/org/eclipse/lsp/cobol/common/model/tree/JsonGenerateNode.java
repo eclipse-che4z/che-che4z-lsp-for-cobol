@@ -53,7 +53,6 @@ public class JsonGenerateNode extends StatementNode {
     this.identifier5 = identifier5;
     this.phases = phases;
   }
-
   /** Stores the phrase-1 Format of JSON generate statements */
   @AllArgsConstructor
   @Getter

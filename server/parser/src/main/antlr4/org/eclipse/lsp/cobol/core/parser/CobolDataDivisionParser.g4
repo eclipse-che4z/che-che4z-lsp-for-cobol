@@ -37,7 +37,7 @@ fileDescriptionEntry
    ;
 
 fileDescriptionEntryClauses
-   : (FD | SD) cobolWord (DOT_FS? fileDescriptionEntryClause)* DOT_FS
+   : (FD | SD) cobolWord  fileDescriptionEntryClause* DOT_FS
    ;
 
 fileDescriptionEntryClause
@@ -533,5 +533,5 @@ cobolWord
    ;
 
 dialectNodeFiller
-    : ZERO_WIDTH_SPACE+
+    : ZERO_WIDTH_SPACE+ DOT_FS? EOF?
     ;

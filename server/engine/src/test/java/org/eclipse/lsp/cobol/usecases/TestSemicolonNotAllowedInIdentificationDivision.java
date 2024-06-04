@@ -17,16 +17,13 @@ package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.eclipse.lsp.cobol.common.dialects.CobolLanguageId;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
-import org.eclipse.lsp.cobol.core.ParserUtils;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.eclipse.lsp4j.Range;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assumptions.assumeFalse;
 
 /** This test checks that the semicolons are not allowed outside the PROCEDURE DIVISION. */
 class TestSemicolonNotAllowedInIdentificationDivision {
@@ -39,11 +36,6 @@ class TestSemicolonNotAllowedInIdentificationDivision {
           + "       procedure division.\n"
           + "           MOVE 2 TO {$LINE-SPACING}.\n";
 
-  @BeforeAll
-  public static void beforeMethod() {
-    assumeFalse(ParserUtils.isHwParserEnabled());
-  }
-
   @Test
   void test() {
     UseCaseEngine.runTest(
@@ -55,6 +47,7 @@ class TestSemicolonNotAllowedInIdentificationDivision {
                 new Range(),
                 "A period was assumed before \"PROGRAM-ID\".",
                 DiagnosticSeverity.Error,
-                ErrorSource.PARSING.getText())));
+                ErrorSource.PARSING.getText())),
+        CobolLanguageId.COBOL);
   }
 }

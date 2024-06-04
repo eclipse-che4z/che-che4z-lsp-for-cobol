@@ -14,10 +14,31 @@
 
 import * as path from "path";
 import { clearCache } from "../../commands/ClearCopybookCacheCommand";
+import * as vscode from "vscode";
 
 jest.mock("vscode", () => ({
   Uri: {
     parse: jest.fn().mockReturnValue(path.join("tmp-ws", ".c4z", ".copybooks")),
+    file: jest.fn().mockReturnValue({
+      fsPath: path.join(__dirname, ".zowe"),
+      with: jest
+        .fn()
+        .mockImplementation(
+          (change: {
+            scheme?: string;
+            authority?: string;
+            path?: string;
+            query?: string;
+            fragment?: string;
+          }) => {
+            return {
+              path: change.path,
+              fsPath: change.path,
+              with: jest.fn().mockReturnValue({ path: change.path }),
+            };
+          },
+        ),
+    }),
   },
   window: {
     setStatusBarMessage: jest.fn().mockResolvedValue(true),
@@ -68,7 +89,7 @@ describe("Tests downloaded copybook cache clear", () => {
   it("checks running command multiple times doesn't produce error", () => {
     expect(() => {
       for (let index = 0; index < 3; index++) {
-        clearCache();
+        clearCache(vscode.Uri.file("/storagePath"));
       }
     }).not.toThrowError();
   });

@@ -27,7 +27,7 @@ import org.junit.jupiter.api.Test;
 class TestVariableInFileControl {
   private static final String TEXT =
       "       IDENTIFICATION DIVISION.\n"
-          + "          PROGRAM-ID. TEST.\n"
+          + "          PROGRAM-ID. TEST1.\n"
           + "       ENVIRONMENT DIVISION.\n"
           + "       INPUT-OUTPUT SECTION.\n"
           + "       FILE-CONTROL.\n"

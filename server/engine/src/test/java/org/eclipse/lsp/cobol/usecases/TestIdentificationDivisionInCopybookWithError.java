@@ -17,17 +17,15 @@ package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.eclipse.lsp.cobol.common.dialects.CobolLanguageId;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
-import org.eclipse.lsp.cobol.core.ParserUtils;
 import org.eclipse.lsp.cobol.test.CobolText;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.Range;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import static org.eclipse.lsp4j.DiagnosticSeverity.Error;
-import static org.junit.jupiter.api.Assumptions.assumeFalse;
 
 /**
  * This test checks the insertion of IDENTIFICATION DIVISION statement that contains a syntax error
@@ -53,11 +51,6 @@ class TestIdentificationDivisionInCopybookWithError {
 
   private static final String MESSAGE = "Syntax error on 'DIVISIONs'";
 
-  @BeforeAll
-  public static void beforeMethod() {
-    assumeFalse(ParserUtils.isHwParserEnabled());
-  }
-
   @Test
   void test() {
     UseCaseEngine.runTest(
@@ -67,6 +60,7 @@ class TestIdentificationDivisionInCopybookWithError {
             "1",
             new Diagnostic(new Range(), "Errors inside the copybook", Error, ErrorSource.COPYBOOK.getText()),
             "2",
-            new Diagnostic(new Range(), MESSAGE, Error, ErrorSource.PARSING.getText())));
+            new Diagnostic(new Range(), MESSAGE, Error, ErrorSource.PARSING.getText())),
+        CobolLanguageId.COBOL);
   }
 }

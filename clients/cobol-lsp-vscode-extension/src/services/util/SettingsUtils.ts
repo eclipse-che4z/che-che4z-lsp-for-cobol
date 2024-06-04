@@ -22,14 +22,16 @@ export class SettingsUtils {
     fsPath: boolean | undefined = undefined,
   ): string[] {
     const result: string[] = [];
-    const workspaceFolders = vscode.workspace.workspaceFolders!;
-    workspaceFolders.forEach((workspaceFolder) => {
-      result.push(
-        fsPath === undefined
-          ? workspaceFolder.uri.path
-          : workspaceFolder.uri.fsPath,
-      );
-    });
+    const workspaceFolders = vscode.workspace.workspaceFolders;
+    if (workspaceFolders) {
+      workspaceFolders.forEach((workspaceFolder) => {
+        result.push(
+          fsPath === undefined
+            ? workspaceFolder.uri.path
+            : workspaceFolder.uri.fsPath,
+        );
+      });
+    }
     return result;
   }
 }

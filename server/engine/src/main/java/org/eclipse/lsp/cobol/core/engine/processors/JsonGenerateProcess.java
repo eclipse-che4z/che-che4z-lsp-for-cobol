@@ -23,6 +23,7 @@ import org.eclipse.lsp.cobol.common.model.tree.variable.*;
 import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.Processor;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulatorService;
+import org.eclipse.lsp.cobol.core.model.NodeUtils;
 import org.eclipse.lsp.cobol.core.model.VariableUsageUtils;
 import org.eclipse.lsp.cobol.common.model.tree.JsonGenerateNode;
 import org.eclipse.lsp.cobol.common.model.tree.variables.ConditionDataNameNode;
@@ -39,10 +40,6 @@ import static org.eclipse.lsp.cobol.common.OutlineNodeNames.FILLER_NAME;
 
 /** Apply all the validation for the JSON Generate statement and return found errors. */
 public class JsonGenerateProcess implements Processor<JsonGenerateNode> {
-  // TODO: remove undetermined once effective data type calculation is corrected
-  public static final ImmutableList<EffectiveDataType> ALPHANUMERIC_DATA_TYPES =
-      ImmutableList.of(
-          EffectiveDataType.STRING, EffectiveDataType.INTEGER, EffectiveDataType.UNDETERMINED);
   public static final ImmutableList<EffectiveDataType> IDENTIFIER3_DATA_TYPES =
           ImmutableList.of(EffectiveDataType.INTEGER, EffectiveDataType.REAL, EffectiveDataType.UNDETERMINED);
   private final SymbolAccumulatorService symbolAccumulatorService;
@@ -399,7 +396,7 @@ public class JsonGenerateProcess implements Processor<JsonGenerateNode> {
     if (identifier1Definitions.get(0) instanceof ElementaryItemNode) {
       ElementaryItemNode foundDefinitionNode = (ElementaryItemNode) identifier1Definitions.get(0);
       boolean isNational = foundDefinitionNode.getUsageFormat() == UsageFormat.NATIONAL;
-      if (!(ALPHANUMERIC_DATA_TYPES.contains(foundDefinitionNode.getEffectiveDataType())
+      if (!(NodeUtils.ALPHANUMERIC_DATA_TYPES.contains(foundDefinitionNode.getEffectiveDataType())
               || isNational)
           || foundDefinitionNode.isJustified()
           || foundDefinitionNode.isDynamicLength()) {
@@ -433,32 +430,9 @@ public class JsonGenerateProcess implements Processor<JsonGenerateNode> {
   }
 
   private void verifyIdentifier1GroupItem(List<VariableNode> definitions, List<VariableUsageNode> identifier1, ProcessingContext ctx) {
-    boolean isGroupItemAlphanumeric =
-            definitions
-                    .get(0)
-                    .getDepthFirstStream()
-                    .filter(ElementaryItemNode.class::isInstance)
-                    .map(ElementaryItemNode.class::cast)
-                    .anyMatch(node -> ALPHANUMERIC_DATA_TYPES.contains(node.getEffectiveDataType()) || node.getUsageFormat() == UsageFormat.NATIONAL);
-
-    boolean isGroupItemDynamic =
-            definitions
-                    .get(0)
-                    .getDepthFirstStream()
-                    .filter(ElementaryItemNode.class::isInstance)
-                    .map(ElementaryItemNode.class::cast)
-                    .anyMatch(ElementaryNode::isDynamicLength);
-
-    boolean isGroupItemJustified =
-            definitions
-                    .get(0)
-                    .getDepthFirstStream()
-                    .filter(ElementaryItemNode.class::isInstance)
-                    .map(ElementaryItemNode.class::cast)
-                    .anyMatch(ElementaryNode::isJustified);
-
-
-    if (!isGroupItemAlphanumeric || isGroupItemDynamic || isGroupItemJustified) {
+    if (!NodeUtils.isNodeAlphanumeric(definitions.get(0))
+        || NodeUtils.checkIfNodeHasDynamicGroupItem(definitions.get(0))
+        || NodeUtils.checkIfNodeHasJustifiedGroupItem(definitions.get(0))) {
       ctx.getErrors()
               .add(
                       SyntaxError.syntaxError()
@@ -466,7 +440,7 @@ public class JsonGenerateProcess implements Processor<JsonGenerateNode> {
                               .severity(ErrorSeverity.ERROR)
                               .location(identifier1.get(0).getLocality().toOriginalLocation())
                               .messageTemplate(
-                                      MessageTemplate.of("jsonParseProcess.identifier1.groupItemError"))
+                                      MessageTemplate.of("jsonParseProcess.identifier1.groupItemError", identifier1.get(0).getName()))
                               .build());
     }
   }

@@ -14,21 +14,20 @@
  */
 package org.eclipse.lsp.cobol.service.delegates.completions;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import java.util.List;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolsRepository;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.eclipse.lsp4j.CompletionItem;
 import org.eclipse.lsp4j.CompletionItemKind;
 import org.junit.jupiter.api.Test;
-
-import java.util.List;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.is;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * This test {@link VariableCompletion} asserts that filtration and preparing the variable
@@ -38,7 +37,7 @@ class VariableCompletionTest {
 
   private static final String HEADER =
       "       Identification Division.\n"
-          + "       Program-id. TEST.\n"
+          + "       Program-id. TEST1.\n"
           + "       Data Division.\n"
           + "       Working-Storage Section.\n";
 

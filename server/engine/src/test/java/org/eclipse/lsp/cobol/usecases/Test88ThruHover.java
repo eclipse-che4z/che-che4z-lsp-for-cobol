@@ -40,7 +40,7 @@ import org.junit.jupiter.api.Test;
 class Test88ThruHover {
   private static final String TEXT =
       "       IDENTIFICATION DIVISION.\n"
-          + "       PROGRAM-ID.  TEST.\n"
+          + "       PROGRAM-ID.  TEST1.\n"
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
           + "       01 {$*EIGHT-BITS}            PIC X.\n"

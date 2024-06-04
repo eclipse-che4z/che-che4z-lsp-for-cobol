@@ -866,7 +866,7 @@ WS : [ \t\f]+ -> channel(HIDDEN);
 
 //SQL comments
 SQLLINECOMMENT
-	:	SQLLINECOMMENTCHAR ~[\r\n]* NEWLINE -> channel(HIDDEN)
+	:	SQLLINECOMMENTCHAR ~[\r\n]* {_input.LA(1) == NEWLINE}?
 	;
 
 // treat all the non-processed tokens as errors

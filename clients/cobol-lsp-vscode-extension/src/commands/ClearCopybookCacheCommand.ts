@@ -16,27 +16,26 @@ import * as path from "node:path";
 import * as vscode from "vscode";
 import { FileType } from "vscode";
 import {
-  C4Z_FOLDER,
   CLEARING_COPYBOOK_CACHE,
   COPYBOOK_CACHE_CLEARED_INFO,
   COPYBOOKS_FOLDER,
+  ZOWE_FOLDER,
 } from "../constants";
+import { Utils } from "../services/util/Utils";
 
 /**
- * Clears the downloaded copybook cache folder ({workspace}/.c4z/.copybooks).
+ * Clears the downloaded copybook cache folder ({globalStoragePath}/.zowe/.copybooks).
  *
  */
-export function clearCache() {
+export function clearCache(uri: vscode.Uri) {
   vscode.window.setStatusBarMessage(
     CLEARING_COPYBOOK_CACHE,
     Promise.resolve().then(
       () => {
-        const firstWorkspaceFolder = vscode.workspace.workspaceFolders![0];
-        const folderUri = firstWorkspaceFolder!.uri;
-        const fileUri = folderUri.with({
-          path: path.join(folderUri.fsPath, C4Z_FOLDER, COPYBOOKS_FOLDER),
+        const zoweFileUri = uri.with({
+          path: path.join(uri.fsPath, ZOWE_FOLDER, COPYBOOKS_FOLDER),
         });
-        deleteFolderContent(fileUri);
+        deleteFolderContent(vscode.Uri.file(zoweFileUri.fsPath));
         vscode.window.showInformationMessage(COPYBOOK_CACHE_CLEARED_INFO);
       },
       () =>

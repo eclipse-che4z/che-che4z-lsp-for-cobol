@@ -15,7 +15,7 @@
 import { resolveCopybookHandler } from "../../../services/copybook/CopybookMessageHandler";
 import { CopybookURI } from "../../../services/copybook/CopybookURI";
 import { SettingsService } from "../../../services/Settings";
-import { searchCopybookInWorkspace } from "../../../services/util/FSUtils";
+import { searchCopybookInExtensionFolder } from "../../../services/util/FSUtils";
 import * as vscode from "vscode";
 import { Utils } from "../../../services/util/Utils";
 
@@ -31,11 +31,12 @@ describe("Test the copybook message handler", () => {
     SettingsService.getCopybookLocalPath = jest
       .fn()
       .mockReturnValue("/configured/path/from/setting");
-    (searchCopybookInWorkspace as any) = jest
+    (searchCopybookInExtensionFolder as any) = jest
       .fn()
       .mockReturnValue("copybook content");
     expect(
       await resolveCopybookHandler(
+        "/storagePath",
         "cobolFileName",
         "copybookName",
         "dialectType",
@@ -52,12 +53,13 @@ describe("Test the copybook message handler", () => {
     CopybookURI.createDatasetPath = jest
       .fn()
       .mockReturnValue(["/downloaded/copybook/path"]);
-    (searchCopybookInWorkspace as any) = jest
+    (searchCopybookInExtensionFolder as any) = jest
       .fn()
       .mockReturnValueOnce("")
       .mockReturnValueOnce("Downloaded copybook content");
     expect(
       await resolveCopybookHandler(
+        "/storagePath",
         "cobolFileName",
         "copybookName",
         "dialectType",
@@ -75,13 +77,14 @@ describe("Test the copybook message handler", () => {
     CopybookURI.createDatasetPath = jest
       .fn()
       .mockReturnValue(["/downloaded/copybook/path"]);
-    (searchCopybookInWorkspace as any) = jest
+    (searchCopybookInExtensionFolder as any) = jest
       .fn()
       .mockReturnValueOnce("")
       .mockReturnValueOnce("")
       .mockReturnValue("Downloaded USS copybook content");
     expect(
       await resolveCopybookHandler(
+        "/storagePath",
         "cobolFileName",
         "copybookName",
         "dialectType",

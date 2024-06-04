@@ -126,11 +126,14 @@ class ServerCommunicationsTest {
     expectedNotifyBeginParams.setToken(uri);
     WorkDoneProgressBegin workDoneProgressBegin = new WorkDoneProgressBegin();
     workDoneProgressBegin.setTitle("TITLE");
+    workDoneProgressBegin.setCancellable(true);
     expectedNotifyBeginParams.setValue(Either.forLeft(workDoneProgressBegin));
 
     communications.notifyProgressBegin(uri);
     verify(client).notifyProgress(expectedNotifyBeginParams);
-    verify(client).notifyProgress(new ProgressParams(Either.forLeft(uri), Either.forLeft(new WorkDoneProgressReport())));
+    WorkDoneProgressReport expectedProgressReport = new WorkDoneProgressReport();
+    expectedProgressReport.setCancellable(true);
+    verify(client).notifyProgress(new ProgressParams(Either.forLeft(uri), Either.forLeft(expectedProgressReport)));
   }
 
   @Test

@@ -15,14 +15,13 @@
 
 package org.eclipse.lsp.cobol.usecases;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import org.eclipse.lsp.cobol.common.AnalysisResult;
-import org.eclipse.lsp.cobol.core.ParserUtils;
+import org.eclipse.lsp.cobol.common.dialects.CobolLanguageId;
 import org.eclipse.lsp.cobol.test.engine.UseCase;
 import org.eclipse.lsp.cobol.test.engine.UseCaseUtils;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assumptions.assumeFalse;
 
 /** This test verifies if the margins respected and warnings thrown */
 class TestMarginAB {
@@ -30,50 +29,50 @@ class TestMarginAB {
    * In TEXT_DIVISION_WRONG_PLACE string there are several DIVISIONS that are not in the right place
    */
   private static final String TEXT_AREA_A =
-      "000000       IDENTIFICATION DIVISION.\n" // starting area B instead of A
-          + "000000  PROGRAM-ID.    FILETOTEST.\n"
-          + "000000  AUTHOR. SERGIU ILIE.\n"
+      "             IDENTIFICATION DIVISION.\n" // starting area B instead of A
+          + "        PROGRAM-ID.    FILETOTEST.\n"
+          + "        AUTHOR. SERGIU ILIE.\n"
           + "        ENVIRONMENT DIVISION.\n"
           + "        INPUT-OUTPUT SECTION.\n"
           + "        FILE-CONTROL.\n"
-          + "             SELECT TRANS-FILE-IN ASSIGN TO TEST \n"
+          + "             SELECT TRANS-FILE-IN ASSIGN TO TEST1 \n"
           + "             ORGANIZATION IS LINE SEQUENTIAL \n"
           + "             ACCESS MODE IS SEQUENTIAL. \n"
-          + "000000     DATA DIVISION.\n" // starting area B instead of A
-          + "000000 FILE SECTION.\n"
-          + "000000     FD  TRANS-FILE-IN\n" // FD starting in area B instead of A
-          + "000000     LABEL RECORDS ARE STANDARD\n"
-          + "000000     RECORDING MODE IS F\n"
-          + "000000     BLOCK CONTAINS 0 RECORDS\n"
-          + "000000     RECORD CONTAINS 113 CHARACTERS\n"
-          + "000000     DATA RECORD IS BILL-LADING-RECORD.\n"
-          + "000000  01 BILL-LADING-RECORD PIC 9(2).\n"
-          + "000000  WORKING-STORAGE SECTION.\n"
-          + "000000  01 TAPARM1      PIC 9.\n"
-          + "000000  01 TAPARM2      PIC 99 VALUE 2.\n"
-          + "000000  01 ATCDEM3      PIC X(7) VALUE 'ATCDEM3'.\n"
-          + "000000  01 P1PARM1      PIC 99 VALUE 0.\n"
-          + "000000  01 TASTRUCT.\n"
-          + "000000     05 LOC-ID.\n"
-          + "000000         10 STATE    PIC X(2).\n"
-          + "000000         10 CITY     PIC X(3).\n"
-          + "000000     05 OP-SYS     PIC X(3).\n"
-          + "000000     PROCEDURE DIVISION.\n" // starting area B instead of A
-          + "000000     MOVE 'ILCHIMVS' TO TASTRUCT.\n"
-          + "000000     MOVE 'ILSPR' TO LOC-ID.\n"
-          + "000000     MOVE 'AIX' TO OP-SYS.\n"
-          + "000000  PROGA.\n"
-          + "000000     PERFORM WITH TEST BEFORE UNTIL TAPARM1 = 0\n"
-          + "000000       SUBTRACT 1 FROM TAPARM1\n"
-          + "000000       CALL ATCDEM3\n"
-          + "000000     END-PERFORM\n"
-          + "000000     IF TAPARM2 = 0\n"
-          + "000000       PERFORM PROCA\n"
-          + "000000     END-IF\n"
-          + "000000     PERFORM WITH TEST BEFORE UNTIL TAPARM2 = 0\n"
-          + "000000       SUBTRACT 1 FROM TAPARM2\n"
-          + "000000     END-PERFORM.\n"
-          + "000000  END PROGRAM FILETOTEST.";
+          + "           DATA DIVISION.\n" // starting area B instead of A
+          + "       FILE SECTION.\n"
+          + "           FD  TRANS-FILE-IN\n" // FD starting in area B instead of A
+          + "           LABEL RECORDS ARE STANDARD\n"
+          + "           RECORDING MODE IS F\n"
+          + "           BLOCK CONTAINS 0 RECORDS\n"
+          + "           RECORD CONTAINS 113 CHARACTERS\n"
+          + "           DATA RECORD IS BILL-LADING-RECORD.\n"
+          + "        01 BILL-LADING-RECORD PIC 9(2).\n"
+          + "        WORKING-STORAGE SECTION.\n"
+          + "        01 TAPARM1      PIC 9.\n"
+          + "        01 TAPARM2      PIC 99 VALUE 2.\n"
+          + "        01 ATCDEM3      PIC X(7) VALUE 'ATCDEM3'.\n"
+          + "        01 P1PARM1      PIC 99 VALUE 0.\n"
+          + "        01 TASTRUCT.\n"
+          + "           05 LOC-ID.\n"
+          + "               10 STATE    PIC X(2).\n"
+          + "               10 CITY     PIC X(3).\n"
+          + "           05 OP-SYS     PIC X(3).\n"
+          + "           PROCEDURE DIVISION.\n" // starting area B instead of A
+          + "           MOVE 'ILCHIMVS' TO TASTRUCT.\n"
+          + "           MOVE 'ILSPR' TO LOC-ID.\n"
+          + "           MOVE 'AIX' TO OP-SYS.\n"
+          + "        PROGA.\n"
+          + "           PERFORM WITH TEST BEFORE UNTIL TAPARM1 = 0\n"
+          + "             SUBTRACT 1 FROM TAPARM1\n"
+          + "             CALL ATCDEM3\n"
+          + "           END-PERFORM\n"
+          + "           IF TAPARM2 = 0\n"
+          + "             PERFORM PROCA\n"
+          + "           END-IF\n"
+          + "           PERFORM WITH TEST BEFORE UNTIL TAPARM2 = 0\n"
+          + "             SUBTRACT 1 FROM TAPARM2\n"
+          + "           END-PERFORM.\n"
+          + "        END PROGRAM FILETOTEST.";
 
   /** In TEXT_AREA_B there are several statements starting on the wrong position */
   private static final String TEXT_AREA_B =
@@ -129,30 +128,30 @@ class TestMarginAB {
 
   /** In TEXT_DECLARATIVES the mistake is on the DECLARATIVE line */
   private static final String TEXT_DECLARATIVES =
-      "000000 IDENTIFICATION DIVISION.\n"
-          + "000000  PROGRAM-ID.    FILETOTEST.\n"
-          + "000000  AUTHOR. SERGIU ILIE.\n"
-          + "000000 DATA DIVISION.\n"
-          + "000000  WORKING-STORAGE SECTION.\n"
-          + "000000  01 TASTRUCT.\n"
-          + "000000     05 LOC-ID.\n"
-          + "000000         10 STATE    PIC X(2).\n"
-          + "000000         10 CITY     PIC X(3).\n"
-          + "000000     05 OP-SYS     PIC X(3).\n"
-          + "000000       88 READY-TRACE VALUE 0.\n"
-          + "000000 PROCEDURE DIVISION.\n"
-          + "000000 DECLARATIVES. MAMA\n" // after DECLARATIVES keyword no other token is allowed
-          + "000000 COBOL-DEBUG SECTION.\n"
-          + "000000     USE FOR DEBUGGING ON ALL PROCEDURES.\n"
-          + "000000 COBOL-DEBUG-PARA.\n"
-          + "000000     IF READY-TRACE THEN\n"
-          + "000000       DISPLAY DEBUG-NAME\n"
-          + "000000     END-IF.\n"
-          + "000000  END DECLARATIVES.\n"
-          + "000000     MOVE 'ILCHIMVS' TO TASTRUCT.\n"
-          + "000000     MOVE 'ILSPR' TO LOC-ID.\n"
-          + "000000     MOVE 'AIX' TO OP-SYS.\n"
-          + "000000  END PROGRAM FILETOTEST.";
+            "       IDENTIFICATION DIVISION.\n"
+          + "        PROGRAM-ID.    FILETOTEST.\n"
+          + "        AUTHOR. SERGIU ILIE.\n"
+          + "       DATA DIVISION.\n"
+          + "        WORKING-STORAGE SECTION.\n"
+          + "        01 TASTRUCT.\n"
+          + "           05 LOC-ID.\n"
+          + "               10 STATE    PIC X(2).\n"
+          + "               10 CITY     PIC X(3).\n"
+          + "           05 OP-SYS     PIC X(3).\n"
+          + "             88 READY-TRACE VALUE 0.\n"
+          + "       PROCEDURE DIVISION.\n"
+          + "       DECLARATIVES. MAMA\n" // after DECLARATIVES keyword no other token is allowed
+          + "       COBOL-DEBUG SECTION.\n"
+          + "           USE FOR DEBUGGING ON ALL PROCEDURES.\n"
+          + "       COBOL-DEBUG-PARA.\n"
+          + "           IF READY-TRACE THEN\n"
+          + "             DISPLAY DEBUG-NAME\n"
+          + "           END-IF.\n"
+          + "        END DECLARATIVES.\n"
+          + "           MOVE 'ILCHIMVS' TO TASTRUCT.\n"
+          + "           MOVE 'ILSPR' TO LOC-ID.\n"
+          + "           MOVE 'AIX' TO OP-SYS.\n"
+          + "        END PROGRAM FILETOTEST.";
 
   @Test
   void checkForAreaA() {
@@ -162,8 +161,7 @@ class TestMarginAB {
 
   @Test
   void checkForAreaB() {
-    assumeFalse(ParserUtils.isHwParserEnabled());
-    AnalysisResult result = UseCaseUtils.analyze(UseCase.builder().text(TEXT_AREA_B).build());
+    AnalysisResult result = UseCaseUtils.analyze(UseCase.builder().text(TEXT_AREA_B).build(), CobolLanguageId.COBOL);
     assertEquals(5, result.getDiagnostics().get(UseCaseUtils.DOCUMENT_URI).size());
   }
 
