@@ -72,8 +72,8 @@ class Db2SqlVisitorHelper {
     Location location = originalLocation.getLocation();
     Range updatedRange =
         new Range(
-            getStartPosition(sqlCodeContext, location),
-            getEndPosition(sqlCodeContext, location));
+            getAdjustedStartPosition(sqlCodeContext, location.getRange().getStart()),
+            getAdjustedEndPosition(sqlCodeContext, location.getRange().getEnd()));
     location.setRange(updatedRange);
     Location mapLocation = analysisContext.getExtendedDocument().mapLocation(updatedRange);
     return new OriginalLocation(mapLocation, originalLocation.getCopybookId());
@@ -109,44 +109,44 @@ class Db2SqlVisitorHelper {
     Location location = originalLocation.getLocation();
     Range updatedRange =
             new Range(
-                    getStartPosition(sqlCodeContext, location),
-                    getEndPosition(sqlCodeContext, location));
+                    getAdjustedStartPosition(sqlCodeContext, location.getRange().getStart()),
+                    getAdjustedEndPosition(sqlCodeContext, location.getRange().getEnd()));
     location.setRange(updatedRange);
     return new OriginalLocation(location, originalLocation.getCopybookId());
   }
 
-  private static Position getStartPosition(
-      ParserRuleContext sqlCodeContext, Location nodeLocation) {
+  public static Position getAdjustedStartPosition(
+          ParserRuleContext sqlCodeContext, Position position) {
     Position start;
-    if (nodeLocation.getRange().getStart().getLine() == 0) {
+    if (position.getLine() == 0) {
       start =
-          new Position(
-              nodeLocation.getRange().getStart().getLine() + sqlCodeContext.start.getLine() - 1,
-              nodeLocation.getRange().getStart().getCharacter()
-                  + sqlCodeContext.start.getCharPositionInLine());
+              new Position(
+                      position.getLine() + sqlCodeContext.start.getLine() - 1,
+                      position.getCharacter()
+                              + sqlCodeContext.start.getCharPositionInLine());
     } else {
       start =
-          new Position(
-              nodeLocation.getRange().getStart().getLine() + sqlCodeContext.start.getLine() - 1,
-              nodeLocation.getRange().getStart().getCharacter());
+              new Position(
+                      position.getLine() + sqlCodeContext.start.getLine() - 1,
+                      position.getCharacter());
     }
     return start;
   }
 
-  private static Position getEndPosition(
-      ParserRuleContext sqlCodeContext, Location nodeLocation) {
+  public static Position getAdjustedEndPosition(
+          ParserRuleContext sqlCodeContext, Position position) {
     Position end;
-    if (nodeLocation.getRange().getEnd().getLine() == 0) {
+    if (position.getLine() == 0) {
       end =
-          new Position(
-              nodeLocation.getRange().getEnd().getLine() + sqlCodeContext.start.getLine() - 1,
-              nodeLocation.getRange().getEnd().getCharacter()
-                  + sqlCodeContext.start.getCharPositionInLine());
+              new Position(
+                      position.getLine() + sqlCodeContext.start.getLine() - 1,
+                      position.getCharacter()
+                              + sqlCodeContext.start.getCharPositionInLine());
     } else {
       end =
-          new Position(
-              nodeLocation.getRange().getEnd().getLine() + sqlCodeContext.start.getLine() - 1,
-              nodeLocation.getRange().getEnd().getCharacter());
+              new Position(
+                      position.getLine() + sqlCodeContext.start.getLine() - 1,
+                      position.getCharacter());
     }
     return end;
   }

@@ -24,6 +24,12 @@ interface IApiRegisterClient {
 
 interface IApiExplorerExtender {
   getProfilesCache(): ProfilesCache;
+  datasetProvider: {
+    openFiles: { [label: string]: { profile: { name: string } } };
+  };
+  ussFileProvider: {
+    openFiles: { [label: string]: { profile: { name: string } } };
+  };
 }
 
 interface ProfilesCache {

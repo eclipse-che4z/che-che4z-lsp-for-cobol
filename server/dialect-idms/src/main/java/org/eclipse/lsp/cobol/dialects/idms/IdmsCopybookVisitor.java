@@ -29,6 +29,7 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.antlr.v4.runtime.tree.TerminalNode;
+import org.eclipse.lsp.cobol.common.CleanerPreprocessor;
 import org.eclipse.lsp.cobol.common.ResultWithErrors;
 import org.eclipse.lsp.cobol.common.copybook.*;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
@@ -51,17 +52,17 @@ import org.eclipse.lsp4j.Range;
 @RequiredArgsConstructor
 class IdmsCopybookVisitor extends IdmsCopyParserBaseVisitor<List<Node>> {
   private final CopybookService copybookService;
-  private final CopybookProcessingMode copybookProcessingMode;
+  private final CleanerPreprocessor preprocessor;
   private final IdmsCopybookService idmsCopybookService;
   private final String programDocumentUri;
   private final String documentUri;
   private final int parentLevel;
-  private final Set<CopybookName> processedCopybooks;
   @Getter private final List<SyntaxError> errors = new LinkedList<>();
 
   private int firstCopybookLevel = 0;
 
   IdmsCopybookVisitor(CopybookService copybookService,
+                      CleanerPreprocessor preprocessor,
                       CopybookProcessingMode copybookProcessingMode,
                       ParseTreeListener treeListener,
                       MessageService messageService,
@@ -70,12 +71,11 @@ class IdmsCopybookVisitor extends IdmsCopyParserBaseVisitor<List<Node>> {
                       int parentLevel,
                       Set<CopybookName> processedCopybooks) {
     this.copybookService = copybookService;
-    this.copybookProcessingMode = copybookProcessingMode;
+    this.preprocessor = preprocessor;
     this.programDocumentUri = programDocumentUri;
     this.documentUri = documentUri;
     this.parentLevel = parentLevel;
-    this.processedCopybooks = processedCopybooks;
-    idmsCopybookService = new IdmsCopybookService(programDocumentUri, copybookService,
+    idmsCopybookService = new IdmsCopybookService(programDocumentUri, copybookService, preprocessor,
             copybookProcessingMode, treeListener, messageService, processedCopybooks);
   }
 
@@ -90,7 +90,7 @@ class IdmsCopybookVisitor extends IdmsCopyParserBaseVisitor<List<Node>> {
             copybookName,
             programDocumentUri,
             documentUri,
-            true);
+            preprocessor);
     CopybookModel copybookModel = resolvedCopybook.getResult();
     Locality locality = IdmsParserHelper.buildNameRangeLocality(optionsContext, copybookName.getDisplayName(), documentUri);
     errors.addAll(resolvedCopybook.getErrors());

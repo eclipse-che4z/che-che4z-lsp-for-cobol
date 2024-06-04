@@ -161,7 +161,7 @@ suite("TF35623: Support for Replacing and Mapping statement", function () {
       );
       let diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
       const message = diagnostics[0].message;
-      assert.match(message, /^Missing token SECTION at procedureSectionHeader/);
+      assert.match(message, /^A period was assumed before/);
     },
   );
 });

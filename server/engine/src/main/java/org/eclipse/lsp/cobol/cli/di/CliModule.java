@@ -15,6 +15,9 @@
 
 package org.eclipse.lsp.cobol.cli.di;
 
+import static com.google.inject.multibindings.Multibinder.newSetBinder;
+import static com.google.inject.name.Names.named;
+
 import com.google.inject.AbstractModule;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.Multibinder;
@@ -29,6 +32,7 @@ import org.eclipse.lsp.cobol.common.action.CodeActionProvider;
 import org.eclipse.lsp.cobol.common.benchmark.BenchmarkService;
 import org.eclipse.lsp.cobol.common.benchmark.BenchmarkServiceImpl;
 import org.eclipse.lsp.cobol.common.copybook.CopybookService;
+import org.eclipse.lsp.cobol.common.dialects.TrueDialectService;
 import org.eclipse.lsp.cobol.common.file.FileSystemService;
 import org.eclipse.lsp.cobol.common.file.WorkspaceFileService;
 import org.eclipse.lsp.cobol.common.message.LocaleStore;
@@ -37,22 +41,13 @@ import org.eclipse.lsp.cobol.core.engine.dialects.DialectDiscoveryFolderService;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectDiscoveryService;
 import org.eclipse.lsp.cobol.core.messages.LocaleStoreImpl;
 import org.eclipse.lsp.cobol.core.messages.PropertiesMessageService;
-import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessor;
-import org.eclipse.lsp.cobol.core.preprocessor.TextPreprocessorImpl;
+import org.eclipse.lsp.cobol.dialects.TrueDialectServiceImpl;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.GrammarPreprocessor;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.GrammarPreprocessorImpl;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.GrammarPreprocessorListenerFactory;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.reader.CobolLineReader;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.reader.CobolLineReaderImpl;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.replacement.ReplacePreprocessorFactory;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.replacement.ReplacingService;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.replacement.ReplacingServiceImpl;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.rewriter.CobolLineIndicatorProcessorImpl;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.rewriter.CobolLineReWriter;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.transformer.CobolLinesTransformation;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.transformer.ContinuationLineTransformation;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.writer.CobolLineWriter;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.writer.CobolLineWriterImpl;
 import org.eclipse.lsp.cobol.core.visitor.InterruptingTreeListener;
 import org.eclipse.lsp.cobol.lsp.DisposableLSPStateService;
 import org.eclipse.lsp.cobol.lsp.jrpc.CobolLanguageClient;
@@ -79,22 +74,16 @@ import org.eclipse.lsp.cobol.service.settings.ConfigurationService;
 import org.eclipse.lsp.cobol.service.settings.SettingsService;
 import org.eclipse.lsp.cobol.service.settings.SettingsServiceImpl;
 
-import static com.google.inject.multibindings.Multibinder.newSetBinder;
-import static com.google.inject.name.Names.named;
-
 /** This module provides DI bindings for COBOL language engine part. */
 public class CliModule extends AbstractModule {
   @Override
   protected void configure() {
-    bind(TextPreprocessor.class).to(TextPreprocessorImpl.class);
+    bind(TrueDialectService.class).to(TrueDialectServiceImpl.class);
+
     bind(GrammarPreprocessor.class).to(GrammarPreprocessorImpl.class);
     install(new FactoryModuleBuilder().build(GrammarPreprocessorListenerFactory.class));
     install(new FactoryModuleBuilder().build(ReplacePreprocessorFactory.class));
     bind(ReplacingService.class).to(ReplacingServiceImpl.class);
-    bind(CobolLineReader.class).to(CobolLineReaderImpl.class);
-    bind(CobolLineWriter.class).to(CobolLineWriterImpl.class);
-    bind(CobolLinesTransformation.class).to(ContinuationLineTransformation.class);
-    bind(CobolLineReWriter.class).to(CobolLineIndicatorProcessorImpl.class);
     bind(MessageService.class).to(PropertiesMessageService.class);
     bind(LocaleStore.class).to(LocaleStoreImpl.class);
     bind(ConfigurationService.class).to(CachingConfigurationService.class);

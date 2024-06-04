@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.eclipse.lsp.cobol.common.CleanerPreprocessor;
 import org.eclipse.lsp.cobol.common.ResultWithErrors;
 import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
 import org.eclipse.lsp.cobol.common.copybook.CopybookService;
@@ -61,6 +62,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   @Inject
   GrammarPreprocessorListenerImpl(
       @Assisted PreprocessorContext context,
+      @Assisted CleanerPreprocessor preprocessor,
       GrammarPreprocessor grammarPreprocessor,
       CopybookService copybookService,
       MessageService messageService,
@@ -75,7 +77,8 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
         context.getCopybooksRepository(),
         context.getHierarchy(),
         messageService,
-        replacingService);
+        replacingService,
+        preprocessor);
     this.replacingService = replacingService;
   }
 

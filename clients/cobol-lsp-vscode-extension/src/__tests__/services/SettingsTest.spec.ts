@@ -14,33 +14,14 @@
 import * as fs from "fs-extra";
 import * as path from "path";
 import * as vscode from "vscode";
-import { C4Z_FOLDER, GITIGNORE_FILE } from "../../constants";
-import {
-  createFileWithGivenPath,
-  SettingsService,
-} from "../../services/Settings";
+import { SettingsService } from "../../services/Settings";
 import { SettingsUtils } from "../../services/util/SettingsUtils";
 
 const fsPath = "tmp-ws";
-let wsPath: string;
-let c4zPath: string;
-let filePath: string;
-
 beforeAll(() => {
   (vscode.workspace.workspaceFolders as any) = [
-    { uri: { fsPath, path: fsPath } } as any,
+    { uri: { fsPath: makefsPath(fsPath), path: makePath(fsPath) } } as any,
   ];
-  const firstWorkspaceFolder = vscode.workspace.workspaceFolders![0];
-  if (!firstWorkspaceFolder) return;
-  wsPath = path.join(firstWorkspaceFolder.uri.fsPath);
-  c4zPath = path.join(wsPath, C4Z_FOLDER);
-  filePath = path.join(c4zPath, GITIGNORE_FILE);
-});
-
-afterAll(() => {
-  if (fs.existsSync(wsPath)) {
-    fs.remove(wsPath);
-  }
 });
 
 jest.mock("vscode", () => ({
@@ -54,40 +35,36 @@ jest.mock("vscode", () => ({
   workspace: {},
 }));
 
-describe(".gitignore file in .c4z folder tests", () => {
-  it("Create .gitignore file if not exists", () => {
-    createFileWithGivenPath(C4Z_FOLDER, GITIGNORE_FILE, "/**");
-
-    expect(fs.existsSync(wsPath)).toEqual(true);
-    expect(fs.existsSync(c4zPath)).toEqual(true);
-    expect(fs.existsSync(filePath)).toEqual(true);
-  });
-
-  it("Modify .gitignore file if exists", () => {
-    const pattern = "srs/*\n.sds/*";
-    createFileWithGivenPath(C4Z_FOLDER, GITIGNORE_FILE, pattern);
-    const found = fs
-      .readFileSync(filePath)
-      .toString()
-      .split("\n")
-      .filter((e) => e.trim().length > 0)
-      .map((e) => e.trim())
-      .indexOf(pattern);
-
-    expect(found).toBeGreaterThanOrEqual(-1);
-  });
-
-  it("workspace not exist", () => {
-    (vscode.workspace.workspaceFolders as any) = [];
-    const createFile = jest.fn();
-    createFileWithGivenPath(C4Z_FOLDER, GITIGNORE_FILE, "/**");
-
-    expect(createFile).toHaveBeenCalledTimes(0);
-    expect(vscode.workspace.workspaceFolders![0]).toBe(undefined);
-  });
-});
+function makefsPath(p: string): string {
+  return path.join(process.platform == "win32" ? "a:" : "", p);
+}
+function makePath(p: string): string {
+  return (process.platform == "win32" ? "/a:" : "") + p;
+}
 
 describe("SettingsService evaluate variables", () => {
+  beforeAll(() => {
+    (vscode.workspace.workspaceFolders as vscode.WorkspaceFolder[]) = [
+      {
+        uri: {
+          path: makePath("/tmp-ws"),
+          scheme: "",
+          authority: "",
+          query: "",
+          fragment: "",
+          fsPath: makefsPath("/tmp-ws"),
+          with: function (): vscode.Uri {
+            throw new Error("Function not implemented.");
+          },
+          toJSON: function () {
+            throw new Error("Function not implemented.");
+          },
+        },
+        name: "workspace",
+        index: 0,
+      },
+    ];
+  });
   test("Evaluate fileBasenameNoExtension", () => {
     vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
       get: jest.fn().mockReturnValue(["copybook/${fileBasenameNoExtension}"]),
@@ -96,7 +73,7 @@ describe("SettingsService evaluate variables", () => {
       "file:///program",
       "COBOL",
     );
-    expect(paths[0]).toEqual("copybook/program");
+    expect(paths[0]).toEqual(makefsPath("/tmp-ws/copybook/program"));
   });
 
   test("Evaluate fileBasenameNoExtension", () => {
@@ -107,18 +84,19 @@ describe("SettingsService evaluate variables", () => {
       "file:///program.cbl",
       "COBOL",
     );
-    expect(paths[0]).toEqual("copybook/program");
+    expect(paths[0]).toEqual(makefsPath("/tmp-ws/copybook/program"));
   });
 
   test("Evaluate fileBasenameNoExtension with extension and dots", () => {
     vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
       get: jest.fn().mockReturnValue(["copybook/${fileBasenameNoExtension}"]),
     });
+
     const paths = SettingsService.getCopybookLocalPath(
       "file:///program.file.cbl",
       "COBOL",
     );
-    expect(paths[0]).toEqual("copybook/program.file");
+    expect(paths[0]).toEqual(makefsPath("/tmp-ws/copybook/program.file"));
   });
 
   test("Get local settings for a dialect", () => {
@@ -156,7 +134,6 @@ test("getWorkspaceFoldersPath return an array of paths", () => {
   const paths = SettingsUtils.getWorkspaceFoldersPath();
   expect(paths).toStrictEqual(["/ws-vscode"]);
 });
-
 test("json validation", () => {
   expect(SettingsUtils.isValidJSON(undefined)).toBeFalsy();
   expect(SettingsUtils.isValidJSON("{}")).toBeTruthy();
@@ -238,5 +215,28 @@ describe("SettingsService returns correct Copybook Configuration Values", () => 
     );
     expect(configuredValue).toHaveLength(1);
     expect(configuredValue[0]).toBe("configured-cobol-settings");
+  });
+});
+describe("SettingsService prepares local search folders", () => {
+  test("returns all paths are transformed into absolutes", () => {
+    const paths = [makefsPath("/absolute"), "relative"];
+    expect(
+      SettingsService.prepareLocalSearchFolders(paths, [
+        makefsPath("/workspacePath"),
+      ]),
+    ).toEqual([makefsPath("/absolute"), makefsPath("/workspacePath/relative")]);
+  });
+  test("all workspace paths concatanated into relative paths", () => {
+    const paths = [makefsPath("/absolute"), "relative"];
+    expect(
+      SettingsService.prepareLocalSearchFolders(paths, [
+        makefsPath("/workspacePath"),
+        makefsPath("/workspacePath2"),
+      ]),
+    ).toEqual([
+      makefsPath("/absolute"),
+      makefsPath("/workspacePath/relative"),
+      makefsPath("/workspacePath2/relative"),
+    ]);
   });
 });

@@ -17,15 +17,15 @@ package org.eclipse.lsp.cobol.dialects.daco.usecases;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.dialects.daco.utils.DialectConfigs;
-import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.eclipse.lsp.cobol.dialects.daco.utils.Fixtures;
+import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.junit.jupiter.api.Test;
 
 /** This test covers case with overlap locations in mapping */
 class TestOnRcuRangeException {
   static final String TEXT =
       "       IDENTIFICATION DIVISION.\n"
-          + "       PROGRAM-ID.    TEST.\n"
+          + "       PROGRAM-ID.    TEST1.\n"
           + "       DATA   DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
           + "       01 {$*A} PIC X.\n"

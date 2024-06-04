@@ -17,6 +17,7 @@ package org.eclipse.lsp.cobol.common.utils;
 
 import lombok.experimental.UtilityClass;
 import org.eclipse.lsp.cobol.common.model.Locality;
+import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
@@ -37,6 +38,13 @@ public class RangeUtils {
    */
   public static Optional<Node> findNodeByPosition(Node node, String uri, Position position) {
     Node candidate = null;
+    if (isFromCopybook(uri, node)) {
+      if (node.getChildren().isEmpty()) {
+        return Optional.of(node);
+      }
+      candidate = node;
+    }
+
     if (isInside(uri, position, node.getLocality())) {
       if (node.getChildren().isEmpty()) {
         return Optional.of(node);
@@ -51,6 +59,14 @@ public class RangeUtils {
       }
     }
     return candidate == null ? Optional.empty() : Optional.of(candidate);
+  }
+
+  private boolean isFromCopybook(String uri, Node node) {
+    if (!(node instanceof CopyNode)) {
+      return false;
+    }
+    CopyNode copyNode = (CopyNode) node;
+    return uri.equals(copyNode.getUri());
   }
 
   /**

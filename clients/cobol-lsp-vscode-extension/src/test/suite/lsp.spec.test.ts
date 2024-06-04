@@ -236,9 +236,9 @@ suite("Integration Test Suite", function () {
     assert.strictEqual(diagnostics.length, 1);
     helper.assertRangeIsEqual(
       diagnostics[0].range,
-      range(pos(28, 22), pos(28, 29)),
+      range(pos(29, 7), pos(29, 14)),
     );
-    assert.ok(diagnostics[0].message.includes("Missing token"));
+    assert.ok(diagnostics[0].message.includes("A period was assumed before"));
     await helper.deleteLine(editor, 28);
     await helper.insertString(
       editor,
@@ -352,13 +352,13 @@ suite("Integration Test Suite", function () {
 
       await helper.insertString(editor, pos(40, 21), "\n           Mov");
       await helper.waitFor(
-        () => vscode.languages.getDiagnostics(editor.document.uri).length === 4,
+        () => vscode.languages.getDiagnostics(editor.document.uri).length === 3,
       );
       diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
-      assert.strictEqual(diagnostics.length, 4);
+      assert.strictEqual(diagnostics.length, 3);
       assert.ok(
         diagnostics[2].message.includes(
-          "A misspelled word, maybe you want to put MOVE",
+          "The following token must start in Area A: Mov",
         ),
       );
     },
@@ -559,13 +559,10 @@ suite("Integration Test Suite", function () {
     copyDiagnostics = vscode.languages.getDiagnostics(copybookUri);
     assert.strictEqual(
       copyDiagnostics.length,
-      1,
+      2,
       "got: " + JSON.stringify(diagnostics),
     );
-    assert.strictEqual(
-      copyDiagnostics[0].message,
-      "Extraneous input 'VvvALUE'",
-    );
+    assert.strictEqual(copyDiagnostics[1].message, "Syntax error on 'VvvALUE'");
   })
     .timeout(helper.TEST_TIMEOUT)
     .slow(1000);

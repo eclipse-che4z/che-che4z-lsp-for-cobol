@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 /**
  * Extended Text Line with symbols
  */
-class ExtendedTextLine {
+public class ExtendedTextLine {
   @Getter
   private final List<MappedCharacter> characters = new ArrayList<>();
 

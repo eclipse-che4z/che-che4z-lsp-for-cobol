@@ -14,8 +14,12 @@
  */
 package org.eclipse.lsp.cobol.usecases;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import java.util.Optional;
 import org.eclipse.lsp.cobol.common.AnalysisResult;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.model.Locality;
@@ -27,11 +31,6 @@ import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
-
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /** The test for various cases with the continuation line */
 class TestContinuationLine {
@@ -146,7 +145,7 @@ class TestContinuationLine {
 
     assertTrue(node.isPresent());
     assertEquals(Locality.builder()
-        .uri("file:///c:/workspace/document.cbl")
+        .uri("file:c:/workspace/document.cbl")
         .range(new Range(new Position(8, 7), new Position(13, 44)))
         .build(), node.get().getLocality());
   }

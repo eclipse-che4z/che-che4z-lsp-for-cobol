@@ -20,7 +20,7 @@ import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.junit.jupiter.api.Test;
 
 /** Test optional paragraphs in the Identification division. */
-public class TestIdentificationDivOptionalParagraphs {
+class TestIdentificationDivOptionalParagraphs {
   private static final String TEXT =
       "       IDENTIFICATION DIVISION.                                         \n"
           + "       PROGRAM-ID.                                                      \n"

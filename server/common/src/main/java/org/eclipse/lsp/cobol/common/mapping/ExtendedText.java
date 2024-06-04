@@ -23,6 +23,7 @@ import org.eclipse.lsp4j.Range;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 /**
  * Extended Text contains information about original text and current text with the mapping
@@ -83,6 +84,16 @@ public class ExtendedText {
       }
     }
     throw new RuntimeException("Cannot find original position");
+  }
+
+  /**
+   * Perform operation for the text lines
+   * @param operation - operation to be performed on the test lines
+   */
+  public void perform(Consumer<ExtendedTextLine> operation) {
+    for (ExtendedTextLine line : lines) {
+      operation.accept(line);
+    }
   }
 
   /**

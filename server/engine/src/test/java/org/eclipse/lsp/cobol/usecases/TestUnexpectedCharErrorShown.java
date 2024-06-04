@@ -16,33 +16,25 @@ package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.eclipse.lsp.cobol.common.dialects.CobolLanguageId;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
-import org.eclipse.lsp.cobol.core.ParserUtils;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.eclipse.lsp4j.Range;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assumptions.assumeFalse;
 
 /** This test checks if the parser recognizes an unexpected symbol and shows it as an error. */
 class TestUnexpectedCharErrorShown {
 
   private static final String TEXT =
-      "        IDENTIFICATION DIVISION{?|typo}.\r\n"
+      "        IDENTIFICATION DIVISION{?|typo|dot}.\r\n"
           + "        PROGRAM-ID. test1.\r\n"
           + "        DATA DIVISION.\r\n"
           + "        PROCEDURE DIVISION.\r\n"
-          + "        END PROGRAM test1.";
+          + "        END PROGRAM {test1|1}.";
 
-  private static final String MESSAGE = "Extraneous input '?'";
-
-  @BeforeAll
-  public static void beforeMethod() {
-    assumeFalse(ParserUtils.isHwParserEnabled());
-  }
+  private static final String MESSAGE = "Syntax error on '?'";
 
   @Test
   void test() {
@@ -51,6 +43,20 @@ class TestUnexpectedCharErrorShown {
         ImmutableList.of(),
         ImmutableMap.of(
             "typo",
-            new Diagnostic(new Range(), MESSAGE, DiagnosticSeverity.Error, ErrorSource.PARSING.getText())));
+            new Diagnostic(
+                new Range(), MESSAGE, DiagnosticSeverity.Error, ErrorSource.PARSING.getText()),
+            "dot",
+            new Diagnostic(
+                new Range(),
+                "A period was assumed before \"?\".",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()),
+                "1",
+                new Diagnostic(
+                        new Range(),
+                        "There is an issue with PROGRAM-ID paragraph",
+                        DiagnosticSeverity.Warning,
+                        ErrorSource.PARSING.getText())),
+        CobolLanguageId.COBOL);
   }
 }

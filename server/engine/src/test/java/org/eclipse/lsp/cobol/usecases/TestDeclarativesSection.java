@@ -29,7 +29,7 @@ class TestDeclarativesSection {
       "       Identification Division.\n"
           + "       Program-id. HELLO-WORLD.\n"
           + "       Procedure Division.\n"
-          + "       DECLARATIVES{|1}";
+          + "       DECLARATIVES{|1|2}";
 
   @Test
   void test() {
@@ -41,6 +41,12 @@ class TestDeclarativesSection {
             new Diagnostic(
                 new Range(),
                 "Unexpected end of file",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()),
+            "2",
+            new Diagnostic(
+                new Range(),
+                "A period was assumed before \"<EOF>\".",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())));
   }

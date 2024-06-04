@@ -17,10 +17,10 @@ import { TelemetryService } from "../reporter/TelemetryService";
 
 export class CopybooksCodeActionProvider implements vscode.CodeActionProvider {
   public async provideCodeActions(
-    doc: vscode.TextDocument,
-    range: vscode.Range | vscode.Selection,
+    _doc: vscode.TextDocument,
+    _range: vscode.Range | vscode.Selection,
     context: vscode.CodeActionContext,
-    token: vscode.CancellationToken,
+    _token: vscode.CancellationToken,
   ): Promise<Array<vscode.Command | vscode.CodeAction>> {
     if (!this.shouldHaveCodeAction(context)) {
       return [];

@@ -25,7 +25,7 @@ import {
   LanguageClientOptions,
   StreamInfo,
 } from "vscode-languageclient/node";
-import { LANGUAGE_ID } from "../constants";
+import { HP_LANGUAGE_ID, EXP_LANGUAGE_ID, LANGUAGE_ID } from "../constants";
 import { JavaCheck } from "./JavaCheck";
 import { NativeExecutableService } from "./nativeLanguageClient/nativeExecutableService";
 import { TelemetryService } from "./reporter/TelemetryService";
@@ -41,7 +41,10 @@ export class LanguageClientService {
   private isNativeBuildEnabled: boolean = false;
   private executableService: NativeExecutableService;
 
-  constructor(private outputChannel: vscode.OutputChannel) {
+  constructor(
+    private outputChannel: vscode.OutputChannel,
+    private storagePath: vscode.Uri,
+  ) {
     const ext = vscode.extensions.getExtension(extensionId)!;
     this.executablePath = join(
       ext.extensionPath,
@@ -130,13 +133,15 @@ export class LanguageClientService {
 
   private createClientOptions(): LanguageClientOptions {
     return {
-      documentSelector: [LANGUAGE_ID],
+      documentSelector: [LANGUAGE_ID, EXP_LANGUAGE_ID, HP_LANGUAGE_ID],
       outputChannel: this.outputChannel,
       synchronize: {
         fileEvents: [
           vscode.workspace.createFileSystemWatcher("**/pgm_conf.json"),
           vscode.workspace.createFileSystemWatcher("**/proc_grps.json"),
-          vscode.workspace.createFileSystemWatcher("**/.copybooks/**/*"),
+          vscode.workspace.createFileSystemWatcher(
+            new vscode.RelativePattern(this.storagePath, "**/*"),
+          ),
         ],
       },
     };

@@ -22,6 +22,7 @@ import { LanguageClientService } from "../../services/LanguageClientService";
 import { NativeExecutableService } from "../../services/nativeLanguageClient/nativeExecutableService";
 import { TelemetryService } from "../../services/reporter/TelemetryService";
 import { Utils } from "../../services/util/Utils";
+import { EXP_LANGUAGE_ID, HP_LANGUAGE_ID } from "../../constants";
 
 jest.mock("../../services/reporter/TelemetryService");
 jest.mock("../../services/copybook/CopybookURI");
@@ -39,9 +40,10 @@ jest.mock("vscode", () => ({
   },
   Uri: {
     file: jest.fn().mockReturnValue({
-      fsPath: "path",
+      fsPath: "/storagePath",
     }),
   },
+  RelativePattern: jest.fn().mockReturnValue(undefined),
 }));
 jest.mock("vscode-languageclient/node", () => ({
   LanguageClient: jest.fn(),
@@ -67,7 +69,10 @@ beforeEach(() => {
 const SERVER_STOPPED_MSG = "server stopped";
 describe("LanguageClientService positive scenario", () => {
   beforeEach(() => {
-    languageClientService = new LanguageClientService(jest.fn() as any);
+    languageClientService = new LanguageClientService(
+      jest.fn() as any,
+      vscode.Uri.file("/storagePath"),
+    );
     new JavaCheck().isJavaInstalled = jest.fn().mockResolvedValue(true);
     vscode.workspace.getConfiguration(expect.any(String)).get = jest
       .fn()
@@ -140,7 +145,7 @@ describe("LanguageClientService positive scenario", () => {
         options: { detached: false },
       },
       {
-        documentSelector: [SERVER_ID],
+        documentSelector: [SERVER_ID, EXP_LANGUAGE_ID, HP_LANGUAGE_ID],
         outputChannel: expect.any(Function),
         synchronize: {
           fileEvents: [undefined, undefined],
@@ -163,11 +168,11 @@ describe("LanguageClientService positive scenario", () => {
       SERVER_DESC,
       expect.any(Function),
       {
-        documentSelector: [SERVER_ID],
+        documentSelector: [SERVER_ID, EXP_LANGUAGE_ID, HP_LANGUAGE_ID],
 
         outputChannel: expect.any(Function),
         synchronize: {
-          fileEvents: [undefined, undefined],
+          fileEvents: [undefined, undefined, undefined],
         },
       },
     );
@@ -235,7 +240,10 @@ describe("LanguageClientService negative scenario.", () => {
   test("LSP port not defined and jar path doesn't exists", async () => {
     (fs.existsSync as any) = jest.fn().mockReturnValue(false);
     try {
-      await new LanguageClientService(jest.fn() as any).checkPrerequisites();
+      await new LanguageClientService(
+        jest.fn() as any,
+        vscode.Uri.file("/storagePath"),
+      ).checkPrerequisites();
     } catch (error: any) {
       expect(error.toString()).toBe("Error: LSP server for cobol not found");
     }

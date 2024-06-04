@@ -19,8 +19,8 @@ import static org.eclipse.lsp4j.DiagnosticSeverity.Error;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.eclipse.lsp.cobol.common.dialects.CobolLanguageId;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
-import org.eclipse.lsp.cobol.core.ParserUtils;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.Range;
@@ -44,9 +44,24 @@ class TestSqlIncludeStatementNotDefinedCorrectly {
         ImmutableMap.of(
             "1",
             new Diagnostic(
-                new Range(),
-                    ParserUtils.isHwParserEnabled() ? "Extraneous input 'EXEC'" : "Syntax error on 'EXEC'",
+                new Range(), "Syntax error on 'EXEC'",
                 Error,
-                ErrorSource.PARSING.getText())));
+                ErrorSource.PARSING.getText())),
+        CobolLanguageId.COBOL);
   }
+
+  @Test
+  void testHw() {
+    UseCaseEngine.runTest(
+        TEXT,
+        ImmutableList.of(),
+        ImmutableMap.of(
+            "1",
+            new Diagnostic(
+                new Range(), "Extraneous input 'EXEC'",
+                Error,
+                ErrorSource.PARSING.getText())),
+        CobolLanguageId.EXPERIMENTAL_COBOL);
+  }
+
 }

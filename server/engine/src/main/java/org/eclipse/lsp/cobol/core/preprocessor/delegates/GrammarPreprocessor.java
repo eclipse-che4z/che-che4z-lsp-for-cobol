@@ -15,6 +15,7 @@
 package org.eclipse.lsp.cobol.core.preprocessor.delegates;
 
 import lombok.NonNull;
+import org.eclipse.lsp.cobol.common.CleanerPreprocessor;
 import org.eclipse.lsp.cobol.common.ResultWithErrors;
 import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
 
@@ -26,8 +27,9 @@ public interface GrammarPreprocessor {
    * applying related semantic analysis
    *
    * @param context - preprocessor context
+   * @param preprocessor - dialect specific preprocessor
    * @return extended document with copybooks and related errors
    */
   @NonNull
-  ResultWithErrors<CopybooksRepository> preprocess(@NonNull PreprocessorContext context);
+  ResultWithErrors<CopybooksRepository> preprocess(@NonNull PreprocessorContext context, @NonNull CleanerPreprocessor preprocessor);
 }

@@ -18,7 +18,12 @@ import { isV1RuntimeDialectDetail } from "./dialect/utils";
 
 import { fetchCopybookCommand } from "./commands/FetchCopybookCommand";
 import { gotoCopybookSettings } from "./commands/OpenSettingsCommand";
-import { LANGUAGE_ID } from "./constants";
+import {
+  FAIL_CREATE_COPYBOOK_FOLDER_MSG,
+  FAIL_CREATE_GLOBAL_STORAGE_MSG,
+  LANGUAGE_ID,
+  ZOWE_FOLDER,
+} from "./constants";
 import { CopybookDownloadService } from "./services/copybook/CopybookDownloadService";
 import { CopybooksCodeActionProvider } from "./services/copybook/CopybooksCodeActionProvider";
 
@@ -40,6 +45,9 @@ import {
 import { resolveSubroutineURI } from "./services/util/SubroutineUtils";
 import { ServerRuntimeCodeActionProvider } from "./services/nativeLanguageClient/serverRuntimeCodeActionProvider";
 import { ConfigurationWatcher } from "./services/util/ConfigurationWatcher";
+import * as path from "node:path";
+import { Utils } from "./services/util/Utils";
+import { E4ECopybookService } from "./services/copybook/E4ECopybookService";
 
 interface __AnalysisApi {
   analysis(uri: string, text: string): Promise<any>;
@@ -49,13 +57,32 @@ let languageClientService: LanguageClientService;
 let outputChannel: vscode.OutputChannel;
 const API_VERSION: string = "1.0.0";
 
-function initialize() {
+async function initialize(context: vscode.ExtensionContext) {
   // We need lazy initialization to be able to mock this for unit testing
-  const copyBooksDownloader = new CopybookDownloadService();
   outputChannel = vscode.window.createOutputChannel("COBOL Language Support");
-  languageClientService = new LanguageClientService(outputChannel);
+  try {
+    await vscode.workspace.fs.createDirectory(context.globalStorageUri);
+  } catch (error) {
+    const message = `${FAIL_CREATE_GLOBAL_STORAGE_MSG}: ${error}`;
+    outputChannel.appendLine(message);
+    throw Error(message);
+  }
+  const copyBooksDownloader = new CopybookDownloadService(
+    context.globalStorageUri.fsPath,
+    await Utils.getZoweExplorerAPI(),
+    await E4ECopybookService.getE4EAPI(),
+    outputChannel,
+  );
+  languageClientService = new LanguageClientService(
+    outputChannel,
+    context.globalStorageUri,
+  );
   const configurationWatcher = new ConfigurationWatcher();
-  return { copyBooksDownloader, configurationWatcher };
+
+  return {
+    copyBooksDownloader,
+    configurationWatcher,
+  };
 }
 
 export function getChannel(): vscode.OutputChannel {
@@ -66,7 +93,9 @@ export async function activate(
   context: vscode.ExtensionContext,
 ): Promise<__ExtensionApi & __AnalysisApi> {
   DialectRegistry.clear();
-  const { copyBooksDownloader, configurationWatcher } = initialize();
+  const { copyBooksDownloader, configurationWatcher } = await initialize(
+    context,
+  );
   initSmartTab(context);
 
   TelemetryService.registerEvent(
@@ -74,12 +103,9 @@ export async function activate(
     ["bootstrap", "experiment-tag"],
     "Extension activation event was triggered",
   );
-  copyBooksDownloader.start();
 
   // Register Commands
   registerCommands(context, copyBooksDownloader);
-
-  context.subscriptions.push(copyBooksDownloader);
 
   registerCodeActions(context);
 
@@ -112,11 +138,15 @@ export async function activate(
   // Custom client handlers
   languageClientService.addRequestHandler(
     "cobol/resolveSubroutine",
-    resolveSubroutineURI,
+    resolveSubroutineURI.bind(undefined, context.globalStorageUri.fsPath),
   );
   languageClientService.addRequestHandler(
     "copybook/resolve",
-    resolveCopybookHandler,
+    resolveCopybookHandler.bind(
+      undefined,
+      context.globalStorageUri.fsPath,
+      outputChannel,
+    ),
   );
   languageClientService.addRequestHandler(
     "copybook/download",
@@ -234,7 +264,7 @@ function registerCommands(
     vscode.commands.registerCommand(
       "cobol-lsp.clear.downloaded.copybooks",
       () => {
-        clearCache();
+        clearCache(context.globalStorageUri);
       },
     ),
   );
@@ -275,6 +305,29 @@ function registerCommands(
           "workbench.action.openSettings",
           "cobol-lsp.serverRuntime",
         ),
+    ),
+  );
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand(
+      "cobol-lsp.open.copybook.internalfolder",
+      async () => {
+        const copybookFolder = vscode.Uri.file(
+          path.join(context.globalStorageUri.fsPath, ZOWE_FOLDER),
+        );
+        try {
+          await vscode.workspace.fs.createDirectory(copybookFolder);
+          await vscode.commands.executeCommand(
+            "revealFileInOS",
+            copybookFolder,
+          );
+        } catch (error) {
+          vscode.window.showErrorMessage(FAIL_CREATE_COPYBOOK_FOLDER_MSG);
+          outputChannel.appendLine(
+            `${FAIL_CREATE_COPYBOOK_FOLDER_MSG} : ${error}`,
+          );
+        }
+      },
     ),
   );
 }

@@ -15,11 +15,12 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
 import * as vscode from "vscode";
+import { Utils } from "./util/Utils";
 import {
   COPYBOOK_EXTENSIONS,
   PATHS_LOCAL_KEY,
   PATHS_USS,
-  PATHS_ZOWE,
+  PATHS_DSN,
   SERVER_PORT,
   SERVER_RUNTIME,
   SETTINGS_CPY_EXTENSIONS,
@@ -46,49 +47,7 @@ import {
   loadProcessorGroupSqlBackendConfig,
 } from "./ProcessorGroups";
 import { getProgramNameFromUri } from "./util/FSUtils";
-import { integer } from "vscode-languageclient";
-
-/**
- * New file (e.g .gitignore) will be created or edited if exits, under project folder
- * (e.g. workspace/.c4z) with given  pattern
- * @param folderPath
- * @param fileName
- * @param pattern
- */
-export function createFileWithGivenPath(
-  folderPath: string,
-  fileName: string,
-  pattern: string,
-): void {
-  if (
-    !vscode.workspace.workspaceFolders ||
-    !vscode.workspace.workspaceFolders[0]
-  ) {
-    return;
-  }
-  const ws = vscode.workspace.workspaceFolders![0];
-  const ch4zPath = path.join(ws.uri.fsPath, folderPath);
-  const filePath = path.join(ch4zPath, fileName);
-  try {
-    if (fs.existsSync(filePath)) {
-      const notFound = fs
-        .readFileSync(filePath)
-        .toString()
-        .split("\n")
-        .filter((e) => e.trim().length > 0)
-        .map((e) => e.trim())
-        .every((v) => v !== pattern);
-      if (notFound) {
-        fs.appendFileSync(filePath, "\n" + pattern);
-      }
-    } else {
-      fs.mkdirSync(ch4zPath, { recursive: true });
-      fs.writeFileSync(filePath, pattern);
-    }
-  } catch (e: any) {
-    vscode.window.showErrorMessage("File error: " + e.toString());
-  }
-}
+import { SettingsUtils } from "./util/SettingsUtils";
 
 export class TabRule {
   // tslint:disable-next-line:no-unnecessary-initializer
@@ -154,6 +113,8 @@ export function configHandler(request: any): Array<any> {
         } else {
           result.push(cfg);
         }
+      } else if (item.section === COBOL_PRGM_LAYOUT) {
+        result.push(SettingsService.getCobolProgramLayout());
       } else {
         result.push(vscode.workspace.getConfiguration().get(item.section));
       }
@@ -191,7 +152,7 @@ export class SettingsService {
   ): string[] {
     const pgPaths = loadProcessorGroupCopybookPaths(documentUri, dialectType);
     const cobolFileName = getProgramNameFromUri(documentUri);
-    return [
+    let paths: string[] = [
       ...SettingsService.evaluateVariable(
         pgPaths,
         "fileBasenameNoExtension",
@@ -203,6 +164,9 @@ export class SettingsService {
         dialectType,
       ),
     ];
+    const wsFolders = SettingsUtils.getWorkspaceFoldersPath(true);
+
+    return SettingsService.prepareLocalSearchFolders(paths, wsFolders);
   }
 
   public static getCopybookExtension(
@@ -237,7 +201,7 @@ export class SettingsService {
    */
   public static getDsnPath(documentUri: string, dialectType: string): string[] {
     return SettingsService.getCopybookConfigValues(
-      PATHS_ZOWE,
+      PATHS_DSN,
       documentUri,
       dialectType,
     );
@@ -309,7 +273,7 @@ export class SettingsService {
    * Return the code page for the copybook file encoding supplied by user
    * @returns string
    */
-  public static getCopybookFileEncoding() {
+  public static getCopybookFileEncoding(): string | undefined {
     return vscode.workspace
       .getConfiguration(SETTINGS_CPY_SECTION)
       .get("copybook-file-encoding");
@@ -343,15 +307,7 @@ export class SettingsService {
     return vscode.workspace.getConfiguration().get(SERVER_RUNTIME);
   }
 
-  public static getCobolProgramLayout():
-    | {
-        sequence_length?: integer;
-        indicator_length?: integer;
-        area_a_length?: integer;
-        area_b_length?: integer;
-        comment_area?: integer;
-      }
-    | undefined {
+  public static getCobolProgramLayout() {
     return vscode.workspace.getConfiguration().get(COBOL_PRGM_LAYOUT);
   }
 
@@ -393,5 +349,19 @@ export class SettingsService {
       "fileBasenameNoExtension",
       programFile,
     );
+  }
+  public static prepareLocalSearchFolders(
+    paths: string[],
+    wsFolders: string[],
+  ): string[] {
+    const result = [];
+    for (const p of paths) {
+      if (path.isAbsolute(p)) result.push(p);
+      else
+        wsFolders.forEach((wsFolder) => {
+          result.push(path.join(wsFolder, p));
+        });
+    }
+    return result;
   }
 }

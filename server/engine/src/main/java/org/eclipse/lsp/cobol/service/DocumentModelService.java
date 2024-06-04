@@ -37,12 +37,15 @@ public class DocumentModelService {
   /**
    * Mark the document as opened and stores document text
    *
-   * @param uri  - document uri
-   * @param text - document text
+   * @param uri        - document uri
+   * @param text       - document text
+   * @param languageId
    */
   @Synchronized
-  public void openDocument(String uri, String text) {
-    docs.computeIfAbsent(uri, u -> new CobolDocumentModel(uri, text)).setOpened(true);
+  public void openDocument(String uri, String text, String languageId) {
+    CobolDocumentModel model = docs.computeIfAbsent(uri, u -> new CobolDocumentModel(uri, text));
+    Optional.ofNullable(languageId).ifPresent(model::setLanguageId);
+    model.setOpened(true);
   }
 
   /**
@@ -73,6 +76,7 @@ public class DocumentModelService {
     removeAllRelatedDiagnostics(document);
     updateDiagnosticRepo(uri, analysisResult.getDiagnostics());
     CobolDocumentModel updatedModel = new CobolDocumentModel(uri, text, analysisResult);
+    updatedModel.setLanguageId(document.getLanguageId());
     updatedModel.setOutlineResult(BuildOutlineTreeFromSyntaxTree.convert(analysisResult.getRootNode(), uri));
     docs.put(uri, updatedModel);
   }
