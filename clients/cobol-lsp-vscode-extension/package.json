@@ -38,72 +38,66 @@
   "icon": "resources/logo.png",
   "main": "./dist/extension.js",
   "browser": "./dist/web/extension.js",
-  "capabilities": {
-    "virtualWorkspaces": {
-      "supported": "limited",
-      "description": "In virtual workspaces, only syntax highlighting is supported."
-    }
-  },
   "contributes": {
     "commands": [
       {
         "command": "cobol-lsp.cpy-manager.fetch-copybook",
         "category": "COBOL",
         "title": "Fetch Copybook",
-        "when": "!virtualWorkspace"
+        "when": "!isWeb"
       },
       {
         "command": "cobol-lsp.cpy-manager.goto-settings",
         "category": "COBOL",
         "title": "Open Copybook Location Settings",
-        "when": "!virtualWorkspace"
+        "when": "!isWeb"
       },
       {
         "command": "cobol-lsp.serverRuntime.goto-settings",
         "category": "COBOL",
         "title": "Open Server Runtime Settings",
-        "when": "!virtualWorkspace"
+        "when": "!isWeb"
       },
       {
         "command": "cobol-lsp.dialects.goto-settings",
         "category": "COBOL",
         "title": "Open Dialect Settings",
-        "when": "!virtualWorkspace"
+        "when": "!isWeb"
       },
       {
         "command": "cobol-lsp.commentLine.toggle",
         "category": "COBOL",
         "title": "Toggle COBOL Line Comment",
-        "when": "!virtualWorkspace"
+        "when": "!isWeb"
       },
       {
         "command": "cobol-lsp.commentLine.comment",
         "category": "COBOL",
         "title": "Add COBOL Line Comment",
-        "when": "!virtualWorkspace"
+        "when": "!isWeb"
       },
       {
         "command": "cobol-lsp.commentLine.uncomment",
         "category": "COBOL",
         "title": "Remove COBOL Line Comment",
-        "when": "!virtualWorkspace"
+        "when": "!isWeb"
       },
       {
         "command": "cobol-lsp.clear.downloaded.copybooks",
         "category": "COBOL",
         "title": "Clear Downloaded Copybooks",
-        "when": "!virtualWorkspace"
+        "when": "!isWeb"
       },
       {
         "command": "cobol-lsp.snippets.insertSnippets",
         "title": "Insert COBOL Snippet",
         "category": "Snippets",
-        "when": "!virtualWorkspace"
+        "when": "!isWeb"
       },
       {
         "command": "cobol-lsp.open.copybook.internalfolder",
         "title": "Open Copybooks Internal Folder",
-        "when": "!virtualWorkspace"
+        "when": "!isWeb"
       }
     ],
     "languages": [
