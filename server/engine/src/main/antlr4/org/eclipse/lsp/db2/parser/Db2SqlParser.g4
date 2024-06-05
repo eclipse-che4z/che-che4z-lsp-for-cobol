@@ -15,7 +15,7 @@
 parser grammar Db2SqlParser;
 options {tokenVocab = Db2SqlLexer; superClass = MessageServiceParser;}
 
-startRule: .*? (execRule .*?) * EOF;
+startRule: .*? ((execRule | nonExecRule) .*?) * EOF;
 //startIncludeRule: .*? (includeStatement .*?)* EOF;
 
 execRule: EXEC SQL sqlCode END_EXEC
@@ -24,6 +24,10 @@ execRule: EXEC SQL sqlCode END_EXEC
          | {notifyError("cobolParser.missingEndExec");} EXEC SQL sqlCode DOT_FS? EOF
          | {notifyError("cobolParser.missingEndExec");} EXEC SQL;
 
+nonExecRule: result_set_locator_host_variable;
+
+result_set_locator_host_variable: LEVEL_01 entry_name  (USAGE IS?)? SQL TYPE IS RESULT_SET_LOCATOR VARYING;
+entry_name : (FILLER |dbs_host_names);
 sqlCode
    : ~END_EXEC*?
    ;
@@ -406,7 +410,7 @@ free_specification: (FREEPAGE dbs_integer (PCTFREE dbs_integer)? | PCTFREE  dbs_
 gbpcache_specification: GBPCACHE (CHANGED | ALL) | NONE;
 partition_element: PARTITION dbs_integer (ENDING AT? partition_element_loop INCLUSIVE?)?;
 partition_element_loop:  LPARENCHAR const_options (dbs_comma_separator const_options)*  RPARENCHAR;
-const_options: dbs_string_constant | MAXVALUE | MINVALUE | INTEGERLITERAL;
+const_options: dbs_string_constant | MAXVALUE | MINVALUE | dbs_integer;
 
 //CREATE LOB TABLESPACE
 dbs_create_lob_tablespace: LOB TABLESPACE dbs_table_space_name dbs_create_lob_tablespace_def;
@@ -939,8 +943,8 @@ dbs_grouping_expression_list: dbs_grouping_expression_alternative (dbs_comma_sep
 dbs_grouping_expression: dbs_expression;
 dbs_having_clause: HAVING dbs_search_condition;
 dbs_orderby_clause: ORDER BY (INPUT SEQUENCE | ORDER OF dbs_table_designator | dbs_sort_key (ASC | DESC)? (dbs_comma_separator dbs_sort_key (ASC | DESC)?)*);
-dbs_sort_key:  INTEGERLITERAL | dbs_sort_key_expression;
-dbs_offset_clause: OFFSET INTEGERLITERAL (ROW | ROWS);
+dbs_sort_key:  dbs_integer | dbs_sort_key_expression;
+dbs_offset_clause: OFFSET dbs_integer (ROW | ROWS);
 
 dbs_fullselect: (dbs_select_into | LPARENCHAR dbs_fullselect RPARENCHAR | dbs_value_clause | dbs_subselect)
 ((UNION|EXCEPT|INTERSECT) (DISTINCT|ALL)? (dbs_subselect | LPARENCHAR dbs_fullselect RPARENCHAR))*
@@ -1110,7 +1114,7 @@ common_bit_decimal_opt: (DECIMAL | DEC | NUMERIC);
 common_bit_decimal: common_bit_decimal_opt  (LPARENCHAR (dbs_integer (dbs_comma_separator dbs_integer)? | NUMERICLITERAL) RPARENCHAR)?;
 common_bit_float: (FLOAT (LPARENCHAR dbs_integer RPARENCHAR)? | REAL | DOUBLE PRECISION?);
 common_bit_decfloat: DECFLOAT (LPARENCHAR (dbs_integer34
-             | INTEGERLITERAL {validate34or16($INTEGERLITERAL.text);}
+             | T=dbs_integer {validate34or16($T.text);}
              | dbs_integer16) RPARENCHAR)?;
 common_bit_char: (CHARACTER | CHAR) (VARYING common_bit_varandchar | LARGE OBJECT common_bit_clobandobj | LPARENCHAR dbs_integer RPARENCHAR common_bit_charopts);
 common_bit_char2: ((CHARACTER | CHAR) (LPARENCHAR dbs_integer RPARENCHAR)? | (VARCHAR | (CHARACTER | CHAR) VARYING) (LPARENCHAR dbs_integer RPARENCHAR)) (common_bit_fordata | CCSID dbs_integer1208)?;
@@ -1195,7 +1199,7 @@ option_dbinfo: NO? DBINFO;
 option_debug_mode: (DISALLOW | ALLOW | DISABLE) DEBUG MODE;
 option_decimal: DECIMAL LPARENCHAR (dbs_integer15 (dbs_comma_separator dbs_s)? | dbs_integer31 (dbs_comma_separator dbs_s)?);
 option_defer: (DEFER | NODEFER) PREPARE;
-option_degree: DEGREE  (INTEGERLITERAL  {validateLevel($INTEGERLITERAL.text);} | ANY);
+option_degree: DEGREE  (T=dbs_integer  {validateLevel($T.text);} | ANY);
 option_deterministic: NOT? DETERMINISTIC;
 option_dispatch: STATIC DISPATCH;
 option_dynamic: DYNAMIC RESULT SETS (ZERO_DIGIT | dbs_integer);
@@ -1347,7 +1351,7 @@ dbs_expressions: (dbs_expression| LPARENCHAR dbs_expressions RPARENCHAR) (dbs_ex
 dbs_predicate_condition: (EQUALCHAR | ERRORCHAR EQUALCHAR | LESSTHANCHAR | MORETHANCHAR | MORETHANOREQUAL | LESSTHANOREQUAL | NOTEQUALCHAR);
 dbs_basic_predicate: dbs_expressions dbs_predicate_condition dbs_expressions | dbs_expressions IS NULL;
 dbs_quantified_predicate: dbs_expression dbs_predicate_condition (SOME|ANY|ALL)  LPARENCHAR dbs_select RPARENCHAR;
-dbs_array_exists_predicate: ARRAY_EXISTS LPARENCHAR dbs_sql_identifier dbs_comma_separator INTEGERLITERAL RPARENCHAR;
+dbs_array_exists_predicate: ARRAY_EXISTS LPARENCHAR dbs_sql_identifier dbs_comma_separator dbs_integer RPARENCHAR;
 dbs_between_predicate: dbs_expressions NOT? BETWEEN (dbs_expressions AND dbs_expressions | dbs_between_date_predicate);
 dbs_between_date_predicate: DATELITERAL AND DATELITERAL;
 dbs_distinct_predicate: dbs_expressions IS NOT? DISTINCT FROM dbs_expressions;
@@ -1382,7 +1386,7 @@ dbs_lag_lead_expression: LPARENCHAR dbs_expression (dbs_comma_separator dbs_inte
 dbs_lag_function: LAG dbs_lag_lead_expression;
 
 dbs_lead_function: LEAD dbs_lag_lead_expression;
-dbs_partitioning_expression: DOLLARCHAR INTEGERLITERAL? dbs_char_n (PLUSCHAR INTEGERLITERAL (PERCENT INTEGERLITERAL)? | PERCENT INTEGERLITERAL (PLUSCHAR INTEGERLITERAL)?)? | dbs_expression;
+dbs_partitioning_expression: DOLLARCHAR dbs_integer? dbs_char_n (PLUSCHAR dbs_integer (PERCENT dbs_integer)? | PERCENT dbs_integer (PLUSCHAR dbs_integer)?)? | dbs_expression;
 dbs_window_partition_clause: PARTITION BY dbs_partitioning_expression (dbs_comma_separator dbs_partitioning_expression)*
 ;
 dbs_sort_key_expression: dbs_column_name (dbs_expression_operator dbs_column_name)* | dbs_integer;
@@ -1391,7 +1395,7 @@ dbs_window_each_order_clause: dbs_sort_key_expression (ASC (NULLS LAST)? | ASC N
 dbs_window_order_clause: ORDER BY dbs_window_each_order_clause (dbs_comma_separator dbs_window_each_order_clause)*;
 
 dbs_ordered_OLAP_specification: (CUME_DIST LPARENCHAR RPARENCHAR| PERCENT_RANK LPARENCHAR RPARENCHAR | RANK LPARENCHAR RPARENCHAR|
-DENSE_RANK LPARENCHAR RPARENCHAR | NTILE LPARENCHAR INTEGERLITERAL RPARENCHAR | dbs_lag_function | dbs_lead_function)
+DENSE_RANK LPARENCHAR RPARENCHAR | NTILE LPARENCHAR dbs_integer RPARENCHAR | dbs_lag_function | dbs_lead_function)
 OVER LPARENCHAR dbs_window_partition_clause? dbs_window_order_clause RPARENCHAR;
 
 dbs_numbering_specification: ROW_NUMBER LPARENCHAR RPARENCHAR OVER LPARENCHAR dbs_window_partition_clause? dbs_window_order_clause? RPARENCHAR;
@@ -1433,7 +1437,7 @@ dbs_sequence_reference: (NEXT| PREVIOUS) VALUE FOR dbs_sequence_name;
 
 
 /////// Variables /////////////
-literal: NONNUMERICLITERAL | NUMERICLITERAL | INTEGERLITERAL;
+literal: NONNUMERICLITERAL | NUMERICLITERAL | dbs_integer;
 
 db2sql_db_privileges: DBADM | DBCTRL | DBMAINT | CREATETAB | CREATETS | DISPLAYDB | DROP | IMAGCOPY | LOAD | RECOVERDB | REORG | REPAIR | STARTDB | STATS | STOPDB;
 db2sql_system_privileges: ACCESSCTRL | ARCHIVE | BINDADD | BINDAGENT | BSDS | CREATEALIAS | CREATEDBA | CREATEDBC | CREATESG | CREATETMTAB | CREATE_SECURE_OBJECT |
@@ -1465,7 +1469,7 @@ CURRENT OPTIMIZATION HINT | CURRENT PACKAGE PATH | CURRENT PACKAGESET | (CURRENT
 CURRENT QUERY ACCELERATION | CURRENT QUERY ACCELERATION WAITFORDATA | CURRENT REFRESH AGE | CURRENT ROUTINE VERSION |
 CURRENT RULES | (CURRENT SCHEMA | CURRENT_SCHEMA) | (CURRENT SERVER | CURRENT_SERVER) | CURRENT SQLID |
 CURRENT TEMPORAL BUSINESS_TIME | CURRENT TEMPORAL SYSTEM_TIME | (CURRENT TIME | CURRENT_TIME) |
-((CURRENT TIMESTAMP| CURRENT_TIMESTAMP) (LPARENCHAR INTEGERLITERAL RPARENCHAR)? (WITHOUT TIME ZONE|WITH TIME ZONE)? ) |
+((CURRENT TIMESTAMP| CURRENT_TIMESTAMP) (LPARENCHAR dbs_integer RPARENCHAR)? (WITHOUT TIME ZONE|WITH TIME ZONE)? ) |
 (CURRENT TIME ZONE| CURRENT TIMEZONE | CURRENT_TIMEZONE) | ENCRYPTION PASSWORD | (SESSION TIME ZONE | SESSION TIMEZONE) |
 (SESSION_USER | USER) );
 
@@ -1473,7 +1477,7 @@ CURRENT TEMPORAL BUSINESS_TIME | CURRENT TEMPORAL SYSTEM_TIME | (CURRENT TIME | 
 db2sql_data_value: DATELITERAL;
 dbs_accelerator_name: IDENTIFIER; // - 1
 dbs_hostname_identifier : (IDENTIFIER | (DOT_FS | COLONCHAR | SLASHCHAR))+;
-dbs_quad: (ZERO_DIGIT  HEX_NUMBERS+ | ZERO_DIGIT OCTDIGITS+) | INTEGERLITERAL;
+dbs_quad: (ZERO_DIGIT  HEX_NUMBERS+ | ZERO_DIGIT OCTDIGITS+) | dbs_integer;
 dbs_ip4: dbs_quad DOT_FS dbs_quad DOT_FS dbs_quad DOT_FS dbs_quad+;
 dbs_address_value: dbs_ip4 | dbs_hostname_identifier | NONNUMERICLITERAL ;
 dbs_alias_name: T=dbs_sql_identifier { validateLength($T.text, "Alias name", 128); }; //must not be an alias that exists at the current server
@@ -1492,7 +1496,7 @@ dbs_bp_name: T=dbs_sql_identifier {validateLength($T.text, "Buffer pool name", 8
 dbs_case_expression : CASE (dbs_searched_when_clause | dbs_simple_when_clause) (ELSE NULL | ELSE dbs_result_expression1)? END ;
 dbs_cast_function_name: dbs_sql_identifier;
 dbs_catalog_name: T=dbs_sql_identifier {validateLength($T.text, "Catalog name", 8);};
-dbs_ccsid_value: INTEGERLITERAL;
+dbs_ccsid_value: dbs_integer;
 dbs_character_string_constant: CHAR_STRING_CONSTANT;
 dbs_clone_table_name: T=dbs_sql_identifier {validateLength($T.text, "Clone table name", 128);};
 dbs_collection_id: IDENTIFIER;
@@ -1501,7 +1505,7 @@ dbs_collection_name: T=dbs_sql_identifier {validateLength($T.text, "Collection n
 dbs_generic_name: dbs_host_names | NONNUMERICLITERAL;
 dbs_host_names: dbs_special_name | IDENTIFIER ;
 dbs_host_names_var:  COLONCHAR? dbs_host_name_container;
-dbs_host_name_container: dbs_host_names (MINUSCHAR (dbs_host_names | INTEGERLITERAL))*;
+dbs_host_name_container: dbs_host_names (MINUSCHAR (dbs_host_names | dbs_integer))*;
 dbs_special_name: ABSOLUTE | ACCELERATION | ACCELERATOR | ACCESS | ACCESSCTRL | ACCTNG| ACTION | ACTIVATE | ACTIVE
                   | ADD | ADDRESS | AFTER | AGE| ALGORITHM | ALIAS | ALL | ALLOCATE | ALLOW | ALTER | ALTERIN | ALWAYS
                   | AND | ANY | APPEND | APPLCOMPAT | APPLICATION | APPLNAME | ARCHIVE | ARRAY| ARRAY_EXISTS | AS
@@ -1615,7 +1619,7 @@ dbs_ext_program_name: dbs_sql_identifier;
 dbs_external_program_name: IDENTIFIER;
 dbs_hint_variable:  dbs_variable;
 dbs_hint_string_constant:  IDENTIFIER;
-dbs_fetch_clause: FETCH (FIRST | NEXT) (PLUSCHAR? INTEGERLITERAL)? (ROW | ROWS) ONLY;
+dbs_fetch_clause: FETCH (FIRST | NEXT) (PLUSCHAR? dbs_integer)? (ROW | ROWS) ONLY;
 dbs_field_name: dbs_sql_identifier;
 dbs_function_name: T=dbs_sql_identifier {validateLength($T.text, "Function name", 128);} | dbs_inbuild_functions; //must not be any of the  system-reserved keywords
 dbs_global_variable_name: dbs_generic_name | ROWID;
@@ -1630,12 +1634,12 @@ dbs_imptkmod_param: YES | NO;
 dbs_include_data_type: dbs_alter_procedure_bit_int | dbs_alter_procedure_bit_decimal | dbs_alter_procedure_bit_float | dbs_alter_procedure_bit_decfloat | dbs_alter_procedure_bit_char | dbs_alter_procedure_bit_graphic | dbs_alter_procedure_bit_varchar | DATE | TIME | dbs_alter_procedure_bit_timestamp;
 dbs_index_identifier: IDENTIFIER;
 dbs_index_name: T=dbs_sql_identifier {validateLength($T.text, "Index name", 128);};
-dbs_integer: INTEGERLITERAL;
+dbs_integer: INTEGERLITERAL | LEVEL_01;
 dbs_integer_constant: dbs_integer | NUMERICLITERAL; //range 1 - 32767
 dbs_jar_name: T=dbs_hostname_identifier {validateLength($T.text, "Jar name", 128);};
 dbs_jobname_value: IDENTIFIER | NONNUMERICLITERAL;
 dbs_key_label_name: IDENTIFIER;
-dbs_length: INTEGERLITERAL; //length must be between 1 and 32767. The default value is 100 bytes.
+dbs_length: dbs_integer; //length must be between 1 and 32767. The default value is 100 bytes.
 dbs_level: dbs_integer0 | dbs_integer1 dbs_integer2;
 dbs_location_name: IDENTIFIER {validateLength($IDENTIFIER.text, "Location name", 16);}; //not greater than 16
 dbs_mask_name: dbs_sql_identifier;
@@ -1768,7 +1772,7 @@ dbs_triggered_sql_statement_adv: dbs_call | dbs_delete | dbs_get | dbs_insert | 
 dbs_triggered_sql_statement_basic: dbs_triggered_sql_statement;
 dbs_type_name: IDENTIFIER;
 dbs_value: db2sql_data_value;
-dbs_variable : ( dbs_host_variable | dbs_transition_variable_name | dbs_sql_variable_name | dbs_global_variable_name ) INTEGERLITERAL*;
+dbs_variable : ( dbs_host_variable | dbs_transition_variable_name | dbs_sql_variable_name | dbs_global_variable_name ) dbs_integer*;
 dbs_variable_name: dbs_sql_identifier;
 dbs_version_id: dbs_hostname_identifier | FILENAME | NONNUMERICLITERAL;
 dbs_version_name: IDENTIFIER | FILENAME;
@@ -1780,7 +1784,7 @@ dbs_comma_separator: (COMMASEPARATORDB2 | COMMACHAR);
 dbs_semicolon_end: SEMICOLON_FS | SEMICOLONSEPARATORSQL;
 
 dbs_integer0: INTEGERLITERAL  {validateValue($INTEGERLITERAL.text, "0");};
-dbs_integer1: INTEGERLITERAL  {validateValue($INTEGERLITERAL.text, "1");};
+dbs_integer1: LEVEL_01  {validateValue($LEVEL_01.text, "1");};
 dbs_integer2: INTEGERLITERAL  {validateValue($INTEGERLITERAL.text, "2");};
 dbs_integer4: INTEGERLITERAL  {validateValue($INTEGERLITERAL.text, "4");};
 dbs_integer5: INTEGERLITERAL  {validateValue($INTEGERLITERAL.text, "5");};

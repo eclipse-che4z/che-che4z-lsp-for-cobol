@@ -41,6 +41,7 @@ import org.eclipse.lsp.cobol.implicitDialects.sql.node.Db2DataAndProcedureDivisi
 import org.eclipse.lsp.cobol.implicitDialects.sql.node.Db2DeclareVariableNode;
 import org.eclipse.lsp.cobol.implicitDialects.sql.node.Db2ProcedureDivisionNode;
 import org.eclipse.lsp.cobol.implicitDialects.sql.node.Db2WorkingAndLinkageSectionNode;
+import org.eclipse.lsp.cobol.implicitDialects.sql.node.SqlHostVariable;
 import org.eclipse.lsp.cobol.implicitDialects.sql.processor.*;
 
 /** Db2 SQL dialect */
@@ -102,6 +103,10 @@ public class Db2SqlDialect implements CobolDialect {
   @Override
   public List<ProcessorDescription> getProcessors() {
     return ImmutableList.of(
+            new ProcessorDescription(
+                    SqlHostVariable.class,
+                    ProcessingPhase.DEFINITION,
+                    new SqlHostVariableProcessor(messageService)),
         new ProcessorDescription(
             SectionNode.class,
             ProcessingPhase.POST_DEFINITION,

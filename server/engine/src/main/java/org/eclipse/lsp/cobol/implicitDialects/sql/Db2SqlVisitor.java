@@ -41,6 +41,7 @@ import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.model.tree.variable.QualifiedReferenceNode;
+import org.eclipse.lsp.cobol.common.model.tree.variable.VariableDefinitionNameNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableUsageNode;
 import org.eclipse.lsp.cobol.common.utils.RangeUtils;
 import org.eclipse.lsp.cobol.core.visitor.VisitorHelper;
@@ -59,7 +60,8 @@ class Db2SqlVisitor extends Db2SqlParserBaseVisitor<List<Node>> {
 
   private final DialectProcessingContext context;
   private final MessageService messageService;
-  private static final Pattern DOUBLE_DASH_SQL_COMMENT = Pattern.compile("--\\s[^\\r\\n]*", Pattern.MULTILINE);
+  private static final Pattern DOUBLE_DASH_SQL_COMMENT =
+      Pattern.compile("--\\s[^\\r\\n]*", Pattern.MULTILINE);
 
   @Getter private final List<SyntaxError> errors = new LinkedList<>();
 
@@ -74,6 +76,26 @@ class Db2SqlVisitor extends Db2SqlParserBaseVisitor<List<Node>> {
     return super.visitExecRule(ctx);
   }
 
+  @Override
+  public List<Node> visitResult_set_locator_host_variable(
+      Db2SqlParser.Result_set_locator_host_variableContext ctx) {
+    addReplacementContext(ctx);
+    SqlHostVariable node =
+        new SqlHostVariable(
+            VisitorHelper.getName(ctx.entry_name()),
+            getLocality(this.context.getExtendedDocument().mapLocation(constructRange(ctx))));
+    node.addChild(
+        new VariableDefinitionNameNode(
+            getLocality(
+                this.context.getExtendedDocument().mapLocation(constructRange(ctx.entry_name()))),
+            VisitorHelper.getName(ctx.entry_name())));
+    return ImmutableList.of(node);
+  }
+
+  private Locality getLocality(Location location) {
+    return Locality.builder().uri(location.getUri()).range(location.getRange()).build();
+  }
+
   private void addReplacementContext(ParserRuleContext ctx) {
     getAllTerminalNodes(ctx)
         .forEach(
@@ -86,7 +108,8 @@ class Db2SqlVisitor extends Db2SqlParserBaseVisitor<List<Node>> {
   }
 
   public Range constructRange(TerminalNode ctx) {
-    Position start = new Position(ctx.getSymbol().getLine() - 1, ctx.getSymbol().getCharPositionInLine());
+    Position start =
+        new Position(ctx.getSymbol().getLine() - 1, ctx.getSymbol().getCharPositionInLine());
     Position end =
         ctx.getSymbol().getStopIndex() > ctx.getSymbol().getStartIndex()
             ? new Position(
@@ -163,7 +186,8 @@ class Db2SqlVisitor extends Db2SqlParserBaseVisitor<List<Node>> {
   }
 
   @Override
-  public List<Node> visitRulesAllowedInWorkingStorageAndLinkageSection(Db2SqlParser.RulesAllowedInWorkingStorageAndLinkageSectionContext ctx) {
+  public List<Node> visitRulesAllowedInWorkingStorageAndLinkageSection(
+      Db2SqlParser.RulesAllowedInWorkingStorageAndLinkageSectionContext ctx) {
     return addTreeNode(ctx, Db2WorkingAndLinkageSectionNode::new);
   }
 
@@ -183,11 +207,13 @@ class Db2SqlVisitor extends Db2SqlParserBaseVisitor<List<Node>> {
   }
 
   @Override
-  public List<Node> visitRulesAllowedInDataDivisionAndProcedureDivision(Db2SqlParser.RulesAllowedInDataDivisionAndProcedureDivisionContext ctx) {
+  public List<Node> visitRulesAllowedInDataDivisionAndProcedureDivision(
+      Db2SqlParser.RulesAllowedInDataDivisionAndProcedureDivisionContext ctx) {
     return addTreeNode(ctx, Db2DataAndProcedureDivisionNode::new);
   }
 
-  private Db2SqlParser.StartSqlRuleContext parseSQL(String sqlCode, Db2SqlParser.SqlCodeContext sqlCodeContext) {
+  private Db2SqlParser.StartSqlRuleContext parseSQL(
+      String sqlCode, Db2SqlParser.SqlCodeContext sqlCodeContext) {
     Db2SqlLexer lexer = new Db2SqlLexer(CharStreams.fromString(sqlCode));
     CommonTokenStream tokens = new CommonTokenStream(lexer);
     Db2SqlParser parser = new Db2SqlParser(tokens);
