@@ -15,6 +15,9 @@
           "include": "#sequence-number-area"
         },
         {
+          "include": "#db2-host-var-definition"
+        },
+        {
           "include": "#exec-sql-block"
         },
         {
@@ -142,6 +145,21 @@
       "endCaptures": {
         "0": {
           "name": "string.quoted.cics.cobol"
+        }
+      }
+    },
+    "db2-host-var-definition": {
+      "begin": "(?i:0?1)",
+      "end": "(?i:SQL TYPE IS RESULT-SET-LOCATOR VARYING)",
+      "beginCaptures": {
+        "0": {
+          "name": "constant.numeric.integer"
+        }
+      },
+      "name": "sql.embedded.code",
+      "endCaptures": {
+        "0": {
+          "name": "keyword.other.sql"
         }
       }
     },

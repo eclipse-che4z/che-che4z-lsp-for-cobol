@@ -64,7 +64,7 @@ public class Db2SqlDialect implements CobolDialect {
 
   @Override
   public ResultWithErrors<DialectOutcome> processText(DialectProcessingContext context) {
-    Db2SqlVisitor db2SqlVisitor = new Db2SqlVisitor(context, messageService);
+    Db2SqlVisitor db2SqlVisitor = new Db2SqlVisitor(context, messageService, copybookService);
 
     List<SyntaxError> parseError = new ArrayList<>();
 
