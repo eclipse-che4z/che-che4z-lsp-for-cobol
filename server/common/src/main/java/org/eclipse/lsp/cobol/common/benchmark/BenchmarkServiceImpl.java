@@ -41,23 +41,24 @@ public class BenchmarkServiceImpl implements BenchmarkService {
   @Override
   public List<Measurement> getMeasurements() {
     return benchmarkSessions.stream()
-        .flatMap(s -> s.getMeasurements().stream())
-        .collect(Collectors.toList());
+            .flatMap(s -> s.getMeasurements().stream())
+            .collect(Collectors.toList());
   }
 
   @Override
   public List<JsonElement> toJsons() {
     Gson gson = new Gson();
     return benchmarkSessions.stream()
-        .flatMap(s -> s.getMeasurements().stream())
-        .map(gson::toJsonTree)
-        .collect(Collectors.toList());
+            .flatMap(s -> s.getMeasurements().stream())
+            .map(gson::toJsonTree)
+            .collect(Collectors.toList());
   }
 
   @Override
   public void logTiming() {
     benchmarkSessions.forEach(this::logTiming);
   }
+
   public void logTiming(BenchmarkSession benchmarkSession) {
     Collection<Measurement> measurements = benchmarkSession
             .getMeasurements();
@@ -71,9 +72,12 @@ public class BenchmarkServiceImpl implements BenchmarkService {
                   LOG.info("Write performance data into: " + path);
                   Files.write(path, Collections.singleton(createHeaderLine(measurements)), StandardOpenOption.CREATE);
                 }
-                Files.write(path, Collections.singleton(createTimingLine(measurements,
+                String timingLine = createTimingLine(measurements,
                         benchmarkSession.attr("uri"),
-                        Integer.parseInt(benchmarkSession.attr("size")))), StandardOpenOption.APPEND);
+                        benchmarkSession.attr("language"),
+                        Integer.parseInt(benchmarkSession.attr("lines")),
+                        Integer.parseInt(benchmarkSession.attr("size")));
+                Files.write(path, Collections.singleton(timingLine), StandardOpenOption.APPEND);
               } catch (IOException e) {
                 LOG.debug(e.getMessage(), e);
               }
@@ -89,14 +93,18 @@ public class BenchmarkServiceImpl implements BenchmarkService {
     line.append(",");
     line.append("Total time");
     line.append(",");
+    line.append("Language");
+    line.append(",");
+    line.append("Lines");
+    line.append(",");
     line.append("Size");
     return line.toString();
   }
 
-  private String createTimingLine(Collection<Measurement> measurements, String url, int size) {
+  private String createTimingLine(Collection<Measurement> measurements, String url, String languageId, int lines, int size) {
     StringBuilder line = new StringBuilder(url);
     long total = 0;
-    for(Measurement m: measurements.stream().sorted(Comparator.comparing(Measurement::getId))
+    for (Measurement m : measurements.stream().sorted(Comparator.comparing(Measurement::getId))
             .collect(Collectors.toList())) {
       line.append(",");
       line.append(m.getTime());
@@ -104,6 +112,10 @@ public class BenchmarkServiceImpl implements BenchmarkService {
     }
     line.append(",");
     line.append(total);
+    line.append(",");
+    line.append(languageId);
+    line.append(",");
+    line.append(lines);
     line.append(",");
     line.append(size);
     return line.toString();
