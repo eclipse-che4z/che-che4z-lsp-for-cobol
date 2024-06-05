@@ -547,7 +547,7 @@
     "vscode:prepublish": "npm run -S build -- --minify",
     "postinstall": "node -e \"if (process.env.NODE_ENV === 'production'){process.exit(1)} \" && patch-package || echo skip patching",
     "build": "esbuild src/extension.ts --bundle --sourcemap --platform=node --target=node16.17.1 --outdir=dist --external:vscode --format=cjs",
-    "build:web": "esbuild src/web/extension.ts --bundle --sourcemap --platform=node --target=node16.17.1 --outdir=dist/web --external:vscode --format=cjs",
+    "build:web": "esbuild src/web/extension.ts --bundle --sourcemap --platform=browser --target=node16.17.1 --outdir=dist/web --external:vscode --format=cjs",
     "build:watch": "npm run build -- --watch",
     "test:integration": "npm run compile && node ./out/test/runTest.js",
     "compile": "tsc -p ./",
