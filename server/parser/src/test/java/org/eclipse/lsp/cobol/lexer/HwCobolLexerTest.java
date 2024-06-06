@@ -17,6 +17,8 @@ import org.eclipse.lsp.cobol.parser.hw.lexer.CobolLexer;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import org.eclipse.lsp.cobol.parser.hw.lexer.Token;
+import org.eclipse.lsp.cobol.parser.hw.lexer.TokenType;
 import org.junit.jupiter.api.Test;
 import static org.eclipse.lsp.cobol.lexer.LexerTestUtils.*;
 
@@ -88,6 +90,13 @@ class HwCobolLexerTest {
     assertToken(lexer.forward(), " ", 0, 1, 1);
     assertToken(lexer.forward(), "\"\"\"\n B\"", 0, 2, 2);
     assertFalse(lexer.hasMore());
+  }
+
+  @Test
+  void dotIsNotAWord() {
+    CobolLexer lexer = new CobolLexer(".");
+    Token dot = lexer.forward();
+    assertNotEquals(TokenType.COBOL_WORD, dot.getType());
   }
 
   @Test

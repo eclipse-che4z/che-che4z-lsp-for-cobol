@@ -19,9 +19,7 @@ import org.eclipse.lsp.cobol.rules.data.DataDivisionRule;
 import org.eclipse.lsp.cobol.rules.environment.EnvironmentDivisionRule;
 import org.eclipse.lsp.cobol.rules.identification.IdentificationDivisionRule;
 import org.eclipse.lsp.cobol.rules.procedure.*;
-import org.eclipse.lsp.cobol.rules.procedure.statements.ImperativeStatementRule;
-import org.eclipse.lsp.cobol.rules.procedure.statements.MoveRule;
-import org.eclipse.lsp.cobol.rules.procedure.statements.PerformRule;
+import org.eclipse.lsp.cobol.rules.procedure.statements.*;
 
 /** A container for COBOL language grammar rules. */
 public class CobolLanguage {
@@ -42,10 +40,30 @@ public class CobolLanguage {
     languageRules.put(IdentificationDivisionRule.class, new IdentificationDivisionRule());
     languageRules.put(SectionRule.class, new SectionRule());
     languageRules.put(SentenceRule.class, new SentenceRule());
+    languageRules.put(AddRule.class, new AddRule());
+    languageRules.put(MultiplyRule.class, new MultiplyRule());
+    languageRules.put(ComputeRule.class, new ComputeRule());
     languageRules.put(PerformRule.class, new PerformRule());
+    languageRules.put(IfRule.class, new IfRule());
     languageRules.put(MoveRule.class, new MoveRule());
-    languageRules.put(ImperativeStatementRule.class, new ImperativeStatementRule());
+    languageRules.put(EvaluateRule.class, new EvaluateRule());
+    languageRules.put(StringRule.class, new StringRule());
+    languageRules.put(UnstringRule.class, new UnstringRule());
+    languageRules.put(SearchRule.class, new SearchRule());
+    languageRules.put(SubtractRule.class, new SubtractRule());
+    languageRules.put(CallRule.class, new CallRule());
+    languageRules.put(DivideRule.class, new DivideRule());
+    languageRules.put(StartRule.class, new StartRule());
+    languageRules.put(ReadRule.class, new ReadRule());
+    languageRules.put(ReturnRule.class, new ReturnRule());
+    languageRules.put(DeleteRule.class, new DeleteRule());
+    languageRules.put(WriteRule.class, new WriteRule());
+    languageRules.put(RewriteRule.class, new RewriteRule());
+
+    // Fragments
     languageRules.put(ConditionExpressionRule.class, new ConditionExpressionRule());
+    languageRules.put(ArithmeticExpressionRule.class, new ArithmeticExpressionRule());
+    languageRules.put(IdentifierRule.class, new IdentifierRule());
 
     //// Reserved Words P. 761
     // Arithmetic operator
