@@ -32,6 +32,9 @@ describe("e4e copybook service tests", () => {
 
   it("check getE4EClient assembles client correctly / check getE4EClient returns already assembled client once called with same Uri ", async () => {
     E4ECopybookService.getE4EAPI = jest.fn().mockReturnValue(e4eMock);
+    vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
+      get: jest.fn().mockReturnValue("ENDEVOR_PROCESSOR"),
+    });
     await E4ECopybookService.getE4EClient("document-uri");
     const spyApi = jest.spyOn(E4ECopybookService, "getE4EAPI");
     expect(spyApi).toHaveBeenCalledTimes(1);
