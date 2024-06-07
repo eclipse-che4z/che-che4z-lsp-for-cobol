@@ -14,7 +14,7 @@
 
 {
   "compilerOptions": {
-    "types": ["node", "jest", "mocha", "webpack-env", "assert"],
+    "types": ["node", "jest", "mocha", "assert"],
     "target": "ES2017",
     "skipLibCheck": true,
     "strictNullChecks": true,
