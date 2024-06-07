@@ -23,6 +23,13 @@ export class CopybookName {
 }
 
 export class CopybookDownloadService {
+  /**
+   * Clears any cache maintained by downloaders
+   */
+
+  clearCache() {
+    this.downloadResolver.clearCache();
+  }
   private downloadResolver: DownloadStrategyResolver;
 
   constructor(
