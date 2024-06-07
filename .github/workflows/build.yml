@@ -125,6 +125,11 @@ jobs:
         run: |
           npm ci
           npm run test
+      - name: Unit Test COBOL LS Web extension
+        working-directory: clients/cobol-lsp-vscode-extension
+        run: |
+          npm ci
+          npm run test:web
       - name: Package IDMS vsix
         working-directory: clients/idms-dialect-support
         run: |
