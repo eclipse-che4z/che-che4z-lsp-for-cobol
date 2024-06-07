@@ -21,6 +21,7 @@ import com.google.inject.Singleton;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
+import java.nio.file.FileSystemNotFoundException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
@@ -178,16 +179,18 @@ public class SourceUnitGraph implements AnalysisStateListener {
    * @return true if copybook, false otherwise.
    */
   public boolean isCopybook(String uri) {
-    return documentGraphIndexedByCopybook.keySet().stream().anyMatch(copyUri -> {
-      try {
-        String decodeUri = uri.replace(" ", "%20");
-        copyUri = copyUri.replace(" ", "%20");
-        return new URL(decodeUri).sameFile(new URL(copyUri));
-      } catch (IOException e) {
-        LOG.error("IOException encountered while comparing paths {} and {}", copyUri, uri);
-        return false;
-      }
-    });
+    return documentGraphIndexedByCopybook.keySet().stream()
+        .anyMatch(
+            copyUri -> {
+              try {
+                String decodeUri = uri.replace(" ", "%20");
+                copyUri = copyUri.replace(" ", "%20");
+                return new URL(decodeUri).sameFile(new URL(copyUri));
+              } catch (IOException e) {
+                LOG.error("IOException encountered while comparing paths {} and {}", copyUri, uri);
+                return false;
+              }
+            });
   }
 
   private void updateGraphNodes(CobolDocumentModel model, EventSource eventSource) {
@@ -406,11 +409,24 @@ public class SourceUnitGraph implements AnalysisStateListener {
    */
   public List<String> getCopybookUriInsideFolder(String parentFolder) {
     List<String> result = new ArrayList<>();
-    Path parentPath = Paths.get(URI.create(parentFolder));
+    Path parentPath;
+
+    try {
+      parentPath = Paths.get(URI.create(parentFolder));
+    } catch (FileSystemNotFoundException | SecurityException e) {
+      return result;
+    }
+
     Set<String> allCopybooks = documentGraphIndexedByCopybook.keySet();
     for (String copybookUri : allCopybooks) {
-      Path copybookPath = Paths.get(URI.create(copybookUri));
-      if (copybookPath.startsWith(parentPath)) result.add(copybookUri);
+      try {
+        Path copybookPath = Paths.get(URI.create(copybookUri));
+        if (copybookPath.startsWith(parentPath)) {
+          result.add(copybookUri);
+        }
+      } catch (Exception e) {
+        LOG.error("{} not found", copybookUri);
+      }
     }
     return result;
   }
