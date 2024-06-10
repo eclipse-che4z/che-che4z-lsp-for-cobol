@@ -346,6 +346,11 @@ jobs:
         run: |
           npm run package  -- --target ${{ env.target }}
           cp *.vsix ../../.
+      - name: Package COBOL LS vsix for Web
+        working-directory: clients/cobol-lsp-vscode-extension
+        run: |
+          npm run package:web
+          cp *.vsix ../../.
       - uses: actions/upload-artifact@v3
         with:
           if-no-files-found: warn
