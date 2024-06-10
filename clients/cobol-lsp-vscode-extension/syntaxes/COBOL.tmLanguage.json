@@ -15,9 +15,6 @@
           "include": "#sequence-number-area"
         },
         {
-          "include": "#db2-host-var-definition"
-        },
-        {
           "include": "#exec-sql-block"
         },
         {
@@ -37,6 +34,9 @@
         },
         {
           "include": "#picture"
+        },
+        {
+          "include": "#db2-host-var-definition"
         },
         {
           "include": "#cobol-keywords"
@@ -149,17 +149,17 @@
       }
     },
     "db2-host-var-definition": {
-      "begin": "(?i:0?1)",
-      "end": "(?i:SQL TYPE IS RESULT-SET-LOCATOR VARYING)",
+      "name": "sql.embedded.code",
+      "begin": "(?i:\\s+SQL\\s+TYPE\\s+IS)",
       "beginCaptures": {
         "0": {
-          "name": "constant.numeric.integer"
+          "name": "keyword.cobol"
         }
       },
-      "name": "sql.embedded.code",
+      "end": "\\.",
       "endCaptures": {
         "0": {
-          "name": "keyword.other.sql"
+          "name": "source.cobol"
         }
       }
     },
