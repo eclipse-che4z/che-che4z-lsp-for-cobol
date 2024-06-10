@@ -36,6 +36,7 @@ import org.eclipse.lsp.cobol.common.model.tree.SectionNode;
 import org.eclipse.lsp.cobol.common.processor.ProcessingPhase;
 import org.eclipse.lsp.cobol.common.processor.ProcessorDescription;
 import org.eclipse.lsp.cobol.common.utils.ImplicitCodeUtils;
+import org.eclipse.lsp.cobol.common.utils.KeywordsUtils;
 import org.eclipse.lsp.cobol.common.utils.PredefinedCopybooks;
 import org.eclipse.lsp.cobol.implicitDialects.sql.node.Db2DataAndProcedureDivisionNode;
 import org.eclipse.lsp.cobol.implicitDialects.sql.node.Db2DeclareVariableNode;
@@ -60,6 +61,11 @@ public class Db2SqlDialect implements CobolDialect {
   @Override
   public String getName() {
     return DIALECT_NAME;
+  }
+
+  @Override
+  public Map<String, String> getKeywords() {
+    return KeywordsUtils.getKeywords(Db2SqlDialect.class.getClassLoader(), "LanguageKeywords_sql.txt");
   }
 
   @Override
