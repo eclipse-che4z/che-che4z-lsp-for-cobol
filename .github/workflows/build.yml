@@ -125,11 +125,6 @@ jobs:
         run: |
           npm ci
           npm run test
-      - name: Unit Test COBOL LS Web extension
-        working-directory: clients/cobol-lsp-vscode-extension
-        run: |
-          npm ci
-          npm run test:web
       - name: Package IDMS vsix
         working-directory: clients/idms-dialect-support
         run: |
@@ -161,6 +156,21 @@ jobs:
         uses: sonarsource/sonarcloud-github-action@49e6cd3b187936a73b8280d59ffd9da69df63ec9
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+  buildWeb:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Unit Test COBOL LS Web extension
+        working-directory: clients/cobol-lsp-vscode-extension
+        run: |
+          npm ci
+          npm run test:web
+      - name: Package COBOL LS vsix for Web
+        working-directory: clients/cobol-lsp-vscode-extension
+        run: |
+          npm ci
+          npm run package:web
+          cp *.vsix ../../.
 
   buildNative:
     strategy:
@@ -345,11 +355,6 @@ jobs:
         working-directory: clients/cobol-lsp-vscode-extension
         run: |
           npm run package  -- --target ${{ env.target }}
-          cp *.vsix ../../.
-      - name: Package COBOL LS vsix for Web
-        working-directory: clients/cobol-lsp-vscode-extension
-        run: |
-          npm run package:web
           cp *.vsix ../../.
       - uses: actions/upload-artifact@v3
         with:
