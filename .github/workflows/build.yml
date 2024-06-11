@@ -171,6 +171,12 @@ jobs:
           npm ci
           npm run package:web
           cp *.vsix ../../.
+      - name: Upload Web vsix
+        uses: actions/upload-artifact@v3
+        with:
+          if-no-files-found: warn
+          name: vsix-cobol-language-support-web
+          path: 'cobol-language-support-web*.vsix'
 
   buildNative:
     strategy:
