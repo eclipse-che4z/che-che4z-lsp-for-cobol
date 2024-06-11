@@ -26,7 +26,7 @@ execRule: EXEC SQL sqlCode END_EXEC
 
 nonExecRule: result_set_locator_host_variable;
 
-result_set_locator_host_variable: LEVEL_01 entry_name  (USAGE IS?)? SQL TYPE IS RESULT_SET_LOCATOR VARYING;
+result_set_locator_host_variable: dbs_level_01 entry_name  (USAGE IS?)? SQL TYPE IS RESULT_SET_LOCATOR VARYING;
 entry_name : (FILLER |dbs_host_names);
 sqlCode
    : ~END_EXEC*?
@@ -1609,7 +1609,7 @@ dbs_descriptor_name: COLONCHAR? (SQLD | SQLDABC | SQLN | SQLVAR | SQLDA | IDENTI
 dbs_diagnostic_string_expression: dbs_expressions;
 dbs_distinct_type: db2sql_data_types+;
 dbs_distinct_type_name: T=dbs_sql_identifier {validateLength($T.text, "Distinct type name", 128);};
-dbs_dpsegsz_param: SINGLEDIGITLITERAL? (ZERO_DIGIT | dbs_integer2 | dbs_integer4 | dbs_integer6 | dbs_integer8);// DPSEGSZ value, divisible by 4. Range [0,64], must be checked in code.
+dbs_dpsegsz_param: dbs_s? (ZERO_DIGIT | dbs_integer2 | dbs_integer4 | dbs_integer6 | dbs_integer8);// DPSEGSZ value, divisible by 4. Range [0,64], must be checked in code.
 dbs_end_column_name: dbs_generic_name;
 dbs_element_name: IDENTIFIER;
 dbs_encryption_value: QUOTED_NONE | LOW | HIGH;
@@ -1634,7 +1634,7 @@ dbs_imptkmod_param: YES | NO;
 dbs_include_data_type: dbs_alter_procedure_bit_int | dbs_alter_procedure_bit_decimal | dbs_alter_procedure_bit_float | dbs_alter_procedure_bit_decfloat | dbs_alter_procedure_bit_char | dbs_alter_procedure_bit_graphic | dbs_alter_procedure_bit_varchar | DATE | TIME | dbs_alter_procedure_bit_timestamp;
 dbs_index_identifier: IDENTIFIER;
 dbs_index_name: T=dbs_sql_identifier {validateLength($T.text, "Index name", 128);};
-dbs_integer: INTEGERLITERAL | LEVEL_01;
+dbs_integer: INTEGERLITERAL | SINGLEDIGIT_1 | DOUBLEDIGIT_1 | SINGLEDIGITLITERAL;
 dbs_integer_constant: dbs_integer | NUMERICLITERAL; //range 1 - 32767
 dbs_jar_name: T=dbs_hostname_identifier {validateLength($T.text, "Jar name", 128);};
 dbs_jobname_value: IDENTIFIER | NONNUMERICLITERAL;
@@ -1647,7 +1647,7 @@ dbs_mc_name: IDENTIFIER;// must be 1-8 characters in length
 dbs_member_name: dbs_sql_identifier;
 dbs_name: dbs_sql_identifier; // name of the WLM environment is an SQL identifier
 dbs_namespace_name: VARCHAR;
-dbs_nnnn_m: SINGLEDIGITLITERAL SINGLEDIGITLITERAL? SINGLEDIGITLITERAL? SINGLEDIGITLITERAL? DOT_FS SINGLEDIGITLITERAL;
+dbs_nnnn_m: dbs_s dbs_s? dbs_s? dbs_s? DOT_FS dbs_s;
 dbs_non_deterministic_expression: DATA CHANGE OPERATION | dbs_special_register | dbs_session_variable;
 dbs_session_variable : SYSIBM DOT_FS PACKAGE_NAME | SYSIBM DOT_FS PACKAGE_SCHEMA | SYSIBM DOT_FS PACKAGE_VERSION;
 dbs_numeric_constant: dbs_integer;// numeric literal without non-zero digits to the right of the decimal point.
@@ -1670,7 +1670,7 @@ dbs_role_name: T=dbs_sql_identifier+ {validateLength($T.text, "Role name", 128);
 dbs_routine_version_id: IDENTIFIER {validateLength($IDENTIFIER.text, "Routine version identifier in UTF-8", 122);};
 dbs_rs_locator_variable: dbs_host_var_identifier;
 dbs_run_time_options: NONNUMERICLITERAL; // a character string that is no longer than 254 bytes
-dbs_s: SINGLEDIGITLITERAL ; // a number between 1 and 9
+dbs_s: SINGLEDIGITLITERAL | SINGLEDIGIT_1 ; // a number between 1 and 9
 dbs_sc_name: IDENTIFIER;// must be from 1-8 characters in length
 dbs_scalar_fullselect : LPARENCHAR dbs_fullselect RPARENCHAR;
 dbs_schema_location: dbs_hostname_identifier;
@@ -1783,24 +1783,25 @@ dbs_sql_identifier: NONNUMERICLITERAL | IDENTIFIER | FILENAME | FILENAME (DOT_FS
 dbs_comma_separator: (COMMASEPARATORDB2 | COMMACHAR);
 dbs_semicolon_end: SEMICOLON_FS | SEMICOLONSEPARATORSQL;
 
-dbs_integer0: INTEGERLITERAL  {validateValue($INTEGERLITERAL.text, "0");};
-dbs_integer1: LEVEL_01  {validateValue($LEVEL_01.text, "1");};
-dbs_integer2: INTEGERLITERAL  {validateValue($INTEGERLITERAL.text, "2");};
-dbs_integer4: INTEGERLITERAL  {validateValue($INTEGERLITERAL.text, "4");};
-dbs_integer5: INTEGERLITERAL  {validateValue($INTEGERLITERAL.text, "5");};
-dbs_integer6: INTEGERLITERAL  {validateValue($INTEGERLITERAL.text, "6");};
-dbs_integer8: INTEGERLITERAL  {validateValue($INTEGERLITERAL.text, "8");};
-dbs_integer12: INTEGERLITERAL  {validateValue($INTEGERLITERAL.text, "12");};
-dbs_integer15: INTEGERLITERAL  {validateValue($INTEGERLITERAL.text, "15");};
-dbs_integer16: INTEGERLITERAL  {validateValue($INTEGERLITERAL.text, "16");};
-dbs_integer31: INTEGERLITERAL  {validateValue($INTEGERLITERAL.text, "31");};
-dbs_integer34: INTEGERLITERAL  {validateValue($INTEGERLITERAL.text, "34");};
-dbs_integer100: INTEGERLITERAL  {validateValue($INTEGERLITERAL.text, "100");};
-dbs_integer256: INTEGERLITERAL  {validateValue($INTEGERLITERAL.text, "256");};
-dbs_integer1200: INTEGERLITERAL  {validateValue($INTEGERLITERAL.text, "1200");};
-dbs_integer1208: INTEGERLITERAL  {validateValue($INTEGERLITERAL.text, "1208");};
-dbs_integer_max: INTEGERLITERAL  {validateValue($INTEGERLITERAL.text, "2147483647");};
-dbs_char_a: NONNUMERICLITERAL  {validateValue($NONNUMERICLITERAL.text, "A");};
-dbs_char_n: NONNUMERICLITERAL  {validateValue($NONNUMERICLITERAL.text, "N");};
-dbs_char_r: NONNUMERICLITERAL  {validateValue($NONNUMERICLITERAL.text, "R");};
+dbs_integer0: T=dbs_integer  {validateValue($T.text, "0");};
+dbs_integer1: T=dbs_integer  {validateValue($T.text, "1");};
+dbs_integer2: T=dbs_integer  {validateValue($T.text, "2");};
+dbs_integer4: T=dbs_integer  {validateValue($T.text, "4");};
+dbs_integer5: T=dbs_integer  {validateValue($T.text, "5");};
+dbs_integer6: T=dbs_integer  {validateValue($T.text, "6");};
+dbs_integer8: T=dbs_integer  {validateValue($T.text, "8");};
+dbs_integer12: T=dbs_integer  {validateValue($T.text, "12");};
+dbs_integer15: T=dbs_integer  {validateValue($T.text, "15");};
+dbs_integer16: T=dbs_integer  {validateValue($T.text, "16");};
+dbs_integer31: T=dbs_integer  {validateValue($T.text, "31");};
+dbs_integer34: T=dbs_integer  {validateValue($T.text, "34");};
+dbs_integer100: T=dbs_integer  {validateValue($T.text, "100");};
+dbs_integer256: T=dbs_integer  {validateValue($T.text, "256");};
+dbs_integer1200: T=dbs_integer  {validateValue($T.text, "1200");};
+dbs_integer1208: T=dbs_integer  {validateValue($T.text, "1208");};
+dbs_integer_max: T=dbs_integer  {validateValue($T.text, "2147483647");};
+dbs_char_a: T=(NONNUMERICLITERAL | IDENTIFIER)  {validateValue($T.text, "A");};
+dbs_char_n: T=(NONNUMERICLITERAL | IDENTIFIER) {validateValue($T.text, "N");};
+dbs_char_r: T=(NONNUMERICLITERAL | IDENTIFIER) {validateValue($T.text, "R");};
+dbs_level_01: SINGLEDIGIT_1 | DOUBLEDIGIT_1;
 /////

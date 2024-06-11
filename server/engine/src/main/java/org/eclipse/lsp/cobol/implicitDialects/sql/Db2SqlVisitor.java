@@ -94,10 +94,10 @@ class Db2SqlVisitor extends Db2SqlParserBaseVisitor<List<Node>> {
     // variable definition node
     VariableDefinitionNode variableDefinitionNode =
         VariableDefinitionNode.builder()
-            .level(VisitorHelper.getLevel(ctx.LEVEL_01()))
+            .level(Integer.parseInt(ctx.dbs_level_01().getText()))
             .levelLocality(
                 getLocality(
-                    this.context.getExtendedDocument().mapLocation(constructRange(ctx.LEVEL_01()))))
+                    this.context.getExtendedDocument().mapLocation(constructRange(ctx.dbs_level_01()))))
             .statementLocality(statementLocality)
             .variableNameAndLocality(
                 new VariableNameAndLocality(
