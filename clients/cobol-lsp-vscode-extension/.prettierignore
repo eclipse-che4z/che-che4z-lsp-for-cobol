@@ -17,6 +17,7 @@ out
 dist
 .nyc_output
 .vscode-test
+.vscode-test-web
 # Ignore markdown files
 **/*.md
 # Ignore npm package lock

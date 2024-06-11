@@ -25,7 +25,7 @@ export async function run(): Promise<void> {
     cwd: path.join(sourceRoot, ".."),
     reporter: ["lcov"],
     hookRequire: true,
-    exclude: ["**/test/**", ".vscode-test/**"],
+    exclude: ["**/test/**", ".vscode-test/**", ".vscode-test-web/**"],
   });
 
   // decache files on windows to be hookable by nyc

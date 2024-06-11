@@ -7,6 +7,9 @@ module.exports = {
     "<rootDir>/out",
     "<rootDir>/dist",
     "<rootDir>/src/test",
+    "<rootDir>/src/web",
+    "<rootDir>/.vscode-test",
+    "<rootDir>/.vscode-test-web",
   ],
   collectCoverage: true,
   collectCoverageFrom: [

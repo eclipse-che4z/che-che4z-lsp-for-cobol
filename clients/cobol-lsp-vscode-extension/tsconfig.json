@@ -32,5 +32,5 @@
     "sourceMap": true,
     "resolveJsonModule": true
   },
-  "exclude": ["node_modules", "server", ".vscode-test"]
+  "exclude": ["node_modules", "server", ".vscode-test", ".vscode-test-web"]
 }
