@@ -96,6 +96,14 @@ export class DownloadStrategyResolver {
     return false;
   }
 
+  /**
+   * Clears downloaders cache
+   */
+  clearCache() {
+    this.dsnDownloader?.clearMemberListCache();
+    this.ussDownloader?.clearMemberListCache();
+  }
+
   private async downloadFromPaths(
     downloader: CopybookDownloaderForDsn | CopybookDownloaderForUss,
     copybook: CopybookName,

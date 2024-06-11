@@ -46,9 +46,8 @@ public interface CstNode {
         for (CstNode child : getChildren()) {
             if (clazz.isInstance(child)) {
                 result.add((T) child);
-            } else {
-                result.addAll(child.list(clazz));
             }
+            result.addAll(child.list(clazz));
         }
         return result;
     }

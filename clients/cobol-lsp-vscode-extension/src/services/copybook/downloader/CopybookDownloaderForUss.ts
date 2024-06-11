@@ -75,10 +75,20 @@ export class CopybookDownloaderForUss extends ZoweExplorerDownloader {
   }
 
   private async getAllMembers(profileName: string, dataset: string) {
+    const id = this.createId(profileName, dataset);
+
+    if (this.memberListCache.has(id)) {
+      return this.memberListCache.get(id)!;
+    }
+
+    const profile = DownloadUtil.loadProfile(profileName, this.explorerAPI);
     const response = await this.explorerAPI
-      .getUssApi(DownloadUtil.loadProfile(profileName, this.explorerAPI))
+      .getUssApi(profile)
       .fileList(dataset);
-    return response.apiResponse.items.map((el: any) => el.name);
+    const members = response.apiResponse.items.map((el: any) => el.name);
+
+    this.memberListCache.set(id, members);
+    return members;
   }
 
   /**

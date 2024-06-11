@@ -131,6 +131,20 @@ describe("tests download resolver", () => {
     );
   });
 
+  it("checks download fails if ZE apis are missing", async () => {
+    const resolver = new DownloadStrategyResolver("storage-path", undefined);
+    const result = await resolver.downloadCopybook(
+      { name: "copybook", dialect: "COBOL" },
+      "doc-uri",
+    );
+    expect(result).toBeFalsy();
+  });
+
+  it("checks clear cache do not throw error when ZE apis are missing", () => {
+    const resolver = new DownloadStrategyResolver("storage-path", undefined);
+    expect(() => resolver.clearCache()).not.toThrowError();
+  });
+
   describe("checks successful resolution calls callback method", () => {
     const downloader = new DownloadStrategyResolver(
       "storage-path",

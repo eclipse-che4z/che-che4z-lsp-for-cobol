@@ -87,7 +87,7 @@ describe("Tests Copybook download from USS", () => {
     });
   });
 
-  describe("checks the copybook download using ZE DSN API's", () => {
+  describe("checks the copybook download using ZE USS API's", () => {
     const downloader = new CopybookDownloaderForUss(
       "storage-path",
       zoweExplorerMock,
@@ -112,7 +112,7 @@ describe("Tests Copybook download from USS", () => {
       expect(isDowloaded).toBeFalsy();
     });
 
-    it("checks eligible copybook invoke appropriate ZE Api's", async () => {
+    describe("checks eligible copybook invoke appropriate ZE Api's", () => {
       ProfileUtils.getProfileNameForCopybook = jest
         .fn()
         .mockReturnValue("test-profile");
@@ -127,22 +127,45 @@ describe("Tests Copybook download from USS", () => {
         .fn()
         .mockReturnValue({ fsPath: "profile/uss/path/copybook" });
 
-      const isDowloaded = await downloader.downloadCopybook(
-        { name: "uss_copybook", dialect: "COBOL" },
-        "document-uri",
-        "/uss/path",
-      );
-      expect(allUSSFilemembers).toHaveBeenCalledWith("/uss/path");
-      expect(getUSSContentsMock).toHaveBeenCalledWith(
-        "/uss/path/uss_copybook",
-        {
-          file: "profile/uss/path/copybook",
-          binary: true,
-          encoding: "utf8",
-          returnEtag: true,
-        },
-      );
-      expect(isDowloaded).toBeTruthy();
+      it("checks appropriate invokation of ZE API's", async () => {
+        downloader.clearMemberListCache();
+        const isDowloaded = await downloader.downloadCopybook(
+          { name: "uss_copybook", dialect: "COBOL" },
+          "document-uri",
+          "/uss/path",
+        );
+        expect(allUSSFilemembers).toHaveBeenCalledWith("/uss/path");
+        expect(getUSSContentsMock).toHaveBeenCalledWith(
+          "/uss/path/uss_copybook",
+          {
+            file: "profile/uss/path/copybook",
+            binary: true,
+            encoding: "utf8",
+            returnEtag: true,
+          },
+        );
+        expect(isDowloaded).toBeTruthy();
+      });
+
+      it("checks cache is used if download is trigged again for same profile and uss path", async () => {
+        const isDowloaded = await downloader.downloadCopybook(
+          { name: "uss_copybook", dialect: "COBOL" },
+          "document-uri",
+          "/uss/path",
+        );
+        // cache resolves the members
+        expect(allUSSFilemembers).not.toHaveBeenCalled();
+        expect(getUSSContentsMock).toHaveBeenCalledWith(
+          "/uss/path/uss_copybook",
+          {
+            file: "profile/uss/path/copybook",
+            binary: true,
+            encoding: "utf8",
+            returnEtag: true,
+          },
+        );
+        expect(isDowloaded).toBeTruthy();
+      });
     });
   });
 });
