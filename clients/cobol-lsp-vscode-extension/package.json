@@ -541,7 +541,7 @@
     "vscode:prepublish": "npm run -S build -- --minify",
     "postinstall": "node -e \"if (process.env.NODE_ENV === 'production'){process.exit(1)} \" && patch-package || echo skip patching",
     "build": "esbuild src/extension.ts --bundle --sourcemap --platform=node --target=node16.17.1 --outdir=dist --external:vscode --format=cjs",
-    "build:web": "node esbuild.js",
+    "build:web": "node build.web.js",
     "build:watch": "npm run build -- --watch",
     "test:integration": "npm run compile && node ./out/test/runTest.js",
     "test:web": "npm run build:web && vscode-test-web --browserType=chromium --headless --extensionDevelopmentPath=. --extensionTestsPath=dist/web/test/suite/extensionTests.js",

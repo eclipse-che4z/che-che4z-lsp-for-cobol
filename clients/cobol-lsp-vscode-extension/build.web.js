@@ -1,4 +1,4 @@
-const esbuild = require("esbuild");
+const buildWeb = require("esbuild");
 const glob = require("glob");
 const path = require("path");
 
@@ -61,7 +61,7 @@ const testBundlePlugin = {
 };
 
 async function main() {
-  const ctx = await esbuild.context({
+  const ctx = await buildWeb.context({
     entryPoints: [
       "src/web/extension.ts",
       "src/web/test/suite/extensionTests.ts",
