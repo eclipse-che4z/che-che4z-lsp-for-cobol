@@ -43,7 +43,7 @@ import org.eclipse.lsp4j.Location;
  * Parser stage
  */
 @RequiredArgsConstructor
-class ExperimentalParserStage implements Stage<AnalysisContext, ParserStageResult, DialectOutcome> {
+public class ExperimentalParserStage implements Stage<AnalysisContext, ParserStageResult, DialectOutcome> {
   private final MessageService messageService;
   private final ParseTreeListener treeListener;
 
