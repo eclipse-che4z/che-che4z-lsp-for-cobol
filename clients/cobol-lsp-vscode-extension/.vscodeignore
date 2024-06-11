@@ -39,6 +39,10 @@
 !dist/extension.js.map
 !dist/web/extension.js
 !dist/web/extension.js.map
+!extension/dist/extension.js
+!extension/dist/extension.js.map
+!extension/dist/web/extension.js
+!extension/dist/web/extension.js.map
 # ** server implementation 
 !server/native/*
 !server/jar/server.jar
