@@ -14,34 +14,33 @@
  */
 package org.eclipse.lsp.cobol.core.engine.processors;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Iterables;
-import lombok.experimental.UtilityClass;
-import lombok.extern.slf4j.Slf4j;
-import org.eclipse.lsp.cobol.common.ResultWithErrors;
-import org.eclipse.lsp.cobol.common.error.ErrorSource;
-import org.eclipse.lsp.cobol.common.error.SyntaxError;
-import org.eclipse.lsp.cobol.common.message.MessageTemplate;
-import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
-import org.eclipse.lsp.cobol.common.model.Locality;
-import org.eclipse.lsp.cobol.common.model.tree.Node;
-import org.eclipse.lsp.cobol.common.model.NodeType;
-import org.eclipse.lsp.cobol.common.model.tree.variable.*;
-import org.eclipse.lsp.cobol.common.OutlineNodeNames;
-import org.eclipse.lsp.cobol.common.model.tree.variables.*;
-
-import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
 import static java.util.stream.Collectors.groupingBy;
 import static org.eclipse.lsp.cobol.common.VariableConstants.*;
 import static org.eclipse.lsp.cobol.common.error.ErrorSeverity.ERROR;
 import static org.eclipse.lsp.cobol.common.model.tree.Node.hasType;
 import static org.eclipse.lsp.cobol.common.model.tree.variable.VariableType.FD;
 import static org.eclipse.lsp.cobol.common.model.tree.variable.VariableType.SD;
+
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import lombok.experimental.UtilityClass;
+import lombok.extern.slf4j.Slf4j;
+import org.eclipse.lsp.cobol.common.OutlineNodeNames;
+import org.eclipse.lsp.cobol.common.ResultWithErrors;
+import org.eclipse.lsp.cobol.common.error.ErrorSource;
+import org.eclipse.lsp.cobol.common.error.SyntaxError;
+import org.eclipse.lsp.cobol.common.message.MessageTemplate;
+import org.eclipse.lsp.cobol.common.model.Locality;
+import org.eclipse.lsp.cobol.common.model.NodeType;
+import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
+import org.eclipse.lsp.cobol.common.model.tree.Node;
+import org.eclipse.lsp.cobol.common.model.tree.variable.*;
+import org.eclipse.lsp.cobol.common.model.tree.variables.*;
 
 /** The utility class is for converting VariableDefinitionNode into appropriate VariableNode. */
 @UtilityClass
@@ -128,21 +127,24 @@ public class SectionNodeProcessorHelper {
             .map(CopyNode.class::cast)
             .collect(Collectors.toList());
 
-    allCopybooks.stream()
-        .filter(c -> c.getUri() != null)
-        .forEach(
-            c ->
-                new ArrayList<>(variables)
-                    .stream()
-                        .filter(Objects::nonNull)
-                        .filter(v -> v.getLocality() != null)
-                        .filter(v -> v.getLocality().getUri() != null)
-                        .filter(v -> v.getLocality().getUri().equals(c.getUri()))
-                        .forEach(
-                            v -> {
-                              variables.remove(v);
-                              c.addChild(v);
-                            }));
+//   Below could be problematic if a copybook is referenced at multiple places in a cobol doc.
+//    As the uri of copybooks would match with all variable definition and would result in a wrong node tree structure.
+//
+//    allCopybooks.stream()
+//        .filter(c -> c.getUri() != null)
+//        .forEach(
+//            c ->
+//                new ArrayList<>(variables)
+//                    .stream()
+//                        .filter(Objects::nonNull)
+//                        .filter(v -> v.getLocality() != null)
+//                        .filter(v -> v.getLocality().getUri() != null)
+//                        .filter(v -> v.getLocality().getUri().equals(c.getUri()))
+//                        .forEach(
+//                            v -> {
+//                              variables.remove(v);
+//                              c.addChild(v);
+//                            }));
 
     allCopybooks.forEach(
         copyNode -> {
