@@ -34,30 +34,32 @@ import org.eclipse.lsp.cobol.common.benchmark.BenchmarkService;
 import org.eclipse.lsp.cobol.common.benchmark.BenchmarkSession;
 import org.eclipse.lsp.cobol.common.benchmark.Measurement;
 import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
-import org.eclipse.lsp.cobol.common.dialects.TrueDialectService;
+import org.eclipse.lsp.cobol.common.copybook.CopybookService;
+import org.eclipse.lsp.cobol.common.dialects.CobolLanguageId;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedText;
 import org.eclipse.lsp.cobol.common.message.MessageService;
-import org.eclipse.lsp.cobol.core.engine.analysis.AnalysisContext;
-import org.eclipse.lsp.cobol.core.engine.dialects.DialectService;
 import org.eclipse.lsp.cobol.common.pipeline.Pipeline;
 import org.eclipse.lsp.cobol.common.pipeline.PipelineResult;
 import org.eclipse.lsp.cobol.common.pipeline.StageResult;
+import org.eclipse.lsp.cobol.core.engine.analysis.AnalysisContext;
+import org.eclipse.lsp.cobol.core.engine.dialects.DialectService;
 import org.eclipse.lsp.cobol.core.engine.processor.AstProcessor;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolsRepository;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.GrammarPreprocessor;
 import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
+import org.eclipse.lsp.cobol.dialects.TrueDialectServiceImpl;
+import org.eclipse.lsp.cobol.dialects.hp.HpCleanupStage;
+import org.eclipse.lsp.cobol.dialects.hp.HpCopybookProcessingStage;
 import org.eclipse.lsp.cobol.dialects.ibm.*;
-import org.eclipse.lsp.cobol.common.dialects.CobolLanguageId;
+import org.eclipse.lsp.cobol.dialects.ibm.experimental.ExperimentalParserStage;
 import org.eclipse.lsp.cobol.service.settings.CachingConfigurationService;
 import org.eclipse.lsp.cobol.service.settings.layout.CodeLayoutStore;
 import org.eclipse.lsp4j.Location;
 import picocli.CommandLine;
 
-/**
- * The Cli class represents a Command Line Interface (CLI) for interacting with the application.
- */
+/** The Cli class represents a Command Line Interface (CLI) for interacting with the application. */
 @CommandLine.Command(description = "COBOL Analysis CLI tools.")
 @Slf4j
 public class Cli implements Callable<Integer> {
@@ -85,6 +87,11 @@ public class Cli implements Callable<Integer> {
       description = "List of copybook paths.")
   private String[] cpyExt = {"", ".cpy"};
 
+  @CommandLine.Option(
+      description = "Supported dialect values: ${COMPLETION-CANDIDATES}",
+      names = {"-d", "--dialect"})
+  private CobolLanguageId dialect = CobolLanguageId.COBOL;
+
   /**
    * Prints the file name to the console and returns result code.
    *
@@ -94,7 +101,7 @@ public class Cli implements Callable<Integer> {
   @Override
   public Integer call() throws Exception {
     Injector diCtx = Guice.createInjector(new CliModule());
-    Pipeline<AnalysisContext> pipeline = setupPipeline(diCtx, action);
+    Pipeline<AnalysisContext> pipeline = setupPipeline(diCtx, action, dialect);
 
     CliClientProvider cliClientProvider = diCtx.getInstance(CliClientProvider.class);
     if (cpyPaths != null) {
@@ -103,7 +110,8 @@ public class Cli implements Callable<Integer> {
     cliClientProvider.setCpyExt(Arrays.asList(cpyExt));
 
     // Cleaning up
-    CleanerPreprocessor preprocessor = diCtx.getInstance(TrueDialectService.class).getPreprocessor(CobolLanguageId.COBOL);
+    CleanerPreprocessor preprocessor =
+        diCtx.getInstance(TrueDialectServiceImpl.class).getPreprocessor(dialect);
     BenchmarkService benchmarkService = diCtx.getInstance(BenchmarkService.class);
 
     if (src == null) {
@@ -117,7 +125,10 @@ public class Cli implements Callable<Integer> {
         new AnalysisContext(
             new ExtendedDocument(resultWithErrors.getResult(), text),
             createAnalysisConfiguration(),
-            benchmarkService.startSession(), documentUri, text, CobolLanguageId.COBOL);
+            benchmarkService.startSession(),
+            documentUri,
+            text,
+            dialect);
     ctx.getAccumulatedErrors().addAll(resultWithErrors.getErrors());
     PipelineResult pipelineResult = pipeline.run(ctx);
     Gson gson = new GsonBuilder().setPrettyPrinting().create();
@@ -134,7 +145,7 @@ public class Cli implements Callable<Integer> {
                   JsonObject diagnostic = toJson(err, gson);
                   diagnostics.add(diagnostic);
                 });
-        //        result.add("diagnostics", diagnostics);
+        result.add("diagnostics", diagnostics);
         break;
       case list_copybooks:
         StageResult<CopybooksRepository> copybooksResult =
@@ -177,8 +188,9 @@ public class Cli implements Callable<Integer> {
 
   private void addTiming(JsonObject result, BenchmarkSession benchmarkSession) {
     JsonObject tObj = new JsonObject();
-    benchmarkSession.getMeasurements()
-            .forEach(m -> tObj.add(m.getId(), new JsonPrimitive(m.getTime() / 1_000_000_000.0)));
+    benchmarkSession
+        .getMeasurements()
+        .forEach(m -> tObj.add(m.getId(), new JsonPrimitive(m.getTime() / 1_000_000_000.0)));
     result.add("timings", tObj);
     benchmarkSession.getMeasurements().stream()
         .map(Measurement::getTime)
@@ -190,21 +202,153 @@ public class Cli implements Callable<Integer> {
     return AnalysisConfig.defaultConfig(CopybookProcessingMode.ENABLED);
   }
 
-  private static Pipeline<AnalysisContext> setupPipeline(Injector diCtx, Action action) {
+  private static Pipeline<AnalysisContext> setupPipeline(
+      Injector diCtx, Action action, CobolLanguageId dialect) {
     DialectService dialectService = diCtx.getInstance(DialectService.class);
     MessageService messageService = diCtx.getInstance(MessageService.class);
     GrammarPreprocessor grammarPreprocessor = diCtx.getInstance(GrammarPreprocessor.class);
     ParseTreeListener parseTreeListener = diCtx.getInstance(ParseTreeListener.class);
     SymbolsRepository symbolsRepository = diCtx.getInstance(SymbolsRepository.class);
     SubroutineService subroutineService = diCtx.getInstance(SubroutineService.class);
+    CleanerPreprocessor preprocessor =
+        diCtx.getInstance(TrueDialectServiceImpl.class).getPreprocessor(dialect);
     CachingConfigurationService cachingConfigurationService =
         diCtx.getInstance(CachingConfigurationService.class);
     AstProcessor astProcessor = diCtx.getInstance(AstProcessor.class);
     CodeLayoutStore layoutStore = diCtx.getInstance(CodeLayoutStore.class);
-
-    CleanerPreprocessor preprocessor = diCtx.getInstance(TrueDialectService.class).getPreprocessor(CobolLanguageId.COBOL);
+    CopybookService copybookService = diCtx.getInstance(CopybookService.class);
 
     Pipeline<AnalysisContext> pipeline = new Pipeline<>();
+    switch (dialect) {
+      case COBOL:
+        return getPipelineForCobolDialect(
+                action,
+            pipeline,
+            preprocessor,
+            messageService,
+            dialectService,
+            grammarPreprocessor,
+            parseTreeListener,
+            symbolsRepository,
+            subroutineService,
+            cachingConfigurationService,
+            astProcessor,
+            layoutStore);
+      case EXPERIMENTAL_COBOL:
+        return getPipelineForExpCobol(
+                action,
+            pipeline,
+            preprocessor,
+            messageService,
+            dialectService,
+            grammarPreprocessor,
+            parseTreeListener,
+            symbolsRepository,
+            subroutineService,
+            cachingConfigurationService,
+            astProcessor,
+            layoutStore);
+      case HP_COBOL:
+        return getPipelineForHpCobol(
+                action,
+            pipeline,
+            preprocessor,
+            messageService,
+            copybookService,
+            grammarPreprocessor,
+            dialectService,
+            parseTreeListener,
+            symbolsRepository,
+            subroutineService,
+            cachingConfigurationService,
+            astProcessor,
+            layoutStore);
+      default:
+        return pipeline;
+    }
+  }
+
+  private static Pipeline<AnalysisContext> getPipelineForHpCobol(
+      Action action,
+      Pipeline<AnalysisContext> pipeline,
+      CleanerPreprocessor preprocessor,
+      MessageService messageService,
+      CopybookService copybookService,
+      GrammarPreprocessor grammarPreprocessor,
+      DialectService dialectService,
+      ParseTreeListener parseTreeListener,
+      SymbolsRepository symbolsRepository,
+      SubroutineService subroutineService,
+      CachingConfigurationService cachingConfigurationService,
+      AstProcessor astProcessor,
+      CodeLayoutStore layoutStore) {
+    pipeline.add(new HpCleanupStage(preprocessor));
+    pipeline.add(new CompilerDirectivesStage(messageService));
+    pipeline.add(new HpCopybookProcessingStage(messageService, copybookService));
+    pipeline.add(new PreprocessorStage(grammarPreprocessor, preprocessor));
+    if (action == Action.analysis) {
+      pipeline.add(new ImplicitDialectProcessingStage(dialectService));
+      pipeline.add(new ParserStage(messageService, parseTreeListener));
+      pipeline.add(
+          new TransformTreeStage(
+              symbolsRepository,
+              messageService,
+              subroutineService,
+              cachingConfigurationService,
+              dialectService,
+              astProcessor,
+              layoutStore));
+    }
+    return pipeline;
+  }
+
+  private static Pipeline<AnalysisContext> getPipelineForExpCobol(
+      Action action,
+      Pipeline<AnalysisContext> pipeline,
+      CleanerPreprocessor preprocessor,
+      MessageService messageService,
+      DialectService dialectService,
+      GrammarPreprocessor grammarPreprocessor,
+      ParseTreeListener parseTreeListener,
+      SymbolsRepository symbolsRepository,
+      SubroutineService subroutineService,
+      CachingConfigurationService cachingConfigurationService,
+      AstProcessor astProcessor,
+      CodeLayoutStore layoutStore) {
+    pipeline.add(new IbmCleanupStage(preprocessor));
+    pipeline.add(new CompilerDirectivesStage(messageService));
+    pipeline.add(new DialectProcessingStage(dialectService, preprocessor));
+    pipeline.add(new PreprocessorStage(grammarPreprocessor, preprocessor));
+    if (action == Action.analysis) {
+      pipeline.add(new ImplicitDialectProcessingStage(dialectService));
+      pipeline.add(new ExperimentalParserStage(messageService, parseTreeListener));
+      pipeline.add(
+          new TransformTreeStage(
+              symbolsRepository,
+              messageService,
+              subroutineService,
+              cachingConfigurationService,
+              dialectService,
+              astProcessor,
+              layoutStore));
+    }
+    return pipeline;
+  }
+
+  private static Pipeline<AnalysisContext> getPipelineForCobolDialect(
+      Action action,
+      Pipeline<AnalysisContext> pipeline,
+      CleanerPreprocessor preprocessor,
+      MessageService messageService,
+      DialectService dialectService,
+      GrammarPreprocessor grammarPreprocessor,
+      ParseTreeListener parseTreeListener,
+      SymbolsRepository symbolsRepository,
+      SubroutineService subroutineService,
+      CachingConfigurationService cachingConfigurationService,
+      AstProcessor astProcessor,
+      CodeLayoutStore layoutStore) {
+    pipeline.add(new IbmCleanupStage(preprocessor));
     pipeline.add(new CompilerDirectivesStage(messageService));
     pipeline.add(new DialectProcessingStage(dialectService, preprocessor));
     pipeline.add(new PreprocessorStage(grammarPreprocessor, preprocessor));
