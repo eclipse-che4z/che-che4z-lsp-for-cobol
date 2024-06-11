@@ -1,7 +1,6 @@
 const esbuild = require('esbuild');
 const glob = require('glob');
 const path = require('path');
-const polyfill = require('@esbuild-plugins/node-globals-polyfill');
 
 const production = process.argv.includes('--production');
 const watch = process.argv.includes('--watch');
@@ -78,10 +77,6 @@ async function main() {
         },
 
         plugins: [
-            polyfill.NodeGlobalsPolyfillPlugin({
-                process: true,
-                buffer: true,
-            }),
             testBundlePlugin,
             esbuildProblemMatcherPlugin, /* add to the end of plugins array */
         ],

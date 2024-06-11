@@ -564,7 +564,6 @@
     "vscode-languageclient": "8.0.2"
   },
   "devDependencies": {
-    "@esbuild-plugins/node-globals-polyfill": "^0.2.3",
     "@types/assert": "^1.5.10",
     "@types/fs-extra": "^9.0.13",
     "@types/jest": "^29.0.3",
