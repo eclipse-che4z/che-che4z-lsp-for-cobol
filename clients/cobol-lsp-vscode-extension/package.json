@@ -575,6 +575,7 @@
     "@vscode/test-electron": "2.3.8",
     "@vscode/test-web": "^0.0.54",
     "@vscode/vsce": "2.19.0",
+    "assert": "^2.1.0",
     "decache": "^4.6.1",
     "esbuild": "^0.20.2",
     "eslint-plugin-sonarjs": "^0.15.0",
