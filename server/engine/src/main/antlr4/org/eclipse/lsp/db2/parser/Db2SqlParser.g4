@@ -31,7 +31,10 @@ host_variable_rule: (result_set_locator_host_variable | binary_host_variable);
 result_set_locator_host_variable: dbs_level_01 entry_name  (USAGE IS?)? SQL TYPE IS RESULT_SET_LOCATOR VARYING;
 
 binary_host_variable: dbs_level_01 entry_name host_variable_usage binary_host_variable_type;
-binary_host_variable_type: ((BINARY | VARBINARY) LPARENCHAR INTEGERLITERAL RPARENCHAR ) | BINARY VARYING;
+binary_host_variable_type: BINARY LPARENCHAR binary_host_variable_binary_size RPARENCHAR | VARBINARY LPARENCHAR binary_host_variable_varbinary_size RPARENCHAR  | BINARY VARYING;
+
+binary_host_variable_binary_size: dbs_positive_integerliteral {validateTextInRange($dbs_positive_integerliteral.text, 0, 256);};
+binary_host_variable_varbinary_size: dbs_positive_integerliteral {validateTextInRange($dbs_positive_integerliteral.text, 0, 32705);};
 
 host_variable_usage: (USAGE IS?)? SQL TYPE IS;
 
@@ -1790,6 +1793,9 @@ dbs_pieceSize : IDENTIFIER {validateTokenWithRegex($IDENTIFIER.text, "\\d+[MmGgK
 dbs_sql_identifier: NONNUMERICLITERAL | IDENTIFIER | FILENAME | FILENAME (DOT_FS IDENTIFIER)* | DSNDB04 | TRANSACTION | RECORDS | dbs_special_name;
 dbs_comma_separator: (COMMASEPARATORDB2 | COMMACHAR);
 dbs_semicolon_end: SEMICOLON_FS | SEMICOLONSEPARATORSQL;
+
+dbs_positive_integerliteral: (dbs_integerliteral_expanded | {notifyError("parsers.positiveIntOnly");} MINUSCHAR dbs_integerliteral_expanded);
+dbs_integerliteral_expanded: (INTEGERLITERAL|SINGLEDIGITLITERAL|SINGLEDIGIT_1);
 
 dbs_integer0: T=dbs_integer  {validateValue($T.text, "0");};
 dbs_integer1: T=dbs_integer  {validateValue($T.text, "1");};
