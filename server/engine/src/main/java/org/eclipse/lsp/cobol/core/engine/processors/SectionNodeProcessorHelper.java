@@ -106,6 +106,7 @@ public class SectionNodeProcessorHelper {
   private List<VariableDefinitionNode> unwrapVariables(Node node) {
     List<VariableDefinitionNode> variables = new ArrayList<>();
     List<CopyNode> copybooks = new LinkedList<>();
+    String nodeUri = node.getLocality().getUri();
 
     node.getChildren()
         .forEach(
@@ -127,24 +128,25 @@ public class SectionNodeProcessorHelper {
             .map(CopyNode.class::cast)
             .collect(Collectors.toList());
 
-//   Below could be problematic if a copybook is referenced at multiple places in a cobol doc.
-//    As the uri of copybooks would match with all variable definition and would result in a wrong node tree structure.
-//
-//    allCopybooks.stream()
-//        .filter(c -> c.getUri() != null)
-//        .forEach(
-//            c ->
-//                new ArrayList<>(variables)
-//                    .stream()
-//                        .filter(Objects::nonNull)
-//                        .filter(v -> v.getLocality() != null)
-//                        .filter(v -> v.getLocality().getUri() != null)
-//                        .filter(v -> v.getLocality().getUri().equals(c.getUri()))
-//                        .forEach(
-//                            v -> {
-//                              variables.remove(v);
-//                              c.addChild(v);
-//                            }));
+    //   Below could be problematic if a copybook is referenced at multiple places in a cobol doc.
+    //    As the uri of copybooks would match with all variable definition and would result in a
+    // wrong node tree structure.
+    //
+    //    allCopybooks.stream()
+    //        .filter(c -> c.getUri() != null)
+    //        .forEach(
+    //            c ->
+    //                new ArrayList<>(variables)
+    //                    .stream()
+    //                        .filter(Objects::nonNull)
+    //                        .filter(v -> v.getLocality() != null)
+    //                        .filter(v -> v.getLocality().getUri() != null)
+    //                        .filter(v -> v.getLocality().getUri().equals(c.getUri()))
+    //                        .forEach(
+    //                            v -> {
+    //                              variables.remove(v);
+    //                              c.addChild(v);
+    //                            }));
 
     allCopybooks.forEach(
         copyNode -> {
@@ -156,7 +158,11 @@ public class SectionNodeProcessorHelper {
             if (variable.getLocality().getUri().equals(uri) && variableLine > copybookLine) {
               break;
             }
-            index.incrementAndGet();
+            // index of variable node insertion from copybooks,
+            // should happen  after variable located at same uri as copybook
+            if (variable.getLocality().getUri().equals(uri)) {
+              index.incrementAndGet();
+            }
           }
 
           copyNode
