@@ -260,6 +260,7 @@ function registerCommands(
       "cobol-lsp.clear.downloaded.copybooks",
       () => {
         clearCache(context.globalStorageUri);
+        copyBooksDownloader.clearCache();
       },
     ),
   );

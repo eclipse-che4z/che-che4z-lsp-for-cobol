@@ -49,7 +49,7 @@ import org.eclipse.lsp4j.Location;
  * Resolving and inserting copybooks into the extended source stage
  */
 @RequiredArgsConstructor
-class HpCopybookProcessingStage implements Stage<AnalysisContext, DialectOutcome, Void> {
+public class HpCopybookProcessingStage implements Stage<AnalysisContext, DialectOutcome, Void> {
 
   private final MessageService messageService;
   private final CopybookService copybookService;

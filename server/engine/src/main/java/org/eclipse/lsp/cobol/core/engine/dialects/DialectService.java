@@ -179,7 +179,7 @@ public class DialectService {
    *
    * @return list of all the supported implicit dialects
    */
-  private ImmutableList<CobolDialect> getImplicitCobolDialects() {
+  public ImmutableList<CobolDialect> getImplicitCobolDialects() {
     return ImmutableList.of(
         new CICSDialect(copybookService, messageService),
         new Db2SqlDialect(copybookService, messageService));

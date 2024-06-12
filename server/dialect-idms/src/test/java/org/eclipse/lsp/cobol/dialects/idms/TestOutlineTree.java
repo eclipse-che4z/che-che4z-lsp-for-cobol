@@ -14,7 +14,14 @@
  */
 package org.eclipse.lsp.cobol.dialects.idms;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import com.google.common.collect.ImmutableList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import org.eclipse.lsp.cobol.common.AnalysisResult;
 import org.eclipse.lsp.cobol.common.model.NodeSymbolType;
 import org.eclipse.lsp.cobol.service.utils.BuildOutlineTreeFromSyntaxTree;
@@ -24,14 +31,6 @@ import org.eclipse.lsp.cobol.test.engine.UseCaseUtils;
 import org.eclipse.lsp4j.DocumentSymbol;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /** This test checks that Outline tree fot the program is constructed correctly */
 class TestOutlineTree {
@@ -171,12 +170,10 @@ class TestOutlineTree {
                     "IDENTIFICATION DIVISION",
                     NodeSymbolType.DIVISION,
                     nested(node("PROGRAM-ID HELLO-WORLD", NodeSymbolType.PROGRAM_ID))),
-                node("ENVIRONMENT DIVISION",
+                node(
+                    "ENVIRONMENT DIVISION",
                     NodeSymbolType.DIVISION,
-                    nested(
-                        node("IDMS-CONTROL SECTION",
-                            NodeSymbolType.SECTION)
-                    )),
+                    nested(node("IDMS-CONTROL SECTION", NodeSymbolType.SECTION))),
                 node(
                     "DATA DIVISION",
                     NodeSymbolType.DIVISION,
@@ -184,7 +181,9 @@ class TestOutlineTree {
                         node(
                             "MAP SECTION",
                             NodeSymbolType.SECTION,
-                            nested(node("MAP1", NodeSymbolType.FIELD), node("EMPMAP", NodeSymbolType.FIELD))),
+                            nested(
+                                node("MAP1", NodeSymbolType.FIELD),
+                                node("EMPMAP", NodeSymbolType.FIELD))),
                         node(
                             "WORKING-STORAGE SECTION",
                             NodeSymbolType.SECTION,
@@ -196,11 +195,11 @@ class TestOutlineTree {
                                     "USER-ADDRESS",
                                     NodeSymbolType.STRUCT,
                                     nested(
-                                        node("COPY BAZ", NodeSymbolType.COPYBOOK),
                                         node("USER-CITY", NodeSymbolType.FIELD),
                                         node("USER-COUNTRY", NodeSymbolType.FIELD),
                                         node("USER-INDEX", NodeSymbolType.FIELD),
                                         node("USER-PHONE", NodeSymbolType.FIELD))),
+                                node("COPY BAZ", NodeSymbolType.COPYBOOK),
                                 node(
                                     "FILLER",
                                     NodeSymbolType.STRUCT,
@@ -333,7 +332,9 @@ class TestOutlineTree {
     return node(name, nodeSymbolType, ImmutableList.of());
   }
 
-  private DocumentSymbol node(String name, NodeSymbolType nodeSymbolType, List<DocumentSymbol> nested) {
-    return new DocumentSymbol(name, nodeSymbolType.getSymbolKind(), new Range(), new Range(), "", nested);
+  private DocumentSymbol node(
+      String name, NodeSymbolType nodeSymbolType, List<DocumentSymbol> nested) {
+    return new DocumentSymbol(
+        name, nodeSymbolType.getSymbolKind(), new Range(), new Range(), "", nested);
   }
 }
