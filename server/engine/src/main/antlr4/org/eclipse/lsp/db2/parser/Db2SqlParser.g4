@@ -33,8 +33,8 @@ result_set_locator_host_variable: dbs_level_01 entry_name  (USAGE IS?)? SQL TYPE
 binary_host_variable: dbs_level_01 entry_name host_variable_usage binary_host_variable_type;
 binary_host_variable_type: BINARY LPARENCHAR binary_host_variable_binary_size RPARENCHAR | VARBINARY LPARENCHAR binary_host_variable_varbinary_size RPARENCHAR  | BINARY VARYING;
 
-binary_host_variable_binary_size: dbs_positive_integerliteral {validateTextInRange($dbs_positive_integerliteral.text, 0, 256);};
-binary_host_variable_varbinary_size: dbs_positive_integerliteral {validateTextInRange($dbs_positive_integerliteral.text, 0, 32705);};
+binary_host_variable_binary_size: dbs_integerliteral_expanded {validateTextInRange($dbs_integerliteral_expanded.text, 0, 256);};
+binary_host_variable_varbinary_size: dbs_integerliteral_expanded {validateTextInRange($dbs_integerliteral_expanded.text, 0, 32705);};
 
 host_variable_usage: (USAGE IS?)? SQL TYPE IS;
 
@@ -1794,8 +1794,7 @@ dbs_sql_identifier: NONNUMERICLITERAL | IDENTIFIER | FILENAME | FILENAME (DOT_FS
 dbs_comma_separator: (COMMASEPARATORDB2 | COMMACHAR);
 dbs_semicolon_end: SEMICOLON_FS | SEMICOLONSEPARATORSQL;
 
-dbs_positive_integerliteral: (dbs_integerliteral_expanded | {notifyError("parsers.positiveIntOnly");} MINUSCHAR dbs_integerliteral_expanded);
-dbs_integerliteral_expanded: (INTEGERLITERAL|SINGLEDIGITLITERAL|SINGLEDIGIT_1);
+dbs_integerliteral_expanded: MINUSCHAR? (INTEGERLITERAL|SINGLEDIGITLITERAL|SINGLEDIGIT_1);
 
 dbs_integer0: T=dbs_integer  {validateValue($T.text, "0");};
 dbs_integer1: T=dbs_integer  {validateValue($T.text, "1");};
