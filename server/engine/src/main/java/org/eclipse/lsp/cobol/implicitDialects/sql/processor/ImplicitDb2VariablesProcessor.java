@@ -48,7 +48,8 @@ public class ImplicitDb2VariablesProcessor implements Processor<SectionNode> {
                           "Program for section " + sectionNode.getSectionType() + " not found"));
       if (getSqlBackendConfig(processingContext).equalsIgnoreCase(SQLBackend.DB2_SERVER.toString()) && !hasSqlCa(programNode)) {
         registerVariables(
-            variableAccumulator, programNode, Db2ImplicitVariablesGenerator.generateDb2Nodes());
+            variableAccumulator, programNode, Db2ImplicitVariablesGenerator.generateDb2Nodes(
+                        processingContext.getCompilerDirectiveContext().getCompilerDirectiveMap()));
       }
       if (getSqlBackendConfig(processingContext).equalsIgnoreCase(SQLBackend.DATACOM_SERVER.toString()) && !hasSqlCa(programNode)) {
         registerVariables(
