@@ -18,21 +18,22 @@ import com.google.common.collect.Multimap;
 import com.google.gson.*;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
-
+import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.eclipse.lsp.cobol.cli.di.CliModule;
 import org.eclipse.lsp.cobol.cli.modules.CliClientProvider;
 import org.eclipse.lsp.cobol.cli.processorgroups.ProcessorGroupsResolver;
+import org.eclipse.lsp.cobol.cli.processorgroups.Program;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
 import org.eclipse.lsp.cobol.common.CleanerPreprocessor;
 import org.eclipse.lsp.cobol.common.ResultWithErrors;
@@ -74,6 +75,7 @@ import picocli.CommandLine;
 public class Cli implements Callable<Integer> {
   private enum Action {
     list_copybooks,
+    list_sources,
     analysis
   }
 
@@ -180,11 +182,45 @@ public class Cli implements Callable<Integer> {
         result.add("copybookUris", copybookUris);
         result.add("missingCopybooks", missingCopybooks);
         break;
+      case list_sources:
+        JsonArray sources = new JsonArray();
+        result.remove("timings");
+        if (Objects.nonNull(workspace)) {
+          try (Stream<Path> paths = Files.walk(workspace)) {
+            paths
+                .filter(Files::isRegularFile)
+                .map(f -> workspace.relativize(f))
+                .filter(this::isSourceFile)
+                .map(Path::toString)
+                .forEach(sources::add);
+          }
+        } else {
+          sources.add(src.toPath().toString());
+        }
+        result.add("sources", sources);
+        break;
       default:
         break;
     }
     System.out.println(gson.toJson(result));
     return 0;
+  }
+
+  private boolean isSourceFile(Path f) {
+    if (Objects.isNull(processorGroupsResolver)) {
+      return false;
+    }
+    List<String> programRegexList =
+        processorGroupsResolver.getProgramList().stream()
+            .map(Program::getProgram)
+            .collect(Collectors.toList());
+    for (String globPattern : programRegexList) {
+      boolean matches = FileSystems.getDefault().getPathMatcher("glob:" + globPattern).matches(f);
+      if (matches) {
+        return true;
+      }
+    }
+    return false;
   }
 
   private void initProcessorGroupsReader() {
