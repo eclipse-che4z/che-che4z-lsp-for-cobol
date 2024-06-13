@@ -28,6 +28,7 @@ class CompilerDirectiveContextTest {
 
   public static final String EXTEND = "EXTEND";
   public static final String COMPAT = "COMPAT";
+  public static final String YES = "YES";
 
   @Test
   void testCompilerOptionsContextFetch() {
@@ -54,5 +55,18 @@ class CompilerDirectiveContextTest {
     assertEquals(2, contextValueResult3.size());
 
     assertEquals(COMPAT, contextValueResult3.get(contextValueResult3.size() - 1));
+  }
+
+  @Test
+  void testCompilerOptionsContextFetchStdSql() {
+    CompilerDirectiveContext context = new CompilerDirectiveContext();
+
+    assertEquals(context.getCompilerDirectiveMap().entrySet().size(), 0);
+    context.updateDirectiveOptions(
+            new CompilerDirectiveOption(CompilerDirectiveName.STDSQL, ImmutableList.of(YES)));
+    Optional<CompilerDirectiveOption> result =
+            context.filterDirectiveList(ImmutableList.of(CompilerDirectiveName.STDSQL));
+    assertTrue(result.isPresent());
+    Assertions.assertTrue(result.get().getValue().contains(YES));
   }
 }

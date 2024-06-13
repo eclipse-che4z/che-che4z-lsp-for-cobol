@@ -56,7 +56,8 @@ class AnnotatedDocumentCleaning {
       List<CobolText> explicitCopybooks,
       List<String> subroutineNames,
       Map<String, Diagnostic> expectedDiagnostics,
-      SQLBackend sqlBackend) {
+      SQLBackend sqlBackend,
+      List<String> compilerOptions) {
     TestData testData =
         processDocument(
             text,
@@ -72,7 +73,7 @@ class AnnotatedDocumentCleaning {
     return new PreprocessedDocument(
         testData.getText(),
         processCopybooks(
-            collectCopybooks(explicitCopybooks, testData.getCopybookUsages(), sqlBackend),
+            collectCopybooks(explicitCopybooks, testData.getCopybookUsages(), sqlBackend, compilerOptions),
             expectedDiagnostics,
             testData),
         testData);
@@ -81,21 +82,22 @@ class AnnotatedDocumentCleaning {
   private Stream<CobolText> collectCopybooks(
       List<CobolText> explicitCopybooks,
       Map<String, List<Location>> usedCopybooks,
-      SQLBackend sqlBackend) {
+      SQLBackend sqlBackend,
+      List<String> compilerOptions) {
     return Stream.concat(
         explicitCopybooks.stream(),
         collectUsedPredefinedCopybooks(
             usedCopybooks.keySet(),
             explicitCopybooks.stream().map(CobolText::getFileName).collect(Collectors.toList()),
-            sqlBackend));
+            sqlBackend, compilerOptions));
   }
 
   private Stream<CobolText> collectUsedPredefinedCopybooks(
-      Set<String> copybookUsages, List<String> explicitCopybooks, SQLBackend sqlBackend) {
+      Set<String> copybookUsages, List<String> explicitCopybooks, SQLBackend sqlBackend, List<String> compilerOptions) {
     return PredefinedCopybooks.getNames().stream()
         .filter(copybookUsages::contains)
         .filter(it -> !explicitCopybooks.contains(it))
-        .map(PredefinedCopybookUtils.toCobolText(sqlBackend));
+        .map(PredefinedCopybookUtils.toCobolText(sqlBackend, compilerOptions));
   }
 
   private List<CobolText> processCopybooks(
