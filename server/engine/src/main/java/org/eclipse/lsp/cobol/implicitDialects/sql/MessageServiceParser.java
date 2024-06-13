@@ -97,6 +97,20 @@ public abstract class MessageServiceParser extends Parser {
   }
 
   /**
+   * Validate integer value against range and throw an error if it is incorrect
+   *
+   * @param input integer to check
+   * @param minValue allowed integer value
+   * @param maxValue allowed integer value
+   */
+  protected void validateIntegerRange(String input, Integer minValue, Integer maxValue) {
+    Integer intInputValue = tryParseInt(input);
+    if (intInputValue != null && !(intInputValue >= minValue && intInputValue <= maxValue)) {
+      notifyError("parsers.intRangeValue", minValue.toString(), maxValue.toString());
+    }
+  }
+
+  /**
    * Validate that the subschema name is 16 or 18
    *
    * @param input string to check
@@ -220,5 +234,15 @@ public abstract class MessageServiceParser extends Parser {
     return ((MessageServiceProvider) this.getErrorHandler())
         .getMessageService()
         .getMessage(messageKey, (Object[]) parameters);
+  }
+
+  private Integer tryParseInt(String input) {
+    Integer parsedValue;
+    try {
+      parsedValue = Integer.parseInt(input);
+    } catch (Exception ex) {
+      parsedValue = null;
+    }
+    return parsedValue;
   }
 }
