@@ -33,8 +33,8 @@ result_set_locator_host_variable: dbs_level_01 entry_name  (USAGE IS?)? SQL TYPE
 binary_host_variable: dbs_level_01 entry_name host_variable_usage binary_host_variable_type;
 binary_host_variable_type: BINARY LPARENCHAR binary_host_variable_binary_size RPARENCHAR | VARBINARY LPARENCHAR binary_host_variable_varbinary_size RPARENCHAR  | BINARY VARYING;
 
-binary_host_variable_binary_size: dbs_integerliteral_expanded {validateIntegerRange($dbs_integerliteral_expanded.text, 1, 255);};
-binary_host_variable_varbinary_size: dbs_integerliteral_expanded {validateIntegerRange($dbs_integerliteral_expanded.text, 1, 32704);};
+binary_host_variable_binary_size: T=dbs_integerliteral_expanded {validateIntegerRange($T.start, $T.text, 1, 255);};
+binary_host_variable_varbinary_size: T=dbs_integerliteral_expanded {validateIntegerRange($T.start, $T.text, 1, 32704);};
 
 host_variable_usage: (USAGE IS?)? SQL TYPE IS;
 
