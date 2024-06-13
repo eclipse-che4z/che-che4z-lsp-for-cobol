@@ -124,6 +124,63 @@ public class Cli implements Callable<Integer> {
       return 1;
     }
     initProcessorGroupsReader();
+    Gson gson = new GsonBuilder().setPrettyPrinting().create();
+    JsonObject result = new JsonObject();
+    Result analysisResult = null;
+    switch (action) {
+      case analysis:
+        analysisResult = runAnalysis();
+        addTiming(result, analysisResult.ctx.getBenchmarkSession());
+        JsonArray diagnostics = new JsonArray();
+        analysisResult.ctx.getAccumulatedErrors()
+                .forEach(
+                        err -> {
+                          JsonObject diagnostic = toJson(err, gson);
+                          diagnostics.add(diagnostic);
+                        });
+        result.add("diagnostics", diagnostics);
+        break;
+      case list_copybooks:
+        analysisResult = runAnalysis();
+        addTiming(result, analysisResult.ctx.getBenchmarkSession());
+        StageResult<CopybooksRepository> copybooksResult =
+                (StageResult<CopybooksRepository>) analysisResult.pipelineResult.getLastStageResult();
+        Multimap<String, String> definitions = copybooksResult.getData().getDefinitions();
+        Multimap<String, Location> usages = copybooksResult.getData().getUsages();
+        Set<String> missing = new HashSet<>(usages.keySet());
+        missing.removeAll(definitions.keySet());
+
+        JsonArray copybookUris = new JsonArray();
+        JsonArray missingCopybooks = new JsonArray();
+        missing.forEach(missingCopybooks::add);
+        definitions.values().forEach(copybookUris::add);
+        result.add("copybookUris", copybookUris);
+        result.add("missingCopybooks", missingCopybooks);
+        break;
+      case list_sources:
+        JsonArray sources = new JsonArray();
+        if (Objects.nonNull(workspace)) {
+          try (Stream<Path> paths = Files.walk(workspace)) {
+            paths
+                .filter(Files::isRegularFile)
+                .map(f -> workspace.relativize(f))
+                .filter(this::isSourceFile)
+                .map(Path::toString)
+                .forEach(sources::add);
+          }
+        } else {
+          sources.add(src.toPath().toString());
+        }
+        result.add("sources", sources);
+        break;
+      default:
+        break;
+    }
+    System.out.println(gson.toJson(result));
+    return 0;
+  }
+
+  private Result runAnalysis() throws IOException {
     String documentUri = src.toURI().toString();
 
     Injector diCtx = Guice.createInjector(new CliModule());
@@ -151,59 +208,17 @@ public class Cli implements Callable<Integer> {
                     dialect);
     ctx.getAccumulatedErrors().addAll(resultWithErrors.getErrors());
     PipelineResult pipelineResult = pipeline.run(ctx);
-    Gson gson = new GsonBuilder().setPrettyPrinting().create();
-    JsonObject result = new JsonObject();
-    addTiming(result, ctx.getBenchmarkSession());
-    switch (action) {
-      case analysis:
-        StageResult<ProcessingResult> analysisResult =
-                (StageResult<ProcessingResult>) pipelineResult.getLastStageResult();
-        JsonArray diagnostics = new JsonArray();
-        ctx.getAccumulatedErrors()
-                .forEach(
-                        err -> {
-                          JsonObject diagnostic = toJson(err, gson);
-                          diagnostics.add(diagnostic);
-                        });
-        result.add("diagnostics", diagnostics);
-        break;
-      case list_copybooks:
-        StageResult<CopybooksRepository> copybooksResult =
-                (StageResult<CopybooksRepository>) pipelineResult.getLastStageResult();
-        Multimap<String, String> definitions = copybooksResult.getData().getDefinitions();
-        Multimap<String, Location> usages = copybooksResult.getData().getUsages();
-        Set<String> missing = new HashSet<>(usages.keySet());
-        missing.removeAll(definitions.keySet());
+    return new Result(ctx, pipelineResult);
+  }
 
-        JsonArray copybookUris = new JsonArray();
-        JsonArray missingCopybooks = new JsonArray();
-        missing.forEach(missingCopybooks::add);
-        definitions.values().forEach(copybookUris::add);
-        result.add("copybookUris", copybookUris);
-        result.add("missingCopybooks", missingCopybooks);
-        break;
-      case list_sources:
-        JsonArray sources = new JsonArray();
-        result.remove("timings");
-        if (Objects.nonNull(workspace)) {
-          try (Stream<Path> paths = Files.walk(workspace)) {
-            paths
-                .filter(Files::isRegularFile)
-                .map(f -> workspace.relativize(f))
-                .filter(this::isSourceFile)
-                .map(Path::toString)
-                .forEach(sources::add);
-          }
-        } else {
-          sources.add(src.toPath().toString());
-        }
-        result.add("sources", sources);
-        break;
-      default:
-        break;
+  private static class Result {
+    public final AnalysisContext ctx;
+    public final PipelineResult pipelineResult;
+
+    public Result(AnalysisContext ctx, PipelineResult pipelineResult) {
+      this.ctx = ctx;
+      this.pipelineResult = pipelineResult;
     }
-    System.out.println(gson.toJson(result));
-    return 0;
   }
 
   private boolean isSourceFile(Path f) {
