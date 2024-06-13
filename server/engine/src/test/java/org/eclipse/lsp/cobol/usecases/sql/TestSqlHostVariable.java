@@ -52,6 +52,38 @@ public class TestSqlHostVariable {
           + "        PROCEDURE DIVISION.\n"
           + "         {_01 VAR-NAME USAGE IS SQL TYPE IS RESULT-SET-LOCATOR VARYING|1_}.";
 
+  public static final String BINARY_TEXT1 =
+          "        Identification Division.\n"
+                  + "        Program-Id. 'TEST1'.\n"
+                  + "        Data Division.\n"
+                  + "         Working-Storage Section.\n"
+                  + "       01 {$*VAR-INVALID-BIN} USAGE IS SQL TYPE IS BINARY(256{)|1}.\n"
+                  + "        PROCEDURE DIVISION.\n";
+
+  public static final String BINARY_TEXT2 =
+          "        Identification Division.\n"
+          + "        Program-Id. 'TEST1'.\n"
+          + "        Data Division.\n"
+          + "         Working-Storage Section.\n"
+          + "       01 {$*VAR-INVALID-BIN} USAGE IS SQL TYPE IS BINARY(-1{)|1}.\n"
+          + "        PROCEDURE DIVISION.\n";
+
+  public static final String BINARY_TEXT3 =
+          "        Identification Division.\n"
+          + "        Program-Id. 'TEST1'.\n"
+          + "        Data Division.\n"
+          + "         Working-Storage Section.\n"
+          + "       01 {$*VAR-INVALID-BIN} USAGE IS SQL TYPE IS VARBINARY(32705{)|1}.\n"
+          + "        PROCEDURE DIVISION.\n";
+
+  public static final String BINARY_TEXT4 =
+          "        Identification Division.\n"
+          + "        Program-Id. 'TEST1'.\n"
+          + "        Data Division.\n"
+          + "         Working-Storage Section.\n"
+          + "       01 {$*VAR-INVALID-BIN} USAGE IS SQL TYPE IS VARBINARY(-1234{)|1}.\n"
+          + "        PROCEDURE DIVISION.\n";
+
   @Test
   void testSupportForResultSetLocator() {
     UseCaseEngine.runTest(TEXT, ImmutableList.of(), ImmutableMap.of());
@@ -79,5 +111,70 @@ public class TestSqlHostVariable {
                 "this DB2 statement is allowed only in LINKAGE SECTION or WORKING-STORAGE SECTION",
                 DiagnosticSeverity.Error,
                 ErrorSource.DIALECT.getText())));
+  }
+
+  @Test
+  void testBinaryHostVariable_whenLargeBinaryValue() {
+    UseCaseEngine.runTest(
+            BINARY_TEXT1,
+            ImmutableList.of(),
+            ImmutableMap.of(
+                    "1",
+                    new Diagnostic(
+                            new Range(),
+                            "Allowed range is 1 to 255",
+                            DiagnosticSeverity.Error,
+                            ErrorSource.PARSING.getText())));
+  }
+
+  @Test
+  void testBinaryHostVariable_whenNegativeBinaryValue() {
+    UseCaseEngine.runTest(
+            BINARY_TEXT2,
+            ImmutableList.of(),
+            ImmutableMap.of(
+                    "1",
+                    new Diagnostic(
+                            new Range(),
+                            "Allowed range is 1 to 255",
+                            DiagnosticSeverity.Error,
+                            ErrorSource.PARSING.getText()
+                    )
+            )
+    );
+  }
+
+  @Test
+  void testBinaryHostVariable_whenLargeVarbinaryValue() {
+    UseCaseEngine.runTest(
+            BINARY_TEXT3,
+            ImmutableList.of(),
+            ImmutableMap.of(
+                    "1",
+                    new Diagnostic(
+                            new Range(),
+                            "Allowed range is 1 to 32704",
+                            DiagnosticSeverity.Error,
+                            ErrorSource.PARSING.getText()
+                    )
+            )
+    );
+  }
+
+  @Test
+  void testBinaryHostVariable_whenNegativeVarbinaryValue() {
+    UseCaseEngine.runTest(
+            BINARY_TEXT4,
+            ImmutableList.of(),
+            ImmutableMap.of(
+                    "1",
+                    new Diagnostic(
+                            new Range(),
+                            "Allowed range is 1 to 32704",
+                            DiagnosticSeverity.Error,
+                            ErrorSource.PARSING.getText()
+                    )
+            )
+    );
   }
 }
