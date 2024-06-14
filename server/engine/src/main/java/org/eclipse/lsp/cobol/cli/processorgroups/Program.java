@@ -19,7 +19,7 @@ import lombok.Getter;
 
 /** Program representation */
 @Getter
-class Program {
+public class Program {
   @SerializedName("pgroup")
   String processorGroup;
   String program;
