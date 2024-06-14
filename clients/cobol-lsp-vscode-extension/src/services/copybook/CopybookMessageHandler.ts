@@ -21,6 +21,7 @@ import { CopybookURI } from "./CopybookURI";
 import { CopybookName } from "./CopybookDownloadService";
 import * as path from "path";
 import {
+  COPYBOOKS_FOLDER,
   DATASET,
   E4E_FOLDER,
   E4E_SCHEME,
@@ -69,7 +70,7 @@ export async function resolveCopybookHandler(
       await CopybookURI.createPathForCopybookDownloaded(
         documentUri,
         dialectType,
-        path.join(storagePath, ZOWE_FOLDER),
+        path.join(storagePath, ZOWE_FOLDER, COPYBOOKS_FOLDER),
       ),
       SettingsService.getCopybookExtension(documentUri),
       storagePath,
