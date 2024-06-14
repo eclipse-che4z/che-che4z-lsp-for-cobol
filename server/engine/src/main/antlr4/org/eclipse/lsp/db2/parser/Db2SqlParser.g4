@@ -36,7 +36,7 @@ binary_host_variable_varbinary_size: T=dbs_integerliteral_expanded {validateInte
 
 host_variable_usage: (USAGE IS?)? SQL TYPE IS;
 
-sql_host_variables: result_set_locator_variable | lob_xml_host_variables
+sql_host_variables: result_set_locator_variable | lob_host_variables | lob_xml_host_variables
                   | tableLocators_variable ;
 
 result_set_locator_variable: dbs_level_01 entry_name host_variable_usage result_set_locator;
@@ -44,6 +44,8 @@ result_set_locator_variable: dbs_level_01 entry_name host_variable_usage result_
 tableLocators_variable: dbs_host_var_levels entry_name host_variable_usage tableLocators;
 
 lob_xml_host_variables: dbs_host_var_levels entry_name  host_variable_usage (xml_as lobWithSize | xml_as lobNoSize);
+
+lob_host_variables: dbs_host_var_levels entry_name host_variable_usage (lobWithSize | lobNoSize);
 
 dbs_host_var_levels: dbs_level_01 | T=dbs_integer {validateIntegerRange($T.text, 2, 48);};
 
