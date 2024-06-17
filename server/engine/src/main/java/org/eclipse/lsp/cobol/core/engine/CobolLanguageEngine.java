@@ -158,6 +158,8 @@ public class CobolLanguageEngine {
     StageResult<?> result = pipelineResult.getLastStageResult();
 
     session.attr("uri", ctx.getExtendedDocument().getUri());
+    session.attr("language", ctx.getLanguageId().getId());
+    session.attr("lines", String.valueOf(ctx.getExtendedDocument().toString().split("\n").length));
     session.attr("size", String.valueOf(ctx.getExtendedDocument().toString().length()));
     session.attr("result", result.stopProcessing() ? "stopped" : "done");
     benchmarkService.logTiming();

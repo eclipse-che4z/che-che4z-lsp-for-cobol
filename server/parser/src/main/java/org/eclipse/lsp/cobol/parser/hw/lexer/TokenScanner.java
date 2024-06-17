@@ -91,6 +91,13 @@ public class TokenScanner {
       }
       return start.produceToken(TokenType.OTHER);
     }
+    if (match('*')) {
+      forward();
+      if (match('*')) {
+        forward();
+      }
+      return start.produceToken(TokenType.OTHER);
+    }
     return cobolWord(start);
   }
 
@@ -171,6 +178,9 @@ public class TokenScanner {
       }
     } while (!isAtEnd() && isCobolWordSymbol());
 
+    if (currentPosition.index - start.index == 1 && source.charAt(currentPosition.index - 1) == '.') {
+      return start.produceToken(TokenType.DOT);
+    }
     return start.produceToken(TokenType.COBOL_WORD);
   }
 

@@ -57,8 +57,11 @@ class KeywordCompletionTest {
   @BeforeEach
   void init() {
     DialectService dialectService = mock(DialectService.class);
+    CobolDialect mockDialect = mock(CobolDialect.class);
     Optional<CobolDialect> result = Optional.of(() -> "COBOL");
+    when(mockDialect.getKeywords()).thenReturn(ImmutableMap.of("TEST", "TEST DESCRIPTION"));
     when(dialectService.getDialectByName(any())).thenReturn(result);
+    when(dialectService.getImplicitCobolDialects()).thenReturn(ImmutableList.of(mockDialect));
     completion = new KeywordCompletion(new Keywords(mock(SettingsService.class), dialectService));
   }
 
@@ -67,17 +70,26 @@ class KeywordCompletionTest {
     assertThat(
         completion.getCompletionItems(
             "accep", new CobolDocumentModel("", "", AnalysisResult.builder().build())),
-        is(createExpected()));
+        is(createExpected(LABEL, DOCUMENTATION_TEXT)));
+  }
+
+  @Test
+  void testCompletionForImplicitDialects() {
+    assertThat(
+        completion.getCompletionItems(
+            "TEST", new CobolDocumentModel("", "", AnalysisResult.builder().build())),
+        is(createExpected("TEST", "TEST DESCRIPTION")));
   }
 
   @Test
   void testGetStreamDataMap() {
     DialectService dialectService = mock(DialectService.class);
-
+    CobolDialect implicitDialect = mock(CobolDialect.class);
     CobolDialect idmsDialect = mock(CobolDialect.class);
+    when(implicitDialect.getKeywords()).thenReturn(ImmutableMap.of("implicit", "implicit desc1"));
     when(idmsDialect.getKeywords()).thenReturn(ImmutableMap.of("idms1", "desc1"));
     when(dialectService.getDialectByName("IDMS")).thenReturn(Optional.of(idmsDialect));
-
+    when(dialectService.getImplicitCobolDialects()).thenReturn(ImmutableList.of(implicitDialect));
     CobolDialect dacoDialect = mock(CobolDialect.class);
     when(dacoDialect.getKeywords()).thenReturn(ImmutableMap.of("daco1", "desc1", "daco2", "desc2"));
     when(dialectService.getDialectByName("DaCo")).thenReturn(Optional.of(dacoDialect));
@@ -98,29 +110,32 @@ class KeywordCompletionTest {
 
   @Test
   void testCompletionNull() {
-    assertThat(completion.getCompletionItems("Accep", null), is(createExpected()));
+    assertThat(
+        completion.getCompletionItems("Accep", null),
+        is(createExpected(LABEL, DOCUMENTATION_TEXT)));
   }
 
   @Test
   void testCompletionMock() {
     assertEquals(
-        createExpected(), completion.getCompletionItems("ACCEP", MockCompletionModel.MODEL));
+        createExpected(LABEL, DOCUMENTATION_TEXT),
+        completion.getCompletionItems("ACCEP", MockCompletionModel.MODEL));
   }
 
-  private List<CompletionItem> createExpected() {
-    return ImmutableList.of(createItem());
+  private List<CompletionItem> createExpected(String label, String documentation) {
+    return ImmutableList.of(createItem(label, documentation));
   }
 
-  private CompletionItem createItem() {
+  private CompletionItem createItem(String label, String documentation) {
     MarkupContent doc = new MarkupContent();
-    doc.setValue(DOCUMENTATION_TEXT);
+    doc.setValue(documentation);
     doc.setKind("markdown");
-    CompletionItem item = new CompletionItem(LABEL);
-    item.setLabel(LABEL);
-    item.setInsertText(LABEL);
+    CompletionItem item = new CompletionItem(label);
+    item.setLabel(label);
+    item.setInsertText(label);
     item.setDocumentation(doc);
     item.setKind(CompletionItemKind.Keyword);
-    item.setSortText("6" + LABEL);
+    item.setSortText("6" + label);
     return item;
   }
 }

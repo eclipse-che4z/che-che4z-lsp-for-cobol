@@ -11,7 +11,7 @@
  * Contributors:
  *    Broadcom, Inc. - initial API and implementation
  */
-package org.eclipse.lsp.cobol.divisions.procedure;
+package org.eclipse.lsp.cobol.divisions.procedure.perform;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -22,38 +22,46 @@ import org.eclipse.lsp.cobol.parser.hw.ParserSettings;
 import org.eclipse.lsp.cobol.parser.hw.lexer.CobolLexer;
 import org.junit.jupiter.api.Test;
 
-/** Perform tests */
-public class PerformBasicStatementTest {
+/** Test perform with times */
+public class PerformTimesStatementTest {
   private static final String HEADER =
       "       ID DIVISION. PROGRAM-ID. perf.\n" + "       PROCEDURE DIVISION.\n";
 
   @Test
-  void basicOutOfLine() {
+  void timesOutOfLine() {
     String source =
             HEADER
-                    + "           PERFORM PROC1.\n"
-                    + "           PERFORM PROC1 THROUGH PROC2.\n"
-                    + "           PERFORM PROC1 THRu PROC2.\n";
+                    + "           PERFORM PROC1 A TIMES.\n"
+                    + "           PERFORM PROC1 3 TIMES.\n"
+                    + "           PERFORM PROC1 THROUGH PROC2 A TIMES.\n"
+                    + "           PERFORM PROC1 THROUGH PROC2 4 TIMES.\n"
+                    + "           PERFORM PROC1 THRU PROC2 B TIMES.\n"
+                    + "           PERFORM PROC1 THRU PROC2 67 TIMES.\n";
     CobolParser parser = new CobolParser(new CobolLexer(source), new ParserSettings());
     ParseResult result = parser.parse();
     assertEquals(0, result.getDiagnostics().size());
-    assertEquals(3, result.getSourceUnit().list(Statement.class).size());
+    assertEquals(6, result.getSourceUnit().list(Statement.class).size());
     assertEquals(source, result.getSourceUnit().toText());
   }
 
   @Test
-  void basicInline() {
+  void timesInline() {
     String source =
         HEADER
-            + "           PERFORM\n"
-            + "              DISPLAY \"Iteration: \" WS-I\n"
-            + "              COMPUTE WS-I = WS-I + 1.\n"
-            + "           END-PERFORM.\n"
-            + "           PERFORM END-PERFORM\n";
+                + "           PERFORM A TIMES\n"
+                + "              DISPLAY \"Iteration: \" WS-I\n"
+                + "              COMPUTE WS-I = WS-I + 1.\n"
+                + "           END-PERFORM.\n"
+                + "           PERFORM 1000 TIMES\n"
+                + "              DISPLAY \"Iteration: \" WS-I\n"
+                + "              COMPUTE WS-I = WS-I + 1.\n"
+                + "           END-PERFORM.\n"
+                + "           PERFORM ZOO TIMES END-PERFORM.\n"
+                + "           PERFORM 100 TIMES END-PERFORM.\n";
     CobolParser parser = new CobolParser(new CobolLexer(source), new ParserSettings());
     ParseResult result = parser.parse();
     assertEquals(0, result.getDiagnostics().size());
-    assertEquals(2, result.getSourceUnit().list(Statement.class).size());
+    assertEquals(4, result.getSourceUnit().list(Statement.class).size());
     assertEquals(source, result.getSourceUnit().toText());
   }
 }

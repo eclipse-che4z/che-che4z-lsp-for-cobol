@@ -25,6 +25,7 @@ public enum TokenType {
   NUMBER_LITERAL,
   COBOL_WORD,
   NEW_LINE,
+  DOT,
   OTHER,
   EOF
 }

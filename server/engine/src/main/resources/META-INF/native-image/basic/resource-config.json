@@ -24,6 +24,9 @@
       },
       {
         "pattern":"\\Q/LanguageKeywords.txt\\E"
+      },
+      {
+        "pattern":"\\Q/LanguageKeywords_sql.txt\\E"
       }
     ]},
   "bundles":[{

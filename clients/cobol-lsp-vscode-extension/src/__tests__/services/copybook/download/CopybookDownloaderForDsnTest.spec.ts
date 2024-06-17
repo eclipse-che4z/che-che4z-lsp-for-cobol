@@ -112,7 +112,7 @@ describe("Tests Copybook download from DNS", () => {
       expect(isDowloaded).toBeFalsy();
     });
 
-    it("checks eligible copybook invoke appropriate ZE Api's", async () => {
+    describe("checks eligible copybook invoke appropriate ZE Api's", () => {
       ProfileUtils.getProfileNameForCopybook = jest
         .fn()
         .mockReturnValue("test-profile");
@@ -127,19 +127,40 @@ describe("Tests Copybook download from DNS", () => {
         .fn()
         .mockReturnValue({ fsPath: "profile/dsn.path/copybook" });
 
-      const isDowloaded = await downloader.downloadCopybook(
-        { name: "copybook", dialect: "COBOL" },
-        "document-uri",
-        "DNS.PATH",
-      );
-      expect(allMemberMock).toHaveBeenCalledWith("DNS.PATH");
-      expect(getContentMock).toHaveBeenCalledWith("DNS.PATH(copybook)", {
-        file: "profile/dsn.path/copybook",
-        binary: true,
-        returnEtag: true,
-        encoding: "utf8",
+      it("checks appropriate call for ZE API's", async () => {
+        downloader.clearMemberListCache();
+        const isDowloaded = await downloader.downloadCopybook(
+          { name: "copybook", dialect: "COBOL" },
+          "document-uri",
+          "DNS.PATH",
+        );
+        expect(allMemberMock).toHaveBeenCalledWith("DNS.PATH");
+        expect(getContentMock).toHaveBeenCalledWith("DNS.PATH(copybook)", {
+          file: "profile/dsn.path/copybook",
+          binary: true,
+          returnEtag: true,
+          encoding: "utf8",
+        });
+        expect(isDowloaded).toBeTruthy();
       });
-      expect(isDowloaded).toBeTruthy();
+
+      it("checks cache is used if download is trigged again for same profile and dataset", async () => {
+        // trigger download again and check cache impl
+        const isDowloaded = await downloader.downloadCopybook(
+          { name: "copybook", dialect: "COBOL" },
+          "document-uri",
+          "DNS.PATH",
+        );
+        // cache resolves the members
+        expect(allMemberMock).not.toHaveBeenCalled();
+        expect(getContentMock).toHaveBeenCalledWith("DNS.PATH(copybook)", {
+          file: "profile/dsn.path/copybook",
+          binary: true,
+          returnEtag: true,
+          encoding: "utf8",
+        });
+        expect(isDowloaded).toBeTruthy();
+      });
     });
   });
 });

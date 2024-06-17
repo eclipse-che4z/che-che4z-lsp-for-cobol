@@ -20,8 +20,6 @@ import org.eclipse.lsp.cobol.parser.hw.lexer.CobolLexer;
 import org.eclipse.lsp.cobol.parser.hw.lexer.Token;
 import org.eclipse.lsp.cobol.parser.hw.lexer.TokenType;
 
-import java.util.Objects;
-
 /**
  * COBOL language grammar rule class.
  */
@@ -66,7 +64,7 @@ public class SourceUnitRule implements LanguageRule {
   }
 
   private boolean isContinuationSymbol(Token t) {
-    return Objects.equals(t.getLexeme(), ".");
+    return t.getType() == TokenType.DOT;
   }
 
 }

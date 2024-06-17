@@ -22,7 +22,6 @@ import {
   E4E_FOLDER,
   ZOWE_FOLDER,
 } from "../constants";
-import { Utils } from "../services/util/Utils";
 
 /**
  * Clears the downloaded copybook cache folder ({globalStoragePath}/.zowe/.copybooks).

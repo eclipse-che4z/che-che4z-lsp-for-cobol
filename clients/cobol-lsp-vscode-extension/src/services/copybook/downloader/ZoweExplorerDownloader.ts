@@ -20,6 +20,7 @@ import { CopybookURI } from "../CopybookURI";
 export abstract class ZoweExplorerDownloader {
   public static profileStore: Map<string, "locked-profile" | "valid-profile"> =
     new Map();
+  protected memberListCache: Map<string, string[]> = new Map();
 
   constructor(
     private readonly storagePath: string,
@@ -95,5 +96,16 @@ export abstract class ZoweExplorerDownloader {
     }
 
     return false;
+  }
+
+  protected createId(profileName: string, path: string) {
+    return `${profileName}-${path}`;
+  }
+
+  /**
+   * Clears the member cache for the copybook downloader
+   */
+  public clearMemberListCache() {
+    this.memberListCache.clear();
   }
 }
