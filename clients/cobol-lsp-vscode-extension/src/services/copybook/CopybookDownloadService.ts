@@ -108,8 +108,10 @@ export class CopybookDownloadService {
     documentUri: string,
     copybookNames: CopybookName[],
   ): Promise<boolean> {
-    if (await E4ECopybookService.getE4EClient(documentUri)) {
-      return true;
+    const e4eApi = await E4ECopybookService.getE4EAPI();
+    if (e4eApi && e4eApi.isEndevorElement(documentUri)) {
+      const e4eClient = await E4ECopybookService.getE4EClient(documentUri);
+      return e4eClient ? true : false;
     }
     if (
       !DownloadUtil.areCopybookDownloadConfigurationsPresent(
