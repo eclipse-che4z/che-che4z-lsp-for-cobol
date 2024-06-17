@@ -232,7 +232,9 @@ cics_allocate_partner: PARTNER cics_name (NOQUEUE | STATE cics_cvda | cics_handl
 cics_asktime: ASKTIME cics_handle_response? (ABSTIME (cics_data_area | cics_handle_response)+)?;
 
 /** ASSIGN */
-cics_assign: ASSIGN (ABCODE cics_data_area | ABDUMP cics_data_area | ABPROGRAM cics_data_area | ACTIVITY cics_data_area |
+cics_assign: ASSIGN (cics_assign_parameter1 | cics_assign_parameter2) *;
+
+cics_assign_parameter1: ABCODE cics_data_area | ABDUMP cics_data_area | ABPROGRAM cics_data_area | ACTIVITY cics_data_area |
              ACTIVITYID cics_data_area | ALTSCRNHT cics_data_area | ALTSCRNWD cics_data_area | APLKYBD cics_data_area |
              APLTEXT cics_data_area | APPLID cics_data_area | ASRAINTRPT cics_data_area | ASRAKEY cics_cvda |
              ASRAPSW cics_data_area | ASRAREGS cics_data_area | ASRASPC cics_cvda | ASRASTG cics_cvda |
@@ -242,9 +244,12 @@ cics_assign: ASSIGN (ABCODE cics_data_area | ABDUMP cics_data_area | ABPROGRAM c
              DSSCS cics_data_area | DS3270 cics_data_area | EWASUPP cics_data_area | EXTDS cics_data_area |
              FACILITY cics_data_area | FCI cics_data_area | GCHARS cics_data_area | GCODES cics_data_area |
              GMMI cics_data_area | HILIGHT cics_data_area | INITPARM cics_data_area | INITPARMLEN cics_data_area |
-             INPARTN cics_data_area | INVOKINGPROG cics_data_area | KATAKANA cics_data_area | LANGINUSE cics_data_area |
-             LDCMNEM cics_data_area | LDCNUM cics_data_area | MAPCOLUMN cics_data_area | MAPHEIGHT cics_data_area)*
-             (MAPLINE cics_data_area | MAPWIDTH cics_data_area | MSRCONTROL cics_data_area | NATLANGINUSE cics_data_area |
+             INPARTN cics_data_area | INPUTMSGLEN cics_data_area | INVOKINGPROG cics_data_area |
+             KATAKANA cics_data_area | LANGINUSE cics_data_area | LDCMNEM cics_data_area | LDCNUM cics_data_area |
+             LINKLEVEL cics_data_area | LOCALCCSID cics_data_area | MAJORVERSION cics_data_area |
+             MAPCOLUMN cics_data_area | MAPHEIGHT cics_data_area;
+
+cics_assign_parameter2: MAPLINE cics_data_area | MAPWIDTH cics_data_area | MSRCONTROL cics_data_area | NATLANGINUSE cics_data_area |
              NETNAME cics_data_area | NEXTTRANSID cics_data_area | NUMTAB cics_data_area | OPCLASS cics_data_area |
              OPERKEYS cics_data_area | OPID cics_data_area | OPSECURITY cics_data_area | ORGABCODE cics_data_area |
              OUTLINE cics_data_area | PAGENUM cics_data_area | PARTNPAGE cics_data_area | PARTNS cics_data_area |
@@ -255,7 +260,7 @@ cics_assign: ASSIGN (ABCODE cics_data_area | ABDUMP cics_data_area | ABPROGRAM c
              SYSID cics_data_area | TASKPRIORITY cics_data_area | TCTUALENG cics_data_area | TELLERID cics_data_area |
              TERMCODE cics_data_area | TERMPRIORITY cics_data_area | TEXTKYBD cics_data_area | TEXTPRINT cics_data_area |
              TRANPRIORITY cics_data_area | TWALENG cics_data_area | UNATTEND cics_data_area | USERID cics_data_area |
-             USERNAME cics_data_area | USERPRIORITY cics_data_area | VALIDATION cics_data_area | cics_handle_response)*;
+             USERNAME cics_data_area | USERPRIORITY cics_data_area | VALIDATION cics_data_area | cics_handle_response;
 
 /** BIF DEEDIT / BIF DIGEST */
 cics_bif: BIF (cics_bif_deedit | cics_bif_digest);
@@ -1022,9 +1027,10 @@ cicsLexerDefinedVariableUsageTokens: ABCODE | ABDUMP | ABEND | ABORT | ABPROGRAM
     | INPUTMSGLEN | INQUIRE | INTEGER | INTERVAL | INTOCCSID | INTOCODEPAGE | INVALIDCOUNT | INVITE | INVMPSZ | INVOKE
     | INVOKINGPROG | INVPARTN | INVREQ | ISSUE | ISSUER | ITEM | IUTYPE | JOURNALNAME | JTYPEID | JUSFIRST | JUSLAST
     | JUSTIFY | KATAKANA | KEEP | KEYLENGTH | KEYNUMBER | L40 | L64 | L80 | LANGINUSE | LANGUAGECODE | LASTUSETIME
-    | LDC | LDCMNEM | LDCNUM | LEAVEKB | LENGTHLIST | LEVEL | LIGHTPEN | LINAGE_COUNTER | LINEADDR | LINK | LIST
-    | LISTLENGTH | LLID | LOAD | LOCALITY | LOCALITYLEN | LOGMESSAGE | LOGMODE | LOGONLOGMODE | LOGONMSG | LOW_VALUE
-    | LOW_VALUES | LUNAME | MAIN | MAP | MAPCOLUMN | MAPFAIL | MAPHEIGHT | MAPLINE | MAPONLY | MAPPED
+    | LDC | LDCMNEM | LDCNUM | LEAVEKB | LENGTHLIST | LEVEL | LIGHTPEN | LINAGE_COUNTER | LINEADDR | LINK
+    | LINKAGE | LINKLEVEL | LIST | LISTLENGTH | LLID | LOAD | LOCATION | LOCALCCSID | LOCALITY | LOCALITYLEN
+    | LOGMESSAGE | LOGMODE | LOGONLOGMODE | LOGONMSG | LOW_VALUE
+    | LOW_VALUES | LUNAME | MAIN | MAJORVERSION | MAP | MAPCOLUMN | MAPFAIL | MAPHEIGHT | MAPLINE | MAPONLY | MAPPED
     | MAPPINGDEV | MAPSET | MAPWIDTH | MASSINSERT | MAXDATALEN | MAXFLENGTH | MAXIMUM | MAXLENGTH | MAXLIFETIME
     | MAXPROCLEN | MCC | MEDIATYPE | MESSAGEID | METADATA | METADATALEN | METHODLENGTH | MILLISECONDS | MINIMUM
     | MINUTES | MMDDYY | MMDDYYYY | MODENAME | MONITOR | MONTH | MONTHOFYEAR | MSR | MSRCONTROL | NAME | NAMELENGTH
