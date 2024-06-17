@@ -14,28 +14,68 @@
  */
 package org.eclipse.lsp.cobol.cli;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.Set;
+import org.eclipse.lsp.cobol.cli.command.Cli;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
+import picocli.CommandLine;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-/**
- * Test for {@link Cli}
- */
+/** Test for {@link Cli} */
 @ExtendWith(MockitoExtension.class)
 class CliTest {
+  public static final String EXPECTED_USAGE =
+      "Usage: <main class> [-hV] [COMMAND]"
+          + System.lineSeparator()
+          + "COBOL Analysis CLI tools."
+          + System.lineSeparator()
+          + "  -h, --help      Show this help message and exit."
+          + System.lineSeparator()
+          + "  -V, --version   Print version information and exit."
+          + System.lineSeparator()
+          + "Commands:"
+          + System.lineSeparator()
+          + "  list_sources    list sources"
+          + System.lineSeparator()
+          + "  list_copybooks  list copybooks"
+          + System.lineSeparator()
+          + "  analysis        analyse cobol source"
+          + System.lineSeparator();
 
-    @Test
-    void testCall_srcNull() {
-        Cli cli = new Cli();
-        Integer actual;
-        try {
-        actual = cli.call();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+  @Test
+  void testCli_srcNonNull() {
+    CommandLine commandLine = new CommandLine(new Cli());
+    StringWriter sw = new StringWriter();
+    PrintWriter pw = new PrintWriter(sw);
+    commandLine.usage(pw);
+    pw.flush();
+    assertEquals(EXPECTED_USAGE, sw.toString());
+  }
 
-        assertEquals(1, actual);
-    }
+  @Test
+  void testCli_usage() {
+    CommandLine commandLine = new CommandLine(new Cli());
+    assertEquals(CommandLine.ExitCode.USAGE, commandLine.execute("-s", "source"));
+  }
+
+  @Test
+  void testCli_srcNull() {
+    CommandLine commandLine = new CommandLine(new Cli());
+    assertEquals(CommandLine.ExitCode.OK, commandLine.execute());
+  }
+
+  @Test
+  void testCliCommands() {
+    CommandLine commandLine = new CommandLine(new Cli());
+    Set<String> commandList = commandLine.getSubcommands().keySet();
+    assertEquals(3, commandList.size());
+    assertTrue(commandList.contains("analysis"));
+    assertTrue(commandList.contains("list_copybooks"));
+    assertTrue(commandList.contains("list_sources"));
+  }
 }

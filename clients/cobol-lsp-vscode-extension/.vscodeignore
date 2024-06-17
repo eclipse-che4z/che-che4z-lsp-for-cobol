@@ -37,6 +37,8 @@
 # * bundled extension code
 !dist/extension.js
 !dist/extension.js.map
+!dist/web/extension.js
+!dist/web/extension.js.map
 # ** server implementation 
 !server/native/*
 !server/jar/server.jar
