@@ -17,7 +17,7 @@ import {
   zoweExplorerMock,
   allUSSFilemembers,
   getUSSContentsMock,
-} from "./getZoweExplorerMock.utility";
+} from "../../../../__mocks__/getZoweExplorerMock.utility";
 import * as vscode from "vscode";
 import { TextEncoder } from "util";
 import { SettingsService } from "../../../../services/Settings";

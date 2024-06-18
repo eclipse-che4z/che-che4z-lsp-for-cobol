@@ -14,7 +14,9 @@
 
 import { SettingsService } from "../../../../services/Settings";
 import { DownloadStrategyResolver } from "../../../../services/copybook/downloader/DownloadStrategyResolver";
-import { zoweExplorerMock } from "./getZoweExplorerMock.utility";
+import { zoweExplorerMock } from "../../../../__mocks__/getZoweExplorerMock.utility";
+import { e4eMock } from "../../../../__mocks__/getE4EMock.utility";
+import { E4ECopybookService } from "../../../../services/copybook/E4ECopybookService";
 
 jest.mock("../../../../services/reporter/TelemetryService");
 
@@ -22,15 +24,17 @@ describe("tests download resolver", () => {
   const downloader = new DownloadStrategyResolver(
     "storage-path",
     zoweExplorerMock,
+    e4eMock,
   );
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  describe("checks order of resolution [DSN and USS order]", () => {
+  describe("checks order of resolution [E4E, DSN and USS order]", () => {
     const downloader = new DownloadStrategyResolver(
       "storage-path",
       zoweExplorerMock,
+      e4eMock,
     );
     beforeEach(() => {
       jest.clearAllMocks();
@@ -128,7 +132,11 @@ describe("tests download resolver", () => {
   });
 
   it("checks download fails if ZE apis are missing", async () => {
-    const resolver = new DownloadStrategyResolver("storage-path", undefined);
+    const resolver = new DownloadStrategyResolver(
+      "storage-path",
+      undefined,
+      undefined,
+    );
     const result = await resolver.downloadCopybook(
       { name: "copybook", dialect: "COBOL" },
       "doc-uri",
@@ -137,7 +145,11 @@ describe("tests download resolver", () => {
   });
 
   it("checks clear cache do not throw error when ZE apis are missing", () => {
-    const resolver = new DownloadStrategyResolver("storage-path", undefined);
+    const resolver = new DownloadStrategyResolver(
+      "storage-path",
+      undefined,
+      undefined,
+    );
     expect(() => resolver.clearCache()).not.toThrowError();
   });
 
@@ -145,6 +157,7 @@ describe("tests download resolver", () => {
     const downloader = new DownloadStrategyResolver(
       "storage-path",
       zoweExplorerMock,
+      e4eMock,
     );
     beforeEach(() => {
       jest.clearAllMocks();
@@ -198,6 +211,31 @@ describe("tests download resolver", () => {
         "document-uri",
         "uss",
       );
+    });
+    it("checks the order of copybook resolution - USS and DSN is not called when E4E resolves)", async () => {
+      (downloader as any).e4eDownloader.downloadCopybookE4E = jest
+        .fn()
+        .mockReturnValue(Promise.resolve());
+      (downloader as any).dsnDownloader.downloadCopybook = jest
+        .fn()
+        .mockReturnValue(false);
+      (downloader as any).ussDownloader.downloadCopybook = jest
+        .fn()
+        .mockReturnValue(false);
+      (E4ECopybookService as any).getE4EClient = jest.fn().mockReturnValue({});
+      await downloader.downloadCopybook(
+        { name: "copybook", dialect: "COBOL" },
+        "document-uri",
+      );
+      expect(
+        (downloader as any).e4eDownloader.downloadCopybookE4E,
+      ).toHaveBeenCalledWith({ name: "copybook", dialect: "COBOL" }, {});
+      expect(
+        (downloader as any).dsnDownloader.downloadCopybook,
+      ).toHaveBeenCalledTimes(0);
+      expect(
+        (downloader as any).ussDownloader.downloadCopybook,
+      ).toHaveBeenCalledTimes(0);
     });
   });
 });

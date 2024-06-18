@@ -343,18 +343,18 @@ class CopybookServiceTest {
     // First document parsing done
     copybookService.sendCopybookDownloadRequest(DOCUMENT_URI, emptyList(), ENABLED);
     verify(client, times(1))
-        .downloadCopybooks("document", ImmutableList.of(INVALID_CPY_NAME), "COBOL", true);
+        .downloadCopybooks(DOCUMENT_URI, ImmutableList.of(INVALID_CPY_NAME), "COBOL", true);
 
     // Others parsing done events for first document are not trigger settingsService
     copybookService.sendCopybookDownloadRequest(DOCUMENT_URI, emptyList(), ENABLED);
 
     verify(client, times(1))
-        .downloadCopybooks("document", ImmutableList.of(INVALID_CPY_NAME), "COBOL", true);
+        .downloadCopybooks(DOCUMENT_URI, ImmutableList.of(INVALID_CPY_NAME), "COBOL", true);
 
     // Second document parsing done
     copybookService.sendCopybookDownloadRequest(DOCUMENT_2_URI, emptyList(), ENABLED);
     verify(client, times(1))
-        .downloadCopybooks("document2", ImmutableList.of(INVALID_2_CPY_NAME), "COBOL", true);
+        .downloadCopybooks(DOCUMENT_2_URI, ImmutableList.of(INVALID_2_CPY_NAME), "COBOL", true);
   }
 
   /** Test that the service resolves the SQLDA predefined copybook */
@@ -451,7 +451,7 @@ class CopybookServiceTest {
     copybookService.sendCopybookDownloadRequest(
         DOCUMENT_URI, asList(PARENT_CPY_URI, DOCUMENT_URI), ENABLED);
     verify(client, times(1))
-        .downloadCopybooks("document", asList(INVALID_CPY_NAME, NESTED_CPY_NAME), "COBOL", true);
+        .downloadCopybooks(DOCUMENT_URI, asList(INVALID_CPY_NAME, NESTED_CPY_NAME), "COBOL", true);
   }
 
   @Test

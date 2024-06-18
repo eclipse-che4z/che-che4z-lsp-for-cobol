@@ -11,13 +11,27 @@
  * Contributors:
  *   Broadcom, Inc. - initial API and implementation
  */
-
+import * as vscode from "vscode";
 import { SettingsService } from "../Settings";
-import { searchCopybookInExtensionFolder } from "../util/FSUtils";
+import {
+  getProgramNameFromUri,
+  searchCopybookInExtensionFolder,
+} from "../util/FSUtils";
 import { CopybookURI } from "./CopybookURI";
 import { CopybookName } from "./CopybookDownloadService";
 import * as path from "path";
-import { COPYBOOKS_FOLDER, ZOWE_FOLDER } from "../../constants";
+import {
+  COPYBOOKS_FOLDER,
+  DATASET,
+  E4E_FOLDER,
+  E4E_SCHEME,
+  ENVIRONMENT,
+  USE_MAP,
+  ZOWE_FOLDER,
+} from "../../constants";
+import { E4ECopybookService } from "./E4ECopybookService";
+import { Utils } from "../util/Utils";
+import { CopybookDownloaderForE4E } from "./downloader/CopybookDownloaderForE4E";
 
 enum CopybookFolderKind {
   "local",
@@ -27,12 +41,28 @@ enum CopybookFolderKind {
 
 export async function resolveCopybookHandler(
   storagePath: string,
+  outputChannel: vscode.OutputChannel,
   documentUri: string,
   copybookName: string,
   dialectType: string,
 ): Promise<string | undefined> {
   let result: string | undefined;
-  result = searchCopybook(documentUri, copybookName, dialectType, storagePath);
+  const e4eApi = await E4ECopybookService.getE4EAPI();
+  if (e4eApi && e4eApi.isEndevorElement(documentUri)) {
+    result = await getE4ECopyBookLocation(
+      copybookName,
+      documentUri,
+      storagePath,
+      outputChannel,
+    );
+    return result;
+  }
+  result = await searchCopybook(
+    documentUri,
+    copybookName,
+    dialectType,
+    storagePath,
+  );
   // check in subfolders under .copybooks (copybook downloaded from MF)
   if (!result) {
     result = searchCopybookInExtensionFolder(
@@ -49,13 +79,14 @@ export async function resolveCopybookHandler(
   return result;
 }
 
-function searchCopybook(
+async function searchCopybook(
   documentUri: string,
   copybookName: string,
   dialectType: string,
   storagePath: string,
 ) {
   let result: string | undefined;
+
   for (let i = 0; i < Object.values(CopybookFolderKind).length; i++) {
     const folderKind = Object.values(CopybookFolderKind)[i];
     const targetFolder = getTargetFolderForCopybook(
@@ -113,6 +144,7 @@ function resolveAllowedExtensions(
   switch (folderKind) {
     case "downloaded-dsn":
     case "downloaded-uss":
+    case E4E_SCHEME:
       return [""];
     default:
       return SettingsService.getCopybookExtension(documentUri);
@@ -132,5 +164,42 @@ export function downloadCopybookHandler(
       (copybookName) => new CopybookName(copybookName, dialectType),
     ),
     quietMode,
+  );
+}
+
+async function getE4ECopyBookLocation(
+  copybookName: string,
+  documentUri: string,
+  storagePath: string,
+  outputChannel: vscode.OutputChannel,
+) {
+  const config = await E4ECopybookService.getE4EClient(
+    documentUri,
+    outputChannel,
+  );
+  if (!config) {
+    throw Error;
+  }
+  const first = config.elements[copybookName];
+  if (!first) return;
+  let use_map;
+  let instance;
+  if (DATASET in first) {
+    instance = Utils.profileAsString(config.profile);
+    use_map = first.dataset;
+  } else if (ENVIRONMENT in first) {
+    use_map = first.use_map ? USE_MAP : "";
+    instance = CopybookURI.getEnviromentPath(first, config.profile);
+  } else return;
+  const allowedExtensions = resolveAllowedExtensions(E4E_SCHEME, documentUri);
+  const targetFolder = [
+    CopybookURI.createDatasetPath(instance, use_map, storagePath, E4E_FOLDER),
+  ];
+
+  return searchCopybookInExtensionFolder(
+    copybookName,
+    targetFolder,
+    allowedExtensions,
+    storagePath,
   );
 }
