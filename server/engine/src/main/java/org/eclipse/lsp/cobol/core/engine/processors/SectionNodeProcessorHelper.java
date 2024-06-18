@@ -25,7 +25,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
@@ -41,6 +40,9 @@ import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.model.tree.variable.*;
 import org.eclipse.lsp.cobol.common.model.tree.variables.*;
+import org.eclipse.lsp.cobol.common.utils.RangeUtils;
+import org.eclipse.lsp4j.Position;
+import org.eclipse.lsp4j.Range;
 
 /** The utility class is for converting VariableDefinitionNode into appropriate VariableNode. */
 @UtilityClass
@@ -104,14 +106,14 @@ public class SectionNodeProcessorHelper {
    * @return a list of unwrapped variables
    */
   private List<VariableDefinitionNode> unwrapVariables(Node node) {
-    List<VariableDefinitionNode> variables = new ArrayList<>();
+    List<Node> variables = new ArrayList<>();
     List<CopyNode> copybooks = new LinkedList<>();
 
     node.getChildren()
         .forEach(
             c -> {
               if (c.getNodeType() == NodeType.VARIABLE_DEFINITION) {
-                variables.add((VariableDefinitionNode) c);
+                variables.add(c);
               }
               if (c.getNodeType() == NodeType.COPY) {
                 copybooks.add((CopyNode) c);
@@ -127,48 +129,77 @@ public class SectionNodeProcessorHelper {
             .map(CopyNode.class::cast)
             .collect(Collectors.toList());
 
-//   Below could be problematic if a copybook is referenced at multiple places in a cobol doc.
-//    As the uri of copybooks would match with all variable definition and would result in a wrong node tree structure.
-//
-//    allCopybooks.stream()
-//        .filter(c -> c.getUri() != null)
-//        .forEach(
-//            c ->
-//                new ArrayList<>(variables)
-//                    .stream()
-//                        .filter(Objects::nonNull)
-//                        .filter(v -> v.getLocality() != null)
-//                        .filter(v -> v.getLocality().getUri() != null)
-//                        .filter(v -> v.getLocality().getUri().equals(c.getUri()))
-//                        .forEach(
-//                            v -> {
-//                              variables.remove(v);
-//                              c.addChild(v);
-//                            }));
+    int index = 0;
+    for (CopyNode copyNode : allCopybooks) {
+      index = insertCopybook(variables, index, copyNode);
+    }
 
-    allCopybooks.forEach(
-        copyNode -> {
-          int copybookLine = copyNode.getLocality().getRange().getStart().getLine();
-          String uri = copyNode.getLocality().getUri();
-          AtomicInteger index = new AtomicInteger();
-          for (Node variable : variables) {
-            int variableLine = variable.getLocality().getRange().getStart().getLine();
-            if (variable.getLocality().getUri().equals(uri) && variableLine > copybookLine) {
-              break;
-            }
-            index.incrementAndGet();
-          }
+    return variables.stream()
+        .flatMap(
+            n -> {
+              if (n.getNodeType() == NodeType.COPY) {
+                return n.getDepthFirstStream();
+              }
+              return ImmutableList.of(n).stream();
+            })
+        .filter(hasType(NodeType.VARIABLE_DEFINITION))
+        .map(VariableDefinitionNode.class::cast)
+        .collect(Collectors.toList());
+  }
 
-          copyNode
-              .getDepthFirstStream()
-              .filter(hasType(NodeType.COPY))
-              .flatMap(Node::getDepthFirstStream)
-              .filter(hasType(NodeType.VARIABLE_DEFINITION))
-              .map(VariableDefinitionNode.class::cast)
-              .forEach(
-                  copyNodeVariable -> variables.add(index.getAndIncrement(), copyNodeVariable));
-        });
-    return variables;
+  private static int insertCopybook(List<Node> variables, int index, CopyNode copyNode) {
+    if (index > variables.size() - 1) {
+      variables.add(copyNode);
+      return index;
+    }
+    for (int i = index; i < variables.size(); i++) {
+      index++;
+      if (!canInsertCopyNodeAtIndex(copyNode, i, variables)) {
+        index = i;
+        break;
+      }
+    }
+
+    // append at last
+    if (index >= variables.size()) {
+      variables.add(copyNode);
+      return variables.indexOf(copyNode);
+    }
+
+    variables.add(index, copyNode);
+    if (adjustCopyNodeChild(copyNode, variables, index + 1)) {
+      return variables.indexOf(copyNode) + 1;
+    }
+    return index;
+  }
+
+  private static boolean adjustCopyNodeChild(CopyNode copyNode, List<Node> variables, int index) {
+    boolean areNodesAdjusted = false;
+    ArrayList<Node> nodes = new ArrayList<>(variables);
+    for (int i = index; i < nodes.size(); i++) {
+      Node variable = nodes.get(i);
+      String variableNodeUri = variable.getLocality().getUri();
+      String copybookNodeUri = copyNode.getUri();
+      if (variableNodeUri.equals(copybookNodeUri)) {
+        copyNode.addChild(variable);
+        variables.remove(variable);
+        areNodesAdjusted = true;
+      } else {
+        break;
+      }
+    }
+    return areNodesAdjusted;
+  }
+
+  private static boolean canInsertCopyNodeAtIndex(
+      CopyNode copyNode, int index, List<Node> variables) {
+    String copybookLocalityUri = copyNode.getLocality().getUri();
+    Range copybookLocalityRange = copyNode.getLocality().getRange();
+    Node variableDefinitionNode = variables.get(index);
+    String variableUri = variableDefinitionNode.getLocality().getUri();
+    Position variableStartPosition = variableDefinitionNode.getLocality().getRange().getEnd();
+    return variableUri.equals(copybookLocalityUri)
+        && RangeUtils.isBefore(variableStartPosition, copybookLocalityRange.getStart());
   }
 
   /**
