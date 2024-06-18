@@ -263,13 +263,11 @@ public abstract class MessageServiceParser extends Parser {
         .getMessage(messageKey, (Object[]) parameters);
   }
 
-  private Integer tryParseInt(String input) {
-    Integer parsedValue;
+ private Integer tryParseInt(String input) {
     try {
-      parsedValue = Integer.parseInt(input);
-    } catch (Exception ex) {
-      parsedValue = null;
+        return Integer.parseInt(input);
+    } catch (NumberFormatException ex) {
+        return null;
     }
-    return parsedValue;
-  }
+}
 }
