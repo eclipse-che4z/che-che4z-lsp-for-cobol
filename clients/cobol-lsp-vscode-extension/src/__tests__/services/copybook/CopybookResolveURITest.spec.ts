@@ -25,7 +25,7 @@ import { ProfileUtils } from "../../../services/util/ProfileUtils";
 import { SettingsUtils } from "../../../services/util/SettingsUtils";
 import { Utils } from "../../../services/util/Utils";
 import { E4ECopybookService } from "../../../services/copybook/E4ECopybookService";
-import { DownloadStrategyResolver } from "../../../services/copybook/downloader/DownloadStrategyResolver";
+import { CopybookDownloadService } from "../../../services/copybook/CopybookDownloadService";
 
 const copybookName: string = "NSTCOPY1";
 const copybookNameWithExtension: string = "NSTCOPY2.CPY";
@@ -263,11 +263,7 @@ describe("Prioritize search criteria for copybooks test suite", () => {
     });
     SettingsService.getCopybookExtension = jest.fn().mockReturnValue([""]);
     (globSync as any) = jest.fn().mockReturnValue([copybookName]);
-    const downloader = new DownloadStrategyResolver(
-      "/storagePath",
-      undefined,
-      undefined,
-    );
+    const downloader = new CopybookDownloadService("/storagePath");
     const uri: string | undefined = await downloader.resolveCopybookHandler(
       copybookName,
       "PRGNAME",
@@ -283,7 +279,7 @@ describe("Prioritize search criteria for copybooks test suite", () => {
     ProfileUtils.getProfileNameForCopybook = jest
       .fn()
       .mockReturnValue(undefined);
-    const downloader = new DownloadStrategyResolver(
+    const downloader = new CopybookDownloadService(
       "/storagePath",
       undefined,
       undefined,
@@ -300,11 +296,7 @@ describe("Prioritize search criteria for copybooks test suite", () => {
   });
   test("With both local and dsn references defined in the settings.json, the search is applied on local resources first", async () => {
     (globSync as any) = jest.fn().mockReturnValue([copybookName]);
-    const downloader = new DownloadStrategyResolver(
-      "/storagePath",
-      undefined,
-      undefined,
-    );
+    const downloader = new CopybookDownloadService("/storagePath");
 
     const uri: string | undefined = await downloader.resolveCopybookHandler(
       copybookName,
@@ -321,11 +313,7 @@ describe("Prioritize search criteria for copybooks test suite", () => {
     });
 
     (globSync as any) = jest.fn().mockReturnValue([copybookName]);
-    const downloader = new DownloadStrategyResolver(
-      "/storagePath",
-      undefined,
-      undefined,
-    );
+    const downloader = new CopybookDownloadService("/storagePath");
     const uri: string | undefined = await downloader.resolveCopybookHandler(
       copybookName,
       "PRGNAME",

@@ -18,7 +18,7 @@ import { Utils } from "../../../services/util/Utils";
 import path = require("path");
 import { globSync } from "glob";
 import * as fs from "fs";
-import { DownloadStrategyResolver } from "../../../services/copybook/downloader/DownloadStrategyResolver";
+import { CopybookDownloadService } from "../../../services/copybook/CopybookDownloadService";
 
 vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
   get: jest.fn().mockReturnValue("testProfile"),
@@ -43,11 +43,7 @@ describe("Test the copybook message handler", () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
-  const downloaderNoApi = new DownloadStrategyResolver(
-    "/storagePath",
-    undefined,
-    undefined,
-  );
+  const downloaderNoApi = new CopybookDownloadService("/storagePath");
   it("checks local present copybooks are resolved", async () => {
     SettingsService.getCopybookExtension = jest.fn().mockReturnValue([".cpy"]);
     SettingsService.getCopybookLocalPath = jest
@@ -192,7 +188,7 @@ describe("Test the copybook message handler", () => {
   );
 
   it("checks E4E downloaded member copybooks are resolved", async () => {
-    const downloader = new DownloadStrategyResolver("/storagePath", undefined, {
+    const downloader = new CopybookDownloadService("/storagePath", undefined, {
       isEndevorElement(uri: string) {
         return uri === filename;
       },
@@ -238,7 +234,7 @@ describe("Test the copybook message handler", () => {
     );
   });
   it("checks E4E downloaded element copybooks are resolved", async () => {
-    const downloader = new DownloadStrategyResolver("/storagePath", undefined, {
+    const downloader = new CopybookDownloadService("/storagePath", undefined, {
       isEndevorElement(uri: string) {
         return uri === filename;
       },

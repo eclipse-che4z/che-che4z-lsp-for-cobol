@@ -31,7 +31,6 @@ test("Test fetchCopybookCommand calls telementry services and copybook download 
     new CopybookDownloadService(
       "./storage-path",
       {} as any as IApiRegisterClient,
-      undefined,
     );
   copybookDownloadService.downloadCopybooks = jest.fn();
   expect(fetchCopybookCommand).toBeTruthy();

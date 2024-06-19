@@ -13,9 +13,9 @@
  */
 
 import { SettingsService } from "../../../../services/Settings";
-import { DownloadStrategyResolver } from "../../../../services/copybook/downloader/DownloadStrategyResolver";
 import { zoweExplorerMock } from "../../../../__mocks__/getZoweExplorerMock.utility";
 import { e4eMock } from "../../../../__mocks__/getE4EMock.utility";
+import { CopybookDownloadService } from "../../../../services/copybook/CopybookDownloadService";
 
 jest.mock("../../../../services/reporter/TelemetryService");
 
@@ -25,7 +25,7 @@ describe("tests download resolver", () => {
       jest.clearAllMocks();
     });
     it("checks the order of copybook resolution - DNS followed by USS)", async () => {
-      const downloader = new DownloadStrategyResolver(
+      const downloader = new CopybookDownloadService(
         "storage-path",
         zoweExplorerMock,
         undefined,
@@ -58,7 +58,7 @@ describe("tests download resolver", () => {
     });
 
     it("checks the order of copybook resolution - USS is not called when DNS resolves)", async () => {
-      const downloader = new DownloadStrategyResolver(
+      const downloader = new CopybookDownloadService(
         "storage-path",
         zoweExplorerMock,
         undefined,
@@ -88,7 +88,7 @@ describe("tests download resolver", () => {
   });
 
   it("checks resolver is able to fetch settings", () => {
-    const downloader = new DownloadStrategyResolver(
+    const downloader = new CopybookDownloadService(
       "storage-path",
       zoweExplorerMock,
       e4eMock,
@@ -107,7 +107,7 @@ describe("tests download resolver", () => {
   });
 
   it("checks the order of resolution is same as the one provided in user settings", async () => {
-    const downloader = new DownloadStrategyResolver(
+    const downloader = new CopybookDownloadService(
       "storage-path",
       zoweExplorerMock,
       undefined,
@@ -145,7 +145,7 @@ describe("tests download resolver", () => {
   });
 
   it("checks download fails if ZE apis are missing", async () => {
-    const resolver = new DownloadStrategyResolver(
+    const resolver = new CopybookDownloadService(
       "storage-path",
       undefined,
       undefined,
@@ -158,7 +158,7 @@ describe("tests download resolver", () => {
   });
 
   it("checks clear cache do not throw error when ZE apis are missing", () => {
-    const resolver = new DownloadStrategyResolver(
+    const resolver = new CopybookDownloadService(
       "storage-path",
       undefined,
       undefined,
@@ -172,7 +172,7 @@ describe("tests download resolver", () => {
     });
 
     it("resolution from dsn, calls callback method", async () => {
-      const downloader = new DownloadStrategyResolver(
+      const downloader = new CopybookDownloadService(
         "storage-path",
         zoweExplorerMock,
         undefined,
@@ -197,7 +197,7 @@ describe("tests download resolver", () => {
     });
 
     it("resolution from uss, calls callback method", async () => {
-      const downloader = new DownloadStrategyResolver(
+      const downloader = new CopybookDownloadService(
         "storage-path",
         zoweExplorerMock,
         undefined,
@@ -231,7 +231,7 @@ describe("tests download resolver", () => {
       );
     });
     it("checks the order of copybook resolution - USS and DSN is not called when E4E resolves)", async () => {
-      const downloader = new DownloadStrategyResolver(
+      const downloader = new CopybookDownloadService(
         "storage-path",
         zoweExplorerMock,
         e4eMock,

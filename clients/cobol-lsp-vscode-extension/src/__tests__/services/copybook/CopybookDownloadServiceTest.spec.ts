@@ -46,7 +46,6 @@ describe("Tests copybook download service", () => {
       const downloadService = new CopybookDownloadService(
         "storage-path",
         {} as any as IApiRegisterClient,
-        undefined,
       );
       (ProfileUtils as any).getProfileNameForCopybook = jest
         .fn()
@@ -67,7 +66,6 @@ describe("Tests copybook download service", () => {
       const downloadService = new CopybookDownloadService(
         "storage-path",
         {} as any as IApiRegisterClient,
-        undefined,
       );
       (CopybookDownloadService as any).checkWorkspace = jest
         .fn()
@@ -92,7 +90,6 @@ describe("Tests copybook download service", () => {
       const downloadService = new CopybookDownloadService(
         "storage-path",
         zoweExplorerErrorMock,
-        undefined,
       );
       (ProfileUtils as any).getProfileNameForCopybook = jest
         .fn()
@@ -115,7 +112,6 @@ describe("Tests copybook download service", () => {
       const downloadService = new CopybookDownloadService(
         "storage-path",
         zoweExplorerErrorMock,
-        undefined,
       );
       (ProfileUtils as any).getProfileNameForCopybook = jest
         .fn()
@@ -141,7 +137,6 @@ describe("Tests copybook download service", () => {
       const downloadService = new CopybookDownloadService(
         "storage-path",
         zoweExplorerErrorMock,
-        undefined,
       );
       (ProfileUtils as any).getProfileNameForCopybook = jest
         .fn()
@@ -174,10 +169,9 @@ describe("Tests copybook download service", () => {
     const downloadService = new CopybookDownloadService(
       "storage-path",
       {} as any as IApiRegisterClient,
-      undefined,
     );
     DownloadUtil.checkForInvalidCredProfile = jest.fn().mockReturnValue(false);
-    (downloadService as any).downloadResolver.downloadCopybook = jest
+    (downloadService as any).downloadCopybook = jest
       .fn()
       .mockResolvedValue(true);
     (downloadService as any).updateDownloadProgress = jest.fn();
@@ -195,9 +189,7 @@ describe("Tests copybook download service", () => {
     await downloadService.downloadCopybooks("document-uri", [
       { name: "copybook-name", dialect: DEFAULT_DIALECT },
     ]);
-    expect(
-      (downloadService as any).downloadResolver.downloadCopybook,
-    ).toHaveBeenCalledWith(
+    expect((downloadService as any).downloadCopybook).toHaveBeenCalledWith(
       { name: "copybook-name", dialect: DEFAULT_DIALECT },
       "document-uri",
     );
@@ -207,7 +199,6 @@ describe("Tests copybook download service", () => {
     const downloadService = new CopybookDownloadService(
       "storage-path",
       {} as any as IApiRegisterClient,
-      undefined,
     );
     const mockProgress = {
       report: jest.fn(),
