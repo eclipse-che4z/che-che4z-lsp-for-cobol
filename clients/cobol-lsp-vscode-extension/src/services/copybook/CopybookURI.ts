@@ -65,8 +65,7 @@ export class CopybookURI {
     dialectType: string,
     downloadFolder: string,
   ): Promise<string[]> {
-    const filename = getProgramNameFromUri(documentUri, true);
-    const profile = await ProfileUtils.getProfileNameForCopybook(filename);
+    const profile = await ProfileUtils.getProfileNameForCopybook(documentUri);
 
     let result: string[] = [];
     const datasets: string[] = SettingsService.getDsnPath(
@@ -89,11 +88,11 @@ export class CopybookURI {
     if (profile && ussPaths) {
       Object.assign([], ussPaths).forEach(
         (value, index) =>
-          (result[index + baseIndex] = path.join(
-            downloadFolder,
-            profile,
-            value,
-          )),
+        (result[index + baseIndex] = path.join(
+          downloadFolder,
+          profile,
+          value,
+        )),
       );
     }
     return result;
