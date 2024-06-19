@@ -30,8 +30,8 @@ export class DownloadStrategyResolver {
 
   constructor(
     storagePath: string,
-    explorerApi: IApiRegisterClient | undefined,
-    e4eApi: E4E | undefined,
+    explorerApi?: IApiRegisterClient,
+    e4eApi?: E4E,
     outputChannel?: vscode.OutputChannel,
   ) {
     if (e4eApi) {

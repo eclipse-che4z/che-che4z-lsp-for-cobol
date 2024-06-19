@@ -46,8 +46,8 @@ export async function resolveCopybookHandler(
   dialectType: string,
 ): Promise<string | undefined> {
   let result: string | undefined;
-  const e4eApi = await E4ECopybookService.getE4EAPI();
-  if (e4eApi && e4eApi.isEndevorElement(documentUri)) {
+
+  if (await E4ECopybookService.getE4EClient(documentUri)) {
     result = await getE4ECopyBookLocation(
       copybookName,
       documentUri,

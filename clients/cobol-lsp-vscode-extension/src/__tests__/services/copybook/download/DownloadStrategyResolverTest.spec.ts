@@ -132,7 +132,7 @@ describe("tests download resolver", () => {
   });
 
   it("checks download fails if ZE apis are missing", async () => {
-    const resolver = new DownloadStrategyResolver("storage-path", undefined);
+    const resolver = new DownloadStrategyResolver("storage-path");
     const result = await resolver.downloadCopybook(
       { name: "copybook", dialect: "COBOL" },
       "doc-uri",
@@ -141,7 +141,7 @@ describe("tests download resolver", () => {
   });
 
   it("checks clear cache do not throw error when ZE apis are missing", () => {
-    const resolver = new DownloadStrategyResolver("storage-path", undefined);
+    const resolver = new DownloadStrategyResolver("storage-path");
     expect(() => resolver.clearCache()).not.toThrowError();
   });
 

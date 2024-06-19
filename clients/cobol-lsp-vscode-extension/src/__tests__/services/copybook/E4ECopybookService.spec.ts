@@ -43,4 +43,12 @@ describe("e4e copybook service tests", () => {
     await E4ECopybookService.getE4EClient("new-uri");
     expect(spyApi).toHaveBeenCalledTimes(2);
   });
+  it("checks getE4EClient returns undefined when zowe settings is being used to retrieve copybooks", async () => {
+    vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
+      get: jest.fn().mockReturnValue("ZOWE"),
+    });
+    expect(await E4ECopybookService.getE4EClient("document-uri")).toEqual(
+      undefined,
+    );
+  });
 });
