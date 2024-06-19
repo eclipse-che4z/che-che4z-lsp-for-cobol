@@ -44,10 +44,10 @@ export class ProfileUtils {
   }
 
   private static async getValidProfileForCopybookDownload(
-    programName: string,
+    programUri: string,
   ): Promise<string | undefined> {
     const profileFromDoc = await ProfileUtils.getProfileFromDocument(
-      programName,
+      programUri,
     );
     const passedProfile = SettingsService.getProfileName();
     if (!passedProfile && profileFromDoc) {
@@ -57,29 +57,21 @@ export class ProfileUtils {
   }
 
   private static async getProfileFromDocument(
-    programName: string,
+    programUri: string,
   ): Promise<string | undefined> {
-    const vscodeOpenedDoc = vscode.workspace.textDocuments.find((doc) =>
-      doc.fileName.endsWith(path.basename(programName)),
-    );
-    if (!vscodeOpenedDoc) return;
-
     const zoweExplorerApi = await Utils.getZoweExplorerAPI();
-    const allOpenedFilesThroughZoweExplorer = zoweExplorerApi
-      ? {
-          ...zoweExplorerApi.getExplorerExtenderApi().ussFileProvider.openFiles,
-          ...zoweExplorerApi.getExplorerExtenderApi().datasetProvider.openFiles,
-        }
-      : [];
+    if (!zoweExplorerApi) return;
+    const eeApi = zoweExplorerApi.getExplorerExtenderApi();
 
-    const cobolLsDocPath = vscode.Uri.parse(vscodeOpenedDoc.fileName).fsPath;
-    for (const [path, profile] of Object.entries(
-      allOpenedFilesThroughZoweExplorer,
-    )) {
-      if (cobolLsDocPath === vscode.Uri.parse(path).fsPath) {
-        return profile.profile.name;
-      }
-    }
-    return undefined;
+    const uri = vscode.Uri.parse(programUri);
+    if (uri.scheme !== "file") return;
+    const fsPath = uri.fsPath;
+
+    // TODO: `openFiles` is deprecated in vNext
+    const openedFile =
+      eeApi.ussFileProvider.openFiles[fsPath] ||
+      eeApi.datasetProvider.openFiles[fsPath];
+
+    return openedFile?.profile.name;
   }
 }

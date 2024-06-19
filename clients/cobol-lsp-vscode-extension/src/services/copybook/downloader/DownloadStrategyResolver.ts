@@ -15,10 +15,14 @@ import * as vscode from "vscode";
 import { E4E } from "../../../type/e4eApi";
 import { SettingsService } from "../../Settings";
 import { CopybookName } from "../CopybookDownloadService";
-import { E4ECopybookService } from "../E4ECopybookService";
 import { CopybookDownloaderForDsn } from "./CopybookDownloaderForDsn";
 import { CopybookDownloaderForUss } from "./CopybookDownloaderForUss";
 import { CopybookDownloaderForE4E } from "./CopybookDownloaderForE4E";
+import { searchCopybookInExtensionFolder } from "../../util/FSUtils";
+import { CopybookURI } from "../CopybookURI";
+import path = require("path");
+import { COPYBOOKS_FOLDER, ZOWE_FOLDER } from "../../../constants";
+import { searchCopybook } from "../CopybookMessageHandler";
 
 /**
  * Copybook downloader from E4E Api or using Zowe Explorer MVS & USS Api based on configuration
@@ -29,14 +33,15 @@ export class DownloadStrategyResolver {
   private readonly e4eDownloader?: CopybookDownloaderForE4E;
 
   constructor(
-    storagePath: string,
+    private storagePath: string,
     explorerApi: IApiRegisterClient | undefined,
-    e4eApi: E4E | undefined,
+    private e4eApi: E4E | undefined,
     outputChannel?: vscode.OutputChannel,
   ) {
-    if (e4eApi) {
+    if (this.e4eApi) {
       this.e4eDownloader = new CopybookDownloaderForE4E(
         storagePath,
+        this.e4eApi,
         outputChannel,
       );
     }
@@ -63,9 +68,9 @@ export class DownloadStrategyResolver {
     copybookName: CopybookName,
     documentUri: string,
   ): Promise<boolean> {
-    const e4e = await E4ECopybookService.getE4EClient(documentUri);
-    if (this.e4eDownloader && e4e) {
-      await this.e4eDownloader.downloadCopybookE4E(copybookName, e4e);
+    if (
+      await this.e4eDownloader?.downloadCopybookE4E(documentUri, copybookName)
+    ) {
       return true;
     }
 
@@ -137,5 +142,46 @@ export class DownloadStrategyResolver {
       copybookName.dialect,
     );
     return { dsnPaths, ussPaths };
+  }
+
+  public async resolveCopybookHandler(
+    documentUri: string,
+    copybookName: string,
+    dialectType: string,
+  ): Promise<string | undefined> {
+    let result: string | undefined;
+    if (this.e4eApi?.isEndevorElement(documentUri)) {
+      result = await this.e4eDownloader?.getE4ECopyBookLocation(
+        copybookName,
+        documentUri,
+      );
+      return result;
+    }
+    result = await searchCopybook(
+      documentUri,
+      copybookName,
+      dialectType,
+      this.storagePath,
+    );
+    // check in subfolders under .copybooks (copybook downloaded from MF)
+    if (!result) {
+      result = searchCopybookInExtensionFolder(
+        copybookName,
+        await CopybookURI.createPathForCopybookDownloaded(
+          documentUri,
+          dialectType,
+          path.join(this.storagePath, ZOWE_FOLDER, COPYBOOKS_FOLDER),
+        ),
+        SettingsService.getCopybookExtension(documentUri),
+        this.storagePath,
+      );
+    }
+    return result;
+  }
+
+  public async isE4EPrerequisiteForDownloadSatisfied(
+    documentUri: string,
+  ): Promise<boolean> {
+    return !!(await this.e4eDownloader?.getE4EClient(documentUri));
   }
 }

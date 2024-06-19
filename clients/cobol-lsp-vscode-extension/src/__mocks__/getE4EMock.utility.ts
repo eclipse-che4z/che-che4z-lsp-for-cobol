@@ -64,43 +64,7 @@ export const e4eMock: E4E = {
   getMember: jest.fn().mockReturnValue("content"),
 };
 
-export const e4eErrorMock: E4E = {
-  getConfiguration: jest.fn().mockReturnValue({
-    pgms: {
-      program: "program",
-      pgroup: "pgroup",
-    },
-    pgroups: [
-      {
-        name: "string",
-        libs: [
-          { dataset: "dataset" },
-          {
-            environment: "environment",
-            stage: "stage",
-            system: "system",
-            subsystem: "subsystem",
-            type: "type",
-            use_map: false,
-          },
-        ],
-      },
-    ],
-  }),
-  getProfileInfo: jest.fn().mockReturnValue({
-    profile: "profile",
-    instance: "string",
-  }),
-  isEndevorElement: jest.fn().mockReturnValue(true),
-  listElements: jest.fn().mockReturnValue(["filename", "fingerprint"]),
-  listMembers: jest.fn().mockReturnValue(["member"]),
-  onDidChangeElement: jest.fn(),
-  getElement: jest.fn().mockReturnValue(new Error("Error")),
-  getMember: jest.fn().mockReturnValue(new Error("Error")),
-};
-
-export const e4eResponseMock: e4eResponse = {
-  api: e4eMock,
+export const e4eResponseEndevorFirst: e4eResponse = {
   profile: { instance: "instance", profile: "profile" },
   uri: "document-uri",
   elements: {
@@ -120,52 +84,7 @@ export const e4eResponseMock: e4eResponse = {
     },
   } as { [key: string]: EndevorElement | EndevorMember },
 };
-export const e4eResponseMockDataSetPrior: e4eResponse = {
-  api: e4eMock,
-  profile: { instance: "instance", profile: "profile" },
-  uri: "document-uri",
-  elements: {
-    ["copybook"]: {
-      dataset: "dataset",
-      member: "copybook",
-    },
-    ["copybook2"]: {
-      use_map: false,
-      environment: "environment",
-      stage: "stage",
-      system: "system",
-      subsystem: "subsystem",
-      type: "type",
-      element: "copybook",
-      fingerprint: "fingerprint",
-    },
-  } as { [key: string]: EndevorElement | EndevorMember },
-};
-
-export const e4eErrorResponseMock: e4eResponse = {
-  api: e4eErrorMock,
-  profile: { instance: "instance", profile: "profile" },
-  uri: "document-uri",
-  elements: {
-    ["copybook"]: {
-      use_map: false,
-      environment: "environment",
-      stage: "stage",
-      system: "system",
-      subsystem: "subsystem",
-      type: "type",
-      element: "copybook",
-      fingerprint: "fingerprint",
-    },
-    ["copybook2"]: {
-      dataset: "dataset",
-      member: "copybook",
-    },
-  } as { [key: string]: EndevorElement | EndevorMember },
-};
-
-export const e4eErrorResponseMockDataSetPrior: e4eResponse = {
-  api: e4eErrorMock,
+export const e4eResponseDatasetFirst: e4eResponse = {
   profile: { instance: "instance", profile: "profile" },
   uri: "document-uri",
   elements: {

@@ -14,11 +14,10 @@
 import { CopybookDownloaderForE4E } from "../../../../services/copybook/downloader/CopybookDownloaderForE4E";
 import * as path from "path";
 import * as fs from "node:fs";
+import { E4E } from "../../../../type/e4eApi";
 import {
-  e4eErrorResponseMock,
-  e4eErrorResponseMockDataSetPrior,
-  e4eResponseMock,
-  e4eResponseMockDataSetPrior,
+  e4eResponseDatasetFirst,
+  e4eResponseEndevorFirst,
 } from "../../../../__mocks__/getE4EMock.utility";
 
 jest.mock("node:fs", () => ({
@@ -28,9 +27,6 @@ jest.mock("node:fs", () => ({
   mkdirSync: jest.fn(),
   existsSync: jest.fn(),
 }));
-
-import * as vscode from "vscode";
-const e4eDownloader = new CopybookDownloaderForE4E("/storagePath", undefined);
 
 describe("e4e copybook downloader tests", () => {
   beforeEach(() => {
@@ -66,23 +62,33 @@ describe("e4e copybook downloader tests", () => {
     );
   });
   it("checks not to try to download any if member or element not available in e4e", async () => {
+    const e4eDownloader = new CopybookDownloaderForE4E(
+      "/storagePath",
+      {} as any as E4E,
+    );
     const spyDownloadDataset = jest.spyOn(e4eDownloader, "downloadDatasetE4E");
     const spyDownloadElement = jest.spyOn(e4eDownloader, "downloadElementE4E");
-    await e4eDownloader.downloadCopybookE4E(
-      { name: "NoCopybook", dialect: "COBOL" },
-      e4eResponseMock,
-    );
+    e4eDownloader.getE4EClient = async () => e4eResponseEndevorFirst;
+    await e4eDownloader.downloadCopybookE4E("uri", {
+      name: "NoCopybook",
+      dialect: "COBOL",
+    });
     expect(spyDownloadDataset).not.toHaveBeenCalled();
     expect(spyDownloadElement).not.toHaveBeenCalled();
   });
   it("check download performed with respect to configuration order", async () => {
+    const e4eDownloader = new CopybookDownloaderForE4E(
+      "/storagePath",
+      {} as any as E4E,
+    );
     const spyDownloadDataset = jest.spyOn(e4eDownloader, "downloadDatasetE4E");
     const spyDownloadElement = jest.spyOn(e4eDownloader, "downloadElementE4E");
-    await e4eDownloader.downloadCopybookE4E(
-      { name: "copybook", dialect: "COBOL" },
-      e4eResponseMock,
-    );
-    expect(spyDownloadElement).toHaveBeenCalledWith(e4eResponseMock, {
+    e4eDownloader.getE4EClient = async () => e4eResponseEndevorFirst;
+    await e4eDownloader.downloadCopybookE4E("uri", {
+      name: "copybook",
+      dialect: "COBOL",
+    });
+    expect(spyDownloadElement).toHaveBeenCalledWith(e4eResponseEndevorFirst, {
       use_map: false,
       environment: "environment",
       stage: "stage",
@@ -95,13 +101,18 @@ describe("e4e copybook downloader tests", () => {
     expect(spyDownloadDataset).not.toHaveBeenCalled();
   });
   it("check download performed only for element when no member matches", async () => {
+    const e4eDownloader = new CopybookDownloaderForE4E(
+      "/storagePath",
+      {} as any as E4E,
+    );
     const spyDownloadDataset = jest.spyOn(e4eDownloader, "downloadDatasetE4E");
     const spyDownloadElement = jest.spyOn(e4eDownloader, "downloadElementE4E");
-    await e4eDownloader.downloadCopybookE4E(
-      { name: "copybook", dialect: "COBOL" },
-      e4eResponseMock,
-    );
-    expect(spyDownloadElement).toHaveBeenCalledWith(e4eResponseMock, {
+    e4eDownloader.getE4EClient = async () => e4eResponseEndevorFirst;
+    await e4eDownloader.downloadCopybookE4E("uri", {
+      name: "copybook",
+      dialect: "COBOL",
+    });
+    expect(spyDownloadElement).toHaveBeenCalledWith(e4eResponseEndevorFirst, {
       use_map: false,
       environment: "environment",
       stage: "stage",
@@ -114,45 +125,42 @@ describe("e4e copybook downloader tests", () => {
     expect(spyDownloadDataset).not.toHaveBeenCalled();
   });
   it("check downloadDatasetE4E does not perform IO in case of Error", async () => {
-    vscode.Uri.parse = jest
-      .fn()
-      .mockReturnValue({ fsPath: "/storagePath/document-uri" });
-    await e4eDownloader.downloadCopybookE4E(
-      { name: "copybook", dialect: "COBOL" },
-      e4eErrorResponseMockDataSetPrior,
-    );
-    const spyGetMember = jest.spyOn(
-      e4eErrorResponseMockDataSetPrior.api,
-      "getMember",
-    );
-    expect(spyGetMember).toHaveBeenCalled();
+    const getMember = jest.fn(async () => Error("failed"));
+    const e4eDownloader = new CopybookDownloaderForE4E("/storagePath", {
+      getMember,
+    } as any as E4E);
+    e4eDownloader.getE4EClient = async () => e4eResponseDatasetFirst;
+    await e4eDownloader.downloadCopybookE4E("uri", {
+      name: "copybook",
+      dialect: "COBOL",
+    });
+    expect(getMember).toHaveBeenCalled();
     expect(fs.promises.writeFile).not.toHaveBeenCalled();
   });
   it("check downloadElementE4E does not perform IO in case of Error", async () => {
-    vscode.Uri.parse = jest
-      .fn()
-      .mockReturnValue({ fsPath: "/storagePath/document-uri" });
-    await e4eDownloader.downloadCopybookE4E(
-      { name: "copybook", dialect: "COBOL" },
-      e4eErrorResponseMock,
-    );
-    const spyGetElement = jest.spyOn(e4eErrorResponseMock.api, "getElement");
-    expect(spyGetElement).toHaveBeenCalled();
+    const getElement = jest.fn(async () => Error("failed"));
+    const e4eDownloader = new CopybookDownloaderForE4E("/storagePath", {
+      getElement,
+    } as any as E4E);
+    e4eDownloader.getE4EClient = async () => e4eResponseEndevorFirst;
+    await e4eDownloader.downloadCopybookE4E("uri", {
+      name: "copybook",
+      dialect: "COBOL",
+    });
+    expect(getElement).toHaveBeenCalled();
     expect(fs.promises.writeFile).not.toHaveBeenCalled();
   });
   it("check downloadDatasetE4E nominal performs writeFile with correct path and content", async () => {
-    vscode.Uri.parse = jest
-      .fn()
-      .mockReturnValue({ fsPath: "/storagePath/document-uri" });
-    await e4eDownloader.downloadCopybookE4E(
-      { name: "copybook", dialect: "COBOL" },
-      e4eResponseMockDataSetPrior,
-    );
-    const spyGetgetMember = jest.spyOn(
-      e4eResponseMockDataSetPrior.api,
-      "getMember",
-    );
-    expect(spyGetgetMember).toHaveBeenCalledWith(
+    const getMember = jest.fn(async () => "content");
+    const e4eDownloader = new CopybookDownloaderForE4E("/storagePath", {
+      getMember,
+    } as any as E4E);
+    e4eDownloader.getE4EClient = async () => e4eResponseDatasetFirst;
+    await e4eDownloader.downloadCopybookE4E("uri", {
+      name: "copybook",
+      dialect: "COBOL",
+    });
+    expect(getMember).toHaveBeenCalledWith(
       { instance: "instance", profile: "profile" },
       { dataset: "dataset", member: "copybook" },
     );

@@ -17,7 +17,6 @@ import { DownloadStrategyResolver } from "./downloader/DownloadStrategyResolver"
 import { PROVIDE_PROFILE_MSG } from "../../constants";
 import { ProfileUtils } from "../util/ProfileUtils";
 import { DownloadUtil } from "./downloader/DownloadUtil";
-import { E4ECopybookService } from "./E4ECopybookService";
 import { E4E } from "../../type/e4eApi";
 
 export class CopybookName {
@@ -108,10 +107,10 @@ export class CopybookDownloadService {
     documentUri: string,
     copybookNames: CopybookName[],
   ): Promise<boolean> {
-    const e4eApi = await E4ECopybookService.getE4EAPI();
-    if (e4eApi && e4eApi.isEndevorElement(documentUri)) {
-      const e4eClient = await E4ECopybookService.getE4EClient(documentUri);
-      return e4eClient ? true : false;
+    if (this.e4eAPI?.isEndevorElement(documentUri)) {
+      return this.downloadResolver.isE4EPrerequisiteForDownloadSatisfied(
+        documentUri,
+      );
     }
     if (
       !DownloadUtil.areCopybookDownloadConfigurationsPresent(
@@ -162,5 +161,16 @@ export class CopybookDownloadService {
       increment: downloadPercent,
       message: downloadPercent + "%",
     });
+  }
+  public resolveCopybookHandler(
+    documentUri: string,
+    copybookName: string,
+    dialectType: string,
+  ): Promise<string | undefined> {
+    return this.downloadResolver.resolveCopybookHandler(
+      documentUri,
+      copybookName,
+      dialectType,
+    );
   }
 }

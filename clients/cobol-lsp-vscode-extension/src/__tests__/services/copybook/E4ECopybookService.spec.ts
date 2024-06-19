@@ -29,15 +29,4 @@ describe("e4e copybook service tests", () => {
     expect(spyValidate).toHaveBeenCalled();
     expect(api).toEqual(e4eMock);
   });
-
-  it("check getE4EClient assembles client correctly / check getE4EClient returns already assembled client once called with same Uri ", async () => {
-    E4ECopybookService.getE4EAPI = jest.fn().mockReturnValue(e4eMock);
-    await E4ECopybookService.getE4EClient("document-uri");
-    const spyApi = jest.spyOn(E4ECopybookService, "getE4EAPI");
-    expect(spyApi).toHaveBeenCalledTimes(1);
-    await E4ECopybookService.getE4EClient("document-uri");
-    expect(spyApi).toHaveBeenCalledTimes(1);
-    await E4ECopybookService.getE4EClient("new-uri");
-    expect(spyApi).toHaveBeenCalledTimes(2);
-  });
 });

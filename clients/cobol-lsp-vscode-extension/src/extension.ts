@@ -30,10 +30,7 @@ import { CopybooksCodeActionProvider } from "./services/copybook/CopybooksCodeAc
 import { clearCache } from "./commands/ClearCopybookCacheCommand";
 import { CommentAction, commentCommand } from "./commands/CommentCommand";
 import { initSmartTab, RangeTabShiftStore } from "./commands/SmartTabCommand";
-import {
-  downloadCopybookHandler,
-  resolveCopybookHandler,
-} from "./services/copybook/CopybookMessageHandler";
+import { downloadCopybookHandler } from "./services/copybook/CopybookMessageHandler";
 import { DialectRegistry } from "./services/DialectRegistry";
 import { LanguageClientService } from "./services/LanguageClientService";
 import { TelemetryService } from "./services/reporter/TelemetryService";
@@ -142,11 +139,7 @@ export async function activate(
   );
   languageClientService.addRequestHandler(
     "copybook/resolve",
-    resolveCopybookHandler.bind(
-      undefined,
-      context.globalStorageUri.fsPath,
-      outputChannel,
-    ),
+    copyBooksDownloader.resolveCopybookHandler.bind(copyBooksDownloader),
   );
   languageClientService.addRequestHandler(
     "copybook/download",

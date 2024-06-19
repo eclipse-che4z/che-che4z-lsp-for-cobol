@@ -18,27 +18,12 @@ import * as vscode from "vscode";
 
 jest.mock("vscode", () => ({
   Uri: {
-    parse: jest.fn().mockReturnValue(path.join("tmp-ws", ".c4z", ".copybooks")),
-    file: jest.fn().mockReturnValue({
-      fsPath: path.join(__dirname, ".zowe"),
-      with: jest
-        .fn()
-        .mockImplementation(
-          (change: {
-            scheme?: string;
-            authority?: string;
-            path?: string;
-            query?: string;
-            fragment?: string;
-          }) => {
-            return {
-              path: change.path,
-              fsPath: change.path,
-              with: jest.fn().mockReturnValue({ path: change.path }),
-            };
-          },
-        ),
-    }),
+    joinPath: (uri: { path: string }, ...segments: string[]) => {
+      const result = { ...uri };
+      result.path =
+        uri.path + (uri.path.endsWith("/") ? "" : "/") + segments.join("/");
+      return result;
+    },
   },
   window: {
     setStatusBarMessage: jest.fn().mockResolvedValue(true),
@@ -51,30 +36,6 @@ jest.mock("vscode", () => ({
       delete: jest.fn().mockReturnValue(true),
       readDirectory: jest.fn().mockResolvedValue([["fileName", 2]]),
     },
-    workspaceFolders: [
-      {
-        uri: {
-          fsPath: "tmp-ws",
-          with: jest
-            .fn()
-            .mockImplementation(
-              (change: {
-                scheme?: string;
-                authority?: string;
-                path?: string;
-                query?: string;
-                fragment?: string;
-              }) => {
-                return {
-                  path: change.path,
-                  fsPath: change.path,
-                  with: jest.fn().mockReturnValue({ path: change.path }),
-                };
-              },
-            ),
-        },
-      } as any,
-    ],
   },
 }));
 beforeEach(() => {
@@ -89,7 +50,7 @@ describe("Tests downloaded copybook cache clear", () => {
   it("checks running command multiple times doesn't produce error", () => {
     expect(() => {
       for (let index = 0; index < 3; index++) {
-        clearCache(vscode.Uri.file("/storagePath"));
+        clearCache({ path: "/storagePath" } as any as vscode.Uri);
       }
     }).not.toThrowError();
   });

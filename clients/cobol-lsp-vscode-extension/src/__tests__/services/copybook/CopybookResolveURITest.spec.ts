@@ -24,8 +24,8 @@ import * as fsUtils from "../../../services/util/FSUtils";
 import { ProfileUtils } from "../../../services/util/ProfileUtils";
 import { SettingsUtils } from "../../../services/util/SettingsUtils";
 import { Utils } from "../../../services/util/Utils";
-import { resolveCopybookHandler } from "../../../services/copybook/CopybookMessageHandler";
 import { E4ECopybookService } from "../../../services/copybook/E4ECopybookService";
+import { DownloadStrategyResolver } from "../../../services/copybook/downloader/DownloadStrategyResolver";
 
 const copybookName: string = "NSTCOPY1";
 const copybookNameWithExtension: string = "NSTCOPY2.CPY";
@@ -79,9 +79,6 @@ function removeFolder(targetPath: string) {
   return false;
 }
 
-const outputChannel = vscode.window.createOutputChannel(
-  "COBOL Language Support",
-);
 async function buildResultArrayFrom(
   settingsMockValue: string[] | undefined,
   filename: string,
@@ -266,9 +263,12 @@ describe("Prioritize search criteria for copybooks test suite", () => {
     });
     SettingsService.getCopybookExtension = jest.fn().mockReturnValue([""]);
     (globSync as any) = jest.fn().mockReturnValue([copybookName]);
-    const uri: string | undefined = await resolveCopybookHandler(
+    const downloader = new DownloadStrategyResolver(
       "/storagePath",
-      outputChannel,
+      undefined,
+      undefined,
+    );
+    const uri: string | undefined = await downloader.resolveCopybookHandler(
       copybookName,
       "PRGNAME",
       "COBOL",
@@ -283,9 +283,12 @@ describe("Prioritize search criteria for copybooks test suite", () => {
     ProfileUtils.getProfileNameForCopybook = jest
       .fn()
       .mockReturnValue(undefined);
-    const uri: string | undefined = await resolveCopybookHandler(
+    const downloader = new DownloadStrategyResolver(
       "/storagePath",
-      outputChannel,
+      undefined,
+      undefined,
+    );
+    const uri: string | undefined = await downloader.resolveCopybookHandler(
       copybookName,
       "PRGNAME",
       "COBOL",
@@ -297,10 +300,13 @@ describe("Prioritize search criteria for copybooks test suite", () => {
   });
   test("With both local and dsn references defined in the settings.json, the search is applied on local resources first", async () => {
     (globSync as any) = jest.fn().mockReturnValue([copybookName]);
-
-    const uri: string | undefined = await resolveCopybookHandler(
+    const downloader = new DownloadStrategyResolver(
       "/storagePath",
-      outputChannel,
+      undefined,
+      undefined,
+    );
+
+    const uri: string | undefined = await downloader.resolveCopybookHandler(
       copybookName,
       "PRGNAME",
       "COBOL",
@@ -315,9 +321,12 @@ describe("Prioritize search criteria for copybooks test suite", () => {
     });
 
     (globSync as any) = jest.fn().mockReturnValue([copybookName]);
-    const uri: string | undefined = await resolveCopybookHandler(
+    const downloader = new DownloadStrategyResolver(
       "/storagePath",
-      outputChannel,
+      undefined,
+      undefined,
+    );
+    const uri: string | undefined = await downloader.resolveCopybookHandler(
       copybookName,
       "PRGNAME",
       "DIALECT",

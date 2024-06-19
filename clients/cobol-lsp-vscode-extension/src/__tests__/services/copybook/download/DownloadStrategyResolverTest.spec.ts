@@ -16,30 +16,20 @@ import { SettingsService } from "../../../../services/Settings";
 import { DownloadStrategyResolver } from "../../../../services/copybook/downloader/DownloadStrategyResolver";
 import { zoweExplorerMock } from "../../../../__mocks__/getZoweExplorerMock.utility";
 import { e4eMock } from "../../../../__mocks__/getE4EMock.utility";
-import { E4ECopybookService } from "../../../../services/copybook/E4ECopybookService";
 
 jest.mock("../../../../services/reporter/TelemetryService");
 
 describe("tests download resolver", () => {
-  const downloader = new DownloadStrategyResolver(
-    "storage-path",
-    zoweExplorerMock,
-    e4eMock,
-  );
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
-
   describe("checks order of resolution [E4E, DSN and USS order]", () => {
-    const downloader = new DownloadStrategyResolver(
-      "storage-path",
-      zoweExplorerMock,
-      e4eMock,
-    );
     beforeEach(() => {
       jest.clearAllMocks();
     });
     it("checks the order of copybook resolution - DNS followed by USS)", async () => {
+      const downloader = new DownloadStrategyResolver(
+        "storage-path",
+        zoweExplorerMock,
+        undefined,
+      );
       (downloader as any).dsnDownloader.downloadCopybook = jest
         .fn()
         .mockReturnValue(false);
@@ -68,6 +58,11 @@ describe("tests download resolver", () => {
     });
 
     it("checks the order of copybook resolution - USS is not called when DNS resolves)", async () => {
+      const downloader = new DownloadStrategyResolver(
+        "storage-path",
+        zoweExplorerMock,
+        undefined,
+      );
       (downloader as any).dsnDownloader.downloadCopybook = jest
         .fn()
         .mockReturnValue(true);
@@ -93,6 +88,15 @@ describe("tests download resolver", () => {
   });
 
   it("checks resolver is able to fetch settings", () => {
+    const downloader = new DownloadStrategyResolver(
+      "storage-path",
+      zoweExplorerMock,
+      e4eMock,
+    );
+    beforeEach(() => {
+      jest.clearAllMocks();
+    });
+
     SettingsService.getDsnPath = jest.fn().mockReturnValue(["dsn"]);
     SettingsService.getUssPath = jest.fn().mockReturnValue(["uss"]);
     const settings = (downloader as any).fetchDownloadSettings(
@@ -103,6 +107,15 @@ describe("tests download resolver", () => {
   });
 
   it("checks the order of resolution is same as the one provided in user settings", async () => {
+    const downloader = new DownloadStrategyResolver(
+      "storage-path",
+      zoweExplorerMock,
+      undefined,
+    );
+    beforeEach(() => {
+      jest.clearAllMocks();
+    });
+
     (downloader as any).dsnDownloader.downloadCopybook = jest
       .fn()
       .mockReturnValueOnce(false)
@@ -150,20 +163,20 @@ describe("tests download resolver", () => {
       undefined,
       undefined,
     );
-    expect(() => resolver.clearCache()).not.toThrowError();
+    expect(() => resolver.clearCache()).not.toThrow();
   });
 
   describe("checks successful resolution calls callback method", () => {
-    const downloader = new DownloadStrategyResolver(
-      "storage-path",
-      zoweExplorerMock,
-      e4eMock,
-    );
     beforeEach(() => {
       jest.clearAllMocks();
     });
 
     it("resolution from dsn, calls callback method", async () => {
+      const downloader = new DownloadStrategyResolver(
+        "storage-path",
+        zoweExplorerMock,
+        undefined,
+      );
       (downloader as any).dsnDownloader.downloadCopybook = jest
         .fn()
         .mockReturnValue(true);
@@ -184,6 +197,11 @@ describe("tests download resolver", () => {
     });
 
     it("resolution from uss, calls callback method", async () => {
+      const downloader = new DownloadStrategyResolver(
+        "storage-path",
+        zoweExplorerMock,
+        undefined,
+      );
       (downloader as any).dsnDownloader.downloadCopybook = jest
         .fn()
         .mockReturnValue(false);
@@ -213,23 +231,30 @@ describe("tests download resolver", () => {
       );
     });
     it("checks the order of copybook resolution - USS and DSN is not called when E4E resolves)", async () => {
+      const downloader = new DownloadStrategyResolver(
+        "storage-path",
+        zoweExplorerMock,
+        e4eMock,
+      );
       (downloader as any).e4eDownloader.downloadCopybookE4E = jest
         .fn()
-        .mockReturnValue(Promise.resolve());
+        .mockReturnValue(true);
       (downloader as any).dsnDownloader.downloadCopybook = jest
         .fn()
         .mockReturnValue(false);
       (downloader as any).ussDownloader.downloadCopybook = jest
         .fn()
         .mockReturnValue(false);
-      (E4ECopybookService as any).getE4EClient = jest.fn().mockReturnValue({});
       await downloader.downloadCopybook(
         { name: "copybook", dialect: "COBOL" },
         "document-uri",
       );
       expect(
         (downloader as any).e4eDownloader.downloadCopybookE4E,
-      ).toHaveBeenCalledWith({ name: "copybook", dialect: "COBOL" }, {});
+      ).toHaveBeenCalledWith("document-uri", {
+        name: "copybook",
+        dialect: "COBOL",
+      });
       expect(
         (downloader as any).dsnDownloader.downloadCopybook,
       ).toHaveBeenCalledTimes(0);
