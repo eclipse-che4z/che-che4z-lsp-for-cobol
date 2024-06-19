@@ -14,7 +14,6 @@
 import * as path from "node:path";
 import { COPYBOOKS_FOLDER, ZOWE_FOLDER } from "../../constants";
 import { SettingsService } from "../Settings";
-import { getProgramNameFromUri } from "../util/FSUtils";
 import { ProfileUtils } from "../util/ProfileUtils";
 import { EndevorType, ResolvedProfile } from "../../type/e4eApi.d";
 import { Utils } from "../util/Utils";
@@ -88,11 +87,11 @@ export class CopybookURI {
     if (profile && ussPaths) {
       Object.assign([], ussPaths).forEach(
         (value, index) =>
-        (result[index + baseIndex] = path.join(
-          downloadFolder,
-          profile,
-          value,
-        )),
+          (result[index + baseIndex] = path.join(
+            downloadFolder,
+            profile,
+            value,
+          )),
       );
     }
     return result;

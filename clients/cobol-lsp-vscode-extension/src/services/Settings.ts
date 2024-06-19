@@ -12,10 +12,8 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
-import * as fs from "node:fs";
 import * as path from "node:path";
 import * as vscode from "vscode";
-import { Utils } from "./util/Utils";
 import {
   COPYBOOK_EXTENSIONS,
   PATHS_LOCAL_KEY,
