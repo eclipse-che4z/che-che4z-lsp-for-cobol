@@ -39,6 +39,12 @@ public class ListSources implements Callable<Integer> {
       names = {"-ws", "--workspace"})
   private Path workspace;
 
+  @CommandLine.Option(
+      description = "show absolute path of sources",
+      names = {"-ap", "--absolutePath"},
+      arity = "0")
+  private boolean showAbsolutePath;
+
   /**
    * execute list source command
    *
@@ -52,12 +58,14 @@ public class ListSources implements Callable<Integer> {
     JsonArray sources = new JsonArray();
     if (Objects.nonNull(workspace)) {
       try (Stream<Path> paths = Files.walk(workspace)) {
-        paths
-            .filter(Files::isRegularFile)
-            .map(f -> workspace.relativize(f))
-            .filter(this::isSourceFile)
-            .map(Path::toString)
-            .forEach(sources::add);
+        Stream<Path> pathStream =
+            paths
+                .filter(Files::isRegularFile)
+                .filter(f -> this.isSourceFile(workspace.relativize(f)));
+        if (!showAbsolutePath) {
+          pathStream = pathStream.map(f -> workspace.relativize(f));
+        }
+        pathStream.map(Path::toString).forEach(sources::add);
       }
     }
     result.add("sources", sources);
