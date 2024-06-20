@@ -24,7 +24,6 @@ import * as fsUtils from "../../../services/util/FSUtils";
 import { ProfileUtils } from "../../../services/util/ProfileUtils";
 import { SettingsUtils } from "../../../services/util/SettingsUtils";
 import { Utils } from "../../../services/util/Utils";
-import { E4ECopybookService } from "../../../services/copybook/E4ECopybookService";
 import { CopybookDownloadService } from "../../../services/copybook/CopybookDownloadService";
 
 const copybookName: string = "NSTCOPY1";
@@ -60,7 +59,9 @@ vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
   get: jest.fn().mockReturnValue(undefined),
 });
 Utils.getZoweExplorerAPI = jest.fn();
-E4ECopybookService.getE4EAPI = jest.fn();
+jest.mock("../../../services/copybook/E4ECopybookService", () => ({
+  getE4EAPI: jest.fn(),
+}));
 
 // file utils
 function createFile(filename: string, folderPath: string): string {

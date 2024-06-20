@@ -44,7 +44,7 @@ import { ServerRuntimeCodeActionProvider } from "./services/nativeLanguageClient
 import { ConfigurationWatcher } from "./services/util/ConfigurationWatcher";
 import * as path from "node:path";
 import { Utils } from "./services/util/Utils";
-import { E4ECopybookService } from "./services/copybook/E4ECopybookService";
+import { getE4EAPI } from "./services/copybook/E4ECopybookService";
 
 interface __AnalysisApi {
   analysis(uri: string, text: string): Promise<any>;
@@ -64,12 +64,18 @@ async function initialize(context: vscode.ExtensionContext) {
     outputChannel.appendLine(message);
     throw Error(message);
   }
+  const maybeE4E = await getE4EAPI();
   const copyBooksDownloader = new CopybookDownloadService(
     context.globalStorageUri.fsPath,
     await Utils.getZoweExplorerAPI(),
-    await E4ECopybookService.getE4EAPI(),
+    maybeE4E && "e4e" in maybeE4E ? maybeE4E.e4e : undefined,
     outputChannel,
   );
+  if (maybeE4E && "futureE4E" in maybeE4E) {
+    maybeE4E.futureE4E.then((api) => {
+      if (api) copyBooksDownloader.e4eAppeared(api.e4e);
+    });
+  }
   languageClientService = new LanguageClientService(
     outputChannel,
     context.globalStorageUri,
