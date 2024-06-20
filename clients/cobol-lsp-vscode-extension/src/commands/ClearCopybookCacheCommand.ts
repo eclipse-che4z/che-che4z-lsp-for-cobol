@@ -26,23 +26,22 @@ import {
  *
  */
 export function clearCache(uri: vscode.Uri) {
-  vscode.window.setStatusBarMessage(
-    CLEARING_COPYBOOK_CACHE,
-    (async () => {
-      const zowe = await deleteFolderContent(
-        vscode.Uri.joinPath(uri, ZOWE_FOLDER, COPYBOOKS_FOLDER),
+  const deletePromise = (async () => {
+    const zowe = await deleteFolderContent(
+      vscode.Uri.joinPath(uri, ZOWE_FOLDER, COPYBOOKS_FOLDER),
+    );
+    const e4e = await deleteFolderContent(
+      vscode.Uri.joinPath(uri, E4E_FOLDER, COPYBOOKS_FOLDER),
+    );
+    const results = await Promise.allSettled([...zowe, ...e4e]);
+    if (results.find((r) => r.status === "rejected"))
+      vscode.window.showInformationMessage(
+        "Encountered problem while clearing copybook cache",
       );
-      const e4e = await deleteFolderContent(
-        vscode.Uri.joinPath(uri, E4E_FOLDER, COPYBOOKS_FOLDER),
-      );
-      const results = await Promise.allSettled([...zowe, ...e4e]);
-      if (results.find((r) => r.status === "rejected"))
-        vscode.window.showInformationMessage(
-          "Encountered problem while clearing copybook cache",
-        );
-      else vscode.window.showInformationMessage(COPYBOOK_CACHE_CLEARED_INFO);
-    })(),
-  );
+    else vscode.window.showInformationMessage(COPYBOOK_CACHE_CLEARED_INFO);
+  })();
+  vscode.window.setStatusBarMessage(CLEARING_COPYBOOK_CACHE, deletePromise);
+  return deletePromise;
 }
 
 async function deleteFolderContent(fileUri: vscode.Uri) {
