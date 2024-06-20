@@ -271,7 +271,6 @@ public class CopybookServiceImpl implements CopybookService {
     LOG.debug("Copybooks expecting downloading: {}", copybooksForDownloading);
     Set<String> uris = new HashSet<>(copybookUris);
     uris.add(documentUri);
-    String document = files.getNameFromURI(documentUri);
 
     if (processingMode.download) {
       List<CopybookName> copybooksToDownload =
@@ -283,8 +282,7 @@ public class CopybookServiceImpl implements CopybookService {
               .collect(toList());
       LOG.debug("Copybooks to download: {}", copybooksToDownload);
       if (!copybooksToDownload.isEmpty()) {
-        clientProvider.get().downloadCopybooks(
-            document,
+        clientProvider.get().downloadCopybooks(documentUri,
             copybooksToDownload.stream().map(CopybookName::getQualifiedName).collect(toList()),
             Optional.ofNullable(copybooksToDownload.stream().findFirst().get().getDialectType()).orElse(COBOL), //NOSONAR
             !processingMode.userInteraction);

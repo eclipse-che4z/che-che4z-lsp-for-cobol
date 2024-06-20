@@ -19,6 +19,7 @@ import {
   CLEARING_COPYBOOK_CACHE,
   COPYBOOK_CACHE_CLEARED_INFO,
   COPYBOOKS_FOLDER,
+  E4E_FOLDER,
   ZOWE_FOLDER,
 } from "../constants";
 
@@ -34,7 +35,11 @@ export function clearCache(uri: vscode.Uri) {
         const zoweFileUri = uri.with({
           path: path.join(uri.fsPath, ZOWE_FOLDER, COPYBOOKS_FOLDER),
         });
+        const e4eFileUri = uri.with({
+          path: path.join(uri.fsPath, E4E_FOLDER, COPYBOOKS_FOLDER),
+        });
         deleteFolderContent(vscode.Uri.file(zoweFileUri.fsPath));
+        deleteFolderContent(vscode.Uri.file(e4eFileUri.fsPath));
         vscode.window.showInformationMessage(COPYBOOK_CACHE_CLEARED_INFO);
       },
       () =>

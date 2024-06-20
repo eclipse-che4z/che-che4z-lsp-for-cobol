@@ -67,7 +67,7 @@ function globSearch(
   copybookName: string,
   ext: string,
 ): string | undefined {
-  const pathName: string = isAbsolute(resource)
+  const pathName: string = path.isAbsolute(resource)
     ? resource
     : path.normalize(path.join(workspaceFolder, resource));
   const segments = pathName.split(path.sep);
@@ -104,13 +104,9 @@ export function getProgramNameFromUri(
   uri: string,
   includeExt: boolean = false,
 ): string {
-  const fullPath = Uri.parse(uri).fsPath;
+  const fullPath = Uri.parse(uri, true).fsPath;
   if (includeExt) {
     return path.basename(fullPath);
   }
   return path.basename(fullPath, path.extname(fullPath));
-}
-
-function isAbsolute(resource: string): boolean {
-  return path.resolve(resource) === path.normalize(resource);
 }

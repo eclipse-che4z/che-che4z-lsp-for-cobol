@@ -81,7 +81,3 @@ export const zoweExplorerErrorMock = {
   getUssApi: ussApiMockWithError,
   registeredApiTypes: jest.fn().mockReturnValue([]),
 };
-
-it("dummy", () => {
-  expect(true).toBeTruthy();
-});

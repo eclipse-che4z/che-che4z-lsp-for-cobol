@@ -60,7 +60,7 @@ export class ProfileUtils {
     programName: string,
   ): Promise<string | undefined> {
     const vscodeOpenedDoc = vscode.workspace.textDocuments.find((doc) =>
-      doc.fileName.endsWith(programName),
+      doc.fileName.endsWith(path.basename(programName)),
     );
     if (!vscodeOpenedDoc) return;
 

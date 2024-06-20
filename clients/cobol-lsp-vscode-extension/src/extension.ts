@@ -19,7 +19,6 @@ import { isV1RuntimeDialectDetail } from "./dialect/utils";
 import { fetchCopybookCommand } from "./commands/FetchCopybookCommand";
 import { gotoCopybookSettings } from "./commands/OpenSettingsCommand";
 import {
-  COPYBOOKS_FOLDER,
   FAIL_CREATE_COPYBOOK_FOLDER_MSG,
   FAIL_CREATE_GLOBAL_STORAGE_MSG,
   LANGUAGE_ID,
@@ -48,6 +47,7 @@ import { ServerRuntimeCodeActionProvider } from "./services/nativeLanguageClient
 import { ConfigurationWatcher } from "./services/util/ConfigurationWatcher";
 import * as path from "node:path";
 import { Utils } from "./services/util/Utils";
+import { E4ECopybookService } from "./services/copybook/E4ECopybookService";
 
 interface __AnalysisApi {
   analysis(uri: string, text: string): Promise<any>;
@@ -60,7 +60,6 @@ const API_VERSION: string = "1.0.0";
 async function initialize(context: vscode.ExtensionContext) {
   // We need lazy initialization to be able to mock this for unit testing
   outputChannel = vscode.window.createOutputChannel("COBOL Language Support");
-
   try {
     await vscode.workspace.fs.createDirectory(context.globalStorageUri);
   } catch (error) {
@@ -71,6 +70,8 @@ async function initialize(context: vscode.ExtensionContext) {
   const copyBooksDownloader = new CopybookDownloadService(
     context.globalStorageUri.fsPath,
     await Utils.getZoweExplorerAPI(),
+    await E4ECopybookService.getE4EAPI(),
+    outputChannel,
   );
   languageClientService = new LanguageClientService(
     outputChannel,
@@ -141,7 +142,11 @@ export async function activate(
   );
   languageClientService.addRequestHandler(
     "copybook/resolve",
-    resolveCopybookHandler.bind(undefined, context.globalStorageUri.fsPath),
+    resolveCopybookHandler.bind(
+      undefined,
+      context.globalStorageUri.fsPath,
+      outputChannel,
+    ),
   );
   languageClientService.addRequestHandler(
     "copybook/download",
@@ -309,11 +314,7 @@ function registerCommands(
       "cobol-lsp.open.copybook.internalfolder",
       async () => {
         const copybookFolder = vscode.Uri.file(
-          path.join(
-            context.globalStorageUri.fsPath,
-            ZOWE_FOLDER,
-            COPYBOOKS_FOLDER,
-          ),
+          path.join(context.globalStorageUri.fsPath, ZOWE_FOLDER),
         );
         try {
           await vscode.workspace.fs.createDirectory(copybookFolder);

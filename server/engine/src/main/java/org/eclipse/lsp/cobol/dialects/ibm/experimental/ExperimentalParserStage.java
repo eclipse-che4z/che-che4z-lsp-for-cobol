@@ -15,8 +15,10 @@
 package org.eclipse.lsp.cobol.dialects.ibm.experimental;
 
 import com.google.common.collect.ImmutableList;
+
 import java.util.List;
 import java.util.stream.Collectors;
+
 import lombok.RequiredArgsConstructor;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.DefaultErrorStrategy;
@@ -49,21 +51,19 @@ public class ExperimentalParserStage implements Stage<AnalysisContext, ParserSta
 
   @Override
   public StageResult<ParserStageResult> run(AnalysisContext context, StageResult<DialectOutcome> prevStageResult) {
-    return context.getBenchmarkSession().measure("pipeline.parser", () -> {
-      // Run parser;
-      context.setDialectNodes(ImmutableList.<Node>builder()
-          .addAll(context.getDialectNodes())
-          .addAll(prevStageResult.getData().getDialectNodes())
-          .build());
-      ParserListener listener = new ParserListener(context.getExtendedDocument(), context.getCopybooksRepository());
-      DefaultErrorStrategy errorStrategy = new BasicCobolErrorHandler(messageService);
-      AstBuilder parser = new SplitParser(CharStreams.fromString(context.getExtendedDocument().toString()),
-          listener, errorStrategy, treeListener);
-      CobolParser.StartRuleContext tree = parser.runParser();
-      context.getAccumulatedErrors().addAll(listener.getErrors());
-      context.getAccumulatedErrors().addAll(getParsingError(context, parser));
-      return new StageResult<>(new ParserStageResult(parser.getTokens(), tree));
-    });
+    // Run parser;
+    context.setDialectNodes(ImmutableList.<Node>builder()
+            .addAll(context.getDialectNodes())
+            .addAll(prevStageResult.getData().getDialectNodes())
+            .build());
+    ParserListener listener = new ParserListener(context.getExtendedDocument(), context.getCopybooksRepository());
+    DefaultErrorStrategy errorStrategy = new BasicCobolErrorHandler(messageService);
+    AstBuilder parser = new SplitParser(CharStreams.fromString(context.getExtendedDocument().toString()),
+            listener, errorStrategy, treeListener);
+    CobolParser.StartRuleContext tree = parser.runParser();
+    context.getAccumulatedErrors().addAll(listener.getErrors());
+    context.getAccumulatedErrors().addAll(getParsingError(context, parser));
+    return new StageResult<>(new ParserStageResult(parser.getTokens(), tree));
   }
 
   private List<SyntaxError> getParsingError(AnalysisContext context, AstBuilder parser) {
@@ -71,11 +71,11 @@ public class ExperimentalParserStage implements Stage<AnalysisContext, ParserSta
       Location location = context.getExtendedDocument().mapLocation(diagnostic.getRange());
       String copybookId = context.getCopybooksRepository().getCopybookIdByUri(location.getUri());
       return SyntaxError.syntaxError()
-          .errorSource(ErrorSource.PARSING)
-          .severity(ErrorSeverity.ERROR)
-          .location(new OriginalLocation(location, copybookId))
-          .suggestion(diagnostic.getMessage())
-          .build();
+              .errorSource(ErrorSource.PARSING)
+              .severity(ErrorSeverity.ERROR)
+              .location(new OriginalLocation(location, copybookId))
+              .suggestion(diagnostic.getMessage())
+              .build();
     }).collect(Collectors.toList());
   }
 

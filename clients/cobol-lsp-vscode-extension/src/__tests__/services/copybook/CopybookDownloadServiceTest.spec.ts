@@ -20,7 +20,7 @@ import * as vscode from "vscode";
 import {
   zoweExplorerErrorMock,
   zoweExplorerMock,
-} from "./download/getZoweExplorerMock.utility";
+} from "../../../__mocks__/getZoweExplorerMock.utility";
 import { DownloadUtil } from "../../../services/copybook/downloader/DownloadUtil";
 
 jest.mock("../../../services/reporter/TelemetryService");
@@ -28,6 +28,7 @@ jest.mock("../../../services/reporter/TelemetryService");
   { uri: { fsPath: "/projects" } } as any,
 ];
 Utils.getZoweExplorerAPI = jest.fn().mockReturnValue(zoweExplorerMock);
+
 describe("Tests copybook download service", () => {
   DownloadUtil.areCopybookDownloadConfigurationsPresent = jest
     .fn()
@@ -45,6 +46,7 @@ describe("Tests copybook download service", () => {
       const downloadService = new CopybookDownloadService(
         "storage-path",
         {} as any as IApiRegisterClient,
+        undefined,
       );
       (ProfileUtils as any).getProfileNameForCopybook = jest
         .fn()
@@ -65,6 +67,7 @@ describe("Tests copybook download service", () => {
       const downloadService = new CopybookDownloadService(
         "storage-path",
         {} as any as IApiRegisterClient,
+        undefined,
       );
       (CopybookDownloadService as any).checkWorkspace = jest
         .fn()
@@ -89,6 +92,7 @@ describe("Tests copybook download service", () => {
       const downloadService = new CopybookDownloadService(
         "storage-path",
         zoweExplorerErrorMock,
+        undefined,
       );
       (ProfileUtils as any).getProfileNameForCopybook = jest
         .fn()
@@ -111,6 +115,7 @@ describe("Tests copybook download service", () => {
       const downloadService = new CopybookDownloadService(
         "storage-path",
         zoweExplorerErrorMock,
+        undefined,
       );
       (ProfileUtils as any).getProfileNameForCopybook = jest
         .fn()
@@ -136,6 +141,7 @@ describe("Tests copybook download service", () => {
       const downloadService = new CopybookDownloadService(
         "storage-path",
         zoweExplorerErrorMock,
+        undefined,
       );
       (ProfileUtils as any).getProfileNameForCopybook = jest
         .fn()
@@ -168,6 +174,7 @@ describe("Tests copybook download service", () => {
     const downloadService = new CopybookDownloadService(
       "storage-path",
       {} as any as IApiRegisterClient,
+      undefined,
     );
     DownloadUtil.checkForInvalidCredProfile = jest.fn().mockReturnValue(false);
     (downloadService as any).downloadResolver.downloadCopybook = jest
@@ -200,6 +207,7 @@ describe("Tests copybook download service", () => {
     const downloadService = new CopybookDownloadService(
       "storage-path",
       {} as any as IApiRegisterClient,
+      undefined,
     );
     const mockProgress = {
       report: jest.fn(),
