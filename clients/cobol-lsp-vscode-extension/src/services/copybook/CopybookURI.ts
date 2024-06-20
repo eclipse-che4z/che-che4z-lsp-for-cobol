@@ -59,12 +59,16 @@ export class CopybookURI {
    * @param profile represent a name of a folder within the .copybooks folder that have the same name as the
    * connection name needed to download copybooks from mainframe.
    */
-  public static async createPathForCopybookDownloaded(
+  public static createPathForCopybookDownloaded(
     documentUri: string,
     dialectType: string,
     downloadFolder: string,
-  ): Promise<string[]> {
-    const profile = await ProfileUtils.getProfileNameForCopybook(documentUri);
+    zoweExplorerApi: IApiRegisterClient | undefined,
+  ): string[] {
+    const profile = ProfileUtils.getProfileNameForCopybook(
+      documentUri,
+      zoweExplorerApi,
+    );
 
     let result: string[] = [];
     const datasets: string[] = SettingsService.getDsnPath(

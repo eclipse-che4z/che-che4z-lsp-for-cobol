@@ -58,10 +58,6 @@ SettingsUtils.getWorkspaceFoldersPath = jest.fn().mockReturnValue([__dirname]);
 vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
   get: jest.fn().mockReturnValue(undefined),
 });
-Utils.getZoweExplorerAPI = jest.fn();
-jest.mock("../../../services/copybook/E4ECopybookService", () => ({
-  getE4EAPI: jest.fn(),
-}));
 
 // file utils
 function createFile(filename: string, folderPath: string): string {
@@ -96,11 +92,12 @@ async function buildResultArrayFrom(
   }
   ProfileUtils.getProfileNameForCopybook = jest
     .fn()
-    .mockResolvedValue(profileName);
-  const result = await (CopybookURI as any).createPathForCopybookDownloaded(
+    .mockImplementation(() => profileName);
+  const result = CopybookURI.createPathForCopybookDownloaded(
     filename,
     SettingsService.DEFAULT_DIALECT,
     path.join("downloadFolder", ZOWE_FOLDER),
+    {} as any as IApiRegisterClient,
   );
   return result.length;
 }

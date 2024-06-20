@@ -65,15 +65,21 @@ async function initialize(context: vscode.ExtensionContext) {
     throw Error(message);
   }
   const maybeE4E = await getE4EAPI();
+  const maybeZowe = await Utils.getZoweExplorerAPI();
   const copyBooksDownloader = new CopybookDownloadService(
     context.globalStorageUri.fsPath,
-    await Utils.getZoweExplorerAPI(),
-    maybeE4E && "e4e" in maybeE4E ? maybeE4E.e4e : undefined,
+    maybeZowe && "api" in maybeZowe ? maybeZowe.api : undefined,
+    maybeE4E && "api" in maybeE4E ? maybeE4E.api : undefined,
     outputChannel,
   );
-  if (maybeE4E && "futureE4E" in maybeE4E) {
-    maybeE4E.futureE4E.then((api) => {
-      if (api) copyBooksDownloader.e4eAppeared(api.e4e);
+  if (maybeZowe && "futureApi" in maybeZowe) {
+    maybeZowe.futureApi.then((api) => {
+      if (api) copyBooksDownloader.explorerAppeared(api.api);
+    });
+  }
+  if (maybeE4E && "futureApi" in maybeE4E) {
+    maybeE4E.futureApi.then((api) => {
+      if (api) copyBooksDownloader.e4eAppeared(api.api);
     });
   }
   languageClientService = new LanguageClientService(

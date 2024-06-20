@@ -12,16 +12,14 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
-import * as path from "path";
 import * as vscode from "vscode";
 import { SettingsService } from "../Settings";
-import { Utils } from "./Utils";
 
 export class ProfileUtils {
-  public static async getProfileNameForCopybook(
+  public static getProfileNameForCopybook(
     cobolFileName: string,
-  ): Promise<string | undefined> {
-    const zoweExplorerApi = await Utils.getZoweExplorerAPI();
+    zoweExplorerApi: IApiRegisterClient | undefined,
+  ): string | undefined {
     if (!zoweExplorerApi) {
       return undefined;
     }

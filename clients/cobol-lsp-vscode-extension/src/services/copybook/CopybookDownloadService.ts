@@ -139,10 +139,11 @@ export class CopybookDownloadService {
     // check in subfolders under .copybooks (copybook downloaded from MF)
     return searchCopybookInExtensionFolder(
       copybookName,
-      await CopybookURI.createPathForCopybookDownloaded(
+      CopybookURI.createPathForCopybookDownloaded(
         documentUri,
         dialectType,
         path.join(this.storagePath, ZOWE_FOLDER, COPYBOOKS_FOLDER),
+        this.explorerApi,
       ),
       SettingsService.getCopybookExtension(documentUri),
       this.storagePath,
@@ -248,7 +249,10 @@ export class CopybookDownloadService {
     )
       return false;
     if (!this.explorerApi) return false;
-    const profile = await ProfileUtils.getProfileNameForCopybook(documentUri);
+    const profile = ProfileUtils.getProfileNameForCopybook(
+      documentUri,
+      this.explorerApi,
+    );
     const availableProfiles = ProfileUtils.getAvailableProfiles(
       this.explorerApi,
     );

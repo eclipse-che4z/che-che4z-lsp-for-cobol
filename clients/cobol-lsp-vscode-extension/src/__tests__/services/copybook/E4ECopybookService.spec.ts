@@ -29,7 +29,7 @@ describe("e4e copybook service tests", () => {
     const spyValidate = jest.spyOn(Utils, "validateE4E");
     const api = await getE4EAPI();
     expect(spyValidate).toHaveBeenCalled();
-    expect(api).toEqual({ e4e: e4eMock });
+    expect(api).toEqual({ api: e4eMock });
   });
   it("e4e installed later on", async () => {
     const spyValidate = jest.spyOn(Utils, "validateE4E");
@@ -45,10 +45,10 @@ describe("e4e copybook service tests", () => {
     (vscode.extensions as any).onDidChange = onDidChange;
 
     const api = await getE4EAPI();
-    expect(api).toHaveProperty("futureE4E");
+    expect(api).toHaveProperty("futureApi");
     expect(changeCallback).toBeTruthy();
-    const { futureE4E } = api as {
-      futureE4E: Promise<undefined | { e4e: E4E }>;
+    const { futureApi } = api as {
+      futureApi: Promise<undefined | { api: E4E }>;
     };
 
     // e4e has now been installed
@@ -56,7 +56,7 @@ describe("e4e copybook service tests", () => {
     getExtension.mockReturnValue(ext);
     (changeCallback as () => void)(); // typescript does not see through the indirect call
 
-    expect(await futureE4E).toEqual({ e4e: e4eMock });
+    expect(await futureApi).toEqual({ api: e4eMock });
     expect(spyValidate).toHaveBeenCalled();
   });
 });

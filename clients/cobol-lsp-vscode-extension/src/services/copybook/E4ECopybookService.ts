@@ -11,45 +11,13 @@
  * Contributors:
  *   Broadcom, Inc. - initial API and implementation
  */
-import * as vscode from "vscode";
+
 import { E4E } from "../../type/e4eApi.d";
-import { Utils } from "../util/Utils";
+import { getExtensionApi, Utils } from "../util/Utils";
 
-async function safeActivate(ext: vscode.Extension<any>) {
-  try {
-    return await ext.activate();
-  } catch (_) {}
-}
-
-async function extractApi(
-  ext: vscode.Extension<any>,
-): Promise<E4E | undefined> {
-  const e4e = ext.isActive ? ext.exports : await safeActivate(ext);
-  if (!Utils.validateE4E(e4e)) return undefined;
-  return e4e;
-}
-
-function asE4E(e4e: E4E | undefined) {
-  if (e4e) return { e4e };
-  return undefined;
-}
-
-export async function getE4EAPI(): Promise<
-  undefined | { e4e: E4E } | { futureE4E: Promise<undefined | { e4e: E4E }> }
-> {
-  const e4eExt = "BroadcomMFD.explorer-for-endevor";
-  const ext = vscode.extensions.getExtension(e4eExt);
-  if (ext) {
-    return asE4E(await extractApi(ext));
-  }
-  return {
-    futureE4E: new Promise((res, _) => {
-      const extAdded = vscode.extensions.onDidChange(() => {
-        const ext = vscode.extensions.getExtension(e4eExt);
-        if (!ext) return;
-        extAdded.dispose();
-        extractApi(ext).then((e4e) => res(asE4E(e4e)));
-      });
-    }),
-  };
+export async function getE4EAPI() {
+  return getExtensionApi<E4E>(
+    "BroadcomMFD.explorer-for-endevor",
+    Utils.validateE4E,
+  );
 }

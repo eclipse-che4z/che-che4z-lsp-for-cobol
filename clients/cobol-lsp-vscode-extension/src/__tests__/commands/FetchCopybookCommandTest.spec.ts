@@ -21,7 +21,7 @@ import { TelemetryService } from "../../services/reporter/TelemetryService";
 import { Utils } from "../../services/util/Utils";
 
 jest.mock("../../services/reporter/TelemetryService");
-Utils.getZoweExplorerAPI = jest.fn().mockReturnValue({});
+Utils.getZoweExplorerAPI = jest.fn().mockReturnValue({ api: {} });
 
 const copybook: string = "cobyBookTest";
 const progName: string = "progNameTest";
