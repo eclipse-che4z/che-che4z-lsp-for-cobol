@@ -20,11 +20,14 @@ import { CopybookDownloadService } from "../../../../services/copybook/CopybookD
 jest.mock("../../../../services/reporter/TelemetryService");
 
 describe("tests download resolver", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
   describe("checks order of resolution [E4E, DSN and USS order]", () => {
     beforeEach(() => {
       jest.clearAllMocks();
     });
-    it("checks the order of copybook resolution - DNS followed by USS)", async () => {
+    it("checks the order of copybook resolution - DSN followed by USS)", async () => {
       const downloader = new CopybookDownloadService(
         "storage-path",
         zoweExplorerMock,
@@ -34,9 +37,8 @@ describe("tests download resolver", () => {
         .fn()
         .mockReturnValue(false);
       (downloader as any).ussDownloader.downloadCopybook = jest.fn();
-      (downloader as any).fetchDownloadSettings = jest
-        .fn()
-        .mockReturnValue({ dsnPaths: ["dns"], ussPaths: ["uss"] });
+      SettingsService.getDsnPath = jest.fn().mockReturnValue(["dsn"]);
+      SettingsService.getUssPath = jest.fn().mockReturnValue(["uss"]);
       await downloader.downloadCopybook(
         { name: "copybook", dialect: "COBOL" },
         "document-uri",
@@ -46,7 +48,7 @@ describe("tests download resolver", () => {
       ).toHaveBeenCalledWith(
         { name: "copybook", dialect: "COBOL" },
         "document-uri",
-        "dns",
+        "dsn",
       );
       expect(
         (downloader as any).ussDownloader.downloadCopybook,
@@ -57,7 +59,7 @@ describe("tests download resolver", () => {
       );
     });
 
-    it("checks the order of copybook resolution - USS is not called when DNS resolves)", async () => {
+    it("checks the order of copybook resolution - USS is not called when DSN resolves)", async () => {
       const downloader = new CopybookDownloadService(
         "storage-path",
         zoweExplorerMock,
@@ -67,9 +69,8 @@ describe("tests download resolver", () => {
         .fn()
         .mockReturnValue(true);
       (downloader as any).ussDownloader.downloadCopybook = jest.fn();
-      (downloader as any).fetchDownloadSettings = jest
-        .fn()
-        .mockReturnValue({ dsnPaths: ["dns"], ussPaths: ["uss"] });
+      SettingsService.getDsnPath = jest.fn().mockReturnValue(["dsn"]);
+      SettingsService.getUssPath = jest.fn().mockReturnValue(["uss"]);
       await downloader.downloadCopybook(
         { name: "copybook", dialect: "COBOL" },
         "document-uri",
@@ -79,31 +80,12 @@ describe("tests download resolver", () => {
       ).toHaveBeenCalledWith(
         { name: "copybook", dialect: "COBOL" },
         "document-uri",
-        "dns",
+        "dsn",
       );
       expect(
         (downloader as any).ussDownloader.downloadCopybook,
       ).toHaveBeenCalledTimes(0);
     });
-  });
-
-  it("checks resolver is able to fetch settings", () => {
-    const downloader = new CopybookDownloadService(
-      "storage-path",
-      zoweExplorerMock,
-      e4eMock,
-    );
-    beforeEach(() => {
-      jest.clearAllMocks();
-    });
-
-    SettingsService.getDsnPath = jest.fn().mockReturnValue(["dsn"]);
-    SettingsService.getUssPath = jest.fn().mockReturnValue(["uss"]);
-    const settings = (downloader as any).fetchDownloadSettings(
-      { name: "copybook", dialect: "COBOL" },
-      "document-uri",
-    );
-    expect(settings).toEqual({ dsnPaths: ["dsn"], ussPaths: ["uss"] });
   });
 
   it("checks the order of resolution is same as the one provided in user settings", async () => {
@@ -112,18 +94,14 @@ describe("tests download resolver", () => {
       zoweExplorerMock,
       undefined,
     );
-    beforeEach(() => {
-      jest.clearAllMocks();
-    });
 
     (downloader as any).dsnDownloader.downloadCopybook = jest
       .fn()
       .mockReturnValueOnce(false)
       .mockReturnValue(true);
     (downloader as any).ussDownloader.downloadCopybook = jest.fn();
-    (downloader as any).fetchDownloadSettings = jest
-      .fn()
-      .mockReturnValue({ dsnPaths: ["dsn", "dsn-2"], ussPaths: [] });
+    SettingsService.getDsnPath = jest.fn().mockReturnValue(["dsn", "dsn-2"]);
+    SettingsService.getUssPath = jest.fn().mockReturnValue(["uss"]);
     await downloader.downloadCopybook(
       { name: "copybook", dialect: "COBOL" },
       "document-uri",
@@ -180,9 +158,8 @@ describe("tests download resolver", () => {
       (downloader as any).dsnDownloader.downloadCopybook = jest
         .fn()
         .mockReturnValue(true);
-      (downloader as any).fetchDownloadSettings = jest
-        .fn()
-        .mockReturnValue({ dsnPaths: ["dns"], ussPaths: ["uss"] });
+      SettingsService.getDsnPath = jest.fn().mockReturnValue(["dsn"]);
+      SettingsService.getUssPath = jest.fn().mockReturnValue(["uss"]);
       await downloader.downloadCopybook(
         { name: "copybook", dialect: "COBOL" },
         "document-uri",
@@ -192,7 +169,7 @@ describe("tests download resolver", () => {
       ).toHaveBeenCalledWith(
         { name: "copybook", dialect: "COBOL" },
         "document-uri",
-        "dns",
+        "dsn",
       );
     });
 
@@ -208,9 +185,8 @@ describe("tests download resolver", () => {
       (downloader as any).ussDownloader.downloadCopybook = jest
         .fn()
         .mockReturnValue(true);
-      (downloader as any).fetchDownloadSettings = jest
-        .fn()
-        .mockReturnValue({ dsnPaths: ["dns"], ussPaths: ["uss"] });
+      SettingsService.getDsnPath = jest.fn().mockReturnValue(["dsn"]);
+      SettingsService.getUssPath = jest.fn().mockReturnValue(["uss"]);
       await downloader.downloadCopybook(
         { name: "copybook", dialect: "COBOL" },
         "document-uri",
@@ -220,7 +196,7 @@ describe("tests download resolver", () => {
       ).toHaveBeenCalledWith(
         { name: "copybook", dialect: "COBOL" },
         "document-uri",
-        "dns",
+        "dsn",
       );
       expect(
         (downloader as any).ussDownloader.downloadCopybook,

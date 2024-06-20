@@ -52,7 +52,7 @@ export class CopybookDownloaderForE4E {
 
   private E4EConfigs = new Map<string, e4eResponse>();
 
-  public async getE4EClient(uri: string): Promise<e4eResponse | undefined> {
+  public async getE4EConfig(uri: string): Promise<e4eResponse | undefined> {
     const config = this.E4EConfigs.get(uri);
     if (config) {
       return config;
@@ -150,7 +150,7 @@ export class CopybookDownloaderForE4E {
     documentUri: string,
     copybookName: CopybookName,
   ): Promise<boolean> {
-    const response = await this.getE4EClient(documentUri);
+    const response = await this.getE4EConfig(documentUri);
     if (!response) return false;
     const first = response.elements[copybookName.name];
 
@@ -259,7 +259,7 @@ export class CopybookDownloaderForE4E {
     copybookName: string,
     documentUri: string,
   ) {
-    const config = await this.getE4EClient(documentUri);
+    const config = await this.getE4EConfig(documentUri);
     if (!config) {
       throw Error;
     }

@@ -58,17 +58,12 @@ export class CopybookDownloadService {
       return true;
     }
 
-    const { dsnPaths, ussPaths } = this.fetchDownloadSettings(
-      copybookName,
-      documentUri,
-    );
-
     if (this.dsnDownloader) {
       const dsnSuccess = await this.downloadFromPaths(
         this.dsnDownloader,
         copybookName,
         documentUri,
-        dsnPaths,
+        SettingsService.getDsnPath(documentUri, copybookName.dialect),
       );
       if (dsnSuccess) return true;
     }
@@ -78,7 +73,7 @@ export class CopybookDownloadService {
         this.ussDownloader,
         copybookName,
         documentUri,
-        ussPaths,
+        SettingsService.getUssPath(documentUri, copybookName.dialect),
       );
     }
 
@@ -113,23 +108,12 @@ export class CopybookDownloadService {
     return false;
   }
 
-  private fetchDownloadSettings(
-    copybookName: CopybookName,
-    documentUri: string,
-  ): { dsnPaths: string[]; ussPaths: string[] } {
-    const dsnPaths = SettingsService.getDsnPath(
-      documentUri,
-      copybookName.dialect,
-    );
-    const ussPaths = SettingsService.getUssPath(
-      documentUri,
-      copybookName.dialect,
-    );
-    return { dsnPaths, ussPaths };
+  private handleAsEndevorElement(documentUri: string) {
+    return this.e4eApi?.isEndevorElement(documentUri);
   }
 
-  private handleAsEndevorElements(documentUri: string) {
-    return this.e4eApi?.isEndevorElement(documentUri);
+  public makeResolveCopybookHandler() {
+    return this.resolveCopybookHandler.bind(this);
   }
 
   public async resolveCopybookHandler(
@@ -137,34 +121,32 @@ export class CopybookDownloadService {
     copybookName: string,
     dialectType: string,
   ): Promise<string | undefined> {
-    let result: string | undefined;
-    if (this.handleAsEndevorElements(documentUri)) {
-      result = await this.e4eDownloader?.getE4ECopyBookLocation(
+    if (this.handleAsEndevorElement(documentUri)) {
+      return await this.e4eDownloader?.getE4ECopyBookLocation(
         copybookName,
         documentUri,
       );
-      return result;
     }
-    result = await searchCopybook(
+
+    const result = await searchCopybook(
       documentUri,
       copybookName,
       dialectType,
       this.storagePath,
     );
+    if (result) return result;
+
     // check in subfolders under .copybooks (copybook downloaded from MF)
-    if (!result) {
-      result = searchCopybookInExtensionFolder(
-        copybookName,
-        await CopybookURI.createPathForCopybookDownloaded(
-          documentUri,
-          dialectType,
-          path.join(this.storagePath, ZOWE_FOLDER, COPYBOOKS_FOLDER),
-        ),
-        SettingsService.getCopybookExtension(documentUri),
-        this.storagePath,
-      );
-    }
-    return result;
+    return searchCopybookInExtensionFolder(
+      copybookName,
+      await CopybookURI.createPathForCopybookDownloaded(
+        documentUri,
+        dialectType,
+        path.join(this.storagePath, ZOWE_FOLDER, COPYBOOKS_FOLDER),
+      ),
+      SettingsService.getCopybookExtension(documentUri),
+      this.storagePath,
+    );
   }
 
   constructor(
@@ -255,8 +237,8 @@ export class CopybookDownloadService {
     documentUri: string,
     copybookNames: CopybookName[],
   ): Promise<boolean> {
-    if (this.handleAsEndevorElements(documentUri)) {
-      return !!(await this.e4eDownloader?.getE4EClient(documentUri));
+    if (this.handleAsEndevorElement(documentUri)) {
+      return !!(await this.e4eDownloader?.getE4EConfig(documentUri));
     }
     if (
       !DownloadUtil.areCopybookDownloadConfigurationsPresent(

@@ -145,7 +145,7 @@ export async function activate(
   );
   languageClientService.addRequestHandler(
     "copybook/resolve",
-    copyBooksDownloader.resolveCopybookHandler.bind(copyBooksDownloader),
+    copyBooksDownloader.makeResolveCopybookHandler(),
   );
   languageClientService.addRequestHandler(
     "copybook/download",

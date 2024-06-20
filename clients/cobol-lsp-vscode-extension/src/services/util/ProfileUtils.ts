@@ -25,7 +25,10 @@ export class ProfileUtils {
     if (!zoweExplorerApi) {
       return undefined;
     }
-    return ProfileUtils.getValidProfileForCopybookDownload(cobolFileName);
+    return ProfileUtils.getValidProfileForCopybookDownload(
+      cobolFileName,
+      zoweExplorerApi,
+    );
   }
 
   public static getAvailableProfiles(zoweExplorerApi: IApiRegisterClient) {
@@ -43,11 +46,13 @@ export class ProfileUtils {
     return availableProfiles;
   }
 
-  private static async getValidProfileForCopybookDownload(
+  private static getValidProfileForCopybookDownload(
     programUri: string,
-  ): Promise<string | undefined> {
-    const profileFromDoc = await ProfileUtils.getProfileFromDocument(
+    zoweExplorerApi: IApiRegisterClient | undefined,
+  ): string | undefined {
+    const profileFromDoc = ProfileUtils.getProfileFromDocument(
       programUri,
+      zoweExplorerApi,
     );
     const passedProfile = SettingsService.getProfileName();
     if (!passedProfile && profileFromDoc) {
@@ -56,18 +61,24 @@ export class ProfileUtils {
     return passedProfile;
   }
 
-  private static async getProfileFromDocument(
+  public static getProfileFromDocument(
     programUri: string,
-  ): Promise<string | undefined> {
-    const zoweExplorerApi = await Utils.getZoweExplorerAPI();
+    zoweExplorerApi: IApiRegisterClient | undefined,
+  ): string | undefined {
+    const uri = vscode.Uri.parse(programUri);
+    if (uri.scheme === "zowe-ds" || uri.scheme === "zowe-uss") {
+      const profile = uri.path.split("/")[1];
+      if (!profile) return undefined;
+      return profile;
+    }
+
+    if (uri.scheme !== "file") return;
+
     if (!zoweExplorerApi) return;
     const eeApi = zoweExplorerApi.getExplorerExtenderApi();
 
-    const uri = vscode.Uri.parse(programUri);
-    if (uri.scheme !== "file") return;
     const fsPath = uri.fsPath;
 
-    // TODO: `openFiles` is deprecated in vNext
     const openedFile =
       eeApi.ussFileProvider.openFiles[fsPath] ||
       eeApi.datasetProvider.openFiles[fsPath];

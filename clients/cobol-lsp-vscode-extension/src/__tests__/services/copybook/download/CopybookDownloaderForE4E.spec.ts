@@ -68,7 +68,7 @@ describe("e4e copybook downloader tests", () => {
     );
     const spyDownloadDataset = jest.spyOn(e4eDownloader, "downloadDatasetE4E");
     const spyDownloadElement = jest.spyOn(e4eDownloader, "downloadElementE4E");
-    e4eDownloader.getE4EClient = async () => e4eResponseEndevorFirst;
+    e4eDownloader.getE4EConfig = async () => e4eResponseEndevorFirst;
     await e4eDownloader.downloadCopybookE4E("uri", {
       name: "NoCopybook",
       dialect: "COBOL",
@@ -83,7 +83,7 @@ describe("e4e copybook downloader tests", () => {
     );
     const spyDownloadDataset = jest.spyOn(e4eDownloader, "downloadDatasetE4E");
     const spyDownloadElement = jest.spyOn(e4eDownloader, "downloadElementE4E");
-    e4eDownloader.getE4EClient = async () => e4eResponseEndevorFirst;
+    e4eDownloader.getE4EConfig = async () => e4eResponseEndevorFirst;
     await e4eDownloader.downloadCopybookE4E("uri", {
       name: "copybook",
       dialect: "COBOL",
@@ -107,7 +107,7 @@ describe("e4e copybook downloader tests", () => {
     );
     const spyDownloadDataset = jest.spyOn(e4eDownloader, "downloadDatasetE4E");
     const spyDownloadElement = jest.spyOn(e4eDownloader, "downloadElementE4E");
-    e4eDownloader.getE4EClient = async () => e4eResponseEndevorFirst;
+    e4eDownloader.getE4EConfig = async () => e4eResponseEndevorFirst;
     await e4eDownloader.downloadCopybookE4E("uri", {
       name: "copybook",
       dialect: "COBOL",
@@ -129,7 +129,7 @@ describe("e4e copybook downloader tests", () => {
     const e4eDownloader = new CopybookDownloaderForE4E("/storagePath", {
       getMember,
     } as any as E4E);
-    e4eDownloader.getE4EClient = async () => e4eResponseDatasetFirst;
+    e4eDownloader.getE4EConfig = async () => e4eResponseDatasetFirst;
     await e4eDownloader.downloadCopybookE4E("uri", {
       name: "copybook",
       dialect: "COBOL",
@@ -142,7 +142,7 @@ describe("e4e copybook downloader tests", () => {
     const e4eDownloader = new CopybookDownloaderForE4E("/storagePath", {
       getElement,
     } as any as E4E);
-    e4eDownloader.getE4EClient = async () => e4eResponseEndevorFirst;
+    e4eDownloader.getE4EConfig = async () => e4eResponseEndevorFirst;
     await e4eDownloader.downloadCopybookE4E("uri", {
       name: "copybook",
       dialect: "COBOL",
@@ -155,7 +155,7 @@ describe("e4e copybook downloader tests", () => {
     const e4eDownloader = new CopybookDownloaderForE4E("/storagePath", {
       getMember,
     } as any as E4E);
-    e4eDownloader.getE4EClient = async () => e4eResponseDatasetFirst;
+    e4eDownloader.getE4EConfig = async () => e4eResponseDatasetFirst;
     await e4eDownloader.downloadCopybookE4E("uri", {
       name: "copybook",
       dialect: "COBOL",

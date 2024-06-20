@@ -87,4 +87,24 @@ describe("Test profile Utils", () => {
       "profile2",
     );
   });
+  it("test zowe v3 profile extraction", () => {
+    vscode.Uri.parse = jest.fn().mockImplementation((arg) => {
+      const match = /^([^:]+):(.*)/.exec(arg);
+      return {
+        scheme: match?.[1],
+        path: match?.[2],
+        fsPath: match?.[2]?.replace("/", path.sep),
+      };
+    });
+    expect(ProfileUtils.getProfileFromDocument("", undefined)).toBeUndefined();
+    expect(
+      ProfileUtils.getProfileFromDocument("zowe-ds:", undefined),
+    ).toBeUndefined();
+    expect(
+      ProfileUtils.getProfileFromDocument("zowe-ds:/", undefined),
+    ).toBeUndefined();
+    expect(
+      ProfileUtils.getProfileFromDocument("zowe-ds:/profile", undefined),
+    ).toBe("profile");
+  });
 });
