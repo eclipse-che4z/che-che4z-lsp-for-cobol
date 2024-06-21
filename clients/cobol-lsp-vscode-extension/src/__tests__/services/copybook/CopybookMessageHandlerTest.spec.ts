@@ -143,7 +143,7 @@ describe("Test the copybook message handler", () => {
   });
   it("checks E4E downloaded member copybooks are resolved", async () => {
     vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
-      get: jest.fn().mockReturnValue("ENDEVOR_PROCESSOR"),
+      get: jest.fn().mockReturnValue("ENDEVOR"),
     });
     (vscode.workspace.workspaceFolders as any) = undefined;
     (globSync as any) = jest.fn().mockImplementation((x: any) => [x]);
