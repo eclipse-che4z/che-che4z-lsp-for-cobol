@@ -278,6 +278,39 @@ describe("Tests copybook download service", () => {
     });
   });
 
+  it("checks the order of copybook resolution - USS and DSN is not called when E4E resolves)", async () => {
+    const downloader = new CopybookDownloadService(
+      "storage-path",
+      zoweExplorerMock,
+      e4eMock,
+    );
+    (downloader as any).e4eDownloader.downloadCopybookE4E = jest
+      .fn()
+      .mockReturnValue(true);
+    (downloader as any).dsnDownloader.downloadCopybook = jest
+      .fn()
+      .mockReturnValue(false);
+    (downloader as any).ussDownloader.downloadCopybook = jest
+      .fn()
+      .mockReturnValue(false);
+    await downloader.downloadCopybook(
+      { name: "copybook", dialect: "COBOL" },
+      "document-uri",
+    );
+    expect(
+      (downloader as any).e4eDownloader.downloadCopybookE4E,
+    ).toHaveBeenCalledWith("document-uri", {
+      name: "copybook",
+      dialect: "COBOL",
+    });
+    expect(
+      (downloader as any).dsnDownloader.downloadCopybook,
+    ).toHaveBeenCalledTimes(0);
+    expect(
+      (downloader as any).ussDownloader.downloadCopybook,
+    ).toHaveBeenCalledTimes(0);
+  });
+
   it("checks the order of resolution is same as the one provided in user settings", async () => {
     const downloader = new CopybookDownloadService(
       "storage-path",
@@ -344,101 +377,5 @@ describe("Tests copybook download service", () => {
     (resolver as any).e4eDownloader.clearConfigs = clearConfigs;
     resolver.clearCache();
     expect(clearConfigs).toHaveBeenCalled();
-  });
-
-  describe("checks successful resolution calls callback method", () => {
-    beforeEach(() => {
-      jest.clearAllMocks();
-    });
-
-    it("resolution from dsn, calls callback method", async () => {
-      const downloader = new CopybookDownloadService(
-        "storage-path",
-        zoweExplorerMock,
-        undefined,
-      );
-      (downloader as any).dsnDownloader.downloadCopybook = jest
-        .fn()
-        .mockReturnValue(true);
-      SettingsService.getDsnPath = jest.fn().mockReturnValue(["dsn"]);
-      SettingsService.getUssPath = jest.fn().mockReturnValue(["uss"]);
-      await downloader.downloadCopybook(
-        { name: "copybook", dialect: "COBOL" },
-        "document-uri",
-      );
-      expect(
-        (downloader as any).dsnDownloader.downloadCopybook,
-      ).toHaveBeenCalledWith(
-        { name: "copybook", dialect: "COBOL" },
-        "document-uri",
-        "dsn",
-      );
-    });
-
-    it("resolution from uss, calls callback method", async () => {
-      const downloader = new CopybookDownloadService(
-        "storage-path",
-        zoweExplorerMock,
-        undefined,
-      );
-      (downloader as any).dsnDownloader.downloadCopybook = jest
-        .fn()
-        .mockReturnValue(false);
-      (downloader as any).ussDownloader.downloadCopybook = jest
-        .fn()
-        .mockReturnValue(true);
-      SettingsService.getDsnPath = jest.fn().mockReturnValue(["dsn"]);
-      SettingsService.getUssPath = jest.fn().mockReturnValue(["uss"]);
-      await downloader.downloadCopybook(
-        { name: "copybook", dialect: "COBOL" },
-        "document-uri",
-      );
-      expect(
-        (downloader as any).dsnDownloader.downloadCopybook,
-      ).toHaveBeenCalledWith(
-        { name: "copybook", dialect: "COBOL" },
-        "document-uri",
-        "dsn",
-      );
-      expect(
-        (downloader as any).ussDownloader.downloadCopybook,
-      ).toHaveBeenCalledWith(
-        { name: "copybook", dialect: "COBOL" },
-        "document-uri",
-        "uss",
-      );
-    });
-    it("checks the order of copybook resolution - USS and DSN is not called when E4E resolves)", async () => {
-      const downloader = new CopybookDownloadService(
-        "storage-path",
-        zoweExplorerMock,
-        e4eMock,
-      );
-      (downloader as any).e4eDownloader.downloadCopybookE4E = jest
-        .fn()
-        .mockReturnValue(true);
-      (downloader as any).dsnDownloader.downloadCopybook = jest
-        .fn()
-        .mockReturnValue(false);
-      (downloader as any).ussDownloader.downloadCopybook = jest
-        .fn()
-        .mockReturnValue(false);
-      await downloader.downloadCopybook(
-        { name: "copybook", dialect: "COBOL" },
-        "document-uri",
-      );
-      expect(
-        (downloader as any).e4eDownloader.downloadCopybookE4E,
-      ).toHaveBeenCalledWith("document-uri", {
-        name: "copybook",
-        dialect: "COBOL",
-      });
-      expect(
-        (downloader as any).dsnDownloader.downloadCopybook,
-      ).toHaveBeenCalledTimes(0);
-      expect(
-        (downloader as any).ussDownloader.downloadCopybook,
-      ).toHaveBeenCalledTimes(0);
-    });
   });
 });
