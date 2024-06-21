@@ -86,6 +86,7 @@ export class CopybookDownloadService {
   clearCache() {
     this.dsnDownloader?.clearMemberListCache();
     this.ussDownloader?.clearMemberListCache();
+    this.e4eDownloader?.clearConfigs();
   }
 
   private async downloadFromPaths(

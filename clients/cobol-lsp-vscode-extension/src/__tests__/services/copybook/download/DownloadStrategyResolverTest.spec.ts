@@ -16,6 +16,7 @@ import { SettingsService } from "../../../../services/Settings";
 import { zoweExplorerMock } from "../../../../__mocks__/getZoweExplorerMock.utility";
 import { e4eMock } from "../../../../__mocks__/getE4EMock.utility";
 import { CopybookDownloadService } from "../../../../services/copybook/CopybookDownloadService";
+import { E4E } from "../../../../type/e4eApi";
 
 jest.mock("../../../../services/reporter/TelemetryService");
 
@@ -141,7 +142,19 @@ describe("tests download resolver", () => {
       undefined,
       undefined,
     );
-    expect(() => resolver.clearCache()).not.toThrow();
+    resolver.clearCache();
+  });
+
+  it("checks clear cache calls e4e clear config", () => {
+    const resolver = new CopybookDownloadService(
+      "storage-path",
+      undefined,
+      {} as any as E4E,
+    );
+    const clearConfigs = jest.fn();
+    (resolver as any).e4eDownloader.clearConfigs = clearConfigs;
+    resolver.clearCache();
+    expect(clearConfigs).toHaveBeenCalled();
   });
 
   describe("checks successful resolution calls callback method", () => {

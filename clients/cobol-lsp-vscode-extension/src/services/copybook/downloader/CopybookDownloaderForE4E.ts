@@ -52,6 +52,10 @@ export class CopybookDownloaderForE4E {
 
   private E4EConfigs = new Map<string, e4eResponse>();
 
+  public clearConfigs() {
+    this.E4EConfigs.clear();
+  }
+
   public async getE4EConfig(uri: string): Promise<e4eResponse | undefined> {
     const config = this.E4EConfigs.get(uri);
     if (config) {
