@@ -26,9 +26,7 @@ execRule: EXEC SQL sqlCode END_EXEC
 
 nonExecRule: host_variable_rule;
 
-host_variable_rule: (result_set_locator_host_variable | binary_host_variable);
-
-result_set_locator_host_variable: dbs_level_01 entry_name  (USAGE IS?)? SQL TYPE IS RESULT_SET_LOCATOR VARYING;
+host_variable_rule: (sql_host_variables | binary_host_variable);
 
 binary_host_variable: dbs_level_01 entry_name host_variable_usage binary_host_variable_type;
 binary_host_variable_type: BINARY LPARENCHAR binary_host_variable_binary_size RPARENCHAR | (VARBINARY | BINARY VARYING) LPARENCHAR binary_host_variable_varbinary_size RPARENCHAR;
@@ -37,6 +35,14 @@ binary_host_variable_binary_size: T=dbs_integerliteral_expanded {validateInteger
 binary_host_variable_varbinary_size: T=dbs_integerliteral_expanded {validateIntegerRange($T.start, $T.text, 1, 32704);};
 
 host_variable_usage: (USAGE IS?)? SQL TYPE IS;
+
+sql_host_variables: dbs_level_01 entry_name host_variable_usage (result_set_locator | tableLocators);
+
+result_set_locator : RESULT_SET_LOCATOR VARYING;
+
+tableLocators
+    : TABLE LIKE entry_name AS LOCATOR
+    ;
 
 entry_name : (FILLER |dbs_host_names);
 sqlCode

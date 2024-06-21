@@ -81,12 +81,12 @@ class Db2SqlVisitor extends Db2SqlParserBaseVisitor<List<Node>> {
         return super.visitExecRule(ctx);
     }
 
-    @Override
-    public List<Node> visitResult_set_locator_host_variable(
-            Db2SqlParser.Result_set_locator_host_variableContext ctx) {
-        addReplacementContext(ctx);
-        Locality statementLocality =
-                getLocality(this.context.getExtendedDocument().mapLocation(constructRange(ctx)));
+  @Override
+  public List<Node> visitSql_host_variables(
+      Db2SqlParser.Sql_host_variablesContext ctx) {
+    addReplacementContext(ctx);
+    Locality statementLocality =
+        getLocality(this.context.getExtendedDocument().mapLocation(constructRange(ctx)));
 
         // semantics node just checks that the statement is present at right location
         Db2WorkingAndLinkageSectionNode semanticsNode =
