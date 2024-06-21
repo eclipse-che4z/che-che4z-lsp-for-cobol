@@ -50,19 +50,15 @@ export class CopybookDownloaderForE4E {
     private outputChannel?: vscode.OutputChannel,
   ) {}
 
-  private E4EConfigs = new Map<string, e4eResponse>();
+  private E4EConfigs = new Map<string, Promise<e4eResponse | undefined>>();
 
   public clearConfigs() {
     this.E4EConfigs.clear();
   }
 
-  public async getE4EConfig(uri: string): Promise<e4eResponse | undefined> {
-    const config = this.E4EConfigs.get(uri);
-    if (config) {
-      return config;
-    }
-    if (!this.e4e.isEndevorElement(uri)) return undefined;
-
+  private async getE4EConfigImpl(
+    uri: string,
+  ): Promise<e4eResponse | undefined> {
     const profile = await this.e4e.getProfileInfo(uri);
     if (profile instanceof Error) throw profile;
 
@@ -102,11 +98,24 @@ export class CopybookDownloaderForE4E {
 
     this.writeLocationLogs(candidate?.libs);
 
-    const response = {
+    return {
       profile: profile,
       uri: uri,
       elements: elements,
     };
+  }
+
+  public async getE4EConfig(uri: string): Promise<e4eResponse | undefined> {
+    const config = this.E4EConfigs.get(uri);
+    if (config) {
+      return config;
+    }
+    if (!this.e4e.isEndevorElement(uri)) return undefined;
+
+    const response = this.getE4EConfigImpl(uri).catch((err) => {
+      this.E4EConfigs.delete(uri);
+      throw err;
+    });
     this.E4EConfigs.set(uri, response);
     return response;
   }
