@@ -14,11 +14,12 @@
 
 import * as vscode from "vscode";
 import { DownloadStrategyResolver } from "./downloader/DownloadStrategyResolver";
-import { PROVIDE_PROFILE_MSG } from "../../constants";
+import { ENDEVOR_PROCESSOR, PROVIDE_PROFILE_MSG } from "../../constants";
 import { ProfileUtils } from "../util/ProfileUtils";
 import { DownloadUtil } from "./downloader/DownloadUtil";
 import { E4ECopybookService } from "./E4ECopybookService";
 import { E4E } from "../../type/e4eApi";
+import { SettingsService } from "../Settings";
 
 export class CopybookName {
   constructor(public name: string, public dialect: string) {}
@@ -108,8 +109,15 @@ export class CopybookDownloadService {
     documentUri: string,
     copybookNames: CopybookName[],
   ): Promise<boolean> {
-    if (await E4ECopybookService.getE4EClient(documentUri)) {
-      return true;
+    if (
+      this.e4eAPI &&
+      this.e4eAPI.isEndevorElement(documentUri) &&
+      SettingsService.getCopybookEndevorDependencySettings() ==
+        ENDEVOR_PROCESSOR
+    ) {
+      return (await E4ECopybookService.getE4EClient(documentUri))
+        ? true
+        : false;
     }
     if (
       !DownloadUtil.areCopybookDownloadConfigurationsPresent(
