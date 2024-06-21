@@ -25,6 +25,7 @@ import {
   DATASET,
   E4E_FOLDER,
   E4E_SCHEME,
+  ENDEVOR_PROCESSOR,
   ENVIRONMENT,
   USE_MAP,
   ZOWE_FOLDER,
@@ -47,8 +48,12 @@ export async function resolveCopybookHandler(
   dialectType: string,
 ): Promise<string | undefined> {
   let result: string | undefined;
-
-  if (await E4ECopybookService.getE4EClient(documentUri)) {
+  const e4eApi = await E4ECopybookService.getE4EAPI();
+  if (
+    e4eApi &&
+    e4eApi.isEndevorElement(documentUri) &&
+    SettingsService.getCopybookEndevorDependencySettings() == ENDEVOR_PROCESSOR
+  ) {
     result = await getE4ECopyBookLocation(
       copybookName,
       documentUri,
@@ -172,7 +177,7 @@ async function getE4ECopyBookLocation(
   documentUri: string,
   storagePath: string,
   outputChannel: vscode.OutputChannel,
-) {
+): Promise<string | undefined> {
   const config = await E4ECopybookService.getE4EClient(
     documentUri,
     outputChannel,
