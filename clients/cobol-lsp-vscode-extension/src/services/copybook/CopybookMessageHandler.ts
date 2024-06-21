@@ -93,19 +93,3 @@ function resolveAllowedExtensions(
       return SettingsService.getCopybookExtension(documentUri);
   }
 }
-
-export function downloadCopybookHandler(
-  this: any,
-  cobolFileName: string,
-  copybookNames: string[],
-  dialectType: string,
-  quietMode: boolean,
-): string {
-  return this.downloadCopybooks(
-    cobolFileName,
-    copybookNames.map(
-      (copybookName) => new CopybookName(copybookName, dialectType),
-    ),
-    quietMode,
-  );
-}

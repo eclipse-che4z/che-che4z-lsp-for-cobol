@@ -30,7 +30,6 @@ import { CopybooksCodeActionProvider } from "./services/copybook/CopybooksCodeAc
 import { clearCache } from "./commands/ClearCopybookCacheCommand";
 import { CommentAction, commentCommand } from "./commands/CommentCommand";
 import { initSmartTab, RangeTabShiftStore } from "./commands/SmartTabCommand";
-import { downloadCopybookHandler } from "./services/copybook/CopybookMessageHandler";
 import { DialectRegistry } from "./services/DialectRegistry";
 import { LanguageClientService } from "./services/LanguageClientService";
 import { TelemetryService } from "./services/reporter/TelemetryService";
@@ -155,7 +154,7 @@ export async function activate(
   );
   languageClientService.addRequestHandler(
     "copybook/download",
-    downloadCopybookHandler.bind(copyBooksDownloader),
+    copyBooksDownloader.makeCopybookDownloadHandler(),
   );
   languageClientService.addRequestHandler(
     "workspace/configuration",

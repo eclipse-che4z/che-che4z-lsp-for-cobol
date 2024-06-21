@@ -117,6 +117,22 @@ export class CopybookDownloadService {
     return this.resolveCopybookHandler.bind(this);
   }
 
+  public makeCopybookDownloadHandler() {
+    return (
+      cobolFileName: string,
+      copybookNames: string[],
+      dialectType: string,
+      _quietMode: boolean,
+    ) => {
+      return this.downloadCopybooks(
+        cobolFileName,
+        copybookNames.map(
+          (copybookName) => new CopybookName(copybookName, dialectType),
+        ),
+      );
+    };
+  }
+
   public async resolveCopybookHandler(
     documentUri: string,
     copybookName: string,
