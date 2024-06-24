@@ -13,11 +13,23 @@
  */
 
 import { E4E } from "../../type/e4eApi.d";
-import { getExtensionApi, Utils } from "../util/Utils";
+import { getExtensionApi } from "../util/Utils";
+
+const nameof = <T>(name: keyof T) => name;
+function validateE4E(e4e: any): e4e is E4E {
+  return (
+    e4e instanceof Object &&
+    nameof<E4E>("listElements") in e4e &&
+    nameof<E4E>("getElement") in e4e &&
+    nameof<E4E>("listMembers") in e4e &&
+    nameof<E4E>("getMember") in e4e &&
+    nameof<E4E>("isEndevorElement") in e4e &&
+    nameof<E4E>("getProfileInfo") in e4e &&
+    nameof<E4E>("getConfiguration") in e4e &&
+    nameof<E4E>("onDidChangeElement") in e4e
+  );
+}
 
 export async function getE4EAPI() {
-  return getExtensionApi<E4E>(
-    "BroadcomMFD.explorer-for-endevor",
-    Utils.validateE4E,
-  );
+  return getExtensionApi<E4E>("BroadcomMFD.explorer-for-endevor", validateE4E);
 }

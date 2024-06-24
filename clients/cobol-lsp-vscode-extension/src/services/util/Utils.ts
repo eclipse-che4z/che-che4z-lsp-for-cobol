@@ -13,7 +13,7 @@
  */
 
 import * as vscode from "vscode";
-import { E4E, ResolvedProfile } from "../../type/e4eApi";
+import { ResolvedProfile } from "../../type/e4eApi";
 
 async function safeActivate(ext: vscode.Extension<any>) {
   try {
@@ -60,7 +60,6 @@ export async function getExtensionApi<T>(
 /**
  * This class collects utility methods for general purpose activities
  */
-const nameof = <T>(name: keyof T) => name;
 export class Utils {
   /**
    * This method provides a quick way to verify if the input is null or undefined.
@@ -93,20 +92,6 @@ export class Utils {
    */
   public static isUNCPath(path: string) {
     return this.UNC_PATH_REGEX.test(path);
-  }
-  public static validateE4E(e4e: any): e4e is E4E {
-    const valid =
-      e4e instanceof Object &&
-      nameof<E4E>("listElements") in e4e &&
-      nameof<E4E>("getElement") in e4e &&
-      nameof<E4E>("listMembers") in e4e &&
-      nameof<E4E>("getMember") in e4e &&
-      nameof<E4E>("isEndevorElement") in e4e &&
-      nameof<E4E>("getProfileInfo") in e4e &&
-      nameof<E4E>("getConfiguration") in e4e &&
-      nameof<E4E>("onDidChangeElement") in e4e;
-    if (!valid) throw Error("incompatible interface");
-    return valid;
   }
 
   public static profileAsString(profile: ResolvedProfile) {
