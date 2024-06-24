@@ -73,7 +73,7 @@ public class TestSqlHostVariable {
           + "        Program-Id. 'TEST1'.\n"
           + "        Data Division.\n"
           + "         Working-Storage Section.\n"
-          + "       01 {$*VAR-INVALID-BIN} USAGE IS SQL TYPE IS VARBINARY({32705|1}).\n"
+          + "       01 {$*VAR-INVALID-BIN`->VAR-INVALID-BIN`->VAR-INVALID-BIN-LEN`->VAR-INVALID-BIN-TEXT} USAGE IS SQL TYPE IS VARBINARY({32705|1}).\n"
           + "        PROCEDURE DIVISION.\n";
 
   public static final String BINARY_TEXT4 =
@@ -81,7 +81,7 @@ public class TestSqlHostVariable {
           + "        Program-Id. 'TEST1'.\n"
           + "        Data Division.\n"
           + "         Working-Storage Section.\n"
-          + "       01 {$*VAR-INVALID-BIN} USAGE IS SQL TYPE IS VARBINARY({-|1}1234).\n"
+          + "       01 {$*VAR-INVALID-BIN`->VAR-INVALID-BIN`->VAR-INVALID-BIN-LEN`->VAR-INVALID-BIN-TEXT} USAGE IS SQL TYPE IS VARBINARY({-|1}1234).\n"
           + "        PROCEDURE DIVISION.\n";
 
   @Test
