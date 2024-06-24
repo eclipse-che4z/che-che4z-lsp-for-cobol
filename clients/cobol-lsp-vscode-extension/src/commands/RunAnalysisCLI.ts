@@ -12,6 +12,7 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
+import temp from "fs-temp";
 import * as path from "node:path";
 import * as vscode from "vscode";
 import { Terminal } from "vscode";
@@ -100,7 +101,7 @@ export class RunAnalysis {
         return serverPath + " " + this.buildAnalysisCommandPortion(currentFileLocation);
     }
 
-    private buildJavaCommand(currentFileLocation: string, copybookConfigLocation: string = "") {
+    private buildJavaCommand(currentFileLocation: string) {
         const extensionFolder: (string | undefined) = this.getExtensionPath() + "/server/jar/server.jar";
 
         if (extensionFolder && currentFileLocation !== "") {
@@ -110,7 +111,7 @@ export class RunAnalysis {
         return "";
     }
 
-    private buildAnalysisCommandPortion(currentFileLocation: string)  {
+    private buildAnalysisCommandPortion(currentFileLocation: string) {
 
         const copyBookCommand = `-cf=${this.copybookConfigLocation === "" ? "." : "\"" + this.copybookConfigLocation + "\""}`;
 
@@ -131,19 +132,28 @@ export class RunAnalysis {
 
     private getCurrentFileLocation() {
         if (vscode.workspace.workspaceFile) {
-            if (vscode.workspace.workspaceFile.path.startsWith("untitled")) {
-                // TODO: Unsaved file, need to save to a temp location to pass to the CLI.
+            if (vscode.workspace.workspaceFile.path.startsWith("Untitled")) {
+                return this.saveTempFile();
             } else {
                 return vscode.workspace.workspaceFile?.path;
             }
 
         } else if (vscode.window.activeTextEditor) {
-            if (vscode.window.activeTextEditor.document.uri.path.startsWith("untitled")) {
-                // TODO: Unsaved file, need to save to a temp location to pass to the CLI.
+            if (vscode.window.activeTextEditor.document.uri.path.startsWith("Untitled")) {
+                return this.saveTempFile();
             } else {
                 return vscode.window.activeTextEditor.document.uri.path;
             }
         }
+        return "";
+    }
+
+    private saveTempFile() {
+        const data = vscode.window.activeTextEditor?.document.getText();
+        if (data) {
+            return temp.writeFileSync(data);
+        }
+
         return "";
     }
 
