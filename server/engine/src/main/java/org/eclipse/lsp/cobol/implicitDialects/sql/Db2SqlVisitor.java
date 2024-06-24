@@ -112,6 +112,33 @@ class Db2SqlVisitor extends Db2SqlParserBaseVisitor<List<Node>> {
     return ImmutableList.of(variableDefinitionNode);
   }
 
+   @Override
+   public List<Node> visitBinary_host_variable(Db2SqlParser.Binary_host_variableContext ctx) {
+      addReplacementContext(ctx);
+      Locality statementLocality = getLocality(this.context.getExtendedDocument().mapLocation(constructRange(ctx)));
+
+      Db2WorkingAndLinkageSectionNode semanticsNode = new Db2WorkingAndLinkageSectionNode(statementLocality);
+
+     VariableDefinitionNode variableDefinitionNode =
+             VariableDefinitionNode.builder()
+                     .level(Integer.parseInt(ctx.dbs_level_01().getText()))
+                     .levelLocality(
+                             getLocality(
+                                     this.context.getExtendedDocument().mapLocation(constructRange(ctx.entry_name()))))
+                     .statementLocality(statementLocality)
+                     .variableNameAndLocality(
+                             new VariableNameAndLocality(
+                                     VisitorHelper.getName(ctx.entry_name()),
+                                     getLocality(
+                                             this.context
+                                                     .getExtendedDocument()
+                                                     .mapLocation(constructRange(ctx.entry_name())))))
+                     .usageClauses(ImmutableList.of(UsageFormat.DISPLAY))
+                     .build();
+     variableDefinitionNode.addChild(semanticsNode);
+     return ImmutableList.of(variableDefinitionNode);
+   }
+
   private Locality getLocality(Location location) {
     Locality.LocalityBuilder builder =
         Locality.builder().uri(location.getUri()).range(location.getRange());
