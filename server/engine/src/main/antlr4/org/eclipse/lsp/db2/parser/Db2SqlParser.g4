@@ -24,9 +24,20 @@ execRule: EXEC SQL sqlCode END_EXEC
          | {notifyError("cobolParser.missingEndExec");} EXEC SQL sqlCode DOT_FS? EOF
          | {notifyError("cobolParser.missingEndExec");} EXEC SQL;
 
-nonExecRule: result_set_locator_host_variable;
+nonExecRule: host_variable_rule;
+
+host_variable_rule: (result_set_locator_host_variable | binary_host_variable);
 
 result_set_locator_host_variable: dbs_level_01 entry_name  (USAGE IS?)? SQL TYPE IS RESULT_SET_LOCATOR VARYING;
+
+binary_host_variable: dbs_level_01 entry_name host_variable_usage binary_host_variable_type;
+binary_host_variable_type: BINARY LPARENCHAR binary_host_variable_binary_size RPARENCHAR | (VARBINARY | BINARY VARYING) LPARENCHAR binary_host_variable_varbinary_size RPARENCHAR;
+
+binary_host_variable_binary_size: T=dbs_integerliteral_expanded {validateIntegerRange($T.start, $T.text, 1, 255);};
+binary_host_variable_varbinary_size: T=dbs_integerliteral_expanded {validateIntegerRange($T.start, $T.text, 1, 32704);};
+
+host_variable_usage: (USAGE IS?)? SQL TYPE IS;
+
 entry_name : (FILLER |dbs_host_names);
 sqlCode
    : ~END_EXEC*?
@@ -1782,6 +1793,8 @@ dbs_pieceSize : IDENTIFIER {validateTokenWithRegex($IDENTIFIER.text, "\\d+[MmGgK
 dbs_sql_identifier: NONNUMERICLITERAL | IDENTIFIER | FILENAME | FILENAME (DOT_FS IDENTIFIER)* | DSNDB04 | TRANSACTION | RECORDS | dbs_special_name;
 dbs_comma_separator: (COMMASEPARATORDB2 | COMMACHAR);
 dbs_semicolon_end: SEMICOLON_FS | SEMICOLONSEPARATORSQL;
+
+dbs_integerliteral_expanded: MINUSCHAR? (INTEGERLITERAL|SINGLEDIGITLITERAL|SINGLEDIGIT_1);
 
 dbs_integer0: T=dbs_integer  {validateValue($T.text, "0");};
 dbs_integer1: T=dbs_integer  {validateValue($T.text, "1");};
