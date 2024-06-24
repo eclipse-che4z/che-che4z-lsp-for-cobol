@@ -743,7 +743,7 @@ procedureDeclaratives
    : DECLARATIVES dot_fs procedureDeclarative+ END DECLARATIVES dot_fs   ;
 
 procedureDeclarative
-   : procedureSectionHeader dot_fs (useStatement dot_fs) paragraphs
+   : procedureSectionHeader dot_fs (useStatement dot_fs) sentence* paragraphs
    ;
 
 procedureSectionHeader
@@ -751,26 +751,26 @@ procedureSectionHeader
    ;
 
 procedureDivisionBody
-   : paragraphs procedureSection*
+   : sentence* paragraphs procedureSection*
    ;
 
 // -- procedure section ----------------------------------
 
 procedureSection
-   : procedureSectionHeader dot_fs paragraphs
+   : procedureSectionHeader dot_fs sentence* paragraphs
    ;
 
 sentence
-   : statement * (endClause | dialectStatement)
-   | dialectStatement
+   : dialectStatement
+   | statement* (endClause | dialectStatement)
    ;
 
 paragraph
-   : paragraphDefinitionName dot_fs (alteredGoTo | sentence*)
+   : paragraphDefinitionName dot_fs (sentence* | alteredGoTo)
    ;
 
 paragraphs
-   : (sentence | paragraph)*
+   : paragraph*
    ;
 
 conditionalStatementCall
