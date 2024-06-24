@@ -32,6 +32,7 @@ import {
   SETTINGS_COMPILE_OPTIONS,
   DIALECT_LIBS,
   COBOL_PRGM_LAYOUT,
+  SETTINGS_CPY_NDVR_DEPENDENCIES,
 } from "../constants";
 import cobolSnippets = require("../services/snippetcompletion/cobolSnippets.json");
 import { DialectRegistry, DIALECT_REGISTRY_SECTION } from "./DialectRegistry";
@@ -361,5 +362,16 @@ export class SettingsService {
         });
     }
     return result;
+  }
+  /**
+   * Gives the configured endevor dependecy from settings.
+   *
+   * @returns returns configured endevor dependency
+   */
+  public static getCopybookEndevorDependencySettings(): string | undefined {
+    const setting: string | undefined = vscode.workspace
+      .getConfiguration(SETTINGS_CPY_SECTION)
+      .get(SETTINGS_CPY_NDVR_DEPENDENCIES);
+    return setting;
   }
 }

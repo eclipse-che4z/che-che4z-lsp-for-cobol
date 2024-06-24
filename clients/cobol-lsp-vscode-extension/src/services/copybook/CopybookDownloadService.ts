@@ -15,6 +15,7 @@
 import * as vscode from "vscode";
 import {
   COPYBOOKS_FOLDER,
+  ENDEVOR_PROCESSOR,
   PROVIDE_PROFILE_MSG,
   ZOWE_FOLDER,
 } from "../../constants";
@@ -110,7 +111,10 @@ export class CopybookDownloadService {
   }
 
   private handleAsEndevorElement(documentUri: string) {
-    return this.e4eApi?.isEndevorElement(documentUri);
+    return (
+      SettingsService.getCopybookEndevorDependencySettings() ===
+        ENDEVOR_PROCESSOR && this.e4eApi?.isEndevorElement(documentUri)
+    );
   }
 
   public makeResolveCopybookHandler() {

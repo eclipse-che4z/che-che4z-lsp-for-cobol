@@ -188,6 +188,9 @@ describe("Test the copybook message handler", () => {
   );
 
   it("checks E4E downloaded member copybooks are resolved", async () => {
+    vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
+      get: jest.fn().mockReturnValue("ENDEVOR_PROCESSOR"),
+    });
     const downloader = new CopybookDownloadService("/storagePath", undefined, {
       isEndevorElement(uri: string) {
         return uri === filename;
@@ -234,6 +237,9 @@ describe("Test the copybook message handler", () => {
     );
   });
   it("checks E4E downloaded element copybooks are resolved", async () => {
+    vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
+      get: jest.fn().mockReturnValue("ENDEVOR_PROCESSOR"),
+    });
     const downloader = new CopybookDownloadService("/storagePath", undefined, {
       isEndevorElement(uri: string) {
         return uri === filename;
@@ -282,5 +288,26 @@ describe("Test the copybook message handler", () => {
           "copybook",
         ),
     );
+  });
+  it("checks E4E downloaded element copybooks are not resolved due to settings", async () => {
+    vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
+      get: jest.fn().mockReturnValue("ZOWE"),
+    });
+    const downloader = new CopybookDownloadService("/storagePath", undefined, {
+      isEndevorElement: unreachable,
+      onDidChangeElement: unreachable,
+      listMembers: unreachable,
+      listElements: unreachable,
+      getMember: unreachable,
+      getElement: unreachable,
+      getProfileInfo: unreachable,
+      getConfiguration: unreachable,
+    });
+    await downloader.resolveCopybookHandler(
+      "cobolFileName",
+      "copybook",
+      "dialectType",
+    );
+    expect(unreachable).not.toHaveBeenCalled();
   });
 });
