@@ -78,7 +78,7 @@ export const DATASET = "dataset";
 export const ENVIRONMENT = "environment";
 export const USE_MAP = "MAP";
 export const SETTINGS_CPY_NDVR_DEPENDENCIES = "endevor-dependencies";
-export const ENDEVOR_PROCESSOR = "ENDEVOR";
+export const ENDEVOR_PROCESSOR = "ENDEVOR_PROCESSOR";
 
 export enum PUNCH_CARD {
   SEQUENCE_AREA_END_POS = 6,

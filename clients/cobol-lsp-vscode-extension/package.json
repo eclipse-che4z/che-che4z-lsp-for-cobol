@@ -408,15 +408,15 @@
         "cobol-lsp.cpy-manager.endevor-dependencies": {
           "type": "string",
           "enum": [
-            "COBOL LS",
-            "ENDEVOR"
+            "ZOWE",
+            "ENDEVOR_PROCESSOR"
           ],
           "enumDescriptions": [
-            "Retrieve copybooks from mainframe data sets and USS files specified in the COBOL Language Support extension settings",
-            "Retrieve copybooks from locations specified in the Endevor element processor group."
+            "Use ZOWE Explorer to retrieve copybooks from mainframe data sets and USS files specified in the COBOL Language Support extension settings.",
+            "Use Explorer for Endevor to retrieve copybooks from locations specified in the Endevor element processor group."
           ],
           "description": "The method that is used to retrieve remote copybooks for elements opened in Explorer for Endevor.",
-          "default": "COBOL LS"
+          "default": "ZOWE"
         },
         "cobol-lsp.subroutine-manager.paths-local": {
           "type": "array",
