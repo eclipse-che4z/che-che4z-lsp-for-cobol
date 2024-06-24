@@ -27,6 +27,8 @@ import {
 import { CopybookDownloadService } from "./services/copybook/CopybookDownloadService";
 import { CopybooksCodeActionProvider } from "./services/copybook/CopybooksCodeActionProvider";
 
+import { RunAnalysis, runCobolAnalysis } from "./commands/RunAnalysisCLI";
+
 import { clearCache } from "./commands/ClearCopybookCacheCommand";
 import { CommentAction, commentCommand } from "./commands/CommentCommand";
 import { initSmartTab, RangeTabShiftStore } from "./commands/SmartTabCommand";
@@ -330,6 +332,10 @@ function registerCommands(
         }
       },
     ),
+  );
+
+  context.subscriptions.push(
+      vscode.commands.registerCommand("cobol-lsp.analysis.runAnalysis", () => runCobolAnalysis()),
   );
 }
 

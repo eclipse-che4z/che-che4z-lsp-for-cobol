@@ -89,6 +89,12 @@
         "when": "!isWeb"
       },
       {
+        "command": "cobol-lsp.analysis.runAnalysis",
+        "category": "COBOL",
+        "title": "Run Analysis in CLI",
+        "when": "!isWeb"
+      },
+      {
         "command": "cobol-lsp.snippets.insertSnippets",
         "title": "Insert COBOL Snippet",
         "category": "Snippets",
