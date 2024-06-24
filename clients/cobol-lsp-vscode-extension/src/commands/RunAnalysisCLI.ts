@@ -29,6 +29,9 @@ export async function runCobolAnalysisCommand() {
     new RunAnalysis(typeToRun === "Native", copybookLocation).runCobolAnalysis();
 }
 
+/**
+ *  Prompt the user for whether to run the Java or Native version.
+ */
 export async function getVersionToRun() {
     const typeResult = await vscode.window.showQuickPick(["Java", "Native"], {
         placeHolder: "Select Java or Native",
@@ -36,6 +39,9 @@ export async function getVersionToRun() {
     return typeResult?.toString();
 }
 
+/**
+ * Prompt the user for the location of the copybook config file.
+ */
 export async function getCopybookConfigLocation() {
     const copybookResult = await vscode.window.showInputBox({
         placeHolder: "Enter the folder of the copybook config file. Leave blank if no copybooks are needed.",
@@ -53,6 +59,10 @@ export async function getCopybookConfigLocation() {
     return "";
 }
 
+/**
+ * Class containing functions used to create the command needed to run the analysis from the command line
+ * Handles Java or Native builds with or without copybook support
+ */
 export class RunAnalysis {
     private readonly runNative: boolean;
     private readonly copybookConfigLocation: string;
@@ -62,6 +72,9 @@ export class RunAnalysis {
         this.copybookConfigLocation = copybookConfigLocation;
     }
 
+    /**
+     * Main entrypoint to the class
+     */
     public runCobolAnalysis() {
         const command = this.buildCommand();
         if (command !== "") {
@@ -70,6 +83,10 @@ export class RunAnalysis {
 
     }
 
+    /**
+     * Encapsulates the handling of building the command
+     * @private
+     */
     private buildCommand() {
         const currentFileLocation: string = this.getCurrentFileLocation();
         if (currentFileLocation === "") {
@@ -83,6 +100,11 @@ export class RunAnalysis {
         return this.buildJavaCommand(currentFileLocation);
     }
 
+    /**
+     * Creates the command to run using the native build.
+     * @param currentFileLocation - Location of the main cobol file being analyzed.
+     * @private
+     */
     private buildNativeCommand(currentFileLocation: string) {
         let serverPath = this.getExtensionPath() + "/server/native";
         switch (process.platform) {
@@ -101,6 +123,11 @@ export class RunAnalysis {
         return serverPath + " " + this.buildAnalysisCommandPortion(currentFileLocation);
     }
 
+    /**
+     * Creates the command to run using the java build.
+     * @param currentFileLocation - Location of the main cobol file being analyzed.
+     * @private
+     */
     private buildJavaCommand(currentFileLocation: string) {
         const extensionFolder: (string | undefined) = this.getExtensionPath() + "/server/jar/server.jar";
 
@@ -111,6 +138,12 @@ export class RunAnalysis {
         return "";
     }
 
+    /**
+     * Provides the portion of the command from "analysis" onwards.
+     * Is the same for both the Java and Native builds.
+     * @param currentFileLocation - Location of the main cobol file being analyzed.
+     * @private
+     */
     private buildAnalysisCommandPortion(currentFileLocation: string) {
 
         const copyBookCommand = `-cf=${this.copybookConfigLocation === "" ? "." : "\"" + this.copybookConfigLocation + "\""}`;
@@ -118,6 +151,12 @@ export class RunAnalysis {
         return "analysis -s \"" + currentFileLocation + "\" " + copyBookCommand;
     }
 
+    /**
+     * Sends a given command to a terminal.
+     * Checks to see if one named "Analysis" is already created, if so clear and reuse it.
+     * @param command - The command to run from the terminal.
+     * @private
+     */
     private sendToTerminal(command: string) {
         const existingTerminal = vscode.window.terminals.find((term: Terminal) => term.name === "Analysis");
         const terminal = (existingTerminal) ? existingTerminal : vscode.window.createTerminal("Analysis");
@@ -130,6 +169,12 @@ export class RunAnalysis {
         terminal.show(true);
     }
 
+    /**
+     * Retrieves the location of the currently open file.
+     * If it is not saved, creates a temporary one on the disk to send to the command line with a copy of the contents.
+     *    - Does not result in the actual file being saved to the end user.
+     * @private
+     */
     private getCurrentFileLocation() {
         if (vscode.workspace.workspaceFile) {
             if (vscode.workspace.workspaceFile.path.startsWith("Untitled")) {
@@ -148,19 +193,32 @@ export class RunAnalysis {
         return "";
     }
 
+    /**
+     * Creates a temporary one on the disk to send to the command line with a copy of the contents.
+     *    - Does not result in the actual file being saved to the end user.
+     * @private
+     */
     private saveTempFile() {
         const data = vscode.window.activeTextEditor?.document.getText();
         if (data) {
-            return temp.writeFileSync(data);
+            return temp.writeFileSync(data); // Returns the path to the temporary file.
         }
 
         return "";
     }
 
+    /**
+     * Returns the location of the extension.
+     * @private
+     */
     private getExtensionPath() {
         return vscode.extensions.getExtension("broadcommfd.cobol-language-support")?.extensionPath;
     }
 
+    /**
+     * Returns the command for the current OS that will clear the terminal.
+     * @private
+     */
     private getClearCommand() {
         return ((process.platform === "win32") ? "cls" : "clear");
     }
