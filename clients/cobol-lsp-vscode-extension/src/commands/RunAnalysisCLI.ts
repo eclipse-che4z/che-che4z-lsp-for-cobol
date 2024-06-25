@@ -13,50 +13,83 @@
  */
 
 import temp from "fs-temp";
-import * as path from "node:path";
 import * as vscode from "vscode";
-import { Terminal } from "vscode";
+import {QuickPickItem, Terminal} from "vscode";
+import {MultiStepInput} from "../services/util/MultiStepInputUtil";
 
+/**
+ * Starts the process to gather input from the user to create the COBOL CLI analysis command.
+ */
 export async function runCobolAnalysisCommand() {
     const activeEditor = vscode.window.activeTextEditor;
     if (!activeEditor) {
         return;
     }
 
-    const typeToRun: (string | undefined) = await getVersionToRun();
-    const copybookLocation: (string | undefined) = await getCopybookConfigLocation();
+    const result = {} as Partial<AnalysisResults>;
+    await MultiStepInput.run(input => getVersionToRun(input, result));
 
-    new RunAnalysis(typeToRun === "Native", copybookLocation).runCobolAnalysis();
+    if (result.typeToRun === undefined || result.copybookLocation === undefined) {
+        return;
+    }
+
+    new RunAnalysis(result.typeToRun === "Native", result.copybookLocation).runCobolAnalysis();
+}
+
+interface AnalysisResults {
+    typeToRun: string;
+    copybookLocation: string;
 }
 
 /**
  *  Prompt the user for whether to run the Java or Native version.
  */
-export async function getVersionToRun() {
-    const typeResult = await vscode.window.showQuickPick(["Java", "Native"], {
-        placeHolder: "Select Java or Native",
+async function getVersionToRun(input: MultiStepInput, state: Partial<AnalysisResults>) {
+    const inputItems: QuickPickItem[] = ["Java", "Native"].map(label => ({ label }));
+    const result = await input.showQuickPick({
+        activeItem: typeof state.typeToRun !== "string" ? state.typeToRun : undefined,
+        items: inputItems,
+        placeholder: "Select Java or Native",
+        shouldResume,
+        step: 1,
+        title: "Run COBOL analysis from CLI",
+        totalSteps: 2,
     });
-    return typeResult?.toString();
+
+    state.typeToRun = result.label;
+    return getCopybookConfigLocation(input, state); // Chain steps
 }
 
 /**
  * Prompt the user for the location of the copybook config file.
  */
-export async function getCopybookConfigLocation() {
-    const copybookResult = await vscode.window.showInputBox({
-        placeHolder: "Enter the folder of the copybook config file. Leave blank if no copybooks are needed.",
+async function getCopybookConfigLocation(input: MultiStepInput, state: Partial<AnalysisResults>) {
+    state.copybookLocation = await input.showInputBox({
+        preserveFocus: true,
+        prompt: "Enter the folder containing the copybooks. Leave blank if no copybooks are needed.",
+        shouldResume,
+        step: 2,
+        title: "Run COBOL analysis from CLI",
+        totalSteps: 2,
+        validate: validatePath,
         value: "",
     });
+}
 
-    if (copybookResult) {
-        if (copybookResult.toString().trim() === "") {
-            return "";
-        }
+/**
+ * Dummy function to satisfy the requirement of validating the text input in the config location.
+ */
+function validatePath(value: string) {
+    return Promise.resolve(undefined);
+}
 
-        // TODO: Add search for config file within folder given.
-    }
-
-    return "";
+/**
+ * Dummy function to satisfy the requirement of the pick/input box needing a way to resume.
+ */
+function shouldResume() {
+    return new Promise<boolean>(resolve => {
+        //
+    });
 }
 
 /**
