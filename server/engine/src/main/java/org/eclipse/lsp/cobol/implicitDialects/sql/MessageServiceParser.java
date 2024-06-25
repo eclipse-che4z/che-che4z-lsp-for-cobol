@@ -53,6 +53,18 @@ public abstract class MessageServiceParser extends Parser {
     notifyListeners(message);
   }
 
+  /**
+   * Extend the functionality of notifyError to include the offending token along with the message.
+   * @param offendingToken Token where the error occurs
+   * @param messageId Unique ID for each message in externalized message file.
+   * @param parameters Arguments referenced by the format specifiers in the format string in
+   *    externalized message file.
+   */
+  public void notifyError(Token offendingToken, String messageId, String... parameters) {
+    String message = getMessageForParser(messageId, parameters);
+    notifyErrorListeners(offendingToken, message, null);
+  }
+
   @Override
   public void notifyErrorListeners(Token offendingToken, String msg, RecognitionException e) {
     _syntaxErrors++;
@@ -93,6 +105,35 @@ public abstract class MessageServiceParser extends Parser {
   protected void validateValue(String actual, String expected) {
     if (actual != null && !actual.equals(expected)) {
       notifyError("parsers.validValueMsg", actual, expected);
+    }
+  }
+
+  /**
+   * Validate integer value against range and throw an error if it is incorrect
+   *
+   * @param input integer to check
+   * @param minValue allowed integer value
+   * @param maxValue allowed integer value
+   */
+  protected void validateIntegerRange(String input, Integer minValue, Integer maxValue) {
+    Integer intInputValue = tryParseInt(input);
+    if (intInputValue != null && !(intInputValue >= minValue && intInputValue <= maxValue)) {
+      notifyError("parsers.intRangeValue", minValue.toString(), maxValue.toString());
+    }
+  }
+
+  /**
+   * Validate integer value against range and throw an error if it is incorrect
+   *
+   * @param start start token
+   * @param input integer to check
+   * @param minValue allowed integer value
+   * @param maxValue allowed integer value
+   */
+  protected void validateIntegerRange(Token start, String input, Integer minValue, Integer maxValue) {
+    Integer intInputValue = tryParseInt(input);
+    if (intInputValue != null && !(intInputValue >= minValue && intInputValue <= maxValue)) {
+      notifyError(start, "parsers.intRangeValue", minValue.toString(), maxValue.toString());
     }
   }
 
@@ -221,4 +262,12 @@ public abstract class MessageServiceParser extends Parser {
         .getMessageService()
         .getMessage(messageKey, (Object[]) parameters);
   }
+
+ private Integer tryParseInt(String input) {
+    try {
+        return Integer.parseInt(input);
+    } catch (NumberFormatException ex) {
+        return null;
+    }
+}
 }

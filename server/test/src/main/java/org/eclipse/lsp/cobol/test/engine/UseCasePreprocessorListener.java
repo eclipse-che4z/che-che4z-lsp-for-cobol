@@ -397,11 +397,8 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
           ReplacementContext replacement,
           Map<String, List<Location>> storage,
           List<DiagnosticContext> diagnosticIds) {
-    String replacementText =
-            ofNullable(replacement)
-                    .map(ReplacementContext::identifier)
-                    .map(ParserRuleContext::getText)
-                    .orElse(text);
+
+    String replacementText = getReplacementText(text, replacement).get(0); // TODO support '->' multiplexing
 
     int tokenLength = text.length();
 
@@ -434,30 +431,49 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
           List<DiagnosticContext> diagnosticIds,
           boolean stripQuotes) {
 
-    String replacementText =
-            ofNullable(replacement)
-                    .map(ReplacementContext::identifier)
-                    .map(ParserRuleContext::getText)
-                    .orElse(text);
-
     Range range = retrieveRange(ctx, text.length());
-    ofNullable(storage)
-            .ifPresent(
-                    it -> {
-                      String storedText = replacementText;
-                      if (stripQuotes) {
-                        storedText = StringUtils.trimQuotes(storedText);
-                      }
-                      if (replacement != null && replacement.ORIGINAL_SIZE_COPY_START() != null) {
-                        addTokenLocation(it, text.toUpperCase(), range);
-                      }
-                      addTokenLocation(it, storedText.toUpperCase(), range);
-                    });
 
-    ofNullable(replacement).ifPresent(addPositionShift());
+    if (storage != null) {
+      if (replacement != null && !replacement.PRODUCE_REPLACEMENT().isEmpty()) {
+        List<String> replacementsText = getReplacementText(text, replacement);
+        for (String rt: replacementsText) {
+            if (stripQuotes) {
+                rt = StringUtils.trimQuotes(rt);
+            }
+            addTokenLocation(storage, rt.toUpperCase(), range);
+        }
+      } else {
+          List<String> replacementsText = getReplacementText(text, replacement);
+          String storedText = replacementsText.get(0);
+          if (stripQuotes) {
+              storedText = StringUtils.trimQuotes(storedText);
+          }
+        if (replacement != null && replacement.ORIGINAL_SIZE_COPY_START() != null) {
+          addTokenLocation(storage, text.toUpperCase(), range);
+        }
+        addTokenLocation(storage, storedText.toUpperCase(), range);
+      }
+    }
+
+    if (replacement != null) {
+      addPositionShift().accept(replacement);
+    }
     registerDiagnostics(range, diagnosticIds);
     write(getHiddenText(tokens.getHiddenTokensToLeft(ctx.start.getTokenIndex())));
     write(text);
+  }
+
+  private static List<String> getReplacementText(String text, ReplacementContext replacement) {
+      if (replacement == null) {
+          return Collections.singletonList(text);
+      }
+
+      List<String> replacementTexts = new ArrayList<>();
+      List<IdentifierContext> ids = replacement.identifier();
+      for (IdentifierContext id: ids) {
+          replacementTexts.add(id.getText());
+      }
+      return replacementTexts;
   }
 
   private void addTokenLocation(Map<String, List<Location>> storage, String text, Range range) {
@@ -488,7 +504,8 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
 
   private Consumer<ParserRuleContext> addPositionShift() {
     return it ->
-            lineShifts[getLine(it.start)] += it.start.getText().length() + it.stop.getText().length();
+            lineShifts[getLine(it.start)] +=
+                    it.stop.getCharPositionInLine() - it.start.getCharPositionInLine() + it.stop.getText().length();
   }
 
   private Consumer<Diagnostic> registerDiagnostic(Range range) {
