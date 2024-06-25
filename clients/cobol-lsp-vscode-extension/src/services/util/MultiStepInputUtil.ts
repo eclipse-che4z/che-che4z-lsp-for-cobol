@@ -54,7 +54,7 @@ export class MultiStepInput {
     private current?: QuickInput;
     private steps: InputStep[] = [];
 
-    protected async showQuickPick<T extends QuickPickItem, P extends QuickPickParameters<T>>(
+    public async showQuickPick<T extends QuickPickItem, P extends QuickPickParameters<T>>(
         { title, step, totalSteps, items, activeItem, ignoreFocusOut, placeholder, buttons, shouldResume }: P) {
         const disposables: Disposable[] = [];
         try {
@@ -101,7 +101,7 @@ export class MultiStepInput {
         }
     }
 
-    protected async showInputBox<P extends InputBoxParameters>({ title, step, totalSteps, value, prompt, validate,
+    public async showInputBox<P extends InputBoxParameters>({ title, step, totalSteps, value, prompt, validate,
                                                     buttons, ignoreFocusOut, placeholder, shouldResume }: P) {
         const disposables: Disposable[] = [];
         try {
