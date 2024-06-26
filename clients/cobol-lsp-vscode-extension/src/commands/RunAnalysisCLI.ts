@@ -53,7 +53,7 @@ async function getVersionToRun(input: MultiStepInput, state: Partial<AnalysisRes
         shouldResume,
         step: 1,
         title: "Run COBOL analysis from CLI",
-        totalSteps: 2,
+        totalSteps: 1,
     });
 
     state.typeToRun = result.label;
@@ -64,7 +64,7 @@ async function getVersionToRun(input: MultiStepInput, state: Partial<AnalysisRes
  * Prompt the user for the location of the copybook config file.
  */
 async function getCopybookConfigLocation(input: MultiStepInput, state: Partial<AnalysisResults>) {
-    state.copybookLocation = await input.showInputBox({
+    /* state.copybookLocation = await input.showInputBox({
         preserveFocus: true,
         prompt: "Enter the folder containing the copybooks. Leave blank if no copybooks are needed.",
         shouldResume,
@@ -73,7 +73,9 @@ async function getCopybookConfigLocation(input: MultiStepInput, state: Partial<A
         totalSteps: 2,
         validate: validatePath,
         value: "",
-    });
+    }); */
+
+    state.copybookLocation = "";
 }
 
 /**
