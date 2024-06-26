@@ -405,6 +405,19 @@
             "iso646jp"
           ]
         },
+        "cobol-lsp.cpy-manager.endevor-dependencies": {
+          "type": "string",
+          "enum": [
+            "ZOWE",
+            "ENDEVOR_PROCESSOR"
+          ],
+          "enumDescriptions": [
+            "Use Zowe Explorer to retrieve copybooks from mainframe data sets and USS files specified in the COBOL Language Support extension settings.",
+            "Use Explorer for Endevor to retrieve copybooks from locations specified in the Endevor element processor group."
+          ],
+          "description": "The method that is used to retrieve remote copybooks for elements opened in Explorer for Endevor.",
+          "default": "ZOWE"
+        },
         "cobol-lsp.subroutine-manager.paths-local": {
           "type": "array",
           "items": {

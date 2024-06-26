@@ -14,6 +14,7 @@
 import * as vscode from "vscode";
 import {
   DATASET,
+  ENDEVOR_PROCESSOR,
   ENVIRONMENT,
   OUTPUT_MSG_SEARCH_LOCATION,
 } from "../../constants";
@@ -28,6 +29,7 @@ import {
   EndevorType,
 } from "../../type/e4eApi.d";
 import { Utils } from "../util/Utils";
+import { SettingsService } from "../Settings";
 
 export class E4ECopybookService {
   private static E4EConfigs = new Map<string, e4eResponse>();
@@ -51,6 +53,10 @@ export class E4ECopybookService {
     uri: string,
     outputChannel?: vscode.OutputChannel,
   ): Promise<e4eResponse | undefined> {
+    const e4eSettings = SettingsService.getCopybookEndevorDependencySettings();
+    if (e4eSettings != ENDEVOR_PROCESSOR) {
+      return undefined;
+    }
     const config = this.E4EConfigs.get(uri);
     if (config) {
       return config;
