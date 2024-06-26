@@ -159,7 +159,13 @@ public class CFASTBuilderImpl implements CFASTBuilder {
       node.getChildren().forEach(child -> traverse(parent, child));
       addChild(parent, new CFASTNode(CFASTNodeType.END_EXEC.getValue(), convertLocation(node)));
     } else if (node instanceof ExecSqlWheneverNode) {
-      addChild(parent, new CFASTNode(CFASTNodeType.EXEC_SQL_WHENEVER.getValue(), convertLocation(node)));
+      ExecSqlWheneverNode wheneverNode = (ExecSqlWheneverNode) node;
+      SqlWhenever cfastNode = new SqlWhenever(convertLocation(node),
+          wheneverNode.getWheneverConditionType().name(),
+          wheneverNode.getWheneverType().name(),
+          wheneverNode.getValue());
+
+      addChild(parent, cfastNode);
       node.getChildren().forEach(child -> traverse(parent, child));
       addChild(parent, new CFASTNode(CFASTNodeType.END_EXEC.getValue(), convertLocation(node)));
     } else if (node instanceof StopNode) {
