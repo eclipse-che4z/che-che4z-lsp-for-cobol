@@ -19,6 +19,7 @@ import { isV1RuntimeDialectDetail } from "./dialect/utils";
 import { fetchCopybookCommand } from "./commands/FetchCopybookCommand";
 import { gotoCopybookSettings } from "./commands/OpenSettingsCommand";
 import {
+  E4E_INCOMPATIBLE,
   FAIL_CREATE_COPYBOOK_FOLDER_MSG,
   FAIL_CREATE_GLOBAL_STORAGE_MSG,
   LANGUAGE_ID,
@@ -30,10 +31,6 @@ import { CopybooksCodeActionProvider } from "./services/copybook/CopybooksCodeAc
 import { clearCache } from "./commands/ClearCopybookCacheCommand";
 import { CommentAction, commentCommand } from "./commands/CommentCommand";
 import { initSmartTab, RangeTabShiftStore } from "./commands/SmartTabCommand";
-import {
-  downloadCopybookHandler,
-  resolveCopybookHandler,
-} from "./services/copybook/CopybookMessageHandler";
 import { DialectRegistry } from "./services/DialectRegistry";
 import { LanguageClientService } from "./services/LanguageClientService";
 import { TelemetryService } from "./services/reporter/TelemetryService";
@@ -47,7 +44,7 @@ import { ServerRuntimeCodeActionProvider } from "./services/nativeLanguageClient
 import { ConfigurationWatcher } from "./services/util/ConfigurationWatcher";
 import * as path from "node:path";
 import { Utils } from "./services/util/Utils";
-import { E4ECopybookService } from "./services/copybook/E4ECopybookService";
+import { getE4EAPI } from "./services/copybook/E4ECopybookService";
 
 interface __AnalysisApi {
   analysis(uri: string, text: string): Promise<any>;
@@ -67,12 +64,27 @@ async function initialize(context: vscode.ExtensionContext) {
     outputChannel.appendLine(message);
     throw Error(message);
   }
+  const maybeE4E = await getE4EAPI();
+  const maybeZowe = await Utils.getZoweExplorerAPI();
   const copyBooksDownloader = new CopybookDownloadService(
     context.globalStorageUri.fsPath,
-    await Utils.getZoweExplorerAPI(),
-    await E4ECopybookService.getE4EAPI(),
+    maybeZowe && "api" in maybeZowe ? maybeZowe.api : undefined,
+    maybeE4E && "api" in maybeE4E ? maybeE4E.api : undefined,
     outputChannel,
   );
+  if (maybeZowe && "futureApi" in maybeZowe) {
+    maybeZowe.futureApi.then((api) => {
+      if (api) copyBooksDownloader.explorerAppeared(api.api);
+    });
+  }
+
+  if (!maybeE4E) outputChannel.appendLine(E4E_INCOMPATIBLE);
+  else if ("futureApi" in maybeE4E)
+    maybeE4E.futureApi.then((api) => {
+      if (api) copyBooksDownloader.e4eAppeared(api.api);
+      else outputChannel.appendLine(E4E_INCOMPATIBLE);
+    });
+
   languageClientService = new LanguageClientService(
     outputChannel,
     context.globalStorageUri,
@@ -142,15 +154,11 @@ export async function activate(
   );
   languageClientService.addRequestHandler(
     "copybook/resolve",
-    resolveCopybookHandler.bind(
-      undefined,
-      context.globalStorageUri.fsPath,
-      outputChannel,
-    ),
+    copyBooksDownloader.makeResolveCopybookHandler(),
   );
   languageClientService.addRequestHandler(
     "copybook/download",
-    downloadCopybookHandler.bind(copyBooksDownloader),
+    copyBooksDownloader.makeCopybookDownloadHandler(),
   );
   languageClientService.addRequestHandler(
     "workspace/configuration",

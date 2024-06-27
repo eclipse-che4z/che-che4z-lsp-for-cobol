@@ -15,6 +15,9 @@
     },
     "children": [
       {
+        "wheneverCondition": "SQLERROR",
+        "wheneverType": "GOTO",
+        "value": "HANDLER",
         "type": "execwhenever",
         "location": {
           "uri": "fake/path",

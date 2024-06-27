@@ -22,12 +22,15 @@ import {
   zoweExplorerMock,
 } from "../../../__mocks__/getZoweExplorerMock.utility";
 import { DownloadUtil } from "../../../services/copybook/downloader/DownloadUtil";
+import { SettingsService } from "../../../services/Settings";
+import { E4E } from "../../../type/e4eApi";
+import { e4eMock } from "../../../__mocks__/getE4EMock.utility";
 
 jest.mock("../../../services/reporter/TelemetryService");
 (vscode.workspace.workspaceFolders as any) = [
   { uri: { fsPath: "/projects" } } as any,
 ];
-Utils.getZoweExplorerAPI = jest.fn().mockReturnValue(zoweExplorerMock);
+Utils.getZoweExplorerAPI = jest.fn().mockReturnValue({ api: zoweExplorerMock });
 
 describe("Tests copybook download service", () => {
   DownloadUtil.areCopybookDownloadConfigurationsPresent = jest
@@ -46,7 +49,6 @@ describe("Tests copybook download service", () => {
       const downloadService = new CopybookDownloadService(
         "storage-path",
         {} as any as IApiRegisterClient,
-        undefined,
       );
       (ProfileUtils as any).getProfileNameForCopybook = jest
         .fn()
@@ -67,7 +69,6 @@ describe("Tests copybook download service", () => {
       const downloadService = new CopybookDownloadService(
         "storage-path",
         {} as any as IApiRegisterClient,
-        undefined,
       );
       (CopybookDownloadService as any).checkWorkspace = jest
         .fn()
@@ -92,7 +93,6 @@ describe("Tests copybook download service", () => {
       const downloadService = new CopybookDownloadService(
         "storage-path",
         zoweExplorerErrorMock,
-        undefined,
       );
       (ProfileUtils as any).getProfileNameForCopybook = jest
         .fn()
@@ -115,7 +115,6 @@ describe("Tests copybook download service", () => {
       const downloadService = new CopybookDownloadService(
         "storage-path",
         zoweExplorerErrorMock,
-        undefined,
       );
       (ProfileUtils as any).getProfileNameForCopybook = jest
         .fn()
@@ -141,7 +140,6 @@ describe("Tests copybook download service", () => {
       const downloadService = new CopybookDownloadService(
         "storage-path",
         zoweExplorerErrorMock,
-        undefined,
       );
       (ProfileUtils as any).getProfileNameForCopybook = jest
         .fn()
@@ -174,10 +172,9 @@ describe("Tests copybook download service", () => {
     const downloadService = new CopybookDownloadService(
       "storage-path",
       {} as any as IApiRegisterClient,
-      undefined,
     );
     DownloadUtil.checkForInvalidCredProfile = jest.fn().mockReturnValue(false);
-    (downloadService as any).downloadResolver.downloadCopybook = jest
+    (downloadService as any).downloadCopybook = jest
       .fn()
       .mockResolvedValue(true);
     (downloadService as any).updateDownloadProgress = jest.fn();
@@ -195,9 +192,7 @@ describe("Tests copybook download service", () => {
     await downloadService.downloadCopybooks("document-uri", [
       { name: "copybook-name", dialect: DEFAULT_DIALECT },
     ]);
-    expect(
-      (downloadService as any).downloadResolver.downloadCopybook,
-    ).toHaveBeenCalledWith(
+    expect((downloadService as any).downloadCopybook).toHaveBeenCalledWith(
       { name: "copybook-name", dialect: DEFAULT_DIALECT },
       "document-uri",
     );
@@ -207,7 +202,6 @@ describe("Tests copybook download service", () => {
     const downloadService = new CopybookDownloadService(
       "storage-path",
       {} as any as IApiRegisterClient,
-      undefined,
     );
     const mockProgress = {
       report: jest.fn(),
@@ -217,5 +211,171 @@ describe("Tests copybook download service", () => {
       increment: 50,
       message: "50%",
     });
+  });
+
+  describe("checks order of resolution [E4E, DSN and USS order]", () => {
+    beforeEach(() => {
+      jest.clearAllMocks();
+    });
+    it("checks the order of copybook resolution - DSN followed by USS)", async () => {
+      const downloader = new CopybookDownloadService(
+        "storage-path",
+        zoweExplorerMock,
+        undefined,
+      );
+      (downloader as any).dsnDownloader.downloadCopybook = jest
+        .fn()
+        .mockReturnValue(false);
+      (downloader as any).ussDownloader.downloadCopybook = jest.fn();
+      SettingsService.getDsnPath = jest.fn().mockReturnValue(["dsn"]);
+      SettingsService.getUssPath = jest.fn().mockReturnValue(["uss"]);
+      await downloader.downloadCopybook(
+        { name: "copybook", dialect: "COBOL" },
+        "document-uri",
+      );
+      expect(
+        (downloader as any).dsnDownloader.downloadCopybook,
+      ).toHaveBeenCalledWith(
+        { name: "copybook", dialect: "COBOL" },
+        "document-uri",
+        "dsn",
+      );
+      expect(
+        (downloader as any).ussDownloader.downloadCopybook,
+      ).toHaveBeenCalledWith(
+        { name: "copybook", dialect: "COBOL" },
+        "document-uri",
+        "uss",
+      );
+    });
+
+    it("checks the order of copybook resolution - USS is not called when DSN resolves)", async () => {
+      const downloader = new CopybookDownloadService(
+        "storage-path",
+        zoweExplorerMock,
+        undefined,
+      );
+      (downloader as any).dsnDownloader.downloadCopybook = jest
+        .fn()
+        .mockReturnValue(true);
+      (downloader as any).ussDownloader.downloadCopybook = jest.fn();
+      SettingsService.getDsnPath = jest.fn().mockReturnValue(["dsn"]);
+      SettingsService.getUssPath = jest.fn().mockReturnValue(["uss"]);
+      await downloader.downloadCopybook(
+        { name: "copybook", dialect: "COBOL" },
+        "document-uri",
+      );
+      expect(
+        (downloader as any).dsnDownloader.downloadCopybook,
+      ).toHaveBeenCalledWith(
+        { name: "copybook", dialect: "COBOL" },
+        "document-uri",
+        "dsn",
+      );
+      expect(
+        (downloader as any).ussDownloader.downloadCopybook,
+      ).toHaveBeenCalledTimes(0);
+    });
+  });
+
+  it("checks the order of copybook resolution - USS and DSN is not called when E4E resolves)", async () => {
+    const downloader = new CopybookDownloadService(
+      "storage-path",
+      zoweExplorerMock,
+      e4eMock,
+    );
+    (downloader as any).e4eDownloader.downloadCopybookE4E = jest
+      .fn()
+      .mockReturnValue(true);
+    (downloader as any).dsnDownloader.downloadCopybook = jest
+      .fn()
+      .mockReturnValue(false);
+    (downloader as any).ussDownloader.downloadCopybook = jest
+      .fn()
+      .mockReturnValue(false);
+    await downloader.downloadCopybook(
+      { name: "copybook", dialect: "COBOL" },
+      "document-uri",
+    );
+    expect(
+      (downloader as any).e4eDownloader.downloadCopybookE4E,
+    ).toHaveBeenCalledWith("document-uri", {
+      name: "copybook",
+      dialect: "COBOL",
+    });
+    expect(
+      (downloader as any).dsnDownloader.downloadCopybook,
+    ).toHaveBeenCalledTimes(0);
+    expect(
+      (downloader as any).ussDownloader.downloadCopybook,
+    ).toHaveBeenCalledTimes(0);
+  });
+
+  it("checks the order of resolution is same as the one provided in user settings", async () => {
+    const downloader = new CopybookDownloadService(
+      "storage-path",
+      zoweExplorerMock,
+      undefined,
+    );
+
+    (downloader as any).dsnDownloader.downloadCopybook = jest
+      .fn()
+      .mockReturnValueOnce(false)
+      .mockReturnValue(true);
+    (downloader as any).ussDownloader.downloadCopybook = jest.fn();
+    SettingsService.getDsnPath = jest.fn().mockReturnValue(["dsn", "dsn-2"]);
+    SettingsService.getUssPath = jest.fn().mockReturnValue(["uss"]);
+    await downloader.downloadCopybook(
+      { name: "copybook", dialect: "COBOL" },
+      "document-uri",
+    );
+    expect(
+      (downloader as any).dsnDownloader.downloadCopybook,
+    ).toHaveBeenCalledWith(
+      { name: "copybook", dialect: "COBOL" },
+      "document-uri",
+      "dsn",
+    );
+    expect(
+      (downloader as any).dsnDownloader.downloadCopybook,
+    ).toHaveBeenCalledWith(
+      { name: "copybook", dialect: "COBOL" },
+      "document-uri",
+      "dsn-2",
+    );
+  });
+
+  it("checks download fails if ZE apis are missing", async () => {
+    const resolver = new CopybookDownloadService(
+      "storage-path",
+      undefined,
+      undefined,
+    );
+    const result = await resolver.downloadCopybook(
+      { name: "copybook", dialect: "COBOL" },
+      "doc-uri",
+    );
+    expect(result).toBeFalsy();
+  });
+
+  it("checks clear cache do not throw error when ZE apis are missing", () => {
+    const resolver = new CopybookDownloadService(
+      "storage-path",
+      undefined,
+      undefined,
+    );
+    resolver.clearCache();
+  });
+
+  it("checks clear cache calls e4e clear config", () => {
+    const resolver = new CopybookDownloadService(
+      "storage-path",
+      undefined,
+      {} as any as E4E,
+    );
+    const clearConfigs = jest.fn();
+    (resolver as any).e4eDownloader.clearConfigs = clearConfigs;
+    resolver.clearCache();
+    expect(clearConfigs).toHaveBeenCalled();
   });
 });
