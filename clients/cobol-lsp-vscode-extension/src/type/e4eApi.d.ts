@@ -46,12 +46,6 @@ export type ExternalConfigurationOptions = {
   type: string;
 };
 
-export const defaultConfigs: ExternalConfigurationOptions = {
-  compiler: "IGYCRCTL",
-  preprocessor: ["DSNHPC", "DFHECP1$"],
-  type: ProcessorConfigurationType.COBOL,
-};
-
 export interface E4E {
   isEndevorElement: (uri: string) => boolean;
   getProfileInfo: (
@@ -137,7 +131,6 @@ type E4EExternalConfigurationResponse = {
 };
 
 interface e4eResponse {
-  api: E4E;
   profile: ResolvedProfile;
   uri: string;
   elements: { [key: string]: EndevorElement | EndevorMember };

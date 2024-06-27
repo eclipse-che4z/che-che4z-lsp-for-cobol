@@ -22,7 +22,6 @@ import { LanguageClientService } from "../services/LanguageClientService";
 import { TelemetryService } from "../services/reporter/TelemetryService";
 import { SnippetCompletionProvider } from "../services/snippetcompletion/SnippetCompletionProvider";
 import { Utils } from "../services/util/Utils";
-import { E4ECopybookService } from "../services/copybook/E4ECopybookService";
 
 jest.mock("../commands/SmartTabCommand");
 jest.mock("../commands/FetchCopybookCommand");
@@ -44,7 +43,9 @@ jest.mock("../services/Settings", () => ({
 }));
 
 Utils.getZoweExplorerAPI = jest.fn();
-E4ECopybookService.getE4EAPI = jest.fn().mockResolvedValue(undefined);
+jest.mock("../services/copybook/E4ECopybookService", () => ({
+  getE4EAPI: jest.fn(),
+}));
 jest.mock("vscode", () => ({
   commands: {
     registerCommand: jest

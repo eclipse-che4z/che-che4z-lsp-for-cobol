@@ -53,12 +53,11 @@ const getZoweExplorerMock = () => {
     registeredApiTypes: jest.fn().mockReturnValue(["zosmf"]),
   });
 };
-Utils.getZoweExplorerAPI = jest.fn();
 describe("Test profile Utils", () => {
   const programName = "COBOLFILE.cbl";
   const profile = "profile";
   it("checks a profile passed through settings is always given preference over profile from doc path for copybook download", async () => {
-    Utils.getZoweExplorerAPI = getZoweExplorerMock();
+    const zoweApiMock = getZoweExplorerMock()();
     vscode.Uri.parse = jest.fn().mockImplementation((arg) => arg);
     (vscode.workspace.textDocuments as any) = [];
     (vscode.workspace.textDocuments as any).push({
@@ -68,13 +67,13 @@ describe("Test profile Utils", () => {
       get: jest.fn().mockReturnValue("profileInSettings"),
     });
     ProfileUtils.getAvailableProfiles = jest.fn().mockReturnValue([profile]);
-    expect(await ProfileUtils.getProfileNameForCopybook(programName)).toBe(
-      "profileInSettings",
-    );
+    expect(
+      ProfileUtils.getProfileNameForCopybook(programName, zoweApiMock),
+    ).toBe("profileInSettings");
   });
 
   it("checks that profile is fetched from the settings if not a ZE downloaded file", async () => {
-    Utils.getZoweExplorerAPI = getZoweExplorerMock();
+    const zoweApiMock = getZoweExplorerMock()();
     vscode.Uri.parse = jest.fn().mockImplementation((arg) => arg);
     (vscode.workspace.textDocuments as any) = [];
     (vscode.workspace.textDocuments as any).push({
@@ -83,8 +82,28 @@ describe("Test profile Utils", () => {
     vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
       get: jest.fn().mockReturnValue("profile2"),
     });
-    expect(await ProfileUtils.getProfileNameForCopybook(programName)).toBe(
-      "profile2",
-    );
+    expect(
+      ProfileUtils.getProfileNameForCopybook(programName, zoweApiMock),
+    ).toBe("profile2");
+  });
+  it("test zowe v3 profile extraction", () => {
+    vscode.Uri.parse = jest.fn().mockImplementation((arg) => {
+      const match = /^([^:]+):(.*)/.exec(arg);
+      return {
+        scheme: match?.[1],
+        path: match?.[2],
+        fsPath: match?.[2]?.replace("/", path.sep),
+      };
+    });
+    expect(ProfileUtils.getProfileFromDocument("", undefined)).toBeUndefined();
+    expect(
+      ProfileUtils.getProfileFromDocument("zowe-ds:", undefined),
+    ).toBeUndefined();
+    expect(
+      ProfileUtils.getProfileFromDocument("zowe-ds:/", undefined),
+    ).toBeUndefined();
+    expect(
+      ProfileUtils.getProfileFromDocument("zowe-ds:/profile", undefined),
+    ).toBe("profile");
   });
 });

@@ -12,20 +12,13 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
-import { resolveCopybookHandler } from "../../../services/copybook/CopybookMessageHandler";
-import { CopybookURI } from "../../../services/copybook/CopybookURI";
 import { SettingsService } from "../../../services/Settings";
 import * as vscode from "vscode";
 import { Utils } from "../../../services/util/Utils";
-import { E4ECopybookService } from "../../../services/copybook/E4ECopybookService";
-import {
-  e4eMock,
-  e4eResponseMock,
-  e4eResponseMockDataSetPrior,
-} from "../../../__mocks__/getE4EMock.utility";
 import path = require("path");
 import { globSync } from "glob";
 import * as fs from "fs";
+import { CopybookDownloadService } from "../../../services/copybook/CopybookDownloadService";
 
 vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
   get: jest.fn().mockReturnValue("testProfile"),
@@ -46,18 +39,11 @@ jest.mock("url", () => {
   return { fsPath: x };
 });
 
-const outputChannel: vscode.OutputChannel = {
-  name: "COBOL Language Support",
-  append: jest.fn(),
-  appendLine: jest.fn(),
-  replace: jest.fn(),
-  clear: jest.fn(),
-  show: jest.fn(),
-  hide: jest.fn(),
-  dispose: jest.fn(),
-};
-
 describe("Test the copybook message handler", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+  const downloaderNoApi = new CopybookDownloadService("/storagePath");
   it("checks local present copybooks are resolved", async () => {
     SettingsService.getCopybookExtension = jest.fn().mockReturnValue([".cpy"]);
     SettingsService.getCopybookLocalPath = jest
@@ -65,9 +51,7 @@ describe("Test the copybook message handler", () => {
       .mockReturnValue(["/configured/path/from/setting"]);
 
     expect(
-      await resolveCopybookHandler(
-        "/storagePath",
-        outputChannel,
+      await downloaderNoApi.resolveCopybookHandler(
         "cobolFileName",
         "copybookName",
         "dialectType",
@@ -91,9 +75,7 @@ describe("Test the copybook message handler", () => {
       .fn()
       .mockReturnValue(["/configured/path"]);
     expect(
-      await resolveCopybookHandler(
-        "/storagePath",
-        outputChannel,
+      await downloaderNoApi.resolveCopybookHandler(
         "cobolFileName",
         "copybookName",
         "dialectType",
@@ -121,9 +103,7 @@ describe("Test the copybook message handler", () => {
       .mockReturnValue(["/configured/path"]);
 
     expect(
-      await resolveCopybookHandler(
-        "/storagePath",
-        outputChannel,
+      await downloaderNoApi.resolveCopybookHandler(
         "cobolFileName",
         "copybookName",
         "dialectType",
@@ -141,26 +121,109 @@ describe("Test the copybook message handler", () => {
         ),
     );
   });
+  const filename = "cobolFileName";
+  const group = "group";
+  const profile = { profile: "profile", instance: "instance" };
+  const datasetFirst = {
+    pgms: [
+      {
+        program: filename,
+        pgroup: group,
+      },
+    ],
+    pgroups: [
+      {
+        name: group,
+        libs: [
+          {
+            dataset: "dataset",
+          },
+          {
+            use_map: false,
+            environment: "environment",
+            stage: "stage",
+            system: "system",
+            subsystem: "subsystem",
+            type: "type",
+          },
+        ],
+      },
+    ],
+  };
+  const endevorFirst = {
+    pgms: [
+      {
+        program: filename,
+        pgroup: group,
+      },
+    ],
+    pgroups: [
+      {
+        name: group,
+        libs: [
+          {
+            use_map: false,
+            environment: "environment",
+            stage: "stage",
+            system: "system",
+            subsystem: "subsystem",
+            type: "type",
+          },
+          {
+            dataset: "dataset",
+          },
+        ],
+      },
+    ],
+  };
+
+  const unreachable = jest.fn();
+  const listMembers = jest.fn(async () => ["copybook"]);
+  const listElements = jest.fn(
+    async () =>
+      [
+        ["copybook", "abcdef0123456789"],
+        ["copybook2", "0123456789abcdef"],
+      ] as [string, string][],
+  );
+
   it("checks E4E downloaded member copybooks are resolved", async () => {
     vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
       get: jest.fn().mockReturnValue("ENDEVOR_PROCESSOR"),
     });
-    (vscode.workspace.workspaceFolders as any) = undefined;
-    (globSync as any) = jest.fn().mockImplementation((x: any) => [x]);
-    E4ECopybookService.getE4EAPI = jest.fn().mockResolvedValue(e4eMock);
-    e4eMock.isEndevorElement = jest.fn().mockResolvedValue(true);
-    const spyAsString = jest.spyOn(Utils, "profileAsString");
-    const spyGetEnvironmentPath = jest.spyOn(CopybookURI, "getEnviromentPath");
-    E4ECopybookService.getE4EClient = jest
-      .fn()
-      .mockResolvedValue(e4eResponseMockDataSetPrior);
-    const target = await resolveCopybookHandler(
-      "/storagePath",
-      outputChannel,
+    const downloader = new CopybookDownloadService("/storagePath", undefined, {
+      isEndevorElement(uri: string) {
+        return uri === filename;
+      },
+      onDidChangeElement: unreachable,
+      listMembers,
+      listElements,
+      getMember: unreachable,
+      getElement: unreachable,
+      async getProfileInfo(uri) {
+        return uri === filename ? profile : Error("fail");
+      },
+      async getConfiguration(uri, options) {
+        return uri === filename && options.type === "COBOL"
+          ? datasetFirst
+          : Error("fail");
+      },
+    });
+    const target = await downloader.resolveCopybookHandler(
       "cobolFileName",
       "copybook",
       "dialectType",
     );
+    expect(unreachable).not.toHaveBeenCalled();
+    expect(listMembers).toHaveBeenCalledWith(profile, { dataset: "dataset" });
+    expect(listElements).toHaveBeenCalledWith(profile, {
+      use_map: false,
+      environment: "environment",
+      stage: "stage",
+      system: "system",
+      subsystem: "subsystem",
+      type: "type",
+    });
     expect(target).toEqual(
       "file://" +
         path.resolve(
@@ -172,31 +235,44 @@ describe("Test the copybook message handler", () => {
           "copybook",
         ),
     );
-    expect(spyAsString).toHaveBeenCalled();
-    expect(spyGetEnvironmentPath).not.toHaveBeenCalled();
   });
   it("checks E4E downloaded element copybooks are resolved", async () => {
-    (vscode.workspace.workspaceFolders as any) = undefined;
-    (fs.realpathSync.native as any) = jest
-      .fn()
-      .mockImplementation((x: any) => x);
-    (vscode.Uri.file as any) = jest.fn().mockImplementation((x: any) => {
-      return { fsPath: x };
+    vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
+      get: jest.fn().mockReturnValue("ENDEVOR_PROCESSOR"),
     });
-    E4ECopybookService.getE4EAPI = jest.fn().mockResolvedValue(e4eMock);
-    e4eMock.isEndevorElement = jest.fn().mockResolvedValue(true);
-
-    const spyGetEnvironmentPath = jest.spyOn(CopybookURI, "getEnviromentPath");
-    E4ECopybookService.getE4EClient = jest
-      .fn()
-      .mockResolvedValue(e4eResponseMock);
-    const target = await resolveCopybookHandler(
-      "/storagePath",
-      outputChannel,
+    const downloader = new CopybookDownloadService("/storagePath", undefined, {
+      isEndevorElement(uri: string) {
+        return uri === filename;
+      },
+      onDidChangeElement: unreachable,
+      listMembers,
+      listElements,
+      getMember: unreachable,
+      getElement: unreachable,
+      async getProfileInfo(uri) {
+        return uri === filename ? profile : Error("fail");
+      },
+      async getConfiguration(uri, options) {
+        return uri === filename && options.type === "COBOL"
+          ? endevorFirst
+          : Error("fail");
+      },
+    });
+    const target = await downloader.resolveCopybookHandler(
       "cobolFileName",
       "copybook",
       "dialectType",
     );
+    expect(unreachable).not.toHaveBeenCalled();
+    expect(listMembers).toHaveBeenCalledWith(profile, { dataset: "dataset" });
+    expect(listElements).toHaveBeenCalledWith(profile, {
+      use_map: false,
+      environment: "environment",
+      stage: "stage",
+      system: "system",
+      subsystem: "subsystem",
+      type: "type",
+    });
     expect(target).toEqual(
       "file://" +
         path.resolve(
@@ -212,6 +288,26 @@ describe("Test the copybook message handler", () => {
           "copybook",
         ),
     );
-    expect(spyGetEnvironmentPath).toHaveBeenCalled();
+  });
+  it("checks E4E downloaded element copybooks are not resolved due to settings", async () => {
+    vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
+      get: jest.fn().mockReturnValue("ZOWE"),
+    });
+    const downloader = new CopybookDownloadService("/storagePath", undefined, {
+      isEndevorElement: unreachable,
+      onDidChangeElement: unreachable,
+      listMembers: unreachable,
+      listElements: unreachable,
+      getMember: unreachable,
+      getElement: unreachable,
+      getProfileInfo: unreachable,
+      getConfiguration: unreachable,
+    });
+    await downloader.resolveCopybookHandler(
+      "cobolFileName",
+      "copybook",
+      "dialectType",
+    );
+    expect(unreachable).not.toHaveBeenCalled();
   });
 });
