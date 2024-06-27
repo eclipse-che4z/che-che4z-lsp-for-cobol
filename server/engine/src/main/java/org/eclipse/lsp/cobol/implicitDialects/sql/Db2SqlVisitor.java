@@ -438,11 +438,14 @@ class Db2SqlVisitor extends Db2SqlParserBaseVisitor<List<Node>> {
         ParserRuleContext ruleContext = ((ParserRuleContext) ctx);
         ExecSqlWheneverNode.WheneverConditionType conditionType = ExecSqlWheneverNode.WheneverConditionType.NOT_FOUND;
 
+
         if (ruleContext.getChildCount() >= 3) {
-            ParseTree pt1 = ruleContext.getChild(1);
-            if (Objects.equals(pt1.getText(), "SQLERROR")) {
+            ParseTree pt = ruleContext.getChild(1);
+            String value = pt.getText().trim().toUpperCase();
+
+            if (Objects.equals(value, "SQLERROR")) {
                 conditionType = ExecSqlWheneverNode.WheneverConditionType.SQLERROR;
-            } else if (Objects.equals(pt1.getText(), "SQLWARNING")) {
+            } else if (Objects.equals(value, "SQLWARNING")) {
                 conditionType = ExecSqlWheneverNode.WheneverConditionType.SQLWARNING;
             }
         }
@@ -454,10 +457,16 @@ class Db2SqlVisitor extends Db2SqlParserBaseVisitor<List<Node>> {
         Pair<ExecSqlWheneverNode.WheneverType, String> result = Pair.of(ExecSqlWheneverNode.WheneverType.CONTINUE, null);
 
         if (ruleContext.getChildCount() > 3) {
-            ParseTree pt1 = ruleContext.getChild(2);
-            if (Objects.equals(pt1.getText(), "DO")) {
+            ParseTree pt = ruleContext.getChild(2);
+            String value = pt.getText().trim().toUpperCase();
+
+            if (Objects.equals(value, "DO")) {
                 result = Pair.of(ExecSqlWheneverNode.WheneverType.DO, ruleContext.getChild(3).getText());
-            } else if (Objects.equals(pt1.getText(), "GO") || Objects.equals(pt1.getText(), "GOTO")) {
+            } else if (Objects.equals(value, "GO")) {
+                if (ruleContext.getChildCount() > 4) {
+                    result = Pair.of(ExecSqlWheneverNode.WheneverType.GOTO, ruleContext.getChild(4).getText());
+                }
+            } else if (Objects.equals(value, "GOTO")) {
                 result = Pair.of(ExecSqlWheneverNode.WheneverType.GOTO, ruleContext.getChild(3).getText());
             }
         }

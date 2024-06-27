@@ -48,7 +48,7 @@
       {
         "wheneverCondition": "SQLERROR",
         "wheneverType": "GOTO",
-        "value": "TO",
+        "value": "HANDLER",
         "type": "execwhenever",
         "location": {
           "uri": "fake/path",
