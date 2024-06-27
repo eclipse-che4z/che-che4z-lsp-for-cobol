@@ -15,10 +15,7 @@
 package org.eclipse.lsp.cobol.common.copybook;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Set;
-
-import com.google.common.collect.ImmutableSet;
 import lombok.NonNull;
 import org.eclipse.lsp.cobol.common.CleanerPreprocessor;
 import org.eclipse.lsp.cobol.common.ResultWithErrors;
@@ -30,7 +27,7 @@ import org.eclipse.lsp.cobol.common.ResultWithErrors;
 public interface CopybookService {
   String FILE_BASENAME_VARIABLE = "${fileBasenameNoExtension}";
   /** Remove all the stored copybook. */
-  void invalidateCache();
+  void invalidateCache(boolean onlyNonImplicit);
 
   void invalidateCache(CopybookId copybookId);
 

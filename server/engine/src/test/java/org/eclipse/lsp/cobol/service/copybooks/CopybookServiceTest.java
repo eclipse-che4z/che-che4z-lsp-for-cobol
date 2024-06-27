@@ -29,7 +29,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Path;
 import java.util.Collections;
-
 import org.eclipse.lsp.cobol.common.CleanerPreprocessor;
 import org.eclipse.lsp.cobol.common.ResultWithErrors;
 import org.eclipse.lsp.cobol.common.copybook.*;
@@ -80,6 +79,8 @@ class CopybookServiceTest {
         .thenReturn(supplyAsync(() -> VALID_CPY_URI));
     when(client.resolveCopybook(DOCUMENT_URI, INVALID_CPY_NAME, "COBOL"))
         .thenReturn(supplyAsync(() -> null));
+    when(client.resolveCopybook(DOCUMENT_URI, COPYBOOK_3_NAME, "COBOL"))
+        .thenReturn(supplyAsync(() -> DOCUMENT_3_URI));
 
     when(cpyPath.toUri()).thenReturn(URI.create(VALID_CPY_URI));
     when(parentPath.toUri()).thenReturn(URI.create(PARENT_CPY_URI));
@@ -87,6 +88,7 @@ class CopybookServiceTest {
     when(files.getNameFromURI(VALID_CPY_URI)).thenReturn(VALID_CPY_NAME);
     when(files.getNameFromURI(DOCUMENT_URI)).thenReturn("document");
     when(files.getPathFromURI(VALID_CPY_URI)).thenReturn(cpyPath);
+    when(files.getPathFromURI(DOCUMENT_3_URI)).thenReturn(cpyPath);
     when(files.getContentByPath(cpyPath)).thenReturn(CONTENT);
     when(files.fileExists(cpyPath)).thenReturn(true);
     when(files.fileExists(parentPath)).thenReturn(true);
@@ -234,7 +236,7 @@ class CopybookServiceTest {
             copybookName.toCopybookId(DOCUMENT_URI), copybookName, VALID_CPY_URI, CONTENT),
         copybookModel);
 
-    copybookService.invalidateCache();
+    copybookService.invalidateCache(false);
 
     copybookModel =
         copybookService
@@ -253,6 +255,46 @@ class CopybookServiceTest {
     verify(files, times(2)).getContentByPath(cpyPath);
     verify(files, times(4)).getNameFromURI(DOCUMENT_URI);
     verify(files, times(2)).getPathFromURI(VALID_CPY_URI);
+  }
+
+  @Test
+  void cacheInvalidationForNonImplicitCopybook() {
+    CopybookName copybookName = createCopybook(COPYBOOK_3_NAME);
+    CopybookService copybookService = createCopybookService();
+
+    CopybookModel copybookModel =
+        copybookService
+            .resolve(
+                copybookName.toCopybookId(DOCUMENT_URI),
+                copybookName,
+                DOCUMENT_URI,
+                DOCUMENT_URI,
+                null)
+            .getResult();
+    assertEquals(
+        new CopybookModel(
+            copybookName.toCopybookId(DOCUMENT_URI), copybookName, DOCUMENT_3_URI, CONTENT),
+        copybookModel);
+
+    copybookService.invalidateCache(true);
+
+    copybookModel =
+        copybookService
+            .resolve(
+                copybookName.toCopybookId(DOCUMENT_URI),
+                copybookName,
+                DOCUMENT_URI,
+                DOCUMENT_URI,
+                null)
+            .getResult();
+    assertEquals(
+        new CopybookModel(
+            copybookName.toCopybookId(DOCUMENT_URI), copybookName, DOCUMENT_3_URI, CONTENT),
+        copybookModel);
+
+    verify(files, times(1)).getContentByPath(cpyPath);
+    verify(files, times(2)).getNameFromURI(DOCUMENT_URI);
+    verify(files, times(1)).getPathFromURI(DOCUMENT_3_URI);
   }
 
   /**

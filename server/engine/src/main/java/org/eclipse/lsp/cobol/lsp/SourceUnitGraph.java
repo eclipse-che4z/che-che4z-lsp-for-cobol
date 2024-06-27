@@ -187,6 +187,10 @@ public class SourceUnitGraph implements AnalysisStateListener {
                 copyUri = copyUri.replace(" ", "%20");
                 return new URL(decodeUri).sameFile(new URL(copyUri));
               } catch (IOException e) {
+                if (ImplicitCodeUtils.isImplicit(copyUri)) {
+                  LOG.debug("{} is a implicit copybook", copyUri);
+                  return true;
+                }
                 LOG.error("IOException encountered while comparing paths {} and {}", copyUri, uri);
                 return false;
               }
