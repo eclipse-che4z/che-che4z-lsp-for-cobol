@@ -28,7 +28,7 @@ import com.google.gson.JsonPrimitive;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
-
+import org.eclipse.lsp.cobol.common.copybook.CopybookService;
 import org.eclipse.lsp.cobol.common.dialects.CobolLanguageId;
 import org.eclipse.lsp.cobol.common.message.LocaleStore;
 import org.eclipse.lsp.cobol.common.message.MessageService;
@@ -55,6 +55,7 @@ class DidChangeConfigurationHandlerTest {
         DisposableLSPStateService stateService = new CobolLSPServerStateService();
         SettingsService settingsService = mock(SettingsService.class);
         WatcherService watchingService = mock(WatcherService.class);
+        CopybookService copybookService = mock(CopybookService.class);
         LocaleStore localeStore = mock(LocaleStore.class);
         CopybookNameService copybookNameService = mock(CopybookNameService.class);
         Keywords keywords = mock(Keywords.class);
@@ -70,7 +71,7 @@ class DidChangeConfigurationHandlerTest {
                         localeStore,
                         keywords,
                         messageService,
-                        asyncAnalysisService, getMockLayoutStore());
+                        asyncAnalysisService, getMockLayoutStore(), copybookService);
 
 
         when(copybookNameService.copybookLocalFolders(null))
@@ -101,6 +102,7 @@ class DidChangeConfigurationHandlerTest {
         Keywords keywords = mock(Keywords.class);
         MessageService messageService = mock(MessageService.class);
         AsyncAnalysisService asyncAnalysisService = mock(AsyncAnalysisService.class);
+        CopybookService copybookService = mock(CopybookService.class);
 
         DidChangeConfigurationHandler didChangeConfigurationHandler =
                 new DidChangeConfigurationHandler(
@@ -112,7 +114,8 @@ class DidChangeConfigurationHandlerTest {
                         keywords,
                         messageService,
                         asyncAnalysisService,
-                        getMockLayoutStore());
+                        getMockLayoutStore(),
+                        copybookService);
 
         String path = "foo/bar";
 
@@ -145,6 +148,7 @@ class DidChangeConfigurationHandlerTest {
         Keywords keywords = mock(Keywords.class);
         MessageService messageService = mock(MessageService.class);
         AsyncAnalysisService asyncAnalysisService = mock(AsyncAnalysisService.class);
+        CopybookService copybookService = mock(CopybookService.class);
 
         DidChangeConfigurationHandler didChangeConfigurationHandler =
                 new DidChangeConfigurationHandler(
@@ -156,7 +160,7 @@ class DidChangeConfigurationHandlerTest {
                         keywords,
                         messageService,
                         asyncAnalysisService,
-                        getMockLayoutStore());
+                        getMockLayoutStore(), copybookService);
 
         ArgumentCaptor<List<String>> watcherCaptor = forClass(List.class);
         String path = "foo/bar";
@@ -193,6 +197,7 @@ class DidChangeConfigurationHandlerTest {
         Keywords keywords = mock(Keywords.class);
         MessageService messageService = mock(MessageService.class);
         AsyncAnalysisService asyncAnalysisService = mock(AsyncAnalysisService.class);
+        CopybookService copybookService = mock(CopybookService.class);
 
         DidChangeConfigurationHandler didChangeConfigurationHandler =
                 new DidChangeConfigurationHandler(
@@ -204,7 +209,8 @@ class DidChangeConfigurationHandlerTest {
                         keywords,
                         messageService,
                         asyncAnalysisService,
-                        getMockLayoutStore());
+                        getMockLayoutStore(),
+                        copybookService);
         ArgumentCaptor<List<String>> watcherCaptor = forClass(List.class);
         JsonArray arr = new JsonArray();
         String path = "foo/bar";

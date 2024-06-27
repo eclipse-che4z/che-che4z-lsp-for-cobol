@@ -15,6 +15,8 @@
 package org.eclipse.lsp.cobol.core.preprocessor.delegates;
 
 import com.google.inject.Inject;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.NonNull;
 import org.antlr.v4.runtime.BufferedTokenStream;
 import org.antlr.v4.runtime.CharStreams;
@@ -33,9 +35,6 @@ import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.*;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.replacement.ReplacePreProcessorListener;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.replacement.ReplacePreprocessorFactory;
 import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * This class runs pre-processing for COBOL using CobolPreprocessor.g4 grammar file. As a result, it
@@ -84,6 +83,7 @@ public class GrammarPreprocessorImpl implements GrammarPreprocessor {
 
     GrammarPreprocessorListener<CopybooksRepository> listener = listenerFactory.create(context, preprocessor);
 
+    ThreadInterruptionUtil.checkThreadInterrupted();
     CobolPreprocessor parser = new CobolPreprocessor(tokens);
     parser.removeErrorListeners();
 

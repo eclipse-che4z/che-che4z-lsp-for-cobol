@@ -67,7 +67,7 @@ class AsyncAnalysisServiceTest {
             throw new RuntimeException(e);
         }
 
-        verify(copybookService, times(1)).invalidateCache();
+        verify(copybookService, times(1)).invalidateCache(true);
         verify(subroutineService, times(1)).invalidateCache();
     }
 

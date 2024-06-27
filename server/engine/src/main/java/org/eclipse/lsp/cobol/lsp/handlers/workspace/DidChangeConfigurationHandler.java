@@ -20,6 +20,7 @@ import static org.eclipse.lsp.cobol.service.settings.SettingsParametersEnum.*;
 import com.google.inject.Inject;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.lsp.cobol.common.copybook.CopybookService;
 import org.eclipse.lsp.cobol.common.message.LocaleStore;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.utils.LogLevelUtils;
@@ -46,6 +47,7 @@ public class DidChangeConfigurationHandler {
   private final MessageService messageService;
   private final AsyncAnalysisService asyncAnalysisService;
   private final CodeLayoutStore codeLayoutStore;
+  private final CopybookService copybookService;
 
   @Inject
   public DidChangeConfigurationHandler(DisposableLSPStateService disposableLSPStateService,
@@ -56,7 +58,8 @@ public class DidChangeConfigurationHandler {
                                        Keywords keywords,
                                        MessageService messageService,
                                        AsyncAnalysisService asyncAnalysisService,
-                                       CodeLayoutStore codeLayoutStore) {
+                                       CodeLayoutStore codeLayoutStore,
+                                       CopybookService copybookService) {
     this.disposableLSPStateService = disposableLSPStateService;
     this.settingsService = settingsService;
     this.copybookNameService = copybookNameService;
@@ -66,6 +69,7 @@ public class DidChangeConfigurationHandler {
     this.messageService = messageService;
     this.asyncAnalysisService = asyncAnalysisService;
     this.codeLayoutStore = codeLayoutStore;
+    this.copybookService = copybookService;
   }
 
   /**
@@ -76,7 +80,7 @@ public class DidChangeConfigurationHandler {
     if (disposableLSPStateService.isServerShutdown()) {
       return;
     }
-
+    copybookService.invalidateCache(false);
     messageService.reloadMessages();
     copybookNameService
         .copybookLocalFolders(null)
