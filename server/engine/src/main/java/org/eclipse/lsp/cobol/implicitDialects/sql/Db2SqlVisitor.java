@@ -457,7 +457,7 @@ class Db2SqlVisitor extends Db2SqlParserBaseVisitor<List<Node>> {
             ParseTree pt1 = ruleContext.getChild(2);
             if (Objects.equals(pt1.getText(), "DO")) {
                 result = Pair.of(ExecSqlWheneverNode.WheneverType.DO, ruleContext.getChild(3).getText());
-            } else if (Objects.equals(pt1.getText(), "GO TO") || Objects.equals(pt1.getText(), "GOTO")) {
+            } else if (Objects.equals(pt1.getText(), "GO") || Objects.equals(pt1.getText(), "GOTO")) {
                 result = Pair.of(ExecSqlWheneverNode.WheneverType.GOTO, ruleContext.getChild(3).getText());
             }
         }
