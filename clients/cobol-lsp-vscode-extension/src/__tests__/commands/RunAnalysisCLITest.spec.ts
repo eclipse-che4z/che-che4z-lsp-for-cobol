@@ -98,11 +98,53 @@ describe("Test Analysis CLI command functionality", () => {
     jest.restoreAllMocks();
   });
 
-  test("Cobol Analysis Command", async () => {
+  test("Cobol Analysis Command - Java", async () => {
     const testAnalysis = new RunAnalysis( false, "", vscode.Uri.parse(context.globalStorageUri));
 
-    const spy = jest.spyOn(testAnalysis as any, "getCurrentFileLocation");
+    const runCobolAnalysisSpy = jest.spyOn(testAnalysis as any, "runCobolAnalysis");
+    const buildCommandSpy = jest.spyOn(testAnalysis as any, "buildCommand");
+    const getCurrentFileLocationSpy = jest.spyOn(testAnalysis as any, "getCurrentFileLocation");
+    const buildJavaCommandSpy = jest.spyOn(testAnalysis as any, "buildJavaCommand");
+    const buildNativeCommandSpy = jest.spyOn(testAnalysis as any, "buildNativeCommand");
+    const getExtensionPathSpy = jest.spyOn(testAnalysis as any, "getExtensionPath");
+    const buildAnalysisCommandPortionSpy = jest.spyOn(testAnalysis as any, "buildAnalysisCommandPortion");
+    const sendToTerminalSpy = jest.spyOn(testAnalysis as any, "sendToTerminal");
+
     testAnalysis.runCobolAnalysis();
-    expect(spy).toHaveBeenCalled();
+
+    expect(runCobolAnalysisSpy).toHaveBeenCalled();
+    expect(buildCommandSpy).toHaveBeenCalled();
+    expect(getCurrentFileLocationSpy).toHaveBeenCalled();
+    expect(buildJavaCommandSpy).toHaveBeenCalled();
+    expect(getExtensionPathSpy).toHaveBeenCalled();
+    expect(buildAnalysisCommandPortionSpy).toHaveBeenCalled();
+    expect(sendToTerminalSpy).toHaveBeenCalled();
+
+    expect(buildNativeCommandSpy).toHaveBeenCalledTimes(0);
+  });
+
+  test("Cobol Analysis Command - Native", async () => {
+    const testAnalysis = new RunAnalysis( true, "", vscode.Uri.parse(context.globalStorageUri));
+
+    const runCobolAnalysisSpy = jest.spyOn(testAnalysis as any, "runCobolAnalysis");
+    const buildCommandSpy = jest.spyOn(testAnalysis as any, "buildCommand");
+    const getCurrentFileLocationSpy = jest.spyOn(testAnalysis as any, "getCurrentFileLocation");
+    const buildJavaCommandSpy = jest.spyOn(testAnalysis as any, "buildJavaCommand");
+    const buildNativeCommandSpy = jest.spyOn(testAnalysis as any, "buildNativeCommand");
+    const getExtensionPathSpy = jest.spyOn(testAnalysis as any, "getExtensionPath");
+    const buildAnalysisCommandPortionSpy = jest.spyOn(testAnalysis as any, "buildAnalysisCommandPortion");
+    const sendToTerminalSpy = jest.spyOn(testAnalysis as any, "sendToTerminal");
+
+    testAnalysis.runCobolAnalysis();
+
+    expect(runCobolAnalysisSpy).toHaveBeenCalled();
+    expect(buildCommandSpy).toHaveBeenCalled();
+    expect(getCurrentFileLocationSpy).toHaveBeenCalled();
+    expect(buildNativeCommandSpy).toHaveBeenCalled();
+    expect(getExtensionPathSpy).toHaveBeenCalled();
+    expect(buildAnalysisCommandPortionSpy).toHaveBeenCalled();
+    expect(sendToTerminalSpy).toHaveBeenCalled();
+
+    expect(buildJavaCommandSpy).toHaveBeenCalledTimes(0);
   });
 });
