@@ -335,7 +335,9 @@ function registerCommands(
   );
 
   context.subscriptions.push(
-      vscode.commands.registerCommand("cobol-lsp.analysis.runAnalysis", () => runCobolAnalysisCommand()),
+    vscode.commands.registerCommand("cobol-lsp.analysis.runAnalysis", () =>
+      runCobolAnalysisCommand(context.globalStorageUri),
+    ),
   );
 }
 

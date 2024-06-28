@@ -577,7 +577,6 @@
   "dependencies": {
     "@code4z/cobol-dialect-api": "file:../cobol-dialect-api",
     "@vscode/extension-telemetry": "^0.8.2",
-    "fs-temp": "^2.0.1",
     "glob": "10.3.10",
     "iconv-lite": "^0.6.3",
     "micromatch": "^4.0.7",
