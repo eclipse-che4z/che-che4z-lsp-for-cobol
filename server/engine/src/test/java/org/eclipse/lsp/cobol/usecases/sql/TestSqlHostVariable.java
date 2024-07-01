@@ -85,7 +85,7 @@ public class TestSqlHostVariable {
           + "        PROCEDURE DIVISION.\n";
 
   public static final String LOB_XML_TEXT =
-          "        Identification Division.\n"
+          "        Identification Division. \n"
                   + "        Program-Id. 'TEST1'.\n"
                   + "        Data Division.\n"
                   + "         Working-Storage Section.\n"
