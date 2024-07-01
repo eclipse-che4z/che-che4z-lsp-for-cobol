@@ -121,7 +121,7 @@ describe("Check plugin extension for cobol starts successfully.", () => {
       "Extension activation event was triggered",
     );
 
-    expect(vscode.commands.registerCommand).toBeCalledTimes(10);
+    expect(vscode.commands.registerCommand).toBeCalledTimes(11);
 
     expect(fetchCopybookCommand).toHaveBeenCalled();
     expect(gotoCopybookSettings).toHaveBeenCalled();

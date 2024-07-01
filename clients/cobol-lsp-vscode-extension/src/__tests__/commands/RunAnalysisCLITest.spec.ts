@@ -13,12 +13,10 @@
  */
 
 import {
+  AnalysisResults,
   RunAnalysis,
-  runCobolAnalysisCommand,
 } from "../../commands/RunAnalysisCLI";
 import * as vscode from "vscode";
-
-jest.mock("../../services/util/MultiStepInputUtil");
 
 jest.mock("vscode", () => ({
   commands: {
@@ -53,6 +51,7 @@ jest.mock("vscode", () => ({
     showInformationMessage: jest
         .fn()
         .mockImplementation((message: string) => Promise.resolve(message)),
+    showQuickPick: jest.fn(),
     onDidChangeActiveTextEditor: jest.fn(),
     createQuickPick: jest
         .fn()
@@ -94,15 +93,11 @@ const context: any = {
 
 describe("Test Analysis CLI command functionality", () => {
 
-  afterEach(() => {
-    jest.restoreAllMocks();
-  });
+  test("Cobol Analysis - Java", async () => {
+    const testAnalysis = new RunAnalysis(vscode.Uri.parse(context.globalStorageUri));
+    vscode.window.showQuickPick = jest.fn().mockReturnValue("Java");
 
-  test("Cobol Analysis Command - Java", async () => {
-    const testAnalysis = new RunAnalysis( false, "", vscode.Uri.parse(context.globalStorageUri));
-
-    const runCobolAnalysisSpy = jest.spyOn(testAnalysis as any, "runCobolAnalysis");
-    const buildCommandSpy = jest.spyOn(testAnalysis as any, "buildCommand");
+    const runCobolAnalysisCommandSpy = jest.spyOn(testAnalysis as any, "runCobolAnalysisCommand");
     const getCurrentFileLocationSpy = jest.spyOn(testAnalysis as any, "getCurrentFileLocation");
     const buildJavaCommandSpy = jest.spyOn(testAnalysis as any, "buildJavaCommand");
     const buildNativeCommandSpy = jest.spyOn(testAnalysis as any, "buildNativeCommand");
@@ -110,10 +105,9 @@ describe("Test Analysis CLI command functionality", () => {
     const buildAnalysisCommandPortionSpy = jest.spyOn(testAnalysis as any, "buildAnalysisCommandPortion");
     const sendToTerminalSpy = jest.spyOn(testAnalysis as any, "sendToTerminal");
 
-    testAnalysis.runCobolAnalysis();
+    await testAnalysis.runCobolAnalysisCommand();
 
-    expect(runCobolAnalysisSpy).toHaveBeenCalled();
-    expect(buildCommandSpy).toHaveBeenCalled();
+    expect(runCobolAnalysisCommandSpy).toHaveBeenCalled();
     expect(getCurrentFileLocationSpy).toHaveBeenCalled();
     expect(buildJavaCommandSpy).toHaveBeenCalled();
     expect(getExtensionPathSpy).toHaveBeenCalled();
@@ -123,11 +117,11 @@ describe("Test Analysis CLI command functionality", () => {
     expect(buildNativeCommandSpy).toHaveBeenCalledTimes(0);
   });
 
-  test("Cobol Analysis Command - Native", async () => {
-    const testAnalysis = new RunAnalysis( true, "", vscode.Uri.parse(context.globalStorageUri));
+  test("Cobol Analysis - Native", async () => {
+    const testAnalysis = new RunAnalysis(vscode.Uri.parse(context.globalStorageUri));
+    vscode.window.showQuickPick = jest.fn().mockReturnValue("Native");
 
-    const runCobolAnalysisSpy = jest.spyOn(testAnalysis as any, "runCobolAnalysis");
-    const buildCommandSpy = jest.spyOn(testAnalysis as any, "buildCommand");
+    const runCobolAnalysisCommandSpy = jest.spyOn(testAnalysis as any, "runCobolAnalysisCommand");
     const getCurrentFileLocationSpy = jest.spyOn(testAnalysis as any, "getCurrentFileLocation");
     const buildJavaCommandSpy = jest.spyOn(testAnalysis as any, "buildJavaCommand");
     const buildNativeCommandSpy = jest.spyOn(testAnalysis as any, "buildNativeCommand");
@@ -135,10 +129,9 @@ describe("Test Analysis CLI command functionality", () => {
     const buildAnalysisCommandPortionSpy = jest.spyOn(testAnalysis as any, "buildAnalysisCommandPortion");
     const sendToTerminalSpy = jest.spyOn(testAnalysis as any, "sendToTerminal");
 
-    testAnalysis.runCobolAnalysis();
+    await testAnalysis.runCobolAnalysisCommand();
 
-    expect(runCobolAnalysisSpy).toHaveBeenCalled();
-    expect(buildCommandSpy).toHaveBeenCalled();
+    expect(runCobolAnalysisCommandSpy).toHaveBeenCalled();
     expect(getCurrentFileLocationSpy).toHaveBeenCalled();
     expect(buildNativeCommandSpy).toHaveBeenCalled();
     expect(getExtensionPathSpy).toHaveBeenCalled();
@@ -146,5 +139,20 @@ describe("Test Analysis CLI command functionality", () => {
     expect(sendToTerminalSpy).toHaveBeenCalled();
 
     expect(buildJavaCommandSpy).toHaveBeenCalledTimes(0);
+  });
+
+  test("Undefined Type", async () => {
+    const testAnalysis = new RunAnalysis(vscode.Uri.parse(context.globalStorageUri));
+    vscode.window.showQuickPick = jest.fn().mockReturnValue(undefined);
+
+    const runCobolAnalysisCommandSpy = jest.spyOn(testAnalysis as any, "runCobolAnalysisCommand");
+    const getVersionToRunSpy = jest.spyOn(testAnalysis as any, "getVersionToRun");
+    const buildJavaCommandSpy = jest.spyOn(testAnalysis as any, "buildNativeCommand");
+
+    await testAnalysis.runCobolAnalysisCommand();
+
+    expect(runCobolAnalysisCommandSpy).toHaveBeenCalled();
+    expect(getVersionToRunSpy).toHaveBeenCalled();
+    expect(buildJavaCommandSpy).not.toHaveBeenCalled();
   });
 });

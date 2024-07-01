@@ -13,97 +13,11 @@
  */
 
 import * as vscode from "vscode";
-import {ExtensionContext, QuickPickItem, Terminal} from "vscode";
-import { MultiStepInput } from "../services/util/MultiStepInputUtil";
+import {Terminal} from "vscode";
 
-/**
- * Starts the process to gather input from the user to create the COBOL CLI analysis command.
- */
-export async function runCobolAnalysisCommand(context: vscode.Uri) {
-  const activeEditor = vscode.window.activeTextEditor;
-  if (!activeEditor) {
-    return;
-  }
-
-  const result = {} as Partial<AnalysisResults>;
-  await MultiStepInput.run(input => getVersionToRun(input, result));
-
-  if (result.typeToRun === undefined || result.copybookLocation === undefined) {
-    return;
-  }
-
-  new RunAnalysis(
-    result.typeToRun === "Native",
-    result.copybookLocation,
-    context,
-  ).runCobolAnalysis();
-}
-
-interface AnalysisResults {
+export interface AnalysisResults {
   typeToRun: string;
   copybookLocation: string;
-}
-
-/**
- *  Prompt the user for whether to run the Java or Native version.
- */
-async function getVersionToRun(
-  input: MultiStepInput,
-  result: Partial<AnalysisResults>,
-) {
-  const inputItems: QuickPickItem[] = ["Java", "Native"].map(label => ({
-    label,
-  }));
-  const output = await input.showQuickPick({
-    activeItem:
-      typeof result.typeToRun !== "string" ? result.typeToRun : undefined,
-    items: inputItems,
-    placeholder: "Select Java or Native",
-    shouldResume,
-    step: 1,
-    title: "Run COBOL analysis from CLI",
-    totalSteps: 1,
-  });
-
-  result.typeToRun = output.label;
-  return getCopybookConfigLocation(input, result); // Chain steps
-}
-
-/**
- * Prompt the user for the location of the copybook config file.
- */
-async function getCopybookConfigLocation(
-  input: MultiStepInput,
-  result: Partial<AnalysisResults>,
-) {
-  /* result.copybookLocation = await input.showInputBox({
-        preserveFocus: true,
-        prompt: "Enter the folder containing the copybooks. Leave blank if no copybooks are needed.",
-        shouldResume,
-        step: 2,
-        title: "Run COBOL analysis from CLI",
-        totalSteps: 2,
-        validate: validatePath,
-        value: "",
-    }); */
-
-  result.copybookLocation = "";
-}
-
-/**
- * Dummy function to satisfy the requirement of validating the text input in the config location.
- */
-function validatePath(value: string) {
-  return Promise.resolve(undefined);
-}
-
-/**
- * Dummy function to satisfy the requirement of the pick/input box needing a way to resume.
- */
-function shouldResume() {
-  return new Promise<boolean>(resolve => {
-    //
-  });
 }
 
 /**
@@ -111,24 +25,61 @@ function shouldResume() {
  * Handles Java or Native builds with or without copybook support
  */
 export class RunAnalysis {
-  protected readonly runNative: boolean;
-  protected readonly copybookConfigLocation: string;
-  protected readonly globalStorageUri: vscode.Uri;
+  protected runNative: boolean;
+  protected copybookConfigLocation: string;
+  protected globalStorageUri: vscode.Uri;
 
-  constructor(runNative: boolean = false, copybookConfigLocation: string = "", globalStorageUri: vscode.Uri) {
+  constructor(globalStorageUri: vscode.Uri, runNative: boolean = false, copybookConfigLocation: string = "") {
     this.runNative = runNative;
     this.copybookConfigLocation = copybookConfigLocation;
     this.globalStorageUri = globalStorageUri;
   }
 
   /**
-   * Main entrypoint to the class
+   * Starts the process to gather input from the user to create the COBOL CLI analysis command.
    */
-  public runCobolAnalysis() {
+   public async runCobolAnalysisCommand() {
+    const activeEditor = vscode.window.activeTextEditor;
+    if (!activeEditor) {
+      return;
+    }
+
+    const result = {} as Partial<AnalysisResults>;
+    await this.getVersionToRun(result);
+    await this.getCopybookConfigLocation(result);
+
+    if (result.typeToRun === undefined || result.copybookLocation === undefined) {
+      return;
+    }
+
+    this.runNative = result.typeToRun === "Native";
+    this.copybookConfigLocation = result.copybookLocation;
+
     const command = this.buildCommand();
     if (command !== "") {
       this.sendToTerminal(command);
     }
+  }
+
+  /**
+   *  Prompt the user for whether to run the Java or Native version.
+   */
+  public async getVersionToRun(
+      result: Partial<AnalysisResults>,
+  ) {
+    result.typeToRun = await vscode.window.showQuickPick(["Java", "Native"], {
+      placeHolder: "Select Java or Native",
+    });
+  }
+
+  /**
+   * Prompt the user for the location of the copybook config file.
+   */
+  public async getCopybookConfigLocation(
+      result: Partial<AnalysisResults>,
+  ) {
+
+    result.copybookLocation = "";
   }
 
   /**
