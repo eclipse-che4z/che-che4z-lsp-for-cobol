@@ -8,3 +8,9 @@
 # Contributors:
 #   Broadcom, Inc. - initial API and implementation
 RESULT-SET-LOCATOR=
+BLOB-LOCATOR=
+CLOB-LOCATOR=
+DBCLOB-LOCATOR=
+BLOB-FILE=
+CLOB-FILE=
+DBCLOB-FILE=

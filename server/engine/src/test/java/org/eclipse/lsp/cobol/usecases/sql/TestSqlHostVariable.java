@@ -84,6 +84,26 @@ public class TestSqlHostVariable {
           + "       01 {$*VAR-INVALID-BIN`->VAR-INVALID-BIN`->VAR-INVALID-BIN-LEN`->VAR-INVALID-BIN-TEXT} USAGE IS SQL TYPE IS VARBINARY({-|1}1234).\n"
           + "        PROCEDURE DIVISION.\n";
 
+  public static final String LOB_XML_TEXT =
+          "        Identification Division.\n"
+                  + "        Program-Id. 'TEST1'.\n"
+                  + "        Data Division.\n"
+                  + "         Working-Storage Section.\n"
+                  + "       01 {$*VAR-NAME1} USAGE IS SQL TYPE IS XML AS BINARY LARGE OBJECT (10).\n"
+                  + "       01 {$*VAR-NAME2} USAGE IS SQL TYPE IS XML AS BLOB (10 K).\n"
+                  + "       01 {$*VAR3} USAGE IS SQL TYPE IS XML AS CHARACTER LARGE OBJECT (10 M).\n"
+                  + "       01 {$*VAR-NAME4} USAGE IS SQL TYPE IS XML AS CHAR LARGE OBJECT (10 G).\n"
+                  + "       01 {$*VAR-NAME5} USAGE IS SQL TYPE IS XML AS CLOB (20).\n"
+                  + "       01 {$*VAR-NAME6} USAGE IS SQL TYPE IS XML AS DBCLOB (30 K).\n"
+                  + "       01 {$*VAR-NAME7} USAGE IS SQL TYPE IS XML AS BLOB-LOCATOR.\n"
+                  + "       01 {$*VAR-NAME8} USAGE IS SQL TYPE IS XML AS CLOB-LOCATOR.\n"
+                  + "       01 {$*VAR-NAME9} USAGE IS SQL TYPE IS XML AS DBCLOB-LOCATOR.\n"
+                  + "       01 {$*VAR-NAME10} USAGE IS SQL TYPE IS XML AS  BLOB-FILE.\n"
+                  + "       01 {$*VAR-NAME11} USAGE IS SQL TYPE IS XML AS  CLOB-FILE.\n"
+                  + "       01 {$*VAR-NAME12} USAGE IS SQL TYPE IS XML AS  DBCLOB-FILE.\n"
+                  + "        PROCEDURE DIVISION.\n"
+                  + "           DISPLAY {$var-name1}.";
+
   @Test
   void testSupportForResultSetLocator() {
     UseCaseEngine.runTest(TEXT, ImmutableList.of(), ImmutableMap.of());
@@ -178,5 +198,10 @@ public class TestSqlHostVariable {
                     )
             )
     );
+  }
+
+  @Test
+  void testLobVariables() {
+    UseCaseEngine.runTest(LOB_XML_TEXT, ImmutableList.of(), ImmutableMap.of());
   }
 }
