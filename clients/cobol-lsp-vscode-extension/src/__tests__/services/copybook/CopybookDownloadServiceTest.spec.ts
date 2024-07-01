@@ -12,7 +12,11 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
-import { DEFAULT_DIALECT, PROVIDE_PROFILE_MSG } from "../../../constants";
+import {
+  DEFAULT_DIALECT,
+  ENDEVOR_PROCESSOR,
+  PROVIDE_PROFILE_MSG,
+} from "../../../constants";
 import { CopybookDownloadService } from "../../../services/copybook/CopybookDownloadService";
 import { ProfileUtils } from "../../../services/util/ProfileUtils";
 import { Utils } from "../../../services/util/Utils";
@@ -293,9 +297,9 @@ describe("Tests copybook download service", () => {
     (downloader as any).ussDownloader.downloadCopybook = jest
       .fn()
       .mockReturnValue(false);
-    (downloader as any).handleAsEndevorElement = jest
+    SettingsService.getCopybookEndevorDependencySettings = jest
       .fn()
-      .mockReturnValue(true);
+      .mockReturnValue(ENDEVOR_PROCESSOR);
     await downloader.downloadCopybook(
       { name: "copybook", dialect: "COBOL" },
       "document-uri",
