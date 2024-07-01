@@ -80,7 +80,7 @@ class WorkspaceServiceTest {
             null,
             null,
             messageService,
-            asyncAnalysisService, getMockLayoutStore());
+            asyncAnalysisService, getMockLayoutStore(), copybookService);
     ExecuteCommandHandler executeCommandHandler = new ExecuteCommandHandler(stateService, asyncAnalysisService);
 
     LspMessageBroker lspMessageBroker = new LspMessageBroker();
@@ -116,6 +116,7 @@ class WorkspaceServiceTest {
   void testExecuteNonExistingCommand() throws InterruptedException {
     CopybookNameService copybookNameService = mock(CopybookNameService.class);
     AsyncAnalysisService asyncAnalysisService = mock(AsyncAnalysisService.class);
+    CopybookService copybookService = mock(CopybookService.class);
 
     DidChangeConfigurationHandler didChangeConfigurationHandler = new DidChangeConfigurationHandler(stateService,
             null,
@@ -124,7 +125,7 @@ class WorkspaceServiceTest {
             null,
             null,
             null,
-            asyncAnalysisService, getMockLayoutStore());
+            asyncAnalysisService, getMockLayoutStore(), copybookService);
     ExecuteCommandHandler executeCommandHandler = new ExecuteCommandHandler(stateService, asyncAnalysisService);
 
     LspMessageBroker lspMessageBroker = new LspMessageBroker();
@@ -227,7 +228,7 @@ class WorkspaceServiceTest {
 
     DidChangeConfigurationHandler didChangeConfigurationHandler =
         new DidChangeConfigurationHandler(
-            stateService, null, copybookNameService, null, null, null, null, asyncAnalysisService, getMockLayoutStore());
+            stateService, null, copybookNameService, null, null, null, null, asyncAnalysisService, getMockLayoutStore(), copybookService);
 
     ExecuteCommandHandler executeCommandHandler =
         new ExecuteCommandHandler(stateService, asyncAnalysisService);

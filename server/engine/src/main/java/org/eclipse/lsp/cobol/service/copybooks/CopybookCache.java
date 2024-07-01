@@ -22,8 +22,10 @@ import com.google.inject.name.Named;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 import org.eclipse.lsp.cobol.common.copybook.CopybookId;
 import org.eclipse.lsp.cobol.common.copybook.CopybookModel;
+import org.eclipse.lsp.cobol.common.utils.ImplicitCodeUtils;
 
 /**
  * Implements copybook cache functionality
@@ -50,6 +52,15 @@ public class CopybookCache {
    */
   public void invalidateAll() {
     cache.invalidateAll();
+  }
+
+  /** Invalidates only non-implicit copybook cache */
+  public void invalidateAllNonImplicit() {
+    cache.invalidateAll(
+        cache.asMap().entrySet().stream()
+             .filter(entry -> entry.getValue().getUri() != null)
+            .filter(entry -> !ImplicitCodeUtils.isImplicit(entry.getValue().getUri()))
+            .collect(Collectors.toList()));
   }
 
   /**
