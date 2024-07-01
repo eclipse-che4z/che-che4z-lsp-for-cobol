@@ -293,6 +293,9 @@ describe("Tests copybook download service", () => {
     (downloader as any).ussDownloader.downloadCopybook = jest
       .fn()
       .mockReturnValue(false);
+    (downloader as any).handleAsEndevorElement = jest
+      .fn()
+      .mockReturnValue(true);
     await downloader.downloadCopybook(
       { name: "copybook", dialect: "COBOL" },
       "document-uri",

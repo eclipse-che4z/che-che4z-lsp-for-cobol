@@ -29,6 +29,7 @@ import { CopybookURI } from "../CopybookURI";
 import {
   DATASET,
   E4E_FOLDER,
+  ENDEVOR_PROCESSOR,
   ENVIRONMENT,
   OUTPUT_MSG_SEARCH_LOCATION,
   USE_MAP,
@@ -36,6 +37,7 @@ import {
 import { CopybookName } from "../CopybookDownloadService";
 import { Utils } from "../../util/Utils";
 import { searchCopybookInExtensionFolder } from "../../util/FSUtils";
+import { SettingsService } from "../../Settings";
 
 const defaultConfigs: ExternalConfigurationOptions = {
   compiler: "IGYCRCTL",
@@ -110,7 +112,12 @@ export class CopybookDownloaderForE4E {
     if (config) {
       return config;
     }
-    if (!this.e4e.isEndevorElement(uri)) return undefined;
+    if (
+      !this.e4e.isEndevorElement(uri) &&
+      SettingsService.getCopybookEndevorDependencySettings() !=
+        ENDEVOR_PROCESSOR
+    )
+      return undefined;
 
     const response = this.getE4EConfigImpl(uri).catch((err) => {
       this.E4EConfigs.delete(uri);
