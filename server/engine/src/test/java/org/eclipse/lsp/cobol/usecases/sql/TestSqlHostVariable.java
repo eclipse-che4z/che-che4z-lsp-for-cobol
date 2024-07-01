@@ -161,6 +161,8 @@ public class TestSqlHostVariable {
     );
   }
 
+
+
   @Test
   void testBinaryHostVariable_whenNegativeVarbinaryValue() {
     UseCaseEngine.runTest(

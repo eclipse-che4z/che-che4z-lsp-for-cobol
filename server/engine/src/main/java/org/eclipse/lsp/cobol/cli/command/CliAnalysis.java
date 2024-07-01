@@ -18,7 +18,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-
 import java.io.File;
 import java.lang.management.GarbageCollectorMXBean;
 import java.lang.management.ManagementFactory;
@@ -29,7 +28,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
-
 import org.eclipse.lsp.cobol.cli.di.CliModule;
 import org.eclipse.lsp.cobol.cli.modules.CliClientProvider;
 import org.eclipse.lsp.cobol.common.dialects.CobolLanguageId;
@@ -70,6 +68,7 @@ public class CliAnalysis implements Callable<Integer> {
         cliClientProvider.setCpyExt(createCopybooksExtensions());
         JsonObject result = new JsonObject();
         result.addProperty("uri", src.toURI().toString());
+        result.addProperty("language", dialect.getId());
         try {
             Cli.Result analysisResult = parent.runAnalysis(src, dialect, diCtx, true);
             parent.addTiming(result, analysisResult.ctx.getBenchmarkSession());
@@ -83,7 +82,6 @@ public class CliAnalysis implements Callable<Integer> {
                                 diagnostics.add(diagnostic);
                             });
             result.add("diagnostics", diagnostics);
-            result.addProperty("language", analysisResult.ctx.getLanguageId().getId());
             result.addProperty("lines", String.valueOf(analysisResult.ctx.getExtendedDocument().toString().split("\n").length));
             result.addProperty("size", String.valueOf(analysisResult.ctx.getExtendedDocument().toString().length()));
             collectGcAndMemoryStats(result);
