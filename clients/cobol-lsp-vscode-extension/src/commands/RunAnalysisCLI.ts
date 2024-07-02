@@ -228,7 +228,9 @@ export class RunAnalysis {
               const newUri = vscode.Uri.parse(
                 this.globalStorageUri.path + "/" + newFileName,
               );
-              return vscode.workspace.fs.writeFile(newUri, Buffer.from(data)).then(() => newUri.path);
+              return vscode.workspace.fs
+                .writeFile(newUri, Buffer.from(data))
+                .then(() => newUri.path);
             }
           });
       } catch {
