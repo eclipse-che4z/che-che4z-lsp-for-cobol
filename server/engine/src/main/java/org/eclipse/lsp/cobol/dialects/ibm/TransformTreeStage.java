@@ -96,8 +96,20 @@ public class TransformTreeStage implements Stage<AnalysisContext, ProcessingResu
               dialectNode.getLocality().getUri(),
               dialectNode.getLocality().getRange().getStart());
 
-      nodeByPosition.orElse(rootNode).addChild(dialectNode);
+      Node node = nodeByPosition.orElse(rootNode);
+      addChild(node, dialectNode);
     }
+  }
+
+  private void addChild(Node node, Node dialectNode) {
+    int index = 0;
+    for (Node child : node.getChildren()) {
+      if (child.getLocality().getRange().getStart().getLine() >= dialectNode.getLocality().getRange().getStart().getLine()) {
+        break;
+      }
+      index++;
+    }
+    node.getChildren().add(index, dialectNode);
   }
 
   private void addCopyNodes(AnalysisContext context, Node rootNode) {
