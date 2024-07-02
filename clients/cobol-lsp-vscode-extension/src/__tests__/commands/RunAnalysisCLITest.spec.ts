@@ -231,4 +231,44 @@ describe("Test Analysis CLI command functionality", () => {
 
     expect(saveTempFileSpy).toHaveBeenCalled();
   });
+
+  test("Cobol - Java - No file location", () => {
+    const testAnalysis = new RunAnalysis(
+      vscode.Uri.parse(context.globalStorageUri),
+    );
+
+    const result = (testAnalysis as any).buildJavaCommand("");
+
+    expect(result).toBe("");
+  });
+
+  test("Cobol - getServerPath", () => {
+    const testAnalysis = new RunAnalysis(
+      vscode.Uri.parse(context.globalStorageUri),
+    );
+
+    let result = (testAnalysis as any).getServerPath("initialPath", "win32");
+    expect(result).toBe("initialPath");
+
+    result = (testAnalysis as any).getServerPath("initialPath", "linux");
+    expect(result).toBe("initialPath/server-linux");
+
+    result = (testAnalysis as any).getServerPath("initialPath", "darwin");
+    expect(result).toBe("initialPath/server-mac");
+
+    result = (testAnalysis as any).getServerPath("initialPath", "other");
+    expect(result).toBe("");
+  });
+
+  test("Cobol - getClearCommand", () => {
+    const testAnalysis = new RunAnalysis(
+      vscode.Uri.parse(context.globalStorageUri),
+    );
+
+    let result = (testAnalysis as any).getClearCommand("win32");
+    expect(result).toBe("cls");
+
+    result = (testAnalysis as any).getClearCommand("linux");
+    expect(result).toBe("clear");
+  });
 });

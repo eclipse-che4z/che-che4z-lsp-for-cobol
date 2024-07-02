@@ -95,7 +95,7 @@ export class RunAnalysis {
     }
 
     if (this.runNative) {
-      return this.buildNativeCommand(currentFileLocation);
+      return this.buildNativeCommand(currentFileLocation, process.platform);
     }
 
     return this.buildJavaCommand(currentFileLocation);
@@ -106,24 +106,28 @@ export class RunAnalysis {
    * @param currentFileLocation - Location of the main cobol file being analyzed.
    * @protected
    */
-  protected buildNativeCommand(currentFileLocation: string) {
-    let serverPath = this.getExtensionPath() + "/server/native";
-    switch (process.platform) {
+  protected buildNativeCommand(currentFileLocation: string, platform: string) {
+    const serverPath = this.getExtensionPath() + "/server/native";
+    const result = this.getServerPath(serverPath, platform);
+
+    if (result === "") {
+      return "";
+    }
+
+    return result + " " + this.buildAnalysisCommandPortion(currentFileLocation);
+  }
+
+  protected getServerPath(serverPath: string, platform: string) {
+    switch (platform) {
       case "win32":
-        break;
+        return serverPath;
       case "linux":
-        serverPath += "/server-linux";
-        break;
+        return (serverPath += "/server-linux");
       case "darwin": // macOS
-        serverPath += "/server-mac";
-        break;
+        return (serverPath += "/server-mac");
       default: // Only Windows, Linux and Mac are supported.
         return "";
     }
-
-    return (
-      serverPath + " " + this.buildAnalysisCommandPortion(currentFileLocation)
-    );
   }
 
   /**
@@ -178,7 +182,7 @@ export class RunAnalysis {
       : vscode.window.createTerminal("Analysis");
 
     if (existingTerminal) {
-      terminal.sendText(this.getClearCommand());
+      terminal.sendText(this.getClearCommand(process.platform));
     }
 
     terminal.sendText(command);
@@ -192,15 +196,7 @@ export class RunAnalysis {
    * @protected
    */
   protected getCurrentFileLocation() {
-    if (vscode.workspace.workspaceFile) {
-      if (
-        vscode.workspace.workspaceFile.path.toString().startsWith("Untitled")
-      ) {
-        return this.saveTempFile();
-      } else {
-        return vscode.workspace.workspaceFile?.path;
-      }
-    } else if (vscode.window.activeTextEditor) {
+    if (vscode.window.activeTextEditor) {
       if (
         vscode.window.activeTextEditor.document.uri.path
           .toString()
@@ -257,7 +253,7 @@ export class RunAnalysis {
    * Returns the command for the current OS that will clear the terminal.
    * @protected
    */
-  protected getClearCommand() {
-    return process.platform === "win32" ? "cls" : "clear";
+  protected getClearCommand(platform: string) {
+    return platform === "win32" ? "cls" : "clear";
   }
 }
