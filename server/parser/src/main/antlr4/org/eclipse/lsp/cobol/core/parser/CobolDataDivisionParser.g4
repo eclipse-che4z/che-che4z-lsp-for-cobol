@@ -204,7 +204,9 @@ dialectDescriptionEntry
    ;
 
 entryName
-   : (FILLER | { validateLength(_input.LT(1).getText(), "Variable name", 30);} dataName)
+   : (FILLER | { validateLength(_input.LT(1).getText(), "Variable name", 30);
+         validateAllowedVariableName(_input.LT(1).getText(), "INSERT",
+         "BIT", "CONDITION", "COPY", "CURSOR");} dataName)
    ;
 
 dataGroupUsageClause
