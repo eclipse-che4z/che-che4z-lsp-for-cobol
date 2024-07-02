@@ -13,7 +13,7 @@
  */
 
 import * as vscode from "vscode";
-import {Terminal} from "vscode";
+import { Terminal } from "vscode";
 
 export interface AnalysisResults {
   typeToRun: string;
@@ -29,7 +29,11 @@ export class RunAnalysis {
   protected copybookConfigLocation: string;
   protected globalStorageUri: vscode.Uri;
 
-  constructor(globalStorageUri: vscode.Uri, runNative: boolean = false, copybookConfigLocation: string = "") {
+  constructor(
+    globalStorageUri: vscode.Uri,
+    runNative: boolean = false,
+    copybookConfigLocation: string = "",
+  ) {
     this.runNative = runNative;
     this.copybookConfigLocation = copybookConfigLocation;
     this.globalStorageUri = globalStorageUri;
@@ -38,7 +42,7 @@ export class RunAnalysis {
   /**
    * Starts the process to gather input from the user to create the COBOL CLI analysis command.
    */
-   public async runCobolAnalysisCommand() {
+  public async runCobolAnalysisCommand() {
     const activeEditor = vscode.window.activeTextEditor;
     if (!activeEditor) {
       return;
@@ -48,7 +52,10 @@ export class RunAnalysis {
     await this.getVersionToRun(result);
     await this.getCopybookConfigLocation(result);
 
-    if (result.typeToRun === undefined || result.copybookLocation === undefined) {
+    if (
+      result.typeToRun === undefined ||
+      result.copybookLocation === undefined
+    ) {
       return;
     }
 
@@ -64,9 +71,7 @@ export class RunAnalysis {
   /**
    *  Prompt the user for whether to run the Java or Native version.
    */
-  public async getVersionToRun(
-      result: Partial<AnalysisResults>,
-  ) {
+  public async getVersionToRun(result: Partial<AnalysisResults>) {
     result.typeToRun = await vscode.window.showQuickPick(["Java", "Native"], {
       placeHolder: "Select Java or Native",
     });
@@ -75,10 +80,7 @@ export class RunAnalysis {
   /**
    * Prompt the user for the location of the copybook config file.
    */
-  public async getCopybookConfigLocation(
-      result: Partial<AnalysisResults>,
-  ) {
-
+  public async getCopybookConfigLocation(result: Partial<AnalysisResults>) {
     result.copybookLocation = "";
   }
 
@@ -191,14 +193,18 @@ export class RunAnalysis {
    */
   protected getCurrentFileLocation() {
     if (vscode.workspace.workspaceFile) {
-      if (vscode.workspace.workspaceFile.path.toString().startsWith("Untitled")) {
+      if (
+        vscode.workspace.workspaceFile.path.toString().startsWith("Untitled")
+      ) {
         return this.saveTempFile();
       } else {
         return vscode.workspace.workspaceFile?.path;
       }
     } else if (vscode.window.activeTextEditor) {
       if (
-        vscode.window.activeTextEditor.document.uri.path.toString().startsWith("Untitled")
+        vscode.window.activeTextEditor.document.uri.path
+          .toString()
+          .startsWith("Untitled")
       ) {
         return this.saveTempFile();
       } else {
@@ -218,14 +224,18 @@ export class RunAnalysis {
 
     if (data) {
       try {
-        vscode.workspace.fs.stat(this.globalStorageUri).then(fileStatResult => {
-          if (fileStatResult.type === vscode.FileType.Directory) {
-            const newFileName = Date.now() + ".cbl";
-            const newUri = vscode.Uri.parse(this.globalStorageUri.path + "/" + newFileName);
-            vscode.workspace.fs.writeFile(newUri, Buffer.from(data));
-            return newUri.path;
-          }
-        });
+        vscode.workspace.fs
+          .stat(this.globalStorageUri)
+          .then((fileStatResult) => {
+            if (fileStatResult.type === vscode.FileType.Directory) {
+              const newFileName = Date.now() + ".cbl";
+              const newUri = vscode.Uri.parse(
+                this.globalStorageUri.path + "/" + newFileName,
+              );
+              vscode.workspace.fs.writeFile(newUri, Buffer.from(data));
+              return newUri.path;
+            }
+          });
       } catch {
         return "";
       }

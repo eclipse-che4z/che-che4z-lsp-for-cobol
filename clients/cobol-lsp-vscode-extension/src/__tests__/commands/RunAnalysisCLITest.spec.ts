@@ -12,14 +12,14 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
-import {RunAnalysis,} from "../../commands/RunAnalysisCLI";
+import { RunAnalysis } from "../../commands/RunAnalysisCLI";
 import * as vscode from "vscode";
 
 jest.mock("vscode", () => ({
   commands: {
     registerCommand: jest
-        .fn()
-        .mockImplementation((command, callback) => callback()),
+      .fn()
+      .mockImplementation((command, callback) => callback()),
     executeCommand: jest.fn(),
   },
   extensions: {
@@ -39,21 +39,21 @@ jest.mock("vscode", () => ({
       },
     },
     setStatusBarMessage: jest
-        .fn()
-        .mockImplementation(
-            async (_text: string, _hideWhenDone: Thenable<any>) => {
-              return Promise.resolve(true);
-            },
-        ),
+      .fn()
+      .mockImplementation(
+        async (_text: string, _hideWhenDone: Thenable<any>) => {
+          return Promise.resolve(true);
+        },
+      ),
     showErrorMessage: jest.fn().mockReturnValue("test"),
     showInformationMessage: jest
-        .fn()
-        .mockImplementation((message: string) => Promise.resolve(message)),
+      .fn()
+      .mockImplementation((message: string) => Promise.resolve(message)),
     showQuickPick: jest.fn(),
     onDidChangeActiveTextEditor: jest.fn(),
     createQuickPick: jest
-        .fn()
-        .mockReturnValue({ onDidChangeSelection: jest.fn(), show: jest.fn() }),
+      .fn()
+      .mockReturnValue({ onDidChangeSelection: jest.fn(), show: jest.fn() }),
     createOutputChannel: jest.fn().mockReturnValue({
       appendLine: jest.fn(),
     }),
@@ -71,8 +71,8 @@ jest.mock("vscode", () => ({
     }),
     getWorkspaceFolder: jest.fn().mockReturnValue({ name: "workspaceFolder1" }),
     onDidChangeConfiguration: jest
-        .fn()
-        .mockReturnValue("onDidChangeConfiguration"),
+      .fn()
+      .mockReturnValue("onDidChangeConfiguration"),
     workspaceFolders: [{ uri: { fsPath: "ws-path" } } as any],
     fs: {
       createDirectory: jest.fn(),
@@ -80,7 +80,7 @@ jest.mock("vscode", () => ({
   },
   Uri: {
     file: jest.fn().mockReturnValue("workspaceFolder2"),
-    parse: jest.fn().mockReturnValue({ path: "/storagePath"}),
+    parse: jest.fn().mockReturnValue({ path: "/storagePath" }),
   },
 }));
 
@@ -90,17 +90,36 @@ const context: any = {
 };
 
 describe("Test Analysis CLI command functionality", () => {
-
   test("Cobol Analysis - Java", async () => {
-    const testAnalysis = new RunAnalysis(vscode.Uri.parse(context.globalStorageUri));
+    const testAnalysis = new RunAnalysis(
+      vscode.Uri.parse(context.globalStorageUri),
+    );
     vscode.window.showQuickPick = jest.fn().mockReturnValue("Java");
 
-    const runCobolAnalysisCommandSpy = jest.spyOn(testAnalysis as any, "runCobolAnalysisCommand");
-    const getCurrentFileLocationSpy = jest.spyOn(testAnalysis as any, "getCurrentFileLocation");
-    const buildJavaCommandSpy = jest.spyOn(testAnalysis as any, "buildJavaCommand");
-    const buildNativeCommandSpy = jest.spyOn(testAnalysis as any, "buildNativeCommand");
-    const getExtensionPathSpy = jest.spyOn(testAnalysis as any, "getExtensionPath");
-    const buildAnalysisCommandPortionSpy = jest.spyOn(testAnalysis as any, "buildAnalysisCommandPortion");
+    const runCobolAnalysisCommandSpy = jest.spyOn(
+      testAnalysis as any,
+      "runCobolAnalysisCommand",
+    );
+    const getCurrentFileLocationSpy = jest.spyOn(
+      testAnalysis as any,
+      "getCurrentFileLocation",
+    );
+    const buildJavaCommandSpy = jest.spyOn(
+      testAnalysis as any,
+      "buildJavaCommand",
+    );
+    const buildNativeCommandSpy = jest.spyOn(
+      testAnalysis as any,
+      "buildNativeCommand",
+    );
+    const getExtensionPathSpy = jest.spyOn(
+      testAnalysis as any,
+      "getExtensionPath",
+    );
+    const buildAnalysisCommandPortionSpy = jest.spyOn(
+      testAnalysis as any,
+      "buildAnalysisCommandPortion",
+    );
     const sendToTerminalSpy = jest.spyOn(testAnalysis as any, "sendToTerminal");
 
     await testAnalysis.runCobolAnalysisCommand();
@@ -116,19 +135,40 @@ describe("Test Analysis CLI command functionality", () => {
   });
 
   test("Cobol Analysis - Native", async () => {
-    const testAnalysis = new RunAnalysis(vscode.Uri.parse(context.globalStorageUri));
+    const testAnalysis = new RunAnalysis(
+      vscode.Uri.parse(context.globalStorageUri),
+    );
     vscode.window.showQuickPick = jest.fn().mockReturnValue("Native");
 
     if (vscode.window.activeTextEditor) {
-      (vscode.window.activeTextEditor.document.uri.path as any) = vscode.Uri.parse("/storagePath");
+      (vscode.window.activeTextEditor.document.uri.path as any) =
+        vscode.Uri.parse("/storagePath");
     }
 
-    const runCobolAnalysisCommandSpy = jest.spyOn(testAnalysis as any, "runCobolAnalysisCommand");
-    const getCurrentFileLocationSpy = jest.spyOn(testAnalysis as any, "getCurrentFileLocation");
-    const buildJavaCommandSpy = jest.spyOn(testAnalysis as any, "buildJavaCommand");
-    const buildNativeCommandSpy = jest.spyOn(testAnalysis as any, "buildNativeCommand");
-    const getExtensionPathSpy = jest.spyOn(testAnalysis as any, "getExtensionPath");
-    const buildAnalysisCommandPortionSpy = jest.spyOn(testAnalysis as any, "buildAnalysisCommandPortion");
+    const runCobolAnalysisCommandSpy = jest.spyOn(
+      testAnalysis as any,
+      "runCobolAnalysisCommand",
+    );
+    const getCurrentFileLocationSpy = jest.spyOn(
+      testAnalysis as any,
+      "getCurrentFileLocation",
+    );
+    const buildJavaCommandSpy = jest.spyOn(
+      testAnalysis as any,
+      "buildJavaCommand",
+    );
+    const buildNativeCommandSpy = jest.spyOn(
+      testAnalysis as any,
+      "buildNativeCommand",
+    );
+    const getExtensionPathSpy = jest.spyOn(
+      testAnalysis as any,
+      "getExtensionPath",
+    );
+    const buildAnalysisCommandPortionSpy = jest.spyOn(
+      testAnalysis as any,
+      "buildAnalysisCommandPortion",
+    );
     const sendToTerminalSpy = jest.spyOn(testAnalysis as any, "sendToTerminal");
 
     await testAnalysis.runCobolAnalysisCommand();
@@ -144,12 +184,23 @@ describe("Test Analysis CLI command functionality", () => {
   });
 
   test("Cobol Analysis - Undefined Type", async () => {
-    const testAnalysis = new RunAnalysis(vscode.Uri.parse(context.globalStorageUri));
+    const testAnalysis = new RunAnalysis(
+      vscode.Uri.parse(context.globalStorageUri),
+    );
     vscode.window.showQuickPick = jest.fn().mockReturnValue(undefined);
 
-    const runCobolAnalysisCommandSpy = jest.spyOn(testAnalysis as any, "runCobolAnalysisCommand");
-    const getVersionToRunSpy = jest.spyOn(testAnalysis as any, "getVersionToRun");
-    const buildJavaCommandSpy = jest.spyOn(testAnalysis as any, "buildNativeCommand");
+    const runCobolAnalysisCommandSpy = jest.spyOn(
+      testAnalysis as any,
+      "runCobolAnalysisCommand",
+    );
+    const getVersionToRunSpy = jest.spyOn(
+      testAnalysis as any,
+      "getVersionToRun",
+    );
+    const buildJavaCommandSpy = jest.spyOn(
+      testAnalysis as any,
+      "buildNativeCommand",
+    );
 
     await testAnalysis.runCobolAnalysisCommand();
 
@@ -159,11 +210,19 @@ describe("Test Analysis CLI command functionality", () => {
   });
 
   test("Cobol Analysis - Save temp file", async () => {
-    const testAnalysis = new RunAnalysis(vscode.Uri.parse(context.globalStorageUri));
+    const testAnalysis = new RunAnalysis(
+      vscode.Uri.parse(context.globalStorageUri),
+    );
     vscode.window.showQuickPick = jest.fn().mockReturnValue("Java");
     if (vscode.window.activeTextEditor) {
-      vscode.window.activeTextEditor.document.getText = jest.fn().mockReturnValue("Test data");
-      jest.replaceProperty(vscode.window.activeTextEditor.document.uri, "path", "Untitled-1");
+      vscode.window.activeTextEditor.document.getText = jest
+        .fn()
+        .mockReturnValue("Test data");
+      jest.replaceProperty(
+        vscode.window.activeTextEditor.document.uri,
+        "path",
+        "Untitled-1",
+      );
     }
 
     const saveTempFileSpy = jest.spyOn(testAnalysis as any, "saveTempFile");
