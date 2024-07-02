@@ -12,20 +12,21 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
-import * as path from "path";
 import * as vscode from "vscode";
 import { SettingsService } from "../Settings";
-import { Utils } from "./Utils";
 
 export class ProfileUtils {
-  public static async getProfileNameForCopybook(
+  public static getProfileNameForCopybook(
     cobolFileName: string,
-  ): Promise<string | undefined> {
-    const zoweExplorerApi = await Utils.getZoweExplorerAPI();
+    zoweExplorerApi: IApiRegisterClient | undefined,
+  ): string | undefined {
     if (!zoweExplorerApi) {
       return undefined;
     }
-    return ProfileUtils.getValidProfileForCopybookDownload(cobolFileName);
+    return ProfileUtils.getValidProfileForCopybookDownload(
+      cobolFileName,
+      zoweExplorerApi,
+    );
   }
 
   public static getAvailableProfiles(zoweExplorerApi: IApiRegisterClient) {
@@ -43,11 +44,13 @@ export class ProfileUtils {
     return availableProfiles;
   }
 
-  private static async getValidProfileForCopybookDownload(
-    programName: string,
-  ): Promise<string | undefined> {
-    const profileFromDoc = await ProfileUtils.getProfileFromDocument(
-      programName,
+  private static getValidProfileForCopybookDownload(
+    programUri: string,
+    zoweExplorerApi: IApiRegisterClient | undefined,
+  ): string | undefined {
+    const profileFromDoc = ProfileUtils.getProfileFromDocument(
+      programUri,
+      zoweExplorerApi,
     );
     const passedProfile = SettingsService.getProfileName();
     if (!passedProfile && profileFromDoc) {
@@ -56,30 +59,28 @@ export class ProfileUtils {
     return passedProfile;
   }
 
-  private static async getProfileFromDocument(
-    programName: string,
-  ): Promise<string | undefined> {
-    const vscodeOpenedDoc = vscode.workspace.textDocuments.find((doc) =>
-      doc.fileName.endsWith(path.basename(programName)),
-    );
-    if (!vscodeOpenedDoc) return;
-
-    const zoweExplorerApi = await Utils.getZoweExplorerAPI();
-    const allOpenedFilesThroughZoweExplorer = zoweExplorerApi
-      ? {
-          ...zoweExplorerApi.getExplorerExtenderApi().ussFileProvider.openFiles,
-          ...zoweExplorerApi.getExplorerExtenderApi().datasetProvider.openFiles,
-        }
-      : [];
-
-    const cobolLsDocPath = vscode.Uri.parse(vscodeOpenedDoc.fileName).fsPath;
-    for (const [path, profile] of Object.entries(
-      allOpenedFilesThroughZoweExplorer,
-    )) {
-      if (cobolLsDocPath === vscode.Uri.parse(path).fsPath) {
-        return profile.profile.name;
-      }
+  public static getProfileFromDocument(
+    programUri: string,
+    zoweExplorerApi: IApiRegisterClient | undefined,
+  ): string | undefined {
+    const uri = vscode.Uri.parse(programUri);
+    if (uri.scheme === "zowe-ds" || uri.scheme === "zowe-uss") {
+      const profile = uri.path.split("/")[1];
+      if (!profile) return undefined;
+      return profile;
     }
-    return undefined;
+
+    if (uri.scheme !== "file") return;
+
+    if (!zoweExplorerApi) return;
+    const eeApi = zoweExplorerApi.getExplorerExtenderApi();
+
+    const fsPath = uri.fsPath;
+
+    const openedFile =
+      eeApi.ussFileProvider.openFiles[fsPath] ||
+      eeApi.datasetProvider.openFiles[fsPath];
+
+    return openedFile?.profile.name;
   }
 }

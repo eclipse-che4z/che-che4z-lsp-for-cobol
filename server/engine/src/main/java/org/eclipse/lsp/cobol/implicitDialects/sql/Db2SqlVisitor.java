@@ -21,6 +21,7 @@ import com.google.common.collect.ImmutableList;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -36,6 +37,7 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.RuleNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp.cobol.common.copybook.CopybookService;
 import org.eclipse.lsp.cobol.common.dialects.CobolDialect;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
@@ -284,7 +286,13 @@ class Db2SqlVisitor extends Db2SqlParserBaseVisitor<List<Node>> {
 
     @Override
     public List<Node> visitDbs_whenever(Db2SqlParser.Dbs_wheneverContext ctx) {
-        return addTreeNode(ctx, ExecSqlWheneverNode::new);
+      ExecSqlWheneverNode.WheneverConditionType conditionType = getConditionType(ctx);
+      Pair<ExecSqlWheneverNode.WheneverType, String> result = getWheneverType(ctx);
+
+      return addTreeNode(ctx, location -> new ExecSqlWheneverNode(location,
+          conditionType,
+          result.getKey(),
+          result.getValue()));
     }
 
     @Override
@@ -425,4 +433,44 @@ class Db2SqlVisitor extends Db2SqlParserBaseVisitor<List<Node>> {
         String finalName = name;
         return addTreeNode(ctx, locality -> new VariableUsageNode(finalName, locality));
     }
-}
+
+    private ExecSqlWheneverNode.WheneverConditionType getConditionType(Db2SqlParser.Dbs_wheneverContext ctx) {
+        ParserRuleContext ruleContext = ((ParserRuleContext) ctx);
+        ExecSqlWheneverNode.WheneverConditionType conditionType = ExecSqlWheneverNode.WheneverConditionType.NOT_FOUND;
+
+
+        if (ruleContext.getChildCount() >= 3) {
+            ParseTree pt = ruleContext.getChild(1);
+            String value = pt.getText().trim().toUpperCase();
+
+            if (Objects.equals(value, "SQLERROR")) {
+                conditionType = ExecSqlWheneverNode.WheneverConditionType.SQLERROR;
+            } else if (Objects.equals(value, "SQLWARNING")) {
+                conditionType = ExecSqlWheneverNode.WheneverConditionType.SQLWARNING;
+            }
+        }
+        return conditionType;
+    }
+
+    private Pair<ExecSqlWheneverNode.WheneverType, String> getWheneverType(Db2SqlParser.Dbs_wheneverContext ctx) {
+        ParserRuleContext ruleContext = ((ParserRuleContext) ctx);
+        Pair<ExecSqlWheneverNode.WheneverType, String> result = Pair.of(ExecSqlWheneverNode.WheneverType.CONTINUE, null);
+
+        if (ruleContext.getChildCount() > 3) {
+            ParseTree pt = ruleContext.getChild(2);
+            String value = pt.getText().trim().toUpperCase();
+
+            if (Objects.equals(value, "DO")) {
+                result = Pair.of(ExecSqlWheneverNode.WheneverType.DO, ruleContext.getChild(3).getText());
+            } else if (Objects.equals(value, "GO")) {
+                if (ruleContext.getChildCount() > 4) {
+                    result = Pair.of(ExecSqlWheneverNode.WheneverType.GOTO, ruleContext.getChild(4).getText());
+                }
+            } else if (Objects.equals(value, "GOTO")) {
+                result = Pair.of(ExecSqlWheneverNode.WheneverType.GOTO, ruleContext.getChild(3).getText());
+            }
+        }
+        return result;
+    }
+  }
+

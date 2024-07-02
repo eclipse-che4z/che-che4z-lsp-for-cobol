@@ -24,8 +24,7 @@ import * as fsUtils from "../../../services/util/FSUtils";
 import { ProfileUtils } from "../../../services/util/ProfileUtils";
 import { SettingsUtils } from "../../../services/util/SettingsUtils";
 import { Utils } from "../../../services/util/Utils";
-import { resolveCopybookHandler } from "../../../services/copybook/CopybookMessageHandler";
-import { E4ECopybookService } from "../../../services/copybook/E4ECopybookService";
+import { CopybookDownloadService } from "../../../services/copybook/CopybookDownloadService";
 
 const copybookName: string = "NSTCOPY1";
 const copybookNameWithExtension: string = "NSTCOPY2.CPY";
@@ -59,8 +58,6 @@ SettingsUtils.getWorkspaceFoldersPath = jest.fn().mockReturnValue([__dirname]);
 vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
   get: jest.fn().mockReturnValue(undefined),
 });
-Utils.getZoweExplorerAPI = jest.fn();
-E4ECopybookService.getE4EAPI = jest.fn();
 
 // file utils
 function createFile(filename: string, folderPath: string): string {
@@ -79,9 +76,6 @@ function removeFolder(targetPath: string) {
   return false;
 }
 
-const outputChannel = vscode.window.createOutputChannel(
-  "COBOL Language Support",
-);
 async function buildResultArrayFrom(
   settingsMockValue: string[] | undefined,
   filename: string,
@@ -98,11 +92,12 @@ async function buildResultArrayFrom(
   }
   ProfileUtils.getProfileNameForCopybook = jest
     .fn()
-    .mockResolvedValue(profileName);
-  const result = await (CopybookURI as any).createPathForCopybookDownloaded(
+    .mockImplementation(() => profileName);
+  const result = CopybookURI.createPathForCopybookDownloaded(
     filename,
     SettingsService.DEFAULT_DIALECT,
     path.join("downloadFolder", ZOWE_FOLDER),
+    {} as any as IApiRegisterClient,
   );
   return result.length;
 }
@@ -266,9 +261,8 @@ describe("Prioritize search criteria for copybooks test suite", () => {
     });
     SettingsService.getCopybookExtension = jest.fn().mockReturnValue([""]);
     (globSync as any) = jest.fn().mockReturnValue([copybookName]);
-    const uri: string | undefined = await resolveCopybookHandler(
-      "/storagePath",
-      outputChannel,
+    const downloader = new CopybookDownloadService("/storagePath");
+    const uri: string | undefined = await downloader.resolveCopybookHandler(
       copybookName,
       "PRGNAME",
       "COBOL",
@@ -283,9 +277,12 @@ describe("Prioritize search criteria for copybooks test suite", () => {
     ProfileUtils.getProfileNameForCopybook = jest
       .fn()
       .mockReturnValue(undefined);
-    const uri: string | undefined = await resolveCopybookHandler(
+    const downloader = new CopybookDownloadService(
       "/storagePath",
-      outputChannel,
+      undefined,
+      undefined,
+    );
+    const uri: string | undefined = await downloader.resolveCopybookHandler(
       copybookName,
       "PRGNAME",
       "COBOL",
@@ -297,10 +294,9 @@ describe("Prioritize search criteria for copybooks test suite", () => {
   });
   test("With both local and dsn references defined in the settings.json, the search is applied on local resources first", async () => {
     (globSync as any) = jest.fn().mockReturnValue([copybookName]);
+    const downloader = new CopybookDownloadService("/storagePath");
 
-    const uri: string | undefined = await resolveCopybookHandler(
-      "/storagePath",
-      outputChannel,
+    const uri: string | undefined = await downloader.resolveCopybookHandler(
       copybookName,
       "PRGNAME",
       "COBOL",
@@ -315,9 +311,8 @@ describe("Prioritize search criteria for copybooks test suite", () => {
     });
 
     (globSync as any) = jest.fn().mockReturnValue([copybookName]);
-    const uri: string | undefined = await resolveCopybookHandler(
-      "/storagePath",
-      outputChannel,
+    const downloader = new CopybookDownloadService("/storagePath");
+    const uri: string | undefined = await downloader.resolveCopybookHandler(
       copybookName,
       "PRGNAME",
       "DIALECT",

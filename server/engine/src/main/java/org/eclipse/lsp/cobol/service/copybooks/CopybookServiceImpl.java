@@ -78,13 +78,17 @@ public class CopybookServiceImpl implements CopybookService {
   }
 
   @Override
-  public void invalidateCache() {
+  public void invalidateCache(boolean onlyNonImplicit) {
     LOG.debug("Copybooks for downloading: {}", copybooksForDownloading);
     LOG.debug("Copybook cache: {}", copybookCache);
     LOG.debug("Cache invalidated");
     copybookUsage.clear();
     copybooksForDownloading.clear();
-    copybookCache.invalidateAll();
+    if (onlyNonImplicit) {
+      copybookCache.invalidateAllNonImplicit();
+    } else {
+      copybookCache.invalidateAll();
+    }
   }
 
   /**
@@ -180,9 +184,10 @@ public class CopybookServiceImpl implements CopybookService {
   }
 
   private Optional<CopybookModel> tryResolvePredefinedCopybook(CopybookName copybookName) {
-    CopybookId copybookId = copybookName.toCopybookId(ImplicitCodeUtils.createFullUrl(copybookName.getDisplayName()));
+    CopybookName predefineCopybookName = new CopybookName(copybookName.getDisplayName().toUpperCase(), copybookName.getDialectType(), copybookName.getExtension());
+    CopybookId copybookId = predefineCopybookName.toCopybookId(ImplicitCodeUtils.createFullUrl(predefineCopybookName.getDisplayName()));
     try {
-      CopybookModel copybookModel = copybookCache.get(copybookId, () -> new CopybookModel(copybookId, copybookName, null, null));
+      CopybookModel copybookModel = copybookCache.get(copybookId, () -> new CopybookModel(copybookId, predefineCopybookName, null, null));
       if (copybookModel.getContent() == null || copybookModel.getUri() == null) return Optional.empty();
       return Optional.of(copybookModel);
     } catch (ExecutionException e) {

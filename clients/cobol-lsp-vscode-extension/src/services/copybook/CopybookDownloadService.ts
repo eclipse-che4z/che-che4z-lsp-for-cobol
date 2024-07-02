@@ -13,39 +13,192 @@
  */
 
 import * as vscode from "vscode";
-import { DownloadStrategyResolver } from "./downloader/DownloadStrategyResolver";
-import { ENDEVOR_PROCESSOR, PROVIDE_PROFILE_MSG } from "../../constants";
+import {
+  COPYBOOKS_FOLDER,
+  ENDEVOR_PROCESSOR,
+  PROVIDE_PROFILE_MSG,
+  ZOWE_FOLDER,
+} from "../../constants";
 import { ProfileUtils } from "../util/ProfileUtils";
 import { DownloadUtil } from "./downloader/DownloadUtil";
-import { E4ECopybookService } from "./E4ECopybookService";
 import { E4E } from "../../type/e4eApi";
+import { CopybookDownloaderForE4E } from "./downloader/CopybookDownloaderForE4E";
+import { CopybookDownloaderForUss } from "./downloader/CopybookDownloaderForUss";
+import { CopybookDownloaderForDsn } from "./downloader/CopybookDownloaderForDsn";
 import { SettingsService } from "../Settings";
+import { searchCopybook } from "./CopybookMessageHandler";
+import { searchCopybookInExtensionFolder } from "../util/FSUtils";
+import { CopybookURI } from "./CopybookURI";
+import path = require("path");
 
 export class CopybookName {
   constructor(public name: string, public dialect: string) {}
 }
 
 export class CopybookDownloadService {
-  /**
-   * Clears any cache maintained by downloaders
-   */
+  private explorerApi: IApiRegisterClient | undefined;
+  private e4eApi: E4E | undefined;
+  private dsnDownloader?: CopybookDownloaderForDsn;
+  private ussDownloader?: CopybookDownloaderForUss;
+  private e4eDownloader?: CopybookDownloaderForE4E;
 
-  clearCache() {
-    this.downloadResolver.clearCache();
+  /**
+   * Downloads a file using E4E Api or Zowe Explorer Api based on provided configuration
+   *
+   * @param copybookName Copybook to be downloaded.
+   * @param documentUri cobol programs which needs copybook
+   * @param callback callback function
+   */
+  async downloadCopybook(
+    copybookName: CopybookName,
+    documentUri: string,
+  ): Promise<boolean> {
+    if (
+      await this.e4eDownloader?.downloadCopybookE4E(documentUri, copybookName)
+    ) {
+      return true;
+    }
+
+    if (this.dsnDownloader) {
+      const dsnSuccess = await this.downloadFromPaths(
+        this.dsnDownloader,
+        copybookName,
+        documentUri,
+        SettingsService.getDsnPath(documentUri, copybookName.dialect),
+      );
+      if (dsnSuccess) return true;
+    }
+
+    if (this.ussDownloader) {
+      return this.downloadFromPaths(
+        this.ussDownloader,
+        copybookName,
+        documentUri,
+        SettingsService.getUssPath(documentUri, copybookName.dialect),
+      );
+    }
+
+    return false;
   }
-  private downloadResolver: DownloadStrategyResolver;
+
+  /**
+   * Clears downloaders cache
+   */
+  clearCache() {
+    this.dsnDownloader?.clearMemberListCache();
+    this.ussDownloader?.clearMemberListCache();
+    this.e4eDownloader?.clearConfigs();
+  }
+
+  private async downloadFromPaths(
+    downloader: CopybookDownloaderForDsn | CopybookDownloaderForUss,
+    copybook: CopybookName,
+    documentUri: string,
+    paths: string[] | undefined,
+  ): Promise<boolean> {
+    if (!paths) return false;
+
+    for (const path of paths) {
+      const success = await downloader.downloadCopybook(
+        copybook,
+        documentUri,
+        path,
+      );
+      if (success) return true;
+    }
+
+    return false;
+  }
+
+  private handleAsEndevorElement(documentUri: string) {
+    return (
+      SettingsService.getCopybookEndevorDependencySettings() ===
+        ENDEVOR_PROCESSOR && this.e4eApi?.isEndevorElement(documentUri)
+    );
+  }
+
+  public makeResolveCopybookHandler() {
+    return this.resolveCopybookHandler.bind(this);
+  }
+
+  public makeCopybookDownloadHandler() {
+    return (
+      cobolFileName: string,
+      copybookNames: string[],
+      dialectType: string,
+      _quietMode: boolean,
+    ) => {
+      return this.downloadCopybooks(
+        cobolFileName,
+        copybookNames.map(
+          (copybookName) => new CopybookName(copybookName, dialectType),
+        ),
+      );
+    };
+  }
+
+  public async resolveCopybookHandler(
+    documentUri: string,
+    copybookName: string,
+    dialectType: string,
+  ): Promise<string | undefined> {
+    if (this.handleAsEndevorElement(documentUri)) {
+      return await this.e4eDownloader?.getE4ECopyBookLocation(
+        copybookName,
+        documentUri,
+      );
+    }
+
+    const result = await searchCopybook(
+      documentUri,
+      copybookName,
+      dialectType,
+      this.storagePath,
+    );
+    if (result) return result;
+
+    // check in subfolders under .copybooks (copybook downloaded from MF)
+    return searchCopybookInExtensionFolder(
+      copybookName,
+      CopybookURI.createPathForCopybookDownloaded(
+        documentUri,
+        dialectType,
+        path.join(this.storagePath, ZOWE_FOLDER, COPYBOOKS_FOLDER),
+        this.explorerApi,
+      ),
+      SettingsService.getCopybookExtension(documentUri),
+      this.storagePath,
+    );
+  }
 
   constructor(
-    storagePath: string,
-    private explorerAPI: IApiRegisterClient | undefined,
-    private e4eAPI: E4E | undefined,
+    private storagePath: string,
+    explorer?: IApiRegisterClient,
+    e4e?: E4E,
     private outputChannel?: vscode.OutputChannel,
   ) {
-    this.downloadResolver = new DownloadStrategyResolver(
-      storagePath,
-      this.explorerAPI,
-      this.e4eAPI,
+    if (e4e) this.e4eAppeared(e4e);
+    if (explorer) this.explorerAppeared(explorer);
+  }
+
+  public e4eAppeared(api: E4E) {
+    this.e4eApi = api;
+    this.e4eDownloader = new CopybookDownloaderForE4E(
+      this.storagePath,
+      this.e4eApi,
       this.outputChannel,
+    );
+  }
+
+  public explorerAppeared(api: IApiRegisterClient) {
+    this.explorerApi = api;
+    this.ussDownloader = new CopybookDownloaderForUss(
+      this.storagePath,
+      this.explorerApi,
+    );
+    this.dsnDownloader = new CopybookDownloaderForDsn(
+      this.storagePath,
+      this.explorerApi,
     );
   }
 
@@ -88,10 +241,7 @@ export class CopybookDownloadService {
 
     await Promise.all(
       copybookNames.map(async (copybookName) => {
-        await this.downloadResolver!.downloadCopybook(
-          copybookName,
-          documentUri,
-        ).finally(() => {
+        await this.downloadCopybook(copybookName, documentUri).finally(() => {
           processedCopybooks++;
           this.updateDownloadProgress(
             progress,
@@ -109,15 +259,8 @@ export class CopybookDownloadService {
     documentUri: string,
     copybookNames: CopybookName[],
   ): Promise<boolean> {
-    if (
-      this.e4eAPI &&
-      this.e4eAPI.isEndevorElement(documentUri) &&
-      SettingsService.getCopybookEndevorDependencySettings() ==
-        ENDEVOR_PROCESSOR
-    ) {
-      return (await E4ECopybookService.getE4EClient(documentUri))
-        ? true
-        : false;
+    if (this.handleAsEndevorElement(documentUri)) {
+      return !!(await this.e4eDownloader?.getE4EConfig(documentUri));
     }
     if (
       !DownloadUtil.areCopybookDownloadConfigurationsPresent(
@@ -126,10 +269,13 @@ export class CopybookDownloadService {
       )
     )
       return false;
-    if (!this.explorerAPI) return false;
-    const profile = await ProfileUtils.getProfileNameForCopybook(documentUri);
+    if (!this.explorerApi) return false;
+    const profile = ProfileUtils.getProfileNameForCopybook(
+      documentUri,
+      this.explorerApi,
+    );
     const availableProfiles = ProfileUtils.getAvailableProfiles(
-      this.explorerAPI!,
+      this.explorerApi,
     );
     if (!profile || !availableProfiles.includes(profile)) {
       const message = profile
@@ -142,7 +288,7 @@ export class CopybookDownloadService {
       !(await DownloadUtil.isProfileLocked(profile)) &&
       !(await DownloadUtil.checkForInvalidCredProfile(
         profile!,
-        this.explorerAPI,
+        this.explorerApi,
       ))
     );
   }

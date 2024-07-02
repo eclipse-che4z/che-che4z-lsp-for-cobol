@@ -9,12 +9,15 @@
         "character": 9
       },
       "end": {
-        "line": 19,
+        "line": 21,
         "character": 31
       }
     },
     "children": [
       {
+        "wheneverCondition": "SQLERROR",
+        "wheneverType": "GOTO",
+        "value": "HANDLER",
         "type": "execwhenever",
         "location": {
           "uri": "fake/path",
@@ -43,17 +46,78 @@
         }
       },
       {
+        "wheneverCondition": "SQLERROR",
+        "wheneverType": "GOTO",
+        "value": "HANDLER",
+        "type": "execwhenever",
+        "location": {
+          "uri": "fake/path",
+          "start": {
+            "line": 17,
+            "character": 22
+          },
+          "end": {
+            "line": 17,
+            "character": 49
+          }
+        }
+      },
+      {
+        "type": "endexec",
+        "location": {
+          "uri": "fake/path",
+          "start": {
+            "line": 17,
+            "character": 22
+          },
+          "end": {
+            "line": 17,
+            "character": 49
+          }
+        }
+      },
+      {
+        "wheneverCondition": "SQLERROR",
+        "wheneverType": "CONTINUE",
+        "type": "execwhenever",
+        "location": {
+          "uri": "fake/path",
+          "start": {
+            "line": 18,
+            "character": 22
+          },
+          "end": {
+            "line": 18,
+            "character": 46
+          }
+        }
+      },
+      {
+        "type": "endexec",
+        "location": {
+          "uri": "fake/path",
+          "start": {
+            "line": 18,
+            "character": 22
+          },
+          "end": {
+            "line": 18,
+            "character": 46
+          }
+        }
+      },
+      {
         "snippet": "HANDLER.\r\n            DISPLAY \"HANDLER\".",
         "name": "HANDLER",
         "type": "paragraph",
         "location": {
           "uri": "fake/path",
           "start": {
-            "line": 18,
+            "line": 20,
             "character": 9
           },
           "end": {
-            "line": 19,
+            "line": 21,
             "character": 31
           }
         }

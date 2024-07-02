@@ -29,13 +29,14 @@ export class CopybookDownloaderForDsn extends ZoweExplorerDownloader {
    * @param documentUri cobol programs which needs copybook
    * @param dsnPath dsnpath in mainframe.
    */
-  async isEligibleForDownload(
+  isEligibleForDownload(
     _copybookName: CopybookName,
     documentUri: string,
     dsnPath: string | undefined,
-  ): Promise<boolean> {
-    const providedProfile = await ProfileUtils.getProfileNameForCopybook(
+  ): boolean {
+    const providedProfile = ProfileUtils.getProfileNameForCopybook(
       documentUri,
+      this.explorerAPI,
     );
     return !!(dsnPath && providedProfile);
   }
@@ -52,11 +53,12 @@ export class CopybookDownloaderForDsn extends ZoweExplorerDownloader {
     documentUri: string,
     dsnPath: string,
   ): Promise<boolean> {
-    const providedProfile = await ProfileUtils.getProfileNameForCopybook(
+    const providedProfile = ProfileUtils.getProfileNameForCopybook(
       documentUri,
+      this.explorerAPI,
     );
 
-    if (await this.isEligibleForDownload(copybookName, documentUri, dsnPath)) {
+    if (this.isEligibleForDownload(copybookName, documentUri, dsnPath)) {
       const memberList = await this.getAllMembers(providedProfile!, dsnPath);
       const remoteCopybook = DownloadUtil.getRemoteCopybookName(
         memberList,

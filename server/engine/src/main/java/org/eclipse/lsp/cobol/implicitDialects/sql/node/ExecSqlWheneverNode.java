@@ -16,6 +16,7 @@
 package org.eclipse.lsp.cobol.implicitDialects.sql.node;
 
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.ToString;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.NodeType;
@@ -25,9 +26,34 @@ import org.eclipse.lsp.cobol.implicitDialects.sql.Db2SqlDialect;
 /** EXEC CICS block node */
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
+@Getter
 public class ExecSqlWheneverNode extends Node {
 
-  public ExecSqlWheneverNode(Locality location) {
+  private final WheneverConditionType wheneverConditionType;
+  private final WheneverType wheneverType;
+  private final String value;
+
+  /** Represents a condition clause type of the EXEC SQL WHENEVER statement **/
+  public enum WheneverConditionType {
+    NOT_FOUND,
+    SQLERROR,
+    SQLWARNING
+  }
+
+  /** Represents a verb clause type of the EXEC SQL WHENEVER statement **/
+  public enum WheneverType {
+    CONTINUE,
+    GOTO,
+    DO
+  }
+
+  public ExecSqlWheneverNode(Locality location,
+                             WheneverConditionType wheneverConditionType,
+                             WheneverType wheneverType,
+                             String value) {
     super(location, NodeType.STATEMENT, Db2SqlDialect.DIALECT_NAME);
+    this.wheneverConditionType = wheneverConditionType;
+    this.wheneverType = wheneverType;
+    this.value = value;
   }
 }
