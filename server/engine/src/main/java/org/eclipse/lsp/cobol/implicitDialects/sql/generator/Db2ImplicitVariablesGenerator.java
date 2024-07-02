@@ -17,10 +17,12 @@ package org.eclipse.lsp.cobol.implicitDialects.sql.generator;
 import lombok.experimental.UtilityClass;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.tree.variable.*;
+import org.eclipse.lsp.cobol.common.processor.CompilerDirectiveName;
 import org.eclipse.lsp.cobol.common.utils.ImplicitCodeUtils;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Generates SQLCA data structure for DB2
@@ -34,9 +36,10 @@ public class Db2ImplicitVariablesGenerator {
   /**
    * Generates SQLCA data structure for DB2
    *
+   * @param compilerDirectiveMap map of compiler directives
    * @return SQLCA data structure
    */
-  public List<VariableNode> generateDb2Nodes() {
+  public List<VariableNode> generateDb2Nodes(Map<CompilerDirectiveName, List<String>> compilerDirectiveMap) {
   /*
         01 SQLCA.
                 05 SQLCAID      PIC X(8).
@@ -66,7 +69,12 @@ public class Db2ImplicitVariablesGenerator {
     VariableNode variable = new GroupItemNode(LOCALITY, 1, "SQLCA", false, false, UsageFormat.UNDEFINED);
     addElement(variable, 5, "SQLCAID", "X(8)");
     addElement(variable, 5, "SQLCABC", "S9(9)", UsageFormat.COMP_5);
-    addElement(variable, 5, "SQLCODE", "S9(9)", UsageFormat.COMP_5);
+    if (compilerDirectiveMap.get(CompilerDirectiveName.STDSQL) != null
+            && compilerDirectiveMap.get(CompilerDirectiveName.STDSQL).get(0).equalsIgnoreCase("YES")) {
+      addElement(variable, 5, "SQLCADE", "S9(9)", UsageFormat.COMP_5);
+    } else {
+      addElement(variable, 5, "SQLCODE", "S9(9)", UsageFormat.COMP_5);
+    }
     GroupItemNode sqlerrm = new GroupItemNode(LOCALITY, 5, "SQLERRM", false, false, UsageFormat.UNDEFINED);
     variable.addChild(sqlerrm);
     addElement(sqlerrm, 49, "SQLERRML", "S9(4)", UsageFormat.COMP_5);
@@ -90,7 +98,12 @@ public class Db2ImplicitVariablesGenerator {
     addElement(sqlext, 10, "SQLWARN8", "X");
     addElement(sqlext, 10, "SQLWARN9", "X");
     addElement(sqlext, 10, "SQLWARNA", "X");
-    addElement(sqlext, 10, "SQLSTATE", "X(5)");
+    if (compilerDirectiveMap.get(CompilerDirectiveName.STDSQL) != null
+            && compilerDirectiveMap.get(CompilerDirectiveName.STDSQL).get(0).equalsIgnoreCase("YES")) {
+      addElement(sqlext, 10, "SQLSTAT", "X(5)");
+    } else {
+      addElement(sqlext, 10, "SQLSTATE", "X(5)");
+    }
 
     return Collections.singletonList(variable);
 
