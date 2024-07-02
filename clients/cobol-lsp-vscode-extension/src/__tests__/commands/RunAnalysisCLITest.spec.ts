@@ -12,10 +12,7 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
-import {
-  AnalysisResults,
-  RunAnalysis,
-} from "../../commands/RunAnalysisCLI";
+import {RunAnalysis,} from "../../commands/RunAnalysisCLI";
 import * as vscode from "vscode";
 
 jest.mock("vscode", () => ({
@@ -38,6 +35,7 @@ jest.mock("vscode", () => ({
         uri: {
           path: "/storagePath",
         },
+        getText: jest.fn(),
       },
     },
     setStatusBarMessage: jest
@@ -121,6 +119,10 @@ describe("Test Analysis CLI command functionality", () => {
     const testAnalysis = new RunAnalysis(vscode.Uri.parse(context.globalStorageUri));
     vscode.window.showQuickPick = jest.fn().mockReturnValue("Native");
 
+    if (vscode.window.activeTextEditor) {
+      (vscode.window.activeTextEditor.document.uri.path as any) = vscode.Uri.parse("/storagePath");
+    }
+
     const runCobolAnalysisCommandSpy = jest.spyOn(testAnalysis as any, "runCobolAnalysisCommand");
     const getCurrentFileLocationSpy = jest.spyOn(testAnalysis as any, "getCurrentFileLocation");
     const buildJavaCommandSpy = jest.spyOn(testAnalysis as any, "buildJavaCommand");
@@ -141,7 +143,7 @@ describe("Test Analysis CLI command functionality", () => {
     expect(buildJavaCommandSpy).toHaveBeenCalledTimes(0);
   });
 
-  test("Undefined Type", async () => {
+  test("Cobol Analysis - Undefined Type", async () => {
     const testAnalysis = new RunAnalysis(vscode.Uri.parse(context.globalStorageUri));
     vscode.window.showQuickPick = jest.fn().mockReturnValue(undefined);
 
@@ -154,5 +156,20 @@ describe("Test Analysis CLI command functionality", () => {
     expect(runCobolAnalysisCommandSpy).toHaveBeenCalled();
     expect(getVersionToRunSpy).toHaveBeenCalled();
     expect(buildJavaCommandSpy).not.toHaveBeenCalled();
+  });
+
+  test("Cobol Analysis - Save temp file", async () => {
+    const testAnalysis = new RunAnalysis(vscode.Uri.parse(context.globalStorageUri));
+    vscode.window.showQuickPick = jest.fn().mockReturnValue("Java");
+    if (vscode.window.activeTextEditor) {
+      vscode.window.activeTextEditor.document.getText = jest.fn().mockReturnValue("Test data");
+      jest.replaceProperty(vscode.window.activeTextEditor.document.uri, "path", "Untitled-1");
+    }
+
+    const saveTempFileSpy = jest.spyOn(testAnalysis as any, "saveTempFile");
+
+    await testAnalysis.runCobolAnalysisCommand();
+
+    expect(saveTempFileSpy).toHaveBeenCalled();
   });
 });

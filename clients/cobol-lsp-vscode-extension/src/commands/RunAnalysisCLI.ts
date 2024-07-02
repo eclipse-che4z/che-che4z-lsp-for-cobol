@@ -191,14 +191,14 @@ export class RunAnalysis {
    */
   protected getCurrentFileLocation() {
     if (vscode.workspace.workspaceFile) {
-      if (vscode.workspace.workspaceFile.path.startsWith("Untitled")) {
+      if (vscode.workspace.workspaceFile.path.toString().startsWith("Untitled")) {
         return this.saveTempFile();
       } else {
         return vscode.workspace.workspaceFile?.path;
       }
     } else if (vscode.window.activeTextEditor) {
       if (
-        vscode.window.activeTextEditor.document.uri.path.startsWith("Untitled")
+        vscode.window.activeTextEditor.document.uri.path.toString().startsWith("Untitled")
       ) {
         return this.saveTempFile();
       } else {
