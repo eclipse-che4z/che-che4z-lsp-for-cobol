@@ -33,7 +33,7 @@ class TestImplicitDialectsPosition {
       + "       PROCEDURE DIVISION.\n"
       + "           IF 2 > 1 THEN\n"
       + "             EXEC CICS HANDLE ABEND LABEL({#HANDLE-ABEND})\n"
-      + "             END-EXEC.\n"
+      + "             END-EXEC\n"
       + "             GO TO {#HANDLE-ABEND}\n"
       + "           END-IF.\n"
       + "       {#*HANDLE-ABEND}.\n";
@@ -43,7 +43,7 @@ class TestImplicitDialectsPosition {
       + "       PROCEDURE DIVISION.\n"
       + "           IF 2 > 1 \n"
       + "             PERFORM {#HANDLE-ABEND}\n"
-      + "             COPY {~COPY1}.\n"
+      + "             COPY {~COPY1}\n"
       + "             DISPLAY '1'\n"
       + "           END-IF.\n"
       + "       {#*HANDLE-ABEND}.\n";

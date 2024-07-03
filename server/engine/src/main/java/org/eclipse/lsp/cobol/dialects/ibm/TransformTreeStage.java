@@ -14,11 +14,8 @@
  */
 package org.eclipse.lsp.cobol.dialects.ibm;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+
 import lombok.RequiredArgsConstructor;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
@@ -28,6 +25,7 @@ import org.eclipse.lsp.cobol.common.dialects.CobolLanguageId;
 import org.eclipse.lsp.cobol.common.dialects.CobolProgramLayout;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.model.Locality;
+import org.eclipse.lsp.cobol.common.model.NodeType;
 import org.eclipse.lsp.cobol.common.model.tree.*;
 import org.eclipse.lsp.cobol.common.model.tree.statements.StatementNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.*;
@@ -69,14 +67,15 @@ public class TransformTreeStage implements Stage<AnalysisContext, ProcessingResu
   @Override
   public StageResult<ProcessingResult> run(AnalysisContext context, StageResult<ParserStageResult> prevStageResult) {
     // Transform parsed tree to AST
-    List<Node> syntaxTree = transformAST(
+    // We expect only the root node here
+    Node rootNode = transformAST(
             context,
             context.getCopybooksRepository(),
             prevStageResult.getData().getTokens(),
-            prevStageResult.getData().getTree());
+            prevStageResult.getData().getTree()).get(0);
 
     SymbolAccumulatorService symbolAccumulatorService = new SymbolAccumulatorService();
-    Node rootNode = processSyntaxTree(context.getConfig(), symbolAccumulatorService, context, syntaxTree);
+    processSyntaxTree(context.getConfig(), symbolAccumulatorService, context, rootNode);
 
     symbolsRepository.updateSymbols(symbolAccumulatorService.getProgramSymbols());
 
@@ -134,12 +133,94 @@ public class TransformTreeStage implements Stage<AnalysisContext, ProcessingResu
         new CobolVisitor(copybooksRepository, tokens, ctx.getExtendedDocument(),
             messageService, subroutineService, cachingConfigurationService, cobolProgramLayout);
     List<Node> syntaxTree = visitor.visit(tree);
+    shapeSectionsAndParagraphs(syntaxTree.get(0));
     ctx.getAccumulatedErrors().addAll(visitor.getErrors());
     return syntaxTree;
   }
 
-  private Node processSyntaxTree(AnalysisConfig analysisConfig, SymbolAccumulatorService symbolAccumulatorService, AnalysisContext ctx, List<Node> syntaxTree) {
-    Node rootNode = syntaxTree.get(0);
+  private void shapeSectionsAndParagraphs(Node parent) {
+    LinkedList<Node> stack = new LinkedList<>();
+    for (Node node : parent.getChildren()) {
+      parent.removeChild(node);
+      if (!node.getChildren().isEmpty()) {
+          shapeSectionsAndParagraphs(node);
+      }
+      if (!stack.isEmpty() && !RangeUtils.isInside(node.getLocality().getRange(), stack.peek().getLocality().getRange())) {
+          switch (stack.peek().getNodeType()) {
+              case PARAGRAPH:
+                  stack.pop();
+                  stack.pop();
+                  break;
+              case PROCEDURE_SECTION:
+                  stack.pop();
+                  break;
+              default:
+                  break;
+          }
+      }
+      if (node.getNodeType() == NodeType.PROCEDURE_SECTION) {
+          handleSection(parent, stack, node);
+          parent.addChild(node);
+          continue;
+      }
+      if (node.getNodeType() == NodeType.PARAGRAPH) {
+          handleParagraph(parent, stack, node);
+          continue;
+      }
+
+      if (!stack.isEmpty()) {
+        CodeBlockDefinitionNode n = (CodeBlockDefinitionNode) stack.peek();
+        n.addChild(node);
+      } else {
+        parent.addChild(node);
+      }
+    }
+  }
+
+  private void handleSection(Node parent, LinkedList<Node> stack, Node node) {
+      if (stack.isEmpty()) {
+          stack.push(node);
+          return;
+      }
+      if (stack.peek().getNodeType() == NodeType.PROCEDURE_SECTION) {
+          stack.pop();
+          stack.push(node);
+          return;
+      }
+      if (stack.peek().getNodeType() == NodeType.PARAGRAPH) {
+          stack.pop();
+          stack.pop();
+          stack.push(node);
+      }
+  }
+
+  private static void handleParagraph(Node parent, LinkedList<Node> stack, Node node) {
+    if (stack.isEmpty()) {
+      ParagraphsNode paragraphsNode = new ParagraphsNode(node.getLocality());
+      stack.push(paragraphsNode);
+      parent.addChild(paragraphsNode);
+      paragraphsNode.addChild(node);
+      stack.push(node);
+      return;
+    }
+    if (stack.peek().getNodeType().equals(NodeType.PROCEDURE_SECTION)) {
+      Node section = stack.peek();
+      ParagraphsNode paragraphsNode = new ParagraphsNode(node.getLocality());
+      stack.push(paragraphsNode);
+      section.addChild(paragraphsNode);
+      paragraphsNode.addChild(node);
+      stack.push(node);
+      return;
+    }
+    if (stack.peek().getNodeType() == NodeType.PARAGRAPH) {
+        stack.pop();
+        stack.peek().addChild(node);
+        stack.push(node);
+        return;
+    }
+  }
+
+  private void processSyntaxTree(AnalysisConfig analysisConfig, SymbolAccumulatorService symbolAccumulatorService, AnalysisContext ctx, Node rootNode) {
     addCopyNodes(ctx, rootNode);
     addDialectsNode(ctx, rootNode);
 
@@ -147,7 +228,6 @@ public class TransformTreeStage implements Stage<AnalysisContext, ProcessingResu
             new ProcessingContext(new ArrayList<>(), symbolAccumulatorService, getCompilerDirectiveContext(analysisConfig), ctx.getConfig().getDialectsSettings());
     registerProcessors(analysisConfig, processingContext, symbolAccumulatorService, ctx.getLanguageId());
     ctx.getAccumulatedErrors().addAll(astProcessor.processSyntaxTree(processingContext, rootNode));
-    return rootNode;
   }
 
   private CompilerDirectiveContext getCompilerDirectiveContext(AnalysisConfig analysisConfig) {

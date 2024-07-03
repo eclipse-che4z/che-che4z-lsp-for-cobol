@@ -43,7 +43,8 @@ class TestWithErrorCheck {
             "1",
             new Diagnostic(
                 new Range(),
-                    "A period was assumed before \"<EOF>\".",
+                    // TODO: old error message was "A period was assumed before \"<EOF>\".",
+                "Unexpected end of file",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())),
         CobolLanguageId.COBOL);

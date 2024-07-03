@@ -752,8 +752,19 @@ procedureSectionHeader
    : sectionName SECTION integerLiteral?
    ;
 
+sectionOrParagraph
+   : (cobolWord | integerLiteral)
+         (
+             SECTION integerLiteral?
+         )?
+         dot_fs
+   ;
+
 procedureDivisionBody
-   : paragraphs procedureSection*
+   : (
+       ( sectionOrParagraph alteredGoTo? )
+       | sentence
+     )*
    ;
 
 // -- procedure section ----------------------------------
@@ -763,12 +774,12 @@ procedureSection
    ;
 
 sentence
-   : statement * (endClause | dialectStatement)
+   : statement * endClause
    | dialectStatement
    ;
 
 paragraph
-   : paragraphDefinitionName dot_fs (alteredGoTo | sentence*)
+   : paragraphDefinitionName dot_fs alteredGoTo?
    ;
 
 paragraphs
@@ -776,21 +787,67 @@ paragraphs
    ;
 
 conditionalStatementCall
-   : statement | dialectStatement
+   : statement
    ;
 
 statement
-   : acceptStatement | addStatement | allocateStatement | alterStatement | callStatement | cancelStatement | closeStatement | computeStatement | continueStatement | deleteStatement |
-    disableStatement | displayStatement | divideStatement | enableStatement | entryStatement | evaluateStatement | exhibitStatement |
-    exitStatement | freeStatement | generateStatement | gobackStatement | goToStatement | ifStatement | initializeStatement |
-    initiateStatement | inspectStatement | mergeStatement | moveStatement | multiplyStatement | openStatement | performStatement | purgeStatement |
-    readStatement | readyResetTraceStatement | receiveStatement | releaseStatement | returnStatement | rewriteStatement | searchStatement | sendStatement |
-    serviceReloadStatement | serviceLabelStatement | setStatement | sortStatement | startStatement | stopStatement | stringStatement | subtractStatement |
-    terminateStatement | unstringStatement | writeStatement | xmlParseStatement | jsonStatement | xmlGenerate
+   : acceptStatement
+   | addStatement
+   | allocateStatement
+   | alterStatement
+   | callStatement
+   | cancelStatement
+   | closeStatement
+   | computeStatement
+   | continueStatement
+   | deleteStatement
+   | disableStatement
+   | displayStatement
+   | divideStatement
+   | dialectStatement
+   | enableStatement
+   | entryStatement
+   | evaluateStatement
+   | exhibitStatement
+   | exitStatement
+   | freeStatement
+   | generateStatement
+   | gobackStatement
+   | goToStatement
+   | ifStatement
+   | initializeStatement
+   | initiateStatement
+   | inspectStatement
+   | mergeStatement
+   | moveStatement
+   | multiplyStatement
+   | openStatement
+   | performStatement
+   | purgeStatement
+   | readStatement
+   | readyResetTraceStatement
+   | receiveStatement
+   | releaseStatement
+   | returnStatement
+   | rewriteStatement
+   | searchStatement
+   | sendStatement
+   | serviceStatement
+   | setStatement
+   | sortStatement
+   | startStatement
+   | stopStatement
+   | stringStatement
+   | subtractStatement
+   | terminateStatement
+   | unstringStatement
+   | writeStatement
+   | jsonStatement
+   | xmlStatement
    ;
 
 xmlGenerate
-    : XML GENERATE xmlGenIdentifier1 FROM xmlGenIdentifier2
+    : GENERATE xmlGenIdentifier1 FROM xmlGenIdentifier2
     (COUNT IN? xmlGenIdentifier3)?
     (WITH? ENCODING integerLiteral)? (WITH? XML_DECLARATION)? (WITH? ATTRIBUTES)?
     (NAMESPACE IS? (xmlGenIdentifier4 | literal))? (NAMESPACE_PREFIX IS? (xmlGenIdentifier5 | literal))?
@@ -799,6 +856,19 @@ xmlGenerate
     (SUPPRESS ((xmlGenIdentifier8 when_phrase?) | generic_suppression_phrase)+)?
     onExceptionClause? notOnExceptionClause? END_XML?
     ;
+
+xmlParseStatement
+   : PARSE qualifiedDataName xmlEncoding? xmlNational? xmlValidating? xmlProcessinProcedure through? onExceptionClause? notOnExceptionClause? END_XML?
+   ;
+
+xmlStatement
+   : XML
+   (
+       xmlGenerate
+       |
+       xmlParseStatement
+   )
+   ;
 
 xmlGenIdentifier1: qualifiedDataName;
 
@@ -881,7 +951,7 @@ acceptStatement
    ;
 
 dialectStatement
-   : dialectNodeFiller | dialectIfStatment
+   : ZERO_WIDTH_SPACE+ | dialectIfStatment
    ;
 
 acceptFromDateStatement
@@ -947,7 +1017,7 @@ allocateStatement
 // alter statement
 
 alterStatement
-   : ALTER alterProceedTo+
+   : ALTER alterProceedTo (commaSeparator? alterProceedTo)*
    ;
 
 alterProceedTo
@@ -1232,9 +1302,8 @@ goToStatement
 dialectIfStatment
    : DIALECT_IF dialectNodeFiller* ifThen ifElse? END_IF?
    ;
-
 ifStatement
-   : IF (condition | dialectNodeFiller*) ifThen ifElse? END_IF?
+   : IF condition ifThen ifElse? (END_IF | {_input.LA(1)==DOT_FS || _input.LA(1)==ELSE}?)
    ;
 
 ifThen
@@ -1698,12 +1767,19 @@ sendingField
 
 // service statement
 
+serviceStatement
+   :
+   serviceLabelStatement
+   |
+   serviceReloadStatement
+   ;
+
 serviceLabelStatement
-   : SERVICE LABEL
+   : LABEL
    ;
 
 serviceReloadStatement
-   : SERVICE RELOAD generalIdentifier
+   : RELOAD generalIdentifier
    ;
 
 // sort statement
@@ -1951,10 +2027,6 @@ writeNotAtEndOfPagePhrase
    ;
 
 // xml statement
-
-xmlParseStatement
-   : XML PARSE qualifiedDataName xmlEncoding? xmlNational? xmlValidating? xmlProcessinProcedure through? onExceptionClause? notOnExceptionClause? END_XML?
-   ;
 
 xmlEncoding
    : WITH? ENCODING  integerLiteral
@@ -2269,5 +2341,6 @@ dialectNodeFiller
     ;
 
 dot_fs
-    : DOT_FS | {notifyError("missing.period", _input.LT(1).getText());}
+    : DOT_FS
+//    | {notifyError("missing.period", _input.LT(1).getText());}
     ;
