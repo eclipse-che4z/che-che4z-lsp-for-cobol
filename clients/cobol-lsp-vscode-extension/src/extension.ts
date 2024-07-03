@@ -343,12 +343,16 @@ function registerCommands(
   );
 
   context.subscriptions.push(
-    vscode.commands.registerCommand("cobol-lsp.analysis.runAnalysis", () => {
-      const tempAnalysis: RunAnalysis = new RunAnalysis(
-        context.globalStorageUri,
-      );
-      tempAnalysis.runCobolAnalysisCommand();
-    }),
+    vscode.commands.registerCommand(
+      "cobol-lsp.analysis.runAnalysis",
+      async () => {
+        const tempAnalysis: RunAnalysis = new RunAnalysis(
+          context.globalStorageUri,
+          context.extensionUri,
+        );
+        await tempAnalysis.runCobolAnalysisCommand();
+      },
+    ),
   );
 }
 

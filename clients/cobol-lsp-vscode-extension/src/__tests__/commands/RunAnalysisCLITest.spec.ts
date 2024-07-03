@@ -25,6 +25,9 @@ jest.mock("vscode", () => ({
   extensions: {
     getExtension: jest.fn().mockReturnValue({ extensionPath: "/test" }),
   },
+  FileType: {
+    Directory: 2,
+  },
   languages: {
     registerCodeActionsProvider: jest.fn(),
     registerCompletionItemProvider: jest.fn(),
@@ -34,6 +37,8 @@ jest.mock("vscode", () => ({
       document: {
         uri: {
           path: "/storagePath",
+          fsPath: "/storagePath",
+          scheme: "file",
         },
         getText: jest.fn(),
       },
@@ -76,6 +81,7 @@ jest.mock("vscode", () => ({
     workspaceFolders: [{ uri: { fsPath: "ws-path" } } as any],
     fs: {
       createDirectory: jest.fn(),
+      stat: jest.fn().mockReturnValue(2),
     },
   },
   Uri: {
@@ -87,12 +93,13 @@ jest.mock("vscode", () => ({
 const context: any = {
   subscriptions: [],
   globalStorageUri: { fsPath: "/storagePath" },
+  extensionUri: { fsPath: "/test" },
 };
 
 describe("Test Analysis CLI command functionality", () => {
   test("Cobol Analysis - Java", async () => {
     const testAnalysis = new RunAnalysis(
-      vscode.Uri.parse(context.globalStorageUri),
+      vscode.Uri.parse(context.globalStorageUri), vscode.Uri.parse(context.extensionUri),
     );
     vscode.window.showQuickPick = jest.fn().mockReturnValue("Java");
 
@@ -112,10 +119,6 @@ describe("Test Analysis CLI command functionality", () => {
       testAnalysis as any,
       "buildNativeCommand",
     );
-    const getExtensionPathSpy = jest.spyOn(
-      testAnalysis as any,
-      "getExtensionPath",
-    );
     const buildAnalysisCommandPortionSpy = jest.spyOn(
       testAnalysis as any,
       "buildAnalysisCommandPortion",
@@ -127,7 +130,6 @@ describe("Test Analysis CLI command functionality", () => {
     expect(runCobolAnalysisCommandSpy).toHaveBeenCalled();
     expect(getCurrentFileLocationSpy).toHaveBeenCalled();
     expect(buildJavaCommandSpy).toHaveBeenCalled();
-    expect(getExtensionPathSpy).toHaveBeenCalled();
     expect(buildAnalysisCommandPortionSpy).toHaveBeenCalled();
     expect(sendToTerminalSpy).toHaveBeenCalled();
 
@@ -136,7 +138,7 @@ describe("Test Analysis CLI command functionality", () => {
 
   test("Cobol Analysis - Native", async () => {
     const testAnalysis = new RunAnalysis(
-      vscode.Uri.parse(context.globalStorageUri),
+        vscode.Uri.parse(context.globalStorageUri), vscode.Uri.parse(context.extensionUri),
     );
     vscode.window.showQuickPick = jest.fn().mockReturnValue("Native");
 
@@ -161,10 +163,6 @@ describe("Test Analysis CLI command functionality", () => {
       testAnalysis as any,
       "buildNativeCommand",
     );
-    const getExtensionPathSpy = jest.spyOn(
-      testAnalysis as any,
-      "getExtensionPath",
-    );
     const buildAnalysisCommandPortionSpy = jest.spyOn(
       testAnalysis as any,
       "buildAnalysisCommandPortion",
@@ -176,7 +174,6 @@ describe("Test Analysis CLI command functionality", () => {
     expect(runCobolAnalysisCommandSpy).toHaveBeenCalled();
     expect(getCurrentFileLocationSpy).toHaveBeenCalled();
     expect(buildNativeCommandSpy).toHaveBeenCalled();
-    expect(getExtensionPathSpy).toHaveBeenCalled();
     expect(buildAnalysisCommandPortionSpy).toHaveBeenCalled();
     expect(sendToTerminalSpy).toHaveBeenCalled();
 
@@ -185,7 +182,7 @@ describe("Test Analysis CLI command functionality", () => {
 
   test("Cobol Analysis - Undefined Type", async () => {
     const testAnalysis = new RunAnalysis(
-      vscode.Uri.parse(context.globalStorageUri),
+        vscode.Uri.parse(context.globalStorageUri), vscode.Uri.parse(context.extensionUri),
     );
     vscode.window.showQuickPick = jest.fn().mockReturnValue(undefined);
 
@@ -211,7 +208,7 @@ describe("Test Analysis CLI command functionality", () => {
 
   test("Cobol Analysis - Save temp file", async () => {
     const testAnalysis = new RunAnalysis(
-      vscode.Uri.parse(context.globalStorageUri),
+        vscode.Uri.parse(context.globalStorageUri), vscode.Uri.parse(context.extensionUri),
     );
     vscode.window.showQuickPick = jest.fn().mockReturnValue("Java");
     if (vscode.window.activeTextEditor) {
@@ -220,8 +217,8 @@ describe("Test Analysis CLI command functionality", () => {
         .mockReturnValue("Test data");
       jest.replaceProperty(
         vscode.window.activeTextEditor.document.uri,
-        "path",
-        "Untitled-1",
+        "scheme",
+        "untitled",
       );
     }
 
@@ -234,7 +231,7 @@ describe("Test Analysis CLI command functionality", () => {
 
   test("Cobol - Java - No file location", () => {
     const testAnalysis = new RunAnalysis(
-      vscode.Uri.parse(context.globalStorageUri),
+        vscode.Uri.parse(context.globalStorageUri), vscode.Uri.parse(context.extensionUri),
     );
 
     const result = (testAnalysis as any).buildJavaCommand("");
@@ -244,7 +241,7 @@ describe("Test Analysis CLI command functionality", () => {
 
   test("Cobol - getServerPath", () => {
     const testAnalysis = new RunAnalysis(
-      vscode.Uri.parse(context.globalStorageUri),
+        vscode.Uri.parse(context.globalStorageUri), vscode.Uri.parse(context.extensionUri),
     );
 
     let result = (testAnalysis as any).getServerPath("initialPath", "win32");
@@ -258,17 +255,5 @@ describe("Test Analysis CLI command functionality", () => {
 
     result = (testAnalysis as any).getServerPath("initialPath", "other");
     expect(result).toBe("");
-  });
-
-  test("Cobol - getClearCommand", () => {
-    const testAnalysis = new RunAnalysis(
-      vscode.Uri.parse(context.globalStorageUri),
-    );
-
-    let result = (testAnalysis as any).getClearCommand("win32");
-    expect(result).toBe("cls");
-
-    result = (testAnalysis as any).getClearCommand("linux");
-    expect(result).toBe("clear");
   });
 });

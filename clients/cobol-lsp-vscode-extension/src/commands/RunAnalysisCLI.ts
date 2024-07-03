@@ -28,15 +28,13 @@ export class RunAnalysis {
   protected runNative: boolean;
   protected copybookConfigLocation: string;
   protected globalStorageUri: vscode.Uri;
+  protected extensionUri: vscode.Uri;
 
-  constructor(
-    globalStorageUri: vscode.Uri,
-    runNative: boolean = false,
-    copybookConfigLocation: string = "",
-  ) {
-    this.runNative = runNative;
-    this.copybookConfigLocation = copybookConfigLocation;
+  constructor(globalStorageUri: vscode.Uri, extensionPath: vscode.Uri) {
+    this.runNative = false;
+    this.copybookConfigLocation = "";
     this.globalStorageUri = globalStorageUri;
+    this.extensionUri = extensionPath;
   }
 
   /**
@@ -62,7 +60,7 @@ export class RunAnalysis {
     this.runNative = result.typeToRun === "Native";
     this.copybookConfigLocation = result.copybookLocation;
 
-    const command = this.buildCommand();
+    const command = await this.buildCommand();
     if (command !== "") {
       this.sendToTerminal(command);
     }
@@ -88,9 +86,9 @@ export class RunAnalysis {
    * Encapsulates the handling of building the command
    * @protected
    */
-  protected buildCommand() {
-    const currentFileLocation: string = this.getCurrentFileLocation();
-    if (currentFileLocation === "") {
+  protected async buildCommand() {
+    const currentFileLocation = await this.getCurrentFileLocation();
+    if (!currentFileLocation || currentFileLocation === "") {
       return "";
     }
 
@@ -104,10 +102,11 @@ export class RunAnalysis {
   /**
    * Creates the command to run using the native build.
    * @param currentFileLocation - Location of the main cobol file being analyzed.
+   * @param platform - Result from Node.js' "process.platform".
    * @protected
    */
   protected buildNativeCommand(currentFileLocation: string, platform: string) {
-    const serverPath = this.getExtensionPath() + "/server/native";
+    const serverPath = this.extensionUri.fsPath + "/server/native";
     const result = this.getServerPath(serverPath, platform);
 
     if (result === "") {
@@ -137,7 +136,7 @@ export class RunAnalysis {
    */
   protected buildJavaCommand(currentFileLocation: string) {
     const extensionFolder: string | undefined =
-      this.getExtensionPath() + "/server/jar/server.jar";
+      this.extensionUri.fsPath + "/server/jar/server.jar";
 
     if (extensionFolder && currentFileLocation !== "") {
       return (
@@ -181,10 +180,6 @@ export class RunAnalysis {
       ? existingTerminal
       : vscode.window.createTerminal("Analysis");
 
-    if (existingTerminal) {
-      terminal.sendText(this.getClearCommand(process.platform));
-    }
-
     terminal.sendText(command);
     terminal.show(true);
   }
@@ -195,16 +190,12 @@ export class RunAnalysis {
    *    - Does not result in the actual file being saved to the end user.
    * @protected
    */
-  protected getCurrentFileLocation() {
+  protected async getCurrentFileLocation() {
     if (vscode.window.activeTextEditor) {
-      if (
-        vscode.window.activeTextEditor.document.uri.path
-          .toString()
-          .startsWith("Untitled")
-      ) {
+      if (vscode.window.activeTextEditor.document.uri.scheme === "untitled") {
         return this.saveTempFile();
       } else {
-        return vscode.window.activeTextEditor.document.uri.path;
+        return vscode.window.activeTextEditor.document.uri.fsPath;
       }
     }
     return "";
@@ -215,46 +206,23 @@ export class RunAnalysis {
    *    - Does not result in the actual file being saved to the end user.
    * @protected
    */
-  protected saveTempFile() {
+  protected async saveTempFile() {
     const data = vscode.window.activeTextEditor?.document.getText();
 
     if (data) {
-      try {
-        vscode.workspace.fs
-          .stat(this.globalStorageUri)
-          .then((fileStatResult) => {
-            if (fileStatResult.type === vscode.FileType.Directory) {
-              const newFileName = Date.now() + ".cbl";
-              const newUri = vscode.Uri.parse(
-                this.globalStorageUri.path + "/" + newFileName,
-              );
-              return vscode.workspace.fs
-                .writeFile(newUri, Buffer.from(data))
-                .then(() => newUri.path);
-            }
-          });
-      } catch {
-        return "";
+      const fileStatResult = await vscode.workspace.fs.stat(
+        this.globalStorageUri,
+      );
+      if (fileStatResult.type === vscode.FileType.Directory) {
+        const newFileName = Date.now() + ".cbl";
+        const newUri = vscode.Uri.parse(
+          this.globalStorageUri.path + "/" + newFileName,
+        );
+        await vscode.workspace.fs.writeFile(newUri, Buffer.from(data));
+        return newUri.fsPath;
       }
     }
 
     return "";
-  }
-
-  /**
-   * Returns the location of the extension.
-   * @protected
-   */
-  protected getExtensionPath() {
-    return vscode.extensions.getExtension("broadcommfd.cobol-language-support")
-      ?.extensionPath;
-  }
-
-  /**
-   * Returns the command for the current OS that will clear the terminal.
-   * @protected
-   */
-  protected getClearCommand(platform: string) {
-    return platform === "win32" ? "cls" : "clear";
   }
 }
