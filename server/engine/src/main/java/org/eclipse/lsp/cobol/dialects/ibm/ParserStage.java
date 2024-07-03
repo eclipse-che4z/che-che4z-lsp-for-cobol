@@ -17,6 +17,7 @@ package org.eclipse.lsp.cobol.dialects.ibm;
 import com.google.common.collect.ImmutableList;
 import lombok.RequiredArgsConstructor;
 import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.DefaultErrorStrategy;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.eclipse.lsp.cobol.common.dialects.DialectOutcome;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
@@ -54,7 +55,7 @@ public class ParserStage implements Stage<AnalysisContext, ParserStageResult, Di
             .addAll(prevStageResult.getData().getDialectNodes())
             .build());
     ParserListener listener = new ParserListener(context.getExtendedDocument(), context.getCopybooksRepository());
-    CobolErrorStrategy errorStrategy = new CobolErrorStrategy(messageService);
+    DefaultErrorStrategy errorStrategy = new CobolErrorStrategy(messageService);
     AstBuilder parser = new AntlrCobolParser(CharStreams.fromString(context.getExtendedDocument().toString()),
             listener, errorStrategy, treeListener);
     CobolParser.StartRuleContext tree = parser.runParser();

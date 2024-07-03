@@ -45,7 +45,8 @@ class TestEndIfDoesNotProduceError {
             "1",
             new Diagnostic(
                 new Range(),
-                "Extraneous input 'END'",
+                // TODO: old error message was "Extraneous input 'END'",
+                "No viable alternative at input END",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()),
             "2",

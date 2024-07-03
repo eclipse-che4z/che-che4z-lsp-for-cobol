@@ -23,31 +23,55 @@ import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
-/** Test that typing the Declaratives section doesn't produce an Exception. */
+/**
+ * Test that typing the Declaratives section doesn't produce an Exception.
+ */
 class TestDeclarativesSection {
-  private static final String TEXT =
-      "       Identification Division.\n"
-          + "       Program-id. HELLO-WORLD.\n"
-          + "       Procedure Division.\n"
-          + "       DECLARATIVES{|1|2}";
+    private static final String TEXT_1 =
+            "       Identification Division.\n"
+                    + "       Program-id. HELLO-WORLD.\n"
+                    + "       Procedure Division.\n"
+                    + "       DECLARATIVES{|1|2}";
 
-  @Test
-  void test() {
-    UseCaseEngine.runTest(
-        TEXT,
-        ImmutableList.of(),
-        ImmutableMap.of(
-            "1",
-            new Diagnostic(
-                new Range(),
-                "Unexpected end of file",
-                DiagnosticSeverity.Error,
-                ErrorSource.PARSING.getText()),
-            "2",
-            new Diagnostic(
-                new Range(),
-                "A period was assumed before \"<EOF>\".",
-                DiagnosticSeverity.Error,
-                ErrorSource.PARSING.getText())));
-  }
+    private static final String TEXT_2 =
+            "       Identification Division.\n"
+                    + "       Program-id. HELLO-WORLD.\n"
+                    + "       DATA Division.\n"
+                    + "       WORKING-STORAGE SECTION.\n"
+                    + "       01 {$*VAR1} PIC 9.\n\n"
+                    + "       Procedure Division.\n"
+                    + "       DECLARATIVES.\n"
+                    + "       {@*USE-IX103-TEST} SECTION.\n"
+                    + "           USE AFTER STANDARD EXCEPTION PROCEDURE {$VAR1}.\n"
+                    + "       {#*PAR-001}.\n"
+                    + "           ADD 1 TO {$VAR1}.\n"
+                    + "       {#*PAR-EXIT}.\n"
+                    + "           EXIT.\n"
+                    + "       END DECLARATIVES."
+                    + "       {@*CCVS1} SECTION.\n";
+
+    @Test
+    void test1() {
+        UseCaseEngine.runTest(TEXT_1,
+                ImmutableList.of(),
+                ImmutableMap.of(
+                        "1",
+                        new Diagnostic(
+                                new Range(),
+                                "Unexpected end of file",
+                                DiagnosticSeverity.Error,
+                                ErrorSource.PARSING.getText()),
+                        "2",
+                        new Diagnostic(
+                                new Range(),
+                                "Unexpected end of file",
+                                // TODO: old error message was "A period was assumed before \"<EOF>\".",
+                                DiagnosticSeverity.Error,
+                                ErrorSource.PARSING.getText())));
+    }
+
+    @Test
+    void test2() {
+        UseCaseEngine.runTest(TEXT_2, ImmutableList.of(), ImmutableMap.of());
+    }
 }

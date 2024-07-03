@@ -9,8 +9,8 @@
         "character": 9
       },
       "end": {
-        "line": 22,
-        "character": 8
+        "line": 21,
+        "character": 21
       }
     },
     "children": [
@@ -26,7 +26,7 @@
           },
           "end": {
             "line": 21,
-            "character": 21
+            "character": 20
           }
         }
       },
@@ -40,7 +40,7 @@
           },
           "end": {
             "line": 21,
-            "character": 21
+            "character": 20
           }
         }
       }

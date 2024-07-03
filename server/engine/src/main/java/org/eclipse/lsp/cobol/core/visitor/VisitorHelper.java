@@ -282,6 +282,23 @@ public class VisitorHelper {
   }
 
   /**
+   * Construct the range from ANTLR token
+   *
+   * @param token the ANTLR token
+   * @return the range
+   */
+  public static Range constructRange(Token token) {
+    return new Range(
+            new Position(
+                    token.getLine() - 1,
+                    token.getCharPositionInLine()),
+            new Position(
+                    token.getLine() - 1,
+                    token.getCharPositionInLine() + token.getStopIndex() - token.getStartIndex() + 1)
+    );
+  }
+
+  /**
    * Construct for the locality using the node constructor and child nodes
    *
    * @param nodeConstructor function to construct a node

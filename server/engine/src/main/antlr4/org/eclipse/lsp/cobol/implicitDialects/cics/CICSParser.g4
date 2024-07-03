@@ -16,9 +16,9 @@ options {tokenVocab = CICSLexer; superClass = MessageServiceParser;}
 
 startRule: .*? ((cicsExecBlock | cicsDfhRespLiteral | cicsDfhValueLiteral) .*?) * EOF;
 compilerDirective: (.*? compilerXOpts)* .*? EOF;
-cicsExecBlock: EXEC CICS allCicsRule END_EXEC DOT?
-             | EXEC CICS (allCicsRule | invalidInput)+ END_EXEC DOT?
-             | EXEC CICS END_EXEC DOT?
+cicsExecBlock: EXEC CICS allCicsRule END_EXEC
+             | EXEC CICS (allCicsRule | invalidInput)+ END_EXEC
+             | EXEC CICS END_EXEC
              | {notifyError("cicsParser.missingEndExec");} EXEC CICS allCicsRule
              | {notifyError("cicsParser.missingEndExec");} EXEC CICS
              ;

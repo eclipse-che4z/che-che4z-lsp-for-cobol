@@ -56,7 +56,7 @@ public class TestDeclarativeSectionNameUsageInUseDebugStatement {
           + "           perform {@AT-END-PROC} .";
 
   @Test
-  void test() {
+  void test1() {
     UseCaseEngine.runTest(TEXT, ImmutableList.of(), ImmutableMap.of());
   }
 }

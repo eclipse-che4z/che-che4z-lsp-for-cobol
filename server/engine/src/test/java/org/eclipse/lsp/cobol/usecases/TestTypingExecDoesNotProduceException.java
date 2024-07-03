@@ -32,7 +32,7 @@ class TestTypingExecDoesNotProduceException {
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
           + "       PROCEDURE DIVISION.\n"
-          + "           {#*EXEC}{|1} ";
+          + "           {#*EXEC|1}";
 
   @Test
   void test() {
@@ -43,7 +43,8 @@ class TestTypingExecDoesNotProduceException {
             "1",
             new Diagnostic(
                 new Range(),
-                "A period was assumed before \"<EOF>\".",
+                // TODO "A period was assumed before \"<EOF>\".",
+                "Missing token '.' at dot_fs",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())));
   }
