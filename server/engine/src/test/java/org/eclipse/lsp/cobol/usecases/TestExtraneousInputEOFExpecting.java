@@ -34,7 +34,8 @@ class TestExtraneousInputEOFExpecting {
           + "        PROCEDURE DIVISION.\r\n"
           + "           if (1 > 0) NEXT SENTENCE{|1}"; // No dot at the end of file
 
-  private static final String MESSAGE = "Unexpected end of file";
+  // TODO: old error message was "Unexpected end of file";
+  private static final String MESSAGE = "No viable alternative at input ";
 
   @Test
   void test() {

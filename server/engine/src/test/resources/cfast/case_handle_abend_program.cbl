@@ -19,4 +19,3 @@
         PROCEDURE DIVISION.
            EXEC CICS HANDLE ABEND PROGRAM(PRG)
            END-EXEC.
-

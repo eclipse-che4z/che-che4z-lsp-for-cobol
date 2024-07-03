@@ -17,6 +17,7 @@ package org.eclipse.lsp.cobol.common.model.tree;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.NodeType;
@@ -33,6 +34,7 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 public abstract class CodeBlockDefinitionNode extends Node {
   String name;
+  @Setter
   String text;
   Locality definition;
   List<Locality> usages = new ArrayList<>();

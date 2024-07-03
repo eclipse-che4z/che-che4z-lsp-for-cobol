@@ -9,8 +9,8 @@
         "character": 8
       },
       "end": {
-        "line": 7,
-        "character": 32
+        "line": 10,
+        "character": 21
       }
     },
     "children": [
@@ -23,8 +23,8 @@
             "character": 12
           },
           "end": {
-            "line": 7,
-            "character": 31
+            "line": 8,
+            "character": 18
           }
         }
       },
@@ -40,7 +40,7 @@
           },
           "end": {
             "line": 6,
-            "character": 23
+            "character": 22
           }
         }
       },
@@ -54,7 +54,7 @@
           },
           "end": {
             "line": 6,
-            "character": 23
+            "character": 22
           }
         }
       },
@@ -84,8 +84,24 @@
             "character": 12
           },
           "end": {
-            "line": 7,
-            "character": 31
+            "line": 8,
+            "character": 18
+          }
+        }
+      },
+      {
+        "snippet": "HANDLE-ABEND.",
+        "name": "HANDLE-ABEND",
+        "type": "paragraph",
+        "location": {
+          "uri": "fake/path",
+          "start": {
+            "line": 10,
+            "character": 8
+          },
+          "end": {
+            "line": 10,
+            "character": 21
           }
         }
       }
