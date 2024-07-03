@@ -32,11 +32,23 @@ class TestImplicitDialectsPosition {
       + "       PROGRAM-ID.    CBACT01C.\n"
       + "       PROCEDURE DIVISION.\n"
       + "           IF 2 > 1 THEN\n"
-      + "             EXEC CICS HANDLE ABEND LABEL(HANDLE-ABEND)\n"
+      + "             EXEC CICS HANDLE ABEND LABEL({#HANDLE-ABEND})\n"
       + "             END-EXEC.\n"
       + "             GO TO {#HANDLE-ABEND}\n"
       + "           END-IF.\n"
       + "       {#*HANDLE-ABEND}.\n";
+
+  private static final String TEXT_WITH_COPY = "       IDENTIFICATION DIVISION.\n"
+      + "       PROGRAM-ID.    CBACT01C.\n"
+      + "       PROCEDURE DIVISION.\n"
+      + "           IF 2 > 1 \n"
+      + "             PERFORM {#HANDLE-ABEND}\n"
+      + "             COPY {~COPY1}.\n"
+      + "             DISPLAY '1'\n"
+      + "           END-IF.\n"
+      + "       {#*HANDLE-ABEND}.\n";
+
+  private static final String COPY1 = "             EXEC CICS HANDLE ABEND LABEL({#HANDLE-ABEND}) END-EXEC\n";
 
   @Test
   void test() {
@@ -50,4 +62,20 @@ class TestImplicitDialectsPosition {
     Node execCicsNode = ifNode.getChildren().get(2);
     assertTrue(execCicsNode instanceof ExecCicsHandleNode);
   }
+
+//  @Test
+//  void testCopy() {
+//    AnalysisResult result = UseCaseEngine.runTest(TEXT_WITH_COPY,
+//        ImmutableList.of(new CobolText("COPY1", COPY1)),
+//        ImmutableMap.of());
+//    Node ifNode = result.getRootNode().getDepthFirstStream()
+//        .filter(n -> n.getNodeType() == NodeType.IF)
+//        .findFirst()
+//        .orElse(null);
+//
+//    assertNotNull(ifNode);
+//    Node execCicsNode = ifNode.getChildren().get(3);
+//    assertTrue(execCicsNode instanceof ExecCicsHandleNode);
+//  }
+
 }
