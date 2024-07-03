@@ -91,9 +91,9 @@ jest.mock("vscode", () => ({
 }));
 
 const context: any = {
-  subscriptions: [],
-  globalStorageUri: { fsPath: "/storagePath" },
   extensionUri: { fsPath: "/test" },
+  globalStorageUri: { fsPath: "/storagePath" },
+  subscriptions: [],
 };
 
 describe("Test Analysis CLI command functionality", () => {
