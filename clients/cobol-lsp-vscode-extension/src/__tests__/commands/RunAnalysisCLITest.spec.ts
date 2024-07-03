@@ -99,7 +99,8 @@ const context: any = {
 describe("Test Analysis CLI command functionality", () => {
   test("Cobol Analysis - Java", async () => {
     const testAnalysis = new RunAnalysis(
-      vscode.Uri.parse(context.globalStorageUri), vscode.Uri.parse(context.extensionUri),
+      vscode.Uri.parse(context.globalStorageUri),
+      vscode.Uri.parse(context.extensionUri),
     );
     vscode.window.showQuickPick = jest.fn().mockReturnValue("Java");
 
@@ -138,7 +139,8 @@ describe("Test Analysis CLI command functionality", () => {
 
   test("Cobol Analysis - Native", async () => {
     const testAnalysis = new RunAnalysis(
-        vscode.Uri.parse(context.globalStorageUri), vscode.Uri.parse(context.extensionUri),
+      vscode.Uri.parse(context.globalStorageUri),
+      vscode.Uri.parse(context.extensionUri),
     );
     vscode.window.showQuickPick = jest.fn().mockReturnValue("Native");
 
@@ -182,7 +184,8 @@ describe("Test Analysis CLI command functionality", () => {
 
   test("Cobol Analysis - Undefined Type", async () => {
     const testAnalysis = new RunAnalysis(
-        vscode.Uri.parse(context.globalStorageUri), vscode.Uri.parse(context.extensionUri),
+      vscode.Uri.parse(context.globalStorageUri),
+      vscode.Uri.parse(context.extensionUri),
     );
     vscode.window.showQuickPick = jest.fn().mockReturnValue(undefined);
 
@@ -208,7 +211,8 @@ describe("Test Analysis CLI command functionality", () => {
 
   test("Cobol Analysis - Save temp file", async () => {
     const testAnalysis = new RunAnalysis(
-        vscode.Uri.parse(context.globalStorageUri), vscode.Uri.parse(context.extensionUri),
+      vscode.Uri.parse(context.globalStorageUri),
+      vscode.Uri.parse(context.extensionUri),
     );
     vscode.window.showQuickPick = jest.fn().mockReturnValue("Java");
     if (vscode.window.activeTextEditor) {
@@ -231,7 +235,8 @@ describe("Test Analysis CLI command functionality", () => {
 
   test("Cobol - Java - No file location", () => {
     const testAnalysis = new RunAnalysis(
-        vscode.Uri.parse(context.globalStorageUri), vscode.Uri.parse(context.extensionUri),
+      vscode.Uri.parse(context.globalStorageUri),
+      vscode.Uri.parse(context.extensionUri),
     );
 
     const result = (testAnalysis as any).buildJavaCommand("");
@@ -241,7 +246,8 @@ describe("Test Analysis CLI command functionality", () => {
 
   test("Cobol - getServerPath", () => {
     const testAnalysis = new RunAnalysis(
-        vscode.Uri.parse(context.globalStorageUri), vscode.Uri.parse(context.extensionUri),
+      vscode.Uri.parse(context.globalStorageUri),
+      vscode.Uri.parse(context.extensionUri),
     );
 
     let result = (testAnalysis as any).getServerPath("initialPath", "win32");

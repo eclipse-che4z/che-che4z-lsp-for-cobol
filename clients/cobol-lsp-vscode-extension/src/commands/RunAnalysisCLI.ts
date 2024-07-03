@@ -215,9 +215,7 @@ export class RunAnalysis {
       );
       if (fileStatResult.type === vscode.FileType.Directory) {
         const newFileName = Date.now() + ".cbl";
-        const newUri = vscode.Uri.parse(
-          this.globalStorageUri.path + "/" + newFileName,
-        );
+        const newUri = vscode.Uri.joinPath(this.globalStorageUri, newFileName);
         await vscode.workspace.fs.writeFile(newUri, Buffer.from(data));
         return newUri.fsPath;
       }
