@@ -54,7 +54,8 @@ export class CopybookDownloadService {
     documentUri: string,
   ): Promise<boolean> {
     if (
-      await this.e4eDownloader?.downloadCopybookE4E(documentUri, copybookName)
+      this.handleAsEndevorElement(documentUri) &&
+      (await this.e4eDownloader?.downloadCopybookE4E(documentUri, copybookName))
     ) {
       return true;
     }
