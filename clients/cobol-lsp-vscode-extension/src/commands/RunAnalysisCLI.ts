@@ -214,8 +214,33 @@ export class RunAnalysis {
         this.globalStorageUri,
       );
       if (fileStatResult.type === vscode.FileType.Directory) {
+        const tempFolderUri = vscode.Uri.joinPath(
+          this.globalStorageUri,
+          "/tempAnalysisFiles",
+        );
+        try {
+          const tempFolderStatResult = await vscode.workspace.fs.stat(
+            tempFolderUri,
+          );
+          if (tempFolderStatResult.type === vscode.FileType.Directory) {
+            const tempFolderResult = await vscode.workspace.fs.readDirectory(
+              tempFolderUri,
+            );
+            tempFolderResult.map(async (value) => {
+              await vscode.workspace.fs.delete(
+                vscode.Uri.joinPath(tempFolderUri, value[0]),
+              );
+            });
+            await vscode.workspace.fs.createDirectory(tempFolderUri);
+          } else {
+            return "";
+          }
+        } catch {
+          // Throws exception if the directory does not exist.
+          await vscode.workspace.fs.createDirectory(tempFolderUri);
+        }
         const newFileName = Date.now() + ".cbl";
-        const newUri = vscode.Uri.joinPath(this.globalStorageUri, newFileName);
+        const newUri = vscode.Uri.joinPath(tempFolderUri, newFileName);
         await vscode.workspace.fs.writeFile(newUri, Buffer.from(data));
         return newUri.fsPath;
       }
