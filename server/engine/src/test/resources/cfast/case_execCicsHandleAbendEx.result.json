@@ -1,0 +1,94 @@
+[
+  {
+    "name": "CBACT01C",
+    "type": "program",
+    "location": {
+      "uri": "fake/path",
+      "start": {
+        "line": 3,
+        "character": 8
+      },
+      "end": {
+        "line": 7,
+        "character": 32
+      }
+    },
+    "children": [
+      {
+        "type": "if",
+        "location": {
+          "uri": "fake/path",
+          "start": {
+            "line": 4,
+            "character": 12
+          },
+          "end": {
+            "line": 7,
+            "character": 31
+          }
+        }
+      },
+      {
+        "handleType": "LABEL",
+        "value": "HANDLE-ABEND",
+        "type": "execcicshandle",
+        "location": {
+          "uri": "fake/path",
+          "start": {
+            "line": 5,
+            "character": 14
+          },
+          "end": {
+            "line": 6,
+            "character": 23
+          }
+        }
+      },
+      {
+        "type": "endexec",
+        "location": {
+          "uri": "fake/path",
+          "start": {
+            "line": 5,
+            "character": 14
+          },
+          "end": {
+            "line": 6,
+            "character": 23
+          }
+        }
+      },
+      {
+        "targetName": [
+          "CALCULATION"
+        ],
+        "type": "goto",
+        "location": {
+          "uri": "fake/path",
+          "start": {
+            "line": 7,
+            "character": 14
+          },
+          "end": {
+            "line": 7,
+            "character": 31
+          }
+        }
+      },
+      {
+        "type": "endif",
+        "location": {
+          "uri": "fake/path",
+          "start": {
+            "line": 4,
+            "character": 12
+          },
+          "end": {
+            "line": 7,
+            "character": 31
+          }
+        }
+      }
+    ]
+  }
+]
