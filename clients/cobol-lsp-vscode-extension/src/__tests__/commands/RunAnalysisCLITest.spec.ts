@@ -130,8 +130,13 @@ describe("Test Analysis CLI command functionality", () => {
 
     expect(runCobolAnalysisCommandSpy).toHaveBeenCalled();
     expect(getCurrentFileLocationSpy).toHaveBeenCalled();
-    expect(buildJavaCommandSpy).toHaveBeenCalled();
-    expect(buildAnalysisCommandPortionSpy).toHaveBeenCalled();
+    expect(buildJavaCommandSpy).toHaveBeenCalledWith("/storagePath");
+    expect(buildJavaCommandSpy).toHaveReturnedWith(
+      'java -jar "undefined/server/jar/server.jar" analysis -s "/storagePath" -cf=.',
+    );
+    expect(buildAnalysisCommandPortionSpy).toHaveReturnedWith(
+      'analysis -s "/storagePath" -cf=.',
+    );
     expect(sendToTerminalSpy).toHaveBeenCalled();
 
     expect(buildNativeCommandSpy).toHaveBeenCalledTimes(0);
@@ -175,8 +180,13 @@ describe("Test Analysis CLI command functionality", () => {
 
     expect(runCobolAnalysisCommandSpy).toHaveBeenCalled();
     expect(getCurrentFileLocationSpy).toHaveBeenCalled();
-    expect(buildNativeCommandSpy).toHaveBeenCalled();
-    expect(buildAnalysisCommandPortionSpy).toHaveBeenCalled();
+    expect(buildNativeCommandSpy).toHaveBeenCalledWith(
+      "/storagePath",
+      process.platform,
+    );
+    expect(buildAnalysisCommandPortionSpy).toHaveReturnedWith(
+      'analysis -s "/storagePath" -cf=.',
+    );
     expect(sendToTerminalSpy).toHaveBeenCalled();
 
     expect(buildJavaCommandSpy).toHaveBeenCalledTimes(0);

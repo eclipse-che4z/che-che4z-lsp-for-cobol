@@ -210,40 +210,24 @@ export class RunAnalysis {
     const data = vscode.window.activeTextEditor?.document.getText();
 
     if (data) {
-      const fileStatResult = await vscode.workspace.fs.stat(
+      const tempFolderUri = vscode.Uri.joinPath(
         this.globalStorageUri,
+        "/tempAnalysisFiles",
       );
-      if (fileStatResult.type === vscode.FileType.Directory) {
-        const tempFolderUri = vscode.Uri.joinPath(
-          this.globalStorageUri,
-          "/tempAnalysisFiles",
+      await vscode.workspace.fs.createDirectory(tempFolderUri);
+      const tempFolderResult = await vscode.workspace.fs.readDirectory(
+        tempFolderUri,
+      );
+      tempFolderResult.map(async (value) => {
+        await vscode.workspace.fs.delete(
+          vscode.Uri.joinPath(tempFolderUri, value[0]),
         );
-        try {
-          const tempFolderStatResult = await vscode.workspace.fs.stat(
-            tempFolderUri,
-          );
-          if (tempFolderStatResult.type === vscode.FileType.Directory) {
-            const tempFolderResult = await vscode.workspace.fs.readDirectory(
-              tempFolderUri,
-            );
-            tempFolderResult.map(async (value) => {
-              await vscode.workspace.fs.delete(
-                vscode.Uri.joinPath(tempFolderUri, value[0]),
-              );
-            });
-            await vscode.workspace.fs.createDirectory(tempFolderUri);
-          } else {
-            return "";
-          }
-        } catch {
-          // Throws exception if the directory does not exist.
-          await vscode.workspace.fs.createDirectory(tempFolderUri);
-        }
-        const newFileName = Date.now() + ".cbl";
-        const newUri = vscode.Uri.joinPath(tempFolderUri, newFileName);
-        await vscode.workspace.fs.writeFile(newUri, Buffer.from(data));
-        return newUri.fsPath;
-      }
+      });
+
+      const newFileName = Date.now() + ".cbl";
+      const newUri = vscode.Uri.joinPath(tempFolderUri, newFileName);
+      await vscode.workspace.fs.writeFile(newUri, Buffer.from(data));
+      return newUri.fsPath;
     }
 
     return "";
