@@ -81,12 +81,20 @@ jest.mock("vscode", () => ({
     workspaceFolders: [{ uri: { fsPath: "ws-path" } } as any],
     fs: {
       createDirectory: jest.fn(),
+      readDirectory: jest.fn().mockReturnValue([]),
       stat: jest.fn().mockReturnValue(2),
+      writeFile: jest.fn(),
     },
   },
   Uri: {
     file: jest.fn().mockReturnValue("workspaceFolder2"),
     parse: jest.fn().mockReturnValue({ path: "/storagePath" }),
+    joinPath: jest.fn().mockImplementation((inputUri: vscode.Uri, path) => {
+      return {
+        path: inputUri.path + path,
+        fsPath: inputUri.fsPath + path,
+      };
+    }),
   },
 }));
 
