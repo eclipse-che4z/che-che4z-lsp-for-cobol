@@ -232,8 +232,25 @@ class Db2SqlVisitor extends Db2SqlParserBaseVisitor<List<Node>> {
     public List<Node> visitSqlCode(Db2SqlParser.SqlCodeContext ctx) {
         //    String intervalText = VisitorHelper.getIntervalText(ctx);
         String sqlCode = preProcessSqlComment(ctx);
+
         List<Node> nodes = this.visitStartSqlRule(parseSQL(sqlCode, ctx));
         Db2SqlVisitorHelper.adjustNodeLocations(ctx, context, nodes);
+
+        Locality locality =
+            VisitorHelper.buildNameRangeLocality(
+                ctx.getParent(), VisitorHelper.getName(ctx.getParent()), context.getProgramDocumentUri());
+        Location location = context.getExtendedDocument().mapLocation(locality.getRange());
+        locality = Locality.builder().range(location.getRange()).uri(location.getUri()).build();
+
+        boolean isWhenever = nodes.stream().anyMatch(n ->
+            n.getDepthFirstStream().anyMatch(nd -> nd instanceof ExecSqlWheneverNode));
+
+        if (!isWhenever) {
+            Node sqlNode = new ExecSqlNode(locality);
+            nodes = new LinkedList<>(nodes);
+            nodes.add(0, sqlNode);
+        }
+
         return nodes;
     }
 

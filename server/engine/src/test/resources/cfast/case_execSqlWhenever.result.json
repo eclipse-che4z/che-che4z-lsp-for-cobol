@@ -9,7 +9,7 @@
         "character": 9
       },
       "end": {
-        "line": 21,
+        "line": 25,
         "character": 31
       }
     },
@@ -107,17 +107,45 @@
         }
       },
       {
+        "type": "execsql",
+        "location": {
+          "uri": "fake/path",
+          "start": {
+            "line": 20,
+            "character": 12
+          },
+          "end": {
+            "line": 22,
+            "character": 45
+          }
+        }
+      },
+      {
+        "type": "endexec",
+        "location": {
+          "uri": "fake/path",
+          "start": {
+            "line": 20,
+            "character": 12
+          },
+          "end": {
+            "line": 22,
+            "character": 45
+          }
+        }
+      },
+      {
         "snippet": "HANDLER.\r\n            DISPLAY \"HANDLER\".",
         "name": "HANDLER",
         "type": "paragraph",
         "location": {
           "uri": "fake/path",
           "start": {
-            "line": 20,
+            "line": 24,
             "character": 9
           },
           "end": {
-            "line": 21,
+            "line": 25,
             "character": 31
           }
         }
