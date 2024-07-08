@@ -17,5 +17,9 @@
            EXEC SQL  WHENEVER SQLERROR GO TO HANDLER  END-EXEC.
            EXEC SQL  WHENEVER SQLERROR CONTINUE  END-EXEC.
 
+           EXEC SQL
+               SELECT ABC FROM XYZ;
+           END-EXEC.
+
         HANDLER.
             DISPLAY "HANDLER".
