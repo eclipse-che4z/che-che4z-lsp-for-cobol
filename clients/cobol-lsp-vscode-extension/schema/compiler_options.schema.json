@@ -12,6 +12,9 @@
       },
       {
         "pattern": "(?i)(QUALIFY|QUA)\\s*\\(\\s*(COMPAT|C_CHAR|EXTEND|E_CHAR)\\s*\\)"
+      },
+      {
+        "pattern": "(?i)STDSQL\\s*\\(\\s*(YES|NO)\\s*\\)"
       }
     ]
   }

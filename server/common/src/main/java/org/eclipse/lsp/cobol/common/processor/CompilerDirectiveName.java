@@ -77,6 +77,22 @@ public enum CompilerDirectiveName {
     public CompilerDirectiveOption defaultValue() {
       return new CompilerDirectiveOption(this, ImmutableList.of("XMLSS"));
     }
+  },
+  STDSQL {
+    @Override
+    public Optional<CompilerDirectiveOption> getDirectiveOption(String directiveText) {
+      if (isContains(directiveText, "STDSQL(YES)")) {
+        return Optional.of(new CompilerDirectiveOption(this, ImmutableList.of("YES")));
+      } else if (isContains(directiveText, "STDSQL(NO)")) {
+        return Optional.of(new CompilerDirectiveOption(this, ImmutableList.of("NO")));
+      } else {
+        return Optional.empty();
+      }
+    }
+    @Override
+    public CompilerDirectiveOption defaultValue() {
+      return new CompilerDirectiveOption(this, ImmutableList.of("NO"));
+    }
   };
 
   private static boolean isContains(String directiveText, String s) {

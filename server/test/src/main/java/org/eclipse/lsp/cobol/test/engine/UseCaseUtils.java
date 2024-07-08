@@ -124,7 +124,7 @@ public class UseCaseUtils {
 
     CopybookService copybookService = injector.getInstance(CopybookService.class);
     CleanerPreprocessor preprocessor = dialectService.getPreprocessor(languageId);
-    PredefinedCopybookUtils.loadPredefinedCopybooks(useCase.getSqlBackend(), useCase.getCopybooks(), useCase.documentUri)
+    PredefinedCopybookUtils.loadPredefinedCopybooks(useCase.getSqlBackend(), useCase.getCopybooks(), useCase.documentUri, useCase.compilerOptions)
         .forEach(pc -> copybookService.store(pc, preprocessor));
 
     useCase.getCopybooks()

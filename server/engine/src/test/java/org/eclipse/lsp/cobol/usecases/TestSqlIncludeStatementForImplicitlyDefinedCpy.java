@@ -54,6 +54,26 @@ class TestSqlIncludeStatementForImplicitlyDefinedCpy {
                   + "           DISPLAY  {$SQLN}.\n"
                   + "           DISPLAY  {$SQLD}.\n";
 
+  private static final String TEXT_BACKEND_DB2_STDSQL =
+          "       IDENTIFICATION DIVISION.\n"
+                  + "       PROGRAM-ID. HELLO-DB2.\n"
+                  + "       DATA DIVISION.\n"
+                  + "       WORKING-STORAGE SECTION.\n"
+                  + "           EXEC SQL INCLUDE {~SQLCA} END-EXEC.\n"
+                  + "           EXEC SQL INCLUDE {~SQLDA} END-EXEC.\n"
+                  + "       PROCEDURE DIVISION.\n"
+                  + "           MOVE 23 TO {$SQLCAID}  OF  {$SQLCA}.\n"
+                  + "           MOVE 63 TO {$SQLCABC} OF  {$SQLCA}.\n"
+                  + "           MOVE 00 TO {$SQLCADE} OF  {$SQLCA}.\n"
+                  + "           MOVE 144 TO {$SQLN} OF  {$SQLDA}.\n"
+                  + "           MOVE 200 TO {$SQLD} OF  {$SQLDA}.\n"
+                  + "           IF {$SQLCADE} = ZERO  THEN  DISPLAY \"SUCCESS SQLCODE = \" {$SQLCADE}\n "
+                  + "           ELSE DISPLAY \" FAIL SQLEXT = \"  {$SQLEXT}.\n"
+                  + "           DISPLAY  {$SQLSTAT} .\n"
+                  + "           DISPLAY  {$SQLERRMC}.\n"
+                  + "           DISPLAY  {$SQLN}.\n"
+                  + "           DISPLAY  {$SQLD}.\n";
+
   private static final String TEXT_BACKEND_DATACOM =
           "       IDENTIFICATION DIVISION.\n"
                   + "       PROGRAM-ID. HELLO-DB2.\n"
@@ -179,5 +199,22 @@ class TestSqlIncludeStatementForImplicitlyDefinedCpy {
             ImmutableMap.of(),
             ImmutableList.of(),
             AnalysisConfig.defaultConfig(CopybookProcessingMode.ENABLED));
+  }
+
+  @Test
+  void testStdSql() {
+    AnalysisConfig analysisConfig = new AnalysisConfig(
+            CopybookProcessingMode.ENABLED,
+            ImmutableList.of(), true,
+            ImmutableList.of(),
+            ImmutableMap.of("target-sql-backend", new JsonPrimitive("DB2_SERVER")));
+    analysisConfig.getCompilerOptions().add("STDSQL(YES)");
+
+    UseCaseEngine.runTest(
+            TEXT_BACKEND_DB2_STDSQL,
+            ImmutableList.of(),
+            ImmutableMap.of(),
+            ImmutableList.of(),
+            analysisConfig);
   }
 }
