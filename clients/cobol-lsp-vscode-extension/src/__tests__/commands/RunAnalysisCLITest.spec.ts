@@ -87,8 +87,6 @@ jest.mock("vscode", () => ({
     },
   },
   Uri: {
-    file: jest.fn().mockReturnValue("workspaceFolder2"),
-    parse: jest.fn().mockReturnValue({ path: "/storagePath" }),
     joinPath: jest.fn().mockImplementation((inputUri: vscode.Uri, path) => {
       return {
         path: inputUri.path + path,
@@ -107,8 +105,8 @@ const context: any = {
 describe("Test Analysis CLI command functionality", () => {
   test("Cobol Analysis - Java", async () => {
     const testAnalysis = new RunAnalysis(
-      vscode.Uri.parse(context.globalStorageUri),
-      vscode.Uri.parse(context.extensionUri),
+      context.globalStorageUri,
+      context.extensionUri,
     );
     vscode.window.showQuickPick = jest.fn().mockReturnValue("Java");
 
@@ -140,7 +138,7 @@ describe("Test Analysis CLI command functionality", () => {
     expect(getCurrentFileLocationSpy).toHaveBeenCalled();
     expect(buildJavaCommandSpy).toHaveBeenCalledWith("/storagePath");
     expect(buildJavaCommandSpy).toHaveReturnedWith(
-      'java -jar "undefined/server/jar/server.jar" analysis -s "/storagePath" -cf=.',
+      'java -jar "/test/server/jar/server.jar" analysis -s "/storagePath" -cf=.',
     );
     expect(buildAnalysisCommandPortionSpy).toHaveReturnedWith(
       'analysis -s "/storagePath" -cf=.',
@@ -152,15 +150,10 @@ describe("Test Analysis CLI command functionality", () => {
 
   test("Cobol Analysis - Native", async () => {
     const testAnalysis = new RunAnalysis(
-      vscode.Uri.parse(context.globalStorageUri),
-      vscode.Uri.parse(context.extensionUri),
+      context.globalStorageUri,
+      context.extensionUri,
     );
     vscode.window.showQuickPick = jest.fn().mockReturnValue("Native");
-
-    if (vscode.window.activeTextEditor) {
-      (vscode.window.activeTextEditor.document.uri.path as any) =
-        vscode.Uri.parse("/storagePath");
-    }
 
     const runCobolAnalysisCommandSpy = jest.spyOn(
       testAnalysis as any,
@@ -202,8 +195,8 @@ describe("Test Analysis CLI command functionality", () => {
 
   test("Cobol Analysis - Undefined Type", async () => {
     const testAnalysis = new RunAnalysis(
-      vscode.Uri.parse(context.globalStorageUri),
-      vscode.Uri.parse(context.extensionUri),
+      context.globalStorageUri,
+      context.extensionUri,
     );
     vscode.window.showQuickPick = jest.fn().mockReturnValue(undefined);
 
@@ -217,7 +210,11 @@ describe("Test Analysis CLI command functionality", () => {
     );
     const buildJavaCommandSpy = jest.spyOn(
       testAnalysis as any,
-      "buildNativeCommand",
+      "buildJavaCommand",
+    );
+    const buildNativeCommandSpy = jest.spyOn(
+        testAnalysis as any,
+        "buildNativeCommand",
     );
 
     await testAnalysis.runCobolAnalysisCommand();
@@ -225,12 +222,13 @@ describe("Test Analysis CLI command functionality", () => {
     expect(runCobolAnalysisCommandSpy).toHaveBeenCalled();
     expect(getVersionToRunSpy).toHaveBeenCalled();
     expect(buildJavaCommandSpy).not.toHaveBeenCalled();
+    expect(buildNativeCommandSpy).not.toHaveBeenCalled();
   });
 
   test("Cobol Analysis - Save temp file", async () => {
     const testAnalysis = new RunAnalysis(
-      vscode.Uri.parse(context.globalStorageUri),
-      vscode.Uri.parse(context.extensionUri),
+      context.globalStorageUri,
+      context.extensionUri,
     );
     vscode.window.showQuickPick = jest.fn().mockReturnValue("Java");
     if (vscode.window.activeTextEditor) {
@@ -253,8 +251,8 @@ describe("Test Analysis CLI command functionality", () => {
 
   test("Cobol - Java - No file location", () => {
     const testAnalysis = new RunAnalysis(
-      vscode.Uri.parse(context.globalStorageUri),
-      vscode.Uri.parse(context.extensionUri),
+      context.globalStorageUri,
+      context.extensionUri,
     );
 
     const result = (testAnalysis as any).buildJavaCommand("");
@@ -264,8 +262,8 @@ describe("Test Analysis CLI command functionality", () => {
 
   test("Cobol - getServerPath", () => {
     const testAnalysis = new RunAnalysis(
-      vscode.Uri.parse(context.globalStorageUri),
-      vscode.Uri.parse(context.extensionUri),
+      context.globalStorageUri,
+      context.extensionUri,
     );
 
     let result = (testAnalysis as any).getServerPath("initialPath", "win32");
