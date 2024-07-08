@@ -212,7 +212,7 @@ export class RunAnalysis {
     if (data) {
       const tempFolderUri = vscode.Uri.joinPath(
         this.globalStorageUri,
-        "/tempAnalysisFiles",
+        "tempAnalysisFiles",
       );
       await vscode.workspace.fs.createDirectory(tempFolderUri);
       const tempFolderResult = await vscode.workspace.fs.readDirectory(
