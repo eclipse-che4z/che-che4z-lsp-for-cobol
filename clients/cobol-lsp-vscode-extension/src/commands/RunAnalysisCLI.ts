@@ -218,11 +218,13 @@ export class RunAnalysis {
       const tempFolderResult = await vscode.workspace.fs.readDirectory(
         tempFolderUri,
       );
-      tempFolderResult.map(async (value) => {
-        await vscode.workspace.fs.delete(
-          vscode.Uri.joinPath(tempFolderUri, value[0]),
-        );
-      });
+      await Promise.all(
+        tempFolderResult.map(async (value) => {
+          await vscode.workspace.fs.delete(
+            vscode.Uri.joinPath(tempFolderUri, value[0]),
+          );
+        }),
+      );
 
       const newFileName = Date.now() + ".cbl";
       const newUri = vscode.Uri.joinPath(tempFolderUri, newFileName);
