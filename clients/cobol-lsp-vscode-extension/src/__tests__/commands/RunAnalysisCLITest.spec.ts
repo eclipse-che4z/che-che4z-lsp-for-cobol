@@ -213,8 +213,8 @@ describe("Test Analysis CLI command functionality", () => {
       "buildJavaCommand",
     );
     const buildNativeCommandSpy = jest.spyOn(
-        testAnalysis as any,
-        "buildNativeCommand",
+      testAnalysis as any,
+      "buildNativeCommand",
     );
 
     await testAnalysis.runCobolAnalysisCommand();
