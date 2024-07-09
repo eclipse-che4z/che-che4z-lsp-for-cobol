@@ -9,7 +9,7 @@
         "character": 9
       },
       "end": {
-        "line": 25,
+        "line": 26,
         "character": 31
       }
     },
@@ -46,7 +46,7 @@
         }
       },
       {
-        "wheneverCondition": "SQLERROR",
+        "wheneverCondition": "SQLWARNING",
         "wheneverType": "GOTO",
         "value": "HANDLER",
         "type": "execwhenever",
@@ -58,7 +58,7 @@
           },
           "end": {
             "line": 17,
-            "character": 49
+            "character": 51
           }
         }
       },
@@ -72,7 +72,7 @@
           },
           "end": {
             "line": 17,
-            "character": 49
+            "character": 51
           }
         }
       },
@@ -107,15 +107,46 @@
         }
       },
       {
+        "wheneverCondition": "NOT_FOUND",
+        "wheneverType": "GOTO",
+        "value": "HANDLER",
+        "type": "execwhenever",
+        "location": {
+          "uri": "fake/path",
+          "start": {
+            "line": 19,
+            "character": 22
+          },
+          "end": {
+            "line": 19,
+            "character": 49
+          }
+        }
+      },
+      {
+        "type": "endexec",
+        "location": {
+          "uri": "fake/path",
+          "start": {
+            "line": 19,
+            "character": 22
+          },
+          "end": {
+            "line": 19,
+            "character": 49
+          }
+        }
+      },
+      {
         "type": "execsql",
         "location": {
           "uri": "fake/path",
           "start": {
-            "line": 20,
+            "line": 21,
             "character": 12
           },
           "end": {
-            "line": 22,
+            "line": 23,
             "character": 45
           }
         }
@@ -125,11 +156,11 @@
         "location": {
           "uri": "fake/path",
           "start": {
-            "line": 20,
+            "line": 21,
             "character": 12
           },
           "end": {
-            "line": 22,
+            "line": 23,
             "character": 45
           }
         }
@@ -141,11 +172,11 @@
         "location": {
           "uri": "fake/path",
           "start": {
-            "line": 24,
+            "line": 25,
             "character": 9
           },
           "end": {
-            "line": 25,
+            "line": 26,
             "character": 31
           }
         }

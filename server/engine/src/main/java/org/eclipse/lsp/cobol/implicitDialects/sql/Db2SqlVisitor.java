@@ -474,17 +474,24 @@ class Db2SqlVisitor extends Db2SqlParserBaseVisitor<List<Node>> {
         Pair<ExecSqlWheneverNode.WheneverType, String> result = Pair.of(ExecSqlWheneverNode.WheneverType.CONTINUE, null);
 
         if (ruleContext.getChildCount() > 3) {
-            ParseTree pt = ruleContext.getChild(2);
+
+            int index = 2;
+            ParseTree pt = ruleContext.getChild(index);
             String value = pt.getText().trim().toUpperCase();
+            if (Objects.equals(value, "FOUND")) {
+                index = 3;
+                pt = ruleContext.getChild(index);
+                value = pt.getText().trim().toUpperCase();
+            }
 
             if (Objects.equals(value, "DO")) {
-                result = Pair.of(ExecSqlWheneverNode.WheneverType.DO, ruleContext.getChild(3).getText());
+                result = Pair.of(ExecSqlWheneverNode.WheneverType.DO, ruleContext.getChild(index + 1).getText());
             } else if (Objects.equals(value, "GO")) {
-                if (ruleContext.getChildCount() > 4) {
-                    result = Pair.of(ExecSqlWheneverNode.WheneverType.GOTO, ruleContext.getChild(4).getText());
+                if (ruleContext.getChildCount() > index + 2) {
+                    result = Pair.of(ExecSqlWheneverNode.WheneverType.GOTO, ruleContext.getChild(index + 2).getText());
                 }
             } else if (Objects.equals(value, "GOTO")) {
-                result = Pair.of(ExecSqlWheneverNode.WheneverType.GOTO, ruleContext.getChild(3).getText());
+                result = Pair.of(ExecSqlWheneverNode.WheneverType.GOTO, ruleContext.getChild(index + 1).getText());
             }
         }
         return result;
