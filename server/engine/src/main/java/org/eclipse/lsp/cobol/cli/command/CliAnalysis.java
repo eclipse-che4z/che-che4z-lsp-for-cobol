@@ -55,6 +55,12 @@ public class CliAnalysis implements Callable<Integer> {
             names = {"-d", "--dialect"},
             defaultValue = "COBOL")
     private CobolLanguageId dialect;
+    
+    @CommandLine.Option(
+            description = "Hide diagnostics",
+            names = {"-nd", "--no-diag", "--no-diagnostics", "--no-diagnostic"}
+    )
+    private boolean hideDiagnostics;
 
     @Override
     public Integer call() throws Exception {
@@ -78,18 +84,20 @@ public class CliAnalysis implements Callable<Integer> {
         try {
             Cli.Result analysisResult = parent.runAnalysis(src, dialect, diCtx, true);
             parent.addTiming(result, analysisResult.ctx.getBenchmarkSession());
-            JsonArray diagnostics = new JsonArray();
-            analysisResult
-                    .ctx
-                    .getAccumulatedErrors()
-                    .forEach(
-                            err -> {
-                                JsonObject diagnostic = CliUtils.diagnosticToJson(err);
-                                diagnostics.add(diagnostic);
-                            });
-            result.add("diagnostics", diagnostics);
-            result.addProperty("lines", String.valueOf(analysisResult.ctx.getExtendedDocument().toString().split("\n").length));
-            result.addProperty("size", String.valueOf(analysisResult.ctx.getExtendedDocument().toString().length()));
+            if (!hideDiagnostics) {
+                JsonArray diagnostics = new JsonArray();
+                analysisResult
+                        .ctx
+                        .getAccumulatedErrors()
+                        .forEach(
+                                err -> {
+                                    JsonObject diagnostic = CliUtils.diagnosticToJson(err);
+                                    diagnostics.add(diagnostic);
+                                });
+                result.add("diagnostics", diagnostics);
+                result.addProperty("lines", String.valueOf(analysisResult.ctx.getExtendedDocument().toString().split("\n").length));
+                result.addProperty("size", String.valueOf(analysisResult.ctx.getExtendedDocument().toString().length()));
+            }
             collectGcAndMemoryStats(result);
             System.out.println(CliUtils.GSON.toJson(result));
             return 0;
