@@ -55,7 +55,7 @@ public class CliAnalysis implements Callable<Integer> {
             names = {"-d", "--dialect"},
             defaultValue = "COBOL")
     private CobolLanguageId dialect;
-    
+
     @CommandLine.Option(
             description = "Hide diagnostics",
             names = {"-nd", "--no-diag", "--no-diagnostics", "--no-diagnostic"}
@@ -122,9 +122,9 @@ public class CliAnalysis implements Callable<Integer> {
                 garbageCollectionTime += time;
             }
         }
-        result.addProperty("gc.count", totalGarbageCollections);
+        result.addProperty("Garbage Collection Count", totalGarbageCollections);
         // milliseconds to seconds
-        result.addProperty("gc.time", garbageCollectionTime * 0.001);
+        result.addProperty("Garbage Collection Time", garbageCollectionTime * 0.001);
 
         List<MemoryPoolMXBean> pools = ManagementFactory.getMemoryPoolMXBeans();
         long total = 0;
@@ -134,7 +134,7 @@ public class CliAnalysis implements Callable<Integer> {
                 total = total + peakUsed;
             }
         }
-        result.addProperty("memory.heap_peak", total / 1024 / 1024);
+        result.addProperty("Peak Heap Memory", total / 1024 / 1024);
     }
 
     /**
