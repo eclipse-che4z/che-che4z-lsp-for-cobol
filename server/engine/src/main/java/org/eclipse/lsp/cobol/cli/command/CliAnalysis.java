@@ -47,8 +47,8 @@ public class CliAnalysis implements Callable<Integer> {
             description = "The COBOL program file.")
     private File src;
 
-    @CommandLine.ArgGroup(multiplicity = "1")
-    private Args args;
+    @CommandLine.ArgGroup(multiplicity = "0..1")
+    private Args args = new Args();
 
     @CommandLine.Option(
             description = "Supported dialect values: ${COMPLETION-CANDIDATES}",
@@ -159,7 +159,7 @@ public class CliAnalysis implements Callable<Integer> {
      */
     static class Args {
         @CommandLine.ArgGroup(exclusive = false)
-        ExplicitConfig explicitConfig;
+        ExplicitConfig explicitConfig = new ExplicitConfig();
 
         @CommandLine.ArgGroup(exclusive = false)
         WorkspaceConfig workspaceConfig;
