@@ -18,6 +18,7 @@ import com.google.gson.*;
 import com.google.inject.Injector;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -93,7 +94,7 @@ public class Cli implements Callable<Integer> {
     }
   }
 
-  void initProcessorGroupsReader(Path workspace) {
+  void initProcessorGroupsReader(Path workspace) throws IOException {
     if (workspace == null) {
       return;
     }
@@ -104,9 +105,11 @@ public class Cli implements Callable<Integer> {
         processorGroupsResolver = new ProcessorGroupsResolver(new String(Files.readAllBytes(programConfig)), new String(Files.readAllBytes(groupsConfig)));
       } catch (IOException e) {
         LOG.error("Processor group configuration read error", e);
+        throw new IOException(e.getMessage());
       }
     } else {
       LOG.warn("Processor group configuration is missing");
+      throw new FileNotFoundException("Processor group configuration is missing");
     }
   }
 

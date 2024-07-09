@@ -58,8 +58,14 @@ public class CliAnalysis implements Callable<Integer> {
 
     @Override
     public Integer call() throws Exception {
-        if (args.workspaceConfig != null)
-            parent.initProcessorGroupsReader(args.workspaceConfig.workspace);
+        if (args.workspaceConfig != null) {
+            try {
+                parent.initProcessorGroupsReader(args.workspaceConfig.workspace);
+            } catch (Exception e) {
+                return 2;
+            }
+        }
+
 
         Injector diCtx = Guice.createInjector(new CliModule());
         CliClientProvider cliClientProvider = diCtx.getInstance(CliClientProvider.class);
