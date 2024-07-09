@@ -157,6 +157,27 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
+  buildWeb:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Unit Test COBOL LS Web extension
+        working-directory: clients/cobol-lsp-vscode-extension
+        run: |
+          npm ci
+          npm run test:web
+      - name: Package COBOL LS vsix for Web
+        working-directory: clients/cobol-lsp-vscode-extension
+        run: |
+          npm ci
+          npm run package:web
+          cp *.vsix ../../.
+      - name: Upload Web vsix
+        uses: actions/upload-artifact@v3
+        with:
+          if-no-files-found: warn
+          name: vsix-cobol-language-support-web
+          path: 'cobol-language-support-web*.vsix'
 
   buildNative:
     strategy:
