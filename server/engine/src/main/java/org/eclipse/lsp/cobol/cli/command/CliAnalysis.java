@@ -19,15 +19,21 @@ import com.google.gson.JsonObject;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import java.io.File;
+import java.io.IOException;
 import java.lang.management.GarbageCollectorMXBean;
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryPoolMXBean;
 import java.lang.management.MemoryType;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
+
+import lombok.extern.slf4j.Slf4j;
+
 import org.eclipse.lsp.cobol.cli.di.CliModule;
 import org.eclipse.lsp.cobol.cli.modules.CliClientProvider;
 import org.eclipse.lsp.cobol.common.dialects.CobolLanguageId;
@@ -37,6 +43,7 @@ import picocli.CommandLine;
  * Analysis cli command
  */
 @CommandLine.Command(name = "analysis", description = "analyse cobol source")
+@Slf4j
 public class CliAnalysis implements Callable<Integer> {
     @CommandLine.ParentCommand
     private Cli parent;
@@ -62,11 +69,9 @@ public class CliAnalysis implements Callable<Integer> {
     )
     private boolean hideDiagnostics;
 
-    @CommandLine.Option(
-            description = "Produce extended source",
-            names = {"-es", "-ex", "--extended-source"}
-    )
-    private boolean produceExtendedSource;
+    @CommandLine.ArgGroup(exclusive = false)
+    private ExtendedSourceConfig extendedSourceConfig = new ExtendedSourceConfig();
+
 
     @Override
     public Integer call() throws Exception {
@@ -107,11 +112,7 @@ public class CliAnalysis implements Callable<Integer> {
             collectGcAndMemoryStats(result);
             System.out.println(CliUtils.GSON.toJson(result));
 
-            if (produceExtendedSource) {
-                System.out.println("------------ Extended Source Begins Below -----------");
-                String formattedExtendedDoc = "       " + analysisResult.ctx.getExtendedDocument().toString().trim(); // Trim removes the necessary spaces prior to the first line of COBOL code thus it must be put back in.
-                System.out.println(formattedExtendedDoc);
-            }
+            handleExtendedSource(analysisResult);
             return 0;
         } catch (Exception e) {
             result.addProperty("crash", e.getMessage() != null && e.getMessage().isEmpty() ? "error" : e.getMessage());
@@ -175,6 +176,23 @@ public class CliAnalysis implements Callable<Integer> {
     }
 
     /**
+     * extended source options
+     */
+    static class ExtendedSourceConfig {
+        @CommandLine.Option(
+                description = "Print extended source to terminal",
+                names = {"-es", "-ex", "--extended-source"}
+        )
+        private boolean printExtendedSource;
+
+        @CommandLine.Option(
+                description = "Path where to save extended output",
+                names = {"-esf", "-exf", "--save-extended-source"}
+        )
+        private File extendedSourcePath;
+    }
+
+    /**
      * options for analysis command
      */
     static class Args {
@@ -183,6 +201,30 @@ public class CliAnalysis implements Callable<Integer> {
 
         @CommandLine.ArgGroup(exclusive = false)
         WorkspaceConfig workspaceConfig;
+    }
+
+    private void handleExtendedSource(Cli.Result analysisResult) {
+        String formattedExtendedDoc = "       " + analysisResult.ctx.getExtendedDocument().toString().trim(); // Trim removes the necessary spaces prior to the first line of COBOL code thus it must be put back in.
+        if (extendedSourceConfig.printExtendedSource) {
+            System.out.println("\n------------ Extended Source Begins Below -----------");
+            System.out.println(formattedExtendedDoc);
+        }
+
+        if (extendedSourceConfig.extendedSourcePath != null) {
+            Path outputPath = extendedSourceConfig.extendedSourcePath.toPath();
+            try {
+                if (outputPath.toString().toLowerCase().contains(".cbl")) {
+                    Files.createDirectories(outputPath.getParent());
+                } else {
+                    Files.createDirectories(outputPath);
+                    outputPath = outputPath.resolve("extended-source.cbl");
+                }
+
+                Files.write(outputPath, formattedExtendedDoc.getBytes(StandardCharsets.UTF_8));
+            } catch (IOException e) {
+                System.out.println(e.getMessage());
+            }
+        }
     }
 
     private List<File> createCopybooksPaths() {
