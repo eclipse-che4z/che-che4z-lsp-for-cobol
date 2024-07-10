@@ -47,7 +47,7 @@ public class CliAnalysis implements Callable<Integer> {
             description = "The COBOL program file.")
     private File src;
 
-    @CommandLine.ArgGroup(multiplicity = "0..1")
+    @CommandLine.ArgGroup()
     private Args args = new Args();
 
     @CommandLine.Option(
@@ -58,9 +58,15 @@ public class CliAnalysis implements Callable<Integer> {
 
     @CommandLine.Option(
             description = "Hide diagnostics",
-            names = {"-nd", "--no-diag", "--no-diagnostics", "--no-diagnostic"}
+            names = {"-nd", "--no-diag", "--no-diagnostic", "--no-diagnostics"}
     )
     private boolean hideDiagnostics;
+
+    @CommandLine.Option(
+            description = "Produce extended source",
+            names = {"-es", "-ex", "--extended-source"}
+    )
+    private boolean produceExtendedSource;
 
     @Override
     public Integer call() throws Exception {
@@ -100,6 +106,12 @@ public class CliAnalysis implements Callable<Integer> {
             }
             collectGcAndMemoryStats(result);
             System.out.println(CliUtils.GSON.toJson(result));
+
+            if (produceExtendedSource) {
+                System.out.println("------------ Extended Source Begins Below -----------");
+                String formattedExtendedDoc = "       " + analysisResult.ctx.getExtendedDocument().toString().trim(); // Trim removes the necessary spaces prior to the first line of COBOL code thus it must be put back in.
+                System.out.println(formattedExtendedDoc);
+            }
             return 0;
         } catch (Exception e) {
             result.addProperty("crash", e.getMessage() != null && e.getMessage().isEmpty() ? "error" : e.getMessage());
