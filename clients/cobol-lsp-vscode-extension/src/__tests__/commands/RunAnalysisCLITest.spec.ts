@@ -108,7 +108,10 @@ describe("Test Analysis CLI command functionality", () => {
       context.globalStorageUri,
       context.extensionUri,
     );
-    vscode.window.showQuickPick = jest.fn().mockReturnValue("Java");
+    vscode.window.showQuickPick = jest
+      .fn()
+      .mockReturnValueOnce("Java")
+      .mockReturnValue("Show");
 
     const runCobolAnalysisCommandSpy = jest.spyOn(
       testAnalysis as any,
@@ -136,7 +139,7 @@ describe("Test Analysis CLI command functionality", () => {
 
     expect(runCobolAnalysisCommandSpy).toHaveBeenCalled();
     expect(getCurrentFileLocationSpy).toHaveBeenCalled();
-    expect(buildJavaCommandSpy).toHaveBeenCalledWith("/storagePath");
+    expect(buildJavaCommandSpy).toHaveBeenCalledWith("/storagePath", true);
     expect(buildJavaCommandSpy).toHaveReturnedWith(
       'java -jar "/test/server/jar/server.jar" analysis -s "/storagePath" -cf=.',
     );
@@ -153,7 +156,10 @@ describe("Test Analysis CLI command functionality", () => {
       context.globalStorageUri,
       context.extensionUri,
     );
-    vscode.window.showQuickPick = jest.fn().mockReturnValue("Native");
+    vscode.window.showQuickPick = jest
+      .fn()
+      .mockReturnValueOnce("Native")
+      .mockReturnValue("Show");
 
     const runCobolAnalysisCommandSpy = jest.spyOn(
       testAnalysis as any,
@@ -184,6 +190,7 @@ describe("Test Analysis CLI command functionality", () => {
     expect(buildNativeCommandSpy).toHaveBeenCalledWith(
       "/storagePath",
       process.platform,
+      true,
     );
     expect(buildAnalysisCommandPortionSpy).toHaveReturnedWith(
       'analysis -s "/storagePath" -cf=.',
