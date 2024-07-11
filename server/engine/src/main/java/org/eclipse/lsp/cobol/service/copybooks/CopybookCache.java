@@ -19,6 +19,9 @@ import com.google.common.cache.CacheBuilder;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
+
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -56,11 +59,17 @@ public class CopybookCache {
 
   /** Invalidates only non-implicit copybook cache */
   public void invalidateAllNonImplicit() {
-    cache.invalidateAll(
+    List<CopybookId> toInvalidate =
         cache.asMap().entrySet().stream()
-             .filter(entry -> entry.getValue().getUri() != null)
-            .filter(entry -> !ImplicitCodeUtils.isImplicit(entry.getValue().getUri()))
-            .collect(Collectors.toList()));
+            .filter(this::shouldInvalidate)
+            .map(Map.Entry::getKey)
+            .collect(Collectors.toList());
+    cache.invalidateAll(toInvalidate);
+  }
+
+  private boolean shouldInvalidate(Map.Entry<CopybookId, CopybookModel> entry) {
+    CopybookModel model = entry.getValue();
+    return model.getUri() == null || !ImplicitCodeUtils.isImplicit(model.getUri());
   }
 
   /**
