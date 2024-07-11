@@ -18,8 +18,11 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.lang.management.GarbageCollectorMXBean;
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryPoolMXBean;
@@ -48,11 +51,8 @@ public class CliAnalysis implements Callable<Integer> {
     @CommandLine.ParentCommand
     private Cli parent;
 
-    @CommandLine.Option(
-            names = {"-s", "--source"},
-            required = true,
-            description = "The COBOL program file.")
-    private File src;
+    @CommandLine.ArgGroup(multiplicity = "1")
+    private InputConfig inputConfig = new InputConfig();
 
     @CommandLine.ArgGroup()
     private Args args = new Args();
@@ -83,6 +83,9 @@ public class CliAnalysis implements Callable<Integer> {
             }
         }
 
+        if (inputConfig.useStdin) {
+            createTemporaryFileFromInput();
+        }
 
         Injector diCtx = Guice.createInjector(new CliModule());
         CliClientProvider cliClientProvider = diCtx.getInstance(CliClientProvider.class);
@@ -90,10 +93,10 @@ public class CliAnalysis implements Callable<Integer> {
         cliClientProvider.setCpyPaths(createCopybooksPaths());
         cliClientProvider.setCpyExt(createCopybooksExtensions());
         JsonObject result = new JsonObject();
-        result.addProperty("uri", src.toURI().toString());
+        result.addProperty("uri", (inputConfig.useStdin) ? "N/A (User Input)" : inputConfig.src.toURI().toString());
         result.addProperty("language", dialect.getId());
         try {
-            Cli.Result analysisResult = parent.runAnalysis(src, dialect, diCtx, true);
+            Cli.Result analysisResult = parent.runAnalysis(inputConfig.src, dialect, diCtx, true);
             parent.addTiming(result, analysisResult.ctx.getBenchmarkSession());
             if (!hideDiagnostics) {
                 JsonArray diagnostics = new JsonArray();
@@ -148,6 +151,21 @@ public class CliAnalysis implements Callable<Integer> {
             }
         }
         result.addProperty("Peak Heap Memory", total / 1024 / 1024);
+    }
+
+    /**
+     * input config options
+     */
+    static class InputConfig {
+        @CommandLine.Option(
+                names = {"-s", "--source"},
+                description = "The COBOL program file.")
+        private File src;
+
+        @CommandLine.Option(
+                names = {"-si", "-sf", "--source-input", "--stdin"},
+                description = "Prompt to read input from stdin.")
+        private boolean useStdin;
     }
 
     /**
@@ -231,7 +249,7 @@ public class CliAnalysis implements Callable<Integer> {
         if (args.workspaceConfig != null && parent.processorGroupsResolver != null) {
             return parent
                     .processorGroupsResolver
-                    .resolveCopybooksPaths(src.toPath(), args.workspaceConfig.workspace)
+                    .resolveCopybooksPaths(inputConfig.src.toPath(), args.workspaceConfig.workspace)
                     .stream()
                     .map(Path::toFile)
                     .collect(Collectors.toList());
@@ -242,8 +260,24 @@ public class CliAnalysis implements Callable<Integer> {
     private List<String> createCopybooksExtensions() {
         if (args.workspaceConfig != null && parent.processorGroupsResolver != null) {
             return parent.processorGroupsResolver.resolveCopybooksExtensions(
-                    src.toPath(), args.workspaceConfig.workspace);
+                    inputConfig.src.toPath(), args.workspaceConfig.workspace);
         }
         return Arrays.asList(args.explicitConfig.cpyExt);
+    }
+
+    private void createTemporaryFileFromInput() {
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
+        try {
+            inputConfig.src = File.createTempFile("cobol-analysis-temp", ".cbl");
+            StringBuilder input = new StringBuilder();
+            String temp;
+            while ((temp = bufferedReader.readLine()) != null) {
+                input.append(temp).append(System.lineSeparator());
+            }
+            Files.write(inputConfig.src.toPath(), input.toString().getBytes(StandardCharsets.UTF_8));
+            inputConfig.src.deleteOnExit();
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
     }
 }
