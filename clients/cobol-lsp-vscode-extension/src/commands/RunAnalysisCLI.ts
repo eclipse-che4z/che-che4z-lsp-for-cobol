@@ -192,7 +192,7 @@ export class RunAnalysis {
    */
   protected async getCurrentFileLocation() {
     if (vscode.window.activeTextEditor) {
-      if (vscode.window.activeTextEditor.document.uri.scheme === "untitled") {
+      if (vscode.window.activeTextEditor.document.uri.scheme !== "file") {
         return this.saveTempFile();
       } else {
         return vscode.window.activeTextEditor.document.uri.fsPath;
