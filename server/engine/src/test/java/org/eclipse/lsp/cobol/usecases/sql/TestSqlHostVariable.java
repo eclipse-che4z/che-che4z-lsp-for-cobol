@@ -84,6 +84,16 @@ public class TestSqlHostVariable {
           + "       01 {$*VAR-INVALID-BIN`->VAR-INVALID-BIN`->VAR-INVALID-BIN-LEN`->VAR-INVALID-BIN-TEXT} USAGE IS SQL TYPE IS VARBINARY({-|1}1234).\n"
           + "        PROCEDURE DIVISION.\n";
 
+  public static final String TABLE_LOCATOR_TEXT =
+          "        Identification Division.\n"
+                  + "        Program-Id. 'TEST1'.\n"
+                  + "        Data Division.\n"
+                  + "         Working-Storage Section.\n"
+                  + "       01 {$*VAR-NAME1} USAGE IS SQL TYPE IS TABLE LIKE TABLENAME AS LOCATOR.\n"
+                  + "       01 {$*VAR-NAME2} USAGE SQL TYPE IS TABLE LIKE TABLENAME AS LOCATOR.\n"
+                  + "       01 {$*VAR-NAME3} SQL TYPE IS TABLE LIKE TABLENAME AS LOCATOR.\n"
+                  + "        PROCEDURE DIVISION.\n"
+                  + "           DISPLAY {$var-name1}..";
   @Test
   void testSupportForResultSetLocator() {
     UseCaseEngine.runTest(TEXT, ImmutableList.of(), ImmutableMap.of());
@@ -176,5 +186,10 @@ public class TestSqlHostVariable {
                     )
             )
     );
+  }
+
+  @Test
+  void testLobVariables() {
+    UseCaseEngine.runTest(TABLE_LOCATOR_TEXT, ImmutableList.of(), ImmutableMap.of());
   }
 }
