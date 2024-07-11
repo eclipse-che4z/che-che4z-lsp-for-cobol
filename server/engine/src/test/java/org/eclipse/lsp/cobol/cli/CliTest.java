@@ -45,6 +45,8 @@ class CliTest {
           + "  list_copybooks  list copybooks"
           + System.lineSeparator()
           + "  analysis        analyse cobol source"
+          + System.lineSeparator()
+          + "  cfast           generate cfast from cobol source"
           + System.lineSeparator();
 
   @Test
@@ -73,9 +75,10 @@ class CliTest {
   void testCliCommands() {
     CommandLine commandLine = new CommandLine(new Cli());
     Set<String> commandList = commandLine.getSubcommands().keySet();
-    assertEquals(3, commandList.size());
+    assertEquals(4, commandList.size());
     assertTrue(commandList.contains("analysis"));
     assertTrue(commandList.contains("list_copybooks"));
     assertTrue(commandList.contains("list_sources"));
+    assertTrue(commandList.contains("cfast"));
   }
 }

@@ -49,7 +49,13 @@ import static org.eclipse.lsp.cobol.cli.command.CliUtils.setupPipeline;
 /**
  * The Cli class represents a Command Line Interface (CLI) for interacting with the application.
  */
-@CommandLine.Command(description = "COBOL Analysis CLI tools.", mixinStandardHelpOptions = true, scope = CommandLine.ScopeType.INHERIT, subcommands = {ListSources.class, ListCopybooks.class, CliAnalysis.class})
+@CommandLine.Command(description = "COBOL Analysis CLI tools.", mixinStandardHelpOptions = true, scope = CommandLine.ScopeType.INHERIT,
+    subcommands = {
+        ListSources.class,
+        ListCopybooks.class,
+        CliAnalysis.class,
+        CliCFAST.class
+    })
 @Slf4j
 public class Cli implements Callable<Integer> {
   ProcessorGroupsResolver processorGroupsResolver;
