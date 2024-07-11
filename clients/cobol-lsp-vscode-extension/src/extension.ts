@@ -28,6 +28,8 @@ import {
 import { CopybookDownloadService } from "./services/copybook/CopybookDownloadService";
 import { CopybooksCodeActionProvider } from "./services/copybook/CopybooksCodeActionProvider";
 
+import { RunAnalysis } from "./commands/RunAnalysisCLI";
+
 import { clearCache } from "./commands/ClearCopybookCacheCommand";
 import { CommentAction, commentCommand } from "./commands/CommentCommand";
 import { initSmartTab, RangeTabShiftStore } from "./commands/SmartTabCommand";
@@ -336,6 +338,19 @@ function registerCommands(
             `${FAIL_CREATE_COPYBOOK_FOLDER_MSG} : ${error}`,
           );
         }
+      },
+    ),
+  );
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand(
+      "cobol-lsp.analysis.runAnalysis",
+      async () => {
+        const tempAnalysis: RunAnalysis = new RunAnalysis(
+          context.globalStorageUri,
+          context.extensionUri,
+        );
+        await tempAnalysis.runCobolAnalysisCommand();
       },
     ),
   );
