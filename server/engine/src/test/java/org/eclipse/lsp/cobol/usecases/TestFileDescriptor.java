@@ -209,7 +209,7 @@ class TestFileDescriptor {
     when(uriDecodeService.decode(DOCUMENT_URI)).thenReturn(DOCUMENT_URI);
     SourceUnitGraph documentGraph = mock(SourceUnitGraph.class);
     HoverProvider provider = new VariableHover(uriDecodeService);
-    when(documentGraph.isCopybook(anyString())).thenReturn(false);
+    when(documentGraph.isUserSuppliedCopybook(anyString())).thenReturn(false);
     final Hover actual =
         provider.getHover(
             new CobolDocumentModel("", "", result),

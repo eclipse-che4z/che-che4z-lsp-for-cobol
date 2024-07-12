@@ -53,7 +53,7 @@ public class DidChangeHandler {
       return;
     }
     String text = params.getContentChanges().get(0).getText();
-    if (sourceUnitGraph.isCopybook(uri)) {
+    if (sourceUnitGraph.isUserSuppliedCopybook(uri)) {
       sourceUnitGraph.updateContent(uri, text);
       List<String> allAssociatedFilesForACopybook = sourceUnitGraph.getAllAssociatedFilesForACopybook(uri);
       asyncAnalysisService.reanalyseCopybooksAssociatedPrograms(allAssociatedFilesForACopybook, uri, text, SourceUnitGraph.EventSource.IDE);
