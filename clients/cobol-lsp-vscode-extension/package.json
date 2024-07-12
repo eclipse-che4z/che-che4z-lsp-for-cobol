@@ -519,11 +519,6 @@
       },
       "[hpcobol]": {
         "editor.guides.indentation": false,
-        "editor.rulers": [
-          1,
-          5,
-          132
-        ],
         "editor.wordSeparators": "!\"#$%&'()*+,./:;<=>?@[\\]^`{|}~"
       }
     },
