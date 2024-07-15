@@ -71,8 +71,13 @@ export function configHandler(request: any): Array<any> {
       } else if (item.scopeUri) {
         const cfg = vscode.workspace.getConfiguration().get(item.section);
         if (item.section === SETTINGS_DIALECT) {
-          const object = loadProcessorGroupDialectConfig(item, cfg);
-          result.push(object);
+          const preprocessors = loadProcessorGroupDialectConfig(item);
+          if (preprocessors instanceof Error) {
+            console.error(preprocessors);
+            result.push(cfg);
+          } else {
+            result.push(preprocessors);
+          }
         } else if (item.section === SETTINGS_CPY_LOCAL_PATH) {
           const object = loadProcessorGroupCopybookPathsConfig(
             item,

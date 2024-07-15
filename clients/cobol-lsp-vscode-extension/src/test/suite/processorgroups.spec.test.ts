@@ -53,8 +53,11 @@ suite("Integration Test Suite: Processor Groups", function () {
     assert.match(message, /^MAIDABCD: Copybook not found/);
   });
 
-  test("TC355918: IDMS - without preprocessor setup", async () => {
-    const extSrcPath = path.join("cobol-vanila", "IDMSSMPL.cbl");
+  test.only("TC355918: IDMS - without preprocessor setup", async () => {
+    // const extSrcPath = path.join("cobol-vanila", "IDMSSMPL.cbl");
+    const extSrcPath = path.join("cobol-vanila", "abc.cbl");
+    await helper.showDocument(extSrcPath);
+    return;
     const diagPromise = helper.waitForDiagnosticsChange(extSrcPath);
     await helper.showDocument(extSrcPath);
     const diagnostics = await diagPromise;

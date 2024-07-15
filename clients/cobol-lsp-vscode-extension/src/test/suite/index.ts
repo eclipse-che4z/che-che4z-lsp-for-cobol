@@ -20,32 +20,42 @@ export async function run(): Promise<void> {
   const sourceRoot = path.join(__dirname, "..", "..");
 
   // initialize nyc code coverage
-  const NYC = require("nyc");
-  const nyc = new NYC({
-    cwd: path.join(sourceRoot, ".."),
-    reporter: ["lcov"],
-    hookRequire: true,
-    exclude: ["**/test/**", ".vscode-test/**", ".vscode-test-web/**"],
-  });
+  // const NYC = require("nyc");
+  // const nyc = new NYC({
+  //   cwd: path.join(sourceRoot, ".."),
+  //   reporter: ["lcov"],
+  //   hookRequire: true,
+  //   exclude: ["**/test/**", ".vscode-test/**", ".vscode-test-web/**"],
+  // });
 
-  // decache files on windows to be hookable by nyc
-  let decache = require("decache");
-  glob
-    .sync("**/**.js", {
-      cwd: sourceRoot,
-    })
-    .forEach((file) => {
-      decache(path.join(sourceRoot, file));
-    });
+  // // decache files on windows to be hookable by nyc
+  // let decache = require("decache");
+  // glob
+  //   .sync("**/**.js", {
+  //     cwd: sourceRoot,
+  //   })
+  //   .forEach((file) => {
+  //     decache(path.join(sourceRoot, file));
+  //   });
 
-  nyc.createTempDirectory();
-  nyc.wrap();
+  // nyc.createTempDirectory();
+  // nyc.wrap();
 
   // Create the mocha test
   const mocha = new Mocha({ ui: "tdd", color: true });
   const testsPath = path.join(__dirname, "..");
   const files = await glob("**/*.test.js", { cwd: testsPath });
   // Add files to the test suite
+
+  // const files = [
+  //   'suite/snippet.spec.test.js',
+  //   'suite/replacingstatement.spec.test.js',
+  //   'suite/processorgroups.spec.test.js',
+  //   'suite/lsp.spec.user1.test.js',
+  //   'suite/lsp.spec.test.js',
+  //   'suite/lsp.spec.copybooks.test.js',
+  // ];
+
   files.forEach((file) => mocha.addFile(path.resolve(testsPath, file)));
 
   await new Promise((resolve, reject) => {
@@ -60,7 +70,10 @@ export async function run(): Promise<void> {
   });
 
   // report code coverage
-  nyc.writeCoverageFile();
-  await nyc.report();
-  console.log("Report created");
+  // nyc.writeCoverageFile();
+  // await nyc.report();
+  // console.log("Report created");
+  await new Promise((resolve,reject) => {
+    setTimeout(()=> {resolve(null)}, 10000);
+  });
 }

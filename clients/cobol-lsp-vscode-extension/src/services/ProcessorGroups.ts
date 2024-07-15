@@ -17,12 +17,28 @@ import * as path from "path";
 import { Minimatch } from "minimatch";
 import SettingsUtils from "./util/SettingsUtils";
 import { globSync } from "glob";
+import { parse } from "../type/processorGroups";
+import type { Pgroup, PgmConf, Pgm, ProcGrps } from "../type/processorGroups";
 import { Uri } from "vscode";
 import {
   backwardSlashRegex,
   cleanWorkspaceFolderName,
   normalizePath,
 } from "./util/FSUtils";
+
+interface NormalizedGroup {
+  "compiler-options"?: string[];
+  "copybook-extensions"?: string[];
+  "copybook-file-encoding"?: string;
+  libs?: string[];
+  name: string;
+  preprocessor: NormalizedPrerocessor[];
+}
+
+interface NormalizedPrerocessor {
+  name: string;
+  libs: string[];
+};
 
 const PROCESSOR_GROUP_FOLDER = ".cobolplugin";
 const PROCESSOR_GROUP_PGM = "pgm_conf.json";
@@ -31,22 +47,29 @@ const PROCESSOR_GROUP_PROC = "proc_grps.json";
 export function loadProcessorGroupCopybookPaths(
   documentUri: string,
   dialectType: string,
-): string[] {
-  return loadProcessorGroupSettings(
-    documentUri,
-    "libs",
-    [] as string[],
-    dialectType,
-  );
+): string[] | Error {
+  const pgroup = getProcessorGroup(documentUri);
+  if (pgroup instanceof Error) {
+    return pgroup;
+  }
+  if (dialectType === "COBOL") {
+    return pgroup.libs || [];
+  }
+  const pr = pgroup.preprocessor.find(p => p.name === dialectType);
+  return pr?.libs || [];
 }
 
 export function loadProcessorGroupCopybookPathsConfig(
   item: { scopeUri: string },
   configObject: string[],
-): string[] {
+): string[] | Error {
+  const pgroup = getProcessorGroup(item.scopeUri);
+  if (pgroup instanceof Error) {
+    return pgroup;
+  }
   const config = [
-    ...loadProcessorGroupSettings(item.scopeUri, "libs", [] as string[]),
-    ...configObject,
+    pgroup.libs || [],
+    ...configObject
   ];
   return SettingsUtils.getWorkspaceFoldersFsPath()
     .map((folder) =>
@@ -105,58 +128,8 @@ export function loadProcessorGroupSqlBackendConfig(
   );
 }
 
-export function loadProcessorGroupDialectConfig(
-  item: { scopeUri: string; section: string },
-  configObject: unknown,
-): unknown {
-  try {
-    const pgCfg = loadProcessorsConfig(item.scopeUri);
-    if (pgCfg === undefined) {
-      return configObject;
-    }
-    const dialects: Preprocessor[] = [];
-    if (!Array.isArray(pgCfg.preprocessor)) {
-      dialects.push(pgCfg.preprocessor);
-    } else {
-      for (const pp of pgCfg.preprocessor as Preprocessor) {
-        if (typeof pp === "object" && pp) {
-          dialects.push(pp["name"]);
-        }
-        if (typeof pp === "string" && pp) {
-          dialects.push(pp);
-        }
-      }
-    }
-
-    // "SQL" is not a real dialect, we will use it only to set up sql backend for now
-    return dialects.filter((name) => name != "SQL") || configObject;
-  } catch (e) {
-    console.error(JSON.stringify(e));
-    return configObject;
-  }
-}
-
-type ProgramsConfig = {
-  pgms: {
-    program: string;
-    pgroup: string;
-  }[];
-};
-
-type Preprocessor = string | string[];
-
-type ProcessorConfig = {
-  name: string;
-  libs: string[];
-  preprocessor: Preprocessor[];
-};
-
-type ProcessorsConfig = {
-  pgroups: ProcessorConfig[];
-};
-
 function matchProcessorGroup(
-  pgmCfg: ProgramsConfig,
+  pgms: Pgm[],
   documentPath: string,
   workspacePath: string,
 ): string | undefined {
@@ -171,7 +144,7 @@ function matchProcessorGroup(
   const relativeDocPath = path.relative(workspacePath, documentPath);
 
   const candidates: string[] = [];
-  for (const v of pgmCfg.pgms) {
+  for (const v of pgms) {
     // exact match
     if (path.isAbsolute(v.program)) {
       if (pathMatches(v.program, documentPath)) {
@@ -198,73 +171,89 @@ function pathMatches(program: string, documentPath: string) {
   return path.sep === "/"
     ? program.split("\\").join(path.sep) === documentPath
     : program.split("/").join(path.sep).toUpperCase() ===
-        documentPath.toUpperCase();
+    documentPath.toUpperCase();
 }
 
-function loadProcessorsConfig(
+function getProcessorGroup(
   documentUri: string,
-): ProcessorConfig | undefined {
+): NormalizedGroup | Error {
   const documentPath = Uri.parse(documentUri).fsPath;
   const ws = SettingsUtils.getWorkspaceFoldersFsPath();
   if (ws.length < 1) {
     return undefined;
   }
   const cfgPath = path.join(ws[0], PROCESSOR_GROUP_FOLDER);
-  const procCfgPath = path.join(cfgPath, PROCESSOR_GROUP_PROC);
-  const pgmCfgPath = path.join(cfgPath, PROCESSOR_GROUP_PGM);
-  if (!fs.existsSync(pgmCfgPath) || !fs.existsSync(procCfgPath)) {
-    return undefined;
-  }
-  const procCfg: ProcessorsConfig = JSON.parse(
-    fs.readFileSync(procCfgPath).toString(),
-  );
-  const pgmCfg: ProgramsConfig = JSON.parse(
-    fs.readFileSync(pgmCfgPath).toString(),
-  );
-  const pgroup = matchProcessorGroup(pgmCfg, documentPath, ws[0]);
 
-  let result;
-  procCfg.pgroups.forEach((p) => {
-    if (pgroup === p.name) {
-      result = p;
-      return;
-    }
-  });
-  return result;
-}
-
-function loadProcessorGroupSettings<T>(
-  scopeUri: string,
-  atrtibute: string,
-  configObject: T,
-  dialect: string = "COBOL",
-): T {
+  const pgmConfPath = path.join(cfgPath, PROCESSOR_GROUP_PGM);
+  let pgmConfJson: string;
   try {
-    const pgCfg: ProcessorConfig | undefined = loadProcessorsConfig(scopeUri);
-    if (pgCfg === undefined) {
-      return configObject;
-    }
-
-    if (dialect && dialect !== "COBOL") {
-      for (const pp of pgCfg.preprocessor as Preprocessor) {
-        if (
-          pp &&
-          typeof pp === "object" &&
-          pp["name"] === dialect &&
-          pp[atrtibute]
-        ) {
-          return pp[atrtibute];
-        }
-      }
-    } else {
-      if (pgCfg[atrtibute as keyof ProcessorConfig]) {
-        return pgCfg[atrtibute as keyof ProcessorConfig] as T;
-      }
-    }
-
-    return configObject;
+    pgmConfJson = fs.readFileSync(pgmConfPath).toString();
   } catch (e) {
-    console.error(JSON.stringify(e));
-    return configObject;
+    return Error(`Program config file not found ${pgmConfPath}`);
+  }
+  let pgmConf: PgmConf;
+  try {
+    pgmConf = parse.toPgmConf(pgmConfJson);
+  } catch (e) {
+    const er = (e as Error);
+    return Error(`Program config file ${pgmConfPath} does not match required schema: ${er.message}`);
+  }
+  if (pgmConf instanceof Error) {
+    return pgmConf;
+  }
+  const name = matchProcessorGroup(pgmConf.pgms, documentPath, ws[0]);
+  if (name === undefined) {
+    return Error(`No matching program definition found for ${documentPath}`);
+  }
+
+  const procGrpsPath = path.join(cfgPath, PROCESSOR_GROUP_PROC);
+  let procGrpsJson: string;
+  try {
+    procGrpsJson = fs.readFileSync(procGrpsPath).toString();
+  } catch (e) {
+    return Error(`Processor groups file ${procGrpsPath} not found`);
+  }
+  let procGrps: ProcGrps;
+  try {
+    procGrps = parse.toProcGrps(procGrpsJson);
+  } catch (e) {
+    const er = (e as Error);
+    return Error(`Processor groups file ${procGrpsPath} does not match required schema: ${er.message}`);
+  }
+  if (procGrps instanceof Error) {
+    return procGrps;
+  }
+  const pgroup = procGrps.pgroups.find(p => p.name === name);
+  if (pgroup === undefined) {
+    return Error(`No matching processor group found for ${documentPath}`);
+  }
+
+  let npr: NormalizedPrerocessor[] = [];
+  const pr = pgroup.preprocessor;
+  if (pr === undefined) {
+    npr = [];
+  } else if (typeof pr === "string") {
+    npr = [{ name: pr, libs: [] }];
+  } else if (!Array.isArray(pr)) {
+    npr = [{
+      name: pr.name,
+      libs: pr.libs || []
+    }];
+  } else {
+    npr = pr.map(
+      p => typeof p === "string"
+        ? { name: p, libs: [] }
+        : { name: p.name, libs: p.libs || [] }
+    );
+  }
+
+  return {
+    "compiler-options": pgroup["compiler-options"],
+    "copybook-extensions": pgroup["copybook-extensions"],
+    "copybook-file-encoding": pgroup["copybook-file-encoding"],
+    name: pgroup.name,
+    libs: pgroup.libs,
+    preprocessor: npr.filter((p) => p.name != "SQL"), // "SQL" is not a real dialect, we will use it only to set up sql backend for now
   }
 }
+
