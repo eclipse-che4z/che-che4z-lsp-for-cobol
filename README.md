@@ -209,7 +209,7 @@ We recommend that you refresh your copybooks from time to time. To refresh your 
 
 ### Retrieving Copybooks from Endevor
 
-When you open a COBOL file using Explorer for Endevor, COBOL copybooks that are specified in the Endevor element processor group are automatically downloaded to your workspace.
+When you open a COBOL file using Explorer for Endevor, COBOL copybooks that are specified in the Endevor element processor group are automatically downloaded to your VS Code global storage folder.
 
 The extension setting **Cpy-manager: Endevor-dependencies** determines how copybooks are retrieved from the mainframe when you open a COBOL file in Explorer for Endevor. This setting has the following options:
 * **ENDEVOR_PROCESSOR**
