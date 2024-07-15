@@ -215,7 +215,7 @@ The extension setting **Cpy-manager: Endevor-dependencies** determines how copyb
 * **ENDEVOR_PROCESSOR**
   * Downloads copybooks that are specified in the Endevor element processor group.
 * **ZOWE**
-  * Downloads copybooks that are specified in the **paths-dsn** and **paths-uss** settings, as described in the section **[Retrieving Copybooks from Mainframe Data Sets and USS Files]**(#retrieving-copybooks-from-mainframe-data-sets-and-uss-files).
+  * Downloads copybooks that are specified in the **paths-dsn** and **paths-uss** settings.
 
 ### Copybook Support Features
 
