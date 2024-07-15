@@ -99,18 +99,7 @@ public class CliAnalysis implements Callable<Integer> {
             Cli.Result analysisResult = parent.runAnalysis(inputConfig.src, dialect, diCtx, true);
             parent.addTiming(result, analysisResult.ctx.getBenchmarkSession());
             if (!hideDiagnostics) {
-                JsonArray diagnostics = new JsonArray();
-                analysisResult
-                        .ctx
-                        .getAccumulatedErrors()
-                        .forEach(
-                                err -> {
-                                    JsonObject diagnostic = CliUtils.diagnosticToJson(err);
-                                    diagnostics.add(diagnostic);
-                                });
-                result.add("diagnostics", diagnostics);
-                result.addProperty("lines", String.valueOf(analysisResult.ctx.getExtendedDocument().toString().split("\n").length));
-                result.addProperty("size", String.valueOf(analysisResult.ctx.getExtendedDocument().toString().length()));
+                generateDiagnostics(analysisResult, result);
             }
             collectGcAndMemoryStats(result);
             System.out.println(CliUtils.GSON.toJson(result));
@@ -122,6 +111,21 @@ public class CliAnalysis implements Callable<Integer> {
             System.out.println(CliUtils.GSON.toJson(result));
             return 1;
         }
+    }
+
+    private void generateDiagnostics(Cli.Result analysisResult, JsonObject result) {
+        JsonArray diagnostics = new JsonArray();
+        analysisResult
+                .ctx
+                .getAccumulatedErrors()
+                .forEach(
+                        err -> {
+                            JsonObject diagnostic = CliUtils.diagnosticToJson(err);
+                            diagnostics.add(diagnostic);
+                        });
+        result.add("diagnostics", diagnostics);
+        result.addProperty("lines", String.valueOf(analysisResult.ctx.getExtendedDocument().toString().split("\n").length));
+        result.addProperty("size", String.valueOf(analysisResult.ctx.getExtendedDocument().toString().length()));
     }
 
     private void collectGcAndMemoryStats(JsonObject result) {

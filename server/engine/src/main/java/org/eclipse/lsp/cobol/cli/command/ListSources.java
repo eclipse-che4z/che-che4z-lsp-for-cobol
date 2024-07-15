@@ -56,7 +56,7 @@ public class ListSources implements Callable<Integer> {
     try {
       parent.initProcessorGroupsReader(workspace);
     } catch (Exception e) {
-      return 2;
+      return Cli.FAILURE;
     }
     JsonObject result = new JsonObject();
     JsonArray sources = new JsonArray();
@@ -74,7 +74,7 @@ public class ListSources implements Callable<Integer> {
     }
     result.add("sources", sources);
     System.out.println(gson.toJson(result));
-    return 0;
+    return Cli.SUCCESS;
   }
 
   private boolean isSourceFile(Path f) {

@@ -96,7 +96,7 @@ public class ListCopybooks implements Callable<Integer> {
       try {
         parent.initProcessorGroupsReader(args.workspaceConfig.workspace);
       } catch (Exception e) {
-        return 2;
+        return Cli.FAILURE;
       }
     }
     Injector diCtx = Guice.createInjector(new CliModule());
@@ -123,7 +123,7 @@ public class ListCopybooks implements Callable<Integer> {
     result.add("copybookUris", copybookUris);
     result.add("missingCopybooks", missingCopybooks);
     System.out.println(gson.toJson(result));
-    return 0;
+    return Cli.SUCCESS;
   }
 
   private List<File> createCopybooksPaths() {

@@ -58,6 +58,9 @@ import static org.eclipse.lsp.cobol.cli.command.CliUtils.setupPipeline;
     })
 @Slf4j
 public class Cli implements Callable<Integer> {
+  static final int SUCCESS = 0;
+  static final int FAILURE = 1;
+
   ProcessorGroupsResolver processorGroupsResolver;
 
   /**
@@ -68,7 +71,7 @@ public class Cli implements Callable<Integer> {
    */
   @Override
   public Integer call() throws Exception {
-    return 0;
+    return SUCCESS;
   }
 
   Result runAnalysis(File src, CobolLanguageId dialect, Injector diCtx, boolean isAnalysisRequired) throws IOException {
@@ -111,7 +114,7 @@ public class Cli implements Callable<Integer> {
         processorGroupsResolver = new ProcessorGroupsResolver(new String(Files.readAllBytes(programConfig)), new String(Files.readAllBytes(groupsConfig)));
       } catch (IOException e) {
         LOG.error("Processor group configuration read error", e);
-        throw new IOException(e.getMessage());
+        throw e;
       }
     } else {
       LOG.warn("Processor group configuration is missing");
