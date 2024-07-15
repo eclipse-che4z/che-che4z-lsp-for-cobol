@@ -213,9 +213,9 @@ When you open a COBOL file using Explorer for Endevor, COBOL copybooks that are 
 
 The extension setting **Cpy-manager: Endevor-dependencies** determines how copybooks are retrieved from the mainframe when you open a COBOL file in Explorer for Endevor. This setting has the following options:
 * **ENDEVOR_PROCESSOR**
-  * Downloads copybooks that are specified in the Endevor element processor group.
+  * Downloads copybooks from locations that are specified in the Endevor element processor group.
 * **ZOWE**
-  * Downloads copybooks that are specified in the **paths-dsn** and **paths-uss** settings.
+  * Downloads copybooks from locations that are specified in the **paths-dsn** and **paths-uss** settings.
 
 ### Copybook Support Features
 
