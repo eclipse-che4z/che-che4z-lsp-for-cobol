@@ -79,7 +79,7 @@ public class CliAnalysis implements Callable<Integer> {
             try {
                 parent.initProcessorGroupsReader(args.workspaceConfig.workspace);
             } catch (Exception e) {
-                return 2;
+                return Cli.FAILURE;
             }
         }
 
@@ -105,11 +105,11 @@ public class CliAnalysis implements Callable<Integer> {
             System.out.println(CliUtils.GSON.toJson(result));
 
             handleExtendedSource(analysisResult);
-            return 0;
+            return Cli.SUCCESS;
         } catch (Exception e) {
             result.addProperty("crash", e.getMessage() != null && e.getMessage().isEmpty() ? "error" : e.getMessage());
             System.out.println(CliUtils.GSON.toJson(result));
-            return 1;
+            return Cli.FAILURE;
         }
     }
 
