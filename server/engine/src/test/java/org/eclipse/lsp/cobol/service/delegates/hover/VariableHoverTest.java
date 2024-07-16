@@ -39,7 +39,7 @@ class VariableHoverTest {
   @BeforeEach
   void setUp() {
     this.documentGraph = mock(SourceUnitGraph.class);
-    when(documentGraph.isCopybook(anyString())).thenReturn(false);
+    when(documentGraph.isUserSuppliedCopybook(anyString())).thenReturn(false);
     }
 
   private static final String HEADER =

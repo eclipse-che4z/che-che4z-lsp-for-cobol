@@ -58,7 +58,7 @@ class SourceUnitGraphTest {
 
     assertEquals(initialDocumentText, sourceUnitGraph.getContent(URI));
     assertTrue(sourceUnitGraph.isFileOpened(URI));
-    assertFalse(sourceUnitGraph.isCopybook(URI));
+    assertFalse(sourceUnitGraph.isUserSuppliedCopybook(URI));
 
     sourceUnitGraph.updateContent(URI, updatedContent);
     assertEquals(updatedContent, sourceUnitGraph.getContent(URI));
@@ -103,10 +103,10 @@ class SourceUnitGraphTest {
         AnalysisState.COMPLETED, model, SourceUnitGraph.EventSource.FILE_SYSTEM);
 
     assertEquals("COPY 3 TEXT", sourceUnitGraph.getCopyNodeContent(copyNode3));
-    assertTrue(sourceUnitGraph.isCopybook(copy1Uri));
-    assertTrue(sourceUnitGraph.isCopybook(copy2Uri));
-    assertTrue(sourceUnitGraph.isCopybook(copy3Uri));
-    assertFalse(sourceUnitGraph.isCopybook(URI));
+    assertTrue(sourceUnitGraph.isUserSuppliedCopybook(copy1Uri));
+    assertTrue(sourceUnitGraph.isUserSuppliedCopybook(copy2Uri));
+    assertTrue(sourceUnitGraph.isUserSuppliedCopybook(copy3Uri));
+    assertFalse(sourceUnitGraph.isUserSuppliedCopybook(URI));
 
     List<SourceUnitGraph.NodeV> injectedCopybookNode =
         sourceUnitGraph.getInjectedCopybookNode(URI, new Position(2, 9));

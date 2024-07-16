@@ -78,7 +78,7 @@ class Test88ThruHover {
     HoverProvider provider = new VariableHover(uriDecodeService);
 
     SourceUnitGraph documentGraph = mock(SourceUnitGraph.class);
-    when(documentGraph.isCopybook(anyString())).thenReturn(false);
+    when(documentGraph.isUserSuppliedCopybook(anyString())).thenReturn(false);
     final Hover actual =
         provider.getHover(
             new CobolDocumentModel("", "", result),

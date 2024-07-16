@@ -45,7 +45,7 @@ public class CopybookHoverProvider implements HoverProvider {
   public Hover getHover(@Nullable CobolDocumentModel document, @NonNull TextDocumentPositionParams position, SourceUnitGraph documentGraph) {
     String uri = uriDecodeService.decode(position.getTextDocument().getUri());
     Position hoverPosition = position.getPosition();
-    if (documentGraph.isCopybook(uri)) {
+    if (documentGraph.isUserSuppliedCopybook(uri)) {
       List<SourceUnitGraph.NodeV> containedCopybookNode = documentGraph.getInjectedCopybookNode(uri, hoverPosition);
       if (!containedCopybookNode.isEmpty()) {
         return getHover(containedCopybookNode.get(0).getContent());

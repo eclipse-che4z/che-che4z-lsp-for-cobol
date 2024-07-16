@@ -102,7 +102,7 @@ public class SourceUnitGraph implements AnalysisStateListener {
       CobolDocumentModel model, EventSource eventSource) {
     updateGraphNodes(model, eventSource);
     invalidateGraphLinks(model.getUri());
-    if (isCopybook(model.getUri()) || model.getAnalysisResult() == null) {
+    if (isUserSuppliedCopybook(model.getUri()) || model.getAnalysisResult() == null) {
       return;
     }
     updateGraphLink(model, eventSource);
@@ -178,7 +178,7 @@ public class SourceUnitGraph implements AnalysisStateListener {
    * @param uri document uri
    * @return true if copybook, false otherwise.
    */
-  public boolean isCopybook(String uri) {
+  public boolean isUserSuppliedCopybook(String uri) {
     return documentGraphIndexedByCopybook.keySet().stream()
         .anyMatch(
             copyUri -> {
@@ -187,10 +187,6 @@ public class SourceUnitGraph implements AnalysisStateListener {
                 copyUri = copyUri.replace(" ", "%20");
                 return new URL(decodeUri).sameFile(new URL(copyUri));
               } catch (IOException e) {
-                if (ImplicitCodeUtils.isImplicit(copyUri)) {
-                  LOG.debug("{} is a implicit copybook", copyUri);
-                  return true;
-                }
                 LOG.error("IOException encountered while comparing paths {} and {}", copyUri, uri);
                 return false;
               }
