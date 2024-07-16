@@ -15,7 +15,7 @@ import * as fs from "fs-extra";
 import * as path from "path";
 import * as vscode from "vscode";
 import { SettingsService } from "../../services/Settings";
-import { SettingsUtils } from "../../services/util/SettingsUtils";
+import SettingsUtils from "../../services/util/SettingsUtils";
 
 const fsPath = "tmp-ws";
 beforeAll(() => {
@@ -131,12 +131,8 @@ test("getWorkspaceFoldersPath return an array of paths", () => {
   (vscode.workspace.workspaceFolders as any) = [
     { uri: { path: "/ws-vscode" } } as any,
   ];
-  const paths = SettingsUtils.getWorkspaceFoldersPath();
+  const paths = SettingsUtils.getWorkspaceFoldersFsPath();
   expect(paths).toStrictEqual(["/ws-vscode"]);
-});
-test("json validation", () => {
-  expect(SettingsUtils.isValidJSON(undefined)).toBeFalsy();
-  expect(SettingsUtils.isValidJSON("{}")).toBeTruthy();
 });
 
 describe("SettingsService returns correct tab settings", () => {

@@ -13,25 +13,10 @@
  */
 import * as vscode from "vscode";
 
-export class SettingsUtils {
-  public static isValidJSON(json: string | undefined): boolean {
-    return json !== undefined ? JSON.parse(json) : false;
-  }
-
-  public static getWorkspaceFoldersPath(
-    fsPath: boolean | undefined = undefined,
-  ): string[] {
-    const result: string[] = [];
-    const workspaceFolders = vscode.workspace.workspaceFolders;
-    if (workspaceFolders) {
-      workspaceFolders.forEach((workspaceFolder) => {
-        result.push(
-          fsPath === undefined
-            ? workspaceFolder.uri.path
-            : workspaceFolder.uri.fsPath,
-        );
-      });
-    }
-    return result;
-  }
-}
+export default {
+  getWorkspaceFoldersFsPath(): string[] {
+    return (vscode.workspace.workspaceFolders || []).map(
+      (folder) => folder.uri.fsPath,
+    );
+  },
+};

@@ -22,7 +22,7 @@ import { CopybookURI } from "../../../services/copybook/CopybookURI";
 import { SettingsService } from "../../../services/Settings";
 import * as fsUtils from "../../../services/util/FSUtils";
 import { ProfileUtils } from "../../../services/util/ProfileUtils";
-import { SettingsUtils } from "../../../services/util/SettingsUtils";
+import SettingsUtils from "../../../services/util/SettingsUtils";
 import { Utils } from "../../../services/util/Utils";
 import { CopybookDownloadService } from "../../../services/copybook/CopybookDownloadService";
 
@@ -54,7 +54,7 @@ jest.mock("vscode", () => ({
   workspace: {},
 }));
 
-SettingsUtils.getWorkspaceFoldersPath = jest.fn().mockReturnValue([__dirname]);
+SettingsUtils.getWorkspaceFoldersFsPath = jest.fn().mockReturnValue([__dirname]);
 vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
   get: jest.fn().mockReturnValue(undefined),
 });

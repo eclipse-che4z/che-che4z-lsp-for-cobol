@@ -15,7 +15,7 @@
 import * as fs from "fs";
 import * as path from "path";
 import { Minimatch } from "minimatch";
-import { SettingsUtils } from "./util/SettingsUtils";
+import SettingsUtils from "./util/SettingsUtils";
 import { globSync } from "glob";
 import { Uri } from "vscode";
 import {
@@ -48,7 +48,7 @@ export function loadProcessorGroupCopybookPathsConfig(
     ...loadProcessorGroupSettings(item.scopeUri, "libs", [] as string[]),
     ...configObject,
   ];
-  return SettingsUtils.getWorkspaceFoldersPath(true)
+  return SettingsUtils.getWorkspaceFoldersFsPath()
     .map((folder) =>
       globSync(
         config.map((ele) => ele.replace(backwardSlashRegex, "/")),
@@ -205,7 +205,7 @@ function loadProcessorsConfig(
   documentUri: string,
 ): ProcessorConfig | undefined {
   const documentPath = Uri.parse(documentUri).fsPath;
-  const ws = SettingsUtils.getWorkspaceFoldersPath(true);
+  const ws = SettingsUtils.getWorkspaceFoldersFsPath();
   if (ws.length < 1) {
     return undefined;
   }

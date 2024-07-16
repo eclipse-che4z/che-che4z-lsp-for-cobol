@@ -46,7 +46,7 @@ import {
   loadProcessorGroupSqlBackendConfig,
 } from "./ProcessorGroups";
 import { getProgramNameFromUri } from "./util/FSUtils";
-import { SettingsUtils } from "./util/SettingsUtils";
+import SettingsUtils from "./util/SettingsUtils";
 
 export class TabRule {
   // tslint:disable-next-line:no-unnecessary-initializer
@@ -163,7 +163,7 @@ export class SettingsService {
         dialectType,
       ),
     ];
-    const wsFolders = SettingsUtils.getWorkspaceFoldersPath(true);
+    const wsFolders = SettingsUtils.getWorkspaceFoldersFsPath();
 
     return SettingsService.prepareLocalSearchFolders(paths, wsFolders);
   }
