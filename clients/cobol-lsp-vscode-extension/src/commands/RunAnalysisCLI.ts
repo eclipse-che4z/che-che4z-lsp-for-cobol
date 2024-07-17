@@ -14,6 +14,7 @@
 
 import * as vscode from "vscode";
 import { Terminal } from "vscode";
+import show = Mocha.reporters.Base.cursor.show;
 
 export interface AnalysisResults {
   typeToRun: string;
@@ -49,18 +50,21 @@ export class RunAnalysis {
     const result = {} as Partial<AnalysisResults>;
     await this.getVersionToRun(result);
     await this.getCopybookConfigLocation(result);
+    const showDiagnosticsResult = await this.getShowDiagnosticsChoice();
 
     if (
       result.typeToRun === undefined ||
-      result.copybookLocation === undefined
+      result.copybookLocation === undefined ||
+      showDiagnosticsResult === undefined
     ) {
       return;
     }
 
     this.runNative = result.typeToRun === "Native";
     this.copybookConfigLocation = result.copybookLocation;
+    const showDiagnostics: boolean = showDiagnosticsResult === "Show";
 
-    const command = await this.buildCommand();
+    const command = await this.buildCommand(showDiagnostics);
     if (command !== "") {
       this.sendToTerminal(command);
     }
@@ -82,30 +86,46 @@ export class RunAnalysis {
     result.copybookLocation = "";
   }
 
+  public async getShowDiagnosticsChoice() {
+    return await vscode.window.showQuickPick(["Show", "Hide"], {
+      placeHolder: "Show diagnostics?",
+    });
+  }
+
   /**
    * Encapsulates the handling of building the command
+   * @param showDiagnostics - Option to show/hide diagnostics
    * @protected
    */
-  protected async buildCommand() {
+  protected async buildCommand(showDiagnostics: boolean) {
     const currentFileLocation = await this.getCurrentFileLocation();
     if (!currentFileLocation || currentFileLocation === "") {
       return "";
     }
 
     if (this.runNative) {
-      return this.buildNativeCommand(currentFileLocation, process.platform);
+      return this.buildNativeCommand(
+        currentFileLocation,
+        process.platform,
+        showDiagnostics,
+      );
     }
 
-    return this.buildJavaCommand(currentFileLocation);
+    return this.buildJavaCommand(currentFileLocation, showDiagnostics);
   }
 
   /**
    * Creates the command to run using the native build.
    * @param currentFileLocation - Location of the main cobol file being analyzed.
    * @param platform - Result from Node.js' "process.platform".
+   * @param showDiagnostics - Option to show/hide diagnostics
    * @protected
    */
-  protected buildNativeCommand(currentFileLocation: string, platform: string) {
+  protected buildNativeCommand(
+    currentFileLocation: string,
+    platform: string,
+    showDiagnostics: boolean,
+  ) {
     const serverPath = this.extensionUri.fsPath + "/server/native";
     const result = this.getServerPath(serverPath, platform);
 
@@ -113,7 +133,11 @@ export class RunAnalysis {
       return "";
     }
 
-    return result + " " + this.buildAnalysisCommandPortion(currentFileLocation);
+    return (
+      result +
+      " " +
+      this.buildAnalysisCommandPortion(currentFileLocation, showDiagnostics)
+    );
   }
 
   protected getServerPath(serverPath: string, platform: string) {
@@ -132,9 +156,13 @@ export class RunAnalysis {
   /**
    * Creates the command to run using the java build.
    * @param currentFileLocation - Location of the main cobol file being analyzed.
+   * @param showDiagnostics - Option to show/hide diagnostics
    * @protected
    */
-  protected buildJavaCommand(currentFileLocation: string) {
+  protected buildJavaCommand(
+    currentFileLocation: string,
+    showDiagnostics: boolean,
+  ) {
     const extensionFolder: string | undefined =
       this.extensionUri.fsPath + "/server/jar/server.jar";
 
@@ -143,7 +171,7 @@ export class RunAnalysis {
         'java -jar "' +
         extensionFolder +
         '" ' +
-        this.buildAnalysisCommandPortion(currentFileLocation)
+        this.buildAnalysisCommandPortion(currentFileLocation, showDiagnostics)
       );
     }
 
@@ -154,16 +182,26 @@ export class RunAnalysis {
    * Provides the portion of the command from "analysis" onwards.
    * Is the same for both the Java and Native builds.
    * @param currentFileLocation - Location of the main cobol file being analyzed.
+   * @param showDiagnostics - Option to show/hide diagnostics
    * @protected
    */
-  protected buildAnalysisCommandPortion(currentFileLocation: string) {
+  protected buildAnalysisCommandPortion(
+    currentFileLocation: string,
+    showDiagnostics: boolean,
+  ) {
     const copyBookCommand = `-cf=${
       this.copybookConfigLocation === ""
         ? "."
         : '"' + this.copybookConfigLocation + '"'
     }`;
 
-    return 'analysis -s "' + currentFileLocation + '" ' + copyBookCommand;
+    return (
+      'analysis -s "' +
+      currentFileLocation +
+      '" ' +
+      copyBookCommand +
+      (showDiagnostics ? "" : " -nd")
+    );
   }
 
   /**

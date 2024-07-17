@@ -82,33 +82,31 @@ class Db2SqlVisitor extends Db2SqlParserBaseVisitor<List<Node>> {
     }
 
     @Override
-    public List<Node> visitResult_set_locator_host_variable(
-            Db2SqlParser.Result_set_locator_host_variableContext ctx) {
+    public List<Node> visitResult_set_locator_variable(Db2SqlParser.Result_set_locator_variableContext ctx) {
+        return createHostVariableDefinitionNode(ctx, ctx.dbs_level_01(), ctx.entry_name());
+    }
+
+    @Override
+    public List<Node> visitTableLocators_variable(Db2SqlParser.TableLocators_variableContext ctx) {
+        return createHostVariableDefinitionNode(ctx, ctx.dbs_host_var_levels(), ctx.entry_name());
+    }
+
+    private List<Node> createHostVariableDefinitionNode(ParserRuleContext ctx, ParserRuleContext levelCtx, ParserRuleContext nameCtx) {
         addReplacementContext(ctx);
-        Locality statementLocality =
-                getLocality(this.context.getExtendedDocument().mapLocation(constructRange(ctx)));
+        Locality statementLocality = getLocality(this.context.getExtendedDocument().mapLocation(constructRange(ctx)));
 
-        // semantics node just checks that the statement is present at right location
-        Db2WorkingAndLinkageSectionNode semanticsNode =
-                new Db2WorkingAndLinkageSectionNode(statementLocality);
+        Db2WorkingAndLinkageSectionNode semanticsNode = new Db2WorkingAndLinkageSectionNode(statementLocality);
 
-        // variable definition node
-        VariableDefinitionNode variableDefinitionNode =
-                VariableDefinitionNode.builder()
-                        .level(Integer.parseInt(ctx.dbs_level_01().getText()))
-                        .levelLocality(
-                                getLocality(
-                                        this.context.getExtendedDocument().mapLocation(constructRange(ctx.dbs_level_01()))))
-                        .statementLocality(statementLocality)
-                        .variableNameAndLocality(
-                                new VariableNameAndLocality(
-                                        VisitorHelper.getName(ctx.entry_name()),
-                                        getLocality(
-                                                this.context
-                                                        .getExtendedDocument()
-                                                        .mapLocation(constructRange(ctx.entry_name())))))
-                        .usageClauses(ImmutableList.of(UsageFormat.DISPLAY))
-                        .build();
+        VariableDefinitionNode variableDefinitionNode = VariableDefinitionNode.builder()
+                .level(Integer.parseInt(levelCtx.getText()))
+                .levelLocality(getLocality(this.context.getExtendedDocument().mapLocation(constructRange(levelCtx))))
+                .statementLocality(statementLocality)
+                .variableNameAndLocality(new VariableNameAndLocality(
+                        VisitorHelper.getName(nameCtx),
+                        getLocality(this.context.getExtendedDocument().mapLocation(constructRange(nameCtx)))))
+                .usageClauses(ImmutableList.of(UsageFormat.DISPLAY))
+                .build();
+
         variableDefinitionNode.addChild(semanticsNode);
         return ImmutableList.of(variableDefinitionNode);
     }

@@ -53,7 +53,11 @@ public class ListSources implements Callable<Integer> {
    */
   public Integer call() throws Exception {
     Gson gson = new GsonBuilder().setPrettyPrinting().create();
-    parent.initProcessorGroupsReader(workspace);
+    try {
+      parent.initProcessorGroupsReader(workspace);
+    } catch (Exception e) {
+      return Cli.FAILURE;
+    }
     JsonObject result = new JsonObject();
     JsonArray sources = new JsonArray();
     if (Objects.nonNull(workspace)) {
@@ -70,7 +74,7 @@ public class ListSources implements Callable<Integer> {
     }
     result.add("sources", sources);
     System.out.println(gson.toJson(result));
-    return 0;
+    return Cli.SUCCESS;
   }
 
   private boolean isSourceFile(Path f) {

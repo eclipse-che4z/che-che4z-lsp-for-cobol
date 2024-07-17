@@ -231,7 +231,7 @@ class ElementOccurrencesTest {
   void variousCases(
       AnalysisResult analysisResult, Position position, List<Location> expectedLocations) {
     SourceUnitGraph documentGraph = mock(SourceUnitGraph.class);
-    when(documentGraph.isCopybook(anyString())).thenReturn(false);
+    when(documentGraph.isUserSuppliedCopybook(anyString())).thenReturn(false);
     List<Location> actualLocations =
         new ElementOccurrences(documentGraph, uriDecodeService)
             .findReferences(

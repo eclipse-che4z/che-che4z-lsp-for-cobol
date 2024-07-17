@@ -69,10 +69,10 @@ public class CliCFAST  implements Callable<Integer> {
       }
     } catch (Exception e) {
       System.out.println("Failed to generate CFAST: " + e.getMessage());
-      return 1;
+      return Cli.FAILURE;
     }
 
-    return 0;
+    return Cli.SUCCESS;
   }
 
   private void generateCFAST(File file, CFASTBuilder builder, Gson gson, Injector diCtx) {

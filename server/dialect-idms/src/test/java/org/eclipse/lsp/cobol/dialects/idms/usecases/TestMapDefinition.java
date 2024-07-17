@@ -70,7 +70,7 @@ class TestMapDefinition {
                 ImmutableList.of(),
                 ImmutableMap.of()));
     SourceUnitGraph documentGraph = mock(SourceUnitGraph.class);
-    when(documentGraph.isCopybook(anyString())).thenReturn(false);
+    when(documentGraph.isUserSuppliedCopybook(anyString())).thenReturn(false);
     final Hover mapHover =
         new VariableHover(new UriDecodeService())
             .getHover(
