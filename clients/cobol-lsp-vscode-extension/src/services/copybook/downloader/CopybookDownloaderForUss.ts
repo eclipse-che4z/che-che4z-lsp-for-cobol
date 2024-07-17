@@ -103,7 +103,7 @@ export class CopybookDownloaderForUss extends ZoweExplorerDownloader {
     dataset: string,
     member: string,
     profileName: string,
-  ): Promise<void> {
+  ): Promise<boolean> {
     const loadedProfile = DownloadUtil.loadProfile(
       profileName,
       this.explorerAPI,
@@ -126,5 +126,6 @@ export class CopybookDownloaderForUss extends ZoweExplorerDownloader {
       downloadOptions.file,
       downloadOptions.encoding,
     );
+    return true;
   }
 }

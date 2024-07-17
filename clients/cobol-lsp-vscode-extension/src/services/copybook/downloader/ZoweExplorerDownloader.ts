@@ -12,7 +12,6 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 import * as vscode from "vscode";
-import { DownloadUtil } from "./DownloadUtil";
 import * as iconv from "iconv-lite";
 import { SettingsService } from "../../Settings";
 import { CopybookURI } from "../CopybookURI";
@@ -21,17 +20,22 @@ export abstract class ZoweExplorerDownloader {
   public static profileStore: Map<string, "locked-profile" | "valid-profile"> =
     new Map();
   protected memberListCache: Map<string, string[]> = new Map();
+  private ZoweDownloadQueue = new Map<string, Promise<boolean>>();
+
+  public clearZoweDownloadQueue() {
+    this.ZoweDownloadQueue.clear();
+  }
 
   constructor(
     private readonly storagePath: string,
     protected readonly explorerAPI: IApiRegisterClient,
-  ) {}
+  ) { }
 
   protected abstract downloadCopybookContent(
     dataset: string,
     member: string,
     profileName: string,
-  ): Promise<void>;
+  ): Promise<boolean>;
 
   protected getDownloadOptions(
     profileName: string,
@@ -86,16 +90,18 @@ export abstract class ZoweExplorerDownloader {
       this.storagePath,
     );
 
-    if (!(await DownloadUtil.checkPathExists(copybookPath))) {
-      try {
-        await this.downloadCopybookContent(dataset, member, profileName);
-        return true;
-      } catch (err: any) {
-        vscode.window.showErrorMessage(err.message);
-      }
+    const queueResponse = this.ZoweDownloadQueue.get(copybookPath);
+    if (queueResponse) {
+      return queueResponse;
     }
-
-    return false;
+    const response = this.downloadCopybookContent(dataset, member, profileName)
+      .catch((err) => {
+        vscode.window.showErrorMessage(err.message);
+        return false;
+      })
+      .finally(() => this.ZoweDownloadQueue.delete(copybookPath));
+    this.ZoweDownloadQueue.set(copybookPath, response);
+    return response;
   }
 
   protected createId(profileName: string, path: string) {

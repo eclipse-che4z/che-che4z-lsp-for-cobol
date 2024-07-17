@@ -126,5 +126,6 @@ export class CopybookDownloaderForDsn extends ZoweExplorerDownloader {
       downloadOptions.encoding,
       true,
     );
+    return true;
   }
 }
