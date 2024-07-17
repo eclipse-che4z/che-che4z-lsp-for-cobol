@@ -381,22 +381,22 @@ class CopybookServiceTest {
         new CopybookModel(
             copybookInvalid2.toCopybookId(DOCUMENT_2_URI), copybookInvalid2, null, null),
         invalidCpy2);
-
+    CopybookName invalidCopybookName = new CopybookName(INVALID_CPY_NAME);
     // First document parsing done
     copybookService.sendCopybookDownloadRequest(DOCUMENT_URI, emptyList(), ENABLED);
     verify(client, times(1))
-        .downloadCopybooks(DOCUMENT_URI, ImmutableList.of(INVALID_CPY_NAME), "COBOL", true);
+        .downloadCopybooks(DOCUMENT_URI, ImmutableList.of(invalidCopybookName), true);
 
     // Others parsing done events for first document are not trigger settingsService
     copybookService.sendCopybookDownloadRequest(DOCUMENT_URI, emptyList(), ENABLED);
 
     verify(client, times(1))
-        .downloadCopybooks(DOCUMENT_URI, ImmutableList.of(INVALID_CPY_NAME), "COBOL", true);
-
+        .downloadCopybooks(DOCUMENT_URI, ImmutableList.of(invalidCopybookName), true);
+    CopybookName invalidCopybookName2 = new CopybookName(INVALID_2_CPY_NAME);
     // Second document parsing done
     copybookService.sendCopybookDownloadRequest(DOCUMENT_2_URI, emptyList(), ENABLED);
     verify(client, times(1))
-        .downloadCopybooks(DOCUMENT_2_URI, ImmutableList.of(INVALID_2_CPY_NAME), "COBOL", true);
+        .downloadCopybooks(DOCUMENT_2_URI, ImmutableList.of(invalidCopybookName2), true);
   }
 
   /** Test that the service resolves the SQLDA predefined copybook */
@@ -490,10 +490,12 @@ class CopybookServiceTest {
 
     // Notify that analysis finished sending the document URI and copybook names that have nested
     // copybooks
+    CopybookName invalidCopybookName = new CopybookName(INVALID_CPY_NAME);
+    CopybookName nestedCopybookName = new CopybookName(NESTED_CPY_NAME);
     copybookService.sendCopybookDownloadRequest(
         DOCUMENT_URI, asList(PARENT_CPY_URI, DOCUMENT_URI), ENABLED);
     verify(client, times(1))
-        .downloadCopybooks(DOCUMENT_URI, asList(INVALID_CPY_NAME, NESTED_CPY_NAME), "COBOL", true);
+        .downloadCopybooks(DOCUMENT_URI, asList(invalidCopybookName, nestedCopybookName), true);
   }
 
   @Test

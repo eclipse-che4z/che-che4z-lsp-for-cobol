@@ -232,7 +232,7 @@ class CopybookPreprocessorService {
   }
 
   private CopybookName getCopybookName(CobolPreprocessor.CopySourceContext ctx) {
-    return new CopybookName(StringUtils.trimQuotes(ctx.getText()));
+    return new CopybookName(StringUtils.trimQuotes(ctx.getText()), "COBOL");
   }
 
   private CopybookModel read(CopybookName copybookName, String documentUri) {
