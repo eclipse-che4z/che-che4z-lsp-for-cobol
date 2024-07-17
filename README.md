@@ -203,9 +203,9 @@ You can also set up automatic copybook retrieval from the mainframe to download 
    All copybooks used in the program or project which are not stored locally are downloaded from the mainframe data sets and USS directories that you specified in steps 4 and 5.  
    Copybook support features are now enabled.
 
-Copybooks that you retrieve from mainframe data sets are stored in the **.c4z/.copybooks** directory within the workspace, which is created automatically. 
+Copybooks that you retrieve from mainframe data sets are stored in your VS Code global storage folder. 
 
-We recommend that you refresh your copybooks from time to time. To refresh your copybooks, press **F1** and run the command **Clear downloaded copybooks**. This command clears the **.c4z/.copybooks** directory so that copybooks are downloaded again from the mainframe.
+We recommend that you refresh your copybooks from time to time. To refresh your copybooks, press **F1** and run the command **Clear downloaded copybooks**. This command clears the global storage folder so that copybooks are downloaded again from the mainframe.
 
 ### Retrieving Copybooks from Endevor
 
