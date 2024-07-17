@@ -29,7 +29,7 @@ export abstract class ZoweExplorerDownloader {
   constructor(
     private readonly storagePath: string,
     protected readonly explorerAPI: IApiRegisterClient,
-  ) { }
+  ) {}
 
   protected abstract downloadCopybookContent(
     dataset: string,
