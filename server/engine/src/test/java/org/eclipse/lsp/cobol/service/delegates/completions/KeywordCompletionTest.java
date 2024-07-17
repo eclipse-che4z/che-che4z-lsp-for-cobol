@@ -99,13 +99,13 @@ class KeywordCompletionTest {
     assertEquals(2351, keywords.getDataMap(dialectType).size());
 
     dialectType = ImmutableList.of("IDMS");
-    assertEquals(2351, keywords.getDataMap(dialectType).size());
-
-    dialectType = ImmutableList.of("DaCo");
     assertEquals(2352, keywords.getDataMap(dialectType).size());
 
-    dialectType = ImmutableList.of("DaCo", "IDMS");
+    dialectType = ImmutableList.of("DaCo");
     assertEquals(2353, keywords.getDataMap(dialectType).size());
+
+    dialectType = ImmutableList.of("DaCo", "IDMS");
+    assertEquals(2354, keywords.getDataMap(dialectType).size());
   }
 
   @Test
