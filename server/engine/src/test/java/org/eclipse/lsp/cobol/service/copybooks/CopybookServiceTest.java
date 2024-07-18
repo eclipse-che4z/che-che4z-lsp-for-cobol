@@ -134,7 +134,7 @@ class CopybookServiceTest {
     CopybookModel copybookModel =
         copybookService
             .resolve(
-                CopybookId.fromString(copybookName.getDisplayName()),
+                CopybookId.fromString(copybookName.getQualifiedName()),
                 copybookName,
                 DOCUMENT_URI,
                 DOCUMENT_URI,
@@ -183,7 +183,7 @@ class CopybookServiceTest {
     CopybookModel copybookModelEnabled =
         copybookService
             .resolve(
-                CopybookId.fromString(copybookName.getDisplayName()),
+                CopybookId.fromString(copybookName.getQualifiedName()),
                 copybookName,
                 DOCUMENT_URI,
                 DOCUMENT_URI,
@@ -192,7 +192,7 @@ class CopybookServiceTest {
     CopybookModel copybookModelSkipped =
         copybookService
             .resolve(
-                CopybookId.fromString(copybookName.getDisplayName()),
+                CopybookId.fromString(copybookName.getQualifiedName()),
                 copybookName,
                 DOCUMENT_URI,
                 DOCUMENT_URI,
@@ -410,13 +410,13 @@ class CopybookServiceTest {
 
     assertEquals(
         copybookService.resolve(
-            CopybookId.fromString(copybookName.getDisplayName()),
+            CopybookId.fromString(copybookName.getQualifiedName()),
             copybookName,
             DOCUMENT_URI,
             DOCUMENT_URI,
             null),
         copybookService.resolve(
-            CopybookId.fromString(copybookName.getDisplayName()),
+            CopybookId.fromString(copybookName.getQualifiedName()),
             copybookName,
             DOCUMENT_URI,
             DOCUMENT_URI,
@@ -538,7 +538,7 @@ class CopybookServiceTest {
   }
 
   private CopybookName createCopybook(String displayName) {
-    return CopybookName.builder().displayName(displayName).build();
+    return CopybookName.builder().name(displayName).build();
   }
 
   @Test
@@ -548,7 +548,7 @@ class CopybookServiceTest {
     CopybookModel copybookModel =
         copybookService
             .resolve(
-                CopybookId.fromString(copybookName.getDisplayName()),
+                CopybookId.fromString(copybookName.getQualifiedName()),
                 copybookName,
                 DOCUMENT_URI,
                 DOCUMENT_URI,
@@ -569,7 +569,7 @@ class CopybookServiceTest {
     resolve =
         copybookService
             .resolve(
-                CopybookId.fromString(copybookName.getDisplayName()),
+                CopybookId.fromString(copybookName.getQualifiedName()),
                 copybookName,
                     DOCUMENT_URI,
                     DOCUMENT_URI,
@@ -597,7 +597,7 @@ class CopybookServiceTest {
 
     ResultWithErrors<CopybookModel> resolvedCopybook =
         copybookService.resolve(
-            CopybookId.fromString(copybookName.getDisplayName()),
+            CopybookId.fromString(copybookName.getQualifiedName()),
             copybookName,
             DOCUMENT_URI,
             DOCUMENT_URI,

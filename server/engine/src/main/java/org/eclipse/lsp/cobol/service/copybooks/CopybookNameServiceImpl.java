@@ -79,7 +79,7 @@ public class CopybookNameServiceImpl implements CopybookNameService {
   @Override
   public Optional<CopybookName> findByName(String uri, final String displayName) {
     List<CopybookName> copybookNamesList = createCopybookNamesList(uri,
-            copybookName -> displayName.equalsIgnoreCase(copybookName.getDisplayName()));
+            copybookName -> displayName.equalsIgnoreCase(copybookName.getQualifiedName()));
     return copybookNamesList.isEmpty() ? Optional.empty() : Optional.of(copybookNamesList.get(0));
   }
 
@@ -151,14 +151,14 @@ public class CopybookNameServiceImpl implements CopybookNameService {
                       .map(nameAndExtension -> nameAndExtension.split("\\."))
                       .map(nameAndExtension -> CopybookName
                               .builder()
-                              .displayName(nameAndExtension[0])
+                              .name(nameAndExtension[0])
                               .extension(nameAndExtension.length == 1 ? "" : nameAndExtension[1])
                               .build())
                       .filter(copybookName -> copybookExtensionsWithoutDotAsSet.contains(
                               copybookName.getExtension()))
                       .filter(predicate)
                       .collect(Collectors.toMap(
-                              CopybookName::getDisplayName,
+                              CopybookName::getQualifiedName,
                               Function.identity(),
                               (existing, replacement) ->
                                       copybookExtensionsWithoutDot.indexOf(existing.getExtension())

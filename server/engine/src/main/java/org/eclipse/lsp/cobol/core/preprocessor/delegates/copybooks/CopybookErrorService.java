@@ -56,7 +56,7 @@ class CopybookErrorService {
     SyntaxError error =
         SyntaxError.syntaxError().errorSource(ErrorSource.COPYBOOK)
             .severity(info)
-            .suggestion(messageService.getMessage(messageID, copybookName.getDisplayName()))
+            .suggestion(messageService.getMessage(messageID, copybookName.getQualifiedName()))
             .location(locality.toOriginalLocation())
             .build();
     LOG.debug(logMessage, error.toString());

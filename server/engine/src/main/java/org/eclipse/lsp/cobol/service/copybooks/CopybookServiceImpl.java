@@ -184,8 +184,8 @@ public class CopybookServiceImpl implements CopybookService {
   }
 
   private Optional<CopybookModel> tryResolvePredefinedCopybook(CopybookName copybookName) {
-    CopybookName predefineCopybookName = new CopybookName(copybookName.getDisplayName().toUpperCase(), copybookName.getDialectType(), copybookName.getExtension());
-    CopybookId copybookId = predefineCopybookName.toCopybookId(ImplicitCodeUtils.createFullUrl(predefineCopybookName.getDisplayName()));
+    CopybookName predefineCopybookName = new CopybookName(copybookName.getQualifiedName().toUpperCase(), copybookName.getDialect(), copybookName.getExtension());
+    CopybookId copybookId = predefineCopybookName.toCopybookId(ImplicitCodeUtils.createFullUrl(predefineCopybookName.getQualifiedName()));
     try {
       CopybookModel copybookModel = copybookCache.get(copybookId, () -> new CopybookModel(copybookId, predefineCopybookName, null, null));
       if (copybookModel.getContent() == null || copybookModel.getUri() == null) return Optional.empty();
@@ -215,7 +215,7 @@ public class CopybookServiceImpl implements CopybookService {
     return new OriginalLocation(
             Optional.ofNullable(error.getLocation()).map(OriginalLocation::getLocation).orElse(null),
             CopybooksRepository.toId(dirtyCopybook.getCopybookName().getQualifiedName(),
-                    dirtyCopybook.getCopybookName().getDialectType(),
+                    dirtyCopybook.getCopybookName().getDialect(),
                     dirtyCopybook.getUri()));
   }
 
@@ -238,8 +238,8 @@ public class CopybookServiceImpl implements CopybookService {
     try {
       CompletableFuture<String> future = clientProvider.get().resolveCopybook(
           programUri,
-          copybookName.getDisplayName(),
-          Optional.ofNullable(copybookName.getDialectType()).orElse(COBOL));
+          copybookName.getQualifiedName(),
+          Optional.ofNullable(copybookName.getDialect()).orElse(COBOL));
 
       if (future == null) {
         return Optional.empty();
