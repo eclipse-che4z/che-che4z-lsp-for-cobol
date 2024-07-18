@@ -70,6 +70,11 @@ describe("Validate getLineCommentStatus", () => {
       LineCommentStatus.COMMENTED_TWICE,
     );
   });
+  test("with twice commented line by floating", () => {
+    expect(getLineCommentStatus("123456* *> The comment")).toBe(
+      LineCommentStatus.COMMENTED_TWICE,
+    );
+  });
   test("with non comment line", () => {
     expect(getLineCommentStatus('123456     Display "Hello!"')).toBe(
       LineCommentStatus.NON_COMMENT,
@@ -85,6 +90,16 @@ describe("Validate getLineCommentStatus", () => {
   });
   test("with spaces line", () => {
     expect(getLineCommentStatus("                           ")).toBe(
+      LineCommentStatus.NON_COMMENT,
+    );
+  });
+  test("floating comment", () => {
+    expect(getLineCommentStatus("123456    *>               ")).toBe(
+      LineCommentStatus.FLOATING_COMMENT,
+    );
+  });
+  test("not a floating comment", () => {
+    expect(getLineCommentStatus("123456 A  *>               ")).toBe(
       LineCommentStatus.NON_COMMENT,
     );
   });
@@ -111,6 +126,9 @@ describe("Validate commentLine", () => {
   test("with empty line", () => {
     expect(commentLine("")).toBe("      *");
   });
+  test("with floating comment", () => {
+    expect(commentLine("123456  *>Foobar!")).toBe("123456*  *>Foobar!");
+  });
 });
 
 describe("Validate uncommentLine", () => {
@@ -133,6 +151,10 @@ describe("Validate uncommentLine", () => {
   });
   test("with empty line", () => {
     expect(uncommentLine("")).toBe("");
+  });
+  test("with floating comment", () => {
+    expect(uncommentLine("123456  *>Foobar!")).toBe("123456  Foobar!");
+    expect(uncommentLine("123456  *> Foobar!")).toBe("123456  Foobar!");
   });
 });
 

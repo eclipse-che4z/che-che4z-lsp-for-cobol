@@ -89,6 +89,8 @@ export class CopybookDownloadService {
     this.dsnDownloader?.clearMemberListCache();
     this.ussDownloader?.clearMemberListCache();
     this.e4eDownloader?.clearConfigs();
+    this.dsnDownloader?.clearZoweDownloadQueue();
+    this.ussDownloader?.clearZoweDownloadQueue();
   }
 
   private async downloadFromPaths(
