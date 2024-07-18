@@ -98,7 +98,7 @@ class Db2SqlVisitor extends Db2SqlParserBaseVisitor<List<Node>> {
     @Override
     public List<Node> visitLob_xml_host_variables(Db2SqlParser.Lob_xml_host_variablesContext ctx) {
         List<Node> hostVariableDefinitionNode = createHostVariableDefinitionNode(ctx, ctx.dbs_host_var_levels(), ctx.entry_name());
-        if (ctx.lobWithSize() != null && ctx.lobWithSize().BINARY() != null) {
+        if (ctx.lobWithSize() != null) {
             generateVarbinVariables((VariableDefinitionNode) hostVariableDefinitionNode.get(0),
                     ctx.lobWithSize().dbs_integer().getText(), ctx);
         }
@@ -108,7 +108,17 @@ class Db2SqlVisitor extends Db2SqlParserBaseVisitor<List<Node>> {
     @Override
     public List<Node> visitLob_host_variables(Db2SqlParser.Lob_host_variablesContext ctx) {
         List<Node> hostVariableDefinitionNode = createHostVariableDefinitionNode(ctx, ctx.dbs_integer(), ctx.entry_name());
-        if (ctx.lobWithSize() != null && ctx.lobWithSize().BINARY() != null) {
+        if (ctx.lobWithSize() != null) {
+            generateVarbinVariables((VariableDefinitionNode) hostVariableDefinitionNode.get(0),
+                    ctx.lobWithSize().dbs_integer().getText(), ctx);
+        }
+        return hostVariableDefinitionNode;
+    }
+
+    @Override
+    public List<Node> visitLob_host_variables_arrays(Db2SqlParser.Lob_host_variables_arraysContext ctx) {
+        List<Node> hostVariableDefinitionNode = createHostVariableDefinitionNode(ctx, ctx.dbs_host_var_levels_arrays(), ctx.entry_name());
+        if (ctx.lobWithSize() != null) {
             generateVarbinVariables((VariableDefinitionNode) hostVariableDefinitionNode.get(0),
                     ctx.lobWithSize().dbs_integer().getText(), ctx);
         }
@@ -171,6 +181,7 @@ class Db2SqlVisitor extends Db2SqlParserBaseVisitor<List<Node>> {
         switch (ctx.getClass().getSimpleName()) {
             case "Lob_host_variablesContext":
             case "Lob_xml_host_variablesContext":
+            case "Lob_host_variables_arraysContext":
                 suffux1 = "-LENGTH";
                 suffix2 = "-DATA";
                 break;
