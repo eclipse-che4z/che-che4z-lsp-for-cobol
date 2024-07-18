@@ -1,20 +1,21 @@
 # Changelog
 All notable changes to the COBOL Language Support extension are documented in this file.
 
-## [2.2.0](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/compare/2.1.2...2.2.0) (2024-07-18)
+## [2.2.0](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/compare/2.1.2...2.2.0) (2024-07-19)
+
+#### Added
+- Integration with Explorer for Endevor to enable automatic copybook retrieval from Endevor
+- Support for shared drive URI resolution
+- Command to run analysis via VS Code command
+- Support for result set locator DB2 SQL host variable
 
 #### Fixed
 - Miscellaneous bug fixes
 - Support floating comments in the toggle command
-
-#### Added
-- Support for shared drive uri resolution
-- Command to run analysis via vscode command
 - Improve support for CCF
+
+#### Changed
 - Move copybook download folder into global storage
-- Provide an option to enable Explorer for Endevor copybook integration
-- Support downloading copybooks from Endevor
-- support for result set locator db2 sql host variable
 
 ## [2.1.2](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/compare/2.1.1...2.2.0) (2024-04-03)
 #### Added
