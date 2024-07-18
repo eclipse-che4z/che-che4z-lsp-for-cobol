@@ -129,11 +129,11 @@ class CopybookNameServiceTest {
     return Stream.of(
             Arguments.of(
                     Arrays.asList(".xyz", ".copy", ".COPY", ".cpy", ".CPY"),
-                    Optional.of(CopybookName.builder().displayName("A").extension("copy").build())
+                    Optional.of(CopybookName.builder().name("A").extension("copy").build())
             ),
             Arguments.of(
                     Arrays.asList(".xyz", ".CPY", ".cpy", ".COPY", ".copy"),
-                    Optional.of(CopybookName.builder().displayName("A").extension("CPY").build())
+                    Optional.of(CopybookName.builder().name("A").extension("CPY").build())
             ),
             Arguments.of(
                     Arrays.asList(".xyz", ".acd"),
@@ -141,7 +141,7 @@ class CopybookNameServiceTest {
             ),
             Arguments.of(
                     Arrays.asList("", ".copy"),
-                    Optional.of(CopybookName.builder().displayName("A").extension("").build())
+                    Optional.of(CopybookName.builder().name("A").extension("").build())
             ),
             Arguments.of(
                     Collections.emptyList(),
@@ -149,7 +149,7 @@ class CopybookNameServiceTest {
             ),
             Arguments.of(
                     Arrays.asList(".COPY", ".copy"),
-                    Optional.of(CopybookName.builder().displayName("A").extension("COPY").build())
+                    Optional.of(CopybookName.builder().name("A").extension("COPY").build())
             )
     );
   }
