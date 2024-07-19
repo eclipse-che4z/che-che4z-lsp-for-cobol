@@ -28,6 +28,29 @@ export function commentCommand(actionType: CommentAction) {
   new ToggleComments(activeEditor, actionType).doIt();
 }
 
+const allWhitespace = /^ *$/;
+
+function withoutSeqNum(s: string) {
+  return s.substring(6, 72);
+}
+
+function identifyNonEmptyRegion(text: string[]): [number, number] {
+  let nonEmptyStart = text.findIndex(
+    (x) => !allWhitespace.test(withoutSeqNum(x)),
+  );
+  let nonEmptyEnd = text.length;
+
+  if (nonEmptyStart === -1) {
+    nonEmptyStart = 0;
+  } else {
+    for (; nonEmptyEnd > nonEmptyStart; --nonEmptyEnd) {
+      if (!allWhitespace.test(withoutSeqNum(text[nonEmptyEnd - 1]))) break;
+    }
+  }
+
+  return [nonEmptyStart, nonEmptyEnd];
+}
+
 /**
  * Toggles comments in the active text editor based on selection and action type.
  */
@@ -56,15 +79,24 @@ export class ToggleComments {
     const textLines = selectedLines
       .map((it) => it.text)
       .map(ensureIndicatorArea);
-    const processedLines = textLines.map(this.evaluateAction(textLines));
+
+    const [nonEmptyStart, nonEmptyEnd] = identifyNonEmptyRegion(textLines);
+    const toProcess = textLines.slice(nonEmptyStart, nonEmptyEnd);
+    const processedLines = toProcess.map(this.evaluateAction(toProcess));
+
     const lineSeparator =
       this.textEditor.document.eol === vscode.EndOfLine.LF ? "\n" : "\r\n";
     const selectionRange = new vscode.Range(
-      new vscode.Position(selectedLines[0].range.start.line, 0),
-      new vscode.Position(
-        selectedLines[selectedLines.length - 1].range.end.line,
-        selectedLines[selectedLines.length - 1].range.end.character,
-      ),
+      new vscode.Position(selectedLines[0].range.start.line + nonEmptyStart, 0),
+      nonEmptyEnd == textLines.length
+        ? new vscode.Position(
+            selectedLines[selectedLines.length - 1].range.end.line,
+            selectedLines[selectedLines.length - 1].range.end.character,
+          )
+        : new vscode.Position(
+            selectedLines[0].range.start.line + nonEmptyEnd - 1,
+            textLines[nonEmptyEnd - 1].length,
+          ),
     );
     return {
       selection: selectionRange,
