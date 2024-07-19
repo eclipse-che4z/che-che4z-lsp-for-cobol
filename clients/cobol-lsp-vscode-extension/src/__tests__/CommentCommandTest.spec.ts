@@ -314,6 +314,42 @@ describe("Validate ToggleComments", () => {
     );
   });
 
+  test("toggle mixed selection", () => {
+    // selection[0]
+    // 4           >
+    // 5:       01  WS-POINT.
+    // 6:           05 WS-POINTER USAGE    IS POINTER.
+    // 7:                              <
+    // selection[1]
+    // 13:                  >
+    // 14:      *    DISPLAY 'From P1:' BAR of FOOBAR.
+    // 15:                             <
+    const mixedTextEditor = {
+      selections: [getRange(4, 12, 7, 25), getRange(13, 20, 15, 30)],
+      document: {
+        lineAt: jest.fn().mockImplementation(
+          (line: number) =>
+            documentLines[line as keyof typeof documentLines] ?? {
+              text: "",
+              range: getRange(line, 0, line, 0),
+            },
+        ),
+        eol: vscode.EndOfLine.LF,
+      },
+      edit: jest.fn().mockImplementation((callback) => callback(editBuilder)),
+    } as unknown as vscode.TextEditor;
+    new ToggleComments(mixedTextEditor, CommentAction.TOGGLE).doIt();
+    expect(editBuilder.replace).toBeCalledWith(
+      getRange(5, 0, 6, 45),
+      "      *01  WS-POINT.\n" +
+        "      *    05 WS-POINTER USAGE    IS POINTER.",
+    );
+    expect(editBuilder.replace).toBeCalledWith(
+      getRange(14, 0, 14, 44),
+      "           DISPLAY 'From P1:' BAR of FOOBAR.",
+    );
+  });
+
   function checkCommonCalls() {
     expect(textEditor.document.lineAt).toBeCalledTimes(5);
     expect(textEditor.document.lineAt).toBeCalledWith(5);
