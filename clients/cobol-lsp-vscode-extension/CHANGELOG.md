@@ -8,6 +8,8 @@ All notable changes to the COBOL Language Support extension are documented in th
 - Support for shared drive URI resolution
 - Command to run analysis via VS Code command
 - Support for result set locator DB2 SQL host variable
+- Support for table locator DB2 SQL host variable
+- Support for XML file reference DB2 SQL host variable 
 
 #### Fixed
 - Miscellaneous bug fixes

@@ -5,8 +5,8 @@ All notable changes to the COBOL Language Support extension are documented in th
 
 ### Bug Fixes
 * Add language element to the CLI analysis response in case of crash ([1f87a10](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/1f87a103c3af6a9694f5fcbc164132fba80ef25e))
-* Add semantic check for table locator Db2 host variable ([cd8dce6](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/cd8dce63a22cfe3e1b6aedca77e79ee9222fcb36))
 * Alter go to support in experimental parser ([#2306](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/issues/2306)) ([aa7ba71](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/aa7ba711a37c23cda45e38ef66f5395180df6cdb))
+* Comment toggle when region includes empty lines ([#2386](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/issues/2386)) ([0997bc2](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/0997bc28bcf3e473595f455d613152ed8dce88e5))
 * Do not allow COBOL keywords as identifiers ([803e08d](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/803e08d7d90544053538608a7b2d3f2732f937ba))
 * Do not invalidate implicit copybook cache on re-analysis ([f473617](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/f4736177f2a2eccb1999b19572354ac85a47f9e1))
 * EXP-COBOL not selected by default ([89d963a](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/89d963ad641fb6f15f3135781eecbbe55a9d8e81))
@@ -51,6 +51,9 @@ All notable changes to the COBOL Language Support extension are documented in th
 * Support 'window/workDoneProgress/cancel' LSP event ([f986eca](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/f986eca84e8b9468ec5ad124dc5c6329244db885))
 * Support downloading copybooks from Endevor ([#2302](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/issues/2302)) ([f513a14](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/f513a142541dbd19f161eb07b8b1747b20398bfc))
 * Support for result set locator Db2 SQL host variable ([#2329](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/issues/2329)) ([53c16fa](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/53c16faac605cc46c151ec1c1a6c572dd408b630)), closes [cobol-host-variables-in#db2z_hostvariablecobol__title__20](https://github.com/cobol-host-variables-in/issues/db2z_hostvariablecobol__title__20)
+* XML data host and file reference variables ([#2390](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/issues/2390)) ([a99147e](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/a99147e131e01ddb466f307e7f91d926e57c6a07))
+* Add support for table locator Db2 host variable ([#2380](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/pull/2380))([cd8dce6](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/cd8dce63a22cfe3e1b6aedca77e79ee9222fcb36))
+
 
 ## [2.1.2](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/compare/2.1.1...2.2.0) (2024-04-03)
 
