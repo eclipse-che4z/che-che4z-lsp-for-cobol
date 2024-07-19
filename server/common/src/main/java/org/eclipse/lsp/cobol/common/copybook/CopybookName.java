@@ -36,15 +36,15 @@ public class CopybookName {
     return displayName;
   }
 
-  public CopybookName(String name) {
-    this.displayName = name;
+  public CopybookName(String displayName) {
+    this.displayName = displayName;
     this.extension = null;
     this.dialectType = null;
   }
 
-  public CopybookName(String name, String dialect) {
-    this.displayName = name;
-    this.dialectType = dialect;
+  public CopybookName(String displayName, String dialectType) {
+    this.displayName = displayName;
+    this.dialectType = dialectType;
     this.extension = null;
   }
 

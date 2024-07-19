@@ -79,7 +79,7 @@ public class CopybookNameServiceImpl implements CopybookNameService {
   @Override
   public Optional<CopybookName> findByName(String uri, final String displayName) {
     List<CopybookName> copybookNamesList = createCopybookNamesList(uri,
-            copybookName -> displayName.equalsIgnoreCase(copybookName.getQualifiedName()));
+            copybookName -> displayName.equalsIgnoreCase(copybookName.getDisplayName()));
     return copybookNamesList.isEmpty() ? Optional.empty() : Optional.of(copybookNamesList.get(0));
   }
 
