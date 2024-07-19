@@ -131,17 +131,10 @@
       },
       {
         "id": "hpcobol",
-        "extensions": [
-          ".hpcbl",
-          ".hpcobol",
-          ".hp",
-          "ecobol"
-        ],
         "aliases": [
           "HP-COBOL"
         ],
-        "configuration": "./syntaxes/lang-config-hp.json",
-        "firstLine": "^[ ]( *([Ii][Dd]([Ee][Nn][Tt][Ii][Ff][Ii][Cc][Aa][Tt][Ii][Oo][Nn])? +[Dd][Ii][Vv][Ii][Ss][Ii][Oo][Nn][.].*?)$|^\\?.*"
+        "configuration": "./syntaxes/lang-config-hp.json"
       }
     ],
     "grammars": [
