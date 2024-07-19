@@ -32,13 +32,26 @@ interface NormalizedGroup {
   "copybook-file-encoding"?: string;
   libs?: string[];
   name: string;
-  preprocessor: NormalizedPrerocessor[];
+  preprocessor: NormalizedPreprocessor[];
 }
 
-interface NormalizedPrerocessor {
+type NormalizedPreprocessor = SqlPreprocessor | GenericPrerocessor;
+export type SQL_BACKEND = "DATACOM_SERVER" | "DB2";
+
+interface SqlPreprocessor {
+  name: 'SQL';
+  libs: string[];
+  ["target-sql-backend"]: SQL_BACKEND;
+
+}
+interface GenericPrerocessor {
   name: string;
   libs: string[];
-};
+}
+
+export function isSqlPreprocessor(preprocessor: NormalizedPreprocessor): preprocessor is SqlPreprocessor {
+  return preprocessor.name === "SQL";
+}
 
 const PROCESSOR_GROUP_FOLDER = ".cobolplugin";
 const PROCESSOR_GROUP_PGM = "pgm_conf.json";
@@ -55,7 +68,7 @@ export function loadProcessorGroupCopybookPaths(
   if (dialectType === "COBOL") {
     return pgroup.libs || [];
   }
-  const pr = pgroup.preprocessor.find(p => p.name === dialectType);
+  const pr = pgroup.preprocessor.find((p) => p.name === dialectType);
   return pr?.libs || [];
 }
 
@@ -67,31 +80,19 @@ export function loadProcessorGroupCopybookPathsConfig(
   if (pgroup instanceof Error) {
     return pgroup;
   }
-  const config = [
-    pgroup.libs || [],
-    ...configObject
-  ];
+  const libs = [...(pgroup.libs || []), ...configObject].map((l) =>
+    l.replace(backwardSlashRegex, "/"),
+  );
   return SettingsUtils.getWorkspaceFoldersFsPath()
-    .map((folder) =>
-      globSync(
-        config.map((ele) => ele.replace(backwardSlashRegex, "/")),
-        { cwd: cleanWorkspaceFolderName(folder) },
-      ).map((s) => normalizePath(s)),
-    )
-    .reduce((acc, curVal) => {
-      return acc.concat(curVal);
-    }, []);
+    .map(cleanWorkspaceFolderName)
+    .flatMap((p) => globSync(libs, { cwd: p }))
+    .map(normalizePath);
 }
 
 export function loadProcessorGroupCopybookExtensionsConfig(
   item: { scopeUri: string },
   configObject: string[],
 ): string[] {
-  return loadProcessorGroupSettings(
-    item.scopeUri,
-    "copybook-extensions",
-    configObject,
-  );
 }
 
 export function loadProcessorGroupCopybookEncodingConfig(
@@ -171,12 +172,10 @@ function pathMatches(program: string, documentPath: string) {
   return path.sep === "/"
     ? program.split("\\").join(path.sep) === documentPath
     : program.split("/").join(path.sep).toUpperCase() ===
-    documentPath.toUpperCase();
+        documentPath.toUpperCase();
 }
 
-function getProcessorGroup(
-  documentUri: string,
-): NormalizedGroup | Error {
+export function getProcessorGroup(documentUri: string): NormalizedGroup | Error {
   const documentPath = Uri.parse(documentUri).fsPath;
   const ws = SettingsUtils.getWorkspaceFoldersFsPath();
   if (ws.length < 1) {
@@ -195,8 +194,10 @@ function getProcessorGroup(
   try {
     pgmConf = parse.toPgmConf(pgmConfJson);
   } catch (e) {
-    const er = (e as Error);
-    return Error(`Program config file ${pgmConfPath} does not match required schema: ${er.message}`);
+    const er = e as Error;
+    return Error(
+      `Program config file ${pgmConfPath} does not match required schema: ${er.message}`,
+    );
   }
   if (pgmConf instanceof Error) {
     return pgmConf;
@@ -217,33 +218,37 @@ function getProcessorGroup(
   try {
     procGrps = parse.toProcGrps(procGrpsJson);
   } catch (e) {
-    const er = (e as Error);
-    return Error(`Processor groups file ${procGrpsPath} does not match required schema: ${er.message}`);
+    const er = e as Error;
+    return Error(
+      `Processor groups file ${procGrpsPath} does not match required schema: ${er.message}`,
+    );
   }
   if (procGrps instanceof Error) {
     return procGrps;
   }
-  const pgroup = procGrps.pgroups.find(p => p.name === name);
+  const pgroup = procGrps.pgroups.find((p) => p.name === name);
   if (pgroup === undefined) {
     return Error(`No matching processor group found for ${documentPath}`);
   }
 
-  let npr: NormalizedPrerocessor[] = [];
+  let npr: NormalizedPreprocessor[] = [];
   const pr = pgroup.preprocessor;
   if (pr === undefined) {
     npr = [];
   } else if (typeof pr === "string") {
     npr = [{ name: pr, libs: [] }];
   } else if (!Array.isArray(pr)) {
-    npr = [{
-      name: pr.name,
-      libs: pr.libs || []
-    }];
+    npr = [
+      {
+        name: pr.name,
+        libs: pr.libs || [],
+      },
+    ];
   } else {
-    npr = pr.map(
-      p => typeof p === "string"
+    npr = pr.map((p) =>
+      typeof p === "string"
         ? { name: p, libs: [] }
-        : { name: p.name, libs: p.libs || [] }
+        : { name: p.name, libs: p.libs || [] },
     );
   }
 
@@ -254,6 +259,5 @@ function getProcessorGroup(
     name: pgroup.name,
     libs: pgroup.libs,
     preprocessor: npr.filter((p) => p.name != "SQL"), // "SQL" is not a real dialect, we will use it only to set up sql backend for now
-  }
+  };
 }
-

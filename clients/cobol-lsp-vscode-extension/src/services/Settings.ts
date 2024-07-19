@@ -41,12 +41,19 @@ import {
   loadProcessorGroupCopybookEncodingConfig,
   loadProcessorGroupCopybookExtensionsConfig,
   loadProcessorGroupCopybookPaths,
-  loadProcessorGroupCopybookPathsConfig,
-  loadProcessorGroupDialectConfig,
   loadProcessorGroupSqlBackendConfig,
+  getProcessorGroup,
+  isSqlPreprocessor,
+  SQL_BACKEND,
 } from "./ProcessorGroups";
-import { getProgramNameFromUri } from "./util/FSUtils";
+import {
+  getProgramNameFromUri,
+  cleanWorkspaceFolderName,
+  backwardSlashRegex,
+  normalizePath,
+} from "./util/FSUtils";
 import SettingsUtils from "./util/SettingsUtils";
+import { globSync } from "glob";
 
 export class TabRule {
   // tslint:disable-next-line:no-unnecessary-initializer
@@ -62,71 +69,108 @@ export class TabSettings {
 }
 
 export function configHandler(request: any): Array<any> {
-  const result = new Array<any>();
-  for (let item of request.items) {
-    try {
-      if (item.section === DIALECT_REGISTRY_SECTION) {
-        const object = DialectRegistry.getDialects();
-        result.push(object);
-      } else if (item.scopeUri) {
-        const cfg = vscode.workspace.getConfiguration().get(item.section);
-        if (item.section === SETTINGS_DIALECT) {
-          const preprocessors = loadProcessorGroupDialectConfig(item);
-          if (preprocessors instanceof Error) {
-            console.error(preprocessors);
-            result.push(cfg);
-          } else {
-            result.push(preprocessors);
-          }
-        } else if (item.section === SETTINGS_CPY_LOCAL_PATH) {
-          const object = loadProcessorGroupCopybookPathsConfig(
-            item,
-            cfg as string[],
-          );
-          result.push(object);
-        } else if (item.section === DIALECT_LIBS && !!item.dialect) {
-          const dialectLibs = SettingsService.getCopybookLocalPath(
-            item.scopeUri,
-            item.dialect,
-          );
-          result.push(dialectLibs);
-        } else if (item.section === SETTINGS_CPY_EXTENSIONS) {
-          const object = loadProcessorGroupCopybookExtensionsConfig(
-            item,
-            cfg as string[],
-          );
-          result.push(object);
-        } else if (item.section === SETTINGS_SQL_BACKEND) {
-          const object = loadProcessorGroupSqlBackendConfig(
-            item,
-            cfg as string,
-          );
-          result.push(object);
-        } else if (item.section === SETTINGS_CPY_FILE_ENCODING) {
-          const object = loadProcessorGroupCopybookEncodingConfig(
-            item,
-            cfg as string,
-          );
-          result.push(object);
-        } else if (item.section === SETTINGS_COMPILE_OPTIONS) {
-          const object = loadProcessorGroupCompileOptionsConfig(
-            item,
-            cfg as string,
-          );
-          result.push(object);
-        } else {
-          result.push(cfg);
-        }
-      } else if (item.section === COBOL_PRGM_LAYOUT) {
-        result.push(SettingsService.getCobolProgramLayout());
-      } else {
-        result.push(vscode.workspace.getConfiguration().get(item.section));
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  }
+  const result = request.items.map(handleRequest);
+
   return result;
+}
+
+function getDialects(documentUri: string) {
+  const pgroup = getProcessorGroup(documentUri);
+  if (pgroup instanceof Error) {
+    console.error(pgroup);
+    const setting: string[] =
+      vscode.workspace.getConfiguration().get(SETTINGS_DIALECT) || [];
+    return setting;
+  }
+
+  return pgroup.preprocessor.map((p) => p.name);
+}
+
+function getLocalCopybookPaths(documentUri: string) {
+  const pgroup = getProcessorGroup(documentUri);
+  let config: string[] = [];
+  if (pgroup instanceof Error) {
+    console.log(pgroup);
+    config = [];
+  } else {
+    config = pgroup.libs || [];
+  }
+  const setting: string[] =
+    vscode.workspace.getConfiguration().get(SETTINGS_CPY_LOCAL_PATH) || [];
+  const libs = [...config, ...setting].map((l) =>
+    l.replace(backwardSlashRegex, "/"),
+  );
+
+  return SettingsUtils.getWorkspaceFoldersFsPath()
+    .map(cleanWorkspaceFolderName)
+    .flatMap((p) => globSync(libs, { cwd: p }))
+    .map(normalizePath);
+}
+
+function getDialectLibs(documentUri: string, dialect: string) {
+  const dialectLibs = SettingsService.getCopybookLocalPath(
+    documentUri,
+    dialect,
+  );
+
+  return dialectLibs;
+}
+
+function getCopybookExtensions(documentUri: string): string[] {
+  const setting: string[] | undefined = vscode.workspace
+    .getConfiguration()
+    .get(SETTINGS_CPY_EXTENSIONS);
+  const pgroup = getProcessorGroup(documentUri);
+
+  if (pgroup instanceof Error) {
+    console.log(pgroup);
+    return setting || [];
+  }
+  return pgroup["copybook-extensions"] || [];
+}
+
+function getSqlBackend(documentUri: string): SQL_BACKEND {
+  const setting: SQL_BACKEND =
+    vscode.workspace.getConfiguration().get(SETTINGS_SQL_BACKEND) || "DB2";
+  const pgroup = getProcessorGroup(documentUri);
+  if (pgroup instanceof Error) {
+    console.log(pgroup);
+    return setting;
+  }
+  const preprocessor = pgroup?.preprocessor.find(isSqlPreprocessor);
+  const backend = (preprocessor && preprocessor["target-sql-backend"]) || "DB2";
+  return backend;
+}
+
+function getCopybookEncoding(documentUri: string) {
+  const setting = vscode.workspace.getConfiguration().get(SETTINGS_CPY_FILE_ENCODING);
+  return setting;
+}
+
+function handleRequest(item: any): any {
+  if (item.section === DIALECT_REGISTRY_SECTION) {
+    return DialectRegistry.getDialects();
+  } else if (item.section === SETTINGS_DIALECT) {
+    return getDialects(item.scopeUri);
+  } else if (item.section === SETTINGS_CPY_LOCAL_PATH) {
+    return getLocalCopybookPaths(item.scopeUri);
+  } else if (item.section === DIALECT_LIBS && !!item.dialect) {
+    return getDialectLibs(item.scopeUri, item.dialect);
+  } else if (item.section === SETTINGS_CPY_EXTENSIONS) {
+    return getCopybookExtensions(item.scopeUri);
+  } else if (item.section === SETTINGS_SQL_BACKEND) {
+    return getSqlBackend(item.scopeUri);
+  } else if (item.section === SETTINGS_CPY_FILE_ENCODING) {
+    return getCopybookEncoding(item.scopeUri);
+  } else if (item.section === SETTINGS_COMPILE_OPTIONS) {
+    const cfg = vscode.workspace.getConfiguration().get(item.section);
+    const object = loadProcessorGroupCompileOptionsConfig(item, cfg as string);
+    return object;
+  } else if (item.section === COBOL_PRGM_LAYOUT) {
+    return SettingsService.getCobolProgramLayout();
+  } else {
+    return vscode.workspace.getConfiguration().get(item.section);
+  }
 }
 
 /**

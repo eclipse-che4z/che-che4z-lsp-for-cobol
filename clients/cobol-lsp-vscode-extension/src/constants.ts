@@ -11,19 +11,18 @@
  * Contributors:
  *   Broadcom, Inc. - initial API and implementation
  */
-export const SETTINGS_CPY_SECTION: string = "cobol-lsp.cpy-manager";
-export const SETTINGS_CPY_LOCAL_PATH: string =
-  "cobol-lsp.cpy-manager.paths-local";
-export const SETTINGS_CPY_EXTENSIONS: string =
+export const SETTINGS_CPY_SECTION = "cobol-lsp.cpy-manager";
+export const SETTINGS_CPY_LOCAL_PATH = "cobol-lsp.cpy-manager.paths-local";
+export const SETTINGS_CPY_EXTENSIONS =
   "cobol-lsp.cpy-manager.copybook-extensions";
-export const SETTINGS_CPY_FILE_ENCODING: string =
+export const SETTINGS_CPY_FILE_ENCODING =
   "cobol-lsp.cpy-manager.copybook-file-encoding";
-export const SETTINGS_SQL_BACKEND: string = "cobol-lsp.target-sql-backend";
+export const SETTINGS_SQL_BACKEND = "cobol-lsp.target-sql-backend";
 export const SETTINGS_DIALECT = "cobol-lsp.dialects";
 export const SETTINGS_COMPILE_OPTIONS = "cobol-lsp.compiler.options";
 export const SETTINGS_SUBROUTINE_LOCAL_KEY =
   "cobol-lsp.subroutine-manager.paths-local";
-export const SETTINGS_TAB_CONFIG: string = "cobol-lsp.smart-tab";
+export const SETTINGS_TAB_CONFIG = "cobol-lsp.smart-tab";
 
 export const SERVER_PORT = "cobol-lsp.server.port";
 export const SERVER_RUNTIME = "cobol-lsp.serverRuntime";
@@ -32,9 +31,9 @@ export const PATHS_LOCAL_KEY = "paths-local";
 export const PATHS_DSN = "paths-dsn";
 export const PATHS_USS = "paths-uss";
 export const COBOL_PRGM_LAYOUT = "cobol-lsp.cobol.program.layout";
-export const C4Z_FOLDER: string = ".c4z";
-export const COPYBOOKS_FOLDER: string = ".copybooks";
-export const GITIGNORE_FILE: string = ".gitignore";
+export const C4Z_FOLDER = ".c4z";
+export const COPYBOOKS_FOLDER = ".copybooks";
+export const GITIGNORE_FILE = ".gitignore";
 export const LANGUAGE_ID = "cobol";
 export const EXP_LANGUAGE_ID = "expcobol";
 export const HP_LANGUAGE_ID = "hpcobol";
@@ -68,12 +67,12 @@ export const INSTALL_ZOWE = "Install Zowe Explorer";
 export const DEFAULT_DIALECT = "COBOL";
 export const CLEARING_COPYBOOK_CACHE = "Clearing downloaded copybook cache";
 export const COPYBOOK_CACHE_CLEARED_INFO = "Downloaded copybooks removed";
-export const ZOWE_FOLDER: string = ".zowe";
+export const ZOWE_FOLDER = ".zowe";
 export const FAIL_CREATE_COPYBOOK_FOLDER_MSG = `Failed to create copybook internal folder`;
 export const FAIL_CREATE_GLOBAL_STORAGE_MSG = `Failed to create extension global storage folder`;
-export const E4E_SCHEME: string = "ndvr";
+export const E4E_SCHEME = "ndvr";
 export const OUTPUT_MSG_SEARCH_LOCATION = "Looking for location => ";
-export const E4E_FOLDER: string = ".e4e";
+export const E4E_FOLDER = ".e4e";
 export const DATASET = "dataset";
 export const ENVIRONMENT = "environment";
 export const USE_MAP = "MAP";
