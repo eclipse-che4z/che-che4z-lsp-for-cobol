@@ -215,7 +215,7 @@ public class CopybookServiceImpl implements CopybookService {
     return new OriginalLocation(
             Optional.ofNullable(error.getLocation()).map(OriginalLocation::getLocation).orElse(null),
             CopybooksRepository.toId(dirtyCopybook.getCopybookName().getQualifiedName(),
-                    dirtyCopybook.getCopybookName().getDisplayName(),
+                    dirtyCopybook.getCopybookName().getDialectType(),
                     dirtyCopybook.getUri()));
   }
 
