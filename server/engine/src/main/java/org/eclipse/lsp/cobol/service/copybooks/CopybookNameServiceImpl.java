@@ -151,14 +151,14 @@ public class CopybookNameServiceImpl implements CopybookNameService {
                       .map(nameAndExtension -> nameAndExtension.split("\\."))
                       .map(nameAndExtension -> CopybookName
                               .builder()
-                              .name(nameAndExtension[0])
+                              .displayName(nameAndExtension[0])
                               .extension(nameAndExtension.length == 1 ? "" : nameAndExtension[1])
                               .build())
                       .filter(copybookName -> copybookExtensionsWithoutDotAsSet.contains(
                               copybookName.getExtension()))
                       .filter(predicate)
                       .collect(Collectors.toMap(
-                              CopybookName::getQualifiedName,
+                              CopybookName::getDisplayName,
                               Function.identity(),
                               (existing, replacement) ->
                                       copybookExtensionsWithoutDot.indexOf(existing.getExtension())

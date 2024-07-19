@@ -38,9 +38,9 @@ class CopybookNameCompletionTest {
   @Test
   void testCopybookNameCompletion() {
     when(copybookNameService.getNames("id")).thenReturn(Arrays.asList(
-        CopybookName.builder().name("Copy1").build(),
-        CopybookName.builder().name("copy2").build(),
-        CopybookName.builder().name("no-copy").build()));
+        CopybookName.builder().displayName("Copy1").build(),
+        CopybookName.builder().displayName("copy2").build(),
+        CopybookName.builder().displayName("no-copy").build()));
 
     CopybookNameCompletion copybookNameCompletion = new CopybookNameCompletion(copybookNameService);
     CobolDocumentModel document = new CobolDocumentModel("id", TEXT, AnalysisResult.builder().build());

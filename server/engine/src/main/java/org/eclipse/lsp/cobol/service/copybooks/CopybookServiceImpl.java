@@ -184,8 +184,8 @@ public class CopybookServiceImpl implements CopybookService {
   }
 
   private Optional<CopybookModel> tryResolvePredefinedCopybook(CopybookName copybookName) {
-    CopybookName predefineCopybookName = new CopybookName(copybookName.getQualifiedName().toUpperCase(), copybookName.getDialect(), copybookName.getExtension());
-    CopybookId copybookId = predefineCopybookName.toCopybookId(ImplicitCodeUtils.createFullUrl(predefineCopybookName.getQualifiedName()));
+    CopybookName predefineCopybookName = new CopybookName(copybookName.getDisplayName().toUpperCase(), copybookName.getDialectType(), copybookName.getExtension());
+    CopybookId copybookId = predefineCopybookName.toCopybookId(ImplicitCodeUtils.createFullUrl(predefineCopybookName.getDisplayName()));
     try {
       CopybookModel copybookModel = copybookCache.get(copybookId, () -> new CopybookModel(copybookId, predefineCopybookName, null, null));
       if (copybookModel.getContent() == null || copybookModel.getUri() == null) return Optional.empty();
@@ -215,7 +215,7 @@ public class CopybookServiceImpl implements CopybookService {
     return new OriginalLocation(
             Optional.ofNullable(error.getLocation()).map(OriginalLocation::getLocation).orElse(null),
             CopybooksRepository.toId(dirtyCopybook.getCopybookName().getQualifiedName(),
-                    dirtyCopybook.getCopybookName().getDialect(),
+                    dirtyCopybook.getCopybookName().getDisplayName(),
                     dirtyCopybook.getUri()));
   }
 
@@ -238,8 +238,8 @@ public class CopybookServiceImpl implements CopybookService {
     try {
       CompletableFuture<String> future = clientProvider.get().resolveCopybook(
           programUri,
-          copybookName.getQualifiedName(),
-          Optional.ofNullable(copybookName.getDialect()).orElse(COBOL));
+          copybookName.getDisplayName(),
+          Optional.ofNullable(copybookName.getDialectType()).orElse(COBOL));
 
       if (future == null) {
         return Optional.empty();
@@ -286,11 +286,15 @@ public class CopybookServiceImpl implements CopybookService {
               .flatMap(Set::stream)
               .collect(toList());
       LOG.debug("Copybooks to download: {}", copybooksToDownload);
+      List<CopyBookDTO> copybooks = new ArrayList<>();
+      copybooksToDownload.forEach(copybookName -> copybooks.add(new CopyBookDTO(copybookName.getDisplayName(), copybookName.getDialectType())));
+
       if (!copybooksToDownload.isEmpty()) {
         clientProvider.get().downloadCopybooks(documentUri,
-            copybooksToDownload,
+                copybooks,
             !processingMode.userInteraction);
       }
+      copybooksToDownload.clear();
     }
   }
 

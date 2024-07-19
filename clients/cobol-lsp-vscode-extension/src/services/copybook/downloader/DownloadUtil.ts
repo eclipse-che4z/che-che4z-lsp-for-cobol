@@ -153,13 +153,9 @@ export class DownloadUtil {
     documentUri: string,
     copybookNames: CopybookName[],
   ): boolean {
-    const dialects = [
-      ...new Set(
-        copybookNames
-          .map((n) => n.dialect?.toLocaleUpperCase())
-          .filter(Boolean),
-      ),
-    ];
+    const dialects = new Set(
+      copybookNames.map((n) => n.dialect?.toLocaleUpperCase()).filter(Boolean),
+    );
 
     for (const dialect of dialects) {
       const dsnPath = SettingsService.getDsnPath(documentUri, dialect);

@@ -134,7 +134,7 @@ class CopybookServiceTest {
     CopybookModel copybookModel =
         copybookService
             .resolve(
-                CopybookId.fromString(copybookName.getQualifiedName()),
+                CopybookId.fromString(copybookName.getDisplayName()),
                 copybookName,
                 DOCUMENT_URI,
                 DOCUMENT_URI,
@@ -183,7 +183,7 @@ class CopybookServiceTest {
     CopybookModel copybookModelEnabled =
         copybookService
             .resolve(
-                CopybookId.fromString(copybookName.getQualifiedName()),
+                CopybookId.fromString(copybookName.getDisplayName()),
                 copybookName,
                 DOCUMENT_URI,
                 DOCUMENT_URI,
@@ -192,7 +192,7 @@ class CopybookServiceTest {
     CopybookModel copybookModelSkipped =
         copybookService
             .resolve(
-                CopybookId.fromString(copybookName.getQualifiedName()),
+                CopybookId.fromString(copybookName.getDisplayName()),
                 copybookName,
                 DOCUMENT_URI,
                 DOCUMENT_URI,
@@ -381,22 +381,22 @@ class CopybookServiceTest {
         new CopybookModel(
             copybookInvalid2.toCopybookId(DOCUMENT_2_URI), copybookInvalid2, null, null),
         invalidCpy2);
-    CopybookName invalidCopybookName = new CopybookName(INVALID_CPY_NAME);
+    CopyBookDTO invalidCopybook = new CopyBookDTO(INVALID_CPY_NAME, "COBOL");
     // First document parsing done
     copybookService.sendCopybookDownloadRequest(DOCUMENT_URI, emptyList(), ENABLED);
     verify(client, times(1))
-        .downloadCopybooks(DOCUMENT_URI, ImmutableList.of(invalidCopybookName), true);
+        .downloadCopybooks(DOCUMENT_URI, ImmutableList.of(invalidCopybook), true);
 
     // Others parsing done events for first document are not trigger settingsService
     copybookService.sendCopybookDownloadRequest(DOCUMENT_URI, emptyList(), ENABLED);
 
     verify(client, times(1))
-        .downloadCopybooks(DOCUMENT_URI, ImmutableList.of(invalidCopybookName), true);
-    CopybookName invalidCopybookName2 = new CopybookName(INVALID_2_CPY_NAME);
+        .downloadCopybooks(DOCUMENT_URI, ImmutableList.of(invalidCopybook), true);
+    CopyBookDTO invalidCopybook2 = new CopyBookDTO(INVALID_2_CPY_NAME, "COBOL");
     // Second document parsing done
     copybookService.sendCopybookDownloadRequest(DOCUMENT_2_URI, emptyList(), ENABLED);
     verify(client, times(1))
-        .downloadCopybooks(DOCUMENT_2_URI, ImmutableList.of(invalidCopybookName2), true);
+        .downloadCopybooks(DOCUMENT_2_URI, ImmutableList.of(invalidCopybook2), true);
   }
 
   /** Test that the service resolves the SQLDA predefined copybook */
@@ -410,13 +410,13 @@ class CopybookServiceTest {
 
     assertEquals(
         copybookService.resolve(
-            CopybookId.fromString(copybookName.getQualifiedName()),
+            CopybookId.fromString(copybookName.getDisplayName()),
             copybookName,
             DOCUMENT_URI,
             DOCUMENT_URI,
             null),
         copybookService.resolve(
-            CopybookId.fromString(copybookName.getQualifiedName()),
+            CopybookId.fromString(copybookName.getDisplayName()),
             copybookName,
             DOCUMENT_URI,
             DOCUMENT_URI,
@@ -490,12 +490,12 @@ class CopybookServiceTest {
 
     // Notify that analysis finished sending the document URI and copybook names that have nested
     // copybooks
-    CopybookName invalidCopybookName = new CopybookName(INVALID_CPY_NAME);
-    CopybookName nestedCopybookName = new CopybookName(NESTED_CPY_NAME);
+    CopyBookDTO invalidCopybook = new CopyBookDTO(INVALID_CPY_NAME, "COBOL");
+    CopyBookDTO nestedCopybook = new CopyBookDTO(NESTED_CPY_NAME, "COBOL");
     copybookService.sendCopybookDownloadRequest(
         DOCUMENT_URI, asList(PARENT_CPY_URI, DOCUMENT_URI), ENABLED);
     verify(client, times(1))
-        .downloadCopybooks(DOCUMENT_URI, asList(invalidCopybookName, nestedCopybookName), true);
+        .downloadCopybooks(DOCUMENT_URI, asList(invalidCopybook, nestedCopybook), true);
   }
 
   @Test
@@ -538,7 +538,7 @@ class CopybookServiceTest {
   }
 
   private CopybookName createCopybook(String displayName) {
-    return CopybookName.builder().name(displayName).build();
+    return CopybookName.builder().displayName(displayName).build();
   }
 
   @Test
@@ -548,7 +548,7 @@ class CopybookServiceTest {
     CopybookModel copybookModel =
         copybookService
             .resolve(
-                CopybookId.fromString(copybookName.getQualifiedName()),
+                CopybookId.fromString(copybookName.getDisplayName()),
                 copybookName,
                 DOCUMENT_URI,
                 DOCUMENT_URI,
@@ -569,7 +569,7 @@ class CopybookServiceTest {
     resolve =
         copybookService
             .resolve(
-                CopybookId.fromString(copybookName.getQualifiedName()),
+                CopybookId.fromString(copybookName.getDisplayName()),
                 copybookName,
                     DOCUMENT_URI,
                     DOCUMENT_URI,
@@ -597,7 +597,7 @@ class CopybookServiceTest {
 
     ResultWithErrors<CopybookModel> resolvedCopybook =
         copybookService.resolve(
-            CopybookId.fromString(copybookName.getQualifiedName()),
+            CopybookId.fromString(copybookName.getDisplayName()),
             copybookName,
             DOCUMENT_URI,
             DOCUMENT_URI,

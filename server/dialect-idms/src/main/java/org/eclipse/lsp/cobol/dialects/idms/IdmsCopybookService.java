@@ -75,7 +75,7 @@ class IdmsCopybookService {
 
     processedCopybooks.add(copybookName);
 
-    CopyNode node = new CopyNode(locality, locality.toLocation(), copybookName.getQualifiedName(), IdmsDialect.NAME, copybookModel.getUri());
+    CopyNode node = new CopyNode(locality, locality.toLocation(), copybookName.getDisplayName(), IdmsDialect.NAME, copybookModel.getUri());
 
     List<SyntaxError> errors = new LinkedList<>();
     processNodes(copybookModel, parentLevel).unwrap(errors::addAll)

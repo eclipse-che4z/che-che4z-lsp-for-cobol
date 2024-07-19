@@ -172,7 +172,7 @@ class Db2SqlVisitor extends Db2SqlParserBaseVisitor<List<Node>> {
             copybookService.getCopybookUsage(docUri).stream()
                     .filter(model -> model.getUri().equals(location.getUri()))
                     .findFirst()
-                    .ifPresent(model -> builder.copybookId(model.getCopybookName().getQualifiedName()));
+                    .ifPresent(model -> builder.copybookId(model.getCopybookName().getDisplayName()));
         }
         return builder.build();
     }

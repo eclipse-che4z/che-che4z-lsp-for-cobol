@@ -29,22 +29,22 @@ import lombok.Value;
 @AllArgsConstructor
 @Builder
 public class CopybookName {
-  String name;
-  String dialect;
+  String displayName;
+  String dialectType;
   String extension;
   public String getQualifiedName() {
-    return name;
+    return displayName;
   }
 
   public CopybookName(String name) {
-    this.name = name;
+    this.displayName = name;
     this.extension = null;
-    this.dialect = null;
+    this.dialectType = null;
   }
 
   public CopybookName(String name, String dialect) {
-    this.name = name;
-    this.dialect = dialect;
+    this.displayName = name;
+    this.dialectType = dialect;
     this.extension = null;
   }
 
@@ -54,6 +54,6 @@ public class CopybookName {
    * @return an instance of copybook id
    */
   public CopybookId toCopybookId(String programUri) {
-    return CopybookId.create(name, dialect, programUri);
+    return CopybookId.create(displayName, dialectType, programUri);
   }
 }

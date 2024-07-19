@@ -73,7 +73,7 @@ class PredefinedCopybookUtils {
   }
 
   private CopybookModel retrieveModel(CopybookName copybookName, String programUri, SQLBackend sqlBackend, List<String> compilerOptions) {
-    final String name = retrieveRealName(copybookName.getQualifiedName(), sqlBackend);
+    final String name = retrieveRealName(copybookName.getDisplayName(), sqlBackend);
 
     String content = files.readImplicitCode(name);
 

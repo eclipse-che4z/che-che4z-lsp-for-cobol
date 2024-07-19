@@ -92,7 +92,7 @@ class IdmsCopybookVisitor extends IdmsCopyParserBaseVisitor<List<Node>> {
             documentUri,
             preprocessor);
     CopybookModel copybookModel = resolvedCopybook.getResult();
-    Locality locality = IdmsParserHelper.buildNameRangeLocality(optionsContext, copybookName.getQualifiedName(), documentUri);
+    Locality locality = IdmsParserHelper.buildNameRangeLocality(optionsContext, copybookName.getDisplayName(), documentUri);
     errors.addAll(resolvedCopybook.getErrors());
     return idmsCopybookService.processCopybook(copybookModel, calculateLevel(getLevel(ctx)), locality)
         .unwrap(errors::addAll);

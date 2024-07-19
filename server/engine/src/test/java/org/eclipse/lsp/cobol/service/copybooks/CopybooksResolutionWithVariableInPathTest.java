@@ -62,6 +62,6 @@ class CopybooksResolutionWithVariableInPathTest {
     CopybookNameService cns = new CopybookNameServiceImpl(settings, files, () -> client);
     List<CopybookName> copybooks = cns.getNames("ABCPROG.CPY");
     assertFalse(copybooks.isEmpty());
-    assertEquals("COPY1", copybooks.get(0).getQualifiedName());
+    assertEquals("COPY1", copybooks.get(0).getDisplayName());
   }
 }
