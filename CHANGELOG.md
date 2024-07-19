@@ -25,7 +25,6 @@ All notable changes to the COBOL Language Support extension are documented in th
 * Handle probable error scenario ([761576c](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/761576cd378fbcaf6623e73f239e285cac9b2bef))
 * No editor rulers for HP COBOL ([#2382](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/issues/2382)) ([a48ca83](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/a48ca83878eea784036e6d1caf828479c2cb4f27))
 * Support floating comments in the toggle command ([#2384](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/issues/2384)) ([79bdbd8](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/79bdbd8331a73f417c92a92f97fc2325e5d34c17))
-* Support implicit SQL varbinary variables ([d44f5bd](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/d44f5bd347869780fbdebeff6aa7356caed51c81))
 * Support section priority in experimental parser ([#2305](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/issues/2305)) ([71881e2](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/71881e294c28fb7b13738b77f1ddd5b65adc0001))
 * Tokens are back in HW pipeline ([d101472](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/d101472bb2813c09fa91777b3b2bedeeb315bcd0))
 * Tolerate missing dot_fs ([820f21c](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/820f21c8ce57212777613cecf45593f83e791f4e))
@@ -53,6 +52,7 @@ All notable changes to the COBOL Language Support extension are documented in th
 * Support for result set locator Db2 SQL host variable ([#2329](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/issues/2329)) ([53c16fa](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/53c16faac605cc46c151ec1c1a6c572dd408b630)), closes [cobol-host-variables-in#db2z_hostvariablecobol__title__20](https://github.com/cobol-host-variables-in/issues/db2z_hostvariablecobol__title__20)
 * XML data host and file reference variables ([#2390](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/issues/2390)) ([a99147e](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/a99147e131e01ddb466f307e7f91d926e57c6a07))
 * Add support for table locator Db2 host variable ([#2380](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/pull/2380))([cd8dce6](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/cd8dce63a22cfe3e1b6aedca77e79ee9222fcb36))
+* Support implicit SQL varbinary variables ([d44f5bd](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/d44f5bd347869780fbdebeff6aa7356caed51c81))
 
 
 ## [2.1.2](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/compare/2.1.1...2.2.0) (2024-04-03)
