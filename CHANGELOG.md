@@ -10,7 +10,7 @@ All notable changes to the COBOL Language Support extension are documented in th
 * Do not allow COBOL keywords as identifiers ([803e08d](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/803e08d7d90544053538608a7b2d3f2732f937ba))
 * Do not invalidate implicit copybook cache on re-analysis ([f473617](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/f4736177f2a2eccb1999b19572354ac85a47f9e1))
 * EXP-COBOL not selected by default ([89d963a](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/89d963ad641fb6f15f3135781eecbbe55a9d8e81))
-* Exp. parser ID division adoption ([c92ac96](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/c92ac965784deabb35caff9976eb0fc49f70cc7b))
+* Experimental parser ID division adoption ([c92ac96](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/c92ac965784deabb35caff9976eb0fc49f70cc7b))
 * Fix  NPE ([a6babe9](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/a6babe93b1ecc0aaac456d86d67cb56bf91d58f3))
 * Fix cache invalidation introduced by commit f473617 ([7e02db9](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/7e02db9ae531c389d8d13382b306fce62123248d))
 * Fix CICS assign command to take parameters in any order ([4767165](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/476716549862c866a70c8127959e38a1f339c257))
