@@ -46,7 +46,6 @@ import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.model.tree.variable.*;
-import org.eclipse.lsp.cobol.common.utils.RangeUtils;
 import org.eclipse.lsp.cobol.core.visitor.VisitorHelper;
 import org.eclipse.lsp.cobol.implicitDialects.sql.node.*;
 import org.eclipse.lsp4j.Location;
@@ -439,9 +438,6 @@ class Db2SqlVisitor extends Db2SqlParserBaseVisitor<List<Node>> {
         if (Db2SqlVisitorHelper.isGroupName(name)) {
             Locality locality =
                     VisitorHelper.buildNameRangeLocality(ctx, name, context.getExtendedDocument().getUri());
-            locality.setRange(
-                    RangeUtils.shiftRangeWithPosition(
-                            new Position(ctx.start.getLine() - 1, (hasColumn ? 1 : 0)), locality.getRange()));
 
             return Db2SqlVisitorHelper.generateGroupNodes(name, locality);
         }
