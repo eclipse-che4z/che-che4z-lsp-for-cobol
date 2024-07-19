@@ -7,6 +7,7 @@ All notable changes to the COBOL Language Support extension are documented in th
 * Add language element to the CLI analysis response in case of crash ([1f87a10](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/1f87a103c3af6a9694f5fcbc164132fba80ef25e))
 * Add semantic check for table locator Db2 host variable ([cd8dce6](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/cd8dce63a22cfe3e1b6aedca77e79ee9222fcb36))
 * Alter go to support in experimental parser ([#2306](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/issues/2306)) ([aa7ba71](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/aa7ba711a37c23cda45e38ef66f5395180df6cdb))
+* Comment toggle when region includes empty lines ([#2386](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/issues/2386)) ([0997bc2](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/0997bc28bcf3e473595f455d613152ed8dce88e5))
 * Do not allow COBOL keywords as identifiers ([803e08d](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/803e08d7d90544053538608a7b2d3f2732f937ba))
 * Do not invalidate implicit copybook cache on re-analysis ([f473617](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/f4736177f2a2eccb1999b19572354ac85a47f9e1))
 * EXP-COBOL not selected by default ([89d963a](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/89d963ad641fb6f15f3135781eecbbe55a9d8e81))
