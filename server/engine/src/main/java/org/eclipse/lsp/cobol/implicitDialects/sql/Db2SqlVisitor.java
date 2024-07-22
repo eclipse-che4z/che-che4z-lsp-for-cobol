@@ -127,7 +127,7 @@ class Db2SqlVisitor extends Db2SqlParserBaseVisitor<List<Node>> {
         Db2WorkingAndLinkageSectionNode semanticsNode = new Db2WorkingAndLinkageSectionNode(statementLocality);
 
         VariableDefinitionNode variableDefinitionNode = VariableDefinitionNode.builder()
-                .level(1)
+                .level(Integer.parseInt(levelCtx.getText()))
                 .levelLocality(getLocality(this.context.getExtendedDocument().mapLocation(constructRange(levelCtx))))
                 .statementLocality(statementLocality)
                 .variableNameAndLocality(new VariableNameAndLocality(
