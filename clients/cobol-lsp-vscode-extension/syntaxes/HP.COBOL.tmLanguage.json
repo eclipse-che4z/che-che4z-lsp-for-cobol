@@ -82,7 +82,7 @@
       ]
     },
     "cobol-condition-keyword": {
-      "match": "(?<![\\-\\w])(?i:IF|ELSE|END-IF|EVALUATE|NOT|WHEN\\s+OTHER|WHEN|END-EVALUATE|CONTINUE)(?![\\-\\w])",
+      "match": "(?<![\\-\\w])(?i:IF|ELSE|END-IF|ENDIF|EVALUATE|NOT|WHEN\\s+OTHER|WHEN|END-EVALUATE|CONTINUE)(?![\\-\\w])",
       "name": "keyword.control.condition.cobol"
     },
     "cobol-branch-keyword": {

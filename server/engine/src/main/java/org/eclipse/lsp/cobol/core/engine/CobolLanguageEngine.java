@@ -140,7 +140,7 @@ public class CobolLanguageEngine {
   public AnalysisResult run(
           @NonNull String documentUri, @NonNull String text, @NonNull AnalysisConfig analysisConfig, CobolLanguageId languageId) {
     ThreadInterruptionUtil.checkThreadInterrupted();
-    if (isEmpty(text)) {
+    if (shouldNotAnalyse(text, languageId)) {
       return AnalysisResult.builder().build();
     }
 
@@ -189,6 +189,10 @@ public class CobolLanguageEngine {
                   .collect(toList())),
           documentUri);
     }
+  }
+
+  private static boolean shouldNotAnalyse(String text, CobolLanguageId languageId) {
+    return isEmpty(text) || languageId == CobolLanguageId.HP_COBOL;
   }
 
   /**
