@@ -102,7 +102,7 @@ class Db2SqlVisitor extends Db2SqlParserBaseVisitor<List<Node>> {
 
     @Override
     public List<Node> visitLob_host_variables(Db2SqlParser.Lob_host_variablesContext ctx) {
-        List<Node> hostVariableDefinitionNode = createHostVariableDefinitionNode(ctx, ctx.dbs_host_var_levels(), ctx.entry_name());
+        List<Node> hostVariableDefinitionNode = createHostVariableDefinitionNode(ctx, ctx.dbs_integer(), ctx.entry_name());
         if (ctx.lobWithSize() != null && ctx.lobWithSize().BINARY() != null) {
             generateVarbinVariables((VariableDefinitionNode) hostVariableDefinitionNode.get(0),
                     ctx.lobWithSize().dbs_integer().getText(), ctx);
