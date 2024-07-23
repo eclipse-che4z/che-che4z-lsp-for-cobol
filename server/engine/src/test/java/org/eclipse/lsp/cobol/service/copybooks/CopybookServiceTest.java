@@ -381,7 +381,7 @@ class CopybookServiceTest {
         new CopybookModel(
             copybookInvalid2.toCopybookId(DOCUMENT_2_URI), copybookInvalid2, null, null),
         invalidCpy2);
-    CopyBookDTO invalidCopybook = new CopyBookDTO(INVALID_CPY_NAME, "COBOL");
+    CopyBookDTO invalidCopybook = new CopyBookDTO(copybookInvalid);
     // First document parsing done
     copybookService.sendCopybookDownloadRequest(DOCUMENT_URI, emptyList(), ENABLED);
     verify(client, times(1))
@@ -392,7 +392,7 @@ class CopybookServiceTest {
 
     verify(client, times(1))
         .downloadCopybooks(DOCUMENT_URI, ImmutableList.of(invalidCopybook), true);
-    CopyBookDTO invalidCopybook2 = new CopyBookDTO(INVALID_2_CPY_NAME, "COBOL");
+    CopyBookDTO invalidCopybook2 = new CopyBookDTO(copybookInvalid2);
     // Second document parsing done
     copybookService.sendCopybookDownloadRequest(DOCUMENT_2_URI, emptyList(), ENABLED);
     verify(client, times(1))
@@ -490,8 +490,8 @@ class CopybookServiceTest {
 
     // Notify that analysis finished sending the document URI and copybook names that have nested
     // copybooks
-    CopyBookDTO invalidCopybook = new CopyBookDTO(INVALID_CPY_NAME, "COBOL");
-    CopyBookDTO nestedCopybook = new CopyBookDTO(NESTED_CPY_NAME, "COBOL");
+    CopyBookDTO invalidCopybook = new CopyBookDTO(copybookInvalid);
+    CopyBookDTO nestedCopybook = new CopyBookDTO(copybookNested);
     copybookService.sendCopybookDownloadRequest(
         DOCUMENT_URI, asList(PARENT_CPY_URI, DOCUMENT_URI), ENABLED);
     verify(client, times(1))

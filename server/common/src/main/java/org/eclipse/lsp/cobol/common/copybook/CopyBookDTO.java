@@ -17,6 +17,10 @@ package org.eclipse.lsp.cobol.common.copybook;
 import lombok.Builder;
 import lombok.Value;
 
+import java.util.Optional;
+
+import static org.eclipse.lsp.cobol.common.copybook.CopybookId.COBOL;
+
 /**
  * This value class represents a copybook DTO with name  and dialect info. Display name is the name
  * as it is specified in the original COPY statement. Dialect type is the type of the dialect the
@@ -27,9 +31,8 @@ import lombok.Value;
 public class CopyBookDTO {
     String name;
     String dialect;
-
-    public CopyBookDTO(String name,String dialect) {
-        this.name = name;
-        this.dialect = dialect;
+    public CopyBookDTO(CopybookName copybookName) {
+        this.name = copybookName.getDisplayName();
+        this.dialect = Optional.ofNullable(copybookName.getDialectType()).orElse(COBOL);
     }
 }

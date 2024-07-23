@@ -286,12 +286,9 @@ public class CopybookServiceImpl implements CopybookService {
               .flatMap(Set::stream)
               .collect(toList());
       LOG.debug("Copybooks to download: {}", copybooksToDownload);
-      List<CopyBookDTO> copybooks = new ArrayList<>();
-      copybooksToDownload.forEach(copybookName -> copybooks.add(new CopyBookDTO(copybookName.getDisplayName(), copybookName.getDialectType())));
-
       if (!copybooksToDownload.isEmpty()) {
         clientProvider.get().downloadCopybooks(documentUri,
-                copybooks,
+                copybooksToDownload.stream().map(CopyBookDTO::new).collect(toList()),
             !processingMode.userInteraction);
       }
       copybooksToDownload.clear();
