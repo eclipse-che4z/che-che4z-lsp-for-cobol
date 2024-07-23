@@ -36,7 +36,7 @@ jest.mock("url", () => {
 (globSync as any) = jest.fn().mockImplementation((x: any) => [x]);
 (fs.realpathSync.native as any) = jest.fn().mockImplementation((x: any) => x);
 (vscode.Uri.file as any) = jest.fn().mockImplementation((x: any) => {
-  return { fsPath: x };
+  return { fsPath: x, toString: jest.fn().mockReturnValue("file://" + x) };
 });
 
 describe("Test the copybook message handler", () => {

@@ -15,7 +15,6 @@
 import * as fs from "fs";
 import * as path from "path";
 import { globSync, hasMagic } from "glob";
-import * as urlUtil from "url";
 import { Uri } from "vscode";
 import * as vscode from "vscode";
 import { Utils } from "./Utils";
@@ -38,13 +37,7 @@ export function searchCopybookInExtensionFolder(
     for (const ext of extensions) {
       const searchResult = globSearch(extensionFolder, p, copybookName, ext);
       if (searchResult) {
-        const root = path.parse(searchResult).root;
-        const urlPath = searchResult
-          .substring(root.length)
-          .split(path.sep)
-          .map((s) => encodeURIComponent(s))
-          .join(path.sep);
-        return new urlUtil.URL("file://" + root + urlPath).href;
+        return vscode.Uri.file(searchResult).toString();
       }
     }
   }
