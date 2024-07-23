@@ -264,6 +264,36 @@ public class TestSqlHostVariable {
                   + "          52 {$*VAR1|1} USAGE IS SQL TYPE IS ROWID.\n"
                   + "        PROCEDURE DIVISION.\n";
 
+
+  public static final String ROWID_ARRAYS_TEXT1 =
+          "        Identification Division.\n"
+                  + "        Program-Id. 'TEST1'.\n"
+                  + "        Data Division.\n"
+                  + "         Working-Storage Section.\n"
+                  + "       01 {$*VAR}.\n"
+                  + "          02 {$*VAR1} USAGE IS SQL TYPE IS ROWID OCCURS 10 TIMES.\n"
+                  + "        PROCEDURE DIVISION.\n";
+
+  public static final String ROWID_ARRAYS_TEXT2 =
+          "        Identification Division.\n"
+                  + "        Program-Id. 'TEST1'.\n"
+                  + "        Data Division.\n"
+                  + "         Working-Storage Section.\n"
+                  + "       01 {$*VAR}.\n"
+                  + "          52 {$*VAR1|1} USAGE IS SQL TYPE IS ROWID OCCURS 10 TIMES.\n"
+                  + "        PROCEDURE DIVISION.\n";
+
+  public static final String ROWID_ARRAYS_TEXT3 =
+          "        Identification Division.\n"
+                  + "        Program-Id. 'TEST1'.\n"
+                  + "        Data Division.\n"
+                  + "         Working-Storage Section.\n"
+                  + "       01 {$*GREET}.\n"
+                  + "          40 {$*VAR} USAGE IS SQL TYPE IS ROWID OCCURS 100000 {TIMES|1}.\n"
+                  + "        PROCEDURE DIVISION.\n"
+                  + "           DISPLAY {$VAR}(1).";
+
+
   @Test
   void testSupportForResultSetLocator() {
     UseCaseEngine.runTest(TEXT, ImmutableList.of(), ImmutableMap.of());
@@ -408,6 +438,37 @@ public class TestSqlHostVariable {
             new Diagnostic(
                     new Range(),
                     "Allowed range is 2 to 48",
+                    DiagnosticSeverity.Error,
+                    ErrorSource.PARSING.getText()
+            )
+    ));
+  }
+
+  @Test
+  void testRowidVariablesArrays() {
+    UseCaseEngine.runTest(ROWID_ARRAYS_TEXT1, ImmutableList.of(), ImmutableMap.of());
+  }
+
+  @Test
+  void testRowidVariablesArrays_levelError() {
+    UseCaseEngine.runTest(ROWID_ARRAYS_TEXT2, ImmutableList.of(), ImmutableMap.of(
+            "1",
+            new Diagnostic(
+                    new Range(),
+                    "Allowed range is 2 to 48",
+                    DiagnosticSeverity.Error,
+                    ErrorSource.PARSING.getText()
+            )
+    ));
+  }
+
+  @Test
+  void testRowidVariablesArrays_rangeError() {
+    UseCaseEngine.runTest(ROWID_ARRAYS_TEXT3, ImmutableList.of(), ImmutableMap.of(
+            "1",
+            new Diagnostic(
+                    new Range(),
+                    "Allowed range is 1 to 32767",
                     DiagnosticSeverity.Error,
                     ErrorSource.PARSING.getText()
             )

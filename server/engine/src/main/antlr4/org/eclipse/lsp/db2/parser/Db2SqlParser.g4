@@ -41,7 +41,7 @@ host_variable_array_times: OCCURS host_variable_array_size TIMES?;
 host_variable_array_size: T=dbs_integerliteral_expanded {validateIntegerRange($T.start, $T.text, 1, 32767);};
 
 sql_host_variables: result_set_locator_variable | lob_xml_host_variables | lob_host_variables_arrays | lob_host_variables
-                  | tableLocators_variable | rowid_host_variables;
+                  | tableLocators_variable | rowid_host_variables_arrays | rowid_host_variables;
 
 result_set_locator_variable: dbs_level_01 entry_name host_variable_usage result_set_locator;
 
@@ -54,6 +54,8 @@ lob_host_variables: dbs_integer entry_name host_variable_usage (lobWithSize | lo
 lob_host_variables_arrays: dbs_host_var_levels_arrays entry_name host_variable_usage (lobWithSize | lobNoSize) occurs_clause;
 
 rowid_host_variables: dbs_host_var_levels entry_name host_variable_usage ROWID;
+
+rowid_host_variables_arrays: dbs_host_var_levels_arrays entry_name host_variable_usage ROWID occurs_clause;
 
 dbs_host_var_levels: dbs_level_01 | T=dbs_integer {validateIntegerRange($T.text, 2, 48);};
 
