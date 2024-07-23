@@ -110,14 +110,13 @@ public class CobolWorkspaceServiceImpl extends LspEventConsumer implements Works
             if (file.getType() == FileChangeType.Deleted) {
               path = path.getParent();
             }
-            String uriString = uriDecodeService.decode(path.toUri().toString());
-            if (sourceUnitGraph.isFileOpened(uriString)) {
+              if (sourceUnitGraph.isFileOpened(uriDecodeService.decode(path.toUri().toString()))) {
               // opened files are taken care by textChange events
               return;
             }
             boolean isDirectory = Files.isDirectory(path);
             if (!isDirectory) {
-              triggerAnalysisForChangedFile(uriString);
+              triggerAnalysisForChangedFile(path.toUri().toString());
             } else {
               triggerAnalysisForFilesInDirectory(path);
             }
@@ -127,8 +126,9 @@ public class CobolWorkspaceServiceImpl extends LspEventConsumer implements Works
 
   @SneakyThrows
   private void triggerAnalysisForChangedFile(String uri) {
+    String copybookUri = uriDecodeService.decode(uri);
     List<String> uris =
-        sourceUnitGraph.getAllAssociatedFilesForACopybook(uriDecodeService.decode(uri));
+        sourceUnitGraph.getAllAssociatedFilesForACopybook(copybookUri);
     String fileContent = null;
     if (uris.isEmpty()) {
       asyncAnalysisService.reanalyseOpenedPrograms();
@@ -140,7 +140,7 @@ public class CobolWorkspaceServiceImpl extends LspEventConsumer implements Works
     }
     if (!sourceUnitGraph.isFileOpened(uri)) {
       asyncAnalysisService.reanalyseCopybooksAssociatedPrograms(
-          uris, uri, fileContent, SourceUnitGraph.EventSource.FILE_SYSTEM);
+          uris, copybookUri, fileContent, SourceUnitGraph.EventSource.FILE_SYSTEM);
     }
   }
 
