@@ -47,7 +47,7 @@ result_set_locator_variable: dbs_level_01 entry_name host_variable_usage result_
 
 tableLocators_variable: dbs_host_var_levels entry_name host_variable_usage tableLocators;
 
-lob_xml_host_variables: dbs_host_var_levels entry_name  host_variable_usage xml_as (lobWithSize | xml_lobNO_size);
+lob_xml_host_variables: dbs_host_var_levels entry_name host_variable_usage xml_as (lobWithSize | xml_lobNO_size) host_variable_array_times?;
 
 lob_host_variables: dbs_integer entry_name host_variable_usage (lobWithSize | lobNoSize);
 
