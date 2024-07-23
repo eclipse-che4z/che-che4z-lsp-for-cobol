@@ -36,14 +36,16 @@ binary_host_variable_varbinary_size: T=dbs_integerliteral_expanded {validateInte
 
 host_variable_usage: (USAGE IS?)? SQL TYPE IS;
 
-sql_host_variables: result_set_locator_variable | lob_xml_host_variables
+sql_host_variables: result_set_locator_variable | lob_host_variables | lob_xml_host_variables
                   | tableLocators_variable ;
 
 result_set_locator_variable: dbs_level_01 entry_name host_variable_usage result_set_locator;
 
 tableLocators_variable: dbs_host_var_levels entry_name host_variable_usage tableLocators;
 
-lob_xml_host_variables: dbs_host_var_levels entry_name  host_variable_usage (xml_as lobWithSize | xml_as lobNoSize);
+lob_xml_host_variables: dbs_host_var_levels entry_name  host_variable_usage xml_as (lobWithSize | xml_lobNO_size);
+
+lob_host_variables: dbs_integer entry_name host_variable_usage (lobWithSize | lobNoSize);
 
 dbs_host_var_levels: dbs_level_01 | T=dbs_integer {validateIntegerRange($T.text, 2, 48);};
 
@@ -55,8 +57,11 @@ lobWithSize
     : (BINARY LARGE OBJECT | BLOB | CHARACTER LARGE OBJECT | CHAR LARGE OBJECT | CLOB | DBCLOB) LPARENCHAR dbs_integer k_m_g? RPARENCHAR
     ;
 lobNoSize
-    : BLOB_LOCATOR | CLOB_LOCATOR | DBCLOB_LOCATOR | BLOB_FILE | CLOB_FILE | DBCLOB_FILE
+    : BLOB_LOCATOR | CLOB_LOCATOR | DBCLOB_LOCATOR |  xml_lobNO_size
     ;
+
+xml_lobNO_size: BLOB_FILE | CLOB_FILE | DBCLOB_FILE;
+
 xml_as: XML AS;
 
 entry_name : (FILLER |dbs_host_names);
