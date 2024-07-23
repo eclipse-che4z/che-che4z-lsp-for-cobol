@@ -245,6 +245,25 @@ public class TestSqlHostVariable {
                   + "           DISPLAY {$VB-LENGTH}(1).\n"
                   + "           DISPLAY {$VB-DATA}(1).\n";
 
+
+  public static final String ROWID_TEXT1 =
+          "        Identification Division.\n"
+                  + "        Program-Id. 'TEST1'.\n"
+                  + "        Data Division.\n"
+                  + "         Working-Storage Section.\n"
+                  + "       01 {$*VAR}.\n"
+                  + "          02 {$*VAR1} USAGE IS SQL TYPE IS ROWID.\n"
+                  + "        PROCEDURE DIVISION.\n";
+
+  public static final String ROWID_TEXT2 =
+          "        Identification Division.\n"
+                  + "        Program-Id. 'TEST1'.\n"
+                  + "        Data Division.\n"
+                  + "         Working-Storage Section.\n"
+                  + "       01 {$*VAR}.\n"
+                  + "          52 {$*VAR1|1} USAGE IS SQL TYPE IS ROWID.\n"
+                  + "        PROCEDURE DIVISION.\n";
+
   @Test
   void testSupportForResultSetLocator() {
     UseCaseEngine.runTest(TEXT, ImmutableList.of(), ImmutableMap.of());
@@ -367,6 +386,24 @@ public class TestSqlHostVariable {
   @Test
   void testLobXMLVariables_levelError() {
     UseCaseEngine.runTest(LOB_XML_TEXT3, ImmutableList.of(), ImmutableMap.of(
+            "1",
+            new Diagnostic(
+                    new Range(),
+                    "Allowed range is 2 to 48",
+                    DiagnosticSeverity.Error,
+                    ErrorSource.PARSING.getText()
+            )
+    ));
+  }
+
+  @Test
+  void testRowidVariables() {
+    UseCaseEngine.runTest(ROWID_TEXT1, ImmutableList.of(), ImmutableMap.of());
+  }
+
+  @Test
+  void testRowidVariables_levelError() {
+    UseCaseEngine.runTest(ROWID_TEXT2, ImmutableList.of(), ImmutableMap.of(
             "1",
             new Diagnostic(
                     new Range(),
