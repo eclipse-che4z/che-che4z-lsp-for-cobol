@@ -291,7 +291,6 @@ public class CopybookServiceImpl implements CopybookService {
                 copybooksToDownload.stream().map(CopyBookDTO::new).collect(toList()),
             !processingMode.userInteraction);
       }
-      copybooksToDownload.clear();
     }
   }
 
