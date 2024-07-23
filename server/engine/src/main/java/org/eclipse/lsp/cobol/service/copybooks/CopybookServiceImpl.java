@@ -278,17 +278,18 @@ public class CopybookServiceImpl implements CopybookService {
     uris.add(documentUri);
 
     if (processingMode.download) {
-      List<CopybookName> copybooksToDownload =
+      List<CopyBookDTO> copybooksToDownload =
           uris.stream()
               .map(files::getNameFromURI)
               .map(copybooksForDownloading::remove)
               .filter(Objects::nonNull)
               .flatMap(Set::stream)
+              .map(CopyBookDTO::new)
               .collect(toList());
       LOG.debug("Copybooks to download: {}", copybooksToDownload);
       if (!copybooksToDownload.isEmpty()) {
         clientProvider.get().downloadCopybooks(documentUri,
-                copybooksToDownload.stream().map(CopyBookDTO::new).collect(toList()),
+                copybooksToDownload,
             !processingMode.userInteraction);
       }
     }
