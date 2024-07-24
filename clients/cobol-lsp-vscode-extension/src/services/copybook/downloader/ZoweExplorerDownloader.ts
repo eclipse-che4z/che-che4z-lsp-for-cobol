@@ -43,39 +43,39 @@ export abstract class ZoweExplorerDownloader {
     member: string,
     loadedProfile: IProfileLoaded,
   ) {
-    const downloadBinary = !!SettingsService.getCopybookFileEncoding();
+    const copybookEncoding = SettingsService.getCopybookFileEncoding();
     const baseUri = vscode.Uri.file(
       CopybookURI.createDatasetPath(profileName, dataset, this.storagePath),
     );
-    const filePath = vscode.Uri.joinPath(baseUri, member);
-    const encoding = downloadBinary
-      ? SettingsService.getCopybookFileEncoding()
-      : loadedProfile.profile.encoding;
+    const fileUri = vscode.Uri.joinPath(baseUri, member);
     return {
-      file: filePath,
-      binary: downloadBinary,
-      returnEtag: true,
-      encoding,
+      apiOptions: {
+        file: fileUri.fsPath,
+        returnEtag: true,
+        ...(copybookEncoding
+          ? { binary: true }
+          : { encoding: loadedProfile.profile.encoding }),
+      },
+      fileUri,
+      decode: copybookEncoding,
     };
   }
 
-  protected async encodeDownloadedContent(
+  protected async decodeBinaryContent(
     filePath: vscode.Uri,
-    encoding: string | undefined,
+    encoding: string,
     insertNewLineOn80Char: boolean = false,
   ) {
     const fileContents = await vscode.workspace.fs.readFile(filePath);
-    if (encoding) {
-      let newContent = iconv.decode(Buffer.from(fileContents), encoding);
+    let newContent = iconv.decode(Buffer.from(fileContents), encoding);
 
-      if (insertNewLineOn80Char) {
-        // Based on assumption - Most of source code on z/OS is 80 characters per record - JCL, HLASM, COBOL
-        // Can be exposed later on as a setting.
-        newContent = newContent.replace(/.{80}/g, `$&\n`);
-      }
-      const writeData = Buffer.from(newContent, "utf8");
-      await vscode.workspace.fs.writeFile(filePath, writeData);
+    if (insertNewLineOn80Char) {
+      // Based on assumption - Most of source code on z/OS is 80 characters per record - JCL, HLASM, COBOL
+      // Can be exposed later on as a setting.
+      newContent = newContent.replace(/.{80}/g, `$&\n`);
     }
+    const writeData = Buffer.from(newContent, "utf8");
+    await vscode.workspace.fs.writeFile(filePath, writeData);
   }
 
   protected async downloadCopybookFromMFUsingZowe(

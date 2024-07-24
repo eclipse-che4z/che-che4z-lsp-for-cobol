@@ -140,7 +140,6 @@ describe("Tests Copybook download from USS", () => {
           {
             file: "profile/uss/path/copybook",
             binary: true,
-            encoding: "utf8",
             returnEtag: true,
           },
         );
@@ -160,7 +159,6 @@ describe("Tests Copybook download from USS", () => {
           {
             file: "profile/uss/path/copybook",
             binary: true,
-            encoding: "utf8",
             returnEtag: true,
           },
         );
