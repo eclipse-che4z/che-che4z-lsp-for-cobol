@@ -115,11 +115,6 @@ class Db2SqlVisitor extends Db2SqlParserBaseVisitor<List<Node>> {
         return hostVariableDefinitionNode;
     }
 
-    @Override
-    public List<Node> visitBinary_host_variable_array(Db2SqlParser.Binary_host_variable_arrayContext ctx) {
-        return createHostVariableDefinitionNode(ctx, ctx.dbs_host_var_levels(), ctx.entry_name());
-    }
-
     private List<Node> createHostVariableDefinitionNode(ParserRuleContext ctx, ParserRuleContext levelCtx, ParserRuleContext nameCtx) {
         addReplacementContext(ctx);
         Locality statementLocality = getLocality(this.context.getExtendedDocument().mapLocation(constructRange(ctx)));
