@@ -23,6 +23,10 @@ COBOL Language Support is also part of [Code4z](https://techdocs.broadcom.com/co
 
 There are no client or server-side prerequisites for COBOL Language Support.
 
+## Contribution Guide and Dev Environment Setup
+
+Follow these [instructions](CONTRIBUTING.md) to configure your own development environment and contribute to this project.
+
 ## Compatibility
 
 The COBOL Language Support extension is supported on Visual Studio Code and Github Codespaces.
@@ -44,9 +48,11 @@ Both Zowe Explorer and Explorer for Endevor are available as part of the [Code4z
 <a href="https://www.openmainframeproject.org/all-projects/zowe/conformance"><img alt="This extension is Zowe v2 conformant" src="https://artwork.openmainframeproject.org/other/zowe-conformant/zowev2/explorer/color/zowe-conformant-zowev2-explorer-color.png" width=20% height=20% /></a>
 
 ## Features
+
 COBOL Language Support provides the following COBOL syntax awareness features:
 
 ### Autocomplete
+
 Autocomplete speeds up the coding process by intuitively suggesting the most likely variables or paragraphs to follow existing code. The extension provides live suggestions while you type for:
 
 - COBOL keywords, variables, paragraphs and sections
@@ -62,6 +68,7 @@ The autocomplete feature is only available in the main COBOL file, not in copybo
 ![Autocomplete](/docs/images/CLSAutocorrect.gif)
 
 ### Syntax and Semantic Check for Code
+
 This feature checks for mistakes and errors in COBOL code. The syntax check feature reviews the whole content of the code and suggests fixes, through syntax and semantic analysis which returns diagnostics on the entire context of the code, not just keywords.
 
 This feature is also enabled for Datacom, CICS, and DB2 SQL keywords and variables.
@@ -69,15 +76,19 @@ This feature is also enabled for Datacom, CICS, and DB2 SQL keywords and variabl
 ![Syntax check](/docs/images/CLSErrorHighlighting.gif)
 
 ### Syntax Highlighting
+
 The extension enables syntax highlighting for COBOL code.
 
 ### Syntax Coloring
+
 Contrasting colors are used in displayed code for ease of identifying and distinguishing keywords, variables, paragraphs and sections.
 
 ### Outline View and Breadcrumb View
+
 The extension enables outline view and breadcrumb view, which show the structure of elements within the program and allow easy navigation between them.
 
 ### Code Snippets
+
 Before you write your COBOL code from scratch, search the snippet library for useful templates.
 
 1. Press `F1` to open the command palette.
@@ -100,37 +111,38 @@ To configure the smart tab feature, open your `settings.json` file and change th
 
 - Specify `false` to use the default tab settings for Visual Studio Code.
 - Specify `true` to use the default tab settings for COBOL Language Support. This adds extra tab stops for the margins at columns 8, 12 and 73.
-- To specify custom tab stops for the whole file, specify an array of integers. The tab stops are set at the next column after the numbers that you specify.   
+- To specify custom tab stops for the whole file, specify an array of integers. The tab stops are set at the next column after the numbers that you specify.  
    Example: a value of `[0, 7, 20]` sets tab stops at columns 1, 8 and 21 and nowhere else.
 - To specify conditional tab settings for different anchors in the document, specify a JSON element containing the parameters `"default":` and `"anchors":`.
-   - For `"anchors":`, specify a JSON element containing any number of parameters of the format `"ANCHOR": tab stops`. 
-      - The `ANCHOR` can be a regular expression and corresponds to a string that occurs in the code. 
-      - The `tab stops` are an array of integers that specify tab stops. These tab stop settings apply to all lines in the code below the string specified in the anchor until another condition is met.
-   - For `"default":`, specify an array of integers that specify tab stops when no condition is met.  
-The following example sets tab stops after columns 1, 2, 3 and 4 after the line `DATA DIVISION`, after columns 3, 5 and 70 after the line `PROCEDURE DIVISION` and after columns 5, 10 and 15 elsewhere.
+  - For `"anchors":`, specify a JSON element containing any number of parameters of the format `"ANCHOR": tab stops`.
+    - The `ANCHOR` can be a regular expression and corresponds to a string that occurs in the code.
+    - The `tab stops` are an array of integers that specify tab stops. These tab stop settings apply to all lines in the code below the string specified in the anchor until another condition is met.
+  - For `"default":`, specify an array of integers that specify tab stops when no condition is met.  
+    The following example sets tab stops after columns 1, 2, 3 and 4 after the line `DATA DIVISION`, after columns 3, 5 and 70 after the line `PROCEDURE DIVISION` and after columns 5, 10 and 15 elsewhere.
+  ````
+  "cobol-lsp.smart-tab": {
+       "default": [5, 10, 15],
+       "anchors": {
+           "DATA +DIVISION": [1 ,2, 3, 4],
+           "PROCEDURE +DIVISION": [3, 5, 70]
+       }
+   }
    ```
-   "cobol-lsp.smart-tab": {  
-        "default": [5, 10, 15],
-        "anchors": {
-            "DATA +DIVISION": [1 ,2, 3, 4],
-            "PROCEDURE +DIVISION": [3, 5, 70]
-        }
-    }
-    ```
+  ````
 
 ### Dialect Add-ons
 
 Many companies have their own COBOL preprocessors which complement or modify standard IBM enterprise COBOL with custom statements and keywords. In our documentation, we refer to these preprocessors as "dialects".
 
-Dialect add-ons are available to add support for specific language analysis in your COBOL files. Currently an add-on for the IDMS dialect is available on the Visual Studio Code Marketplace. 
+Dialect add-ons are available to add support for specific language analysis in your COBOL files. Currently an add-on for the IDMS dialect is available on the Visual Studio Code Marketplace.
 
 Dialect add-ons must be enabled in the COBOL Language Support extension settings. To enable dialect add-ons that you install, complete the following tasks:
 
-1. Ensure that you meet the Java prerequisite described in the add-on readme. 
+1. Ensure that you meet the Java prerequisite described in the add-on readme.
 2. Set **Cobol-lsp: serverRuntime** to **JAVA** in the your extension settings.
 3. Add the dialect to the **Cobol-lsp: dialects** array in your workspace extension settings, or to the `preprocessor` parameter in a processor group. For more information, see [Processor Groups](#processor-groups).
 
-COBOL Language Support processes dialects in the order you list them in the **Cobol-lsp: dialects** setting or within the `preprocessor` parameter of a processor group. If you list dialects in the wrong order, some pieces of code might be incorrectly processed using the wrong dialect parser and marked as errors. 
+COBOL Language Support processes dialects in the order you list them in the **Cobol-lsp: dialects** setting or within the `preprocessor` parameter of a processor group. If you list dialects in the wrong order, some pieces of code might be incorrectly processed using the wrong dialect parser and marked as errors.
 
 ### SQL Backend Server
 
@@ -177,7 +189,7 @@ You can store your copybooks locally in folders in your workspace and specify th
 2. Switch from **User** to **Workspace**.
 3. Specify the paths of the folders containing copybooks under **Cpy-manager: Paths-local**.
    - **Tip:** We recommend that you specify relative paths from the workspace root. To obtain the relative path of a folder in your workspace, right-click it in the folder tree and select **Copy Relative Path**.
-   - You can use [Glob](https://www.npmjs.com/package/glob) wildcards, such as * to substitute one whole level of the path. For example, specifying the path `*/copybooks` searches all subfolders named "copybooks" in  subfolders of your workspace root, while the path `copybooks/*` searches all subfolders one level below the `copybooks` folder in the workspace root. For more information on available wildcards, see the [Glob Primer](https://www.npmjs.com/package/glob#Glob-Primer)
+   - You can use [Glob](https://www.npmjs.com/package/glob) wildcards, such as _ to substitute one whole level of the path. For example, specifying the path `_/copybooks`searches all subfolders named "copybooks" in  subfolders of your workspace root, while the path`copybooks/\*`searches all subfolders one level below the`copybooks` folder in the workspace root. For more information on available wildcards, see the [Glob Primer](https://www.npmjs.com/package/glob#Glob-Primer)
    - The folders are searched in the order they are listed, or in alphabetical order if multiple paths are indexed by a wildcard. If two folders contain a copybook with the same file name, the one from the folder higher on the list is used.
 4. (Optional) Under **Cpy-manager: Copybook-extensions**, specify the file extensions used for your copybooks. The default supported file extensions are `.cpy` and `.copy`.
 5. Open a program or project.  
@@ -203,7 +215,7 @@ You can also set up automatic copybook retrieval from the mainframe to download 
    All copybooks used in the program or project which are not stored locally are downloaded from the mainframe data sets and USS directories that you specified in steps 4 and 5.  
    Copybook support features are now enabled.
 
-Copybooks that you retrieve from mainframe data sets are stored in your VS Code global storage folder. 
+Copybooks that you retrieve from mainframe data sets are stored in your VS Code global storage folder.
 
 We recommend that you refresh your copybooks from time to time. To refresh your copybooks, press **F1** and run the command **Clear downloaded copybooks**. This command clears the global storage folder so that copybooks are downloaded again from the mainframe.
 
@@ -212,10 +224,11 @@ We recommend that you refresh your copybooks from time to time. To refresh your 
 When you open a COBOL file using Explorer for Endevor, COBOL copybooks that are specified in the Endevor element processor group are automatically downloaded to your VS Code global storage folder.
 
 The extension setting **Cpy-manager: Endevor-dependencies** determines how copybooks are retrieved from the mainframe when you open a COBOL file in Explorer for Endevor. This setting has the following options:
-* **ENDEVOR_PROCESSOR**
-  * Downloads copybooks from locations that are specified in the Endevor element processor group.
-* **ZOWE**
-  * Downloads copybooks from locations that are specified in the **paths-dsn** and **paths-uss** settings.
+
+- **ENDEVOR_PROCESSOR**
+  - Downloads copybooks from locations that are specified in the Endevor element processor group.
+- **ZOWE**
+  - Downloads copybooks from locations that are specified in the **paths-dsn** and **paths-uss** settings.
 
 ### Copybook Support Features
 
@@ -235,16 +248,16 @@ Syntax coloring is automatically enabled for copybook files with the extension `
 
 The Find All References and Go To Definition functionalities are extended to work for occurrences of copybook names, variables and paragraphs in the main COBOL file.
 
-* **Find All References** identifies all occurrences of variables and paragraphs from copybooks in the code.
-* **Go To Definition** enables you to right-click on any variable or paragraph to reveal a definition of the element. If the definition is in a copybook, or the name of a copybook, the copybook opens.
+- **Find All References** identifies all occurrences of variables and paragraphs from copybooks in the code.
+- **Go To Definition** enables you to right-click on any variable or paragraph to reveal a definition of the element. If the definition is in a copybook, or the name of a copybook, the copybook opens.
 
 ![Go To Definition in a copybook](/docs/images/CPYGoToDefinition.gif)
 
 #### Other
 
-* Inbuilt protection against recursive and missing copybooks. If the copybook is missing or contains looping code, an error displays, preventing issues only being discovered when the code is executed.
-* Variables and paragraphs are defined across copybooks. This ensures consistency of code, and prevents issues in error diagnostics caused by incorrect variables or paragraphs in code.
-* Functionality to skip variable levels when called, reducing call time.
+- Inbuilt protection against recursive and missing copybooks. If the copybook is missing or contains looping code, an error displays, preventing issues only being discovered when the code is executed.
+- Variables and paragraphs are defined across copybooks. This ensures consistency of code, and prevents issues in error diagnostics caused by incorrect variables or paragraphs in code.
+- Functionality to skip variable levels when called, reducing call time.
 
 ## Processor Groups
 
@@ -252,19 +265,19 @@ Use processor groups to link programs with specific dialects, SQL backend settin
 
 The `proc_grps.json` file is formatted as an array of JSON elements, with one JSON per processor group. Each processor group can contain the following elements:
 
-- **"name":** (string)  
-    - Specify a name for the processor group.
-- (Optional) **"libs":** (array)  
-    - Specify libraries that contain copybooks as either absolute or relative local paths. These libraries are used to search for copybooks in programs linked with this processor group, and take priority over the local copybook libraries that you specify in the extension settings.
-- (Optional) **"copybook-extensions":** (array)  
-    - Specify copybook extensions that you use for the programs linked with this processor groups. These copybook extensions take priority over extensions that you specify in the extension settings.
-- (Optional) **"compiler-options":** (array)  
-    - Specify compiler directives that you want to apply to the programs linked with this processor group. Currently the following directives are supported:
-        - QUALIFY(*EXTEND|COMPAT*)
-		- XMLPARSE(*XMLSS|COMPAT*)
-	- For more information on COBOL compiler options, see the [IBM Enterprise COBOL documentation](https://www.ibm.com/docs/en/cobol-zos/6.3?topic=guide-enterprise-cobol-compiler-options).
+- **"name":** (string)
+  - Specify a name for the processor group.
+- (Optional) **"libs":** (array)
+  - Specify libraries that contain copybooks as either absolute or relative local paths. These libraries are used to search for copybooks in programs linked with this processor group, and take priority over the local copybook libraries that you specify in the extension settings.
+- (Optional) **"copybook-extensions":** (array)
+  - Specify copybook extensions that you use for the programs linked with this processor groups. These copybook extensions take priority over extensions that you specify in the extension settings.
+- (Optional) **"compiler-options":** (array)
+  - Specify compiler directives that you want to apply to the programs linked with this processor group. Currently the following directives are supported:
+    - QUALIFY(_EXTEND|COMPAT_)
+    - XMLPARSE(_XMLSS|COMPAT_)
+  - For more information on COBOL compiler options, see the [IBM Enterprise COBOL documentation](https://www.ibm.com/docs/en/cobol-zos/6.3?topic=guide-enterprise-cobol-compiler-options).
 - (Optional) **"preprocessor":** (array)
-	- Specify dialect and SQL preprocessors that you want to apply to the programs linked with this processor group. See the [Preprocessors](#preprocessors) section below for further information.
+  - Specify dialect and SQL preprocessors that you want to apply to the programs linked with this processor group. See the [Preprocessors](#preprocessors) section below for further information.
 
 ### Preprocessors
 
@@ -277,19 +290,19 @@ Each preprocessor is formatted as a JSON element containing a name, which identi
 The SQL backend preprocessor is used to override the SQL server that you specify in the extension settings. This preprocessor has the following parameters:
 
 - **"name":** (string)
-    - Specify **SQL**
+  - Specify **SQL**
 - **"target-sql-backend":** (string)
-    - Specify either **DB2_SERVER** or **DATACOM_SERVER**
-	
+  - Specify either **DB2_SERVER** or **DATACOM_SERVER**
+
 #### Dialect Preprocessor
 
 A dialect preprocessor can be used to enable a COBOL dialect for a particular processor group and specify libraries which contain copybooks written in that dialect. Dialects that you enable in processor groups take priority over those that you specify in the extension settings. A dialect preprocessor has the following parameters:
 
 - **"name":** (string)
-    - Specify the name of a dialect.
+  - Specify the name of a dialect.
 - (Optional) **"libs":** (array)
-    - Specify libraries that contain copybooks written in the specified dialect as either absolute or relative local paths. These libraries are used to search for copybooks in programs linked with this processor group, and take priority over the local copybook libraries that you specify in the extension settings.
- 
+  - Specify libraries that contain copybooks written in the specified dialect as either absolute or relative local paths. These libraries are used to search for copybooks in programs linked with this processor group, and take priority over the local copybook libraries that you specify in the extension settings.
+
 ### Program configuration file
 
 The program configuration file, `pgm_conf.json`, links programs to processor groups. The program configuration file has the following format:
@@ -306,10 +319,10 @@ The program configuration file, `pgm_conf.json`, links programs to processor gro
 Each element contains the following parameters:
 
 - **"program":** (string)
-    - Specify a program name. This field can be wildcarded.
+  - Specify a program name. This field can be wildcarded.
 - **"pgroup":** (string)
-    - Specify the name of a procecssor group that is defined in `proc_grps.json`.
-   
+  - Specify the name of a procecssor group that is defined in `proc_grps.json`.
+
 ### Example
 
 Using the example `pgm_conf.json` file above, the following `proc_grps.json` example enables the following:
@@ -317,8 +330,8 @@ Using the example `pgm_conf.json` file above, the following `proc_grps.json` exa
 - Copybooks from libraries LIB1 and LIB2, with the extensions ".cpy" and ".copy", are used with PROGRAM1.
 - The QUALIFY(EXTEND) and XMLPARSE(COMPAT) compiler options are enabled for PROGRAM1.
 - The IDMS dialect is enabled for PROGRAM2, and IDMS copybooks from LIB3 and LIB4 are used with PROGRAM2.
-- The DB2 SQL server is enabled for PROGRAM2. 
-- Non-IDMS copybooks from libraries LIB5 and LIB6 are used with PROGRAM2. 
+- The DB2 SQL server is enabled for PROGRAM2.
+- Non-IDMS copybooks from libraries LIB5 and LIB6 are used with PROGRAM2.
 
 ```
 {
@@ -343,7 +356,7 @@ Using the example `pgm_conf.json` file above, the following `proc_grps.json` exa
                     "libs": [
                         "LIB3", "LIB4"
                         ]
-                }, 
+                },
                 {
                     "name": "SQL",
                     "target-sql-backend": "DB2_SERVER"
@@ -361,12 +374,12 @@ Using the example `pgm_conf.json` file above, the following `proc_grps.json` exa
 
 To enable troubleshooting logs for the LSP server, specify a value for the parameter **cobol-lsp.logging.level.root** in the extension settings. Specify one of the following values:
 
-* ERROR
-* WARN
-* INFO
-* DEBUG
-* TRACE
-* ALL
+- ERROR
+- WARN
+- INFO
+- DEBUG
+- TRACE
+- ALL
 
 These values are ordered from returning the least information ("ERROR"; errors only) to the most information ("ALL"; all details).
 
@@ -380,31 +393,34 @@ If you are on active support for Brightside, you get technical assistance and su
 
 This support generally includes:
 
-* Telephone and online access to technical support
-* Ability to submit new incidents 24x7x365
-* 24x7x365 continuous support for Severity 1 incidents
-* 24x7x365 access to Broadcom Support
-* Interactive remote diagnostic support
-* Technical support cases must be submitted to Broadcom in accordance with guidance provided in “Working with Support”.
+- Telephone and online access to technical support
+- Ability to submit new incidents 24x7x365
+- 24x7x365 continuous support for Severity 1 incidents
+- 24x7x365 access to Broadcom Support
+- Interactive remote diagnostic support
+- Technical support cases must be submitted to Broadcom in accordance with guidance provided in “Working with Support”.
 
 Note: To receive technical assistance and support, you must remain compliant with “Working with Support”, be current on all applicable licensing and maintenance requirements, and maintain an environment in which all computer hardware, operating systems, and third party software associated with the affected Broadcom software are on the releases and version levels from the manufacturer that Broadcom designates as compatible with the software. Changes you elect to make to your operating environment could detrimentally affect the performance of Broadcom software and Broadcom shall not be responsible for these effects or any resulting degradation in performance of the Broadcom software. Severity 1 cases must be opened via telephone and elevations of lower severity incidents to Severity 1 status must be requested via telephone.
 
 ## Privacy Notice
+
 The extensions for Visual Studio Code developed by Broadcom Inc., including its corporate affiliates and subsidiaries, ("Broadcom") are provided free of charge, but in order to better understand and meet its users’ needs, Broadcom may collect, use, analyze and retain anonymous users’ metadata and interaction data, (collectively, “Usage Data”) and aggregate such Usage Data with similar Usage Data of other Broadcom customers. Please find more detailed information in [License and Service Terms & Repository](https://www.broadcom.com/company/legal/licensing).
 
 This data collection uses built-in Microsoft VS Code Telemetry, which can be disabled, at your sole discretion, if you do not want to send Usage Data.
 
 The current release of COBOL Language Support collects anonymous data for the following events:
-* Activation of this VS Code extension
-* Problem interaction
-* Quick Fix
-* Invalid ZOWE credentials
-* ZOWE connection issues
-* Java version issues
+
+- Activation of this VS Code extension
+- Problem interaction
+- Quick Fix
+- Invalid ZOWE credentials
+- ZOWE connection issues
+- Java version issues
 
 Each such event is logged with the following information:
-* Event time
-* Operating system and version
-* Country or region
-* Anonymous user and session ID
-* Version numbers of Microsoft VS Code and COBOL Language Support
+
+- Event time
+- Operating system and version
+- Country or region
+- Anonymous user and session ID
+- Version numbers of Microsoft VS Code and COBOL Language Support
