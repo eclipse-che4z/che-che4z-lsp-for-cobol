@@ -84,7 +84,7 @@ describe("Test the copybook message handler", () => {
       "file://" +
         path.resolve(
           "/storagePath",
-          ".zowe",
+          "zowe",
           ".copybooks",
           "testProfile",
           "configured",
@@ -112,7 +112,7 @@ describe("Test the copybook message handler", () => {
       "file://" +
         path.resolve(
           "/storagePath",
-          ".zowe",
+          "zowe",
           ".copybooks",
           "testProfile",
           "configured",
