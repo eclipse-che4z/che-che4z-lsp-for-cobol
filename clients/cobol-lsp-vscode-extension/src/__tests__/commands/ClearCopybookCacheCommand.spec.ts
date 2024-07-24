@@ -52,7 +52,7 @@ describe("Tests downloaded copybook cache clear", () => {
       path: "/storagePath/zowe/copybooks",
     });
     expect(vscode.workspace.fs.readDirectory).toHaveBeenNthCalledWith(2, {
-      path: "/storagePath/.e4e/copybooks",
+      path: "/storagePath/e4e/copybooks",
     });
     expect(vscode.workspace.fs.delete).toHaveBeenNthCalledWith(
       1,
@@ -61,7 +61,7 @@ describe("Tests downloaded copybook cache clear", () => {
     );
     expect(vscode.workspace.fs.delete).toHaveBeenNthCalledWith(
       2,
-      { path: "/storagePath/.e4e/copybooks/fileName" },
+      { path: "/storagePath/e4e/copybooks/fileName" },
       { recursive: true, useTrash: false },
     );
   });

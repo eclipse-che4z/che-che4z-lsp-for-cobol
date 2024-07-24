@@ -228,7 +228,7 @@ describe("Test the copybook message handler", () => {
       "file://" +
         path.resolve(
           "/storagePath",
-          ".e4e",
+          "e4e",
           "copybooks",
           "instance.profile",
           "dataset",
@@ -277,7 +277,7 @@ describe("Test the copybook message handler", () => {
       "file://" +
         path.resolve(
           "/storagePath",
-          ".e4e",
+          "e4e",
           "copybooks",
           "instance.profile",
           "environment",

@@ -73,7 +73,7 @@ export const FAIL_CREATE_COPYBOOK_FOLDER_MSG = `Failed to create copybook intern
 export const FAIL_CREATE_GLOBAL_STORAGE_MSG = `Failed to create extension global storage folder`;
 export const E4E_SCHEME: string = "ndvr";
 export const OUTPUT_MSG_SEARCH_LOCATION = "Looking for location => ";
-export const E4E_FOLDER: string = ".e4e";
+export const E4E_FOLDER: string = "e4e";
 export const DATASET = "dataset";
 export const ENVIRONMENT = "environment";
 export const USE_MAP = "MAP";
