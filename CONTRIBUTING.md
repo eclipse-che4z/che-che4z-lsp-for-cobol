@@ -39,7 +39,7 @@ $ git clone https://github.com/eclipse/che-che4z-lsp-for-cobol.git
 
 To build both the server and client extension run the following from project root:
 
-`$ ./BUILD.sh`
+```$ ./BUILD.sh```
 
 You need to change the run configuration in your IDE to enable logging to the console while debugging the Java part.
 Add `-Dlogback.configurationFile=server/localDev/logback.xml` to your `VM options` parameter.
