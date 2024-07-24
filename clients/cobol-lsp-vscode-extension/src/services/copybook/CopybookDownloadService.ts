@@ -160,7 +160,7 @@ export class CopybookDownloadService {
     );
     if (result) return result;
 
-    // check in subfolders under .copybooks (copybook downloaded from MF)
+    // check in subfolders under copybooks (copybook downloaded from MF)
     return searchCopybookInExtensionFolder(
       copybookName,
       CopybookURI.createPathForCopybookDownloaded(
