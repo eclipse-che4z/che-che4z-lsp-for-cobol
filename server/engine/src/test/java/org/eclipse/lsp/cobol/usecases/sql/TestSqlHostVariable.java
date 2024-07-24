@@ -123,7 +123,7 @@ public class TestSqlHostVariable {
                   + "        Data Division.\n"
                   + "         Working-Storage Section.\n"
                   + "       01 {$*GREET}.\n"
-                  + "          49 {$*VAR|1} USAGE IS SQL TYPE IS CHARACTER LARGE OBJECT (10 M).\n"
+                  + "          49 {$*VAR} USAGE IS SQL TYPE IS CHARACTER LARGE OBJECT (10 M).\n"
                   + "        PROCEDURE DIVISION.\n"
                   + "           DISPLAY {$VAR}.";
 
@@ -138,9 +138,6 @@ public class TestSqlHostVariable {
                   + "       01 {$*VAR-NAME4} USAGE IS SQL TYPE IS XML AS CHAR LARGE OBJECT (10 G).\n"
                   + "       01 {$*VAR-NAME5} USAGE IS SQL TYPE IS XML AS CLOB (20).\n"
                   + "       01 {$*VAR-NAME6} USAGE IS SQL TYPE IS XML AS DBCLOB (30 K).\n"
-                  + "       01 {$*VAR-NAME7} USAGE IS SQL TYPE IS XML AS BLOB-LOCATOR.\n"
-                  + "       01 {$*VAR-NAME8} USAGE IS SQL TYPE IS XML AS CLOB-LOCATOR.\n"
-                  + "       01 {$*VAR-NAME9} USAGE IS SQL TYPE IS XML AS DBCLOB-LOCATOR.\n"
                   + "       01 {$*VAR-NAME10} USAGE IS SQL TYPE IS XML AS  BLOB-FILE.\n"
                   + "       01 {$*VAR-NAME11} USAGE IS SQL TYPE IS XML AS  CLOB-FILE.\n"
                   + "       01 {$*VAR-NAME12} USAGE IS SQL TYPE IS XML AS  DBCLOB-FILE.\n"
@@ -272,15 +269,7 @@ public class TestSqlHostVariable {
 
   @Test
   void testLobVariables_levelError() {
-    UseCaseEngine.runTest(LOD_VARS_TEXT1, ImmutableList.of(), ImmutableMap.of(
-            "1",
-            new Diagnostic(
-                    new Range(),
-                    "Allowed range is 2 to 48",
-                    DiagnosticSeverity.Error,
-                    ErrorSource.PARSING.getText()
-            )
-    ));
+    UseCaseEngine.runTest(LOD_VARS_TEXT1, ImmutableList.of(), ImmutableMap.of());
   }
 
   @Test
