@@ -139,7 +139,6 @@ describe("Tests Copybook download from DNS", () => {
           file: "profile/dsn.path/copybook",
           binary: true,
           returnEtag: true,
-          encoding: "utf8",
         });
         expect(isDowloaded).toBeTruthy();
       });
@@ -157,7 +156,6 @@ describe("Tests Copybook download from DNS", () => {
           file: "profile/dsn.path/copybook",
           binary: true,
           returnEtag: true,
-          encoding: "utf8",
         });
         expect(isDowloaded).toBeTruthy();
       });
