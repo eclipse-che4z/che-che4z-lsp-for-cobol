@@ -36,7 +36,7 @@ describe("CopybooksPathGenerator tests", () => {
       path.join(
         "downloadFolder",
         "zowe",
-        ".copybooks",
+        "copybooks",
         "profile",
         "dataset",
         "copybook",
@@ -47,7 +47,7 @@ describe("CopybooksPathGenerator tests", () => {
     expect(
       CopybookURI.createDatasetPath(profile, dataset, "downloadFolder"),
     ).toEqual(
-      path.join("downloadFolder", "zowe", ".copybooks", "profile", "dataset"),
+      path.join("downloadFolder", "zowe", "copybooks", "profile", "dataset"),
     );
   });
 });

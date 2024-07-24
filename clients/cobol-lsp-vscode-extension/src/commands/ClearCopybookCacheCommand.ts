@@ -22,7 +22,7 @@ import {
 } from "../constants";
 
 /**
- * Clears the downloaded copybook cache folder ({globalStoragePath}/zowe/.copybooks).
+ * Clears the downloaded copybook cache folder ({globalStoragePath}/zowe/copybooks).
  *
  */
 export function clearCache(uri: vscode.Uri) {

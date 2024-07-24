@@ -44,7 +44,7 @@ describe("e4e copybook downloader tests", () => {
       path.join(
         "/storagePath",
         ".e4e",
-        ".copybooks",
+        "copybooks",
         "Instance.Instance",
         "pgm",
         "Copy",
@@ -54,7 +54,7 @@ describe("e4e copybook downloader tests", () => {
       path.join(
         "/storagePath",
         ".e4e",
-        ".copybooks",
+        "copybooks",
         "Instance.Instance",
         "pgm",
       ),
@@ -168,7 +168,7 @@ describe("e4e copybook downloader tests", () => {
       path.join(
         "/storagePath",
         ".e4e",
-        ".copybooks",
+        "copybooks",
         "instance.profile",
         "dataset",
         "copybook",
