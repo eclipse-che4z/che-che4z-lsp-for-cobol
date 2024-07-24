@@ -103,6 +103,7 @@
       {
         "command": "cobol-lsp.open.copybook.internalfolder",
         "title": "Open Copybooks Internal Folder",
+        "category": "COBOL",
         "when": "!isWeb"
       }
     ],
