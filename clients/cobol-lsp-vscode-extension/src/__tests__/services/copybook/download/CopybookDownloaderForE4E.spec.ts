@@ -43,21 +43,15 @@ describe("e4e copybook downloader tests", () => {
     ).toEqual(
       path.join(
         "/storagePath",
-        ".e4e",
-        ".copybooks",
+        "e4e",
+        "copybooks",
         "Instance.Instance",
         "pgm",
         "Copy",
       ),
     );
     expect(fs.mkdirSync).toHaveBeenCalledWith(
-      path.join(
-        "/storagePath",
-        ".e4e",
-        ".copybooks",
-        "Instance.Instance",
-        "pgm",
-      ),
+      path.join("/storagePath", "e4e", "copybooks", "Instance.Instance", "pgm"),
       { recursive: true },
     );
   });
@@ -167,8 +161,8 @@ describe("e4e copybook downloader tests", () => {
     expect(fs.promises.writeFile).toHaveBeenCalledWith(
       path.join(
         "/storagePath",
-        ".e4e",
-        ".copybooks",
+        "e4e",
+        "copybooks",
         "instance.profile",
         "dataset",
         "copybook",

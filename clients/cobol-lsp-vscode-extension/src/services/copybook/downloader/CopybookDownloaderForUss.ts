@@ -117,15 +117,15 @@ export class CopybookDownloaderForUss extends ZoweExplorerDownloader {
 
     await this.explorerAPI
       .getUssApi(loadedProfile)
-      .getContents(`${dataset}/${member}`, {
-        ...downloadOptions,
-        file: downloadOptions.file.fsPath,
-      });
+      .getContents(`${dataset}/${member}`, downloadOptions.apiOptions);
 
-    await this.encodeDownloadedContent(
-      downloadOptions.file,
-      downloadOptions.encoding,
-    );
+    if (downloadOptions.decode) {
+      await this.decodeBinaryContent(
+        downloadOptions.fileUri,
+        downloadOptions.decode,
+      );
+    }
+
     return true;
   }
 }
