@@ -31,14 +31,15 @@ This extension is not compatible with other extensions that provide COBOL suppor
 
 The COBOL Language Support extension only supports IBM Enterprise COBOL. Other versions of COBOL are not supported.
 
-## Integration with Zowe Explorer
+## Integration with Zowe Explorer and Explorer for Endevor
 
-Integrating COBOL Language Support with Zowe Explorer lets you:
+Integrating COBOL Language Support with the Zowe Explorer and Explorer for Endevor extensions let you:
 
 - Load your data sets containing COBOL code directly from the data set tree.
+- Load your COBOL code directly from Endevor elements.
 - Enable automatic copybook retrieval from the mainframe.
 
-To enable these features, install the [Zowe Explorer](https://marketplace.visualstudio.com/items?itemName=Zowe.vscode-extension-for-zowe) extension and configure a Zowe Explorer `zosmf` or `zftp` profile with credentials and a connection URL.
+Both Zowe Explorer and Explorer for Endevor are available as part of the [Code4z extension pack](https://marketplace.visualstudio.com/items?itemName=broadcomMFD.code4z-extension-pack). A Zowe Explorer `zosmf` or `zftp` profile with credentials and a connection URL is also required to retrieve copybooks from mainframe data sets.
 
 <a href="https://www.openmainframeproject.org/all-projects/zowe/conformance"><img alt="This extension is Zowe v2 conformant" src="https://artwork.openmainframeproject.org/other/zowe-conformant/zowev2/explorer/color/zowe-conformant-zowev2-explorer-color.png" width=20% height=20% /></a>
 
@@ -186,7 +187,7 @@ If you specify your copybook folders using absolute paths or paths containing `.
 
 To resolve copybook names manually, hover over the copybook name with the error underline, select **Quick Fix...** and **Resolve copybook**.
 
-### Retrieving Copybooks from the Mainframe
+### Retrieving Copybooks from Mainframe Data Sets and USS Files
 
 You can also set up automatic copybook retrieval from the mainframe to download copybooks from mainframe data sets and USS directories to your workspace.
 
@@ -202,9 +203,19 @@ You can also set up automatic copybook retrieval from the mainframe to download 
    All copybooks used in the program or project which are not stored locally are downloaded from the mainframe data sets and USS directories that you specified in steps 4 and 5.  
    Copybook support features are now enabled.
 
-Copybooks that you retrieve from mainframe data sets are stored in the **.c4z/.copybooks** directory within the workspace, which is created automatically. 
+Copybooks that you retrieve from mainframe data sets are stored in your VS Code global storage folder. 
 
-We recommend that you refresh your copybooks from time to time. To refresh your copybooks, press **F1** and run the command **Clear downloaded copybooks**. This command clears the **.c4z/.copybooks** directory so that copybooks are downloaded again from the mainframe.
+We recommend that you refresh your copybooks from time to time. To refresh your copybooks, press **F1** and run the command **Clear downloaded copybooks**. This command clears the global storage folder so that copybooks are downloaded again from the mainframe.
+
+### Retrieving Copybooks from Endevor
+
+When you open a COBOL file using Explorer for Endevor, COBOL copybooks that are specified in the Endevor element processor group are automatically downloaded to your VS Code global storage folder.
+
+The extension setting **Cpy-manager: Endevor-dependencies** determines how copybooks are retrieved from the mainframe when you open a COBOL file in Explorer for Endevor. This setting has the following options:
+* **ENDEVOR_PROCESSOR**
+  * Downloads copybooks from locations that are specified in the Endevor element processor group.
+* **ZOWE**
+  * Downloads copybooks from locations that are specified in the **paths-dsn** and **paths-uss** settings.
 
 ### Copybook Support Features
 

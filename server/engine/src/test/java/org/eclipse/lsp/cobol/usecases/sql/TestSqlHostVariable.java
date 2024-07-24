@@ -94,6 +94,75 @@ public class TestSqlHostVariable {
                   + "       01 {$*VAR-NAME3} SQL TYPE IS TABLE LIKE TABLENAME AS LOCATOR.\n"
                   + "        PROCEDURE DIVISION.\n"
                   + "           DISPLAY {$var-name1}..";
+
+  public static final String LOD_VARS_TEXT =
+          "        Identification Division.\n"
+                  + "        Program-Id. 'TEST1'.\n"
+                  + "        Data Division.\n"
+                  + "         Working-Storage Section.\n"
+                  + "       01 {$*VAR-NAME1} USAGE IS SQL TYPE IS DBCLOB-FILE.\n"
+                  + "       01 {$*VAR-NAME2} USAGE IS SQL TYPE IS BLOB (10 K).\n"
+                  + "       01 {$*VAR-NAME3} USAGE IS SQL TYPE IS CHARACTER LARGE OBJECT (10 M).\n"
+                  + "       01 {$*VAR-NAME4} USAGE IS SQL TYPE IS CHAR LARGE OBJECT (10 G).\n"
+                  + "       01 {$*VAR-NAME5} USAGE IS SQL TYPE IS CLOB (20).\n"
+                  + "       01 {$*VAR-NAME6} USAGE IS SQL TYPE IS DBCLOB (30 K).\n"
+                  + "       01 {$*VAR-NAME7} USAGE IS SQL TYPE IS BLOB-LOCATOR.\n"
+                  + "       01 {$*VAR-NAME8} USAGE IS SQL TYPE IS CLOB-LOCATOR.\n"
+                  + "       01 {$*VAR-NAME9} USAGE IS SQL TYPE IS DBCLOB-LOCATOR.\n"
+                  + "       01 {$*VAR-NAME10} USAGE IS SQL TYPE IS BLOB-FILE.\n"
+                  + "       01 {$*VAR-NAME11} USAGE IS SQL TYPE IS CLOB-FILE.\n"
+                  + "       01 {$*VAR12`->VAR12`->VAR12-LENGTH`->VAR12-DATA} USAGE IS SQL TYPE IS BINARY LARGE OBJECT (10).\n"
+                  + "        PROCEDURE DIVISION.\n"
+                  + "           DISPLAY {$VAR12}.\n"
+                  + "           DISPLAY {$VAR12-LENGTH}.\n"
+                  + "           DISPLAY {$VAR12-DATA}.";
+
+  public static final String LOD_VARS_TEXT1 =
+          "        Identification Division.\n"
+                  + "        Program-Id. 'TEST1'.\n"
+                  + "        Data Division.\n"
+                  + "         Working-Storage Section.\n"
+                  + "       01 {$*GREET}.\n"
+                  + "          49 {$*VAR} USAGE IS SQL TYPE IS CHARACTER LARGE OBJECT (10 M).\n"
+                  + "        PROCEDURE DIVISION.\n"
+                  + "           DISPLAY {$VAR}.";
+
+  public static final String LOB_XML_TEXT1 =
+          "        Identification Division.\n"
+                  + "        Program-Id. 'TEST1'.\n"
+                  + "        Data Division.\n"
+                  + "         Working-Storage Section.\n"
+                  + "       01 {$*VAR1`->VAR1`->VAR1-LENGTH`->VAR1-DATA} USAGE IS SQL TYPE IS XML AS BINARY LARGE OBJECT (10).\n"
+                  + "       01 {$*VAR-NAME2} USAGE IS SQL TYPE IS XML AS BLOB (10 K).\n"
+                  + "       01 {$*VAR3} USAGE IS SQL TYPE IS XML AS CHARACTER LARGE OBJECT (10 M).\n"
+                  + "       01 {$*VAR-NAME4} USAGE IS SQL TYPE IS XML AS CHAR LARGE OBJECT (10 G).\n"
+                  + "       01 {$*VAR-NAME5} USAGE IS SQL TYPE IS XML AS CLOB (20).\n"
+                  + "       01 {$*VAR-NAME6} USAGE IS SQL TYPE IS XML AS DBCLOB (30 K).\n"
+                  + "       01 {$*VAR-NAME10} USAGE IS SQL TYPE IS XML AS  BLOB-FILE.\n"
+                  + "       01 {$*VAR-NAME11} USAGE IS SQL TYPE IS XML AS  CLOB-FILE.\n"
+                  + "       01 {$*VAR-NAME12} USAGE IS SQL TYPE IS XML AS  DBCLOB-FILE.\n"
+                  + "        PROCEDURE DIVISION.\n"
+                  + "           DISPLAY {$var1}.";
+
+  public static final String LOB_XML_TEXT2 =
+          "        Identification Division.\n"
+                  + "        Program-Id. 'TEST1'.\n"
+                  + "        Data Division.\n"
+                  + "         Working-Storage Section.\n"
+                  + "       01 {$*VAR-NAME1}.\n"
+                  + "          04 {$*VAR} USAGE IS SQL TYPE IS XML AS CHARACTER LARGE OBJECT (10).\n"
+                  + "        PROCEDURE DIVISION.\n"
+                  + "           DISPLAY {$var-name1}.";
+
+  public static final String LOB_XML_TEXT3 =
+          "        Identification Division.\n"
+                  + "        Program-Id. 'TEST1'.\n"
+                  + "        Data Division.\n"
+                  + "         Working-Storage Section.\n"
+                  + "       01 {$*VAR-NAME1}.\n"
+                  + "          49 {$*VAR|1} USAGE IS SQL TYPE IS XML AS CHARACTER LARGE OBJECT (10).\n"
+                  + "        PROCEDURE DIVISION.\n"
+                  + "           DISPLAY {$var-name1}.";
   @Test
   void testSupportForResultSetLocator() {
     UseCaseEngine.runTest(TEXT, ImmutableList.of(), ImmutableMap.of());
@@ -189,7 +258,40 @@ public class TestSqlHostVariable {
   }
 
   @Test
-  void testLobVariables() {
+  void testTableLocVariable() {
     UseCaseEngine.runTest(TABLE_LOCATOR_TEXT, ImmutableList.of(), ImmutableMap.of());
+  }
+
+  @Test
+  void testLobVariables() {
+    UseCaseEngine.runTest(LOD_VARS_TEXT, ImmutableList.of(), ImmutableMap.of());
+  }
+
+  @Test
+  void testLobVariables_levelError() {
+    UseCaseEngine.runTest(LOD_VARS_TEXT1, ImmutableList.of(), ImmutableMap.of());
+  }
+
+  @Test
+  void testLobXMLVariables1() {
+    UseCaseEngine.runTest(LOB_XML_TEXT1, ImmutableList.of(), ImmutableMap.of());
+  }
+
+  @Test
+  void testLobXMLVariables2() {
+    UseCaseEngine.runTest(LOB_XML_TEXT2, ImmutableList.of(), ImmutableMap.of());
+  }
+
+  @Test
+  void testLobXMLVariables_levelError() {
+    UseCaseEngine.runTest(LOB_XML_TEXT3, ImmutableList.of(), ImmutableMap.of(
+            "1",
+            new Diagnostic(
+                    new Range(),
+                    "Allowed range is 2 to 48",
+                    DiagnosticSeverity.Error,
+                    ErrorSource.PARSING.getText()
+            )
+    ));
   }
 }

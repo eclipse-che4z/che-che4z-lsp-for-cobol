@@ -46,7 +46,6 @@ import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.model.tree.variable.*;
-import org.eclipse.lsp.cobol.common.utils.RangeUtils;
 import org.eclipse.lsp.cobol.core.visitor.VisitorHelper;
 import org.eclipse.lsp.cobol.implicitDialects.sql.node.*;
 import org.eclipse.lsp4j.Location;
@@ -89,6 +88,26 @@ class Db2SqlVisitor extends Db2SqlParserBaseVisitor<List<Node>> {
     @Override
     public List<Node> visitTableLocators_variable(Db2SqlParser.TableLocators_variableContext ctx) {
         return createHostVariableDefinitionNode(ctx, ctx.dbs_host_var_levels(), ctx.entry_name());
+    }
+
+    @Override
+    public List<Node> visitLob_xml_host_variables(Db2SqlParser.Lob_xml_host_variablesContext ctx) {
+        List<Node> hostVariableDefinitionNode = createHostVariableDefinitionNode(ctx, ctx.dbs_host_var_levels(), ctx.entry_name());
+        if (ctx.lobWithSize() != null && ctx.lobWithSize().BINARY() != null) {
+            generateVarbinVariables((VariableDefinitionNode) hostVariableDefinitionNode.get(0),
+                    ctx.lobWithSize().dbs_integer().getText(), ctx);
+        }
+        return hostVariableDefinitionNode;
+    }
+
+    @Override
+    public List<Node> visitLob_host_variables(Db2SqlParser.Lob_host_variablesContext ctx) {
+        List<Node> hostVariableDefinitionNode = createHostVariableDefinitionNode(ctx, ctx.dbs_integer(), ctx.entry_name());
+        if (ctx.lobWithSize() != null && ctx.lobWithSize().BINARY() != null) {
+            generateVarbinVariables((VariableDefinitionNode) hostVariableDefinitionNode.get(0),
+                    ctx.lobWithSize().dbs_integer().getText(), ctx);
+        }
+        return hostVariableDefinitionNode;
     }
 
     private List<Node> createHostVariableDefinitionNode(ParserRuleContext ctx, ParserRuleContext levelCtx, ParserRuleContext nameCtx) {
@@ -135,23 +154,37 @@ class Db2SqlVisitor extends Db2SqlParserBaseVisitor<List<Node>> {
                         .usageClauses(ImmutableList.of(UsageFormat.DISPLAY))
                         .build();
         if (ctx.binary_host_variable_type().VARBINARY() != null) {
-            generateVarbinVariables(variableDefinitionNode, ctx.binary_host_variable_type().binary_host_variable_varbinary_size().getText());
+            generateVarbinVariables(variableDefinitionNode, ctx.binary_host_variable_type().binary_host_variable_varbinary_size().getText(), ctx);
         }
         variableDefinitionNode.addChild(semanticsNode);
         return ImmutableList.of(variableDefinitionNode);
     }
 
-    private void generateVarbinVariables(VariableDefinitionNode variableDefinitionNode, String len) {
+    private void generateVarbinVariables(VariableDefinitionNode variableDefinitionNode, String len, ParserRuleContext ctx) {
+        String suffux1 = "";
+        String suffix2 = "";
+        switch (ctx.getClass().getSimpleName()) {
+            case "Lob_host_variablesContext":
+            case "Lob_xml_host_variablesContext":
+                suffux1 = "-LENGTH";
+                suffix2 = "-DATA";
+                break;
+            case "Binary_host_variableContext":
+                suffux1 = "-LEN";
+                suffix2 = "-TEXT";
+                break;
+            default:
+        }
         int generatedVariableLevel = 49;
         VariableNode variableLenNode = new ElementaryItemNode(variableDefinitionNode.getLevelLocality(),
                 generatedVariableLevel,
-                variableDefinitionNode.getVariableName().getName() + "-LEN",
+                variableDefinitionNode.getVariableName().getName() + suffux1,
                 false, "S9(4)", "",
                 UsageFormat.BINARY, false, false, false);
 
         VariableNode variableTextNode = new ElementaryItemNode(variableDefinitionNode.getLevelLocality(),
                 generatedVariableLevel,
-                variableDefinitionNode.getVariableName().getName() + "-TEXT",
+                variableDefinitionNode.getVariableName().getName() + suffix2,
                 false, "X(" + len + ")", "",
                 UsageFormat.UNDEFINED, false, false, false);
 
@@ -439,9 +472,6 @@ class Db2SqlVisitor extends Db2SqlParserBaseVisitor<List<Node>> {
         if (Db2SqlVisitorHelper.isGroupName(name)) {
             Locality locality =
                     VisitorHelper.buildNameRangeLocality(ctx, name, context.getExtendedDocument().getUri());
-            locality.setRange(
-                    RangeUtils.shiftRangeWithPosition(
-                            new Position(ctx.start.getLine() - 1, (hasColumn ? 1 : 0)), locality.getRange()));
 
             return Db2SqlVisitorHelper.generateGroupNodes(name, locality);
         }
