@@ -251,7 +251,7 @@ public class TestSqlHostVariable {
                   + "        Data Division.\n"
                   + "         Working-Storage Section.\n"
                   + "       01 {$*VAR-NAME1}.\n"
-                  + "       04 {$*VAR} USAGE IS SQL TYPE IS XML AS CLOB (10) OCCURS 12345 TIMES.\n"
+                  + "       04 {$*VAR`->VAR`->VAR-LENGTH`->VAR-DATA} USAGE IS SQL TYPE IS XML AS CLOB (10) OCCURS 12345 TIMES.\n"
                   + "        PROCEDURE DIVISION.\n";
 
   public static final String LOB_XML_ARR_TEXT2 =
@@ -259,7 +259,7 @@ public class TestSqlHostVariable {
                   + "        Program-Id. 'TEST1'.\n"
                   + "        Data Division.\n"
                   + "         Working-Storage Section.\n"
-                  + "       01 {$*VAR} USAGE IS SQL TYPE IS XML AS CLOB(10) OCCURS 1234 TIMES.\n"
+                  + "       01 {$*VAR`->VAR`->VAR-LENGTH`->VAR-DATA} USAGE IS SQL TYPE IS XML AS CLOB(10) OCCURS 1234 TIMES.\n"
                   + "        PROCEDURE DIVISION.\n";
 
   public static final String LOB_XML_ARR_TEXT3 =
@@ -268,7 +268,7 @@ public class TestSqlHostVariable {
                   + "        Data Division.\n"
                   + "         Working-Storage Section.\n"
                   + "       01 {$*VAR-NAME1}.\n"
-                  + "       04 {$*VAR} USAGE IS SQL TYPE IS XML AS CLOB (10) OCCURS {123456|1} TIMES.\n"
+                  + "       04 {$*VAR`->VAR`->VAR-LENGTH`->VAR-DATA} USAGE IS SQL TYPE IS XML AS CLOB (10) OCCURS {123456|1} TIMES.\n"
                   + "        PROCEDURE DIVISION.\n";
 
   public static final String LOB_XML_ARR_TEXT4 =
