@@ -1,0 +1,1 @@
+java -jar lombok.jar delombok server -d server-delomboked
