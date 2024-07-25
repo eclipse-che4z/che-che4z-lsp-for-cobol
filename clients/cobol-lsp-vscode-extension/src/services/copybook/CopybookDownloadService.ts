@@ -254,7 +254,9 @@ export class CopybookDownloadService {
         });
       }),
     ).catch((err) => {
-      vscode.window.showErrorMessage(err.message);
+      this.outputChannel?.appendLine(
+        `Error downloading copybooks : ${err.message}`,
+      );
     });
   }
 
