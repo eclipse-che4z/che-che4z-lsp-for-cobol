@@ -279,6 +279,7 @@ public class TestSqlHostVariable {
                   + "       01 {$*GREET}.\n"
                   + "          02 {$*VA`->VA`->VA-LENGTH`->VA-DATA} USAGE IS SQL TYPE IS XML AS CLOB (10) OCCURS 12345 TIMES.\n"
                   + "        PROCEDURE DIVISION.\n"
+                  + "           DISPLAY {$VA}(1).\n"
                   + "           DISPLAY {$VA-LENGTH}(1).\n"
                   + "           DISPLAY {$VA-DATA}(1).\n";
 
