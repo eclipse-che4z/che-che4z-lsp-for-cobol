@@ -84,6 +84,42 @@ public class TestSqlHostVariable {
           + "       01 {$*VAR-INVALID-BIN`->VAR-INVALID-BIN`->VAR-INVALID-BIN-LEN`->VAR-INVALID-BIN-TEXT} USAGE IS SQL TYPE IS VARBINARY({-|1}1234).\n"
           + "        PROCEDURE DIVISION.\n";
 
+  public static final String BINARY_ARR_TEXT1 =
+          "        Identification Division.\n"
+                  + "        Program-Id. 'TEST1'.\n"
+                  + "        Data Division.\n"
+                  + "         Working-Storage Section.\n"
+                  + "       01 {$*GREET}.\n"
+                  + "       02 {$*VAR} SQL TYPE IS BINARY(255) OCCURS 32767 TIMES.\n"
+                  + "        PROCEDURE DIVISION.\n";
+
+  public static final String BINARY_ARR_TEXT2 =
+          "        Identification Division.\n"
+                  + "        Program-Id. 'TEST1'.\n"
+                  + "        Data Division.\n"
+                  + "         Working-Storage Section.\n"
+                  + "       01 {$*GREET}.\n"
+                  + "       02 {$*VAR} SQL TYPE IS VARBINARY(32704) OCCURS 32767 TIMES.\n"
+                  + "        PROCEDURE DIVISION.\n";
+
+  public static final String BINARY_ARR_TEXT3 =
+          "        Identification Division.\n"
+                  + "        Program-Id. 'TEST1'.\n"
+                  + "        Data Division.\n"
+                  + "         Working-Storage Section.\n"
+                  + "       01 {$*GREET}.\n"
+                  + "       02 {$*VAR} SQL TYPE IS BINARY(255) OCCURS 32767.\n"
+                  + "        PROCEDURE DIVISION.\n";
+
+  public static final String BINARY_ARR_TEXT4 =
+          "        Identification Division.\n"
+                  + "        Program-Id. 'TEST1'.\n"
+                  + "        Data Division.\n"
+                  + "         Working-Storage Section.\n"
+                  + "       01 {$*GREET}.\n"
+                  + "       02 {$*VAR} SQL TYPE IS VARBINARY(32704) OCCURS 32767.\n"
+                  + "        PROCEDURE DIVISION.\n";
+
   public static final String TABLE_LOCATOR_TEXT =
           "        Identification Division.\n"
                   + "        Program-Id. 'TEST1'.\n"
@@ -293,5 +329,25 @@ public class TestSqlHostVariable {
                     ErrorSource.PARSING.getText()
             )
     ));
+  }
+
+  @Test
+  void testBinaryHostVariableArray1() {
+    UseCaseEngine.runTest(BINARY_ARR_TEXT1, ImmutableList.of(), ImmutableMap.of());
+  }
+
+  @Test
+  void testBinaryHostVariableArray2() {
+    UseCaseEngine.runTest(BINARY_ARR_TEXT2, ImmutableList.of(), ImmutableMap.of());
+  }
+
+  @Test
+  void testBinaryHostVariableArray3() {
+    UseCaseEngine.runTest(BINARY_ARR_TEXT3, ImmutableList.of(), ImmutableMap.of());
+  }
+
+  @Test
+  void testBinaryHostVariableArray4() {
+    UseCaseEngine.runTest(BINARY_ARR_TEXT4, ImmutableList.of(), ImmutableMap.of());
   }
 }

@@ -119,13 +119,17 @@ export class CopybookDownloaderForDsn extends ZoweExplorerDownloader {
       .getMvsApi(loadedProfile)
       .getContents(
         `${dataset}(${DownloadUtil.getFilenameWithoutExtension(member)})`,
-        { ...downloadOptions, file: downloadOptions.file.fsPath },
+        downloadOptions.apiOptions,
       );
-    await this.encodeDownloadedContent(
-      downloadOptions.file,
-      downloadOptions.encoding,
-      true,
-    );
+
+    if (downloadOptions.decode) {
+      await this.decodeBinaryContent(
+        downloadOptions.fileUri,
+        downloadOptions.decode,
+        true,
+      );
+    }
+
     return true;
   }
 }

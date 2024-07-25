@@ -84,8 +84,8 @@ describe("Test the copybook message handler", () => {
       "file://" +
         path.resolve(
           "/storagePath",
-          ".zowe",
-          ".copybooks",
+          "zowe",
+          "copybooks",
           "testProfile",
           "configured",
           "path",
@@ -112,8 +112,8 @@ describe("Test the copybook message handler", () => {
       "file://" +
         path.resolve(
           "/storagePath",
-          ".zowe",
-          ".copybooks",
+          "zowe",
+          "copybooks",
           "testProfile",
           "configured",
           "path",
@@ -228,8 +228,8 @@ describe("Test the copybook message handler", () => {
       "file://" +
         path.resolve(
           "/storagePath",
-          ".e4e",
-          ".copybooks",
+          "e4e",
+          "copybooks",
           "instance.profile",
           "dataset",
           "copybook",
@@ -277,8 +277,8 @@ describe("Test the copybook message handler", () => {
       "file://" +
         path.resolve(
           "/storagePath",
-          ".e4e",
-          ".copybooks",
+          "e4e",
+          "copybooks",
           "instance.profile",
           "environment",
           "stage",
