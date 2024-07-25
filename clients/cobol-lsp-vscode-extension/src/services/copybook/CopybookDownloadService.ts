@@ -136,7 +136,6 @@ export class CopybookDownloadService {
         copybookNames.map(
           (copybookName) => new CopybookName(copybookName, dialectType),
         ),
-        this.outputChannel,
       );
     };
   }
@@ -209,7 +208,6 @@ export class CopybookDownloadService {
   public async downloadCopybooks(
     documentUri: string,
     copybookNames: CopybookName[],
-    outputChannel?: vscode.OutputChannel,
   ): Promise<void> {
     if (
       !(await this.isPrerequisiteForDownloadSatisfied(
@@ -231,7 +229,6 @@ export class CopybookDownloadService {
           progress,
           documentUri,
           copybookNames,
-          outputChannel,
         );
       },
     );
@@ -241,7 +238,6 @@ export class CopybookDownloadService {
     progress: vscode.Progress<{ message?: string; increment?: number }>,
     documentUri: string,
     copybookNames: CopybookName[],
-    outputChannel?: vscode.OutputChannel,
   ): Promise<void> {
     const totalCopybooksToDownload = copybookNames.length;
     let processedCopybooks = 0;
@@ -258,7 +254,9 @@ export class CopybookDownloadService {
         });
       }),
     ).catch((err) => {
-      outputChannel?.appendLine(`Error downloading copybooks : ${err.message}`);
+      this.outputChannel?.appendLine(
+        `Error downloading copybooks : ${err.message}`,
+      );
     });
   }
 
