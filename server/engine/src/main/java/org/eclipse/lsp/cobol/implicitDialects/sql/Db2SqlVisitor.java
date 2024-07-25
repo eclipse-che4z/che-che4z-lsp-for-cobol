@@ -108,7 +108,10 @@ class Db2SqlVisitor extends Db2SqlParserBaseVisitor<List<Node>> {
     @Override
     public List<Node> visitLob_xml_host_variables(Db2SqlParser.Lob_xml_host_variablesContext ctx) {
         List<Node> hostVariableDefinitionNode = createHostVariableDefinitionNode(ctx, ctx.dbs_host_var_levels(), ctx.entry_name());
-        if (ctx.lobWithSize() != null) {
+        if (ctx.host_variable_array_times() != null) {
+            generateVarbinArrayVariables((VariableDefinitionNode) hostVariableDefinitionNode.get(0),
+                    ctx.lobWithSize().dbs_integer().getText(), ctx);
+        } else if (ctx.lobWithSize() != null) {
             generateVarbinVariables((VariableDefinitionNode) hostVariableDefinitionNode.get(0),
                     ctx.lobWithSize().dbs_integer().getText(), ctx);
         }
@@ -206,6 +209,43 @@ class Db2SqlVisitor extends Db2SqlParserBaseVisitor<List<Node>> {
                 generatedVariableLevel,
                 variableDefinitionNode.getVariableName().getName() + suffux1,
                 false, "S9(4)", "",
+                UsageFormat.BINARY, false, false, false);
+
+        VariableNode variableTextNode = new ElementaryItemNode(variableDefinitionNode.getLevelLocality(),
+                generatedVariableLevel,
+                variableDefinitionNode.getVariableName().getName() + suffix2,
+                false, "X(" + len + ")", "",
+                UsageFormat.UNDEFINED, false, false, false);
+
+        variableLenNode.getChildren().add(new VariableDefinitionNameNode(
+                variableDefinitionNode.getVariableName().getLocality(), variableLenNode.getName()));
+        variableTextNode.getChildren().add(new VariableDefinitionNameNode(
+                variableDefinitionNode.getVariableName().getLocality(), variableTextNode.getName()));
+
+        variableDefinitionNode.addChild(variableLenNode);
+        variableDefinitionNode.addChild(variableTextNode);
+    }
+
+    private void generateVarbinArrayVariables(VariableDefinitionNode variableDefinitionNode, String len, ParserRuleContext ctx) {
+        String suffux1 = "";
+        String suffix2 = "";
+        switch (ctx.getClass().getSimpleName()) {
+            case "Lob_host_variablesContext":
+            case "Lob_xml_host_variablesContext":
+                suffux1 = "-LENGTH";
+                suffix2 = "-DATA";
+                break;
+            case "Binary_host_variableContext":
+                suffux1 = "-LEN";
+                suffix2 = "-TEXT";
+                break;
+            default:
+        }
+        int generatedVariableLevel = 49;
+        VariableNode variableLenNode = new ElementaryItemNode(variableDefinitionNode.getLevelLocality(),
+                generatedVariableLevel,
+                variableDefinitionNode.getVariableName().getName() + suffux1,
+                false, "S9(9) COMP-5", "",
                 UsageFormat.BINARY, false, false, false);
 
         VariableNode variableTextNode = new ElementaryItemNode(variableDefinitionNode.getLevelLocality(),

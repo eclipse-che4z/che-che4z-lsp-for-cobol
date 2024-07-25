@@ -245,6 +245,43 @@ public class TestSqlHostVariable {
                   + "           DISPLAY {$VB-LENGTH}(1).\n"
                   + "           DISPLAY {$VB-DATA}(1).\n";
 
+  public static final String LOB_XML_ARR_TEXT1 =
+          "        Identification Division.\n"
+                  + "        Program-Id. 'TEST1'.\n"
+                  + "        Data Division.\n"
+                  + "         Working-Storage Section.\n"
+                  + "       01 {$*VAR-NAME1}.\n"
+                  + "       04 {$*VAR`->VAR`->VAR-LENGTH`->VAR-DATA} USAGE IS SQL TYPE IS XML AS CLOB (10) OCCURS 12345 TIMES.\n"
+                  + "        PROCEDURE DIVISION.\n";
+
+  public static final String LOB_XML_ARR_TEXT2 =
+          "        Identification Division.\n"
+                  + "        Program-Id. 'TEST1'.\n"
+                  + "        Data Division.\n"
+                  + "         Working-Storage Section.\n"
+                  + "       01 {$*VAR`->VAR`->VAR-LENGTH`->VAR-DATA} USAGE IS SQL TYPE IS XML AS CLOB(10) OCCURS 1234 TIMES.\n"
+                  + "        PROCEDURE DIVISION.\n";
+
+  public static final String LOB_XML_ARR_TEXT3 =
+          "        Identification Division.\n"
+                  + "        Program-Id. 'TEST1'.\n"
+                  + "        Data Division.\n"
+                  + "         Working-Storage Section.\n"
+                  + "       01 {$*VAR-NAME1}.\n"
+                  + "       04 {$*VAR`->VAR`->VAR-LENGTH`->VAR-DATA} USAGE IS SQL TYPE IS XML AS CLOB (10) OCCURS {123456|1} TIMES.\n"
+                  + "        PROCEDURE DIVISION.\n";
+
+  public static final String LOB_XML_ARR_TEXT4 =
+          "        Identification Division.\n"
+                  + "        Program-Id. 'TEST1'.\n"
+                  + "        Data Division.\n"
+                  + "         Working-Storage Section.\n"
+                  + "       01 {$*GREET}.\n"
+                  + "          02 {$*VA`->VA`->VA-LENGTH`->VA-DATA} USAGE IS SQL TYPE IS XML AS CLOB (10) OCCURS 12345 TIMES.\n"
+                  + "        PROCEDURE DIVISION.\n"
+                  + "           DISPLAY {$VA}(1).\n"
+                  + "           DISPLAY {$VA-LENGTH}(1).\n"
+                  + "           DISPLAY {$VA-DATA}(1).\n";
 
   public static final String ROWID_TEXT1 =
           "        Identification Division.\n"
@@ -529,5 +566,45 @@ public class TestSqlHostVariable {
   @Test
   void testBinaryHostVariableArray4() {
     UseCaseEngine.runTest(BINARY_ARR_TEXT4, ImmutableList.of(), ImmutableMap.of());
+  }
+
+  @Test
+  void testLobXMLVariableArray1() {
+    UseCaseEngine.runTest(LOB_XML_ARR_TEXT1, ImmutableList.of(), ImmutableMap.of());
+  }
+
+  @Test
+  void testLobXMLVariableArray2() {
+    UseCaseEngine.runTest(LOB_XML_ARR_TEXT2, ImmutableList.of(), ImmutableMap.of(
+            "1",
+            new Diagnostic(
+                    new Range(),
+                    "Allowed range is 2 to 48",
+                    DiagnosticSeverity.Error,
+                    ErrorSource.PARSING.getText()
+            )
+    ));
+  }
+
+  @Test
+  void testLobXMLVariableArray3() {
+    UseCaseEngine.runTest(
+            LOB_XML_ARR_TEXT3,
+            ImmutableList.of(),
+            ImmutableMap.of(
+                    "1",
+                    new Diagnostic(
+                            new Range(),
+                            "Allowed range is 1 to 32767",
+                            DiagnosticSeverity.Error,
+                            ErrorSource.PARSING.getText()
+                    )
+            )
+    );
+  }
+
+  @Test
+  void testLobXMLVariableArray4() {
+    UseCaseEngine.runTest(LOB_XML_ARR_TEXT4, ImmutableList.of(), ImmutableMap.of());
   }
 }
