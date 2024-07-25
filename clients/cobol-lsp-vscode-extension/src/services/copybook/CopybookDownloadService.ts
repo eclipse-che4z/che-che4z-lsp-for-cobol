@@ -127,16 +127,10 @@ export class CopybookDownloadService {
   public makeCopybookDownloadHandler() {
     return (
       cobolFileName: string,
-      copybookNames: string[],
-      dialectType: string,
+      copybookNames: CopybookName[],
       _quietMode: boolean,
     ) => {
-      return this.downloadCopybooks(
-        cobolFileName,
-        copybookNames.map(
-          (copybookName) => new CopybookName(copybookName, dialectType),
-        ),
-      );
+      return this.downloadCopybooks(cobolFileName, copybookNames);
     };
   }
 
