@@ -271,6 +271,17 @@ public class TestSqlHostVariable {
                   + "       04 {$*VAR} USAGE IS SQL TYPE IS XML AS CLOB (10) OCCURS {123456|1} TIMES.\n"
                   + "        PROCEDURE DIVISION.\n";
 
+  public static final String LOB_XML_ARR_TEXT4 =
+          "        Identification Division.\n"
+                  + "        Program-Id. 'TEST1'.\n"
+                  + "        Data Division.\n"
+                  + "         Working-Storage Section.\n"
+                  + "       01 {$*GREET}.\n"
+                  + "          02 {$*VA`->VA`->VA-LENGTH`->VA-DATA} USAGE IS SQL TYPE IS XML AS CLOB (10) OCCURS 12345 TIMES.\n"
+                  + "        PROCEDURE DIVISION.\n"
+                  + "           DISPLAY {$VA-LENGTH}(1).\n"
+                  + "           DISPLAY {$VA-DATA}(1).\n";
+
   public static final String ROWID_TEXT1 =
           "        Identification Division.\n"
                   + "        Program-Id. 'TEST1'.\n"
@@ -528,5 +539,10 @@ public class TestSqlHostVariable {
                     )
             )
     );
+  }
+
+  @Test
+  void testLobXMLVariableArray4() {
+    UseCaseEngine.runTest(LOB_XML_ARR_TEXT4, ImmutableList.of(), ImmutableMap.of());
   }
 }
