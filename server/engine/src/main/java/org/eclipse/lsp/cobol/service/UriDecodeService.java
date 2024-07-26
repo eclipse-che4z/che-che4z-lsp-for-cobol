@@ -18,6 +18,7 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.inject.Singleton;
 import java.io.UnsupportedEncodingException;
+import java.net.URI;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import lombok.extern.slf4j.Slf4j;
@@ -30,6 +31,15 @@ import lombok.extern.slf4j.Slf4j;
 public class UriDecodeService {
 
   private final BiMap<String, String> mapper = HashBiMap.create();
+
+  /**
+   * Decode given uri
+   * @param uri to decode
+   * @return decoded uri
+   */
+  public String decode(URI uri) {
+    return decode(uri.toString());
+  }
 
   /**
    * Decode given uri

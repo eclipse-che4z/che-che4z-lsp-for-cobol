@@ -110,13 +110,13 @@ public class CobolWorkspaceServiceImpl extends LspEventConsumer implements Works
             if (file.getType() == FileChangeType.Deleted) {
               path = path.getParent();
             }
-              if (sourceUnitGraph.isFileOpened(uriDecodeService.decode(path.toUri().toString()))) {
+              if (sourceUnitGraph.isFileOpened(uriDecodeService.decode(path.toUri()))) {
               // opened files are taken care by textChange events
               return;
             }
             boolean isDirectory = Files.isDirectory(path);
             if (!isDirectory) {
-              triggerAnalysisForChangedFile(path.toUri().toString());
+              triggerAnalysisForChangedFile(path.toUri());
             } else {
               triggerAnalysisForFilesInDirectory(path);
             }
@@ -125,7 +125,7 @@ public class CobolWorkspaceServiceImpl extends LspEventConsumer implements Works
   }
 
   @SneakyThrows
-  private void triggerAnalysisForChangedFile(String uri) {
+  private void triggerAnalysisForChangedFile(URI uri) {
     String copybookUri = uriDecodeService.decode(uri);
     List<String> uris =
         sourceUnitGraph.getAllAssociatedFilesForACopybook(copybookUri);
@@ -134,11 +134,11 @@ public class CobolWorkspaceServiceImpl extends LspEventConsumer implements Works
       asyncAnalysisService.reanalyseOpenedPrograms();
       return;
     }
-    if (Files.exists(Paths.get(URI.create(uri)))) {
+    if (Files.exists(Paths.get(uri))) {
       sourceUnitGraph.updateContent(uri);
-      fileContent = sourceUnitGraph.getContent(uri);
+      fileContent = sourceUnitGraph.getContent(uri.toString());
     }
-    if (!sourceUnitGraph.isFileOpened(uri)) {
+    if (!sourceUnitGraph.isFileOpened(uri.toString())) {
       asyncAnalysisService.reanalyseCopybooksAssociatedPrograms(
           uris, copybookUri, fileContent, SourceUnitGraph.EventSource.FILE_SYSTEM);
     }
@@ -153,6 +153,6 @@ public class CobolWorkspaceServiceImpl extends LspEventConsumer implements Works
                     sourceUnitGraph.getAllAssociatedFilesForACopybook(copybookUri).stream())
             .collect(Collectors.toSet());
 
-    affectedPrograms.forEach(this::triggerAnalysisForChangedFile);
+    affectedPrograms.stream().map(uri -> Paths.get(uri).toUri()).forEach(this::triggerAnalysisForChangedFile);
   }
 }

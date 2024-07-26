@@ -285,8 +285,15 @@ public class SourceUnitGraph implements AnalysisStateListener {
 
   /**
    * Update the graph with the latest content from the file system
-   *
-   * @param uri
+   * @param uri {@link URI}
+   */
+  public synchronized void updateContent(URI uri) {
+    updateContent(uri.toString());
+  }
+
+  /**
+   * Update the graph with the latest content from the file system
+   * @param uri - String representation of URI
    */
   public synchronized void updateContent(String uri) {
     if (objectRef.containsKey(uri)) {
