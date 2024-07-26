@@ -43,70 +43,129 @@
       {
         "command": "cobol-lsp.cpy-manager.fetch-copybook",
         "category": "COBOL",
-        "title": "Fetch Copybook",
-        "when": "!isWeb"
+        "title": "Fetch Copybook"
       },
       {
         "command": "cobol-lsp.cpy-manager.goto-settings",
         "category": "COBOL",
-        "title": "Open Copybook Location Settings",
-        "when": "!isWeb"
+        "title": "Open Copybook Location Settings"
       },
       {
         "command": "cobol-lsp.serverRuntime.goto-settings",
         "category": "COBOL",
-        "title": "Open Server Runtime Settings",
-        "when": "!isWeb"
+        "title": "Open Server Runtime Settings"
       },
       {
         "command": "cobol-lsp.dialects.goto-settings",
         "category": "COBOL",
-        "title": "Open Dialect Settings",
-        "when": "!isWeb"
+        "title": "Open Dialect Settings"
       },
       {
         "command": "cobol-lsp.commentLine.toggle",
         "category": "COBOL",
-        "title": "Toggle COBOL Line Comment",
-        "when": "!isWeb"
+        "title": "Toggle COBOL Line Comment"
       },
       {
         "command": "cobol-lsp.commentLine.comment",
         "category": "COBOL",
-        "title": "Add COBOL Line Comment",
-        "when": "!isWeb"
+        "title": "Add COBOL Line Comment"
       },
       {
         "command": "cobol-lsp.commentLine.uncomment",
         "category": "COBOL",
-        "title": "Remove COBOL Line Comment",
-        "when": "!isWeb"
+        "title": "Remove COBOL Line Comment"
       },
       {
         "command": "cobol-lsp.clear.downloaded.copybooks",
         "category": "COBOL",
-        "title": "Clear Downloaded Copybooks",
-        "when": "!isWeb"
+        "title": "Clear Downloaded Copybooks"
       },
       {
         "command": "cobol-lsp.analysis.runAnalysis",
         "category": "COBOL",
-        "title": "Run Analysis in CLI",
-        "when": "!isWeb"
+        "title": "Run Analysis in CLI"
       },
       {
         "command": "cobol-lsp.snippets.insertSnippets",
         "title": "Insert COBOL Snippet",
-        "category": "Snippets",
-        "when": "!isWeb"
+        "category": "Snippets"
       },
       {
         "command": "cobol-lsp.open.copybook.internalfolder",
         "title": "Open Copybooks Internal Folder",
-        "category": "COBOL",
-        "when": "!isWeb"
+        "category": "COBOL"
       }
     ],
+    "menus": {
+      "commandPalette": [
+        {
+          "command": "cobol-lsp.cpy-manager.fetch-copybook",
+          "category": "COBOL",
+          "title": "Fetch Copybook",
+          "when": "!isWeb"
+        },
+        {
+          "command": "cobol-lsp.cpy-manager.goto-settings",
+          "category": "COBOL",
+          "title": "Open Copybook Location Settings",
+          "when": "!isWeb"
+        },
+        {
+          "command": "cobol-lsp.serverRuntime.goto-settings",
+          "category": "COBOL",
+          "title": "Open Server Runtime Settings",
+          "when": "!isWeb"
+        },
+        {
+          "command": "cobol-lsp.dialects.goto-settings",
+          "category": "COBOL",
+          "title": "Open Dialect Settings",
+          "when": "!isWeb"
+        },
+        {
+          "command": "cobol-lsp.commentLine.toggle",
+          "category": "COBOL",
+          "title": "Toggle COBOL Line Comment",
+          "when": "!isWeb"
+        },
+        {
+          "command": "cobol-lsp.commentLine.comment",
+          "category": "COBOL",
+          "title": "Add COBOL Line Comment",
+          "when": "!isWeb"
+        },
+        {
+          "command": "cobol-lsp.commentLine.uncomment",
+          "category": "COBOL",
+          "title": "Remove COBOL Line Comment",
+          "when": "!isWeb"
+        },
+        {
+          "command": "cobol-lsp.clear.downloaded.copybooks",
+          "category": "COBOL",
+          "title": "Clear Downloaded Copybooks",
+          "when": "!isWeb"
+        },
+        {
+          "command": "cobol-lsp.analysis.runAnalysis",
+          "category": "COBOL",
+          "title": "Run Analysis in CLI",
+          "when": "!isWeb"
+        },
+        {
+          "command": "cobol-lsp.snippets.insertSnippets",
+          "title": "Insert COBOL Snippet",
+          "category": "Snippets",
+          "when": "!isWeb"
+        },
+        {
+          "command": "cobol-lsp.open.copybook.internalfolder",
+          "title": "Open Copybooks Internal Folder",
+          "category": "COBOL",
+          "when": "!isWeb"
+        }
+      ]
+    },
     "languages": [
       {
         "id": "cobol",
@@ -121,7 +180,10 @@
           "COBOL"
         ],
         "configuration": "./syntaxes/lang-config.json",
-        "firstLine": "^[0-9 ]{6}([*].*|[ Dd] *([Ii][Dd]([Ee][Nn][Tt][Ii][Ff][Ii][Cc][Aa][Tt][Ii][Oo][Nn])? +[Dd][Ii][Vv][Ii][Ss][Ii][Oo][Nn][. ]|[0-9][0-9] +[@#$A-Z][-A-Z0-9]*[. ]|[*](CBL|PROCESS) ).*)$|^([0-9].{5})?[ ]*(CBL|PROCESS) "
+        "firstLine": "^[0-9 ]{6}([*].*|[ Dd] *([Ii][Dd]([Ee][Nn][Tt][Ii][Ff][Ii][Cc][Aa][Tt][Ii][Oo][Nn])? +[Dd][Ii][Vv][Ii][Ss][Ii][Oo][Nn][. ]|[0-9][0-9] +[@#$A-Z][-A-Z0-9]*[. ]|[*](CBL|PROCESS) ).*)$|^([0-9].{5})?[ ]*(CBL|PROCESS) ",
+        "filenamePatterns": [
+          "**/broadcommfd.cobol-language-support/*/copybooks/**"
+        ]
       },
       {
         "id": "expcobol",

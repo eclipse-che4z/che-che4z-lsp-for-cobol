@@ -127,16 +127,10 @@ export class CopybookDownloadService {
   public makeCopybookDownloadHandler() {
     return (
       cobolFileName: string,
-      copybookNames: string[],
-      dialectType: string,
+      copybookNames: CopybookName[],
       _quietMode: boolean,
     ) => {
-      return this.downloadCopybooks(
-        cobolFileName,
-        copybookNames.map(
-          (copybookName) => new CopybookName(copybookName, dialectType),
-        ),
-      );
+      return this.downloadCopybooks(cobolFileName, copybookNames);
     };
   }
 
@@ -254,7 +248,9 @@ export class CopybookDownloadService {
         });
       }),
     ).catch((err) => {
-      vscode.window.showErrorMessage(err.message);
+      this.outputChannel?.appendLine(
+        `Error downloading copybooks : ${err.message}`,
+      );
     });
   }
 

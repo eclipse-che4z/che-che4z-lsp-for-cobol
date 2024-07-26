@@ -26,28 +26,40 @@ execRule: EXEC SQL sqlCode END_EXEC
 
 nonExecRule: host_variable_rule;
 
-host_variable_rule: (sql_host_variables | binary_host_variable);
+host_variable_rule: (sql_host_variables | binary_host_variable | binary_host_variable_array);
 
 binary_host_variable: dbs_level_01 entry_name host_variable_usage binary_host_variable_type;
 binary_host_variable_type: BINARY LPARENCHAR binary_host_variable_binary_size RPARENCHAR | (VARBINARY | BINARY VARYING) LPARENCHAR binary_host_variable_varbinary_size RPARENCHAR;
+
+binary_host_variable_array: dbs_host_var_levels entry_name SQL TYPE IS binary_host_variable_type host_variable_array_times;
 
 binary_host_variable_binary_size: T=dbs_integerliteral_expanded {validateIntegerRange($T.start, $T.text, 1, 255);};
 binary_host_variable_varbinary_size: T=dbs_integerliteral_expanded {validateIntegerRange($T.start, $T.text, 1, 32704);};
 
 host_variable_usage: (USAGE IS?)? SQL TYPE IS;
+host_variable_array_times: OCCURS host_variable_array_size TIMES?;
+host_variable_array_size: T=dbs_integerliteral_expanded {validateIntegerRange($T.start, $T.text, 1, 32767);};
 
-sql_host_variables: result_set_locator_variable | lob_host_variables | lob_xml_host_variables
-                  | tableLocators_variable ;
+sql_host_variables: result_set_locator_variable | lob_xml_host_variables | lob_host_variables_arrays | lob_host_variables
+                  | tableLocators_variable | rowid_host_variables_arrays | rowid_host_variables;
 
 result_set_locator_variable: dbs_level_01 entry_name host_variable_usage result_set_locator;
 
 tableLocators_variable: dbs_host_var_levels entry_name host_variable_usage tableLocators;
 
-lob_xml_host_variables: dbs_host_var_levels entry_name  host_variable_usage xml_as (lobWithSize | xml_lobNO_size);
+lob_xml_host_variables: dbs_host_var_levels entry_name host_variable_usage xml_as (lobWithSize | xml_lobNO_size) host_variable_array_times?;
 
 lob_host_variables: dbs_integer entry_name host_variable_usage (lobWithSize | lobNoSize);
 
+lob_host_variables_arrays: dbs_host_var_levels_arrays entry_name host_variable_usage (lobWithSize | lobNoSize) occurs_clause;
+
+rowid_host_variables: dbs_host_var_levels entry_name host_variable_usage ROWID;
+
+rowid_host_variables_arrays: dbs_host_var_levels_arrays entry_name host_variable_usage ROWID occurs_clause;
+
 dbs_host_var_levels: dbs_level_01 | T=dbs_integer {validateIntegerRange($T.text, 2, 48);};
+
+dbs_host_var_levels_arrays: T=dbs_integer {validateIntegerRange($T.text, 2, 48);};
 
 result_set_locator: RESULT_SET_LOCATOR VARYING;
 
@@ -63,6 +75,10 @@ lobNoSize
 xml_lobNO_size: BLOB_FILE | CLOB_FILE | DBCLOB_FILE;
 
 xml_as: XML AS;
+
+occurs_clause: OCCURS dbs_host_var_size_arrays TIMES?;
+
+dbs_host_var_size_arrays: T=dbs_integer {validateIntegerRange($T.text, 1, 32767);};
 
 entry_name : (FILLER |dbs_host_names);
 sqlCode
