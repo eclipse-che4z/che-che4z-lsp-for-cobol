@@ -23,10 +23,6 @@ COBOL Language Support is also part of [Code4z](https://techdocs.broadcom.com/co
 
 There are no client or server-side prerequisites for COBOL Language Support.
 
-## Contribution Guide and Dev Environment Setup
-
-Follow these [instructions](CONTRIBUTING.md) to configure your own development environment and contribute to this project.
-
 ## Compatibility
 
 The COBOL Language Support extension is supported on Visual Studio Code and Github Codespaces.
