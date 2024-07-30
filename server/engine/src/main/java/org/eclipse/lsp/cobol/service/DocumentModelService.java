@@ -14,8 +14,10 @@
  */
 package org.eclipse.lsp.cobol.service;
 
-import com.google.common.collect.ImmutableList;
 import com.google.inject.Singleton;
+
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -178,17 +180,37 @@ public class DocumentModelService {
   @Synchronized
   public Map<String, List<Diagnostic>> getOpenedDiagnostic() {
     Map<String, List<Diagnostic>> result = new HashMap<>();
+
     for (Map.Entry<String, CobolDocumentModel> entry : docs.entrySet()) {
-      String uri = entry.getKey();
+      String path = getPathFromUri(entry.getKey());
+      if (path == null) continue;
+
       CobolDocumentModel document = entry.getValue();
-      List<Diagnostic> diagnostics = diagnosticRepo.get(document.getUri());
-      if (diagnostics != null && document.isOpened()) {
-        result.put(uri, diagnostics);
-      } else {
-        result.put(uri, ImmutableList.of());
-      }
+      List<Diagnostic> diagnostics = getDiagnosticsForPath(path);
+
+      result.put(entry.getKey(), document.isOpened() ? diagnostics : Collections.emptyList());
     }
 
     return result;
+  }
+
+  private String getPathFromUri(String uriString) {
+    try {
+      return new URI(uriString).getPath();
+    } catch (URISyntaxException e) {
+      LOG.error("Encountered URISyntaxException processing diagnostics for {}", uriString);
+      return null;
+    }
+  }
+
+  private List<Diagnostic> getDiagnosticsForPath(String path) {
+    return diagnosticRepo.entrySet().stream()
+            .filter(e -> {
+              String diagnosticPath = getPathFromUri(e.getKey());
+              return diagnosticPath != null && diagnosticPath.equals(path);
+            })
+            .findFirst()
+            .map(Map.Entry::getValue)
+            .orElse(Collections.emptyList());
   }
 }

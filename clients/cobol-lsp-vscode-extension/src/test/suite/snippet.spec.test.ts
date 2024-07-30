@@ -31,8 +31,7 @@ suite.skip(
 
     test("Autocompletion basic dialect", async () => {
       helper.updateConfig("basic.json");
-      await helper.showDocument("SNIPPET.cbl");
-      const editor = helper.get_editor("SNIPPET.cbl");
+      const editor = await helper.showDocument("SNIPPET.cbl");
       await helper.waitFor(() => editor.document.languageId === "cobol");
       await helper.insertString(editor, pos(2, 0), "   IDENTIFICATION");
       await vscode.commands.executeCommand(
@@ -49,8 +48,7 @@ suite.skip(
     }).timeout(helper.TEST_TIMEOUT);
 
     test("Autocompletion with IDMS dialect", async () => {
-      await helper.showDocument("SNIPPET_IDMS.cbl");
-      const editor = helper.get_editor("SNIPPET_IDMS.cbl");
+      const editor = await helper.showDocument("SNIPPET_IDMS.cbl");
       await helper.waitFor(() => editor.document.languageId === "cobol");
       await helper.insertString(editor, pos(1, 0), "   COPY");
       await vscode.commands.executeCommand(
@@ -65,8 +63,7 @@ suite.skip(
     }).timeout(helper.TEST_TIMEOUT);
 
     test("Keywords Autocompletion for IDMS dialect", async () => {
-      await helper.showDocument("SNIPPET_IDMS.cbl");
-      const editor = helper.get_editor("SNIPPET_IDMS.cbl");
+      const editor = await helper.showDocument("SNIPPET_IDMS.cbl");
       await helper.waitFor(() => editor.document.languageId === "cobol");
       await helper.insertString(editor, pos(1, 0), "   IDMS-STATIST");
       await vscode.commands.executeCommand(
@@ -83,8 +80,7 @@ suite.skip(
     }).timeout(helper.TEST_TIMEOUT);
 
     test("TC152058 Autocompletion basic dialect", async () => {
-      await helper.showDocument("USER1.cbl");
-      const editor = helper.get_editor("USER1.cbl");
+      const editor = await helper.showDocument("USER1.cbl");
       helper.updateConfig("basic.json");
       await helper.waitFor(() => editor.document.languageId === "cobol");
       await helper.insertString(editor, pos(40, 0), "           A");
@@ -124,8 +120,7 @@ suite("TF42379 COBOL LS F96588 - Insert code snippets", function () {
   );
 
   test.skip("TC289633 Provide default COBOL code snippets - basic scenario", async () => {
-    await helper.showDocument("SNIPPET.cbl");
-    const editor = helper.get_editor("SNIPPET.cbl");
+    const editor = await helper.showDocument("SNIPPET.cbl");
     await helper.insertString(editor, pos(2, 0), "sh");
     await vscode.commands.executeCommand(
       "editor.action.triggerSuggest",
@@ -144,8 +139,7 @@ suite("TF42379 COBOL LS F96588 - Insert code snippets", function () {
   // .timeout(helper.TEST_TIMEOUT);
 
   test.skip("TC289635 Provide default COBOL code snippets - upper case", async () => {
-    await helper.showDocument("SNIPPET.cbl");
-    const editor = helper.get_editor("SNIPPET.cbl");
+    const editor = await helper.showDocument("SNIPPET.cbl");
     await helper.insertString(editor, pos(2, 0), "sh");
     await vscode.commands.executeCommand(
       "editor.action.triggerSuggest",
@@ -181,8 +175,7 @@ suite("TF42379 COBOL LS F96588 - Insert code snippets", function () {
   // .timeout(helper.TEST_TIMEOUT);
 
   test.skip("TC289636 Provide default COBOL code snippets - lower case", async () => {
-    await helper.showDocument("SNIPPET.cbl");
-    const editor = helper.get_editor("SNIPPET.cbl");
+    const editor = await helper.showDocument("SNIPPET.cbl");
     await helper.insertString(editor, pos(2, 0), "sh");
     await vscode.commands.executeCommand(
       "editor.action.triggerSuggest",

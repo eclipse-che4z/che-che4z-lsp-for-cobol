@@ -40,10 +40,14 @@ export async function activate() {
   }
 }
 
-export function getWorkspacePath(): string {
+export function getWorkspaceUri(): vscode.Uri {
   if (vscode.workspace.workspaceFolders)
-    return vscode.workspace.workspaceFolders[0].uri.fsPath;
+    return vscode.workspace.workspaceFolders[0].uri;
   throw new Error("Workspace not found");
+}
+
+export function getWorkspacePath(): string {
+  return getWorkspaceUri().fsPath;
 }
 
 export function getWorkspace(): vscode.WorkspaceFolder {
@@ -56,7 +60,7 @@ export function get_editor(workspace_file: string): vscode.TextEditor {
   const editor = vscode.window.activeTextEditor!;
   assert.strictEqual(
     editor.document.uri.fsPath,
-    path.join(getWorkspacePath(), workspace_file),
+    vscode.Uri.joinPath(getWorkspaceUri(), workspace_file).fsPath,
   );
   return editor;
 }

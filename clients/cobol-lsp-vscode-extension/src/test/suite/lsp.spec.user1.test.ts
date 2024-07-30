@@ -33,8 +33,7 @@ suite("Tests with USER1.cbl", function () {
     helper.TEST_TIMEOUT,
   );
   this.beforeEach(async () => {
-    await helper.showDocument(WORKSPACE_FILE);
-    editor = helper.get_editor(WORKSPACE_FILE);
+    editor = await helper.showDocument(WORKSPACE_FILE);
   });
 
   // open 'open' file, should be recognized as COBOL

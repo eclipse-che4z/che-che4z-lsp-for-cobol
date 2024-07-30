@@ -171,6 +171,7 @@ export class LanguageClientService {
       args: [
         "-Dline.separator=\r\n",
         "-Ddialect.path=" + this.dialectsPath,
+        `-Duser.dir=${jarPath}`, // this makes sure that a java process started with UNC path like \\.\c:\Users doesn't fail
         "-Xmx768M",
         "-jar",
         jarPath,

@@ -52,6 +52,11 @@ async function main() {
     }
     // run tests
     await runTests(options);
+    if (process.platform === "win32") {
+      console.log("----- RUNNING TEST USING UNC PATH ------");
+      launchArgs[0] = "\\\\.\\" + launchArgs[0];
+      await runTests(options);
+    }
   } catch (error) {
     console.log(error);
     console.error("Tests Failed");

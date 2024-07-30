@@ -86,6 +86,12 @@ function globSearch(
     copybookName +
     ext;
   pattern = pattern + suffix;
+
+  // Special handling of //./ UNC path as glob module doesn't support this. refer: https://github.com/isaacs/node-glob
+  if (pattern.startsWith("//./") && process.platform === "win32") {
+    pattern = pattern.replace("//./", "//?/");
+  }
+
   const result = globSync(pattern, { cwd, dot: true });
   // TODO report the case with more then one copybook fit the pattern.
   return result[0]

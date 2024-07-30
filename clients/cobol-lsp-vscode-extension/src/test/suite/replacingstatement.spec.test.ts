@@ -33,8 +33,7 @@ suite("TF35623: Support for Replacing and Mapping statement", function () {
   test("TC248045: Replacing Basic Scenario", async () => {
     const extSrcPath = path.join("TEST1.CBL");
     let diagPromise = helper.waitForDiagnosticsChange(extSrcPath);
-    await helper.showDocument(extSrcPath);
-    let editor = helper.get_editor("TEST1.CBL");
+    let editor = await helper.showDocument(extSrcPath);
     let diagnostics = await diagPromise;
     assert.strictEqual(diagnostics.length, 1);
     const message = diagnostics[0].message;
@@ -55,8 +54,7 @@ suite("TF35623: Support for Replacing and Mapping statement", function () {
   test("TC248087: Replacing twice for one variable", async () => {
     const extSrcPath = path.join("TEST2.CBL");
     let diagPromise = helper.waitForDiagnosticsChange(extSrcPath);
-    await helper.showDocument(extSrcPath);
-    let editor = helper.get_editor("TEST2.CBL");
+    let editor = await helper.showDocument(extSrcPath);
     let diagnostics = await diagPromise;
     assert.strictEqual(diagnostics.length, 1);
     const message = diagnostics[0].message;
@@ -128,6 +126,7 @@ suite("TF35623: Support for Replacing and Mapping statement", function () {
     editor = await helper.showDocument(extSrcPath);
     await helper.waitFor(
       () => vscode.languages.getDiagnostics(editor.document.uri).length === 1,
+      8000,
     );
     let diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
     assert.strictEqual(diagnostics.length, 1);

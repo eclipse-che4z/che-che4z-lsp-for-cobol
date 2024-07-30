@@ -136,6 +136,7 @@ describe("LanguageClientService positive scenario", () => {
         args: [
           "-Dline.separator=\r\n",
           `-Ddialect.path=${expectedDialectPath}`,
+          `-Duser.dir=${serverPath}`,
           "-Xmx768M",
           "-jar",
           serverPath,
