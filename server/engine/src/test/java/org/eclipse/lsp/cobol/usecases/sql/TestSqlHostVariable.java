@@ -174,9 +174,9 @@ public class TestSqlHostVariable {
                   + "       01 {$*VAR4`->VAR4`->VAR4-LENGTH`->VAR4-DATA} USAGE IS SQL TYPE IS XML AS CHAR LARGE OBJECT (10 G).\n"
                   + "       01 {$*VAR5`->VAR5`->VAR5-LENGTH`->VAR5-DATA} USAGE IS SQL TYPE IS XML AS CLOB (20).\n"
                   + "       01 {$*VAR6`->VAR6`->VAR6-LENGTH`->VAR6-DATA} USAGE IS SQL TYPE IS XML AS DBCLOB (30 K).\n"
-                  + "       01 {$*VAR-NAME10} USAGE IS SQL TYPE IS XML AS  BLOB-FILE.\n"
-                  + "       01 {$*VAR-NAME11} USAGE IS SQL TYPE IS XML AS  CLOB-FILE.\n"
-                  + "       01 {$*VAR-NAME12} USAGE IS SQL TYPE IS XML AS  DBCLOB-FILE.\n"
+                  + "       01 {$*VAR-NAME10`->VAR-NAME10`->VAR-NAME10-NAME-LENGTH`->VAR-NAME10-DATA-LENGTH`->VAR-NAME10-FILE-OPTION`->VAR-NAME10-NAME} USAGE IS SQL TYPE IS XML AS  BLOB-FILE.\n"
+                  + "       01 {$*VAR-NAME11`->VAR-NAME11`->VAR-NAME11-NAME-LENGTH`->VAR-NAME11-DATA-LENGTH`->VAR-NAME11-FILE-OPTION`->VAR-NAME11-NAME} USAGE IS SQL TYPE IS XML AS  CLOB-FILE.\n"
+                  + "       01 {$*VAR-NAME12`->VAR-NAME12`->VAR-NAME12-NAME-LENGTH`->VAR-NAME12-DATA-LENGTH`->VAR-NAME12-FILE-OPTION`->VAR-NAME12-NAME} USAGE IS SQL TYPE IS XML AS  DBCLOB-FILE.\n"
                   + "        PROCEDURE DIVISION.\n"
                   + "           DISPLAY {$var1}.";
 
@@ -270,6 +270,20 @@ public class TestSqlHostVariable {
                   + "       01 {$*VAR-NAME1}.\n"
                   + "       04 {$*VAR`->VAR`->VAR-LENGTH`->VAR-DATA} USAGE IS SQL TYPE IS XML AS CLOB (10) OCCURS {123456|1} TIMES.\n"
                   + "        PROCEDURE DIVISION.\n";
+
+  public static final String LOB_XML_ARR_TEXT3_ERR2 =
+      "        Identification Division.\n"
+          + "        Program-Id. 'TEST1'.\n"
+          + "        Data Division.\n"
+          + "         Working-Storage Section.\n"
+          + "       01 {$*VAR-NAME1}.\n"
+          + "       04 {$*VAR`->VAR`->VAR-NAME-LENGTH`->VAR-DATA-LENGTH`->VAR-FILE-OPTION`->VAR-NAME} USAGE IS SQL TYPE IS XML AS CLOB-FILE OCCURS {123456|1} TIMES.\n"
+          + "        PROCEDURE DIVISION.\n"
+          + "           DISPLAY {$VAR}(1).\n"
+          + "           DISPLAY {$VAR-NAME-LENGTH}(1).\n"
+          + "           DISPLAY {$VAR-DATA-LENGTH}(1).\n"
+          + "           DISPLAY {$VAR-FILE-OPTION}(1).\n"
+          + "           DISPLAY {$VAR-NAME}(1).";
 
   public static final String LOB_XML_ARR_TEXT4 =
           "        Identification Division.\n"
@@ -601,6 +615,20 @@ public class TestSqlHostVariable {
                     )
             )
     );
+  }
+
+  @Test
+  void testLobXMLVariableArray3_err() {
+    UseCaseEngine.runTest(
+        LOB_XML_ARR_TEXT3_ERR2,
+        ImmutableList.of(),
+        ImmutableMap.of(
+            "1",
+            new Diagnostic(
+                new Range(),
+                "Allowed range is 1 to 32767",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
   }
 
   @Test
