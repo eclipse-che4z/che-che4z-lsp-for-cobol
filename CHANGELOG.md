@@ -1,7 +1,7 @@
 # Changelog
 All notable changes to the COBOL Language Support extension are documented in this file.
 
-## [2.2.0](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/compare/2.1.2...2.2.0) (2024-07-18)
+## [2.2.0](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/compare/2.1.2...2.2.0) (2024-08-01)
 
 ### Bug Fixes
 * Add language element to the CLI analysis response in case of crash ([1f87a10](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/1f87a103c3af6a9694f5fcbc164132fba80ef25e))
@@ -53,6 +53,8 @@ All notable changes to the COBOL Language Support extension are documented in th
 * Support implicit SQL varbinary variables ([d44f5bd](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/d44f5bd347869780fbdebeff6aa7356caed51c81))
 * Support for result set locator Db2 SQL host variable ([#2329](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/issues/2329)) ([53c16fa](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/53c16faac605cc46c151ec1c1a6c572dd408b630)), closes [cobol-host-variables-in#db2z_hostvariablecobol__title__20](https://github.com/cobol-host-variables-in/issues/db2z_hostvariablecobol__title__20)
 * XML data host and file reference variables ([#2390](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/issues/2390)) ([a99147e](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/a99147e131e01ddb466f307e7f91d926e57c6a07))
+* Add support for Binary Host Variable Arrays ([#2394](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/issues/2394)) ([4db32ac](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/4db32acdcd285bd7c4ee3f9a4001cc62f406eac3)), closes [#2399](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/issues/2399) [#2402](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/issues/2402)
+* XML host file reference variable array support ([#2406](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/issues/2406)) ([0d28f1b](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/0d28f1bf5cc49cb956ad21e5fa8cd28650671c66))
 
 ## [2.1.2](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/compare/2.1.1...2.2.0) (2024-04-03)
 
