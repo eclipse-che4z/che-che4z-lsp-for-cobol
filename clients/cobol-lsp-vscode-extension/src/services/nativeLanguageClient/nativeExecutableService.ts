@@ -12,7 +12,7 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
-import * as os from "os";
+import * as os from "node:os";
 import { LinuxlanguageClient } from "./linuxlanguageClient";
 import { MacosLanguageClient } from "./macosLanguageClient";
 import { NativeLanguageClient } from "./nativelanguageClientInterface";

@@ -11,8 +11,8 @@
  * Contributors:
  *   Broadcom, Inc. - initial API and implementation
  */
-import * as fs from "fs";
-import * as path from "path";
+import * as fs from "node:fs";
+import * as path from "node:path";
 import * as vscode from "vscode";
 import TelemetryReporter from "@vscode/extension-telemetry";
 import { EXTENSION_ID, TELEMETRY_DEFAULT_CONTENT } from "../../constants";

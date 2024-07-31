@@ -12,7 +12,7 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
-import { join } from "path";
+import { join } from "node:path";
 import { Executable } from "vscode-languageclient/node";
 import { NativeLanguageClient } from "./nativelanguageClientInterface";
 

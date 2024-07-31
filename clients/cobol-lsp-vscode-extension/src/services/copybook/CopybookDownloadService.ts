@@ -29,7 +29,7 @@ import { SettingsService } from "../Settings";
 import { searchCopybook } from "./CopybookMessageHandler";
 import { searchCopybookInExtensionFolder } from "../util/FSUtils";
 import { CopybookURI } from "./CopybookURI";
-import path = require("path");
+import path = require("node:path");
 
 export class CopybookName {
   constructor(public name: string, public dialect: string) {}

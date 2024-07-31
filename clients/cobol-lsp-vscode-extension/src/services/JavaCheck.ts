@@ -11,7 +11,7 @@
  * Contributors:
  *   Broadcom, Inc. - initial API and implementation
  */
-import * as cp from "child_process";
+import * as cp from "node:child_process";
 
 const versionPattern = new RegExp(
   '(java|openjdk) (version)? ?"?((9|[0-9][0-9])|(1|9|[0-9][0-9]).(1|8|[0-9][0-9]).*).*',
