@@ -12,7 +12,6 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
-import * as os from "node:os";
 import { LinuxlanguageClient } from "./linuxlanguageClient";
 import { MacosLanguageClient } from "./macosLanguageClient";
 import { NativeLanguageClient } from "./nativelanguageClientInterface";
@@ -23,7 +22,7 @@ export class NativeExecutableService {
 
   public getNativeLanguageClient() {
     let client: NativeLanguageClient | undefined;
-    switch (os.type()) {
+    switch (process.platform.toString()) {
       case "Windows_NT":
         client = new WindowsLanguageClient(this.serverPath);
         break;
