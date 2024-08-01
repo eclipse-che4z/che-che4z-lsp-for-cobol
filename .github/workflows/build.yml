@@ -201,7 +201,7 @@ jobs:
         if: matrix.os == 'windows-latest'
         run: echo "target=win32-${{ matrix.arch }}" >> $env:GITHUB_ENV
       - shell: sh
-        if: startsWith( matrix.os, 'macos-14')
+        if: startsWith( matrix.os, 'macos')
         run: echo "target=darwin-${{ matrix.arch }}" >> $GITHUB_ENV
       - shell: sh
         if: matrix.os == 'ubuntu-latest'
