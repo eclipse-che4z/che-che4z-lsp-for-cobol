@@ -43,7 +43,6 @@ import {
 import { resolveSubroutineURI } from "./services/util/SubroutineUtils";
 import { ServerRuntimeCodeActionProvider } from "./services/nativeLanguageClient/serverRuntimeCodeActionProvider";
 import { ConfigurationWatcher } from "./services/util/ConfigurationWatcher";
-// import * as path from "node:path";
 import { Utils } from "./services/util/Utils";
 import { getE4EAPI } from "./services/copybook/E4ECopybookService";
 

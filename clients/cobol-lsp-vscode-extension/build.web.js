@@ -77,7 +77,6 @@ async function main() {
       "node:events",
       "node:stream",
       "node:net",
-      // "node:os",
       "node:child_process",
       "glob",
     ],
