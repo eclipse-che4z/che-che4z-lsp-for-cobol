@@ -15,7 +15,8 @@ import * as vscode from "vscode";
 import { LANGUAGE_ID } from "../../constants";
 import { DialectRegistry } from "../DialectRegistry";
 import { SettingsService } from "../Settings";
-import { readFileSync } from "node:fs";
+// import { readFileSync } from "node:fs";
+import * as fs from "../util/FSWrapper";
 
 const SNIPPETS: Map<string, Map<any, any>> = new Map();
 
@@ -75,11 +76,13 @@ async function getSnippets(): Promise<Map<any, any>> {
   return map;
 }
 
-function importSnippet(snippetPath: string): Map<any, any> | undefined {
+async function importSnippet(
+  snippetPath: string,
+): Promise<Map<any, any> | undefined> {
   var result = SNIPPETS.get(snippetPath);
   if (result === undefined) {
     try {
-      const json = readFileSync(snippetPath, "utf-8");
+      const json = await fs.readFileAsync(snippetPath, "utf-8");
       var snippet = JSON.parse(json);
       SNIPPETS.set(snippetPath, snippet);
       result = snippet;

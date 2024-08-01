@@ -12,17 +12,19 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
-import * as fs from "node:fs";
+// import * as fs from "node:fs";
 import * as path from "node:path";
 import { Minimatch } from "minimatch";
 import { SettingsUtils } from "./util/SettingsUtils";
 import { globSync } from "glob";
-import { Uri } from "vscode";
+import * as vscode from "vscode";
 import {
   backwardSlashRegex,
   cleanWorkspaceFolderName,
   normalizePath,
 } from "./util/FSUtils";
+
+import * as fs from "./util/FSWrapper";
 
 const PROCESSOR_GROUP_FOLDER = ".cobolplugin";
 const PROCESSOR_GROUP_PGM = "pgm_conf.json";
@@ -204,22 +206,24 @@ function pathMatches(program: string, documentPath: string) {
 function loadProcessorsConfig(
   documentUri: string,
 ): ProcessorConfig | undefined {
-  const documentPath = Uri.parse(documentUri).fsPath;
+  const documentPath = vscode.Uri.parse(documentUri).fsPath;
   const ws = SettingsUtils.getWorkspaceFoldersPath(true);
   if (ws.length < 1) {
     return undefined;
   }
-  const cfgPath = path.join(ws[0], PROCESSOR_GROUP_FOLDER);
-  const procCfgPath = path.join(cfgPath, PROCESSOR_GROUP_PROC);
-  const pgmCfgPath = path.join(cfgPath, PROCESSOR_GROUP_PGM);
-  if (!fs.existsSync(pgmCfgPath) || !fs.existsSync(procCfgPath)) {
+  const cfgPath = fs.join(ws[0], PROCESSOR_GROUP_FOLDER);
+
+  const procCfgPath = fs.join(cfgPath, PROCESSOR_GROUP_PROC);
+  const pgmCfgPath = fs.join(cfgPath, PROCESSOR_GROUP_PGM);
+
+  if (!fs.existsSync(procCfgPath) && !fs.existsSync(pgmCfgPath)) {
     return undefined;
   }
   const procCfg: ProcessorsConfig = JSON.parse(
-    fs.readFileSync(procCfgPath).toString(),
+    vscode.workspace.fs.readFile(vscode.Uri.file(procCfgPath)).toString(),
   );
   const pgmCfg: ProgramsConfig = JSON.parse(
-    fs.readFileSync(pgmCfgPath).toString(),
+    vscode.workspace.fs.readFile(vscode.Uri.file(pgmCfgPath)).toString(),
   );
   const pgroup = matchProcessorGroup(pgmCfg, documentPath, ws[0]);
 

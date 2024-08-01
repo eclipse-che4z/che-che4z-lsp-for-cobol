@@ -16,6 +16,7 @@ import { globSync, hasMagic } from "glob";
 import { Uri } from "vscode";
 import * as vscode from "vscode";
 import { Utils } from "./Utils";
+
 /**
  * This method scans the list of folders as given input and find the required entity name within the folder.
  * If found returns its URI representation
@@ -33,7 +34,7 @@ export function searchCopybookInExtensionFolder(
   const extensionFolder = cleanWorkspaceFolderName(storagePath);
   for (const p of copybookFolders) {
     for (const ext of extensions) {
-      const searchResult = globSearchVS(extensionFolder, p, copybookName, ext);
+      const searchResult = globSearch(extensionFolder, p, copybookName, ext);
       if (searchResult) {
         return searchResult;
       }
@@ -52,46 +53,7 @@ export function normalizePath(folder: string): string {
   return vscode.Uri.file(folder).fsPath;
 }
 
-// function globSearch(
-//   workspaceFolder: string,
-//   resource: string,
-//   copybookName: string,
-//   ext: string,
-// ): string | undefined {
-//   const pathName: string = path.isAbsolute(resource)
-//     ? resource
-//     : path.normalize(path.join(workspaceFolder, resource));
-//   const segments = pathName.split(path.sep);
-//   const cwdSegments: string[] = [];
-//   for (const s of segments) {
-//     if (!hasMagic(s)) {
-//       cwdSegments.push(s);
-//     } else {
-//       break;
-//     }
-//   }
-//   // One must use forward-slashes only in glob expressions
-//   const cwd = path
-//     .resolve("/", ...cwdSegments)
-//     .replace(backwardSlashRegex, "/");
-//   const normalizePathName = pathName.replace(backwardSlashRegex, "/");
-//   let pattern =
-//     normalizePathName === cwd && !Utils.isUNCPath(normalizePathName)
-//       ? ""
-//       : normalizePathName.replace(cwd.endsWith("/") ? cwd : cwd + "/", "");
-//   const suffix =
-//     (pattern.length === 0 || pattern.endsWith("/") ? "" : "/") +
-//     copybookName +
-//     ext;
-//   pattern = pattern + suffix;
-//   const result = globSync(pattern, { cwd, dot: true });
-//   // TODO report the case with more then one copybook fit the pattern.
-//   return result[0]
-//     ? normalizePath(fs.realpathSync.native(path.resolve(cwd, result[0])))
-//     : undefined;
-// }
-
-function globSearchVS(
+function globSearch(
   workspaceFolder: string,
   resource: string,
   copybookName: string,

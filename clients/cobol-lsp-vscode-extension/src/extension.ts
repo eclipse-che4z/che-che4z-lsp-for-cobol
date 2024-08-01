@@ -43,7 +43,7 @@ import {
 import { resolveSubroutineURI } from "./services/util/SubroutineUtils";
 import { ServerRuntimeCodeActionProvider } from "./services/nativeLanguageClient/serverRuntimeCodeActionProvider";
 import { ConfigurationWatcher } from "./services/util/ConfigurationWatcher";
-import * as path from "node:path";
+// import * as path from "node:path";
 import { Utils } from "./services/util/Utils";
 import { getE4EAPI } from "./services/copybook/E4ECopybookService";
 
@@ -323,7 +323,7 @@ function registerCommands(
       "cobol-lsp.open.copybook.internalfolder",
       async () => {
         const copybookFolder = vscode.Uri.file(
-          path.join(context.globalStorageUri.fsPath, ZOWE_FOLDER),
+          context.globalStorageUri.fsPath + ZOWE_FOLDER,
         );
         try {
           await vscode.workspace.fs.createDirectory(copybookFolder);

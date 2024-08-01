@@ -12,7 +12,6 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
-import * as fs from "node:fs";
 import * as net from "node:net";
 import { join } from "node:path";
 import * as vscode from "vscode";
@@ -69,7 +68,16 @@ export class LanguageClientService {
 
   public async checkPrerequisites(): Promise<void> {
     await new JavaCheck().isJavaInstalled();
-    if (!SettingsService.getLspPort() && !fs.existsSync(this.executablePath)) {
+    var pathExists = false;
+
+    try {
+      await vscode.workspace.fs.stat(vscode.Uri.file(this.executablePath));
+      pathExists = true;
+    } catch {
+      pathExists = false;
+    }
+
+    if (!SettingsService.getLspPort() && !pathExists) {
       throw new Error("LSP server for " + LANGUAGE_ID + " not found");
     }
   }

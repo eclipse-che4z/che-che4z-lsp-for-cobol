@@ -25,7 +25,7 @@
     "strictPropertyInitialization": true,
     "alwaysStrict": true,
     "strict": true,
-    "lib": ["es6", "es2020"],
+    "lib": ["dom", "es6", "es2020"],
     "module": "commonjs",
     "moduleResolution": "node",
     "outDir": "out",

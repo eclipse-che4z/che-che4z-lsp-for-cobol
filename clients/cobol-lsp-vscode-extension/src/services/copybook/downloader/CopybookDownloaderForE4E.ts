@@ -12,7 +12,7 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 import * as vscode from "vscode";
-import * as fs from "node:fs";
+// import * as fs from "node:fs";
 import * as Path from "node:path";
 import {
   EndevorElement,
@@ -36,6 +36,8 @@ import {
 import { CopybookName } from "../CopybookDownloadService";
 import { Utils } from "../../util/Utils";
 import { searchCopybookInExtensionFolder } from "../../util/FSUtils";
+
+import * as fs from "../../util/FSWrapper";
 
 const defaultConfigs: ExternalConfigurationOptions = {
   compiler: "IGYCRCTL",
@@ -203,7 +205,7 @@ export class CopybookDownloaderForE4E {
       if (resultElement instanceof Error) {
         this.outputChannel?.appendLine(resultElement.message);
       } else {
-        await fs.promises.writeFile(filePath, resultElement[0]);
+        await fs.writeFile(filePath, resultElement[0]);
         return true;
       }
     } catch (err: any) {
@@ -233,7 +235,7 @@ export class CopybookDownloaderForE4E {
       if (memberContent instanceof Error) {
         this.outputChannel?.appendLine(memberContent.message);
       } else {
-        await fs.promises.writeFile(filePath, memberContent);
+        await fs.writeFile(filePath, memberContent);
         return true;
       }
     } catch (err: any) {
