@@ -83,9 +83,6 @@ class CobolTextDocumentServiceTest {
   @Mock
   LspMessageBroker lspMessageBroker;
 
-  @Mock
-  UriDecodeService uriDecodeService;
-
   private CobolTextDocumentService service;
 
   /**
@@ -99,21 +96,21 @@ class CobolTextDocumentServiceTest {
     SubroutineService subroutineService = mock(SubroutineService.class);
     AsyncAnalysisService asyncAnalysisService = new AsyncAnalysisService(mock(TrueDialectService.class), documentModelService, analysisService, copybookService, subroutineService, communications);
 
-    CompletionHandler completionHandler = new CompletionHandler(asyncAnalysisService, completions, documentModelService, uriDecodeService);
-    FormattingHandler formattingHandler = new FormattingHandler(documentModelService, formations, asyncAnalysisService, uriDecodeService);
+    CompletionHandler completionHandler = new CompletionHandler(asyncAnalysisService, completions, documentModelService);
+    FormattingHandler formattingHandler = new FormattingHandler(documentModelService, formations, asyncAnalysisService);
 
     CodeActionHandler codeActionHandler = new CodeActionHandler(actions);
-    AnalysisHandler analysisHandler = new AnalysisHandler(asyncAnalysisService, analysisService, builder, communications, documentModelService, uriDecodeService);
+    AnalysisHandler analysisHandler = new AnalysisHandler(asyncAnalysisService, analysisService, builder, communications, documentModelService);
 
-    DidOpenHandler didOpenHandler = new DidOpenHandler(asyncAnalysisService, watcherService, uriDecodeService);
-    DidCloseHandler didCloseHandler = new DidCloseHandler(disposableLSPStateService, asyncAnalysisService, documentModelService, watcherService, copybookService, documentGraph, uriDecodeService);
-    DidChangeHandler didChangeHandler = new DidChangeHandler(asyncAnalysisService, documentGraph, uriDecodeService);
-    DefinitionHandler definitionHandler = new DefinitionHandler(asyncAnalysisService, documentModelService, occurrences, uriDecodeService);
-    DocumentSymbolHandler documentSymbolHandler = new DocumentSymbolHandler(asyncAnalysisService, analysisService, documentModelService, uriDecodeService);
-    DocumentHighlightHandler documentHighlightHandler = new DocumentHighlightHandler(asyncAnalysisService, occurrences, documentModelService, uriDecodeService);
-    ReferencesHandler referencesHandler = new ReferencesHandler(asyncAnalysisService, occurrences, documentModelService, uriDecodeService);
-    HoverHandler hoverHandler = new HoverHandler(asyncAnalysisService, hoverProvider, documentModelService, documentGraph, uriDecodeService);
-    FoldingRangeHandler foldingRangeHandler = new FoldingRangeHandler(documentModelService, asyncAnalysisService, uriDecodeService, analysisService);
+    DidOpenHandler didOpenHandler = new DidOpenHandler(asyncAnalysisService, watcherService);
+    DidCloseHandler didCloseHandler = new DidCloseHandler(disposableLSPStateService, asyncAnalysisService, documentModelService, watcherService, copybookService, documentGraph);
+    DidChangeHandler didChangeHandler = new DidChangeHandler(asyncAnalysisService, documentGraph);
+    DefinitionHandler definitionHandler = new DefinitionHandler(asyncAnalysisService, documentModelService, occurrences);
+    DocumentSymbolHandler documentSymbolHandler = new DocumentSymbolHandler(asyncAnalysisService, analysisService, documentModelService);
+    DocumentHighlightHandler documentHighlightHandler = new DocumentHighlightHandler(asyncAnalysisService, occurrences, documentModelService);
+    ReferencesHandler referencesHandler = new ReferencesHandler(asyncAnalysisService, occurrences, documentModelService);
+    HoverHandler hoverHandler = new HoverHandler(asyncAnalysisService, hoverProvider, documentModelService, documentGraph);
+    FoldingRangeHandler foldingRangeHandler = new FoldingRangeHandler(documentModelService, asyncAnalysisService, analysisService);
 
     service = new CobolTextDocumentService(
             lspMessageBroker,
@@ -169,7 +166,6 @@ class CobolTextDocumentServiceTest {
     TextDocumentItem textDocumentItem = mock(TextDocumentItem.class);
     when(params.getTextDocument()).thenReturn(textDocumentItem);
     when(textDocumentItem.getUri()).thenReturn(URI);
-    when(uriDecodeService.decode(URI)).thenReturn(URI);
     service.didOpen(params);
     Mockito.verify(lspMessageBroker, times(0)).query(any());
   }

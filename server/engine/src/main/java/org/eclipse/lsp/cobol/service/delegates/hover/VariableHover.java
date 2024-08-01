@@ -15,7 +15,6 @@
 package org.eclipse.lsp.cobol.service.delegates.hover;
 
 import com.google.common.collect.ImmutableList;
-import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import java.util.Optional;
 import javax.annotation.Nullable;
@@ -25,7 +24,6 @@ import org.eclipse.lsp.cobol.common.model.Describable;
 import org.eclipse.lsp.cobol.common.utils.RangeUtils;
 import org.eclipse.lsp.cobol.lsp.SourceUnitGraph;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
-import org.eclipse.lsp.cobol.service.UriDecodeService;
 import org.eclipse.lsp4j.Hover;
 import org.eclipse.lsp4j.MarkedString;
 import org.eclipse.lsp4j.TextDocumentPositionParams;
@@ -34,13 +32,6 @@ import org.eclipse.lsp4j.jsonrpc.messages.Either;
 /** The class provides hover information for variables. */
 @Singleton
 public class VariableHover implements HoverProvider {
-
-  private final UriDecodeService uriDecodeService;
-
-  @Inject
-  public VariableHover(UriDecodeService uriDecodeService) {
-    this.uriDecodeService = uriDecodeService;
-  }
 
   @Nullable
   @Override
@@ -52,7 +43,7 @@ public class VariableHover implements HoverProvider {
         .flatMap(
             root ->
                 RangeUtils.findNodeByPosition(
-                    root, uriDecodeService.decode(position.getTextDocument().getUri()), position.getPosition()))
+                    root, position.getTextDocument().getUri(), position.getPosition()))
         .filter(Describable.class::isInstance)
         .map(Describable.class::cast)
         .map(VariableHover::createHoverInfo)

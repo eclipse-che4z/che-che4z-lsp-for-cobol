@@ -43,7 +43,6 @@ import org.eclipse.lsp.cobol.common.utils.ImplicitCodeUtils;
 import org.eclipse.lsp.cobol.common.utils.ThreadInterruptionUtil;
 import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
 import org.eclipse.lsp.cobol.lsp.jrpc.CobolLanguageClient;
-import org.eclipse.lsp.cobol.service.UriDecodeService;
 
 /**
  * This service processes copybook requests and returns content by its name. The service also caches
@@ -57,7 +56,6 @@ public class CopybookServiceImpl implements CopybookService {
   private final Map<String, List<SyntaxError>> preprocessCopybookErrors = new ConcurrentHashMap<>();
   private final Map<String, Set<CopybookModel>> copybookUsage = new ConcurrentHashMap<>();
   private final Provider<CobolLanguageClient> clientProvider;
-  private final UriDecodeService uriDecodeService;
   private final FileSystemService files;
   private static final String COBOL = "COBOL";
 
@@ -69,12 +67,10 @@ public class CopybookServiceImpl implements CopybookService {
   @Inject
   public CopybookServiceImpl(Provider<CobolLanguageClient> clientProvider,
       FileSystemService files,
-      CopybookCache copybookCache,
-      UriDecodeService uriDecodeService) {
+      CopybookCache copybookCache) {
     this.files = files;
     this.clientProvider = clientProvider;
     this.copybookCache = copybookCache;
-    this.uriDecodeService = uriDecodeService;
   }
 
   @Override
@@ -265,9 +261,9 @@ public class CopybookServiceImpl implements CopybookService {
 
   private CopybookModel loadCopybook(String uri, CopybookName copybookName, String programUri) {
     Path file = files.getPathFromURI(uri);
-    LOG.debug("Loading {} with URI {} for {} from path {}", copybookName, uriDecodeService.decode(uri), files.getNameFromURI(programUri), file);
+    LOG.debug("Loading {} with URI {} for {} from path {}", copybookName, uri, files.getNameFromURI(programUri), file);
     return files.fileExists(file)
-        ? new CopybookModel(copybookName.toCopybookId(programUri), copybookName, uriDecodeService.decode(uri), files.getContentByPath(Objects.requireNonNull(file)))
+        ? new CopybookModel(copybookName.toCopybookId(programUri), copybookName, uri, files.getContentByPath(Objects.requireNonNull(file)))
         : registerForDownloading(copybookName, programUri);
   }
 

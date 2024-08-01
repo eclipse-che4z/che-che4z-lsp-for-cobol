@@ -24,7 +24,6 @@ import org.eclipse.lsp.cobol.lsp.LspQuery;
 import org.eclipse.lsp.cobol.lsp.analysis.AsyncAnalysisService;
 import org.eclipse.lsp.cobol.lsp.events.queries.CompletionQuery;
 import org.eclipse.lsp.cobol.service.DocumentModelService;
-import org.eclipse.lsp.cobol.service.UriDecodeService;
 import org.eclipse.lsp.cobol.service.delegates.completions.Completions;
 import org.eclipse.lsp4j.CompletionItem;
 import org.eclipse.lsp4j.CompletionList;
@@ -39,14 +38,12 @@ public class CompletionHandler {
   private final Completions completions;
   private final AsyncAnalysisService asyncAnalysisService;
   private final DocumentModelService documentModelService;
-  private final UriDecodeService uriDecodeService;
 
   @Inject
-  public CompletionHandler(AsyncAnalysisService asyncAnalysisService, Completions completions, DocumentModelService documentModelService, UriDecodeService uriDecodeService) {
+  public CompletionHandler(AsyncAnalysisService asyncAnalysisService, Completions completions, DocumentModelService documentModelService) {
     this.completions = completions;
     this.asyncAnalysisService = asyncAnalysisService;
     this.documentModelService = documentModelService;
-    this.uriDecodeService = uriDecodeService;
   }
 
   /**
@@ -58,7 +55,7 @@ public class CompletionHandler {
    * @throws InterruptedException forward exception.
    */
   public Either<List<CompletionItem>, CompletionList> completion(CompletionParams params) throws ExecutionException, InterruptedException {
-    String uri = uriDecodeService.decode(params.getTextDocument().getUri());
+    String uri = params.getTextDocument().getUri();
     return Either.forRight(completions.collectFor(documentModelService.get(uri), params));
   }
 
@@ -78,7 +75,6 @@ public class CompletionHandler {
    */
   public List<LspEventDependency> getDocumentHighlightDependency(CompletionParams params) {
     return ImmutableList.of(
-            asyncAnalysisService.createDependencyOn(
-                    uriDecodeService.decode(params.getTextDocument().getUri())));
+            asyncAnalysisService.createDependencyOn(params.getTextDocument().getUri()));
   }
 }

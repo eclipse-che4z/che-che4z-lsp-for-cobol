@@ -28,7 +28,6 @@ import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.lsp.analysis.AnalysisState;
 import org.eclipse.lsp.cobol.lsp.analysis.AsyncAnalysisService;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
-import org.eclipse.lsp.cobol.service.UriDecodeService;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
@@ -43,12 +42,11 @@ class SourceUnitGraphTest {
   public static final String URI = "file://document.cbl";
   @Mock private WorkspaceFileService fileService;
   @Mock private AsyncAnalysisService asyncAnalysisService;
-  private final UriDecodeService uriDecodeService = new UriDecodeService();
 
   @Test
   void testNotifyState() {
     SourceUnitGraph sourceUnitGraph =
-        new SourceUnitGraph(fileService, asyncAnalysisService, uriDecodeService);
+        new SourceUnitGraph(fileService, asyncAnalysisService);
     String initialDocumentText = "sample text for test";
     String updatedContent = "Updated content";
     sourceUnitGraph.notifyState(
@@ -71,7 +69,7 @@ class SourceUnitGraphTest {
     String copy2Uri = "file://copy2.cpy";
     String copy3Uri = "file://copy3.cpy";
     SourceUnitGraph sourceUnitGraph =
-        new SourceUnitGraph(fileService, asyncAnalysisService, uriDecodeService);
+        new SourceUnitGraph(fileService, asyncAnalysisService);
     Node rootNode = mock(Node.class);
     when(fileService.getPathFromURI(anyString())).thenReturn(Paths.get(""));
     when(fileService.getContentByPath(any()))

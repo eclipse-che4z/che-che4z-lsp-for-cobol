@@ -23,7 +23,6 @@ import org.eclipse.lsp.cobol.lsp.LspQuery;
 import org.eclipse.lsp.cobol.lsp.analysis.AsyncAnalysisService;
 import org.eclipse.lsp.cobol.lsp.events.queries.FormattingQuery;
 import org.eclipse.lsp.cobol.service.DocumentModelService;
-import org.eclipse.lsp.cobol.service.UriDecodeService;
 import org.eclipse.lsp.cobol.service.delegates.formations.Formations;
 import org.eclipse.lsp4j.DocumentFormattingParams;
 import org.eclipse.lsp4j.TextEdit;
@@ -36,14 +35,12 @@ public class FormattingHandler {
   private final DocumentModelService documentService;
   private final Formations formations;
   private final AsyncAnalysisService asyncAnalysisService;
-  private final UriDecodeService uriDecodeService;
 
   @Inject
-  public FormattingHandler(DocumentModelService documentService, Formations formations, AsyncAnalysisService asyncAnalysisService, UriDecodeService uriDecodeService) {
+  public FormattingHandler(DocumentModelService documentService, Formations formations, AsyncAnalysisService asyncAnalysisService) {
     this.documentService = documentService;
     this.formations = formations;
     this.asyncAnalysisService = asyncAnalysisService;
-    this.uriDecodeService = uriDecodeService;
   }
 
   /**
@@ -53,7 +50,7 @@ public class FormattingHandler {
    * @return TextEdit.
    */
   public List<? extends TextEdit> formatting(DocumentFormattingParams params) {
-    String uri = uriDecodeService.decode(params.getTextDocument().getUri());
+    String uri = params.getTextDocument().getUri();
     return formations.format(documentService.get(uri));
   }
 
@@ -74,6 +71,6 @@ public class FormattingHandler {
    */
   public List<LspEventDependency> getDependencies(DocumentFormattingParams params) {
     return ImmutableList.of(
-            asyncAnalysisService.createDependencyOn(uriDecodeService.decode(params.getTextDocument().getUri())));
+            asyncAnalysisService.createDependencyOn(params.getTextDocument().getUri()));
   }
 }

@@ -31,7 +31,6 @@ import org.eclipse.lsp.cobol.common.model.tree.variables.MnemonicNameNode;
 import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
 import org.eclipse.lsp.cobol.lsp.SourceUnitGraph;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
-import org.eclipse.lsp.cobol.service.UriDecodeService;
 import org.eclipse.lsp4j.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -43,7 +42,6 @@ class ElementOccurrencesTest {
   private static final String URI = "uri";
   private static final String URI2 = "uri2";
   private static final String ELEMENT_NAME = "foo";
-  private UriDecodeService uriDecodeService = new UriDecodeService();
 
   static Stream<Arguments> variousData() {
     Location definition = new Location(URI, new Range(new Position(1, 2), new Position(2, 5)));
@@ -179,7 +177,7 @@ class ElementOccurrencesTest {
     CobolDocumentModel cobolDocumentModel = new CobolDocumentModel(URI, "", analysisResult);
     TextDocumentPositionParams textDocumentPositionParams =
         new TextDocumentPositionParams(new TextDocumentIdentifier(URI), insideUsage);
-    ElementOccurrences elementOccurrences = new ElementOccurrences(documentGraph, uriDecodeService);
+    ElementOccurrences elementOccurrences = new ElementOccurrences(documentGraph);
     assertEquals(
         ImmutableList.of(definition),
         elementOccurrences.findDefinitions(cobolDocumentModel, textDocumentPositionParams));
@@ -215,7 +213,7 @@ class ElementOccurrencesTest {
     rootNode.addChild(variableUsageNodeInOtherFile);
     AnalysisResult analysisResult = AnalysisResult.builder().rootNode(rootNode).build();
     List<DocumentHighlight> highlights =
-        new ElementOccurrences(documentGraph, uriDecodeService)
+        new ElementOccurrences(documentGraph)
             .findHighlights(
                 analysisResult,
                 new TextDocumentPositionParams(new TextDocumentIdentifier(URI), insideUsage));
@@ -233,7 +231,7 @@ class ElementOccurrencesTest {
     SourceUnitGraph documentGraph = mock(SourceUnitGraph.class);
     when(documentGraph.isUserSuppliedCopybook(anyString())).thenReturn(false);
     List<Location> actualLocations =
-        new ElementOccurrences(documentGraph, uriDecodeService)
+        new ElementOccurrences(documentGraph)
             .findReferences(
                 new CobolDocumentModel(URI, "", analysisResult),
                 new TextDocumentPositionParams(new TextDocumentIdentifier(URI), position),

@@ -25,7 +25,6 @@ import org.eclipse.lsp.cobol.lsp.SourceUnitGraph;
 import org.eclipse.lsp.cobol.lsp.analysis.AsyncAnalysisService;
 import org.eclipse.lsp.cobol.lsp.events.queries.HoverLspQuery;
 import org.eclipse.lsp.cobol.service.DocumentModelService;
-import org.eclipse.lsp.cobol.service.UriDecodeService;
 import org.eclipse.lsp.cobol.service.delegates.hover.HoverProvider;
 import org.eclipse.lsp4j.Hover;
 import org.eclipse.lsp4j.HoverParams;
@@ -39,15 +38,13 @@ public class HoverHandler {
   private final Set<HoverProvider> hoverProvider;
   private final DocumentModelService documentModelService;
   private final SourceUnitGraph documentGraph;
-  private final UriDecodeService uriDecodeService;
 
   @Inject
-  public HoverHandler(AsyncAnalysisService asyncAnalysisService, Set<HoverProvider> hoverProvider, DocumentModelService documentModelService, SourceUnitGraph documentGraph, UriDecodeService uriDecodeService) {
+  public HoverHandler(AsyncAnalysisService asyncAnalysisService, Set<HoverProvider> hoverProvider, DocumentModelService documentModelService, SourceUnitGraph documentGraph) {
     this.asyncAnalysisService = asyncAnalysisService;
     this.hoverProvider = hoverProvider;
     this.documentModelService = documentModelService;
     this.documentGraph = documentGraph;
-    this.uriDecodeService = uriDecodeService;
   }
 
   /**
@@ -59,7 +56,7 @@ public class HoverHandler {
    * @throws InterruptedException forward exception.
    */
   public Hover hover(HoverParams params) throws ExecutionException, InterruptedException {
-    String uri = uriDecodeService.decode(params.getTextDocument().getUri());
+    String uri = params.getTextDocument().getUri();
     for (HoverProvider provider : hoverProvider) {
       Hover hover = provider.getHover(documentModelService.get(uri), params, documentGraph);
       if (hover != null) {
@@ -86,6 +83,6 @@ public class HoverHandler {
    */
   public ImmutableList<LspEventDependency> getDependencies(HoverParams params) {
     return ImmutableList.of(
-            asyncAnalysisService.createDependencyOn(uriDecodeService.decode(params.getTextDocument().getUri())));
+            asyncAnalysisService.createDependencyOn(params.getTextDocument().getUri()));
   }
 }
