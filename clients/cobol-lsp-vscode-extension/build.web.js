@@ -73,7 +73,6 @@ async function main() {
     outdir: "dist/web",
     external: [
       "vscode",
-      "node:path",
       "node:events",
       "node:stream",
       "node:net",

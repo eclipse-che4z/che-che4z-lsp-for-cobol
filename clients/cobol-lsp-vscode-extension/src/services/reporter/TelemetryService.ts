@@ -11,7 +11,6 @@
  * Contributors:
  *   Broadcom, Inc. - initial API and implementation
  */
-import { userInfo } from "node:os";
 import { sep } from "node:path";
 import {
   TelemetryEvent,
@@ -137,6 +136,6 @@ export class TelemetryService {
   }
 
   private static getUsername(): string {
-    return userInfo().username;
+    return process.env.username ? process.env.username : "";
   }
 }

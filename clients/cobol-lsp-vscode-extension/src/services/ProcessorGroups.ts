@@ -11,8 +11,6 @@
  * Contributors:
  *   Broadcom, Inc. - initial API and implementation
  */
-
-import * as path from "node:path";
 import { Minimatch } from "minimatch";
 import { SettingsUtils } from "./util/SettingsUtils";
 import { globSync } from "glob";
@@ -161,14 +159,15 @@ function matchProcessorGroup(
   documentPath: string,
   workspacePath: string,
 ): string | undefined {
+  const sep = fs.getPathSeparator();
   documentPath =
-    path.sep === "/"
-      ? documentPath.replace("\\", path.sep)
-      : documentPath.replace("/", path.sep);
+    sep === "/"
+      ? documentPath.replace("\\", sep)
+      : documentPath.replace("/", sep);
   workspacePath =
-    path.sep === "/"
-      ? workspacePath.replace("\\", path.sep)
-      : workspacePath.replace("/", path.sep);
+    sep === "/"
+      ? workspacePath.replace("\\", sep)
+      : workspacePath.replace("/", sep);
   const relativeDocPath = path.relative(workspacePath, documentPath);
 
   const candidates: string[] = [];
@@ -196,10 +195,10 @@ function matchProcessorGroup(
 }
 
 function pathMatches(program: string, documentPath: string) {
-  return path.sep === "/"
-    ? program.split("\\").join(path.sep) === documentPath
-    : program.split("/").join(path.sep).toUpperCase() ===
-        documentPath.toUpperCase();
+  const sep = fs.getPathSeparator();
+  return sep === "/"
+    ? program.split("\\").join(sep) === documentPath
+    : program.split("/").join(sep).toUpperCase() === documentPath.toUpperCase();
 }
 
 function loadProcessorsConfig(

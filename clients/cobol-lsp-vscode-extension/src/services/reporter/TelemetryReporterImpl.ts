@@ -11,7 +11,6 @@
  * Contributors:
  *   Broadcom, Inc. - initial API and implementation
  */
-import * as path from "path";
 import * as vscode from "vscode";
 import TelemetryReporter from "@vscode/extension-telemetry";
 import { EXTENSION_ID, TELEMETRY_DEFAULT_CONTENT } from "../../constants";
@@ -47,7 +46,7 @@ export class TelemetryReporterImpl implements TelemetryReport {
 
   private static getTelemetryResourcePath() {
     const extPath = vscode.extensions.getExtension(EXTENSION_ID)!.extensionPath;
-    return vscode.Uri.file(path.join(extPath, "resources", "TELEMETRY_KEY"))
+    return vscode.Uri.file(fs.join(extPath, "resources", "TELEMETRY_KEY"))
       .fsPath;
   }
 

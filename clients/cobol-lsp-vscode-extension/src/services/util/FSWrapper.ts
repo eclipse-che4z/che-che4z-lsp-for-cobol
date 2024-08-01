@@ -20,8 +20,13 @@ export async function writeFile(file: string, content: string) {
   );
 }
 
-export function join(base: string, addition: string): string {
-  return vscode.Uri.joinPath(vscode.Uri.file(base), addition).fsPath;
+export function join(...paths: string[]): string {
+  if (paths.length > 0) {
+    const base = paths.shift()!;
+    var root = vscode.Uri.file(base);
+    return vscode.Uri.joinPath(root, ...paths).fsPath;
+  }
+  return "";
 }
 
 export function mkdirSync(folder: string, options?: any) {
@@ -39,4 +44,18 @@ export async function readFileAsync(
       return content;
     });
   return decoder.decode(content);
+}
+
+function isWindows() {
+  return window.navigator.userAgent.indexOf("Win") != -1;
+}
+
+export function getPathSeparator() {
+  if (isWindows()) return "\\";
+  else return "/";
+}
+
+//TODO: add regex for absolute path validation
+export function isAbsolute(path: string) {
+  if (path.startsWith(".")) return false;
 }

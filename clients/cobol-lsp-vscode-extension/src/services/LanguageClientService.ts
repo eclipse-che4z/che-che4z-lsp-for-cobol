@@ -13,7 +13,6 @@
  */
 
 import * as net from "node:net";
-import { join } from "node:path";
 import * as vscode from "vscode";
 import * as fs from "./util/FSWrapper";
 
@@ -46,16 +45,16 @@ export class LanguageClientService {
     private storagePath: vscode.Uri,
   ) {
     const ext = vscode.extensions.getExtension(extensionId)!;
-    this.executablePath = join(
+    this.executablePath = fs.join(
       ext.extensionPath,
       "server",
       "jar",
       "server.jar",
     );
     this.executableService = new NativeExecutableService(
-      join(ext.extensionPath, "server"),
+      fs.join(ext.extensionPath, "server"),
     );
-    this.dialectsPath = join(ext.extensionPath, "server", "jar", "dialects");
+    this.dialectsPath = fs.join(ext.extensionPath, "server", "jar", "dialects");
   }
 
   public enableNativeBuild() {
