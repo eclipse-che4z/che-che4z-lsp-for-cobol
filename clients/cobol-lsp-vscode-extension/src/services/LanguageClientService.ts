@@ -15,6 +15,7 @@
 import * as net from "node:net";
 import { join } from "node:path";
 import * as vscode from "vscode";
+import * as fs from "./util/FSWrapper";
 
 import {
   DidChangeConfigurationNotification,
@@ -68,16 +69,8 @@ export class LanguageClientService {
 
   public async checkPrerequisites(): Promise<void> {
     await new JavaCheck().isJavaInstalled();
-    var pathExists = false;
 
-    try {
-      await vscode.workspace.fs.stat(vscode.Uri.file(this.executablePath));
-      pathExists = true;
-    } catch {
-      pathExists = false;
-    }
-
-    if (!SettingsService.getLspPort() && !pathExists) {
+    if (!SettingsService.getLspPort() && !fs.existsSync(this.executablePath)) {
       throw new Error("LSP server for " + LANGUAGE_ID + " not found");
     }
   }

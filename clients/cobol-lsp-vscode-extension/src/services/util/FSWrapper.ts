@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
-import { Utils } from "./Utils";
-import { TextDecoder, TextEncoder } from "util";
+import * as fs from "node:fs";
+import { TextEncoder } from "util";
 
 export function existsSync(path: string): boolean {
   var pathExists: boolean;
@@ -32,12 +32,16 @@ export function mkdirSync(folder: string, options?: any) {
 
 //TODO: Very much dislike making this async and propogating awaits up the callstack but
 // spent some time trying to find a readFileSync function that is not node and was unsuccessful
-export async function readFileAsync(path: string, contentType: string) {
-  const decoder = new TextDecoder(contentType);
-  const content = await vscode.workspace.fs
-    .readFile(vscode.Uri.file(path))
-    .then((content: Uint8Array) => {
-      return content;
-    });
-  return decoder.decode(content);
+// export async function readFileAsync(path: string, contentType: string) {
+//   const decoder = new TextDecoder(contentType);
+//   const content = await vscode.workspace.fs
+//     .readFile(vscode.Uri.file(path))
+//     .then((content: Uint8Array) => {
+//       return content;
+//     });
+//   return decoder.decode(content);
+// }
+
+export function readFileSync(path: string, encoding: BufferEncoding) {
+  return fs.readFileSync(path, { encoding: encoding });
 }

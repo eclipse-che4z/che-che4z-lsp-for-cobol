@@ -52,9 +52,9 @@ export class TelemetryReporterImpl implements TelemetryReport {
       .fsPath;
   }
 
-  private static async getInstrumentationKey(): Promise<string> {
+  private static getInstrumentationKey(): string {
     return Buffer.from(
-      await fs.readFileAsync(this.getTelemetryResourcePath(), "utf8"),
+      fs.readFileSync(this.getTelemetryResourcePath(), "utf8"),
       "base64",
     )
       .toString()
