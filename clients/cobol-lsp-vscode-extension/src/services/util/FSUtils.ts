@@ -12,8 +12,6 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
-import * as fs from "node:fs";
-import * as path from "node:path";
 import { globSync, hasMagic } from "glob";
 import { Uri } from "vscode";
 import * as vscode from "vscode";
@@ -35,9 +33,9 @@ export function searchCopybookInExtensionFolder(
   const extensionFolder = cleanWorkspaceFolderName(storagePath);
   for (const p of copybookFolders) {
     for (const ext of extensions) {
-      const searchResult = globSearch(extensionFolder, p, copybookName, ext);
+      const searchResult = globSearchVS(extensionFolder, p, copybookName, ext);
       if (searchResult) {
-        return vscode.Uri.file(searchResult).toString();
+        return searchResult;
       }
     }
   }
@@ -54,16 +52,60 @@ export function normalizePath(folder: string): string {
   return vscode.Uri.file(folder).fsPath;
 }
 
-function globSearch(
+// function globSearch(
+//   workspaceFolder: string,
+//   resource: string,
+//   copybookName: string,
+//   ext: string,
+// ): string | undefined {
+//   const pathName: string = path.isAbsolute(resource)
+//     ? resource
+//     : path.normalize(path.join(workspaceFolder, resource));
+//   const segments = pathName.split(path.sep);
+//   const cwdSegments: string[] = [];
+//   for (const s of segments) {
+//     if (!hasMagic(s)) {
+//       cwdSegments.push(s);
+//     } else {
+//       break;
+//     }
+//   }
+//   // One must use forward-slashes only in glob expressions
+//   const cwd = path
+//     .resolve("/", ...cwdSegments)
+//     .replace(backwardSlashRegex, "/");
+//   const normalizePathName = pathName.replace(backwardSlashRegex, "/");
+//   let pattern =
+//     normalizePathName === cwd && !Utils.isUNCPath(normalizePathName)
+//       ? ""
+//       : normalizePathName.replace(cwd.endsWith("/") ? cwd : cwd + "/", "");
+//   const suffix =
+//     (pattern.length === 0 || pattern.endsWith("/") ? "" : "/") +
+//     copybookName +
+//     ext;
+//   pattern = pattern + suffix;
+//   const result = globSync(pattern, { cwd, dot: true });
+//   // TODO report the case with more then one copybook fit the pattern.
+//   return result[0]
+//     ? normalizePath(fs.realpathSync.native(path.resolve(cwd, result[0])))
+//     : undefined;
+// }
+
+function globSearchVS(
   workspaceFolder: string,
   resource: string,
   copybookName: string,
   ext: string,
 ): string | undefined {
-  const pathName: string = path.isAbsolute(resource)
-    ? resource
-    : path.normalize(path.join(workspaceFolder, resource));
-  const segments = pathName.split(path.sep);
+  var resourcePath: Uri;
+
+  if (resource.includes("/") || resource.includes("\\")) {
+    resourcePath = Uri.file(resource);
+  } else resourcePath = Uri.file(workspaceFolder + resource);
+
+  const separators = resourcePath.fsPath.includes("\\") ? "\\" : "/";
+
+  const segments = resourcePath.fsPath.split(separators);
   const cwdSegments: string[] = [];
   for (const s of segments) {
     if (!hasMagic(s)) {
@@ -72,11 +114,14 @@ function globSearch(
       break;
     }
   }
+
   // One must use forward-slashes only in glob expressions
-  const cwd = path
-    .resolve("/", ...cwdSegments)
-    .replace(backwardSlashRegex, "/");
-  const normalizePathName = pathName.replace(backwardSlashRegex, "/");
+  var cwd = resourcePath.fsPath.replace(backwardSlashRegex, "/");
+
+  const normalizePathName = resourcePath.fsPath.replace(
+    backwardSlashRegex,
+    "/",
+  );
   let pattern =
     normalizePathName === cwd && !Utils.isUNCPath(normalizePathName)
       ? ""
@@ -86,11 +131,13 @@ function globSearch(
     copybookName +
     ext;
   pattern = pattern + suffix;
-  const result = globSync(pattern, { cwd, dot: true });
+
+  const result = globSync(pattern, {
+    cwd,
+    dot: true,
+  });
   // TODO report the case with more then one copybook fit the pattern.
-  return result[0]
-    ? normalizePath(fs.realpathSync.native(path.resolve(cwd, result[0])))
-    : undefined;
+  return result[0] ? resourcePath.fsPath + result[0] : undefined;
 }
 
 export function getProgramNameFromUri(
@@ -98,8 +145,12 @@ export function getProgramNameFromUri(
   includeExt: boolean = false,
 ): string {
   const fullPath = Uri.parse(uri, true).fsPath;
+  // TODO: Modify for non UNC paths
+  const fileName = Utils.isUNCPath(fullPath)
+    ? fullPath.slice(fullPath.lastIndexOf("\\"))
+    : fullPath.slice(fullPath.lastIndexOf("/"));
   if (includeExt) {
-    return path.basename(fullPath);
+    return fileName;
   }
-  return path.basename(fullPath, path.extname(fullPath));
+  return fileName.slice(fileName.lastIndexOf("."));
 }

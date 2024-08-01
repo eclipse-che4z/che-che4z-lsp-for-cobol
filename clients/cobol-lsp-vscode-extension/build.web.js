@@ -63,10 +63,7 @@ const testBundlePlugin = {
 
 async function main() {
   const ctx = await buildWeb.context({
-    entryPoints: [
-      "src/web/extension.ts",
-      "src/web/test/suite/extensionTests.ts",
-    ],
+    entryPoints: ["src/extension.ts", "src/web/test/suite/extensionTests.ts"],
     bundle: true,
     format: "cjs",
     minify: production,
@@ -74,7 +71,19 @@ async function main() {
     sourcesContent: false,
     platform: "browser",
     outdir: "dist/web",
-    external: ["vscode"],
+    external: [
+      "vscode",
+      // "node:fs",
+      "node:path",
+      "node:events",
+      "node:stream",
+      "node:string_decoder",
+      "node:url",
+      "node:net",
+      "node:os",
+      "node:child_process",
+      "glob",
+    ],
     logLevel: "silent",
     // Node.js global to browser globalThis
     define: {
