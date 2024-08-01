@@ -25,7 +25,6 @@ import org.eclipse.lsp.cobol.lsp.analysis.AsyncAnalysisService;
 import org.eclipse.lsp.cobol.lsp.events.queries.DefinitionQuery;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp.cobol.service.DocumentModelService;
-import org.eclipse.lsp.cobol.service.UriDecodeService;
 import org.eclipse.lsp.cobol.service.delegates.references.Occurrences;
 import org.eclipse.lsp4j.DefinitionParams;
 import org.eclipse.lsp4j.Location;
@@ -40,14 +39,12 @@ public class DefinitionHandler {
   private final AsyncAnalysisService asyncAnalysisService;
   private final DocumentModelService documentModelService;
   private final Occurrences occurrences;
-  private final UriDecodeService uriDecodeService;
 
   @Inject
-  public DefinitionHandler(AsyncAnalysisService asyncAnalysisService, DocumentModelService documentModelService, Occurrences occurrences, UriDecodeService uriDecodeService) {
+  public DefinitionHandler(AsyncAnalysisService asyncAnalysisService, DocumentModelService documentModelService, Occurrences occurrences) {
     this.asyncAnalysisService = asyncAnalysisService;
     this.documentModelService = documentModelService;
     this.occurrences = occurrences;
-    this.uriDecodeService = uriDecodeService;
   }
 
   /**
@@ -59,9 +56,9 @@ public class DefinitionHandler {
    * @throws InterruptedException forward exception.
    */
   public Either<List<? extends Location>, List<? extends LocationLink>> definition(DefinitionParams params) throws ExecutionException, InterruptedException {
-    CobolDocumentModel doc = documentModelService.get(uriDecodeService.decode(params.getTextDocument().getUri()));
+    CobolDocumentModel doc = documentModelService.get(params.getTextDocument().getUri());
     List<Location> definitions = occurrences.findDefinitions(doc, params);
-    return Either.forLeft(HandlerUtility.mapToOriginalLocation(definitions, uriDecodeService));
+    return Either.forLeft(definitions);
   }
 
   /**
@@ -81,7 +78,6 @@ public class DefinitionHandler {
    */
   public List<LspEventDependency> getDefinitionEventDependencies(DefinitionParams params) {
     return ImmutableList.of(
-            asyncAnalysisService.createDependencyOn(
-                    uriDecodeService.decode(params.getTextDocument().getUri())));
+            asyncAnalysisService.createDependencyOn(params.getTextDocument().getUri()));
   }
 }

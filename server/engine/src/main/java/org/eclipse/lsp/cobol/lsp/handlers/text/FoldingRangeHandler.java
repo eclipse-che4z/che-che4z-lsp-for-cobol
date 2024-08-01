@@ -29,7 +29,6 @@ import org.eclipse.lsp.cobol.lsp.events.queries.FoldingQuery;
 import org.eclipse.lsp.cobol.service.AnalysisService;
 import org.eclipse.lsp.cobol.service.DocumentModelService;
 import org.eclipse.lsp.cobol.service.DocumentServiceHelper;
-import org.eclipse.lsp.cobol.service.UriDecodeService;
 import org.eclipse.lsp4j.FoldingRange;
 import org.eclipse.lsp4j.FoldingRangeRequestParams;
 
@@ -41,14 +40,12 @@ public class FoldingRangeHandler {
 
   private final DocumentModelService documentService;
   private final AsyncAnalysisService asyncAnalysisService;
-  private final UriDecodeService uriDecodeService;
   private final AnalysisService analysisService;
 
   @Inject
-  public FoldingRangeHandler(DocumentModelService documentService, AsyncAnalysisService asyncAnalysisService, UriDecodeService uriDecodeService, AnalysisService analysisService) {
+  public FoldingRangeHandler(DocumentModelService documentService, AsyncAnalysisService asyncAnalysisService, AnalysisService analysisService) {
     this.documentService = documentService;
     this.asyncAnalysisService = asyncAnalysisService;
-    this.uriDecodeService = uriDecodeService;
     this.analysisService = analysisService;
   }
 
@@ -59,7 +56,7 @@ public class FoldingRangeHandler {
    * @return list of FoldingRanges
    */
   public List<FoldingRange> foldingRange(FoldingRangeRequestParams params) {
-    String uri = uriDecodeService.decode(params.getTextDocument().getUri());
+    String uri = params.getTextDocument().getUri();
     Node rootNode =
             documentService.isDocumentSynced(uri)
                     ? documentService.get(uri).getAnalysisResult().getRootNode()
@@ -75,7 +72,7 @@ public class FoldingRangeHandler {
    * @return LspNotification.
    */
   public LspQuery<List<FoldingRange>> createEvent(FoldingRangeRequestParams params) {
-    return new FoldingQuery(params, this, uriDecodeService);
+    return new FoldingQuery(params, this);
   }
 
   /**

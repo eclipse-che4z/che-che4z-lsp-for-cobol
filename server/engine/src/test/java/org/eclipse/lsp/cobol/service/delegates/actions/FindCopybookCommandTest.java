@@ -26,7 +26,6 @@ import com.google.common.collect.Lists;
 import java.util.List;
 import org.eclipse.lsp.cobol.common.action.CodeActionProvider;
 import org.eclipse.lsp.cobol.common.error.ErrorCodes;
-import org.eclipse.lsp.cobol.service.UriDecodeService;
 import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.junit.jupiter.api.Test;
@@ -47,12 +46,10 @@ class FindCopybookCommandTest {
       new Diagnostic(
           RANGE, COPYBOOK_NAME + ": Copybook not found", Error, null, ErrorCodes.MISSING_COPYBOOK.getLabel());
 
-  UriDecodeService uriDecodeService = new UriDecodeService();
-
   /** Test a code action to resolve the required copybook created for the missing copybook error. */
   @Test
   void testCollectCommandsOrActionsPositive() {
-    CodeActionProvider provider = new FindCopybookCommand(uriDecodeService);
+    CodeActionProvider provider = new FindCopybookCommand();
 
     List<Diagnostic> diagnostics = singletonList(COPYBOOK_ERROR);
     CodeActionParams params =
@@ -71,7 +68,7 @@ class FindCopybookCommandTest {
   @Test
   void testCollectCommandsOrActionsNegative() {
 
-    CodeActionProvider provider = new FindCopybookCommand(uriDecodeService);
+    CodeActionProvider provider = new FindCopybookCommand();
 
     List<Diagnostic> diagnostics = singletonList(SYNTAX_ERROR);
     CodeActionParams params =
@@ -86,7 +83,7 @@ class FindCopybookCommandTest {
   /** Test only correct errors processed. */
   @Test
   void testCollectCommandsOrActionsMixed() {
-    CodeActionProvider provider = new FindCopybookCommand(uriDecodeService);
+    CodeActionProvider provider = new FindCopybookCommand();
 
     List<Diagnostic> diagnostics = Lists.newArrayList(SYNTAX_ERROR, COPYBOOK_ERROR);
     CodeActionParams params =

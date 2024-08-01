@@ -16,13 +16,11 @@ package org.eclipse.lsp.cobol.service.delegates.hover;
 
 import org.eclipse.lsp.cobol.lsp.SourceUnitGraph;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
-import org.eclipse.lsp.cobol.service.UriDecodeService;
 import org.eclipse.lsp4j.TextDocumentIdentifier;
 import org.eclipse.lsp4j.TextDocumentPositionParams;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
@@ -36,13 +34,11 @@ import static org.mockito.Mockito.*;
  */
 @ExtendWith(MockitoExtension.class)
 class CopybookHoverProviderTest {
-    @Mock
-    private UriDecodeService uriDecodeService;
     private CopybookHoverProvider copybookHoverProvider;
 
     @BeforeEach
     void setUp() {
-        copybookHoverProvider = new CopybookHoverProvider(uriDecodeService);
+        copybookHoverProvider = new CopybookHoverProvider();
     }
 
     @Test

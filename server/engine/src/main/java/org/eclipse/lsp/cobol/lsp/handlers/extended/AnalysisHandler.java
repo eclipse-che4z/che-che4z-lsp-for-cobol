@@ -34,7 +34,6 @@ import org.eclipse.lsp.cobol.lsp.events.queries.AnalysisQuery;
 import org.eclipse.lsp.cobol.service.AnalysisService;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp.cobol.service.DocumentModelService;
-import org.eclipse.lsp.cobol.service.UriDecodeService;
 import org.eclipse.lsp.cobol.service.delegates.communications.Communications;
 import org.eclipse.lsp4j.MessageType;
 
@@ -48,16 +47,14 @@ public class AnalysisHandler {
   private final CFASTBuilder cfastBuilder;
   private final Communications communications;
   private final DocumentModelService documentModelService;
-  private final UriDecodeService uriDecodeService;
 
   @Inject
-  public AnalysisHandler(AsyncAnalysisService asyncAnalysisService, AnalysisService analysisService, CFASTBuilder cfastBuilder, Communications communications, DocumentModelService documentModelService, UriDecodeService uriDecodeService) {
+  public AnalysisHandler(AsyncAnalysisService asyncAnalysisService, AnalysisService analysisService, CFASTBuilder cfastBuilder, Communications communications, DocumentModelService documentModelService) {
     this.asyncAnalysisService = asyncAnalysisService;
     this.analysisService = analysisService;
     this.cfastBuilder = cfastBuilder;
     this.communications = communications;
     this.documentModelService = documentModelService;
-    this.uriDecodeService = uriDecodeService;
   }
 
   /**
@@ -69,7 +66,7 @@ public class AnalysisHandler {
    * @throws InterruptedException forward the exception
    */
   public ExtendedApiResult analysis(AnalysisResultEvent analysisResultEvent) throws ExecutionException, InterruptedException {
-    String uri = uriDecodeService.decode(analysisResultEvent.getUri());
+    String uri = analysisResultEvent.getUri();
     CobolDocumentModel doc = documentModelService.get(uri);
     if (analysisService.isCopybook(uri, analysisResultEvent.getText())) {
       communications.notifyGeneralMessage(MessageType.Info, "Cannot retrieve outline tree because file was treated as a copybook");
@@ -97,12 +94,12 @@ public class AnalysisHandler {
   public List<LspEventDependency> getDependencies(JsonObject params) {
     AnalysisResultEvent analysisResultEvent = ofNullable(new Gson().fromJson(params.toString(), AnalysisResultEvent.class))
             .orElseGet(() -> new AnalysisResultEvent("", ""));
-    String uri = uriDecodeService.decode(analysisResultEvent.getUri());
+    String uri = analysisResultEvent.getUri();
     if (documentModelService.get(uri) == null) {
       asyncAnalysisService.scheduleAnalysis(uri, analysisResultEvent.getText(), true);
     }
     return ImmutableList.of(
-            asyncAnalysisService.createDependencyOn(uriDecodeService.decode(analysisResultEvent.getUri())));
+            asyncAnalysisService.createDependencyOn(analysisResultEvent.getUri()));
   }
 
 }

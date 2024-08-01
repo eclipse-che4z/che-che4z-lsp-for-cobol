@@ -25,7 +25,6 @@ import org.eclipse.lsp.cobol.lsp.analysis.AsyncAnalysisService;
 import org.eclipse.lsp.cobol.lsp.events.queries.DocumentSymbolQuery;
 import org.eclipse.lsp.cobol.service.AnalysisService;
 import org.eclipse.lsp.cobol.service.DocumentModelService;
-import org.eclipse.lsp.cobol.service.UriDecodeService;
 import org.eclipse.lsp4j.DocumentSymbol;
 import org.eclipse.lsp4j.DocumentSymbolParams;
 import org.eclipse.lsp4j.SymbolInformation;
@@ -39,14 +38,12 @@ public class DocumentSymbolHandler {
   private final AsyncAnalysisService asyncAnalysisService;
   private final AnalysisService analysisService;
   private final DocumentModelService documentModelService;
-  private final UriDecodeService uriDecodeService;
 
   @Inject
-  public DocumentSymbolHandler(AsyncAnalysisService asyncAnalysisService, AnalysisService analysisService, DocumentModelService documentModelService, UriDecodeService uriDecodeService) {
+  public DocumentSymbolHandler(AsyncAnalysisService asyncAnalysisService, AnalysisService analysisService, DocumentModelService documentModelService) {
     this.asyncAnalysisService = asyncAnalysisService;
     this.analysisService = analysisService;
     this.documentModelService = documentModelService;
-    this.uriDecodeService = uriDecodeService;
   }
 
   /**
@@ -56,7 +53,7 @@ public class DocumentSymbolHandler {
    * @return The list of either SymbolInformation or DocumentSymbols.
    */
   public List<Either<SymbolInformation, DocumentSymbol>> documentSymbol(DocumentSymbolParams params) {
-    String uri = uriDecodeService.decode(params.getTextDocument().getUri());
+    String uri = params.getTextDocument().getUri();
     return createDocumentSymbols(documentModelService.get(uri).getOutlineResult());
   }
 
@@ -73,7 +70,7 @@ public class DocumentSymbolHandler {
    * @return LspNotification.
    */
   public LspQuery<List<Either<SymbolInformation, DocumentSymbol>>> createEvent(DocumentSymbolParams params) {
-    return new DocumentSymbolQuery(params, this, uriDecodeService);
+    return new DocumentSymbolQuery(params, this);
   }
 
   /**
@@ -82,7 +79,7 @@ public class DocumentSymbolHandler {
    * @return list of {@link LspEventDependency}
    */
   public List<LspEventDependency> getDependencies(DocumentSymbolParams params) {
-    String uri = uriDecodeService.decode(params.getTextDocument().getUri());
+    String uri = params.getTextDocument().getUri();
     return ImmutableList.of(
             asyncAnalysisService.createDependencyOn(uri),
             () -> documentModelService.get(uri) != null && ((documentModelService.get(uri).getOutlineResult() != null
@@ -96,7 +93,7 @@ public class DocumentSymbolHandler {
    * @return list of {@link LspEventCancelCondition
    */
   public List<LspEventCancelCondition> getCancelDependencies(DocumentSymbolParams params) {
-    String uri = uriDecodeService.decode(params.getTextDocument().getUri());
+    String uri = params.getTextDocument().getUri();
     return ImmutableList.of(
             asyncAnalysisService.createCancelConditionOnClose(uri));
   }
