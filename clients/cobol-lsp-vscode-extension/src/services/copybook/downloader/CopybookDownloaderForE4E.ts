@@ -12,7 +12,6 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 import * as vscode from "vscode";
-// import * as fs from "node:fs";
 import * as Path from "node:path";
 import {
   EndevorElement,

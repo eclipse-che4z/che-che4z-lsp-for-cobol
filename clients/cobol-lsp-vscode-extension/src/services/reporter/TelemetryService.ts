@@ -51,15 +51,17 @@ export class TelemetryService {
     telemetryMeasurement?: TelemetryEventMeasurements,
   ): void {
     if (this.isValidEventName(eventName)) {
-      TelemetryFactory.getReporter().reportEvent(
-        this.createTelemetryEvent(
-          eventName,
-          categories!,
-          notes!,
-          undefined,
-          telemetryMeasurement,
-        ),
-      );
+      TelemetryFactory.getReporter().then((result: any) => {
+        result.reportEvent(
+          this.createTelemetryEvent(
+            eventName,
+            categories!,
+            notes!,
+            undefined,
+            telemetryMeasurement,
+          ),
+        );
+      });
     }
   }
 
@@ -80,15 +82,17 @@ export class TelemetryService {
     telemetryMeasurement?: TelemetryEventMeasurements,
   ): void {
     if (this.isValidEventName(eventName) && this.isValidRootCause(rootCause)) {
-      TelemetryFactory.getReporter().reportExceptionEvent(
-        this.createTelemetryEvent(
-          eventName,
-          categories!,
-          notes!,
-          this.anonymizeContent(rootCause),
-          telemetryMeasurement,
-        ),
-      );
+      TelemetryFactory.getReporter().then((result: any) => {
+        result.reportExceptionEvent(
+          this.createTelemetryEvent(
+            eventName,
+            categories!,
+            notes!,
+            this.anonymizeContent(rootCause),
+            telemetryMeasurement,
+          ),
+        );
+      });
     }
   }
 

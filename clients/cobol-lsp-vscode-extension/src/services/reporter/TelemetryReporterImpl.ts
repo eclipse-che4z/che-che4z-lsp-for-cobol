@@ -11,7 +11,6 @@
  * Contributors:
  *   Broadcom, Inc. - initial API and implementation
  */
-import * as fs1 from "fs";
 import * as path from "path";
 import * as vscode from "vscode";
 import TelemetryReporter from "@vscode/extension-telemetry";
@@ -24,10 +23,10 @@ import { TelemetryReport } from "./TelemetryReport";
 import * as fs from "../util/FSWrapper";
 
 export class TelemetryReporterImpl implements TelemetryReport {
-  public static getInstance(): TelemetryReporterImpl {
+  public static async getInstance(): Promise<TelemetryReporterImpl> {
     if (!TelemetryReporterImpl.instance) {
       TelemetryReporterImpl.instance = new TelemetryReporterImpl(
-        this.getTelemetryKeyId(),
+        await this.getTelemetryKeyId(),
       );
     }
     return TelemetryReporterImpl.instance;
@@ -40,8 +39,8 @@ export class TelemetryReporterImpl implements TelemetryReport {
    * external file configuration. If the file doesn't exists it returns a generic value that will not be valid
    * for collect telemetry event.
    */
-  private static getTelemetryKeyId(): string {
-    return fs.existsSync(this.getTelemetryResourcePath())
+  private static async getTelemetryKeyId(): Promise<string> {
+    return fs.existsSync(await this.getTelemetryResourcePath())
       ? this.getInstrumentationKey()
       : TELEMETRY_DEFAULT_CONTENT;
   }
@@ -52,9 +51,9 @@ export class TelemetryReporterImpl implements TelemetryReport {
       .fsPath;
   }
 
-  private static getInstrumentationKey(): string {
+  private static async getInstrumentationKey(): Promise<string> {
     return Buffer.from(
-      fs1.readFileSync(this.getTelemetryResourcePath(), "utf8"),
+      await fs.readFileAsync(this.getTelemetryResourcePath(), "utf8"),
       "base64",
     )
       .toString()
