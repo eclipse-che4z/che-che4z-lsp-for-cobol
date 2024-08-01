@@ -16,6 +16,7 @@ import { globSync, hasMagic } from "glob";
 import { Uri } from "vscode";
 import * as vscode from "vscode";
 import { Utils } from "./Utils";
+import * as fs from "./FSWrapper";
 
 /**
  * This method scans the list of folders as given input and find the required entity name within the folder.
@@ -36,7 +37,7 @@ export function searchCopybookInExtensionFolder(
     for (const ext of extensions) {
       const searchResult = globSearch(extensionFolder, p, copybookName, ext);
       if (searchResult) {
-        return searchResult;
+        return vscode.Uri.file(searchResult).toString();
       }
     }
   }
@@ -99,7 +100,7 @@ function globSearch(
     dot: true,
   });
   // TODO report the case with more then one copybook fit the pattern.
-  return result[0] ? resourcePath.fsPath + result[0] : undefined;
+  return result[0] ? fs.join(cwd, result[0]) : undefined;
 }
 
 export function getProgramNameFromUri(
