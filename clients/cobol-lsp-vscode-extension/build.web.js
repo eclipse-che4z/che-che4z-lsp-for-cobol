@@ -73,11 +73,15 @@ async function main() {
     outdir: "dist/web",
     external: [
       "vscode",
-      "node:events",
-      "node:stream",
       "node:net",
       "node:child_process",
       "glob",
+      // "node:path",
+      // "node:os",
+      // "node:fs",
+      // "node:events",
+      // "node:stream",
+      // "node:string_decoder",
     ],
     logLevel: "silent",
     // Node.js global to browser globalThis
