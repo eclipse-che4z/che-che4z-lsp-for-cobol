@@ -11,6 +11,7 @@
  * Contributors:
  *   Broadcom, Inc. - initial API and implementation
  */
+import * as path from "node:path";
 import { Minimatch } from "minimatch";
 import { SettingsUtils } from "./util/SettingsUtils";
 import { globSync } from "glob";
