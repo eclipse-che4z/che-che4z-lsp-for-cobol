@@ -28,20 +28,19 @@ beforeAll(() => {
 jest.mock("vscode", () => ({
   Uri: {
     parse: jest.fn().mockImplementation((str: string) => {
-      str = str.replace(/\\/g, "/");
-      const fsPath = str.substring("file://".length);
-      const path = (str.startsWith("/") ? "" : "/") + fsPath;
+      const fsPath = str.substring("file://".length).replace(/\//g, path.sep);
+      const p =
+        (str.startsWith("/") ? "" : "/") + str.substring("file://".length);
       return {
-        path,
-        fsPath,
+        path: p,
+        fsPath: process.platform === "win32" ? fsPath.substring(1) : fsPath,
       };
     }),
     joinPath: (u: any, segment: string) => {
       expect(segment).toBe("..");
-      const path = u.path;
       return {
-        path: path.substring(0, path.lastIndexOf("/")),
-        fsPath: path.substring(0, path.lastIndexOf("/")),
+        path: u.path.substring(0, u.path.lastIndexOf("/")),
+        fsPath: u.fsPath.substring(0, u.fsPath.lastIndexOf(path.sep)),
       };
     },
   },
@@ -110,6 +109,28 @@ describe("SettingsService evaluate variables", () => {
       "COBOL",
     );
     expect(paths[0]).toEqual(makefsPath("/tmp-ws/copybook/program.file"));
+  });
+
+  test("Evaluate fileDirname", () => {
+    vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
+      get: jest.fn().mockReturnValue(["${fileDirname}/copybooks"]),
+    });
+    const paths = SettingsService.getCopybookLocalPath(
+      "file://" + makePath("/toplevel/program"),
+      "COBOL",
+    );
+    expect(paths[0]).toEqual(makefsPath("/toplevel") + "/copybooks");
+  });
+
+  test("Evaluate fileDirnameBasename", () => {
+    vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
+      get: jest.fn().mockReturnValue(["${fileDirnameBasename}/copybooks"]),
+    });
+    const paths = SettingsService.getCopybookLocalPath(
+      "file:///toplevel/program",
+      "COBOL",
+    );
+    expect(paths[0]).toEqual(makefsPath("/tmp-ws/toplevel/copybooks"));
   });
 
   test("Get local settings for a dialect", () => {
