@@ -23,7 +23,8 @@ export async function writeFile(file: string, content: string) {
 export function join(...paths: string[]): string {
   if (paths.length > 0) {
     const base = paths.shift()!;
-    return vscode.Uri.joinPath(vscode.Uri.file(base), ...paths).fsPath;
+    const result = vscode.Uri.joinPath(vscode.Uri.file(base), ...paths).fsPath;
+    return result;
   }
   return "";
 }
@@ -46,7 +47,10 @@ export async function readFileAsync(
 }
 
 function isWindows() {
-  return window.navigator.userAgent.indexOf("Win") != -1;
+  return false;
+
+  //TODO: Find a solid way to determin os
+  // return window.navigator.userAgent.indexOf("Win") != -1;
 }
 
 export function getPathSeparator() {
@@ -54,9 +58,14 @@ export function getPathSeparator() {
   else return "/";
 }
 
-// Low fidelity to check if path is abolute based off the first directory entry of process.cwd is common
+// Low fidelity to check if path is abolute based off the first directory entry of process.env[HOME] is common
 export function isAbsolute(path: string): boolean {
-  return path.includes(process.cwd().split(getPathSeparator())[0]);
+  const refPath = process.env["HOME"] ? process.env["HOME"] : "";
+  // TODO revice attempt to compare paths agnostic of os style path being queried
+  // const sep = getPathSeparator();
+  // const chunks = refPath.split(getPathSeparator());
+  const result = path.includes(refPath);
+  return result;
 }
 
 //Assumes both paths have atleast one common node
@@ -75,5 +84,7 @@ export function relative(path1: string, path2: string): string {
   // Populate the reverse paths if there are any
   const reverse = new Array(pathOneChunks.length).fill("..");
 
-  return reverse.concat(pathTwoChunks).join(getPathSeparator());
+  const result = reverse.concat(pathTwoChunks).join(getPathSeparator());
+
+  return result;
 }

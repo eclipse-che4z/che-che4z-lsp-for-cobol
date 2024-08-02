@@ -13,6 +13,7 @@
  */
 
 // import * as path from "node:path";
+import * as fs from "./util/FSWrapper";
 import * as vscode from "vscode";
 import {
   COPYBOOK_EXTENSIONS,
@@ -47,7 +48,6 @@ import {
 } from "./ProcessorGroups";
 import { getProgramNameFromUri } from "./util/FSUtils";
 import { SettingsUtils } from "./util/SettingsUtils";
-import * as fs from "./util/FSWrapper";
 
 export class TabRule {
   // tslint:disable-next-line:no-unnecessary-initializer

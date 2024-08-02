@@ -93,7 +93,7 @@
         "--runTestsByPath",
         "${jest.testFile}"
       ],
-      "cwd": "/Users/cm898306broadcom.net/git/che-che4z-lsp-for-cobol/clients/cobol-lsp-vscode-extension",
+      "cwd": "${workspaceFolder}",
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
       "disableOptimisticBPs": true,

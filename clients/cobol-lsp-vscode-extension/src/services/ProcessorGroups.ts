@@ -11,7 +11,8 @@
  * Contributors:
  *   Broadcom, Inc. - initial API and implementation
  */
-// import * as path from "node:path";
+import * as path from "node:path";
+import * as fs1 from "fs";
 import { Minimatch } from "minimatch";
 import { SettingsUtils } from "./util/SettingsUtils";
 import { globSync } from "glob";
@@ -218,12 +219,20 @@ function loadProcessorsConfig(
   if (!fs.existsSync(procCfgPath) && !fs.existsSync(pgmCfgPath)) {
     return undefined;
   }
-  const procCfg: ProcessorsConfig = JSON.parse(
-    vscode.workspace.fs.readFile(vscode.Uri.file(procCfgPath)).toString(),
-  );
-  const pgmCfg: ProgramsConfig = JSON.parse(
-    vscode.workspace.fs.readFile(vscode.Uri.file(pgmCfgPath)).toString(),
-  );
+
+  const procCfgFileString = vscode.workspace.fs
+    .readFile(vscode.Uri.file(procCfgPath))
+    .toString();
+  const procCfgFileStringOld = fs1.readFileSync(procCfgPath).toString();
+
+  const procCfg: ProcessorsConfig = JSON.parse(procCfgFileStringOld);
+
+  const prgmCfgFileString = vscode.workspace.fs
+    .readFile(vscode.Uri.file(pgmCfgPath))
+    .toString();
+  const prgmCfgFileStringOld = fs1.readFileSync(pgmCfgPath).toString();
+  const pgmCfg: ProgramsConfig = JSON.parse(prgmCfgFileStringOld);
+
   const pgroup = matchProcessorGroup(pgmCfg, documentPath, ws[0]);
 
   let result;
