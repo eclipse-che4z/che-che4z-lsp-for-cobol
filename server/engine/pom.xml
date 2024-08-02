@@ -347,13 +347,6 @@
                         </goals>
                         <configuration>
                             <generateTestSources>true</generateTestSources>
-                            <arguments>
-                                <argument>-package</argument>
-                                <argument>org.eclipse.usecase</argument>
-                                <argument>-o</argument>
-                                <argument>${basedir}/target/generated-sources/antlr4/org/eclipse/usecase</argument>
-                            </arguments>
-                            <sourceDirectory>src/test/antlr4/org/eclipse/usecase</sourceDirectory>
                             <listener>true</listener>
                             <visitor>false</visitor>
                         </configuration>
@@ -365,53 +358,7 @@
                             <goal>antlr4</goal>
                         </goals>
                         <configuration>
-                            <arguments>
-                                <argument>-package</argument>
-                                <argument>org.eclipse.lsp.cobol.core</argument>
-                                <argument>-o</argument>
-                                <argument>${project.build.directory}/generated-sources/antlr4/org/eclipse/lsp/cobol/core</argument>
-                            </arguments>
-                            <sourceDirectory>src/main/antlr4/org/eclipse/lsp/cobol/core/parser</sourceDirectory>
-                            <listener>true</listener>
-                            <visitor>true</visitor>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>run cics antlr</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>antlr4</goal>
-                        </goals>
-                        <configuration>
-                            <arguments>
-                                <argument>-package</argument>
-                                <argument>org.eclipse.lsp.cobol.implicitDialects.cics</argument>
-                                <argument>-o</argument>
-                                <argument>
-                                    ${project.build.directory}/generated-sources/antlr4/org/eclipse/lsp/cobol/implicitDialects/cics
-                                </argument>
-                            </arguments>
-                            <sourceDirectory>src/main/antlr4/org/eclipse/lsp/cics/parser</sourceDirectory>
-                            <listener>true</listener>
-                            <visitor>true</visitor>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>run sql antlr</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>antlr4</goal>
-                        </goals>
-                        <configuration>
-                            <arguments>
-                                <argument>-package</argument>
-                                <argument>org.eclipse.lsp.cobol.implicitDialects.sql</argument>
-                                <argument>-o</argument>
-                                <argument>
-                                    ${project.build.directory}/generated-sources/antlr4/org/eclipse/lsp/cobol/implicitDialects/sql
-                                </argument>
-                            </arguments>
-                            <sourceDirectory>src/main/antlr4/org/eclipse/lsp/db2/parser</sourceDirectory>
+                            <libDirectory>src/main/antlr4/org/eclipse/lsp/cobol/core</libDirectory>
                             <listener>true</listener>
                             <visitor>true</visitor>
                         </configuration>
