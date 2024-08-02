@@ -11,12 +11,14 @@
  * Contributors:
  *   Broadcom, Inc. - initial API and implementation
  */
-import * as path from "node:path";
+// import * as path from "node:path";
 import { COPYBOOKS_FOLDER, ZOWE_FOLDER } from "../../constants";
 import { SettingsService } from "../Settings";
 import { ProfileUtils } from "../util/ProfileUtils";
 import { EndevorType, ResolvedProfile } from "../../type/e4eApi.d";
 import { Utils } from "../util/Utils";
+
+import * as fs from "../util/FSWrapper";
 
 /**
  * This class is responsible to identify from which source resolve copybooks required by the server.
@@ -28,14 +30,14 @@ export class CopybookURI {
     copybook: string,
     downloadFolder: string,
   ): string {
-    const copybookDirPath = path.join(
+    const copybookDirPath = fs.join(
       downloadFolder,
       ZOWE_FOLDER,
       COPYBOOKS_FOLDER,
       profileName,
       dataset,
     );
-    return path.join(copybookDirPath, copybook);
+    return fs.join(copybookDirPath, copybook);
   }
 
   public static createDatasetPath(
@@ -44,7 +46,7 @@ export class CopybookURI {
     downloadFolder: string,
     source: string = ZOWE_FOLDER,
   ): string {
-    return path.join(
+    return fs.join(
       downloadFolder,
       source,
       COPYBOOKS_FOLDER,
@@ -79,7 +81,7 @@ export class CopybookURI {
       result = Object.assign([], datasets);
       result.forEach(
         (value, index) =>
-          (result[index] = path.join(downloadFolder, profile, value)),
+          (result[index] = fs.join(downloadFolder, profile, value)),
       );
     }
 
@@ -91,18 +93,14 @@ export class CopybookURI {
     if (profile && ussPaths) {
       Object.assign([], ussPaths).forEach(
         (value, index) =>
-          (result[index + baseIndex] = path.join(
-            downloadFolder,
-            profile,
-            value,
-          )),
+          (result[index + baseIndex] = fs.join(downloadFolder, profile, value)),
       );
     }
     return result;
   }
 
   public static getEnviromentPath(type: EndevorType, profile: ResolvedProfile) {
-    return path.join(
+    return fs.join(
       Utils.profileAsString(profile),
       type.environment,
       type.stage,

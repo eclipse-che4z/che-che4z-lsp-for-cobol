@@ -12,7 +12,7 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
-import * as path from "node:path";
+// import * as path from "node:path";
 import * as vscode from "vscode";
 import {
   COPYBOOK_EXTENSIONS,
@@ -47,6 +47,7 @@ import {
 } from "./ProcessorGroups";
 import { getProgramNameFromUri } from "./util/FSUtils";
 import { SettingsUtils } from "./util/SettingsUtils";
+import * as fs from "./util/FSWrapper";
 
 export class TabRule {
   // tslint:disable-next-line:no-unnecessary-initializer
@@ -355,10 +356,10 @@ export class SettingsService {
   ): string[] {
     const result = [];
     for (const p of paths) {
-      if (path.isAbsolute(p)) result.push(p);
+      if (fs.isAbsolute(p)) result.push(p);
       else
         wsFolders.forEach((wsFolder) => {
-          result.push(path.join(wsFolder, p));
+          result.push(fs.join(wsFolder, p));
         });
     }
     return result;

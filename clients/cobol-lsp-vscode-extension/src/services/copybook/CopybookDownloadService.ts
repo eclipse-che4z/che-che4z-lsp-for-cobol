@@ -29,7 +29,8 @@ import { SettingsService } from "../Settings";
 import { searchCopybook } from "./CopybookMessageHandler";
 import { searchCopybookInExtensionFolder } from "../util/FSUtils";
 import { CopybookURI } from "./CopybookURI";
-import path = require("node:path");
+// import path = require("node:path");
+import * as fs from "../util/FSWrapper";
 
 export class CopybookName {
   constructor(public name: string, public dialect: string) {}
@@ -160,7 +161,7 @@ export class CopybookDownloadService {
       CopybookURI.createPathForCopybookDownloaded(
         documentUri,
         dialectType,
-        path.join(this.storagePath, ZOWE_FOLDER, COPYBOOKS_FOLDER),
+        fs.join(this.storagePath, ZOWE_FOLDER, COPYBOOKS_FOLDER),
         this.explorerApi,
       ),
       SettingsService.getCopybookExtension(documentUri),

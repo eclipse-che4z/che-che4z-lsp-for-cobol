@@ -12,9 +12,11 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
-import { join } from "node:path";
+// import { join } from "node:path";
 import { Executable } from "vscode-languageclient/node";
 import { NativeLanguageClient } from "./nativelanguageClientInterface";
+
+import { join } from "../util/FSWrapper";
 
 export class MacosLanguageClient implements NativeLanguageClient {
   private readonly executablePath: string;

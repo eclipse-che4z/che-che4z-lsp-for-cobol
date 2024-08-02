@@ -5,8 +5,7 @@ export function existsSync(path: string): boolean {
   try {
     vscode.workspace.fs.stat(vscode.Uri.file(path));
     pathExists = true;
-  } catch (e: any) {
-    console.log(e.message);
+  } catch {
     pathExists = false;
   }
   return pathExists;

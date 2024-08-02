@@ -11,13 +11,15 @@
  * Contributors:
  *   Broadcom, Inc. - initial API and implementation
  */
-import { sep } from "node:path";
+// import { sep } from "node:path";
 import {
   TelemetryEvent,
   TelemetryEventMeasurements,
 } from "./model/TelemetryEvent";
 import { TelemetryFactory } from "./TelemetryFactory";
 import { Utils } from "../util/Utils";
+
+import { getPathSeparator } from "../util/FSWrapper";
 
 export class TelemetryService {
   /**
@@ -130,8 +132,8 @@ export class TelemetryService {
    */
   private static anonymizeContent(content: string): string {
     return content.replace(
-      new RegExp("\\" + sep + this.getUsername(), "g"),
-      sep + "anonymous",
+      new RegExp("\\" + getPathSeparator() + this.getUsername(), "g"),
+      getPathSeparator() + "anonymous",
     );
   }
 

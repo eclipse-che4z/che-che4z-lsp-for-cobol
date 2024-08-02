@@ -12,7 +12,7 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 import * as vscode from "vscode";
-import * as Path from "node:path";
+// import * as Path from "node:path";
 import {
   EndevorElement,
   EndevorMember,
@@ -258,7 +258,7 @@ export class CopybookDownloaderForE4E {
 
     if (!fs.existsSync(folder)) fs.mkdirSync(folder, { recursive: true });
 
-    folder = Path.join(
+    folder = fs.join(
       folder,
       copybook.substring(
         0,
