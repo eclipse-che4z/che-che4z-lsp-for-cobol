@@ -65,34 +65,34 @@ describe("SettingsService evaluate variables", () => {
       },
     ];
   });
-  test("Evaluate fileBasenameNoExtension", () => {
+  test("Evaluate fileBasenameNoExtension", async () => {
     vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
       get: jest.fn().mockReturnValue(["copybook/${fileBasenameNoExtension}"]),
     });
-    const paths = SettingsService.getCopybookLocalPath(
+    const paths = await SettingsService.getCopybookLocalPath(
       "file:///program",
       "COBOL",
     );
     expect(paths[0]).toEqual(makefsPath("/tmp-ws/copybook/program"));
   });
 
-  test("Evaluate fileBasenameNoExtension", () => {
+  test("Evaluate fileBasenameNoExtension", async () => {
     vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
       get: jest.fn().mockReturnValue(["copybook/${fileBasenameNoExtension}"]),
     });
-    const paths = SettingsService.getCopybookLocalPath(
+    const paths = await SettingsService.getCopybookLocalPath(
       "file:///program.cbl",
       "COBOL",
     );
     expect(paths[0]).toEqual(makefsPath("/tmp-ws/copybook/program"));
   });
 
-  test("Evaluate fileBasenameNoExtension with extension and dots", () => {
+  test("Evaluate fileBasenameNoExtension with extension and dots", async () => {
     vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
       get: jest.fn().mockReturnValue(["copybook/${fileBasenameNoExtension}"]),
     });
 
-    const paths = SettingsService.getCopybookLocalPath(
+    const paths = await SettingsService.getCopybookLocalPath(
       "file:///program.file.cbl",
       "COBOL",
     );

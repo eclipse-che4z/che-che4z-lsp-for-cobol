@@ -33,13 +33,16 @@ export async function searchCopybook(
 
   for (let i = 0; i < Object.values(CopybookFolderKind).length; i++) {
     const folderKind = Object.values(CopybookFolderKind)[i];
-    const targetFolder = getTargetFolderForCopybook(
+    const targetFolder = await getTargetFolderForCopybook(
       folderKind,
       documentUri,
       dialectType,
       storagePath,
     );
-    const allowedExtensions = resolveAllowedExtensions(folderKind, documentUri);
+    const allowedExtensions = await resolveAllowedExtensions(
+      folderKind,
+      documentUri,
+    );
     result = searchCopybookInExtensionFolder(
       copybookName,
       targetFolder,
@@ -53,7 +56,7 @@ export async function searchCopybook(
   return result;
 }
 
-function getTargetFolderForCopybook(
+async function getTargetFolderForCopybook(
   folderKind: string | CopybookFolderKind,
   documentUri: string,
   dialectType: string,
@@ -63,7 +66,10 @@ function getTargetFolderForCopybook(
   const profile = SettingsService.getProfileName()!;
   switch (folderKind) {
     case CopybookFolderKind[CopybookFolderKind.local]:
-      result = SettingsService.getCopybookLocalPath(documentUri, dialectType);
+      result = await SettingsService.getCopybookLocalPath(
+        documentUri,
+        dialectType,
+      );
       break;
     case CopybookFolderKind[CopybookFolderKind["downloaded-dsn"]]:
       result = SettingsService.getDsnPath(documentUri, dialectType).map(

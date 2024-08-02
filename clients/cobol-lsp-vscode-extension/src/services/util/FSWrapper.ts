@@ -1,9 +1,9 @@
 import * as vscode from "vscode";
 
-export function existsSync(path: string): boolean {
+export async function existsAsync(path: string): Promise<boolean> {
   var pathExists: boolean;
   try {
-    vscode.workspace.fs.stat(vscode.Uri.file(path));
+    const info = await vscode.workspace.fs.stat(vscode.Uri.file(path));
     pathExists = true;
   } catch {
     pathExists = false;
@@ -35,8 +35,9 @@ export function mkdirSync(folder: string, options?: any) {
 
 export async function readFileAsync(
   path: string,
-  contentType: string,
+  contentType?: string,
 ): Promise<string> {
+  if (!contentType) contentType = "utf-8";
   const decoder = new TextDecoder(contentType);
   const content = await vscode.workspace.fs
     .readFile(vscode.Uri.file(path))
@@ -61,7 +62,7 @@ export function getPathSeparator() {
 // Low fidelity to check if path is abolute based off the first directory entry of process.env[HOME] is common
 export function isAbsolute(path: string): boolean {
   const refPath = process.env["HOME"] ? process.env["HOME"] : "";
-  // TODO revice attempt to compare paths agnostic of os style path being queried
+  // TODO: revise attempt to compare paths agnostic of os style path being queried
   // const sep = getPathSeparator();
   // const chunks = refPath.split(getPathSeparator());
   const result = path.includes(refPath);

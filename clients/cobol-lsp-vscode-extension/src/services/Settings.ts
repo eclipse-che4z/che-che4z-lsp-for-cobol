@@ -146,11 +146,14 @@ export class SettingsService {
    * @param dialectType name of the cobol dialect type
    * @returns a list of local path
    */
-  public static getCopybookLocalPath(
+  public static async getCopybookLocalPath(
     documentUri: string,
     dialectType: string,
-  ): string[] {
-    const pgPaths = loadProcessorGroupCopybookPaths(documentUri, dialectType);
+  ): Promise<string[]> {
+    const pgPaths = await loadProcessorGroupCopybookPaths(
+      documentUri,
+      dialectType,
+    );
     const cobolFileName = getProgramNameFromUri(documentUri);
     let paths: string[] = [
       ...SettingsService.evaluateVariable(
@@ -169,15 +172,15 @@ export class SettingsService {
     return SettingsService.prepareLocalSearchFolders(paths, wsFolders);
   }
 
-  public static getCopybookExtension(
+  public static async getCopybookExtension(
     documentUri: string,
-  ): string[] | undefined {
+  ): Promise<string[] | undefined> {
     const global: string[] | undefined = vscode.workspace
       .getConfiguration(SETTINGS_CPY_SECTION)
       .get(COPYBOOK_EXTENSIONS);
     return documentUri === undefined
       ? global
-      : loadProcessorGroupCopybookExtensionsConfig(
+      : await loadProcessorGroupCopybookExtensionsConfig(
           { scopeUri: documentUri },
           global!,
         );

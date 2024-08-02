@@ -11,8 +11,6 @@
  * Contributors:
  *   Broadcom, Inc. - initial API and implementation
  */
-import * as path from "node:path";
-import * as fs1 from "fs";
 import { Minimatch } from "minimatch";
 import { SettingsUtils } from "./util/SettingsUtils";
 import { globSync } from "glob";
@@ -29,10 +27,10 @@ const PROCESSOR_GROUP_FOLDER = ".cobolplugin";
 const PROCESSOR_GROUP_PGM = "pgm_conf.json";
 const PROCESSOR_GROUP_PROC = "proc_grps.json";
 
-export function loadProcessorGroupCopybookPaths(
+export async function loadProcessorGroupCopybookPaths(
   documentUri: string,
   dialectType: string,
-): string[] {
+): Promise<string[]> {
   return loadProcessorGroupSettings(
     documentUri,
     "libs",
@@ -41,12 +39,16 @@ export function loadProcessorGroupCopybookPaths(
   );
 }
 
-export function loadProcessorGroupCopybookPathsConfig(
+export async function loadProcessorGroupCopybookPathsConfig(
   item: { scopeUri: string },
   configObject: string[],
-): string[] {
+): Promise<string[]> {
   const config = [
-    ...loadProcessorGroupSettings(item.scopeUri, "libs", [] as string[]),
+    ...(await loadProcessorGroupSettings(
+      item.scopeUri,
+      "libs",
+      [] as string[],
+    )),
     ...configObject,
   ];
   return SettingsUtils.getWorkspaceFoldersPath(true)
@@ -61,10 +63,10 @@ export function loadProcessorGroupCopybookPathsConfig(
     }, []);
 }
 
-export function loadProcessorGroupCopybookExtensionsConfig(
+export async function loadProcessorGroupCopybookExtensionsConfig(
   item: { scopeUri: string },
   configObject: string[],
-): string[] {
+): Promise<string[]> {
   return loadProcessorGroupSettings(
     item.scopeUri,
     "copybook-extensions",
@@ -72,10 +74,10 @@ export function loadProcessorGroupCopybookExtensionsConfig(
   );
 }
 
-export function loadProcessorGroupCopybookEncodingConfig(
+export async function loadProcessorGroupCopybookEncodingConfig(
   item: { scopeUri: string },
   configObject: string,
-): string {
+): Promise<string> {
   return loadProcessorGroupSettings(
     item.scopeUri,
     "copybook-file-encoding",
@@ -83,10 +85,10 @@ export function loadProcessorGroupCopybookEncodingConfig(
   );
 }
 
-export function loadProcessorGroupCompileOptionsConfig(
+export async function loadProcessorGroupCompileOptionsConfig(
   item: { scopeUri: string },
   configObject: string,
-): string {
+): Promise<string> {
   return loadProcessorGroupSettings(
     item.scopeUri,
     "compiler-options",
@@ -94,11 +96,11 @@ export function loadProcessorGroupCompileOptionsConfig(
   );
 }
 
-export function loadProcessorGroupSqlBackendConfig(
+export async function loadProcessorGroupSqlBackendConfig(
   item: { scopeUri: string },
   configObject: string,
-): string {
-  return loadProcessorGroupSettings(
+): Promise<string> {
+  return await loadProcessorGroupSettings(
     item.scopeUri,
     "target-sql-backend",
     configObject,
@@ -106,12 +108,12 @@ export function loadProcessorGroupSqlBackendConfig(
   );
 }
 
-export function loadProcessorGroupDialectConfig(
+export async function loadProcessorGroupDialectConfig(
   item: { scopeUri: string; section: string },
   configObject: unknown,
-): unknown {
+): Promise<unknown> {
   try {
-    const pgCfg = loadProcessorsConfig(item.scopeUri);
+    const pgCfg = await loadProcessorsConfig(item.scopeUri);
     if (pgCfg === undefined) {
       return configObject;
     }
@@ -203,9 +205,9 @@ function pathMatches(program: string, documentPath: string) {
     : program.split("/").join(sep).toUpperCase() === documentPath.toUpperCase();
 }
 
-function loadProcessorsConfig(
+async function loadProcessorsConfig(
   documentUri: string,
-): ProcessorConfig | undefined {
+): Promise<ProcessorConfig | undefined> {
   const documentPath = vscode.Uri.parse(documentUri).fsPath;
   const ws = SettingsUtils.getWorkspaceFoldersPath(true);
   if (ws.length < 1) {
@@ -216,22 +218,17 @@ function loadProcessorsConfig(
   const procCfgPath = fs.join(cfgPath, PROCESSOR_GROUP_PROC);
   const pgmCfgPath = fs.join(cfgPath, PROCESSOR_GROUP_PGM);
 
-  if (!fs.existsSync(procCfgPath) && !fs.existsSync(pgmCfgPath)) {
+  if (
+    !(await fs.existsAsync(procCfgPath)) &&
+    !(await fs.existsAsync(pgmCfgPath))
+  ) {
     return undefined;
   }
 
-  const procCfgFileString = vscode.workspace.fs
-    .readFile(vscode.Uri.file(procCfgPath))
-    .toString();
-  const procCfgFileStringOld = fs1.readFileSync(procCfgPath).toString();
-
-  const procCfg: ProcessorsConfig = JSON.parse(procCfgFileStringOld);
-
-  const prgmCfgFileString = vscode.workspace.fs
-    .readFile(vscode.Uri.file(pgmCfgPath))
-    .toString();
-  const prgmCfgFileStringOld = fs1.readFileSync(pgmCfgPath).toString();
-  const pgmCfg: ProgramsConfig = JSON.parse(prgmCfgFileStringOld);
+  const procCfg: ProcessorsConfig = JSON.parse(
+    await fs.readFileAsync(procCfgPath),
+  );
+  const pgmCfg: ProgramsConfig = JSON.parse(await fs.readFileAsync(pgmCfgPath));
 
   const pgroup = matchProcessorGroup(pgmCfg, documentPath, ws[0]);
 
@@ -245,14 +242,16 @@ function loadProcessorsConfig(
   return result;
 }
 
-function loadProcessorGroupSettings<T>(
+async function loadProcessorGroupSettings<T>(
   scopeUri: string,
   atrtibute: string,
   configObject: T,
   dialect: string = "COBOL",
-): T {
+): Promise<T> {
   try {
-    const pgCfg: ProcessorConfig | undefined = loadProcessorsConfig(scopeUri);
+    const pgCfg: ProcessorConfig | undefined = await loadProcessorsConfig(
+      scopeUri,
+    );
     if (pgCfg === undefined) {
       return configObject;
     }

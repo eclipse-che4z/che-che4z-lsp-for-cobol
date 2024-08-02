@@ -39,7 +39,7 @@ export class TelemetryReporterImpl implements TelemetryReport {
    * for collect telemetry event.
    */
   private static async getTelemetryKeyId(): Promise<string> {
-    return fs.existsSync(this.getTelemetryResourcePath())
+    return (await fs.existsAsync(this.getTelemetryResourcePath()))
       ? this.getInstrumentationKey()
       : TELEMETRY_DEFAULT_CONTENT;
   }

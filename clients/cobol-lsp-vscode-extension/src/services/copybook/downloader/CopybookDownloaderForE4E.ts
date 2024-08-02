@@ -189,7 +189,7 @@ export class CopybookDownloaderForE4E {
         element,
         endevorApi.profile,
       );
-      const filePath: string = CopybookDownloaderForE4E.getCopybookPath(
+      const filePath: string = await CopybookDownloaderForE4E.getCopybookPath(
         instance,
         use_map,
         this.storagePath,
@@ -219,7 +219,7 @@ export class CopybookDownloaderForE4E {
   ): Promise<boolean> {
     try {
       const instance = Utils.profileAsString(endevorApi.profile);
-      const filePath: string = CopybookDownloaderForE4E.getCopybookPath(
+      const filePath: string = await CopybookDownloaderForE4E.getCopybookPath(
         instance,
         member.dataset,
         this.storagePath,
@@ -243,12 +243,12 @@ export class CopybookDownloaderForE4E {
     return false;
   }
 
-  private static getCopybookPath(
+  private static async getCopybookPath(
     instance: string,
     mapped: string,
     downloadFolder: string,
     copybook: string,
-  ): string {
+  ): Promise<string> {
     let folder = CopybookURI.createDatasetPath(
       instance,
       mapped,
@@ -256,7 +256,8 @@ export class CopybookDownloaderForE4E {
       E4E_FOLDER,
     );
 
-    if (!fs.existsSync(folder)) fs.mkdirSync(folder, { recursive: true });
+    if (!(await fs.existsAsync(folder)))
+      fs.mkdirSync(folder, { recursive: true });
 
     folder = fs.join(
       folder,

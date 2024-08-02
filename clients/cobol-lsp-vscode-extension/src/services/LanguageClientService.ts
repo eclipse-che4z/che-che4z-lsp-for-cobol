@@ -69,7 +69,10 @@ export class LanguageClientService {
   public async checkPrerequisites(): Promise<void> {
     await new JavaCheck().isJavaInstalled();
 
-    if (!SettingsService.getLspPort() && !fs.existsSync(this.executablePath)) {
+    if (
+      !SettingsService.getLspPort() &&
+      !(await fs.existsAsync(this.executablePath))
+    ) {
       throw new Error("LSP server for " + LANGUAGE_ID + " not found");
     }
   }
