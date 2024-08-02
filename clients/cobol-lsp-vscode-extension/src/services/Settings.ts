@@ -45,7 +45,7 @@ import {
   loadProcessorGroupDialectConfig,
   loadProcessorGroupSqlBackendConfig,
 } from "./ProcessorGroups";
-import { getProgramNameFromUri, SupportedVariables } from "./util/FSUtils";
+import { getVariablesFromUri, SupportedVariables } from "./util/FSUtils";
 import { SettingsUtils } from "./util/SettingsUtils";
 
 export class TabRule {
@@ -150,7 +150,7 @@ export class SettingsService {
     dialectType: string,
   ): string[] {
     const pgPaths = loadProcessorGroupCopybookPaths(documentUri, dialectType);
-    const vars = getProgramNameFromUri(documentUri);
+    const vars = getVariablesFromUri(documentUri);
     const paths: string[] = [
       ...SettingsService.evaluateVariables(pgPaths, vars),
       ...SettingsService.getCopybookConfigValues(
@@ -324,7 +324,7 @@ export class SettingsService {
     documentUri: string,
     dialectType: string,
   ) {
-    const vars = getProgramNameFromUri(documentUri);
+    const vars = getVariablesFromUri(documentUri);
     if (dialectType !== SettingsService.DEFAULT_DIALECT) {
       const pathList: string[] | undefined = vscode.workspace
         .getConfiguration(SETTINGS_CPY_SECTION)

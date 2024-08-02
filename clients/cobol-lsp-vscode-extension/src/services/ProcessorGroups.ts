@@ -21,7 +21,7 @@ import { Uri } from "vscode";
 import {
   backwardSlashRegex,
   cleanWorkspaceFolderName,
-  getProgramNameFromUri,
+  getVariablesFromUri,
   normalizePath,
 } from "./util/FSUtils";
 import { SettingsService } from "./Settings";
@@ -51,7 +51,7 @@ export function loadProcessorGroupCopybookPathsConfig(
       ...loadProcessorGroupSettings(item.scopeUri, "libs", [] as string[]),
       ...configObject,
     ],
-    getProgramNameFromUri(item.scopeUri, false),
+    getVariablesFromUri(item.scopeUri, false),
   );
   return SettingsUtils.getWorkspaceFoldersPath(true)
     .map((folder) =>

@@ -99,7 +99,7 @@ export type SupportedVariables = {
   dirBasename: string;
 };
 
-export function getProgramNameFromUri(
+export function getVariablesFromUri(
   uri: string,
   includeExt: boolean = false,
 ): SupportedVariables {
