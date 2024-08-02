@@ -109,7 +109,7 @@ export function getProgramNameFromUri(
   const dot = file.lastIndexOf(".");
 
   return {
-    filename: includeExt || dot == 0 ? file : file.substring(0, dot),
+    filename: includeExt || dot <= 0 ? file : file.substring(0, dot),
     dirName: p.fsPath,
     dirBasename: p.path.substring(p.path.lastIndexOf("/") + 1),
   };

@@ -32,17 +32,37 @@ const CPY_FOLDER_NAME = ".cobcopy";
 const RELATIVE_CPY_FOLDER_NAME = "../relativeCobcopy";
 const folderPath = path.join(__dirname, CPY_FOLDER_NAME);
 
+// TODO: This is horrifying
 jest.mock("vscode", () => ({
   Uri: {
     parse: jest.fn().mockImplementation((str: string) => {
+      str = str.substring("file://".length);
       return {
-        fsPath: str.substring("file://".length),
+        path: str.substring(str.indexOf("/")),
+        fsPath: str,
+        toString() {
+          return "file://" + this.path;
+        },
       };
     }),
+    joinPath: jest.fn().mockImplementation((u, segment: string) => {
+      expect(segment).toBe("..");
+      const result = { ...u };
+
+      result.path = result.path.substring(0, result.path.lastIndexOf("/"));
+      result.fsPath = result.fsPath.substring(0, result.path.lastIndexOf("/"));
+
+      return result;
+    }),
+
     file: jest.fn().mockImplementation((str: string) => {
+      const path = str.startsWith("/") ? str : "/" + str;
       return {
+        path,
         fsPath: str,
-        toString: jest.fn().mockReturnValue(str),
+        toString() {
+          return "file://" + this.path;
+        },
       };
     }),
   },
