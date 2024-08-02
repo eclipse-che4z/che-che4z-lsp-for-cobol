@@ -21,8 +21,10 @@ import { Uri } from "vscode";
 import {
   backwardSlashRegex,
   cleanWorkspaceFolderName,
+  getProgramNameFromUri,
   normalizePath,
 } from "./util/FSUtils";
+import { SettingsService } from "./Settings";
 
 const PROCESSOR_GROUP_FOLDER = ".cobolplugin";
 const PROCESSOR_GROUP_PGM = "pgm_conf.json";
@@ -44,15 +46,18 @@ export function loadProcessorGroupCopybookPathsConfig(
   item: { scopeUri: string },
   configObject: string[],
 ): string[] {
-  const config = [
-    ...loadProcessorGroupSettings(item.scopeUri, "libs", [] as string[]),
-    ...configObject,
-  ];
+  const config = SettingsService.evaluateVariables(
+    [
+      ...loadProcessorGroupSettings(item.scopeUri, "libs", [] as string[]),
+      ...configObject,
+    ],
+    getProgramNameFromUri(item.scopeUri, false),
+  );
   return SettingsUtils.getWorkspaceFoldersPath(true)
     .map((folder) =>
       globSync(
         config.map((ele) => ele.replace(backwardSlashRegex, "/")),
-        { cwd: cleanWorkspaceFolderName(folder) },
+        { cwd: cleanWorkspaceFolderName(folder), absolute: true },
       ).map((s) => normalizePath(s)),
     )
     .reduce((acc, curVal) => {

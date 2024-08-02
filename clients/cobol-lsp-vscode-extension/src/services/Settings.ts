@@ -45,7 +45,7 @@ import {
   loadProcessorGroupDialectConfig,
   loadProcessorGroupSqlBackendConfig,
 } from "./ProcessorGroups";
-import { getProgramNameFromUri } from "./util/FSUtils";
+import { getProgramNameFromUri, SupportedVariables } from "./util/FSUtils";
 import { SettingsUtils } from "./util/SettingsUtils";
 
 export class TabRule {
@@ -150,13 +150,9 @@ export class SettingsService {
     dialectType: string,
   ): string[] {
     const pgPaths = loadProcessorGroupCopybookPaths(documentUri, dialectType);
-    const cobolFileName = getProgramNameFromUri(documentUri);
-    let paths: string[] = [
-      ...SettingsService.evaluateVariable(
-        pgPaths,
-        "fileBasenameNoExtension",
-        cobolFileName,
-      ),
+    const vars = getProgramNameFromUri(documentUri);
+    const paths: string[] = [
+      ...SettingsService.evaluateVariables(pgPaths, vars),
       ...SettingsService.getCopybookConfigValues(
         PATHS_LOCAL_KEY,
         documentUri,
@@ -310,18 +306,17 @@ export class SettingsService {
     return vscode.workspace.getConfiguration().get(COBOL_PRGM_LAYOUT);
   }
 
-  private static evaluateVariable(
+  public static evaluateVariables(
     dataList: string[] | undefined,
-    variable: string,
-    value: string,
+    vars: SupportedVariables,
   ): string[] {
-    const result: string[] = [];
-    if (dataList) {
-      dataList.forEach((d) =>
-        result.push(d.replace(`$\{${variable}\}`, value)),
-      );
-    }
-    return result;
+    if (!dataList) return [];
+    return dataList.map((d) =>
+      d
+        .replace("${fileBasenameNoExtension}", vars.filename)
+        .replace("${fileDirname}", vars.dirName)
+        .replace("${fileDirnameBasename}", vars.dirBasename),
+    );
   }
 
   private static getCopybookConfigValues(
@@ -329,25 +324,17 @@ export class SettingsService {
     documentUri: string,
     dialectType: string,
   ) {
-    const programFile = getProgramNameFromUri(documentUri);
+    const vars = getProgramNameFromUri(documentUri);
     if (dialectType !== SettingsService.DEFAULT_DIALECT) {
       const pathList: string[] | undefined = vscode.workspace
         .getConfiguration(SETTINGS_CPY_SECTION)
         .get(`${dialectType.toLowerCase()}.${section}`);
-      return SettingsService.evaluateVariable(
-        pathList,
-        "fileBasenameNoExtension",
-        programFile,
-      );
+      return SettingsService.evaluateVariables(pathList, vars);
     }
     const pathList: string[] | undefined = vscode.workspace
       .getConfiguration(SETTINGS_CPY_SECTION)
       .get(section);
-    return SettingsService.evaluateVariable(
-      pathList,
-      "fileBasenameNoExtension",
-      programFile,
-    );
+    return SettingsService.evaluateVariables(pathList, vars);
   }
   public static prepareLocalSearchFolders(
     paths: string[],

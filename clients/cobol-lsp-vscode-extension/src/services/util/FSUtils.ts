@@ -93,13 +93,24 @@ function globSearch(
     : undefined;
 }
 
+export type SupportedVariables = {
+  filename: string;
+  dirName: string;
+  dirBasename: string;
+};
+
 export function getProgramNameFromUri(
   uri: string,
   includeExt: boolean = false,
-): string {
-  const fullPath = Uri.parse(uri, true).fsPath;
-  if (includeExt) {
-    return path.basename(fullPath);
-  }
-  return path.basename(fullPath, path.extname(fullPath));
+): SupportedVariables {
+  const u = Uri.parse(uri, true);
+  const p = Uri.joinPath(u, "..");
+  const file = u.path.substring(u.path.lastIndexOf("/") + 1);
+  const dot = file.lastIndexOf(".");
+
+  return {
+    filename: includeExt || dot == 0 ? file : file.substring(0, dot),
+    dirName: p.fsPath,
+    dirBasename: p.path.substring(p.path.lastIndexOf("/") + 1),
+  };
 }
