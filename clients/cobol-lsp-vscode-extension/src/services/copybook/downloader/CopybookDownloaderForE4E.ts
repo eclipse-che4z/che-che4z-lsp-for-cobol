@@ -257,7 +257,7 @@ export class CopybookDownloaderForE4E {
     );
 
     if (!(await fs.existsAsync(folder)))
-      fs.mkdirSync(folder, { recursive: true });
+      await fs.mkdirAsync(folder, { recursive: true });
 
     folder = fs.join(
       folder,

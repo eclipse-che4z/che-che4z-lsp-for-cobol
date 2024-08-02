@@ -29,8 +29,8 @@ export function join(...paths: string[]): string {
   return "";
 }
 
-export function mkdirSync(folder: string, options?: any) {
-  vscode.workspace.fs.createDirectory(vscode.Uri.file(folder));
+export async function mkdirAsync(folder: string, options?: any) {
+  await vscode.workspace.fs.createDirectory(vscode.Uri.file(folder));
 }
 
 export async function readFileAsync(
