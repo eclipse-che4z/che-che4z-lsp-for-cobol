@@ -5,7 +5,8 @@ export function existsSync(path: string): boolean {
   try {
     vscode.workspace.fs.stat(vscode.Uri.file(path));
     pathExists = true;
-  } catch {
+  } catch (e: any) {
+    console.log(e.message);
     pathExists = false;
   }
   return pathExists;
@@ -54,15 +55,26 @@ export function getPathSeparator() {
   else return "/";
 }
 
-//TODO: add regex for absolute path validation
+// Low fidelity to check if path is abolute based off the first directory entry of process.cwd is common
 export function isAbsolute(path: string): boolean {
-  var isAbsolute: boolean = false;
+  return path.includes(process.cwd().split(getPathSeparator())[0]);
+}
 
-  try {
-    const abs = new URL(path);
-    isAbsolute = true;
-  } catch {
-    isAbsolute = false;
+//Assumes both paths have atleast one common node
+export function relative(path1: string, path2: string): string {
+  var pathOneChunks = path1.split(getPathSeparator());
+  const pathTwoChunks = path2.split(getPathSeparator());
+
+  // Remove what is common
+  for (const dir of pathOneChunks) {
+    if (pathTwoChunks.includes(dir)) {
+      pathOneChunks.shift();
+      pathTwoChunks.shift();
+    } else break;
   }
-  return isAbsolute;
+
+  // Populate the reverse paths if there are any
+  const reverse = new Array(pathOneChunks.length).fill("..");
+
+  return reverse.concat(pathTwoChunks).join(getPathSeparator());
 }

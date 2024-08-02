@@ -79,6 +79,25 @@
       "env": {},
       "skipFiles": ["<node_internals>/**"],
       "preLaunchTask": "Watch"
+    },
+    {
+      "type": "node",
+      "name": "vscode-jest-tests.v2.cobol-lsp-vscode-extension",
+      "request": "launch",
+      "args": [
+        "test",
+        "--",
+        "--watchAll=false",
+        "--testNamePattern",
+        "${jest.testNamePattern}",
+        "--runTestsByPath",
+        "${jest.testFile}"
+      ],
+      "cwd": "/Users/cm898306broadcom.net/git/che-che4z-lsp-for-cobol/clients/cobol-lsp-vscode-extension",
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "disableOptimisticBPs": true,
+      "runtimeExecutable": "npm"
     }
   ]
 }
