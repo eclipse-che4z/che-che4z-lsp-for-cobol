@@ -313,9 +313,18 @@ export class SettingsService {
     if (!dataList) return [];
     return dataList.map((d) =>
       d
-        .replace("${fileBasenameNoExtension}", vars.filename)
-        .replace("${fileDirname}", vars.dirName)
-        .replace("${fileDirnameBasename}", vars.dirBasename),
+        .replace(/\${fileBasenameNoExtension}/g, vars.filename)
+        .replace(/\${fileDirname}/g, vars.dirName)
+        .replace(/\${fileDirnameBasename}/g, vars.dirBasename)
+        .replace(/\${workspaceFolder(:[^}]+)?}/g, (_, ws) => {
+          if (ws === undefined)
+            return vscode.workspace.workspaceFolders?.[0]?.uri.fsPath ?? "";
+          ws = ws.substring(1);
+          return (
+            vscode.workspace.workspaceFolders?.find((x) => x.name === ws)?.uri
+              .fsPath ?? ""
+          );
+        }),
     );
   }
 

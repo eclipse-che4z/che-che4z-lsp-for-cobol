@@ -133,6 +133,30 @@ describe("SettingsService evaluate variables", () => {
     expect(paths[0]).toEqual(makefsPath("/tmp-ws/toplevel/copybooks"));
   });
 
+  test("Evaluate workspaceFolder", () => {
+    vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
+      get: jest.fn().mockReturnValue(["${workspaceFolder}/copybooks"]),
+    });
+    const paths = SettingsService.getCopybookLocalPath(
+      "file://" + makePath("/toplevel/program"),
+      "COBOL",
+    );
+    expect(paths[0]).toEqual(makefsPath("/tmp-ws") + "/copybooks");
+  });
+
+  test("Evaluate workspaceFolder with name", () => {
+    vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
+      get: jest
+        .fn()
+        .mockReturnValue(["${workspaceFolder:workspace}/copybooks"]),
+    });
+    const paths = SettingsService.getCopybookLocalPath(
+      "file://" + makePath("/toplevel/program"),
+      "COBOL",
+    );
+    expect(paths[0]).toEqual(makefsPath("/tmp-ws") + "/copybooks");
+  });
+
   test("Get local settings for a dialect", () => {
     const tracking = jest.fn().mockReturnValue(["copybook"]);
     vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
