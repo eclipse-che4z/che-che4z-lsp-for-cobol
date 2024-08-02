@@ -61,6 +61,10 @@ export class Uri {
     return result;
   }
   static parse = jest.fn();
+
+  static joinPath(root: Uri, adds: string[]): Uri {
+    return Uri.file(root.toString() + adds.concat());
+  }
 }
 
 export enum ConfigurationTarget {
