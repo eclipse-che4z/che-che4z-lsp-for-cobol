@@ -23,8 +23,7 @@ export async function writeFile(file: string, content: string) {
 export function join(...paths: string[]): string {
   if (paths.length > 0) {
     const base = paths.shift()!;
-    var root = vscode.Uri.file(base);
-    return vscode.Uri.joinPath(root, ...paths).fsPath;
+    return vscode.Uri.joinPath(vscode.Uri.file(base), ...paths).fsPath;
   }
   return "";
 }
@@ -56,6 +55,14 @@ export function getPathSeparator() {
 }
 
 //TODO: add regex for absolute path validation
-export function isAbsolute(path: string) {
-  if (path.startsWith(".")) return false;
+export function isAbsolute(path: string): boolean {
+  var isAbsolute: boolean = false;
+
+  try {
+    const abs = new URL(path);
+    isAbsolute = true;
+  } catch {
+    isAbsolute = false;
+  }
+  return isAbsolute;
 }
