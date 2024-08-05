@@ -48,10 +48,10 @@ export async function readFileAsync(
 }
 
 function isWindows() {
-  return false;
-
-  //TODO: Find a solid way to determin os
-  // return window.navigator.userAgent.indexOf("Win") != -1;
+  // Low fidelity way to determine if windows by using the vscode api UNC path formatting functionality
+  const testPath = "/hello/world";
+  const uri = vscode.Uri.file(testPath);
+  return uri.fsPath.includes("\\");
 }
 
 export function getPathSeparator() {
@@ -62,10 +62,10 @@ export function getPathSeparator() {
 // Low fidelity to check if path is abolute based off the first directory entry of process.env[HOME] is common
 export function isAbsolute(path: string): boolean {
   const refPath = process.env["HOME"] ? process.env["HOME"] : "";
-  // TODO: revise attempt to compare paths agnostic of os style path being queried
-  // const sep = getPathSeparator();
-  // const chunks = refPath.split(getPathSeparator());
-  const result = path.includes(refPath);
+  const refPathUri = vscode.Uri.file(refPath);
+  const targetUri = vscode.Uri.file(path);
+
+  const result = targetUri.fsPath.includes(refPathUri.fsPath);
   return result;
 }
 

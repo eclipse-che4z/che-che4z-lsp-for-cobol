@@ -46,6 +46,8 @@ import { ConfigurationWatcher } from "./services/util/ConfigurationWatcher";
 import { Utils } from "./services/util/Utils";
 import { getE4EAPI } from "./services/copybook/E4ECopybookService";
 
+import * as fs from "./services/util/FSWrapper";
+
 interface __AnalysisApi {
   analysis(uri: string, text: string): Promise<any>;
 }
@@ -322,7 +324,7 @@ function registerCommands(
       "cobol-lsp.open.copybook.internalfolder",
       async () => {
         const copybookFolder = vscode.Uri.file(
-          context.globalStorageUri.fsPath + ZOWE_FOLDER,
+          fs.join(context.globalStorageUri.fsPath, ZOWE_FOLDER),
         );
         try {
           await vscode.workspace.fs.createDirectory(copybookFolder);
