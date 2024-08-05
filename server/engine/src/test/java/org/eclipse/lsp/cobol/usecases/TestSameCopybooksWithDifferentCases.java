@@ -38,9 +38,9 @@ class TestSameCopybooksWithDifferentCases {
 
   private static final String STRUCT1 =
       "       02  {$*PARENT2}.\n"
-          + "           03  {$*CHILD1}         PIC 9   VALUE IS '0'.\n"
-          + "           03  {$*CHILD2}         PIC 9   VALUE IS '1'.\n"
-          + "           03  {$*CHILD3}         PIC 9   VALUE IS '2'.";
+          + "           03  {$*CHILD1}         PIC 9   VALUE IS 0.\n"
+          + "           03  {$*CHILD2}         PIC 9   VALUE IS 1.\n"
+          + "           03  {$*CHILD3}         PIC 9   VALUE IS 2.";
 
   private static final String CPY_NAME = "STRUCT1";
 

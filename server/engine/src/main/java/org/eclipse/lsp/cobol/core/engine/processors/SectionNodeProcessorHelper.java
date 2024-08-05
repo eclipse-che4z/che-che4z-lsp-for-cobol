@@ -122,15 +122,8 @@ public class SectionNodeProcessorHelper {
 
     copybooks.sort(Comparator.comparingInt(c -> c.getLocality().getRange().getStart().getLine()));
 
-    List<CopyNode> allCopybooks =
-        copybooks.stream()
-            .flatMap(Node::getDepthFirstStream)
-            .filter(n -> n.getNodeType() == NodeType.COPY)
-            .map(CopyNode.class::cast)
-            .collect(Collectors.toList());
-
     int index = 0;
-    for (CopyNode copyNode : allCopybooks) {
+    for (CopyNode copyNode : copybooks) {
       index = insertCopybook(variables, index, copyNode);
     }
 
@@ -181,8 +174,7 @@ public class SectionNodeProcessorHelper {
       String variableNodeUri = variable.getLocality().getUri();
       String copybookNodeUri = copyNode.getUri();
       if (variableNodeUri.equals(copybookNodeUri)) {
-        copyNode.addChild(variable);
-        variables.remove(variable);
+        adjustVariableNodeInsideCopyNode(copyNode, variables, i, variable);
         areNodesAdjusted = true;
       } else {
         break;
@@ -191,7 +183,36 @@ public class SectionNodeProcessorHelper {
     return areNodesAdjusted;
   }
 
-  private static boolean canInsertCopyNodeAtIndex(
+  private static void adjustVariableNodeInsideCopyNode(CopyNode copyNode, List<Node> variables, int i, Node variable) {
+      if (variable instanceof VariableDefinitionNode) {
+          int insertIndex;
+          for (insertIndex = 0; insertIndex < copyNode.getChildren().size(); insertIndex++) {
+              Node node = copyNode.getChildren().get(insertIndex);
+              if (node instanceof CopyNode) {
+                  adjustCopyNodeChild((CopyNode) node, variables, i);
+              }
+              Locality copybNodeChildLocality = node.getLocality();
+              Locality variableLocality = variable.getLocality();
+              if (RangeUtils.isBefore(variableLocality.getRange().getStart(), copybNodeChildLocality.getRange().getStart())) {
+                  break;
+              }
+          }
+          if (!isVariableNodeAlreadyPresentIn(copyNode, (VariableDefinitionNode) variable)) {
+              copyNode.addChildAt(insertIndex, variable);
+              variables.remove(variable);
+          }
+      }
+  }
+
+    private static boolean isVariableNodeAlreadyPresentIn(CopyNode copyNode, VariableDefinitionNode variable) {
+        return copyNode.getChildren().stream()
+                .filter(VariableDefinitionNode.class::isInstance)
+                .map(VariableDefinitionNode.class::cast)
+                .anyMatch(n -> n.getLocality().equals(variable.getLocality())
+                        && n.getVariableName().equals(variable.getVariableName()));
+    }
+
+    private static boolean canInsertCopyNodeAtIndex(
       CopyNode copyNode, int index, List<Node> variables) {
     String copybookLocalityUri = copyNode.getLocality().getUri();
     Range copybookLocalityRange = copyNode.getLocality().getRange();

@@ -71,6 +71,18 @@ public abstract class Node {
     children.add(node);
   }
 
+
+  /**
+   * Add a child node to this node and updates the child parent link.
+   *
+   * @param index index of insertion
+   * @param node a child node.
+   */
+  public void addChildAt(int index, Node node) {
+    node.setParent(this);
+    children.add(index, node);
+  }
+
   /**
    * Remove a child node.
    *

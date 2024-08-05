@@ -104,6 +104,27 @@ class TestWithCopybook {
           + "       {#*bug-test2}.\n"
           + "           move 0 to {$test1}.";
 
+  public static final String TEXT7 =
+      "       IDENTIFICATION DIVISION.\n"
+          + "       PROGRAM-ID. ABCDEF.\n"
+          + "       DATA DIVISION.\n"
+          + "       WORKING-STORAGE SECTION.\n"
+          + "       copy {~AMAZE}.    \n"
+          + "       copy {~AMAZE2}.      \n"
+          + "       PROCEDURE DIVISION.\n";
+
+  public static final String AMAZE_TEXT =
+      "       01  {$*CHK-PARMS}.\n" + "P#1325         07  {$*CHECK}    PIC 9(09) COMP SYNC.\n";
+
+  public static final String AMAZE2_TEXT =
+      "001600 01  {$*META-TABLE}.\n"
+          + "001700     05  {$*META-FIELD} OCCURS 12500 TIMES.\n"
+          + "FMC    COPY {~AMAZE3}.\n"
+          + "       01  {$*TEST-ULTI} pic x.";
+
+  public static final String AMAZE3_TEXT =
+      "\n" + "         10  {$*META-FIELD-NAME}               PIC  X(35).\n";
+
   private static final String COPYBOOK_CONTENT = "       01  {$*VAR}     PIC S9(4) COMP.";
 
   @Test
@@ -150,5 +171,16 @@ class TestWithCopybook {
             TEXT6,
             ImmutableList.of(new CobolText("BUG0", "            \"scenario 4\"\n")),
             ImmutableMap.of());
+  }
+
+  @Test
+  void testEmbeddedCopybooks() {
+    UseCaseEngine.runTest(
+        TEXT7,
+        ImmutableList.of(
+            new CobolText("AMAZE", AMAZE_TEXT),
+            new CobolText("AMAZE2", AMAZE2_TEXT),
+            new CobolText("AMAZE3", AMAZE3_TEXT)),
+        ImmutableMap.of());
   }
 }
