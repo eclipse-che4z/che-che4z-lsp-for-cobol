@@ -172,14 +172,6 @@
                             <goal>antlr4</goal>
                         </goals>
                         <configuration>
-                            <arguments>
-                                <argument>-package</argument>
-                                <argument>org.eclipse.lsp.cobol.core</argument>
-                            </arguments>
-                            <sourceDirectory>src/main/antlr4/org/eclipse/lsp/cobol/core/parser</sourceDirectory>
-                            <outputDirectory>
-                                ${project.build.directory}/generated-sources/antlr4/org/eclipse/lsp/cobol/core
-                            </outputDirectory>
                             <visitor>true</visitor>
                         </configuration>
                     </execution>

@@ -189,9 +189,9 @@ jobs:
           - os: ubuntu-latest
             arch: x64
             container: alpine:3.17
-          - os: macos-14-large
+          - os: macos-13
             arch: x64
-          - os: macos-14-xlarge
+          - os: macos-14
             arch: arm64
     runs-on: ${{ matrix.os }}
     needs: [generateNativeConfig]
@@ -201,7 +201,7 @@ jobs:
         if: matrix.os == 'windows-latest'
         run: echo "target=win32-${{ matrix.arch }}" >> $env:GITHUB_ENV
       - shell: sh
-        if: startsWith( matrix.os, 'macos-14')
+        if: startsWith( matrix.os, 'macos')
         run: echo "target=darwin-${{ matrix.arch }}" >> $GITHUB_ENV
       - shell: sh
         if: matrix.os == 'ubuntu-latest'
@@ -293,9 +293,9 @@ jobs:
           - os: ubuntu-latest
             arch: x64
             container: alpine:3.17
-          - os: macos-14-large
+          - os: macos-13
             arch: x64
-          - os: macos-14-xlarge
+          - os: macos-14
             arch: arm64
     runs-on: ${{ matrix.os }}
     needs: [buildNative,buildPlatformIndependedPart]
@@ -305,7 +305,7 @@ jobs:
         if: matrix.os == 'windows-latest'
         run: echo "target=win32-${{ matrix.arch }}" >> $env:GITHUB_ENV
       - shell: sh
-        if: startsWith( matrix.os, 'macos-14')
+        if: startsWith( matrix.os, 'macos')
         run: echo "target=darwin-${{ matrix.arch }}" >> $GITHUB_ENV
       - shell: sh
         if: matrix.os == 'ubuntu-latest'
