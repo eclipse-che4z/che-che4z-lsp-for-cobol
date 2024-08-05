@@ -49,9 +49,10 @@ export async function readFileAsync(
 
 function isWindows() {
   // Low fidelity way to determine if windows by using the vscode api UNC path formatting functionality
-  const testPath = "/hello/world";
-  const uri = vscode.Uri.file(testPath);
-  return uri.fsPath.includes("\\");
+  // const testPath = "/hello/world";
+  // const uri = vscode.Uri.file(testPath);
+  // return uri.fsPath.includes("\\");
+  return typeof process !== "undefined" && process.platform === "win32";
 }
 
 export function getPathSeparator() {
@@ -61,12 +62,17 @@ export function getPathSeparator() {
 
 // Low fidelity to check if path is abolute based off the first directory entry of process.env[HOME] is common
 export function isAbsolute(path: string): boolean {
-  const refPath = process.env["HOME"] ? process.env["HOME"] : "";
-  const refPathUri = vscode.Uri.file(refPath);
-  const targetUri = vscode.Uri.file(path);
+  var refPath: string;
+  let RgExp = new RegExp("^(?:[a-z]+:)?//", "i");
 
-  const result = targetUri.fsPath.includes(refPathUri.fsPath);
-  return result;
+  if (typeof process !== "undefined" && process.env["HOME"]) {
+    const refPathUri = vscode.Uri.file(process.env["HOME"]);
+    const targetUri = vscode.Uri.file(path);
+    const result = targetUri.fsPath.includes(refPathUri.fsPath);
+    return result;
+  } else if (RgExp.test(path)) {
+    return true;
+  } else return false;
 }
 
 //Assumes both paths have atleast one common node
