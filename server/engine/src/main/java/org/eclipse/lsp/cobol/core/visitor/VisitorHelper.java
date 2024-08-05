@@ -193,8 +193,7 @@ public class VisitorHelper {
     return contexts.stream()
             .map(org.eclipse.lsp.cobol.core.CobolParser.DataUsageClauseContext::usageFormat)
             .filter(Objects::nonNull)
-            .map(org.eclipse.lsp.cobol.core.CobolParser.UsageFormatContext::getStart)
-            .map(Token::getText)
+            .map(org.eclipse.lsp.cobol.core.CobolParser.UsageFormatContext::getText)
             .map(UsageFormat::of)
             .collect(toList());
   }

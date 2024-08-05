@@ -44,7 +44,7 @@ public enum UsageFormat {
   INDEX,
   NATIONAL,
   UTF_8,
-  OBJECT_REFERENCE,
+  OBJECT_REFERENCE("OBJECTREFERENCE"),
   PACKED_DECIMAL,
   POINTER,
   POINTER_32,
@@ -53,11 +53,18 @@ public enum UsageFormat {
   UNDEFINED;
 
   private static final Map<String, UsageFormat> MAP;
+  private final String text;
 
   static {
-    MAP =
-        Arrays.stream(values())
-            .collect(toMap(it -> it.toDisplayString(), Function.identity()));
+    MAP = Arrays.stream(values()).collect(toMap(it -> it.text, Function.identity()));
+  }
+
+  UsageFormat(String text) {
+    this.text = text.replace("_", "-");
+  }
+
+  UsageFormat() {
+    this.text = this.name().replace("_", "-");
   }
 
   /**
@@ -76,6 +83,6 @@ public enum UsageFormat {
    * @return the name to display
    */
   public String toDisplayString() {
-    return toString().replace("_", "-");
+    return this.text;
   }
 }

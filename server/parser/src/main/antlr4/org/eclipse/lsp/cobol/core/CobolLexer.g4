@@ -324,6 +324,7 @@ PERFORM                : P E R F O R M {cobolVerbTokens.add(PERFORM);};
 PIC : P I C  {cobolVerbTokens.add(PIC);} -> pushMode(PICTURECLAUSE) ;
 PICTURE : P I C T U R E  {cobolVerbTokens.add(PICTURE);} -> pushMode(PICTURECLAUSE) ;
 POINTER                : P O I N T E R {cobolVerbTokens.add(POINTER);};
+POINTER_32                : P O I N T E R MINUSCHAR '3' '2' {cobolVerbTokens.add(POINTER_32);};
 PORT : P O R T;
 POSITION               : P O S I T I O N {cobolVerbTokens.add(POSITION);};
 POSITIVE               : P O S I T I V E {cobolVerbTokens.add(POSITIVE);};
