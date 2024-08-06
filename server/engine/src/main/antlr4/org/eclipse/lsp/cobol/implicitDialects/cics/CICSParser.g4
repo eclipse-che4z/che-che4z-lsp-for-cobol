@@ -95,6 +95,32 @@ cicsTranslatorCompileDirectivedKeywords
    ;
 
 /** RECEIVE: */
+// For reference:
+//cics_into: (INTO cics_data_area | SET cics_ref) cics_handle_response?;
+//cics_maxlength: MAXLENGTH cics_data_value | MAXFLENGTH cics_data_value;
+//cics_handle_response: cics_inline_handle_exception | WAIT;
+//cics_inline_handle_exception: (cics_resp | NOHANDLE)+;
+//cics_data_area: LPARENCHAR data_area RPARENCHAR;
+//cics_data_value: LPARENCHAR data_value RPARENCHAR;
+//cics_cvda: LPARENCHAR cvda RPARENCHAR;
+//cics_name: LPARENCHAR name RPARENCHAR;
+//cics_ref: LPARENCHAR ptr_ref RPARENCHAR;
+//cics_hhmmss: LPARENCHAR hhmmss RPARENCHAR;
+//cics_label: LPARENCHAR paragraphNameUsage RPARENCHAR;
+//cics_value: LPARENCHAR ptr_value RPARENCHAR;
+//empty_parens: LPARENCHAR RPARENCHAR;
+
+/* Prototype corrections */
+//cics_receive_default: RECEIVE cics_into? cics_fLength cics_maxlength? NOTRUNCATE; // Wrong
+new_cics_receive_default: RECEIVE (INTO cics_data_area | SET cics_ref) ? (LENGTH cics_data_area | FLENGTH cics_data_area) (MAXLENGTH cics_data_value | MAXFLENGTH)? NOTRUNCATE? cics_handle_response?;
+new_cics_receive_appc: RECEIVE (CONVID cics_name)? (INTO cics_data_area | SET cics_ref)  (LENGTH cics_data_area | FLENGTH cics_data_area) (MAXLENGTH cics_data_value | MAXFLENGTH cics_data_value)? NOTRUNCATE? (STATE cics_cvda)? cics_handle_response?;
+new_cics_receive_lut23: RECEIVE (INTO cics_data_area | SET cics_ref)? (LENGTH cics_data_area | FLENGTH cics_data_area) (MAXLENGTH cics_data_value | MAXFLENGTH cics_data_value)? ASIS? BUFFER? NOTRUNCATE? cics_handle_response?;
+new_cics_receive_lut4: RECEIVE  (INTO cics_data_area | SET cics_ref)? (LENGTH cics_data_area | FLENGTH cics_data_area) (MAXLENGTH cics_data_value | MAXFLENGTH cics_data_value)? NOTRUNCATE? cics_handle_response?;
+new_cics_receive_lut6: RECEIVE (SESSION cics_name)? (INTO cics_data_area | SET cics_ref) (LENGTH cics_data_area | FLENGTH cics_data_area) (MAXLENGTH cics_data_value | MAXFLENGTH cics_data_value)? NOTRUNCATE? cics_handle_response?;
+new_cics_receive_3270_logical: RECEIVE (INTO cics_data_area | SET cics_ref)? (LENGTH cics_data_area | FLENGTH cics_data_area) (MAXLENGTH cics_data_value | MAXFLENGTH cics_data_value)? ASIS? BUFFER? NOTRUNCATE? cics_handle_response?;
+
+/** RECEIVE: */
+//* OLD */
 cics_receive: RECEIVE (cics_receive_group | cics_receive_appc | cics_receive_lu61 | cics_partn | cics_rcv_map);
 cics_receive_group: (cics_into | cics_fLength | ASIS | BUFFER | NOTRUNCATE| cics_handle_response)+;
 cics_receive_appc: (CONVID cics_name | cics_into | cics_fLength | NOTRUNCATE | STATE cics_cvda | cics_handle_response)+;
