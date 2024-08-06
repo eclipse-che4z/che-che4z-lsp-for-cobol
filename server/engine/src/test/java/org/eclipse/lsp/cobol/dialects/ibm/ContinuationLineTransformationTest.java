@@ -21,10 +21,14 @@ import static org.mockito.Mockito.when;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+import org.eclipse.lsp.cobol.common.ResultWithErrors;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
+import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.core.preprocessor.CobolLine;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.transformer.ContinuationLineTransformation;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.validator.StringClosedCorrectlyValidator;
 import org.eclipse.lsp.cobol.service.settings.layout.CodeLayoutStore;
 import org.junit.jupiter.api.Test;
 
@@ -34,8 +38,10 @@ class ContinuationLineTransformationTest extends AbstractCobolLinePreprocessorTe
   /** POSITIVE TEXT: No text allowed in the content area A */
   @Test
   void testNoContentAreaAInContinuationLine() {
-    String line = "000010-    NO CONTENT AREA ON THIS LINE";
-    List<SyntaxError> errors = runTransformation(line);
+    List<String> lines = new ArrayList<>();
+    lines.add("000010     PREDECESSOR OF CONTINUED LINE");
+    lines.add("000010-    NO CONTENT AREA ON THIS LINE");
+    List<SyntaxError> errors = runTransformation(reduceLines(lines));
     assertEquals(0, errors.size());
   }
 
@@ -45,8 +51,10 @@ class ContinuationLineTransformationTest extends AbstractCobolLinePreprocessorTe
    */
   @Test
   void testContentAreaAInContinuationLine() {
-    String line = "000010-THERE IS CONTENT AREA DEFINED HERE";
-    List<SyntaxError> errors = runTransformation(line);
+    List<String> lines = new ArrayList<>();
+    lines.add("000010     PREDECESSOR OF CONTINUED LINE");
+    lines.add("000010-THERE IS CONTENT AREA DEFINED HERE");
+    List<SyntaxError> errors = runTransformation(reduceLines(lines));
     assertEquals(1, errors.size());
   }
 
@@ -71,7 +79,7 @@ class ContinuationLineTransformationTest extends AbstractCobolLinePreprocessorTe
 
   /**
    * [CASE1]: Content defined till the end of comment area without closing quotes and without a
-   * continuation line - Expected result: 1 Syntax Error
+   * continuation line - Expected result: 0 Syntax Error for the quotes
    */
   @Test
   void testContinuationLineCaseNegative() {
@@ -85,7 +93,7 @@ class ContinuationLineTransformationTest extends AbstractCobolLinePreprocessorTe
     lines.add("000500    01 WS-CONST-CREATE PIC X(134) VALUE 'DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD");
     lines.add("000251     'DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD'.");
 
-    List<SyntaxError> errors = runTransformation(reduceLines(lines));
+      List<SyntaxError> errors = runTransformation(reduceLines(lines));
 
     assertEquals(1, errors.size());
   }
@@ -105,12 +113,19 @@ class ContinuationLineTransformationTest extends AbstractCobolLinePreprocessorTe
   }
 
   private List<SyntaxError> runTransformation(String text) {
-    List<CobolLine> lines = convertToCobolLines(text);
+      List<CobolLine> lines = convertToCobolLines(text);
     MessageService mockMessageService = mock(MessageService.class);
     CodeLayoutStore store = mock(CodeLayoutStore.class);
+    IbmCobolLineWriter ibmCobolLineWriter = new IbmCobolLineWriter(new CodeLayoutStore());
     when(store.getCodeLayout()).thenReturn(Optional.empty());
     ContinuationLineTransformation transformation = new IbmCobolContinuationLineTransformation(mockMessageService, store);
-    return transformation.transformLines("", lines).getErrors();
+    StringClosedCorrectlyValidator stringClosedCorrectlyValidator = new StringClosedCorrectlyValidator(mockMessageService);
+
+    ResultWithErrors<List<CobolLine>> listResultWithErrors = transformation.transformLines("", lines);
+    List<SyntaxError> result = new ArrayList<>(listResultWithErrors.getErrors());
+    ExtendedDocument extendedDocument = ibmCobolLineWriter.serialize(listResultWithErrors.getResult(), "DOC_URI");
+    result.addAll(stringClosedCorrectlyValidator.validateLines(extendedDocument));
+    return result;
   }
 
   private List<CobolLine> convertToCobolLines(String text) {
