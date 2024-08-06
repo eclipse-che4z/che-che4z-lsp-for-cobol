@@ -45,6 +45,11 @@ jest.mock("vscode", () => ({
         toString: jest.fn().mockReturnValue(str),
       };
     }),
+    joinPath: jest
+      .fn()
+      .mockImplementation((base: any, ...pathSegments: string[]) => {
+        return { fsPath: pathSegments.join("") };
+      }),
   },
   window: {
     createOutputChannel: jest.fn().mockReturnValue({

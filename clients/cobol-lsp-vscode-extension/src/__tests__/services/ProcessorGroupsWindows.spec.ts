@@ -70,6 +70,11 @@ jest.mock("vscode", () => ({
         fsPath: str,
       };
     }),
+    joinPath: jest
+      .fn()
+      .mockImplementation((base: any, ...pathSegments: string[]) => {
+        return { fsPath: pathSegments.join("") };
+      }),
   },
   workspace: {
     getWorkspaceFolder: jest
