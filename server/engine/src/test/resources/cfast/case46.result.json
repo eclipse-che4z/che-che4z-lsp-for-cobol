@@ -31,6 +31,20 @@
         },
         "children": [
           {
+            "type": "statement",
+            "location": {
+              "uri": "fake/path",
+              "start": {
+                "line": 26,
+                "character": 12
+              },
+              "end": {
+                "line": 27,
+                "character": 37
+              }
+            }
+          },
+          {
             "type": "atEnd",
             "location": {
               "uri": "fake/path",
@@ -76,6 +90,20 @@
             }
           },
           {
+            "type": "statement",
+            "location": {
+              "uri": "fake/path",
+              "start": {
+                "line": 28,
+                "character": 21
+              },
+              "end": {
+                "line": 28,
+                "character": 45
+              }
+            }
+          },
+          {
             "targetName": "X1",
             "type": "perform",
             "location": {
@@ -106,7 +134,23 @@
             "line": 31,
             "character": 28
           }
-        }
+        },
+        "children": [
+          {
+            "type": "statement",
+            "location": {
+              "uri": "fake/path",
+              "start": {
+                "line": 31,
+                "character": 12
+              },
+              "end": {
+                "line": 31,
+                "character": 27
+              }
+            }
+          }
+        ]
       },
       {
         "snippet": "P8000-EXIT.\r\n           EXIT.",

@@ -73,7 +73,23 @@
             "line": 23,
             "character": 21
           }
-        }
+        },
+        "children": [
+          {
+            "type": "statement",
+            "location": {
+              "uri": "fake/path",
+              "start": {
+                "line": 23,
+                "character": 12
+              },
+              "end": {
+                "line": 23,
+                "character": 20
+              }
+            }
+          }
+        ]
       }
     ]
   }

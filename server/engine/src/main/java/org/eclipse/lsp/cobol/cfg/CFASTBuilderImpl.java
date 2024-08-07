@@ -202,6 +202,7 @@ public class CFASTBuilderImpl implements CFASTBuilder {
       node.getChildren().forEach(child -> traverse(parent, child));
       addChild(parent, new CFASTNode(CFASTNodeType.END_ON.getValue(), convertLocation(node)));
     } else if (node instanceof StatementNode) {
+      addChild(parent, new CFASTNode(CFASTNodeType.STATEMENT.getValue(), convertLocation(node)));
       node.getChildren().forEach(child -> traverse(parent, child));
     }
   }

@@ -15,6 +15,20 @@
     },
     "children": [
       {
+        "type": "statement",
+        "location": {
+          "uri": "fake/path",
+          "start": {
+            "line": 16,
+            "character": 12
+          },
+          "end": {
+            "line": 16,
+            "character": 25
+          }
+        }
+      },
+      {
         "targetName": [
           "PARAG1"
         ],
@@ -63,6 +77,20 @@
               }
             },
             "children": [
+              {
+                "type": "statement",
+                "location": {
+                  "uri": "fake/path",
+                  "start": {
+                    "line": 20,
+                    "character": 12
+                  },
+                  "end": {
+                    "line": 20,
+                    "character": 28
+                  }
+                }
+              },
               {
                 "targetName": "PARAG2",
                 "targetSectionName": "SECT2",
@@ -113,7 +141,23 @@
                 "line": 24,
                 "character": 29
               }
-            }
+            },
+            "children": [
+              {
+                "type": "statement",
+                "location": {
+                  "uri": "fake/path",
+                  "start": {
+                    "line": 24,
+                    "character": 12
+                  },
+                  "end": {
+                    "line": 24,
+                    "character": 28
+                  }
+                }
+              }
+            ]
           }
         ]
       }

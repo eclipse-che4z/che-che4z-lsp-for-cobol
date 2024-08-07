@@ -31,6 +31,34 @@
         },
         "children": [
           {
+            "type": "statement",
+            "location": {
+              "uri": "fake/path",
+              "start": {
+                "line": 25,
+                "character": 12
+              },
+              "end": {
+                "line": 25,
+                "character": 38
+              }
+            }
+          },
+          {
+            "type": "statement",
+            "location": {
+              "uri": "fake/path",
+              "start": {
+                "line": 26,
+                "character": 12
+              },
+              "end": {
+                "line": 26,
+                "character": 38
+              }
+            }
+          },
+          {
             "type": "if",
             "location": {
               "uri": "fake/path",
@@ -41,6 +69,20 @@
               "end": {
                 "line": 38,
                 "character": 18
+              }
+            }
+          },
+          {
+            "type": "statement",
+            "location": {
+              "uri": "fake/path",
+              "start": {
+                "line": 29,
+                "character": 16
+              },
+              "end": {
+                "line": 29,
+                "character": 46
               }
             }
           },
@@ -59,12 +101,40 @@
             }
           },
           {
+            "type": "statement",
+            "location": {
+              "uri": "fake/path",
+              "start": {
+                "line": 32,
+                "character": 20
+              },
+              "end": {
+                "line": 32,
+                "character": 50
+              }
+            }
+          },
+          {
             "type": "else",
             "location": {
               "uri": "fake/path",
               "start": {
                 "line": 33,
                 "character": 16
+              },
+              "end": {
+                "line": 34,
+                "character": 52
+              }
+            }
+          },
+          {
+            "type": "statement",
+            "location": {
+              "uri": "fake/path",
+              "start": {
+                "line": 34,
+                "character": 20
               },
               "end": {
                 "line": 34,

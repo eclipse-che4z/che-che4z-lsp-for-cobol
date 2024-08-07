@@ -15,6 +15,20 @@
     },
     "children": [
       {
+        "type": "statement",
+        "location": {
+          "uri": "fake/path",
+          "start": {
+            "line": 16,
+            "character": 12
+          },
+          "end": {
+            "line": 16,
+            "character": 25
+          }
+        }
+      },
+      {
         "targetName": [
           "PARAG1"
         ],
@@ -48,6 +62,20 @@
         },
         "children": [
           {
+            "type": "statement",
+            "location": {
+              "uri": "fake/path",
+              "start": {
+                "line": 19,
+                "character": 12
+              },
+              "end": {
+                "line": 19,
+                "character": 28
+              }
+            }
+          },
+          {
             "targetName": "PARAG2",
             "type": "perform",
             "location": {
@@ -78,7 +106,23 @@
             "line": 22,
             "character": 29
           }
-        }
+        },
+        "children": [
+          {
+            "type": "statement",
+            "location": {
+              "uri": "fake/path",
+              "start": {
+                "line": 22,
+                "character": 12
+              },
+              "end": {
+                "line": 22,
+                "character": 28
+              }
+            }
+          }
+        ]
       }
     ]
   }

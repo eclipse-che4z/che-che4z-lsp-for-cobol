@@ -31,6 +31,20 @@
         },
         "children": [
           {
+            "type": "statement",
+            "location": {
+              "uri": "fake/path",
+              "start": {
+                "line": 23,
+                "character": 14
+              },
+              "end": {
+                "line": 23,
+                "character": 56
+              }
+            }
+          },
+          {
             "target": {
               "name": "XML-HANDLER"
             },
@@ -107,6 +121,20 @@
             }
           },
           {
+            "type": "statement",
+            "location": {
+              "uri": "fake/path",
+              "start": {
+                "line": 29,
+                "character": 18
+              },
+              "end": {
+                "line": 29,
+                "character": 60
+              }
+            }
+          },
+          {
             "type": "endon",
             "location": {
               "uri": "fake/path",
@@ -150,7 +178,23 @@
             "line": 32,
             "character": 43
           }
-        }
+        },
+        "children": [
+          {
+            "type": "statement",
+            "location": {
+              "uri": "fake/path",
+              "start": {
+                "line": 32,
+                "character": 12
+              },
+              "end": {
+                "line": 32,
+                "character": 42
+              }
+            }
+          }
+        ]
       },
       {
         "snippet": "ABEND.\r\n           DISPLAY \u0027XML-EVENT\u003d\u0027 XML-EVENT.",
@@ -166,7 +210,23 @@
             "line": 34,
             "character": 43
           }
-        }
+        },
+        "children": [
+          {
+            "type": "statement",
+            "location": {
+              "uri": "fake/path",
+              "start": {
+                "line": 34,
+                "character": 12
+              },
+              "end": {
+                "line": 34,
+                "character": 42
+              }
+            }
+          }
+        ]
       }
     ]
   }

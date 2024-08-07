@@ -27,9 +27,9 @@ import static org.eclipse.lsp.cobol.common.model.NodeType.STATEMENT;
  * The extensions should encapsulate the logic of all the applicable semantic checks.
  */
 @Slf4j
-public abstract class StatementNode extends Node {
+public class StatementNode extends Node {
 
-  protected StatementNode(Locality locality) {
+  public StatementNode(Locality locality) {
     super(locality, STATEMENT);
   }
 

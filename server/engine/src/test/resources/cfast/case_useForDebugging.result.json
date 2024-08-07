@@ -43,6 +43,20 @@
                 "character": 46
               }
             }
+          },
+          {
+            "type": "statement",
+            "location": {
+              "uri": "fake/path",
+              "start": {
+                "line": 20,
+                "character": 13
+              },
+              "end": {
+                "line": 20,
+                "character": 32
+              }
+            }
           }
         ]
       },
@@ -60,7 +74,23 @@
             "line": 24,
             "character": 36
           }
-        }
+        },
+        "children": [
+          {
+            "type": "statement",
+            "location": {
+              "uri": "fake/path",
+              "start": {
+                "line": 24,
+                "character": 13
+              },
+              "end": {
+                "line": 24,
+                "character": 35
+              }
+            }
+          }
+        ]
       }
     ]
   }
