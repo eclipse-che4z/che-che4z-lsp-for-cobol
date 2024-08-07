@@ -111,13 +111,37 @@ cicsTranslatorCompileDirectivedKeywords
 //empty_parens: LPARENCHAR RPARENCHAR;
 
 /* Prototype corrections */
+// How do we enforce order of the optional instances??
+// How do we enforce not allowing random keywords like adding BLAHHH anywhere?
+
 //cics_receive_default: RECEIVE cics_into? cics_fLength cics_maxlength? NOTRUNCATE; // Wrong
-new_cics_receive_default: RECEIVE (INTO cics_data_area | SET cics_ref) ? (LENGTH cics_data_area | FLENGTH cics_data_area) (MAXLENGTH cics_data_value | MAXFLENGTH)? NOTRUNCATE? cics_handle_response?;
+// Exhaustive List
+new_cics_receive_default: RECEIVE (INTO cics_data_area | SET cics_ref)? (LENGTH cics_data_area | FLENGTH cics_data_area) (MAXLENGTH cics_data_value | MAXFLENGTH)? NOTRUNCATE? cics_handle_response?;
+
 new_cics_receive_appc: RECEIVE (CONVID cics_name)? (INTO cics_data_area | SET cics_ref)  (LENGTH cics_data_area | FLENGTH cics_data_area) (MAXLENGTH cics_data_value | MAXFLENGTH cics_data_value)? NOTRUNCATE? (STATE cics_cvda)? cics_handle_response?;
+
 new_cics_receive_lut23: RECEIVE (INTO cics_data_area | SET cics_ref)? (LENGTH cics_data_area | FLENGTH cics_data_area) (MAXLENGTH cics_data_value | MAXFLENGTH cics_data_value)? ASIS? BUFFER? NOTRUNCATE? cics_handle_response?;
 new_cics_receive_lut4: RECEIVE  (INTO cics_data_area | SET cics_ref)? (LENGTH cics_data_area | FLENGTH cics_data_area) (MAXLENGTH cics_data_value | MAXFLENGTH cics_data_value)? NOTRUNCATE? cics_handle_response?;
+
 new_cics_receive_lut6: RECEIVE (SESSION cics_name)? (INTO cics_data_area | SET cics_ref) (LENGTH cics_data_area | FLENGTH cics_data_area) (MAXLENGTH cics_data_value | MAXFLENGTH cics_data_value)? NOTRUNCATE? cics_handle_response?;
+
 new_cics_receive_3270_logical: RECEIVE (INTO cics_data_area | SET cics_ref)? (LENGTH cics_data_area | FLENGTH cics_data_area) (MAXLENGTH cics_data_value | MAXFLENGTH cics_data_value)? ASIS? BUFFER? NOTRUNCATE? cics_handle_response?;
+new_cics_receive_3600_and_beyond: RECEIVE (INTO cics_data_area | SET cics_ref)? (LENGTH cics_data_area | FLENGTH cics_data_area) (MAXLENGTH cics_data_value | MAXFLENGTH cics_data_value)? NOTRUNCATE? cics_handle_response?;
+
+new_cics_receive_non_z_default: RECEIVE (INTO cics_data_area | SET cics_ref)? LENGTH cics_data_area FLENGTH cics_data_area (MAXLENGTH cics_data_value)? NOTRUNCATE? cics_handle_response?;
+
+new_cics_receive_mro: RECEIVE (SESSION cics_name)? (INTO cics_data_area | SET cics_ref) (LENGTH cics_data_area | FLENGTH cics_data_area) (MAXLENGTH cics_data_value | MAXFLENGTH cics_data_value)? NOTRUNCATE? (STATE cics_cvda)? cics_handle_response?;
+
+new_cics_receive_2260: RECEIVE (INTO cics_data_area | SET cics_ref)? (LENGTH cics_data_area | FLENGTH cics_data_area) (MAXLENGTH cics_data_value | MAXFLENGTH cics_data_value)? NOTRUNCATE? LEAVEKB? cics_handle_response?;
+new_cics_receive_2980: RECEIVE (INTO cics_data_area | SET cics_ref)? (LENGTH cics_data_area | FLENGTH cics_data_area) (MAXLENGTH cics_data_value | MAXFLENGTH cics_data_value)? NOTRUNCATE? PASSBK cics_handle_response?;
+new_cics_receive_3790_3270_display: RECEIVE (INTO cics_data_area | SET cics_ref)? (LENGTH cics_data_area | FLENGTH cics_data_area) (MAXLENGTH cics_data_value | MAXFLENGTH cics_data_value)? ASIS? BUFFER? NOTRUNCATE? cics_handle_response?;
+
+//Helpers
+new_cics_into_set: (INTO cics_data_area | SET cics_ref);
+new_cics_length: (LENGTH cics_data_area | FLENGTH cics_data_area);
+new_cics_max_length: (MAXLENGTH cics_data_value | MAXFLENGTH);
+
+// Contensed receive
 
 /** RECEIVE: */
 //* OLD */
