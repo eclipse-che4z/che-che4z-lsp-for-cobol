@@ -62,7 +62,23 @@
                 "line": 19,
                 "character": 25
               }
-            }
+            },
+            "children": [
+              {
+                "type": "statement",
+                "location": {
+                  "uri": "fake/path",
+                  "start": {
+                    "line": 19,
+                    "character": 12
+                  },
+                  "end": {
+                    "line": 19,
+                    "character": 24
+                  }
+                }
+              }
+            ]
           },
           {
             "snippet": "CP.\r\n           DISPLAY \u0027CP\u0027.",
@@ -78,7 +94,23 @@
                 "line": 21,
                 "character": 25
               }
-            }
+            },
+            "children": [
+              {
+                "type": "statement",
+                "location": {
+                  "uri": "fake/path",
+                  "start": {
+                    "line": 21,
+                    "character": 12
+                  },
+                  "end": {
+                    "line": 21,
+                    "character": 24
+                  }
+                }
+              }
+            ]
           }
         ]
       },
@@ -112,7 +144,23 @@
                 "line": 24,
                 "character": 25
               }
-            }
+            },
+            "children": [
+              {
+                "type": "statement",
+                "location": {
+                  "uri": "fake/path",
+                  "start": {
+                    "line": 24,
+                    "character": 12
+                  },
+                  "end": {
+                    "line": 24,
+                    "character": 24
+                  }
+                }
+              }
+            ]
           }
         ]
       }

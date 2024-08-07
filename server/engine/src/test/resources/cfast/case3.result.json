@@ -15,6 +15,20 @@
     },
     "children": [
       {
+        "type": "statement",
+        "location": {
+          "uri": "fake/path",
+          "start": {
+            "line": 16,
+            "character": 12
+          },
+          "end": {
+            "line": 16,
+            "character": 25
+          }
+        }
+      },
+      {
         "snippet": "PARAG1.\r\n           DISPLAY \u0027PARAG1\u0027.",
         "name": "PARAG1",
         "type": "paragraph",
@@ -28,7 +42,23 @@
             "line": 18,
             "character": 29
           }
-        }
+        },
+        "children": [
+          {
+            "type": "statement",
+            "location": {
+              "uri": "fake/path",
+              "start": {
+                "line": 18,
+                "character": 12
+              },
+              "end": {
+                "line": 18,
+                "character": 28
+              }
+            }
+          }
+        ]
       },
       {
         "snippet": "PARAG2.\r\n           DISPLAY \u0027PARAG2\u0027.",
@@ -44,7 +74,23 @@
             "line": 20,
             "character": 29
           }
-        }
+        },
+        "children": [
+          {
+            "type": "statement",
+            "location": {
+              "uri": "fake/path",
+              "start": {
+                "line": 20,
+                "character": 12
+              },
+              "end": {
+                "line": 20,
+                "character": 28
+              }
+            }
+          }
+        ]
       }
     ]
   }

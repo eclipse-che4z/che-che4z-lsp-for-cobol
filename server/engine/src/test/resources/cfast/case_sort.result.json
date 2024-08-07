@@ -108,7 +108,23 @@
             "line": 38,
             "character": 27
           }
-        }
+        },
+        "children": [
+          {
+            "type": "statement",
+            "location": {
+              "uri": "fake/path",
+              "start": {
+                "line": 38,
+                "character": 12
+              },
+              "end": {
+                "line": 38,
+                "character": 26
+              }
+            }
+          }
+        ]
       },
       {
         "snippet": "PAR2.\r\n           DISPLAY \"PAR2\".",
@@ -124,7 +140,23 @@
             "line": 41,
             "character": 27
           }
-        }
+        },
+        "children": [
+          {
+            "type": "statement",
+            "location": {
+              "uri": "fake/path",
+              "start": {
+                "line": 41,
+                "character": 12
+              },
+              "end": {
+                "line": 41,
+                "character": 26
+              }
+            }
+          }
+        ]
       },
       {
         "snippet": "PAR3.\r\n           DISPLAY \"PAR3\".",
@@ -140,7 +172,23 @@
             "line": 44,
             "character": 27
           }
-        }
+        },
+        "children": [
+          {
+            "type": "statement",
+            "location": {
+              "uri": "fake/path",
+              "start": {
+                "line": 44,
+                "character": 12
+              },
+              "end": {
+                "line": 44,
+                "character": 26
+              }
+            }
+          }
+        ]
       },
       {
         "snippet": "INPUT-PAR1.\r\n           PERFORM PAR1.",

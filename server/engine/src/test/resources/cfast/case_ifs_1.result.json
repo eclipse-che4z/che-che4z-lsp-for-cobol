@@ -45,6 +45,20 @@
             }
           },
           {
+            "type": "statement",
+            "location": {
+              "uri": "fake/path",
+              "start": {
+                "line": 24,
+                "character": 15
+              },
+              "end": {
+                "line": 24,
+                "character": 30
+              }
+            }
+          },
+          {
             "targetName": [
               "A000-PARA"
             ],

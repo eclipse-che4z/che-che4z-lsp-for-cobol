@@ -43,6 +43,20 @@
                 "character": 60
               }
             }
+          },
+          {
+            "type": "statement",
+            "location": {
+              "uri": "fake/path",
+              "start": {
+                "line": 20,
+                "character": 13
+              },
+              "end": {
+                "line": 20,
+                "character": 32
+              }
+            }
           }
         ]
       }

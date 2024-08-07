@@ -38,6 +38,7 @@ import org.eclipse.lsp.cobol.common.model.tree.*;
 import org.eclipse.lsp.cobol.common.model.tree.statements.SetToBooleanStatement;
 import org.eclipse.lsp.cobol.common.model.tree.statements.SetToOnOffStatement;
 import org.eclipse.lsp.cobol.common.model.tree.statements.SetUpDownByStatement;
+import org.eclipse.lsp.cobol.common.model.tree.statements.StatementNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.*;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableDefinitionNode.Builder;
 import org.eclipse.lsp.cobol.common.model.variables.DivisionType;
@@ -1262,6 +1263,186 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
       }
     }
     return visitChildren(ctx);
+  }
+
+  @Override
+  public List<Node> visitAcceptStatement(CobolParser.AcceptStatementContext ctx) {
+    return addTreeNode(ctx, StatementNode::new);
+  }
+
+  @Override
+  public List<Node> visitAddStatement(CobolParser.AddStatementContext ctx) {
+    return addTreeNode(ctx, StatementNode::new);
+  }
+
+  @Override
+  public List<Node> visitAllocateStatement(CobolParser.AllocateStatementContext ctx) {
+    return addTreeNode(ctx, StatementNode::new);
+  }
+
+  @Override
+  public List<Node> visitCancelStatement(CobolParser.CancelStatementContext ctx) {
+    return addTreeNode(ctx, StatementNode::new);
+  }
+
+  @Override
+  public List<Node> visitCloseStatement(CobolParser.CloseStatementContext ctx) {
+    return addTreeNode(ctx, StatementNode::new);
+  }
+
+  @Override
+  public List<Node> visitComputeStatement(CobolParser.ComputeStatementContext ctx) {
+    return addTreeNode(ctx, StatementNode::new);
+  }
+
+  @Override
+  public List<Node> visitContinueStatement(CobolParser.ContinueStatementContext ctx) {
+    return addTreeNode(ctx, StatementNode::new);
+  }
+
+  @Override
+  public List<Node> visitDisableStatement(CobolParser.DisableStatementContext ctx) {
+    return addTreeNode(ctx, StatementNode::new);
+  }
+
+  @Override
+  public List<Node> visitDisplayStatement(CobolParser.DisplayStatementContext ctx) {
+    return addTreeNode(ctx, StatementNode::new);
+  }
+
+  @Override
+  public List<Node> visitDivideStatement(CobolParser.DivideStatementContext ctx) {
+    return addTreeNode(ctx, StatementNode::new);
+  }
+
+  @Override
+  public List<Node> visitEnableStatement(CobolParser.EnableStatementContext ctx) {
+    return addTreeNode(ctx, StatementNode::new);
+  }
+
+  @Override
+  public List<Node> visitEntryStatement(CobolParser.EntryStatementContext ctx) {
+    return addTreeNode(ctx, StatementNode::new);
+  }
+
+  @Override
+  public List<Node> visitExhibitStatement(CobolParser.ExhibitStatementContext ctx) {
+    return addTreeNode(ctx, StatementNode::new);
+  }
+
+  @Override
+  public List<Node> visitFreeStatement(CobolParser.FreeStatementContext ctx) {
+    return addTreeNode(ctx, StatementNode::new);
+  }
+
+  @Override
+  public List<Node> visitGenerateStatement(CobolParser.GenerateStatementContext ctx) {
+    return addTreeNode(ctx, StatementNode::new);
+  }
+
+  @Override
+  public List<Node> visitInitializeStatement(CobolParser.InitializeStatementContext ctx) {
+    return addTreeNode(ctx, StatementNode::new);
+  }
+
+  @Override
+  public List<Node> visitInitiateStatement(CobolParser.InitiateStatementContext ctx) {
+    return addTreeNode(ctx, StatementNode::new);
+  }
+
+  @Override
+  public List<Node> visitInspectStatement(CobolParser.InspectStatementContext ctx) {
+    return addTreeNode(ctx, StatementNode::new);
+  }
+
+  @Override
+  public List<Node> visitMoveStatement(CobolParser.MoveStatementContext ctx) {
+    return addTreeNode(ctx, StatementNode::new);
+  }
+
+  @Override
+  public List<Node> visitMultiplyStatement(CobolParser.MultiplyStatementContext ctx) {
+    return addTreeNode(ctx, StatementNode::new);
+  }
+
+  @Override
+  public List<Node> visitOpenStatement(CobolParser.OpenStatementContext ctx) {
+    return addTreeNode(ctx, StatementNode::new);
+  }
+
+  @Override
+  public List<Node> visitPurgeStatement(CobolParser.PurgeStatementContext ctx) {
+    return addTreeNode(ctx, StatementNode::new);
+  }
+
+  @Override
+  public List<Node> visitReadyResetTraceStatement(CobolParser.ReadyResetTraceStatementContext ctx) {
+    return addTreeNode(ctx, StatementNode::new);
+  }
+
+  @Override
+  public List<Node> visitReceiveStatement(CobolParser.ReceiveStatementContext ctx) {
+    return addTreeNode(ctx, StatementNode::new);
+  }
+
+  @Override
+  public List<Node> visitReleaseStatement(CobolParser.ReleaseStatementContext ctx) {
+    return addTreeNode(ctx, StatementNode::new);
+  }
+
+  @Override
+  public List<Node> visitReturnStatement(CobolParser.ReturnStatementContext ctx) {
+    return addTreeNode(ctx, StatementNode::new);
+  }
+
+  @Override
+  public List<Node> visitSearchStatement(CobolParser.SearchStatementContext ctx) {
+    return addTreeNode(ctx, StatementNode::new);
+  }
+
+  @Override
+  public List<Node> visitSendStatement(CobolParser.SendStatementContext ctx) {
+    return addTreeNode(ctx, StatementNode::new);
+  }
+
+  @Override
+  public List<Node> visitServiceReloadStatement(CobolParser.ServiceReloadStatementContext ctx) {
+    return addTreeNode(ctx, StatementNode::new);
+  }
+
+  @Override
+  public List<Node> visitServiceLabelStatement(CobolParser.ServiceLabelStatementContext ctx) {
+    return addTreeNode(ctx, StatementNode::new);
+  }
+
+  @Override
+  public List<Node> visitSetStatement(CobolParser.SetStatementContext ctx) {
+    return addTreeNode(ctx, StatementNode::new);
+  }
+
+  @Override
+  public List<Node> visitStringStatement(CobolParser.StringStatementContext ctx) {
+    return addTreeNode(ctx, StatementNode::new);
+  }
+
+  @Override
+  public List<Node> visitSubtractStatement(CobolParser.SubtractStatementContext ctx) {
+    return addTreeNode(ctx, StatementNode::new);
+  }
+
+  @Override
+  public List<Node> visitTerminateStatement(CobolParser.TerminateStatementContext ctx) {
+    return addTreeNode(ctx, StatementNode::new);
+  }
+
+  @Override
+  public List<Node> visitUnstringStatement(CobolParser.UnstringStatementContext ctx) {
+    return addTreeNode(ctx, StatementNode::new);
+  }
+
+  @Override
+  public List<Node> visitJsonStatement(CobolParser.JsonStatementContext ctx) {
+    return addTreeNode(ctx, StatementNode::new);
   }
 
   private ProcedureName parseProcedureName(CobolParser.ProcedureNameContext procedureNameContext) {
