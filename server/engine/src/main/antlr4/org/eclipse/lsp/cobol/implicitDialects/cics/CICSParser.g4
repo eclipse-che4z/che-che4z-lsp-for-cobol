@@ -116,30 +116,33 @@ cicsTranslatorCompileDirectivedKeywords
 
 //cics_receive_default: RECEIVE cics_into? cics_fLength cics_maxlength? NOTRUNCATE; // Wrong
 // Exhaustive List
-new_cics_receive_default: RECEIVE (INTO cics_data_area | SET cics_ref)? (LENGTH cics_data_area | FLENGTH cics_data_area) (MAXLENGTH cics_data_value | MAXFLENGTH)? NOTRUNCATE? cics_handle_response?;
+//Cics Group 1
+//new_cics_receive_default:           RECEIVE new_cics_into_set? new_cics_length_flength cics_maxlength? NOTRUNCATE? cics_handle_response?;
+//new_cics_receive_lut23:             RECEIVE new_cics_into_set? new_cics_length_flength cics_maxlength? ASIS? BUFFER? NOTRUNCATE? cics_handle_response?;
+//new_cics_receive_3270_logical:      RECEIVE new_cics_into_set? new_cics_length_flength cics_maxlength? ASIS? BUFFER? NOTRUNCATE? cics_handle_response?;
+//new_cics_receive_3790_3270_display: RECEIVE new_cics_into_set? new_cics_length_flength cics_maxlength? ASIS? BUFFER? NOTRUNCATE? cics_handle_response?;
+//new_cics_receive_lut4:              RECEIVE  new_cics_into_set? new_cics_length_flength cics_maxlength? NOTRUNCATE? cics_handle_response?;
+//new_cics_receive_3600_and_beyond:   RECEIVE new_cics_into_set? new_cics_length_flength cics_maxlength? NOTRUNCATE? cics_handle_response?;
+//new_cics_receive_2260:              RECEIVE new_cics_into_set? new_cics_length_flength cics_maxlength? NOTRUNCATE? LEAVEKB? cics_handle_response?;
+// cics_group_one summary
+new_cics_receive_group_one: new_cics_into_set? new_cics_length_flength cics_maxlength? ASIS? BUFFER? NOTRUNCATE? LEAVEKB?;
 
-new_cics_receive_appc: RECEIVE (CONVID cics_name)? (INTO cics_data_area | SET cics_ref)  (LENGTH cics_data_area | FLENGTH cics_data_area) (MAXLENGTH cics_data_value | MAXFLENGTH cics_data_value)? NOTRUNCATE? (STATE cics_cvda)? cics_handle_response?;
+// Cics Group 2
+//new_cics_receive_appc:              RECEIVE (CONVID cics_name)? new_cics_into_set  new_cics_length_flength new_cics_max_length_flength? NOTRUNCATE? (STATE cics_cvda)? cics_handle_response?;
+//new_cics_receive_lut6:              RECEIVE (SESSION cics_name)? new_cics_into_set new_cics_length_flength new_cics_max_length_flength? NOTRUNCATE? cics_handle_response?;
+//new_cics_receive_mro:               RECEIVE (SESSION cics_name)? new_cics_into_set new_cics_length_flength new_cics_max_length_flength? NOTRUNCATE? (STATE cics_cvda)? cics_handle_response?;
+// cics_group_two summary
+new_cics_receive_group_two: ((CONVID cics_name)? | (SESSION cics_name)?) new_cics_into_set new_cics_length_flength cics_maxlength? NOTRUNCATE? (STATE cics_cvda)?;
 
-new_cics_receive_lut23: RECEIVE (INTO cics_data_area | SET cics_ref)? (LENGTH cics_data_area | FLENGTH cics_data_area) (MAXLENGTH cics_data_value | MAXFLENGTH cics_data_value)? ASIS? BUFFER? NOTRUNCATE? cics_handle_response?;
-new_cics_receive_lut4: RECEIVE  (INTO cics_data_area | SET cics_ref)? (LENGTH cics_data_area | FLENGTH cics_data_area) (MAXLENGTH cics_data_value | MAXFLENGTH cics_data_value)? NOTRUNCATE? cics_handle_response?;
+// Independents
+new_cics_receive_2980:              RECEIVE new_cics_into_set? new_cics_length_flength cics_maxlength? NOTRUNCATE? PASSBK cics_handle_response?;
+new_cics_receive_non_z_default:     RECEIVE new_cics_into_set? LENGTH cics_data_area FLENGTH cics_data_area (MAXLENGTH cics_data_value)? NOTRUNCATE? cics_handle_response?;
 
-new_cics_receive_lut6: RECEIVE (SESSION cics_name)? (INTO cics_data_area | SET cics_ref) (LENGTH cics_data_area | FLENGTH cics_data_area) (MAXLENGTH cics_data_value | MAXFLENGTH cics_data_value)? NOTRUNCATE? cics_handle_response?;
-
-new_cics_receive_3270_logical: RECEIVE (INTO cics_data_area | SET cics_ref)? (LENGTH cics_data_area | FLENGTH cics_data_area) (MAXLENGTH cics_data_value | MAXFLENGTH cics_data_value)? ASIS? BUFFER? NOTRUNCATE? cics_handle_response?;
-new_cics_receive_3600_and_beyond: RECEIVE (INTO cics_data_area | SET cics_ref)? (LENGTH cics_data_area | FLENGTH cics_data_area) (MAXLENGTH cics_data_value | MAXFLENGTH cics_data_value)? NOTRUNCATE? cics_handle_response?;
-
-new_cics_receive_non_z_default: RECEIVE (INTO cics_data_area | SET cics_ref)? LENGTH cics_data_area FLENGTH cics_data_area (MAXLENGTH cics_data_value)? NOTRUNCATE? cics_handle_response?;
-
-new_cics_receive_mro: RECEIVE (SESSION cics_name)? (INTO cics_data_area | SET cics_ref) (LENGTH cics_data_area | FLENGTH cics_data_area) (MAXLENGTH cics_data_value | MAXFLENGTH cics_data_value)? NOTRUNCATE? (STATE cics_cvda)? cics_handle_response?;
-
-new_cics_receive_2260: RECEIVE (INTO cics_data_area | SET cics_ref)? (LENGTH cics_data_area | FLENGTH cics_data_area) (MAXLENGTH cics_data_value | MAXFLENGTH cics_data_value)? NOTRUNCATE? LEAVEKB? cics_handle_response?;
-new_cics_receive_2980: RECEIVE (INTO cics_data_area | SET cics_ref)? (LENGTH cics_data_area | FLENGTH cics_data_area) (MAXLENGTH cics_data_value | MAXFLENGTH cics_data_value)? NOTRUNCATE? PASSBK cics_handle_response?;
-new_cics_receive_3790_3270_display: RECEIVE (INTO cics_data_area | SET cics_ref)? (LENGTH cics_data_area | FLENGTH cics_data_area) (MAXLENGTH cics_data_value | MAXFLENGTH cics_data_value)? ASIS? BUFFER? NOTRUNCATE? cics_handle_response?;
+new_cics_recceive_all: RECEIVE (new_cics_receive_group_one | new_cics_receive_group_two | new_cics_receive_2980 | new_cics_receive_2980) cics_handle_response?;
 
 //Helpers
 new_cics_into_set: (INTO cics_data_area | SET cics_ref);
-new_cics_length: (LENGTH cics_data_area | FLENGTH cics_data_area);
-new_cics_max_length: (MAXLENGTH cics_data_value | MAXFLENGTH);
+new_cics_length_flength: (LENGTH cics_data_area | FLENGTH cics_data_area);
 
 // Contensed receive
 
