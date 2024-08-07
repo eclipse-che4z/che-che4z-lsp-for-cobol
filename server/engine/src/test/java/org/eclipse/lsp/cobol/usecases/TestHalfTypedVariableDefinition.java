@@ -30,7 +30,8 @@ class TestHalfTypedVariableDefinition {
           + "       Program-id. HELLO-WORLD.\n"
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
-          + "       01 {$*COD-RETOUR} PIC X{(|1|2}66";
+// TODO   + "       01 {$*COD-RETOUR} PIC X{(|1|2}66";
+          + "       01 {$*COD-RETOUR} PIC X{(|1}{66|2}{|3}";
 
   @Test
   void test() {
@@ -41,14 +42,33 @@ class TestHalfTypedVariableDefinition {
             "1",
             new Diagnostic(
                 new Range(),
-                "A period was assumed before \"(\".",
+                "Extraneous input '('",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()),
-            "2",
+           "2",
             new Diagnostic(
                 new Range(),
-                "Syntax error on '('",
+               "No data definition entry found for rename",
                 DiagnosticSeverity.Error,
-                ErrorSource.PARSING.getText())));
+                ErrorSource.PARSING.getText()),
+            "3",
+            new Diagnostic(
+                new Range(),
+               "Unexpected end of file",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())
+//            "1",
+//            new Diagnostic(
+//                new Range(),
+//                "A period was assumed before \"(\".",
+//                DiagnosticSeverity.Error,
+//                ErrorSource.PARSING.getText()),
+//            "2",
+//            new Diagnostic(
+//                new Range(),
+//                "Syntax error on '('",
+//                DiagnosticSeverity.Error,
+//                ErrorSource.PARSING.getText())
+        ));
   }
 }
