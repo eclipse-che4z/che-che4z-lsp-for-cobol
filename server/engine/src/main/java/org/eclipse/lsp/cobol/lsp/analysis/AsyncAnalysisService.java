@@ -120,6 +120,7 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
     Integer prevId = analysisResultsRevisions.put(uri, currentRevision);
     if (currentRevision.equals(prevId) && !force) {
       notifyAllListeners(AnalysisState.SKIPPED, documentModelService.get(uri), eventSource);
+      LOG.debug("Adonis [scheduleAnalysis] skipped: ");
       return analysisResults.get(id);
     }
     Executor analysisExecutor = getExecutor(uri);
@@ -142,6 +143,7 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
       } finally {
         if (Objects.equals(analysisResultsRevisions.get(uri), currentRevision) || force) {
           communications.publishDiagnostics(documentModelService.getOpenedDiagnostic());
+          LOG.debug("Adonis [scheduleAnalysis] publish : ");
         }
         communications.notifyProgressEnd(uri);
       }
@@ -173,6 +175,7 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
    * Trigger reanalyse of opened programs.
    */
   public void reanalyseOpenedPrograms() throws InterruptedException {
+    LOG.debug("Re analysis Triggered");
     List<CobolDocumentModel> openDocuments = documentModelService.getAllOpened()
             .stream().filter(d -> !analysisService.isCopybook(d.getUri(), d.getText())).collect(Collectors.toList());
     boolean analysisInProgress;
@@ -185,6 +188,7 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
       if (analysisInProgress) {
         cancelRunningAnalysis(openDocuments);
       }
+      LOG.debug("Open Documents List : {} ", openDocuments.size());
       LOG.debug(" re-analysis is waiting for prev analysis to finish");
       TimeUnit.MILLISECONDS.sleep(100);
     } while (analysisInProgress);
@@ -192,6 +196,7 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
     copybookService.invalidateCache(true);
     subroutineService.invalidateCache();
     LOG.info("Cache invalidated");
+    LOG.debug("Open Documents List after Sleep: {} ", openDocuments.size());
     openDocuments
             .forEach(doc -> scheduleAnalysis(doc.getUri(), doc.getText(), analysisResultsRevisions.getOrDefault(doc.getUri(), 0), false, true, SourceUnitGraph.EventSource.IDE));
   }
