@@ -757,7 +757,11 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
     final ProcedureName thruName = parseProcedureName(Optional.ofNullable(ctx.through())
             .map(ThroughContext::procedureName)
             .orElse(null));
-    return addTreeNode(ctx, locality -> new PerformNode(locality, targetName, thruName));
+
+    List<Node> children = visitChildren(ctx);
+    return retrieveLocality(ctx.getParent().getParent())
+            .map(constructNode(locality -> new PerformNode(locality, targetName, thruName), children))
+            .orElse(children);
   }
 
   @Override

@@ -21,7 +21,7 @@
           "uri": "fake/path",
           "start": {
             "line": 16,
-            "character": 20
+            "character": 12
           },
           "end": {
             "line": 16,

@@ -99,7 +99,7 @@
                   "uri": "fake/path",
                   "start": {
                     "line": 21,
-                    "character": 20
+                    "character": 12
                   },
                   "end": {
                     "line": 21,
