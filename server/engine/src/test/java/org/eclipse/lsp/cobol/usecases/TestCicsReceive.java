@@ -16,7 +16,11 @@ package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
+import org.eclipse.lsp4j.Diagnostic;
+import org.eclipse.lsp4j.DiagnosticSeverity;
+import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -35,11 +39,15 @@ public class TestCicsReceive {
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
           + "       PROCEDURE DIVISION.\n"
-          + "            EXEC CICS RECEIVE\n"
+          + "            EXEC CICS \n"
           + "            END-EXEC.";
 
-  private static final String[] DEFAULT_CONFIG_OPTIONS_ONE = {
-    "INTO(100)", "MAXLENGTH(100)", "LENGTH(10)", "MAXLENGTH(100)", "NOTRUNCATE"
+  private static final String[] DEFAULT_ALL_OPTIONS_VALID_ONE = {
+    "RECEIVE", "INTO(100)", "LENGTH(10)", "MAXLENGTH(100)", "NOTRUNCATE"
+  };
+
+  private static final String[] DEFAULT_ALL_OPTIONS_INVALID_ONE = {
+    "{RECEIVE|1}", "INTO(100)", "MAXLENGTH(100)", "LENGTH(10)", "MAXLENGTH(100)", "NOTRUNCATE"
   };
 
   private static String getTestString(String[] components) {
@@ -47,35 +55,27 @@ public class TestCicsReceive {
       components[i] = "                " + components[i];
     }
     ArrayList<String> base = new ArrayList<String>(Arrays.asList(DEFAULT_BASE_TEXT.split("\n")));
-    base.addAll(base.indexOf("            EXEC CICS RECEIVE") + 1, Arrays.asList(components));
+    base.addAll(base.indexOf("            END-EXEC."), Arrays.asList(components));
     return String.join("\n", base);
   }
 
   @Test
-  void testDefaultReceiveCICSCommand_withAllOptionsOne() {
-    //        UseCaseEngine.runTest(getTestString(defaultZOSAllOptionsOne), ImmutableList.of(),
-    // ImmutableMap.of("one", new Diagnostic(
-    //                new Range(),
-    //                "Any error please",
-    //                Error,
-    //                ErrorSource.PREPROCESSING.getText())));
-
+  void testDefaultReceiveCICSCommand_withAllOptionsValidOne() {
     UseCaseEngine.runTest(
-        getTestString(DEFAULT_CONFIG_OPTIONS_ONE), ImmutableList.of(), ImmutableMap.of());
+        getTestString(DEFAULT_ALL_OPTIONS_VALID_ONE), ImmutableList.of(), ImmutableMap.of());
+  }
 
-    //        AnalysisResult analysisResult =
-    //                UseCaseEngine.runTest(
-    //                        getTestString(defaultZOSAllOptionsOne),
-    //                        ImmutableList.of(),
-    //                        ImmutableMap.of(),
-    //                        ImmutableList.of(),
-    //                        AnalysisConfig.defaultConfig(CopybookProcessingMode.ENABLED));
-    //        List<Node> sections =
-    //                analysisResult
-    //                        .getRootNode()
-    //                        .getDepthFirstStream()
-    //                        .filter(it -> it.getNodeType().equals(NodeType.PROCEDURE_SECTION))
-    //                        .collect(Collectors.toList());
-    //        assertThat(sections.size(), equalTo(1));
+  @Test
+  void testDefaultReceiveCICSCommand_withAllOptionsInvalidOne() {
+    UseCaseEngine.runTest(
+        getTestString(DEFAULT_ALL_OPTIONS_INVALID_ONE),
+        ImmutableList.of(),
+        ImmutableMap.of(
+            "1",
+            new Diagnostic(
+                new Range(),
+                "Extraneous input 'RECEIVE'",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
   }
 }
