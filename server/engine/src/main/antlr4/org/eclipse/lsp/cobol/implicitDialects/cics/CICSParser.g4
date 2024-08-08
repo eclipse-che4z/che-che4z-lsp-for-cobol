@@ -148,7 +148,7 @@ new_cics_receive_group_one:          new_cics_into_set? new_cics_length_flength 
 //new_cics_receive_lut6:              RECEIVE (SESSION cics_name)? new_cics_into_set new_cics_length_flength new_cics_max_length_flength? NOTRUNCATE? cics_handle_response?;
 //new_cics_receive_mro:               RECEIVE (SESSION cics_name)? new_cics_into_set new_cics_length_flength new_cics_max_length_flength? NOTRUNCATE? (STATE cics_cvda)? cics_handle_response?;
 // cics_group_two summary
-new_cics_receive_group_two:          ((CONVID cics_name)? | (SESSION cics_name)?) new_cics_into_set new_cics_length_flength cics_maxlength? NOTRUNCATE? (STATE cics_cvda)?;
+new_cics_receive_group_two:          (CONVID cics_name | SESSION cics_name)? new_cics_into_set new_cics_length_flength cics_maxlength? NOTRUNCATE? (STATE cics_cvda)?;
 
 // Independents
 new_cics_receive_2980:              new_cics_into_set? new_cics_length_flength cics_maxlength? NOTRUNCATE? PASSBK;
