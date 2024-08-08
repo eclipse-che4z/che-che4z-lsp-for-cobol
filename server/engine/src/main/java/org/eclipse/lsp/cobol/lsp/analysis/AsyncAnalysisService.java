@@ -183,6 +183,7 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
               .filter(analysisResults::containsKey)
               .anyMatch(id -> !analysisResults.get(id).isDone());
       if (analysisInProgress) {
+        LOG.debug(" Adonis : Analysis Cancelled");
         cancelRunningAnalysis(openDocuments);
       }
       LOG.debug(" re-analysis is waiting for prev analysis to finish");
@@ -221,6 +222,9 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
             .filter(model -> !analysisService.isCopybook(model.getUri(), model.getText()))
             .map(CobolDocumentModel::getUri)
             .collect(Collectors.toList());
+    if(openedUris.isEmpty()){
+      LOG.debug(" Adonis : Analysis for reanalyseCopybooksAssociatedPrograms empty Uri");
+    }
     for (String uri : openedUris) {
         String languageId = documentModelService.get(uri).getLanguageId();
       //TODO: update cache directly from workspace document graph
@@ -239,6 +243,7 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
       subroutineService.invalidateCache();
       LOG.info("Cache invalidated");
       CobolDocumentModel document = documentModelService.get(uri);
+      LOG.debug(" Adonis : Analysis for reanalyseCopybooksAssociatedPrograms ");
       scheduleAnalysis(uri, document.getText(), analysisResultsRevisions.get(document.getUri()), false, true, eventSource);
     }
   }

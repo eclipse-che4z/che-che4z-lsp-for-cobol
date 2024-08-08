@@ -113,6 +113,7 @@ public class CobolWorkspaceServiceImpl extends LspEventConsumer implements Works
             String uriString = uriDecodeService.decode(path.toUri().toString());
             if (sourceUnitGraph.isFileOpened(uriString)) {
               // opened files are taken care by textChange events
+              LOG.debug(" Adonis : Analysis for opened files discarded");
               return;
             }
             boolean isDirectory = Files.isDirectory(path);
@@ -122,6 +123,7 @@ public class CobolWorkspaceServiceImpl extends LspEventConsumer implements Works
               triggerAnalysisForFilesInDirectory(path);
             }
           }
+          LOG.debug(" Adonis : Analysis discarded for scheme mismatch");
         });
   }
 
@@ -131,6 +133,7 @@ public class CobolWorkspaceServiceImpl extends LspEventConsumer implements Works
         sourceUnitGraph.getAllAssociatedFilesForACopybook(uriDecodeService.decode(uri));
     String fileContent = null;
     if (uris.isEmpty()) {
+        LOG.debug(" Adonis : Analysis for Files changed");
       asyncAnalysisService.reanalyseOpenedPrograms();
       return;
     }
@@ -142,6 +145,7 @@ public class CobolWorkspaceServiceImpl extends LspEventConsumer implements Works
       asyncAnalysisService.reanalyseCopybooksAssociatedPrograms(
           uris, uri, fileContent, SourceUnitGraph.EventSource.FILE_SYSTEM);
     }
+    LOG.debug(" Adonis : Analysis for Files changed cancelled");
   }
 
   private void triggerAnalysisForFilesInDirectory(Path path) {
@@ -152,7 +156,9 @@ public class CobolWorkspaceServiceImpl extends LspEventConsumer implements Works
                 copybookUri ->
                     sourceUnitGraph.getAllAssociatedFilesForACopybook(copybookUri).stream())
             .collect(Collectors.toSet());
-
+    if(affectedPrograms.isEmpty()){
+      LOG.debug(" Adonis : Empty for Directory Analysis Cancelled");
+    }
     affectedPrograms.forEach(this::triggerAnalysisForChangedFile);
   }
 }
