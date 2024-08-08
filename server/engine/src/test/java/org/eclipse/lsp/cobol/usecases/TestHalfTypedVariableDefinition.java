@@ -30,7 +30,6 @@ class TestHalfTypedVariableDefinition {
           + "       Program-id. HELLO-WORLD.\n"
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
-// TODO   + "       01 {$*COD-RETOUR} PIC X{(|1|2}66";
           + "       01 {$*COD-RETOUR} PIC X{(|1}{66|2}{|3}";
 
   @Test
@@ -42,7 +41,7 @@ class TestHalfTypedVariableDefinition {
             "1",
             new Diagnostic(
                 new Range(),
-                "Extraneous input '('",
+                "A period was assumed before \"(\".",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()),
            "2",
@@ -57,18 +56,6 @@ class TestHalfTypedVariableDefinition {
                "Unexpected end of file",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())
-//            "1",
-//            new Diagnostic(
-//                new Range(),
-//                "A period was assumed before \"(\".",
-//                DiagnosticSeverity.Error,
-//                ErrorSource.PARSING.getText()),
-//            "2",
-//            new Diagnostic(
-//                new Range(),
-//                "Syntax error on '('",
-//                DiagnosticSeverity.Error,
-//                ErrorSource.PARSING.getText())
         ));
   }
 }

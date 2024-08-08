@@ -43,8 +43,6 @@ class TestTypingExecDoesNotProduceException {
             "1",
             new Diagnostic(
                 new Range(),
-                // TODO "A period was assumed before \"<EOF>\".",
-                //  "Missing token '.' at dot_fs",
                 "Unexpected end of file",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())));

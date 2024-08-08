@@ -26,7 +26,7 @@ import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
-/** Test for multiline variable definition * */
+/** Test for multiline variable definition */
 class TestMappingMultilineVariable {
   private static final String TEXT =
       "000100 IDENTIFICATION DIVISION.                                         NC2054.2\n"
@@ -40,8 +40,6 @@ class TestMappingMultilineVariable {
           + "006600                                                                  NC2054.2\n"
           + "006700     X(10)                                                   VALUENC2054.2\n"
           + "006900     \"ABCDE12345\".                                                NC2054.2\n"
-          //      + "007100 77  {$*SPACING-RECEIVE|1}    {PICTUREQ|2}{|3}
-          //       NC2054.2\n";
           + "007100 77  {$*SPACING-RECEIVE|1}    {PICTUREQ|2}                                  NC2054.2\n";
 
   @Test
@@ -57,21 +55,11 @@ class TestMappingMultilineVariable {
                 Error,
                 ErrorSource.PARSING.getText()),
             "2",
-            //            new Diagnostic(
-            //                new Range(),
-            //                "Encountered invalid token. Analysis skipped to the next verb or
-            // period.",
-            //                Error,
-            //                ErrorSource.PARSING.getText())
             new Diagnostic(
-                new Range(), "Syntax error on 'PICTUREQ'", Error, ErrorSource.PARSING.getText())
-            // TODO: A period was assumed before EOF
-            //            "3",
-            //            new Diagnostic(
-            //                new Range(),
-            //                "A period was assumed before \"<EOF>\".",
-            //                Error,
-            //                ErrorSource.PARSING.getText())
+              new Range(),
+              "Syntax error on 'PICTUREQ'",
+              Error,
+              ErrorSource.PARSING.getText())
             ),
         ImmutableList.of(),
         AnalysisConfig.defaultConfig(CopybookProcessingMode.DISABLED));

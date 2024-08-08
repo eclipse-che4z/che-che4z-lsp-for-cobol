@@ -51,7 +51,6 @@ class TestVariableEndDoesNotProduceNPE {
             new Diagnostic(
                 new Range(),
                 "Syntax error on 'END'",
-// TODO                "A period was assumed before \"END\".",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()),
             "3",

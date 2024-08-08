@@ -31,7 +31,7 @@ class TestDeclarativesSection {
             "       Identification Division.\n"
                     + "       Program-id. HELLO-WORLD.\n"
                     + "       Procedure Division.\n"
-                    + "       DECLARATIVES{|1|2}";
+                    + "       DECLARATIVES{|1}";
 
     private static final String TEXT_2 =
             "       Identification Division.\n"
@@ -60,18 +60,16 @@ class TestDeclarativesSection {
                                 new Range(),
                                 "Unexpected end of file",
                                 DiagnosticSeverity.Error,
-                                ErrorSource.PARSING.getText()),
-                        "2",
-                        new Diagnostic(
-                                new Range(),
-                                "Unexpected end of file",
-                                // TODO: old error message was "A period was assumed before \"<EOF>\".",
-                                DiagnosticSeverity.Error,
                                 ErrorSource.PARSING.getText())));
     }
 
     @Test
     void test2() {
-        UseCaseEngine.runTest(TEXT_2, ImmutableList.of(), ImmutableMap.of());
+        UseCaseEngine.runTest(TEXT_2, ImmutableList.of(),
+                ImmutableMap.of("1",
+                        new Diagnostic(new Range(),
+                                "\"VAR1\" was defined as a type that was invalid in this context. The statement was discarded",
+                                DiagnosticSeverity.Error,
+                                ErrorSource.PARSING.getText())));
     }
 }

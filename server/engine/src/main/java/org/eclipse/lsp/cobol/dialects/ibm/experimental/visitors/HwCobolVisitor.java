@@ -48,7 +48,6 @@ public class HwCobolVisitor extends CobolVisitor {
 
   @Override
   public List<Node> visitStatement(StatementContext ctx) {
-
     if (expectedInAriaA(ctx)) {
       areaBWarning(ctx);
     }

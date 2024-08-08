@@ -57,7 +57,7 @@ class TestSetUpDownBy {
           + "           SET {$NOT-A-TABLE|1} {$IND1} UP BY 1.\n"
           + "           SET {$IND1} UP BY {$INTVAL}.\n"
           + "           SET {$IND1} UP BY {$SUBINT} OF {$GROUP-VAR}.\n"
-          + "           SET {$IND1} UP BY {$SUBINT} {#*IND3|3|5}.\n"
+          + "           SET {$IND1} UP BY {$SUBINT} {#*IND3|3|ariaa}.\n"
           + "           SET {$INTVAL|1} DOWN BY {$SUBINT} OF {$GROUP-VAR}.\n"
           + "           SET {$IND1} DOWN BY {IND4|4}.\n"
           + "           SET {IND4|4} DOWN BY {$INTVAL}.\n"
@@ -87,7 +87,7 @@ class TestSetUpDownBy {
             "3",
             new Diagnostic(
                 new Range(),
-                    "Extraneous input 'IND3'",
+                    "A period was assumed before \"IND3\".",
                     DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()),
             "4",
@@ -96,12 +96,13 @@ class TestSetUpDownBy {
                 "Variable IND4 is not defined",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()),
-            "5",
+            "ariaa",
             new Diagnostic(
                 new Range(),
                 "The following token must start in Area A: IND3",
                 DiagnosticSeverity.Warning,
-                ErrorSource.PARSING.getText())),
+                ErrorSource.PARSING.getText())
+        ),
         ImmutableList.of(),
         AnalysisConfig.defaultConfig(CopybookProcessingMode.DISABLED));
   }

@@ -22,11 +22,9 @@ import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.eclipse.lsp4j.Range;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 /** This test checks that PIC Clause with valid period usage. */
-@Disabled("Optimized parser can't report expected DOT yet")
 class TestPICVariableStructure {
   private static final String TEXT =
       "       IDENTIFICATION DIVISION.\n"
@@ -48,8 +46,8 @@ class TestPICVariableStructure {
           + "       ENVIRONMENT DIVISION.                                            \n"
           + "       DATA DIVISION.                                                   \n"
           + "       WORKING-STORAGE SECTION.                                         \n"
-          + "       77  {$*DATA-J}                             PICTURE IS {W|1}WWWW.         \n"
-          + "       {77|2}  {$*DATA-S}             PICTURE X(20) VALUE               \"OFFSET \n"
+          + "       77  {$*DATA-J}                             PICTURE IS {W|1}WWWW.\n"
+          + "       {77}  {$*DATA-S}             PICTURE X(20) VALUE               \"OFFSET \n"
           + "      -             \"CONTINUATION \".     ";
 
   @Test
@@ -67,12 +65,6 @@ class TestPICVariableStructure {
             new Diagnostic(
                 new Range(),
                 "Syntax error on 'W'",
-                DiagnosticSeverity.Error,
-                ErrorSource.PARSING.getText()),
-            "2",
-            new Diagnostic(
-                new Range(),
-                "A period was assumed before \"77\".",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())));
   }

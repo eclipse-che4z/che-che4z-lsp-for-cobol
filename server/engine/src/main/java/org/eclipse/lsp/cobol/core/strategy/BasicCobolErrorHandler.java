@@ -19,8 +19,10 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.misc.IntervalSet;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.message.MessageServiceProvider;
+import org.eclipse.lsp.cobol.core.CobolParser;
 
 /**
  * This implementation of the error strategy customizes error messages that are extracted from the
@@ -97,15 +99,43 @@ public class BasicCobolErrorHandler extends DefaultErrorStrategy implements Mess
         }
         beginErrorCondition(recognizer);
         Token currentToken = recognizer.getCurrentToken();
-        String msg =
-                errorMessageHelper.getUnwantedTokenMessage(
-                        recognizer, currentToken, getTokenErrorDisplay(currentToken));
-        recognizer.notifyErrorListeners(currentToken, msg, null);
+        IntervalSet expectedTokens = recognizer.getExpectedTokens();
+        if (dotIsExpected(expectedTokens)
+                && !dotIsNext(recognizer.getInputStream())
+                && !errorCharIsNext(recognizer.getInputStream())) {
+            ((CobolParser) recognizer).notifyError("missing.period", currentToken.getText());
+        } else {
+            String msg =
+                    errorMessageHelper.getUnwantedTokenMessage(
+                            recognizer, currentToken, getTokenErrorDisplay(currentToken));
+            recognizer.notifyErrorListeners(currentToken, msg, null);
+        }
+    }
+
+    private static boolean dotIsExpected(IntervalSet expectedTokensForRule) {
+        return expectedTokensForRule.contains(CobolParser.DOT_FS)
+                || expectedTokensForRule.contains(CobolParser.DOT_FS2);
+    }
+
+    private static boolean dotIsNext(TokenStream inputStream) {
+        return isDot(inputStream.LA(1));
+    }
+
+    private boolean errorCharIsNext(TokenStream inputStream) {
+        return inputStream.LA(1) == CobolParser.ERRORCHAR;
+    }
+
+    private static boolean isDot(int type) {
+        return type == CobolParser.DOT_FS || type == CobolParser.DOT_FS2;
     }
 
     @Override
     protected void reportMissingToken(Parser recognizer) {
         if (inErrorRecoveryMode(recognizer)) {
+            return;
+        }
+        if (dotIsExpected(recognizer.getExpectedTokens())) {
+            ((CobolParser) recognizer).notifyError("missing.period", recognizer.getCurrentToken().getText());
             return;
         }
         beginErrorCondition(recognizer);

@@ -90,7 +90,7 @@ public final class DaCoDialect implements CobolDialect {
     lexer.addErrorListener(listener);
     parser.removeErrorListeners();
     parser.addErrorListener(listener);
-    parser.setErrorHandler(new CobolErrorStrategy(messageService));
+    parser.setErrorHandler(new DaCoErrorStrategy(messageService));
     DaCoVisitor visitor = new DaCoVisitor(context);
     List<Node> nodes = visitor.visitStartRule(parser.startRule());
     nodes.addAll(maidOutcome.getDialectNodes());

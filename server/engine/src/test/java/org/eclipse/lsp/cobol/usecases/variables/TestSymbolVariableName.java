@@ -115,7 +115,7 @@ public class TestSymbolVariableName {
                   "1",
                   new Diagnostic(
                           new Range(),
-                          String.format("Extraneous input '%s'", keyword.getLeft()),
+                          String.format("A period was assumed before \"%s\".", keyword.getLeft()),
                           DiagnosticSeverity.Error,
                           ErrorSource.PARSING.getText()));
 

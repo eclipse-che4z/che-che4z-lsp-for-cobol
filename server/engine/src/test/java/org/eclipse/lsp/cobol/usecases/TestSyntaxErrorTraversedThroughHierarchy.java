@@ -47,8 +47,7 @@ class TestSyntaxErrorTraversedThroughHierarchy {
   private static final String CONT = "       {_COPY {~REPL}.|1_}";
   private static final String CONT_NAME = "CONT";
 
-    private static final String REPL = "       {#*05} {#*TAG-ID|3} {PIC|4} 9.\n";
-//  private static final String REPL = "       {#*05} {TAG-ID|3|skip} {PIC|4|5} 9.\n";
+  private static final String REPL = "       {#*05} {#*TAG-ID|3} {PIC|4} 9.\n";
   private static final String REPL_NAME = "REPL";
 
   @Test
@@ -68,30 +67,15 @@ class TestSyntaxErrorTraversedThroughHierarchy {
             new Diagnostic(
                 new Range(),
                 "Syntax error on 'TAG-ID'",
-// TODO                "A period was assumed before \"TAG-ID\".",
                 Error,
                 ErrorSource.PARSING.getText(),
                 null),
             "4",
             new Diagnostic(
-                new Range(), "Syntax error on 'PIC'", Error, ErrorSource.PARSING.getText(), null)
-// TODO
-//            ,
-//            "5",
-//            new Diagnostic(
-//                new Range(),
-//                "A period was assumed before \"PIC\".",
-//                Error,
-//                ErrorSource.PARSING.getText(),
-//                null)
-//            ,
-//            "skip",
-//            new Diagnostic(
-//                new Range(),
-//                "Encountered invalid token. Analysis skipped to the next verb or period.",
-//                Error,
-//                ErrorSource.PARSING.getText(),
-//            null)
-        ));
+                new Range(),
+                "Syntax error on 'PIC'",
+                Error,
+                ErrorSource.PARSING.getText(),
+                null)));
   }
 }

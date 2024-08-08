@@ -19,48 +19,62 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.eclipse.lsp4j.Range;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 /**
  * Tests the toleration of missing DOT_FS
  */
-// TODO fix it
-@Disabled("Parser optimization break this case")
 public class TestTolerationForMissingDot {
-  public static final String TEXT =
-      "       IDENTIFICATION DIVISION\n"
-          + "       {PROGRAM-ID|1}. testabd.\n"
-          + "       ENVIRONMENT DIVISION\n"
-          + "       {CONFIGURATION|2} SECTION\n"
-          + "       {SPECIAL-NAMES|3}.\n"
-          + "       SOURCE-COMPUTER    {IBM-PC|4}                                              \n"
-          + "       {OBJECT-COMPUTER|5}    .IBM-PC CHARACTER SET.\n"
-          + "       {INPUT-OUTPUT|6} SECTION\n"
-          + "       {FILE-CONTROL|7}\n"
-          + "       {DATA|8} DIVISION\n"
-          + "        {FILE|9} SECTION\n"
-          + "        {WORKING-STORAGE|10} SECTION\n"
-          + "        {01|11} {$*test1}.\n"
-          + "           05 {$*testa} pic x\n"
-          + "        {LINKAGE|12} SECTION\n"
-          + "       {PROCEDURE|13} DIVISION\n"
-          + "        {_{@*MAIN-PROCESSING}|14_} SECTION.\n"
-          + "         {#*MAINLINE-PARAGRAPH}.\n"
-          + "             display {$TESTA}\n"
-          + "             STOP RUN.\n"
-          + "       {#*ABC}\n"
-          + "           {display|15} \"under abc\".";
+  public static final String TEXT_ENV_COMP =
+          "       IDENTIFICATION DIVISION.\n"
+                  + "       PROGRAM-ID. aaa.\n"
+                  + "       ENVIRONMENT DIVISION.\n"
+                  + "       CONFIGURATION SECTION.\n"
+                  + "       SPECIAL-NAMES.\n"
+                  + "       SOURCE-COMPUTER {IBM-PC|1}\n"
+                  + "       {OBJECT-COMPUTER|2}. {IBM-PC|3} CHARACTER SET.\n"
+                  + "       PROCEDURE DIVISION.\n";
+
+  public static final String TEXT_ID =
+          "       IDENTIFICATION DIVISION\n"
+                  + "       {PROGRAM-ID|1}. aaa.\n"
+                  + "       PROCEDURE DIVISION.\n";
 
   @Test
-  void test() {
-    UseCaseEngine.runTest(TEXT, ImmutableList.of(), getExpectedDiagnostics());
+  void testId() {
+    UseCaseEngine.runTest(TEXT_ID, ImmutableList.of(), ImmutableMap.of(
+            "1",
+            new Diagnostic(new Range(), "A period was assumed before \"PROGRAM-ID\".",
+                    DiagnosticSeverity.Error,
+                    ErrorSource.PARSING.getText())
+    ));
   }
+
+  @Test
+  void testEnvComp() {
+    UseCaseEngine.runTest(TEXT_ENV_COMP, ImmutableList.of(), ImmutableMap.of(
+            "1",
+            new Diagnostic(new Range(), "A period was assumed before \"IBM-PC\".",
+                    DiagnosticSeverity.Error,
+                    ErrorSource.PARSING.getText()),
+            "2",
+            new Diagnostic(new Range(), "A period was assumed before \"OBJECT-COMPUTER\".",
+                    DiagnosticSeverity.Error,
+                    ErrorSource.PARSING.getText()),
+            "3",
+            new Diagnostic(new Range(), "Syntax error on 'IBM-PC'",
+                    DiagnosticSeverity.Error,
+                    ErrorSource.PARSING.getText())
+    ));
+  }
+
 
   private Stream<String> getExpectedErrorMessages() {
     return Stream.of(

@@ -742,7 +742,7 @@ procedureDivisionUsingParameter
    ;
 
 procedureDeclaratives
-   : DECLARATIVES dot_fs procedureDeclarative+ END DECLARATIVES dot_fs   ;
+   : DECLARATIVES dot_fs procedureDeclarative+ END DECLARATIVES dot_fs;
 
 procedureDeclarative
    : procedureSectionHeader dot_fs (useStatement dot_fs) paragraphs
@@ -951,7 +951,7 @@ acceptStatement
    ;
 
 dialectStatement
-   : ZERO_WIDTH_SPACE+ | dialectIfStatment
+   : ZERO_WIDTH_SPACE | dialectIfStatment
    ;
 
 acceptFromDateStatement
@@ -1303,7 +1303,7 @@ dialectIfStatment
    : DIALECT_IF dialectNodeFiller* ifThen ifElse? END_IF?
    ;
 ifStatement
-   : IF condition ifThen ifElse? (END_IF | {_input.LA(1)==DOT_FS || _input.LA(1)==ELSE}?)
+   : IF condition ifThen ifElse? (END_IF | {_input.LA(1)==DOT_FS || _input.LA(1)==ELSE || _input.LA(1)==EOF}?)
    ;
 
 ifThen
@@ -1769,18 +1769,10 @@ sendingField
 
 serviceStatement
    :
-   serviceLabelStatement
-   |
-   serviceReloadStatement
-   ;
-
-serviceLabelStatement
-   : LABEL
-   ;
-
-serviceReloadStatement
-   : RELOAD generalIdentifier
-   ;
+   SERVICE
+   (
+      LABEL | RELOAD generalIdentifier
+   );
 
 // sort statement
 
@@ -2337,10 +2329,9 @@ allowedCobolKeywords
    ;
 
 dialectNodeFiller
-    : ZERO_WIDTH_SPACE+ DOT_FS? EOF?
+    : ZERO_WIDTH_SPACE DOT_FS? EOF?
     ;
 
 dot_fs
     : DOT_FS
-//    | {notifyError("missing.period", _input.LT(1).getText());}
     ;
