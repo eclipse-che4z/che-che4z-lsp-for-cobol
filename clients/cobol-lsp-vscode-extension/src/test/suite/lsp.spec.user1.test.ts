@@ -55,7 +55,16 @@ suite("Tests with USER1.cbl", function () {
   });
 
   test("TC152049: Navigate through definitions", async () => {
-    await helper.sleep(10000);
+    await helper.waitFor(
+      async () =>
+        (
+          (await vscode.commands.executeCommand(
+            "vscode.executeDefinitionProvider",
+            editor.document.uri,
+            pos(28, 24),
+          )) as any[]
+        ).length > 0,
+    );
     const result: any[] = await vscode.commands.executeCommand(
       "vscode.executeDefinitionProvider",
       editor.document.uri,

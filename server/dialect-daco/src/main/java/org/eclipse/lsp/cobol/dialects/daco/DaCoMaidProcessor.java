@@ -288,7 +288,7 @@ public class DaCoMaidProcessor {
     VariableParser parser = new VariableParser(tokens);
     parser.removeErrorListeners();
     parser.addErrorListener(listener);
-    parser.setErrorHandler(new CobolErrorStrategy(messageService));
+    parser.setErrorHandler(new DaCoErrorStrategy(messageService));
     parser.addParseListener(treeListener);
 
     DaCoCopybookVisitor visitor =

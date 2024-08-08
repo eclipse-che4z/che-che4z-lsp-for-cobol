@@ -145,20 +145,7 @@ public class TransformTreeStage implements Stage<AnalysisContext, ProcessingResu
       if (!node.getChildren().isEmpty()) {
           shapeSectionsAndParagraphs(node);
       }
-      if (!stack.isEmpty() && !RangeUtils.isInside(node.getLocality().getRange(), stack.peek().getLocality().getRange())) {
-          switch (stack.peek().getNodeType()) {
-              case PARAGRAPH:
-                  stack.pop();
-                  stack.pop();
-                  break;
-              case PROCEDURE_SECTION:
-                  stack.pop();
-                  break;
-              default:
-                  break;
-          }
-      }
-      if (node.getNodeType() == NodeType.PROCEDURE_SECTION) {
+      if (node.getNodeType() == NodeType.PROCEDURE_SECTION && !(node instanceof DeclarativeProcedureSectionNode)) {
           handleSection(parent, stack, node);
           parent.addChild(node);
           continue;
@@ -302,5 +289,4 @@ public class TransformTreeStage implements Stage<AnalysisContext, ProcessingResu
     List<ProcessorDescription> pds = dialectService.getProcessors(analysisConfig.getDialects());
     pds.forEach(ctx::register);
   }
-
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Broadcom.
+ * Copyright (c) 2024 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -24,27 +24,21 @@ import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
-/** Typing a variable definition with OCCURS TO clause should not produce any exceptions */
-class TestOccursToDoesNotProduceExceptions {
-  private static final String TEXT =
-      "       IDENTIFICATION DIVISION.\n"
-          + "       PROGRAM-ID.    MNEM.\n"
-          + "       DATA DIVISION.\n"
-          + "       working-storage section.\n"
-          + "       01 {$*ABCD} OCCURS 5 TO{|1}";
+/**
+ * Check EXEC CICS not in Procedure Division error message
+ */
+class TestExecCicsInProcedureDivision {
 
-  @Test
-  void test() {
-    UseCaseEngine.runTest(
-        TEXT,
-        ImmutableList.of(),
-        ImmutableMap.of(
-            "1",
-            new Diagnostic(
-                new Range(),
-                "Unexpected end of file",
-                DiagnosticSeverity.Error,
-                ErrorSource.PARSING.getText())
-            ));
-  }
+    private static final String TEXT =
+            "       IDENTIFICATION DIVISION.\n"
+                    + "       PROGRAM-ID. CICSERR.\n"
+                    + "       DATA DIVISION.\n"
+                    + "           {_EXEC CICS END-EXEC|1_}.\n";
+
+    @Test
+    void test() {
+        UseCaseEngine.runTest(TEXT, ImmutableList.of(), ImmutableMap.of(
+                "1", new Diagnostic(new Range(), "Invalid CICS EXEC block", DiagnosticSeverity.Error, ErrorSource.PARSING.getText())
+        ));
+    }
 }

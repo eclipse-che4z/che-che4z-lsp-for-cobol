@@ -38,7 +38,6 @@ class TestMisspelledKeywordWarningInCorrectPosition {
           + "4       COPY {~STRUC1}. \n"
           + "5      Procedure Division.\n"
           + "6      {#*000-Main-Logic}.\n"
-          //          + "7          {@*DISPLA|area} {\"hello\"|hello|dot}.\n"
           + "7          {#*DISPLA|area} {\"hello\"|dot}.\n"
           + "8          DISPLAY {$CHILD1} OF {$PARENT1}.\n"
           + "9      End program ProgramId.";
@@ -63,21 +62,10 @@ class TestMisspelledKeywordWarningInCorrectPosition {
                 "The following token must start in Area A: DISPLA",
                 Warning,
                 ErrorSource.PARSING.getText()),
-            // TODO: A period was assumed before
-            //            "hello",
-            //            new Diagnostic(
-            //                new Range(), "Encountered invalid token. Analysis skipped to the next
-            // verb or period.", Error, ErrorSource.PARSING.getText()),
-            //            "dot",
-            //            new Diagnostic(
-            //                new Range(),
-            //                "A period was assumed before \"\"hello\"\".",
-            //                Error,
-            //                ErrorSource.PARSING.getText())
             "dot",
             new Diagnostic(
                 new Range(),
-                "Extraneous input '\"hello\"'",
+                "A period was assumed before \"\"hello\"\".",
                 Error,
                 ErrorSource.PARSING.getText())));
   }

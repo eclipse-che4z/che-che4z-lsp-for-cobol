@@ -394,6 +394,10 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
 
     if (!ctx.procedureDeclarative().isEmpty()) {
       Token declarativeBody = ctx.procedureDeclarative(0).getStart();
+      if (declarativeBody.getType() == EOF) {
+        // Error will be reported by parser
+        return Collections.emptyList();
+      }
       if (firstDeclLine == declarativeBody.getLine()) {
         getLocality(declarativeBody)
                 .ifPresent(
@@ -408,13 +412,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
     areaAWarning(firstDeclarative);
 
     ofNullable(ctx.END()).map(TerminalNode::getSymbol).ifPresent(this::areaAWarning);
-    try {
-      return visitChildren(ctx);
-    } finally {
-      text.flush();
-      text.reset();
-    }
-
+    return visitChildren(ctx);
   }
 
   @Override
@@ -674,6 +672,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
     // https://www.ibm.com/docs/en/cobol-zos/6.4?topic=format-area
     //    Certain items must begin in Area A:
     //    Division headers
+
     if (ctx instanceof IdentificationDivisionContext) {
       return true;
     }
@@ -810,7 +809,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
             .orElse(null));
 
     List<Node> children = visitChildren(ctx);
-    return retrieveLocality(ctx.getParent().getParent())
+    return retrieveLocality(ctx.getParent().getParent(), extendedDocument, copybooks)
             .map(constructNode(locality -> new PerformNode(locality, targetName, thruName), children))
             .orElse(children);
   }
@@ -1468,12 +1467,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   }
 
   @Override
-  public List<Node> visitServiceReloadStatement(CobolParser.ServiceReloadStatementContext ctx) {
-    return addTreeNode(ctx, StatementNode::new);
-  }
-
-  @Override
-  public List<Node> visitServiceLabelStatement(CobolParser.ServiceLabelStatementContext ctx) {
+  public List<Node> visitServiceStatement(ServiceStatementContext ctx) {
     return addTreeNode(ctx, StatementNode::new);
   }
 
@@ -1577,6 +1571,9 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   private void areaAWarning(Token token) {
     // skip area A check for cics and sql block
     if (token.getText().startsWith("EXEC")) {
+      return;
+    }
+    if (token.getType() == EOF) {
       return;
     }
     int areaBStartIndex =

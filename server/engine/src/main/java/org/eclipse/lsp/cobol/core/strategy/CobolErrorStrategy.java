@@ -24,7 +24,6 @@ import org.antlr.v4.runtime.atn.ATNState;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.core.CobolLexer;
-import org.eclipse.lsp.cobol.core.CobolParser;
 import org.eclipse.lsp.cobol.core.MessageServiceParser;
 
 /**
@@ -109,10 +108,8 @@ public class CobolErrorStrategy extends BasicCobolErrorHandler {
       if (nextTokensContext == null) {
         // It's possible the next token won't match; information tracked
         // by sync is restricted for performance.
-        //        List<Integer> skipToTokenList =
-        // CobolLexer.cobolVerbTokens.stream().filter(nextTokens::contains).distinct().collect(Collectors.toList());
         if (shouldSkipToSync(nextTokens, la, lastToken)) {
-          cobolSync(recognizer);
+          consumeUntilNext(recognizer, getSkipToTokenList());
           return;
         }
         nextTokensContext = recognizer.getContext();
@@ -134,7 +131,6 @@ public class CobolErrorStrategy extends BasicCobolErrorHandler {
 
       case ATNState.PLUS_LOOP_BACK:
       case ATNState.STAR_LOOP_BACK:
-        // System.err.println("at loop back: "+s.getClass().getSimpleName());
         reportUnwantedToken(recognizer);
         IntervalSet expecting = recognizer.getExpectedTokens();
         IntervalSet whatFollowsLoopIterationOrRule = expecting.or(getErrorRecoverySet(recognizer));
@@ -147,11 +143,6 @@ public class CobolErrorStrategy extends BasicCobolErrorHandler {
     }
   }
 
-  private void cobolSync(Parser recognizer) {
-    handleMissingDot(recognizer);
-    consumeUntilNext(recognizer, getSkipToTokenList());
-  }
-
   private static List<Integer> getSkipToTokenList() {
     List<Integer> skipToTokenList = new ArrayList<>();
     skipToTokenList.add(CobolLexer.DOT_FS);
@@ -160,20 +151,21 @@ public class CobolErrorStrategy extends BasicCobolErrorHandler {
     return skipToTokenList;
   }
 
-  private static void handleMissingDot(Parser recognizer) {
-    if (recognizer.getContext() instanceof CobolParser.Dot_fsContext
-        && recognizer instanceof CobolParser) {
-      ((CobolParser) recognizer)
-          .notifyError("missing.period", recognizer.getInputStream().LT(1).getText());
+  private static boolean shouldSkipToSync(IntervalSet nextTokens, int la, Optional<Integer> lastToken) {
+    if (!nextTokens.contains(CobolLexer.DOT_FS) && !nextTokens.contains(CobolLexer.DOT_FS2)) {
+      return false;
     }
-  }
-
-  private static boolean shouldSkipToSync(
-      IntervalSet nextTokens, int la, Optional<Integer> lastToken) {
-    return (nextTokens.contains(CobolLexer.DOT_FS) || nextTokens.contains(CobolLexer.DOT_FS2))
-        && !nextTokens.contains(Token.EOF)
-        && la != Token.EOF
-        && (lastToken.isPresent() && !getSkipToTokenList().contains(lastToken.get()));
+    if (nextTokens.contains(Token.EOF)) {
+      return false;
+    }
+    if (la == Token.EOF) {
+      return false;
+    }
+    if (!lastToken.isPresent()) {
+      return false;
+    }
+    Integer token = lastToken.get();
+    return !getSkipToTokenList().contains(token);
   }
 
   protected void consumeUntilNext(Parser recognizer, List<Integer> skipToTokenList) {
@@ -201,5 +193,24 @@ public class CobolErrorStrategy extends BasicCobolErrorHandler {
     }
     nextTokensContext = (ParserRuleContext) recognizer.getContext().parent;
     nextTokensState = recognizer.getState();
+  }
+
+    @Override
+  public Token recoverInline(Parser recognizer) throws RecognitionException {
+    // SINGLE TOKEN INSERTION
+    if (singleTokenInsertion(recognizer)) {
+      return getMissingSymbol(recognizer);
+    }
+    // SINGLE TOKEN DELETION
+    Token matchedSymbol = singleTokenDeletion(recognizer);
+    if (matchedSymbol != null) {
+      recognizer.consume();
+      return matchedSymbol;
+    }
+    if (nextTokensContext == null) {
+      throw new InputMismatchException(recognizer);
+    } else {
+      throw new InputMismatchException(recognizer, nextTokensState, nextTokensContext);
+    }
   }
 }

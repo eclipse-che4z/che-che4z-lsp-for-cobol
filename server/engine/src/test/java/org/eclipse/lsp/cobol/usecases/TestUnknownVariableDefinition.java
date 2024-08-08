@@ -34,7 +34,6 @@ class TestUnknownVariableDefinition {
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
           + "       {_01  BLANK|1_}{|2}";
-// TODO         + "       {_01  BLANK|1_}{|2|3}";
 
   @Test
   void test() {
@@ -53,14 +52,6 @@ class TestUnknownVariableDefinition {
                 new Range(),
                 "Unexpected end of file",
                 DiagnosticSeverity.Error,
-                ErrorSource.PARSING.getText())
-// TODO: optimized parser can't handle this case yet
-//            "3",
-//            new Diagnostic(
-//                new Range(),
-//                "A period was assumed before \"<EOF>\".",
-//                DiagnosticSeverity.Error,
-//                ErrorSource.PARSING.getText())
-        ));
+                ErrorSource.PARSING.getText())));
   }
 }

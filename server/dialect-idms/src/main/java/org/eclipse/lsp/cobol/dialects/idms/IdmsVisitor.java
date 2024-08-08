@@ -39,6 +39,7 @@ import java.util.function.Function;
 
 import static java.util.Optional.ofNullable;
 import static org.eclipse.lsp.cobol.common.VariableConstants.LEVEL_MAP_NAME;
+import static org.eclipse.lsp.cobol.dialects.idms.IdmsParser.DOT_FS;
 
 /**
  * This extension of {@link IdmsParserBaseVisitor} applies the semantic analysis based on the
@@ -190,6 +191,11 @@ class IdmsVisitor extends IdmsParserBaseVisitor<List<Node>> {
                 .toString()
                 .substring(ctx.start.getStartIndex(), ctx.stop.getStopIndex() + 1)
                 .replaceAll("[^ \n]", CobolDialect.FILLER);
+    // TODO: probably it should be resolved in grammar, but we need to preserve dot
+    //  cause COBOL parser does not expect dots to be consumed by IDMS preprocessor.
+    if (ctx.getStop().getType() == DOT_FS) {
+      newText = newText.substring(0, newText.length() - 1) + ".";
+    }
     context.getExtendedDocument().replace(DialectUtils.constructRange(ctx), newText);
   }
 }

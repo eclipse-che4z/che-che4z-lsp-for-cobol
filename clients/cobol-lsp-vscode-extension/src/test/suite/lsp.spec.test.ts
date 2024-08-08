@@ -103,7 +103,7 @@ suite("Integration Test Suite", function () {
     assert.strictEqual(diagnostics.length, 1);
     helper.assertRangeIsEqual(
       diagnostics[0].range,
-      range(pos(34, 11), pos(34, 51)),
+      range(pos(34, 11), pos(34, 50)),
     );
     assert.strictEqual(diagnostics[0].message, "Invalid CICS EXEC block");
   })
@@ -238,7 +238,10 @@ suite("Integration Test Suite", function () {
       diagnostics[0].range,
       range(pos(29, 7), pos(29, 14)),
     );
-    assert.ok(diagnostics[0].message.includes("A period was assumed before"));
+    assert.ok(
+      diagnostics[0].message.includes('A period was assumed before "LINKAGE".'),
+      diagnostics[0].message,
+    );
     await helper.deleteLine(editor, 28);
     await helper.insertString(
       editor,
@@ -559,10 +562,14 @@ suite("Integration Test Suite", function () {
     copyDiagnostics = vscode.languages.getDiagnostics(copybookUri);
     assert.strictEqual(
       copyDiagnostics.length,
-      2,
+      1,
       "got: " + JSON.stringify(diagnostics),
     );
-    assert.strictEqual(copyDiagnostics[1].message, "Syntax error on 'VvvALUE'");
+    assert.strictEqual(
+      copyDiagnostics[0].message,
+      'A period was assumed before "VvvALUE".',
+      copyDiagnostics[0].message,
+    );
   })
     .timeout(helper.TEST_TIMEOUT)
     .slow(1000);

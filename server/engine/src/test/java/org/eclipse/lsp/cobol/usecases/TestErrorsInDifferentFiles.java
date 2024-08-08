@@ -41,14 +41,11 @@ class TestErrorsInDifferentFiles {
           + "4      Procedure Division.\n"
           + "5      {#*000-Main-Logic}.\n"
           + "6      {_COPY {~ASDASD}.|error_} \n"
-          + "7          DISPLAY CHILD1.\n"
+          + "7          DISPLAY {CHILD1|chund}.\n"
           + "8      End program ProgramId.";
 
-//  private static final String ASDASD =
-//      "           {@*03|areaA11}  {@*CHILD1|child11|areaA22}         {PIC|pic1|dot} 9   VALUE IS '0'.";
-
   private static final String ASDASD =
-          "           {#*03|areaA11}  {CHILD1|child11|areaA22}         {PIC|pic1|dot} 9   VALUE IS '0'.";
+          "           {#*03|areaA11}  {#*CHILD1|child11|waria}         {PIC|dot} 9   VALUE IS '0'.";
 
   private static final String ASDASD_NAME = "ASDASD";
 
@@ -57,64 +54,55 @@ class TestErrorsInDifferentFiles {
     UseCaseEngine.runTest(
         TEXT,
         ImmutableList.of(new CobolText(ASDASD_NAME, ASDASD)),
-        new ImmutableMap.Builder<String, Diagnostic>()
-            .put(
-                "pic",
-                new Diagnostic(
-                    new Range(), "Syntax error on 'PIC'", Error, ErrorSource.COPYBOOK.getText()))
-            .put(
-                "pic1",
-                new Diagnostic(
-                    new Range(), "Syntax error on 'PIC'", Error, ErrorSource.PARSING.getText()))
-            .put(
-                "child1",
-                new Diagnostic(
-                    new Range(),
-                    "A period was assumed before \"CHILD1\".",
-                    Error,
-                    ErrorSource.COPYBOOK.getText()))
-            .put(
-                "child11",
-                new Diagnostic(
-                    new Range(),
-                    "A period was assumed before \"CHILD1\".",
-                    Error,
-                    ErrorSource.PARSING.getText()))
-            .put(
-                "areaA1",
-                new Diagnostic(
-                    new Range(),
-                    "The following token must start in Area A: 03",
-                    Warning,
-                    ErrorSource.COPYBOOK.getText()))
-            .put(
-                "areaA11",
-                new Diagnostic(
-                    new Range(),
-                    "The following token must start in Area A: 03",
-                    Warning,
-                    ErrorSource.PARSING.getText()))
-            .put(
-                "error",
-                new Diagnostic(
-                    new Range(),
-                    "Errors inside the copybook",
-                    Error,
-                    ErrorSource.COPYBOOK.getText()))
-            .put(
-                "areaA22",
-                new Diagnostic(
-                    new Range(),
-                    "Encountered invalid token. Analysis skipped to the next verb or period.",
-                    Error,
-                    ErrorSource.PARSING.getText()))
-            .put(
-                "dot",
-                new Diagnostic(
-                    new Range(),
-                    "A period was assumed before \"PIC\".",
-                        Error,
-                    ErrorSource.PARSING.getText()))
-            .build());
+            ImmutableMap.of(
+                    "pic",
+                    new Diagnostic(
+                            new Range(),
+                            "Syntax error on 'PIC'",
+                            Error,
+                            ErrorSource.COPYBOOK.getText()),
+                    "child1",
+                    new Diagnostic(
+                            new Range(),
+                            "Syntax error on 'CHILD1'",
+                            Error,
+                            ErrorSource.COPYBOOK.getText()),
+                    "child11",
+                    new Diagnostic(
+                            new Range(),
+                            "Syntax error on 'CHILD1'",
+                            Error,
+                            ErrorSource.PARSING.getText()),
+                    "areaA11",
+                    new Diagnostic(
+                            new Range(),
+                            "The following token must start in Area A: 03",
+                            Warning,
+                            ErrorSource.PARSING.getText()),
+                    "error",
+                    new Diagnostic(
+                            new Range(),
+                            "Errors inside the copybook",
+                            Error,
+                            ErrorSource.COPYBOOK.getText()),
+                    "waria",
+                    new Diagnostic(
+                            new Range(),
+                            "The following token must start in Area A: CHILD1",
+                            Warning,
+                            ErrorSource.PARSING.getText()),
+                    "dot",
+                    new Diagnostic(
+                            new Range(),
+                            "Syntax error on 'PIC'",
+                            Error,
+                            ErrorSource.PARSING.getText()),
+                    "chund",
+                    new Diagnostic(
+                            new Range(),
+                            "Variable CHILD1 is not defined",
+                            Error,
+                            ErrorSource.PARSING.getText())
+                    ));
   }
 }
