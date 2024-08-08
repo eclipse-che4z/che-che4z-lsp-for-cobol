@@ -16,7 +16,6 @@ package org.eclipse.lsp.cobol.core.preprocessor.delegates.transformer;
 
 import static java.util.Optional.ofNullable;
 import static org.eclipse.lsp.cobol.common.error.ErrorSeverity.ERROR;
-import static org.eclipse.lsp.cobol.core.preprocessor.delegates.rewriter.LineIndicatorProcessor.FLOATING_COMMENT_LINE;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,6 +36,7 @@ import org.eclipse.lsp.cobol.core.preprocessor.delegates.reader.CompilerDirectiv
 import org.eclipse.lsp.cobol.common.dialects.CobolProgramLayout;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
+import static org.eclipse.lsp.cobol.core.preprocessor.delegates.rewriter.LineIndicatorProcessor.FLOATING_COMMENT_LINE;
 
 /**
  * Process continuation lines. Any sentence, entry, clause, or phrase that requires more than one
@@ -59,23 +59,35 @@ public abstract class ContinuationLineTransformation implements CobolLinesTransf
   }
 
   @Override
-  public ResultWithErrors<List<CobolLine>>
-  transformLines(
+  public ResultWithErrors<List<CobolLine>> transformLines(
       String documentURI, List<CobolLine> lines) {
     List<CobolLine> result = new ArrayList<>();
     List<SyntaxError> errors = new ArrayList<>();
-    CobolLine previousLine = null;
-    for (int i = 0; i < lines.size(); i++) {
+      for (int i = 0; i < lines.size(); i++) {
       CobolLine cobolLine = lines.get(i);
 
       ofNullable(checkContinuationLine(documentURI, i, cobolLine)).ifPresent(errors::add);
-      ofNullable(checkIfStringClosedCorrectly(previousLine, documentURI, i, cobolLine))
+      ofNullable(checkInvalidIndexOfInlineComment(documentURI, i + 1, cobolLine))
           .ifPresent(errors::add);
 
-      previousLine = cobolLine;
-      result.add(cobolLine);
+        result.add(cobolLine);
     }
     return new ResultWithErrors<>(result, errors);
+  }
+
+  /**
+   * Check and raise an error if indicator area A of current line is not empty and the previous line
+   * doesn't end correctly.
+   */
+  private SyntaxError checkInvalidIndexOfInlineComment(
+      String uri, int lineNumber, CobolLine currentCobolLine) {
+    if (isBlankLine(currentCobolLine) || isCommentLine(currentCobolLine)) return null;
+
+    Integer invalidIndexOfInlineComment = getInvalidIndexOfInlineComment(currentCobolLine);
+    if (invalidIndexOfInlineComment != null) {
+      return registerInlineCommentError(uri, lineNumber, invalidIndexOfInlineComment);
+    }
+    return null;
   }
 
   /**
@@ -113,10 +125,13 @@ public abstract class ContinuationLineTransformation implements CobolLinesTransf
                   .uri(uri)
                   .range(
                       new Range(
-                          new Position(lineNumber, (codeLayout.getIndicatorLength() + codeLayout.getSequenceLength())),
+                          new Position(
+                              lineNumber,
+                              (codeLayout.getIndicatorLength() + codeLayout.getSequenceLength())),
                           new Position(lineNumber, cobolLine.toString().length())))
                   .recognizer(ContinuationLineTransformation.class)
-                  .build().toOriginalLocation())
+                  .build()
+                  .toOriginalLocation())
           .suggestion(
               messageService.getMessage(
                   "ContinuationLineTransformation.compilerDirectiveContinued"))
@@ -138,7 +153,7 @@ public abstract class ContinuationLineTransformation implements CobolLinesTransf
   // topic - Continuation of alphanumeric and national literals
   private boolean isPseudoDelimiterContinued(CobolLine line, String predecessorContentArea) {
     return StringUtils.stripEnd(StringUtils.normalizeSpace(predecessorContentArea), ",;")
-        .endsWith(PSEUDO_TEXT_DELIMITER)
+            .endsWith(PSEUDO_TEXT_DELIMITER)
         && StringUtils.normalizeSpace(line.getContentArea()).startsWith(PSEUDO_TEXT_DELIMITER);
   }
 
@@ -159,9 +174,11 @@ public abstract class ContinuationLineTransformation implements CobolLinesTransf
   private boolean isBlankLine(CobolLine cobolLine) {
     return BLANK_LINE_PATTERN.matcher(cobolLine.toString()).matches();
   }
+
   private boolean isCommentLine(CobolLine cobolLine) {
     return cobolLine.getType() == CobolLineTypeEnum.COMMENT;
   }
+
   /**
    * Method that check if the rule for fixed format is respected: when there is a continuation line
    * the content area A (7-11) should be blank.
@@ -173,8 +190,10 @@ public abstract class ContinuationLineTransformation implements CobolLinesTransf
    */
   private SyntaxError checkContentAreaAWithContinuationLine(
       CobolLine cobolLine, String uri, int lineNumber) {
-    if (cobolLine.getType() == CobolLineTypeEnum.CONTINUATION && !StringUtils.isBlank(cobolLine.getContentAreaA())) {
-      return registerContinuationLineError(uri, lineNumber, countLeadingSpaces(cobolLine.getContentAreaA()));
+    if (cobolLine.getType() == CobolLineTypeEnum.CONTINUATION
+        && !StringUtils.isBlank(cobolLine.getContentAreaA())) {
+      return registerContinuationLineError(
+          uri, lineNumber, countLeadingSpaces(cobolLine.getContentAreaA()));
     }
     return null;
   }
@@ -183,140 +202,18 @@ public abstract class ContinuationLineTransformation implements CobolLinesTransf
   private int countLeadingSpaces(String line) {
     int spaces = 0;
     for (char c : line.toCharArray())
-      if (c == ' ')
-        spaces++;
-      else
-        break;
+      if (c == ' ') spaces++;
+      else break;
     return spaces;
-  }
-
-  /**
-   * Check and raise an error if indicator area A of current line is not empty and the previous line
-   * doesn't end correctly.
-   */
-  private SyntaxError checkIfStringClosedCorrectly(
-      CobolLine previousCobolLine, String uri, int lineNumber, CobolLine currentCobolLine) {
-    if (isBlankLine(currentCobolLine) || isCommentLine(currentCobolLine))
-      return null;
-    if (checkIfLineHasUnclosedString(previousCobolLine)
-        && !CobolLineTypeEnum.CONTINUATION.equals(currentCobolLine.getType())) {
-      // there is a string not closed correctly - I'll raise an error
-      return registerStringClosingError(
-          uri, lineNumber, getCobolLineTrimmedLength(previousCobolLine));
-    }
-    Integer invalidIndexOfInlineComment = getInvalidIndexOfInlineComment(previousCobolLine);
-    if (invalidIndexOfInlineComment != null) {
-      return registerInlineCommentError(uri, lineNumber, invalidIndexOfInlineComment);
-    }
-    return null;
-  }
-
-  private SyntaxError registerInlineCommentError(String uri, int lineNumber, Integer invalidIndexOfInlineComment) {
-    return SyntaxError.syntaxError().errorSource(ErrorSource.PREPROCESSING)
-            .location(
-                    Locality.builder()
-                            .uri(uri)
-                            .range(
-                                    new Range(
-                                            new Position(lineNumber - 1, invalidIndexOfInlineComment),
-                                            new Position(lineNumber - 1, invalidIndexOfInlineComment + 1)))
-                            .recognizer(ContinuationLineTransformation.class)
-                            .build().toOriginalLocation())
-            .suggestion(messageService.getMessage("inlineComment.missingBlank"))
-            .severity(ERROR)
-            .build();
-  }
-
-  private Integer getInvalidIndexOfInlineComment(CobolLine cobolLine) {
-    if (doNotNeedAnalysis(cobolLine)) return null;
-    Matcher floatingCommentMatcher = FLOATING_COMMENT_LINE.matcher(cobolLine.getContentArea());
-    boolean isInlineCommentPresent = floatingCommentMatcher.matches() && floatingCommentMatcher.group("floatingComment") != null;
-    if (!isInlineCommentPresent) return null;
-    boolean isMissingSpace = !floatingCommentMatcher.group("validText").endsWith(" ");
-    if (isMissingSpace) {
-      int floatingCommentIndex = floatingCommentMatcher.start("floatingComment");
-      return (floatingCommentIndex == 0) ? null : (floatingCommentIndex + getCodeLayout().getSequenceLength());
-    }
-    return null;
-  }
-
-  /** Check with a good pattern if there is an unclosed string */
-  private boolean checkIfLineHasUnclosedString(CobolLine cobolLine) {
-    if (doNotNeedAnalysis(cobolLine)) return false;
-    Matcher floatingCommentMatcher = FLOATING_COMMENT_LINE.matcher(cobolLine.getContentArea());
-    String cobolLineToCheck = floatingCommentMatcher.matches()
-            ? floatingCommentMatcher.group("validText")
-            : cobolLine.getContentArea();
-    String startChar = findQuoteOpeningChar(cobolLineToCheck);
-
-    if (startChar == null) return false;
-    return isStringMatchOdd(cobolLineToCheck, startChar);
-  }
-
-  private boolean doNotNeedAnalysis(CobolLine cobolLine) {
-    return Objects.isNull(cobolLine) || isCommentLine(cobolLine);
-  }
-
-  private String findQuoteOpeningChar(String cobolLineToCheck) {
-    int indexOfSingle = cobolLineToCheck.indexOf('\'');
-    int indexOfDouble = cobolLineToCheck.indexOf('"');
-
-    if (indexOfSingle == indexOfDouble) return null;
-
-    if (indexOfSingle != -1 && indexOfDouble == -1) return "'";
-    if (indexOfSingle == -1) return "\"";
-    return indexOfSingle > indexOfDouble ? "\"" : "'";
-  }
-
-  private boolean isStringMatchOdd(String cobolLineToCheck, String substring) {
-    return StringUtils.countMatches(cobolLineToCheck, substring) % 2 != 0;
-  }
-
-  /**
-   * The syntax error should be thrown in the content area B, so it is necessary to remove the
-   * comment area from the Cobol line
-   *
-   * @param lastCobolLine - CobolLine that was processed before the current one
-   * @return content length without spaces
-   */
-  private int getCobolLineTrimmedLength(CobolLine lastCobolLine) {
-    return (lastCobolLine.getSequenceArea()
-                + lastCobolLine.getIndicatorArea()
-                + lastCobolLine.getContentAreaA()
-                + lastCobolLine.getContentAreaB())
-            .trim()
-            .length()
-        - 1;
-  }
-
-  private SyntaxError registerStringClosingError(
-      String uri, int lineNumber, int cobolLineTrimmedLength) {
-    SyntaxError error =
-        SyntaxError.syntaxError().errorSource(ErrorSource.PREPROCESSING)
-            .location(
-                Locality.builder()
-                    .uri(uri)
-                    .range(
-                        new Range(
-                            new Position(lineNumber - 1, cobolLineTrimmedLength),
-                            new Position(lineNumber - 1, cobolLineTrimmedLength + 1)))
-                    .recognizer(ContinuationLineTransformation.class)
-                    .build().toOriginalLocation())
-            .suggestion(messageService.getMessage("ContinuationLineTransformation.periodRequired"))
-            .severity(ERROR)
-            .build();
-
-    LOG.debug(
-        "Syntax error by ContinuationLineTransformation#registerStringClosingError: {}",
-        error.toString());
-    return error;
   }
 
   private SyntaxError registerContinuationLineError(String uri, int lineNumber, int countingSpace) {
     CobolProgramLayout codeLayout = getCodeLayout();
-    int startPosition = codeLayout.getSequenceLength() + codeLayout.getIndicatorLength() + countingSpace;
+    int startPosition =
+        codeLayout.getSequenceLength() + codeLayout.getIndicatorLength() + countingSpace;
     SyntaxError error =
-        SyntaxError.syntaxError().errorSource(ErrorSource.PREPROCESSING)
+        SyntaxError.syntaxError()
+            .errorSource(ErrorSource.PREPROCESSING)
             .location(
                 Locality.builder()
                     .uri(uri)
@@ -324,9 +221,13 @@ public abstract class ContinuationLineTransformation implements CobolLinesTransf
                         new Range(
                             new Position(lineNumber, startPosition),
                             new Position(
-                                lineNumber, (codeLayout.getIndicatorLength() + codeLayout.getSequenceLength() + codeLayout.getAreaALength()))))
+                                lineNumber,
+                                (codeLayout.getIndicatorLength()
+                                    + codeLayout.getSequenceLength()
+                                    + codeLayout.getAreaALength()))))
                     .recognizer(ContinuationLineTransformation.class)
-                    .build().toOriginalLocation())
+                    .build()
+                    .toOriginalLocation())
             .suggestion(
                 messageService.getMessage(
                     "ContinuationLineTransformation.continuationLineContentAreaA"))
@@ -336,5 +237,44 @@ public abstract class ContinuationLineTransformation implements CobolLinesTransf
         "Syntax error by ContinuationLineTransformation#registerContinuationLineError: {}",
         error.toString());
     return error;
+  }
+
+  private Integer getInvalidIndexOfInlineComment(CobolLine cobolLine) {
+    if (doNotNeedAnalysis(cobolLine)) return null;
+    Matcher floatingCommentMatcher = FLOATING_COMMENT_LINE.matcher(cobolLine.getContentArea());
+    boolean isInlineCommentPresent =
+        floatingCommentMatcher.matches() && floatingCommentMatcher.group("floatingComment") != null;
+    if (!isInlineCommentPresent) return null;
+    boolean isMissingSpace = !floatingCommentMatcher.group("validText").endsWith(" ");
+    if (isMissingSpace) {
+      int floatingCommentIndex = floatingCommentMatcher.start("floatingComment");
+      return (floatingCommentIndex == 0)
+          ? null
+          : (floatingCommentIndex + getCodeLayout().getSequenceLength());
+    }
+    return null;
+  }
+
+  private SyntaxError registerInlineCommentError(
+      String uri, int lineNumber, Integer invalidIndexOfInlineComment) {
+    return SyntaxError.syntaxError()
+        .errorSource(ErrorSource.PREPROCESSING)
+        .location(
+            Locality.builder()
+                .uri(uri)
+                .range(
+                    new Range(
+                        new Position(lineNumber - 1, invalidIndexOfInlineComment),
+                        new Position(lineNumber - 1, invalidIndexOfInlineComment + 1)))
+                .recognizer(ContinuationLineTransformation.class)
+                .build()
+                .toOriginalLocation())
+        .suggestion(messageService.getMessage("inlineComment.missingBlank"))
+        .severity(ERROR)
+        .build();
+  }
+
+  private boolean doNotNeedAnalysis(CobolLine cobolLine) {
+    return Objects.isNull(cobolLine) || isCommentLine(cobolLine);
   }
 }

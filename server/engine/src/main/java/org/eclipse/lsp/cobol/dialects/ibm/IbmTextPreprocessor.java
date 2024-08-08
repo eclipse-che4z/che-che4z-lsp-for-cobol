@@ -27,6 +27,8 @@ import org.eclipse.lsp.cobol.core.preprocessor.CobolLine;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.reader.CobolLineReader;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.rewriter.CobolLineReWriter;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.transformer.CobolLinesTransformation;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.validator.ExtendedDocumentValidation;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.validator.StringClosedCorrectlyValidator;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.writer.CobolLineWriter;
 import org.eclipse.lsp.cobol.service.settings.layout.CodeLayoutStore;
 
@@ -41,12 +43,14 @@ public class IbmTextPreprocessor implements CleanerPreprocessor {
   private final CobolLineWriter writer;
   private final CobolLinesTransformation transformation;
   private final CobolLineReWriter indicatorProcessor;
+  private final ExtendedDocumentValidation extendedDocumentValidation;
 
   public IbmTextPreprocessor(MessageService messageService, CodeLayoutStore layoutStore) {
     this.reader = new IbmCobolLineReader(messageService, layoutStore);
     this.writer = new IbmCobolLineWriter(layoutStore);
     this.transformation = new IbmCobolContinuationLineTransformation(messageService, layoutStore);
     this.indicatorProcessor = new IbmCobolLineIndicatorProcessor(layoutStore);
+    this.extendedDocumentValidation = new StringClosedCorrectlyValidator(messageService);
   }
 
   @Override
@@ -57,6 +61,7 @@ public class IbmTextPreprocessor implements CleanerPreprocessor {
     List<CobolLine> rewrittenLines = indicatorProcessor.processLines(transformedLines);
 
     ExtendedDocument code = writer.serialize(rewrittenLines, documentUri);
+    errors.addAll(extendedDocumentValidation.validateLines(code));
     return new ResultWithErrors<>(code.getCurrentText(), errors);
   }
 }
