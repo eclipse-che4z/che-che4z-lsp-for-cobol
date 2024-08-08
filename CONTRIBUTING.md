@@ -37,16 +37,12 @@ To build project you need to install npm and maven.
 Checkout source code:
 $ git clone https://github.com/eclipse/che-che4z-lsp-for-cobol.git
 
-To build server run:
+To build both the server and client extension run the following from project root:
 
-```$ cd server && mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent verify test-compile```
+```$ ./BUILD.sh```
 
-To build extension run:
-
-```$ cd clients/cobol-lsp-vscode-extension && npm install && npm run compile```
-
-You need to change the run configuration in your IDE to enable logging to the console while debugging the Java part. 
-Add `-Dlogback.configurationFile=server/localDev/logback.xml` to your `VM options` parameter. 
+You need to change the run configuration in your IDE to enable logging to the console while debugging the Java part.
+Add `-Dlogback.configurationFile=server/localDev/logback.xml` to your `VM options` parameter.
 The value can be `localDev/logback.xml` if the `server` folder is a root folder for your project.
 
 ## Start contributing
