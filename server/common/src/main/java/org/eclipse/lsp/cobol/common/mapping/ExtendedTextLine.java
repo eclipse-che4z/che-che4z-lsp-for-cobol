@@ -43,7 +43,7 @@ public class ExtendedTextLine {
     this(line, new Position(lineNumber, 0), uri);
   }
 
-  ExtendedTextLine(String line, Position start, String uri) {
+  public ExtendedTextLine(String line, Position start, String uri) {
     for (int i = 0; i < line.length(); i++) {
       char character = line.charAt(i);
       checkCharacter(character);
@@ -127,7 +127,7 @@ public class ExtendedTextLine {
    * Appends the line with given line
    * @param line - line that will be added to the end of this line
    */
-  void append(ExtendedTextLine line) {
+  public void append(ExtendedTextLine line) {
     characters.addAll(line.characters);
     characters.forEach(c -> c.setParent(this));
   }

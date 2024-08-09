@@ -22,7 +22,6 @@ import org.eclipse.lsp.cobol.test.CobolText;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
-import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
@@ -38,7 +37,8 @@ class TestPseudoTextContentConstraint {
           + "3      WORKING-STORAGE SECTION.\n";
   private static final String TEXT =
       BASE
-          + "5      COPY {~REPL} REPLACING {_==asasasasasasasasasasasasa|1_}\n"
+          + "5      COPY {~REPL}\n"
+          + "          REPLACING {_==asasasasasasasasasasasasa\n"
           + "      -    cccccccccccccccccccccccccccccccccccccccccccccccccccc\n"
           + "      -    oooooooooooooooooooooooooooooooooooooooooooooooooooo\n"
           + "      -    bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\n"
@@ -47,8 +47,8 @@ class TestPseudoTextContentConstraint {
           + "      -    IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII\n"
           + "      -    BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB\n"
           + "      -    MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM\n"
-          + "      -    == BY ====.\n"
-          + "8      PROCEDURE DIVISION.\n";
+          + "      -    == BY ====|1_}.\n"
+          + "8      PROCEDURE DIVISION.";
   private static final String PSEUDO_COPY_TEXT =
       BASE
           + "5      COPY {~REPL} REPLACING {_==COPY== BY ====|1_}.\n"
@@ -80,7 +80,7 @@ class TestPseudoTextContentConstraint {
         ImmutableMap.of(
             "1",
             new Diagnostic(
-                new Range(new Position(4, 27), new Position(13, 22)),
+                new Range(),
                 "Max 322 chars allowed for each individual word in pseudo text",
                 DiagnosticSeverity.Error,
                 ErrorSource.EXTENDED_DOCUMENT.getText())));
