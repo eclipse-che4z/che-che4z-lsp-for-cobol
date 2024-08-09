@@ -109,6 +109,22 @@ public class TestCicsReceive {
     "RECEIVE", "SET({$abc})", "FLENGTH({$def})", "NOTRUNCATE"
   };
 
+  private static final String[] DEFAULT_PARTIAL_OPTIONS_VALID_THIRTEEN = {
+    "RECEIVE", "LENGTH({$def})", "MAXLENGTH({$ghi})", "NOTRUNCATE"
+  };
+
+  private static final String[] DEFAULT_PARTIAL_OPTIONS_VALID_FOURTEEN = {
+    "RECEIVE", "FLENGTH({$def})", "MAXFLENGTH({$ghi})", "NOTRUNCATE"
+  };
+
+  private static final String[] DEFAULT_PARTIAL_OPTIONS_VALID_FIFTEEN = {
+    "RECEIVE", "LENGTH({$def})"
+  };
+
+  private static final String[] DEFAULT_PARTIAL_OPTIONS_VALID_SIXTEEN = {
+    "RECEIVE", "FLENGTH({$def})"
+  };
+
   private static final String[] DEFAULT_INVALID_ONE = {
     "{RECEIVE|1}", "INTO(100)", "MAXLENGTH(10)", "NOTRUNCATE"
   };
@@ -216,6 +232,38 @@ public class TestCicsReceive {
   void testDefaultReceiveCICSCommand_withPartialOptionsValidTwelve() {
     UseCaseEngine.runTest(
         getTestString(DEFAULT_PARTIAL_OPTIONS_VALID_TWELVE), ImmutableList.of(), ImmutableMap.of());
+  }
+
+  @Test
+  void testDefaultReceiveCICSCommand_withPartialOptionsValidThirteen() {
+    UseCaseEngine.runTest(
+        getTestString(DEFAULT_PARTIAL_OPTIONS_VALID_THIRTEEN),
+        ImmutableList.of(),
+        ImmutableMap.of());
+  }
+
+  @Test
+  void testDefaultReceiveCICSCommand_withPartialOptionsValidFourteen() {
+    UseCaseEngine.runTest(
+        getTestString(DEFAULT_PARTIAL_OPTIONS_VALID_FOURTEEN),
+        ImmutableList.of(),
+        ImmutableMap.of());
+  }
+
+  @Test
+  void testDefaultReceiveCICSCommand_withPartialOptionsValidFifteen() {
+    UseCaseEngine.runTest(
+        getTestString(DEFAULT_PARTIAL_OPTIONS_VALID_FIFTEEN),
+        ImmutableList.of(),
+        ImmutableMap.of());
+  }
+
+  @Test
+  void testDefaultReceiveCICSCommand_withPartialOptionsValidSixteen() {
+    UseCaseEngine.runTest(
+        getTestString(DEFAULT_PARTIAL_OPTIONS_VALID_SIXTEEN),
+        ImmutableList.of(),
+        ImmutableMap.of());
   }
 
   @Test

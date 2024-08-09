@@ -23,22 +23,6 @@ cicsExecBlock: EXEC CICS allCicsRule END_EXEC
              | {notifyError("cicsParser.missingEndExec");} EXEC CICS
              ;
 
-/*
-
-       IDENTIFICATION DIVISION.
-       PROGRAM-ID. ABCDEF.
-       DATA DIVISION.
-       WORKING-STORAGE SECTION.
-       PROCEDURE DIVISION.
-            EXEC CICS RECEIVE
-                INTO(100)
-                MAXLENGTH(1000)
-                LENGTH(10)
-                MAXLENGTH(1000)
-                NOTRUNCATE
-            END-EXEC.
-*/
-
 allCicsRule: cics_send | cics_receive | cics_add | cics_address | cics_allocate | cics_asktime | cics_assign | cics_bif |
                        cics_build | cics_cancel | cics_change | cics_change_task | cics_check | cics_connect | cics_converttime |
                        cics_define | cics_delay | cics_delete | cics_deleteq | cics_deq | cics_document | cics_dump | cics_endbr |
@@ -111,6 +95,23 @@ cicsTranslatorCompileDirectivedKeywords
    ;
 
 /** RECEIVE: */
+
+/*
+Test String:
+
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. ABCDEF.
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       PROCEDURE DIVISION.
+            EXEC CICS RECEIVE
+                INTO(100)
+                LENGTH(10)
+                MAXLENGTH(1000)
+                NOTRUNCATE
+            END-EXEC.
+*/
+
 // For reference:
 //cics_into: (INTO cics_data_area | SET cics_ref) cics_handle_response?;
 //cics_maxlength: MAXLENGTH cics_data_value | MAXFLENGTH cics_data_value;
@@ -127,8 +128,6 @@ cicsTranslatorCompileDirectivedKeywords
 //empty_parens: LPARENCHAR RPARENCHAR;
 
 /* Prototype corrections */
-// How do we enforce order of the optional instances??
-// How do we enforce not allowing random keywords like adding BLAHHH anywhere?
 
 //cics_receive_default: RECEIVE cics_into? cics_fLength cics_maxlength? NOTRUNCATE; // Wrong
 // Exhaustive List
