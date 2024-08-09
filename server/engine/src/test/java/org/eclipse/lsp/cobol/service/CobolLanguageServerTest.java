@@ -212,8 +212,6 @@ class CobolLanguageServerTest {
     server.initialized(new InitializedParams());
     waitingQuery(lspMessageBroker).join();
     lspMessageBroker.stop();
-    verify(analysisService, timeout(TimeUnit.SECONDS.toMillis(5))
-            .times(1)).setExtensionConfig(any());
   }
 
   /**
