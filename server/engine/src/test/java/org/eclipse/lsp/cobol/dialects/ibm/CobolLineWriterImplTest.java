@@ -44,8 +44,11 @@ class CobolLineWriterImplTest extends AbstractCobolLinePreprocessorTest {
       "CBL DATA(24)\n"
           + "                       PERFORM BBAB-MOVE-TO-DETAIL-MAP\n"
           + "                       MOVE -1 TO SNAMEDL\n"
-          + "                       MOVE 'PRESS \"CLEAR\" OR \"ENTER\" TO RETURN TO THE MENU WHEN FINISHED'\n\n"
-          + "                       MOVE \"PRESS 'CLEAR' OR 'ENTER' TO RETURN TO THE MENU WHEN FINISHED\"\n\n"
+          + "                       MOVE 'PRESS \"CLEAR\" OR \"ENTER\" TO RETURN TO THE MENU WHEN FINISHED'\n"
+          + "                                      \n"
+          + "                                      \n"
+          + "                       MOVE \"PRESS 'CLEAR' OR 'ENTER' TO RETURN TO THE MENU WHEN FINISHED\"\n"
+          + "                                               \n"
           + "                       MOVE 'asd' NEXT LINE\n";
 
   @Test
