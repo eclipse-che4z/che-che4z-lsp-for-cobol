@@ -35,7 +35,7 @@
 
         <!-- Version numbers-->
         <antlr.version>4.13.2</antlr.version>
-        <google.guava.version>32.0.1-jre</google.guava.version>
+        <google.guava.version>33.2.1-jre</google.guava.version>
         <lifecycle-mapping.plugin.version>1.0.0</lifecycle-mapping.plugin.version>
         <maven.resources.plugin.version>3.0.2</maven.resources.plugin.version>
         <maven.antlr4.plugin.version>4.13.2</maven.antlr4.plugin.version>
