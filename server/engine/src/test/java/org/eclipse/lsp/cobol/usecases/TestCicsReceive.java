@@ -24,6 +24,8 @@ import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Test CICS RECEIVE command. Documentation link: <a
@@ -130,11 +132,10 @@ public class TestCicsReceive {
   };
 
   private static String getTestString(String[] components) {
-    for (int i = 0; i < components.length; i++) {
-      components[i] = "                " + components[i];
-    }
+    List<String> instances = Arrays.asList(components);
+    instances.replaceAll(String.join("", Collections.nCopies(12, " "))::concat);
     ArrayList<String> base = new ArrayList<String>(Arrays.asList(DEFAULT_BASE_TEXT.split("\n")));
-    base.addAll(base.indexOf("            END-EXEC."), Arrays.asList(components));
+    base.addAll(base.size() - 1, instances);
     return String.join("\n", base);
   }
 
