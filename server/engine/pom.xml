@@ -30,7 +30,7 @@
     </parent>
 
     <properties>
-        <antlr.version>4.7.1</antlr.version>
+        <antlr.version>4.13.2</antlr.version>
         <awaitility.version>3.0.0</awaitility.version>
         <commons.io.version>2.10.0</commons.io.version>
         <commons.lang.version>3.12.0</commons.lang.version>
@@ -46,7 +46,7 @@
         <lombok.version>1.18.30</lombok.version>
         <lsp4j.version>0.14.0</lsp4j.version>
         <picocli.version>4.7.5</picocli.version>
-        <maven.antlr4.plugin.version>4.7</maven.antlr4.plugin.version>
+        <maven.antlr4.plugin.version>4.13.2</maven.antlr4.plugin.version>
         <maven.assembly.plugin.version>3.2.0</maven.assembly.plugin.version>
         <maven.compiler.plugin.version>3.7.0</maven.compiler.plugin.version>
         <maven.jacoco.plugin.version>0.8.11</maven.jacoco.plugin.version>
@@ -102,6 +102,10 @@
                 <exclusion>
                     <groupId>junit</groupId>
                     <artifactId>junit</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-simple</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
