@@ -473,6 +473,16 @@ public class TestSqlHostVariable {
   }
 
   @Test
+  void testLobVariables_dbclobPicClause() {
+    AnalysisResult actual = UseCaseEngine.runTest(LOD_VARS_TEXT_DBCLOB, ImmutableList.of(), ImmutableMap.of());
+    actual.getSymbolTableMap().values().stream()
+            .findFirst().flatMap(firstSymbolTable -> firstSymbolTable.getVariables().values().stream()
+                    .filter(item -> "VAR-DATA".equals(item.getName()))
+                    .findFirst())
+            .ifPresent(varNode -> assertEquals("G(30)", ((ElementaryNode) varNode).getPicClause()));
+  }
+
+  @Test
   void testLobVariables_level() {
     UseCaseEngine.runTest(LOD_VARS_TEXT1, ImmutableList.of(), ImmutableMap.of());
   }
