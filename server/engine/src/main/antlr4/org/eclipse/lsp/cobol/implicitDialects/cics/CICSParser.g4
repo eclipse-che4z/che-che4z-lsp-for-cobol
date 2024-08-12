@@ -172,19 +172,6 @@ cics_send_terminal: (TERMINAL | WAIT | LAST)+;
 cics_send_autopage: AUTOPAGE (CURRENT | ALL)?;
 
 /** CONVERSE: */
-cics_converse: CONVERSE (cics_converse_appc | cics_converse_lu23_3270 | cics_converse_lu61 | cics_converse_mro | cics_cnv_group);
-
-cics_cnv_group: cics_converse_from_into_to (cics_converse_default | cics_converse_lu4 | cics_converse_scs |
-                cics_converse_3601 | cics_converse_3614_3653_3767 | cics_converse_3650int_3770 |
-                cics_converse_3650_3270 | cics_converse_3680_3790F | cics_converse_3790_3270 | cics_converse_2260);
-cics_converse_default: (cics_maxlength | NOTRUNCATE | cics_handle_response)+;
-cics_converse_lu4:  (DEFRESP | cics_maxlength | FMH | NOTRUNCATE | cics_handle_response)+;
-cics_converse_scs:   (cics_maxlength | DEFRESP | STRFIELD | NOTRUNCATE | cics_handle_response)+;
-cics_converse_3601:  (LDC cics_name | FMH | DEFRESP | cics_maxlength | NOTRUNCATE | cics_handle_response)+;
-cics_converse_3614_3653_3767:   (DEFRESP | cics_maxlength | NOTRUNCATE | cics_handle_response)+;
-cics_converse_3650int_3770:   (DEFRESP | FMH | cics_maxlength | NOTRUNCATE | cics_handle_response)+;
-cics_converse_3650_3270:   (CTLCHAR cics_data_value | cics_converse_erase | DEFRESP | FMH | cics_maxlength | NOTRUNCATE | cics_handle_response)+;
-cics_converse_3680_3790F:   (FMH | DEFRESP | cics_maxlength | NOTRUNCATE | cics_handle_response)+;
 cics_converse: CONVERSE (cics_converse_appc | cics_converse_lu61 | cics_converse_mro | cics_cnv_group) cics_handle_response?;
 
 cics_cnv_group: cics_converse_from_into (cics_converse_lu23_3270 | cics_cnv_to_group);
