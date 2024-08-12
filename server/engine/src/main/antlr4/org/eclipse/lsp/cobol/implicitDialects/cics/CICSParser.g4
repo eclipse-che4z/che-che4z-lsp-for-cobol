@@ -167,8 +167,6 @@ cics_receive:                       RECEIVE (new_cics_receive_group_one | new_ci
 new_cics_into_set:                  (INTO cics_data_area | SET cics_ref);
 new_cics_length_flength:            (LENGTH cics_data_area | FLENGTH cics_data_area);
 
-// Contensed receive
-
 /** RECEIVE: */
 //* OLD */
 //cics_receive: RECEIVE (cics_receive_group | cics_receive_appc | cics_receive_lu61 | cics_partn | cics_rcv_map);

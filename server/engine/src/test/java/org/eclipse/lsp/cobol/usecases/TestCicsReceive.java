@@ -35,7 +35,7 @@ import java.util.List;
  * <p>This class tests all variations of the RECEIVE command found in the link above.
  */
 public class TestCicsReceive {
-  private static final String DEFAULT_BASE_TEXT =
+  private static final String GROUP_ONE_BASE_TEXT =
       "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID. ABCDEF.\n"
           + "       DATA DIVISION.\n"
@@ -47,233 +47,271 @@ public class TestCicsReceive {
           + "            EXEC CICS \n"
           + "            END-EXEC.";
 
-  private static final String[] DEFAULT_ALL_OPTIONS_VALID_ONE = {
-    "RECEIVE", "INTO({$abc})", "LENGTH({$def})", "MAXLENGTH({$ghi})", "NOTRUNCATE"
+  private static final String[] GROUP_ONE_ALL_OPTIONS_VALID_ONE = {
+    "RECEIVE",
+    "INTO({$abc})",
+    "LENGTH({$def})",
+    "MAXLENGTH({$ghi})",
+    "ASIS",
+    "BUFFER",
+    "NOTRUNCATE",
+    "LEAVEKB"
   };
 
-  private static final String[] DEFAULT_ALL_OPTIONS_VALID_TWO = {
-    "RECEIVE", "INTO({$abc})", "FLENGTH({$def})", "MAXFLENGTH({$ghi})", "NOTRUNCATE"
+  private static final String[] GROUP_ONE_ALL_OPTIONS_VALID_TWO = {
+    "RECEIVE",
+    "INTO({$abc})",
+    "FLENGTH({$def})",
+    "MAXFLENGTH({$ghi})",
+    "ASIS",
+    "BUFFER",
+    "NOTRUNCATE",
+    "LEAVEKB"
   };
 
-  private static final String[] DEFAULT_ALL_OPTIONS_VALID_THREE = {
-    "RECEIVE", "SET({$abc})", "LENGTH({$def})", "MAXLENGTH({$ghi})", "NOTRUNCATE"
+  private static final String[] GROUP_ONE_ALL_OPTIONS_VALID_THREE = {
+    "RECEIVE",
+    "SET({$abc})",
+    "LENGTH({$def})",
+    "MAXLENGTH({$ghi})",
+    "ASIS",
+    "BUFFER",
+    "NOTRUNCATE",
+    "LEAVEKB"
   };
 
-  private static final String[] DEFAULT_ALL_OPTIONS_VALID_FOUR = {
-    "RECEIVE", "SET({$abc})", "FLENGTH({$def})", "MAXFLENGTH({$ghi})", "NOTRUNCATE"
+  private static final String[] GROUP_ONE_ALL_OPTIONS_VALID_FOUR = {
+    "RECEIVE",
+    "SET({$abc})",
+    "FLENGTH({$def})",
+    "MAXFLENGTH({$ghi})",
+    "ASIS",
+    "BUFFER",
+    "NOTRUNCATE",
+    "LEAVEKB"
   };
 
-  private static final String[] DEFAULT_PARTIAL_OPTIONS_VALID_ONE = {
-    "RECEIVE", "INTO({$abc})", "LENGTH({$def})", "MAXLENGTH({$ghi})"
+  private static final String[] GROUP_ONE_PARTIAL_OPTIONS_VALID_ONE = {
+    "RECEIVE", "INTO({$abc})", "LENGTH({$def})", "MAXLENGTH({$ghi})", "ASIS", "BUFFER"
   };
 
-  private static final String[] DEFAULT_PARTIAL_OPTIONS_VALID_TWO = {
-    "RECEIVE", "INTO({$abc})", "FLENGTH({$def})", "MAXFLENGTH({$ghi})"
+  private static final String[] GROUP_ONE_PARTIAL_OPTIONS_VALID_TWO = {
+    "RECEIVE", "INTO({$abc})", "FLENGTH({$def})", "MAXFLENGTH({$ghi})", "NOTRUNCATE", "LEAVEKB"
   };
 
-  private static final String[] DEFAULT_PARTIAL_OPTIONS_VALID_THREE = {
+  private static final String[] GROUP_ONE_PARTIAL_OPTIONS_VALID_THREE = {
     "RECEIVE", "SET({$abc})", "LENGTH({$def})", "MAXLENGTH({$ghi})"
   };
 
-  private static final String[] DEFAULT_PARTIAL_OPTIONS_VALID_FOUR = {
+  private static final String[] GROUP_ONE_PARTIAL_OPTIONS_VALID_FOUR = {
     "RECEIVE", "SET({$abc})", "FLENGTH({$def})", "MAXFLENGTH({$ghi})"
   };
 
-  private static final String[] DEFAULT_PARTIAL_OPTIONS_VALID_FIVE = {
+  private static final String[] GROUP_ONE_PARTIAL_OPTIONS_VALID_FIVE = {
     "RECEIVE", "INTO({$abc})", "LENGTH({$def})"
   };
 
-  private static final String[] DEFAULT_PARTIAL_OPTIONS_VALID_SIX = {
+  private static final String[] GROUP_ONE_PARTIAL_OPTIONS_VALID_SIX = {
     "RECEIVE", "INTO({$abc})", "FLENGTH({$def})"
   };
 
-  private static final String[] DEFAULT_PARTIAL_OPTIONS_VALID_SEVEN = {
+  private static final String[] GROUP_ONE_PARTIAL_OPTIONS_VALID_SEVEN = {
     "RECEIVE", "SET({$abc})", "LENGTH({$def})"
   };
 
-  private static final String[] DEFAULT_PARTIAL_OPTIONS_VALID_EIGHT = {
+  private static final String[] GROUP_ONE_PARTIAL_OPTIONS_VALID_EIGHT = {
     "RECEIVE", "SET({$abc})", "FLENGTH({$def})"
   };
 
-  private static final String[] DEFAULT_PARTIAL_OPTIONS_VALID_NINE = {
+  private static final String[] GROUP_ONE_PARTIAL_OPTIONS_VALID_NINE = {
     "RECEIVE", "INTO({$abc})", "LENGTH({$def})", "NOTRUNCATE"
   };
 
-  private static final String[] DEFAULT_PARTIAL_OPTIONS_VALID_TEN = {
+  private static final String[] GROUP_ONE_PARTIAL_OPTIONS_VALID_TEN = {
     "RECEIVE", "INTO({$abc})", "FLENGTH({$def})", "NOTRUNCATE"
   };
 
-  private static final String[] DEFAULT_PARTIAL_OPTIONS_VALID_ELEVEN = {
+  private static final String[] GROUP_ONE_PARTIAL_OPTIONS_VALID_ELEVEN = {
     "RECEIVE", "SET({$abc})", "LENGTH({$def})", "NOTRUNCATE"
   };
 
-  private static final String[] DEFAULT_PARTIAL_OPTIONS_VALID_TWELVE = {
+  private static final String[] GROUP_ONE_PARTIAL_OPTIONS_VALID_TWELVE = {
     "RECEIVE", "SET({$abc})", "FLENGTH({$def})", "NOTRUNCATE"
   };
 
-  private static final String[] DEFAULT_PARTIAL_OPTIONS_VALID_THIRTEEN = {
+  private static final String[] GROUP_ONE_PARTIAL_OPTIONS_VALID_THIRTEEN = {
     "RECEIVE", "LENGTH({$def})", "MAXLENGTH({$ghi})", "NOTRUNCATE"
   };
 
-  private static final String[] DEFAULT_PARTIAL_OPTIONS_VALID_FOURTEEN = {
+  private static final String[] GROUP_ONE_PARTIAL_OPTIONS_VALID_FOURTEEN = {
     "RECEIVE", "FLENGTH({$def})", "MAXFLENGTH({$ghi})", "NOTRUNCATE"
   };
 
-  private static final String[] DEFAULT_PARTIAL_OPTIONS_VALID_FIFTEEN = {
+  private static final String[] GROUP_ONE_PARTIAL_OPTIONS_VALID_FIFTEEN = {
     "RECEIVE", "LENGTH({$def})"
   };
 
-  private static final String[] DEFAULT_PARTIAL_OPTIONS_VALID_SIXTEEN = {
+  private static final String[] GROUP_ONE_PARTIAL_OPTIONS_VALID_SIXTEEN = {
     "RECEIVE", "FLENGTH({$def})"
   };
 
-  private static final String[] DEFAULT_INVALID_ONE = {
-    "{RECEIVE|1}", "INTO(100)", "MAXLENGTH(10)", "NOTRUNCATE"
+  private static final String[] GROUP_ONE_INVALID_ONE = {
+    "{RECEIVE|error1}", "INTO(100)", "MAXLENGTH(10)", "NOTRUNCATE"
   };
 
   private static String getTestString(String[] components) {
     List<String> instances = Arrays.asList(components);
     instances.replaceAll(String.join("", Collections.nCopies(12, " "))::concat);
-    ArrayList<String> base = new ArrayList<String>(Arrays.asList(DEFAULT_BASE_TEXT.split("\n")));
+    ArrayList<String> base = new ArrayList<String>(Arrays.asList(GROUP_ONE_BASE_TEXT.split("\n")));
     base.addAll(base.size() - 1, instances);
     return String.join("\n", base);
   }
 
   @Test
-  void testDefaultReceiveCICSCommand_withAllOptionsValidOne() {
+  void testGroupOneReceiveCICSCommand_withAllOptionsValidOne() {
     UseCaseEngine.runTest(
-        getTestString(DEFAULT_ALL_OPTIONS_VALID_ONE), ImmutableList.of(), ImmutableMap.of());
+        getTestString(GROUP_ONE_ALL_OPTIONS_VALID_ONE), ImmutableList.of(), ImmutableMap.of());
   }
 
   @Test
-  void testDefaultReceiveCICSCommand_withAllOptionsValidTwo() {
+  void testGroupOneReceiveCICSCommand_withAllOptionsValidTwo() {
     UseCaseEngine.runTest(
-        getTestString(DEFAULT_ALL_OPTIONS_VALID_TWO), ImmutableList.of(), ImmutableMap.of());
+        getTestString(GROUP_ONE_ALL_OPTIONS_VALID_TWO), ImmutableList.of(), ImmutableMap.of());
   }
 
   @Test
-  void testDefaultReceiveCICSCommand_withAllOptionsValidThree() {
+  void testGroupOneReceiveCICSCommand_withAllOptionsValidThree() {
     UseCaseEngine.runTest(
-        getTestString(DEFAULT_ALL_OPTIONS_VALID_THREE), ImmutableList.of(), ImmutableMap.of());
+        getTestString(GROUP_ONE_ALL_OPTIONS_VALID_THREE), ImmutableList.of(), ImmutableMap.of());
   }
 
   @Test
-  void testDefaultReceiveCICSCommand_withAllOptionsValidFour() {
+  void testGroupOneReceiveCICSCommand_withAllOptionsValidFour() {
     UseCaseEngine.runTest(
-        getTestString(DEFAULT_ALL_OPTIONS_VALID_FOUR), ImmutableList.of(), ImmutableMap.of());
+        getTestString(GROUP_ONE_ALL_OPTIONS_VALID_FOUR), ImmutableList.of(), ImmutableMap.of());
   }
 
   @Test
-  void testDefaultReceiveCICSCommand_withPartialOptionsValidOne() {
+  void testGroupOneReceiveCICSCommand_withPartialOptionsValidOne() {
     UseCaseEngine.runTest(
-        getTestString(DEFAULT_PARTIAL_OPTIONS_VALID_ONE), ImmutableList.of(), ImmutableMap.of());
+        getTestString(GROUP_ONE_PARTIAL_OPTIONS_VALID_ONE), ImmutableList.of(), ImmutableMap.of());
   }
 
   @Test
-  void testDefaultReceiveCICSCommand_withPartialOptionsValidTwo() {
+  void testGroupOneReceiveCICSCommand_withPartialOptionsValidTwo() {
     UseCaseEngine.runTest(
-        getTestString(DEFAULT_PARTIAL_OPTIONS_VALID_TWO), ImmutableList.of(), ImmutableMap.of());
+        getTestString(GROUP_ONE_PARTIAL_OPTIONS_VALID_TWO), ImmutableList.of(), ImmutableMap.of());
   }
 
   @Test
-  void testDefaultReceiveCICSCommand_withPartialOptionsValidThree() {
+  void testGroupOneReceiveCICSCommand_withPartialOptionsValidThree() {
     UseCaseEngine.runTest(
-        getTestString(DEFAULT_PARTIAL_OPTIONS_VALID_THREE), ImmutableList.of(), ImmutableMap.of());
-  }
-
-  @Test
-  void testDefaultReceiveCICSCommand_withPartialOptionsValidFour() {
-    UseCaseEngine.runTest(
-        getTestString(DEFAULT_PARTIAL_OPTIONS_VALID_FOUR), ImmutableList.of(), ImmutableMap.of());
-  }
-
-  @Test
-  void testDefaultReceiveCICSCommand_withPartialOptionsValidFive() {
-    UseCaseEngine.runTest(
-        getTestString(DEFAULT_PARTIAL_OPTIONS_VALID_FIVE), ImmutableList.of(), ImmutableMap.of());
-  }
-
-  @Test
-  void testDefaultReceiveCICSCommand_withPartialOptionsValidSix() {
-    UseCaseEngine.runTest(
-        getTestString(DEFAULT_PARTIAL_OPTIONS_VALID_SIX), ImmutableList.of(), ImmutableMap.of());
-  }
-
-  @Test
-  void testDefaultReceiveCICSCommand_withPartialOptionsValidSeven() {
-    UseCaseEngine.runTest(
-        getTestString(DEFAULT_PARTIAL_OPTIONS_VALID_SEVEN), ImmutableList.of(), ImmutableMap.of());
-  }
-
-  @Test
-  void testDefaultReceiveCICSCommand_withPartialOptionsValidEight() {
-    UseCaseEngine.runTest(
-        getTestString(DEFAULT_PARTIAL_OPTIONS_VALID_EIGHT), ImmutableList.of(), ImmutableMap.of());
-  }
-
-  @Test
-  void testDefaultReceiveCICSCommand_withPartialOptionsValidNine() {
-    UseCaseEngine.runTest(
-        getTestString(DEFAULT_PARTIAL_OPTIONS_VALID_NINE), ImmutableList.of(), ImmutableMap.of());
-  }
-
-  @Test
-  void testDefaultReceiveCICSCommand_withPartialOptionsValidTen() {
-    UseCaseEngine.runTest(
-        getTestString(DEFAULT_PARTIAL_OPTIONS_VALID_TEN), ImmutableList.of(), ImmutableMap.of());
-  }
-
-  @Test
-  void testDefaultReceiveCICSCommand_withPartialOptionsValidEleven() {
-    UseCaseEngine.runTest(
-        getTestString(DEFAULT_PARTIAL_OPTIONS_VALID_ELEVEN), ImmutableList.of(), ImmutableMap.of());
-  }
-
-  @Test
-  void testDefaultReceiveCICSCommand_withPartialOptionsValidTwelve() {
-    UseCaseEngine.runTest(
-        getTestString(DEFAULT_PARTIAL_OPTIONS_VALID_TWELVE), ImmutableList.of(), ImmutableMap.of());
-  }
-
-  @Test
-  void testDefaultReceiveCICSCommand_withPartialOptionsValidThirteen() {
-    UseCaseEngine.runTest(
-        getTestString(DEFAULT_PARTIAL_OPTIONS_VALID_THIRTEEN),
+        getTestString(GROUP_ONE_PARTIAL_OPTIONS_VALID_THREE),
         ImmutableList.of(),
         ImmutableMap.of());
   }
 
   @Test
-  void testDefaultReceiveCICSCommand_withPartialOptionsValidFourteen() {
+  void testGroupOneReceiveCICSCommand_withPartialOptionsValidFour() {
     UseCaseEngine.runTest(
-        getTestString(DEFAULT_PARTIAL_OPTIONS_VALID_FOURTEEN),
+        getTestString(GROUP_ONE_PARTIAL_OPTIONS_VALID_FOUR), ImmutableList.of(), ImmutableMap.of());
+  }
+
+  @Test
+  void testGroupOneReceiveCICSCommand_withPartialOptionsValidFive() {
+    UseCaseEngine.runTest(
+        getTestString(GROUP_ONE_PARTIAL_OPTIONS_VALID_FIVE), ImmutableList.of(), ImmutableMap.of());
+  }
+
+  @Test
+  void testGroupOneReceiveCICSCommand_withPartialOptionsValidSix() {
+    UseCaseEngine.runTest(
+        getTestString(GROUP_ONE_PARTIAL_OPTIONS_VALID_SIX), ImmutableList.of(), ImmutableMap.of());
+  }
+
+  @Test
+  void testGroupOneReceiveCICSCommand_withPartialOptionsValidSeven() {
+    UseCaseEngine.runTest(
+        getTestString(GROUP_ONE_PARTIAL_OPTIONS_VALID_SEVEN),
         ImmutableList.of(),
         ImmutableMap.of());
   }
 
   @Test
-  void testDefaultReceiveCICSCommand_withPartialOptionsValidFifteen() {
+  void testGroupOneReceiveCICSCommand_withPartialOptionsValidEight() {
     UseCaseEngine.runTest(
-        getTestString(DEFAULT_PARTIAL_OPTIONS_VALID_FIFTEEN),
+        getTestString(GROUP_ONE_PARTIAL_OPTIONS_VALID_EIGHT),
         ImmutableList.of(),
         ImmutableMap.of());
   }
 
   @Test
-  void testDefaultReceiveCICSCommand_withPartialOptionsValidSixteen() {
+  void testGroupOneReceiveCICSCommand_withPartialOptionsValidNine() {
     UseCaseEngine.runTest(
-        getTestString(DEFAULT_PARTIAL_OPTIONS_VALID_SIXTEEN),
+        getTestString(GROUP_ONE_PARTIAL_OPTIONS_VALID_NINE), ImmutableList.of(), ImmutableMap.of());
+  }
+
+  @Test
+  void testGroupOneReceiveCICSCommand_withPartialOptionsValidTen() {
+    UseCaseEngine.runTest(
+        getTestString(GROUP_ONE_PARTIAL_OPTIONS_VALID_TEN), ImmutableList.of(), ImmutableMap.of());
+  }
+
+  @Test
+  void testGroupOneReceiveCICSCommand_withPartialOptionsValidEleven() {
+    UseCaseEngine.runTest(
+        getTestString(GROUP_ONE_PARTIAL_OPTIONS_VALID_ELEVEN),
         ImmutableList.of(),
         ImmutableMap.of());
   }
 
   @Test
-  void testDefaultReceiveCICSCommand_withAllOptionsInvalidOne() {
+  void testGroupOneReceiveCICSCommand_withPartialOptionsValidTwelve() {
     UseCaseEngine.runTest(
-        getTestString(DEFAULT_INVALID_ONE),
+        getTestString(GROUP_ONE_PARTIAL_OPTIONS_VALID_TWELVE),
+        ImmutableList.of(),
+        ImmutableMap.of());
+  }
+
+  @Test
+  void testGroupOneReceiveCICSCommand_withPartialOptionsValidThirteen() {
+    UseCaseEngine.runTest(
+        getTestString(GROUP_ONE_PARTIAL_OPTIONS_VALID_THIRTEEN),
+        ImmutableList.of(),
+        ImmutableMap.of());
+  }
+
+  @Test
+  void testGroupOneReceiveCICSCommand_withPartialOptionsValidFourteen() {
+    UseCaseEngine.runTest(
+        getTestString(GROUP_ONE_PARTIAL_OPTIONS_VALID_FOURTEEN),
+        ImmutableList.of(),
+        ImmutableMap.of());
+  }
+
+  @Test
+  void testGroupOneReceiveCICSCommand_withPartialOptionsValidFifteen() {
+    UseCaseEngine.runTest(
+        getTestString(GROUP_ONE_PARTIAL_OPTIONS_VALID_FIFTEEN),
+        ImmutableList.of(),
+        ImmutableMap.of());
+  }
+
+  @Test
+  void testGroupOneReceiveCICSCommand_withPartialOptionsValidSixteen() {
+    UseCaseEngine.runTest(
+        getTestString(GROUP_ONE_PARTIAL_OPTIONS_VALID_SIXTEEN),
+        ImmutableList.of(),
+        ImmutableMap.of());
+  }
+
+  @Test
+  void testGroupOneReceiveCICSCommand_withAllOptionsInvalidOne() {
+    UseCaseEngine.runTest(
+        getTestString(GROUP_ONE_INVALID_ONE),
         ImmutableList.of(),
         ImmutableMap.of(
-            "1",
+            "error1",
             new Diagnostic(
                 new Range(),
                 "Extraneous input 'RECEIVE'",
