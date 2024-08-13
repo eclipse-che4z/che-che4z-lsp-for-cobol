@@ -27,11 +27,14 @@ import org.eclipse.lsp4j.FileChangeType;
 import org.eclipse.lsp4j.FileEvent;
 
 import java.net.URI;
+import java.net.URLEncoder;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -60,8 +63,6 @@ public class DidChangeWatchedFiles implements LspNotification {
         changedFiles.forEach(
                 file -> {
                     URI uri = URI.create(file.getUri());
-                    LOG.debug("Did Change Watched Files Uri : {}",uri);
-                    LOG.debug("Did Change Watched Files Uri Scheme : {}",uri.getScheme());
                     if ("file".equals(uri.getScheme())) {
                         Path path = Paths.get(uri);
                         if (file.getType() == FileChangeType.Deleted) {
@@ -70,10 +71,8 @@ public class DidChangeWatchedFiles implements LspNotification {
                         String uriString = uriDecodeService.decode(path.toUri().toString());
                         if (sourceUnitGraph.isFileOpened(uriString)) {
                             // opened files are taken care by textChange events
-                            LOG.debug("Did Change Watched Files not reached");
                             return;
                         }
-                        LOG.debug("Did Change Watched Files reached");
                         boolean isDirectory = Files.isDirectory(path);
                         if (!isDirectory) {
                             triggerAnalysisForChangedFile(uriString);
@@ -86,20 +85,23 @@ public class DidChangeWatchedFiles implements LspNotification {
 
     @SneakyThrows
     private void triggerAnalysisForChangedFile(String uri) {
-        List<String> uris =
-                sourceUnitGraph.getAllAssociatedFilesForACopybook(uriDecodeService.decode(uri));
-        String fileContent = null;
-        if (uris.isEmpty()) {
-            asyncAnalysisService.reanalyseOpenedPrograms();
-            return;
-        }
-        if (Files.exists(Paths.get(URI.create(uri)))) {
-            sourceUnitGraph.updateContent(uri);
-            fileContent = sourceUnitGraph.getContent(uri);
-        }
-        if (!sourceUnitGraph.isFileOpened(uri)) {
-            asyncAnalysisService.reanalyseCopybooksAssociatedPrograms(
-                    uris, uri, fileContent, SourceUnitGraph.EventSource.FILE_SYSTEM);
+        try {
+            List<String> uris = sourceUnitGraph.getAllAssociatedFilesForACopybook(uriDecodeService.decode(uri));
+            String fileContent = null;
+            if (uris.isEmpty()) {
+                asyncAnalysisService.reanalyseOpenedPrograms(false);
+                return;
+            }
+            if (Files.exists(Paths.get(URI.create(uri)))) {
+                sourceUnitGraph.updateContent(uri);
+                fileContent = sourceUnitGraph.getContent(uri);
+            }
+            if (!sourceUnitGraph.isFileOpened(uri)) {
+                asyncAnalysisService.reanalyseCopybooksAssociatedPrograms(
+                        uris, uri, fileContent, SourceUnitGraph.EventSource.FILE_SYSTEM);
+            }
+        } catch (Exception e) {
+            LOG.debug("[triggerAnalysisForChangedFile] exception: {}", e.getMessage());
         }
     }
 

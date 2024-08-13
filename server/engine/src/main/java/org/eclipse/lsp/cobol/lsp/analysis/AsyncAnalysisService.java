@@ -174,7 +174,7 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
   /**
    * Trigger reanalyse of opened programs.
    */
-  public void reanalyseOpenedPrograms() throws InterruptedException {
+  public void reanalyseOpenedPrograms(Boolean... cancel) throws InterruptedException {
     LOG.debug("Re analysis Triggered");
     List<CobolDocumentModel> openDocuments = documentModelService.getAllOpened()
             .stream().filter(d -> !analysisService.isCopybook(d.getUri(), d.getText())).collect(Collectors.toList());
@@ -185,10 +185,13 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
               .map(model -> makeId(model.getUri(), analysisResultsRevisions.get(model.getUri())))
               .filter(analysisResults::containsKey)
               .anyMatch(id -> !analysisResults.get(id).isDone());
-      if (analysisInProgress) {
+      boolean dgr = true;
+      if(cancel != null && cancel.length > 0) {
+        dgr = cancel[0];
+      }
+      if (analysisInProgress && dgr ) {
         cancelRunningAnalysis(openDocuments);
       }
-      LOG.debug("Open Documents List : {} ", openDocuments.size());
       LOG.debug(" re-analysis is waiting for prev analysis to finish");
       TimeUnit.MILLISECONDS.sleep(100);
     } while (analysisInProgress);
