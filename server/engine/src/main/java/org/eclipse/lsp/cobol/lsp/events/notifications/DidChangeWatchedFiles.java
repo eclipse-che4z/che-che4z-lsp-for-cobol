@@ -27,14 +27,11 @@ import org.eclipse.lsp4j.FileChangeType;
 import org.eclipse.lsp4j.FileEvent;
 
 import java.net.URI;
-import java.net.URLEncoder;
-import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -58,7 +55,7 @@ public class DidChangeWatchedFiles implements LspNotification {
     @Override
     public void execute() {
         Set<FileEvent> changedFiles = new HashSet<>(params.getChanges());
-        LOG.debug("Did Change Watched Files executed : {}",changedFiles);
+        LOG.debug("Did Change Watched Files executed : {}", changedFiles);
 
         changedFiles.forEach(
                 file -> {
