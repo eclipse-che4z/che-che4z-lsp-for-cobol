@@ -119,6 +119,18 @@ public class ExtendedDocument {
   }
 
   /**
+   * Replaces given range of text with a new text
+   * @param range - range of text to replace
+   * @param textLine - a new Extended text
+   */
+  public void replace(Range range, ExtendedTextLine textLine) {
+    Range updatedRange = updateRangeDueToChanges(range);
+    currentText.clear(updatedRange);
+    currentText.append(updatedRange.getStart().getLine(), textLine);
+    dirty = true;
+  }
+
+  /**
    * Cleares a range of text
    * @param range - a range of text
    */

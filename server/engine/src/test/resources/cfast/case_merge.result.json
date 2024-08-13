@@ -193,7 +193,7 @@
               "uri": "fake/path",
               "start": {
                 "line": 47,
-                "character": 20
+                "character": 12
               },
               "end": {
                 "line": 47,
@@ -226,7 +226,7 @@
               "uri": "fake/path",
               "start": {
                 "line": 50,
-                "character": 20
+                "character": 12
               },
               "end": {
                 "line": 50,
@@ -275,7 +275,7 @@
                   "uri": "fake/path",
                   "start": {
                     "line": 55,
-                    "character": 20
+                    "character": 12
                   },
                   "end": {
                     "line": 55,

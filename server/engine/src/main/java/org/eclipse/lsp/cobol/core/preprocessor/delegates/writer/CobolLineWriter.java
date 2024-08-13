@@ -21,8 +21,11 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
+import org.eclipse.lsp.cobol.common.mapping.ExtendedTextLine;
 import org.eclipse.lsp.cobol.core.model.CobolLineTypeEnum;
 import org.eclipse.lsp.cobol.core.preprocessor.CobolLine;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.rewriter.CobolLineReWriter;
@@ -45,8 +48,8 @@ public abstract class CobolLineWriter {
    */
   public ExtendedDocument serialize(List<CobolLine> lines, String documentUri) {
     final StringBuilder sb = new StringBuilder();
-    final Map<Range, String> acc = new HashMap<>();
-    StringBuilder clSb = new StringBuilder();
+    final Map<Range, ExtendedTextLine> acc = new HashMap<>();
+    ExtendedTextLine clSb = null;
     Position start = null;
     lines.sort(Comparator.comparingInt(CobolLine::getNumber));
     for (final CobolLine line : lines) {
@@ -57,8 +60,8 @@ public abstract class CobolLineWriter {
           Position stop =
                   new Position(line.getNumber() - 1, sb.length() - sb.lastIndexOf("\n") - 1);
           Range range = new Range(start, stop);
-          acc.put(range, clSb.toString());
-          clSb = new StringBuilder();
+          acc.put(range, clSb);
+          clSb = null;
           start = null;
         }
         process(sb, line);
@@ -76,7 +79,14 @@ public abstract class CobolLineWriter {
           start = new Position(predecessor.getNumber(), col);
         }
         process(sb, line);
-        clSb.append(removeStartingQuote(line));
+        String unquotedContinuedLine = removeStartingQuote(line);
+        Position unquotedExtendedLinePOsition = new Position(line.getNumber(), line.toString().indexOf(unquotedContinuedLine));
+        ExtendedTextLine extendedTextLine = new ExtendedTextLine(unquotedContinuedLine, unquotedExtendedLinePOsition, documentUri);
+        if (Objects.nonNull(clSb))  {
+          clSb.append(extendedTextLine);
+        } else {
+          clSb = extendedTextLine;
+        }
       }
     }
 

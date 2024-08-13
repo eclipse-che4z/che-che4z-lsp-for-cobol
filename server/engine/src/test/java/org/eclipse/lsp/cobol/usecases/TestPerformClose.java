@@ -66,6 +66,9 @@ class TestPerformClose {
     assertEquals("SEC1", perform.getTarget().getInSection());
     assertEquals("EP", perform.getThru().getName());
     assertEquals("SEC2", perform.getThru().getInSection());
+    assertEquals(3, perform.getLocality().getRange().getStart().getLine());
+    assertEquals(11, perform.getLocality().getRange().getStart().getCharacter());
+    assertEquals(45, perform.getLocality().getRange().getEnd().getCharacter());
   }
 
 }
