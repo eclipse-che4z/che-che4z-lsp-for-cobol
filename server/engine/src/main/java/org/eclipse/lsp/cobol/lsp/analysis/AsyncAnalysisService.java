@@ -120,7 +120,6 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
     Integer prevId = analysisResultsRevisions.put(uri, currentRevision);
     if (currentRevision.equals(prevId) && !force) {
       notifyAllListeners(AnalysisState.SKIPPED, documentModelService.get(uri), eventSource);
-      LOG.debug("Adonis [scheduleAnalysis] skipped: ");
       return analysisResults.get(id);
     }
     Executor analysisExecutor = getExecutor(uri);
@@ -143,7 +142,6 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
       } finally {
         if (Objects.equals(analysisResultsRevisions.get(uri), currentRevision) || force) {
           communications.publishDiagnostics(documentModelService.getOpenedDiagnostic());
-          LOG.debug("Adonis [scheduleAnalysis] publish : ");
         }
         communications.notifyProgressEnd(uri);
       }
@@ -175,7 +173,6 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
    * Trigger reanalyse of opened programs.
    */
   public void reanalyseOpenedPrograms(Boolean... cancel) throws InterruptedException {
-    LOG.debug("Re analysis Triggered");
     List<CobolDocumentModel> openDocuments = documentModelService.getAllOpened()
             .stream().filter(d -> !analysisService.isCopybook(d.getUri(), d.getText())).collect(Collectors.toList());
     boolean analysisInProgress;
@@ -185,11 +182,11 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
               .map(model -> makeId(model.getUri(), analysisResultsRevisions.get(model.getUri())))
               .filter(analysisResults::containsKey)
               .anyMatch(id -> !analysisResults.get(id).isDone());
-      boolean dgr = true;
+      boolean cancelFlg = true;
       if(cancel != null && cancel.length > 0) {
-        dgr = cancel[0];
+        cancelFlg = cancel[0];
       }
-      if (analysisInProgress && dgr ) {
+      if (analysisInProgress && cancelFlg ) {
         cancelRunningAnalysis(openDocuments);
       }
       LOG.debug(" re-analysis is waiting for prev analysis to finish");
@@ -199,7 +196,6 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
     copybookService.invalidateCache(true);
     subroutineService.invalidateCache();
     LOG.info("Cache invalidated");
-    LOG.debug("Open Documents List after Sleep: {} ", openDocuments.size());
     openDocuments
             .forEach(doc -> scheduleAnalysis(doc.getUri(), doc.getText(), analysisResultsRevisions.getOrDefault(doc.getUri(), 0), false, true, SourceUnitGraph.EventSource.IDE));
   }
