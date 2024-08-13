@@ -110,7 +110,7 @@ cics_receive_group_one:         cics_into_set? cics_length_flength cics_maxlengt
 cics_receive_group_two:         (CONVID cics_name | SESSION cics_name)? cics_into_set cics_length_flength cics_maxlength? NOTRUNCATE? (STATE cics_cvda)?;
 
 cics_receive_2980:              cics_into_set? cics_length_flength cics_maxlength? NOTRUNCATE? PASSBK;
-cics_receive_non_z_default:     cics_into_set? LENGTH cics_data_area FLENGTH cics_data_area (MAXLENGTH cics_data_value)? NOTRUNCATE?;
+cics_receive_non_z_default:     cics_into_set? LENGTH cics_data_area FLENGTH cics_data_area (MAXLENGTH cics_data_value)? NOTRUNCATE;
 cics_receive_partn:             cics_into_set LENGTH cics_data_area ASIS?;
 
 // RECEIVE MAPS

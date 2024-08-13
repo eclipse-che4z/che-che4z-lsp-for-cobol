@@ -43,6 +43,7 @@ public class TestCicsReceive {
           + "       01 {$*abc} PIC S9 VALUE +100.\n"
           + "       01 {$*def} PIC S9 VALUE +10.\n"
           + "       01 {$*ghi} PIC S9 VALUE +1000.\n"
+          + "       01 {$*jkl} PIC X VALUE 'NAME'.\n"
           + "       PROCEDURE DIVISION.\n"
           + "            EXEC CICS \n"
           + "            END-EXEC.";
@@ -157,6 +158,122 @@ public class TestCicsReceive {
 
   private static final String[] GROUP_ONE_INVALID_ONE = {
     "{RECEIVE|error1}", "INTO(100)", "MAXLENGTH(10)", "NOTRUNCATE"
+  };
+
+  private static final String[] GROUP_TWO_APPC_FULL_OPTIONS_VALID_ONE = {
+    "RECEIVE",
+    "CONVID({$abc})",
+    "INTO({$abc})",
+    "LENGTH({$def})",
+    "MAXLENGTH({$ghi})",
+    "NOTRUNCATE",
+    "STATE({$jkl})"
+  };
+
+  private static final String[] GROUP_TWO_APPC_PARTIAL_OPTIONS_VALID_ONE = {
+    "RECEIVE", "CONVID({$abc})", "INTO({$abc})", "LENGTH({$def})"
+  };
+
+  private static final String[] GROUP_TWO_LUTYPE6_FULL_OPTIONS_VALID_ONE = {
+    "RECEIVE",
+    "SESSION({$abc})",
+    "INTO({$abc})",
+    "LENGTH({$def})",
+    "MAXLENGTH({$ghi})",
+    "NOTRUNCATE",
+  };
+
+  private static final String[] GROUP_TWO_LUTYPE6_PARTIAL_OPTIONS_VALID_ONE = {
+    "RECEIVE", "INTO({$abc})", "LENGTH({$def})", "NOTRUNCATE",
+  };
+
+  private static final String[] GROUP_TWO_MRO_FULL_OPTIONS_VALID_ONE = {
+    "RECEIVE",
+    "SESSION({$abc})",
+    "INTO({$abc})",
+    "LENGTH({$def})",
+    "MAXLENGTH({$ghi})",
+    "NOTRUNCATE",
+    "STATE({$jkl})"
+  };
+
+  private static final String[] GROUP_TWO_MRO_PARTIAL_OPTIONS_VALID_ONE = {
+    "RECEIVE", "INTO({$abc})", "LENGTH({$def})", "STATE({$jkl})",
+  };
+
+  private static final String[] GROUP_TWO_INVALID_ONE = {
+    "{RECEIVE|error1}",
+    "SESSION(failure)",
+    "LENGTH(10)",
+    "MAXLENGTH(1000)",
+    "NOTRUNCATE",
+    "STATE(incomplete)"
+  };
+
+  private static final String[] R2980_FULL_OPTIONS_VALID_ONE = {
+    "RECEIVE", "INTO({$abc})", "LENGTH({$def})", "MAXLENGTH({$ghi})", "NOTRUNCATE", "PASSBK"
+  };
+
+  private static final String[] R2980_PARTIAL_OPTIONS_VALID_ONE = {
+    "RECEIVE", "LENGTH({$def})", "PASSBK"
+  };
+
+  private static final String[] R2980_INVALID_ONE = {
+    "{RECEIVE|error1}", "SESSION(failure)", "MAXLENGTH(1000)", "NOTRUNCATE", "STATE(incomplete)"
+  };
+
+  private static final String[] NON_Z_FULL_OPTIONS_VALID_ONE = {
+    "RECEIVE", "INTO({$abc})", "LENGTH({$def})", "FLENGTH({$ghi})", "MAXLENGTH(1000)", "NOTRUNCATE"
+  };
+
+  private static final String[] NON_Z_PARTIAL_OPTIONS_VALID_ONE = {
+    "RECEIVE", "LENGTH({$def})", "FLENGTH({$ghi})", "NOTRUNCATE"
+  };
+
+  private static final String[] NON_Z_INVALID_ONE = {
+    "RECEIVE", "INTO(100)", "LENGTH(1)", "{FLENGTH|error1}(100)", "MAXLENGTH(1000)",
+  };
+
+  private static final String[] PARTN_FULL_OPTIONS_VALID_ONE = {
+    "RECEIVE", "INTO({$abc})", "LENGTH({$def})", "ASIS"
+  };
+
+  private static final String[] PARTN_PARTIAL_OPTIONS_VALID_ONE = {"RECEIVE", "LENGTH({$def})"};
+
+  private static final String[] PARTN_INVALID_ONE = {
+    "{RECEIVE|error1}", "SET(100)", "{ASIS|error2}"
+  };
+
+  private static final String[] MAP_FULL_OPTIONS_VALID_ONE = {
+    "RECEIVE",
+    "MAP({$abc})",
+    "MAPSET({$abc})",
+    "INTO({$abc})",
+    "TERMINAL",
+    "ASIS",
+    "INPARTN({$abc})"
+  };
+
+  private static final String[] MAP_PARTIAL_OPTIONS_VALID_ONE = {"RECEIVE", "MAP({$abc})"};
+
+  private static final String[] MAP_INVALID_ONE = {"{RECEIVE|error1}", "TERMINAL"};
+
+  private static final String[] MAP_MAPPINGDEV_FULL_OPTIONS_VALID_ONE = {
+    "RECEIVE",
+    "MAP({$abc})",
+    "MAPPINGDEV({$def})",
+    "FROM({$abc})",
+    "LENGTH({$def})",
+    "MAPSET({$abc})",
+    "INTO({$abc})"
+  };
+
+  private static final String[] MAP_MAPPINGDEV_PARTIAL_OPTIONS_VALID_ONE = {
+    "RECEIVE", "MAP({$abc})", "MAPPINGDEV({$def})", "FROM({$abc})",
+  };
+
+  private static final String[] MAP_MAPPINGDEV_INVALID_ONE = {
+    "RECEIVE", "MAP(1)", "FROM(1)", "{MAPSET|error1}(1)"
   };
 
   private static String getTestString(String[] components) {
@@ -315,6 +432,212 @@ public class TestCicsReceive {
             new Diagnostic(
                 new Range(),
                 "Extraneous input 'RECEIVE'",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())),
+        ImmutableList.of());
+  }
+
+  @Test
+  void testGroupTwoAppcFullOptionsValidOne() {
+    UseCaseEngine.runTest(
+        getTestString(GROUP_TWO_APPC_FULL_OPTIONS_VALID_ONE),
+        ImmutableList.of(),
+        ImmutableMap.of());
+  }
+
+  @Test
+  void testGroupTwoAppcPartialOptionsValidOne() {
+    UseCaseEngine.runTest(
+        getTestString(GROUP_TWO_APPC_PARTIAL_OPTIONS_VALID_ONE),
+        ImmutableList.of(),
+        ImmutableMap.of());
+  }
+
+  @Test
+  void testGroupTwoLTSixFullOptionsValidOne() {
+    UseCaseEngine.runTest(
+        getTestString(GROUP_TWO_LUTYPE6_FULL_OPTIONS_VALID_ONE),
+        ImmutableList.of(),
+        ImmutableMap.of());
+  }
+
+  @Test
+  void testGroupTwoLTSixPartialOptionsValidOne() {
+    UseCaseEngine.runTest(
+        getTestString(GROUP_TWO_LUTYPE6_PARTIAL_OPTIONS_VALID_ONE),
+        ImmutableList.of(),
+        ImmutableMap.of());
+  }
+
+  @Test
+  void testGroupTwoMROFullOptionsValidOne() {
+    UseCaseEngine.runTest(
+        getTestString(GROUP_TWO_MRO_FULL_OPTIONS_VALID_ONE), ImmutableList.of(), ImmutableMap.of());
+  }
+
+  @Test
+  void testGroupTwoMROPartialOptionsValidOne() {
+    UseCaseEngine.runTest(
+        getTestString(GROUP_TWO_MRO_PARTIAL_OPTIONS_VALID_ONE),
+        ImmutableList.of(),
+        ImmutableMap.of());
+  }
+
+  @Test
+  void testGroupTwoInvalidOne() {
+    UseCaseEngine.runTest(
+        getTestString(GROUP_TWO_INVALID_ONE),
+        ImmutableList.of(),
+        ImmutableMap.of(
+            "error1",
+            new Diagnostic(
+                new Range(),
+                "Extraneous input 'RECEIVE'",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())),
+        ImmutableList.of());
+  }
+
+  @Test
+  void testR2980FullOptionsValidOne() {
+    UseCaseEngine.runTest(
+        getTestString(R2980_FULL_OPTIONS_VALID_ONE), ImmutableList.of(), ImmutableMap.of());
+  }
+
+  @Test
+  void testR2980PartialOptionsValidOne() {
+    UseCaseEngine.runTest(
+        getTestString(R2980_PARTIAL_OPTIONS_VALID_ONE), ImmutableList.of(), ImmutableMap.of());
+  }
+
+  @Test
+  void testR2980InvalidOne() {
+    UseCaseEngine.runTest(
+        getTestString(R2980_INVALID_ONE),
+        ImmutableList.of(),
+        ImmutableMap.of(
+            "error1",
+            new Diagnostic(
+                new Range(),
+                "Extraneous input 'RECEIVE'",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())),
+        ImmutableList.of());
+  }
+
+  @Test
+  void testNonZFullOptionsValidOne() {
+    UseCaseEngine.runTest(
+        getTestString(NON_Z_FULL_OPTIONS_VALID_ONE), ImmutableList.of(), ImmutableMap.of());
+  }
+
+  @Test
+  void testNonZ0PartialOptionsValidOne() {
+    UseCaseEngine.runTest(
+        getTestString(NON_Z_PARTIAL_OPTIONS_VALID_ONE), ImmutableList.of(), ImmutableMap.of());
+  }
+
+  @Test
+  void testNonZInvalidOne() {
+    UseCaseEngine.runTest(
+        getTestString(NON_Z_INVALID_ONE),
+        ImmutableList.of(),
+        ImmutableMap.of(
+            "error1",
+            new Diagnostic(
+                new Range(),
+                "Extraneous input 'FLENGTH'",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())),
+        ImmutableList.of());
+  }
+
+  @Test
+  void testPartNFullOptionsValidOne() {
+    UseCaseEngine.runTest(
+        getTestString(PARTN_FULL_OPTIONS_VALID_ONE), ImmutableList.of(), ImmutableMap.of());
+  }
+
+  @Test
+  void testPartNPartialOptionsValidOne() {
+    UseCaseEngine.runTest(
+        getTestString(PARTN_PARTIAL_OPTIONS_VALID_ONE), ImmutableList.of(), ImmutableMap.of());
+  }
+
+  @Test
+  void testPartNInvalidOne() {
+    UseCaseEngine.runTest(
+        getTestString(PARTN_INVALID_ONE),
+        ImmutableList.of(),
+        ImmutableMap.of(
+            "error1",
+            new Diagnostic(
+                new Range(),
+                "Extraneous input 'RECEIVE'",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()),
+            "error2",
+            new Diagnostic(
+                new Range(),
+                "Extraneous input 'ASIS'",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())),
+        ImmutableList.of());
+  }
+
+  @Test
+  void testMapFullOptionsValidOne() {
+    UseCaseEngine.runTest(
+        getTestString(MAP_FULL_OPTIONS_VALID_ONE), ImmutableList.of(), ImmutableMap.of());
+  }
+
+  @Test
+  void testMapPartialOptionsValidOne() {
+    UseCaseEngine.runTest(
+        getTestString(MAP_PARTIAL_OPTIONS_VALID_ONE), ImmutableList.of(), ImmutableMap.of());
+  }
+
+  @Test
+  void testMapInvalidOne() {
+    UseCaseEngine.runTest(
+        getTestString(MAP_INVALID_ONE),
+        ImmutableList.of(),
+        ImmutableMap.of(
+            "error1",
+            new Diagnostic(
+                new Range(),
+                "Extraneous input 'RECEIVE'",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())),
+        ImmutableList.of());
+  }
+
+  @Test
+  void testMapMappingDevFullOptionsValidOne() {
+    UseCaseEngine.runTest(
+        getTestString(MAP_MAPPINGDEV_FULL_OPTIONS_VALID_ONE),
+        ImmutableList.of(),
+        ImmutableMap.of());
+  }
+
+  @Test
+  void testMapMappingDevPartialOptionsValidOne() {
+    UseCaseEngine.runTest(
+        getTestString(MAP_MAPPINGDEV_PARTIAL_OPTIONS_VALID_ONE),
+        ImmutableList.of(),
+        ImmutableMap.of());
+  }
+
+  @Test
+  void testMapMappingDevInvalidOne() {
+    UseCaseEngine.runTest(
+        getTestString(MAP_MAPPINGDEV_INVALID_ONE),
+        ImmutableList.of(),
+        ImmutableMap.of(
+            "error1",
+            new Diagnostic(
+                new Range(),
+                "Extraneous input 'MAPSET'",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())),
         ImmutableList.of());
