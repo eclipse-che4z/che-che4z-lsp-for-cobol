@@ -106,7 +106,7 @@ public class TestCicsConverseStatement {
     }
 
     private static String getTestString(String newCommand) {
-        List<String> instances = Arrays.asList(newCommand.split(" "));
+        List<String> instances = Arrays.asList(newCommand.split("\\s"));
         instances.replaceAll(String.join("", Collections.nCopies(12, " "))::concat);
         ArrayList<String> base = new ArrayList<String>(Arrays.asList(BASE_TEXT.split("\n")));
         base.addAll(base.size() - 1, instances);
