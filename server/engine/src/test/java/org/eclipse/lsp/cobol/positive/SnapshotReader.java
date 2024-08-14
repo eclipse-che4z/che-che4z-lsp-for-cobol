@@ -36,7 +36,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class SnapshotReader {
   private static final Pattern EXTRACT_DIFF_SECTION_OF_A_SNAPSHOT =
-      Pattern.compile("DATA_NAMES((?s:.*?))PROCEDURES((?s:.*?))PROGRAMS((?s:.*))");
+      Pattern.compile("DATA_NAMES((?s:.*?))\\nPROCEDURES\\n((?s:.*?))\\nPROGRAMS\\n((?s:.*))");
   private static final Pattern STRING_TO_SYSPRINTSNAP =
       Pattern.compile(
           "(\\d+(:\\d+-\\d+:\\d+)?)\\t(.*?)\\t((\\d+(:\\d+-\\d+:\\d+)?)(,\\d+(:\\d+-\\d+:\\d+)?)*)?");

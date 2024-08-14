@@ -17,12 +17,15 @@ package org.eclipse.lsp.cobol.positive;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import lombok.experimental.UtilityClass;
+import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.NodeType;
+import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNode;
 import org.eclipse.lsp.cobol.common.symbols.CodeBlockReference;
 import org.eclipse.lsp.cobol.common.symbols.SymbolTable;
+import org.eclipse.lsp.cobol.common.utils.ImplicitCodeUtils;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolsRepository;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Range;
@@ -42,39 +45,7 @@ import static java.util.stream.Collectors.toList;
 public class PositiveTestUtility {
 
   private final List<String> blacklistedTestFiles =
-      Arrays.asList(
-          "DB1014.2.cbl",
-          "DB1024.2.cbl",
-          "DB1044.2.cbl",
-          "DB1054.2.cbl",
-          "EXEC84.2.cbl",
-          "IF1054.2.cbl",
-          "IF1194.2.cbl",
-          "IF1234.2.cbl",
-          "IF1274.2.cbl",
-          "IF1284.2.cbl",
-          "IF1294.2.cbl",
-          "IX1114.2.cbl",
-          "IX2104.2.cbl",
-          "IX2124.2.cbl",
-          "IX2144.2.cbl",
-          "IX2154.2.cbl",
-          "IX2184.2.cbl",
-          "NC1354.2.cbl",
-          "NC2024.2.cbl",
-          "NC2054.2.cbl",
-          "NC2074.2.cbl",
-          "NC2084.2.cbl",
-          "NC2094.2.cbl",
-          "NC2144.2.cbl",
-          "NC2154.2.cbl",
-          "NC2194.2.cbl",
-          "NC2224.2.cbl",
-          "NC2504.2.cbl",
-          "NC2524.2.cbl",
-          "NC2534.2.cbl",
-          "SM1064.2.cbl",
-          "SM1074.2.cbl");
+          emptyList();
 
   /**
    * Assets DataName, procedure and program definition and references matches from the listing
@@ -281,61 +252,93 @@ public class PositiveTestUtility {
         });
   }
 
-  private void assertReferencesByDataName(
-      SysprintSnap snap, Collection<Node> nodes, String fileName) {
-    Optional<VariableNode> foundVariableNodeInLSP =
-        nodes.stream()
-            .filter(
-                node ->
-                    node.getLocality().toLocation().getRange().getStart().getLine() + 1
-                        == snap.getDefinedLineNo())
-            .findFirst()
-            .filter(VariableNode.class::isInstance)
-            .map(VariableNode.class::cast);
-    Assertions.assertTrue(
-        foundVariableNodeInLSP.isPresent(),
-        "["
-            + fileName
-            + "]:"
-            + "Data name definition for "
-            + snap.getDataName()
-            + " not found in LSP engine");
+    private void assertReferencesByDataName(
+            SysprintSnap snap, Collection<Node> nodes, String fileName) {
+        Optional<Node> first =
+                nodes.stream()
+                        .filter(
+                                node -> {
+                                    Locality locality = node.getLocality();
+                                    boolean isImplicit = ImplicitCodeUtils.isImplicit(locality.getUri());
+                                    int definedLineNo =
+                                            snap.getDefinedLineNo(); // implicit nodes are always at line 0
+                                    return (isImplicit && definedLineNo == 0)
+                                            || locality.toLocation().getRange().getStart().getLine() + 1 == definedLineNo;
+                                })
+                        .findFirst();
 
-    foundVariableNodeInLSP.ifPresent(
-        node -> {
-          List<Object> usagesFromEngine =
-              node.getUsages().stream()
-                  .map(usage -> usage.getRange().getStart().getLine() + 1)
-                  .collect(Collectors.toList());
+        Optional<VariableNode> foundVariableNodeInLSP =
+                first.filter(VariableNode.class::isInstance).map(VariableNode.class::cast);
 
-          List<Integer> unmatchedReferences =
-              snap.getReferences().stream()
-                  .filter(lineNo -> !usagesFromEngine.contains(lineNo))
-                  .collect(Collectors.toList());
+        Assertions.assertTrue(
+                foundVariableNodeInLSP.isPresent(),
+                "["
+                        + fileName
+                        + "]:"
+                        + "Data name definition for "
+                        + snap.getDataName()
+                        + " not found in LSP engine");
 
-          Assertions.assertEquals(
-              0,
-              unmatchedReferences.size(),
-              "["
-                  + fileName
-                  + "]:"
-                  + "Data references are not found for "
-                  + snap.getDataName()
-                  + ", at: "
-                  + unmatchedReferences.stream()
-                      .map(Object::toString)
-                      .collect(Collectors.joining(" ,")));
+        foundVariableNodeInLSP.ifPresent(
+                node -> {
+                    List<Object> usagesFromEngine =
+                            node.getUsages().stream()
+                                    .flatMap(
+                                            usage -> {
+                                                if (usage.getUri().contains(fileName)) {
+                                                    return Stream.of(usage.getRange().getStart().getLine() + 1);
+                                                } else {
+                                                    // seems a copybook
+                                                    return getCopyBookLineNumber(node, usage).stream()
+                                                            .map(x -> x + usage.getRange().getStart().getLine() + 1);
+                                                }
+                                            })
+                                    .collect(Collectors.toList());
 
-          String updateFlag = ofNullable(getProperty("UpdateSnapListing")).orElse("false");
-          if (!updateFlag.equals("false")) {
-            Range location = foundVariableNodeInLSP.get().getLocality().getRange();
-            List<Range> collect =
-                node.getUsages().stream().map(Location::getRange).collect(toList());
-            snap.setReferencesLocation(collect);
-            snap.setDefinitionLocation(location);
-          }
-        });
-  }
+                    List<Integer> unmatchedReferences =
+                            snap.getReferences().stream()
+                                    .filter(lineNo -> !usagesFromEngine.contains(lineNo))
+                                    .collect(Collectors.toList());
+
+                    Assertions.assertEquals(
+                            0,
+                            unmatchedReferences.size(),
+                            "["
+                                    + fileName
+                                    + "]:"
+                                    + "Data references are not found for "
+                                    + snap.getDataName()
+                                    + ", at: "
+                                    + unmatchedReferences.stream()
+                                    .map(Object::toString)
+                                    .collect(Collectors.joining(" ,")));
+
+                    String updateFlag = ofNullable(getProperty("UpdateSnapListing")).orElse("false");
+                    if (!updateFlag.equals("false")) {
+                        Range location = foundVariableNodeInLSP.get().getLocality().getRange();
+                        List<Range> collect =
+                                node.getUsages().stream().map(Location::getRange).collect(toList());
+                        snap.setReferencesLocation(collect);
+                        snap.setDefinitionLocation(location);
+                    }
+                });
+    }
+
+    private List<Integer> getCopyBookLineNumber(Node node, Location usage) {
+        return node
+                .getNearestParentByType(NodeType.PROGRAM)
+                .map(
+                        x ->
+                                x.getDepthFirstStream()
+                                        .filter(n1 -> n1.getNodeType() == NodeType.COPY)
+                                        .map(CopyNode.class::cast)
+                                        .filter(n2 -> n2.getUri().equals(usage.getUri()))
+                                        .collect(toList()))
+                .orElse(emptyList())
+                .stream()
+                .map(n -> n.getLocality().getRange().getEnd().getLine() + 1)
+                .collect(toList());
+    }
 
   private void fetchReferencesFromLSPEngine(
       Node rootNode,
