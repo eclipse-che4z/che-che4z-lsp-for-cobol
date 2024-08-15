@@ -895,7 +895,7 @@ cics_web_rqueryparm: QUERYPARM cics_data_value (NAMELENGTH cics_data_value | VAL
 cics_web_readnext: READNEXT (cics_web_rnformfield | cics_web_rnhttpheader);
 cics_web_rnformfield: (FORMFIELD cics_data_area | QUERYPARM cics_data_area | NAMELENGTH cics_data_area |
                       VALUE cics_data_area | VALUELENGTH cics_data_area | cics_handle_response)+;
-cics_web_rnhttpheader: ((HTTPHEADER | NAMELENGTH | VALUE | VALUELENGTH) cics_data_area SESSTOKEN cics_data_value | cics_handle_response)+;
+cics_web_rnhttpheader: ((HTTPHEADER | NAMELENGTH | VALUE | VALUELENGTH) cics_data_area | SESSTOKEN cics_data_value | cics_handle_response)+;
 cics_web_receive: RECEIVE (cics_web_rserver | cics_web_rtocontainer | cics_web_rsesstoken);
 cics_web_rserver: cics_into (LENGTH cics_data_area | MAXLENGTH cics_data_value | NOTRUNCATE | TYPE cics_cvda | SRVCONVERT |
                   NOSRVCONVERT | SERVERCONV cics_cvda | CHARACTERSET cics_data_value | HOSTCODEPAGE cics_data_value |
