@@ -12,15 +12,39 @@ options {tokenVocab = CobolLexer; superClass = MessageServiceParser;}
 startRule : compilationUnit EOF;
 
 compilationUnit
-   : programUnit+
+   : programOrFunctionUnit+
    ;
 
-programUnit
-   : identificationDivision environmentDivision? dataDivision? procedureDivision? programUnit* endProgramStatement?
+programOrFunctionUnit
+   : identificationDivision (programDetails | functionDetails)
+   ;
+
+programDetails
+   : programIdParagraph identificationDivisionBody* environmentDivision? dataDivision? procedureDivision?
+   // TODO: This rule requires abitrary long lookahead due to conflict with compilationUnit
+   //       It might be possible to parse all programs as peers and enforce nesting later on
+   (
+      nestedProgramUnit+ endProgramStatement
+      |
+      endProgramStatement?
+   )
+   ;
+
+nestedProgramUnit
+   : identificationDivision programDetails endProgramStatement
    ;
 
 endProgramStatement
    : END PROGRAM programName DOT_FS
+   ;
+
+functionDetails
+   : functionIdParagraph identificationDivisionBody* environmentDivision? dataDivision? procedureDivision? endFunctionStatement
+   // END is required by the compiler even though the documentation suggests it is optional
+   ;
+
+endFunctionStatement
+   : END FUNCTION programName DOT_FS
    ;
 
 commaSeparator: COMMACHAR | COMMASEPARATOR;
@@ -28,7 +52,7 @@ commaSeparator: COMMACHAR | COMMASEPARATOR;
 // --- identification division --------------------------------------------------------------------
 
 identificationDivision
-   : (IDENTIFICATION | ID) DIVISION dot_fs programIdParagraph identificationDivisionBody*
+   : (IDENTIFICATION | ID) DIVISION dot_fs
    ;
 
 identificationDivisionBody
@@ -39,6 +63,10 @@ identificationDivisionBody
 
 programIdParagraph
    : PROGRAM_ID DOT_FS? programName (IS? (COMMON | INITIAL | LIBRARY | DEFINITION | RECURSIVE) PROGRAM?)? DOT_FS?
+   ;
+
+functionIdParagraph
+   : FUNCTION_ID DOT_FS programName (IS? (COMMON | INITIAL | LIBRARY | DEFINITION | RECURSIVE) PROGRAM?)? DOT_FS?
    ;
 
 // - author paragraph ----------------------------------

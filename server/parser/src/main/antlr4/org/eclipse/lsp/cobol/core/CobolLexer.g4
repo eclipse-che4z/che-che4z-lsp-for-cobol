@@ -208,6 +208,7 @@ FOR                  : F O R {cobolVerbTokens.add(FOR);};
 FREE                 : F R E E {cobolVerbTokens.add(FREE);};
 FROM                 : F R O M {cobolVerbTokens.add(FROM);};
 FUNCTION             : F U N C T I O N {cobolVerbTokens.add(FUNCTION);};
+FUNCTION_ID          : F U N C T I O N MINUSCHAR I D {cobolVerbTokens.add(FUNCTION_ID);};
 FUNCTION_POINTER     : F U N C T I O N MINUSCHAR P O I N T E R {cobolVerbTokens.add(FUNCTION_POINTER);};
 GENERATE             : G E N E R A T E {cobolVerbTokens.add(GENERATE);};
 GIVING               : G I V I N G {cobolVerbTokens.add(GIVING);};

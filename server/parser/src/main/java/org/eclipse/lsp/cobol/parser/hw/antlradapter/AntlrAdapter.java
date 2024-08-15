@@ -61,8 +61,8 @@ public class AntlrAdapter {
     return startRuleContext;
   }
 
-  private static CobolParser.ProgramUnitContext replaceWithAntlr(
-      ProgramUnit p, CobolParser.ProgramUnitContext result) {
+  private static CobolParser.ProgramOrFunctionUnitContext replaceWithAntlr(
+      ProgramUnit p, CobolParser.ProgramOrFunctionUnitContext result) {
     org.eclipse.lsp.cobol.parser.hw.lexer.Token token = Utils.findStartToken(p).get();
     int startLine = token.getLine();
     int startPos = token.getStartPositionInLine();
@@ -89,7 +89,7 @@ public class AntlrAdapter {
   }
 
   private void traversePrograms(
-      CstNode node, Function<ProgramUnit, CobolParser.ProgramUnitContext> processor) {
+      CstNode node, Function<ProgramUnit, CobolParser.ProgramOrFunctionUnitContext> processor) {
     node.getChildren().forEach(s -> traversePrograms(s, processor));
     if (node instanceof ProgramUnit) {
       processor.apply((ProgramUnit) node);
@@ -101,34 +101,28 @@ public class AntlrAdapter {
     start.children = new ArrayList<>();
     start.start = Utils.toAntlrToken(Utils.findStartToken(cstNode, true).get(), charStream);
     start.stop = Utils.toAntlrToken(Utils.findStopToken(cstNode, true).get(), charStream);
-    CobolParser.CompilationUnitContext compilationUnit =
-        new CobolParser.CompilationUnitContext(start, 0);
+    CobolParser.CompilationUnitContext compilationUnit = new CobolParser.CompilationUnitContext(start, 0);
     Utils.initNode(cstNode, compilationUnit, charStream);
     start.addChild(compilationUnit);
     processChildNodes(cstNode, compilationUnit);
     return start;
   }
 
-  private CobolParser.ProgramUnitContext convertProgramNode(CstNode programUnit) {
-    CobolParser.ProgramUnitContext program = new CobolParser.ProgramUnitContext(null, 0);
+  private CobolParser.ProgramOrFunctionUnitContext convertProgramNode(CstNode programUnit) {
+    CobolParser.ProgramOrFunctionUnitContext program = new CobolParser.ProgramOrFunctionUnitContext(null, 0);
     Utils.initNode(programUnit, program, charStream);
     processChildNodes(programUnit, program);
-    Optional<List<org.eclipse.lsp.cobol.parser.hw.lexer.Token>> endProgramName =
-        getEndProgramName(programUnit);
+    Optional<List<org.eclipse.lsp.cobol.parser.hw.lexer.Token>> endProgramName = getEndProgramName(programUnit);
     if (endProgramName.isPresent()) {
-      CobolParser.EndProgramStatementContext endProgramStatementContext =
-          new CobolParser.EndProgramStatementContext(program, 0);
-      endProgramStatementContext.start =
-          Utils.toAntlrToken(Utils.findStartToken(programUnit).get(), charStream);
-      endProgramStatementContext.stop =
-          Utils.toAntlrToken(Utils.findStopToken(programUnit).get(), charStream);
-      CobolParser.ProgramNameContext nameContext =
-          new CobolParser.ProgramNameContext(endProgramStatementContext, 0);
+      CobolParser.EndProgramStatementContext endProgramStatementContext = new CobolParser.EndProgramStatementContext(
+          program, 0);
+      endProgramStatementContext.start = Utils.toAntlrToken(Utils.findStartToken(programUnit).get(), charStream);
+      endProgramStatementContext.stop = Utils.toAntlrToken(Utils.findStopToken(programUnit).get(), charStream);
+      CobolParser.ProgramNameContext nameContext = new CobolParser.ProgramNameContext(endProgramStatementContext, 0);
       org.eclipse.lsp.cobol.parser.hw.lexer.Token nameToken = endProgramName.get().get(0);
       nameContext.start = Utils.toAntlrToken(nameToken, charStream);
-      nameContext.stop =
-          Utils.toAntlrToken(
-              (endProgramName.get().get(endProgramName.get().size() - 1)), charStream);
+      nameContext.stop = Utils.toAntlrToken(
+          (endProgramName.get().get(endProgramName.get().size() - 1)), charStream);
       endProgramStatementContext.children = new ArrayList<>();
       endProgramStatementContext.children.add(nameContext);
       nameContext.addChild(new TerminalNodeImpl(Utils.toAntlrToken(nameToken, charStream)));
@@ -142,25 +136,23 @@ public class AntlrAdapter {
       // All programs should be adapted to this point
       return ((AntlrAdapted) cstNode.getChildren().get(0)).getRuleContext();
     } else if (cstNode instanceof DataDivision) {
-      CobolDataDivisionParser.DataDivisionContext dataDivisionContext =
-          antlrDataDivisionParser(cstNode).dataDivision();
+      CobolDataDivisionParser.DataDivisionContext dataDivisionContext = antlrDataDivisionParser(cstNode).dataDivision();
       Utils.removeEofNode(dataDivisionContext);
       return dataDivisionContext;
     } else if (cstNode instanceof IdentificationDivision) {
-      CobolIdentificationDivisionParser.IdentificationDivisionContext
-          identificationDivisionContext = antlrIdDivisionParser(cstNode).identificationDivision();
+      CobolIdentificationDivisionParser.IdentificationDivisionContext identificationDivisionContext = antlrIdDivisionParser(
+          cstNode).identificationDivision();
       Utils.removeEofNode(identificationDivisionContext);
       return identificationDivisionContext;
     } else if (cstNode instanceof EnvironmentDivision) {
-      CobolParser.EnvironmentDivisionContext environmentDivisionContext =
-          antlrParser(cstNode).environmentDivision();
+      CobolParser.EnvironmentDivisionContext environmentDivisionContext = antlrParser(cstNode).environmentDivision();
       Utils.removeEofNode(environmentDivisionContext);
       return environmentDivisionContext;
     } else if (cstNode instanceof ProcedureDivision) {
-      ProcedureDivisionAntlrAdapter adapter =
-          new ProcedureDivisionAntlrAdapter(charStream, errorListener, errorStrategy, treeListener);
-      CobolProcedureDivisionParser.ProcedureDivisionContext procedureDivisionContext =
-          adapter.processProcedureDivisionContext((ProcedureDivision) cstNode);
+      ProcedureDivisionAntlrAdapter adapter = new ProcedureDivisionAntlrAdapter(charStream, errorListener,
+          errorStrategy, treeListener);
+      CobolProcedureDivisionParser.ProcedureDivisionContext procedureDivisionContext = adapter
+          .processProcedureDivisionContext((ProcedureDivision) cstNode);
       Utils.removeEofNode(procedureDivisionContext);
       return procedureDivisionContext;
     } else {
@@ -182,8 +174,7 @@ public class AntlrAdapter {
   private CobolIdentificationDivisionParser antlrIdDivisionParser(CstNode node) {
     org.eclipse.lsp.cobol.parser.hw.lexer.Token startToken = Utils.findStartToken(node).get();
     String input = Utils.generatePrefix(charStream, startToken) + node.toText().trim();
-    CobolIdentificationDivisionLexer antlrLexer =
-        new CobolIdentificationDivisionLexer(CharStreams.fromString(input));
+    CobolIdentificationDivisionLexer antlrLexer = new CobolIdentificationDivisionLexer(CharStreams.fromString(input));
     antlrLexer.removeErrorListeners();
     antlrLexer.addErrorListener(errorListener);
     CommonTokenStream tokens = new CommonTokenStream(antlrLexer);
@@ -213,13 +204,12 @@ public class AntlrAdapter {
   private CobolParser antlrParser(CstNode node) {
     org.eclipse.lsp.cobol.parser.hw.lexer.Token startToken = Utils.findStartToken(node).get();
     String input = Utils.generatePrefix(charStream, startToken) + node.toText();
-    org.eclipse.lsp.cobol.core.CobolLexer antlrLexer =
-        new org.eclipse.lsp.cobol.core.CobolLexer(CharStreams.fromString(input));
+    org.eclipse.lsp.cobol.core.CobolLexer antlrLexer = new org.eclipse.lsp.cobol.core.CobolLexer(
+        CharStreams.fromString(input));
     antlrLexer.removeErrorListeners();
     antlrLexer.addErrorListener(errorListener);
     CommonTokenStream tokens = new CommonTokenStream(antlrLexer);
-    org.eclipse.lsp.cobol.core.CobolParser antlrParser =
-        new org.eclipse.lsp.cobol.core.CobolParser(tokens);
+    org.eclipse.lsp.cobol.core.CobolParser antlrParser = new org.eclipse.lsp.cobol.core.CobolParser(tokens);
     antlrParser.removeErrorListeners();
     antlrParser.addErrorListener(errorListener);
     antlrParser.setErrorHandler(errorStrategy);
@@ -236,13 +226,12 @@ public class AntlrAdapter {
   public CommonTokenStream adaptTokens(SourceUnit su) {
     List<CstNode> tokens = new ArrayList<>();
     collectTokens(su, tokens);
-    CommonTokenStream commonTokenStream =
-        new CommonTokenStream(
-            new ListTokenSource(
-                tokens.stream()
-                    .map(org.eclipse.lsp.cobol.parser.hw.lexer.Token.class::cast)
-                    .map(token -> Utils.toAntlrToken(token, charStream))
-                    .collect(Collectors.toList())));
+    CommonTokenStream commonTokenStream = new CommonTokenStream(
+        new ListTokenSource(
+            tokens.stream()
+                .map(org.eclipse.lsp.cobol.parser.hw.lexer.Token.class::cast)
+                .map(token -> Utils.toAntlrToken(token, charStream))
+                .collect(Collectors.toList())));
     commonTokenStream.fill();
     return commonTokenStream;
   }

@@ -142,12 +142,23 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   public List<Node> visitProgramIdParagraph(ProgramIdParagraphContext ctx) {
     List<Node> result = new ArrayList<>();
     ofNullable(ctx.programName())
-            .map(RuleContext::getText)
-            .map(StringUtils::trimQuotes)
-            .ifPresent(
-                    name ->
-                            retrieveLocality(ctx, extendedDocument, copybooks)
-                                    .ifPresent(locality -> result.add(new ProgramIdNode(locality, name))));
+        .map(RuleContext::getText)
+        .map(StringUtils::trimQuotes)
+        .ifPresent(
+            name -> retrieveLocality(ctx, extendedDocument, copybooks)
+                .ifPresent(locality -> result.add(new ProgramIdNode(locality, name, ProgramSubtype.Program))));
+    return result;
+  }
+
+  @Override
+  public List<Node> visitFunctionIdParagraph(FunctionIdParagraphContext ctx) {
+    List<Node> result = new ArrayList<>();
+    ofNullable(ctx.programName())
+        .map(RuleContext::getText)
+        .map(StringUtils::trimQuotes)
+        .ifPresent(
+            name -> retrieveLocality(ctx, extendedDocument, copybooks)
+                .ifPresent(locality -> result.add(new ProgramIdNode(locality, name, ProgramSubtype.Function))));
     return result;
   }
 
@@ -195,10 +206,20 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   }
 
   @Override
-  public List<Node> visitProgramUnit(ProgramUnitContext ctx) {
+  public List<Node> visitProgramOrFunctionUnit(ProgramOrFunctionUnitContext ctx) {
     fileControls = new HashMap<>();
     text.reset();
-    return addTreeNode(ctx, ProgramNode::new);
+    if (ctx.functionDetails() != null)
+      return addTreeNode(ctx, (l) -> new ProgramNode(l, ProgramSubtype.Function));
+    else
+      return addTreeNode(ctx, (l) -> new ProgramNode(l, ProgramSubtype.Program));
+  }
+
+  @Override
+  public List<Node> visitNestedProgramUnit(NestedProgramUnitContext ctx) {
+    fileControls = new HashMap<>();
+    text.reset();
+    return addTreeNode(ctx, (l) -> new ProgramNode(l, ProgramSubtype.Program));
   }
 
   @Override
@@ -483,6 +504,17 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
 
   @Override
   public List<Node> visitEndProgramStatement(EndProgramStatementContext ctx) {
+    areaAWarning(ctx.getStart());
+    return ofNullable(ctx.programName())
+            .map(ParserRuleContext::getStart)
+            .map(Token::getText)
+            .map(StringUtils::trimQuotes)
+            .map(id -> addTreeNode(ctx.programName(), locality -> new ProgramEndNode(locality, id)))
+            .orElse(ImmutableList.of());
+  }
+
+  @Override
+  public List<Node> visitEndFunctionStatement(EndFunctionStatementContext ctx) {
     areaAWarning(ctx.getStart());
     return ofNullable(ctx.programName())
             .map(ParserRuleContext::getStart)

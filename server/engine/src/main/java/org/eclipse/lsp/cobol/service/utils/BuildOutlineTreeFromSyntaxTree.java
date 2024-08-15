@@ -32,15 +32,14 @@ public class BuildOutlineTreeFromSyntaxTree {
    * Converts the node from Syntax Tree to outline tree based on NodeType
    *
    * @param node a rootNode
-   * @param uri uri of the node
+   * @param uri  uri of the node
    * @return the outline tree view
    */
   public List<DocumentSymbol> convert(Node node, String uri) {
-    List<DocumentSymbol> childrenSymbols =
-        node.getChildren().stream()
-            .map(it -> convert(it, uri))
-            .flatMap(List::stream)
-            .collect(Collectors.toList());
+    List<DocumentSymbol> childrenSymbols = node.getChildren().stream()
+        .map(it -> convert(it, uri))
+        .flatMap(List::stream)
+        .collect(Collectors.toList());
     Optional<DocumentSymbol> convertedNode = convertNode(node, uri);
     if (convertedNode.isPresent()) {
       DocumentSymbol resultNode = convertedNode.get();
@@ -102,7 +101,8 @@ public class BuildOutlineTreeFromSyntaxTree {
   }
 
   private DocumentSymbol convertProgramId(ProgramIdNode node) {
-    return createDocumentSymbol("PROGRAM-ID " + node.getProgramId(), NodeSymbolType.PROGRAM_ID, node);
+    return createDocumentSymbol(node.getSubtype().subtypeName + " " + node.getProgramId(), NodeSymbolType.PROGRAM_ID,
+        node);
   }
 
   private DocumentSymbol convertDivision(DivisionNode node) {
@@ -124,8 +124,9 @@ public class BuildOutlineTreeFromSyntaxTree {
   }
 
   private DocumentSymbol convertProgram(ProgramNode node) {
-    String programName = "PROGRAM";
-    if (node.getProgramName() != null) programName += ": " + node.getProgramName();
+    String programName = node.getSubtype().subtypeName;
+    if (node.getProgramName() != null)
+      programName += ": " + node.getProgramName();
     return createDocumentSymbol(programName, NodeSymbolType.PROGRAM, node);
   }
 

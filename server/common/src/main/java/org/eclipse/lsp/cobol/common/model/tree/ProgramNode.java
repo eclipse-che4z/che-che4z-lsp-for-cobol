@@ -21,15 +21,17 @@ import org.eclipse.lsp.cobol.common.model.Locality;
 
 import static org.eclipse.lsp.cobol.common.model.NodeType.PROGRAM;
 
-/** This class represents program in COBOL. */
+/** This class represents program or function in COBOL. */
 @ToString(callSuper = true)
 @Getter
 @EqualsAndHashCode(callSuper = true)
 public class ProgramNode extends Node {
   private String programName;
+  private final ProgramSubtype subtype;
 
-  public ProgramNode(Locality locality) {
+  public ProgramNode(Locality locality, ProgramSubtype subtype) {
     super(locality, PROGRAM);
+    this.subtype = subtype;
   }
 
   public String getProgramName() {

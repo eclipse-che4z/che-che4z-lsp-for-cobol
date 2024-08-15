@@ -26,9 +26,11 @@ import org.eclipse.lsp.cobol.common.model.NodeType;
 @EqualsAndHashCode(callSuper = true)
 public class ProgramIdNode extends Node {
   String programId;
+  final ProgramSubtype subtype;
 
-  public ProgramIdNode(Locality locality, String programId) {
+  public ProgramIdNode(Locality locality, String programId, ProgramSubtype subtype) {
     super(locality, NodeType.PROGRAM_ID);
     this.programId = programId;
+    this.subtype = subtype;
   }
 }
