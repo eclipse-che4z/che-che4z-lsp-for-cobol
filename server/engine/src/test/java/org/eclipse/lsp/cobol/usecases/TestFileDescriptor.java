@@ -204,8 +204,6 @@ class TestFileDescriptor {
   }
 
   private void assertHover(AnalysisResult result) {
-//    UriDecodeService uriDecodeService = mock(UriDecodeService.class);
-//    when(uriDecodeService.decode(DOCUMENT_URI)).thenReturn(DOCUMENT_URI);
     SourceUnitGraph documentGraph = mock(SourceUnitGraph.class);
     HoverProvider provider = new VariableHover();
     when(documentGraph.isUserSuppliedCopybook(anyString())).thenReturn(false);
