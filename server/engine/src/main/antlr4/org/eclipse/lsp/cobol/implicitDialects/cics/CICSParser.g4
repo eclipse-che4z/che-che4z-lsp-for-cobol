@@ -197,7 +197,7 @@ cics_converse_erase: ERASE (DEFAULT | ALTERNATE)?;
 cics_converse_from: FROM cics_data_area ((FROMLENGTH | FROMFLENGTH) cics_data_value);
 
 cics_into: (INTO cics_data_area | SET cics_ref);
-cics_converse_to: (TOLENGTH cics_data_area | TOFLENGTH cics_data_area);
+cics_converse_to: (TOLENGTH | TOFLENGTH) cics_data_area;
 cics_converse_from_into: cics_converse_from cics_into;
 cics_converse_from_into_to: cics_converse_from_into cics_converse_to;
 cics_converse_into_to_maxlength: cics_into cics_converse_to cics_maxlength;
