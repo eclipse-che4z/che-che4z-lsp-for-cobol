@@ -72,8 +72,6 @@ class Test88ThruHover {
   }
 
   private void assertHover(AnalysisResult result) {
-//    UriDecodeService uriDecodeService = mock(UriDecodeService.class);
-//    when(uriDecodeService.decode(DOCUMENT_URI)).thenReturn(DOCUMENT_URI);
     HoverProvider provider = new VariableHover();
 
     SourceUnitGraph documentGraph = mock(SourceUnitGraph.class);

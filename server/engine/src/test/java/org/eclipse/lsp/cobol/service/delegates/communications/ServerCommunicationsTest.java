@@ -104,7 +104,6 @@ class ServerCommunicationsTest {
     // Prepare diagnostic map
     Diagnostic diagnostic = new Diagnostic(new Range(), "\r\ntest\r\n");
     List<Diagnostic> diagnostics = ImmutableList.of(diagnostic);
-//    when(uriDecodeService.getOriginalUri(anyString())).thenReturn(uri);
 
     communications.publishDiagnostics(ImmutableMap.of(uri, diagnostics));
 

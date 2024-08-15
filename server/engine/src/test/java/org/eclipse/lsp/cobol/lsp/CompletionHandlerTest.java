@@ -34,7 +34,6 @@ class CompletionHandlerTest {
   void test() throws ExecutionException, InterruptedException {
     String uri = "file:/document.cbl";
     CobolDocumentModel document = mock(CobolDocumentModel.class);
-//    UriDecodeService urlDecoder = new UriDecodeService();
     AsyncAnalysisService asyncAnalysisService = mock(AsyncAnalysisService.class);
     Completions completions = mock(Completions.class);
     DocumentModelService documentModelService = mock((DocumentModelService.class));
