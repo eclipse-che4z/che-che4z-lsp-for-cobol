@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Broadcom.
+ * Copyright (c) 2024 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -15,20 +15,17 @@
 package org.eclipse.lsp.cobol.common.model.tree;
 
 import lombok.ToString;
-
-import java.util.Optional;
-
 import org.eclipse.lsp.cobol.common.model.Locality;
-import org.eclipse.lsp.cobol.common.model.variables.DivisionType;
+import org.eclipse.lsp.cobol.common.model.NodeType;
+import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNameAndLocality;
 
-/** The class represents procedure division in COBOL. */
+/** The class represents procedure division returning phrase in COBOL. */
 @ToString(callSuper = true)
-public class ProcedureDivisionNode extends DivisionNode {
-  public ProcedureDivisionNode(Locality location, Optional<Locality> clauses) {
-    super(location, DivisionType.PROCEDURE_DIVISION);
-    clausesLocation = clauses.orElse(location);
-  }
+public class ProcedureDivisionReturningNode extends Node {
+  public final VariableNameAndLocality variable;
 
-  public boolean hasReturningClause = false;
-  public final Locality clausesLocation;
+  public ProcedureDivisionReturningNode(Locality location, VariableNameAndLocality v) {
+    super(location, NodeType.PROCEDURE_RETURNING);
+    this.variable = v;
+  }
 }

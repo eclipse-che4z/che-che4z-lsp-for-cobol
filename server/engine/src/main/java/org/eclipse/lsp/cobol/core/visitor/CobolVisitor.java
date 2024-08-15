@@ -166,7 +166,10 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   public List<Node> visitProcedureDivision(ProcedureDivisionContext ctx) {
     areaAWarning(ctx.getStart());
     return addTreeNode(
-            ctx, location -> new DivisionNode(location, DivisionType.PROCEDURE_DIVISION));
+        ctx, location -> new ProcedureDivisionNode(location,
+            retrieveLocality(ctx.dot_fs(), extendedDocument, copybooks)
+                .map(x -> location.toBuilder().range(new Range(location.getRange().getStart(), x.getRange().getEnd()))
+                    .build())));
   }
 
   @Override
@@ -1146,6 +1149,14 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
       text.update(ctx.getStop());
       text.flush();
     }
+  }
+
+  @Override
+  public List<Node> visitProcedureDivisionGivingClause(ProcedureDivisionGivingClauseContext ctx) {
+    DataNameContext dt = ctx.dataName();
+    Optional<Locality> locality = retrieveLocality(ctx, extendedDocument, copybooks);
+    if (dt == null || !locality.isPresent()) return List.of();
+    return List.of(new ProcedureDivisionReturningNode(locality.get(), extractNameAndLocality(dt)));
   }
 
   @Override

@@ -242,6 +242,7 @@ public class TransformTreeStage implements Stage<AnalysisContext, ProcessingResu
     ctx.register(t, FileDescriptionNode.class, new FileDescriptionProcess(symbolAccumulatorService));
     ctx.register(t, DeclarativeProcedureSectionNode.class, new DeclarativeProcedureSectionRegister(symbolAccumulatorService));
     ctx.register(t, RootNode.class, new RootNodeUpdateCopyNodesByPositionInTree());
+    ctx.register(t, ProcedureDivisionReturningNode.class, new ProcedureDivisionReturningProcess());
 
     // Phase DEFINITION
     ProcessingPhase d = ProcessingPhase.DEFINITION;
@@ -272,6 +273,7 @@ public class TransformTreeStage implements Stage<AnalysisContext, ProcessingResu
     ctx.register(v, GroupItemNode.class, new GroupItemCheck());
     ctx.register(v, ObsoleteNode.class, new ObsoleteNodeCheck());
     ctx.register(v, StandAloneDataItemNode.class, new StandAloneDataItemCheck());
+    ctx.register(v, ProcedureDivisionNode.class, new FunctionReturningClauseCheck());
     ctx.register(v, ProgramEndNode.class, new ProgramEndCheck());
     ctx.register(v, JsonParseNode.class, new JsonParseProcess(symbolAccumulatorService));
     ctx.register(v, JsonGenerateNode.class, new JsonGenerateProcess(symbolAccumulatorService));
