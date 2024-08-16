@@ -1,7 +1,7 @@
 # Changelog
 All notable changes to the COBOL Language Support extension are documented in this file.
 
-## [2.2.0](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/compare/2.1.2...2.2.0) (2024-07-19)
+## [2.2.0](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/compare/2.1.2...2.2.0) (2024-08-19)
 
 #### Added
 - Integration with Explorer for Endevor to enable automatic copybook retrieval from Endevor
@@ -10,7 +10,7 @@ All notable changes to the COBOL Language Support extension are documented in th
 - Support for result set locator DB2 SQL host variable
 - Support for table locator DB2 SQL host variable
 - Support for XML file reference DB2 SQL host variable
-- Support Binary DB2 SQL host variable
+- Support Binary DB2 SQL host variables and variable arrays
 
 #### Fixed
 - Miscellaneous bug fixes
