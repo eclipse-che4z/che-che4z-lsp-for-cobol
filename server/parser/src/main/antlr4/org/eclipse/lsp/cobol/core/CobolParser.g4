@@ -39,7 +39,7 @@ endProgramStatement
    ;
 
 functionDetails
-   : functionIdParagraph identificationDivisionBody* environmentDivision? dataDivision? procedureDivision? endFunctionStatement
+   : functionIdParagraph identificationDivisionBody* environmentDivision? dataDivision? procedureDivision endFunctionStatement
    // END is required by the compiler even though the documentation suggests it is optional
    ;
 
@@ -66,7 +66,12 @@ programIdParagraph
    ;
 
 functionIdParagraph
-   : FUNCTION_ID DOT_FS programName (IS? (COMMON | INITIAL | LIBRARY | DEFINITION | RECURSIVE) PROGRAM?)? DOT_FS?
+   : FUNCTION_ID DOT_FS programName
+     (AS literal)?
+     (IS? PROTOTYPE)?
+     (ENTRY_NAME IS? (COMPAT|LONGUPPER|LONGMIXED))?
+     (ENTRY_INTERFACE IS? (STATIC|DYNAMIC|DLL))?
+     DOT_FS?
    ;
 
 // - author paragraph ----------------------------------
