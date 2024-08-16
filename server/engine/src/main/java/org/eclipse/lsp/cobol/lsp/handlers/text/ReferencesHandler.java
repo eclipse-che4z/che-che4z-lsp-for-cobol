@@ -23,7 +23,6 @@ import org.eclipse.lsp.cobol.lsp.LspQuery;
 import org.eclipse.lsp.cobol.lsp.analysis.AsyncAnalysisService;
 import org.eclipse.lsp.cobol.lsp.events.queries.ReferenceQuery;
 import org.eclipse.lsp.cobol.service.DocumentModelService;
-import org.eclipse.lsp.cobol.service.UriDecodeService;
 import org.eclipse.lsp.cobol.service.delegates.references.Occurrences;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.ReferenceParams;
@@ -35,14 +34,12 @@ public class ReferencesHandler {
   private final AsyncAnalysisService asyncAnalysisService;
   private final Occurrences occurrences;
   private final DocumentModelService documentModelService;
-  private final UriDecodeService uriDecodeService;
 
   @Inject
-  public ReferencesHandler(AsyncAnalysisService asyncAnalysisService, Occurrences occurrences, DocumentModelService documentModelService, UriDecodeService uriDecodeService) {
+  public ReferencesHandler(AsyncAnalysisService asyncAnalysisService, Occurrences occurrences, DocumentModelService documentModelService) {
     this.asyncAnalysisService = asyncAnalysisService;
     this.occurrences = occurrences;
     this.documentModelService = documentModelService;
-    this.uriDecodeService = uriDecodeService;
   }
 
   /**
@@ -54,9 +51,8 @@ public class ReferencesHandler {
    * @throws InterruptedException forward exception
    */
   public List<? extends Location> references(ReferenceParams params) throws ExecutionException, InterruptedException {
-    String uri = uriDecodeService.decode(params.getTextDocument().getUri());
-    List<Location> references = occurrences.findReferences(documentModelService.get(uri), params, params.getContext());
-    return HandlerUtility.mapToOriginalLocation(references, uriDecodeService);
+    String uri = params.getTextDocument().getUri();
+      return occurrences.findReferences(documentModelService.get(uri), params, params.getContext());
   }
 
   /**
@@ -76,7 +72,6 @@ public class ReferencesHandler {
    */
   public List<LspEventDependency> getReferenceDependency(ReferenceParams params) {
     return ImmutableList.of(
-            asyncAnalysisService.createDependencyOn(
-                    uriDecodeService.decode(params.getTextDocument().getUri())));
+            asyncAnalysisService.createDependencyOn(params.getTextDocument().getUri()));
   }
 }

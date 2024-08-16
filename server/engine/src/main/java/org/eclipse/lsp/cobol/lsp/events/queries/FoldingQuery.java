@@ -20,7 +20,6 @@ import org.eclipse.lsp.cobol.lsp.LspEventCancelCondition;
 import org.eclipse.lsp.cobol.lsp.LspEventDependency;
 import org.eclipse.lsp.cobol.lsp.LspQuery;
 import org.eclipse.lsp.cobol.lsp.handlers.text.FoldingRangeHandler;
-import org.eclipse.lsp.cobol.service.UriDecodeService;
 import org.eclipse.lsp4j.FoldingRange;
 import org.eclipse.lsp4j.FoldingRangeRequestParams;
 
@@ -33,8 +32,8 @@ public class FoldingQuery implements LspQuery<List<FoldingRange>> {
   private final FoldingRangeRequestParams params;
   private final FoldingRangeHandler foldingRangeHandler;
 
-  public FoldingQuery(FoldingRangeRequestParams params, FoldingRangeHandler foldingRangeHandler, UriDecodeService uriDecodeService) {
-    this.uri = uriDecodeService.decode(params.getTextDocument().getUri());
+  public FoldingQuery(FoldingRangeRequestParams params, FoldingRangeHandler foldingRangeHandler) {
+    this.uri = params.getTextDocument().getUri();
     this.params = params;
     this.foldingRangeHandler = foldingRangeHandler;
     result = new CompletableFuture<>();

@@ -16,6 +16,7 @@
 package org.eclipse.lsp.cobol.service.utils;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mockStatic;
@@ -23,6 +24,7 @@ import static org.mockito.Mockito.times;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.stream.Stream;
 import org.apache.commons.io.FileSystem;
 import org.eclipse.lsp.cobol.common.file.FileSystemService;
@@ -147,5 +149,26 @@ class WorkspaceFileServiceTest {
         new WorkspaceFileService()
             .getNameFromURI(
                 "file:///c:/workspace/POSITIVE_TESTS/.e4e/AD1DEV.PUBLIC.COTPA01.COBOL(TSTJUST).cbl?%7B%22service%22:%7B%22credential%22:%7B%22"));
+  }
+
+  @Test
+  void getPathFromURI() {
+    WorkspaceFileService workspaceFileService = new WorkspaceFileService();
+    String unNormalizedURI = "file:///c:/workspace/path/wi th/spe&cial!@#chars";
+    assertThrows(
+        IllegalArgumentException.class, () -> workspaceFileService.getPathFromURI(unNormalizedURI));
+
+    String normalizedURI = "file:///c:/workspace/path/wi%20th/spe%26cial%21%40%23chars";
+    Path expectedPath = Paths.get("c:", "workspace", "path", "wi th", "spe&cial!@#chars");
+    Path actualPath = workspaceFileService.getPathFromURI(normalizedURI);
+      assert actualPath != null;
+      String actualPathString = actualPath.toString();
+
+    // adjust path as per fs
+    if (actualPath.startsWith("/")) {
+      actualPathString = actualPath.toString().substring(1);
+    }
+
+    assertEquals(actualPathString, expectedPath.toString());
   }
 }

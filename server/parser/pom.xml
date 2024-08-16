@@ -34,11 +34,11 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
         <!-- Version numbers-->
-        <antlr.version>4.7.1</antlr.version>
-        <google.guava.version>32.0.1-jre</google.guava.version>
+        <antlr.version>4.13.2</antlr.version>
+        <google.guava.version>33.2.1-jre</google.guava.version>
         <lifecycle-mapping.plugin.version>1.0.0</lifecycle-mapping.plugin.version>
         <maven.resources.plugin.version>3.0.2</maven.resources.plugin.version>
-        <maven.antlr4.plugin.version>4.7</maven.antlr4.plugin.version>
+        <maven.antlr4.plugin.version>4.13.2</maven.antlr4.plugin.version>
         <maven.compiler.plugin.version>3.7.0</maven.compiler.plugin.version>
         <maven.checkstyle.plugin.version>3.1.1</maven.checkstyle.plugin.version>
         <maven.jacoco.plugin.version>0.8.11</maven.jacoco.plugin.version>
@@ -70,6 +70,10 @@
                 <exclusion>
                     <groupId>junit</groupId>
                     <artifactId>junit</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-simple</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>

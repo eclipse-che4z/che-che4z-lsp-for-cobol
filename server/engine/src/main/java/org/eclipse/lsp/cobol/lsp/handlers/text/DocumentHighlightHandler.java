@@ -22,7 +22,6 @@ import org.eclipse.lsp.cobol.lsp.LspQuery;
 import org.eclipse.lsp.cobol.lsp.analysis.AsyncAnalysisService;
 import org.eclipse.lsp.cobol.lsp.events.queries.DocumentHighlightQuery;
 import org.eclipse.lsp.cobol.service.DocumentModelService;
-import org.eclipse.lsp.cobol.service.UriDecodeService;
 import org.eclipse.lsp.cobol.service.delegates.references.Occurrences;
 import org.eclipse.lsp4j.DocumentHighlight;
 import org.eclipse.lsp4j.DocumentHighlightParams;
@@ -34,14 +33,12 @@ public class DocumentHighlightHandler {
   private final AsyncAnalysisService asyncAnalysisService;
   private final Occurrences occurrences;
   private final DocumentModelService documentModelService;
-  private final UriDecodeService uriDecodeService;
 
   @Inject
-  public DocumentHighlightHandler(AsyncAnalysisService asyncAnalysisService, Occurrences occurrences, DocumentModelService documentModelService, UriDecodeService uriDecodeService) {
+  public DocumentHighlightHandler(AsyncAnalysisService asyncAnalysisService, Occurrences occurrences, DocumentModelService documentModelService) {
     this.asyncAnalysisService = asyncAnalysisService;
     this.occurrences = occurrences;
     this.documentModelService = documentModelService;
-    this.uriDecodeService = uriDecodeService;
   }
 
   /**
@@ -51,7 +48,7 @@ public class DocumentHighlightHandler {
    */
   public List<LspEventDependency> getDocumentHighlightDependency(DocumentHighlightParams documentHighlightParams) {
     return ImmutableList.of(
-            asyncAnalysisService.createDependencyOn(uriDecodeService.decode(documentHighlightParams.getTextDocument().getUri())));
+            asyncAnalysisService.createDependencyOn(documentHighlightParams.getTextDocument().getUri()));
   }
 
   /**
@@ -62,7 +59,7 @@ public class DocumentHighlightHandler {
    */
   public List<DocumentHighlight> documentHighlight(
           DocumentHighlightParams params) {
-    String uri = uriDecodeService.decode(params.getTextDocument().getUri());
+    String uri = params.getTextDocument().getUri();
     return occurrences.findHighlights(documentModelService.get(uri).getLastAnalysisResult(), params);
   }
 

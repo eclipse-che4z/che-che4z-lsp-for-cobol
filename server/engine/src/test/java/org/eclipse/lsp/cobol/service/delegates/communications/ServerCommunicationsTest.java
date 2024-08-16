@@ -27,7 +27,6 @@ import java.util.*;
 import org.eclipse.lsp.cobol.common.file.FileSystemService;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.lsp.jrpc.CobolLanguageClient;
-import org.eclipse.lsp.cobol.service.UriDecodeService;
 import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.junit.jupiter.api.BeforeEach;
@@ -53,8 +52,6 @@ class ServerCommunicationsTest {
   @Mock private HashSet<String> uriInProgress;
 
   @InjectMocks private ServerCommunications communications;
-
-  @Mock private UriDecodeService uriDecodeService;
 
   @Mock private MessageService messageService;
 
@@ -107,7 +104,6 @@ class ServerCommunicationsTest {
     // Prepare diagnostic map
     Diagnostic diagnostic = new Diagnostic(new Range(), "\r\ntest\r\n");
     List<Diagnostic> diagnostics = ImmutableList.of(diagnostic);
-    when(uriDecodeService.getOriginalUri(anyString())).thenReturn(uri);
 
     communications.publishDiagnostics(ImmutableMap.of(uri, diagnostics));
 

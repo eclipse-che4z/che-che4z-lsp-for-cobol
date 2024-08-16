@@ -30,14 +30,14 @@
     </parent>
 
     <properties>
-        <antlr.version>4.7.1</antlr.version>
+        <antlr.version>4.13.2</antlr.version>
         <awaitility.version>3.0.0</awaitility.version>
         <commons.io.version>2.10.0</commons.io.version>
         <commons.lang.version>3.12.0</commons.lang.version>
         <commons.text.version>1.10.0</commons.text.version>
         <concurrentunit.version>0.4.6</concurrentunit.version>
         <exclude.tests>nothing.to.exclude</exclude.tests>
-        <google.guava.version>32.0.1-jre</google.guava.version>
+        <google.guava.version>33.2.1-jre</google.guava.version>
         <guice.version>4.2.2</guice.version>
         <java.version>8</java.version>
         <junit-jupiter.version>5.6.0</junit-jupiter.version>
@@ -46,7 +46,7 @@
         <lombok.version>1.18.30</lombok.version>
         <lsp4j.version>0.14.0</lsp4j.version>
         <picocli.version>4.7.5</picocli.version>
-        <maven.antlr4.plugin.version>4.7</maven.antlr4.plugin.version>
+        <maven.antlr4.plugin.version>4.13.2</maven.antlr4.plugin.version>
         <maven.assembly.plugin.version>3.2.0</maven.assembly.plugin.version>
         <maven.compiler.plugin.version>3.7.0</maven.compiler.plugin.version>
         <maven.jacoco.plugin.version>0.8.11</maven.jacoco.plugin.version>
@@ -102,6 +102,10 @@
                 <exclusion>
                     <groupId>junit</groupId>
                     <artifactId>junit</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-simple</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>

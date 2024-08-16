@@ -21,7 +21,6 @@ import org.eclipse.lsp.cobol.lsp.analysis.AsyncAnalysisService;
 import org.eclipse.lsp.cobol.lsp.handlers.text.CompletionHandler;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp.cobol.service.DocumentModelService;
-import org.eclipse.lsp.cobol.service.UriDecodeService;
 import org.eclipse.lsp.cobol.service.delegates.completions.Completions;
 import org.eclipse.lsp4j.CompletionParams;
 import org.eclipse.lsp4j.TextDocumentIdentifier;
@@ -35,12 +34,11 @@ class CompletionHandlerTest {
   void test() throws ExecutionException, InterruptedException {
     String uri = "file:/document.cbl";
     CobolDocumentModel document = mock(CobolDocumentModel.class);
-    UriDecodeService urlDecoder = new UriDecodeService();
     AsyncAnalysisService asyncAnalysisService = mock(AsyncAnalysisService.class);
     Completions completions = mock(Completions.class);
     DocumentModelService documentModelService = mock((DocumentModelService.class));
     when(documentModelService.get(uri)).thenReturn(document);
-    CompletionHandler completionHandler = new CompletionHandler(asyncAnalysisService, completions, documentModelService, urlDecoder);
+    CompletionHandler completionHandler = new CompletionHandler(asyncAnalysisService, completions, documentModelService);
     CompletionParams params = mock(CompletionParams.class);
     TextDocumentIdentifier textDocument = mock(TextDocumentIdentifier.class);
     when(textDocument.getUri()).thenReturn(uri);

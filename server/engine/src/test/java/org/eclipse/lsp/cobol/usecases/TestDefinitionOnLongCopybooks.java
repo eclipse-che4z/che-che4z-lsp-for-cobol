@@ -29,7 +29,6 @@ import org.eclipse.lsp.cobol.common.model.DefinedAndUsedStructure;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolsRepository;
 import org.eclipse.lsp.cobol.lsp.SourceUnitGraph;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
-import org.eclipse.lsp.cobol.service.UriDecodeService;
 import org.eclipse.lsp.cobol.service.delegates.references.ElementOccurrences;
 import org.eclipse.lsp.cobol.test.CobolText;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
@@ -66,7 +65,6 @@ class TestDefinitionOnLongCopybooks {
         UseCaseEngine.runTest(
             TEXT, ImmutableList.of(new CobolText("ABCD", COPYBOOK_CONTENT)), ImmutableMap.of());
     SymbolsRepository symbolsRepository = mock(SymbolsRepository.class);
-    UriDecodeService uriDecodeService = new UriDecodeService();
     CobolDocumentModel document = new CobolDocumentModel(DOCUMENT_URI, TEXT, result);
     TextDocumentPositionParams position = new TextDocumentPositionParams(
             new TextDocumentIdentifier(DOCUMENT_URI), new Position(4, 15));
@@ -81,7 +79,7 @@ class TestDefinitionOnLongCopybooks {
     try (MockedStatic mocked = mockStatic(SymbolsRepository.class)) {
       mocked.when(() -> SymbolsRepository.findElementByPosition(eq(DOCUMENT_URI), eq(document.getAnalysisResult()),
           eq(position.getPosition()))).thenReturn(Optional.of(ctx));
-      List<Location> definitions = new ElementOccurrences(documentGraph, uriDecodeService).findDefinitions(document, position);
+      List<Location> definitions = new ElementOccurrences(documentGraph).findDefinitions(document, position);
 
       assertEquals(1, definitions.size());
       assertEquals(expectedDef, definitions.get(0));

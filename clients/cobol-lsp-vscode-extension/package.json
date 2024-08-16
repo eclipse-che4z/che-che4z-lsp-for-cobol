@@ -627,11 +627,11 @@
   },
   "dependencies": {
     "@code4z/cobol-dialect-api": "file:../cobol-dialect-api",
-    "@vscode/extension-telemetry": "^0.8.2",
+    "@vscode/extension-telemetry": "^0.9.7",
     "glob": "10.3.10",
     "iconv-lite": "^0.6.3",
     "micromatch": "^4.0.7",
-    "vscode-languageclient": "8.0.2"
+    "vscode-languageclient": "^8.1.0"
   },
   "devDependencies": {
     "@esbuild-plugins/node-globals-polyfill": "^0.2.3",

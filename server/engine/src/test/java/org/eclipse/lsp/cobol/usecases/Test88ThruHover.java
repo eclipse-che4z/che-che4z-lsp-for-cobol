@@ -28,7 +28,6 @@ import org.eclipse.lsp.cobol.common.AnalysisResult;
 import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
 import org.eclipse.lsp.cobol.lsp.SourceUnitGraph;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
-import org.eclipse.lsp.cobol.service.UriDecodeService;
 import org.eclipse.lsp.cobol.service.delegates.hover.HoverProvider;
 import org.eclipse.lsp.cobol.service.delegates.hover.VariableHover;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
@@ -73,9 +72,7 @@ class Test88ThruHover {
   }
 
   private void assertHover(AnalysisResult result) {
-    UriDecodeService uriDecodeService = mock(UriDecodeService.class);
-    when(uriDecodeService.decode(DOCUMENT_URI)).thenReturn(DOCUMENT_URI);
-    HoverProvider provider = new VariableHover(uriDecodeService);
+    HoverProvider provider = new VariableHover();
 
     SourceUnitGraph documentGraph = mock(SourceUnitGraph.class);
     when(documentGraph.isUserSuppliedCopybook(anyString())).thenReturn(false);

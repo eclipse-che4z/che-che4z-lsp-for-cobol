@@ -55,7 +55,6 @@ import org.junit.jupiter.api.Test;
 class WorkspaceServiceTest {
   /** Test of the workspace/executeCommand entry point. */
   private DisposableLSPStateService stateService;
-  private UriDecodeService uriDecodeService = mock(UriDecodeService.class);
 
   @BeforeEach
   void initialize() {
@@ -89,8 +88,7 @@ class WorkspaceServiceTest {
             executeCommandHandler,
             documentGraph,
             didChangeConfigurationHandler,
-            asyncAnalysisService,
-            uriDecodeService);
+            asyncAnalysisService);
     ((LspEventConsumer) service).startConsumer();
     CompletableFuture<Object> result =
         service.executeCommand(
@@ -135,7 +133,7 @@ class WorkspaceServiceTest {
             executeCommandHandler,
             documentGraph,
             didChangeConfigurationHandler,
-            asyncAnalysisService, uriDecodeService);
+            asyncAnalysisService);
     ((LspEventConsumer) service).startConsumer();
 
     CompletableFuture<Object> result =
@@ -175,7 +173,7 @@ class WorkspaceServiceTest {
             executeCommandHandler,
             documentGraph,
             didChangeConfigurationHandler,
-            asyncAnalysisService, uriDecodeService);
+            asyncAnalysisService);
     ((LspEventConsumer) workspaceService).startConsumer();
     doNothing().when(didChangeConfigurationHandler).didChangeConfiguration(any(DidChangeConfigurationParams.class));
     DidChangeConfigurationParams didChangeConfigurationParams = new DidChangeConfigurationParams(new Object());
@@ -241,7 +239,7 @@ class WorkspaceServiceTest {
             executeCommandHandler,
             documentGraph,
             didChangeConfigurationHandler,
-            asyncAnalysisService, uriDecodeService);
+            asyncAnalysisService);
 
     ((LspEventConsumer) service).startConsumer();
     DidChangeWatchedFilesParams params = new DidChangeWatchedFilesParams(singletonList(event));

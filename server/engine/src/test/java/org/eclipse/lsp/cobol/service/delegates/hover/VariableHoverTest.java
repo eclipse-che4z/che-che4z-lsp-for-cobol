@@ -24,7 +24,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.lsp.SourceUnitGraph;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
-import org.eclipse.lsp.cobol.service.UriDecodeService;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.eclipse.lsp4j.*;
 import org.junit.jupiter.api.BeforeEach;
@@ -32,8 +31,7 @@ import org.junit.jupiter.api.Test;
 
 /** Test {@link VariableHover} */
 class VariableHoverTest {
-    private final UriDecodeService uriDecodeService = mock(UriDecodeService.class);
-    private final VariableHover variableHover = new VariableHover(uriDecodeService);
+    private final VariableHover variableHover = new VariableHover();
     SourceUnitGraph documentGraph;
 
   @BeforeEach
@@ -115,7 +113,6 @@ class VariableHoverTest {
   }
 
   private TextDocumentPositionParams getPosition(int line, int character) {
-    when(uriDecodeService.decode(anyString())).thenReturn(DOCUMENT_URI);
     return new TextDocumentPositionParams(new TextDocumentIdentifier(DOCUMENT_URI), new Position(line, character));
   }
 }

@@ -24,7 +24,6 @@ import org.eclipse.lsp.cobol.lsp.DisposableLSPStateService;
 import org.eclipse.lsp.cobol.lsp.SourceUnitGraph;
 import org.eclipse.lsp.cobol.lsp.analysis.AsyncAnalysisService;
 import org.eclipse.lsp.cobol.service.DocumentModelService;
-import org.eclipse.lsp.cobol.service.UriDecodeService;
 import org.eclipse.lsp.cobol.service.WatcherService;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookServiceImpl;
 import org.eclipse.lsp4j.DidCloseTextDocumentParams;
@@ -39,18 +38,16 @@ public class DidCloseHandler {
   private final DocumentModelService documentModelService;
   private final WatcherService watcherService;
   private final CopybookService copybookService;
-  private final UriDecodeService uriDecodeService;
   private final SourceUnitGraph sourceUnitGraph;
 
   @Inject
   public DidCloseHandler(DisposableLSPStateService disposableLSPStateService,
-                         AsyncAnalysisService asyncAnalysisService, DocumentModelService documentModelService, WatcherService watcherService, CopybookService copybookService, SourceUnitGraph sourceUnitGraph, UriDecodeService uriDecodeService) {
+                         AsyncAnalysisService asyncAnalysisService, DocumentModelService documentModelService, WatcherService watcherService, CopybookService copybookService, SourceUnitGraph sourceUnitGraph) {
     this.disposableLSPStateService = disposableLSPStateService;
     this.asyncAnalysisService = asyncAnalysisService;
     this.documentModelService = documentModelService;
     this.watcherService = watcherService;
     this.copybookService = copybookService;
-    this.uriDecodeService = uriDecodeService;
     this.sourceUnitGraph = sourceUnitGraph;
   }
 
@@ -62,7 +59,7 @@ public class DidCloseHandler {
     if (disposableLSPStateService.isServerShutdown()) {
       return;
     }
-    String uri = uriDecodeService.decode(params.getTextDocument().getUri());
+    String uri = params.getTextDocument().getUri();
     LOG.info(format("Document closing invoked on URI %s", uri));
     if (!sourceUnitGraph.isFileOpened(uri)) {
       LOG.info(format("Ignoring document closing invoked on URI %s", uri));
@@ -80,6 +77,5 @@ public class DidCloseHandler {
               copybookModel -> copybookServiceImpl.invalidateCache(copybookModel.getCopybookId()));
     }
     asyncAnalysisService.cancelAnalysis(uri);
-    uriDecodeService.invalidate(uri);
   }
 }

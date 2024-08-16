@@ -40,7 +40,6 @@ import org.eclipse.lsp.cobol.lsp.analysis.AnalysisState;
 import org.eclipse.lsp.cobol.lsp.analysis.AnalysisStateListener;
 import org.eclipse.lsp.cobol.lsp.analysis.AsyncAnalysisService;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
-import org.eclipse.lsp.cobol.service.UriDecodeService;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 
@@ -49,7 +48,6 @@ import org.eclipse.lsp4j.Position;
 @Slf4j
 public class SourceUnitGraph implements AnalysisStateListener {
   private final WorkspaceFileService fileService;
-  private final UriDecodeService uriDecodeService;
 
   // doc-a-uri --> copy-a Node. copy-b node, copy-c node
   // doc-1-uri --> copy-a Node. copy-2 node, copy-3 node
@@ -66,10 +64,8 @@ public class SourceUnitGraph implements AnalysisStateListener {
   @Inject
   public SourceUnitGraph(
       WorkspaceFileService fileService,
-      AsyncAnalysisService asyncAnalysisService,
-      UriDecodeService uriDecodeService) {
+      AsyncAnalysisService asyncAnalysisService) {
     this.fileService = fileService;
-    this.uriDecodeService = uriDecodeService;
     asyncAnalysisService.register(ImmutableList.of(this));
   }
 
@@ -131,7 +127,7 @@ public class SourceUnitGraph implements AnalysisStateListener {
             });
         objectRef.putIfAbsent(copyNode.getUri(), copyNodeV);
         references.add(copyNodeV);
-        String decodedUri = uriDecodeService.decode(copyNode.getUri());
+        String decodedUri = copyNode.getUri();
         documentGraphIndexedByCopybook.putIfAbsent(decodedUri, new ArrayList<>());
         List<String> strings = documentGraphIndexedByCopybook.get(decodedUri);
         if (!strings.contains(parentUri)) {

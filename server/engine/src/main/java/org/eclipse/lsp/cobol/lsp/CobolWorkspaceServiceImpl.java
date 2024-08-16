@@ -24,7 +24,6 @@ import org.eclipse.lsp.cobol.lsp.events.notifications.DidChangeWatchedFiles;
 import org.eclipse.lsp.cobol.lsp.events.queries.ExecuteCommandQuery;
 import org.eclipse.lsp.cobol.lsp.handlers.workspace.DidChangeConfigurationHandler;
 import org.eclipse.lsp.cobol.lsp.handlers.workspace.ExecuteCommandHandler;
-import org.eclipse.lsp.cobol.service.UriDecodeService;
 import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.services.WorkspaceService;
 
@@ -40,7 +39,6 @@ public class CobolWorkspaceServiceImpl extends LspEventConsumer implements Works
   private final SourceUnitGraph sourceUnitGraph;
   private final DidChangeConfigurationHandler didChangeConfigurationHandler;
   private final AsyncAnalysisService asyncAnalysisService;
-  private final UriDecodeService uriDecodeService;
 
   @Inject
   public CobolWorkspaceServiceImpl(
@@ -48,14 +46,12 @@ public class CobolWorkspaceServiceImpl extends LspEventConsumer implements Works
       ExecuteCommandHandler executeCommandHandler,
       SourceUnitGraph sourceUnitGraph,
       DidChangeConfigurationHandler didChangeConfigurationHandler,
-      AsyncAnalysisService asyncAnalysisService,
-      UriDecodeService uriDecodeService) {
+      AsyncAnalysisService asyncAnalysisService) {
     super(lspMessageBroker);
     this.executeCommandHandler = executeCommandHandler;
     this.sourceUnitGraph = sourceUnitGraph;
     this.didChangeConfigurationHandler = didChangeConfigurationHandler;
     this.asyncAnalysisService = asyncAnalysisService;
-    this.uriDecodeService = uriDecodeService;
   }
 
   /**
