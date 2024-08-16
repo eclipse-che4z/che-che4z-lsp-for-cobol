@@ -21,7 +21,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.lsp.LspNotification;
 import org.eclipse.lsp.cobol.lsp.SourceUnitGraph;
 import org.eclipse.lsp.cobol.lsp.analysis.AsyncAnalysisService;
-import org.eclipse.lsp.cobol.service.UriDecodeService;
 import org.eclipse.lsp4j.DidChangeWatchedFilesParams;
 import org.eclipse.lsp4j.FileChangeType;
 import org.eclipse.lsp4j.FileEvent;
@@ -42,14 +41,11 @@ public class DidChangeWatchedFiles implements LspNotification {
     private final DidChangeWatchedFilesParams params;
     private final SourceUnitGraph sourceUnitGraph;
     private final AsyncAnalysisService asyncAnalysisService;
-    private final UriDecodeService uriDecodeService;
 
-    public DidChangeWatchedFiles(DidChangeWatchedFilesParams params, SourceUnitGraph sourceUnitGraph, AsyncAnalysisService asyncAnalysisService, UriDecodeService uriDecodeService) {
-
+    public DidChangeWatchedFiles(DidChangeWatchedFilesParams params, SourceUnitGraph sourceUnitGraph, AsyncAnalysisService asyncAnalysisService) {
         this.params = params;
         this.sourceUnitGraph = sourceUnitGraph;
         this.asyncAnalysisService = asyncAnalysisService;
-        this.uriDecodeService = uriDecodeService;
     }
 
     @Override
@@ -72,7 +68,7 @@ public class DidChangeWatchedFiles implements LspNotification {
                         }
                         boolean isDirectory = Files.isDirectory(path);
                         if (!isDirectory) {
-                            triggerAnalysisForChangedFile(uriString);
+                            triggerAnalysisForChangedFile(file.getUri());
                         } else {
                             triggerAnalysisForFilesInDirectory(path);
                         }
@@ -83,7 +79,7 @@ public class DidChangeWatchedFiles implements LspNotification {
     @SneakyThrows
     private void triggerAnalysisForChangedFile(String uri) {
         try {
-            List<String> uris = sourceUnitGraph.getAllAssociatedFilesForACopybook(uriDecodeService.decode(uri));
+            List<String> uris = sourceUnitGraph.getAllAssociatedFilesForACopybook(uri);
             String fileContent = null;
             if (uris.isEmpty()) {
                 asyncAnalysisService.reanalyseOpenedPrograms(false);

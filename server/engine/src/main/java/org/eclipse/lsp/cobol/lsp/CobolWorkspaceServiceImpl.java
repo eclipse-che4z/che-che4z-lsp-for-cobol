@@ -89,7 +89,7 @@ public class CobolWorkspaceServiceImpl extends LspEventConsumer implements Works
    */
   @Override
   public void didChangeWatchedFiles(@NonNull DidChangeWatchedFilesParams params) {
-    getLspMessageBroker().notify(new DidChangeWatchedFiles(params, sourceUnitGraph, asyncAnalysisService, uriDecodeService));
+    getLspMessageBroker().notify(new DidChangeWatchedFiles(params, sourceUnitGraph, asyncAnalysisService));
   }
 
 
