@@ -34,6 +34,7 @@ jest.mock("../../../services/reporter/TelemetryService");
 (vscode.workspace.workspaceFolders as any) = [
   { uri: { fsPath: "/projects" } } as any,
 ];
+(vscode.workspace.findFiles as any) = jest.fn();
 Utils.getZoweExplorerAPI = jest.fn().mockReturnValue({ api: zoweExplorerMock });
 
 describe("Tests copybook download service", () => {
