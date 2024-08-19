@@ -252,6 +252,10 @@ export class CopybookDownloadService {
         `Error downloading copybooks : ${err.message}`,
       );
     });
+    if (totalCopybooksToDownload > 0) {
+      await new Promise((f) => setTimeout(f, 100)); //to avoid to be discarded in server
+      vscode.workspace.findFiles(this.storagePath);
+    }
   }
 
   private async isPrerequisiteForDownloadSatisfied(
