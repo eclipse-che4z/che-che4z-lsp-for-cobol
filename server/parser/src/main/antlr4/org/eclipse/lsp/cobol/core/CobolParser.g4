@@ -67,7 +67,7 @@ programIdParagraph
    ;
 
 functionIdParagraph
-   : FUNCTION_ID DOT_FS programName
+   : FUNCTION_ID DOT_FS? programName
      (AS literal)?
      (IS? PROTOTYPE)?
      (ENTRY_NAME IS? (COMPAT|LONGUPPER|LONGMIXED))?
