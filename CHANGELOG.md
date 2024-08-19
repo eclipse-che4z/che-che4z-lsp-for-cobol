@@ -1,7 +1,7 @@
 # Changelog
 All notable changes to the COBOL Language Support extension are documented in this file.
 
-## [2.2.0](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/compare/2.1.2...2.2.0) (2024-07-18)
+## [2.2.0](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/compare/2.1.2...2.2.0) (2024-08-19)
 
 ### Bug Fixes
 * Add language element to the CLI analysis response in case of crash ([1f87a10](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/1f87a103c3af6a9694f5fcbc164132fba80ef25e))
@@ -28,6 +28,17 @@ All notable changes to the COBOL Language Support extension are documented in th
 * Support section priority in experimental parser ([#2305](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/issues/2305)) ([71881e2](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/71881e294c28fb7b13738b77f1ddd5b65adc0001))
 * Tokens are back in HW pipeline ([d101472](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/d101472bb2813c09fa91777b3b2bedeeb315bcd0))
 * Tolerate missing dot_fs ([820f21c](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/820f21c8ce57212777613cecf45593f83e791f4e))
+* allow standalone node without pic clause for the supported usage clause ([bf85ebd](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/bf85ebd2b3c0a8a6c10db114e937d4ff2296e7e7))
+* Avoid redundant rebuilds ([#2416](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/issues/2416)) ([86da47a](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/86da47ab36a7c8fc47116a2364ca8a0754d46d11))
+* check string quote semantics on extended document ([#2421](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/issues/2421)) ([cd11624](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/cd116249b020eb027916927edf365e7d4d74c627))
+* detect downloaded copybooks as COBOL ([#2407](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/issues/2407)) ([16e5c3e](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/16e5c3e57af18073f9e5dbfdf2f16c5e1e914c2a))
+* Encoding error during copybook download ([#2402](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/issues/2402)) ([70eafd1](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/70eafd13c7b5d9808ea8e82114af46c23f29d656))
+* fix dimension validation of lob_xml_host_variables ([6501db3](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/6501db33a964420e844f2cdef9de1aae355b0f76))
+* Fix PERFORM node position ([#2425](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/issues/2425)) ([7c00c92](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/7c00c92f4b34589dcc5153764816a62d245d23ab))
+* fix variable definitions inside embedded copybooks ([4a97756](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/4a977564a1914f0f5ac7b3a99e914456f128fbbc))
+* fix wrong variable reference in a continued line [#2360](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/issues/2360) ([61085eb](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/61085ebf94b4c55f5f7dc9e7fc180b3888f4cee5))
+* minor fixes for db2 host variable ([e8331a7](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/e8331a724902c47011147e469a15159080b424c1))
+* remove decoder service ([08a55a1](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/08a55a1b44d234268cfd44636dd15b4def4defac))
 
 ### Features
 * Add CLI command to generate cfast representation for COBOL programs in the specified folder ([#2377](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/issues/2377)) ([f0bf273](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/f0bf273c851653109257e04bf25022c2feb92528))
@@ -53,6 +64,10 @@ All notable changes to the COBOL Language Support extension are documented in th
 * Support implicit SQL varbinary variables ([d44f5bd](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/d44f5bd347869780fbdebeff6aa7356caed51c81))
 * Support for result set locator Db2 SQL host variable ([#2329](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/issues/2329)) ([53c16fa](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/53c16faac605cc46c151ec1c1a6c572dd408b630)), closes [cobol-host-variables-in#db2z_hostvariablecobol__title__20](https://github.com/cobol-host-variables-in/issues/db2z_hostvariablecobol__title__20)
 * XML data host and file reference variables ([#2390](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/issues/2390)) ([a99147e](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/a99147e131e01ddb466f307e7f91d926e57c6a07))
+* Add support for Binary Host Variable Arrays ([#2394](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/issues/2394)) ([4db32ac](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/4db32acdcd285bd7c4ee3f9a4001cc62f406eac3)), closes [#2399](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/issues/2399) [#2402](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/issues/2402)
+* XML host file reference variable array support ([#2406](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/issues/2406)) ([0d28f1b](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/0d28f1bf5cc49cb956ad21e5fa8cd28650671c66))
+* Support regular cobol statement for CCF processing ([#2422](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/issues/2422)) ([485806e](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/485806e404cf6651ac53cf5eab31762510276d4b))
+
 
 ## [2.1.2](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/compare/2.1.1...2.2.0) (2024-04-03)
 
