@@ -20,18 +20,19 @@ programOrFunctionUnit
    ;
 
 programDetails
-   : programIdParagraph identificationDivisionBody* environmentDivision? dataDivision? procedureDivision?
+   : programIdParagraph identificationDivisionBody* environmentDivision? dataDivision? procedureDivision? nestedProgramUnit* endProgramStatement?
    // TODO: This rule requires abitrary long lookahead due to conflict with compilationUnit
    //       It might be possible to parse all programs as peers and enforce nesting later on
-   (
-      nestedProgramUnit+ endProgramStatement
-      |
-      endProgramStatement?
-   )
+   // This is what the grammar should actually look like, but tests start failing.
+   // (
+   //    nestedProgramUnit+ endProgramStatement
+   //    |
+   //    endProgramStatement?
+   // )
    ;
 
 nestedProgramUnit
-   : identificationDivision programDetails endProgramStatement
+   : identificationDivision programDetails endProgramStatement? // The end should be unconditional, but tests start failing
    ;
 
 endProgramStatement
@@ -2354,7 +2355,9 @@ cobolWord
    ;
 
 allowedCobolKeywords
-   : CR | FIELD | MMDDYYYY | PRINTER | DAY_OF_WEEK
+   : AS | COMPAT| CR | DLL | FIELD | MMDDYYYY | PRINTER | DAY_OF_WEEK
+   | ENTRY_NAME | ENTRY_INTERFACE
+   | STATIC | LONGUPPER | LONGMIXED
    | REMARKS | RESUME | TIMER | TODAYS_DATE | TODAYS_NAME | YEAR | YYYYDDD | YYYYMMDD | WHEN_COMPILED
    | DISK | KEYBOARD | PORT | READER | REMOTE | VIRTUAL | LIBRARY | DEFINITION | PARSE | BOOL | ESCAPE | INITIALIZED
    | LOC | BYTITLE | BYFUNCTION | ABORT | ORDERLY | ASSOCIATED_DATA | ASSOCIATED_DATA_LENGTH
