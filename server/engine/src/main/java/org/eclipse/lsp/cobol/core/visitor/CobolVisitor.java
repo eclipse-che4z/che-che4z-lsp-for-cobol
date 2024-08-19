@@ -208,21 +208,65 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
     return addTreeNode(ctx, locality -> new SectionNode(locality, SectionType.WORKING_STORAGE));
   }
 
+  private Position extractLastPosition(FunctionDetailsContext ctx) {
+    if (ctx == null)
+      return null;
+    List<IdentificationDivisionBodyContext> idDetails = ctx.identificationDivisionBody();
+    if (!idDetails.isEmpty())
+      return getLocality(idDetails.get(idDetails.size() - 1).getStop()).map(x -> x.getRange().getEnd()).orElse(null);
+    if (ctx.functionIdParagraph() != null)
+      return getLocality(ctx.functionIdParagraph().getStop()).map(x -> x.getRange().getEnd()).orElse(null);
+    return null;
+  }
+
+  private Position extractLastPosition(ProgramDetailsContext ctx) {
+    if (ctx == null)
+      return null;
+    List<IdentificationDivisionBodyContext> idDetails = ctx.identificationDivisionBody();
+    if (!idDetails.isEmpty())
+      return getLocality(idDetails.get(idDetails.size() - 1).getStop()).map(x -> x.getRange().getEnd()).orElse(null);
+    if (ctx.programIdParagraph() != null)
+      return getLocality(ctx.programIdParagraph().getStop()).map(x -> x.getRange().getEnd()).orElse(null);
+    return null;
+  }
+
+  private List<Node> adjustIdentificationDivision(List<Node> pgmNodes, Position lastPos) {
+    if (pgmNodes.size() != 1)
+      return pgmNodes;
+    Node pgm = pgmNodes.get(0);
+    Optional<Node> identification = pgm.getChildren().stream().filter(n -> n instanceof DivisionNode && ((DivisionNode) n).getDivisionType() == DivisionType.IDENTIFICATION_DIVISION).findFirst();
+    Optional<Node> pgmNode = pgm.getChildren().stream().filter(n -> n instanceof ProgramIdNode).findFirst();
+
+    if (identification.isEmpty())
+      return pgmNodes;
+
+    if (lastPos != null) {
+      Node id = identification.get();
+      Position oldStart = id.getLocality().getRange().getStart();
+      id.setLocality(id.getLocality().toBuilder().range(new Range(oldStart, lastPos)).build());
+    }
+
+    if (pgmNode.isPresent()) {
+      pgm.removeChild(pgmNode.get());
+      identification.get().addChildAt(0, pgmNode.get());
+    }
+
+    return pgmNodes;
+  }
+
   @Override
   public List<Node> visitProgramOrFunctionUnit(ProgramOrFunctionUnitContext ctx) {
     fileControls = new HashMap<>();
     text.reset();
-    if (ctx.functionDetails() != null)
-      return addTreeNode(ctx, (l) -> new ProgramNode(l, ProgramSubtype.Function));
-    else
-      return addTreeNode(ctx, (l) -> new ProgramNode(l, ProgramSubtype.Program));
+    ProgramSubtype ps = ctx.functionDetails() != null ? ProgramSubtype.Function : ProgramSubtype.Program;
+    return adjustIdentificationDivision(addTreeNode(ctx, (l) -> new ProgramNode(l, ps)), ctx.functionDetails() != null ? extractLastPosition(ctx.functionDetails()) : extractLastPosition(ctx.programDetails()));
   }
 
   @Override
   public List<Node> visitNestedProgramUnit(NestedProgramUnitContext ctx) {
     fileControls = new HashMap<>();
     text.reset();
-    return addTreeNode(ctx, (l) -> new ProgramNode(l, ProgramSubtype.Program));
+    return adjustIdentificationDivision(addTreeNode(ctx, (l) -> new ProgramNode(l, ProgramSubtype.Program)), extractLastPosition(ctx.programDetails()));
   }
 
   @Override

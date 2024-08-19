@@ -101,7 +101,7 @@ public class BuildOutlineTreeFromSyntaxTree {
   }
 
   private DocumentSymbol convertProgramId(ProgramIdNode node) {
-    return createDocumentSymbol(node.getSubtype().subtypeName + " " + node.getProgramId(), NodeSymbolType.PROGRAM_ID,
+    return createDocumentSymbol(node.getSubtype().subtypeName + "-ID " + node.getProgramId(), NodeSymbolType.PROGRAM_ID,
         node);
   }
 

@@ -32,7 +32,7 @@ programDetails
    ;
 
 nestedProgramUnit
-   : identificationDivision programDetails endProgramStatement? // The end should be unconditional, but tests start failing
+   : identificationDivision programDetails // The end should be unconditional, but tests start failing
    ;
 
 endProgramStatement
