@@ -219,7 +219,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
     return null;
   }
 
-  private Position extractLastPosition(ProgramDetailsContext ctx) {
+  private Position extractIdentificationEndPosition(ProgramDetailsContext ctx) {
     if (ctx == null)
       return null;
     List<IdentificationDivisionBodyContext> idDetails = ctx.identificationDivisionBody();
@@ -248,7 +248,9 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
     if (pgmNodes.size() != 1)
       return pgmNodes;
     Node pgm = pgmNodes.get(0);
-    Optional<Node> identification = pgm.getChildren().stream().filter(n -> n instanceof DivisionNode && ((DivisionNode) n).getDivisionType() == DivisionType.IDENTIFICATION_DIVISION).findFirst();
+    Optional<Node> identification = pgm.getChildren().stream()
+      .filter(n -> n instanceof DivisionNode && ((DivisionNode) n).getDivisionType() == DivisionType.IDENTIFICATION_DIVISION)
+      .findFirst();
     Optional<Node> pgmNode = pgm.getChildren().stream().filter(n -> n instanceof ProgramIdNode).findFirst();
 
     if (identification.isEmpty())
@@ -269,21 +271,21 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
     fileControls = new HashMap<>();
     text.reset();
 
-    FunctionDetailsContext func_ctx = ctx.functionDetails();
+    FunctionDetailsContext funcCtx = ctx.functionDetails();
 
-    if (func_ctx != null)
+    if (funcCtx != null)
       return adjustIdentificationDivision(addTreeNode(ctx, (l) -> new ProgramNode(l, ProgramSubtype.Function)),
-          extractLastPosition(func_ctx));
+          extractLastPosition(funcCtx));
     else
       return adjustIdentificationDivision(addTreeNode(ctx, (l) -> new ProgramNode(l, ProgramSubtype.Program)),
-          extractLastPosition(ctx.programDetails()));
+          extractIdentificationEndPosition(ctx.programDetails()));
   }
 
   @Override
   public List<Node> visitNestedProgramUnit(NestedProgramUnitContext ctx) {
     fileControls = new HashMap<>();
     text.reset();
-    return adjustIdentificationDivision(addTreeNode(ctx, (l) -> new ProgramNode(l, ProgramSubtype.Program)), extractLastPosition(ctx.programDetails()));
+    return adjustIdentificationDivision(addTreeNode(ctx, (l) -> new ProgramNode(l, ProgramSubtype.Program)), extractIdentificationEndPosition(ctx.programDetails()));
   }
 
   @Override
