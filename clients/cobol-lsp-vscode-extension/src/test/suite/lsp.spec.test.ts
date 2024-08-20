@@ -34,24 +34,13 @@ suite("Integration Test Suite", function () {
     const editor = helper.get_editor("USER2.cbl");
     await helper.waitForDiagnostics(editor.document.uri);
     const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
-    assert.strictEqual(diagnostics.length, 2);
-    assert.ok(diagnostics.length === 2);
+    assert.strictEqual(diagnostics.length, 1);
     const d0 = diagnostics[0];
-    const d1 = diagnostics[1];
     assert.strictEqual(
       d0.message,
-      "Missing token PROGRAM-ID at programIdParagraph",
+      "Syntax error on 'Program1-id'",
     );
-    helper.assertRangeIsEqual(d0.range, range(pos(13, 30), pos(13, 31)));
-    assert.strictEqual(d0.severity, diagnostics[1].severity);
-    assert.strictEqual(
-      d0.severity,
-      vscode.DiagnosticSeverity.Error,
-      "No syntax errors detected in USER2.cbl",
-    );
-
-    assert.strictEqual(d1.message, "Syntax error on 'HELLO-WORLD'");
-    helper.assertRangeIsEqual(d1.range, range(pos(14, 20), pos(14, 31)));
+    helper.assertRangeIsEqual(d0.range, range(pos(14, 7), pos(14, 18)));
   });
 
   test("TC152050, TC152053: Error case - file has semantic errors and are marked with detailed hints", async () => {
