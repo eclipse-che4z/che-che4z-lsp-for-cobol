@@ -213,9 +213,9 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
       return null;
     List<IdentificationDivisionBodyContext> idDetails = ctx.identificationDivisionBody();
     if (!idDetails.isEmpty())
-      return getLocality(idDetails.get(idDetails.size() - 1).getStop()).map(x -> x.getRange().getEnd()).orElse(null);
+      return extractEndPosition(idDetails.get(idDetails.size() - 1));
     if (ctx.functionIdParagraph() != null)
-      return getLocality(ctx.functionIdParagraph().getStop()).map(x -> x.getRange().getEnd()).orElse(null);
+      return extractEndPosition(ctx.functionIdParagraph());
     return null;
   }
 
@@ -224,10 +224,24 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
       return null;
     List<IdentificationDivisionBodyContext> idDetails = ctx.identificationDivisionBody();
     if (!idDetails.isEmpty())
-      return getLocality(idDetails.get(idDetails.size() - 1).getStop()).map(x -> x.getRange().getEnd()).orElse(null);
+      return extractEndPosition(idDetails.get(idDetails.size() - 1));
     if (ctx.programIdParagraph() != null)
-      return getLocality(ctx.programIdParagraph().getStop()).map(x -> x.getRange().getEnd()).orElse(null);
+      return extractEndPosition(ctx.programIdParagraph());
     return null;
+  }
+
+  private Position extractEndPosition(ParserRuleContext ctx) {
+    if (ctx == null)
+      return null;
+    return getLocality(ctx.getStop()).map(x -> x.getRange().getEnd()).orElse(null);
+  }
+
+  private Node replaceRangeEnd(Node n, Position p) {
+    if (p == null)
+      return n;
+    Locality l = n.getLocality();
+    n.setLocality(l.toBuilder().range(new Range(l.getRange().getStart(), p)).build());
+    return n;
   }
 
   private List<Node> adjustIdentificationDivision(List<Node> pgmNodes, Position lastPos) {
@@ -240,11 +254,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
     if (identification.isEmpty())
       return pgmNodes;
 
-    if (lastPos != null) {
-      Node id = identification.get();
-      Position oldStart = id.getLocality().getRange().getStart();
-      id.setLocality(id.getLocality().toBuilder().range(new Range(oldStart, lastPos)).build());
-    }
+    replaceRangeEnd(identification.get(), lastPos);
 
     if (pgmNode.isPresent()) {
       pgm.removeChild(pgmNode.get());
@@ -258,8 +268,15 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   public List<Node> visitProgramOrFunctionUnit(ProgramOrFunctionUnitContext ctx) {
     fileControls = new HashMap<>();
     text.reset();
-    ProgramSubtype ps = ctx.functionDetails() != null ? ProgramSubtype.Function : ProgramSubtype.Program;
-    return adjustIdentificationDivision(addTreeNode(ctx, (l) -> new ProgramNode(l, ps)), ctx.functionDetails() != null ? extractLastPosition(ctx.functionDetails()) : extractLastPosition(ctx.programDetails()));
+
+    FunctionDetailsContext func_ctx = ctx.functionDetails();
+
+    if (func_ctx != null)
+      return adjustIdentificationDivision(addTreeNode(ctx, (l) -> new ProgramNode(l, ProgramSubtype.Function)),
+          extractLastPosition(func_ctx));
+    else
+      return adjustIdentificationDivision(addTreeNode(ctx, (l) -> new ProgramNode(l, ProgramSubtype.Program)),
+          extractLastPosition(ctx.programDetails()));
   }
 
   @Override
