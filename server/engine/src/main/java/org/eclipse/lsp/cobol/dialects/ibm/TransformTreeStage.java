@@ -266,6 +266,7 @@ public class TransformTreeStage implements Stage<AnalysisContext, ProcessingResu
     ctx.register(e, SectionNameNode.class, new SectionNameNodeEnricher(symbolAccumulatorService));
     ctx.register(e, ParagraphNameNode.class, new ParagraphNameNodeEnricher(symbolAccumulatorService));
     ctx.register(e, CodeBlockUsageNode.class, new CodeBlockUsageNodeEnricher(symbolAccumulatorService));
+    ctx.register(e, FunctionReference.class, new FunctionReferenceEnricher(symbolAccumulatorService));
 
     // Phase VALIDATION
     ProcessingPhase v = ProcessingPhase.VALIDATION;

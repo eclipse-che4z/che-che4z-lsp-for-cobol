@@ -295,6 +295,23 @@ public class SymbolAccumulatorService implements VariableAccumulator {
   }
 
   /**
+   * Search for a function reference
+   *
+   * @param programNode the program to search block references in
+   * @param name the name of the function
+   * @return the block reference or null if not found
+   */
+  public CodeBlockReference getFunctionReference(ProgramNode programNode, String name) {
+    SymbolTable symbolTable = createOrGetSymbolTable(programNode);
+    CodeBlockReference result = symbolTable.getFunctionMap().get(name);
+
+    if (result == null)
+      return new CodeBlockReference();
+
+    return result;
+  }
+
+  /**
    * Add a paragraph definition name node in the program context.
    *
    * @param programNode the program to register in
