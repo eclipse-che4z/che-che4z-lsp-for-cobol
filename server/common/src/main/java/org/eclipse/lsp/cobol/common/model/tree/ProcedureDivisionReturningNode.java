@@ -19,7 +19,6 @@ import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.NodeType;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNameAndLocality;
 
-/** The class represents procedure division returning phrase in COBOL. */
 @ToString(callSuper = true)
 public class ProcedureDivisionReturningNode extends Node {
   public final VariableNameAndLocality variable;

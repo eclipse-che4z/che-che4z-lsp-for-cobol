@@ -20,7 +20,7 @@ import org.eclipse.lsp.cobol.common.model.NodeType;
 import org.eclipse.lsp.cobol.common.model.tree.ProcedureDivisionNode;
 import org.eclipse.lsp.cobol.common.model.tree.ProcedureDivisionReturningNode;
 
-/** ProcedureDivisionReturning processor */
+/** Propagate information about presence of a returning clause */
 public class ProcedureDivisionReturningProcess implements Processor<ProcedureDivisionReturningNode> {
   @Override
   public void accept(ProcedureDivisionReturningNode node, ProcessingContext ctx) {

@@ -32,7 +32,7 @@ public class BuildOutlineTreeFromSyntaxTree {
    * Converts the node from Syntax Tree to outline tree based on NodeType
    *
    * @param node a rootNode
-   * @param uri  uri of the node
+   * @param uri uri of the node
    * @return the outline tree view
    */
   public List<DocumentSymbol> convert(Node node, String uri) {

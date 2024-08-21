@@ -26,7 +26,6 @@ import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.NodeType;
 import org.eclipse.lsp4j.Location;
 
-/** The class represents program ID. */
 @ToString(callSuper = true)
 @Getter
 @EqualsAndHashCode(callSuper = true)

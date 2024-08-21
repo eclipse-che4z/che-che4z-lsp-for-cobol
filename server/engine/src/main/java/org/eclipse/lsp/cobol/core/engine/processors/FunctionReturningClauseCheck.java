@@ -24,7 +24,7 @@ import org.eclipse.lsp.cobol.common.message.MessageTemplate;
 import org.eclipse.lsp.cobol.common.model.tree.ProcedureDivisionNode;
 import org.eclipse.lsp.cobol.common.model.tree.ProgramSubtype;
 
-/** FunctionReturningClauseCheck processor */
+/** Check presence of a returning clause of a function */
 public class FunctionReturningClauseCheck implements Processor<ProcedureDivisionNode> {
   @Override
   public void accept(ProcedureDivisionNode proc, ProcessingContext ctx) {

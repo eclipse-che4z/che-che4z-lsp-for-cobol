@@ -19,7 +19,7 @@ import org.eclipse.lsp.cobol.common.processor.Processor;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulatorService;
 import org.eclipse.lsp.cobol.common.model.tree.FunctionReference;
 
-/** SectionNameNode processor */
+/** FunctionReference processor */
 public class FunctionReferenceProcessor implements Processor<FunctionReference> {
   private final SymbolAccumulatorService symbolAccumulatorService;
 

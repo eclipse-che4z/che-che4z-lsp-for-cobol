@@ -20,7 +20,7 @@ import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.Processor;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulatorService;
 
-/** SectionNode processor */
+/** FunctionNode processor */
 public class FunctionNodeProcess implements Processor<ProgramNode> {
   private final SymbolAccumulatorService symbolAccumulatorService;
 
