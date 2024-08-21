@@ -19,21 +19,25 @@ import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.Processor;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulatorService;
 
-import org.eclipse.lsp.cobol.common.model.tree.FunctionReference;
+import org.eclipse.lsp.cobol.common.model.tree.ProgramIdNode;
+import org.eclipse.lsp.cobol.common.model.tree.ProgramSubtype;
 
-/** Enrich FunctionReference nodes */
+/** Enrich ProgramId nodes */
 @AllArgsConstructor
-public class FunctionReferenceEnricher implements Processor<FunctionReference> {
+public class ProgramIdEnricher implements Processor<ProgramIdNode> {
   private final SymbolAccumulatorService symbolAccumulatorService;
 
   @Override
-  public void accept(FunctionReference node, ProcessingContext processingContext) {
-    SymbolAccumulatorService.FunctionInfo fi = symbolAccumulatorService.getFunctionReference(node.getName());
-    if (fi == null)
+  public void accept(ProgramIdNode node, ProcessingContext processingContext) {
+    if (node.getSubtype() != ProgramSubtype.Function)
       return;
 
+    SymbolAccumulatorService.FunctionInfo fi = node.getProgram()
+        .map(p -> symbolAccumulatorService.getFunctionReference(p))
+        .orElse(null);
+    if (fi == null)
+      return;
     node.setDefinitions(fi.getDefinition());
     node.setUsages(fi.getReferences());
   }
-
 }

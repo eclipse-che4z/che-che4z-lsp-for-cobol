@@ -32,7 +32,6 @@ public class SymbolTable {
   List<CodeBlockDefinitionNode> codeBlocks = new ArrayList<>();
   Map<String, CodeBlockReference> paragraphMap = new HashMap<>();
   Map<String, CodeBlockReference> sectionMap = new HashMap<>();
-  Map<String, CodeBlockReference> functionMap = new HashMap<>();
   Multimap<String, VariableNode> variables = ArrayListMultimap.create();
 
   /**
