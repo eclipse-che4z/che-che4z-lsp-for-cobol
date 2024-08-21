@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Broadcom.
+ * Copyright (c) 2024 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -18,29 +18,17 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import org.eclipse.lsp.cobol.common.model.Locality;
+import org.eclipse.lsp.cobol.common.model.NodeType;
 
-import static org.eclipse.lsp.cobol.common.model.NodeType.PROGRAM;
-
-/** This class represents program or function in COBOL. */
+/** The class represents program ID. */
 @ToString(callSuper = true)
 @Getter
 @EqualsAndHashCode(callSuper = true)
-public class ProgramNode extends Node {
-  private String programName;
-  private final ProgramSubtype subtype;
-  private final int ordinal;
+public class FunctionReference extends Node {
+  final String name;
 
-  public ProgramNode(Locality locality, ProgramSubtype subtype, int ordinal) {
-    super(locality, PROGRAM);
-    this.subtype = subtype;
-    this.ordinal = ordinal;
-  }
-
-  public String getProgramName() {
-    return programName;
-  }
-
-  public void setProgramName(String programName) {
-    this.programName = programName;
+  public FunctionReference(Locality locality, String name) {
+    super(locality, NodeType.FUNCTION_REFERENCE);
+    this.name = name;
   }
 }

@@ -151,7 +151,11 @@ classRepositoryClause
     ;
 
 functionRepositoryClause
-    : FUNCTION functionName | intrinsicClause
+    : functionReference | intrinsicClause
+    ;
+
+functionReference
+    : FUNCTION functionName
     ;
 
 intrinsicClause
@@ -2151,7 +2155,7 @@ generalIdentifier
    ;
 
 functionCall
-   : FUNCTION functionName (LPARENCHAR argument (COMMACHAR? argument)* RPARENCHAR)* referenceModifier?
+   : functionReference (LPARENCHAR argument (COMMACHAR? argument)* RPARENCHAR)* referenceModifier?
    ;
 
 referenceModifier

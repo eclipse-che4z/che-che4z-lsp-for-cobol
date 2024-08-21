@@ -156,7 +156,6 @@ public class TestFunction {
 
   @Test
   void parse_disallow_function_nesting_in_programs() {
-    // This diagnostic seems suboptimal, but shows A problem.
     UseCaseEngine.runTest(
         DISALLOW_FUNCTION_NESTING_IN_PROGRAMS,
         ImmutableList.of(),
@@ -165,6 +164,146 @@ public class TestFunction {
             new Diagnostic(
                 new Range(),
                 "Syntax error on 'END'",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
+  }
+
+  public static final String DIAGNOSE_MISSING_FUNCTION = ""
+      // ----+----1----+----2----+----3----+----4----+----5----+----6
+      + "       IDENTIFICATION DIVISION.                             \n"
+      + "       PROGRAM-ID. PGM.                                     \n"
+      + "       ENVIRONMENT DIVISION.                                \n"
+      + "       CONFIGURATION SECTION.                               \n"
+      + "       REPOSITORY.                                          \n"
+      + "               FUNCTION {FUNC1|1}.                              \n"
+      + "       DATA DIVISION.                                       \n"
+      + "       WORKING-STORAGE SECTION.                             \n"
+      + "       01  {$*RETVAL}.                                          \n"
+      + "           05  {$*NUM}              PIC X(1234).                \n"
+      + "       PROCEDURE DIVISION RETURNING RETVAL.                 \n"
+      + "             MOVE FUNCTION {FUNC1|2} TO {$NUM}.                    \n"
+      + "       END PROGRAM PGM.                                     \n";
+
+  @Test
+  void diagnose_missing_function() {
+    // This diagnostic seems suboptimal, but shows A problem.
+    UseCaseEngine.runTest(
+        DIAGNOSE_MISSING_FUNCTION,
+        ImmutableList.of(),
+        ImmutableMap.of(
+            "1",
+            new Diagnostic(
+                new Range(),
+                "Expected a function name, but found 'FUNC1'",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()),
+            "2",
+            new Diagnostic(
+                new Range(),
+                "Expected a function name, but found 'FUNC1'",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
+  }
+
+  public static final String FUNCTION_FOUND = ""
+      // ----+----1----+----2----+----3----+----4----+----5----+----6
+      + "       IDENTIFICATION DIVISION.                             \n"
+      + "       FUNCTION-ID. FUNC1.                                  \n"
+      + "       DATA DIVISION.                                       \n"
+      + "       LINKAGE SECTION.                                     \n"
+      + "       01  {$*UNRELATED-STUFF}.                                 \n"
+      + "           05  {$*NUM}         PIC X(1234).                     \n"
+      + "       PROCEDURE DIVISION RETURNING UNRELATED-STUFF.        \n"
+      + "       END FUNCTION FUNC1.                                  \n"
+      + "                                                            \n"
+      + "       IDENTIFICATION DIVISION.                             \n"
+      + "       PROGRAM-ID. PGM.                                     \n"
+      + "       ENVIRONMENT DIVISION.                                \n"
+      + "       CONFIGURATION SECTION.                               \n"
+      + "       REPOSITORY.                                          \n"
+      + "               FUNCTION FUNC1.                              \n"
+      + "       DATA DIVISION.                                       \n"
+      + "       WORKING-STORAGE SECTION.                             \n"
+      + "       01  {$*RETVAL}.                                          \n"
+      + "           05  {$*NUM}              PIC X(1234).                \n"
+      + "       PROCEDURE DIVISION RETURNING RETVAL.                 \n"
+      + "             MOVE FUNCTION FUNC1 TO {$RETVAL}.                    \n"
+      + "       END PROGRAM PGM.                                     \n";
+
+  @Test
+  void function_found() {
+    UseCaseEngine.runTest(FUNCTION_FOUND, ImmutableList.of(), ImmutableMap.of());
+  }
+
+  public static final String FUNCTION_REDEFINED = ""
+      // ----+----1----+----2----+----3----+----4----+----5----+----6
+      + "       IDENTIFICATION DIVISION.                             \n"
+      + "       FUNCTION-ID. FUNC1.                                  \n"
+      + "       DATA DIVISION.                                       \n"
+      + "       LINKAGE SECTION.                                     \n"
+      + "       01  {$*RETVAL}.                                          \n"
+      + "           05  {$*NUM}              PIC X(1234).                \n"
+      + "       PROCEDURE DIVISION RETURNING RETVAL.                 \n"
+      + "             MOVE 1234 to {$NUM}.                              \n"
+      + "       END FUNCTION FUNC1.                                  \n"
+      + "                                                            \n"
+      + "       IDENTIFICATION DIVISION.                             \n"
+      + "       {FUNCTION-ID. FUNC1.|1}                                  \n"
+      + "       DATA DIVISION.                                       \n"
+      + "       LINKAGE SECTION.                                     \n"
+      + "       01  {$*RETVAL}.                                          \n"
+      + "           05  {$*NUM}              PIC X(1234).                \n"
+      + "       PROCEDURE DIVISION RETURNING RETVAL.                 \n"
+      + "             MOVE 1234 to {$NUM}.                              \n"
+      + "       END FUNCTION FUNC1.                                  \n";
+
+  @Test
+  void function_redefined() {
+    UseCaseEngine.runTest(
+        FUNCTION_REDEFINED,
+        ImmutableList.of(),
+        ImmutableMap.of(
+            "1",
+            new Diagnostic(
+                new Range(),
+                "Function 'FUNC1' redefined",
+                DiagnosticSeverity.Warning,
+                ErrorSource.PARSING.getText())));
+  }
+
+  public static final String DIAGNOSE_DEFINED_AFTER = ""
+      // ----+----1----+----2----+----3----+----4----+----5----+----6
+      + "       IDENTIFICATION DIVISION.                             \n"
+      + "       PROGRAM-ID. PGM.                                     \n"
+      + "       DATA DIVISION.                                       \n"
+      + "       WORKING-STORAGE SECTION.                             \n"
+      + "       01  {$*RETVAL}.                                          \n"
+      + "           05  {$*NUM}              PIC X(1234).                \n"
+      + "       PROCEDURE DIVISION RETURNING RETVAL.                 \n"
+      + "             MOVE FUNCTION {FUNC1|1} TO {$RETVAL}.                 \n"
+      + "       END PROGRAM PGM.                                     \n"
+      + "                                                            \n"
+      + "       IDENTIFICATION DIVISION.                             \n"
+      + "       FUNCTION-ID. FUNC1.                                  \n"
+      + "       DATA DIVISION.                                       \n"
+      + "       LINKAGE SECTION.                                     \n"
+      + "       01  {$*RETVAL}.                                          \n"
+      + "           05  {$*NUM}              PIC X(1234).                \n"
+      + "       PROCEDURE DIVISION RETURNING RETVAL.                 \n"
+      + "             MOVE 1234 to {$NUM}.                              \n"
+      + "       END FUNCTION FUNC1.                                  \n";
+
+  @Test
+  void diagnose_defined_after() {
+    // This diagnostic seems suboptimal, but shows A problem.
+    UseCaseEngine.runTest(
+        DIAGNOSE_DEFINED_AFTER,
+        ImmutableList.of(),
+        ImmutableMap.of(
+            "1",
+            new Diagnostic(
+                new Range(),
+                "Expected a function name, but found 'FUNC1'",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())));
   }

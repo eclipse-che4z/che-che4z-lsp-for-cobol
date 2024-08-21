@@ -150,6 +150,23 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
     return result;
   }
 
+  private List<Node> makeFunctionReferenceNodes(FunctionNameContext fnCtx) {
+    if (fnCtx == null)
+      return List.of();
+
+    String name = fnCtx.getText();
+
+    return retrieveLocality(fnCtx, extendedDocument, copybooks)
+        .map(l -> new FunctionReference(l, name))
+        .stream()
+        .collect(toList());
+  }
+
+  @Override
+  public List<Node> visitFunctionReference(FunctionReferenceContext ctx) {
+    return makeFunctionReferenceNodes(ctx.functionName());
+  }
+
   @Override
   public List<Node> visitFunctionIdParagraph(FunctionIdParagraphContext ctx) {
     List<Node> result = new ArrayList<>();
@@ -274,10 +291,12 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
     FunctionDetailsContext funcCtx = ctx.functionDetails();
 
     if (funcCtx != null)
-      return adjustIdentificationDivision(addTreeNode(ctx, (l) -> new ProgramNode(l, ProgramSubtype.Function)),
+      return adjustIdentificationDivision(
+          addTreeNode(ctx, (l) -> new ProgramNode(l, ProgramSubtype.Function, ctx.getStart().getTokenIndex())),
           extractLastPosition(funcCtx));
     else
-      return adjustIdentificationDivision(addTreeNode(ctx, (l) -> new ProgramNode(l, ProgramSubtype.Program)),
+      return adjustIdentificationDivision(
+          addTreeNode(ctx, (l) -> new ProgramNode(l, ProgramSubtype.Program, ctx.getStart().getTokenIndex())),
           extractIdentificationEndPosition(ctx.programDetails()));
   }
 
@@ -285,7 +304,9 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   public List<Node> visitNestedProgramUnit(NestedProgramUnitContext ctx) {
     fileControls = new HashMap<>();
     text.reset();
-    return adjustIdentificationDivision(addTreeNode(ctx, (l) -> new ProgramNode(l, ProgramSubtype.Program)), extractIdentificationEndPosition(ctx.programDetails()));
+    return adjustIdentificationDivision(
+        addTreeNode(ctx, (l) -> new ProgramNode(l, ProgramSubtype.Program, ctx.getStart().getTokenIndex())),
+        extractIdentificationEndPosition(ctx.programDetails()));
   }
 
   @Override

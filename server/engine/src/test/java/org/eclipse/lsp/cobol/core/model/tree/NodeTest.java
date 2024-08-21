@@ -39,11 +39,11 @@ class NodeTest {
   @Test
   void getDepthFirstStream() {
     Node rootNode = new RootNode(LOCALITY);
-    Node firstProg = new ProgramNode(LOCALITY, ProgramSubtype.Program);
+    Node firstProg = new ProgramNode(LOCALITY, ProgramSubtype.Program, 0);
     Node sectionNode = new SectionNode(LOCALITY, SectionType.WORKING_STORAGE);
     Node definition = VariableDefinitionNode.builder().build();
-    Node nestedProg = new ProgramNode(LOCALITY, ProgramSubtype.Program);
-    Node secondProg = new ProgramNode(LOCALITY, ProgramSubtype.Program);
+    Node nestedProg = new ProgramNode(LOCALITY, ProgramSubtype.Program, 0);
+    Node secondProg = new ProgramNode(LOCALITY, ProgramSubtype.Program, 0);
     Node anotherDefinition = VariableDefinitionNode.builder().build();
 
     rootNode.addChild(firstProg);
@@ -68,9 +68,9 @@ class NodeTest {
   @Test
   void getParentByType() {
     Node rootNode = new RootNode(LOCALITY);
-    Node program = new ProgramNode(LOCALITY, ProgramSubtype.Program);
+    Node program = new ProgramNode(LOCALITY, ProgramSubtype.Program, 0);
     rootNode.addChild(program);
-    Node nestedProgram = new ProgramNode(LOCALITY, ProgramSubtype.Program);
+    Node nestedProgram = new ProgramNode(LOCALITY, ProgramSubtype.Program, 0);
     program.addChild(nestedProgram);
     Node section = new SectionNode(LOCALITY, SectionType.WORKING_STORAGE);
     nestedProgram.addChild(section);

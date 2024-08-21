@@ -25,7 +25,9 @@ import org.eclipse.lsp.cobol.common.model.NodeType;
 import org.eclipse.lsp.cobol.common.model.tree.CodeBlockDefinitionNode;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.model.tree.ProcedureSectionNode;
+import org.eclipse.lsp.cobol.common.model.tree.ProgramIdNode;
 import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
+import org.eclipse.lsp.cobol.common.model.tree.ProgramSubtype;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableUsageNode;
 import org.eclipse.lsp.cobol.common.symbols.CodeBlockReference;
@@ -33,6 +35,7 @@ import org.eclipse.lsp.cobol.common.symbols.SymbolTable;
 import org.eclipse.lsp.cobol.common.symbols.VariableAccumulator;
 import org.eclipse.lsp.cobol.core.model.VariableUsageUtils;
 import org.eclipse.lsp.cobol.common.model.tree.CodeBlockUsageNode;
+import org.eclipse.lsp.cobol.common.model.tree.FunctionReference;
 import org.eclipse.lsp.cobol.common.model.tree.ParagraphNameNode;
 import org.eclipse.lsp.cobol.common.model.tree.SectionNameNode;
 import org.eclipse.lsp4j.Location;
@@ -40,15 +43,18 @@ import org.eclipse.lsp4j.Location;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.eclipse.lsp.cobol.common.model.tree.Node.hasType;
 
 /** Service to handle symbol information and dependencies */
 public class SymbolAccumulatorService implements VariableAccumulator {
   private final Map<String, SymbolTable> programSymbols;
+  private final Map<String, ProgramNode> functions;
 
   public SymbolAccumulatorService() {
     this.programSymbols = Collections.synchronizedMap(new HashMap<>());
+    this.functions = Collections.synchronizedMap(new HashMap<>());
   }
 
   /**
@@ -205,6 +211,86 @@ public class SymbolAccumulatorService implements VariableAccumulator {
         .getSectionMap()
         .computeIfAbsent(node.getName(), n -> new CodeBlockReference())
         .addDefinition(node.getLocality().toLocation());
+    return Optional.empty();
+  }
+
+  private static final HashSet<String> INTRINSIC_FUNCTIONS = Stream.of(
+      "ABS", "ACOS", "ANNUITY", "ASIN", "ATAN", "BIT-OF", "BIT-TO-CHAR", "BYTE-LENGTH",
+      "CHAR", "COMBINED-DATETIME", "CONTENT-OF", "COS", "CURRENT-DATE", "DATE-OF-INTEGER",
+      "DATE-TO-YYYYMMDD", "DAY-OF-INTEGER", "DAY-TO-YYYYDDD", "DISPLAY-OF", "E", "EXP", "EXP10",
+      "FACTORIAL", "FORMATTED-CURRENT-DATE", "FORMATTED-DATE", "FORMATTED-DATETIME", "FORMATTED-TIME",
+      "HEX-OF", "HEX-TO-CHAR", "INTEGER", "INTEGER-OF-DATE", "INTEGER-OF-DAY", "INTEGER-OF-FORMATTED-DATE",
+      "INTEGER-PART", "LENGTH", "LOG", "LOG10", "LOWER-CASE", "MAX", "MEAN", "MEDIAN", "MIDRANGE", "MIN",
+      "MOD", "NATIONAL-OF", "NUMVAL", "NUMVAL-C", "NUMVAL-F", "ORD", "ORD-MAX", "ORD-MIN", "PI",
+      "PRESENT-VALUE", "RANDOM", "RANGE", "REM", "REVERSE", "SECONDS-FROM-FORMATTED-TIME",
+      "SECONDS-PAST-MIDNIGHT", "SIGN", "SIN", "SQRT", "STANDARD-DEVIATION", "SUM", "TAN",
+      "TEST-DATE-YYYYMMDD", "TEST-DAY-YYYYDDD", "TEST-FORMATTED-DATETIME", "TEST-NUMVAL", "TEST-NUMVAL-C",
+      "TEST-NUMVAL-F", "TRIM", "ULENGTH", "UPOS", "UPPER-CASE", "USUBSTR", "USUPPLEMENTARY",
+      "UUID4", "UVALID", "UWIDTH", "VARIANCE", "WHEN-COMPILED", "YEAR-TO-YYYY")
+      .collect(Collectors.toCollection(HashSet::new));
+
+  private boolean isIntrinsic(String name) {
+    return INTRINSIC_FUNCTIONS.contains(name.toUpperCase());
+  }
+
+  /**
+   * Add function usage or definition to a program
+   *
+   * @param program  the program to register section in
+   * @param function - the function reference node
+   * @return syntax error if the function is not available
+   */
+  public Optional<SyntaxError> registerFunctionReferenceNode(ProgramNode program, FunctionReference function) {
+    String functionName = function.getName();
+    if (isIntrinsic(functionName)) // TODO: UseEngine
+      return Optional.empty();
+    CodeBlockReference refs = createOrGetSymbolTable(program)
+        .getFunctionMap()
+        .computeIfAbsent(functionName, n -> new CodeBlockReference());
+    refs.addUsage(function.getLocality().toLocation());
+    if (refs.getDefinitions().isEmpty()) {
+      ProgramNode f = functions.get(functionName);
+      if (f == null || f.getOrdinal() > program.getOrdinal())
+        return Optional.of(
+            SyntaxError.syntaxError()
+                .errorSource(ErrorSource.PARSING)
+                .messageTemplate(
+                    MessageTemplate.of("semantics.functionExpected", functionName))
+                .severity(ErrorSeverity.ERROR)
+                .location(function.getLocality().toOriginalLocation())
+                .build());
+      refs.addDefinition(f.getLocality().toLocation());
+    }
+    return Optional.empty();
+  }
+
+  /**
+   * Add function definition
+   *
+   * @param function - the function node
+   * @return syntax error if the function is redefined
+   */
+  public Optional<SyntaxError> registerFunctionNode(ProgramNode function) {
+    assert function.getSubtype() == ProgramSubtype.Function;
+    String functionName = function.getProgramName();
+    if (isIntrinsic(functionName)) // TODO: UseEngine
+      return Optional.empty();
+    if (functions.putIfAbsent(functionName, function) != null) {
+      return Optional.of(
+          SyntaxError.syntaxError()
+              .errorSource(ErrorSource.PARSING)
+              .messageTemplate(
+                  MessageTemplate.of("semantics.functionRedefined", function.getProgramName()))
+              .severity(ErrorSeverity.WARNING)
+              .location(function.getDepthFirstStream()
+                  .filter(n -> n instanceof ProgramIdNode)
+                  .filter(n -> ((ProgramIdNode) n).getSubtype() == ProgramSubtype.Function)
+                  .findFirst()
+                  .orElse(function)
+                  .getLocality().toOriginalLocation())
+              .build());
+    }
+
     return Optional.empty();
   }
 

@@ -41,7 +41,7 @@ class MockCompletionModel {
   static final SymbolsRepository REPO = new SymbolsRepository();
 
   static {
-    ProgramNode programNode = new ProgramNode(Locality.builder().build(), ProgramSubtype.Program);
+    ProgramNode programNode = new ProgramNode(Locality.builder().build(), ProgramSubtype.Program, 0);
     RESULT.getRootNode().addChild(programNode);
     ImmutableList.of("constD1", "ConstD2")
         .forEach(

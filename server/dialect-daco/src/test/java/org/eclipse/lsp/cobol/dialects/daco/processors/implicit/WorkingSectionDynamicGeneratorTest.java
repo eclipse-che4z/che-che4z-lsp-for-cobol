@@ -32,7 +32,7 @@ public class WorkingSectionDynamicGeneratorTest {
   @Test
   void testGenerate() {
     Locality locality = Locality.builder().build();
-    ProgramNode programNode = new ProgramNode(locality, ProgramSubtype.Program);
+    ProgramNode programNode = new ProgramNode(locality, ProgramSubtype.Program, 0);
 
     programNode.addChild(new VariableDefinitionNameNode(locality, "TBF123-XAB"));
     programNode.addChild(new VariableDefinitionNameNode(locality, "TBL456-XCD"));

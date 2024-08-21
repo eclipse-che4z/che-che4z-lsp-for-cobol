@@ -33,6 +33,7 @@ public enum NodeType {
   EXIT_SECTION,
   FILE_CONTROL_ENTRY,
   FILE_USAGE,
+  FUNCTION_REFERENCE,
   GO_BACK,
   GO_TO,
   IF,
