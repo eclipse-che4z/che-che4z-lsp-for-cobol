@@ -17,6 +17,7 @@ package org.eclipse.lsp.cobol.dialects.daco;
 import com.google.common.collect.ImmutableList;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.eclipse.lsp.cobol.common.dialects.CobolDialect;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
@@ -30,11 +31,14 @@ import org.eclipse.lsp.cobol.dialects.daco.DaCoParser.VariableUsageNameContext;
 import org.eclipse.lsp.cobol.common.model.tree.variable.QualifiedReferenceNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableUsageNode;
 import org.eclipse.lsp4j.Location;
+import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
+
+import static org.eclipse.lsp.cobol.dialects.daco.DaCoParser.DOT_FS;
 
 /**
  * This extension of {@link DaCoParserBaseVisitor} applies the semantic analysis based on the
@@ -114,14 +118,36 @@ public class DaCoVisitor extends DaCoParserBaseVisitor<List<Node>> {
     String newText = context.getExtendedDocument().toString()
             .substring(token.getSymbol().getStartIndex(), token.getSymbol().getStopIndex() + 1)
             .replaceAll("[^ \n]", " ");
-    Range range = DialectUtils.constructRange(token);
+
+    int line = token.getSymbol().getLine();
+    int inLine = token.getSymbol().getCharPositionInLine();
+    Range range = new Range(
+            new Position(line - 1, inLine),
+            new Position(
+                    line - 1,
+                    inLine + token.getSymbol().getStopIndex() - token.getSymbol().getStartIndex())
+    );
+    // TODO: probably it should be resolved in grammar, but we need to preserve dot
+    //  cause COBOL parser does not expect dots to be consumed by IDMS preprocessor.
+    if (token.getSymbol().getType() == DOT_FS) {
+      newText = newText.substring(0, newText.length() - 1) + ".";
+    }
     context.getExtendedDocument().replace(range, newText);
   }
   private void addReplacementContext(ParserRuleContext ctx) {
     String newText = context.getExtendedDocument().toString()
             .substring(ctx.start.getStartIndex(), ctx.stop.getStopIndex() + 1)
             .replaceAll("[^ \n]", CobolDialect.FILLER);
-    Range range = DialectUtils.constructRange(ctx);
+    Token start = ctx.start;
+    Token stop = ctx.stop;
+    Range range = new Range(new Position(start.getLine() - 1, start.getCharPositionInLine()),
+            new Position(stop.getLine() - 1,
+                    stop.getCharPositionInLine() + stop.getStopIndex() - stop.getStartIndex()));
+    // TODO: probably it should be resolved in grammar, but we need to preserve dot
+    //  cause COBOL parser does not expect dots to be consumed by IDMS preprocessor.
+    if (ctx.getStop().getType() == DOT_FS) {
+      newText = newText.substring(0, newText.length() - 1) + ".";
+    }
     context.getExtendedDocument().replace(range, newText);
   }
 }
