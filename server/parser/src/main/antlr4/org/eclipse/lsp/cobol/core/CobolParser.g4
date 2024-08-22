@@ -70,8 +70,13 @@ functionIdParagraph
    : FUNCTION_ID DOT_FS? programName
      (AS literal)?
      (IS? PROTOTYPE)?
-     (ENTRY_NAME IS? (COMPAT|LONGUPPER|LONGMIXED))?
-     (ENTRY_INTERFACE IS? (STATIC|DYNAMIC|DLL))?
+     // compiler accepts both orderings
+     (
+        ENTRY_NAME IS? (COMPAT|LONGUPPER|LONGMIXED) (ENTRY_INTERFACE IS? (STATIC|DYNAMIC|DLL))?
+        |
+        ENTRY_INTERFACE IS? (STATIC|DYNAMIC|DLL) (ENTRY_NAME IS? (COMPAT|LONGUPPER|LONGMIXED))?
+        |
+     )
      DOT_FS?
    ;
 
