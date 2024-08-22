@@ -181,7 +181,6 @@ public class TestFunction {
 
   @Test
   void diagnose_missing_function() {
-    // This diagnostic seems suboptimal, but shows A problem.
     UseCaseEngine.runTest(
         DIAGNOSE_MISSING_FUNCTION,
         ImmutableList.of(),

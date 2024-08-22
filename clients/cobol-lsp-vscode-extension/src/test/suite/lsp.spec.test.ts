@@ -36,10 +36,7 @@ suite("Integration Test Suite", function () {
     const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
     assert.strictEqual(diagnostics.length, 1);
     const d0 = diagnostics[0];
-    assert.strictEqual(
-      d0.message,
-      "Syntax error on 'Program1-id'",
-    );
+    assert.strictEqual(d0.message, "Syntax error on 'Program1-id'");
     helper.assertRangeIsEqual(d0.range, range(pos(14, 7), pos(14, 18)));
   });
 
