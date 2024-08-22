@@ -16,6 +16,7 @@ package org.eclipse.lsp.cobol.dialects.daco;
 
 import lombok.experimental.UtilityClass;
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
@@ -32,13 +33,15 @@ public class DialectUtils {
    * @return the range
    */
   public Range constructRange(ParserRuleContext ctx) {
+    Token start = ctx.start;
+    Token stop = ctx.stop;
     return new Range(
             new Position(
-                    ctx.start.getLine() - 1,
-                    ctx.start.getCharPositionInLine()),
+                    start.getLine() - 1,
+                    start.getCharPositionInLine()),
             new Position(
-                    ctx.stop.getLine() - 1,
-                    ctx.stop.getCharPositionInLine() + ctx.stop.getStopIndex() - ctx.stop.getStartIndex() + 1)
+                    stop.getLine() - 1,
+                    stop.getCharPositionInLine() + stop.getStopIndex() - stop.getStartIndex() + 1)
     );
   }
 
