@@ -33,7 +33,7 @@ public class ProgramIdEnricher implements Processor<ProgramIdNode> {
       return;
 
     SymbolAccumulatorService.FunctionInfo fi = node.getProgram()
-        .map(p -> symbolAccumulatorService.getFunctionReference(p))
+        .map(p -> symbolAccumulatorService.getFunctionReference(p.getProgramName()))
         .orElse(null);
     if (fi == null)
       return;

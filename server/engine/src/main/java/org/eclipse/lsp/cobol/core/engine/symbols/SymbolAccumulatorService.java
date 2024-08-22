@@ -264,31 +264,31 @@ public class SymbolAccumulatorService implements VariableAccumulator {
       .collect(Collectors.toCollection(HashSet::new));
 
   private boolean isIntrinsic(String name) {
-    return INTRINSIC_FUNCTIONS.contains(name.toUpperCase());
+    return INTRINSIC_FUNCTIONS.contains(name);
   }
 
   /**
    * Add function usage or definition to a program
    *
-   * @param program  the program to register section in
+   * @param callingProgram  the program to register section in
    * @param function - the function reference node
    * @return syntax error if the function is not available
    */
-  public Optional<SyntaxError> registerFunctionReferenceNode(ProgramNode program, FunctionReference function) {
-    String functionName = function.getName();
-    if (isIntrinsic(functionName)) // TODO: UseEngine
+  public Optional<SyntaxError> registerFunctionReferenceNode(ProgramNode callingProgram, FunctionReference function) {
+    String functionName = function.getName().toUpperCase();
+    if (isIntrinsic(functionName)) // TODO: UseEngine problem
       return Optional.empty();
     FunctionInfo fi = functions.computeIfAbsent(functionName, (String) -> new FunctionInfo());
     fi.usage.add(function.getLocality().toLocation());
-    if (fi.node == null || fi.node.getOrdinal() > program.getOrdinal()) {
-        return Optional.of(
-            SyntaxError.syntaxError()
-                .errorSource(ErrorSource.PARSING)
-                .messageTemplate(
-                    MessageTemplate.of("semantics.functionExpected", functionName))
-                .severity(ErrorSeverity.ERROR)
-                .location(function.getLocality().toOriginalLocation())
-                .build());
+    if (fi.node == null || fi.node.getOrdinal() > callingProgram.getOrdinal()) {
+      return Optional.of(
+          SyntaxError.syntaxError()
+              .errorSource(ErrorSource.PARSING)
+              .messageTemplate(
+                  MessageTemplate.of("semantics.functionExpected", functionName))
+              .severity(ErrorSeverity.ERROR)
+              .location(function.getLocality().toOriginalLocation())
+              .build());
     }
     return Optional.empty();
   }
@@ -301,8 +301,8 @@ public class SymbolAccumulatorService implements VariableAccumulator {
    */
   public Optional<SyntaxError> registerFunctionNode(ProgramNode function) {
     assert function.getSubtype() == ProgramSubtype.Function;
-    String functionName = function.getProgramName();
-    if (isIntrinsic(functionName)) // TODO: UseEngine
+    String functionName = function.getProgramName().toUpperCase();
+    if (isIntrinsic(functionName)) // TODO: UseEngine problem
       return Optional.empty();
     FunctionInfo fi = functions.computeIfAbsent(functionName, (String) -> new FunctionInfo(function));
     if (fi.node != function) {
@@ -310,7 +310,7 @@ public class SymbolAccumulatorService implements VariableAccumulator {
           SyntaxError.syntaxError()
               .errorSource(ErrorSource.PARSING)
               .messageTemplate(
-                  MessageTemplate.of("semantics.functionRedefined", function.getProgramName()))
+                  MessageTemplate.of("semantics.functionRedefined", functionName))
               .severity(ErrorSeverity.WARNING)
               .location(function.getDepthFirstStream()
                   .filter(n -> n instanceof ProgramIdNode)
@@ -331,18 +331,7 @@ public class SymbolAccumulatorService implements VariableAccumulator {
    * @return the block reference or null if not found
    */
   public FunctionInfo getFunctionReference(String name) {
-    return functions.get(name);
-  }
-
-  /**
-   * Search for a function reference
-   *
-   * @param programNode the function to search block references in
-   * @return the block reference or null if not found
-   */
-  public FunctionInfo getFunctionReference(ProgramNode programNode) {
-    assert programNode.getSubtype() == ProgramSubtype.Function;
-    return functions.get(programNode.getProgramName());
+    return functions.get(name.toUpperCase());
   }
 
   /**

@@ -221,8 +221,8 @@ public class TestFunction {
       + "       WORKING-STORAGE SECTION.                             \n"
       + "       01  {$*RETVAL}.                                          \n"
       + "           05  {$*NUM}              PIC X(1234).                \n"
-      + "       PROCEDURE DIVISION RETURNING RETVAL.                 \n"
-      + "             MOVE FUNCTION FUNC1 TO {$RETVAL}.                    \n"
+      + "       PROCEDURE DIVISION.                                  \n"
+      + "             MOVE FUNCTION func1 TO {$RETVAL}.                    \n"
       + "       END PROGRAM PGM.                                     \n";
 
   @Test
