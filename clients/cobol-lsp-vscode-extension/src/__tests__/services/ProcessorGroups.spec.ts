@@ -74,15 +74,32 @@ jest.mock("fs", () => ({
   }),
 }));
 
+// TODO: Yes, still horrifying
 jest.mock("vscode", () => ({
   Uri: {
     parse: jest.fn().mockImplementation((str: string) => {
+      str = str.replace(/\\/g, "/");
+      const fsPath = str.substring("file://".length);
+      const path = (str.startsWith("/") ? "" : "/") + fsPath;
       return {
-        fsPath: str.substring("file://".length),
+        path,
+        fsPath,
       };
     }),
+    joinPath: (u: any, segment: string) => {
+      expect(segment).toBe("..");
+      const path = u.path;
+      return {
+        path: path.substring(0, path.lastIndexOf("/")),
+        fsPath: path.substring(0, path.lastIndexOf("/")),
+      };
+    },
     file: jest.fn().mockImplementation((str: string) => {
-      return { fsPath: str };
+      const path = (str.startsWith("/") ? "" : "/") + str.replace(/\\/g, "/");
+      return {
+        path,
+        fsPath: str,
+      };
     }),
   },
   workspace: {

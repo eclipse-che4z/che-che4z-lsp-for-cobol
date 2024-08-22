@@ -24,13 +24,25 @@ beforeAll(() => {
   ];
 });
 
+// TODO: this is horrifying as well
 jest.mock("vscode", () => ({
   Uri: {
     parse: jest.fn().mockImplementation((str: string) => {
+      const fsPath = str.substring("file://".length).replace(/\//g, path.sep);
+      const p =
+        (str.startsWith("/") ? "" : "/") + str.substring("file://".length);
       return {
-        fsPath: str.substring("file://".length),
+        path: p,
+        fsPath: process.platform === "win32" ? fsPath.substring(1) : fsPath,
       };
     }),
+    joinPath: (u: any, segment: string) => {
+      expect(segment).toBe("..");
+      return {
+        path: u.path.substring(0, u.path.lastIndexOf("/")),
+        fsPath: u.fsPath.substring(0, u.fsPath.lastIndexOf(path.sep)),
+      };
+    },
   },
   workspace: {},
 }));
@@ -97,6 +109,52 @@ describe("SettingsService evaluate variables", () => {
       "COBOL",
     );
     expect(paths[0]).toEqual(makefsPath("/tmp-ws/copybook/program.file"));
+  });
+
+  test("Evaluate fileDirname", () => {
+    vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
+      get: jest.fn().mockReturnValue(["${fileDirname}/copybooks"]),
+    });
+    const paths = SettingsService.getCopybookLocalPath(
+      "file://" + makePath("/toplevel/program"),
+      "COBOL",
+    );
+    expect(paths[0]).toEqual(makefsPath("/toplevel") + "/copybooks");
+  });
+
+  test("Evaluate fileDirnameBasename", () => {
+    vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
+      get: jest.fn().mockReturnValue(["${fileDirnameBasename}/copybooks"]),
+    });
+    const paths = SettingsService.getCopybookLocalPath(
+      "file:///toplevel/program",
+      "COBOL",
+    );
+    expect(paths[0]).toEqual(makefsPath("/tmp-ws/toplevel/copybooks"));
+  });
+
+  test("Evaluate workspaceFolder", () => {
+    vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
+      get: jest.fn().mockReturnValue(["${workspaceFolder}/copybooks"]),
+    });
+    const paths = SettingsService.getCopybookLocalPath(
+      "file://" + makePath("/toplevel/program"),
+      "COBOL",
+    );
+    expect(paths[0]).toEqual(makefsPath("/tmp-ws") + "/copybooks");
+  });
+
+  test("Evaluate workspaceFolder with name", () => {
+    vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
+      get: jest
+        .fn()
+        .mockReturnValue(["${workspaceFolder:workspace}/copybooks"]),
+    });
+    const paths = SettingsService.getCopybookLocalPath(
+      "file://" + makePath("/toplevel/program"),
+      "COBOL",
+    );
+    expect(paths[0]).toEqual(makefsPath("/tmp-ws") + "/copybooks");
   });
 
   test("Get local settings for a dialect", () => {
