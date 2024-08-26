@@ -152,7 +152,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
 
   private List<Node> makeFunctionReferenceNodes(FunctionNameContext fnCtx) {
     if (fnCtx == null)
-      return List.of();
+      return ImmutableList.of();
 
     String name = fnCtx.getText();
 
@@ -270,7 +270,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
       .findFirst();
     Optional<Node> pgmNode = pgm.getChildren().stream().filter(n -> n instanceof ProgramIdNode).findFirst();
 
-    if (identification.isEmpty())
+    if (!identification.isPresent())
       return pgmNodes;
 
     replaceRangeEnd(identification.get(), lastPos);
@@ -1239,8 +1239,8 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   public List<Node> visitProcedureDivisionGivingClause(ProcedureDivisionGivingClauseContext ctx) {
     DataNameContext dt = ctx.dataName();
     Optional<Locality> locality = retrieveLocality(ctx, extendedDocument, copybooks);
-    if (dt == null || !locality.isPresent()) return List.of();
-    return List.of(new ProcedureDivisionReturningNode(locality.get(), extractNameAndLocality(dt)));
+    if (dt == null || !locality.isPresent()) return ImmutableList.of();
+    return ImmutableList.of(new ProcedureDivisionReturningNode(locality.get(), extractNameAndLocality(dt)));
   }
 
   @Override

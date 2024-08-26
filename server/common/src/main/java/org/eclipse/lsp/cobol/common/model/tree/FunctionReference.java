@@ -26,15 +26,17 @@ import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.NodeType;
 import org.eclipse.lsp4j.Location;
 
+import com.google.common.collect.ImmutableList;
+
 @ToString(callSuper = true)
 @Getter
 @EqualsAndHashCode(callSuper = true)
 public class FunctionReference extends Node implements DefinedAndUsedStructure {
   final String name;
   @Setter
-  private List<Location> definitions;
+  private List<Location> definitions = ImmutableList.of();
   @Setter
-  private List<Location> usages;
+  private List<Location> usages = ImmutableList.of();
 
   public FunctionReference(Locality locality, String name) {
     super(locality, NodeType.FUNCTION_REFERENCE);

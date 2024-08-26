@@ -24,6 +24,8 @@ import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.NodeType;
 import org.eclipse.lsp4j.Location;
 
+import com.google.common.collect.ImmutableList;
+
 import java.util.List;
 
 /** The class represents usages of paragraphs or sections. */
@@ -33,9 +35,9 @@ import java.util.List;
 public class CodeBlockUsageNode extends Node implements DefinedAndUsedStructure {
   private final String name;
   @Setter
-  private List<Location> definitions;
+  private List<Location> definitions = ImmutableList.of();
   @Setter
-  private List<Location> usages;
+  private List<Location> usages = ImmutableList.of();
 
   public CodeBlockUsageNode(Locality location, String name) {
     super(location, NodeType.CODE_BLOCK_USAGE);

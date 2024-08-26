@@ -69,9 +69,9 @@ public class SymbolAccumulatorService implements VariableAccumulator {
      */
     public List<Location> getDefinition() {
       if (node == null)
-        return List.of();
+        return ImmutableList.of();
       else
-        return List.of(node.getLocality().toLocation());
+        return ImmutableList.of(node.getLocality().toLocation());
     }
 
     /**
