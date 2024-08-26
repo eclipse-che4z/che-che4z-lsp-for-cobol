@@ -543,7 +543,7 @@ suite("Integration Test Suite", function () {
     await helper.showDocument(copybookPath);
 
     await helper.waitFor(
-      () => vscode.languages.getDiagnostics(copybookUri).length === 2,
+      () => vscode.languages.getDiagnostics(copybookUri).length === 1,
     );
     copyDiagnostics = vscode.languages.getDiagnostics(copybookUri);
     assert.strictEqual(
