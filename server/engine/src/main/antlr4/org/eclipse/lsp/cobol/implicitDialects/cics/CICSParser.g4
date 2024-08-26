@@ -97,23 +97,24 @@ cicsTranslatorCompileDirectivedKeywords
 /** RECEIVE: */
 
 // Receive all
-cics_receive:                   RECEIVE (cics_receive_group_one | cics_receive_group_two | cics_receive_partn | cics_receive_maps) cics_handle_response?;
+cics_receive:                   RECEIVE (cics_receive_group_one | cics_receive_group_two | cics_receive_2980 | cics_receive_non_z_default | cics_receive_partn | cics_receive_maps) cics_handle_response?;
 
 //Helpers
 cics_into_set:                  (INTO cics_data_area | SET cics_ref);
-cics_length_flength:            (LENGTH | FLENGTH) cics_data_area;
+cics_length_flength:            (LENGTH cics_data_area | FLENGTH cics_data_area);
 
-// CICS Group 1 (zOS DEFAULT, non Z DEFAULT, LUTYPE (2,3,4), 2260, 2980, 3270-logical, 3790 / 3270-display, 3600 pipeline, 3600-3601, 3600-3614, 3650, 3767, 3770, 3790 FF)
-cics_receive_non_z_default:     LENGTH cics_data_area FLENGTH cics_data_area cics_maxlength? NOTRUNCATE;
-cics_receive_group_one:         cics_into_set? (cics_length_flength cics_maxlength? ((ASIS? BUFFER? NOTRUNCATE? LEAVEKB?) | NOTRUNCATE | (NOTRUNCATE? PASSBK)) | cics_receive_non_z_default);
+// CICS Group 1 (zOS DEFAULT, LUTYPE (2,3,4), 2260, 3270-logical, 3790 / 3270-display, 3600 pipeline, 3600-3601, 3600-3614, 3650, 3767, 3770, 3790 FF)
+cics_receive_group_one:         cics_into_set? cics_length_flength cics_maxlength? ASIS? BUFFER? NOTRUNCATE? LEAVEKB?;
 
 // CICS Group 2 (APPC, LUTYPE 6.1, MRO)
-cics_receive_group_two:         ((CONVID | SESSION) cics_name)? cics_into_set cics_length_flength cics_maxlength? NOTRUNCATE? (STATE cics_cvda)?;
+cics_receive_group_two:         (CONVID cics_name | SESSION cics_name)? cics_into_set cics_length_flength cics_maxlength? NOTRUNCATE? (STATE cics_cvda)?;
 
+cics_receive_2980:              cics_into_set? cics_length_flength cics_maxlength? NOTRUNCATE? PASSBK;
+cics_receive_non_z_default:     cics_into_set? LENGTH cics_data_area FLENGTH cics_data_area (MAXLENGTH cics_data_value)? NOTRUNCATE?;
 cics_receive_partn:             cics_into_set LENGTH cics_data_area ASIS?;
 
 // RECEIVE MAPS
-cics_receive_map: (MAPSET cics_name)? cics_into_set? ((FROM cics_data_area (LENGTH cics_data_area)?) | (TERMINAL ASIS? (INPARTN cics_name)?))?;
+cics_receive_map: (MAPSET cics_name)? cics_into_set? (TERMINAL | (FROM cics_data_area (LENGTH cics_data_area)?) | (TERMINAL ASIS? (INPARTN cics_name)?))?;
 cics_receive_map_mappingdev:    MAPPINGDEV cics_data_area FROM cics_data_area (LENGTH cics_data_area)? (MAPSET cics_name)? cics_into_set?;
 cics_receive_maps:              MAP cics_name (cics_receive_map | cics_receive_map_mappingdev);
 
