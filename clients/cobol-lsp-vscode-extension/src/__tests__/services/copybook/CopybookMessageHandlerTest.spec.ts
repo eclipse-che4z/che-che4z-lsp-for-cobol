@@ -45,10 +45,12 @@ describe("Test the copybook message handler", () => {
   });
   const downloaderNoApi = new CopybookDownloadService("/storagePath");
   it("checks local present copybooks are resolved", async () => {
-    SettingsService.getCopybookExtension = jest.fn().mockReturnValue([".cpy"]);
+    SettingsService.getCopybookExtension = jest
+      .fn()
+      .mockReturnValue(Promise.resolve([".cpy"]));
     SettingsService.getCopybookLocalPath = jest
       .fn()
-      .mockReturnValue(["/configured/path/from/setting"]);
+      .mockReturnValue(Promise.resolve(["/configured/path/from/setting"]));
 
     expect(
       await downloaderNoApi.resolveCopybookHandler(
@@ -69,8 +71,12 @@ describe("Test the copybook message handler", () => {
   });
 
   it("checks downloaded copybooks are resolved", async () => {
-    SettingsService.getCopybookExtension = jest.fn().mockReturnValue([".cpy"]);
-    SettingsService.getCopybookLocalPath = jest.fn().mockReturnValue([]);
+    SettingsService.getCopybookExtension = jest
+      .fn()
+      .mockReturnValue(Promise.resolve([".cpy"]));
+    SettingsService.getCopybookLocalPath = jest
+      .fn()
+      .mockReturnValue(Promise.resolve([]));
     SettingsService.getDsnPath = jest
       .fn()
       .mockReturnValue(["/configured/path"]);
@@ -95,8 +101,12 @@ describe("Test the copybook message handler", () => {
   });
 
   it("checks USS downloaded copybooks are resolved", async () => {
-    SettingsService.getCopybookExtension = jest.fn().mockReturnValue([".cpy"]);
-    SettingsService.getCopybookLocalPath = jest.fn().mockReturnValue([]);
+    SettingsService.getCopybookExtension = jest
+      .fn()
+      .mockReturnValue(Promise.resolve([".cpy"]));
+    SettingsService.getCopybookLocalPath = jest
+      .fn()
+      .mockReturnValue(Promise.resolve([]));
     SettingsService.getDsnPath = jest.fn().mockReturnValue([]);
     SettingsService.getUssPath = jest
       .fn()

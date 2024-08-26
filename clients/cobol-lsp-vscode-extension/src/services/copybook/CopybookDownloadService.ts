@@ -163,7 +163,7 @@ export class CopybookDownloadService {
         path.join(this.storagePath, ZOWE_FOLDER, COPYBOOKS_FOLDER),
         this.explorerApi,
       ),
-      SettingsService.getCopybookExtension(documentUri),
+      await SettingsService.getCopybookExtension(documentUri),
       this.storagePath,
     );
   }

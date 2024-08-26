@@ -61,8 +61,8 @@ export class TabSettings {
   public constructor(public rules: TabRule[], public defaultRule: TabRule) {}
 }
 
-export function configHandler(request: any): Array<any> {
-  const result = new Array<any>();
+export async function lspConfigHandler(request: any): Promise<Array<any>> {
+  const result = new Array<unknown>();
   for (let item of request.items) {
     try {
       if (item.section === DIALECT_REGISTRY_SECTION) {
@@ -71,40 +71,41 @@ export function configHandler(request: any): Array<any> {
       } else if (item.scopeUri) {
         const cfg = vscode.workspace.getConfiguration().get(item.section);
         if (item.section === SETTINGS_DIALECT) {
-          const object = loadProcessorGroupDialectConfig(item, cfg);
+          const object = await loadProcessorGroupDialectConfig(item, cfg);
           result.push(object);
         } else if (item.section === SETTINGS_CPY_LOCAL_PATH) {
-          const object = loadProcessorGroupCopybookPathsConfig(
+          const object = await loadProcessorGroupCopybookPathsConfig(
             item,
             cfg as string[],
           );
           result.push(object);
         } else if (item.section === DIALECT_LIBS && !!item.dialect) {
-          const dialectLibs = SettingsService.getCopybookLocalPath(
-            item.scopeUri,
-            item.dialect,
-          );
+          const dialectLibs: string[] =
+            await SettingsService.getCopybookLocalPath(
+              item.scopeUri,
+              item.dialect,
+            );
           result.push(dialectLibs);
         } else if (item.section === SETTINGS_CPY_EXTENSIONS) {
-          const object = loadProcessorGroupCopybookExtensionsConfig(
+          const object = await loadProcessorGroupCopybookExtensionsConfig(
             item,
             cfg as string[],
           );
           result.push(object);
         } else if (item.section === SETTINGS_SQL_BACKEND) {
-          const object = loadProcessorGroupSqlBackendConfig(
+          const object = await loadProcessorGroupSqlBackendConfig(
             item,
             cfg as string,
           );
           result.push(object);
         } else if (item.section === SETTINGS_CPY_FILE_ENCODING) {
-          const object = loadProcessorGroupCopybookEncodingConfig(
+          const object = await loadProcessorGroupCopybookEncodingConfig(
             item,
             cfg as string,
           );
           result.push(object);
         } else if (item.section === SETTINGS_COMPILE_OPTIONS) {
-          const object = loadProcessorGroupCompileOptionsConfig(
+          const object = await loadProcessorGroupCompileOptionsConfig(
             item,
             cfg as string,
           );
@@ -145,11 +146,14 @@ export class SettingsService {
    * @param dialectType name of the cobol dialect type
    * @returns a list of local path
    */
-  public static getCopybookLocalPath(
+  public static async getCopybookLocalPath(
     documentUri: string,
     dialectType: string,
-  ): string[] {
-    const pgPaths = loadProcessorGroupCopybookPaths(documentUri, dialectType);
+  ): Promise<string[]> {
+    const pgPaths = await loadProcessorGroupCopybookPaths(
+      documentUri,
+      dialectType,
+    );
     const vars = getVariablesFromUri(documentUri);
     const paths: string[] = [
       ...SettingsService.evaluateVariables(pgPaths, vars),
@@ -164,9 +168,9 @@ export class SettingsService {
     return SettingsService.prepareLocalSearchFolders(paths, wsFolders);
   }
 
-  public static getCopybookExtension(
+  public static async getCopybookExtension(
     documentUri: string,
-  ): string[] | undefined {
+  ): Promise<string[] | undefined> {
     const global: string[] | undefined = vscode.workspace
       .getConfiguration(SETTINGS_CPY_SECTION)
       .get(COPYBOOK_EXTENSIONS);

@@ -87,6 +87,13 @@ jest.mock("vscode", () => ({
       };
     }),
     joinPath: (u: any, segment: string) => {
+      if (segment === "../.bridge.json") {
+        return {
+          path: u.path.substring(0, u.path.lastIndexOf("/") + "/.bridge.json"),
+          fsPath:
+            u.fsPath.substring(0, u.fsPath.lastIndexOf("/")) + "/.bridge.json",
+        };
+      }
       expect(segment).toBe("..");
       const path = u.path;
       return {
@@ -103,6 +110,11 @@ jest.mock("vscode", () => ({
     }),
   },
   workspace: {
+    fs: {
+      readFile: jest.fn().mockImplementation(() => {
+        throw { code: "FileNotFound" };
+      }),
+    },
     getWorkspaceFolder: jest
       .fn()
       .mockReturnValue({ uri: { fsPath: "file:///my/workspace" } }),
@@ -111,6 +123,7 @@ jest.mock("vscode", () => ({
 }));
 
 jest.mock("path", () => ({
+  ...jest.requireActual("path"),
   join: jest.fn().mockImplementation((...strs: string[]) => {
     if (strs[1] === "pgm_conf.json") {
       return "pgmCfgPath";
@@ -129,7 +142,7 @@ jest.mock("path", () => ({
   sep: "/",
 }));
 
-it("Processor groups configuration provides lib path", () => {
+it("Processor groups configuration provides lib path", async () => {
   const item = {
     scopeUri: WORKSPACE_URI + "/TEST.cob",
     section: "cobol-lsp.cpy-manager.paths-local",
@@ -138,11 +151,11 @@ it("Processor groups configuration provides lib path", () => {
     if (config[0] === "/copy") return ["/copy-resolved-from-glob"];
     else throw Error("some issue with input param");
   });
-  const result = loadProcessorGroupCopybookPathsConfig(item, []);
+  const result = await loadProcessorGroupCopybookPathsConfig(item, []);
   expect(result).toStrictEqual(["/copy-resolved-from-glob"]);
 });
 
-it("Processor groups configuration understend absolute paths", () => {
+it("Processor groups configuration understend absolute paths", async () => {
   const item = {
     scopeUri: WORKSPACE_URI + "/abs/TEST.cob",
     section: "cobol-lsp.cpy-manager.paths-local",
@@ -151,86 +164,86 @@ it("Processor groups configuration understend absolute paths", () => {
     if (config[0] === "/abs") return ["/copy-resolved-from-glob"];
     else throw Error("some issue with input param");
   });
-  const result = loadProcessorGroupCopybookPathsConfig(item, []);
+  const result = await loadProcessorGroupCopybookPathsConfig(item, []);
   expect(result).toStrictEqual(["/copy-resolved-from-glob"]);
 });
 
-it("Processor groups configuration provides copybook-extensions", () => {
+it("Processor groups configuration provides copybook-extensions", async () => {
   const item = {
     scopeUri: WORKSPACE_URI + "/TEST.cob",
     section: "cobol-lsp.cpy-manager.copybook-extensions",
   };
-  const result = loadProcessorGroupCopybookExtensionsConfig(item, []);
+  const result = await loadProcessorGroupCopybookExtensionsConfig(item, []);
   expect(result).toStrictEqual([".copy"]);
 });
 
-it("Processor groups configuration provides copybook-file-encoding", () => {
+it("Processor groups configuration provides copybook-file-encoding", async () => {
   const item = {
     scopeUri: WORKSPACE_URI + "/TEST.cob",
     section: "cobol-lsp.cpy-manager.copybook-file-encoding",
   };
-  const result = loadProcessorGroupCopybookEncodingConfig(item, "");
+  const result = await loadProcessorGroupCopybookEncodingConfig(item, "");
   expect(result).toStrictEqual("UTF-8");
 });
 
-it("Processor groups configuration provides cobol-lsp.target-sql-backend", () => {
+it("Processor groups configuration provides cobol-lsp.target-sql-backend", async () => {
   const item = {
     scopeUri: WORKSPACE_URI + "/TEST.cob",
     section: "cobol-lsp.target-sql-backend",
   };
-  const result = loadProcessorGroupSqlBackendConfig(item, "");
+  const result = await loadProcessorGroupSqlBackendConfig(item, "");
   expect(result).toStrictEqual("DATACOM_SERVER");
 });
 
-it("Processor groups configuration provides dialect lib path", () => {
-  const result = loadProcessorGroupCopybookPaths(
+it("Processor groups configuration provides dialect lib path", async () => {
+  const result = await loadProcessorGroupCopybookPaths(
     WORKSPACE_URI + "/TEST.cob",
     "DaCo",
   );
   expect(result).toStrictEqual(["/daco"]);
 });
 
-it("Processor groups configuration matches program", () => {
+it("Processor groups configuration matches program", async () => {
   const item = {
     scopeUri: WORKSPACE_URI + "/TEST.cob",
     section: "cobol-lsp.dialects",
   };
-  const result = loadProcessorGroupDialectConfig(item, {});
+  const result = await loadProcessorGroupDialectConfig(item, {});
   expect(result).toStrictEqual(["IDMS", "DaCo"]);
 });
 
-it("Processor groups configuration matches program relative to workspace", () => {
+it("Processor groups configuration matches program relative to workspace", async () => {
   const item = {
     scopeUri: WORKSPACE_URI + "/IDMS/TEST.cob",
     section: "cobol-lsp.dialects",
   };
-  const result = loadProcessorGroupDialectConfig(item, {});
+  const result = await loadProcessorGroupDialectConfig(item, {});
   expect(result).toStrictEqual(["IDMS"]);
 });
 
-it("Processor groups configuration matches program with *", () => {
+it("Processor groups configuration matches program with *", async () => {
   const item = {
     scopeUri: WORKSPACE_URI + "/progDaF.cob",
     section: "cobol-lsp.dialects",
   };
-  const result = loadProcessorGroupDialectConfig(item, {});
+  const result = await loadProcessorGroupDialectConfig(item, {});
   expect(result).toStrictEqual(["IDMS", "DaCo"]);
 });
 
-it("Processor groups configuration mismatches program with *", () => {
+it("Processor groups configuration mismatches program with *", async () => {
   const item = {
     scopeUri: WORKSPACE_URI + "/progDA.cob",
     section: "cobol-lsp.dialects",
   };
-  const result = loadProcessorGroupDialectConfig(item, {});
+  const result = await loadProcessorGroupDialectConfig(item, {});
   expect(result).toStrictEqual({});
 });
 
-it("Processor groups configuration provides compiler-options", () => {
+it("Processor groups configuration provides compiler-options", async () => {
   const item = {
     scopeUri: WORKSPACE_URI + "/TEST.cob",
     section: "cobol-lsp.compiler.options",
   };
-  const result = loadProcessorGroupCompileOptionsConfig(item, "");
+  const result = await loadProcessorGroupCompileOptionsConfig(item, "");
   expect(result).toStrictEqual(["QUALIFY(EXTEND)", "XMLPARSE(COMPAT)"]);
 });
