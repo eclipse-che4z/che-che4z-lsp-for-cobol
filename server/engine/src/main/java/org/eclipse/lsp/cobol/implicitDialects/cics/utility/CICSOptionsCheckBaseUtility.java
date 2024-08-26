@@ -321,7 +321,11 @@ public abstract class CICSOptionsCheckBaseUtility {
             if (validateResponseHandler
                 && child.getClass().getSimpleName().equals("Cics_handle_responseContext"))
               checkResponseHandlers((CICSParser.Cics_handle_responseContext) child);
-            getAllTokenChildren((ParserRuleContext) child, children, validateResponseHandler);
+            if (!CICSParser.Cics_data_areaContext.class.isAssignableFrom(child.getClass())
+                    && !CICSParser.Cics_nameContext.class.isAssignableFrom(child.getClass())
+                    && !CICSParser.Cics_data_valueContext.class.isAssignableFrom(child.getClass())) {
+              getAllTokenChildren((ParserRuleContext) child, children, validateResponseHandler);
+            }
           }
         });
   }

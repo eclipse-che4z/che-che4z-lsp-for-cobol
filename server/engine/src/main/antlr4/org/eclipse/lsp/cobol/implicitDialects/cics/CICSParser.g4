@@ -24,7 +24,7 @@ allCicsRule: cics_send | cics_receive | cics_add | cics_address | cics_allocate 
                        cics_endbrowse | cics_enq | cics_enter | cics_extract | cics_force | cics_formattime | cics_free |
                        cics_freemain | cics_gds | cics_get | cics_getmain | cics_getnext | cics_handle | cics_ignore | cics_inquire |
                        cics_invoke | cics_issue | cics_link | cics_load | cics_monitor | cics_move | cics_point | cics_pop |
-                       cics_post | cics_purge | cics_push | cics_put | cics_query | cics_read | cics_readnext |
+                       cics_post | cics_purge | cics_push | cics_put | cics_query | cics_read | cics_readnext_readprev |
                        cics_readq | cics_release | cics_remove | cics_reset | cics_resetbr | cics_resume | cics_retrieve |
                        cics_return | cics_rewind | cics_rewrite | cics_route | cics_run | cics_signal | cics_signoff | cics_signon |
                        cics_soapfault | cics_spoolclose | cics_spoolopen | cics_spoolread | cics_spoolwrite | cics_start |
@@ -109,61 +109,32 @@ cics_receive_map_mappingdev:    ((MAP | MAPSET) cics_name | (MAPPINGDEV | FROM |
 
 
 /** SEND: */
-cics_send: SEND (cics_send_group | cics_send_mro | cics_send_appc | cics_send_control | cics_send_map | cics_send_page |
-           cics_send_partnset | cics_send_text | cics_len_map);
-cics_send_group: cics_send_from (cics_send_from_wait | cics_send_from_ctlchar | cics_send_3600_01 | cics_send_2980);
+cics_send: SEND (cics_send_group1 | cics_send_control_map | cics_send_mappingdev | cics_send_page | cics_send_partnset | cics_send_text | cics_send_text_mapped | cics_send_text_noedit);
 
-cics_send_from_wait: WAIT? (INVITE | LAST | cics_send_defaultmax | cics_send_lu23 | cics_handle_response)*;
-cics_send_defaultmax: (CNOTCOMPL | DEFRESP | STRFIELD | FMH | cics_handle_response)+;
-cics_send_lu23: (cics_send_erase | CTLCHAR cics_data_value | STRFIELD | DEFRESP | cics_handle_response)+;
-cics_send_from_ctlchar: (CTLCHAR cics_data_value)? (cics_send_3560_3270 | cics_send_2260);
-cics_send_3560_3270: WAIT? (cics_send_erase | INVITE | LAST | CNOTCOMPL | DEFRESP | FMH | cics_handle_response)*;
-cics_send_2260: (LINEADDR cics_data_value | WAIT | LEAVEKB | cics_handle_response)+;
-cics_send_3600_01: (LDC cics_name | FMH | WAIT | INVITE | LAST | CNOTCOMPL | DEFRESP | cics_handle_response)+;
-cics_send_2980: (PASSBK | CBUFF)?;
-cics_len_map: ((LENGTH cics_data_value | FLENGTH cics_data_value) | cics_send_map | cics_handle_response)+;
-cics_send_mro: (SESSION cics_name | WAIT | INVITE | LAST | ATTACHID cics_name | FROM cics_data_area |
-               LENGTH cics_data_value | FLENGTH cics_data_value | FMH | DEFRESP | STATE cics_cvda | cics_send_erase | cics_handle_response)+;
-cics_send_appc: (CONVID cics_name | cics_send_from | INVITE | LAST | CONFIRM | WAIT | STATE cics_cvda | cics_handle_response)+;
-cics_send_control: CONTROL (cics_send_control_min | cics_send_control_std | cics_send_control_full);
-cics_send_control_min: (cics_send_cursor | FORMFEED | cics_send_erase | ERASEAUP | PRINT | FREEKB | ALARM | FRSET | cics_handle_response)+;
-cics_send_control_std: (MSR cics_data_value | OUTPARTN cics_name | ACTPARTN cics_name | LDC cics_name | cics_handle_response)+;
-cics_send_control_full: (ACCUM | cics_send_terminal | SET cics_ref | PAGING | REQID cics_name | HONEOM | L40 | L64 | L80 | cics_handle_response)+;
-cics_send_map: MAP cics_name (cics_send_map_null | cics_send_map_mappingdev);
-cics_send_map_null: (cics_send_map_min | cics_send_map_std | cics_send_map_full);
-cics_send_map_min: (MAPSET cics_name | MAPONLY | FROM cics_data_area | DATAONLY | LENGTH cics_data_value
-                   | cics_send_cursor | FORMFEED | cics_send_erase | ERASEAUP | PRINT | FREEKB | ALARM | FRSET | cics_handle_response)+;
-cics_send_map_std: (NLEOM | MSR cics_data_value | FMHPARM cics_name | OUTPARTN cics_name | ACTPARTN cics_name |
-                   LDC cics_name | cics_handle_response)+;
-cics_send_map_full: (ACCUM | cics_send_terminal | SET cics_ref | PAGING | REQID cics_name | NOFLUSH
-                    | HONEOM | L40 | L64 | L80 | cics_handle_response)+;
-cics_send_map_mappingdev: MAPPINGDEV cics_data_value (SET cics_ref | MAPSET cics_name | MAPONLY | FROM cics_data_area |
-                          DATAONLY | LENGTH cics_data_value | cics_send_cursor | FORMFEED | ERASE | ERASEAUP | PRINT |
-                          FREEKB | ALARM | FRSET | cics_handle_response)+;
+// CICS SEND Group1 (zOS DEFAULT, APPC, LUTYPE2/LUTYPE3, LUTYPE4, LUTYPE6.1, SCS, 3270, 3600, 3601, 3614, 3650, 3270, 3653, 3680, 3767, 3770, 3790, 3790 SCS,
+//                      3270-display, 3270-printer, Server default, MRO, 2260, 2280)
+cics_send_group1 : ((FROM | LENGTH | FLENGTH) cics_data_area | (CONVID | SESSION | ATTACHID | LDC ) cics_name | WAIT | INVITE | LAST | CONFIRM | ERASE | DEFAULT | ALTERNATE
+                | (CTLCHAR | LINEADDR) cics_data_value | STRFIELD | STATE cics_cvda | CNOTCOMPL | DEFRESP | FMH | LEAVEKB | PASSBK | CBUFF | cics_handle_response)*;
 
-cics_send_page: PAGE (RELEASE | TRANSID cics_name | RETAIN | TRAILER cics_data_area | SET cics_ref |
-                cics_send_autopage | NOAUTOPAGE | OPERPURGE | FMHPARM cics_name | LAST | cics_handle_response)*;
-cics_send_partnset: PARTNSET cics_name?;
-cics_send_text: TEXT (cics_send_text_null | cics_send_text_mapped | cics_send_text_noedit);
-cics_send_text_null: (cics_send_text_std | cics_send_text_full);
-cics_send_text_std: FROM cics_data_area cics_send_text_std_args*;
-cics_send_text_std_args: LENGTH cics_data_value | CURSOR cics_data_value | FORMFEED | cics_send_erase |
-                     PRINT | FREEKB | ALARM | NLEOM | FMHPARM cics_name | OUTPARTN cics_name | ACTPARTN cics_name |
-                     LDC cics_name | MSR cics_data_value | cics_handle_response;
-cics_send_text_full: FROM cics_data_area (cics_send_text_std_args | cics_send_terminal | SET cics_ref | PAGING | REQID cics_name | HEADER cics_data_area |
-                     TRAILER cics_data_area | JUSTIFY cics_data_value | JUSFIRST | JUSLAST | ACCUM |
-                     HONEOM | L40 | L64 | L80 | cics_handle_response)*;
-cics_send_text_mapped: MAPPED (FROM cics_data_area | LENGTH cics_data_value | cics_send_terminal |
-                       SET cics_ref | PAGING | REQID cics_name | cics_handle_response)*;
-cics_send_text_noedit: NOEDIT (FROM cics_data_area | LENGTH cics_data_value | cics_send_erase | PRINT | FREEKB | ALARM |
-                       OUTPARTN cics_name | cics_send_terminal | PAGING | REQID cics_name |
-                       HONEOM | L40 | L64 | L80 | cics_handle_response)*;
+cics_send_control_map : (CONTROL | CURSOR cics_data_value? | FORMFEED | ERASE | DEFAULT | ALTERNATE | ERASEAUP | PRINT | FREEKB | ALARM | FRSET | (MSR | LENGTH) cics_data_value
+                | (MAP | OUTPARTN | ACTPARTN | LDC | REQID | MAPSET | FMHPARM) cics_name | ACCUM | TERMINAL | SET cics_ref | PAGING | WAIT | LAST | HONEOM | L40 | L64 | L80
+                | FROM cics_data_area | NLEOM | NOFLUSH | DATAONLY | MAPONLY | cics_handle_response)*;
 
-cics_send_from: FROM cics_data_area (LENGTH cics_data_value | FLENGTH cics_data_value) cics_handle_response?;
-cics_send_erase: ERASE (DEFAULT | ALTERNATE)?;
-cics_send_cursor: CURSOR cics_data_value?;
-cics_send_terminal: (TERMINAL | WAIT | LAST)+;
-cics_send_autopage: AUTOPAGE (CURRENT | ALL)?;
+cics_send_mappingdev : ((MAP | MAPSET) cics_name | (MAPPINGDEV | LENGTH | FROM) cics_data_area | SET cics_ref | DATAONLY | MAPONLY | CURSOR cics_data_value?
+                | FORMFEED | ERASE | ERASEAUP| PRINT | FREEKB | ALARM | FRSET | cics_handle_response)*;
+
+cics_send_page : (PAGE | RELEASE | RETAIN | TRANSID cics_name | TRAILER cics_data_area | SET cics_ref | AUTOPAGE | CURRENT | ALL | NOAUTOPAGE | OPERPURGE | FMHPARM cics_name | LAST | cics_handle_response)*;
+
+cics_send_partnset : (PARTNSET cics_name? | cics_handle_response)*;
+
+cics_send_text : (TEXT | (FROM | LENGTH | CURSOR | HEADER | TRAILER) cics_data_area | FORMFEED | ERASE | DEFAULT | ALTERNATE | PRINT | FREEKB | ALARM | NLEOM
+                | (FMHPARM | OUTPARTN | ACTPARTN | LDC | REQID) cics_name | (MSR | JUSTIFY) cics_data_value | TERMINAL | SET cics_ref | PAGING | WAIT | LAST
+                | JUSFIRST | JUSLAST | ACCUM | HONEOM | L40 | L64 | L80 | cics_handle_response)*;
+
+cics_send_text_mapped: (TEXT | MAPPED | (FROM | LENGTH) cics_data_area | PAGING | TERMINAL | WAIT | LAST | REQID cics_name | cics_handle_response)*;
+
+cics_send_text_noedit: (TEXT | NOEDIT | (FROM | LENGTH) cics_data_area | ERASE | DEFAULT | ALTERNATE | PRINT | FREEKB | ALARM | (OUTPARTN | REQID) cics_name | PAGING
+                | TERMINAL | WAIT | LAST | HONEOM | L40 | L64 | L80 | cics_handle_response)*;
 
 /** CONVERSE: */
 cics_converse: CONVERSE (cics_converse_group_one | cics_converse_group_two);
@@ -611,9 +582,9 @@ cics_read: READ (cics_file_name | UNCOMMITTED | CONSISTENT | REPEATABLE | UPDATE
            XRBA | EQUAL | GTEQ | NOSUSPEND | cics_handle_response)+;
 
 /** READNEXT | READPREV*/
-cics_readnext: (READNEXT | READPREV | cics_file_name | cics_into | UNCOMMITTED | CONSISTENT | REPETABLE |
-               UPDATE TOKEN cics_data_area | RIDFLD cics_data_area | KEYLENGTH cics_data_value | REQID cics_data_value |
-               SYSID cics_data_area | LENGTH cics_data_area | LENGTH cics_data_area | RBA | RRN | XRBA | NOSUSPEND | cics_handle_response)+;
+cics_readnext_readprev: (READNEXT | READPREV)  (cics_file_name | INTO cics_data_area | SET cics_ref | UNCOMMITTED | CONSISTENT | REPEATABLE |
+               UPDATE | TOKEN cics_data_area | RIDFLD cics_data_area | KEYLENGTH cics_data_value | REQID cics_data_value |
+               SYSID cics_data_area | LENGTH cics_data_area | RBA | RRN | XRBA | NOSUSPEND | cics_handle_response)*;
 
 /** READQ TD / TS */
 cics_readq: READQ (cics_readq_td | cics_readq_ts);
