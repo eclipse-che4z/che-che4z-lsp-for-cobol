@@ -36,7 +36,7 @@ import { initSmartTab, RangeTabShiftStore } from "./commands/SmartTabCommand";
 import { DialectRegistry } from "./services/DialectRegistry";
 import { LanguageClientService } from "./services/LanguageClientService";
 import { TelemetryService } from "./services/reporter/TelemetryService";
-import { configHandler, SettingsService } from "./services/Settings";
+import { lspConfigHandler, SettingsService } from "./services/Settings";
 import {
   pickSnippet,
   SnippetCompletionProvider,
@@ -164,7 +164,7 @@ export async function activate(
   );
   languageClientService.addRequestHandler(
     "workspace/configuration",
-    configHandler,
+    lspConfigHandler,
   );
 
   await languageClientService.start();

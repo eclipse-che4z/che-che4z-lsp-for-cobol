@@ -46,8 +46,18 @@ jest.mock("vscode", () => ({
       };
     }),
     joinPath: jest.fn().mockImplementation((u, segment: string) => {
-      expect(segment).toBe("..");
       const result = { ...u };
+      if (segment === "../.bridge.json") {
+        result.path =
+          result.path.substring(0, result.path.lastIndexOf("/")) +
+          "/.bridge.json";
+        result.fsPath = result.fsPath.substring(
+          0,
+          result.path.lastIndexOf("/") + "/.bridge.json",
+        );
+        return result;
+      }
+      expect(segment).toBe("..");
 
       result.path = result.path.substring(0, result.path.lastIndexOf("/"));
       result.fsPath = result.fsPath.substring(0, result.path.lastIndexOf("/"));
@@ -71,7 +81,13 @@ jest.mock("vscode", () => ({
       appendLine: jest.fn(),
     }),
   },
-  workspace: {},
+  workspace: {
+    fs: {
+      readFile: jest.fn().mockImplementation(() => {
+        throw { code: "FileNotFound" };
+      }),
+    },
+  },
 }));
 
 SettingsUtils.getWorkspaceFoldersPath = jest.fn().mockReturnValue([__dirname]);
@@ -279,7 +295,9 @@ describe("Prioritize search criteria for copybooks test suite", () => {
     vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
       get: jest.fn().mockReturnValue([CPY_FOLDER_NAME]),
     });
-    SettingsService.getCopybookExtension = jest.fn().mockReturnValue([""]);
+    SettingsService.getCopybookExtension = jest
+      .fn()
+      .mockReturnValue(Promise.resolve([""]));
     (globSync as any) = jest.fn().mockReturnValue([copybookName]);
     const downloader = new CopybookDownloadService("/storagePath");
     const uri: string | undefined = await downloader.resolveCopybookHandler(

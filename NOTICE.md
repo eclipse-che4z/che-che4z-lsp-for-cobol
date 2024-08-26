@@ -463,3 +463,6 @@ yamljs (0.3.0)
  * License: MIT
 
 
+io-ts (2.2.21)
+
+ * License: MIT

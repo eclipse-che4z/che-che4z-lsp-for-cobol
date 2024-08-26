@@ -15,6 +15,7 @@ jest.mock("glob");
 import { globSync } from "glob";
 import { loadProcessorGroupCopybookPathsConfig } from "../../services/ProcessorGroups";
 jest.mock("fs", () => ({
+  ...jest.requireActual("fs"),
   existsSync: jest.fn().mockReturnValue(true),
   readFileSync: jest.fn().mockImplementation((f) => {
     if (f === "procCfgPath") {
@@ -71,6 +72,13 @@ jest.mock("vscode", () => ({
       };
     }),
     joinPath: (u: any, segment: string) => {
+      if (segment === "../.bridge.json") {
+        return {
+          path: u.path.substring(0, u.path.lastIndexOf("/") + "/.bridge.json"),
+          fsPath:
+            u.fsPath.substring(0, u.fsPath.lastIndexOf("/")) + "/.bridge.json",
+        };
+      }
       expect(segment).toBe("..");
       const path = u.path;
       return {
@@ -87,6 +95,11 @@ jest.mock("vscode", () => ({
     }),
   },
   workspace: {
+    fs: {
+      readFile: jest.fn().mockImplementation(() => {
+        throw { code: "FileNotFound" };
+      }),
+    },
     getWorkspaceFolder: jest
       .fn()
       .mockReturnValue({ uri: { fsPath: "C:\\my\\workspace" } }),
@@ -95,6 +108,7 @@ jest.mock("vscode", () => ({
 }));
 
 jest.mock("path", () => ({
+  ...jest.requireActual("path"),
   join: jest.fn().mockImplementation((...strs: string[]) => {
     if (strs[1] === "pgm_conf.json") {
       return "pgmCfgPath";
@@ -113,7 +127,7 @@ jest.mock("path", () => ({
   sep: "\\",
 }));
 
-it("Processor groups configuration provides lib path in Windows", () => {
+it("Processor groups configuration provides lib path in Windows", async () => {
   const item = {
     scopeUri: "file:///c%3A/my/workspace" + "/TEST.cob",
     section: "cobol-lsp.cpy-manager.paths-local",
@@ -125,6 +139,6 @@ it("Processor groups configuration provides lib path in Windows", () => {
       throw Error("some issue with input param");
     }
   });
-  const result = loadProcessorGroupCopybookPathsConfig(item, []);
+  const result = await loadProcessorGroupCopybookPathsConfig(item, []);
   expect(result).toStrictEqual(["/copy-resolved-from-glob"]);
 });

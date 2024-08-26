@@ -37,7 +37,7 @@ jest.mock("../services/Settings", () => ({
       .fn()
       .mockReturnValueOnce(undefined)
       .mockReturnValue("JAVA"),
-    getSnippetsForCobol: jest.fn().mockReturnValue([]),
+    getSnippetsForCobol: jest.fn().mockReturnValue(Promise.resolve([])),
     getDialects: jest.fn().mockReturnValue([]),
   },
 }));
