@@ -230,7 +230,7 @@ class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
   public List<Node> visitCics_receive_group_one(CICSParser.Cics_receive_group_oneContext ctx) {
     checkHasMandatoryOptions(ctx.cics_length_flength(), ctx, "LENGTH or FLENGTH");
     if (!ctx.ASIS().isEmpty() || !ctx.BUFFER().isEmpty()) {
-      checkHasIllegalOptions(ctx.LEAVEKB(), ctx, "LEAVEK8");
+      checkHasIllegalOptions(ctx.LEAVEKB(), ctx, "LEAVEKB");
     }
     return visitChildren(ctx);
   }
