@@ -49,14 +49,7 @@ public class TestCicsReceive {
           + "            END-EXEC.";
 
   private static final String[] GROUP_ONE_ALL_OPTIONS_VALID_ONE = {
-    "RECEIVE",
-    "INTO({$abc})",
-    "LENGTH({$def})",
-    "MAXLENGTH({$ghi})",
-    "ASIS",
-    "BUFFER",
-    "NOTRUNCATE",
-    "LEAVEKB"
+    "RECEIVE", "INTO({$abc})", "LENGTH({$def})", "MAXLENGTH({$ghi})", "NOTRUNCATE", "LEAVEKB"
   };
 
   private static final String[] GROUP_ONE_ALL_OPTIONS_VALID_TWO = {
@@ -66,30 +59,15 @@ public class TestCicsReceive {
     "MAXFLENGTH({$ghi})",
     "ASIS",
     "BUFFER",
-    "NOTRUNCATE",
-    "LEAVEKB"
+    "NOTRUNCATE"
   };
 
   private static final String[] GROUP_ONE_ALL_OPTIONS_VALID_THREE = {
-    "RECEIVE",
-    "SET({$abc})",
-    "LENGTH({$def})",
-    "MAXLENGTH({$ghi})",
-    "ASIS",
-    "BUFFER",
-    "NOTRUNCATE",
-    "LEAVEKB"
+    "RECEIVE", "SET({$abc})", "LENGTH({$def})", "MAXLENGTH({$ghi})", "ASIS", "BUFFER", "NOTRUNCATE"
   };
 
   private static final String[] GROUP_ONE_ALL_OPTIONS_VALID_FOUR = {
-    "RECEIVE",
-    "SET({$abc})",
-    "FLENGTH({$def})",
-    "MAXFLENGTH({$ghi})",
-    "ASIS",
-    "BUFFER",
-    "NOTRUNCATE",
-    "LEAVEKB"
+    "RECEIVE", "SET({$abc})", "FLENGTH({$def})", "MAXFLENGTH({$ghi})", "NOTRUNCATE", "LEAVEKB"
   };
 
   private static final String[] GROUP_ONE_PARTIAL_OPTIONS_VALID_ONE = {
@@ -157,7 +135,7 @@ public class TestCicsReceive {
   };
 
   private static final String[] GROUP_ONE_INVALID_ONE = {
-    "{RECEIVE|error1}", "INTO(100)", "MAXLENGTH(10)", "NOTRUNCATE"
+    "RECEIVE", "{INTO(100)", "MAXLENGTH(10)", "NOTRUNCATE|error1}"
   };
 
   private static final String[] GROUP_TWO_APPC_FULL_OPTIONS_VALID_ONE = {
@@ -202,12 +180,7 @@ public class TestCicsReceive {
   };
 
   private static final String[] GROUP_TWO_INVALID_ONE = {
-    "{RECEIVE|error1}",
-    "SESSION(failure)",
-    "LENGTH(10)",
-    "MAXLENGTH(1000)",
-    "NOTRUNCATE",
-    "STATE(incomplete)"
+    "RECEIVE", "{SESSION(100)", "LENGTH(10)", "MAXLENGTH(1000)", "NOTRUNCATE|error1}"
   };
 
   private static final String[] R2980_FULL_OPTIONS_VALID_ONE = {
@@ -219,7 +192,7 @@ public class TestCicsReceive {
   };
 
   private static final String[] R2980_INVALID_ONE = {
-    "{RECEIVE|error1}", "SESSION(failure)", "MAXLENGTH(1000)", "NOTRUNCATE", "STATE(incomplete)"
+    "RECEIVE", "{INTO(100)", "MAXLENGTH(1000)", "NOTRUNCATE|error1}"
   };
 
   private static final String[] NON_Z_FULL_OPTIONS_VALID_ONE = {
@@ -230,19 +203,13 @@ public class TestCicsReceive {
     "RECEIVE", "LENGTH({$def})", "FLENGTH({$ghi})", "NOTRUNCATE"
   };
 
-  private static final String[] NON_Z_INVALID_ONE = {
-    "RECEIVE", "INTO(100)", "LENGTH(1)", "{FLENGTH|error1}(100)", "MAXLENGTH(1000)",
-  };
-
   private static final String[] PARTN_FULL_OPTIONS_VALID_ONE = {
     "RECEIVE", "INTO({$abc})", "LENGTH({$def})", "ASIS"
   };
 
   private static final String[] PARTN_PARTIAL_OPTIONS_VALID_ONE = {"RECEIVE", "LENGTH({$def})"};
 
-  private static final String[] PARTN_INVALID_ONE = {
-    "{RECEIVE|error1}", "SET(100)", "{ASIS|error2}"
-  };
+  private static final String[] PARTN_INVALID_ONE = {"RECEIVE", "{SET(100)", "ASIS|error1}"};
 
   private static final String[] MAP_FULL_OPTIONS_VALID_ONE = {
     "RECEIVE",
@@ -254,9 +221,9 @@ public class TestCicsReceive {
     "INPARTN({$abc})"
   };
 
-  private static final String[] MAP_PARTIAL_OPTIONS_VALID_ONE = {"RECEIVE", "MAP({$abc})"};
+  private static final String[] MAP_PARTIAL_OPTIONS_VALID_ONE = {"RECEIVE", "MAP({$abc})", "ASIS"};
 
-  private static final String[] MAP_INVALID_ONE = {"{RECEIVE|error1}", "TERMINAL"};
+  private static final String[] MAP_INVALID_ONE = {"{RECEIVE|error1}", "MAP", "LENGTH(100)"};
 
   private static final String[] MAP_MAPPINGDEV_FULL_OPTIONS_VALID_ONE = {
     "RECEIVE",
@@ -273,7 +240,7 @@ public class TestCicsReceive {
   };
 
   private static final String[] MAP_MAPPINGDEV_INVALID_ONE = {
-    "RECEIVE", "MAP(1)", "FROM(1)", "{MAPSET|error1}(1)"
+    "RECEIVE", "{MAP(1)", "MAPPINGDEV(100)", "MAPSET(1)|error1}"
   };
 
   private static String getTestString(String[] components) {
@@ -431,8 +398,8 @@ public class TestCicsReceive {
             "error1",
             new Diagnostic(
                 new Range(),
-                "Extraneous input 'RECEIVE'",
-                DiagnosticSeverity.Error,
+                "Missing required option: LENGTH or FLENGTH",
+                DiagnosticSeverity.Warning,
                 ErrorSource.PARSING.getText())),
         ImmutableList.of());
   }
@@ -492,8 +459,8 @@ public class TestCicsReceive {
             "error1",
             new Diagnostic(
                 new Range(),
-                "Extraneous input 'RECEIVE'",
-                DiagnosticSeverity.Error,
+                "Missing required option: INTO or SET",
+                DiagnosticSeverity.Warning,
                 ErrorSource.PARSING.getText())),
         ImmutableList.of());
   }
@@ -519,8 +486,8 @@ public class TestCicsReceive {
             "error1",
             new Diagnostic(
                 new Range(),
-                "Extraneous input 'RECEIVE'",
-                DiagnosticSeverity.Error,
+                "Missing required option: LENGTH or FLENGTH",
+                DiagnosticSeverity.Warning,
                 ErrorSource.PARSING.getText())),
         ImmutableList.of());
   }
@@ -535,21 +502,6 @@ public class TestCicsReceive {
   void testNonZ0PartialOptionsValidOne() {
     UseCaseEngine.runTest(
         getTestString(NON_Z_PARTIAL_OPTIONS_VALID_ONE), ImmutableList.of(), ImmutableMap.of());
-  }
-
-  @Test
-  void testNonZInvalidOne() {
-    UseCaseEngine.runTest(
-        getTestString(NON_Z_INVALID_ONE),
-        ImmutableList.of(),
-        ImmutableMap.of(
-            "error1",
-            new Diagnostic(
-                new Range(),
-                "Extraneous input 'FLENGTH'",
-                DiagnosticSeverity.Error,
-                ErrorSource.PARSING.getText())),
-        ImmutableList.of());
   }
 
   @Test
@@ -573,14 +525,8 @@ public class TestCicsReceive {
             "error1",
             new Diagnostic(
                 new Range(),
-                "Extraneous input 'RECEIVE'",
-                DiagnosticSeverity.Error,
-                ErrorSource.PARSING.getText()),
-            "error2",
-            new Diagnostic(
-                new Range(),
-                "Extraneous input 'ASIS'",
-                DiagnosticSeverity.Error,
+                "Missing required option: LENGTH or FLENGTH",
+                DiagnosticSeverity.Warning,
                 ErrorSource.PARSING.getText())),
         ImmutableList.of());
   }
@@ -637,8 +583,8 @@ public class TestCicsReceive {
             "error1",
             new Diagnostic(
                 new Range(),
-                "Extraneous input 'MAPSET'",
-                DiagnosticSeverity.Error,
+                "Missing required option: FROM",
+                DiagnosticSeverity.Warning,
                 ErrorSource.PARSING.getText())),
         ImmutableList.of());
   }

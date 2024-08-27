@@ -83,29 +83,38 @@ class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
     areaBWarning(ctx);
     addReplacementContext(ctx);
 
-    boolean isReturn = (ctx.allCicsRule() != null && ctx.allCicsRule().size() > 0 && ctx.allCicsRule().get(0).cics_return() != null);
-    boolean isHandle = (ctx.allCicsRule() != null && ctx.allCicsRule().size() > 0 && ctx.allCicsRule().get(0).cics_handle() != null);
+    boolean isReturn =
+        (ctx.allCicsRule() != null
+            && ctx.allCicsRule().size() > 0
+            && ctx.allCicsRule().get(0).cics_return() != null);
+    boolean isHandle =
+        (ctx.allCicsRule() != null
+            && ctx.allCicsRule().size() > 0
+            && ctx.allCicsRule().get(0).cics_handle() != null);
 
     if (isReturn) {
       return addTreeNode(ctx, ExecCicsReturnNode::new);
     } else if (isHandle) {
-      boolean isProgram = Optional.ofNullable(ctx.allCicsRule().get(0).cics_handle())
-          .map(CICSParser.Cics_handleContext::cics_handle_abend)
-          .map(CICSParser.Cics_handle_abendContext::PROGRAM)
-          .filter(s -> s.size() > 0)
-          .isPresent();
+      boolean isProgram =
+          Optional.ofNullable(ctx.allCicsRule().get(0).cics_handle())
+              .map(CICSParser.Cics_handleContext::cics_handle_abend)
+              .map(CICSParser.Cics_handle_abendContext::PROGRAM)
+              .filter(s -> s.size() > 0)
+              .isPresent();
 
-      boolean isLabel = Optional.ofNullable(ctx.allCicsRule().get(0).cics_handle())
-          .map(CICSParser.Cics_handleContext::cics_handle_abend)
-          .map(CICSParser.Cics_handle_abendContext::LABEL)
-          .filter(s -> s.size() > 0)
-          .isPresent();
+      boolean isLabel =
+          Optional.ofNullable(ctx.allCicsRule().get(0).cics_handle())
+              .map(CICSParser.Cics_handleContext::cics_handle_abend)
+              .map(CICSParser.Cics_handle_abendContext::LABEL)
+              .filter(s -> s.size() > 0)
+              .isPresent();
 
-      boolean isReset = Optional.ofNullable(ctx.allCicsRule().get(0).cics_handle())
-          .map(CICSParser.Cics_handleContext::cics_handle_abend)
-          .map(CICSParser.Cics_handle_abendContext::RESET)
-          .filter(s -> s.size() > 0)
-          .isPresent();
+      boolean isReset =
+          Optional.ofNullable(ctx.allCicsRule().get(0).cics_handle())
+              .map(CICSParser.Cics_handleContext::cics_handle_abend)
+              .map(CICSParser.Cics_handle_abendContext::RESET)
+              .filter(s -> s.size() > 0)
+              .isPresent();
 
       ExecCicsHandleNode.HandleAbendType type;
       if (isProgram) {
@@ -137,7 +146,8 @@ class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
 
   @Override
   public List<Node> visitAllExciRules(CICSParser.AllExciRulesContext ctx) {
-    // TODO: uncomment and adjust below when we decide to support this feature based on compiler directive
+    // TODO: uncomment and adjust below when we decide to support this feature based on compiler
+    // directive
     //    boolean isExciModeEnabled = context
     //            .getConfig()
     //            .getCompilerOptions()
@@ -209,6 +219,106 @@ class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
     return Stream.concat(aggregate.stream(), nextResult.stream()).collect(toList());
   }
 
+  /**
+   * Inspects CICS Receive Group One Rule to make sure mandatory options exist since the Parser
+   * Rules only enforce if any combination of possible inputs exist.
+   *
+   * @param ctx the parse tree
+   * @return List of children nodes
+   */
+  @Override
+  public List<Node> visitCics_receive_group_one(CICSParser.Cics_receive_group_oneContext ctx) {
+    checkHasMandatoryOptions(ctx.cics_length_flength(), ctx, "LENGTH or FLENGTH");
+    if (!ctx.ASIS().isEmpty() || !ctx.BUFFER().isEmpty()) {
+      checkHasIllegalOptions(ctx.LEAVEKB(), ctx, "LEAVEK8");
+    }
+    return visitChildren(ctx);
+  }
+
+  /**
+   * Inspects CICS Receive Group Two Rule to make sure mandatory options exist since the Parser
+   * Rules only enforce if any combination of possible inputs exist.
+   *
+   * @param ctx the parse tree
+   * @return List of children nodes
+   */
+  @Override
+  public List<Node> visitCics_receive_group_two(CICSParser.Cics_receive_group_twoContext ctx) {
+    checkHasMandatoryOptions(ctx.cics_length_flength(), ctx, "LENGTH or FLENGTH");
+    checkHasMandatoryOptions(ctx.cics_into_set(), ctx, "INTO or SET");
+    return visitChildren(ctx);
+  }
+
+  /**
+   * Inspects CICS Receive 2980 Rule to make sure mandatory options exist since the Parser Rules
+   * only enforce if any combination of possible inputs exist.
+   *
+   * @param ctx the parse tree
+   * @return List of children nodes
+   */
+  @Override
+  public List<Node> visitCics_receive_2980(CICSParser.Cics_receive_2980Context ctx) {
+    checkHasMandatoryOptions(ctx.cics_length_flength(), ctx, "LENGTH or FLENGTH");
+    return visitChildren(ctx);
+  }
+
+  /**
+   * Inspects CICS Receive Non Z Default Rule to make sure mandatory options exist since the Parser
+   * Rules only enforce if any combination of possible inputs exist.
+   *
+   * @param ctx the parse tree
+   * @return List of children nodes
+   */
+  @Override
+  public List<Node> visitCics_receive_non_z_default(
+      CICSParser.Cics_receive_non_z_defaultContext ctx) {
+    checkHasMandatoryOptions(ctx.LENGTH(), ctx, "LENGTH");
+    checkHasMandatoryOptions(ctx.FLENGTH(), ctx, "FLENGTH");
+    return visitChildren(ctx);
+  }
+
+  /**
+   * Inspects CICS Receive Partn Rule to make sure mandatory options exist since the Parser Rules
+   * only enforce if any combination of possible inputs exist.
+   *
+   * @param ctx the parse tree
+   * @return List of children nodes
+   */
+  @Override
+  public List<Node> visitCics_receive_partn(CICSParser.Cics_receive_partnContext ctx) {
+    checkHasMandatoryOptions(ctx.cics_into_set(), ctx, "INTO or SET");
+    checkHasMandatoryOptions(ctx.LENGTH(), ctx, "LENGTH");
+    return visitChildren(ctx);
+  }
+
+  /**
+   * Inspects CICS Receive Map Rule to make sure mandatory options exist since the Parser Rules only
+   * enforce if any combination of possible inputs exist.
+   *
+   * @param ctx the parse tree
+   * @return List of children nodes
+   */
+  @Override
+  public List<Node> visitCics_receive_map(CICSParser.Cics_receive_mapContext ctx) {
+    if (ctx.FROM().isEmpty()) checkHasIllegalOptions(ctx.LENGTH(), ctx, "LENGTH");
+    if (ctx.TERMINAL().isEmpty()) checkHasIllegalOptions(ctx.INPARTN(), ctx, "INPARTN");
+    return visitChildren(ctx);
+  }
+
+  /**
+   * Inspects CICS Receive Map Mapping Dev Rule to make sure mandatory options exist since the
+   * Parser Rules only enforce if any combination of possible inputs exist.
+   *
+   * @param ctx the parse tree
+   * @return List of children nodes
+   */
+  @Override
+  public List<Node> visitCics_receive_map_mappingdev(
+      CICSParser.Cics_receive_map_mappingdevContext ctx) {
+    checkHasMandatoryOptions(ctx.FROM(), ctx, "FROM");
+    return visitChildren(ctx);
+  }
+
   @Override
   public List<Node> visitCics_return(CICSParser.Cics_returnContext ctx) {
     return addTreeNode(ctx, StopNode::new);
@@ -218,6 +328,36 @@ class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
     Node node = nodeConstructor.apply(VisitorUtility.constructLocality(ctx, context));
     visitChildren(ctx).forEach(node::addChild);
     return ImmutableList.of(node);
+  }
+
+  /**
+   * Helper method to collect analysis errors if the rule context does not contain mandatory options
+   *
+   * @param rules Generic list of rules to check. Will either be a collection of ParserRuleContext
+   *     or TerminalNode
+   * @param ctx Context to extrapolate locality against
+   * @param options Options checked to insert into error message
+   */
+  private void checkHasMandatoryOptions(List<?> rules, ParserRuleContext ctx, String options) {
+    if (rules.isEmpty()) {
+      throwException(
+          options, VisitorUtility.constructLocality(ctx, context), "Missing required option: ");
+    }
+  }
+
+  /**
+   * Helper method to collect analysis errors if the rule context contains illegal options
+   *
+   * @param rules Generic list of rules to check. Will either be a collection of ParserRuleContext
+   *     or TerminalNode
+   * @param ctx Context to extrapolate locality against
+   * @param options Options checked to insert into error message
+   */
+  private void checkHasIllegalOptions(List<?> rules, ParserRuleContext ctx, String options) {
+    if (!rules.isEmpty()) {
+      throwException(
+          options, VisitorUtility.constructLocality(ctx, context), "Invalid option provided: ");
+    }
   }
 
   private String getName(ParserRuleContext context) {
