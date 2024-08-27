@@ -23,6 +23,22 @@ cicsExecBlock: EXEC CICS allCicsRule END_EXEC
              | {notifyError("cicsParser.missingEndExec");} EXEC CICS
              ;
 
+/*
+
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. ABCDEF.
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       PROCEDURE DIVISION.
+            EXEC CICS RECEIVE
+                INTO(100)
+                MAXLENGTH(1000)
+                LENGTH(10)
+                MAXLENGTH(1000)
+                NOTRUNCATE
+            END-EXEC.
+*/
+
 allCicsRule: cics_send | cics_receive | cics_add | cics_address | cics_allocate | cics_asktime | cics_assign | cics_bif |
                        cics_build | cics_cancel | cics_change | cics_change_task | cics_check | cics_connect | cics_converttime |
                        cics_define | cics_delay | cics_delete | cics_deleteq | cics_deq | cics_document | cics_dump | cics_endbr |
@@ -125,25 +141,32 @@ cicsTranslatorCompileDirectivedKeywords
 //new_cics_receive_3600_and_beyond:   RECEIVE new_cics_into_set? new_cics_length_flength cics_maxlength? NOTRUNCATE? cics_handle_response?;
 //new_cics_receive_2260:              RECEIVE new_cics_into_set? new_cics_length_flength cics_maxlength? NOTRUNCATE? LEAVEKB? cics_handle_response?;
 // cics_group_one summary
-new_cics_receive_group_one: new_cics_into_set? new_cics_length_flength cics_maxlength? ASIS? BUFFER? NOTRUNCATE? LEAVEKB?;
+new_cics_receive_group_one:          new_cics_into_set? new_cics_length_flength cics_maxlength? ASIS? BUFFER? NOTRUNCATE? LEAVEKB?;
 
 // Cics Group 2
 //new_cics_receive_appc:              RECEIVE (CONVID cics_name)? new_cics_into_set  new_cics_length_flength new_cics_max_length_flength? NOTRUNCATE? (STATE cics_cvda)? cics_handle_response?;
 //new_cics_receive_lut6:              RECEIVE (SESSION cics_name)? new_cics_into_set new_cics_length_flength new_cics_max_length_flength? NOTRUNCATE? cics_handle_response?;
 //new_cics_receive_mro:               RECEIVE (SESSION cics_name)? new_cics_into_set new_cics_length_flength new_cics_max_length_flength? NOTRUNCATE? (STATE cics_cvda)? cics_handle_response?;
 // cics_group_two summary
-new_cics_receive_group_two: ((CONVID cics_name)? | (SESSION cics_name)?) new_cics_into_set new_cics_length_flength cics_maxlength? NOTRUNCATE? (STATE cics_cvda)?;
+new_cics_receive_group_two:          ((CONVID cics_name)? | (SESSION cics_name)?) new_cics_into_set new_cics_length_flength cics_maxlength? NOTRUNCATE? (STATE cics_cvda)?;
 
 // Independents
 new_cics_receive_2980:              new_cics_into_set? new_cics_length_flength cics_maxlength? NOTRUNCATE? PASSBK;
 new_cics_receive_non_z_default:     new_cics_into_set? LENGTH cics_data_area FLENGTH cics_data_area (MAXLENGTH cics_data_value)? NOTRUNCATE?;
+new_cics_receive_partn:             new_cics_into_set LENGTH cics_data_area ASIS?;
+
+// RECEIVE MAPS
+new_cics_receive_map:               (MAPSET cics_name)? new_cics_into_set? (TERMINAL | (FROM cics_data_area (LENGTH cics_data_area)?)) (TERMINAL ASIS? (INPARTN cics_name)?)?;
+new_cics_receive_map_mappingdev:    MAPPINGDEV cics_data_area FROM cics_data_area (LENGTH cics_data_area)? (MAPSET cics_name)? new_cics_into_set?;
+new_cics_receive_maps:              MAP cics_name (new_cics_receive_map | new_cics_receive_map_mappingdev);
+
 
 // Receive all
-cics_receive: RECEIVE (new_cics_receive_group_one | new_cics_receive_group_two | new_cics_receive_2980 | new_cics_receive_non_z_default) cics_handle_response?;
+cics_receive:                       RECEIVE (new_cics_receive_group_one | new_cics_receive_group_two | new_cics_receive_2980 | new_cics_receive_non_z_default | new_cics_receive_partn | new_cics_receive_maps) cics_handle_response?;
 
 //Helpers
-new_cics_into_set: (INTO cics_data_area | SET cics_ref);
-new_cics_length_flength: (LENGTH cics_data_area | FLENGTH cics_data_area);
+new_cics_into_set:                  (INTO cics_data_area | SET cics_ref);
+new_cics_length_flength:            (LENGTH cics_data_area | FLENGTH cics_data_area);
 
 // Contensed receive
 
