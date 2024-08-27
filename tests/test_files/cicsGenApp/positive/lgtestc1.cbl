@@ -77,9 +77,8 @@
                      END-EXEC.
 
            EXEC CICS RECEIVE MAP('SSMAPC1')
-                     MAPSET('SSMAP') 
-                     INTO(SSMAPC1I) 
-                     TERMINAL ASIS END-EXEC.
+                     INTO(SSMAPC1I) ASIS
+                     MAPSET('SSMAP') END-EXEC.
 
 
            EVALUATE ENT1OPTO
@@ -171,10 +170,8 @@
                            MAPSET ('SSMAP')
                  END-EXEC
                  EXEC CICS RECEIVE MAP('SSMAPC1')
-                           MAPSET('SSMAP')
-                           INTO(SSMAPC1I) 
-                           TERMINAL ASIS
-                 END-EXEC
+                           INTO(SSMAPC1I) ASIS
+                           MAPSET('SSMAP') END-EXEC
 
                  Move '01UCUS'   To CA-REQUEST-ID
                  Move ENT1CNOI   To CA-CUSTOMER-NUM

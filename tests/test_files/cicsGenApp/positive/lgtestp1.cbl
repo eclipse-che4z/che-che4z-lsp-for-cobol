@@ -59,8 +59,8 @@
                      END-EXEC.
 
            EXEC CICS RECEIVE MAP('SSMAPP1')
-                     MAPSET('SSMAP')
-                     INTO(SSMAPP1I) END-EXEC.
+                     INTO(SSMAPP1I)
+                     MAPSET('SSMAP') END-EXEC.
 
 
            EVALUATE ENP1OPTO
@@ -194,8 +194,8 @@
                            MAPSET ('SSMAP')
                  END-EXEC
                  EXEC CICS RECEIVE MAP('SSMAPP1')
-                           MAPSET('SSMAP')
-                           INTO(SSMAPP1I) END-EXEC
+                           INTO(SSMAPP1I)
+                           MAPSET('SSMAP') END-EXEC
 
                  Move '01UMOT'          To CA-REQUEST-ID
                  Move ENP1CNOI          To CA-CUSTOMER-NUM

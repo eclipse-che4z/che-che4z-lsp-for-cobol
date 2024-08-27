@@ -64,8 +64,8 @@
                      END-EXEC.
 
            EXEC CICS RECEIVE MAP('SSMAPP4')
-                     MAPSET('SSMAP') 
-                     INTO(SSMAPP4I) END-EXEC.
+                     INTO(SSMAPP4I)
+                     MAPSET('SSMAP') END-EXEC.
 
 
            EVALUATE ENP4OPTO
