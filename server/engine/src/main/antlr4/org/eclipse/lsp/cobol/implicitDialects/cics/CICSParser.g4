@@ -110,7 +110,7 @@ cics_receive_group_one:         (cics_into_set | cics_length_flength | cics_maxl
 cics_receive_group_two:         (CONVID cics_name | SESSION cics_name | cics_into_set | cics_length_flength | cics_maxlength | NOTRUNCATE | STATE cics_cvda)+;
 
 
-// NOTE: Since non z default and 2890 both allow length, flength, and maxlength. We are unable to farce the parser to parse either one of these routes.
+// NOTE: Since non z default and 2890 both allow length, flength, and maxlength. We are unable to force the parser to parse either one of these routes.
 // I.e. if length and flength exists, the parser will proabbly route through 2980 since we are not enforcing a singular OR of these inputs.
 cics_receive_2980:              (cics_into_set | cics_length_flength | cics_maxlength | NOTRUNCATE | PASSBK)+;
 cics_receive_non_z_default:     (cics_into_set | LENGTH cics_data_area | FLENGTH cics_data_area | MAXLENGTH cics_data_value | NOTRUNCATE)+;
