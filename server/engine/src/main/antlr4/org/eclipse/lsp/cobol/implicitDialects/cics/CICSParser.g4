@@ -135,10 +135,11 @@ new_cics_receive_group_one: new_cics_into_set? new_cics_length_flength cics_maxl
 new_cics_receive_group_two: ((CONVID cics_name)? | (SESSION cics_name)?) new_cics_into_set new_cics_length_flength cics_maxlength? NOTRUNCATE? (STATE cics_cvda)?;
 
 // Independents
-new_cics_receive_2980:              RECEIVE new_cics_into_set? new_cics_length_flength cics_maxlength? NOTRUNCATE? PASSBK cics_handle_response?;
-new_cics_receive_non_z_default:     RECEIVE new_cics_into_set? LENGTH cics_data_area FLENGTH cics_data_area (MAXLENGTH cics_data_value)? NOTRUNCATE? cics_handle_response?;
+new_cics_receive_2980:              new_cics_into_set? new_cics_length_flength cics_maxlength? NOTRUNCATE? PASSBK;
+new_cics_receive_non_z_default:     new_cics_into_set? LENGTH cics_data_area FLENGTH cics_data_area (MAXLENGTH cics_data_value)? NOTRUNCATE?;
 
-new_cics_recceive_all: RECEIVE (new_cics_receive_group_one | new_cics_receive_group_two | new_cics_receive_2980 | new_cics_receive_2980) cics_handle_response?;
+// Receive all
+cics_receive: RECEIVE (new_cics_receive_group_one | new_cics_receive_group_two | new_cics_receive_2980 | new_cics_receive_non_z_default) cics_handle_response?;
 
 //Helpers
 new_cics_into_set: (INTO cics_data_area | SET cics_ref);
@@ -148,18 +149,18 @@ new_cics_length_flength: (LENGTH cics_data_area | FLENGTH cics_data_area);
 
 /** RECEIVE: */
 //* OLD */
-cics_receive: RECEIVE (cics_receive_group | cics_receive_appc | cics_receive_lu61 | cics_partn | cics_rcv_map);
-cics_receive_group: (cics_into | cics_fLength | ASIS | BUFFER | NOTRUNCATE| cics_handle_response)+;
-cics_receive_appc: (CONVID cics_name | cics_into | cics_fLength | NOTRUNCATE | STATE cics_cvda | cics_handle_response)+;
-cics_receive_lu61: (SESSION cics_name | cics_into | cics_fLength | NOTRUNCATE | cics_handle_response)+;
-cics_fLength: ((LENGTH cics_data_area | FLENGTH cics_data_area) | cics_maxlength)+;
-
-cics_rcv_map: MAP (cics_receive_map | cics_receive_mappingdev);
-cics_receive_map: cics_name (MAPSET cics_name | cics_into | TERMINAL | ASIS | INPARTN cics_name |
-                  FROM cics_data_area | cics_fLength | cics_handle_response)+;
-cics_receive_mappingdev: cics_name (MAPPINGDEV cics_data_value | FROM cics_data_area | LENGTH cics_data_area |
-                         MAPSET cics_name | cics_into | cics_handle_response)+;
-cics_partn: PARTN cics_data_area (cics_into | cics_fLength | ASIS | cics_handle_response)+;
+//cics_receive: RECEIVE (cics_receive_group | cics_receive_appc | cics_receive_lu61 | cics_partn | cics_rcv_map);
+//cics_receive_group: (cics_into | cics_fLength | ASIS | BUFFER | NOTRUNCATE| cics_handle_response)+;
+//cics_receive_appc: (CONVID cics_name | cics_into | cics_fLength | NOTRUNCATE | STATE cics_cvda | cics_handle_response)+;
+//cics_receive_lu61: (SESSION cics_name | cics_into | cics_fLength | NOTRUNCATE | cics_handle_response)+;
+//cics_fLength: ((LENGTH cics_data_area | FLENGTH cics_data_area) | cics_maxlength)+;
+//
+//cics_rcv_map: MAP (cics_receive_map | cics_receive_mappingdev);
+//cics_receive_map: cics_name (MAPSET cics_name | cics_into | TERMINAL | ASIS | INPARTN cics_name |
+//                  FROM cics_data_area | cics_fLength | cics_handle_response)+;
+//cics_receive_mappingdev: cics_name (MAPPINGDEV cics_data_value | FROM cics_data_area | LENGTH cics_data_area |
+//                         MAPSET cics_name | cics_into | cics_handle_response)+;
+//cics_partn: PARTN cics_data_area (cics_into | cics_fLength | ASIS | cics_handle_response)+;
 
 /** SEND: */
 cics_send: SEND (cics_send_group | cics_send_mro | cics_send_appc | cics_send_control | cics_send_map | cics_send_page |
