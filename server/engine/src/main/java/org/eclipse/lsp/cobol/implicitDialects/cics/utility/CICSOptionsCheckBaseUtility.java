@@ -1,0 +1,114 @@
+/*
+ * Copyright (c) 2024 Broadcom.
+ * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
+ *
+ * This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License 2.0
+ * which is available at https://www.eclipse.org/legal/epl-2.0/
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ *
+ * Contributors:
+ *    Broadcom, Inc. - initial API and implementation
+ *
+ */
+
+package org.eclipse.lsp.cobol.implicitDialects.cics.utility;
+
+import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
+import org.antlr.v4.runtime.ParserRuleContext;
+import org.apache.commons.lang3.tuple.Pair;
+import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
+import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
+import org.eclipse.lsp.cobol.common.error.ErrorSource;
+import org.eclipse.lsp.cobol.common.error.SyntaxError;
+import org.eclipse.lsp.cobol.common.model.Locality;
+
+import java.util.List;
+
+/** Common facilities for checking CICS parser options */
+@Slf4j
+public abstract class CICSOptionsCheckBaseUtility {
+
+  private final DialectProcessingContext context;
+
+  private final List<SyntaxError> errors;
+
+  public CICSOptionsCheckBaseUtility(DialectProcessingContext context, List<SyntaxError> errors) {
+    this.context = context;
+    this.errors = errors;
+  }
+
+  /**
+   * General entrypoint to check CICS rule options
+   *
+   * @param ctx ParserRuleContext subclass containging options
+   * @param <E> A subclass of ParserRuleContext
+   */
+  public abstract <E extends ParserRuleContext> void checkOptions(E ctx);
+
+  /**
+   * Checks for duplicate option entries
+   *
+   * @param options Lists of Target rule List and String pairs to check for duplicates of where
+   *     String is the name of the option to check for and the rule list is the context to check for
+   *     duplicates
+   * @param ctx Context to extrapolate locality against
+   */
+  protected void checkDuplicates(List<Pair<List<?>, String>> options, ParserRuleContext ctx) {
+    for (Pair<List<?>, String> option : options) {
+      if (option.getLeft().size() >= 2) {
+        throwException(
+            option.getRight(),
+            VisitorUtility.constructLocality(ctx, context),
+            "Excessive options provided for: ");
+      }
+    }
+  }
+
+  /**
+   * Helper method to collect analysis errors if the rule context does not contain mandatory options
+   *
+   * @param rules Generic list of rules to check. Will either be a collection of ParserRuleContext
+   *     or TerminalNode
+   * @param ctx Context to extrapolate locality against
+   * @param options Options checked to insert into error message
+   */
+  protected void checkHasMandatoryOptions(List<?> rules, ParserRuleContext ctx, String options) {
+    if (rules.isEmpty()) {
+      throwException(
+          options, VisitorUtility.constructLocality(ctx, context), "Missing required option: ");
+    }
+  }
+
+  /**
+   * Helper method to collect analysis errors if the rule context contains illegal options
+   *
+   * @param rules Generic list of rules to check. Will either be a collection of ParserRuleContext
+   *     or TerminalNode
+   * @param ctx Context to extrapolate locality against
+   * @param options Options checked to insert into error message
+   */
+  protected void checkHasIllegalOptions(List<?> rules, ParserRuleContext ctx, String options) {
+    if (!rules.isEmpty()) {
+      throwException(
+          options, VisitorUtility.constructLocality(ctx, context), "Invalid option provided: ");
+    }
+  }
+
+  private void throwException(String wrongToken, @NonNull Locality locality, String message) {
+    SyntaxError error =
+        SyntaxError.syntaxError()
+            .errorSource(ErrorSource.PARSING)
+            .location(locality.toOriginalLocation())
+            .suggestion(message + wrongToken)
+            .severity(ErrorSeverity.WARNING)
+            .build();
+
+    LOG.debug("Syntax error by CobolVisitor#throwException: {}", error);
+    if (!errors.contains(error)) {
+      errors.add(error);
+    }
+  }
+}

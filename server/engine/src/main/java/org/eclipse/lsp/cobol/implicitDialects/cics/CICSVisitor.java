@@ -28,7 +28,7 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
-import lombok.AllArgsConstructor;
+
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -56,22 +56,28 @@ import org.eclipse.lsp.cobol.common.utils.ThreadInterruptionUtil;
 import org.eclipse.lsp.cobol.implicitDialects.cics.nodes.ExecCicsHandleNode;
 import org.eclipse.lsp.cobol.implicitDialects.cics.nodes.ExecCicsNode;
 import org.eclipse.lsp.cobol.implicitDialects.cics.nodes.ExecCicsReturnNode;
+import org.eclipse.lsp.cobol.implicitDialects.cics.utility.CICSOptionsCheckUtility;
 import org.eclipse.lsp.cobol.implicitDialects.cics.utility.VisitorUtility;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.Pair;
 
 /**
  * This visitor analyzes the parser tree for CICS and returns its semantic context as a syntax tree
  */
 @Slf4j
-@AllArgsConstructor
+// @AllArgsConstructor
 class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
 
   private final DialectProcessingContext context;
   private final MessageService messageService;
+  private final CICSOptionsCheckUtility cicsOptionsCheckUtility;
+
+  CICSVisitor(DialectProcessingContext context, MessageService messageService) {
+    this.context = context;
+    this.messageService = messageService;
+    this.cicsOptionsCheckUtility = new CICSOptionsCheckUtility(context, errors);
+  }
 
   @Getter private final List<SyntaxError> errors = new LinkedList<>();
 
@@ -231,20 +237,7 @@ class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
    */
   @Override
   public List<Node> visitCics_receive_group_one(CICSParser.Cics_receive_group_oneContext ctx) {
-    checkHasMandatoryOptions(ctx.cics_length_flength(), ctx, "LENGTH or FLENGTH");
-    if (!ctx.ASIS().isEmpty() || !ctx.BUFFER().isEmpty()) {
-      checkHasIllegalOptions(ctx.LEAVEKB(), ctx, "LEAVEKB");
-    }
-
-    List<Pair<List<?>, String>> contexts = new ArrayList<>();
-    contexts.add(new ImmutablePair<>(ctx.cics_into_set(), "INTO or SET"));
-    contexts.add(new ImmutablePair<>(ctx.cics_maxlength(), "MAXLENGTH or MAXFLENGTH"));
-    contexts.add(new ImmutablePair<>(ctx.ASIS(), "ASIS"));
-    contexts.add(new ImmutablePair<>(ctx.BUFFER(), "BUFFER"));
-    contexts.add(new ImmutablePair<>(ctx.NOTRUNCATE(), "NOTRUNCATE"));
-    contexts.add(new ImmutablePair<>(ctx.LEAVEKB(), "LEAVEKB"));
-    checkDuplicates(contexts, ctx);
-
+    cicsOptionsCheckUtility.checkOptions(ctx, ctx.parent.getRuleIndex());
     return visitChildren(ctx);
   }
 
@@ -258,19 +251,7 @@ class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
    */
   @Override
   public List<Node> visitCics_receive_group_two(CICSParser.Cics_receive_group_twoContext ctx) {
-    checkHasMandatoryOptions(ctx.cics_length_flength(), ctx, "LENGTH or FLENGTH");
-    checkHasMandatoryOptions(ctx.cics_into_set(), ctx, "INTO or SET");
-
-    List<Pair<List<?>, String>> contexts = new ArrayList<>();
-    contexts.add(new ImmutablePair<>(ctx.CONVID(), "CONVID"));
-    contexts.add(new ImmutablePair<>(ctx.SESSION(), "SESSION"));
-    contexts.add(new ImmutablePair<>(ctx.cics_into_set(), "INTO or SET"));
-    contexts.add(new ImmutablePair<>(ctx.cics_length_flength(), "LENGTH or FLENGTH"));
-    contexts.add(new ImmutablePair<>(ctx.cics_maxlength(), "MAXLENGTH or MAXFLENGTH"));
-    contexts.add(new ImmutablePair<>(ctx.NOTRUNCATE(), "NOTRUNCATE"));
-    contexts.add(new ImmutablePair<>(ctx.STATE(), "STATE"));
-    checkDuplicates(contexts, ctx);
-
+    cicsOptionsCheckUtility.checkOptions(ctx, ctx.parent.getRuleIndex());
     return visitChildren(ctx);
   }
 
@@ -284,16 +265,7 @@ class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
    */
   @Override
   public List<Node> visitCics_receive_group_three(CICSParser.Cics_receive_group_threeContext ctx) {
-    checkHasMandatoryOptions(ctx.cics_length_flength(), ctx, "LENGTH or FLENGTH");
-
-    List<Pair<List<?>, String>> contexts = new ArrayList<>();
-    contexts.add(new ImmutablePair<>(ctx.cics_into_set(), "INTO or SET"));
-    contexts.add(new ImmutablePair<>(ctx.cics_length_flength(), "LENGTH or FLENGTH"));
-    contexts.add(new ImmutablePair<>(ctx.cics_maxlength(), "MAXLENGTH or MAXFLENGTH"));
-    contexts.add(new ImmutablePair<>(ctx.NOTRUNCATE(), "NOTRUNCATE"));
-    contexts.add(new ImmutablePair<>(ctx.PASSBK(), "PASSBK"));
-    contexts.add(new ImmutablePair<>(ctx.ASIS(), "ASIS"));
-    checkDuplicates(contexts, ctx);
+    cicsOptionsCheckUtility.checkOptions(ctx, ctx.parent.getRuleIndex());
     return visitChildren(ctx);
   }
 
@@ -307,15 +279,7 @@ class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
    */
   @Override
   public List<Node> visitCics_receive_partn(CICSParser.Cics_receive_partnContext ctx) {
-    checkHasMandatoryOptions(ctx.cics_into_set(), ctx, "INTO or SET");
-    checkHasMandatoryOptions(ctx.LENGTH(), ctx, "LENGTH");
-
-    List<Pair<List<?>, String>> contexts = new ArrayList<>();
-    contexts.add(new ImmutablePair<>(ctx.cics_into_set(), "INTO or SET"));
-    contexts.add(new ImmutablePair<>(ctx.LENGTH(), "LENGTH"));
-    contexts.add(new ImmutablePair<>(ctx.ASIS(), "ASIS"));
-    checkDuplicates(contexts, ctx);
-
+    cicsOptionsCheckUtility.checkOptions(ctx, ctx.parent.getRuleIndex());
     return visitChildren(ctx);
   }
 
@@ -329,19 +293,7 @@ class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
    */
   @Override
   public List<Node> visitCics_receive_map(CICSParser.Cics_receive_mapContext ctx) {
-    if (ctx.FROM().isEmpty()) checkHasIllegalOptions(ctx.LENGTH(), ctx, "LENGTH");
-    if (ctx.TERMINAL().isEmpty()) checkHasIllegalOptions(ctx.INPARTN(), ctx, "INPARTN");
-
-    List<Pair<List<?>, String>> contexts = new ArrayList<>();
-    contexts.add(new ImmutablePair<>(ctx.MAPSET(), "MAPSET"));
-    contexts.add(new ImmutablePair<>(ctx.cics_into_set(), "INTO or SET"));
-    contexts.add(new ImmutablePair<>(ctx.FROM(), "FROM"));
-    contexts.add(new ImmutablePair<>(ctx.LENGTH(), "LENGTH"));
-    contexts.add(new ImmutablePair<>(ctx.TERMINAL(), "TERMINAL"));
-    contexts.add(new ImmutablePair<>(ctx.ASIS(), "ASIS"));
-    contexts.add(new ImmutablePair<>(ctx.INPARTN(), "INPARTN"));
-    checkDuplicates(contexts, ctx);
-
+    cicsOptionsCheckUtility.checkOptions(ctx, ctx.parent.getRuleIndex());
     return visitChildren(ctx);
   }
 
@@ -356,15 +308,7 @@ class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
   @Override
   public List<Node> visitCics_receive_map_mappingdev(
       CICSParser.Cics_receive_map_mappingdevContext ctx) {
-    checkHasMandatoryOptions(ctx.FROM(), ctx, "FROM");
-
-    List<Pair<List<?>, String>> contexts = new ArrayList<>();
-    contexts.add(new ImmutablePair<>(ctx.MAPPINGDEV(), "MAPPINGDEV"));
-    contexts.add(new ImmutablePair<>(ctx.FROM(), "FROM"));
-    contexts.add(new ImmutablePair<>(ctx.LENGTH(), "LENGTH"));
-    contexts.add(new ImmutablePair<>(ctx.MAPSET(), "MAPSET"));
-    contexts.add(new ImmutablePair<>(ctx.cics_into_set(), "INTO or SET"));
-    checkDuplicates(contexts, ctx);
+    cicsOptionsCheckUtility.checkOptions(ctx, ctx.parent.getRuleIndex());
 
     return visitChildren(ctx);
   }
@@ -378,55 +322,6 @@ class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
     Node node = nodeConstructor.apply(VisitorUtility.constructLocality(ctx, context));
     visitChildren(ctx).forEach(node::addChild);
     return ImmutableList.of(node);
-  }
-
-  /**
-   * Helper method to collect analysis errors if the rule context does not contain mandatory options
-   *
-   * @param rules Generic list of rules to check. Will either be a collection of ParserRuleContext
-   *     or TerminalNode
-   * @param ctx Context to extrapolate locality against
-   * @param options Options checked to insert into error message
-   */
-  private void checkHasMandatoryOptions(List<?> rules, ParserRuleContext ctx, String options) {
-    if (rules.isEmpty()) {
-      throwException(
-          options, VisitorUtility.constructLocality(ctx, context), "Missing required option: ");
-    }
-  }
-
-  /**
-   * Helper method to collect analysis errors if the rule context contains illegal options
-   *
-   * @param rules Generic list of rules to check. Will either be a collection of ParserRuleContext
-   *     or TerminalNode
-   * @param ctx Context to extrapolate locality against
-   * @param options Options checked to insert into error message
-   */
-  private void checkHasIllegalOptions(List<?> rules, ParserRuleContext ctx, String options) {
-    if (!rules.isEmpty()) {
-      throwException(
-          options, VisitorUtility.constructLocality(ctx, context), "Invalid option provided: ");
-    }
-  }
-
-  /**
-   * Checks for duplicate option entries
-   *
-   * @param options Lists of Target rule List and String pairs to check for duplicates of where
-   *     String is the name of the option to check for and the rule list is the context to check for
-   *     duplicates
-   * @param ctx Context to extrapolate locality against
-   */
-  private void checkDuplicates(List<Pair<List<?>, String>> options, ParserRuleContext ctx) {
-    for (Pair<List<?>, String> option : options) {
-      if (option.getLeft().size() >= 2) {
-        throwException(
-            option.getRight(),
-            VisitorUtility.constructLocality(ctx, context),
-            "Excessive options provided for: ");
-      }
-    }
   }
 
   private String getName(ParserRuleContext context) {
