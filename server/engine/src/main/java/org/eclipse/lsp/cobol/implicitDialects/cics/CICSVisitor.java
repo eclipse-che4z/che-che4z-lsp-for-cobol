@@ -60,6 +60,8 @@ import org.eclipse.lsp.cobol.implicitDialects.cics.utility.VisitorUtility;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 
 /**
  * This visitor analyzes the parser tree for CICS and returns its semantic context as a syntax tree
@@ -221,7 +223,8 @@ class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
 
   /**
    * Inspects CICS Receive Group One Rule to make sure mandatory options exist since the Parser
-   * Rules only enforce if any combination of possible inputs exist.
+   * Rules only enforce if any combination of possible inputs exist. Also checks for Invalid options
+   * given the other provided optionals and checks for duplicates.
    *
    * @param ctx the parse tree
    * @return List of children nodes
@@ -232,12 +235,23 @@ class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
     if (!ctx.ASIS().isEmpty() || !ctx.BUFFER().isEmpty()) {
       checkHasIllegalOptions(ctx.LEAVEKB(), ctx, "LEAVEKB");
     }
+
+    List<Pair<List<?>, String>> contexts = new ArrayList<>();
+    contexts.add(new ImmutablePair<>(ctx.cics_into_set(), "INTO or SET"));
+    contexts.add(new ImmutablePair<>(ctx.cics_maxlength(), "MAXLENGTH or MAXFLENGTH"));
+    contexts.add(new ImmutablePair<>(ctx.ASIS(), "ASIS"));
+    contexts.add(new ImmutablePair<>(ctx.BUFFER(), "BUFFER"));
+    contexts.add(new ImmutablePair<>(ctx.NOTRUNCATE(), "NOTRUNCATE"));
+    contexts.add(new ImmutablePair<>(ctx.LEAVEKB(), "LEAVEKB"));
+    checkDuplicates(contexts, ctx);
+
     return visitChildren(ctx);
   }
 
   /**
-   * Inspects CICS Receive Group Two Rule to make sure mandatory options exist since the Parser
-   * Rules only enforce if any combination of possible inputs exist.
+   * Inspects CICS Receive Group Two Rule to make sure mandatory options exist since the Parser *
+   * Rules only enforce if any combination of possible inputs exist. Also checks for Invalid options
+   * given the other provided optionals and checks for duplicates.
    *
    * @param ctx the parse tree
    * @return List of children nodes
@@ -246,12 +260,24 @@ class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
   public List<Node> visitCics_receive_group_two(CICSParser.Cics_receive_group_twoContext ctx) {
     checkHasMandatoryOptions(ctx.cics_length_flength(), ctx, "LENGTH or FLENGTH");
     checkHasMandatoryOptions(ctx.cics_into_set(), ctx, "INTO or SET");
+
+    List<Pair<List<?>, String>> contexts = new ArrayList<>();
+    contexts.add(new ImmutablePair<>(ctx.CONVID(), "CONVID"));
+    contexts.add(new ImmutablePair<>(ctx.SESSION(), "SESSION"));
+    contexts.add(new ImmutablePair<>(ctx.cics_into_set(), "INTO or SET"));
+    contexts.add(new ImmutablePair<>(ctx.cics_length_flength(), "LENGTH or FLENGTH"));
+    contexts.add(new ImmutablePair<>(ctx.cics_maxlength(), "MAXLENGTH or MAXFLENGTH"));
+    contexts.add(new ImmutablePair<>(ctx.NOTRUNCATE(), "NOTRUNCATE"));
+    contexts.add(new ImmutablePair<>(ctx.STATE(), "STATE"));
+    checkDuplicates(contexts, ctx);
+
     return visitChildren(ctx);
   }
 
   /**
    * Inspects CICS Receive Group Three Rule to make sure mandatory options exist since the Parser
-   * Rules only enforce if any combination of possible inputs exist.
+   * Rules only enforce if any combination of possible inputs exist. Also checks for Invalid options
+   * given the other provided optionals and checks for duplicates.
    *
    * @param ctx the parse tree
    * @return List of children nodes
@@ -259,12 +285,22 @@ class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
   @Override
   public List<Node> visitCics_receive_group_three(CICSParser.Cics_receive_group_threeContext ctx) {
     checkHasMandatoryOptions(ctx.cics_length_flength(), ctx, "LENGTH or FLENGTH");
+
+    List<Pair<List<?>, String>> contexts = new ArrayList<>();
+    contexts.add(new ImmutablePair<>(ctx.cics_into_set(), "INTO or SET"));
+    contexts.add(new ImmutablePair<>(ctx.cics_length_flength(), "LENGTH or FLENGTH"));
+    contexts.add(new ImmutablePair<>(ctx.cics_maxlength(), "MAXLENGTH or MAXFLENGTH"));
+    contexts.add(new ImmutablePair<>(ctx.NOTRUNCATE(), "NOTRUNCATE"));
+    contexts.add(new ImmutablePair<>(ctx.PASSBK(), "PASSBK"));
+    contexts.add(new ImmutablePair<>(ctx.ASIS(), "ASIS"));
+    checkDuplicates(contexts, ctx);
     return visitChildren(ctx);
   }
 
   /**
    * Inspects CICS Receive Partn Rule to make sure mandatory options exist since the Parser Rules
-   * only enforce if any combination of possible inputs exist.
+   * only enforce if any combination of possible inputs exist. Also checks for Invalid options given
+   * the other provided optionals and checks for duplicates.
    *
    * @param ctx the parse tree
    * @return List of children nodes
@@ -273,12 +309,20 @@ class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
   public List<Node> visitCics_receive_partn(CICSParser.Cics_receive_partnContext ctx) {
     checkHasMandatoryOptions(ctx.cics_into_set(), ctx, "INTO or SET");
     checkHasMandatoryOptions(ctx.LENGTH(), ctx, "LENGTH");
+
+    List<Pair<List<?>, String>> contexts = new ArrayList<>();
+    contexts.add(new ImmutablePair<>(ctx.cics_into_set(), "INTO or SET"));
+    contexts.add(new ImmutablePair<>(ctx.LENGTH(), "LENGTH"));
+    contexts.add(new ImmutablePair<>(ctx.ASIS(), "ASIS"));
+    checkDuplicates(contexts, ctx);
+
     return visitChildren(ctx);
   }
 
   /**
    * Inspects CICS Receive Map Rule to make sure mandatory options exist since the Parser Rules only
-   * enforce if any combination of possible inputs exist.
+   * enforce if any combination of possible inputs exist. Also checks for Invalid options given the
+   * other provided optionals and checks for duplicates.
    *
    * @param ctx the parse tree
    * @return List of children nodes
@@ -287,12 +331,24 @@ class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
   public List<Node> visitCics_receive_map(CICSParser.Cics_receive_mapContext ctx) {
     if (ctx.FROM().isEmpty()) checkHasIllegalOptions(ctx.LENGTH(), ctx, "LENGTH");
     if (ctx.TERMINAL().isEmpty()) checkHasIllegalOptions(ctx.INPARTN(), ctx, "INPARTN");
+
+    List<Pair<List<?>, String>> contexts = new ArrayList<>();
+    contexts.add(new ImmutablePair<>(ctx.MAPSET(), "MAPSET"));
+    contexts.add(new ImmutablePair<>(ctx.cics_into_set(), "INTO or SET"));
+    contexts.add(new ImmutablePair<>(ctx.FROM(), "FROM"));
+    contexts.add(new ImmutablePair<>(ctx.LENGTH(), "LENGTH"));
+    contexts.add(new ImmutablePair<>(ctx.TERMINAL(), "TERMINAL"));
+    contexts.add(new ImmutablePair<>(ctx.ASIS(), "ASIS"));
+    contexts.add(new ImmutablePair<>(ctx.INPARTN(), "INPARTN"));
+    checkDuplicates(contexts, ctx);
+
     return visitChildren(ctx);
   }
 
   /**
    * Inspects CICS Receive Map Mapping Dev Rule to make sure mandatory options exist since the
-   * Parser Rules only enforce if any combination of possible inputs exist.
+   * Parser Rules only enforce if any combination of possible inputs exist. Also checks for Invalid
+   * options given the other provided optionals and checks for duplicates.
    *
    * @param ctx the parse tree
    * @return List of children nodes
@@ -301,6 +357,15 @@ class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
   public List<Node> visitCics_receive_map_mappingdev(
       CICSParser.Cics_receive_map_mappingdevContext ctx) {
     checkHasMandatoryOptions(ctx.FROM(), ctx, "FROM");
+
+    List<Pair<List<?>, String>> contexts = new ArrayList<>();
+    contexts.add(new ImmutablePair<>(ctx.MAPPINGDEV(), "MAPPINGDEV"));
+    contexts.add(new ImmutablePair<>(ctx.FROM(), "FROM"));
+    contexts.add(new ImmutablePair<>(ctx.LENGTH(), "LENGTH"));
+    contexts.add(new ImmutablePair<>(ctx.MAPSET(), "MAPSET"));
+    contexts.add(new ImmutablePair<>(ctx.cics_into_set(), "INTO or SET"));
+    checkDuplicates(contexts, ctx);
+
     return visitChildren(ctx);
   }
 
@@ -327,11 +392,6 @@ class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
     if (rules.isEmpty()) {
       throwException(
           options, VisitorUtility.constructLocality(ctx, context), "Missing required option: ");
-    } else if (rules.size() >= 2) {
-      throwException(
-          options,
-          VisitorUtility.constructLocality(ctx, context),
-          "Excessive options provided for: ");
     }
   }
 
@@ -347,6 +407,25 @@ class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
     if (!rules.isEmpty()) {
       throwException(
           options, VisitorUtility.constructLocality(ctx, context), "Invalid option provided: ");
+    }
+  }
+
+  /**
+   * Checks for duplicate option entries
+   *
+   * @param options Lists of Target rule List and String pairs to check for duplicates of where
+   *     String is the name of the option to check for and the rule list is the context to check for
+   *     duplicates
+   * @param ctx Context to extrapolate locality against
+   */
+  private void checkDuplicates(List<Pair<List<?>, String>> options, ParserRuleContext ctx) {
+    for (Pair<List<?>, String> option : options) {
+      if (option.getLeft().size() >= 2) {
+        throwException(
+            option.getRight(),
+            VisitorUtility.constructLocality(ctx, context),
+            "Excessive options provided for: ");
+      }
     }
   }
 
