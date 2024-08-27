@@ -97,7 +97,7 @@ cicsTranslatorCompileDirectivedKeywords
 /** RECEIVE: */
 
 // Receive all
-cics_receive:                   RECEIVE (cics_receive_group_one | cics_receive_group_two | cics_receive_2980 | cics_receive_non_z_default | cics_receive_partn | cics_receive_map | cics_receive_map_mappingdev) cics_handle_response?;
+cics_receive:                   RECEIVE (cics_receive_group_one | cics_receive_group_two | cics_receive_group_three | cics_receive_partn | cics_receive_map | cics_receive_map_mappingdev) cics_handle_response?;
 
 //Helpers
 cics_into_set:                  INTO cics_data_area | SET cics_ref;
@@ -109,11 +109,9 @@ cics_receive_group_one:         (cics_into_set | cics_length_flength | cics_maxl
 // CICS Group 2 (APPC, LUTYPE 6.1, MRO)
 cics_receive_group_two:         (CONVID cics_name | SESSION cics_name | cics_into_set | cics_length_flength | cics_maxlength | NOTRUNCATE | STATE cics_cvda)+;
 
+// CICS Group 3 (2980, Non z Default)
+cics_receive_group_three:       (cics_into_set | cics_length_flength | cics_maxlength | NOTRUNCATE | PASSBK | ASIS)+;
 
-// NOTE: Since non z default and 2890 both allow length, flength, and maxlength. We are unable to force the parser to parse either one of these routes.
-// I.e. if length and flength exists, the parser will proabbly route through 2980 since we are not enforcing a singular OR of these inputs.
-cics_receive_2980:              (cics_into_set | cics_length_flength | cics_maxlength | NOTRUNCATE | PASSBK)+;
-cics_receive_non_z_default:     (cics_into_set | (LENGTH | FLENGTH) cics_data_area | MAXLENGTH cics_data_value | NOTRUNCATE)+;
 cics_receive_partn:             (cics_into_set | LENGTH cics_data_area | ASIS)+;
 
 // RECEIVE MAPS

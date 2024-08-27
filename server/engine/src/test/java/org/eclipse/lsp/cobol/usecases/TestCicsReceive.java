@@ -196,11 +196,11 @@ public class TestCicsReceive {
   };
 
   private static final String[] NON_Z_FULL_OPTIONS_VALID_ONE = {
-    "RECEIVE", "INTO({$abc})", "LENGTH({$def})", "FLENGTH({$ghi})", "MAXLENGTH(1000)", "NOTRUNCATE"
+    "RECEIVE", "INTO({$abc})", "LENGTH({$def})", "MAXLENGTH(1000)", "NOTRUNCATE"
   };
 
   private static final String[] NON_Z_PARTIAL_OPTIONS_VALID_ONE = {
-    "RECEIVE", "LENGTH({$def})", "FLENGTH({$ghi})", "NOTRUNCATE"
+    "RECEIVE", "FLENGTH({$ghi})", "NOTRUNCATE"
   };
 
   private static final String[] PARTN_FULL_OPTIONS_VALID_ONE = {

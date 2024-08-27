@@ -250,30 +250,15 @@ class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
   }
 
   /**
-   * Inspects CICS Receive 2980 Rule to make sure mandatory options exist since the Parser Rules
-   * only enforce if any combination of possible inputs exist.
-   *
-   * @param ctx the parse tree
-   * @return List of children nodes
-   */
-  @Override
-  public List<Node> visitCics_receive_2980(CICSParser.Cics_receive_2980Context ctx) {
-    checkHasMandatoryOptions(ctx.cics_length_flength(), ctx, "LENGTH or FLENGTH");
-    return visitChildren(ctx);
-  }
-
-  /**
-   * Inspects CICS Receive Non Z Default Rule to make sure mandatory options exist since the Parser
+   * Inspects CICS Receive Group Three Rule to make sure mandatory options exist since the Parser
    * Rules only enforce if any combination of possible inputs exist.
    *
    * @param ctx the parse tree
    * @return List of children nodes
    */
   @Override
-  public List<Node> visitCics_receive_non_z_default(
-      CICSParser.Cics_receive_non_z_defaultContext ctx) {
-    checkHasMandatoryOptions(ctx.LENGTH(), ctx, "LENGTH");
-    checkHasMandatoryOptions(ctx.FLENGTH(), ctx, "FLENGTH");
+  public List<Node> visitCics_receive_group_three(CICSParser.Cics_receive_group_threeContext ctx) {
+    checkHasMandatoryOptions(ctx.cics_length_flength(), ctx, "LENGTH or FLENGTH");
     return visitChildren(ctx);
   }
 
@@ -342,6 +327,11 @@ class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
     if (rules.isEmpty()) {
       throwException(
           options, VisitorUtility.constructLocality(ctx, context), "Missing required option: ");
+    } else if (rules.size() >= 2) {
+      throwException(
+          options,
+          VisitorUtility.constructLocality(ctx, context),
+          "Excessive options provided for: ");
     }
   }
 
