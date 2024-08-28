@@ -407,7 +407,7 @@ public class TestCicsReceive {
             new Diagnostic(
                 new Range(),
                 "Missing required option: LENGTH or FLENGTH",
-                DiagnosticSeverity.Warning,
+                DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())),
         ImmutableList.of());
   }
@@ -422,7 +422,7 @@ public class TestCicsReceive {
             new Diagnostic(
                 new Range(),
                 "Excessive options provided for: INTO or SET",
-                DiagnosticSeverity.Warning,
+                DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())),
         ImmutableList.of());
   }
@@ -483,7 +483,7 @@ public class TestCicsReceive {
             new Diagnostic(
                 new Range(),
                 "Missing required option: INTO or SET",
-                DiagnosticSeverity.Warning,
+                DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())),
         ImmutableList.of());
   }
@@ -510,7 +510,7 @@ public class TestCicsReceive {
             new Diagnostic(
                 new Range(),
                 "Missing required option: LENGTH or FLENGTH",
-                DiagnosticSeverity.Warning,
+                DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())),
         ImmutableList.of());
   }
@@ -549,7 +549,7 @@ public class TestCicsReceive {
             new Diagnostic(
                 new Range(),
                 "Missing required option: LENGTH or FLENGTH",
-                DiagnosticSeverity.Warning,
+                DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())),
         ImmutableList.of());
   }
@@ -622,7 +622,7 @@ public class TestCicsReceive {
             new Diagnostic(
                 new Range(),
                 "Missing required option: FROM",
-                DiagnosticSeverity.Warning,
+                DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())),
         ImmutableList.of());
   }

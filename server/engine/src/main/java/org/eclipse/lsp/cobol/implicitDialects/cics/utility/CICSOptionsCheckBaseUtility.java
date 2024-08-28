@@ -15,11 +15,13 @@
 
 package org.eclipse.lsp.cobol.implicitDialects.cics.utility;
 
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.TerminalNode;
-import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
@@ -56,16 +58,19 @@ public abstract class CICSOptionsCheckBaseUtility {
    *     String is the name of the option to check for and the rule list is the context to check for
    *     duplicates
    */
-  protected void checkDuplicates(List<Pair<List<?>, String>> options) {
-    for (Pair<List<?>, String> option : options) {
-      if (option.getLeft().size() >= 2) {
+  protected void checkDuplicates(List<RuleContextData> options) {
+    for (RuleContextData option : options) {
+      if (option.rules.size() >= 2) {
         option
-            .getLeft()
-            .subList(1, option.getLeft().size())
+            .rules
+            .subList(1, option.rules.size())
             .forEach(
                 error ->
                     throwException(
-                        option.getRight(), getLocality(error), "Excessive options provided for: "));
+                        option.ruleName,
+                        getLocality(error),
+                        "Excessive options provided for: ",
+                        option.severity));
       }
     }
   }
@@ -81,7 +86,10 @@ public abstract class CICSOptionsCheckBaseUtility {
   protected void checkHasMandatoryOptions(List<?> rules, ParserRuleContext ctx, String options) {
     if (rules.isEmpty()) {
       throwException(
-          options, VisitorUtility.constructLocality(ctx, context), "Missing required option: ");
+          options,
+          VisitorUtility.constructLocality(ctx, context),
+          "Missing required option: ",
+          ErrorSeverity.ERROR);
     }
   }
 
@@ -96,7 +104,9 @@ public abstract class CICSOptionsCheckBaseUtility {
   protected void checkHasIllegalOptions(List<?> rules, ParserRuleContext ctx, String options) {
     if (!rules.isEmpty()) {
       rules.forEach(
-          error -> throwException(options, getLocality(error), "Invalid option provided: "));
+          error ->
+              throwException(
+                  options, getLocality(error), "Invalid option provided: ", ErrorSeverity.ERROR));
     }
   }
 
@@ -106,18 +116,29 @@ public abstract class CICSOptionsCheckBaseUtility {
     else return VisitorUtility.constructLocality((TerminalNode) rule, context);
   }
 
-  private void throwException(String wrongToken, @NonNull Locality locality, String message) {
+  private void throwException(
+      String wrongToken, @NonNull Locality locality, String message, ErrorSeverity errorSeverity) {
     SyntaxError error =
         SyntaxError.syntaxError()
             .errorSource(ErrorSource.PARSING)
             .location(locality.toOriginalLocation())
             .suggestion(message + wrongToken)
-            .severity(ErrorSeverity.WARNING)
+            .severity(errorSeverity)
             .build();
 
     LOG.debug("Syntax error by CobolVisitor#throwException: {}", error);
     if (!errors.contains(error)) {
       errors.add(error);
     }
+  }
+
+  /** Container to store rule context data */
+  @AllArgsConstructor
+  @NoArgsConstructor
+  @RequiredArgsConstructor
+  public class RuleContextData {
+    @lombok.NonNull public List<?> rules;
+    @lombok.NonNull public String ruleName;
+    public ErrorSeverity severity = ErrorSeverity.ERROR;
   }
 }

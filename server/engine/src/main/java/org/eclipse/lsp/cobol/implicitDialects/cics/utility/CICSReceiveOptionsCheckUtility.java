@@ -16,9 +16,8 @@
 package org.eclipse.lsp.cobol.implicitDialects.cics.utility;
 
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
+import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser;
 
@@ -60,13 +59,14 @@ public class CICSReceiveOptionsCheckUtility extends CICSOptionsCheckBaseUtility 
     if (!ctx.ASIS().isEmpty() || !ctx.BUFFER().isEmpty()) {
       checkHasIllegalOptions(ctx.LEAVEKB(), ctx, "LEAVEKB");
     }
-    List<Pair<List<?>, String>> contexts = new ArrayList<>();
-    contexts.add(new ImmutablePair<>(ctx.cics_into_set(), "INTO or SET"));
-    contexts.add(new ImmutablePair<>(ctx.cics_maxlength(), "MAXLENGTH or MAXFLENGTH"));
-    contexts.add(new ImmutablePair<>(ctx.ASIS(), "ASIS"));
-    contexts.add(new ImmutablePair<>(ctx.BUFFER(), "BUFFER"));
-    contexts.add(new ImmutablePair<>(ctx.NOTRUNCATE(), "NOTRUNCATE"));
-    contexts.add(new ImmutablePair<>(ctx.LEAVEKB(), "LEAVEKB"));
+
+    List<RuleContextData> contexts = new ArrayList<>();
+    contexts.add(new RuleContextData(ctx.cics_into_set(), "INTO or SET"));
+    contexts.add(new RuleContextData(ctx.cics_maxlength(), "MAXLENGTH or MAXFLENGTH"));
+    contexts.add(new RuleContextData(ctx.ASIS(), "ASIS", ErrorSeverity.WARNING));
+    contexts.add(new RuleContextData(ctx.BUFFER(), "BUFFER", ErrorSeverity.WARNING));
+    contexts.add(new RuleContextData(ctx.NOTRUNCATE(), "NOTRUNCATE", ErrorSeverity.WARNING));
+    contexts.add(new RuleContextData(ctx.LEAVEKB(), "LEAVEKB", ErrorSeverity.WARNING));
     checkDuplicates(contexts);
   }
 
@@ -74,26 +74,26 @@ public class CICSReceiveOptionsCheckUtility extends CICSOptionsCheckBaseUtility 
     checkHasMandatoryOptions(ctx.cics_length_flength(), ctx, "LENGTH or FLENGTH");
     checkHasMandatoryOptions(ctx.cics_into_set(), ctx, "INTO or SET");
 
-    List<Pair<List<?>, String>> contexts = new ArrayList<>();
-    contexts.add(new ImmutablePair<>(ctx.CONVID(), "CONVID"));
-    contexts.add(new ImmutablePair<>(ctx.SESSION(), "SESSION"));
-    contexts.add(new ImmutablePair<>(ctx.cics_into_set(), "INTO or SET"));
-    contexts.add(new ImmutablePair<>(ctx.cics_length_flength(), "LENGTH or FLENGTH"));
-    contexts.add(new ImmutablePair<>(ctx.cics_maxlength(), "MAXLENGTH or MAXFLENGTH"));
-    contexts.add(new ImmutablePair<>(ctx.NOTRUNCATE(), "NOTRUNCATE"));
-    contexts.add(new ImmutablePair<>(ctx.STATE(), "STATE"));
+    List<RuleContextData> contexts = new ArrayList<>();
+    contexts.add(new RuleContextData(ctx.CONVID(), "CONVID"));
+    contexts.add(new RuleContextData(ctx.SESSION(), "SESSION"));
+    contexts.add(new RuleContextData(ctx.cics_into_set(), "INTO or SET"));
+    contexts.add(new RuleContextData(ctx.cics_length_flength(), "LENGTH or FLENGTH"));
+    contexts.add(new RuleContextData(ctx.cics_maxlength(), "MAXLENGTH or MAXFLENGTH"));
+    contexts.add(new RuleContextData(ctx.NOTRUNCATE(), "NOTRUNCATE", ErrorSeverity.WARNING));
+    contexts.add(new RuleContextData(ctx.STATE(), "STATE"));
     checkDuplicates(contexts);
   }
 
   private void checkGroupThree(CICSParser.Cics_receive_group_threeContext ctx) {
     checkHasMandatoryOptions(ctx.cics_length_flength(), ctx, "LENGTH or FLENGTH");
 
-    List<Pair<List<?>, String>> contexts = new ArrayList<>();
-    contexts.add(new ImmutablePair<>(ctx.cics_into_set(), "INTO or SET"));
-    contexts.add(new ImmutablePair<>(ctx.cics_length_flength(), "LENGTH or FLENGTH"));
-    contexts.add(new ImmutablePair<>(ctx.cics_maxlength(), "MAXLENGTH or MAXFLENGTH"));
-    contexts.add(new ImmutablePair<>(ctx.NOTRUNCATE(), "NOTRUNCATE"));
-    contexts.add(new ImmutablePair<>(ctx.PASSBK(), "PASSBK"));
+    List<RuleContextData> contexts = new ArrayList<>();
+    contexts.add(new RuleContextData(ctx.cics_into_set(), "INTO or SET"));
+    contexts.add(new RuleContextData(ctx.cics_length_flength(), "LENGTH or FLENGTH"));
+    contexts.add(new RuleContextData(ctx.cics_maxlength(), "MAXLENGTH or MAXFLENGTH"));
+    contexts.add(new RuleContextData(ctx.NOTRUNCATE(), "NOTRUNCATE", ErrorSeverity.WARNING));
+    contexts.add(new RuleContextData(ctx.PASSBK(), "PASSBK", ErrorSeverity.WARNING));
     checkDuplicates(contexts);
   }
 
@@ -101,10 +101,10 @@ public class CICSReceiveOptionsCheckUtility extends CICSOptionsCheckBaseUtility 
     checkHasMandatoryOptions(ctx.cics_into_set(), ctx, "INTO or SET");
     checkHasMandatoryOptions(ctx.LENGTH(), ctx, "LENGTH");
 
-    List<Pair<List<?>, String>> contexts = new ArrayList<>();
-    contexts.add(new ImmutablePair<>(ctx.cics_into_set(), "INTO or SET"));
-    contexts.add(new ImmutablePair<>(ctx.LENGTH(), "LENGTH"));
-    contexts.add(new ImmutablePair<>(ctx.ASIS(), "ASIS"));
+    List<RuleContextData> contexts = new ArrayList<>();
+    contexts.add(new RuleContextData(ctx.cics_into_set(), "INTO or SET"));
+    contexts.add(new RuleContextData(ctx.LENGTH(), "LENGTH"));
+    contexts.add(new RuleContextData(ctx.ASIS(), "ASIS", ErrorSeverity.WARNING));
     checkDuplicates(contexts);
   }
 
@@ -112,26 +112,26 @@ public class CICSReceiveOptionsCheckUtility extends CICSOptionsCheckBaseUtility 
     if (ctx.FROM().isEmpty()) checkHasIllegalOptions(ctx.LENGTH(), ctx, "LENGTH");
     if (ctx.TERMINAL().isEmpty()) checkHasIllegalOptions(ctx.INPARTN(), ctx, "INPARTN");
 
-    List<Pair<List<?>, String>> contexts = new ArrayList<>();
-    contexts.add(new ImmutablePair<>(ctx.MAPSET(), "MAPSET"));
-    contexts.add(new ImmutablePair<>(ctx.cics_into_set(), "INTO or SET"));
-    contexts.add(new ImmutablePair<>(ctx.FROM(), "FROM"));
-    contexts.add(new ImmutablePair<>(ctx.LENGTH(), "LENGTH"));
-    contexts.add(new ImmutablePair<>(ctx.TERMINAL(), "TERMINAL"));
-    contexts.add(new ImmutablePair<>(ctx.ASIS(), "ASIS"));
-    contexts.add(new ImmutablePair<>(ctx.INPARTN(), "INPARTN"));
+    List<RuleContextData> contexts = new ArrayList<>();
+    contexts.add(new RuleContextData(ctx.MAPSET(), "MAPSET"));
+    contexts.add(new RuleContextData(ctx.cics_into_set(), "INTO or SET"));
+    contexts.add(new RuleContextData(ctx.FROM(), "FROM"));
+    contexts.add(new RuleContextData(ctx.LENGTH(), "LENGTH"));
+    contexts.add(new RuleContextData(ctx.TERMINAL(), "TERMINAL", ErrorSeverity.WARNING));
+    contexts.add(new RuleContextData(ctx.ASIS(), "ASIS", ErrorSeverity.WARNING));
+    contexts.add(new RuleContextData(ctx.INPARTN(), "INPARTN"));
     checkDuplicates(contexts);
   }
 
   private void checkMapMappingDev(CICSParser.Cics_receive_map_mappingdevContext ctx) {
     checkHasMandatoryOptions(ctx.FROM(), ctx, "FROM");
 
-    List<Pair<List<?>, String>> contexts = new ArrayList<>();
-    contexts.add(new ImmutablePair<>(ctx.MAPPINGDEV(), "MAPPINGDEV"));
-    contexts.add(new ImmutablePair<>(ctx.FROM(), "FROM"));
-    contexts.add(new ImmutablePair<>(ctx.LENGTH(), "LENGTH"));
-    contexts.add(new ImmutablePair<>(ctx.MAPSET(), "MAPSET"));
-    contexts.add(new ImmutablePair<>(ctx.cics_into_set(), "INTO or SET"));
+    List<RuleContextData> contexts = new ArrayList<>();
+    contexts.add(new RuleContextData(ctx.MAPPINGDEV(), "MAPPINGDEV"));
+    contexts.add(new RuleContextData(ctx.FROM(), "FROM"));
+    contexts.add(new RuleContextData(ctx.LENGTH(), "LENGTH"));
+    contexts.add(new RuleContextData(ctx.MAPSET(), "MAPSET"));
+    contexts.add(new RuleContextData(ctx.cics_into_set(), "INTO or SET"));
     checkDuplicates(contexts);
   }
 }
