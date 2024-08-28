@@ -138,6 +138,10 @@ public class TestCicsReceive {
     "RECEIVE", "{INTO(100)", "MAXLENGTH(10)", "NOTRUNCATE|error1}"
   };
 
+  private static final String[] GROUP_ONE_DUPLICATE_INVALID = {
+    "RECEIVE", "INTO(100)", "{INTO(1000)|error1}", "LENGTH(100)", "MAXLENGTH(10)", "NOTRUNCATE"
+  };
+
   private static final String[] GROUP_TWO_APPC_FULL_OPTIONS_VALID_ONE = {
     "RECEIVE",
     "CONVID({$abc})",
@@ -210,6 +214,10 @@ public class TestCicsReceive {
   private static final String[] PARTN_PARTIAL_OPTIONS_VALID_ONE = {"RECEIVE", "LENGTH({$def})"};
 
   private static final String[] PARTN_INVALID_ONE = {"RECEIVE", "{SET(100)", "ASIS|error1}"};
+
+  private static final String[] PARTN_DUPLICATE_INVALID = {
+    "RECEIVE", "LENGTH(101)", "ASIS", "{ASIS|error1}"
+  };
 
   private static final String[] MAP_FULL_OPTIONS_VALID_ONE = {
     "RECEIVE",
@@ -405,6 +413,21 @@ public class TestCicsReceive {
   }
 
   @Test
+  void testGroupOneReceiveCICSCommand_withDuplicateInvalid() {
+    UseCaseEngine.runTest(
+        getTestString(GROUP_ONE_DUPLICATE_INVALID),
+        ImmutableList.of(),
+        ImmutableMap.of(
+            "error1",
+            new Diagnostic(
+                new Range(),
+                "Excessive options provided for: INTO or SET",
+                DiagnosticSeverity.Warning,
+                ErrorSource.PARSING.getText())),
+        ImmutableList.of());
+  }
+
+  @Test
   void testGroupTwoAppcFullOptionsValidOne() {
     UseCaseEngine.runTest(
         getTestString(GROUP_TWO_APPC_FULL_OPTIONS_VALID_ONE),
@@ -526,6 +549,21 @@ public class TestCicsReceive {
             new Diagnostic(
                 new Range(),
                 "Missing required option: LENGTH or FLENGTH",
+                DiagnosticSeverity.Warning,
+                ErrorSource.PARSING.getText())),
+        ImmutableList.of());
+  }
+
+  @Test
+  void testPartnDuplicateInvalid() {
+    UseCaseEngine.runTest(
+        getTestString(PARTN_DUPLICATE_INVALID),
+        ImmutableList.of(),
+        ImmutableMap.of(
+            "error1",
+            new Diagnostic(
+                new Range(),
+                "Excessive options provided for: ASIS",
                 DiagnosticSeverity.Warning,
                 ErrorSource.PARSING.getText())),
         ImmutableList.of());

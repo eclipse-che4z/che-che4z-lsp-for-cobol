@@ -18,6 +18,7 @@ package org.eclipse.lsp.cobol.implicitDialects.cics.utility;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.tree.TerminalNode;
 import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
@@ -54,15 +55,19 @@ public abstract class CICSOptionsCheckBaseUtility {
    * @param options Lists of Target rule List and String pairs to check for duplicates of where
    *     String is the name of the option to check for and the rule list is the context to check for
    *     duplicates
-   * @param ctx Context to extrapolate locality against
    */
-  protected void checkDuplicates(List<Pair<List<?>, String>> options, ParserRuleContext ctx) {
+  protected void checkDuplicates(List<Pair<List<?>, String>> options) {
     for (Pair<List<?>, String> option : options) {
       if (option.getLeft().size() >= 2) {
-        throwException(
-            option.getRight(),
-            VisitorUtility.constructLocality(ctx, context),
-            "Excessive options provided for: ");
+        option
+            .getLeft()
+            .subList(1, option.getLeft().size())
+            .forEach(
+                error ->
+                    throwException(
+                        option.getRight(),
+                        getLocality(option.getLeft().get(1)),
+                        "Excessive options provided for: "));
       }
     }
   }
@@ -92,9 +97,16 @@ public abstract class CICSOptionsCheckBaseUtility {
    */
   protected void checkHasIllegalOptions(List<?> rules, ParserRuleContext ctx, String options) {
     if (!rules.isEmpty()) {
-      throwException(
-          options, VisitorUtility.constructLocality(ctx, context), "Invalid option provided: ");
+      //      throwException(options, getLocality(rules.get(1)), "Invalid option provided: ");
+      rules.forEach(
+          error -> throwException(options, getLocality(error), "Invalid option provided: "));
     }
+  }
+
+  private <E> Locality getLocality(E rule) {
+    if (ParserRuleContext.class.isAssignableFrom(rule.getClass()))
+      return VisitorUtility.constructLocality((ParserRuleContext) rule, context);
+    else return VisitorUtility.constructLocality((TerminalNode) rule, context);
   }
 
   private void throwException(String wrongToken, @NonNull Locality locality, String message) {

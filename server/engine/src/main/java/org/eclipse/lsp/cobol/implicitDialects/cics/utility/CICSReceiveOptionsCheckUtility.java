@@ -67,7 +67,7 @@ public class CICSReceiveOptionsCheckUtility extends CICSOptionsCheckBaseUtility 
     contexts.add(new ImmutablePair<>(ctx.BUFFER(), "BUFFER"));
     contexts.add(new ImmutablePair<>(ctx.NOTRUNCATE(), "NOTRUNCATE"));
     contexts.add(new ImmutablePair<>(ctx.LEAVEKB(), "LEAVEKB"));
-    checkDuplicates(contexts, ctx);
+    checkDuplicates(contexts);
   }
 
   private void checkGroupTwo(CICSParser.Cics_receive_group_twoContext ctx) {
@@ -82,7 +82,7 @@ public class CICSReceiveOptionsCheckUtility extends CICSOptionsCheckBaseUtility 
     contexts.add(new ImmutablePair<>(ctx.cics_maxlength(), "MAXLENGTH or MAXFLENGTH"));
     contexts.add(new ImmutablePair<>(ctx.NOTRUNCATE(), "NOTRUNCATE"));
     contexts.add(new ImmutablePair<>(ctx.STATE(), "STATE"));
-    checkDuplicates(contexts, ctx);
+    checkDuplicates(contexts);
   }
 
   private void checkGroupThree(CICSParser.Cics_receive_group_threeContext ctx) {
@@ -94,8 +94,7 @@ public class CICSReceiveOptionsCheckUtility extends CICSOptionsCheckBaseUtility 
     contexts.add(new ImmutablePair<>(ctx.cics_maxlength(), "MAXLENGTH or MAXFLENGTH"));
     contexts.add(new ImmutablePair<>(ctx.NOTRUNCATE(), "NOTRUNCATE"));
     contexts.add(new ImmutablePair<>(ctx.PASSBK(), "PASSBK"));
-    contexts.add(new ImmutablePair<>(ctx.ASIS(), "ASIS"));
-    checkDuplicates(contexts, ctx);
+    checkDuplicates(contexts);
   }
 
   private void checkPartn(CICSParser.Cics_receive_partnContext ctx) {
@@ -106,7 +105,7 @@ public class CICSReceiveOptionsCheckUtility extends CICSOptionsCheckBaseUtility 
     contexts.add(new ImmutablePair<>(ctx.cics_into_set(), "INTO or SET"));
     contexts.add(new ImmutablePair<>(ctx.LENGTH(), "LENGTH"));
     contexts.add(new ImmutablePair<>(ctx.ASIS(), "ASIS"));
-    checkDuplicates(contexts, ctx);
+    checkDuplicates(contexts);
   }
 
   private void checkMap(CICSParser.Cics_receive_mapContext ctx) {
@@ -121,7 +120,7 @@ public class CICSReceiveOptionsCheckUtility extends CICSOptionsCheckBaseUtility 
     contexts.add(new ImmutablePair<>(ctx.TERMINAL(), "TERMINAL"));
     contexts.add(new ImmutablePair<>(ctx.ASIS(), "ASIS"));
     contexts.add(new ImmutablePair<>(ctx.INPARTN(), "INPARTN"));
-    checkDuplicates(contexts, ctx);
+    checkDuplicates(contexts);
   }
 
   private void checkMapMappingDev(CICSParser.Cics_receive_map_mappingdevContext ctx) {
@@ -133,6 +132,6 @@ public class CICSReceiveOptionsCheckUtility extends CICSOptionsCheckBaseUtility 
     contexts.add(new ImmutablePair<>(ctx.LENGTH(), "LENGTH"));
     contexts.add(new ImmutablePair<>(ctx.MAPSET(), "MAPSET"));
     contexts.add(new ImmutablePair<>(ctx.cics_into_set(), "INTO or SET"));
-    checkDuplicates(contexts, ctx);
+    checkDuplicates(contexts);
   }
 }

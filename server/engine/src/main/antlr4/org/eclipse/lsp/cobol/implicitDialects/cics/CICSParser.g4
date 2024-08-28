@@ -110,7 +110,7 @@ cics_receive_group_one:         (cics_into_set | cics_length_flength | cics_maxl
 cics_receive_group_two:         (CONVID cics_name | SESSION cics_name | cics_into_set | cics_length_flength | cics_maxlength | NOTRUNCATE | STATE cics_cvda)+;
 
 // CICS Group 3 (2980, Non z Default)
-cics_receive_group_three:       (cics_into_set | cics_length_flength | cics_maxlength | NOTRUNCATE | PASSBK | ASIS)+;
+cics_receive_group_three:       (cics_into_set | cics_length_flength | cics_maxlength | NOTRUNCATE | PASSBK)+;
 
 cics_receive_partn:             (cics_into_set | LENGTH cics_data_area | ASIS)+;
 
