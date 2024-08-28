@@ -65,9 +65,7 @@ public abstract class CICSOptionsCheckBaseUtility {
             .forEach(
                 error ->
                     throwException(
-                        option.getRight(),
-                        getLocality(option.getLeft().get(1)),
-                        "Excessive options provided for: "));
+                        option.getRight(), getLocality(error), "Excessive options provided for: "));
       }
     }
   }
@@ -97,7 +95,6 @@ public abstract class CICSOptionsCheckBaseUtility {
    */
   protected void checkHasIllegalOptions(List<?> rules, ParserRuleContext ctx, String options) {
     if (!rules.isEmpty()) {
-      //      throwException(options, getLocality(rules.get(1)), "Invalid option provided: ");
       rules.forEach(
           error -> throwException(options, getLocality(error), "Invalid option provided: "));
     }
