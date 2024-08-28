@@ -19,6 +19,7 @@ import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.NodeType;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
+import org.eclipse.lsp.cobol.common.model.tree.ProgramSubtype;
 import org.eclipse.lsp.cobol.common.model.tree.variable.*;
 import org.eclipse.lsp.cobol.core.engine.processors.SectionNodeProcessorHelper;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulatorService;
@@ -42,7 +43,7 @@ class SectionNodeProcessorHelperTest {
 
   @Test
   void simpleStructureTest() {
-    Node programNode = new ProgramNode(LOCALITY);
+    Node programNode = new ProgramNode(LOCALITY, ProgramSubtype.Program, 0);
     // 01 Level-01-order-1
     // 01 Level-01-order-2
     //    05 Level-05-order-1
@@ -97,7 +98,7 @@ class SectionNodeProcessorHelperTest {
 
   @Test
   void nonCorrectStructures() {
-    Node programNode = new ProgramNode(LOCALITY);
+    Node programNode = new ProgramNode(LOCALITY, ProgramSubtype.Program, 0);
     // 05 Level-05
     // 01 Level-01
     //   10 Level-10
@@ -136,7 +137,7 @@ class SectionNodeProcessorHelperTest {
 
   @Test
   void moveLevel66ToTop() {
-    Node programNode = new ProgramNode(LOCALITY);
+    Node programNode = new ProgramNode(LOCALITY, ProgramSubtype.Program, 0);
     // 01 Level-01
     //    05 Level-05
     // 66 Level-66
@@ -169,7 +170,7 @@ class SectionNodeProcessorHelperTest {
     List<ValueClause> valueClauses =
         ImmutableList.of(
             new ValueClause(ImmutableList.of(new ValueInterval("", "", "thru")), LOCALITY));
-    Node programNode = new ProgramNode(LOCALITY);
+    Node programNode = new ProgramNode(LOCALITY, ProgramSubtype.Program, 0);
     // 01 Level-01
     //      88 Cond-1
     //    05 Level-05-1

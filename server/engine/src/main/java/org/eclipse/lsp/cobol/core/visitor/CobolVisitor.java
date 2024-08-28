@@ -142,12 +142,40 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   public List<Node> visitProgramIdParagraph(ProgramIdParagraphContext ctx) {
     List<Node> result = new ArrayList<>();
     ofNullable(ctx.programName())
-            .map(RuleContext::getText)
-            .map(StringUtils::trimQuotes)
-            .ifPresent(
-                    name ->
-                            retrieveLocality(ctx, extendedDocument, copybooks)
-                                    .ifPresent(locality -> result.add(new ProgramIdNode(locality, name))));
+        .map(RuleContext::getText)
+        .map(StringUtils::trimQuotes)
+        .ifPresent(
+            name -> retrieveLocality(ctx, extendedDocument, copybooks)
+                .ifPresent(locality -> result.add(new ProgramIdNode(locality, name, ProgramSubtype.Program))));
+    return result;
+  }
+
+  private List<Node> makeFunctionReferenceNodes(FunctionNameContext fnCtx) {
+    if (fnCtx == null)
+      return ImmutableList.of();
+
+    String name = fnCtx.getText();
+
+    return retrieveLocality(fnCtx, extendedDocument, copybooks)
+        .map(l -> new FunctionReference(l, name))
+        .stream()
+        .collect(toList());
+  }
+
+  @Override
+  public List<Node> visitFunctionReference(FunctionReferenceContext ctx) {
+    return makeFunctionReferenceNodes(ctx.functionName());
+  }
+
+  @Override
+  public List<Node> visitFunctionIdParagraph(FunctionIdParagraphContext ctx) {
+    List<Node> result = new ArrayList<>();
+    ofNullable(ctx.programName())
+        .map(RuleContext::getText)
+        .map(StringUtils::trimQuotes)
+        .ifPresent(
+            name -> retrieveLocality(ctx, extendedDocument, copybooks)
+                .ifPresent(locality -> result.add(new ProgramIdNode(locality, name, ProgramSubtype.Function))));
     return result;
   }
 
@@ -155,7 +183,10 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   public List<Node> visitProcedureDivision(ProcedureDivisionContext ctx) {
     areaAWarning(ctx.getStart());
     return addTreeNode(
-            ctx, location -> new DivisionNode(location, DivisionType.PROCEDURE_DIVISION));
+        ctx, location -> new ProcedureDivisionNode(location,
+            retrieveLocality(ctx.dot_fs(), extendedDocument, copybooks)
+                .map(x -> location.toBuilder().range(new Range(location.getRange().getStart(), x.getRange().getEnd()))
+                    .build())));
   }
 
   @Override
@@ -194,11 +225,88 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
     return addTreeNode(ctx, locality -> new SectionNode(locality, SectionType.WORKING_STORAGE));
   }
 
+  private Position extractLastPosition(FunctionDetailsContext ctx) {
+    if (ctx == null)
+      return null;
+    List<IdentificationDivisionBodyContext> idDetails = ctx.identificationDivisionBody();
+    if (!idDetails.isEmpty())
+      return extractEndPosition(idDetails.get(idDetails.size() - 1));
+    if (ctx.functionIdParagraph() != null)
+      return extractEndPosition(ctx.functionIdParagraph());
+    return null;
+  }
+
+  private Position extractIdentificationEndPosition(ProgramDetailsContext ctx) {
+    if (ctx == null)
+      return null;
+    List<IdentificationDivisionBodyContext> idDetails = ctx.identificationDivisionBody();
+    if (!idDetails.isEmpty())
+      return extractEndPosition(idDetails.get(idDetails.size() - 1));
+    if (ctx.programIdParagraph() != null)
+      return extractEndPosition(ctx.programIdParagraph());
+    return null;
+  }
+
+  private Position extractEndPosition(ParserRuleContext ctx) {
+    if (ctx == null)
+      return null;
+    return getLocality(ctx.getStop()).map(x -> x.getRange().getEnd()).orElse(null);
+  }
+
+  private Node replaceRangeEnd(Node n, Position p) {
+    if (p == null)
+      return n;
+    Locality l = n.getLocality();
+    n.setLocality(l.toBuilder().range(new Range(l.getRange().getStart(), p)).build());
+    return n;
+  }
+
+  private List<Node> adjustIdentificationDivision(List<Node> pgmNodes, Position lastPos) {
+    if (pgmNodes.size() != 1)
+      return pgmNodes;
+    Node pgm = pgmNodes.get(0);
+    Optional<Node> identification = pgm.getChildren().stream()
+      .filter(n -> n instanceof DivisionNode && ((DivisionNode) n).getDivisionType() == DivisionType.IDENTIFICATION_DIVISION)
+      .findFirst();
+    Optional<Node> pgmNode = pgm.getChildren().stream().filter(n -> n instanceof ProgramIdNode).findFirst();
+
+    if (!identification.isPresent())
+      return pgmNodes;
+
+    replaceRangeEnd(identification.get(), lastPos);
+
+    if (pgmNode.isPresent()) {
+      pgm.removeChild(pgmNode.get());
+      identification.get().addChildAt(0, pgmNode.get());
+    }
+
+    return pgmNodes;
+  }
+
   @Override
-  public List<Node> visitProgramUnit(ProgramUnitContext ctx) {
+  public List<Node> visitProgramOrFunctionUnit(ProgramOrFunctionUnitContext ctx) {
     fileControls = new HashMap<>();
     text.reset();
-    return addTreeNode(ctx, ProgramNode::new);
+
+    FunctionDetailsContext funcCtx = ctx.functionDetails();
+
+    if (funcCtx != null)
+      return adjustIdentificationDivision(
+          addTreeNode(ctx, (l) -> new ProgramNode(l, ProgramSubtype.Function, ctx.getStart().getTokenIndex())),
+          extractLastPosition(funcCtx));
+    else
+      return adjustIdentificationDivision(
+          addTreeNode(ctx, (l) -> new ProgramNode(l, ProgramSubtype.Program, ctx.getStart().getTokenIndex())),
+          extractIdentificationEndPosition(ctx.programDetails()));
+  }
+
+  @Override
+  public List<Node> visitNestedProgramUnit(NestedProgramUnitContext ctx) {
+    fileControls = new HashMap<>();
+    text.reset();
+    return adjustIdentificationDivision(
+        addTreeNode(ctx, (l) -> new ProgramNode(l, ProgramSubtype.Program, ctx.getStart().getTokenIndex())),
+        extractIdentificationEndPosition(ctx.programDetails()));
   }
 
   @Override
@@ -483,6 +591,17 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
 
   @Override
   public List<Node> visitEndProgramStatement(EndProgramStatementContext ctx) {
+    areaAWarning(ctx.getStart());
+    return ofNullable(ctx.programName())
+            .map(ParserRuleContext::getStart)
+            .map(Token::getText)
+            .map(StringUtils::trimQuotes)
+            .map(id -> addTreeNode(ctx.programName(), locality -> new ProgramEndNode(locality, id)))
+            .orElse(ImmutableList.of());
+  }
+
+  @Override
+  public List<Node> visitEndFunctionStatement(EndFunctionStatementContext ctx) {
     areaAWarning(ctx.getStart());
     return ofNullable(ctx.programName())
             .map(ParserRuleContext::getStart)
@@ -1114,6 +1233,14 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
       text.update(ctx.getStop());
       text.flush();
     }
+  }
+
+  @Override
+  public List<Node> visitProcedureDivisionGivingClause(ProcedureDivisionGivingClauseContext ctx) {
+    DataNameContext dt = ctx.dataName();
+    Optional<Locality> locality = retrieveLocality(ctx, extendedDocument, copybooks);
+    if (dt == null || !locality.isPresent()) return ImmutableList.of();
+    return ImmutableList.of(new ProcedureDivisionReturningNode(locality.get(), extractNameAndLocality(dt)));
   }
 
   @Override

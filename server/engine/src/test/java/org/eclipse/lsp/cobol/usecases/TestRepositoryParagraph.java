@@ -16,7 +16,12 @@ package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+
+import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
+import org.eclipse.lsp4j.Diagnostic;
+import org.eclipse.lsp4j.DiagnosticSeverity;
+import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
 /** Test repository paragraph statements */
@@ -32,14 +37,27 @@ public class TestRepositoryParagraph {
       + "           Class JavaException is \"java.lang.Exception\"\n"
       + "           Class jdbb          is \"java.nio.ByteBuffer\"\n"
       + "           Class ToKafka       is \"CobolToKafka.ToKafka\"\n"
-      + "           Function FOO1\n"
-      + "           Function FOO2.\n"
+      + "           Function {FOO1|1}\n"
+      + "           Function {FOO2|2}.\n"
       + "       Input-output section.\n"
       + "       Data Division.";
 
   @Test
   void test() {
-    UseCaseEngine.runTest(TEXT, ImmutableList.of(), ImmutableMap.of());
+    UseCaseEngine.runTest(TEXT, ImmutableList.of(), ImmutableMap.of(
+        "1",
+        new Diagnostic(
+            new Range(),
+            "Expected a function name, but found 'FOO1'",
+            DiagnosticSeverity.Error,
+            ErrorSource.PARSING.getText()),
+        "2",
+        new Diagnostic(
+            new Range(),
+            "Expected a function name, but found 'FOO2'",
+            DiagnosticSeverity.Error,
+            ErrorSource.PARSING.getText())));
+
   }
 
 }

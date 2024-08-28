@@ -61,8 +61,8 @@ public class AntlrAdapter {
     return startRuleContext;
   }
 
-  private static CobolParser.ProgramUnitContext replaceWithAntlr(
-      ProgramUnit p, CobolParser.ProgramUnitContext result) {
+  private static CobolParser.ProgramOrFunctionUnitContext replaceWithAntlr(
+      ProgramUnit p, CobolParser.ProgramOrFunctionUnitContext result) {
     org.eclipse.lsp.cobol.parser.hw.lexer.Token token = Utils.findStartToken(p).get();
     int startLine = token.getLine();
     int startPos = token.getStartPositionInLine();
@@ -89,7 +89,7 @@ public class AntlrAdapter {
   }
 
   private void traversePrograms(
-      CstNode node, Function<ProgramUnit, CobolParser.ProgramUnitContext> processor) {
+      CstNode node, Function<ProgramUnit, CobolParser.ProgramOrFunctionUnitContext> processor) {
     node.getChildren().forEach(s -> traversePrograms(s, processor));
     if (node instanceof ProgramUnit) {
       processor.apply((ProgramUnit) node);
@@ -109,8 +109,8 @@ public class AntlrAdapter {
     return start;
   }
 
-  private CobolParser.ProgramUnitContext convertProgramNode(CstNode programUnit) {
-    CobolParser.ProgramUnitContext program = new CobolParser.ProgramUnitContext(null, 0);
+  private CobolParser.ProgramOrFunctionUnitContext convertProgramNode(CstNode programUnit) {
+    CobolParser.ProgramOrFunctionUnitContext program = new CobolParser.ProgramOrFunctionUnitContext(null, 0);
     Utils.initNode(programUnit, program, charStream);
     processChildNodes(programUnit, program);
     Optional<List<org.eclipse.lsp.cobol.parser.hw.lexer.Token>> endProgramName =
