@@ -211,8 +211,21 @@ class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
     return ImmutableList.of(node);
   }
 
+  /**
+   * Traverses children of the parse tree.
+   *
+   * <p>Inspects CICS Rules to make sure mandatory options exist since the Parser Rules only enforce
+   * if any combination of possible inputs exist. Also checks for Invalid options given the other
+   * provided optionals and checks for duplicates.
+   *
+   * @param node the node under inspection
+   * @return List of children nodes
+   */
   @Override
   public List<Node> visitChildren(RuleNode node) {
+    if (node.getRuleContext().parent != null)
+      cicsOptionsCheckUtility.checkOptions(
+          (ParserRuleContext) node.getRuleContext(), node.getRuleContext().parent.getRuleIndex());
     ThreadInterruptionUtil.checkThreadInterrupted();
     return super.visitChildren(node);
   }
@@ -225,92 +238,6 @@ class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
   @Override
   protected List<Node> aggregateResult(List<Node> aggregate, List<Node> nextResult) {
     return Stream.concat(aggregate.stream(), nextResult.stream()).collect(toList());
-  }
-
-  /**
-   * Inspects CICS Receive Group One Rule to make sure mandatory options exist since the Parser
-   * Rules only enforce if any combination of possible inputs exist. Also checks for Invalid options
-   * given the other provided optionals and checks for duplicates.
-   *
-   * @param ctx the parse tree
-   * @return List of children nodes
-   */
-  @Override
-  public List<Node> visitCics_receive_group_one(CICSParser.Cics_receive_group_oneContext ctx) {
-    cicsOptionsCheckUtility.checkOptions(ctx, ctx.parent.getRuleIndex());
-    return visitChildren(ctx);
-  }
-
-  /**
-   * Inspects CICS Receive Group Two Rule to make sure mandatory options exist since the Parser *
-   * Rules only enforce if any combination of possible inputs exist. Also checks for Invalid options
-   * given the other provided optionals and checks for duplicates.
-   *
-   * @param ctx the parse tree
-   * @return List of children nodes
-   */
-  @Override
-  public List<Node> visitCics_receive_group_two(CICSParser.Cics_receive_group_twoContext ctx) {
-    cicsOptionsCheckUtility.checkOptions(ctx, ctx.parent.getRuleIndex());
-    return visitChildren(ctx);
-  }
-
-  /**
-   * Inspects CICS Receive Group Three Rule to make sure mandatory options exist since the Parser
-   * Rules only enforce if any combination of possible inputs exist. Also checks for Invalid options
-   * given the other provided optionals and checks for duplicates.
-   *
-   * @param ctx the parse tree
-   * @return List of children nodes
-   */
-  @Override
-  public List<Node> visitCics_receive_group_three(CICSParser.Cics_receive_group_threeContext ctx) {
-    cicsOptionsCheckUtility.checkOptions(ctx, ctx.parent.getRuleIndex());
-    return visitChildren(ctx);
-  }
-
-  /**
-   * Inspects CICS Receive Partn Rule to make sure mandatory options exist since the Parser Rules
-   * only enforce if any combination of possible inputs exist. Also checks for Invalid options given
-   * the other provided optionals and checks for duplicates.
-   *
-   * @param ctx the parse tree
-   * @return List of children nodes
-   */
-  @Override
-  public List<Node> visitCics_receive_partn(CICSParser.Cics_receive_partnContext ctx) {
-    cicsOptionsCheckUtility.checkOptions(ctx, ctx.parent.getRuleIndex());
-    return visitChildren(ctx);
-  }
-
-  /**
-   * Inspects CICS Receive Map Rule to make sure mandatory options exist since the Parser Rules only
-   * enforce if any combination of possible inputs exist. Also checks for Invalid options given the
-   * other provided optionals and checks for duplicates.
-   *
-   * @param ctx the parse tree
-   * @return List of children nodes
-   */
-  @Override
-  public List<Node> visitCics_receive_map(CICSParser.Cics_receive_mapContext ctx) {
-    cicsOptionsCheckUtility.checkOptions(ctx, ctx.parent.getRuleIndex());
-    return visitChildren(ctx);
-  }
-
-  /**
-   * Inspects CICS Receive Map Mapping Dev Rule to make sure mandatory options exist since the
-   * Parser Rules only enforce if any combination of possible inputs exist. Also checks for Invalid
-   * options given the other provided optionals and checks for duplicates.
-   *
-   * @param ctx the parse tree
-   * @return List of children nodes
-   */
-  @Override
-  public List<Node> visitCics_receive_map_mappingdev(
-      CICSParser.Cics_receive_map_mappingdevContext ctx) {
-    cicsOptionsCheckUtility.checkOptions(ctx, ctx.parent.getRuleIndex());
-
-    return visitChildren(ctx);
   }
 
   @Override
