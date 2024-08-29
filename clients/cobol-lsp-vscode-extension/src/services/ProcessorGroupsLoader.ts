@@ -11,16 +11,15 @@
  * Contributors:
  *   Broadcom, Inc. - initial API and implementation
  */
-import * as path from "path";
-import * as fs from "fs";
-import { SettingsUtils } from "./util/SettingsUtils";
 import * as t from "io-ts";
+import { workspace, Uri } from "vscode";
 import { PathReporter } from "io-ts/lib/PathReporter";
 import { isLeft } from "fp-ts/Either";
+import { TextDecoder } from "util";
 
-const PROCESSOR_GROUP_FOLDER = ".cobolplugin";
-const PROCESSOR_GROUP_PGM = "pgm_conf.json";
-const PROCESSOR_GROUP_PROC = "proc_grps.json";
+const PG_FOLDER = ".cobolplugin";
+const PGR_PGM_FILE = "pgm_conf.json";
+const PG_PROC_FILE = "proc_grps.json";
 
 const ProgramsConfigModel = t.type({
   pgms: t.array(
@@ -65,19 +64,20 @@ const ProcessorGroupModel = t.intersection([
 
 export type ProcessorGroup = t.TypeOf<typeof ProcessorGroupModel>;
 
-export const readProgramConfigFileContent = (): ProgramsConfig => {
+export async function readProgramConfigFileContent(
+  documentUri: Uri,
+): Promise<ProgramsConfig> {
   const EMPTY = { pgms: [] };
-  const ws = SettingsUtils.getWorkspaceFoldersPath(true);
-  if (ws.length < 1) {
+
+  const ws = workspace.getWorkspaceFolder(documentUri);
+  if (ws === undefined) {
     return EMPTY;
   }
-  const cfgPath = path.join(ws[0], PROCESSOR_GROUP_FOLDER);
-  const pgmCfgPath = path.join(cfgPath, PROCESSOR_GROUP_PGM);
-  if (!fs.existsSync(pgmCfgPath)) {
-    return EMPTY;
-  }
+  const pgmCfgPath = Uri.joinPath(ws.uri, PG_FOLDER, PGR_PGM_FILE);
   try {
-    const json = JSON.parse(fs.readFileSync(pgmCfgPath).toString());
+    const json = JSON.parse(
+      new TextDecoder().decode(await workspace.fs.readFile(pgmCfgPath)),
+    );
     const decoded = ProgramsConfigModel.decode(json);
     if (isLeft(decoded)) {
       throw Error(
@@ -85,27 +85,31 @@ export const readProgramConfigFileContent = (): ProgramsConfig => {
       );
     }
     return decoded.right;
-  } catch (e) {
-    console.error(e);
+  } catch (e: any) {
+    if (e.code !== "FileNotFound") {
+      console.error(e);
+    }
     return EMPTY;
   }
-};
+}
 
-export function readProcessorGroupsFileContent(): ProcessorGroup[] {
-  const ws = SettingsUtils.getWorkspaceFoldersPath(true);
-  if (ws.length < 1) {
+export async function readProcessorGroupsFileContent(
+  documentUri: Uri,
+): Promise<ProcessorGroup[]> {
+  const ws = workspace.getWorkspaceFolder(documentUri);
+  if (ws === undefined) {
     return [];
   }
-  const cfgPath = path.join(ws[0], PROCESSOR_GROUP_FOLDER);
-  const procCfgPath = path.join(cfgPath, PROCESSOR_GROUP_PROC);
-  if (!fs.existsSync(procCfgPath)) {
-    return [];
-  }
+
+  const procCfgPath = Uri.joinPath(ws.uri, PG_FOLDER, PG_PROC_FILE);
   try {
     const ProcessorGrpupsModel = t.type({
       pgroups: t.array(ProcessorGroupModel),
     });
-    const json = JSON.parse(fs.readFileSync(procCfgPath).toString());
+    const json = JSON.parse(
+      new TextDecoder().decode(await workspace.fs.readFile(procCfgPath)),
+    );
+
     const decoded = ProcessorGrpupsModel.decode(json);
     if (isLeft(decoded)) {
       throw Error(
@@ -113,8 +117,10 @@ export function readProcessorGroupsFileContent(): ProcessorGroup[] {
       );
     }
     return decoded.right.pgroups;
-  } catch (e) {
-    console.error(e);
+  } catch (e: any) {
+    if (e.code !== "FileNotFound") {
+      console.error(e);
+    }
     return [];
   }
 }

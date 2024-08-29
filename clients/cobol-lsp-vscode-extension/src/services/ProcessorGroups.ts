@@ -14,9 +14,8 @@
 
 import * as path from "path";
 import { Minimatch } from "minimatch";
-import { SettingsUtils } from "./util/SettingsUtils";
 import { globSync } from "glob";
-import { Uri } from "vscode";
+import { Uri, workspace } from "vscode";
 import {
   backwardSlashRegex,
   cleanWorkspaceFolderName,
@@ -62,16 +61,16 @@ export async function loadProcessorGroupCopybookPathsConfig(
     [...cfg, ...configObject],
     getVariablesFromUri(item.scopeUri, false),
   );
-  return SettingsUtils.getWorkspaceFoldersPath(true)
-    .map((folder) =>
-      globSync(
-        config.map((ele) => ele.replace(backwardSlashRegex, "/")),
-        { cwd: cleanWorkspaceFolderName(folder), absolute: true },
-      ).map((s) => normalizePath(s)),
-    )
-    .reduce((acc, curVal) => {
-      return acc.concat(curVal);
-    }, []);
+
+  const wsUri = workspace.getWorkspaceFolder(Uri.parse(item.scopeUri))?.uri;
+  if (wsUri === undefined) {
+    return configObject;
+  }
+  const globs = globSync(
+    config.map((ele) => ele.replace(backwardSlashRegex, "/")),
+    { cwd: cleanWorkspaceFolderName(wsUri.fsPath), absolute: true },
+  ).map((s) => normalizePath(s));
+  return globs;
 }
 
 export async function loadProcessorGroupCopybookExtensionsConfig(
@@ -126,8 +125,8 @@ export async function loadProcessorGroupDialectConfig(
   try {
     const pgCfg = loadProcessorsConfigForDocument(
       item.scopeUri,
-      readProcessorGroupsFileContent(),
-      readProgramConfigFileContent(),
+      await readProcessorGroupsFileContent(Uri.parse(item.scopeUri)),
+      await readProgramConfigFileContent(Uri.parse(item.scopeUri)),
       decodeBridgeJson(await loadBridgeJsonContent(Uri.parse(item.scopeUri))),
     );
     if (pgCfg === undefined || pgCfg.preprocessor == undefined) {
@@ -159,24 +158,18 @@ export async function loadProcessorGroupDialectConfig(
 
 function matchProcessorGroup(
   pgmCfg: ProgramsConfig,
-  documentPath: string,
-  workspacePath: string,
+  documentUri: Uri,
+  workspaceUri: Uri,
 ): string | undefined {
-  documentPath =
-    path.sep === "/"
-      ? documentPath.replace("\\", path.sep)
-      : documentPath.replace("/", path.sep);
-  workspacePath =
-    path.sep === "/"
-      ? workspacePath.replace("\\", path.sep)
-      : workspacePath.replace("/", path.sep);
-  const relativeDocPath = path.relative(workspacePath, documentPath);
-
+  const relativeDocPath = path.relative(
+    workspaceUri.fsPath,
+    documentUri.fsPath,
+  );
   const candidates: string[] = [];
   for (const v of pgmCfg.pgms) {
     // exact match
     if (path.isAbsolute(v.program)) {
-      if (pathMatches(v.program, documentPath)) {
+      if (pathMatches(v.program, documentUri.fsPath)) {
         return v.pgroup;
       }
     } else {
@@ -197,14 +190,17 @@ function matchProcessorGroup(
 }
 
 function pathMatches(program: string, documentPath: string) {
-  return path.sep === "/"
-    ? program.split("\\").join(path.sep) === documentPath
-    : program.split("/").join(path.sep).toUpperCase() ===
-        documentPath.toUpperCase();
+  return (
+    program === documentPath ||
+    (path.sep === "/"
+      ? program.split("\\").join(path.sep) === documentPath
+      : program.split("/").join(path.sep).toUpperCase() ===
+        documentPath.toUpperCase())
+  );
 }
 
 export const loadProcessorsConfigForDocument = (
-  documentUri: string,
+  documentUriString: string,
   pgroups: ProcessorGroup[],
   pgmCfg: ProgramsConfig,
   b4g: B4GTypeMetadata | undefined,
@@ -212,13 +208,12 @@ export const loadProcessorsConfigForDocument = (
   if (pgroups.length === 0) {
     return undefined;
   }
-  const documentPath = Uri.parse(documentUri).fsPath;
-  const ws = SettingsUtils.getWorkspaceFoldersPath(true);
-  if (ws.length < 1) {
+  const documentUri = Uri.parse(documentUriString);
+  const wsUri = workspace.getWorkspaceFolder(documentUri)?.uri;
+  if (wsUri === undefined) {
     return undefined;
   }
-  const pgroup = selectProcessorGroup(pgmCfg, documentPath, ws[0], b4g);
-
+  const pgroup = selectProcessorGroup(pgmCfg, documentUri, wsUri, b4g);
   let result;
   pgroups.forEach((p) => {
     if (pgroup === p.name) {
@@ -231,16 +226,16 @@ export const loadProcessorsConfigForDocument = (
 
 function selectProcessorGroup(
   pgmCfg: ProgramsConfig,
-  documentPath: string,
-  workspacePath: string,
+  documentUri: Uri,
+  workspaceUri: Uri,
   b4g: B4GTypeMetadata | undefined,
 ): string | undefined {
   if (b4g === undefined) {
-    return matchProcessorGroup(pgmCfg, documentPath, workspacePath);
+    return matchProcessorGroup(pgmCfg, documentUri, workspaceUri);
   }
   const selectedElement = b4g.fileExtension
-    ? path.basename(documentPath, "." + b4g.fileExtension)
-    : path.basename(documentPath);
+    ? path.basename(documentUri.fsPath, "." + b4g.fileExtension)
+    : path.basename(documentUri.fsPath);
   return b4g.elements[selectedElement] === undefined
     ? b4g.defaultProcessorGroup
     : b4g.elements[selectedElement].processorGroup;
@@ -260,8 +255,8 @@ async function loadProcessorGroupSettings<T extends string | string[]>(
 ): Promise<T> {
   const pgCfg: ProcessorGroup | undefined = loadProcessorsConfigForDocument(
     documentUri,
-    readProcessorGroupsFileContent(),
-    readProgramConfigFileContent(),
+    await readProcessorGroupsFileContent(Uri.parse(documentUri)),
+    await readProgramConfigFileContent(Uri.parse(documentUri)),
     decodeBridgeJson(await loadBridgeJsonContent(Uri.parse(documentUri))),
   );
   if (pgCfg === undefined) {

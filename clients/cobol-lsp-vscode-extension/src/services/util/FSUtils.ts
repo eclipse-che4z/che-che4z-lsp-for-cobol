@@ -30,14 +30,14 @@ export function searchCopybookInExtensionFolder(
   copybookFolders: string[] | undefined,
   extensions: string[] | undefined,
   storagePath: string,
-): string | undefined {
+): Uri | undefined {
   if (!copybookFolders || !extensions) return undefined;
   const extensionFolder = cleanWorkspaceFolderName(storagePath);
   for (const p of copybookFolders) {
     for (const ext of extensions) {
       const searchResult = globSearch(extensionFolder, p, copybookName, ext);
       if (searchResult) {
-        return vscode.Uri.file(searchResult).toString();
+        return vscode.Uri.file(searchResult);
       }
     }
   }
