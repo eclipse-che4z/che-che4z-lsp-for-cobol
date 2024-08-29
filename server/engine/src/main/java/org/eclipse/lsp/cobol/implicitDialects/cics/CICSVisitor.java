@@ -224,8 +224,7 @@ class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
   @Override
   public List<Node> visitChildren(RuleNode node) {
     if (node.getRuleContext().parent != null)
-      cicsOptionsCheckUtility.checkOptions(
-          (ParserRuleContext) node.getRuleContext(), node.getRuleContext().parent.getRuleIndex());
+      cicsOptionsCheckUtility.checkOptions((ParserRuleContext) node.getRuleContext());
     ThreadInterruptionUtil.checkThreadInterrupted();
     return super.visitChildren(node);
   }

@@ -100,7 +100,6 @@ public abstract class CICSOptionsCheckBaseUtility {
    *
    * @param rules Generic list of rules to check. Will either be a collection of ParserRuleContext
    *     or TerminalNode
-   * @param ctx Context to extrapolate locality against
    * @param options Options checked to insert into error message
    */
   protected void checkHasIllegalOptions(List<?> rules, String options) {

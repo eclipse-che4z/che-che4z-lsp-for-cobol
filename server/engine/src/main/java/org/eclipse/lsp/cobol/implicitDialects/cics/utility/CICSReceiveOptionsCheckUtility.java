@@ -24,8 +24,12 @@ import org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_receive;
+
 /** Checks CICS Receive rules for required and invalid options */
 public class CICSReceiveOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
+
+  public static final int RULE_INDEX = RULE_cics_receive;
 
   public CICSReceiveOptionsCheckUtility(
       DialectProcessingContext context, List<SyntaxError> errors) {

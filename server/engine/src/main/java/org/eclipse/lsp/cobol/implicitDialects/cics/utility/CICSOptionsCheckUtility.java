@@ -18,32 +18,28 @@ package org.eclipse.lsp.cobol.implicitDialects.cics.utility;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
-
+import java.util.Map;
+import java.util.HashMap;
 import java.util.List;
 
-import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_receive;
-
-/** Manages trafic for CICS parser options checking */
+/** Manages traffic for CICS parser options checking */
 public class CICSOptionsCheckUtility {
-  private final CICSReceiveOptionsCheckUtility receiveUtility;
+  private final Map<Integer, CICSOptionsCheckBaseUtility> optionsMap = new HashMap<>();
 
   public CICSOptionsCheckUtility(DialectProcessingContext context, List<SyntaxError> errors) {
-    receiveUtility = new CICSReceiveOptionsCheckUtility(context, errors);
+    optionsMap.put(
+        CICSReceiveOptionsCheckUtility.RULE_INDEX,
+        new CICSReceiveOptionsCheckUtility(context, errors));
   }
 
   /**
    * Entrypoint to check CICS rule options
    *
-   * @param ctx ParserRuleContext subclass containging options
-   * @param parentIndex Index used to determine what Rule Set to check against
+   * @param ctx ParserRuleContext subclass containing options
    * @param <E> A subclass of ParserRuleContext
    */
-  public <E extends ParserRuleContext> void checkOptions(E ctx, int parentIndex) {
-    switch (parentIndex) {
-      case (RULE_cics_receive):
-        receiveUtility.checkOptions(ctx);
-      default:
-        break;
-    }
+  public <E extends ParserRuleContext> void checkOptions(E ctx) {
+    CICSOptionsCheckBaseUtility utility = optionsMap.get(ctx.parent.getRuleIndex());
+    if (utility != null) utility.checkOptions(ctx);
   }
 }
