@@ -217,7 +217,7 @@ it("Processor groups configuration matches program relative to workspace", async
     scopeUri: WORKSPACE_URI + "/IDMS/TEST.cob",
     section: "cobol-lsp.dialects",
   };
-  const result = await loadProcessorGroupDialectConfig(item, {});
+  const result = await loadProcessorGroupDialectConfig(item, []);
   expect(result).toStrictEqual(["IDMS"]);
 });
 

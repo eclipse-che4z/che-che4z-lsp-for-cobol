@@ -12,7 +12,10 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
-import { B4GTypeMetadata, decodeBridgeJson } from "../../services/BridgeForGit";
+import {
+  B4GTypeMetadata,
+  decodeBridgeJson,
+} from "../../services/BridgeForGitLoader";
 import { loadProcessorsConfigForDocument } from "../../services/ProcessorGroups";
 import * as path from "path";
 
