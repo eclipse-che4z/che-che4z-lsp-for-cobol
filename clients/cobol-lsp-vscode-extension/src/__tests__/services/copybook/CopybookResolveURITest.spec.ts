@@ -23,7 +23,6 @@ import { SettingsService } from "../../../services/Settings";
 import * as fsUtils from "../../../services/util/FSUtils";
 import { ProfileUtils } from "../../../services/util/ProfileUtils";
 import { SettingsUtils } from "../../../services/util/SettingsUtils";
-import { Utils } from "../../../services/util/Utils";
 import { CopybookDownloadService } from "../../../services/copybook/CopybookDownloadService";
 
 const copybookName: string = "NSTCOPY1";
@@ -32,63 +31,22 @@ const CPY_FOLDER_NAME = ".cobcopy";
 const RELATIVE_CPY_FOLDER_NAME = "../relativeCobcopy";
 const folderPath = path.join(__dirname, CPY_FOLDER_NAME);
 
-// TODO: This is horrifying
-jest.mock("vscode", () => ({
-  Uri: {
-    parse: jest.fn().mockImplementation((str: string) => {
-      str = str.substring("file://".length);
-      return {
-        path: str.substring(str.indexOf("/")),
-        fsPath: str,
-        toString() {
-          return "file://" + this.path;
-        },
-      };
-    }),
-    joinPath: jest.fn().mockImplementation((u, segment: string) => {
-      const result = { ...u };
-      if (segment === "../.bridge.json") {
-        result.path =
-          result.path.substring(0, result.path.lastIndexOf("/")) +
-          "/.bridge.json";
-        result.fsPath = result.fsPath.substring(
-          0,
-          result.path.lastIndexOf("/") + "/.bridge.json",
-        );
-        return result;
-      }
-      expect(segment).toBe("..");
-
-      result.path = result.path.substring(0, result.path.lastIndexOf("/"));
-      result.fsPath = result.fsPath.substring(0, result.path.lastIndexOf("/"));
-
-      return result;
-    }),
-
-    file: jest.fn().mockImplementation((str: string) => {
-      const path = str.startsWith("/") ? str : "/" + str;
-      return {
-        path,
-        fsPath: str,
-        toString() {
-          return "file://" + this.path;
-        },
-      };
-    }),
-  },
-  window: {
-    createOutputChannel: jest.fn().mockReturnValue({
-      appendLine: jest.fn(),
-    }),
-  },
-  workspace: {
-    fs: {
-      readFile: jest.fn().mockImplementation(() => {
-        throw { code: "FileNotFound" };
-      }),
+jest.mock("vscode", () => {
+  const Uri = require("../../../__mocks__/UriMock").Uri;
+  const WS_URI = new Uri("/c:/my/workspace");
+  return {
+    Uri,
+    workspace: {
+      fs: {
+        readFile: jest.fn().mockImplementation(() => {
+          throw { code: "FileNotFound" };
+        }),
+      },
+      getWorkspaceFolder: () => ({ uri: WS_URI }),
+      workspaceFolders: [{ uri: WS_URI }],
     },
-  },
-}));
+  };
+});
 
 SettingsUtils.getWorkspaceFoldersPath = jest.fn().mockReturnValue([__dirname]);
 vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
