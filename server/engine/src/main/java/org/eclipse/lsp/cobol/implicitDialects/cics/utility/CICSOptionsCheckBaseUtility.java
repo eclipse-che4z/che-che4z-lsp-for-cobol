@@ -27,7 +27,9 @@ import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.model.Locality;
+import org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /** Common facilities for checking CICS parser options */
@@ -101,13 +103,50 @@ public abstract class CICSOptionsCheckBaseUtility {
    * @param ctx Context to extrapolate locality against
    * @param options Options checked to insert into error message
    */
-  protected void checkHasIllegalOptions(List<?> rules, ParserRuleContext ctx, String options) {
+  protected void checkHasIllegalOptions(List<?> rules, String options) {
     if (!rules.isEmpty()) {
       rules.forEach(
           error ->
               throwException(
                   options, getLocality(error), "Invalid option provided: ", ErrorSeverity.ERROR));
     }
+  }
+
+  /**
+   * Iterates over the provided response handlers, extracts what is provided, and validates
+   *
+   * @param ruleHandlers
+   * @param contexts
+   * @return List of Rule Context Data
+   */
+  protected List<RuleContextData> harvestResponseHandlers(
+      List<CICSParser.Cics_handle_responseContext> ruleHandlers, List<RuleContextData> contexts) {
+
+    List<TerminalNode> respResponseHandlers = new ArrayList<>();
+    List<TerminalNode> respTwoResponseHandlers = new ArrayList<>();
+    List<TerminalNode> noHandle = new ArrayList<>();
+    ruleHandlers.forEach(
+        optionOne -> {
+          optionOne
+              .cics_inline_handle_exception()
+              .cics_resp()
+              .forEach(
+                  optionTwo -> {
+                    if (optionTwo.RESP() != null) respResponseHandlers.add(optionTwo.RESP());
+                    if (optionTwo.RESP2() != null) respTwoResponseHandlers.add(optionTwo.RESP2());
+                  });
+          noHandle.addAll(optionOne.cics_inline_handle_exception().NOHANDLE());
+        });
+
+    contexts.add(new RuleContextData(respResponseHandlers, "RESP"));
+    contexts.add(new RuleContextData(respTwoResponseHandlers, "RESP2"));
+    contexts.add(new RuleContextData(noHandle, "NOHANDLE"));
+
+    if (respResponseHandlers.isEmpty()) {
+      checkHasIllegalOptions(respTwoResponseHandlers, "RESP2");
+    }
+
+    return contexts;
   }
 
   private <E> Locality getLocality(E rule) {

@@ -251,6 +251,14 @@ public class TestCicsReceive {
     "RECEIVE", "{MAP(1)", "MAPPINGDEV(100)", "MAPSET(1)|error1}"
   };
 
+  private static final String[] MAP_RESPONSE_HANDLER_DUPLICATE_INVALID = {
+    "RECEIVE", "MAP(1)", "RESP(100)", "{RESP|errorOne}(100)"
+  };
+
+  private static final String[] MAP_RESPONSE_HANDLER_DUPLICATE_INVALID_TWO = {
+    "RECEIVE", "MAP(1)", "NOHANDLE", "{NOHANDLE|errorOne}"
+  };
+
   private static String getTestString(String[] components) {
     List<String> instances = Arrays.asList(components);
     instances.replaceAll(String.join("", Collections.nCopies(12, " "))::concat);
@@ -622,6 +630,36 @@ public class TestCicsReceive {
             new Diagnostic(
                 new Range(),
                 "Missing required option: FROM",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())),
+        ImmutableList.of());
+  }
+
+  @Test
+  void testMapResponseHandlerDuplicateInvalidOne() {
+    UseCaseEngine.runTest(
+        getTestString(MAP_RESPONSE_HANDLER_DUPLICATE_INVALID),
+        ImmutableList.of(),
+        ImmutableMap.of(
+            "errorOne",
+            new Diagnostic(
+                new Range(),
+                "Excessive options provided for: RESP",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())),
+        ImmutableList.of());
+  }
+
+  @Test
+  void testMapResponseHandlerDuplicateInvalidTwo() {
+    UseCaseEngine.runTest(
+        getTestString(MAP_RESPONSE_HANDLER_DUPLICATE_INVALID_TWO),
+        ImmutableList.of(),
+        ImmutableMap.of(
+            "errorOne",
+            new Diagnostic(
+                new Range(),
+                "Excessive options provided for: NOHANDLE",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())),
         ImmutableList.of());

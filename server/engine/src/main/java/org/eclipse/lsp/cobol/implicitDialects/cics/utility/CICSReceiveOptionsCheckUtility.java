@@ -57,7 +57,7 @@ public class CICSReceiveOptionsCheckUtility extends CICSOptionsCheckBaseUtility 
   private void checkGroupOne(CICSParser.Cics_receive_group_oneContext ctx) {
     checkHasMandatoryOptions(ctx.cics_length_flength(), ctx, "LENGTH or FLENGTH");
     if (!ctx.ASIS().isEmpty() || !ctx.BUFFER().isEmpty()) {
-      checkHasIllegalOptions(ctx.LEAVEKB(), ctx, "LEAVEKB");
+      checkHasIllegalOptions(ctx.LEAVEKB(), "LEAVEKB");
     }
 
     List<RuleContextData> contexts = new ArrayList<>();
@@ -67,6 +67,8 @@ public class CICSReceiveOptionsCheckUtility extends CICSOptionsCheckBaseUtility 
     contexts.add(new RuleContextData(ctx.BUFFER(), "BUFFER", ErrorSeverity.WARNING));
     contexts.add(new RuleContextData(ctx.NOTRUNCATE(), "NOTRUNCATE", ErrorSeverity.WARNING));
     contexts.add(new RuleContextData(ctx.LEAVEKB(), "LEAVEKB", ErrorSeverity.WARNING));
+    contexts.add(new RuleContextData(ctx.cics_handle_response(), "RESPONSE HANDLER"));
+    contexts = harvestResponseHandlers(ctx.cics_handle_response(), contexts);
     checkDuplicates(contexts);
   }
 
@@ -82,6 +84,8 @@ public class CICSReceiveOptionsCheckUtility extends CICSOptionsCheckBaseUtility 
     contexts.add(new RuleContextData(ctx.cics_maxlength(), "MAXLENGTH or MAXFLENGTH"));
     contexts.add(new RuleContextData(ctx.NOTRUNCATE(), "NOTRUNCATE", ErrorSeverity.WARNING));
     contexts.add(new RuleContextData(ctx.STATE(), "STATE"));
+    contexts.add(new RuleContextData(ctx.cics_handle_response(), "RESPONSE HANDLER"));
+    contexts = harvestResponseHandlers(ctx.cics_handle_response(), contexts);
     checkDuplicates(contexts);
   }
 
@@ -94,6 +98,8 @@ public class CICSReceiveOptionsCheckUtility extends CICSOptionsCheckBaseUtility 
     contexts.add(new RuleContextData(ctx.cics_maxlength(), "MAXLENGTH or MAXFLENGTH"));
     contexts.add(new RuleContextData(ctx.NOTRUNCATE(), "NOTRUNCATE", ErrorSeverity.WARNING));
     contexts.add(new RuleContextData(ctx.PASSBK(), "PASSBK", ErrorSeverity.WARNING));
+    contexts.add(new RuleContextData(ctx.cics_handle_response(), "RESPONSE HANDLER"));
+    contexts = harvestResponseHandlers(ctx.cics_handle_response(), contexts);
     checkDuplicates(contexts);
   }
 
@@ -105,12 +111,14 @@ public class CICSReceiveOptionsCheckUtility extends CICSOptionsCheckBaseUtility 
     contexts.add(new RuleContextData(ctx.cics_into_set(), "INTO or SET"));
     contexts.add(new RuleContextData(ctx.LENGTH(), "LENGTH"));
     contexts.add(new RuleContextData(ctx.ASIS(), "ASIS", ErrorSeverity.WARNING));
+    contexts.add(new RuleContextData(ctx.cics_handle_response(), "RESPONSE HANDLER"));
+    contexts = harvestResponseHandlers(ctx.cics_handle_response(), contexts);
     checkDuplicates(contexts);
   }
 
   private void checkMap(CICSParser.Cics_receive_mapContext ctx) {
-    if (ctx.FROM().isEmpty()) checkHasIllegalOptions(ctx.LENGTH(), ctx, "LENGTH");
-    if (ctx.TERMINAL().isEmpty()) checkHasIllegalOptions(ctx.INPARTN(), ctx, "INPARTN");
+    if (ctx.FROM().isEmpty()) checkHasIllegalOptions(ctx.LENGTH(), "LENGTH");
+    if (ctx.TERMINAL().isEmpty()) checkHasIllegalOptions(ctx.INPARTN(), "INPARTN");
 
     List<RuleContextData> contexts = new ArrayList<>();
     contexts.add(new RuleContextData(ctx.MAPSET(), "MAPSET"));
@@ -120,6 +128,7 @@ public class CICSReceiveOptionsCheckUtility extends CICSOptionsCheckBaseUtility 
     contexts.add(new RuleContextData(ctx.TERMINAL(), "TERMINAL", ErrorSeverity.WARNING));
     contexts.add(new RuleContextData(ctx.ASIS(), "ASIS", ErrorSeverity.WARNING));
     contexts.add(new RuleContextData(ctx.INPARTN(), "INPARTN"));
+    contexts = harvestResponseHandlers(ctx.cics_handle_response(), contexts);
     checkDuplicates(contexts);
   }
 
@@ -132,6 +141,8 @@ public class CICSReceiveOptionsCheckUtility extends CICSOptionsCheckBaseUtility 
     contexts.add(new RuleContextData(ctx.LENGTH(), "LENGTH"));
     contexts.add(new RuleContextData(ctx.MAPSET(), "MAPSET"));
     contexts.add(new RuleContextData(ctx.cics_into_set(), "INTO or SET"));
+    contexts.add(new RuleContextData(ctx.cics_handle_response(), "RESPONSE HANDLER"));
+    contexts = harvestResponseHandlers(ctx.cics_handle_response(), contexts);
     checkDuplicates(contexts);
   }
 }
