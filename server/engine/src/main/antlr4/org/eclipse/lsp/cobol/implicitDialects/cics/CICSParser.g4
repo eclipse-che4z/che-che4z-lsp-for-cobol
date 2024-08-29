@@ -107,7 +107,7 @@ cics_length_flength:            (LENGTH | FLENGTH) cics_data_area;
 cics_receive_group_one:         (cics_into_set | cics_length_flength | cics_maxlength | ASIS | BUFFER | NOTRUNCATE | LEAVEKB)+;
 
 // CICS Group 2 (APPC, LUTYPE 6.1, MRO)
-cics_receive_group_two:         (CONVID cics_name | SESSION cics_name | cics_into_set | cics_length_flength | cics_maxlength | NOTRUNCATE | STATE cics_cvda)+;
+cics_receive_group_two:         ((CONVID | SESSION) cics_name | cics_into_set | cics_length_flength | cics_maxlength | NOTRUNCATE | STATE cics_cvda)+;
 
 // CICS Group 3 (2980, Non z Default)
 cics_receive_group_three:       (cics_into_set | cics_length_flength | cics_maxlength | NOTRUNCATE | PASSBK)+;
@@ -115,8 +115,8 @@ cics_receive_group_three:       (cics_into_set | cics_length_flength | cics_maxl
 cics_receive_partn:             (cics_into_set | LENGTH cics_data_area | ASIS)+;
 
 // RECEIVE MAPS
-cics_receive_map: (MAP cics_name | MAPSET cics_name | cics_into_set | FROM cics_data_area | LENGTH cics_data_area | TERMINAL | ASIS | INPARTN cics_name)+;
-cics_receive_map_mappingdev:    (MAP cics_name | MAPPINGDEV cics_data_area | FROM cics_data_area | LENGTH cics_data_area | MAPSET cics_name | cics_into_set)+;
+cics_receive_map: ((MAP | MAPSET | INPARTN) cics_name | cics_into_set | (FROM | LENGTH) cics_data_area | TERMINAL | ASIS)+;
+cics_receive_map_mappingdev:    ((MAP | MAPSET) cics_name | (MAPPINGDEV | FROM | LENGTH) cics_data_area  | cics_into_set)+;
 
 
 /** SEND: */
