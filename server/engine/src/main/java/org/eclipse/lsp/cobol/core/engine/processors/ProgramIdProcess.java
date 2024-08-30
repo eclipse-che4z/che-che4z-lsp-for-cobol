@@ -22,6 +22,6 @@ import org.eclipse.lsp.cobol.common.model.tree.ProgramIdNode;
 public class ProgramIdProcess implements Processor<ProgramIdNode> {
   @Override
   public void accept(ProgramIdNode node, ProcessingContext ctx) {
-    node.getProgram().ifPresent(it -> it.setProgramName(node.getProgramId()));
+    node.getProgram().ifPresent(program -> program.setProgramName(node.getProgramId()));
   }
 }

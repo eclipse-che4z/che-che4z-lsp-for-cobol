@@ -90,7 +90,7 @@ export async function closeActiveEditor() {
     await vscode.commands.executeCommand("undo");
     await sleep(100);
   }
-  await vscode.languages.setTextDocumentLanguage(doc.document, "json");
+  await vscode.languages.setTextDocumentLanguage(doc.document, "plaintext");
   await vscode.commands.executeCommand("workbench.action.closeActiveEditor");
   await sleep(100);
 }

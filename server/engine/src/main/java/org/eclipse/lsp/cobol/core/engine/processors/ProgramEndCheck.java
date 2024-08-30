@@ -27,6 +27,17 @@ import org.eclipse.lsp.cobol.common.model.tree.ProgramEndNode;
 /** ProgramEndNode processor */
 @Slf4j
 public class ProgramEndCheck implements Processor<ProgramEndNode> {
+  private static MessageTemplate nodeNameIssueMessage(ProgramNode node) {
+    switch (node.getSubtype()) {
+      case Program:
+        return MessageTemplate.of("CobolVisitor.progIDIssueMsg");
+      case Function:
+        return MessageTemplate.of("CobolVisitor.funcIDIssueMsg");
+      default:
+        throw new AssertionError();
+    }
+  }
+
   @Override
   public void accept(ProgramEndNode programEndNode, ProcessingContext ctx) {
     ProgramNode node = programEndNode.getProgram().orElseThrow(RuntimeException::new);
@@ -38,7 +49,7 @@ public class ProgramEndCheck implements Processor<ProgramEndNode> {
                   .errorSource(ErrorSource.PARSING)
                   .location(programEndNode.getLocality().toOriginalLocation())
                   .severity(ErrorSeverity.WARNING)
-                  .messageTemplate(MessageTemplate.of("CobolVisitor.progIDIssueMsg"))
+                  .messageTemplate(nodeNameIssueMessage(node))
                   .build());
     } else if (!node.getProgramName().equalsIgnoreCase(programEndNode.getProgramId())) {
       LOG.debug(

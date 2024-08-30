@@ -35,7 +35,7 @@ class TestSyntaxError {
           + "        PROGRAM-ID. test1.\r\n"
           + "        DATA DIVISION.\r\n"
           + "        PROCEDURE DIVISION.\r\n"
-          + "        END PROGRAM {test1|name}.";
+          + "        END PROGRAM test1.";
 
   private static final String DIVISION = "Syntax error on 'DIVISIONs'";
   private static final String NAME = "There is an issue with PROGRAM-ID paragraph";
@@ -47,9 +47,7 @@ class TestSyntaxError {
         ImmutableList.of(),
         ImmutableMap.of(
             "typo",
-            new Diagnostic(new Range(), DIVISION, DiagnosticSeverity.Error, ErrorSource.PARSING.getText()),
-            "name",
-            new Diagnostic(new Range(), NAME, DiagnosticSeverity.Warning, ErrorSource.PARSING.getText())),
+            new Diagnostic(new Range(), DIVISION, DiagnosticSeverity.Error, ErrorSource.PARSING.getText())),
         CobolLanguageId.COBOL);
   }
 }

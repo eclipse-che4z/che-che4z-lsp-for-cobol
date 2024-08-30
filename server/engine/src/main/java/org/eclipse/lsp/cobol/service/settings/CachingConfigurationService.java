@@ -82,10 +82,10 @@ public class CachingConfigurationService implements ConfigurationService {
       }
       return config;
     } catch (InterruptedException e) {
-      LOG.error("Issue while resolving analysis configuration", e);
+      LOG.error("Issue while resolving analysis configuration for {}", scopeURI, e);
       Thread.currentThread().interrupt();
     } catch (ExecutionException e) {
-      LOG.error("Issue while resolving analysis configuration", e);
+      LOG.error("Issue while resolving analysis configuration for {}", scopeURI, e);
     }
     return AnalysisConfig.defaultConfig(mode);
   }

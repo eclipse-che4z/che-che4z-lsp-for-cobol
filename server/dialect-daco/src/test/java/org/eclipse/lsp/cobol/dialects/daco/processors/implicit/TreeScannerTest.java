@@ -16,6 +16,7 @@ package org.eclipse.lsp.cobol.dialects.daco.processors.implicit;
 
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
+import org.eclipse.lsp.cobol.common.model.tree.ProgramSubtype;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableDefinitionNameNode;
 import org.junit.jupiter.api.Test;
 
@@ -30,7 +31,7 @@ public class TreeScannerTest {
   @Test
   void testScan() {
     Locality locality = Locality.builder().build();
-    ProgramNode programNode = new ProgramNode(locality);
+    ProgramNode programNode = new ProgramNode(locality, ProgramSubtype.Program, 0);
 
     programNode.addChild(new VariableDefinitionNameNode(locality, "TBF123-XAB"));
     programNode.addChild(new VariableDefinitionNameNode(locality, "TBL123-XAB"));
