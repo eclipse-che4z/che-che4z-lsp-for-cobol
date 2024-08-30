@@ -21,8 +21,6 @@ import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.NodeType;
 import org.eclipse.lsp4j.Location;
 
-import com.google.common.collect.ImmutableList;
-
 import java.util.List;
 
 /** The class represents section name node in COBOL grammar. */
@@ -31,9 +29,9 @@ public class SectionNameNode extends Node implements DefinedAndUsedStructure {
   private final String name;
 
   @Setter
-  private List<Location> definitions = ImmutableList.of();
+  private List<Location> definitions;
   @Setter
-  private List<Location> usages = ImmutableList.of();
+  private List<Location> usages;
 
   public SectionNameNode(
       Locality location, String name) {

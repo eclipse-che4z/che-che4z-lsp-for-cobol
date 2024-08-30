@@ -12,40 +12,15 @@ options {tokenVocab = CobolLexer; superClass = MessageServiceParser;}
 startRule : compilationUnit EOF;
 
 compilationUnit
-   : programOrFunctionUnit+
+   : programUnit+
    ;
 
-programOrFunctionUnit
-   : identificationDivision (programDetails | functionDetails)
-   ;
-
-programDetails
-   : programIdParagraph identificationDivisionBody* environmentDivision? dataDivision? procedureDivision? nestedProgramUnit* endProgramStatement?
-   // TODO: This rule requires abitrary long lookahead due to conflict with compilationUnit
-   //       It might be possible to parse all programs as peers and enforce nesting later on
-   // This is what the grammar should actually look like, but tests start failing.
-   // (
-   //    nestedProgramUnit+ endProgramStatement
-   //    |
-   //    endProgramStatement?
-   // )
-   ;
-
-nestedProgramUnit
-   : identificationDivision programDetails // The end should be unconditional, but tests start failing
+programUnit
+   : identificationDivision environmentDivision? dataDivision? procedureDivision? programUnit* endProgramStatement?
    ;
 
 endProgramStatement
    : END PROGRAM programName DOT_FS
-   ;
-
-functionDetails
-   : functionIdParagraph identificationDivisionBody* environmentDivision? dataDivision? procedureDivision endFunctionStatement
-   // END is required by the compiler even though the documentation suggests it is optional
-   ;
-
-endFunctionStatement
-   : END FUNCTION programName DOT_FS
    ;
 
 commaSeparator: COMMACHAR | COMMASEPARATOR;
@@ -53,7 +28,7 @@ commaSeparator: COMMACHAR | COMMASEPARATOR;
 // --- identification division --------------------------------------------------------------------
 
 identificationDivision
-   : (IDENTIFICATION | ID) DIVISION dot_fs
+   : (IDENTIFICATION | ID) DIVISION dot_fs programIdParagraph identificationDivisionBody*
    ;
 
 identificationDivisionBody
@@ -64,20 +39,6 @@ identificationDivisionBody
 
 programIdParagraph
    : PROGRAM_ID DOT_FS? programName (IS? (COMMON | INITIAL | LIBRARY | DEFINITION | RECURSIVE) PROGRAM?)? DOT_FS?
-   ;
-
-functionIdParagraph
-   : FUNCTION_ID DOT_FS? programName
-     (AS literal)?
-     (IS? PROTOTYPE)?
-     // compiler accepts both orderings
-     (
-        ENTRY_NAME IS? (COMPAT|LONGUPPER|LONGMIXED) (ENTRY_INTERFACE IS? (STATIC|DYNAMIC|DLL))?
-        |
-        ENTRY_INTERFACE IS? (STATIC|DYNAMIC|DLL) (ENTRY_NAME IS? (COMPAT|LONGUPPER|LONGMIXED))?
-        |
-     )
-     DOT_FS?
    ;
 
 // - author paragraph ----------------------------------
@@ -156,11 +117,7 @@ classRepositoryClause
     ;
 
 functionRepositoryClause
-    : functionReference | intrinsicClause
-    ;
-
-functionReference
-    : FUNCTION functionName
+    : FUNCTION functionName | intrinsicClause
     ;
 
 intrinsicClause
@@ -2160,7 +2117,7 @@ generalIdentifier
    ;
 
 functionCall
-   : functionReference (LPARENCHAR argument (COMMACHAR? argument)* RPARENCHAR)* referenceModifier?
+   : FUNCTION functionName (LPARENCHAR argument (COMMACHAR? argument)* RPARENCHAR)* referenceModifier?
    ;
 
 referenceModifier
@@ -2364,9 +2321,7 @@ cobolWord
    ;
 
 allowedCobolKeywords
-   : AS | COMPAT| CR | DLL | FIELD | MMDDYYYY | PRINTER | DAY_OF_WEEK
-   | ENTRY_NAME | ENTRY_INTERFACE
-   | STATIC | LONGUPPER | LONGMIXED
+   : CR | FIELD | MMDDYYYY | PRINTER | DAY_OF_WEEK
    | REMARKS | RESUME | TIMER | TODAYS_DATE | TODAYS_NAME | YEAR | YYYYDDD | YYYYMMDD | WHEN_COMPILED
    | DISK | KEYBOARD | PORT | READER | REMOTE | VIRTUAL | LIBRARY | DEFINITION | PARSE | BOOL | ESCAPE | INITIALIZED
    | LOC | BYTITLE | BYFUNCTION | ABORT | ORDERLY | ASSOCIATED_DATA | ASSOCIATED_DATA_LENGTH

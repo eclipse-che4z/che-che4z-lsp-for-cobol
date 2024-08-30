@@ -15,20 +15,13 @@
 package org.eclipse.lsp.cobol.common.model.tree;
 
 import lombok.ToString;
-
-import java.util.Optional;
-
 import org.eclipse.lsp.cobol.common.model.Locality;
-import org.eclipse.lsp.cobol.common.model.variables.DivisionType;
+import org.eclipse.lsp.cobol.common.model.NodeType;
 
 /** The class represents procedure division in COBOL. */
 @ToString(callSuper = true)
-public class ProcedureDivisionNode extends DivisionNode {
-  public ProcedureDivisionNode(Locality location, Optional<Locality> clauses) {
-    super(location, DivisionType.PROCEDURE_DIVISION);
-    clausesLocation = clauses.orElse(location);
+public class ProcedureDivisionNode extends Node {
+  public ProcedureDivisionNode(Locality location) {
+    super(location, NodeType.PROCEDURE_DIVISION);
   }
-
-  public boolean hasReturningClause = false;
-  public final Locality clausesLocation;
 }

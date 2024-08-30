@@ -19,7 +19,6 @@ import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.model.NodeType;
 import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
-import org.eclipse.lsp.cobol.common.model.tree.ProgramSubtype;
 import org.eclipse.lsp.cobol.common.model.tree.RootNode;
 import org.eclipse.lsp.cobol.common.model.tree.SectionNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableDefinitionNode;
@@ -39,11 +38,11 @@ class NodeTest {
   @Test
   void getDepthFirstStream() {
     Node rootNode = new RootNode(LOCALITY);
-    Node firstProg = new ProgramNode(LOCALITY, ProgramSubtype.Program, 0);
+    Node firstProg = new ProgramNode(LOCALITY);
     Node sectionNode = new SectionNode(LOCALITY, SectionType.WORKING_STORAGE);
     Node definition = VariableDefinitionNode.builder().build();
-    Node nestedProg = new ProgramNode(LOCALITY, ProgramSubtype.Program, 0);
-    Node secondProg = new ProgramNode(LOCALITY, ProgramSubtype.Program, 0);
+    Node nestedProg = new ProgramNode(LOCALITY);
+    Node secondProg = new ProgramNode(LOCALITY);
     Node anotherDefinition = VariableDefinitionNode.builder().build();
 
     rootNode.addChild(firstProg);
@@ -68,9 +67,9 @@ class NodeTest {
   @Test
   void getParentByType() {
     Node rootNode = new RootNode(LOCALITY);
-    Node program = new ProgramNode(LOCALITY, ProgramSubtype.Program, 0);
+    Node program = new ProgramNode(LOCALITY);
     rootNode.addChild(program);
-    Node nestedProgram = new ProgramNode(LOCALITY, ProgramSubtype.Program, 0);
+    Node nestedProgram = new ProgramNode(LOCALITY);
     program.addChild(nestedProgram);
     Node section = new SectionNode(LOCALITY, SectionType.WORKING_STORAGE);
     nestedProgram.addChild(section);
