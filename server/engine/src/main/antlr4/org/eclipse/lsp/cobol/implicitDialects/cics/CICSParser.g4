@@ -229,11 +229,6 @@ cics_address_set: (SET cics_data_area USING cics_ref |
                   SET cics_ref USING cics_data_area) cics_handle_response?;
 
 /** ALLOCATE (all of them) */
-//cics_allocate: ALLOCATE (cics_allocate_appc_partner | cics_allocate_appc_mro_lut61_sysid | cics_allocate_lut61_session);
-//cics_allocate_appc_partner: (PARTNER cics_name | NOQUEUE | STATE cics_cvda | cics_handle_response)+;
-//cics_allocate_appc_mro_lut61_sysid: (SYSID cics_data_area | PROFILE cics_name | NOQUEUE | STATE cics_cvda | cics_handle_response)+;
-//cics_allocate_lut61_session: ((SESSION | PROFILE) cics_name | NOQUEUE | cics_handle_response)+;
-
 cics_allocate: ALLOCATE (cics_allocate_appc_partner | cics_allocate_appc_mro_lut61_sysid | cics_allocate_lut61_session);
 cics_allocate_appc_mro_lut61_sysid:  (SYSID cics_data_area | PROFILE cics_name | NOQUEUE | STATE cics_cvda | cics_handle_response)+;
 cics_allocate_lut61_session: (SESSION  cics_name | PROFILE cics_name | NOQUEUE | cics_handle_response)+;
