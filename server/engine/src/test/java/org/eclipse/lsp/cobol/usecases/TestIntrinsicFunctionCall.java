@@ -63,7 +63,7 @@ public class TestIntrinsicFunctionCall {
         "ORD-MAX",
         "ORD-MIN",
         "REVERSE",
-        "SECONDS-FORM-FORMATTED-TIME",
+        "SECONDS-FROM-FORMATTED-TIME",
         "TEST-FORMATTED-DATETIME",
         "TEST-NUMVAL",
         "TEST-NUMVAL-C",

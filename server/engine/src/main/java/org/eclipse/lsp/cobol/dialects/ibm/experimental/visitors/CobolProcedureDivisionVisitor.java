@@ -40,7 +40,6 @@ import org.eclipse.lsp.cobol.common.model.tree.statements.SetToBooleanStatement;
 import org.eclipse.lsp.cobol.common.model.tree.statements.SetToOnOffStatement;
 import org.eclipse.lsp.cobol.common.model.tree.statements.SetUpDownByStatement;
 import org.eclipse.lsp.cobol.common.model.tree.variable.*;
-import org.eclipse.lsp.cobol.common.model.variables.DivisionType;
 import org.eclipse.lsp.cobol.common.utils.ImplicitCodeUtils;
 import org.eclipse.lsp.cobol.common.utils.StringUtils;
 import org.eclipse.lsp.cobol.core.*;
@@ -106,7 +105,7 @@ public class CobolProcedureDivisionVisitor extends CobolProcedureDivisionParserB
   public List<Node> visitProcedureDivision(ProcedureDivisionContext ctx) {
     areaAWarning(ctx.getStart());
     return addTreeNode(
-            ctx, location -> new DivisionNode(location, DivisionType.PROCEDURE_DIVISION));
+        ctx, location -> new ProcedureDivisionNode(location, Optional.empty()));
   }
 
   @Override

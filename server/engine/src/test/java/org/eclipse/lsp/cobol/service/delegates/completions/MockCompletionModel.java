@@ -19,6 +19,7 @@ import com.google.common.collect.ImmutableList;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
+import org.eclipse.lsp.cobol.common.model.tree.ProgramSubtype;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNode;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulatorService;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolsRepository;
@@ -40,7 +41,7 @@ class MockCompletionModel {
   static final SymbolsRepository REPO = new SymbolsRepository();
 
   static {
-    ProgramNode programNode = new ProgramNode(Locality.builder().build());
+    ProgramNode programNode = new ProgramNode(Locality.builder().build(), ProgramSubtype.Program, 0);
     RESULT.getRootNode().addChild(programNode);
     ImmutableList.of("constD1", "ConstD2")
         .forEach(
