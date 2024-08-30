@@ -67,7 +67,7 @@ public class CobolIdentificationDivisionVisitor extends CobolIdentificationDivis
             .ifPresent(
                     name ->
                             retrieveLocality(ctx)
-                                    .ifPresent(locality -> result.add(new ProgramIdNode(locality, name, ProgramSubtype.Program))));
+                                    .ifPresent(locality -> result.add(new ProgramIdNode(locality, name))));
     return result;
   }
 
