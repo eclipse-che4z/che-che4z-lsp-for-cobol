@@ -61,6 +61,7 @@ public class BenchmarkServiceImpl implements BenchmarkService {
   }
 
   public void logTiming(BenchmarkSession benchmarkSession) {
+    LOG.debug("---- Benchmark for uri : {}", benchmarkSession.attr("uri"));
     Collection<Measurement> measurements = benchmarkSession
             .getMeasurements();
     measurements
