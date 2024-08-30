@@ -95,18 +95,29 @@ cicsTranslatorCompileDirectivedKeywords
    ;
 
 /** RECEIVE: */
-cics_receive: RECEIVE (cics_receive_group | cics_receive_appc | cics_receive_lu61 | cics_partn | cics_rcv_map);
-cics_receive_group: (cics_into | cics_fLength | ASIS | BUFFER | NOTRUNCATE| cics_handle_response)+;
-cics_receive_appc: (CONVID cics_name | cics_into | cics_fLength | NOTRUNCATE | STATE cics_cvda | cics_handle_response)+;
-cics_receive_lu61: (SESSION cics_name | cics_into | cics_fLength | NOTRUNCATE | cics_handle_response)+;
-cics_fLength: ((LENGTH cics_data_area | FLENGTH cics_data_area) | cics_maxlength)+;
 
-cics_rcv_map: MAP (cics_receive_map | cics_receive_mappingdev);
-cics_receive_map: cics_name (MAPSET cics_name | cics_into | TERMINAL | ASIS | INPARTN cics_name |
-                  FROM cics_data_area | cics_fLength | cics_handle_response)+;
-cics_receive_mappingdev: cics_name (MAPPINGDEV cics_data_value | FROM cics_data_area | LENGTH cics_data_area |
-                         MAPSET cics_name | cics_into | cics_handle_response)+;
-cics_partn: PARTN cics_data_area (cics_into | cics_fLength | ASIS | cics_handle_response)+;
+// Receive all
+cics_receive:                   RECEIVE (cics_receive_group_one | cics_receive_group_two | cics_receive_group_three | cics_receive_partn | cics_receive_map | cics_receive_map_mappingdev);
+
+//Helpers
+cics_into_set:                  INTO cics_data_area | SET cics_ref;
+cics_length_flength:            (LENGTH | FLENGTH) cics_data_area;
+
+// CICS Group 1 (zOS DEFAULT, LUTYPE (2,3,4), 2260, 3270-logical, 3790 / 3270-display, 3600 pipeline, 3600-3601, 3600-3614, 3650, 3767, 3770, 3790 FF)
+cics_receive_group_one:         (cics_into_set | cics_length_flength | cics_maxlength | ASIS | BUFFER | NOTRUNCATE | LEAVEKB | cics_handle_response)+;
+
+// CICS Group 2 (APPC, LUTYPE 6.1, MRO)
+cics_receive_group_two:         ((CONVID | SESSION) cics_name | cics_into_set | cics_length_flength | cics_maxlength | NOTRUNCATE | STATE cics_cvda | cics_handle_response)+;
+
+// CICS Group 3 (2980, Non z Default)
+cics_receive_group_three:       (cics_into_set | cics_length_flength | cics_maxlength | NOTRUNCATE | PASSBK | cics_handle_response)+;
+
+cics_receive_partn:             (cics_into_set | LENGTH cics_data_area | ASIS | cics_handle_response)+;
+
+// RECEIVE MAPS
+cics_receive_map: ((MAP | MAPSET | INPARTN) cics_name | cics_into_set | (FROM | LENGTH) cics_data_area | TERMINAL | ASIS | cics_handle_response)+;
+cics_receive_map_mappingdev:    ((MAP | MAPSET) cics_name | (MAPPINGDEV | FROM | LENGTH) cics_data_area  | cics_into_set | cics_handle_response)+;
+
 
 /** SEND: */
 cics_send: SEND (cics_send_group | cics_send_mro | cics_send_appc | cics_send_control | cics_send_map | cics_send_page |
@@ -401,7 +412,7 @@ cics_extract_tcpip: TCPIP (AUTHENTICATE cics_cvda | cics_extract_clientname | ci
                     cics_extract_serveraddr | SRVRIPFAMILY cics_cvda | SERVERADDRNU cics_data_area | SRVRADDR6NU
                     cics_data_area | SSLTYPE cics_cvda | TCPIPSERVICE cics_data_area | PORTNUMBER cics_data_area |
                     PORTNUMNU cics_data_area | PRIVACY cics_cvda | MAXDATALEN cics_cvda | cics_handle_response)+;
-                    
+
 cics_extract_clientname: CLIENTNAME cics_data_area CNAMELENGTH cics_data_area;
 cics_extract_servername: SERVERNAME cics_data_area SNAMELENGTH cics_data_area;
 cics_extract_clientaddr: CLIENTADDR cics_data_area CADDRLENGTH cics_data_area;
@@ -885,8 +896,7 @@ cics_web_rqueryparm: QUERYPARM cics_data_value (NAMELENGTH cics_data_value | VAL
 cics_web_readnext: READNEXT (cics_web_rnformfield | cics_web_rnhttpheader);
 cics_web_rnformfield: (FORMFIELD cics_data_area | QUERYPARM cics_data_area | NAMELENGTH cics_data_area |
                       VALUE cics_data_area | VALUELENGTH cics_data_area | cics_handle_response)+;
-cics_web_rnhttpheader: (HTTPHEADER cics_data_area | NAMELENGTH cics_data_area | SESSTOKEN cics_data_value| 
-                      VALUE cics_data_area | VALUELENGTH cics_data_area | cics_handle_response)+;
+cics_web_rnhttpheader: ((HTTPHEADER | NAMELENGTH | VALUE | VALUELENGTH) cics_data_area | SESSTOKEN cics_data_value | cics_handle_response)+;
 cics_web_receive: RECEIVE (cics_web_rserver | cics_web_rtocontainer | cics_web_rsesstoken);
 cics_web_rserver: cics_into (LENGTH cics_data_area | MAXLENGTH cics_data_value | NOTRUNCATE | TYPE cics_cvda | SRVCONVERT |
                   NOSRVCONVERT | SERVERCONV cics_cvda | CHARACTERSET cics_data_value | HOSTCODEPAGE cics_data_value |

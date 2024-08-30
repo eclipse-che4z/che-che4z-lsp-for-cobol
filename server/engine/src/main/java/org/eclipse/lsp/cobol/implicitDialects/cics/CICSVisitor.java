@@ -28,7 +28,7 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
-import lombok.AllArgsConstructor;
+
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -56,6 +56,7 @@ import org.eclipse.lsp.cobol.common.utils.ThreadInterruptionUtil;
 import org.eclipse.lsp.cobol.implicitDialects.cics.nodes.ExecCicsHandleNode;
 import org.eclipse.lsp.cobol.implicitDialects.cics.nodes.ExecCicsNode;
 import org.eclipse.lsp.cobol.implicitDialects.cics.nodes.ExecCicsReturnNode;
+import org.eclipse.lsp.cobol.implicitDialects.cics.utility.CICSOptionsCheckUtility;
 import org.eclipse.lsp.cobol.implicitDialects.cics.utility.VisitorUtility;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
@@ -65,11 +66,18 @@ import org.eclipse.lsp4j.Range;
  * This visitor analyzes the parser tree for CICS and returns its semantic context as a syntax tree
  */
 @Slf4j
-@AllArgsConstructor
+// @AllArgsConstructor
 class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
 
   private final DialectProcessingContext context;
   private final MessageService messageService;
+  private final CICSOptionsCheckUtility cicsOptionsCheckUtility;
+
+  CICSVisitor(DialectProcessingContext context, MessageService messageService) {
+    this.context = context;
+    this.messageService = messageService;
+    this.cicsOptionsCheckUtility = new CICSOptionsCheckUtility(context, errors);
+  }
 
   @Getter private final List<SyntaxError> errors = new LinkedList<>();
 
@@ -83,29 +91,38 @@ class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
     areaBWarning(ctx);
     addReplacementContext(ctx);
 
-    boolean isReturn = (ctx.allCicsRule() != null && ctx.allCicsRule().size() > 0 && ctx.allCicsRule().get(0).cics_return() != null);
-    boolean isHandle = (ctx.allCicsRule() != null && ctx.allCicsRule().size() > 0 && ctx.allCicsRule().get(0).cics_handle() != null);
+    boolean isReturn =
+        (ctx.allCicsRule() != null
+            && ctx.allCicsRule().size() > 0
+            && ctx.allCicsRule().get(0).cics_return() != null);
+    boolean isHandle =
+        (ctx.allCicsRule() != null
+            && ctx.allCicsRule().size() > 0
+            && ctx.allCicsRule().get(0).cics_handle() != null);
 
     if (isReturn) {
       return addTreeNode(ctx, ExecCicsReturnNode::new);
     } else if (isHandle) {
-      boolean isProgram = Optional.ofNullable(ctx.allCicsRule().get(0).cics_handle())
-          .map(CICSParser.Cics_handleContext::cics_handle_abend)
-          .map(CICSParser.Cics_handle_abendContext::PROGRAM)
-          .filter(s -> s.size() > 0)
-          .isPresent();
+      boolean isProgram =
+          Optional.ofNullable(ctx.allCicsRule().get(0).cics_handle())
+              .map(CICSParser.Cics_handleContext::cics_handle_abend)
+              .map(CICSParser.Cics_handle_abendContext::PROGRAM)
+              .filter(s -> s.size() > 0)
+              .isPresent();
 
-      boolean isLabel = Optional.ofNullable(ctx.allCicsRule().get(0).cics_handle())
-          .map(CICSParser.Cics_handleContext::cics_handle_abend)
-          .map(CICSParser.Cics_handle_abendContext::LABEL)
-          .filter(s -> s.size() > 0)
-          .isPresent();
+      boolean isLabel =
+          Optional.ofNullable(ctx.allCicsRule().get(0).cics_handle())
+              .map(CICSParser.Cics_handleContext::cics_handle_abend)
+              .map(CICSParser.Cics_handle_abendContext::LABEL)
+              .filter(s -> s.size() > 0)
+              .isPresent();
 
-      boolean isReset = Optional.ofNullable(ctx.allCicsRule().get(0).cics_handle())
-          .map(CICSParser.Cics_handleContext::cics_handle_abend)
-          .map(CICSParser.Cics_handle_abendContext::RESET)
-          .filter(s -> s.size() > 0)
-          .isPresent();
+      boolean isReset =
+          Optional.ofNullable(ctx.allCicsRule().get(0).cics_handle())
+              .map(CICSParser.Cics_handleContext::cics_handle_abend)
+              .map(CICSParser.Cics_handle_abendContext::RESET)
+              .filter(s -> s.size() > 0)
+              .isPresent();
 
       ExecCicsHandleNode.HandleAbendType type;
       if (isProgram) {
@@ -137,7 +154,8 @@ class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
 
   @Override
   public List<Node> visitAllExciRules(CICSParser.AllExciRulesContext ctx) {
-    // TODO: uncomment and adjust below when we decide to support this feature based on compiler directive
+    // TODO: uncomment and adjust below when we decide to support this feature based on compiler
+    // directive
     //    boolean isExciModeEnabled = context
     //            .getConfig()
     //            .getCompilerOptions()
@@ -193,8 +211,20 @@ class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
     return ImmutableList.of(node);
   }
 
+  /**
+   * Traverses children of the parse tree.
+   *
+   * <p>Inspects CICS Rules to make sure mandatory options exist since the Parser Rules only enforce
+   * if any combination of possible inputs exist. Also checks for Invalid options given the other
+   * provided optionals and checks for duplicates.
+   *
+   * @param node the node under inspection
+   * @return List of children nodes
+   */
   @Override
   public List<Node> visitChildren(RuleNode node) {
+    if (node.getRuleContext().parent != null)
+      cicsOptionsCheckUtility.checkOptions((ParserRuleContext) node.getRuleContext());
     ThreadInterruptionUtil.checkThreadInterrupted();
     return super.visitChildren(node);
   }
