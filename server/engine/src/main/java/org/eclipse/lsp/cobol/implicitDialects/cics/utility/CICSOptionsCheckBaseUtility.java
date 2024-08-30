@@ -118,7 +118,7 @@ public abstract class CICSOptionsCheckBaseUtility {
    * @param contexts
    * @return List of Rule Context Data
    */
-  protected List<RuleContextData> harvestResponseHandlers(
+  protected void harvestResponseHandlers(
       List<CICSParser.Cics_handle_responseContext> ruleHandlers, List<RuleContextData> contexts) {
 
     List<TerminalNode> respResponseHandlers = new ArrayList<>();
@@ -126,15 +126,17 @@ public abstract class CICSOptionsCheckBaseUtility {
     List<TerminalNode> noHandle = new ArrayList<>();
     ruleHandlers.forEach(
         optionOne -> {
-          optionOne
-              .cics_inline_handle_exception()
-              .cics_resp()
-              .forEach(
-                  optionTwo -> {
-                    if (optionTwo.RESP() != null) respResponseHandlers.add(optionTwo.RESP());
-                    if (optionTwo.RESP2() != null) respTwoResponseHandlers.add(optionTwo.RESP2());
-                  });
-          noHandle.addAll(optionOne.cics_inline_handle_exception().NOHANDLE());
+          if (optionOne.cics_inline_handle_exception() != null) {
+            optionOne
+                .cics_inline_handle_exception()
+                .cics_resp()
+                .forEach(
+                    optionTwo -> {
+                      if (optionTwo.RESP() != null) respResponseHandlers.add(optionTwo.RESP());
+                      if (optionTwo.RESP2() != null) respTwoResponseHandlers.add(optionTwo.RESP2());
+                    });
+            noHandle.addAll(optionOne.cics_inline_handle_exception().NOHANDLE());
+          }
         });
 
     contexts.add(new RuleContextData(respResponseHandlers, "RESP"));
@@ -144,8 +146,6 @@ public abstract class CICSOptionsCheckBaseUtility {
     if (respResponseHandlers.isEmpty()) {
       checkHasIllegalOptions(respTwoResponseHandlers, "RESP2");
     }
-
-    return contexts;
   }
 
   private <E> Locality getLocality(E rule) {
