@@ -24,13 +24,12 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.*;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
 public class BenchmarkServiceImpl implements BenchmarkService {
   private final static Logger LOG = LoggerFactory.getLogger(BenchmarkServiceImpl.class);
   private static final String PERFORMANCE_LOG_PATH = "performance.log.path";
-  private final List<BenchmarkSession> benchmarkSessions = new CopyOnWriteArrayList<>();
+  private final List<BenchmarkSession> benchmarkSessions = new ArrayList<>();
 
   @Override
   public BenchmarkSession startSession() {
