@@ -166,7 +166,6 @@ class CobolTextDocumentServiceTest {
     TextDocumentItem textDocumentItem = mock(TextDocumentItem.class);
     when(params.getTextDocument()).thenReturn(textDocumentItem);
     when(textDocumentItem.getUri()).thenReturn(URI);
-    when(documentModelService.get(anyString())).thenReturn(new CobolDocumentModel(URI));
     service.didOpen(params);
     Mockito.verify(lspMessageBroker, times(0)).query(any());
   }
