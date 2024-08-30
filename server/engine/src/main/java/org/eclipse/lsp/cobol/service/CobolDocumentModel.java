@@ -19,6 +19,8 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.common.AnalysisResult;
@@ -42,6 +44,7 @@ public class CobolDocumentModel {
   private volatile AnalysisResult analysisResult;
   private volatile AnalysisResult lastAnalysisResult;
   @Setter private volatile List<DocumentSymbol> outlineResult;
+  private AtomicBoolean isLastAnalysisCancelled = new AtomicBoolean(false);
 
   public CobolDocumentModel(String uri, String text, AnalysisResult analysisResult) {
     this.uri = uri;
@@ -101,6 +104,20 @@ public class CobolDocumentModel {
     this.text = text;
     parse(text);
     analysisResult = null;
+  }
+
+  /**
+   * update isLastAnalysisCancelled to true
+   */
+  public void updateLastAnalysisCancelled() {
+    isLastAnalysisCancelled.compareAndSet(false, true);
+  }
+
+  /**
+   * update isLastAnalysisCancelled to false
+   */
+  public void updateLastAnalysisNotCancelled() {
+    isLastAnalysisCancelled.compareAndSet(true, false);
   }
 
   String getFullTokenAtPosition(Position position) {

@@ -44,8 +44,7 @@ suite("Integration Test Suite: Copybooks", function () {
     .slow(1000);
 
   test("TC174657: Copybook - not exist: no syntax ok message", async () => {
-    await helper.showDocument("USERC1F.cbl");
-    const editor = helper.get_editor("USERC1F.cbl");
+    const editor = await helper.showDocument("USERC1F.cbl");
     await helper.waitForDiagnostics(editor.document.uri);
     const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
     assert.strictEqual(
