@@ -29,6 +29,10 @@ suite.skip(
       helper.TEST_TIMEOUT,
     );
 
+    this.afterAll(async () => await helper.closeAllEditors()).timeout(
+      helper.TEST_TIMEOUT,
+    );
+
     test("Autocompletion basic dialect", async () => {
       helper.updateConfig("basic.json");
       await helper.showDocument("SNIPPET.cbl");

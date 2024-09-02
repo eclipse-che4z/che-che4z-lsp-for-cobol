@@ -29,9 +29,12 @@ suite("Integration Test Suite: Copybooks", function () {
     helper.TEST_TIMEOUT,
   );
 
+  this.afterAll(async () => await helper.closeAllEditors()).timeout(
+    helper.TEST_TIMEOUT,
+  );
+
   test("TC174655: Copybook - Nominal", async () => {
-    await helper.showDocument("USERC1N1.cbl");
-    const editor = helper.get_editor("USERC1N1.cbl");
+    const editor = await helper.showDocument("USERC1N1.cbl");
     await helper.waitForDiagnostics(editor.document.uri);
     const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
     assert.strictEqual(
@@ -57,8 +60,7 @@ suite("Integration Test Suite: Copybooks", function () {
     .slow(1000);
 
   test("TC174658, TC174658: Copybook - not exist: error underlying and detailed hint", async () => {
-    await helper.showDocument("USERC1F.cbl");
-    const editor = helper.get_editor("USERC1F.cbl");
+    const editor = await helper.showDocument("USERC1F.cbl");
     await helper.waitForDiagnostics(editor.document.uri);
     const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
     assert.strictEqual(diagnostics.length, 3);
@@ -72,8 +74,7 @@ suite("Integration Test Suite: Copybooks", function () {
     .slow(1000);
 
   test("TC174916/TC174917 Copybook - recursive error and detailed hint", async () => {
-    await helper.showDocument("USERC1R.cbl");
-    const editor = helper.get_editor("USERC1R.cbl");
+    const editor = await helper.showDocument("USERC1R.cbl");
     await helper.waitForDiagnostics(editor.document.uri);
     const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
     assert.strictEqual(diagnostics.length, 3);
@@ -90,8 +91,7 @@ suite("Integration Test Suite: Copybooks", function () {
     .slow(1000);
 
   test("TC174932/TC174933 Copybook - invalid definition and hint", async () => {
-    await helper.showDocument("USERC1N2.cbl");
-    const editor = helper.get_editor("USERC1N2.cbl");
+    const editor = await helper.showDocument("USERC1N2.cbl");
     await helper.waitForDiagnostics(editor.document.uri);
     const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
     assert.strictEqual(diagnostics.length, 4);

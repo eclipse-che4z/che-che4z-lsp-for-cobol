@@ -203,6 +203,8 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
 
       if (analysisInProgress) {
         cancelRunningAnalysis(openDocuments);
+      } else {
+        break;
       }
       LOG.debug(" re-analysis is waiting for prev analysis to finish");
       TimeUnit.MILLISECONDS.sleep(100);
@@ -273,7 +275,7 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
       ExecutorService service = analysisExecutors.remove(uri);
       if (service != null) {
         service.shutdownNow();
-        service.awaitTermination(1, TimeUnit.SECONDS);
+//        service.awaitTermination(1, TimeUnit.SECONDS);
       }
     }
     LOG.debug("[stopAnalysis] Document " + uri + " publish diagnostic: " + documentModelService.getOpenedDiagnostic());
