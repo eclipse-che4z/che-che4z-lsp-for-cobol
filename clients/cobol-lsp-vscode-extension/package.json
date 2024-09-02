@@ -186,13 +186,6 @@
         ]
       },
       {
-        "id": "expcobol",
-        "aliases": [
-          "EXP-COBOL"
-        ],
-        "configuration": "./syntaxes/lang-config.json"
-      },
-      {
         "id": "hpcobol",
         "aliases": [
           "HP-COBOL"
@@ -203,14 +196,6 @@
     "grammars": [
       {
         "language": "cobol",
-        "scopeName": "source.cobol",
-        "path": "./syntaxes/COBOL.tmLanguage.json",
-        "embeddedLanguages": {
-          "meta.embedded.block.html": "html"
-        }
-      },
-      {
-        "language": "expcobol",
         "scopeName": "source.cobol",
         "path": "./syntaxes/COBOL.tmLanguage.json",
         "embeddedLanguages": {
@@ -554,16 +539,6 @@
     },
     "configurationDefaults": {
       "[cobol]": {
-        "editor.guides.indentation": false,
-        "editor.rulers": [
-          7,
-          11,
-          72,
-          80
-        ],
-        "editor.wordSeparators": "!\"#$%&'()*+,./:;<=>?@[\\]^`{|}~"
-      },
-      "[expcobol]": {
         "editor.guides.indentation": false,
         "editor.rulers": [
           7,
