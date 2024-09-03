@@ -149,6 +149,24 @@ public class ExtendedTextLine {
   }
 
   /**
+   * Fill area
+   * @param start - start position
+   * @param end - end position
+   * @param c - character to fill the area with
+   */
+  void fillArea(int start, int end, char c) {
+    characters.subList(start, Math.min(end + 1, characters.size())).forEach(l -> l.setCharacter(c));
+  }
+
+  /**
+   * Fill line
+   * @param c - character to fill the area with
+   */
+  void fillLine(char c) {
+    fillArea(0, size() - 1, c);
+  }
+
+  /**
    * Creates a shadow copy of the line object
    * @return a line object
    */

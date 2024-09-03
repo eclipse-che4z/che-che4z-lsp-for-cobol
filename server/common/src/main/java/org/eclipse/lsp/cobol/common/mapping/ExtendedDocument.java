@@ -140,6 +140,16 @@ public class ExtendedDocument {
     dirty = true;
   }
 
+  /**
+   * Replace with zero width space
+   * @param range - a range of text
+   */
+  public void fillArea(Range range, char c) {
+    range = updateRangeDueToChanges(range);
+    currentText.fillArea(range, c);
+    dirty = true;
+  }
+
   @Override
   public String toString() {
     return baseText.toString();

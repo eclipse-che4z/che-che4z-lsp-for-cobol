@@ -89,7 +89,16 @@ class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
   @Override
   public List<Node> visitCicsExecBlock(CICSParser.CicsExecBlockContext ctx) {
     areaBWarning(ctx);
-    addReplacementContext(ctx);
+    changeContextToDialectStatement(ctx);
+    if (ctx.stop.getType() != CICSLexer.END_EXEC) {
+      SyntaxError error = SyntaxError.syntaxError()
+          .errorSource(ErrorSource.PARSING)
+          .location(getTokenEndLocality(ctx.stop).toOriginalLocation())
+          .suggestion(messageService.getMessage("cicsParser.missingEndExec"))
+          .severity(ErrorSeverity.ERROR)
+          .build();
+      errors.add(error);
+    }
 
     boolean isReturn =
         (ctx.allCicsRule() != null
@@ -272,6 +281,10 @@ class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
     return Locality.builder().uri(uri).range(range).build();
   }
 
+  private void changeContextToDialectStatement(ParserRuleContext ctx) {
+    context.getExtendedDocument().fillArea(constructRange(ctx), CobolDialect.FILLER.charAt(0));
+  }
+
   private void addReplacementContext(ParserRuleContext ctx) {
     getAllTerminalNodes(ctx)
         .forEach(
@@ -294,6 +307,16 @@ class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
       }
     }
     return result;
+  }
+
+  public Range constructRange(ParserRuleContext ctx) {
+    return new Range(
+        new Position(ctx.start.getLine() - 1, ctx.start.getCharPositionInLine()),
+        new Position(
+            ctx.stop.getLine() - 1,
+            ctx.stop.getCharPositionInLine()
+                + ctx.stop.getStopIndex()
+                - ctx.stop.getStartIndex()));
   }
 
   public Range constructRange(TerminalNode ctx) {
@@ -332,6 +355,13 @@ class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
         .build();
   }
 
+  private Locality getTokenEndLocality(Token token) {
+    return Locality.builder()
+        .uri(context.getProgramDocumentUri())
+        .range(buildTokenEndRange(token))
+        .build();
+  }
+
   private Predicate<Locality> startsInAreaA(Token token) {
     return it -> {
       int charPosition = it.getRange().getStart().getCharacter();
@@ -365,5 +395,10 @@ class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
         new Position(token.getLine() - 1, token.getCharPositionInLine()),
         new Position(
             token.getLine() - 1, token.getCharPositionInLine() + token.getText().length()));
+  }
+
+  public Range buildTokenEndRange(Token token) {
+    Position p = new Position(token.getLine() - 1, token.getCharPositionInLine() + token.getStopIndex() - token.getStartIndex() + 1);
+    return new Range(p, p);
   }
 }

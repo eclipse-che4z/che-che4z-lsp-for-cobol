@@ -14,14 +14,9 @@
 parser grammar CICSParser;
 options {tokenVocab = CICSLexer; superClass = MessageServiceParser;}
 
-startRule: .*? ((cicsExecBlock | cicsDfhRespLiteral | cicsDfhValueLiteral) .*?) * EOF;
+startRule: (cicsExecBlock | cicsDfhRespLiteral | cicsDfhValueLiteral | ~(EXEC_CICS|DFHRESP|DFHVALUE))* EOF;
 compilerDirective: (.*? compilerXOpts)* .*? EOF;
-cicsExecBlock: EXEC CICS allCicsRule END_EXEC
-             | EXEC CICS (allCicsRule | invalidInput)+ END_EXEC
-             | EXEC CICS END_EXEC
-             | {notifyError("cicsParser.missingEndExec");} EXEC CICS allCicsRule
-             | {notifyError("cicsParser.missingEndExec");} EXEC CICS
-             ;
+cicsExecBlock: EXEC_CICS (allCicsRule)* END_EXEC ;
 
 allCicsRule: cics_send | cics_receive | cics_add | cics_address | cics_allocate | cics_asktime | cics_assign | cics_bif |
                        cics_build | cics_cancel | cics_change | cics_change_task | cics_check | cics_connect | cics_converttime |
@@ -1208,10 +1203,3 @@ basis
    ;
 
 commaClause : COMMACHAR;
-
-invalidInput
-    :  {notifyError("cicsParser.invalidInput", "'" + _input.LT(1).getText() + "'");} notExec
-    ;
-
-//notExec: (~ END_EXEC)+;
-notExec: (literal | dataName | (LPARENCHAR .*? RPARENCHAR))+;

@@ -42,7 +42,7 @@ class TestExecCicsShowsErrorCorrectly {
             "1",
             new Diagnostic(
                 new Range(),
-                "Extraneous input 'XCTL123'",
+                "Syntax error on 'XCTL123'",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())));
   }
