@@ -384,43 +384,18 @@ cics_enq: ENQ (RESOURCE cics_data_area | LENGTH cics_data_value | UOW | TASK | M
 cics_enter: ENTER (TRACENUM cics_data_value | FROM cics_data_area | FROMLENGTH cics_data_area | RESOURCE cics_name | EXCEPTION | cics_handle_response)+;
 
 /** EXTRACT (all of them) */
-cics_extract: EXTRACT (cics_extract_attach | cics_extract_attributes | cics_extract_certificate |
-              cics_extract_logonmsg | cics_extract_process | cics_extract_tcpip | cics_extract_tct | cics_extract_web);
-cics_extract_attach: ATTACH (ATTACHID cics_name | CONVID cics_name | SESSION cics_name | PROCESS cics_data_area |
-                     RESOURCE cics_data_area | RPROCESS cics_data_area | RRESOURCE cics_data_area |
-                     QUEUE cics_data_area | IUTYPE cics_data_area | DATASTR cics_data_area | RECFM cics_data_area | cics_handle_response)*;
-
-cics_extract_attributes: ATTRIBUTES (CONVID cics_name | SESSION cics_name | STATE cics_cvda) | cics_handle_response+;
-
-cics_extract_certificate: CERTIFICATE cics_ref (LENGTH cics_data_area | SERIALNUM cics_ref | SERIALNUMLEN cics_data_area |
-                          USERID cics_data_area | OWNER | ISSUER | COMMONNAME cics_ref | COMMONNAMLEN cics_data_area |
-                          COUNTRY cics_ref | COUNTRYLEN cics_data_area | STATE cics_ref | STATELEN cics_data_area |
-                          LOCALITY cics_ref | LOCALITYLEN cics_data_area | ORGANIZATION cics_ref |
-                          ORGANIZATLEN cics_data_area | ORGUNIT cics_ref | ORGUNITLEN cics_data_area | cics_handle_response)*;
-
-cics_extract_logonmsg: (LOGONMSG cics_into | LENGTH cics_data_area | cics_handle_response)+;
-cics_extract_process: PROCESS (cics_extract_procname | CONVID cics_name | SYNCLEVEL cics_data_area | cics_extract_piplist | cics_handle_response)*;
-cics_extract_procname: PROCNAME cics_data_area (PROCLENGTH cics_data_area | MAXPROCLEN cics_data_value | cics_handle_response)+;
-cics_extract_piplist: PIPLIST cics_ref PIPLENGTH cics_data_area;
-cics_extract_tcpip: TCPIP (AUTHENTICATE cics_cvda | cics_extract_clientname | cics_extract_servername | cics_extract_clientaddr |
-                    CLNTIPFAMILY cics_cvda | CLIENTADDRNU cics_data_area | CLNTADDR6NU cics_data_area |
-                    cics_extract_serveraddr | SRVRIPFAMILY cics_cvda | SERVERADDRNU cics_data_area | SRVRADDR6NU
-                    cics_data_area | SSLTYPE cics_cvda | TCPIPSERVICE cics_data_area | PORTNUMBER cics_data_area |
-                    PORTNUMNU cics_data_area | PRIVACY cics_cvda | MAXDATALEN cics_cvda | cics_handle_response)+;
-
-cics_extract_clientname: CLIENTNAME cics_data_area CNAMELENGTH cics_data_area;
-cics_extract_servername: SERVERNAME cics_data_area SNAMELENGTH cics_data_area;
-cics_extract_clientaddr: CLIENTADDR cics_data_area CADDRLENGTH cics_data_area;
-cics_extract_serveraddr: SERVERADDR cics_data_area SADDRLENGTH cics_data_area;
-
-cics_extract_tct: TCT (NETNAME cics_name | SYSID cics_data_area | TERMID cics_data_area | cics_handle_response)+;
-cics_extract_web: WEB (SCHEME cics_cvda | cics_extract_host | cics_extract_httpmethod | cics_extract_httpversion |
-                  cics_extract_path | PORTNUMBER cics_data_area | cics_extract_querystring | REQUESTTYPE cics_cvda | cics_handle_response)+;
-cics_extract_host: HOST cics_data_area HOSTLENGTH cics_data_value (HOSTTYPE cics_cvda)?;
-cics_extract_httpmethod: HTTPMETHOD cics_data_area METHODLENGTH cics_data_value;
-cics_extract_httpversion: HTTPVERSION cics_data_area VERSIONLEN cics_data_area;
-cics_extract_path: PATH cics_data_area PATHLENGTH cics_data_area;
-cics_extract_querystring: QUERYSTRING cics_data_area QUERYSTRLEN cics_data_area;
+cics_extract: EXTRACT (cics_extract_attach | cics_extract_attributes | cics_extract_certificate | cics_extract_logonmessage | cics_extract_process | cics_extract_tcpip | cics_extract_tct | cics_extract_web);
+cics_extract_attach: ATTACH ((ATTACHID | CONVID | SESSION) cics_name | (PROCESS | RESOURCE | RPROCESS | RRESOURCE | QUEUE | IUTYPE | DATASTR | RECFM) cics_data_area | cics_handle_response)*;
+cics_extract_attributes: ATTRIBUTES ((CONVID | SESSION) cics_name | STATE cics_cvda | cics_handle_response)*;
+cics_extract_certificate: CERTIFICATE cics_ref ((LENGTH | SERIALNUMLEN | USERID | COMMONNAMLEN | COUNTRYLEN | STATELEN | LOCALITYLEN | ORGANIZATLEN | ORGUNITLEN) cics_data_area | (SERIALNUM | COMMONNAME | COUNTRY | STATE | LOCALITY | ORGANIZATION | ORGUNIT) cics_ref | OWNER | ISSUER | cics_handle_response)*;
+cics_extract_logonmessage: LOGONMSG ((INTO | LENGTH) cics_data_area | SET cics_ref | cics_handle_response)*;
+cics_extract_process: PROCESS ((PROCNAME | PROCLENGTH | MAXPROCLEN | SYNCLEVEL | PIPLENGTH) cics_data_area | CONVID cics_name | PIPLIST cics_ref | cics_handle_response)*;
+cics_extract_tcpip: TCPIP ((AUTHENTICATE | CLNTIPFAMILY | SRVRIPFAMILY | SSLTYPE | PRIVACY)  cics_cvda | (CLIENTNAME | CNAMELENGTH | SERVERNAME | SNAMELENGTH | CLIENTADDR | CADDRLENGTH | CLIENTADDRNU | CLNTADDR6NU | SERVERADDR | SADDRLENGTH | SERVERADDRNU | SRVRADDR6NU | TCPIPSERVICE | PORTNUMBER | PORTNUMNU | MAXDATALEN) cics_data_area | cics_handle_response)*;
+cics_extract_tct: TCT (NETNAME cics_name | (SYSID | TERMID) cics_data_area | cics_handle_response)*;
+cics_extract_web: WEB (cics_extract_web_server | cics_extract_web_client);
+cics_extract_web_server: ((REQUESTTYPE) cics_cvda | cics_extract_web_header | (HTTPMETHOD | METHODLENGTH | PORTNUMBER | QUERYSTRING | QUERYSTRLEN | URIMAP) cics_data_area | cics_handle_response)*;
+cics_extract_web_client: ((SESSTOKEN | PORTNUMBER | URIMAP | REALM | REALMLEN) cics_data_area | cics_extract_web_header | cics_handle_response)*;
+cics_extract_web_header: HOSTLENGTH cics_data_value | (HOSTTYPE | SCHEME) cics_cvda | (HOST | HTTPVERSION |VERSIONLEN | PATH | PATHLENGTH) cics_data_area;
 
 /** FORCE TIMER */
 cics_force: FORCE (TIMER cics_data_value | ACQUACTIVITY | ACQPROCESS | cics_handle_response)+;
@@ -451,8 +426,8 @@ cics_gds_connect: CONNECT (PROCESS | CONVID cics_name | PROCNAME cics_name | PRO
                   RETCODE cics_data_area | STATE cics_cvda | cics_handle_response)+;
 cics_gds_extract: EXTRACT (cics_gds_attributes | cics_gds_process);
 cics_gds_attributes: ATTRIBUTES (CONVID cics_name | STATE cics_cvda | CONVDATA cics_data_area | RETCODE cics_data_area | cics_handle_response)+;
-cics_gds_process: PROCESS (CONVID cics_name | cics_extract_procname | SYNCLEVEL cics_data_area |
-                  cics_extract_piplist | RETCODE cics_data_area | cics_handle_response)+;
+cics_gds_process: PROCESS (CONVID cics_name | (PROCNAME cics_data_area (PROCLENGTH cics_data_area | MAXPROCLEN cics_data_value | cics_handle_response)+) | SYNCLEVEL cics_data_area |
+                  (PIPLIST cics_ref PIPLENGTH cics_data_area) | RETCODE cics_data_area | cics_handle_response)+;
 cics_gds_free: FREE (CONVID cics_name | CONVDATA cics_data_area | RETCODE cics_data_area | STATE cics_cvda | cics_handle_response)+;
 cics_gds_issue: ISSUE (ABEND | CONFIRMATION | ERROR | PREPARE | SIGNAL) (CONVID cics_name | CONVDATA cics_data_area |
                 RETCODE cics_data_area | STATE cics_cvda | cics_handle_response)+;
