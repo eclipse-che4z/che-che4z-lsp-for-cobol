@@ -244,7 +244,7 @@ jobs:
       - uses: ilammy/msvc-dev-cmd@v1
         if: matrix.os == 'windows-latest'
       - name: Retrieve native build configurations
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4.1.7
         with:
           name: native-build-configuration
           path: native-build-configuration
@@ -312,12 +312,12 @@ jobs:
         run: echo "target=linux-${{ matrix.arch }}" >> $GITHUB_ENV
       - uses: actions/checkout@v3
       - name: Retrieve native build
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4.1.7
         with:
           name: staging-${{ env.target }}
           path: staging/${{ env.target }}
       - name: Retrieve server jars
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4.1.7
         with:
           name: jar
           path: jar
@@ -354,7 +354,7 @@ jobs:
         with:
           node-version: 16
       - name: Download VS Code extension dialect API
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4.1.7
         with:
           name: lib
           path: clients/cobol-dialect-api
@@ -377,7 +377,7 @@ jobs:
           name: vsix-cobol-language-support-${{ env.target }}
           path: 'cobol-language-support*.vsix'
       - name: Retrieve idms dialect
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4.1.7
         with:
           name: vsix-idms-dialect
           path: dialects-idms
@@ -387,7 +387,7 @@ jobs:
           unzip -j dialects-idms/*.vsix extension/server/jar/dialect-idms.jar -d clients/idms-dialect-support/server/jar
         shell: bash
       - name: Retrieve daco dialect
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4.1.7
         with:
           name: vsix-daco-dialect
           path: dialects-daco
