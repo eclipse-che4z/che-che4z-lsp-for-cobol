@@ -39,7 +39,7 @@ public class CICSConverseOptionsCheckUtility extends CICSOptionsCheckBaseUtility
     /**
      * Entrypoint to check CICS CONVERSE rule options
      *
-     * @param ctx ParserRuleContext subclass containging options
+     * @param ctx ParserRuleContext subclass containing options
      * @param <E> A subclass of ParserRuleContext
      */
     public <E extends ParserRuleContext> void checkOptions(E ctx) {
