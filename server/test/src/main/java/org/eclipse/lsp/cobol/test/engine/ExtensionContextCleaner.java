@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Broadcom.
+ * Copyright (c) 2024 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -12,21 +12,22 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-
 package org.eclipse.lsp.cobol.test.engine;
 
-import lombok.Value;
-import org.eclipse.lsp.cobol.test.CobolText;
-
-import java.util.List;
+import org.junit.jupiter.api.extension.AfterEachCallback;
+import org.junit.jupiter.api.extension.ExtensionContext;
 
 /**
- * This class contains the result of the use-case preprocessing. Text and copybooks will be passed
- * to the actual Language Engine, and the testDAta will be used to assert the result.
+ * ExtensionContextCleaner
  */
-@Value
-public class PreprocessedDocument {
-  String text;
-  List<CobolText> copybooks;
-  TestData testData;
+public class ExtensionContextCleaner implements AfterEachCallback {
+
+    /**
+     *
+     * @param context
+     */
+    @Override
+    public void afterEach(ExtensionContext context) {
+        ExtensionContextProvider.clearExtensionContext();
+    }
 }
