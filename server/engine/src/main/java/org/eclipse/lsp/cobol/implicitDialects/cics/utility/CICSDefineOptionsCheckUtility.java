@@ -71,10 +71,8 @@ public class CICSDefineOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
 
   private void checkCompositeEvent(CICSParser.Cics_define_composite_eventContext ctx) {
     checkHasMandatoryOptions(ctx.EVENT(), ctx, "EVENT");
-    if (ctx.OR().isEmpty()) checkHasMandatoryOptions(ctx.AND(), ctx, "AND");
-    else checkHasIllegalOptions(ctx.AND(), "AND");
-    if (ctx.AND().isEmpty()) checkHasMandatoryOptions(ctx.OR(), ctx, "OR");
-    else checkHasIllegalOptions(ctx.OR(), "OR");
+    if (!ctx.OR().isEmpty()) checkHasIllegalOptions(ctx.AND(), "AND");
+    else checkHasMandatoryOptions(ctx.AND(), ctx, "AND or OR");
 
     List<RuleContextData> contexts = new ArrayList<>();
     contexts.add(new RuleContextData(ctx.EVENT(), "EVENT"));
