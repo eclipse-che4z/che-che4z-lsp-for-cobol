@@ -62,7 +62,7 @@ public class TestCICSDefine {
   private static final String DEFINE_INPUT_EVENT_ALL_OPTIONS_VALID_ONE =
       "DEFINE INPUT EVENT({$varOne})";
 
-  private static final String DEFINE_INPUT_EVENT_INVALID_ONE = "{DEFINE|errorOne} EVENT(100)";
+  private static final String DEFINE_INPUT_EVENT_INVALID_ONE = "DEFINE {INPUT|errorOne} ";
 
   private static final String DEFINE_PROCESS_ALL_OPTIONS_VALID_ONE =
       "DEFINE PROCESS({$varOne}) PROCESSTYPE({$varTwo}) TRANSID({$varThree}) PROGRAM({$varFour}) USERID({$varFive}) NOCHECK";
@@ -163,7 +163,7 @@ public class TestCICSDefine {
             "errorOne",
             new Diagnostic(
                 new Range(),
-                "Extraneous input 'DEFINE'",
+                "Missing required option: EVENT",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()));
     CICSTestUtils.errorTest(DEFINE_INPUT_EVENT_INVALID_ONE, expectedDiagnostics);

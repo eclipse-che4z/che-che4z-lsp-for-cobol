@@ -57,9 +57,11 @@ public class CICSDefineOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
   }
 
   private void checkActivity(CICSParser.Cics_define_activityContext ctx) {
+    checkHasMandatoryOptions(ctx.ACTIVITY(), ctx, "ACTIVITY");
     checkHasMandatoryOptions(ctx.TRANSID(), ctx, "TRANSID");
 
     List<RuleContextData> contexts = new ArrayList<>();
+    contexts.add(new RuleContextData(ctx.ACTIVITY(), "ACTIVITY"));
     contexts.add(new RuleContextData(ctx.EVENT(), "EVENT"));
     contexts.add(new RuleContextData(ctx.TRANSID(), "TRANSID"));
     contexts.add(new RuleContextData(ctx.PROGRAM(), "PROGRAM"));
@@ -70,11 +72,13 @@ public class CICSDefineOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
   }
 
   private void checkCompositeEvent(CICSParser.Cics_define_composite_eventContext ctx) {
+    checkHasMandatoryOptions(ctx.COMPOSITE(), ctx, "COMPOSITE");
     checkHasMandatoryOptions(ctx.EVENT(), ctx, "EVENT");
     if (!ctx.OR().isEmpty()) checkHasIllegalOptions(ctx.AND(), "AND");
     else checkHasMandatoryOptions(ctx.AND(), ctx, "AND or OR");
 
     List<RuleContextData> contexts = new ArrayList<>();
+    contexts.add(new RuleContextData(ctx.COMPOSITE(), "COMPOSITE"));
     contexts.add(new RuleContextData(ctx.EVENT(), "EVENT"));
     contexts.add(new RuleContextData(ctx.AND(), "AND"));
     contexts.add(new RuleContextData(ctx.OR(), "OR"));
@@ -91,9 +95,12 @@ public class CICSDefineOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
   }
 
   private void checkCounter(CICSParser.Cics_define_counter_dcounterContext ctx) {
+    if (ctx.COUNTER().isEmpty()) checkHasMandatoryOptions(ctx.DCOUNTER(), ctx, "DCOUNTER");
     if (ctx.VALUE().isEmpty()) checkHasIllegalOptions(ctx.MINIMUM(), "MINIMUM");
 
     List<RuleContextData> contexts = new ArrayList<>();
+    contexts.add(new RuleContextData(ctx.COUNTER(), "COUNTER"));
+    contexts.add(new RuleContextData(ctx.DCOUNTER(), "DCOUNTER"));
     contexts.add(new RuleContextData(ctx.POOL(), "POOL"));
     contexts.add(new RuleContextData(ctx.VALUE(), "VALUE"));
     contexts.add(new RuleContextData(ctx.MINIMUM(), "MINIMUM"));
@@ -104,19 +111,23 @@ public class CICSDefineOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
   }
 
   private void checkInputEvent(CICSParser.Cics_define_input_eventContext ctx) {
+    checkHasMandatoryOptions(ctx.INPUT(), ctx, "INPUT");
     checkHasMandatoryOptions(ctx.EVENT(), ctx, "EVENT");
 
     List<RuleContextData> contexts = new ArrayList<>();
+    contexts.add(new RuleContextData(ctx.INPUT(), "INPUT"));
     contexts.add(new RuleContextData(ctx.EVENT(), "EVENT"));
     harvestResponseHandlers(ctx.cics_handle_response(), contexts);
     checkDuplicates(contexts);
   }
 
   private void checkDefineProcess(CICSParser.Cics_define_processContext ctx) {
+    checkHasMandatoryOptions(ctx.PROCESS(), ctx, "PROCESS");
     checkHasMandatoryOptions(ctx.PROCESSTYPE(), ctx, "PROCESSTYPE");
     checkHasMandatoryOptions(ctx.TRANSID(), ctx, "TRANSID");
 
     List<RuleContextData> contexts = new ArrayList<>();
+    contexts.add(new RuleContextData(ctx.PROCESS(), "PROCESS"));
     contexts.add(new RuleContextData(ctx.PROCESSTYPE(), "PROCESSTYPE"));
     contexts.add(new RuleContextData(ctx.TRANSID(), "TRANSID"));
     contexts.add(new RuleContextData(ctx.PROGRAM(), "PROGRAM"));
@@ -127,7 +138,7 @@ public class CICSDefineOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
   }
 
   private void checkDefineTimer(CICSParser.Cics_define_timerContext ctx) {
-
+    checkHasMandatoryOptions(ctx.TIMER(), ctx, "TIMER");
     if (ctx.AFTER().isEmpty()) {
       checkHasIllegalOptions(ctx.DAYS(), "DAYS");
       if (checkHasMandatoryOptions(ctx.AT(), ctx, "AT")) {
@@ -184,6 +195,7 @@ public class CICSDefineOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     }
 
     List<RuleContextData> contexts = new ArrayList<>();
+    contexts.add(new RuleContextData(ctx.TIMER(), "TIMER"));
     contexts.add(new RuleContextData(ctx.EVENT(), "EVENT"));
     contexts.add(new RuleContextData(ctx.AFTER(), "AFTER"));
     contexts.add(new RuleContextData(ctx.AT(), "AT"));
