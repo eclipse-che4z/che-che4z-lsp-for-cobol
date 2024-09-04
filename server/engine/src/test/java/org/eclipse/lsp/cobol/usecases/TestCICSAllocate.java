@@ -31,31 +31,23 @@ import java.util.Map;
  * <p>This class tests all variations of the ALLOCATE command found in the link above.
  */
 public class TestCICSAllocate {
-  private static final String ALLOCATE = "ALLOCATE ";
-  private static final String PARTNER = "PARTNER({$varFour}) ";
-  private static final String SESSION = "SESSION({$varFive}) ";
-  private static final String SYSID = "SYSID({$varOne}) ";
-  private static final String PROFILE = "PROFILE({$varSix}) ";
-  private static final String STATE = "STATE({$varFour}) ";
-  private static final String NOQUEUE = "NOQUEUE ";
-
   private static final String APPC_ALL_OPTIONS_VALID_ONE =
-      ALLOCATE + PARTNER + NOQUEUE + STATE.trim();
+      "ALLOCATE PARTNER({$varFour}) NOQUEUE STATE({$varFour})";
 
   private static final String APPC_ALL_OPTIONS_VALID_TWO =
-      ALLOCATE + SYSID + PROFILE + NOQUEUE + STATE.trim();
+      "ALLOCATE SYSID({$varOne}) PROFILE({$varSix}) NOQUEUE STATE({$varFour})";
 
   private static final String APPC_INVALID_ONE =
-      ALLOCATE + PARTNER + "{PROFILE|error1}(100) " + NOQUEUE + "STATE(err)";
+      "ALLOCATE PARTNER({$varFour}) {PROFILE|error1}(100) NOQUEUE STATE(err)";
 
   private static final String LUT61_ALL_OPTIONS_VALID_ONE =
-      ALLOCATE + SESSION + PROFILE + NOQUEUE.trim();
+      "ALLOCATE SESSION({$varFive}) PROFILE({$varSix}) NOQUEUE";
 
   private static final String LUT61_INVALID_ONE =
-      ALLOCATE + "SESSION(100) " + "PROFILE(100) " + "{STATE|errorOne}(100)";
+      "ALLOCATE SESSION(100) PROFILE(100) {STATE|errorOne}(100)";
 
   private static final String MRO_ALL_OPTIONS_VALID_ONE =
-      ALLOCATE + SYSID + PROFILE + NOQUEUE + STATE.trim();
+      "ALLOCATE SYSID({$varOne}) PROFILE({$varSix}) NOQUEUE STATE({$varFour})";
 
   @Test
   void testAPPCAllOptionsValidOne() {

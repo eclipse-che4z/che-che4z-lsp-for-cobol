@@ -125,6 +125,7 @@ public class CICSReceiveOptionsCheckUtility extends CICSOptionsCheckBaseUtility 
     if (ctx.TERMINAL().isEmpty()) checkHasIllegalOptions(ctx.INPARTN(), "INPARTN");
 
     List<RuleContextData> contexts = new ArrayList<>();
+    contexts.add(new RuleContextData(ctx.MAP(), "MAP"));
     contexts.add(new RuleContextData(ctx.MAPSET(), "MAPSET"));
     contexts.add(new RuleContextData(ctx.cics_into_set(), "INTO or SET"));
     contexts.add(new RuleContextData(ctx.FROM(), "FROM"));
@@ -140,6 +141,7 @@ public class CICSReceiveOptionsCheckUtility extends CICSOptionsCheckBaseUtility 
     checkHasMandatoryOptions(ctx.FROM(), ctx, "FROM");
 
     List<RuleContextData> contexts = new ArrayList<>();
+    contexts.add(new RuleContextData(ctx.MAP(), "MAP"));
     contexts.add(new RuleContextData(ctx.MAPPINGDEV(), "MAPPINGDEV"));
     contexts.add(new RuleContextData(ctx.FROM(), "FROM"));
     contexts.add(new RuleContextData(ctx.LENGTH(), "LENGTH"));
