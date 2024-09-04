@@ -48,7 +48,7 @@ public class TestCICSDefine {
       "DEFINE COMPOSITE EVENT({$varOne}) AND";
 
   private static final String DEFINE_COMPOSITE_EVENT_INVALID_ONE =
-      "DEFINE {_COMPOSITE EVENT('ERROR') SUBEVENT1(100) SUBEVENT2(200)|errorOne|errorTwo_}";
+      "DEFINE {_COMPOSITE EVENT('ERROR') SUBEVENT1(100) SUBEVENT2(200)|errorOne_}";
 
   private static final String DEFINE_COUNTER_ALL_OPTIONS_VALID_ONE =
       "DEFINE COUNTER({$varFive}) POOL({$varFour}) VALUE({$varOne}) MINIMUM({$varTwo}) MAXIMUM({$varThree}) NOSUSPEND";
@@ -122,13 +122,7 @@ public class TestCICSDefine {
             "errorOne",
             new Diagnostic(
                 new Range(),
-                "Missing required option: OR",
-                DiagnosticSeverity.Error,
-                ErrorSource.PARSING.getText()),
-            "errorTwo",
-            new Diagnostic(
-                new Range(),
-                "Missing required option: AND",
+                "Missing required option: AND or OR",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()));
     CICSTestUtils.errorTest(DEFINE_COMPOSITE_EVENT_INVALID_ONE, expectedDiagnostics);
