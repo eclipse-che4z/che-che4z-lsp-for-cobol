@@ -158,8 +158,9 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
 
     return retrieveLocality(fnCtx, extendedDocument, copybooks)
         .map(l -> new FunctionReference(l, name))
-        .stream()
-        .collect(toList());
+        .map(Node.class::cast)
+        .map(n -> ImmutableList.of(n))
+        .orElse(ImmutableList.of());
   }
 
   @Override
