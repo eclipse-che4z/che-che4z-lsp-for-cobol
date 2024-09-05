@@ -20,8 +20,12 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.antlr.v4.runtime.CommonToken;
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.tree.ParseTree;
+import org.antlr.v4.runtime.tree.SyntaxTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
+import org.antlr.v4.runtime.tree.TerminalNodeImpl;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
@@ -30,7 +34,9 @@ import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /** Common facilities for checking CICS parser options */
 @Slf4j
@@ -115,15 +121,12 @@ public abstract class CICSOptionsCheckBaseUtility {
    * Iterates over the provided response handlers, extracts what is provided, and validates
    *
    * @param ruleHandlers
-   * @param contexts
    * @return List of Rule Context Data
    */
-  protected void harvestResponseHandlers(
-      List<CICSParser.Cics_handle_responseContext> ruleHandlers, List<RuleContextData> contexts) {
+  protected void checkResponseHandlers(List<CICSParser.Cics_handle_responseContext> ruleHandlers) {
 
     List<TerminalNode> respResponseHandlers = new ArrayList<>();
     List<TerminalNode> respTwoResponseHandlers = new ArrayList<>();
-    List<TerminalNode> noHandle = new ArrayList<>();
     ruleHandlers.forEach(
         optionOne -> {
           if (optionOne.cics_inline_handle_exception() != null) {
@@ -135,13 +138,8 @@ public abstract class CICSOptionsCheckBaseUtility {
                       if (optionTwo.RESP() != null) respResponseHandlers.add(optionTwo.RESP());
                       if (optionTwo.RESP2() != null) respTwoResponseHandlers.add(optionTwo.RESP2());
                     });
-            noHandle.addAll(optionOne.cics_inline_handle_exception().NOHANDLE());
           }
         });
-
-    contexts.add(new RuleContextData(respResponseHandlers, "RESP"));
-    contexts.add(new RuleContextData(respTwoResponseHandlers, "RESP2"));
-    contexts.add(new RuleContextData(noHandle, "NOHANDLE"));
 
     if (respResponseHandlers.isEmpty()) {
       checkHasIllegalOptions(respTwoResponseHandlers, "RESP2");
@@ -168,6 +166,43 @@ public abstract class CICSOptionsCheckBaseUtility {
     if (!errors.contains(error)) {
       errors.add(error);
     }
+  }
+
+  private void checkDuplicateEntries(
+      ParserRuleContext ctx,
+      Map<Integer, TerminalNode> entries,
+      Map<String, ErrorSeverity> specialSeverities) {
+    if (ctx.getChildCount() != 0) {
+      for (ParseTree entry : ctx.children) {
+        if (entry.getChildCount() == 0) {
+          TerminalNode current = (TerminalNode) entry;
+          if (current.getSymbol().getType() < 897) {
+            if (entries.containsKey(current.getSymbol().getType())) {
+              ErrorSeverity severity = ErrorSeverity.ERROR;
+              if (specialSeverities.containsKey(current.getText())) {
+                severity = specialSeverities.get(current.getText());
+              }
+              throwException(
+                  current.getText(),
+                  getLocality(current),
+                  "Excessive options provided for: ",
+                  severity);
+            } else entries.put(current.getSymbol().getType(), current);
+          }
+
+        } else checkDuplicateEntries((ParserRuleContext) entry, entries, specialSeverities);
+      }
+    }
+  }
+
+  protected void checkDuplicates(
+      ParserRuleContext ctx, Map<String, ErrorSeverity> specialSeverities) {
+    Map<Integer, TerminalNode> entries = new HashMap<>();
+    checkDuplicateEntries(ctx, entries, specialSeverities);
+  }
+
+  protected void checkDuplicates(ParserRuleContext ctx) {
+    checkDuplicates(ctx, new HashMap<String, ErrorSeverity>());
   }
 
   /** Container to store rule context data */

@@ -22,7 +22,9 @@ import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_receive;
 
@@ -64,91 +66,60 @@ public class CICSReceiveOptionsCheckUtility extends CICSOptionsCheckBaseUtility 
       checkHasIllegalOptions(ctx.LEAVEKB(), "LEAVEKB");
     }
 
-    List<RuleContextData> contexts = new ArrayList<>();
-    contexts.add(new RuleContextData(ctx.cics_into_set(), "INTO or SET"));
-    contexts.add(new RuleContextData(ctx.cics_maxlength(), "MAXLENGTH or MAXFLENGTH"));
-    contexts.add(new RuleContextData(ctx.ASIS(), "ASIS", ErrorSeverity.WARNING));
-    contexts.add(new RuleContextData(ctx.BUFFER(), "BUFFER", ErrorSeverity.WARNING));
-    contexts.add(new RuleContextData(ctx.NOTRUNCATE(), "NOTRUNCATE", ErrorSeverity.WARNING));
-    contexts.add(new RuleContextData(ctx.LEAVEKB(), "LEAVEKB", ErrorSeverity.WARNING));
-    contexts.add(new RuleContextData(ctx.cics_handle_response(), "RESPONSE HANDLER"));
-    harvestResponseHandlers(ctx.cics_handle_response(), contexts);
-    checkDuplicates(contexts);
+    checkResponseHandlers(ctx.cics_handle_response());
+    Map<String, ErrorSeverity> specialSeverities = new HashMap<>();
+    specialSeverities.put("ASIS", ErrorSeverity.WARNING);
+    specialSeverities.put("BUFFER", ErrorSeverity.WARNING);
+    specialSeverities.put("NOTRUNCATE", ErrorSeverity.WARNING);
+    specialSeverities.put("LEAVEKB", ErrorSeverity.WARNING);
+    checkDuplicates(ctx, specialSeverities);
   }
 
   private void checkGroupTwo(CICSParser.Cics_receive_group_twoContext ctx) {
     checkHasMandatoryOptions(ctx.cics_length_flength(), ctx, "LENGTH or FLENGTH");
     checkHasMandatoryOptions(ctx.cics_into_set(), ctx, "INTO or SET");
 
-    List<RuleContextData> contexts = new ArrayList<>();
-    contexts.add(new RuleContextData(ctx.CONVID(), "CONVID"));
-    contexts.add(new RuleContextData(ctx.SESSION(), "SESSION"));
-    contexts.add(new RuleContextData(ctx.cics_into_set(), "INTO or SET"));
-    contexts.add(new RuleContextData(ctx.cics_length_flength(), "LENGTH or FLENGTH"));
-    contexts.add(new RuleContextData(ctx.cics_maxlength(), "MAXLENGTH or MAXFLENGTH"));
-    contexts.add(new RuleContextData(ctx.NOTRUNCATE(), "NOTRUNCATE", ErrorSeverity.WARNING));
-    contexts.add(new RuleContextData(ctx.STATE(), "STATE"));
-    contexts.add(new RuleContextData(ctx.cics_handle_response(), "RESPONSE HANDLER"));
-    harvestResponseHandlers(ctx.cics_handle_response(), contexts);
-    checkDuplicates(contexts);
+    checkResponseHandlers(ctx.cics_handle_response());
+    Map<String, ErrorSeverity> specialSeverities = new HashMap<>();
+    specialSeverities.put("NOTRUNCATE", ErrorSeverity.WARNING);
+    checkDuplicates(ctx, specialSeverities);
   }
 
   private void checkGroupThree(CICSParser.Cics_receive_group_threeContext ctx) {
     checkHasMandatoryOptions(ctx.cics_length_flength(), ctx, "LENGTH or FLENGTH");
 
-    List<RuleContextData> contexts = new ArrayList<>();
-    contexts.add(new RuleContextData(ctx.cics_into_set(), "INTO or SET"));
-    contexts.add(new RuleContextData(ctx.cics_length_flength(), "LENGTH or FLENGTH"));
-    contexts.add(new RuleContextData(ctx.cics_maxlength(), "MAXLENGTH or MAXFLENGTH"));
-    contexts.add(new RuleContextData(ctx.NOTRUNCATE(), "NOTRUNCATE", ErrorSeverity.WARNING));
-    contexts.add(new RuleContextData(ctx.PASSBK(), "PASSBK", ErrorSeverity.WARNING));
-    contexts.add(new RuleContextData(ctx.cics_handle_response(), "RESPONSE HANDLER"));
-    harvestResponseHandlers(ctx.cics_handle_response(), contexts);
-    checkDuplicates(contexts);
+    checkResponseHandlers(ctx.cics_handle_response());
+    Map<String, ErrorSeverity> specialSeverities = new HashMap<>();
+    specialSeverities.put("PASSBK", ErrorSeverity.WARNING);
+    specialSeverities.put("NOTRUNCATE", ErrorSeverity.WARNING);
+    checkDuplicates(ctx, specialSeverities);
   }
 
   private void checkPartn(CICSParser.Cics_receive_partnContext ctx) {
     checkHasMandatoryOptions(ctx.cics_into_set(), ctx, "INTO or SET");
     checkHasMandatoryOptions(ctx.LENGTH(), ctx, "LENGTH");
 
-    List<RuleContextData> contexts = new ArrayList<>();
-    contexts.add(new RuleContextData(ctx.cics_into_set(), "INTO or SET"));
-    contexts.add(new RuleContextData(ctx.LENGTH(), "LENGTH"));
-    contexts.add(new RuleContextData(ctx.ASIS(), "ASIS", ErrorSeverity.WARNING));
-    contexts.add(new RuleContextData(ctx.cics_handle_response(), "RESPONSE HANDLER"));
-    harvestResponseHandlers(ctx.cics_handle_response(), contexts);
-    checkDuplicates(contexts);
+    checkResponseHandlers(ctx.cics_handle_response());
+    Map<String, ErrorSeverity> specialSeverities = new HashMap<>();
+    specialSeverities.put("ASIS", ErrorSeverity.WARNING);
+    checkDuplicates(ctx, specialSeverities);
   }
 
   private void checkMap(CICSParser.Cics_receive_mapContext ctx) {
     if (ctx.FROM().isEmpty()) checkHasIllegalOptions(ctx.LENGTH(), "LENGTH");
     if (ctx.TERMINAL().isEmpty()) checkHasIllegalOptions(ctx.INPARTN(), "INPARTN");
 
-    List<RuleContextData> contexts = new ArrayList<>();
-    contexts.add(new RuleContextData(ctx.MAP(), "MAP"));
-    contexts.add(new RuleContextData(ctx.MAPSET(), "MAPSET"));
-    contexts.add(new RuleContextData(ctx.cics_into_set(), "INTO or SET"));
-    contexts.add(new RuleContextData(ctx.FROM(), "FROM"));
-    contexts.add(new RuleContextData(ctx.LENGTH(), "LENGTH"));
-    contexts.add(new RuleContextData(ctx.TERMINAL(), "TERMINAL", ErrorSeverity.WARNING));
-    contexts.add(new RuleContextData(ctx.ASIS(), "ASIS", ErrorSeverity.WARNING));
-    contexts.add(new RuleContextData(ctx.INPARTN(), "INPARTN"));
-    harvestResponseHandlers(ctx.cics_handle_response(), contexts);
-    checkDuplicates(contexts);
+    checkResponseHandlers(ctx.cics_handle_response());
+    Map<String, ErrorSeverity> specialSeverities = new HashMap<>();
+    specialSeverities.put("ASIS", ErrorSeverity.WARNING);
+    specialSeverities.put("TERMINAL", ErrorSeverity.WARNING);
+    checkDuplicates(ctx, specialSeverities);
   }
 
   private void checkMapMappingDev(CICSParser.Cics_receive_map_mappingdevContext ctx) {
     checkHasMandatoryOptions(ctx.FROM(), ctx, "FROM");
 
-    List<RuleContextData> contexts = new ArrayList<>();
-    contexts.add(new RuleContextData(ctx.MAP(), "MAP"));
-    contexts.add(new RuleContextData(ctx.MAPPINGDEV(), "MAPPINGDEV"));
-    contexts.add(new RuleContextData(ctx.FROM(), "FROM"));
-    contexts.add(new RuleContextData(ctx.LENGTH(), "LENGTH"));
-    contexts.add(new RuleContextData(ctx.MAPSET(), "MAPSET"));
-    contexts.add(new RuleContextData(ctx.cics_into_set(), "INTO or SET"));
-    contexts.add(new RuleContextData(ctx.cics_handle_response(), "RESPONSE HANDLER"));
-    harvestResponseHandlers(ctx.cics_handle_response(), contexts);
-    checkDuplicates(contexts);
+    checkResponseHandlers(ctx.cics_handle_response());
+    checkDuplicates(ctx);
   }
 }
