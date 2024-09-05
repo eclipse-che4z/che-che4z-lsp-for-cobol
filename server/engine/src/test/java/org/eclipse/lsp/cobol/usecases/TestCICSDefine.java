@@ -57,7 +57,7 @@ public class TestCICSDefine {
       "DEFINE DCOUNTER({$varOne}) POOL({$varTwo}) NOSUSPEND";
 
   private static final String DEFINE_COUNTER_INVALID_ONE =
-      "{DEFINE|errorOne} COUNTER MAXIMUM(100) NOSUSPEND";
+      "DEFINE COUNTER {MAXIMUM|errorOne}(100) NOSUSPEND";
 
   private static final String DEFINE_INPUT_EVENT_ALL_OPTIONS_VALID_ONE =
       "DEFINE INPUT EVENT({$varOne})";
@@ -145,7 +145,7 @@ public class TestCICSDefine {
             "errorOne",
             new Diagnostic(
                 new Range(),
-                "Extraneous input 'DEFINE'",
+                "Extraneous input MAXIMUM",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()));
     CICSTestUtils.errorTest(DEFINE_COUNTER_INVALID_ONE, expectedDiagnostics);
