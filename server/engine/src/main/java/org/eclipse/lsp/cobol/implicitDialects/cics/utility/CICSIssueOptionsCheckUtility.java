@@ -44,6 +44,8 @@ public class CICSIssueOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
       checkAbend((CICSParser.Cics_issue_abendContext) ctx);
     else if (ctx.getClass() == CICSParser.Cics_issue_abortContext.class)
       checkAbort((CICSParser.Cics_issue_abortContext) ctx);
+    else if (ctx.getClass() == CICSParser.Cics_issue_addContext.class)
+      checkAdd((CICSParser.Cics_issue_addContext) ctx);
   }
 
   private void checkAbend(CICSParser.Cics_issue_abendContext ctx) {
