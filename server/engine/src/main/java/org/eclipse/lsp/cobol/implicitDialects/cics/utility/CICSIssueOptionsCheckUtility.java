@@ -42,6 +42,8 @@ public class CICSIssueOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
   public <E extends ParserRuleContext> void checkOptions(E ctx) {
     if (ctx.getClass() == CICSParser.Cics_issue_abendContext.class)
       checkAbend((CICSParser.Cics_issue_abendContext) ctx);
+    else if (ctx.getClass() == CICSParser.Cics_issue_abortContext.class)
+      checkAbort((CICSParser.Cics_issue_abortContext) ctx);
   }
 
   private void checkAbend(CICSParser.Cics_issue_abendContext ctx) {
@@ -58,15 +60,6 @@ public class CICSIssueOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
   private void checkAbort(CICSParser.Cics_issue_abortContext ctx) {
     checkHasMandatoryOptions(ctx.ABORT(), ctx, "ABORT");
 
-    int volumeSubArgCount =
-        ctx.CONSOLE().size()
-            + ctx.PRINT().size()
-            + ctx.CARD().size()
-            + ctx.WPMEDIA1().size()
-            + ctx.WPMEDIA2().size()
-            + ctx.WPMEDIA3().size()
-            + ctx.WPMEDIA4().size();
-
     if (!ctx.DESTID().isEmpty()) {
       checkHasIllegalOptions(ctx.SUBADDR(), "SUBADDR with DESTID");
       checkHasIllegalOptions(ctx.CONSOLE(), "CONSOLE with DESTID");
@@ -78,6 +71,14 @@ public class CICSIssueOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
       checkHasIllegalOptions(ctx.WPMEDIA4(), "WPMEDIA4 with DESTID");
     } else {
       checkHasIllegalOptions(ctx.DESTIDLENG(), "DESTIDLENG without DESTID");
+      int volumeSubArgCount =
+          ctx.CONSOLE().size()
+              + ctx.PRINT().size()
+              + ctx.CARD().size()
+              + ctx.WPMEDIA1().size()
+              + ctx.WPMEDIA2().size()
+              + ctx.WPMEDIA3().size()
+              + ctx.WPMEDIA4().size();
       if (volumeSubArgCount > 1) {
         checkHasIllegalOptions(ctx.CONSOLE(), "CONSOLE");
         checkHasIllegalOptions(ctx.PRINT(), "PRINT");
@@ -105,6 +106,30 @@ public class CICSIssueOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     contexts.add(new RuleContextData(ctx.WPMEDIA4(), "WPMEDIA4"));
     contexts.add(new RuleContextData(ctx.VOLUME(), "VOLUME"));
     contexts.add(new RuleContextData(ctx.VOLUMELENG(), "VOLUMELENG"));
+    harvestResponseHandlers(ctx.cics_handle_response(), contexts);
+    checkDuplicates(contexts);
+  }
+
+  private void checkAdd(CICSParser.Cics_issue_addContext ctx) {
+    checkHasMandatoryOptions(ctx.ADD(), ctx, "ADD");
+    checkHasMandatoryOptions(ctx.DESTID(), ctx, "DESTID");
+    checkHasMandatoryOptions(ctx.FROM(), ctx, "FROM");
+
+    if (ctx.RIDFLD().isEmpty()) checkHasIllegalOptions(ctx.RRN(), "RRN without RIDFLD");
+
+    List<RuleContextData> contexts = new ArrayList<>();
+    contexts.add(new RuleContextData(ctx.ADD(), "ADD"));
+    contexts.add(new RuleContextData(ctx.DESTID(), "DESTID"));
+    contexts.add(new RuleContextData(ctx.DESTIDLENG(), "DESTIDLENG"));
+    contexts.add(new RuleContextData(ctx.VOLUME(), "VOLUME"));
+    contexts.add(new RuleContextData(ctx.VOLUMELENG(), "VOLUMELENG"));
+    contexts.add(new RuleContextData(ctx.FROM(), "FROM"));
+    contexts.add(new RuleContextData(ctx.LENGTH(), "LENGTH"));
+    contexts.add(new RuleContextData(ctx.NUMREC(), "NUMREC"));
+    contexts.add(new RuleContextData(ctx.DEFRESP(), "DEFRESP"));
+    contexts.add(new RuleContextData(ctx.NOWAIT(), "NOWAIT"));
+    contexts.add(new RuleContextData(ctx.RIDFLD(), "RIDFLD"));
+    contexts.add(new RuleContextData(ctx.RRN(), "RRN"));
     harvestResponseHandlers(ctx.cics_handle_response(), contexts);
     checkDuplicates(contexts);
   }
