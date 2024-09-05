@@ -66,7 +66,7 @@ public class TestCICSAllocate {
             "error1",
             new Diagnostic(
                 new Range(),
-                "Extraneous input 'PROFILE'",
+                "Extraneous input PROFILE",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()));
     CICSTestUtils.errorTest(APPC_INVALID_ONE, expectedDiagnostic);
@@ -84,7 +84,7 @@ public class TestCICSAllocate {
             "errorOne",
             new Diagnostic(
                 new Range(),
-                "Extraneous input 'STATE'",
+                "Extraneous input STATE",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()));
     CICSTestUtils.errorTest(LUT61_INVALID_ONE, expectedDiagnostic);
