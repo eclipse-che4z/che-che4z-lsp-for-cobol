@@ -192,14 +192,13 @@ public abstract class CICSOptionsCheckBaseUtility {
     }
   }
 
-  protected void checkDuplicates(
-      ParserRuleContext ctx, Map<String, ErrorSeverity> specialSeverities) {
+  protected void checkDuplicates(ParserRuleContext ctx, String... warnings) {
+    Map<String, ErrorSeverity> specialSeverities = new HashMap<>();
+    for (String entry : warnings) {
+      specialSeverities.put(entry, ErrorSeverity.WARNING);
+    }
     Map<Integer, TerminalNode> entries = new HashMap<>();
     checkDuplicateEntries(ctx, entries, specialSeverities);
-  }
-
-  protected void checkDuplicates(ParserRuleContext ctx) {
-    checkDuplicates(ctx, new HashMap<String, ErrorSeverity>());
   }
 
   /** Container to store rule context data */

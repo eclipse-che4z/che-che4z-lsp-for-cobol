@@ -16,13 +16,10 @@ package org.eclipse.lsp.cobol.implicitDialects.cics.utility;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
-import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_allocate;
 
@@ -55,24 +52,18 @@ public class CICSAllocateOptionsCheckUtility extends CICSOptionsCheckBaseUtility
   private void checkAppcPartner(CICSParser.Cics_allocate_appc_partnerContext ctx) {
     checkHasMandatoryOptions(ctx.PARTNER(), ctx, "PARTNER");
     checkResponseHandlers(ctx.cics_handle_response());
-    Map<String, ErrorSeverity> specialSeverities = new HashMap<>();
-    specialSeverities.put("NOQUEUE", ErrorSeverity.WARNING);
-    checkDuplicates(ctx, specialSeverities);
+    checkDuplicates(ctx, "NOQUEUE");
   }
 
   private void checkAppcMroLut61Sysid(CICSParser.Cics_allocate_appc_mro_lut61_sysidContext ctx) {
     checkHasMandatoryOptions(ctx.SYSID(), ctx, "SYSID");
     checkResponseHandlers(ctx.cics_handle_response());
-    Map<String, ErrorSeverity> specialSeverities = new HashMap<>();
-    specialSeverities.put("NOQUEUE", ErrorSeverity.WARNING);
-    checkDuplicates(ctx, specialSeverities);
+    checkDuplicates(ctx, "NOQUEUE");
   }
 
   private void checkLut61Session(CICSParser.Cics_allocate_lut61_sessionContext ctx) {
     checkHasMandatoryOptions(ctx.SESSION(), ctx, "SESSION");
     checkResponseHandlers(ctx.cics_handle_response());
-    Map<String, ErrorSeverity> specialSeverities = new HashMap<>();
-    specialSeverities.put("NOQUEUE", ErrorSeverity.WARNING);
-    checkDuplicates(ctx, specialSeverities);
+    checkDuplicates(ctx, "NOQUEUE");
   }
 }

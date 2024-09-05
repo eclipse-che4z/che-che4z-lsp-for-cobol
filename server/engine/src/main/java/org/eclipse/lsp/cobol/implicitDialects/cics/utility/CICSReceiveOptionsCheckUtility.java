@@ -64,14 +64,8 @@ public class CICSReceiveOptionsCheckUtility extends CICSOptionsCheckBaseUtility 
     if (!ctx.ASIS().isEmpty() || !ctx.BUFFER().isEmpty()) {
       checkHasIllegalOptions(ctx.LEAVEKB(), "LEAVEKB");
     }
-
     checkResponseHandlers(ctx.cics_handle_response());
-    Map<String, ErrorSeverity> specialSeverities = new HashMap<>();
-    specialSeverities.put("ASIS", ErrorSeverity.WARNING);
-    specialSeverities.put("BUFFER", ErrorSeverity.WARNING);
-    specialSeverities.put("NOTRUNCATE", ErrorSeverity.WARNING);
-    specialSeverities.put("LEAVEKB", ErrorSeverity.WARNING);
-    checkDuplicates(ctx, specialSeverities);
+    checkDuplicates(ctx, "ASIS", "BUFFER", "NOTRUNCATE", "LEAVEKB");
   }
 
   private void checkGroupTwo(CICSParser.Cics_receive_group_twoContext ctx) {
@@ -81,17 +75,14 @@ public class CICSReceiveOptionsCheckUtility extends CICSOptionsCheckBaseUtility 
     checkResponseHandlers(ctx.cics_handle_response());
     Map<String, ErrorSeverity> specialSeverities = new HashMap<>();
     specialSeverities.put("NOTRUNCATE", ErrorSeverity.WARNING);
-    checkDuplicates(ctx, specialSeverities);
+    checkDuplicates(ctx, "NOTRUNCATE");
   }
 
   private void checkGroupThree(CICSParser.Cics_receive_group_threeContext ctx) {
     checkHasMandatoryOptions(ctx.cics_length_flength(), ctx, "LENGTH or FLENGTH");
 
     checkResponseHandlers(ctx.cics_handle_response());
-    Map<String, ErrorSeverity> specialSeverities = new HashMap<>();
-    specialSeverities.put("PASSBK", ErrorSeverity.WARNING);
-    specialSeverities.put("NOTRUNCATE", ErrorSeverity.WARNING);
-    checkDuplicates(ctx, specialSeverities);
+    checkDuplicates(ctx, "PASSBK", "NOTRUNCATEs");
   }
 
   private void checkPartn(CICSParser.Cics_receive_partnContext ctx) {
@@ -99,9 +90,7 @@ public class CICSReceiveOptionsCheckUtility extends CICSOptionsCheckBaseUtility 
     checkHasMandatoryOptions(ctx.LENGTH(), ctx, "LENGTH");
 
     checkResponseHandlers(ctx.cics_handle_response());
-    Map<String, ErrorSeverity> specialSeverities = new HashMap<>();
-    specialSeverities.put("ASIS", ErrorSeverity.WARNING);
-    checkDuplicates(ctx, specialSeverities);
+    checkDuplicates(ctx, "ASIS");
   }
 
   private void checkMap(CICSParser.Cics_receive_mapContext ctx) {
@@ -109,10 +98,7 @@ public class CICSReceiveOptionsCheckUtility extends CICSOptionsCheckBaseUtility 
     if (ctx.TERMINAL().isEmpty()) checkHasIllegalOptions(ctx.INPARTN(), "INPARTN");
 
     checkResponseHandlers(ctx.cics_handle_response());
-    Map<String, ErrorSeverity> specialSeverities = new HashMap<>();
-    specialSeverities.put("ASIS", ErrorSeverity.WARNING);
-    specialSeverities.put("TERMINAL", ErrorSeverity.WARNING);
-    checkDuplicates(ctx, specialSeverities);
+    checkDuplicates(ctx, "ASIS", "TERMINAL");
   }
 
   private void checkMapMappingDev(CICSParser.Cics_receive_map_mappingdevContext ctx) {
