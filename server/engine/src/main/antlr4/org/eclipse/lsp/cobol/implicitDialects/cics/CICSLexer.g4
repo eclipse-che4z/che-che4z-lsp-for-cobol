@@ -279,6 +279,7 @@ EWASUPP : E W A S U P P;
 EXCEPTION : E X C E P T I O N;
 EXCI : E X C I;
 EXEC: E X E C;
+EXEC_CICS: E X E C [ \t\f\r\n]+ C I C S;
 EXPECT : E X P E C T;
 EXPIRYTIME : E X P I R Y T I M E;
 EXTDS : E X T D S;

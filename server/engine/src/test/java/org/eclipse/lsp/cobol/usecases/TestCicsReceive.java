@@ -231,7 +231,7 @@ public class TestCicsReceive {
 
   private static final String[] MAP_PARTIAL_OPTIONS_VALID_ONE = {"RECEIVE", "MAP({$abc})", "ASIS"};
 
-  private static final String[] MAP_INVALID_ONE = {"{RECEIVE|error1}", "MAP", "LENGTH(100)"};
+  private static final String[] MAP_INVALID_ONE = {"RECEIVE", "MAP", "{LENGTH|error1}(100)"};
 
   private static final String[] MAP_MAPPINGDEV_FULL_OPTIONS_VALID_ONE = {
     "RECEIVE",
@@ -598,7 +598,7 @@ public class TestCicsReceive {
             "error1",
             new Diagnostic(
                 new Range(),
-                "Extraneous input 'RECEIVE'",
+                "No viable alternative at input MAP\n            LENGTH",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())),
         ImmutableList.of());

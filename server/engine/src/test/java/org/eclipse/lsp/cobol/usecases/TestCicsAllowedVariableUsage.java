@@ -24,8 +24,8 @@ import java.util.stream.Stream;
 
 /** Test the allowed variable usage */
 public class TestCicsAllowedVariableUsage {
-  public static final String TEXT =
-      "       Identification Division.\n"
+  public static final String TEXT = ""
+          + "       Identification Division.\n"
           + "       Program-id. HELLOT.\n"
           + "\n"
           + "       Data Division.\n"
@@ -208,8 +208,6 @@ public class TestCicsAllowedVariableUsage {
             "DESTID",
             "DESTIDLENG",
             "DETAILLENGTH",
-            "DFHRESP",
-            "DFHVALUE",
             "DIGEST",
             "DIGESTTYPE",
             "DISCONNECT",

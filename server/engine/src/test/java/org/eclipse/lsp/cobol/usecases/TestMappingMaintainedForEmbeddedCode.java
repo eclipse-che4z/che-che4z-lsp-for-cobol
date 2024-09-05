@@ -62,9 +62,9 @@ public class TestMappingMaintainedForEmbeddedCode {
           + "      *                                                                         \n"
           + "      *  some comments                                              \n"
           + "      *                                                                         \n"
-          + "                 EXEC CICS {LINK|1}                                                 \n"
+          + "                 EXEC CICS LINK                                                 \n"
           + "                    PROGRAM(PGM)                                        \n"
-          + "                    DUMMY-CMD()                            \n"
+          + "                    {DUMMY-CMD|1}()                        \n"
           + "                    SYNCONRETURN                                                \n"
           + "                 END-EXEC                                                       \n"
           + "                                                                      \n"
@@ -117,7 +117,7 @@ public class TestMappingMaintainedForEmbeddedCode {
             "1",
             new Diagnostic(
                 new Range(),
-                "Extraneous input 'LINK'",
+                "No viable alternative at input LINK\n                    PROGRAM(PGM)\n                    DUMMY-CMD",
                 Error,
                 ErrorSource.PARSING.getText())));
   }

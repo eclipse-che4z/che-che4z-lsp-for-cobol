@@ -140,6 +140,17 @@ public class ExtendedDocument {
     dirty = true;
   }
 
+  /**
+   * Fill the range with the given character
+   * @param range - a range of text
+   * @param c - the character
+   */
+  public void fillArea(Range range, char c) {
+    range = updateRangeDueToChanges(range);
+    currentText.fillArea(range, c);
+    dirty = true;
+  }
+
   @Override
   public String toString() {
     return baseText.toString();

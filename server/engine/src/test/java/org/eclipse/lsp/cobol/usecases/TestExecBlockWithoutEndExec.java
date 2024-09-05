@@ -42,8 +42,8 @@ public class TestExecBlockWithoutEndExec {
           + "       WORKING-STORAGE SECTION.\n"
           + "       01  {$*WS-TIME}                     PIC S9(08) COMP VALUE +0.\n"
           + "       PROCEDURE DIVISION.\n"
-          + "           {EXEC|1} CICS ASKTIME\n"
-          + "                     ABSTIME({$WS-TIME}).\n";
+          + "           EXEC CICS ASKTIME\n"
+          + "                     ABSTIME({$WS-TIME}){|1}{.|2}\n";
 
   @Test
   void testEndExecBlockRequiredForExecSQL() {
@@ -70,6 +70,13 @@ public class TestExecBlockWithoutEndExec {
                 new Range(),
                 "Missing token END-EXEC for the CICS EXEC block",
                 DiagnosticSeverity.Error,
-                ErrorSource.PARSING.getText())));
+                ErrorSource.PARSING.getText()),
+            "2",
+            new Diagnostic(
+                new Range(),
+                "Extraneous input .",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())
+            ));
   }
 }

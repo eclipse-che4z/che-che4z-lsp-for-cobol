@@ -151,7 +151,7 @@ suite("Integration Test Suite", function () {
       diagnostics[0].range,
       range(pos(58, 21), pos(58, 28)),
     );
-    assert.ok(diagnostics[0].message.includes("Extraneous input 'XCTL123'"));
+    assert.ok(diagnostics[0].message.includes("Syntax error on 'XCTL123'"));
     await helper.deleteLine(editor, 58);
     await helper.insertString(
       editor,
