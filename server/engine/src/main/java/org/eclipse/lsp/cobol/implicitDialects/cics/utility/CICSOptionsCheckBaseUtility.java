@@ -23,6 +23,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
@@ -41,33 +43,30 @@ public abstract class CICSOptionsCheckBaseUtility {
 
   private final List<SyntaxError> errors;
 
+  public static final Map<String, Pair<ErrorSeverity, String>> COMMON_SUBGROUPS =
+      new HashMap<String, Pair<ErrorSeverity, String>>() {
+        {
+          put(
+              "Cics_handle_responseContext",
+              new ImmutablePair<>(ErrorSeverity.ERROR, "RESPONSE HANDLER"));
+        }
+      };
+
   private static final Map<String, ErrorSeverity> SPECIAL_SEVERITIES =
       new HashMap<String, ErrorSeverity>() {
         {
           put("ASIS", ErrorSeverity.WARNING);
-        }
 
-        {
           put("BUFFER", ErrorSeverity.WARNING);
-        }
 
-        {
           put("LEAVEKB", ErrorSeverity.WARNING);
-        }
 
-        {
           put("NOTRUNCATE", ErrorSeverity.WARNING);
-        }
 
-        {
           put("NOQUEUE", ErrorSeverity.WARNING);
-        }
 
-        {
           put("NOTRUNCATE", ErrorSeverity.WARNING);
-        }
 
-        {
           put("TERMINAL", ErrorSeverity.WARNING);
         }
       };
@@ -84,30 +83,6 @@ public abstract class CICSOptionsCheckBaseUtility {
    * @param <E> A subclass of ParserRuleContext
    */
   public abstract <E extends ParserRuleContext> void checkOptions(E ctx);
-
-  /**
-   * Checks for duplicate option entries
-   *
-   * @param options Lists of Target rule List and String pairs to check for duplicates of where
-   *     String is the name of the option to check for and the rule list is the context to check for
-   *     duplicates
-   */
-  protected void checkDuplicates(List<RuleContextData> options) {
-    for (RuleContextData option : options) {
-      if (option.rules.size() >= 2) {
-        option
-            .rules
-            .subList(1, option.rules.size())
-            .forEach(
-                error ->
-                    throwException(
-                        option.ruleName,
-                        getLocality(error),
-                        "Excessive options provided for: ",
-                        option.severity));
-      }
-    }
-  }
 
   /**
    * Helper method to collect analysis errors if the rule context does not contain mandatory options
@@ -150,7 +125,6 @@ public abstract class CICSOptionsCheckBaseUtility {
    * @return List of Rule Context Data
    */
   protected void checkResponseHandlers(List<CICSParser.Cics_handle_responseContext> ruleHandlers) {
-
     List<TerminalNode> respResponseHandlers = new ArrayList<>();
     List<TerminalNode> respTwoResponseHandlers = new ArrayList<>();
     ruleHandlers.forEach(
@@ -194,7 +168,11 @@ public abstract class CICSOptionsCheckBaseUtility {
     }
   }
 
-  private void checkDuplicateEntries(ParserRuleContext ctx, Map<String, ParseTree> entries) {
+  private void checkDuplicateEntries(
+      ParserRuleContext ctx,
+      Map<String, ParseTree> entries,
+      Map<String, Pair<ErrorSeverity, String>> subGroups) {
+
     if (ctx.getChildCount() != 0) {
       for (ParseTree entry : ctx.children) {
         if (entry.getChildCount() == 0) {
@@ -212,16 +190,37 @@ public abstract class CICSOptionsCheckBaseUtility {
             }
           }
         } else {
-          String content = entry.getClass().getName();
-          checkDuplicateEntries((ParserRuleContext) entry, entries);
+          String className = "";
+          if (entry.getClass().toString().split("\\$").length > 0) {
+            className = entry.getClass().toString().split("\\$")[1];
+          }
+          boolean errorFound = false;
+          Pair<ErrorSeverity, String> subGroup = subGroups.getOrDefault(className, null);
+          if (subGroup != null) {
+            if (entries.putIfAbsent(className, entry) != null) {
+              errorFound = true;
+              throwException(
+                  subGroup.getRight(),
+                  getLocality(entry),
+                  "Excessive options provided for: ",
+                  subGroup.getLeft());
+            }
+          }
+          if (!errorFound) checkDuplicateEntries((ParserRuleContext) entry, entries, subGroups);
         }
       }
     }
   }
 
-  protected void checkDuplicates(ParserRuleContext ctx) {
+  protected void checkDuplicates(
+      ParserRuleContext ctx, Map<String, Pair<ErrorSeverity, String>> subGroups) {
     Map<String, ParseTree> entries = new HashMap<>();
-    checkDuplicateEntries(ctx, entries);
+    subGroups.putAll(COMMON_SUBGROUPS);
+    checkDuplicateEntries(ctx, entries, subGroups);
+  }
+
+  protected void checkDuplicates(ParserRuleContext ctx) {
+    checkDuplicates(ctx, Collections.emptyMap());
   }
 
   /** Container to store rule context data */

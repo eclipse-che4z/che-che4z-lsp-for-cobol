@@ -16,6 +16,8 @@
 package org.eclipse.lsp.cobol.implicitDialects.cics.utility;
 
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
@@ -31,6 +33,16 @@ import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_r
 public class CICSReceiveOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
 
   public static final int RULE_INDEX = RULE_cics_receive;
+
+  public static final Map<String, Pair<ErrorSeverity, String>> SUBGROUPS =
+      new HashMap<String, Pair<ErrorSeverity, String>>() {
+        {
+          put("Cics_into_setContext", new ImmutablePair<>(ErrorSeverity.ERROR, "INTO or SET"));
+          put(
+              "Cics_length_flengthContext",
+              new ImmutablePair<>(ErrorSeverity.ERROR, "LENGTH or FLENGTH"));
+        }
+      };
 
   public CICSReceiveOptionsCheckUtility(
       DialectProcessingContext context, List<SyntaxError> errors) {
@@ -65,7 +77,7 @@ public class CICSReceiveOptionsCheckUtility extends CICSOptionsCheckBaseUtility 
       checkHasIllegalOptions(ctx.LEAVEKB(), "LEAVEKB");
     }
     checkResponseHandlers(ctx.cics_handle_response());
-    checkDuplicates(ctx);
+    checkDuplicates(ctx, SUBGROUPS);
   }
 
   private void checkGroupTwo(CICSParser.Cics_receive_group_twoContext ctx) {
@@ -73,16 +85,14 @@ public class CICSReceiveOptionsCheckUtility extends CICSOptionsCheckBaseUtility 
     checkHasMandatoryOptions(ctx.cics_into_set(), ctx, "INTO or SET");
 
     checkResponseHandlers(ctx.cics_handle_response());
-    Map<String, ErrorSeverity> specialSeverities = new HashMap<>();
-    specialSeverities.put("NOTRUNCATE", ErrorSeverity.WARNING);
-    checkDuplicates(ctx);
+    checkDuplicates(ctx, SUBGROUPS);
   }
 
   private void checkGroupThree(CICSParser.Cics_receive_group_threeContext ctx) {
     checkHasMandatoryOptions(ctx.cics_length_flength(), ctx, "LENGTH or FLENGTH");
 
     checkResponseHandlers(ctx.cics_handle_response());
-    checkDuplicates(ctx);
+    checkDuplicates(ctx, SUBGROUPS);
   }
 
   private void checkPartn(CICSParser.Cics_receive_partnContext ctx) {
@@ -90,7 +100,7 @@ public class CICSReceiveOptionsCheckUtility extends CICSOptionsCheckBaseUtility 
     checkHasMandatoryOptions(ctx.LENGTH(), ctx, "LENGTH");
 
     checkResponseHandlers(ctx.cics_handle_response());
-    checkDuplicates(ctx);
+    checkDuplicates(ctx, SUBGROUPS);
   }
 
   private void checkMap(CICSParser.Cics_receive_mapContext ctx) {
@@ -98,13 +108,13 @@ public class CICSReceiveOptionsCheckUtility extends CICSOptionsCheckBaseUtility 
     if (ctx.TERMINAL().isEmpty()) checkHasIllegalOptions(ctx.INPARTN(), "INPARTN");
 
     checkResponseHandlers(ctx.cics_handle_response());
-    checkDuplicates(ctx);
+    checkDuplicates(ctx, SUBGROUPS);
   }
 
   private void checkMapMappingDev(CICSParser.Cics_receive_map_mappingdevContext ctx) {
     checkHasMandatoryOptions(ctx.FROM(), ctx, "FROM");
 
     checkResponseHandlers(ctx.cics_handle_response());
-    checkDuplicates(ctx);
+    checkDuplicates(ctx, SUBGROUPS);
   }
 }

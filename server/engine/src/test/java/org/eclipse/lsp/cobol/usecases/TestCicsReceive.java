@@ -139,7 +139,7 @@ public class TestCicsReceive {
   };
 
   private static final String[] GROUP_ONE_DUPLICATE_INVALID = {
-    "RECEIVE", "INTO(100)", "{INTO|error1}(1000)", "LENGTH(100)", "MAXLENGTH(10)", "NOTRUNCATE"
+    "RECEIVE", "INTO(100)", "{INTO(1000)|error1}", "LENGTH(100)", "MAXLENGTH(10)", "NOTRUNCATE"
   };
 
   private static final String[] GROUP_TWO_APPC_FULL_OPTIONS_VALID_ONE = {
@@ -429,7 +429,7 @@ public class TestCicsReceive {
             "error1",
             new Diagnostic(
                 new Range(),
-                "Excessive options provided for: INTO",
+                "Excessive options provided for: INTO or SET",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())),
         ImmutableList.of());
