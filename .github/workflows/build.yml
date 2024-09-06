@@ -61,8 +61,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: graalvm/setup-graalvm@v1
         with:
-          version: '22.3.0'
-          java-version: '11'
+          java-version: '17'
           components: 'native-image'
           github-token: ${{ secrets.GITHUB_TOKEN }}
           ## uncomment me if you need native image job reports
@@ -84,14 +83,10 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - uses: graalvm/setup-graalvm@v1
+      - uses: actions/setup-java@v4
         with:
-          version: '22.3.0'
+          distribution: 'temurin'
           java-version: '11'
-          components: 'native-image'
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          ## uncomment me if you need native image job reports
-          # native-image-job-reports: 'true'
           cache: 'maven'
       - name: Build Server and Dialects Jars
         working-directory: server
@@ -223,8 +218,7 @@ jobs:
       - uses: graalvm/setup-graalvm@v1
         if: matrix.os == 'ubuntu-latest' && matrix.arch == 'x64'
         with:
-          version: '22.3.0'
-          java-version: '11'
+          java-version: '17'
           components: 'native-image'
           native-image-musl: 'true'
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -234,8 +228,7 @@ jobs:
       - uses: graalvm/setup-graalvm@v1
         if: matrix.os != 'ubuntu-latest' || matrix.arch != 'x64'
         with:
-          version: '22.3.0'
-          java-version: '11'
+          java-version: '17'
           components: 'native-image'
           github-token: ${{ secrets.GITHUB_TOKEN }}
           ## uncomment me if you need native image job reports
@@ -332,9 +325,7 @@ jobs:
         working-directory: clients/cobol-lsp-vscode-extension
         if: startsWith( matrix.os, 'windows')
         run: |
-          cp ../../staging/${{ env.target }}/engine.build_artifacts.txt ./server/native
           cp ../../staging/${{ env.target }}/engine.exe ./server/native
-          cp ../../staging/${{ env.target }}/sunmscapi.dll ./server/native
           cp ./server/native/* ../../tests/native-executable-tests/server/windows/
       - name: Deploy macos executable
         working-directory: clients/cobol-lsp-vscode-extension
