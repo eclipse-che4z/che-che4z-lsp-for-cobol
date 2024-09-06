@@ -52,18 +52,18 @@ public class CICSAllocateOptionsCheckUtility extends CICSOptionsCheckBaseUtility
   private void checkAppcPartner(CICSParser.Cics_allocate_appc_partnerContext ctx) {
     checkHasMandatoryOptions(ctx.PARTNER(), ctx, "PARTNER");
     checkResponseHandlers(ctx.cics_handle_response());
-    checkDuplicates(ctx, "NOQUEUE");
+    checkDuplicates(ctx);
   }
 
   private void checkAppcMroLut61Sysid(CICSParser.Cics_allocate_appc_mro_lut61_sysidContext ctx) {
     checkHasMandatoryOptions(ctx.SYSID(), ctx, "SYSID");
     checkResponseHandlers(ctx.cics_handle_response());
-    checkDuplicates(ctx, "NOQUEUE");
+    checkDuplicates(ctx);
   }
 
   private void checkLut61Session(CICSParser.Cics_allocate_lut61_sessionContext ctx) {
     checkHasMandatoryOptions(ctx.SESSION(), ctx, "SESSION");
     checkResponseHandlers(ctx.cics_handle_response());
-    checkDuplicates(ctx, "NOQUEUE");
+    checkDuplicates(ctx);
   }
 }

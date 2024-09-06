@@ -41,6 +41,37 @@ public abstract class CICSOptionsCheckBaseUtility {
 
   private final List<SyntaxError> errors;
 
+  private static final Map<String, ErrorSeverity> SPECIAL_SEVERITIES =
+      new HashMap<String, ErrorSeverity>() {
+        {
+          put("ASIS", ErrorSeverity.WARNING);
+        }
+
+        {
+          put("BUFFER", ErrorSeverity.WARNING);
+        }
+
+        {
+          put("LEAVEKB", ErrorSeverity.WARNING);
+        }
+
+        {
+          put("NOTRUNCATE", ErrorSeverity.WARNING);
+        }
+
+        {
+          put("NOQUEUE", ErrorSeverity.WARNING);
+        }
+
+        {
+          put("NOTRUNCATE", ErrorSeverity.WARNING);
+        }
+
+        {
+          put("TERMINAL", ErrorSeverity.WARNING);
+        }
+      };
+
   public CICSOptionsCheckBaseUtility(DialectProcessingContext context, List<SyntaxError> errors) {
     this.context = context;
     this.errors = errors;
@@ -163,10 +194,7 @@ public abstract class CICSOptionsCheckBaseUtility {
     }
   }
 
-  private void checkDuplicateEntries(
-      ParserRuleContext ctx,
-      Map<String, ParseTree> entries,
-      Map<String, ErrorSeverity> specialSeverities) {
+  private void checkDuplicateEntries(ParserRuleContext ctx, Map<String, ParseTree> entries) {
     if (ctx.getChildCount() != 0) {
       for (ParseTree entry : ctx.children) {
         if (entry.getChildCount() == 0) {
@@ -174,7 +202,7 @@ public abstract class CICSOptionsCheckBaseUtility {
               .anyMatch(rule -> rule.equals(entry.getText().toUpperCase()))) {
             if (entries.putIfAbsent(entry.getText(), entry) != null) {
               ErrorSeverity severity =
-                  specialSeverities.getOrDefault(
+                  SPECIAL_SEVERITIES.getOrDefault(
                       entry.getText().toUpperCase(), ErrorSeverity.ERROR);
               throwException(
                   entry.getText(),
@@ -183,18 +211,17 @@ public abstract class CICSOptionsCheckBaseUtility {
                   severity);
             }
           }
-        } else checkDuplicateEntries((ParserRuleContext) entry, entries, specialSeverities);
+        } else {
+          String content = entry.getClass().getName();
+          checkDuplicateEntries((ParserRuleContext) entry, entries);
+        }
       }
     }
   }
 
-  protected void checkDuplicates(ParserRuleContext ctx, String... warnings) {
-    Map<String, ErrorSeverity> specialSeverities = new HashMap<>();
-    for (String entry : warnings) {
-      specialSeverities.put(entry, ErrorSeverity.WARNING);
-    }
+  protected void checkDuplicates(ParserRuleContext ctx) {
     Map<String, ParseTree> entries = new HashMap<>();
-    checkDuplicateEntries(ctx, entries, specialSeverities);
+    checkDuplicateEntries(ctx, entries);
   }
 
   /** Container to store rule context data */

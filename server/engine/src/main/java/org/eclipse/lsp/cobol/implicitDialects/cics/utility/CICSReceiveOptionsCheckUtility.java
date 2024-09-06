@@ -65,7 +65,7 @@ public class CICSReceiveOptionsCheckUtility extends CICSOptionsCheckBaseUtility 
       checkHasIllegalOptions(ctx.LEAVEKB(), "LEAVEKB");
     }
     checkResponseHandlers(ctx.cics_handle_response());
-    checkDuplicates(ctx, "ASIS", "BUFFER", "NOTRUNCATE", "LEAVEKB");
+    checkDuplicates(ctx);
   }
 
   private void checkGroupTwo(CICSParser.Cics_receive_group_twoContext ctx) {
@@ -75,14 +75,14 @@ public class CICSReceiveOptionsCheckUtility extends CICSOptionsCheckBaseUtility 
     checkResponseHandlers(ctx.cics_handle_response());
     Map<String, ErrorSeverity> specialSeverities = new HashMap<>();
     specialSeverities.put("NOTRUNCATE", ErrorSeverity.WARNING);
-    checkDuplicates(ctx, "NOTRUNCATE");
+    checkDuplicates(ctx);
   }
 
   private void checkGroupThree(CICSParser.Cics_receive_group_threeContext ctx) {
     checkHasMandatoryOptions(ctx.cics_length_flength(), ctx, "LENGTH or FLENGTH");
 
     checkResponseHandlers(ctx.cics_handle_response());
-    checkDuplicates(ctx, "PASSBK", "NOTRUNCATEs");
+    checkDuplicates(ctx);
   }
 
   private void checkPartn(CICSParser.Cics_receive_partnContext ctx) {
@@ -90,7 +90,7 @@ public class CICSReceiveOptionsCheckUtility extends CICSOptionsCheckBaseUtility 
     checkHasMandatoryOptions(ctx.LENGTH(), ctx, "LENGTH");
 
     checkResponseHandlers(ctx.cics_handle_response());
-    checkDuplicates(ctx, "ASIS");
+    checkDuplicates(ctx);
   }
 
   private void checkMap(CICSParser.Cics_receive_mapContext ctx) {
@@ -98,7 +98,7 @@ public class CICSReceiveOptionsCheckUtility extends CICSOptionsCheckBaseUtility 
     if (ctx.TERMINAL().isEmpty()) checkHasIllegalOptions(ctx.INPARTN(), "INPARTN");
 
     checkResponseHandlers(ctx.cics_handle_response());
-    checkDuplicates(ctx, "ASIS", "TERMINAL");
+    checkDuplicates(ctx);
   }
 
   private void checkMapMappingDev(CICSParser.Cics_receive_map_mappingdevContext ctx) {
