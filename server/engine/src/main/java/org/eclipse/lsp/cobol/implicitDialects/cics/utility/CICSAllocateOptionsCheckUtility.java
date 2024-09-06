@@ -17,10 +17,13 @@ package org.eclipse.lsp.cobol.implicitDialects.cics.utility;
 import org.antlr.v4.runtime.ParserRuleContext;
 
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
+import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_allocate;
 
@@ -29,9 +32,28 @@ public class CICSAllocateOptionsCheckUtility extends CICSOptionsCheckBaseUtility
 
   public static final int RULE_INDEX = RULE_cics_allocate;
 
+  private static final Map<String, ErrorSeverity> DUPLICATE_CHECK_OPTIONS =
+      new HashMap<String, ErrorSeverity>() {
+        {
+          put("ALLOCATE", ErrorSeverity.ERROR);
+          put("SYSID", ErrorSeverity.ERROR);
+          put("PROFILE", ErrorSeverity.ERROR);
+          put("STATE", ErrorSeverity.ERROR);
+          put("SESSION", ErrorSeverity.ERROR);
+          put("PARTNER", ErrorSeverity.ERROR);
+          put("ASIS", ErrorSeverity.WARNING);
+          put("BUFFER", ErrorSeverity.WARNING);
+          put("LEAVEKB", ErrorSeverity.WARNING);
+          put("NOTRUNCATE", ErrorSeverity.WARNING);
+          put("NOQUEUE", ErrorSeverity.WARNING);
+          put("NOTRUNCATE", ErrorSeverity.WARNING);
+          put("TERMINAL", ErrorSeverity.WARNING);
+        }
+      };
+
   public CICSAllocateOptionsCheckUtility(
       DialectProcessingContext context, List<SyntaxError> errors) {
-    super(context, errors);
+    super(context, errors, DUPLICATE_CHECK_OPTIONS);
   }
 
   /**
@@ -48,23 +70,21 @@ public class CICSAllocateOptionsCheckUtility extends CICSOptionsCheckBaseUtility
     } else if (ctx.getClass() == CICSParser.Cics_allocate_lut61_sessionContext.class) {
       checkLut61Session((CICSParser.Cics_allocate_lut61_sessionContext) ctx);
     }
+    checkDuplicates(ctx);
   }
 
   private void checkAppcPartner(CICSParser.Cics_allocate_appc_partnerContext ctx) {
     checkHasMandatoryOptions(ctx.PARTNER(), ctx, "PARTNER");
     checkResponseHandlers(ctx.cics_handle_response());
-    checkDuplicates(ctx);
   }
 
   private void checkAppcMroLut61Sysid(CICSParser.Cics_allocate_appc_mro_lut61_sysidContext ctx) {
     checkHasMandatoryOptions(ctx.SYSID(), ctx, "SYSID");
     checkResponseHandlers(ctx.cics_handle_response());
-    checkDuplicates(ctx);
   }
 
   private void checkLut61Session(CICSParser.Cics_allocate_lut61_sessionContext ctx) {
     checkHasMandatoryOptions(ctx.SESSION(), ctx, "SESSION");
     checkResponseHandlers(ctx.cics_handle_response());
-    checkDuplicates(ctx);
   }
 }

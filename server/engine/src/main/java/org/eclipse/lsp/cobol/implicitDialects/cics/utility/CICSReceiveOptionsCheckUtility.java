@@ -34,19 +34,44 @@ public class CICSReceiveOptionsCheckUtility extends CICSOptionsCheckBaseUtility 
 
   public static final int RULE_INDEX = RULE_cics_receive;
 
-  public static final Map<String, Pair<ErrorSeverity, String>> SUBGROUPS =
-      new HashMap<String, Pair<ErrorSeverity, String>>() {
+  private static final Map<String, ErrorSeverity> DUPLICATE_CHECK_OPTIONS =
+      new HashMap<String, ErrorSeverity>() {
         {
-          put("Cics_into_setContext", new ImmutablePair<>(ErrorSeverity.ERROR, "INTO or SET"));
+          put("RECEIVE", ErrorSeverity.ERROR);
+          put("INTO", ErrorSeverity.ERROR);
+          put("SET", ErrorSeverity.ERROR);
+          put("LENGTH", ErrorSeverity.ERROR);
+          put("FLENGTH", ErrorSeverity.ERROR);
+          put("CONVID", ErrorSeverity.ERROR);
+          put("SESSION", ErrorSeverity.ERROR);
+          put("STATE", ErrorSeverity.ERROR);
+          put("MAP", ErrorSeverity.ERROR);
+          put("MAPSET", ErrorSeverity.ERROR);
+          put("INPARTN", ErrorSeverity.ERROR);
+          put("MAPPINGDEV", ErrorSeverity.ERROR);
+          put("ASIS", ErrorSeverity.WARNING);
+          put("BUFFER", ErrorSeverity.WARNING);
+          put("LEAVEKB", ErrorSeverity.WARNING);
+          put("PASSBK", ErrorSeverity.WARNING);
+          put("NOTRUNCATE", ErrorSeverity.WARNING);
+          put("NOQUEUE", ErrorSeverity.WARNING);
+          put("TERMINAL", ErrorSeverity.WARNING);
+        }
+      };
+
+  public static final Map<String, Pair<String, ErrorSeverity>> SUBGROUPS =
+      new HashMap<String, Pair<String, ErrorSeverity>>() {
+        {
+          put("Cics_into_setContext", new ImmutablePair<>("INTO or SET", ErrorSeverity.ERROR));
           put(
               "Cics_length_flengthContext",
-              new ImmutablePair<>(ErrorSeverity.ERROR, "LENGTH or FLENGTH"));
+              new ImmutablePair<>("LENGTH or FLENGTH", ErrorSeverity.ERROR));
         }
       };
 
   public CICSReceiveOptionsCheckUtility(
       DialectProcessingContext context, List<SyntaxError> errors) {
-    super(context, errors);
+    super(context, errors, DUPLICATE_CHECK_OPTIONS, SUBGROUPS);
   }
 
   /**
@@ -69,6 +94,7 @@ public class CICSReceiveOptionsCheckUtility extends CICSOptionsCheckBaseUtility 
     } else if (ctx.getClass() == CICSParser.Cics_receive_map_mappingdevContext.class) {
       checkMapMappingDev((CICSParser.Cics_receive_map_mappingdevContext) ctx);
     }
+    checkDuplicates(ctx);
   }
 
   private void checkGroupOne(CICSParser.Cics_receive_group_oneContext ctx) {
@@ -77,44 +103,33 @@ public class CICSReceiveOptionsCheckUtility extends CICSOptionsCheckBaseUtility 
       checkHasIllegalOptions(ctx.LEAVEKB(), "LEAVEKB");
     }
     checkResponseHandlers(ctx.cics_handle_response());
-    checkDuplicates(ctx, SUBGROUPS);
   }
 
   private void checkGroupTwo(CICSParser.Cics_receive_group_twoContext ctx) {
     checkHasMandatoryOptions(ctx.cics_length_flength(), ctx, "LENGTH or FLENGTH");
     checkHasMandatoryOptions(ctx.cics_into_set(), ctx, "INTO or SET");
-
     checkResponseHandlers(ctx.cics_handle_response());
-    checkDuplicates(ctx, SUBGROUPS);
   }
 
   private void checkGroupThree(CICSParser.Cics_receive_group_threeContext ctx) {
     checkHasMandatoryOptions(ctx.cics_length_flength(), ctx, "LENGTH or FLENGTH");
-
     checkResponseHandlers(ctx.cics_handle_response());
-    checkDuplicates(ctx, SUBGROUPS);
   }
 
   private void checkPartn(CICSParser.Cics_receive_partnContext ctx) {
     checkHasMandatoryOptions(ctx.cics_into_set(), ctx, "INTO or SET");
     checkHasMandatoryOptions(ctx.LENGTH(), ctx, "LENGTH");
-
     checkResponseHandlers(ctx.cics_handle_response());
-    checkDuplicates(ctx, SUBGROUPS);
   }
 
   private void checkMap(CICSParser.Cics_receive_mapContext ctx) {
     if (ctx.FROM().isEmpty()) checkHasIllegalOptions(ctx.LENGTH(), "LENGTH");
     if (ctx.TERMINAL().isEmpty()) checkHasIllegalOptions(ctx.INPARTN(), "INPARTN");
-
     checkResponseHandlers(ctx.cics_handle_response());
-    checkDuplicates(ctx, SUBGROUPS);
   }
 
   private void checkMapMappingDev(CICSParser.Cics_receive_map_mappingdevContext ctx) {
     checkHasMandatoryOptions(ctx.FROM(), ctx, "FROM");
-
     checkResponseHandlers(ctx.cics_handle_response());
-    checkDuplicates(ctx, SUBGROUPS);
   }
 }

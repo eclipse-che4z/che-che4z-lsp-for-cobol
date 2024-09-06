@@ -15,10 +15,7 @@
 
 package org.eclipse.lsp.cobol.implicitDialects.cics.utility;
 
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
@@ -30,7 +27,6 @@ import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.model.Locality;
-import org.eclipse.lsp.cobol.implicitDialects.cics.CICSLexer;
 import org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser;
 
 import java.util.*;
@@ -43,37 +39,43 @@ public abstract class CICSOptionsCheckBaseUtility {
 
   private final List<SyntaxError> errors;
 
-  public static final Map<String, Pair<ErrorSeverity, String>> COMMON_SUBGROUPS =
-      new HashMap<String, Pair<ErrorSeverity, String>>() {
+  private final Map<String, ErrorSeverity> originalDuplicateOptions =
+      new HashMap<String, ErrorSeverity>() {
+        { // handle response options
+          put("RESP", ErrorSeverity.ERROR);
+          put("RESP2", ErrorSeverity.ERROR);
+          put("WAIT", ErrorSeverity.ERROR);
+          put("NOHANDLE", ErrorSeverity.ERROR);
+        }
+      };
+
+  private final Map<String, Pair<String, ErrorSeverity>> subGroups =
+      new HashMap<String, Pair<String, ErrorSeverity>>() {
         {
           put(
               "Cics_handle_responseContext",
-              new ImmutablePair<>(ErrorSeverity.ERROR, "RESPONSE HANDLER"));
+              new ImmutablePair<>("RESPONSE HANDLER", ErrorSeverity.ERROR));
         }
       };
 
-  private static final Map<String, ErrorSeverity> SPECIAL_SEVERITIES =
-      new HashMap<String, ErrorSeverity>() {
-        {
-          put("ASIS", ErrorSeverity.WARNING);
-
-          put("BUFFER", ErrorSeverity.WARNING);
-
-          put("LEAVEKB", ErrorSeverity.WARNING);
-
-          put("NOTRUNCATE", ErrorSeverity.WARNING);
-
-          put("NOQUEUE", ErrorSeverity.WARNING);
-
-          put("NOTRUNCATE", ErrorSeverity.WARNING);
-
-          put("TERMINAL", ErrorSeverity.WARNING);
-        }
-      };
-
-  public CICSOptionsCheckBaseUtility(DialectProcessingContext context, List<SyntaxError> errors) {
+  public CICSOptionsCheckBaseUtility(
+      DialectProcessingContext context,
+      List<SyntaxError> errors,
+      Map<String, ErrorSeverity> duplicateOptions,
+      Map<String, Pair<String, ErrorSeverity>> subGroups) {
     this.context = context;
     this.errors = errors;
+    this.originalDuplicateOptions.putAll(duplicateOptions);
+    this.subGroups.putAll(subGroups);
+  }
+
+  public CICSOptionsCheckBaseUtility(
+      DialectProcessingContext context,
+      List<SyntaxError> errors,
+      Map<String, ErrorSeverity> duplicateOptions) {
+    this.context = context;
+    this.errors = errors;
+    this.originalDuplicateOptions.putAll(duplicateOptions);
   }
 
   /**
@@ -95,10 +97,10 @@ public abstract class CICSOptionsCheckBaseUtility {
   protected void checkHasMandatoryOptions(List<?> rules, ParserRuleContext ctx, String options) {
     if (rules.isEmpty()) {
       throwException(
-          options,
+          ErrorSeverity.ERROR,
           VisitorUtility.constructLocality(ctx, context),
           "Missing required option: ",
-          ErrorSeverity.ERROR);
+          options);
     }
   }
 
@@ -114,15 +116,14 @@ public abstract class CICSOptionsCheckBaseUtility {
       rules.forEach(
           error ->
               throwException(
-                  options, getLocality(error), "Invalid option provided: ", ErrorSeverity.ERROR));
+                  ErrorSeverity.ERROR, getLocality(error), "Invalid option provided: ", options));
     }
   }
 
   /**
    * Iterates over the provided response handlers, extracts what is provided, and validates
    *
-   * @param ruleHandlers
-   * @return List of Rule Context Data
+   * @param ruleHandlers Response handlers from parser rule
    */
   protected void checkResponseHandlers(List<CICSParser.Cics_handle_responseContext> ruleHandlers) {
     List<TerminalNode> respResponseHandlers = new ArrayList<>();
@@ -153,7 +154,7 @@ public abstract class CICSOptionsCheckBaseUtility {
   }
 
   private void throwException(
-      String wrongToken, @NonNull Locality locality, String message, ErrorSeverity errorSeverity) {
+      ErrorSeverity errorSeverity, @NonNull Locality locality, String message, String wrongToken) {
     SyntaxError error =
         SyntaxError.syntaxError()
             .errorSource(ErrorSource.PARSING)
@@ -170,34 +171,27 @@ public abstract class CICSOptionsCheckBaseUtility {
 
   private void checkDuplicateEntries(
       ParserRuleContext ctx,
-      Map<String, ParseTree> entries,
-      Map<String, Pair<ErrorSeverity, String>> subGroups) {
+      Map<String, ErrorSeverity> entries,
+      Map<String, ErrorSeverity> duplicateOptions) {
 
     if (ctx.getChildCount() != 0) {
       for (ParseTree entry : ctx.children) {
         if (entry.getChildCount() == 0) {
-          if (Arrays.stream(CICSLexer.ruleNames)
-              .anyMatch(rule -> rule.equals(entry.getText().toUpperCase()))) {
-            if (entries.putIfAbsent(entry.getText(), entry) != null) {
-              ErrorSeverity severity =
-                  SPECIAL_SEVERITIES.getOrDefault(
-                      entry.getText().toUpperCase(), ErrorSeverity.ERROR);
+          String option = entry.getText().toUpperCase();
+          if (duplicateOptions.containsKey(option)) {
+            ErrorSeverity severity =
+                entries.putIfAbsent(entry.getText(), duplicateOptions.get(option));
+            if (severity != null) {
               throwException(
-                  entry.getText(),
-                  getLocality(entry),
-                  "Excessive options provided for: ",
-                  severity);
+                  severity, getLocality(entry), "Excessive options provided for: ", option);
             }
           }
         } else {
-          String className = "";
-          if (entry.getClass().toString().split("\\$").length > 0) {
-            className = entry.getClass().toString().split("\\$")[1];
-          }
+          String className = entry.getClass().getSimpleName();
           boolean errorFound = false;
-          Pair<ErrorSeverity, String> subGroup = subGroups.getOrDefault(className, null);
+          Pair<String, ErrorSeverity> subGroup = subGroups.getOrDefault(className, null);
           if (subGroup != null) {
-            if (entries.putIfAbsent(className, entry) != null) {
+            if (entries.putIfAbsent(className, subGroup.getRight()) != null) {
               errorFound = true;
               throwException(
                   subGroup.getRight(),
@@ -206,30 +200,30 @@ public abstract class CICSOptionsCheckBaseUtility {
                   subGroup.getLeft());
             }
           }
-          if (!errorFound) checkDuplicateEntries((ParserRuleContext) entry, entries, subGroups);
+          if (!errorFound)
+            checkDuplicateEntries((ParserRuleContext) entry, entries, duplicateOptions);
         }
       }
     }
   }
 
-  protected void checkDuplicates(
-      ParserRuleContext ctx, Map<String, Pair<ErrorSeverity, String>> subGroups) {
-    Map<String, ParseTree> entries = new HashMap<>();
-    subGroups.putAll(COMMON_SUBGROUPS);
-    checkDuplicateEntries(ctx, entries, subGroups);
-  }
-
   protected void checkDuplicates(ParserRuleContext ctx) {
-    checkDuplicates(ctx, Collections.emptyMap());
+    Map<String, ErrorSeverity> foundEntries = new HashMap<>();
+    checkDuplicateEntries(ctx, foundEntries, originalDuplicateOptions);
   }
 
-  /** Container to store rule context data */
-  @AllArgsConstructor
-  @NoArgsConstructor
-  @RequiredArgsConstructor
-  public class RuleContextData {
-    @lombok.NonNull public List<?> rules;
-    @lombok.NonNull public String ruleName;
-    public ErrorSeverity severity = ErrorSeverity.ERROR;
+  /**
+   * Additional check duplicates method that can utilize custom duplicate error severity options
+   * not used for the whole command set
+   *
+   * @param ctx ParserRuleContext To evaluate
+   * @param customDuplicateOptions Custom duplicate options to evaluate against
+   */
+  protected void checkDuplicates(
+      ParserRuleContext ctx, Map<String, ErrorSeverity> customDuplicateOptions) {
+    Map<String, ErrorSeverity> foundEntries = new HashMap<>();
+    Map<String, ErrorSeverity> updatedDuplicateOptions = new HashMap<>(originalDuplicateOptions);
+    updatedDuplicateOptions.putAll(customDuplicateOptions);
+    checkDuplicateEntries(ctx, foundEntries, updatedDuplicateOptions);
   }
 }

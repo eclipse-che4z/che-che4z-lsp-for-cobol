@@ -142,6 +142,10 @@ public class TestCicsReceive {
     "RECEIVE", "INTO(100)", "{INTO(1000)|error1}", "LENGTH(100)", "MAXLENGTH(10)", "NOTRUNCATE"
   };
 
+  private static final String[] GROUP_ONE_DUPLICATE_INVALID_TWO = {
+    "RECEIVE", "INTO(100)", "{INTO(1000)|error1}", "LENGTH(100)", "MAXLENGTH(10)", "NOTRUNCATE"
+  };
+
   private static final String[] GROUP_TWO_APPC_FULL_OPTIONS_VALID_ONE = {
     "RECEIVE",
     "CONVID({$abc})",
@@ -424,6 +428,21 @@ public class TestCicsReceive {
   void testGroupOneReceiveCICSCommand_withDuplicateInvalid() {
     UseCaseEngine.runTest(
         getTestString(GROUP_ONE_DUPLICATE_INVALID),
+        ImmutableList.of(),
+        ImmutableMap.of(
+            "error1",
+            new Diagnostic(
+                new Range(),
+                "Excessive options provided for: INTO or SET",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())),
+        ImmutableList.of());
+  }
+
+  @Test
+  void testGroupOneReceiveCICSCommand_withDuplicateInvalidTwo() {
+    UseCaseEngine.runTest(
+        getTestString(GROUP_ONE_DUPLICATE_INVALID_TWO),
         ImmutableList.of(),
         ImmutableMap.of(
             "error1",
