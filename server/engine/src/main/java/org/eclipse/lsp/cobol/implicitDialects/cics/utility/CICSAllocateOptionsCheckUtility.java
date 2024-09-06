@@ -54,7 +54,6 @@ public class CICSAllocateOptionsCheckUtility extends CICSOptionsCheckBaseUtility
   private void checkAppcPartner(CICSParser.Cics_allocate_appc_partnerContext ctx) {
     checkHasMandatoryOptions(ctx.PARTNER(), ctx, "PARTNER");
     List<RuleContextData> contexts = new ArrayList<>();
-    contexts.add(new RuleContextData(ctx.PARTNER(), "PARTNER"));
     contexts.add(new RuleContextData(ctx.NOQUEUE(), "NOQUEUE", ErrorSeverity.WARNING));
     contexts.add(new RuleContextData(ctx.STATE(), "STATE"));
     harvestResponseHandlers(ctx.cics_handle_response(), contexts);
@@ -64,7 +63,6 @@ public class CICSAllocateOptionsCheckUtility extends CICSOptionsCheckBaseUtility
   private void checkAppcMroLut61Sysid(CICSParser.Cics_allocate_appc_mro_lut61_sysidContext ctx) {
     checkHasMandatoryOptions(ctx.SYSID(), ctx, "SYSID");
     List<RuleContextData> contexts = new ArrayList<>();
-    contexts.add(new RuleContextData(ctx.SYSID(), "SYSID"));
     contexts.add(new RuleContextData(ctx.PROFILE(), "PROFILE"));
     contexts.add(new RuleContextData(ctx.NOQUEUE(), "NOQUEUE", ErrorSeverity.WARNING));
     contexts.add(new RuleContextData(ctx.STATE(), "STATE"));
@@ -75,7 +73,6 @@ public class CICSAllocateOptionsCheckUtility extends CICSOptionsCheckBaseUtility
   private void checkLut61Session(CICSParser.Cics_allocate_lut61_sessionContext ctx) {
     checkHasMandatoryOptions(ctx.SESSION(), ctx, "SESSION");
     List<RuleContextData> contexts = new ArrayList<>();
-    contexts.add(new RuleContextData(ctx.SESSION(), "SESSION"));
     contexts.add(new RuleContextData(ctx.PROFILE(), "PROFILE"));
     contexts.add(new RuleContextData(ctx.NOQUEUE(), "NOQUEUE", ErrorSeverity.WARNING));
     harvestResponseHandlers(ctx.cics_handle_response(), contexts);
