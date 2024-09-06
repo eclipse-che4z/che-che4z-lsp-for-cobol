@@ -22,18 +22,17 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
+import org.antlr.v4.runtime.tree.SyntaxTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.model.Locality;
+import org.eclipse.lsp.cobol.implicitDialects.cics.CICSLexer;
 import org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /** Common facilities for checking CICS parser options */
 @Slf4j
@@ -167,26 +166,24 @@ public abstract class CICSOptionsCheckBaseUtility {
 
   private void checkDuplicateEntries(
       ParserRuleContext ctx,
-      Map<Integer, TerminalNode> entries,
+      Map<String, ParseTree> entries,
       Map<String, ErrorSeverity> specialSeverities) {
     if (ctx.getChildCount() != 0) {
       for (ParseTree entry : ctx.children) {
         if (entry.getChildCount() == 0) {
-          TerminalNode current = (TerminalNode) entry;
-          if (current.getSymbol().getType() < 897) {
-            if (entries.containsKey(current.getSymbol().getType())) {
-              ErrorSeverity severity = ErrorSeverity.ERROR;
-              if (specialSeverities.containsKey(current.getText())) {
-                severity = specialSeverities.get(current.getText());
-              }
+          if (Arrays.stream(CICSLexer.ruleNames)
+              .anyMatch(rule -> rule.equals(entry.getText().toUpperCase()))) {
+            if (entries.putIfAbsent(entry.getText(), entry) != null) {
+              ErrorSeverity severity =
+                  specialSeverities.getOrDefault(
+                      entry.getText().toUpperCase(), ErrorSeverity.ERROR);
               throwException(
-                  current.getText(),
-                  getLocality(current),
+                  entry.getText(),
+                  getLocality(entry),
                   "Excessive options provided for: ",
                   severity);
-            } else entries.put(current.getSymbol().getType(), current);
+            }
           }
-
         } else checkDuplicateEntries((ParserRuleContext) entry, entries, specialSeverities);
       }
     }
@@ -197,7 +194,7 @@ public abstract class CICSOptionsCheckBaseUtility {
     for (String entry : warnings) {
       specialSeverities.put(entry, ErrorSeverity.WARNING);
     }
-    Map<Integer, TerminalNode> entries = new HashMap<>();
+    Map<String, ParseTree> entries = new HashMap<>();
     checkDuplicateEntries(ctx, entries, specialSeverities);
   }
 
