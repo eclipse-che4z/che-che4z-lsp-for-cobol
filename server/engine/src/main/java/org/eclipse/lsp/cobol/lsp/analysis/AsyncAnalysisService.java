@@ -19,6 +19,7 @@ import com.google.inject.Singleton;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.stream.Collectors;
+
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.common.SubroutineService;
 import org.eclipse.lsp.cobol.common.copybook.CopybookService;
@@ -191,30 +192,31 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
   public void reanalyseOpenedPrograms() throws InterruptedException {
     List<CobolDocumentModel> openDocuments = documentModelService.getAllOpened()
             .stream().filter(d -> !analysisService.isCopybook(d.getUri(), d.getText())).collect(Collectors.toList());
+    waitForPreviousAnalysisToBeCompleted(openDocuments);
+    copybookService.invalidateCache(true);
+    subroutineService.invalidateCache();
+    LOG.info("Cache invalidated");
+    openDocuments
+            .forEach(doc -> scheduleAnalysis(doc.getUri(), doc.getText(), analysisResultsRevisions.getOrDefault(doc.getUri(), 0), false, true, SourceUnitGraph.EventSource.IDE));
+  }
+
+  private void waitForPreviousAnalysisToBeCompleted(List<CobolDocumentModel> openDocuments) {
     boolean analysisInProgress;
     do {
-        analysisInProgress = openDocuments.stream()
-              .filter(model -> model.getLastAnalysisResult() != null)
-              .filter(model -> {
-                String id = makeId(model.getUri(), analysisResultsRevisions.get(model.getUri()));
-                return analysisResults.containsKey(id);
-              })
-              .anyMatch(model -> !model.getIsLastAnalysisCancelled().get());
-
+      analysisInProgress = openDocuments.stream().anyMatch(model -> isAnalysisInProgress(model.getUri()));
       if (analysisInProgress) {
         cancelRunningAnalysis(openDocuments);
       } else {
         break;
       }
       LOG.debug(" re-analysis is waiting for prev analysis to finish");
-      TimeUnit.MILLISECONDS.sleep(100);
+        try {
+            TimeUnit.MILLISECONDS.sleep(100);
+        } catch (InterruptedException e) {
+            LOG.error("re-analysis sleep interrupted", e);
+            Thread.currentThread().interrupt();
+        }
     } while (analysisInProgress);
-
-    copybookService.invalidateCache(true);
-    subroutineService.invalidateCache();
-    LOG.info("Cache invalidated");
-    openDocuments
-            .forEach(doc -> scheduleAnalysis(doc.getUri(), doc.getText(), analysisResultsRevisions.getOrDefault(doc.getUri(), 0), false, true, SourceUnitGraph.EventSource.IDE));
   }
 
   private void cancelRunningAnalysis(List<CobolDocumentModel> openDocuments) {
@@ -244,6 +246,7 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
             .collect(Collectors.toList());
     for (String uri : openedUris) {
         String languageId = documentModelService.get(uri).getLanguageId();
+      //   waitForPreviousAnalysisToBeCompleted(ImmutableList.of(documentModelService.get(uri)));
       //TODO: update cache directly from workspace document graph
       copybookService.getCopybookUsage(uri).stream()
           .filter(model -> Objects.nonNull(model.getUri()))
@@ -262,6 +265,17 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
       CobolDocumentModel document = documentModelService.get(uri);
       scheduleAnalysis(uri, document.getText(), analysisResultsRevisions.get(document.getUri()), false, true, eventSource);
     }
+  }
+
+  private boolean isAnalysisInProgress(String uri) {
+    CobolDocumentModel document = documentModelService.get(uri);
+    if (document.getLastAnalysisResult() == null) return false;
+    String id = makeId(document.getUri(), analysisResultsRevisions.get(document.getUri()));
+    boolean analysisInProgress = analysisResults.containsKey(id);
+    if (!analysisInProgress) {
+      return false;
+    }
+    return !document.getIsLastAnalysisCancelled().get();
   }
 
   /**
