@@ -63,6 +63,7 @@ jobs:
         with:
           java-version: '17'
           components: 'native-image'
+          distribution: 'graalvm-community'
           github-token: ${{ secrets.GITHUB_TOKEN }}
           ## uncomment me if you need native image job reports
           # native-image-job-reports: 'true'
@@ -220,6 +221,7 @@ jobs:
         with:
           java-version: '17'
           components: 'native-image'
+          distribution: 'graalvm-community'
           native-image-musl: 'true'
           github-token: ${{ secrets.GITHUB_TOKEN }}
           ## uncomment me if you need native image job reports
@@ -230,6 +232,7 @@ jobs:
         with:
           java-version: '17'
           components: 'native-image'
+          distribution: 'graalvm-community'
           github-token: ${{ secrets.GITHUB_TOKEN }}
           ## uncomment me if you need native image job reports
           # native-image-job-reports: 'true'
