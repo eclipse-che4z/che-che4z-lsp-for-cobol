@@ -878,11 +878,11 @@ cics_web_readnext_formfield_queryparm: (FORMFIELD|QUERYPARM) cics_data_area ((VA
 cics_web_readnext_httpheader: HTTPHEADER cics_data_area ((VALUE|VALUELENGTH) cics_data_area | ((SESSTOKEN|NAMELENGTH) cics_data_value))+;
 
 cics_web_receive: RECEIVE (cics_web_receive_server_buffer | cics_web_receive_server_container | cics_web_receive_client);
-cics_web_receive_server_buffer: cics_web_into_set ((LENGTH|BODYCHARSET) cics_data_area | ((MAXLENGTH|CHARACTERSET|HOSTCODEPAGE|MEDIATYPE) cics_data_value) | NOTRUNCATE | (TYPE cics_cvda) | cics_web_server_convert)+;
-cics_web_receive_server_container: TOCONTAINER cics_data_value (((TOCHANNEL|CHARACTERSET|MEDIATYPE) cics_data_value) | (TYPE cics_cvda) | (BODYCHARSET cics_data_area))+;
+cics_web_receive_server_buffer: (cics_web_into_set | (LENGTH|BODYCHARSET) cics_data_area | ((MAXLENGTH|CHARACTERSET|HOSTCODEPAGE|MEDIATYPE) cics_data_value) | NOTRUNCATE | (TYPE cics_cvda) | cics_web_server_convert)+;
+cics_web_receive_server_container: (((TOCONTAINER|TOCHANNEL|CHARACTERSET|MEDIATYPE) cics_data_value) | (TYPE cics_cvda) | (BODYCHARSET cics_data_area))+;
 cics_web_receive_client: SESSTOKEN cics_data_value ((MEDIATYPE cics_data_value) | cics_web_statuscode | cics_web_receive_client_buffer | cics_web_receive_client_container)+;
-cics_web_receive_client_buffer: cics_web_into_set ((LENGTH|BODYCHARSET) cics_data_area | (MAXLENGTH cics_data_value) | NOTRUNCATE | cics_web_client_convert)+;
-cics_web_receive_client_container: TOCONTAINER cics_data_value ((TOCHANNEL cics_data_value) | (BODYCHARSET cics_data_area))+;
+cics_web_receive_client_buffer: (cics_web_into_set | (LENGTH|BODYCHARSET) cics_data_area | (MAXLENGTH cics_data_value) | NOTRUNCATE | cics_web_client_convert)+;
+cics_web_receive_client_container: (TOCONTAINER cics_data_value | (TOCHANNEL cics_data_value) | (BODYCHARSET cics_data_area))+;
 
 cics_web_retrieve: RETRIEVE DOCTOKEN cics_data_area;
 
