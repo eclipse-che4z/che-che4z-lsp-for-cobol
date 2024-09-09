@@ -44,7 +44,7 @@ public class CobolDocumentModel {
   private volatile AnalysisResult analysisResult;
   private volatile AnalysisResult lastAnalysisResult;
   @Setter private volatile List<DocumentSymbol> outlineResult;
-  private AtomicBoolean isLastAnalysisCancelled = new AtomicBoolean(false);
+  private final AtomicBoolean isLastAnalysisCancelled = new AtomicBoolean(false);
 
   public CobolDocumentModel(String uri, String text, AnalysisResult analysisResult) {
     this.uri = uri;
