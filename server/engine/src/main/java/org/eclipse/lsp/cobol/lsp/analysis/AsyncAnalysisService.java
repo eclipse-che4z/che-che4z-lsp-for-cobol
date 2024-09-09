@@ -14,6 +14,7 @@
  */
 package org.eclipse.lsp.cobol.lsp.analysis;
 
+import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import java.util.*;
@@ -125,6 +126,9 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
     }
     ExecutorService analysisExecutor = getExecutor(uri);
     CobolDocumentModel documentModel = documentModelService.get(uri);
+    if (documentModel.getLastAnalysisResult() != null) {
+      waitForPreviousAnalysisToBeCompleted(ImmutableList.of(documentModel));
+    }
     documentModel.updateLastAnalysisNotCancelled();
     FutureTask<CobolDocumentModel> futureTask = new FutureTask<>(scheduleAnalysis(uri, documentModel, text, currentRevision, open, force, eventSource, id));
     analysisResults.put(id, futureTask);
@@ -192,7 +196,6 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
   public void reanalyseOpenedPrograms() throws InterruptedException {
     List<CobolDocumentModel> openDocuments = documentModelService.getAllOpened()
             .stream().filter(d -> !analysisService.isCopybook(d.getUri(), d.getText())).collect(Collectors.toList());
-    waitForPreviousAnalysisToBeCompleted(openDocuments);
     copybookService.invalidateCache(true);
     subroutineService.invalidateCache();
     LOG.info("Cache invalidated");
@@ -209,11 +212,11 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
       } else {
         break;
       }
-      LOG.debug(" re-analysis is waiting for prev analysis to finish");
+      LOG.debug("waiting for prev analysis to finish");
         try {
             TimeUnit.MILLISECONDS.sleep(100);
         } catch (InterruptedException e) {
-            LOG.error("re-analysis sleep interrupted", e);
+            LOG.error("waiting for analysis is interrupted", e);
             Thread.currentThread().interrupt();
         }
     } while (analysisInProgress);
@@ -246,7 +249,6 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
             .collect(Collectors.toList());
     for (String uri : openedUris) {
         String languageId = documentModelService.get(uri).getLanguageId();
-      //   waitForPreviousAnalysisToBeCompleted(ImmutableList.of(documentModelService.get(uri)));
       //TODO: update cache directly from workspace document graph
       copybookService.getCopybookUsage(uri).stream()
           .filter(model -> Objects.nonNull(model.getUri()))
@@ -269,11 +271,14 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
 
   private boolean isAnalysisInProgress(String uri) {
     CobolDocumentModel document = documentModelService.get(uri);
-    if (document.getLastAnalysisResult() == null) return false;
     String id = makeId(document.getUri(), analysisResultsRevisions.get(document.getUri()));
     boolean analysisInProgress = analysisResults.containsKey(id);
     if (!analysisInProgress) {
+      LOG.debug("analysis finished for {}", uri);
       return false;
+    }
+    if (!document.getIsLastAnalysisCancelled().get()) {
+      LOG.debug("analysis still in progress for {}", uri);
     }
     return !document.getIsLastAnalysisCancelled().get();
   }
@@ -284,16 +289,11 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
    * @param uri source URI
    */
   public void cancelAnalysis(String uri) throws InterruptedException {
+    String analysisID = makeId(uri, analysisResultsRevisions.get(uri));
     analysisResultsRevisions.remove(uri);
-    synchronized (analysisExecutors) {
-      ExecutorService service = analysisExecutors.remove(uri);
-      if (service != null) {
-        service.shutdownNow();
-//        service.awaitTermination(1, TimeUnit.SECONDS);
-      }
-    }
     LOG.debug("[stopAnalysis] Document " + uri + " publish diagnostic: " + documentModelService.getOpenedDiagnostic());
     communications.publishDiagnostics(documentModelService.getOpenedDiagnostic());
+    analysisResults.get(analysisID).cancel(true);
   }
 
   /**
