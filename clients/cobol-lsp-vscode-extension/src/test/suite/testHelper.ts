@@ -96,11 +96,11 @@ export async function closeActiveEditor() {
 }
 
 export async function closeAllEditors() {
-  let doc = vscode.window.activeTextEditor;
-  while (!!doc?.document) {
+  let editor = vscode.window.activeTextEditor;
+  while (!!editor?.document) {
     // simulate didClose by changing the languageID
     await closeActiveEditor();
-    doc = vscode.window.activeTextEditor;
+    editor = vscode.window.activeTextEditor;
   }
 }
 

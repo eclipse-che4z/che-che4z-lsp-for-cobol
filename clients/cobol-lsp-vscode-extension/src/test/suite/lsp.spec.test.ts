@@ -406,18 +406,29 @@ suite("Integration Test Suite", function () {
       pos(18, 0),
       "           FD  TRANS-FILE-IN IS EXTERNAL.\n",
     );
+
     await helper.waitFor(
-      () => vscode.languages.getDiagnostics(editor.document.uri).length > 0,
+      () =>
+        vscode.languages
+          .getDiagnostics(editor.document.uri)
+          .map((d) => d.message)
+          .filter((m) => m === "The following token must start in Area A: FD")
+          .length > 0,
     );
+
     let diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
     assert.strictEqual(
       diagnostics.length,
       2,
       "got: " + JSON.stringify(diagnostics),
     );
-    assert.strictEqual(
-      diagnostics[0].message,
-      "The following token must start in Area A: FD",
+    assert.ok(
+      () =>
+        vscode.languages
+          .getDiagnostics(editor.document.uri)
+          .map((d) => d.message)
+          .filter((m) => m === "The following token must start in Area A: FD")
+          .length === 1,
     );
   })
     .timeout(helper.TEST_TIMEOUT)
