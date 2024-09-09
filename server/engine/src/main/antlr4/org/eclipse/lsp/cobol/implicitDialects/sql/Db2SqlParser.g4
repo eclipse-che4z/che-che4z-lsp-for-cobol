@@ -643,7 +643,8 @@ dbs_declare_statement: dbs_statement_name (dbs_comma_separator dbs_statement_nam
 dbs_declare_table: DECLARE (dbs_table_name | dbs_view_name) TABLE LPARENCHAR dbs_declare_table_loop (dbs_comma_separator dbs_declare_table_loop)* RPARENCHAR;
 dbs_declare_table_loop: dbs_column_name (dbs_distinct_type_name | dbs_declare_table_bit) (NOT NULL (WITH DEFAULT)?)?;
 dbs_declare_table_bit: (dbs_declare_table_bit_int | dbs_declare_table_bit_decimal | dbs_declare_table_bit_float | dbs_declare_table_bit_decfloat | dbs_declare_table_bit_char |
-                        dbs_declare_table_bit_clob | dbs_declare_table_bit_varchar | dbs_declare_table_bit_graphic | dbs_declare_table_bit_binary | DATE | TIME | TIMESTAMP | ROWID | XML);
+                        dbs_declare_table_bit_clob | dbs_declare_table_bit_varchar | dbs_declare_table_bit_graphic | dbs_declare_table_bit_binary | DATE | TIME |
+                        dbs_declare_table_bit_timestamp | ROWID | XML);
 dbs_declare_table_bit_int: (SMALLINT | INT | INTEGER | BIGINT);
 dbs_declare_table_bit_decimal: (DECIMAL | DEC | NUMERIC) (LPARENCHAR (dbs_integer (dbs_comma_separator dbs_integer)? | NUMERICLITERAL) RPARENCHAR)?;
 dbs_declare_table_bit_float: (FLOAT (LPARENCHAR dbs_integer RPARENCHAR)? | REAL | DOUBLE PRECISION?);
@@ -655,6 +656,7 @@ dbs_declare_table_bit_clob: CLOB dbs_declare_table_bit_cloba;
 dbs_declare_table_bit_cloba: (LPARENCHAR dbs_integer k_m_g? RPARENCHAR)?;
 dbs_declare_table_bit_graphic: (GRAPHIC (LPARENCHAR dbs_integer RPARENCHAR)? | VARGRAPHIC LPARENCHAR dbs_integer RPARENCHAR | DBCLOB (LPARENCHAR dbs_integer k_m_g? RPARENCHAR)?);
 dbs_declare_table_bit_binary: (BINARY (LPARENCHAR dbs_integer RPARENCHAR)? | (BINARY VARYING | VARBINARY) LPARENCHAR dbs_integer RPARENCHAR | (BINARY LARGE OBJECT | BLOB) (LPARENCHAR dbs_integer k_m_g? RPARENCHAR)?);
+dbs_declare_table_bit_timestamp: TIMESTAMP (LPARENCHAR dbs_integer RPARENCHAR)? ((WITH|WITHOUT) (TIME ZONE|TIMEZONE))?;
 /*DELETE */
 dbs_delete: DELETE FROM (dbs_table_name | dbs_view_name) (dbs_delete_period | dbs_delete_noperiod | dbs_delete_positioned);
 dbs_delete_period: dbs_delete_period_clause dbs_correlation_name? dbs_delete_include_column? (SET dbs_delete_assignment_clause)?
