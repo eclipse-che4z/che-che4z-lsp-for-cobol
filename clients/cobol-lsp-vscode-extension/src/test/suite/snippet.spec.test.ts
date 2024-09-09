@@ -29,10 +29,6 @@ suite.skip(
       helper.TEST_TIMEOUT,
     );
 
-    this.afterAll(async () => await helper.closeAllEditors()).timeout(
-      helper.TEST_TIMEOUT,
-    );
-
     test("Autocompletion basic dialect", async () => {
       helper.updateConfig("basic.json");
       await helper.showDocument("SNIPPET.cbl");
@@ -117,7 +113,7 @@ suite.skip(
   },
 );
 
-suite("TF42379 COBOL LS F96588 - Insert code snippets", function () {
+suite.skip("TF42379 COBOL LS F96588 - Insert code snippets", function () {
   suiteSetup(async function () {
     this.timeout(helper.TEST_TIMEOUT);
     helper.updateConfig("basic.json");
@@ -127,7 +123,7 @@ suite("TF42379 COBOL LS F96588 - Insert code snippets", function () {
     helper.TEST_TIMEOUT,
   );
 
-  test.skip("TC289633 Provide default COBOL code snippets - basic scenario", async () => {
+  test("TC289633 Provide default COBOL code snippets - basic scenario", async () => {
     await helper.showDocument("SNIPPET.cbl");
     const editor = helper.get_editor("SNIPPET.cbl");
     await helper.insertString(editor, pos(2, 0), "sh");
@@ -147,7 +143,7 @@ suite("TF42379 COBOL LS F96588 - Insert code snippets", function () {
   });
   // .timeout(helper.TEST_TIMEOUT);
 
-  test.skip("TC289635 Provide default COBOL code snippets - upper case", async () => {
+  test("TC289635 Provide default COBOL code snippets - upper case", async () => {
     await helper.showDocument("SNIPPET.cbl");
     const editor = helper.get_editor("SNIPPET.cbl");
     await helper.insertString(editor, pos(2, 0), "sh");
@@ -184,7 +180,7 @@ suite("TF42379 COBOL LS F96588 - Insert code snippets", function () {
   });
   // .timeout(helper.TEST_TIMEOUT);
 
-  test.skip("TC289636 Provide default COBOL code snippets - lower case", async () => {
+  test("TC289636 Provide default COBOL code snippets - lower case", async () => {
     await helper.showDocument("SNIPPET.cbl");
     const editor = helper.get_editor("SNIPPET.cbl");
     await helper.insertString(editor, pos(2, 0), "sh");

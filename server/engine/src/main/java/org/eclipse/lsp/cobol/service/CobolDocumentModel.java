@@ -34,6 +34,7 @@ import org.eclipse.lsp4j.Position;
 @Getter
 @RequiredArgsConstructor
 @Slf4j
+@ToString
 public class CobolDocumentModel {
   private static final String DELIMITER = "[ .\\[\\]()<>,*\"']+";
   private final List<Line> lines = new CopyOnWriteArrayList<>();
@@ -44,7 +45,7 @@ public class CobolDocumentModel {
   private volatile AnalysisResult analysisResult;
   private volatile AnalysisResult lastAnalysisResult;
   @Setter private volatile List<DocumentSymbol> outlineResult;
-  private AtomicBoolean isLastAnalysisCancelled = new AtomicBoolean(false);
+  private final AtomicBoolean isAnalysisInProgress = new AtomicBoolean(false);
 
   public CobolDocumentModel(String uri, String text, AnalysisResult analysisResult) {
     this.uri = uri;
@@ -109,15 +110,15 @@ public class CobolDocumentModel {
   /**
    * update isLastAnalysisCancelled to true
    */
-  public void updateLastAnalysisCancelled() {
-    isLastAnalysisCancelled.compareAndSet(false, true);
+  public void markAnalysisInProgress() {
+    isAnalysisInProgress.compareAndSet(false, true);
   }
 
   /**
    * update isLastAnalysisCancelled to false
    */
-  public void updateLastAnalysisNotCancelled() {
-    isLastAnalysisCancelled.compareAndSet(true, false);
+  public void markAnalysisCompleted() {
+    isAnalysisInProgress.compareAndSet(true, false);
   }
 
   String getFullTokenAtPosition(Position position) {
