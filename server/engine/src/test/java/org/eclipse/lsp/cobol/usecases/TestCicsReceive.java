@@ -139,7 +139,7 @@ public class TestCicsReceive {
   };
 
   private static final String[] GROUP_ONE_DUPLICATE_INVALID = {
-    "RECEIVE", "INTO(100)", "{INTO(1000)|error1}", "LENGTH(100)", "MAXLENGTH(10)", "NOTRUNCATE"
+    "RECEIVE", "InTO(100)", "{INTO(1000)|error1}", "LENGTH(100)", "MAXLENGTH(10)", "NOTRUNCATE"
   };
 
   private static final String[] GROUP_ONE_DUPLICATE_INVALID_TWO = {

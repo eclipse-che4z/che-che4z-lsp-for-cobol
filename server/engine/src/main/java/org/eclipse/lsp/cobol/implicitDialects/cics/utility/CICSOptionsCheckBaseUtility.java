@@ -39,7 +39,7 @@ public abstract class CICSOptionsCheckBaseUtility {
 
   private final List<SyntaxError> errors;
 
-  private final Map<String, ErrorSeverity> originalDuplicateOptions =
+  private final Map<String, ErrorSeverity> baseDuplicateOptions =
       new HashMap<String, ErrorSeverity>() {
         { // handle response options
           put("RESP", ErrorSeverity.ERROR);
@@ -65,7 +65,7 @@ public abstract class CICSOptionsCheckBaseUtility {
       Map<String, Pair<String, ErrorSeverity>> subGroups) {
     this.context = context;
     this.errors = errors;
-    this.originalDuplicateOptions.putAll(duplicateOptions);
+    this.baseDuplicateOptions.putAll(duplicateOptions);
     this.subGroups.putAll(subGroups);
   }
 
@@ -75,7 +75,7 @@ public abstract class CICSOptionsCheckBaseUtility {
       Map<String, ErrorSeverity> duplicateOptions) {
     this.context = context;
     this.errors = errors;
-    this.originalDuplicateOptions.putAll(duplicateOptions);
+    this.baseDuplicateOptions.putAll(duplicateOptions);
   }
 
   /**
@@ -170,20 +170,19 @@ public abstract class CICSOptionsCheckBaseUtility {
   }
 
   private void checkDuplicateEntries(
-      ParserRuleContext ctx,
-      Map<String, ErrorSeverity> entries,
-      Map<String, ErrorSeverity> duplicateOptions) {
+      ParserRuleContext ctx, Set<String> entries, Map<String, ErrorSeverity> duplicateOptions) {
 
     if (ctx.getChildCount() != 0) {
       for (ParseTree entry : ctx.children) {
         if (entry.getChildCount() == 0) {
           String option = entry.getText().toUpperCase();
           if (duplicateOptions.containsKey(option)) {
-            ErrorSeverity severity =
-                entries.putIfAbsent(entry.getText(), duplicateOptions.get(option));
-            if (severity != null) {
+            if (!entries.add(option)) {
               throwException(
-                  severity, getLocality(entry), "Excessive options provided for: ", option);
+                  duplicateOptions.get(option),
+                  getLocality(entry),
+                  "Excessive options provided for: ",
+                  option);
             }
           }
         } else {
@@ -191,7 +190,7 @@ public abstract class CICSOptionsCheckBaseUtility {
           boolean errorFound = false;
           Pair<String, ErrorSeverity> subGroup = subGroups.getOrDefault(className, null);
           if (subGroup != null) {
-            if (entries.putIfAbsent(className, subGroup.getRight()) != null) {
+            if (!entries.add(className)) {
               errorFound = true;
               throwException(
                   subGroup.getRight(),
@@ -208,21 +207,21 @@ public abstract class CICSOptionsCheckBaseUtility {
   }
 
   protected void checkDuplicates(ParserRuleContext ctx) {
-    Map<String, ErrorSeverity> foundEntries = new HashMap<>();
-    checkDuplicateEntries(ctx, foundEntries, originalDuplicateOptions);
+    Set<String> foundEntries = new HashSet<>();
+    checkDuplicateEntries(ctx, foundEntries, baseDuplicateOptions);
   }
 
   /**
-   * Additional check duplicates method that can utilize custom duplicate error severity options
-   * not used for the whole command set
+   * Additional check duplicates method that can utilize custom duplicate error severity options not
+   * used for the whole command set
    *
    * @param ctx ParserRuleContext To evaluate
    * @param customDuplicateOptions Custom duplicate options to evaluate against
    */
   protected void checkDuplicates(
       ParserRuleContext ctx, Map<String, ErrorSeverity> customDuplicateOptions) {
-    Map<String, ErrorSeverity> foundEntries = new HashMap<>();
-    Map<String, ErrorSeverity> updatedDuplicateOptions = new HashMap<>(originalDuplicateOptions);
+    Set<String> foundEntries = new HashSet<>();
+    Map<String, ErrorSeverity> updatedDuplicateOptions = new HashMap<>(baseDuplicateOptions);
     updatedDuplicateOptions.putAll(customDuplicateOptions);
     checkDuplicateEntries(ctx, foundEntries, updatedDuplicateOptions);
   }
