@@ -1241,7 +1241,13 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
     DataNameContext dt = ctx.dataName();
     Optional<Locality> locality = retrieveLocality(ctx, extendedDocument, copybooks);
     if (dt == null || !locality.isPresent()) return ImmutableList.of();
-    return ImmutableList.of(new ProcedureDivisionReturningNode(locality.get(), extractNameAndLocality(dt)));
+    VariableNameAndLocality nameAndLocality = extractNameAndLocality(dt);
+    ProcedureDivisionReturningNode returningNode = new ProcedureDivisionReturningNode(locality.get(), nameAndLocality);
+    VariableUsageNode variableUsageNode = new VariableUsageNode(nameAndLocality.getName(), nameAndLocality.getLocality());
+    QualifiedReferenceNode qualifiedReferenceNode = new QualifiedReferenceNode(nameAndLocality.getLocality());
+    qualifiedReferenceNode.addChild(variableUsageNode);
+    returningNode.addChild(qualifiedReferenceNode);
+    return ImmutableList.of(returningNode);
   }
 
   @Override
