@@ -293,7 +293,9 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
     analysisResultsRevisions.remove(uri);
     LOG.debug("[stopAnalysis] Document " + uri + " publish diagnostic: " + documentModelService.getOpenedDiagnostic());
     communications.publishDiagnostics(documentModelService.getOpenedDiagnostic());
-    analysisResults.get(analysisID).cancel(true);
+    if (analysisResults.containsKey(analysisID)) {
+      analysisResults.get(analysisID).cancel(true);
+    }
   }
 
   /**
