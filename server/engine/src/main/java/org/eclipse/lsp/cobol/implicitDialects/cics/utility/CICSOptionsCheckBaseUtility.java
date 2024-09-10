@@ -137,7 +137,7 @@ public abstract class CICSOptionsCheckBaseUtility {
         if (rule.RESP2() != null) respTwoResponseHandlers.add(rule.RESP2());
       }
     }
-    if (respFound) {
+    if (!respFound) {
       checkHasIllegalOptions(respTwoResponseHandlers, "RESP2");
     }
   }
