@@ -127,9 +127,9 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
     ExecutorService analysisExecutor = getExecutor(uri);
     CobolDocumentModel documentModel = documentModelService.get(uri);
     if (documentModel.getLastAnalysisResult() != null) {
-      waitForPreviousAnalysisToBeCompleted(ImmutableList.of(uri));
+      // initiate cancel on prev running analysis
+      cancelRunningAnalysis(ImmutableList.of(documentModel));
     }
-    documentModel.updateLastAnalysisNotCancelled();
     FutureTask<CobolDocumentModel> futureTask = new FutureTask<>(scheduleAnalysis(uri, documentModel, text, currentRevision, open, force, eventSource, id));
     analysisResults.put(id, futureTask);
     analysisExecutor.submit(futureTask);
@@ -151,22 +151,26 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
                         + analysisResultsRevisions.get(uri));
         return null;
       }
-      LOG.debug("[scheduleAnalysis] Start analysis: " + uri);
-      notifyAllListeners(AnalysisState.STARTED, documentModelService.get(uri), eventSource);
+      LOG.debug("[scheduleAnalysis] waiting for previous analysis of {} to finish", uri);
       try {
+        if (documentModel.getLastAnalysisResult() != null) {
+          waitForPreviousAnalysisToBeCompleted(ImmutableList.of(uri));
+        }
+        documentModel.markAnalysisInProgress();
+        LOG.debug("[scheduleAnalysis] Start analysis: " + uri);
+        notifyAllListeners(AnalysisState.STARTED, documentModelService.get(uri), eventSource);
         communications.notifyProgressBegin(uri);
         documentModelService.get(uri).setOutlineResult(null);
         analysisService.analyzeDocument(uri, text, open);
-//        analysisResults.remove(id);
         notifyAllListeners(AnalysisState.COMPLETED, documentModel, eventSource);
+        analysisResults.remove(id);
         return documentModel;
       } catch (Exception genericException) { // Ideally we should not do this, but a safer catch might help to remove unknown issues
         LOG.error("Encountered Exception {} , while analysing uri : {}", genericException, documentModel.getUri(), genericException);
-        // set the analysis as cancelled due to exception
-        documentModel.updateLastAnalysisCancelled();
         return documentModel;
       } finally {
-        analysisResults.remove(id);
+        // mark analysis completed, for all cases
+        documentModel.markAnalysisCompleted();
         if (Objects.equals(analysisResultsRevisions.get(uri), currentRevision) || force) {
           communications.publishDiagnostics(documentModelService.getOpenedDiagnostic());
         }
@@ -204,23 +208,13 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
             .forEach(doc -> scheduleAnalysis(doc.getUri(), doc.getText(), analysisResultsRevisions.getOrDefault(doc.getUri(), 0), false, true, SourceUnitGraph.EventSource.IDE));
   }
 
-  private void waitForPreviousAnalysisToBeCompleted(List<String> uris) {
+  private void waitForPreviousAnalysisToBeCompleted(List<String> uris) throws InterruptedException {
     boolean analysisInProgress;
     do {
       List<CobolDocumentModel> openDocuments = uris.stream().map(documentModelService::get).filter(CobolDocumentModel::isOpened).collect(Collectors.toList());
       analysisInProgress = openDocuments.stream().anyMatch(model -> isAnalysisInProgress(model.getUri()));
-      if (analysisInProgress) {
-        cancelRunningAnalysis(openDocuments);
-      } else {
-        break;
-      }
-      LOG.debug("waiting for prev analysis to finish");
-        try {
-            TimeUnit.MILLISECONDS.sleep(100);
-        } catch (InterruptedException e) {
-            LOG.error("waiting for analysis is interrupted", e);
-            Thread.currentThread().interrupt();
-        }
+      LOG.debug("waiting for prev analysis of {} , to finish", openDocuments.stream().map(CobolDocumentModel::getUri).collect(Collectors.joining(", ")));
+      TimeUnit.MILLISECONDS.sleep(100);
     } while (analysisInProgress);
   }
 
@@ -272,12 +266,13 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
 
   private boolean isAnalysisInProgress(String uri) {
     CobolDocumentModel document = documentModelService.get(uri);
+    LOG.debug("-- checking analysis in prigrss for {}", document.getUri());
     String id = makeId(document.getUri(), analysisResultsRevisions.get(document.getUri()));
     boolean analysisInProgress = analysisResults.containsKey(id);
     if (!analysisInProgress) {
       return false;
     }
-    return !document.getIsLastAnalysisCancelled().get();
+    return document.getIsAnalysisInProgress().get();
   }
 
   /**
@@ -292,6 +287,8 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
     communications.publishDiagnostics(documentModelService.getOpenedDiagnostic());
     if (analysisResults.containsKey(analysisID)) {
       analysisResults.get(analysisID).cancel(true);
+    } else {
+      LOG.debug("*** [STP ana] uri {} not found in analysisResults", uri);
     }
   }
 
