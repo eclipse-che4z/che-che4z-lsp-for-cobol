@@ -30,7 +30,6 @@ import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser;
 
 import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /** Common facilities for checking CICS parser options */
 @Slf4j
@@ -94,18 +93,15 @@ public abstract class CICSOptionsCheckBaseUtility {
    *     or TerminalNode
    * @param ctx Context to extrapolate locality against
    * @param options Options checked to insert into error message
-   * @return true if mandatory option found
    */
-  protected boolean checkHasMandatoryOptions(List<?> rules, ParserRuleContext ctx, String options) {
+  protected void checkHasMandatoryOptions(List<?> rules, ParserRuleContext ctx, String options) {
     if (rules.isEmpty()) {
       throwException(
           ErrorSeverity.ERROR,
           VisitorUtility.constructLocality(ctx, context),
           "Missing required option: ",
           options);
-      return false;
     }
-    return true;
   }
 
   /**
@@ -131,21 +127,17 @@ public abstract class CICSOptionsCheckBaseUtility {
    * @param ruleHandlers Response handlers from parser rule
    */
   protected void checkResponseHandlers(CICSParser.Cics_handle_responseContext ruleHandlers) {
-    AtomicBoolean respFound = new AtomicBoolean(false);
+    boolean respFound = false;
     List<TerminalNode> respTwoResponseHandlers = new ArrayList<>();
-
     if (ruleHandlers.cics_inline_handle_exception() != null) {
-      ruleHandlers
-          .cics_inline_handle_exception()
-          .cics_resp()
-          .forEach(
-              handler -> {
-                if (handler.RESP() != null) respFound.set(true);
-                if (handler.RESP2() != null) respTwoResponseHandlers.add(handler.RESP2());
-              });
+      List<CICSParser.Cics_respContext> rules =
+          ruleHandlers.cics_inline_handle_exception().cics_resp();
+      for (CICSParser.Cics_respContext rule : rules) {
+        if (rule.RESP() != null) respFound = true;
+        if (rule.RESP2() != null) respTwoResponseHandlers.add(rule.RESP2());
+      }
     }
-
-    if (!respFound.get()) {
+    if (respFound) {
       checkHasIllegalOptions(respTwoResponseHandlers, "RESP2");
     }
   }
