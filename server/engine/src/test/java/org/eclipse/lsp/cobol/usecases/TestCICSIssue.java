@@ -57,7 +57,7 @@ public class TestCICSIssue {
   private static final String ISSUE_COPY_FULL =
       "ISSUE COPY TERMID({$varFour}) CTLCHAR({$varThree}) WAIT";
 
-  private static final String ISSUE_COPY_INVALID = "{ISSUE|errorOne} COPY CTLCHAR(100)";
+  private static final String ISSUE_COPY_INVALID = "ISSUE {_COPY CTLCHAR(100)|errorOne_}";
 
   private static final String ISSUE_DISCONNECT_FULL = "ISSUE DISCONNECT SESSION(100) ";
 
@@ -87,7 +87,7 @@ public class TestCICSIssue {
       "ISSUE ERASE DESTID({$varOne}) VOLUME({$varOne}) RIDFLD({$varFour}) KEYLENGTH({$varOne}) DEFRESP";
 
   private static final String ISSUE_ERASE_INVALID =
-      "{ISSUE|errorOne} ERASE DESTID(100) VOLUME({100) NOWAIT";
+      "ISSUE {_ERASE DESTID(100) VOLUME(100) NOWAIT|errorOne|errorTwo_}";
 
   private static final String ISSUE_ERASEAUP_FULL = "ISSUE ERASEAUP WAIT";
 
@@ -105,7 +105,7 @@ public class TestCICSIssue {
       "ISSUE NOTE DESTID({$varOne}) DESTIDLENG({$varOne}) VOLUME({$varOne}) VOLUMELENG({$varOne}) RIDFLD({$varFour}) RRN";
 
   private static final String ISSUE_NOTE_INVALID =
-      "{ISSUE|errorOne} NOTE DESTID(100) DESTIDLENG(111)  VOLUMELENG(100) RIDFLD(111) RRN";
+      "ISSUE NOTE DESTID(100) DESTIDLENG(111) {VOLUMELENG|errorOne}(100) RIDFLD(111) RRN";
 
   private static final String ISSUE_PASS_FULL =
       "ISSUE PASS LUNAME({$varOne}) FROM({$varFour}) LENGTH({$varone}) LOGONLOGMODE NOQUIESCE";
@@ -114,7 +114,7 @@ public class TestCICSIssue {
       "ISSUE PASS LUNAME({$varOne}) LOGONLOGMODE NOQUIESCE";
 
   private static final String ISSUE_PASS_INVALID =
-      "ISSUE PASS LUNAME(100) LENGTH(100) {LOGONLOGMODE|errorOne} NOQUIESCE";
+      "ISSUE PASS LUNAME(100) {LENGTH|errorOne}(100) LOGONLOGMODE NOQUIESCE";
 
   private static final String ISSUE_PREPARE_FULL =
       "ISSUE PREPARE CONVID({$varFour}) STATE({$varFour})";
@@ -143,7 +143,7 @@ public class TestCICSIssue {
       "ISSUE REPLACE DESTID({$varFour}) FROM({$varFour}) LENGTH({$varOne}) RIDFLD({$varFour}) RRN NOWAIT";
 
   private static final String ISSUE_REPLACE_INVALID =
-      "{ISSUE|errorOne} REPLACE DESTID(100) VOLUMELENG(100) FROM(101) LENGTH(100) RIDFLD(101) NOWAIT";
+      "ISSUE {_REPLACE DESTID(100) {VOLUMELENG|errorTwo}(100) FROM(101) LENGTH(100) RIDFLD(101) NOWAIT|errorOne_}";
 
   private static final String ISSUE_SEND_FULL =
       "ISSUE SEND SUBADDR({$varOne}) CARD VOLUME({$varTwo}) VOLUMELENG({$varThree}) FROM({$varOne}) LENGTH({$varOne}) NOWAIT DEFRESP";
@@ -151,7 +151,7 @@ public class TestCICSIssue {
   private static final String ISSUE_SEND_PARTIAL = "ISSUE SEND SUBADDR({$varOne}) FROM({$varOne})";
 
   private static final String ISSUE_SEND_INVALID =
-      "{ISSUE|errorOne} SEND SUBADDR(100) VOLUMELENG(100) FROM(101)";
+      "ISSUE SEND SUBADDR(100) {VOLUMELENG|errorOne}(100) FROM(101)";
 
   private static final String ISSUE_SIGNAL_FULL =
       "ISSUE SIGNAL CONVID({$varFour}) STATE({$varFive})";
@@ -192,7 +192,7 @@ public class TestCICSIssue {
             "errorOne",
             new Diagnostic(
                 new Range(),
-                "Extraneous input 'PRINT'",
+                "Invalid option provided: PRINT without SUBADDR",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()));
     CICSTestUtils.errorTest(ISSUE_ABORT_INVALID_ONE, expectedDiagnostics);
@@ -230,7 +230,7 @@ public class TestCICSIssue {
             "errorOne",
             new Diagnostic(
                 new Range(),
-                "Extraneous input 'ISSUE'",
+                "Missing required option: TERMID",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()));
     CICSTestUtils.errorTest(ISSUE_COPY_INVALID, expectedDiagnostics);
@@ -263,7 +263,7 @@ public class TestCICSIssue {
             "errorOne",
             new Diagnostic(
                 new Range(),
-                "Extraneous input 'CONSOLE'",
+                "Invalid option provided: CONSOLE without SUBADDR",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()));
     CICSTestUtils.errorTest(ISSUE_END_INVALID, expectedDiagnostics);
@@ -311,7 +311,13 @@ public class TestCICSIssue {
             "errorOne",
             new Diagnostic(
                 new Range(),
-                "Extraneous input 'ISSUE'",
+                "Missing required option: RIDFLD",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()),
+            "errorTwo",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: RRN",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()));
     CICSTestUtils.errorTest(ISSUE_ERASE_INVALID, expectedDiagnostics);
@@ -359,7 +365,7 @@ public class TestCICSIssue {
             "errorOne",
             new Diagnostic(
                 new Range(),
-                "Extraneous input 'ISSUE'",
+                "Invalid option provided: VOLUMELENG without VOLUME",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()));
     CICSTestUtils.errorTest(ISSUE_NOTE_INVALID, expectedDiagnostics);
@@ -382,7 +388,7 @@ public class TestCICSIssue {
             "errorOne",
             new Diagnostic(
                 new Range(),
-                "Extraneous input 'LOGONLOGMODE'",
+                "Invalid option provided: LENGTH without FROM",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()));
     CICSTestUtils.errorTest(ISSUE_PASS_INVALID, expectedDiagnostics);
@@ -420,7 +426,7 @@ public class TestCICSIssue {
             "errorOne",
             new Diagnostic(
                 new Range(),
-                "Extraneous input 'VOLUMELENG'",
+                "Invalid option provided: VOLUMELENG without VOLUME",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()));
     CICSTestUtils.errorTest(ISSUE_QUERY_INVALID, expectedDiagnostics);
@@ -453,7 +459,13 @@ public class TestCICSIssue {
             "errorOne",
             new Diagnostic(
                 new Range(),
-                "Extraneous input 'ISSUE'",
+                "Missing required option: RRN",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()),
+            "errorTwo",
+            new Diagnostic(
+                new Range(),
+                "Invalid option provided: VOLUMELENG without VOLUME",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()));
     CICSTestUtils.errorTest(ISSUE_REPLACE_INVALID, expectedDiagnostics);
@@ -476,7 +488,7 @@ public class TestCICSIssue {
             "errorOne",
             new Diagnostic(
                 new Range(),
-                "Extraneous input 'ISSUE'",
+                "Invalid option provided: VOLUMELENG without VOLUME",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()));
     CICSTestUtils.errorTest(ISSUE_SEND_INVALID, expectedDiagnostics);
@@ -509,7 +521,7 @@ public class TestCICSIssue {
             "errorOne",
             new Diagnostic(
                 new Range(),
-                "Extraneous input 'CONSOLE'",
+                "Invalid option provided: CONSOLE without SUBADDR",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()));
     CICSTestUtils.errorTest(ISSUE_WAIT_INVALID, expectedDiagnostics);
