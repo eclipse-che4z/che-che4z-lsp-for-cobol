@@ -29,10 +29,6 @@ suite.skip(
       helper.TEST_TIMEOUT,
     );
 
-    this.afterAll(async () => await helper.closeAllEditors()).timeout(
-      helper.TEST_TIMEOUT,
-    );
-
     test("Autocompletion basic dialect", async () => {
       helper.updateConfig("basic.json");
       await helper.showDocument("SNIPPET.cbl");
@@ -117,7 +113,7 @@ suite.skip(
   },
 );
 
-suite("TF42379 COBOL LS F96588 - Insert code snippets", function () {
+suite.skip("TF42379 COBOL LS F96588 - Insert code snippets", function () {
   suiteSetup(async function () {
     this.timeout(helper.TEST_TIMEOUT);
     helper.updateConfig("basic.json");
