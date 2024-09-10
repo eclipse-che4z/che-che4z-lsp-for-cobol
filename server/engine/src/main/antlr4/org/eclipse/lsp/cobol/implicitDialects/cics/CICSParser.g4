@@ -310,10 +310,14 @@ cics_delete_container: CONTAINER cics_data_value (ACTIVITY cics_data_value | ACQ
 cics_delete_counter: (COUNTER cics_name | DCOUNTER cics_name | POOL cics_name | cics_handle_response)+;
 
 /** DELETEQ TD/TS */
-cics_deleteq: DELETEQ (TD | TS | QUEUE cics_name | QNAME cics_name | SYSID cics_data_area | cics_handle_response)+;
+cics_deleteq: DELETEQ (cics_deleteq_td | cics_deleteq_ts);
+cics_deleteq_td: (TD | QUEUE cics_name | SYSID cics_data_area | cics_handle_response)+;
+cics_deleteq_ts: (TS | cics_queue_qname | SYSID cics_data_area | cics_handle_response)+;
+cics_queue_qname: (QUEUE | QNAME) cics_name;
 
 /** DEQ */
-cics_deq: DEQ (RESOURCE cics_data_area | LENGTH cics_data_value | UOW | MAXLIFETIME cics_cvda | TASK | cics_handle_response)+;
+cics_deq: DEQ (cics_deq_cmds | cics_handle_response);
+cics_deq_cmds : (RESOURCE cics_data_area | LENGTH cics_data_value | MAXLIFETIME cics_cvda | TASK | UOW)+;
 
 /** DOCUMENT CREATE / DELETE / INSERT / RETRIEVE / SET */
 cics_document: DOCUMENT (cics_document_create | DELETE DOCTOKEN cics_data_area | cics_document_insert |
