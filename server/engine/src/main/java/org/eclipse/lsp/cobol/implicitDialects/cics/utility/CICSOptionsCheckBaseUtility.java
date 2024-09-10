@@ -131,22 +131,20 @@ public abstract class CICSOptionsCheckBaseUtility {
    *
    * @param ruleHandlers Response handlers from parser rule
    */
-  protected void checkResponseHandlers(List<CICSParser.Cics_handle_responseContext> ruleHandlers) {
+  protected void checkResponseHandlers(CICSParser.Cics_handle_responseContext ruleHandlers) {
     AtomicBoolean respFound = new AtomicBoolean(false);
     List<TerminalNode> respTwoResponseHandlers = new ArrayList<>();
-    ruleHandlers.forEach(
-        optionOne -> {
-          if (optionOne.cics_inline_handle_exception() != null) {
-            optionOne
-                .cics_inline_handle_exception()
-                .cics_resp()
-                .forEach(
-                    optionTwo -> {
-                      if (optionTwo.RESP() != null) respFound.set(true);
-                      if (optionTwo.RESP2() != null) respTwoResponseHandlers.add(optionTwo.RESP2());
-                    });
-          }
-        });
+
+    if (ruleHandlers.cics_inline_handle_exception() != null) {
+      ruleHandlers
+          .cics_inline_handle_exception()
+          .cics_resp()
+          .forEach(
+              handler -> {
+                if (handler.RESP() != null) respFound.set(true);
+                if (handler.RESP2() != null) respTwoResponseHandlers.add(handler.RESP2());
+              });
+    }
 
     if (!respFound.get()) {
       checkHasIllegalOptions(respTwoResponseHandlers, "RESP2");
@@ -205,7 +203,7 @@ public abstract class CICSOptionsCheckBaseUtility {
         String className = entry.getClass().getSimpleName();
         Pair<String, ErrorSeverity> subGroup = subGroups.getOrDefault(className, null);
         if (className.equals("Cics_handle_responseContext"))
-          checkResponseHandlers(List.of((CICSParser.Cics_handle_responseContext) entry));
+          checkResponseHandlers((CICSParser.Cics_handle_responseContext) entry);
         if (subGroup != null && !entries.add(className)) {
           throwException(
               subGroup.getRight(),
