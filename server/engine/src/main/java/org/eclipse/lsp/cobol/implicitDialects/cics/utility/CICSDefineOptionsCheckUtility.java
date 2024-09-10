@@ -57,11 +57,9 @@ public class CICSDefineOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
   }
 
   private void checkActivity(CICSParser.Cics_define_activityContext ctx) {
-    checkHasMandatoryOptions(ctx.ACTIVITY(), ctx, "ACTIVITY");
     checkHasMandatoryOptions(ctx.TRANSID(), ctx, "TRANSID");
 
     List<RuleContextData> contexts = new ArrayList<>();
-    contexts.add(new RuleContextData(ctx.ACTIVITY(), "ACTIVITY"));
     contexts.add(new RuleContextData(ctx.EVENT(), "EVENT"));
     contexts.add(new RuleContextData(ctx.TRANSID(), "TRANSID"));
     contexts.add(new RuleContextData(ctx.PROGRAM(), "PROGRAM"));
@@ -72,7 +70,6 @@ public class CICSDefineOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
   }
 
   private void checkCompositeEvent(CICSParser.Cics_define_composite_eventContext ctx) {
-    checkHasMandatoryOptions(ctx.COMPOSITE(), ctx, "COMPOSITE");
     checkHasMandatoryOptions(ctx.EVENT(), ctx, "EVENT");
     if (ctx.OR().isEmpty()) checkHasMandatoryOptions(ctx.AND(), ctx, "AND");
     else checkHasIllegalOptions(ctx.AND(), "AND");
@@ -80,7 +77,6 @@ public class CICSDefineOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     else checkHasIllegalOptions(ctx.OR(), "OR");
 
     List<RuleContextData> contexts = new ArrayList<>();
-    contexts.add(new RuleContextData(ctx.COMPOSITE(), "COMPOSITE"));
     contexts.add(new RuleContextData(ctx.EVENT(), "EVENT"));
     contexts.add(new RuleContextData(ctx.AND(), "AND"));
     contexts.add(new RuleContextData(ctx.OR(), "OR"));
@@ -97,15 +93,9 @@ public class CICSDefineOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
   }
 
   private void checkCounter(CICSParser.Cics_define_counter_dcounterContext ctx) {
-    if (ctx.COUNTER().isEmpty()) checkHasMandatoryOptions(ctx.DCOUNTER(), ctx, "DCOUNTER");
-    else checkHasIllegalOptions(ctx.DCOUNTER(), "DCOUNTER");
-    if (ctx.DCOUNTER().isEmpty()) checkHasMandatoryOptions(ctx.COUNTER(), ctx, "COUNTER");
-    else checkHasIllegalOptions(ctx.COUNTER(), "COUNTER");
     if (ctx.VALUE().isEmpty()) checkHasIllegalOptions(ctx.MINIMUM(), "MINIMUM");
 
     List<RuleContextData> contexts = new ArrayList<>();
-    contexts.add(new RuleContextData(ctx.COUNTER(), "COUNTER"));
-    contexts.add(new RuleContextData(ctx.DCOUNTER(), "DCOUNTER"));
     contexts.add(new RuleContextData(ctx.POOL(), "POOL"));
     contexts.add(new RuleContextData(ctx.VALUE(), "VALUE"));
     contexts.add(new RuleContextData(ctx.MINIMUM(), "MINIMUM"));
@@ -115,9 +105,99 @@ public class CICSDefineOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     checkDuplicates(contexts);
   }
 
-  private void checkInputEvent(CICSParser.Cics_define_input_eventContext ctx) {}
+  private void checkInputEvent(CICSParser.Cics_define_input_eventContext ctx) {
+    checkHasMandatoryOptions(ctx.EVENT(), ctx, "EVENT");
 
-  private void checkDefineProcess(CICSParser.Cics_define_processContext ctx) {}
+    List<RuleContextData> contexts = new ArrayList<>();
+    contexts.add(new RuleContextData(ctx.EVENT(), "EVENT"));
+    harvestResponseHandlers(ctx.cics_handle_response(), contexts);
+    checkDuplicates(contexts);
+  }
 
-  private void checkDefineTimer(CICSParser.Cics_define_timerContext ctx) {}
+  private void checkDefineProcess(CICSParser.Cics_define_processContext ctx) {
+    checkHasMandatoryOptions(ctx.PROCESSTYPE(), ctx, "PROCESSTYPE");
+    checkHasMandatoryOptions(ctx.TRANSID(), ctx, "TRANSID");
+
+    List<RuleContextData> contexts = new ArrayList<>();
+    contexts.add(new RuleContextData(ctx.PROCESSTYPE(), "PROCESSTYPE"));
+    contexts.add(new RuleContextData(ctx.TRANSID(), "TRANSID"));
+    contexts.add(new RuleContextData(ctx.PROGRAM(), "PROGRAM"));
+    contexts.add(new RuleContextData(ctx.USERID(), "USERID"));
+    contexts.add(new RuleContextData(ctx.NOCHECK(), "NOCHECK"));
+    harvestResponseHandlers(ctx.cics_handle_response(), contexts);
+    checkDuplicates(contexts);
+  }
+
+  private void checkDefineTimer(CICSParser.Cics_define_timerContext ctx) {
+
+    if (ctx.AFTER().isEmpty()) {
+      checkHasIllegalOptions(ctx.DAYS(), "DAYS");
+      if (checkHasMandatoryOptions(ctx.AT(), ctx, "AT")) {
+        // AT CASE
+        if (ctx.HOURS().size() + ctx.MINUTES().size() + ctx.SECONDS().size() == 0) {
+          checkHasMandatoryOptions(ctx.HOURS(), ctx, "HOURS or MINUTES or SECONDS");
+        }
+        if (ctx.ON().isEmpty()) {
+          // ON
+          checkHasIllegalOptions(ctx.YEAR(), "YEAR without ON");
+          checkHasIllegalOptions(ctx.MONTH(), "MONTH without ON");
+          checkHasIllegalOptions(ctx.DAYOFYEAR(), "DAYOFYEAR without ON");
+          checkHasIllegalOptions(ctx.DAYOFMONTH(), "DAYOFMONTH without ON");
+        } else if (ctx.YEAR().isEmpty()) {
+          // YEAR
+          checkHasIllegalOptions(ctx.MONTH(), "MONTH without YEAR");
+          checkHasIllegalOptions(ctx.DAYOFYEAR(), "DAYOFYEAR without YEAR");
+          checkHasIllegalOptions(ctx.DAYOFMONTH(), "DAYOFMONTH without YEAR");
+        } else if (!ctx.DAYOFYEAR().isEmpty()) {
+          // DAYOFYEAR
+          checkHasIllegalOptions(ctx.MONTH(), "MONTH without DAYOFYEAR");
+          checkHasIllegalOptions(ctx.DAYOFMONTH(), "DAYOFMONTH without DAYOFYEAR");
+        } else {
+          // MONTH and DAYOFMONTH
+          checkHasIllegalOptions(ctx.DAYOFYEAR(), "DAYOFYEAR with MONTH");
+          checkHasMandatoryOptions(ctx.MONTH(), ctx, "MONTH");
+          checkHasMandatoryOptions(ctx.DAYOFMONTH(), ctx, "DAYOFMONTH");
+        }
+      } else {
+        // Neither AT or AND
+        checkHasMandatoryOptions(ctx.AFTER(), ctx, "AFTER");
+      }
+    } else if (ctx.AT().isEmpty() && checkHasMandatoryOptions(ctx.AFTER(), ctx, "AFTER")) {
+      // AFTER CASE
+      checkHasIllegalOptions(ctx.ON(), "ON");
+      checkHasIllegalOptions(ctx.YEAR(), "YEAR");
+      checkHasIllegalOptions(ctx.MONTH(), "MONTH");
+      checkHasIllegalOptions(ctx.DAYOFYEAR(), "DAYOFYEAR");
+      checkHasIllegalOptions(ctx.DAYOFMONTH(), "DAYOFMONTH");
+      if (ctx.DAYS().size() + ctx.HOURS().size() + ctx.MINUTES().size() + ctx.SECONDS().size()
+          == 0) {
+        checkHasMandatoryOptions(ctx.DAYS(), ctx, "DAYS or HOURS or MINUTES or SECONDS");
+      }
+    } else {
+      // Both AT and AFTER
+      checkHasIllegalOptions(ctx.AFTER(), "AFTER with AT");
+      checkHasIllegalOptions(ctx.AT(), "AT with AFTER");
+      checkHasIllegalOptions(ctx.ON(), "ON");
+      checkHasIllegalOptions(ctx.YEAR(), "YEAR");
+      checkHasIllegalOptions(ctx.MONTH(), "MONTH");
+      checkHasIllegalOptions(ctx.DAYOFYEAR(), "DAYOFYEAR");
+      checkHasIllegalOptions(ctx.DAYOFMONTH(), "DAYOFMONTH");
+      checkHasIllegalOptions(ctx.DAYS(), "DAYS");
+    }
+
+    List<RuleContextData> contexts = new ArrayList<>();
+    contexts.add(new RuleContextData(ctx.EVENT(), "EVENT"));
+    contexts.add(new RuleContextData(ctx.AFTER(), "AFTER"));
+    contexts.add(new RuleContextData(ctx.AT(), "AT"));
+    contexts.add(new RuleContextData(ctx.DAYS(), "DAYS"));
+    contexts.add(new RuleContextData(ctx.HOURS(), "HOURS"));
+    contexts.add(new RuleContextData(ctx.MINUTES(), "MINUTES"));
+    contexts.add(new RuleContextData(ctx.SECONDS(), "SECONDS"));
+    contexts.add(new RuleContextData(ctx.DAYOFYEAR(), "DAYOFYEAR"));
+    contexts.add(new RuleContextData(ctx.DAYOFMONTH(), "DAYOFMONTH"));
+    contexts.add(new RuleContextData(ctx.YEAR(), "YEAR"));
+    contexts.add(new RuleContextData(ctx.MONTH(), "MONTH"));
+    contexts.add(new RuleContextData(ctx.ON(), "ON"));
+    harvestResponseHandlers(ctx.cics_handle_response(), contexts);
+  }
 }

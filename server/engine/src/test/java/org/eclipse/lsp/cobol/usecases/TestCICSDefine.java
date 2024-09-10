@@ -71,7 +71,7 @@ public class TestCICSDefine {
       "DEFINE PROCESS({$varOne}) PROCESSTYPE({$varTwo}) TRANSID({$varThree})";
 
   private static final String DEFINE_PROCESS_INVALID_ONE =
-      "{DEFINE|errorOne} PROCESS(10) PROCESSTYPE(100) USERID(1000)";
+      "DEFINE {_PROCESS(10) PROCESSTYPE(100) USERID(1000)|errorOne_}";
 
   private static final String DEFINE_PROCESS_TIMER_ALL_OPTIONS_VALID_ONE =
       "DEFINE TIMER({$varOne}) EVENT({$varTwo}) AT HOURS({$varThree}) MINUTES({$varFour}) ON YEAR({$varfive}) MONTH({$varSix}) DAYOFMONTH({$varSix})";
@@ -79,7 +79,8 @@ public class TestCICSDefine {
   private static final String DEFINE_PROCESS_TIMER_PARTIAL_OPTIONS_VALID_ONE =
       "DEFINE TIMER({$varOne}) AFTER DAYS({$varTwo})";
 
-  private static final String DEFINE_PROCESS_TIMER_INVALID_ONE = "{DEFINE|errorOne} TIMER(100) AT";
+  private static final String DEFINE_PROCESS_TIMER_INVALID_ONE =
+      "DEFINE {_TIMER(100) AT|errorOne_}";
 
   @Test
   void testDefineActivityAllOptionsValidOne() {
@@ -191,7 +192,7 @@ public class TestCICSDefine {
             "errorOne",
             new Diagnostic(
                 new Range(),
-                "Extraneous input 'DEFINE'",
+                "Missing required option: TRANSID",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()));
     CICSTestUtils.errorTest(DEFINE_PROCESS_INVALID_ONE, expectedDiagnostics);
@@ -214,7 +215,7 @@ public class TestCICSDefine {
             "errorOne",
             new Diagnostic(
                 new Range(),
-                "Extraneous input 'DEFINE'",
+                "Missing required option: HOURS or MINUTES or SECONDS",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()));
     CICSTestUtils.errorTest(DEFINE_PROCESS_TIMER_INVALID_ONE, expectedDiagnostics);

@@ -98,15 +98,19 @@ public abstract class CICSOptionsCheckBaseUtility {
    *     or TerminalNode
    * @param ctx Context to extrapolate locality against
    * @param options Options checked to insert into error message
+   * @return true if mandatory option found
    */
-  protected void checkHasMandatoryOptions(List<?> rules, ParserRuleContext ctx, String options) {
+  protected boolean checkHasMandatoryOptions(List<?> rules, ParserRuleContext ctx, String options) {
+    boolean found = false;
     if (rules.isEmpty()) {
       throwException(
           ErrorSeverity.ERROR,
           VisitorUtility.constructLocality(ctx, context),
           "Missing required option: ",
           options);
-    }
+    } else found = true;
+
+    return found;
   }
 
   /**

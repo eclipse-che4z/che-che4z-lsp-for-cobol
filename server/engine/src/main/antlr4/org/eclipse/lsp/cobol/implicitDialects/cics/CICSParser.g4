@@ -305,12 +305,12 @@ cics_converttime: CONVERTTIME (DATESTRING cics_data_area | ABSTIME cics_data_are
 
 /** DEFINE (all of them) */
 cics_define: DEFINE (cics_define_activity | cics_define_composite_event | cics_define_counter_dcounter | cics_define_input_event | cics_define_process | cics_define_timer);
-cics_define_activity: ((ACTIVITY | EVENT | TRANSID | PROGRAM | USERID) cics_data_value | ACTIVITYID cics_data_area | cics_handle_response)+;
-cics_define_composite_event: (COMPOSITE | AND | OR  | (EVENT | SUBEVENT1 | SUBEVENT2 | SUBEVENT3 | SUBEVENT4 | SUBEVENT5 | SUBEVENT6 | SUBEVENT7 | SUBEVENT8) cics_data_value | cics_handle_response)+;
-cics_define_counter_dcounter: ((COUNTER | DCOUNTER | POOL) cics_name  | (VALUE | MINIMUM | MAXIMUM) cics_data_value | NOSUSPEND | cics_handle_response)+;
-cics_define_input_event: (INPUT | EVENT cics_data_value | cics_handle_response)+;
-cics_define_process: ((PROCESS | PROCESSTYPE | TRANSID | PROGRAM | USERID) cics_data_value | NOCHECK | cics_handle_response)+;
-cics_define_timer: ((TIMER | EVENT | DAYS | HOURS | MINUTES | SECONDS | YEAR | MONTH | DAYOFMONTH | DAYOFYEAR) cics_data_value | AFTER  | AT | ON | TODAY | cics_handle_response)+;
+cics_define_activity: ACTIVITY cics_data_value ((EVENT | TRANSID | PROGRAM | USERID) cics_data_value | ACTIVITYID cics_data_area | cics_handle_response)*;
+cics_define_composite_event: COMPOSITE (AND | OR  | (EVENT | SUBEVENT1 | SUBEVENT2 | SUBEVENT3 | SUBEVENT4 | SUBEVENT5 | SUBEVENT6 | SUBEVENT7 | SUBEVENT8) cics_data_value | cics_handle_response)*;
+cics_define_counter_dcounter: (COUNTER | DCOUNTER) cics_name (POOL cics_name  | (VALUE | MINIMUM | MAXIMUM) cics_data_value | NOSUSPEND | cics_handle_response)*;
+cics_define_input_event: INPUT (EVENT cics_data_value | cics_handle_response)*;
+cics_define_process: PROCESS cics_data_value ((PROCESSTYPE | TRANSID | PROGRAM | USERID) cics_data_value | NOCHECK | cics_handle_response)*;
+cics_define_timer: TIMER cics_data_value ((EVENT | DAYS | HOURS | MINUTES | SECONDS | YEAR | MONTH | DAYOFMONTH | DAYOFYEAR) cics_data_value | AFTER  | AT | ON | cics_handle_response)*;
 
 /** DELAY */
 cics_delay: DELAY (INTERVAL cics_zero_digit | INTERVAL cics_hhmmss | TIME cics_hhmmss | cics_delay_for | cics_dealy_until | REQID cics_name | cics_handle_response)+;
