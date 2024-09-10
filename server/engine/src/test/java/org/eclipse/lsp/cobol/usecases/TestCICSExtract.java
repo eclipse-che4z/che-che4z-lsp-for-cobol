@@ -45,7 +45,7 @@ public class TestCICSExtract {
       "EXTRACT ATTRIBUTES STATE({$varOne})";
 
   private static final String EXTRACT_ATTRIBUTES_INVALID_ONE =
-      "{EXTRACT|errorOne} ATTRIBUTES CONVID(100)";
+      "EXTRACT {_ATTRIBUTES CONVID(100)|errorOne_}";
 
   private static final String EXTRACT_CERTIFICATE_ALL_OPTIONS_VALID_ONE =
       "EXTRACT CERTIFICATE({$varOne}) LENGTH({$varOne}) SERIALNUM({$varOne}) SERIALNUMLEN({$varOne}) USERID({$varOne}) OWNER COMMONNAME({$varOne}) COMMONNAMLEN({$varOne}) COUNTRY({$varOne}) COUNTRYLEN({$varOne}) STATE({$varOne}) STATELEN({$varOne}) LOCALITY({$varOne}) LOCALITYLEN({$varOne}) ORGANIZATION({$varOne}) ORGANIZATLEN({$varOne}) ORGUNIT({$varOne}) ORGUNITLEN({$varOne})";
@@ -62,7 +62,8 @@ public class TestCICSExtract {
   private static final String EXTRACT_LOGONMSG_ALL_OPTIONS_VALID_TWO =
       "EXTRACT LOGONMSG SET({$varOne}) LENGTH({$varOne})";
 
-  private static final String EXTRACT_LOGONMSG_INVALID_ONE = "{EXTRACT|errorOne} LOGONMSG SET(100)";
+  private static final String EXTRACT_LOGONMSG_INVALID_ONE =
+      "EXTRACT {_LOGONMSG SET(100)|errorOne_}";
 
   private static final String EXTRACT_PROCESS_ALL_OPTIONS_VALID_ONE =
       "EXTRACT PROCESS PROCNAME({$varOne}) PROCLENGTH({$varOne}) MAXPROCLEN({$varOne}) CONVID({$varOne}) SYNCLEVEL({$varOne}) PIPLIST({$varOne}) PIPLENGTH({$varOne})";
@@ -87,7 +88,7 @@ public class TestCICSExtract {
 
   private static final String EXTRACT_TCT_PARTIAL_VALID_ONE = "EXTRACT TCT NETNAME({$varOne})";
 
-  private static final String EXTRACT_TCT_INVALID_ONE = "{EXTRACT|errorOne} TCT SYSID(100)";
+  private static final String EXTRACT_TCT_INVALID_ONE = "EXTRACT {_TCT SYSID(100)|errorOne_}";
 
   private static final String EXTRACT_WEB_SERVER_ALL_OPTIONS_VALID_ONE =
       "EXTRACT WEB SCHEME({$varOne}) HOST({$varOne}) HOSTLENGTH({$varOne}) HOSTTYPE({$varOne}) HTTPMETHOD({$varOne}) METHODLENGTH({$varOne}) HTTPVERSION({$varOne}) VERSIONLEN({$varOne}) PATH({$varOne}) PATHLENGTH({$varOne}) PORTNUMBER({$varOne}) QUERYSTRING({$varOne}) QUERYSTRLEN({$varOne}) REQUESTTYPE({$varOne}) URIMAP({$varOne})";
@@ -105,7 +106,7 @@ public class TestCICSExtract {
       "EXTRACT WEB SESSTOKEN({$varOne}) SCHEME({$varOne}) PORTNUMBER({$varOne})";
 
   private static final String EXTRACT_WEB_CLIENT_INVALID_ONE =
-      "EXTRACT WEB {SESSTOKEN|errorOne}(100) REALMLEN(100)";
+      "EXTRACT WEB SESSTOKEN(100) {REALMLEN|errorOne}(100)";
 
   @Test
   void testExtractAttachAllOptionsValidOne() {
@@ -134,7 +135,7 @@ public class TestCICSExtract {
             "errorOne",
             new Diagnostic(
                 new Range(),
-                "Extraneous input 'EXTRACT'",
+                "Missing required option: STATE",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()));
     CICSTestUtils.errorTest(EXTRACT_ATTRIBUTES_INVALID_ONE, expectedDiagnostics);
@@ -157,7 +158,7 @@ public class TestCICSExtract {
             "errorOne",
             new Diagnostic(
                 new Range(),
-                "Extraneous input 'ISSUER'",
+                "Invalid option provided: ISSUER with OWNER",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()));
     CICSTestUtils.errorTest(EXTRACT_CERTIFICATE_INVALID_ONE, expectedDiagnostics);
@@ -180,7 +181,7 @@ public class TestCICSExtract {
             "errorOne",
             new Diagnostic(
                 new Range(),
-                "Extraneous input 'EXTRACT'",
+                "Missing required option: LENGTH",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()));
     CICSTestUtils.errorTest(EXTRACT_LOGONMSG_INVALID_ONE, expectedDiagnostics);
@@ -203,7 +204,7 @@ public class TestCICSExtract {
             "errorOne",
             new Diagnostic(
                 new Range(),
-                "Extraneous input 'MAXPROCLEN'",
+                "Invalid option provided: MAXPROCLEN without PROCNAME",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()));
     CICSTestUtils.errorTest(EXTRACT_PROCESS_INVALID_ONE, expectedDiagnostics);
@@ -226,7 +227,7 @@ public class TestCICSExtract {
             "errorOne",
             new Diagnostic(
                 new Range(),
-                "Extraneous input 'SADDRLENGTH'",
+                "Invalid option provided: SADDRLENGTH without SERVERADDR",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()));
     CICSTestUtils.errorTest(EXTRACT_TCPIP_INVALID_ONE, expectedDiagnostics);
@@ -249,7 +250,7 @@ public class TestCICSExtract {
             "errorOne",
             new Diagnostic(
                 new Range(),
-                "Extraneous input 'EXTRACT'",
+                "Missing required option: NETNAME",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()));
     CICSTestUtils.errorTest(EXTRACT_TCT_INVALID_ONE, expectedDiagnostics);
@@ -272,7 +273,7 @@ public class TestCICSExtract {
             "errorOne",
             new Diagnostic(
                 new Range(),
-                "Extraneous input 'HOSTTYPE'",
+                "Invalid option provided: HOSTTYPE without HOSTLENGTH",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()));
     CICSTestUtils.errorTest(EXTRACT_WEB_SERVER_INVALID_ONE, expectedDiagnostics);
@@ -295,7 +296,7 @@ public class TestCICSExtract {
             "errorOne",
             new Diagnostic(
                 new Range(),
-                "Extraneous input 'SESSTOKEN'",
+                "Invalid option provided: REALMLEN without REALM",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()));
     CICSTestUtils.errorTest(EXTRACT_WEB_CLIENT_INVALID_ONE, expectedDiagnostics);

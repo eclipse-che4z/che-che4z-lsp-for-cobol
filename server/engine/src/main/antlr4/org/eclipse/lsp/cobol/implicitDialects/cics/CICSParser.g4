@@ -385,17 +385,17 @@ cics_enter: ENTER (TRACENUM cics_data_value | FROM cics_data_area | FROMLENGTH c
 
 /** EXTRACT (all of them) */
 cics_extract: EXTRACT (cics_extract_attach | cics_extract_attributes | cics_extract_certificate | cics_extract_logonmessage | cics_extract_process | cics_extract_tcpip | cics_extract_tct | cics_extract_web);
-cics_extract_attach: ATTACH ((ATTACHID | CONVID | SESSION) cics_name | (PROCESS | RESOURCE | RPROCESS | RRESOURCE | QUEUE | IUTYPE | DATASTR | RECFM) cics_data_area | cics_handle_response)*;
-cics_extract_attributes: ATTRIBUTES ((CONVID | SESSION) cics_name | STATE cics_cvda | cics_handle_response)*;
-cics_extract_certificate: CERTIFICATE cics_ref ((LENGTH | SERIALNUMLEN | USERID | COMMONNAMLEN | COUNTRYLEN | STATELEN | LOCALITYLEN | ORGANIZATLEN | ORGUNITLEN) cics_data_area | (SERIALNUM | COMMONNAME | COUNTRY | STATE | LOCALITY | ORGANIZATION | ORGUNIT) cics_ref | OWNER | ISSUER | cics_handle_response)*;
-cics_extract_logonmessage: LOGONMSG ((INTO | LENGTH) cics_data_area | SET cics_ref | cics_handle_response)*;
-cics_extract_process: PROCESS ((PROCNAME | PROCLENGTH | MAXPROCLEN | SYNCLEVEL | PIPLENGTH) cics_data_area | CONVID cics_name | PIPLIST cics_ref | cics_handle_response)*;
-cics_extract_tcpip: TCPIP ((AUTHENTICATE | CLNTIPFAMILY | SRVRIPFAMILY | SSLTYPE | PRIVACY)  cics_cvda | (CLIENTNAME | CNAMELENGTH | SERVERNAME | SNAMELENGTH | CLIENTADDR | CADDRLENGTH | CLIENTADDRNU | CLNTADDR6NU | SERVERADDR | SADDRLENGTH | SERVERADDRNU | SRVRADDR6NU | TCPIPSERVICE | PORTNUMBER | PORTNUMNU | MAXDATALEN) cics_data_area | cics_handle_response)*;
-cics_extract_tct: TCT (NETNAME cics_name | (SYSID | TERMID) cics_data_area | cics_handle_response)*;
-cics_extract_web: WEB (cics_extract_web_server | cics_extract_web_client);
-cics_extract_web_server: ((REQUESTTYPE) cics_cvda | cics_extract_web_header | (HTTPMETHOD | METHODLENGTH | PORTNUMBER | QUERYSTRING | QUERYSTRLEN | URIMAP) cics_data_area | cics_handle_response)*;
-cics_extract_web_client: ((SESSTOKEN | PORTNUMBER | URIMAP | REALM | REALMLEN) cics_data_area | cics_extract_web_header | cics_handle_response)*;
-cics_extract_web_header: HOSTLENGTH cics_data_value | (HOSTTYPE | SCHEME) cics_cvda | (HOST | HTTPVERSION |VERSIONLEN | PATH | PATHLENGTH) cics_data_area;
+cics_extract_attach: (ATTACH | (ATTACHID | CONVID | SESSION) cics_name | (PROCESS | RESOURCE | RPROCESS | RRESOURCE | QUEUE | IUTYPE | DATASTR | RECFM) cics_data_area | cics_handle_response)+;
+cics_extract_attributes: (ATTRIBUTES | (CONVID | SESSION) cics_name | STATE cics_cvda | cics_handle_response)+;
+cics_extract_certificate: (CERTIFICATE cics_ref | (LENGTH | SERIALNUMLEN | USERID | COMMONNAMLEN | COUNTRYLEN | STATELEN | LOCALITYLEN | ORGANIZATLEN | ORGUNITLEN) cics_data_area | (SERIALNUM | COMMONNAME | COUNTRY | STATE | LOCALITY | ORGANIZATION | ORGUNIT) cics_ref | OWNER | ISSUER | cics_handle_response)+;
+cics_extract_logonmessage: (LOGONMSG | (INTO | LENGTH) cics_data_area | SET cics_ref | cics_handle_response)+;
+cics_extract_process: (PROCESS | (PROCNAME | PROCLENGTH | MAXPROCLEN | SYNCLEVEL | PIPLENGTH) cics_data_area | CONVID cics_name | PIPLIST cics_ref | cics_handle_response)+;
+cics_extract_tcpip: (TCPIP | (AUTHENTICATE | CLNTIPFAMILY | SRVRIPFAMILY | SSLTYPE | PRIVACY)  cics_cvda | (CLIENTNAME | CNAMELENGTH | SERVERNAME | SNAMELENGTH | CLIENTADDR | CADDRLENGTH | CLIENTADDRNU | CLNTADDR6NU | SERVERADDR | SADDRLENGTH | SERVERADDRNU | SRVRADDR6NU | TCPIPSERVICE | PORTNUMBER | PORTNUMNU | MAXDATALEN) cics_data_area | cics_handle_response)+;
+cics_extract_tct: (TCT | NETNAME cics_name | (SYSID | TERMID) cics_data_area | cics_handle_response)+;
+cics_extract_web: (cics_extract_web_server | cics_extract_web_client);
+cics_extract_web_server: (WEB | (REQUESTTYPE | HOSTTYPE | SCHEME) cics_cvda | HOSTLENGTH cics_data_value | (HOST | HTTPVERSION |VERSIONLEN | PATH | PATHLENGTH | HTTPMETHOD | METHODLENGTH | PORTNUMBER | QUERYSTRING | QUERYSTRLEN | URIMAP) cics_data_area | cics_handle_response)+;
+cics_extract_web_client: (WEB | (SESSTOKEN | PORTNUMBER | URIMAP | REALM | REALMLEN | HOST | HTTPVERSION |VERSIONLEN | PATH | PATHLENGTH) cics_data_area | HOSTLENGTH cics_data_value | (HOSTTYPE | SCHEME) cics_cvda | cics_handle_response)+;
+
 
 /** FORCE TIMER */
 cics_force: FORCE (TIMER cics_data_value | ACQUACTIVITY | ACQPROCESS | cics_handle_response)+;
