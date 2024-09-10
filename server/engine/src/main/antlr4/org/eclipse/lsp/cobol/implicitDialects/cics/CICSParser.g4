@@ -494,7 +494,9 @@ cics_invoke: INVOKE (SERVICE cics_data_value | CHANNEL cics_data_value | OPERATI
 /** ISSUE (all of them) */
 cics_issue:
 	ISSUE (
-		cics_issue_abend
+	    cics_issue_print
+        | cics_issue_eods
+		| cics_issue_abend
 		| cics_issue_abort
 		| cics_issue_add
 		| cics_issue_confirmation
@@ -514,8 +516,7 @@ cics_issue:
         | cics_issue_replace
         | cics_issue_send
         | cics_issue_signal
-        | cics_issue_wait
-        | cics_issue_print_eods);
+        | cics_issue_wait);
 
 cics_issue_abend: (ABEND | CONVID cics_name | STATE cics_cvda | cics_handle_response)+;
 cics_issue_abort: (ABORT | (DESTID | DESTIDLENG | VOLUME | VOLUMELENG | SUBADDR) cics_data_value | CONSOLE | PRINT | CARD | WPMEDIA1 | WPMEDIA2 | WPMEDIA3 | WPMEDIA4 | cics_handle_response)+;
@@ -538,7 +539,8 @@ cics_issue_replace: (REPLACE | (DESTID | DESTIDLENG | VOLUME | VOLUMELENG | LENG
 cics_issue_send: (SEND | (DESTID | DESTIDLENG | SUBADDR | VOLUME | VOLUMELENG | LENGTH) cics_data_value | FROM cics_data_area | CONSOLE | PRINT | CARD | WPMEDIA1 | WPMEDIA2 | WPMEDIA3 | WPMEDIA4 | NOWAIT | DEFRESP | cics_handle_response)+;
 cics_issue_signal: (SIGNAL | (CONVID | SESSION) cics_name | STATE cics_cvda | cics_handle_response)+;
 cics_issue_wait: (WAIT | (DESTID | DESTIDLENG | SUBADDR | VOLUME | VOLUMELENG) cics_data_value | CONSOLE | PRINT | CARD | WPMEDIA1 | WPMEDIA2 | WPMEDIA3 | WPMEDIA4 | cics_handle_response)+;
-cics_issue_print_eods: (PRINT | EODS | cics_handle_response)+;
+cics_issue_print: (PRINT | cics_handle_response)+;
+cics_issue_eods: (EODS | cics_handle_response)+;
 
 /** LINK / LINK ACQPROCESS / LINK ACTIVITY: */
 cics_link: LINK (cics_link_program | cics_link_acqprocess | cics_link_activity);
@@ -944,7 +946,7 @@ cics_file_name: (FILE | DATASET) cics_name;
 /** RESP **/
 cics_resp: (RESP | RESP2) cics_data_area;
 
-cics_handle_response: cics_inline_handle_exception | WAIT;
+cics_handle_response: cics_inline_handle_exception;
 cics_inline_handle_exception: (cics_resp | NOHANDLE)+;
 
 cics_data_area: LPARENCHAR data_area RPARENCHAR;
