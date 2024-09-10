@@ -127,6 +127,17 @@ class TestSqlAllDeclareStatements {
           + "             END-EXEC.\n"
           + "       PROCEDURE DIVISION.";
 
+  private static final String DECLARE_TABLE_WITH_COMPLEX_TIMESTAMP = ""
+          + "       IDENTIFICATION DIVISION.                                 \n"
+          + "       PROGRAM-ID. HELLO-SQL.                                   \n"
+          + "       DATA DIVISION.                                           \n"
+          + "       WORKING-STORAGE SECTION.                                 \n"
+          + "           EXEC SQL                                             \n"
+          + "             DECLARE TBL TABLE                                  \n"
+          + "              (TIMESTAMP TIMESTAMP(6) WITHOUT TIMEZONE NOT NULL)\n"
+          + "           END-EXEC.                                            \n"
+          + "       PROCEDURE DIVISION.                                      \n";
+
   private static Stream<String> textsToTest() {
     return Stream.of(
         DECLARE_CURSOR,
@@ -135,7 +146,8 @@ class TestSqlAllDeclareStatements {
         DECLARE_STATEMENT,
         DECLARE_VARIABLE,
         DECLARE_STATEMENT_IN_WORKING_STORAGE,
-        DECLARE_STATEMENT_IN_LINKAGE_SECTION);
+        DECLARE_STATEMENT_IN_LINKAGE_SECTION,
+        DECLARE_TABLE_WITH_COMPLEX_TIMESTAMP);
   }
 
   @ParameterizedTest
