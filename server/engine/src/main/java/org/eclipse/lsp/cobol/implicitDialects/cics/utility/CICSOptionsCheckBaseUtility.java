@@ -30,6 +30,7 @@ import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /** Common facilities for checking CICS parser options */
 @Slf4j
@@ -93,15 +94,19 @@ public abstract class CICSOptionsCheckBaseUtility {
    *     or TerminalNode
    * @param ctx Context to extrapolate locality against
    * @param options Options checked to insert into error message
+   * @return true if mandatory option found
    */
-  protected void checkHasMandatoryOptions(List<?> rules, ParserRuleContext ctx, String options) {
+  protected boolean checkHasMandatoryOptions(List<?> rules, ParserRuleContext ctx, String options) {
+    boolean found = false;
     if (rules.isEmpty()) {
       throwException(
           ErrorSeverity.ERROR,
           VisitorUtility.constructLocality(ctx, context),
           "Missing required option: ",
           options);
-    }
+    } else found = true;
+
+    return found;
   }
 
   /**
@@ -121,12 +126,13 @@ public abstract class CICSOptionsCheckBaseUtility {
   }
 
   /**
-   * Iterates over the provided response handlers, extracts what is provided, and validates
+   * Iterates over the provided response handlers, extracts what is provided, and validates there is
+   * not RESP2 without RESP
    *
    * @param ruleHandlers Response handlers from parser rule
    */
   protected void checkResponseHandlers(List<CICSParser.Cics_handle_responseContext> ruleHandlers) {
-    List<TerminalNode> respResponseHandlers = new ArrayList<>();
+    AtomicBoolean respFound = new AtomicBoolean(false);
     List<TerminalNode> respTwoResponseHandlers = new ArrayList<>();
     ruleHandlers.forEach(
         optionOne -> {
@@ -136,13 +142,13 @@ public abstract class CICSOptionsCheckBaseUtility {
                 .cics_resp()
                 .forEach(
                     optionTwo -> {
-                      if (optionTwo.RESP() != null) respResponseHandlers.add(optionTwo.RESP());
+                      if (optionTwo.RESP() != null) respFound.set(true);
                       if (optionTwo.RESP2() != null) respTwoResponseHandlers.add(optionTwo.RESP2());
                     });
           }
         });
 
-    if (respResponseHandlers.isEmpty()) {
+    if (!respFound.get()) {
       checkHasIllegalOptions(respTwoResponseHandlers, "RESP2");
     }
   }
@@ -169,6 +175,15 @@ public abstract class CICSOptionsCheckBaseUtility {
     }
   }
 
+  /**
+   * Checks context passed as parameter for duplicate options by traversing the Parse Tree. Also
+   * iterates over the response handler by calling checkResponseHandler(), if the
+   * Cics_handle_response context is found, to ensure there is not a RESP2 option provided without a
+   * RESP option
+   *
+   * @param ctx ParserRuleContext To evaluate
+   * @param duplicateOptions Custom duplicate options to evaluate against
+   */
   private void checkDuplicateEntries(
       ParserRuleContext ctx, Set<String> entries, Map<String, ErrorSeverity> duplicateOptions) {
 
@@ -189,6 +204,8 @@ public abstract class CICSOptionsCheckBaseUtility {
       } else {
         String className = entry.getClass().getSimpleName();
         Pair<String, ErrorSeverity> subGroup = subGroups.getOrDefault(className, null);
+        if (className.equals("Cics_handle_responseContext"))
+          checkResponseHandlers(List.of((CICSParser.Cics_handle_responseContext) entry));
         if (subGroup != null && !entries.add(className)) {
           throwException(
               subGroup.getRight(),
@@ -200,6 +217,11 @@ public abstract class CICSOptionsCheckBaseUtility {
     }
   }
 
+  /**
+   * Client accessible entrypoint to check for duplicates.
+   *
+   * @param ctx Higer order context as ParserRuleContext to traverse for duplicates
+   */
   protected void checkDuplicates(ParserRuleContext ctx) {
     Set<String> foundEntries = new HashSet<>();
     checkDuplicateEntries(ctx, foundEntries, baseDuplicateOptions);

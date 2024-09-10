@@ -102,34 +102,28 @@ public class CICSReceiveOptionsCheckUtility extends CICSOptionsCheckBaseUtility 
     if (!ctx.ASIS().isEmpty() || !ctx.BUFFER().isEmpty()) {
       checkHasIllegalOptions(ctx.LEAVEKB(), "LEAVEKB");
     }
-    checkResponseHandlers(ctx.cics_handle_response());
   }
 
   private void checkGroupTwo(CICSParser.Cics_receive_group_twoContext ctx) {
     checkHasMandatoryOptions(ctx.cics_length_flength(), ctx, "LENGTH or FLENGTH");
     checkHasMandatoryOptions(ctx.cics_into_set(), ctx, "INTO or SET");
-    checkResponseHandlers(ctx.cics_handle_response());
   }
 
   private void checkGroupThree(CICSParser.Cics_receive_group_threeContext ctx) {
     checkHasMandatoryOptions(ctx.cics_length_flength(), ctx, "LENGTH or FLENGTH");
-    checkResponseHandlers(ctx.cics_handle_response());
   }
 
   private void checkPartn(CICSParser.Cics_receive_partnContext ctx) {
     checkHasMandatoryOptions(ctx.cics_into_set(), ctx, "INTO or SET");
     checkHasMandatoryOptions(ctx.LENGTH(), ctx, "LENGTH");
-    checkResponseHandlers(ctx.cics_handle_response());
   }
 
   private void checkMap(CICSParser.Cics_receive_mapContext ctx) {
     if (ctx.FROM().isEmpty()) checkHasIllegalOptions(ctx.LENGTH(), "LENGTH");
     if (ctx.TERMINAL().isEmpty()) checkHasIllegalOptions(ctx.INPARTN(), "INPARTN");
-    checkResponseHandlers(ctx.cics_handle_response());
   }
 
   private void checkMapMappingDev(CICSParser.Cics_receive_map_mappingdevContext ctx) {
     checkHasMandatoryOptions(ctx.FROM(), ctx, "FROM");
-    checkResponseHandlers(ctx.cics_handle_response());
   }
 }
