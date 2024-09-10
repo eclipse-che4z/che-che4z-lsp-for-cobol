@@ -172,36 +172,30 @@ public abstract class CICSOptionsCheckBaseUtility {
   private void checkDuplicateEntries(
       ParserRuleContext ctx, Set<String> entries, Map<String, ErrorSeverity> duplicateOptions) {
 
-    if (ctx.getChildCount() != 0) {
-      for (ParseTree entry : ctx.children) {
-        if (entry.getChildCount() == 0) {
-          String option = entry.getText().toUpperCase();
-          if (duplicateOptions.containsKey(option)) {
-            if (!entries.add(option)) {
-              throwException(
-                  duplicateOptions.get(option),
-                  getLocality(entry),
-                  "Excessive options provided for: ",
-                  option);
-            }
+    if (ctx.getChildCount() == 0) return;
+
+    for (ParseTree entry : ctx.children) {
+      if (entry.getChildCount() == 0) {
+        String option = entry.getText().toUpperCase();
+        if (duplicateOptions.containsKey(option)) {
+          if (!entries.add(option)) {
+            throwException(
+                duplicateOptions.get(option),
+                getLocality(entry),
+                "Excessive options provided for: ",
+                option);
           }
-        } else {
-          String className = entry.getClass().getSimpleName();
-          boolean errorFound = false;
-          Pair<String, ErrorSeverity> subGroup = subGroups.getOrDefault(className, null);
-          if (subGroup != null) {
-            if (!entries.add(className)) {
-              errorFound = true;
-              throwException(
-                  subGroup.getRight(),
-                  getLocality(entry),
-                  "Excessive options provided for: ",
-                  subGroup.getLeft());
-            }
-          }
-          if (!errorFound)
-            checkDuplicateEntries((ParserRuleContext) entry, entries, duplicateOptions);
         }
+      } else {
+        String className = entry.getClass().getSimpleName();
+        Pair<String, ErrorSeverity> subGroup = subGroups.getOrDefault(className, null);
+        if (subGroup != null && !entries.add(className)) {
+          throwException(
+              subGroup.getRight(),
+              getLocality(entry),
+              "Excessive options provided for: ",
+              subGroup.getLeft());
+        } else checkDuplicateEntries((ParserRuleContext) entry, entries, duplicateOptions);
       }
     }
   }
