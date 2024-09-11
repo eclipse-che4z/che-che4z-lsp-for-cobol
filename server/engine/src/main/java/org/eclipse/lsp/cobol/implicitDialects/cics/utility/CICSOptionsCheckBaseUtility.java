@@ -15,13 +15,13 @@
 
 package org.eclipse.lsp.cobol.implicitDialects.cics.utility;
 
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
@@ -29,8 +29,7 @@ import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /** Common facilities for checking CICS parser options */
 @Slf4j
@@ -40,9 +39,43 @@ public abstract class CICSOptionsCheckBaseUtility {
 
   private final List<SyntaxError> errors;
 
-  public CICSOptionsCheckBaseUtility(DialectProcessingContext context, List<SyntaxError> errors) {
+  private final Map<String, ErrorSeverity> baseDuplicateOptions =
+      new HashMap<String, ErrorSeverity>() {
+        { // handle response options
+          put("RESP", ErrorSeverity.ERROR);
+          put("RESP2", ErrorSeverity.ERROR);
+          put("WAIT", ErrorSeverity.ERROR);
+          put("NOHANDLE", ErrorSeverity.ERROR);
+        }
+      };
+
+  private final Map<String, Pair<String, ErrorSeverity>> subGroups =
+      new HashMap<String, Pair<String, ErrorSeverity>>() {
+        {
+          put(
+              "Cics_handle_responseContext",
+              new ImmutablePair<>("RESPONSE HANDLER", ErrorSeverity.ERROR));
+        }
+      };
+
+  public CICSOptionsCheckBaseUtility(
+      DialectProcessingContext context,
+      List<SyntaxError> errors,
+      Map<String, ErrorSeverity> duplicateOptions,
+      Map<String, Pair<String, ErrorSeverity>> subGroups) {
     this.context = context;
     this.errors = errors;
+    this.baseDuplicateOptions.putAll(duplicateOptions);
+    this.subGroups.putAll(subGroups);
+  }
+
+  public CICSOptionsCheckBaseUtility(
+      DialectProcessingContext context,
+      List<SyntaxError> errors,
+      Map<String, ErrorSeverity> duplicateOptions) {
+    this.context = context;
+    this.errors = errors;
+    this.baseDuplicateOptions.putAll(duplicateOptions);
   }
 
   /**
@@ -52,30 +85,6 @@ public abstract class CICSOptionsCheckBaseUtility {
    * @param <E> A subclass of ParserRuleContext
    */
   public abstract <E extends ParserRuleContext> void checkOptions(E ctx);
-
-  /**
-   * Checks for duplicate option entries
-   *
-   * @param options Lists of Target rule List and String pairs to check for duplicates of where
-   *     String is the name of the option to check for and the rule list is the context to check for
-   *     duplicates
-   */
-  protected void checkDuplicates(List<RuleContextData> options) {
-    for (RuleContextData option : options) {
-      if (option.rules.size() >= 2) {
-        option
-            .rules
-            .subList(1, option.rules.size())
-            .forEach(
-                error ->
-                    throwException(
-                        option.ruleName,
-                        getLocality(error),
-                        "Excessive options provided for: ",
-                        option.severity));
-      }
-    }
-  }
 
   /**
    * Helper method to collect analysis errors if the rule context does not contain mandatory options
@@ -88,10 +97,10 @@ public abstract class CICSOptionsCheckBaseUtility {
   protected void checkHasMandatoryOptions(List<?> rules, ParserRuleContext ctx, String options) {
     if (rules.isEmpty()) {
       throwException(
-          options,
+          ErrorSeverity.ERROR,
           VisitorUtility.constructLocality(ctx, context),
           "Missing required option: ",
-          ErrorSeverity.ERROR);
+          options);
     }
   }
 
@@ -107,43 +116,28 @@ public abstract class CICSOptionsCheckBaseUtility {
       rules.forEach(
           error ->
               throwException(
-                  options, getLocality(error), "Invalid option provided: ", ErrorSeverity.ERROR));
+                  ErrorSeverity.ERROR, getLocality(error), "Invalid option provided: ", options));
     }
   }
 
   /**
-   * Iterates over the provided response handlers, extracts what is provided, and validates
+   * Iterates over the provided response handlers, extracts what is provided, and validates there is
+   * not RESP2 without RESP
    *
-   * @param ruleHandlers
-   * @param contexts
-   * @return List of Rule Context Data
+   * @param ruleHandlers Response handlers from parser rule
    */
-  protected void harvestResponseHandlers(
-      List<CICSParser.Cics_handle_responseContext> ruleHandlers, List<RuleContextData> contexts) {
-
-    List<TerminalNode> respResponseHandlers = new ArrayList<>();
+  protected void checkResponseHandlers(CICSParser.Cics_handle_responseContext ruleHandlers) {
+    boolean respFound = false;
     List<TerminalNode> respTwoResponseHandlers = new ArrayList<>();
-    List<TerminalNode> noHandle = new ArrayList<>();
-    ruleHandlers.forEach(
-        optionOne -> {
-          if (optionOne.cics_inline_handle_exception() != null) {
-            optionOne
-                .cics_inline_handle_exception()
-                .cics_resp()
-                .forEach(
-                    optionTwo -> {
-                      if (optionTwo.RESP() != null) respResponseHandlers.add(optionTwo.RESP());
-                      if (optionTwo.RESP2() != null) respTwoResponseHandlers.add(optionTwo.RESP2());
-                    });
-            noHandle.addAll(optionOne.cics_inline_handle_exception().NOHANDLE());
-          }
-        });
-
-    contexts.add(new RuleContextData(respResponseHandlers, "RESP"));
-    contexts.add(new RuleContextData(respTwoResponseHandlers, "RESP2"));
-    contexts.add(new RuleContextData(noHandle, "NOHANDLE"));
-
-    if (respResponseHandlers.isEmpty()) {
+    if (ruleHandlers.cics_inline_handle_exception() != null) {
+      List<CICSParser.Cics_respContext> rules =
+          ruleHandlers.cics_inline_handle_exception().cics_resp();
+      for (CICSParser.Cics_respContext rule : rules) {
+        if (rule.RESP() != null) respFound = true;
+        if (rule.RESP2() != null) respTwoResponseHandlers.add(rule.RESP2());
+      }
+    }
+    if (!respFound) {
       checkHasIllegalOptions(respTwoResponseHandlers, "RESP2");
     }
   }
@@ -155,7 +149,7 @@ public abstract class CICSOptionsCheckBaseUtility {
   }
 
   private void throwException(
-      String wrongToken, @NonNull Locality locality, String message, ErrorSeverity errorSeverity) {
+      ErrorSeverity errorSeverity, @NonNull Locality locality, String message, String wrongToken) {
     SyntaxError error =
         SyntaxError.syntaxError()
             .errorSource(ErrorSource.PARSING)
@@ -170,13 +164,70 @@ public abstract class CICSOptionsCheckBaseUtility {
     }
   }
 
-  /** Container to store rule context data */
-  @AllArgsConstructor
-  @NoArgsConstructor
-  @RequiredArgsConstructor
-  public class RuleContextData {
-    @lombok.NonNull public List<?> rules;
-    @lombok.NonNull public String ruleName;
-    public ErrorSeverity severity = ErrorSeverity.ERROR;
+  /**
+   * Checks context passed as parameter for duplicate options by traversing the Parse Tree. Also
+   * iterates over the response handler by calling checkResponseHandler(), if the
+   * Cics_handle_response context is found, to ensure there is not a RESP2 option provided without a
+   * RESP option
+   *
+   * @param ctx ParserRuleContext To evaluate
+   * @param duplicateOptions Custom duplicate options to evaluate against
+   */
+  private void checkDuplicateEntries(
+      ParserRuleContext ctx, Set<String> entries, Map<String, ErrorSeverity> duplicateOptions) {
+
+    if (ctx.getChildCount() == 0) return;
+
+    for (ParseTree entry : ctx.children) {
+      if (entry.getChildCount() == 0) {
+        String option = entry.getText().toUpperCase();
+        if (duplicateOptions.containsKey(option)) {
+          if (!entries.add(option)) {
+            throwException(
+                duplicateOptions.get(option),
+                getLocality(entry),
+                "Excessive options provided for: ",
+                option);
+          }
+        }
+      } else {
+        String className = entry.getClass().getSimpleName();
+        Pair<String, ErrorSeverity> subGroup = subGroups.getOrDefault(className, null);
+        if (className.equals("Cics_handle_responseContext"))
+          checkResponseHandlers((CICSParser.Cics_handle_responseContext) entry);
+        if (subGroup != null && !entries.add(className)) {
+          throwException(
+              subGroup.getRight(),
+              getLocality(entry),
+              "Excessive options provided for: ",
+              subGroup.getLeft());
+        } else checkDuplicateEntries((ParserRuleContext) entry, entries, duplicateOptions);
+      }
+    }
+  }
+
+  /**
+   * Client accessible entrypoint to check for duplicates.
+   *
+   * @param ctx Higer order context as ParserRuleContext to traverse for duplicates
+   */
+  protected void checkDuplicates(ParserRuleContext ctx) {
+    Set<String> foundEntries = new HashSet<>();
+    checkDuplicateEntries(ctx, foundEntries, baseDuplicateOptions);
+  }
+
+  /**
+   * Additional check duplicates method that can utilize custom duplicate error severity options not
+   * used for the whole command set
+   *
+   * @param ctx ParserRuleContext To evaluate
+   * @param customDuplicateOptions Custom duplicate options to evaluate against
+   */
+  protected void checkDuplicates(
+      ParserRuleContext ctx, Map<String, ErrorSeverity> customDuplicateOptions) {
+    Set<String> foundEntries = new HashSet<>();
+    Map<String, ErrorSeverity> updatedDuplicateOptions = new HashMap<>(baseDuplicateOptions);
+    updatedDuplicateOptions.putAll(customDuplicateOptions);
+    checkDuplicateEntries(ctx, foundEntries, updatedDuplicateOptions);
   }
 }

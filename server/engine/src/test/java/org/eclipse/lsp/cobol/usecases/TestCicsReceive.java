@@ -139,7 +139,15 @@ public class TestCicsReceive {
   };
 
   private static final String[] GROUP_ONE_DUPLICATE_INVALID = {
+    "RECEIVE", "InTO(100)", "{INTO(1000)|error1}", "LENGTH(100)", "MAXLENGTH(10)", "NOTRUNCATE"
+  };
+
+  private static final String[] GROUP_ONE_DUPLICATE_INVALID_TWO = {
     "RECEIVE", "INTO(100)", "{INTO(1000)|error1}", "LENGTH(100)", "MAXLENGTH(10)", "NOTRUNCATE"
+  };
+
+  private static final String[] GROUP_ONE_RESP_INVALID = {
+    "RECEIVE", "INTO(100)", "LENGTH(100)", "MAXLENGTH(10)", "{RESP2|errorOne}(100)", "NOHANDLE"
   };
 
   private static final String[] GROUP_TWO_APPC_FULL_OPTIONS_VALID_ONE = {
@@ -436,6 +444,21 @@ public class TestCicsReceive {
   }
 
   @Test
+  void testGroupOneReceiveCICSCommand_withDuplicateInvalidTwo() {
+    UseCaseEngine.runTest(
+        getTestString(GROUP_ONE_DUPLICATE_INVALID_TWO),
+        ImmutableList.of(),
+        ImmutableMap.of(
+            "error1",
+            new Diagnostic(
+                new Range(),
+                "Excessive options provided for: INTO or SET",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())),
+        ImmutableList.of());
+  }
+
+  @Test
   void testGroupTwoAppcFullOptionsValidOne() {
     UseCaseEngine.runTest(
         getTestString(GROUP_TWO_APPC_FULL_OPTIONS_VALID_ONE),
@@ -660,6 +683,21 @@ public class TestCicsReceive {
             new Diagnostic(
                 new Range(),
                 "Excessive options provided for: NOHANDLE",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())),
+        ImmutableList.of());
+  }
+
+  @Test
+  void testGroupOneRespTwoError() {
+    UseCaseEngine.runTest(
+        getTestString(GROUP_ONE_RESP_INVALID),
+        ImmutableList.of(),
+        ImmutableMap.of(
+            "errorOne",
+            new Diagnostic(
+                new Range(),
+                "Invalid option provided: RESP2",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())),
         ImmutableList.of());
