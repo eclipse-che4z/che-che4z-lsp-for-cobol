@@ -75,6 +75,7 @@ public class DidChangeWatchedFilesHandler {
               }
               String uriString = path.toUri().toString();
               if (sourceUnitGraph.isFileOpened(uriString)) {
+                LOG.debug("[File change event]  ignoring event for uri : {} as its already opened in editor", uri);
                 // opened files are taken care by textChange events
                 return;
               }
@@ -103,6 +104,7 @@ public class DidChangeWatchedFilesHandler {
     List<String> uris = sourceUnitGraph.getAllAssociatedFilesForACopybook(uri);
     String fileContent = null;
     if (uris.isEmpty()) {
+      LOG.debug("[File change event]  trigger analysis for all opened document");
       analyseAllOpenedDocument();
       return;
     }
@@ -111,6 +113,7 @@ public class DidChangeWatchedFilesHandler {
       fileContent = sourceUnitGraph.getContent(uri);
     }
     if (!sourceUnitGraph.isFileOpened(uri)) {
+      LOG.debug("[File change event]  trigger analysis for uris: {}", String.join(", ", uris));
       asyncAnalysisService.reanalyseCopybooksAssociatedPrograms(
           uris, uri, fileContent, SourceUnitGraph.EventSource.FILE_SYSTEM);
     }
@@ -128,6 +131,7 @@ public class DidChangeWatchedFilesHandler {
     affectedPrograms.forEach(this::triggerAnalysisForChangedFile);
 
     if (affectedPrograms.isEmpty()) {
+      LOG.debug("[File change event]  trigger analysis for all opened document due to event for path: {}", path);
       analyseAllOpenedDocument();
     }
   }
