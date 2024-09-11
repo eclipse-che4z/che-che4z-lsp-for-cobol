@@ -100,7 +100,7 @@ public class CliAnalysis implements Callable<Integer> {
         cliClientProvider.setCpyExt(createCopybooksExtensions());
         try {
             for (int i = 0; i < repeat; ++i) {
-                JsonObject result = getResultJson();
+                JsonObject result = createResultJson();
 
                 Cli.Result analysisResult = parent.runAnalysis(inputConfig.src, dialect, diCtx, true);
                 parent.addTiming(result, analysisResult.ctx.getBenchmarkSession());
@@ -114,14 +114,14 @@ public class CliAnalysis implements Callable<Integer> {
             }
             return Cli.SUCCESS;
         } catch (Exception e) {
-            JsonObject result = getResultJson();
+            JsonObject result = createResultJson();
             result.addProperty("crash", e.getMessage() != null && e.getMessage().isEmpty() ? "error" : e.getMessage());
             System.out.println(CliUtils.GSON.toJson(result));
             return Cli.FAILURE;
         }
     }
 
-    private JsonObject getResultJson() {
+    private JsonObject createResultJson() {
         JsonObject result = new JsonObject();
 
         result.addProperty("uri", (inputConfig.useStdin) ? "N/A (User Input)" : inputConfig.src.toURI().toString());
