@@ -504,7 +504,7 @@ cics_issue:
 		| cics_issue_disconnect
 		| cics_issue_end
 		| cics_issue_endfile_endoutput
-		| cics_issue_eraseT
+		| cics_issue_erase
 		| cics_issue_erase_aup
 		| cics_issue_error
         | cics_issue_load
