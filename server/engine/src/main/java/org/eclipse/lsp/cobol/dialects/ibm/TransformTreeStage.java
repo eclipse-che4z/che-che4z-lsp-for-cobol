@@ -68,7 +68,7 @@ public class TransformTreeStage implements Stage<AnalysisContext, ProcessingResu
   public StageResult<ProcessingResult> run(AnalysisContext context, StageResult<ParserStageResult> prevStageResult) {
     // Transform parsed tree to AST
     // We expect only the root node here
-    Node rootNode = transformAST(
+    RootNode rootNode = (RootNode) transformAST(
             context,
             context.getCopybooksRepository(),
             prevStageResult.getData().getTokens(),

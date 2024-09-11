@@ -42,7 +42,7 @@ public class AnalysisQuery implements LspQuery<ExtendedApiResult> {
     result = new CompletableFuture<>();
     analysisResultEvent =
         ofNullable(new Gson().fromJson(params.toString(), AnalysisResultEvent.class))
-            .orElseGet(() -> new AnalysisResultEvent("", ""));
+            .orElseGet(() -> new AnalysisResultEvent("", "", 0, 0));
   }
 
   @Override
