@@ -108,14 +108,15 @@ public class CobolDocumentModel {
   }
 
   /**
-   * update isLastAnalysisCancelled to true
+   * Marks the document's analysis is progress
    */
   public void markAnalysisInProgress() {
     isAnalysisInProgress.compareAndSet(false, true);
   }
 
   /**
-   * update isLastAnalysisCancelled to false
+   * Marks the document's analysis is completed.
+   * This indicates either the analysis is completed or cancelled
    */
   public void markAnalysisCompleted() {
     isAnalysisInProgress.compareAndSet(true, false);

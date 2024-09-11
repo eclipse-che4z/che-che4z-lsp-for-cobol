@@ -153,9 +153,7 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
       }
       LOG.debug("[scheduleAnalysis] waiting for previous analysis of {} to finish", uri);
       try {
-        if (documentModel.getLastAnalysisResult() != null) {
-          waitForPreviousAnalysisToBeCompleted(ImmutableList.of(uri));
-        }
+        waitForPreviousAnalysisToBeCompleted(ImmutableList.of(uri));
         documentModel.markAnalysisInProgress();
         LOG.debug("[scheduleAnalysis] Start analysis: " + uri);
         notifyAllListeners(AnalysisState.STARTED, documentModelService.get(uri), eventSource);
@@ -169,7 +167,7 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
         LOG.error("Encountered Exception {} , while analysing uri : {}", genericException, documentModel.getUri(), genericException);
         return documentModel;
       } finally {
-        // mark analysis completed, for all cases
+        // mark analysis completed, for all cases even the cancelled analysis
         documentModel.markAnalysisCompleted();
         if (Objects.equals(analysisResultsRevisions.get(uri), currentRevision) || force) {
           communications.publishDiagnostics(documentModelService.getOpenedDiagnostic());
@@ -209,13 +207,10 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
   }
 
   private void waitForPreviousAnalysisToBeCompleted(List<String> uris) throws InterruptedException {
-    boolean analysisInProgress;
-    do {
-      List<CobolDocumentModel> openDocuments = uris.stream().map(documentModelService::get).filter(CobolDocumentModel::isOpened).collect(Collectors.toList());
-      analysisInProgress = openDocuments.stream().anyMatch(model -> isAnalysisInProgress(model.getUri()));
-      LOG.debug("waiting for prev analysis of {} , to finish", openDocuments.stream().map(CobolDocumentModel::getUri).collect(Collectors.joining(", ")));
+    while (isAnyAnalysisInProgress(uris)) {
+      LOG.debug("Waiting for previous analysis to finish for: {}", String.join(", ", uris));
       TimeUnit.MILLISECONDS.sleep(100);
-    } while (analysisInProgress);
+    }
   }
 
   private void cancelRunningAnalysis(List<CobolDocumentModel> openDocuments) {
@@ -264,9 +259,16 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
     }
   }
 
+  private boolean isAnyAnalysisInProgress(List<String> uris) {
+    return uris.stream()
+            .map(documentModelService::get)
+            .filter(CobolDocumentModel::isOpened)
+            .anyMatch(model -> isAnalysisInProgress(model.getUri()));
+  }
+
   private boolean isAnalysisInProgress(String uri) {
     CobolDocumentModel document = documentModelService.get(uri);
-    LOG.debug("-- checking analysis in prigrss for {}", document.getUri());
+    LOG.debug("checking analysis in progress for {}", document.getUri());
     String id = makeId(document.getUri(), analysisResultsRevisions.get(document.getUri()));
     boolean analysisInProgress = analysisResults.containsKey(id);
     if (!analysisInProgress) {
