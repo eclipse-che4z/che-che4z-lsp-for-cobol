@@ -132,6 +132,14 @@ public abstract class CICSOptionsCheckBaseUtility {
     }
   }
 
+  /**
+   * Gets the locality of an element passed as a generic type. Only supports ParserRuleContext and
+   * TerminalNode.
+   *
+   * @param rule Rule to construct locality for
+   * @return The locality of the rule
+   * @param <E> Generic locality source type
+   */
   private <E> Locality getLocality(E rule) {
     if (ParserRuleContext.class.isAssignableFrom(rule.getClass()))
       return VisitorUtility.constructLocality((ParserRuleContext) rule, context);
@@ -188,8 +196,7 @@ public abstract class CICSOptionsCheckBaseUtility {
    * @param ctx Higher order context as ParserRuleContext to traverse for duplicates
    */
   protected void checkDuplicates(ParserRuleContext ctx) {
-    Set<String> foundEntries = new HashSet<>();
-    checkDuplicateEntries(ctx, foundEntries, baseDuplicateOptions);
+    checkDuplicates(ctx, null);
   }
 
   /**
@@ -203,7 +210,7 @@ public abstract class CICSOptionsCheckBaseUtility {
       ParserRuleContext ctx, Map<String, ErrorSeverity> customDuplicateOptions) {
     Set<String> foundEntries = new HashSet<>();
     Map<String, ErrorSeverity> updatedDuplicateOptions = new HashMap<>(baseDuplicateOptions);
-    updatedDuplicateOptions.putAll(customDuplicateOptions);
+    if (customDuplicateOptions != null) updatedDuplicateOptions.putAll(customDuplicateOptions);
     checkDuplicateEntries(ctx, foundEntries, updatedDuplicateOptions);
   }
 
