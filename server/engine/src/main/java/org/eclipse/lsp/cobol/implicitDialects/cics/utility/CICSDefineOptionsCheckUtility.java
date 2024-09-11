@@ -17,21 +17,70 @@ package org.eclipse.lsp.cobol.implicitDialects.cics.utility;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
+import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser;
 
 import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_define;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /** Checks CICS Define rules for required and invalid options */
 public class CICSDefineOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
 
   public static final int RULE_INDEX = RULE_cics_define;
 
+  private static final Map<String, ErrorSeverity> DUPLICATE_CHECK_OPTIONS =
+      new HashMap<String, ErrorSeverity>() {
+        {
+          put("DEFINE", ErrorSeverity.ERROR);
+          put("ACTIVITY", ErrorSeverity.ERROR);
+          put("EVENT", ErrorSeverity.ERROR);
+          put("TRANSID", ErrorSeverity.ERROR);
+          put("PROGRAM", ErrorSeverity.ERROR);
+          put("USERID", ErrorSeverity.ERROR);
+          put("ACTIVITYID", ErrorSeverity.ERROR);
+          put("COMPOSITE", ErrorSeverity.ERROR);
+          put("AND", ErrorSeverity.ERROR);
+          put("OR", ErrorSeverity.ERROR);
+          put("SUBEVENT1", ErrorSeverity.ERROR);
+          put("SUBEVENT2", ErrorSeverity.ERROR);
+          put("SUBEVENT3", ErrorSeverity.ERROR);
+          put("SUBEVENT4", ErrorSeverity.ERROR);
+          put("SUBEVENT5", ErrorSeverity.ERROR);
+          put("SUBEVENT6", ErrorSeverity.ERROR);
+          put("SUBEVENT7", ErrorSeverity.ERROR);
+          put("SUBEVENT8", ErrorSeverity.ERROR);
+          put("COUNTER", ErrorSeverity.ERROR);
+          put("DCOUNTER", ErrorSeverity.ERROR);
+          put("POOL", ErrorSeverity.ERROR);
+          put("VALUE", ErrorSeverity.ERROR);
+          put("MINIMUM", ErrorSeverity.ERROR);
+          put("MAXIMUM", ErrorSeverity.ERROR);
+          put("NOSUSPEND", ErrorSeverity.WARNING);
+          put("INPUT", ErrorSeverity.ERROR);
+          put("PROCESS", ErrorSeverity.ERROR);
+          put("PROCESSTYPE", ErrorSeverity.ERROR);
+          put("NOCHECK", ErrorSeverity.WARNING);
+          put("TIMER", ErrorSeverity.ERROR);
+          put("DAYS", ErrorSeverity.ERROR);
+          put("HOURS", ErrorSeverity.ERROR);
+          put("MINUTES", ErrorSeverity.ERROR);
+          put("SECONDS", ErrorSeverity.ERROR);
+          put("YEAR", ErrorSeverity.ERROR);
+          put("MONTH", ErrorSeverity.ERROR);
+          put("DAYOFMONTH", ErrorSeverity.ERROR);
+          put("DAYOFYEAR", ErrorSeverity.ERROR);
+          put("AFTER", ErrorSeverity.ERROR);
+          put("AT", ErrorSeverity.ERROR);
+          put("0N", ErrorSeverity.ERROR);
+        }
+      };
+
   public CICSDefineOptionsCheckUtility(DialectProcessingContext context, List<SyntaxError> errors) {
-    super(context, errors);
+    super(context, errors, DUPLICATE_CHECK_OPTIONS);
   }
 
   /**
@@ -54,21 +103,12 @@ public class CICSDefineOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     } else if (ctx.getClass() == CICSParser.Cics_define_timerContext.class) {
       checkDefineTimer((CICSParser.Cics_define_timerContext) ctx);
     }
+    checkDuplicates(ctx);
   }
 
   private void checkActivity(CICSParser.Cics_define_activityContext ctx) {
     checkHasMandatoryOptions(ctx.ACTIVITY(), ctx, "ACTIVITY");
     checkHasMandatoryOptions(ctx.TRANSID(), ctx, "TRANSID");
-
-    List<RuleContextData> contexts = new ArrayList<>();
-    contexts.add(new RuleContextData(ctx.ACTIVITY(), "ACTIVITY"));
-    contexts.add(new RuleContextData(ctx.EVENT(), "EVENT"));
-    contexts.add(new RuleContextData(ctx.TRANSID(), "TRANSID"));
-    contexts.add(new RuleContextData(ctx.PROGRAM(), "PROGRAM"));
-    contexts.add(new RuleContextData(ctx.USERID(), "USERID"));
-    contexts.add(new RuleContextData(ctx.ACTIVITYID(), "ACTIVITYID"));
-    harvestResponseHandlers(ctx.cics_handle_response(), contexts);
-    checkDuplicates(contexts);
   }
 
   private void checkCompositeEvent(CICSParser.Cics_define_composite_eventContext ctx) {
@@ -76,65 +116,22 @@ public class CICSDefineOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     checkHasMandatoryOptions(ctx.EVENT(), ctx, "EVENT");
     if (!ctx.OR().isEmpty()) checkHasIllegalOptions(ctx.AND(), "AND");
     else checkHasMandatoryOptions(ctx.AND(), ctx, "AND or OR");
-
-    List<RuleContextData> contexts = new ArrayList<>();
-    contexts.add(new RuleContextData(ctx.COMPOSITE(), "COMPOSITE"));
-    contexts.add(new RuleContextData(ctx.EVENT(), "EVENT"));
-    contexts.add(new RuleContextData(ctx.AND(), "AND"));
-    contexts.add(new RuleContextData(ctx.OR(), "OR"));
-    contexts.add(new RuleContextData(ctx.SUBEVENT1(), "SUBEVENT1"));
-    contexts.add(new RuleContextData(ctx.SUBEVENT2(), "SUBEVENT2"));
-    contexts.add(new RuleContextData(ctx.SUBEVENT3(), "SUBEVENT3"));
-    contexts.add(new RuleContextData(ctx.SUBEVENT4(), "SUBEVENT4"));
-    contexts.add(new RuleContextData(ctx.SUBEVENT5(), "SUBEVENT5"));
-    contexts.add(new RuleContextData(ctx.SUBEVENT6(), "SUBEVENT6"));
-    contexts.add(new RuleContextData(ctx.SUBEVENT7(), "SUBEVENT7"));
-    contexts.add(new RuleContextData(ctx.SUBEVENT8(), "SUBEVENT8"));
-    harvestResponseHandlers(ctx.cics_handle_response(), contexts);
-    checkDuplicates(contexts);
   }
 
   private void checkCounter(CICSParser.Cics_define_counter_dcounterContext ctx) {
     if (ctx.COUNTER().isEmpty()) checkHasMandatoryOptions(ctx.DCOUNTER(), ctx, "DCOUNTER");
     if (ctx.VALUE().isEmpty()) checkHasIllegalOptions(ctx.MINIMUM(), "MINIMUM");
-
-    List<RuleContextData> contexts = new ArrayList<>();
-    contexts.add(new RuleContextData(ctx.COUNTER(), "COUNTER"));
-    contexts.add(new RuleContextData(ctx.DCOUNTER(), "DCOUNTER"));
-    contexts.add(new RuleContextData(ctx.POOL(), "POOL"));
-    contexts.add(new RuleContextData(ctx.VALUE(), "VALUE"));
-    contexts.add(new RuleContextData(ctx.MINIMUM(), "MINIMUM"));
-    contexts.add(new RuleContextData(ctx.MAXIMUM(), "MAXIMUM"));
-    contexts.add(new RuleContextData(ctx.NOSUSPEND(), "NOSUSPEND"));
-    harvestResponseHandlers(ctx.cics_handle_response(), contexts);
-    checkDuplicates(contexts);
   }
 
   private void checkInputEvent(CICSParser.Cics_define_input_eventContext ctx) {
     checkHasMandatoryOptions(ctx.INPUT(), ctx, "INPUT");
     checkHasMandatoryOptions(ctx.EVENT(), ctx, "EVENT");
-
-    List<RuleContextData> contexts = new ArrayList<>();
-    contexts.add(new RuleContextData(ctx.INPUT(), "INPUT"));
-    contexts.add(new RuleContextData(ctx.EVENT(), "EVENT"));
-    harvestResponseHandlers(ctx.cics_handle_response(), contexts);
-    checkDuplicates(contexts);
   }
 
   private void checkDefineProcess(CICSParser.Cics_define_processContext ctx) {
     checkHasMandatoryOptions(ctx.PROCESS(), ctx, "PROCESS");
     checkHasMandatoryOptions(ctx.PROCESSTYPE(), ctx, "PROCESSTYPE");
     checkHasMandatoryOptions(ctx.TRANSID(), ctx, "TRANSID");
-
-    List<RuleContextData> contexts = new ArrayList<>();
-    contexts.add(new RuleContextData(ctx.PROCESS(), "PROCESS"));
-    contexts.add(new RuleContextData(ctx.PROCESSTYPE(), "PROCESSTYPE"));
-    contexts.add(new RuleContextData(ctx.TRANSID(), "TRANSID"));
-    contexts.add(new RuleContextData(ctx.PROGRAM(), "PROGRAM"));
-    contexts.add(new RuleContextData(ctx.USERID(), "USERID"));
-    contexts.add(new RuleContextData(ctx.NOCHECK(), "NOCHECK"));
-    harvestResponseHandlers(ctx.cics_handle_response(), contexts);
-    checkDuplicates(contexts);
   }
 
   private void checkDefineTimer(CICSParser.Cics_define_timerContext ctx) {
@@ -193,21 +190,5 @@ public class CICSDefineOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
       checkHasIllegalOptions(ctx.DAYOFMONTH(), "DAYOFMONTH");
       checkHasIllegalOptions(ctx.DAYS(), "DAYS");
     }
-
-    List<RuleContextData> contexts = new ArrayList<>();
-    contexts.add(new RuleContextData(ctx.TIMER(), "TIMER"));
-    contexts.add(new RuleContextData(ctx.EVENT(), "EVENT"));
-    contexts.add(new RuleContextData(ctx.AFTER(), "AFTER"));
-    contexts.add(new RuleContextData(ctx.AT(), "AT"));
-    contexts.add(new RuleContextData(ctx.DAYS(), "DAYS"));
-    contexts.add(new RuleContextData(ctx.HOURS(), "HOURS"));
-    contexts.add(new RuleContextData(ctx.MINUTES(), "MINUTES"));
-    contexts.add(new RuleContextData(ctx.SECONDS(), "SECONDS"));
-    contexts.add(new RuleContextData(ctx.DAYOFYEAR(), "DAYOFYEAR"));
-    contexts.add(new RuleContextData(ctx.DAYOFMONTH(), "DAYOFMONTH"));
-    contexts.add(new RuleContextData(ctx.YEAR(), "YEAR"));
-    contexts.add(new RuleContextData(ctx.MONTH(), "MONTH"));
-    contexts.add(new RuleContextData(ctx.ON(), "ON"));
-    harvestResponseHandlers(ctx.cics_handle_response(), contexts);
   }
 }
