@@ -101,16 +101,15 @@ public abstract class CICSOptionsCheckBaseUtility {
    * @return true if mandatory option found
    */
   protected boolean checkHasMandatoryOptions(List<?> rules, ParserRuleContext ctx, String options) {
-    boolean found = false;
     if (rules.isEmpty()) {
       throwException(
           ErrorSeverity.ERROR,
           VisitorUtility.constructLocality(ctx, context),
           "Missing required option: ",
           options);
-    } else found = true;
-
-    return found;
+      return false;
+    }
+    return true;
   }
 
   /**
