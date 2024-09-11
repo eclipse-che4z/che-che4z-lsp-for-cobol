@@ -791,9 +791,13 @@ cics_verify: VERIFY (PASSWORD cics_data_value | PHRASE cics_data_area PHRASELEN 
              EXPIRYTIME cics_data_area | INVALIDCOUNT cics_data_area | LASTUSETIME cics_data_area | cics_handle_response)+;
 
 /** WAIT CONVID / EVENT / EXTERNAL / JOURNALNAME / JOURNALNUM / SIGNAL / TERMINAL */
-cics_wait: WAIT (CONVID cics_name | STATE cics_cvda | EVENT | ECADDR cics_value | NAME cics_name | EXTERNAL | ECBLIST cics_value |
-           NUMEVENTS cics_data_value | PURGEABLE | BURGEABILITY cics_cvda | NOTPURGEABLE | NAME cics_name | JOURNALNAME cics_data_value |
-           REQID cics_data_value | SIGNAL | TERMINAL | CONVID cics_name | SESSION cics_name | cics_handle_response)+;
+cics_wait: WAIT (cics_wait_convid | cics_wait_event | cics_wait_external | cics_wait_journalname | cics_wait_signal | cics_wait_terminal)+;
+cics_wait_convid: (CONVID cics_name | STATE cics_cvda | cics_handle_response)+;
+cics_wait_event: (EVENT | ECADDR cics_value | NAME cics_name | cics_handle_response)+;
+cics_wait_external: (EXTERNAL | (ECBLIST | NUMEVENTS) cics_value | PURGEABILITY cics_cvda | NAME cics_name | PURGEABLE | NOTPURGEABLE | cics_handle_response)+;
+cics_wait_journalname: ((JOURNALNAME | JOURNALNUM) cics_value | REQID cics_value | cics_handle_response)+;
+cics_wait_signal: (SIGNAL | cics_handle_response)+;
+cics_wait_terminal: (TERMINAL | (CONVID | SESSION) cics_name | cics_handle_response)+;
 
 /** WAITCICS */
 cics_waitcics: WAITCICS (ECBLIST cics_value | NUMEVENTS cics_data_value | PURGEABLE | BURGEABILITY cics_cvda |
