@@ -21,6 +21,9 @@ import org.apache.commons.text.similarity.LevenshteinDistance;
 import java.util.Optional;
 
 import static java.util.Comparator.comparingInt;
+import static java.util.stream.Collectors.toList;
+
+import java.util.List;
 
 /**
  * Calculates a distance between a processing token and keyword from the list of suggestions using a
@@ -31,6 +34,9 @@ public class MisspelledKeywordDistance {
 
   public static final KeywordSuggestions KEYWORDS = new KeywordSuggestions();
   private static final LevenshteinDistance DISTANCE = LevenshteinDistance.getDefaultInstance();
+  private static final List<String> SORTED_KEYWORDS = KEYWORDS.getSuggestions().stream()
+      .sorted(comparingInt(s -> s.length())).collect(toList());
+  private static final int DIST_LIMIT = 2;
 
   /**
    * Calculate a distance between the given token and all the keywords and find the closest one.
@@ -39,10 +45,11 @@ public class MisspelledKeywordDistance {
    * @return the closest keyword or null if nothing found
    */
   public Optional<String> calculateDistance(String wrongToken) {
-    return KEYWORDS.getSuggestions().stream()
+    return SORTED_KEYWORDS.stream()
+        .filter(s -> Math.abs(s.length() - wrongToken.length()) < DIST_LIMIT)
         .map(item -> new Object[] {item, DISTANCE.apply(wrongToken, item)})
+        .filter(item -> (int) item[1] < DIST_LIMIT)
         .sorted(comparingInt(o -> (int) o[1]))
-        .filter(item -> (int) item[1] < 2)
         .map(item -> item[0].toString())
         .findFirst();
   }
