@@ -160,12 +160,13 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
         communications.notifyProgressBegin(uri);
         documentModelService.get(uri).setOutlineResult(null);
         analysisService.analyzeDocument(uri, text, open);
-        notifyAllListeners(AnalysisState.COMPLETED, documentModel, eventSource);
+        notifyAllListeners(AnalysisState.COMPLETED, documentModelService.get(uri), eventSource);
         analysisResults.remove(id);
         return documentModel;
       } catch (Exception genericException) { // Ideally we should not do this, but a safer catch might help to remove unknown issues
-        LOG.error("Encountered Exception {} , while analysing uri : {}", genericException, documentModel.getUri(), genericException);
-        return documentModel;
+        LOG.error("Encountered Exception {} , while analysing uri : {}", genericException, uri, genericException);
+        notifyAllListeners(AnalysisState.EXCEPTIONALLY_FINISHED, documentModelService.get(uri), eventSource);
+        return documentModelService.get(uri);
       } finally {
         // mark analysis completed, for all cases even the cancelled analysis
         documentModel.markAnalysisCompleted();
@@ -194,16 +195,24 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
   }
 
   /**
-   * Trigger reanalyse of opened programs.
+   * Trigger reanalyse of opened programs considering its triggered by IDE.
    */
   public void reanalyseOpenedPrograms() throws InterruptedException {
+    reanalyseOpenedPrograms(SourceUnitGraph.EventSource.IDE);
+  }
+
+  /**
+   * Trigger reanalyse of opened programs based on source event (IDE or FILE_SYSTEM).
+   * @param eventSource {@link org.eclipse.lsp.cobol.lsp.SourceUnitGraph.EventSource}
+   */
+  public void reanalyseOpenedPrograms(SourceUnitGraph.EventSource eventSource) throws InterruptedException {
     List<CobolDocumentModel> openDocuments = documentModelService.getAllOpened()
             .stream().filter(d -> !analysisService.isCopybook(d.getUri(), d.getText())).collect(Collectors.toList());
     copybookService.invalidateCache(true);
     subroutineService.invalidateCache();
     LOG.info("Cache invalidated");
     openDocuments
-            .forEach(doc -> scheduleAnalysis(doc.getUri(), doc.getText(), analysisResultsRevisions.getOrDefault(doc.getUri(), 0), false, true, SourceUnitGraph.EventSource.IDE));
+            .forEach(doc -> scheduleAnalysis(doc.getUri(), doc.getText(), analysisResultsRevisions.getOrDefault(doc.getUri(), 0), false, true, eventSource));
   }
 
   private void waitForPreviousAnalysisToBeCompleted(List<String> uris) throws InterruptedException {

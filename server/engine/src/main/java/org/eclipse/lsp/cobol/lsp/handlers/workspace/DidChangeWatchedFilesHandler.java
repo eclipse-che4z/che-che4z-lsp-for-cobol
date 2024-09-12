@@ -138,7 +138,7 @@ public class DidChangeWatchedFilesHandler {
 
   private void analyseAllOpenedDocument() {
     try {
-      asyncAnalysisService.reanalyseOpenedPrograms();
+      asyncAnalysisService.reanalyseOpenedPrograms(SourceUnitGraph.EventSource.FILE_SYSTEM);
     } catch (InterruptedException e) {
       throw new UserInterruptException("analysis interrupted by user");
     }
