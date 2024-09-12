@@ -15,13 +15,15 @@
 package org.eclipse.lsp.cobol.implicitDialects.cics.utility;
 
 import org.antlr.v4.runtime.ParserRuleContext;
+
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_allocate;
 
@@ -30,9 +32,28 @@ public class CICSAllocateOptionsCheckUtility extends CICSOptionsCheckBaseUtility
 
   public static final int RULE_INDEX = RULE_cics_allocate;
 
+  private static final Map<String, ErrorSeverity> DUPLICATE_CHECK_OPTIONS =
+      new HashMap<String, ErrorSeverity>() {
+        {
+          put("ALLOCATE", ErrorSeverity.ERROR);
+          put("SYSID", ErrorSeverity.ERROR);
+          put("PROFILE", ErrorSeverity.ERROR);
+          put("STATE", ErrorSeverity.ERROR);
+          put("SESSION", ErrorSeverity.ERROR);
+          put("PARTNER", ErrorSeverity.ERROR);
+          put("ASIS", ErrorSeverity.WARNING);
+          put("BUFFER", ErrorSeverity.WARNING);
+          put("LEAVEKB", ErrorSeverity.WARNING);
+          put("NOTRUNCATE", ErrorSeverity.WARNING);
+          put("NOQUEUE", ErrorSeverity.WARNING);
+          put("NOTRUNCATE", ErrorSeverity.WARNING);
+          put("TERMINAL", ErrorSeverity.WARNING);
+        }
+      };
+
   public CICSAllocateOptionsCheckUtility(
       DialectProcessingContext context, List<SyntaxError> errors) {
-    super(context, errors);
+    super(context, errors, DUPLICATE_CHECK_OPTIONS);
   }
 
   /**
@@ -49,36 +70,18 @@ public class CICSAllocateOptionsCheckUtility extends CICSOptionsCheckBaseUtility
     } else if (ctx.getClass() == CICSParser.Cics_allocate_lut61_sessionContext.class) {
       checkLut61Session((CICSParser.Cics_allocate_lut61_sessionContext) ctx);
     }
+    checkDuplicates(ctx);
   }
 
   private void checkAppcPartner(CICSParser.Cics_allocate_appc_partnerContext ctx) {
     checkHasMandatoryOptions(ctx.PARTNER(), ctx, "PARTNER");
-    List<RuleContextData> contexts = new ArrayList<>();
-    contexts.add(new RuleContextData(ctx.PARTNER(), "PARTNER"));
-    contexts.add(new RuleContextData(ctx.NOQUEUE(), "NOQUEUE", ErrorSeverity.WARNING));
-    contexts.add(new RuleContextData(ctx.STATE(), "STATE"));
-    harvestResponseHandlers(ctx.cics_handle_response(), contexts);
-    checkDuplicates(contexts);
   }
 
   private void checkAppcMroLut61Sysid(CICSParser.Cics_allocate_appc_mro_lut61_sysidContext ctx) {
     checkHasMandatoryOptions(ctx.SYSID(), ctx, "SYSID");
-    List<RuleContextData> contexts = new ArrayList<>();
-    contexts.add(new RuleContextData(ctx.SYSID(), "SYSID"));
-    contexts.add(new RuleContextData(ctx.PROFILE(), "PROFILE"));
-    contexts.add(new RuleContextData(ctx.NOQUEUE(), "NOQUEUE", ErrorSeverity.WARNING));
-    contexts.add(new RuleContextData(ctx.STATE(), "STATE"));
-    harvestResponseHandlers(ctx.cics_handle_response(), contexts);
-    checkDuplicates(contexts);
   }
 
   private void checkLut61Session(CICSParser.Cics_allocate_lut61_sessionContext ctx) {
     checkHasMandatoryOptions(ctx.SESSION(), ctx, "SESSION");
-    List<RuleContextData> contexts = new ArrayList<>();
-    contexts.add(new RuleContextData(ctx.SESSION(), "SESSION"));
-    contexts.add(new RuleContextData(ctx.PROFILE(), "PROFILE"));
-    contexts.add(new RuleContextData(ctx.NOQUEUE(), "NOQUEUE", ErrorSeverity.WARNING));
-    harvestResponseHandlers(ctx.cics_handle_response(), contexts);
-    checkDuplicates(contexts);
   }
 }

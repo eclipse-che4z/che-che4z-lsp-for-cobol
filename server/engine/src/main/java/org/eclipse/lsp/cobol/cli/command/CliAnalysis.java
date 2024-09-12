@@ -72,6 +72,12 @@ public class CliAnalysis implements Callable<Integer> {
     @CommandLine.ArgGroup(exclusive = false)
     private ExtendedSourceConfig extendedSourceConfig = new ExtendedSourceConfig();
 
+    @CommandLine.Option(
+            description = "Repeat analysis",
+            names = {"--repeat"},
+            defaultValue = "1")
+    private int repeat = 1;
+
 
     @Override
     public Integer call() throws Exception {
@@ -92,25 +98,36 @@ public class CliAnalysis implements Callable<Integer> {
 
         cliClientProvider.setCpyPaths(createCopybooksPaths());
         cliClientProvider.setCpyExt(createCopybooksExtensions());
-        JsonObject result = new JsonObject();
-        result.addProperty("uri", (inputConfig.useStdin) ? "N/A (User Input)" : inputConfig.src.toURI().toString());
-        result.addProperty("language", dialect.getId());
         try {
-            Cli.Result analysisResult = parent.runAnalysis(inputConfig.src, dialect, diCtx, true);
-            parent.addTiming(result, analysisResult.ctx.getBenchmarkSession());
-            if (!hideDiagnostics) {
-                generateDiagnostics(analysisResult, result);
-            }
-            collectGcAndMemoryStats(result);
-            System.out.println(CliUtils.GSON.toJson(result));
+            for (int i = 0; i < repeat; ++i) {
+                JsonObject result = createResultJson();
 
-            handleExtendedSource(analysisResult);
+                Cli.Result analysisResult = parent.runAnalysis(inputConfig.src, dialect, diCtx, true);
+                parent.addTiming(result, analysisResult.ctx.getBenchmarkSession());
+                if (!hideDiagnostics) {
+                    generateDiagnostics(analysisResult, result);
+                }
+                collectGcAndMemoryStats(result);
+                System.out.println(CliUtils.GSON.toJson(result));
+
+                handleExtendedSource(analysisResult);
+            }
             return Cli.SUCCESS;
         } catch (Exception e) {
+            JsonObject result = createResultJson();
             result.addProperty("crash", e.getMessage() != null && e.getMessage().isEmpty() ? "error" : e.getMessage());
             System.out.println(CliUtils.GSON.toJson(result));
             return Cli.FAILURE;
         }
+    }
+
+    private JsonObject createResultJson() {
+        JsonObject result = new JsonObject();
+
+        result.addProperty("uri", (inputConfig.useStdin) ? "N/A (User Input)" : inputConfig.src.toURI().toString());
+        result.addProperty("language", dialect.getId());
+
+        return result;
     }
 
     private void generateDiagnostics(Cli.Result analysisResult, JsonObject result) {
