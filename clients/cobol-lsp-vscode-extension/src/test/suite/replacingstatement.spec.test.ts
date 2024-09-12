@@ -26,9 +26,13 @@ suite("TF35623: Support for Replacing and Mapping statement", function () {
     await helper.activate();
   });
 
-  this.beforeEach(async () => {
+  this.afterEach(async () => {
     await helper.closeAllEditors();
   });
+
+  this.afterAll(async () => await helper.closeAllEditors()).timeout(
+    helper.TEST_TIMEOUT,
+  );
 
   test("TC248045: Replacing Basic Scenario", async () => {
     const extSrcPath = path.join("TEST1.CBL");

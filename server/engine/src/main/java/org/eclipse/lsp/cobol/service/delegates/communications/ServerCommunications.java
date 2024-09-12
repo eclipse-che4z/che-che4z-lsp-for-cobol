@@ -23,6 +23,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -56,7 +57,7 @@ import org.eclipse.lsp4j.jsonrpc.messages.Either;
 @Slf4j
 public class ServerCommunications implements Communications {
 
-  private final Set<String> uriInProgress = new HashSet<>();
+  private final Set<String> uriInProgress = Collections.synchronizedSet(new HashSet<>());
   private final MessageService messageService;
   private final Provider<CobolLanguageClient> provider;
   private final FileSystemService files;

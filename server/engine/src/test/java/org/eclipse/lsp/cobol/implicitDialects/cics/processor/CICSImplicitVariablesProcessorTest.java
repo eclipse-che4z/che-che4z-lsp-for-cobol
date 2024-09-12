@@ -57,11 +57,11 @@ class CICSImplicitVariablesProcessorTest {
   @Test
   void testWorkingSectionWhenCicsTranslateEnabled() {
     SectionNode sectionNode =
-        new SectionNode(Locality.builder().build(), SectionType.WORKING_STORAGE);
+            new SectionNode(Locality.builder().build(), SectionType.WORKING_STORAGE);
     sectionNode.setParent(new ProgramNode(Locality.builder().build(), ProgramSubtype.Program, 0));
 
     processor.accept(sectionNode, processingContext);
     verify(variableAccumulator, times(CICS_INTRODUCED_REGISTERS_COUNT))
-        .addVariableDefinition(any(), any());
+            .addVariableDefinition(any(), any());
   }
 }

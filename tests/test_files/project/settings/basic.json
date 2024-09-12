@@ -11,5 +11,6 @@
         ".copybooks"
       ],
     "cobol-lsp.cpy-manager.paths-dsn": [],
-    "editor.snippetSuggestions": "top"
+    "editor.snippetSuggestions": "top",
+    "files.autoSave": "off"
 }

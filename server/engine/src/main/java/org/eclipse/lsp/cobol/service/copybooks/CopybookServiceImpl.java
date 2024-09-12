@@ -138,6 +138,7 @@ public class CopybookServiceImpl implements CopybookService {
   private CopybookModel getFromCache(String programDocumentUri, CopybookId copybookId,
                                      CopybookName copybookName, CleanerPreprocessor preprocessor) throws ExecutionException {
     return copybookCache.get(copybookId, () -> {
+      ThreadInterruptionUtil.checkThreadInterrupted();
       CopybookModel copybookModel = resolveSync(copybookName, programDocumentUri);
       if (preprocessor != null && copybookModel.getUri() != null) {
         ResultWithErrors<CopybookModel> copybookModelResultWithErrors = cleanupCopybook(copybookModel, preprocessor);
@@ -180,6 +181,7 @@ public class CopybookServiceImpl implements CopybookService {
   }
 
   private Optional<CopybookModel> tryResolvePredefinedCopybook(CopybookName copybookName) {
+    ThreadInterruptionUtil.checkThreadInterrupted();
     CopybookName predefineCopybookName = new CopybookName(copybookName.getDisplayName().toUpperCase(), copybookName.getDialectType(), copybookName.getExtension());
     CopybookId copybookId = predefineCopybookName.toCopybookId(ImplicitCodeUtils.createFullUrl(predefineCopybookName.getDisplayName()));
     try {
@@ -221,7 +223,7 @@ public class CopybookServiceImpl implements CopybookService {
         "Trying to resolve copybook copybook {} for {} from workspace",
         copybookName,
         files.getNameFromURI(programUri));
-
+    ThreadInterruptionUtil.checkThreadInterrupted();
     final Optional<CopybookModel> copybookModel =
         resolveCopybookFromWorkspace(copybookName, programUri)
                 .map(uri -> loadCopybook(uri, copybookName, programUri));
