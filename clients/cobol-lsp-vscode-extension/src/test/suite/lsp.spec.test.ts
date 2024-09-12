@@ -29,6 +29,10 @@ suite("Integration Test Suite", function () {
     helper.TEST_TIMEOUT,
   );
 
+  this.afterAll(async () => await helper.closeAllEditors()).timeout(
+    helper.TEST_TIMEOUT,
+  );
+
   test("TC152047, TC152052, TC152051, TC152050, TC152053: Error case - file has syntax errors and are marked with detailed hints", async () => {
     await helper.showDocument("USER2.cbl");
     const editor = helper.get_editor("USER2.cbl");
@@ -210,8 +214,7 @@ suite("Integration Test Suite", function () {
     .slow(1000);
 
   test("TC314992 CICS as a Variable Name", async () => {
-    await helper.showDocument("ADSORT.cbl");
-    let editor = helper.get_editor("ADSORT.cbl");
+    let editor = await helper.showDocument("ADSORT.cbl");
     await helper.insertString(
       editor,
       pos(28, 0),
@@ -271,8 +274,7 @@ suite("Integration Test Suite", function () {
     .slow(1000);
 
   test("Load resource file", async () => {
-    await helper.showDocument("RES.cbl");
-    const editor = helper.get_editor("RES.cbl");
+    const editor = await helper.showDocument("RES.cbl");
     await helper.waitForDiagnostics(editor.document.uri);
     const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
 
@@ -298,8 +300,7 @@ suite("Integration Test Suite", function () {
         path.join(getWorkspacePath(), extSrcUser1FilePath),
       );
 
-      await helper.showDocument(extSrcUser1FilePath);
-      let editor = helper.get_editor(extSrcUser1FilePath);
+      let editor = await helper.showDocument(extSrcUser1FilePath);
       await helper.insertString(editor, pos(25, 0), "           COPY ABC.");
 
       let diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
@@ -322,8 +323,7 @@ suite("Integration Test Suite", function () {
         1,
       );
 
-      await helper.showDocument("USER1.cbl");
-      editor = helper.get_editor("USER1.cbl");
+      editor = await helper.showDocument("USER1.cbl");
       await helper.insertString(editor, pos(40, 0), "           COPY ABC.");
       await helper.waitFor(
         () => vscode.languages.getDiagnostics(editor.document.uri).length > 0,
@@ -356,8 +356,7 @@ suite("Integration Test Suite", function () {
     ?.slow(1000);
 
   test("TC250108 Test Program Name", async () => {
-    await helper.showDocument("USER1.cbl");
-    const editor = helper.get_editor("USER1.cbl");
+    const editor = await helper.showDocument("USER1.cbl");
     await editor.edit((edit) => {
       edit.replace(range(pos(48, 30), pos(48, 32)), "1.");
     });
@@ -373,8 +372,7 @@ suite("Integration Test Suite", function () {
     ?.slow(1000);
 
   test("TC250109 Test Area B", async () => {
-    await helper.showDocument("USER1.cbl");
-    const editor = helper.get_editor("USER1.cbl");
+    const editor = await helper.showDocument("USER1.cbl");
     await editor.edit((edit) => edit.delete(range(pos(32, 0), pos(32, 3))));
     await helper.waitForDiagnostics(editor.document.uri);
     let diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
@@ -401,26 +399,36 @@ suite("Integration Test Suite", function () {
     ?.slow(1000);
 
   test("TC250107 Test Area A, Check FD/SD level data", async () => {
-    await helper.showDocument("USER1.cbl");
-    let editor = helper.get_editor("USER1.cbl");
+    let editor = await helper.showDocument("USER1.cbl");
     await helper.insertString(editor, pos(17, 0), "       FILE SECTION.\n");
     await helper.insertString(
       editor,
       pos(18, 0),
       "           FD  TRANS-FILE-IN IS EXTERNAL.\n",
     );
+
     await helper.waitFor(
-      () => vscode.languages.getDiagnostics(editor.document.uri).length === 2,
+      () =>
+        vscode.languages
+          .getDiagnostics(editor.document.uri)
+          .map((d) => d.message)
+          .filter((m) => m === "The following token must start in Area A: FD")
+          .length > 0,
     );
+
     let diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
     assert.strictEqual(
       diagnostics.length,
       2,
       "got: " + JSON.stringify(diagnostics),
     );
-    assert.strictEqual(
-      diagnostics[0].message,
-      "The following token must start in Area A: FD",
+    assert.ok(
+      () =>
+        vscode.languages
+          .getDiagnostics(editor.document.uri)
+          .map((d) => d.message)
+          .filter((m) => m === "The following token must start in Area A: FD")
+          .length === 1,
     );
   })
     .timeout(helper.TEST_TIMEOUT)

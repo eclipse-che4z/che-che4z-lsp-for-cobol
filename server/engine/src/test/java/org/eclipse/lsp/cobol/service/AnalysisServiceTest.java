@@ -84,7 +84,7 @@ class AnalysisServiceTest {
   }
 
   @Test
-  void testAnalyzeDocument_copybook() {
+  void testAnalyzeDocument_copybook() throws InterruptedException {
     String uri = UUID.randomUUID().toString();
     String text = UUID.randomUUID().toString();
     when(copybookIdentificationService.isCopybook(any(), any(), any())).thenReturn(true);
@@ -95,7 +95,7 @@ class AnalysisServiceTest {
   }
 
   @Test
-  void testAnalyzeDocument_program() {
+  void testAnalyzeDocument_program() throws InterruptedException {
     AnalysisResult result = mock(AnalysisResult.class);
     when(result.getRootNode()).thenReturn(new RootNode());
 
@@ -112,7 +112,7 @@ class AnalysisServiceTest {
   }
 
   @Test
-  void testReanalyzeDocument_copybook() {
+  void testReanalyzeDocument_copybook() throws InterruptedException {
     String uri = UUID.randomUUID().toString();
     String text = UUID.randomUUID().toString();
     when(copybookIdentificationService.isCopybook(any(), any(), any())).thenReturn(true);
@@ -122,7 +122,7 @@ class AnalysisServiceTest {
   }
 
   @Test
-  void testReanalyzeDocument_program() {
+  void testReanalyzeDocument_program() throws InterruptedException {
     String uri = UUID.randomUUID().toString();
     String text = UUID.randomUUID().toString();
     when(copybookIdentificationService.isCopybook(any(), any(), any())).thenReturn(false);
