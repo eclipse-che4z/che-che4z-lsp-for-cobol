@@ -130,7 +130,7 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
       // initiate cancel on prev running analysis
       cancelRunningAnalysis(ImmutableList.of(documentModel));
     }
-    FutureTask<CobolDocumentModel> futureTask = new FutureTask<>(scheduleAnalysis(uri, documentModel, text, currentRevision, open, force, eventSource, id));
+    FutureTask<CobolDocumentModel> futureTask = new FutureTask<>(scheduleAnalysis(uri, text, currentRevision, open, force, eventSource, id));
     analysisResults.put(id, futureTask);
     analysisExecutor.submit(futureTask);
     if (prevId != null && !force) {
@@ -139,7 +139,7 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
     return futureTask;
   }
 
-  private Callable<CobolDocumentModel> scheduleAnalysis(String uri, CobolDocumentModel documentModel, String text, Integer currentRevision, boolean open, boolean force, SourceUnitGraph.EventSource eventSource, String id) {
+  private Callable<CobolDocumentModel> scheduleAnalysis(String uri, String text, Integer currentRevision, boolean open, boolean force, SourceUnitGraph.EventSource eventSource, String id) {
     return () -> {
       if (currentRevision < analysisResultsRevisions.get(uri) && !force) {
         notifyAllListeners(
@@ -153,8 +153,6 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
       }
       LOG.debug("[scheduleAnalysis] waiting for previous analysis of {} to finish", uri);
       try {
-        waitForPreviousAnalysisToBeCompleted(ImmutableList.of(uri));
-        documentModel.markAnalysisInProgress();
         LOG.debug("[scheduleAnalysis] Start analysis: " + uri);
         notifyAllListeners(AnalysisState.STARTED, documentModelService.get(uri), eventSource);
         communications.notifyProgressBegin(uri);
@@ -162,14 +160,12 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
         analysisService.analyzeDocument(uri, text, open);
         notifyAllListeners(AnalysisState.COMPLETED, documentModelService.get(uri), eventSource);
         analysisResults.remove(id);
-        return documentModel;
+        return documentModelService.get(uri);
       } catch (Exception genericException) { // Ideally we should not do this, but a safer catch might help to remove unknown issues
         LOG.error("Encountered Exception {} , while analysing uri : {}", genericException, uri, genericException);
         notifyAllListeners(AnalysisState.EXCEPTIONALLY_FINISHED, documentModelService.get(uri), eventSource);
         return documentModelService.get(uri);
       } finally {
-        // mark analysis completed, for all cases even the cancelled analysis
-        documentModel.markAnalysisCompleted();
         if (Objects.equals(analysisResultsRevisions.get(uri), currentRevision) || force) {
           communications.publishDiagnostics(documentModelService.getOpenedDiagnostic());
         }
@@ -179,6 +175,14 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
   }
 
 
+  /**
+   * IMPORTANT:
+   *  1. Never shutdown or terminate Executor service as we rely on this for synchronization
+   *  2. Each uri will always have a singleThreadExecutor and should not be modified as we rely on this for synchronization
+   *
+   * @param uri
+   * @return
+   */
   private ExecutorService getExecutor(String uri) {
     synchronized (analysisExecutors) {
       ExecutorService analysisExecutor = analysisExecutors.computeIfAbsent(uri, u -> Executors.newSingleThreadExecutor(THREAD_FACTORY));
@@ -213,13 +217,6 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
     LOG.info("Cache invalidated");
     openDocuments
             .forEach(doc -> scheduleAnalysis(doc.getUri(), doc.getText(), analysisResultsRevisions.getOrDefault(doc.getUri(), 0), false, true, eventSource));
-  }
-
-  private void waitForPreviousAnalysisToBeCompleted(List<String> uris) throws InterruptedException {
-    while (isAnyAnalysisInProgress(uris)) {
-      LOG.debug("Waiting for previous analysis to finish for: {}", String.join(", ", uris));
-      TimeUnit.MILLISECONDS.sleep(100);
-    }
   }
 
   private void cancelRunningAnalysis(List<CobolDocumentModel> openDocuments) {
@@ -266,24 +263,6 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
       CobolDocumentModel document = documentModelService.get(uri);
       scheduleAnalysis(uri, document.getText(), analysisResultsRevisions.get(document.getUri()), false, true, eventSource);
     }
-  }
-
-  private boolean isAnyAnalysisInProgress(List<String> uris) {
-    return uris.stream()
-            .map(documentModelService::get)
-            .filter(CobolDocumentModel::isOpened)
-            .anyMatch(model -> isAnalysisInProgress(model.getUri()));
-  }
-
-  private boolean isAnalysisInProgress(String uri) {
-    CobolDocumentModel document = documentModelService.get(uri);
-    LOG.debug("checking analysis in progress for {}", document.getUri());
-    String id = makeId(document.getUri(), analysisResultsRevisions.get(document.getUri()));
-    boolean analysisInProgress = analysisResults.containsKey(id);
-    if (!analysisInProgress) {
-      return false;
-    }
-    return document.getIsAnalysisInProgress().get();
   }
 
   /**
