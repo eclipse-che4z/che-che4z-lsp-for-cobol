@@ -22,7 +22,9 @@ import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_converse;
 
@@ -31,9 +33,40 @@ public class CICSConverseOptionsCheckUtility extends CICSOptionsCheckBaseUtility
 
     public static final int RULE_INDEX = RULE_cics_converse;
 
+    private static final Map<String, ErrorSeverity> DUPLICATE_CHECK_OPTIONS =
+            new HashMap<String, ErrorSeverity>() {
+                {
+                    put("FROM", ErrorSeverity.ERROR);
+                    put("FROMLENGTH", ErrorSeverity.ERROR);
+                    put("FROMFLENGTH", ErrorSeverity.ERROR);
+                    put("INTO", ErrorSeverity.ERROR);
+                    put("SET", ErrorSeverity.ERROR);
+                    put("TOLENGTH", ErrorSeverity.ERROR);
+                    put("TOFLENGTH", ErrorSeverity.ERROR);
+                    put("MAXLENGTH", ErrorSeverity.ERROR);
+                    put("MAXFLENGTH", ErrorSeverity.ERROR);
+                    put("NOTRUNCATE", ErrorSeverity.ERROR);
+                    put("DEFRESP", ErrorSeverity.ERROR);
+                    put("STRFIELD", ErrorSeverity.ERROR);
+                    put("CTLCHAR", ErrorSeverity.ERROR);
+                    put("LINEADDR", ErrorSeverity.ERROR);
+                    put("LDC", ErrorSeverity.ERROR);
+                    put("FMH", ErrorSeverity.ERROR);
+                    put("LEAVEKB", ErrorSeverity.ERROR);
+                    put("ASIS", ErrorSeverity.ERROR);
+                    put("CONVID", ErrorSeverity.ERROR);
+                    put("SESSION", ErrorSeverity.ERROR);
+                    put("ATTACHID", ErrorSeverity.ERROR);
+                    put("STATE", ErrorSeverity.ERROR);
+                    put("ERASE", ErrorSeverity.ERROR);
+                    put("DEFAULT", ErrorSeverity.ERROR);
+                    put("ALTERNATE", ErrorSeverity.ERROR);
+                }
+            };
+
     public CICSConverseOptionsCheckUtility(
             DialectProcessingContext context, List<SyntaxError> errors) {
-        super(context, errors);
+        super(context, errors, DUPLICATE_CHECK_OPTIONS);
     }
 
     /**
@@ -56,33 +89,14 @@ public class CICSConverseOptionsCheckUtility extends CICSOptionsCheckBaseUtility
             checkHasIllegalOptions(ctx.LEAVEKB(), "LEAVEKB");
         }
 
-        List<RuleContextData> contexts = new ArrayList<>();
-        contexts.add(new RuleContextData(ctx.cics_into(), "INTO"));
-        contexts.add(new RuleContextData(ctx.cics_maxlength(), "MAXLENGTH or MAXFLENGTH"));
-        contexts.add(new RuleContextData(ctx.ASIS(), "ASIS", ErrorSeverity.WARNING));
-        contexts.add(new RuleContextData(ctx.DEFRESP(), "BUFFER", ErrorSeverity.WARNING));
-        contexts.add(new RuleContextData(ctx.NOTRUNCATE(), "NOTRUNCATE", ErrorSeverity.WARNING));
-        contexts.add(new RuleContextData(ctx.LEAVEKB(), "LEAVEKB", ErrorSeverity.WARNING));
-        contexts.add(new RuleContextData(ctx.cics_handle_response(), "RESPONSE HANDLER"));
-        harvestResponseHandlers(ctx.cics_handle_response(), contexts);
-        checkDuplicates(contexts);
+        checkDuplicates(ctx);
     }
 
     private void checkGroupTwo(CICSParser.Cics_converse_group_twoContext ctx) {
         checkHasMandatoryOptions(ctx.cics_converse_from(), ctx, "FROM");
         checkHasMandatoryOptions(ctx.cics_into(), ctx, "INTO");
 
-        List<RuleContextData> contexts = new ArrayList<>();
-        contexts.add(new RuleContextData(ctx.CONVID(), "CONVID"));
-        contexts.add(new RuleContextData(ctx.SESSION(), "SESSION"));
-        contexts.add(new RuleContextData(ctx.cics_into(), "INTO"));
-        contexts.add(new RuleContextData(ctx.cics_converse_to(), "TOLENGTH or TOFLENGTH"));
-        contexts.add(new RuleContextData(ctx.cics_maxlength(), "MAXLENGTH or MAXFLENGTH"));
-        contexts.add(new RuleContextData(ctx.NOTRUNCATE(), "NOTRUNCATE", ErrorSeverity.WARNING));
-        contexts.add(new RuleContextData(ctx.STATE(), "STATE"));
-        contexts.add(new RuleContextData(ctx.cics_handle_response(), "RESPONSE HANDLER"));
-        harvestResponseHandlers(ctx.cics_handle_response(), contexts);
-        checkDuplicates(contexts);
+        checkDuplicates(ctx);
     }
 
 }
