@@ -21,6 +21,7 @@ import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -158,16 +159,11 @@ public class CICSExtractOptionsUtility extends CICSOptionsCheckBaseUtility {
 
   private void checkAttach(CICSParser.Cics_extract_attachContext ctx) {
     checkHasMandatoryOptions(ctx.ATTACH(), ctx, "ATTACH");
-    if (!ctx.ATTACHID().isEmpty()) {
-      checkHasIllegalOptions(ctx.CONVID(), "CONVID with ATTACHID");
-      checkHasIllegalOptions(ctx.SESSION(), "SESSION with ATTACHID");
-    } else if (!ctx.CONVID().isEmpty()) {
-      checkHasIllegalOptions(ctx.ATTACHID(), "ATTACHID with CONVID");
-      checkHasIllegalOptions(ctx.SESSION(), "SESSION with CONVID");
-    } else if (!ctx.SESSION().isEmpty()) {
-      checkHasIllegalOptions(ctx.ATTACHID(), "ATTACHID with SESSION");
-      checkHasIllegalOptions(ctx.CONVID(), "CONVID with ATTACHID");
-    }
+    checkMutuallyExclusiveOptions(
+        "ATTACHID CONVID SESSION",
+        new ArrayList<>(ctx.ATTACH()),
+        new ArrayList<>(ctx.CONVID()),
+        new ArrayList<>(ctx.SESSION()));
   }
 
   private void checkAttributes(CICSParser.Cics_extract_attributesContext ctx) {
@@ -179,14 +175,15 @@ public class CICSExtractOptionsUtility extends CICSOptionsCheckBaseUtility {
 
   private void checkCertificate(CICSParser.Cics_extract_certificateContext ctx) {
     checkHasMandatoryOptions(ctx.CERTIFICATE(), ctx, "CERTIFICATE");
-    if (!ctx.OWNER().isEmpty()) checkHasIllegalOptions(ctx.ISSUER(), "ISSUER with OWNER");
+    checkMutuallyExclusiveOptions(
+        "ISSUER OWNER", new ArrayList<>(ctx.ISSUER()), new ArrayList<>(ctx.OWNER()));
   }
 
   private void checkLogonMsg(CICSParser.Cics_extract_logonmessageContext ctx) {
     checkHasMandatoryOptions(ctx.LOGONMSG(), ctx, "LOGONMSG");
     checkHasMandatoryOptions(ctx.LENGTH(), ctx, "LENGTH");
-    if (!ctx.INTO().isEmpty()) checkHasIllegalOptions(ctx.SET(), "SET with INTO");
-    else checkHasMandatoryOptions(ctx.SET(), ctx, "INTO or SET");
+    checkHasExactlyOneOption(
+        "INTO or SET", ctx, new ArrayList<>(ctx.INTO()), new ArrayList<>(ctx.SET()));
   }
 
   private void checkProcess(CICSParser.Cics_extract_processContext ctx) {
@@ -217,7 +214,8 @@ public class CICSExtractOptionsUtility extends CICSOptionsCheckBaseUtility {
     checkHasMandatoryOptions(ctx.TCT(), ctx, "TCT");
     checkHasMandatoryOptions(ctx.NETNAME(), ctx, "NETNAME");
 
-    if (!ctx.SYSID().isEmpty()) checkHasIllegalOptions(ctx.TERMID(), "TERMID with SYSID");
+    checkMutuallyExclusiveOptions(
+        "TERMID SYSID", new ArrayList<>(ctx.TERMID()), new ArrayList<>(ctx.SYSID()));
   }
 
   private void checkWebClient(CICSParser.Cics_extract_web_clientContext ctx) {

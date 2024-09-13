@@ -230,4 +230,44 @@ public abstract class CICSOptionsCheckBaseUtility {
     updatedDuplicateOptions.putAll(customDuplicateOptions);
     checkDuplicateEntries(ctx, foundEntries, updatedDuplicateOptions);
   }
+
+  /**
+   * Helper function to check and see if more than one rule was visited out of a set provided.
+   *
+   * @param options Options checked to insert into error message
+   * @param rules Generic lists of rule lists to check. Will be a collection of ParserRuleContext
+   *     and/or TerminalNode objects.
+   * @param <E> List of Generics to allow cross-rule context collection.
+   * @return True if ex
+   */
+  protected <E> boolean checkMutuallyExclusiveOptions(String options, List<E>... rules) {
+    boolean foundNonEmpty = false;
+    for (List<E> option : rules) {
+      if (option.isEmpty()) continue;
+      if (foundNonEmpty) {
+        option.forEach(
+            rule -> {
+              throwException(
+                  ErrorSeverity.ERROR,
+                  getLocality(rule),
+                  "Exactly one option required, options are mutually exclusive: ",
+                  options);
+            });
+        return false;
+      }
+      foundNonEmpty = true;
+    }
+    return !foundNonEmpty;
+  }
+
+  protected <E> void checkHasExactlyOneOption(
+      String options, ParserRuleContext parentCtx, List<E>... rules) {
+    if (checkMutuallyExclusiveOptions(options, rules)) {
+      throwException(
+          ErrorSeverity.ERROR,
+          getLocality(parentCtx),
+          "Exactly one option required, none provided: ",
+          options);
+    }
+  }
 }
