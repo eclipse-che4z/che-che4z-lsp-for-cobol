@@ -114,12 +114,14 @@ public class CICSDefineOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
   private void checkCompositeEvent(CICSParser.Cics_define_composite_eventContext ctx) {
     checkHasMandatoryOptions(ctx.COMPOSITE(), ctx, "COMPOSITE");
     checkHasMandatoryOptions(ctx.EVENT(), ctx, "EVENT");
-    if (!ctx.OR().isEmpty()) checkHasIllegalOptions(ctx.AND(), "AND");
+    if (!ctx.OR().isEmpty()) checkHasIllegalOptions(ctx.AND(), "AND with OR");
     else checkHasMandatoryOptions(ctx.AND(), ctx, "AND or OR");
   }
 
   private void checkCounter(CICSParser.Cics_define_counter_dcounterContext ctx) {
-    if (ctx.COUNTER().isEmpty()) checkHasMandatoryOptions(ctx.DCOUNTER(), ctx, "DCOUNTER");
+    if (ctx.COUNTER().isEmpty())
+      checkHasMandatoryOptions(ctx.DCOUNTER(), ctx, "COUNTER or DCOUNTER");
+    else checkHasIllegalOptions(ctx.DCOUNTER(), "DCOUNTER with COUNTER");
     if (ctx.VALUE().isEmpty()) checkHasIllegalOptions(ctx.MINIMUM(), "MINIMUM");
   }
 
