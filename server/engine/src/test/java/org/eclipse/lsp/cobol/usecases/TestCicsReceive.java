@@ -241,9 +241,13 @@ public class TestCicsReceive {
     "INPARTN({$abc})"
   };
 
-  private static final String[] MAP_PARTIAL_OPTIONS_VALID_ONE = {"RECEIVE", "MAP({$abc})", "ASIS"};
+  private static final String[] MAP_PARTIAL_OPTIONS_VALID_ONE = {
+    "RECEIVE", "INTO({$def})", "MAP({$abc})", "ASIS"
+  };
 
-  private static final String[] MAP_INVALID_ONE = {"RECEIVE", "MAP", "{LENGTH|error1}(100)"};
+  private static final String[] MAP_INVALID_ONE = {
+    "RECEIVE", "MAP(100)", "INTO(100)", "{LENGTH|error1}(100)"
+  };
 
   private static final String[] MAP_MAPPINGDEV_FULL_OPTIONS_VALID_ONE = {
     "RECEIVE",
@@ -256,19 +260,19 @@ public class TestCicsReceive {
   };
 
   private static final String[] MAP_MAPPINGDEV_PARTIAL_OPTIONS_VALID_ONE = {
-    "RECEIVE", "MAP({$abc})", "MAPPINGDEV({$def})", "FROM({$abc})",
+    "RECEIVE", "MAP({$abc})", "INTO({$def})", "MAPPINGDEV({$def})", "FROM({$abc})",
   };
 
   private static final String[] MAP_MAPPINGDEV_INVALID_ONE = {
-    "RECEIVE", "{MAP(1)", "MAPPINGDEV(100)", "MAPSET(1)|error1}"
+    "RECEIVE", "{MAP(1)", "INTO(100)", "MAPPINGDEV(100)", "MAPSET(1)|error1}"
   };
 
   private static final String[] MAP_RESPONSE_HANDLER_DUPLICATE_INVALID = {
-    "RECEIVE", "MAP(1)", "RESP(100)", "{RESP|errorOne}(100)"
+    "RECEIVE", "MAP(1)", "INTO(100)", "RESP(100)", "{RESP|errorOne}(100)"
   };
 
   private static final String[] MAP_RESPONSE_HANDLER_DUPLICATE_INVALID_TWO = {
-    "RECEIVE", "MAP(1)", "NOHANDLE", "{NOHANDLE|errorOne}"
+    "RECEIVE", "MAP(1)", "INTO(100)", "NOHANDLE", "{NOHANDLE|errorOne}"
   };
 
   private static String getTestString(String[] components) {
@@ -625,7 +629,7 @@ public class TestCicsReceive {
             "error1",
             new Diagnostic(
                 new Range(),
-                "No viable alternative at input MAP\n            LENGTH",
+                "Invalid option provided: LENGTH without FROM",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())),
         ImmutableList.of());
