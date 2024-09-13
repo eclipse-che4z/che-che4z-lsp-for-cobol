@@ -39,7 +39,7 @@ public class TestCICSDefine {
       "DEFINE ACTIVITY({$varOne}) TRANSID({$varThree}) PROGRAM({$varFour}) ACTIVITYID({$varSix})";
 
   private static final String DEFINE_ACTIVITY_INVALID_ONE =
-      "DEFINE {_ACTIVITY(100) PROGRAM(200) ACTIVITYID(300)|errorOne_} ";
+      "DEFINE {ACTIVITY(100) PROGRAM(200) ACTIVITYID(300)|errorOne} ";
 
   private static final String DEFINE_COMPOSITE_EVENT_ALL_OPTIONS_VALID_ONE =
       "DEFINE COMPOSITE EVENT({$varOne}) AND SUBEVENT1({$varTwo}) SUBEVENT2({$varThree})";
@@ -71,7 +71,7 @@ public class TestCICSDefine {
       "DEFINE PROCESS({$varOne}) PROCESSTYPE({$varTwo}) TRANSID({$varThree})";
 
   private static final String DEFINE_PROCESS_INVALID_ONE =
-      "DEFINE {_PROCESS(10) PROCESSTYPE(100) USERID(1000)|errorOne_}";
+      "DEFINE {PROCESS(10) PROCESSTYPE(100) USERID(1000)|errorOne}";
 
   private static final String DEFINE_PROCESS_TIMER_ALL_OPTIONS_VALID_ONE =
       "DEFINE TIMER({$varOne}) EVENT({$varTwo}) AT HOURS({$varThree}) MINUTES({$varFour}) ON YEAR({$varfive}) MONTH({$varSix}) DAYOFMONTH({$varSix})";
@@ -79,8 +79,7 @@ public class TestCICSDefine {
   private static final String DEFINE_PROCESS_TIMER_PARTIAL_OPTIONS_VALID_ONE =
       "DEFINE TIMER({$varOne}) AFTER DAYS({$varTwo})";
 
-  private static final String DEFINE_PROCESS_TIMER_INVALID_ONE =
-      "DEFINE {_TIMER(100) AT|errorOne_}";
+  private static final String DEFINE_PROCESS_TIMER_INVALID_ONE = "DEFINE {TIMER(100) AT|errorOne}";
 
   @Test
   void testDefineActivityAllOptionsValidOne() {
