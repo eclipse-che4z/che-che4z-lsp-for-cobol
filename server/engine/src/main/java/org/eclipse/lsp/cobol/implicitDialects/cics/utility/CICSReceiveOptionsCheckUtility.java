@@ -118,12 +118,11 @@ public class CICSReceiveOptionsCheckUtility extends CICSOptionsCheckBaseUtility 
 
   private void checkMap(CICSParser.Cics_receive_mapContext ctx) {
     if (ctx.FROM().isEmpty()) checkHasIllegalOptions(ctx.LENGTH(), "LENGTH without FROM");
-    if (ctx.TERMINAL().isEmpty()) checkHasIllegalOptions(ctx.INPARTN(), "INPARTN without TERMINAL");
-    checkHasMutuallyExclusiveOptions("INTO or SET", ctx.cics_into_set());
+    checkHasExactlyOneOption("INTO or SET", ctx, ctx.cics_into_set());
   }
 
   private void checkMapMappingDev(CICSParser.Cics_receive_map_mappingdevContext ctx) {
     checkHasMandatoryOptions(ctx.FROM(), ctx, "FROM");
-    checkHasMutuallyExclusiveOptions("INTO or SET", ctx.cics_into_set());
+    checkHasExactlyOneOption("INTO or SET", ctx, ctx.cics_into_set());
   }
 }
