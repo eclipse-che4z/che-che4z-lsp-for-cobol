@@ -216,15 +216,19 @@ public class TestCicsReceive {
   };
 
   private static final String[] PARTN_FULL_OPTIONS_VALID_ONE = {
-    "RECEIVE", "INTO({$abc})", "LENGTH({$def})", "ASIS"
+    "RECEIVE", "PARTN({$abc})", "INTO({$abc})", "LENGTH({$def})", "ASIS"
   };
 
-  private static final String[] PARTN_PARTIAL_OPTIONS_VALID_ONE = {"RECEIVE", "LENGTH({$def})"};
+  private static final String[] PARTN_PARTIAL_OPTIONS_VALID_ONE = {
+    "RECEIVE", "PARTN({$abc})", "INTO({$abc})", "LENGTH({$def})"
+  };
 
-  private static final String[] PARTN_INVALID_ONE = {"RECEIVE", "{SET(100)", "ASIS|error1}"};
+  private static final String[] PARTN_INVALID_ONE = {
+    "RECEIVE", "{PARTN(100)", "SET(100)", "ASIS|error1}"
+  };
 
   private static final String[] PARTN_DUPLICATE_INVALID = {
-    "RECEIVE", "LENGTH(101)", "ASIS", "{ASIS|error1}"
+    "RECEIVE", "PARTN(100)", "INTO(100)", "LENGTH(101)", "ASIS", "{ASIS|error1}"
   };
 
   private static final String[] MAP_FULL_OPTIONS_VALID_ONE = {
@@ -422,7 +426,7 @@ public class TestCicsReceive {
             "error1",
             new Diagnostic(
                 new Range(),
-                "Missing required option: LENGTH or FLENGTH",
+                "Exactly one option required, none provided: LENGTH or FLENGTH",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())),
         ImmutableList.of());
@@ -513,7 +517,7 @@ public class TestCicsReceive {
             "error1",
             new Diagnostic(
                 new Range(),
-                "Missing required option: INTO or SET",
+                "Exactly one option required, none provided: INTO or SET",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())),
         ImmutableList.of());
@@ -540,7 +544,7 @@ public class TestCicsReceive {
             "error1",
             new Diagnostic(
                 new Range(),
-                "Missing required option: LENGTH or FLENGTH",
+                "Exactly one option required, none provided: LENGTH or FLENGTH",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())),
         ImmutableList.of());
@@ -579,7 +583,7 @@ public class TestCicsReceive {
             "error1",
             new Diagnostic(
                 new Range(),
-                "Missing required option: LENGTH or FLENGTH",
+                "Missing required option: LENGTH",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())),
         ImmutableList.of());

@@ -241,7 +241,7 @@ public abstract class CICSOptionsCheckBaseUtility {
    * @return True if an instance is found and the Mutual Exclusivity clause not violated within the
    *     options passed.
    */
-  protected <E> boolean checkMutuallyExclusiveOptions(String options, List<E>... rules) {
+  protected <E> boolean checkHasMutuallyExclusiveOptions(String options, List<E>... rules) {
     boolean foundNonEmpty = false;
     for (List<E> option : rules) {
       if (option.isEmpty()) continue;
@@ -263,7 +263,7 @@ public abstract class CICSOptionsCheckBaseUtility {
 
   protected <E> void checkHasExactlyOneOption(
       String options, ParserRuleContext parentCtx, List<E>... rules) {
-    if (checkMutuallyExclusiveOptions(options, rules)) {
+    if (checkHasMutuallyExclusiveOptions(options, rules)) {
       throwException(
           ErrorSeverity.ERROR,
           getLocality(parentCtx),
