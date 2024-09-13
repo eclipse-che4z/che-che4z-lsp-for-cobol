@@ -15,6 +15,8 @@
 package org.eclipse.lsp.cobol.implicitDialects.cics.utility;
 
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
@@ -96,8 +98,17 @@ public class CICSIssueOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
         }
       };
 
+  public static final Map<String, Pair<String, ErrorSeverity>> SUBGROUPS =
+      new HashMap<String, Pair<String, ErrorSeverity>>() {
+        {
+          put(
+              "Cics_issue_commonContext",
+              new ImmutablePair<>("DESTID or SUBADDR with VOLUME", ErrorSeverity.ERROR));
+        }
+      };
+
   public CICSIssueOptionsCheckUtility(DialectProcessingContext context, List<SyntaxError> errors) {
-    super(context, errors, DUPLICATE_CHECK_OPTIONS);
+    super(context, errors, DUPLICATE_CHECK_OPTIONS, SUBGROUPS);
   }
 
   /**
@@ -162,37 +173,9 @@ public class CICSIssueOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
 
   private void checkAbort(CICSParser.Cics_issue_abortContext ctx) {
     checkHasMandatoryOptions(ctx.ABORT(), ctx, "ABORT");
-    if (!ctx.DESTID().isEmpty()) {
-      checkHasIllegalOptions(ctx.SUBADDR(), "SUBADDR with DESTID");
-      checkHasIllegalOptions(ctx.CONSOLE(), "CONSOLE with DESTID");
-      checkHasIllegalOptions(ctx.PRINT(), "PRINT with DESTID");
-      checkHasIllegalOptions(ctx.CARD(), "CARD with DESTID");
-      checkHasIllegalOptions(ctx.WPMEDIA1(), "WPMEDIA1 with DESTID");
-      checkHasIllegalOptions(ctx.WPMEDIA2(), "WPMEDIA2 with DESTID");
-      checkHasIllegalOptions(ctx.WPMEDIA3(), "WPMEDIA3 with DESTID");
-      checkHasIllegalOptions(ctx.WPMEDIA4(), "WPMEDIA4 with DESTID");
-    } else {
-      checkHasIllegalOptions(ctx.DESTIDLENG(), "DESTIDLENG without DESTID");
-      int subArgCount =
-          ctx.CONSOLE().size()
-              + ctx.PRINT().size()
-              + ctx.CARD().size()
-              + ctx.WPMEDIA1().size()
-              + ctx.WPMEDIA2().size()
-              + ctx.WPMEDIA3().size()
-              + ctx.WPMEDIA4().size();
-      if (subArgCount > 1 || (ctx.SUBADDR().isEmpty() && subArgCount > 0)) {
-        checkHasIllegalOptions(ctx.CONSOLE(), "CONSOLE without SUBADDR");
-        checkHasIllegalOptions(ctx.PRINT(), "PRINT without SUBADDR");
-        checkHasIllegalOptions(ctx.CARD(), "CARD without SUBADDR");
-        checkHasIllegalOptions(ctx.WPMEDIA1(), "WPMEDIA1 without SUBADDR");
-        checkHasIllegalOptions(ctx.WPMEDIA2(), "WPMEDIA2 without SUBADDR");
-        checkHasIllegalOptions(ctx.WPMEDIA3(), "WPMEDIA3 without SUBADDR");
-        checkHasIllegalOptions(ctx.WPMEDIA4(), "WPMEDIA4 without SUBADDR");
-      }
-    }
-    if (ctx.VOLUME().isEmpty())
-      checkHasIllegalOptions(ctx.VOLUMELENG(), "VOLUMELENG without VOLUME");
+    if (ctx.cics_issue_common().isEmpty())
+      checkHasMandatoryOptions(ctx.cics_issue_common(), ctx, "DESTID or SUBADDR branches");
+    ctx.cics_issue_common().forEach(this::checkIssueCommon);
   }
 
   private void checkAdd(CICSParser.Cics_issue_addContext ctx) {
@@ -218,37 +201,7 @@ public class CICSIssueOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
 
   private void checkEnd(CICSParser.Cics_issue_endContext ctx) {
     checkHasMandatoryOptions(ctx.END(), ctx, "END");
-    if (!ctx.DESTID().isEmpty()) {
-      checkHasIllegalOptions(ctx.SUBADDR(), "SUBADDR with DESTID");
-      checkHasIllegalOptions(ctx.CONSOLE(), "CONSOLE with DESTID");
-      checkHasIllegalOptions(ctx.PRINT(), "PRINT with DESTID");
-      checkHasIllegalOptions(ctx.CARD(), "CARD with DESTID");
-      checkHasIllegalOptions(ctx.WPMEDIA1(), "WPMEDIA1 with DESTID");
-      checkHasIllegalOptions(ctx.WPMEDIA2(), "WPMEDIA2 with DESTID");
-      checkHasIllegalOptions(ctx.WPMEDIA3(), "WPMEDIA3 with DESTID");
-      checkHasIllegalOptions(ctx.WPMEDIA4(), "WPMEDIA4 with DESTID");
-    } else {
-      checkHasIllegalOptions(ctx.DESTIDLENG(), "DESTIDLENG without DESTID");
-      int subArgCount =
-          ctx.CONSOLE().size()
-              + ctx.PRINT().size()
-              + ctx.CARD().size()
-              + ctx.WPMEDIA1().size()
-              + ctx.WPMEDIA2().size()
-              + ctx.WPMEDIA3().size()
-              + ctx.WPMEDIA4().size();
-      if (subArgCount > 1 || (ctx.SUBADDR().isEmpty() && subArgCount > 0)) {
-        checkHasIllegalOptions(ctx.CONSOLE(), "CONSOLE without SUBADDR");
-        checkHasIllegalOptions(ctx.PRINT(), "PRINT without SUBADDR");
-        checkHasIllegalOptions(ctx.CARD(), "CARD without SUBADDR");
-        checkHasIllegalOptions(ctx.WPMEDIA1(), "WPMEDIA1 without SUBADDR");
-        checkHasIllegalOptions(ctx.WPMEDIA2(), "WPMEDIA2 without SUBADDR");
-        checkHasIllegalOptions(ctx.WPMEDIA3(), "WPMEDIA3 without SUBADDR");
-        checkHasIllegalOptions(ctx.WPMEDIA4(), "WPMEDIA4 without SUBADDR");
-      }
-    }
-    if (ctx.VOLUME().isEmpty())
-      checkHasIllegalOptions(ctx.VOLUMELENG(), "VOLUMELENG without VOLUME");
+    ctx.cics_issue_common().forEach(this::checkIssueCommon);
   }
 
   void checkEndFileOutput(CICSParser.Cics_issue_endfile_endoutputContext ctx) {
@@ -344,38 +297,9 @@ public class CICSIssueOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
   void checkSend(CICSParser.Cics_issue_sendContext ctx) {
     checkHasMandatoryOptions(ctx.SEND(), ctx, "SEND");
     checkHasMandatoryOptions(ctx.FROM(), ctx, "FROM");
-
-    if (!ctx.DESTID().isEmpty()) {
-      checkHasIllegalOptions(ctx.SUBADDR(), "SUBADDR with DESTID");
-      checkHasIllegalOptions(ctx.CONSOLE(), "CONSOLE with DESTID");
-      checkHasIllegalOptions(ctx.PRINT(), "PRINT with DESTID");
-      checkHasIllegalOptions(ctx.CARD(), "CARD with DESTID");
-      checkHasIllegalOptions(ctx.WPMEDIA1(), "WPMEDIA1 with DESTID");
-      checkHasIllegalOptions(ctx.WPMEDIA2(), "WPMEDIA2 with DESTID");
-      checkHasIllegalOptions(ctx.WPMEDIA3(), "WPMEDIA3 with DESTID");
-      checkHasIllegalOptions(ctx.WPMEDIA4(), "WPMEDIA4 with DESTID");
-    } else {
-      checkHasIllegalOptions(ctx.DESTIDLENG(), "DESTIDLENG without DESTID");
-      int subArgCount =
-          ctx.CONSOLE().size()
-              + ctx.PRINT().size()
-              + ctx.CARD().size()
-              + ctx.WPMEDIA1().size()
-              + ctx.WPMEDIA2().size()
-              + ctx.WPMEDIA3().size()
-              + ctx.WPMEDIA4().size();
-      if (subArgCount > 1 || (ctx.SUBADDR().isEmpty() && subArgCount > 0)) {
-        checkHasIllegalOptions(ctx.CONSOLE(), "CONSOLE without SUBADDR");
-        checkHasIllegalOptions(ctx.PRINT(), "PRINT without SUBADDR");
-        checkHasIllegalOptions(ctx.CARD(), "CARD without SUBADDR");
-        checkHasIllegalOptions(ctx.WPMEDIA1(), "WPMEDIA1 without SUBADDR");
-        checkHasIllegalOptions(ctx.WPMEDIA2(), "WPMEDIA2 without SUBADDR");
-        checkHasIllegalOptions(ctx.WPMEDIA3(), "WPMEDIA3 without SUBADDR");
-        checkHasIllegalOptions(ctx.WPMEDIA4(), "WPMEDIA4 without SUBADDR");
-      }
-    }
-    if (ctx.VOLUME().isEmpty())
-      checkHasIllegalOptions(ctx.VOLUMELENG(), "VOLUMELENG without VOLUME");
+    if (ctx.cics_issue_common().isEmpty())
+      checkHasMandatoryOptions(ctx.cics_issue_common(), ctx, "DESTID or SUBADDR branches");
+    ctx.cics_issue_common().forEach(this::checkIssueCommon);
   }
 
   void checkSignal(CICSParser.Cics_issue_signalContext ctx) {
@@ -386,7 +310,12 @@ public class CICSIssueOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
 
   void checkWait(CICSParser.Cics_issue_waitContext ctx) {
     checkHasMandatoryOptions(ctx.WAIT(), ctx, "WAIT");
+    if (ctx.cics_issue_common().isEmpty())
+      checkHasMandatoryOptions(ctx.cics_issue_common(), ctx, "DESTID or SUBADDR branches");
+    ctx.cics_issue_common().forEach(this::checkIssueCommon);
+  }
 
+  void checkIssueCommon(CICSParser.Cics_issue_commonContext ctx) {
     if (!ctx.DESTID().isEmpty()) {
       checkHasIllegalOptions(ctx.SUBADDR(), "SUBADDR with DESTID");
       checkHasIllegalOptions(ctx.CONSOLE(), "CONSOLE with DESTID");

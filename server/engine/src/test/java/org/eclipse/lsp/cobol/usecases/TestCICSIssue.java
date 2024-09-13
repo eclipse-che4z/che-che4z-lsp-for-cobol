@@ -165,6 +165,9 @@ public class TestCICSIssue {
 
   private static final String ISSUE_WAIT_INVALID = "ISSUE WAIT {CONSOLE|errorOne}";
 
+  private static final String ISSUE_WAIT_DUPLICATE_COMMON_INVALID =
+      "ISSUE WAIT SUBADDR(100) CONSOLE VOLUME(100) RESP(100) NOHANDLE {_{SUBADDR|errorOne}(200) DESTID(10) DESTIDLENG(100)|errorTwo_}";
+
   @Test
   void testIssueAbendAllOptionsValidOne() {
     CICSTestUtils.noErrorTest(ISSUE_ABEND_ALL_OPTIONS_VALID_ONE);
@@ -525,5 +528,24 @@ public class TestCICSIssue {
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()));
     CICSTestUtils.errorTest(ISSUE_WAIT_INVALID, expectedDiagnostics);
+  }
+
+  @Test
+  void testIssueWaitDuplicateCommonInvalid() {
+    Map<String, Diagnostic> expectedDiagnostics =
+        ImmutableMap.of(
+            "errorOne",
+            new Diagnostic(
+                new Range(),
+                "Invalid option provided: SUBADDR with DESTID",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()),
+            "errorTwo",
+            new Diagnostic(
+                new Range(),
+                "Excessive options provided for: DESTID or SUBADDR and VOLUME",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()));
+    CICSTestUtils.errorTest(ISSUE_WAIT_DUPLICATE_COMMON_INVALID, expectedDiagnostics);
   }
 }
