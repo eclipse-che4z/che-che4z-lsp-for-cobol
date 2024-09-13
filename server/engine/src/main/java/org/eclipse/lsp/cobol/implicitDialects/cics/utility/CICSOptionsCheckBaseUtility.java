@@ -238,7 +238,8 @@ public abstract class CICSOptionsCheckBaseUtility {
    * @param rules Generic lists of rule lists to check. Will be a collection of ParserRuleContext
    *     and/or TerminalNode objects.
    * @param <E> List of Generics to allow cross-rule context collection.
-   * @return True if ex
+   * @return True if an instance is found and the Mutual Exclusivity clause not violated within the
+   *     options passed.
    */
   protected <E> boolean checkMutuallyExclusiveOptions(String options, List<E>... rules) {
     boolean foundNonEmpty = false;
