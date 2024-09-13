@@ -167,7 +167,7 @@ public class CICSDefineOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
           checkHasMandatoryOptions(ctx.DAYOFMONTH(), ctx, "DAYOFMONTH");
         }
       } else {
-        // Neither AT or AND
+        // Neither AT nor AND
         checkHasMandatoryOptions(ctx.AFTER(), ctx, "AFTER");
       }
     } else if (ctx.AT().isEmpty() && checkHasMandatoryOptions(ctx.AFTER(), ctx, "AFTER")) {
