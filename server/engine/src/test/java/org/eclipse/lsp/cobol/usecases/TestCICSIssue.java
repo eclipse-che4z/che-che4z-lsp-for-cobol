@@ -543,7 +543,7 @@ public class TestCICSIssue {
             "errorTwo",
             new Diagnostic(
                 new Range(),
-                "Excessive options provided for: DESTID or SUBADDR and VOLUME",
+                "Excessive options provided for: DESTID or SUBADDR with VOLUME",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()));
     CICSTestUtils.errorTest(ISSUE_WAIT_DUPLICATE_COMMON_INVALID, expectedDiagnostics);
