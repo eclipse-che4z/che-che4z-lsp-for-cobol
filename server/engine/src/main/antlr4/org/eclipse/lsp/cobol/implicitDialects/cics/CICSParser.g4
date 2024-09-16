@@ -214,8 +214,8 @@ cics_maxlength: MAXLENGTH cics_data_value | MAXFLENGTH cics_data_value;
 cics_abend: ABEND (ABCODE cics_name | CANCEL | NODUMP | cics_handle_response)*;
 
 /** ACQUIRE */
-cics_acquire: PROCESS cics_data_value (PROCESSTYPE cics_data_value |
-              ACTIVITYID cics_data_value | cics_handle_response?);
+cics_acquire:ACQUIRE (PROCESS cics_data_value PROCESSTYPE cics_data_value |
+              ACTIVITYID cics_data_value | cics_handle_response?) ;
 
 /** ADD SUBEVENT */
 cics_add: ADD (SUBEVENT cics_data_value | EVENT cics_data_value | cics_handle_response)+;
