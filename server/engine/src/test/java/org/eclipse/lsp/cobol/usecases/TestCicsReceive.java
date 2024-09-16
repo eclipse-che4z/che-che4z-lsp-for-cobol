@@ -236,6 +236,10 @@ public class TestCicsReceive {
     "RECEIVE", "PARTN(100)", "INTO(100)", "LENGTH(101)", "ASIS", "{ASIS|error1}"
   };
 
+  private static final String[] PARTN_DUPLICATE_INVALID_TWO = {
+    "RECEIVE", "PARTN(100)", "INTO(100)", "{INTO|errorOne}(100)", "LENGTH(101)"
+  };
+
   private static final String[] MAP_FULL_OPTIONS_VALID_ONE = {
     "RECEIVE",
     "MAP({$abc})",
@@ -609,6 +613,21 @@ public class TestCicsReceive {
                 new Range(),
                 "Excessive options provided for: ASIS",
                 DiagnosticSeverity.Warning,
+                ErrorSource.PARSING.getText())),
+        ImmutableList.of());
+  }
+
+  @Test
+  void testPartnDuplicateInvalidTwo() {
+    UseCaseEngine.runTest(
+        getTestString(PARTN_DUPLICATE_INVALID_TWO),
+        ImmutableList.of(),
+        ImmutableMap.of(
+            "errorOne",
+            new Diagnostic(
+                new Range(),
+                "Excessive options provided for: INTO",
+                DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())),
         ImmutableList.of());
   }

@@ -16,8 +16,6 @@
 package org.eclipse.lsp.cobol.implicitDialects.cics.utility;
 
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
@@ -61,23 +59,13 @@ public class CICSReceiveOptionsCheckUtility extends CICSOptionsCheckBaseUtility 
         }
       };
 
-  public static final Map<String, Pair<String, ErrorSeverity>> SUBGROUPS =
-      new HashMap<String, Pair<String, ErrorSeverity>>() {
-        {
-          put("Cics_into_setContext", new ImmutablePair<>("INTO or SET", ErrorSeverity.ERROR));
-          put(
-              "Cics_length_flengthContext",
-              new ImmutablePair<>("LENGTH or FLENGTH", ErrorSeverity.ERROR));
-        }
-      };
-
   public CICSReceiveOptionsCheckUtility(
       DialectProcessingContext context, List<SyntaxError> errors) {
-    super(context, errors, DUPLICATE_CHECK_OPTIONS, SUBGROUPS);
+    super(context, errors, DUPLICATE_CHECK_OPTIONS);
   }
 
   /**
-   * Entrypoint to check CICS RECEIVE rule options
+   * Entrypoint to check CICS RECEIVE rule options 0
    *
    * @param ctx ParserRuleContext subclass containging options
    * @param <E> A subclass of ParserRuleContext

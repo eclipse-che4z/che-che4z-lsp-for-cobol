@@ -209,7 +209,7 @@ public abstract class CICSOptionsCheckBaseUtility {
   /**
    * Client accessible entrypoint to check for duplicates.
    *
-   * @param ctx Higer order context as ParserRuleContext to traverse for duplicates
+   * @param ctx HigHer order context as ParserRuleContext to traverse for duplicates
    */
   protected void checkDuplicates(ParserRuleContext ctx) {
     Set<String> foundEntries = new HashSet<>();
@@ -232,30 +232,31 @@ public abstract class CICSOptionsCheckBaseUtility {
   }
 
   /**
-   * Helper function to check and see if more than one rule was visited out of a set provided.
+   * Flags errors for rule lists passed as parameters if there are multiple instances of mutually
+   * exclusive options.
    *
    * @param options Options checked to insert into error message
    * @param rules Generic lists of rule lists to check. Will be a collection of ParserRuleContext
    *     and/or TerminalNode objects.
    * @param <E> List of Generics to allow cross-rule context collection.
-   * @return True if an instance is found and the Mutual Exclusivity clause not violated within the
-   *     options passed.
+   * @return True if an instance is not found
    */
   protected <E extends ParseTree> boolean checkHasMutuallyExclusiveOptions(
       String options, List<E>... rules) {
     String token = null;
     for (List<E> option : rules) {
       if (option.isEmpty()) continue;
-      if (token == null) token = option.remove(0).getText().toUpperCase();
+      if (token == null) token = option.remove(0).getText().split("\\(")[0].toUpperCase();
       for (E rule : option) {
         // Flag only options that do NOT match the first option encountered.
         // If the option is the same then this is already flagged by checkDuplicates
-        if (!rule.getText().toUpperCase().equals(token))
+        if (!token.equals(rule.getText().split("\\(")[0].toUpperCase())) {
           throwException(
               ErrorSeverity.ERROR,
               getLocality(rule),
               "Exactly one option required, options are mutually exclusive: ",
               options);
+        }
       }
     }
     return token == null;
