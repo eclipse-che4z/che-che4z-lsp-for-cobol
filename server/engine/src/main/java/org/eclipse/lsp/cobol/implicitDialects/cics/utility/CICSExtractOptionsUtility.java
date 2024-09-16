@@ -160,7 +160,7 @@ public class CICSExtractOptionsUtility extends CICSOptionsCheckBaseUtility {
   private void checkAttach(CICSParser.Cics_extract_attachContext ctx) {
     checkHasMandatoryOptions(ctx.ATTACH(), ctx, "ATTACH");
     checkHasMutuallyExclusiveOptions(
-        "ATTACHID CONVID SESSION",
+        "ATTACHID or CONVID or SESSION",
         new ArrayList<>(ctx.ATTACH()),
         new ArrayList<>(ctx.CONVID()),
         new ArrayList<>(ctx.SESSION()));
@@ -215,7 +215,7 @@ public class CICSExtractOptionsUtility extends CICSOptionsCheckBaseUtility {
     checkHasMandatoryOptions(ctx.NETNAME(), ctx, "NETNAME");
 
     checkHasMutuallyExclusiveOptions(
-        "TERMID SYSID", new ArrayList<>(ctx.TERMID()), new ArrayList<>(ctx.SYSID()));
+        "TERMID or SYSID", new ArrayList<>(ctx.TERMID()), new ArrayList<>(ctx.SYSID()));
   }
 
   private void checkWebClient(CICSParser.Cics_extract_web_clientContext ctx) {

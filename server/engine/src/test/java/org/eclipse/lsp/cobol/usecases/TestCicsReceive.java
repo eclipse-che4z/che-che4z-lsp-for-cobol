@@ -134,8 +134,58 @@ public class TestCicsReceive {
     "RECEIVE", "FLENGTH({$def})"
   };
 
+  private static final String[] GROUP_ONE_APPC_FULL_OPTIONS_VALID_ONE = {
+    "RECEIVE",
+    "CONVID({$abc})",
+    "INTO({$abc})",
+    "LENGTH({$def})",
+    "MAXLENGTH({$ghi})",
+    "NOTRUNCATE",
+    "STATE({$jkl})"
+  };
+
+  private static final String[] GROUP_ONE_APPC_PARTIAL_OPTIONS_VALID_ONE = {
+    "RECEIVE", "CONVID({$abc})", "INTO({$abc})", "LENGTH({$def})"
+  };
+
+  private static final String[] GROUP_ONE_LUTYPE6_FULL_OPTIONS_VALID_ONE = {
+    "RECEIVE",
+    "SESSION({$abc})",
+    "INTO({$abc})",
+    "LENGTH({$def})",
+    "MAXLENGTH({$ghi})",
+    "NOTRUNCATE",
+  };
+
+  private static final String[] GROUP_ONE_LUTYPE6_PARTIAL_OPTIONS_VALID_ONE = {
+    "RECEIVE", "INTO({$abc})", "LENGTH({$def})", "NOTRUNCATE",
+  };
+
+  private static final String[] GROUP_ONE_MRO_FULL_OPTIONS_VALID_ONE = {
+    "RECEIVE",
+    "SESSION({$abc})",
+    "INTO({$abc})",
+    "LENGTH({$def})",
+    "MAXLENGTH({$ghi})",
+    "NOTRUNCATE",
+    "STATE({$jkl})"
+  };
+
+  private static final String[] GROUP_ONE_MRO_PARTIAL_OPTIONS_VALID_ONE = {
+    "RECEIVE", "INTO({$abc})", "LENGTH({$def})", "STATE({$jkl})",
+  };
+
   private static final String[] GROUP_ONE_INVALID_ONE = {
     "RECEIVE", "{SET(100)", "MAXLENGTH(10)", "NOTRUNCATE|error1}"
+  };
+
+  private static final String[] GROUP_ONE_INVALID_TWO = {
+    "RECEIVE",
+    "SESSION(100)",
+    "LENGTH(10)",
+    "MAXLENGTH(1000)",
+    "{MAXFLENGTH(100)|errorOne}",
+    "STATE(101)"
   };
 
   private static final String[] GROUP_ONE_DUPLICATE_INVALID = {
@@ -148,56 +198,6 @@ public class TestCicsReceive {
 
   private static final String[] GROUP_ONE_RESP_INVALID = {
     "RECEIVE", "INTO(100)", "LENGTH(100)", "MAXLENGTH(10)", "{RESP2|errorOne}(100)", "NOHANDLE"
-  };
-
-  private static final String[] GROUP_TWO_APPC_FULL_OPTIONS_VALID_ONE = {
-    "RECEIVE",
-    "CONVID({$abc})",
-    "INTO({$abc})",
-    "LENGTH({$def})",
-    "MAXLENGTH({$ghi})",
-    "NOTRUNCATE",
-    "STATE({$jkl})"
-  };
-
-  private static final String[] GROUP_TWO_APPC_PARTIAL_OPTIONS_VALID_ONE = {
-    "RECEIVE", "CONVID({$abc})", "INTO({$abc})", "LENGTH({$def})"
-  };
-
-  private static final String[] GROUP_TWO_LUTYPE6_FULL_OPTIONS_VALID_ONE = {
-    "RECEIVE",
-    "SESSION({$abc})",
-    "INTO({$abc})",
-    "LENGTH({$def})",
-    "MAXLENGTH({$ghi})",
-    "NOTRUNCATE",
-  };
-
-  private static final String[] GROUP_TWO_LUTYPE6_PARTIAL_OPTIONS_VALID_ONE = {
-    "RECEIVE", "INTO({$abc})", "LENGTH({$def})", "NOTRUNCATE",
-  };
-
-  private static final String[] GROUP_TWO_MRO_FULL_OPTIONS_VALID_ONE = {
-    "RECEIVE",
-    "SESSION({$abc})",
-    "INTO({$abc})",
-    "LENGTH({$def})",
-    "MAXLENGTH({$ghi})",
-    "NOTRUNCATE",
-    "STATE({$jkl})"
-  };
-
-  private static final String[] GROUP_TWO_MRO_PARTIAL_OPTIONS_VALID_ONE = {
-    "RECEIVE", "INTO({$abc})", "LENGTH({$def})", "STATE({$jkl})",
-  };
-
-  private static final String[] GROUP_TWO_INVALID_ONE = {
-    "RECEIVE",
-    "SESSION(100)",
-    "LENGTH(10)",
-    "MAXLENGTH(1000)",
-    "{MAXFLENGTH(100)|errorOne}",
-    "STATE(101)"
   };
 
   private static final String[] R2980_FULL_OPTIONS_VALID_ONE = {
@@ -472,55 +472,55 @@ public class TestCicsReceive {
   }
 
   @Test
-  void testGroupTwoAppcFullOptionsValidOne() {
+  void testGroupOneAppcFullOptionsValidOne() {
     UseCaseEngine.runTest(
-        getTestString(GROUP_TWO_APPC_FULL_OPTIONS_VALID_ONE),
+        getTestString(GROUP_ONE_APPC_FULL_OPTIONS_VALID_ONE),
         ImmutableList.of(),
         ImmutableMap.of());
   }
 
   @Test
-  void testGroupTwoAppcPartialOptionsValidOne() {
+  void testGroupOneAppcPartialOptionsValidOne() {
     UseCaseEngine.runTest(
-        getTestString(GROUP_TWO_APPC_PARTIAL_OPTIONS_VALID_ONE),
+        getTestString(GROUP_ONE_APPC_PARTIAL_OPTIONS_VALID_ONE),
         ImmutableList.of(),
         ImmutableMap.of());
   }
 
   @Test
-  void testGroupTwoLTSixFullOptionsValidOne() {
+  void testGroupOneLTSixFullOptionsValidOne() {
     UseCaseEngine.runTest(
-        getTestString(GROUP_TWO_LUTYPE6_FULL_OPTIONS_VALID_ONE),
+        getTestString(GROUP_ONE_LUTYPE6_FULL_OPTIONS_VALID_ONE),
         ImmutableList.of(),
         ImmutableMap.of());
   }
 
   @Test
-  void testGroupTwoLTSixPartialOptionsValidOne() {
+  void testGroupOneLTSixPartialOptionsValidOne() {
     UseCaseEngine.runTest(
-        getTestString(GROUP_TWO_LUTYPE6_PARTIAL_OPTIONS_VALID_ONE),
+        getTestString(GROUP_ONE_LUTYPE6_PARTIAL_OPTIONS_VALID_ONE),
         ImmutableList.of(),
         ImmutableMap.of());
   }
 
   @Test
-  void testGroupTwoMROFullOptionsValidOne() {
+  void testGroupOneMROFullOptionsValidOne() {
     UseCaseEngine.runTest(
-        getTestString(GROUP_TWO_MRO_FULL_OPTIONS_VALID_ONE), ImmutableList.of(), ImmutableMap.of());
+        getTestString(GROUP_ONE_MRO_FULL_OPTIONS_VALID_ONE), ImmutableList.of(), ImmutableMap.of());
   }
 
   @Test
-  void testGroupTwoMROPartialOptionsValidOne() {
+  void testGroupOneMROPartialOptionsValidOne() {
     UseCaseEngine.runTest(
-        getTestString(GROUP_TWO_MRO_PARTIAL_OPTIONS_VALID_ONE),
+        getTestString(GROUP_ONE_MRO_PARTIAL_OPTIONS_VALID_ONE),
         ImmutableList.of(),
         ImmutableMap.of());
   }
 
   @Test
-  void testGroupTwoInvalidOne() {
+  void testGroupOneInvalidTwo() {
     UseCaseEngine.runTest(
-        getTestString(GROUP_TWO_INVALID_ONE),
+        getTestString(GROUP_ONE_INVALID_TWO),
         ImmutableList.of(),
         ImmutableMap.of(
             "errorOne",
