@@ -241,27 +241,27 @@ public abstract class CICSOptionsCheckBaseUtility {
    * @return True if an instance is found and the Mutual Exclusivity clause not violated within the
    *     options passed.
    */
-  protected <E> boolean checkHasMutuallyExclusiveOptions(String options, List<E>... rules) {
-    boolean foundNonEmpty = false;
+  protected <E extends ParseTree> boolean checkHasMutuallyExclusiveOptions(
+      String options, List<E>... rules) {
+    String token = null;
     for (List<E> option : rules) {
       if (option.isEmpty()) continue;
-      if (foundNonEmpty) {
-        option.forEach(
-            rule -> {
-              throwException(
-                  ErrorSeverity.ERROR,
-                  getLocality(rule),
-                  "Exactly one option required, options are mutually exclusive: ",
-                  options);
-            });
-        return false;
+      if (token == null) token = option.remove(0).getText().toUpperCase();
+      for (E rule : option) {
+        // Flag only options that do NOT match the first option encountered.
+        // If the option is the same then this is already flagged by checkDuplicates
+        if (!rule.getText().toUpperCase().equals(token))
+          throwException(
+              ErrorSeverity.ERROR,
+              getLocality(rule),
+              "Exactly one option required, options are mutually exclusive: ",
+              options);
       }
-      foundNonEmpty = true;
     }
-    return !foundNonEmpty;
+    return token == null;
   }
 
-  protected <E> void checkHasExactlyOneOption(
+  protected <E extends ParseTree> void checkHasExactlyOneOption(
       String options, ParserRuleContext parentCtx, List<E>... rules) {
     if (checkHasMutuallyExclusiveOptions(options, rules)) {
       throwException(

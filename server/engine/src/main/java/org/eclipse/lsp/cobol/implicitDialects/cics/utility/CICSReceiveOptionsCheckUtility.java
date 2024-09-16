@@ -85,8 +85,6 @@ public class CICSReceiveOptionsCheckUtility extends CICSOptionsCheckBaseUtility 
   public <E extends ParserRuleContext> void checkOptions(E ctx) {
     if (ctx.getClass() == CICSParser.Cics_receive_group_oneContext.class) {
       checkGroupOne((CICSParser.Cics_receive_group_oneContext) ctx);
-    } else if (ctx.getClass() == CICSParser.Cics_receive_group_twoContext.class) {
-      checkGroupTwo((CICSParser.Cics_receive_group_twoContext) ctx);
     } else if (ctx.getClass() == CICSParser.Cics_receive_partnContext.class) {
       checkPartn((CICSParser.Cics_receive_partnContext) ctx);
     } else if (ctx.getClass() == CICSParser.Cics_receive_mapContext.class) {
@@ -102,16 +100,6 @@ public class CICSReceiveOptionsCheckUtility extends CICSOptionsCheckBaseUtility 
     if (!ctx.SET().isEmpty())
       checkHasExactlyOneOption("LENGTH or FLENGTH", ctx, ctx.cics_length_flength());
     checkHasMutuallyExclusiveOptions("MAXLENGTH or MAXFLENGTH", ctx.cics_maxlength());
-    if (!ctx.ASIS().isEmpty() || !ctx.BUFFER().isEmpty()) {
-      checkHasIllegalOptions(ctx.LEAVEKB(), "LEAVEKB");
-    }
-  }
-
-  private void checkGroupTwo(CICSParser.Cics_receive_group_twoContext ctx) {
-    checkHasExactlyOneOption("INTO or SET", ctx, ctx.INTO(), ctx.SET());
-    if (!ctx.SET().isEmpty())
-      checkHasExactlyOneOption("LENGTH or FLENGTH", ctx, ctx.cics_length_flength());
-    checkHasMutuallyExclusiveOptions("MAXLENGTH or MAXFLENGTH", ctx.cics_maxlength());
   }
 
   private void checkPartn(CICSParser.Cics_receive_partnContext ctx) {
@@ -122,11 +110,11 @@ public class CICSReceiveOptionsCheckUtility extends CICSOptionsCheckBaseUtility 
 
   private void checkMap(CICSParser.Cics_receive_mapContext ctx) {
     if (ctx.FROM().isEmpty()) checkHasIllegalOptions(ctx.LENGTH(), "LENGTH without FROM");
-    checkHasExactlyOneOption("INTO or SET", ctx, ctx.cics_into_set());
+    checkHasMutuallyExclusiveOptions("INTO or SET", ctx.cics_into_set());
   }
 
   private void checkMapMappingDev(CICSParser.Cics_receive_map_mappingdevContext ctx) {
     checkHasMandatoryOptions(ctx.FROM(), ctx, "FROM");
-    checkHasExactlyOneOption("INTO or SET", ctx, ctx.cics_into_set());
+    checkHasMutuallyExclusiveOptions("INTO or SET", ctx.cics_into_set());
   }
 }

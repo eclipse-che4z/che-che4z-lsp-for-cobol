@@ -192,7 +192,12 @@ public class TestCicsReceive {
   };
 
   private static final String[] GROUP_TWO_INVALID_ONE = {
-    "RECEIVE", "{SESSION(100)", "LENGTH(10)", "MAXLENGTH(1000)", "NOTRUNCATE|error1}"
+    "RECEIVE",
+    "SESSION(100)",
+    "LENGTH(10)",
+    "MAXLENGTH(1000)",
+    "{MAXFLENGTH(100)|errorOne}",
+    "STATE(101)"
   };
 
   private static final String[] R2980_FULL_OPTIONS_VALID_ONE = {
@@ -518,10 +523,10 @@ public class TestCicsReceive {
         getTestString(GROUP_TWO_INVALID_ONE),
         ImmutableList.of(),
         ImmutableMap.of(
-            "error1",
+            "errorOne",
             new Diagnostic(
                 new Range(),
-                "Exactly one option required, none provided: INTO or SET",
+                "Exactly one option required, options are mutually exclusive: MAXLENGTH or MAXFLENGTH",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())),
         ImmutableList.of());
