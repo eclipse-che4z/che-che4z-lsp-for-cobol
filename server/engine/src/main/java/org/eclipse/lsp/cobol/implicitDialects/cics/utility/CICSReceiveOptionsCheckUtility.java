@@ -47,6 +47,8 @@ public class CICSReceiveOptionsCheckUtility extends CICSOptionsCheckBaseUtility 
           put("STATE", ErrorSeverity.ERROR);
           put("MAP", ErrorSeverity.ERROR);
           put("MAPSET", ErrorSeverity.ERROR);
+          put("MAXLENGTH", ErrorSeverity.ERROR);
+          put("MAXFLENGTH", ErrorSeverity.ERROR);
           put("INPARTN", ErrorSeverity.ERROR);
           put("MAPPINGDEV", ErrorSeverity.ERROR);
           put("ASIS", ErrorSeverity.WARNING);
@@ -96,8 +98,9 @@ public class CICSReceiveOptionsCheckUtility extends CICSOptionsCheckBaseUtility 
   }
 
   private void checkGroupOne(CICSParser.Cics_receive_group_oneContext ctx) {
-    checkHasExactlyOneOption("LENGTH or FLENGTH", ctx, ctx.cics_length_flength());
-    checkHasMutuallyExclusiveOptions("INTO or SET", ctx.cics_into_set());
+    checkHasMutuallyExclusiveOptions("INTO or SET", ctx.INTO(), ctx.SET());
+    if (!ctx.SET().isEmpty())
+      checkHasExactlyOneOption("LENGTH or FLENGTH", ctx, ctx.cics_length_flength());
     checkHasMutuallyExclusiveOptions("MAXLENGTH or MAXFLENGTH", ctx.cics_maxlength());
     if (!ctx.ASIS().isEmpty() || !ctx.BUFFER().isEmpty()) {
       checkHasIllegalOptions(ctx.LEAVEKB(), "LEAVEKB");
@@ -105,8 +108,9 @@ public class CICSReceiveOptionsCheckUtility extends CICSOptionsCheckBaseUtility 
   }
 
   private void checkGroupTwo(CICSParser.Cics_receive_group_twoContext ctx) {
-    checkHasExactlyOneOption("INTO or SET", ctx, ctx.cics_into_set());
-    checkHasExactlyOneOption("LENGTH or FLENGTH", ctx, ctx.cics_length_flength());
+    checkHasExactlyOneOption("INTO or SET", ctx, ctx.INTO(), ctx.SET());
+    if (!ctx.SET().isEmpty())
+      checkHasExactlyOneOption("LENGTH or FLENGTH", ctx, ctx.cics_length_flength());
     checkHasMutuallyExclusiveOptions("MAXLENGTH or MAXFLENGTH", ctx.cics_maxlength());
   }
 

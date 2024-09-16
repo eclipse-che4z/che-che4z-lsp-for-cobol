@@ -135,15 +135,15 @@ public class TestCicsReceive {
   };
 
   private static final String[] GROUP_ONE_INVALID_ONE = {
-    "RECEIVE", "{INTO(100)", "MAXLENGTH(10)", "NOTRUNCATE|error1}"
+    "RECEIVE", "{SET(100)", "MAXLENGTH(10)", "NOTRUNCATE|error1}"
   };
 
   private static final String[] GROUP_ONE_DUPLICATE_INVALID = {
-    "RECEIVE", "InTO(100)", "{INTO(1000)|error1}", "LENGTH(100)", "MAXLENGTH(10)", "NOTRUNCATE"
+    "RECEIVE", "InTO(100)", "{INTO|error1}(1000)", "LENGTH(100)", "MAXLENGTH(10)", "NOTRUNCATE"
   };
 
   private static final String[] GROUP_ONE_DUPLICATE_INVALID_TWO = {
-    "RECEIVE", "INTO(100)", "{INTO(1000)|error1}", "LENGTH(100)", "MAXLENGTH(10)", "NOTRUNCATE"
+    "RECEIVE", "INTO(100)", "{INTO|error1}(1000)", "LENGTH(100)", "MAXLENGTH(10)", "NOTRUNCATE"
   };
 
   private static final String[] GROUP_ONE_RESP_INVALID = {
@@ -204,7 +204,7 @@ public class TestCicsReceive {
   };
 
   private static final String[] R2980_INVALID_ONE = {
-    "RECEIVE", "{INTO(100)", "MAXLENGTH(1000)", "NOTRUNCATE|error1}"
+    "RECEIVE", "{SET(100)", "MAXLENGTH(1000)", "NOTRUNCATE|error1}"
   };
 
   private static final String[] NON_Z_FULL_OPTIONS_VALID_ONE = {
@@ -445,7 +445,7 @@ public class TestCicsReceive {
             "error1",
             new Diagnostic(
                 new Range(),
-                "Excessive options provided for: INTO or SET",
+                "Excessive options provided for: INTO",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())),
         ImmutableList.of());
@@ -460,7 +460,7 @@ public class TestCicsReceive {
             "error1",
             new Diagnostic(
                 new Range(),
-                "Excessive options provided for: INTO or SET",
+                "Excessive options provided for: INTO",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())),
         ImmutableList.of());
