@@ -160,18 +160,6 @@ public class ExtendedDocument {
   }
 
   /**
-   * Returns the line text or empty string if out of range
-   * @param line to get the text for
-   * @return line text or empty stirng
-   */
-  public String getLineText(int line) {
-    List<ExtendedTextLine> lines = baseText.getLines();
-    if (line >= lines.size())
-      return "";
-    return lines.get(line).toString();
-  }
-
-  /**
    * Checks if a line segment can be trimmed to empty string
    * @param lineno line number to investigate
    * @param start start column
@@ -187,6 +175,7 @@ public class ExtendedDocument {
       return true;
     List<MappedCharacter> chars = lines.get(lineno).getCharacters();
     for (int i = start; i < chars.size() && i < end; ++i) {
+      // emulates behavior of trim function
       if (chars.get(i).getCharacter() > ' ')
         return false;
     }
