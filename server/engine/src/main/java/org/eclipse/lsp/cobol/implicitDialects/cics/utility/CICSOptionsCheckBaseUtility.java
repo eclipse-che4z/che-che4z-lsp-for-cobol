@@ -180,18 +180,16 @@ public abstract class CICSOptionsCheckBaseUtility {
     if (ctx.getChildCount() == 0) return;
 
     for (ParseTree entry : ctx.children) {
-      if (entry.getChildCount() == 0) {
-        String option = entry.getText().toUpperCase();
-        if (duplicateOptions.containsKey(option)) {
-          if (!entries.add(option)) {
-            throwException(
-                duplicateOptions.get(option),
-                getLocality(entry),
-                "Excessive options provided for: ",
-                option);
-          }
+      String option = entry.getText().toUpperCase();
+      if (duplicateOptions.containsKey(option)) {
+        if (!entries.add(option)) {
+          throwException(
+              duplicateOptions.get(option),
+              getLocality(entry),
+              "Excessive options provided for: ",
+              option);
         }
-      } else {
+      } else if (ParserRuleContext.class.isAssignableFrom(entry.getClass())) {
         String className = entry.getClass().getSimpleName();
         Pair<String, ErrorSeverity> subGroup = subGroups.getOrDefault(className, null);
         if (className.equals("Cics_handle_responseContext"))
@@ -210,7 +208,7 @@ public abstract class CICSOptionsCheckBaseUtility {
   /**
    * Client accessible entrypoint to check for duplicates.
    *
-   * @param ctx HigHer order context as ParserRuleContext to traverse for duplicates
+   * @param ctx Higher order context as ParserRuleContext to traverse for duplicates
    */
   protected void checkDuplicates(ParserRuleContext ctx) {
     Set<String> foundEntries = new HashSet<>();
@@ -237,7 +235,7 @@ public abstract class CICSOptionsCheckBaseUtility {
    * exclusive options.
    *
    * @param options Options checked to insert into error message
-   * @param rules Lists of TerminalNode.
+   * @param rules Lists of TerminalNode to iterate through
    * @return Number of TerminalNode instances found
    */
   protected int checkHasMutuallyExclusiveOptions(String options, List<TerminalNode>... rules) {
@@ -272,7 +270,7 @@ public abstract class CICSOptionsCheckBaseUtility {
     List<TerminalNode> children = new ArrayList<>();
     for (List<E> rule : rules) {
       if (!rule.isEmpty()) {
-        if (rule.get(0).getClass().isAssignableFrom(TerminalNodeImpl.class))
+        if (TerminalNode.class.isAssignableFrom(rule.get(0).getClass()))
           children.addAll((List<TerminalNode>) rule);
         else {
           for (E context : rule) {
@@ -292,10 +290,9 @@ public abstract class CICSOptionsCheckBaseUtility {
 
   private void getAllTokenChildren(ParserRuleContext ctx, List<TerminalNode> children) {
     for (ParseTree child : ctx.children) {
-      if (child.getChildCount() == 0
-          && baseDuplicateOptions.containsKey(child.getText().toUpperCase()))
+      if (baseDuplicateOptions.containsKey(child.getText().toUpperCase()))
         children.add((TerminalNode) child);
-      else if (child.getClass().isAssignableFrom(ParserRuleContext.class))
+      else if (ParserRuleContext.class.isAssignableFrom(child.getClass()))
         getAllTokenChildren((ParserRuleContext) child, children);
     }
   }

@@ -219,12 +219,12 @@ public class CICSExtractOptionsUtility extends CICSOptionsCheckBaseUtility {
 
     if (ctx.HOST().isEmpty()) {
       checkHasIllegalOptions(ctx.HOSTLENGTH(), "HOSTLENGTH without HOST");
-      checkHasIllegalOptions(ctx.HOSTTYPE(), "HOSTTYPE without HOSTLENGTH");
+      checkHasIllegalOptions(ctx.HOSTTYPE(), "HOSTTYPE without without HOST");
     } else if (ctx.HOSTLENGTH().isEmpty())
       checkHasIllegalOptions(ctx.HOSTTYPE(), "HOSTTYPE without HOSTLENGTH");
     if (ctx.HTTPVERSION().isEmpty())
       checkHasIllegalOptions(ctx.VERSIONLEN(), "VERSIONLEN without HTTPVERSION");
-    if (ctx.PATH().isEmpty()) checkHasIllegalOptions(ctx.PATHLENGTH(), "PATHLEN without PATH");
+    if (ctx.PATH().isEmpty()) checkHasIllegalOptions(ctx.PATHLENGTH(), "PATHLENGTH without PATH");
   }
 
   private void checkWebServer(CICSParser.Cics_extract_web_serverContext ctx) {
