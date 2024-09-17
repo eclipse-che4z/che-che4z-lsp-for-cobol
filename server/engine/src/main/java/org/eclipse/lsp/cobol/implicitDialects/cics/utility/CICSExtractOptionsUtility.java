@@ -166,7 +166,7 @@ public class CICSExtractOptionsUtility extends CICSOptionsCheckBaseUtility {
     checkHasMandatoryOptions(ctx.ATTRIBUTES(), ctx, "ATTRIBUTES");
     checkHasMandatoryOptions(ctx.STATE(), ctx, "STATE");
 
-    if (!ctx.SESSION().isEmpty()) checkHasIllegalOptions(ctx.CONVID(), "CONVID with SESSION");
+    checkHasMutuallyExclusiveOptions("CONVID or SESSION", ctx.SESSION(), ctx.CONVID());
   }
 
   private void checkCertificate(CICSParser.Cics_extract_certificateContext ctx) {
