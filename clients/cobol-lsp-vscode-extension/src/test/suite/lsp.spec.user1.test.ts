@@ -37,6 +37,10 @@ suite("Tests with USER1.cbl", function () {
     editor = helper.get_editor(WORKSPACE_FILE);
   });
 
+  this.afterAll(async () => await helper.closeAllEditors()).timeout(
+    helper.TEST_TIMEOUT,
+  );
+
   // open 'open' file, should be recognized as COBOL
   test("TC152048: Cobol file is recognized by LSP", async () => {
     // setting a language takes a while but shouldn't take longer than a second
@@ -80,6 +84,17 @@ suite("Tests with USER1.cbl", function () {
   });
 
   test("TC152080: Find all references from the word middle", async () => {
+    await helper.waitFor(
+      async () =>
+        (
+          (await vscode.commands.executeCommand(
+            "vscode.executeDefinitionProvider",
+            editor.document.uri,
+            pos(20, 15),
+          )) as any[]
+        ).length > 0,
+    );
+
     const result: any[] = await vscode.commands.executeCommand(
       "vscode.executeReferenceProvider",
       editor.document.uri,
@@ -96,6 +111,17 @@ suite("Tests with USER1.cbl", function () {
   });
 
   test("TC152080: Find all references from the word begin", async () => {
+    await helper.waitFor(
+      async () =>
+        (
+          (await vscode.commands.executeCommand(
+            "vscode.executeDefinitionProvider",
+            editor.document.uri,
+            pos(20, 10),
+          )) as any[]
+        ).length > 0,
+    );
+
     const result: any[] = await vscode.commands.executeCommand(
       "vscode.executeReferenceProvider",
       editor.document.uri,

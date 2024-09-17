@@ -16,21 +16,15 @@ package org.eclipse.lsp.cobol.lsp;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import java.net.URI;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
+
 import lombok.NonNull;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.lsp.cobol.lsp.analysis.AsyncAnalysisService;
+import org.eclipse.lsp.cobol.lsp.events.notifications.DidChangeWatchedFilesNotification;
 import org.eclipse.lsp.cobol.lsp.events.queries.ExecuteCommandQuery;
 import org.eclipse.lsp.cobol.lsp.handlers.workspace.DidChangeConfigurationHandler;
+import org.eclipse.lsp.cobol.lsp.handlers.workspace.DidChangeWatchedFilesHandler;
 import org.eclipse.lsp.cobol.lsp.handlers.workspace.ExecuteCommandHandler;
 import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.services.WorkspaceService;
@@ -44,22 +38,19 @@ import org.eclipse.lsp4j.services.WorkspaceService;
 @Slf4j
 public class CobolWorkspaceServiceImpl extends LspEventConsumer implements WorkspaceService {
   private final ExecuteCommandHandler executeCommandHandler;
-  private final SourceUnitGraph sourceUnitGraph;
   private final DidChangeConfigurationHandler didChangeConfigurationHandler;
-  private final AsyncAnalysisService asyncAnalysisService;
+  private final DidChangeWatchedFilesHandler didChangeWatchedFilesHandler;
 
   @Inject
   public CobolWorkspaceServiceImpl(
       LspMessageBroker lspMessageBroker,
       ExecuteCommandHandler executeCommandHandler,
-      SourceUnitGraph sourceUnitGraph,
       DidChangeConfigurationHandler didChangeConfigurationHandler,
-      AsyncAnalysisService asyncAnalysisService) {
+      DidChangeWatchedFilesHandler didChangeWatchedFilesHandler) {
     super(lspMessageBroker);
     this.executeCommandHandler = executeCommandHandler;
-    this.sourceUnitGraph = sourceUnitGraph;
     this.didChangeConfigurationHandler = didChangeConfigurationHandler;
-    this.asyncAnalysisService = asyncAnalysisService;
+    this.didChangeWatchedFilesHandler = didChangeWatchedFilesHandler;
   }
 
   /**
@@ -97,58 +88,7 @@ public class CobolWorkspaceServiceImpl extends LspEventConsumer implements Works
    */
   @Override
   public void didChangeWatchedFiles(@NonNull DidChangeWatchedFilesParams params) {
-    Set<FileEvent> changedFiles = new HashSet<>(params.getChanges());
-    changedFiles.forEach(
-        file -> {
-          URI uri = URI.create(file.getUri());
-          if ("file".equals(uri.getScheme())) {
-            Path path = Paths.get(uri);
-            if (file.getType() == FileChangeType.Deleted) {
-              path = path.getParent();
-            }
-            String uriString = path.toUri().toString();
-            if (sourceUnitGraph.isFileOpened(uriString)) {
-              // opened files are taken care by textChange events
-              return;
-            }
-            boolean isDirectory = Files.isDirectory(path);
-            if (!isDirectory) {
-              triggerAnalysisForChangedFile(uriString);
-            } else {
-              triggerAnalysisForFilesInDirectory(path);
-            }
-          }
-        });
-  }
-
-  @SneakyThrows
-  private void triggerAnalysisForChangedFile(String uri) {
-    List<String> uris =
-        sourceUnitGraph.getAllAssociatedFilesForACopybook(uri);
-    String fileContent = null;
-    if (uris.isEmpty()) {
-      asyncAnalysisService.reanalyseOpenedPrograms();
-      return;
-    }
-    if (Files.exists(Paths.get(URI.create(uri)))) {
-      sourceUnitGraph.updateContent(uri);
-      fileContent = sourceUnitGraph.getContent(uri);
-    }
-    if (!sourceUnitGraph.isFileOpened(uri)) {
-      asyncAnalysisService.reanalyseCopybooksAssociatedPrograms(
-          uris, uri, fileContent, SourceUnitGraph.EventSource.FILE_SYSTEM);
-    }
-  }
-
-  private void triggerAnalysisForFilesInDirectory(Path path) {
-    // Only care for deleted copybooks as they impact the diagnostics
-    Set<String> affectedPrograms =
-        sourceUnitGraph.getCopybookUriInsideFolder(path.toUri().toString()).stream()
-            .flatMap(
-                copybookUri ->
-                    sourceUnitGraph.getAllAssociatedFilesForACopybook(copybookUri).stream())
-            .collect(Collectors.toSet());
-
-    affectedPrograms.forEach(this::triggerAnalysisForChangedFile);
+    getLspMessageBroker()
+        .notify(new DidChangeWatchedFilesNotification(params, didChangeWatchedFilesHandler));
   }
 }

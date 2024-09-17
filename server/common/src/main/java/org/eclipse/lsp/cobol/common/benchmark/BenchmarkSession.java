@@ -17,12 +17,13 @@ package org.eclipse.lsp.cobol.common.benchmark;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
 @Slf4j
 public class BenchmarkSession {
-  private final Map<String, Measurement> measurementMap = new HashMap<>();
-  private final Map<String, String> attributes = new HashMap<>();
+  private final Map<String, Measurement> measurementMap = new ConcurrentHashMap<>();
+  private final Map<String, String> attributes = new ConcurrentHashMap<>();
 
   /**
    * Measure run time of supplier

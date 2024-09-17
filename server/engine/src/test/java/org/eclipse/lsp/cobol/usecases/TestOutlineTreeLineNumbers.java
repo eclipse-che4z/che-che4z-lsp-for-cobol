@@ -41,6 +41,18 @@ class TestOutlineTreeLineNumbers {
           + "05     01 STRUCTNAME.\n"
           + "06     03 VARNAME  PIC X(20).";
 
+  public static final String DUMMY_NODE_TEXT =
+          "       IDENTIFICATION DIVISION.\n"
+                  + "       PROGRAM-ID. CBLMERGE.\n"
+                  + "       \n"
+                  + "       ENVIRONMENT DIVISION.\n"
+                  + "        INPUT-OUTPUT SECTION.\n"
+                  + "        FILE-CONTROL.\n"
+                  + "           SELECT INPUT1 ASSIGN TO IN1.\n"
+                  + "           SELECT INPUT2 ASSIGN TO IN2.\n"
+                  + "           SELECT OUTPUT ASSIGN TO OUT.\n"
+                  + "           SELECT WORK ASSIGN TO WRK.";
+
   @Test
   void test() {
     AnalysisResult result =
@@ -88,6 +100,32 @@ class TestOutlineTreeLineNumbers {
             extractLineRange(
                     BuildOutlineTreeFromSyntaxTree.convert(
                             result.getRootNode(), result.getRootNode().getLocality().getUri())));
+  }
+
+  @Test
+  void unknownNodeName_whenNodeNameIsEmpty() {
+    AnalysisResult result =
+            UseCaseUtils.analyze(UseCase.builder().text(DUMMY_NODE_TEXT).cicsTranslator(false).build());
+
+    List<DocumentSymbol> actualOutline =
+            BuildOutlineTreeFromSyntaxTree.convert(
+                    result.getRootNode(), result.getRootNode().getLocality().getUri());
+
+    assertEquals(getDummyNodeOutlineRange(), extractLineRange(actualOutline));
+  }
+
+  private Map<String, LineRange> getDummyNodeOutlineRange() {
+    return new ImmutableMap.Builder<String, LineRange>()
+            .put("PROGRAM: CBLMERGE", new LineRange(0, 9))
+            .put("IDENTIFICATION DIVISION", new LineRange(0, 1))
+            .put("PROGRAM-ID CBLMERGE", new LineRange(1, 1))
+            .put("ENVIRONMENT DIVISION", new LineRange(3, 9))
+            .put("INPUT-OUTPUT SECTION", new LineRange(4, 9))
+            .put("INPUT1", new LineRange(6, 6))
+            .put("INPUT2", new LineRange(7, 7))
+            .put("UNKNOWN (FILE)", new LineRange(8, 8))
+            .put("WORK", new LineRange(9, 9))
+            .build();
   }
 
   private Map<String, LineRange> extractLineRange(List<DocumentSymbol> documentSymbols) {

@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.common.AnalysisResult;
@@ -32,6 +33,7 @@ import org.eclipse.lsp4j.Position;
 @Getter
 @RequiredArgsConstructor
 @Slf4j
+@ToString
 public class CobolDocumentModel {
   private static final String DELIMITER = "[ .\\[\\]()<>,*\"']+";
   private final List<Line> lines = new CopyOnWriteArrayList<>();
