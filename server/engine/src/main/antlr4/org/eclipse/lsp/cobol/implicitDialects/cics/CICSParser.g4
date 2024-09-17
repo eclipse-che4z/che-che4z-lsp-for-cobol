@@ -218,7 +218,7 @@ cics_acquire: PROCESS cics_data_value (PROCESSTYPE cics_data_value |
               ACTIVITYID cics_data_value | cics_handle_response?);
 
 /** ADD SUBEVENT */
-cics_add: ADD (SUBEVENT cics_data_value | EVENT cics_data_value | cics_handle_response)+;
+cics_add: ADD (SUBEVENT cics_data_value EVENT cics_data_value | EVENT cics_data_value SUBEVENT cics_data_value) cics_handle_response?;
 
 /** ADDRESS / ADDRESS SET */
 cics_address: ADDRESS (cics_address_null | cics_address_set);
