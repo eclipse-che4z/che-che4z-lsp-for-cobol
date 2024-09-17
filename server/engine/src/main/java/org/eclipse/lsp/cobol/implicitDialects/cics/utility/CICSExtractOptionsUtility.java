@@ -21,7 +21,6 @@ import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -160,10 +159,7 @@ public class CICSExtractOptionsUtility extends CICSOptionsCheckBaseUtility {
   private void checkAttach(CICSParser.Cics_extract_attachContext ctx) {
     checkHasMandatoryOptions(ctx.ATTACH(), ctx, "ATTACH");
     checkHasMutuallyExclusiveOptions(
-        "ATTACHID or CONVID or SESSION",
-        new ArrayList<>(ctx.ATTACH()),
-        new ArrayList<>(ctx.CONVID()),
-        new ArrayList<>(ctx.SESSION()));
+        "ATTACHID or CONVID or SESSION", ctx.ATTACHID(), ctx.CONVID(), ctx.SESSION());
   }
 
   private void checkAttributes(CICSParser.Cics_extract_attributesContext ctx) {
@@ -175,15 +171,13 @@ public class CICSExtractOptionsUtility extends CICSOptionsCheckBaseUtility {
 
   private void checkCertificate(CICSParser.Cics_extract_certificateContext ctx) {
     checkHasMandatoryOptions(ctx.CERTIFICATE(), ctx, "CERTIFICATE");
-    checkHasMutuallyExclusiveOptions(
-        "ISSUER OWNER", new ArrayList<>(ctx.ISSUER()), new ArrayList<>(ctx.OWNER()));
+    checkHasMutuallyExclusiveOptions("ISSUER OWNER", ctx.ISSUER(), ctx.OWNER());
   }
 
   private void checkLogonMsg(CICSParser.Cics_extract_logonmessageContext ctx) {
     checkHasMandatoryOptions(ctx.LOGONMSG(), ctx, "LOGONMSG");
     checkHasMandatoryOptions(ctx.LENGTH(), ctx, "LENGTH");
-    checkHasExactlyOneOption(
-        "INTO or SET", ctx, new ArrayList<>(ctx.INTO()), new ArrayList<>(ctx.SET()));
+    checkHasExactlyOneOption("INTO or SET", ctx, ctx.INTO(), ctx.SET());
   }
 
   private void checkProcess(CICSParser.Cics_extract_processContext ctx) {
@@ -214,8 +208,7 @@ public class CICSExtractOptionsUtility extends CICSOptionsCheckBaseUtility {
     checkHasMandatoryOptions(ctx.TCT(), ctx, "TCT");
     checkHasMandatoryOptions(ctx.NETNAME(), ctx, "NETNAME");
 
-    checkHasMutuallyExclusiveOptions(
-        "TERMID or SYSID", new ArrayList<>(ctx.TERMID()), new ArrayList<>(ctx.SYSID()));
+    checkHasMutuallyExclusiveOptions("TERMID or SYSID", ctx.TERMID(), ctx.SYSID());
   }
 
   private void checkWebClient(CICSParser.Cics_extract_web_clientContext ctx) {

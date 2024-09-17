@@ -24,6 +24,7 @@ import org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_receive;
 
@@ -87,7 +88,7 @@ public class CICSReceiveOptionsCheckUtility extends CICSOptionsCheckBaseUtility 
     checkHasMutuallyExclusiveOptions("INTO or SET", ctx.INTO(), ctx.SET());
     if (!ctx.SET().isEmpty())
       checkHasExactlyOneOption("LENGTH or FLENGTH", ctx, ctx.cics_length_flength());
-    checkHasMutuallyExclusiveOptions("MAXLENGTH or MAXFLENGTH", ctx.cics_maxlength());
+    checkMaxLength(ctx.cics_maxlength());
   }
 
   private void checkPartn(CICSParser.Cics_receive_partnContext ctx) {
@@ -98,11 +99,27 @@ public class CICSReceiveOptionsCheckUtility extends CICSOptionsCheckBaseUtility 
 
   private void checkMap(CICSParser.Cics_receive_mapContext ctx) {
     if (ctx.FROM().isEmpty()) checkHasIllegalOptions(ctx.LENGTH(), "LENGTH without FROM");
-    checkHasMutuallyExclusiveOptions("INTO or SET", ctx.cics_into_set());
+    checkIntoSet(ctx.cics_into_set());
   }
 
   private void checkMapMappingDev(CICSParser.Cics_receive_map_mappingdevContext ctx) {
     checkHasMandatoryOptions(ctx.FROM(), ctx, "FROM");
-    checkHasMutuallyExclusiveOptions("INTO or SET", ctx.cics_into_set());
+    checkIntoSet(ctx.cics_into_set());
+  }
+
+  private void checkIntoSet(List<CICSParser.Cics_into_setContext> ctx) {
+    checkHasMutuallyExclusiveOptions(
+        "INTO or SET",
+        ctx.stream().map(CICSParser.Cics_into_setContext::INTO).collect(Collectors.toList()),
+        ctx.stream().map(CICSParser.Cics_into_setContext::SET).collect(Collectors.toList()));
+  }
+
+  private void checkMaxLength(List<CICSParser.Cics_maxlengthContext> ctx) {
+    checkHasMutuallyExclusiveOptions(
+        "MAXLENGTH or MAXFLENGTH",
+        ctx.stream().map(CICSParser.Cics_maxlengthContext::MAXLENGTH).collect(Collectors.toList()),
+        ctx.stream()
+            .map(CICSParser.Cics_maxlengthContext::MAXFLENGTH)
+            .collect(Collectors.toList()));
   }
 }

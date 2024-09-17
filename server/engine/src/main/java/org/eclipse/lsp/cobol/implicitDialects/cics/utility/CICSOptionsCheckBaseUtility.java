@@ -20,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
+import org.antlr.v4.runtime.tree.TerminalNodeImpl;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
@@ -236,40 +237,65 @@ public abstract class CICSOptionsCheckBaseUtility {
    * exclusive options.
    *
    * @param options Options checked to insert into error message
-   * @param rules Generic lists of rule lists to check. Will be a collection of ParserRuleContext
-   *     and/or TerminalNode objects.
-   * @param <E> List of Generics to allow cross-rule context collection.
-   * @return True if an instance is not found
+   * @param rules Lists of TerminalNode.
+   * @return Number of TerminalNode instances found
    */
-  protected <E extends ParseTree> boolean checkHasMutuallyExclusiveOptions(
-      String options, List<E>... rules) {
-    String token = null;
-    for (List<E> option : rules) {
+  protected int checkHasMutuallyExclusiveOptions(String options, List<TerminalNode>... rules) {
+    String tokenType = null;
+    int occurances = 0;
+    for (List<TerminalNode> option : rules) {
       if (option.isEmpty()) continue;
-      if (token == null) token = option.remove(0).getText().split("\\(")[0].toUpperCase();
-      for (E rule : option) {
+      for (TerminalNode rule : option) {
+        if (rule == null) continue;
+        if (tokenType == null) {
+          tokenType = option.get(0).getText().toUpperCase();
+          occurances++;
+          continue;
+        }
         // Flag only options that do NOT match the first option encountered.
         // If the option is the same then this is already flagged by checkDuplicates
-        if (!token.equals(rule.getText().split("\\(")[0].toUpperCase())) {
+        if (!tokenType.equals(rule.getText().toUpperCase())) {
           throwException(
               ErrorSeverity.ERROR,
               getLocality(rule),
               "Exactly one option required, options are mutually exclusive: ",
               options);
         }
+        occurances++;
       }
     }
-    return token == null;
+    return occurances;
   }
 
   protected <E extends ParseTree> void checkHasExactlyOneOption(
       String options, ParserRuleContext parentCtx, List<E>... rules) {
-    if (checkHasMutuallyExclusiveOptions(options, rules)) {
+    List<TerminalNode> children = new ArrayList<>();
+    for (List<E> rule : rules) {
+      if (!rule.isEmpty()) {
+        if (rule.get(0).getClass().isAssignableFrom(TerminalNodeImpl.class))
+          children.addAll((List<TerminalNode>) rule);
+        else {
+          for (E context : rule) {
+            getAllTokenChildren((ParserRuleContext) context, children);
+          }
+        }
+      }
+    }
+    if (checkHasMutuallyExclusiveOptions(options, children) == 0) {
       throwException(
           ErrorSeverity.ERROR,
           getLocality(parentCtx),
           "Exactly one option required, none provided: ",
           options);
+    }
+  }
+
+  private void getAllTokenChildren(ParserRuleContext ctx, List<TerminalNode> children) {
+    for (ParseTree child : ctx.children) {
+      if (child.getChildCount() == 0 && baseDuplicateOptions.containsKey(child.getText()))
+        children.add((TerminalNode) child);
+      else if (child.getClass().isAssignableFrom(ParserRuleContext.class))
+        getAllTokenChildren((ParserRuleContext) child, children);
     }
   }
 }

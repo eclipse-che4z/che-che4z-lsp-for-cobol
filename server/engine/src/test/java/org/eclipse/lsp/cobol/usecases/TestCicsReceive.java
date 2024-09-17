@@ -184,7 +184,7 @@ public class TestCicsReceive {
     "SESSION(100)",
     "LENGTH(10)",
     "MAXLENGTH(1000)",
-    "{MAXFLENGTH(100)|errorOne}",
+    "{MAXFLENGTH|errorOne}(100)",
     "STATE(101)"
   };
 
