@@ -292,7 +292,8 @@ public abstract class CICSOptionsCheckBaseUtility {
 
   private void getAllTokenChildren(ParserRuleContext ctx, List<TerminalNode> children) {
     for (ParseTree child : ctx.children) {
-      if (child.getChildCount() == 0 && baseDuplicateOptions.containsKey(child.getText()))
+      if (child.getChildCount() == 0
+          && baseDuplicateOptions.containsKey(child.getText().toUpperCase()))
         children.add((TerminalNode) child);
       else if (child.getClass().isAssignableFrom(ParserRuleContext.class))
         getAllTokenChildren((ParserRuleContext) child, children);
