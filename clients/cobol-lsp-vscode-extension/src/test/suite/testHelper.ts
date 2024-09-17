@@ -78,7 +78,9 @@ export async function showDocument(workspace_file: string) {
   // open and show the file
   const document = await vscode.workspace.openTextDocument(file);
   await vscode.languages.setTextDocumentLanguage(document, "cobol");
-  const editor = await vscode.window.showTextDocument(document);
+  const editor = await vscode.window.showTextDocument(document, {
+    preview: false,
+  });
 
   return editor;
 }
@@ -86,23 +88,20 @@ export async function showDocument(workspace_file: string) {
 export async function closeActiveEditor() {
   const doc = vscode.window.activeTextEditor;
   if (!doc) return;
-  while (doc.document.isDirty) {
-    await vscode.commands.executeCommand("undo");
-    await sleep(100);
-  }
-  await vscode.languages.setTextDocumentLanguage(doc.document, "json");
-  await vscode.commands.executeCommand("workbench.action.closeActiveEditor");
-  await sleep(100);
+  // simulate didClose by changing the languageID
+  await vscode.languages.setTextDocumentLanguage(doc.document, "plaintext");
+  await vscode.commands.executeCommand(
+    "workbench.action.revertAndCloseActiveEditor",
+  );
 }
 
 export async function closeAllEditors() {
-  await waitFor(async () => {
-    if (vscode.window.activeTextEditor === undefined) {
-      return true;
-    }
+  let editor = vscode.window.activeTextEditor;
+  while (!!editor?.document) {
+    // simulate didClose by changing the languageID
     await closeActiveEditor();
-    return vscode.window.activeTextEditor === undefined;
-  });
+    editor = vscode.window.activeTextEditor;
+  }
 }
 
 export function moveCursor(

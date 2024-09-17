@@ -39,6 +39,7 @@ public class AstProcessor {
    */
   public List<SyntaxError> processSyntaxTree(ProcessingContext ctx, Node rootNode) {
     for (ProcessingPhase phase : ProcessingPhase.values()) {
+      ThreadInterruptionUtil.checkThreadInterrupted();
       process(phase, rootNode, ctx);
     }
     return ctx.getErrors();
