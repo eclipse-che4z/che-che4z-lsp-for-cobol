@@ -238,20 +238,20 @@ public abstract class CICSOptionsCheckBaseUtility {
    * @return Number of TerminalNode instances found
    */
   protected int checkHasMutuallyExclusiveOptions(String options, List<TerminalNode>... rules) {
-    String tokenType = null;
+    int tokenType = -1;
     int occurances = 0;
     for (List<TerminalNode> option : rules) {
       if (option.isEmpty()) continue;
       for (TerminalNode rule : option) {
         if (rule == null) continue;
-        if (tokenType == null) {
-          tokenType = option.get(0).getText().toUpperCase();
+        if (tokenType < 0) {
+          tokenType = rule.getSymbol().getType();
           occurances++;
           continue;
         }
         // Flag only options that do NOT match the first option encountered.
         // If the option is the same then this is already flagged by checkDuplicates
-        if (!tokenType.equals(rule.getText().toUpperCase())) {
+        if (tokenType != rule.getSymbol().getType()) {
           throwException(
               ErrorSeverity.ERROR,
               getLocality(rule),
@@ -289,7 +289,8 @@ public abstract class CICSOptionsCheckBaseUtility {
 
   private void getAllTokenChildren(ParserRuleContext ctx, List<TerminalNode> children) {
     for (ParseTree child : ctx.children) {
-      if (baseDuplicateOptions.containsKey(child.getText().toUpperCase()))
+      if (TerminalNode.class.isAssignableFrom(child.getClass())
+          && baseDuplicateOptions.containsKey(child.getText().toUpperCase()))
         children.add((TerminalNode) child);
       else if (ParserRuleContext.class.isAssignableFrom(child.getClass()))
         getAllTokenChildren((ParserRuleContext) child, children);

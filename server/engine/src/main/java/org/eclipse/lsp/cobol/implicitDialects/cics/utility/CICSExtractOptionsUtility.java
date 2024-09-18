@@ -171,7 +171,7 @@ public class CICSExtractOptionsUtility extends CICSOptionsCheckBaseUtility {
 
   private void checkCertificate(CICSParser.Cics_extract_certificateContext ctx) {
     checkHasMandatoryOptions(ctx.CERTIFICATE(), ctx, "CERTIFICATE");
-    checkHasMutuallyExclusiveOptions("ISSUER OWNER", ctx.ISSUER(), ctx.OWNER());
+    checkHasMutuallyExclusiveOptions("ISSUER or OWNER", ctx.ISSUER(), ctx.OWNER());
   }
 
   private void checkLogonMsg(CICSParser.Cics_extract_logonmessageContext ctx) {
