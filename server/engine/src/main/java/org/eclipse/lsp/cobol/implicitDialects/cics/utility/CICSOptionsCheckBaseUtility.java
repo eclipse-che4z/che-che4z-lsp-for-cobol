@@ -146,6 +146,14 @@ public abstract class CICSOptionsCheckBaseUtility {
     checkHasRequiredOptionFromString(requiredContext.getText(), optionalContext.getText(), ctx, options);
   }
 
+  protected void checkHasRequiredOption(TerminalNode requiredContext, List<TerminalNode> optionalContext, ParserRuleContext ctx, String options) {
+    checkHasRequiredOptionFromString(requiredContext.getText(), (optionalContext.isEmpty() ? "" : optionalContext.get(0).getText()), ctx, options);
+  }
+
+  protected void checkHasRequiredOption(List<TerminalNode> requiredContext, TerminalNode optionalContext, ParserRuleContext ctx, String options) {
+    checkHasRequiredOptionFromString((requiredContext.isEmpty() ? "" : requiredContext.get(0).getText()), optionalContext.getText(), ctx, options);
+  }
+
 
   private void checkHasRequiredOptionFromString(String requiredContextText, String optionalContextText, ParserRuleContext ctx, String options) {
     if (requiredContextText.isEmpty() && !optionalContextText.isEmpty()) {
@@ -169,6 +177,18 @@ public abstract class CICSOptionsCheckBaseUtility {
           error ->
               throwException(
                   ErrorSeverity.ERROR, getLocality(error), "Invalid option provided: ", options));
+    }
+  }
+
+  /**
+   * Helper method to collect analysis errors if the rule context contains illegal options
+   *
+   * @param rule Generic rule to check
+   * @param options Options checked to insert into error message
+   */
+  protected void checkHasIllegalOptions(TerminalNode rule, String options) {
+    if (!rule.getText().isEmpty()) {
+      throwException(ErrorSeverity.ERROR, getLocality(rule), "Invalid option provided: ", options);
     }
   }
 
