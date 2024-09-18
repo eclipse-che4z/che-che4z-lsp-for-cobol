@@ -22,7 +22,7 @@ import com.google.inject.Injector;
 import org.eclipse.lsp.cobol.cfg.CFASTBuilder;
 import org.eclipse.lsp.cobol.cli.di.CliModule;
 import org.eclipse.lsp.cobol.common.dialects.CobolLanguageId;
-import org.eclipse.lsp.cobol.common.model.tree.Node;
+import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
 import org.eclipse.lsp.cobol.common.pipeline.StageResult;
 import org.eclipse.lsp.cobol.dialects.ibm.ProcessingResult;
 import picocli.CommandLine;
@@ -79,9 +79,8 @@ public class CliCFAST  implements Callable<Integer> {
     try {
       Cli.Result analysisResult = parent.runAnalysis(file.getCanonicalFile(), CobolLanguageId.COBOL, diCtx, true);
       StageResult<ProcessingResult> result = (StageResult<ProcessingResult>) analysisResult.pipelineResult.getLastStageResult();
-      Node rootNode = result.getData().getRootNode();
-
-      String json = gson.toJson(builder.build(rootNode).getControlFlowAST());
+      ProgramNode programNode = result.getData().getRootNode().findFirstProgramNode();
+      String json = gson.toJson(builder.build(programNode).getControlFlowAST());
 
       try (FileWriter writer = new FileWriter(getCFASTFileName(file.toPath()))) {
         writer.write(json);

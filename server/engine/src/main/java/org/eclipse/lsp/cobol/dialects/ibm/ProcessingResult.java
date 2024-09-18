@@ -15,7 +15,7 @@
 package org.eclipse.lsp.cobol.dialects.ibm;
 
 import lombok.Value;
-import org.eclipse.lsp.cobol.common.model.tree.Node;
+import org.eclipse.lsp.cobol.common.model.tree.RootNode;
 import org.eclipse.lsp.cobol.common.symbols.SymbolTable;
 
 import java.util.Map;
@@ -26,5 +26,5 @@ import java.util.Map;
 @Value
 public class ProcessingResult {
   Map<String, SymbolTable> symbolTableMap;
-  Node rootNode;
+  RootNode rootNode;
 }
