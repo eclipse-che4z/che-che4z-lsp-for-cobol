@@ -167,7 +167,7 @@ public class TestCICSExtract {
             "errorOne",
             new Diagnostic(
                 new Range(),
-                "Exactly one option required, options are mutually exclusive: ISSUER OWNER",
+                "Exactly one option required, options are mutually exclusive: ISSUER or OWNER",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()));
     CICSTestUtils.errorTest(EXTRACT_CERTIFICATE_INVALID_ONE, expectedDiagnostics);
