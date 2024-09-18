@@ -54,7 +54,7 @@ public class TestCICSExtract {
       "EXTRACT CERTIFICATE({$varOne}) COMMONNAME({$varOne}) ORGUNITLEN({$varOne})";
 
   private static final String EXTRACT_CERTIFICATE_INVALID_ONE =
-      "EXTRACT CERTIFICATE(100) {OWNER|errorOne} ISSUER";
+      "EXTRACT CERTIFICATE(100) {OWNER|errorOne} {ISSUER|errorTwo}";
 
   private static final String EXTRACT_LOGONMSG_ALL_OPTIONS_VALID_ONE =
       "EXTRACT LOGONMSG INTO({$varOne}) LENGTH({$varTwo})";
@@ -66,13 +66,13 @@ public class TestCICSExtract {
       "EXTRACT {_LOGONMSG SET(100)|errorOne_}";
 
   private static final String EXTRACT_LOGONMSG_INVALID_TWO =
-      "EXTRACT LOGONMSG INTO(100) {SET|errorOne}(100) LENGTH(100)";
+      "EXTRACT LOGONMSG {INTO|errorOne}(100) {SET|errorTwo}(100) LENGTH(100)";
 
   private static final String EXTRACT_LOGONMSG_INVALID_THREE =
       "EXTRACT {_LOGONMSG LENGTH(100)|errorOne_}";
 
   private static final String EXTRACT_LOGONMSG_INVALID_FOUR =
-      "EXTRACT LOGONMSG INTO(100) RESP(100) RESP2(101) {SET|errorOne}(100) LENGTH(100)";
+      "EXTRACT LOGONMSG {INTO|errorOne}(100) RESP(100) RESP2(101) {SET|errorTwo}(100) LENGTH(100)";
 
   private static final String EXTRACT_PROCESS_ALL_OPTIONS_VALID_ONE =
       "EXTRACT PROCESS PROCNAME({$varOne}) PROCLENGTH({$varOne}) MAXPROCLEN({$varOne}) CONVID({$varOne}) SYNCLEVEL({$varOne}) PIPLIST({$varOne}) PIPLENGTH({$varOne})";
@@ -169,6 +169,12 @@ public class TestCICSExtract {
                 new Range(),
                 "Exactly one option required, options are mutually exclusive: ISSUER or OWNER",
                 DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()),
+            "errorTwo",
+            new Diagnostic(
+                new Range(),
+                "Exactly one option required, options are mutually exclusive: ISSUER or OWNER",
+                DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()));
     CICSTestUtils.errorTest(EXTRACT_CERTIFICATE_INVALID_ONE, expectedDiagnostics);
   }
@@ -205,6 +211,12 @@ public class TestCICSExtract {
                 new Range(),
                 "Exactly one option required, options are mutually exclusive: INTO or SET",
                 DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()),
+            "errorTwo",
+            new Diagnostic(
+                new Range(),
+                "Exactly one option required, options are mutually exclusive: INTO or SET",
+                DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()));
     CICSTestUtils.errorTest(EXTRACT_LOGONMSG_INVALID_TWO, expectedDiagnostics);
   }
@@ -227,6 +239,12 @@ public class TestCICSExtract {
     Map<String, Diagnostic> expectedDiagnostics =
         ImmutableMap.of(
             "errorOne",
+            new Diagnostic(
+                new Range(),
+                "Exactly one option required, options are mutually exclusive: INTO or SET",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()),
+            "errorTwo",
             new Diagnostic(
                 new Range(),
                 "Exactly one option required, options are mutually exclusive: INTO or SET",

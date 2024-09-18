@@ -30,6 +30,8 @@ import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser;
 
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /** Common facilities for checking CICS parser options */
 @Slf4j
@@ -175,33 +177,21 @@ public abstract class CICSOptionsCheckBaseUtility {
    */
   private void checkDuplicateEntries(
       ParserRuleContext ctx, Set<String> entries, Map<String, ErrorSeverity> duplicateOptions) {
-
-    if (ctx.getChildCount() == 0) return;
-
-    for (ParseTree entry : ctx.children) {
-      String option = entry.getText().toUpperCase();
-      if (duplicateOptions.containsKey(option)) {
-        if (!entries.add(option)) {
-          throwException(
-              duplicateOptions.get(option),
-              getLocality(entry),
-              "Excessive options provided for: ",
-              option);
-        }
-      } else if (ParserRuleContext.class.isAssignableFrom(entry.getClass())) {
-        String className = entry.getClass().getSimpleName();
-        Pair<String, ErrorSeverity> subGroup = subGroups.getOrDefault(className, null);
-        if (className.equals("Cics_handle_responseContext"))
-          checkResponseHandlers((CICSParser.Cics_handle_responseContext) entry);
-        if (subGroup != null && !entries.add(className)) {
-          throwException(
-              subGroup.getRight(),
-              getLocality(entry),
-              "Excessive options provided for: ",
-              subGroup.getLeft());
-        } else checkDuplicateEntries((ParserRuleContext) entry, entries, duplicateOptions);
-      }
-    }
+    List<TerminalNode> children = new ArrayList<>();
+    getAllTokenChildren(ctx, children, true);
+    children.forEach(
+        child -> {
+          String option = child.getText().toUpperCase();
+          if (duplicateOptions.containsKey(option)) {
+            if (!entries.add(option)) {
+              throwException(
+                  duplicateOptions.get(option),
+                  getLocality(child),
+                  "Excessive options provided for: ",
+                  option);
+            }
+          }
+        });
   }
 
   /**
@@ -238,46 +228,49 @@ public abstract class CICSOptionsCheckBaseUtility {
    * @return Number of TerminalNode instances found
    */
   protected int checkHasMutuallyExclusiveOptions(String options, List<TerminalNode>... rules) {
-    int tokenType = -1;
-    int occurances = 0;
-    for (List<TerminalNode> option : rules) {
-      if (option.isEmpty()) continue;
-      for (TerminalNode rule : option) {
-        if (rule == null) continue;
-        if (tokenType < 0) {
-          tokenType = rule.getSymbol().getType();
-          occurances++;
-          continue;
-        }
-        // Flag only options that do NOT match the first option encountered.
-        // If the option is the same then this is already flagged by checkDuplicates
-        if (tokenType != rule.getSymbol().getType()) {
-          throwException(
-              ErrorSeverity.ERROR,
-              getLocality(rule),
-              "Exactly one option required, options are mutually exclusive: ",
-              options);
-        }
-        occurances++;
-      }
+    List<TerminalNode> nodes =
+        Stream.of(rules)
+            .filter(rule -> !rule.isEmpty())
+            .flatMap(Collection::stream)
+            .collect(Collectors.toList());
+    nodes.removeIf(Objects::isNull);
+
+    // Only raise error if this validates mutual exclusivity and is not an artifact of duplicate
+    // options
+    if (!nodes.stream()
+        .allMatch(e -> e.getSymbol().getType() == nodes.get(0).getSymbol().getType())) {
+      nodes.forEach(
+          node -> {
+            throwException(
+                ErrorSeverity.ERROR,
+                getLocality(node),
+                "Exactly one option required, options are mutually exclusive: ",
+                options);
+          });
     }
-    return occurances;
+    return nodes.size();
   }
 
   protected <E extends ParseTree> void checkHasExactlyOneOption(
       String options, ParserRuleContext parentCtx, List<E>... rules) {
-    List<TerminalNode> children = new ArrayList<>();
-    for (List<E> rule : rules) {
-      if (!rule.isEmpty()) {
-        if (TerminalNode.class.isAssignableFrom(rule.get(0).getClass()))
-          children.addAll((List<TerminalNode>) rule);
-        else {
-          for (E context : rule) {
-            getAllTokenChildren((ParserRuleContext) context, children);
-          }
-        }
-      }
-    }
+
+    List<TerminalNode> children =
+        Stream.of(rules)
+            .filter(
+                rule ->
+                    !rule.isEmpty() && TerminalNode.class.isAssignableFrom(rule.get(0).getClass()))
+            .flatMap(Collection::stream)
+            .map(rule -> (TerminalNode) rule)
+            .collect(Collectors.toList());
+
+    Stream.of(rules)
+        .filter(
+            rule ->
+                !rule.isEmpty() && ParserRuleContext.class.isAssignableFrom(rule.get(0).getClass()))
+        .flatMap(Collection::stream)
+        .collect(Collectors.toList())
+        .forEach(rule -> getAllTokenChildren((ParserRuleContext) rule, children, false));
+
     if (checkHasMutuallyExclusiveOptions(options, children) == 0) {
       throwException(
           ErrorSeverity.ERROR,
@@ -287,13 +280,19 @@ public abstract class CICSOptionsCheckBaseUtility {
     }
   }
 
-  private void getAllTokenChildren(ParserRuleContext ctx, List<TerminalNode> children) {
-    for (ParseTree child : ctx.children) {
-      if (TerminalNode.class.isAssignableFrom(child.getClass())
-          && baseDuplicateOptions.containsKey(child.getText().toUpperCase()))
-        children.add((TerminalNode) child);
-      else if (ParserRuleContext.class.isAssignableFrom(child.getClass()))
-        getAllTokenChildren((ParserRuleContext) child, children);
-    }
+  private void getAllTokenChildren(
+      ParserRuleContext ctx, List<TerminalNode> children, boolean validateResponseHandler) {
+    ctx.children.forEach(
+        child -> {
+          if (TerminalNode.class.isAssignableFrom(child.getClass())
+              && baseDuplicateOptions.containsKey(child.getText().toUpperCase()))
+            children.add((TerminalNode) child);
+          else if (ParserRuleContext.class.isAssignableFrom(child.getClass())) {
+            if (validateResponseHandler
+                && child.getClass().getSimpleName().equals("Cics_handle_responseContext"))
+              checkResponseHandlers((CICSParser.Cics_handle_responseContext) child);
+            getAllTokenChildren((ParserRuleContext) child, children, validateResponseHandler);
+          }
+        });
   }
 }

@@ -183,8 +183,8 @@ public class TestCicsReceive {
     "RECEIVE",
     "SESSION(100)",
     "LENGTH(10)",
-    "MAXLENGTH(1000)",
-    "{MAXFLENGTH|errorOne}(100)",
+    "{MAXLENGTH|errorOne}(1000)",
+    "{MAXFLENGTH|errorTwo}(100)",
     "STATE(101)"
   };
 
@@ -528,6 +528,12 @@ public class TestCicsReceive {
         ImmutableList.of(),
         ImmutableMap.of(
             "errorOne",
+            new Diagnostic(
+                new Range(),
+                "Exactly one option required, options are mutually exclusive: MAXLENGTH or MAXFLENGTH",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()),
+            "errorTwo",
             new Diagnostic(
                 new Range(),
                 "Exactly one option required, options are mutually exclusive: MAXLENGTH or MAXFLENGTH",
