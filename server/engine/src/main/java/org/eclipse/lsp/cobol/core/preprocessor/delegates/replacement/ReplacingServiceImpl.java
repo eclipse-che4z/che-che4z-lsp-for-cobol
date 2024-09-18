@@ -230,10 +230,10 @@ public class ReplacingServiceImpl implements ReplacingService {
   }
 
   private void replace(@NonNull ExtendedDocument extendedDocument, @NonNull Pair<String, String> pattern, @NonNull Range scope) {
-    if (StringUtils.isBlank(extendedDocument.toString())) {
+    String text = extendedDocument.toString();
+    if (StringUtils.isBlank(text)) {
       return;
     }
-    String text = extendedDocument.toString();
     try {
       Matcher matcher = Pattern.compile(pattern.getLeft(), Pattern.CASE_INSENSITIVE).matcher(text);
       while (matcher.find()) {

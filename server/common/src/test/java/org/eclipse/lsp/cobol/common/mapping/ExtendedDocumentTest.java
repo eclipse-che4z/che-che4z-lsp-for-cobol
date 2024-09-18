@@ -116,5 +116,10 @@ class ExtendedDocumentTest {
     assertEquals(documentUri, location.getUri());
   }
 
-
+  @Test
+  void testIsLineEmptyBetweenColumns() {
+    assertTrue(document.isLineEmptyBetweenColumns(0, 0, 8));
+    assertFalse(document.isLineEmptyBetweenColumns(0, 7, 100));
+    assertTrue(document.isLineEmptyBetweenColumns(1000, 0, 1));
+  }
 }

@@ -36,7 +36,6 @@ import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.mapping.OriginalLocation;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
-import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.model.tree.RootNode;
 import org.eclipse.lsp.cobol.common.utils.ImplicitCodeUtils;
 import org.eclipse.lsp.cobol.common.utils.ThreadInterruptionUtil;
@@ -83,7 +82,7 @@ public class CobolLanguageEngine {
 
   private static AnalysisResult toAnalysisResult(
       ResultWithErrors<AnalysisResult> result, String uri) {
-    Node rootNode = result.getResult().getRootNode();
+    RootNode rootNode = result.getResult().getRootNode();
 
     List<String> copyUriList =
         rootNode
