@@ -326,14 +326,9 @@ public class CICSIssueOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
                 .collect(Collectors.toList()));
 
     boolean hasVolume =
-        !ctx.stream()
-            .map(CICSParser.Cics_issue_commonContext::VOLUME)
-            .collect(Collectors.toList())
-            .stream()
-            .filter(r -> r.isEmpty())
-            .flatMap(Collection::stream)
-            .collect(Collectors.toList())
-            .isEmpty();
+        !(ctx.stream()
+                .map(CICSParser.Cics_issue_commonContext::VOLUME)
+                .flatMap(Collection::stream).count() == 0);
 
     ctx.forEach(
         context -> {
