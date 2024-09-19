@@ -33,6 +33,8 @@ public class CICSOptionsCheckUtility {
     optionsMap.put(
         CICSAllocateOptionsCheckUtility.RULE_INDEX,
         new CICSAllocateOptionsCheckUtility(context, errors));
+    optionsMap.put(
+        CICSExtractOptionsUtility.RULE_INDEX, new CICSExtractOptionsUtility(context, errors));
   }
 
   /**
