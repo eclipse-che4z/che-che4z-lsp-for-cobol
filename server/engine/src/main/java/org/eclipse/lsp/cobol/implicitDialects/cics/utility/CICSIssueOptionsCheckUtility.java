@@ -125,8 +125,6 @@ public class CICSIssueOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
       checkDisconnect((CICSParser.Cics_issue_disconnectContext) ctx);
     else if (ctx.getClass() == CICSParser.Cics_issue_endContext.class)
       checkEnd((CICSParser.Cics_issue_endContext) ctx);
-    else if (ctx.getClass() == CICSParser.Cics_issue_endfile_endoutputContext.class)
-      checkEndFileOutput((CICSParser.Cics_issue_endfile_endoutputContext) ctx);
     else if (ctx.getClass() == CICSParser.Cics_issue_eodsContext.class)
       checkEODS((CICSParser.Cics_issue_eodsContext) ctx);
     else if (ctx.getClass() == CICSParser.Cics_issue_eraseContext.class)
@@ -193,10 +191,6 @@ public class CICSIssueOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
   private void checkEnd(CICSParser.Cics_issue_endContext ctx) {
     checkHasMandatoryOptions(ctx.END(), ctx, "END");
     checkIssueCommon(ctx.cics_issue_common());
-  }
-
-  void checkEndFileOutput(CICSParser.Cics_issue_endfile_endoutputContext ctx) {
-    if (ctx.ENDFILE().isEmpty()) checkHasMandatoryOptions(ctx.ENDOUTPUT(), ctx, "ENDOUTPUT");
   }
 
   void checkEODS(CICSParser.Cics_issue_eodsContext ctx) {
