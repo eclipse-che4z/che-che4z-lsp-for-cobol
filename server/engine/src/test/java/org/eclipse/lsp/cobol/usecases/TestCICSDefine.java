@@ -121,7 +121,7 @@ public class TestCICSDefine {
             "errorOne",
             new Diagnostic(
                 new Range(),
-                "Missing required option: AND or OR",
+                "Exactly one option required, none provided: AND or OR",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()));
     CICSTestUtils.errorTest(DEFINE_COMPOSITE_EVENT_INVALID_ONE, expectedDiagnostics);

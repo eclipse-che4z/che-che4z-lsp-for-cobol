@@ -20,10 +20,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.Pair;
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
@@ -47,30 +43,16 @@ public abstract class CICSOptionsCheckBaseUtility {
       new HashMap<String, ErrorSeverity>() {
         {
           put("ASIS", ErrorSeverity.WARNING);
-
           put("BUFFER", ErrorSeverity.WARNING);
-
           put("LEAVEKB", ErrorSeverity.WARNING);
-
           put("NOTRUNCATE", ErrorSeverity.WARNING);
-
           put("NOQUEUE", ErrorSeverity.WARNING);
-
           put("NOTRUNCATE", ErrorSeverity.WARNING);
-        { // handle response options
+          // handle response options
           put("RESP", ErrorSeverity.ERROR);
           put("RESP2", ErrorSeverity.ERROR);
           put("WAIT", ErrorSeverity.ERROR);
           put("NOHANDLE", ErrorSeverity.ERROR);
-        }
-      };
-
-  private final Map<String, Pair<String, ErrorSeverity>> subGroups =
-      new HashMap<String, Pair<String, ErrorSeverity>>() {
-        {
-          put(
-              "Cics_handle_responseContext",
-              new ImmutablePair<>("RESPONSE HANDLER", ErrorSeverity.ERROR));
         }
       };
 
@@ -266,6 +248,7 @@ public abstract class CICSOptionsCheckBaseUtility {
         .filter(rule -> !rule.isEmpty())
         .forEach(
             rule -> {
+              rule.removeIf(Objects::isNull);
               if (TerminalNode.class.isAssignableFrom(rule.get(0).getClass()))
                 children.addAll((List<TerminalNode>) rule);
               else
@@ -284,6 +267,7 @@ public abstract class CICSOptionsCheckBaseUtility {
 
   private void getAllTokenChildren(
       ParserRuleContext ctx, List<TerminalNode> children, boolean validateResponseHandler) {
+    if (ctx.children == null) return;
     ctx.children.forEach(
         child -> {
           if (TerminalNode.class.isAssignableFrom(child.getClass())
