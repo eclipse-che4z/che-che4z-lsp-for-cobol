@@ -15,21 +15,21 @@
 package org.eclipse.lsp.cobol.common.mapping;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 
 import java.util.Map;
-import java.util.UUID;
 
 /**
  * Mapped character class with original position information
  */
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 public class MappedCharacter {
-  private final UUID id = UUID.randomUUID();
   private char character;
   private Position originalPosition;
   private String uri;
