@@ -14,4 +14,3 @@
 # */
 org.eclipse.lsp.cobol.usecases.suite.UniqueIdTestWatcher
 org.eclipse.lsp.cobol.test.engine.ExtensionContextProvider
-org.eclipse.lsp.cobol.test.engine.ExtensionContextCleaner

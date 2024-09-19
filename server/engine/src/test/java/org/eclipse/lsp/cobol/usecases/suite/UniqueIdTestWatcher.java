@@ -113,7 +113,6 @@ public class UniqueIdTestWatcher implements TestWatcher {
 
   private static void writeTestData(TestData testData, Path mainFolderPath) throws IOException {
     Path testDataPath = mainFolderPath.resolve("testData.txt");
-    Files.deleteIfExists(testDataPath);
     writeToFile(testDataPath, testData.toString());
   }
 

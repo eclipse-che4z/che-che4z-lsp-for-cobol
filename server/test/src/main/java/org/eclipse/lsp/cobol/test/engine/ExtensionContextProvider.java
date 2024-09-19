@@ -15,6 +15,7 @@
 
 package org.eclipse.lsp.cobol.test.engine;
 
+import org.junit.jupiter.api.extension.AfterEachCallback;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import java.util.Optional;
@@ -22,7 +23,7 @@ import java.util.Optional;
 /**
  * BeforeEachCallback for Use case test
  */
-public class ExtensionContextProvider implements BeforeEachCallback {
+public class ExtensionContextProvider implements BeforeEachCallback, AfterEachCallback {
 
   private static final ThreadLocal<ExtensionContext> CONTEXT_HOLDER = new ThreadLocal<>();
 
@@ -45,5 +46,14 @@ public class ExtensionContextProvider implements BeforeEachCallback {
    */
   public static void clearExtensionContext() {
     CONTEXT_HOLDER.remove();
+  }
+
+  /**
+   *
+   * @param context
+   */
+  @Override
+  public void afterEach(ExtensionContext context) {
+    ExtensionContextProvider.clearExtensionContext();
   }
 }
