@@ -72,13 +72,13 @@ The extension enables syntax highlighting for COBOL code.
 ### Syntax Coloring
 Contrasting colors are used in displayed code for ease of identifying and distinguishing keywords, variables, paragraphs and sections.
 
-### Outline View and Breadcrumb View
-The extension enables outline view and breadcrumb view, which show the structure of elements within the program and allow easy navigation between them.
+### Outline View and Breadcrumbs
+The extension enables outline view and the breadcrumbs navigation bar at the top of the edit window, which show the structure of elements within the program and allow easy navigation between them.
 
 ### Code Snippets
 Before you write your COBOL code from scratch, search the snippet library for useful templates.
 
-1. Press `F1` to open the command palette.
+1. Press **F1** to open the command palette.
 2. Type **Insert Snippet** and press enter.
 3. Select the snippet that you want to insert.
 
@@ -86,7 +86,7 @@ Before you write your COBOL code from scratch, search the snippet library for us
 
 You can also insert a code snippet by typing the name of the snippet in your code and clicking on the autocomplete text.
 
-The COBOL Language Support extension also supports user snippets. Add your custom snippets to the `COBOL.json` file in your user snippets folder.
+The COBOL Language Support extension also supports user snippets. Add your custom snippets to the `COBOL.json` file in your user snippets folder. To access your user snippets file, select **File** - **Preferences** - **Configure Snippets** and select `COBOL.json` from the list.
 
 ### Smart Tab
 
