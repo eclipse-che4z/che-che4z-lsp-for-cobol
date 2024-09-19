@@ -26,7 +26,7 @@ package org.eclipse.lsp.cobol.implicitDialects.cics.utility;
 
         import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_abend;
 
-/** Checks CICS Allocate rules for required and invalid options */
+/** Checks CICS Abend rules for required and invalid options */
 public class CICSAbendOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
 
     public static final int RULE_INDEX = RULE_cics_abend;
@@ -47,7 +47,7 @@ public class CICSAbendOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     }
 
     /**
-     * Entrypoint to check CICS Allocate rule options
+     * Entrypoint to check CICS Abend rule options
      *
      * @param ctx ParserRuleContext subclass containing options
      * @param <E> A subclass of ParserRuleContext
