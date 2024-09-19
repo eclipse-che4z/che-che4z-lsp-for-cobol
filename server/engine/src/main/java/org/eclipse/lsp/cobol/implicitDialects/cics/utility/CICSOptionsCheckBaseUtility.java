@@ -17,6 +17,7 @@ package org.eclipse.lsp.cobol.implicitDialects.cics.utility;
 
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
@@ -211,13 +212,18 @@ public abstract class CICSOptionsCheckBaseUtility {
     for (E rule : rules) {
       if (ParserRuleContext.class.isAssignableFrom(rule.getClass())) {
         if (!((ParserRuleContext) rule).isEmpty()) {
+          if (rulesSeen == 1) {
+            String temp = ((ParserRuleContext) rule).getText();
+            lastSeenRule = temp.contains(" ") ? temp.substring(0, temp.indexOf(" ")) : temp;
+          }
           rulesSeen++;
-          lastSeenRule = ((ParserRuleContext) rule).getText();
         }
       } else if (TerminalNode.class.isAssignableFrom(rule.getClass())) {
         if (!((TerminalNode) rule).getText().isEmpty()) {
+          if (rulesSeen == 1) {
+            lastSeenRule = ((TerminalNode) rule).getText();
+          }
           rulesSeen++;
-          lastSeenRule = ((TerminalNode) rule).getText();
         }
       }
 
