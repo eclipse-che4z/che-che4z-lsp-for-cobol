@@ -70,7 +70,7 @@ class CFASTBuilderTest {
         GSON.toJson(GSON.fromJson(jsonTree, List.class)),
         GSON.toJson(
             GSON.fromJson(
-                GSON.toJson(builder.build(analysisResult.getRootNode()).getControlFlowAST()),
+                GSON.toJson(builder.build(analysisResult.getRootNode().findFirstProgramNode()).getControlFlowAST()),
                 List.class)));
   }
 

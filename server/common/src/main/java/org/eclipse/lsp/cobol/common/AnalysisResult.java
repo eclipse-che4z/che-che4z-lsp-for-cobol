@@ -33,7 +33,8 @@ import java.util.Map;
 @Value
 @Builder(toBuilder = true)
 public class AnalysisResult {
+  public static final AnalysisResult EMPTY = AnalysisResult.builder().build();
   @Builder.Default Map<String, List<Diagnostic>> diagnostics = new HashMap<>();
-  @Builder.Default Node rootNode = new RootNode();
+  @Builder.Default RootNode rootNode = new RootNode();
   @EqualsAndHashCode.Exclude @Builder.Default Map<String, SymbolTable> symbolTableMap = new HashMap<>();
 }

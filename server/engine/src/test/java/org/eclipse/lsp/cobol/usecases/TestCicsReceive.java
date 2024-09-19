@@ -134,23 +134,7 @@ public class TestCicsReceive {
     "RECEIVE", "FLENGTH({$def})"
   };
 
-  private static final String[] GROUP_ONE_INVALID_ONE = {
-    "RECEIVE", "{INTO(100)", "MAXLENGTH(10)", "NOTRUNCATE|error1}"
-  };
-
-  private static final String[] GROUP_ONE_DUPLICATE_INVALID = {
-    "RECEIVE", "InTO(100)", "{INTO(1000)|error1}", "LENGTH(100)", "MAXLENGTH(10)", "NOTRUNCATE"
-  };
-
-  private static final String[] GROUP_ONE_DUPLICATE_INVALID_TWO = {
-    "RECEIVE", "INTO(100)", "{INTO(1000)|error1}", "LENGTH(100)", "MAXLENGTH(10)", "NOTRUNCATE"
-  };
-
-  private static final String[] GROUP_ONE_RESP_INVALID = {
-    "RECEIVE", "INTO(100)", "LENGTH(100)", "MAXLENGTH(10)", "{RESP2|errorOne}(100)", "NOHANDLE"
-  };
-
-  private static final String[] GROUP_TWO_APPC_FULL_OPTIONS_VALID_ONE = {
+  private static final String[] GROUP_ONE_APPC_FULL_OPTIONS_VALID_ONE = {
     "RECEIVE",
     "CONVID({$abc})",
     "INTO({$abc})",
@@ -160,11 +144,11 @@ public class TestCicsReceive {
     "STATE({$jkl})"
   };
 
-  private static final String[] GROUP_TWO_APPC_PARTIAL_OPTIONS_VALID_ONE = {
+  private static final String[] GROUP_ONE_APPC_PARTIAL_OPTIONS_VALID_ONE = {
     "RECEIVE", "CONVID({$abc})", "INTO({$abc})", "LENGTH({$def})"
   };
 
-  private static final String[] GROUP_TWO_LUTYPE6_FULL_OPTIONS_VALID_ONE = {
+  private static final String[] GROUP_ONE_LUTYPE6_FULL_OPTIONS_VALID_ONE = {
     "RECEIVE",
     "SESSION({$abc})",
     "INTO({$abc})",
@@ -173,11 +157,11 @@ public class TestCicsReceive {
     "NOTRUNCATE",
   };
 
-  private static final String[] GROUP_TWO_LUTYPE6_PARTIAL_OPTIONS_VALID_ONE = {
+  private static final String[] GROUP_ONE_LUTYPE6_PARTIAL_OPTIONS_VALID_ONE = {
     "RECEIVE", "INTO({$abc})", "LENGTH({$def})", "NOTRUNCATE",
   };
 
-  private static final String[] GROUP_TWO_MRO_FULL_OPTIONS_VALID_ONE = {
+  private static final String[] GROUP_ONE_MRO_FULL_OPTIONS_VALID_ONE = {
     "RECEIVE",
     "SESSION({$abc})",
     "INTO({$abc})",
@@ -187,12 +171,33 @@ public class TestCicsReceive {
     "STATE({$jkl})"
   };
 
-  private static final String[] GROUP_TWO_MRO_PARTIAL_OPTIONS_VALID_ONE = {
+  private static final String[] GROUP_ONE_MRO_PARTIAL_OPTIONS_VALID_ONE = {
     "RECEIVE", "INTO({$abc})", "LENGTH({$def})", "STATE({$jkl})",
   };
 
-  private static final String[] GROUP_TWO_INVALID_ONE = {
-    "RECEIVE", "{SESSION(100)", "LENGTH(10)", "MAXLENGTH(1000)", "NOTRUNCATE|error1}"
+  private static final String[] GROUP_ONE_INVALID_ONE = {
+    "RECEIVE", "{SET(100)", "MAXLENGTH(10)", "NOTRUNCATE|error1}"
+  };
+
+  private static final String[] GROUP_ONE_INVALID_TWO = {
+    "RECEIVE",
+    "SESSION(100)",
+    "LENGTH(10)",
+    "{MAXLENGTH|errorOne}(1000)",
+    "{MAXFLENGTH|errorTwo}(100)",
+    "STATE(101)"
+  };
+
+  private static final String[] GROUP_ONE_DUPLICATE_INVALID = {
+    "RECEIVE", "InTO(100)", "{INTO|error1}(1000)", "LENGTH(100)", "MAXLENGTH(10)", "NOTRUNCATE"
+  };
+
+  private static final String[] GROUP_ONE_DUPLICATE_INVALID_TWO = {
+    "RECEIVE", "INTO(100)", "{INTO|error1}(1000)", "LENGTH(100)", "MAXLENGTH(10)", "NOTRUNCATE"
+  };
+
+  private static final String[] GROUP_ONE_RESP_INVALID = {
+    "RECEIVE", "INTO(100)", "LENGTH(100)", "MAXLENGTH(10)", "{RESP2|errorOne}(100)", "NOHANDLE"
   };
 
   private static final String[] R2980_FULL_OPTIONS_VALID_ONE = {
@@ -204,7 +209,7 @@ public class TestCicsReceive {
   };
 
   private static final String[] R2980_INVALID_ONE = {
-    "RECEIVE", "{INTO(100)", "MAXLENGTH(1000)", "NOTRUNCATE|error1}"
+    "RECEIVE", "{SET(100)", "MAXLENGTH(1000)", "NOTRUNCATE|error1}"
   };
 
   private static final String[] NON_Z_FULL_OPTIONS_VALID_ONE = {
@@ -216,15 +221,23 @@ public class TestCicsReceive {
   };
 
   private static final String[] PARTN_FULL_OPTIONS_VALID_ONE = {
-    "RECEIVE", "INTO({$abc})", "LENGTH({$def})", "ASIS"
+    "RECEIVE", "PARTN({$abc})", "INTO({$abc})", "LENGTH({$def})", "ASIS"
   };
 
-  private static final String[] PARTN_PARTIAL_OPTIONS_VALID_ONE = {"RECEIVE", "LENGTH({$def})"};
+  private static final String[] PARTN_PARTIAL_OPTIONS_VALID_ONE = {
+    "RECEIVE", "PARTN({$abc})", "INTO({$abc})", "LENGTH({$def})"
+  };
 
-  private static final String[] PARTN_INVALID_ONE = {"RECEIVE", "{SET(100)", "ASIS|error1}"};
+  private static final String[] PARTN_INVALID_ONE = {
+    "RECEIVE", "{PARTN(100)", "SET(100)", "ASIS|error1}"
+  };
 
   private static final String[] PARTN_DUPLICATE_INVALID = {
-    "RECEIVE", "LENGTH(101)", "ASIS", "{ASIS|error1}"
+    "RECEIVE", "PARTN(100)", "INTO(100)", "LENGTH(101)", "ASIS", "{ASIS|error1}"
+  };
+
+  private static final String[] PARTN_DUPLICATE_INVALID_TWO = {
+    "RECEIVE", "PARTN(100)", "INTO(100)", "{INTO|errorOne}(100)", "LENGTH(101)"
   };
 
   private static final String[] MAP_FULL_OPTIONS_VALID_ONE = {
@@ -237,9 +250,13 @@ public class TestCicsReceive {
     "INPARTN({$abc})"
   };
 
-  private static final String[] MAP_PARTIAL_OPTIONS_VALID_ONE = {"RECEIVE", "MAP({$abc})", "ASIS"};
+  private static final String[] MAP_PARTIAL_OPTIONS_VALID_ONE = {
+    "RECEIVE", "INTO({$def})", "MAP({$abc})", "ASIS"
+  };
 
-  private static final String[] MAP_INVALID_ONE = {"RECEIVE", "MAP", "{LENGTH|error1}(100)"};
+  private static final String[] MAP_INVALID_ONE = {
+    "RECEIVE", "MAP(100)", "INTO(100)", "{LENGTH|error1}(100)"
+  };
 
   private static final String[] MAP_MAPPINGDEV_FULL_OPTIONS_VALID_ONE = {
     "RECEIVE",
@@ -252,19 +269,19 @@ public class TestCicsReceive {
   };
 
   private static final String[] MAP_MAPPINGDEV_PARTIAL_OPTIONS_VALID_ONE = {
-    "RECEIVE", "MAP({$abc})", "MAPPINGDEV({$def})", "FROM({$abc})",
+    "RECEIVE", "MAP({$abc})", "INTO({$def})", "MAPPINGDEV({$def})", "FROM({$abc})",
   };
 
   private static final String[] MAP_MAPPINGDEV_INVALID_ONE = {
-    "RECEIVE", "{MAP(1)", "MAPPINGDEV(100)", "MAPSET(1)|error1}"
+    "RECEIVE", "{MAP(1)", "INTO(100)", "MAPPINGDEV(100)", "MAPSET(1)|error1}"
   };
 
   private static final String[] MAP_RESPONSE_HANDLER_DUPLICATE_INVALID = {
-    "RECEIVE", "MAP(1)", "RESP(100)", "{RESP|errorOne}(100)"
+    "RECEIVE", "MAP(1)", "INTO(100)", "RESP(100)", "{RESP|errorOne}(100)"
   };
 
   private static final String[] MAP_RESPONSE_HANDLER_DUPLICATE_INVALID_TWO = {
-    "RECEIVE", "MAP(1)", "NOHANDLE", "{NOHANDLE|errorOne}"
+    "RECEIVE", "MAP(1)", "INTO(100)", "NOHANDLE", "{NOHANDLE|errorOne}"
   };
 
   private static String getTestString(String[] components) {
@@ -422,7 +439,7 @@ public class TestCicsReceive {
             "error1",
             new Diagnostic(
                 new Range(),
-                "Missing required option: LENGTH or FLENGTH",
+                "Exactly one option required, none provided: LENGTH or FLENGTH",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())),
         ImmutableList.of());
@@ -437,7 +454,7 @@ public class TestCicsReceive {
             "error1",
             new Diagnostic(
                 new Range(),
-                "Excessive options provided for: INTO or SET",
+                "Excessive options provided for: INTO",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())),
         ImmutableList.of());
@@ -452,68 +469,74 @@ public class TestCicsReceive {
             "error1",
             new Diagnostic(
                 new Range(),
-                "Excessive options provided for: INTO or SET",
+                "Excessive options provided for: INTO",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())),
         ImmutableList.of());
   }
 
   @Test
-  void testGroupTwoAppcFullOptionsValidOne() {
+  void testGroupOneAppcFullOptionsValidOne() {
     UseCaseEngine.runTest(
-        getTestString(GROUP_TWO_APPC_FULL_OPTIONS_VALID_ONE),
+        getTestString(GROUP_ONE_APPC_FULL_OPTIONS_VALID_ONE),
         ImmutableList.of(),
         ImmutableMap.of());
   }
 
   @Test
-  void testGroupTwoAppcPartialOptionsValidOne() {
+  void testGroupOneAppcPartialOptionsValidOne() {
     UseCaseEngine.runTest(
-        getTestString(GROUP_TWO_APPC_PARTIAL_OPTIONS_VALID_ONE),
+        getTestString(GROUP_ONE_APPC_PARTIAL_OPTIONS_VALID_ONE),
         ImmutableList.of(),
         ImmutableMap.of());
   }
 
   @Test
-  void testGroupTwoLTSixFullOptionsValidOne() {
+  void testGroupOneLTSixFullOptionsValidOne() {
     UseCaseEngine.runTest(
-        getTestString(GROUP_TWO_LUTYPE6_FULL_OPTIONS_VALID_ONE),
+        getTestString(GROUP_ONE_LUTYPE6_FULL_OPTIONS_VALID_ONE),
         ImmutableList.of(),
         ImmutableMap.of());
   }
 
   @Test
-  void testGroupTwoLTSixPartialOptionsValidOne() {
+  void testGroupOneLTSixPartialOptionsValidOne() {
     UseCaseEngine.runTest(
-        getTestString(GROUP_TWO_LUTYPE6_PARTIAL_OPTIONS_VALID_ONE),
+        getTestString(GROUP_ONE_LUTYPE6_PARTIAL_OPTIONS_VALID_ONE),
         ImmutableList.of(),
         ImmutableMap.of());
   }
 
   @Test
-  void testGroupTwoMROFullOptionsValidOne() {
+  void testGroupOneMROFullOptionsValidOne() {
     UseCaseEngine.runTest(
-        getTestString(GROUP_TWO_MRO_FULL_OPTIONS_VALID_ONE), ImmutableList.of(), ImmutableMap.of());
+        getTestString(GROUP_ONE_MRO_FULL_OPTIONS_VALID_ONE), ImmutableList.of(), ImmutableMap.of());
   }
 
   @Test
-  void testGroupTwoMROPartialOptionsValidOne() {
+  void testGroupOneMROPartialOptionsValidOne() {
     UseCaseEngine.runTest(
-        getTestString(GROUP_TWO_MRO_PARTIAL_OPTIONS_VALID_ONE),
+        getTestString(GROUP_ONE_MRO_PARTIAL_OPTIONS_VALID_ONE),
         ImmutableList.of(),
         ImmutableMap.of());
   }
 
   @Test
-  void testGroupTwoInvalidOne() {
+  void testGroupOneInvalidTwo() {
     UseCaseEngine.runTest(
-        getTestString(GROUP_TWO_INVALID_ONE),
+        getTestString(GROUP_ONE_INVALID_TWO),
         ImmutableList.of(),
         ImmutableMap.of(
-            "error1",
+            "errorOne",
             new Diagnostic(
                 new Range(),
-                "Missing required option: INTO or SET",
+                "Exactly one option required, options are mutually exclusive: MAXLENGTH or MAXFLENGTH",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()),
+            "errorTwo",
+            new Diagnostic(
+                new Range(),
+                "Exactly one option required, options are mutually exclusive: MAXLENGTH or MAXFLENGTH",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())),
         ImmutableList.of());
@@ -540,7 +563,7 @@ public class TestCicsReceive {
             "error1",
             new Diagnostic(
                 new Range(),
-                "Missing required option: LENGTH or FLENGTH",
+                "Exactly one option required, none provided: LENGTH or FLENGTH",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())),
         ImmutableList.of());
@@ -579,7 +602,7 @@ public class TestCicsReceive {
             "error1",
             new Diagnostic(
                 new Range(),
-                "Missing required option: LENGTH or FLENGTH",
+                "Missing required option: LENGTH",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())),
         ImmutableList.of());
@@ -596,6 +619,21 @@ public class TestCicsReceive {
                 new Range(),
                 "Excessive options provided for: ASIS",
                 DiagnosticSeverity.Warning,
+                ErrorSource.PARSING.getText())),
+        ImmutableList.of());
+  }
+
+  @Test
+  void testPartnDuplicateInvalidTwo() {
+    UseCaseEngine.runTest(
+        getTestString(PARTN_DUPLICATE_INVALID_TWO),
+        ImmutableList.of(),
+        ImmutableMap.of(
+            "errorOne",
+            new Diagnostic(
+                new Range(),
+                "Excessive options provided for: INTO",
+                DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())),
         ImmutableList.of());
   }
@@ -621,7 +659,7 @@ public class TestCicsReceive {
             "error1",
             new Diagnostic(
                 new Range(),
-                "No viable alternative at input MAP\n            LENGTH",
+                "Invalid option provided: LENGTH without FROM",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())),
         ImmutableList.of());
