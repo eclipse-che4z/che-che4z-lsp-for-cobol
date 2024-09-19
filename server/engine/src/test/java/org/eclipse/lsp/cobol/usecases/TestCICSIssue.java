@@ -87,7 +87,7 @@ public class TestCICSIssue {
       "ISSUE ERASE DESTID({$varOne}) VOLUME({$varOne}) RIDFLD({$varFour}) KEYLENGTH({$varOne}) DEFRESP";
 
   private static final String ISSUE_ERASE_INVALID =
-      "ISSUE {_ERASE DESTID(100) VOLUME(100) NOWAIT|errorOne|errorTwo_}";
+      "ISSUE {_ERASE DESTID(100) VOLUME(100) NOWAIT|errorTwo|errorOne_}";
 
   private static final String ISSUE_ERASEAUP_FULL = "ISSUE ERASEAUP WAIT";
 
@@ -166,7 +166,7 @@ public class TestCICSIssue {
   private static final String ISSUE_WAIT_INVALID = "ISSUE WAIT {CONSOLE|errorOne}";
 
   private static final String ISSUE_WAIT_DUPLICATE_COMMON_INVALID =
-      "ISSUE WAIT SUBADDR(100) CONSOLE VOLUME(100) RESP(100) NOHANDLE {_{SUBADDR|errorOne}(200) DESTID(10) DESTIDLENG(100)|errorTwo_}";
+      "ISSUE WAIT {SUBADDR|errorOne}(100) CONSOLE VOLUME(100) RESP(100) NOHANDLE {SUBADDR|errorTwo|errorThree}(200) {DESTID|errorFour}(10) {DESTIDLENG|errorFive}(100)";
 
   @Test
   void testIssueAbendAllOptionsValidOne() {
@@ -314,13 +314,13 @@ public class TestCICSIssue {
             "errorOne",
             new Diagnostic(
                 new Range(),
-                "Missing required option: RIDFLD",
+                "Exactly one option required, none provided: RRN or KEYLENGTH",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()),
             "errorTwo",
             new Diagnostic(
                 new Range(),
-                "Missing required option: RRN",
+                "Missing required option: RIDFLD",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()));
     CICSTestUtils.errorTest(ISSUE_ERASE_INVALID, expectedDiagnostics);
@@ -537,13 +537,31 @@ public class TestCICSIssue {
             "errorOne",
             new Diagnostic(
                 new Range(),
-                "Invalid option provided: SUBADDR with DESTID",
+                "Exactly one option required, options are mutually exclusive: SUBARR or DESIT",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()),
             "errorTwo",
             new Diagnostic(
                 new Range(),
-                "Excessive options provided for: DESTID or SUBADDR with VOLUME",
+                "Exactly one option required, options are mutually exclusive: SUBARR or DESIT",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()),
+            "errorThree",
+            new Diagnostic(
+                new Range(),
+                "Excessive options provided for: SUBADDR",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()),
+            "errorFour",
+            new Diagnostic(
+                new Range(),
+                "Exactly one option required, options are mutually exclusive: SUBARR or DESIT",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()),
+            "errorFive",
+            new Diagnostic(
+                new Range(),
+                "Invalid option provided: DESTIDLENG with SUBADDR",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()));
     CICSTestUtils.errorTest(ISSUE_WAIT_DUPLICATE_COMMON_INVALID, expectedDiagnostics);

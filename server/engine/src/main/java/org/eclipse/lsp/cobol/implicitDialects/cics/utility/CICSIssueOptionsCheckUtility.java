@@ -15,16 +15,18 @@
 package org.eclipse.lsp.cobol.implicitDialects.cics.utility;
 
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.Pair;
+import org.antlr.v4.runtime.tree.TerminalNode;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
+import org.eclipse.lsp.cobol.implicitDialects.cics.CICSLexer;
 import org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_issue;
 
@@ -42,6 +44,7 @@ public class CICSIssueOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
           put("ABORT", ErrorSeverity.ERROR);
           put("DESTID", ErrorSeverity.ERROR);
           put("DESTIDLENG", ErrorSeverity.ERROR);
+          put("SUBADDR", ErrorSeverity.ERROR);
           put("VOLUME", ErrorSeverity.ERROR);
           put("VOLUMELENG", ErrorSeverity.ERROR);
           put("CONSOLE", ErrorSeverity.ERROR);
@@ -98,17 +101,8 @@ public class CICSIssueOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
         }
       };
 
-  public static final Map<String, Pair<String, ErrorSeverity>> SUBGROUPS =
-      new HashMap<String, Pair<String, ErrorSeverity>>() {
-        {
-          put(
-              "Cics_issue_commonContext",
-              new ImmutablePair<>("DESTID or SUBADDR with VOLUME", ErrorSeverity.ERROR));
-        }
-      };
-
   public CICSIssueOptionsCheckUtility(DialectProcessingContext context, List<SyntaxError> errors) {
-    super(context, errors, DUPLICATE_CHECK_OPTIONS, SUBGROUPS);
+    super(context, errors, DUPLICATE_CHECK_OPTIONS);
   }
 
   /**
@@ -173,9 +167,7 @@ public class CICSIssueOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
 
   private void checkAbort(CICSParser.Cics_issue_abortContext ctx) {
     checkHasMandatoryOptions(ctx.ABORT(), ctx, "ABORT");
-    if (ctx.cics_issue_common().isEmpty())
-      checkHasMandatoryOptions(ctx.cics_issue_common(), ctx, "DESTID or SUBADDR branches");
-    ctx.cics_issue_common().forEach(this::checkIssueCommon);
+    checkIssueCommon(ctx.cics_issue_common());
   }
 
   private void checkAdd(CICSParser.Cics_issue_addContext ctx) {
@@ -201,7 +193,7 @@ public class CICSIssueOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
 
   private void checkEnd(CICSParser.Cics_issue_endContext ctx) {
     checkHasMandatoryOptions(ctx.END(), ctx, "END");
-    ctx.cics_issue_common().forEach(this::checkIssueCommon);
+    checkIssueCommon(ctx.cics_issue_common());
   }
 
   void checkEndFileOutput(CICSParser.Cics_issue_endfile_endoutputContext ctx) {
@@ -219,10 +211,11 @@ public class CICSIssueOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     if (ctx.VOLUME().isEmpty())
       checkHasIllegalOptions(ctx.VOLUMELENG(), "VOLUMELENG without VOLUME");
 
+    checkHasExactlyOneOption("RRN or KEYLENGTH", ctx, ctx.RRN(), ctx.KEYLENGTH());
+
     if (ctx.KEYLENGTH().isEmpty()) {
       checkHasIllegalOptions(ctx.KEYNUMBER(), "KEYNUMBER without KEYLENGTH");
-      checkHasMandatoryOptions(ctx.RRN(), ctx, "RRN");
-    } else checkHasIllegalOptions(ctx.RRN(), "RRN with KEYLENGTH");
+    }
   }
 
   void checkEraseAUP(CICSParser.Cics_issue_erase_aupContext ctx) {
@@ -299,7 +292,7 @@ public class CICSIssueOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     checkHasMandatoryOptions(ctx.FROM(), ctx, "FROM");
     if (ctx.cics_issue_common().isEmpty())
       checkHasMandatoryOptions(ctx.cics_issue_common(), ctx, "DESTID or SUBADDR branches");
-    ctx.cics_issue_common().forEach(this::checkIssueCommon);
+    checkIssueCommon(ctx.cics_issue_common());
   }
 
   void checkSignal(CICSParser.Cics_issue_signalContext ctx) {
@@ -312,40 +305,70 @@ public class CICSIssueOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     checkHasMandatoryOptions(ctx.WAIT(), ctx, "WAIT");
     if (ctx.cics_issue_common().isEmpty())
       checkHasMandatoryOptions(ctx.cics_issue_common(), ctx, "DESTID or SUBADDR branches");
-    ctx.cics_issue_common().forEach(this::checkIssueCommon);
+    checkIssueCommon(ctx.cics_issue_common());
   }
 
-  void checkIssueCommon(CICSParser.Cics_issue_commonContext ctx) {
-    if (!ctx.DESTID().isEmpty()) {
-      checkHasIllegalOptions(ctx.SUBADDR(), "SUBADDR with DESTID");
-      checkHasIllegalOptions(ctx.CONSOLE(), "CONSOLE with DESTID");
-      checkHasIllegalOptions(ctx.PRINT(), "PRINT with DESTID");
-      checkHasIllegalOptions(ctx.CARD(), "CARD with DESTID");
-      checkHasIllegalOptions(ctx.WPMEDIA1(), "WPMEDIA1 with DESTID");
-      checkHasIllegalOptions(ctx.WPMEDIA2(), "WPMEDIA2 with DESTID");
-      checkHasIllegalOptions(ctx.WPMEDIA3(), "WPMEDIA3 with DESTID");
-      checkHasIllegalOptions(ctx.WPMEDIA4(), "WPMEDIA4 with DESTID");
-    } else {
-      checkHasIllegalOptions(ctx.DESTIDLENG(), "DESTIDLENG without DESTID");
-      int subArgCount =
-          ctx.CONSOLE().size()
-              + ctx.PRINT().size()
-              + ctx.CARD().size()
-              + ctx.WPMEDIA1().size()
-              + ctx.WPMEDIA2().size()
-              + ctx.WPMEDIA3().size()
-              + ctx.WPMEDIA4().size();
-      if (subArgCount > 1 || (ctx.SUBADDR().isEmpty() && subArgCount > 0)) {
-        checkHasIllegalOptions(ctx.CONSOLE(), "CONSOLE without SUBADDR");
-        checkHasIllegalOptions(ctx.PRINT(), "PRINT without SUBADDR");
-        checkHasIllegalOptions(ctx.CARD(), "CARD without SUBADDR");
-        checkHasIllegalOptions(ctx.WPMEDIA1(), "WPMEDIA1 without SUBADDR");
-        checkHasIllegalOptions(ctx.WPMEDIA2(), "WPMEDIA2 without SUBADDR");
-        checkHasIllegalOptions(ctx.WPMEDIA3(), "WPMEDIA3 without SUBADDR");
-        checkHasIllegalOptions(ctx.WPMEDIA4(), "WPMEDIA4 without SUBADDR");
-      }
-    }
-    if (ctx.VOLUME().isEmpty())
-      checkHasIllegalOptions(ctx.VOLUMELENG(), "VOLUMELENG without VOLUME");
+  void checkIssueCommon(List<CICSParser.Cics_issue_commonContext> ctx) {
+    TerminalNode exclusiveOption =
+        checkHasMutuallyExclusiveOptions(
+            "SUBARR or DESIT",
+            ctx.stream()
+                .map(CICSParser.Cics_issue_commonContext::SUBADDR)
+                .collect(Collectors.toList())
+                .stream()
+                .flatMap(Collection::stream)
+                .collect(Collectors.toList()),
+            ctx.stream()
+                .map(CICSParser.Cics_issue_commonContext::DESTID)
+                .collect(Collectors.toList())
+                .stream()
+                .flatMap(Collection::stream)
+                .collect(Collectors.toList()));
+
+    boolean hasVolume =
+        !ctx.stream()
+            .map(CICSParser.Cics_issue_commonContext::VOLUME)
+            .collect(Collectors.toList())
+            .stream()
+            .filter(r -> r.isEmpty())
+            .flatMap(Collection::stream)
+            .collect(Collectors.toList())
+            .isEmpty();
+
+    ctx.forEach(
+        context -> {
+          if (exclusiveOption == null) {
+            checkHasIllegalOptions(context.DESTIDLENG(), "DESTIDLENG without DESTID");
+            checkHasIllegalOptions(context.CONSOLE(), "CONSOLE without SUBADDR");
+            checkHasIllegalOptions(context.PRINT(), "PRINT without SUBADDR");
+            checkHasIllegalOptions(context.CARD(), "CARD without SUBADDR");
+            checkHasIllegalOptions(context.WPMEDIA1(), "WPMEDIA1 without SUBADDR");
+            checkHasIllegalOptions(context.WPMEDIA2(), "WPMEDIA2 without SUBADDR");
+            checkHasIllegalOptions(context.WPMEDIA3(), "WPMEDIA3 without SUBADDR");
+            checkHasIllegalOptions(context.WPMEDIA4(), "WPMEDIA4 without SUBADDR");
+          } else if (CICSLexer.DESTID == exclusiveOption.getSymbol().getType()) {
+            checkHasIllegalOptions(context.SUBADDR(), "SUBADDR with DESTID");
+            checkHasIllegalOptions(context.CONSOLE(), "CONSOLE with DESTID");
+            checkHasIllegalOptions(context.PRINT(), "PRINT with DESTID");
+            checkHasIllegalOptions(context.CARD(), "CARD with DESTID");
+            checkHasIllegalOptions(context.WPMEDIA1(), "WPMEDIA1 with DESTID");
+            checkHasIllegalOptions(context.WPMEDIA2(), "WPMEDIA2 with DESTID");
+            checkHasIllegalOptions(context.WPMEDIA3(), "WPMEDIA3 with DESTID");
+            checkHasIllegalOptions(context.WPMEDIA4(), "WPMEDIA4 with DESTID");
+          } else if (CICSLexer.SUBADDR == exclusiveOption.getSymbol().getType()) {
+            checkHasIllegalOptions(context.DESTIDLENG(), "DESTIDLENG with SUBADDR");
+            checkHasMutuallyExclusiveOptions(
+                "CONSOLE or PRINT or CARD or WPMEDIA1 or WPMEDIA2 or WPMEDIA3 or WPMEDIA4",
+                context.CONSOLE(),
+                context.PRINT(),
+                context.CARD(),
+                context.WPMEDIA1(),
+                context.WPMEDIA2(),
+                context.WPMEDIA3(),
+                context.WPMEDIA4());
+          }
+
+          if (!hasVolume) checkHasIllegalOptions(context.VOLUMELENG(), "VOLUMELENG without VOLUME");
+        });
   }
 }
