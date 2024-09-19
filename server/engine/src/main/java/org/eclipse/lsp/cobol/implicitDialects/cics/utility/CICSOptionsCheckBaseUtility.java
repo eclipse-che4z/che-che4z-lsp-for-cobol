@@ -222,9 +222,7 @@ public abstract class CICSOptionsCheckBaseUtility {
    * @param rules Lists of TerminalNode to iterate through
    * @return Number of TerminalNode instances found
    */
-  protected TerminalNode checkHasMutuallyExclusiveOptions(
-      String options, List<TerminalNode>... rules) {
-
+  protected int checkHasMutuallyExclusiveOptions(String options, List<TerminalNode>... rules) {
     List<TerminalNode> nodes =
         Stream.of(rules)
             .filter(rule -> !rule.isEmpty())
@@ -245,7 +243,7 @@ public abstract class CICSOptionsCheckBaseUtility {
                 options);
           });
     }
-    return nodes.size() > 0 ? nodes.get(0) : null;
+    return nodes.size();
   }
 
   protected <E extends ParseTree> void checkHasExactlyOneOption(
@@ -265,7 +263,7 @@ public abstract class CICSOptionsCheckBaseUtility {
                     context -> getAllTokenChildren((ParserRuleContext) context, children, false));
             });
 
-    if (checkHasMutuallyExclusiveOptions(options, children) == null) {
+    if (checkHasMutuallyExclusiveOptions(options, children) == 0) {
       throwException(
           ErrorSeverity.ERROR,
           getLocality(parentCtx),

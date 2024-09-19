@@ -166,7 +166,7 @@ public class TestCICSIssue {
   private static final String ISSUE_WAIT_INVALID = "ISSUE WAIT {CONSOLE|errorOne}";
 
   private static final String ISSUE_WAIT_DUPLICATE_COMMON_INVALID =
-      "ISSUE WAIT {SUBADDR|errorOne}(100) CONSOLE VOLUME(100) RESP(100) NOHANDLE {SUBADDR|errorTwo|errorThree}(200) {DESTID|errorFour}(10) {DESTIDLENG|errorFive}(100)";
+      "ISSUE WAIT {SUBADDR|errorOne}(100) {CONSOLE|errorTwo} VOLUME(100) RESP(100) NOHANDLE {SUBADDR|errorThree|errorFour}(200) {DESTID|errorFive}(10) DESTIDLENG(100)";
 
   @Test
   void testIssueAbendAllOptionsValidOne() {
@@ -543,25 +543,25 @@ public class TestCICSIssue {
             "errorTwo",
             new Diagnostic(
                 new Range(),
-                "Exactly one option required, options are mutually exclusive: SUBARR or DESIT",
+                "Invalid option provided: CONSOLE with DESTID",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()),
             "errorThree",
             new Diagnostic(
                 new Range(),
-                "Excessive options provided for: SUBADDR",
+                "Exactly one option required, options are mutually exclusive: SUBARR or DESIT",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()),
             "errorFour",
             new Diagnostic(
                 new Range(),
-                "Exactly one option required, options are mutually exclusive: SUBARR or DESIT",
+                "Excessive options provided for: SUBADDR",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()),
             "errorFive",
             new Diagnostic(
                 new Range(),
-                "Invalid option provided: DESTIDLENG with SUBADDR",
+                "Exactly one option required, options are mutually exclusive: SUBARR or DESIT",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()));
     CICSTestUtils.errorTest(ISSUE_WAIT_DUPLICATE_COMMON_INVALID, expectedDiagnostics);

@@ -309,30 +309,33 @@ public class CICSIssueOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
   }
 
   void checkIssueCommon(List<CICSParser.Cics_issue_commonContext> ctx) {
-    TerminalNode exclusiveOption =
-        checkHasMutuallyExclusiveOptions(
-            "SUBARR or DESIT",
-            ctx.stream()
-                .map(CICSParser.Cics_issue_commonContext::SUBADDR)
-                .collect(Collectors.toList())
-                .stream()
-                .flatMap(Collection::stream)
-                .collect(Collectors.toList()),
-            ctx.stream()
-                .map(CICSParser.Cics_issue_commonContext::DESTID)
-                .collect(Collectors.toList())
-                .stream()
-                .flatMap(Collection::stream)
-                .collect(Collectors.toList()));
+    List<TerminalNode> destIds =
+        ctx.stream()
+            .map(CICSParser.Cics_issue_commonContext::DESTID)
+            .collect(Collectors.toList())
+            .stream()
+            .flatMap(Collection::stream)
+            .collect(Collectors.toList());
+    List<TerminalNode> subAddrs =
+        ctx.stream()
+            .map(CICSParser.Cics_issue_commonContext::SUBADDR)
+            .collect(Collectors.toList())
+            .stream()
+            .flatMap(Collection::stream)
+            .collect(Collectors.toList());
+
+    checkHasMutuallyExclusiveOptions("SUBARR or DESIT", destIds, subAddrs);
 
     boolean hasVolume =
         !(ctx.stream()
                 .map(CICSParser.Cics_issue_commonContext::VOLUME)
-                .flatMap(Collection::stream).count() == 0);
+                .mapToInt(Collection::size)
+                .sum()
+            == 0);
 
     ctx.forEach(
         context -> {
-          if (exclusiveOption == null) {
+          if (destIds.isEmpty() && subAddrs.isEmpty()) {
             checkHasIllegalOptions(context.DESTIDLENG(), "DESTIDLENG without DESTID");
             checkHasIllegalOptions(context.CONSOLE(), "CONSOLE without SUBADDR");
             checkHasIllegalOptions(context.PRINT(), "PRINT without SUBADDR");
@@ -341,8 +344,7 @@ public class CICSIssueOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
             checkHasIllegalOptions(context.WPMEDIA2(), "WPMEDIA2 without SUBADDR");
             checkHasIllegalOptions(context.WPMEDIA3(), "WPMEDIA3 without SUBADDR");
             checkHasIllegalOptions(context.WPMEDIA4(), "WPMEDIA4 without SUBADDR");
-          } else if (CICSLexer.DESTID == exclusiveOption.getSymbol().getType()) {
-            checkHasIllegalOptions(context.SUBADDR(), "SUBADDR with DESTID");
+          } else if (!destIds.isEmpty()) {
             checkHasIllegalOptions(context.CONSOLE(), "CONSOLE with DESTID");
             checkHasIllegalOptions(context.PRINT(), "PRINT with DESTID");
             checkHasIllegalOptions(context.CARD(), "CARD with DESTID");
@@ -350,7 +352,7 @@ public class CICSIssueOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
             checkHasIllegalOptions(context.WPMEDIA2(), "WPMEDIA2 with DESTID");
             checkHasIllegalOptions(context.WPMEDIA3(), "WPMEDIA3 with DESTID");
             checkHasIllegalOptions(context.WPMEDIA4(), "WPMEDIA4 with DESTID");
-          } else if (CICSLexer.SUBADDR == exclusiveOption.getSymbol().getType()) {
+          } else {
             checkHasIllegalOptions(context.DESTIDLENG(), "DESTIDLENG with SUBADDR");
             checkHasMutuallyExclusiveOptions(
                 "CONSOLE or PRINT or CARD or WPMEDIA1 or WPMEDIA2 or WPMEDIA3 or WPMEDIA4",
