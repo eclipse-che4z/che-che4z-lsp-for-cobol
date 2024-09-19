@@ -240,32 +240,33 @@ cics_asktime: ASKTIME cics_handle_response? (ABSTIME (cics_data_area | cics_hand
 /** ASSIGN */
 cics_assign: ASSIGN (cics_assign_parameter1 | cics_assign_parameter2) *;
 
-cics_assign_parameter1: ABCODE cics_data_area | ABDUMP cics_data_area | ABPROGRAM cics_data_area | ACTIVITY cics_data_area |
+cics_assign_parameter1: ABCODE cics_data_area | ABDUMP cics_data_area | ABOFFSET cics_data_area | ABPROGRAM cics_data_area | ACTIVITY cics_data_area |
              ACTIVITYID cics_data_area | ALTSCRNHT cics_data_area | ALTSCRNWD cics_data_area | APLKYBD cics_data_area |
-             APLTEXT cics_data_area | APPLID cics_data_area | ASRAINTRPT cics_data_area | ASRAKEY cics_cvda |
-             ASRAPSW cics_data_area | ASRAREGS cics_data_area | ASRASPC cics_cvda | ASRASTG cics_cvda |
+             APLTEXT cics_data_area | APPLICATION cics_data_area | APPLID cics_data_area | ASRAINTRPT cics_data_area | ASRAKEY cics_cvda |
+             ASRAPSW cics_data_area | ASRAPSW16 cics_data_area | ASRAREGS cics_data_area | ASRAREGS64 cics_data_area |ASRASPC cics_cvda | ASRASTG cics_cvda |
              BRIDGE cics_data_area | BTRANS cics_data_area | CHANNEL cics_data_area | CMDSEC cics_data_area |
              COLOR cics_data_area | CWALENG cics_data_area | DEFSCRNHT cics_data_area | DEFSCRNWD cics_data_area |
              DELIMITER cics_data_area | DESTCOUNT cics_data_area | DESTID cics_data_area | DESTIDLENG cics_data_area |
-             DSSCS cics_data_area | DS3270 cics_data_area | EWASUPP cics_data_area | EXTDS cics_data_area |
+             DSSCS cics_data_area | DS3270 cics_data_area | ERRORMSG cics_data_area | ERRORMSGLEN cics_data_area | EWASUPP cics_data_area | EXTDS cics_data_area |
              FACILITY cics_data_area | FCI cics_data_area | GCHARS cics_data_area | GCODES cics_data_area |
-             GMMI cics_data_area | HILIGHT cics_data_area | INITPARM cics_data_area | INITPARMLEN cics_data_area |
+             GMMI cics_data_area | GMEXITOPT cics_cvda | HILIGHT cics_data_area | INITPARM cics_data_area | INITPARMLEN cics_data_area |
              INPARTN cics_data_area | INPUTMSGLEN cics_data_area | INVOKINGPROG cics_data_area |
              KATAKANA cics_data_area | LANGINUSE cics_data_area | LDCMNEM cics_data_area | LDCNUM cics_data_area |
              LINKLEVEL cics_data_area | LOCALCCSID cics_data_area | MAJORVERSION cics_data_area |
              MAPCOLUMN cics_data_area | MAPHEIGHT cics_data_area;
 
-cics_assign_parameter2: MAPLINE cics_data_area | MAPWIDTH cics_data_area | MSRCONTROL cics_data_area | NATLANGINUSE cics_data_area |
-             NETNAME cics_data_area | NEXTTRANSID cics_data_area | NUMTAB cics_data_area | OPCLASS cics_data_area |
-             OPERKEYS cics_data_area | OPID cics_data_area | OPSECURITY cics_data_area | ORGABCODE cics_data_area |
+cics_assign_parameter2: MAPLINE cics_data_area | MAPWIDTH cics_data_area | MICROVERSION cics_data_area | MINORVERSION cics_data_area |
+             MSRCONTROL cics_data_area | NATLANGINUSE cics_data_area |NETNAME cics_data_area | NEXTTRANSID cics_data_area |
+             NUMTAB cics_data_area | OPCLASS cics_data_area | OPERKEYS cics_data_area | OPID cics_data_area | OPSECURITY cics_data_area | ORGABCODE cics_data_area |
              OUTLINE cics_data_area | PAGENUM cics_data_area | PARTNPAGE cics_data_area | PARTNS cics_data_area |
-             PARTNSET cics_data_area | PRINSYSID cics_data_area | PROCESS cics_data_area | PROCESSTYPE cics_data_area |
+             PARTNSET cics_data_area | PLATFORM cics_data_area | PRINSYSID cics_data_area | PROCESS cics_data_area | PROCESSTYPE cics_data_area |
              PROGRAM cics_data_area | PS cics_data_area | QNAME cics_data_area | RESSEC cics_data_area |
              RESTART cics_data_area | RETURNPROG cics_data_area | SCRNHT cics_data_area | SCRNWD cics_data_area |
              SIGDATA cics_data_area | SOSI cics_data_area | STARTCODE cics_data_area | STATIONID cics_data_area |
              SYSID cics_data_area | TASKPRIORITY cics_data_area | TCTUALENG cics_data_area | TELLERID cics_data_area |
              TERMCODE cics_data_area | TERMPRIORITY cics_data_area | TEXTKYBD cics_data_area | TEXTPRINT cics_data_area |
-             TRANPRIORITY cics_data_area | TWALENG cics_data_area | UNATTEND cics_data_area | USERID cics_data_area |
+             TNADDR cics_data_area | TNIPFAMILY cics_cvda | TNPORT cics_data_area |  TRANPRIORITY cics_data_area |
+             TWALENG cics_data_area | UNATTEND cics_data_area | USERID cics_data_area |
              USERNAME cics_data_area | USERPRIORITY cics_data_area | VALIDATION cics_data_area | cics_handle_response;
 
 /** BIF DEEDIT / BIF DIGEST */
