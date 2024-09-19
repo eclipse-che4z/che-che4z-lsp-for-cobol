@@ -19,7 +19,6 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
-import org.eclipse.lsp.cobol.implicitDialects.cics.CICSLexer;
 import org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser;
 
 import java.util.Collection;
