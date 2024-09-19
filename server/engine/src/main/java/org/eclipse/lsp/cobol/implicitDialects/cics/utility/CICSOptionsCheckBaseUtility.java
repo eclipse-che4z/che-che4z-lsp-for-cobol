@@ -63,17 +63,6 @@ public abstract class CICSOptionsCheckBaseUtility {
   public CICSOptionsCheckBaseUtility(
       DialectProcessingContext context,
       List<SyntaxError> errors,
-      Map<String, ErrorSeverity> duplicateOptions,
-      Map<String, Pair<String, ErrorSeverity>> subGroups) {
-    this.context = context;
-    this.errors = errors;
-    this.baseDuplicateOptions.putAll(duplicateOptions);
-    this.subGroups.putAll(subGroups);
-  }
-
-  public CICSOptionsCheckBaseUtility(
-      DialectProcessingContext context,
-      List<SyntaxError> errors,
       Map<String, ErrorSeverity> duplicateOptions) {
     this.context = context;
     this.errors = errors;
@@ -254,22 +243,18 @@ public abstract class CICSOptionsCheckBaseUtility {
   protected <E extends ParseTree> void checkHasExactlyOneOption(
       String options, ParserRuleContext parentCtx, List<E>... rules) {
 
-    List<TerminalNode> children =
-        Stream.of(rules)
-            .filter(
-                rule ->
-                    !rule.isEmpty() && TerminalNode.class.isAssignableFrom(rule.get(0).getClass()))
-            .flatMap(Collection::stream)
-            .map(rule -> (TerminalNode) rule)
-            .collect(Collectors.toList());
+    List<TerminalNode> children = new ArrayList<>();
 
     Stream.of(rules)
-        .filter(
-            rule ->
-                !rule.isEmpty() && ParserRuleContext.class.isAssignableFrom(rule.get(0).getClass()))
-        .flatMap(Collection::stream)
-        .collect(Collectors.toList())
-        .forEach(rule -> getAllTokenChildren((ParserRuleContext) rule, children, false));
+        .filter(rule -> !rule.isEmpty())
+        .forEach(
+            rule -> {
+              if (TerminalNode.class.isAssignableFrom(rule.get(0).getClass()))
+                children.addAll((List<TerminalNode>) rule);
+              else
+                rule.forEach(
+                    context -> getAllTokenChildren((ParserRuleContext) context, children, false));
+            });
 
     if (checkHasMutuallyExclusiveOptions(options, children) == 0) {
       throwException(
