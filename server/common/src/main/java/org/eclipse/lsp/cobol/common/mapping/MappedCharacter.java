@@ -20,6 +20,7 @@ import lombok.Data;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -39,5 +40,11 @@ public class MappedCharacter {
 
   MappedCharacter shadowCopy() {
     return new MappedCharacter(character, originalPosition, uri, parent, instantLocation, initialLocationMap);
+  }
+
+  Map<String, Location> getOrCreateInitialLocationMap() {
+    if (initialLocationMap == null)
+      initialLocationMap = new HashMap<>();
+    return initialLocationMap;
   }
 }
