@@ -17,13 +17,14 @@ package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
+import org.eclipse.lsp4j.Diagnostic;
+import org.eclipse.lsp4j.DiagnosticSeverity;
+import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /**
  * Test CICS CONVERSE command. Documentation link: <a
@@ -66,8 +67,11 @@ public class TestCicsConverseStatement {
     // Test Strings
     private static final String DEFAULT_VALID_1 = CONVERSE_FROM_INTO_TO + "MAXLENGTH({$maxLen})";
     private static final String DEFAULT_VALID_2 = CONVERSE_FROM_INTO_TO + "MAXLENGTH({$maxLen}) NOTRUNCATE";
+    private static final String DEFAULT_INVAL_1 = CONVERSE_FROM_INTO_TO + "MAXLENGTH({$maxLen}) NOTRUNCATE {NOTRUNCATE|errorOne}";
+    private static final String DEFAULT_INVAL_2 = "CONVERSE {MAXLENGTH(123) NOTRUNCATE|errorOne}";
 
     private static final String APPC_VALID = CONVERSE + "CONVID({$convidVar}) " + FROM_INTO_TO + "MAXLENGTH({$maxLen}) STATE({$stateVar})";
+    private static final String APPC_INVAL = CONVERSE + "CONVID({$convidVar}) " + FROM_INTO_TO + "MAXLENGTH({$maxLen}) STATE({$stateVar}) {CTLCHAR|errorOne}(123)";
 
     private static final String LU23_3270_VALID_1 = CONVERSE_FROM_INTO + "ERASE DEFAULT TOLENGTH({$toLen}) MAXLENGTH({$maxLen}) DEFRESP NOTRUNCATE ASIS";
     private static final String LU23_3270_VALID_2 = CONVERSE_FROM_INTO + "ERASE DEFAULT CTLCHAR({$ctlCharVar}) TOLENGTH({$toLen}) MAXLENGTH({$maxLen}) DEFRESP NOTRUNCATE ASIS";
@@ -105,6 +109,18 @@ public class TestCicsConverseStatement {
         UseCaseEngine.runTest(getTestString(newCommand), ImmutableList.of(), ImmutableMap.of());
     }
 
+    private static void errorTest(String newCommand, String errorMessage) {
+        Map<String, Diagnostic> expectedDiagnostics =
+                ImmutableMap.of(
+                        "errorOne",
+                        new Diagnostic(
+                                new Range(),
+                                errorMessage,
+                                DiagnosticSeverity.Error,
+                                ErrorSource.PARSING.getText()));
+        UseCaseEngine.runTest(getTestString(newCommand), ImmutableList.of(), expectedDiagnostics);
+    }
+
     private static String getTestString(String newCommand) {
         List<String> instances = Arrays.asList(newCommand.split("\\s"));
         instances.replaceAll(String.join("", Collections.nCopies(12, " "))::concat);
@@ -121,8 +137,23 @@ public class TestCicsConverseStatement {
     }
 
     @Test
+    void testDefaultInvalid_1() {
+        errorTest(DEFAULT_INVAL_1, "Excessive options provided for: NOTRUNCATE");
+    }
+
+    @Test
+    void testDefaultInvalid_2() {
+        errorTest(DEFAULT_INVAL_2, "Missing required option: FROM");
+    }
+
+    @Test
     void testAPPCValid() {
         noErrorTest(APPC_VALID);
+    }
+
+    @Test
+    void testAPPCInvalid() {
+        errorTest(APPC_INVAL, "Extraneous input CTLCHAR");
     }
 
     @Test
