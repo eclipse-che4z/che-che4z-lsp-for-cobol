@@ -25,7 +25,7 @@ import java.util.List;
  * to the actual Language Engine, and the testDAta will be used to assert the result.
  */
 @Value
-class PreprocessedDocument {
+public class PreprocessedDocument {
   String text;
   List<CobolText> copybooks;
   TestData testData;
