@@ -21,7 +21,6 @@ import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -303,28 +302,14 @@ public class CICSIssueOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
 
   void checkIssueCommon(List<CICSParser.Cics_issue_commonContext> ctx) {
     List<TerminalNode> destIds =
-        ctx.stream()
-            .map(CICSParser.Cics_issue_commonContext::DESTID)
-            .collect(Collectors.toList())
-            .stream()
-            .flatMap(Collection::stream)
-            .collect(Collectors.toList());
+        ctx.stream().flatMap(context -> context.DESTID().stream()).collect(Collectors.toList());
+
     List<TerminalNode> subAddrs =
-        ctx.stream()
-            .map(CICSParser.Cics_issue_commonContext::SUBADDR)
-            .collect(Collectors.toList())
-            .stream()
-            .flatMap(Collection::stream)
-            .collect(Collectors.toList());
+        ctx.stream().flatMap(context -> context.SUBADDR().stream()).collect(Collectors.toList());
 
     checkHasMutuallyExclusiveOptions("SUBARR or DESIT", destIds, subAddrs);
 
-    boolean hasVolume =
-        !(ctx.stream()
-                .map(CICSParser.Cics_issue_commonContext::VOLUME)
-                .mapToInt(Collection::size)
-                .sum()
-            == 0);
+    boolean hasVolume = !(ctx.stream().mapToInt(context -> context.VOLUME().size()).sum() == 0);
 
     ctx.forEach(
         context -> {
