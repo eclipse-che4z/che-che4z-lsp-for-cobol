@@ -573,7 +573,7 @@ DECRYPT_DATAKEY_INTEGER=
 DECRYPT_DATAKEY_VARCHAR=
 DECRYPT_DATAKEY_VARGRAPHIC=
 DECRYPT_DB=
-DEEDIT=
+DEEDIT= The BIF DEEDIT provides the built-in function DEEDIT. It specifies that alphabetic and special characters are removed from an EBCDIC data field, and the remaining digits right-aligned and padded to the left with zeros as necessary.<br>[Read more](https://www.ibm.com/docs/en/cics-ts/6.x?topic=summary-bif-deedit)<br>\u00A9 Copyright IBM Corporation 1994, 2019.<br>U.S. Government Users Restricted Rights - Use, duplication or disclosure restricted by GSA ADP Schedule Contract with IBM Corp.
 DEFAULT-DISPLAY=
 DEFAULT=
 DEFAULTS=
@@ -620,7 +620,7 @@ DICTNAME=
 DICTNODE=
 DIFFERENCE=
 DIFFERENT=
-DIGEST=
+DIGEST= THE The BIF DIGEST command is a CICS® built-in function that calculates the SHA-1 digest of a string of data. The result can be returned as binary (20 bytes long), hexadecimal (40 bytes long), or base64-encoded (28 bytes long). The SHA-1 digest is a cryptographically strong checksum of the string, so for practical purposes it is unique for each string.<br>[Read more](https://www.ibm.com/docs/en/cics-ts/6.x?topic=summary-bif-digest)<br>\u00A9 Copyright IBM Corporation 1994, 2019.<br>U.S. Government Users Restricted Rights - Use, duplication or disclosure restricted by GSA ADP Schedule Contract with IBM Corp.
 DIGESTTYPE=
 DIGITS=
 DIMENSIONS=
