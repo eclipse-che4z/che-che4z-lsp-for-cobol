@@ -75,10 +75,15 @@ public class CICSConverseOptionsCheckUtility extends CICSOptionsCheckBaseUtility
      * @param <E> A subclass of ParserRuleContext
      */
     public <E extends ParserRuleContext> void checkOptions(E ctx) {
-        if (ctx.getClass() == CICSParser.Cics_converse_group_oneContext.class) {
-            checkGroupOne((CICSParser.Cics_converse_group_oneContext) ctx);
-        } else if (ctx.getClass() == CICSParser.Cics_converse_group_twoContext.class) {
-            checkGroupTwo((CICSParser.Cics_converse_group_twoContext) ctx);
+        switch (ctx.getRuleIndex()) {
+            case CICSParser.RULE_cics_converse_group_one:
+                checkGroupOne((CICSParser.Cics_converse_group_oneContext) ctx);
+                break;
+            case CICSParser.RULE_cics_converse_group_two:
+                checkGroupTwo((CICSParser.Cics_converse_group_twoContext) ctx);
+                break;
+            default:
+                break;
         }
     }
 
