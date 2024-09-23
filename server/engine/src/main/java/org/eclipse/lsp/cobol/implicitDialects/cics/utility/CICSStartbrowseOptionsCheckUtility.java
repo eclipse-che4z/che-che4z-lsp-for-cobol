@@ -16,13 +16,11 @@
 package org.eclipse.lsp.cobol.implicitDialects.cics.utility;
 
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.tree.TerminalNode;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,6 +45,12 @@ public class CICSStartbrowseOptionsCheckUtility extends CICSOptionsCheckBaseUtil
       super(dialectProcessingContext, errors, DUPLICATE_CHECK_OPTIONS);
     }
 
+    /**
+     * Entrypoint to check CICS STARTBROWSE rule options
+     *
+     * @param ctx ParserRuleContext subclass containing options
+     * @param <E> A subclass of ParserRuleContext
+     */
     public <E extends ParserRuleContext> void checkOptions(E ctx) {
         switch (ctx.getRuleIndex()) {
             case CICSParser.RULE_cics_startbrowse_activity:
@@ -67,6 +71,8 @@ public class CICSStartbrowseOptionsCheckUtility extends CICSOptionsCheckBaseUtil
             case CICSParser.RULE_cics_startbrowse_activityid_process:
                 checkActivityIdProcess((CICSParser.Cics_startbrowse_activityid_processContext) ctx);
                 break;
+            default:
+                break;
         }
     }
 
@@ -76,8 +82,7 @@ public class CICSStartbrowseOptionsCheckUtility extends CICSOptionsCheckBaseUtil
 
     private void checkContainer(CICSParser.Cics_startbrowse_containerContext ctx) {
         checkHasMandatoryOptions(ctx.BROWSETOKEN(), ctx, "BROWSETOKEN");
-        if(!ctx.CHANNEL().isEmpty())
-        {
+        if (!ctx.CHANNEL().isEmpty()) {
             checkHasIllegalOptions(ctx.cics_startbrowse_activityid_process(), "ACTIVITYID or PROCESS");
         }
     }
