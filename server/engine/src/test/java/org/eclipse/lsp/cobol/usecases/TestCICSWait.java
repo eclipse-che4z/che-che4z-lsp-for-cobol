@@ -51,7 +51,7 @@ public class TestCICSWait {
       "WAIT EXTERNAL ECBLIST({$varOne}) NUMEVENTS({$varTwo})";
 
   private static final String EXTERNAL_INVALID_ONE =
-      "WAIT EXTERNAL ECBLIST({$varOne}) NUMEVENTS({$varTwo}) PURGABLE NOTPURGEABLE";
+      "WAIT EXTERNAL ECBLIST(100) NUMEVENTS(100) PURGEABLE {NOTPURGEABLE|errorOne}";
 
   private static final String JOURNALNAME_VALID_ONE =
       "WAIT JOURNALNAME({$varOne}) REQID({$varOne})";
@@ -62,7 +62,7 @@ public class TestCICSWait {
   private static final String JOURNALNAME_VALID_TWO = "WAIT JOURNALNAME({$varOne})";
 
   private static final String JOURNALNAME_INVALID_ONE =
-      "WAIT JOURNALNAME(100) {JOURNALNUM|errorOne}(100) REQID(100) NOHANDLE";
+      "WAIT {JOURNALNAME|errorOne}(100) JOURNALNUM(100) REQID(100) NOHANDLE";
 
   private static final String SIGNAL_VALID_ONE = "WAIT SIGNAL RESP({$varOne})";
 
@@ -74,7 +74,7 @@ public class TestCICSWait {
   private static final String TERMINAL_VALID_TWO = "WAIT TERMINAL";
 
   private static final String TERMINAL_INVALID_ONE =
-      "WAIT TERMINAL SESSION(100) {CONVID|errorOne}(100)";
+      "WAIT TERMINAL {SESSION|errorOne}(100) CONVID(100)";
 
   @Test
   void testConvidValidOne() {
@@ -140,7 +140,7 @@ public class TestCICSWait {
             "errorOne",
             new Diagnostic(
                 new Range(),
-                "Invalid option provided: NOTPURGABLE with PURGEABLE",
+                "Invalid option provided: NOTPURGEABLE with PURGEABLE",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())));
   }
@@ -168,7 +168,7 @@ public class TestCICSWait {
             "errorOne",
             new Diagnostic(
                 new Range(),
-                "Invalid option provided: JOURNALNUM with JOURNALNAME",
+                "Invalid option provided: JOURNALNAME with JOURNALNUM",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())));
   }
@@ -186,7 +186,7 @@ public class TestCICSWait {
             "errorOne",
             new Diagnostic(
                 new Range(),
-                "Excessive options provided: SIGNAL",
+                "Excessive options provided for: SIGNAL",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())));
   }
@@ -209,7 +209,7 @@ public class TestCICSWait {
             "errorOne",
             new Diagnostic(
                 new Range(),
-                "Invalid option provided: CONVID with SESSION",
+                "Invalid option provided: SESSION with CONVID",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())));
   }
