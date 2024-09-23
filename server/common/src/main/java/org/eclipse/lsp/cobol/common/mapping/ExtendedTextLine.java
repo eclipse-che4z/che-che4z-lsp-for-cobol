@@ -35,7 +35,7 @@ public class ExtendedTextLine {
     for (int i = 0; i < line.length(); i++) {
       char character = line.charAt(i);
       checkCharacter(character);
-      characters.add(new MappedCharacter(character, null, uri, this, instantLocation, new HashMap<>()));
+      characters.add(new MappedCharacter(character, null, uri, this, instantLocation, null));
     }
   }
 
@@ -48,7 +48,7 @@ public class ExtendedTextLine {
       char character = line.charAt(i);
       checkCharacter(character);
       Position position = new Position(start.getLine(), start.getCharacter() + i);
-      characters.add(new MappedCharacter(character, position, uri, this, null, new HashMap<>()));
+      characters.add(new MappedCharacter(character, position, uri, this, null, null));
     }
   }
 
@@ -183,7 +183,7 @@ public class ExtendedTextLine {
    */
   void addPadding(int character) {
     for (int i = 0; i < character; i++) {
-      characters.add(0, new MappedCharacter(' ', new Position(0, 0), "", this, null, new HashMap<>()));
+      characters.add(0, new MappedCharacter(' ', new Position(0, 0), "", this, null, null));
     }
   }
 

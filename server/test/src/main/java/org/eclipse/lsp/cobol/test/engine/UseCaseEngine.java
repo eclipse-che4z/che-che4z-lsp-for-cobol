@@ -27,6 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Multimap;
 import com.google.gson.JsonElement;
+
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -262,6 +263,7 @@ public class UseCaseEngine {
     PreprocessedDocument document =
         AnnotatedDocumentCleaning.prepareDocument(
             text, copybooks, subroutineNames, expectedDiagnostics, sqlBackendSetting, analysisConfig.getCompilerOptions());
+
     AnalysisResult actual =
         analyze(
             UseCase.builder()
@@ -278,6 +280,7 @@ public class UseCaseEngine {
                 .build(),
             languageId);
     assertResultEquals(actual, document.getTestData());
+    UseCaseUtils.storeDocumentToUnitTextExtensionContext(document.getText(), document.getCopybooks(), document.getTestData());
     return actual;
   }
 
