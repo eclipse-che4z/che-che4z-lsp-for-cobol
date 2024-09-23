@@ -745,15 +745,16 @@ cics_zero_digit: LPARENCHAR ZERO_DIGIT RPARENCHAR;
 cics_startbr: STARTBR cics_file_name (RIDFLD cics_data_area | KEYLENGTH cics_data_value | GENERIC | REQID cics_data_value |
               SYSID cics_data_area | DEBKEY | DEBREC | RBA | RBN | XRBA | GTEQ | EQUAL | cics_handle_response)+;
 
-/** STARTBROWSE ACTIVITY / CONTAINER / EVENT / PROCESS */
+/** STARTBROWSE ACTIVITY / CONTAINER / EVENT / PROCESS / TIMER */
 cics_startbrowse: STARTBROWSE (cics_startbrowse_activity | cics_startbrowse_container | cics_startbrowse_event |
-                  cics_startbrowse_process);
-cics_startbrowse_activity: ACTIVITY (ACTIVITYID cics_data_value | PROCESS cics_data_value PROCESSTYPE cics_data_value |
-                           BROWSETOKEN cics_data_area | cics_handle_response)+;
-cics_startbrowse_container: CONTAINER (ACTIVITYID cics_data_value | PROCESS cics_data_value PROCESSTYPE cics_data_value |
-                            CHANNEL cics_data_value | BROWSETOKEN cics_data_area | cics_handle_response)+;
+                  cics_startbrowse_process | cics_startbrowse_timer);
+cics_startbrowse_activity: ACTIVITY (cics_startbrowse_activityid_process | BROWSETOKEN cics_data_area | cics_handle_response)+;
+cics_startbrowse_container: CONTAINER (cics_startbrowse_activityid_process | CHANNEL cics_data_value | BROWSETOKEN cics_data_area | cics_handle_response)+;
 cics_startbrowse_event: EVENT (BROWSETOKEN cics_data_area | ACTIVITYID cics_data_value | cics_handle_response)+;
 cics_startbrowse_process: PROCESS (PROCESSTYPE cics_data_value | BROWSETOKEN cics_data_area | cics_handle_response)+;
+cics_startbrowse_timer: TIMER cics_data_value (BROWSETOKEN cics_data_area | cics_handle_response)+;
+
+cics_startbrowse_activityid_process: (ACTIVITYID cics_data_value | PROCESS cics_data_value PROCESSTYPE cics_data_value);
 
 /** SUSPEND (both) */
 cics_suspend: SUSPEND (ACQACTIVITY | ACQPROCESS | ACTIVITY cics_data_value | cics_handle_response)*;
