@@ -92,22 +92,16 @@ cicsTranslatorCompileDirectivedKeywords
 /** RECEIVE: */
 
 // Receive all
-cics_receive:                   RECEIVE (cics_receive_group_one | cics_receive_group_two | cics_receive_group_three | cics_receive_partn | cics_receive_map | cics_receive_map_mappingdev);
+cics_receive:                   RECEIVE (cics_receive_group_one | cics_receive_partn | cics_receive_map | cics_receive_map_mappingdev);
 
 //Helpers
 cics_into_set:                  INTO cics_data_area | SET cics_ref;
 cics_length_flength:            (LENGTH | FLENGTH) cics_data_area;
 
-// CICS Group 1 (zOS DEFAULT, LUTYPE (2,3,4), 2260, 3270-logical, 3790 / 3270-display, 3600 pipeline, 3600-3601, 3600-3614, 3650, 3767, 3770, 3790 FF)
-cics_receive_group_one:         (cics_into_set | cics_length_flength | cics_maxlength | ASIS | BUFFER | NOTRUNCATE | LEAVEKB | cics_handle_response)+;
+// CICS Group 1 (zOS DEFAULT, LUTYPE (2,3,4), 2260, 3270-logical, 3790 / 3270-display, 3600 pipeline, 3600-3601, 3600-3614, 3650, 3767, 3770, 3790 FF, 2980, Non z Default, APPC, LUTYPE 6.1, MRO)
+cics_receive_group_one:         (INTO cics_data_area | SET cics_ref | cics_length_flength | cics_maxlength | (CONVID | SESSION) cics_name | STATE cics_cvda | ASIS | BUFFER | NOTRUNCATE | LEAVEKB | NOTRUNCATE | PASSBK | cics_handle_response)+;
 
-// CICS Group 2 (APPC, LUTYPE 6.1, MRO)
-cics_receive_group_two:         ((CONVID | SESSION) cics_name | cics_into_set | cics_length_flength | cics_maxlength | NOTRUNCATE | STATE cics_cvda | cics_handle_response)+;
-
-// CICS Group 3 (2980, Non z Default)
-cics_receive_group_three:       (cics_into_set | cics_length_flength | cics_maxlength | NOTRUNCATE | PASSBK | cics_handle_response)+;
-
-cics_receive_partn:             (cics_into_set | LENGTH cics_data_area | ASIS | cics_handle_response)+;
+cics_receive_partn:             (PARTN cics_data_area | cics_into_set | LENGTH cics_data_area | ASIS | cics_handle_response)+;
 
 // RECEIVE MAPS
 cics_receive_map: ((MAP | MAPSET | INPARTN) cics_name | cics_into_set | (FROM | LENGTH) cics_data_area | TERMINAL | ASIS | cics_handle_response)+;
@@ -310,24 +304,13 @@ cics_connect_piplist: PIPLIST cics_data_area cics_handle_response? (PIPLENGTH ci
 cics_converttime: CONVERTTIME (DATESTRING cics_data_area | ABSTIME cics_data_area | cics_handle_response)+;
 
 /** DEFINE (all of them) */
-cics_define: DEFINE (cics_define_activity | cics_define_composite | cics_define_counter | cics_define_dcounter |
-             cics_define_input | cics_define_process | cics_define_timer);
-cics_define_activity: ACTIVITY cics_data_value (EVENT cics_data_value | TRANSID cics_data_value
-                      PROGRAM cics_data_value | USERID cics_data_value | ACTIVITYID cics_data_area | cics_handle_response)+;
-cics_define_composite: COMPOSITE (EVENT cics_data_value | AND | OR | subevent_option cics_data_value | cics_handle_response)+;
-subevent_option: SUBEVENT1 | SUBEVENT2 | SUBEVENT3 | SUBEVENT4 | SUBEVENT5 | SUBEVENT6 | SUBEVENT7 | SUBEVENT8;
-
-cics_define_counter: COUNTER cics_name (POOL cics_name | cics_define_value | MAXIMUM cics_data_value | cics_handle_response)*;
-cics_define_value: VALUE cics_data_value (MINIMUM cics_data_value | cics_handle_response)*;
-cics_define_dcounter: DCOUNTER cics_name (POOL cics_name | cics_define_value | MAXIMUM cics_data_area | cics_handle_response)*;
-cics_define_input: INPUT (EVENT cics_data_value | cics_handle_response)+;
-cics_define_process: PROCESS cics_data_value (PROCESSTYPE cics_data_value | TRANSID cics_data_value |
-                     PROGRAM cics_data_value | USERID cics_data_value | NOCHECK | cics_handle_response)+;
-cics_define_timer: (TIMER cics_data_value EVENT cics_data_value | cics_define_after | cics_define_at)+;
-cics_define_after: AFTER (DAYS cics_data_value | HOURS cics_data_value | MINUTES cics_data_value |
-                   SECONDS cics_data_value | cics_handle_response)+;
-cics_define_at: AT (HOURS cics_data_value | MINUTES cics_data_value | SECONDS cics_data_value | cics_handle_response)+ cics_define_on? cics_handle_response?;
-cics_define_on: ON YEAR cics_data_value (MONTH cics_data_value DAYOFMONTH cics_data_value | DAYOFYEAR cics_data_value) cics_handle_response?;
+cics_define: DEFINE (cics_define_activity | cics_define_composite_event | cics_define_counter_dcounter | cics_define_input_event | cics_define_process | cics_define_timer);
+cics_define_activity: (ACTIVITY cics_data_value | (EVENT | TRANSID | PROGRAM | USERID) cics_data_value | ACTIVITYID cics_data_area | cics_handle_response)+;
+cics_define_composite_event: (COMPOSITE | AND | OR  | (EVENT | SUBEVENT1 | SUBEVENT2 | SUBEVENT3 | SUBEVENT4 | SUBEVENT5 | SUBEVENT6 | SUBEVENT7 | SUBEVENT8) cics_data_value | cics_handle_response)+;
+cics_define_counter_dcounter: ((COUNTER | DCOUNTER) cics_name | POOL cics_name  | (VALUE | MINIMUM | MAXIMUM) cics_data_value | NOSUSPEND | cics_handle_response)+;
+cics_define_input_event: (INPUT | EVENT cics_data_value | cics_handle_response)+;
+cics_define_process: (PROCESS cics_data_value | (PROCESSTYPE | TRANSID | PROGRAM | USERID) cics_data_value | NOCHECK | cics_handle_response)+;
+cics_define_timer: (TIMER cics_data_value | (EVENT | DAYS | HOURS | MINUTES | SECONDS | YEAR | MONTH | DAYOFMONTH | DAYOFYEAR) cics_data_value | AFTER  | AT | ON | cics_handle_response)+;
 
 /** DELAY */
 cics_delay: DELAY (INTERVAL cics_zero_digit | INTERVAL cics_hhmmss | TIME cics_hhmmss | cics_delay_for | cics_dealy_until | REQID cics_name | cics_handle_response)+;
@@ -384,43 +367,17 @@ cics_enq: ENQ (RESOURCE cics_data_area | LENGTH cics_data_value | UOW | TASK | M
 cics_enter: ENTER (TRACENUM cics_data_value | FROM cics_data_area | FROMLENGTH cics_data_area | RESOURCE cics_name | EXCEPTION | cics_handle_response)+;
 
 /** EXTRACT (all of them) */
-cics_extract: EXTRACT (cics_extract_attach | cics_extract_attributes | cics_extract_certificate |
-              cics_extract_logonmsg | cics_extract_process | cics_extract_tcpip | cics_extract_tct | cics_extract_web);
-cics_extract_attach: ATTACH (ATTACHID cics_name | CONVID cics_name | SESSION cics_name | PROCESS cics_data_area |
-                     RESOURCE cics_data_area | RPROCESS cics_data_area | RRESOURCE cics_data_area |
-                     QUEUE cics_data_area | IUTYPE cics_data_area | DATASTR cics_data_area | RECFM cics_data_area | cics_handle_response)*;
+cics_extract: EXTRACT (cics_extract_attach | cics_extract_attributes | cics_extract_certificate | cics_extract_logonmessage | cics_extract_process | cics_extract_tcpip | cics_extract_tct | cics_extract_web_server | cics_extract_web_client);
+cics_extract_attach: (ATTACH | (ATTACHID | CONVID | SESSION) cics_name | (PROCESS | RESOURCE | RPROCESS | RRESOURCE | QUEUE | IUTYPE | DATASTR | RECFM) cics_data_area | cics_handle_response)+;
+cics_extract_attributes: (ATTRIBUTES | (CONVID | SESSION) cics_name | STATE cics_cvda | cics_handle_response)+;
+cics_extract_certificate: (CERTIFICATE cics_ref | (LENGTH | SERIALNUMLEN | USERID | COMMONNAMLEN | COUNTRYLEN | STATELEN | LOCALITYLEN | ORGANIZATLEN | ORGUNITLEN) cics_data_area | (SERIALNUM | COMMONNAME | COUNTRY | STATE | LOCALITY | ORGANIZATION | ORGUNIT) cics_ref | OWNER | ISSUER | cics_handle_response)+;
+cics_extract_logonmessage: (LOGONMSG | (INTO | LENGTH) cics_data_area | SET cics_ref | cics_handle_response)+;
+cics_extract_process: (PROCESS | (PROCNAME | PROCLENGTH | MAXPROCLEN | SYNCLEVEL | PIPLENGTH) cics_data_area | CONVID cics_name | PIPLIST cics_ref | cics_handle_response)+;
+cics_extract_tcpip: (TCPIP | (AUTHENTICATE | CLNTIPFAMILY | SRVRIPFAMILY | SSLTYPE | PRIVACY)  cics_cvda | (CLIENTNAME | CNAMELENGTH | SERVERNAME | SNAMELENGTH | CLIENTADDR | CADDRLENGTH | CLIENTADDRNU | CLNTADDR6NU | SERVERADDR | SADDRLENGTH | SERVERADDRNU | SRVRADDR6NU | TCPIPSERVICE | PORTNUMBER | PORTNUMNU | MAXDATALEN) cics_data_area | cics_handle_response)+;
+cics_extract_tct: (TCT | NETNAME cics_name | (SYSID | TERMID) cics_data_area | cics_handle_response)+;
+cics_extract_web_server: (WEB | (REQUESTTYPE | HOSTTYPE | SCHEME) cics_cvda | HOSTLENGTH cics_data_value | (HOST | HTTPVERSION | VERSIONLEN | PATH | PATHLENGTH | HTTPMETHOD | METHODLENGTH | PORTNUMBER | QUERYSTRING | QUERYSTRLEN | URIMAP) cics_data_area | cics_handle_response)+;
+cics_extract_web_client: (WEB | (SESSTOKEN | PORTNUMBER | URIMAP | REALM | REALMLEN | HOST | HTTPVERSION | VERSIONLEN | PATH | PATHLENGTH) cics_data_area | HOSTLENGTH cics_data_value | (HOSTTYPE | SCHEME) cics_cvda | cics_handle_response)+;
 
-cics_extract_attributes: ATTRIBUTES (CONVID cics_name | SESSION cics_name | STATE cics_cvda) | cics_handle_response+;
-
-cics_extract_certificate: CERTIFICATE cics_ref (LENGTH cics_data_area | SERIALNUM cics_ref | SERIALNUMLEN cics_data_area |
-                          USERID cics_data_area | OWNER | ISSUER | COMMONNAME cics_ref | COMMONNAMLEN cics_data_area |
-                          COUNTRY cics_ref | COUNTRYLEN cics_data_area | STATE cics_ref | STATELEN cics_data_area |
-                          LOCALITY cics_ref | LOCALITYLEN cics_data_area | ORGANIZATION cics_ref |
-                          ORGANIZATLEN cics_data_area | ORGUNIT cics_ref | ORGUNITLEN cics_data_area | cics_handle_response)*;
-
-cics_extract_logonmsg: (LOGONMSG cics_into | LENGTH cics_data_area | cics_handle_response)+;
-cics_extract_process: PROCESS (cics_extract_procname | CONVID cics_name | SYNCLEVEL cics_data_area | cics_extract_piplist | cics_handle_response)*;
-cics_extract_procname: PROCNAME cics_data_area (PROCLENGTH cics_data_area | MAXPROCLEN cics_data_value | cics_handle_response)+;
-cics_extract_piplist: PIPLIST cics_ref PIPLENGTH cics_data_area;
-cics_extract_tcpip: TCPIP (AUTHENTICATE cics_cvda | cics_extract_clientname | cics_extract_servername | cics_extract_clientaddr |
-                    CLNTIPFAMILY cics_cvda | CLIENTADDRNU cics_data_area | CLNTADDR6NU cics_data_area |
-                    cics_extract_serveraddr | SRVRIPFAMILY cics_cvda | SERVERADDRNU cics_data_area | SRVRADDR6NU
-                    cics_data_area | SSLTYPE cics_cvda | TCPIPSERVICE cics_data_area | PORTNUMBER cics_data_area |
-                    PORTNUMNU cics_data_area | PRIVACY cics_cvda | MAXDATALEN cics_cvda | cics_handle_response)+;
-
-cics_extract_clientname: CLIENTNAME cics_data_area CNAMELENGTH cics_data_area;
-cics_extract_servername: SERVERNAME cics_data_area SNAMELENGTH cics_data_area;
-cics_extract_clientaddr: CLIENTADDR cics_data_area CADDRLENGTH cics_data_area;
-cics_extract_serveraddr: SERVERADDR cics_data_area SADDRLENGTH cics_data_area;
-
-cics_extract_tct: TCT (NETNAME cics_name | SYSID cics_data_area | TERMID cics_data_area | cics_handle_response)+;
-cics_extract_web: WEB (SCHEME cics_cvda | cics_extract_host | cics_extract_httpmethod | cics_extract_httpversion |
-                  cics_extract_path | PORTNUMBER cics_data_area | cics_extract_querystring | REQUESTTYPE cics_cvda | cics_handle_response)+;
-cics_extract_host: HOST cics_data_area HOSTLENGTH cics_data_value (HOSTTYPE cics_cvda)?;
-cics_extract_httpmethod: HTTPMETHOD cics_data_area METHODLENGTH cics_data_value;
-cics_extract_httpversion: HTTPVERSION cics_data_area VERSIONLEN cics_data_area;
-cics_extract_path: PATH cics_data_area PATHLENGTH cics_data_area;
-cics_extract_querystring: QUERYSTRING cics_data_area QUERYSTRLEN cics_data_area;
 
 /** FORCE TIMER */
 cics_force: FORCE (TIMER cics_data_value | ACQUACTIVITY | ACQPROCESS | cics_handle_response)+;
@@ -451,8 +408,8 @@ cics_gds_connect: CONNECT (PROCESS | CONVID cics_name | PROCNAME cics_name | PRO
                   RETCODE cics_data_area | STATE cics_cvda | cics_handle_response)+;
 cics_gds_extract: EXTRACT (cics_gds_attributes | cics_gds_process);
 cics_gds_attributes: ATTRIBUTES (CONVID cics_name | STATE cics_cvda | CONVDATA cics_data_area | RETCODE cics_data_area | cics_handle_response)+;
-cics_gds_process: PROCESS (CONVID cics_name | cics_extract_procname | SYNCLEVEL cics_data_area |
-                  cics_extract_piplist | RETCODE cics_data_area | cics_handle_response)+;
+cics_gds_process: PROCESS (CONVID cics_name | (PROCNAME cics_data_area (PROCLENGTH cics_data_area | MAXPROCLEN cics_data_value | cics_handle_response)+) | SYNCLEVEL cics_data_area |
+                  (PIPLIST cics_ref PIPLENGTH cics_data_area) | RETCODE cics_data_area | cics_handle_response)+;
 cics_gds_free: FREE (CONVID cics_name | CONVDATA cics_data_area | RETCODE cics_data_area | STATE cics_cvda | cics_handle_response)+;
 cics_gds_issue: ISSUE (ABEND | CONFIRMATION | ERROR | PREPARE | SIGNAL) (CONVID cics_name | CONVDATA cics_data_area |
                 RETCODE cics_data_area | STATE cics_cvda | cics_handle_response)+;
