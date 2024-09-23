@@ -63,82 +63,111 @@ public class CICSWebOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
      * @param <E> A subclass of ParserRuleContext
      */
     public <E extends ParserRuleContext> void checkOptions(E ctx) {
-        Class<?> ruleClass = ctx.getClass();
-
-        if (ruleClass == CICSParser.Cics_web_closeContext.class) {
-            checkClose((CICSParser.Cics_web_closeContext) ctx);
-        } else if (ruleClass == CICSParser.Cics_web_converseContext.class) {
-            checkConverse((CICSParser.Cics_web_converseContext) ctx);
-        } else if (ruleClass == CICSParser.Cics_web_endbrowseContext.class) {
-            checkEndbrowse((CICSParser.Cics_web_endbrowseContext) ctx);
-        } else if (ruleClass == CICSParser.Cics_web_openContext.class) {
-            checkOpen((CICSParser.Cics_web_openContext) ctx);
-        } else if (ruleClass == CICSParser.Cics_web_parseContext.class) {
-            checkParse((CICSParser.Cics_web_parseContext) ctx);
-        } else if (ruleClass == CICSParser.Cics_web_readContext.class) {
-            checkRead((CICSParser.Cics_web_readContext) ctx);
-        } else if (ruleClass == CICSParser.Cics_web_readnext_formfield_queryparmContext.class) {
-            checkReadnextFormfieldQueryparm((CICSParser.Cics_web_readnext_formfield_queryparmContext) ctx);
-        } else if (ruleClass == CICSParser.Cics_web_readnext_httpheaderContext.class) {
-            checkReadnextHTTPHeader((CICSParser.Cics_web_readnext_httpheaderContext) ctx);
-        } else if (ruleClass == CICSParser.Cics_web_receive_server_bufferContext.class) {
-            checkReceiveServerBuffer((CICSParser.Cics_web_receive_server_bufferContext) ctx);
-        } else if (ruleClass == CICSParser.Cics_web_receive_server_containerContext.class) {
-            checkReceiveServerContainer((CICSParser.Cics_web_receive_server_containerContext) ctx);
-        } else if (ruleClass == CICSParser.Cics_web_receive_clientContext.class) {
-            checkReceiveClient((CICSParser.Cics_web_receive_clientContext) ctx);
-        } else if (ruleClass == CICSParser.Cics_web_receive_client_containerContext.class) {
-            checkReceiveClientContainer((CICSParser.Cics_web_receive_client_containerContext) ctx);
-        } else if (ruleClass == CICSParser.Cics_web_startbrowse_formfield_queryparmContext.class) {
-            checkStartbrowseFormfieldQueryparm((CICSParser.Cics_web_startbrowse_formfield_queryparmContext) ctx);
-        } else if (ruleClass == CICSParser.Cics_web_writeContext.class) {
-            checkWrite((CICSParser.Cics_web_writeContext) ctx);
-        } else {
-            checkHelperRules(ctx, ruleClass);
-        }
-    }
-
-    private <E extends ParserRuleContext> void checkHelperRules(E ctx, Class<?> ruleClass) {
-        if (ruleClass == CICSParser.Cics_web_pathContext.class) {
-            checkWebPath((CICSParser.Cics_web_pathContext) ctx);
-        } else if (ruleClass == CICSParser.Cics_web_body_doctokenContext.class) {
-            checkWebBodyDoctoken((CICSParser.Cics_web_body_doctokenContext) ctx);
-        } else if (ruleClass == CICSParser.Cics_web_querystringContext.class) {
-            checkWebQuerystring((CICSParser.Cics_web_querystringContext) ctx);
-        } else if (ruleClass == CICSParser.Cics_web_close_optionsContext.class) {
-            checkWebCloseOptions((CICSParser.Cics_web_close_optionsContext) ctx);
-        } else if (ruleClass == CICSParser.Cics_web_auth_usernameContext.class) {
-            checkWebAuthUsernameOptions((CICSParser.Cics_web_auth_usernameContext) ctx);
-        } else if (ruleClass == CICSParser.Cics_web_auth_passwordContext.class) {
-            checkWebAuthPasswordOptions((CICSParser.Cics_web_auth_passwordContext) ctx);
-        } else if (ruleClass == CICSParser.Cics_web_client_auth_typeContext.class) {
-            checkWebClientAuthType((CICSParser.Cics_web_client_auth_typeContext) ctx);
-        } else if (ruleClass == CICSParser.Cics_web_send_from_chunkContext.class) {
-            checkSendFromChunk((CICSParser.Cics_web_send_from_chunkContext) ctx);
-        } else if (ruleClass == CICSParser.Cics_web_send_container_subruleContext.class) {
-            checkSendContainerSubrule((CICSParser.Cics_web_send_container_subruleContext) ctx);
-        } else if (ruleClass == CICSParser.Cics_web_into_set_tocontainerContext.class) {
-            checkIntoSetTocontainer((CICSParser.Cics_web_into_set_tocontainerContext) ctx);
-        } else if (ruleClass == CICSParser.Cics_web_hostContext.class) {
-            checkHost((CICSParser.Cics_web_hostContext) ctx);
-        } else if (ruleClass == CICSParser.Cics_web_host_hosttypeContext.class) {
-            checkHostHosttype((CICSParser.Cics_web_host_hosttypeContext) ctx);
-        } else if (ruleClass == CICSParser.Cics_web_httpmethodContext.class) {
-            checkHTTPMethod((CICSParser.Cics_web_httpmethodContext) ctx);
-        } else if (ruleClass == CICSParser.Cics_web_httpversionContext.class) {
-            checkHTTPVersion((CICSParser.Cics_web_httpversionContext) ctx);
-        } else if (ruleClass == CICSParser.Cics_web_realmContext.class) {
-            checkRealm((CICSParser.Cics_web_realmContext) ctx);
-        } else if (ruleClass == CICSParser.Cics_web_server_convertContext.class) {
-            checkWebServerConvert((CICSParser.Cics_web_server_convertContext) ctx);
-        } else if (ruleClass == CICSParser.Cics_web_client_convertContext.class) {
-            checkWebClientConvert((CICSParser.Cics_web_client_convertContext) ctx);
-        } else if (ruleClass == CICSParser.Cics_web_statuscodeContext.class) {
-            checkStatuscode((CICSParser.Cics_web_statuscodeContext) ctx);
-        } else if (ruleClass == CICSParser.Cics_web_send_doctokenContext.class) {
-            checkSendDoctoken((CICSParser.Cics_web_send_doctokenContext) ctx);
-        } else if (ruleClass == CICSParser.Cics_web_send_server_bodyContext.class) {
-            checkSendServerBody((CICSParser.Cics_web_send_server_bodyContext) ctx);
+        switch (ctx.getRuleIndex()) {
+            case CICSParser.RULE_cics_web_close:
+                checkClose((CICSParser.Cics_web_closeContext) ctx);
+                break;
+            case CICSParser.RULE_cics_web_converse:
+                checkConverse((CICSParser.Cics_web_converseContext) ctx);
+                break;
+            case CICSParser.RULE_cics_web_endbrowse:
+                checkEndbrowse((CICSParser.Cics_web_endbrowseContext) ctx);
+                break;
+            case CICSParser.RULE_cics_web_open:
+                checkOpen((CICSParser.Cics_web_openContext) ctx);
+                break;
+            case CICSParser.RULE_cics_web_parse:
+                checkParse((CICSParser.Cics_web_parseContext) ctx);
+                break;
+            case CICSParser.RULE_cics_web_read:
+                checkRead((CICSParser.Cics_web_readContext) ctx);
+                break;
+            case CICSParser.RULE_cics_web_readnext_formfield_queryparm:
+                checkReadnextFormfieldQueryparm((CICSParser.Cics_web_readnext_formfield_queryparmContext) ctx);
+                break;
+            case CICSParser.RULE_cics_web_readnext_httpheader:
+                checkReadnextHTTPHeader((CICSParser.Cics_web_readnext_httpheaderContext) ctx);
+                break;
+            case CICSParser.RULE_cics_web_receive_server_buffer:
+                checkReceiveServerBuffer((CICSParser.Cics_web_receive_server_bufferContext) ctx);
+                break;
+            case CICSParser.RULE_cics_web_receive_server_container:
+                checkReceiveServerContainer((CICSParser.Cics_web_receive_server_containerContext) ctx);
+                break;
+            case CICSParser.RULE_cics_web_receive_client:
+                checkReceiveClient((CICSParser.Cics_web_receive_clientContext) ctx);
+                break;
+            case CICSParser.RULE_cics_web_receive_client_container:
+                checkReceiveClientContainer((CICSParser.Cics_web_receive_client_containerContext) ctx);
+                break;
+            case CICSParser.RULE_cics_web_startbrowse_formfield_queryparm:
+                checkStartbrowseFormfieldQueryparm((CICSParser.Cics_web_startbrowse_formfield_queryparmContext) ctx);
+                break;
+            case CICSParser.RULE_cics_web_write:
+                checkWrite((CICSParser.Cics_web_writeContext) ctx);
+                break;
+            case CICSParser.RULE_cics_web_path:
+                checkWebPath((CICSParser.Cics_web_pathContext) ctx);
+                break;
+            case CICSParser.RULE_cics_web_body_doctoken:
+                checkWebBodyDoctoken((CICSParser.Cics_web_body_doctokenContext) ctx);
+                break;
+            case CICSParser.RULE_cics_web_querystring:
+                checkWebQuerystring((CICSParser.Cics_web_querystringContext) ctx);
+                break;
+            case CICSParser.RULE_cics_web_close_options:
+                checkWebCloseOptions((CICSParser.Cics_web_close_optionsContext) ctx);
+                break;
+            case CICSParser.RULE_cics_web_auth_username:
+                checkWebAuthUsernameOptions((CICSParser.Cics_web_auth_usernameContext) ctx);
+                break;
+            case CICSParser.RULE_cics_web_auth_password:
+                checkWebAuthPasswordOptions((CICSParser.Cics_web_auth_passwordContext) ctx);
+                break;
+            case CICSParser.RULE_cics_web_client_auth_type:
+                checkWebClientAuthType((CICSParser.Cics_web_client_auth_typeContext) ctx);
+                break;
+            case CICSParser.RULE_cics_web_send_from_chunk:
+                checkSendFromChunk((CICSParser.Cics_web_send_from_chunkContext) ctx);
+                break;
+            case CICSParser.RULE_cics_web_send_container_subrule:
+                checkSendContainerSubrule((CICSParser.Cics_web_send_container_subruleContext) ctx);
+                break;
+            case CICSParser.RULE_cics_web_into_set_tocontainer:
+                checkIntoSetTocontainer((CICSParser.Cics_web_into_set_tocontainerContext) ctx);
+                break;
+            case CICSParser.RULE_cics_web_host:
+                checkHost((CICSParser.Cics_web_hostContext) ctx);
+                break;
+            case CICSParser.RULE_cics_web_host_hosttype:
+                checkHostHosttype((CICSParser.Cics_web_host_hosttypeContext) ctx);
+                break;
+            case CICSParser.RULE_cics_web_httpmethod:
+                checkHTTPMethod((CICSParser.Cics_web_httpmethodContext) ctx);
+                break;
+            case CICSParser.RULE_cics_web_httpversion:
+                checkHTTPVersion((CICSParser.Cics_web_httpversionContext) ctx);
+                break;
+            case CICSParser.RULE_cics_web_realm:
+                checkRealm((CICSParser.Cics_web_realmContext) ctx);
+                break;
+            case CICSParser.RULE_cics_web_server_convert:
+                checkWebServerConvert((CICSParser.Cics_web_server_convertContext) ctx);
+                break;
+            case CICSParser.RULE_cics_web_client_convert:
+                checkWebClientConvert((CICSParser.Cics_web_client_convertContext) ctx);
+                break;
+            case CICSParser.RULE_cics_web_statuscode:
+                checkStatuscode((CICSParser.Cics_web_statuscodeContext) ctx);
+                break;
+            case CICSParser.RULE_cics_web_send_doctoken:
+                checkSendDoctoken((CICSParser.Cics_web_send_doctokenContext) ctx);
+                break;
+            case CICSParser.RULE_cics_web_send_server_body:
+                checkSendServerBody((CICSParser.Cics_web_send_server_bodyContext) ctx);
+                break;
+            default:
+                break;
         }
     }
 
