@@ -51,7 +51,7 @@ public class TestCICSWait {
       "WAIT EXTERNAL ECBLIST({$varOne}) NUMEVENTS({$varTwo})";
 
   private static final String EXTERNAL_INVALID_ONE =
-      "WAIT EXTERNAL ECBLIST(100) NUMEVENTS(100) PURGEABLE {NOTPURGEABLE|errorOne}";
+      "WAIT EXTERNAL ECBLIST(100) NUMEVENTS(100) {PURGEABLE|errorOne} {NOTPURGEABLE|errorTwo}";
 
   private static final String JOURNALNAME_VALID_ONE =
       "WAIT JOURNALNAME({$varOne}) REQID({$varOne})";
@@ -62,7 +62,7 @@ public class TestCICSWait {
   private static final String JOURNALNAME_VALID_TWO = "WAIT JOURNALNAME({$varOne})";
 
   private static final String JOURNALNAME_INVALID_ONE =
-      "WAIT {JOURNALNAME|errorOne}(100) JOURNALNUM(100) REQID(100) NOHANDLE";
+      "WAIT {JOURNALNAME|errorOne}(100) {JOURNALNUM|errorTwo}(100) REQID(100) NOHANDLE";
 
   private static final String SIGNAL_VALID_ONE = "WAIT SIGNAL RESP({$varOne})";
 
@@ -74,7 +74,7 @@ public class TestCICSWait {
   private static final String TERMINAL_VALID_TWO = "WAIT TERMINAL";
 
   private static final String TERMINAL_INVALID_ONE =
-      "WAIT TERMINAL {SESSION|errorOne}(100) CONVID(100)";
+      "WAIT TERMINAL {SESSION|errorOne}(100) {CONVID|errorTwo}(100)";
 
   @Test
   void testConvidValidOne() {
@@ -140,7 +140,13 @@ public class TestCICSWait {
             "errorOne",
             new Diagnostic(
                 new Range(),
-                "Invalid option provided: NOTPURGEABLE with PURGEABLE",
+                "Exactly one option required, options are mutually exclusive: PURGEABLE or PURGEABILITY or NOTPURGEABLE",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()),
+            "errorTwo",
+            new Diagnostic(
+                new Range(),
+                "Exactly one option required, options are mutually exclusive: PURGEABLE or PURGEABILITY or NOTPURGEABLE",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())));
   }
@@ -168,7 +174,13 @@ public class TestCICSWait {
             "errorOne",
             new Diagnostic(
                 new Range(),
-                "Invalid option provided: JOURNALNAME with JOURNALNUM",
+                "Exactly one option required, options are mutually exclusive: JOURNALNAME or JORUNALNUM",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()),
+            "errorTwo",
+            new Diagnostic(
+                new Range(),
+                "Exactly one option required, options are mutually exclusive: JOURNALNAME or JORUNALNUM",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())));
   }
@@ -209,7 +221,13 @@ public class TestCICSWait {
             "errorOne",
             new Diagnostic(
                 new Range(),
-                "Invalid option provided: SESSION with CONVID",
+                "Exactly one option required, options are mutually exclusive: SESSION or CONVID",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()),
+            "errorTwo",
+            new Diagnostic(
+                new Range(),
+                "Exactly one option required, options are mutually exclusive: SESSION or CONVID",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())));
   }

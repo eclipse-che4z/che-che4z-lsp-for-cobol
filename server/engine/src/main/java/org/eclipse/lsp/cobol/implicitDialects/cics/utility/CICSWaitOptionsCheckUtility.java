@@ -74,8 +74,6 @@ public class CICSWaitOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
       checkExternal((CICSParser.Cics_wait_externalContext) ctx);
     else if (ctx.getClass() == CICSParser.Cics_wait_journalnameContext.class)
       checkJournalName((CICSParser.Cics_wait_journalnameContext) ctx);
-    else if (ctx.getClass() == CICSParser.Cics_wait_signalContext.class)
-      checkSignal((CICSParser.Cics_wait_signalContext) ctx);
     else if (ctx.getClass() == CICSParser.Cics_wait_terminalContext.class)
       checkTerminal((CICSParser.Cics_wait_terminalContext) ctx);
     checkDuplicates(ctx);
@@ -95,27 +93,19 @@ public class CICSWaitOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     checkHasMandatoryOptions(ctx.ECBLIST(), ctx, "ECBLIST");
     checkHasMandatoryOptions(ctx.NUMEVENTS(), ctx, "NUMEVENTS");
 
-    if (!ctx.PURGEABLE().isEmpty()) {
-      checkHasIllegalOptions(ctx.PURGEABILITY(), "PURGEABILITY with PURGEABLE");
-      checkHasIllegalOptions(ctx.NOTPURGEABLE(), "NOTPURGEABLE with PURGEABLE");
-    } else if (!ctx.PURGEABILITY().isEmpty()) {
-      checkHasIllegalOptions(ctx.NOTPURGEABLE(), "NOTPURGEABLE with PURGEABILITY");
-      checkHasIllegalOptions(ctx.PURGEABLE(), "PURGEABLE with PURGEABILITY");
-    }
+    checkHasMutuallyExclusiveOptions(
+        "PURGEABLE or PURGEABILITY or NOTPURGEABLE",
+        ctx.PURGEABLE(),
+        ctx.PURGEABILITY(),
+        ctx.NOTPURGEABLE());
   }
 
   private void checkJournalName(CICSParser.Cics_wait_journalnameContext ctx) {
-    if (!ctx.JOURNALNUM().isEmpty())
-      checkHasIllegalOptions(ctx.JOURNALNAME(), "JOURNALNAME with JOURNALNUM");
-    else checkHasMandatoryOptions(ctx.JOURNALNAME(), ctx, "JOURNALNAME");
-  }
-
-  private void checkSignal(CICSParser.Cics_wait_signalContext ctx) {
-    checkHasMandatoryOptions(ctx.SIGNAL(), ctx, "SIGNAL");
+    checkHasExactlyOneOption("JOURNALNAME or JORUNALNUM", ctx, ctx.JOURNALNAME(), ctx.JOURNALNUM());
   }
 
   private void checkTerminal(CICSParser.Cics_wait_terminalContext ctx) {
     checkHasMandatoryOptions(ctx.TERMINAL(), ctx, "TERMINAL");
-    if (!ctx.CONVID().isEmpty()) checkHasIllegalOptions(ctx.SESSION(), "SESSION with CONVID");
+    checkHasMutuallyExclusiveOptions("SESSION or CONVID", ctx.SESSION(), ctx.CONVID());
   }
 }
