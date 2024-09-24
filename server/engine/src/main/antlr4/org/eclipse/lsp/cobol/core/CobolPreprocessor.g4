@@ -10,7 +10,7 @@ parser grammar CobolPreprocessor;
 options {tokenVocab = CobolPreprocessorLexer;}
 
 startRule
-   : .*? ((includeStatement | copyStatement | replaceAreaStart | replaceOffStatement | titleDirective | enterDirective
+   : .*? ((includeStatement | copyStatement | replaceAreaStartOrOffStatement | titleDirective | enterDirective
    | controlDirective | linkageSection | plusplusIncludeStatement | procedureDivision | workingStorageSection)+ .*?)* EOF
    ;
 
@@ -58,7 +58,7 @@ titleDirective
    ;
 
 enterDirective
-   : ENTER languageName? routineName? DOT_FS
+   : ENTER languageName? DOT_FS
    ;
 
 routineName
@@ -66,7 +66,7 @@ routineName
    ;
 
 languageName
-   : cobolWord
+   : cobolWord routineName?
    ;
 
 controlDirective
@@ -86,12 +86,8 @@ replacingPhrase
    : REPLACING replaceClause+
    ;
 
-replaceAreaStart
-   : REPLACE (replacePseudoText)+ DOT_FS
-   ;
-
-replaceOffStatement
-   : REPLACE OFF DOT_FS
+replaceAreaStartOrOffStatement
+   : REPLACE (replacePseudoText+ | OFF) DOT_FS
    ;
 
 replaceClause
