@@ -16,13 +16,11 @@
 package org.eclipse.lsp.cobol.implicitDialects.cics.utility;
 
 import org.antlr.v4.runtime.ParserRuleContext;
-//import org.antlr.v4.runtime.tree.TerminalNode;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser;
 
-//import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -63,15 +61,13 @@ public class CICSGetnextOptionsCheckUtility extends CICSOptionsCheckBaseUtility 
      * @param <E> A subclass of ParserRuleContext
      */
     public <E extends ParserRuleContext> void checkOptions(E ctx) {
-        Class<?> ruleClass = ctx.getClass();
-        if (ruleClass == CICSParser.Cics_getnextContext.class) {
+        if (ctx.getRuleIndex() == CICSParser.RULE_cics_getnext) {
             checkGetNext((CICSParser.Cics_getnextContext) ctx);
         }
     }
 
     private void checkGetNext(CICSParser.Cics_getnextContext ctx) {
         checkMutuallyExclusiveOptions("ACTIVITY, CONTAINER, EVENT, PROCESS, TIMER", ctx.ACTIVITY(), ctx.CONTAINER(), ctx.EVENT(), ctx.PROCESS(), ctx.TIMER());
-
 
         // Distinct elements for a given command subset:
         checkHasRequiredOption(ctx.ACTIVITY(), ctx.LEVEL(), ctx, "ACTIVITY");
