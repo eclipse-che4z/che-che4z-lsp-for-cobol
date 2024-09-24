@@ -3929,5 +3929,17 @@
         "parameterTypes": []
       }
     ]
+  },
+  {
+    "name": "org.eclipse.lsp.cobol.common.copybook.CopyBookDTO",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "java.lang.String",
+          "java.lang.String"
+        ]
+      }
+    ]
   }
 ]
