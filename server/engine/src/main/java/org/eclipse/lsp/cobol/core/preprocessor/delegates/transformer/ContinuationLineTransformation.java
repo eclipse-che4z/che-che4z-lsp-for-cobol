@@ -36,6 +36,8 @@ import org.eclipse.lsp.cobol.core.preprocessor.delegates.reader.CompilerDirectiv
 import org.eclipse.lsp.cobol.common.dialects.CobolProgramLayout;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
+
+import static org.eclipse.lsp.cobol.common.error.ErrorSeverity.WARNING;
 import static org.eclipse.lsp.cobol.core.preprocessor.delegates.rewriter.LineIndicatorProcessor.FLOATING_COMMENT_LINE;
 
 /**
@@ -270,7 +272,7 @@ public abstract class ContinuationLineTransformation implements CobolLinesTransf
                 .build()
                 .toOriginalLocation())
         .suggestion(messageService.getMessage("inlineComment.missingBlank"))
-        .severity(ERROR)
+        .severity(WARNING)
         .build();
   }
 
