@@ -3931,15 +3931,13 @@
     ]
   },
   {
-    "name": "org.eclipse.lsp.cobol.common.copybook.CopyBookDTO",
-    "methods": [
-      {
-        "name": "<init>",
-        "parameterTypes": [
-          "java.lang.String",
-          "java.lang.String"
-        ]
-      }
-    ]
+    "name":"org.eclipse.lsp4j.SetTraceParams",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {"name":"setTrace","parameterTypes":["org.eclipse.lsp4j.SetTraceParams"] },
+  {
+    "name":"org.eclipse.lsp.cobol.common.copybook.CopyBookDTO",
+    "allDeclaredFields":true
   }
 ]
