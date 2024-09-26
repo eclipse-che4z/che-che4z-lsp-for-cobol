@@ -38,6 +38,10 @@ public class TestCICSAddSubevent {
             "ADD EVENT({$varFour}) SUBEVENT({$varFour})";
     private static final String ADD_INVALID =
             "{ADD | error} ";
+    private static final String ADD_EVENT_INVALID =
+            "ADD {EVENT(100) | errorMissingSubevent} ";
+    private static final String ADD_SUBEVENT_INVALID =
+            "ADD {SUBEVENT(100) | errorMissingEvent} ";
     @Test
     void testAddSubEventValid() {
         CICSTestUtils.noErrorTest(ADD_SUBEVENT_EVENT);
@@ -47,7 +51,7 @@ public class TestCICSAddSubevent {
         CICSTestUtils.noErrorTest(ADD_EVENT_SUBEVENT);
     }
     @Test
-    void testAddSubEventInvalid() {
+    void testAddInvalid() {
         Map<String, Diagnostic> expectedDiagnostic =
                 ImmutableMap.of(
                         "error",
@@ -57,5 +61,29 @@ public class TestCICSAddSubevent {
                                 DiagnosticSeverity.Error,
                                 ErrorSource.PARSING.getText()));
         CICSTestUtils.errorTest(ADD_INVALID, expectedDiagnostic);
+    }
+    @Test
+    void testAddSubEventInvalid() {
+        Map<String, Diagnostic> expectedDiagnostic =
+                ImmutableMap.of(
+                        "errorMissingSubevent",
+                        new Diagnostic(
+                                new Range(),
+                                "Missing required option: SUBEVENT",
+                                DiagnosticSeverity.Error,
+                                ErrorSource.PARSING.getText()));
+        CICSTestUtils.errorTest(ADD_EVENT_INVALID, expectedDiagnostic);
+    }
+    @Test
+    void testAddEventInvalid() {
+        Map<String, Diagnostic> expectedDiagnostic =
+                ImmutableMap.of(
+                        "errorMissingEvent",
+                        new Diagnostic(
+                                new Range(),
+                                "Missing required option: EVENT",
+                                DiagnosticSeverity.Error,
+                                ErrorSource.PARSING.getText()));
+        CICSTestUtils.errorTest(ADD_SUBEVENT_INVALID, expectedDiagnostic);
     }
 }

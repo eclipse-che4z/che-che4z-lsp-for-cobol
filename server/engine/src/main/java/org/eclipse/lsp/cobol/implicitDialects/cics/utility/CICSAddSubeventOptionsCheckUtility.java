@@ -19,12 +19,14 @@ package org.eclipse.lsp.cobol.implicitDialects.cics.utility;
         import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
         import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
         import org.eclipse.lsp.cobol.common.error.SyntaxError;
+        import org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser;
 
         import java.util.HashMap;
         import java.util.List;
         import java.util.Map;
 
         import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_add;
+        import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_ciss_add_event_subevent;
 
 /** Checks CICS Add rules for required and invalid options */
 public class CICSAddSubeventOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
@@ -52,6 +54,13 @@ public class CICSAddSubeventOptionsCheckUtility extends CICSOptionsCheckBaseUtil
      * @param <E> A subclass of ParserRuleContext
      */
     public <E extends ParserRuleContext> void checkOptions(E ctx) {
+        if (ctx.getRuleIndex() == RULE_ciss_add_event_subevent)
+            checkAddEventSubEvent((CICSParser.Ciss_add_event_subeventContext) ctx);
+
         checkDuplicates(ctx);
+    }
+    private void checkAddEventSubEvent(CICSParser.Ciss_add_event_subeventContext ctx) {
+        checkHasMandatoryOptions(ctx.SUBEVENT(), ctx, "SUBEVENT");
+        checkHasMandatoryOptions(ctx.EVENT(), ctx, "EVENT");
     }
 }
