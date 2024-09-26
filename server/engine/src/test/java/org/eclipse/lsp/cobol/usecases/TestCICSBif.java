@@ -38,8 +38,8 @@ public class TestCICSBif {
     private static final String BIF_DEEDIT_FIELD_LENGTH_VALID =
             "BIF DEEDIT FIELD({$varFour}) LENGTH(100)";
 
-    private static final String BIF_DEEDIT_DIGEST_INVALID =
-            "BIF DEEDIT {DIGEST | error}";
+    private static final String BIF_DEEDIT_INVALID =
+            "BIF {DEEDIT | errorMissingField }";
     private static final String BIF_DIGEST_RECORD_RECORDLEN_RESULT_VALID =
             "BIF DIGEST RECORD(100) RECORDLEN(100) RESULT({$varFour})";
     private static final String BIF_DIGEST_RECORD_RECORDLEN_HEX_RESULT_VALID =
@@ -51,11 +51,11 @@ public class TestCICSBif {
     private static final String BIF_DIGEST_RECORD_RECORDLEN_DIGESTTYPE_RESULT_VALID =
             "BIF DIGEST RECORD(100) RECORDLEN(100) DIGESTTYPE({$varFour}) RESULT({$varFour})";
     private static final String BIF_DIGEST_RECORDLEN_INVALID =
-            "BIF DIGEST {RECORDLEN | errorRecordLen }";
+            "BIF DIGEST  RESULT({$varFour}) { RECORD(100) | errorRecordLen } ";
     private static final String BIF_DIGEST_DIGESTTYPE_INVALID =
-            "BIF DIGEST RECORD(100) RECORDLEN(100) HEX {DIGESTTYPE|errorDigestType }";
+            "BIF DIGEST RECORD(100) RECORDLEN(100) HEX { DIGESTTYPE | errorDigestType }(100)";
     private static final String BIF_DIGEST_RESULT_MISSING_INVALID =
-            "BIF DIGEST RECORD(100) {RECORDLEN(100) | errorResultMissing}";
+            "BIF DIGEST RECORD(100) {RECORDLEN | errorResultMissing}(100)";
 
     @Test
     void testBifDeeditField() {
@@ -71,13 +71,14 @@ public class TestCICSBif {
     void testBifDeeditDigestInvalid() {
         Map<String, Diagnostic> expectedDiagnostic =
                 ImmutableMap.of(
-                        "error",
+                        "errorMissingField",
                         new Diagnostic(
                                 new Range(),
-                                "Syntax error on 'DIGEST'",
+                                "Missing required option: FIELD",
                                 DiagnosticSeverity.Error,
                                 ErrorSource.PARSING.getText()));
-        CICSTestUtils.errorTest(BIF_DEEDIT_DIGEST_INVALID, expectedDiagnostic);
+
+        CICSTestUtils.errorTest(BIF_DEEDIT_INVALID, expectedDiagnostic);
     }
     @Test
     void testBifDigestRecordRecordlenResultValid() {
@@ -105,8 +106,8 @@ public class TestCICSBif {
                 ImmutableMap.of(
                         "errorRecordLen",
                         new Diagnostic(
-                                new Range(),
-                                "Syntax error on 'RECORDLEN'",
+                                new Range(new Position(13, 12), new Position(16, 23)),
+                                "Missing required option: RECORDLEN",
                                 DiagnosticSeverity.Error,
                                 ErrorSource.PARSING.getText()));
         CICSTestUtils.errorTest(BIF_DIGEST_RECORDLEN_INVALID, expectedDiagnostic);
@@ -117,8 +118,8 @@ public class TestCICSBif {
                 ImmutableMap.of(
                         "errorDigestType",
                         new Diagnostic(
-                                new Range(),
-                                "Syntax error on 'DIGESTTYPE'",
+                                new Range(new Position(13, 12), new Position(17, 27)),
+                                "Missing required option: RESULT",
                                 DiagnosticSeverity.Error,
                                 ErrorSource.PARSING.getText()));
         CICSTestUtils.errorTest(BIF_DIGEST_DIGESTTYPE_INVALID, expectedDiagnostic);
@@ -129,8 +130,8 @@ public class TestCICSBif {
                 ImmutableMap.of(
                         "errorResultMissing",
                         new Diagnostic(
-                                new Range(new Position(16, 12), new Position(16, 20)),
-                                "Syntax error on 'END-EXEC'",
+                                new Range(new Position(13, 12), new Position(15, 26)),
+                                "Missing required option: RESULT",
                                 DiagnosticSeverity.Error,
                                 ErrorSource.PARSING.getText()));
         CICSTestUtils.errorTest(BIF_DIGEST_RESULT_MISSING_INVALID, expectedDiagnostic);
