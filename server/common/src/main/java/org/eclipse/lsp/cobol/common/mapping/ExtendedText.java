@@ -110,7 +110,7 @@ public class ExtendedText {
   }
 
   private ExtendedTextLine updateLine(ExtendedTextLine textLine, Location initialLocation) {
-    textLine.getCharacters().forEach(c -> c.getInitialLocationMap().put(uri, initialLocation));
+    textLine.getCharacters().forEach(c -> c.getOrCreateInitialLocationMap().put(uri, initialLocation));
     return textLine;
   }
 

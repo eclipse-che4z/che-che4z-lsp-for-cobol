@@ -14,7 +14,7 @@
  */
 package org.eclipse.lsp.cobol.cfg;
 
-import org.eclipse.lsp.cobol.common.model.tree.Node;
+import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
 import org.eclipse.lsp.cobol.core.model.extendedapi.ExtendedApiResult;
 
 /**
@@ -23,8 +23,8 @@ import org.eclipse.lsp.cobol.core.model.extendedapi.ExtendedApiResult;
 public interface CFASTBuilder {
     /**
      * Build Abstract Syntax Tree with Control Flow related nodes.
-     * @param rootNode of the application
+     * @param programNode a program node
      * @return CF ASTs wrapped in ExtendedApiResult
      */
-    ExtendedApiResult build(Node rootNode);
+    ExtendedApiResult build(ProgramNode programNode);
 }

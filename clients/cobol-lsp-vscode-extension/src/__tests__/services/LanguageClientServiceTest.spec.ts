@@ -26,6 +26,7 @@ import { EXP_LANGUAGE_ID, HP_LANGUAGE_ID } from "../../constants";
 
 jest.mock("../../services/reporter/TelemetryService");
 jest.mock("../../services/copybook/CopybookURI");
+
 jest.mock("vscode", () => ({
   extensions: {
     getExtension: jest.fn().mockReturnValue({ extensionPath: "/test" }),
@@ -42,6 +43,9 @@ jest.mock("vscode", () => ({
     file: jest.fn().mockReturnValue({
       fsPath: "/storagePath",
     }),
+  },
+  Position: class {
+    constructor(private line: number, private character: number) {}
   },
   RelativePattern: jest.fn().mockReturnValue(undefined),
 }));
@@ -116,9 +120,13 @@ describe("LanguageClientService positive scenario", () => {
 
     LanguageClient.prototype.sendRequest = () =>
       Promise.resolve(expectedResult);
-    expect(await languageClientService.retrieveAnalysis("test", "text")).toBe(
-      expectedResult,
-    );
+    expect(
+      await languageClientService.retrieveAnalysis(
+        "test",
+        "text",
+        new vscode.Position(0, 0),
+      ),
+    ).toBe(expectedResult);
   });
 
   test("Test LanguageClientService starts language client", async () => {

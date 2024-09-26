@@ -38,7 +38,7 @@ suite("TF35623: Support for Replacing and Mapping statement", function () {
     const extSrcPath = path.join("TEST1.CBL");
     let diagPromise = helper.waitForDiagnosticsChange(extSrcPath);
     await helper.showDocument(extSrcPath);
-    let editor = helper.get_editor("TEST1.CBL");
+    let editor = helper.getEditor("TEST1.CBL");
     let diagnostics = await diagPromise;
     assert.strictEqual(diagnostics.length, 1);
     const message = diagnostics[0].message;
@@ -60,7 +60,7 @@ suite("TF35623: Support for Replacing and Mapping statement", function () {
     const extSrcPath = path.join("TEST2.CBL");
     let diagPromise = helper.waitForDiagnosticsChange(extSrcPath);
     await helper.showDocument(extSrcPath);
-    let editor = helper.get_editor("TEST2.CBL");
+    let editor = helper.getEditor("TEST2.CBL");
     let diagnostics = await diagPromise;
     assert.strictEqual(diagnostics.length, 1);
     const message = diagnostics[0].message;

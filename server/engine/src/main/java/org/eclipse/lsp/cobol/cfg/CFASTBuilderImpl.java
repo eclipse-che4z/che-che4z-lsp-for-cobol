@@ -14,6 +14,8 @@
  */
 package org.eclipse.lsp.cobol.cfg;
 
+import com.google.gson.Gson;
+import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.common.model.tree.*;
 import org.eclipse.lsp.cobol.common.model.tree.statements.StatementNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableUsageNode;
@@ -31,23 +33,21 @@ import org.eclipse.lsp4j.Range;
 import java.util.ArrayList;
 import java.util.List;
 
-import static java.util.stream.Collectors.toList;
 import static org.eclipse.lsp.cobol.common.model.NodeType.*;
-import static org.eclipse.lsp.cobol.common.model.tree.Node.hasType;
 
 /** CF tree builder implementation */
+@Slf4j
 public class CFASTBuilderImpl implements CFASTBuilder {
   private static final int SNIPPET_LENGTH = 10;
 
   @Override
-  public ExtendedApiResult build(Node rootNode) {
+  public ExtendedApiResult build(ProgramNode programNode) {
     ExtendedApiResult result = new ExtendedApiResult(new ArrayList<>());
-    if (rootNode == null) {
+    if (programNode == null) {
       return result;
     }
-    for (Node node : rootNode.getChildren().stream().filter(hasType(PROGRAM)).collect(toList())) {
-      traverse((ProgramNode) node, result.getControlFlowAST());
-    }
+    traverse(programNode, result.getControlFlowAST());
+    LOG.debug(new Gson().toJson(result));
     return result;
   }
 

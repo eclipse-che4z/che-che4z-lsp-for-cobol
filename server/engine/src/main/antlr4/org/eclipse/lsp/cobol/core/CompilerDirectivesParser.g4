@@ -75,26 +75,25 @@ cicsTranslatorCompileDirectivedKeywords
        ;
 
 deprecatedCompilerOptions:
+            unSupportedDeprecatedCompilerDirectives
+            | optionalDeprecatedCompilerDirectives
+            | compilableSupportedDeprecatedCompilerDirectives
+        ;
+
+unSupportedDeprecatedCompilerDirectives:
             CPP
-           | (DATEPROC | DP) (LPARENCHAR (FLAG | NOFLAG)? COMMACHAR? (TRIG | NOTRIG)? RPARENCHAR)?
            | EPILOG
            | GDS
            | GRAPHIC
            | LEASM
-           | LIB
            | LIN
            | MARGINS LPARENCHAR LITERAL COMMACHAR LITERAL (COMMACHAR LITERAL)? RPARENCHAR
            | NATLANG LPARENCHAR (CS | EN | KA) RPARENCHAR
-           | NUMPROC LPARENCHAR MIG RPARENCHAR
            | NOCMPR2
-           | (NODATEPROC | NODP)
            | NODE
            | NOEPILOG
-           | NOFLAGMIG
            | NOGRAPHIC
-           | NOLIB
            | NOOPSEQUENCE
-           | (NOOPTIMIZE | NOOPT)
            | NOP
            | NOPROLOG
            | NOSTDTRUNC
@@ -104,9 +103,23 @@ deprecatedCompilerOptions:
            | OP
            | PROLOG
            | RES
-           | (SIZE | SZ) LPARENCHAR (MAX | LITERAL) RPARENCHAR
-           | (YEARWINDOW | YW) LPARENCHAR LITERAL RPARENCHAR
         ;
+
+optionalDeprecatedCompilerDirectives:
+           LIB
+           | (NOOPTIMIZE | NOOPT)
+           | (SIZE | SZ) LPARENCHAR (MAX | LITERAL) RPARENCHAR
+           | NOFLAGMIG
+           | FLAGMIG
+           ;
+
+compilableSupportedDeprecatedCompilerDirectives:
+            NUMPROC LPARENCHAR MIG RPARENCHAR
+            | (NODATEPROC | NODP)
+            | (DATEPROC | DP) (LPARENCHAR (FLAG | NOFLAG)? COMMACHAR? (TRIG | NOTRIG)? RPARENCHAR)?
+            | NOLIB
+            | (YEARWINDOW | YW) LPARENCHAR LITERAL RPARENCHAR
+            ;
 
 cobolCompilerOption
    : ADATA | NOADATA

@@ -52,17 +52,12 @@ export function getWorkspace(): vscode.WorkspaceFolder {
   throw new Error("Workspace not found");
 }
 
-export function get_editor(workspace_file: string): vscode.TextEditor {
+export function getEditor(workspace_file: string): vscode.TextEditor {
   const editor = vscode.window.activeTextEditor!;
   assert.strictEqual(
     editor.document.uri.fsPath,
     path.join(getWorkspacePath(), workspace_file),
   );
-  return editor;
-}
-
-export function get_active_editor(): vscode.TextEditor {
-  const editor = vscode.window.activeTextEditor!;
   return editor;
 }
 

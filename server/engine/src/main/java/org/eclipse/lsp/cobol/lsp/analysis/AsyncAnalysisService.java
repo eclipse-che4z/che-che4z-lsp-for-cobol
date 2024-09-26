@@ -22,6 +22,7 @@ import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.lsp.cobol.common.AnalysisResult;
 import org.eclipse.lsp.cobol.common.SubroutineService;
 import org.eclipse.lsp.cobol.common.copybook.CopybookService;
 import org.eclipse.lsp.cobol.common.dialects.CobolLanguageId;
@@ -295,7 +296,7 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
       if (analysisService.isCopybook(uri, doc.getText())) {
         return true;
       }
-      return doc.getLastAnalysisResult() != null;
+      return doc.getLastAnalysisResult() != null && doc.getLastAnalysisResult() != AnalysisResult.EMPTY;
     };
   }
 

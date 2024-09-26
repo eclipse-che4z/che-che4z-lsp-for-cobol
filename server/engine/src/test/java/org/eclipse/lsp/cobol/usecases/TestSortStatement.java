@@ -115,7 +115,7 @@ class TestSortStatement {
     assertNull(outputNode);
 
     CFASTBuilder builder = new CFASTBuilderImpl();
-    ExtendedApiResult extendedApiResult = builder.build(result.getRootNode());
+    ExtendedApiResult extendedApiResult = builder.build(result.getRootNode().findFirstProgramNode());
 
     assertEquals(1, extendedApiResult.getControlFlowAST().size());
   }
