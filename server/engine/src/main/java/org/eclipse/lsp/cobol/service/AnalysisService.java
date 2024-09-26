@@ -121,7 +121,7 @@ public class AnalysisService {
               uri, DocumentServiceHelper.extractCopybookUris(result), copybookProcessingMode);
       LOG.debug("[doAnalysis] Document " + uri + " analyzed: " + result.getDiagnostics());
     } catch (Exception e) {
-      documentService.processAnalysisResult(uri, AnalysisResult.builder().build(), text);
+      documentService.processAnalysisResult(uri, AnalysisResult.EMPTY, text);
       LOG.debug(format("An exception thrown while applying %s for %s:", "analysis", uri));
       LOG.error(format("An exception thrown while applying %s for %s:", "analysis", uri), e);
       throw e;

@@ -291,6 +291,10 @@
                             <!--suppress UnresolvedMavenProperty -->
                             <value>${listingSnap}</value>
                         </property>
+                        <property>
+                            <name>usecase.test.repo.dir</name>
+                            <value>${usecase.test.repo.dir}</value>
+                        </property>
                     </systemPropertyVariables>
                     <excludes>
                         <exclude>**/org/eclipse/lsp/cobol/dialects/**/*</exclude>
@@ -432,7 +436,7 @@
                     <plugin>
                         <groupId>org.graalvm.buildtools</groupId>
                         <artifactId>native-maven-plugin</artifactId>
-                        <version>0.9.15</version>
+                        <version>0.10.3</version>
                         <extensions>true</extensions>
                         <executions>
                             <execution>

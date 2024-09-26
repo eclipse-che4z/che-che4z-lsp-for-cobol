@@ -26,7 +26,7 @@ import java.util.Map;
 /** This data class defines output of use-case text preprocessor */
 @Value
 @Builder(toBuilder = true)
-class TestData {
+public class TestData {
   String text;
   String copybookName;
   String dialectType;

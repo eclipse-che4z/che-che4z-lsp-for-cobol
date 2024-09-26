@@ -22,7 +22,6 @@ import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.symbols.VariableAccumulator;
 
 import java.util.*;
-import java.util.function.BiConsumer;
 
 /**
  * AST processing context. Stores the state of processing progress.
@@ -32,7 +31,7 @@ import java.util.function.BiConsumer;
 public class ProcessingContext {
     private final Map<
         ProcessingPhase,
-            Map<Class<? extends Node>, List<BiConsumer<? extends Node, ProcessingContext>>>>
+            Map<Class<? extends Node>, List<Processor<? extends Node>>>>
             processors = new HashMap<>();
 
     final List<SyntaxError> errors;
