@@ -62,7 +62,7 @@ public class CICSBuildOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
      * @param <E> A subclass of ParserRuleContext
      */
     public <E extends ParserRuleContext> void checkOptions(E ctx) {
-        if(ctx.getRuleIndex() == RULE_cics_build_attach) {
+        if (ctx.getRuleIndex() == RULE_cics_build_attach) {
         checkAttachIdOptions((CICSParser.Cics_build_attachContext) ctx);
         }
         checkDuplicates(ctx);
