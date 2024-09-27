@@ -60,7 +60,7 @@ The autocomplete feature is only available in the main COBOL file, not in copybo
 ![Autocomplete](/docs/images/CLSAutocorrect.gif)
 
 ### Syntax and Semantic Check for Code
-This feature checks for mistakes and errors in COBOL code. The syntax check feature reviews the whole content of the code and suggests fixes, through syntax and semantic analysis which returns diagnostics on the entire context of the code, not just keywords.
+This feature checks for mistakes and errors in COBOL code. The syntax check feature reviews the whole content of the code and suggests fixes, and the semantic analysis highlights incorrect names of variables, copybooks and paragraphs.
 
 This feature is also enabled for Datacom, CICS, and DB2 SQL keywords and variables.
 
