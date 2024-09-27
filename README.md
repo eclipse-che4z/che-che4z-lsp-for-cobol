@@ -86,7 +86,7 @@ Before you write your COBOL code from scratch, search the snippet library for us
 
 You can also insert a code snippet by typing the name of the snippet in your code and clicking on the autocomplete text.
 
-The COBOL Language Support extension also supports user snippets. Add your custom snippets to the `COBOL.json` file in your user snippets folder. To access your user snippets file, select **File** - **Preferences** - **Configure Snippets** and select `COBOL.json` from the list.
+The COBOL Language Support extension also supports user snippets. Add your custom snippets to the `COBOL.json` file in your user snippets folder. To access your user snippets file, press **F1** to open the command pallette, and run the command **Snippets: Configure Snippets**.
 
 ### Smart Tab
 
