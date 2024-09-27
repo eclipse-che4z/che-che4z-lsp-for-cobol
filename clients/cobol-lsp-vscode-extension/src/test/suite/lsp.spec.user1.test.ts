@@ -34,8 +34,12 @@ suite("Tests with USER1.cbl", function () {
   );
   this.beforeEach(async () => {
     await helper.showDocument(WORKSPACE_FILE);
-    editor = helper.get_editor(WORKSPACE_FILE);
+    editor = helper.getEditor(WORKSPACE_FILE);
   });
+
+  this.afterAll(async () => await helper.closeAllEditors()).timeout(
+    helper.TEST_TIMEOUT,
+  );
 
   // open 'open' file, should be recognized as COBOL
   test("TC152048: Cobol file is recognized by LSP", async () => {
@@ -46,8 +50,11 @@ suite("Tests with USER1.cbl", function () {
 
   test("TC152046: Nominal - check syntax Ok message", async () => {
     await helper.waitFor(() => editor.document.languageId === "cobol");
+    if (vscode.window.activeTextEditor === undefined) {
+      assert.fail("activeTextEditor in undefined");
+    }
     const diagnostics = vscode.languages.getDiagnostics(
-      helper.get_active_editor().document.uri,
+      vscode.window.activeTextEditor.document.uri,
     );
     const expectedMsg =
       "Checks that when opening Cobol file with correct syntax there is an appropriate message is shown";
@@ -80,6 +87,17 @@ suite("Tests with USER1.cbl", function () {
   });
 
   test("TC152080: Find all references from the word middle", async () => {
+    await helper.waitFor(
+      async () =>
+        (
+          (await vscode.commands.executeCommand(
+            "vscode.executeDefinitionProvider",
+            editor.document.uri,
+            pos(20, 15),
+          )) as any[]
+        ).length > 0,
+    );
+
     const result: any[] = await vscode.commands.executeCommand(
       "vscode.executeReferenceProvider",
       editor.document.uri,
@@ -96,6 +114,17 @@ suite("Tests with USER1.cbl", function () {
   });
 
   test("TC152080: Find all references from the word begin", async () => {
+    await helper.waitFor(
+      async () =>
+        (
+          (await vscode.commands.executeCommand(
+            "vscode.executeDefinitionProvider",
+            editor.document.uri,
+            pos(20, 10),
+          )) as any[]
+        ).length > 0,
+    );
+
     const result: any[] = await vscode.commands.executeCommand(
       "vscode.executeReferenceProvider",
       editor.document.uri,

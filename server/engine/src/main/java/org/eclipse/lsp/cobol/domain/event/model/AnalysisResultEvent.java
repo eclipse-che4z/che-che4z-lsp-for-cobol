@@ -32,4 +32,6 @@ public class AnalysisResultEvent {
   private String uri;
   @NonNull
   private String text;
+  private int line;
+  private int character;
 }

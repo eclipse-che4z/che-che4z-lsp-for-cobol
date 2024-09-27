@@ -26,15 +26,19 @@ suite("TF35623: Support for Replacing and Mapping statement", function () {
     await helper.activate();
   });
 
-  this.beforeEach(async () => {
+  this.afterEach(async () => {
     await helper.closeAllEditors();
   });
+
+  this.afterAll(async () => await helper.closeAllEditors()).timeout(
+    helper.TEST_TIMEOUT,
+  );
 
   test("TC248045: Replacing Basic Scenario", async () => {
     const extSrcPath = path.join("TEST1.CBL");
     let diagPromise = helper.waitForDiagnosticsChange(extSrcPath);
     await helper.showDocument(extSrcPath);
-    let editor = helper.get_editor("TEST1.CBL");
+    let editor = helper.getEditor("TEST1.CBL");
     let diagnostics = await diagPromise;
     assert.strictEqual(diagnostics.length, 1);
     const message = diagnostics[0].message;
@@ -56,7 +60,7 @@ suite("TF35623: Support for Replacing and Mapping statement", function () {
     const extSrcPath = path.join("TEST2.CBL");
     let diagPromise = helper.waitForDiagnosticsChange(extSrcPath);
     await helper.showDocument(extSrcPath);
-    let editor = helper.get_editor("TEST2.CBL");
+    let editor = helper.getEditor("TEST2.CBL");
     let diagnostics = await diagPromise;
     assert.strictEqual(diagnostics.length, 1);
     const message = diagnostics[0].message;

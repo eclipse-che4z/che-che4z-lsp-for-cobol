@@ -14,12 +14,15 @@
  */
 package org.eclipse.lsp.cobol.lsp.analysis;
 
+import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.stream.Collectors;
+
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.lsp.cobol.common.AnalysisResult;
 import org.eclipse.lsp.cobol.common.SubroutineService;
 import org.eclipse.lsp.cobol.common.copybook.CopybookService;
 import org.eclipse.lsp.cobol.common.dialects.CobolLanguageId;
@@ -46,7 +49,7 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
   private final SubroutineService subroutineService;
   private final Communications communications;
 
-  private final Map<String, CompletableFuture<CobolDocumentModel>> analysisResults = Collections.synchronizedMap(new HashMap<>());
+  private final Map<String, FutureTask<CobolDocumentModel>> analysisResults = Collections.synchronizedMap(new HashMap<>());
   private final Map<String, Integer> analysisResultsRevisions = Collections.synchronizedMap(new HashMap<>());
   private final Map<String, ExecutorService> analysisExecutors = Collections.synchronizedMap(new HashMap<>());
 
@@ -85,7 +88,7 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
    * @param open Is document just opened, or it's reanalyse request
    * @return document model with analysis result
    */
-  public synchronized CompletableFuture<CobolDocumentModel> scheduleAnalysis(String uri, String text, boolean open) {
+  public synchronized FutureTask<CobolDocumentModel> scheduleAnalysis(String uri, String text, boolean open) {
     return scheduleAnalysis(uri, text, analysisResultsRevisions.getOrDefault(uri, 0), open, SourceUnitGraph.EventSource.IDE);
   }
 
@@ -99,7 +102,7 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
    * @param eventSource source of the event
    * @return document model with analysis result
    */
-  public synchronized CompletableFuture<CobolDocumentModel> scheduleAnalysis(String uri, String text, Integer currentRevision, boolean open, SourceUnitGraph.EventSource eventSource) {
+  public synchronized FutureTask<CobolDocumentModel> scheduleAnalysis(String uri, String text, Integer currentRevision, boolean open, SourceUnitGraph.EventSource eventSource) {
     return scheduleAnalysis(uri, text, currentRevision, open, false, eventSource);
   }
 
@@ -114,7 +117,7 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
    * @param eventSource source of the event
    * @return document model with analysis result
    */
-  public synchronized CompletableFuture<CobolDocumentModel> scheduleAnalysis(String uri, String text, Integer currentRevision, boolean open, boolean force, SourceUnitGraph.EventSource eventSource) {
+  public synchronized FutureTask<CobolDocumentModel> scheduleAnalysis(String uri, String text, Integer currentRevision, boolean open, boolean force, SourceUnitGraph.EventSource eventSource) {
     notifyAllListeners(AnalysisState.SCHEDULED, documentModelService.get(uri), eventSource);
     String id = makeId(uri, currentRevision);
     Integer prevId = analysisResultsRevisions.put(uri, currentRevision);
@@ -122,39 +125,66 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
       notifyAllListeners(AnalysisState.SKIPPED, documentModelService.get(uri), eventSource);
       return analysisResults.get(id);
     }
-    Executor analysisExecutor = getExecutor(uri);
-    CompletableFuture<CobolDocumentModel> value = CompletableFuture.supplyAsync(() -> {
+    ExecutorService analysisExecutor = getExecutor(uri);
+    CobolDocumentModel documentModel = documentModelService.get(uri);
+    if (documentModel.getLastAnalysisResult() != null) {
+      // initiate cancel on prev running analysis
+      cancelRunningAnalysis(ImmutableList.of(documentModel));
+    }
+    FutureTask<CobolDocumentModel> futureTask = new FutureTask<>(scheduleAnalysis(uri, text, currentRevision, open, force, eventSource, id));
+    analysisResults.put(id, futureTask);
+    analysisExecutor.submit(futureTask);
+    if (prevId != null && !force) {
+      Optional.ofNullable(analysisResults.get(makeId(uri, prevId))).ifPresent(cf -> cf.cancel(true));
+    }
+    return futureTask;
+  }
+
+  private Callable<CobolDocumentModel> scheduleAnalysis(String uri, String text, Integer currentRevision, boolean open, boolean force, SourceUnitGraph.EventSource eventSource, String id) {
+    return () -> {
       if (currentRevision < analysisResultsRevisions.get(uri) && !force) {
-        notifyAllListeners(AnalysisState.SKIPPED, documentModelService.get(uri), eventSource);
-        LOG.debug("[scheduleAnalysis] skip revision: " + currentRevision + " latest: " + analysisResultsRevisions.get(uri));
+        notifyAllListeners(
+                AnalysisState.SKIPPED, documentModelService.get(uri), eventSource);
+        LOG.debug(
+                "[scheduleAnalysis] skip revision: "
+                        + currentRevision
+                        + " latest: "
+                        + analysisResultsRevisions.get(uri));
         return null;
       }
-      LOG.debug("[scheduleAnalysis] Start analysis: " + uri);
-      notifyAllListeners(AnalysisState.STARTED, documentModelService.get(uri), eventSource);
+      LOG.debug("[scheduleAnalysis] waiting for previous analysis of {} to finish", uri);
       try {
+        LOG.debug("[scheduleAnalysis] Start analysis: " + uri);
+        notifyAllListeners(AnalysisState.STARTED, documentModelService.get(uri), eventSource);
         communications.notifyProgressBegin(uri);
         documentModelService.get(uri).setOutlineResult(null);
         analysisService.analyzeDocument(uri, text, open);
-        CobolDocumentModel documentModel = documentModelService.get(uri);
-        analysisResults.remove(id).complete(documentModel);
-        notifyAllListeners(AnalysisState.COMPLETED, documentModel, eventSource);
-        return documentModel;
+        notifyAllListeners(AnalysisState.COMPLETED, documentModelService.get(uri), eventSource);
+        analysisResults.remove(id);
+        return documentModelService.get(uri);
+      } catch (Exception genericException) { // Ideally we should not do this, but a safer catch might help to remove unknown issues
+        LOG.error("Encountered Exception {} , while analysing uri : {}", genericException, uri, genericException);
+        notifyAllListeners(AnalysisState.EXCEPTIONALLY_FINISHED, documentModelService.get(uri), eventSource);
+        return documentModelService.get(uri);
       } finally {
         if (Objects.equals(analysisResultsRevisions.get(uri), currentRevision) || force) {
           communications.publishDiagnostics(documentModelService.getOpenedDiagnostic());
         }
         communications.notifyProgressEnd(uri);
       }
-    }, analysisExecutor);
-    analysisResults.put(id, value);
-    if (prevId != null && !force) {
-      Optional.ofNullable(analysisResults.get(makeId(uri, prevId))).ifPresent(cf -> cf.cancel(true));
-    }
-    return value;
+    };
   }
 
 
-  private Executor getExecutor(String uri) {
+  /**
+   * IMPORTANT:
+   *  1. Never shutdown or terminate Executor service as we rely on this for synchronization
+   *  2. Each uri will always have a singleThreadExecutor and should not be modified as we rely on this for synchronization
+   *
+   * @param uri
+   * @return
+   */
+  private ExecutorService getExecutor(String uri) {
     synchronized (analysisExecutors) {
       ExecutorService analysisExecutor = analysisExecutors.computeIfAbsent(uri, u -> Executors.newSingleThreadExecutor(THREAD_FACTORY));
       if (analysisExecutor.isShutdown()) {
@@ -170,35 +200,28 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
   }
 
   /**
-   * Trigger reanalyse of opened programs.
+   * Trigger reanalyse of opened programs considering its triggered by IDE.
    */
   public void reanalyseOpenedPrograms() throws InterruptedException {
+    reanalyseOpenedPrograms(SourceUnitGraph.EventSource.IDE);
+  }
+
+  /**
+   * Trigger reanalyse of opened programs based on source event (IDE or FILE_SYSTEM).
+   * @param eventSource {@link org.eclipse.lsp.cobol.lsp.SourceUnitGraph.EventSource}
+   */
+  public void reanalyseOpenedPrograms(SourceUnitGraph.EventSource eventSource) throws InterruptedException {
     List<CobolDocumentModel> openDocuments = documentModelService.getAllOpened()
             .stream().filter(d -> !analysisService.isCopybook(d.getUri(), d.getText())).collect(Collectors.toList());
-    boolean analysisInProgress;
-    do {
-      analysisInProgress = openDocuments.stream()
-              .filter(model -> model.getLastAnalysisResult() != null)
-              .map(model -> makeId(model.getUri(), analysisResultsRevisions.get(model.getUri())))
-              .filter(analysisResults::containsKey)
-              .anyMatch(id -> !analysisResults.get(id).isDone());
-      if (analysisInProgress) {
-        cancelRunningAnalysis(openDocuments);
-      }
-      LOG.debug(" re-analysis is waiting for prev analysis to finish");
-      TimeUnit.MILLISECONDS.sleep(100);
-    } while (analysisInProgress);
-
     copybookService.invalidateCache(true);
     subroutineService.invalidateCache();
     LOG.info("Cache invalidated");
     openDocuments
-            .forEach(doc -> scheduleAnalysis(doc.getUri(), doc.getText(), analysisResultsRevisions.getOrDefault(doc.getUri(), 0), false, true, SourceUnitGraph.EventSource.IDE));
+            .forEach(doc -> scheduleAnalysis(doc.getUri(), doc.getText(), analysisResultsRevisions.getOrDefault(doc.getUri(), 0), false, true, eventSource));
   }
 
   private void cancelRunningAnalysis(List<CobolDocumentModel> openDocuments) {
     openDocuments.stream()
-            .filter(model -> model.getLastAnalysisResult() != null)
             .map(model -> makeId(model.getUri(), analysisResultsRevisions.get(model.getUri())))
             .filter(analysisResults::containsKey)
             .map(analysisResults::get)
@@ -249,16 +272,13 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
    * @param uri source URI
    */
   public void cancelAnalysis(String uri) throws InterruptedException {
+    String analysisID = makeId(uri, analysisResultsRevisions.get(uri));
     analysisResultsRevisions.remove(uri);
-    synchronized (analysisExecutors) {
-      ExecutorService service = analysisExecutors.remove(uri);
-      if (service != null) {
-        service.shutdownNow();
-        service.awaitTermination(1, TimeUnit.SECONDS);
-      }
-    }
     LOG.debug("[stopAnalysis] Document " + uri + " publish diagnostic: " + documentModelService.getOpenedDiagnostic());
     communications.publishDiagnostics(documentModelService.getOpenedDiagnostic());
+    if (analysisResults.containsKey(analysisID)) {
+      analysisResults.get(analysisID).cancel(true);
+    }
   }
 
   /**
@@ -276,7 +296,7 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
       if (analysisService.isCopybook(uri, doc.getText())) {
         return true;
       }
-      return doc.getLastAnalysisResult() != null;
+      return doc.getLastAnalysisResult() != null && doc.getLastAnalysisResult() != AnalysisResult.EMPTY;
     };
   }
 

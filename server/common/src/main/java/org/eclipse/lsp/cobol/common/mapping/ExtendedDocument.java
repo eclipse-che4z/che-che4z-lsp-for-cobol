@@ -15,6 +15,9 @@
 package org.eclipse.lsp.cobol.common.mapping;
 
 import lombok.Getter;
+
+import java.util.List;
+
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
@@ -140,9 +143,43 @@ public class ExtendedDocument {
     dirty = true;
   }
 
+  /**
+   * Fill the range with the given character
+   * @param range - a range of text
+   * @param c - the character
+   */
+  public void fillArea(Range range, char c) {
+    range = updateRangeDueToChanges(range);
+    currentText.fillArea(range, c);
+    dirty = true;
+  }
+
   @Override
   public String toString() {
     return baseText.toString();
+  }
+
+  /**
+   * Checks if a line segment can be trimmed to empty string
+   * @param lineno line number to investigate
+   * @param start start column
+   * @param end end column (exclusive)
+   * @return segment consists of trimmable characters only
+   */
+  public boolean isLineEmptyBetweenColumns(int lineno, int start, int end) {
+    assert 0 <= lineno;
+    assert 0 <= start;
+    assert start <= end;
+    List<ExtendedTextLine> lines = baseText.getLines();
+    if (lineno >= lines.size())
+      return true;
+    List<MappedCharacter> chars = lines.get(lineno).getCharacters();
+    for (int i = start; i < chars.size() && i < end; ++i) {
+      // emulates behavior of trim function
+      if (chars.get(i).getCharacter() > ' ')
+        return false;
+    }
+    return true;
   }
 
   private Range updateRangeDueToChanges(Range range) {

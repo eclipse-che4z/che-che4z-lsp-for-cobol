@@ -29,6 +29,7 @@ jest.mock("vscode", () => ({
       get: jest.fn().mockReturnValueOnce(undefined).mockReturnValue("JAVA"),
       update: jest.fn(),
     }),
+
     onDidChangeConfiguration: jest
       .fn()
       .mockReturnValue("onDidChangeConfiguration"),

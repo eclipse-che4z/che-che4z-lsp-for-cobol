@@ -24,7 +24,7 @@ import org.eclipse.lsp.cobol.common.AnalysisResult;
 import org.eclipse.lsp.cobol.common.file.WorkspaceFileService;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
-import org.eclipse.lsp.cobol.common.model.tree.Node;
+import org.eclipse.lsp.cobol.common.model.tree.RootNode;
 import org.eclipse.lsp.cobol.lsp.analysis.AnalysisState;
 import org.eclipse.lsp.cobol.lsp.analysis.AsyncAnalysisService;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
@@ -70,7 +70,7 @@ class SourceUnitGraphTest {
     String copy3Uri = "file://copy3.cpy";
     SourceUnitGraph sourceUnitGraph =
         new SourceUnitGraph(fileService, asyncAnalysisService);
-    Node rootNode = mock(Node.class);
+    RootNode rootNode = mock(RootNode.class);
     when(fileService.getPathFromURI(anyString())).thenReturn(Paths.get(""));
     when(fileService.getContentByPath(any()))
         .thenReturn("COPY 1 TEXT")

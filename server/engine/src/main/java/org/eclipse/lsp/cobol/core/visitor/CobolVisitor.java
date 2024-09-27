@@ -55,7 +55,6 @@ import org.slf4j.Logger;
 
 import java.util.*;
 import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static java.util.Collections.emptyList;
@@ -158,8 +157,9 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
 
     return retrieveLocality(fnCtx, extendedDocument, copybooks)
         .map(l -> new FunctionReference(l, name))
-        .stream()
-        .collect(toList());
+        .map(Node.class::cast)
+        .map(n -> ImmutableList.of(n))
+        .orElse(ImmutableList.of());
   }
 
   @Override
@@ -1240,7 +1240,13 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
     DataNameContext dt = ctx.dataName();
     Optional<Locality> locality = retrieveLocality(ctx, extendedDocument, copybooks);
     if (dt == null || !locality.isPresent()) return ImmutableList.of();
-    return ImmutableList.of(new ProcedureDivisionReturningNode(locality.get(), extractNameAndLocality(dt)));
+    VariableNameAndLocality nameAndLocality = extractNameAndLocality(dt);
+    ProcedureDivisionReturningNode returningNode = new ProcedureDivisionReturningNode(locality.get(), nameAndLocality);
+    VariableUsageNode variableUsageNode = new VariableUsageNode(nameAndLocality.getName(), nameAndLocality.getLocality());
+    QualifiedReferenceNode qualifiedReferenceNode = new QualifiedReferenceNode(nameAndLocality.getLocality());
+    qualifiedReferenceNode.addChild(variableUsageNode);
+    returningNode.addChild(qualifiedReferenceNode);
+    return ImmutableList.of(returningNode);
   }
 
   @Override
@@ -1655,9 +1661,12 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
     }
   }
 
+  private Location getLocation(Token childToken) {
+    return extendedDocument.mapLocation(buildTokenRange(childToken));
+  }
+
   private Optional<Locality> getLocality(Token childToken) {
-    Location location = extendedDocument.mapLocation(buildTokenRange(childToken));
-    return ofNullable(locationToLocality(location));
+    return ofNullable(locationToLocality(getLocation(childToken)));
   }
 
   private void reportSubroutineNotDefined(String name, Locality locality) {
@@ -1697,58 +1706,56 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
 
   private void areaAWarning(Token token) {
     // skip area A check for cics and sql block
-    if (token.getText().startsWith("EXEC")) {
+    final int tokenType = token.getType();
+    if (tokenType == EOF || tokenType == IDENTIFIER && startsWithIcase(token.getText(), "EXEC")) {
       return;
     }
-    if (token.getType() == EOF) {
+    final int areaBStartIndex = programLayout.getSequenceLength()
+        + programLayout.getIndicatorLength()
+        + programLayout.getAreaALength() - 1;
+
+    final Location tokenLoc = getLocation(token);
+    if (tokenLoc.getRange().getStart().getCharacter() <= areaBStartIndex)
       return;
-    }
-    int areaBStartIndex =
-            programLayout.getSequenceLength()
-                    + programLayout.getIndicatorLength()
-                    + programLayout.getAreaALength() - 1;
-    getLocality(token)
-            .filter(it -> it.getRange().getStart().getCharacter() > areaBStartIndex)
-            .ifPresent(
-                    it ->
-                            throwException(
-                                    token.getText(),
-                                    it,
-                                    messageService.getMessage("CobolVisitor.AreaAWarningMsg")));
+    throwException(
+        token.getText(),
+        locationToLocality(tokenLoc),
+        messageService.getMessage("CobolVisitor.AreaAWarningMsg"));
+  }
+
+  private static boolean startsWithIcase(String s, String b) {
+    if (s.length() < b.length())
+      return false;
+
+    return s.substring(0, b.length()).compareToIgnoreCase(b) == 0;
   }
 
   protected void areaBWarning(ParserRuleContext ctx) {
     final int start = ctx.getStart().getTokenIndex();
-    final int stop = ctx.getStop().getTokenIndex();
+    int stop = ctx.getStop().getTokenIndex();
+    if (start < 0 || stop < 0)
+      return;
+    if (stop >= tokenStream.size())
+      stop = tokenStream.size() - 1;
 
-    areaBWarning(start < stop ? tokenStream.getTokens(start, stop) : ImmutableList.of(ctx.getStart()));
+    for (int i = start; i <= stop; ++i) {
+      Token t = tokenStream.get(i);
+      if (t.getChannel() == HIDDEN)
+        continue;
+      Location l = getLocation(t);
+      if (!startsInAreaA(l.getRange()))
+        continue;
+      throwException(
+          t.getText(),
+          locationToLocality(l),
+          messageService.getMessage("CobolVisitor.AreaBWarningMsg"));
+    }
   }
 
-  private void areaBWarning(@NonNull List<Token> tokenList) {
-    tokenList.forEach(
-            token ->
-                    getLocality(token)
-                            .filter(startsInAreaA(token))
-                            .ifPresent(
-                                    locality ->
-                                            throwException(
-                                                    token.getText(),
-                                                    locality,
-                                                    messageService.getMessage("CobolVisitor.AreaBWarningMsg"))));
-  }
-
-  private Predicate<Locality> startsInAreaA(Token token) {
-    return it -> {
-      // TODO: Update this
-      int charPosition = it.getRange().getStart().getCharacter();
-      int areaBStartIndex =
-              programLayout.getSequenceLength()
-                      + programLayout.getIndicatorLength()
-                      + programLayout.getAreaALength();
-      return charPosition > programLayout.getSequenceLength()
-              && charPosition < areaBStartIndex
-              && token.getChannel() != HIDDEN;
-    };
+  private boolean startsInAreaA(Range r) {
+    final int charPosition = r.getStart().getCharacter();
+    final int areaBStartIndex = programLayout.getSequenceLength() + programLayout.getIndicatorLength() + programLayout.getAreaALength();
+    return charPosition > programLayout.getSequenceLength() && charPosition < areaBStartIndex;
   }
 
   private static Collection<Location> getSubroutineLocation(

@@ -24,41 +24,22 @@ beforeAll(() => {
 });
 
 // TODO: this is horrifying as well
-jest.mock("vscode", () => ({
-  Uri: {
-    parse: jest.fn().mockImplementation((str: string) => {
-      const fsPath = str.substring("file://".length).replace(/\//g, path.sep);
-      const p =
-        (str.startsWith("/") ? "" : "/") + str.substring("file://".length);
-      return {
-        path: p,
-        fsPath: process.platform === "win32" ? fsPath.substring(1) : fsPath,
-      };
-    }),
-    joinPath: (u: any, segment: string) => {
-      if (segment === "../.bridge.json") {
-        return {
-          path: u.path.substring(0, u.path.lastIndexOf("/") + "/.bridge.json"),
-          fsPath:
-            u.fsPath.substring(0, u.fsPath.lastIndexOf(path.sep)) +
-            "/.bridge.json",
-        };
-      }
-      expect(segment).toBe("..");
-      return {
-        path: u.path.substring(0, u.path.lastIndexOf("/")),
-        fsPath: u.fsPath.substring(0, u.fsPath.lastIndexOf(path.sep)),
-      };
+jest.mock("vscode", () => {
+  const Uri = require("../../__mocks__/UriMock").Uri;
+  return {
+    Uri,
+    workspace: {
+      fs: {
+        readFile: jest.fn().mockImplementation(() => {
+          throw { code: "FileNotFound" };
+        }),
+      },
+      getWorkspaceFolder: () => {
+        uri: new Uri("/c:/my/workspace");
+      },
     },
-  },
-  workspace: {
-    fs: {
-      readFile: jest.fn().mockImplementation(() => {
-        throw { code: "FileNotFound" };
-      }),
-    },
-  },
-}));
+  };
+});
 
 function makefsPath(p: string): string {
   return path.join(process.platform == "win32" ? "a:" : "", p);

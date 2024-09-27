@@ -110,7 +110,7 @@ public class ExtendedText {
   }
 
   private ExtendedTextLine updateLine(ExtendedTextLine textLine, Location initialLocation) {
-    textLine.getCharacters().forEach(c -> c.getInitialLocationMap().put(uri, initialLocation));
+    textLine.getCharacters().forEach(c -> c.getOrCreateInitialLocationMap().put(uri, initialLocation));
     return textLine;
   }
 
@@ -242,6 +242,24 @@ public class ExtendedText {
 
       if (range.getStart().getLine() + 1 <= range.getEnd().getLine() - 1) {
         lines.subList(range.getStart().getLine() + 1, range.getEnd().getLine()).forEach(ExtendedTextLine::clear);
+      }
+      lines.get(range.getEnd().getLine()).clear(0, range.getEnd().getCharacter());
+    }
+  }
+
+  /**
+   * Replace range with symbol
+   * @param range - a range to clear
+   */
+  public void fillArea(Range range, char c) {
+    if (range.getStart().getLine() == range.getEnd().getLine()) {
+      lines.get(range.getStart().getLine()).fillArea(range.getStart().getCharacter(), range.getEnd().getCharacter(), c);
+    } else {
+      ExtendedTextLine line = lines.get(range.getStart().getLine());
+      line.clear(range.getStart().getCharacter(), line.size() - 1);
+
+      if (range.getStart().getLine() + 1 <= range.getEnd().getLine() - 1) {
+        lines.subList(range.getStart().getLine() + 1, range.getEnd().getLine()).forEach((l) -> l.fillLine(c));
       }
       lines.get(range.getEnd().getLine()).clear(0, range.getEnd().getCharacter());
     }

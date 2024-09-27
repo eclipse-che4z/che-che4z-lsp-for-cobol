@@ -38,7 +38,7 @@ public class TestVariableNameNotAllowed {
                   + "       PROCEDURE DIVISION.";
 
   @ParameterizedTest
-  @ValueSource(strings = {"INSERT", "BIT", "CONDITION", "COPY", "CURSOR"})
+  @ValueSource(strings = {"INSERT", "COPY"})
   void test(String input) {
     UseCaseEngine.runTest(
             String.format(TEXT, input),

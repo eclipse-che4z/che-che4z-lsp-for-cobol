@@ -12,35 +12,24 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
-import { B4GTypeMetadata, decodeBridgeJson } from "../../services/BridgeForGit";
+import { decodeBridgeJson } from "../../services/BridgeForGitLoader";
 import { loadProcessorsConfigForDocument } from "../../services/ProcessorGroups";
 import * as path from "path";
 
-jest.mock("vscode", () => ({
-  Uri: {
-    parse: jest.fn().mockImplementation((str: string) => {
-      const fsPath = str.substring("file://".length).replace(/\//g, path.sep);
-      const p =
-        (str.startsWith("/") ? "" : "/") + str.substring("file://".length);
-      return {
-        path: p,
-        fsPath: process.platform === "win32" ? fsPath.substring(1) : fsPath,
-      };
-    }),
-  },
-  workspace: {
-    getConfiguration: jest.fn().mockReturnValue({
-      get: jest.fn(),
-    }),
-    workspaceFolders: [
-      {
-        uri: {
-          fsPath: "/home/",
-        },
-      },
-    ],
-  },
-}));
+jest.mock("vscode", () => {
+  const Uri = require("../../__mocks__/UriMock").Uri;
+  const WS_URI = new Uri("/c:/my/workspace");
+  return {
+    Uri,
+    workspace: {
+      getConfiguration: jest.fn().mockReturnValue({
+        get: jest.fn(),
+      }),
+      getWorkspaceFolder: () => ({ uri: WS_URI }),
+      workspaceFolders: [{ uri: WS_URI }],
+    },
+  };
+});
 const b4gJson = {
   elements: {
     main: {

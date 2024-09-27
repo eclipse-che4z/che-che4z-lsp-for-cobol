@@ -30,20 +30,31 @@ import org.eclipse.lsp4j.Range;
 public class VisitorUtility {
   /**
    * Construct locality
+   *
    * @param ctx
    * @param context
    * @return locality
    */
   public Locality constructLocality(ParserRuleContext ctx, DialectProcessingContext context) {
     Location location = context.getExtendedDocument().mapLocation(constructRange(ctx));
-    return Locality.builder()
-        .uri(location.getUri())
-        .range(location.getRange())
-        .build();
+    return Locality.builder().uri(location.getUri()).range(location.getRange()).build();
+  }
+
+  /**
+   * Construct Locality from a Terminal Node
+   *
+   * @param node
+   * @param context
+   * @return locality
+   */
+  public Locality constructLocality(TerminalNode node, DialectProcessingContext context) {
+    Location location = context.getExtendedDocument().mapLocation(constructRange(node));
+    return Locality.builder().uri(location.getUri()).range(location.getRange()).build();
   }
 
   /**
    * Construct range
+   *
    * @param ctx
    * @return range
    */
@@ -60,6 +71,7 @@ public class VisitorUtility {
 
   /**
    * Construct range
+   *
    * @param token
    * @return range
    */

@@ -16,13 +16,16 @@ package org.eclipse.lsp.cobol.usecases.sql;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.eclipse.lsp.cobol.common.AnalysisResult;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
+import org.eclipse.lsp.cobol.common.model.tree.variable.ElementaryNode;
 import org.eclipse.lsp.cobol.test.CobolText;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /** Test sql host variables */
 public class TestSqlHostVariable {
@@ -152,6 +155,16 @@ public class TestSqlHostVariable {
                   + "           DISPLAY {$VAR12}.\n"
                   + "           DISPLAY {$VAR12-LENGTH}.\n"
                   + "           DISPLAY {$VAR12-DATA}.";
+
+  public static final String LOD_VARS_TEXT_DBCLOB =
+          "        Identification Division.\n"
+                  + "        Program-Id. 'TEST1'.\n"
+                  + "        Data Division.\n"
+                  + "         Working-Storage Section.\n"
+                  + "       01 {$*VAR`->VAR`->VAR-LENGTH`->VAR-DATA} USAGE IS SQL TYPE IS DBCLOB (30).\n"
+                  + "       01 {$*VAS`->VAS`->VAS-LENGTH`->VAS-DATA} USAGE IS SQL TYPE IS DBCLOB (10 K).\n"
+                  + "        PROCEDURE DIVISION.\n"
+                  + "           DISPLAY {$VAR}.";
 
   public static final String LOD_VARS_TEXT1 =
           "        Identification Division.\n"
@@ -447,6 +460,26 @@ public class TestSqlHostVariable {
   @Test
   void testLobVariables() {
     UseCaseEngine.runTest(LOD_VARS_TEXT, ImmutableList.of(), ImmutableMap.of());
+  }
+
+  @Test
+  void testLobVariables_dbclobPicClause_sizePrefix() {
+    AnalysisResult actual = UseCaseEngine.runTest(LOD_VARS_TEXT_DBCLOB, ImmutableList.of(), ImmutableMap.of());
+    actual.getSymbolTableMap().values().stream()
+            .findFirst().flatMap(firstSymbolTable -> firstSymbolTable.getVariables().values().stream()
+                    .filter(item -> "VAS-DATA".equals(item.getName()))
+                    .findFirst())
+            .ifPresent(varNode -> assertEquals("G(10 K)", ((ElementaryNode) varNode).getPicClause()));
+  }
+
+  @Test
+  void testLobVariables_dbclobPicClause() {
+    AnalysisResult actual = UseCaseEngine.runTest(LOD_VARS_TEXT_DBCLOB, ImmutableList.of(), ImmutableMap.of());
+    actual.getSymbolTableMap().values().stream()
+            .findFirst().flatMap(firstSymbolTable -> firstSymbolTable.getVariables().values().stream()
+                    .filter(item -> "VAR-DATA".equals(item.getName()))
+                    .findFirst())
+            .ifPresent(varNode -> assertEquals("G(30)", ((ElementaryNode) varNode).getPicClause()));
   }
 
   @Test

@@ -19,7 +19,10 @@ import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 
 import com.google.inject.Injector;
+
+import java.lang.reflect.Method;
 import java.util.List;
+import java.util.Optional;
 import java.util.ServiceLoader;
 import java.util.stream.StreamSupport;
 import lombok.experimental.UtilityClass;
@@ -34,6 +37,7 @@ import org.eclipse.lsp.cobol.test.CobolText;
 import org.eclipse.lsp.cobol.test.UseCaseInitializer;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
+import org.junit.jupiter.api.extension.ExtensionContext;
 
 /**
  * This utility class provides methods to run use cases with COBOL code examples.
@@ -114,7 +118,7 @@ public class UseCaseUtils {
    * @return the entire analysis result
    */
   public static AnalysisResult analyze(UseCase useCase, CobolLanguageId languageId) {
-
+    storeDocumentToUnitTextExtensionContext(useCase.getText(), useCase.getCopybooks(), null);
     ServiceLoader<UseCaseInitializer> loader = ServiceLoader.load(UseCaseInitializer.class);
     Injector injector = StreamSupport.stream(loader.spliterator(), false).findFirst()
         .map(UseCaseInitializer::createInjector)
@@ -155,5 +159,22 @@ public class UseCaseUtils {
     CopybookName copybookName = new CopybookName(cobolText.getFileName(), cobolText.getDialectType());
     return new CopybookModel(copybookName.toCopybookId(programUri), copybookName,
             uri, cobolText.getFullText());
+  }
+
+  /**
+   * Stores the document in the Extension context store
+   * @param documentText
+   * @param copybooks
+   * @param testData
+   */
+  static void storeDocumentToUnitTextExtensionContext(
+      String documentText, List<CobolText> copybooks, TestData testData) {
+    Optional<ExtensionContext> extensionContext = ExtensionContextProvider.getExtensionContext();
+    if (extensionContext.isPresent()) {
+      Method requiredTestMethod = extensionContext.get().getRequiredTestMethod();
+      ExtensionContext.Store store =
+          extensionContext.get().getStore(ExtensionContext.Namespace.create(requiredTestMethod));
+      store.put("document", new PreprocessedDocument(documentText, copybooks, testData));
+    }
   }
 }

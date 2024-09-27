@@ -186,13 +186,6 @@
         ]
       },
       {
-        "id": "expcobol",
-        "aliases": [
-          "EXP-COBOL"
-        ],
-        "configuration": "./syntaxes/lang-config.json"
-      },
-      {
         "id": "hpcobol",
         "aliases": [
           "HP-COBOL"
@@ -203,14 +196,6 @@
     "grammars": [
       {
         "language": "cobol",
-        "scopeName": "source.cobol",
-        "path": "./syntaxes/COBOL.tmLanguage.json",
-        "embeddedLanguages": {
-          "meta.embedded.block.html": "html"
-        }
-      },
-      {
-        "language": "expcobol",
         "scopeName": "source.cobol",
         "path": "./syntaxes/COBOL.tmLanguage.json",
         "embeddedLanguages": {
@@ -563,16 +548,6 @@
         ],
         "editor.wordSeparators": "!\"#$%&'()*+,./:;<=>?@[\\]^`{|}~"
       },
-      "[expcobol]": {
-        "editor.guides.indentation": false,
-        "editor.rulers": [
-          7,
-          11,
-          72,
-          80
-        ],
-        "editor.wordSeparators": "!\"#$%&'()*+,./:;<=>?@[\\]^`{|}~"
-      },
       "[hpcobol]": {
         "editor.guides.indentation": false,
         "editor.wordSeparators": "!\"#$%&'()*+,./:;<=>?@[\\]^`{|}~"
@@ -643,8 +618,8 @@
     "@types/mocha": "^9.1.1",
     "@types/node": "^14.18.29",
     "@types/vscode": "^1.71.0",
-    "@vscode/test-electron": "2.3.8",
-    "@vscode/test-web": "^0.0.56",
+    "@vscode/test-electron": "^2.4.0",
+    "@vscode/test-web": "^0.0.59",
     "@vscode/vsce": "2.19.0",
     "assert": "^2.1.0",
     "decache": "^4.6.1",

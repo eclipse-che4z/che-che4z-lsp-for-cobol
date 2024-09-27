@@ -113,6 +113,7 @@ public class AnalysisService {
     try {
       CopybookProcessingMode copybookProcessingMode = CopybookProcessingMode.getCopybookProcessingMode(uri, CopybookProcessingMode.ENABLED);
       AnalysisConfig config = configurationService.getConfig(uri, copybookProcessingMode);
+      ThreadInterruptionUtil.checkThreadInterrupted();
       AnalysisResult result = engine.analyze(uri, text, config, documentService.get(uri).getLanguageId());
       documentService.processAnalysisResult(uri, result, text);
       ThreadInterruptionUtil.checkThreadInterrupted();
@@ -120,7 +121,7 @@ public class AnalysisService {
               uri, DocumentServiceHelper.extractCopybookUris(result), copybookProcessingMode);
       LOG.debug("[doAnalysis] Document " + uri + " analyzed: " + result.getDiagnostics());
     } catch (Exception e) {
-      documentService.processAnalysisResult(uri, AnalysisResult.builder().build(), text);
+      documentService.processAnalysisResult(uri, AnalysisResult.EMPTY, text);
       LOG.debug(format("An exception thrown while applying %s for %s:", "analysis", uri));
       LOG.error(format("An exception thrown while applying %s for %s:", "analysis", uri), e);
       throw e;

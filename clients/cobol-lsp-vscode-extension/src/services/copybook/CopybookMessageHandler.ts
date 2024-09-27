@@ -16,6 +16,7 @@ import { SettingsService } from "../Settings";
 import { searchCopybookInExtensionFolder } from "../util/FSUtils";
 import { CopybookURI } from "./CopybookURI";
 import { CopybookName } from "./CopybookDownloadService";
+import { Uri } from "vscode";
 
 enum CopybookFolderKind {
   "local",
@@ -28,8 +29,8 @@ export async function searchCopybook(
   copybookName: string,
   dialectType: string,
   storagePath: string,
-): Promise<string | undefined> {
-  let result: string | undefined;
+): Promise<Uri | undefined> {
+  let result: Uri | undefined;
 
   for (let i = 0; i < Object.values(CopybookFolderKind).length; i++) {
     const folderKind = Object.values(CopybookFolderKind)[i];

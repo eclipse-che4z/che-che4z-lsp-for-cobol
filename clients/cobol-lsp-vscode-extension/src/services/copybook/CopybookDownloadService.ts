@@ -140,10 +140,11 @@ export class CopybookDownloadService {
     dialectType: string,
   ): Promise<string | undefined> {
     if (this.handleAsEndevorElement(documentUri)) {
-      return await this.e4eDownloader?.getE4ECopyBookLocation(
+      const copybookUri = await this.e4eDownloader?.getE4ECopyBookLocation(
         copybookName,
         documentUri,
       );
+      return copybookUri?.toString();
     }
 
     const result = await searchCopybook(
@@ -152,7 +153,9 @@ export class CopybookDownloadService {
       dialectType,
       this.storagePath,
     );
-    if (result) return result;
+    if (result) {
+      return result.toString();
+    }
 
     // check in subfolders under copybooks (copybook downloaded from MF)
     return searchCopybookInExtensionFolder(
@@ -165,7 +168,7 @@ export class CopybookDownloadService {
       ),
       await SettingsService.getCopybookExtension(documentUri),
       this.storagePath,
-    );
+    )?.toString();
   }
 
   constructor(
