@@ -145,7 +145,7 @@ To enable subroutine support, specify the paths of folders containing subroutine
 3. Under **Subroutine-manager: Paths-local**, specify the paths of the folders containing subroutines.
    - **Tip:** We recommend that you specify relative paths from the workspace root. To obtain the relative path of a folder in your workspace, right-click it in the folder tree and select **Copy Relative Path**.
    - The folders are searched in the order they are listed. If two folders contain a subroutine with the same file name, the one from the folder higher on the list is used.
-4. Open a program or project.  
+4. Open a file or folder.  
    Subroutine support features are now enabled.
 
 If you specify your subroutine folders using absolute paths or paths containing `../` or `./`, the subroutine folders are not watched for changes. You might need to resolve names of recently added files in your code manually.
@@ -178,7 +178,7 @@ You can store your copybooks locally in folders in your workspace and specify th
    - You can use [Glob](https://www.npmjs.com/package/glob) wildcards, such as * to substitute one whole level of the path. For example, specifying the path `*/copybooks` searches all subfolders named "copybooks" in  subfolders of your workspace root, while the path `copybooks/*` searches all subfolders one level below the `copybooks` folder in the workspace root. For more information on available wildcards, see the [Glob Primer](https://www.npmjs.com/package/glob#Glob-Primer)
    - The folders are searched in the order they are listed, or in alphabetical order if multiple paths are indexed by a wildcard. If two folders contain a copybook with the same file name, the one from the folder higher on the list is used.
 4. (Optional) Under **Cpy-manager: Copybook-extensions**, specify the file extensions used for your copybooks. The default supported file extensions are `.cpy` and `.copy`.
-5. Open a program or project.  
+5. Open a file or folder.  
    Copybook support features are now enabled.
 
 If you specify your copybook folders using absolute paths or paths containing `../` or `./`, the copybook folders are not watched for changes. You might need to resolve names of recently added copybooks in your code manually.
@@ -197,8 +197,8 @@ You can also set up automatic copybook retrieval from the mainframe to download 
 6. Under **Cpy-manager: Profiles**, enter the name of your Zowe Explorer profile.
 7. (Optional) Under **Cpy-manager: Copybook-extensions**, specify the file extensions used for your copybooks. The default supported file extensions are `.cpy` and `.copy`.
 8. (Optional) Under **Cpy-manager: Copybook-file-encoding**, specify the file encoding used in your copybooks. COBOL Language Support converts copybooks that it downloads from the mainframe from the specified encoding to UTF-8.
-9. Open a program or project.  
-   All copybooks used in the program or project which are not stored locally are downloaded from the mainframe data sets and USS directories that you specified in steps 4 and 5.  
+9. Open a file or folder.  
+   All copybooks used in the program which are not stored locally are downloaded from the mainframe data sets and USS directories that you specified in steps 4 and 5.  
    Copybook support features are now enabled.
 
 Copybooks that you retrieve from mainframe data sets are stored in your VS Code global storage folder. 
