@@ -203,6 +203,8 @@ You can also set up automatic copybook retrieval from the mainframe to download 
 
 Copybooks that you retrieve from mainframe data sets are stored in your VS Code global storage folder. 
 
+Changes you make to copybooks that you retrieve from mainframe data sets are not saved back to the mainframe. To edit the content of your copybooks, we recommend that you use Zowe Explorer.
+
 We recommend that you refresh your copybooks from time to time. To refresh your copybooks, press **F1** and run the command **Clear downloaded copybooks**. This command clears the global storage folder so that copybooks are downloaded again from the mainframe.
 
 ### Retrieving Copybooks from Endevor
