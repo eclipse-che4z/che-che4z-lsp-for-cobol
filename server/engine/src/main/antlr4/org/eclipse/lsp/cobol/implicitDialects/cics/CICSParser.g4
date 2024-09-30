@@ -469,40 +469,36 @@ cics_invoke: INVOKE (SERVICE cics_data_value | CHANNEL cics_data_value | OPERATI
              URIMAP cics_data_value | SCOPE cics_data_value | SCOPELEN cics_data_value | cics_handle_response)+;
 
 /** ISSUE (all of them) */
-cics_issue: ISSUE (cics_issue_abend | cics_issue_abort | cics_issue_add | cics_issue_confirmation | cics_issue_copy |
-            cics_issue_disconnect | cics_issue_endfile | cics_issue_endoutput | EODS | cics_issue_erase |
-            cics_issue_eraseaup | cics_issue_load | cics_issue_note | cics_issue_pass | PRINT | cics_issue_query |
-            cics_issue_receive | cics_issue_replace | cics_issue_send | cics_issue_signal);
-	/** ISSUE ABEND, ISSUE ERROR and ISSUE PREPARE are combined into one as they have the same syntax */
-cics_issue_abend: (ABEND | ERROR | PREPARE | CONVID cics_name | STATE cics_cvda | cics_handle_response)+;
-	/** ISSUE ABORT, ISSUE END and ISSUE WAIT are combined into one as they have the same syntax */
-cics_issue_abort: (ABORT | END | WAIT | cics_issue_destid | cics_issue_subaddr | cics_issue_volume | cics_handle_response)+;
-cics_issue_destid: (DESTID cics_data_value | DESTIDLENG cics_data_value)+;
-cics_issue_subaddr: (SUBADDR cics_data_value | CONSOLE | PRINT | CARD | WPMEDIA1 | WPMEDIA2 | WPMEDIA3 | WPMEDIA4)+;
-cics_issue_volume: (VOLUME cics_data_value | VOLUMELENG cics_data_value)+;
+cics_issue:
+	ISSUE (cics_issue_print | cics_issue_eods | cics_issue_abend | cics_issue_abort | cics_issue_add | cics_issue_confirmation
+	      | cics_issue_copy | cics_issue_disconnect | cics_issue_end | cics_issue_endfile_endoutput | cics_issue_erase | cics_issue_erase_aup | cics_issue_error
+          | cics_issue_load | cics_issue_note | cics_issue_pass | cics_issue_prepare | cics_issue_query | cics_issue_receive | cics_issue_replace | cics_issue_send
+          | cics_issue_signal | cics_issue_wait);
 
-cics_issue_add: ADD cics_issue_destid (cics_issue_volume | FROM cics_data_value | LENGTH cics_data_value |
-                NUMREC cics_data_value | DEFRESP | NOWAIT | RIDFLD cics_data_area | RRN | cics_handle_response)+;
-cics_issue_confirmation: CONFIRMATION (CONVID cics_name | STATE cics_cvda | cics_handle_response)+;
-cics_issue_copy: COPY (TERMID cics_name | CTLCHAR cics_data_value | WAIT | cics_handle_response)+;
-cics_issue_disconnect: DISCONNECT (SESSION cics_name | cics_handle_response)+;
-cics_issue_endfile: (ENDFILE | ENDOUTPUT | cics_handle_response)+;
-cics_issue_endoutput: (ENDOUTPUT | ENDFILE | cics_handle_response)+;
-cics_issue_erase: ERASE (cics_issue_destid | cics_issue_volume | RIDFLD cics_data_area | KEYLENGTH cics_data_value |
-                  KEYNUMBER cics_data_value | RRN | NUMREC cics_data_value | DEFRESP | NOWAIT | cics_handle_response)+;
-cics_issue_eraseaup: (ERASEAUP | WAIT | cics_handle_response)+;
-cics_issue_load: LOAD (PROGRAM cics_name | CONVERSE | cics_handle_response)+;
-cics_issue_note: NOTE (cics_issue_destid | cics_issue_volume | RIDFLD cics_data_area | RRN | cics_handle_response)+;
-cics_issue_pass: PASS (LUNAME cics_name | cics_issue_from | LOGMODE cics_data_value | LOGONLOGMODE | NOQUIESCE | cics_handle_response)+;
-cics_issue_from: (FROM cics_data_area | LENGTH cics_data_value)+;
-cics_issue_query: (QUERY cics_issue_destid | cics_issue_volume | cics_handle_response)+;
-cics_issue_receive: (RECEIVE cics_into | LENGTH cics_data_area | cics_handle_response)+;
-cics_issue_replace: (REPLACE cics_issue_destid | cics_issue_volume | FROM cics_data_area | LENGTH cics_data_value | RIDFLD
-                    cics_data_area | KEYLENGTH cics_data_value | KEYNUMBER cics_data_value | RRN | DEFRESP | NOWAIT | cics_handle_response)+;
-cics_issue_send: SEND (cics_issue_destid | cics_issue_subaddr | cics_issue_volume | FROM cics_data_area |
-                 LENGTH cics_data_value | NOWAIT | DEFRESP | cics_handle_response)+;
-cics_issue_signal: SIGNAL (cics_issue_convid | SESSION cics_name | STATE cics_cvda | cics_handle_response)?;
-cics_issue_convid: (CONVID cics_name | STATE cics_cvda)+;
+cics_issue_abend: (ABEND | CONVID cics_name | STATE cics_cvda | cics_handle_response)+;
+cics_issue_abort: (ABORT | cics_issue_common | cics_handle_response)+;
+cics_issue_add: (ADD | (DESTID | DESTIDLENG | VOLUME | VOLUMELENG | LENGTH | NUMREC) cics_data_value |  (FROM | RIDFLD) cics_data_area  | DEFRESP | NOWAIT | RRN | cics_handle_response)+;
+cics_issue_confirmation: (CONFIRMATION | CONVID cics_name | STATE cics_cvda | cics_handle_response)+;
+cics_issue_copy: (COPY | TERMID cics_name | CTLCHAR cics_data_value | WAIT | cics_handle_response)+;
+cics_issue_disconnect: (DISCONNECT | SESSION cics_name | cics_handle_response)+;
+cics_issue_end: (END | cics_issue_common | cics_handle_response)+;
+cics_issue_endfile_endoutput: (ENDFILE | ENDOUTPUT | cics_handle_response)+;
+cics_issue_erase: (ERASE | (DESTID | DESTIDLENG | VOLUME | VOLUMELENG | KEYLENGTH | KEYNUMBER | NUMREC) cics_data_value | RIDFLD cics_data_area | RRN | DEFRESP | NOWAIT | cics_handle_response)+;
+cics_issue_erase_aup: (ERASEAUP | WAIT | cics_handle_response)+;
+cics_issue_error: (ERROR | CONVID cics_name | STATE cics_cvda | cics_handle_response)+;
+cics_issue_load: (LOAD | PROGRAM cics_name | CONVERSE | cics_handle_response)+;
+cics_issue_note: (NOTE | (DESTID | DESTIDLENG | VOLUME | VOLUMELENG) cics_data_value | RIDFLD cics_data_area | RRN | cics_handle_response)+;
+cics_issue_pass: (PASS | LUNAME cics_name | FROM cics_data_area | (LENGTH | LOGMODE) cics_data_value | LOGONLOGMODE | NOQUIESCE | cics_handle_response)+;
+cics_issue_prepare: (PREPARE | CONVID cics_name | STATE cics_cvda | cics_handle_response)+;
+cics_issue_query: (QUERY | (DESTID | DESTIDLENG | VOLUME | VOLUMELENG) cics_data_value | cics_handle_response)+;
+cics_issue_receive: (RECEIVE | (INTO | LENGTH) cics_data_area | SET cics_ref | cics_handle_response)+;
+cics_issue_replace: (REPLACE | (DESTID | DESTIDLENG | VOLUME | VOLUMELENG | LENGTH | NUMREC | KEYLENGTH | KEYNUMBER) cics_data_value | (FROM | RIDFLD) cics_data_area | RRN | DEFRESP | NOWAIT | cics_handle_response)+;
+cics_issue_send: (SEND | LENGTH cics_data_value | FROM cics_data_area | cics_issue_common | NOWAIT | DEFRESP | cics_handle_response)+;
+cics_issue_signal: (SIGNAL | (CONVID | SESSION) cics_name | STATE cics_cvda | cics_handle_response)+;
+cics_issue_wait: (WAIT | cics_issue_common | cics_handle_response)+;
+cics_issue_print: (PRINT | cics_handle_response)+;
+cics_issue_eods: (EODS | cics_handle_response)+;
+cics_issue_common: ((DESTID | DESTIDLENG | VOLUME | VOLUMELENG | SUBADDR) cics_data_value | CONSOLE | PRINT | CARD | WPMEDIA1 | WPMEDIA2 | WPMEDIA3 | WPMEDIA4)+;
 
 /** LINK / LINK ACQPROCESS / LINK ACTIVITY: */
 cics_link: LINK (cics_link_program | cics_link_acqprocess | cics_link_activity);
@@ -772,12 +768,16 @@ cics_verify: VERIFY (PASSWORD cics_data_value | PHRASE cics_data_area PHRASELEN 
              EXPIRYTIME cics_data_area | INVALIDCOUNT cics_data_area | LASTUSETIME cics_data_area | cics_handle_response)+;
 
 /** WAIT CONVID / EVENT / EXTERNAL / JOURNALNAME / JOURNALNUM / SIGNAL / TERMINAL */
-cics_wait: WAIT (CONVID cics_name | STATE cics_cvda | EVENT | ECADDR cics_value | NAME cics_name | EXTERNAL | ECBLIST cics_value |
-           NUMEVENTS cics_data_value | PURGEABLE | BURGEABILITY cics_cvda | NOTPURGEABLE | NAME cics_name | JOURNALNAME cics_data_value |
-           REQID cics_data_value | SIGNAL | TERMINAL | CONVID cics_name | SESSION cics_name | cics_handle_response)+;
+cics_wait: WAIT (cics_wait_convid | cics_wait_event | cics_wait_external | cics_wait_journalname | cics_wait_signal | cics_wait_terminal)+;
+cics_wait_convid: (CONVID cics_name | STATE cics_cvda | cics_handle_response)+;
+cics_wait_event: (EVENT | ECADDR cics_value | NAME cics_name | cics_handle_response)+;
+cics_wait_external: (EXTERNAL | (ECBLIST | NUMEVENTS) cics_value | PURGEABILITY cics_cvda | NAME cics_name | PURGEABLE | NOTPURGEABLE | cics_handle_response)+;
+cics_wait_journalname: ((JOURNALNAME | JOURNALNUM) cics_value | REQID cics_value | cics_handle_response)+;
+cics_wait_signal: (SIGNAL | cics_handle_response)+;
+cics_wait_terminal: (TERMINAL | (CONVID | SESSION) cics_name | cics_handle_response)+;
 
 /** WAITCICS */
-cics_waitcics: WAITCICS (ECBLIST cics_value | NUMEVENTS cics_data_value | PURGEABLE | BURGEABILITY cics_cvda |
+cics_waitcics: WAITCICS (ECBLIST cics_value | NUMEVENTS cics_data_value | PURGEABLE | PURGEABILITY cics_cvda |
                NOTPURGEABLE | NAME cics_name | cics_handle_response)+;
 
 /** WEB (all) */
@@ -908,7 +908,7 @@ cics_file_name: (FILE | DATASET) cics_name;
 /** RESP **/
 cics_resp: (RESP | RESP2) cics_data_area;
 
-cics_handle_response: cics_inline_handle_exception | WAIT;
+cics_handle_response: cics_inline_handle_exception;
 cics_inline_handle_exception: (cics_resp | NOHANDLE)+;
 
 cics_data_area: LPARENCHAR data_area RPARENCHAR;
@@ -941,7 +941,7 @@ cicsLexerDefinedVariableUsageTokens: ABCODE | ABDUMP | ABEND | ABORT | ABPROGRAM
     | ANYKEY | APLKYBD | APLTEXT | APPLID | AS | ASA | ASIS | ASKTIME | ASRAINTRPT | ASRAKEY | ASRAPSW | ASRAREGS | ASRASPC
     | ASRASTG | ASYNCHRONOUS | ATTACH | ATTACHID | ATTRIBUTES | AUTHENTICATE | AUTOPAGE | AUXILIARY | BASE64
     | BASICAUTH | BELOW | BIF | BODYCHARSET | BOOKMARK | BRDATA | BRDATALENGTH | BREXIT | BRIDGE | BROWSETOKEN
-    | BTRANS | BUFFER | BUILD | BURGEABILITY | CADDRLENGTH | CARD | CBUFF | CCSID | CERTIFICATE | CHANGE | CHANGETIME
+    | BTRANS | BUFFER | BUILD | CADDRLENGTH | CARD | CBUFF | CCSID | CERTIFICATE | CHANGE | CHANGETIME
     | CHANNEL | CHAR | CHARACTERSET | CHECK | CHUNKEND | CHUNKING | CHUNKNO | CHUNKYES | CICSDATAKEY | CIPHERS | CLEAR
     | CLICONVERT | CLIENT | CLIENTADDR | CLIENTADDRNU | CLIENTCONV | CLNTCODEPAGE | CLIENTNAME | CLNTADDR6NU | CLNTIPFAMILY
     | CLOSESTATUS | CLRPARTN | CMDSEC | CNAMELENGTH | CNOTCOMPL | CODEPAGE | COLOR | COMMAREA | COMMONNAME
@@ -984,7 +984,7 @@ cicsLexerDefinedVariableUsageTokens: ABCODE | ABDUMP | ABEND | ABORT | ABPROGRAM
     | PF17 | PF18 | PF19 | PF2 | PF20 | PF21 | PF22 | PF23 | PF24 | PF3 | PF4 | PF5 | PF6 | PF7 | PF8 | PF9 | PFXLENG
     | PHRASE | PHRASELEN | PIPLENGTH | PIPLIST | POINT | POOL | POP | PORTNUMBER | PORTNUMNU | POST | PPT | PREDICATE
     | PREFIX | PREPARE | PRINCONVID | PRINSYSID | PRINT | PRIORITY | PRIVACY | PROCESS | PROCESSTYPE | PROCLENGTH
-    | PROCNAME | PROFILE | PROTECT | PS | PUNCH | PURGEABLE | PUSH | PUT | QNAME | QUERY | QUERYPARM | QUERYSTRING
+    | PROCNAME | PROFILE | PROTECT | PS | PUNCH | PURGEABILITY | PURGEABLE | PUSH | PUT | QNAME | QUERY | QUERYPARM | QUERYSTRING
     | QUERYSTRLEN | RBA | RBN | RDATT | READNEXT | READPREV | READQ | REATTACH | RECEIVER | RECFM | RECORDLEN
     | RECORDLENGTH | REDUCE | REFPARMS | REFPARMSLEN | RELATESINDEX | RELATESTYPE | RELATESURI | REMOVE | REPEATABLE
     | REPETABLE | REPLY | REPLYLENGTH | REQID | REQUESTTYPE | RESCLASS | RESETBR | RESID | RESIDLENGTH | RESOURCE
