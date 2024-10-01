@@ -18,6 +18,7 @@ package org.eclipse.lsp.cobol.implicitDialects.cics;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static org.antlr.v4.runtime.Lexer.HIDDEN;
+import static org.eclipse.lsp.cobol.AntlrRangeUtils.constructRange;
 
 import com.google.common.collect.ImmutableList;
 import java.util.*;
@@ -54,6 +55,7 @@ import org.eclipse.lsp.cobol.common.model.tree.variable.QualifiedReferenceNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableUsageNode;
 import org.eclipse.lsp.cobol.common.utils.RangeUtils;
 import org.eclipse.lsp.cobol.common.utils.ThreadInterruptionUtil;
+import org.eclipse.lsp.cobol.core.visitor.VisitorHelper;
 import org.eclipse.lsp.cobol.implicitDialects.cics.nodes.ExecCicsHandleNode;
 import org.eclipse.lsp.cobol.implicitDialects.cics.nodes.ExecCicsNode;
 import org.eclipse.lsp.cobol.implicitDialects.cics.nodes.ExecCicsReturnNode;
@@ -209,9 +211,7 @@ class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
   @Override
   public List<Node> visitParagraphNameUsage(CICSParser.ParagraphNameUsageContext ctx) {
     String name = getName(ctx);
-    Locality locality = buildNameRangeLocality(ctx, name, context.getProgramDocumentUri());
-    //    locality.setRange(RangeUtils.shiftRangeWithPosition(position, locality.getRange()));
-
+    Locality locality = VisitorHelper.buildNameRangeLocality(ctx, name, context.getProgramDocumentUri());
     Location location = context.getExtendedDocument().mapLocation(locality.getRange());
 
     Node node =
@@ -278,13 +278,7 @@ class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
    * @return locality object
    */
   private Locality buildNameRangeLocality(ParserRuleContext ctx, String name, String uri) {
-    Range range =
-        new Range(
-            new Position(ctx.start.getLine() - 1, ctx.start.getCharPositionInLine()),
-            new Position(
-                ctx.stop.getLine() - 1, ctx.start.getCharPositionInLine() + name.length()));
-
-    return Locality.builder().uri(uri).range(range).build();
+      return VisitorHelper.buildNameRangeLocality(ctx, name, uri);
   }
 
   private void changeContextToDialectStatement(ParserRuleContext ctx) {
@@ -298,7 +292,7 @@ class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
                 context
                     .getExtendedDocument()
                     .replace(
-                            RangeUtils.extendByCharacter(VisitorUtility.constructRange(node), -1),
+                        constructRange(node.getSymbol()),
                         StringUtils.repeat(CobolDialect.FILLER, node.getText().length())));
   }
 

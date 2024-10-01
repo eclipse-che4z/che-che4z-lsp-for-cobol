@@ -75,7 +75,7 @@ class TestMappingComplexCopybook {
                 ErrorSource.PARSING.getText()),
             "2",
             new Diagnostic(
-                new Range(new Position(5, 25), new Position(9, 59)),
+                new Range(new Position(5, 25), new Position(9, 60)),
                 "Variable WRK-DS-05V00-O005-001 is not defined",
                 Error,
                 ErrorSource.PARSING.getText()),

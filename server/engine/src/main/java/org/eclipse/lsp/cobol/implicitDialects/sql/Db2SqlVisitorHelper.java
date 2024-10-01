@@ -141,20 +141,11 @@ class Db2SqlVisitorHelper {
 
   public static Position getAdjustedEndPosition(
           ParserRuleContext sqlCodeContext, Position position) {
-    Position end;
-    if (position.getLine() == 0) {
-      end =
-              new Position(
-                      position.getLine() + sqlCodeContext.start.getLine() - 1,
-                      position.getCharacter()
-                              + sqlCodeContext.start.getCharPositionInLine());
-    } else {
-      end =
-              new Position(
-                      position.getLine() + sqlCodeContext.start.getLine() - 1,
-                      position.getCharacter());
-    }
-    return end;
+      int character = position.getCharacter() + (
+            position.getLine() == 0
+                    ? sqlCodeContext.start.getCharPositionInLine()
+                    : 0);
+    return new Position(position.getLine() + sqlCodeContext.start.getLine() - 1, character);
   }
 
   public static ExecSqlWheneverNode.WheneverConditionType getConditionType(Db2SqlParser.Dbs_wheneverContext ctx) {
