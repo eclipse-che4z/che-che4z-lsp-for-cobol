@@ -14,19 +14,13 @@
  */
 package org.eclipse.lsp.cobol.usecases;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
-import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
+import org.eclipse.lsp.cobol.usecases.common.CICSTestUtils;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 
 /**
  * Tests CICS STARTBROWSE CONTAINER (EXCI) statement. Ref:
@@ -52,60 +46,43 @@ public class TestCicsExciStartBrowseStatement {
 
   private static final String STARTBROWSE_INVALID_PROCESS_CHANNEL = "STARTBROWSE CONTAINER {PROCESS(123) PROCESSTYPE(123)|errorOne} CHANNEL(3) BROWSETOKEN(123)";
 
-  // Utility Functions
-  private static void noErrorTest(String newCommand) {
-    UseCaseEngine.runTest(getTestString(newCommand), ImmutableList.of(), ImmutableMap.of());
-  }
-
-  private static void errorTest(String newCommand, String errorMessage) {
-    UseCaseEngine.runTest(getTestString(newCommand), ImmutableList.of(), ImmutableMap.of(
-            "errorOne",
-            new Diagnostic(
-                    new Range(),
-                    errorMessage,
-                    DiagnosticSeverity.Error,
-                    ErrorSource.PARSING.getText()))
-    );
-  }
-
-  private static String getTestString(String newCommand) {
-    List<String> instances = Arrays.asList(newCommand.split("\\s"));
-    instances.replaceAll(String.join("", Collections.nCopies(12, " "))::concat);
-    ArrayList<String> base = new ArrayList<String>(Arrays.asList(BASE_TEXT.split("\n")));
-    base.addAll(base.size() - 1, instances);
-    return String.join("\n", base);
-  }
-
   // Test Functions
   @Test
   void testStartBrowseActivity() {
-    noErrorTest(STARTBROWSE_ACTIVITY_VALID);
+    CICSTestUtils.noErrorTest(STARTBROWSE_ACTIVITY_VALID);
   }
 
   @Test
   void testStartBrowseContainer() {
-    noErrorTest(STARTBROWSE_CONTAINER_VALID);
+    CICSTestUtils.noErrorTest(STARTBROWSE_CONTAINER_VALID);
   }
 
   @Test
   void testStartBrowseEvent() {
-    noErrorTest(STARTBROWSE_EVENT_VALID);
+    CICSTestUtils.noErrorTest(STARTBROWSE_EVENT_VALID);
   }
 
   @Test
   void testStartBrowseProcess() {
-    noErrorTest(STARTBROWSE_PROCESS_VALID);
+    CICSTestUtils.noErrorTest(STARTBROWSE_PROCESS_VALID);
   }
 
   @Test
   void testStartBrowseTimer() {
-    noErrorTest(STARTBROWSE_TIMER_VALID);
+    CICSTestUtils.noErrorTest(STARTBROWSE_TIMER_VALID);
   }
 
   // Invalid Test
-
   @Test
   void testStartBrowseContainerInvalid() {
-    errorTest(STARTBROWSE_INVALID_PROCESS_CHANNEL, "Invalid option provided: ACTIVITYID or PROCESS");
+   ImmutableMap<String, Diagnostic> tempDiagnostic = ImmutableMap.of(
+           "errorOne",
+           new Diagnostic(
+            new Range(),
+           "Invalid option provided: ACTIVITYID or PROCESS",
+            DiagnosticSeverity.Error,
+            ErrorSource.PARSING.getText()));
+
+    CICSTestUtils.errorTest(STARTBROWSE_INVALID_PROCESS_CHANNEL, tempDiagnostic);
   }
 }
