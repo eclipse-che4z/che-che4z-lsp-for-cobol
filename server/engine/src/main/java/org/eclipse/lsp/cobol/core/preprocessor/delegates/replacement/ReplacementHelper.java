@@ -19,8 +19,8 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
+import org.eclipse.lsp.cobol.AntlrRangeUtils;
 import org.eclipse.lsp.cobol.core.CobolPreprocessor;
-import org.eclipse.lsp.cobol.core.visitor.VisitorHelper;
 import org.eclipse.lsp4j.Range;
 
 import java.util.LinkedList;
@@ -71,7 +71,7 @@ public class ReplacementHelper {
             String clauseString = createClause(context)
                 .replace(" : ", ":")
                 .replace(" .", ".");
-            clauses.add(ImmutablePair.of(clauseString, VisitorHelper.constructRange(context)));
+            clauses.add(ImmutablePair.of(clauseString, AntlrRangeUtils.constructRange(context)));
           }
         }
       }

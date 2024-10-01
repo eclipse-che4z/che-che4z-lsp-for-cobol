@@ -107,6 +107,7 @@ local.properties
 .tern-project
 
 # ANTLR plugin
+.antlr
 /server/engine/gen
 /server/dialect-idms/gen
 /server/dialect-daco/gen
