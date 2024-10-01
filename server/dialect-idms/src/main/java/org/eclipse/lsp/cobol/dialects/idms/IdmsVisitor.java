@@ -28,7 +28,7 @@ import org.eclipse.lsp.cobol.common.model.tree.SectionNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.QualifiedReferenceNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableDefinitionNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNameAndLocality;
-import org.eclipse.lsp.cobol.common.model.tree.variable.VariableUsageNode;
+import org.eclipse.lsp.cobol.common.model.tree.variable.UsageNode;
 import org.eclipse.lsp.cobol.common.model.SectionType;
 import org.eclipse.lsp4j.Location;
 
@@ -102,7 +102,7 @@ class IdmsVisitor extends IdmsParserBaseVisitor<List<Node>> {
   @Override
   public List<Node> visitVariableUsageName(VariableUsageNameContext ctx) {
     return addTreeNode(
-        ctx, locality -> new VariableUsageNode(getName(ctx), locality));
+        ctx, locality -> new UsageNode(getName(ctx), locality));
   }
 
   @Override

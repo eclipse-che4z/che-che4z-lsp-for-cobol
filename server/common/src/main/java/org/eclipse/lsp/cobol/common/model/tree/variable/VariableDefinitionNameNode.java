@@ -76,7 +76,7 @@ public class VariableDefinitionNameNode extends Node implements DefinedAndUsedSt
   public String getFormattedDisplayString() {
     return getNearestParentByType(NodeType.VARIABLE)
         .map(VariableNode.class::cast)
-        .map(VariableNode::getFullVariableDescription)
+        .map(VariableNode::getFormattedDisplayString)
         .orElse("");
   }
 }

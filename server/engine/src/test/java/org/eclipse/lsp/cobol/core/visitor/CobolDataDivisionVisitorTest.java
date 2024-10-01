@@ -103,7 +103,7 @@ class CobolDataDivisionVisitorTest {
         when(extendedDocument.mapLocation(any())).thenReturn(location);
         List<Node> result = visitor.visitVariableUsageName(ctx);
 
-        assertEquals(NodeType.VARIABLE_USAGE, result.get(0).getNodeType());
+        assertEquals(NodeType.UNDETERMINED, result.get(0).getNodeType());
         assertEquals(location, result.get(0).getLocality().toLocation());
     }
 

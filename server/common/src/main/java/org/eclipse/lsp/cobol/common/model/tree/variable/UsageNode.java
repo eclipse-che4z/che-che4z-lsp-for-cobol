@@ -27,66 +27,77 @@ import org.eclipse.lsp4j.Location;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-/**
- * The class represents variable usage in COBOL program.
- */
+/** The class represents variable usage in COBOL program. */
 @ToString(callSuper = true)
 @Getter
 @EqualsAndHashCode(callSuper = true)
-public class VariableUsageNode extends Node implements DefinedAndUsedStructure, Describable {
+public class UsageNode extends Node implements DefinedAndUsedStructure, Describable {
   private final String name;
-  @EqualsAndHashCode.Exclude @ToString.Exclude private final List<VariableNode> definitions = new ArrayList<>();
+
+  @EqualsAndHashCode.Exclude @ToString.Exclude
+  private final List<DefinedAndUsedStructure> definitions = new ArrayList<>();
+
   private final boolean isDefinitionMandatory;
 
-  public VariableUsageNode(
-      String dataName,
-      Locality locality) {
-    super(locality, NodeType.VARIABLE_USAGE);
+  public UsageNode(String dataName, Locality locality) {
+    this(dataName, locality, NodeType.UNDETERMINED);
+  }
+
+  public UsageNode(String dataName, Locality locality, NodeType type) {
+    super(locality, type);
     this.name = dataName;
     this.isDefinitionMandatory = true;
   }
 
-  public VariableUsageNode(
-          String dataName,
-          Locality locality,
-          boolean isDefinitionMandatory) {
-    super(locality, NodeType.VARIABLE_USAGE);
+  public UsageNode(String dataName, Locality locality,boolean isDefinitionMandatory) {
+    this (dataName, locality, NodeType.UNDETERMINED, isDefinitionMandatory);
+  }
+
+  public UsageNode(String dataName, Locality locality, NodeType type, boolean isDefinitionMandatory) {
+    super(locality, type);
     this.name = dataName;
     this.isDefinitionMandatory = isDefinitionMandatory;
   }
 
   @Override
   public List<Location> getDefinitions() {
-    return definitions.stream().map(VariableNode::getLocality).map(Locality::toLocation).collect(Collectors.toList());
+    return definitions.stream()
+        .map(DefinedAndUsedStructure::getLocality)
+        .filter(Objects::nonNull)
+        .map(Locality::toLocation)
+        .collect(Collectors.toList());
   }
 
   /**
    * Add a definition to the node.
    * @param definition the definition node
    */
-  public void addDefinition(VariableNode definition) {
-    definitions.add(definition);
+  public void addDefinition(DefinedAndUsedStructure definition) {
+    if (!definitions.contains(definition)) {
+        definitions.add(definition);
+    }
   }
 
-  private Optional<VariableNode> getDefinition() {
+  private Optional<DefinedAndUsedStructure> getDefinition() {
     if (definitions.isEmpty()) return Optional.empty();
     return Optional.of(definitions.get(0));
   }
 
   @Override
   public List<Location> getUsages() {
-    return getDefinition()
-        .map(VariableNode::getUsages)
-        .orElseGet(ImmutableList::of);
+    return getDefinition().map(DefinedAndUsedStructure::getUsages).orElseGet(ImmutableList::of);
   }
 
   @Override
   public String getFormattedDisplayString() {
     return getDefinition()
-        .map(VariableNode::getFullVariableDescription)
+        .filter(Describable.class::isInstance)
+        .map(Describable.class::cast)
+        .map(Describable::getFormattedDisplayString)
         .orElse("");
   }
 }

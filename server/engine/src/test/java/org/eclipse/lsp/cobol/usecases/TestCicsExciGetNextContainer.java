@@ -30,8 +30,6 @@ public class TestCicsExciGetNextContainer {
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
           + "       01  {$*CONTAINER-VALUE}       PIC X(50).\n"
-          + "       01  {$*RETURN-CODE}           PIC S9(8) COMP.\n"
-          + "\n"
           + "       PROCEDURE DIVISION.\n"
           + "           EXEC CICS \n"
           + "           GETNEXT\n"

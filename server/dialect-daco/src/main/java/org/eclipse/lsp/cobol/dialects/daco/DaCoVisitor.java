@@ -29,7 +29,7 @@ import org.eclipse.lsp.cobol.dialects.daco.DaCoParser.DacoStatementsContext;
 import org.eclipse.lsp.cobol.dialects.daco.DaCoParser.QualifiedDataNameContext;
 import org.eclipse.lsp.cobol.dialects.daco.DaCoParser.VariableUsageNameContext;
 import org.eclipse.lsp.cobol.common.model.tree.variable.QualifiedReferenceNode;
-import org.eclipse.lsp.cobol.common.model.tree.variable.VariableUsageNode;
+import org.eclipse.lsp.cobol.common.model.tree.variable.UsageNode;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
@@ -83,7 +83,7 @@ public class DaCoVisitor extends DaCoParserBaseVisitor<List<Node>> {
   @Override
   public List<Node> visitVariableUsageName(VariableUsageNameContext ctx) {
     return addTreeNode(
-        ctx, locality -> new VariableUsageNode(VisitorHelper.getName(ctx), locality));
+        ctx, locality -> new UsageNode(VisitorHelper.getName(ctx), locality));
   }
 
   @Override

@@ -26,7 +26,7 @@ import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.tree.RootNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableDefinitionNameNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNode;
-import org.eclipse.lsp.cobol.common.model.tree.variable.VariableUsageNode;
+import org.eclipse.lsp.cobol.common.model.tree.variable.UsageNode;
 import org.eclipse.lsp.cobol.common.model.tree.variables.MnemonicNameNode;
 import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
 import org.eclipse.lsp.cobol.lsp.SourceUnitGraph;
@@ -62,30 +62,30 @@ class ElementOccurrencesTest {
     copyBook.define(ELEMENT_NAME, null, URI, "copybookUri");
     VariableNode variableNodeInOneFile =
         createDefinitionNode(ELEMENT_NAME, definition.getUri(), definition.getRange());
-    VariableUsageNode variableUsageNodeInOneFile =
+    UsageNode usageNodeInOneFile =
         createUsageNode(variableNodeInOneFile, usage.getUri(), usage.getRange());
     RootNode rootNodeForOneFile = new RootNode(rootLocality);
     rootNodeForOneFile.addChild(variableNodeInOneFile);
-    rootNodeForOneFile.addChild(variableUsageNodeInOneFile);
+    rootNodeForOneFile.addChild(usageNodeInOneFile);
     VariableNode variableNodeInTwoFiles =
         createDefinitionNode(ELEMENT_NAME, definition.getUri(), definition.getRange());
-    VariableUsageNode variableUsageNodeInTwoFiles =
+    UsageNode usageNodeInTwoFiles =
         createUsageNode(
             variableNodeInTwoFiles, usageInOtherFile.getUri(), usageInOtherFile.getRange());
     RootNode rootNodeForTwoFiles = new RootNode(rootLocality);
     rootNodeForTwoFiles.addChild(variableNodeInTwoFiles);
-    rootNodeForTwoFiles.addChild(variableUsageNodeInTwoFiles);
+    rootNodeForTwoFiles.addChild(usageNodeInTwoFiles);
     VariableNode variableNodeWithTwoUsages =
         createDefinitionNode(ELEMENT_NAME, definition.getUri(), definition.getRange());
-    VariableUsageNode variableUsageNode1 =
+    UsageNode usageNode1 =
         createUsageNode(variableNodeWithTwoUsages, usage.getUri(), usage.getRange());
-    VariableUsageNode variableUsageNode2 =
+    UsageNode usageNode2 =
         createUsageNode(
             variableNodeWithTwoUsages, usageInOtherFile.getUri(), usageInOtherFile.getRange());
     RootNode rootNodeWithTwoUsages = new RootNode(rootLocality);
     rootNodeWithTwoUsages.addChild(variableNodeWithTwoUsages);
-    rootNodeWithTwoUsages.addChild(variableUsageNode1);
-    rootNodeWithTwoUsages.addChild(variableUsageNode2);
+    rootNodeWithTwoUsages.addChild(usageNode1);
+    rootNodeWithTwoUsages.addChild(usageNode2);
     return Stream.of(
         // find variables usage by usage position
         Arguments.of(
@@ -161,7 +161,7 @@ class ElementOccurrencesTest {
     Location definition = definitionNode.getLocality().toLocation();
     CopybooksRepository copyBook = new CopybooksRepository();
     SourceUnitGraph documentGraph = mock(SourceUnitGraph.class);
-    VariableUsageNode usageNode =
+    UsageNode usageNode =
         createUsageNode(definitionNode, URI, new Range(new Position(3, 0), new Position(3, 5)));
     Location usage = usageNode.getLocality().toLocation();
     Position insideUsage = new Position(3, 1);
@@ -198,8 +198,8 @@ class ElementOccurrencesTest {
     Range definitionRange = new Range(new Position(1, 2), new Position(2, 5));
     VariableNode definitionNode = createDefinitionNode(ELEMENT_NAME, URI, definitionRange);
     Range usageRange = new Range(new Position(3, 0), new Position(3, 5));
-    VariableUsageNode variableUsageNode = createUsageNode(definitionNode, URI, usageRange);
-    VariableUsageNode variableUsageNodeInOtherFile =
+    UsageNode usageNode = createUsageNode(definitionNode, URI, usageRange);
+    UsageNode usageNodeInOtherFile =
         createUsageNode(definitionNode, URI2, new Range(new Position(3, 0), new Position(3, 5)));
     Position insideUsage = new Position(3, 1);
     RootNode rootNode =
@@ -209,8 +209,8 @@ class ElementOccurrencesTest {
                 .range(new Range(new Position(1, 1), new Position(5, 1)))
                 .build());
     rootNode.addChild(definitionNode);
-    rootNode.addChild(variableUsageNode);
-    rootNode.addChild(variableUsageNodeInOtherFile);
+    rootNode.addChild(usageNode);
+    rootNode.addChild(usageNodeInOtherFile);
     AnalysisResult analysisResult = AnalysisResult.builder().rootNode(rootNode).build();
     List<DocumentHighlight> highlights =
         new ElementOccurrences(documentGraph)
@@ -248,10 +248,10 @@ class ElementOccurrencesTest {
     return definitionNode;
   }
 
-  private static VariableUsageNode createUsageNode(
+  private static UsageNode createUsageNode(
       VariableNode variableNode, String uri, Range range) {
-    VariableUsageNode usageNode =
-        new VariableUsageNode(
+    UsageNode usageNode =
+        new UsageNode(
             variableNode.getName(), Locality.builder().uri(uri).range(range).build());
     variableNode.addUsage(usageNode);
     return usageNode;

@@ -28,7 +28,7 @@ import org.eclipse.lsp.cobol.common.mapping.OriginalLocation;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.model.tree.variable.QualifiedReferenceNode;
-import org.eclipse.lsp.cobol.common.model.tree.variable.VariableUsageNode;
+import org.eclipse.lsp.cobol.common.model.tree.variable.UsageNode;
 import org.eclipse.lsp.cobol.implicitDialects.sql.node.ExecSqlWheneverNode;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
@@ -66,7 +66,7 @@ class Db2SqlVisitorHelper {
     QualifiedReferenceNode groupNode = new QualifiedReferenceNode(locality);
     for (int i = ranges.length - 1; i >= 0; i--) {
       Locality nodeLocality = locality.toBuilder().range(ranges[i]).build();
-      groupNode.addChild(new VariableUsageNode(names[i], nodeLocality));
+      groupNode.addChild(new UsageNode(names[i], nodeLocality));
     }
     return ImmutableList.of(groupNode);
   }

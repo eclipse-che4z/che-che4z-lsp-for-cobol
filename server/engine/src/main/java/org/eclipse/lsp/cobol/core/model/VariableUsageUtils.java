@@ -22,7 +22,7 @@ import org.eclipse.lsp.cobol.common.model.NodeType;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNameAndLocality;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNode;
-import org.eclipse.lsp.cobol.common.model.tree.variable.VariableUsageNode;
+import org.eclipse.lsp.cobol.common.model.tree.variable.UsageNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableWithLevelNode;
 import org.eclipse.lsp.cobol.common.utils.RangeUtils;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulatorService;
@@ -43,7 +43,7 @@ public class VariableUsageUtils {
    * @return the list of all matched variables
    */
   public static List<VariableNode> findVariablesForUsage(
-      Multimap<String, VariableNode> definedVariables, List<VariableUsageNode> usageNodes) {
+      Multimap<String, VariableNode> definedVariables, List<UsageNode> usageNodes) {
     Map<VariableNode, Integer> variableToStepCountsToMatchParentsMap =
         findDefinedVariable(usageNodes.get(0).getName(), definedVariables).stream()
             .map(
@@ -86,10 +86,10 @@ public class VariableUsageUtils {
   }
 
   private static Map<VariableNode, Integer> mapVariableToStepCountsToMatchParents(
-      VariableNode variable, List<VariableUsageNode> parents) {
+      VariableNode variable, List<UsageNode> parents) {
     VariableNode referredVariable = variable;
     int count = 0;
-    for (VariableUsageNode parent : parents) {
+    for (UsageNode parent : parents) {
       String parentName = parent.getName();
       do {
 
@@ -136,27 +136,27 @@ public class VariableUsageUtils {
   }
 
   /**
-   * Retrieves {@link VariableUsageNode} based on the passed parent node and variable locality
+   * Retrieves {@link UsageNode} based on the passed parent node and variable locality
    * @param parentNode parent node under which usage needs to be determined
    * @param identifier {@link VariableNameAndLocality} variable locality whose usage needs to be determined.
-   * @return List of {@link VariableUsageNode} for the passed identifier
+   * @return List of {@link UsageNode} for the passed identifier
    */
-  public List<VariableUsageNode> getVariableUsageNode(
+  public List<UsageNode> getVariableUsageNode(
           Node parentNode, VariableNameAndLocality identifier) {
     return parentNode.getDepthFirstStream()
-            .filter(VariableUsageNode.class::isInstance)
-            .map(VariableUsageNode.class::cast)
+            .filter(UsageNode.class::isInstance)
+            .map(UsageNode.class::cast)
             .filter(node1 -> RangeUtils.isInside(node1.getLocality().getRange(), identifier.getLocality().getRange()))
             .collect(Collectors.toList());
   }
 
   /**
-   * Retrieves {@link VariableUsageNode} based on the passed parent node and variable locality
+   * Retrieves {@link UsageNode} based on the passed parent node and variable locality
    * @param parentNode parent node under which usage needs to be determined
    * @param identifiers Lis of {@link VariableNameAndLocality} variable locality whose usage needs to be determined.
-   * @return List of {@link VariableUsageNode} for the passed identifier
+   * @return List of {@link UsageNode} for the passed identifier
    */
-  public List<VariableUsageNode> getVariableUsageNode(
+  public List<UsageNode> getVariableUsageNode(
           Node parentNode, List<VariableNameAndLocality> identifiers) {
     return identifiers.stream().map(iden -> VariableUsageUtils.getVariableUsageNode(parentNode, iden))
             .flatMap(Collection::stream)
@@ -165,14 +165,14 @@ public class VariableUsageUtils {
 
 
   /**
-   * Retrieves variable definition nodes for the passed {@link VariableUsageNode}
+   * Retrieves variable definition nodes for the passed {@link UsageNode}
    * @param symbolAccumulatorService instance of {@link SymbolAccumulatorService}
    * @param containerNode  container node for the variableUsage node
-   * @param identifiers List of {@link VariableUsageNode}
+   * @param identifiers List of {@link UsageNode}
    * @return List of {@link VariableNode}
    */
   public List<VariableNode> getDefinitionNode(SymbolAccumulatorService symbolAccumulatorService,
-                                               Node containerNode, List<VariableUsageNode> identifiers) {
+                                               Node containerNode, List<UsageNode> identifiers) {
     return containerNode.getProgram()
             .map(
                     programNode -> identifiers.stream().map(id -> symbolAccumulatorService.getVariableDefinition(

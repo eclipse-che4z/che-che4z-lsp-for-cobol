@@ -17,20 +17,25 @@ package org.eclipse.lsp.cobol.common.model.tree;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
-
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.NodeType;
-import org.eclipse.lsp.cobol.common.model.tree.variable.UsageNode;
 
+import java.util.List;
+
+/**
+ * This class represents declaration of intrinsic function names or user-defined function names (in
+ * the REPOSITORY paragraph), that may be used without specifying the keyword FUNCTION.
+ */
 @ToString(callSuper = true)
 @Getter
 @EqualsAndHashCode(callSuper = true)
-public class FunctionReference extends UsageNode {
+public class FunctionDeclaration extends Node {
+  private final boolean isIntrinsic;
 
-  private final boolean isFunctionPrefixed;
-
-  public FunctionReference(Locality locality, String name, boolean isFunctionPrefixed) {
-    super(name, locality, NodeType.FUNCTION_REFERENCE);
-    this.isFunctionPrefixed = isFunctionPrefixed;
+  public FunctionDeclaration(
+      Locality location, List<FunctionReference> functionNames, boolean isIntrinsic) {
+    super(location, NodeType.FUNCTION_DECLARATION);
+    this.isIntrinsic = isIntrinsic;
+    functionNames.forEach(this::addChild);
   }
 }

@@ -554,7 +554,7 @@ class Db2SqlVisitor extends Db2SqlParserBaseVisitor<List<Node>> {
             return Db2SqlVisitorHelper.generateGroupNodes(name, locality);
         }
         String finalName = name;
-        return addTreeNode(ctx, locality -> new VariableUsageNode(finalName, locality));
+        return addTreeNode(ctx, locality -> new UsageNode(finalName, locality));
     }
  }
 

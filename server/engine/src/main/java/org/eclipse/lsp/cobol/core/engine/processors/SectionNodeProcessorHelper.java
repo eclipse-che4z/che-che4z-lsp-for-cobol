@@ -625,11 +625,11 @@ public class SectionNodeProcessorHelper {
     String renamesName = renames.get(0).getName();
     int renamesIndex = Iterables.indexOf(nodesForRenaming, it -> renamesName.equals(it.getName()));
     if (renamesIndex != -1) {
-      VariableUsageNode variableUsageNode =
-          new VariableUsageNode(renamesName, renames.get(0).getLocality());
-      variable.addChild(variableUsageNode);
+      UsageNode usageNode =
+          new UsageNode(renamesName, renames.get(0).getLocality());
+      variable.addChild(usageNode);
       VariableNode variableDefNode = nodesForRenaming.get(renamesIndex);
-      variableDefNode.addUsage(variableUsageNode);
+      variableDefNode.addUsage(usageNode);
       if (renames.size() > 1) {
         VariableNode allowedQualifier = getAllowedQualifier(group, variableDefNode, renames.get(1));
         if (Objects.nonNull(allowedQualifier)) {
@@ -649,7 +649,7 @@ public class SectionNodeProcessorHelper {
 
   private void processRenameClause(
       RenameItemNode variable, VariableNameAndLocality rename, VariableNode allowedQualifier) {
-    VariableUsageNode qualifiedVar = new VariableUsageNode(rename.getName(), rename.getLocality());
+    UsageNode qualifiedVar = new UsageNode(rename.getName(), rename.getLocality());
     variable.addChild(qualifiedVar);
     allowedQualifier.addUsage(qualifiedVar);
   }
@@ -684,7 +684,7 @@ public class SectionNodeProcessorHelper {
     VariableNameAndLocality redefinesNameAndLocality = definitionNode.getRedefines();
     String redefinesName = redefinesNameAndLocality.getName();
     Locality redefinesLocality = redefinesNameAndLocality.getLocality();
-    VariableUsageNode redefineUsage = new VariableUsageNode(redefinesName, redefinesLocality);
+    UsageNode redefineUsage = new UsageNode(redefinesName, redefinesLocality);
     variableNode.addChild(redefineUsage);
     List<VariableWithLevelNode> eligibleNodesForRedefine =
         getEligibleNodesForRedefine(definitionNode);

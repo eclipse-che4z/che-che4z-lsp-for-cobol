@@ -31,7 +31,6 @@ public class TestCicsExciPutContainerStatement {
           + "       WORKING-STORAGE SECTION.\n"
           + "       01  {$*CONTAINER-VALUE}       PIC X(50).\n"
           + "       01  {$*CONTAINER-AREA}       PIC X(50).\n"
-          + "       01  {$*RETURN-CODE}           PIC S9(8) COMP.\n"
           + "       01  {$*CVDA}           PIC S9(8) COMP.\n"
           + "\n"
           + "       PROCEDURE DIVISION.\n"

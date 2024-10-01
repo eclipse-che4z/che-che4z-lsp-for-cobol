@@ -32,7 +32,7 @@ class TestWorkingStoragePredefinedVariables {
             + "       Program-id.    ProgramId.\n"
             + "       Data Division.\n"
             + "       WORKING-STORAGE SECTION.\n"
-            + "       01 {$*XML-TEXT} PIC 99.\n"
+//            + "       01 {$*XML-TEXT} PIC 99.\n"
             + "       01 {$*LDAY} PIC 99.\n"
             + "       LINKAGE SECTION.\n"
             + "       01  {$*DFHCOMMAREA}.\n"

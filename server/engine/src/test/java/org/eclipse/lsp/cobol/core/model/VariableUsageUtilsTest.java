@@ -37,8 +37,8 @@ public class VariableUsageUtilsTest {
             .build();
     @Test
     void testFindVariablesForUsage() {
-        VariableUsageNode usageNode1 = new VariableUsageNode("SQLCA-ERR-MSG", locality);
-        List<VariableUsageNode> usageNodes = Arrays.asList(usageNode1);
+        UsageNode usageNode1 = new UsageNode("SQLCA-ERR-MSG", locality);
+        List<UsageNode> usageNodes = Arrays.asList(usageNode1);
         VariableNode variableNode1 = new ElementaryItemNode(locality, 10, "SQLCA-ERR-MSG", false, "X(80)",
                 null, UsageFormat.UNDEFINED, false, false, false);
         Multimap<String, VariableNode> definedVariables = ArrayListMultimap.create();
@@ -51,8 +51,8 @@ public class VariableUsageUtilsTest {
 
     @Test
     void testFindVariablesForUsageNoMatch() {
-        VariableUsageNode usageNode1 = new VariableUsageNode("SQLCA-NO-MATCH", locality);
-        List<VariableUsageNode> usageNodes = Arrays.asList(usageNode1);
+        UsageNode usageNode1 = new UsageNode("SQLCA-NO-MATCH", locality);
+        List<UsageNode> usageNodes = Arrays.asList(usageNode1);
         Multimap<String, VariableNode> definedVariables = ArrayListMultimap.create();
         definedVariables.put("SQLCA", datacomNodes.get(0));
         List<VariableNode> result = VariableUsageUtils.findVariablesForUsage(definedVariables, usageNodes);

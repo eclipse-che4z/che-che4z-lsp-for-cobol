@@ -18,7 +18,7 @@ import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.common.model.tree.*;
 import org.eclipse.lsp.cobol.common.model.tree.statements.StatementNode;
-import org.eclipse.lsp.cobol.common.model.tree.variable.VariableUsageNode;
+import org.eclipse.lsp.cobol.common.model.tree.variable.UsageNode;
 import org.eclipse.lsp.cobol.common.model.variables.DivisionType;
 import org.eclipse.lsp.cobol.core.model.extendedapi.*;
 import org.eclipse.lsp.cobol.implicitDialects.cics.nodes.ExecCicsHandleNode;
@@ -135,8 +135,8 @@ public class CFASTBuilderImpl implements CFASTBuilder {
         case PROGRAM:
           value = node.getDepthFirstStream().filter(n -> n.getNodeType() == VARIABLE_USAGE)
               .findFirst()
-              .map(VariableUsageNode.class::cast)
-              .map(VariableUsageNode::getName)
+              .map(UsageNode.class::cast)
+              .map(UsageNode::getName)
               .orElse(null);
           break;
         case LABEL:

@@ -55,7 +55,7 @@ public class JsonParseProcess implements Processor<JsonParseNode> {
   }
 
   private void semanticAnalysisForIdentifier(JsonParseNode jsonParseNode, ProcessingContext ctx) {
-    List<VariableUsageNode> identifier1Nodes = VariableUsageUtils.getVariableUsageNode(jsonParseNode, jsonParseNode.getIdentifier1());
+    List<UsageNode> identifier1Nodes = VariableUsageUtils.getVariableUsageNode(jsonParseNode, jsonParseNode.getIdentifier1());
     if (identifier1Nodes.isEmpty()) {
       return;
     }
@@ -83,11 +83,11 @@ public class JsonParseProcess implements Processor<JsonParseNode> {
   }
 
   private void semanticAnalysisForCondition(JsonParseNode jsonParseNode, ProcessingContext ctx) {
-    List<VariableUsageNode> identifier5Nodes = VariableUsageUtils.getVariableUsageNode(jsonParseNode, jsonParseNode.getIdentifier5());
+    List<UsageNode> identifier5Nodes = VariableUsageUtils.getVariableUsageNode(jsonParseNode, jsonParseNode.getIdentifier5());
     List<VariableNode> foundDefinitionsForIdentifier5 =
             VariableUsageUtils.getDefinitionNode(symbolAccumulatorService, jsonParseNode, identifier5Nodes);
 
-    List<VariableUsageNode> conditionNames = VariableUsageUtils.getVariableUsageNode(jsonParseNode, jsonParseNode.getConditionName());
+    List<UsageNode> conditionNames = VariableUsageUtils.getVariableUsageNode(jsonParseNode, jsonParseNode.getConditionName());
     if (conditionNames.isEmpty()) return;
     List<VariableNode> conditionDefinition =
             VariableUsageUtils.getDefinitionNode(symbolAccumulatorService, jsonParseNode, conditionNames);
@@ -131,8 +131,8 @@ public class JsonParseProcess implements Processor<JsonParseNode> {
                     }));
   }
 
-  private Optional<VariableUsageNode> getConditionVariableUsage(
-      List<VariableUsageNode> conditionNames, VariableNode condition) {
+  private Optional<UsageNode> getConditionVariableUsage(
+          List<UsageNode> conditionNames, VariableNode condition) {
     return conditionNames.stream()
         .filter(qs -> condition.getName().equalsIgnoreCase(qs.getName()))
         .findFirst();
@@ -142,7 +142,7 @@ public class JsonParseProcess implements Processor<JsonParseNode> {
       JsonParseNode jsonParseNode,
       ProcessingContext ctx,
       List<VariableNode> identifier1Definitions) {
-    List<VariableUsageNode> identifier2Nodes = VariableUsageUtils.getVariableUsageNode(jsonParseNode, jsonParseNode.getIdentifier2());
+    List<UsageNode> identifier2Nodes = VariableUsageUtils.getVariableUsageNode(jsonParseNode, jsonParseNode.getIdentifier2());
     if (identifier2Nodes.isEmpty()) return;
     List<VariableNode> foundDefinitionsForIdentifier2 =
             VariableUsageUtils.getDefinitionNode(symbolAccumulatorService, jsonParseNode, identifier2Nodes);
@@ -204,7 +204,7 @@ public class JsonParseProcess implements Processor<JsonParseNode> {
 
   private void validateIdentifier2GroupItem(
       ProcessingContext ctx,
-      List<VariableUsageNode> identifier2Nodes,
+      List<UsageNode> identifier2Nodes,
       List<VariableNode> foundDefinitionsForIdentifier2) {
     boolean isGroupItemAlphanumeric =
         foundDefinitionsForIdentifier2
@@ -250,7 +250,7 @@ public class JsonParseProcess implements Processor<JsonParseNode> {
   }
 
   private void semanticAnalysisForIdentifier5(JsonParseNode jsonParseNode, ProcessingContext ctx) {
-    List<VariableUsageNode> identifier5Nodes = VariableUsageUtils.getVariableUsageNode(jsonParseNode, jsonParseNode.getIdentifier5());
+    List<UsageNode> identifier5Nodes = VariableUsageUtils.getVariableUsageNode(jsonParseNode, jsonParseNode.getIdentifier5());
     identifier5Nodes.forEach(identifier5 -> {
       List<VariableNode> foundDefinitionsForIdentifier5 =
               VariableUsageUtils.getDefinitionNode(symbolAccumulatorService, jsonParseNode, Collections.singletonList(identifier5));
@@ -281,14 +281,14 @@ public class JsonParseProcess implements Processor<JsonParseNode> {
   }
 
   private void semanticAnalysisForIdentifier4(JsonParseNode jsonParseNode, ProcessingContext ctx) {
-    List<VariableUsageNode> identifier2Nodes = VariableUsageUtils.getVariableUsageNode(jsonParseNode, jsonParseNode.getIdentifier2());
+    List<UsageNode> identifier2Nodes = VariableUsageUtils.getVariableUsageNode(jsonParseNode, jsonParseNode.getIdentifier2());
     if (identifier2Nodes.isEmpty()) {
       return;
     }
     List<VariableNode> foundDefinitionsForIdentifier2 =
             VariableUsageUtils.getDefinitionNode(symbolAccumulatorService, jsonParseNode, identifier2Nodes);
 
-    List<VariableUsageNode> identifier4Nodes = VariableUsageUtils.getVariableUsageNode(jsonParseNode, jsonParseNode.getIdentifier4());
+    List<UsageNode> identifier4Nodes = VariableUsageUtils.getVariableUsageNode(jsonParseNode, jsonParseNode.getIdentifier4());
     if (identifier4Nodes.isEmpty()) return;
     identifier4Nodes.forEach(identifier4 -> {
       List<VariableNode> foundDefinitionsForIdentifier4 =
@@ -322,14 +322,14 @@ public class JsonParseProcess implements Processor<JsonParseNode> {
   }
 
   private void semanticAnalysisForIdentifier3(JsonParseNode jsonParseNode, ProcessingContext ctx) {
-    List<VariableUsageNode> identifier2Nodes = VariableUsageUtils.getVariableUsageNode(jsonParseNode, jsonParseNode.getIdentifier2());
+    List<UsageNode> identifier2Nodes = VariableUsageUtils.getVariableUsageNode(jsonParseNode, jsonParseNode.getIdentifier2());
     if (identifier2Nodes.isEmpty()) {
       return;
     }
     List<VariableNode> foundDefinitionsForIdentifier2 =
             VariableUsageUtils.getDefinitionNode(symbolAccumulatorService, jsonParseNode, identifier2Nodes);
 
-    List<VariableUsageNode> identifier3Nodes = VariableUsageUtils.getVariableUsageNode(jsonParseNode, jsonParseNode.getIdentifier3());
+    List<UsageNode> identifier3Nodes = VariableUsageUtils.getVariableUsageNode(jsonParseNode, jsonParseNode.getIdentifier3());
     if (identifier3Nodes.isEmpty()) return;
     identifier3Nodes.forEach(identifier3 -> {
       List<VariableNode> foundDefinitionsForIdentifier3 =
@@ -379,7 +379,7 @@ public class JsonParseProcess implements Processor<JsonParseNode> {
   private void semanticAnalysisForIdentifier1(
       JsonParseNode jsonParseNode,
       ProcessingContext ctx,
-      List<VariableUsageNode> identifier1Nodes,
+      List<UsageNode> identifier1Nodes,
       List<VariableNode> foundDefinitions) {
     checkValidDefinition(jsonParseNode, ctx, identifier1Nodes, foundDefinitions);
 
@@ -422,7 +422,7 @@ public class JsonParseProcess implements Processor<JsonParseNode> {
   private void checkValidDefinition(
       JsonParseNode jsonParseNode,
       ProcessingContext ctx,
-      List<VariableUsageNode> nodes,
+      List<UsageNode> nodes,
       List<VariableNode> foundDefinitions) {
     if (foundDefinitions.isEmpty()) {
       ctx.getErrors()
@@ -451,7 +451,7 @@ public class JsonParseProcess implements Processor<JsonParseNode> {
 
   private void verifyIdentifier1GroupItem(
       List<VariableNode> foundDefinitions,
-      List<VariableUsageNode> identifier1Nodes,
+      List<UsageNode> identifier1Nodes,
       ProcessingContext ctx) {
     boolean isGroupItemAlphanumeric =
         foundDefinitions

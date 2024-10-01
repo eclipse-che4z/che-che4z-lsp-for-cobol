@@ -32,7 +32,6 @@ public class TestCicsExciGetContainerStatement {
           + "       01  {$*CONTAINER-NAME}        PIC X(10) VALUE 'SAMPLECNT'.\n"
           + "       01  {$*CONTAINER-LENGTH}      PIC S9(4) COMP.\n"
           + "       01  {$*CONTAINER-VALUE}       PIC X(50).\n"
-          + "       01  {$*RETURN-CODE}           PIC S9(8) COMP.\n"
           + "\n"
           + "       PROCEDURE DIVISION.\n"
           + "           EXEC CICS HANDLE CONDITION \n"

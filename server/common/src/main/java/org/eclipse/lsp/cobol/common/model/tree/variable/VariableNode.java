@@ -23,6 +23,7 @@ import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.message.MessageTemplate;
 import org.eclipse.lsp.cobol.common.model.DefinedAndUsedStructure;
+import org.eclipse.lsp.cobol.common.model.Describable;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.utils.RangeUtils;
@@ -42,7 +43,7 @@ import static org.eclipse.lsp.cobol.common.model.NodeType.VARIABLE_DEFINITION_NA
 @Getter
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-public abstract class VariableNode extends Node implements DefinedAndUsedStructure {
+public abstract class VariableNode extends Node implements DefinedAndUsedStructure, Describable {
 
   public static final String PREFIX = "  ";
   private final VariableType variableType;
@@ -99,11 +100,11 @@ public abstract class VariableNode extends Node implements DefinedAndUsedStructu
    *
    * @param usageNode a variable usage node
    */
-  public void addUsage(VariableUsageNode usageNode) {
+  public void addUsage(UsageNode usageNode) {
     if (!usages.contains(usageNode.getLocality().toLocation())) {
       usages.add(usageNode.getLocality().toLocation());
-      usageNode.addDefinition(this);
     }
+    usageNode.addDefinition(this);
   }
 
   public List<Location> getDefinitions() {
@@ -142,7 +143,8 @@ public abstract class VariableNode extends Node implements DefinedAndUsedStructu
    *
    * @return the string with described variable.
    */
-  public String getFullVariableDescription() {
+  @Override
+  public String getFormattedDisplayString() {
     StringBuilder prefix = new StringBuilder();
     List<String> lines = new ArrayList<>();
     for (String parentLine : parentsDescription()) {

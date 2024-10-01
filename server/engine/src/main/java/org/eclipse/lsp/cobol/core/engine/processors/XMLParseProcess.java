@@ -108,12 +108,12 @@ public class XMLParseProcess implements Processor<XMLParseNode> {
   private List<VariableNode> getVariableDefinition(
       XMLParseNode xmlParseNode, VariableNameAndLocality identifier) {
     if (Objects.nonNull(identifier)) {
-      List<VariableUsageNode> variableUsageNodeForIdentifier =
+      List<UsageNode> usageNodeForIdentifier =
           VariableUsageUtils.getVariableUsageNode(xmlParseNode, identifier);
-      if (variableUsageNodeForIdentifier.isEmpty()) {
+      if (usageNodeForIdentifier.isEmpty()) {
         return Collections.emptyList();
       }
-      return VariableUsageUtils.getDefinitionNode(symbolAccumulatorService, xmlParseNode, variableUsageNodeForIdentifier);
+      return VariableUsageUtils.getDefinitionNode(symbolAccumulatorService, xmlParseNode, usageNodeForIdentifier);
     }
     return Collections.emptyList();
   }

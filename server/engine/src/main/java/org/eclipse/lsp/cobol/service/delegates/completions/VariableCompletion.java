@@ -79,7 +79,7 @@ public class VariableCompletion implements Completion {
     CompletionItem item = new CompletionItem(name);
     item.setLabel(name);
     item.setInsertText(name);
-    item.setDocumentation(it.getFullVariableDescription());
+    item.setDocumentation(it.getFormattedDisplayString());
     if (ImplicitCodeUtils.isImplicit(it.getLocality().getUri())) {
       item.setSortText(CONSTANTS.prefix + name);
       item.setKind(Constant);
