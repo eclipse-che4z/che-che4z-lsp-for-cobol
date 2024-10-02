@@ -23,6 +23,7 @@ import { NativeExecutableService } from "../../services/nativeLanguageClient/nat
 import { TelemetryService } from "../../services/reporter/TelemetryService";
 import { Utils } from "../../services/util/Utils";
 import { EXP_LANGUAGE_ID, HP_LANGUAGE_ID } from "../../constants";
+import { mockSpawnProcess } from "../../__mocks__/child_process.utility";
 
 jest.mock("../../services/reporter/TelemetryService");
 jest.mock("../../services/copybook/CopybookURI");
@@ -102,17 +103,74 @@ describe("LanguageClientService positive scenario", () => {
   });
 
   test("Test LanguageClientService checkPrerequisites passes", async () => {
-    let message = false;
-    (fs.existsSync as any) = jest.fn().mockReturnValue(true);
-    vscode.workspace.getConfiguration(expect.any(String)).get = jest
-      .fn()
-      .mockReturnValue(9999);
+    let message: string | null = null;
+
+    const mockProcess = mockSpawnProcess(
+      "",
+      `java version "17.0.2" 2022-01-18 LTS
+      Java(TM) SE Runtime Environment (build 17.0.2+8-LTS-86)
+      Java HotSpot(TM) 64-Bit Server VM (build 17.0.2+8-LTS-86, mixed mode, sharing)`,
+      0,
+    );
+
     try {
       await languageClientService.checkPrerequisites();
-    } catch (error: any) {
-      message = error;
+    } catch (error: unknown) {
+      if (typeof error === "string") {
+        message = error;
+      }
     }
-    expect(message).toBeFalsy();
+    expect(message).toBeNull();
+    mockProcess.mockRestore();
+  });
+
+  test("Test LanguageClientService checkPrerequisites fails - java is not installed", async () => {
+    let message: string | null = null;
+
+    const mockProcess = mockSpawnProcess(
+      "",
+      `The operation couldn’t be completed. Unable to locate a Java Runtime.
+      Please visit http://www.java.com for information on installing Java.`,
+      1,
+    );
+
+    try {
+      await languageClientService.checkPrerequisites();
+    } catch (error: unknown) {
+      if (typeof error === "string") {
+        message = error;
+      }
+    }
+    expect(message).toEqual(
+      "An error occurred when checking if Java was installed. Switching to native build.",
+    );
+
+    mockProcess.mockRestore();
+  });
+
+  test("Test LanguageClientService checkPrerequisites fails - old java version", async () => {
+    let message: string | null = null;
+
+    const mockProcess = mockSpawnProcess(
+      "",
+      `java version "1.6.0_45"
+      Java(TM) SE Runtime Environment (build 1.6.0_45-b06)
+      Java HotSpot(TM) 64-Bit Server VM (build 20.45-b01, mixed mode)`,
+      0,
+    );
+
+    try {
+      await languageClientService.checkPrerequisites();
+    } catch (error: unknown) {
+      if (typeof error === "string") {
+        message = error;
+      }
+    }
+    expect(message).toEqual(
+      "Minimum expected Java version is 8. Switching to native builds",
+    );
+
+    mockProcess.mockRestore();
   });
 
   test("Test LanguageClientService retrieve analysis passes", async () => {
@@ -246,6 +304,11 @@ describe("LanguageClientService positive scenario", () => {
 
 describe("LanguageClientService negative scenario.", () => {
   test("LSP port not defined and jar path doesn't exists", async () => {
+    const mockProcess = mockSpawnProcess(
+      "",
+      `java version "17.0.2" 2022-01-18 LTS\nJava(TM) SE Runtime Environment (build 17.0.2+8-LTS-86)\nJava HotSpot(TM) 64-Bit Server VM (build 17.0.2+8-LTS-86, mixed mode, sharing)\n`,
+      0,
+    );
     (fs.existsSync as any) = jest.fn().mockReturnValue(false);
     try {
       await new LanguageClientService(
@@ -255,5 +318,6 @@ describe("LanguageClientService negative scenario.", () => {
     } catch (error: any) {
       expect(error.toString()).toBe("Error: LSP server for cobol not found");
     }
+    mockProcess.mockRestore();
   });
 });
