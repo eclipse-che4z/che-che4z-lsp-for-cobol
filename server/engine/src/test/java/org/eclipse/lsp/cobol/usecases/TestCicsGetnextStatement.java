@@ -15,15 +15,8 @@
 
 package org.eclipse.lsp.cobol.usecases;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
+import org.eclipse.lsp.cobol.usecases.common.CICSTestUtils;
 import org.junit.jupiter.api.Test;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 
 /**
  * Test GETNEXT WEB command. Documentation link: <a
@@ -50,42 +43,29 @@ public class TestCicsGetnextStatement {
     private static final String GETNEXT_PROCESS_VALID = "GETNEXT PROCESS(123) BROWSETOKEN(123) ACTIVITYID(123)";
     private static final String GETNEXT_TIMER_VALID = "GETNEXT TIMER(123) BROWSETOKEN(123) ACTIVITYID(123) EVENT(123) STATUS(123) ABSTIME(123)";
 
-    // Utility Functions
-    private static void noErrorTest(String newCommand) {
-        UseCaseEngine.runTest(getTestString(newCommand), ImmutableList.of(), ImmutableMap.of());
-    }
-
-    private static String getTestString(String newCommand) {
-        List<String> instances = Arrays.asList(newCommand.split("\\s"));
-        instances.replaceAll(String.join("", Collections.nCopies(12, " "))::concat);
-        ArrayList<String> base = new ArrayList<String>(Arrays.asList(BASE_TEXT.split("\n")));
-        base.addAll(base.size() - 1, instances);
-        return String.join("\n", base);
-    }
-
     // Test Functions
     @Test
     void testGetnextActivity() {
-        noErrorTest(GETNEXT_ACTIVITY_VALID);
+        CICSTestUtils.noErrorTest(GETNEXT_ACTIVITY_VALID);
     }
 
     @Test
     void testGetnextContainer() {
-        noErrorTest(GETNEXT_CONTAINER_VALID);
+        CICSTestUtils.noErrorTest(GETNEXT_CONTAINER_VALID);
     }
 
     @Test
     void testGetnextEvent() {
-        noErrorTest(GETNEXT_EVENT_VALID);
+        CICSTestUtils.noErrorTest(GETNEXT_EVENT_VALID);
     }
 
     @Test
     void testGetnextProcess() {
-        noErrorTest(GETNEXT_PROCESS_VALID);
+        CICSTestUtils.noErrorTest(GETNEXT_PROCESS_VALID);
     }
 
     @Test
     void testGetnextTimer() {
-        noErrorTest(GETNEXT_TIMER_VALID);
+        CICSTestUtils.noErrorTest(GETNEXT_TIMER_VALID);
     }
 }
