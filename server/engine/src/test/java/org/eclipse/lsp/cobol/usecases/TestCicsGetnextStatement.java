@@ -19,7 +19,7 @@ import org.eclipse.lsp.cobol.usecases.common.CICSTestUtils;
 import org.junit.jupiter.api.Test;
 
 /**
- * Test GETNEXT WEB command. Documentation link: <a
+ * Test GETNEXT command. Documentation link: <a
  * href="https://www.ibm.com/docs/en/cics-ts/6.x?topic=summary-getnext-zos-communications-server-default">GETNEXT
  * Command</a>
  *
