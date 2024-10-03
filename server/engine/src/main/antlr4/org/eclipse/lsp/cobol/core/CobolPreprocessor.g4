@@ -10,8 +10,8 @@ parser grammar CobolPreprocessor;
 options {tokenVocab = CobolPreprocessorLexer;}
 
 startRule
-   : .*? ((includeStatement | copyStatement | replaceAreaStartOrOffStatement | titleDirective | enterDirective
-   | controlDirective | plusplusIncludeStatement)+ .*?)* EOF
+   : (includeStatement | copyStatement | replaceAreaStartOrOffStatement | titleDirective | enterDirective
+   | controlDirective | plusplusIncludeStatement | .)* EOF
    ;
 
 // copy statement
