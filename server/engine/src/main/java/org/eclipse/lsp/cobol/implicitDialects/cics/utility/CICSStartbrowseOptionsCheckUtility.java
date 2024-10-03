@@ -32,7 +32,20 @@ public class CICSStartbrowseOptionsCheckUtility extends CICSOptionsCheckBaseUtil
 
     public static final int RULE_INDEX = RULE_cics_startbrowse;
 
-    private static final Map<String, ErrorSeverity> DUPLICATE_CHECK_OPTIONS = new HashMap<>();
+    private static final Map<String, ErrorSeverity> DUPLICATE_CHECK_OPTIONS = new HashMap<String, ErrorSeverity>() {
+        {
+            put("STARTBROWSE", ErrorSeverity.ERROR);
+            put("ACTIVITYID", ErrorSeverity.ERROR);
+            put("PROCESS", ErrorSeverity.ERROR);
+            put("PROCESSTYPE", ErrorSeverity.ERROR);
+            put("ACTIVITY", ErrorSeverity.ERROR);
+            put("BROWSETOKEN", ErrorSeverity.ERROR);
+            put("CONTAINER", ErrorSeverity.ERROR);
+            put("CHANNEL", ErrorSeverity.ERROR);
+            put("EVENT", ErrorSeverity.ERROR);
+            put("TIMER", ErrorSeverity.ERROR);
+        }
+    };
 
     /**
      * Checks CICS Startbrowse rules for required and invalid options
