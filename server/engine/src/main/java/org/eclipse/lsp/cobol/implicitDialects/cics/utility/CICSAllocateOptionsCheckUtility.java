@@ -19,6 +19,7 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
+import org.eclipse.lsp.cobol.implicitDialects.cics.CICSLexer;
 import org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser;
 
 import java.util.HashMap;
@@ -32,22 +33,22 @@ public class CICSAllocateOptionsCheckUtility extends CICSOptionsCheckBaseUtility
 
   public static final int RULE_INDEX = RULE_cics_allocate;
 
-  private static final Map<String, ErrorSeverity> DUPLICATE_CHECK_OPTIONS =
-      new HashMap<String, ErrorSeverity>() {
+  private static final Map<Integer, ErrorSeverity> DUPLICATE_CHECK_OPTIONS =
+      new HashMap<Integer, ErrorSeverity>() {
         {
-          put("ALLOCATE", ErrorSeverity.ERROR);
-          put("SYSID", ErrorSeverity.ERROR);
-          put("PROFILE", ErrorSeverity.ERROR);
-          put("STATE", ErrorSeverity.ERROR);
-          put("SESSION", ErrorSeverity.ERROR);
-          put("PARTNER", ErrorSeverity.ERROR);
-          put("ASIS", ErrorSeverity.WARNING);
-          put("BUFFER", ErrorSeverity.WARNING);
-          put("LEAVEKB", ErrorSeverity.WARNING);
-          put("NOTRUNCATE", ErrorSeverity.WARNING);
-          put("NOQUEUE", ErrorSeverity.WARNING);
-          put("NOTRUNCATE", ErrorSeverity.WARNING);
-          put("TERMINAL", ErrorSeverity.WARNING);
+          put(CICSLexer.ALLOCATE, ErrorSeverity.ERROR);
+          put(CICSLexer.SYSID, ErrorSeverity.ERROR);
+          put(CICSLexer.PROFILE, ErrorSeverity.ERROR);
+          put(CICSLexer.STATE, ErrorSeverity.ERROR);
+          put(CICSLexer.SESSION, ErrorSeverity.ERROR);
+          put(CICSLexer.PARTNER, ErrorSeverity.ERROR);
+          put(CICSLexer.ASIS, ErrorSeverity.WARNING);
+          put(CICSLexer.BUFFER, ErrorSeverity.WARNING);
+          put(CICSLexer.LEAVEKB, ErrorSeverity.WARNING);
+          put(CICSLexer.NOTRUNCATE, ErrorSeverity.WARNING);
+          put(CICSLexer.NOQUEUE, ErrorSeverity.WARNING);
+          put(CICSLexer.NOTRUNCATE, ErrorSeverity.WARNING);
+          put(CICSLexer.TERMINAL, ErrorSeverity.WARNING);
         }
       };
 

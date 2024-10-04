@@ -19,6 +19,7 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
+import org.eclipse.lsp.cobol.implicitDialects.cics.CICSLexer;
 import org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser;
 
 import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_define;
@@ -32,50 +33,50 @@ public class CICSDefineOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
 
   public static final int RULE_INDEX = RULE_cics_define;
 
-  private static final Map<String, ErrorSeverity> DUPLICATE_CHECK_OPTIONS =
-      new HashMap<String, ErrorSeverity>() {
+  private static final Map<Integer, ErrorSeverity> DUPLICATE_CHECK_OPTIONS =
+      new HashMap<Integer, ErrorSeverity>() {
         {
-          put("DEFINE", ErrorSeverity.ERROR);
-          put("ACTIVITY", ErrorSeverity.ERROR);
-          put("EVENT", ErrorSeverity.ERROR);
-          put("TRANSID", ErrorSeverity.ERROR);
-          put("PROGRAM", ErrorSeverity.ERROR);
-          put("USERID", ErrorSeverity.ERROR);
-          put("ACTIVITYID", ErrorSeverity.ERROR);
-          put("COMPOSITE", ErrorSeverity.ERROR);
-          put("AND", ErrorSeverity.ERROR);
-          put("OR", ErrorSeverity.ERROR);
-          put("SUBEVENT1", ErrorSeverity.ERROR);
-          put("SUBEVENT2", ErrorSeverity.ERROR);
-          put("SUBEVENT3", ErrorSeverity.ERROR);
-          put("SUBEVENT4", ErrorSeverity.ERROR);
-          put("SUBEVENT5", ErrorSeverity.ERROR);
-          put("SUBEVENT6", ErrorSeverity.ERROR);
-          put("SUBEVENT7", ErrorSeverity.ERROR);
-          put("SUBEVENT8", ErrorSeverity.ERROR);
-          put("COUNTER", ErrorSeverity.ERROR);
-          put("DCOUNTER", ErrorSeverity.ERROR);
-          put("POOL", ErrorSeverity.ERROR);
-          put("VALUE", ErrorSeverity.ERROR);
-          put("MINIMUM", ErrorSeverity.ERROR);
-          put("MAXIMUM", ErrorSeverity.ERROR);
-          put("NOSUSPEND", ErrorSeverity.WARNING);
-          put("INPUT", ErrorSeverity.ERROR);
-          put("PROCESS", ErrorSeverity.ERROR);
-          put("PROCESSTYPE", ErrorSeverity.ERROR);
-          put("NOCHECK", ErrorSeverity.WARNING);
-          put("TIMER", ErrorSeverity.ERROR);
-          put("DAYS", ErrorSeverity.ERROR);
-          put("HOURS", ErrorSeverity.ERROR);
-          put("MINUTES", ErrorSeverity.ERROR);
-          put("SECONDS", ErrorSeverity.ERROR);
-          put("YEAR", ErrorSeverity.ERROR);
-          put("MONTH", ErrorSeverity.ERROR);
-          put("DAYOFMONTH", ErrorSeverity.ERROR);
-          put("DAYOFYEAR", ErrorSeverity.ERROR);
-          put("AFTER", ErrorSeverity.ERROR);
-          put("AT", ErrorSeverity.ERROR);
-          put("0N", ErrorSeverity.ERROR);
+          put(CICSLexer.DEFINE, ErrorSeverity.ERROR);
+          put(CICSLexer.ACTIVITY, ErrorSeverity.ERROR);
+          put(CICSLexer.EVENT, ErrorSeverity.ERROR);
+          put(CICSLexer.TRANSID, ErrorSeverity.ERROR);
+          put(CICSLexer.PROGRAM, ErrorSeverity.ERROR);
+          put(CICSLexer.USERID, ErrorSeverity.ERROR);
+          put(CICSLexer.ACTIVITYID, ErrorSeverity.ERROR);
+          put(CICSLexer.COMPOSITE, ErrorSeverity.ERROR);
+          put(CICSLexer.AND, ErrorSeverity.ERROR);
+          put(CICSLexer.OR, ErrorSeverity.ERROR);
+          put(CICSLexer.SUBEVENT1, ErrorSeverity.ERROR);
+          put(CICSLexer.SUBEVENT2, ErrorSeverity.ERROR);
+          put(CICSLexer.SUBEVENT3, ErrorSeverity.ERROR);
+          put(CICSLexer.SUBEVENT4, ErrorSeverity.ERROR);
+          put(CICSLexer.SUBEVENT5, ErrorSeverity.ERROR);
+          put(CICSLexer.SUBEVENT6, ErrorSeverity.ERROR);
+          put(CICSLexer.SUBEVENT7, ErrorSeverity.ERROR);
+          put(CICSLexer.SUBEVENT8, ErrorSeverity.ERROR);
+          put(CICSLexer.COUNTER, ErrorSeverity.ERROR);
+          put(CICSLexer.DCOUNTER, ErrorSeverity.ERROR);
+          put(CICSLexer.POOL, ErrorSeverity.ERROR);
+          put(CICSLexer.VALUE, ErrorSeverity.ERROR);
+          put(CICSLexer.MINIMUM, ErrorSeverity.ERROR);
+          put(CICSLexer.MAXIMUM, ErrorSeverity.ERROR);
+          put(CICSLexer.NOSUSPEND, ErrorSeverity.WARNING);
+          put(CICSLexer.INPUT, ErrorSeverity.ERROR);
+          put(CICSLexer.PROCESS, ErrorSeverity.ERROR);
+          put(CICSLexer.PROCESSTYPE, ErrorSeverity.ERROR);
+          put(CICSLexer.NOCHECK, ErrorSeverity.WARNING);
+          put(CICSLexer.TIMER, ErrorSeverity.ERROR);
+          put(CICSLexer.DAYS, ErrorSeverity.ERROR);
+          put(CICSLexer.HOURS, ErrorSeverity.ERROR);
+          put(CICSLexer.MINUTES, ErrorSeverity.ERROR);
+          put(CICSLexer.SECONDS, ErrorSeverity.ERROR);
+          put(CICSLexer.YEAR, ErrorSeverity.ERROR);
+          put(CICSLexer.MONTH, ErrorSeverity.ERROR);
+          put(CICSLexer.DAYOFMONTH, ErrorSeverity.ERROR);
+          put(CICSLexer.DAYOFYEAR, ErrorSeverity.ERROR);
+          put(CICSLexer.AFTER, ErrorSeverity.ERROR);
+          put(CICSLexer.AT, ErrorSeverity.ERROR);
+          put(CICSLexer.ON, ErrorSeverity.ERROR);
         }
       };
 
