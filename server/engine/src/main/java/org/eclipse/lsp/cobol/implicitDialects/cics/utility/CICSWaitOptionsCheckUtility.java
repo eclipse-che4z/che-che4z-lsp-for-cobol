@@ -19,6 +19,7 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
+import org.eclipse.lsp.cobol.implicitDialects.cics.CICSLexer;
 import org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser;
 
 import java.util.HashMap;
@@ -31,27 +32,27 @@ import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_w
 public class CICSWaitOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
   public static final int RULE_INDEX = RULE_cics_wait;
 
-  private static final Map<String, ErrorSeverity> DUPLICATE_CHECK_OPTIONS =
-      new HashMap<String, ErrorSeverity>() {
+  private static final Map<Integer, ErrorSeverity> DUPLICATE_CHECK_OPTIONS =
+      new HashMap<Integer, ErrorSeverity>() {
         {
-          put("WAIT", ErrorSeverity.ERROR);
-          put("CONVID", ErrorSeverity.ERROR);
-          put("STATE", ErrorSeverity.ERROR);
-          put("EVENT", ErrorSeverity.ERROR);
-          put("ECADDR", ErrorSeverity.ERROR);
-          put("NAME", ErrorSeverity.ERROR);
-          put("EXTERNAL", ErrorSeverity.ERROR);
-          put("ECBLIST", ErrorSeverity.ERROR);
-          put("NUMEVENTS", ErrorSeverity.ERROR);
-          put("PURGEABILITY", ErrorSeverity.ERROR);
-          put("PURGEABLE", ErrorSeverity.ERROR);
-          put("NOTPURGEABLE", ErrorSeverity.ERROR);
-          put("JOURNALNAME", ErrorSeverity.ERROR);
-          put("JOURNALNUM", ErrorSeverity.ERROR);
-          put("REQID", ErrorSeverity.ERROR);
-          put("SIGNAL", ErrorSeverity.ERROR);
-          put("SESSION", ErrorSeverity.ERROR);
-          put("TERMINAL", ErrorSeverity.ERROR);
+          put(CICSLexer.WAIT, ErrorSeverity.ERROR);
+          put(CICSLexer.CONVID, ErrorSeverity.ERROR);
+          put(CICSLexer.STATE, ErrorSeverity.ERROR);
+          put(CICSLexer.EVENT, ErrorSeverity.ERROR);
+          put(CICSLexer.ECADDR, ErrorSeverity.ERROR);
+          put(CICSLexer.NAME, ErrorSeverity.ERROR);
+          put(CICSLexer.EXTERNAL, ErrorSeverity.ERROR);
+          put(CICSLexer.ECBLIST, ErrorSeverity.ERROR);
+          put(CICSLexer.NUMEVENTS, ErrorSeverity.ERROR);
+          put(CICSLexer.PURGEABILITY, ErrorSeverity.ERROR);
+          put(CICSLexer.PURGEABLE, ErrorSeverity.ERROR);
+          put(CICSLexer.NOTPURGEABLE, ErrorSeverity.ERROR);
+          put(CICSLexer.JOURNALNAME, ErrorSeverity.ERROR);
+          put(CICSLexer.JOURNALNUM, ErrorSeverity.ERROR);
+          put(CICSLexer.REQID, ErrorSeverity.ERROR);
+          put(CICSLexer.SIGNAL, ErrorSeverity.ERROR);
+          put(CICSLexer.SESSION, ErrorSeverity.ERROR);
+          put(CICSLexer.TERMINAL, ErrorSeverity.ERROR);
         }
       };
 

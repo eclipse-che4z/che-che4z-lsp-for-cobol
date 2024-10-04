@@ -19,6 +19,7 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
+import org.eclipse.lsp.cobol.implicitDialects.cics.CICSLexer;
 import org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser;
 
 import java.util.HashMap;
@@ -32,34 +33,34 @@ public class CICSConverseOptionsCheckUtility extends CICSOptionsCheckBaseUtility
 
     public static final int RULE_INDEX = RULE_cics_converse;
 
-    private static final Map<String, ErrorSeverity> DUPLICATE_CHECK_OPTIONS =
-            new HashMap<String, ErrorSeverity>() {
+    private static final Map<Integer, ErrorSeverity> DUPLICATE_CHECK_OPTIONS =
+            new HashMap<Integer, ErrorSeverity>() {
                 {
-                    put("FROM", ErrorSeverity.ERROR);
-                    put("FROMLENGTH", ErrorSeverity.ERROR);
-                    put("FROMFLENGTH", ErrorSeverity.ERROR);
-                    put("INTO", ErrorSeverity.ERROR);
-                    put("SET", ErrorSeverity.ERROR);
-                    put("TOLENGTH", ErrorSeverity.ERROR);
-                    put("TOFLENGTH", ErrorSeverity.ERROR);
-                    put("MAXLENGTH", ErrorSeverity.ERROR);
-                    put("MAXFLENGTH", ErrorSeverity.ERROR);
-                    put("NOTRUNCATE", ErrorSeverity.ERROR);
-                    put("DEFRESP", ErrorSeverity.ERROR);
-                    put("STRFIELD", ErrorSeverity.ERROR);
-                    put("CTLCHAR", ErrorSeverity.ERROR);
-                    put("LINEADDR", ErrorSeverity.ERROR);
-                    put("LDC", ErrorSeverity.ERROR);
-                    put("FMH", ErrorSeverity.ERROR);
-                    put("LEAVEKB", ErrorSeverity.ERROR);
-                    put("ASIS", ErrorSeverity.ERROR);
-                    put("CONVID", ErrorSeverity.ERROR);
-                    put("SESSION", ErrorSeverity.ERROR);
-                    put("ATTACHID", ErrorSeverity.ERROR);
-                    put("STATE", ErrorSeverity.ERROR);
-                    put("ERASE", ErrorSeverity.ERROR);
-                    put("DEFAULT", ErrorSeverity.ERROR);
-                    put("ALTERNATE", ErrorSeverity.ERROR);
+                    put(CICSLexer.FROM, ErrorSeverity.ERROR);
+                    put(CICSLexer.FROMLENGTH, ErrorSeverity.ERROR);
+                    put(CICSLexer.FROMFLENGTH, ErrorSeverity.ERROR);
+                    put(CICSLexer.INTO, ErrorSeverity.ERROR);
+                    put(CICSLexer.SET, ErrorSeverity.ERROR);
+                    put(CICSLexer.TOLENGTH, ErrorSeverity.ERROR);
+                    put(CICSLexer.TOFLENGTH, ErrorSeverity.ERROR);
+                    put(CICSLexer.MAXLENGTH, ErrorSeverity.ERROR);
+                    put(CICSLexer.MAXFLENGTH, ErrorSeverity.ERROR);
+                    put(CICSLexer.NOTRUNCATE, ErrorSeverity.ERROR);
+                    put(CICSLexer.DEFRESP, ErrorSeverity.ERROR);
+                    put(CICSLexer.STRFIELD, ErrorSeverity.ERROR);
+                    put(CICSLexer.CTLCHAR, ErrorSeverity.ERROR);
+                    put(CICSLexer.LINEADDR, ErrorSeverity.ERROR);
+                    put(CICSLexer.LDC, ErrorSeverity.ERROR);
+                    put(CICSLexer.FMH, ErrorSeverity.ERROR);
+                    put(CICSLexer.LEAVEKB, ErrorSeverity.ERROR);
+                    put(CICSLexer.ASIS, ErrorSeverity.ERROR);
+                    put(CICSLexer.CONVID, ErrorSeverity.ERROR);
+                    put(CICSLexer.SESSION, ErrorSeverity.ERROR);
+                    put(CICSLexer.ATTACHID, ErrorSeverity.ERROR);
+                    put(CICSLexer.STATE, ErrorSeverity.ERROR);
+                    put(CICSLexer.ERASE, ErrorSeverity.ERROR);
+                    put(CICSLexer.DEFAULT, ErrorSeverity.ERROR);
+                    put(CICSLexer.ALTERNATE, ErrorSeverity.ERROR);
                 }
             };
 
