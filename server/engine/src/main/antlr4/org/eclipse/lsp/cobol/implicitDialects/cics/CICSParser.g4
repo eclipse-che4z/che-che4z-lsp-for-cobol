@@ -185,8 +185,11 @@ cics_maxlength: ((MAXLENGTH | MAXFLENGTH) cics_data_value);
 cics_abend: ABEND (ABCODE cics_name | CANCEL | NODUMP | cics_handle_response)*;
 
 /** ACQUIRE */
-cics_acquire: PROCESS cics_data_value (PROCESSTYPE cics_data_value |
-              ACTIVITYID cics_data_value | cics_handle_response?);
+cics_acquire:ACQUIRE (cics_acquire_process | cics_acquire_activityId ) ;
+
+cics_acquire_process: ((PROCESS | PROCESSTYPE) cics_data_value | cics_handle_response)+;
+
+cics_acquire_activityId: (ACTIVITYID cics_data_value | cics_handle_response)+;
 
 /** ADD SUBEVENT */
 cics_add: ADD (SUBEVENT cics_data_value | EVENT cics_data_value | cics_handle_response)+;
@@ -252,9 +255,9 @@ cics_build_attach: (ATTACH | ATTACHID cics_name | PROCESS cics_name | RESOURCE c
             RECFM cics_data_value | cics_handle_response)+;
 
 /** CANCEL (both of them) */
-cics_cancel: CANCEL (ACTIVITY cics_data_value | ACQACTIVITY | ACQPROCESS | cics_cancel_reqid | cics_handle_response)*;
-cics_cancel_reqid: REQID cics_name (SYSID cics_data_area |
-                   TRANSID cics_name | cics_handle_response)*;
+cics_cancel: CANCEL (cics_cancel_bts | cics_cancel_reqid);
+cics_cancel_bts: (ACTIVITY cics_data_value | ACQACTIVITY | ACQPROCESS) cics_handle_response?;
+cics_cancel_reqid: REQID cics_name (SYSID cics_data_area | TRANSID cics_name | cics_handle_response)*;
 
 /** CHANGE PHRASE / PASSWORD / TASK */
 cics_change: CHANGE (cics_change_phrase | cics_change_password);
