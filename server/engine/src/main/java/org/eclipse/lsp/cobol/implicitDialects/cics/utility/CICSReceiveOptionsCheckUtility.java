@@ -19,6 +19,7 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
+import org.eclipse.lsp.cobol.implicitDialects.cics.CICSLexer;
 import org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser;
 
 import java.util.HashMap;
@@ -33,30 +34,30 @@ public class CICSReceiveOptionsCheckUtility extends CICSOptionsCheckBaseUtility 
 
   public static final int RULE_INDEX = RULE_cics_receive;
 
-  private static final Map<String, ErrorSeverity> DUPLICATE_CHECK_OPTIONS =
-      new HashMap<String, ErrorSeverity>() {
+  private static final Map<Integer, ErrorSeverity> DUPLICATE_CHECK_OPTIONS =
+      new HashMap<Integer, ErrorSeverity>() {
         {
-          put("RECEIVE", ErrorSeverity.ERROR);
-          put("INTO", ErrorSeverity.ERROR);
-          put("SET", ErrorSeverity.ERROR);
-          put("LENGTH", ErrorSeverity.ERROR);
-          put("FLENGTH", ErrorSeverity.ERROR);
-          put("CONVID", ErrorSeverity.ERROR);
-          put("SESSION", ErrorSeverity.ERROR);
-          put("STATE", ErrorSeverity.ERROR);
-          put("MAP", ErrorSeverity.ERROR);
-          put("MAPSET", ErrorSeverity.ERROR);
-          put("MAXLENGTH", ErrorSeverity.ERROR);
-          put("MAXFLENGTH", ErrorSeverity.ERROR);
-          put("INPARTN", ErrorSeverity.ERROR);
-          put("MAPPINGDEV", ErrorSeverity.ERROR);
-          put("ASIS", ErrorSeverity.WARNING);
-          put("BUFFER", ErrorSeverity.WARNING);
-          put("LEAVEKB", ErrorSeverity.WARNING);
-          put("PASSBK", ErrorSeverity.WARNING);
-          put("NOTRUNCATE", ErrorSeverity.WARNING);
-          put("NOQUEUE", ErrorSeverity.WARNING);
-          put("TERMINAL", ErrorSeverity.WARNING);
+          put(CICSLexer.RECEIVE, ErrorSeverity.ERROR);
+          put(CICSLexer.INTO, ErrorSeverity.ERROR);
+          put(CICSLexer.SET, ErrorSeverity.ERROR);
+          put(CICSLexer.LENGTH, ErrorSeverity.ERROR);
+          put(CICSLexer.FLENGTH, ErrorSeverity.ERROR);
+          put(CICSLexer.CONVID, ErrorSeverity.ERROR);
+          put(CICSLexer.SESSION, ErrorSeverity.ERROR);
+          put(CICSLexer.STATE, ErrorSeverity.ERROR);
+          put(CICSLexer.MAP, ErrorSeverity.ERROR);
+          put(CICSLexer.MAPSET, ErrorSeverity.ERROR);
+          put(CICSLexer.MAXLENGTH, ErrorSeverity.ERROR);
+          put(CICSLexer.MAXFLENGTH, ErrorSeverity.ERROR);
+          put(CICSLexer.INPARTN, ErrorSeverity.ERROR);
+          put(CICSLexer.MAPPINGDEV, ErrorSeverity.ERROR);
+          put(CICSLexer.ASIS, ErrorSeverity.WARNING);
+          put(CICSLexer.BUFFER, ErrorSeverity.WARNING);
+          put(CICSLexer.LEAVEKB, ErrorSeverity.WARNING);
+          put(CICSLexer.PASSBK, ErrorSeverity.WARNING);
+          put(CICSLexer.NOTRUNCATE, ErrorSeverity.WARNING);
+          put(CICSLexer.NOQUEUE, ErrorSeverity.WARNING);
+          put(CICSLexer.TERMINAL, ErrorSeverity.WARNING);
         }
       };
 

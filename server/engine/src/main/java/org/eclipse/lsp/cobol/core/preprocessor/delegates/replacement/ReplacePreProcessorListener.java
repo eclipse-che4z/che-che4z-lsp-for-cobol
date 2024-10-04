@@ -17,7 +17,6 @@ package org.eclipse.lsp.cobol.core.preprocessor.delegates.replacement;
 
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
-import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.Token;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
@@ -71,15 +70,17 @@ public class ReplacePreProcessorListener extends CobolPreprocessorBaseListener {
   }
 
   @Override
-  public void enterReplaceAreaStart(@NonNull ReplaceAreaStartContext ctx) {
+  public void enterReplaceAreaStartOrOffStatement(ReplaceAreaStartOrOffStatementContext ctx) {
     restartReplace(ctx.getStart());
-    applyReplacing();
-    currentTextReplaceData = new ReplaceData(new ArrayList<>(), extendedDocument.getUri(), new Range());
+    if (!ctx.replacePseudoText().isEmpty()) {
+      applyReplacing();
+      currentTextReplaceData = new ReplaceData(new ArrayList<>(), extendedDocument.getUri(), new Range());
+    }
   }
 
   @Override
   public void exitReplacePseudoText(ReplacePseudoTextContext ctx) {
-    if ((ctx.getParent() instanceof ReplaceAreaStartContext)) {
+    if ((ctx.getParent() instanceof ReplaceAreaStartOrOffStatementContext)) {
       currentTextReplaceData.getRange(extendedDocument.getUri()).setStart(new Position(ctx.getStop().getLine() - 1, ctx.getStop().getCharPositionInLine()));
       replacingService
           .retrievePseudoTextReplacingPattern(ReplacementHelper.createClause(ctx), retrieveLocality(ctx))
@@ -87,10 +88,6 @@ public class ReplacePreProcessorListener extends CobolPreprocessorBaseListener {
     }
   }
 
-  @Override
-  public void enterReplaceOffStatement(ReplaceOffStatementContext ctx) {
-    restartReplace(ctx.getStart());
-  }
 
   private void replace() {
     hierarchy.replaceText(extendedDocument, replacingService::applyReplacing);
@@ -125,5 +122,4 @@ public class ReplacePreProcessorListener extends CobolPreprocessorBaseListener {
       range.setEnd(new Position(start.getLine(), start.getCharPositionInLine()));
     }
   }
-
 }
