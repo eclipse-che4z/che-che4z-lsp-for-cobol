@@ -31,6 +31,6 @@ class IdmsDialectTest {
   void testKeywords() {
     IdmsDialect dialect = new IdmsDialect(mock(CopybookService.class), mock(MessageService.class));
     Map<String, String> result = dialect.getKeywords();
-    assertEquals(46, result.size());
+    assertEquals(47, result.size());
   }
 }
