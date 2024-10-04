@@ -47,6 +47,7 @@ import {
 } from "./ProcessorGroups";
 import { getVariablesFromUri, SupportedVariables } from "./util/FSUtils";
 import { SettingsUtils } from "./util/SettingsUtils";
+import { Snippet } from "./snippetcompletion/SnippetCompletionProvider";
 
 export class TabRule {
   // tslint:disable-next-line:no-unnecessary-initializer
@@ -279,14 +280,12 @@ export class SettingsService {
   }
 
   /**
-   * Return the dialect type supplied by user
+   * Return map of snippets loaded from the `cobolSnippets.json` file.
    * @returns Map of snippets
    */
-  public static async getSnippetsForCobol(): Promise<Map<any, any>> {
-    const map: Map<any, any> = new Map<any, any>([
-      ...Object.entries(cobolSnippets),
-    ]);
-    return map;
+  public static async getSnippetsForCobol() {
+    const snippets: Record<string, Snippet> = cobolSnippets;
+    return new Map(Object.entries(snippets));
   }
 
   /**

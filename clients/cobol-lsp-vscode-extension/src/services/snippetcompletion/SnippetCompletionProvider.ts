@@ -17,7 +17,13 @@ import { DialectRegistry } from "../DialectRegistry";
 import { SettingsService } from "../Settings";
 import { readFileSync } from "node:fs";
 
-const SNIPPETS: Map<string, Map<any, any>> = new Map();
+export interface Snippet {
+  prefix: string | string[];
+  body: string | string[];
+  description?: string;
+}
+
+const SNIPPETS: Map<string, Map<string, Snippet>> = new Map();
 
 export class SnippetCompletionProvider
   implements vscode.CompletionItemProvider
@@ -35,7 +41,7 @@ export class SnippetCompletionProvider
     const wordsUptoCursor = fetchWordsList(textUptoCursor);
 
     this.resetList();
-    const snippets: Map<any, any> = await getSnippets();
+    const snippets = await getSnippets();
     snippets.forEach((value, key) => {
       const prefixList: string[] = fetchWordsList(value.prefix);
       const matchedWords = getMatchedWords(prefixList, wordsUptoCursor);
@@ -61,7 +67,7 @@ export class SnippetCompletionProvider
   }
 }
 
-async function getSnippets(): Promise<Map<any, any>> {
+async function getSnippets() {
   const map = await SettingsService.getSnippetsForCobol();
   const dialectList = SettingsService.getDialects()!;
   const registeredDialects = DialectRegistry.getDialects();
@@ -69,7 +75,7 @@ async function getSnippets(): Promise<Map<any, any>> {
     .filter((d) => dialectList.includes(d.name))
     .forEach((d) => {
       const snippets = importSnippet(d.snippetPath);
-      if (snippets !== undefined) {
+      if (snippets) {
         Object.entries(snippets).forEach((value) =>
           map.set(value[0], value[1]),
         );
@@ -79,9 +85,9 @@ async function getSnippets(): Promise<Map<any, any>> {
   return map;
 }
 
-function importSnippet(snippetPath: string): Map<any, any> | undefined {
+function importSnippet(snippetPath: string) {
   let result = SNIPPETS.get(snippetPath);
-  if (result === undefined) {
+  if (!result) {
     try {
       const json = readFileSync(snippetPath, "utf-8");
       const snippet = JSON.parse(json);
@@ -123,10 +129,22 @@ function createCompletionItem(
   return completionItem;
 }
 
-function fetchWordsList(text: string) {
-  const wordsList = text.split(/(\s+)/).filter(function (e) {
-    return e.trim().length > 0;
+function fetchWordsList(text: string | string[]) {
+  const wordsList: string[] = [];
+  let texts: string[];
+  if (Array.isArray(text)) {
+    texts = text;
+  } else {
+    texts = [text];
+  }
+  texts.forEach((text) => {
+    wordsList.push(
+      ...text.split(/(\s+)/).filter(function (e) {
+        return e.trim().length > 0;
+      }),
+    );
   });
+
   return wordsList;
 }
 
@@ -160,30 +178,46 @@ function formatString(arg: string) {
 
 export async function pickSnippet() {
   try {
-    const editor = vscode.window.activeTextEditor!;
-    const snippetList: { detail: string; label: string }[] = [];
-    const mapKeyForSelectedSnippet = new Map<string, any>();
-    const snippetMapsFromSettings = await getSnippets();
+    const editor = vscode.window.activeTextEditor;
+    const snippetList: vscode.QuickPickItem[] = [];
+    const prefixToKeyMap = new Map<string, string>();
+    const snippets = await getSnippets();
     const input = vscode.window.createQuickPick<vscode.QuickPickItem>();
     input.matchOnDetail = true;
     input.matchOnDescription = true;
     input.placeholder = "Type to search snippet";
     // Create the snippets list using settings for dialect
-    snippetMapsFromSettings.forEach((value, key) => {
-      // Also store the key as we are aligining the view with VSCode snippet
-      mapKeyForSelectedSnippet.set(value.prefix, key);
-      snippetList.push({
-        detail: value.description,
-        label: value.prefix,
-      });
+    snippets.forEach((snippet, key) => {
+      let prefixes: string[];
+      if (Array.isArray(snippet.prefix)) {
+        prefixes = snippet.prefix;
+      } else {
+        prefixes = [snippet.prefix];
+      }
+
+      for (const prefix in prefixes) {
+        // Also store the key as we are aligning the view with VSCode snippet
+        prefixToKeyMap.set(prefix, key);
+        snippetList.push({
+          detail: snippet.description,
+          label: prefix,
+        });
+      }
+
       input.items = snippetList;
     });
     input.onDidChangeSelection((items) => {
       const item = items[0];
-      const getKey = mapKeyForSelectedSnippet.get(item.label);
-      const snippetString = snippetMapsFromSettings.get(getKey);
-      const snippet = new vscode.SnippetString(snippetString.body.join("\n"));
-      editor.insertSnippet(snippet);
+      const getKey = prefixToKeyMap.get(item.label);
+      if (getKey) {
+        const snippetString = snippets.get(getKey);
+        const snippet = new vscode.SnippetString(
+          Array.isArray(snippetString?.body)
+            ? snippetString?.body.join("\n")
+            : snippetString?.body,
+        );
+        editor?.insertSnippet(snippet);
+      }
     });
     input.show();
   } catch (error) {
