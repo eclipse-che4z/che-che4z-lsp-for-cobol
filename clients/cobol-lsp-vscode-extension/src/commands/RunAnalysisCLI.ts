@@ -253,9 +253,8 @@ export class RunAnalysis {
         "tempAnalysisFiles",
       );
       await vscode.workspace.fs.createDirectory(tempFolderUri);
-      const tempFolderResult = await vscode.workspace.fs.readDirectory(
-        tempFolderUri,
-      );
+      const tempFolderResult =
+        await vscode.workspace.fs.readDirectory(tempFolderUri);
       await Promise.all(
         tempFolderResult.map(async (value) => {
           await vscode.workspace.fs.delete(
