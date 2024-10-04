@@ -19,6 +19,7 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
+import org.eclipse.lsp.cobol.implicitDialects.cics.CICSLexer;
 import org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser;
 
 import java.util.HashMap;
@@ -32,21 +33,21 @@ import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_g
 public class CICSGetnextOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     public static final int RULE_INDEX = RULE_cics_getnext;
 
-    private static final Map<String, ErrorSeverity> DUPLICATE_CHECK_OPTIONS = new HashMap<String, ErrorSeverity>() {
+    private static final Map<Integer, ErrorSeverity> DUPLICATE_CHECK_OPTIONS = new HashMap<Integer, ErrorSeverity>() {
         {
-            put("ACTIVITY", ErrorSeverity.ERROR);
-            put("ACTIVITYID", ErrorSeverity.ERROR);
-            put("LEVEL", ErrorSeverity.ERROR);
-            put("CONTAINER", ErrorSeverity.ERROR);
-            put("COMPOSITE", ErrorSeverity.ERROR);
-            put("TIMER", ErrorSeverity.ERROR);
-            put("EVENT", ErrorSeverity.ERROR);
-            put("ABSTIME", ErrorSeverity.ERROR);
-            put("BROWSETOKEN", ErrorSeverity.ERROR);
-            put("EVENTTYPE", ErrorSeverity.ERROR);
-            put("FIRESTATUS", ErrorSeverity.ERROR);
-            put("PREDICATE", ErrorSeverity.ERROR);
-            put("STATUS", ErrorSeverity.ERROR);
+            put(CICSLexer.ACTIVITY, ErrorSeverity.ERROR);
+            put(CICSLexer.ACTIVITYID, ErrorSeverity.ERROR);
+            put(CICSLexer.LEVEL, ErrorSeverity.ERROR);
+            put(CICSLexer.CONTAINER, ErrorSeverity.ERROR);
+            put(CICSLexer.COMPOSITE, ErrorSeverity.ERROR);
+            put(CICSLexer.TIMER, ErrorSeverity.ERROR);
+            put(CICSLexer.EVENT, ErrorSeverity.ERROR);
+            put(CICSLexer.ABSTIME, ErrorSeverity.ERROR);
+            put(CICSLexer.BROWSETOKEN, ErrorSeverity.ERROR);
+            put(CICSLexer.EVENTTYPE, ErrorSeverity.ERROR);
+            put(CICSLexer.FIRESTATUS, ErrorSeverity.ERROR);
+            put(CICSLexer.PREDICATE, ErrorSeverity.ERROR);
+            put(CICSLexer.STATUS, ErrorSeverity.ERROR);
         }
     };
 
