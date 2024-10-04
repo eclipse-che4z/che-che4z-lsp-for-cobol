@@ -15,15 +15,21 @@
 package org.eclipse.lsp.cobol.implicitDialects.sql;
 
 import com.google.common.collect.ImmutableList;
+
 import java.util.List;
+import java.util.Optional;
+
 import lombok.experimental.UtilityClass;
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.tree.ParseTree;
+import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.mapping.OriginalLocation;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.model.tree.variable.QualifiedReferenceNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableUsageNode;
+import org.eclipse.lsp.cobol.implicitDialects.sql.node.ExecSqlWheneverNode;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
@@ -149,5 +155,27 @@ class Db2SqlVisitorHelper {
                       position.getCharacter());
     }
     return end;
+  }
+
+  public static ExecSqlWheneverNode.WheneverConditionType getConditionType(Db2SqlParser.Dbs_wheneverContext ctx) {
+    if (ctx.SQLERROR() != null)
+      return ExecSqlWheneverNode.WheneverConditionType.SQLERROR;
+    else if (ctx.SQLWARNING() != null)
+      return ExecSqlWheneverNode.WheneverConditionType.SQLWARNING;
+    else
+      return ExecSqlWheneverNode.WheneverConditionType.NOT_FOUND;
+  }
+
+  public static Pair<ExecSqlWheneverNode.WheneverType, String> getWheneverType(Db2SqlParser.Dbs_wheneverContext ctx) {
+    if (ctx.CONTINUE() != null) {
+      return Pair.of(ExecSqlWheneverNode.WheneverType.CONTINUE, null);
+    }
+    return Optional.ofNullable(ctx.dbs_host_name_container())
+        .map(c -> c.dbs_host_names())
+        .filter(hn -> !hn.isEmpty())
+        .map(c -> c.get(0))
+        .map(ParseTree::getText)
+        .map(t -> Pair.of(ExecSqlWheneverNode.WheneverType.GOTO, t))
+        .orElse(Pair.of(ExecSqlWheneverNode.WheneverType.CONTINUE, null));
   }
 }
