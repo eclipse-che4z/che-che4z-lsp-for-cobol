@@ -626,7 +626,6 @@
     "decache": "^4.6.1",
     "esbuild": "^0.20.2",
     "eslint": "^9.11.1",
-    "eslint-plugin-sonarjs": "^0.15.0",
     "fs-extra": "10.1.0",
     "globals": "^15.10.0",
     "jest": "^29.0.3",
@@ -637,7 +636,6 @@
     "patch-package": "^6.4.7",
     "prettier": "2.8.7",
     "ts-jest": "^29.0.1",
-    "tslint": "^5.18.0",
     "typescript": "^4.9.4",
     "typescript-eslint": "^8.8.0"
   },
