@@ -21,7 +21,6 @@ import com.google.common.collect.ImmutableList;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Objects;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -408,8 +407,8 @@ class Db2SqlVisitor extends Db2SqlParserBaseVisitor<List<Node>> {
 
     @Override
     public List<Node> visitDbs_whenever(Db2SqlParser.Dbs_wheneverContext ctx) {
-      ExecSqlWheneverNode.WheneverConditionType conditionType = getConditionType(ctx);
-      Pair<ExecSqlWheneverNode.WheneverType, String> result = getWheneverType(ctx);
+      ExecSqlWheneverNode.WheneverConditionType conditionType = Db2SqlVisitorHelper.getConditionType(ctx);
+      Pair<ExecSqlWheneverNode.WheneverType, String> result = Db2SqlVisitorHelper.getWheneverType(ctx);
 
       return addTreeNode(ctx, location -> new ExecSqlWheneverNode(location,
           conditionType,
@@ -557,51 +556,5 @@ class Db2SqlVisitor extends Db2SqlParserBaseVisitor<List<Node>> {
         String finalName = name;
         return addTreeNode(ctx, locality -> new VariableUsageNode(finalName, locality));
     }
-
-    private ExecSqlWheneverNode.WheneverConditionType getConditionType(Db2SqlParser.Dbs_wheneverContext ctx) {
-        ParserRuleContext ruleContext = ((ParserRuleContext) ctx);
-        ExecSqlWheneverNode.WheneverConditionType conditionType = ExecSqlWheneverNode.WheneverConditionType.NOT_FOUND;
-
-
-        if (ruleContext.getChildCount() >= 3) {
-            ParseTree pt = ruleContext.getChild(1);
-            String value = pt.getText().trim().toUpperCase();
-
-            if (Objects.equals(value, "SQLERROR")) {
-                conditionType = ExecSqlWheneverNode.WheneverConditionType.SQLERROR;
-            } else if (Objects.equals(value, "SQLWARNING")) {
-                conditionType = ExecSqlWheneverNode.WheneverConditionType.SQLWARNING;
-            }
-        }
-        return conditionType;
-    }
-
-    private Pair<ExecSqlWheneverNode.WheneverType, String> getWheneverType(Db2SqlParser.Dbs_wheneverContext ctx) {
-        ParserRuleContext ruleContext = ((ParserRuleContext) ctx);
-        Pair<ExecSqlWheneverNode.WheneverType, String> result = Pair.of(ExecSqlWheneverNode.WheneverType.CONTINUE, null);
-
-        if (ruleContext.getChildCount() > 3) {
-
-            int index = 2;
-            ParseTree pt = ruleContext.getChild(index);
-            String value = pt.getText().trim().toUpperCase();
-            if (Objects.equals(value, "FOUND")) {
-                index = 3;
-                pt = ruleContext.getChild(index);
-                value = pt.getText().trim().toUpperCase();
-            }
-
-            if (Objects.equals(value, "DO")) {
-                result = Pair.of(ExecSqlWheneverNode.WheneverType.DO, ruleContext.getChild(index + 1).getText());
-            } else if (Objects.equals(value, "GO")) {
-                if (ruleContext.getChildCount() > index + 2) {
-                    result = Pair.of(ExecSqlWheneverNode.WheneverType.GOTO, ruleContext.getChild(index + 2).getText());
-                }
-            } else if (Objects.equals(value, "GOTO")) {
-                result = Pair.of(ExecSqlWheneverNode.WheneverType.GOTO, ruleContext.getChild(index + 1).getText());
-            }
-        }
-        return result;
-    }
-  }
+ }
 

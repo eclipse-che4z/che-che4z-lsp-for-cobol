@@ -166,50 +166,30 @@ cics_send_terminal: (TERMINAL | WAIT | LAST)+;
 cics_send_autopage: AUTOPAGE (CURRENT | ALL)?;
 
 /** CONVERSE: */
-cics_converse: CONVERSE (cics_converse_appc | cics_converse_lu23_3270 | cics_converse_lu61 | cics_converse_mro | cics_cnv_group);
+cics_converse: CONVERSE (cics_converse_group_one | cics_converse_group_two);
 
-cics_cnv_group: cics_converse_from_into_to (cics_converse_default | cics_converse_lu4 | cics_converse_scs |
-                cics_converse_3601 | cics_converse_3614_3653_3767 | cics_converse_3650int_3770 |
-                cics_converse_3650_3270 | cics_converse_3680_3790F | cics_converse_3790_3270 | cics_converse_2260);
-cics_converse_default: (cics_maxlength | NOTRUNCATE | cics_handle_response)+;
-cics_converse_lu4:  (DEFRESP | cics_maxlength | FMH | NOTRUNCATE | cics_handle_response)+;
-cics_converse_scs:   (cics_maxlength | DEFRESP | STRFIELD | NOTRUNCATE | cics_handle_response)+;
-cics_converse_3601:  (LDC cics_name | FMH | DEFRESP | cics_maxlength | NOTRUNCATE | cics_handle_response)+;
-cics_converse_3614_3653_3767:   (DEFRESP | cics_maxlength | NOTRUNCATE | cics_handle_response)+;
-cics_converse_3650int_3770:   (DEFRESP | FMH | cics_maxlength | NOTRUNCATE | cics_handle_response)+;
-cics_converse_3650_3270:   (CTLCHAR cics_data_value | cics_converse_erase | DEFRESP | FMH | cics_maxlength | NOTRUNCATE | cics_handle_response)+;
-cics_converse_3680_3790F:   (FMH | DEFRESP | cics_maxlength | NOTRUNCATE | cics_handle_response)+;
-cics_converse_3790_3270:   (DEFRESP | CTLCHAR cics_data_value | cics_converse_erase2 | cics_handle_response)+;
-cics_converse_2260:  cics_converse_default (CTLCHAR cics_data_value | LINEADDR cics_data_value | LEAVEKB | cics_handle_response)*;
+// CONVERSE Group 1: Default zOS, Lu4, SCS,Lu23, 3270/3601/3614/3653/3767/3650/3770/3650_int/3270/3680/3790/3270disp/2260
+cics_converse_group_one:  (cics_converse_from | cics_into | cics_converse_to | cics_maxlength | NOTRUNCATE | DEFRESP | STRFIELD | ((CTLCHAR | LINEADDR) cics_data_value) | LDC cics_name | FMH | LEAVEKB | cics_converse_erase | ASIS | cics_handle_response)+ ;
 
-cics_converse_appc:  (CONVID cics_name | cics_converse_from_into_to | cics_converse_default | STATE cics_cvda | cics_handle_response)+;
-cics_converse_lu23_3270:  cics_converse_from_into (cics_converse_erase | CTLCHAR cics_data_value | STRFIELD |
-                          TOLENGTH cics_data_area | TOFLENGTH cics_data_area | cics_maxlength | DEFRESP | NOTRUNCATE |
-                          ASIS | cics_handle_response)*;
-cics_converse_lu61:  (cics_converse_from61 | CONVID cics_name | SESSION cics_name | ATTACHID cics_name | cics_into |
-                     TOLENGTH cics_data_area | TOFLENGTH cics_data_area | cics_maxlength | NOTRUNCATE | DEFRESP | cics_handle_response)+;
-cics_converse_mro:  (CONVID cics_name | SESSION cics_name | ATTACHID cics_name | cics_converse_from61 |
-                    TOLENGTH cics_data_area | TOFLENGTH cics_data_area | cics_maxlength | NOTRUNCATE | DEFRESP |
-                    STATE cics_cvda | cics_handle_response)+;
+// CONVERSE Group 2: APPC, LU61, MRO
+cics_converse_group_two: (cics_into | cics_converse_to | cics_converse_from | cics_maxlength | ((CONVID | SESSION | ATTACHID) cics_name) | NOTRUNCATE | STATE cics_cvda | DEFRESP | FMH | cics_handle_response)+;
 
 cics_converse_erase: ERASE (DEFAULT | ALTERNATE)?;
-cics_converse_erase2: (cics_converse_erase | cics_maxlength | NOTRUNCATE | cics_handle_response)+;
-
-cics_converse_from: (FROM cics_data_area | FROMLENGTH cics_data_value | FROMFLENGTH cics_data_value | cics_handle_response)+;
-cics_converse_from61: (cics_converse_from | FMH)+;
-
-cics_into: (INTO cics_data_area | SET cics_ref) cics_handle_response?;
-cics_converse_from_into: cics_converse_from cics_into;
-cics_converse_from_into_to: cics_converse_from_into (TOLENGTH cics_data_area | TOFLENGTH cics_data_area) cics_handle_response?;
-cics_maxlength: MAXLENGTH cics_data_value | MAXFLENGTH cics_data_value;
+cics_converse_from: (FROM cics_data_area | ((FROMLENGTH | FROMFLENGTH) cics_data_value))+;
+cics_into: (INTO cics_data_area | SET cics_ref);
+cics_converse_to: (TOLENGTH | TOFLENGTH) cics_data_area;
+cics_maxlength: ((MAXLENGTH | MAXFLENGTH) cics_data_value);
 
 
 /** ABEND: */
 cics_abend: ABEND (ABCODE cics_name | CANCEL | NODUMP | cics_handle_response)*;
 
 /** ACQUIRE */
-cics_acquire: PROCESS cics_data_value (PROCESSTYPE cics_data_value |
-              ACTIVITYID cics_data_value | cics_handle_response?);
+cics_acquire:ACQUIRE (cics_acquire_process | cics_acquire_activityId ) ;
+
+cics_acquire_process: ((PROCESS | PROCESSTYPE) cics_data_value | cics_handle_response)+;
+
+cics_acquire_activityId: (ACTIVITYID cics_data_value | cics_handle_response)+;
 
 /** ADD SUBEVENT */
 cics_add: ADD (SUBEVENT cics_data_value | EVENT cics_data_value | cics_handle_response)+;
@@ -274,9 +254,9 @@ cics_build: BUILD ATTACH (ATTACHID cics_name | PROCESS cics_name | RESOURCE cics
             RECFM cics_data_value | cics_handle_response)+;
 
 /** CANCEL (both of them) */
-cics_cancel: CANCEL (ACTIVITY cics_data_value | ACQACTIVITY | ACQPROCESS | cics_cancel_reqid | cics_handle_response)*;
-cics_cancel_reqid: REQID cics_name (SYSID cics_data_area |
-                   TRANSID cics_name | cics_handle_response)*;
+cics_cancel: CANCEL (cics_cancel_bts | cics_cancel_reqid);
+cics_cancel_bts: (ACTIVITY cics_data_value | ACQACTIVITY | ACQPROCESS) cics_handle_response?;
+cics_cancel_reqid: REQID cics_name (SYSID cics_data_area | TRANSID cics_name | cics_handle_response)*;
 
 /** CHANGE PHRASE / PASSWORD / TASK */
 cics_change: CHANGE (cics_change_phrase | cics_change_password);
@@ -792,12 +772,16 @@ cics_verify: VERIFY (PASSWORD cics_data_value | PHRASE cics_data_area PHRASELEN 
              EXPIRYTIME cics_data_area | INVALIDCOUNT cics_data_area | LASTUSETIME cics_data_area | cics_handle_response)+;
 
 /** WAIT CONVID / EVENT / EXTERNAL / JOURNALNAME / JOURNALNUM / SIGNAL / TERMINAL */
-cics_wait: WAIT (CONVID cics_name | STATE cics_cvda | EVENT | ECADDR cics_value | NAME cics_name | EXTERNAL | ECBLIST cics_value |
-           NUMEVENTS cics_data_value | PURGEABLE | BURGEABILITY cics_cvda | NOTPURGEABLE | NAME cics_name | JOURNALNAME cics_data_value |
-           REQID cics_data_value | SIGNAL | TERMINAL | CONVID cics_name | SESSION cics_name | cics_handle_response)+;
+cics_wait: WAIT (cics_wait_convid | cics_wait_event | cics_wait_external | cics_wait_journalname | cics_wait_signal | cics_wait_terminal)+;
+cics_wait_convid: (CONVID cics_name | STATE cics_cvda | cics_handle_response)+;
+cics_wait_event: (EVENT | ECADDR cics_value | NAME cics_name | cics_handle_response)+;
+cics_wait_external: (EXTERNAL | (ECBLIST | NUMEVENTS) cics_value | PURGEABILITY cics_cvda | NAME cics_name | PURGEABLE | NOTPURGEABLE | cics_handle_response)+;
+cics_wait_journalname: ((JOURNALNAME | JOURNALNUM) cics_value | REQID cics_value | cics_handle_response)+;
+cics_wait_signal: (SIGNAL | cics_handle_response)+;
+cics_wait_terminal: (TERMINAL | (CONVID | SESSION) cics_name | cics_handle_response)+;
 
 /** WAITCICS */
-cics_waitcics: WAITCICS (ECBLIST cics_value | NUMEVENTS cics_data_value | PURGEABLE | BURGEABILITY cics_cvda |
+cics_waitcics: WAITCICS (ECBLIST cics_value | NUMEVENTS cics_data_value | PURGEABLE | PURGEABILITY cics_cvda |
                NOTPURGEABLE | NAME cics_name | cics_handle_response)+;
 
 /** WEB (all) */
@@ -961,7 +945,7 @@ cicsLexerDefinedVariableUsageTokens: ABCODE | ABDUMP | ABEND | ABORT | ABPROGRAM
     | ANYKEY | APLKYBD | APLTEXT | APPLID | AS | ASA | ASIS | ASKTIME | ASRAINTRPT | ASRAKEY | ASRAPSW | ASRAREGS | ASRASPC
     | ASRASTG | ASYNCHRONOUS | ATTACH | ATTACHID | ATTRIBUTES | AUTHENTICATE | AUTOPAGE | AUXILIARY | BASE64
     | BASICAUTH | BELOW | BIF | BODYCHARSET | BOOKMARK | BRDATA | BRDATALENGTH | BREXIT | BRIDGE | BROWSETOKEN
-    | BTRANS | BUFFER | BUILD | BURGEABILITY | CADDRLENGTH | CARD | CBUFF | CCSID | CERTIFICATE | CHANGE | CHANGETIME
+    | BTRANS | BUFFER | BUILD | CADDRLENGTH | CARD | CBUFF | CCSID | CERTIFICATE | CHANGE | CHANGETIME
     | CHANNEL | CHAR | CHARACTERSET | CHECK | CHUNKEND | CHUNKING | CHUNKNO | CHUNKYES | CICSDATAKEY | CIPHERS | CLEAR
     | CLICONVERT | CLIENT | CLIENTADDR | CLIENTADDRNU | CLIENTCONV | CLNTCODEPAGE | CLIENTNAME | CLNTADDR6NU | CLNTIPFAMILY
     | CLOSESTATUS | CLRPARTN | CMDSEC | CNAMELENGTH | CNOTCOMPL | CODEPAGE | COLOR | COMMAREA | COMMONNAME
@@ -1004,7 +988,7 @@ cicsLexerDefinedVariableUsageTokens: ABCODE | ABDUMP | ABEND | ABORT | ABPROGRAM
     | PF17 | PF18 | PF19 | PF2 | PF20 | PF21 | PF22 | PF23 | PF24 | PF3 | PF4 | PF5 | PF6 | PF7 | PF8 | PF9 | PFXLENG
     | PHRASE | PHRASELEN | PIPLENGTH | PIPLIST | POINT | POOL | POP | PORTNUMBER | PORTNUMNU | POST | PPT | PREDICATE
     | PREFIX | PREPARE | PRINCONVID | PRINSYSID | PRINT | PRIORITY | PRIVACY | PROCESS | PROCESSTYPE | PROCLENGTH
-    | PROCNAME | PROFILE | PROTECT | PS | PUNCH | PURGEABLE | PUSH | PUT | QNAME | QUERY | QUERYPARM | QUERYSTRING
+    | PROCNAME | PROFILE | PROTECT | PS | PUNCH | PURGEABILITY | PURGEABLE | PUSH | PUT | QNAME | QUERY | QUERYPARM | QUERYSTRING
     | QUERYSTRLEN | RBA | RBN | RDATT | READNEXT | READPREV | READQ | REATTACH | RECEIVER | RECFM | RECORDLEN
     | RECORDLENGTH | REDUCE | REFPARMS | REFPARMSLEN | RELATESINDEX | RELATESTYPE | RELATESURI | REMOVE | REPEATABLE
     | REPETABLE | REPLY | REPLYLENGTH | REQID | REQUESTTYPE | RESCLASS | RESETBR | RESID | RESIDLENGTH | RESOURCE

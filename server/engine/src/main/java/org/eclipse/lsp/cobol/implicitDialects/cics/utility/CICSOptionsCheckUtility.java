@@ -15,12 +15,12 @@
 
 package org.eclipse.lsp.cobol.implicitDialects.cics.utility;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.List;
 
 /** Manages traffic for CICS parser options checking */
 public class CICSOptionsCheckUtility {
@@ -34,7 +34,11 @@ public class CICSOptionsCheckUtility {
         CICSAllocateOptionsCheckUtility.RULE_INDEX,
         new CICSAllocateOptionsCheckUtility(context, errors));
     optionsMap.put(
-        CICSExtractOptionsUtility.RULE_INDEX, new CICSExtractOptionsUtility(context, errors));
+        CICSConverseOptionsCheckUtility.RULE_INDEX,
+        new CICSConverseOptionsCheckUtility(context, errors));
+    optionsMap.put(
+        CICSExtractOptionsUtility.RULE_INDEX,
+        new CICSExtractOptionsUtility(context, errors));
     optionsMap.put(
         CICSDefineOptionsCheckUtility.RULE_INDEX,
         new CICSDefineOptionsCheckUtility(context, errors));
@@ -42,6 +46,14 @@ public class CICSOptionsCheckUtility {
         CICSIssueOptionsCheckUtility.RULE_INDEX, new CICSIssueOptionsCheckUtility(context, errors));
     optionsMap.put(
         CICSStartbrowseOptionsCheckUtility.RULE_INDEX, new CICSStartbrowseOptionsCheckUtility(context, errors));
+    optionsMap.put(
+        CICSAcquireOptionsCheckUtility.RULE_INDEX,
+        new CICSAcquireOptionsCheckUtility(context, errors));
+    optionsMap.put(
+        CICSWaitOptionsCheckUtility.RULE_INDEX,
+        new CICSWaitOptionsCheckUtility(context, errors));
+    optionsMap.put(
+        CICSCancelOptionsCheckUtility.RULE_INDEX, new CICSCancelOptionsCheckUtility(context, errors));
 
   }
 
