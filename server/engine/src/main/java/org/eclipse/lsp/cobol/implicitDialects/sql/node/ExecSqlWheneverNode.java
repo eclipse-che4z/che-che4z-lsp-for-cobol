@@ -44,7 +44,6 @@ public class ExecSqlWheneverNode extends Node {
   public enum WheneverType {
     CONTINUE,
     GOTO,
-    DO
   }
 
   public ExecSqlWheneverNode(Locality location,
