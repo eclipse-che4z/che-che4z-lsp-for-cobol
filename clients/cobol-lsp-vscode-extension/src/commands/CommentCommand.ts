@@ -110,7 +110,7 @@ export class ToggleComments {
         return commentLine;
       case CommentAction.UNCOMMENT:
         return uncommentLine;
-      case CommentAction.TOGGLE:
+      case CommentAction.TOGGLE: {
         const allIsComment = textLines
           .map(getLineCommentStatus)
           .every(
@@ -120,6 +120,7 @@ export class ToggleComments {
               it === LineCommentStatus.FLOATING_COMMENT,
           );
         return allIsComment ? uncommentLine : commentLine;
+      }
     }
   }
 

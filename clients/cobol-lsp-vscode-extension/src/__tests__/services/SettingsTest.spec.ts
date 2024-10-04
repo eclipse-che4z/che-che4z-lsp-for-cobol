@@ -25,6 +25,7 @@ beforeAll(() => {
 
 // TODO: this is horrifying as well
 jest.mock("vscode", () => {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   const Uri = require("../../__mocks__/UriMock").Uri;
   return {
     Uri,
@@ -34,9 +35,7 @@ jest.mock("vscode", () => {
           throw { code: "FileNotFound" };
         }),
       },
-      getWorkspaceFolder: () => {
-        uri: new Uri("/c:/my/workspace");
-      },
+      getWorkspaceFolder: () => {},
     },
   };
 });
@@ -232,7 +231,7 @@ describe("SettingsService returns correct tab settings", () => {
 describe("SettingsService returns correct Copybook Configuration Values", () => {
   const mockConfigurationFetch = (settings: string, configuredValue: any) =>
     jest.fn().mockReturnValue({
-      get: (args: String) => {
+      get: (args: string) => {
         if (settings === args) {
           return configuredValue;
         }

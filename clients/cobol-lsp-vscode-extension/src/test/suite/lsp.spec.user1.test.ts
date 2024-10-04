@@ -17,7 +17,6 @@ import * as helper from "./testHelper";
 import { pos } from "./testHelper";
 import * as vscode from "vscode";
 
-const TEST_TIMEOUT = 30000;
 const WORKSPACE_FILE = "USER1.cbl";
 
 suite("Tests with USER1.cbl", function () {

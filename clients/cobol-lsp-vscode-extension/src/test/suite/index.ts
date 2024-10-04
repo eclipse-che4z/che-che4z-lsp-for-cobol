@@ -20,6 +20,7 @@ export async function run(): Promise<void> {
   const sourceRoot = path.join(__dirname, "..", "..");
 
   // initialize nyc code coverage
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   const NYC = require("nyc");
   const nyc = new NYC({
     cwd: path.join(sourceRoot, ".."),
@@ -29,7 +30,8 @@ export async function run(): Promise<void> {
   });
 
   // decache files on windows to be hookable by nyc
-  let decache = require("decache");
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const decache = require("decache");
   glob
     .sync("**/**.js", {
       cwd: sourceRoot,
