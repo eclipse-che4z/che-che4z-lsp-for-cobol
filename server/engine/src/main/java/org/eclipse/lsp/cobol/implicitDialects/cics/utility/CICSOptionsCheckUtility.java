@@ -49,7 +49,7 @@ public class CICSOptionsCheckUtility {
         CICSAcquireOptionsCheckUtility.RULE_INDEX,
         new CICSAcquireOptionsCheckUtility(context, errors));
     optionsMap.put(
-        CICSWaitOptionsCheckUtility.RULE_INDEX, 
+        CICSWaitOptionsCheckUtility.RULE_INDEX,
         new CICSWaitOptionsCheckUtility(context, errors));
   }
 
