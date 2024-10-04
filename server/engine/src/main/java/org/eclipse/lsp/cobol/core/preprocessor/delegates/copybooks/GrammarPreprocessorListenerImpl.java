@@ -183,21 +183,21 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   }
 
   @Override
-  public void enterReplaceAreaStart(ReplaceAreaStartContext ctx) {
+  public void enterReplaceAreaStartOrOffStatement(ReplaceAreaStartOrOffStatementContext ctx) {
     Locality locality = preprocessorService.retrieveLocality(ctx);
-    replacementContext = ctx.replacePseudoText().stream()
-        .map(ReplacementHelper::createClause)
-        .map(c -> replacingService.retrievePseudoTextReplacingPattern(c, locality))
-        .map(r -> r.unwrap(errors::addAll))
-        .map(r -> new ReplacementContext(r, locality))
-        .collect(Collectors.toList());
+    if (!ctx.replacePseudoText().isEmpty()) {
+      replacementContext = ctx.replacePseudoText().stream()
+              .map(ReplacementHelper::createClause)
+              .map(c -> replacingService.retrievePseudoTextReplacingPattern(c, locality))
+              .map(r -> r.unwrap(errors::addAll))
+              .map(r -> new ReplacementContext(r, locality))
+              .collect(Collectors.toList());
+    }
+
+    if (ctx.OFF() != null) {
+      replacementContext = null;
+    }
 
     preprocessorService.replaceWithSpaces(ctx);
-  }
-
-  @Override
-  public void enterReplaceOffStatement(ReplaceOffStatementContext ctx) {
-    preprocessorService.replaceWithSpaces(ctx);
-    replacementContext = null;
   }
 }
