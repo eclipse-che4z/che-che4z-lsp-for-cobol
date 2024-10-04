@@ -19,6 +19,7 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
+import org.eclipse.lsp.cobol.implicitDialects.cics.CICSLexer;
 import org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser;
 
 import java.util.HashMap;
@@ -32,18 +33,18 @@ public class CICSStartbrowseOptionsCheckUtility extends CICSOptionsCheckBaseUtil
 
     public static final int RULE_INDEX = RULE_cics_startbrowse;
 
-    private static final Map<String, ErrorSeverity> DUPLICATE_CHECK_OPTIONS = new HashMap<String, ErrorSeverity>() {
+    private static final Map<Integer, ErrorSeverity> DUPLICATE_CHECK_OPTIONS = new HashMap<Integer, ErrorSeverity>() {
         {
-            put("STARTBROWSE", ErrorSeverity.ERROR);
-            put("ACTIVITYID", ErrorSeverity.ERROR);
-            put("PROCESS", ErrorSeverity.ERROR);
-            put("PROCESSTYPE", ErrorSeverity.ERROR);
-            put("ACTIVITY", ErrorSeverity.ERROR);
-            put("BROWSETOKEN", ErrorSeverity.ERROR);
-            put("CONTAINER", ErrorSeverity.ERROR);
-            put("CHANNEL", ErrorSeverity.ERROR);
-            put("EVENT", ErrorSeverity.ERROR);
-            put("TIMER", ErrorSeverity.ERROR);
+            put(CICSLexer.STARTBROWSE, ErrorSeverity.ERROR);
+            put(CICSLexer.ACTIVITYID, ErrorSeverity.ERROR);
+            put(CICSLexer.PROCESS, ErrorSeverity.ERROR);
+            put(CICSLexer.PROCESSTYPE, ErrorSeverity.ERROR);
+            put(CICSLexer.ACTIVITY, ErrorSeverity.ERROR);
+            put(CICSLexer.BROWSETOKEN, ErrorSeverity.ERROR);
+            put(CICSLexer.CONTAINER, ErrorSeverity.ERROR);
+            put(CICSLexer.CHANNEL, ErrorSeverity.ERROR);
+            put(CICSLexer.EVENT, ErrorSeverity.ERROR);
+            put(CICSLexer.TIMER, ErrorSeverity.ERROR);
         }
     };
 
