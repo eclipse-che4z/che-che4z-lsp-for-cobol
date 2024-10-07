@@ -73,14 +73,21 @@ public class CICSReceiveOptionsCheckUtility extends CICSOptionsCheckBaseUtility 
    * @param <E> A subclass of ParserRuleContext
    */
   public <E extends ParserRuleContext> void checkOptions(E ctx) {
-    if (ctx.getClass() == CICSParser.Cics_receive_group_oneContext.class) {
-      checkGroupOne((CICSParser.Cics_receive_group_oneContext) ctx);
-    } else if (ctx.getClass() == CICSParser.Cics_receive_partnContext.class) {
-      checkPartn((CICSParser.Cics_receive_partnContext) ctx);
-    } else if (ctx.getClass() == CICSParser.Cics_receive_mapContext.class) {
-      checkMap((CICSParser.Cics_receive_mapContext) ctx);
-    } else if (ctx.getClass() == CICSParser.Cics_receive_map_mappingdevContext.class) {
-      checkMapMappingDev((CICSParser.Cics_receive_map_mappingdevContext) ctx);
+    switch (ctx.getRuleIndex()) {
+      case CICSParser.RULE_cics_receive_group_one:
+        checkGroupOne((CICSParser.Cics_receive_group_oneContext) ctx);
+        break;
+      case CICSParser.RULE_cics_receive_partn:
+        checkPartn((CICSParser.Cics_receive_partnContext) ctx);
+        break;
+      case CICSParser.RULE_cics_receive_map:
+        checkMap((CICSParser.Cics_receive_mapContext) ctx);
+        break;
+      case CICSParser.RULE_cics_receive_map_mappingdev:
+        checkMapMappingDev((CICSParser.Cics_receive_map_mappingdevContext) ctx);
+        break;
+      default:
+        break;
     }
     checkDuplicates(ctx);
   }
