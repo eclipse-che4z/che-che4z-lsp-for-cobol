@@ -35,7 +35,9 @@
     "commands": [],
     "grammars": [
       {
-        "injectTo": ["source.cobol"],
+        "injectTo": [
+          "source.cobol"
+        ],
         "scopeName": "daco.injection",
         "path": "./syntaxes/daco.injection.json"
       }

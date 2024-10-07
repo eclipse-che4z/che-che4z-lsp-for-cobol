@@ -41,7 +41,9 @@
     "commands": [],
     "grammars": [
       {
-        "injectTo": ["source.cobol"],
+        "injectTo": [
+          "source.cobol"
+        ],
         "scopeName": "idms.injection",
         "path": "./syntaxes/idms.injection.json"
       }
