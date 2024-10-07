@@ -11,6 +11,7 @@
  * Contributors:
  *   Broadcom, Inc. - initial API and implementation
  */
+import { Uri } from "../../__mocks__/UriMock";
 import * as path from "path";
 import * as vscode from "vscode";
 import { SettingsService } from "../../services/Settings";
@@ -25,8 +26,6 @@ beforeAll(() => {
 
 // TODO: this is horrifying as well
 jest.mock("vscode", () => {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const Uri = require("../../__mocks__/UriMock").Uri;
   return {
     Uri,
     workspace: {
