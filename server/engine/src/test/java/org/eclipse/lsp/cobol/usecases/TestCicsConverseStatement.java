@@ -69,6 +69,7 @@ public class TestCicsConverseStatement {
     private static final String DEFAULT_VALID_2 = CONVERSE_FROM_INTO_TO + "MAXLENGTH({$maxLen}) NOTRUNCATE";
     private static final String DEFAULT_INVAL_1 = CONVERSE_FROM_INTO_TO + "MAXLENGTH({$maxLen}) NOTRUNCATE {NOTRUNCATE|errorOne}";
     private static final String DEFAULT_INVAL_2 = "CONVERSE {MAXLENGTH(123) NOTRUNCATE|errorOne}";
+    private static final String DEFAULT_INVAL_3 = "CONVERSE FROM(123) {FROMLENGTH|errorOne}(123) {FROMFLENGTH|errorTwo}(123) MAXLENGTH({$maxLen})";
 
     private static final String APPC_VALID = CONVERSE + "CONVID({$convidVar}) " + FROM_INTO_TO + "MAXLENGTH({$maxLen}) STATE({$stateVar})";
     private static final String APPC_INVAL = CONVERSE + "CONVID({$convidVar}) " + FROM_INTO_TO + "MAXLENGTH({$maxLen}) STATE({$stateVar}) {CTLCHAR|errorOne}(123)";
@@ -144,6 +145,25 @@ public class TestCicsConverseStatement {
     @Test
     void testDefaultInvalid_2() {
         errorTest(DEFAULT_INVAL_2, "Missing required option: FROM");
+    }
+
+    @Test
+    void testDefaultInvalid_3() {
+        Map<String, Diagnostic> expectedDiagnostics = new HashMap<String, Diagnostic>();
+        expectedDiagnostics.put("errorOne",
+            new Diagnostic(
+                new Range(),
+                "Exactly one option required, options are mutually exclusive: FROMLENGTH or FROMFLENGTH",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()));
+        expectedDiagnostics.put("errorTwo",
+             new Diagnostic(
+                new Range(),
+                "Exactly one option required, options are mutually exclusive: FROMLENGTH or FROMFLENGTH",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()));
+
+        UseCaseEngine.runTest(getTestString(DEFAULT_INVAL_3), ImmutableList.of(), expectedDiagnostics);
     }
 
     @Test

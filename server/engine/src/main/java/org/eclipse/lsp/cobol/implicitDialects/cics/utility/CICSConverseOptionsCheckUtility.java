@@ -89,7 +89,8 @@ public class CICSConverseOptionsCheckUtility extends CICSOptionsCheckBaseUtility
     }
 
     private void checkGroupOne(CICSParser.Cics_converse_group_oneContext ctx) {
-        checkHasMandatoryOptions(ctx.cics_converse_from(), ctx, "FROM");
+        checkHasMandatoryOptions(ctx.FROM(), ctx, "FROM");
+        checkHasMutuallyExclusiveOptions("FROMLENGTH or FROMFLENGTH", ctx.FROMLENGTH(), ctx.FROMFLENGTH());
         if (!ctx.ASIS().isEmpty()) {
             checkHasIllegalOptions(ctx.LEAVEKB(), "LEAVEKB");
         }
@@ -98,7 +99,8 @@ public class CICSConverseOptionsCheckUtility extends CICSOptionsCheckBaseUtility
     }
 
     private void checkGroupTwo(CICSParser.Cics_converse_group_twoContext ctx) {
-        checkHasMandatoryOptions(ctx.cics_converse_from(), ctx, "FROM");
+        checkHasMandatoryOptions(ctx.FROM(), ctx, "FROM");
+        checkHasMutuallyExclusiveOptions("FROMLENGTH or FROMFLENGTH", ctx.FROMLENGTH(), ctx.FROMFLENGTH());
         checkHasMandatoryOptions(ctx.cics_into(), ctx, "INTO");
 
         checkDuplicates(ctx);
