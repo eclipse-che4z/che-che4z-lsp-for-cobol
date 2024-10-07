@@ -57,7 +57,7 @@ export class DownloadUtil {
     try {
       await vscode.workspace.fs.stat(vscode.Uri.file(path));
       return true; // Path exists
-    } catch (error) {
+    } catch (_error) {
       return false;
     }
   }

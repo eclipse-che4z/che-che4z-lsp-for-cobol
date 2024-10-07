@@ -15,7 +15,6 @@
 import { SettingsService } from "../Settings";
 import { searchCopybookInExtensionFolder } from "../util/FSUtils";
 import { CopybookURI } from "./CopybookURI";
-import { CopybookName } from "./CopybookDownloadService";
 import { Uri } from "vscode";
 
 enum CopybookFolderKind {

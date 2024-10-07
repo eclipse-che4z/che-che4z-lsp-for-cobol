@@ -15,7 +15,6 @@
 import * as path from "path";
 import * as vscode from "vscode";
 import { ProfileUtils } from "../../../services/util/ProfileUtils";
-import { Utils } from "../../../services/util/Utils";
 
 const getZoweExplorerMock = () => {
   return jest.fn().mockReturnValue({
