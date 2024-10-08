@@ -217,3 +217,15 @@ suite.skip("TF42379 COBOL LS F96588 - Insert code snippets", function () {
   });
   // .timeout(helper.TEST_TIMEOUT);
 });
+
+suite.only("Insert default COBOL code snippets", async () => {
+  test("Insert ADD snippet", async () => {
+    // workbench.action.showCommands
+    await helper.showDocument("SNIPPET.cbl");
+    const editor = helper.getEditor("SNIPPET.cbl");
+    await vscode.commands.executeCommand(
+      "workbench.action.showCommands",
+      editor.document.uri,
+    );
+  });
+});

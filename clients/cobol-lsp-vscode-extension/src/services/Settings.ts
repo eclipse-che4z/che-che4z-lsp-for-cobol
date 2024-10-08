@@ -34,7 +34,6 @@ import {
   COBOL_PRGM_LAYOUT,
   SETTINGS_CPY_NDVR_DEPENDENCIES,
 } from "../constants";
-import cobolSnippets = require("../services/snippetcompletion/cobolSnippets.json");
 import { DialectRegistry, DIALECT_REGISTRY_SECTION } from "./DialectRegistry";
 import {
   loadProcessorGroupCompileOptionsConfig,
@@ -47,7 +46,6 @@ import {
 } from "./ProcessorGroups";
 import { getVariablesFromUri, SupportedVariables } from "./util/FSUtils";
 import { SettingsUtils } from "./util/SettingsUtils";
-import { Snippet } from "./snippetcompletion/SnippetCompletionProvider";
 
 export class TabRule {
   // tslint:disable-next-line:no-unnecessary-initializer
@@ -277,15 +275,6 @@ export class SettingsService {
     return vscode.workspace
       .getConfiguration(SETTINGS_CPY_SECTION)
       .get("copybook-file-encoding");
-  }
-
-  /**
-   * Return map of snippets loaded from the `cobolSnippets.json` file.
-   * @returns Map of snippets
-   */
-  public static async getSnippetsForCobol() {
-    const snippets: Record<string, Snippet> = cobolSnippets;
-    return new Map(Object.entries(snippets));
   }
 
   /**

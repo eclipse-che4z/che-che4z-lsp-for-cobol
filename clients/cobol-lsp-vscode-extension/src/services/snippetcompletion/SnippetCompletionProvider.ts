@@ -15,14 +15,21 @@ import * as vscode from "vscode";
 import { LANGUAGE_ID } from "../../constants";
 import { DialectRegistry } from "../DialectRegistry";
 import { SettingsService } from "../Settings";
-import { readFileSync } from "node:fs";
+import { readFile } from "node:fs/promises";
+import cobolSnippets = require("./cobolSnippets.json");
+import * as t from "io-ts";
+import { isRight } from "fp-ts/Either";
 
-export interface Snippet {
-  prefix: string | string[];
-  body: string | string[];
-  description?: string;
-}
+const SnippetCodec = t.type({
+  prefix: t.string,
+  body: t.array(t.string),
+  description: t.union([t.string, t.undefined]),
+});
+type Snippet = t.TypeOf<typeof SnippetCodec>;
 
+const SnippetRecordCodec = t.record(t.string, SnippetCodec);
+
+const predefinedSnippets: Record<string, Snippet> = cobolSnippets;
 const SNIPPETS: Map<string, Map<string, Snippet>> = new Map();
 
 export class SnippetCompletionProvider
@@ -68,33 +75,43 @@ export class SnippetCompletionProvider
 }
 
 async function getSnippets() {
-  const map = await SettingsService.getSnippetsForCobol();
+  const map = new Map(Object.entries(predefinedSnippets));
   const dialectList = SettingsService.getDialects()!;
   const registeredDialects = DialectRegistry.getDialects();
-  registeredDialects
-    .filter((d) => dialectList.includes(d.name))
-    .forEach((d) => {
-      const snippets = importSnippet(d.snippetPath);
+  const activeDialects = registeredDialects.filter((d) =>
+    dialectList.includes(d.name),
+  );
+
+  await Promise.all(
+    activeDialects.map(async (d) => {
+      const snippets = await importSnippet(d.snippetPath);
       if (snippets) {
+        snippets.forEach((snippet, key) => {
+          map.set(key, snippet);
+        });
         Object.entries(snippets).forEach((value) =>
           map.set(value[0], value[1]),
         );
       }
-    });
+    }),
+  );
 
   return map;
 }
 
-function importSnippet(snippetPath: string) {
+async function importSnippet(snippetPath: string) {
   let result = SNIPPETS.get(snippetPath);
   if (!result) {
-    try {
-      const json = readFileSync(snippetPath, "utf-8");
-      const snippet = JSON.parse(json);
-      SNIPPETS.set(snippetPath, snippet);
-      result = snippet;
-    } catch (e) {
-      console.log(e);
+    const json = await readFile(snippetPath, "utf-8");
+    const decoded = SnippetRecordCodec.decode(JSON.parse(json));
+    if (isRight(decoded)) {
+      const snippetMap = new Map<string, Snippet>();
+      Object.entries(decoded.right).forEach((snippetRecord) => {
+        const [key, snippet] = snippetRecord;
+        snippetMap.set(key, snippet);
+      });
+      SNIPPETS.set(snippetPath, snippetMap);
+      result = snippetMap;
     }
   }
   return result;
@@ -129,23 +146,10 @@ function createCompletionItem(
   return completionItem;
 }
 
-function fetchWordsList(text: string | string[]) {
-  const wordsList: string[] = [];
-  let texts: string[];
-  if (Array.isArray(text)) {
-    texts = text;
-  } else {
-    texts = [text];
-  }
-  texts.forEach((text) => {
-    wordsList.push(
-      ...text.split(/(\s+)/).filter(function (e) {
-        return e.trim().length > 0;
-      }),
-    );
+function fetchWordsList(text: string) {
+  return text.split(/(\s+)/).filter((e) => {
+    return e.trim().length > 0;
   });
-
-  return wordsList;
 }
 
 function getCurrentLineText(
@@ -188,22 +192,12 @@ export async function pickSnippet() {
     input.placeholder = "Type to search snippet";
     // Create the snippets list using settings for dialect
     snippets.forEach((snippet, key) => {
-      let prefixes: string[];
-      if (Array.isArray(snippet.prefix)) {
-        prefixes = snippet.prefix;
-      } else {
-        prefixes = [snippet.prefix];
-      }
-
-      for (const prefix in prefixes) {
-        // Also store the key as we are aligning the view with VSCode snippet
-        prefixToKeyMap.set(prefix, key);
-        snippetList.push({
-          detail: snippet.description,
-          label: prefix,
-        });
-      }
-
+      // Also store the key as we are aligning the view with VSCode snippet
+      prefixToKeyMap.set(snippet.prefix, key);
+      snippetList.push({
+        detail: snippet.description,
+        label: snippet.prefix,
+      });
       input.items = snippetList;
     });
     input.onDidChangeSelection((items) => {
