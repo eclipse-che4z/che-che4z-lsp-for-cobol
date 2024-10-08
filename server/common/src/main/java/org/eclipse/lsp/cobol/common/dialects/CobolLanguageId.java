@@ -20,7 +20,6 @@ import java.util.stream.Collectors;
 /** Enum of supported Cobol language id's */
 public enum CobolLanguageId {
   COBOL("cobol", new CobolProgramLayout(6, 1, 4, 61, 8)),
-  EXPERIMENTAL_COBOL("expcobol", new CobolProgramLayout(6, 1, 4, 61, 8)),
   HP_COBOL("hpcobol", new CobolProgramLayout(0, 1, 4, 127, 0));
 
   private final CobolProgramLayout layout;

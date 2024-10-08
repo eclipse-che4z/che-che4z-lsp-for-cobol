@@ -48,20 +48,4 @@ class TestIndicatorAreaError {
                 new Range(), MESSAGE_2, DiagnosticSeverity.Error, ErrorSource.PARSING.getText())),
         CobolLanguageId.COBOL);
   }
-
-  @Test
-  void testHw() {
-    UseCaseEngine.runTest(
-        TEXT,
-        ImmutableList.of(),
-        ImmutableMap.of(
-            "1",
-            new Diagnostic(
-                new Range(), MESSAGE_1, DiagnosticSeverity.Error, ErrorSource.PREPROCESSING.getText()),
-            "2",
-            new Diagnostic(
-                new Range(), MESSAGE_2_HW, DiagnosticSeverity.Error, ErrorSource.PARSING.getText())),
-        CobolLanguageId.EXPERIMENTAL_COBOL);
-  }
-
 }
