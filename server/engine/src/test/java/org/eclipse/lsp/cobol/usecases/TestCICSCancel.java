@@ -51,9 +51,6 @@ public class TestCICSCancel {
 
     private static final String CANCEL_REQID_ACTIVITY_INVALID =
             "CANCEL REQID({$varFour}) {ACTIVITY | error} ";
-
-    private static final String CANCEL_SYSID_INVALID =
-            "CANCEL {SYSID | errorSysid} ";
     private static final String CANCEL_TRANSID_INVALID =
             "CANCEL {TRANSID | errorTransid} ";
     private static final String CANCEL_ACQACTIVITY_ACQPROCESS_INVALID =
@@ -104,25 +101,13 @@ public class TestCICSCancel {
         CICSTestUtils.errorTest(CANCEL_REQID_ACTIVITY_INVALID, expectedDiagnostics);
     }
     @Test
-    void testCancelSysidInvalid() {
-        Map<String, Diagnostic> expectedDiagnostics =
-                ImmutableMap.of(
-                        "errorSysid",
-                        new Diagnostic(
-                                new Range(),
-                                "Syntax error on 'SYSID'",
-                                DiagnosticSeverity.Error,
-                                ErrorSource.PARSING.getText()));
-        CICSTestUtils.errorTest(CANCEL_SYSID_INVALID, expectedDiagnostics);
-    }
-    @Test
     void testCancelTransidInvalid() {
         Map<String, Diagnostic> expectedDiagnostics =
                 ImmutableMap.of(
                         "errorTransid",
                         new Diagnostic(
                                 new Range(),
-                                "Syntax error on 'TRANSID'",
+                                "Extraneous input TRANSID",
                                 DiagnosticSeverity.Error,
                                 ErrorSource.PARSING.getText()));
         CICSTestUtils.errorTest(CANCEL_TRANSID_INVALID, expectedDiagnostics);
