@@ -19,6 +19,7 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
+import org.eclipse.lsp.cobol.implicitDialects.cics.CICSLexer;
 import org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser;
 
 import java.util.HashMap;
@@ -32,22 +33,22 @@ public class CICSAllocateOptionsCheckUtility extends CICSOptionsCheckBaseUtility
 
   public static final int RULE_INDEX = RULE_cics_allocate;
 
-  private static final Map<String, ErrorSeverity> DUPLICATE_CHECK_OPTIONS =
-      new HashMap<String, ErrorSeverity>() {
+  private static final Map<Integer, ErrorSeverity> DUPLICATE_CHECK_OPTIONS =
+      new HashMap<Integer, ErrorSeverity>() {
         {
-          put("ALLOCATE", ErrorSeverity.ERROR);
-          put("SYSID", ErrorSeverity.ERROR);
-          put("PROFILE", ErrorSeverity.ERROR);
-          put("STATE", ErrorSeverity.ERROR);
-          put("SESSION", ErrorSeverity.ERROR);
-          put("PARTNER", ErrorSeverity.ERROR);
-          put("ASIS", ErrorSeverity.WARNING);
-          put("BUFFER", ErrorSeverity.WARNING);
-          put("LEAVEKB", ErrorSeverity.WARNING);
-          put("NOTRUNCATE", ErrorSeverity.WARNING);
-          put("NOQUEUE", ErrorSeverity.WARNING);
-          put("NOTRUNCATE", ErrorSeverity.WARNING);
-          put("TERMINAL", ErrorSeverity.WARNING);
+          put(CICSLexer.ALLOCATE, ErrorSeverity.ERROR);
+          put(CICSLexer.SYSID, ErrorSeverity.ERROR);
+          put(CICSLexer.PROFILE, ErrorSeverity.ERROR);
+          put(CICSLexer.STATE, ErrorSeverity.ERROR);
+          put(CICSLexer.SESSION, ErrorSeverity.ERROR);
+          put(CICSLexer.PARTNER, ErrorSeverity.ERROR);
+          put(CICSLexer.ASIS, ErrorSeverity.WARNING);
+          put(CICSLexer.BUFFER, ErrorSeverity.WARNING);
+          put(CICSLexer.LEAVEKB, ErrorSeverity.WARNING);
+          put(CICSLexer.NOTRUNCATE, ErrorSeverity.WARNING);
+          put(CICSLexer.NOQUEUE, ErrorSeverity.WARNING);
+          put(CICSLexer.NOTRUNCATE, ErrorSeverity.WARNING);
+          put(CICSLexer.TERMINAL, ErrorSeverity.WARNING);
         }
       };
 
@@ -63,12 +64,18 @@ public class CICSAllocateOptionsCheckUtility extends CICSOptionsCheckBaseUtility
    * @param <E> A subclass of ParserRuleContext
    */
   public <E extends ParserRuleContext> void checkOptions(E ctx) {
-    if (ctx.getClass() == CICSParser.Cics_allocate_appc_partnerContext.class) {
-      checkAppcPartner((CICSParser.Cics_allocate_appc_partnerContext) ctx);
-    } else if (ctx.getClass() == CICSParser.Cics_allocate_appc_mro_lut61_sysidContext.class) {
-      checkAppcMroLut61Sysid((CICSParser.Cics_allocate_appc_mro_lut61_sysidContext) ctx);
-    } else if (ctx.getClass() == CICSParser.Cics_allocate_lut61_sessionContext.class) {
-      checkLut61Session((CICSParser.Cics_allocate_lut61_sessionContext) ctx);
+    switch (ctx.getRuleIndex()) {
+      case CICSParser.RULE_cics_allocate_appc_partner:
+        checkAppcPartner((CICSParser.Cics_allocate_appc_partnerContext) ctx);
+        break;
+      case CICSParser.RULE_cics_allocate_appc_mro_lut61_sysid:
+        checkAppcMroLut61Sysid((CICSParser.Cics_allocate_appc_mro_lut61_sysidContext) ctx);
+        break;
+      case CICSParser.RULE_cics_allocate_lut61_session:
+        checkLut61Session((CICSParser.Cics_allocate_lut61_sessionContext) ctx);
+        break;
+      default:
+        break;
     }
     checkDuplicates(ctx);
   }

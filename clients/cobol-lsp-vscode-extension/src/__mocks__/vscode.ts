@@ -14,7 +14,7 @@
 import path = require("path");
 import * as url from "url";
 
-// tslint:disable: no-namespace no-empty
+// eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace workspace {
   export const workspaceFolders: any[] = [{}];
   export function getConfiguration() {
@@ -26,11 +26,12 @@ export namespace workspace {
       },
     };
   }
-  export function createFileSystemWatcher(a: string) {}
+  export function createFileSystemWatcher() {}
 }
 
+// eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace extensions {
-  export function getExtension(id: string) {
+  export function getExtension() {
     return {
       extensionPath: path.join(__dirname, "../../"),
       packageJSON: {
@@ -40,13 +41,14 @@ export namespace extensions {
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace window {
-  export let showErrorMessage = () => {};
-  export let showInformationMessage = () => {};
-  export let createStatusBarItem = () => {
+  export const showErrorMessage = () => {};
+  export const showInformationMessage = () => {};
+  export const createStatusBarItem = () => {
     return { show: () => {} };
   };
-  export let createQuickPick = () => {
+  export const createQuickPick = () => {
     return { show: jest.fn() };
   };
 }
@@ -87,6 +89,7 @@ export const Position = jest.fn().mockImplementation((line, character) => {
   return { line: line, character: character };
 });
 
+// eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace commands {
   export const registerTextEditorCommand = jest.fn();
   export const executeCommand = jest.fn();

@@ -4,7 +4,7 @@
   "description": "Autocomplete, highlighting and diagnostics for COBOL code and copybooks.",
   "author": "Broadcom",
   "license": "EPL-2.0",
-  "version": "2.2.0",
+  "version": "2.3.0",
   "preview": false,
   "publisher": "BroadcomMFD",
   "engines": {
@@ -591,8 +591,11 @@
     "test:integration": "npm run compile && node ./out/test/runTest.js",
     "test:web": "npm run build:web && vscode-test-web --browserType=chromium --headless --extensionDevelopmentPath=. --extensionTestsPath=dist/web/test/suite/extensionTests.js",
     "compile": "tsc -p ./",
-    "lint": "prettier -c .",
-    "pretest": "npm run compile && npm run lint",
+    "lint-format": "prettier -c .",
+    "lint-quality": "eslint ./src",
+    "lint-fix": "eslint --fix ./src && prettier -w .",
+    "lint": "npm run lint-format && npm run lint-quality",
+    "pretest": "npm run compile",
     "pretty": "prettier -w .",
     "watch": "tsc -watch -p ./",
     "test": "jest -w 1 --unhandled-rejections=strict",
@@ -606,11 +609,12 @@
     "glob": "10.3.10",
     "iconv-lite": "^0.6.3",
     "io-ts": "2.2.21",
-    "micromatch": "^4.0.7",
+    "micromatch": "^4.0.8",
     "vscode-languageclient": "^8.1.0"
   },
   "devDependencies": {
     "@esbuild-plugins/node-globals-polyfill": "^0.2.3",
+    "@eslint/js": "^9.11.1",
     "@types/assert": "^1.5.10",
     "@types/fs-extra": "^9.0.13",
     "@types/jest": "^29.0.3",
@@ -624,8 +628,9 @@
     "assert": "^2.1.0",
     "decache": "^4.6.1",
     "esbuild": "^0.20.2",
-    "eslint-plugin-sonarjs": "^0.15.0",
+    "eslint": "^9.11.1",
     "fs-extra": "10.1.0",
+    "globals": "^15.10.0",
     "jest": "^29.0.3",
     "jest-jasmine2": "^29.0.3",
     "jest-sonar-reporter": "^2.0.0",
@@ -634,8 +639,8 @@
     "patch-package": "^6.4.7",
     "prettier": "2.8.7",
     "ts-jest": "^29.0.1",
-    "tslint": "^5.18.0",
-    "typescript": "^4.9.4"
+    "typescript": "^4.9.4",
+    "typescript-eslint": "^8.8.0"
   },
   "overrides": {
     "isexe": "^3.1.1"
