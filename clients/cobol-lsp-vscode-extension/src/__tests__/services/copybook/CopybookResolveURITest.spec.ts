@@ -13,7 +13,9 @@
  */
 jest.mock("glob");
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { globSync } from "glob";
+import { Uri } from "../../../__mocks__/UriMock";
 import * as fs from "fs-extra";
 import * as path from "path";
 import * as vscode from "vscode";
@@ -32,7 +34,6 @@ const RELATIVE_CPY_FOLDER_NAME = "../relativeCobcopy";
 const folderPath = path.join(__dirname, CPY_FOLDER_NAME);
 
 jest.mock("vscode", () => {
-  const Uri = require("../../../__mocks__/UriMock").Uri;
   const WS_URI = new Uri("/c:/my/workspace");
   return {
     Uri,

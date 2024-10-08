@@ -14,7 +14,6 @@
 import * as vscode from "vscode";
 import { getE4EAPI } from "../../../services/copybook/E4ECopybookService";
 import { e4eMock } from "../../../__mocks__/getE4EMock.utility";
-import { Utils } from "../../../services/util/Utils";
 import { E4E } from "../../../type/e4eApi";
 
 describe("e4e copybook service tests", () => {

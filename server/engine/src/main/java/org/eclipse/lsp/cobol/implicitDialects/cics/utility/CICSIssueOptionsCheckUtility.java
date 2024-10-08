@@ -19,6 +19,7 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
+import org.eclipse.lsp.cobol.implicitDialects.cics.CICSLexer;
 import org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser;
 
 import java.util.HashMap;
@@ -33,69 +34,69 @@ public class CICSIssueOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
 
   public static final int RULE_INDEX = RULE_cics_issue;
 
-  private static final Map<String, ErrorSeverity> DUPLICATE_CHECK_OPTIONS =
-      new HashMap<String, ErrorSeverity>() {
+  private static final Map<Integer, ErrorSeverity> DUPLICATE_CHECK_OPTIONS =
+      new HashMap<Integer, ErrorSeverity>() {
         {
-          put("ABEND", ErrorSeverity.ERROR);
-          put("CONVID", ErrorSeverity.ERROR);
-          put("STATE", ErrorSeverity.ERROR);
-          put("ABORT", ErrorSeverity.ERROR);
-          put("DESTID", ErrorSeverity.ERROR);
-          put("DESTIDLENG", ErrorSeverity.ERROR);
-          put("SUBADDR", ErrorSeverity.ERROR);
-          put("VOLUME", ErrorSeverity.ERROR);
-          put("VOLUMELENG", ErrorSeverity.ERROR);
-          put("CONSOLE", ErrorSeverity.ERROR);
-          put("PRINT", ErrorSeverity.ERROR);
-          put("CARD", ErrorSeverity.ERROR);
-          put("WPMEDIA1", ErrorSeverity.ERROR);
-          put("WPMEDIA2", ErrorSeverity.ERROR);
-          put("WPMEDIA3", ErrorSeverity.ERROR);
-          put("WPMEDIA4", ErrorSeverity.ERROR);
-          put("ADD", ErrorSeverity.ERROR);
-          put("LENGTH", ErrorSeverity.ERROR);
-          put("NUMREC", ErrorSeverity.ERROR);
-          put("FROM", ErrorSeverity.ERROR);
-          put("RIDFLD", ErrorSeverity.ERROR);
-          put("CONFIRMATION", ErrorSeverity.ERROR);
-          put("COPY", ErrorSeverity.ERROR);
-          put("TERMID", ErrorSeverity.ERROR);
-          put("CTLCHAR", ErrorSeverity.ERROR);
-          put("DISCONNECT", ErrorSeverity.ERROR);
-          put("SESSION", ErrorSeverity.ERROR);
-          put("END", ErrorSeverity.ERROR);
-          put("ENDFILE", ErrorSeverity.ERROR);
-          put("ENDOUTPUT", ErrorSeverity.ERROR);
-          put("ERASE", ErrorSeverity.ERROR);
-          put("KEYLENGTH", ErrorSeverity.ERROR);
-          put("KEYNUMBER", ErrorSeverity.ERROR);
-          put("ERASEAUP", ErrorSeverity.ERROR);
-          put("ERROR", ErrorSeverity.ERROR);
-          put("LOAD", ErrorSeverity.ERROR);
-          put("PROGRAM", ErrorSeverity.ERROR);
-          put("CONVERSE", ErrorSeverity.ERROR);
-          put("NOTE", ErrorSeverity.ERROR);
-          put("PASS", ErrorSeverity.ERROR);
-          put("LUNAME", ErrorSeverity.ERROR);
-          put("LOGMODE", ErrorSeverity.ERROR);
-          put("LOGONLOGMODE", ErrorSeverity.ERROR);
-          put("NOQUIESCE", ErrorSeverity.ERROR);
-          put("PREPARE", ErrorSeverity.ERROR);
-          put("QUERY", ErrorSeverity.ERROR);
-          put("RECEIVE", ErrorSeverity.ERROR);
-          put("INTO", ErrorSeverity.ERROR);
-          put("SET", ErrorSeverity.ERROR);
-          put("REPLACE", ErrorSeverity.ERROR);
-          put("SEND", ErrorSeverity.ERROR);
-          put("SIGNAL", ErrorSeverity.ERROR);
-          put("WAIT", ErrorSeverity.ERROR);
-          put("EODS", ErrorSeverity.ERROR);
+          put(CICSLexer.ABEND, ErrorSeverity.ERROR);
+          put(CICSLexer.CONVID, ErrorSeverity.ERROR);
+          put(CICSLexer.STATE, ErrorSeverity.ERROR);
+          put(CICSLexer.ABORT, ErrorSeverity.ERROR);
+          put(CICSLexer.DESTID, ErrorSeverity.ERROR);
+          put(CICSLexer.DESTIDLENG, ErrorSeverity.ERROR);
+          put(CICSLexer.SUBADDR, ErrorSeverity.ERROR);
+          put(CICSLexer.VOLUME, ErrorSeverity.ERROR);
+          put(CICSLexer.VOLUMELENG, ErrorSeverity.ERROR);
+          put(CICSLexer.CONSOLE, ErrorSeverity.ERROR);
+          put(CICSLexer.PRINT, ErrorSeverity.ERROR);
+          put(CICSLexer.CARD, ErrorSeverity.ERROR);
+          put(CICSLexer.WPMEDIA1, ErrorSeverity.ERROR);
+          put(CICSLexer.WPMEDIA2, ErrorSeverity.ERROR);
+          put(CICSLexer.WPMEDIA3, ErrorSeverity.ERROR);
+          put(CICSLexer.WPMEDIA4, ErrorSeverity.ERROR);
+          put(CICSLexer.ADD, ErrorSeverity.ERROR);
+          put(CICSLexer.LENGTH, ErrorSeverity.ERROR);
+          put(CICSLexer.NUMREC, ErrorSeverity.ERROR);
+          put(CICSLexer.FROM, ErrorSeverity.ERROR);
+          put(CICSLexer.RIDFLD, ErrorSeverity.ERROR);
+          put(CICSLexer.CONFIRMATION, ErrorSeverity.ERROR);
+          put(CICSLexer.COPY, ErrorSeverity.ERROR);
+          put(CICSLexer.TERMID, ErrorSeverity.ERROR);
+          put(CICSLexer.CTLCHAR, ErrorSeverity.ERROR);
+          put(CICSLexer.DISCONNECT, ErrorSeverity.ERROR);
+          put(CICSLexer.SESSION, ErrorSeverity.ERROR);
+          put(CICSLexer.END, ErrorSeverity.ERROR);
+          put(CICSLexer.ENDFILE, ErrorSeverity.ERROR);
+          put(CICSLexer.ENDOUTPUT, ErrorSeverity.ERROR);
+          put(CICSLexer.ERASE, ErrorSeverity.ERROR);
+          put(CICSLexer.KEYLENGTH, ErrorSeverity.ERROR);
+          put(CICSLexer.KEYNUMBER, ErrorSeverity.ERROR);
+          put(CICSLexer.ERASEAUP, ErrorSeverity.ERROR);
+          put(CICSLexer.ERROR, ErrorSeverity.ERROR);
+          put(CICSLexer.LOAD, ErrorSeverity.ERROR);
+          put(CICSLexer.PROGRAM, ErrorSeverity.ERROR);
+          put(CICSLexer.CONVERSE, ErrorSeverity.ERROR);
+          put(CICSLexer.NOTE, ErrorSeverity.ERROR);
+          put(CICSLexer.PASS, ErrorSeverity.ERROR);
+          put(CICSLexer.LUNAME, ErrorSeverity.ERROR);
+          put(CICSLexer.LOGMODE, ErrorSeverity.ERROR);
+          put(CICSLexer.LOGONLOGMODE, ErrorSeverity.ERROR);
+          put(CICSLexer.NOQUIESCE, ErrorSeverity.ERROR);
+          put(CICSLexer.PREPARE, ErrorSeverity.ERROR);
+          put(CICSLexer.QUERY, ErrorSeverity.ERROR);
+          put(CICSLexer.RECEIVE, ErrorSeverity.ERROR);
+          put(CICSLexer.INTO, ErrorSeverity.ERROR);
+          put(CICSLexer.SET, ErrorSeverity.ERROR);
+          put(CICSLexer.REPLACE, ErrorSeverity.ERROR);
+          put(CICSLexer.SEND, ErrorSeverity.ERROR);
+          put(CICSLexer.SIGNAL, ErrorSeverity.ERROR);
+          put(CICSLexer.WAIT, ErrorSeverity.ERROR);
+          put(CICSLexer.EODS, ErrorSeverity.ERROR);
 
-          put("DEFRESP", ErrorSeverity.WARNING);
-          put("NOWAIT", ErrorSeverity.WARNING);
-          put("RRN", ErrorSeverity.WARNING);
-          put("NOQUEUE", ErrorSeverity.WARNING);
-          put("TERMINAL", ErrorSeverity.WARNING);
+          put(CICSLexer.DEFRESP, ErrorSeverity.WARNING);
+          put(CICSLexer.NOWAIT, ErrorSeverity.WARNING);
+          put(CICSLexer.RRN, ErrorSeverity.WARNING);
+          put(CICSLexer.NOQUEUE, ErrorSeverity.WARNING);
+          put(CICSLexer.TERMINAL, ErrorSeverity.WARNING);
         }
       };
 
@@ -110,50 +111,76 @@ public class CICSIssueOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
    * @param <E> A subclass of ParserRuleContext
    */
   public <E extends ParserRuleContext> void checkOptions(E ctx) {
-    if (ctx.getClass() == CICSParser.Cics_issue_abendContext.class)
-      checkAbend((CICSParser.Cics_issue_abendContext) ctx);
-    else if (ctx.getClass() == CICSParser.Cics_issue_abortContext.class)
-      checkAbort((CICSParser.Cics_issue_abortContext) ctx);
-    else if (ctx.getClass() == CICSParser.Cics_issue_addContext.class)
-      checkAdd((CICSParser.Cics_issue_addContext) ctx);
-    else if (ctx.getClass() == CICSParser.Cics_issue_confirmationContext.class)
-      checkConfirmation((CICSParser.Cics_issue_confirmationContext) ctx);
-    else if (ctx.getClass() == CICSParser.Cics_issue_copyContext.class)
-      checkCopy((CICSParser.Cics_issue_copyContext) ctx);
-    else if (ctx.getClass() == CICSParser.Cics_issue_disconnectContext.class)
-      checkDisconnect((CICSParser.Cics_issue_disconnectContext) ctx);
-    else if (ctx.getClass() == CICSParser.Cics_issue_endContext.class)
-      checkEnd((CICSParser.Cics_issue_endContext) ctx);
-    else if (ctx.getClass() == CICSParser.Cics_issue_eodsContext.class)
-      checkEODS((CICSParser.Cics_issue_eodsContext) ctx);
-    else if (ctx.getClass() == CICSParser.Cics_issue_eraseContext.class)
-      checkErase((CICSParser.Cics_issue_eraseContext) ctx);
-    else if (ctx.getClass() == CICSParser.Cics_issue_erase_aupContext.class)
-      checkEraseAUP((CICSParser.Cics_issue_erase_aupContext) ctx);
-    else if (ctx.getClass() == CICSParser.Cics_issue_errorContext.class)
-      checkError((CICSParser.Cics_issue_errorContext) ctx);
-    else if (ctx.getClass() == CICSParser.Cics_issue_loadContext.class)
-      checkLoad((CICSParser.Cics_issue_loadContext) ctx);
-    else if (ctx.getClass() == CICSParser.Cics_issue_noteContext.class)
-      checkNote((CICSParser.Cics_issue_noteContext) ctx);
-    else if (ctx.getClass() == CICSParser.Cics_issue_passContext.class)
-      checkPass((CICSParser.Cics_issue_passContext) ctx);
-    else if (ctx.getClass() == CICSParser.Cics_issue_prepareContext.class)
-      checkPrepare((CICSParser.Cics_issue_prepareContext) ctx);
-    else if (ctx.getClass() == CICSParser.Cics_issue_printContext.class)
-      checkPrint((CICSParser.Cics_issue_printContext) ctx);
-    else if (ctx.getClass() == CICSParser.Cics_issue_queryContext.class)
-      checkQuery((CICSParser.Cics_issue_queryContext) ctx);
-    else if (ctx.getClass() == CICSParser.Cics_issue_receiveContext.class)
-      checkReceive((CICSParser.Cics_issue_receiveContext) ctx);
-    else if (ctx.getClass() == CICSParser.Cics_issue_replaceContext.class)
-      checkReplace((CICSParser.Cics_issue_replaceContext) ctx);
-    else if (ctx.getClass() == CICSParser.Cics_issue_sendContext.class)
-      checkSend((CICSParser.Cics_issue_sendContext) ctx);
-    else if (ctx.getClass() == CICSParser.Cics_issue_signalContext.class)
-      checkSignal((CICSParser.Cics_issue_signalContext) ctx);
-    else if (ctx.getClass() == CICSParser.Cics_issue_waitContext.class)
-      checkWait((CICSParser.Cics_issue_waitContext) ctx);
+    switch (ctx.getRuleIndex()) {
+      case CICSParser.RULE_cics_issue_abend:
+        checkAbend((CICSParser.Cics_issue_abendContext) ctx);
+        break;
+      case CICSParser.RULE_cics_issue_abort:
+        checkAbort((CICSParser.Cics_issue_abortContext) ctx);
+        break;
+      case CICSParser.RULE_cics_issue_add:
+        checkAdd((CICSParser.Cics_issue_addContext) ctx);
+        break;
+      case CICSParser.RULE_cics_issue_confirmation:
+        checkConfirmation((CICSParser.Cics_issue_confirmationContext) ctx);
+        break;
+      case CICSParser.RULE_cics_issue_copy:
+        checkCopy((CICSParser.Cics_issue_copyContext) ctx);
+        break;
+      case CICSParser.RULE_cics_issue_disconnect:
+        checkDisconnect((CICSParser.Cics_issue_disconnectContext) ctx);
+        break;
+      case CICSParser.RULE_cics_issue_end:
+        checkEnd((CICSParser.Cics_issue_endContext) ctx);
+        break;
+      case CICSParser.RULE_cics_issue_eods:
+        checkEODS((CICSParser.Cics_issue_eodsContext) ctx);
+        break;
+      case CICSParser.RULE_cics_issue_erase:
+        checkErase((CICSParser.Cics_issue_eraseContext) ctx);
+        break;
+      case CICSParser.RULE_cics_issue_erase_aup:
+        checkEraseAUP((CICSParser.Cics_issue_erase_aupContext) ctx);
+        break;
+      case CICSParser.RULE_cics_issue_error:
+        checkError((CICSParser.Cics_issue_errorContext) ctx);
+        break;
+      case CICSParser.RULE_cics_issue_load:
+        checkLoad((CICSParser.Cics_issue_loadContext) ctx);
+        break;
+      case CICSParser.RULE_cics_issue_note:
+        checkNote((CICSParser.Cics_issue_noteContext) ctx);
+        break;
+      case CICSParser.RULE_cics_issue_pass:
+        checkPass((CICSParser.Cics_issue_passContext) ctx);
+        break;
+      case CICSParser.RULE_cics_issue_prepare:
+        checkPrepare((CICSParser.Cics_issue_prepareContext) ctx);
+        break;
+      case CICSParser.RULE_cics_issue_print:
+        checkPrint((CICSParser.Cics_issue_printContext) ctx);
+        break;
+      case CICSParser.RULE_cics_issue_query:
+        checkQuery((CICSParser.Cics_issue_queryContext) ctx);
+        break;
+      case CICSParser.RULE_cics_issue_receive:
+        checkReceive((CICSParser.Cics_issue_receiveContext) ctx);
+        break;
+      case CICSParser.RULE_cics_issue_replace:
+        checkReplace((CICSParser.Cics_issue_replaceContext) ctx);
+        break;
+      case CICSParser.RULE_cics_issue_send:
+        checkSend((CICSParser.Cics_issue_sendContext) ctx);
+        break;
+      case CICSParser.RULE_cics_issue_signal:
+        checkSignal((CICSParser.Cics_issue_signalContext) ctx);
+        break;
+      case CICSParser.RULE_cics_issue_wait:
+        checkWait((CICSParser.Cics_issue_waitContext) ctx);
+        break;
+      default:
+        break;
+    }
     checkDuplicates(ctx);
   }
 

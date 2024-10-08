@@ -857,7 +857,7 @@ DATELITERAL: '\'' (DIGIT DIGIT DIGIT DIGIT '-' DIGIT DIGIT '-' DIGIT DIGIT | //y
 
 SINGLEDIGITLITERAL : DIGIT;
 INTEGERLITERAL : DIGIT+;
-IDENTIFIER : [a-zA-Z0-9][_a-zA-Z0-9-]*;
+IDENTIFIER : [\p{Alnum}\p{General_Category=Other_Letter}] [-_\p{Alnum}\p{General_Category=Other_Letter}]*;
 COPYBOOK_IDENTIFIER : [a-zA-Z0-9#@$][_a-zA-Z0-9#@$]*;
 
 NUMERICLITERAL : (PLUSCHAR | MINUSCHAR)? DIGIT* (DOT_FS | COMMACHAR) DIGIT+ (('e' | 'E') (PLUSCHAR | MINUSCHAR)? DIGIT+)?;

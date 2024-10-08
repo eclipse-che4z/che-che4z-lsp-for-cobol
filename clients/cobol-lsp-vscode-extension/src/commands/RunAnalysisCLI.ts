@@ -14,7 +14,6 @@
 
 import * as vscode from "vscode";
 import { Terminal } from "vscode";
-import show = Mocha.reporters.Base.cursor.show;
 
 export interface AnalysisResults {
   typeToRun: string;

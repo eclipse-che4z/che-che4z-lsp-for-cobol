@@ -81,7 +81,7 @@ suite("Integration Test Suite", function () {
 
   test("TC312735 Check EXEC CICS is in Procedure Division", async () => {
     await helper.showDocument("ADSORT.cbl");
-    let editor = helper.getEditor("ADSORT.cbl");
+    const editor = helper.getEditor("ADSORT.cbl");
     await helper.deleteLine(editor, 58);
     await helper.insertString(
       editor,
@@ -174,7 +174,7 @@ suite("Integration Test Suite", function () {
 
   test("TC312738 CICS variables and paragraphs support", async () => {
     await helper.showDocument("ADSORT.cbl");
-    let editor = helper.getEditor("ADSORT.cbl");
+    const editor = helper.getEditor("ADSORT.cbl");
     await helper.waitFor(async () => {
       helper.sleep(100);
       const result: any[] = await vscode.commands.executeCommand(
@@ -249,7 +249,7 @@ suite("Integration Test Suite", function () {
 
   test("TC266094 Underline the entire incorrect variable structure", async () => {
     await helper.showDocument("VAR.cbl");
-    let editor = helper.getEditor("VAR.cbl");
+    const editor = helper.getEditor("VAR.cbl");
     await helper.waitForDiagnostics(editor.document.uri);
     const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
     assert.strictEqual(diagnostics.length, 2);
@@ -399,7 +399,7 @@ suite("Integration Test Suite", function () {
     ?.slow(1000);
 
   test("TC250107 Test Area A, Check FD/SD level data", async () => {
-    let editor = await helper.showDocument("USER1.cbl");
+    const editor = await helper.showDocument("USER1.cbl");
     await helper.insertString(editor, pos(17, 0), "       FILE SECTION.\n");
     await helper.insertString(
       editor,
@@ -416,7 +416,7 @@ suite("Integration Test Suite", function () {
           .length > 0,
     );
 
-    let diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
+    const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
     assert.strictEqual(
       diagnostics.length,
       2,
@@ -436,7 +436,7 @@ suite("Integration Test Suite", function () {
 
   test("TC250107 Test Area A, check DIVISION and paragraph name warnings", async () => {
     await helper.showDocument("USER1.cbl");
-    let editor = helper.getEditor("USER1.cbl");
+    const editor = helper.getEditor("USER1.cbl");
     await helper.insertString(editor, pos(13, 0), "      ");
     await helper.waitForDiagnostics(editor.document.uri);
     let diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
@@ -482,7 +482,7 @@ suite("Integration Test Suite", function () {
     const extSrcPath = path.join("ADSORT.cbl");
     const diagPromise = helper.waitForDiagnosticsChange(extSrcPath);
     await helper.showDocument(extSrcPath);
-    let editor = helper.getEditor("ADSORT.cbl");
+    const editor = helper.getEditor("ADSORT.cbl");
     await helper.deleteLine(editor, 58);
     await helper.insertString(
       editor,
@@ -504,7 +504,7 @@ suite("Integration Test Suite", function () {
 
   test.skip("TC335192 COPY MAID scenarios", async () => {
     await helper.showDocument("cobol-dc/ABCD.cbl");
-    let editor = helper.getEditor("cobol-dc/ABCD.cbl");
+    const editor = helper.getEditor("cobol-dc/ABCD.cbl");
     await helper.waitFor(
       () => vscode.languages.getDiagnostics(editor.document.uri).length === 0,
       500,
@@ -535,7 +535,7 @@ suite("Integration Test Suite", function () {
     await helper.waitFor(
       () => vscode.languages.getDiagnostics(progUri).length === 1,
     );
-    let diagnostics = vscode.languages.getDiagnostics(progUri);
+    const diagnostics = vscode.languages.getDiagnostics(progUri);
     assert.strictEqual(
       diagnostics.length,
       1,

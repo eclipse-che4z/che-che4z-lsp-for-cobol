@@ -16,16 +16,7 @@ import * as vscode from "../../__mocks__/vscode";
 import * as smartTab from "../../commands/SmartTabCommand";
 import { initSmartTab } from "../../commands/SmartTabCommand";
 import { TabRule, TabSettings } from "../../services/Settings";
-import { Position, Selection, TextEditor, TextEditorEdit } from "vscode";
-
-const editor: any = {
-  document: {
-    uri: {
-      path: "",
-    },
-  },
-  selections: [],
-};
+import { Position, Selection, TextEditor } from "vscode";
 
 const context: any = {
   subscriptions: [],
