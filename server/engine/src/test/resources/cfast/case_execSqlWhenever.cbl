@@ -21,6 +21,8 @@
            EXEC SQL
                SELECT ABC FROM XYZ;
            END-EXEC.
+           EXEC SQL  WHENEVER SQLERROR GOTO : HANDLER  END-EXEC.
+           EXEC SQL  WHENEVER SQLERROR GO TO : HANDLER  END-EXEC.
 
         HANDLER.
             DISPLAY "HANDLER".

@@ -33,6 +33,20 @@ on:
       - master
 
 jobs:
+  checks:
+    name: Checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install dependencies for COBOL LS
+        working-directory: clients/cobol-lsp-vscode-extension
+        run: npm ci
+      - name: Check code formatting for COBOL LS
+        working-directory: clients/cobol-lsp-vscode-extension
+        run: npm run lint-format
+      - name: Check code quality for COBOL LS
+        working-directory: clients/cobol-lsp-vscode-extension
+        run: npm run lint-quality
   zipSources:
     runs-on: ubuntu-latest
     steps:
@@ -49,7 +63,7 @@ jobs:
       - name: Install dependencies for DaCo dialect
         working-directory: clients/daco-dialect-support
         run: NODE_ENV=production npm ci
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: clients-for-bd-scan
           path: clients/**
@@ -72,7 +86,7 @@ jobs:
         working-directory: server
         run: mvn -e -B -Pnative -Dagent=true -Dtest=\!PositiveTest* -DfailIfNoTests=false test
       - name: Upload native build configuration
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           if-no-files-found: warn
           name: native-build-configuration
@@ -93,13 +107,13 @@ jobs:
         working-directory: server
         run: mvn clean verify --no-transfer-progress
       - name: Upload performance data
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           if-no-files-found: warn
           name: test-perfomance-data
           path: server/engine/target/perf.csv
       - name: Upload jar files
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: jar
           path: server/engine/target/server.jar
@@ -112,7 +126,7 @@ jobs:
           npm ci
           npm run compile
       - name: Upload cobol dialect API library
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: lib
           path: clients/cobol-dialect-api/lib/*    
@@ -136,13 +150,13 @@ jobs:
           npm run package
           cp *.vsix ../../.
       - name: Upload IDMS vsix
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           if-no-files-found: warn
           name: vsix-idms-dialect
           path: 'cobol-language-support-for-idms*.vsix'
       - name: Upload DaCo vsix
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           if-no-files-found: warn
           name: vsix-daco-dialect
@@ -169,7 +183,7 @@ jobs:
           npm run package:web
           cp *.vsix ../../.
       - name: Upload Web vsix
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           if-no-files-found: warn
           name: vsix-cobol-language-support-web
@@ -240,7 +254,7 @@ jobs:
       - uses: ilammy/msvc-dev-cmd@v1
         if: matrix.os == 'windows-latest'
       - name: Retrieve native build configurations
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: native-build-configuration
           path: native-build-configuration
@@ -263,7 +277,7 @@ jobs:
         run: mvn -e -B -Plinux-native -DskipTests clean package
       - name: Prepare windows artifacts
         if: matrix.os == 'windows-latest'
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: staging-${{ env.target }}
           path: |
@@ -273,7 +287,7 @@ jobs:
           if-no-files-found: error
       - name: Prepare non-windows artifacts
         if: matrix.os != 'windows-latest'
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: staging-${{ env.target }}
           path: server/engine/target/engine
@@ -308,12 +322,12 @@ jobs:
         run: echo "target=linux-${{ matrix.arch }}" >> $GITHUB_ENV
       - uses: actions/checkout@v3
       - name: Retrieve native build
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: staging-${{ env.target }}
           path: staging/${{ env.target }}
       - name: Retrieve server jars
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: jar
           path: jar
@@ -348,7 +362,7 @@ jobs:
         with:
           node-version: 16
       - name: Download VS Code extension dialect API
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: lib
           path: clients/cobol-dialect-api
@@ -365,13 +379,13 @@ jobs:
         run: |
           npm run package  -- --target ${{ env.target }}
           cp *.vsix ../../.
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           if-no-files-found: warn
           name: vsix-cobol-language-support-${{ env.target }}
           path: 'cobol-language-support*.vsix'
       - name: Retrieve idms dialect
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: vsix-idms-dialect
           path: dialects-idms
@@ -381,7 +395,7 @@ jobs:
           unzip -j dialects-idms/*.vsix extension/server/jar/dialect-idms.jar -d clients/idms-dialect-support/server/jar
         shell: bash
       - name: Retrieve daco dialect
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: vsix-daco-dialect
           path: dialects-daco

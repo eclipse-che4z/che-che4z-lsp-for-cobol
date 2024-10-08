@@ -159,7 +159,7 @@ suite.skip("TF42379 COBOL LS F96588 - Insert code snippets", function () {
     await helper.waitFor(
       () => vscode.languages.getDiagnostics(editor.document.uri).length === 1,
     );
-    let diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
+    const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
     assert.strictEqual(diagnostics.length, 1);
     assert.strictEqual(diagnostics[0].message, "AB: Copybook not found");
 
@@ -196,7 +196,7 @@ suite.skip("TF42379 COBOL LS F96588 - Insert code snippets", function () {
     await helper.waitFor(
       () => vscode.languages.getDiagnostics(editor.document.uri).length === 1,
     );
-    let diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
+    const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
     assert.strictEqual(diagnostics.length, 1);
     assert.strictEqual(diagnostics[0].message, "AB: Copybook not found");
 
