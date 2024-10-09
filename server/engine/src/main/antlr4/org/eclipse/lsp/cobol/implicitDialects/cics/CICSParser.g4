@@ -286,12 +286,12 @@ cics_converttime: CONVERTTIME (DATESTRING cics_data_area | ABSTIME cics_data_are
 
 /** DEFINE (all of them) */
 cics_define: DEFINE (cics_define_activity | cics_define_composite_event | cics_define_counter_dcounter | cics_define_input_event | cics_define_process | cics_define_timer);
-cics_define_activity: (ACTIVITY cics_data_value | (EVENT | TRANSID | PROGRAM | USERID) cics_data_value | ACTIVITYID cics_data_area | cics_handle_response)+;
+cics_define_activity: ACTIVITY cics_data_value ((EVENT | TRANSID | PROGRAM | USERID) cics_data_value | ACTIVITYID cics_data_area | cics_handle_response)+;
 cics_define_composite_event: (COMPOSITE | AND | OR  | (EVENT | SUBEVENT1 | SUBEVENT2 | SUBEVENT3 | SUBEVENT4 | SUBEVENT5 | SUBEVENT6 | SUBEVENT7 | SUBEVENT8) cics_data_value | cics_handle_response)+;
 cics_define_counter_dcounter: ((COUNTER | DCOUNTER) cics_name | POOL cics_name  | (VALUE | MINIMUM | MAXIMUM) cics_data_value | NOSUSPEND | cics_handle_response)+;
 cics_define_input_event: (INPUT | EVENT cics_data_value | cics_handle_response)+;
 cics_define_process: (PROCESS cics_data_value | (PROCESSTYPE | TRANSID | PROGRAM | USERID) cics_data_value | NOCHECK | cics_handle_response)+;
-cics_define_timer: (TIMER cics_data_value | (EVENT | DAYS | HOURS | MINUTES | SECONDS | YEAR | MONTH | DAYOFMONTH | DAYOFYEAR) cics_data_value | AFTER  | AT | ON | cics_handle_response)+;
+cics_define_timer: TIMER cics_data_value ((EVENT | DAYS | HOURS | MINUTES | SECONDS | YEAR | MONTH | DAYOFMONTH | DAYOFYEAR) cics_data_value | AFTER  | AT | ON | cics_handle_response)+;
 
 /** DELAY */
 cics_delay: DELAY (INTERVAL cics_zero_digit | INTERVAL cics_hhmmss | TIME cics_hhmmss | cics_delay_for | cics_dealy_until | REQID cics_name | cics_handle_response)+;
@@ -772,7 +772,7 @@ cics_verify: VERIFY (PASSWORD cics_data_value | PHRASE cics_data_area PHRASELEN 
              EXPIRYTIME cics_data_area | INVALIDCOUNT cics_data_area | LASTUSETIME cics_data_area | cics_handle_response)+;
 
 /** WAIT CONVID / EVENT / EXTERNAL / JOURNALNAME / JOURNALNUM / SIGNAL / TERMINAL */
-cics_wait: WAIT (cics_wait_convid | cics_wait_event | cics_wait_external | cics_wait_journalname | cics_wait_signal | cics_wait_terminal)+;
+cics_wait: WAIT (cics_wait_convid | cics_wait_event | cics_wait_external | cics_wait_journalname | cics_wait_signal | cics_wait_terminal);
 cics_wait_convid: (CONVID cics_name | STATE cics_cvda | cics_handle_response)+;
 cics_wait_event: (EVENT | ECADDR cics_value | NAME cics_name | cics_handle_response)+;
 cics_wait_external: (EXTERNAL | (ECBLIST | NUMEVENTS) cics_value | PURGEABILITY cics_cvda | NAME cics_name | PURGEABLE | NOTPURGEABLE | cics_handle_response)+;
@@ -930,7 +930,7 @@ cicsWord
     ;
 
 cicsWords
-    : ENDFILE | ERROR | ABORT | ADDRESS | AFTER | ALTER | AS | ASSIGN | AT | BINARY | CANCEL | CHANNEL | CLASS | CLOSE
+    : ENDFILE | ERROR | ABORT | ADDRESS | AFTER | ALTER | AS | ASSIGN | AT | ATTACH | BINARY | CANCEL | CHANNEL | CLASS | CLOSE
     | CONTROL | COPY | DATA | DELETE | DELIMITER | DETAIL | END | ENTER | ENTRY | EQUAL | ERASE | EVENT
     | EXCEPTION | EXTERNAL | FOR | FROM | INPUT | INTO | INVOKE | LABEL | LAST | LENGTH | LINE | LINK | LIST | MESSAGE
     | MMDDYYYY | MODE | ORGANIZATION | OUTPUT | PAGE | PARSE | PASSWORD | PROCESS
@@ -943,7 +943,7 @@ cicsWords
 cicsLexerDefinedVariableUsageTokens: ABCODE | ABDUMP | ABEND | ABORT | ABPROGRAM | ABSTIME | ACCUM | ACEE | ACQACTIVITY
     | ACQPROCESS | ACQUACTIVITY | ACTION | ACTIVITY | ACTIVITYID | ACTPARTN | AID | ALARM | ALTSCRNHT | ALTSCRNWD
     | ANYKEY | APLKYBD | APLTEXT | APPLID | AS | ASA | ASIS | ASKTIME | ASRAINTRPT | ASRAKEY | ASRAPSW | ASRAREGS | ASRASPC
-    | ASRASTG | ASYNCHRONOUS | ATTACH | ATTACHID | ATTRIBUTES | AUTHENTICATE | AUTOPAGE | AUXILIARY | BASE64
+    | ASRASTG | ASYNCHRONOUS | ATTACHID | ATTRIBUTES | AUTHENTICATE | AUTOPAGE | AUXILIARY | BASE64
     | BASICAUTH | BELOW | BIF | BODYCHARSET | BOOKMARK | BRDATA | BRDATALENGTH | BREXIT | BRIDGE | BROWSETOKEN
     | BTRANS | BUFFER | BUILD | CADDRLENGTH | CARD | CBUFF | CCSID | CERTIFICATE | CHANGE | CHANGETIME
     | CHANNEL | CHAR | CHARACTERSET | CHECK | CHUNKEND | CHUNKING | CHUNKNO | CHUNKYES | CICSDATAKEY | CIPHERS | CLEAR
@@ -989,7 +989,7 @@ cicsLexerDefinedVariableUsageTokens: ABCODE | ABDUMP | ABEND | ABORT | ABPROGRAM
     | PHRASE | PHRASELEN | PIPLENGTH | PIPLIST | POINT | POOL | POP | PORTNUMBER | PORTNUMNU | POST | PPT | PREDICATE
     | PREFIX | PREPARE | PRINCONVID | PRINSYSID | PRINT | PRIORITY | PRIVACY | PROCESS | PROCESSTYPE | PROCLENGTH
     | PROCNAME | PROFILE | PROTECT | PS | PUNCH | PURGEABILITY | PURGEABLE | PUSH | PUT | QNAME | QUERY | QUERYPARM | QUERYSTRING
-    | QUERYSTRLEN | RBA | RBN | RDATT | READNEXT | READPREV | READQ | REATTACH | RECEIVER | RECFM | RECORDLEN
+    | QUERYSTRLEN | RBA | RBN | RDATT | READNEXT | READPREV | READQ | REALM | REALMLEN | REATTACH | RECEIVER | RECFM | RECORDLEN
     | RECORDLENGTH | REDUCE | REFPARMS | REFPARMSLEN | RELATESINDEX | RELATESTYPE | RELATESURI | REMOVE | REPEATABLE
     | REPETABLE | REPLY | REPLYLENGTH | REQID | REQUESTTYPE | RESCLASS | RESETBR | RESID | RESIDLENGTH | RESOURCE
     | RESP | RESP2 | RESSEC | RESTART | RESTYPE | RESULT | RESUME | RETAIN | RETCODE | RETCORD | RETRIECE | RETRIEVE

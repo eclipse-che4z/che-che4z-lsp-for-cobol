@@ -18,7 +18,6 @@ package org.eclipse.lsp.cobol.core.visitor;
 import com.google.common.collect.ImmutableList;
 import lombok.NonNull;
 import org.antlr.v4.runtime.*;
-import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.RuleNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
@@ -110,7 +109,6 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   @Override
   public List<Node> visitStartRule(StartRuleContext ctx) {
     // we can skip the other nodes, but not the root
-    text.setInputStream(ctx.getStart().getInputStream());
     try {
       return ImmutableList.of(
             retrieveLocality(ctx, extendedDocument, copybooks)
@@ -1856,7 +1854,6 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
 
   private static final class TextExtractionState {
     private final ExtendedDocument extendedDocument;
-    private CharStream input = null;
     private ParagraphNode lastParagraphNode = null;
     private ProcedureSectionNode lastSectionNode = null;
     private Token firstSectionToken = null;
@@ -1870,16 +1867,14 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
 
       void update(ProcedureSectionNode section, Token firstToken) {
       if (lastParagraphNode != null) {
-        String text = input.getText(new Interval(firstParagraphToken.getStartIndex(), lastSentenseToken.getStopIndex()));
-        lastParagraphNode.setText(text);
         lastParagraphNode.getLocality().getRange().setEnd(lastSentensePosition);
+        lastParagraphNode.setText(extendedDocument.getBaseText(lastParagraphNode.getLocality()));
         lastParagraphNode = null;
         firstParagraphToken = null;
       }
       if (lastSectionNode != null) {
-        String text = input.getText(new Interval(firstSectionToken.getStartIndex(), lastSentenseToken.getStopIndex()));
         lastSectionNode.getLocality().getRange().setEnd(lastSentensePosition);
-        lastSectionNode.setText(text);
+        lastSectionNode.setText(extendedDocument.getBaseText(lastSectionNode.getLocality()));
       }
       firstSectionToken = firstToken;
       lastSectionNode = section;
@@ -1887,9 +1882,8 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
 
     void update(ParagraphNode paragraphNode, Token firstToken) {
       if (lastParagraphNode != null) {
-        String text = input.getText(new Interval(firstParagraphToken.getStartIndex(), lastSentenseToken.getStopIndex()));
-        lastParagraphNode.setText(text);
         lastParagraphNode.getLocality().getRange().setEnd(lastSentensePosition);
+        lastParagraphNode.setText(extendedDocument.getBaseText(lastParagraphNode.getLocality()));
       }
       lastParagraphNode = paragraphNode;
       firstParagraphToken = firstToken;
@@ -1899,10 +1893,6 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
       lastSentenseToken = lastToken;
       lastSentensePosition = extendedDocument.mapLocation(constructRange(lastSentenseToken))
               .getRange().getEnd();
-    }
-
-    void setInputStream(CharStream input) {
-      this.input = input;
     }
 
     void reset() {
@@ -1915,14 +1905,12 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
     }
     void flush() {
       if (lastParagraphNode != null) {
-        String text = input.getText(new Interval(firstParagraphToken.getStartIndex(), lastSentenseToken.getStopIndex()));
-        lastParagraphNode.setText(text);
         lastParagraphNode.getLocality().getRange().setEnd(lastSentensePosition);
+        lastParagraphNode.setText(extendedDocument.getBaseText(lastParagraphNode.getLocality()));
       }
       if (lastSectionNode != null) {
-        String text = input.getText(new Interval(firstSectionToken.getStartIndex(), lastSentenseToken.getStopIndex()));
-        lastSectionNode.setText(text);
         lastSectionNode.getLocality().getRange().setEnd(lastSentensePosition);
+        lastSectionNode.setText(extendedDocument.getBaseText(lastSectionNode.getLocality()));
       }
     }
   }

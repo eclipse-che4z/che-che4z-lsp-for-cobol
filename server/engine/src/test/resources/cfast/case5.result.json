@@ -47,7 +47,7 @@
       },
       {
         "name": "SECT1",
-        "snippet": "SECT1 SECTION.\r\n       PARAG1.\r\n           DISPLAY \u0027PARAG1\u0027.\r\n           PERFORM PARAG2 OF SECT2.",
+        "snippet": "       SECT1 SECTION.\r\n       PARAG1.\r\n           DISPLAY \u0027PARAG1\u0027.\r\n           PERFORM PARAG2 OF SECT2.",
         "type": "section",
         "location": {
           "uri": "fake/path",
@@ -62,7 +62,7 @@
         },
         "children": [
           {
-            "snippet": "PARAG1.\r\n           DISPLAY \u0027PARAG1\u0027.\r\n           PERFORM PARAG2 OF SECT2.",
+            "snippet": "       PARAG1.\r\n           DISPLAY \u0027PARAG1\u0027.\r\n           PERFORM PARAG2 OF SECT2.",
             "name": "PARAG1",
             "type": "paragraph",
             "location": {
@@ -113,7 +113,7 @@
       },
       {
         "name": "SECT2",
-        "snippet": "SECT2 SECTION.\r\n       PARAG2.\r\n           DISPLAY \u0027PARAG2\u0027.",
+        "snippet": "       SECT2 SECTION.\r\n       PARAG2.\r\n           DISPLAY \u0027PARAG2\u0027.",
         "type": "section",
         "location": {
           "uri": "fake/path",
@@ -128,7 +128,7 @@
         },
         "children": [
           {
-            "snippet": "PARAG2.\r\n           DISPLAY \u0027PARAG2\u0027.",
+            "snippet": "       PARAG2.\r\n           DISPLAY \u0027PARAG2\u0027.",
             "name": "PARAG2",
             "type": "paragraph",
             "location": {

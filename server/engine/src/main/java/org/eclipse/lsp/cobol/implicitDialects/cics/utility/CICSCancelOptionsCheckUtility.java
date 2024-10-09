@@ -15,33 +15,33 @@
 
 package org.eclipse.lsp.cobol.implicitDialects.cics.utility;
 
-        import org.antlr.v4.runtime.ParserRuleContext;
-        import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
-        import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
-        import org.eclipse.lsp.cobol.common.error.SyntaxError;
+import org.antlr.v4.runtime.ParserRuleContext;
+import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
+import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
+import org.eclipse.lsp.cobol.common.error.SyntaxError;
+import org.eclipse.lsp.cobol.implicitDialects.cics.CICSLexer;
 
-        import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_cancel;
+import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_cancel;
 
-
-        import java.util.HashMap;
-        import java.util.List;
-        import java.util.Map;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /** Checks CICS Cancel rules for required and invalid options */
 public class CICSCancelOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
 
     public static final int RULE_INDEX = RULE_cics_cancel;
 
-    private static final Map<String, ErrorSeverity> DUPLICATE_CHECK_OPTIONS =
-            new HashMap<String, ErrorSeverity>() {
+    private static final Map<Integer, ErrorSeverity> DUPLICATE_CHECK_OPTIONS =
+            new HashMap<Integer, ErrorSeverity>() {
                 {
-                    put("CANCEL", ErrorSeverity.ERROR);
-                    put("ACTIVITY", ErrorSeverity.ERROR);
-                    put("ACQACTIVITY", ErrorSeverity.ERROR);
-                    put("ACQPROCESS", ErrorSeverity.ERROR);
-                    put("REQID", ErrorSeverity.ERROR);
-                    put("SYSID", ErrorSeverity.ERROR);
-                    put("TRANSID", ErrorSeverity.ERROR);
+                    put(CICSLexer.CANCEL, ErrorSeverity.ERROR);
+                    put(CICSLexer.ACTIVITY, ErrorSeverity.ERROR);
+                    put(CICSLexer.ACQACTIVITY, ErrorSeverity.ERROR);
+                    put(CICSLexer.ACQPROCESS, ErrorSeverity.ERROR);
+                    put(CICSLexer.REQID, ErrorSeverity.ERROR);
+                    put(CICSLexer.SYSID, ErrorSeverity.ERROR);
+                    put(CICSLexer.TRANSID, ErrorSeverity.ERROR);
                 }
             };
 

@@ -9,7 +9,7 @@
         "character": 9
       },
       "end": {
-        "line": 26,
+        "line": 28,
         "character": 31
       }
     },
@@ -166,17 +166,79 @@
         }
       },
       {
-        "snippet": "HANDLER.\r\n            DISPLAY \"HANDLER\".",
+        "wheneverCondition": "SQLERROR",
+        "wheneverType": "GOTO",
+        "value": "HANDLER",
+        "type": "execwhenever",
+        "location": {
+          "uri": "fake/path",
+          "start": {
+            "line": 24,
+            "character": 22
+          },
+          "end": {
+            "line": 24,
+            "character": 50
+          }
+        }
+      },
+      {
+        "type": "endexec",
+        "location": {
+          "uri": "fake/path",
+          "start": {
+            "line": 24,
+            "character": 22
+          },
+          "end": {
+            "line": 24,
+            "character": 50
+          }
+        }
+      },
+      {
+        "wheneverCondition": "SQLERROR",
+        "wheneverType": "GOTO",
+        "value": "HANDLER",
+        "type": "execwhenever",
+        "location": {
+          "uri": "fake/path",
+          "start": {
+            "line": 25,
+            "character": 22
+          },
+          "end": {
+            "line": 25,
+            "character": 50
+          }
+        }
+      },
+      {
+        "type": "endexec",
+        "location": {
+          "uri": "fake/path",
+          "start": {
+            "line": 25,
+            "character": 22
+          },
+          "end": {
+            "line": 25,
+            "character": 50
+          }
+        }
+      },
+      {
+        "snippet": "        HANDLER.\r\n            DISPLAY \"HANDLER\".",
         "name": "HANDLER",
         "type": "paragraph",
         "location": {
           "uri": "fake/path",
           "start": {
-            "line": 25,
+            "line": 27,
             "character": 9
           },
           "end": {
-            "line": 26,
+            "line": 28,
             "character": 31
           }
         },
@@ -186,11 +248,11 @@
             "location": {
               "uri": "fake/path",
               "start": {
-                "line": 26,
+                "line": 28,
                 "character": 13
               },
               "end": {
-                "line": 26,
+                "line": 28,
                 "character": 30
               }
             }

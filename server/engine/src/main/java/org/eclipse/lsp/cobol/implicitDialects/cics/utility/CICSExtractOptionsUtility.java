@@ -19,6 +19,7 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
+import org.eclipse.lsp.cobol.implicitDialects.cics.CICSLexer;
 import org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser;
 
 import java.util.HashMap;
@@ -32,95 +33,95 @@ public class CICSExtractOptionsUtility extends CICSOptionsCheckBaseUtility {
 
   public static final int RULE_INDEX = RULE_cics_extract;
 
-  private static final Map<String, ErrorSeverity> DUPLICATE_CHECK_OPTIONS =
-      new HashMap<String, ErrorSeverity>() {
+  private static final Map<Integer, ErrorSeverity> DUPLICATE_CHECK_OPTIONS =
+      new HashMap<Integer, ErrorSeverity>() {
         {
-          put("EXTRACT", ErrorSeverity.ERROR);
-          put("ATTACH", ErrorSeverity.ERROR);
-          put("ATTACHID", ErrorSeverity.ERROR);
-          put("CONVID", ErrorSeverity.ERROR);
-          put("SESSION", ErrorSeverity.ERROR);
-          put("PROCESS", ErrorSeverity.ERROR);
-          put("RESOURCE", ErrorSeverity.ERROR);
-          put("RPROCESS", ErrorSeverity.ERROR);
-          put("RRESOURCE", ErrorSeverity.ERROR);
-          put("QUEUE", ErrorSeverity.ERROR);
-          put("IUTYPE", ErrorSeverity.ERROR);
-          put("DATASTR", ErrorSeverity.ERROR);
-          put("RECFM", ErrorSeverity.ERROR);
-          put("ATTRIBUTES", ErrorSeverity.ERROR);
-          put("STATE", ErrorSeverity.ERROR);
-          put("CERTIFICATE", ErrorSeverity.ERROR);
-          put("LENGTH", ErrorSeverity.ERROR);
-          put("SERIALNUMLEN", ErrorSeverity.ERROR);
-          put("USERID", ErrorSeverity.ERROR);
-          put("COMMONNAMELEN", ErrorSeverity.ERROR);
-          put("COUNTRYLEN", ErrorSeverity.ERROR);
-          put("STATELEN", ErrorSeverity.ERROR);
-          put("LOCALITYLEN", ErrorSeverity.ERROR);
-          put("ORGANIZATLEN", ErrorSeverity.ERROR);
-          put("ORGUNITLEN", ErrorSeverity.ERROR);
-          put("SERIALNUM", ErrorSeverity.ERROR);
-          put("COMMONNAME", ErrorSeverity.ERROR);
-          put("COUNTRY", ErrorSeverity.ERROR);
-          put("LOCALITY", ErrorSeverity.ERROR);
-          put("ORGANIZATION", ErrorSeverity.ERROR);
-          put("ORGUNIT", ErrorSeverity.ERROR);
-          put("OWNER", ErrorSeverity.WARNING);
-          put("ISSUER", ErrorSeverity.WARNING);
-          put("LOGONMSG", ErrorSeverity.ERROR);
-          put("INTO", ErrorSeverity.ERROR);
-          put("SET", ErrorSeverity.ERROR);
-          put("PROCNAME", ErrorSeverity.ERROR);
-          put("PROCLENGTH", ErrorSeverity.ERROR);
-          put("MAXPROCLEN", ErrorSeverity.ERROR);
-          put("SYNCLEVEL", ErrorSeverity.ERROR);
-          put("PIPELENGTH", ErrorSeverity.ERROR);
-          put("PIPLIST", ErrorSeverity.ERROR);
-          put("TCPIP", ErrorSeverity.ERROR);
-          put("AUTHENTICATE", ErrorSeverity.ERROR);
-          put("CLNTIPFAMILY", ErrorSeverity.ERROR);
-          put("SRVRIPFAMILY", ErrorSeverity.ERROR);
-          put("SSLTYPE", ErrorSeverity.ERROR);
-          put("PRIVACY", ErrorSeverity.ERROR);
-          put("CLIENTNAME", ErrorSeverity.ERROR);
-          put("CNAMELENGTH", ErrorSeverity.ERROR);
-          put("SERVERNAME", ErrorSeverity.ERROR);
-          put("SNAMELENGTH", ErrorSeverity.ERROR);
-          put("CLIENTADDR", ErrorSeverity.ERROR);
-          put("CADDRLENGTH", ErrorSeverity.ERROR);
-          put("CLIENTADDRNU", ErrorSeverity.ERROR);
-          put("CLNTADDR6NU", ErrorSeverity.ERROR);
-          put("SERVERADDR", ErrorSeverity.ERROR);
-          put("SADDRLENGTH", ErrorSeverity.ERROR);
-          put("SERVERADDRNU", ErrorSeverity.ERROR);
-          put("SRVRADDR6NU", ErrorSeverity.ERROR);
-          put("TCPIPSERVICE", ErrorSeverity.ERROR);
-          put("PORTNUMBER", ErrorSeverity.ERROR);
-          put("PORTNUMNU", ErrorSeverity.ERROR);
-          put("MAXDATALEN", ErrorSeverity.ERROR);
-          put("TCT", ErrorSeverity.ERROR);
-          put("NETNAME", ErrorSeverity.ERROR);
-          put("SYSID", ErrorSeverity.ERROR);
-          put("TERMID", ErrorSeverity.ERROR);
-          put("WEB", ErrorSeverity.ERROR);
-          put("REQUESTTYPE", ErrorSeverity.ERROR);
-          put("HOSTTYPE", ErrorSeverity.ERROR);
-          put("SCHEME", ErrorSeverity.ERROR);
-          put("HOSTLENGTH", ErrorSeverity.ERROR);
-          put("HOST", ErrorSeverity.ERROR);
-          put("HTTPVERSION", ErrorSeverity.ERROR);
-          put("VERSIONLEN", ErrorSeverity.ERROR);
-          put("PATH", ErrorSeverity.ERROR);
-          put("PATHLENGTH", ErrorSeverity.ERROR);
-          put("HTTPMETHOD", ErrorSeverity.ERROR);
-          put("METHODLENGTH", ErrorSeverity.ERROR);
-          put("QUERYSTRING", ErrorSeverity.ERROR);
-          put("QUERYSTRLEN", ErrorSeverity.ERROR);
-          put("URIMAP", ErrorSeverity.ERROR);
-          put("SESSTOKEN", ErrorSeverity.ERROR);
-          put("REALM", ErrorSeverity.ERROR);
-          put("REALMLEN", ErrorSeverity.ERROR);
+          put(CICSLexer.EXTRACT, ErrorSeverity.ERROR);
+          put(CICSLexer.ATTACH, ErrorSeverity.ERROR);
+          put(CICSLexer.ATTACHID, ErrorSeverity.ERROR);
+          put(CICSLexer.CONVID, ErrorSeverity.ERROR);
+          put(CICSLexer.SESSION, ErrorSeverity.ERROR);
+          put(CICSLexer.PROCESS, ErrorSeverity.ERROR);
+          put(CICSLexer.RESOURCE, ErrorSeverity.ERROR);
+          put(CICSLexer.RPROCESS, ErrorSeverity.ERROR);
+          put(CICSLexer.RRESOURCE, ErrorSeverity.ERROR);
+          put(CICSLexer.QUEUE, ErrorSeverity.ERROR);
+          put(CICSLexer.IUTYPE, ErrorSeverity.ERROR);
+          put(CICSLexer.DATASTR, ErrorSeverity.ERROR);
+          put(CICSLexer.RECFM, ErrorSeverity.ERROR);
+          put(CICSLexer.ATTRIBUTES, ErrorSeverity.ERROR);
+          put(CICSLexer.STATE, ErrorSeverity.ERROR);
+          put(CICSLexer.CERTIFICATE, ErrorSeverity.ERROR);
+          put(CICSLexer.LENGTH, ErrorSeverity.ERROR);
+          put(CICSLexer.SERIALNUMLEN, ErrorSeverity.ERROR);
+          put(CICSLexer.USERID, ErrorSeverity.ERROR);
+          put(CICSLexer.COMMONNAMLEN, ErrorSeverity.ERROR);
+          put(CICSLexer.COUNTRYLEN, ErrorSeverity.ERROR);
+          put(CICSLexer.STATELEN, ErrorSeverity.ERROR);
+          put(CICSLexer.LOCALITYLEN, ErrorSeverity.ERROR);
+          put(CICSLexer.ORGANIZATLEN, ErrorSeverity.ERROR);
+          put(CICSLexer.ORGUNITLEN, ErrorSeverity.ERROR);
+          put(CICSLexer.SERIALNUM, ErrorSeverity.ERROR);
+          put(CICSLexer.COMMONNAME, ErrorSeverity.ERROR);
+          put(CICSLexer.COUNTRY, ErrorSeverity.ERROR);
+          put(CICSLexer.LOCALITY, ErrorSeverity.ERROR);
+          put(CICSLexer.ORGANIZATION, ErrorSeverity.ERROR);
+          put(CICSLexer.ORGUNIT, ErrorSeverity.ERROR);
+          put(CICSLexer.OWNER, ErrorSeverity.WARNING);
+          put(CICSLexer.ISSUER, ErrorSeverity.WARNING);
+          put(CICSLexer.LOGONMSG, ErrorSeverity.ERROR);
+          put(CICSLexer.INTO, ErrorSeverity.ERROR);
+          put(CICSLexer.SET, ErrorSeverity.ERROR);
+          put(CICSLexer.PROCNAME, ErrorSeverity.ERROR);
+          put(CICSLexer.PROCLENGTH, ErrorSeverity.ERROR);
+          put(CICSLexer.MAXPROCLEN, ErrorSeverity.ERROR);
+          put(CICSLexer.SYNCLEVEL, ErrorSeverity.ERROR);
+          put(CICSLexer.PIPLENGTH, ErrorSeverity.ERROR);
+          put(CICSLexer.PIPLIST, ErrorSeverity.ERROR);
+          put(CICSLexer.TCPIP, ErrorSeverity.ERROR);
+          put(CICSLexer.AUTHENTICATE, ErrorSeverity.ERROR);
+          put(CICSLexer.CLNTIPFAMILY, ErrorSeverity.ERROR);
+          put(CICSLexer.SRVRIPFAMILY, ErrorSeverity.ERROR);
+          put(CICSLexer.SSLTYPE, ErrorSeverity.ERROR);
+          put(CICSLexer.PRIVACY, ErrorSeverity.ERROR);
+          put(CICSLexer.CLIENTNAME, ErrorSeverity.ERROR);
+          put(CICSLexer.CNAMELENGTH, ErrorSeverity.ERROR);
+          put(CICSLexer.SERVERNAME, ErrorSeverity.ERROR);
+          put(CICSLexer.SNAMELENGTH, ErrorSeverity.ERROR);
+          put(CICSLexer.CLIENTADDR, ErrorSeverity.ERROR);
+          put(CICSLexer.CADDRLENGTH, ErrorSeverity.ERROR);
+          put(CICSLexer.CLIENTADDRNU, ErrorSeverity.ERROR);
+          put(CICSLexer.CLNTADDR6NU, ErrorSeverity.ERROR);
+          put(CICSLexer.SERVERADDR, ErrorSeverity.ERROR);
+          put(CICSLexer.SADDRLENGTH, ErrorSeverity.ERROR);
+          put(CICSLexer.SERVERADDRNU, ErrorSeverity.ERROR);
+          put(CICSLexer.SRVRADDR6NU, ErrorSeverity.ERROR);
+          put(CICSLexer.TCPIPSERVICE, ErrorSeverity.ERROR);
+          put(CICSLexer.PORTNUMBER, ErrorSeverity.ERROR);
+          put(CICSLexer.PORTNUMNU, ErrorSeverity.ERROR);
+          put(CICSLexer.MAXDATALEN, ErrorSeverity.ERROR);
+          put(CICSLexer.TCT, ErrorSeverity.ERROR);
+          put(CICSLexer.NETNAME, ErrorSeverity.ERROR);
+          put(CICSLexer.SYSID, ErrorSeverity.ERROR);
+          put(CICSLexer.TERMID, ErrorSeverity.ERROR);
+          put(CICSLexer.WEB, ErrorSeverity.ERROR);
+          put(CICSLexer.REQUESTTYPE, ErrorSeverity.ERROR);
+          put(CICSLexer.HOSTTYPE, ErrorSeverity.ERROR);
+          put(CICSLexer.SCHEME, ErrorSeverity.ERROR);
+          put(CICSLexer.HOSTLENGTH, ErrorSeverity.ERROR);
+          put(CICSLexer.HOST, ErrorSeverity.ERROR);
+          put(CICSLexer.HTTPVERSION, ErrorSeverity.ERROR);
+          put(CICSLexer.VERSIONLEN, ErrorSeverity.ERROR);
+          put(CICSLexer.PATH, ErrorSeverity.ERROR);
+          put(CICSLexer.PATHLENGTH, ErrorSeverity.ERROR);
+          put(CICSLexer.HTTPMETHOD, ErrorSeverity.ERROR);
+          put(CICSLexer.METHODLENGTH, ErrorSeverity.ERROR);
+          put(CICSLexer.QUERYSTRING, ErrorSeverity.ERROR);
+          put(CICSLexer.QUERYSTRLEN, ErrorSeverity.ERROR);
+          put(CICSLexer.URIMAP, ErrorSeverity.ERROR);
+          put(CICSLexer.SESSTOKEN, ErrorSeverity.ERROR);
+          put(CICSLexer.REALM, ErrorSeverity.ERROR);
+          put(CICSLexer.REALMLEN, ErrorSeverity.ERROR);
         }
       };
 
@@ -135,24 +136,37 @@ public class CICSExtractOptionsUtility extends CICSOptionsCheckBaseUtility {
    * @param <E> A subclass of ParserRuleContext
    */
   public <E extends ParserRuleContext> void checkOptions(E ctx) {
-    if (ctx.getClass() == CICSParser.Cics_extract_attachContext.class)
-      checkAttach((CICSParser.Cics_extract_attachContext) ctx);
-    else if (ctx.getClass() == CICSParser.Cics_extract_attributesContext.class)
-      checkAttributes((CICSParser.Cics_extract_attributesContext) ctx);
-    else if (ctx.getClass() == CICSParser.Cics_extract_certificateContext.class)
-      checkCertificate((CICSParser.Cics_extract_certificateContext) ctx);
-    else if (ctx.getClass() == CICSParser.Cics_extract_logonmessageContext.class)
-      checkLogonMsg((CICSParser.Cics_extract_logonmessageContext) ctx);
-    else if (ctx.getClass() == CICSParser.Cics_extract_processContext.class)
-      checkProcess((CICSParser.Cics_extract_processContext) ctx);
-    else if (ctx.getClass() == CICSParser.Cics_extract_tcpipContext.class)
-      checkTcpIp((CICSParser.Cics_extract_tcpipContext) ctx);
-    else if (ctx.getClass() == CICSParser.Cics_extract_tctContext.class)
-      checkTCT((CICSParser.Cics_extract_tctContext) ctx);
-    else if (ctx.getClass() == CICSParser.Cics_extract_web_clientContext.class)
-      checkWebClient((CICSParser.Cics_extract_web_clientContext) ctx);
-    else if (ctx.getClass() == CICSParser.Cics_extract_web_serverContext.class)
-      checkWebServer((CICSParser.Cics_extract_web_serverContext) ctx);
+    switch (ctx.getRuleIndex()) {
+      case CICSParser.RULE_cics_extract_attach:
+        checkAttach((CICSParser.Cics_extract_attachContext) ctx);
+        break;
+      case CICSParser.RULE_cics_extract_attributes:
+        checkAttributes((CICSParser.Cics_extract_attributesContext) ctx);
+        break;
+      case CICSParser.RULE_cics_extract_certificate:
+        checkCertificate((CICSParser.Cics_extract_certificateContext) ctx);
+        break;
+      case CICSParser.RULE_cics_extract_logonmessage:
+        checkLogonMsg((CICSParser.Cics_extract_logonmessageContext) ctx);
+        break;
+      case CICSParser.RULE_cics_extract_process:
+        checkProcess((CICSParser.Cics_extract_processContext) ctx);
+        break;
+      case CICSParser.RULE_cics_extract_tcpip:
+        checkTcpIp((CICSParser.Cics_extract_tcpipContext) ctx);
+        break;
+      case CICSParser.RULE_cics_extract_tct:
+        checkTCT((CICSParser.Cics_extract_tctContext) ctx);
+        break;
+      case CICSParser.RULE_cics_extract_web_client:
+        checkWebClient((CICSParser.Cics_extract_web_clientContext) ctx);
+        break;
+      case CICSParser.RULE_cics_extract_web_server:
+        checkWebServer((CICSParser.Cics_extract_web_serverContext) ctx);
+        break;
+      default:
+        break;
+    }
     checkDuplicates(ctx);
   }
 

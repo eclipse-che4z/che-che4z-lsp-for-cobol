@@ -34,7 +34,7 @@ async function main() {
       "--user-data-dir",
       `${os.tmpdir()}`,
     ];
-    var options: TestOptions;
+    let options: TestOptions;
     if (process.argv.length > 2 && process.argv[2] == "insiders") {
       const vscodeExecutablePath = await downloadAndUnzipVSCode("insiders");
       options = {

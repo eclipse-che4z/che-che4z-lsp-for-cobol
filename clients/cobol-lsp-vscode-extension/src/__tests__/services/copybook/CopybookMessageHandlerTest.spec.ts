@@ -15,10 +15,10 @@
 import { SettingsService } from "../../../services/Settings";
 import * as vscode from "vscode";
 import { Utils } from "../../../services/util/Utils";
-import path = require("path");
 import { globSync } from "glob";
 import * as fs from "fs";
 import { CopybookDownloadService } from "../../../services/copybook/CopybookDownloadService";
+import path = require("path");
 
 vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
   get: jest.fn().mockReturnValue("testProfile"),
@@ -33,6 +33,7 @@ jest.mock("url", () => {
     }),
   };
 });
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 (globSync as any) = jest.fn().mockImplementation((x: any) => [x]);
 (fs.realpathSync.native as any) = jest.fn().mockImplementation((x: any) => x);
 (vscode.Uri.file as any) = jest.fn().mockImplementation((x: any) => {
