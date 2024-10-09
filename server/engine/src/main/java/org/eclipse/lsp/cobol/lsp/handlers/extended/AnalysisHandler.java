@@ -85,12 +85,16 @@ public class AnalysisHandler {
         int character = analysisResultEvent.getCharacter();
         Position position = new Position(line, character);
         Optional<Node> selectedNode = RangeUtils.findNodeByPosition(rootNode, analysisResultEvent.getUri(), position);
+
+        ProgramNode programNode;
         if (selectedNode.isPresent() && !(selectedNode.get() instanceof RootNode)) {
-            return cfastBuilder.build((ProgramNode) selectedNode.get()
-                    .getNearestParentByType(PROGRAM).orElse(selectProgramNode(rootNode.findPrograms(), line, character)));
+            programNode = (ProgramNode) selectedNode.get()
+                .getNearestParentByType(PROGRAM).orElse(selectProgramNode(rootNode.findPrograms(), line, character));
+        } else {
+            programNode = selectProgramNode(rootNode.findPrograms(), line, character);
         }
 
-        return cfastBuilder.build(selectProgramNode(rootNode.findPrograms(), line, character));
+        return cfastBuilder.build(programNode);
     }
 
     private ProgramNode selectProgramNode(List<ProgramNode> programs, int line, int character) {

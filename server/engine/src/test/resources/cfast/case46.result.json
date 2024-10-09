@@ -15,7 +15,7 @@
     },
     "children": [
       {
-        "snippet": "P8000-READ-TABLE.\r\n       \r\n           READ TRAVCONV-FILE INTO TRAVELERS-CONV-RECORD\r\n             AT END GO TO P8000-EXIT.\r\n                    MOVE \u0027Y\u0027 TO OUT-REC-TYPE.\r\n                    PERFORM X1.",
+        "snippet": "       P8000-READ-TABLE.\r\n       \r\n           READ TRAVCONV-FILE INTO TRAVELERS-CONV-RECORD\r\n             AT END GO TO P8000-EXIT.\r\n                    MOVE \u0027Y\u0027 TO OUT-REC-TYPE.\r\n                    PERFORM X1.",
         "name": "P8000-READ-TABLE",
         "type": "paragraph",
         "location": {
@@ -121,7 +121,7 @@
         ]
       },
       {
-        "snippet": "X1.\r\n           DISPLAY \u0027HAHAH\u0027.",
+        "snippet": "        X1.\r\n           DISPLAY \u0027HAHAH\u0027.",
         "name": "X1",
         "type": "paragraph",
         "location": {
@@ -153,7 +153,7 @@
         ]
       },
       {
-        "snippet": "P8000-EXIT.\r\n           EXIT.",
+        "snippet": "       P8000-EXIT.\r\n           EXIT.",
         "name": "P8000-EXIT",
         "type": "paragraph",
         "location": {

@@ -228,7 +228,7 @@
         }
       },
       {
-        "snippet": "HANDLER.\r\n            DISPLAY \"HANDLER\".",
+        "snippet": "        HANDLER.\r\n            DISPLAY \"HANDLER\".",
         "name": "HANDLER",
         "type": "paragraph",
         "location": {
