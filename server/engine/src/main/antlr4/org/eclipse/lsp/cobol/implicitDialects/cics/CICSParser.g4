@@ -473,7 +473,7 @@ cics_invoke: INVOKE (SERVICE cics_data_value | CHANNEL cics_data_value | OPERATI
 
 /** ISSUE (all of them) */
 cics_issue:
-	ISSUE (cics_issue_wait | cics_issue_print | cics_issue_eods | cics_issue_abend | cics_issue_abort | cics_issue_add | cics_issue_confirmation
+	ISSUE (cics_issue_print | cics_issue_wait | cics_issue_eods | cics_issue_abend | cics_issue_abort | cics_issue_add | cics_issue_confirmation
 	      | cics_issue_copy | cics_issue_disconnect | cics_issue_end | cics_issue_endfile_endoutput | cics_issue_erase | cics_issue_erase_aup | cics_issue_error
           | cics_issue_load | cics_issue_note | cics_issue_pass | cics_issue_prepare | cics_issue_query | cics_issue_receive | cics_issue_replace | cics_issue_send
           | cics_issue_signal);
