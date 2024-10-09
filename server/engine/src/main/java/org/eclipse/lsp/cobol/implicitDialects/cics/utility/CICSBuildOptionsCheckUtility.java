@@ -19,6 +19,7 @@ package org.eclipse.lsp.cobol.implicitDialects.cics.utility;
         import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
         import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
         import org.eclipse.lsp.cobol.common.error.SyntaxError;
+        import org.eclipse.lsp.cobol.implicitDialects.cics.CICSLexer;
         import org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser;
 
         import java.util.HashMap;
@@ -33,20 +34,20 @@ public class CICSBuildOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
 
     public static final int RULE_INDEX = RULE_cics_build;
 
-    private static final Map<String, ErrorSeverity> DUPLICATE_CHECK_OPTIONS =
-            new HashMap<String, ErrorSeverity>() {
+    private static final Map<Integer, ErrorSeverity> DUPLICATE_CHECK_OPTIONS =
+            new HashMap<Integer, ErrorSeverity>() {
                 {
-                    put("BUILD", ErrorSeverity.ERROR);
-                    put("ATTACH", ErrorSeverity.ERROR);
-                    put("ATTACHID", ErrorSeverity.ERROR);
-                    put("PROCESS", ErrorSeverity.ERROR);
-                    put("RESOURCE", ErrorSeverity.ERROR);
-                    put("RPROCESS", ErrorSeverity.ERROR);
-                    put("RRESOURCE", ErrorSeverity.ERROR);
-                    put("QUEUE", ErrorSeverity.ERROR);
-                    put("IUTYPE", ErrorSeverity.ERROR);
-                    put("DATASTR", ErrorSeverity.ERROR);
-                    put("RECFM", ErrorSeverity.ERROR);
+                    put(CICSLexer.BUILD, ErrorSeverity.ERROR);
+                    put(CICSLexer.ATTACH, ErrorSeverity.ERROR);
+                    put(CICSLexer.ATTACHID, ErrorSeverity.ERROR);
+                    put(CICSLexer.PROCESS, ErrorSeverity.ERROR);
+                    put(CICSLexer.RESOURCE, ErrorSeverity.ERROR);
+                    put(CICSLexer.RPROCESS, ErrorSeverity.ERROR);
+                    put(CICSLexer.RRESOURCE, ErrorSeverity.ERROR);
+                    put(CICSLexer.QUEUE, ErrorSeverity.ERROR);
+                    put(CICSLexer.IUTYPE, ErrorSeverity.ERROR);
+                    put(CICSLexer.DATASTR, ErrorSeverity.ERROR);
+                    put(CICSLexer.RECFM, ErrorSeverity.ERROR);
                 }
             };
 
