@@ -324,8 +324,6 @@ public class CICSIssueOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
 
   void checkWait(CICSParser.Cics_issue_waitContext ctx) {
     checkHasMandatoryOptions(ctx.WAIT(), ctx, "WAIT");
-    if (ctx.cics_issue_common().isEmpty())
-      checkHasMandatoryOptions(ctx.cics_issue_common(), ctx, "DESTID or SUBADDR branches");
     checkIssueCommon(ctx.cics_issue_common());
   }
 
