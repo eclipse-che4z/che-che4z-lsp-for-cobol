@@ -68,8 +68,8 @@ public class TestCicsConverseStatement {
     private static final String DEFAULT_VALID_1 = CONVERSE_FROM_INTO_TO + "MAXLENGTH({$maxLen})";
     private static final String DEFAULT_VALID_2 = CONVERSE_FROM_INTO_TO + "MAXLENGTH({$maxLen}) NOTRUNCATE";
     private static final String DEFAULT_INVAL_1 = CONVERSE_FROM_INTO_TO + "MAXLENGTH({$maxLen}) NOTRUNCATE {NOTRUNCATE|errorOne}";
-    private static final String DEFAULT_INVAL_2 = "CONVERSE {MAXLENGTH(123) NOTRUNCATE|errorOne}";
-    private static final String DEFAULT_INVAL_3 = "CONVERSE FROM(123) {FROMLENGTH|errorOne}(123) {FROMFLENGTH|errorTwo}(123) MAXLENGTH({$maxLen})";
+    private static final String DEFAULT_INVAL_2 = "CONVERSE {INTO(123) MAXLENGTH(123) NOTRUNCATE|errorOne}";
+    private static final String DEFAULT_INVAL_3 = "CONVERSE FROM(123) INTO(123) {FROMLENGTH(123)|errorOne} {FROMFLENGTH(123)|errorTwo} MAXLENGTH({$maxLen})";
 
     private static final String APPC_VALID = CONVERSE + "CONVID({$convidVar}) " + FROM_INTO_TO + "MAXLENGTH({$maxLen}) STATE({$stateVar})";
     private static final String APPC_INVAL = CONVERSE + "CONVID({$convidVar}) " + FROM_INTO_TO + "MAXLENGTH({$maxLen}) STATE({$stateVar}) {CTLCHAR|errorOne}(123)";
@@ -153,13 +153,13 @@ public class TestCicsConverseStatement {
         expectedDiagnostics.put("errorOne",
             new Diagnostic(
                 new Range(),
-                "Exactly one option required, options are mutually exclusive: FROMLENGTH or FROMFLENGTH",
+                "Options \"FROMLENGTH or FROMFLENGTH\" cannot be used more than once in a given command.",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()));
         expectedDiagnostics.put("errorTwo",
              new Diagnostic(
                 new Range(),
-                "Exactly one option required, options are mutually exclusive: FROMLENGTH or FROMFLENGTH",
+                "Options \"FROMLENGTH or FROMFLENGTH\" cannot be used more than once in a given command.",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()));
 

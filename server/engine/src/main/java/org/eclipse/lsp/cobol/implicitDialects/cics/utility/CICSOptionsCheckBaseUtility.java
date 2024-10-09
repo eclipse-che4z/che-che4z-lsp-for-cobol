@@ -31,6 +31,7 @@ import org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.util.function.Consumer;
 
 /** Common facilities for checking CICS parser options */
 @Slf4j
@@ -110,6 +111,21 @@ public abstract class CICSOptionsCheckBaseUtility {
                   ErrorSeverity.ERROR, getLocality(error), "Invalid option provided: ", options));
     }
   }
+  
+  protected <E extends ParserRuleContext> void checkIfSelfCalledMultipleTimes(String options, E ctx) {
+    if (ctx.getParent().getRuleContexts(ctx.getClass()).size() > 1) {
+      throwException(ErrorSeverity.ERROR, getLocality(ctx), "Options \"" + options + "\" cannot be used more than once in a given command.", "");
+    }
+  }
+
+  protected <E extends ParserRuleContext> void checkSubrules(E ctx, Map<Integer, Consumer<ParserRuleContext>> subruleOptions) {
+    ArrayList<ParserRuleContext> childRules = new ArrayList<>(ctx.getRuleContexts(ParserRuleContext.class));
+    for (ParserRuleContext child : childRules) {
+      if (subruleOptions.containsKey(child.getRuleIndex())) {
+          subruleOptions.get(child.getRuleIndex()).accept(child);
+        }
+      }
+    }
 
   /**
    * Iterates over the provided response handlers, extracts what is provided, and validates there is
@@ -273,7 +289,11 @@ public abstract class CICSOptionsCheckBaseUtility {
     }
   }
 
-  private void getAllTokenChildren(
+  protected <E extends ParseTree> void checkHasExactlyOneOption(String options, ParserRuleContext parentCtx, E... rules) {
+      checkHasExactlyOneOption(options, parentCtx, new ArrayList<>(Arrays.asList(rules)));
+  }
+
+  protected void getAllTokenChildren(
       ParserRuleContext ctx, List<TerminalNode> children, boolean validateResponseHandler) {
     if (ctx.children == null) return;
     ctx.children.forEach(

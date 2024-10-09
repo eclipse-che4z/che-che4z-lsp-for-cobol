@@ -169,12 +169,13 @@ cics_send_autopage: AUTOPAGE (CURRENT | ALL)?;
 cics_converse: CONVERSE (cics_converse_group_one | cics_converse_group_two);
 
 // CONVERSE Group 1: Default zOS, Lu4, SCS,Lu23, 3270/3601/3614/3653/3767/3650/3770/3650_int/3270/3680/3790/3270disp/2260
-cics_converse_group_one:  (FROM cics_data_area | ((FROMLENGTH | FROMFLENGTH) cics_data_value) | cics_into | cics_converse_to | cics_maxlength | NOTRUNCATE | DEFRESP | STRFIELD | ((CTLCHAR | LINEADDR) cics_data_value) | LDC cics_name | FMH | LEAVEKB | cics_converse_erase | ASIS | cics_handle_response)+ ;
+cics_converse_group_one:  (FROM cics_data_area | cics_converse_from | cics_into | cics_converse_to | cics_maxlength | NOTRUNCATE | DEFRESP | STRFIELD | ((CTLCHAR | LINEADDR) cics_data_value) | LDC cics_name | FMH | LEAVEKB | cics_converse_erase | ASIS | cics_handle_response)+ ;
 
 // CONVERSE Group 2: APPC, LU61, MRO
-cics_converse_group_two: (cics_into | cics_converse_to | FROM cics_data_area | ((FROMLENGTH | FROMFLENGTH) cics_data_value) | cics_maxlength | ((CONVID | SESSION | ATTACHID) cics_name) | NOTRUNCATE | STATE cics_cvda | DEFRESP | FMH | cics_handle_response)+;
+cics_converse_group_two: (FROM cics_data_area | cics_into | cics_converse_to | cics_converse_from | cics_maxlength | ((CONVID | SESSION | ATTACHID) cics_name) | NOTRUNCATE | STATE cics_cvda | DEFRESP | FMH | cics_handle_response)+;
 
 cics_converse_erase: ERASE (DEFAULT | ALTERNATE)?;
+cics_converse_from: (FROMLENGTH | FROMFLENGTH) cics_data_value;
 cics_into: (INTO cics_data_area | SET cics_ref);
 cics_converse_to: (TOLENGTH | TOFLENGTH) cics_data_area;
 cics_maxlength: ((MAXLENGTH | MAXFLENGTH) cics_data_value);

@@ -22,9 +22,8 @@ import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.implicitDialects.cics.CICSLexer;
 import org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.function.Consumer;
 
 import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_converse;
 
@@ -64,6 +63,15 @@ public class CICSConverseOptionsCheckUtility extends CICSOptionsCheckBaseUtility
                 }
             };
 
+    private final Map<Integer, Consumer<ParserRuleContext>> subruleOptions = new HashMap<Integer, Consumer<ParserRuleContext>>() {
+        {
+            put(CICSParser.RULE_cics_into, (ctx -> checkInto((CICSParser.Cics_intoContext) ctx)));
+            put(CICSParser.RULE_cics_converse_from, (ctx -> checkFrom((CICSParser.Cics_converse_fromContext) ctx)));
+            put(CICSParser.RULE_cics_converse_to, (ctx -> checkTo((CICSParser.Cics_converse_toContext) ctx)));
+            put(CICSParser.RULE_cics_maxlength, (ctx -> checkMax((CICSParser.Cics_maxlengthContext) ctx)));
+        }
+    };
+
     public CICSConverseOptionsCheckUtility(
             DialectProcessingContext context, List<SyntaxError> errors) {
         super(context, errors, DUPLICATE_CHECK_OPTIONS);
@@ -76,7 +84,8 @@ public class CICSConverseOptionsCheckUtility extends CICSOptionsCheckBaseUtility
      * @param <E> A subclass of ParserRuleContext
      */
     public <E extends ParserRuleContext> void checkOptions(E ctx) {
-        switch (ctx.getRuleIndex()) {
+        int currIndex = ctx.getRuleIndex();
+        switch (currIndex) {
             case CICSParser.RULE_cics_converse_group_one:
                 checkGroupOne((CICSParser.Cics_converse_group_oneContext) ctx);
                 break;
@@ -89,21 +98,40 @@ public class CICSConverseOptionsCheckUtility extends CICSOptionsCheckBaseUtility
     }
 
     private void checkGroupOne(CICSParser.Cics_converse_group_oneContext ctx) {
-        checkHasMandatoryOptions(ctx.FROM(), ctx, "FROM");
-        checkHasMutuallyExclusiveOptions("FROMLENGTH or FROMFLENGTH", ctx.FROMLENGTH(), ctx.FROMFLENGTH());
         if (!ctx.ASIS().isEmpty()) {
             checkHasIllegalOptions(ctx.LEAVEKB(), "LEAVEKB");
         }
 
+        checkHasMandatoryOptions(ctx.FROM(), ctx, "FROM");
+        checkHasMandatoryOptions(ctx.cics_into(), ctx, "INTO or SET");
+
+        checkSubrules(ctx, subruleOptions);
         checkDuplicates(ctx);
     }
 
-    private void checkGroupTwo(CICSParser.Cics_converse_group_twoContext ctx) {
-        checkHasMandatoryOptions(ctx.FROM(), ctx, "FROM");
-        checkHasMutuallyExclusiveOptions("FROMLENGTH or FROMFLENGTH", ctx.FROMLENGTH(), ctx.FROMFLENGTH());
-        checkHasMandatoryOptions(ctx.cics_into(), ctx, "INTO");
+    // Subrules
 
+    private void checkGroupTwo(CICSParser.Cics_converse_group_twoContext ctx) {
+        checkHasMandatoryOptions(ctx.cics_into(), ctx, "INTO or SET");
+
+        checkSubrules(ctx, subruleOptions);
         checkDuplicates(ctx);
+    }
+
+    private void checkInto(CICSParser.Cics_intoContext ctx) {
+        checkIfSelfCalledMultipleTimes("INTO or SET", ctx);
+    }
+
+    private void checkFrom(CICSParser.Cics_converse_fromContext ctx) {
+        checkIfSelfCalledMultipleTimes("FROMLENGTH or FROMFLENGTH", ctx);
+    }
+
+    private void checkTo(CICSParser.Cics_converse_toContext ctx) {
+        checkIfSelfCalledMultipleTimes("TOLENGTH or TOFLENGTH", ctx);
+    }
+
+    private void checkMax(CICSParser.Cics_maxlengthContext ctx) {
+        checkIfSelfCalledMultipleTimes("MAXLENGTH or MAXFLENGTH", ctx);
     }
 
 }
