@@ -53,39 +53,40 @@ public abstract class LineIndicatorProcessor implements CobolLineReWriter {
     if (lines.isEmpty()) {
       return Collections.emptyList();
     }
+    CobolProgramLayout layout = getLayout();
     return StreamSupport.stream(lines.get(0).spliterator(), false)
-        .map(line -> line.getType() == PREPROCESSED ? line : processLine(line))
+        .map(line -> line.getType() == PREPROCESSED ? line : processLine(line, layout))
         .collect(Collectors.toList());
   }
 
-  private CobolLine processLine(final CobolLine line) {
+  private CobolLine processLine(final CobolLine line, CobolProgramLayout layout) {
     CobolLineTypeEnum type = line.getType();
     if (type == COMMENT || type == COMPILER_DIRECTIVE) {
       return CobolLineUtils.copyCobolLineWithIndicatorAndContentArea(
-          WS, EMPTY_STRING, line, getLayout());
+          WS, EMPTY_STRING, line, layout);
     }
 
     String trimmedContentArea = conditionalRightTrimContentArea(line);
     if (type == CONTINUATION) {
-      return processContinuationLine(line, trimmedContentArea);
+      return processContinuationLine(line, trimmedContentArea, layout);
     }
 
     Matcher matchedLine = FLOATING_COMMENT_LINE.matcher(trimmedContentArea);
     return matchedLine.matches()
         ? CobolLineUtils.copyCobolLineWithIndicatorAndContentArea(
-            WS, matchedLine.group("validText"), line, getLayout())
+            WS, matchedLine.group("validText"), line, layout)
         : CobolLineUtils.copyCobolLineWithIndicatorAndContentArea(
-            WS, trimmedContentArea, line, getLayout());
+            WS, trimmedContentArea, line, layout);
   }
 
   private CobolLine processContinuationLine(
-      CobolLine line, String conditionalRightTrimmedContentArea) {
+      CobolLine line, String conditionalRightTrimmedContentArea, CobolProgramLayout layout) {
     CobolLine result;
     final String trimmedContentArea = trimLeadingWhitespace(conditionalRightTrimmedContentArea);
     if (StringUtils.isBlank(conditionalRightTrimmedContentArea)) {
       result =
           CobolLineUtils.copyCobolLineWithIndicatorAndContentArea(
-              WS, EMPTY_STRING, line, getLayout());
+              WS, EMPTY_STRING, line, layout);
       /*
        If a line, which is continued on the next line, ends in column 72 with a quotation mark as
        the last character ...
@@ -104,7 +105,7 @@ public abstract class LineIndicatorProcessor implements CobolLineReWriter {
         */
         result =
             CobolLineUtils.copyCobolLineWithIndicatorAndContentArea(
-                WS, trimLeadingChar(trimmedContentArea), line, getLayout());
+                WS, trimLeadingChar(trimmedContentArea), line, layout);
       } else {
         /*
          However there are non-compliant parsers out there without the two consecutive quotation
@@ -113,7 +114,7 @@ public abstract class LineIndicatorProcessor implements CobolLineReWriter {
         /* ... where we simply remove leading whitespace. */
         result =
             CobolLineUtils.copyCobolLineWithIndicatorAndContentArea(
-                WS, trimLeadingWhitespace(conditionalRightTrimmedContentArea), line, getLayout());
+                WS, trimLeadingWhitespace(conditionalRightTrimmedContentArea), line, layout);
       }
     } else if (line.getPredecessor() != null && isEndingWithOpenLiteral(line.getPredecessor())) {
       /* If we are ending with an open literal ... */
@@ -125,11 +126,11 @@ public abstract class LineIndicatorProcessor implements CobolLineReWriter {
       */
       result =
           CobolLineUtils.copyCobolLineWithIndicatorAndContentArea(
-              WS, conditionalRightTrimmedContentArea, line, getLayout());
+              WS, conditionalRightTrimmedContentArea, line, layout);
     } else {
       result =
           CobolLineUtils.copyCobolLineWithIndicatorAndContentArea(
-              WS, conditionalRightTrimmedContentArea, line, getLayout());
+              WS, conditionalRightTrimmedContentArea, line, layout);
     }
     return result;
   }
