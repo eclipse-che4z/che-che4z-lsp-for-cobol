@@ -555,7 +555,7 @@ public class CobolProcedureDivisionVisitor extends CobolProcedureDivisionParserB
 
   @Override
   public List<Node> visitVariableUsageName(VariableUsageNameContext ctx) {
-    return addTreeNode(ctx, locality -> new VariableUsageNode(getName(ctx), locality, isVariableDefinitionMandatory(ctx)));
+    return addTreeNode(ctx, locality -> new UsageNode(getName(ctx), locality, isVariableDefinitionMandatory(ctx)));
   }
 
   private boolean isVariableDefinitionMandatory(VariableUsageNameContext ctx) {
@@ -572,7 +572,7 @@ public class CobolProcedureDivisionVisitor extends CobolProcedureDivisionParserB
             ctx,
             locality -> {
               QualifiedReferenceNode reference = new QualifiedReferenceNode(locality);
-              VariableUsageNode usage = new VariableUsageNode(getName(ctx), locality);
+              UsageNode usage = new UsageNode(getName(ctx), locality);
               reference.addChild(usage);
               return reference;
             });

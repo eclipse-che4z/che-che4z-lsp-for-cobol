@@ -23,6 +23,7 @@ import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.message.MessageTemplate;
 import org.eclipse.lsp.cobol.common.model.DefinedAndUsedStructure;
+import org.eclipse.lsp.cobol.common.model.Describable;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.utils.RangeUtils;
@@ -42,7 +43,7 @@ import static org.eclipse.lsp.cobol.common.model.NodeType.VARIABLE_DEFINITION_NA
 @Getter
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-public abstract class VariableNode extends Node implements DefinedAndUsedStructure {
+public abstract class VariableNode extends Node implements DefinedAndUsedStructure, Describable {
 
   public static final String PREFIX = "  ";
   private final VariableType variableType;
@@ -51,7 +52,7 @@ public abstract class VariableNode extends Node implements DefinedAndUsedStructu
   @EqualsAndHashCode.Exclude private final List<Location> usages = new ArrayList<>();
 
   protected VariableNode(
-      Locality location, String name, VariableType variableType, boolean global) {
+          Locality location, String name, VariableType variableType, boolean global) {
     super(location, VARIABLE);
     this.name = name;
     this.variableType = variableType;
@@ -86,11 +87,11 @@ public abstract class VariableNode extends Node implements DefinedAndUsedStructu
    */
   public SyntaxError getError(MessageTemplate messageTemplate, ErrorSeverity severity) {
     return SyntaxError.syntaxError()
-        .errorSource(ErrorSource.PARSING)
-        .severity(severity)
-        .location(getLocalityForError().toOriginalLocation())
-        .messageTemplate(messageTemplate)
-        .build();
+            .errorSource(ErrorSource.PARSING)
+            .severity(severity)
+            .location(getLocalityForError().toOriginalLocation())
+            .messageTemplate(messageTemplate)
+            .build();
   }
 
   /**
@@ -99,27 +100,40 @@ public abstract class VariableNode extends Node implements DefinedAndUsedStructu
    *
    * @param usageNode a variable usage node
    */
-  public void addUsage(VariableUsageNode usageNode) {
+//  public void addUsage(VariableUsageNode usageNode) {
+//    if (!usages.contains(usageNode.getLocality().toLocation())) {
+//      usages.add(usageNode.getLocality().toLocation());
+//      usageNode.addDefinition(this);
+//    }
+//  }
+
+  /**
+   * Add usage node to this variable definition. The method also updates definition for the usage
+   * node.
+   *
+   * @param usageNode a variable usage node
+   */
+  public void addUsage(DefinedAndUsedStructure usageNode) {
     if (!usages.contains(usageNode.getLocality().toLocation())) {
       usages.add(usageNode.getLocality().toLocation());
-      usageNode.addDefinition(this);
     }
+    usageNode.addDefinition(this);
   }
 
   public List<Location> getDefinitions() {
     return getChildren().stream()
-        .filter(hasType(VARIABLE_DEFINITION_NAME))
-        .map(Node::getLocality)
-        .map(Locality::toLocation)
-        .collect(toList());
+            .filter(hasType(VARIABLE_DEFINITION_NAME))
+            .map(Node::getLocality)
+            .map(Locality::toLocation)
+            .collect(toList());
   }
 
   private Locality getLocalityForError() {
     return getChildren().stream()
-        .filter(hasType(VARIABLE_DEFINITION_NAME))
-        .findAny()
-        .map(Node::getLocality)
-        .orElseGet(this::getLocality);
+            .filter(hasType(VARIABLE_DEFINITION_NAME))
+            .findAny()
+            .map(Node::getLocality)
+            .orElseGet(this::getLocality);
   }
 
   /**
@@ -130,12 +144,17 @@ public abstract class VariableNode extends Node implements DefinedAndUsedStructu
   public void extendLocality(Position newEndPosition) {
     if (RangeUtils.isBefore(locality.getRange().getEnd(), newEndPosition))
       locality =
-          locality.toBuilder()
-              .range(new Range(locality.getRange().getStart(), newEndPosition))
-              .build();
+              locality.toBuilder()
+                      .range(new Range(locality.getRange().getStart(), newEndPosition))
+                      .build();
   }
 
   protected abstract String getVariableDisplayString();
+
+  @Override
+  public String getFormattedDisplayString() {
+    return getFullVariableDescription();
+  }
 
   /**
    * Get user friendly variable description.
@@ -157,35 +176,35 @@ public abstract class VariableNode extends Node implements DefinedAndUsedStructu
 
   private List<String> parentsDescription() {
     return getNearestParentByType(VARIABLE)
-        .map(VariableNode.class::cast)
-        .map(
-            variableNode -> {
-              List<String> result = variableNode.parentsDescription();
-              result.add(variableNode.getVariableDisplayString());
-              return result;
-            })
-        .orElseGet(ArrayList::new);
+            .map(VariableNode.class::cast)
+            .map(
+                    variableNode -> {
+                      List<String> result = variableNode.parentsDescription();
+                      result.add(variableNode.getVariableDisplayString());
+                      return result;
+                    })
+            .orElseGet(ArrayList::new);
   }
 
   protected List<String> getChildrenDescription(String prefix) {
     return getChildren().stream()
-        .filter(hasType(VARIABLE))
-        .map(VariableNode.class::cast)
-        .map(VariableNode::getDisplayStringWithConditionals)
-        .map(description -> prepend(prefix, description))
-        .collect(toList());
+            .filter(hasType(VARIABLE))
+            .map(VariableNode.class::cast)
+            .map(VariableNode::getDisplayStringWithConditionals)
+            .map(description -> prepend(prefix, description))
+            .collect(toList());
   }
 
   private String getDisplayStringWithConditionals() {
     List<String> result = new ArrayList<>();
     result.add(getVariableDisplayString());
     getChildren().stream()
-        .filter(hasType(VARIABLE))
-        .map(VariableNode.class::cast)
-        .filter(variableNode -> variableNode.variableType == VariableType.CONDITION_DATA_NAME)
-        .map(VariableNode::getVariableDisplayString)
-        .map(displayString -> prepend(PREFIX, displayString))
-        .forEach(result::add);
+            .filter(hasType(VARIABLE))
+            .map(VariableNode.class::cast)
+            .filter(variableNode -> variableNode.variableType == VariableType.CONDITION_DATA_NAME)
+            .map(VariableNode::getVariableDisplayString)
+            .map(displayString -> prepend(PREFIX, displayString))
+            .forEach(result::add);
     return String.join("\n", result);
   }
 

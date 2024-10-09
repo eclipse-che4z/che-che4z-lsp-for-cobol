@@ -38,12 +38,12 @@ import java.util.stream.Collectors;
 @EqualsAndHashCode(callSuper = true)
 public class VariableUsageNode extends Node implements DefinedAndUsedStructure, Describable {
   private final String name;
-  @EqualsAndHashCode.Exclude @ToString.Exclude private final List<VariableNode> definitions = new ArrayList<>();
+  @EqualsAndHashCode.Exclude @ToString.Exclude private final List<DefinedAndUsedStructure> definitions = new ArrayList<>();
   private final boolean isDefinitionMandatory;
 
   public VariableUsageNode(
-      String dataName,
-      Locality locality) {
+          String dataName,
+          Locality locality) {
     super(locality, NodeType.VARIABLE_USAGE);
     this.name = dataName;
     this.isDefinitionMandatory = true;
@@ -60,18 +60,19 @@ public class VariableUsageNode extends Node implements DefinedAndUsedStructure, 
 
   @Override
   public List<Location> getDefinitions() {
-    return definitions.stream().map(VariableNode::getLocality).map(Locality::toLocation).collect(Collectors.toList());
+    return definitions.stream().map(DefinedAndUsedStructure::getLocality).map(Locality::toLocation).collect(Collectors.toList());
   }
 
   /**
    * Add a definition to the node.
    * @param definition the definition node
    */
-  public void addDefinition(VariableNode definition) {
+  @Override
+  public void addDefinition(DefinedAndUsedStructure definition) {
     definitions.add(definition);
   }
 
-  private Optional<VariableNode> getDefinition() {
+  private Optional<DefinedAndUsedStructure> getDefinition() {
     if (definitions.isEmpty()) return Optional.empty();
     return Optional.of(definitions.get(0));
   }
@@ -79,14 +80,16 @@ public class VariableUsageNode extends Node implements DefinedAndUsedStructure, 
   @Override
   public List<Location> getUsages() {
     return getDefinition()
-        .map(VariableNode::getUsages)
-        .orElseGet(ImmutableList::of);
+            .map(DefinedAndUsedStructure::getUsages)
+            .orElseGet(ImmutableList::of);
   }
 
   @Override
   public String getFormattedDisplayString() {
     return getDefinition()
-        .map(VariableNode::getFullVariableDescription)
-        .orElse("");
+            .filter(Describable.class::isInstance)
+            .map(Describable.class::cast)
+            .map(Describable::getFormattedDisplayString)
+            .orElse("");
   }
 }

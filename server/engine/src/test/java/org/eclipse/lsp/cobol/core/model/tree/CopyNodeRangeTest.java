@@ -14,9 +14,9 @@
  */
 package org.eclipse.lsp.cobol.core.model.tree;
 
+import org.eclipse.lsp.cobol.common.model.DefinedAndUsedStructure;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.model.NodeType;
-import org.eclipse.lsp.cobol.common.model.tree.variable.VariableUsageNode;
 import org.eclipse.lsp.cobol.common.utils.RangeUtils;
 import org.eclipse.lsp.cobol.common.AnalysisResult;
 import org.eclipse.lsp.cobol.test.engine.UseCase;
@@ -48,7 +48,7 @@ class CopyNodeRangeTest {
     Node usageNode =
         RangeUtils.findNodeByPosition(result.getRootNode(), DOCUMENT_URI, fooUsage).orElse(null);
     assertNotNull(usageNode);
-    assertEquals(NodeType.VARIABLE_USAGE, usageNode.getNodeType());
-    assertEquals("FOO", ((VariableUsageNode) usageNode).getName());
+    assertEquals(NodeType.REFERENCE, usageNode.getNodeType());
+    assertEquals("FOO", ((DefinedAndUsedStructure) usageNode).getName());
   }
 }

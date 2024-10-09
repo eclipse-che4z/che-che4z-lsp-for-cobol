@@ -18,9 +18,9 @@ package org.eclipse.lsp.cobol.usecases;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
+import org.eclipse.lsp.cobol.common.model.DefinedAndUsedStructure;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.model.NodeType;
-import org.eclipse.lsp.cobol.common.model.tree.variable.VariableUsageNode;
 import org.eclipse.lsp.cobol.common.AnalysisResult;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.eclipse.lsp.cobol.test.engine.UseCaseUtils;
@@ -177,8 +177,8 @@ class TestDuplicatedDefinition {
                 "Ambiguous reference for VARNAME",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())));
-    List<VariableUsageNode> variableUsages = result.getRootNode().getDepthFirstStream()
-        .filter(Node.hasType(NodeType.VARIABLE_USAGE)).map(VariableUsageNode.class::cast).collect(Collectors.toList());
+    List<DefinedAndUsedStructure> variableUsages = result.getRootNode().getDepthFirstStream()
+        .filter(Node.hasType(NodeType.VARIABLE_USAGE).or(Node.hasType(NodeType.REFERENCE))).map(DefinedAndUsedStructure.class::cast).collect(Collectors.toList());
     assertEquals(1, variableUsages.size());
     List<Location> expectedLocations = ImmutableList.of(
         new Location(UseCaseUtils.DOCUMENT_URI, new Range(new Position(4, 7), new Position(4, 29))),

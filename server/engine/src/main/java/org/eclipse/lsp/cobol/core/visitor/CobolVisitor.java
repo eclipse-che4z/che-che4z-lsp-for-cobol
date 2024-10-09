@@ -149,22 +149,40 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
     return result;
   }
 
-  private List<Node> makeFunctionReferenceNodes(FunctionNameContext fnCtx) {
+  private List<Node> makeUsageNodes(VariableUsageNameContext fnCtx, boolean isDefMandatory, boolean isFunctionPrefixed) {
     if (fnCtx == null)
       return ImmutableList.of();
 
-    String name = fnCtx.getText();
+    String name = getName(fnCtx);
 
     return retrieveLocality(fnCtx, extendedDocument, copybooks)
-        .map(l -> new FunctionReference(l, name))
+        .map(l -> isFunctionPrefixed ? new FunctionReference(l, name, true) : new UsageNode(name, l, isDefMandatory))
         .map(Node.class::cast)
-        .map(n -> ImmutableList.of(n))
+        .map(ImmutableList::of)
         .orElse(ImmutableList.of());
   }
 
   @Override
-  public List<Node> visitFunctionReference(FunctionReferenceContext ctx) {
-    return makeFunctionReferenceNodes(ctx.functionName());
+  public List<Node> visitFunctionRepositoryClause(FunctionRepositoryClauseContext ctx) {
+    Optional<Locality> statementLocality = retrieveLocality(ctx, extendedDocument, copybooks);
+    if (statementLocality.isPresent()) {
+      boolean isIntrinsic = ctx.INTRINSIC() != null;
+      TerminalNode all = ctx.ALL();
+      List<FunctionReference> functionNames = ctx.variableUsageName().stream()
+              .map(functionNameContext -> retrieveLocality(functionNameContext, extendedDocument, copybooks)
+                      .map(functionLocality -> new FunctionReference(functionLocality, functionNameContext.getText(), true)))
+              .filter(Optional::isPresent)
+              .map(Optional::get)
+              .collect(Collectors.toList());
+
+      if (Objects.nonNull(all)) {
+        retrieveLocality(ctx.ALL(), extendedDocument, copybooks)
+            .ifPresent(locality -> functionNames.add(new FunctionReference(locality, all.getText(), true)));
+      }
+      return ImmutableList.of(new FunctionDeclaration(statementLocality.get(), functionNames, isIntrinsic));
+    } else {
+      return ImmutableList.of();
+    }
   }
 
   @Override
@@ -1133,7 +1151,16 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
 
   @Override
   public List<Node> visitVariableUsageName(VariableUsageNameContext ctx) {
-    return addTreeNode(ctx, locality -> new VariableUsageNode(getName(ctx), locality, isVariableDefinitionMandatory(ctx)));
+    return makeUsageNodes(ctx, isVariableDefinitionMandatory(ctx), isFunctionPrefixed(ctx));
+  }
+
+  private boolean isFunctionPrefixed(VariableUsageNameContext ctx) {
+    return ofNullable(ctx.getParent())
+            .filter(QualifiedDataNameContext.class::isInstance)
+            .map(QualifiedDataNameContext.class::cast)
+            .map(QualifiedDataNameContext::FUNCTION)
+            .map(Objects::nonNull)
+            .orElse(false);
   }
 
   private boolean isVariableDefinitionMandatory(VariableUsageNameContext ctx) {
@@ -1150,7 +1177,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
             ctx,
             locality -> {
               QualifiedReferenceNode reference = new QualifiedReferenceNode(locality);
-              VariableUsageNode usage = new VariableUsageNode(getName(ctx), locality);
+              UsageNode usage = new UsageNode(getName(ctx), locality);
               reference.addChild(usage);
               return reference;
             });
@@ -1242,9 +1269,9 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
     if (dt == null || !locality.isPresent()) return ImmutableList.of();
     VariableNameAndLocality nameAndLocality = extractNameAndLocality(dt);
     ProcedureDivisionReturningNode returningNode = new ProcedureDivisionReturningNode(locality.get(), nameAndLocality);
-    VariableUsageNode variableUsageNode = new VariableUsageNode(nameAndLocality.getName(), nameAndLocality.getLocality());
+    UsageNode usageNode = new UsageNode(nameAndLocality.getName(), nameAndLocality.getLocality(), NodeType.VARIABLE_USAGE);
     QualifiedReferenceNode qualifiedReferenceNode = new QualifiedReferenceNode(nameAndLocality.getLocality());
-    qualifiedReferenceNode.addChild(variableUsageNode);
+    qualifiedReferenceNode.addChild(usageNode);
     returningNode.addChild(qualifiedReferenceNode);
     return ImmutableList.of(returningNode);
   }

@@ -22,6 +22,7 @@ import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.model.NodeType;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
+import org.eclipse.lsp.cobol.common.model.tree.variable.UsageNode;
 import org.eclipse.lsp.cobol.core.CobolDataDivisionParser.*;
 import org.eclipse.lsp.cobol.core.CobolParser;
 import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
@@ -39,6 +40,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -103,7 +105,9 @@ class CobolDataDivisionVisitorTest {
         when(extendedDocument.mapLocation(any())).thenReturn(location);
         List<Node> result = visitor.visitVariableUsageName(ctx);
 
-        assertEquals(NodeType.VARIABLE_USAGE, result.get(0).getNodeType());
+        assertEquals(NodeType.REFERENCE, result.get(0).getNodeType());
+        assertTrue(result.get(0) instanceof UsageNode);
+        assertEquals(UsageNode.UsageType.UNKNOWN, ((UsageNode) result.get(0)).getUsageType());
         assertEquals(location, result.get(0).getLocality().toLocation());
     }
 

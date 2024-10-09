@@ -19,6 +19,8 @@ import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.message.MessageTemplate;
+import org.eclipse.lsp.cobol.common.model.DefinedAndUsedStructure;
+import org.eclipse.lsp.cobol.common.model.NodeType;
 import org.eclipse.lsp.cobol.common.model.tree.XmlGenerateNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.*;
 import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
@@ -50,7 +52,7 @@ public class XmlGenerateProcess implements Processor<XmlGenerateNode> {
 
   @Override
   public void accept(XmlGenerateNode xmlGenerateNode, ProcessingContext processingContext) {
-    List<VariableUsageNode> identifier1Nodes =
+    List<DefinedAndUsedStructure> identifier1Nodes =
         VariableUsageUtils.getVariableUsageNode(xmlGenerateNode, xmlGenerateNode.getIdentifier1());
     if (identifier1Nodes.isEmpty()) return;
     List<VariableNode> identifier1FoundDefinitions =
@@ -59,7 +61,7 @@ public class XmlGenerateProcess implements Processor<XmlGenerateNode> {
 
     semanticAnalysisForIdentifier1(
         processingContext, identifier1Nodes, identifier1FoundDefinitions);
-    List<VariableUsageNode> identifier2Nodes =
+    List<DefinedAndUsedStructure> identifier2Nodes =
         VariableUsageUtils.getVariableUsageNode(xmlGenerateNode, xmlGenerateNode.getIdentifier2());
     if (identifier2Nodes.isEmpty()) return;
     List<VariableNode> identifier2FoundDefinitions =
@@ -73,7 +75,7 @@ public class XmlGenerateProcess implements Processor<XmlGenerateNode> {
         identifier1FoundDefinitions);
 
     if (Objects.nonNull(xmlGenerateNode.getIdentifier3())) {
-      List<VariableUsageNode> identifier3Nodes =
+      List<DefinedAndUsedStructure> identifier3Nodes =
           VariableUsageUtils.getVariableUsageNode(
               xmlGenerateNode, xmlGenerateNode.getIdentifier3());
       if (identifier3Nodes.isEmpty()) return;
@@ -89,7 +91,7 @@ public class XmlGenerateProcess implements Processor<XmlGenerateNode> {
 
       if (Objects.nonNull(xmlGenerateNode.getIdentifier4())) {
 
-        List<VariableUsageNode> identifier4Nodes =
+        List<DefinedAndUsedStructure> identifier4Nodes =
             VariableUsageUtils.getVariableUsageNode(
                 xmlGenerateNode, xmlGenerateNode.getIdentifier4());
         if (identifier4Nodes.isEmpty()) return;
@@ -105,7 +107,7 @@ public class XmlGenerateProcess implements Processor<XmlGenerateNode> {
       }
       if (Objects.nonNull(xmlGenerateNode.getIdentifier5())) {
 
-        List<VariableUsageNode> identifier5Nodes =
+        List<DefinedAndUsedStructure> identifier5Nodes =
             VariableUsageUtils.getVariableUsageNode(
                 xmlGenerateNode, xmlGenerateNode.getIdentifier5());
         if (identifier5Nodes.isEmpty()) return;
@@ -144,7 +146,7 @@ public class XmlGenerateProcess implements Processor<XmlGenerateNode> {
       XmlGenerateNode xmlGenerateNode,
       ProcessingContext ctx,
       List<VariableNode> identifier2FoundDefinitions) {
-    List<VariableUsageNode> identifier8Nodes =
+    List<DefinedAndUsedStructure> identifier8Nodes =
         VariableUsageUtils.getVariableUsageNode(xmlGenerateNode, xmlGenerateNode.getIdentifier8());
     identifier8Nodes.forEach(
         identifier8 -> {
@@ -172,7 +174,7 @@ public class XmlGenerateProcess implements Processor<XmlGenerateNode> {
                         .messageTemplate(
                             MessageTemplate.of(
                                 "xmlParseProcess.identifier7",
-                                identifier8.getNodeType(),
+                                    NodeType.VARIABLE_USAGE,
                                 identifier2FoundDefinitions.get(0).getName()))
                         .build());
           }
@@ -184,7 +186,7 @@ public class XmlGenerateProcess implements Processor<XmlGenerateNode> {
       ProcessingContext ctx,
       List<VariableNode> identifier2FoundDefinitions) {
 
-    List<VariableUsageNode> identifier7Nodes =
+    List<DefinedAndUsedStructure> identifier7Nodes =
         VariableUsageUtils.getVariableUsageNode(xmlGenerateNode, xmlGenerateNode.getIdentifier7());
     identifier7Nodes.forEach(
         identifier7 -> {
@@ -212,7 +214,7 @@ public class XmlGenerateProcess implements Processor<XmlGenerateNode> {
                         .messageTemplate(
                             MessageTemplate.of(
                                 "xmlParseProcess.identifier7",
-                                identifier7.getNodeType(),
+                                    NodeType.VARIABLE_USAGE,
                                 identifier2FoundDefinitions.get(0).getName()))
                         .build());
           }
@@ -223,7 +225,7 @@ public class XmlGenerateProcess implements Processor<XmlGenerateNode> {
       XmlGenerateNode xmlGenerateNode,
       ProcessingContext ctx,
       List<VariableNode> identifier2FoundDefinitions) {
-    List<VariableUsageNode> identifier6Nodes =
+    List<DefinedAndUsedStructure> identifier6Nodes =
         VariableUsageUtils.getVariableUsageNode(xmlGenerateNode, xmlGenerateNode.getIdentifier6());
     identifier6Nodes.forEach(
         identifier6 -> {
@@ -260,7 +262,7 @@ public class XmlGenerateProcess implements Processor<XmlGenerateNode> {
 
   private void semanticAnalysisForIdentifier5(
       ProcessingContext ctx,
-      List<VariableUsageNode> identifier5Nodes,
+      List<DefinedAndUsedStructure> identifier5Nodes,
       List<VariableNode> identifier5FoundDefinitions,
       List<VariableNode> identifier1FoundDefinitions,
       List<VariableNode> identifier3FoundDefinitions) {
@@ -324,7 +326,7 @@ public class XmlGenerateProcess implements Processor<XmlGenerateNode> {
 
   private void semanticAnalysisForIdentifier4(
       ProcessingContext ctx,
-      List<VariableUsageNode> identifier4Nodes,
+      List<DefinedAndUsedStructure> identifier4Nodes,
       List<VariableNode> identifier3FoundDefinitions,
       List<VariableNode> identifier1FoundDefinitions,
       List<VariableNode> identifier4FoundDefinitions) {
@@ -387,7 +389,7 @@ public class XmlGenerateProcess implements Processor<XmlGenerateNode> {
 
   private void semanticAnalysisForIdentifier3(
       ProcessingContext ctx,
-      List<VariableUsageNode> identifier3Nodes,
+      List<DefinedAndUsedStructure> identifier3Nodes,
       List<VariableNode> identifier3FoundDefinitions,
       List<VariableNode> identifier2FoundDefinitions,
       List<VariableNode> identifier1FoundDefinitions) {
@@ -471,7 +473,7 @@ public class XmlGenerateProcess implements Processor<XmlGenerateNode> {
 
   private void semanticAnalysisForIdentifier2(
       ProcessingContext ctx,
-      List<VariableUsageNode> identifier2Nodes,
+      List<DefinedAndUsedStructure> identifier2Nodes,
       List<VariableNode> identifier2FoundDefnitions,
       List<VariableNode> identifier1FoundDefinitions) {
     // checking for overlap between identifier1 and identifier2
@@ -519,7 +521,7 @@ public class XmlGenerateProcess implements Processor<XmlGenerateNode> {
   }
 
   private void validateIdentifier2Group(
-      ProcessingContext ctx, List<VariableUsageNode> nodes, List<VariableNode> definitions) {
+      ProcessingContext ctx, List<DefinedAndUsedStructure> nodes, List<VariableNode> definitions) {
     boolean isNonUniqueChildren =
         getElementaryNodeStreamForIdentifier2(definitions)
             .collect(groupingBy(VariableWithLevelNode::getName))
@@ -592,7 +594,7 @@ public class XmlGenerateProcess implements Processor<XmlGenerateNode> {
 
   private void semanticAnalysisForIdentifier1(
       ProcessingContext ctx,
-      List<VariableUsageNode> identifier1,
+      List<DefinedAndUsedStructure> identifier1,
       List<VariableNode> identifier1Definitions) {
     if (identifier1Definitions.isEmpty()) return;
     if (identifier1Definitions.get(0) instanceof ElementaryNode) {
@@ -623,7 +625,7 @@ public class XmlGenerateProcess implements Processor<XmlGenerateNode> {
   }
 
   private void verifyIdentifier1GroupItem(
-      List<VariableNode> definitions, List<VariableUsageNode> identifier1, ProcessingContext ctx) {
+      List<VariableNode> definitions, List<DefinedAndUsedStructure> identifier1, ProcessingContext ctx) {
     if (!NodeUtils.isNodeAlphanumeric(definitions.get(0))
         || NodeUtils.checkIfNodeHasDynamicGroupItem(definitions.get(0))
         || NodeUtils.checkIfNodeHasJustifiedGroupItem(definitions.get(0))) {

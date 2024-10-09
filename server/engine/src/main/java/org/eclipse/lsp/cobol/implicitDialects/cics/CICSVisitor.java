@@ -51,7 +51,7 @@ import org.eclipse.lsp.cobol.common.model.tree.CompilerDirectiveNode;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.model.tree.StopNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.QualifiedReferenceNode;
-import org.eclipse.lsp.cobol.common.model.tree.variable.VariableUsageNode;
+import org.eclipse.lsp.cobol.common.model.tree.variable.UsageNode;
 import org.eclipse.lsp.cobol.common.utils.ThreadInterruptionUtil;
 import org.eclipse.lsp.cobol.implicitDialects.cics.nodes.ExecCicsHandleNode;
 import org.eclipse.lsp.cobol.implicitDialects.cics.nodes.ExecCicsNode;
@@ -201,7 +201,7 @@ class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
 
   @Override
   public List<Node> visitDataName(CICSParser.DataNameContext ctx) {
-    return addTreeNode(ctx, locality -> new VariableUsageNode(getName(ctx), locality));
+    return addTreeNode(ctx, locality -> new UsageNode(getName(ctx), locality));
   }
 
   // TODO : correct the implementation
