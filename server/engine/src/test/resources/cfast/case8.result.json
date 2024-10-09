@@ -44,7 +44,7 @@
         }
       },
       {
-        "snippet": "PARAG1.\r\n            EXIT.",
+        "snippet": "       PARAG1.\r\n            EXIT.",
         "name": "PARAG1",
         "type": "paragraph",
         "location": {

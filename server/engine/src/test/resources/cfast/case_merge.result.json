@@ -75,7 +75,7 @@
         }
       },
       {
-        "snippet": "PAR1.\r\n           DISPLAY \"PAR1\".",
+        "snippet": "       PAR1.\r\n           DISPLAY \"PAR1\".",
         "name": "PAR1",
         "type": "paragraph",
         "location": {
@@ -107,7 +107,7 @@
         ]
       },
       {
-        "snippet": "PAR2.\r\n           DISPLAY \"PAR2\".",
+        "snippet": "       PAR2.\r\n           DISPLAY \"PAR2\".",
         "name": "PAR2",
         "type": "paragraph",
         "location": {
@@ -139,7 +139,7 @@
         ]
       },
       {
-        "snippet": "PAR3.\r\n           DISPLAY \"PAR3\".",
+        "snippet": "       PAR3.\r\n           DISPLAY \"PAR3\".",
         "name": "PAR3",
         "type": "paragraph",
         "location": {
@@ -171,7 +171,7 @@
         ]
       },
       {
-        "snippet": "INPUT-PAR1.\r\n           PERFORM PAR1.",
+        "snippet": "       INPUT-PAR1.\r\n           PERFORM PAR1.",
         "name": "INPUT-PAR1",
         "type": "paragraph",
         "location": {
@@ -204,7 +204,7 @@
         ]
       },
       {
-        "snippet": "INPUT-PAR2.\r\n           PERFORM PAR2.",
+        "snippet": "       INPUT-PAR2.\r\n           PERFORM PAR2.",
         "name": "INPUT-PAR2",
         "type": "paragraph",
         "location": {
@@ -238,7 +238,7 @@
       },
       {
         "name": "SECTION1",
-        "snippet": "SECTION1 SECTION.\r\n       \r\n       OUTPUT-PAR1.\r\n           PERFORM PAR3.",
+        "snippet": "       SECTION1 SECTION.\r\n       \r\n       OUTPUT-PAR1.\r\n           PERFORM PAR3.",
         "type": "section",
         "location": {
           "uri": "fake/path",
@@ -253,7 +253,7 @@
         },
         "children": [
           {
-            "snippet": "OUTPUT-PAR1.\r\n           PERFORM PAR3.",
+            "snippet": "       OUTPUT-PAR1.\r\n           PERFORM PAR3.",
             "name": "OUTPUT-PAR1",
             "type": "paragraph",
             "location": {
