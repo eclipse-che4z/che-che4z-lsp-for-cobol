@@ -106,12 +106,12 @@ public abstract class CICSOptionsCheckBaseUtility {
   protected void checkHasIllegalOptions(List<?> rules, String options) {
     if (!rules.isEmpty()) {
       rules.forEach(
-          error ->
-              throwException(
-                  ErrorSeverity.ERROR, getLocality(error), "Invalid option provided: ", options));
+              error ->
+                      throwException(
+                              ErrorSeverity.ERROR, getLocality(error), "Invalid option provided: ", options));
     }
   }
-  
+
   protected <E extends ParserRuleContext> void checkIfSelfCalledMultipleTimes(String options, E ctx) {
     if (ctx.getParent().getRuleContexts(ctx.getClass()).size() > 1) {
       throwException(ErrorSeverity.ERROR, getLocality(ctx), "Options \"" + options + "\" cannot be used more than once in a given command.", "");
