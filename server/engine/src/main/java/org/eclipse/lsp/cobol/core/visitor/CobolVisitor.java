@@ -18,7 +18,6 @@ package org.eclipse.lsp.cobol.core.visitor;
 import com.google.common.collect.ImmutableList;
 import lombok.NonNull;
 import org.antlr.v4.runtime.*;
-import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.RuleNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
@@ -55,7 +54,6 @@ import org.slf4j.Logger;
 
 import java.util.*;
 import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static java.util.Collections.emptyList;
@@ -111,7 +109,6 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   @Override
   public List<Node> visitStartRule(StartRuleContext ctx) {
     // we can skip the other nodes, but not the root
-    text.setInputStream(ctx.getStart().getInputStream());
     try {
       return ImmutableList.of(
             retrieveLocality(ctx, extendedDocument, copybooks)
@@ -1662,9 +1659,12 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
     }
   }
 
+  private Location getLocation(Token childToken) {
+    return extendedDocument.mapLocation(buildTokenRange(childToken));
+  }
+
   private Optional<Locality> getLocality(Token childToken) {
-    Location location = extendedDocument.mapLocation(buildTokenRange(childToken));
-    return ofNullable(locationToLocality(location));
+    return ofNullable(locationToLocality(getLocation(childToken)));
   }
 
   private void reportSubroutineNotDefined(String name, Locality locality) {
@@ -1704,58 +1704,56 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
 
   private void areaAWarning(Token token) {
     // skip area A check for cics and sql block
-    if (token.getText().startsWith("EXEC")) {
+    final int tokenType = token.getType();
+    if (tokenType == EOF || tokenType == IDENTIFIER && startsWithIcase(token.getText(), "EXEC")) {
       return;
     }
-    if (token.getType() == EOF) {
+    final int areaBStartIndex = programLayout.getSequenceLength()
+        + programLayout.getIndicatorLength()
+        + programLayout.getAreaALength() - 1;
+
+    final Location tokenLoc = getLocation(token);
+    if (tokenLoc.getRange().getStart().getCharacter() <= areaBStartIndex)
       return;
-    }
-    int areaBStartIndex =
-            programLayout.getSequenceLength()
-                    + programLayout.getIndicatorLength()
-                    + programLayout.getAreaALength() - 1;
-    getLocality(token)
-            .filter(it -> it.getRange().getStart().getCharacter() > areaBStartIndex)
-            .ifPresent(
-                    it ->
-                            throwException(
-                                    token.getText(),
-                                    it,
-                                    messageService.getMessage("CobolVisitor.AreaAWarningMsg")));
+    throwException(
+        token.getText(),
+        locationToLocality(tokenLoc),
+        messageService.getMessage("CobolVisitor.AreaAWarningMsg"));
+  }
+
+  private static boolean startsWithIcase(String s, String b) {
+    if (s.length() < b.length())
+      return false;
+
+    return s.substring(0, b.length()).compareToIgnoreCase(b) == 0;
   }
 
   protected void areaBWarning(ParserRuleContext ctx) {
     final int start = ctx.getStart().getTokenIndex();
-    final int stop = ctx.getStop().getTokenIndex();
+    int stop = ctx.getStop().getTokenIndex();
+    if (start < 0 || stop < 0)
+      return;
+    if (stop >= tokenStream.size())
+      stop = tokenStream.size() - 1;
 
-    areaBWarning(start < stop ? tokenStream.getTokens(start, stop) : ImmutableList.of(ctx.getStart()));
+    for (int i = start; i <= stop; ++i) {
+      Token t = tokenStream.get(i);
+      if (t.getChannel() == HIDDEN)
+        continue;
+      Location l = getLocation(t);
+      if (!startsInAreaA(l.getRange()))
+        continue;
+      throwException(
+          t.getText(),
+          locationToLocality(l),
+          messageService.getMessage("CobolVisitor.AreaBWarningMsg"));
+    }
   }
 
-  private void areaBWarning(@NonNull List<Token> tokenList) {
-    tokenList.forEach(
-            token ->
-                    getLocality(token)
-                            .filter(startsInAreaA(token))
-                            .ifPresent(
-                                    locality ->
-                                            throwException(
-                                                    token.getText(),
-                                                    locality,
-                                                    messageService.getMessage("CobolVisitor.AreaBWarningMsg"))));
-  }
-
-  private Predicate<Locality> startsInAreaA(Token token) {
-    return it -> {
-      // TODO: Update this
-      int charPosition = it.getRange().getStart().getCharacter();
-      int areaBStartIndex =
-              programLayout.getSequenceLength()
-                      + programLayout.getIndicatorLength()
-                      + programLayout.getAreaALength();
-      return charPosition > programLayout.getSequenceLength()
-              && charPosition < areaBStartIndex
-              && token.getChannel() != HIDDEN;
-    };
+  private boolean startsInAreaA(Range r) {
+    final int charPosition = r.getStart().getCharacter();
+    final int areaBStartIndex = programLayout.getSequenceLength() + programLayout.getIndicatorLength() + programLayout.getAreaALength();
+    return charPosition > programLayout.getSequenceLength() && charPosition < areaBStartIndex;
   }
 
   private static Collection<Location> getSubroutineLocation(
@@ -1856,7 +1854,6 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
 
   private static final class TextExtractionState {
     private final ExtendedDocument extendedDocument;
-    private CharStream input = null;
     private ParagraphNode lastParagraphNode = null;
     private ProcedureSectionNode lastSectionNode = null;
     private Token firstSectionToken = null;
@@ -1870,16 +1867,14 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
 
       void update(ProcedureSectionNode section, Token firstToken) {
       if (lastParagraphNode != null) {
-        String text = input.getText(new Interval(firstParagraphToken.getStartIndex(), lastSentenseToken.getStopIndex()));
-        lastParagraphNode.setText(text);
         lastParagraphNode.getLocality().getRange().setEnd(lastSentensePosition);
+        lastParagraphNode.setText(extendedDocument.getBaseText(lastParagraphNode.getLocality()));
         lastParagraphNode = null;
         firstParagraphToken = null;
       }
       if (lastSectionNode != null) {
-        String text = input.getText(new Interval(firstSectionToken.getStartIndex(), lastSentenseToken.getStopIndex()));
         lastSectionNode.getLocality().getRange().setEnd(lastSentensePosition);
-        lastSectionNode.setText(text);
+        lastSectionNode.setText(extendedDocument.getBaseText(lastSectionNode.getLocality()));
       }
       firstSectionToken = firstToken;
       lastSectionNode = section;
@@ -1887,9 +1882,8 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
 
     void update(ParagraphNode paragraphNode, Token firstToken) {
       if (lastParagraphNode != null) {
-        String text = input.getText(new Interval(firstParagraphToken.getStartIndex(), lastSentenseToken.getStopIndex()));
-        lastParagraphNode.setText(text);
         lastParagraphNode.getLocality().getRange().setEnd(lastSentensePosition);
+        lastParagraphNode.setText(extendedDocument.getBaseText(lastParagraphNode.getLocality()));
       }
       lastParagraphNode = paragraphNode;
       firstParagraphToken = firstToken;
@@ -1899,10 +1893,6 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
       lastSentenseToken = lastToken;
       lastSentensePosition = extendedDocument.mapLocation(constructRange(lastSentenseToken))
               .getRange().getEnd();
-    }
-
-    void setInputStream(CharStream input) {
-      this.input = input;
     }
 
     void reset() {
@@ -1915,14 +1905,12 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
     }
     void flush() {
       if (lastParagraphNode != null) {
-        String text = input.getText(new Interval(firstParagraphToken.getStartIndex(), lastSentenseToken.getStopIndex()));
-        lastParagraphNode.setText(text);
         lastParagraphNode.getLocality().getRange().setEnd(lastSentensePosition);
+        lastParagraphNode.setText(extendedDocument.getBaseText(lastParagraphNode.getLocality()));
       }
       if (lastSectionNode != null) {
-        String text = input.getText(new Interval(firstSectionToken.getStartIndex(), lastSentenseToken.getStopIndex()));
-        lastSectionNode.setText(text);
         lastSectionNode.getLocality().getRange().setEnd(lastSentensePosition);
+        lastSectionNode.setText(extendedDocument.getBaseText(lastSectionNode.getLocality()));
       }
     }
   }

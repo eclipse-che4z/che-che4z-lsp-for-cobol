@@ -46,7 +46,7 @@
       },
       {
         "name": "SEC1",
-        "snippet": "SEC1 SECTION.",
+        "snippet": "        SEC1 SECTION.",
         "type": "section",
         "location": {
           "uri": "fake/path",

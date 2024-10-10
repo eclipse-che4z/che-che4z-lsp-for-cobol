@@ -21,8 +21,8 @@ import org.eclipse.lsp.cobol.common.processor.ProcessingPhase;
 import org.eclipse.lsp.cobol.common.processor.Processor;
 import org.eclipse.lsp.cobol.common.utils.ThreadInterruptionUtil;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * AST processor. This class contains node type specific processors and handles abstract syntax tree
@@ -53,25 +53,28 @@ public class AstProcessor {
    * @param ctx processing context
    */
   public void process(ProcessingPhase phase, Node node, ProcessingContext ctx) {
-    ThreadInterruptionUtil.checkThreadInterrupted();
-    findProcessors(ctx, phase, node.getClass()).forEach(p -> ((Processor<Node>) p).accept(node, ctx));
-    node.getChildren().forEach(n -> process(phase, n, ctx));
+    Map<Class<? extends Node>, List<Processor<? extends Node>>> processors = ctx.getProcessors().get(phase);
+    if (processors != null)
+      process(processors, node, ctx);
   }
 
-  private List<Processor<? extends Node>> findProcessors(ProcessingContext ctx,
-                                               ProcessingPhase phase, Class<? extends Node> nodeClass) {
-    List<Processor<? extends Node>> result = new ArrayList<>();
-    if (!ctx.getProcessors().containsKey(phase)) {
-      return result;
-    }
-    ctx.getProcessors()
-        .get(phase)
-        .forEach(
-            (key, value) -> {
-              if (key.isAssignableFrom(nodeClass)) {
-                value.forEach(v -> result.add((Processor<? extends Node>) v));
-              }
-            });
-    return result;
+  /**
+   * Process tree node and its children after tree construction.
+   *
+   * @param processor list of available processors
+   * @param node a node to process
+   * @param ctx processing context
+   */
+  private void process(Map<Class<? extends Node>, List<Processor<? extends Node>>> processors,
+      Node node, ProcessingContext ctx) {
+    ThreadInterruptionUtil.checkThreadInterrupted();
+    final Class<? extends Node> nodeClass = node.getClass();
+    processors.forEach((key, value) -> {
+      if (!key.isAssignableFrom(nodeClass))
+        return;
+      for (Processor<? extends Node> p : value)
+        ((Processor<Node>) p).accept(node, ctx);
+    });
+    node.getChildren().forEach(n -> process(processors, n, ctx));
   }
 }

@@ -48,7 +48,7 @@ public class CompilerDirectivesVisitor extends CompilerDirectivesParserBaseVisit
   }
 
   @Override
-  public Object visitDeprecatedCompilerOptions(CompilerDirectivesParser.DeprecatedCompilerOptionsContext ctx) {
+  public Object visitUnSupportedDeprecatedCompilerDirectives(CompilerDirectivesParser.UnSupportedDeprecatedCompilerDirectivesContext ctx) {
     VisitorHelper.retrieveRangeLocality(ctx).ifPresent(r -> {
       Range range = CompilerDirectivesUtils.shiftRange(r, startPosition);
       Location location = new Location(analysisContext.getExtendedDocument().getUri(), range);
@@ -60,8 +60,38 @@ public class CompilerDirectivesVisitor extends CompilerDirectivesParserBaseVisit
               .severity(ErrorSeverity.ERROR)
               .build());
     });
-    return super.visitDeprecatedCompilerOptions(ctx);
+    return super.visitUnSupportedDeprecatedCompilerDirectives(ctx);
   }
 
+  @Override
+  public Object visitOptionalDeprecatedCompilerDirectives(CompilerDirectivesParser.OptionalDeprecatedCompilerDirectivesContext ctx) {
+    VisitorHelper.retrieveRangeLocality(ctx).ifPresent(r -> {
+      Range range = CompilerDirectivesUtils.shiftRange(r, startPosition);
+      Location location = new Location(analysisContext.getExtendedDocument().getUri(), range);
+      analysisContext.getAccumulatedErrors().add(SyntaxError.syntaxError()
+              .errorSource(ErrorSource.PARSING)
+              .errorCode(() -> "IGYOS4013-I")
+              .location(new OriginalLocation(location, null))
+              .suggestion(messageService.getMessage("compilerDirective.info.deprecatedDirectiveUse", ctx.getText()))
+              .severity(ErrorSeverity.INFO)
+              .build());
+    });
+    return super.visitOptionalDeprecatedCompilerDirectives(ctx);
+  }
 
+  @Override
+  public Object visitCompilableSupportedDeprecatedCompilerDirectives(CompilerDirectivesParser.CompilableSupportedDeprecatedCompilerDirectivesContext ctx) {
+    VisitorHelper.retrieveRangeLocality(ctx).ifPresent(r -> {
+      Range range = CompilerDirectivesUtils.shiftRange(r, startPosition);
+      Location location = new Location(analysisContext.getExtendedDocument().getUri(), range);
+      analysisContext.getAccumulatedErrors().add(SyntaxError.syntaxError()
+              .errorSource(ErrorSource.PARSING)
+              .errorCode(() -> "IGYOS4008-W")
+              .location(new OriginalLocation(location, null))
+              .suggestion(messageService.getMessage("compilerDirective.warning.deprecatedDirectiveUse", ctx.getText()))
+              .severity(ErrorSeverity.WARNING)
+              .build());
+    });
+    return super.visitCompilableSupportedDeprecatedCompilerDirectives(ctx);
+  }
 }

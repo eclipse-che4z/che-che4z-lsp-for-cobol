@@ -23,7 +23,7 @@ import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
-import static org.eclipse.lsp4j.DiagnosticSeverity.Error;
+import static org.eclipse.lsp4j.DiagnosticSeverity.Warning;
 
 /** Tests inline comment with just the comment tag doesn't throw error. */
 public class TestInlineComments {
@@ -86,7 +86,7 @@ public class TestInlineComments {
     UseCaseEngine.runTest(TEXT4, ImmutableList.of(), ImmutableMap.of("1", new Diagnostic(
             new Range(),
             "Missing blank before inline comment",
-            Error,
+            Warning,
             ErrorSource.PREPROCESSING.getText())));
   }
 }

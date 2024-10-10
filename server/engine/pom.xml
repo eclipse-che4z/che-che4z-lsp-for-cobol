@@ -32,7 +32,7 @@
     <properties>
         <antlr.version>4.13.2</antlr.version>
         <awaitility.version>3.0.0</awaitility.version>
-        <commons.io.version>2.10.0</commons.io.version>
+        <commons.io.version>2.14.0</commons.io.version>
         <commons.lang.version>3.12.0</commons.lang.version>
         <commons.text.version>1.10.0</commons.text.version>
         <concurrentunit.version>0.4.6</concurrentunit.version>
@@ -291,6 +291,10 @@
                             <!--suppress UnresolvedMavenProperty -->
                             <value>${listingSnap}</value>
                         </property>
+                        <property>
+                            <name>usecase.test.repo.dir</name>
+                            <value>${usecase.test.repo.dir}</value>
+                        </property>
                     </systemPropertyVariables>
                     <excludes>
                         <exclude>**/org/eclipse/lsp/cobol/dialects/**/*</exclude>
@@ -432,7 +436,7 @@
                     <plugin>
                         <groupId>org.graalvm.buildtools</groupId>
                         <artifactId>native-maven-plugin</artifactId>
-                        <version>0.9.15</version>
+                        <version>0.10.3</version>
                         <extensions>true</extensions>
                         <executions>
                             <execution>

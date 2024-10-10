@@ -22,16 +22,16 @@ const SNIPPETS: Map<string, Map<any, any>> = new Map();
 export class SnippetCompletionProvider
   implements vscode.CompletionItemProvider
 {
-  private matchingWordsList: vscode.CompletionItem[] = new Array();
-  private otherList: vscode.CompletionItem[] = new Array();
+  private matchingWordsList: vscode.CompletionItem[] = [];
+  private otherList: vscode.CompletionItem[] = [];
 
   public async provideCompletionItems(
     document: vscode.TextDocument,
     position: vscode.Position,
-    token: vscode.CancellationToken,
-    context: vscode.CompletionContext,
+    _token: vscode.CancellationToken,
+    _context: vscode.CompletionContext,
   ): Promise<vscode.CompletionItem[]> {
-    var textUptoCursor = getCurrentLineText(document, position);
+    const textUptoCursor = getCurrentLineText(document, position);
     const wordsUptoCursor = fetchWordsList(textUptoCursor);
 
     this.resetList();
@@ -39,13 +39,17 @@ export class SnippetCompletionProvider
     snippets.forEach((value, key) => {
       const prefixList: string[] = fetchWordsList(value.prefix);
       const matchedWords = getMatchedWords(prefixList, wordsUptoCursor);
-      matchedWords.length > 0
-        ? this.matchingWordsList.push(
-            createCompletionItem(value, key, position, document),
-          )
-        : this.otherList.push(
-            createCompletionItem(value, key, position, document),
-          );
+      const completionItem = createCompletionItem(
+        value,
+        key,
+        position,
+        document,
+      );
+      if (matchedWords.length > 0) {
+        this.matchingWordsList.push(completionItem);
+      } else {
+        this.otherList.push(completionItem);
+      }
     });
     return this.matchingWordsList.length > 0
       ? this.matchingWordsList
@@ -64,7 +68,7 @@ async function getSnippets(): Promise<Map<any, any>> {
   registeredDialects
     .filter((d) => dialectList.includes(d.name))
     .forEach((d) => {
-      var snippets = importSnippet(d.snippetPath);
+      const snippets = importSnippet(d.snippetPath);
       if (snippets !== undefined) {
         Object.entries(snippets).forEach((value) =>
           map.set(value[0], value[1]),
@@ -76,11 +80,11 @@ async function getSnippets(): Promise<Map<any, any>> {
 }
 
 function importSnippet(snippetPath: string): Map<any, any> | undefined {
-  var result = SNIPPETS.get(snippetPath);
+  let result = SNIPPETS.get(snippetPath);
   if (result === undefined) {
     try {
       const json = readFileSync(snippetPath, "utf-8");
-      var snippet = JSON.parse(json);
+      const snippet = JSON.parse(json);
       SNIPPETS.set(snippetPath, snippet);
       result = snippet;
     } catch (e) {
@@ -138,8 +142,8 @@ function findPosition(
   document: vscode.TextDocument,
 ) {
   const lineText = document.lineAt(position).text.slice(0, position.character);
-  var charPosition: number = 7;
-  for (var index: number = 0; index < lineText.length; index++) {
+  const charPosition: number = 7;
+  for (let index: number = 0; index < lineText.length; index++) {
     if (lineText.charAt(index) !== " ") return index;
   }
   return charPosition;
@@ -157,7 +161,7 @@ function formatString(arg: string) {
 export async function pickSnippet() {
   try {
     const editor = vscode.window.activeTextEditor!;
-    const snippetList = new Array();
+    const snippetList: { detail: string; label: string }[] = [];
     const mapKeyForSelectedSnippet = new Map<string, any>();
     const snippetMapsFromSettings = await getSnippets();
     const input = vscode.window.createQuickPick<vscode.QuickPickItem>();

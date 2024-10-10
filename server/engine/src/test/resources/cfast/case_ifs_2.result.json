@@ -15,7 +15,7 @@
     },
     "children": [
       {
-        "snippet": "A000-PARA.\r\n           IF NOT WS-NUM1 \u003e WS-NUM2\r\n              DISPLAY \u0027HELLO\u0027\r\n              IF WS-NUM1 \u003e WS-NUM2\r\n                  GO TO A000-PARA\r\n              END-IF\r\n           END-IF\r\n           PERFORM A000-PARA.\r\n           STOP RUN.",
+        "snippet": "       A000-PARA.\r\n           IF NOT WS-NUM1 \u003e WS-NUM2\r\n              DISPLAY \u0027HELLO\u0027\r\n              IF WS-NUM1 \u003e WS-NUM2\r\n                  GO TO A000-PARA\r\n              END-IF\r\n           END-IF\r\n           PERFORM A000-PARA.\r\n           STOP RUN.",
         "name": "A000-PARA",
         "type": "paragraph",
         "location": {
