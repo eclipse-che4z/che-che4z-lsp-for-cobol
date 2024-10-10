@@ -105,7 +105,7 @@ public class CICSConverseOptionsCheckUtility extends CICSOptionsCheckBaseUtility
         checkHasMandatoryOptions(ctx.FROM(), ctx, "FROM");
         checkHasMandatoryOptions(ctx.cics_into(), ctx, "INTO or SET");
 
-        checkSubrules(ctx, subruleOptions);
+        callSubruleFunctions(ctx, subruleOptions);
         checkDuplicates(ctx);
     }
 
@@ -114,7 +114,7 @@ public class CICSConverseOptionsCheckUtility extends CICSOptionsCheckBaseUtility
     private void checkGroupTwo(CICSParser.Cics_converse_group_twoContext ctx) {
         checkHasMandatoryOptions(ctx.cics_into(), ctx, "INTO or SET");
 
-        checkSubrules(ctx, subruleOptions);
+        callSubruleFunctions(ctx, subruleOptions);
         checkDuplicates(ctx);
     }
 

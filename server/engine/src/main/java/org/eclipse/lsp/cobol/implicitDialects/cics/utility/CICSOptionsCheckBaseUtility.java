@@ -118,7 +118,7 @@ public abstract class CICSOptionsCheckBaseUtility {
     }
   }
 
-  protected <E extends ParserRuleContext> void checkSubrules(E ctx, Map<Integer, Consumer<ParserRuleContext>> subruleOptions) {
+  protected <E extends ParserRuleContext> void callSubruleFunctions(E ctx, Map<Integer, Consumer<ParserRuleContext>> subruleOptions) {
     ArrayList<ParserRuleContext> childRules = new ArrayList<>(ctx.getRuleContexts(ParserRuleContext.class));
     for (ParserRuleContext child : childRules) {
       if (subruleOptions.containsKey(child.getRuleIndex())) {
