@@ -19,6 +19,7 @@ package org.eclipse.lsp.cobol.implicitDialects.cics.utility;
         import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
         import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
         import org.eclipse.lsp.cobol.common.error.SyntaxError;
+        import org.eclipse.lsp.cobol.implicitDialects.cics.CICSLexer;
         import org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser;
 
         import java.util.HashMap;
@@ -30,21 +31,21 @@ package org.eclipse.lsp.cobol.implicitDialects.cics.utility;
 /** Checks CICS Bif rules for required and invalid options */
 public class CICSBifOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     public static final int RULE_INDEX = RULE_cics_bif;
-    private static final Map<String, ErrorSeverity> DUPLICATE_CHECK_OPTIONS =
-            new HashMap<String, ErrorSeverity>() {
+    private static final Map<Integer, ErrorSeverity> DUPLICATE_CHECK_OPTIONS =
+            new HashMap<Integer, ErrorSeverity>() {
                 {
-                    put("BIF", ErrorSeverity.ERROR);
-                    put("DEEDIT", ErrorSeverity.ERROR);
-                    put("FIELD", ErrorSeverity.ERROR);
-                    put("LENGTH", ErrorSeverity.ERROR);
-                    put("DIGEST", ErrorSeverity.ERROR);
-                    put("RECORD", ErrorSeverity.ERROR);
-                    put("RECORDLEN", ErrorSeverity.ERROR);
-                    put("HEX", ErrorSeverity.ERROR);
-                    put("BINARY", ErrorSeverity.ERROR);
-                    put("BASE64", ErrorSeverity.ERROR);
-                    put("DIGESTTYPE", ErrorSeverity.ERROR);
-                    put("RESULT", ErrorSeverity.ERROR);
+                    put(CICSLexer.BIF, ErrorSeverity.ERROR);
+                    put(CICSLexer.DEEDIT, ErrorSeverity.ERROR);
+                    put(CICSLexer.FIELD, ErrorSeverity.ERROR);
+                    put(CICSLexer.LENGTH, ErrorSeverity.ERROR);
+                    put(CICSLexer.DIGEST, ErrorSeverity.ERROR);
+                    put(CICSLexer.RECORD, ErrorSeverity.ERROR);
+                    put(CICSLexer.RECORDLEN, ErrorSeverity.ERROR);
+                    put(CICSLexer.HEX, ErrorSeverity.ERROR);
+                    put(CICSLexer.BINARY, ErrorSeverity.ERROR);
+                    put(CICSLexer.BASE64, ErrorSeverity.ERROR);
+                    put(CICSLexer.DIGESTTYPE, ErrorSeverity.ERROR);
+                    put(CICSLexer.RESULT, ErrorSeverity.ERROR);
                 }
             };
     public CICSBifOptionsCheckUtility(
