@@ -66,8 +66,8 @@ public class CICSConverseOptionsCheckUtility extends CICSOptionsCheckBaseUtility
     private final Map<Integer, Consumer<ParserRuleContext>> subruleOptions = new HashMap<Integer, Consumer<ParserRuleContext>>() {
         {
             put(CICSParser.RULE_cics_into, (ctx -> checkInto((CICSParser.Cics_intoContext) ctx)));
-            put(CICSParser.RULE_cics_converse_from, (ctx -> checkFrom((CICSParser.Cics_converse_fromContext) ctx)));
-            put(CICSParser.RULE_cics_converse_to, (ctx -> checkTo((CICSParser.Cics_converse_toContext) ctx)));
+            put(CICSParser.RULE_cics_converse_fromlength, (ctx -> checkFromlength((CICSParser.Cics_converse_fromlengthContext) ctx)));
+            put(CICSParser.RULE_cics_converse_tolength, (ctx -> checkTolength((CICSParser.Cics_converse_tolengthContext) ctx)));
             put(CICSParser.RULE_cics_maxlength, (ctx -> checkMax((CICSParser.Cics_maxlengthContext) ctx)));
         }
     };
@@ -122,11 +122,11 @@ public class CICSConverseOptionsCheckUtility extends CICSOptionsCheckBaseUtility
         checkIfSelfCalledMultipleTimes("INTO or SET", ctx);
     }
 
-    private void checkFrom(CICSParser.Cics_converse_fromContext ctx) {
+    private void checkFromlength(CICSParser.Cics_converse_fromlengthContext ctx) {
         checkIfSelfCalledMultipleTimes("FROMLENGTH or FROMFLENGTH", ctx);
     }
 
-    private void checkTo(CICSParser.Cics_converse_toContext ctx) {
+    private void checkTolength(CICSParser.Cics_converse_tolengthContext ctx) {
         checkIfSelfCalledMultipleTimes("TOLENGTH or TOFLENGTH", ctx);
     }
 
