@@ -105,8 +105,6 @@ public class CICSConverseOptionsCheckUtility extends CICSOptionsCheckBaseUtility
         checkDuplicates(ctx);
     }
 
-    // Subrules
-
     private void checkGroupTwo(CICSParser.Cics_converse_group_twoContext ctx) {
         checkHasMandatoryOptions(ctx.cics_into(), ctx, "INTO or SET");
 
