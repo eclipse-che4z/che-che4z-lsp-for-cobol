@@ -289,10 +289,6 @@ public abstract class CICSOptionsCheckBaseUtility {
     }
   }
 
-  protected <E extends ParseTree> void checkHasExactlyOneOption(String options, ParserRuleContext parentCtx, E... rules) {
-      checkHasExactlyOneOption(options, parentCtx, new ArrayList<>(Arrays.asList(rules)));
-  }
-
   protected void getAllTokenChildren(
       ParserRuleContext ctx, List<TerminalNode> children, boolean validateResponseHandler) {
     if (ctx.children == null) return;
