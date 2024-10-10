@@ -18,6 +18,7 @@ import lombok.Getter;
 
 import java.util.List;
 
+import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
@@ -52,6 +53,29 @@ public class ExtendedDocument {
 
   public String getUri() {
     return baseText.getUri();
+  }
+
+  /**
+   * Returns original text, situated between the start and the end lines from the locality range
+   * @param locality - the text locality
+   * @return string value that represents a text from the original document
+   */
+  public String getBaseText(Locality locality) {
+    int startLine = locality.getRange().getStart().getLine();
+    int endLine = locality.getRange().getEnd().getLine();;
+
+    if (!baseText.getUri().equals(locality.getUri())
+        || baseText.getLines().size() <= endLine) {
+      return "";
+    }
+    StringBuilder sb = new StringBuilder();
+    for (int i = startLine; i <= endLine; i++) {
+      sb.append(baseText.getLines().get(i).toString());
+      if (i != endLine) {
+        sb.append("\r\n");
+      }
+    }
+    return sb.toString();
   }
 
   /**

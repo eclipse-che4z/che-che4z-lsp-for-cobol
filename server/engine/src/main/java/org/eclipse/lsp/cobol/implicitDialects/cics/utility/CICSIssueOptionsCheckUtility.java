@@ -226,6 +226,7 @@ public class CICSIssueOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
   void checkErase(CICSParser.Cics_issue_eraseContext ctx) {
     checkHasMandatoryOptions(ctx.ERASE(), ctx, "ERASE");
     checkHasMandatoryOptions(ctx.RIDFLD(), ctx, "RIDFLD");
+    checkHasMandatoryOptions(ctx.DESTID(), ctx, "DESTID");
 
     if (ctx.VOLUME().isEmpty())
       checkHasIllegalOptions(ctx.VOLUMELENG(), "VOLUMELENG without VOLUME");
@@ -295,6 +296,7 @@ public class CICSIssueOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
   void checkReplace(CICSParser.Cics_issue_replaceContext ctx) {
     checkHasMandatoryOptions(ctx.REPLACE(), ctx, "REPLACE");
     checkHasMandatoryOptions(ctx.DESTID(), ctx, "DESTID");
+    checkHasMandatoryOptions(ctx.RIDFLD(), ctx, "RIDFLD");
     checkHasMandatoryOptions(ctx.FROM(), ctx, "FROM");
 
     if (ctx.KEYLENGTH().isEmpty()) {
@@ -334,7 +336,7 @@ public class CICSIssueOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     List<TerminalNode> subAddrs =
         ctx.stream().flatMap(context -> context.SUBADDR().stream()).collect(Collectors.toList());
 
-    checkHasMutuallyExclusiveOptions("SUBARR or DESIT", destIds, subAddrs);
+    checkHasMutuallyExclusiveOptions("SUBADDR or DESTID", destIds, subAddrs);
 
     boolean hasVolume = !(ctx.stream().mapToInt(context -> context.VOLUME().size()).sum() == 0);
 
