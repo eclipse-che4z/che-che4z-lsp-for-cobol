@@ -1351,7 +1351,13 @@ dialectIfStatment
    : DIALECT_IF dialectNodeFiller* ifThen ifElse? END_IF?
    ;
 ifStatement
-   : IF condition ifThen ifElse? (END_IF | {_input.LA(1)==DOT_FS || _input.LA(1)==ELSE || _input.LA(1)==EOF}?)
+   : IF condition ifThen
+   (
+      ifElse
+      |
+      {_input.LA(1)!=ELSE}?
+   )
+   (END_IF | {_input.LA(1)==DOT_FS || _input.LA(1)==ELSE || _input.LA(1)==EOF}?)
    ;
 
 ifThen
