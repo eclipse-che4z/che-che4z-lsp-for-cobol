@@ -128,25 +128,6 @@ public abstract class CICSOptionsCheckBaseUtility {
     }
   }
 
-  protected <E extends ParserRuleContext> void checkIfSelfCalledMultipleTimes(String options, E ctx) {
-    if (ctx.getParent().getRuleContexts(ctx.getClass()).size() > 1) {
-      throwException(ErrorSeverity.ERROR, getLocality(ctx), "Options \"" + options + "\" cannot be used more than once in a given command.", "");
-    }
-  }
-
-  protected <E extends ParserRuleContext> void callSubruleFunctions(E ctx, Map<Integer, Consumer<ParserRuleContext>> subruleOptions) {
-    ArrayList<ParserRuleContext> childRules = new ArrayList<>(ctx.getRuleContexts(ParserRuleContext.class));
-    HashSet<Integer> seenRules = new HashSet<>();
-    for (ParserRuleContext child : childRules) {
-      if (!seenRules.contains(child.getRuleIndex())) {
-        seenRules.add(child.getRuleIndex());
-        if (subruleOptions.containsKey(child.getRuleIndex())) {
-          subruleOptions.get(child.getRuleIndex()).accept(child);
-        }
-      }
-    }
-  }
-
   /**
    * Iterates over the provided response handlers, extracts what is provided, and validates there is
    * not RESP2 without RESP
