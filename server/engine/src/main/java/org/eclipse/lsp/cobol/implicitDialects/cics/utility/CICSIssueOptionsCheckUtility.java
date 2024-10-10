@@ -139,9 +139,6 @@ public class CICSIssueOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
       case CICSParser.RULE_cics_issue_erase:
         checkErase((CICSParser.Cics_issue_eraseContext) ctx);
         break;
-      case CICSParser.RULE_cics_issue_erase_aup:
-        checkEraseAUP((CICSParser.Cics_issue_erase_aupContext) ctx);
-        break;
       case CICSParser.RULE_cics_issue_error:
         checkError((CICSParser.Cics_issue_errorContext) ctx);
         break;
@@ -236,10 +233,6 @@ public class CICSIssueOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     if (ctx.KEYLENGTH().isEmpty()) {
       checkHasIllegalOptions(ctx.KEYNUMBER(), "KEYNUMBER without KEYLENGTH");
     }
-  }
-
-  void checkEraseAUP(CICSParser.Cics_issue_erase_aupContext ctx) {
-    checkHasMandatoryOptions(ctx.ERASEAUP(), ctx, "ERASEAUP");
   }
 
   void checkError(CICSParser.Cics_issue_errorContext ctx) {
