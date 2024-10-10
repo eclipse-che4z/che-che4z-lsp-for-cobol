@@ -49,7 +49,6 @@ public abstract class CICSOptionsCheckBaseUtility {
           put(CICSLexer.LEAVEKB, ErrorSeverity.WARNING);
           put(CICSLexer.NOTRUNCATE, ErrorSeverity.WARNING);
           put(CICSLexer.NOQUEUE, ErrorSeverity.WARNING);
-          put(CICSLexer.NOTRUNCATE, ErrorSeverity.WARNING);
           // handle response options
           put(CICSLexer.RESP, ErrorSeverity.ERROR);
           put(CICSLexer.RESP2, ErrorSeverity.ERROR);
@@ -58,6 +57,12 @@ public abstract class CICSOptionsCheckBaseUtility {
         }
       };
 
+  private final Map<Integer, String> baseDupilicateRulesOptions = new HashMap<Integer, String>() {
+    {
+      put(CICSParser.RULE_cics_into, "INTO or SET");
+    }
+  };
+
   public CICSOptionsCheckBaseUtility(
       DialectProcessingContext context,
       List<SyntaxError> errors,
@@ -65,6 +70,17 @@ public abstract class CICSOptionsCheckBaseUtility {
     this.context = context;
     this.errors = errors;
     this.baseDuplicateOptions.putAll(duplicateOptions);
+  }
+
+  public CICSOptionsCheckBaseUtility(
+      DialectProcessingContext context,
+      List<SyntaxError> errors,
+      Map<Integer, ErrorSeverity> duplicateOptions,
+      Map<Integer, String> duplicateRulesOptions) {
+    this.context = context;
+    this.errors = errors;
+    this.baseDuplicateOptions.putAll(duplicateOptions);
+    this.baseDupilicateRulesOptions.putAll(duplicateRulesOptions);
   }
 
   /**
@@ -120,12 +136,16 @@ public abstract class CICSOptionsCheckBaseUtility {
 
   protected <E extends ParserRuleContext> void callSubruleFunctions(E ctx, Map<Integer, Consumer<ParserRuleContext>> subruleOptions) {
     ArrayList<ParserRuleContext> childRules = new ArrayList<>(ctx.getRuleContexts(ParserRuleContext.class));
+    HashSet<Integer> seenRules = new HashSet<>();
     for (ParserRuleContext child : childRules) {
-      if (subruleOptions.containsKey(child.getRuleIndex())) {
+      if (!seenRules.contains(child.getRuleIndex())) {
+        seenRules.add(child.getRuleIndex());
+        if (subruleOptions.containsKey(child.getRuleIndex())) {
           subruleOptions.get(child.getRuleIndex()).accept(child);
         }
       }
     }
+  }
 
   /**
    * Iterates over the provided response handlers, extracts what is provided, and validates there is
@@ -207,6 +227,17 @@ public abstract class CICSOptionsCheckBaseUtility {
         });
   }
 
+  private void processDuplicateRules(ParserRuleContext ctx, Map<Integer, String> subruleOptions) {
+    Set<Integer> seenRules = new HashSet<>();
+    for (ParserRuleContext child : ctx.getRuleContexts(ParserRuleContext.class)) {
+      int ruleId = child.getRuleIndex();
+      String name = subruleOptions.get(ruleId);
+      if (name == null) continue;
+      if (seenRules.add(ruleId)) continue;
+      throwException(ErrorSeverity.ERROR, getLocality(child), "Options \"" + name + "\" cannot be used more than once in a given command.", "");
+    }
+  }
+
   /**
    * Client accessible entrypoint to check for duplicates.
    *
@@ -225,12 +256,21 @@ public abstract class CICSOptionsCheckBaseUtility {
    */
   protected void checkDuplicates(
       ParserRuleContext ctx, Map<Integer, ErrorSeverity> customDuplicateOptions) {
+    checkDuplicates(ctx, customDuplicateOptions, null);
+  }
+
+  protected void checkDuplicates(ParserRuleContext ctx, Map<Integer, ErrorSeverity> customDuplicateOptions, Map<Integer, String> customDuplicateRuleOptions) {
+    // Check for duplicate options
     Set<Integer> foundEntries = new HashSet<>();
     Map<Integer, ErrorSeverity> updatedDuplicateOptions = new HashMap<>(baseDuplicateOptions);
     if (customDuplicateOptions != null) updatedDuplicateOptions.putAll(customDuplicateOptions);
     checkDuplicateEntries(ctx, foundEntries, updatedDuplicateOptions);
-  }
 
+    // Check for duplicate rules
+    Map<Integer, String> updatedRuleOptions = new HashMap<>(baseDupilicateRulesOptions);
+    if (customDuplicateRuleOptions != null) updatedRuleOptions.putAll(customDuplicateRuleOptions);
+    processDuplicateRules(ctx, updatedRuleOptions);
+  }
   /**
    * Flags errors for rule lists passed as parameters if there are multiple instances of mutually
    * exclusive options.

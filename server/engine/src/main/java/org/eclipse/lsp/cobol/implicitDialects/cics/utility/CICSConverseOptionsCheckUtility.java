@@ -23,7 +23,6 @@ import org.eclipse.lsp.cobol.implicitDialects.cics.CICSLexer;
 import org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser;
 
 import java.util.*;
-import java.util.function.Consumer;
 
 import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_converse;
 
@@ -63,18 +62,17 @@ public class CICSConverseOptionsCheckUtility extends CICSOptionsCheckBaseUtility
                 }
             };
 
-    private final Map<Integer, Consumer<ParserRuleContext>> subruleOptions = new HashMap<Integer, Consumer<ParserRuleContext>>() {
+    private static final Map<Integer, String> DUPLICATE_RULES_CHECK = new HashMap<Integer, String>() {
         {
-            put(CICSParser.RULE_cics_into, (ctx -> checkInto((CICSParser.Cics_intoContext) ctx)));
-            put(CICSParser.RULE_cics_converse_fromlength, (ctx -> checkFromlength((CICSParser.Cics_converse_fromlengthContext) ctx)));
-            put(CICSParser.RULE_cics_converse_tolength, (ctx -> checkTolength((CICSParser.Cics_converse_tolengthContext) ctx)));
-            put(CICSParser.RULE_cics_maxlength, (ctx -> checkMax((CICSParser.Cics_maxlengthContext) ctx)));
+            put(CICSParser.RULE_cics_converse_fromlength, "FROMLENGTH or FROMFLENGTH");
+            put(CICSParser.RULE_cics_converse_tolength, "TOLENGTH or TOFLENGTH");
+            put(CICSParser.RULE_cics_maxlength, "MAXLENGTH or MAXFLENGTH");
         }
     };
 
     public CICSConverseOptionsCheckUtility(
             DialectProcessingContext context, List<SyntaxError> errors) {
-        super(context, errors, DUPLICATE_CHECK_OPTIONS);
+        super(context, errors, DUPLICATE_CHECK_OPTIONS, DUPLICATE_RULES_CHECK);
     }
 
     /**
@@ -101,11 +99,9 @@ public class CICSConverseOptionsCheckUtility extends CICSOptionsCheckBaseUtility
         if (!ctx.ASIS().isEmpty()) {
             checkHasIllegalOptions(ctx.LEAVEKB(), "LEAVEKB");
         }
-
         checkHasMandatoryOptions(ctx.FROM(), ctx, "FROM");
         checkHasMandatoryOptions(ctx.cics_into(), ctx, "INTO or SET");
 
-        callSubruleFunctions(ctx, subruleOptions);
         checkDuplicates(ctx);
     }
 
@@ -114,24 +110,7 @@ public class CICSConverseOptionsCheckUtility extends CICSOptionsCheckBaseUtility
     private void checkGroupTwo(CICSParser.Cics_converse_group_twoContext ctx) {
         checkHasMandatoryOptions(ctx.cics_into(), ctx, "INTO or SET");
 
-        callSubruleFunctions(ctx, subruleOptions);
         checkDuplicates(ctx);
-    }
-
-    private void checkInto(CICSParser.Cics_intoContext ctx) {
-        checkIfSelfCalledMultipleTimes("INTO or SET", ctx);
-    }
-
-    private void checkFromlength(CICSParser.Cics_converse_fromlengthContext ctx) {
-        checkIfSelfCalledMultipleTimes("FROMLENGTH or FROMFLENGTH", ctx);
-    }
-
-    private void checkTolength(CICSParser.Cics_converse_tolengthContext ctx) {
-        checkIfSelfCalledMultipleTimes("TOLENGTH or TOFLENGTH", ctx);
-    }
-
-    private void checkMax(CICSParser.Cics_maxlengthContext ctx) {
-        checkIfSelfCalledMultipleTimes("MAXLENGTH or MAXFLENGTH", ctx);
     }
 
 }
