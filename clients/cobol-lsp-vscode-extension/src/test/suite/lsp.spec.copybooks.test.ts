@@ -109,7 +109,7 @@ suite("Integration Test Suite: Copybooks", function () {
 
   test("TC174952 Copybook - not exist, but dynamically appears", async () => {
     await helper.showDocument("VAR.cbl");
-    let editor = helper.getEditor("VAR.cbl");
+    const editor = helper.getEditor("VAR.cbl");
     await helper.waitForDiagnostics(editor.document.uri);
     const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
     assert.strictEqual(diagnostics.length, 2);
@@ -135,9 +135,9 @@ suite("Integration Test Suite: Copybooks", function () {
 
   test("TC174952 / TC174953 Copybook - definition not exist, but dynamically appears", async () => {
     await helper.showDocument("USERC1F.cbl");
-    let editor = helper.getEditor("USERC1F.cbl");
+    const editor = helper.getEditor("USERC1F.cbl");
     await helper.waitForDiagnostics(editor.document.uri);
-    let diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
+    const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
     helper.assertRangeIsEqual(
       diagnostics[2].range,
       new vscode.Range(pos(41, 29), pos(41, 46)),

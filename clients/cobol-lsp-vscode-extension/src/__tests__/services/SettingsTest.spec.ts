@@ -11,6 +11,7 @@
  * Contributors:
  *   Broadcom, Inc. - initial API and implementation
  */
+import { Uri } from "../../__mocks__/UriMock";
 import * as path from "path";
 import * as vscode from "vscode";
 import { SettingsService } from "../../services/Settings";
@@ -25,7 +26,6 @@ beforeAll(() => {
 
 // TODO: this is horrifying as well
 jest.mock("vscode", () => {
-  const Uri = require("../../__mocks__/UriMock").Uri;
   return {
     Uri,
     workspace: {
@@ -34,9 +34,7 @@ jest.mock("vscode", () => {
           throw { code: "FileNotFound" };
         }),
       },
-      getWorkspaceFolder: () => {
-        uri: new Uri("/c:/my/workspace");
-      },
+      getWorkspaceFolder: () => {},
     },
   };
 });
@@ -232,7 +230,7 @@ describe("SettingsService returns correct tab settings", () => {
 describe("SettingsService returns correct Copybook Configuration Values", () => {
   const mockConfigurationFetch = (settings: string, configuredValue: any) =>
     jest.fn().mockReturnValue({
-      get: (args: String) => {
+      get: (args: string) => {
         if (settings === args) {
           return configuredValue;
         }

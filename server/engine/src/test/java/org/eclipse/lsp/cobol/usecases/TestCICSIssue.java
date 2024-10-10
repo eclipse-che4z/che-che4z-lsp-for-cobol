@@ -537,7 +537,7 @@ public class TestCICSIssue {
             "errorOne",
             new Diagnostic(
                 new Range(),
-                "Exactly one option required, options are mutually exclusive: SUBARR or DESIT",
+                "Exactly one option required, options are mutually exclusive: SUBADDR or DESTID",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()),
             "errorTwo",
@@ -549,7 +549,7 @@ public class TestCICSIssue {
             "errorThree",
             new Diagnostic(
                 new Range(),
-                "Exactly one option required, options are mutually exclusive: SUBARR or DESIT",
+                "Exactly one option required, options are mutually exclusive: SUBADDR or DESTID",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()),
             "errorFour",
@@ -561,7 +561,7 @@ public class TestCICSIssue {
             "errorFive",
             new Diagnostic(
                 new Range(),
-                "Exactly one option required, options are mutually exclusive: SUBARR or DESIT",
+                "Exactly one option required, options are mutually exclusive: SUBADDR or DESTID",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()));
     CICSTestUtils.errorTest(ISSUE_WAIT_DUPLICATE_COMMON_INVALID, expectedDiagnostics);

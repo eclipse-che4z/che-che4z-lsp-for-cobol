@@ -18,7 +18,6 @@ import TelemetryReporter from "@vscode/extension-telemetry";
 import { EXTENSION_ID, TELEMETRY_DEFAULT_CONTENT } from "../../constants";
 
 import { TelemetryEvent } from "./model/TelemetryEvent";
-import { TelemetryMeasurement } from "./model/TelemetryMeasurement";
 import { TelemetryReport } from "./TelemetryReport";
 
 export class TelemetryReporterImpl implements TelemetryReport {

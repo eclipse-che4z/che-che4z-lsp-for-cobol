@@ -33,6 +33,20 @@ on:
       - master
 
 jobs:
+  checks:
+    name: Checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install dependencies for COBOL LS
+        working-directory: clients/cobol-lsp-vscode-extension
+        run: npm ci
+      - name: Check code formatting for COBOL LS
+        working-directory: clients/cobol-lsp-vscode-extension
+        run: npm run lint-format
+      - name: Check code quality for COBOL LS
+        working-directory: clients/cobol-lsp-vscode-extension
+        run: npm run lint-quality
   zipSources:
     runs-on: ubuntu-latest
     steps:
