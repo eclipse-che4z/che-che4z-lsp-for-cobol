@@ -63,7 +63,7 @@ export class TabSettings {
 
 export async function lspConfigHandler(request: any): Promise<Array<any>> {
   const result = new Array<unknown>();
-  for (let item of request.items) {
+  for (const item of request.items) {
     try {
       if (item.section === DIALECT_REGISTRY_SECTION) {
         const object = DialectRegistry.getDialects();
@@ -250,7 +250,7 @@ export class SettingsService {
       if (stops !== undefined && stops.length > 0) {
         defaultRule = new TabRule(stops, stops[stops.length - 1]);
       }
-      let rules: TabRule[] = [];
+      const rules: TabRule[] = [];
       const anchors = obj.anchors;
       if (obj.anchors !== undefined && Object.keys(anchors).length > 0) {
         const keys = Object.keys(anchors);

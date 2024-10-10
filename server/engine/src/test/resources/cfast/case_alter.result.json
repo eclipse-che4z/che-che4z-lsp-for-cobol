@@ -37,7 +37,7 @@
       },
       {
         "name": "SEC1",
-        "snippet": "SEC1 SECTION.\r\n       PAR1.\r\n       PAR2.",
+        "snippet": "       SEC1 SECTION.\r\n       PAR1.\r\n       PAR2.",
         "type": "section",
         "location": {
           "uri": "fake/path",
@@ -52,7 +52,7 @@
         },
         "children": [
           {
-            "snippet": "PAR1.",
+            "snippet": "       PAR1.",
             "name": "PAR1",
             "type": "paragraph",
             "location": {
@@ -68,7 +68,7 @@
             }
           },
           {
-            "snippet": "PAR2.",
+            "snippet": "       PAR2.",
             "name": "PAR2",
             "type": "paragraph",
             "location": {

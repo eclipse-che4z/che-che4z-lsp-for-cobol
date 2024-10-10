@@ -25,6 +25,7 @@ import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.model.Locality;
+import org.eclipse.lsp.cobol.implicitDialects.cics.CICSLexer;
 import org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser;
 
 import java.util.*;
@@ -39,27 +40,27 @@ public abstract class CICSOptionsCheckBaseUtility {
 
   private final List<SyntaxError> errors;
 
-  private final Map<String, ErrorSeverity> baseDuplicateOptions =
-      new HashMap<String, ErrorSeverity>() {
+  private final Map<Integer, ErrorSeverity> baseDuplicateOptions =
+      new HashMap<Integer, ErrorSeverity>() {
         {
-          put("ASIS", ErrorSeverity.WARNING);
-          put("BUFFER", ErrorSeverity.WARNING);
-          put("LEAVEKB", ErrorSeverity.WARNING);
-          put("NOTRUNCATE", ErrorSeverity.WARNING);
-          put("NOQUEUE", ErrorSeverity.WARNING);
-          put("NOTRUNCATE", ErrorSeverity.WARNING);
+          put(CICSLexer.ASIS, ErrorSeverity.WARNING);
+          put(CICSLexer.BUFFER, ErrorSeverity.WARNING);
+          put(CICSLexer.LEAVEKB, ErrorSeverity.WARNING);
+          put(CICSLexer.NOTRUNCATE, ErrorSeverity.WARNING);
+          put(CICSLexer.NOQUEUE, ErrorSeverity.WARNING);
+          put(CICSLexer.NOTRUNCATE, ErrorSeverity.WARNING);
           // handle response options
-          put("RESP", ErrorSeverity.ERROR);
-          put("RESP2", ErrorSeverity.ERROR);
-          put("WAIT", ErrorSeverity.ERROR);
-          put("NOHANDLE", ErrorSeverity.ERROR);
+          put(CICSLexer.RESP, ErrorSeverity.ERROR);
+          put(CICSLexer.RESP2, ErrorSeverity.ERROR);
+          put(CICSLexer.WAIT, ErrorSeverity.ERROR);
+          put(CICSLexer.NOHANDLE, ErrorSeverity.ERROR);
         }
       };
 
   public CICSOptionsCheckBaseUtility(
       DialectProcessingContext context,
       List<SyntaxError> errors,
-      Map<String, ErrorSeverity> duplicateOptions) {
+      Map<Integer, ErrorSeverity> duplicateOptions) {
     this.context = context;
     this.errors = errors;
     this.baseDuplicateOptions.putAll(duplicateOptions);
@@ -172,19 +173,19 @@ public abstract class CICSOptionsCheckBaseUtility {
    * @param duplicateOptions Custom duplicate options to evaluate against
    */
   private void checkDuplicateEntries(
-      ParserRuleContext ctx, Set<String> entries, Map<String, ErrorSeverity> duplicateOptions) {
+      ParserRuleContext ctx, Set<Integer> entries, Map<Integer, ErrorSeverity> duplicateOptions) {
     List<TerminalNode> children = new ArrayList<>();
     getAllTokenChildren(ctx, children, true);
     children.forEach(
         child -> {
-          String option = child.getText().toUpperCase();
+          int option = child.getSymbol().getType();
           if (duplicateOptions.containsKey(option)) {
             if (!entries.add(option)) {
               throwException(
                   duplicateOptions.get(option),
                   getLocality(child),
                   "Excessive options provided for: ",
-                  option);
+                  child.getSymbol().getText());
             }
           }
         });
@@ -207,9 +208,9 @@ public abstract class CICSOptionsCheckBaseUtility {
    * @param customDuplicateOptions Custom duplicate options to evaluate against
    */
   protected void checkDuplicates(
-      ParserRuleContext ctx, Map<String, ErrorSeverity> customDuplicateOptions) {
-    Set<String> foundEntries = new HashSet<>();
-    Map<String, ErrorSeverity> updatedDuplicateOptions = new HashMap<>(baseDuplicateOptions);
+      ParserRuleContext ctx, Map<Integer, ErrorSeverity> customDuplicateOptions) {
+    Set<Integer> foundEntries = new HashSet<>();
+    Map<Integer, ErrorSeverity> updatedDuplicateOptions = new HashMap<>(baseDuplicateOptions);
     if (customDuplicateOptions != null) updatedDuplicateOptions.putAll(customDuplicateOptions);
     checkDuplicateEntries(ctx, foundEntries, updatedDuplicateOptions);
   }
@@ -278,7 +279,7 @@ public abstract class CICSOptionsCheckBaseUtility {
     ctx.children.forEach(
         child -> {
           if (TerminalNode.class.isAssignableFrom(child.getClass())
-              && baseDuplicateOptions.containsKey(child.getText().toUpperCase()))
+              && baseDuplicateOptions.containsKey(((TerminalNode) child).getSymbol().getType()))
             children.add((TerminalNode) child);
           else if (ParserRuleContext.class.isAssignableFrom(child.getClass())) {
             if (validateResponseHandler

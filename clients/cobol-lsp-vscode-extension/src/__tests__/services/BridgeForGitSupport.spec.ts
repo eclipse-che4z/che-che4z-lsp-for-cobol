@@ -12,12 +12,11 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
+import { Uri } from "../../__mocks__/UriMock";
 import { decodeBridgeJson } from "../../services/BridgeForGitLoader";
 import { loadProcessorsConfigForDocument } from "../../services/ProcessorGroups";
-import * as path from "path";
 
 jest.mock("vscode", () => {
-  const Uri = require("../../__mocks__/UriMock").Uri;
   const WS_URI = new Uri("/c:/my/workspace");
   return {
     Uri,

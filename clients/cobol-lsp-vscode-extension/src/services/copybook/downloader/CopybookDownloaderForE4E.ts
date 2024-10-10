@@ -72,7 +72,7 @@ export class CopybookDownloaderForE4E {
     if (!candidate) throw Error("Invalid configuration");
 
     const libs = candidate.libs as (EndevorElement | EndevorMember)[];
-    let elements: { [key: string]: EndevorElement | EndevorMember } = {};
+    const elements: { [key: string]: EndevorElement | EndevorMember } = {};
     const promises: Promise<EndevorMember[] | EndevorElement[] | Error>[] = [];
 
     for (const lib of libs) {
@@ -194,7 +194,6 @@ export class CopybookDownloaderForE4E {
         this.storagePath,
         element.element,
       );
-      element.element = element.element;
       const resultElement = await this.e4e.getElement(
         endevorApi.profile,
         element,
