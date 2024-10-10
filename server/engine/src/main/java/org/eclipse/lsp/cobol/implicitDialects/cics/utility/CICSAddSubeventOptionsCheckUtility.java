@@ -19,6 +19,7 @@ package org.eclipse.lsp.cobol.implicitDialects.cics.utility;
         import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
         import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
         import org.eclipse.lsp.cobol.common.error.SyntaxError;
+        import org.eclipse.lsp.cobol.implicitDialects.cics.CICSLexer;
         import org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser;
 
         import java.util.HashMap;
@@ -33,12 +34,12 @@ public class CICSAddSubeventOptionsCheckUtility extends CICSOptionsCheckBaseUtil
 
     public static final int RULE_INDEX = RULE_cics_add;
 
-    private static final Map<String, ErrorSeverity> DUPLICATE_CHECK_OPTIONS =
-            new HashMap<String, ErrorSeverity>() {
+    private static final Map<Integer, ErrorSeverity> DUPLICATE_CHECK_OPTIONS =
+            new HashMap<Integer, ErrorSeverity>() {
                 {
-                    put("ADD", ErrorSeverity.ERROR);
-                    put("SUBEVENT", ErrorSeverity.ERROR);
-                    put("EVENT", ErrorSeverity.ERROR);
+                    put(CICSLexer.ADD, ErrorSeverity.ERROR);
+                    put(CICSLexer.SUBEVENT, ErrorSeverity.ERROR);
+                    put(CICSLexer.EVENT, ErrorSeverity.ERROR);
                 }
             };
 
