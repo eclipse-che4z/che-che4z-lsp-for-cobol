@@ -1567,7 +1567,7 @@ performStatement
    ;
 
 performInlineStatement
-   : performType? conditionalStatementCall*? (EXIT PERFORM CYCLE?)? END_PERFORM
+   : performType? conditionalStatementCall* END_PERFORM
    ;
 
 performProcedureStatement
