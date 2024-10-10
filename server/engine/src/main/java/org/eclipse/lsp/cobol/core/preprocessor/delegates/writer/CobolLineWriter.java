@@ -52,6 +52,7 @@ public abstract class CobolLineWriter {
     ExtendedTextLine clSb = null;
     Position start = null;
     lines.sort(Comparator.comparingInt(CobolLine::getNumber));
+    CobolProgramLayout layout = getLayout();
     for (final CobolLine line : lines) {
       final boolean isContinuationLine = CobolLineTypeEnum.CONTINUATION.equals(line.getType());
 
@@ -64,7 +65,7 @@ public abstract class CobolLineWriter {
           clSb = null;
           start = null;
         }
-        process(sb, line);
+        process(sb, line, layout);
       }
 
       /*
@@ -75,10 +76,10 @@ public abstract class CobolLineWriter {
       if (isContinuationLine) {
         if (start == null) {
           CobolLine predecessor = line.getPredecessor();
-          int col = lineString(predecessor).length();
+          int col = lineString(predecessor, layout).length();
           start = new Position(predecessor.getNumber(), col);
         }
-        process(sb, line);
+        process(sb, line, layout);
         String unquotedContinuedLine = removeStartingQuote(line);
         Position unquotedExtendedLinePOsition = new Position(line.getNumber(), line.toString().indexOf(unquotedContinuedLine));
         ExtendedTextLine extendedTextLine = new ExtendedTextLine(unquotedContinuedLine, unquotedExtendedLinePOsition, documentUri);
@@ -104,17 +105,17 @@ public abstract class CobolLineWriter {
 
   protected abstract CobolProgramLayout getLayout();
 
-  private void process(StringBuilder sb, CobolLine line) {
+  private void process(StringBuilder sb, CobolLine line, CobolProgramLayout layout) {
     if (line.getNumber() > 0) {
       sb.append(NEWLINE);
     }
-    sb.append(lineString(line));
+    sb.append(lineString(line, layout));
   }
 
-  private String lineString(CobolLine line) {
+  private String lineString(CobolLine line, CobolProgramLayout layout) {
     StringBuilder sb = new StringBuilder();
     if (line.getType() != CobolLineTypeEnum.PREPROCESSED) {
-      String blankSequenceArea = StringUtils.repeat(WS, getLayout().getSequenceLength());
+      String blankSequenceArea = StringUtils.repeat(WS, layout.getSequenceLength());
       sb.append(blankSequenceArea);
     }
     sb.append(line.getIndicatorArea());
