@@ -54,8 +54,8 @@ public class CICSOptionsCheckUtility {
     optionsMap.put(
         CICSCancelOptionsCheckUtility.RULE_INDEX, new CICSCancelOptionsCheckUtility(context, errors));
     optionsMap.put(
-        TestCICSAssignOptionsCheckUtility.RULE_INDEX,
-        new TestCICSAssignOptionsCheckUtility(context, errors));
+        CICSAssignOptionsCheckUtility.RULE_INDEX,
+        new CICSAssignOptionsCheckUtility(context, errors));
 
   }
 

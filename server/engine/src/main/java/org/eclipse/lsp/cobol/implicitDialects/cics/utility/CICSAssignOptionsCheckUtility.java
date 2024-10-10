@@ -28,7 +28,7 @@ package org.eclipse.lsp.cobol.implicitDialects.cics.utility;
         import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_assign;
 
 /** Checks CICS Assign rules for required and invalid options */
-public class TestCICSAssignOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
+public class CICSAssignOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
 
     public static final int RULE_INDEX = RULE_cics_assign;
 
@@ -142,7 +142,7 @@ public class TestCICSAssignOptionsCheckUtility extends CICSOptionsCheckBaseUtili
                 }
             };
 
-    public TestCICSAssignOptionsCheckUtility(
+    public CICSAssignOptionsCheckUtility(
             DialectProcessingContext context, List<SyntaxError> errors) {
         super(context, errors, DUPLICATE_CHECK_OPTIONS);
     }
