@@ -19,6 +19,7 @@ package org.eclipse.lsp.cobol.implicitDialects.cics.utility;
         import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
         import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
         import org.eclipse.lsp.cobol.common.error.SyntaxError;
+        import org.eclipse.lsp.cobol.implicitDialects.cics.CICSLexer;
 
         import java.util.HashMap;
         import java.util.List;
@@ -31,13 +32,13 @@ public class CICSAbendOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
 
     public static final int RULE_INDEX = RULE_cics_abend;
 
-    private static final Map<String, ErrorSeverity> DUPLICATE_CHECK_OPTIONS =
-            new HashMap<String, ErrorSeverity>() {
+    private static final Map<Integer, ErrorSeverity> DUPLICATE_CHECK_OPTIONS =
+            new HashMap<Integer, ErrorSeverity>() {
                 {
-                    put("ABEND", ErrorSeverity.ERROR);
-                    put("ABCODE", ErrorSeverity.ERROR);
-                    put("CANCEL", ErrorSeverity.ERROR);
-                    put("NODUMP", ErrorSeverity.ERROR);
+                    put(CICSLexer.ABEND, ErrorSeverity.ERROR);
+                    put(CICSLexer.ABCODE, ErrorSeverity.ERROR);
+                    put(CICSLexer.CANCEL, ErrorSeverity.ERROR);
+                    put(CICSLexer.NODUMP, ErrorSeverity.ERROR);
                 }
             };
 
