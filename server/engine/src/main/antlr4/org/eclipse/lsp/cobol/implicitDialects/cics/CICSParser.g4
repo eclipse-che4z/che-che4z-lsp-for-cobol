@@ -473,10 +473,10 @@ cics_invoke: INVOKE (SERVICE cics_data_value | CHANNEL cics_data_value | OPERATI
 
 /** ISSUE (all of them) */
 cics_issue:
-	ISSUE (cics_issue_print | cics_issue_eods | cics_issue_abend | cics_issue_abort | cics_issue_add | cics_issue_confirmation
+	ISSUE (cics_issue_print | cics_issue_wait | cics_issue_eods | cics_issue_abend | cics_issue_abort | cics_issue_add | cics_issue_confirmation
 	      | cics_issue_copy | cics_issue_disconnect | cics_issue_end | cics_issue_endfile_endoutput | cics_issue_erase | cics_issue_erase_aup | cics_issue_error
           | cics_issue_load | cics_issue_note | cics_issue_pass | cics_issue_prepare | cics_issue_query | cics_issue_receive | cics_issue_replace | cics_issue_send
-          | cics_issue_signal | cics_issue_wait);
+          | cics_issue_signal);
 
 cics_issue_abend: (ABEND | CONVID cics_name | STATE cics_cvda | cics_handle_response)+;
 cics_issue_abort: (ABORT | cics_issue_common | cics_handle_response)+;
@@ -487,7 +487,7 @@ cics_issue_disconnect: (DISCONNECT | SESSION cics_name | cics_handle_response)+;
 cics_issue_end: (END | cics_issue_common | cics_handle_response)+;
 cics_issue_endfile_endoutput: (ENDFILE | ENDOUTPUT | cics_handle_response)+;
 cics_issue_erase: (ERASE | (DESTID | DESTIDLENG | VOLUME | VOLUMELENG | KEYLENGTH | KEYNUMBER | NUMREC) cics_data_value | RIDFLD cics_data_area | RRN | DEFRESP | NOWAIT | cics_handle_response)+;
-cics_issue_erase_aup: (ERASEAUP | WAIT | cics_handle_response)+;
+cics_issue_erase_aup: ERASEAUP (WAIT | cics_handle_response)*;
 cics_issue_error: (ERROR | CONVID cics_name | STATE cics_cvda | cics_handle_response)+;
 cics_issue_load: (LOAD | PROGRAM cics_name | CONVERSE | cics_handle_response)+;
 cics_issue_note: (NOTE | (DESTID | DESTIDLENG | VOLUME | VOLUMELENG) cics_data_value | RIDFLD cics_data_area | RRN | cics_handle_response)+;
