@@ -31,7 +31,6 @@ import org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import java.util.function.Consumer;
 
 /** Common facilities for checking CICS parser options */
 @Slf4j
