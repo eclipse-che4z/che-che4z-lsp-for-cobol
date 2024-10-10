@@ -48,20 +48,4 @@ class TestWithErrorCheck {
                 ErrorSource.PARSING.getText())),
         CobolLanguageId.COBOL);
   }
-
-  @Test
-  void testHw() {
-    UseCaseEngine.runTest(
-        TEXT,
-        ImmutableList.of(),
-        ImmutableMap.of(
-            "1",
-            new Diagnostic(
-                new Range(),
-                "Unexpected end of file",
-                DiagnosticSeverity.Error,
-                ErrorSource.PARSING.getText())),
-        CobolLanguageId.EXPERIMENTAL_COBOL);
-  }
-
 }

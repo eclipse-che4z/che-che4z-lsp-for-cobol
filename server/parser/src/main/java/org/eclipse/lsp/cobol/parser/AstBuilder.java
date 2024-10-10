@@ -19,7 +19,6 @@ package org.eclipse.lsp.cobol.parser;
 import com.google.common.collect.ImmutableList;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.eclipse.lsp.cobol.core.CobolParser;
-import org.eclipse.lsp.cobol.parser.hw.Diagnostic;
 
 import java.util.List;
 

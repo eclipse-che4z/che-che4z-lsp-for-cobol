@@ -19,7 +19,6 @@ import com.google.common.collect.ImmutableList;
 import lombok.NonNull;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.ParseTree;
-import org.antlr.v4.runtime.tree.RuleNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.eclipse.lsp.cobol.common.SubroutineService;
@@ -43,9 +42,6 @@ import org.eclipse.lsp.cobol.common.utils.ImplicitCodeUtils;
 import org.eclipse.lsp.cobol.common.utils.StringUtils;
 import org.eclipse.lsp.cobol.core.*;
 import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
-import org.eclipse.lsp.cobol.dialects.ibm.experimental.visitors.CobolDataDivisionVisitor;
-import org.eclipse.lsp.cobol.dialects.ibm.experimental.visitors.CobolIdentificationDivisionVisitor;
-import org.eclipse.lsp.cobol.dialects.ibm.experimental.visitors.CobolProcedureDivisionVisitor;
 import org.eclipse.lsp.cobol.service.settings.CachingConfigurationService;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
@@ -72,7 +68,7 @@ import static org.eclipse.lsp.cobol.core.visitor.VisitorHelper.*;
  * elements to add the usages or throw a warning on an invalid definition. If there is a misspelled
  * keyword, the visitor finds it and throws a warning.
  */
-public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
+public final class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   private static final Logger LOG = org.slf4j.LoggerFactory.getLogger(CobolVisitor.class);
   protected final List<SyntaxError> errors = new ArrayList<>();
   protected final CopybooksRepository copybooks;
@@ -1282,39 +1278,6 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
                       return ImmutableList.of((Node) usage);
                     })
             .orElseGet(ImmutableList::of);
-  }
-
-  // NOTE: CobolVisitor is not managed by Guice DI, so can't use annotation here.
-  @Override
-  public List<Node> visitChildren(RuleNode node) {
-    checkInterruption();
-    if (node.getClass().getEnclosingClass() == CobolIdentificationDivisionParser.class) {
-      CobolIdentificationDivisionVisitor cobolIdentificationDivisionVisitor = new CobolIdentificationDivisionVisitor(extendedDocument, copybooks);
-      List<Node> nodes = cobolIdentificationDivisionVisitor.visit(node);
-      errors.addAll(cobolIdentificationDivisionVisitor.getErrors());
-      return nodes;
-    }
-    if (node.getClass().getEnclosingClass() == CobolDataDivisionParser.class) {
-      CobolDataDivisionVisitor cobolDataDivisionVisitor = new CobolDataDivisionVisitor(extendedDocument, copybooks, messageService, fileControls);
-      List<Node> nodes = cobolDataDivisionVisitor.visit(node);
-      errors.addAll(cobolDataDivisionVisitor.getErrors());
-      return nodes;
-    }
-    if (node.getClass().getEnclosingClass() == CobolProcedureDivisionParser.class) {
-      CobolProcedureDivisionVisitor cobolProcedureDivisionVisitor = new CobolProcedureDivisionVisitor(
-              copybooks,
-              tokenStream,
-              extendedDocument,
-              messageService,
-              subroutineService,
-              cachingConfigurationService,
-              programLayout
-      );
-      List<Node> nodes = cobolProcedureDivisionVisitor.visit(node);
-      errors.addAll(cobolProcedureDivisionVisitor.getErrors());
-      return nodes;
-    }
-    return super.visitChildren(node);
   }
 
   @Override

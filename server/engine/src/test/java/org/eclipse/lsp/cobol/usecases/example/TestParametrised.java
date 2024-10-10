@@ -59,22 +59,4 @@ class TestParametrised {
                 ErrorSource.PARSING.getText())),
         CobolLanguageId.COBOL);
   }
-
-  @ParameterizedTest
-  @MethodSource("textsGetter")
-  @DisplayName("Parameterized - different ends")
-  void testHw(String text) {
-    UseCaseEngine.runTest(
-        text,
-        ImmutableList.of(),
-        ImmutableMap.of(
-            "eof",
-            new Diagnostic(
-                new Range(),
-                "Unexpected end of file",
-                DiagnosticSeverity.Error,
-                ErrorSource.PARSING.getText())),
-        CobolLanguageId.EXPERIMENTAL_COBOL);
-  }
-
 }
