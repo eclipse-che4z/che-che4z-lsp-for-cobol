@@ -19,6 +19,7 @@ package org.eclipse.lsp.cobol.implicitDialects.cics.utility;
         import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
         import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
         import org.eclipse.lsp.cobol.common.error.SyntaxError;
+        import org.eclipse.lsp.cobol.implicitDialects.cics.CICSLexer;
 
         import java.util.HashMap;
         import java.util.List;
@@ -29,11 +30,11 @@ package org.eclipse.lsp.cobol.implicitDialects.cics.utility;
 /** Checks CICS Asktime rules for required and invalid options */
 public class CICSAsktimeOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     public static final int RULE_INDEX = RULE_cics_asktime;
-    private static final Map<String, ErrorSeverity> DUPLICATE_CHECK_OPTIONS =
-            new HashMap<String, ErrorSeverity>() {
+    private static final Map<Integer, ErrorSeverity> DUPLICATE_CHECK_OPTIONS =
+            new HashMap<Integer, ErrorSeverity>() {
                 {
-                    put("ASKTIME", ErrorSeverity.ERROR);
-                    put("ABSTIME", ErrorSeverity.ERROR);
+                    put(CICSLexer.ASKTIME, ErrorSeverity.ERROR);
+                    put(CICSLexer.ABSTIME, ErrorSeverity.ERROR);
                 }
             };
     public CICSAsktimeOptionsCheckUtility(
