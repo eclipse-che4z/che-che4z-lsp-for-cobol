@@ -13,12 +13,16 @@
  */
 
 import * as vscode from "vscode";
-import { SnippetCompletionProvider } from "../../../services/snippetcompletion/SnippetCompletionProvider";
+import {
+  resetSnippetsCompletionItems,
+  SnippetCompletionProvider,
+} from "../../../services/snippetcompletion/SnippetCompletionProvider";
+import { DialectRegistry } from "../../../services/DialectRegistry";
+import path = require("path");
 
 describe("Test CompletionProvider", () => {
   const context = { triggerKind: {}, diagnostics: [], only: undefined };
-  const snippetcompletion: SnippetCompletionProvider =
-    new SnippetCompletionProvider();
+  const snippetcompletion = new SnippetCompletionProvider();
   const SNIPPET_CBL = "SNIPPET.cbl";
   beforeAll(() => {
     (vscode.extensions as any) = {
@@ -29,7 +33,9 @@ describe("Test CompletionProvider", () => {
         },
       }),
     };
-    (vscode.CompletionItem as any) = jest.fn();
+    (vscode.CompletionItem as any) = jest
+      .fn()
+      .mockImplementation((label) => ({ label }));
     (vscode.SnippetString as any) = jest.fn();
     (vscode.MarkdownString as any) = jest.fn().mockReturnValue({
       string: "",
@@ -38,9 +44,30 @@ describe("Test CompletionProvider", () => {
         .mockReturnValue({ value: "", language: "COBOL" }),
     });
     (vscode.CompletionItemKind as any) = jest.fn();
+
+    DialectRegistry.getDialects = jest.fn().mockReturnValue([
+      {
+        name: "DaCo",
+        snippetPath: path.resolve(
+          __dirname,
+          "../../../../../daco-dialect-support/snippets.json",
+        ),
+      },
+      {
+        name: "IDMS",
+        snippetPath: path.resolve(
+          __dirname,
+          "../../../../../idms-dialect-support/snippets.json",
+        ),
+      },
+    ]);
   });
   afterAll(() => {
     jest.clearAllMocks();
+  });
+
+  beforeEach(() => {
+    resetSnippetsCompletionItems();
   });
 
   test("Suggest all DaCo Snippets", async () => {
@@ -70,7 +97,7 @@ describe("Test CompletionProvider", () => {
           context as any,
         )
       ).length,
-    ).toBe(222);
+    ).toBe(301);
   });
   test("Suggest all IDMS Snippets", async () => {
     const doc = {
@@ -99,8 +126,9 @@ describe("Test CompletionProvider", () => {
           context as any,
         )
       ).length,
-    ).toBe(222);
+    ).toBe(232);
   });
+
   test("Suggest all Cobol only Snippets", async () => {
     const doc = {
       uri: { fsPath: "ws-path" },
@@ -158,7 +186,7 @@ describe("Test CompletionProvider", () => {
           context as any,
         )
       ).length,
-    ).toBe(222);
+    ).toBe(311);
   });
 
   test(" Test number of suggestions for COPY when no dialect is selected", async () => {
@@ -207,16 +235,13 @@ describe("Test CompletionProvider", () => {
     vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
       get: jest.fn().mockReturnValue(["IDMS"]),
     });
-    expect(
-      (
-        await snippetcompletion.provideCompletionItems(
-          doc,
-          position as any,
-          token,
-          context as any,
-        )
-      ).length,
-    ).toBe(1);
+    const completions = await snippetcompletion.provideCompletionItems(
+      doc,
+      position as any,
+      token,
+      context as any,
+    );
+    expect(completions.length).toBe(7);
   });
 
   test(" Test number of suggestions for WRITE when dialect is IDMS", async () => {
@@ -265,15 +290,12 @@ describe("Test CompletionProvider", () => {
     vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
       get: jest.fn().mockReturnValue(["DaCo", "IDMS"]),
     });
-    expect(
-      (
-        await snippetcompletion.provideCompletionItems(
-          doc,
-          position as any,
-          token,
-          context as any,
-        )
-      ).length,
-    ).toBe(1);
+    const completions = await snippetcompletion.provideCompletionItems(
+      doc,
+      position as any,
+      token,
+      context as any,
+    );
+    expect(completions.length).toBe(10);
   });
 });
