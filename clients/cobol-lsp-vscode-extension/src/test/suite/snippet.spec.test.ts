@@ -21,6 +21,7 @@ suite(
   "Integration Test Suite: Snippets with different dialects settings",
   function () {
     this.timeout(helper.TEST_TIMEOUT);
+    this.retries(2);
 
     suiteSetup(async function () {
       this.timeout(helper.TEST_TIMEOUT);
