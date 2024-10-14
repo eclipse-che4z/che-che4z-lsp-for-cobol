@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.text.DecimalFormat;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
@@ -64,8 +65,10 @@ public class BenchmarkServiceImpl implements BenchmarkService {
     LOG.debug("---- Benchmark for uri : {}", benchmarkSession.attr("uri"));
     Collection<Measurement> measurements = benchmarkSession
             .getMeasurements();
+
     measurements
-            .forEach(m -> LOG.debug("Timing for {}: {}", m.getId(), m.getTime()));
+            .forEach(m -> LOG.debug("Timing for {}: {} ns", m.getId(), new DecimalFormat("#,###")
+                    .format(m.getTime())));
     Optional.ofNullable(System.getProperty(PERFORMANCE_LOG_PATH))
             .map(Paths::get)
             .ifPresent(path -> {

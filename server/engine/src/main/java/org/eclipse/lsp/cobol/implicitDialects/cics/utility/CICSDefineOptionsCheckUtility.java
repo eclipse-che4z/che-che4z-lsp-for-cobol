@@ -117,7 +117,6 @@ public class CICSDefineOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
   }
 
   private void checkActivity(CICSParser.Cics_define_activityContext ctx) {
-    checkHasMandatoryOptions(ctx.ACTIVITY(), ctx, "ACTIVITY");
     checkHasMandatoryOptions(ctx.TRANSID(), ctx, "TRANSID");
   }
 
@@ -144,7 +143,6 @@ public class CICSDefineOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
   }
 
   private void checkDefineTimer(CICSParser.Cics_define_timerContext ctx) {
-    checkHasMandatoryOptions(ctx.TIMER(), ctx, "TIMER");
     if (ctx.AFTER().isEmpty()) {
       checkHasIllegalOptions(ctx.DAYS(), "DAYS");
       if (checkHasMandatoryOptions(ctx.AT(), ctx, "AT")) {

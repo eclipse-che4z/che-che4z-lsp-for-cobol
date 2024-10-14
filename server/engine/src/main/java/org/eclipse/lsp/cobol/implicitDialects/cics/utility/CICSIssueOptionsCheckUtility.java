@@ -139,9 +139,6 @@ public class CICSIssueOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
       case CICSParser.RULE_cics_issue_erase:
         checkErase((CICSParser.Cics_issue_eraseContext) ctx);
         break;
-      case CICSParser.RULE_cics_issue_erase_aup:
-        checkEraseAUP((CICSParser.Cics_issue_erase_aupContext) ctx);
-        break;
       case CICSParser.RULE_cics_issue_error:
         checkError((CICSParser.Cics_issue_errorContext) ctx);
         break;
@@ -226,6 +223,7 @@ public class CICSIssueOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
   void checkErase(CICSParser.Cics_issue_eraseContext ctx) {
     checkHasMandatoryOptions(ctx.ERASE(), ctx, "ERASE");
     checkHasMandatoryOptions(ctx.RIDFLD(), ctx, "RIDFLD");
+    checkHasMandatoryOptions(ctx.DESTID(), ctx, "DESTID");
 
     if (ctx.VOLUME().isEmpty())
       checkHasIllegalOptions(ctx.VOLUMELENG(), "VOLUMELENG without VOLUME");
@@ -235,10 +233,6 @@ public class CICSIssueOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     if (ctx.KEYLENGTH().isEmpty()) {
       checkHasIllegalOptions(ctx.KEYNUMBER(), "KEYNUMBER without KEYLENGTH");
     }
-  }
-
-  void checkEraseAUP(CICSParser.Cics_issue_erase_aupContext ctx) {
-    checkHasMandatoryOptions(ctx.ERASEAUP(), ctx, "ERASEAUP");
   }
 
   void checkError(CICSParser.Cics_issue_errorContext ctx) {
@@ -295,6 +289,7 @@ public class CICSIssueOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
   void checkReplace(CICSParser.Cics_issue_replaceContext ctx) {
     checkHasMandatoryOptions(ctx.REPLACE(), ctx, "REPLACE");
     checkHasMandatoryOptions(ctx.DESTID(), ctx, "DESTID");
+    checkHasMandatoryOptions(ctx.RIDFLD(), ctx, "RIDFLD");
     checkHasMandatoryOptions(ctx.FROM(), ctx, "FROM");
 
     if (ctx.KEYLENGTH().isEmpty()) {
@@ -322,8 +317,6 @@ public class CICSIssueOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
 
   void checkWait(CICSParser.Cics_issue_waitContext ctx) {
     checkHasMandatoryOptions(ctx.WAIT(), ctx, "WAIT");
-    if (ctx.cics_issue_common().isEmpty())
-      checkHasMandatoryOptions(ctx.cics_issue_common(), ctx, "DESTID or SUBADDR branches");
     checkIssueCommon(ctx.cics_issue_common());
   }
 
@@ -334,7 +327,7 @@ public class CICSIssueOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     List<TerminalNode> subAddrs =
         ctx.stream().flatMap(context -> context.SUBADDR().stream()).collect(Collectors.toList());
 
-    checkHasMutuallyExclusiveOptions("SUBARR or DESIT", destIds, subAddrs);
+    checkHasMutuallyExclusiveOptions("SUBADDR or DESTID", destIds, subAddrs);
 
     boolean hasVolume = !(ctx.stream().mapToInt(context -> context.VOLUME().size()).sum() == 0);
 

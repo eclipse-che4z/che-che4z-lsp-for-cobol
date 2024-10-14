@@ -15,7 +15,7 @@
     },
     "children": [
       {
-        "snippet": "MAINLINE.\r\n             DISPLAY \u0027XML-DOCUMENT\u003d\u0027 XML-STRING(EZ-PTR)\r\n             XML PARSE XML-STRING(EZ-PTR) RETURNING NATIONAL\r\n                                PROCESSING PROCEDURE XML-HANDLER\r\n               ON EXCEPTION\r\n                 GO TO ABEND\r\n               NOT ON EXCEPTION\r\n                 DISPLAY \u0027XML DOCUMENT SUCCESSFULLY PARSED\u0027\r\n              END-XML.",
+        "snippet": "          MAINLINE.\r\n             DISPLAY \u0027XML-DOCUMENT\u003d\u0027 XML-STRING(EZ-PTR)\r\n             XML PARSE XML-STRING(EZ-PTR) RETURNING NATIONAL\r\n                                PROCESSING PROCEDURE XML-HANDLER\r\n               ON EXCEPTION\r\n                 GO TO ABEND\r\n               NOT ON EXCEPTION\r\n                 DISPLAY \u0027XML DOCUMENT SUCCESSFULLY PARSED\u0027\r\n              END-XML.",
         "name": "MAINLINE",
         "type": "paragraph",
         "location": {
@@ -165,7 +165,7 @@
         ]
       },
       {
-        "snippet": "XML-HANDLER.\r\n           DISPLAY \u0027XML-EVENT\u003d\u0027 XML-EVENT.",
+        "snippet": "       XML-HANDLER.\r\n           DISPLAY \u0027XML-EVENT\u003d\u0027 XML-EVENT.",
         "name": "XML-HANDLER",
         "type": "paragraph",
         "location": {
@@ -197,7 +197,7 @@
         ]
       },
       {
-        "snippet": "ABEND.\r\n           DISPLAY \u0027XML-EVENT\u003d\u0027 XML-EVENT.",
+        "snippet": "       ABEND.\r\n           DISPLAY \u0027XML-EVENT\u003d\u0027 XML-EVENT.",
         "name": "ABEND",
         "type": "paragraph",
         "location": {

@@ -133,7 +133,7 @@
         }
       },
       {
-        "snippet": "PAR1.\r\n           CONTINUE.",
+        "snippet": "       PAR1.\r\n           CONTINUE.",
         "name": "PAR1",
         "type": "paragraph",
         "location": {
