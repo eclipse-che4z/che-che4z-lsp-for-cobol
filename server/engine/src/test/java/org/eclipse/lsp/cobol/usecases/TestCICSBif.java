@@ -116,7 +116,7 @@ public class TestCICSBif {
                                 ErrorSource.PARSING.getText()),
                         "errorDigestType2",
                         new Diagnostic(
-                                new Range(new Position(17,12), new Position(17,18)),
+                                new Range(new Position(17, 12), new Position(17, 18)),
                                 "Exactly one option required, options are mutually exclusive: HEX or BINARY or BASE64 or DIGESTTYPE",
                                 DiagnosticSeverity.Error,
                                 ErrorSource.PARSING.getText())
