@@ -36,7 +36,7 @@ class TestXmlSpecialRegisters {
           + "           MOVE -1 TO {$XML-CODE}.\n"
           + "           MOVE {$XML-NTEXT} TO {$XML-NAT-CHAR}\n"
           + "           COMPUTE {$LOCAL-NAME-LEN}\n"
-          + "            = FUNCTION LENGTH ({$XML-TEXT})\n"
+          + "            = FUNCTION {$$LENGTH} ({$XML-TEXT})\n"
           + "           GOBACK.";
 
   @Test
