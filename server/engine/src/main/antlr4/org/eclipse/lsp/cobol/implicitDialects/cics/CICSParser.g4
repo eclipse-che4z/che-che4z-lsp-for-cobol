@@ -193,7 +193,7 @@ cics_acquire_activityId: (ACTIVITYID cics_data_value | cics_handle_response)+;
 
 /** ADD SUBEVENT */
 cics_add: ADD ( ciss_add_event_subevent | cics_handle_response)+;
-ciss_add_event_subevent: ((SUBEVENT  | EVENT) cics_data_value | cics_handle_response)+;
+ciss_add_event_subevent: ((SUBEVENT  | EVENT) cics_data_value)+;
 
 /** ADDRESS / ADDRESS SET */
 cics_address: ADDRESS (cics_address_null | cics_address_set);
