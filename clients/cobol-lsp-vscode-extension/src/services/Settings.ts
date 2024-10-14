@@ -278,14 +278,6 @@ export class SettingsService {
   }
 
   /**
-   * Gets list of desired fialects
-   * @returns a list of desired fialects
-   */
-  public static getDialects(): string[] | undefined {
-    return vscode.workspace.getConfiguration().get(SETTINGS_DIALECT);
-  }
-
-  /**
    * Gives the configured runtime from settings.
    *
    * @returns returns configured runtime

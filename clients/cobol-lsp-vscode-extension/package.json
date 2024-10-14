@@ -613,7 +613,6 @@
     "vscode-languageclient": "^8.1.0"
   },
   "devDependencies": {
-    "@esbuild-plugins/node-globals-polyfill": "^0.2.3",
     "@eslint/js": "^9.11.1",
     "@types/assert": "^1.5.10",
     "@types/fs-extra": "^9.0.13",
@@ -628,6 +627,7 @@
     "assert": "^2.1.0",
     "decache": "^4.6.1",
     "esbuild": "^0.20.2",
+    "esbuild-plugin-polyfill-node": "^0.3.0",
     "eslint": "^9.11.1",
     "fs-extra": "10.1.0",
     "globals": "^15.10.0",

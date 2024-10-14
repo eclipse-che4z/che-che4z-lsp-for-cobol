@@ -14,7 +14,6 @@
 import * as vscode from "vscode";
 import { LANGUAGE_ID } from "../../constants";
 import { DialectRegistry } from "../DialectRegistry";
-import { SettingsService } from "../Settings";
 import { readFile } from "node:fs/promises";
 import cobolSnippets = require("./cobolSnippets.json");
 import * as t from "io-ts";
@@ -119,11 +118,7 @@ function createCompletionItem(
  */
 async function loadSnippets() {
   const loadedSnippets = new Map(Object.entries(predefinedSnippets));
-  const activeDialectsNames = SettingsService.getDialects()!;
-  const registeredDialects = DialectRegistry.getDialects();
-  const activeDialects = registeredDialects.filter((dialect) =>
-    activeDialectsNames.includes(dialect.name),
-  );
+  const activeDialects = DialectRegistry.getActiveDialects();
 
   await Promise.all(
     activeDialects.map(async (d) => {

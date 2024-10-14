@@ -83,6 +83,7 @@ suite(
       );
       await helper.triggerCompletionsAndWaitForResults();
       await helper.executeCommandMultipleTimes("selectNextSuggestion", 5);
+      await helper.sleep(500);
       await vscode.commands.executeCommand("acceptSelectedSuggestion");
       await helper.waitFor(
         () => editor.document.getText().includes("ADD id TO id"),
