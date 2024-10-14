@@ -14,6 +14,7 @@
  */
 package org.eclipse.lsp.cobol.common.mapping;
 
+import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
@@ -122,4 +123,44 @@ class ExtendedDocumentTest {
     assertFalse(document.isLineEmptyBetweenColumns(0, 7, 100));
     assertTrue(document.isLineEmptyBetweenColumns(1000, 0, 1));
   }
+
+  @Test
+  void testGetBaseTextProperUri() {
+    document.insertCopybook(5, copybook);
+    Locality locality = Locality.builder()
+        .uri(documentUri)
+        .range(new Range(new Position(3, 5), new Position(4, 8)))
+        .build();
+    String text = document.getBaseText(locality);
+
+    assertEquals("        WORKING-STORAGE SECTION.\r\n" +
+        "        COPY CPY.", text);
+  }
+
+  @Test
+  void testGetBaseTextEdge() {
+    document.insertCopybook(5, copybook);
+    Locality locality = Locality.builder()
+        .uri(documentUri)
+        .range(new Range(new Position(3, 5), new Position(5, 1)))
+        .build();
+    String text = document.getBaseText(locality);
+
+    assertEquals("        WORKING-STORAGE SECTION.\r\n" +
+        "        COPY CPY.\r\n" +
+        "        PROCEDURE DIVISION.", text);
+  }
+
+  @Test
+  void testGetBaseTextWrongUri() {
+    document.insertCopybook(5, copybook);
+    Locality locality = Locality.builder()
+        .uri("wrong")
+        .range(new Range(new Position(3, 5), new Position(4, 8)))
+        .build();
+    String text = document.getBaseText(locality);
+
+    assertEquals("", text);
+  }
+
 }

@@ -22,13 +22,14 @@ import {
   loadProcessorGroupDialectConfig,
   loadProcessorGroupSqlBackendConfig,
 } from "../../services/ProcessorGroups";
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { globSync } from "glob";
 
 const WORKSPACE_URI = "file:///my/workspace";
 
 jest.mock("fs", () => ({
   existsSync: jest.fn().mockReturnValue(true),
-  readFileSync: jest.fn().mockImplementation((f) => {}),
+  readFileSync: jest.fn().mockImplementation(() => {}),
 }));
 
 jest.mock("vscode", () => {

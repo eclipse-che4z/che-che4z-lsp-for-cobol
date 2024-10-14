@@ -92,7 +92,7 @@ export async function closeActiveEditor() {
 
 export async function closeAllEditors() {
   let editor = vscode.window.activeTextEditor;
-  while (!!editor?.document) {
+  while (editor?.document) {
     // simulate didClose by changing the languageID
     await closeActiveEditor();
     editor = vscode.window.activeTextEditor;

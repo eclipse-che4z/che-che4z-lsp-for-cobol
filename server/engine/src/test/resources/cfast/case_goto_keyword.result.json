@@ -46,7 +46,7 @@
         }
       },
       {
-        "snippet": "OPTIONS.\r\n           DISPLAY \u0027OPTION\u0027.",
+        "snippet": "       OPTIONS.\r\n           DISPLAY \u0027OPTION\u0027.",
         "name": "OPTIONS",
         "type": "paragraph",
         "location": {

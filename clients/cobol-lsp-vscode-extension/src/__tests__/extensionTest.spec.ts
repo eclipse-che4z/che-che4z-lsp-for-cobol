@@ -182,6 +182,7 @@ describe("Check plugin extension for cobol fails.", () => {
 });
 
 describe("Check recognition of COBOL from first line", () => {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   const manifest = require("../../package.json");
   const firstLine = manifest.contributes.languages[0].firstLine;
   const cobol = expect.stringMatching(firstLine);

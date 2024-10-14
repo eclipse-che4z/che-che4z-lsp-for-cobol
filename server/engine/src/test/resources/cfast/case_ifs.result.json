@@ -15,7 +15,7 @@
     },
     "children": [
       {
-        "snippet": "A000-PARA.\r\n           MOVE 25 TO WS-NUM1 WS-NUM3.\r\n           MOVE 15 TO WS-NUM2 WS-NUM4.\r\n       \r\n           IF WS-NUM1 \u003e WS-NUM2 THEN\r\n               DISPLAY \u0027IN LOOP 1 - IF BLOCK\u0027\r\n       \r\n               IF WS-NUM3 \u003d WS-NUM4 THEN\r\n                   DISPLAY \u0027IN LOOP 2 - IF BLOCK\u0027\r\n               ELSE",
+        "snippet": "       A000-PARA.\r\n           MOVE 25 TO WS-NUM1 WS-NUM3.\r\n           MOVE 15 TO WS-NUM2 WS-NUM4.\r\n       \r\n           IF WS-NUM1 \u003e WS-NUM2 THEN\r\n               DISPLAY \u0027IN LOOP 1 - IF BLOCK\u0027\r\n       \r\n               IF WS-NUM3 \u003d WS-NUM4 THEN\r\n                   DISPLAY \u0027IN LOOP 2 - IF BLOCK\u0027\r\n               ELSE",
         "name": "A000-PARA",
         "type": "paragraph",
         "location": {
@@ -204,7 +204,7 @@
         ]
       },
       {
-        "snippet": "A001-PARA.\r\n           STOP RUN.",
+        "snippet": "       A001-PARA.\r\n           STOP RUN.",
         "name": "A001-PARA",
         "type": "paragraph",
         "location": {

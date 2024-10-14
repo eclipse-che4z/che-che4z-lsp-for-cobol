@@ -90,7 +90,7 @@
         }
       },
       {
-        "snippet": "HANDLE-ABEND.",
+        "snippet": "       HANDLE-ABEND.",
         "name": "HANDLE-ABEND",
         "type": "paragraph",
         "location": {

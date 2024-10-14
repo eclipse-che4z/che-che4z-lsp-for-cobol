@@ -111,50 +111,73 @@ public class CICSIssueOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
    * @param <E> A subclass of ParserRuleContext
    */
   public <E extends ParserRuleContext> void checkOptions(E ctx) {
-    if (ctx.getClass() == CICSParser.Cics_issue_abendContext.class)
-      checkAbend((CICSParser.Cics_issue_abendContext) ctx);
-    else if (ctx.getClass() == CICSParser.Cics_issue_abortContext.class)
-      checkAbort((CICSParser.Cics_issue_abortContext) ctx);
-    else if (ctx.getClass() == CICSParser.Cics_issue_addContext.class)
-      checkAdd((CICSParser.Cics_issue_addContext) ctx);
-    else if (ctx.getClass() == CICSParser.Cics_issue_confirmationContext.class)
-      checkConfirmation((CICSParser.Cics_issue_confirmationContext) ctx);
-    else if (ctx.getClass() == CICSParser.Cics_issue_copyContext.class)
-      checkCopy((CICSParser.Cics_issue_copyContext) ctx);
-    else if (ctx.getClass() == CICSParser.Cics_issue_disconnectContext.class)
-      checkDisconnect((CICSParser.Cics_issue_disconnectContext) ctx);
-    else if (ctx.getClass() == CICSParser.Cics_issue_endContext.class)
-      checkEnd((CICSParser.Cics_issue_endContext) ctx);
-    else if (ctx.getClass() == CICSParser.Cics_issue_eodsContext.class)
-      checkEODS((CICSParser.Cics_issue_eodsContext) ctx);
-    else if (ctx.getClass() == CICSParser.Cics_issue_eraseContext.class)
-      checkErase((CICSParser.Cics_issue_eraseContext) ctx);
-    else if (ctx.getClass() == CICSParser.Cics_issue_erase_aupContext.class)
-      checkEraseAUP((CICSParser.Cics_issue_erase_aupContext) ctx);
-    else if (ctx.getClass() == CICSParser.Cics_issue_errorContext.class)
-      checkError((CICSParser.Cics_issue_errorContext) ctx);
-    else if (ctx.getClass() == CICSParser.Cics_issue_loadContext.class)
-      checkLoad((CICSParser.Cics_issue_loadContext) ctx);
-    else if (ctx.getClass() == CICSParser.Cics_issue_noteContext.class)
-      checkNote((CICSParser.Cics_issue_noteContext) ctx);
-    else if (ctx.getClass() == CICSParser.Cics_issue_passContext.class)
-      checkPass((CICSParser.Cics_issue_passContext) ctx);
-    else if (ctx.getClass() == CICSParser.Cics_issue_prepareContext.class)
-      checkPrepare((CICSParser.Cics_issue_prepareContext) ctx);
-    else if (ctx.getClass() == CICSParser.Cics_issue_printContext.class)
-      checkPrint((CICSParser.Cics_issue_printContext) ctx);
-    else if (ctx.getClass() == CICSParser.Cics_issue_queryContext.class)
-      checkQuery((CICSParser.Cics_issue_queryContext) ctx);
-    else if (ctx.getClass() == CICSParser.Cics_issue_receiveContext.class)
-      checkReceive((CICSParser.Cics_issue_receiveContext) ctx);
-    else if (ctx.getClass() == CICSParser.Cics_issue_replaceContext.class)
-      checkReplace((CICSParser.Cics_issue_replaceContext) ctx);
-    else if (ctx.getClass() == CICSParser.Cics_issue_sendContext.class)
-      checkSend((CICSParser.Cics_issue_sendContext) ctx);
-    else if (ctx.getClass() == CICSParser.Cics_issue_signalContext.class)
-      checkSignal((CICSParser.Cics_issue_signalContext) ctx);
-    else if (ctx.getClass() == CICSParser.Cics_issue_waitContext.class)
-      checkWait((CICSParser.Cics_issue_waitContext) ctx);
+    switch (ctx.getRuleIndex()) {
+      case CICSParser.RULE_cics_issue_abend:
+        checkAbend((CICSParser.Cics_issue_abendContext) ctx);
+        break;
+      case CICSParser.RULE_cics_issue_abort:
+        checkAbort((CICSParser.Cics_issue_abortContext) ctx);
+        break;
+      case CICSParser.RULE_cics_issue_add:
+        checkAdd((CICSParser.Cics_issue_addContext) ctx);
+        break;
+      case CICSParser.RULE_cics_issue_confirmation:
+        checkConfirmation((CICSParser.Cics_issue_confirmationContext) ctx);
+        break;
+      case CICSParser.RULE_cics_issue_copy:
+        checkCopy((CICSParser.Cics_issue_copyContext) ctx);
+        break;
+      case CICSParser.RULE_cics_issue_disconnect:
+        checkDisconnect((CICSParser.Cics_issue_disconnectContext) ctx);
+        break;
+      case CICSParser.RULE_cics_issue_end:
+        checkEnd((CICSParser.Cics_issue_endContext) ctx);
+        break;
+      case CICSParser.RULE_cics_issue_eods:
+        checkEODS((CICSParser.Cics_issue_eodsContext) ctx);
+        break;
+      case CICSParser.RULE_cics_issue_erase:
+        checkErase((CICSParser.Cics_issue_eraseContext) ctx);
+        break;
+      case CICSParser.RULE_cics_issue_error:
+        checkError((CICSParser.Cics_issue_errorContext) ctx);
+        break;
+      case CICSParser.RULE_cics_issue_load:
+        checkLoad((CICSParser.Cics_issue_loadContext) ctx);
+        break;
+      case CICSParser.RULE_cics_issue_note:
+        checkNote((CICSParser.Cics_issue_noteContext) ctx);
+        break;
+      case CICSParser.RULE_cics_issue_pass:
+        checkPass((CICSParser.Cics_issue_passContext) ctx);
+        break;
+      case CICSParser.RULE_cics_issue_prepare:
+        checkPrepare((CICSParser.Cics_issue_prepareContext) ctx);
+        break;
+      case CICSParser.RULE_cics_issue_print:
+        checkPrint((CICSParser.Cics_issue_printContext) ctx);
+        break;
+      case CICSParser.RULE_cics_issue_query:
+        checkQuery((CICSParser.Cics_issue_queryContext) ctx);
+        break;
+      case CICSParser.RULE_cics_issue_receive:
+        checkReceive((CICSParser.Cics_issue_receiveContext) ctx);
+        break;
+      case CICSParser.RULE_cics_issue_replace:
+        checkReplace((CICSParser.Cics_issue_replaceContext) ctx);
+        break;
+      case CICSParser.RULE_cics_issue_send:
+        checkSend((CICSParser.Cics_issue_sendContext) ctx);
+        break;
+      case CICSParser.RULE_cics_issue_signal:
+        checkSignal((CICSParser.Cics_issue_signalContext) ctx);
+        break;
+      case CICSParser.RULE_cics_issue_wait:
+        checkWait((CICSParser.Cics_issue_waitContext) ctx);
+        break;
+      default:
+        break;
+    }
     checkDuplicates(ctx);
   }
 
@@ -200,6 +223,7 @@ public class CICSIssueOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
   void checkErase(CICSParser.Cics_issue_eraseContext ctx) {
     checkHasMandatoryOptions(ctx.ERASE(), ctx, "ERASE");
     checkHasMandatoryOptions(ctx.RIDFLD(), ctx, "RIDFLD");
+    checkHasMandatoryOptions(ctx.DESTID(), ctx, "DESTID");
 
     if (ctx.VOLUME().isEmpty())
       checkHasIllegalOptions(ctx.VOLUMELENG(), "VOLUMELENG without VOLUME");
@@ -209,10 +233,6 @@ public class CICSIssueOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     if (ctx.KEYLENGTH().isEmpty()) {
       checkHasIllegalOptions(ctx.KEYNUMBER(), "KEYNUMBER without KEYLENGTH");
     }
-  }
-
-  void checkEraseAUP(CICSParser.Cics_issue_erase_aupContext ctx) {
-    checkHasMandatoryOptions(ctx.ERASEAUP(), ctx, "ERASEAUP");
   }
 
   void checkError(CICSParser.Cics_issue_errorContext ctx) {
@@ -269,6 +289,7 @@ public class CICSIssueOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
   void checkReplace(CICSParser.Cics_issue_replaceContext ctx) {
     checkHasMandatoryOptions(ctx.REPLACE(), ctx, "REPLACE");
     checkHasMandatoryOptions(ctx.DESTID(), ctx, "DESTID");
+    checkHasMandatoryOptions(ctx.RIDFLD(), ctx, "RIDFLD");
     checkHasMandatoryOptions(ctx.FROM(), ctx, "FROM");
 
     if (ctx.KEYLENGTH().isEmpty()) {
@@ -296,8 +317,6 @@ public class CICSIssueOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
 
   void checkWait(CICSParser.Cics_issue_waitContext ctx) {
     checkHasMandatoryOptions(ctx.WAIT(), ctx, "WAIT");
-    if (ctx.cics_issue_common().isEmpty())
-      checkHasMandatoryOptions(ctx.cics_issue_common(), ctx, "DESTID or SUBADDR branches");
     checkIssueCommon(ctx.cics_issue_common());
   }
 
@@ -308,7 +327,7 @@ public class CICSIssueOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     List<TerminalNode> subAddrs =
         ctx.stream().flatMap(context -> context.SUBADDR().stream()).collect(Collectors.toList());
 
-    checkHasMutuallyExclusiveOptions("SUBARR or DESIT", destIds, subAddrs);
+    checkHasMutuallyExclusiveOptions("SUBADDR or DESTID", destIds, subAddrs);
 
     boolean hasVolume = !(ctx.stream().mapToInt(context -> context.VOLUME().size()).sum() == 0);
 

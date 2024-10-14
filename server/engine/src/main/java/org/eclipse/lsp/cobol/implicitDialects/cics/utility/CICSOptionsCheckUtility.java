@@ -48,14 +48,17 @@ public class CICSOptionsCheckUtility {
     optionsMap.put(
         CICSGetnextOptionsCheckUtility.RULE_INDEX, new CICSGetnextOptionsCheckUtility(context, errors));
     optionsMap.put(
+        CICSBuildOptionsCheckUtility.RULE_INDEX,
+        new CICSBuildOptionsCheckUtility(context, errors));
+    optionsMap.put(
         CICSAcquireOptionsCheckUtility.RULE_INDEX,
         new CICSAcquireOptionsCheckUtility(context, errors));
     optionsMap.put(
         CICSWaitOptionsCheckUtility.RULE_INDEX,
         new CICSWaitOptionsCheckUtility(context, errors));
     optionsMap.put(
-        CICSCancelOptionsCheckUtility.RULE_INDEX, new CICSCancelOptionsCheckUtility(context, errors));
-
+        CICSCancelOptionsCheckUtility.RULE_INDEX,
+        new CICSCancelOptionsCheckUtility(context, errors));
   }
 
   /**

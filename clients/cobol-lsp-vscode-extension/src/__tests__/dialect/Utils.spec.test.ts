@@ -12,7 +12,6 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
-import { error } from "console";
 import { isV1RuntimeDialectDetail } from "../../dialect/utils";
 import * as vscode from "vscode";
 
