@@ -75,8 +75,8 @@ public class CICSBifOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     private void checkDigest(CICSParser.Cics_bif_digestContext ctx) {
         checkHasMandatoryOptions(ctx.DIGEST(), ctx, "DIGEST");
         checkHasMandatoryOptions(ctx.RECORD(), ctx, "RECORD");
-        checkHasMandatoryOptions(ctx.RECORDLEN(), ctx, "RECORDLEN");
         checkHasMandatoryOptions(ctx.RESULT(), ctx, "RESULT");
+        checkHasMutuallyExclusiveOptions("HEX or BINARY or BASE64 or DIGESTTYPE", ctx.HEX(), ctx.BINARY(), ctx.BASE64(),ctx.DIGESTTYPE());
     }
 
 }
