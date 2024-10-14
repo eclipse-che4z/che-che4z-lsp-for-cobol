@@ -110,8 +110,6 @@ public abstract class CICSOptionsCheckBaseUtility {
    */
   @SafeVarargs
   protected final void checkHasRequiredOption(ParserRuleContext ctx, String options, List<TerminalNode> requiredContext, List<TerminalNode>... optionalContext) {
-    boolean hasRequired;
-
     for (TerminalNode required : requiredContext) {
       for (List<TerminalNode> terminalNodes : optionalContext) {
         String optionalContextText = terminalNodes.get(0).getText();
