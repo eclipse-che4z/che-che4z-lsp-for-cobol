@@ -734,7 +734,7 @@ cics_startbrowse_event: EVENT (BROWSETOKEN cics_data_area | ACTIVITYID cics_data
 cics_startbrowse_process: PROCESS (PROCESSTYPE cics_data_value | BROWSETOKEN cics_data_area | cics_handle_response)+;
 cics_startbrowse_timer: TIMER cics_data_value (BROWSETOKEN cics_data_area | cics_handle_response)+;
 
-cics_startbrowse_activityid_process: (ACTIVITYID cics_data_value | PROCESS cics_data_value PROCESSTYPE cics_data_value);
+cics_startbrowse_activityid_process: (ACTIVITYID|PROCESS|PROCESSTYPE) cics_data_value;
 
 /** SUSPEND (both) */
 cics_suspend: SUSPEND (ACQACTIVITY | ACQPROCESS | ACTIVITY cics_data_value | cics_handle_response)*;

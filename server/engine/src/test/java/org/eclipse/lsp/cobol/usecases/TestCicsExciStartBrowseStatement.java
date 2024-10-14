@@ -14,13 +14,15 @@
  */
 package org.eclipse.lsp.cobol.usecases;
 
-import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.usecases.common.CICSTestUtils;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Tests CICS STARTBROWSE CONTAINER (EXCI) statement. Ref:
@@ -44,7 +46,7 @@ public class TestCicsExciStartBrowseStatement {
   private static final String STARTBROWSE_PROCESS_VALID = "STARTBROWSE PROCESS PROCESSTYPE(123) BROWSETOKEN(123)";
   private static final String STARTBROWSE_TIMER_VALID = "STARTBROWSE TIMER(123) BROWSETOKEN(123)";
 
-  private static final String STARTBROWSE_INVALID_PROCESS_CHANNEL = "STARTBROWSE CONTAINER {PROCESS(123) PROCESSTYPE(123)|errorOne} CHANNEL(3) BROWSETOKEN(123)";
+  private static final String STARTBROWSE_INVALID_PROCESS_CHANNEL = "STARTBROWSE CONTAINER {PROCESS(123)|errorOne} {PROCESSTYPE(123)|errorTwo} CHANNEL(3) BROWSETOKEN(123)";
 
   // Test Functions
   @Test
@@ -75,13 +77,19 @@ public class TestCicsExciStartBrowseStatement {
   // Invalid Test
   @Test
   void testStartBrowseContainerInvalid() {
-   ImmutableMap<String, Diagnostic> tempDiagnostic = ImmutableMap.of(
-           "errorOne",
-           new Diagnostic(
-            new Range(),
-           "Invalid option provided: ACTIVITYID or PROCESS",
-            DiagnosticSeverity.Error,
-            ErrorSource.PARSING.getText()));
+    Map<String, Diagnostic> tempDiagnostic = new HashMap<>();
+    tempDiagnostic.put("errorOne",
+            new Diagnostic(
+                    new Range(),
+                    "Invalid option provided: ACTIVITYID or PROCESS",
+                    DiagnosticSeverity.Error,
+                    ErrorSource.PARSING.getText()));
+    tempDiagnostic.put("errorTwo",
+            new Diagnostic(
+                    new Range(),
+                    "Invalid option provided: ACTIVITYID or PROCESS",
+                    DiagnosticSeverity.Error,
+                    ErrorSource.PARSING.getText()));
 
     CICSTestUtils.errorTest(STARTBROWSE_INVALID_PROCESS_CHANNEL, tempDiagnostic);
   }
