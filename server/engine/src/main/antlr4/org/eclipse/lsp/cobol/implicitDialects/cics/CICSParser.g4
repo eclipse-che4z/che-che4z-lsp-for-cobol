@@ -192,8 +192,7 @@ cics_acquire_process: ((PROCESS | PROCESSTYPE) cics_data_value | cics_handle_res
 cics_acquire_activityId: (ACTIVITYID cics_data_value | cics_handle_response)+;
 
 /** ADD SUBEVENT */
-cics_add: ADD ( ciss_add_event_subevent | cics_handle_response)+;
-ciss_add_event_subevent: ((SUBEVENT  | EVENT) cics_data_value | cics_handle_response)+;
+cics_add: ADD ((SUBEVENT | EVENT) cics_data_value | cics_handle_response)+;
 
 /** ADDRESS / ADDRESS SET */
 cics_address: ADDRESS (cics_address_null | cics_address_set);
