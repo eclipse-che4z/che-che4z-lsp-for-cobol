@@ -50,10 +50,8 @@ public class TestCICSBif {
             "BIF DIGEST RECORD(100) RECORDLEN(100) BASE64 RESULT({$varFour})";
     private static final String BIF_DIGEST_RECORD_RECORDLEN_DIGESTTYPE_RESULT_VALID =
             "BIF DIGEST RECORD(100) RECORDLEN(100) DIGESTTYPE({$varFour}) RESULT({$varFour})";
-    private static final String BIF_DIGEST_RECORDLEN_INVALID =
-            "BIF DIGEST  RESULT({$varFour}) { RECORD(100) | errorRecordLen } ";
     private static final String BIF_DIGEST_DIGESTTYPE_INVALID =
-            "BIF DIGEST RECORD(100) RECORDLEN(100) HEX { DIGESTTYPE | errorDigestType }(100)";
+            "BIF DIGEST {RECORD |errorResultMissing }(100) RECORDLEN(100) {HEX | errorDigestType} {BASE64 | errorDigestType2}";
     private static final String BIF_DIGEST_RESULT_MISSING_INVALID =
             "BIF DIGEST RECORD(100) {RECORDLEN | errorResultMissing}(100)";
 
@@ -101,27 +99,28 @@ public class TestCICSBif {
         CICSTestUtils.noErrorTest(BIF_DIGEST_RECORD_RECORDLEN_DIGESTTYPE_RESULT_VALID);
     }
     @Test
-    void testBifDigestRecordlenInvalid() {
-        Map<String, Diagnostic> expectedDiagnostic =
-                ImmutableMap.of(
-                        "errorRecordLen",
-                        new Diagnostic(
-                                new Range(new Position(13, 12), new Position(16, 23)),
-                                "Missing required option: RECORDLEN",
-                                DiagnosticSeverity.Error,
-                                ErrorSource.PARSING.getText()));
-        CICSTestUtils.errorTest(BIF_DIGEST_RECORDLEN_INVALID, expectedDiagnostic);
-    }
-    @Test
     void testBifDigestDigesttypeInvalid() {
         Map<String, Diagnostic> expectedDiagnostic =
                 ImmutableMap.of(
-                        "errorDigestType",
+                        "errorResultMissing",
                         new Diagnostic(
-                                new Range(new Position(13, 12), new Position(17, 27)),
+                                new Range(new Position(13, 12), new Position(17, 18)),
                                 "Missing required option: RESULT",
                                 DiagnosticSeverity.Error,
-                                ErrorSource.PARSING.getText()));
+                                ErrorSource.PARSING.getText()),
+                        "errorDigestType",
+                        new Diagnostic(
+                                new Range(new Position(16, 12), new Position(16, 15)),
+                                "Exactly one option required, options are mutually exclusive: HEX or BINARY or BASE64 or DIGESTTYPE",
+                                DiagnosticSeverity.Error,
+                                ErrorSource.PARSING.getText()),
+                        "errorDigestType2",
+                        new Diagnostic(
+                                new Range(new Position(17,12), new Position(17,18)),
+                                "Exactly one option required, options are mutually exclusive: HEX or BINARY or BASE64 or DIGESTTYPE",
+                                DiagnosticSeverity.Error,
+                                ErrorSource.PARSING.getText())
+                        );
         CICSTestUtils.errorTest(BIF_DIGEST_DIGESTTYPE_INVALID, expectedDiagnostic);
     }
     @Test
