@@ -249,9 +249,10 @@ cics_bif_digest: DIGEST (RECORD cics_data_value | RECORDLEN cics_data_value | HE
                  RESULT cics_data_area | cics_handle_response)+;
 
 /** BUILD ATTACH (both of them) */
-cics_build: BUILD ATTACH (ATTACHID cics_name | PROCESS cics_name | RESOURCE cics_name | RPROCESS cics_name |
-            RRESOURCE cics_name | QUEUE cics_name | IUTYPE cics_data_value | DATASTR cics_data_value |
-            RECFM cics_data_value | cics_handle_response)+;
+cics_build: BUILD cics_build_attach;
+cics_build_attach: (ATTACH | (ATTACHID  | PROCESS  | RESOURCE  | RPROCESS  |
+            RRESOURCE | QUEUE) cics_name | (IUTYPE | DATASTR |
+            RECFM) cics_data_value | cics_handle_response)+;
 
 /** CANCEL (both of them) */
 cics_cancel: CANCEL (cics_cancel_bts | cics_cancel_reqid);
