@@ -61,7 +61,7 @@
         ]
       },
       {
-        "snippet": "Some-Routine.\r\n            DISPLAY \"SOME-ROUTINE\".",
+        "snippet": "        Some-Routine.\r\n            DISPLAY \"SOME-ROUTINE\".",
         "name": "SOME-ROUTINE",
         "type": "paragraph",
         "location": {

@@ -46,7 +46,7 @@
         }
       },
       {
-        "snippet": "PARAG1.\r\n           DISPLAY \u0027PARAG1\u0027.\r\n           PERFORM PARAG2.",
+        "snippet": "       PARAG1.\r\n           DISPLAY \u0027PARAG1\u0027.\r\n           PERFORM PARAG2.",
         "name": "PARAG1",
         "type": "paragraph",
         "location": {
@@ -93,7 +93,7 @@
         ]
       },
       {
-        "snippet": "PARAG2.\r\n           DISPLAY \u0027PARAG2\u0027.",
+        "snippet": "       PARAG2.\r\n           DISPLAY \u0027PARAG2\u0027.",
         "name": "PARAG2",
         "type": "paragraph",
         "location": {

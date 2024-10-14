@@ -78,8 +78,10 @@ export class ProfileUtils {
     const fsPath = uri.fsPath;
 
     const openedFile =
-      eeApi.ussFileProvider.openFiles[fsPath] ||
-      eeApi.datasetProvider.openFiles[fsPath];
+      (eeApi.ussFileProvider.openFiles &&
+        eeApi.ussFileProvider.openFiles[fsPath]) ||
+      (eeApi.datasetProvider.openFiles &&
+        eeApi.datasetProvider.openFiles[fsPath]);
 
     return openedFile?.profile.name;
   }

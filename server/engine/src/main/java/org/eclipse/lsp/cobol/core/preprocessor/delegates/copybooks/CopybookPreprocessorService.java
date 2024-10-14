@@ -99,7 +99,6 @@ class CopybookPreprocessorService {
                           int maxCopybookLen, List<ReplacementContext> replacementContext) {
     CopybookName name = getCopybookName(copySource);
     String copybookName = name.getQualifiedName();
-    String copybookId = name.toCopybookId(programDocumentUri).toString();
 
     Range range = VisitorHelper.constructRange(ctx);
     Locality nameLocality = mapLocality(retrieveLocality(copySource));
