@@ -71,15 +71,11 @@ public class CICSGetnextOptionsCheckUtility extends CICSOptionsCheckBaseUtility 
         checkMutuallyExclusiveOptions("ACTIVITY, CONTAINER, EVENT, PROCESS, TIMER", ctx.ACTIVITY(), ctx.CONTAINER(), ctx.EVENT(), ctx.PROCESS(), ctx.TIMER());
 
         // Distinct elements for a given command subset:
-        checkHasRequiredOption(ctx.ACTIVITY(), ctx.LEVEL(), ctx, "ACTIVITY");
+        checkHasRequiredOption(ctx, "ACTIVITY", ctx.ACTIVITY(), ctx.LEVEL());
 
         checkHasMandatoryOptions(ctx.BROWSETOKEN(), ctx, "BROWSETOKEN");
 
-        checkHasRequiredOption(ctx.EVENT(), ctx.COMPOSITE(), ctx, "EVENT");
-        checkHasRequiredOption(ctx.EVENT(), ctx.EVENTTYPE(), ctx, "EVENT");
-        checkHasRequiredOption(ctx.EVENT(), ctx.FIRESTATUS(), ctx, "EVENT");
-        checkHasRequiredOption(ctx.EVENT(), ctx.PREDICATE(), ctx, "EVENT");
-
-        checkHasRequiredOption(ctx.TIMER(), ctx.ABSTIME(), ctx, "TIMER");
+        checkHasRequiredOption(ctx, "EVENT", ctx.EVENT(), ctx.COMPOSITE(), ctx.EVENTTYPE(), ctx.FIRESTATUS(), ctx.PREDICATE());
+        checkHasRequiredOption(ctx, "TIMER", ctx.TIMER(), ctx.ABSTIME());
     }
 }
