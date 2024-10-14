@@ -182,8 +182,8 @@ cics_maxlength: ((MAXLENGTH | MAXFLENGTH) cics_data_value);
 
 
 /** ABEND: */
-cics_abend: ABEND (ABCODE cics_name | CANCEL | NODUMP | cics_handle_response)*;
-
+cics_abend: ABEND cics_abend_opts;
+cics_abend_opts:(ABCODE cics_name | CANCEL | NODUMP| cics_handle_response)*;
 /** ACQUIRE */
 cics_acquire:ACQUIRE (cics_acquire_process | cics_acquire_activityId ) ;
 
