@@ -419,7 +419,7 @@ cics_getmain: GETMAIN (SET cics_ref | FLENGTH cics_data_value | BELOW | LENGTH c
               SHARED | NOSUSPEND | USERDATAKEY | CICSDATAKEY | cics_handle_response)+;
 
 /** GETNEXT ACTIVITY / CONTAINER / EVENT / PROCESS */
-cics_getnext: GETNEXT ((ACTIVITY|ACTIVITYID|LEVEL|CONTAINER|COMPOSITE|PROCESS|TIMER|EVENT|ABSTIME) cics_data_area | (BROWSETOKEN) cics_data_value | (EVENTTYPE|FIRESTATUS|PREDICATE|STATUS) cics_cvda)+;
+cics_getnext: GETNEXT ((ACTIVITY|ACTIVITYID|LEVEL|CONTAINER|COMPOSITE|PROCESS|TIMER|EVENT|ABSTIME) cics_data_area | (BROWSETOKEN|TIMER) cics_data_value | (EVENTTYPE|FIRESTATUS|PREDICATE|STATUS) cics_cvda)+;
 
 /** HANDLE CONDITION / HANDLE AID / HANDLE ABEND: */
 cics_handle: HANDLE (cics_handle_abend | cics_handle_aid | cics_handle_condition);
