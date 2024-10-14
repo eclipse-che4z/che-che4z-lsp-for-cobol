@@ -103,57 +103,29 @@ public abstract class CICSOptionsCheckBaseUtility {
 
   /**
    *
-   * @param requiredContext - The rule that is required
-   * @param optionalContext - The rule that is optional
-   * @param options - String of the element that is required.
-   */
-  protected void checkHasRequiredOption(ParserRuleContext requiredContext, ParserRuleContext optionalContext, String options) {
-    checkHasRequiredOptionFromString(requiredContext.getText(), optionalContext.getText(), optionalContext, options);
-  }
-
-  /**
-   *
-   * @param requiredContext - The rule that is required
-   * @param optionalContext - The rule that is optional
    * @param ctx - The overall context.
    * @param options - String of the element that is required.
+   * @param requiredContext - The required rule
+   * @param optionalContext - The optional rule(s)
    */
-  protected void checkHasRequiredOption(List<TerminalNode> requiredContext, List<TerminalNode> optionalContext, ParserRuleContext ctx, String options) {
-    checkHasRequiredOptionFromString(
-            (requiredContext.isEmpty() ? "" : requiredContext.get(0).getText()),
-            (optionalContext.isEmpty() ? "" : optionalContext.get(0).getText()),
-            ctx, options);
-  }
+  @SafeVarargs
+  protected final void checkHasRequiredOption(ParserRuleContext ctx, String options, List<TerminalNode> requiredContext, List<TerminalNode>... optionalContext) {
+    boolean hasRequired;
 
-  protected void checkHasRequiredOption(TerminalNode requiredContext, TerminalNode optionalContext, ParserRuleContext ctx, String options) {
-    checkHasRequiredOptionFromString(requiredContext.getText(), optionalContext.getText(), ctx, options);
-  }
-
-  protected void checkHasRequiredOption(ParserRuleContext requiredContext, TerminalNode optionalContext, ParserRuleContext ctx, String options) {
-    checkHasRequiredOptionFromString(requiredContext.getText(), optionalContext.getText(), ctx, options);
-  }
-
-  protected void checkHasRequiredOption(TerminalNode requiredContext, ParserRuleContext optionalContext, ParserRuleContext ctx, String options) {
-    checkHasRequiredOptionFromString(requiredContext.getText(), optionalContext.getText(), ctx, options);
-  }
-
-  protected void checkHasRequiredOption(TerminalNode requiredContext, List<TerminalNode> optionalContext, ParserRuleContext ctx, String options) {
-    checkHasRequiredOptionFromString(requiredContext.getText(), (optionalContext.isEmpty() ? "" : optionalContext.get(0).getText()), ctx, options);
-  }
-
-  protected void checkHasRequiredOption(List<TerminalNode> requiredContext, TerminalNode optionalContext, ParserRuleContext ctx, String options) {
-    checkHasRequiredOptionFromString((requiredContext.isEmpty() ? "" : requiredContext.get(0).getText()), optionalContext.getText(), ctx, options);
-  }
-
-
-  private void checkHasRequiredOptionFromString(String requiredContextText, String optionalContextText, ParserRuleContext ctx, String options) {
-    if (requiredContextText.isEmpty() && !optionalContextText.isEmpty()) {
-      throwException(
-              ErrorSeverity.ERROR,
-              VisitorUtility.constructLocality(ctx, context),
-              "Missing required option \"" + options + "\" for " + optionalContextText,
-              options);
+    for (TerminalNode required : requiredContext) {
+      for (List<TerminalNode> terminalNodes : optionalContext) {
+        String optionalContextText = terminalNodes.get(0).getText();
+        if (required.getText().isEmpty() && !optionalContextText.isEmpty()) {
+          throwException(
+                  ErrorSeverity.ERROR,
+                  VisitorUtility.constructLocality(ctx, context),
+                  "Missing required option: " + options,
+                  optionalContextText);
+          return;
+        }
+      }
     }
+
   }
 
   /**
