@@ -139,9 +139,6 @@ public class CICSIssueOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
       case CICSParser.RULE_cics_issue_erase:
         checkErase((CICSParser.Cics_issue_eraseContext) ctx);
         break;
-      case CICSParser.RULE_cics_issue_erase_aup:
-        checkEraseAUP((CICSParser.Cics_issue_erase_aupContext) ctx);
-        break;
       case CICSParser.RULE_cics_issue_error:
         checkError((CICSParser.Cics_issue_errorContext) ctx);
         break;
@@ -238,10 +235,6 @@ public class CICSIssueOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     }
   }
 
-  void checkEraseAUP(CICSParser.Cics_issue_erase_aupContext ctx) {
-    checkHasMandatoryOptions(ctx.ERASEAUP(), ctx, "ERASEAUP");
-  }
-
   void checkError(CICSParser.Cics_issue_errorContext ctx) {
     checkHasMandatoryOptions(ctx.ERROR(), ctx, "ERROR");
   }
@@ -324,8 +317,6 @@ public class CICSIssueOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
 
   void checkWait(CICSParser.Cics_issue_waitContext ctx) {
     checkHasMandatoryOptions(ctx.WAIT(), ctx, "WAIT");
-    if (ctx.cics_issue_common().isEmpty())
-      checkHasMandatoryOptions(ctx.cics_issue_common(), ctx, "DESTID or SUBADDR branches");
     checkIssueCommon(ctx.cics_issue_common());
   }
 
