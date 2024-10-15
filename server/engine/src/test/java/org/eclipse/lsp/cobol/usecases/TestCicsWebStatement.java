@@ -121,10 +121,6 @@ public class TestCicsWebStatement {
         UseCaseEngine.runTest(getTestString(newCommand), ImmutableList.of(), ImmutableMap.of());
     }
 
-    private static void errorTest(String newCommand, HashMap<String, Diagnostic> expectedDiagnostics) {
-        UseCaseEngine.runTest(getTestString(newCommand), ImmutableList.of(), expectedDiagnostics);
-    }
-
     private static String getTestString(String newCommand) {
         List<String> instances = Arrays.asList(newCommand.split("\\s"));
         instances.replaceAll(String.join("", Collections.nCopies(12, " "))::concat);
