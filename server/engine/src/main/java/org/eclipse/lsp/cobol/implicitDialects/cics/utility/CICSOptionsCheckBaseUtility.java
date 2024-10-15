@@ -111,6 +111,37 @@ public abstract class CICSOptionsCheckBaseUtility {
     return true;
   }
 
+  protected void checkHasMandatoryOptions(TerminalNode rules, ParserRuleContext ctx, String options) {
+    ArrayList<TerminalNode> tempList = new ArrayList<>();
+    tempList.add(rules);
+    checkHasMandatoryOptions(tempList, ctx, options);
+  }
+
+  /**
+   *
+   * @param ctx - The overall context.
+   * @param options - String of the element that is required.
+   * @param requiredContext - The required rule
+   * @param optionalContext - The optional rule(s)
+   */
+  @SafeVarargs
+  protected final void checkHasRequiredOption(ParserRuleContext ctx, String options, List<TerminalNode> requiredContext, List<TerminalNode>... optionalContext) {
+    for (TerminalNode required : requiredContext) {
+      for (List<TerminalNode> terminalNodes : optionalContext) {
+        String optionalContextText = terminalNodes.get(0).getText();
+        if (required.getText().isEmpty() && !optionalContextText.isEmpty()) {
+          throwException(
+                  ErrorSeverity.ERROR,
+                  VisitorUtility.constructLocality(ctx, context),
+                  "Missing required option: " + options,
+                  optionalContextText);
+          return;
+        }
+      }
+    }
+
+  }
+
   /**
    * Helper method to collect analysis errors if the rule context contains illegal options
    *
@@ -282,6 +313,53 @@ public abstract class CICSOptionsCheckBaseUtility {
     }
     return nodes.size();
   }
+
+  /**
+   * Helper method to collect analysis errors if the rule context contains illegal options
+   *
+   * @param rule Generic rule to check
+   * @param options Options checked to insert into error message
+   */
+  protected void checkHasIllegalOptions(TerminalNode rule, String options) {
+    if (!rule.getText().isEmpty()) {
+      throwException(ErrorSeverity.ERROR, getLocality(rule), "Invalid option provided: ", options);
+    }
+  }
+
+  /**
+   * Helper function to check and see if more than one rule was visited out of a set provided.
+   *
+   * @param options Options checked to insert into error message
+   * @param rules Generic list of rules to check. Will be a collection of ParserRuleContext and/or TerminalNode objects.
+   * @param <E> Generic type to allow cross-rule context collection.
+   */
+  @SafeVarargs
+  protected final <E> void checkMutuallyExclusiveOptions(String options, E... rules) {
+    if (rules.length <= 1) {
+      return;
+    }
+
+    int rulesSeen = 0;
+
+    for (E rule : rules) {
+      if (ParserRuleContext.class.isAssignableFrom(rule.getClass())) {
+        if (!((ParserRuleContext) rule).isEmpty()) {
+          rulesSeen++;
+        }
+      } else if (TerminalNode.class.isAssignableFrom(rule.getClass())) {
+        if (!((TerminalNode) rule).getText().isEmpty()) {
+          rulesSeen++;
+        }
+      }
+
+      if (rulesSeen > 1) {
+        throwException(ErrorSeverity.ERROR, getLocality(rule), "Options \"" + options + "\" are mutually exclusive, ", "");
+        break;
+      }
+    }
+  }
+
+
 
   protected <E extends ParseTree> void checkHasExactlyOneOption(
       String options, ParserRuleContext parentCtx, List<E>... rules) {
