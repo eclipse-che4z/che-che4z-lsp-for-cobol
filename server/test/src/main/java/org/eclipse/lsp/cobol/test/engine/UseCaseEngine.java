@@ -25,6 +25,7 @@ import static org.eclipse.lsp.cobol.test.engine.UseCaseUtils.analyze;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Multimap;
 import com.google.gson.JsonElement;
 
@@ -43,6 +44,7 @@ import org.eclipse.lsp.cobol.common.dialects.CobolLanguageId;
 import org.eclipse.lsp.cobol.common.model.DefinedAndUsedStructure;
 import org.eclipse.lsp.cobol.common.model.NodeType;
 import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
+import org.eclipse.lsp.cobol.common.model.tree.FunctionReference;
 import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNode;
 import org.eclipse.lsp.cobol.common.symbols.SymbolTable;
@@ -403,6 +405,16 @@ public class UseCaseEngine {
         "Subroutine usage:",
         expected.getSubroutineUsages(),
         extractUsages(actual, SUBROUTINE_NAME_NODE));
+
+    assertResult(
+            "Function definition:",
+            expected.getFunctionDefinitions(),
+            extractFunctionDefinitions(actual));
+
+    assertResult(
+            "Function usage:",
+            expected.getFunctionUsages(),
+            extractDefinitionsUsage(actual));
   }
 
   private Map<String, List<Location>> extractVariableDefinitions(AnalysisResult result) {
@@ -445,6 +457,29 @@ public class UseCaseEngine {
         context ->
             !(context.getDefinitions().isEmpty()
                 || ImplicitCodeUtils.isImplicit(context.getDefinitions().get(0).getUri())));
+  }
+
+  private Map<String, List<Location>> extractFunctionDefinitions(AnalysisResult result) {
+    return result
+        .getRootNode()
+        .getDepthFirstStream()
+        .filter(hasType(FUNCTION_REFERENCE))
+        .map(FunctionReference.class::cast)
+        .filter(
+            context ->
+                !(context.getDefinitions().isEmpty()
+                    || ImplicitCodeUtils.isImplicit(context.getDefinitions().get(0).getUri())))
+        .collect(Collectors.toMap(fr -> fr.getName().toUpperCase(Locale.ROOT), FunctionReference::getDefinitions, (m1, m2) -> m2));
+  }
+
+  private Map<String, List<Location>> extractDefinitionsUsage(AnalysisResult result) {
+    return  result
+            .getRootNode()
+            .getDepthFirstStream()
+            .filter(hasType(FUNCTION_REFERENCE))
+            .map(DefinedAndUsedStructure.class::cast)
+            .filter(context -> !context.getDefinitions().isEmpty())
+            .collect(toMap(d -> ImmutableList.of(d.getLocality().toLocation()), FUNCTION_REFERENCE));
   }
 
   private Map<String, List<Location>> extractUsages(AnalysisResult result, NodeType nodeType) {

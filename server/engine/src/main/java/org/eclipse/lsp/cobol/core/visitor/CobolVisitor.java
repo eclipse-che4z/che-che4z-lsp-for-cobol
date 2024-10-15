@@ -163,6 +163,39 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   }
 
   @Override
+  public List<Node> visitFunctionRepositoryClause(FunctionRepositoryClauseContext ctx) {
+    Optional<Locality> statementLocality = retrieveLocality(ctx, extendedDocument, copybooks);
+    if (statementLocality.isPresent()) {
+      boolean isIntrinsic = ctx.INTRINSIC() != null;
+      TerminalNode all = ctx.ALL();
+      List<FunctionReference> functionNames =
+          ctx.variableUsageName().stream()
+              .map(
+                  functionNameContext ->
+                      retrieveLocality(functionNameContext, extendedDocument, copybooks)
+                          .map(
+                              functionLocality ->
+                                  new FunctionReference(
+                                      functionLocality, functionNameContext.getText(), true)))
+              .filter(Optional::isPresent)
+              .map(Optional::get)
+              .collect(Collectors.toList());
+
+      if (Objects.nonNull(all)) {
+        retrieveLocality(ctx.ALL(), extendedDocument, copybooks)
+            .ifPresent(
+                locality ->
+                    functionNames.add(new FunctionReference(locality, all.getText(), true)));
+      }
+      return ImmutableList.of(
+          new FunctionDeclaration(statementLocality.get(), functionNames, isIntrinsic));
+    } else {
+      return ImmutableList.of();
+    }
+    }
+
+
+  @Override
   public List<Node> visitFunctionReference(FunctionReferenceContext ctx) {
     return makeFunctionReferenceNodes(ctx.functionName());
   }

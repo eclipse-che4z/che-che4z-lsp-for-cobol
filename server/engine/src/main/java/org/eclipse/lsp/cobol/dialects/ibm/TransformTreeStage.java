@@ -258,6 +258,8 @@ public class TransformTreeStage implements Stage<AnalysisContext, ProcessingResu
     // Phase USAGE
     ProcessingPhase u = ProcessingPhase.USAGE;
     ctx.register(u, CodeBlockUsageNode.class, new CodeBlockUsage(symbolAccumulatorService));
+    ctx.register(u, FunctionReference.class, new FunctionReferenceEnricher(symbolAccumulatorService));
+    ctx.register(u, FunctionDeclaration.class, new FunctionDeclarationProcessor(symbolAccumulatorService));
     ctx.register(u, QualifiedReferenceNode.class, new QualifiedReferenceUpdateVariableUsage(symbolAccumulatorService));
     ctx.register(u, FunctionReference.class, new FunctionReferenceProcessor(symbolAccumulatorService));
 
@@ -266,12 +268,12 @@ public class TransformTreeStage implements Stage<AnalysisContext, ProcessingResu
     ctx.register(e, SectionNameNode.class, new SectionNameNodeEnricher(symbolAccumulatorService));
     ctx.register(e, ParagraphNameNode.class, new ParagraphNameNodeEnricher(symbolAccumulatorService));
     ctx.register(e, CodeBlockUsageNode.class, new CodeBlockUsageNodeEnricher(symbolAccumulatorService));
-    ctx.register(e, FunctionReference.class, new FunctionReferenceEnricher(symbolAccumulatorService));
     ctx.register(e, ProgramIdNode.class, new ProgramIdEnricher(symbolAccumulatorService));
 
     // Phase VALIDATION
     ProcessingPhase v = ProcessingPhase.VALIDATION;
     ctx.register(v, VariableWithLevelNode.class, new VariableWithLevelCheck(CodeLayoutUtil.getProgramLayout(languageId, layoutStore)));
+    ctx.register(v, VariableWithLevelNode.class, new VariableNameCheck(symbolAccumulatorService));
     ctx.register(v, StatementNode.class, new StatementValidate());
     ctx.register(v, ElementaryNode.class, new ElementaryNodeCheck());
     ctx.register(v, GroupItemNode.class, new GroupItemCheck());

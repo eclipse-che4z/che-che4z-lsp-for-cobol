@@ -17,10 +17,12 @@ package org.eclipse.lsp.cobol.core.engine.symbols;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Multimap;
+import lombok.Getter;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.message.MessageTemplate;
+import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.NodeType;
 import org.eclipse.lsp.cobol.common.model.tree.CodeBlockDefinitionNode;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
@@ -56,10 +58,22 @@ public class SymbolAccumulatorService implements VariableAccumulator {
     ProgramNode node;
     List<Location> usage = new ArrayList<>();
 
+    @Getter
+    List<ProgramNode> declaredProgramNode = new ArrayList<>();
+    @Getter boolean isImplicit;
+
     public FunctionInfo() {}
 
     public FunctionInfo(ProgramNode node) {
       this.node = node;
+      isImplicit = false;
+    }
+
+    private FunctionInfo(String implicitFunctionName) {
+      ProgramNode implicitProgramName = new ProgramNode(Locality.builder().uri("implicit://" + implicitFunctionName).build(), ProgramSubtype.Function, 0);
+      implicitProgramName.setProgramName(implicitFunctionName.toUpperCase());
+      this.node = implicitProgramName;
+      isImplicit = true;
     }
 
     /**
@@ -82,13 +96,32 @@ public class SymbolAccumulatorService implements VariableAccumulator {
     public List<Location> getReferences() {
       return usage;
     }
-  };
 
-  private final Map<String, FunctionInfo> functions;
+    /**
+     * Checks if a function is declared under a passed programNode
+     * @param programNode
+     * @return true if a function is declared under a passed programNode, false otherwise
+     */
+    public boolean isDeclared(ProgramNode programNode) {
+      if (programNode == null) return false;
+      while (!this.getDeclaredProgramNode().contains(programNode)) {
+        Optional<Node> nearestParentByType = programNode.getNearestParentByType(NodeType.PROGRAM);
+        if (nearestParentByType.isPresent()) {
+          programNode = (ProgramNode) nearestParentByType.get();
+          continue;
+        }
+        return false;
+      }
+      return true;
+    }
+  }
+
+    private final Map<String, FunctionInfo> functions;
 
   public SymbolAccumulatorService() {
     this.programSymbols = Collections.synchronizedMap(new HashMap<>());
     this.functions = Collections.synchronizedMap(new HashMap<>());
+    addImplicitFunctions(functions);
   }
 
   /**
@@ -191,6 +224,26 @@ public class SymbolAccumulatorService implements VariableAccumulator {
     return Optional.empty();
   }
 
+  /**
+   * Declare all intrinsic functions
+   * @param programNode
+   */
+  public void declareAllIntrinsicFUnctions(ProgramNode programNode) {
+    functions.entrySet().stream()
+            .filter(entry -> entry.getValue().isImplicit)
+            .forEach(entry -> entry.getValue().getDeclaredProgramNode().add(programNode));
+  }
+
+  /**
+   * checks if a variable name is allowed
+   * @param varName VariableNode to check for allowed name
+   * @param node ProgramNode under which varName must be checked for
+   * @return boolean indicating if the variable name is allowed
+   */
+  public boolean isVariableNameAllowed(String varName, ProgramNode node) {
+    return !Optional.ofNullable(functions.get(varName)).filter(fi -> fi.isDeclared(node)).isPresent();
+  }
+
   private boolean filterNodes(CodeBlockDefinitionNode definition, CodeBlockUsageNode usage) {
     if (!usage.getName().equalsIgnoreCase(definition.getName())) {
       return false;
@@ -248,23 +301,21 @@ public class SymbolAccumulatorService implements VariableAccumulator {
     return Optional.empty();
   }
 
-  private static final HashSet<String> INTRINSIC_FUNCTIONS = Stream.of(
-      "ABS", "ACOS", "ANNUITY", "ASIN", "ATAN", "BIT-OF", "BIT-TO-CHAR", "BYTE-LENGTH",
-      "CHAR", "COMBINED-DATETIME", "CONTENT-OF", "COS", "CURRENT-DATE", "DATE-OF-INTEGER",
-      "DATE-TO-YYYYMMDD", "DAY-OF-INTEGER", "DAY-TO-YYYYDDD", "DISPLAY-OF", "E", "EXP", "EXP10",
-      "FACTORIAL", "FORMATTED-CURRENT-DATE", "FORMATTED-DATE", "FORMATTED-DATETIME", "FORMATTED-TIME",
-      "HEX-OF", "HEX-TO-CHAR", "INTEGER", "INTEGER-OF-DATE", "INTEGER-OF-DAY", "INTEGER-OF-FORMATTED-DATE",
-      "INTEGER-PART", "LENGTH", "LOG", "LOG10", "LOWER-CASE", "MAX", "MEAN", "MEDIAN", "MIDRANGE", "MIN",
-      "MOD", "NATIONAL-OF", "NUMVAL", "NUMVAL-C", "NUMVAL-F", "ORD", "ORD-MAX", "ORD-MIN", "PI",
-      "PRESENT-VALUE", "RANDOM", "RANGE", "REM", "REVERSE", "SECONDS-FROM-FORMATTED-TIME",
-      "SECONDS-PAST-MIDNIGHT", "SIGN", "SIN", "SQRT", "STANDARD-DEVIATION", "SUM", "TAN",
-      "TEST-DATE-YYYYMMDD", "TEST-DAY-YYYYDDD", "TEST-FORMATTED-DATETIME", "TEST-NUMVAL", "TEST-NUMVAL-C",
-      "TEST-NUMVAL-F", "TRIM", "ULENGTH", "UPOS", "UPPER-CASE", "USUBSTR", "USUPPLEMENTARY",
-      "UUID4", "UVALID", "UWIDTH", "VARIANCE", "WHEN-COMPILED", "YEAR-TO-YYYY")
-      .collect(Collectors.toCollection(HashSet::new));
-
-  private boolean isIntrinsic(String name) {
-    return INTRINSIC_FUNCTIONS.contains(name);
+  private void addImplicitFunctions(Map<String, FunctionInfo> functions) {
+    Stream.of(
+            "ABS", "ACOS", "ANNUITY", "ASIN", "ATAN", "BIT-OF", "BIT-TO-CHAR", "BYTE-LENGTH",
+            "CHAR", "COMBINED-DATETIME", "CONTENT-OF", "COS", "CURRENT-DATE", "DATE-OF-INTEGER",
+            "DATE-TO-YYYYMMDD", "DAY-OF-INTEGER", "DAY-TO-YYYYDDD", "DISPLAY-OF", "E", "EXP", "EXP10",
+            "FACTORIAL", "FORMATTED-CURRENT-DATE", "FORMATTED-DATE", "FORMATTED-DATETIME", "FORMATTED-TIME",
+            "HEX-OF", "HEX-TO-CHAR", "INTEGER", "INTEGER-OF-DATE", "INTEGER-OF-DAY", "INTEGER-OF-FORMATTED-DATE",
+            "INTEGER-PART", "LENGTH", "LOG", "LOG10", "LOWER-CASE", "MAX", "MEAN", "MEDIAN", "MIDRANGE", "MIN",
+            "MOD", "NATIONAL-OF", "NUMVAL", "NUMVAL-C", "NUMVAL-F", "ORD", "ORD-MAX", "ORD-MIN", "PI",
+            "PRESENT-VALUE", "RANDOM", "RANGE", "REM", "REVERSE", "SECONDS-FROM-FORMATTED-TIME",
+            "SECONDS-PAST-MIDNIGHT", "SIGN", "SIN", "SQRT", "STANDARD-DEVIATION", "SUM", "TAN",
+            "TEST-DATE-YYYYMMDD", "TEST-DAY-YYYYDDD", "TEST-FORMATTED-DATETIME", "TEST-NUMVAL", "TEST-NUMVAL-C",
+            "TEST-NUMVAL-F", "TRIM", "ULENGTH", "UPOS", "UPPER-CASE", "USUBSTR", "USUPPLEMENTARY",
+            "UUID4", "UVALID", "UWIDTH", "VARIANCE", "WHEN-COMPILED", "YEAR-TO-YYYY").forEach(name ->
+            functions.put(name, new FunctionInfo(name)));
   }
 
   /**
@@ -276,8 +327,7 @@ public class SymbolAccumulatorService implements VariableAccumulator {
    */
   public Optional<SyntaxError> registerFunctionReferenceNode(ProgramNode callingProgram, FunctionReference function) {
     String functionName = function.getName().toUpperCase();
-    if (isIntrinsic(functionName)) // TODO: UseEngine problem
-      return Optional.empty();
+    if (functionName.equalsIgnoreCase("ALL")) return Optional.empty();
     FunctionInfo fi = functions.computeIfAbsent(functionName, (String) -> new FunctionInfo());
     fi.usage.add(function.getLocality().toLocation());
     if (fi.node == null || fi.node.getOrdinal() > callingProgram.getOrdinal()) {
@@ -302,8 +352,7 @@ public class SymbolAccumulatorService implements VariableAccumulator {
   public Optional<SyntaxError> registerFunctionNode(ProgramNode function) {
     assert function.getSubtype() == ProgramSubtype.Function;
     String functionName = function.getProgramName().toUpperCase();
-    if (isIntrinsic(functionName)) // TODO: UseEngine problem
-      return Optional.empty();
+    if (functionName.equalsIgnoreCase("ALL")) return Optional.empty();
     FunctionInfo fi = functions.computeIfAbsent(functionName, (String) -> new FunctionInfo(function));
     if (fi.node != function) {
       return Optional.of(

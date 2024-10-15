@@ -40,4 +40,10 @@ public interface DefinedAndUsedStructure {
    * @return the list of locations for the usages
    */
   List<Location> getUsages();
+
+  /**
+   * returns structure locality
+   * @return Locality of the structure
+   */
+  Locality getLocality();
 }
