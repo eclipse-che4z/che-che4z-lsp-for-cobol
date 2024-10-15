@@ -218,7 +218,7 @@ export async function pickSnippet() {
       // Also store the key as we are aligning the view with VSCode snippet
       prefixToKeyMap.set(snippet.prefix, key);
       snippetList.push({
-        detail: snippet.description,
+        detail: snippet.description ?? key,
         label: snippet.prefix,
       });
       input.items = snippetList;

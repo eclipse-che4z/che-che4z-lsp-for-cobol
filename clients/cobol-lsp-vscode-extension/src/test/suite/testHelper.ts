@@ -348,41 +348,32 @@ export async function waitForDiagnosticsChange(file: string | vscode.Uri) {
 }
 
 export async function triggerCompletionsAndWaitForResults() {
-  return new Promise<vscode.CompletionList | undefined>((resolve, reject) => {
-    // Polling function to repeatedly check for suggestion visibility
-    const checkSuggestions = async () => {
-      // Get the active text editor
-      const editor = vscode.window.activeTextEditor;
-      if (!editor) {
-        reject("No active editor found");
-        return;
-      }
+  while (true) {
+    // Get the active text editor
+    const editor = vscode.window.activeTextEditor;
+    if (!editor) {
+      throw new Error("No active editor found");
+    }
 
-      // Use the registered completion provider
-      const position = editor.selection.active;
-      const document = editor.document;
+    await vscode.commands.executeCommand(
+      "editor.action.triggerSuggest",
+      editor.document.uri,
+    );
 
-      await vscode.commands.executeCommand(
-        "editor.action.triggerSuggest",
-        editor.document.uri,
+    const position = editor.selection.active;
+    const document = editor.document;
+
+    // Trigger the completion provider manually
+    const completions =
+      await vscode.commands.executeCommand<vscode.CompletionList>(
+        "vscode.executeCompletionItemProvider",
+        document.uri,
+        position,
       );
 
-      // Trigger the completion provider manually
-      const completions =
-        await vscode.commands.executeCommand<vscode.CompletionList>(
-          "vscode.executeCompletionItemProvider",
-          document.uri,
-          position,
-        );
-
-      if (completions && completions.items.length > 0) {
-        resolve(completions); // Resolve once we get suggestions
-      } else {
-        // Retry after a small delay
-        setTimeout(checkSuggestions, 100);
-      }
-    };
-
-    checkSuggestions();
-  });
+    if (completions && completions.items.length > 0) {
+      return completions;
+    }
+    await sleep(100);
+  }
 }
