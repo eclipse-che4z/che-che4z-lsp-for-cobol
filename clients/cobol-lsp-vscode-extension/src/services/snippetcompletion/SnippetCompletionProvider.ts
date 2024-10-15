@@ -14,10 +14,10 @@
 import * as vscode from "vscode";
 import { LANGUAGE_ID } from "../../constants";
 import { DialectRegistry } from "../DialectRegistry";
-import { readFile } from "node:fs/promises";
 import cobolSnippets = require("./cobolSnippets.json");
 import * as t from "io-ts";
 import { isRight } from "fp-ts/Either";
+import { TextDecoder } from "util";
 
 const SnippetCodec = t.type({
   prefix: t.string,
@@ -30,11 +30,11 @@ const SnippetRecordCodec = t.record(t.string, SnippetCodec);
 
 const predefinedSnippets: Record<string, Snippet> = cobolSnippets;
 
-let snippetsCompletionItems: vscode.CompletionItem[] | null = null;
-
 export class SnippetCompletionProvider
   implements vscode.CompletionItemProvider
 {
+  snippetsCompletionItems: vscode.CompletionItem[] | null = null;
+
   public async provideCompletionItems(
     document: vscode.TextDocument,
     position: vscode.Position,
@@ -42,15 +42,15 @@ export class SnippetCompletionProvider
     _context: vscode.CompletionContext,
   ): Promise<vscode.CompletionItem[]> {
     // use already loaded completion items if available
-    if (!snippetsCompletionItems) {
-      snippetsCompletionItems = [];
+    if (!this.snippetsCompletionItems) {
+      this.snippetsCompletionItems = [];
       // load all snippets for all dialects
       const snippets = await loadSnippets();
       snippets.forEach((snippet, key) => {
         if (!snippet.description) {
           snippet.description = key;
         }
-        snippetsCompletionItems?.push(
+        this.snippetsCompletionItems?.push(
           createCompletionItem(snippet, key, position, document),
         );
       });
@@ -59,7 +59,7 @@ export class SnippetCompletionProvider
     // filter completion items using words on current line
     const textUptoCursor = getCurrentLineText(document, position);
     const wordsUptoCursor = splitToWords(textUptoCursor);
-    const filteredSnippets = snippetsCompletionItems.filter(
+    const filteredSnippets = this.snippetsCompletionItems.filter(
       (completionItem) => {
         const prefixList: string[] =
           splitToWordsFromCompletionItem(completionItem);
@@ -71,23 +71,28 @@ export class SnippetCompletionProvider
 
     // if no snippet matches current line, return all of them
     const resultCompletionItems =
-      filteredSnippets.length > 0 ? filteredSnippets : snippetsCompletionItems;
+      filteredSnippets.length > 0
+        ? filteredSnippets
+        : this.snippetsCompletionItems;
+
+    // calculate ranges
+    const firstCharacterPosition = findPosition(position, document);
+    const insertingRange = new vscode.Position(
+      position.line,
+      firstCharacterPosition,
+    );
+    const replaceRange = new vscode.Position(position.line, position.character);
 
     // update ranges for each completion item
     resultCompletionItems.forEach((completionItem) => {
-      const firstCharacterPosition = findPosition(position, document);
-      const insertingRange = new vscode.Position(
-        position.line,
-        firstCharacterPosition,
-      );
-      const replaceRange = new vscode.Position(
-        position.line,
-        position.character,
-      );
       completionItem.range = new vscode.Range(insertingRange, replaceRange);
     });
 
     return resultCompletionItems;
+  }
+
+  public resetSnippetsCompletionItems() {
+    this.snippetsCompletionItems = null;
   }
 }
 
@@ -136,13 +141,19 @@ async function loadSnippets() {
 
 async function importDialectSnippets(snippetPath: string) {
   const dialectSnippets: Map<string, Snippet> = new Map();
-  const json = await readFile(snippetPath, "utf-8");
-  const decoded = SnippetRecordCodec.decode(JSON.parse(json));
-  if (isRight(decoded)) {
-    Object.entries(decoded.right).forEach((snippetRecord) => {
-      const [key, snippet] = snippetRecord;
-      dialectSnippets.set(key, snippet);
-    });
+  const snippetUri = vscode.Uri.parse(snippetPath);
+  try {
+    const rawFile = await vscode.workspace.fs.readFile(snippetUri);
+    const textData = new TextDecoder().decode(rawFile);
+    const decodedJSON = SnippetRecordCodec.decode(JSON.parse(textData));
+    if (isRight(decodedJSON)) {
+      Object.entries(decodedJSON.right).forEach((snippetRecord) => {
+        const [key, snippet] = snippetRecord;
+        dialectSnippets.set(key, snippet);
+      });
+    }
+  } catch (error) {
+    console.error({ snippetPath, error }, "Unable to import snippet");
   }
 
   return dialectSnippets;
@@ -190,10 +201,6 @@ function findPosition(
 
 function formatString(arg: string) {
   return arg.replace(/(\$\{*\d*\/*:*|\/\(.*\)|\\\.\.\+|\$\/|\})/g, "");
-}
-
-export async function resetSnippetsCompletionItems() {
-  snippetsCompletionItems = null;
 }
 
 export async function pickSnippet() {

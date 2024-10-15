@@ -45,6 +45,7 @@ suite(
       assert.strictEqual(text.trimEnd(), "   IDENTIFICATION DIVISION.");
     });
 
+    // Skipped because dialects are not possible to run on Java-less machine
     test.skip("Autocompletion with IDMS dialect", async () => {
       helper.updateConfig("idms.json");
       await helper.showDocument("SNIPPET_IDMS.cbl");
@@ -58,6 +59,7 @@ suite(
       assert.strictEqual(text, "   COPY IDMS idms-entity.");
     });
 
+    // Skipped because dialects are not possible to run on Java-less machine
     test.skip("Keywords Autocompletion for IDMS dialect", async () => {
       await helper.showDocument("SNIPPET_IDMS.cbl");
       const editor = helper.getEditor("SNIPPET_IDMS.cbl");

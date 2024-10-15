@@ -13,38 +13,17 @@
  */
 
 import * as vscode from "vscode";
-import {
-  resetSnippetsCompletionItems,
-  SnippetCompletionProvider,
-} from "../../../services/snippetcompletion/SnippetCompletionProvider";
+import { SnippetCompletionProvider } from "../../../services/snippetcompletion/SnippetCompletionProvider";
 import { DialectRegistry } from "../../../services/DialectRegistry";
 import path = require("path");
+
+jest.mock("vscode");
 
 describe("Test CompletionProvider", () => {
   const context = { triggerKind: {}, diagnostics: [], only: undefined };
   const snippetcompletion = new SnippetCompletionProvider();
   const SNIPPET_CBL = "SNIPPET.cbl";
   beforeAll(() => {
-    (vscode.extensions as any) = {
-      getExtension: jest.fn().mockReturnValue({
-        extensionPath: "/test",
-        packageJSON: {
-          version: 1,
-        },
-      }),
-    };
-    (vscode.CompletionItem as any) = jest
-      .fn()
-      .mockImplementation((label) => ({ label }));
-    (vscode.SnippetString as any) = jest.fn();
-    (vscode.MarkdownString as any) = jest.fn().mockReturnValue({
-      string: "",
-      appendCodeblock: jest
-        .fn()
-        .mockReturnValue({ value: "", language: "COBOL" }),
-    });
-    (vscode.CompletionItemKind as any) = jest.fn();
-
     DialectRegistry.getDialects = jest.fn().mockReturnValue([
       {
         name: "DaCo",
@@ -67,7 +46,7 @@ describe("Test CompletionProvider", () => {
   });
 
   beforeEach(() => {
-    resetSnippetsCompletionItems();
+    snippetcompletion.resetSnippetsCompletionItems();
   });
 
   test("Suggest all DaCo Snippets", async () => {

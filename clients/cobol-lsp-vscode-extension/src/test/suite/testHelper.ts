@@ -350,7 +350,7 @@ export async function waitForDiagnosticsChange(file: string | vscode.Uri) {
 export async function triggerCompletionsAndWaitForResults() {
   return new Promise<vscode.CompletionList | undefined>((resolve, reject) => {
     // Polling function to repeatedly check for suggestion visibility
-    const checkSuggestions = () => {
+    const checkSuggestions = async () => {
       // Get the active text editor
       const editor = vscode.window.activeTextEditor;
       if (!editor) {
@@ -362,26 +362,25 @@ export async function triggerCompletionsAndWaitForResults() {
       const position = editor.selection.active;
       const document = editor.document;
 
-      void vscode.commands.executeCommand(
+      await vscode.commands.executeCommand(
         "editor.action.triggerSuggest",
         editor.document.uri,
       );
 
       // Trigger the completion provider manually
-      vscode.commands
-        .executeCommand<vscode.CompletionList>(
+      const completions =
+        await vscode.commands.executeCommand<vscode.CompletionList>(
           "vscode.executeCompletionItemProvider",
           document.uri,
           position,
-        )
-        .then((completions) => {
-          if (completions && completions.items.length > 0) {
-            resolve(completions); // Resolve once we get suggestions
-          } else {
-            // Retry after a small delay
-            setTimeout(checkSuggestions, 100);
-          }
-        });
+        );
+
+      if (completions && completions.items.length > 0) {
+        resolve(completions); // Resolve once we get suggestions
+      } else {
+        // Retry after a small delay
+        setTimeout(checkSuggestions, 100);
+      }
     };
 
     checkSuggestions();
