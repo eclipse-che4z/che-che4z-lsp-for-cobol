@@ -121,56 +121,52 @@ public abstract class CICSOptionsCheckBaseUtility {
    *
    * @param requiredContext - The rule that is required
    * @param optionalContext - The rule that is optional
-   * @param options - String of the element that is required.
-   */
-  protected void checkHasRequiredOption(ParserRuleContext requiredContext, ParserRuleContext optionalContext, String options) {
-    checkHasRequiredOptionFromString(requiredContext.getText(), optionalContext.getText(), optionalContext, options);
-  }
-
-  /**
-   *
-   * @param requiredContext - The rule that is required
-   * @param optionalContext - The rule that is optional
    * @param ctx - The overall context.
    * @param options - String of the element that is required.
    */
-  protected void checkHasRequiredOption(List<TerminalNode> requiredContext, List<TerminalNode> optionalContext, ParserRuleContext ctx, String options) {
-    checkHasRequiredOptionFromString(
-            (requiredContext.isEmpty() ? "" : requiredContext.get(0).getText()),
-            (optionalContext.isEmpty() ? "" : optionalContext.get(0).getText()),
-            ctx, options);
+  protected <E extends ParseTree> void checkHasRequiredOption(List<E> requiredContext, List<E> optionalContext, ParserRuleContext ctx, String options) {
+    checkHasRequiredOption(isNodePresent(requiredContext), isNodePresent(optionalContext), ctx, options);
   }
 
-  protected void checkHasRequiredOption(TerminalNode requiredContext, TerminalNode optionalContext, ParserRuleContext ctx, String options) {
-    checkHasRequiredOptionFromString(requiredContext.getText(), optionalContext.getText(), ctx, options);
+  protected <E extends ParseTree> void checkHasRequiredOption(E requiredContext, List<TerminalNode> optionalContext, ParserRuleContext ctx, String options) {
+    checkHasRequiredOption(isNodePresent(requiredContext), isNodePresent(optionalContext), ctx, options);
   }
 
-  protected void checkHasRequiredOption(ParserRuleContext requiredContext, TerminalNode optionalContext, ParserRuleContext ctx, String options) {
-    checkHasRequiredOptionFromString(requiredContext.getText(), optionalContext.getText(), ctx, options);
+  protected <E extends ParseTree> void checkHasRequiredOption(List<E> requiredContext, E optionalContext, ParserRuleContext ctx, String options) {
+    checkHasRequiredOption(isNodePresent(requiredContext), isNodePresent(optionalContext), ctx, options);
   }
 
-  protected void checkHasRequiredOption(TerminalNode requiredContext, ParserRuleContext optionalContext, ParserRuleContext ctx, String options) {
-    checkHasRequiredOptionFromString(requiredContext.getText(), optionalContext.getText(), ctx, options);
+  protected <E extends ParseTree> void checkHasRequiredOption(E requiredContext, E optionalContext, ParserRuleContext ctx, String options) {
+    checkHasRequiredOption(isNodePresent(requiredContext), isNodePresent(optionalContext), ctx, options);
   }
 
-  protected void checkHasRequiredOption(TerminalNode requiredContext, List<TerminalNode> optionalContext, ParserRuleContext ctx, String options) {
-    checkHasRequiredOptionFromString(requiredContext.getText(), (optionalContext.isEmpty() ? "" : optionalContext.get(0).getText()), ctx, options);
+  private <E extends ParseTree> Boolean isNodePresent(E node) {
+    return node != null;
   }
 
-  protected void checkHasRequiredOption(List<TerminalNode> requiredContext, TerminalNode optionalContext, ParserRuleContext ctx, String options) {
-    checkHasRequiredOptionFromString((requiredContext.isEmpty() ? "" : requiredContext.get(0).getText()), optionalContext.getText(), ctx, options);
-  }
-
-
-  private void checkHasRequiredOptionFromString(String requiredContextText, String optionalContextText, ParserRuleContext ctx, String options) {
-    if (requiredContextText.isEmpty() && !optionalContextText.isEmpty()) {
-      throwException(
-              ErrorSeverity.ERROR,
-              VisitorUtility.constructLocality(ctx, context),
-              "Missing required option \"" + options + "\" for " + optionalContextText,
-              options);
+  private <E extends ParseTree> boolean isNodePresent(List<E> node) {
+    if (node == null || node.isEmpty()) {
+      return false;
     }
+
+    for (E e : node) {
+      if (e != null) {
+        return true;
+      }
+    }
+    return false;
   }
+
+  private void checkHasRequiredOption(Boolean isRequiredContextPresent, Boolean isOptionalContextPresent, ParserRuleContext ctx, String options) {
+      if (!isRequiredContextPresent && isOptionalContextPresent) {
+        throwException(
+                ErrorSeverity.ERROR,
+                VisitorUtility.constructLocality(ctx, context),
+                "Missing required option for: " + options,
+                options);
+      }
+  }
+
   /**
    * Helper method to collect analysis errors if the rule context contains illegal options
    *
@@ -178,7 +174,7 @@ public abstract class CICSOptionsCheckBaseUtility {
    *     or TerminalNode
    * @param options Options checked to insert into error message
    */
-  protected void checkHasIllegalOptions(List<?> rules, String options) {
+  protected <E extends ParseTree> void checkHasIllegalOptions(List<E> rules, String options) {
     if (!rules.isEmpty()) {
       rules.forEach(
               error ->
@@ -215,6 +211,10 @@ public abstract class CICSOptionsCheckBaseUtility {
     int rulesSeen = 0;
 
     for (E rule : rules) {
+      if (rule == null) {
+          continue;
+      }
+
       if (ParserRuleContext.class.isAssignableFrom(rule.getClass())) {
         if (!((ParserRuleContext) rule).isEmpty()) {
           rulesSeen++;
