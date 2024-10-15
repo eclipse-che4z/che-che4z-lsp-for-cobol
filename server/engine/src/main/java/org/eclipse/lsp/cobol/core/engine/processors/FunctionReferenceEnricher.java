@@ -32,8 +32,8 @@ public class FunctionReferenceEnricher implements Processor<FunctionReference> {
     if (fi == null)
       return;
 
-    node.addDefinition(fi);
-//    node.setUsages(fi.getReferences());
+    node.setDefinitions(fi.getDefinition());
+    node.setUsages(fi.getReferences());
   }
 
 }

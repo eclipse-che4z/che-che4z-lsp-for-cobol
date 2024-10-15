@@ -20,7 +20,6 @@ import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.mapping.OriginalLocation;
 import org.eclipse.lsp.cobol.common.message.MessageTemplate;
-import org.eclipse.lsp.cobol.common.model.DefinedAndUsedStructure;
 import org.eclipse.lsp.cobol.common.model.tree.variable.*;
 import org.eclipse.lsp.cobol.common.processor.CompilerDirectiveName;
 import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
@@ -109,7 +108,7 @@ public class XMLParseProcess implements Processor<XMLParseNode> {
   private List<VariableNode> getVariableDefinition(
       XMLParseNode xmlParseNode, VariableNameAndLocality identifier) {
     if (Objects.nonNull(identifier)) {
-      List<DefinedAndUsedStructure> variableUsageNodeForIdentifier =
+      List<VariableUsageNode> variableUsageNodeForIdentifier =
           VariableUsageUtils.getVariableUsageNode(xmlParseNode, identifier);
       if (variableUsageNodeForIdentifier.isEmpty()) {
         return Collections.emptyList();

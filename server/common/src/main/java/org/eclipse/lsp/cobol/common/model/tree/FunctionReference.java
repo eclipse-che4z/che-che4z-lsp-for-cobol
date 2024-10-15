@@ -16,21 +16,40 @@ package org.eclipse.lsp.cobol.common.model.tree;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
 
+import java.util.List;
+
+import org.eclipse.lsp.cobol.common.model.DefinedAndUsedStructure;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.NodeType;
-import org.eclipse.lsp.cobol.common.model.tree.variable.UsageNode;
+import org.eclipse.lsp4j.Location;
+
+import com.google.common.collect.ImmutableList;
 
 @ToString(callSuper = true)
 @Getter
 @EqualsAndHashCode(callSuper = true)
-public class FunctionReference extends UsageNode {
+public class FunctionReference extends Node implements DefinedAndUsedStructure {
+  final String name;
+  @Setter
+  private List<Location> definitions = ImmutableList.of();
+  @Setter
+  private List<Location> usages = ImmutableList.of();
 
-  private final boolean isFunctionPrefixed;
+  public FunctionReference(Locality locality, String name) {
+    super(locality, NodeType.FUNCTION_REFERENCE);
+    this.name = name;
+  }
 
-  public FunctionReference(Locality locality, String name, boolean isFunctionPrefixed) {
-    super(name, locality, NodeType.FUNCTION_REFERENCE, UsageType.FUNCTION);
-    this.isFunctionPrefixed = isFunctionPrefixed;
+  @Override
+  public List<Location> getDefinitions() {
+    return definitions;
+  }
+
+  @Override
+  public List<Location> getUsages() {
+    return usages;
   }
 }

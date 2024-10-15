@@ -44,7 +44,6 @@ import org.eclipse.lsp.cobol.common.model.DefinedAndUsedStructure;
 import org.eclipse.lsp.cobol.common.model.NodeType;
 import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
-import org.eclipse.lsp.cobol.common.model.tree.variable.UsageNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNode;
 import org.eclipse.lsp.cobol.common.symbols.SymbolTable;
 import org.eclipse.lsp.cobol.common.utils.ImplicitCodeUtils;
@@ -404,16 +403,6 @@ public class UseCaseEngine {
         "Subroutine usage:",
         expected.getSubroutineUsages(),
         extractUsages(actual, SUBROUTINE_NAME_NODE));
-
-    assertResult(
-            "Function definition:",
-            expected.getFunctionDefinitions(),
-            extractFunctionDefinitions(actual));
-
-    assertResult(
-            "Function usage:",
-            expected.getFunctionUsages(),
-            extractDefinitionsUsage(actual));
   }
 
   private Map<String, List<Location>> extractVariableDefinitions(AnalysisResult result) {
@@ -456,33 +445,6 @@ public class UseCaseEngine {
         context ->
             !(context.getDefinitions().isEmpty()
                 || ImplicitCodeUtils.isImplicit(context.getDefinitions().get(0).getUri())));
-  }
-
-  private Map<String, List<Location>> extractFunctionDefinitions(AnalysisResult result) {
-   return  result
-            .getRootNode()
-            .getDepthFirstStream()
-            .filter(hasType(REFERENCE).or(hasType(FUNCTION_REFERENCE)))
-            .map(UsageNode.class::cast)
-            .filter(u -> u.getUsageType() == UsageNode.UsageType.FUNCTION)
-            .map(UsageNode::getDefinitionNodes)
-            .flatMap(Collection::stream)
-            .map(DefinedAndUsedStructure.class::cast)
-            .filter(context -> !(context.getDefinitions().isEmpty()
-                    || ImplicitCodeUtils.isImplicit(context.getDefinitions().get(0).getUri())))
-            .collect(toMap(DefinedAndUsedStructure::getDefinitions, REFERENCE));
-  }
-
-  private Map<String, List<Location>> extractDefinitionsUsage(AnalysisResult result) {
-    return  result
-            .getRootNode()
-            .getDepthFirstStream()
-            .filter(hasType(REFERENCE).or(hasType(FUNCTION_REFERENCE)))
-            .map(UsageNode.class::cast)
-            .filter(u -> u.getUsageType() == UsageNode.UsageType.FUNCTION)
-            .map(DefinedAndUsedStructure.class::cast)
-            .filter(context -> !context.getDefinitions().isEmpty())
-            .collect(toMap(d -> ImmutableList.of(d.getLocality().toLocation()), REFERENCE));
   }
 
   private Map<String, List<Location>> extractUsages(AnalysisResult result, NodeType nodeType) {

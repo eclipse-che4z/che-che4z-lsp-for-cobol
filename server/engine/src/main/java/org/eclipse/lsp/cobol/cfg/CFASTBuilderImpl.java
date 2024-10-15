@@ -16,9 +16,9 @@ package org.eclipse.lsp.cobol.cfg;
 
 import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.lsp.cobol.common.model.DefinedAndUsedStructure;
 import org.eclipse.lsp.cobol.common.model.tree.*;
 import org.eclipse.lsp.cobol.common.model.tree.statements.StatementNode;
+import org.eclipse.lsp.cobol.common.model.tree.variable.VariableUsageNode;
 import org.eclipse.lsp.cobol.common.model.variables.DivisionType;
 import org.eclipse.lsp.cobol.core.model.extendedapi.*;
 import org.eclipse.lsp.cobol.implicitDialects.cics.nodes.ExecCicsHandleNode;
@@ -133,10 +133,10 @@ public class CFASTBuilderImpl implements CFASTBuilder {
 
       switch (type) {
         case PROGRAM:
-          value = node.getDepthFirstStream().filter(n -> n.getNodeType() == VARIABLE_USAGE || n.getNodeType() == REFERENCE)
+          value = node.getDepthFirstStream().filter(n -> n.getNodeType() == VARIABLE_USAGE)
               .findFirst()
-              .map(DefinedAndUsedStructure.class::cast)
-              .map(DefinedAndUsedStructure::getName)
+              .map(VariableUsageNode.class::cast)
+              .map(VariableUsageNode::getName)
               .orElse(null);
           break;
         case LABEL:

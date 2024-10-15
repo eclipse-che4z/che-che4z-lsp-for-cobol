@@ -52,9 +52,7 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
   private final Map<String, List<Diagnostic>> diagnostics = new HashMap<>();
   private final Map<String, List<Location>> variableDefinitions = new HashMap<>();
   private final Map<String, List<Location>> variableUsages = new HashMap<>();
-  private final Map<String, List<Location>> functionUsages = new HashMap<>();
   private final Map<String, List<Location>> paragraphDefinitions = new HashMap<>();
-  private final Map<String, List<Location>> functionDefinitions = new HashMap<>();
   private final Map<String, List<Location>> paragraphUsages = new HashMap<>();
   private final Map<String, List<Location>> sectionDefinitions = new HashMap<>();
   private final Map<String, List<Location>> sectionUsages = new HashMap<>();
@@ -117,9 +115,7 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
             copybookDefinitions,
             copybookUsages,
             makeSubroutinesDefinitions(subroutineNames),
-            subroutineUsages,
-            functionDefinitions,
-            functionUsages);
+            subroutineUsages);
   }
 
   @Override
@@ -231,47 +227,6 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
                                     ctx,
                                     it.replacement(),
                                     paragraphDefinitions,
-                                    ctx.diagnostic()));
-  }
-
-  @Override
-  public void enterFunctionDefinition(FunctionDefinitionContext ctx) {
-    push();
-  }
-
-  @Override
-  public void exitFunctionDefinition(FunctionDefinitionContext ctx) {
-    String multiTokenText = peek().toString().replaceAll("\\{\\$\\$\\*", "").replaceAll("}", "");
-    List<TerminalNode> word = ctx.multiToken().word().get(0).identifier().IDENTIFIER();
-    String functionID = word.stream()
-            .filter(node -> node.getText().equalsIgnoreCase("FUNCTION-ID"))
-            .findFirst()
-            .map(node -> {
-              int index = word.indexOf(node);
-              return index < word.size() - 1 ? word.get(index + 1).getText() : null;
-            })
-            .orElse(null);
-    addTokenLocation(functionDefinitions, functionID, new Range(new Position(ctx.getStart().getLine() - 1, ctx.start.getCharPositionInLine()), new Position(ctx.getStop().getLine() - 1, ctx.stop.getCharPositionInLine())));
-    pop();
-    write(multiTokenText);
-  }
-
-  @Override
-  public void enterFunctionUsage(FunctionUsageContext ctx) {
-    push();
-  }
-
-  @Override
-  public void exitFunctionUsage(FunctionUsageContext ctx) {
-    pop();
-    ofNullable(ctx.word())
-            .ifPresent(
-                    it ->
-                            processToken(
-                                    it.identifier().getText(),
-                                    ctx,
-                                    it.replacement(),
-                                    functionUsages,
                                     ctx.diagnostic()));
   }
 

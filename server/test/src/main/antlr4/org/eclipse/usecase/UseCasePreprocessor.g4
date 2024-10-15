@@ -16,7 +16,7 @@
 grammar UseCasePreprocessor;
 
 startRule
-   : .*? ((copybookStatement | functionDefinition | variableStatement | functionUsage | paragraphStatement | sectionStatement | subroutineStatement
+   : .*? ((copybookStatement | variableStatement | paragraphStatement | sectionStatement | subroutineStatement
    | constantStatement | errorStatement | multiTokenError | linkageSection | NEWLINE)+ .*?)+ EOF
    ;
 
@@ -25,7 +25,7 @@ multiTokenError
    ;
 
 multiToken
-   : (word | copybookStatement | variableStatement | functionUsage | paragraphStatement | sectionStatement | subroutineStatement
+   : (word | copybookStatement | variableStatement | paragraphStatement | sectionStatement | subroutineStatement
    | constantStatement | errorStatement | multiTokenError | TEXT)+
    ;
 
@@ -57,16 +57,8 @@ variableUsage
    : VARIABLEUSAGE word
    ;
 
-functionUsage
-  : FUNCTIONUSAGE word diagnostic* STOP
-  ;
-
 variableDefinition
    : VARIABLEDEFINITION word
-   ;
-
-functionDefinition
-   : FUNCTIONDEFINITION multiToken replacement? STOP
    ;
 
 constantStatement
@@ -161,8 +153,6 @@ PRODUCE_REPLACEMENT: '`->';
 COPYBOOKDIALECT: '!';
 MULTITOKENSTART : START '_';
 MULTITOKENSTOP : '_' STOP;
-FUNCTIONDEFINITION : START '$$*';
-FUNCTIONUSAGE : START '$$';
 DOT : '.';
 
 NUMBERLITERAL : [\-+0-9.,]+;

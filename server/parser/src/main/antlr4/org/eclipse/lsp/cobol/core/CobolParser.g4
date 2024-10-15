@@ -156,7 +156,15 @@ classRepositoryClause
     ;
 
 functionRepositoryClause
-    : FUNCTION (variableUsageName+ INTRINSIC? | ALL INTRINSIC)
+    : functionReference | intrinsicClause
+    ;
+
+functionReference
+    : FUNCTION functionName
+    ;
+
+intrinsicClause
+    : (functionName* | ALL) INTRINSIC
     ;
 
 // - source computer paragraph ----------------------------------
@@ -2153,12 +2161,12 @@ relationalOperator
 // identifier ----------------------------------
 
 generalIdentifier
-   : specialRegister | qualifiedDataName
+   : specialRegister | qualifiedDataName | functionCall
    ;
 
-//functionCall
-//   : functionReference (LPARENCHAR argument (COMMACHAR? argument)* RPARENCHAR)* referenceModifier?
-//   ;
+functionCall
+   : functionReference (LPARENCHAR argument (COMMACHAR? argument)* RPARENCHAR)* referenceModifier?
+   ;
 
 referenceModifier
    : LPARENCHAR characterPosition COLONCHAR length? RPARENCHAR
@@ -2173,20 +2181,18 @@ length
    ;
 
 argument
-   : ALL
-   | arithmeticExpression
-   | TRAILING
-   | LEADING
+   : arithmeticExpression
+   | TRAILING | LEADING
    ;
 
 // qualified data name ----------------------------------
 
 qualifiedDataName
-   : FUNCTION? variableUsageName tableCall? referenceModifier? inData*
+   : variableUsageName tableCall? referenceModifier? inData*
    ;
 
 tableCall
-   : LPARENCHAR argument (COMMACHAR? argument)* RPARENCHAR
+   : LPARENCHAR (ALL | arithmeticExpression) (COMMACHAR? (ALL | arithmeticExpression))* RPARENCHAR
    ;
 
 specialRegister
@@ -2231,7 +2237,7 @@ dataName
    ;
 
 variableUsageName
-   : cobolWord | INTEGER | LENGTH | RANDOM | SUM | MAX | WHEN_COMPILED
+   : cobolWord
    ;
 
 environmentName
@@ -2240,6 +2246,10 @@ environmentName
 
 fileName
    : cobolWord
+   ;
+
+functionName
+   : INTEGER | LENGTH | RANDOM | SUM | MAX | WHEN_COMPILED | cobolWord
    ;
 
 indexName

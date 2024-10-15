@@ -85,7 +85,7 @@ public class CobolDataDivisionVisitor extends CobolDataDivisionParserBaseVisitor
 
   @Override
   public List<Node> visitVariableUsageName(CobolDataDivisionParser.VariableUsageNameContext ctx) {
-    return addTreeNode(ctx, locality -> new UsageNode(getName(ctx), locality, isVariableDefinitionMandatory(ctx)));
+    return addTreeNode(ctx, locality -> new VariableUsageNode(getName(ctx), locality, isVariableDefinitionMandatory(ctx)));
   }
 
   @Override

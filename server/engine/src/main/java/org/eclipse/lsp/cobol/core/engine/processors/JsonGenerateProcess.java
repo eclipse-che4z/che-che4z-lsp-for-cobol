@@ -19,7 +19,6 @@ import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.message.MessageTemplate;
-import org.eclipse.lsp.cobol.common.model.DefinedAndUsedStructure;
 import org.eclipse.lsp.cobol.common.model.tree.variable.*;
 import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.Processor;
@@ -57,14 +56,14 @@ public class JsonGenerateProcess implements Processor<JsonGenerateNode> {
    */
   @Override
   public void accept(JsonGenerateNode jsonGenerateNode, ProcessingContext processingContext) {
-    List<DefinedAndUsedStructure> identifier1Nodes = VariableUsageUtils.getVariableUsageNode(jsonGenerateNode, jsonGenerateNode.getIdentifier1());
+    List<VariableUsageNode> identifier1Nodes = VariableUsageUtils.getVariableUsageNode(jsonGenerateNode, jsonGenerateNode.getIdentifier1());
     if (identifier1Nodes.isEmpty()) return;
     List<VariableNode> identifier1FoundDefinitions =
             VariableUsageUtils.getDefinitionNode(symbolAccumulatorService, jsonGenerateNode, identifier1Nodes);
     if (identifier1FoundDefinitions.isEmpty()) return;
     semanticAnalysisForIdentifier1(processingContext, identifier1Nodes, identifier1FoundDefinitions);
 
-    List<DefinedAndUsedStructure> identifier2Nodes = VariableUsageUtils.getVariableUsageNode(jsonGenerateNode, jsonGenerateNode.getIdentifier2());
+    List<VariableUsageNode> identifier2Nodes = VariableUsageUtils.getVariableUsageNode(jsonGenerateNode, jsonGenerateNode.getIdentifier2());
     if (identifier2Nodes.isEmpty()) return;
     List<VariableNode> identifier2FoundDefinitions =
             VariableUsageUtils.getDefinitionNode(symbolAccumulatorService, jsonGenerateNode, identifier2Nodes);
@@ -72,7 +71,7 @@ public class JsonGenerateProcess implements Processor<JsonGenerateNode> {
     semanticAnalysisForIdentifier2(processingContext, identifier2Nodes, identifier2FoundDefinitions, identifier1FoundDefinitions);
 
     if (Objects.nonNull(jsonGenerateNode.getIdentifier3())) {
-      List<DefinedAndUsedStructure> identifier3Nodes = VariableUsageUtils.getVariableUsageNode(jsonGenerateNode, jsonGenerateNode.getIdentifier3());
+      List<VariableUsageNode> identifier3Nodes = VariableUsageUtils.getVariableUsageNode(jsonGenerateNode, jsonGenerateNode.getIdentifier3());
       if (identifier3Nodes.isEmpty()) return;
       List<VariableNode> identifier3FoundDefinitions =
               VariableUsageUtils.getDefinitionNode(symbolAccumulatorService, jsonGenerateNode, identifier3Nodes);
@@ -100,7 +99,7 @@ public class JsonGenerateProcess implements Processor<JsonGenerateNode> {
   private void semanticAnalysisForIdentifier6(JsonGenerateNode jsonGenerateNode, ProcessingContext ctx) {
     jsonGenerateNode.getPhases().forEach(phase -> {
       VariableNameAndLocality identifier6 = phase.getIdentifier6();
-      List<DefinedAndUsedStructure> identifier6Nodes = VariableUsageUtils.getVariableUsageNode(jsonGenerateNode, identifier6);
+      List<VariableUsageNode> identifier6Nodes = VariableUsageUtils.getVariableUsageNode(jsonGenerateNode, identifier6);
       List<VariableNode> foundDefinitionsForIdentifier6 =
               VariableUsageUtils.getDefinitionNode(symbolAccumulatorService, jsonGenerateNode, identifier6Nodes);
       if (foundDefinitionsForIdentifier6.isEmpty()) return;
@@ -126,7 +125,7 @@ public class JsonGenerateProcess implements Processor<JsonGenerateNode> {
   }
 
   private void semanticCheckForCondition(JsonGenerateNode jsonGenerateNode, ProcessingContext ctx, JsonGenerateNode.JsonGenPhase phase, List<VariableNode> foundDefinitionsForIdentifier6) {
-    List<DefinedAndUsedStructure> conditionNodes = VariableUsageUtils.getVariableUsageNode(jsonGenerateNode, phase.getConditionNames());
+    List<VariableUsageNode> conditionNodes = VariableUsageUtils.getVariableUsageNode(jsonGenerateNode, phase.getConditionNames());
     List<VariableNode> conditionNodeDefn =
             VariableUsageUtils.getDefinitionNode(symbolAccumulatorService, jsonGenerateNode, conditionNodes);
     if (foundDefinitionsForIdentifier6
@@ -151,7 +150,7 @@ public class JsonGenerateProcess implements Processor<JsonGenerateNode> {
   }
 
   private void semanticAnalysisForIdentifier5(JsonGenerateNode jsonGenerateNode, ProcessingContext ctx, List<VariableNode> identifier2FoundDefinitions) {
-    List<DefinedAndUsedStructure> identifier5Nodes = VariableUsageUtils.getVariableUsageNode(jsonGenerateNode, jsonGenerateNode.getIdentifier5());
+    List<VariableUsageNode> identifier5Nodes = VariableUsageUtils.getVariableUsageNode(jsonGenerateNode, jsonGenerateNode.getIdentifier5());
     identifier5Nodes.forEach(identifier5 -> {
       List<VariableNode> foundDefinitionsForIdentifier5 =
               VariableUsageUtils.getDefinitionNode(symbolAccumulatorService, jsonGenerateNode, Collections.singletonList(identifier5));
@@ -184,7 +183,7 @@ public class JsonGenerateProcess implements Processor<JsonGenerateNode> {
   }
 
   private void semanticAnalysisForIdentifier4(JsonGenerateNode jsonGenerateNode, ProcessingContext ctx, List<VariableNode> identifier2FoundDefinitions) {
-    List<DefinedAndUsedStructure> identifier4Nodes = VariableUsageUtils.getVariableUsageNode(jsonGenerateNode, jsonGenerateNode.getIdentifier4());
+    List<VariableUsageNode> identifier4Nodes = VariableUsageUtils.getVariableUsageNode(jsonGenerateNode, jsonGenerateNode.getIdentifier4());
     identifier4Nodes.forEach(identifier4 -> {
       List<VariableNode> foundDefinitionsForIdentifier4 =
               VariableUsageUtils.getDefinitionNode(symbolAccumulatorService, jsonGenerateNode, Collections.singletonList(identifier4));
@@ -214,7 +213,7 @@ public class JsonGenerateProcess implements Processor<JsonGenerateNode> {
     });
   }
 
-  private void semanticAnalysisForIdentifier3(ProcessingContext ctx, List<DefinedAndUsedStructure> identifier3Nodes, List<VariableNode> identifier3FoundDefinitions, List<VariableNode> identifier2FoundDefinitions, List<VariableNode> identifier1FoundDefinitions) {
+  private void semanticAnalysisForIdentifier3(ProcessingContext ctx, List<VariableUsageNode> identifier3Nodes, List<VariableNode> identifier3FoundDefinitions, List<VariableNode> identifier2FoundDefinitions, List<VariableNode> identifier1FoundDefinitions) {
     if (identifier3FoundDefinitions.isEmpty()) return;
     if (VariableUsageUtils.checkForNoOverlapBetweenNodes(identifier3FoundDefinitions.get(0), identifier1FoundDefinitions.get(0))) {
       ctx.getErrors()
@@ -286,7 +285,7 @@ public class JsonGenerateProcess implements Processor<JsonGenerateNode> {
       }
   }
 
-  private void semanticAnalysisForIdentifier2(ProcessingContext ctx, List<DefinedAndUsedStructure> identifier2Nodes, List<VariableNode> identifier2FoundDefinitions, List<VariableNode> identifier1FoundDefinitions) {
+  private void semanticAnalysisForIdentifier2(ProcessingContext ctx, List<VariableUsageNode> identifier2Nodes, List<VariableNode> identifier2FoundDefinitions, List<VariableNode> identifier1FoundDefinitions) {
     // check no overlap
     if (!identifier2FoundDefinitions.isEmpty()
             && !identifier1FoundDefinitions.isEmpty()
@@ -330,7 +329,7 @@ public class JsonGenerateProcess implements Processor<JsonGenerateNode> {
 
   }
 
-  private void validateIdentifier2GroupItem(ProcessingContext ctx, List<DefinedAndUsedStructure> nodes, List<VariableNode> definitions) {
+  private void validateIdentifier2GroupItem(ProcessingContext ctx, List<VariableUsageNode> nodes, List<VariableNode> definitions) {
     boolean isNonUniqueChildrenItem = getElementaryNodeStreamForIdentifier2(definitions)
             .collect(groupingBy(VariableWithLevelNode::getName))
             .entrySet().stream()
@@ -390,7 +389,7 @@ public class JsonGenerateProcess implements Processor<JsonGenerateNode> {
 
   private void semanticAnalysisForIdentifier1(
           ProcessingContext ctx,
-          List<DefinedAndUsedStructure> identifier1,
+          List<VariableUsageNode> identifier1,
           List<VariableNode> identifier1Definitions) {
     // node must be an elementary data item of category alphanumeric/National OR
     // alphanumeric/national group item
@@ -430,7 +429,7 @@ public class JsonGenerateProcess implements Processor<JsonGenerateNode> {
     }
   }
 
-  private void verifyIdentifier1GroupItem(List<VariableNode> definitions, List<DefinedAndUsedStructure> identifier1, ProcessingContext ctx) {
+  private void verifyIdentifier1GroupItem(List<VariableNode> definitions, List<VariableUsageNode> identifier1, ProcessingContext ctx) {
     if (!NodeUtils.isNodeAlphanumeric(definitions.get(0))
         || NodeUtils.checkIfNodeHasDynamicGroupItem(definitions.get(0))
         || NodeUtils.checkIfNodeHasJustifiedGroupItem(definitions.get(0))) {

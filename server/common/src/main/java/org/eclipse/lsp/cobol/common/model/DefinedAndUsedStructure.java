@@ -40,26 +40,4 @@ public interface DefinedAndUsedStructure {
    * @return the list of locations for the usages
    */
   List<Location> getUsages();
-
-  /**
-   * returns structure locality
-   * @return Locality of the structure
-   */
-  Locality getLocality();
-
-  /**
-   * Add structure definition
-   * @param node
-   */
-  default void addDefinition(DefinedAndUsedStructure node) {
-      node.getDefinitions().add(this.getLocality().toLocation());
-  }
-
-  /**
-   * Tells is a block needs to be defined before using it or it's implicitly resolved.
-   * @return True,if it is mandatory to define the block before using it. False, otherwise.
-   */
-  default boolean isDefinitionMandatory() {
-    return true;
-  }
 }

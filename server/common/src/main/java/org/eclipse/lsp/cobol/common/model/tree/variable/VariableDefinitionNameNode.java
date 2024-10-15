@@ -67,16 +67,16 @@ public class VariableDefinitionNameNode extends Node implements DefinedAndUsedSt
   @Override
   public List<Location> getUsages() {
     return getNearestParentByType(NodeType.VARIABLE)
-            .map(VariableNode.class::cast)
-            .map(VariableNode::getUsages)
-            .orElseGet(ImmutableList::of);
+        .map(VariableNode.class::cast)
+        .map(VariableNode::getUsages)
+        .orElseGet(ImmutableList::of);
   }
 
   @Override
   public String getFormattedDisplayString() {
     return getNearestParentByType(NodeType.VARIABLE)
-            .map(VariableNode.class::cast)
-            .map(VariableNode::getFullVariableDescription)
-            .orElse("");
+        .map(VariableNode.class::cast)
+        .map(VariableNode::getFullVariableDescription)
+        .orElse("");
   }
 }
