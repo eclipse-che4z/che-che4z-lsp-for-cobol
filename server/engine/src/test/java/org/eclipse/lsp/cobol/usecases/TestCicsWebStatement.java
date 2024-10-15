@@ -19,6 +19,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
+import org.eclipse.lsp.cobol.usecases.common.CICSTestUtils;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.eclipse.lsp4j.Range;
@@ -85,7 +86,7 @@ public class TestCicsWebStatement {
     private static final String READ_QUERYPARM_VALID = WEB_READ + "QUERYPARM(123) NAMELENGTH(123) VALUE(123) VALUELENGTH(123) HOSTCODEPAGE(1) ";
     private static final String READ_HTTPHEADER_VALID = WEB_READ + "HTTPHEADER(123) NAMELENGTH(123) VALUE(123) VALUELENGTH(123)";
 
-    private static final String READ_HTTPHEADER_INVALID = WEB_READ + "HTTPHEADER(123) NAMELENGTH(123) SESSTOKEN({$sessVar}) VALUE(123) VALUELENGTH(123)";
+    private static final String READ_QUERYPARM_INVALID = WEB_READ + "QUERYPARM(123) NAMELENGTH(123) {SESSTOKEN|errorOne}(123) VALUE(123) VALUELENGTH(123)";
 
     private static final String WEB_READNEXT = WEB + "READNEXT ";
     private static final String READNEXT_FORMFIELD_VALID = WEB_READNEXT + "FORMFIELD(123) NAMELENGTH(123) VALUE(123) VALUELENGTH(123)";
@@ -179,8 +180,8 @@ public class TestCicsWebStatement {
     @Test
     void testReadInvalid() {
         HashMap<String, Diagnostic> expectedDiagnostics = new HashMap<>();
-        expectedDiagnostics.put("errorOne", new Diagnostic(new Range(), "Missing required option: TERMID", DiagnosticSeverity.Error, ErrorSource.PARSING.getText()));
-        errorTest(READ_HTTPHEADER_INVALID, expectedDiagnostics);
+        expectedDiagnostics.put("errorOne", new Diagnostic(new Range(), "Invalid option provided: SESSTOKEN", DiagnosticSeverity.Error, ErrorSource.PARSING.getText()));
+        CICSTestUtils.errorTest(READ_QUERYPARM_INVALID, expectedDiagnostics);
     }
 
     @Test
