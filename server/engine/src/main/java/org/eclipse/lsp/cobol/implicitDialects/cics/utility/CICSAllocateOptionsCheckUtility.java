@@ -64,12 +64,18 @@ public class CICSAllocateOptionsCheckUtility extends CICSOptionsCheckBaseUtility
    * @param <E> A subclass of ParserRuleContext
    */
   public <E extends ParserRuleContext> void checkOptions(E ctx) {
-    if (ctx.getClass() == CICSParser.Cics_allocate_appc_partnerContext.class) {
-      checkAppcPartner((CICSParser.Cics_allocate_appc_partnerContext) ctx);
-    } else if (ctx.getClass() == CICSParser.Cics_allocate_appc_mro_lut61_sysidContext.class) {
-      checkAppcMroLut61Sysid((CICSParser.Cics_allocate_appc_mro_lut61_sysidContext) ctx);
-    } else if (ctx.getClass() == CICSParser.Cics_allocate_lut61_sessionContext.class) {
-      checkLut61Session((CICSParser.Cics_allocate_lut61_sessionContext) ctx);
+    switch (ctx.getRuleIndex()) {
+      case CICSParser.RULE_cics_allocate_appc_partner:
+        checkAppcPartner((CICSParser.Cics_allocate_appc_partnerContext) ctx);
+        break;
+      case CICSParser.RULE_cics_allocate_appc_mro_lut61_sysid:
+        checkAppcMroLut61Sysid((CICSParser.Cics_allocate_appc_mro_lut61_sysidContext) ctx);
+        break;
+      case CICSParser.RULE_cics_allocate_lut61_session:
+        checkLut61Session((CICSParser.Cics_allocate_lut61_sessionContext) ctx);
+        break;
+      default:
+        break;
     }
     checkDuplicates(ctx);
   }

@@ -30,7 +30,7 @@ interface EndevorType {
 }
 
 type TypeOrArray<T> = T | T[];
-function asArray<T>(o: TypeOrArray<T>) {
+export function asArray<T>(o: TypeOrArray<T>) {
   if (Array.isArray(o)) return o;
   return [o];
 }
