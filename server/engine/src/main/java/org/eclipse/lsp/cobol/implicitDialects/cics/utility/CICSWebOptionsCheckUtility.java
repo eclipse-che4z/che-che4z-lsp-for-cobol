@@ -23,10 +23,7 @@ import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser;
 import org.eclipse.lsp.cobol.implicitDialects.cics.CICSLexer;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_web;
 
@@ -197,6 +194,32 @@ public class CICSWebOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
             case CICSParser.RULE_cics_web_write:
                 checkWrite((CICSParser.Cics_web_writeContext) ctx);
                 break;
+            default:
+                break;
+        }
+    }
+
+    private <E extends ParserRuleContext> void iterateSubrules(E ctx) {
+        if (ctx == null) {
+            return;
+        }
+
+        for (ParserRuleContext subrule : getSafeSubruleList(ctx)) {
+            checkSubrules(subrule);
+        }
+    }
+
+    private static <E extends ParserRuleContext> List<ParserRuleContext> getSafeSubruleList(E ctx) {
+        return ctx == null ? new ArrayList<>() : ctx.getRuleContexts(ParserRuleContext.class);
+    }
+    /**
+     * Entrypoint to check CICS WEB rule options
+     *
+     * @param ctx ParserRuleContext subclass containing options
+     * @param <E> A subclass of ParserRuleContext
+     */
+    private <E extends ParserRuleContext> void checkSubrules(E ctx) {
+        switch (ctx.getRuleIndex()) {
             case CICSParser.RULE_cics_web_path:
                 checkWebPath((CICSParser.Cics_web_pathContext) ctx);
                 break;
@@ -267,16 +290,21 @@ public class CICSWebOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
         List<TerminalNode> ruleList = new ArrayList<>();
         ruleList.add(ctx.SESSTOKEN()); // SESSTOKEN in CLOSE does not utilize the repeat notation.
         checkHasMandatoryOptions(ruleList, ctx, "SESSTOKEN");
+        iterateSubrules(ctx);
     }
 
     private void checkConverse(CICSParser.Cics_web_converseContext ctx) {
         checkHasMandatoryOptions(ctx.SESSTOKEN(), ctx, "SESSTOKEN");
         checkMutuallyExclusiveOptions("PATH PATHLENGTH or URIMAP", ctx.cics_web_path(), ctx.cics_web_urimap());
+
+        iterateSubrules(ctx);
     }
 
     private void checkEndbrowse(CICSParser.Cics_web_endbrowseContext ctx) {
         checkMutuallyExclusiveOptions("FORMFIELD, HTTPHEADER, QUERYPARM", ctx.FORMFIELD(), ctx.HTTPHEADER(), ctx.QUERYPARM());
         checkHasRequiredOption(ctx.HTTPHEADER(), ctx.SESSTOKEN(), ctx, "HTTPHEADER");
+
+        iterateSubrules(ctx);
     }
 
     // EXTRACT does not need any checks other than the helper rules.
@@ -286,39 +314,43 @@ public class CICSWebOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
         checkHasMandatoryOptions(ctx.SESSTOKEN(), ctx, "SESSTOKEN");
         checkHasRequiredOption(ctx.HTTPVNUM(), ctx.HTTPRNUM(), ctx, "HTTPVNUM");
 
+        iterateSubrules(ctx);
     }
 
     private void checkParse(CICSParser.Cics_web_parseContext ctx) {
         checkHasRequiredOption(ctx.URL(), ctx.URLLENGTH(), ctx, "URL");
+
+        iterateSubrules(ctx);
     }
 
     private void checkRead(CICSParser.Cics_web_readContext ctx) {
         checkMutuallyExclusiveOptions("FORMFIELD, HTTPHEADER or QUERYPARM", ctx.FORMFIELD(), ctx.HTTPHEADER(), ctx.QUERYPARM());
 
-        if (ctx.FORMFIELD().getText().isEmpty()) {
+        if (ctx.FORMFIELD() != null) {
            checkHasIllegalOptions(ctx.SESSTOKEN(), "SESSTOKEN");
         }
 
-        if (ctx.HTTPHEADER().getText().isEmpty()) {
-            checkHasIllegalOptions(ctx.SESSTOKEN(), "SESSTOKEN");
-        } else {
+        if (ctx.HTTPHEADER() != null) {
             checkHasMandatoryOptions(ctx.NAMELENGTH(), ctx, "NAMELENGTH");
+            checkHasIllegalOptions(ctx.CHARACTERSET(), "CHARACTERSET");
         }
 
-        if (!ctx.QUERYPARM().getText().isEmpty()) {
+        if (ctx.QUERYPARM() != null) {
             checkHasIllegalOptions(ctx.SESSTOKEN(), "SESSTOKEN");
         }
 
         checkMutuallyExclusiveOptions("VALUE or SET", ctx.VALUE(), ctx.SET());
-        if (ctx.VALUE().isEmpty()) {
+        if (ctx.VALUE() == null) {
             checkHasMandatoryOptions(ctx.SET(), ctx, "SET");
             checkHasMandatoryOptions(ctx.VALUELENGTH(), ctx, "VALUELENGTH");
-        } else if (ctx.SET().isEmpty()) {
+        } else if (ctx.SET() == null) {
             checkHasMandatoryOptions(ctx.VALUE(), ctx, "VALUE");
             checkHasMandatoryOptions(ctx.VALUELENGTH(), ctx, "VALUELENGTH");
         }
 
         checkHasRequiredOption(ctx.FORMFIELD(), ctx.CHARACTERSET(), ctx, "FORMFIELD");
+
+        iterateSubrules(ctx);
     }
 
     private void checkReadnextFormfieldQueryparm(CICSParser.Cics_web_readnext_formfield_queryparmContext ctx) {
@@ -327,30 +359,42 @@ public class CICSWebOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
         checkHasMandatoryOptions(ctx.NAMELENGTH(), ctx, "NAMELENGTH");
         checkHasMandatoryOptions(ctx.VALUE(), ctx, "VALUE");
         checkHasMandatoryOptions(ctx.VALUELENGTH(), ctx, "VALUELENGTH");
+
+        iterateSubrules(ctx);
     }
 
     private void checkReadnextHTTPHeader(CICSParser.Cics_web_readnext_httpheaderContext ctx) {
         checkHasMandatoryOptions(ctx.NAMELENGTH(), ctx, "NAMELENGTH");
         checkHasMandatoryOptions(ctx.VALUE(), ctx, "VALUE");
         checkHasMandatoryOptions(ctx.VALUELENGTH(), ctx, "VALUELENGTH");
+
+        iterateSubrules(ctx);
     }
 
     private void checkReceiveServerBuffer(CICSParser.Cics_web_receive_server_bufferContext ctx) {
         checkHasMandatoryOptions(ctx.LENGTH(), ctx, "LENGTH");
+
+        iterateSubrules(ctx);
     }
 
     private void checkReceiveServerContainer(CICSParser.Cics_web_receive_server_containerContext ctx) {
         checkHasMandatoryOptions(ctx.TOCONTAINER(), ctx, "TOCONTAINER");
+
+        iterateSubrules(ctx);
     }
 
     private void checkReceiveClient(CICSParser.Cics_web_receive_clientContext ctx) {
         checkHasMandatoryOptions(ctx.SESSTOKEN(), ctx, "SESSTOKEN");
+
+        iterateSubrules(ctx);
     }
 
     // RECEIVE Client (Buffer) does not need any checks.
 
     private void checkReceiveClientContainer(CICSParser.Cics_web_receive_client_containerContext ctx) {
         checkHasMandatoryOptions(ctx.TOCONTAINER(), ctx, "TOCONTAINER");
+
+        iterateSubrules(ctx);
     }
 
     // RETRIEVE does not need any checks.
@@ -359,11 +403,15 @@ public class CICSWebOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
 
     private void checkStartbrowseFormfieldQueryparm(CICSParser.Cics_web_startbrowse_formfield_queryparmContext ctx) {
         checkHasRequiredOption(ctx.FORMFIELD(), ctx.CHARACTERSET(), ctx, "FORMFIELD");
+
+        iterateSubrules(ctx);
     }
 
     private void checkWrite(CICSParser.Cics_web_writeContext ctx) {
         checkHasMandatoryOptions(ctx.HTTPHEADER(), ctx, "HTTPHEADER");
         checkHasMandatoryOptions(ctx.VALUE(), ctx, "VALUE");
+
+        iterateSubrules(ctx);
     }
 
 
