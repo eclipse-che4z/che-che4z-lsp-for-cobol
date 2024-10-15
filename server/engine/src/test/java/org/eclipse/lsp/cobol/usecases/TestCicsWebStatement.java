@@ -17,13 +17,14 @@ package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
+import org.eclipse.lsp4j.Diagnostic;
+import org.eclipse.lsp4j.DiagnosticSeverity;
+import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /**
  * Test CICS WEB command. Documentation link: <a
@@ -82,7 +83,9 @@ public class TestCicsWebStatement {
     private static final String WEB_READ = WEB + "READ ";
     private static final String READ_FORMFIELD_VALID = WEB_READ + "FORMFIELD(123) NAMELENGTH(123) VALUE(123) VALUELENGTH(123) CHARACTERSET(1) HOSTCODEPAGE(1) ";
     private static final String READ_QUERYPARM_VALID = WEB_READ + "QUERYPARM(123) NAMELENGTH(123) VALUE(123) VALUELENGTH(123) HOSTCODEPAGE(1) ";
-    private static final String READ_HTTPHEADER_VALID = WEB_READ + "HTTPHEADER(123) NAMELENGTH(123) SESSTOKEN({$sessVar}) VALUE(123) VALUELENGTH(123)";
+    private static final String READ_HTTPHEADER_VALID = WEB_READ + "HTTPHEADER(123) NAMELENGTH(123) VALUE(123) VALUELENGTH(123)";
+
+    private static final String READ_HTTPHEADER_INVALID = WEB_READ + "HTTPHEADER(123) NAMELENGTH(123) SESSTOKEN({$sessVar}) VALUE(123) VALUELENGTH(123)";
 
     private static final String WEB_READNEXT = WEB + "READNEXT ";
     private static final String READNEXT_FORMFIELD_VALID = WEB_READNEXT + "FORMFIELD(123) NAMELENGTH(123) VALUE(123) VALUELENGTH(123)";
@@ -115,6 +118,10 @@ public class TestCicsWebStatement {
     // Utility Functions
     private static void noErrorTest(String newCommand) {
         UseCaseEngine.runTest(getTestString(newCommand), ImmutableList.of(), ImmutableMap.of());
+    }
+
+    private static void errorTest(String newCommand, HashMap<String, Diagnostic> expectedDiagnostics) {
+        UseCaseEngine.runTest(getTestString(newCommand), ImmutableList.of(), expectedDiagnostics);
     }
 
     private static String getTestString(String newCommand) {
@@ -167,6 +174,13 @@ public class TestCicsWebStatement {
         noErrorTest(READ_FORMFIELD_VALID);
         noErrorTest(READ_QUERYPARM_VALID);
         noErrorTest(READ_HTTPHEADER_VALID);
+    }
+
+    @Test
+    void testReadInvalid() {
+        HashMap<String, Diagnostic> expectedDiagnostics = new HashMap<>();
+        expectedDiagnostics.put("errorOne", new Diagnostic(new Range(), "Missing required option: TERMID", DiagnosticSeverity.Error, ErrorSource.PARSING.getText()));
+        errorTest(READ_HTTPHEADER_INVALID, expectedDiagnostics);
     }
 
     @Test
