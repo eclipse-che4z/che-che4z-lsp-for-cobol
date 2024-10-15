@@ -22,7 +22,7 @@ import org.eclipse.lsp.cobol.common.copybook.CopybookId;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp4j.Location;
 
-import java.util.Map;
+import java.util.HashMap;
 
 /**
  * This class represents a semantic sub-context for specific types of elements that have names and
@@ -31,6 +31,7 @@ import java.util.Map;
 @Value
 public class CopybooksRepository {
   Multimap<String, String> definitions = HashMultimap.create();
+  HashMap<String, String> definitionsInvert = new HashMap<>();
   Multimap<String, Location> usages = HashMultimap.create();
   Multimap<String, Locality> definitionStatements = HashMultimap.create();
 
@@ -43,7 +44,9 @@ public class CopybooksRepository {
    * @param copybookUri - the uri of a copybook
    */
   public void define(String name, String dialect, String documentUri, String copybookUri) {
-    definitions.put(toId(name, dialect, documentUri), copybookUri);
+    String id = toId(name, dialect, documentUri);
+    definitions.put(id, copybookUri);
+    definitionsInvert.put(copybookUri, id);
   }
 
   /**
@@ -97,10 +100,6 @@ public class CopybooksRepository {
    * @return a copybook id
    */
   public String getCopybookIdByUri(String uri) {
-    return definitions.asMap().entrySet().stream()
-        .filter(e -> e.getValue().stream().anyMatch(u -> u.equals(uri)))
-        .findFirst()
-        .map(Map.Entry::getKey)
-        .orElse(null);
+    return definitionsInvert.get(uri);
   }
 }
