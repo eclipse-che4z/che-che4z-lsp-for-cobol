@@ -169,21 +169,21 @@ cics_send_autopage: AUTOPAGE (CURRENT | ALL)?;
 cics_converse: CONVERSE (cics_converse_group_one | cics_converse_group_two);
 
 // CONVERSE Group 1: Default zOS, Lu4, SCS,Lu23, 3270/3601/3614/3653/3767/3650/3770/3650_int/3270/3680/3790/3270disp/2260
-cics_converse_group_one:  (cics_converse_from | cics_into | cics_converse_to | cics_maxlength | NOTRUNCATE | DEFRESP | STRFIELD | ((CTLCHAR | LINEADDR) cics_data_value) | LDC cics_name | FMH | LEAVEKB | cics_converse_erase | ASIS | cics_handle_response)+ ;
+cics_converse_group_one:  (FROM cics_data_area | cics_converse_fromlength | cics_into | cics_converse_tolength | cics_maxlength | NOTRUNCATE | DEFRESP | STRFIELD | ((CTLCHAR | LINEADDR) cics_data_value) | LDC cics_name | FMH | LEAVEKB | cics_converse_erase | ASIS | cics_handle_response)+ ;
 
 // CONVERSE Group 2: APPC, LU61, MRO
-cics_converse_group_two: (cics_into | cics_converse_to | cics_converse_from | cics_maxlength | ((CONVID | SESSION | ATTACHID) cics_name) | NOTRUNCATE | STATE cics_cvda | DEFRESP | FMH | cics_handle_response)+;
+cics_converse_group_two: (FROM cics_data_area | cics_into | cics_converse_tolength | cics_converse_fromlength | cics_maxlength | ((CONVID | SESSION | ATTACHID) cics_name) | NOTRUNCATE | STATE cics_cvda | DEFRESP | FMH | cics_handle_response)+;
 
 cics_converse_erase: ERASE (DEFAULT | ALTERNATE)?;
-cics_converse_from: (FROM cics_data_area | ((FROMLENGTH | FROMFLENGTH) cics_data_value))+;
+cics_converse_fromlength: (FROMLENGTH | FROMFLENGTH) cics_data_value;
 cics_into: (INTO cics_data_area | SET cics_ref);
-cics_converse_to: (TOLENGTH | TOFLENGTH) cics_data_area;
+cics_converse_tolength: (TOLENGTH | TOFLENGTH) cics_data_area;
 cics_maxlength: ((MAXLENGTH | MAXFLENGTH) cics_data_value);
 
 
 /** ABEND: */
-cics_abend: ABEND (ABCODE cics_name | CANCEL | NODUMP | cics_handle_response)*;
-
+cics_abend: ABEND cics_abend_opts;
+cics_abend_opts:(ABCODE cics_name | CANCEL | NODUMP| cics_handle_response)*;
 /** ACQUIRE */
 cics_acquire:ACQUIRE (cics_acquire_process | cics_acquire_activityId ) ;
 
@@ -192,7 +192,8 @@ cics_acquire_process: ((PROCESS | PROCESSTYPE) cics_data_value | cics_handle_res
 cics_acquire_activityId: (ACTIVITYID cics_data_value | cics_handle_response)+;
 
 /** ADD SUBEVENT */
-cics_add: ADD (SUBEVENT cics_data_value | EVENT cics_data_value | cics_handle_response)+;
+cics_add: ADD ( ciss_add_event_subevent | cics_handle_response)+;
+ciss_add_event_subevent: ((SUBEVENT  | EVENT) cics_data_value)+;
 
 /** ADDRESS / ADDRESS SET */
 cics_address: ADDRESS (cics_address_null | cics_address_set);
@@ -249,9 +250,10 @@ cics_bif_digest: (DIGEST | RECORD cics_data_value | RECORDLEN cics_data_value | 
                  RESULT cics_data_area | cics_handle_response)+;
 
 /** BUILD ATTACH (both of them) */
-cics_build: BUILD ATTACH (ATTACHID cics_name | PROCESS cics_name | RESOURCE cics_name | RPROCESS cics_name |
-            RRESOURCE cics_name | QUEUE cics_name | IUTYPE cics_data_value | DATASTR cics_data_value |
-            RECFM cics_data_value | cics_handle_response)+;
+cics_build: BUILD cics_build_attach;
+cics_build_attach: (ATTACH | (ATTACHID  | PROCESS  | RESOURCE  | RPROCESS  |
+            RRESOURCE | QUEUE) cics_name | (IUTYPE | DATASTR |
+            RECFM) cics_data_value | cics_handle_response)+;
 
 /** CANCEL (both of them) */
 cics_cancel: CANCEL (cics_cancel_bts | cics_cancel_reqid);
@@ -473,10 +475,10 @@ cics_invoke: INVOKE (SERVICE cics_data_value | CHANNEL cics_data_value | OPERATI
 
 /** ISSUE (all of them) */
 cics_issue:
-	ISSUE (cics_issue_print | cics_issue_eods | cics_issue_abend | cics_issue_abort | cics_issue_add | cics_issue_confirmation
+	ISSUE (cics_issue_print | cics_issue_wait | cics_issue_eods | cics_issue_abend | cics_issue_abort | cics_issue_add | cics_issue_confirmation
 	      | cics_issue_copy | cics_issue_disconnect | cics_issue_end | cics_issue_endfile_endoutput | cics_issue_erase | cics_issue_erase_aup | cics_issue_error
           | cics_issue_load | cics_issue_note | cics_issue_pass | cics_issue_prepare | cics_issue_query | cics_issue_receive | cics_issue_replace | cics_issue_send
-          | cics_issue_signal | cics_issue_wait);
+          | cics_issue_signal);
 
 cics_issue_abend: (ABEND | CONVID cics_name | STATE cics_cvda | cics_handle_response)+;
 cics_issue_abort: (ABORT | cics_issue_common | cics_handle_response)+;
@@ -487,7 +489,7 @@ cics_issue_disconnect: (DISCONNECT | SESSION cics_name | cics_handle_response)+;
 cics_issue_end: (END | cics_issue_common | cics_handle_response)+;
 cics_issue_endfile_endoutput: (ENDFILE | ENDOUTPUT | cics_handle_response)+;
 cics_issue_erase: (ERASE | (DESTID | DESTIDLENG | VOLUME | VOLUMELENG | KEYLENGTH | KEYNUMBER | NUMREC) cics_data_value | RIDFLD cics_data_area | RRN | DEFRESP | NOWAIT | cics_handle_response)+;
-cics_issue_erase_aup: (ERASEAUP | WAIT | cics_handle_response)+;
+cics_issue_erase_aup: ERASEAUP (WAIT | cics_handle_response)*;
 cics_issue_error: (ERROR | CONVID cics_name | STATE cics_cvda | cics_handle_response)+;
 cics_issue_load: (LOAD | PROGRAM cics_name | CONVERSE | cics_handle_response)+;
 cics_issue_note: (NOTE | (DESTID | DESTIDLENG | VOLUME | VOLUMELENG) cics_data_value | RIDFLD cics_data_area | RRN | cics_handle_response)+;

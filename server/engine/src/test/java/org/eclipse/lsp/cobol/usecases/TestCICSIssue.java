@@ -161,7 +161,7 @@ public class TestCICSIssue {
   private static final String ISSUE_WAIT_FULL =
       "ISSUE WAIT DESTID({$varFour}) DESTIDLENG({$varOne}) VOLUME({$varOne}) VOLUMELENG({$varOne})";
 
-  private static final String ISSUE_WAIT_PARTIAL = "ISSUE WAIT SUBADDR(100) PRINT";
+  private static final String ISSUE_WAIT_PARTIAL = "ISSUE WAIT";
 
   private static final String ISSUE_WAIT_INVALID = "ISSUE WAIT {CONSOLE|errorOne}";
 
