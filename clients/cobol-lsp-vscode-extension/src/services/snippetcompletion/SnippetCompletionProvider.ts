@@ -12,7 +12,7 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 import * as vscode from "vscode";
-import { LANGUAGE_ID } from "../../constants";
+import { LANGUAGE_ID, SETTINGS_DIALECT } from "../../constants";
 import { DialectRegistry } from "../DialectRegistry";
 import cobolSnippets = require("./cobolSnippets.json");
 import * as t from "io-ts";
@@ -34,6 +34,13 @@ export class SnippetCompletionProvider
   implements vscode.CompletionItemProvider
 {
   snippetsCompletionItems: vscode.CompletionItem[] | null = null;
+
+  constructor() {
+    vscode.workspace.onDidChangeConfiguration(async (event) => {
+      if (event.affectsConfiguration(SETTINGS_DIALECT))
+        this.resetSnippetsCompletionItems();
+    });
+  }
 
   public async provideCompletionItems(
     document: vscode.TextDocument,
