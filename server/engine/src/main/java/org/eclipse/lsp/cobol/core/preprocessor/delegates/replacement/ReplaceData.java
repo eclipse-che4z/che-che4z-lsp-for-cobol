@@ -17,6 +17,7 @@ package org.eclipse.lsp.cobol.core.preprocessor.delegates.replacement;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
 import org.apache.commons.lang3.tuple.Pair;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp4j.Range;
 
 import java.util.ArrayList;
@@ -31,9 +32,9 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class ReplaceData {
   List<Pair<String, String>> replacePatterns = new ArrayList<>();
-  Map<String, Range> ranges = new HashMap<>();
+  Map<Uri, Range> ranges = new HashMap<>();
 
-  public ReplaceData(List<Pair<String, String>> replacePatterns, String url, Range range) {
+  public ReplaceData(List<Pair<String, String>> replacePatterns, Uri url, Range range) {
     this.replacePatterns.addAll(replacePatterns);
     this.ranges.put(url, range);
   }
@@ -44,7 +45,7 @@ public class ReplaceData {
    * @param url a document URI
    * @return the replacement range
    */
-  public Range getRange(String url) {
+  public Range getRange(Uri url) {
     return ranges.computeIfAbsent(url, u -> new Range());
   }
 }

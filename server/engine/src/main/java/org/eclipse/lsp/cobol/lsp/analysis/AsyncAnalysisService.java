@@ -29,6 +29,7 @@ import org.eclipse.lsp.cobol.common.dialects.CobolLanguageId;
 import org.eclipse.lsp.cobol.common.dialects.TrueDialectService;
 import org.eclipse.lsp.cobol.lsp.LspEventCancelCondition;
 import org.eclipse.lsp.cobol.lsp.LspEventDependency;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.lsp.SourceUnitGraph;
 import org.eclipse.lsp.cobol.service.AnalysisService;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
@@ -50,8 +51,8 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
   private final Communications communications;
 
   private final Map<String, FutureTask<CobolDocumentModel>> analysisResults = Collections.synchronizedMap(new HashMap<>());
-  private final Map<String, Integer> analysisResultsRevisions = Collections.synchronizedMap(new HashMap<>());
-  private final Map<String, ExecutorService> analysisExecutors = Collections.synchronizedMap(new HashMap<>());
+  private final Map<Uri, Integer> analysisResultsRevisions = Collections.synchronizedMap(new HashMap<>());
+  private final Map<Uri, ExecutorService> analysisExecutors = Collections.synchronizedMap(new HashMap<>());
 
   private final List<AnalysisStateListener> analysisStateListeners;
 
@@ -88,7 +89,7 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
    * @param open Is document just opened, or it's reanalyse request
    * @return document model with analysis result
    */
-  public synchronized FutureTask<CobolDocumentModel> scheduleAnalysis(String uri, String text, boolean open) {
+  public synchronized FutureTask<CobolDocumentModel> scheduleAnalysis(Uri uri, String text, boolean open) {
     return scheduleAnalysis(uri, text, analysisResultsRevisions.getOrDefault(uri, 0), open, SourceUnitGraph.EventSource.IDE);
   }
 
@@ -102,7 +103,7 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
    * @param eventSource source of the event
    * @return document model with analysis result
    */
-  public synchronized FutureTask<CobolDocumentModel> scheduleAnalysis(String uri, String text, Integer currentRevision, boolean open, SourceUnitGraph.EventSource eventSource) {
+  public synchronized FutureTask<CobolDocumentModel> scheduleAnalysis(Uri uri, String text, Integer currentRevision, boolean open, SourceUnitGraph.EventSource eventSource) {
     return scheduleAnalysis(uri, text, currentRevision, open, false, eventSource);
   }
 
@@ -117,7 +118,7 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
    * @param eventSource source of the event
    * @return document model with analysis result
    */
-  public synchronized FutureTask<CobolDocumentModel> scheduleAnalysis(String uri, String text, Integer currentRevision, boolean open, boolean force, SourceUnitGraph.EventSource eventSource) {
+  public synchronized FutureTask<CobolDocumentModel> scheduleAnalysis(Uri uri, String text, Integer currentRevision, boolean open, boolean force, SourceUnitGraph.EventSource eventSource) {
     notifyAllListeners(AnalysisState.SCHEDULED, documentModelService.get(uri), eventSource);
     String id = makeId(uri, currentRevision);
     Integer prevId = analysisResultsRevisions.put(uri, currentRevision);
@@ -140,7 +141,7 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
     return futureTask;
   }
 
-  private Callable<CobolDocumentModel> scheduleAnalysis(String uri, String text, Integer currentRevision, boolean open, boolean force, SourceUnitGraph.EventSource eventSource, String id) {
+  private Callable<CobolDocumentModel> scheduleAnalysis(Uri uri, String text, Integer currentRevision, boolean open, boolean force, SourceUnitGraph.EventSource eventSource, String id) {
     return () -> {
       if (currentRevision < analysisResultsRevisions.get(uri) && !force) {
         notifyAllListeners(
@@ -168,7 +169,7 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
         return documentModelService.get(uri);
       } finally {
         if (Objects.equals(analysisResultsRevisions.get(uri), currentRevision) || force) {
-          communications.publishDiagnostics(documentModelService.getOpenedDiagnostic());
+          communications.publishDiagnostics(documentModelService.getOpenedDiagnosticLsp());
         }
         communications.notifyProgressEnd(uri);
       }
@@ -184,7 +185,7 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
    * @param uri
    * @return
    */
-  private ExecutorService getExecutor(String uri) {
+  private ExecutorService getExecutor(Uri uri) {
     synchronized (analysisExecutors) {
       ExecutorService analysisExecutor = analysisExecutors.computeIfAbsent(uri, u -> Executors.newSingleThreadExecutor(THREAD_FACTORY));
       if (analysisExecutor.isShutdown()) {
@@ -195,7 +196,7 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
     }
   }
 
-  private static String makeId(String uri, Integer revision) {
+  private static String makeId(Uri uri, Integer revision) {
     return revision + "#" + uri;
   }
 
@@ -235,16 +236,16 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
    * @param copybookContent
    * @param eventSource
    */
-  public void reanalyseCopybooksAssociatedPrograms(List<String> uris, String copybookUri, String copybookContent, SourceUnitGraph.EventSource eventSource) {
+  public void reanalyseCopybooksAssociatedPrograms(List<Uri> uris, Uri copybookUri, String copybookContent, SourceUnitGraph.EventSource eventSource) {
     documentModelService.removeDocumentDiagnostics(copybookUri);
     Optional.ofNullable(documentModelService.get(copybookUri)).ifPresent(model -> model.update(copybookContent));
-    List<String> openedUris =
+    List<Uri> openedUris =
         documentModelService.getAllOpened().stream()
             .filter(model -> uris.contains(model.getUri()))
             .filter(model -> !analysisService.isCopybook(model.getUri(), model.getText()))
             .map(CobolDocumentModel::getUri)
             .collect(Collectors.toList());
-    for (String uri : openedUris) {
+    for (Uri uri : openedUris) {
         String languageId = documentModelService.get(uri).getLanguageId();
       //TODO: update cache directly from workspace document graph
       copybookService.getCopybookUsage(uri).stream()
@@ -271,11 +272,11 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
    *
    * @param uri source URI
    */
-  public void cancelAnalysis(String uri) throws InterruptedException {
+  public void cancelAnalysis(Uri uri) throws InterruptedException {
     String analysisID = makeId(uri, analysisResultsRevisions.get(uri));
     analysisResultsRevisions.remove(uri);
-    LOG.debug("[stopAnalysis] Document " + uri + " publish diagnostic: " + documentModelService.getOpenedDiagnostic());
-    communications.publishDiagnostics(documentModelService.getOpenedDiagnostic());
+    LOG.debug("[stopAnalysis] Document " + uri + " publish diagnostic: " + documentModelService.getOpenedDiagnosticLsp());
+    communications.publishDiagnostics(documentModelService.getOpenedDiagnosticLsp());
     if (analysisResults.containsKey(analysisID)) {
       analysisResults.get(analysisID).cancel(true);
     }
@@ -287,7 +288,7 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
    * @param uri url of document to wait
    * @return LspEventDependency object
    */
-  public LspEventDependency createDependencyOn(String uri) {
+  public LspEventDependency createDependencyOn(Uri uri) {
     return () -> {
       CobolDocumentModel doc = documentModelService.get(uri);
       if (doc == null) {
@@ -306,7 +307,7 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
    * @param uri url of document to wait
    * @return LspEventCancelCondition object
    */
-  public LspEventCancelCondition createCancelConditionOnClose(String uri) {
+  public LspEventCancelCondition createCancelConditionOnClose(Uri uri) {
     return () -> {
       CobolDocumentModel doc = documentModelService.get(uri);
       if (doc == null) {
@@ -323,7 +324,7 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
    * @param text       content od document.
    * @param languageId
    */
-  public void openDocument(String uri, String text, String languageId) {
+  public void openDocument(Uri uri, String text, String languageId) {
     documentModelService.openDocument(uri, text, languageId);
   }
 

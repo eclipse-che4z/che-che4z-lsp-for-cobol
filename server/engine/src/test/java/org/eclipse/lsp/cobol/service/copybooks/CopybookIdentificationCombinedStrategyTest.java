@@ -15,13 +15,13 @@
 package org.eclipse.lsp.cobol.service.copybooks;
 
 import com.google.common.collect.ImmutableList;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 /**
@@ -41,23 +41,23 @@ class CopybookIdentificationCombinedStrategyTest {
 
   @Test
   void testAllReturnFalse() {
-    when(contentStrategy.isCopybook(anyString(), any(), any())).thenReturn(false);
-    when(suffixStrategy.isCopybook(anyString(), any(), any())).thenReturn(false);
-    boolean result = combinedStrategy.isCopybook("file.cbl", "content", ImmutableList.of());
+    when(contentStrategy.isCopybook(any(Uri.class), any(), any())).thenReturn(false);
+    when(suffixStrategy.isCopybook(any(Uri.class), any(), any())).thenReturn(false);
+    boolean result = combinedStrategy.isCopybook(new Uri("file.cbl"), "content", ImmutableList.of());
 
     assertFalse(result);
-    verify(contentStrategy, times(1)).isCopybook(anyString(), any(), any());
-    verify(suffixStrategy, times(1)).isCopybook(anyString(), any(), any());
+    verify(contentStrategy, times(1)).isCopybook(any(Uri.class), any(), any());
+    verify(suffixStrategy, times(1)).isCopybook(any(Uri.class), any(), any());
   }
 
   @Test
   void testFirstReturnTrue() {
-    when(suffixStrategy.isCopybook(anyString(), any(), any())).thenReturn(true);
-    boolean result = combinedStrategy.isCopybook("file.cbl", "content", ImmutableList.of());
+    when(suffixStrategy.isCopybook(any(Uri.class), any(), any())).thenReturn(true);
+    boolean result = combinedStrategy.isCopybook(new Uri("file.cbl"), "content", ImmutableList.of());
 
     assertTrue(result);
-    verify(contentStrategy, times(0)).isCopybook(anyString(), any(), any());
-    verify(suffixStrategy, times(1)).isCopybook(anyString(), any(), any());
+    verify(contentStrategy, times(0)).isCopybook(any(Uri.class), any(), any());
+    verify(suffixStrategy, times(1)).isCopybook(any(Uri.class), any(), any());
   }
 
 }

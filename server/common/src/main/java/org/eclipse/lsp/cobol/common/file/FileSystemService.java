@@ -20,36 +20,12 @@ import lombok.NonNull;
 import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.List;
 
 /** This interface represents API for low-level file systems access */
 public interface FileSystemService {
-  /**
-   * Normalize the URI defined in the workspace to get a NIO Path object that will be used within
-   * the FileSystemService, example: [input:
-   * file:///C:/Users/test/AppData/Local/Temp/WORKSPACE/COPYTEST.cpy] --} [output:
-   * C:/Users/test/AppData/Local/Temp/WORKSPACE/COPYTEST.cpy]
-   *
-   * @param uri URI string representation of a file
-   * @return the {@link Path} representation of the given URI in input
-   * @throws IllegalArgumentException if the URI of WorkspaceFolder is not valid
-   */
-  @Nullable
-  Path getPathFromURI(@NonNull String uri);
-
-  /**
-   * Extract the name and extension of a file from a valid {@link URI} and return the name back to
-   * the client as String or an empty string.
-   *
-   * @param uri the reference of the file from where extract the name
-   * @return the String representation of the file name and extension or an empty string
-   */
-  @Nullable
-  String getNameFromURI(@NonNull String uri);
-
   /**
    * Retrieve the content of the file as a string.
    *

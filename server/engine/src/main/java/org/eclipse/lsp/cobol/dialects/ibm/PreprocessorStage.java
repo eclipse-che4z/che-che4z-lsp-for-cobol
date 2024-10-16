@@ -21,6 +21,7 @@ import org.eclipse.lsp.cobol.common.CleanerPreprocessor;
 import org.eclipse.lsp.cobol.common.dialects.DialectOutcome;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.core.engine.analysis.AnalysisContext;
@@ -62,11 +63,11 @@ public class PreprocessorStage implements Stage<AnalysisContext, CopybooksReposi
         .filter(n -> n.getUri() != null)
         .forEach(n -> {
           copybooksRepository.addStatement(n.getName(), n.getDialect(), n.getLocality());
-          copybooksRepository.define(n.getName(), n.getDialect(), n.getNameLocation().getUri(), n.getUri());
+          copybooksRepository.define(n.getName(), n.getDialect(), new Uri(n.getNameLocation().getUri()), n.getUri());
         });
   }
 
-  private CopybooksRepository runPreprocessor(String programDocumentUri, AnalysisContext ctx) {
+  private CopybooksRepository runPreprocessor(Uri programDocumentUri, AnalysisContext ctx) {
     List<SyntaxError> preprocessorErrors = new ArrayList<>();
     ExtendedDocument extendedDocument = ctx.getExtendedDocument();
     PreprocessorContext context = new PreprocessorContext(programDocumentUri, extendedDocument,

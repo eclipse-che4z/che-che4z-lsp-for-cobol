@@ -44,7 +44,7 @@ public class CompilerDirectivesErrorListener extends BaseErrorListener {
     Position start = new Position(line - 1, charPositionInLine);
     Position end = new Position(line - 1, ((CommonToken) offendingSymbol).getStopIndex() + 1);
     Range range = CompilerDirectivesUtils.shiftRange(new Range(start, end), startPosition);
-    Location location = new Location(analysisContext.getExtendedDocument().getUri(), range);
+    Location location = new Location(analysisContext.getExtendedDocument().getUri().toString(), range);
     SyntaxError error = SyntaxError.syntaxError()
             .errorSource(ErrorSource.PARSING)
             .suggestion(msg)

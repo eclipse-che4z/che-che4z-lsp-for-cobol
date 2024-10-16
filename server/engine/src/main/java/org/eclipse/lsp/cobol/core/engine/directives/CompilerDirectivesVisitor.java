@@ -51,7 +51,7 @@ public class CompilerDirectivesVisitor extends CompilerDirectivesParserBaseVisit
   public Object visitUnSupportedDeprecatedCompilerDirectives(CompilerDirectivesParser.UnSupportedDeprecatedCompilerDirectivesContext ctx) {
     VisitorHelper.retrieveRangeLocality(ctx).ifPresent(r -> {
       Range range = CompilerDirectivesUtils.shiftRange(r, startPosition);
-      Location location = new Location(analysisContext.getExtendedDocument().getUri(), range);
+      Location location = new Location(analysisContext.getExtendedDocument().getUri().toString(), range);
       analysisContext.getAccumulatedErrors().add(SyntaxError.syntaxError()
               .errorSource(ErrorSource.PARSING)
               .errorCode(() -> "IGYOS4003-E")
@@ -67,7 +67,7 @@ public class CompilerDirectivesVisitor extends CompilerDirectivesParserBaseVisit
   public Object visitOptionalDeprecatedCompilerDirectives(CompilerDirectivesParser.OptionalDeprecatedCompilerDirectivesContext ctx) {
     VisitorHelper.retrieveRangeLocality(ctx).ifPresent(r -> {
       Range range = CompilerDirectivesUtils.shiftRange(r, startPosition);
-      Location location = new Location(analysisContext.getExtendedDocument().getUri(), range);
+      Location location = new Location(analysisContext.getExtendedDocument().getUri().toString(), range);
       analysisContext.getAccumulatedErrors().add(SyntaxError.syntaxError()
               .errorSource(ErrorSource.PARSING)
               .errorCode(() -> "IGYOS4013-I")
@@ -83,7 +83,7 @@ public class CompilerDirectivesVisitor extends CompilerDirectivesParserBaseVisit
   public Object visitCompilableSupportedDeprecatedCompilerDirectives(CompilerDirectivesParser.CompilableSupportedDeprecatedCompilerDirectivesContext ctx) {
     VisitorHelper.retrieveRangeLocality(ctx).ifPresent(r -> {
       Range range = CompilerDirectivesUtils.shiftRange(r, startPosition);
-      Location location = new Location(analysisContext.getExtendedDocument().getUri(), range);
+      Location location = new Location(analysisContext.getExtendedDocument().getUri().toString(), range);
       analysisContext.getAccumulatedErrors().add(SyntaxError.syntaxError()
               .errorSource(ErrorSource.PARSING)
               .errorCode(() -> "IGYOS4008-W")

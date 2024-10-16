@@ -14,6 +14,8 @@
  */
 package org.eclipse.lsp.cobol.service.settings;
 
+import org.eclipse.lsp.cobol.common.model.Uri;
+
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -46,7 +48,7 @@ public interface SettingsService {
    * @param section the required section.
    * @return a list of string of one configuration object.
    */
-  CompletableFuture<List<String>> fetchTextConfigurationWithScope(String scopeUri, String section);
+  CompletableFuture<List<String>> fetchTextConfigurationWithScope(Uri scopeUri, String section);
 
   /**
    * Fetch the required dialect specific text configuration section from the client.
@@ -55,7 +57,7 @@ public interface SettingsService {
    * @param dialect
    * @return a list of string of one configuration object.
    */
-  CompletableFuture<List<String>> fetchTextConfigurationWithScope(String scopeUri, String section, String dialect);
+  CompletableFuture<List<String>> fetchTextConfigurationWithScope(Uri scopeUri, String section, String dialect);
 
   /**
    * Fetch the required configuration sections from the client. Note that Scope URI is null. The
@@ -74,6 +76,6 @@ public interface SettingsService {
    * @param sections the required sections.
    * @return a list of configuration objects.
    */
-  CompletableFuture<List<Object>> fetchConfigurations(String documentUri, List<String> sections);
+  CompletableFuture<List<Object>> fetchConfigurations(Uri documentUri, List<String> sections);
 
 }

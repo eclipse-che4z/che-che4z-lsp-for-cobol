@@ -40,6 +40,7 @@ import org.eclipse.lsp.cobol.ConfigurableTest;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
 import org.eclipse.lsp.cobol.common.AnalysisResult;
 import org.eclipse.lsp.cobol.common.copybook.SQLBackend;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.test.CobolText;
 import org.eclipse.lsp.cobol.test.engine.UseCase;
 import org.eclipse.lsp.cobol.test.engine.UseCaseUtils;
@@ -70,7 +71,7 @@ class PositiveTest extends ConfigurableTest {
   void test(CobolTextRegistry cobolTextRegistry, CobolText text, String folderName) {
     LOG.info("-- {} under test --", text.getFileName());
     this.cobolTextRegistry = cobolTextRegistry;
-    String fileName = text.getFileName();
+    Uri fileName = new Uri(text.getFileName());
     Map<ReportSection, List<SysprintSnap>> dataNameRefs =
             getDataNameRefs(fileName, cobolTextRegistry);
     LOG.debug("Processing: " + fileName);
@@ -164,7 +165,7 @@ class PositiveTest extends ConfigurableTest {
   }
 
   protected static Map<ReportSection, List<SysprintSnap>> getDataNameRefs(
-          String filename, CobolTextRegistry textRegistry) {
+          Uri filename, CobolTextRegistry textRegistry) {
     return textRegistry.getSnapForFile(filename);
   }
 
@@ -174,8 +175,8 @@ class PositiveTest extends ConfigurableTest {
    * @param diagnostics list of diagnostic from the analysis result
    * @param fileName    name of the file that has been tested
    */
-  protected void assertNoSyntaxErrorsFound(List<Diagnostic> diagnostics, String fileName) {
-    assertEquals(0, diagnostics.size(), createErrorMessage(diagnostics, fileName));
+  protected void assertNoSyntaxErrorsFound(List<Diagnostic> diagnostics, Uri fileName) {
+    assertEquals(0, diagnostics.size(), createErrorMessage(diagnostics, fileName.toString()));
   }
 
   private String createErrorMessage(List<Diagnostic> diagnostics, String fileName) {
@@ -206,7 +207,7 @@ class PositiveTest extends ConfigurableTest {
     }
   }
 
-  void assertNoError(String fileName, AnalysisResult analyze) {
+  void assertNoError(Uri fileName, AnalysisResult analyze) {
     List<Diagnostic> diagnostic =
             ofNullable(analyze.getDiagnostics().get(fileName))
                     .map(
@@ -227,15 +228,15 @@ class PositiveTest extends ConfigurableTest {
    * @return List of copybooks
    */
   protected List<CobolText> getTestFileSpecificCopybooks(
-          CobolTextRegistry cobolTextRegistry, String fileName) {
+          CobolTextRegistry cobolTextRegistry, Uri fileName) {
     Stream<CobolText> cobolTextStream =
             getCopybooks(cobolTextRegistry).stream()
                     .filter(
                             book ->
-                                    getCopybooks(cobolTextRegistry, fileName.split("\\.")[0]).stream()
+                                    getCopybooks(cobolTextRegistry, fileName.toString().split("\\.")[0]).stream()
                                             .noneMatch(b1 -> b1.getFileName().equals(book.getFileName())));
     return Stream.concat(
-                    cobolTextStream, getCopybooks(cobolTextRegistry, fileName.split("\\.")[0]).stream())
+                    cobolTextStream, getCopybooks(cobolTextRegistry, fileName.toString().split("\\.")[0]).stream())
             .collect(toList());
   }
 

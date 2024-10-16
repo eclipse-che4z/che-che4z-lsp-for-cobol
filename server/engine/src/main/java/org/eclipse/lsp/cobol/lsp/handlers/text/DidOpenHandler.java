@@ -16,6 +16,7 @@ package org.eclipse.lsp.cobol.lsp.handlers.text;
 
 import com.google.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.lsp.LspNotification;
 import org.eclipse.lsp.cobol.lsp.SourceUnitGraph;
 import org.eclipse.lsp.cobol.lsp.analysis.AsyncAnalysisService;
@@ -46,7 +47,7 @@ public class DidOpenHandler {
    * @param eventSource
    */
   public void didOpen(DidOpenTextDocumentParams params, SourceUnitGraph.EventSource eventSource) {
-    String uri = params.getTextDocument().getUri();
+    Uri uri = Uri.fromLsp(params.getTextDocument().getUri());
     if (!HandlerUtility.isUriSupported(uri)) {
       return;
     }

@@ -28,6 +28,7 @@ import lombok.Singular;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
 import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
 import org.eclipse.lsp.cobol.common.copybook.SQLBackend;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.test.CobolText;
 
 /** Defines all the required data for the test */
@@ -38,7 +39,8 @@ public class UseCase {
   String text;
 
   /** Name of the processing file */
-  @Builder.Default String documentUri = UseCaseUtils.DOCUMENT_URI;
+  @Builder.Default
+  Uri documentUri = UseCaseUtils.DOCUMENT_URI;
 
   /** List of the copybooks need for the analysis */
   @Singular List<CobolText> copybooks;

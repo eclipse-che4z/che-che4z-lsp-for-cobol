@@ -15,7 +15,6 @@
 package org.eclipse.lsp.cobol.service.delegates.references;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 import com.google.common.collect.ImmutableList;
@@ -23,6 +22,7 @@ import java.util.List;
 import java.util.stream.Stream;
 import org.eclipse.lsp.cobol.common.AnalysisResult;
 import org.eclipse.lsp.cobol.common.model.Locality;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.common.model.tree.RootNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableDefinitionNameNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNode;
@@ -39,16 +39,16 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 /** Test {@link ElementOccurrences} */
 class ElementOccurrencesTest {
-  private static final String URI = "uri";
-  private static final String URI2 = "uri2";
+  private static final Uri URI = new Uri("uri");
+  private static final Uri URI2 = new Uri("uri2");
   private static final String ELEMENT_NAME = "foo";
 
   static Stream<Arguments> variousData() {
-    Location definition = new Location(URI, new Range(new Position(1, 2), new Position(2, 5)));
-    Location usage = new Location(URI, new Range(new Position(3, 0), new Position(3, 5)));
+    Location definition = new Location(URI.toString(), new Range(new Position(1, 2), new Position(2, 5)));
+    Location usage = new Location(URI.toString(), new Range(new Position(3, 0), new Position(3, 5)));
 
     Location usageInOtherFile =
-        new Location(URI2, new Range(new Position(3, 0), new Position(3, 5)));
+        new Location(URI2.toString(), new Range(new Position(3, 0), new Position(3, 5)));
     Position insideDefinition = new Position(1, 5);
     Position insideUsage = new Position(3, 1);
     Locality rootLocality =
@@ -58,8 +58,8 @@ class ElementOccurrencesTest {
             .build();
     CopybooksRepository copyBook = new CopybooksRepository();
     copyBook.addUsage(
-        ELEMENT_NAME, null, new Location(URI, new Range(new Position(3, 0), new Position(3, 5))));
-    copyBook.define(ELEMENT_NAME, null, URI, "copybookUri");
+        ELEMENT_NAME, null, new Location(URI.toString(), new Range(new Position(3, 0), new Position(3, 5))));
+    copyBook.define(ELEMENT_NAME, null, URI, new Uri("copybookUri"));
     VariableNode variableNodeInOneFile =
         createDefinitionNode(ELEMENT_NAME, definition.getUri(), definition.getRange());
     VariableUsageNode variableUsageNodeInOneFile =
@@ -157,12 +157,11 @@ class ElementOccurrencesTest {
   @Test
   void simpleCaseOfDefinitionsAndUsages() {
     VariableNode definitionNode =
-        createDefinitionNode(ELEMENT_NAME, URI, new Range(new Position(1, 2), new Position(2, 5)));
+        createDefinitionNode(ELEMENT_NAME, URI.toString(), new Range(new Position(1, 2), new Position(2, 5)));
     Location definition = definitionNode.getLocality().toLocation();
-    CopybooksRepository copyBook = new CopybooksRepository();
     SourceUnitGraph documentGraph = mock(SourceUnitGraph.class);
     VariableUsageNode usageNode =
-        createUsageNode(definitionNode, URI, new Range(new Position(3, 0), new Position(3, 5)));
+        createUsageNode(definitionNode, URI.toString(), new Range(new Position(3, 0), new Position(3, 5)));
     Location usage = usageNode.getLocality().toLocation();
     Position insideUsage = new Position(3, 1);
     RootNode rootNode =
@@ -176,7 +175,7 @@ class ElementOccurrencesTest {
     AnalysisResult analysisResult = AnalysisResult.builder().rootNode(rootNode).build();
     CobolDocumentModel cobolDocumentModel = new CobolDocumentModel(URI, "", analysisResult);
     TextDocumentPositionParams textDocumentPositionParams =
-        new TextDocumentPositionParams(new TextDocumentIdentifier(URI), insideUsage);
+        new TextDocumentPositionParams(new TextDocumentIdentifier(URI.toString()), insideUsage);
     ElementOccurrences elementOccurrences = new ElementOccurrences(documentGraph);
     assertEquals(
         ImmutableList.of(definition),
@@ -193,14 +192,13 @@ class ElementOccurrencesTest {
 
   @Test
   void findHighlights() {
-    CopybooksRepository copybook = new CopybooksRepository();
     SourceUnitGraph documentGraph = mock(SourceUnitGraph.class);
     Range definitionRange = new Range(new Position(1, 2), new Position(2, 5));
-    VariableNode definitionNode = createDefinitionNode(ELEMENT_NAME, URI, definitionRange);
+    VariableNode definitionNode = createDefinitionNode(ELEMENT_NAME, URI.toString(), definitionRange);
     Range usageRange = new Range(new Position(3, 0), new Position(3, 5));
-    VariableUsageNode variableUsageNode = createUsageNode(definitionNode, URI, usageRange);
+    VariableUsageNode variableUsageNode = createUsageNode(definitionNode, URI.toString(), usageRange);
     VariableUsageNode variableUsageNodeInOtherFile =
-        createUsageNode(definitionNode, URI2, new Range(new Position(3, 0), new Position(3, 5)));
+        createUsageNode(definitionNode, URI2.toString(), new Range(new Position(3, 0), new Position(3, 5)));
     Position insideUsage = new Position(3, 1);
     RootNode rootNode =
         new RootNode(
@@ -216,7 +214,7 @@ class ElementOccurrencesTest {
         new ElementOccurrences(documentGraph)
             .findHighlights(
                 analysisResult,
-                new TextDocumentPositionParams(new TextDocumentIdentifier(URI), insideUsage));
+                new TextDocumentPositionParams(new TextDocumentIdentifier(URI.toString()), insideUsage));
     List<DocumentHighlight> expectedHighlights =
         ImmutableList.of(
             new DocumentHighlight(usageRange, DocumentHighlightKind.Text),
@@ -229,19 +227,19 @@ class ElementOccurrencesTest {
   void variousCases(
       AnalysisResult analysisResult, Position position, List<Location> expectedLocations) {
     SourceUnitGraph documentGraph = mock(SourceUnitGraph.class);
-    when(documentGraph.isUserSuppliedCopybook(anyString())).thenReturn(false);
+    when(documentGraph.isUserSuppliedCopybook(any(Uri.class))).thenReturn(false);
     List<Location> actualLocations =
         new ElementOccurrences(documentGraph)
             .findReferences(
                 new CobolDocumentModel(URI, "", analysisResult),
-                new TextDocumentPositionParams(new TextDocumentIdentifier(URI), position),
+                new TextDocumentPositionParams(new TextDocumentIdentifier(URI.toString()), position),
                 new ReferenceContext(false));
     assertEquals(expectedLocations, actualLocations);
   }
 
   private static VariableNode createDefinitionNode(String name, String uri, Range range) {
     VariableNode definitionNode =
-        new MnemonicNameNode(Locality.builder().uri(uri).range(range).build(), "systemName", name);
+        new MnemonicNameNode(Locality.builder().uri(new Uri(uri)).range(range).build(), "systemName", name);
     VariableDefinitionNameNode varNameNode =
         new VariableDefinitionNameNode(definitionNode.getLocality(), name);
     definitionNode.addChild(varNameNode);
@@ -252,7 +250,7 @@ class ElementOccurrencesTest {
       VariableNode variableNode, String uri, Range range) {
     VariableUsageNode usageNode =
         new VariableUsageNode(
-            variableNode.getName(), Locality.builder().uri(uri).range(range).build());
+            variableNode.getName(), Locality.builder().uri(new Uri(uri)).range(range).build());
     variableNode.addUsage(usageNode);
     return usageNode;
   }

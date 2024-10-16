@@ -23,6 +23,7 @@ import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.common.utils.StringUtils;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.Location;
@@ -49,7 +50,7 @@ import static org.antlr.v4.runtime.Lexer.EOF;
  * UseCasePreprocessor.g4
  */
 class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
-  private final Map<String, List<Diagnostic>> diagnostics = new HashMap<>();
+  private final Map<Uri, List<Diagnostic>> diagnostics = new HashMap<>();
   private final Map<String, List<Location>> variableDefinitions = new HashMap<>();
   private final Map<String, List<Location>> variableUsages = new HashMap<>();
   private final Map<String, List<Location>> paragraphDefinitions = new HashMap<>();
@@ -65,7 +66,7 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
 
   private final int[] lineShifts;
   private final CommonTokenStream tokens;
-  private final String documentUri;
+  private final Uri documentUri;
   private final String copybookName;
   private final List<String> subroutineNames;
   private final Map<String, Diagnostic> expectedDiagnostics;
@@ -74,7 +75,7 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
   UseCasePreprocessorListener(
           CommonTokenStream tokens,
           String documentName,
-          String documentUri,
+          Uri documentUri,
           int numberOfLines,
           List<String> subroutineNames,
           Map<String, Diagnostic> expectedDiagnostics,
@@ -383,11 +384,11 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
    * @param uri URI of the copybook
    * @return consumer that turns the given copybook name into a definition using given URI
    */
-  private Consumer<String> defineCopybook(String uri) {
+  private Consumer<String> defineCopybook(Uri uri) {
     return copybookName ->
             copybookDefinitions.put(
                     copybookName.toUpperCase(),
-                    singletonList(new Location(uri, new Range(new Position(), new Position()))));
+                    singletonList(new Location(uri.toString(), new Range(new Position(), new Position()))));
   }
 
   private void processCopybookToken(
@@ -477,7 +478,7 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
   }
 
   private void addTokenLocation(Map<String, List<Location>> storage, String text, Range range) {
-    Location location = new Location(documentUri, range);
+    Location location = new Location(documentUri.toString(), range);
     if (storage.containsKey(text)) {
       storage.get(text).add(location);
     } else {

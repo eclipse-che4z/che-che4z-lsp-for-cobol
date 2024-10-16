@@ -25,6 +25,7 @@ import org.eclipse.lsp.cobol.common.benchmark.BenchmarkSessionProvider;
 import org.eclipse.lsp.cobol.common.dialects.CobolLanguageId;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
 
@@ -39,7 +40,7 @@ public class AnalysisContext implements BenchmarkSessionProvider {
   private final AnalysisConfig config;
   private final List<SyntaxError> accumulatedErrors = new ArrayList<>();
   private final BenchmarkSession benchmarkSession;
-  private final String documentUri;
+  private final Uri documentUri;
   private final String text;
   private final CobolLanguageId languageId;
 
@@ -49,7 +50,7 @@ public class AnalysisContext implements BenchmarkSessionProvider {
   public AnalysisContext(ExtendedDocument extendedDocument,
                          AnalysisConfig config,
                          BenchmarkSession benchmarkSession,
-                         String documentUri,
+                         Uri documentUri,
                          String text,
                          CobolLanguageId languageId) {
     this.extendedDocument = extendedDocument;

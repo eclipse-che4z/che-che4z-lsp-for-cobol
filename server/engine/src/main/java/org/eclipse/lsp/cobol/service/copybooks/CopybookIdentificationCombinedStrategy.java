@@ -17,6 +17,7 @@ package org.eclipse.lsp.cobol.service.copybooks;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
+import org.eclipse.lsp.cobol.common.model.Uri;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -47,7 +48,7 @@ public class CopybookIdentificationCombinedStrategy implements CopybookIdentific
    * @return True if it's a copybook. False otherwise
    */
   @Override
-  public boolean isCopybook(String uri, String text, List<String> config) {
+  public boolean isCopybook(Uri uri, String text, List<String> config) {
     for (CopybookIdentificationService strategy : strategies) {
       if (strategy.isCopybook(uri, text, config)) {
         return true;

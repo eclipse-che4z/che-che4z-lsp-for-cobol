@@ -27,12 +27,13 @@ import java.util.Optional;
 import org.eclipse.lsp.cobol.common.CleanerPreprocessor;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.message.MessageService;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.service.settings.layout.CodeLayoutStore;
 import org.junit.jupiter.api.Test;
 
 /** This test checks multiple comment entries are parsed and cleaned up correctly */
 class TestCommentLines {
-  public static final String DOCUMENT_URI = "file:///c:/workspace/document.cbl";
+  public static final Uri DOCUMENT_URI = new Uri("file:///c:/workspace/document.cbl");
   private static final String TEXT =
       "      * Copyright (c) 2021 Broadcom.\n"
           + "      * The term Broadcom  refers to Broadcom Inc. and/or its subsidiaries.\n"

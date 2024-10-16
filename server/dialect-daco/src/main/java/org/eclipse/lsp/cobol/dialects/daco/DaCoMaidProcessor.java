@@ -40,6 +40,7 @@ import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.model.Locality;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.dialects.daco.nodes.DaCoCopyFromNode;
@@ -137,7 +138,7 @@ public class DaCoMaidProcessor {
 
     Location originalLocation = context.getExtendedDocument().mapLocation(range);
     Locality locality =
-        Locality.builder().uri(originalLocation.getUri()).range(originalLocation.getRange()).build();
+        Locality.builder().uri(new Uri(originalLocation.getUri())).range(originalLocation.getRange()).build();
 
     return new DaCoCopyFromNode(
         locality, prototypeName, newSuffix.orElse(""), Integer.parseInt(copyFrom.group("lvl")));

@@ -18,6 +18,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.common.AnalysisResult;
 import org.eclipse.lsp.cobol.common.copybook.SQLBackend;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.test.engine.UseCase;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.eclipse.lsp.cobol.test.engine.UseCaseUtils;
@@ -130,7 +131,7 @@ public class TestCICSTranslatorOptions {
             .cicsTranslator(false)
             .build();
     AnalysisResult analyze = UseCaseUtils.analyze(useCase);
-    Map<String, List<Diagnostic>> diagnostics = analyze.getDiagnostics();
+    Map<Uri, List<Diagnostic>> diagnostics = analyze.getDiagnostics();
     Assertions.assertEquals(1, diagnostics.get(UseCaseUtils.DOCUMENT_URI).size());
     Assertions.assertEquals(
         "Syntax error on 'XOPTS'",

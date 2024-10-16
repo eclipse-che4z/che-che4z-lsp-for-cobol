@@ -19,6 +19,7 @@ import com.google.common.collect.Multimap;
 import lombok.experimental.UtilityClass;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.NodeType;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
@@ -88,8 +89,8 @@ public class PositiveTestUtility {
       Map<String, SymbolTable> symbolTableMap,
       Map<ReportSection, List<SysprintSnap>> dataNameRefs,
       Node rootNode,
-      String fileName) {
-    if (blacklistedTestFiles.contains(fileName)) return;
+      Uri fileName) {
+    if (blacklistedTestFiles.contains(fileName.toString())) return;
     Multimap<String, Node> variableDefinitionFromLSPEngine = ArrayListMultimap.create();
     Multimap<String, CodeBlockReference> paragraphDefFromLSPEngine = ArrayListMultimap.create();
     Multimap<String, Node> programDefinitionFromLSPEngine = ArrayListMultimap.create();
@@ -117,7 +118,7 @@ public class PositiveTestUtility {
   private void assertPrograms(
       List<SysprintSnap> allProgRef,
       Multimap<String, Node> programDefinitionFromLSPEngine,
-      String fileName) {
+      Uri fileName) {
     allProgRef.forEach(
         prog -> {
           String dataName = prog.getDataName();
@@ -135,7 +136,7 @@ public class PositiveTestUtility {
   private void assertProcedures(
       List<SysprintSnap> sysprintSnaps,
       Multimap<String, CodeBlockReference> paragraphDefFromLSPEngine,
-      String fileName) {
+      Uri fileName) {
     sysprintSnaps.forEach(
         snap -> {
           String dataName = snap.getDataName();
@@ -174,7 +175,7 @@ public class PositiveTestUtility {
   }
 
   private void assertReferencesByProcedures(
-      SysprintSnap snap, List<Location> lspNodes, String fileName) {
+      SysprintSnap snap, List<Location> lspNodes, Uri fileName) {
     List<Integer> referencesFromLSPEngine =
         lspNodes.stream()
             .map(loc -> loc.getRange().getStart().getLine() + 1)
@@ -213,7 +214,7 @@ public class PositiveTestUtility {
   private void assertDataName(
       List<SysprintSnap> dataNameRefs,
       Multimap<String, Node> variableDefinitionFromLSPEngine,
-      String fileName) {
+      Uri fileName) {
     dataNameRefs.forEach(
         snap -> {
           String dataName = snap.getDataName();
@@ -227,7 +228,7 @@ public class PositiveTestUtility {
   }
 
   private void assertSnapRangeReferencesByDataName(
-      SysprintSnap snap, Collection<Node> nodes, String fileName) {
+      SysprintSnap snap, Collection<Node> nodes, Uri fileName) {
     Optional<VariableNode> foundVariableNodeInLSP =
         nodes.stream()
             .filter(node -> snap.getDefinitionLocation().equals(node.getLocality().getRange()))
@@ -281,7 +282,7 @@ public class PositiveTestUtility {
   }
 
   private void assertReferencesByDataName(
-      SysprintSnap snap, Collection<Node> nodes, String fileName) {
+      SysprintSnap snap, Collection<Node> nodes, Uri fileName) {
     Optional<Node> first =
         nodes.stream()
             .filter(
@@ -313,7 +314,7 @@ public class PositiveTestUtility {
               node.getUsages().stream()
                   .flatMap(
                       usage -> {
-                        if (usage.getUri().contains(fileName)) {
+                        if (usage.getUri().contains(fileName.toString())) {
                           return Stream.of(usage.getRange().getStart().getLine() + 1);
                         } else {
                           // seems a copybook
@@ -360,7 +361,7 @@ public class PositiveTestUtility {
                 x.getDepthFirstStream()
                     .filter(n1 -> n1.getNodeType() == NodeType.COPY)
                     .map(CopyNode.class::cast)
-                    .filter(n2 -> n2.getUri().equals(usage.getUri()))
+                    .filter(n2 -> n2.getUri().toString().equals(usage.getUri()))
                     .collect(toList()))
         .orElse(emptyList())
         .stream()

@@ -29,6 +29,7 @@ import org.eclipse.lsp.cobol.common.AnalysisResult;
 import org.eclipse.lsp.cobol.common.LanguageEngineFacade;
 import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
 import org.eclipse.lsp.cobol.common.copybook.CopybookService;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.common.utils.ThreadInterruptionUtil;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookIdentificationService;
 import org.eclipse.lsp.cobol.service.settings.ConfigurationService;
@@ -68,7 +69,7 @@ public class AnalysisService {
    * @return true for copybook and false otherwise
    */
   @SneakyThrows
-  public boolean isCopybook(String uri, String text) {
+  public boolean isCopybook(Uri uri, String text) {
     if (waitConfig.getCount() > 0) {
       LOG.info("Waiting for extension config..");
     }
@@ -93,7 +94,7 @@ public class AnalysisService {
    * @param text Content
    * @param isNew Is document just opened, or it's reanalyse request.
    */
-  public void analyzeDocument(String uri, String text, boolean isNew) {
+  public void analyzeDocument(Uri uri, String text, boolean isNew) {
     String logPrefix = isNew ? "[analyzeDocument] Document " : "[reanalyzeDocument] Document ";
     LOG.debug(logPrefix + uri + " opened");
 
@@ -109,7 +110,7 @@ public class AnalysisService {
    * @param uri - document uri
    * @param text - document text
    */
-  private void analyzeDocumentWithCopybooks(String uri, String text) {
+  private void analyzeDocumentWithCopybooks(Uri uri, String text) {
     try {
       CopybookProcessingMode copybookProcessingMode = CopybookProcessingMode.getCopybookProcessingMode(uri, CopybookProcessingMode.ENABLED);
       AnalysisConfig config = configurationService.getConfig(uri, copybookProcessingMode);

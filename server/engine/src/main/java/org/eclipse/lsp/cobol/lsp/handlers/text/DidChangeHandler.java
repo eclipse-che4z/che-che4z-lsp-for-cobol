@@ -17,6 +17,7 @@ package org.eclipse.lsp.cobol.lsp.handlers.text;
 import com.google.inject.Inject;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.lsp.SourceUnitGraph;
 import org.eclipse.lsp.cobol.lsp.analysis.AsyncAnalysisService;
 import org.eclipse.lsp.cobol.lsp.handlers.HandlerUtility;
@@ -45,14 +46,14 @@ public class DidChangeHandler {
    */
   public void didChange(
       DidChangeTextDocumentParams params, SourceUnitGraph.EventSource eventSource) {
-    String uri = params.getTextDocument().getUri();
+    Uri uri = Uri.fromLsp(params.getTextDocument().getUri());
     if (!HandlerUtility.isUriSupported(uri)) {
       return;
     }
     String text = params.getContentChanges().get(0).getText();
     if (sourceUnitGraph.isUserSuppliedCopybook(uri)) {
       sourceUnitGraph.updateContent(uri, text);
-      List<String> allAssociatedFilesForACopybook = sourceUnitGraph.getAllAssociatedFilesForACopybook(uri);
+      List<Uri> allAssociatedFilesForACopybook = sourceUnitGraph.getAllAssociatedFilesForACopybook(uri);
       asyncAnalysisService.reanalyseCopybooksAssociatedPrograms(allAssociatedFilesForACopybook, uri, text, SourceUnitGraph.EventSource.IDE);
       return;
     }

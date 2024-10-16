@@ -16,6 +16,7 @@ package org.eclipse.lsp.cobol.core.engine.processors;
 
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.SectionType;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.common.model.tree.*;
 import org.eclipse.lsp.cobol.common.model.tree.statements.StatementNode;
 import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
@@ -37,7 +38,7 @@ import static org.mockito.Mockito.mock;
  */
 class RootNodeUpdateCopyNodesByPositionInTreeTest {
 
-  public static final String DOC_URI = "uri";
+  public static final Uri DOC_URI = new Uri("uri");
   public static final String COPYBOOK_NAME = "copybook-A";
 
   @Test
@@ -53,7 +54,7 @@ class RootNodeUpdateCopyNodesByPositionInTreeTest {
                 .range(new Range(new Position(2, 3), new Position(2, COPYBOOK_NAME.length() + 3)))
                 .build(),
             new Location(
-                DOC_URI,
+                DOC_URI.toString(),
                 new Range(new Position(2, 5), new Position(2, COPYBOOK_NAME.length() + 3))),
             COPYBOOK_NAME,
             DOC_URI);

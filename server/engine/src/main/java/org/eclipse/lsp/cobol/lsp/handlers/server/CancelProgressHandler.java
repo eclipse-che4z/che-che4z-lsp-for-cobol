@@ -15,6 +15,7 @@
 package org.eclipse.lsp.cobol.lsp.handlers.server;
 
 import com.google.inject.Inject;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.lsp.analysis.AsyncAnalysisService;
 
 /** LSP `window/workDoneProgress/cancel` Handler */
@@ -31,7 +32,7 @@ public class CancelProgressHandler {
    * @param uri
    * @throws InterruptedException
    */
-  public void cancel(String uri) throws InterruptedException {
+  public void cancel(Uri uri) throws InterruptedException {
     asyncAnalysisService.cancelAnalysis(uri);
   }
 }

@@ -221,7 +221,7 @@ public class DialectService {
         .location(
             new OriginalLocation(
                 new Location(
-                    context.getProgramDocumentUri(),
+                    context.getProgramDocumentUri().toString(),
                     new Range(new Position(0, 0), new Position(0, 0))),
                 null))
         .errorSource(ErrorSource.DIALECT)

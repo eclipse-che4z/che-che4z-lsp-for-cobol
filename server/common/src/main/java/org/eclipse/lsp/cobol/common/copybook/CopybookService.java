@@ -19,6 +19,7 @@ import java.util.Set;
 import lombok.NonNull;
 import org.eclipse.lsp.cobol.common.CleanerPreprocessor;
 import org.eclipse.lsp.cobol.common.ResultWithErrors;
+import org.eclipse.lsp.cobol.common.model.Uri;
 
 /**
  * Provide API definition to search for copybooks files. The service also caches copybook to reduce
@@ -46,8 +47,8 @@ public interface CopybookService {
   ResultWithErrors<CopybookModel> resolve(
           @NonNull CopybookId copybookId,
           @NonNull CopybookName copybookName,
-          @NonNull String programDocumentUri,
-          @NonNull String documentUri,
+          @NonNull Uri programDocumentUri,
+          @NonNull Uri documentUri,
           CleanerPreprocessor preprocessor);
 
   /**
@@ -72,7 +73,7 @@ public interface CopybookService {
    * @param copybookUris collection of copybook uris.
    * @param processingMode copybook processing mode.
    */
-  void sendCopybookDownloadRequest(String documentUri, Collection<String> copybookUris, CopybookProcessingMode processingMode);
+  void sendCopybookDownloadRequest(Uri documentUri, Collection<Uri> copybookUris, CopybookProcessingMode processingMode);
 
   /**
    * Get the list of copybook used by a document
@@ -80,6 +81,6 @@ public interface CopybookService {
    * @param documentUri  current document uri.
    * @return Set of all the {@link CopybookModel} used by the passed document
    */
-  Set<CopybookModel> getCopybookUsage(String documentUri);
+  Set<CopybookModel> getCopybookUsage(Uri documentUri);
 
 }

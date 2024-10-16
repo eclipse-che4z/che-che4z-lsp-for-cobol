@@ -36,10 +36,10 @@ class ReplaceMapper implements Mapper {
       }
       if (endCharacter.getOriginalPosition() != null) {
         Range calculatedRange = new Range(startCharacter.getInstantLocation().getRange().getStart(), endCharacter.getOriginalPosition());
-        return new Location(startCharacter.getUri(), calculatedRange);
+        return new Location(startCharacter.getUri().toString(), calculatedRange);
       } else if (startCharacter.getOriginalPosition() != null) {
         Range calculatedRange = new Range(startCharacter.getOriginalPosition(), endCharacter.getInstantLocation().getRange().getEnd());
-        return new Location(startCharacter.getUri(), calculatedRange);
+        return new Location(startCharacter.getUri().toString(), calculatedRange);
       }
       return Optional.ofNullable(startCharacter.getInstantLocation()).orElse(endCharacter.getInstantLocation());
     }

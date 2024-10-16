@@ -32,10 +32,10 @@ import org.eclipse.lsp4j.Range;
 public class CopyNode extends Node implements DefinedAndUsedStructure {
   private final String name;
   @EqualsAndHashCode.Exclude @ToString.Exclude private final Location nameLocation;
-  private final String uri;
+  private final Uri uri;
   private final List<Location> usages = new LinkedList<>();
 
-  public CopyNode(Locality statementLocality, Location nameLocation, String copyBookName, String uri) {
+  public CopyNode(Locality statementLocality, Location nameLocation, String copyBookName, Uri uri) {
     super(statementLocality, NodeType.COPY);
     this.name = copyBookName;
     this.nameLocation = nameLocation;
@@ -43,7 +43,7 @@ public class CopyNode extends Node implements DefinedAndUsedStructure {
     usages.add(nameLocation);
   }
 
-  public CopyNode(Locality statementLocality, Location nameLocation, String copyBookName, String dialect, String uri) {
+  public CopyNode(Locality statementLocality, Location nameLocation, String copyBookName, String dialect, Uri uri) {
     super(statementLocality, NodeType.COPY, dialect);
     this.name = copyBookName;
     this.nameLocation = nameLocation;
@@ -54,7 +54,7 @@ public class CopyNode extends Node implements DefinedAndUsedStructure {
   @Override
   public List<Location> getDefinitions() {
     return Optional.ofNullable(uri)
-        .map(u -> ImmutableList.of(new Location(u, new Range(new Position(), new Position()))))
+        .map(u -> ImmutableList.of(new Location(u.toString(), new Range(new Position(), new Position()))))
         .orElse(ImmutableList.of());
   }
 

@@ -22,6 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.common.copybook.CopybookName;
 import org.eclipse.lsp.cobol.common.copybook.CopybookService;
 import org.eclipse.lsp.cobol.common.file.FileSystemService;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.lsp.jrpc.CobolLanguageClient;
 import org.eclipse.lsp.cobol.service.settings.SettingsService;
 import org.eclipse.lsp4j.WorkspaceFolder;
@@ -71,20 +72,20 @@ public class CopybookNameServiceImpl implements CopybookNameService {
   }
 
   @Override
-  public List<CopybookName> getNames(String uri) {
+  public List<CopybookName> getNames(Uri uri) {
     List<CopybookName> copybookNamesList = createCopybookNamesList(uri, n -> true);
     return ImmutableList.copyOf(copybookNamesList);
   }
 
   @Override
-  public Optional<CopybookName> findByName(String uri, final String displayName) {
+  public Optional<CopybookName> findByName(Uri uri, final String displayName) {
     List<CopybookName> copybookNamesList = createCopybookNamesList(uri,
             copybookName -> displayName.equalsIgnoreCase(copybookName.getDisplayName()));
     return copybookNamesList.isEmpty() ? Optional.empty() : Optional.of(copybookNamesList.get(0));
   }
 
   @Override
-  public CompletableFuture<List<String>> copybookLocalFolders(String documentUri) {
+  public CompletableFuture<List<String>> copybookLocalFolders(Uri documentUri) {
     List<CompletableFuture<List<String>>> copybookLocalFolders = new ArrayList<>();
     copybookLocalFolders.add(
             settingsService.fetchTextConfigurationWithScope(documentUri, CPY_LOCAL_PATHS.label));
@@ -107,14 +108,15 @@ public class CopybookNameServiceImpl implements CopybookNameService {
     // TODO cache invalidation if we will have cache
   }
 
-  private String extractProgramName(@Nullable String uri) {
+  // FIXME: move into URI?
+  private String extractProgramName(@Nullable Uri uri) {
     if (uri == null) {
       return null;
     }
-    int lastSegment = uri.lastIndexOf("/");
-    String programName = uri;
+    int lastSegment = uri.toString().lastIndexOf("/");
+    String programName = uri.toString();
     if (lastSegment >= 0) {
-      programName = uri.substring(lastSegment + 1);
+      programName = uri.toString().substring(lastSegment + 1);
     }
     int lastDot = programName.lastIndexOf(".");
     if (lastDot >= 0) {
@@ -177,7 +179,7 @@ public class CopybookNameServiceImpl implements CopybookNameService {
           final List<WorkspaceFolder> workspaces,
           final String copybookPath) {
     return Optional.ofNullable(workspaces).orElse(emptyList()).stream()
-            .map(workspace -> files.getPathFromURI(workspace.getUri()))
+            .map(workspace -> new Uri(workspace.getUri()).getPath())
             .map(workspacePath -> {
               String copybookFinalPath = Paths.get(copybookPath.replace("*", "tmp")).isAbsolute() ? copybookPath
                       : String.join("/",
@@ -190,7 +192,7 @@ public class CopybookNameServiceImpl implements CopybookNameService {
             .collect(Collectors.toList());
   }
 
-  private List<CopybookName> createCopybookNamesList(String uri, Predicate<CopybookName> predicate) {
+  private List<CopybookName> createCopybookNamesList(Uri uri, Predicate<CopybookName> predicate) {
     CobolLanguageClient cobolLanguageClient = clientProvider.get();
     CompletableFuture<List<WorkspaceFolder>> copybookWorkspaces = cobolLanguageClient.workspaceFolders();
     CompletableFuture<List<String>> copybooksExtensions = settingsService.fetchTextConfigurationWithScope(uri, CPY_EXTENSIONS.label);

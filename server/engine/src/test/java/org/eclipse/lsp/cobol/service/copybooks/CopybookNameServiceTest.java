@@ -38,6 +38,7 @@ import java.util.stream.Stream;
 
 import org.apache.commons.io.FileSystem;
 import org.eclipse.lsp.cobol.common.copybook.CopybookName;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.lsp.jrpc.CobolLanguageClient;
 import org.eclipse.lsp.cobol.service.settings.SettingsService;
 import org.eclipse.lsp.cobol.common.file.FileSystemService;
@@ -162,7 +163,7 @@ class CopybookNameServiceTest {
   ) {
 
     validFoldersMock();
-    when(settingsService.fetchTextConfigurationWithScope(anyString(),
+    when(settingsService.fetchTextConfigurationWithScope(any(Uri.class),
             eq(CPY_EXTENSIONS.label))).thenReturn(CompletableFuture.completedFuture(extensionsInConfig));
     when(files.listFilesInDirectory(anyString())).thenReturn(Collections.emptyList());
     when(files.listFilesInDirectory(anyString())).thenReturn(Arrays.asList("A.CPY", "A.COPY", "A.cpy", "A.copy", "A"));
@@ -171,7 +172,7 @@ class CopybookNameServiceTest {
             new CopybookNameServiceImpl(settingsService, files, provider);
     copybookNameService.collectLocalCopybookNames();
 
-    assertEquals(copybookFound, copybookNameService.findByName("", "A"));
+    assertEquals(copybookFound, copybookNameService.findByName(new Uri(""), "A"));
 
   }
 
@@ -187,14 +188,14 @@ class CopybookNameServiceTest {
           int expectedCopybookFound
   ) {
     validFoldersMock();
-    when(settingsService.fetchTextConfigurationWithScope(anyString(),
+    when(settingsService.fetchTextConfigurationWithScope(any(Uri.class),
             eq(CPY_EXTENSIONS.label))).thenReturn(CompletableFuture.completedFuture(extensionsInCofig));
     when(files.listFilesInDirectory(absoluteValidCpyPath)).thenReturn(filesInCopybookDirectory);
 
     CopybookNameService copybookNameService =
             new CopybookNameServiceImpl(settingsService, files, provider);
 
-    assertEquals(expectedCopybookFound, copybookNameService.getNames("/TEST/MY.CBL").size());
+    assertEquals(expectedCopybookFound, copybookNameService.getNames(new Uri("/TEST/MY.CBL")).size());
   }
 
   @Test
@@ -202,22 +203,19 @@ class CopybookNameServiceTest {
     CopybookNameService copybookNameService =
             new CopybookNameServiceImpl(settingsService, files, provider);
     when(client.workspaceFolders()).thenReturn(CompletableFuture.completedFuture(null));
-    when(settingsService.fetchTextConfigurationWithScope(anyString(), eq(CPY_EXTENSIONS.label)))
+    when(settingsService.fetchTextConfigurationWithScope(any(Uri.class), eq(CPY_EXTENSIONS.label)))
             .thenReturn(CompletableFuture.completedFuture(Collections.singletonList("cpy")));
     when(settingsService.fetchConfigurations(any(), any())).thenReturn(CompletableFuture.completedFuture(ImmutableList.of()));
     when(files.decodeURI(absoluteValidCpyPath)).thenReturn(null);
-    when(files.getPathFromURI(absoluteValidCpyPath)).thenReturn(null);
     when(cpyPath.resolve(absoluteValidCpyPath)).thenReturn(null);
 
     copybookNameService.collectLocalCopybookNames();
-    assertEquals(0, copybookNameService.getNames("").size());
+    assertEquals(0, copybookNameService.getNames(new Uri("")).size());
   }
 
   private void validFoldersMock() {
     when(wrkPath.toUri()).thenReturn(URI.create(workspaceProgramPath));
     when(cpyPath.toUri()).thenReturn(URI.create(absoluteValidCpyPath));
-
-    when(files.getPathFromURI(workspaceProgramUri)).thenReturn(wrkPath);
 
     when(files.fileExists(wrkPath)).thenReturn(true);
     when(files.fileExists(cpyPath)).thenReturn(true);

@@ -16,9 +16,11 @@ package org.eclipse.lsp.cobol.implicitDialects.cics.utility;
 
 import lombok.experimental.UtilityClass;
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.model.Locality;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
@@ -37,7 +39,7 @@ public class VisitorUtility {
    */
   public Locality constructLocality(ParserRuleContext ctx, DialectProcessingContext context) {
     Location location = context.getExtendedDocument().mapLocation(constructRange(ctx));
-    return Locality.builder().uri(location.getUri()).range(location.getRange()).build();
+    return Locality.builder().uri(new Uri(location.getUri())).range(location.getRange()).build();
   }
 
   /**
@@ -48,8 +50,8 @@ public class VisitorUtility {
    * @return locality
    */
   public Locality constructLocality(TerminalNode node, DialectProcessingContext context) {
-    Location location = context.getExtendedDocument().mapLocation(constructRange(node));
-    return Locality.builder().uri(location.getUri()).range(location.getRange()).build();
+    Location location = context.getExtendedDocument().mapLocation(constructRange(node.getSymbol()));
+    return Locality.builder().uri(new Uri(location.getUri())).range(location.getRange()).build();
   }
 
   /**
@@ -75,13 +77,13 @@ public class VisitorUtility {
    * @param token
    * @return range
    */
-  public Range constructRange(TerminalNode token) {
-    int line = token.getSymbol().getLine();
-    int inLine = token.getSymbol().getCharPositionInLine();
+  public Range constructRange(Token token) {
+    int line = token.getLine();
+    int inLine = token.getCharPositionInLine();
     return new Range(
         new Position(line - 1, inLine),
         new Position(
             line - 1,
-            inLine + token.getSymbol().getStopIndex() - token.getSymbol().getStartIndex() + 1));
+            inLine + token.getStopIndex() - token.getStartIndex() + 1));
   }
 }

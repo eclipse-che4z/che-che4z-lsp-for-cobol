@@ -18,6 +18,7 @@ import org.antlr.v4.runtime.CommonToken;
 import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.Recognizer;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -38,7 +39,7 @@ class DialectParserListenerTest {
 
   @BeforeEach
   void init() {
-    service = new DialectParserListener("uri");
+    service = new DialectParserListener(new Uri("uri"));
   }
 
   @Test

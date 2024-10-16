@@ -19,6 +19,7 @@ import com.google.inject.Inject;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.lsp.LspEventDependency;
 import org.eclipse.lsp.cobol.lsp.LspQuery;
 import org.eclipse.lsp.cobol.lsp.SourceUnitGraph;
@@ -56,7 +57,7 @@ public class HoverHandler {
    * @throws InterruptedException forward exception.
    */
   public Hover hover(HoverParams params) throws ExecutionException, InterruptedException {
-    String uri = params.getTextDocument().getUri();
+    Uri uri = Uri.fromLsp(params.getTextDocument().getUri());
     for (HoverProvider provider : hoverProvider) {
       Hover hover = provider.getHover(documentModelService.get(uri), params, documentGraph);
       if (hover != null) {
@@ -83,6 +84,6 @@ public class HoverHandler {
    */
   public ImmutableList<LspEventDependency> getDependencies(HoverParams params) {
     return ImmutableList.of(
-            asyncAnalysisService.createDependencyOn(params.getTextDocument().getUri()));
+            asyncAnalysisService.createDependencyOn(Uri.fromLsp(params.getTextDocument().getUri())));
   }
 }

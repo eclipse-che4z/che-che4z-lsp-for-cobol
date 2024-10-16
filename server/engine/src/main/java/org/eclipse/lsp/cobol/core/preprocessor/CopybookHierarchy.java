@@ -21,6 +21,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp.cobol.common.copybook.CopybookName;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.core.model.CopyStatementModifier;
 import org.eclipse.lsp.cobol.core.model.CopybookUsage;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.replacement.ReplaceData;
@@ -93,7 +94,7 @@ public class CopybookHierarchy {
    * @param uri The url of original document
    * @param range   a range to replace text in
    */
-  public void addTextReplacing(Pair<String, String> pattern, String uri, Range range) {
+  public void addTextReplacing(Pair<String, String> pattern, Uri uri, Range range) {
     ReplaceData data = textReplacing.peek();
     if (data != null && getLastTextReplacing().getRange(uri) == range) {
       data.getReplacePatterns().add(pattern);
@@ -129,7 +130,7 @@ public class CopybookHierarchy {
   /** Move all the copy replacing clauses to the recursive replacement stack
    * @param uri document uri
    */
-  public void prepareCopybookReplacement(String uri) {
+  public void prepareCopybookReplacement(Uri uri) {
     if (!copyReplacingClauses.isEmpty()) {
       recursiveReplaceStmtStack.add(new ReplaceData(new ArrayList<>(copyReplacingClauses), uri, new Range()));
       copyReplacingClauses.clear();

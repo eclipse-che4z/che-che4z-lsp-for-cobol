@@ -30,6 +30,7 @@ import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.SectionType;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.common.model.tree.DivisionNode;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.model.tree.SectionNode;
@@ -271,8 +272,8 @@ public class CobolDataDivisionVisitor extends CobolDataDivisionParserBaseVisitor
   private Locality locationToLocality(Location location) {
     return Locality.builder()
             .range(location.getRange())
-            .uri(location.getUri())
-            .copybookId(copybooks.getCopybookIdByUri(location.getUri()))
+            .uri(new Uri(location.getUri()))
+            .copybookId(copybooks.getCopybookIdByUri(new Uri(location.getUri())))
             .build();
   }
 

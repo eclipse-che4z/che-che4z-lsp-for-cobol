@@ -1843,8 +1843,8 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   private Locality locationToLocality(Location location) {
     return Locality.builder()
             .range(location.getRange())
-            .uri(location.getUri())
-            .copybookId(copybooks.getCopybookIdByUri(location.getUri()))
+            .uri(new Uri(location.getUri()))
+            .copybookId(copybooks.getCopybookIdByUri(new Uri(location.getUri())))
             .build();
   }
 

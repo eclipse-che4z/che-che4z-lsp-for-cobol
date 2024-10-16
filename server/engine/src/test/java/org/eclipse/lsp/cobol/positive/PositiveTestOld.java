@@ -17,6 +17,7 @@ package org.eclipse.lsp.cobol.positive;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
 import org.eclipse.lsp.cobol.common.AnalysisResult;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.test.CobolText;
 import org.eclipse.lsp.cobol.test.engine.UseCase;
 import org.eclipse.lsp.cobol.test.engine.UseCaseUtils;
@@ -55,7 +56,7 @@ class PositiveTestOld extends FileBasedTest {
       if (text == null) {
         return;
       }
-      String fileName = text.getFileName();
+      Uri fileName = new Uri(text.getFileName());
       Map<ReportSection, List<SysprintSnap>> dataNameRefs =
           getDataNameRefs(fileName, cobolTextRegistry);
       LOG.debug("Processing: " + fileName);

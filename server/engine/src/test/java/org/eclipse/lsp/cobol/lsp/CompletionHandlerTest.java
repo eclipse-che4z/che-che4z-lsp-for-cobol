@@ -17,6 +17,8 @@ package org.eclipse.lsp.cobol.lsp;
 import static org.mockito.Mockito.*;
 
 import java.util.concurrent.ExecutionException;
+
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.lsp.analysis.AsyncAnalysisService;
 import org.eclipse.lsp.cobol.lsp.handlers.text.CompletionHandler;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
@@ -37,7 +39,7 @@ class CompletionHandlerTest {
     AsyncAnalysisService asyncAnalysisService = mock(AsyncAnalysisService.class);
     Completions completions = mock(Completions.class);
     DocumentModelService documentModelService = mock((DocumentModelService.class));
-    when(documentModelService.get(uri)).thenReturn(document);
+    when(documentModelService.get(new Uri(uri))).thenReturn(document);
     CompletionHandler completionHandler = new CompletionHandler(asyncAnalysisService, completions, documentModelService);
     CompletionParams params = mock(CompletionParams.class);
     TextDocumentIdentifier textDocument = mock(TextDocumentIdentifier.class);
@@ -46,7 +48,7 @@ class CompletionHandlerTest {
 
     completionHandler.completion(params);
 
-    verify(documentModelService).get(uri);
+    verify(documentModelService).get(new Uri(uri));
     verify(completions).collectFor(document, params);
   }
 }

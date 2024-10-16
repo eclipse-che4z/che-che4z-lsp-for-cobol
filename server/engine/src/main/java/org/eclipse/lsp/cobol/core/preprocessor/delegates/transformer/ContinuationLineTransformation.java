@@ -30,6 +30,7 @@ import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.model.Locality;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.core.model.CobolLineTypeEnum;
 import org.eclipse.lsp.cobol.core.preprocessor.CobolLine;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.reader.CompilerDirectives;
@@ -62,7 +63,7 @@ public abstract class ContinuationLineTransformation implements CobolLinesTransf
 
   @Override
   public ResultWithErrors<List<CobolLine>> transformLines(
-      String documentURI, List<CobolLine> lines) {
+          Uri documentURI, List<CobolLine> lines) {
     List<CobolLine> result = new ArrayList<>();
     List<SyntaxError> errors = new ArrayList<>();
       for (int i = 0; i < lines.size(); i++) {
@@ -82,7 +83,7 @@ public abstract class ContinuationLineTransformation implements CobolLinesTransf
    * doesn't end correctly.
    */
   private SyntaxError checkInvalidIndexOfInlineComment(
-      String uri, int lineNumber, CobolLine currentCobolLine) {
+      Uri uri, int lineNumber, CobolLine currentCobolLine) {
     if (isBlankLine(currentCobolLine) || isCommentLine(currentCobolLine)) return null;
 
     Integer invalidIndexOfInlineComment = getInvalidIndexOfInlineComment(currentCobolLine);
@@ -97,7 +98,7 @@ public abstract class ContinuationLineTransformation implements CobolLinesTransf
    *
    * @return a SyntaxError if there is a continuation line error or null if not
    */
-  private SyntaxError checkContinuationLine(String uri, int lineNumber, CobolLine cobolLine) {
+  private SyntaxError checkContinuationLine(Uri uri, int lineNumber, CobolLine cobolLine) {
     if (CobolLineTypeEnum.CONTINUATION.equals(cobolLine.getType())) {
 
       adjustBlankOrCommentLines(cobolLine);
@@ -116,7 +117,7 @@ public abstract class ContinuationLineTransformation implements CobolLinesTransf
   }
 
   private SyntaxError checkCompilerDirectiveContinued(
-      CobolLine cobolLine, String uri, int lineNumber) {
+      CobolLine cobolLine, Uri uri, int lineNumber) {
     if (isCompilerDirectiveStatement(cobolLine)) {
       CobolProgramLayout codeLayout = getCodeLayout();
       return SyntaxError.syntaxError()
@@ -191,7 +192,7 @@ public abstract class ContinuationLineTransformation implements CobolLinesTransf
    * @return error if found or null
    */
   private SyntaxError checkContentAreaAWithContinuationLine(
-      CobolLine cobolLine, String uri, int lineNumber) {
+      CobolLine cobolLine, Uri uri, int lineNumber) {
     if (cobolLine.getType() == CobolLineTypeEnum.CONTINUATION
         && !StringUtils.isBlank(cobolLine.getContentAreaA())) {
       return registerContinuationLineError(
@@ -209,7 +210,7 @@ public abstract class ContinuationLineTransformation implements CobolLinesTransf
     return spaces;
   }
 
-  private SyntaxError registerContinuationLineError(String uri, int lineNumber, int countingSpace) {
+  private SyntaxError registerContinuationLineError(Uri uri, int lineNumber, int countingSpace) {
     CobolProgramLayout codeLayout = getCodeLayout();
     int startPosition =
         codeLayout.getSequenceLength() + codeLayout.getIndicatorLength() + countingSpace;
@@ -258,7 +259,7 @@ public abstract class ContinuationLineTransformation implements CobolLinesTransf
   }
 
   private SyntaxError registerInlineCommentError(
-      String uri, int lineNumber, Integer invalidIndexOfInlineComment) {
+      Uri uri, int lineNumber, Integer invalidIndexOfInlineComment) {
     return SyntaxError.syntaxError()
         .errorSource(ErrorSource.PREPROCESSING)
         .location(

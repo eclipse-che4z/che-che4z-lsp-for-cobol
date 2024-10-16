@@ -93,7 +93,7 @@ class WorkspaceServiceTest {
                 ErrorCodes.MISSING_COPYBOOK.getLabel(),
                 ImmutableList.of(
                     new JsonPrimitive(copybookName),
-                    new JsonPrimitive(UseCaseUtils.DOCUMENT_URI))));
+                    new JsonPrimitive(UseCaseUtils.DOCUMENT_URI.toString()))));
     waitingQuery(lspMessageBroker).join();
     lspMessageBroker.stop();
     try {

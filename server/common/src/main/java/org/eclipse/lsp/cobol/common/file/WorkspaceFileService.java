@@ -35,6 +35,7 @@ import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.common.utils.ImplicitCodeUtils;
 
 /**
@@ -64,12 +65,6 @@ public class WorkspaceFileService implements FileSystemService {
 
   @Nullable
   @Override
-  public String getNameFromURI(@NonNull String uri) {
-    return new File(uri).getName().replaceFirst("\\?.*$", "");
-  }
-
-  @Nullable
-  @Override
   public String getContentByPath(@NonNull Path path) {
     CharsetDecoder decoder = StandardCharsets.UTF_8.newDecoder();
     decoder.onMalformedInput(CodingErrorAction.REPLACE);
@@ -85,22 +80,6 @@ public class WorkspaceFileService implements FileSystemService {
       return sb.toString();
     } catch (IOException e) {
       LOG.error("Cannot get content of: {}", path, e);
-      return null;
-    }
-  }
-
-  @Override
-  @Nullable
-  public Path getPathFromURI(@NonNull String uri) {
-    try {
-      String decodedUri = uri.replace(" ", "%20");
-      Path path = Paths.get(new URI(decodedUri).normalize());
-      if (path.startsWith("\\") || path.startsWith("/")) {
-        path = Paths.get(new URI(decodedUri).getPath()); //
-      }
-      return path;
-    } catch (URISyntaxException e) {
-      LOG.error("Cannot find file by given URI: {}", uri, e);
       return null;
     }
   }

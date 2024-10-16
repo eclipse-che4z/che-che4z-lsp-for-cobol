@@ -29,6 +29,6 @@ class StraightforwardMapper implements Mapper {
     Position endPosition = new Position(endCharacter.getOriginalPosition().getLine(), endCharacter.getOriginalPosition().getCharacter());
 
     Range originalRange = new Range(startPosition, endPosition);
-    return new Location(startCharacter.getUri(), originalRange);
+    return new Location(startCharacter.getUri().toString(), originalRange);
   }
 }

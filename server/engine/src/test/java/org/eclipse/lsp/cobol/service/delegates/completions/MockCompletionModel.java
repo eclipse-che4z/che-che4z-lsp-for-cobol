@@ -17,6 +17,7 @@ package org.eclipse.lsp.cobol.service.delegates.completions;
 
 import com.google.common.collect.ImmutableList;
 import org.eclipse.lsp.cobol.common.model.Locality;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
 import org.eclipse.lsp.cobol.common.model.tree.ProgramSubtype;
@@ -36,7 +37,7 @@ class MockCompletionModel {
       AnalysisResult.builder()
           .rootNode(new RootNode())
           .build();
-  static final CobolDocumentModel MODEL = new CobolDocumentModel("", "some text", RESULT);
+  static final CobolDocumentModel MODEL = new CobolDocumentModel(new Uri(""), "some text", RESULT);
   static final SymbolAccumulatorService SYMBOL_SERVICE = new SymbolAccumulatorService();
   static final SymbolsRepository REPO = new SymbolsRepository();
 
@@ -71,7 +72,7 @@ class MockCompletionModel {
     ImmutableList.of("cpyU1", "CpyU2", "Not-cpyU")
         .forEach(
             name -> {
-              CopyNode nameNode = new CopyNode(Locality.builder().build(), Locality.builder().build().toLocation(), name, "uri");
+              CopyNode nameNode = new CopyNode(Locality.builder().build(), Locality.builder().build().toLocation(), name, new Uri("uri"));
               rootNode.addChild(nameNode);
             });
       REPO.updateSymbols(SYMBOL_SERVICE.getProgramSymbols());

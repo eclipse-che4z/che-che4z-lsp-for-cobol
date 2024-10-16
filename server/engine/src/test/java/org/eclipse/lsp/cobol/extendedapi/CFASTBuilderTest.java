@@ -27,6 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.cfg.CFASTBuilder;
 import org.eclipse.lsp.cobol.cfg.CFASTBuilderImpl;
 import org.eclipse.lsp.cobol.common.AnalysisResult;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.test.engine.UseCase;
 import org.eclipse.lsp.cobol.test.engine.UseCaseUtils;
 import org.junit.jupiter.api.Assertions;
@@ -62,7 +63,7 @@ class CFASTBuilderTest {
     AnalysisResult analysisResult =
         UseCaseUtils.analyze(
             UseCase.builder()
-                .documentUri("fake/path")
+                .documentUri(new Uri("fake/path"))
                 .text(src)
                 .build());
     CFASTBuilder builder = new CFASTBuilderImpl();

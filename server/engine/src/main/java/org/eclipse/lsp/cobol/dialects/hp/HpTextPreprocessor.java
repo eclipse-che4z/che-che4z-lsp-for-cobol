@@ -21,6 +21,7 @@ import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedText;
 import org.eclipse.lsp.cobol.common.message.MessageService;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.core.preprocessor.CobolLine;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.reader.CobolLineReader;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.rewriter.CobolLineReWriter;
@@ -51,7 +52,7 @@ class HpTextPreprocessor implements CleanerPreprocessor {
   }
 
   @Override
-  public ResultWithErrors<ExtendedText> cleanUpCode(String documentUri, String cobolCode) {
+  public ResultWithErrors<ExtendedText> cleanUpCode(Uri documentUri, String cobolCode) {
     List<SyntaxError> errors = new ArrayList<>();
     List<CobolLine> lines = reader.processLines(documentUri, cobolCode).unwrap(errors::addAll);
     List<CobolLine> transformedLines = transformation.transformLines(documentUri, lines).unwrap(errors::addAll);

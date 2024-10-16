@@ -119,12 +119,12 @@ public class ClientServerIntegrationTest extends ConfigurableTest {
     assertEquals(0, stateService.getExitCode());
 
     CodeActionParams params =
-        new CodeActionParams(new TextDocumentIdentifier(DOCUMENT_URI), new Range(), new CodeActionContext());
+        new CodeActionParams(new TextDocumentIdentifier(DOCUMENT_URI.toString()), new Range(), new CodeActionContext());
     CompletionParams completionParams =
-        new CompletionParams(new TextDocumentIdentifier(DOCUMENT_URI), new Position(0, 8));
+        new CompletionParams(new TextDocumentIdentifier(DOCUMENT_URI.toString()), new Position(0, 8));
 
     Position position = new Position(0, 2);
-    TextDocumentIdentifier testTextDocumentIdentifier = new TextDocumentIdentifier(DOCUMENT_URI);
+    TextDocumentIdentifier testTextDocumentIdentifier = new TextDocumentIdentifier(DOCUMENT_URI.toString());
     DocumentHighlightParams documentHighlightParams =
             new DocumentHighlightParams(testTextDocumentIdentifier, position);
     DefinitionParams definitionParams = new DefinitionParams(testTextDocumentIdentifier, position);
@@ -148,9 +148,9 @@ public class ClientServerIntegrationTest extends ConfigurableTest {
     textEdits.add(new TextDocumentContentChangeEvent(INCORRECT_TEXT_EXAMPLE));
     service.didChange(
         new DidChangeTextDocumentParams(
-            new VersionedTextDocumentIdentifier(DOCUMENT_URI, 0), textEdits));
+            new VersionedTextDocumentIdentifier(DOCUMENT_URI.toString(), 0), textEdits));
 
-    service.didClose(new DidCloseTextDocumentParams(new TextDocumentIdentifier(DOCUMENT_URI)));
+    service.didClose(new DidCloseTextDocumentParams(new TextDocumentIdentifier(DOCUMENT_URI.toString())));
 
     stateService.revokeShutdown();
     assertEquals(1, stateService.getExitCode());
@@ -171,7 +171,7 @@ public class ClientServerIntegrationTest extends ConfigurableTest {
     lspEventConsumer.startConsumer();
 
     textService.didOpen(
-        new DidOpenTextDocumentParams(new TextDocumentItem(DOCUMENT_URI, LANGUAGE, 1, TEXT)));
+        new DidOpenTextDocumentParams(new TextDocumentItem(DOCUMENT_URI.toString(), LANGUAGE, 1, TEXT)));
     List<? extends Location> locations = invokeReferencesRequest(TEST_COPYBOOK1, true, textService);
     CompletableFuture<List<Either<Command, CodeAction>>> waitingQuery = waitingQuery(lspMessageBroker);
     waitingQuery.join();
@@ -195,7 +195,7 @@ public class ClientServerIntegrationTest extends ConfigurableTest {
     analysisService.setExtensionConfig(ImmutableList.of());
     CompletableFuture<List<Either<Command, CodeAction>>> waitingQuery = waitingQuery(lspMessageBroker);
     textService.didOpen(
-        new DidOpenTextDocumentParams(new TextDocumentItem(DOCUMENT_URI, LANGUAGE, 1, TEXT)));
+        new DidOpenTextDocumentParams(new TextDocumentItem(DOCUMENT_URI.toString(), LANGUAGE, 1, TEXT)));
     List<? extends Location> locations = invokeReferencesRequest(TEST_COPYBOOK2, true, textService);
     waitingQuery.join();
     lspMessageBroker.stop();
@@ -232,7 +232,7 @@ public class ClientServerIntegrationTest extends ConfigurableTest {
       throws ExecutionException, InterruptedException {
     ReferenceParams referenceParams = new ReferenceParams(new ReferenceContext(includeDeclaration));
     referenceParams.setPosition(position);
-    referenceParams.setTextDocument(new TextDocumentIdentifier(DOCUMENT_URI));
+    referenceParams.setTextDocument(new TextDocumentIdentifier(DOCUMENT_URI.toString()));
     return textService.references(referenceParams).get();
   }
 

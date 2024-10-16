@@ -15,6 +15,7 @@
 package org.eclipse.lsp.cobol.service.settings;
 
 import com.google.inject.Provider;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.lsp.jrpc.CobolLanguageClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -69,7 +70,7 @@ class SettingsServiceImplTest {
     void testFetchTextConfigurationWithScope() {
         when(clientProvider.get()).thenReturn(mock(CobolLanguageClient.class));
         when(clientProvider.get().configuration(any())).thenReturn(CompletableFuture.completedFuture(Arrays.asList(Object.class, Object.class)));
-        CompletableFuture<List<String>> future = settingsService.fetchTextConfigurationWithScope("scopeUri", "section");
+        CompletableFuture<List<String>> future = settingsService.fetchTextConfigurationWithScope(new Uri("scopeUri"), "section");
         List<String> result = future.join();
         assertNotNull(result);
         verify(clientProvider.get(), times(1)).configuration(any());
@@ -79,7 +80,7 @@ class SettingsServiceImplTest {
     void testFetchTextConfigurationWithScope_dialect() {
         when(clientProvider.get()).thenReturn(mock(CobolLanguageClient.class));
         when(clientProvider.get().configuration(any())).thenReturn(CompletableFuture.completedFuture(Arrays.asList(Object.class, Object.class)));
-        CompletableFuture<List<String>> future = settingsService.fetchTextConfigurationWithScope("scopeUri", "section", "dialect");
+        CompletableFuture<List<String>> future = settingsService.fetchTextConfigurationWithScope(new Uri("scopeUri"), "section", "dialect");
         List<String> result = future.join();
         assertNotNull(result);
         verify(clientProvider.get(), times(1)).configuration(any());

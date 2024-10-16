@@ -18,6 +18,7 @@ package org.eclipse.lsp.cobol.common.copybook;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
+import org.eclipse.lsp.cobol.common.model.Uri;
 
 import java.util.Optional;
 
@@ -43,7 +44,7 @@ public interface CopybookId {
    * @param programUri uri of a program that use the copybook
    * @return an instance of id
    */
-  static CopybookId create(String name, String dialect, String programUri) {
+  static CopybookId create(String name, String dialect, Uri programUri) {
     final String id = String.format("%s#%s#%s", name, Optional.ofNullable(dialect)
             .orElse(COBOL), programUri);
     return new CopybookIdStringImpl(id);

@@ -31,6 +31,7 @@ import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.eclipse.lsp.cobol.common.model.Locality;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.model.tree.variable.UsageFormat;
 import org.eclipse.lsp.cobol.common.model.tree.variable.ValueInterval;
@@ -382,7 +383,7 @@ public class VisitorHelper {
    * @param uri is an uri of the document
    * @return locality object
    */
-  public static Locality buildNameRangeLocality(ParserRuleContext ctx, String name, String uri) {
+  public static Locality buildNameRangeLocality(ParserRuleContext ctx, String name, Uri uri) {
     int startLine = Optional.ofNullable(ctx.start).map(Token::getLine).orElse(1) - 1;
     int startCharPos = Optional.ofNullable(ctx.start).map(Token::getCharPositionInLine).orElse(0);
     int stopLine = Optional.ofNullable(ctx.stop).map(Token::getLine).orElse(startLine + 1) - 1;

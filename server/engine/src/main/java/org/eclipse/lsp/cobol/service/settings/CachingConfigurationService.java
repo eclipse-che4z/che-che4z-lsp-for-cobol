@@ -29,6 +29,7 @@ import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
 import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectService;
 import org.eclipse.lsp.cobol.service.utils.ServerTypeUtil;
 
@@ -45,7 +46,7 @@ public class CachingConfigurationService implements ConfigurationService {
     this.dialectService = dialectService;
   }
 
-  private CompletableFuture<ConfigurationEntity> createConfigFuture(String documentURI) {
+  private CompletableFuture<ConfigurationEntity> createConfigFuture(Uri documentURI) {
     List<String> settingsList = new LinkedList<>(Arrays.asList(
         DIALECTS.label,
         SUBROUTINE_LOCAL_PATHS.label,
@@ -70,7 +71,7 @@ public class CachingConfigurationService implements ConfigurationService {
 
   @Override
   @SuppressWarnings("java:S2142")
-  public AnalysisConfig getConfig(String scopeURI, CopybookProcessingMode mode) {
+  public AnalysisConfig getConfig(Uri scopeURI, CopybookProcessingMode mode) {
     try {
       AnalysisConfig config = AnalysisConfigHelper.fromConfigEntity(mode, createConfigFuture(scopeURI).get());
       if (ServerTypeUtil.isNativeServerType()) {
@@ -104,7 +105,7 @@ public class CachingConfigurationService implements ConfigurationService {
   }
 
   @Override
-  public CompletableFuture<List<String>> getListConfiguration(String documentUri, String section) {
+  public CompletableFuture<List<String>> getListConfiguration(Uri documentUri, String section) {
     return settingsService.fetchTextConfigurationWithScope(documentUri, section);
   }
 

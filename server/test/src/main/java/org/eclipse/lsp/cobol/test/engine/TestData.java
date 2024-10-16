@@ -17,6 +17,7 @@ package org.eclipse.lsp.cobol.test.engine;
 
 import lombok.Builder;
 import lombok.Value;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.Location;
 
@@ -30,7 +31,7 @@ public class TestData {
   String text;
   String copybookName;
   String dialectType;
-  Map<String, List<Diagnostic>> diagnostics;
+  Map<Uri, List<Diagnostic>> diagnostics;
   Map<String, List<Location>> variableDefinitions;
   Map<String, List<Location>> variableUsages;
   Map<String, List<Location>> paragraphDefinitions;

@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.lsp.LspEventCancelCondition;
 import org.eclipse.lsp.cobol.lsp.LspEventDependency;
@@ -56,7 +57,7 @@ public class FoldingRangeHandler {
    * @return list of FoldingRanges
    */
   public List<FoldingRange> foldingRange(FoldingRangeRequestParams params) {
-    String uri = params.getTextDocument().getUri();
+    Uri uri = Uri.fromLsp(params.getTextDocument().getUri());
     Node rootNode =
             documentService.isDocumentSynced(uri)
                     ? documentService.get(uri).getAnalysisResult().getRootNode()
@@ -80,7 +81,7 @@ public class FoldingRangeHandler {
    * @param uri
    * @return list of {@link LspEventDependency
    */
-  public List<LspEventDependency> getDependencies(String uri) {
+  public List<LspEventDependency> getDependencies(Uri uri) {
     return ImmutableList.of(
         asyncAnalysisService.createDependencyOn(uri),
         () -> documentService.isDocumentSynced(uri));
@@ -91,7 +92,7 @@ public class FoldingRangeHandler {
    * @param uri
    * @return list of {@link LspEventCancelCondition}
    */
-  public List<LspEventCancelCondition> getCancelConditions(String uri) {
+  public List<LspEventCancelCondition> getCancelConditions(Uri uri) {
    return ImmutableList.of(
             asyncAnalysisService.createCancelConditionOnClose(uri),
            () -> analysisService.isCopybook(uri, documentService.get(uri).getText()));

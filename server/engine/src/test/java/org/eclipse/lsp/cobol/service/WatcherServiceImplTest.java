@@ -16,6 +16,7 @@
 package org.eclipse.lsp.cobol.service;
 
 import com.google.common.collect.ImmutableList;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.lsp.jrpc.CobolLanguageClient;
 import org.eclipse.lsp.cobol.service.providers.ClientProvider;
 import org.eclipse.lsp.cobol.service.settings.ConfigurationService;
@@ -101,7 +102,7 @@ class WatcherServiceImplTest {
     ArgumentCaptor<RegistrationParams> captor = forClass(RegistrationParams.class);
     WatcherService watcherService = new WatcherServiceImpl(provider, configurationService);
     watcherService.getWorkspaceFolders().add(new WorkspaceFolder(WORKSPACE_URI, WORKSPACE_NAME));
-    watcherService.addRuntimeWatchers("document.cbl");
+    watcherService.addRuntimeWatchers(new Uri("document.cbl"));
 
     verify(client, new Times(3)).registerCapability(captor.capture());
     List<RegistrationParams> params = captor.getAllValues();
@@ -111,13 +112,13 @@ class WatcherServiceImplTest {
 
   private ConfigurationService mockConfigurationService() {
     ConfigurationService configurationService = mock(ConfigurationService.class);
-    when(configurationService.getListConfiguration("document.cbl", CPY_LOCAL_PATHS.label))
+    when(configurationService.getListConfiguration(new Uri("document.cbl"), CPY_LOCAL_PATHS.label))
         .thenReturn(CompletableFuture.completedFuture(singletonList("cobol/copybook")));
-    when(configurationService.getListConfiguration("document.cbl", SUBROUTINE_LOCAL_PATHS.label))
+    when(configurationService.getListConfiguration(new Uri("document.cbl"), SUBROUTINE_LOCAL_PATHS.label))
         .thenReturn(CompletableFuture.completedFuture(singletonList("sub/routine")));
     when(configurationService.getDialectWatchingFolders())
         .thenReturn(singletonList("dialect/testDialect"));
-    when(configurationService.getListConfiguration("document.cbl", "dialect/testDialect"))
+    when(configurationService.getListConfiguration(new Uri("document.cbl"), "dialect/testDialect"))
         .thenReturn(CompletableFuture.completedFuture(singletonList("dialect/watchFolder")));
     return configurationService;
   }
@@ -159,8 +160,8 @@ class WatcherServiceImplTest {
     ArgumentCaptor<RegistrationParams> registerRequest = forClass(RegistrationParams.class);
     WatcherService watcherService = new WatcherServiceImpl(provider, configurationService);
     watcherService.getWorkspaceFolders().add(new WorkspaceFolder(WORKSPACE_URI, WORKSPACE_NAME));
-    watcherService.addRuntimeWatchers("document.cbl");
-    watcherService.removeRuntimeWatchers("document.cbl");
+    watcherService.addRuntimeWatchers(new Uri("document.cbl"));
+    watcherService.removeRuntimeWatchers(new Uri("document.cbl"));
 
     verify(client, new Times(3)).registerCapability(registerRequest.capture());
     List<RegistrationParams> allValues = registerRequest.getAllValues();

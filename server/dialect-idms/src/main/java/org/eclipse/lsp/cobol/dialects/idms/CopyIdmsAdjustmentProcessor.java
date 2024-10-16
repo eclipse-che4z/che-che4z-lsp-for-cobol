@@ -22,6 +22,7 @@ import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.model.Locality;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
 import org.eclipse.lsp4j.DiagnosticRelatedInformation;
 import org.eclipse.lsp4j.Range;
@@ -40,7 +41,7 @@ import static org.eclipse.lsp.cobol.common.error.ErrorSeverity.WARNING;
 public class CopyIdmsAdjustmentProcessor {
 
   private final CopyNode copyNode;
-  private final String uri;
+  private final Uri uri;
   private final int copybookLevel;
   private final int firstLevel;
   private final Pair<Range, Integer> variable;
@@ -79,7 +80,7 @@ public class CopyIdmsAdjustmentProcessor {
       int copybookLevel,
       int firstLevel,
       Pair<Range, Integer> rangeIntegerPair,
-      String uri,
+      Uri uri,
       Locality sourceLocality) {
     if (shouldWarnForAdjustment(copybookLevel, firstLevel, rangeIntegerPair)) {
       int delta = copybookLevel - firstLevel;
@@ -103,7 +104,7 @@ public class CopyIdmsAdjustmentProcessor {
   }
 
   private List<SyntaxError> getWarningAtARange(
-      Range rangeForError, String uri, String message, Locality sourceLocality) {
+      Range rangeForError, Uri uri, String message, Locality sourceLocality) {
     return Collections.singletonList(
         SyntaxError.syntaxError()
             .location(Locality.builder().uri(uri).range(rangeForError).build().toOriginalLocation())

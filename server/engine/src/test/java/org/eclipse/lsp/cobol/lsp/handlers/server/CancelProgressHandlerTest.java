@@ -17,6 +17,7 @@ package org.eclipse.lsp.cobol.lsp.handlers.server;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.lsp.analysis.AsyncAnalysisService;
 import org.junit.jupiter.api.Test;
 
@@ -27,7 +28,7 @@ class CancelProgressHandlerTest {
   void whenCancelIsCalled_properMethodIsInvoked() throws InterruptedException {
     AsyncAnalysisService asyncAnalysisService = mock(AsyncAnalysisService.class);
     CancelProgressHandler handler = new CancelProgressHandler(asyncAnalysisService);
-    handler.cancel("test-uri");
-    verify(asyncAnalysisService).cancelAnalysis("test-uri");
+    handler.cancel(new Uri("test-uri"));
+    verify(asyncAnalysisService).cancelAnalysis(new Uri("test-uri"));
   }
 }

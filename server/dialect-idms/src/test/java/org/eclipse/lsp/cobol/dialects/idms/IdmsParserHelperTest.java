@@ -18,6 +18,7 @@ import com.google.common.collect.ImmutableList;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 import org.eclipse.lsp.cobol.common.model.Locality;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.common.model.tree.variable.UsageFormat;
 import org.eclipse.lsp.cobol.common.model.tree.variable.ValueInterval;
 import org.eclipse.lsp4j.Position;
@@ -105,11 +106,11 @@ class IdmsParserHelperTest {
     when(ctx.getStart()).thenReturn(startToken);
     when(ctx.getStop()).thenReturn(startToken);
 
-    Locality locality = IdmsParserHelper.buildNameRangeLocality(ctx, name, "uri");
+    Locality locality = IdmsParserHelper.buildNameRangeLocality(ctx, name, new Uri("uri"));
 
     assertEquals(start, locality.getRange().getStart());
     assertEquals(new Position(start.getLine(), start.getCharacter() + name.length()), locality.getRange().getEnd());
-    assertEquals("uri", locality.getUri());
+    assertEquals("uri", locality.getUri().toString());
   }
 
   @Test

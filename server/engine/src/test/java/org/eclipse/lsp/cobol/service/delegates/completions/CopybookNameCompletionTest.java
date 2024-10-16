@@ -16,6 +16,7 @@ package org.eclipse.lsp.cobol.service.delegates.completions;
 
 import com.google.common.collect.ImmutableSet;
 import org.eclipse.lsp.cobol.common.copybook.CopybookName;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookNameService;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookNameServiceImpl;
@@ -37,13 +38,13 @@ class CopybookNameCompletionTest {
 
   @Test
   void testCopybookNameCompletion() {
-    when(copybookNameService.getNames("id")).thenReturn(Arrays.asList(
+    when(copybookNameService.getNames(new Uri("id"))).thenReturn(Arrays.asList(
         CopybookName.builder().displayName("Copy1").build(),
         CopybookName.builder().displayName("copy2").build(),
         CopybookName.builder().displayName("no-copy").build()));
 
     CopybookNameCompletion copybookNameCompletion = new CopybookNameCompletion(copybookNameService);
-    CobolDocumentModel document = new CobolDocumentModel("id", TEXT, AnalysisResult.builder().build());
+    CobolDocumentModel document = new CobolDocumentModel(new Uri("id"), TEXT, AnalysisResult.builder().build());
     CompletionParams params =
         new CompletionParams(new TextDocumentIdentifier("id"), new Position(1, 16));
 

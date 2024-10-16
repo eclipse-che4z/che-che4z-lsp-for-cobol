@@ -25,6 +25,7 @@ import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.mapping.OriginalLocation;
 import org.eclipse.lsp.cobol.common.message.MessageService;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.core.*;
 import org.eclipse.lsp.cobol.core.engine.analysis.AnalysisContext;
@@ -67,7 +68,7 @@ public class ParserStage implements Stage<AnalysisContext, ParserStageResult, Di
   private List<SyntaxError> getParsingError(AnalysisContext context, AstBuilder parser) {
     return parser.diagnostics().stream().map(diagnostic -> {
       Location location = context.getExtendedDocument().mapLocation(diagnostic.getRange());
-      String copybookId = context.getCopybooksRepository().getCopybookIdByUri(location.getUri());
+      String copybookId = context.getCopybooksRepository().getCopybookIdByUri(new Uri(location.getUri()));
       return SyntaxError.syntaxError()
               .errorSource(ErrorSource.PARSING)
               .severity(ErrorSeverity.ERROR)

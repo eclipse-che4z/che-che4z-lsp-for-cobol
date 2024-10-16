@@ -30,6 +30,7 @@ import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.lsp.cobol.common.AnalysisResult;
 import org.eclipse.lsp.cobol.common.model.NodeType;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.common.model.tree.EvaluateNode;
 import org.eclipse.lsp.cobol.common.model.tree.EvaluateWhenNode;
@@ -61,10 +62,10 @@ public class DocumentServiceHelper {
    * Creates folding ranges for given document symbol table
    *
    * @param rootNode root node
-   * @param uri
+   * @param uri uri of a document
    * @return Set of folding ranges
    */
-  public static Set<FoldingRange> getFoldingRange(@NonNull Node rootNode, @NonNull String uri) {
+  public static Set<FoldingRange> getFoldingRange(@NonNull Node rootNode, @NonNull Uri uri) {
     return rootNode
         .getDepthFirstStream()
         .filter(node -> node.getLocality().getUri().equals(uri))
@@ -90,7 +91,7 @@ public class DocumentServiceHelper {
     return new FoldingRange(start.getMin(), end.getMax());
   }
 
-  private static List<FoldingRange> getFoldingRange(IfNode node, String uri) {
+  private static List<FoldingRange> getFoldingRange(IfNode node, Uri uri) {
     List<Node> ifThenStatements =
         node.getChildren().stream()
             .filter(n -> !(n instanceof IfElseNode))
@@ -99,7 +100,7 @@ public class DocumentServiceHelper {
     return Lists.newArrayList(getFoldingRange(ifThenStatements));
   }
 
-  private static List<FoldingRange> getFoldingRange(EvaluateNode node, String uri) {
+  private static List<FoldingRange> getFoldingRange(EvaluateNode node, Uri uri) {
     List<Node> evaluateDirectChildNodes =
         node.getChildren().stream()
             .filter(child -> child.getLocality().getUri().equals(uri))
@@ -126,7 +127,7 @@ public class DocumentServiceHelper {
     return rangeBetweenWhenClause;
   }
 
-  private static List<FoldingRange> getFoldingRanges(Node node, String uri) {
+  private static List<FoldingRange> getFoldingRanges(Node node, Uri uri) {
     if (node instanceof IfNode) {
       return getFoldingRange((IfNode) node, uri);
     }
@@ -151,14 +152,14 @@ public class DocumentServiceHelper {
    * @param result - analysis result
    * @return - list of copybook uris
    */
-  public List<String> extractCopybookUris(AnalysisResult result) {
+  public List<Uri> extractCopybookUris(AnalysisResult result) {
     return result
         .getRootNode()
         .getDepthFirstStream()
         .filter(hasType(COPY))
         .map(CopyNode.class::cast)
         .map(CopyNode::getUri)
-        .filter(def -> !StringUtils.isEmpty(def))
+        .filter(def -> def != null && !StringUtils.isEmpty(def.toString()))
         .collect(toList());
   }
 }

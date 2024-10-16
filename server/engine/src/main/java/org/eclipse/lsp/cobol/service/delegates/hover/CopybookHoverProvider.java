@@ -19,6 +19,7 @@ import java.util.Optional;
 import javax.annotation.Nullable;
 import lombok.NonNull;
 import org.eclipse.lsp.cobol.common.AnalysisResult;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.common.utils.RangeUtils;
 import org.eclipse.lsp.cobol.lsp.SourceUnitGraph;
@@ -35,7 +36,7 @@ public class CopybookHoverProvider implements HoverProvider {
   @Nullable
   @Override
   public Hover getHover(@Nullable CobolDocumentModel document, @NonNull TextDocumentPositionParams position, SourceUnitGraph documentGraph) {
-    String uri = position.getTextDocument().getUri();
+    Uri uri = Uri.fromLsp(position.getTextDocument().getUri());
     Position hoverPosition = position.getPosition();
     if (documentGraph.isUserSuppliedCopybook(uri)) {
       List<SourceUnitGraph.NodeV> containedCopybookNode = documentGraph.getInjectedCopybookNode(uri, hoverPosition);

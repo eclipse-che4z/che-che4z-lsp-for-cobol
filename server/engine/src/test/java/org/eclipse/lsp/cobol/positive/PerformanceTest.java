@@ -15,6 +15,7 @@
 
 package org.eclipse.lsp.cobol.positive;
 
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.test.CobolText;
 import org.eclipse.lsp.cobol.test.engine.UseCase;
 import org.eclipse.lsp.cobol.test.engine.UseCaseUtils;
@@ -47,7 +48,7 @@ class PerformanceTest extends FileBasedTest {
     for (CobolText text : textsToTest) {
       if (!Boolean.TRUE.toString().equals(TEST_MODE) || text == null) return;
 
-      String name = text.getFileName();
+      Uri name = new Uri(text.getFileName());
       String fullText = text.getFullText();
 
       long start = System.currentTimeMillis();

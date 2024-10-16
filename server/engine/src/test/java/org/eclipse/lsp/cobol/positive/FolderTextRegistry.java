@@ -21,6 +21,7 @@ import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.test.CobolText;
 
 import java.io.IOException;
@@ -273,8 +274,8 @@ public class FolderTextRegistry implements CobolTextRegistry {
    * @param filename filename
    * @return cross-reference object
    */
-  public TreeMap<ReportSection, List<SysprintSnap>> getSnapForFile(String filename) {
-    return snaps.getOrDefault(filename, new TreeMap<>(Collections.emptyMap()));
+  public TreeMap<ReportSection, List<SysprintSnap>> getSnapForFile(Uri filename) {
+    return snaps.getOrDefault(filename.toString(), new TreeMap<>(Collections.emptyMap()));
   }
 
   @Override

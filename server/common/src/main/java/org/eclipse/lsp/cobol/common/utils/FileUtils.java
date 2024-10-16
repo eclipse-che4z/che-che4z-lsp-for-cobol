@@ -15,6 +15,7 @@
 package org.eclipse.lsp.cobol.common.utils;
 
 import lombok.experimental.UtilityClass;
+import org.eclipse.lsp.cobol.common.model.Uri;
 
 import java.util.regex.Pattern;
 
@@ -23,6 +24,7 @@ import java.util.regex.Pattern;
  */
 @UtilityClass
 public class FileUtils {
+  Pattern UNDER_EXT_SRC_FOLDER = Pattern.compile("file://.*?\\.c4z/\\.extsrcs/.+");
   /**
    * This method validates an URI to verify if is defined as extended document, according to a
    * regex.
@@ -30,8 +32,8 @@ public class FileUtils {
    * @param uri document URI opened in the client
    * @return true if the document is an extended document, false otherwise
    */
-  public boolean isFileUnderExtendedSourceFolder(String uri) {
+  public boolean isFileUnderExtendedSourceFolder(Uri uri) {
     // the regex will match resources in the format [file://<FOLDER>/.c4z/.extsrcs/<DOCUMENT>]
-    return Pattern.matches("file://.*?\\.c4z/\\.extsrcs/.+", uri);
+    return UNDER_EXT_SRC_FOLDER.matcher(uri.toString()).matches();
   }
 }

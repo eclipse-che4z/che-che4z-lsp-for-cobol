@@ -18,6 +18,7 @@ package org.eclipse.lsp.cobol.common.copybook;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Value;
+import org.eclipse.lsp.cobol.common.model.Uri;
 
 /**
  * This value class represents a copybook name with dialect info context. Display name is the name
@@ -53,7 +54,7 @@ public class CopybookName {
    * @param programUri a program URI
    * @return an instance of copybook id
    */
-  public CopybookId toCopybookId(String programUri) {
+  public CopybookId toCopybookId(Uri programUri) {
     return CopybookId.create(displayName, dialectType, programUri);
   }
 }

@@ -15,6 +15,7 @@
 package org.eclipse.lsp.cobol.service.copybooks;
 
 import com.google.common.collect.ImmutableList;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp4j.TextDocumentItem;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -30,7 +31,7 @@ class CopybookIdentificationBasedOnExtensionTest {
     CopybookIdentificationBasedOnExtension service = new CopybookIdentificationBasedOnExtension();
     TextDocumentItem doc = new TextDocumentItem();
     doc.setUri("blah/blah1/copy.txt.cpy");
-    Assertions.assertTrue(service.isCopybook(doc.getUri(), doc.getText(), ImmutableList.of(".cpy")));
+    Assertions.assertTrue(service.isCopybook(new Uri(doc.getUri()), doc.getText(), ImmutableList.of(".cpy")));
   }
 
   @Test
@@ -38,6 +39,6 @@ class CopybookIdentificationBasedOnExtensionTest {
     CopybookIdentificationBasedOnExtension service = new CopybookIdentificationBasedOnExtension();
     TextDocumentItem doc = new TextDocumentItem();
     doc.setUri("blah/blah1/copy.cpy");
-    Assertions.assertFalse(service.isCopybook(doc.getUri(), doc.getText(), ImmutableList.of("cpyy")));
+    Assertions.assertFalse(service.isCopybook(new Uri(doc.getUri()), doc.getText(), ImmutableList.of("cpyy")));
   }
 }

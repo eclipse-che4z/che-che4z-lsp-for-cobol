@@ -15,6 +15,7 @@
 package org.eclipse.lsp.cobol.service.copybooks;
 
 import org.eclipse.lsp.cobol.common.copybook.CopybookName;
+import org.eclipse.lsp.cobol.common.model.Uri;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -31,14 +32,14 @@ public interface CopybookNameService {
    *
    * @return List of resolved copybook names
    */
-  List<CopybookName> getNames(@Nullable String documentUri);
+  List<CopybookName> getNames(@Nullable Uri documentUri);
 
   /**
    * Get copybook folders paths based on local settings (paths, dialects etc)
    * @param documentUri URI of main program file. If it's null the method will return no file specific settings
    * @return List of copybook folders
    */
-  CompletableFuture<List<String>> copybookLocalFolders(@Nullable String documentUri);
+  CompletableFuture<List<String>> copybookLocalFolders(@Nullable Uri documentUri);
 
   /**
    * Find copybook in the list of unique copybookNames
@@ -47,7 +48,7 @@ public interface CopybookNameService {
    * @param displayName an attribute to find by
    * @return optional CopybookName
    */
-  Optional<CopybookName> findByName(String documentUri, String displayName);
+  Optional<CopybookName> findByName(Uri documentUri, String displayName);
 
   /** Resolves the paths defined in Settings.json for cobol-lsp.cpy-manager.paths-local */
   void collectLocalCopybookNames();

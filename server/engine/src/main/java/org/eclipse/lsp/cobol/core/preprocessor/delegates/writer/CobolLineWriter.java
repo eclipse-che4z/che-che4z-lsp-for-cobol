@@ -26,6 +26,7 @@ import java.util.Objects;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedTextLine;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.core.model.CobolLineTypeEnum;
 import org.eclipse.lsp.cobol.core.preprocessor.CobolLine;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.rewriter.CobolLineReWriter;
@@ -46,7 +47,7 @@ public abstract class CobolLineWriter {
    * @param documentUri - uri of the document
    * @return a string representation of the COBOL program
    */
-  public ExtendedDocument serialize(List<CobolLine> lines, String documentUri) {
+  public ExtendedDocument serialize(List<CobolLine> lines, Uri documentUri) {
     final StringBuilder sb = new StringBuilder();
     final Map<Range, ExtendedTextLine> acc = new HashMap<>();
     ExtendedTextLine clSb = null;

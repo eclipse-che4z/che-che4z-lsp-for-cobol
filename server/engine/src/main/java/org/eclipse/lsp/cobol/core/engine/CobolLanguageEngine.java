@@ -35,6 +35,7 @@ import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.mapping.OriginalLocation;
 import org.eclipse.lsp.cobol.common.message.MessageService;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.common.model.tree.RootNode;
 import org.eclipse.lsp.cobol.common.utils.ImplicitCodeUtils;
@@ -81,10 +82,10 @@ public class CobolLanguageEngine {
   }
 
   private static AnalysisResult toAnalysisResult(
-      ResultWithErrors<AnalysisResult> result, String uri) {
+      ResultWithErrors<AnalysisResult> result, Uri uri) {
     RootNode rootNode = result.getResult().getRootNode();
 
-    List<String> copyUriList =
+    List<Uri> copyUriList =
         rootNode
             .getDepthFirstStream()
             .filter(hasType(COPY))
@@ -92,6 +93,7 @@ public class CobolLanguageEngine {
             .map(CopyNode::getDefinitions)
             .flatMap(Collection::stream)
             .map(Location::getUri)
+            .map(Uri::new)
             .filter(it -> !ImplicitCodeUtils.isImplicit(it))
             .distinct()
             .collect(toList());
@@ -115,9 +117,9 @@ public class CobolLanguageEngine {
    * @param uri - current document URI
    * @return map with file URI as a key, and lists of diagnostics as values
    */
-  private static Map<String, List<Diagnostic>> collectDiagnosticsForAffectedDocuments(
-      Map<String, List<Diagnostic>> diagnostics, List<String> copybookUris, String uri) {
-    Map<String, List<Diagnostic>> result = new HashMap<>(diagnostics);
+  private static Map<Uri, List<Diagnostic>> collectDiagnosticsForAffectedDocuments(
+      Map<Uri, List<Diagnostic>> diagnostics, List<Uri> copybookUris, Uri uri) {
+    Map<Uri, List<Diagnostic>> result = new HashMap<>(diagnostics);
     copybookUris.forEach(it -> result.putIfAbsent(it, emptyList()));
     result.putIfAbsent(uri, emptyList());
     return result;
@@ -137,7 +139,7 @@ public class CobolLanguageEngine {
    */
   @NonNull
   public AnalysisResult run(
-          @NonNull String documentUri, @NonNull String text, @NonNull AnalysisConfig analysisConfig, CobolLanguageId languageId) {
+          @NonNull Uri documentUri, @NonNull String text, @NonNull AnalysisConfig analysisConfig, CobolLanguageId languageId) {
     ThreadInterruptionUtil.checkThreadInterrupted();
     if (shouldNotAnalyse(text, languageId)) {
       return AnalysisResult.builder().build();
@@ -156,7 +158,7 @@ public class CobolLanguageEngine {
     PipelineResult pipelineResult = pipeline.run(ctx);
     StageResult<?> result = pipelineResult.getLastStageResult();
 
-    session.attr("uri", ctx.getExtendedDocument().getUri());
+    session.attr("uri", ctx.getExtendedDocument().getUri().toString());
     session.attr("language", ctx.getLanguageId().getId());
     session.attr("lines", String.valueOf(ctx.getExtendedDocument().toString().split("\n").length));
     session.attr("size", String.valueOf(ctx.getExtendedDocument().toString().length()));
@@ -205,7 +207,7 @@ public class CobolLanguageEngine {
   }
 
   private ResultWithErrors<AnalysisResult> getErrorForIncompatibleServerTypeAndDialects(
-      String documentUri) {
+      Uri documentUri) {
     return new ResultWithErrors<>(
         AnalysisResult.builder().build(),
         Collections.singletonList(
@@ -217,7 +219,7 @@ public class CobolLanguageEngine {
                 .location(
                     new OriginalLocation(
                         new Location(
-                            documentUri, new Range(new Position(0, 0), new Position(0, 6))),
+                            documentUri.toString(), new Range(new Position(0, 0), new Position(0, 6))),
                         null))
                 .build()));
   }

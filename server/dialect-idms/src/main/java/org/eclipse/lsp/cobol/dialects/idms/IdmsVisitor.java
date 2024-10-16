@@ -22,6 +22,7 @@ import org.eclipse.lsp.cobol.common.dialects.CobolDialect;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.model.Locality;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.dialects.idms.IdmsParser.*;
 import org.eclipse.lsp.cobol.common.model.tree.SectionNode;
@@ -176,7 +177,7 @@ class IdmsVisitor extends IdmsParserBaseVisitor<List<Node>> {
   private Locality constructLocality(ParserRuleContext ctx) {
     Location location =
         context.getExtendedDocument().mapLocation(DialectUtils.constructRange(ctx));
-    return Locality.builder().uri(location.getUri()).range(location.getRange()).build();
+    return Locality.builder().uri(new Uri(location.getUri())).range(location.getRange()).build();
   }
 
   private void addReplacementContext(ParserRuleContext ctx) {

@@ -14,6 +14,7 @@
  */
 package org.eclipse.lsp.cobol.positive;
 
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.service.mocks.CopybooksMock;
 import org.eclipse.lsp.cobol.test.CobolText;
 
@@ -35,7 +36,7 @@ public interface CobolTextRegistry extends CopybooksMock {
    * @param filename filename
    * @return Map of positive filename mapped to a snap objects.
    */
-  Map<ReportSection, List<SysprintSnap>> getSnapForFile(String filename);
+  Map<ReportSection, List<SysprintSnap>> getSnapForFile(Uri filename);
 
   /**
    * Gives the dialect.

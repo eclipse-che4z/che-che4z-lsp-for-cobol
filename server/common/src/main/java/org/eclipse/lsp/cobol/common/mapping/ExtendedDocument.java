@@ -19,6 +19,7 @@ import lombok.Getter;
 import java.util.List;
 
 import org.eclipse.lsp.cobol.common.model.Locality;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
@@ -35,7 +36,7 @@ public class ExtendedDocument {
   @Getter
   private boolean dirty;
 
-  public ExtendedDocument(String text, String uri) {
+  public ExtendedDocument(String text, Uri uri) {
     originalText = text;
     baseText = new ExtendedText("", uri);
     currentText = new ExtendedText(text, uri);
@@ -51,7 +52,7 @@ public class ExtendedDocument {
     commitTransformations();
   }
 
-  public String getUri() {
+  public Uri getUri() {
     return baseText.getUri();
   }
 
@@ -130,7 +131,8 @@ public class ExtendedDocument {
    */
   public void insertCopybook(int line, ExtendedText copybook) {
     int updatedLine = updateLineDueToChanges(line);
-    currentText.insert(updatedLine, copybook, new Location(currentText.getUri(), new Range(new Position(line, 0), new Position(line, 0))));
+    currentText.insert(updatedLine, copybook, new Location(currentText.getUri().toString(),
+            new Range(new Position(line, 0), new Position(line, 0))));
     dirty = true;
   }
 

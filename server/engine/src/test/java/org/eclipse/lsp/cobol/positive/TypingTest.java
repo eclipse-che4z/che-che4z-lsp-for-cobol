@@ -32,6 +32,7 @@ import org.eclipse.lsp.cobol.common.ResultWithErrors;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedText;
 import org.eclipse.lsp.cobol.common.message.MessageService;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.dialects.ibm.IbmTextPreprocessor;
 import org.eclipse.lsp.cobol.common.dialects.CobolLanguageId;
 import org.eclipse.lsp.cobol.service.settings.layout.CodeLayoutStore;
@@ -87,7 +88,7 @@ class TypingTest extends FileBasedTest {
             messageService,
             layoutStore);
     ResultWithErrors<ExtendedText> cleanTextResult =
-        preprocessor.cleanUpCode(cobolText.getFileName(), cobolText.getFullText());
+        preprocessor.cleanUpCode(new Uri(cobolText.getFileName()), cobolText.getFullText());
     for (SyntaxError error : cleanTextResult.getErrors()) LOG.error(error.toString());
     return cleanTextResult.getResult().toString();
   }
@@ -138,7 +139,7 @@ class TypingTest extends FileBasedTest {
                 UseCaseUtils.analyzeForErrors(
                     UseCase.builder()
                         .text(text)
-                        .documentUri(name)
+                        .documentUri(new Uri(name))
                         .copybooks(getCopybooks(cobolTextRegistry))
                         .build());
                 return null;

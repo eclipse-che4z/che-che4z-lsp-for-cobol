@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Optional;
 import org.eclipse.lsp.cobol.common.AnalysisResult;
 import org.eclipse.lsp.cobol.common.model.DefinedAndUsedStructure;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolsRepository;
 import org.eclipse.lsp.cobol.lsp.SourceUnitGraph;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
@@ -67,14 +68,14 @@ class TestDefinitionOnLongCopybooks {
     SymbolsRepository symbolsRepository = mock(SymbolsRepository.class);
     CobolDocumentModel document = new CobolDocumentModel(DOCUMENT_URI, TEXT, result);
     TextDocumentPositionParams position = new TextDocumentPositionParams(
-            new TextDocumentIdentifier(DOCUMENT_URI), new Position(4, 15));
+            new TextDocumentIdentifier(DOCUMENT_URI.toString()), new Position(4, 15));
     Location expectedDef = new Location(
             "file:///c:/workspace/.c4z/.copybooks/ABCD.cpy",
             new Range(new Position(), new Position()));
     DefinedAndUsedStructure ctx = mock(DefinedAndUsedStructure.class);
     when(ctx.getDefinitions()).thenReturn(Collections.singletonList(expectedDef));
     SourceUnitGraph documentGraph = mock(SourceUnitGraph.class);
-    when(documentGraph.isUserSuppliedCopybook(anyString())).thenReturn(false);
+    when(documentGraph.isUserSuppliedCopybook(any(Uri.class))).thenReturn(false);
 
     try (MockedStatic mocked = mockStatic(SymbolsRepository.class)) {
       mocked.when(() -> SymbolsRepository.findElementByPosition(eq(DOCUMENT_URI), eq(document.getAnalysisResult()),

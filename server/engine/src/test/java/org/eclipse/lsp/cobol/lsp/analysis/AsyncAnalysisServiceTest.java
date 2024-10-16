@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.eclipse.lsp.cobol.common.SubroutineService;
 import org.eclipse.lsp.cobol.common.dialects.TrueDialectService;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.lsp.SourceUnitGraph;
 import org.eclipse.lsp.cobol.service.AnalysisService;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
@@ -73,7 +74,7 @@ class AsyncAnalysisServiceTest {
 
     @Test
     void testReanalyseCopybooksAssociatedPrograms() {
-        Map<String, Integer> analysisResultsRevisionsMock = mock(Map.class);
+        Map<Uri, Integer> analysisResultsRevisionsMock = mock(Map.class);
         try {
             Field field = AsyncAnalysisService.class.getDeclaredField("analysisResultsRevisions");
             field.setAccessible(true);
@@ -81,16 +82,16 @@ class AsyncAnalysisServiceTest {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        List<String> uris = Stream.of("URI1", "URI2").collect(Collectors.toList());
+        List<Uri> uris = Stream.of("URI1", "URI2").map(Uri::new).collect(Collectors.toList());
         SourceUnitGraph.EventSource eventSource = mock(SourceUnitGraph.EventSource.class);
         CobolDocumentModel cobolDocumentModel = mock(CobolDocumentModel.class);
-        when(cobolDocumentModel.getUri()).thenReturn("URI1");
+        when(cobolDocumentModel.getUri()).thenReturn(new Uri("URI1"));
         when(cobolDocumentModel.getText()).thenReturn("code");
         when(documentModelService.getAllOpened()).thenReturn(ImmutableList.of(cobolDocumentModel));
         when(documentModelService.get(any())).thenReturn(cobolDocumentModel);
-        when(analysisService.isCopybook(anyString(), anyString())).thenReturn(false);
+        when(analysisService.isCopybook(any(Uri.class), anyString())).thenReturn(false);
         when(analysisResultsRevisionsMock.get(cobolDocumentModel.getUri())).thenReturn(1);
-        asyncAnalysisService.reanalyseCopybooksAssociatedPrograms(uris, "copybookUri", "copybookContent", eventSource);
+        asyncAnalysisService.reanalyseCopybooksAssociatedPrograms(uris, new Uri("copybookUri"), "copybookContent", eventSource);
 
         verify(cobolDocumentModel, times(2)).getText();
     }
@@ -98,7 +99,7 @@ class AsyncAnalysisServiceTest {
     @Test
     void testCancelAnalysis() {
         try {
-            asyncAnalysisService.cancelAnalysis("URI");
+            asyncAnalysisService.cancelAnalysis(new Uri("URI"));
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }

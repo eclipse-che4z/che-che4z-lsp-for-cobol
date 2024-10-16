@@ -16,6 +16,7 @@ package org.eclipse.lsp.cobol.service.utils;
 
 import com.google.common.collect.ImmutableList;
 import lombok.experimental.UtilityClass;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.common.model.tree.*;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNode;
 import org.eclipse.lsp.cobol.common.model.NodeSymbolType;
@@ -35,7 +36,7 @@ public class BuildOutlineTreeFromSyntaxTree {
    * @param uri uri of the node
    * @return the outline tree view
    */
-  public List<DocumentSymbol> convert(Node node, String uri) {
+  public List<DocumentSymbol> convert(Node node, Uri uri) {
     List<DocumentSymbol> childrenSymbols =
         node.getChildren().stream()
             .map(it -> convert(it, uri))
@@ -51,7 +52,7 @@ public class BuildOutlineTreeFromSyntaxTree {
     return childrenSymbols;
   }
 
-  private Optional<DocumentSymbol> convertNode(Node node, String uri) {
+  private Optional<DocumentSymbol> convertNode(Node node, Uri uri) {
     if (!node.getLocality().getUri().equals(uri)) {
       return Optional.empty();
     }

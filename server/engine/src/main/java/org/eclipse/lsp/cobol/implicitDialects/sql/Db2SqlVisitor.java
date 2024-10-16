@@ -43,6 +43,7 @@ import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.model.Locality;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.model.tree.variable.*;
 import org.eclipse.lsp.cobol.core.visitor.VisitorHelper;
@@ -272,11 +273,11 @@ class Db2SqlVisitor extends Db2SqlParserBaseVisitor<List<Node>> {
 
     private Locality getLocality(Location location) {
         Locality.LocalityBuilder builder =
-                Locality.builder().uri(location.getUri()).range(location.getRange());
-        String docUri = context.getExtendedDocument().getUri();
-        if (!docUri.equals(location.getUri())) {
+                Locality.builder().uri(new Uri(location.getUri())).range(location.getRange());
+        Uri docUri = context.getExtendedDocument().getUri();
+        if (!docUri.toString().equals(location.getUri())) {
             copybookService.getCopybookUsage(docUri).stream()
-                    .filter(model -> model.getUri().equals(location.getUri()))
+                    .filter(model -> model.getUri().toString().equals(location.getUri()))
                     .findFirst()
                     .ifPresent(model -> builder.copybookId(model.getCopybookName().getDisplayName()));
         }
@@ -344,7 +345,7 @@ class Db2SqlVisitor extends Db2SqlParserBaseVisitor<List<Node>> {
             VisitorHelper.buildNameRangeLocality(
                 ctx.getParent(), VisitorHelper.getName(ctx.getParent()), context.getProgramDocumentUri());
         Location location = context.getExtendedDocument().mapLocation(locality.getRange());
-        locality = Locality.builder().range(location.getRange()).uri(location.getUri()).build();
+        locality = Locality.builder().range(location.getRange()).uri(new Uri(location.getUri())).build();
 
         boolean isWhenever = nodes.stream().anyMatch(n ->
             n.getDepthFirstStream().anyMatch(nd -> nd instanceof ExecSqlWheneverNode));
@@ -535,7 +536,8 @@ class Db2SqlVisitor extends Db2SqlParserBaseVisitor<List<Node>> {
 
         Node node =
                 nodeConstructor.apply(
-                        Locality.builder().range(location.getRange()).uri(location.getUri()).build());
+                        Locality.builder().range(location.getRange()).uri(
+                                new Uri(location.getUri())).build());
         visitChildren(ctx).forEach(node::addChild);
         return ImmutableList.of(node);
     }

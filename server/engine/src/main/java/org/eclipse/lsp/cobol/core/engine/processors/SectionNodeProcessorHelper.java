@@ -36,6 +36,7 @@ import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.message.MessageTemplate;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.NodeType;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.model.tree.variable.*;
@@ -171,8 +172,8 @@ public class SectionNodeProcessorHelper {
     ArrayList<Node> nodes = new ArrayList<>(variables);
     for (int i = index; i < nodes.size(); i++) {
       Node variable = nodes.get(i);
-      String variableNodeUri = variable.getLocality().getUri();
-      String copybookNodeUri = copyNode.getUri();
+      Uri variableNodeUri = variable.getLocality().getUri();
+      Uri copybookNodeUri = copyNode.getUri();
       if (variableNodeUri.equals(copybookNodeUri)) {
         adjustVariableNodeInsideCopyNode(copyNode, variables, i, variable);
         areNodesAdjusted = true;
@@ -214,10 +215,10 @@ public class SectionNodeProcessorHelper {
 
     private static boolean canInsertCopyNodeAtIndex(
       CopyNode copyNode, int index, List<Node> variables) {
-    String copybookLocalityUri = copyNode.getLocality().getUri();
+    Uri copybookLocalityUri = copyNode.getLocality().getUri();
     Range copybookLocalityRange = copyNode.getLocality().getRange();
     Node variableDefinitionNode = variables.get(index);
-    String variableUri = variableDefinitionNode.getLocality().getUri();
+    Uri variableUri = variableDefinitionNode.getLocality().getUri();
     Position variableStartPosition = variableDefinitionNode.getLocality().getRange().getEnd();
     return variableUri.equals(copybookLocalityUri)
         && RangeUtils.isBefore(variableStartPosition, copybookLocalityRange.getStart());
