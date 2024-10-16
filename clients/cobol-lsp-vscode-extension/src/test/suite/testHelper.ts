@@ -23,19 +23,19 @@ export async function activate() {
   const cobol = vscode.extensions.getExtension(
     "BroadcomMFD.cobol-language-support",
   )!;
-  if (!cobol.isActive) {
+  if (cobol && !cobol.isActive) {
     await cobol.activate();
   }
   const idms = vscode.extensions.getExtension(
     "BroadcomMFD.cobol-language-support-for-idms",
   )!;
-  if (!idms.isActive) {
+  if (idms && !idms.isActive) {
     await idms.activate();
   }
   const daco = vscode.extensions.getExtension(
     "BroadcomMFD.cobol-language-support-for-daco",
   )!;
-  if (!daco.isActive) {
+  if (daco && !daco.isActive) {
     await daco.activate();
   }
 }
