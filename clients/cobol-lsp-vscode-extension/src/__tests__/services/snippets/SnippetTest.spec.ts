@@ -16,12 +16,15 @@ import * as vscode from "vscode";
 import { SnippetCompletionProvider } from "../../../services/snippetcompletion/SnippetCompletionProvider";
 import { DialectRegistry } from "../../../services/DialectRegistry";
 import path = require("path");
+import { createExtensionContextMock } from "../../../__mocks__/ExtensionContext.utility";
 
 jest.mock("vscode");
 
 describe("Test CompletionProvider", () => {
   const context = { triggerKind: {}, diagnostics: [], only: undefined };
-  const snippetcompletion = new SnippetCompletionProvider();
+  const snippetcompletion = new SnippetCompletionProvider(
+    createExtensionContextMock(),
+  );
   const SNIPPET_CBL = "SNIPPET.cbl";
   beforeAll(() => {
     DialectRegistry.getDialects = jest.fn().mockReturnValue([
