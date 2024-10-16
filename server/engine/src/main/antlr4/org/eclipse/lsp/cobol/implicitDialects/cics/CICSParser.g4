@@ -22,7 +22,7 @@ allCicsRule: cics_send | cics_receive | cics_add | cics_address | cics_allocate 
                        cics_build | cics_cancel | cics_change | cics_change_task | cics_check | cics_connect | cics_converttime |
                        cics_define | cics_delay | cics_delete | cics_deleteq | cics_deq | cics_document | cics_dump | cics_endbr |
                        cics_endbrowse | cics_enq | cics_enter | cics_extract | cics_force | cics_formattime | cics_free |
-                       cics_freemain | cics_gds | cics_get | cics_getmain | cics_getnext | cics_handle | cics_ignore | cics_inquire |
+                       cics_freemain | cics_get | cics_getmain | cics_getnext | cics_handle | cics_ignore | cics_inquire |
                        cics_invoke | cics_issue | cics_link | cics_load | cics_monitor | cics_move | cics_point | cics_pop |
                        cics_post | cics_purge | cics_push | cics_put | cics_query | cics_read | cics_readnext |
                        cics_readq | cics_release | cics_remove | cics_reset | cics_resetbr | cics_resume | cics_retrieve |
@@ -378,28 +378,6 @@ cics_free: FREE (CONVID cics_name | SESSION cics_name | STATE cics_cvda | cics_h
 
 /** FREEMAIN */
 cics_freemain: FREEMAIN (DATA cics_data_area | DATAPOINTER cics_value | cics_handle_response)+;
-
-/** GDS (all) */
-cics_gds: GDS (cics_gds_allocate | cics_gds_assign | cics_gds_connect | cics_gds_extract | cics_gds_free |
-          cics_gds_issue | cics_gds_receive | cics_gds_send | cics_gds_wait);
-cics_gds_allocate: ALLOCATE (SYSID cics_data_area | MODENAME cics_name | PARTNER cics_name | CONVID cics_data_area |
-                   RETCORD cics_data_area | NOQUEUE | STATE cics_cvda | cics_handle_response)+;
-cics_gds_assign: ASSIGN (PRINCONVID cics_data_area | PRINSYSID cics_data_area | RETCODE cics_data_area | cics_handle_response)+;
-cics_gds_connect: CONNECT (PROCESS | CONVID cics_name | PROCNAME cics_name | PROCLENGTH cics_data_value | PARTNER cics_name |
-                  PIPLIST cics_data_area | PIPLENGTH cics_data_value | SYNCLEVEL cics_data_value | CONVDATA cics_data_area |
-                  RETCODE cics_data_area | STATE cics_cvda | cics_handle_response)+;
-cics_gds_extract: EXTRACT (cics_gds_attributes | cics_gds_process);
-cics_gds_attributes: ATTRIBUTES (CONVID cics_name | STATE cics_cvda | CONVDATA cics_data_area | RETCODE cics_data_area | cics_handle_response)+;
-cics_gds_process: PROCESS (CONVID cics_name | (PROCNAME cics_data_area (PROCLENGTH cics_data_area | MAXPROCLEN cics_data_value | cics_handle_response)+) | SYNCLEVEL cics_data_area |
-                  (PIPLIST cics_ref PIPLENGTH cics_data_area) | RETCODE cics_data_area | cics_handle_response)+;
-cics_gds_free: FREE (CONVID cics_name | CONVDATA cics_data_area | RETCODE cics_data_area | STATE cics_cvda | cics_handle_response)+;
-cics_gds_issue: ISSUE (ABEND | CONFIRMATION | ERROR | PREPARE | SIGNAL) (CONVID cics_name | CONVDATA cics_data_area |
-                RETCODE cics_data_area | STATE cics_cvda | cics_handle_response)+;
-cics_gds_receive: RECEIVE (CONVID cics_name | cics_into | FLENGTH cics_data_area | MAXFLENGTH
-                  cics_data_value | BUFFER | LLID | CONVDATA cics_data_area | RETCODE cics_data_area | STATE cics_cvda | cics_handle_response)+;
-cics_gds_send: SEND (CONVID cics_name | FROM cics_data_area | FLENGTH cics_data_value | INVITE | LAST | CONFIRM | WAIT |
-               CONVDATA cics_data_area | RETCODE cics_data_area | STATE cics_cvda | cics_handle_response)+;
-cics_gds_wait: WAIT (CONVID cics_name | CONVDATA cics_data_area | RETCODE cics_data_area | STATE cics_cvda | cics_handle_response)+;
 
 /** GET CONTAINER (both of them) / GET COUNTER / GET DCOUNTER */
 cics_get: GET (cics_get_container | cics_get_counter | cics_get_dcounter);
