@@ -30,19 +30,18 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 /** Processor for FUnctionDeclaration */
-public class FunctionDeclarationProcessor implements Processor<FunctionDeclaration> {
+public class FunctionDeclarationValidator implements Processor<FunctionDeclaration> {
   private final SymbolAccumulatorService symbolAccumulatorService;
 
   private static final String WHEN_COMPILED = "WHEN-COMPILED";
   private static final String ALL = "ALL";
 
-  public FunctionDeclarationProcessor(SymbolAccumulatorService symbolAccumulatorService) {
+  public FunctionDeclarationValidator(SymbolAccumulatorService symbolAccumulatorService) {
     this.symbolAccumulatorService = symbolAccumulatorService;
   }
 
   @Override
   public void accept(FunctionDeclaration functionDeclaration, ProcessingContext processingContext) {
-    updateFunctionInfo(functionDeclaration);
     if (functionDeclaration.isIntrinsic()) {
       checkSemanticsForIntrinsicFunctions(functionDeclaration, processingContext);
     } else if (functionDeclaration.getChildren().size() > 1) {
@@ -55,20 +54,20 @@ public class FunctionDeclarationProcessor implements Processor<FunctionDeclarati
     if (nearestParentByType.isPresent()) {
       ProgramNode parent = nearestParentByType.get();
       getFunctionReferences(functionDeclaration)
-              .forEach(
-                      reference -> {
-                        SymbolAccumulatorService.FunctionInfo functionInfo =
-                                symbolAccumulatorService.getFunctionReference(
-                                        reference.getName().toUpperCase());
-                        if (functionInfo != null) functionInfo.getDeclaredProgramNode().add(parent);
-                      });
+          .forEach(
+              reference -> {
+                SymbolAccumulatorService.FunctionInfo functionInfo =
+                    symbolAccumulatorService.getFunctionReference(
+                        reference.getName().toUpperCase());
+                if (functionInfo != null) functionInfo.getDeclaredProgramNode().add(parent);
+              });
     }
   }
 
   private void checkSemanticsForIntrinsicFunctions(
       FunctionDeclaration functionDeclaration, ProcessingContext processingContext) {
     List<FunctionReference> functionReferences = getFunctionReferences(functionDeclaration);
-    functionDeclaration.getProgram().ifPresent(programNode -> checkSemanticsForAllImplicitFunctionDeclaration(functionReferences, processingContext, programNode));
+    checkSemanticsForAllImplicitFunctionDeclaration(functionReferences, processingContext);
     checkIfWhenCompiledIntrinsicFunctionDeclared(functionReferences, processingContext);
   }
 
@@ -85,22 +84,16 @@ public class FunctionDeclarationProcessor implements Processor<FunctionDeclarati
   }
 
   private void checkSemanticsForAllImplicitFunctionDeclaration(
-          List<FunctionReference> functionReferences, ProcessingContext processingContext, ProgramNode programNode) {
+      List<FunctionReference> functionReferences, ProcessingContext processingContext) {
     boolean hasAllFunction =
-            functionReferences.stream().anyMatch(ref -> ref.getName().equalsIgnoreCase(ALL));
+        functionReferences.stream().anyMatch(ref -> ref.getName().equalsIgnoreCase(ALL));
 
     if (hasAllFunction && functionReferences.size() > 1) {
       functionReferences.forEach(
-              funcReference ->
-                      addError(
-                              processingContext, funcReference, "\"%s\" was invalid", funcReference.getName()));
-      return;
+          funcReference ->
+              addError(
+                  processingContext, funcReference, "\"%s\" was invalid", funcReference.getName()));
     }
-
-    if (hasAllFunction) {
-      symbolAccumulatorService.declareAllIntrinsicFUnctions(programNode);
-    }
-
   }
 
   private void checkIfWhenCompiledIntrinsicFunctionDeclared(

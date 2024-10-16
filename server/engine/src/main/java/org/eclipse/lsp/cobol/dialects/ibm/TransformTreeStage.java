@@ -254,12 +254,11 @@ public class TransformTreeStage implements Stage<AnalysisContext, ProcessingResu
 
     // Phase POST DEFINITION
     ctx.register(ProcessingPhase.POST_DEFINITION, SectionNode.class, new ImplicitVariablesProcessor());
+    ctx.register(ProcessingPhase.POST_DEFINITION, FunctionDeclaration.class, new ImplicitFunctionsDefinitionEnricher(symbolAccumulatorService));
 
     // Phase USAGE
     ProcessingPhase u = ProcessingPhase.USAGE;
     ctx.register(u, CodeBlockUsageNode.class, new CodeBlockUsage(symbolAccumulatorService));
-    ctx.register(u, FunctionReference.class, new FunctionReferenceEnricher(symbolAccumulatorService));
-    ctx.register(u, FunctionDeclaration.class, new FunctionDeclarationProcessor(symbolAccumulatorService));
     ctx.register(u, QualifiedReferenceNode.class, new QualifiedReferenceUpdateVariableUsage(symbolAccumulatorService));
     ctx.register(u, FunctionReference.class, new FunctionReferenceProcessor(symbolAccumulatorService));
 
@@ -268,10 +267,13 @@ public class TransformTreeStage implements Stage<AnalysisContext, ProcessingResu
     ctx.register(e, SectionNameNode.class, new SectionNameNodeEnricher(symbolAccumulatorService));
     ctx.register(e, ParagraphNameNode.class, new ParagraphNameNodeEnricher(symbolAccumulatorService));
     ctx.register(e, CodeBlockUsageNode.class, new CodeBlockUsageNodeEnricher(symbolAccumulatorService));
+    ctx.register(e, QualifiedReferenceNode.class, new UsageReferenceEnricher(symbolAccumulatorService));
+    ctx.register(e, FunctionReference.class, new FunctionReferenceEnricher(symbolAccumulatorService));
     ctx.register(e, ProgramIdNode.class, new ProgramIdEnricher(symbolAccumulatorService));
 
     // Phase VALIDATION
     ProcessingPhase v = ProcessingPhase.VALIDATION;
+    ctx.register(v, QualifiedReferenceNode.class, new ReferenceNodeValidation());
     ctx.register(v, VariableWithLevelNode.class, new VariableWithLevelCheck(CodeLayoutUtil.getProgramLayout(languageId, layoutStore)));
     ctx.register(v, VariableWithLevelNode.class, new VariableNameCheck(symbolAccumulatorService));
     ctx.register(v, StatementNode.class, new StatementValidate());
@@ -286,6 +288,7 @@ public class TransformTreeStage implements Stage<AnalysisContext, ProcessingResu
     ctx.register(v, XMLParseNode.class, new XMLParseProcess(symbolAccumulatorService));
     ctx.register(v, FileOperationStatementNode.class, new FileOperationProcess());
     ctx.register(v, XmlGenerateNode.class, new XmlGenerateProcess(symbolAccumulatorService));
+    ctx.register(v, FunctionDeclaration.class, new FunctionDeclarationValidator(symbolAccumulatorService));
 
     // Implicit Dialects
     dialectService.getActiveImplicitDialects(analysisConfig)
