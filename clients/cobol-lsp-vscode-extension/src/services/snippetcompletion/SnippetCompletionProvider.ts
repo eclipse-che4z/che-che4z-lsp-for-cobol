@@ -12,18 +12,38 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 import * as vscode from "vscode";
-import { LANGUAGE_ID } from "../../constants";
+import { LANGUAGE_ID, SETTINGS_DIALECT } from "../../constants";
 import { DialectRegistry } from "../DialectRegistry";
-import { SettingsService } from "../Settings";
-import { readFileSync } from "node:fs";
+import cobolSnippets = require("./cobolSnippets.json");
+import * as t from "io-ts";
+import { isRight } from "fp-ts/Either";
+import { TextDecoder } from "util";
 
-const SNIPPETS: Map<string, Map<any, any>> = new Map();
+const SnippetCodec = t.type({
+  prefix: t.string,
+  body: t.array(t.string),
+  description: t.union([t.string, t.undefined]),
+});
+type Snippet = t.TypeOf<typeof SnippetCodec>;
+
+const SnippetRecordCodec = t.record(t.string, SnippetCodec);
+
+const predefinedSnippets: Record<string, Snippet> = cobolSnippets;
 
 export class SnippetCompletionProvider
   implements vscode.CompletionItemProvider
 {
-  private matchingWordsList: vscode.CompletionItem[] = [];
-  private otherList: vscode.CompletionItem[] = [];
+  snippetsCompletionItems: vscode.CompletionItem[] | null = null;
+
+  constructor(context: vscode.ExtensionContext) {
+    const disposable = vscode.workspace.onDidChangeConfiguration(
+      async (event) => {
+        if (event.affectsConfiguration(SETTINGS_DIALECT))
+          this.resetSnippetsCompletionItems();
+      },
+    );
+    context.subscriptions.push(disposable);
+  }
 
   public async provideCompletionItems(
     document: vscode.TextDocument,
@@ -31,103 +51,138 @@ export class SnippetCompletionProvider
     _token: vscode.CancellationToken,
     _context: vscode.CompletionContext,
   ): Promise<vscode.CompletionItem[]> {
-    const textUptoCursor = getCurrentLineText(document, position);
-    const wordsUptoCursor = fetchWordsList(textUptoCursor);
-
-    this.resetList();
-    const snippets: Map<any, any> = await getSnippets();
-    snippets.forEach((value, key) => {
-      const prefixList: string[] = fetchWordsList(value.prefix);
-      const matchedWords = getMatchedWords(prefixList, wordsUptoCursor);
-      const completionItem = createCompletionItem(
-        value,
-        key,
-        position,
-        document,
-      );
-      if (matchedWords.length > 0) {
-        this.matchingWordsList.push(completionItem);
-      } else {
-        this.otherList.push(completionItem);
-      }
-    });
-    return this.matchingWordsList.length > 0
-      ? this.matchingWordsList
-      : this.otherList;
-  }
-  public resetList() {
-    this.matchingWordsList = [];
-    this.otherList = [];
-  }
-}
-
-async function getSnippets(): Promise<Map<any, any>> {
-  const map = await SettingsService.getSnippetsForCobol();
-  const dialectList = SettingsService.getDialects()!;
-  const registeredDialects = DialectRegistry.getDialects();
-  registeredDialects
-    .filter((d) => dialectList.includes(d.name))
-    .forEach((d) => {
-      const snippets = importSnippet(d.snippetPath);
-      if (snippets !== undefined) {
-        Object.entries(snippets).forEach((value) =>
-          map.set(value[0], value[1]),
+    // use already loaded completion items if available
+    if (!this.snippetsCompletionItems) {
+      this.snippetsCompletionItems = [];
+      // load all snippets for all dialects
+      const snippets = await loadSnippets();
+      snippets.forEach((snippet, key) => {
+        if (!snippet.description) {
+          snippet.description = key;
+        }
+        this.snippetsCompletionItems?.push(
+          createCompletionItem(snippet, key, position, document),
         );
-      }
+      });
+    }
+
+    // filter completion items using words on current line
+    const textUptoCursor = getCurrentLineText(document, position);
+    const wordsUptoCursor = splitToWords(textUptoCursor);
+    const filteredSnippets = this.snippetsCompletionItems.filter(
+      (completionItem) => {
+        const prefixList: string[] =
+          splitToWordsFromCompletionItem(completionItem);
+        const matchedWords = getMatchedWords(prefixList, wordsUptoCursor);
+
+        return matchedWords.length > 0;
+      },
+    );
+
+    // if no snippet matches current line, return all of them
+    const resultCompletionItems =
+      filteredSnippets.length > 0
+        ? filteredSnippets
+        : this.snippetsCompletionItems;
+
+    // calculate ranges
+    const firstCharacterPosition = findPosition(position, document);
+    const insertingRange = new vscode.Position(
+      position.line,
+      firstCharacterPosition,
+    );
+    const replaceRange = new vscode.Position(position.line, position.character);
+
+    // update ranges for each completion item
+    resultCompletionItems.forEach((completionItem) => {
+      completionItem.range = new vscode.Range(insertingRange, replaceRange);
     });
 
-  return map;
-}
-
-function importSnippet(snippetPath: string): Map<any, any> | undefined {
-  let result = SNIPPETS.get(snippetPath);
-  if (result === undefined) {
-    try {
-      const json = readFileSync(snippetPath, "utf-8");
-      const snippet = JSON.parse(json);
-      SNIPPETS.set(snippetPath, snippet);
-      result = snippet;
-    } catch (e) {
-      console.log(e);
-    }
+    return resultCompletionItems;
   }
-  return result;
+
+  public resetSnippetsCompletionItems() {
+    this.snippetsCompletionItems = null;
+  }
 }
 
 function createCompletionItem(
-  value: any,
+  snippet: Snippet,
   key: string,
-  position: vscode.Position,
-  document: vscode.TextDocument,
+  _position: vscode.Position,
+  _document: vscode.TextDocument,
 ): vscode.CompletionItem {
   const itemLabel: vscode.CompletionItemLabel = {
-    label: value.prefix,
+    label: snippet.prefix,
     description: key,
   };
   const completionItem = new vscode.CompletionItem(itemLabel);
-  completionItem.detail = value.description;
-  completionItem.insertText = new vscode.SnippetString(value.body.join("\n"));
+  completionItem.detail = snippet.description;
+  completionItem.insertText = new vscode.SnippetString(snippet.body.join("\n"));
   completionItem.documentation = new vscode.MarkdownString().appendCodeblock(
-    formatString(value.body.join("\n")),
+    formatString(snippet.body.join("\n")),
     LANGUAGE_ID,
   );
   completionItem.kind = vscode.CompletionItemKind.Snippet;
-  //Find the start position of the first word in the line
-  const firstCharacterPosition = findPosition(position, document);
-  const insertingRange = new vscode.Position(
-    position.line,
-    firstCharacterPosition,
-  );
-  const replaceRange = new vscode.Position(position.line, position.character);
-  completionItem.range = new vscode.Range(insertingRange, replaceRange);
   return completionItem;
 }
 
-function fetchWordsList(text: string) {
-  const wordsList = text.split(/(\s+)/).filter(function (e) {
+/**
+ * Return map of all predefined snippets and snippets
+ * for all active dialects from JSON files provided by dialects
+ */
+async function loadSnippets() {
+  const loadedSnippets = new Map(Object.entries(predefinedSnippets));
+  const activeDialects = DialectRegistry.getActiveDialects();
+
+  await Promise.all(
+    activeDialects.map(async (d) => {
+      const dialectSnippets = await importDialectSnippets(d.snippetPath);
+      if (dialectSnippets) {
+        dialectSnippets.forEach((snippet, key) => {
+          loadedSnippets.set(key, snippet);
+        });
+      }
+    }),
+  );
+
+  return loadedSnippets;
+}
+
+async function importDialectSnippets(snippetPath: string) {
+  const dialectSnippets: Map<string, Snippet> = new Map();
+  const snippetUri = vscode.Uri.parse(snippetPath);
+  try {
+    const rawFile = await vscode.workspace.fs.readFile(snippetUri);
+    const textData = new TextDecoder().decode(rawFile);
+    const decodedJSON = SnippetRecordCodec.decode(JSON.parse(textData));
+    if (isRight(decodedJSON)) {
+      Object.entries(decodedJSON.right).forEach((snippetRecord) => {
+        const [key, snippet] = snippetRecord;
+        dialectSnippets.set(key, snippet);
+      });
+    }
+  } catch (error) {
+    console.error({ snippetPath, error }, "Unable to import snippet");
+  }
+
+  return dialectSnippets;
+}
+
+function splitToWordsFromCompletionItem(completionItem: vscode.CompletionItem) {
+  let prefix: string;
+  if (typeof completionItem.label === "string") {
+    prefix = completionItem.label;
+  } else {
+    prefix = completionItem.label.label;
+  }
+  return splitToWords(prefix);
+}
+
+function splitToWords(text: string) {
+  return text.split(/(\s+)/).filter((e) => {
     return e.trim().length > 0;
   });
-  return wordsList;
 }
 
 function getCurrentLineText(
@@ -137,21 +192,21 @@ function getCurrentLineText(
   return document.lineAt(position).text.slice(0, position.character).trim();
 }
 
+function getMatchedWords(words1: string[], words2: string[]) {
+  const word = words1.filter((word) => words2.includes(word));
+  return word;
+}
+
 function findPosition(
   position: vscode.Position,
   document: vscode.TextDocument,
 ) {
   const lineText = document.lineAt(position).text.slice(0, position.character);
-  const charPosition: number = 7;
+  const charPosition: number = position.character;
   for (let index: number = 0; index < lineText.length; index++) {
     if (lineText.charAt(index) !== " ") return index;
   }
   return charPosition;
-}
-
-function getMatchedWords(words1: string[], words2: string[]) {
-  const word = words1.filter((word) => words2.includes(word));
-  return word;
 }
 
 function formatString(arg: string) {
@@ -160,30 +215,36 @@ function formatString(arg: string) {
 
 export async function pickSnippet() {
   try {
-    const editor = vscode.window.activeTextEditor!;
-    const snippetList: { detail: string; label: string }[] = [];
-    const mapKeyForSelectedSnippet = new Map<string, any>();
-    const snippetMapsFromSettings = await getSnippets();
+    const editor = vscode.window.activeTextEditor;
+    const snippetList: vscode.QuickPickItem[] = [];
+    const prefixToKeyMap = new Map<string, string>();
+    const snippets = await loadSnippets();
     const input = vscode.window.createQuickPick<vscode.QuickPickItem>();
     input.matchOnDetail = true;
     input.matchOnDescription = true;
     input.placeholder = "Type to search snippet";
     // Create the snippets list using settings for dialect
-    snippetMapsFromSettings.forEach((value, key) => {
-      // Also store the key as we are aligining the view with VSCode snippet
-      mapKeyForSelectedSnippet.set(value.prefix, key);
+    snippets.forEach((snippet, key) => {
+      // Also store the key as we are aligning the view with VSCode snippet
+      prefixToKeyMap.set(snippet.prefix, key);
       snippetList.push({
-        detail: value.description,
-        label: value.prefix,
+        detail: snippet.description ?? key,
+        label: snippet.prefix,
       });
       input.items = snippetList;
     });
     input.onDidChangeSelection((items) => {
       const item = items[0];
-      const getKey = mapKeyForSelectedSnippet.get(item.label);
-      const snippetString = snippetMapsFromSettings.get(getKey);
-      const snippet = new vscode.SnippetString(snippetString.body.join("\n"));
-      editor.insertSnippet(snippet);
+      const snippetKey = prefixToKeyMap.get(item.label);
+      if (snippetKey) {
+        const snippet = snippets.get(snippetKey);
+        if (snippet) {
+          const snippetString = new vscode.SnippetString(
+            snippet.body.join("\n"),
+          );
+          editor?.insertSnippet(snippetString);
+        }
+      }
     });
     input.show();
   } catch (error) {

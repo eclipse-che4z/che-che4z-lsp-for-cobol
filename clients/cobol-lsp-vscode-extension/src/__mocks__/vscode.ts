@@ -12,7 +12,10 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 import path = require("path");
-import * as url from "url";
+import type { Uri as UriVscode } from "vscode";
+import { Uri as UriMock } from "./UriMock";
+
+import { readFile } from "fs/promises";
 
 // eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace workspace {
@@ -27,6 +30,13 @@ export namespace workspace {
     };
   }
   export function createFileSystemWatcher() {}
+  export const fs = {
+    readFile: async (uri: UriVscode): Promise<Uint8Array> => {
+      const path = uri.fsPath;
+      return await readFile(path);
+    },
+  };
+  export function onDidChangeConfiguration() {}
 }
 
 // eslint-disable-next-line @typescript-eslint/no-namespace
@@ -56,14 +66,7 @@ export enum StatusBarAlignment {
   Right,
 }
 
-export class Uri {
-  static file(path: string): Uri {
-    const result: Uri = new Uri();
-    result.toString = () => url.pathToFileURL(path).toString();
-    return result;
-  }
-  static parse = jest.fn();
-}
+export const Uri = UriMock;
 
 export enum ConfigurationTarget {
   Global = 1,
@@ -110,3 +113,17 @@ export class Selection {
     this.active = active;
   }
 }
+
+export const CompletionItem = jest
+  .fn()
+  .mockImplementation((label) => ({ label }));
+
+export enum CompletionItemKind {
+  Snippet = 14,
+}
+
+export const SnippetString = jest.fn();
+export const MarkdownString = jest.fn().mockReturnValue({
+  string: "",
+  appendCodeblock: jest.fn().mockReturnValue({ value: "", language: "COBOL" }),
+});

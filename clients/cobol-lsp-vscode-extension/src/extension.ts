@@ -126,7 +126,7 @@ export async function activate(
   context.subscriptions.push(
     vscode.languages.registerCompletionItemProvider(
       { language: LANGUAGE_ID },
-      new SnippetCompletionProvider(),
+      new SnippetCompletionProvider(context),
     ),
   );
 
