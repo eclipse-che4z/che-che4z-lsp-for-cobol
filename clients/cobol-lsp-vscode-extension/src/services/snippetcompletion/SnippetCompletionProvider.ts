@@ -199,7 +199,7 @@ function findPosition(
   document: vscode.TextDocument,
 ) {
   const lineText = document.lineAt(position).text.slice(0, position.character);
-  const charPosition: number = 7;
+  const charPosition: number = position.character;
   for (let index: number = 0; index < lineText.length; index++) {
     if (lineText.charAt(index) !== " ") return index;
   }

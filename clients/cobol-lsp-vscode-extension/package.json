@@ -155,8 +155,7 @@
         {
           "command": "cobol-lsp.snippets.insertSnippets",
           "title": "Insert COBOL Snippet",
-          "category": "Snippets",
-          "when": "!isWeb"
+          "category": "Snippets"
         },
         {
           "command": "cobol-lsp.open.copybook.internalfolder",

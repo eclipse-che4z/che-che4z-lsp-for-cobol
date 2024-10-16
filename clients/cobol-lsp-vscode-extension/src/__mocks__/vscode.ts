@@ -36,6 +36,7 @@ export namespace workspace {
       return await readFile(path);
     },
   };
+  export function onDidChangeConfiguration() {}
 }
 
 // eslint-disable-next-line @typescript-eslint/no-namespace
