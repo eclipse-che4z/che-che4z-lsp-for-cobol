@@ -468,17 +468,25 @@ public class UseCaseEngine {
             context ->
                 !(context.getDefinitions().isEmpty()
                     || ImplicitCodeUtils.isImplicit(context.getDefinitions().get(0).getUri())))
-        .collect(Collectors.toMap(fr -> fr.getName().toUpperCase(Locale.ROOT), FunctionReference::getDefinitions, (m1, m2) -> m2));
+        .collect(
+            Collectors.toMap(
+                fr -> fr.getName().toUpperCase(Locale.ROOT),
+                FunctionReference::getDefinitions,
+                (l1, l2) -> Stream.concat(l1.stream(), l2.stream()).distinct().collect(toList())));
   }
 
   private Map<String, List<Location>> extractDefinitionsUsage(AnalysisResult result) {
-    return  result
-            .getRootNode()
-            .getDepthFirstStream()
-            .filter(hasType(FUNCTION_REFERENCE))
-            .map(DefinedAndUsedStructure.class::cast)
-            .filter(context -> !context.getDefinitions().isEmpty())
-            .collect(toMap(d -> ImmutableList.of(d.getLocality().toLocation()), FUNCTION_REFERENCE));
+    return result
+        .getRootNode()
+        .getDepthFirstStream()
+        .filter(hasType(FUNCTION_REFERENCE))
+        .map(FunctionReference.class::cast)
+        .filter(context -> !context.getDefinitions().isEmpty())
+        .collect(
+            Collectors.toMap(
+                d -> d.getName().toUpperCase(Locale.ROOT),
+                d -> ImmutableList.of(d.getLocality().toLocation()),
+                (l1, l2) -> Stream.concat(l1.stream(), l2.stream()).distinct().collect(toList())));
   }
 
   private Map<String, List<Location>> extractUsages(AnalysisResult result, NodeType nodeType) {
