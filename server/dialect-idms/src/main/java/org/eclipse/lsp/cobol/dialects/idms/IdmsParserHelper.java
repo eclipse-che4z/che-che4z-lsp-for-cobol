@@ -20,6 +20,7 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.misc.Interval;
 import org.eclipse.lsp.cobol.common.model.Locality;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.common.model.tree.variable.UsageFormat;
 import org.eclipse.lsp.cobol.common.model.tree.variable.ValueInterval;
 import org.eclipse.lsp4j.Position;
@@ -99,7 +100,7 @@ class IdmsParserHelper {
    * @param uri is an uri of the document
    * @return locality object
    */
-  public Locality buildNameRangeLocality(ParserRuleContext ctx, String name, String uri) {
+  public Locality buildNameRangeLocality(ParserRuleContext ctx, String name, Uri uri) {
     Range range = new Range(
         new Position(ctx.getStart().getLine() - 1, ctx.getStart().getCharPositionInLine()),
         new Position(ctx.getStop().getLine() - 1, ctx.getStart().getCharPositionInLine() + name.length()));

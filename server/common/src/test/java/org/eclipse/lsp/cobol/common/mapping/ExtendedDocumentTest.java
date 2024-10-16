@@ -15,6 +15,7 @@
 package org.eclipse.lsp.cobol.common.mapping;
 
 import org.eclipse.lsp.cobol.common.model.Locality;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
@@ -44,15 +45,15 @@ class ExtendedDocumentTest {
 
   private static final String ONE_LINE_COPY = "        COPYBOOK LINE 0";
 
-  private String documentUri;
-  private String copybookUri;
+  private Uri documentUri;
+  private Uri copybookUri;
   private ExtendedDocument document;
   private ExtendedText copybook;
 
   @BeforeEach
   void init() {
-    documentUri = UUID.randomUUID().toString();
-    copybookUri = UUID.randomUUID().toString();
+    documentUri = new Uri(UUID.randomUUID().toString());
+    copybookUri = new Uri(UUID.randomUUID().toString());
     document = new ExtendedDocument(TEXT, documentUri);
     copybook = new ExtendedText(COPYBOOK, copybookUri);
   }
@@ -93,11 +94,11 @@ class ExtendedDocumentTest {
 
     Location location = document.mapLocation(new Range(new Position(6, 8), new Position(6, 16)));
     assertEquals(new Range(new Position(1, 8), new Position(1, 16)).toString(), location.getRange().toString());
-    assertEquals(copybookUri, location.getUri());
+    assertEquals(copybookUri.toString(), location.getUri());
 
     location = document.mapLocation(new Range(new Position(10, 8), new Position(10, 16)));
     assertEquals(new Range(new Position(5, 8), new Position(5, 16)).toString(), location.getRange().toString());
-    assertEquals(documentUri, location.getUri());
+    assertEquals(documentUri.toString(), location.getUri());
   }
 
   @Test
@@ -110,11 +111,11 @@ class ExtendedDocumentTest {
 
     Location location = document.mapLocation(new Range(new Position(6, 8), new Position(6, 16)));
     assertEquals(new Range(new Position(1, 8), new Position(1, 16)).toString(), location.getRange().toString());
-    assertEquals(copybookUri, location.getUri());
+    assertEquals(copybookUri.toString(), location.getUri());
 
     location = document.mapLocation(new Range(new Position(9, 8), new Position(9, 16)));
     assertEquals(new Range(new Position(5, 8), new Position(5, 16)).toString(), location.getRange().toString());
-    assertEquals(documentUri, location.getUri());
+    assertEquals(documentUri.toString(), location.getUri());
   }
 
   @Test
@@ -155,7 +156,7 @@ class ExtendedDocumentTest {
   void testGetBaseTextWrongUri() {
     document.insertCopybook(5, copybook);
     Locality locality = Locality.builder()
-        .uri("wrong")
+        .uri(new Uri("wrong"))
         .range(new Range(new Position(3, 5), new Position(4, 8)))
         .build();
     String text = document.getBaseText(locality);

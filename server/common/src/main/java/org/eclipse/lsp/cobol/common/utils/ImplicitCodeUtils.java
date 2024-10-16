@@ -16,6 +16,7 @@ package org.eclipse.lsp.cobol.common.utils;
 
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.lsp.cobol.common.model.Uri;
 
 /**
  * Utility class for implicit code injection
@@ -36,16 +37,18 @@ public class ImplicitCodeUtils {
    * @param uri uri of the copybook
    * @return true if the copybook is predefined
    */
-  public boolean isImplicit(String uri) {
-    return uri.startsWith(PREF_IMPLICIT);
+  public boolean isImplicit(Uri uri) {
+    return isImplicit(uri.decode());
   }
 
   /**
-   * Creates a url for implicit code
-   * @return implicit code location
+   * Check if this copybook is predefined
+   *
+   * @param uri uri of the copybook (string form for optimization)
+   * @return true if the copybook is predefined
    */
-  public String createLocation() {
-    return PREF_IMPLICIT + IMPLICIT_PATH;
+  public boolean isImplicit(String uri) {
+    return uri.startsWith(PREF_IMPLICIT);
   }
 
   /**
@@ -70,7 +73,7 @@ public class ImplicitCodeUtils {
    * @param name is a name of the implicit code
    * @return the full url
    */
-  public String createFullUrl(String name) {
-    return PREF_IMPLICIT + createPath(name);
+  public Uri createFullUrl(String name) {
+    return new Uri(PREF_IMPLICIT + createPath(name));
   }
 }

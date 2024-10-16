@@ -19,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.eclipse.lsp.cobol.common.model.Locality;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.model.tree.variable.OccursClause;
 import org.eclipse.lsp.cobol.common.model.tree.variable.ValueClause;
@@ -41,7 +42,7 @@ import static org.eclipse.lsp.cobol.dialects.daco.VisitorHelper.*;
  */
 @RequiredArgsConstructor
 public class DaCoCopybookVisitor extends VariableParserBaseVisitor<List<Node>> {
-  private final String uri;
+  private final Uri uri;
   private final int startingLevel;
   private final String suffix;
   private int firstCopybookLevel = 0;

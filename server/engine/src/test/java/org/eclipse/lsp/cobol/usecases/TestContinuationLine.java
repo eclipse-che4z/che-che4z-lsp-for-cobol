@@ -24,6 +24,7 @@ import org.eclipse.lsp.cobol.common.AnalysisResult;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.NodeType;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNode;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
@@ -162,7 +163,7 @@ class TestContinuationLine {
     assertTrue(node.isPresent());
     assertEquals(
         Locality.builder()
-            .uri("file:c:/workspace/document.cbl")
+            .uri(new Uri("file:c:/workspace/document.cbl"))
             .range(new Range(new Position(8, 7), new Position(13, 44)))
             .build(),
         node.get().getLocality());

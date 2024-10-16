@@ -21,6 +21,7 @@ import org.antlr.v4.runtime.RuleContext;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
 import org.eclipse.lsp.cobol.common.model.Locality;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.common.model.tree.*;
 import org.eclipse.lsp.cobol.common.model.variables.DivisionType;
 import org.eclipse.lsp.cobol.common.utils.StringUtils;
@@ -92,8 +93,8 @@ public class CobolIdentificationDivisionVisitor extends CobolIdentificationDivis
   private Locality locationToLocality(Location location) {
     return Locality.builder()
             .range(location.getRange())
-            .uri(location.getUri())
-            .copybookId(copybooks.getCopybookIdByUri(location.getUri()))
+            .uri(new Uri(location.getUri()))
+            .copybookId(copybooks.getCopybookIdByUri(new Uri(location.getUri())))
             .build();
   }
 

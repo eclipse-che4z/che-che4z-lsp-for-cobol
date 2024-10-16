@@ -15,6 +15,7 @@
 package org.eclipse.lsp.cobol.service.delegates.completions;
 
 import com.google.common.collect.ImmutableList;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp.cobol.common.AnalysisResult;
 import org.eclipse.lsp4j.CompletionItem;
@@ -39,7 +40,7 @@ class SectionCompletionTest {
   void testCompletionEmptyResult() {
     assertThat(
         completion.getCompletionItems(
-            "smth", new CobolDocumentModel("", "", AnalysisResult.builder().build())),
+            "smth", new CobolDocumentModel(new Uri(""), "", AnalysisResult.builder().build())),
         is(empty()));
   }
 

@@ -18,6 +18,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.lsp.LspEventDependency;
 import org.eclipse.lsp.cobol.lsp.LspQuery;
 import org.eclipse.lsp.cobol.lsp.analysis.AsyncAnalysisService;
@@ -50,7 +51,7 @@ public class FormattingHandler {
    * @return TextEdit.
    */
   public List<? extends TextEdit> formatting(DocumentFormattingParams params) {
-    String uri = params.getTextDocument().getUri();
+    Uri uri = Uri.fromLsp(params.getTextDocument().getUri());
     return formations.format(documentService.get(uri));
   }
 
@@ -71,6 +72,6 @@ public class FormattingHandler {
    */
   public List<LspEventDependency> getDependencies(DocumentFormattingParams params) {
     return ImmutableList.of(
-            asyncAnalysisService.createDependencyOn(params.getTextDocument().getUri()));
+            asyncAnalysisService.createDependencyOn(Uri.fromLsp(params.getTextDocument().getUri())));
   }
 }

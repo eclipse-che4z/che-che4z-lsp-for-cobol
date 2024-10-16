@@ -33,6 +33,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.common.file.WorkspaceFileService;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.common.utils.ImplicitCodeUtils;
 import org.eclipse.lsp.cobol.common.utils.RangeUtils;
@@ -51,14 +52,14 @@ public class SourceUnitGraph implements AnalysisStateListener {
 
   // doc-a-uri --> copy-a Node. copy-b node, copy-c node
   // doc-1-uri --> copy-a Node. copy-2 node, copy-3 node
-  private final Map<String, List<NodeV>> documentGraph = new ConcurrentHashMap<>();
+  private final Map<Uri, List<NodeV>> documentGraph = new ConcurrentHashMap<>();
 
   // doc-a-uri <==> doc-a node
   // copy-a-uri <--> copy-a node
-  private final Map<String, NodeV> objectRef = new ConcurrentHashMap<>();
+  private final Map<Uri, NodeV> objectRef = new ConcurrentHashMap<>();
 
   // copy-2-uri <--> doc-a-uri, doc-1-uri
-  private final Map<String, List<String>> documentGraphIndexedByCopybook =
+  private final Map<Uri, List<Uri>> documentGraphIndexedByCopybook =
       new ConcurrentHashMap<>();
 
   @Inject
@@ -115,7 +116,7 @@ public class SourceUnitGraph implements AnalysisStateListener {
             .collect(Collectors.toList());
     List<NodeV> references = new ArrayList<>();
     for (CopyNode copyNode : copyNodes) {
-      String parentUri = copyNode.getLocality().getUri();
+      Uri parentUri = copyNode.getLocality().getUri();
       NodeV copyNodeV = getNode(copyNode, eventSource);
       if (!copyNodeV.isDirty) {
         objectRef.computeIfPresent(
@@ -127,9 +128,9 @@ public class SourceUnitGraph implements AnalysisStateListener {
             });
         objectRef.putIfAbsent(copyNode.getUri(), copyNodeV);
         references.add(copyNodeV);
-        String decodedUri = copyNode.getUri();
+        Uri decodedUri = copyNode.getUri();
         documentGraphIndexedByCopybook.putIfAbsent(decodedUri, new ArrayList<>());
-        List<String> strings = documentGraphIndexedByCopybook.get(decodedUri);
+        List<Uri> strings = documentGraphIndexedByCopybook.get(decodedUri);
         if (!strings.contains(parentUri)) {
           strings.add(parentUri);
         }
@@ -139,7 +140,7 @@ public class SourceUnitGraph implements AnalysisStateListener {
     documentGraph.put(model.getUri(), references);
   }
 
-  private void invalidateGraphLinks(String uri) {
+  private void invalidateGraphLinks(Uri uri) {
     if (documentGraph.containsKey(uri)) {
       List<NodeV> prevLinks = documentGraph.get(uri);
       for (NodeV prevLink : prevLinks) {
@@ -159,7 +160,7 @@ public class SourceUnitGraph implements AnalysisStateListener {
     }
   }
 
-  private void invalidateCopybookIndexedCache(String referUri, String copybookUri) {
+  private void invalidateCopybookIndexedCache(Uri referUri, Uri copybookUri) {
     documentGraphIndexedByCopybook.computeIfPresent(
         copybookUri,
         (k, v) -> {
@@ -174,14 +175,15 @@ public class SourceUnitGraph implements AnalysisStateListener {
    * @param uri document uri
    * @return true if copybook, false otherwise.
    */
-  public boolean isUserSuppliedCopybook(String uri) {
+  public boolean isUserSuppliedCopybook(Uri uri) {
     return documentGraphIndexedByCopybook.keySet().stream()
         .anyMatch(
             copyUri -> {
               try {
-                String decodeUri = uri.replace(" ", "%20");
-                copyUri = copyUri.replace(" ", "%20");
-                return new URL(decodeUri).sameFile(new URL(copyUri));
+                // FIXME uri decoding looks off. Actually all logic here looks strange
+                String decodeUri = uri.decode().replace(" ", "%20");
+                copyUri = new Uri(copyUri.decode().replace(" ", "%20"));
+                return new URL(decodeUri).sameFile(new URL(copyUri.decode()));
               } catch (IOException e) {
                 LOG.error("IOException encountered while comparing paths {} and {}", copyUri, uri);
                 return false;
@@ -191,16 +193,16 @@ public class SourceUnitGraph implements AnalysisStateListener {
 
   private void updateGraphNodes(CobolDocumentModel model, EventSource eventSource) {
     Location location = new Location();
-    location.setUri(model.getUri());
+    location.setUri(model.getUri().toString());
     NodeV defaultNodeForModel =
-        new NodeV(
-            model.getUri(),
-            eventSource,
-            Sets.newConcurrentHashSet(Sets.newHashSet(location)),
-            false,
-            false,
-            getContent(model),
-            true);
+            new NodeV(
+                    model.getUri(),
+                    eventSource,
+                    Sets.newConcurrentHashSet(Sets.newHashSet(location)),
+                    false,
+                    false,
+                    getContent(model),
+                    true);
     objectRef.compute(
         model.getUri(),
         (uri, node) -> {
@@ -215,10 +217,10 @@ public class SourceUnitGraph implements AnalysisStateListener {
   /**
    * Get content for a passed uri
    *
-   * @param uri
+   * @param uri uri
    * @return content
    */
-  public String getContent(String uri) {
+  public String getContent(Uri uri) {
     if (ImplicitCodeUtils.isImplicit(uri)) {
       return null;
     }
@@ -227,15 +229,15 @@ public class SourceUnitGraph implements AnalysisStateListener {
         .orElse(getFileContent(uri));
   }
 
-  private String getFileContent(String uri) {
-    return Optional.ofNullable(fileService.getPathFromURI(uri))
+  private String getFileContent(Uri uri) {
+    return Optional.ofNullable(uri.getPath())
         .map(fileService::getContentByPath)
         .orElse(null);
   }
 
   private NodeV getNode(CopyNode copyNode, EventSource eventSource) {
     String content = null;
-    String uri = null;
+    Uri uri = null;
     boolean isDirty = true;
     Set<Location> references =
         Sets.newConcurrentHashSet(Sets.newHashSet(copyNode.getNameLocation()));
@@ -253,7 +255,7 @@ public class SourceUnitGraph implements AnalysisStateListener {
    * @param uri document uri
    * @return returns true if the passed document uri is opened in the IDE, false otherwise.
    */
-  public boolean isFileOpened(String uri) {
+  public boolean isFileOpened(Uri uri) {
     return Optional.ofNullable(objectRef.get(uri)).map(node -> node.isOpenInIde).orElse(false);
   }
 
@@ -264,12 +266,12 @@ public class SourceUnitGraph implements AnalysisStateListener {
    * @return returns a list of all uri's which consumes the passed URI as a copybook. An empty list
    *     is returned if uri is not a copybook
    */
-  public List<String> getAllAssociatedFilesForACopybook(String uri) {
-    List<String> result = new ArrayList<>();
-    List<String> linkedUris =
+  public List<Uri> getAllAssociatedFilesForACopybook(Uri uri) {
+    List<Uri> result = new ArrayList<>();
+    List<Uri> linkedUris =
         documentGraphIndexedByCopybook.getOrDefault(uri, Collections.emptyList());
     linkedUris.remove(uri);
-    for (String linkedUri : linkedUris) {
+    for (Uri linkedUri : linkedUris) {
       if (documentGraphIndexedByCopybook.containsKey(linkedUri)) {
         result.addAll(getAllAssociatedFilesForACopybook(linkedUri));
       } else {
@@ -284,7 +286,7 @@ public class SourceUnitGraph implements AnalysisStateListener {
    *
    * @param uri
    */
-  public synchronized void updateContent(String uri) {
+  public synchronized void updateContent(Uri uri) {
     if (objectRef.containsKey(uri)) {
       NodeV nodeV = objectRef.get(uri);
       nodeV.setContent(getFileContent(uri));
@@ -297,7 +299,7 @@ public class SourceUnitGraph implements AnalysisStateListener {
    * @param uri
    * @param content
    */
-  public synchronized void updateContent(String uri, String content) {
+  public synchronized void updateContent(Uri uri, String content) {
     if (objectRef.containsKey(uri)) {
       NodeV nodeV = objectRef.get(uri);
       nodeV.setContent(content);
@@ -309,7 +311,7 @@ public class SourceUnitGraph implements AnalysisStateListener {
    *
    * @param uri
    */
-  public synchronized void remove(String uri) {
+  public synchronized void remove(Uri uri) {
     if (documentGraph.containsKey(uri)) {
       documentGraph
           .get(uri)
@@ -333,11 +335,11 @@ public class SourceUnitGraph implements AnalysisStateListener {
     Optional.ofNullable(objectRef.get(uri)).ifPresent(node -> node.setOpenInIde(false));
   }
 
-  private void updateReferences(String uri, NodeV node) {
+  private void updateReferences(Uri uri, NodeV node) {
     NodeV nodeV = objectRef.get(node.getUri());
     Set<Location> updatedReferences =
         nodeV.getReferencedLocation().stream()
-            .filter(loc -> !loc.getUri().equals(uri))
+            .filter(loc -> !loc.getUri().equals(uri.decode()))
             .collect(Collectors.toSet());
     nodeV.setReferencedLocation(updatedReferences);
   }
@@ -359,14 +361,14 @@ public class SourceUnitGraph implements AnalysisStateListener {
    * @param usage
    * @return content of the copybook in the provided range, or else null
    */
-  public List<NodeV> getInjectedCopybookNode(String uri, Position usage) {
+  public List<NodeV> getInjectedCopybookNode(Uri uri, Position usage) {
     List<NodeV> result = new ArrayList<>();
     List<NodeV> cobolDocLinks = documentGraph.get(uri);
-    List<Map.Entry<String, List<String>>> containedCopybook =
+    List<Map.Entry<Uri, List<Uri>>> containedCopybook =
         this.documentGraphIndexedByCopybook.entrySet().stream()
             .filter(enn -> enn.getValue().contains(uri))
             .collect(Collectors.toList());
-    for (Map.Entry<String, List<String>> entry : containedCopybook) {
+    for (Map.Entry<Uri, List<Uri>> entry : containedCopybook) {
       if (objectRef.containsKey(entry.getKey())) {
         NodeV nodeV = objectRef.get(entry.getKey());
         if (isContainedInside(usage, nodeV)) result.add(nodeV);
@@ -403,8 +405,8 @@ public class SourceUnitGraph implements AnalysisStateListener {
    * @param parentFolder parent directory
    * @return List of copybooks contained inside a parent directory
    */
-  public List<String> getCopybookUriInsideFolder(String parentFolder) {
-    List<String> result = new ArrayList<>();
+  public List<Uri> getCopybookUriInsideFolder(String parentFolder) {
+    List<Uri> result = new ArrayList<>();
     Path parentPath;
 
     try {
@@ -413,10 +415,10 @@ public class SourceUnitGraph implements AnalysisStateListener {
       return result;
     }
 
-    Set<String> allCopybooks = documentGraphIndexedByCopybook.keySet();
-    for (String copybookUri : allCopybooks) {
+    Set<Uri> allCopybooks = documentGraphIndexedByCopybook.keySet();
+    for (Uri copybookUri : allCopybooks) {
       try {
-        Path copybookPath = Paths.get(URI.create(copybookUri));
+        Path copybookPath = Paths.get(URI.create(copybookUri.decode()));
         if (copybookPath.startsWith(parentPath)) {
           result.add(copybookUri);
         }
@@ -431,8 +433,8 @@ public class SourceUnitGraph implements AnalysisStateListener {
   @AllArgsConstructor
   @EqualsAndHashCode(onlyExplicitlyIncluded = true)
   @Getter
-  public class NodeV {
-    @EqualsAndHashCode.Include private String uri;
+  public static class NodeV {
+    @EqualsAndHashCode.Include private Uri uri;
     @Setter private EventSource lastUpdatedBy;
     @Setter private Set<Location> referencedLocation;
     private boolean isCopybook;

@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
 import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectService;
 import org.eclipse.lsp.cobol.service.settings.CachingConfigurationService;
 import org.eclipse.lsp.cobol.service.settings.SettingsService;
@@ -77,7 +78,7 @@ class CachingConfigurationServiceTest {
             new JsonArray(),
             predefinedParagraphs);
 
-    when(settingsService.fetchConfigurations("",
+    when(settingsService.fetchConfigurations(Uri.EMPTY,
             Arrays.asList(
                 DIALECTS.label,
                 SUBROUTINE_LOCAL_PATHS.label,
@@ -95,7 +96,7 @@ class CachingConfigurationServiceTest {
             ImmutableList.of("Dialect"),
             true, ImmutableList.of(),
             ImmutableMap.of("dialect", predefinedParagraphs)),
-        configuration.getConfig("", CopybookProcessingMode.DISABLED));
+        configuration.getConfig(Uri.EMPTY, CopybookProcessingMode.DISABLED));
   }
 
   @Test
@@ -118,7 +119,7 @@ class CachingConfigurationServiceTest {
             new JsonArray(),
              new JsonArray(),
             dialectsSettings);
-    when(settingsService.fetchConfigurations("",
+    when(settingsService.fetchConfigurations(new Uri(""),
             Arrays.asList(
                 DIALECTS.label,
                 SUBROUTINE_LOCAL_PATHS.label,
@@ -137,13 +138,13 @@ class CachingConfigurationServiceTest {
             false,
             ImmutableList.of(),
             ImmutableMap.of("dialect", dialectsSettings)),
-        configuration.getConfig("", CopybookProcessingMode.DISABLED));
+        configuration.getConfig(new Uri(""), CopybookProcessingMode.DISABLED));
   }
 
   @Test
   void testFetchingListConfiguration() {
     String expectedValue = "list-of-some-values-from-client";
-    String documentUri = "documentUri";
+    Uri documentUri = new Uri("documentUri");
     String section = "settings-section";
     SettingsService settingsService = mock(SettingsService.class);
     when(settingsService.fetchTextConfigurationWithScope(documentUri, section))

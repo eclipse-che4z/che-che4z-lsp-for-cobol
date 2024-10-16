@@ -17,6 +17,7 @@ package org.eclipse.lsp.cobol.dialects.idms;
 import lombok.Data;
 import org.antlr.v4.runtime.Token;
 import org.eclipse.lsp.cobol.common.model.Locality;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp4j.Range;
 
 /**
@@ -37,7 +38,7 @@ class IdmsCopybookDescriptor {
    * @param programDocumentUri uri of file
    * @return copybook descriptor
    */
-  public static IdmsCopybookDescriptor from(IdmsCopyParser.CopyIdmsStatementContext ctx, String programDocumentUri) {
+  public static IdmsCopybookDescriptor from(IdmsCopyParser.CopyIdmsStatementContext ctx, Uri programDocumentUri) {
     IdmsCopybookDescriptor result = new IdmsCopybookDescriptor();
     result.name = getName(ctx);
     Range range = DialectUtils.constructRange(ctx.copyIdmsOptions().copyIdmsSource());
@@ -66,7 +67,7 @@ class IdmsCopybookDescriptor {
    * @param programDocumentUri uri of file
    * @return copybook descriptor
    */
-  public static IdmsCopybookDescriptor from(IdmsParser.CopyIdmsStatementContext ctx, String programDocumentUri) {
+  public static IdmsCopybookDescriptor from(IdmsParser.CopyIdmsStatementContext ctx, Uri programDocumentUri) {
     IdmsCopybookDescriptor result = new IdmsCopybookDescriptor();
     result.name = getName(ctx);
     Range range = DialectUtils.constructRange(ctx.copyIdmsOptions().copyIdmsSource());

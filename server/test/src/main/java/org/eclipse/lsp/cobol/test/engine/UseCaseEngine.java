@@ -42,6 +42,7 @@ import org.eclipse.lsp.cobol.common.copybook.SQLBackend;
 import org.eclipse.lsp.cobol.common.dialects.CobolLanguageId;
 import org.eclipse.lsp.cobol.common.model.DefinedAndUsedStructure;
 import org.eclipse.lsp.cobol.common.model.NodeType;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNode;
@@ -484,9 +485,9 @@ public class UseCaseEngine {
   }
 
   private void assertDiagnostics(
-      Map<String, List<Diagnostic>> expected, Map<String, List<Diagnostic>> actual) {
+          Map<Uri, List<Diagnostic>> expected, Map<Uri, List<Diagnostic>> actual) {
     assertEquals(expected.keySet(), actual.keySet(), "Diagnostic documents are not the same");
-    for (String documentUri : expected.keySet()) {
+    for (Uri documentUri : expected.keySet()) {
       List<Diagnostic> expectedDiagnostic =
           expected.get(documentUri).stream().sorted(diagnosticComparator).collect(toList());
       List<Diagnostic> actualDiagnostic =

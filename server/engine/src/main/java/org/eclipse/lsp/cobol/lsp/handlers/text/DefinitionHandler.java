@@ -19,6 +19,7 @@ import com.google.inject.Inject;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.lsp.LspEventDependency;
 import org.eclipse.lsp.cobol.lsp.LspQuery;
 import org.eclipse.lsp.cobol.lsp.analysis.AsyncAnalysisService;
@@ -56,7 +57,7 @@ public class DefinitionHandler {
    * @throws InterruptedException forward exception.
    */
   public Either<List<? extends Location>, List<? extends LocationLink>> definition(DefinitionParams params) throws ExecutionException, InterruptedException {
-    CobolDocumentModel doc = documentModelService.get(params.getTextDocument().getUri());
+    CobolDocumentModel doc = documentModelService.get(Uri.fromLsp(params.getTextDocument().getUri()));
     List<Location> definitions = occurrences.findDefinitions(doc, params);
     return Either.forLeft(definitions);
   }
@@ -78,6 +79,6 @@ public class DefinitionHandler {
    */
   public List<LspEventDependency> getDefinitionEventDependencies(DefinitionParams params) {
     return ImmutableList.of(
-            asyncAnalysisService.createDependencyOn(params.getTextDocument().getUri()));
+            asyncAnalysisService.createDependencyOn(Uri.fromLsp(params.getTextDocument().getUri())));
   }
 }

@@ -21,6 +21,7 @@ import lombok.Synchronized;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.common.model.DefinedAndUsedStructure;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNode;
@@ -99,7 +100,7 @@ public class SymbolsRepository {
    * @param position the position to check
    * @return element at specified position
    */
-  public static Optional<DefinedAndUsedStructure> findElementByPosition(String uri, AnalysisResult result, Position position) {
+  public static Optional<DefinedAndUsedStructure> findElementByPosition(Uri uri, AnalysisResult result, Position position) {
     if (result == null || result.getRootNode() == null) {
       return Optional.empty();
     }

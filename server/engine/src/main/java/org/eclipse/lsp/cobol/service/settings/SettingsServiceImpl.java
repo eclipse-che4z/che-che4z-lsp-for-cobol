@@ -24,6 +24,7 @@ import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.lsp.jrpc.CobolLanguageClient;
 import org.eclipse.lsp4j.ConfigurationItem;
 import org.eclipse.lsp4j.ConfigurationParams;
@@ -64,7 +65,7 @@ public class SettingsServiceImpl implements SettingsService {
   }
 
   @Override
-  public CompletableFuture<List<String>> fetchTextConfigurationWithScope(String scopeUri, String section) {
+  public CompletableFuture<List<String>> fetchTextConfigurationWithScope(Uri scopeUri, String section) {
     return fetchConfigurations(scopeUri, singletonList(section)).thenApply(objects -> objects.stream()
             .filter(JsonArray.class::isInstance)
             .map(JsonArray.class::cast)
@@ -75,11 +76,11 @@ public class SettingsServiceImpl implements SettingsService {
   }
 
   @Override
-  public CompletableFuture<List<String>> fetchTextConfigurationWithScope(String scopeUri, String section, String dialect) {
+  public CompletableFuture<List<String>> fetchTextConfigurationWithScope(Uri scopeUri, String section, String dialect) {
     CobolConfigItem item = new CobolConfigItem();
     item.setSection(section);
     item.setDialect(dialect);
-    item.setScopeUri(scopeUri);
+    item.setScopeUri(scopeUri.toLsp());
     return clientProvider.get().configuration(new ConfigurationParams(singletonList(item)))
             .thenApply(objects -> objects.stream()
                     .filter(JsonArray.class::isInstance)
@@ -98,14 +99,14 @@ public class SettingsServiceImpl implements SettingsService {
 
   @NonNull
   @Override
-  public CompletableFuture<List<Object>> fetchConfigurations(String documentUri, List<String> sections) {
+  public CompletableFuture<List<Object>> fetchConfigurations(Uri documentUri, List<String> sections) {
     List<ConfigurationItem> configurationItems = sections.stream()
             .map(section -> LSP_PREFIX.label + "." + section)
             .map(SettingsServiceImpl::buildConfigurationItem)
             .collect(toList());
 
     if (documentUri != null) {
-      configurationItems.forEach(ci -> ci.setScopeUri(documentUri));
+      configurationItems.forEach(ci -> ci.setScopeUri(documentUri.toLsp()));
     }
 
     return clientProvider.get().configuration(new ConfigurationParams(configurationItems));

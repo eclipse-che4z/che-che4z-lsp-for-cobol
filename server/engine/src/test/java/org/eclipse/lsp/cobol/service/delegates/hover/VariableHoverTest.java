@@ -16,12 +16,13 @@ package org.eclipse.lsp.cobol.service.delegates.hover;
 
 import static org.eclipse.lsp.cobol.test.engine.UseCaseUtils.DOCUMENT_URI;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.lsp.SourceUnitGraph;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
@@ -37,7 +38,7 @@ class VariableHoverTest {
   @BeforeEach
   void setUp() {
     this.documentGraph = mock(SourceUnitGraph.class);
-    when(documentGraph.isUserSuppliedCopybook(anyString())).thenReturn(false);
+    when(documentGraph.isUserSuppliedCopybook(any(Uri.class))).thenReturn(false);
     }
 
   private static final String HEADER =
@@ -113,6 +114,6 @@ class VariableHoverTest {
   }
 
   private TextDocumentPositionParams getPosition(int line, int character) {
-    return new TextDocumentPositionParams(new TextDocumentIdentifier(DOCUMENT_URI), new Position(line, character));
+    return new TextDocumentPositionParams(new TextDocumentIdentifier(DOCUMENT_URI.toString()), new Position(line, character));
   }
 }

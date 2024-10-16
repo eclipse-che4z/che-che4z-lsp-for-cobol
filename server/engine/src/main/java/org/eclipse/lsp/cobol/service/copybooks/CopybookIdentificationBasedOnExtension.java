@@ -16,6 +16,7 @@ package org.eclipse.lsp.cobol.service.copybooks;
 
 import com.google.inject.Singleton;
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.lsp.cobol.common.model.Uri;
 
 import java.util.List;
 import java.util.Objects;
@@ -33,17 +34,14 @@ public class CopybookIdentificationBasedOnExtension implements CopybookIdentific
    * @return True if it's a copybook. False otherwise
    */
   @Override
-  public boolean isCopybook(String uri, String text, List<String> config) {
-    String[] uriAsArray = uri.split("/");
+  public boolean isCopybook(Uri uri, String text, List<String> config) {
+    String[] uriAsArray = uri.decode().split("/");
     String fileNameWithExtension = uriAsArray[uriAsArray.length - 1];
     String[] split = fileNameWithExtension.split("\\.");
     String extension = split.length > 1 ? "." + split[split.length - 1] : "";
-    if (Objects.isNull(config)
-        || config.size() == 0
-        || StringUtils.isBlank(extension)) {
+    if (Objects.isNull(config) || config.isEmpty() || StringUtils.isBlank(extension)) {
       return false;
     }
-    return config.size() > 0
-        && config.contains(extension);
+    return !config.isEmpty() && config.contains(extension);
   }
 }

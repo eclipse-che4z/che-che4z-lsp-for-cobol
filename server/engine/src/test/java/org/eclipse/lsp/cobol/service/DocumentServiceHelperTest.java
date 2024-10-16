@@ -18,6 +18,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.Set;
 import org.eclipse.lsp.cobol.common.model.Locality;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.common.model.tree.*;
 import org.eclipse.lsp.cobol.common.model.tree.variable.QualifiedReferenceNode;
 import org.eclipse.lsp.cobol.implicitDialects.cics.nodes.ExecCicsReturnNode;
@@ -31,7 +32,7 @@ import org.junit.jupiter.api.Test;
 /** Tests {@link DocumentServiceHelper} */
 class DocumentServiceHelperTest {
   private static final Locality LOCALITY = Locality.builder().build();
-  public static final String DOCUMENT_URI = "file:///c:/workspace/document.cbl";
+  public static final Uri DOCUMENT_URI = new Uri("file:///c:/workspace/document.cbl");
 
   @Test
   @Disabled("No longer valid")
@@ -95,10 +96,10 @@ class DocumentServiceHelperTest {
                     .build(),
             new Location(),
             "",
-            "");
+            Uri.EMPTY);
     PerformNode performNode = new PerformNode(Locality.builder()
             .range(new Range(new Position(0, 0), new Position(12, 10)))
-            .uri("file:///c:/workspace/copy.cpy")
+            .uri(new Uri("file:///c:/workspace/copy.cpy"))
             .build());
     copyNode.addChild(performNode);
     ifNode.addChild(performNode);

@@ -38,6 +38,7 @@ import org.eclipse.lsp.cobol.ConfigurableTest;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
 import org.eclipse.lsp.cobol.common.AnalysisResult;
 import org.eclipse.lsp.cobol.common.copybook.SQLBackend;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.test.CobolText;
 import org.eclipse.lsp.cobol.usecases.DialectConfigs;
 import org.eclipse.lsp4j.Diagnostic;
@@ -117,7 +118,7 @@ public abstract class FileBasedTest extends ConfigurableTest {
   }
 
   protected static Map<ReportSection, List<SysprintSnap>> getDataNameRefs(
-      String filename, CobolTextRegistry textRegistry) {
+          Uri filename, CobolTextRegistry textRegistry) {
     return textRegistry.getSnapForFile(filename);
   }
 
@@ -127,12 +128,12 @@ public abstract class FileBasedTest extends ConfigurableTest {
    * @param diagnostics list of diagnostic from the analysis result
    * @param fileName name of the file that has been tested
    */
-  protected void assertNoSyntaxErrorsFound(List<Diagnostic> diagnostics, String fileName) {
+  protected void assertNoSyntaxErrorsFound(List<Diagnostic> diagnostics, Uri fileName) {
     assertEquals(0, diagnostics.size(), createErrorMessage(diagnostics, fileName));
   }
 
-  private String createErrorMessage(List<Diagnostic> diagnostics, String fileName) {
-    StringBuilder result = new StringBuilder(fileName);
+  private String createErrorMessage(List<Diagnostic> diagnostics, Uri fileName) {
+    StringBuilder result = new StringBuilder(fileName.toString());
     result.append(" contains syntax errors:\r\n");
     diagnostics.forEach(
         it -> {
@@ -159,7 +160,7 @@ public abstract class FileBasedTest extends ConfigurableTest {
     }
   }
 
-  void assertNoError(String fileName, AnalysisResult analyze) {
+  void assertNoError(Uri fileName, AnalysisResult analyze) {
     List<Diagnostic> diagnostic =
         ofNullable(analyze.getDiagnostics().get(fileName))
             .map(
@@ -180,15 +181,15 @@ public abstract class FileBasedTest extends ConfigurableTest {
    * @return List of copybooks
    */
   protected List<CobolText> getFileSpecificCopybooks(
-      CobolTextRegistry cobolTextRegistry, String fileName) {
+      CobolTextRegistry cobolTextRegistry, Uri fileName) {
     Stream<CobolText> cobolTextStream =
         getCopybooks(cobolTextRegistry).stream()
             .filter(
                 book ->
-                    getCopybooks(cobolTextRegistry, fileName.split("\\.")[0]).stream()
+                    getCopybooks(cobolTextRegistry, fileName.toString().split("\\.")[0]).stream()
                         .noneMatch(b1 -> b1.getFileName().equals(book.getFileName())));
     return Stream.concat(
-            cobolTextStream, getCopybooks(cobolTextRegistry, fileName.split("\\.")[0]).stream())
+            cobolTextStream, getCopybooks(cobolTextRegistry, fileName.toString().split("\\.")[0]).stream())
         .collect(toList());
   }
 

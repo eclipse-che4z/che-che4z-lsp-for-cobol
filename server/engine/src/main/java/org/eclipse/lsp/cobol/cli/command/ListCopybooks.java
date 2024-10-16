@@ -32,6 +32,7 @@ import java.util.stream.Collectors;
 import org.eclipse.lsp.cobol.cli.di.CliModule;
 import org.eclipse.lsp.cobol.cli.modules.CliClientProvider;
 import org.eclipse.lsp.cobol.common.dialects.CobolLanguageId;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.common.pipeline.StageResult;
 import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
 import org.eclipse.lsp4j.Location;
@@ -111,7 +112,7 @@ public class ListCopybooks implements Callable<Integer> {
     parent.addTiming(result, analysisResult.ctx.getBenchmarkSession());
     StageResult<CopybooksRepository> copybooksResult =
         (StageResult<CopybooksRepository>) analysisResult.pipelineResult.getLastStageResult();
-    Multimap<String, String> definitions = copybooksResult.getData().getDefinitions();
+    Multimap<String, Uri> definitions = copybooksResult.getData().getDefinitions();
     Multimap<String, Location> usages = copybooksResult.getData().getUsages();
     Set<String> missing = new HashSet<>(usages.keySet());
     missing.removeAll(definitions.keySet());
@@ -119,7 +120,7 @@ public class ListCopybooks implements Callable<Integer> {
     JsonArray copybookUris = new JsonArray();
     JsonArray missingCopybooks = new JsonArray();
     missing.forEach(missingCopybooks::add);
-    definitions.values().forEach(copybookUris::add);
+    definitions.values().stream().map(Uri::toString).forEach(copybookUris::add);
     result.add("copybookUris", copybookUris);
     result.add("missingCopybooks", missingCopybooks);
     System.out.println(gson.toJson(result));

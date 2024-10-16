@@ -23,6 +23,7 @@ import org.eclipse.lsp.cobol.common.copybook.CopybookModel;
 import org.eclipse.lsp.cobol.common.copybook.CopybookName;
 import org.eclipse.lsp.cobol.common.copybook.SQLBackend;
 import org.eclipse.lsp.cobol.common.file.WorkspaceFileService;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.common.utils.ImplicitCodeUtils;
 import org.eclipse.lsp.cobol.common.utils.PredefinedCopybooks;
 import org.eclipse.lsp.cobol.test.CobolText;
@@ -58,7 +59,7 @@ class PredefinedCopybookUtils {
    * @param programUri uri of the program
    * @return list of models for predefined copybooks
    */
-  List<CopybookModel> loadPredefinedCopybooks(SQLBackend sqlBackend, List<CobolText> copybooks, String programUri, List<String> compilerOptions) {
+  List<CopybookModel> loadPredefinedCopybooks(SQLBackend sqlBackend, List<CobolText> copybooks, Uri programUri, List<String> compilerOptions) {
     return PredefinedCopybooks.getNames().stream()
         .map(name -> retrieveModel(new CopybookName(name, findDialect(name, copybooks)), programUri, sqlBackend, compilerOptions))
         .collect(Collectors.toList());
@@ -72,7 +73,7 @@ class PredefinedCopybookUtils {
         .orElse(null);
   }
 
-  private CopybookModel retrieveModel(CopybookName copybookName, String programUri, SQLBackend sqlBackend, List<String> compilerOptions) {
+  private CopybookModel retrieveModel(CopybookName copybookName, Uri programUri, SQLBackend sqlBackend, List<String> compilerOptions) {
     final String name = retrieveRealName(copybookName.getDisplayName(), sqlBackend);
 
     String content = files.readImplicitCode(name);
@@ -85,7 +86,7 @@ class PredefinedCopybookUtils {
             ImmutableMap.of(),
             sqlBackend,
             compilerOptions);
-    String fullUrl = ImplicitCodeUtils.createFullUrl(name);
+    Uri fullUrl = ImplicitCodeUtils.createFullUrl(name);
     return new CopybookModel(copybookName.toCopybookId(programUri), copybookName, fullUrl, cleanCopybook.getText());
   }
 

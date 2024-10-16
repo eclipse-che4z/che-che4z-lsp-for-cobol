@@ -18,6 +18,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 
@@ -33,16 +34,16 @@ import java.util.Map;
 public class MappedCharacter {
   private char character;
   private Position originalPosition;
-  private String uri;
+  private Uri uri;
   private ExtendedTextLine parent;
   private Location instantLocation;
-  private Map<String, Location> initialLocationMap;
+  private Map<Uri, Location> initialLocationMap;
 
   MappedCharacter shadowCopy() {
     return new MappedCharacter(character, originalPosition, uri, parent, instantLocation, initialLocationMap);
   }
 
-  Map<String, Location> getOrCreateInitialLocationMap() {
+  Map<Uri, Location> getOrCreateInitialLocationMap() {
     if (initialLocationMap == null)
       initialLocationMap = new HashMap<>();
     return initialLocationMap;

@@ -30,6 +30,7 @@ import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.model.Locality;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.core.model.CobolLineTypeEnum;
 import org.eclipse.lsp.cobol.core.preprocessor.CobolLine;
 import org.eclipse.lsp.cobol.common.dialects.CobolProgramLayout;
@@ -56,7 +57,7 @@ public abstract class CobolLineReader {
    * @return List of COBOL lines with a list of errors if found, or an empty list
    */
   @NonNull
-  public ResultWithErrors<List<CobolLine>> processLines(@NonNull String uri, @NonNull String lines) {
+  public ResultWithErrors<List<CobolLine>> processLines(@NonNull Uri uri, @NonNull String lines) {
     List<SyntaxError> accumulatedErrors = new ArrayList<>();
     List<CobolLine> result = new ArrayList<>();
     try (Scanner scanner = new Scanner(lines)) {
@@ -86,7 +87,7 @@ public abstract class CobolLineReader {
   protected abstract CobolProgramLayout getLayout();
 
   @NonNull ResultWithErrors<CobolLine> parseLine(
-          @NonNull String line, @NonNull String uri, int lineNumber) {
+          @NonNull String line, @NonNull Uri uri, int lineNumber) {
     List<SyntaxError> errors = new ArrayList<>();
     CobolLine cobolLine;
 
@@ -109,7 +110,7 @@ public abstract class CobolLineReader {
   }
 
   private ResultWithErrors<CobolLine> processCompilerDirectives(
-          @NonNull String line, @NonNull String uri, int lineNumber, @NonNull Matcher matcher) {
+          @NonNull String line, @NonNull Uri uri, int lineNumber, @NonNull Matcher matcher) {
     List<SyntaxError> errors = new ArrayList<>();
     int contentStart = matcher.start("directives");
     String directives = matcher.group("directives");
@@ -122,7 +123,7 @@ public abstract class CobolLineReader {
   }
 
   private ResultWithErrors<CobolLine> processNormalLine(
-          @NonNull String line, @NonNull String uri, int lineNumber, Matcher matcher) {
+          @NonNull String line, @NonNull Uri uri, int lineNumber, Matcher matcher) {
     List<SyntaxError> errors = new ArrayList<>();
     CobolLine cobolLine = new CobolLine();
     cobolLine.setSequenceArea(matcher.group("sequence"));
@@ -145,7 +146,7 @@ public abstract class CobolLineReader {
   }
 
   private ResultWithErrors<CobolLineTypeEnum> determineType(
-          String indicatorArea, String uri, int lineNumber) {
+          String indicatorArea, Uri uri, int lineNumber) {
     return ofNullable(getIndicator().get(indicatorArea))
             .map(it -> new ResultWithErrors<>(it, Collections.emptyList()))
             .orElseGet(
@@ -162,7 +163,7 @@ public abstract class CobolLineReader {
 
   @NonNull
   private Optional<SyntaxError> checkLineLength(
-          @NonNull String line, @NonNull String uri, int lineNumber) {
+          @NonNull String line, @NonNull Uri uri, int lineNumber) {
     int maxLineLength = getLayout().getMaxLineLength();
     if (line.length() <= maxLineLength) {
       return Optional.empty();
@@ -177,7 +178,7 @@ public abstract class CobolLineReader {
   }
 
   private Optional<SyntaxError> checkSequenceArea(
-          @NonNull String line, @NonNull String uri, int lineNumber, int contentStart) {
+          @NonNull String line, @NonNull Uri uri, int lineNumber, int contentStart) {
     if (isSequenceNumberFormatCorrect(line, contentStart)) {
       return Optional.empty();
     }
@@ -209,17 +210,14 @@ public abstract class CobolLineReader {
    */
   @NonNull
   private SyntaxError createError(
-          @NonNull String uri, @NonNull String message, int lineNumber, int start, int stop) {
+          @NonNull Uri uri, @NonNull String message, int lineNumber, int start, int stop) {
     SyntaxError error =
             SyntaxError.syntaxError()
                     .errorSource(ErrorSource.PREPROCESSING)
                     .suggestion(message)
                     .severity(ERROR)
-                    .location(
-                            Locality.builder()
-                                    .uri(uri)
-                                    .range(
-                                            new Range(new Position(lineNumber, start), new Position(lineNumber, stop)))
+                    .location(Locality.builder().uri(uri)
+                                    .range(new Range(new Position(lineNumber, start), new Position(lineNumber, stop)))
                                     .recognizer(getClass())
                                     .build().toOriginalLocation())
                     .build();

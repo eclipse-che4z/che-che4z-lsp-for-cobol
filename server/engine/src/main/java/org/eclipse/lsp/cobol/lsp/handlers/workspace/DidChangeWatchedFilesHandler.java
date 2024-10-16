@@ -28,6 +28,7 @@ import java.util.stream.Collectors;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.common.UserInterruptException;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.lsp.DisposableLSPStateService;
 import org.eclipse.lsp.cobol.lsp.SourceUnitGraph;
 import org.eclipse.lsp.cobol.lsp.analysis.AsyncAnalysisService;
@@ -73,15 +74,15 @@ public class DidChangeWatchedFilesHandler {
               if (file.getType() == FileChangeType.Deleted) {
                 path = path.getParent();
               }
-              String uriString = path.toUri().toString();
-              if (sourceUnitGraph.isFileOpened(uriString)) {
+              Uri uriPath = new Uri(path.toUri().toString());
+              if (sourceUnitGraph.isFileOpened(uriPath)) {
                 LOG.debug("[File change event]  ignoring event for uri : {} as its already opened in editor", uri);
                 // opened files are taken care by textChange events
                 return;
               }
               boolean isDirectory = Files.isDirectory(path);
               if (!isDirectory) {
-                triggerAnalysisForChangedFile(uriString);
+                triggerAnalysisForChangedFile(uriPath);
               } else {
                 triggerAnalysisForFilesInDirectory(path);
               }
@@ -100,20 +101,20 @@ public class DidChangeWatchedFilesHandler {
     return uri.startsWith("file:") && uri.contains("/.git/");
   }
 
-  private void triggerAnalysisForChangedFile(String uri) {
-    List<String> uris = sourceUnitGraph.getAllAssociatedFilesForACopybook(uri);
+  private void triggerAnalysisForChangedFile(Uri uri) {
+    List<Uri> uris = sourceUnitGraph.getAllAssociatedFilesForACopybook(uri);
     String fileContent = null;
     if (uris.isEmpty()) {
       LOG.debug("[File change event]  trigger analysis for all opened document");
       analyseAllOpenedDocument();
       return;
     }
-    if (Files.exists(Paths.get(URI.create(uri)))) {
+    if (Files.exists(Paths.get(URI.create(uri.decode())))) {
       sourceUnitGraph.updateContent(uri);
       fileContent = sourceUnitGraph.getContent(uri);
     }
     if (!sourceUnitGraph.isFileOpened(uri)) {
-      LOG.debug("[File change event]  trigger analysis for uris: {}", String.join(", ", uris));
+      LOG.debug("[File change event]  trigger analysis for uris: {}", uris.stream().map(Uri::toString).collect(Collectors.joining(", ")));
       asyncAnalysisService.reanalyseCopybooksAssociatedPrograms(
           uris, uri, fileContent, SourceUnitGraph.EventSource.FILE_SYSTEM);
     }
@@ -121,7 +122,7 @@ public class DidChangeWatchedFilesHandler {
 
   private void triggerAnalysisForFilesInDirectory(Path path) {
     // Only care for deleted copybooks as they impact the diagnostics
-    Set<String> affectedPrograms =
+    Set<Uri> affectedPrograms =
         sourceUnitGraph.getCopybookUriInsideFolder(path.toUri().toString()).stream()
             .flatMap(
                 copybookUri ->

@@ -18,7 +18,6 @@ import static org.eclipse.lsp.cobol.dialects.idms.IdmsCopyParser.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -33,6 +32,7 @@ import org.eclipse.lsp.cobol.common.CleanerPreprocessor;
 import org.eclipse.lsp.cobol.common.ResultWithErrors;
 import org.eclipse.lsp.cobol.common.copybook.*;
 import org.eclipse.lsp.cobol.common.model.NodeType;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.dialects.idms.utils.TestUtils;
 import org.eclipse.lsp4j.Position;
@@ -48,7 +48,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class IdmsCopybookVisitorTest {
 
-  private static final String PROGRAM_DOCUMENT_URI = "programDocumentUri";
+  private static final Uri PROGRAM_DOCUMENT_URI = new Uri("programDocumentUri");
   @Mock
   private CopybookService copybookService;
   @Mock
@@ -59,7 +59,7 @@ class IdmsCopybookVisitorTest {
 
   @BeforeEach
   void init() {
-      visitor = new IdmsCopybookVisitor(copybookService, preprocessor, idmsCopybookService, PROGRAM_DOCUMENT_URI, "documentUri", 1);
+      visitor = new IdmsCopybookVisitor(copybookService, preprocessor, idmsCopybookService, PROGRAM_DOCUMENT_URI, new Uri("documentUri"), 1);
   }
 
   @Test
@@ -68,7 +68,7 @@ class IdmsCopybookVisitorTest {
     IdmsCopyParser.CopyIdmsOptionsContext copyContext = mock(IdmsCopyParser.CopyIdmsOptionsContext.class);
     IdmsCopyParser.CopyIdmsSourceContext sourceContext = mock(IdmsCopyParser.CopyIdmsSourceContext.class);
     CopybookName expectedCopybookName = new CopybookName("copybook", "IDMS");
-    when(copybookService.resolve(any(CopybookId.class), any(CopybookName.class), anyString(), anyString(),
+    when(copybookService.resolve(any(CopybookId.class), any(CopybookName.class), any(Uri.class), any(Uri.class),
             any()))
             .thenReturn(
                     new ResultWithErrors<>(

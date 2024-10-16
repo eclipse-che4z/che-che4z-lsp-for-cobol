@@ -38,6 +38,7 @@ import org.eclipse.lsp.cobol.common.dialects.CobolLanguageId;
 
 import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedText;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.common.pipeline.Pipeline;
 import org.eclipse.lsp.cobol.common.pipeline.PipelineResult;
 import org.eclipse.lsp.cobol.core.engine.analysis.AnalysisContext;
@@ -75,7 +76,7 @@ public class Cli implements Callable<Integer> {
   }
 
   Result runAnalysis(File src, CobolLanguageId dialect, Injector diCtx, boolean isAnalysisRequired) throws IOException {
-    String documentUri = src.toURI().toString();
+    Uri documentUri = new Uri(src.toURI().toString());
     Pipeline<AnalysisContext> pipeline = setupPipeline(diCtx, isAnalysisRequired, dialect);
 
     // Cleaning up

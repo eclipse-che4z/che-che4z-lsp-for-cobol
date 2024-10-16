@@ -21,6 +21,7 @@ import com.google.inject.Singleton;
 import lombok.NonNull;
 import lombok.Synchronized;
 import org.eclipse.lsp.cobol.common.copybook.CopybookService;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.lsp.jrpc.CobolLanguageClient;
 import org.eclipse.lsp.cobol.service.settings.ConfigurationService;
 import org.eclipse.lsp4j.*;
@@ -58,7 +59,7 @@ public class WatcherServiceImpl implements WatcherService {
   private static final String CONFIGURATION_CHANGE_ID = "configurationChange";
 
   private final List<String> folderWatchers = new ArrayList<>();
-  private final Map<String, List<String>> runtimeSpecifiedFolderWatchers = new HashMap<>();
+  private final Map<Uri, List<String>> runtimeSpecifiedFolderWatchers = new HashMap<>();
   private final List<WorkspaceFolder> workspaceFolders = new ArrayList<>();
 
   private final Provider<CobolLanguageClient> clientProvider;
@@ -126,7 +127,7 @@ public class WatcherServiceImpl implements WatcherService {
    * @param documentUri - document for which runtime watchers need to be removed.
    */
   @Override
-  public void removeRuntimeWatchers(@NonNull String documentUri) {
+  public void removeRuntimeWatchers(@NonNull Uri documentUri) {
     List<String> removedWatchers =
             runtimeSpecifiedFolderWatchers.getOrDefault(documentUri, Collections.emptyList());
     runtimeSpecifiedFolderWatchers.remove(documentUri);
@@ -148,19 +149,19 @@ public class WatcherServiceImpl implements WatcherService {
    * @param documentUri - documents for which specified path need to be watched.
    */
   @Override
-  public void addRuntimeWatchers(String documentUri) {
+  public void addRuntimeWatchers(Uri documentUri) {
     addWatchersForLocalCopybooks(documentUri);
     addWatchersForDialects(documentUri);
     addWatchersForSubroutines(documentUri);
   }
 
-  private void addWatchersForSubroutines(String uri) {
+  private void addWatchersForSubroutines(Uri uri) {
     configurationService
         .getListConfiguration(uri, SUBROUTINE_LOCAL_PATHS.label)
         .thenAccept(dir -> addRuntimeWatcher(uri, dir));
   }
 
-  private void addWatchersForDialects(String uri) {
+  private void addWatchersForDialects(Uri uri) {
     configurationService
         .getDialectWatchingFolders()
         .forEach(
@@ -170,13 +171,13 @@ public class WatcherServiceImpl implements WatcherService {
                     .thenAccept(dir -> addRuntimeWatcher(uri, dir)));
   }
 
-  private void addWatchersForLocalCopybooks(String uri) {
+  private void addWatchersForLocalCopybooks(Uri uri) {
     configurationService
         .getListConfiguration(uri, CPY_LOCAL_PATHS.label)
         .thenAccept(dir -> addRuntimeWatcher(uri, dir));
   }
 
-  private void addRuntimeWatcher(String uri, List<String> dir) {
+  private void addRuntimeWatcher(Uri uri, List<String> dir) {
     List<String> directories = new ArrayList<>();
     for (String path : dir) {
       if (path.contains(CopybookService.FILE_BASENAME_VARIABLE)) {
@@ -187,11 +188,11 @@ public class WatcherServiceImpl implements WatcherService {
     addRuntimeWatchers(directories, uri);
   }
 
-  private String getNameFromURI(String uri) {
-    return new File(uri).getName().replaceFirst("\\?.*$", "").split("\\.")[0];
+  private String getNameFromURI(Uri uri) {
+    return new File(uri.decode()).getName().replaceFirst("\\?.*$", "").split("\\.")[0];
   }
 
-  private void addRuntimeWatchers(@NonNull List<String> paths, String documentUri) {
+  private void addRuntimeWatchers(@NonNull List<String> paths, Uri documentUri) {
     List<String> watchedFolders =
         runtimeSpecifiedFolderWatchers.getOrDefault(documentUri, new ArrayList<>());
     watchedFolders.addAll(paths);
@@ -223,6 +224,7 @@ public class WatcherServiceImpl implements WatcherService {
     return Either.forRight(relativePattern);
   }
 
+  // FIXME: why folder is ignored?
   private Either<String, RelativePattern> createFolderWatcher(String folder) {
     RelativePattern relativePattern = new RelativePattern();
     relativePattern.setBaseUri(getWorkspaceFolders().get(0));

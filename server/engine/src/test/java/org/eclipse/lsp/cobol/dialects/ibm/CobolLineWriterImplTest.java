@@ -21,6 +21,7 @@ import static org.mockito.Mockito.when;
 import java.util.List;
 import java.util.Optional;
 import org.eclipse.lsp.cobol.common.ResultWithErrors;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.core.preprocessor.CobolLine;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.writer.CobolLineWriter;
 import org.eclipse.lsp.cobol.service.settings.layout.CodeLayoutStore;
@@ -57,7 +58,7 @@ class CobolLineWriterImplTest extends AbstractCobolLinePreprocessorTest {
     CodeLayoutStore store = mock(CodeLayoutStore.class);
     when(store.getCodeLayout()).thenReturn(Optional.empty());
     CobolLineWriter writer = new IbmCobolLineWriter(store);
-    assertEquals(EXPECTED, writer.serialize(result.getResult(), "").toString());
+    assertEquals(EXPECTED, writer.serialize(result.getResult(), Uri.EMPTY).toString());
     assertEquals(0, result.getErrors().size());
   }
 }

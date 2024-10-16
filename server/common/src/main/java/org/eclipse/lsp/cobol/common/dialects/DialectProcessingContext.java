@@ -21,6 +21,7 @@ import lombok.Value;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
 import org.eclipse.lsp.cobol.common.CleanerPreprocessor;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 
 /** Contains all needed data for dialect processing */
@@ -28,7 +29,7 @@ import org.eclipse.lsp.cobol.common.model.tree.Node;
 @Builder(toBuilder = true)
 public class DialectProcessingContext {
   AnalysisConfig config;
-  String programDocumentUri;
+  Uri programDocumentUri;
   ExtendedDocument extendedDocument;
   CleanerPreprocessor preprocessor;
   @Builder.Default List<Node> dialectNodes = new ArrayList<>();

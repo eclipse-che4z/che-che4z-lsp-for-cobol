@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import org.eclipse.lsp.cobol.common.AnalysisResult;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.common.model.tree.RootNode;
 import org.eclipse.lsp4j.Diagnostic;
 import org.junit.jupiter.api.BeforeEach;
@@ -32,7 +33,7 @@ import org.junit.jupiter.api.Test;
  */
 class DocumentModelServiceTest {
   private DocumentModelService service;
-  private String languageId = "cobol";
+  private final String languageId = "cobol";
 
   @BeforeEach
   void init() {
@@ -41,14 +42,14 @@ class DocumentModelServiceTest {
 
   @Test
   void testOpenDocument() {
-    String uri = UUID.randomUUID().toString();
+    Uri uri = new Uri(UUID.randomUUID().toString());
     String text = UUID.randomUUID().toString();
     service.openDocument(uri, text, "cobol");
 
     assertTrue(service.get(uri).isOpened());
   }
 
-  private AnalysisResult createAnalysisResult(String uri) {
+  private AnalysisResult createAnalysisResult(Uri uri) {
     return AnalysisResult.builder()
         .diagnostics(ImmutableMap.of(uri, ImmutableList.of(new Diagnostic())))
         .rootNode(new RootNode())
@@ -58,8 +59,8 @@ class DocumentModelServiceTest {
 
   @Test
   void testGetAllOpened() {
-    String uri1 = UUID.randomUUID().toString();
-    String uri2 = UUID.randomUUID().toString();
+    Uri uri1 = new Uri(UUID.randomUUID().toString());
+    Uri uri2 = new Uri(UUID.randomUUID().toString());
     service.openDocument(uri1, UUID.randomUUID().toString(), languageId);
     service.openDocument(uri2, UUID.randomUUID().toString(), languageId);
     service.closeDocument(uri1);
@@ -69,7 +70,7 @@ class DocumentModelServiceTest {
 
   @Test
   void testIsDocumentSynced() {
-    String uri = UUID.randomUUID().toString();
+    Uri uri = new Uri(UUID.randomUUID().toString());
     service.openDocument(uri, UUID.randomUUID().toString(), languageId);
     assertFalse(service.isDocumentSynced(uri));
 
@@ -78,9 +79,9 @@ class DocumentModelServiceTest {
   }
 
   @Test
-  void testGetOpenedDiagnostic() {
-    String uri1 = UUID.randomUUID().toString();
-    String uri2 = UUID.randomUUID().toString();
+  void testGetOpenedDiagnosticLsp() {
+    Uri uri1 = new Uri(UUID.randomUUID().toString());
+    Uri uri2 = new Uri(UUID.randomUUID().toString());
     service.openDocument(uri1, UUID.randomUUID().toString(), languageId);
     service.processAnalysisResult(uri1, createAnalysisResult(uri1), "text");
 
@@ -88,7 +89,7 @@ class DocumentModelServiceTest {
     service.processAnalysisResult(uri2, createAnalysisResult(uri2), "text");
 
     service.closeDocument(uri1);
-    Map<String, List<Diagnostic>> diagnostics = service.getOpenedDiagnostic();
+    Map<Uri, List<Diagnostic>> diagnostics = service.getOpenedDiagnosticLsp();
 
     assertEquals(2, diagnostics.size());
     assertEquals(0, diagnostics.get(uri1).size());
@@ -97,18 +98,18 @@ class DocumentModelServiceTest {
 
   @Test
   void testInvalidate() {
-    String uri = UUID.randomUUID().toString();
+    Uri uri = new Uri(UUID.randomUUID().toString());
     service.openDocument(uri, UUID.randomUUID().toString(), languageId);
     service.processAnalysisResult(uri, createAnalysisResult(uri), "text");
 
-    Map<String, List<Diagnostic>> diagnostics = service.getOpenedDiagnostic();
+    Map<Uri, List<Diagnostic>> diagnostics = service.getOpenedDiagnosticLsp();
     assertEquals(1, diagnostics.get(uri).size());
 
     CobolDocumentModel documentModel = service.get(uri);
     assertNotNull(documentModel);
 
     service.removeDocumentDiagnostics(uri);
-    diagnostics = service.getOpenedDiagnostic();
+    diagnostics = service.getOpenedDiagnosticLsp();
     assertEquals(0, diagnostics.get(uri).size());
 
     documentModel = service.get(uri);
@@ -117,7 +118,7 @@ class DocumentModelServiceTest {
 
   @Test
   void testProcessAnalysis() {
-    String uri = UUID.randomUUID().toString();
+    Uri uri = new Uri(UUID.randomUUID().toString());
     String text = UUID.randomUUID().toString();
     service.openDocument(uri, text, languageId);
     service.processAnalysisResult(uri, createAnalysisResult(uri), text);
@@ -127,14 +128,14 @@ class DocumentModelServiceTest {
 
   @Test
   void testRemove() {
-    String uri = UUID.randomUUID().toString();
+    Uri uri = new Uri(UUID.randomUUID().toString());
     String text = UUID.randomUUID().toString();
 
     service.openDocument(uri, text, languageId);
     assertNotNull(service.get(uri));
 
     service.removeDocumentDiagnostics(uri);
-    Map<String, List<Diagnostic>> diagnostics = service.getOpenedDiagnostic();
+    Map<Uri, List<Diagnostic>> diagnostics = service.getOpenedDiagnosticLsp();
     assertEquals(0, diagnostics.get(uri).size());
     assertNotNull(service.get(uri));
   }

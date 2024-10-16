@@ -17,6 +17,7 @@ package org.eclipse.lsp.cobol.common;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Value;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.symbols.SymbolTable;
 import org.eclipse.lsp.cobol.common.model.tree.RootNode;
@@ -34,7 +35,7 @@ import java.util.Map;
 @Builder(toBuilder = true)
 public class AnalysisResult {
   public static final AnalysisResult EMPTY = AnalysisResult.builder().build();
-  @Builder.Default Map<String, List<Diagnostic>> diagnostics = new HashMap<>();
+  @Builder.Default Map<Uri, List<Diagnostic>> diagnostics = new HashMap<>();
   @Builder.Default RootNode rootNode = new RootNode();
   @EqualsAndHashCode.Exclude @Builder.Default Map<String, SymbolTable> symbolTableMap = new HashMap<>();
 }

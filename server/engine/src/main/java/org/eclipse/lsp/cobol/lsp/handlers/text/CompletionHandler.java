@@ -19,6 +19,7 @@ import com.google.inject.Inject;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.lsp.LspEventDependency;
 import org.eclipse.lsp.cobol.lsp.LspQuery;
 import org.eclipse.lsp.cobol.lsp.analysis.AsyncAnalysisService;
@@ -55,7 +56,7 @@ public class CompletionHandler {
    * @throws InterruptedException forward exception.
    */
   public Either<List<CompletionItem>, CompletionList> completion(CompletionParams params) throws ExecutionException, InterruptedException {
-    String uri = params.getTextDocument().getUri();
+    Uri uri = Uri.fromLsp(params.getTextDocument().getUri());
     return Either.forRight(completions.collectFor(documentModelService.get(uri), params));
   }
 
@@ -74,7 +75,7 @@ public class CompletionHandler {
    * @return List of {@link LspEventDependency}
    */
   public List<LspEventDependency> getDocumentHighlightDependency(CompletionParams params) {
-    return ImmutableList.of(
-            asyncAnalysisService.createDependencyOn(params.getTextDocument().getUri()));
+    Uri uri = Uri.fromLsp(params.getTextDocument().getUri());
+    return ImmutableList.of(asyncAnalysisService.createDependencyOn(uri));
   }
 }

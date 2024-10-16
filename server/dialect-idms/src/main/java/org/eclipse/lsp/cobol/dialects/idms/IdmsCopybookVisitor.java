@@ -35,6 +35,7 @@ import org.eclipse.lsp.cobol.common.copybook.*;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.model.Locality;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.model.tree.variable.OccursClause;
 import org.eclipse.lsp.cobol.common.model.tree.variable.ValueClause;
@@ -54,8 +55,8 @@ class IdmsCopybookVisitor extends IdmsCopyParserBaseVisitor<List<Node>> {
   private final CopybookService copybookService;
   private final CleanerPreprocessor preprocessor;
   private final IdmsCopybookService idmsCopybookService;
-  private final String programDocumentUri;
-  private final String documentUri;
+  private final Uri programDocumentUri;
+  private final Uri documentUri;
   private final int parentLevel;
   @Getter private final List<SyntaxError> errors = new LinkedList<>();
 
@@ -66,8 +67,8 @@ class IdmsCopybookVisitor extends IdmsCopyParserBaseVisitor<List<Node>> {
                       CopybookProcessingMode copybookProcessingMode,
                       ParseTreeListener treeListener,
                       MessageService messageService,
-                      String programDocumentUri,
-                      String documentUri,
+                      Uri programDocumentUri,
+                      Uri documentUri,
                       int parentLevel,
                       Set<CopybookName> processedCopybooks) {
     this.copybookService = copybookService;

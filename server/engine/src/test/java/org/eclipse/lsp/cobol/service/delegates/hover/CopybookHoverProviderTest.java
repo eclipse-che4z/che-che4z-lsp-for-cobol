@@ -44,7 +44,9 @@ class CopybookHoverProviderTest {
     @Test
     void testGetHover() {
         TextDocumentPositionParams position = mock(TextDocumentPositionParams.class);
-        when(position.getTextDocument()).thenReturn(mock(TextDocumentIdentifier.class));
+        TextDocumentIdentifier textDocumentIdentifier = mock(TextDocumentIdentifier.class);
+        when(textDocumentIdentifier.getUri()).thenReturn("");
+        when(position.getTextDocument()).thenReturn(textDocumentIdentifier);
         SourceUnitGraph sourceUnitGraph = mock(SourceUnitGraph.class);
         copybookHoverProvider.getHover(mock(CobolDocumentModel.class), position, sourceUnitGraph);
 
@@ -54,7 +56,9 @@ class CopybookHoverProviderTest {
     @Test
     void testGetHover_graphIsCopybook() {
         TextDocumentPositionParams position = mock(TextDocumentPositionParams.class);
-        when(position.getTextDocument()).thenReturn(mock(TextDocumentIdentifier.class));
+        TextDocumentIdentifier textDocumentIdentifier = mock(TextDocumentIdentifier.class);
+        when(textDocumentIdentifier.getUri()).thenReturn("");
+        when(position.getTextDocument()).thenReturn(textDocumentIdentifier);
         SourceUnitGraph sourceUnitGraph = mock(SourceUnitGraph.class);
         when(sourceUnitGraph.isUserSuppliedCopybook(any())).thenReturn(true);
         SourceUnitGraph.NodeV nodeV = mock(SourceUnitGraph.NodeV.class);

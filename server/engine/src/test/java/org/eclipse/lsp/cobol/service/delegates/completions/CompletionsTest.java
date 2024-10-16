@@ -16,6 +16,7 @@
 package org.eclipse.lsp.cobol.service.delegates.completions;
 
 import com.google.common.collect.ImmutableSet;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp4j.*;
 import org.hamcrest.Matchers;
@@ -40,7 +41,7 @@ class CompletionsTest {
                     new ParagraphCompletion(REPO)));
     CompletionList actual =
         completions.collectFor(
-            new CobolDocumentModel("", "Lorem ipsum dolor c amet", RESULT),
+            new CobolDocumentModel(new Uri(""), "Lorem ipsum dolor c amet", RESULT),
             new CompletionParams(
                 new TextDocumentIdentifier(""), new Position(0, 19))); // The position of 'c;
     assertThat(actual.getItems(), Matchers.containsInAnyOrder(createExpected()));

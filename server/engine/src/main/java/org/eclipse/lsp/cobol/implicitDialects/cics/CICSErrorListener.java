@@ -24,6 +24,7 @@ import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.model.Locality;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
@@ -34,11 +35,11 @@ import java.util.Optional;
 /** ANTLR error listener for CICS */
 @Slf4j
 public class CICSErrorListener extends BaseErrorListener {
-  private final String uri;
+  private final Uri uri;
 
   @Getter private final List<SyntaxError> errors = new ArrayList<>();
 
-  CICSErrorListener(String uri) {
+  CICSErrorListener(Uri uri) {
     this.uri = uri;
   }
 

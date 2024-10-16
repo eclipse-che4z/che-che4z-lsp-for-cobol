@@ -20,11 +20,11 @@ import lombok.experimental.UtilityClass;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 import org.eclipse.lsp.cobol.common.model.Locality;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
 import javax.annotation.Nullable;
-import java.util.function.Function;
 
 /** Utilities for Locality building and retrieving */
 @UtilityClass
@@ -40,33 +40,13 @@ public class LocalityUtils {
    */
   @NonNull
   public Locality buildLocality(
-      ParserRuleContext context, String documentUri, @Nullable String copybookId) {
+          ParserRuleContext context, Uri documentUri, @Nullable String copybookId) {
     return Locality.builder()
         .uri(documentUri)
         .copybookId(copybookId)
         .range(retrieveRange(context.getStart(), context.getStop()))
         .recognizer(LocalityUtils.class)
         .build();
-  }
-
-  /**
-   * Create a functor to turn a token into a locality using the current document URI and the current
-   * copybook.
-   *
-   * @param documentUri uri of the current document
-   * @param copybookId the id of the current copybook
-   * @return a functor Token -> Locality
-   */
-  @NonNull
-  public Function<Token, Locality> toLocality(String documentUri, @Nullable String copybookId) {
-    return token ->
-        Locality.builder()
-            .uri(documentUri)
-            .copybookId(copybookId)
-            .range(retrieveRange(token, token))
-            .token(token.getText())
-            .recognizer(LocalityUtils.class)
-            .build();
   }
 
   private Range retrieveRange(Token start, Token stop) {

@@ -14,6 +14,7 @@
  */
 package org.eclipse.lsp.cobol.core.engine.processors;
 
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.model.NodeType;
@@ -58,7 +59,7 @@ public class RootNodeUpdateCopyNodesByPositionInTree implements Processor<RootNo
 
   private int getNodeInsertionIndex(List<Node> nodes, Node nodeToInsert) {
     int nodeSize = nodes.size();
-    String nodeToInsertUri = nodeToInsert.getLocality().getUri();
+    Uri nodeToInsertUri = nodeToInsert.getLocality().getUri();
     Range nodeToInsertRange = nodeToInsert.getLocality().getRange();
     int nodeToInsertLine = nodeToInsertRange.getStart().getLine();
     int nodeToInsertCharacter = nodeToInsertRange.getStart().getCharacter();
@@ -82,7 +83,7 @@ public class RootNodeUpdateCopyNodesByPositionInTree implements Processor<RootNo
     return nodeSize;
   }
 
-  private void registerCopyUsage(List<CopyNode> node, Location nameLocation, String uri) {
+  private void registerCopyUsage(List<CopyNode> node, Location nameLocation, Uri uri) {
     node.forEach(n -> {
       if (n.getUri() != null && !n.getNameLocation().equals(nameLocation) && n.getUri().equals(uri)) {
         n.addUsage(nameLocation);

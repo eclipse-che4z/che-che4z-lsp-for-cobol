@@ -16,6 +16,7 @@ package org.eclipse.lsp.cobol.service.copybooks;
 
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Singleton;
+import org.eclipse.lsp.cobol.common.model.Uri;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -45,7 +46,7 @@ public class CopybookIdentificationServiceBasedOnContent implements CopybookIden
    * @return True if it's a copybook. False otherwise
    */
   @Override
-  public boolean isCopybook(String uri, String text, List<String> config) throws UndeterminedDocumentException {
+  public boolean isCopybook(Uri uri, String text, List<String> config) throws UndeterminedDocumentException {
     String copybookContent = Optional.ofNullable(text).orElse("");
     for (Pattern pattern : patterns) {
       Matcher matcher = pattern.matcher(copybookContent);

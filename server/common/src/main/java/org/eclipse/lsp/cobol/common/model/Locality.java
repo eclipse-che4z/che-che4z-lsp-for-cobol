@@ -39,7 +39,7 @@ import org.eclipse.lsp4j.Range;
 @Data
 @Builder(toBuilder = true)
 public class Locality {
-  @Builder.Default private String uri = "";
+  @Builder.Default private Uri uri = Uri.EMPTY;
   @Builder.Default private Range range = new Range(new Position(), new Position());
   @Builder.Default private String copybookId = null;
   @Builder.Default private String token = null;
@@ -48,10 +48,10 @@ public class Locality {
   /**
    * Convert this Locality instance to Location using its URI and Range
    *
-   * @return a Location from this locality
+   * @return a LSP Location from this locality
    */
   public Location toLocation() {
-    return new Location(uri, range);
+    return new Location(uri.decode(), range);
   }
 
   /**

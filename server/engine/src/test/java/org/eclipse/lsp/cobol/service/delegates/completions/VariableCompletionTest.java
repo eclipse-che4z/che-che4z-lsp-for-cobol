@@ -22,6 +22,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import java.util.List;
+
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolsRepository;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
@@ -85,7 +87,7 @@ class VariableCompletionTest {
   }
 
   private CobolDocumentModel getModel(String text) {
-    return new CobolDocumentModel("",
+    return new CobolDocumentModel(new Uri(""),
         text, UseCaseEngine.runTest(text, ImmutableList.of(), ImmutableMap.of()));
   }
 }

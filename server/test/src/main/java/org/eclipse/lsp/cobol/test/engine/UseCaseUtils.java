@@ -21,6 +21,7 @@ import static java.util.stream.Collectors.toList;
 import com.google.inject.Injector;
 
 import java.lang.reflect.Method;
+import java.nio.file.FileSystems;
 import java.util.List;
 import java.util.Optional;
 import java.util.ServiceLoader;
@@ -33,6 +34,7 @@ import org.eclipse.lsp.cobol.common.copybook.CopybookName;
 import org.eclipse.lsp.cobol.common.copybook.CopybookService;
 import org.eclipse.lsp.cobol.common.dialects.CobolLanguageId;
 import org.eclipse.lsp.cobol.common.dialects.TrueDialectService;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.test.CobolText;
 import org.eclipse.lsp.cobol.test.UseCaseInitializer;
 import org.eclipse.lsp4j.Diagnostic;
@@ -45,7 +47,7 @@ import org.junit.jupiter.api.extension.ExtensionContext;
 @Slf4j
 @UtilityClass
 public class UseCaseUtils {
-  public static final String DOCUMENT_URI = "file:c:/workspace/document.cbl";
+  public static final Uri DOCUMENT_URI = new Uri("file:c:/workspace/document.cbl");
   public static final String DOCUMENT2_URI = "file:c:/workspace/document2.cbl";
 
   public static final String COPYBOOK_URI = "file:c:/copybooks/copybook.cpy";
@@ -59,17 +61,17 @@ public class UseCaseUtils {
    * @param dialect the copybook dialect name
    * @return the URI
    */
-  public static String toURI(String name, String dialect) {
+  public static Uri toURI(String name, String dialect) {
     StringBuilder sb = new StringBuilder();
     String currentWorkingDir = System.getProperty("user.dir");
-    sb.append("file:").append(currentWorkingDir).append(System.getProperty("file.separator")).append(CPY_URI_PREFIX);
+    sb.append("file:").append(currentWorkingDir).append(FileSystems.getDefault().getSeparator()).append(CPY_URI_PREFIX);
     if (dialect != null) {
       sb.append(dialect);
       sb.append("/");
     }
     sb.append(name);
     sb.append(CPY_URI_SUFFIX);
-    return sb.toString().replace("\\", "/");
+    return new Uri(sb.toString().replace("\\", "/"));
   }
 
   /**
@@ -154,8 +156,8 @@ public class UseCaseUtils {
    * @param programUri main program uri
    * @return the CopybookModel instance
    */
-  public static CopybookModel toCopybookModel(CobolText cobolText, String programUri) {
-    String uri = toURI(cobolText.getFileName(), cobolText.getDialectType());
+  public static CopybookModel toCopybookModel(CobolText cobolText, Uri programUri) {
+    Uri uri = toURI(cobolText.getFileName(), cobolText.getDialectType());
     CopybookName copybookName = new CopybookName(cobolText.getFileName(), cobolText.getDialectType());
     return new CopybookModel(copybookName.toCopybookId(programUri), copybookName,
             uri, cobolText.getFullText());

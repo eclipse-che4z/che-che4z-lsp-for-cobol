@@ -16,6 +16,7 @@ package org.eclipse.lsp.cobol.core.preprocessor.delegates.transformer;
 
 import java.util.List;
 import org.eclipse.lsp.cobol.common.ResultWithErrors;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.core.preprocessor.CobolLine;
 import org.eclipse.lsp.cobol.common.dialects.CobolProgramLayout;
 
@@ -32,7 +33,7 @@ public interface CobolLinesTransformation {
    * @param lines document lines for transformation
    * @return the transformation result
    */
-  ResultWithErrors<List<CobolLine>> transformLines(String documentURI, List<CobolLine> lines);
+  ResultWithErrors<List<CobolLine>> transformLines(Uri documentURI, List<CobolLine> lines);
 
   /**
    * gives layout of the program which would get transformed.

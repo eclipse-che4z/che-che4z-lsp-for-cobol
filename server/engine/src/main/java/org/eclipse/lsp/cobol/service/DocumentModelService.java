@@ -22,6 +22,7 @@ import java.util.stream.Collectors;
 import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.common.AnalysisResult;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.service.utils.BuildOutlineTreeFromSyntaxTree;
 import org.eclipse.lsp4j.Diagnostic;
 
@@ -31,18 +32,18 @@ import org.eclipse.lsp4j.Diagnostic;
 @Singleton
 @Slf4j
 public class DocumentModelService {
-  private final Map<String, CobolDocumentModel> docs = new HashMap<>();
-  private final Map<String, List<Diagnostic>> diagnosticRepo = Collections.synchronizedMap(new HashMap<>());
+  private final Map<Uri, CobolDocumentModel> docs = new HashMap<>();
+  private final Map<Uri, List<Diagnostic>> diagnosticRepo = Collections.synchronizedMap(new HashMap<>());
 
   /**
    * Mark the document as opened and stores document text
    *
    * @param uri        - document uri
    * @param text       - document text
-   * @param languageId
+   * @param languageId - Language identifier.
    */
   @Synchronized
-  public void openDocument(String uri, String text, String languageId) {
+  public void openDocument(Uri uri, String text, String languageId) {
     CobolDocumentModel model = docs.computeIfAbsent(uri, u -> new CobolDocumentModel(uri, text));
     Optional.ofNullable(languageId).ifPresent(model::setLanguageId);
     model.setOpened(true);
@@ -55,7 +56,7 @@ public class DocumentModelService {
    * @return the document model object
    */
   @Synchronized
-  public CobolDocumentModel get(String uri) {
+  public CobolDocumentModel get(Uri uri) {
     return docs.get(uri);
   }
 
@@ -67,7 +68,7 @@ public class DocumentModelService {
    * @param text           - updated text
    */
   @Synchronized
-  public void processAnalysisResult(String uri, AnalysisResult analysisResult, String text) {
+  public void processAnalysisResult(Uri uri, AnalysisResult analysisResult, String text) {
     CobolDocumentModel document = docs.get(uri);
     if (document == null) {
       LOG.warn("Can't process analysis result of " + uri);
@@ -81,7 +82,7 @@ public class DocumentModelService {
     docs.put(uri, updatedModel);
   }
 
-  private void updateDiagnosticRepo(String currentUri, Map<String, List<Diagnostic>> diagnostics) {
+  private void updateDiagnosticRepo(Uri currentUri, Map<Uri, List<Diagnostic>> diagnostics) {
     LOG.debug("updateDiagnosticRepo " + currentUri + " " + diagnostics);
     synchronized (diagnosticRepo) {
       diagnostics.forEach((key, diagnosticList) -> {
@@ -103,7 +104,7 @@ public class DocumentModelService {
    * @param uri - document uri
    */
   @Synchronized
-  public void closeDocument(String uri) {
+  public void closeDocument(Uri uri) {
     Optional.ofNullable(docs.get(uri))
             .ifPresent(
                     d -> {
@@ -117,8 +118,8 @@ public class DocumentModelService {
     if (analysisResult == null || analysisResult.getDiagnostics() == null) {
       return;
     }
-    for (Map.Entry<String, List<Diagnostic>> entry : analysisResult.getDiagnostics().entrySet()) {
-      String uri = entry.getKey();
+    for (Map.Entry<Uri, List<Diagnostic>> entry : analysisResult.getDiagnostics().entrySet()) {
+      Uri uri = entry.getKey();
       if (!diagnosticRepo.containsKey(uri)) {
         continue;
       }
@@ -141,7 +142,7 @@ public class DocumentModelService {
    * @param uri - document uri
    */
   @Synchronized
-  public void removeDocumentDiagnostics(String uri) {
+  public void removeDocumentDiagnostics(Uri uri) {
     diagnosticRepo.computeIfPresent(uri, (k, v) -> Collections.emptyList());
   }
 
@@ -162,7 +163,7 @@ public class DocumentModelService {
    * @return true if document was analysed and false otherwise
    */
   @Synchronized
-  public boolean isDocumentSynced(String uri) {
+  public boolean isDocumentSynced(Uri uri) {
     return Optional.ofNullable(docs.get(uri))
             .map(CobolDocumentModel::isDocumentSynced)
             .orElse(false);
@@ -176,10 +177,10 @@ public class DocumentModelService {
    * for this document
    */
   @Synchronized
-  public Map<String, List<Diagnostic>> getOpenedDiagnostic() {
-    Map<String, List<Diagnostic>> result = new HashMap<>();
-    for (Map.Entry<String, CobolDocumentModel> entry : docs.entrySet()) {
-      String uri = entry.getKey();
+  public Map<Uri, List<Diagnostic>> getOpenedDiagnosticLsp() {
+    Map<Uri, List<Diagnostic>> result = new HashMap<>();
+    for (Map.Entry<Uri, CobolDocumentModel> entry : docs.entrySet()) {
+      Uri uri = entry.getKey();
       CobolDocumentModel document = entry.getValue();
       List<Diagnostic> diagnostics = diagnosticRepo.get(document.getUri());
       if (diagnostics != null && document.isOpened()) {

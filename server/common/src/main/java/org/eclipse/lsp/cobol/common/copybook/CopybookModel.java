@@ -17,6 +17,7 @@ package org.eclipse.lsp.cobol.common.copybook;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import org.eclipse.lsp.cobol.common.model.Uri;
 
 /**
  * This value class represents a resolved copybook. It consists of the copybook name, its URI using
@@ -27,6 +28,6 @@ import lombok.Data;
 public class CopybookModel {
   CopybookId copybookId;
   CopybookName copybookName;
-  String uri;
+  Uri uri;
   String content;
 }

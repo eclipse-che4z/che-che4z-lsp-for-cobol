@@ -30,6 +30,7 @@ import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.model.Locality;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.utils.KeywordsUtils;
@@ -68,14 +69,14 @@ public final class IdmsDialect implements CobolDialect {
 
     List<IdmsCopybookDescriptor> cbs = inlineVisitor.visitStartRule(ruleContext);
     cbs.forEach(cb -> {
-      String currentUri = context.getExtendedDocument().getUri();
+      Uri currentUri = context.getExtendedDocument().getUri();
       insertIdmsCopybook(context, context.getExtendedDocument(), errors, cb, context.getProgramDocumentUri(), currentUri, new LinkedList<>());
     });
     return errors;
   }
 
   private void insertIdmsCopybook(DialectProcessingContext ctx, ExtendedDocument extendedDocument, List<SyntaxError> errors,
-                                  IdmsCopybookDescriptor cb, String programDocumentUri, String currentUri,
+                                  IdmsCopybookDescriptor cb, Uri programDocumentUri, Uri currentUri,
                                   Deque<String> copybookStack) {
     CopybookName copybookName = new CopybookName(cb.getName(), IdmsDialect.NAME);
     ResultWithErrors<CopybookModel> resolvedCopybook = copybookService.resolve(
@@ -144,7 +145,7 @@ public final class IdmsDialect implements CobolDialect {
           DialectProcessingContext ctx,
           ExtendedDocument currentDocument,
           List<SyntaxError> errors,
-          String programDocumentUri,
+          Uri programDocumentUri,
           int copybookLevel,
           Deque<String> copybookStack,
           CopyNode copyNode) {
@@ -226,7 +227,7 @@ public final class IdmsDialect implements CobolDialect {
     return ImmutableList.of(IDMS_CPY_LOCAL_PATHS);
   }
 
-  private IdmsCopyParser.StartRuleContext parseCopyIdms(String text, String programDocumentUri, List<SyntaxError> errors) {
+  private IdmsCopyParser.StartRuleContext parseCopyIdms(String text, Uri programDocumentUri, List<SyntaxError> errors) {
     IdmsCopyLexer lexer = new IdmsCopyLexer(CharStreams.fromString(text));
     CommonTokenStream tokens = new CommonTokenStream(lexer);
     IdmsCopyParser parser = new IdmsCopyParser(tokens);
@@ -243,7 +244,7 @@ public final class IdmsDialect implements CobolDialect {
   }
 
   private IdmsParser.StartRuleContext parseIdms(
-      String text, String programDocumentUri, List<SyntaxError> errors) {
+          String text, Uri programDocumentUri, List<SyntaxError> errors) {
     IdmsLexer lexer = new IdmsLexer(CharStreams.fromString(text));
     CommonTokenStream tokens = new CommonTokenStream(lexer);
     IdmsParser parser = new IdmsParser(tokens);

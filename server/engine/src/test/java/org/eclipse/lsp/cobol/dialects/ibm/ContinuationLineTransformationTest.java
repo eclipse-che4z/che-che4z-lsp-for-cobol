@@ -26,6 +26,7 @@ import org.eclipse.lsp.cobol.common.ResultWithErrors;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
 import org.eclipse.lsp.cobol.common.message.MessageService;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.core.preprocessor.CobolLine;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.transformer.ContinuationLineTransformation;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.validator.StringClosedCorrectlyValidator;
@@ -121,9 +122,9 @@ class ContinuationLineTransformationTest extends AbstractCobolLinePreprocessorTe
     ContinuationLineTransformation transformation = new IbmCobolContinuationLineTransformation(mockMessageService, store);
     StringClosedCorrectlyValidator stringClosedCorrectlyValidator = new StringClosedCorrectlyValidator(mockMessageService);
 
-    ResultWithErrors<List<CobolLine>> listResultWithErrors = transformation.transformLines("", lines);
+    ResultWithErrors<List<CobolLine>> listResultWithErrors = transformation.transformLines(Uri.EMPTY, lines);
     List<SyntaxError> result = new ArrayList<>(listResultWithErrors.getErrors());
-    ExtendedDocument extendedDocument = ibmCobolLineWriter.serialize(listResultWithErrors.getResult(), "DOC_URI");
+    ExtendedDocument extendedDocument = ibmCobolLineWriter.serialize(listResultWithErrors.getResult(), new Uri("DOC_URI"));
     result.addAll(stringClosedCorrectlyValidator.validateLines(extendedDocument));
     return result;
   }

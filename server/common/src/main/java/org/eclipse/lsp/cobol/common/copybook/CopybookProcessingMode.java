@@ -14,6 +14,7 @@
  */
 package org.eclipse.lsp.cobol.common.copybook;
 
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.common.utils.FileUtils;
 
 /** This enum class used to allow or not the copybook analysis for the processed document. */
@@ -42,7 +43,7 @@ public enum CopybookProcessingMode {
    * @return a final copybook processing mode based on the file type.
    */
   public static CopybookProcessingMode getCopybookProcessingMode(
-      String uri, CopybookProcessingMode copybookProcessingMode) {
+          Uri uri, CopybookProcessingMode copybookProcessingMode) {
     return FileUtils.isFileUnderExtendedSourceFolder(uri) ? DISABLED : copybookProcessingMode;
   }
 

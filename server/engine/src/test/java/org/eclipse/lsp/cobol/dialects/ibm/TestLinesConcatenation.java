@@ -27,6 +27,7 @@ import org.eclipse.lsp.cobol.common.CleanerPreprocessor;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedText;
 import org.eclipse.lsp.cobol.common.message.MessageService;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.service.settings.layout.CodeLayoutStore;
 import org.junit.jupiter.api.Test;
 
@@ -65,7 +66,7 @@ class TestLinesConcatenation {
     when(store.getCodeLayout()).thenReturn(Optional.empty());
 
     CleanerPreprocessor textPreprocessor = new IbmTextPreprocessor(messageService, store);
-    ExtendedText extendedText = textPreprocessor.cleanUpCode(DOCUMENT_URI, TEXT).unwrap(accumulatedErrors::addAll);
+    ExtendedText extendedText = textPreprocessor.cleanUpCode(new Uri(DOCUMENT_URI), TEXT).unwrap(accumulatedErrors::addAll);
     assertEquals(EXPECTED, extendedText.toString());
     assertTrue(accumulatedErrors.isEmpty());
   }

@@ -16,6 +16,7 @@ package org.eclipse.lsp.cobol.common.mapping;
 
 import com.google.common.collect.ImmutableList;
 import lombok.Getter;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
@@ -33,9 +34,9 @@ public class ExtendedText {
   private final List<Mapper> mappers;
   private final List<ReplaceStrategy> replacers;
   @Getter
-  private final String uri;
+  private final Uri uri;
 
-  public ExtendedText(String text, String uri) {
+  public ExtendedText(String text, Uri uri) {
     String[] textLines = MappingHelper.split(text);
     for (int i = 0; i < textLines.length; i++) {
       String line = textLines[i];
@@ -75,7 +76,7 @@ public class ExtendedText {
       endCharacter = startCharacter;
     }
     if (startCharacter == null && endCharacter == null) {
-      return new Location(uri, range);
+      return new Location(uri.decode(), range);
     }
     for (Mapper mapper : mappers) {
       Location result = mapper.apply(startCharacter, endCharacter);

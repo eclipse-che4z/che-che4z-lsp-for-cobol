@@ -30,6 +30,7 @@ import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.model.Locality;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.common.utils.ImplicitCodeUtils;
 import org.eclipse.lsp.cobol.common.utils.StringUtils;
 import org.eclipse.lsp.cobol.core.CobolPreprocessor;
@@ -53,7 +54,7 @@ import org.eclipse.lsp4j.Range;
 @Slf4j
 @RequiredArgsConstructor
 class CopybookPreprocessorService {
-  private final String programDocumentUri;
+  private final Uri programDocumentUri;
   private final GrammarPreprocessor grammarPreprocessor;
   private final ExtendedDocument currentDocument;
 
@@ -73,7 +74,7 @@ class CopybookPreprocessorService {
   private static final String HYPHEN = "-";
   private static final String UNDERSCORE = "_";
 
-  CopybookPreprocessorService(String programDocumentUri,
+  CopybookPreprocessorService(Uri programDocumentUri,
                               GrammarPreprocessor grammarPreprocessor,
                               ExtendedDocument currentDocument,
                               CopybookService copybookService,
@@ -181,7 +182,7 @@ class CopybookPreprocessorService {
   private Locality mapLocality(Locality locality) {
     Location location = currentDocument.mapLocation(locality.getRange());
     return Locality.builder()
-        .uri(location.getUri())
+        .uri(new Uri(location.getUri()))
         .range(location.getRange())
         .copybookId(locality.getCopybookId())
         .build();
@@ -190,7 +191,7 @@ class CopybookPreprocessorService {
   private Locality mapLocality(Range range) {
     Location location = currentDocument.mapLocation(range);
     return Locality.builder()
-        .uri(location.getUri())
+        .uri(new Uri(location.getUri()))
         .range(location.getRange())
         .build();
   }
@@ -224,7 +225,7 @@ class CopybookPreprocessorService {
     return new CopybookName(StringUtils.trimQuotes(ctx.getText()));
   }
 
-  private CopybookModel read(CopybookName copybookName, String documentUri) {
+  private CopybookModel read(CopybookName copybookName, Uri documentUri) {
     ResultWithErrors<CopybookModel> resolvedCopybook = copybookService.resolve(
             copybookName.toCopybookId(programDocumentUri),
             copybookName,

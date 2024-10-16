@@ -20,6 +20,7 @@ import java.util.concurrent.CompletableFuture;
 import javax.annotation.Nullable;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.lsp.events.notifications.CancelProgressNotification;
 import org.eclipse.lsp.cobol.lsp.events.notifications.InitializedNotification;
 import org.eclipse.lsp.cobol.lsp.events.queries.InitializeQuery;
@@ -121,6 +122,7 @@ public class CobolLanguageServer implements LanguageServer {
 
   @Override
   public void cancelProgress(WorkDoneProgressCancelParams params) {
-    lspMessageBroker.notify(new CancelProgressNotification(params.getToken().getLeft(), cancelProgressHandler));
+    Uri left = new Uri(params.getToken().getLeft());
+    lspMessageBroker.notify(new CancelProgressNotification(left, cancelProgressHandler));
   }
 }

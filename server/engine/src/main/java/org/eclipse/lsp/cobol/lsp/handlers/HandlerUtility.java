@@ -18,6 +18,7 @@ import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.common.error.ErrorCode;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 
@@ -41,10 +42,11 @@ public class HandlerUtility {
    * @param uri - document uri.
    * @return true if we should continue the analysis of the document.
    */
-  public boolean isUriSupported(String uri) {
+  public boolean isUriSupported(Uri uri) {
     // git FS URIs are not currently supported
-    if (uri.startsWith(GIT_FS_URI) || uri.startsWith(GIT_URI)) {
-      LOG.warn(String.join(" ", GITFS_URI_NOT_SUPPORTED, uri));
+    String decoded = uri.decode();
+    if (decoded.startsWith(GIT_FS_URI) || decoded.startsWith(GIT_URI)) {
+      LOG.warn(String.join(" ", GITFS_URI_NOT_SUPPORTED, uri.toString()));
       return false;
     }
     return true;
@@ -55,11 +57,11 @@ public class HandlerUtility {
    * @param errors a list of error object
    * @return a converted diagnostic map
    */
-  public static Map<String, List<Diagnostic>> convertErrors(List<SyntaxError> errors) {
-    Map<String, List<Diagnostic>> result = errors.stream()
+  public static Map<Uri, List<Diagnostic>> convertErrors(List<SyntaxError> errors) {
+    Map<Uri, List<Diagnostic>> result = errors.stream()
         .filter(Objects::nonNull)
         .filter(e -> Objects.nonNull(e.getLocation()))
-        .collect(groupingBy(err -> err.getLocation().getLocation().getUri(), mapping(HandlerUtility::toDiagnostic, toList())));
+        .collect(groupingBy(err -> new Uri(err.getLocation().getLocation().getUri()), mapping(HandlerUtility::toDiagnostic, toList())));
     result.values().forEach(l -> l.sort(Comparator.comparingInt(a -> a.getRange().getStart().getLine())));
     return result;
   }

@@ -26,6 +26,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.mapping.OriginalLocation;
 import org.eclipse.lsp.cobol.common.model.Locality;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.model.tree.variable.QualifiedReferenceNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableUsageNode;
@@ -101,7 +102,7 @@ class Db2SqlVisitorHelper {
                               originalLocation
                                       .getLocation()
                                       .getRange())
-                      .uri(originalLocation.getLocation().getUri())
+                      .uri(new Uri(originalLocation.getLocation().getUri()))
                       .build();
       node.setLocality(updatedLocality);
       if (node.getChildren().isEmpty()) continue;

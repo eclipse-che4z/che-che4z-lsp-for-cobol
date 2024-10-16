@@ -29,6 +29,7 @@ import lombok.experimental.UtilityClass;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.eclipse.lsp.cobol.common.copybook.SQLBackend;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.common.utils.PredefinedCopybooks;
 import org.eclipse.lsp.cobol.test.CobolText;
 import org.eclipse.lsp4j.Diagnostic;
@@ -125,7 +126,7 @@ class AnnotatedDocumentCleaning {
   private TestData processDocument(
       String text,
       String documentName,
-      String uri,
+      Uri uri,
       List<String> subroutineNames,
       Map<String, Diagnostic> expectedDiagnostics,
       String dialectType) {
@@ -171,7 +172,7 @@ class AnnotatedDocumentCleaning {
     };
   }
 
-  private <T> void mergeMaps(Map<String, List<T>> to, Map<String, List<T>> from) {
+  private <T, K> void mergeMaps(Map<K, List<T>> to, Map<K, List<T>> from) {
     from.forEach(
         (key, value) -> {
           if (to.containsKey(key)) {
