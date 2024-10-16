@@ -27,30 +27,27 @@ import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulatorService;
  * repository, the same name can't be used as a variable name
  */
 public class VariableNameCheck implements Processor<VariableWithLevelNode> {
-    private final SymbolAccumulatorService symbolAccumulatorService;
+  private final SymbolAccumulatorService symbolAccumulatorService;
 
-    public VariableNameCheck(SymbolAccumulatorService symbolAccumulatorService) {
-        this.symbolAccumulatorService = symbolAccumulatorService;
-    }
+  public VariableNameCheck(SymbolAccumulatorService symbolAccumulatorService) {
+    this.symbolAccumulatorService = symbolAccumulatorService;
+  }
 
-    @Override
-    public void accept(
-            VariableWithLevelNode variableWithLevelNode, ProcessingContext processingContext) {
-        variableWithLevelNode
-                .getNearestParentByType(NodeType.PROGRAM)
-                .map(ProgramNode.class::cast)
-                .ifPresent(
-                        programNode -> {
-                            if (!symbolAccumulatorService.isVariableNameAllowed(
-                                    variableWithLevelNode.getName(), programNode)) {
-                                processingContext
-                                        .getErrors()
-                                        .add(
-                                                variableWithLevelNode.getError(
-                                                        MessageTemplate.of(
-                                                                "parsers.notAllowedVariableName",
-                                                                variableWithLevelNode.getName())));
-                            }
-                        });
-    }
+  @Override
+  public void accept(
+      VariableWithLevelNode variableWithLevelNode, ProcessingContext processingContext) {
+    variableWithLevelNode
+        .getNearestParentByType(NodeType.PROGRAM)
+        .map(ProgramNode.class::cast)
+        .filter(
+            pgm ->
+                !symbolAccumulatorService.isVariableNameAllowed(
+                    variableWithLevelNode.getName(), pgm))
+        .map(
+            x ->
+                MessageTemplate.of(
+                    "parsers.notAllowedVariableName", variableWithLevelNode.getName()))
+        .map(variableWithLevelNode::getError)
+        .ifPresent(processingContext.getErrors()::add);
+  }
 }

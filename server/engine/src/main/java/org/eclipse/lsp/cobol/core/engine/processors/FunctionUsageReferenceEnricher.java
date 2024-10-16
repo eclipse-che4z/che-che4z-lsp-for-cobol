@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
  * with @{@link FunctionReference} node.
  */
 @AllArgsConstructor
-public class UsageReferenceEnricher implements Processor<QualifiedReferenceNode> {
+public class FunctionUsageReferenceEnricher implements Processor<QualifiedReferenceNode> {
   private final SymbolAccumulatorService symbolAccumulatorService;
 
   @Override
@@ -43,7 +43,7 @@ public class UsageReferenceEnricher implements Processor<QualifiedReferenceNode>
     List<Node> usageNodes =
         node.getChildren().stream()
             .filter(
-                Node.hasType(NodeType.VARIABLE_USAGE).or(Node.hasType(NodeType.FUNCTION_REFERENCE)))
+                Node.hasType(NodeType.VARIABLE_USAGE))
             .collect(Collectors.toList());
 
     if (usageNodes.isEmpty()) {
@@ -75,10 +75,6 @@ public class UsageReferenceEnricher implements Processor<QualifiedReferenceNode>
                 FunctionReference functionReference =
                     new FunctionReference(dataNameNode.getLocality(), usageNode.getName());
                 node.getChildren().add(indexOfNode, functionReference);
-                symbolAccumulatorService
-                    .registerFunctionReferenceNode(programNode, functionReference)
-                    .ifPresent(processingContext.getErrors()::add);
-                functionReference.setDefinitions(functionInfo.getDefinition());
               });
     }
   }

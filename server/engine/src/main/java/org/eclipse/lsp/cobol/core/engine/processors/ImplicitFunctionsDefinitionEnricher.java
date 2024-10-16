@@ -40,7 +40,7 @@ public class ImplicitFunctionsDefinitionEnricher implements Processor<FunctionDe
     if (functionDeclaration.isIntrinsic() && hasAllFunction) {
       functionDeclaration
           .getProgram()
-          .ifPresent(symbolAccumulatorService::declareAllIntrinsicFUnctions);
+          .ifPresent(symbolAccumulatorService::declareAllIntrinsicFunctions);
     }
   }
 
@@ -52,7 +52,7 @@ public class ImplicitFunctionsDefinitionEnricher implements Processor<FunctionDe
       functionReferences.forEach(
           reference -> {
             SymbolAccumulatorService.FunctionInfo functionInfo =
-                symbolAccumulatorService.getFunctionReference(reference.getName().toUpperCase());
+                symbolAccumulatorService.getFunctionReference(reference.getName());
             if (functionInfo != null) functionInfo.getDeclaredProgramNode().add(parent);
           });
     }

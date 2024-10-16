@@ -228,7 +228,7 @@ public class SymbolAccumulatorService implements VariableAccumulator {
    * Declare all intrinsic functions
    * @param programNode
    */
-  public void declareAllIntrinsicFUnctions(ProgramNode programNode) {
+  public void declareAllIntrinsicFunctions(ProgramNode programNode) {
     functions.entrySet().stream()
             .filter(entry -> entry.getValue().isImplicit)
             .forEach(entry -> entry.getValue().getDeclaredProgramNode().add(programNode));

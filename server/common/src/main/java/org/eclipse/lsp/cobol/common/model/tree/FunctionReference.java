@@ -56,8 +56,4 @@ public class FunctionReference extends Node implements DefinedAndUsedStructure {
   public List<Location> getUsages() {
     return usages;
   }
-
-  public Locality getLocality() {
-    return locality;
-  }
 }

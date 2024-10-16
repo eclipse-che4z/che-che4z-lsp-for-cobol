@@ -20,25 +20,17 @@ import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.message.MessageTemplate;
 import org.eclipse.lsp.cobol.common.model.tree.FunctionDeclaration;
 import org.eclipse.lsp.cobol.common.model.tree.FunctionReference;
-import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
 import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.Processor;
-import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulatorService;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 /** Processor for FUnctionDeclaration */
 public class FunctionDeclarationValidator implements Processor<FunctionDeclaration> {
-  private final SymbolAccumulatorService symbolAccumulatorService;
 
   private static final String WHEN_COMPILED = "WHEN-COMPILED";
   private static final String ALL = "ALL";
-
-  public FunctionDeclarationValidator(SymbolAccumulatorService symbolAccumulatorService) {
-    this.symbolAccumulatorService = symbolAccumulatorService;
-  }
 
   @Override
   public void accept(FunctionDeclaration functionDeclaration, ProcessingContext processingContext) {
@@ -46,21 +38,6 @@ public class FunctionDeclarationValidator implements Processor<FunctionDeclarati
       checkSemanticsForIntrinsicFunctions(functionDeclaration, processingContext);
     } else if (functionDeclaration.getChildren().size() > 1) {
       checkSemanticsForUserDefinedFunctions(functionDeclaration, processingContext);
-    }
-  }
-
-  private void updateFunctionInfo(FunctionDeclaration functionDeclaration) {
-    Optional<ProgramNode> nearestParentByType = functionDeclaration.getProgram();
-    if (nearestParentByType.isPresent()) {
-      ProgramNode parent = nearestParentByType.get();
-      getFunctionReferences(functionDeclaration)
-          .forEach(
-              reference -> {
-                SymbolAccumulatorService.FunctionInfo functionInfo =
-                    symbolAccumulatorService.getFunctionReference(
-                        reference.getName().toUpperCase());
-                if (functionInfo != null) functionInfo.getDeclaredProgramNode().add(parent);
-              });
     }
   }
 
