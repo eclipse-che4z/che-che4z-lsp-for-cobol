@@ -93,7 +93,7 @@ public class QualifiedReferenceUpdateVariableUsage implements Processor<Qualifie
     if (foundDefinitions.size() > 1) {
       foundDefinitions =
           foundDefinitions.stream()
-              .filter(d -> !d.getLocality().getUri().startsWith("implicit:"))
+              .filter(d -> !d.getLocality().getUri().toString().startsWith("implicit:"))
               .collect(Collectors.toList());
     }
     if (foundDefinitions.size() == 1) {

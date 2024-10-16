@@ -25,6 +25,7 @@ import lombok.Value;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
 import org.eclipse.lsp.cobol.common.DialectRegistryItem;
 import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
+import org.eclipse.lsp.cobol.common.model.Uri;
 
 /** This interface handles the request for configurations from the client settings */
 public interface ConfigurationService {
@@ -37,7 +38,7 @@ public interface ConfigurationService {
    * @param mode the mode of copybook processing for this analysis
    * @return the analysis configuration
    */
-  AnalysisConfig getConfig(String scopeURI, CopybookProcessingMode mode);
+  AnalysisConfig getConfig(Uri scopeURI, CopybookProcessingMode mode);
 
   /**
    * Gets a client configuration for the Subroutine settings
@@ -57,7 +58,7 @@ public interface ConfigurationService {
    * @param section the required section in the client configuration.
    * @return the list from the copybook directories defined in user settings
    */
-  CompletableFuture<List<String>> getListConfiguration(String documentUri, String section);
+  CompletableFuture<List<String>> getListConfiguration(Uri documentUri, String section);
 
   /**
    * Get a list of watching folders for the provided dialects.

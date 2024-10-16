@@ -656,7 +656,7 @@ public class CobolProcedureDivisionVisitor extends CobolProcedureDivisionParserB
     return getLocality(ctx.getStart())
             .map(
                     locality -> {
-                      if (cachingConfigurationService.getSubroutineDirectories().size() > 0
+                      if (!cachingConfigurationService.getSubroutineDirectories().isEmpty()
                               && !subroutineService.getUri(subroutineName).isPresent()) {
                         reportSubroutineNotDefined(subroutineName, locality);
                       }
@@ -797,7 +797,7 @@ public class CobolProcedureDivisionVisitor extends CobolProcedureDivisionParserB
   }
 
   @Override public List<Node> visitAlterStatement(AlterStatementContext ctx) {
-    if (ctx.alterProceedTo() != null && ctx.alterProceedTo().size() > 0) {
+    if (ctx.alterProceedTo() != null && !ctx.alterProceedTo().isEmpty()) {
       AlterProceedToContext alter = ctx.alterProceedTo().get(0);
       if (alter.procedureName() != null && alter.procedureName().size() == 2) {
         ProcedureNameContext from = alter.procedureName(0);
@@ -962,11 +962,6 @@ public class CobolProcedureDivisionVisitor extends CobolProcedureDivisionParserB
     return ImmutableList.of(node);
   }
 
-  private VariableNameAndLocality extractNameAndLocality(CobolWordContext context) {
-    return new VariableNameAndLocality(
-            getName(context), retrieveLocality(context).orElse(null));
-  }
-
   private Optional<Locality> retrieveLocality(ParserRuleContext ctx) {
     return retrieveRangeLocality(ctx)
             .map(extendedDocument::mapLocation)
@@ -976,8 +971,8 @@ public class CobolProcedureDivisionVisitor extends CobolProcedureDivisionParserB
   private Locality locationToLocality(Location location) {
     return Locality.builder()
             .range(location.getRange())
-            .uri(location.getUri())
-            .copybookId(copybooks.getCopybookIdByUri(location.getUri()))
+            .uri(new Uri(location.getUri()))
+            .copybookId(copybooks.getCopybookIdByUri(new Uri(location.getUri())))
             .build();
   }
 }

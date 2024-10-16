@@ -15,6 +15,7 @@
 package org.eclipse.lsp.cobol.service;
 
 import org.eclipse.lsp.cobol.common.AnalysisResult;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp4j.Position;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -41,7 +42,7 @@ class CobolDocumentModelTest {
 
   @BeforeEach
   void createModel() {
-    model = new CobolDocumentModel("", TEXT, AnalysisResult.builder().build());
+    model = new CobolDocumentModel(Uri.EMPTY, TEXT, AnalysisResult.builder().build());
   }
 
   @Test
@@ -106,7 +107,7 @@ class CobolDocumentModelTest {
 
   @Test
   void testTokenRetrieving() {
-    CobolDocumentModel model = new CobolDocumentModel("", "a bc\r\nde", AnalysisResult.builder().build());
+    CobolDocumentModel model = new CobolDocumentModel(new Uri(""), "a bc\r\nde", AnalysisResult.builder().build());
     assertEquals("", model.getTokenBeforePosition(new Position()));
     assertEquals("a", model.getTokenBeforePosition(new Position(0, 1)));
     assertEquals("bc", model.getTokenBeforePosition(new Position(0, 4)));
@@ -116,7 +117,7 @@ class CobolDocumentModelTest {
 
   @Test
   void testUpdate() {
-    CobolDocumentModel model = new CobolDocumentModel("", TEXT);
+    CobolDocumentModel model = new CobolDocumentModel(new Uri(""), TEXT);
     assertEquals(10, model.getLines().size());
 
     model.update("NEW TEXT");

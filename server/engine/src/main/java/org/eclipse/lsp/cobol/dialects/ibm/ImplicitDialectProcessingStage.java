@@ -27,6 +27,7 @@ import org.eclipse.lsp.cobol.common.dialects.DialectOutcome;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.mapping.OriginalLocation;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.core.engine.analysis.AnalysisContext;
@@ -92,7 +93,7 @@ public class ImplicitDialectProcessingStage implements Stage<AnalysisContext, Di
 
   private static List<Node> getAllImplicitDialectNodes(
       DialectOutcome dialectOutcome, ArrayList<Node> extendedNodes) {
-    Map<String, List<Node>> dialectProcessNodeMap =
+    Map<Uri, List<Node>> dialectProcessNodeMap =
         dialectOutcome.getDialectNodes().stream()
             .collect(Collectors.groupingBy(node -> node.getLocality().getUri()));
 
@@ -101,7 +102,7 @@ public class ImplicitDialectProcessingStage implements Stage<AnalysisContext, Di
         .map(CopyNode.class::cast)
         .forEach(
             node -> {
-              String uri = node.getUri();
+              Uri uri = node.getUri();
               if (dialectProcessNodeMap.containsKey(uri)) {
                 dialectProcessNodeMap.get(uri).forEach(node::addChild);
                 dialectProcessNodeMap.remove(uri);
@@ -122,7 +123,7 @@ public class ImplicitDialectProcessingStage implements Stage<AnalysisContext, Di
             n -> {
               copybooksRepository.addStatement(n.getName(), n.getDialect(), n.getLocality());
               copybooksRepository.define(
-                  n.getName(), n.getDialect(), n.getNameLocation().getUri(), n.getUri());
+                  n.getName(), n.getDialect(), new Uri(n.getNameLocation().getUri()), n.getUri());
             });
   }
 
@@ -130,7 +131,7 @@ public class ImplicitDialectProcessingStage implements Stage<AnalysisContext, Di
       AnalysisContext ctx, CopybooksRepository copybooksRepository, SyntaxError error) {
     Location location =
         ctx.getExtendedDocument().mapLocation(error.getLocation().getLocation().getRange());
-    String copybookId = copybooksRepository.getCopybookIdByUri(location.getUri());
+    String copybookId = copybooksRepository.getCopybookIdByUri(new Uri(location.getUri()));
     OriginalLocation originalLocation = new OriginalLocation(location, copybookId);
     return error.toBuilder().location(originalLocation).build();
   }

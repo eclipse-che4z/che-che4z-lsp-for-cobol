@@ -31,6 +31,7 @@ import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.file.WorkspaceFileService;
 import org.eclipse.lsp.cobol.common.message.MessageService;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.model.tree.SectionNode;
 import org.eclipse.lsp.cobol.common.processor.ProcessingPhase;
@@ -136,7 +137,7 @@ public class Db2SqlDialect implements CobolDialect {
   }
 
   private Db2SqlParser.StartRuleContext parseDB2(
-      String text, String programDocumentUri, List<SyntaxError> errors) {
+          String text, Uri programDocumentUri, List<SyntaxError> errors) {
     Db2SqlLexer lexer = new Db2SqlLexer(CharStreams.fromString(text));
     CommonTokenStream tokens = new CommonTokenStream(lexer);
     Db2SqlParser parser = new Db2SqlParser(tokens);

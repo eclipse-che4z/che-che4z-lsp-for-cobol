@@ -17,6 +17,7 @@ package org.eclipse.lsp.cobol.common.utils;
 
 import lombok.experimental.UtilityClass;
 import org.eclipse.lsp.cobol.common.model.Locality;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp4j.Position;
@@ -36,7 +37,7 @@ public class RangeUtils {
    * @param position a cursor position
    * @return the found node
    */
-  public static Optional<Node> findNodeByPosition(Node node, String uri, Position position) {
+  public static Optional<Node> findNodeByPosition(Node node, Uri uri, Position position) {
     Node candidate = null;
     if (isFromCopybook(uri, node)) {
       if (node.getChildren().isEmpty()) {
@@ -61,7 +62,7 @@ public class RangeUtils {
     return candidate == null ? Optional.empty() : Optional.of(candidate);
   }
 
-  private boolean isFromCopybook(String uri, Node node) {
+  private boolean isFromCopybook(Uri uri, Node node) {
     if (!(node instanceof CopyNode)) {
       return false;
     }
@@ -118,7 +119,7 @@ public class RangeUtils {
    * @param location the locality of the wrapping node
    * @return true if position is inside the location.
    */
-  private boolean isInside(String uri, Position position, Locality location) {
+  private boolean isInside(Uri uri, Position position, Locality location) {
     return uri.equals(location.getUri())
         && !isBefore(position, location.getRange().getStart())
         && !isAfter(position, location.getRange().getEnd());

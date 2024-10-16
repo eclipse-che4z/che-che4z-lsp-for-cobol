@@ -54,7 +54,7 @@ class FindCopybookCommandTest {
     List<Diagnostic> diagnostics = singletonList(COPYBOOK_ERROR);
     CodeActionParams params =
         new CodeActionParams(
-            new TextDocumentIdentifier(DOCUMENT_URI), RANGE, new CodeActionContext(diagnostics));
+            new TextDocumentIdentifier(DOCUMENT_URI.toString()), RANGE, new CodeActionContext(diagnostics));
 
     List<Either<Command, CodeAction>> actions = provider.collectCommandsOrActions(params);
 
@@ -73,7 +73,7 @@ class FindCopybookCommandTest {
     List<Diagnostic> diagnostics = singletonList(SYNTAX_ERROR);
     CodeActionParams params =
         new CodeActionParams(
-            new TextDocumentIdentifier(DOCUMENT_URI), RANGE, new CodeActionContext(diagnostics));
+            new TextDocumentIdentifier(DOCUMENT_URI.toString()), RANGE, new CodeActionContext(diagnostics));
 
     List<Either<Command, CodeAction>> actions = provider.collectCommandsOrActions(params);
 
@@ -88,7 +88,7 @@ class FindCopybookCommandTest {
     List<Diagnostic> diagnostics = Lists.newArrayList(SYNTAX_ERROR, COPYBOOK_ERROR);
     CodeActionParams params =
         new CodeActionParams(
-            new TextDocumentIdentifier(DOCUMENT_URI), RANGE, new CodeActionContext(diagnostics));
+            new TextDocumentIdentifier(DOCUMENT_URI.toString()), RANGE, new CodeActionContext(diagnostics));
 
     List<Either<Command, CodeAction>> actions = provider.collectCommandsOrActions(params);
 
@@ -111,6 +111,6 @@ class FindCopybookCommandTest {
     List<Object> arguments = command.getArguments();
     assertEquals(2, arguments.size());
     assertEquals(COPYBOOK_NAME, arguments.get(0));
-    assertEquals(DOCUMENT_URI, arguments.get(1));
+    assertEquals(DOCUMENT_URI.toString(), arguments.get(1));
   }
 }

@@ -16,6 +16,7 @@
 package org.eclipse.lsp.cobol.service;
 
 import lombok.NonNull;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp4j.WorkspaceFolder;
 
 import java.util.List;
@@ -43,7 +44,7 @@ public interface WatcherService {
    *
    * @param documentUri - documents for which specified path need to be watched.
    */
-  void addRuntimeWatchers(String documentUri);
+  void addRuntimeWatchers(Uri documentUri);
 
   /**
    * Stop watching all types of file system changes in folders with given paths relative to
@@ -58,7 +59,7 @@ public interface WatcherService {
    *
    * @param documentUri - document for which runtime watchers need to be removed.
    */
-  void removeRuntimeWatchers(@NonNull String documentUri);
+  void removeRuntimeWatchers(@NonNull Uri documentUri);
 
   /**
    * Get a list of paths of registered custom watchers not including .copybooks folder

@@ -181,8 +181,8 @@ class TestDuplicatedDefinition {
         .filter(Node.hasType(NodeType.VARIABLE_USAGE)).map(VariableUsageNode.class::cast).collect(Collectors.toList());
     assertEquals(1, variableUsages.size());
     List<Location> expectedLocations = ImmutableList.of(
-        new Location(UseCaseUtils.DOCUMENT_URI, new Range(new Position(4, 7), new Position(4, 29))),
-        new Location(UseCaseUtils.DOCUMENT_URI, new Range(new Position(5, 7), new Position(5, 28)))
+        new Location(UseCaseUtils.DOCUMENT_URI.toString(), new Range(new Position(4, 7), new Position(4, 29))),
+        new Location(UseCaseUtils.DOCUMENT_URI.toString(), new Range(new Position(5, 7), new Position(5, 28)))
     );
     List<Location> locations = variableUsages.get(0).getDefinitions();
     assertEquals(locations.size(), expectedLocations.size());

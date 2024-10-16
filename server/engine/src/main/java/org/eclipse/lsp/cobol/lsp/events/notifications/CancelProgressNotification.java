@@ -15,15 +15,16 @@
 package org.eclipse.lsp.cobol.lsp.events.notifications;
 
 import lombok.SneakyThrows;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.lsp.LspNotification;
 import org.eclipse.lsp.cobol.lsp.handlers.server.CancelProgressHandler;
 
 /** `window/workDoneProgress/cancel` language server event */
 public class CancelProgressNotification implements LspNotification {
-  private final String uri;
+  private final Uri uri;
   private final CancelProgressHandler cancelProgressHandler;
 
-  public CancelProgressNotification(String uri, CancelProgressHandler cancelProgressHandler) {
+  public CancelProgressNotification(Uri uri, CancelProgressHandler cancelProgressHandler) {
     this.uri = uri;
     this.cancelProgressHandler = cancelProgressHandler;
   }

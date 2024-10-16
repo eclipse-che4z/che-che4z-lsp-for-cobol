@@ -18,6 +18,7 @@ package org.eclipse.lsp.cobol.implicitDialects.cics;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static org.antlr.v4.runtime.Lexer.HIDDEN;
+import static org.eclipse.lsp.cobol.core.visitor.VisitorHelper.buildNameRangeLocality;
 
 import com.google.common.collect.ImmutableList;
 import java.util.*;
@@ -46,6 +47,7 @@ import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.model.Locality;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.common.model.tree.CodeBlockUsageNode;
 import org.eclipse.lsp.cobol.common.model.tree.CompilerDirectiveNode;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
@@ -102,11 +104,11 @@ class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
 
     boolean isReturn =
         (ctx.allCicsRule() != null
-            && ctx.allCicsRule().size() > 0
+            && !ctx.allCicsRule().isEmpty()
             && ctx.allCicsRule().get(0).cics_return() != null);
     boolean isHandle =
         (ctx.allCicsRule() != null
-            && ctx.allCicsRule().size() > 0
+            && !ctx.allCicsRule().isEmpty()
             && ctx.allCicsRule().get(0).cics_handle() != null);
 
     if (isReturn) {
@@ -116,21 +118,21 @@ class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
           Optional.ofNullable(ctx.allCicsRule().get(0).cics_handle())
               .map(CICSParser.Cics_handleContext::cics_handle_abend)
               .map(CICSParser.Cics_handle_abendContext::PROGRAM)
-              .filter(s -> s.size() > 0)
+              .filter(s -> !s.isEmpty())
               .isPresent();
 
       boolean isLabel =
           Optional.ofNullable(ctx.allCicsRule().get(0).cics_handle())
               .map(CICSParser.Cics_handleContext::cics_handle_abend)
               .map(CICSParser.Cics_handle_abendContext::LABEL)
-              .filter(s -> s.size() > 0)
+              .filter(s -> !s.isEmpty())
               .isPresent();
 
       boolean isReset =
           Optional.ofNullable(ctx.allCicsRule().get(0).cics_handle())
               .map(CICSParser.Cics_handleContext::cics_handle_abend)
               .map(CICSParser.Cics_handle_abendContext::RESET)
-              .filter(s -> s.size() > 0)
+              .filter(s -> !s.isEmpty())
               .isPresent();
 
       ExecCicsHandleNode.HandleAbendType type;
@@ -215,7 +217,7 @@ class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
 
     Node node =
         new CodeBlockUsageNode(
-            Locality.builder().range(location.getRange()).uri(location.getUri()).build(), name);
+            Locality.builder().range(location.getRange()).uri(new Uri(location.getUri())).build(), name);
     visitChildren(ctx).forEach(node::addChild);
     return ImmutableList.of(node);
   }
@@ -261,24 +263,6 @@ class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
 
   private String getName(ParserRuleContext context) {
     return ofNullable(context).map(RuleContext::getText).map(String::toUpperCase).orElse("");
-  }
-
-  /**
-   * Builds context name locality based on the name and uri of the document
-   *
-   * @param ctx is a parse rule context
-   * @param name is a name of the entity
-   * @param uri is an uri of the document
-   * @return locality object
-   */
-  public Locality buildNameRangeLocality(ParserRuleContext ctx, String name, String uri) {
-    Range range =
-        new Range(
-            new Position(ctx.start.getLine() - 1, ctx.start.getCharPositionInLine()),
-            new Position(
-                ctx.stop.getLine() - 1, ctx.start.getCharPositionInLine() + name.length()));
-
-    return Locality.builder().uri(uri).range(range).build();
   }
 
   private void changeContextToDialectStatement(ParserRuleContext ctx) {

@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Optional;
 import org.eclipse.lsp.cobol.common.ResultWithErrors;
 import org.eclipse.lsp.cobol.common.message.MessageService;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.core.preprocessor.CobolLine;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.reader.CobolLineReader;
 import org.eclipse.lsp.cobol.common.dialects.CobolProgramLayout;
@@ -37,7 +38,7 @@ public abstract class AbstractCobolLinePreprocessorTest {
         .thenReturn("Unexpected indicator area content");
     when(mockMessageService.getMessage(matches("CobolLineReaderImpl.longLineMsg"), anyInt()))
         .thenReturn("Source text cannot go past column 80");
-    return reader.processLines("", text);
+    return reader.processLines(Uri.EMPTY, text);
   }
 
   protected ResultWithErrors<List<CobolLine>> processTextWithNoSequenceArea(String text) {
@@ -49,7 +50,7 @@ public abstract class AbstractCobolLinePreprocessorTest {
         .thenReturn("Unexpected indicator area content");
     when(mockMessageService.getMessage(matches("CobolLineReaderImpl.longLineMsg")))
         .thenReturn("Source text cannot go past column 80");
-    return reader.processLines("", text);
+    return reader.processLines(new Uri(""), text);
   }
 
   protected String reduceLines(List<String> lines) {

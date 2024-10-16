@@ -38,6 +38,7 @@ import org.eclipse.lsp.cobol.common.mapping.ExtendedText;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.NodeType;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.core.engine.analysis.AnalysisContext;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectService;
@@ -67,7 +68,7 @@ class CobolLanguageEngineTest {
   private static final String ERROR_MSG = "Ensure that you have Java installed and that your serverRuntime is set to JAVA for dialect support.";
 
   private static final String TEXT = "       IDENTIFICATION DIVISION.";
-  private static final String URI = "document.cbl";
+  private static final Uri URI = new Uri("document.cbl");
   private final GrammarPreprocessor grammarPreprocessor = mock(GrammarPreprocessor.class);
   private final MessageService mockMessageService = mock(MessageService.class);
   private final ErrorMessageHelper mockErrUtil = mock(ErrorMessageHelper.class);

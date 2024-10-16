@@ -29,6 +29,7 @@ import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
 import org.eclipse.lsp.cobol.common.model.Locality;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.parser.WarningRecognitionException;
 import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
 import org.eclipse.lsp4j.Location;
@@ -67,9 +68,9 @@ public class ParserListener extends BaseErrorListener {
             .errorSource(ErrorSource.PARSING)
             .location(
                 Locality.builder()
-                    .uri(location.getUri())
+                    .uri(new Uri(location.getUri()))
                     .range(location.getRange())
-                    .copybookId(copybooksRepository.getCopybookIdByUri(location.getUri()))
+                    .copybookId(copybooksRepository.getCopybookIdByUri(new Uri(location.getUri())))
                     .build().toOriginalLocation())
             .suggestion(msg)
             .severity(getErrorSeverity(e))

@@ -23,6 +23,7 @@ import org.eclipse.lsp.cobol.cfg.CFASTBuilder;
 import org.eclipse.lsp.cobol.common.SubroutineService;
 import org.eclipse.lsp.cobol.common.copybook.CopybookService;
 import org.eclipse.lsp.cobol.common.dialects.TrueDialectService;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.lsp.*;
 import org.eclipse.lsp.cobol.lsp.analysis.AsyncAnalysisService;
 import org.eclipse.lsp.cobol.lsp.events.notifications.DidChangeNotification;
@@ -166,7 +167,7 @@ class CobolTextDocumentServiceTest {
     TextDocumentItem textDocumentItem = mock(TextDocumentItem.class);
     when(params.getTextDocument()).thenReturn(textDocumentItem);
     when(textDocumentItem.getUri()).thenReturn(URI);
-    when(documentModelService.get(anyString())).thenReturn(new CobolDocumentModel(URI));
+    when(documentModelService.get(any(Uri.class))).thenReturn(new CobolDocumentModel(new Uri(URI)));
     service.didOpen(params);
     Mockito.verify(lspMessageBroker, times(0)).query(any());
   }

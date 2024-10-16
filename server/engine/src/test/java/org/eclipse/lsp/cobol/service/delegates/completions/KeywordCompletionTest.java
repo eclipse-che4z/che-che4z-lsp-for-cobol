@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Optional;
 import org.eclipse.lsp.cobol.common.AnalysisResult;
 import org.eclipse.lsp.cobol.common.dialects.CobolDialect;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectService;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp.cobol.service.settings.SettingsService;
@@ -69,7 +70,7 @@ class KeywordCompletionTest {
   void testCompletionEmptyResult() {
     assertThat(
         completion.getCompletionItems(
-            "accep", new CobolDocumentModel("", "", AnalysisResult.builder().build())),
+            "accep", new CobolDocumentModel(new Uri(""), "", AnalysisResult.builder().build())),
         is(createExpected(LABEL, DOCUMENTATION_TEXT)));
   }
 
@@ -77,7 +78,7 @@ class KeywordCompletionTest {
   void testCompletionForImplicitDialects() {
     assertThat(
         completion.getCompletionItems(
-            "TEST", new CobolDocumentModel("", "", AnalysisResult.builder().build())),
+            "TEST", new CobolDocumentModel(new Uri(""), "", AnalysisResult.builder().build())),
         is(createExpected("TEST", "TEST DESCRIPTION")));
   }
 

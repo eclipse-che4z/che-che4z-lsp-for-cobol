@@ -17,6 +17,7 @@ package org.eclipse.lsp.cobol.core.model.tree.logic;
 import com.google.common.collect.ImmutableList;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.NodeType;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
 import org.eclipse.lsp.cobol.common.model.tree.ProgramSubtype;
@@ -37,7 +38,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /** Test {@link SectionNodeProcessorHelper} */
 class SectionNodeProcessorHelperTest {
   private static final Locality LOCALITY = Locality.builder()
-      .uri("")
+      .uri(Uri.EMPTY)
       .range(new Range(new Position(1, 1), new Position(2, 2)))
       .build();
 

@@ -20,6 +20,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.lsp.*;
 import org.eclipse.lsp.cobol.lsp.analysis.AsyncAnalysisService;
 import org.eclipse.lsp.cobol.lsp.events.queries.DocumentSymbolQuery;
@@ -53,7 +54,7 @@ public class DocumentSymbolHandler {
    * @return The list of either SymbolInformation or DocumentSymbols.
    */
   public List<Either<SymbolInformation, DocumentSymbol>> documentSymbol(DocumentSymbolParams params) {
-    String uri = params.getTextDocument().getUri();
+    Uri uri = Uri.fromLsp(params.getTextDocument().getUri());
     return createDocumentSymbols(documentModelService.get(uri).getOutlineResult());
   }
 
@@ -79,7 +80,7 @@ public class DocumentSymbolHandler {
    * @return list of {@link LspEventDependency}
    */
   public List<LspEventDependency> getDependencies(DocumentSymbolParams params) {
-    String uri = params.getTextDocument().getUri();
+    Uri uri = Uri.fromLsp(params.getTextDocument().getUri());
     return ImmutableList.of(
             asyncAnalysisService.createDependencyOn(uri),
             () -> documentModelService.get(uri) != null && ((documentModelService.get(uri).getOutlineResult() != null
@@ -93,7 +94,7 @@ public class DocumentSymbolHandler {
    * @return list of {@link LspEventCancelCondition
    */
   public List<LspEventCancelCondition> getCancelDependencies(DocumentSymbolParams params) {
-    String uri = params.getTextDocument().getUri();
+    Uri uri = Uri.fromLsp(params.getTextDocument().getUri());
     return ImmutableList.of(
             asyncAnalysisService.createCancelConditionOnClose(uri));
   }

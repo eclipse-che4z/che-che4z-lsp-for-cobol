@@ -22,6 +22,7 @@ import org.eclipse.lsp.cobol.common.mapping.ExtendedTextLine;
 import org.eclipse.lsp.cobol.common.mapping.MappedCharacter;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.model.Locality;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.transformer.ContinuationLineTransformation;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
@@ -52,7 +53,7 @@ public class StringClosedCorrectlyValidator implements ExtendedDocumentValidatio
   @Override
   public List<SyntaxError> validateLines(ExtendedDocument extendedDocument) {
     List<SyntaxError> errors = new ArrayList<>();
-    String documentURI = extendedDocument.getCurrentText().getUri();
+    Uri documentURI = extendedDocument.getCurrentText().getUri();
     extendedDocument
         .getCurrentText()
         .perform(
@@ -66,7 +67,7 @@ public class StringClosedCorrectlyValidator implements ExtendedDocumentValidatio
    * Check and raise an error if indicator area A of current line is not empty and the previous line
    * doesn't end correctly.
    */
-  private List<SyntaxError> getStringClosedInCorrectlyError(ExtendedTextLine line, String uri) {
+  private List<SyntaxError> getStringClosedInCorrectlyError(ExtendedTextLine line, Uri uri) {
     List<SyntaxError> result = new ArrayList<>();
     if (isBlankLine(line)) return null;
 
@@ -129,7 +130,7 @@ public class StringClosedCorrectlyValidator implements ExtendedDocumentValidatio
   }
 
   private SyntaxError registerStringClosingError(
-      String uri, ExtendedTextLine line, QuoteInfo quoteInfo) {
+      Uri uri, ExtendedTextLine line, QuoteInfo quoteInfo) {
     MappedCharacter mappedCharacter = line.getCharacters().get(quoteInfo.index);
     Position originalPosition = mappedCharacter.getOriginalPosition();
     SyntaxError error =

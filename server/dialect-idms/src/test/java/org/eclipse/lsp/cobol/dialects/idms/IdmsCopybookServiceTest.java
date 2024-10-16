@@ -28,6 +28,7 @@ import org.eclipse.lsp.cobol.common.copybook.*;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.model.Locality;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -56,7 +57,7 @@ class IdmsCopybookServiceTest {
   @BeforeEach
   void init() {
     processedCopybooks = new HashSet<>();
-    service = new IdmsCopybookService("uri", copybookService, preprocessor,
+    service = new IdmsCopybookService(new Uri("uri"), copybookService, preprocessor,
         CopybookProcessingMode.ENABLED,
         treeListener, messageService, processedCopybooks);
   }
@@ -64,7 +65,7 @@ class IdmsCopybookServiceTest {
   @Test
   void testNullContent() {
     CopybookName copybookName = new CopybookName("copybook");
-    CopybookModel copybookModel = new CopybookModel(copybookName.toCopybookId(""), copybookName, "copybookUri", null);
+    CopybookModel copybookModel = new CopybookModel(copybookName.toCopybookId(Uri.EMPTY), copybookName, new Uri("copybookUri"), null);
     Locality locality = Locality.builder().build();
     List<SyntaxError> errors = new LinkedList<>();
 
@@ -77,7 +78,7 @@ class IdmsCopybookServiceTest {
   @Test
   void testCircularDependency() {
     CopybookName copybookName = new CopybookName("copybook");
-    CopybookModel copybookModel = new CopybookModel(copybookName.toCopybookId(""), copybookName, "copybookUri", "content");
+    CopybookModel copybookModel = new CopybookModel(copybookName.toCopybookId(new Uri("")), copybookName, new Uri("copybookUri"), "content");
     Locality locality = Locality.builder().build();
     List<SyntaxError> errors = new LinkedList<>();
 
@@ -91,7 +92,7 @@ class IdmsCopybookServiceTest {
   @Test
   void testCreateNode() {
     CopybookName copybookName = new CopybookName("copybook");
-    CopybookModel copybookModel = new CopybookModel(copybookName.toCopybookId(""), copybookName, "copybookUri", "content");
+    CopybookModel copybookModel = new CopybookModel(copybookName.toCopybookId(new Uri("")), copybookName, new Uri("copybookUri"), "content");
     Locality locality = Locality.builder().build();
     List<SyntaxError> errors = new LinkedList<>();
 

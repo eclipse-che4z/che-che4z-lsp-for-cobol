@@ -18,6 +18,7 @@ import com.google.common.collect.ImmutableList;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
 import org.eclipse.lsp.cobol.common.message.MessageService;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.core.engine.analysis.AnalysisContext;
 import org.eclipse.lsp.cobol.dialects.ibm.CompilerDirectivesStage;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -45,7 +46,7 @@ class CompilerDirectivesStageTest {
     AnalysisConfig configuration = mock(AnalysisConfig.class);
     when(configuration.getCompilerOptions()).thenReturn(co);
     AnalysisContext ctx = mock(AnalysisContext.class);
-    ExtendedDocument doc = new ExtendedDocument(code, "http://doc.cbl");
+    ExtendedDocument doc = new ExtendedDocument(code, new Uri("http://doc.cbl"));
     when(ctx.getExtendedDocument()).thenReturn(doc);
     when(ctx.getConfig()).thenReturn(configuration);
 
@@ -63,7 +64,7 @@ class CompilerDirectivesStageTest {
     AnalysisConfig configuration = mock(AnalysisConfig.class);
     when(configuration.getCompilerOptions()).thenReturn(co);
     AnalysisContext ctx = mock(AnalysisContext.class);
-    ExtendedDocument doc = new ExtendedDocument(code, "http://doc.cbl");
+    ExtendedDocument doc = new ExtendedDocument(code, new Uri("http://doc.cbl"));
     when(ctx.getExtendedDocument()).thenReturn(doc);
     when(ctx.getConfig()).thenReturn(configuration);
 

@@ -23,6 +23,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.common.AnalysisResult;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp4j.DocumentSymbol;
 import org.eclipse.lsp4j.Position;
 
@@ -38,14 +39,14 @@ public class CobolDocumentModel {
   private static final String DELIMITER = "[ .\\[\\]()<>,*\"']+";
   private final List<Line> lines = new CopyOnWriteArrayList<>();
   private String text;
-  private final String uri;
+  private final Uri uri;
   @Setter private volatile boolean opened = true;
   @Setter private String languageId;
   private volatile AnalysisResult analysisResult;
   private volatile AnalysisResult lastAnalysisResult;
   @Setter private volatile List<DocumentSymbol> outlineResult;
 
-  public CobolDocumentModel(String uri, String text, AnalysisResult analysisResult) {
+  public CobolDocumentModel(Uri uri, String text, AnalysisResult analysisResult) {
     this.uri = uri;
     this.text = text;
     this.analysisResult = analysisResult;
@@ -53,7 +54,7 @@ public class CobolDocumentModel {
     parse(text);
   }
 
-  public CobolDocumentModel(String uri, String text) {
+  public CobolDocumentModel(Uri uri, String text) {
     this.text = text;
     this.uri = uri;
     parse(text);

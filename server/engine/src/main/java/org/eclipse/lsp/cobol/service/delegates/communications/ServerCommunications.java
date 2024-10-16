@@ -30,8 +30,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.lsp.cobol.common.file.FileSystemService;
 import org.eclipse.lsp.cobol.common.message.MessageService;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.lsp.jrpc.CobolLanguageClient;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.ExecuteCommandOptions;
@@ -57,18 +57,15 @@ import org.eclipse.lsp4j.jsonrpc.messages.Either;
 @Slf4j
 public class ServerCommunications implements Communications {
 
-  private final Set<String> uriInProgress = Collections.synchronizedSet(new HashSet<>());
+  private final Set<Uri> uriInProgress = Collections.synchronizedSet(new HashSet<>());
   private final MessageService messageService;
   private final Provider<CobolLanguageClient> provider;
-  private final FileSystemService files;
 
   @Inject
   public ServerCommunications(
           Provider<CobolLanguageClient> provider,
-          FileSystemService files,
           MessageService messageService) {
     this.provider = provider;
-    this.files = files;
     this.messageService = messageService;
   }
 
@@ -79,14 +76,14 @@ public class ServerCommunications implements Communications {
    * @param uri - uri of the document that is currently processed
    */
   @Override
-  public void notifyThatDocumentAnalysed(String uri) {
+  public void notifyThatDocumentAnalysed(Uri uri) {
     runAsync(
             () ->
                     logMessage(
                             Info,
                             messageService.getMessage(
                                     "Communications.noSyntaxError",
-                                    files.getNameFromURI(files.decodeURI(uri)))));
+                                    uri.getName())));
   }
 
   /**
@@ -118,7 +115,7 @@ public class ServerCommunications implements Communications {
 
 
   @Override
-  public void notifyProgressBegin(String uri) {
+  public void notifyProgressBegin(Uri uri) {
     synchronized (uriInProgress) {
       handleDanglingProgressNotifications(uri);
       createProgressWindow(uri);
@@ -128,49 +125,52 @@ public class ServerCommunications implements Communications {
     }
   }
 
-  private void handleDanglingProgressNotifications(String uri) {
+  private void handleDanglingProgressNotifications(Uri uri) {
     if (uriInProgress.contains(uri)) {
       notifyProgressEnd(uri);
       uriInProgress.remove(uri);
     }
   }
 
-  private void notifyWorkProgress(String uri) {
+  private void notifyWorkProgress(Uri uri) {
     WorkDoneProgressReport workDoneProgressReport = new WorkDoneProgressReport();
     workDoneProgressReport.setCancellable(true);
-    ProgressParams params = new ProgressParams(Either.forLeft(uri), Either.forLeft(workDoneProgressReport));
+    ProgressParams params = new ProgressParams(Either.forLeft(uri.toString()), Either.forLeft(workDoneProgressReport));
     getClient().notifyProgress(params);
   }
 
-  private void createProgressWindow(String uri) {
-    getClient().createProgress(new WorkDoneProgressCreateParams(Either.forLeft(uri)));
+  private void createProgressWindow(Uri uri) {
+    getClient().createProgress(new WorkDoneProgressCreateParams(Either.forLeft(uri.toString())));
   }
 
-  private void notifyWorkProgressBegin(String uri) {
+  private void notifyWorkProgressBegin(Uri uri) {
     ProgressParams params = new ProgressParams();
-    params.setToken(uri);
+    params.setToken(uri.toString());
     WorkDoneProgressBegin workDoneProgressBegin = new WorkDoneProgressBegin();
+    String name = uri.getName();
     workDoneProgressBegin.setTitle(messageService.getMessage(
             "Communications.syntaxAnalysisInProgressTitle",
-            files.getNameFromURI(uri)));
+            name));
     workDoneProgressBegin.setCancellable(true);
     params.setValue(Either.forLeft(workDoneProgressBegin));
     getClient().notifyProgress(params);
   }
 
   @Override
-  public void notifyProgressReport(String uri) {
+  public void notifyProgressReport(Uri uri) {
     ProgressParams params =
-            new ProgressParams(Either.forLeft(uri), Either.forLeft(new WorkDoneProgressReport()));
+            new ProgressParams(Either.forLeft(uri.toString()),
+                    Either.forLeft(new WorkDoneProgressReport()));
     getClient().notifyProgress(params);
   }
 
   @Override
-  public void notifyProgressEnd(String uri) {
+  public void notifyProgressEnd(Uri uri) {
     synchronized (uriInProgress) {
       if (uriInProgress.contains(uri)) {
         ProgressParams params =
-                new ProgressParams(Either.forLeft(uri), Either.forLeft(new WorkDoneProgressEnd()));
+                new ProgressParams(Either.forLeft(uri.toString()),
+                        Either.forLeft(new WorkDoneProgressEnd()));
         getClient().notifyProgress(params);
         uriInProgress.remove(uri);
       }

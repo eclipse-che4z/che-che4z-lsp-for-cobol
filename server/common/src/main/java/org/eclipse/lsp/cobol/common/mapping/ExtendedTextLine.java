@@ -15,6 +15,7 @@
 package org.eclipse.lsp.cobol.common.mapping;
 
 import lombok.Getter;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 
@@ -31,7 +32,7 @@ public class ExtendedTextLine {
   private ExtendedTextLine() {
   }
 
-  ExtendedTextLine(String line, Location instantLocation, String uri) {
+  ExtendedTextLine(String line, Location instantLocation, Uri uri) {
     for (int i = 0; i < line.length(); i++) {
       char character = line.charAt(i);
       checkCharacter(character);
@@ -39,11 +40,11 @@ public class ExtendedTextLine {
     }
   }
 
-  ExtendedTextLine(String line, int lineNumber, String uri) {
+  ExtendedTextLine(String line, int lineNumber, Uri uri) {
     this(line, new Position(lineNumber, 0), uri);
   }
 
-  public ExtendedTextLine(String line, Position start, String uri) {
+  public ExtendedTextLine(String line, Position start, Uri uri) {
     for (int i = 0; i < line.length(); i++) {
       char character = line.charAt(i);
       checkCharacter(character);
@@ -183,7 +184,7 @@ public class ExtendedTextLine {
    */
   void addPadding(int character) {
     for (int i = 0; i < character; i++) {
-      characters.add(0, new MappedCharacter(' ', new Position(0, 0), "", this, null, null));
+      characters.add(0, new MappedCharacter(' ', new Position(0, 0), Uri.EMPTY, this, null, null));
     }
   }
 
@@ -191,7 +192,7 @@ public class ExtendedTextLine {
    * Trim spaces from the beginning of the line
    */
   void trim() {
-    while (characters.size() > 0 && characters.get(0).getCharacter() == ' ') {
+    while (!characters.isEmpty() && characters.get(0).getCharacter() == ' ') {
       characters.remove(0);
     }
   }

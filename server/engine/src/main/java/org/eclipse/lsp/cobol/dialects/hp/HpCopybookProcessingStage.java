@@ -39,6 +39,7 @@ import org.eclipse.lsp.cobol.common.mapping.MappedCharacter;
 import org.eclipse.lsp.cobol.common.mapping.OriginalLocation;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.model.Locality;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.common.pipeline.Stage;
 import org.eclipse.lsp.cobol.common.pipeline.StageResult;
@@ -82,14 +83,14 @@ public class HpCopybookProcessingStage implements Stage<AnalysisContext, Dialect
     return "Copybook processing";
   }
 
-  private List<CopyNode> insertHpCopybook(String programUri, ExtendedDocument extendedDocument, CopybookDescriptor descriptor, List<SyntaxError> errors) {
+  private List<CopyNode> insertHpCopybook(Uri programUri, ExtendedDocument extendedDocument, CopybookDescriptor descriptor, List<SyntaxError> errors) {
     CopybookName copybookName = new CopybookName(descriptor.getName());
     CopybookModel model = copybookService.resolve(copybookName.toCopybookId(extendedDocument.getUri()),
             copybookName, programUri,
             extendedDocument.getUri(), null)
         .unwrap(errors::addAll);
 
-    Location nameLocation = new Location(extendedDocument.getUri(), descriptor.getNameRange());
+    Location nameLocation = new Location(extendedDocument.getUri().toString(), descriptor.getNameRange());
     if (model.getUri() == null) {
       errors.add(SyntaxError.syntaxError()
           .errorSource(ErrorSource.DIALECT)

@@ -23,6 +23,7 @@ import java.util.concurrent.CompletableFuture;
 import org.eclipse.lsp.cobol.common.AnalysisResult;
 import org.eclipse.lsp.cobol.common.LanguageEngineFacade;
 import org.eclipse.lsp.cobol.common.copybook.CopybookService;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.common.model.tree.RootNode;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookIdentificationService;
 import org.eclipse.lsp.cobol.service.delegates.communications.Communications;
@@ -72,7 +73,7 @@ class AnalysisServiceTest {
                     copybookService, documentService
             );
 
-    CompletableFuture<Boolean> booleanCompletableFuture = CompletableFuture.supplyAsync(() -> service.isCopybook("", ""));
+    CompletableFuture<Boolean> booleanCompletableFuture = CompletableFuture.supplyAsync(() -> service.isCopybook(Uri.EMPTY, ""));
 
     Thread.sleep(10);
     verify(copybookIdentificationService, times(0)).isCopybook(any(), any(), any());
@@ -85,7 +86,7 @@ class AnalysisServiceTest {
 
   @Test
   void testAnalyzeDocument_copybook() throws InterruptedException {
-    String uri = UUID.randomUUID().toString();
+    Uri uri = new Uri(UUID.randomUUID().toString());
     String text = UUID.randomUUID().toString();
     when(copybookIdentificationService.isCopybook(any(), any(), any())).thenReturn(true);
 
@@ -99,7 +100,7 @@ class AnalysisServiceTest {
     AnalysisResult result = mock(AnalysisResult.class);
     when(result.getRootNode()).thenReturn(new RootNode());
 
-    String uri = UUID.randomUUID().toString();
+    Uri uri = new Uri(UUID.randomUUID().toString());
     String text = UUID.randomUUID().toString();
     when(copybookIdentificationService.isCopybook(any(), any(), any())).thenReturn(false);
     when(engine.analyze(any(), any(), any(), anyString())).thenReturn(result);
@@ -113,7 +114,7 @@ class AnalysisServiceTest {
 
   @Test
   void testReanalyzeDocument_copybook() throws InterruptedException {
-    String uri = UUID.randomUUID().toString();
+    Uri uri = new Uri(UUID.randomUUID().toString());
     String text = UUID.randomUUID().toString();
     when(copybookIdentificationService.isCopybook(any(), any(), any())).thenReturn(true);
 
@@ -123,7 +124,7 @@ class AnalysisServiceTest {
 
   @Test
   void testReanalyzeDocument_program() throws InterruptedException {
-    String uri = UUID.randomUUID().toString();
+    Uri uri = new Uri(UUID.randomUUID().toString());
     String text = UUID.randomUUID().toString();
     when(copybookIdentificationService.isCopybook(any(), any(), any())).thenReturn(false);
     when(engine.analyze(any(), any(), any(), anyString())).thenReturn(prepareAnalysisResult());

@@ -26,6 +26,7 @@ import org.eclipse.lsp.cobol.common.dialects.CobolProgramLayout;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.NodeType;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.common.model.tree.*;
 import org.eclipse.lsp.cobol.common.model.tree.statements.StatementNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.*;
@@ -116,8 +117,8 @@ public class TransformTreeStage implements Stage<AnalysisContext, ProcessingResu
     for (Map.Entry<String, Location> copybook : context.getCopybooksRepository().getUsages().entries()) {
       String name = copybook.getKey();
       Range range = copybook.getValue().getRange();
-      Locality statementLocality = Locality.builder().range(range).uri(copybook.getValue().getUri()).build();
-      String copybookUri = context.getCopybooksRepository().getDefinitions().get(name).stream().findFirst().orElse(null);
+      Locality statementLocality = Locality.builder().range(range).uri(new Uri(copybook.getValue().getUri())).build();
+      Uri copybookUri = context.getCopybooksRepository().getDefinitions().get(name).stream().findFirst().orElse(null);
       rootNode.addChild(
           new CopyNode(statementLocality, copybook.getValue(), name, copybookUri));
     }
@@ -146,7 +147,7 @@ public class TransformTreeStage implements Stage<AnalysisContext, ProcessingResu
           shapeSectionsAndParagraphs(node);
       }
       if (node.getNodeType() == NodeType.PROCEDURE_SECTION && !(node instanceof DeclarativeProcedureSectionNode)) {
-          handleSection(parent, stack, node);
+          handleSection(stack, node);
           parent.addChild(node);
           continue;
       }
@@ -164,7 +165,7 @@ public class TransformTreeStage implements Stage<AnalysisContext, ProcessingResu
     }
   }
 
-  private void handleSection(Node parent, LinkedList<Node> stack, Node node) {
+  private void handleSection(LinkedList<Node> stack, Node node) {
       if (stack.isEmpty()) {
           stack.push(node);
           return;
@@ -203,7 +204,6 @@ public class TransformTreeStage implements Stage<AnalysisContext, ProcessingResu
         stack.pop();
         stack.peek().addChild(node);
         stack.push(node);
-        return;
     }
   }
 

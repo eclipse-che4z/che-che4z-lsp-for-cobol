@@ -18,7 +18,10 @@ import lombok.experimental.UtilityClass;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
 import org.eclipse.lsp.cobol.common.model.Locality;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
+import org.eclipse.lsp4j.Location;
+import org.eclipse.lsp4j.Range;
 
 import java.util.Optional;
 
@@ -39,12 +42,17 @@ public class MappingUtils {
      */
 
     public static Optional<Locality> retrieveLocality(ParserRuleContext ctx, ExtendedDocument extendedDocument, CopybooksRepository copybooks) {
-        return retrieveRangeLocality(ctx)
-                .map(extendedDocument::mapLocation)
-                .map(loc -> Locality.builder()
-                        .range(loc.getRange())
-                        .uri(loc.getUri())
-                        .copybookId(copybooks.getCopybookIdByUri(loc.getUri()))
-                        .build());
+        Optional<Range> rangeOpt = retrieveRangeLocality(ctx);
+        if (!rangeOpt.isPresent()) {
+            return Optional.empty();
+        }
+        Range range = rangeOpt.get();
+        Location location = extendedDocument.mapLocation(range);
+        Uri uri = new Uri(location.getUri());
+        return Optional.of(Locality.builder()
+                .range(location.getRange())
+                .uri(uri)
+                .copybookId(copybooks.getCopybookIdByUri(uri))
+                .build());
     }
 }

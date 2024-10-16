@@ -14,6 +14,8 @@
  */
 package org.eclipse.lsp.cobol.service.copybooks;
 
+import org.eclipse.lsp.cobol.common.model.Uri;
+
 import java.util.List;
 
 /** Identifies a copybook */
@@ -27,7 +29,7 @@ public interface CopybookIdentificationService {
    * @param config is a config
    * @return True if it's a copybook. False otherwise
    */
-  boolean isCopybook(String uri, String text, List<String> config) throws UndeterminedDocumentException;
+  boolean isCopybook(Uri uri, String text, List<String> config) throws UndeterminedDocumentException;
 
   /** Runtime exception in case a doc is not recognisable if it's a copybook or a cobol program. */
   class UndeterminedDocumentException extends RuntimeException {}

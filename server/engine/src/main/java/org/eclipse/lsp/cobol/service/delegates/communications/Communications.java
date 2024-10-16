@@ -14,6 +14,7 @@
  */
 package org.eclipse.lsp.cobol.service.delegates.communications;
 
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.MessageType;
 
@@ -24,15 +25,15 @@ public interface Communications {
 
   void publishDiagnostics(Map<String, List<Diagnostic>> diagnostics);
 
-  void notifyThatDocumentAnalysed(String uri);
+  void notifyThatDocumentAnalysed(Uri uri);
 
   void notifyGeneralMessage(MessageType messageType, String errorMessage);
 
-  void notifyProgressBegin(String uri);
+  void notifyProgressBegin(Uri uri);
 
-  void notifyProgressReport(String uri);
+  void notifyProgressReport(Uri uri);
 
-  void notifyProgressEnd(String uri);
+  void notifyProgressEnd(Uri uri);
 
   void registerExecuteCommandCapability(List<String> capabilities, String id);
 

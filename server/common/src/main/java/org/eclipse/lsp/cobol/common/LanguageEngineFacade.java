@@ -14,6 +14,8 @@
  */
 package org.eclipse.lsp.cobol.common;
 
+import org.eclipse.lsp.cobol.common.model.Uri;
+
 /**
  * Language Engine Facade interface
  */
@@ -26,7 +28,7 @@ public interface LanguageEngineFacade {
    *                       reflect the sync status of the document (DID_OPEN|DID_CHANGE)
    * @return list of LSP diagnostic object used to display errors in the editor
    */
-  AnalysisResult analyze(String uri, String text, AnalysisConfig analysisConfig);
+  AnalysisResult analyze(Uri uri, String text, AnalysisConfig analysisConfig);
 
   /**
    * Analyze the document for a specific cobol dialect (language id)
@@ -40,5 +42,5 @@ public interface LanguageEngineFacade {
    * @param languageId
    * @return a model containing full analysis result, e.g. errors and semantic elements
    */
-  AnalysisResult analyze(String uri, String text, AnalysisConfig analysisConfig, String languageId);
+  AnalysisResult analyze(Uri uri, String text, AnalysisConfig analysisConfig, String languageId);
 }

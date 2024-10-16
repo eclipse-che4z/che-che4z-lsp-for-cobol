@@ -16,6 +16,7 @@
 package org.eclipse.lsp.cobol.service.delegates.formations;
 
 import lombok.NonNull;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp4j.TextEdit;
 import org.junit.jupiter.api.Assertions;
@@ -54,7 +55,7 @@ class TrimFormationTest {
   @Test
   void whenFormatIsCalledValidListParam_thenGetTextLines() {
     TrimFormation trimFormation = new TrimFormation();
-    CobolDocumentModel model = new CobolDocumentModel("", TEXT);
+    CobolDocumentModel model = new CobolDocumentModel(new Uri(""), TEXT);
     List<CobolDocumentModel.Line> lines = model.getLines();
     List<TextEdit> format = trimFormation.format(lines);
     assertEquals(5, format.size());

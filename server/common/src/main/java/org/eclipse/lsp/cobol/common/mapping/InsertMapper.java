@@ -16,6 +16,7 @@ package org.eclipse.lsp.cobol.common.mapping;
 
 import java.util.Map;
 
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Range;
 
@@ -26,12 +27,12 @@ class InsertMapper implements Mapper {
   @Override
   public Location apply(MappedCharacter startCharacter, MappedCharacter endCharacter) {
     if (startCharacter != null && !startCharacter.getUri().equals(endCharacter.getUri()) && startCharacter.getOriginalPosition() != null) {
-      Map<String, Location> ilm = endCharacter.getInitialLocationMap();
+      Map<Uri, Location> ilm = endCharacter.getInitialLocationMap();
       Location location = ilm != null ? ilm.get(startCharacter.getUri()) : null;
       if (location != null) {
-        return new Location(startCharacter.getUri(), new Range(startCharacter.getOriginalPosition(), location.getRange().getEnd()));
+        return new Location(startCharacter.getUri().toString(), new Range(startCharacter.getOriginalPosition(), location.getRange().getEnd()));
       }
-      return new Location(startCharacter.getUri(), new Range(startCharacter.getOriginalPosition(), startCharacter.getOriginalPosition()));
+      return new Location(startCharacter.getUri().toString(), new Range(startCharacter.getOriginalPosition(), startCharacter.getOriginalPosition()));
     }
     return null;
   }

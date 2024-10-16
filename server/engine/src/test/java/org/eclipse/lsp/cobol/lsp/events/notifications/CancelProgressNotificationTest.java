@@ -17,6 +17,7 @@ package org.eclipse.lsp.cobol.lsp.events.notifications;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.lsp.handlers.server.CancelProgressHandler;
 import org.junit.jupiter.api.Test;
 
@@ -25,8 +26,8 @@ class CancelProgressNotificationTest {
   @Test
   void test() throws InterruptedException {
     CancelProgressHandler handler = mock(CancelProgressHandler.class);
-    CancelProgressNotification notification = new CancelProgressNotification("uri", handler);
+    CancelProgressNotification notification = new CancelProgressNotification(new Uri("uri"), handler);
     notification.execute();
-    verify(handler).cancel("uri");
+    verify(handler).cancel(new Uri("uri"));
   }
 }

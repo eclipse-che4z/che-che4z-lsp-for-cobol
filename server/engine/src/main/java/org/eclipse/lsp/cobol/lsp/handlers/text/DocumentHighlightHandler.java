@@ -17,6 +17,8 @@ package org.eclipse.lsp.cobol.lsp.handlers.text;
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import java.util.List;
+
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.lsp.LspEventDependency;
 import org.eclipse.lsp.cobol.lsp.LspQuery;
 import org.eclipse.lsp.cobol.lsp.analysis.AsyncAnalysisService;
@@ -48,7 +50,7 @@ public class DocumentHighlightHandler {
    */
   public List<LspEventDependency> getDocumentHighlightDependency(DocumentHighlightParams documentHighlightParams) {
     return ImmutableList.of(
-            asyncAnalysisService.createDependencyOn(documentHighlightParams.getTextDocument().getUri()));
+            asyncAnalysisService.createDependencyOn(Uri.fromLsp(documentHighlightParams.getTextDocument().getUri())));
   }
 
   /**
@@ -59,7 +61,7 @@ public class DocumentHighlightHandler {
    */
   public List<DocumentHighlight> documentHighlight(
           DocumentHighlightParams params) {
-    String uri = params.getTextDocument().getUri();
+    Uri uri = Uri.fromLsp(params.getTextDocument().getUri());
     return occurrences.findHighlights(documentModelService.get(uri).getLastAnalysisResult(), params);
   }
 

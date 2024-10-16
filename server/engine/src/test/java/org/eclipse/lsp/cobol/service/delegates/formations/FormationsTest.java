@@ -17,6 +17,7 @@ package org.eclipse.lsp.cobol.service.delegates.formations;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp4j.TextEdit;
 import org.junit.jupiter.api.Test;
@@ -43,7 +44,7 @@ class FormationsTest {
 
   @Test
   void WhenCobolDocumentModelNonNull_thenFormatReturnsFormattedString() {
-    CobolDocumentModel model = new CobolDocumentModel("", "SAMPLE TEXT FOR TEST");
+    CobolDocumentModel model = new CobolDocumentModel(new Uri(""), "SAMPLE TEXT FOR TEST");
     List<TextEdit> response1 = ImmutableList.of(new TextEdit());
     List<TextEdit> response2 = ImmutableList.of(new TextEdit(), new TextEdit());
     when(FORMATION_1.format(anyList())).thenReturn(response1);

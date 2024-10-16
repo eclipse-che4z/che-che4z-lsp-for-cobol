@@ -20,6 +20,7 @@ import com.google.inject.Inject;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.common.copybook.CopybookService;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.lsp.DisposableLSPStateService;
 import org.eclipse.lsp.cobol.lsp.SourceUnitGraph;
 import org.eclipse.lsp.cobol.lsp.analysis.AsyncAnalysisService;
@@ -59,7 +60,7 @@ public class DidCloseHandler {
     if (disposableLSPStateService.isServerShutdown()) {
       return;
     }
-    String uri = params.getTextDocument().getUri();
+    Uri uri = Uri.fromLsp(params.getTextDocument().getUri());
     LOG.info(format("Document closing invoked on URI %s", uri));
     if (!sourceUnitGraph.isFileOpened(uri)) {
       LOG.info(format("Ignoring document closing invoked on URI %s", uri));

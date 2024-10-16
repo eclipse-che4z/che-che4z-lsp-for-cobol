@@ -28,6 +28,7 @@ import java.util.concurrent.ExecutionException;
 
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.cfg.CFASTBuilder;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
 import org.eclipse.lsp.cobol.common.model.tree.RootNode;
@@ -74,7 +75,7 @@ public class AnalysisHandler {
      * @throws InterruptedException forward the exception
      */
     public ExtendedApiResult analysis(AnalysisResultEvent analysisResultEvent) throws ExecutionException, InterruptedException {
-        String uri = analysisResultEvent.getUri();
+        Uri uri = Uri.fromLsp(analysisResultEvent.getUri());
         CobolDocumentModel doc = documentModelService.get(uri);
         if (analysisService.isCopybook(uri, analysisResultEvent.getText())) {
             communications.notifyGeneralMessage(MessageType.Info, "Cannot retrieve outline tree because file was treated as a copybook");
@@ -84,7 +85,7 @@ public class AnalysisHandler {
         int line = analysisResultEvent.getLine();
         int character = analysisResultEvent.getCharacter();
         Position position = new Position(line, character);
-        Optional<Node> selectedNode = RangeUtils.findNodeByPosition(rootNode, analysisResultEvent.getUri(), position);
+        Optional<Node> selectedNode = RangeUtils.findNodeByPosition(rootNode, uri, position);
 
         ProgramNode programNode;
         if (selectedNode.isPresent() && !(selectedNode.get() instanceof RootNode)) {
@@ -129,12 +130,12 @@ public class AnalysisHandler {
     public List<LspEventDependency> getDependencies(JsonObject params) {
         AnalysisResultEvent analysisResultEvent = ofNullable(new Gson().fromJson(params.toString(), AnalysisResultEvent.class))
                 .orElseGet(() -> new AnalysisResultEvent("", "", 0, 0));
-        String uri = analysisResultEvent.getUri();
+        Uri uri = Uri.fromLsp(analysisResultEvent.getUri());
         if (documentModelService.get(uri) == null) {
             asyncAnalysisService.scheduleAnalysis(uri, analysisResultEvent.getText(), true);
         }
         return ImmutableList.of(
-                asyncAnalysisService.createDependencyOn(analysisResultEvent.getUri()));
+                asyncAnalysisService.createDependencyOn(uri));
     }
 
 }

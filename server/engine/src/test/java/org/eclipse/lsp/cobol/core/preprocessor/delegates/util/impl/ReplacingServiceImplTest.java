@@ -21,6 +21,7 @@ import org.eclipse.lsp.cobol.common.ResultWithErrors;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.model.Locality;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.replacement.ReplaceData;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.replacement.ReplacingService;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.replacement.ReplacingServiceImpl;
@@ -47,15 +48,15 @@ class ReplacingServiceImplTest {
   @Test
   void testApplyReplacing() {
     ReplacingService replacingService = new ReplacingServiceImpl(messageService);
-    ExtendedDocument dm1 = new ExtendedDocument("   01\n.   .CHILD101\n.", "");
+    ExtendedDocument dm1 = new ExtendedDocument("   01\n.   .CHILD101\n.", Uri.EMPTY);
     replacingService.applyReplacing(dm1, new ReplaceData(ImmutableList.of(
             Pair.of("(?<=[\\.\\s\\r\\n])01(?=[\\.\\s\\r\\n])", "05"), // .
-            Pair.of("CHILD1", "CHILD2")), "", new Range()));
+            Pair.of("CHILD1", "CHILD2")), new Uri(""), new Range()));
     assertEquals("   05\n.   .CHILD201\n.", dm1.toString());
 
-    ExtendedDocument dm2 = new ExtendedDocument("01 ABC.", "");
+    ExtendedDocument dm2 = new ExtendedDocument("01 ABC.", new Uri(""));
     replacingService.applyReplacing(dm2,
-            new ReplaceData(ImmutableList.of(Pair.of("", "")), "", new Range()));
+            new ReplaceData(ImmutableList.of(Pair.of("", "")), new Uri(""), new Range()));
     assertEquals("01 ABC.", dm2.toString());
   }
 

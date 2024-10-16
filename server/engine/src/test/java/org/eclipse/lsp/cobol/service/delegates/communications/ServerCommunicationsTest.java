@@ -26,6 +26,7 @@ import java.lang.reflect.Field;
 import java.util.*;
 import org.eclipse.lsp.cobol.common.file.FileSystemService;
 import org.eclipse.lsp.cobol.common.message.MessageService;
+import org.eclipse.lsp.cobol.common.model.Uri;
 import org.eclipse.lsp.cobol.lsp.jrpc.CobolLanguageClient;
 import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
@@ -49,8 +50,6 @@ class ServerCommunicationsTest {
 
   @Mock private FileSystemService files;
 
-  @Mock private HashSet<String> uriInProgress;
-
   @InjectMocks private ServerCommunications communications;
 
   @Mock private MessageService messageService;
@@ -63,29 +62,27 @@ class ServerCommunicationsTest {
   }
 
   /**
-   * Method {@link ServerCommunications#notifyThatDocumentAnalysed(String)} should asynchronously
+   * Method {@link ServerCommunications#notifyThatDocumentAnalysed(Uri)} should asynchronously
    * call logging on the client for a specific message with a document name retrieved from uri
    */
   @Test
   void testNotifyThatDocumentAnalysed_multi_segment_uri() {
-    assertDocumentAnalysedNotification(DOCUMENT_URI, "document.cbl");
+    assertDocumentAnalysedNotification(DOCUMENT_URI.toString(), "document.cbl");
     assertDocumentAnalysedNotification("document.cbl", "document.cbl");
     assertDocumentAnalysedNotification("", "");
   }
 
 
   /**
-   * Method {@link ServerCommunications#notifyThatDocumentAnalysed(String)} should asynchronously
-   * call logging on the client for a specific message with an URI
+   * Method {@link ServerCommunications#notifyThatDocumentAnalysed(Uri)} should asynchronously
+   * call logging on the client for a specific message with a URI
    */
   @Test
   void testNotifyThatDocumentAnalysed() {
     String data = UUID.randomUUID().toString();
-    when(files.decodeURI(data)).thenReturn(data);
-    when(files.getNameFromURI(data)).thenReturn(data);
     when(messageService.getMessage(anyString(), anyString()))
         .thenReturn("No syntax errors detected in %s");
-    communications.notifyThatDocumentAnalysed(data);
+    communications.notifyThatDocumentAnalysed(new Uri(data));
     verify(client, timeout(TEST_TIMEOUT))
         .logMessage(
             eq(
@@ -114,12 +111,11 @@ class ServerCommunicationsTest {
 
   @Test
   void testNotifyProgressBegin() throws NoSuchFieldException {
-    String uri = UUID.randomUUID().toString();
-    when(files.getNameFromURI(uri)).thenReturn(uri);
-    when(messageService.getMessage("Communications.syntaxAnalysisInProgressTitle", uri)).thenReturn("TITLE");
+    Uri uri = new Uri(UUID.randomUUID().toString());
+    when(messageService.getMessage("Communications.syntaxAnalysisInProgressTitle", uri.toString())).thenReturn("TITLE");
     setUpProgressDataStructure(uri);
     ProgressParams expectedNotifyBeginParams = new ProgressParams();
-    expectedNotifyBeginParams.setToken(uri);
+    expectedNotifyBeginParams.setToken(uri.toString());
     WorkDoneProgressBegin workDoneProgressBegin = new WorkDoneProgressBegin();
     workDoneProgressBegin.setTitle("TITLE");
     workDoneProgressBegin.setCancellable(true);
@@ -129,22 +125,22 @@ class ServerCommunicationsTest {
     verify(client).notifyProgress(expectedNotifyBeginParams);
     WorkDoneProgressReport expectedProgressReport = new WorkDoneProgressReport();
     expectedProgressReport.setCancellable(true);
-    verify(client).notifyProgress(new ProgressParams(Either.forLeft(uri), Either.forLeft(expectedProgressReport)));
+    verify(client).notifyProgress(new ProgressParams(Either.forLeft(uri.toString()), Either.forLeft(expectedProgressReport)));
   }
 
   @Test
   void testNotifyProgressEnd() throws NoSuchFieldException {
-    String uri = UUID.randomUUID().toString();
+    Uri uri = new Uri(UUID.randomUUID().toString());
     setUpProgressDataStructure(uri);
     communications.notifyProgressEnd(uri);
-    verify(client).notifyProgress(new ProgressParams(Either.forLeft(uri), Either.forLeft(new WorkDoneProgressEnd())));
+    verify(client).notifyProgress(new ProgressParams(Either.forLeft(uri.toString()), Either.forLeft(new WorkDoneProgressEnd())));
   }
 
   @Test
   void testNotifyProgressReport() {
-    String uri = UUID.randomUUID().toString();
+    Uri uri = new Uri(UUID.randomUUID().toString());
     communications.notifyProgressReport(uri);
-    verify(client).notifyProgress(new ProgressParams(Either.forLeft(uri), Either.forLeft(new WorkDoneProgressReport())));
+    verify(client).notifyProgress(new ProgressParams(Either.forLeft(uri.toString()), Either.forLeft(new WorkDoneProgressReport())));
   }
 
   @Test
@@ -167,8 +163,8 @@ class ServerCommunicationsTest {
     verify(client).unregisterCapability(unregistrationParams);
   }
 
-  private void setUpProgressDataStructure(String data) throws NoSuchFieldException {
-    HashSet<String> uriInProgress = new HashSet<>();
+  private void setUpProgressDataStructure(Uri data) throws NoSuchFieldException {
+    HashSet<Uri> uriInProgress = new HashSet<>();
     uriInProgress.add(data);
     Field f = communications.getClass().getDeclaredField("uriInProgress");
     f.setAccessible(true);
@@ -182,11 +178,9 @@ class ServerCommunicationsTest {
   private void assertDocumentAnalysedNotification(String uri, String fileName) {
     client = mock(CobolLanguageClient.class);
     when(provider.get()).thenReturn(client);
-    when(files.decodeURI(uri)).thenReturn(uri);
-    when(files.getNameFromURI(uri)).thenReturn(fileName);
     when(messageService.getMessage(anyString(), anyString()))
         .thenReturn("No syntax errors detected in %s");
-    communications.notifyThatDocumentAnalysed(uri);
+    communications.notifyThatDocumentAnalysed(new Uri(uri));
     verify(client, timeout(TEST_TIMEOUT))
         .logMessage(
             eq(
