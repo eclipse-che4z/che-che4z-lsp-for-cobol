@@ -789,82 +789,96 @@ cics_waitcics: WAITCICS (ECBLIST cics_value | NUMEVENTS cics_data_value | PURGEA
 cics_web: WEB (cics_web_close | cics_web_converse | cics_web_endbrowse | cics_web_extract | cics_web_open |
           cics_web_parse | cics_web_read | cics_web_readnext | cics_web_receive | cics_web_retrieve | cics_web_send |
           cics_web_startbrowse | cics_web_write);
-cics_web_close: (CLOSE | SESSTOKEN cics_data_value | cics_handle_response)+;
-cics_web_converse: CONVERSE (SESSTOKEN cics_data_value | PATH cics_data_area PATHLENGTH cics_data_value | URIMAP cics_data_value |
-                   GET | HEAD | POST | PUT | TRACE | OPTIONS | DELETE | METHOD cics_cvda | MEDIATYPE cics_data_area |
-                   cics_web_querystring | cics_web_body | ACTION cics_cvda | EXPECT | CLOSE | CLOSESTATUS cics_cvda | NOCLOSE |
-                   cics_web_credentials | INTO cics_data_area | SET cics_ref | cics_web_tocontainer |TOLENGTH cics_data_area |
-                   MAXLENGTH cics_data_value | NOTRUNCATE | STATUSCODE cics_data_area | cics_web_statustext |
-                   cics_web_translation | BODYCHARSET cics_data_area | cics_handle_response)+;
-cics_web_querystring: (QUERYSTRING cics_data_area | QUERYSTRLEN cics_data_value | cics_handle_response)+;
-cics_web_tocontainer: (TOCONTAINER cics_data_value | TOCHANNEL cics_data_value | cics_handle_response)+;
-cics_web_statustext: (STATUSTEXT cics_data_area | STATUSLEN cics_data_value | cics_handle_response)+;
-cics_web_body: cics_web_doctoken | cics_web_from | cics_web_container;
-cics_web_doctoken: (DOCTOKEN cics_data_value | NODOCDELETE | DOCDELETE | DOCSTATUS cics_cvda | cics_handle_response)+;
-cics_web_from: (FROM cics_data_area | FROMLENGTH cics_data_value | cics_handle_response)+;
-cics_web_container: (CONTAINER cics_data_value | CHANNEL cics_data_value | cics_handle_response)+;
-cics_web_credentials: (cics_web_username | PASSWORD cics_data_value | PASSWORDLEN cics_data_value | cics_handle_response)+;
-cics_web_username: (NONE | BASICAUTH | AUTHENTICATE cics_cvda | USERNAME cics_data_value | USERNAMELEN cics_data_value | cics_handle_response)+;
-cics_web_translation: (CHARACTERSET cics_data_value | CLICONVERT | NOINCONVERT | NOOUTCONERT | NOCLICONVERT | CLIENTCONV cics_cvda | cics_handle_response)+;
-cics_web_endbrowse: ENDBROWSE (FORMFIELD | HTTPHEADER | SESSTOKEN cics_data_value | QUERYPARM | cics_handle_response)+;
-cics_web_extract: EXTRACT (SCHEME cics_cvda | cics_web_host | cics_web_httpmethod | cics_web_httpversion | cics_web_path |
-                  PORTNUMBER cics_data_area | cics_web_querystring | REQUESTTYPE cics_cvda | cics_handle_response)+;
-cics_web_host: HOST cics_data_area (HOSTLENGTH cics_data_value | HOSTTYPE cics_cvda | cics_handle_response)+;
-cics_web_httpmethod: (HTTPMETHOD cics_data_area | METHODLENGTH cics_data_area | cics_handle_response)+;
-cics_web_httpversion: (HTTPVERSION cics_data_area | VERSIONLEN cics_data_area | cics_handle_response)+;
-cics_web_path: (PATH cics_data_area | PATHLENGTH cics_data_area | cics_handle_response)+;
-cics_web_open: OPEN (URIMAP cics_data_value | cics_web_ohost | CERTIFICATE cics_data_value | cics_web_ciphers |
-               CODEPAGE cics_data_value |SESSTOKEN cics_data_area | cics_web_httpvnum | cics_handle_response)+;
-cics_web_ohost: HOST cics_data_value (HOSTLENGTH cics_data_value | PORTNUMBER cics_data_value | SCHEME cics_cvda | cics_handle_response)+;
-cics_web_ciphers: (CIPHERS cics_data_value | NUMCIPHERS cics_data_value | cics_handle_response)+;
-cics_web_httpvnum: (HTTPVNUM cics_data_area | HTTPRNUM cics_data_area | cics_handle_response)+;
-cics_web_parse: PARSE (URL cics_data_value | URLLENGTH cics_data_value | SCHEMENAME cics_data_area | cics_web_host |
-                PORTNUMBER cics_data_area | cics_web_path | cics_web_querystring | cics_handle_response)+;
-cics_web_read: READ (cics_web_rformfield | cics_web_rhttpheader | cics_web_rqueryparm);
-cics_web_rformfield: FORMFIELD cics_data_area (NAMELENGTH cics_data_value | VALUE cics_data_area | SET cics_ref |
-                     VALUELENGTH cics_data_area | CHARACTERSET cics_data_value | HOSTCODEPAGE cics_data_value | cics_handle_response)+;
-cics_web_rhttpheader: (HTTPHEADER cics_data_area | NAMELENGTH cics_data_value | SESSTOKEN cics_data_area | VALUE cics_data_area |
-                      VALUELENGTH cics_data_area | cics_handle_response)+;
-cics_web_rqueryparm: QUERYPARM cics_data_value (NAMELENGTH cics_data_value | VALUE cics_data_area | SET cics_ref |
-                     VALUELENGTH cics_data_area | HOSTCODEPAGE cics_data_value | cics_handle_response)+;
-cics_web_readnext: READNEXT (cics_web_rnformfield | cics_web_rnhttpheader);
-cics_web_rnformfield: (FORMFIELD cics_data_area | QUERYPARM cics_data_area | NAMELENGTH cics_data_area |
-                      VALUE cics_data_area | VALUELENGTH cics_data_area | cics_handle_response)+;
-cics_web_rnhttpheader: ((HTTPHEADER | NAMELENGTH | VALUE | VALUELENGTH) cics_data_area | SESSTOKEN cics_data_value | cics_handle_response)+;
-cics_web_receive: RECEIVE (cics_web_rserver | cics_web_rtocontainer | cics_web_rsesstoken);
-cics_web_rserver: cics_into (LENGTH cics_data_area | MAXLENGTH cics_data_value | NOTRUNCATE | TYPE cics_cvda | SRVCONVERT |
-                  NOSRVCONVERT | SERVERCONV cics_cvda | CHARACTERSET cics_data_value | HOSTCODEPAGE cics_data_value |
-                  BODYCHARSET cics_data_area | MEDIATYPE cics_data_value | cics_handle_response)+;
-cics_web_rtocontainer: TOCONTAINER cics_data_value (TOCHANNEL cics_data_value | TYPE cics_cvda | CHARACTERSET cics_data_value | CLNTCODEPAGE cics_data_value |
-                       BODYCHARSET cics_data_area | MEDIATYPE cics_data_value | cics_handle_response)+;
-cics_web_rsesstoken: SESSTOKEN cics_data_value (MEDIATYPE cics_data_area | cics_web_rcbuffers | cics_web_rccontainers | cics_handle_response)+;
-cics_web_rcbuffers: cics_web_statuscode? (cics_into | LENGTH cics_data_area | MAXLENGTH cics_data_value |
-                    NOTRUNCATE | CLICONVERT | NOCLICONVERT | CLIENTCONV cics_cvda | BODYCHARSET cics_data_area | CHARACTERSET cics_data_value |
-                    CLNTCODEPAGE cics_data_value cics_handle_response)+;
-cics_web_statuscode: STATUSCODE cics_data_value cics_web_statustext;
-cics_web_rccontainers: (cics_web_statustext | TOCONTAINER cics_data_value | TOCHANNEL cics_data_value | BODYCHARSET cics_data_area | CHARACTERSET cics_data_value
-                    | CLNTCODEPAGE cics_data_value | cics_handle_response)+;
-cics_web_retrieve: (RETRIECE | DOCTOKEN cics_data_area | cics_handle_response)+;
-cics_web_send: SEND (cics_web_sserver | cics_web_sclient);
-cics_web_sserver: (cics_web_doctoken | cics_web_ssfrom | cics_web_container | MEDIATYPE cics_data_value | SRVCONVERT |
-                  NOSRVCONVERT | SERVERCONV cics_cvda | CHARACTERSET cics_data_value | cics_web_ssstatuscode |
-                  IMMEDIATE | EVENTUAL | ACTION cics_cvda | NOCLOSE | CLOSE | CLOSESTATUS cics_cvda | cics_handle_response)+;
-cics_web_sfrom: FROM cics_data_area (FROMLENGTH cics_data_value | CHUNKNO | CHUNKYES | CHUNKEND | CHUNKING cics_cvda | cics_handle_response)+;
-cics_web_ssfrom: cics_web_sfrom (HOSTCODEPAGE cics_data_value)?;
-cics_web_ssstatuscode: STATUSCODE cics_data_value (STATUSTEXT cics_data_area | STATUSLEN cics_data_value | LENGTH cics_data_value | cics_handle_response)+;
-cics_web_sclient: SESSTOKEN cics_data_value (GET | HEAD | POST | PUT | TRACE | OPTIONS | DELETE | METHOD cics_cvda |
-                  cics_web_path | URIMAP cics_data_value | cics_web_querystring| cics_web_scbody |
-                  CLICONVERT | NOCLICONVERT | CLIENTCONV cics_cvda | CHARACTERSET cics_data_value |
-                  EXPECT | ACTION cics_cvda | NOCLOSE | CLOSE | CLOSESTATUS cics_cvda | cics_web_scauth | cics_handle_response)+;
-cics_web_scbody: MEDIATYPE cics_data_value (cics_web_doctoken | cics_web_sfrom | cics_web_container)?;
-cics_web_scauth: (NONE | BASICAUTH | AUTHENTICATE cics_cvda | cics_web_sccredentials | cics_handle_response)+;
-cics_web_sccredentials: USERNAME cics_data_value (USERNAMELEN cics_data_value | PASSWORD cics_data_value | PASSWORDLEN cics_data_value | cics_handle_response)+;
-cics_web_startbrowse: STARTBROWSE (cics_web_sbformfield | cics_web_sbhttpheader | cics_web_sbqueryparm);
-cics_web_sbformfield: FORMFIELD cics_data_area? (NAMELENGTH cics_data_area | CHARACTERSET cics_data_value | HOSTCODEPAGE cics_data_value | cics_handle_response)+;
-cics_web_sbhttpheader: (HTTPHEADER | SESSTOKEN cics_data_area | cics_handle_response)+;
-cics_web_sbqueryparm: QUERYPARM cics_data_area? (NAMELENGTH cics_data_area | HOSTCODEPAGE cics_data_value | cics_handle_response)+;
-cics_web_write: WRITE (HTTPHEADER cics_data_area | NAMELENGTH cics_data_value | SESSTOKEN cics_data_value |
-                VALUE cics_data_area | VALUELENGTH cics_data_value | cics_handle_response)+;
+
+cics_web_close: CLOSE SESSTOKEN cics_data_value;
+
+cics_web_converse: CONVERSE (((SESSTOKEN | MEDIATYPE | MAXLENGTH) cics_data_value) | cics_web_path | cics_web_urimap | cics_web_http_call_method | cics_web_querystring |
+                   cics_web_body | cics_web_action_expect | cics_web_close_options | cics_web_converse_credentials | cics_web_into_set_tocontainer | (TOLENGTH | BODYCHARSET) cics_data_area | NOTRUNCATE |
+                   cics_web_statuscode | cics_web_translation | cics_handle_response)+;
+
+cics_web_endbrowse: ENDBROWSE (FORMFIELD | HTTPHEADER | SESSTOKEN cics_data_value | QUERYPARM | cics_handle_response)+; // All three variants
+
+cics_web_extract: EXTRACT (cics_web_extract_server | cics_web_extract_client);
+cics_web_extract_server: (((SCHEME | REQUESTTYPE) cics_cvda) | cics_web_host_hosttype | cics_web_httpmethod | cics_web_httpversion | cics_web_path | (PORTNUMBER cics_data_area) |
+                         cics_web_querystring | cics_web_urimap | cics_handle_response)+;
+cics_web_extract_client: ((SESSTOKEN | PORTNUMBER) cics_data_area | (SCHEME cics_cvda) | cics_web_host_hosttype | cics_web_httpversion | cics_web_path | cics_web_urimap | cics_web_realm | cics_handle_response)+;
+
+cics_web_open: OPEN (cics_web_urimap | cics_web_host_portnumber | (CERTIFICATE|CODEPAGE) cics_data_value | ((SESSTOKEN | HTTPVNUM | HTTPRNUM) cics_data_area) | cics_web_open_deprecated | cics_handle_response)+;
+
+cics_web_parse: PARSE ((URL|URLLENGTH|PORTNUMBER) cics_data_value | (SCHEMENAME cics_data_area) | cics_web_host_hosttype | cics_web_path | cics_web_querystring | cics_handle_response)+;
+
+cics_web_read: READ ((FORMFIELD | HTTPHEADER) cics_data_area | QUERYPARM cics_data_value) ((NAMELENGTH | CHARACTERSET | HOSTCODEPAGE) cics_data_value | (SESSTOKEN | VALUE | VALUELENGTH) cics_data_area | SET ptr_ref | cics_handle_response)+;
+
+cics_web_readnext: READNEXT (cics_web_readnext_formfield_queryparm | cics_web_readnext_httpheader);
+cics_web_readnext_formfield_queryparm: (FORMFIELD|QUERYPARM) cics_data_area ((VALUE | VALUELENGTH) cics_data_area | NAMELENGTH cics_data_value | cics_handle_response)+;
+cics_web_readnext_httpheader: HTTPHEADER cics_data_area ((VALUE|VALUELENGTH) cics_data_area | ((SESSTOKEN|NAMELENGTH) cics_data_value) | cics_handle_response)+;
+
+cics_web_receive: RECEIVE (cics_web_receive_server_buffer | cics_web_receive_server_container | cics_web_receive_client);
+cics_web_receive_server_buffer: (cics_web_into_set | (LENGTH|BODYCHARSET) cics_data_area | ((MAXLENGTH|CHARACTERSET|HOSTCODEPAGE|MEDIATYPE) cics_data_value) | NOTRUNCATE | (TYPE cics_cvda) | cics_web_server_convert | cics_handle_response)+;
+cics_web_receive_server_container: (((TOCONTAINER|TOCHANNEL|CHARACTERSET|MEDIATYPE) cics_data_value) | (TYPE cics_cvda) | (BODYCHARSET cics_data_area) | cics_handle_response)+;
+cics_web_receive_client: (((SESSTOKEN|MEDIATYPE) cics_data_value) | cics_web_statuscode | cics_web_receive_client_buffer | cics_web_receive_client_container | cics_handle_response)+;
+cics_web_receive_client_buffer: (cics_web_into_set | (LENGTH|BODYCHARSET) cics_data_area | (MAXLENGTH cics_data_value) | NOTRUNCATE | cics_web_client_convert | cics_handle_response)+;
+cics_web_receive_client_container: (TOCONTAINER cics_data_value | (TOCHANNEL cics_data_value) | (BODYCHARSET cics_data_area) | cics_handle_response)+;
+
+cics_web_retrieve: RETRIEVE DOCTOKEN cics_data_area cics_handle_response*;
+
+cics_web_send: SEND (cics_web_send_server | cics_web_send_client);
+cics_web_send_server: (cics_web_send_server_body | ((MEDIATYPE|CHARACTERSET) cics_data_value) | cics_web_server_convert | cics_web_statuscode |
+                        (IMMEDIATE | EVENTUAL | ACTION cics_cvda) | (NOCLOSE | CLOSE | CLOSESTATUS cics_cvda) | cics_handle_response)+;
+cics_web_send_client: SESSTOKEN cics_data_value (cics_web_http_call_method | cics_web_path | cics_web_urimap | cics_web_querystring | cics_web_send_client_body | cics_web_client_convert |
+                        (CHARACTERSET cics_data_value) | EXPECT | NOCLOSE | CLOSE | ((ACTION | CLOSESTATUS) cics_cvda) | cics_web_server_client_credentials | cics_handle_response)+;
+
+cics_web_startbrowse: STARTBROWSE (cics_web_startbrowse_formfield_queryparm | cics_web_startbrowse_httpheader);
+cics_web_startbrowse_formfield_queryparm: (((FORMFIELD|QUERYPARM) cics_data_area?) | (NAMELENGTH cics_data_area) | (CHARACTERSET|HOSTCODEPAGE) cics_data_value | cics_handle_response)+;
+cics_web_startbrowse_httpheader: HTTPHEADER (SESSTOKEN cics_data_area | cics_handle_response)?;
+
+cics_web_write: WRITE ((HTTPHEADER|NAMELENGTH|SESSTOKEN|VALUE|VALUELENGTH) cics_data_area | cics_handle_response)+;
+
+// WEB Helpers
+cics_web_path: (PATH cics_data_area | PATHLENGTH cics_data_value)+;
+cics_web_urimap: URIMAP cics_data_value;
+cics_web_querystring: (QUERYSTRING cics_data_area | QUERYSTRLEN cics_data_value)+;
+
+cics_web_http_call_method: (GET | HEAD | PATCH | POST | PUT | TRACE | OPTIONS | DELETE | METHOD cics_cvda);
+
+cics_web_body: (cics_web_body_doctoken | cics_web_from | cics_web_container);
+cics_web_body_doctoken: (DOCTOKEN cics_data_value | NODOCDELETE | DOCDELETE | DOCSTATUS cics_cvda);
+cics_web_from: FROM cics_data_area | FROMLENGTH cics_data_value;
+cics_web_container: (CONTAINER | CHANNEL) cics_data_value;
+
+cics_web_action_expect: (ACTION cics_cvda | EXPECT);
+cics_web_close_options: (CLOSE | NOCLOSE | CLOSESTATUS cics_cvda);
+
+cics_web_into_set_tocontainer: (INTO cics_data_area | SET ptr_ref | (TOCONTAINER|TOCHANNEL) cics_data_value);
+cics_web_statuscode: (((STATUSCODE|STATUSTEXT) cics_data_area) | STATUSLEN cics_data_value)+;
+
+cics_web_translation: (CHARACTERSET cics_data_value) | (CLICONVERT | NOINCONVERT | NOOUTCONVERT | NOCLICONVERT | CLIENTCONV cics_cvda);
+
+cics_web_host: (HOST cics_data_area | HOSTLENGTH cics_data_value)+;
+cics_web_host_hosttype: cics_web_host (HOSTTYPE cics_cvda)?;
+cics_web_host_portnumber: cics_web_host PORTNUMBER cics_data_value SCHEME cics_cvda;
+cics_web_httpmethod: ((HTTPMETHOD|METHODLENGTH) cics_data_area);
+cics_web_httpversion: (HTTPVERSION|VERSIONLEN) cics_data_area;
+cics_web_realm: (REALM|REALMLEN) cics_data_area;
+cics_web_open_deprecated: (CIPHERS|NUMCIPHERS) cics_data_value;
+
+cics_web_into_set: (INTO cics_data_area | SET ptr_ref);
+
+cics_web_converse_credentials: cics_web_client_auth_type | cics_web_auth_username | cics_web_auth_password;
+cics_web_server_client_credentials: (cics_web_client_auth_type | cics_web_auth_username_password);
+cics_web_server_convert: (SRVCONVERT | NOSRVCONVERT | SERVERCONV cics_cvda);
+cics_web_client_convert: (CLICONVERT | NOCLICONVERT | CLIENTCONV cics_cvda);
+cics_web_client_auth_type: (NONE | BASICAUTH | AUTHENTICATE cics_cvda);
+cics_web_auth_username_password: (cics_web_auth_username | cics_web_auth_password)+;
+cics_web_auth_username: (USERNAME|USERNAMELEN) cics_data_value;
+cics_web_auth_password: (PASSWORD|PASSWORDLEN) cics_data_value;
+
+cics_web_send_doctoken: (DOCTOKEN cics_data_value | (NODOCDELETE | DOCDELETE | DOCSTATUS cics_cvda));
+cics_web_send_from_chunk: FROM cics_data_area | FROMLENGTH cics_data_value | (CHUNKNO | CHUNKYES | CHUNKEND | CHUNKING cics_cvda);
+cics_web_send_container_subrule: (CONTAINER cics_data_value | CHANNEL cics_data_value)+;
+
+cics_web_send_server_body: (cics_web_send_doctoken | cics_web_send_from_chunk | (HOSTCODEPAGE cics_data_value) | cics_web_send_container_subrule);
+cics_web_send_client_body: (cics_web_send_doctoken | cics_web_send_from_chunk | cics_web_send_container_subrule)+;
 
 /** WRITE / WRITE JOURNALNAME / WRITE OPERATOR */
 cics_write: WRITE (cics_write_file | cics_write_journalname | cics_write_operator);
@@ -980,12 +994,12 @@ cicsLexerDefinedVariableUsageTokens: ABCODE | ABDUMP | ABEND | ABORT | ABPROGRAM
     | MINUTES | MMDDYY | MMDDYYYY | MODENAME | MONITOR | MONTH | MONTHOFYEAR | MSR | MSRCONTROL | NAME | NAMELENGTH
     | NATLANG | NATLANGINUSE | NETNAME | NEWPASSWORD | NEWPHRASE | NEWPHRASELEN | NEXTTRANSID | NLEOM | NOAUTOPAGE
     | NOCC | NOCHECK | NOCLICONVERT | NOCLOSE | NODATA | NODE | NODOCDELETE | NODUMP | NOEDIT | NOFLUSH | NOHANDLE
-    | NOINCONVERT | NONE | NOOUTCONERT | NOQUEUE | NOQUIESCE | NOSRVCONVERT | NOSUSPEND | NOTE | NOTPURGEABLE
+    | NOINCONVERT | NONE | NOOUTCONVERT | NOQUEUE | NOQUIESCE | NOSRVCONVERT | NOSUSPEND | NOTE | NOTPURGEABLE
     | NOTRUNCATE | NOWAIT | NSCONTAINER | NUMCIPHERS | NUMEVENTS | NUMITEMS | NUMREC | NUMROUTES | NUMSEGMENTS
     | NUMTAB | OIDCARD | OPCLASS | OPERATION | OPERATOR | OPERID | OPERKEYS | OPERPURGE | OPID | OPSECURITY
     | OPTIONS | ORGABCODE | ORGANIZATLEN | ORGUNIT | ORGUNITLEN | OUTDESCR | OUTLINE | OUTPARTN | OWNER | PA1 | PA2
     | PA3 | PAGENUM | PAGE_COUNTER | PAGING | PARSE | PARTN | PARTNER | PARTNFAIL | PARTNPAGE | PARTNS | PARTNSET
-    | PASS | PASSBK | PASSWORDLEN | PATH | PATHLENGTH | PCT | PF1 | PF10 | PF11 | PF12 | PF13 | PF14 | PF15 | PF16
+    | PASS | PASSBK | PASSWORDLEN | PATCH | PATH | PATHLENGTH | PCT | PF1 | PF10 | PF11 | PF12 | PF13 | PF14 | PF15 | PF16
     | PF17 | PF18 | PF19 | PF2 | PF20 | PF21 | PF22 | PF23 | PF24 | PF3 | PF4 | PF5 | PF6 | PF7 | PF8 | PF9 | PFXLENG
     | PHRASE | PHRASELEN | PIPLENGTH | PIPLIST | POINT | POOL | POP | PORTNUMBER | PORTNUMNU | POST | PPT | PREDICATE
     | PREFIX | PREPARE | PRINCONVID | PRINSYSID | PRINT | PRIORITY | PRIVACY | PROCESS | PROCESSTYPE | PROCLENGTH

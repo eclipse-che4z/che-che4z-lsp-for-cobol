@@ -48,7 +48,7 @@ public class TestCicsWebReceive {
           + "                     TOCHANNEL({$CON-CHANNEL})\n"
           + "                     STATUSCODE({$HTTP-RESP})\n"
           + "                     STATUSTEXT({$HTTPSTATUS})\n"
-          + "                     CHARACTERSET({$CHARSET-CODE})\n"
+          + "                     BODYCHARSET({$CHARSET-CODE})\n"
           + "                     RESP({$CICS-RESP})\n"
           + "                     RESP2({$CICS-RESP2})\n"
           + "           END-EXEC.\n"
