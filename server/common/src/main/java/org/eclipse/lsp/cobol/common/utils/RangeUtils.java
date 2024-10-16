@@ -146,17 +146,6 @@ public class RangeUtils {
   }
 
   /**
-   * Moves the end of the range on defined character's count
-   * @param range - range to extend
-   * @param count - character's count
-   * @return a new range
-   */
-  public Range extendByCharacter(Range range, int count) {
-    return new Range(range.getStart(),
-        new Position(range.getEnd().getLine(), range.getEnd().getCharacter() + count));
-  }
-
-  /**
    * Moves the end of the range on defined lines's count
    * @param range - range to extend
    * @param count - line's count
@@ -165,14 +154,5 @@ public class RangeUtils {
   public Range moveByLine(Range range, int count) {
     return new Range(new Position(range.getStart().getLine() + count, range.getStart().getCharacter()),
         new Position(range.getEnd().getLine() + count, range.getEnd().getCharacter()));
-  }
-
-  /**
-   * Returns character size of the range
-   * @param range - range
-   * @return character size
-   */
-  public int charSize(Range range) {
-    return range.getEnd().getCharacter() - range.getStart().getCharacter() + 1;
   }
 }

@@ -30,6 +30,7 @@ import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.antlr.v4.runtime.tree.TerminalNode;
+import org.eclipse.lsp.cobol.AntlrRangeUtils;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.model.tree.variable.UsageFormat;
@@ -253,49 +254,7 @@ public class VisitorHelper {
     if (ctx == null) {
       return Optional.empty();
     }
-    return Optional.of(constructRange(ctx));
-  }
-
-  /**
-   * Construct the range from ANTLR context
-   *
-   * @param ctx the ANTLR context
-   * @return the range
-   */
-  public static Range constructRange(ParserRuleContext ctx) {
-    Token start = ctx.start;
-    Token end = ctx.stop;
-
-    if (start.getLine() > end.getLine()) {
-      start = ctx.stop;
-      end = ctx.start;
-    }
-
-    return new Range(
-        new Position(
-            start.getLine() - 1,
-            start.getCharPositionInLine()),
-        new Position(
-            end.getLine() - 1,
-            end.getCharPositionInLine() + end.getStopIndex() - end.getStartIndex() + 1)
-    );
-  }
-
-  /**
-   * Construct the range from ANTLR token
-   *
-   * @param token the ANTLR token
-   * @return the range
-   */
-  public static Range constructRange(Token token) {
-    return new Range(
-            new Position(
-                    token.getLine() - 1,
-                    token.getCharPositionInLine()),
-            new Position(
-                    token.getLine() - 1,
-                    token.getCharPositionInLine() + token.getStopIndex() - token.getStartIndex() + 1)
-    );
+    return Optional.of(AntlrRangeUtils.constructRange(ctx));
   }
 
   /**

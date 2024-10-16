@@ -129,7 +129,7 @@ public class DaCoMaidProcessor {
     String prototypeName =
         entryName.substring(0, entryName.length() - 2) + copyFrom.group("protoSuffix");
     int startChar = copyFrom.start("copyfrom");
-    int endChar = copyFrom.end("protoSuffix") - 1;
+    int endChar = copyFrom.end("protoSuffix");
     Range range = new Range(new Position(lineNumber, startChar), new Position(lineNumber, endChar));
     int len = endChar - startChar;
     String newString = String.join("", Collections.nCopies(len, " "));

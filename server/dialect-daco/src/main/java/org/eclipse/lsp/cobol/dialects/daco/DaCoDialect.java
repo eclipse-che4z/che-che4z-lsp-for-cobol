@@ -118,7 +118,7 @@ public final class DaCoDialect implements CobolDialect {
     Matcher matcher = dcdbPattern.matcher(input);
     while (matcher.find()) {
       Position start = DialectUtils.findPosition(input, matcher.start());
-      Position end = DialectUtils.findPosition(input, matcher.end() - 2);
+      Position end = DialectUtils.findPosition(input, matcher.end() - 1);
       String replace = new String(new char[matcher.end() - matcher.start() - 1]).replace('\0', ' ');
       extendedDocument.replace(new Range(start, end), replace);
     }

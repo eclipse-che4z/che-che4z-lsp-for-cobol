@@ -28,7 +28,7 @@ class OneToOneReplaceStrategy implements ReplaceStrategy {
     if (range.getEnd().getLine() == range.getStart().getLine()) {
       String[] newLines = MappingHelper.split(newText);
       // Replace the same length string
-      if (newLines.length == 1 && newLines[0].length() == RangeUtils.charSize(range)) {
+      if (newLines.length == 1 && newLines[0].length() == range.getEnd().getCharacter() - range.getStart().getCharacter()) {
         extendedText.getLines().get(range.getStart().getLine()).replace(range.getStart().getCharacter(), newLines[0]);
         return true;
       }

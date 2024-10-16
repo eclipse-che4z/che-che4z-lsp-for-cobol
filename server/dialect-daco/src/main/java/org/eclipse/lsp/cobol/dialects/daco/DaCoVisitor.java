@@ -125,7 +125,7 @@ public class DaCoVisitor extends DaCoParserBaseVisitor<List<Node>> {
             new Position(line - 1, inLine),
             new Position(
                     line - 1,
-                    inLine + token.getSymbol().getStopIndex() - token.getSymbol().getStartIndex())
+                    inLine + token.getSymbol().getStopIndex() - token.getSymbol().getStartIndex() + 1)
     );
     // TODO: probably it should be resolved in grammar, but we need to preserve dot
     //  cause COBOL parser does not expect dots to be consumed by IDMS preprocessor.
@@ -142,7 +142,7 @@ public class DaCoVisitor extends DaCoParserBaseVisitor<List<Node>> {
     Token stop = ctx.stop;
     Range range = new Range(new Position(start.getLine() - 1, start.getCharPositionInLine()),
             new Position(stop.getLine() - 1,
-                    stop.getCharPositionInLine() + stop.getStopIndex() - stop.getStartIndex()));
+                    stop.getCharPositionInLine() + stop.getStopIndex() - stop.getStartIndex() + 1));
     // TODO: probably it should be resolved in grammar, but we need to preserve dot
     //  cause COBOL parser does not expect dots to be consumed by IDMS preprocessor.
     if (ctx.getStop().getType() == DOT_FS) {

@@ -34,18 +34,17 @@ class MultilineReplaceStrategy implements ReplaceStrategy {
   }
 
   private void addLines(ExtendedText extendedText, int firstLine, String[] newLines, Location instantLocation) {
-    if (newLines.length == 1) {
-      extendedText.append(firstLine, new ExtendedTextLine(newLines[0], instantLocation, extendedText.getUri()));
-    } else if (newLines.length > 1) {
-      extendedText.append(firstLine, new ExtendedTextLine(newLines[0], instantLocation, extendedText.getUri()));
-      extendedText.insert(new Position(firstLine + 1, 0), new ExtendedTextLine(newLines[newLines.length - 1],
-          instantLocation, extendedText.getUri()));
-      for (int i = 1; i < newLines.length - 2; i++) {
-        extendedText.insert(firstLine + i, new ExtendedTextLine(newLines[i], instantLocation, extendedText.getUri()));
-      }
-    } else {
+    if (newLines.length == 0) {
       extendedText.append(firstLine, extendedText.getLines().get(firstLine + 1));
       extendedText.delete(firstLine + 1);
+    } else {
+      extendedText.append(firstLine, new ExtendedTextLine(newLines[0], instantLocation, extendedText.getUri()));
+      if (newLines.length > 1) {
+        extendedText.insert(new Position(firstLine + 1, 0), new ExtendedTextLine(newLines[newLines.length - 1], instantLocation, extendedText.getUri()));
+        for (int i = 1; i < newLines.length - 2; i++) {
+          extendedText.insert(firstLine + i, new ExtendedTextLine(newLines[i], instantLocation, extendedText.getUri()));
+        }
+      }
     }
   }
 }

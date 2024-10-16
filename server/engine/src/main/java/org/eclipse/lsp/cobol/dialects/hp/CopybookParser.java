@@ -44,7 +44,7 @@ class CopybookParser {
 
       for (int i = 0; i < content.length(); i++) {
         if (content.charAt(i) == '$') {
-            extendedDocument.replace(new Range(new Position(line, i), new Position(line, i)), " ");
+            extendedDocument.replace(new Range(new Position(line, i), new Position(line, i + 1)), " ");
         }
       }
 

@@ -173,8 +173,7 @@ public class ExtendedDocument {
    * @param c - the character
    */
   public void fillArea(Range range, char c) {
-    range = updateRangeDueToChanges(range);
-    currentText.fillArea(range, c);
+    currentText.fillArea(updateRangeDueToChanges(range), c);
     dirty = true;
   }
 
@@ -217,7 +216,7 @@ public class ExtendedDocument {
     int result = lineNumber;
     if (isDirty()) {
       ExtendedTextLine line = baseText.getLines().get(lineNumber);
-      if (line.getCharacters().size() > 0) {
+      if (!line.getCharacters().isEmpty()) {
         ExtendedTextLine parentLine = line.getCharacters().get(0).getParent();
         result = currentText.getLines().indexOf(parentLine);
       }

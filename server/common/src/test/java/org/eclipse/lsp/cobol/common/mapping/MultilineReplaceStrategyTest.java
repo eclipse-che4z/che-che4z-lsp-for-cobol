@@ -31,7 +31,7 @@ class MultilineReplaceStrategyTest {
     void testExecuteWithMultilineRange() {
         MultilineReplaceStrategy strategy = new MultilineReplaceStrategy();
         ExtendedText extendedText = new ExtendedText("Line 1\nLine 2\nLine 3", "uri");
-        Range range = new Range(new Position(1, 0), new Position(2, 6));
+        Range range = new Range(new Position(1, 0), new Position(2, 7));
         String newText = "New Line 1\nNew Line 2";
         Location originalLocation = new Location("original", range);
 
@@ -43,7 +43,7 @@ class MultilineReplaceStrategyTest {
     void testExecuteWithSingleLineRange() {
         MultilineReplaceStrategy strategy = new MultilineReplaceStrategy();
         ExtendedText extendedText = new ExtendedText("Line 1", "uri");
-        Range range = new Range(new Position(0, 0), new Position(0, 6));
+        Range range = new Range(new Position(0, 0), new Position(0, 7));
         String newText = "New Line 1";
         Location originalLocation = new Location("original", range);
 
@@ -55,7 +55,7 @@ class MultilineReplaceStrategyTest {
     void testExecuteWithNoLine() {
         MultilineReplaceStrategy strategy = new MultilineReplaceStrategy();
         ExtendedText extendedText = new ExtendedText("Line 1\nLine 2", "uri");
-        Range range = new Range(new Position(0, 0), new Position(1, 6));
+        Range range = new Range(new Position(0, 0), new Position(1, 7));
         String newLines = "\n";
         Location instantLocation = new Location("instant", range);
 
