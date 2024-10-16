@@ -86,8 +86,6 @@ public class TestCicsWebStatement {
     private static final String READ_QUERYPARM_VALID = WEB_READ + "QUERYPARM(123) NAMELENGTH(123) VALUE(123) VALUELENGTH(123) HOSTCODEPAGE(1) ";
     private static final String READ_HTTPHEADER_VALID = WEB_READ + "HTTPHEADER(123) NAMELENGTH(123) VALUE(123) VALUELENGTH(123)";
 
-    private static final String READ_QUERYPARM_INVALID = WEB_READ + "QUERYPARM(123) NAMELENGTH(123) {SESSTOKEN|errorOne}(123) VALUE(123) VALUELENGTH(123)";
-
     private static final String WEB_READNEXT = WEB + "READNEXT ";
     private static final String READNEXT_FORMFIELD_VALID = WEB_READNEXT + "FORMFIELD(123) NAMELENGTH(123) VALUE(123) VALUELENGTH(123)";
     private static final String READNEXT_QUERYPARM_VALID = WEB_READNEXT + "QUERYPARM(123) NAMELENGTH(123) VALUE(123) VALUELENGTH(123)";
@@ -115,6 +113,9 @@ public class TestCicsWebStatement {
     private static final String STARTBROWSE_QUERYPARM_VALID = WEB + "STARTBROWSE QUERYPARM(123) NAMELENGTH(123) HOSTCODEPAGE(123)";
 
     private static final String WRITE_HTTPHEADER_VALID = WEB + "WRITE HTTPHEADER(123) NAMELENGTH(123) SESSTOKEN({$sessVar}) VALUE(123) VALUELENGTH(123)";
+
+    // Invalid use cases
+    private static final String READ_QUERYPARM_INVALID = WEB_READ + "QUERYPARM(123) NAMELENGTH(123) {SESSTOKEN|errorOne}(123) VALUE(123) VALUELENGTH(123)";
 
     // Utility Functions
     private static void noErrorTest(String newCommand) {
