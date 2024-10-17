@@ -24,5 +24,5 @@ public class OccursClause {
   Integer from;
   Integer to;
   boolean isUnbounded;
-  List<VariableNameAndLocality> indexed;
+  transient List<VariableNameAndLocality> indexed;
 }
