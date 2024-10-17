@@ -47,7 +47,9 @@ import java.util.Optional;
  */
 public class CliUtils {
 
-  public static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+  public static final Gson GSON = new GsonBuilder()
+          .disableHtmlEscaping()
+          .setPrettyPrinting().create();
 
   /**
    * Init CLI pipeline

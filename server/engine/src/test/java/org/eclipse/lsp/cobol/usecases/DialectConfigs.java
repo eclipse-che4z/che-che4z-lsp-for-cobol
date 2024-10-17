@@ -29,7 +29,7 @@ public class DialectConfigs {
   public AnalysisConfig getIDMSAnalysisConfig() {
     return new AnalysisConfig(
             CopybookProcessingMode.DISABLED,
-        ImmutableList.of("IDMS"), true,
+        ImmutableList.of("IDMS"), true, false,
         ImmutableList.of(),
         ImmutableMap.of());
   }
@@ -43,7 +43,7 @@ public class DialectConfigs {
 
     return new AnalysisConfig(
             CopybookProcessingMode.DISABLED,
-            ImmutableList.of("DaCo", "IDMS"), true,
+            ImmutableList.of("DaCo", "IDMS"), true, false,
             ImmutableList.of(),
             ImmutableMap.of("daco.predefined-sections", new Gson().toJsonTree(list),
                     "target-sql-backend", new Gson().toJsonTree(SQLBackend.DB2_SERVER)));
