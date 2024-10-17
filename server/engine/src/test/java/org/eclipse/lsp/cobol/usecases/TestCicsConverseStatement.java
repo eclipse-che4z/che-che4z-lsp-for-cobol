@@ -92,6 +92,11 @@ public class TestCicsConverseStatement {
                                 ErrorSource.PARSING.getText()));
     }
 
+    @Test
+    void testConverseOnly() {
+        CICSTestUtils.noErrorTest(CONVERSE);
+    }
+
     // Test Functions
     @Test
     void testDefaultValid() {
