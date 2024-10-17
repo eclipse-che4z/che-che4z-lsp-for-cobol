@@ -69,7 +69,14 @@ export class CopybookDownloaderForE4E {
     const candidate = result.pgroups.find(
       (x) => x.name === result.pgms[0].pgroup,
     );
-    if (!candidate) throw Error("Invalid configuration");
+    if (!candidate) {
+      this.outputChannel?.appendLine("*** E4E - Invalid configuration")
+      this.outputChannel?.appendLine("*** Please find below E4E configuration for program");
+      this.outputChannel?.appendLine(JSON.stringify(result.pgms));
+      this.outputChannel?.appendLine("*** Please find below E4E processor groups configuration");
+      this.outputChannel?.appendLine(JSON.stringify(result.pgroups));
+      throw Error("Invalid configuration");
+    }
 
     const libs = candidate.libs as (EndevorElement | EndevorMember)[];
     const elements: { [key: string]: EndevorElement | EndevorMember } = {};
