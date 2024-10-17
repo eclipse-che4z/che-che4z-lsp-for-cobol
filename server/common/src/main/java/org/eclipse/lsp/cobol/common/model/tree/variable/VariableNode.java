@@ -102,8 +102,8 @@ public abstract class VariableNode extends Node implements DefinedAndUsedStructu
   public void addUsage(VariableUsageNode usageNode) {
     if (!usages.contains(usageNode.getLocality().toLocation())) {
       usages.add(usageNode.getLocality().toLocation());
-      usageNode.addDefinition(this);
     }
+    usageNode.addDefinition(this);
   }
 
   public List<Location> getDefinitions() {
