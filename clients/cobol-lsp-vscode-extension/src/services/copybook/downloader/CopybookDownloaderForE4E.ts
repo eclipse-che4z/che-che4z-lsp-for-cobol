@@ -70,10 +70,14 @@ export class CopybookDownloaderForE4E {
       (x) => x.name === result.pgms[0].pgroup,
     );
     if (!candidate) {
-      this.outputChannel?.appendLine("*** E4E - Invalid configuration")
-      this.outputChannel?.appendLine("*** Please find below E4E configuration for program");
+      this.outputChannel?.appendLine("*** E4E - Invalid configuration");
+      this.outputChannel?.appendLine(
+        "*** Please find below E4E configuration for program",
+      );
       this.outputChannel?.appendLine(JSON.stringify(result.pgms));
-      this.outputChannel?.appendLine("*** Please find below E4E processor groups configuration");
+      this.outputChannel?.appendLine(
+        "*** Please find below E4E processor groups configuration",
+      );
       this.outputChannel?.appendLine(JSON.stringify(result.pgroups));
       throw Error("Invalid configuration");
     }
