@@ -35,6 +35,7 @@ import org.eclipse.usecase.UseCasePreprocessorParser.*;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.regex.Pattern;
 
 import static java.util.Collections.singletonList;
 import static java.util.Optional.ofNullable;
@@ -241,19 +242,19 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
 
   @Override
   public void exitFunctionDefinition(FunctionDefinitionContext ctx) {
-    String multiTokenText = peek().toString().replaceAll("\\{\\$\\$\\*", "").replaceAll("}", "");
-    List<TerminalNode> word = ctx.multiToken().word().get(0).identifier().IDENTIFIER();
-    String functionID = word.stream()
-            .filter(node -> node.getText().equalsIgnoreCase("FUNCTION-ID"))
-            .findFirst()
-            .map(node -> {
-              int index = word.indexOf(node);
-              return index < word.size() - 1 ? word.get(index + 1).getText() : null;
-            })
-            .orElse(null);
-    addTokenLocation(functionDefinitions, functionID, new Range(new Position(ctx.getStart().getLine() - 1, ctx.start.getCharPositionInLine()), new Position(ctx.getStop().getLine() - 1, ctx.stop.getCharPositionInLine())));
+    String multiTokenText = peek().toString().replaceAll(Pattern.quote("{$$*"), "").replaceAll("}", "");
+    String affectedTokens = multiTokenText.substring(0, multiTokenText.indexOf('|'));
+    String functionID = ctx.diagnostic().identifier().getText();
+    addTokenLocation(
+        functionDefinitions,
+        functionID,
+        new Range(
+            new Position(ctx.getStart().getLine() - 1, ctx.start.getCharPositionInLine()),
+            new Position(
+                ctx.diagnostic().start.getLine() - 1,
+                ctx.diagnostic().start.getCharPositionInLine() - lineShifts[getLine(ctx.diagnostic().start)])));
     pop();
-    write(multiTokenText);
+    write(affectedTokens);
   }
 
   @Override

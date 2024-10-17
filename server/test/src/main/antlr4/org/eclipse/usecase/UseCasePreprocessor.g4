@@ -66,7 +66,7 @@ variableDefinition
    ;
 
 functionDefinition
-   : FUNCTIONDEFINITION multiToken replacement? STOP
+   : FUNCTIONDEFINITION multiToken replacement? diagnostic STOP
    ;
 
 constantStatement

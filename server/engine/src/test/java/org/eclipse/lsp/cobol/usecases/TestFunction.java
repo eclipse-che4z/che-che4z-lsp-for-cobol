@@ -17,6 +17,7 @@ package org.eclipse.lsp.cobol.usecases;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
+import org.eclipse.lsp.cobol.test.CobolText;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
@@ -205,30 +206,30 @@ public class TestFunction {
   }
 
   public static final String FUNCTION_FOUND =
-          ""
-                  // ----+----1----+----2----+----3----+----4----+----5----+----6
-                  + "       {$$*IDENTIFICATION DIVISION.                             \n"
-                  + "       FUNCTION-ID. FUNC1.                                  \n"
-                  + "       DATA DIVISION.                                       \n"
-                  + "       LINKAGE SECTION.                                     \n"
-                  + "       01  {$*UNRELATED-STUFF}.                                 \n"
-                  + "           05  {$*NUM}         PIC X(1234).                     \n"
-                  + "       PROCEDURE DIVISION RETURNING {$UNRELATED-STUFF}.        \n"
-                  + "       END FUNCTION FUNC1.}                                  \n"
-                  + "                                                            \n"
-                  + "       IDENTIFICATION DIVISION.                             \n"
-                  + "       PROGRAM-ID. PGM.                                     \n"
-                  + "       ENVIRONMENT DIVISION.                                \n"
-                  + "       CONFIGURATION SECTION.                               \n"
-                  + "       REPOSITORY.                                          \n"
-                  + "               FUNCTION {$$FUNC1}.                              \n"
-                  + "       DATA DIVISION.                                       \n"
-                  + "       WORKING-STORAGE SECTION.                             \n"
-                  + "       01  {$*RETVAL}.                                          \n"
-                  + "           05  {$*NUM}              PIC X(1234).                \n"
-                  + "       PROCEDURE DIVISION.                                  \n"
-                  + "             MOVE FUNCTION {$$func1} TO {$RETVAL}.                    \n"
-                  + "       END PROGRAM PGM.                                     \n";
+      ""
+          // ----+----1----+----2----+----3----+----4----+----5----+----6
+          + "       {$$*IDENTIFICATION DIVISION.                             \n"
+          + "       FUNCTION-ID. FUNC1.                                  \n"
+          + "       DATA DIVISION.                                       \n"
+          + "       LINKAGE SECTION.                                     \n"
+          + "       01  {$*UNRELATED-STUFF}.                                 \n"
+          + "           05  {$*NUM}         PIC X(1234).                     \n"
+          + "       PROCEDURE DIVISION RETURNING {$UNRELATED-STUFF}.        \n"
+          + "       END FUNCTION FUNC1.|FUNC1}                                  \n"
+          + "                                                            \n"
+          + "       IDENTIFICATION DIVISION.                             \n"
+          + "       PROGRAM-ID. PGM.                                     \n"
+          + "       ENVIRONMENT DIVISION.                                \n"
+          + "       CONFIGURATION SECTION.                               \n"
+          + "       REPOSITORY.                                          \n"
+          + "               FUNCTION {$$FUNC1}.                              \n"
+          + "       DATA DIVISION.                                       \n"
+          + "       WORKING-STORAGE SECTION.                             \n"
+          + "       01  {$*RETVAL}.                                          \n"
+          + "           05  {$*NUM}              PIC X(1234).                \n"
+          + "       PROCEDURE DIVISION.                                  \n"
+          + "             MOVE FUNCTION {$$func1} TO {$RETVAL}.                    \n"
+          + "       END PROGRAM PGM.                                     \n";
 
   @Test
   void function_found() {
@@ -236,27 +237,27 @@ public class TestFunction {
   }
 
   public static final String FUNCTION_REDEFINED =
-          ""
-                  // ----+----1----+----2----+----3----+----4----+----5----+----6
-                  + "       IDENTIFICATION DIVISION.                             \n"
-                  + "       FUNCTION-ID. FUNC1.                                  \n"
-                  + "       DATA DIVISION.                                       \n"
-                  + "       LINKAGE SECTION.                                     \n"
-                  + "       01  {$*RETVAL}.                                          \n"
-                  + "           05  {$*NUM}              PIC X(1234).                \n"
-                  + "       PROCEDURE DIVISION RETURNING {$RETVAL}.                 \n"
-                  + "             MOVE 1234 to {$NUM}.                              \n"
-                  + "       END FUNCTION FUNC1.                                  \n"
-                  + "                                                            \n"
-                  + "       IDENTIFICATION DIVISION.                             \n"
-                  + "       {FUNCTION-ID. FUNC1.|1}                                  \n"
-                  + "       DATA DIVISION.                                       \n"
-                  + "       LINKAGE SECTION.                                     \n"
-                  + "       01  {$*RETVAL}.                                          \n"
-                  + "           05  {$*NUM}              PIC X(1234).                \n"
-                  + "       PROCEDURE DIVISION RETURNING {$RETVAL}.                 \n"
-                  + "             MOVE 1234 to {$NUM}.                              \n"
-                  + "       END FUNCTION FUNC1.                                  \n";
+      ""
+          // ----+----1----+----2----+----3----+----4----+----5----+----6
+          + "       IDENTIFICATION DIVISION.                             \n"
+          + "       FUNCTION-ID. FUNC1.                                  \n"
+          + "       DATA DIVISION.                                       \n"
+          + "       LINKAGE SECTION.                                     \n"
+          + "       01  {$*RETVAL}.                                          \n"
+          + "           05  {$*NUM}              PIC X(1234).                \n"
+          + "       PROCEDURE DIVISION RETURNING {$RETVAL}.                 \n"
+          + "             MOVE 1234 to {$NUM}.                              \n"
+          + "       END FUNCTION FUNC1.                                  \n"
+          + "                                                            \n"
+          + "       IDENTIFICATION DIVISION.                             \n"
+          + "       {FUNCTION-ID. FUNC1.|1}                                  \n"
+          + "       DATA DIVISION.                                       \n"
+          + "       LINKAGE SECTION.                                     \n"
+          + "       01  {$*RETVAL}.                                          \n"
+          + "           05  {$*NUM}              PIC X(1234).                \n"
+          + "       PROCEDURE DIVISION RETURNING {$RETVAL}.                 \n"
+          + "             MOVE 1234 to {$NUM}.                              \n"
+          + "       END FUNCTION FUNC1.                                  \n";
 
   @Test
   void function_redefined() {
@@ -273,27 +274,27 @@ public class TestFunction {
   }
 
   public static final String DIAGNOSE_DEFINED_AFTER =
-          ""
-                  // ----+----1----+----2----+----3----+----4----+----5----+----6
-                  + "       IDENTIFICATION DIVISION.                             \n"
-                  + "       PROGRAM-ID. PGM.                                     \n"
-                  + "       DATA DIVISION.                                       \n"
-                  + "       WORKING-STORAGE SECTION.                             \n"
-                  + "       01  {$*RETVAL}.                                          \n"
-                  + "           05  {$*NUM}              PIC X(1234).                \n"
-                  + "       PROCEDURE DIVISION RETURNING {$RETVAL}.                 \n"
-                  + "             MOVE FUNCTION {_{$$FUNC1}|1_} TO {$RETVAL}.                 \n"
-                  + "       END PROGRAM PGM.                                     \n"
-                  + "                                                            \n"
-                  + "       {$$*IDENTIFICATION DIVISION.                             \n"
-                  + "       FUNCTION-ID. FUNC1.                                  \n"
-                  + "       DATA DIVISION.                                       \n"
-                  + "       LINKAGE SECTION.                                     \n"
-                  + "       01  {$*RETVAL}.                                          \n"
-                  + "           05  {$*NUM}              PIC X(1234).                \n"
-                  + "       PROCEDURE DIVISION RETURNING {$RETVAL}.                 \n"
-                  + "             MOVE 1234 to {$NUM}.                              \n"
-                  + "       END FUNCTION FUNC1.}                                  \n";
+      ""
+          // ----+----1----+----2----+----3----+----4----+----5----+----6
+          + "       IDENTIFICATION DIVISION.                             \n"
+          + "       PROGRAM-ID. PGM.                                     \n"
+          + "       DATA DIVISION.                                       \n"
+          + "       WORKING-STORAGE SECTION.                             \n"
+          + "       01  {$*RETVAL}.                                          \n"
+          + "           05  {$*NUM}              PIC X(1234).                \n"
+          + "       PROCEDURE DIVISION RETURNING {$RETVAL}.                 \n"
+          + "             MOVE FUNCTION {_{$$FUNC1}|1_} TO {$RETVAL}.                 \n"
+          + "       END PROGRAM PGM.                                     \n"
+          + "                                                            \n"
+          + "       {$$*IDENTIFICATION DIVISION.                             \n"
+          + "       FUNCTION-ID. FUNC1.                                  \n"
+          + "       DATA DIVISION.                                       \n"
+          + "       LINKAGE SECTION.                                     \n"
+          + "       01  {$*RETVAL}.                                          \n"
+          + "           05  {$*NUM}              PIC X(1234).                \n"
+          + "       PROCEDURE DIVISION RETURNING {$RETVAL}.                 \n"
+          + "             MOVE 1234 to {$NUM}.                              \n"
+          + "       END FUNCTION FUNC1.|FUNC1}                                  \n";
 
   @Test
   void diagnose_defined_after() {
@@ -412,30 +413,30 @@ public class TestFunction {
 
   //
   public static final String USER_DEFINED_DECLARED_FUNCTION_NEED_NO_FUNCTION_PREFIX =
-          "       {$$*IDENTIFICATION DIVISION.                             \n"
-                  + "       FUNCTION-ID. FUNC1.                                  \n"
-                  + "       DATA DIVISION.                                       \n"
-                  + "       LINKAGE SECTION.                                     \n"
-                  + "       01  {$*UNRELATED-STUFF}.                                 \n"
-                  + "           05  {$*NUM}         PIC X(1234).                     \n"
-                  + "       PROCEDURE DIVISION RETURNING {$UNRELATED-STUFF}.        \n"
-                  + "       END FUNCTION FUNC1.}                                  \n"
-                  + "       \n"
-                  + "       IDENTIFICATION DIVISION.\n"
-                  + "       PROGRAM-ID. EXAMPLE.\n"
-                  + "       ENVIRONMENT DIVISION.\n"
-                  + "       CONFIGURATION SECTION.\n"
-                  + "       repository.\n"
-                  + "           FUNCTION {$$FUNC1}\n"
-                  + "           FUNCTION ALL INTRINSIC.\n"
-                  + "       DATA DIVISION.\n"
-                  + "       WORKING-STORAGE SECTION.\n"
-                  + "       01 {$*so-data}.\n"
-                  + "           05 {$*HEX-OF1} pic 9.\n"
-                  + "       PROCEDURE DIVISION.\n"
-                  + "           display {$$HEX-OF}({$HEX-OF1}) .\n"
-                  + "           display {$$func1}.\n"
-                  + "           display \"hello\".";
+      "       {$$*IDENTIFICATION DIVISION.                             \n"
+          + "       FUNCTION-ID. FUNC1.                                  \n"
+          + "       DATA DIVISION.                                       \n"
+          + "       LINKAGE SECTION.                                     \n"
+          + "       01  {$*UNRELATED-STUFF}.                                 \n"
+          + "           05  {$*NUM}         PIC X(1234).                     \n"
+          + "       PROCEDURE DIVISION RETURNING {$UNRELATED-STUFF}.        \n"
+          + "       END FUNCTION FUNC1.|FUNC1}                                  \n"
+          + "       \n"
+          + "       IDENTIFICATION DIVISION.\n"
+          + "       PROGRAM-ID. EXAMPLE.\n"
+          + "       ENVIRONMENT DIVISION.\n"
+          + "       CONFIGURATION SECTION.\n"
+          + "       repository.\n"
+          + "           FUNCTION {$$FUNC1}\n"
+          + "           FUNCTION ALL INTRINSIC.\n"
+          + "       DATA DIVISION.\n"
+          + "       WORKING-STORAGE SECTION.\n"
+          + "       01 {$*so-data}.\n"
+          + "           05 {$*HEX-OF1} pic 9.\n"
+          + "       PROCEDURE DIVISION.\n"
+          + "           display {$$HEX-OF}({$HEX-OF1}) .\n"
+          + "           display {$$func1}.\n"
+          + "           display \"hello\".";
 
   @Test
   void test_user_defined_declared_function_need_no_function_prefix() {
@@ -447,27 +448,27 @@ public class TestFunction {
 
   //
   public static final String NON_DECLARED_FUNCTION_NAME_CAN_BE_USED_AS_VAR_NAME =
-          "       {$$*IDENTIFICATION DIVISION.                             \n"
-                  + "       FUNCTION-ID. FUNC1.                                  \n"
-                  + "       DATA DIVISION.                                       \n"
-                  + "       LINKAGE SECTION.                                     \n"
-                  + "       01  {$*UNRELATED-STUFF}.                                 \n"
-                  + "           05  {$*NUM}         PIC X(1234).                     \n"
-                  + "       PROCEDURE DIVISION RETURNING {$UNRELATED-STUFF}.        \n"
-                  + "       END FUNCTION FUNC1.}                                  \n"
-                  + "       \n"
-                  + "       IDENTIFICATION DIVISION.\n"
-                  + "       PROGRAM-ID. EXAMPLE.\n"
-                  + "       ENVIRONMENT DIVISION.\n"
-                  + "       CONFIGURATION SECTION.\n"
-                  + "       DATA DIVISION.\n"
-                  + "       WORKING-STORAGE SECTION.\n"
-                  + "       01 {$*so-data}.\n"
-                  + "           05 {$*func1} pic 9.\n"
-                  + "       PROCEDURE DIVISION.\n"
-                  + "           display {$func1}.\n"
-                  + "           display function {$$func1}.\n"
-                  + "           display \"hello\".";
+      "       {$$*IDENTIFICATION DIVISION.                             \n"
+          + "       FUNCTION-ID. FUNC1.                                  \n"
+          + "       DATA DIVISION.                                       \n"
+          + "       LINKAGE SECTION.                                     \n"
+          + "       01  {$*UNRELATED-STUFF}.                                 \n"
+          + "           05  {$*NUM}         PIC X(1234).                     \n"
+          + "       PROCEDURE DIVISION RETURNING {$UNRELATED-STUFF}.        \n"
+          + "       END FUNCTION FUNC1.|FUNC1}                                  \n"
+          + "       \n"
+          + "       IDENTIFICATION DIVISION.\n"
+          + "       PROGRAM-ID. EXAMPLE.\n"
+          + "       ENVIRONMENT DIVISION.\n"
+          + "       CONFIGURATION SECTION.\n"
+          + "       DATA DIVISION.\n"
+          + "       WORKING-STORAGE SECTION.\n"
+          + "       01 {$*so-data}.\n"
+          + "           05 {$*func1} pic 9.\n"
+          + "       PROCEDURE DIVISION.\n"
+          + "           display {$func1}.\n"
+          + "           display function {$$func1}.\n"
+          + "           display \"hello\".";
 
   @Test
   void test_non_declared_function_name_can_be_used_as_var_name() {
@@ -477,31 +478,31 @@ public class TestFunction {
 
   //
   public static final String DECLARED_FUNCTION_NAME_CANT_BE_USED_AS_VAR_NAME =
-          "       {$$*IDENTIFICATION DIVISION.                             \n"
-                  + "       FUNCTION-ID. FUNC1.                                  \n"
-                  + "       DATA DIVISION.                                       \n"
-                  + "       LINKAGE SECTION.                                     \n"
-                  + "       01  {$*UNRELATED-STUFF}.                                 \n"
-                  + "           05  {$*NUM}         PIC X(1234).                     \n"
-                  + "       PROCEDURE DIVISION RETURNING {$UNRELATED-STUFF}.        \n"
-                  + "       END FUNCTION FUNC1.}                                  \n"
-                  + "       \n"
-                  + "       IDENTIFICATION DIVISION.\n"
-                  + "       PROGRAM-ID. EXAMPLE.\n"
-                  + "       ENVIRONMENT DIVISION.\n"
-                  + "       CONFIGURATION SECTION.\n"
-                  + "       repository.\n"
-                  + "           FUNCTION {$$func1}\n"
-                  + "           FUNCTION ALL Intrinsic.\n"
-                  + "       DATA DIVISION.\n"
-                  + "       WORKING-STORAGE SECTION.\n"
-                  + "       01 {$*so-data}.\n"
-                  + "           05 {$*func1|1} pic 9.\n"
-                  + "           05 {$*hex-of|2} pic 9.\n"
-                  + "       PROCEDURE DIVISION.\n"
-                  + "           display {$func1}.\n"
-                  + "           display function {$$func1}.\n"
-                  + "           display \"hello\".";
+      "       {$$*IDENTIFICATION DIVISION.                             \n"
+          + "       FUNCTION-ID. FUNC1.                                  \n"
+          + "       DATA DIVISION.                                       \n"
+          + "       LINKAGE SECTION.                                     \n"
+          + "       01  {$*UNRELATED-STUFF}.                                 \n"
+          + "           05  {$*NUM}         PIC X(1234).                     \n"
+          + "       PROCEDURE DIVISION RETURNING {$UNRELATED-STUFF}.        \n"
+          + "       END FUNCTION FUNC1.|FUNC1}                                  \n"
+          + "       \n"
+          + "       IDENTIFICATION DIVISION.\n"
+          + "       PROGRAM-ID. EXAMPLE.\n"
+          + "       ENVIRONMENT DIVISION.\n"
+          + "       CONFIGURATION SECTION.\n"
+          + "       repository.\n"
+          + "           FUNCTION {$$func1}\n"
+          + "           FUNCTION ALL Intrinsic.\n"
+          + "       DATA DIVISION.\n"
+          + "       WORKING-STORAGE SECTION.\n"
+          + "       01 {$*so-data}.\n"
+          + "           05 {$*func1|1} pic 9.\n"
+          + "           05 {$*hex-of|2} pic 9.\n"
+          + "       PROCEDURE DIVISION.\n"
+          + "           display {$func1}.\n"
+          + "           display function {$$func1}.\n"
+          + "           display \"hello\".";
 
   @Test
   void test_declared_function_name_cant_be_used_as_var_name() {
@@ -524,32 +525,32 @@ public class TestFunction {
   }
 
   public static final String USE_DECLARED_FUNCTION_IN_NESTED_PROGRAM =
-          "       {$$*IDENTIFICATION DIVISION.                             \n"
-                  + "       FUNCTION-ID. FUNC1.                                  \n"
-                  + "       DATA DIVISION.                                       \n"
-                  + "       LINKAGE SECTION.                                     \n"
-                  + "       01  {$*UNRELATED-STUFF}.                                 \n"
-                  + "           05  {$*NUM}         PIC X(1234).                     \n"
-                  + "       PROCEDURE DIVISION RETURNING {$UNRELATED-STUFF}.        \n"
-                  + "       END FUNCTION FUNC1.}                                  \n"
-                  + "\n"
-                  + "       IDENTIFICATION DIVISION.                             \n"
-                  + "       PROGRAM-ID. PGM.                                     \n"
-                  + "       ENVIRONMENT DIVISION.                                \n"
-                  + "       CONFIGURATION SECTION.                               \n"
-                  + "       REPOSITORY.                                          \n"
-                  + "               FUNCTION {$$FUNC1}.                              \n"
-                  + "       DATA DIVISION.                                       \n"
-                  + "       WORKING-STORAGE SECTION.                             \n"
-                  + "       PROCEDURE DIVISION.\n"
-                  + "       IDENTIFICATION DIVISION.                             \n"
-                  + "       PROGRAM-ID. PGM1.                                            \n"
-                  + "       DATA DIVISION.                                       \n"
-                  + "       WORKING-STORAGE SECTION.                                      \n"
-                  + "       PROCEDURE DIVISION.                                  \n"
-                  + "             display {$$func1}.               \n"
-                  + "       END PROGRAM PGM1.                                                       \n"
-                  + "       END PROGRAM PGM. ";
+      "       {$$*IDENTIFICATION DIVISION.                             \n"
+          + "       FUNCTION-ID. FUNC1.                                  \n"
+          + "       DATA DIVISION.                                       \n"
+          + "       LINKAGE SECTION.                                     \n"
+          + "       01  {$*UNRELATED-STUFF}.                                 \n"
+          + "           05  {$*NUM}         PIC X(1234).                     \n"
+          + "       PROCEDURE DIVISION RETURNING {$UNRELATED-STUFF}.        \n"
+          + "       END FUNCTION FUNC1.|FUNC1}                                  \n"
+          + "\n"
+          + "       IDENTIFICATION DIVISION.                             \n"
+          + "       PROGRAM-ID. PGM.                                     \n"
+          + "       ENVIRONMENT DIVISION.                                \n"
+          + "       CONFIGURATION SECTION.                               \n"
+          + "       REPOSITORY.                                          \n"
+          + "               FUNCTION {$$FUNC1}.                              \n"
+          + "       DATA DIVISION.                                       \n"
+          + "       WORKING-STORAGE SECTION.                             \n"
+          + "       PROCEDURE DIVISION.\n"
+          + "       IDENTIFICATION DIVISION.                             \n"
+          + "       PROGRAM-ID. PGM1.                                            \n"
+          + "       DATA DIVISION.                                       \n"
+          + "       WORKING-STORAGE SECTION.                                      \n"
+          + "       PROCEDURE DIVISION.                                  \n"
+          + "             display {$$func1}.               \n"
+          + "       END PROGRAM PGM1.                                                       \n"
+          + "       END PROGRAM PGM. ";
 
   @Test
   void test_use_declared_function_in_nested_program() {
@@ -557,35 +558,35 @@ public class TestFunction {
   }
 
   public static final String
-          MULTIPLE_PROGRAM_IN_COMPILE_UNIT_REFERS_CORRECTLY_TO_FUNCTION_DECLARATION =
+      MULTIPLE_PROGRAM_IN_COMPILE_UNIT_REFERS_CORRECTLY_TO_FUNCTION_DECLARATION =
           "       {$$*IDENTIFICATION DIVISION.                             \n"
-                  + "       FUNCTION-ID. FUNC1.                                  \n"
-                  + "       DATA DIVISION.                                       \n"
-                  + "       LINKAGE SECTION.                                     \n"
-                  + "       01  {$*UNRELATED-STUFF}.                                 \n"
-                  + "           05  {$*NUM}         PIC X(1234).                     \n"
-                  + "       PROCEDURE DIVISION RETURNING {$UNRELATED-STUFF}.        \n"
-                  + "       END FUNCTION FUNC1.}                                  \n"
-                  + "\n"
-                  + "       IDENTIFICATION DIVISION.                             \n"
-                  + "       PROGRAM-ID. PGM.                                     \n"
-                  + "       ENVIRONMENT DIVISION.                                \n"
-                  + "       CONFIGURATION SECTION.                               \n"
-                  + "       REPOSITORY.                                          \n"
-                  + "               FUNCTION {$$FUNC1}.                              \n"
-                  + "       DATA DIVISION.                                       \n"
-                  + "       WORKING-STORAGE SECTION.                             \n"
-                  + "       PROCEDURE DIVISION.       \n"
-                  + "           display {$$func1}.                                           \n"
-                  + "       END PROGRAM PGM. \n"
-                  + "\n"
-                  + "       IDENTIFICATION DIVISION.                             \n"
-                  + "       PROGRAM-ID. PGM1.                                            \n"
-                  + "       DATA DIVISION.                                       \n"
-                  + "       WORKING-STORAGE SECTION.                                      \n"
-                  + "       PROCEDURE DIVISION.                                  \n"
-                  + "             display {func1|1}.               \n"
-                  + "       END PROGRAM PGM1. ";
+              + "       FUNCTION-ID. FUNC1.                                  \n"
+              + "       DATA DIVISION.                                       \n"
+              + "       LINKAGE SECTION.                                     \n"
+              + "       01  {$*UNRELATED-STUFF}.                                 \n"
+              + "           05  {$*NUM}         PIC X(1234).                     \n"
+              + "       PROCEDURE DIVISION RETURNING {$UNRELATED-STUFF}.        \n"
+              + "       END FUNCTION FUNC1.|FUNC1}                                  \n"
+              + "\n"
+              + "       IDENTIFICATION DIVISION.                             \n"
+              + "       PROGRAM-ID. PGM.                                     \n"
+              + "       ENVIRONMENT DIVISION.                                \n"
+              + "       CONFIGURATION SECTION.                               \n"
+              + "       REPOSITORY.                                          \n"
+              + "               FUNCTION {$$FUNC1}.                              \n"
+              + "       DATA DIVISION.                                       \n"
+              + "       WORKING-STORAGE SECTION.                             \n"
+              + "       PROCEDURE DIVISION.       \n"
+              + "           display {$$func1}.                                           \n"
+              + "       END PROGRAM PGM. \n"
+              + "\n"
+              + "       IDENTIFICATION DIVISION.                             \n"
+              + "       PROGRAM-ID. PGM1.                                            \n"
+              + "       DATA DIVISION.                                       \n"
+              + "       WORKING-STORAGE SECTION.                                      \n"
+              + "       PROCEDURE DIVISION.                                  \n"
+              + "             display {func1|1}.               \n"
+              + "       END PROGRAM PGM1. ";
 
   @Test
   void test_multiple_program_in_compile_unit_refers_correctly_to_function_declaration() {
@@ -595,5 +596,44 @@ public class TestFunction {
                     "Variable FUNC1 is not defined",
                     DiagnosticSeverity.Error,
                     ErrorSource.PARSING.getText())));
+  }
+
+  public static final String FUNCTION_DEF_IN_COPYBOOK =
+      "       {$$*IDENTIFICATION DIVISION.                             \n"
+          + "         copy {~abc}.|FUNC1}"
+          + "\n"
+          + "       IDENTIFICATION DIVISION.                             \n"
+          + "       PROGRAM-ID. PGM.                                     \n"
+          + "       ENVIRONMENT DIVISION.                                \n"
+          + "       CONFIGURATION SECTION.                               \n"
+          + "       REPOSITORY.                                          \n"
+          + "               FUNCTION {$$FUNC1}.                              \n"
+          + "       DATA DIVISION.                                       \n"
+          + "       WORKING-STORAGE SECTION.                             \n"
+          + "       PROCEDURE DIVISION.\n"
+          + "       IDENTIFICATION DIVISION.                             \n"
+          + "       PROGRAM-ID. PGM1.                                            \n"
+          + "       DATA DIVISION.                                       \n"
+          + "       WORKING-STORAGE SECTION.                                      \n"
+          + "       PROCEDURE DIVISION.                                  \n"
+          + "             display {$$func1}.               \n"
+          + "       END PROGRAM PGM1.                                                       \n"
+          + "       END PROGRAM PGM. ";
+
+  @Test
+  void test_funcDefinition_in_copybook() {
+    UseCaseEngine.runTest(
+            FUNCTION_DEF_IN_COPYBOOK,
+        ImmutableList.of(
+            new CobolText(
+                "ABC",
+                "       FUNCTION-ID. FUNC1.                                  \n"
+                    + "       DATA DIVISION.                                       \n"
+                    + "       LINKAGE SECTION.                                     \n"
+                    + "       01  {$*UNRELATED-STUFF}.                                 \n"
+                    + "           05  {$*NUM}         PIC X(1234).                     \n"
+                    + "       PROCEDURE DIVISION RETURNING {$UNRELATED-STUFF}.        \n"
+                    + "       END FUNCTION FUNC1.")),
+        ImmutableMap.of());
   }
 }
