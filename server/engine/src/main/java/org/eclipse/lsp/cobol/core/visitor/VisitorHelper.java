@@ -383,9 +383,13 @@ public class VisitorHelper {
    * @return locality object
    */
   public static Locality buildNameRangeLocality(ParserRuleContext ctx, String name, String uri) {
+    int startLine = Optional.ofNullable(ctx.start).map(Token::getLine).orElse(1) - 1;
+    int startCharPos = Optional.ofNullable(ctx.start).map(Token::getCharPositionInLine).orElse(0);
+    int stopLine = Optional.ofNullable(ctx.stop).map(Token::getLine).orElse(startLine + 1) - 1;
+
     Range range = new Range(
-        new Position(ctx.start.getLine() - 1, ctx.start.getCharPositionInLine()),
-        new Position(ctx.stop.getLine() - 1, ctx.start.getCharPositionInLine() + name.length()));
+        new Position(startLine, startCharPos),
+        new Position(stopLine, startCharPos + name.length()));
 
     return Locality.builder()
         .uri(uri)

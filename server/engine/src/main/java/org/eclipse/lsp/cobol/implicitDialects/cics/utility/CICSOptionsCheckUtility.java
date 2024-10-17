@@ -34,6 +34,9 @@ public class CICSOptionsCheckUtility {
         CICSAllocateOptionsCheckUtility.RULE_INDEX,
         new CICSAllocateOptionsCheckUtility(context, errors));
     optionsMap.put(
+        CICSAbendOptionsCheckUtility.RULE_INDEX,
+        new CICSAbendOptionsCheckUtility(context, errors));
+    optionsMap.put(
         CICSConverseOptionsCheckUtility.RULE_INDEX,
         new CICSConverseOptionsCheckUtility(context, errors));
     optionsMap.put(
@@ -44,7 +47,13 @@ public class CICSOptionsCheckUtility {
         new CICSDefineOptionsCheckUtility(context, errors));
     optionsMap.put(
         CICSIssueOptionsCheckUtility.RULE_INDEX,
-         new CICSIssueOptionsCheckUtility(context, errors));
+        new CICSIssueOptionsCheckUtility(context, errors));
+    optionsMap.put(
+        CICSAddSubeventOptionsCheckUtility.RULE_INDEX,
+        new CICSAddSubeventOptionsCheckUtility(context, errors));
+    optionsMap.put(
+        CICSBuildOptionsCheckUtility.RULE_INDEX,
+        new CICSBuildOptionsCheckUtility(context, errors));
     optionsMap.put(
         CICSAcquireOptionsCheckUtility.RULE_INDEX,
         new CICSAcquireOptionsCheckUtility(context, errors));
@@ -52,8 +61,8 @@ public class CICSOptionsCheckUtility {
         CICSWaitOptionsCheckUtility.RULE_INDEX,
         new CICSWaitOptionsCheckUtility(context, errors));
     optionsMap.put(
-        CICSCancelOptionsCheckUtility.RULE_INDEX, new CICSCancelOptionsCheckUtility(context, errors));
-
+        CICSCancelOptionsCheckUtility.RULE_INDEX,
+        new CICSCancelOptionsCheckUtility(context, errors));
   }
 
   /**
