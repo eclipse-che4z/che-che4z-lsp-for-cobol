@@ -22,7 +22,7 @@ suite("TF35623: Support for Replacing and Mapping statement", function () {
   this.timeout(helper.TEST_TIMEOUT);
   this.slow(1000);
   suiteSetup(async function () {
-    helper.updateConfig("basic.json");
+    await helper.updateConfig("basic.json");
     await helper.activate();
     await helper.sleep(1000);
   });

@@ -19,6 +19,7 @@ import {
   SnippetCompletionProvider,
 } from "../services/snippetcompletion/SnippetCompletionProvider";
 import { LANGUAGE_ID } from "../constants";
+import { initSmartTab, RangeTabShiftStore } from "../commands/SmartTabCommand";
 
 let outputChannel: vscode.OutputChannel;
 
@@ -38,6 +39,14 @@ export function activate(context: ExtensionContext) {
       outputChannel.appendLine("Executing Insert Cobol Snippet command");
       pickSnippet();
     }),
+  );
+
+  initSmartTab(context);
+
+  context.subscriptions.push(
+    vscode.window.onDidChangeActiveTextEditor((_e) =>
+      RangeTabShiftStore.reset(),
+    ),
   );
 }
 

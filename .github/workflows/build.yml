@@ -120,6 +120,11 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 16
+      - name: Inject telemetry key
+        run: |
+          export TEL_KEY=`node -e "console.log(Buffer.from('${{ secrets.TELEMETRY_KEY }}').toString('base64'))"`
+          sed -i "s/const TELEMETRY_KEY_ENCODED = TELEMETRY_DEFAULT_CONTENT/const TELEMETRY_KEY_ENCODED = '$TEL_KEY'/" src/services/reporter/TelemetryReporterImpl.ts
+        working-directory: clients/cobol-lsp-vscode-extension
       - name: Build VS Code extension dialect API
         working-directory: clients/cobol-dialect-api
         run: |

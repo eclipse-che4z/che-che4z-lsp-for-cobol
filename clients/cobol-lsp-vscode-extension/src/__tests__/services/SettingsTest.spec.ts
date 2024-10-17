@@ -16,6 +16,7 @@ import * as path from "path";
 import * as vscode from "vscode";
 import { SettingsService } from "../../services/Settings";
 import { SettingsUtils } from "../../services/util/SettingsUtils";
+import { getTabSettings } from "../../services/SmartTabSettings";
 
 const fsPath = "tmp-ws";
 beforeAll(() => {
@@ -195,7 +196,7 @@ describe("SettingsService returns correct tab settings", () => {
       get: jest.fn().mockReturnValue(true),
     });
 
-    const tabSettings = SettingsService.getTabSettings();
+    const tabSettings = getTabSettings();
     expect(tabSettings.defaultRule.maxPosition).toBe(72);
   });
 
@@ -204,7 +205,7 @@ describe("SettingsService returns correct tab settings", () => {
       get: jest.fn().mockReturnValue([1, 3, 5, 7, 25]),
     });
 
-    const tabSettings = SettingsService.getTabSettings();
+    const tabSettings = getTabSettings();
     expect(tabSettings.defaultRule.maxPosition).toBe(25);
   });
 
@@ -219,7 +220,7 @@ describe("SettingsService returns correct tab settings", () => {
       }),
     });
 
-    const tabSettings = SettingsService.getTabSettings();
+    const tabSettings = getTabSettings();
     expect(tabSettings.defaultRule.maxPosition).toBe(40);
     expect(tabSettings.defaultRule.regex).toBeUndefined();
     expect(tabSettings.defaultRule.stops[3]).toBe(40);

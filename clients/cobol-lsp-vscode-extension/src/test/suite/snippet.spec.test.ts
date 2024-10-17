@@ -25,7 +25,7 @@ suite(
 
     suiteSetup(async function () {
       this.timeout(helper.TEST_TIMEOUT);
-      helper.updateConfig("basic.json");
+      await helper.updateConfig("basic.json");
       await helper.activate();
     });
     this.afterEach(async () => await helper.closeAllEditors()).timeout(
@@ -33,7 +33,7 @@ suite(
     );
 
     test("Autocompletion basic dialect", async () => {
-      helper.updateConfig("basic.json");
+      await helper.updateConfig("basic.json");
       await helper.showDocument("SNIPPET.cbl");
       const editor = helper.getEditor("SNIPPET.cbl");
       await helper.waitFor(() => editor.document.languageId === "cobol");
@@ -47,7 +47,7 @@ suite(
 
     // Skipped because dialects are not possible to run on Java-less machine
     test.skip("Autocompletion with IDMS dialect", async () => {
-      helper.updateConfig("idms.json");
+      await helper.updateConfig("idms.json");
       await helper.showDocument("SNIPPET_IDMS.cbl");
       const editor = helper.getEditor("SNIPPET_IDMS.cbl");
       await helper.waitFor(() => editor.document.languageId === "cobol");
@@ -77,7 +77,7 @@ suite(
     test("TC152058 Autocompletion basic dialect", async () => {
       await helper.showDocument("USER1.cbl");
       const editor = helper.getEditor("USER1.cbl");
-      helper.updateConfig("basic.json");
+      await helper.updateConfig("basic.json");
       await helper.waitFor(() => editor.document.languageId === "cobol");
       await helper.insertString(editor, pos(39, 0), "           A");
       await helper.waitFor(
@@ -114,7 +114,7 @@ suite(
 suite("TF42379 COBOL LS F96588 - Insert code snippets", function () {
   suiteSetup(async function () {
     this.timeout(helper.TEST_TIMEOUT);
-    helper.updateConfig("basic.json");
+    await helper.updateConfig("basic.json");
     await helper.activate();
   });
   this.afterEach(async () => await helper.closeAllEditors()).timeout(

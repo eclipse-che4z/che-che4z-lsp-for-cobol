@@ -11,11 +11,9 @@
  * Contributors:
  *   Broadcom, Inc. - initial API and implementation
  */
-import * as fs from "fs";
-import * as path from "path";
 import * as vscode from "vscode";
 import TelemetryReporter from "@vscode/extension-telemetry";
-import { EXTENSION_ID, TELEMETRY_DEFAULT_CONTENT } from "../../constants";
+import { TELEMETRY_DEFAULT_CONTENT } from "../../constants";
 
 import { TelemetryEvent } from "./model/TelemetryEvent";
 import { TelemetryReport } from "./TelemetryReport";
@@ -32,30 +30,14 @@ export class TelemetryReporterImpl implements TelemetryReport {
 
   private static instance: TelemetryReporterImpl;
 
-  /**
-   * This method return the value of the instrumentation key necessary to create the telemetry reporter from an
-   * external file configuration. If the file doesn't exists it returns a generic value that will not be valid
-   * for collect telemetry event.
-   */
   private static getTelemetryKeyId(): string {
-    return fs.existsSync(this.getTelemetryResourcePath())
-      ? this.getInstrumentationKey()
-      : TELEMETRY_DEFAULT_CONTENT;
-  }
+    // The following line is replaced by base64 encoded telemetry key in the CI
+    const TELEMETRY_KEY_ENCODED = TELEMETRY_DEFAULT_CONTENT;
 
-  private static getTelemetryResourcePath() {
-    const extPath = vscode.extensions.getExtension(EXTENSION_ID)!.extensionPath;
-    return vscode.Uri.file(path.join(extPath, "resources", "TELEMETRY_KEY"))
-      .fsPath;
-  }
-
-  private static getInstrumentationKey(): string {
-    return Buffer.from(
-      fs.readFileSync(this.getTelemetryResourcePath(), "utf8"),
-      "base64",
-    )
-      .toString()
-      .trim();
+    if (TELEMETRY_KEY_ENCODED !== TELEMETRY_DEFAULT_CONTENT) {
+      return Buffer.from(TELEMETRY_KEY_ENCODED, "base64").toString();
+    }
+    return TELEMETRY_DEFAULT_CONTENT;
   }
 
   private static convertData(content: TelemetryEvent) {
