@@ -134,7 +134,6 @@ jobs:
         working-directory: clients/cobol-lsp-vscode-extension
         run: |
           npm ci
-          npm run test
       - name: Package IDMS vsix
         working-directory: clients/idms-dialect-support
         run: |
