@@ -131,7 +131,7 @@ public class TestQualifyExtendedImpactOnVariableDefinition {
   void whenQualifyExtendedOptionActiveFromConfigurationWithMultipleDefinitionThenConsider01LevelAsDefinition() {
     AnalysisConfig analysisConfig = new AnalysisConfig(
             CopybookProcessingMode.ENABLED,
-            ImmutableList.of(), true, ImmutableList.of(), ImmutableMap.of());
+            ImmutableList.of(), true, false, ImmutableList.of(), ImmutableMap.of());
     analysisConfig.getCompilerOptions().add("QUALIFY(EXTEND)");
     UseCaseEngine.runTest(
             TEXT_PROGRAM_WITH_NO_CD,

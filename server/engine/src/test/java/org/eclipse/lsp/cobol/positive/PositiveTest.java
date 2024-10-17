@@ -253,7 +253,7 @@ class PositiveTest extends ConfigurableTest {
       return new AnalysisConfig(
               ENABLED,
               ImmutableList.of("IDMS"),
-              true,
+              true, false,
               ImmutableList.of(),
               ImmutableMap.of("target-sql-backend", new Gson().toJsonTree(SQLBackend.DB2_SERVER)));
     }

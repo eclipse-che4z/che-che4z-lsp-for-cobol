@@ -52,7 +52,7 @@ public class TestMixedCopybookNavigation {
             ImmutableMap.of(), ImmutableList.of(),
             new AnalysisConfig(
                     CopybookProcessingMode.ENABLED,
-                    ImmutableList.of(IdmsDialect.NAME), true,
+                    ImmutableList.of(IdmsDialect.NAME), true, false,
                     ImmutableList.of(),
                     ImmutableMap.of()));
   }
