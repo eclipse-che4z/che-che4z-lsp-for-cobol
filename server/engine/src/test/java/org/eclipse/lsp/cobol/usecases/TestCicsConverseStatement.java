@@ -40,7 +40,6 @@ public class TestCicsConverseStatement {
     private static final String FROM_INTO = FROM + "INTO(123) ";
     private static final String FROM_INTO_TO = FROM_INTO + "TOLENGTH(123) ";
 
-    private static final String CONVERSE_FROM = CONVERSE + FROM;
     private static final String CONVERSE_FROM_INTO = CONVERSE + FROM_INTO;
     private static final String CONVERSE_FROM_INTO_TO = CONVERSE + FROM_INTO_TO;
 
@@ -48,11 +47,9 @@ public class TestCicsConverseStatement {
     private static final String DEFAULT_VALID_1 = CONVERSE_FROM_INTO_TO + "MAXLENGTH(123)";
     private static final String DEFAULT_VALID_2 = CONVERSE_FROM_INTO_TO + "MAXLENGTH(123) NOTRUNCATE";
     private static final String DEFAULT_INVAL_1 = CONVERSE_FROM_INTO_TO + "MAXLENGTH(123) NOTRUNCATE {NOTRUNCATE|errorOne}";
-    private static final String DEFAULT_INVAL_2 = "CONVERSE {INTO(123) MAXLENGTH(123) NOTRUNCATE|errorOne}";
-    private static final String DEFAULT_INVAL_3 = "CONVERSE FROM(123) INTO(123) FROMLENGTH(123) {FROMFLENGTH(123)|errorOne} MAXLENGTH(123)";
+    private static final String DEFAULT_INVAL_2 = "CONVERSE FROM(123) INTO(123) TOLENGTH(123) FROMLENGTH(123) {FROMFLENGTH(123)|errorOne} MAXLENGTH(123)";
 
     private static final String APPC_VALID = CONVERSE + "CONVID(123) " + FROM_INTO_TO + "MAXLENGTH(123) STATE(123)";
-    private static final String APPC_INVAL = CONVERSE + "CONVID(123) " + FROM_INTO_TO + "MAXLENGTH(123) STATE(123) {CTLCHAR|errorOne}(123)";
 
     private static final String LU23_3270_VALID_1 = CONVERSE_FROM_INTO + "ERASE DEFAULT TOLENGTH(123) MAXLENGTH(123) DEFRESP NOTRUNCATE ASIS";
     private static final String LU23_3270_VALID_2 = CONVERSE_FROM_INTO + "ERASE DEFAULT CTLCHAR(123) TOLENGTH(123) MAXLENGTH(123) DEFRESP NOTRUNCATE ASIS";
@@ -63,7 +60,7 @@ public class TestCicsConverseStatement {
 
     private static final String LU4_VALID = CONVERSE_FROM_INTO_TO + "DEFRESP FMH NOTRUNCATE";
 
-    private static final String LU61_VALID = CONVERSE_FROM + "SESSION(123) ATTACHID(123) INTO(123) TOLENGTH(123) MAXLENGTH(123) NOTRUNCATE DEFRESP";
+    private static final String LU61_VALID = CONVERSE + "SESSION(123) ATTACHID(123) INTO(123) TOLENGTH(123) MAXLENGTH(123) NOTRUNCATE DEFRESP";
 
     private static final String SCS_VALID = CONVERSE_FROM_INTO_TO + "MAXLENGTH(123) DEFRESP STRFIELD NOTRUNCATE";
 
@@ -95,6 +92,11 @@ public class TestCicsConverseStatement {
                                 ErrorSource.PARSING.getText()));
     }
 
+    @Test
+    void testConverseOnly() {
+        CICSTestUtils.noErrorTest(CONVERSE);
+    }
+
     // Test Functions
     @Test
     void testDefaultValid() {
@@ -109,22 +111,12 @@ public class TestCicsConverseStatement {
 
     @Test
     void testDefaultInvalid_2() {
-        CICSTestUtils.errorTest(DEFAULT_INVAL_2, getErrorDiagnostic("Missing required option: FROM"));
-    }
-
-    @Test
-    void testDefaultInvalid_3() {
-        CICSTestUtils.errorTest(DEFAULT_INVAL_3, getErrorDiagnostic("Options \"FROMLENGTH or FROMFLENGTH\" cannot be used more than once in a given command."));
+        CICSTestUtils.errorTest(DEFAULT_INVAL_2, getErrorDiagnostic("Options \"FROMLENGTH or FROMFLENGTH\" cannot be used more than once in a given command."));
     }
 
     @Test
     void testAPPCValid() {
         CICSTestUtils.noErrorTest(APPC_VALID);
-    }
-
-    @Test
-    void testAPPCInvalid() {
-        CICSTestUtils.errorTest(APPC_INVAL, getErrorDiagnostic("Extraneous input CTLCHAR"));
     }
 
     @Test

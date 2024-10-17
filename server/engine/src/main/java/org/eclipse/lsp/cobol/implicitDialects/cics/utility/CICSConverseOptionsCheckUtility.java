@@ -82,31 +82,34 @@ public class CICSConverseOptionsCheckUtility extends CICSOptionsCheckBaseUtility
      * @param <E> A subclass of ParserRuleContext
      */
     public <E extends ParserRuleContext> void checkOptions(E ctx) {
-        int currIndex = ctx.getRuleIndex();
-        switch (currIndex) {
-            case CICSParser.RULE_cics_converse_group_one:
-                checkGroupOne((CICSParser.Cics_converse_group_oneContext) ctx);
-                break;
-            case CICSParser.RULE_cics_converse_group_two:
-                checkGroupTwo((CICSParser.Cics_converse_group_twoContext) ctx);
-                break;
-            default:
-                break;
+        if (ctx.getRuleIndex() == CICSParser.RULE_cics_converse_group) {
+            checkRule((CICSParser.Cics_converse_groupContext) ctx);
         }
     }
 
-    private void checkGroupOne(CICSParser.Cics_converse_group_oneContext ctx) {
+    private void checkRule(CICSParser.Cics_converse_groupContext ctx) {
         if (!ctx.ASIS().isEmpty()) {
             checkHasIllegalOptions(ctx.LEAVEKB(), "LEAVEKB");
         }
-        checkHasMandatoryOptions(ctx.FROM(), ctx, "FROM");
-        checkHasMandatoryOptions(ctx.cics_into(), ctx, "INTO or SET");
 
-        checkDuplicates(ctx);
-    }
+        if (!ctx.cics_converse_fromlength().isEmpty()) {
+            checkHasMandatoryOptions(ctx.FROM(), ctx, "FROM");
+        }
 
-    private void checkGroupTwo(CICSParser.Cics_converse_group_twoContext ctx) {
+        if (!ctx.CTLCHAR().isEmpty()) {
+            checkHasIllegalOptions(ctx.CONVID(), "CONVID");
+            checkHasIllegalOptions(ctx.STRFIELD(), "STRFIELD");
+        }
+
+        if (!ctx.cics_converse_erase().isEmpty()) {
+            checkHasIllegalOptions(ctx.STRFIELD(), "STRFIELD");
+        }
+        if (!ctx.STRFIELD().isEmpty()) {
+            checkHasIllegalOptions(ctx.cics_converse_erase(), "CTLCHAR");
+        }
+
         checkHasMandatoryOptions(ctx.cics_into(), ctx, "INTO or SET");
+        checkHasMandatoryOptions(ctx.cics_converse_tolength(), ctx, "TOLENGTH OR TOFLENGTH");
 
         checkDuplicates(ctx);
     }
