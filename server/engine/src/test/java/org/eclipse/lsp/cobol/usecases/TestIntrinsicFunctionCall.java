@@ -38,8 +38,8 @@ public class TestIntrinsicFunctionCall {
           + "           03 {$*WS-NUM} PIC X.\n"
           + "       PROCEDURE DIVISION.\n"
           + "       {#*F-MAX-TEST-01}.                                                   \n"
-          + "           COMPUTE {$WS-NUM} = FUNCTION ";
-  private static final String SUFFIX = "(5).";
+          + "           COMPUTE {$WS-NUM} = FUNCTION {$$";
+  private static final String SUFFIX = "}(5).";
   // Ref - https://www.ibm.com/docs/en/cobol-zos/6.3?topic=cobol-intrinsic-functions-national-data
   private static Stream<String> getFunctionName() {
     return Stream.of(

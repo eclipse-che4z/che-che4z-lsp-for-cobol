@@ -35,6 +35,7 @@ import org.eclipse.usecase.UseCasePreprocessorParser.*;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.regex.Pattern;
 
 import static java.util.Collections.singletonList;
 import static java.util.Optional.ofNullable;
@@ -52,7 +53,9 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
   private final Map<String, List<Diagnostic>> diagnostics = new HashMap<>();
   private final Map<String, List<Location>> variableDefinitions = new HashMap<>();
   private final Map<String, List<Location>> variableUsages = new HashMap<>();
+  private final Map<String, List<Location>> functionUsages = new HashMap<>();
   private final Map<String, List<Location>> paragraphDefinitions = new HashMap<>();
+  private final Map<String, List<Location>> functionDefinitions = new HashMap<>();
   private final Map<String, List<Location>> paragraphUsages = new HashMap<>();
   private final Map<String, List<Location>> sectionDefinitions = new HashMap<>();
   private final Map<String, List<Location>> sectionUsages = new HashMap<>();
@@ -115,7 +118,9 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
             copybookDefinitions,
             copybookUsages,
             makeSubroutinesDefinitions(subroutineNames),
-            subroutineUsages);
+            subroutineUsages,
+            functionDefinitions,
+            functionUsages);
   }
 
   @Override
@@ -227,6 +232,47 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
                                     ctx,
                                     it.replacement(),
                                     paragraphDefinitions,
+                                    ctx.diagnostic()));
+  }
+
+  @Override
+  public void enterFunctionDefinition(FunctionDefinitionContext ctx) {
+    push();
+  }
+
+  @Override
+  public void exitFunctionDefinition(FunctionDefinitionContext ctx) {
+    String multiTokenText = peek().toString().replaceAll(Pattern.quote("{$$*"), "").replaceAll("}", "");
+    String affectedTokens = multiTokenText.substring(0, multiTokenText.indexOf('|'));
+    String functionID = ctx.diagnostic().identifier().getText();
+    addTokenLocation(
+        functionDefinitions,
+        functionID,
+        new Range(
+            new Position(ctx.getStart().getLine() - 1, ctx.start.getCharPositionInLine()),
+            new Position(
+                ctx.diagnostic().start.getLine() - 1,
+                ctx.diagnostic().start.getCharPositionInLine() - lineShifts[getLine(ctx.diagnostic().start)])));
+    pop();
+    write(affectedTokens);
+  }
+
+  @Override
+  public void enterFunctionUsage(FunctionUsageContext ctx) {
+    push();
+  }
+
+  @Override
+  public void exitFunctionUsage(FunctionUsageContext ctx) {
+    pop();
+    ofNullable(ctx.word())
+            .ifPresent(
+                    it ->
+                            processToken(
+                                    it.identifier().getText(),
+                                    ctx,
+                                    it.replacement(),
+                                    functionUsages,
                                     ctx.diagnostic()));
   }
 
