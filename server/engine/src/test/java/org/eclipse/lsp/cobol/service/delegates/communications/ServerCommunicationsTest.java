@@ -116,6 +116,7 @@ class ServerCommunicationsTest {
   void testNotifyProgressBegin() throws NoSuchFieldException {
     String uri = UUID.randomUUID().toString();
     when(files.getNameFromURI(uri)).thenReturn(uri);
+    when(files.decodeURI(uri)).thenReturn(uri);
     when(messageService.getMessage("Communications.syntaxAnalysisInProgressTitle", uri)).thenReturn("TITLE");
     setUpProgressDataStructure(uri);
     ProgressParams expectedNotifyBeginParams = new ProgressParams();
