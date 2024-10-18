@@ -156,7 +156,7 @@ classRepositoryClause
     ;
 
 functionRepositoryClause
-    : FUNCTION (variableUsageName+ INTRINSIC? | ALL INTRINSIC)
+    : FUNCTION (functionName+ INTRINSIC? | ALL INTRINSIC)
     ;
 
 functionReference

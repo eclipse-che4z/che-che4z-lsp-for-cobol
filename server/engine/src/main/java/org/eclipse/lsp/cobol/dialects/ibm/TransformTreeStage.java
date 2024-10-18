@@ -254,7 +254,7 @@ public class TransformTreeStage implements Stage<AnalysisContext, ProcessingResu
 
     // Phase POST DEFINITION
     ctx.register(ProcessingPhase.POST_DEFINITION, SectionNode.class, new ImplicitVariablesProcessor());
-    ctx.register(ProcessingPhase.POST_DEFINITION, FunctionDeclaration.class, new ImplicitFunctionsDefinitionEnricher(symbolAccumulatorService));
+    ctx.register(ProcessingPhase.POST_DEFINITION, FunctionDeclaration.class, new ProgramRepositoryEnricher(symbolAccumulatorService));
 
     // Phase USAGE
     ProcessingPhase u = ProcessingPhase.USAGE;
@@ -275,7 +275,7 @@ public class TransformTreeStage implements Stage<AnalysisContext, ProcessingResu
     ProcessingPhase v = ProcessingPhase.VALIDATION;
     ctx.register(v, QualifiedReferenceNode.class, new ReferenceNodeValidation());
     ctx.register(v, VariableWithLevelNode.class, new VariableWithLevelCheck(CodeLayoutUtil.getProgramLayout(languageId, layoutStore)));
-    ctx.register(v, VariableWithLevelNode.class, new VariableNameCheck(symbolAccumulatorService));
+    ctx.register(v, VariableWithLevelNode.class, new VariableNameCheck());
     ctx.register(v, StatementNode.class, new StatementValidate());
     ctx.register(v, ElementaryNode.class, new ElementaryNodeCheck());
     ctx.register(v, GroupItemNode.class, new GroupItemCheck());

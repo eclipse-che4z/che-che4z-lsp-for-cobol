@@ -168,8 +168,14 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
     if (statementLocality.isPresent()) {
       boolean isIntrinsic = ctx.INTRINSIC() != null;
       TerminalNode all = ctx.ALL();
+      if (Objects.nonNull(all)) {
+        Optional<Locality> allImplicitLocality = retrieveLocality(ctx.ALL(), extendedDocument, copybooks);
+        if (allImplicitLocality.isPresent()) {
+          return  ImmutableList.of(new FunctionDeclaration(allImplicitLocality.get()));
+        }
+      }
       List<FunctionReference> functionNames =
-          ctx.variableUsageName().stream()
+          ctx.functionName().stream()
               .map(
                   functionNameContext ->
                       retrieveLocality(functionNameContext, extendedDocument, copybooks)
@@ -180,13 +186,6 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
               .filter(Optional::isPresent)
               .map(Optional::get)
               .collect(Collectors.toList());
-
-      if (Objects.nonNull(all)) {
-        retrieveLocality(ctx.ALL(), extendedDocument, copybooks)
-            .ifPresent(
-                locality ->
-                    functionNames.add(new FunctionReference(locality, all.getText(), true)));
-      }
       return ImmutableList.of(
           new FunctionDeclaration(statementLocality.get(), functionNames, isIntrinsic));
     } else {

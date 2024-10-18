@@ -15,7 +15,6 @@
 package org.eclipse.lsp.cobol.core.engine.processors;
 
 import lombok.AllArgsConstructor;
-import org.eclipse.lsp.cobol.common.model.DefinedAndUsedStructure;
 import org.eclipse.lsp.cobol.common.model.NodeType;
 import org.eclipse.lsp.cobol.common.model.tree.FunctionReference;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
@@ -27,6 +26,7 @@ import org.eclipse.lsp.cobol.common.processor.Processor;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulatorService;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -40,59 +40,52 @@ public class FunctionUsageReferenceEnricher implements Processor<QualifiedRefere
 
   @Override
   public void accept(QualifiedReferenceNode node, ProcessingContext processingContext) {
-    List<Node> usageNodes =
+    Optional<ProgramNode> program = node.getProgram();
+    if (!program.isPresent()) return;
+    List<VariableUsageNode> usageNodes =
         node.getChildren().stream()
-            .filter(
-                Node.hasType(NodeType.VARIABLE_USAGE))
+            .filter(Node.hasType(NodeType.VARIABLE_USAGE))
+            .map(VariableUsageNode.class::cast)
             .collect(Collectors.toList());
 
     if (usageNodes.isEmpty()) {
       return;
     }
 
-    Node dataNameNode = usageNodes.get(0);
-    DefinedAndUsedStructure usageNode = (DefinedAndUsedStructure) dataNameNode;
-    if (!usageNode.getDefinitions().isEmpty()) {
+    VariableUsageNode dataNameNode = usageNodes.get(0);
+    if (!isFunctionDeclaredWithName(dataNameNode, program.get())) return;
+
+    if (!dataNameNode.getDefinitions().isEmpty()) {
       return;
     }
     SymbolAccumulatorService.FunctionInfo functionInfo =
-        symbolAccumulatorService.getFunctionReference(usageNode.getName());
+        symbolAccumulatorService.getFunctionReference(dataNameNode.getName(), program.get());
 
     if (functionInfo == null) {
       return;
     }
 
-    if (!shouldProcessFunction(functionInfo, dataNameNode)) {
-      return;
-    }
-
-    if (dataNameNode instanceof VariableUsageNode) {
-      node.getProgram()
-          .ifPresent(
-              programNode -> {
-                int indexOfNode = node.getChildren().indexOf(dataNameNode);
-                node.getChildren().remove(dataNameNode);
-                FunctionReference functionReference =
-                    new FunctionReference(dataNameNode.getLocality(), usageNode.getName());
-                node.getChildren().add(indexOfNode, functionReference);
-              });
-    }
+    program.ifPresent(
+        programNode -> {
+          int indexOfNode = node.getChildren().indexOf(dataNameNode);
+          node.getChildren().remove(dataNameNode);
+          FunctionReference functionReference =
+              new FunctionReference(dataNameNode.getLocality(), dataNameNode.getName());
+          functionReference.setDefinitions(functionInfo.getDefinition());
+          node.getChildren().add(indexOfNode, functionReference);
+        });
   }
 
-  private boolean shouldProcessFunction(
-      SymbolAccumulatorService.FunctionInfo functionInfo, Node usageNode) {
-    Optional<Node> nearestProgramNode = usageNode.getNearestParentByType(NodeType.PROGRAM);
-    if (!nearestProgramNode.isPresent()) return false;
-    ProgramNode programNode = (ProgramNode) nearestProgramNode.get();
-    if (functionInfo.isDeclared(programNode)) {
-      return true;
-    }
-
-    if (!(usageNode instanceof FunctionReference)) {
+  private static boolean isFunctionDeclaredWithName(
+      VariableUsageNode dataNameNode, ProgramNode program) {
+    while (!program.getRepository().containsKey(dataNameNode.getName().toUpperCase(Locale.ROOT))) {
+      Optional<ProgramNode> nearestProgram = program.getProgram();
+      if (nearestProgram.isPresent()) {
+        program = nearestProgram.get();
+        continue;
+      }
       return false;
     }
-
-    FunctionReference functionReference = (FunctionReference) usageNode;
-    return functionReference.isFunctionPrefixed();
+    return true;
   }
 }

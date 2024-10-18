@@ -31,11 +31,19 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 public class FunctionDeclaration extends Node {
   private final boolean isIntrinsic;
+  private final boolean declareAllIntrinsicFunctions;
 
   public FunctionDeclaration(
       Locality location, List<FunctionReference> functionNames, boolean isIntrinsic) {
     super(location, NodeType.FUNCTION_DECLARATION);
     this.isIntrinsic = isIntrinsic;
+    this.declareAllIntrinsicFunctions = false;
     functionNames.forEach(this::addChild);
+  }
+
+  public FunctionDeclaration(Locality location) {
+    super(location, NodeType.FUNCTION_DECLARATION);
+    this.isIntrinsic = true;
+    this.declareAllIntrinsicFunctions = true;
   }
 }

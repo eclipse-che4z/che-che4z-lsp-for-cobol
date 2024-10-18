@@ -20,18 +20,14 @@ import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableWithLevelNode;
 import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.Processor;
-import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulatorService;
+
+import java.util.Locale;
 
 /**
  * perform semantics check on the name of a VariableNode. If a function is declared in the
  * repository, the same name can't be used as a variable name
  */
 public class VariableNameCheck implements Processor<VariableWithLevelNode> {
-  private final SymbolAccumulatorService symbolAccumulatorService;
-
-  public VariableNameCheck(SymbolAccumulatorService symbolAccumulatorService) {
-    this.symbolAccumulatorService = symbolAccumulatorService;
-  }
 
   @Override
   public void accept(
@@ -41,8 +37,8 @@ public class VariableNameCheck implements Processor<VariableWithLevelNode> {
         .map(ProgramNode.class::cast)
         .filter(
             pgm ->
-                !symbolAccumulatorService.isVariableNameAllowed(
-                    variableWithLevelNode.getName(), pgm))
+                pgm.getRepository()
+                    .containsKey(variableWithLevelNode.getName().toUpperCase(Locale.ROOT)))
         .map(
             x ->
                 MessageTemplate.of(
