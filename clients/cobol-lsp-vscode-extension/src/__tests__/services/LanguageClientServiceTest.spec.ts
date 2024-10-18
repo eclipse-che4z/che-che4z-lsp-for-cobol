@@ -46,7 +46,10 @@ jest.mock("vscode", () => ({
     }),
   },
   Position: class {
-    constructor(private line: number, private character: number) {}
+    constructor(
+      private line: number,
+      private character: number,
+    ) {}
   },
   RelativePattern: jest.fn().mockReturnValue(undefined),
 }));
