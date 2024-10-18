@@ -77,7 +77,7 @@ public class CliCFAST  implements Callable<Integer> {
 
   private void generateCFAST(File file, CFASTBuilder builder, Gson gson, Injector diCtx) {
     try {
-      Cli.Result analysisResult = parent.runAnalysis(file.getCanonicalFile(), CobolLanguageId.COBOL, diCtx, true);
+      Cli.Result analysisResult = parent.runAnalysis(file.getCanonicalFile(), CobolLanguageId.COBOL, diCtx, true, false);
       StageResult<ProcessingResult> result = (StageResult<ProcessingResult>) analysisResult.pipelineResult.getLastStageResult();
       ProgramNode programNode = result.getData().getRootNode().findFirstProgramNode();
       String json = gson.toJson(builder.build(programNode).getControlFlowAST());

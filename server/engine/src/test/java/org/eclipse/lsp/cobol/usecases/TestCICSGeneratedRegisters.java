@@ -72,7 +72,7 @@ public class TestCICSGeneratedRegisters {
         new AnalysisConfig(
                 CopybookProcessingMode.ENABLED,
             ImmutableList.of(),
-            false,
+            false, false,
             ImmutableList.of(),
             ImmutableMap.of());
 

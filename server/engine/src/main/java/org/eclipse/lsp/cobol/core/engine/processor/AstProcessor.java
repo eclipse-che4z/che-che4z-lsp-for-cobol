@@ -14,12 +14,16 @@
  */
 package org.eclipse.lsp.cobol.core.engine.processor;
 
+import lombok.extern.slf4j.Slf4j;
+import org.eclipse.lsp.cobol.cli.command.CliUtils;
+import org.eclipse.lsp.cobol.common.AnalysisConfig;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.ProcessingPhase;
 import org.eclipse.lsp.cobol.common.processor.Processor;
 import org.eclipse.lsp.cobol.common.utils.ThreadInterruptionUtil;
+import org.eclipse.lsp.cobol.core.engine.analysis.AnalysisContext;
 
 import java.util.List;
 import java.util.Map;
@@ -28,19 +32,28 @@ import java.util.Map;
  * AST processor. This class contains node type specific processors and handles abstract syntax tree
  * processing.
  */
+@Slf4j
 public class AstProcessor {
 
   /**
    * The entry point to AST processing
    *
-   * @param ctx processing context
-   * @param rootNode the root node of AST
+   * @param analysisConfig
+   * @param ctx             processing context
+   * @param analysisContext
+   * @param rootNode        the root node of AST
    * @return a list of errors
    */
-  public List<SyntaxError> processSyntaxTree(ProcessingContext ctx, Node rootNode) {
+  public List<SyntaxError> processSyntaxTree(AnalysisConfig analysisConfig, ProcessingContext ctx, AnalysisContext analysisContext, Node rootNode) {
+    if (analysisConfig.isCollectAstChanges()) {
+      analysisContext.logAst(null, CliUtils.GSON.toJsonTree(rootNode));
+    }
     for (ProcessingPhase phase : ProcessingPhase.values()) {
       ThreadInterruptionUtil.checkThreadInterrupted();
       process(phase, rootNode, ctx);
+      if (analysisConfig.isCollectAstChanges()) {
+        analysisContext.logAst(phase, CliUtils.GSON.toJsonTree(rootNode));
+      }
     }
     return ctx.getErrors();
   }

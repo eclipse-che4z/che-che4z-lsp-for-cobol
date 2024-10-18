@@ -150,7 +150,7 @@ class TestSqlIncludeStatementForImplicitlyDefinedCpy {
             ImmutableList.of(),
             new AnalysisConfig(
                     CopybookProcessingMode.ENABLED,
-                    ImmutableList.of(), true,
+                    ImmutableList.of(), true, false,
                     ImmutableList.of(),
                     ImmutableMap.of("target-sql-backend", new JsonPrimitive("DATACOM_SERVER"))));
   }
@@ -176,7 +176,7 @@ class TestSqlIncludeStatementForImplicitlyDefinedCpy {
             ImmutableList.of(),
             new AnalysisConfig(
                     CopybookProcessingMode.ENABLED,
-                    ImmutableList.of(), true,
+                    ImmutableList.of(), true, false,
                     ImmutableList.of(),
                     ImmutableMap.of("target-sql-backend", new JsonPrimitive("DATACOM_SERVER"))));
   }
@@ -205,7 +205,7 @@ class TestSqlIncludeStatementForImplicitlyDefinedCpy {
   void testStdSql() {
     AnalysisConfig analysisConfig = new AnalysisConfig(
             CopybookProcessingMode.ENABLED,
-            ImmutableList.of(), true,
+            ImmutableList.of(), true, false,
             ImmutableList.of(),
             ImmutableMap.of("target-sql-backend", new JsonPrimitive("DB2_SERVER")));
     analysisConfig.getCompilerOptions().add("STDSQL(YES)");

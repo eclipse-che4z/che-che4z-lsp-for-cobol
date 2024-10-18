@@ -15,6 +15,8 @@
 package org.eclipse.lsp.cobol.core.engine.analysis;
 
 import java.util.*;
+
+import com.google.gson.JsonElement;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -26,6 +28,7 @@ import org.eclipse.lsp.cobol.common.dialects.CobolLanguageId;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
+import org.eclipse.lsp.cobol.common.processor.ProcessingPhase;
 import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
 
 /**
@@ -42,6 +45,7 @@ public class AnalysisContext implements BenchmarkSessionProvider {
   private final String documentUri;
   private final String text;
   private final CobolLanguageId languageId;
+  private final Map<ProcessingPhase, JsonElement> astChanges = new HashMap<>();
 
   private @Setter List<Node> dialectNodes = new ArrayList<>();
   private @Setter CopybooksRepository copybooksRepository;
@@ -58,5 +62,15 @@ public class AnalysisContext implements BenchmarkSessionProvider {
     this.documentUri = documentUri;
     this.text = text;
     this.languageId = languageId;
+  }
+
+  /**
+   * Logs the Abstract Syntax Tree (AST) changes for a specific processing phase.
+   *
+   * @param phase The processing phase for which the AST changes are being logged.
+   * @param jsonTree The JSON representation of the AST changes.
+   */
+  public void logAst(ProcessingPhase phase, JsonElement jsonTree) {
+    astChanges.put(phase, jsonTree);
   }
 }

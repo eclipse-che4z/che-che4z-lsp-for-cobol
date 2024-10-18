@@ -27,7 +27,7 @@ public class DialectConfigs {
   public AnalysisConfig getIDMSAnalysisConfig() {
     return new AnalysisConfig(
             CopybookProcessingMode.DISABLED,
-        ImmutableList.of(IdmsDialect.NAME), true,
+        ImmutableList.of(IdmsDialect.NAME), true, false,
         ImmutableList.of(),
         ImmutableMap.of());
   }
