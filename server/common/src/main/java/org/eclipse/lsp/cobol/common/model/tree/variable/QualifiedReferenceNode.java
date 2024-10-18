@@ -32,7 +32,7 @@ import java.util.Optional;
 @EqualsAndHashCode(callSuper = true)
 @Slf4j
 public class QualifiedReferenceNode extends Node {
-  @Setter private VariableNode variableDefinitionNode;
+  @Setter private transient VariableNode variableDefinitionNode;
 
   public QualifiedReferenceNode(Locality location) {
     super(location, NodeType.QUALIFIED_REFERENCE_NODE);

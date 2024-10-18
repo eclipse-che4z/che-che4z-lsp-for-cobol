@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
 public class SubroutineDefinition {
   private final String subroutineName;
   private final Location location;
-  @EqualsAndHashCode.Exclude private final List<SubroutineNameNode> usages = new ArrayList<>();
+  @EqualsAndHashCode.Exclude private final transient List<SubroutineNameNode> usages = new ArrayList<>();
 
   public SubroutineDefinition(Location locality, String subroutineName) {
     this.location = locality;

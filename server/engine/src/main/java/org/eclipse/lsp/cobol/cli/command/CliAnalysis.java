@@ -40,6 +40,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.cli.di.CliModule;
 import org.eclipse.lsp.cobol.cli.modules.CliClientProvider;
 import org.eclipse.lsp.cobol.common.dialects.CobolLanguageId;
+import org.eclipse.lsp.cobol.common.model.tree.RootNode;
+import org.eclipse.lsp.cobol.common.pipeline.StageResult;
+import org.eclipse.lsp.cobol.dialects.ibm.ProcessingResult;
 import picocli.CommandLine;
 
 /**
@@ -68,6 +71,12 @@ public class CliAnalysis implements Callable<Integer> {
             names = {"-nd", "--no-diag", "--no-diagnostic", "--no-diagnostics"}
     )
     private boolean hideDiagnostics;
+
+    @CommandLine.Option(
+            description = "Add AST to output",
+            names = {"--ast"}
+    )
+    private boolean printTree = false;
 
     @CommandLine.ArgGroup(exclusive = false)
     private ExtendedSourceConfig extendedSourceConfig = new ExtendedSourceConfig();
@@ -104,6 +113,12 @@ public class CliAnalysis implements Callable<Integer> {
 
                 Cli.Result analysisResult = parent.runAnalysis(inputConfig.src, dialect, diCtx, true);
                 parent.addTiming(result, analysisResult.ctx.getBenchmarkSession());
+                if (printTree) {
+                    RootNode root = ((ProcessingResult) analysisResult.pipelineResult.getLastStageResult()
+                            .getData()).getRootNode();
+                    result.add("AST", CliUtils.GSON.toJsonTree(root));
+                }
+
                 if (!hideDiagnostics) {
                     generateDiagnostics(analysisResult, result);
                 }

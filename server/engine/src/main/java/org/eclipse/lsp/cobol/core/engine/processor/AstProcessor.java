@@ -14,6 +14,8 @@
  */
 package org.eclipse.lsp.cobol.core.engine.processor;
 
+import lombok.extern.slf4j.Slf4j;
+import org.eclipse.lsp.cobol.cli.command.CliUtils;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
@@ -28,6 +30,7 @@ import java.util.Map;
  * AST processor. This class contains node type specific processors and handles abstract syntax tree
  * processing.
  */
+@Slf4j
 public class AstProcessor {
 
   /**
@@ -38,9 +41,15 @@ public class AstProcessor {
    * @return a list of errors
    */
   public List<SyntaxError> processSyntaxTree(ProcessingContext ctx, Node rootNode) {
+    if (LOG.isTraceEnabled()) {
+        LOG.trace("Processor start ast: {}", CliUtils.GSON.toJson(rootNode));
+    }
     for (ProcessingPhase phase : ProcessingPhase.values()) {
       ThreadInterruptionUtil.checkThreadInterrupted();
       process(phase, rootNode, ctx);
+      if (LOG.isTraceEnabled()) {
+          LOG.trace("Processor ast after {}: {}", phase, CliUtils.GSON.toJson(rootNode));
+      }
     }
     return ctx.getErrors();
   }
