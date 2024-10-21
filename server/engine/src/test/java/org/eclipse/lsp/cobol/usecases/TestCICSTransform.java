@@ -15,8 +15,14 @@
 
 package org.eclipse.lsp.cobol.usecases;
 
+import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.usecases.common.CICSTestUtils;
+import org.eclipse.lsp4j.Diagnostic;
+import org.eclipse.lsp4j.DiagnosticSeverity;
+import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
+
+import java.util.HashMap;
 
 /**
  * Test CICS TRANSFORM command. Documentation link: <a
@@ -44,6 +50,9 @@ public class TestCICSTransform {
     private static final String TRANSFORM_XMLTODATA_VALID = "TRANSFORM XMLTODATA CHANNEL(3) DATCONTAINER(123) ELEMNAME(123) ELEMNAMELEN(123) ELEMNS(123) ELEMNSLEN(123) NSCONTAINER(123) TYPENAME(123) TYPENAMELEN(123) TYPENS(123) TYPENSLEN(123) XMLCONTAINER(123) XMLTRANSFORM(123)";
 
 
+    private static final String TRANSFORM_DATATOXML_INVALID = "TRANSFORM DATATOXML CHANNEL(3) DATCONTAINER(123) {NSCONTAINER|errorOne}(123) XMLTRANSFORM(123)";
+
+
     @Test
     protected void testDataToJSON() {
         CICSTestUtils.noErrorTest(TRANSFORM_DATATOJSON_VALID);
@@ -64,4 +73,17 @@ public class TestCICSTransform {
         CICSTestUtils.noErrorTest(TRANSFORM_XMLTODATA_VALID);
     }
 
+
+    @Test
+    protected void testInvalidDataToXML() {
+        HashMap<String, Diagnostic> tempDiagnostic = new HashMap<>();
+        tempDiagnostic.put("errorOne",
+                new Diagnostic(
+                        new Range(),
+                        "Invalid option provided: NSCONTAINER",
+                        DiagnosticSeverity.Error,
+                        ErrorSource.PARSING.getText()));
+
+        CICSTestUtils.errorTest(TRANSFORM_DATATOXML_INVALID, tempDiagnostic);
+    }
 }
