@@ -16,10 +16,6 @@ package org.eclipse.lsp.cobol.core.engine.processors;
 
 import com.google.common.collect.ImmutableList;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
-import org.eclipse.lsp.cobol.common.error.ErrorSource;
-import org.eclipse.lsp.cobol.common.error.SyntaxError;
-import org.eclipse.lsp.cobol.common.message.MessageTemplate;
 import org.eclipse.lsp.cobol.common.model.NodeType;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.model.tree.variable.QualifiedReferenceNode;
@@ -30,7 +26,6 @@ import org.eclipse.lsp.cobol.common.processor.CompilerDirectiveName;
 import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.Processor;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulatorService;
-import org.eclipse.lsp.cobol.common.model.tree.FigurativeConstants;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -38,9 +33,6 @@ import java.util.stream.Collectors;
 /** QualifiedReferenceNode processor */
 @Slf4j
 public class QualifiedReferenceUpdateVariableUsage implements Processor<QualifiedReferenceNode> {
-  private static final String NOT_DEFINED_ERROR = "semantics.notDefined";
-  private static final String AMBIGUOUS_REFERENCE_ERROR = "semantics.ambiguous";
-
   private final SymbolAccumulatorService symbolAccumulatorService;
 
   public QualifiedReferenceUpdateVariableUsage(SymbolAccumulatorService symbolAccumulatorService) {
@@ -90,48 +82,18 @@ public class QualifiedReferenceUpdateVariableUsage implements Processor<Qualifie
         definitionNode.addUsage(usageNode);
       }
     }
-    if (foundDefinitions.size() > 1) {
-      foundDefinitions =
-          foundDefinitions.stream()
-              .filter(d -> !d.getLocality().getUri().startsWith("implicit:"))
-              .collect(Collectors.toList());
-    }
-    if (foundDefinitions.size() == 1) {
-      return;
-    }
-    String dataName = variableUsageNodes.get(0).getName();
-    if (FigurativeConstants.FIGURATIVE_CONSTANTS.stream()
-        .anyMatch(e -> dataName.toUpperCase().equals(e))) {
-      return;
-    }
-
-    if (!variableUsageNodes.get(0).isDefinitionMandatory()) {
-      return;
-    }
-
-    SyntaxError error =
-        SyntaxError.syntaxError()
-            .errorSource(ErrorSource.PARSING)
-            .severity(ErrorSeverity.ERROR)
-            .location(node.getLocality().toOriginalLocation())
-            .messageTemplate(
-                MessageTemplate.of(
-                    foundDefinitions.isEmpty() ? NOT_DEFINED_ERROR : AMBIGUOUS_REFERENCE_ERROR,
-                    dataName))
-            .build();
-    ctx.getErrors().add(error);
-    LOG.debug("Syntax error by QualifiedReferenceNode " + error.toString());
   }
 
   private static boolean isQualifyExtendedDirectiveEnabled(ProcessingContext ctx) {
     return ctx.getCompilerDirectiveContext()
-            .filterDirectiveList(ImmutableList.of(CompilerDirectiveName.QUALIFY))
-            .filter(t -> !t.getValue().isEmpty())
-            .map(t -> t.getValue().get(t.getValue().size() - 1).equals("EXTEND"))
-            .orElse(false);
+        .filterDirectiveList(ImmutableList.of(CompilerDirectiveName.QUALIFY))
+        .filter(t -> !t.getValue().isEmpty())
+        .map(t -> t.getValue().get(t.getValue().size() - 1).equals("EXTEND"))
+        .orElse(false);
   }
 
-  private List<VariableNode> updateDefinitionForQualifyExtended(QualifiedReferenceNode node, List<VariableNode> foundDefinitions) {
+  private List<VariableNode> updateDefinitionForQualifyExtended(
+      QualifiedReferenceNode node, List<VariableNode> foundDefinitions) {
     List<VariableNode> definitionWithLevel01 =
         foundDefinitions.stream()
             .filter(VariableWithLevelNode.class::isInstance)

@@ -39,7 +39,7 @@ public class TestUTFPicClause {
           + "       LINKAGE SECTION.\n"
           + "       1 {$*str} PIC X(1024).\n"
           + "       PROCEDURE DIVISION.\n"
-          + "           MOVE FUNCTION DISPLAY-OF( FUNCTION NATIONAL-OF( {$str} ( 1: {$ln}\n"
+          + "           MOVE FUNCTION {$$DISPLAY-OF}( FUNCTION {$$NATIONAL-OF}( {$str} ( 1: {$ln}\n"
           + "            ) ) ) TO {$ubuff}.\n"
           + "       END PROGRAM 'DUMMY'.";
 

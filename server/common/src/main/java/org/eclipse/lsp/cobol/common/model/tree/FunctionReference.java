@@ -33,14 +33,18 @@ import com.google.common.collect.ImmutableList;
 @EqualsAndHashCode(callSuper = true)
 public class FunctionReference extends Node implements DefinedAndUsedStructure {
   final String name;
-  @Setter
-  private List<Location> definitions = ImmutableList.of();
-  @Setter
-  private List<Location> usages = ImmutableList.of();
+  @Setter private List<Location> definitions = ImmutableList.of();
+  @Setter private List<Location> usages = ImmutableList.of();
+  private final boolean isFunctionPrefixed;
 
   public FunctionReference(Locality locality, String name) {
+    this(locality, name, false);
+  }
+
+  public FunctionReference(Locality locality, String name, boolean isFunctionPrefixed) {
     super(locality, NodeType.FUNCTION_REFERENCE);
     this.name = name;
+    this.isFunctionPrefixed = isFunctionPrefixed;
   }
 
   @Override
