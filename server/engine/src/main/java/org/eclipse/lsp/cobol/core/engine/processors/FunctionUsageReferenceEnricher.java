@@ -67,12 +67,12 @@ public class FunctionUsageReferenceEnricher implements Processor<QualifiedRefere
 
     program.ifPresent(
         programNode -> {
-          int indexOfNode = node.getChildren().indexOf(dataNameNode);
+          int indexOfQualifiedNode = node.getParent().getChildren().indexOf(node);
           node.getChildren().remove(dataNameNode);
           FunctionReference functionReference =
               new FunctionReference(dataNameNode.getLocality(), dataNameNode.getName());
           functionReference.setDefinitions(functionInfo.getDefinition());
-          node.getChildren().add(indexOfNode, functionReference);
+          node.getParent().getChildren().add(indexOfQualifiedNode, functionReference);
         });
   }
 

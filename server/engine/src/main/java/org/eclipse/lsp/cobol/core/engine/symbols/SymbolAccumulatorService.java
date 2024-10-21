@@ -473,7 +473,7 @@ public class SymbolAccumulatorService implements VariableAccumulator {
 
   private FunctionInfo getDeclaredFunctionInfo(String functionName, boolean isImplicit) {
     if (isImplicit) {
-      return implicitFunctions.get(functionName);
+      return implicitFunctions.getOrDefault(functionName, new FunctionInfo());
     } else {
       return userDefinedFunctions.computeIfAbsent(functionName, k -> new FunctionInfo());
     }
