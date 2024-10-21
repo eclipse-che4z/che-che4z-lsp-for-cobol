@@ -22,6 +22,7 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.RuleNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.eclipse.lsp.cobol.AntlrRangeUtils;
 import org.eclipse.lsp.cobol.common.SubroutineService;
 import org.eclipse.lsp.cobol.common.dialects.CobolDialect;
 import org.eclipse.lsp.cobol.common.dialects.CobolProgramLayout;
@@ -1891,7 +1892,7 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
 
     void update(Token lastToken) {
       lastSentenseToken = lastToken;
-      lastSentensePosition = extendedDocument.mapLocation(constructRange(lastSentenseToken))
+      lastSentensePosition = extendedDocument.mapLocation(AntlrRangeUtils.constructRange(lastSentenseToken))
               .getRange().getEnd();
     }
 
