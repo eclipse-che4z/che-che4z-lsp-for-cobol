@@ -111,6 +111,62 @@ public abstract class CICSOptionsCheckBaseUtility {
     return true;
   }
 
+  protected void checkHasMandatoryOptions(TerminalNode rules, ParserRuleContext ctx, String options) {
+    ArrayList<TerminalNode> tempList = new ArrayList<>();
+    tempList.add(rules);
+    checkHasMandatoryOptions(tempList, ctx, options);
+  }
+
+  /**
+   *
+   * @param requiredContext - The rule that is required
+   * @param optionalContext - The rule that is optional
+   * @param ctx - The overall context.
+   * @param options - String of the element that is required.
+   */
+  protected <E extends ParseTree> void checkHasRequiredOption(List<E> requiredContext, List<E> optionalContext, ParserRuleContext ctx, String options) {
+    checkHasRequiredOption(isNodePresent(requiredContext), isNodePresent(optionalContext), ctx, options);
+  }
+
+  protected <E extends ParseTree> void checkHasRequiredOption(E requiredContext, List<TerminalNode> optionalContext, ParserRuleContext ctx, String options) {
+    checkHasRequiredOption(isNodePresent(requiredContext), isNodePresent(optionalContext), ctx, options);
+  }
+
+  protected <E extends ParseTree> void checkHasRequiredOption(List<E> requiredContext, E optionalContext, ParserRuleContext ctx, String options) {
+    checkHasRequiredOption(isNodePresent(requiredContext), isNodePresent(optionalContext), ctx, options);
+  }
+
+  protected <E extends ParseTree> void checkHasRequiredOption(E requiredContext, E optionalContext, ParserRuleContext ctx, String options) {
+    checkHasRequiredOption(isNodePresent(requiredContext), isNodePresent(optionalContext), ctx, options);
+  }
+
+  private <E extends ParseTree> Boolean isNodePresent(E node) {
+    return node != null;
+  }
+
+  private <E extends ParseTree> boolean isNodePresent(List<E> node) {
+    if (node == null || node.isEmpty()) {
+      return false;
+    }
+
+    for (E e : node) {
+      if (e != null) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private void checkHasRequiredOption(Boolean isRequiredContextPresent, Boolean isOptionalContextPresent, ParserRuleContext ctx, String options) {
+      if (!isRequiredContextPresent && isOptionalContextPresent) {
+        throwException(
+                ErrorSeverity.ERROR,
+                VisitorUtility.constructLocality(ctx, context),
+                "Missing required option for: " + options,
+                options);
+      }
+  }
+
   /**
    * Helper method to collect analysis errors if the rule context contains illegal options
    *
@@ -118,12 +174,61 @@ public abstract class CICSOptionsCheckBaseUtility {
    *     or TerminalNode
    * @param options Options checked to insert into error message
    */
-  protected void checkHasIllegalOptions(List<?> rules, String options) {
+  protected <E extends ParseTree> void checkHasIllegalOptions(List<E> rules, String options) {
     if (!rules.isEmpty()) {
       rules.forEach(
               error ->
                       throwException(
                               ErrorSeverity.ERROR, getLocality(error), "Invalid option provided: ", options));
+    }
+  }
+
+  /**
+   * Helper method to collect analysis errors if the rule context contains illegal options
+   *
+   * @param rule Generic rule to check
+   * @param options Options checked to insert into error message
+   */
+  protected void checkHasIllegalOptions(TerminalNode rule, String options) {
+    if (!rule.getText().isEmpty()) {
+      throwException(ErrorSeverity.ERROR, getLocality(rule), "Invalid option provided: ", options);
+    }
+  }
+
+  /**
+   * Helper function to check and see if more than one rule was visited out of a set provided.
+   *
+   * @param options Options checked to insert into error message
+   * @param rules Generic list of rules to check. Will be a collection of ParserRuleContext and/or TerminalNode objects.
+   * @param <E> Generic type to allow cross-rule context collection.
+   */
+  @SafeVarargs
+  protected final <E> void checkMutuallyExclusiveOptions(String options, E... rules) {
+    if (rules.length <= 1) {
+      return;
+    }
+
+    int rulesSeen = 0;
+
+    for (E rule : rules) {
+      if (rule == null) {
+          continue;
+      }
+
+      if (ParserRuleContext.class.isAssignableFrom(rule.getClass())) {
+        if (!((ParserRuleContext) rule).isEmpty()) {
+          rulesSeen++;
+        }
+      } else if (TerminalNode.class.isAssignableFrom(rule.getClass())) {
+        if (!((TerminalNode) rule).getText().isEmpty()) {
+          rulesSeen++;
+        }
+      }
+
+      if (rulesSeen > 1) {
+        throwException(ErrorSeverity.ERROR, getLocality(rule), "Options \"" + options + "\" are mutually exclusive, ", "");
+        break;
+      }
     }
   }
 
