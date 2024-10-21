@@ -112,6 +112,7 @@ local.properties
 /server/dialect-daco/gen
 /server/test/gen
 /server/parser/gen
+.antlr/
 
 # TeXlipse plugin
 .texlipse

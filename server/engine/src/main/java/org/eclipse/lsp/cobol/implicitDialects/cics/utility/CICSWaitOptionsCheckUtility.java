@@ -67,16 +67,25 @@ public class CICSWaitOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
    * @param <E> A subclass of ParserRuleContext
    */
   public <E extends ParserRuleContext> void checkOptions(E ctx) {
-    if (ctx.getClass() == CICSParser.Cics_wait_convidContext.class)
-      checkConvid((CICSParser.Cics_wait_convidContext) ctx);
-    else if (ctx.getClass() == CICSParser.Cics_wait_eventContext.class)
-      checkEvent((CICSParser.Cics_wait_eventContext) ctx);
-    else if (ctx.getClass() == CICSParser.Cics_wait_externalContext.class)
-      checkExternal((CICSParser.Cics_wait_externalContext) ctx);
-    else if (ctx.getClass() == CICSParser.Cics_wait_journalnameContext.class)
-      checkJournalName((CICSParser.Cics_wait_journalnameContext) ctx);
-    else if (ctx.getClass() == CICSParser.Cics_wait_terminalContext.class)
-      checkTerminal((CICSParser.Cics_wait_terminalContext) ctx);
+    switch (ctx.getRuleIndex()) {
+      case CICSParser.RULE_cics_wait_convid:
+        checkConvid((CICSParser.Cics_wait_convidContext) ctx);
+        break;
+      case CICSParser.RULE_cics_wait_event:
+        checkEvent((CICSParser.Cics_wait_eventContext) ctx);
+        break;
+      case CICSParser.RULE_cics_wait_external:
+        checkExternal((CICSParser.Cics_wait_externalContext) ctx);
+        break;
+      case CICSParser.RULE_cics_wait_journalname:
+        checkJournalName((CICSParser.Cics_wait_journalnameContext) ctx);
+        break;
+      case CICSParser.RULE_cics_wait_terminal:
+        checkTerminal((CICSParser.Cics_wait_terminalContext) ctx);
+        break;
+      default:
+        break;
+    }
     checkDuplicates(ctx);
   }
 

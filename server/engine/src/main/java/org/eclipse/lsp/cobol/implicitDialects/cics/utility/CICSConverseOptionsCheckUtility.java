@@ -22,9 +22,7 @@ import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.implicitDialects.cics.CICSLexer;
 import org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_converse;
 
@@ -64,9 +62,17 @@ public class CICSConverseOptionsCheckUtility extends CICSOptionsCheckBaseUtility
                 }
             };
 
+    private static final Map<Integer, String> DUPLICATE_RULES_CHECK = new HashMap<Integer, String>() {
+        {
+            put(CICSParser.RULE_cics_converse_fromlength, "FROMLENGTH or FROMFLENGTH");
+            put(CICSParser.RULE_cics_converse_tolength, "TOLENGTH or TOFLENGTH");
+            put(CICSParser.RULE_cics_maxlength, "MAXLENGTH or MAXFLENGTH");
+        }
+    };
+
     public CICSConverseOptionsCheckUtility(
             DialectProcessingContext context, List<SyntaxError> errors) {
-        super(context, errors, DUPLICATE_CHECK_OPTIONS);
+        super(context, errors, DUPLICATE_CHECK_OPTIONS, DUPLICATE_RULES_CHECK);
     }
 
     /**
@@ -76,7 +82,8 @@ public class CICSConverseOptionsCheckUtility extends CICSOptionsCheckBaseUtility
      * @param <E> A subclass of ParserRuleContext
      */
     public <E extends ParserRuleContext> void checkOptions(E ctx) {
-        switch (ctx.getRuleIndex()) {
+        int currIndex = ctx.getRuleIndex();
+        switch (currIndex) {
             case CICSParser.RULE_cics_converse_group_one:
                 checkGroupOne((CICSParser.Cics_converse_group_oneContext) ctx);
                 break;
@@ -89,17 +96,17 @@ public class CICSConverseOptionsCheckUtility extends CICSOptionsCheckBaseUtility
     }
 
     private void checkGroupOne(CICSParser.Cics_converse_group_oneContext ctx) {
-        checkHasMandatoryOptions(ctx.cics_converse_from(), ctx, "FROM");
         if (!ctx.ASIS().isEmpty()) {
             checkHasIllegalOptions(ctx.LEAVEKB(), "LEAVEKB");
         }
+        checkHasMandatoryOptions(ctx.FROM(), ctx, "FROM");
+        checkHasMandatoryOptions(ctx.cics_into(), ctx, "INTO or SET");
 
         checkDuplicates(ctx);
     }
 
     private void checkGroupTwo(CICSParser.Cics_converse_group_twoContext ctx) {
-        checkHasMandatoryOptions(ctx.cics_converse_from(), ctx, "FROM");
-        checkHasMandatoryOptions(ctx.cics_into(), ctx, "INTO");
+        checkHasMandatoryOptions(ctx.cics_into(), ctx, "INTO or SET");
 
         checkDuplicates(ctx);
     }

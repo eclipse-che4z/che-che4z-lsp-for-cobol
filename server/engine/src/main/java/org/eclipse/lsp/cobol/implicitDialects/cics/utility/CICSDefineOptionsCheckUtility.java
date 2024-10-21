@@ -91,24 +91,32 @@ public class CICSDefineOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
    * @param <E> A subclass of ParserRuleContext
    */
   public <E extends ParserRuleContext> void checkOptions(E ctx) {
-    if (ctx.getClass() == CICSParser.Cics_define_activityContext.class) {
-      checkActivity((CICSParser.Cics_define_activityContext) ctx);
-    } else if (ctx.getClass() == CICSParser.Cics_define_composite_eventContext.class) {
-      checkCompositeEvent((CICSParser.Cics_define_composite_eventContext) ctx);
-    } else if (ctx.getClass() == CICSParser.Cics_define_counter_dcounterContext.class) {
-      checkCounter((CICSParser.Cics_define_counter_dcounterContext) ctx);
-    } else if (ctx.getClass() == CICSParser.Cics_define_input_eventContext.class) {
-      checkInputEvent((CICSParser.Cics_define_input_eventContext) ctx);
-    } else if (ctx.getClass() == CICSParser.Cics_define_processContext.class) {
-      checkDefineProcess((CICSParser.Cics_define_processContext) ctx);
-    } else if (ctx.getClass() == CICSParser.Cics_define_timerContext.class) {
-      checkDefineTimer((CICSParser.Cics_define_timerContext) ctx);
+    switch (ctx.getRuleIndex()) {
+      case CICSParser.RULE_cics_define_activity:
+        checkActivity((CICSParser.Cics_define_activityContext) ctx);
+        break;
+      case CICSParser.RULE_cics_define_composite_event:
+        checkCompositeEvent((CICSParser.Cics_define_composite_eventContext) ctx);
+        break;
+      case CICSParser.RULE_cics_define_counter_dcounter:
+        checkCounter((CICSParser.Cics_define_counter_dcounterContext) ctx);
+        break;
+      case CICSParser.RULE_cics_define_input_event:
+        checkInputEvent((CICSParser.Cics_define_input_eventContext) ctx);
+        break;
+      case CICSParser.RULE_cics_define_process:
+        checkDefineProcess((CICSParser.Cics_define_processContext) ctx);
+        break;
+      case CICSParser.RULE_cics_define_timer:
+        checkDefineTimer((CICSParser.Cics_define_timerContext) ctx);
+        break;
+      default:
+        break;
     }
     checkDuplicates(ctx);
   }
 
   private void checkActivity(CICSParser.Cics_define_activityContext ctx) {
-    checkHasMandatoryOptions(ctx.ACTIVITY(), ctx, "ACTIVITY");
     checkHasMandatoryOptions(ctx.TRANSID(), ctx, "TRANSID");
   }
 
@@ -135,7 +143,6 @@ public class CICSDefineOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
   }
 
   private void checkDefineTimer(CICSParser.Cics_define_timerContext ctx) {
-    checkHasMandatoryOptions(ctx.TIMER(), ctx, "TIMER");
     if (ctx.AFTER().isEmpty()) {
       checkHasIllegalOptions(ctx.DAYS(), "DAYS");
       if (checkHasMandatoryOptions(ctx.AT(), ctx, "AT")) {

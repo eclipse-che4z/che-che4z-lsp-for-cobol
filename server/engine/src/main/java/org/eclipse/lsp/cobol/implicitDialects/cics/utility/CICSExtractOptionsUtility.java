@@ -136,24 +136,37 @@ public class CICSExtractOptionsUtility extends CICSOptionsCheckBaseUtility {
    * @param <E> A subclass of ParserRuleContext
    */
   public <E extends ParserRuleContext> void checkOptions(E ctx) {
-    if (ctx.getClass() == CICSParser.Cics_extract_attachContext.class)
-      checkAttach((CICSParser.Cics_extract_attachContext) ctx);
-    else if (ctx.getClass() == CICSParser.Cics_extract_attributesContext.class)
-      checkAttributes((CICSParser.Cics_extract_attributesContext) ctx);
-    else if (ctx.getClass() == CICSParser.Cics_extract_certificateContext.class)
-      checkCertificate((CICSParser.Cics_extract_certificateContext) ctx);
-    else if (ctx.getClass() == CICSParser.Cics_extract_logonmessageContext.class)
-      checkLogonMsg((CICSParser.Cics_extract_logonmessageContext) ctx);
-    else if (ctx.getClass() == CICSParser.Cics_extract_processContext.class)
-      checkProcess((CICSParser.Cics_extract_processContext) ctx);
-    else if (ctx.getClass() == CICSParser.Cics_extract_tcpipContext.class)
-      checkTcpIp((CICSParser.Cics_extract_tcpipContext) ctx);
-    else if (ctx.getClass() == CICSParser.Cics_extract_tctContext.class)
-      checkTCT((CICSParser.Cics_extract_tctContext) ctx);
-    else if (ctx.getClass() == CICSParser.Cics_extract_web_clientContext.class)
-      checkWebClient((CICSParser.Cics_extract_web_clientContext) ctx);
-    else if (ctx.getClass() == CICSParser.Cics_extract_web_serverContext.class)
-      checkWebServer((CICSParser.Cics_extract_web_serverContext) ctx);
+    switch (ctx.getRuleIndex()) {
+      case CICSParser.RULE_cics_extract_attach:
+        checkAttach((CICSParser.Cics_extract_attachContext) ctx);
+        break;
+      case CICSParser.RULE_cics_extract_attributes:
+        checkAttributes((CICSParser.Cics_extract_attributesContext) ctx);
+        break;
+      case CICSParser.RULE_cics_extract_certificate:
+        checkCertificate((CICSParser.Cics_extract_certificateContext) ctx);
+        break;
+      case CICSParser.RULE_cics_extract_logonmessage:
+        checkLogonMsg((CICSParser.Cics_extract_logonmessageContext) ctx);
+        break;
+      case CICSParser.RULE_cics_extract_process:
+        checkProcess((CICSParser.Cics_extract_processContext) ctx);
+        break;
+      case CICSParser.RULE_cics_extract_tcpip:
+        checkTcpIp((CICSParser.Cics_extract_tcpipContext) ctx);
+        break;
+      case CICSParser.RULE_cics_extract_tct:
+        checkTCT((CICSParser.Cics_extract_tctContext) ctx);
+        break;
+      case CICSParser.RULE_cics_extract_web_client:
+        checkWebClient((CICSParser.Cics_extract_web_clientContext) ctx);
+        break;
+      case CICSParser.RULE_cics_extract_web_server:
+        checkWebServer((CICSParser.Cics_extract_web_serverContext) ctx);
+        break;
+      default:
+        break;
+    }
     checkDuplicates(ctx);
   }
 
