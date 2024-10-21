@@ -102,13 +102,74 @@ public abstract class CICSOptionsCheckBaseUtility {
   protected boolean checkHasMandatoryOptions(List<?> rules, ParserRuleContext ctx, String options) {
     if (rules.isEmpty()) {
       throwException(
-          ErrorSeverity.ERROR,
-          VisitorUtility.constructLocality(ctx, context),
-          "Missing required option: ",
-          options);
+              ErrorSeverity.ERROR,
+              VisitorUtility.constructLocality(ctx, context),
+              "Missing required option: ",
+              options);
       return false;
     }
     return true;
+  }
+
+  protected void checkHasMandatoryOptions(TerminalNode rules, ParserRuleContext ctx, String options) {
+    ArrayList<TerminalNode> tempList = new ArrayList<>();
+    tempList.add(rules);
+    checkHasMandatoryOptions(tempList, ctx, options);
+  }
+
+  /**
+   *
+   * @param requiredContext - The rule that is required
+   * @param optionalContext - The rule that is optional
+   * @param options - String of the element that is required.
+   */
+  protected void checkHasRequiredOption(ParserRuleContext requiredContext, ParserRuleContext optionalContext, String options) {
+    checkHasRequiredOptionFromString(requiredContext.getText(), optionalContext.getText(), optionalContext, options);
+  }
+
+  /**
+   *
+   * @param requiredContext - The rule that is required
+   * @param optionalContext - The rule that is optional
+   * @param ctx - The overall context.
+   * @param options - String of the element that is required.
+   */
+  protected void checkHasRequiredOption(List<TerminalNode> requiredContext, List<TerminalNode> optionalContext, ParserRuleContext ctx, String options) {
+    checkHasRequiredOptionFromString(
+            (requiredContext.isEmpty() ? "" : requiredContext.get(0).getText()),
+            (optionalContext.isEmpty() ? "" : optionalContext.get(0).getText()),
+            ctx, options);
+  }
+
+  protected void checkHasRequiredOption(TerminalNode requiredContext, TerminalNode optionalContext, ParserRuleContext ctx, String options) {
+    checkHasRequiredOptionFromString(requiredContext.getText(), optionalContext.getText(), ctx, options);
+  }
+
+  protected void checkHasRequiredOption(ParserRuleContext requiredContext, TerminalNode optionalContext, ParserRuleContext ctx, String options) {
+    checkHasRequiredOptionFromString(requiredContext.getText(), optionalContext.getText(), ctx, options);
+  }
+
+  protected void checkHasRequiredOption(TerminalNode requiredContext, ParserRuleContext optionalContext, ParserRuleContext ctx, String options) {
+    checkHasRequiredOptionFromString(requiredContext.getText(), optionalContext.getText(), ctx, options);
+  }
+
+  protected void checkHasRequiredOption(TerminalNode requiredContext, List<TerminalNode> optionalContext, ParserRuleContext ctx, String options) {
+    checkHasRequiredOptionFromString(requiredContext.getText(), (optionalContext.isEmpty() ? "" : optionalContext.get(0).getText()), ctx, options);
+  }
+
+  protected void checkHasRequiredOption(List<TerminalNode> requiredContext, TerminalNode optionalContext, ParserRuleContext ctx, String options) {
+    checkHasRequiredOptionFromString((requiredContext.isEmpty() ? "" : requiredContext.get(0).getText()), optionalContext.getText(), ctx, options);
+  }
+
+
+  private void checkHasRequiredOptionFromString(String requiredContextText, String optionalContextText, ParserRuleContext ctx, String options) {
+    if (requiredContextText.isEmpty() && !optionalContextText.isEmpty()) {
+      throwException(
+              ErrorSeverity.ERROR,
+              VisitorUtility.constructLocality(ctx, context),
+              "Missing required option \"" + options + "\" for " + optionalContextText,
+              options);
+    }
   }
 
   /**
@@ -138,7 +199,7 @@ public abstract class CICSOptionsCheckBaseUtility {
     List<TerminalNode> respTwoResponseHandlers = new ArrayList<>();
     if (ruleHandlers.cics_inline_handle_exception() != null) {
       List<CICSParser.Cics_respContext> rules =
-          ruleHandlers.cics_inline_handle_exception().cics_resp();
+              ruleHandlers.cics_inline_handle_exception().cics_resp();
       for (CICSParser.Cics_respContext rule : rules) {
         if (rule.RESP() != null) respFound = true;
         if (rule.RESP2() != null) respTwoResponseHandlers.add(rule.RESP2());
@@ -164,14 +225,14 @@ public abstract class CICSOptionsCheckBaseUtility {
   }
 
   private void throwException(
-      ErrorSeverity errorSeverity, @NonNull Locality locality, String message, String wrongToken) {
+          ErrorSeverity errorSeverity, @NonNull Locality locality, String message, String wrongToken) {
     SyntaxError error =
-        SyntaxError.syntaxError()
-            .errorSource(ErrorSource.PARSING)
-            .location(locality.toOriginalLocation())
-            .suggestion(message + wrongToken)
-            .severity(errorSeverity)
-            .build();
+            SyntaxError.syntaxError()
+                    .errorSource(ErrorSource.PARSING)
+                    .location(locality.toOriginalLocation())
+                    .suggestion(message + wrongToken)
+                    .severity(errorSeverity)
+                    .build();
 
     LOG.debug("Syntax error by CobolVisitor#throwException: {}", error);
     if (!errors.contains(error)) {
@@ -261,51 +322,98 @@ public abstract class CICSOptionsCheckBaseUtility {
    */
   protected int checkHasMutuallyExclusiveOptions(String options, List<TerminalNode>... rules) {
     List<TerminalNode> nodes =
-        Stream.of(rules)
-            .filter(rule -> !rule.isEmpty())
-            .flatMap(Collection::stream)
-            .collect(Collectors.toList());
+            Stream.of(rules)
+                    .filter(rule -> !rule.isEmpty())
+                    .flatMap(Collection::stream)
+                    .collect(Collectors.toList());
     nodes.removeIf(Objects::isNull);
 
     // Only raise error if this validates mutual exclusivity and is not an artifact of duplicate
     // options
     if (!nodes.stream()
-        .allMatch(e -> e.getSymbol().getType() == nodes.get(0).getSymbol().getType())) {
+            .allMatch(e -> e.getSymbol().getType() == nodes.get(0).getSymbol().getType())) {
       nodes.forEach(
-          node -> {
-            throwException(
-                ErrorSeverity.ERROR,
-                getLocality(node),
-                "Exactly one option required, options are mutually exclusive: ",
-                options);
-          });
+              node -> {
+                throwException(
+                        ErrorSeverity.ERROR,
+                        getLocality(node),
+                        "Exactly one option required, options are mutually exclusive: ",
+                        options);
+              });
     }
     return nodes.size();
   }
 
+  /**
+   * Helper method to collect analysis errors if the rule context contains illegal options
+   *
+   * @param rule Generic rule to check
+   * @param options Options checked to insert into error message
+   */
+  protected void checkHasIllegalOptions(TerminalNode rule, String options) {
+    if (!rule.getText().isEmpty()) {
+      throwException(ErrorSeverity.ERROR, getLocality(rule), "Invalid option provided: ", options);
+    }
+  }
+
+  /**
+   * Helper function to check and see if more than one rule was visited out of a set provided.
+   *
+   * @param options Options checked to insert into error message
+   * @param rules Generic list of rules to check. Will be a collection of ParserRuleContext and/or TerminalNode objects.
+   * @param <E> Generic type to allow cross-rule context collection.
+   */
+  @SafeVarargs
+  protected final <E> void checkMutuallyExclusiveOptions(String options, E... rules) {
+    if (rules.length <= 1) {
+      return;
+    }
+
+    int rulesSeen = 0;
+
+    for (E rule : rules) {
+      if (ParserRuleContext.class.isAssignableFrom(rule.getClass())) {
+        if (!((ParserRuleContext) rule).isEmpty()) {
+          rulesSeen++;
+        }
+      } else if (TerminalNode.class.isAssignableFrom(rule.getClass())) {
+        if (!((TerminalNode) rule).getText().isEmpty()) {
+          rulesSeen++;
+        }
+      }
+
+      if (rulesSeen > 1) {
+        throwException(ErrorSeverity.ERROR, getLocality(rule), "Options \"" + options + "\" are mutually exclusive, ", "");
+        break;
+      }
+    }
+  }
+
+
+
   protected <E extends ParseTree> void checkHasExactlyOneOption(
-      String options, ParserRuleContext parentCtx, List<E>... rules) {
+          String options, ParserRuleContext parentCtx, List<E>... rules) {
 
     List<TerminalNode> children = new ArrayList<>();
 
     Stream.of(rules)
-        .filter(rule -> !rule.isEmpty())
-        .forEach(
-            rule -> {
-              rule.removeIf(Objects::isNull);
-              if (TerminalNode.class.isAssignableFrom(rule.get(0).getClass()))
-                children.addAll((List<TerminalNode>) rule);
-              else
-                rule.forEach(
-                    context -> getAllTokenChildren((ParserRuleContext) context, children, false));
-            });
+            .filter(rule -> !rule.isEmpty())
+            .forEach(
+                    rule -> {
+                      rule.removeIf(Objects::isNull);
+                      if (TerminalNode.class.isAssignableFrom(rule.get(0).getClass()))
+                        children.addAll((List<TerminalNode>) rule);
+                      else
+                        rule.forEach(
+                                context -> getAllTokenChildren((ParserRuleContext) context, children, false));
+                    });
 
     if (checkHasMutuallyExclusiveOptions(options, children) == 0) {
       throwException(
-          ErrorSeverity.ERROR,
-          getLocality(parentCtx),
-          "Exactly one option required, none provided: ",
-          options);
+              ErrorSeverity.ERROR,
+              getLocality(parentCtx),
+              "Exactly one option required, none provided: ",
+              options);
     }
   }
 

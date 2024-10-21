@@ -46,8 +46,9 @@ public class CICSOptionsCheckUtility {
         CICSDefineOptionsCheckUtility.RULE_INDEX,
         new CICSDefineOptionsCheckUtility(context, errors));
     optionsMap.put(
-        CICSIssueOptionsCheckUtility.RULE_INDEX,
-        new CICSIssueOptionsCheckUtility(context, errors));
+        CICSIssueOptionsCheckUtility.RULE_INDEX, new CICSIssueOptionsCheckUtility(context, errors));
+    optionsMap.put(
+        CICSStartbrowseOptionsCheckUtility.RULE_INDEX, new CICSStartbrowseOptionsCheckUtility(context, errors));
     optionsMap.put(
         CICSAddSubeventOptionsCheckUtility.RULE_INDEX,
         new CICSAddSubeventOptionsCheckUtility(context, errors));
