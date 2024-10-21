@@ -63,6 +63,12 @@ public class CICSOptionsCheckUtility {
     optionsMap.put(
         CICSCancelOptionsCheckUtility.RULE_INDEX,
         new CICSCancelOptionsCheckUtility(context, errors));
+    optionsMap.put(
+        CICSEndBrowseOptionsUtility.RULE_ENDBR_INDEX,
+        new CICSEndBrowseOptionsUtility(context, errors));
+    optionsMap.put(
+        CICSEndBrowseOptionsUtility.RULE_ENDBROWSE_INDEX,
+        new CICSEndBrowseOptionsUtility(context, errors));
   }
 
   /**
