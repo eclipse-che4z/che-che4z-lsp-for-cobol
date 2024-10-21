@@ -18,7 +18,6 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Multimap;
 import lombok.Getter;
-import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
@@ -159,7 +158,7 @@ public class SymbolAccumulatorService implements VariableAccumulator {
             .filter(it -> filterNodes(it, node))
             .collect(Collectors.toList());
 
-    if (definitions.size() == 0) {
+    if (definitions.isEmpty()) {
       return Optional.of(
           SyntaxError.syntaxError()
               .errorSource(ErrorSource.PARSING)
@@ -291,7 +290,7 @@ public class SymbolAccumulatorService implements VariableAccumulator {
   public Optional<SyntaxError> registerFunctionReferenceNode(ProgramNode callingProgram, FunctionReference function) {
     String functionName = function.getName().toUpperCase();
     boolean isDeclared = callingProgram.getRepository().containsKey(functionName);
-    Boolean isImplicit = Optional.ofNullable(callingProgram.getRepository().get(functionName)).map(Pair::getRight).orElse(false);
+    Boolean isImplicit = Optional.ofNullable(callingProgram.getRepository().get(functionName)).orElse(false);
     FunctionInfo fi = getFunctionInfo(functionName, isDeclared, isImplicit);
     fi.usage.add(function.getLocality().toLocation());
     function.setDefinitions(fi.getDefinition());
@@ -346,7 +345,7 @@ public class SymbolAccumulatorService implements VariableAccumulator {
    * @return the block reference or null if not found
    */
   public FunctionInfo getFunctionReference(String name, ProgramNode programNode) {
-    Boolean isDeclaredIntrinsic = Optional.ofNullable(programNode.getRepository().get(name.toUpperCase(Locale.ROOT))).map(Pair::getRight).orElse(false);
+    Boolean isDeclaredIntrinsic = Optional.ofNullable(programNode.getRepository().get(name.toUpperCase(Locale.ROOT))).orElse(false);
     if (isDeclaredIntrinsic) {
         return implicitFunctions.get(name.toUpperCase());
     } else {

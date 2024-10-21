@@ -15,7 +15,6 @@
 package org.eclipse.lsp.cobol.core.engine.processors;
 
 import lombok.AllArgsConstructor;
-import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
@@ -47,12 +46,19 @@ public class ProgramRepositoryEnricher implements Processor<FunctionDeclaration>
         .getProgram()
         .ifPresent(
             program -> {
-              Map<String, Pair<String, Boolean>> repository = program.getRepository();
+              Map<String, Boolean> repository = program.getRepository();
 
+                //  function-name collision with the implicitly available function names is possible.
+                //  Normally this would lead to error,but NOT when `function all intrinsic` clause is used as the
+                //  last declaration in the chain of declarations.
+                //  For example below is a valid syntax:
+                //        `               function hex-of
+                //                        function all intrinsic.`
+                //  In this case we simply replace any collision (hex-of in above example) as an intrinsic references.
               if (functionDeclaration.isDeclareAllIntrinsicFunctions()) {
                 symbolAccumulatorService
                     .getAllImplicitFunctionNames()
-                    .forEach(name -> repository.put(name, Pair.of(name, true)));
+                    .forEach(name -> repository.put(name, true));
               }
 
               getFunctionReferences(functionDeclaration)
@@ -64,7 +70,7 @@ public class ProgramRepositoryEnricher implements Processor<FunctionDeclaration>
   }
 
   private void addOrValidateFunction(
-      Map<String, Pair<String, Boolean>> repository,
+      Map<String, Boolean> repository,
       FunctionReference reference,
       FunctionDeclaration functionDeclaration,
       ProcessingContext processingContext) {
@@ -72,13 +78,13 @@ public class ProgramRepositoryEnricher implements Processor<FunctionDeclaration>
     repository.compute(
         reference.getName().toUpperCase(Locale.ROOT),
         (key, existingValue) -> {
-          if (existingValue != null && existingValue.getRight() != isIntrinsic) {
+          if (existingValue != null && existingValue != isIntrinsic) {
             addError(
                 processingContext,
                 reference,
                 "Name '%s' was previously defined in the REPOSITORY paragraph.", reference.getName());
           }
-          return existingValue != null ? existingValue : Pair.of(key, isIntrinsic);
+          return existingValue != null ? existingValue : isIntrinsic;
         });
   }
 
