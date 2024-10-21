@@ -747,18 +747,9 @@ cics_syncpoint: SYNCPOINT (cics_handle_response | ROLLBACK)*;
 cics_test: TEST (EVENT cics_data_value | FIRESTATUS cics_cvda | cics_handle_response)+;
 
 /** TRANSFORM DATATOXML / XMLTODATA */
-cics_transform: TRANSFORM (cics_transform_datatoxml | cics_transform_xmltodata);
-cics_transform_datatoxml: DATATOXML (CHANNEL cics_data_value | DATCONTAINER cics_data_value | cics_transform_elemname
-                          cics_transform_elemns | cics_transform_typenamens | XMLCONTAINER cics_data_value |
-                          XMLTRANSFORM cics_name | cics_handle_response)+;
-cics_transform_typenamens: (cics_transform_typename | cics_transform_typens)+;
-cics_transform_typename: (TYPENAME cics_data_area | TYPENAMELEN cics_data_area)+;
-cics_transform_typens: (TYPENS cics_data_area | TYPENSLEN cics_data_area)+;
-cics_transform_elemns: (ELEMNS cics_data_area | ELEMNSLEN cics_data_area)+;
-cics_transform_elemname: (ELEMNAME cics_data_area | ELEMNAMELEN cics_data_area)+;
-cics_transform_xmltodata: XMLTODATA (CHANNEL cics_data_value | DATCONTAINER cics_data_value | cics_transform_elemname |
-                          cics_transform_elemns | NSCONTAINER cics_data_value | cics_transform_typename |
-                          cics_transform_typens | XMLCONTAINER cics_data_value | XMLTRANSFORM cics_name | cics_handle_response)+;
+cics_transform: TRANSFORM (cics_transform_json | cics_transform_xml);
+cics_transform_json: (DATATOJSON|JSONTODATA) ((CHANNEL | INCONTAINER | OUTCONTAINER) cics_data_value | TRANSFORMER cics_name | cics_handle_response)+;
+cics_transform_xml: (DATATOXML|XMLTODATA) ((CHANNEL | DATCONTAINER | XMLCONTAINER | NSCONTAINER) cics_data_value | (ELEMNAME | ELEMNAMELEN | ELEMNS | ELEMNSLEN | TYPENAME | TYPENAMELEN | TYPENS | TYPENSLEN) cics_data_area | XMLTRANSFORM cics_name | cics_handle_response)+;
 
 /** UNLOCK */
 cics_unlock: UNLOCK cics_file_name (TOKEN cics_data_area | SYSID cics_data_area | cics_handle_response)*;
