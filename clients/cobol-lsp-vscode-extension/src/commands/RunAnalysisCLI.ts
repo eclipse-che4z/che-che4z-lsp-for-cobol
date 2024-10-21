@@ -48,7 +48,7 @@ export class RunAnalysis {
 
     const result = {} as Partial<AnalysisResults>;
     await this.getVersionToRun(result);
-    await this.getCopybookConfigLocation(result);
+    this.getCopybookConfigLocation(result);
     const showDiagnosticsResult = await this.getShowDiagnosticsChoice();
 
     if (
@@ -81,7 +81,7 @@ export class RunAnalysis {
   /**
    * Prompt the user for the location of the copybook config file.
    */
-  public async getCopybookConfigLocation(result: Partial<AnalysisResults>) {
+  public getCopybookConfigLocation(result: Partial<AnalysisResults>) {
     result.copybookLocation = "";
   }
 

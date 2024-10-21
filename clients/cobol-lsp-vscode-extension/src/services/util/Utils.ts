@@ -15,7 +15,7 @@
 import * as vscode from "vscode";
 import { ResolvedProfile } from "../../type/e4eApi";
 
-async function safeActivate(ext: vscode.Extension<any>) {
+async function safeActivate(ext: vscode.Extension<unknown>) {
   try {
     return await ext.activate();
   } catch (_) {
@@ -24,8 +24,8 @@ async function safeActivate(ext: vscode.Extension<any>) {
 }
 
 async function extractApi<T>(
-  ext: vscode.Extension<any>,
-  validate: (api: any) => api is T,
+  ext: vscode.Extension<unknown>,
+  validate: (api: unknown) => api is T,
 ): Promise<T | undefined> {
   const api = ext.isActive ? ext.exports : await safeActivate(ext);
   if (!validate(api)) return undefined;
@@ -39,7 +39,7 @@ function asAPI<T>(api: T | undefined) {
 
 export async function getExtensionApi<T>(
   extName: string,
-  validate: (api: any) => api is T,
+  validate: (api: unknown) => api is T,
 ): Promise<
   undefined | { api: T } | { futureApi: Promise<undefined | { api: T }> }
 > {
@@ -49,11 +49,11 @@ export async function getExtensionApi<T>(
   }
   return {
     futureApi: new Promise((res, _) => {
-      const extAdded = vscode.extensions.onDidChange(() => {
+      const extAdded = vscode.extensions.onDidChange(async () => {
         const ext = vscode.extensions.getExtension(extName);
         if (!ext) return;
         extAdded.dispose();
-        extractApi<T>(ext, validate).then((api) => res(asAPI<T>(api)));
+        await extractApi<T>(ext, validate).then((api) => res(asAPI<T>(api)));
       });
     }),
   };
@@ -84,7 +84,7 @@ export class Utils {
   public static async getZoweExplorerAPI() {
     return getExtensionApi<IApiRegisterClient>(
       "Zowe.vscode-extension-for-zowe",
-      (api: any): api is IApiRegisterClient => !!api,
+      (api: unknown): api is IApiRegisterClient => !!api,
     );
   }
 

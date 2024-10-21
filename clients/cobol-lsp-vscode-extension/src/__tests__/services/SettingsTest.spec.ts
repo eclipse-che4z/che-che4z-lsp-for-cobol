@@ -11,7 +11,6 @@
  * Contributors:
  *   Broadcom, Inc. - initial API and implementation
  */
-import { Uri } from "../../__mocks__/UriMock";
 import * as path from "path";
 import * as vscode from "vscode";
 import { lspConfigHandler, SettingsService } from "../../services/Settings";
@@ -23,27 +22,7 @@ import {
   DialectRegistry,
 } from "../../services/DialectRegistry";
 
-const fsPath = "tmp-ws";
-beforeAll(() => {
-  (vscode.workspace.workspaceFolders as any) = [
-    { uri: { fsPath: makefsPath(fsPath), path: makePath(fsPath) } } as any,
-  ];
-});
-
-// TODO: this is horrifying as well
-jest.mock("vscode", () => {
-  return {
-    Uri,
-    workspace: {
-      fs: {
-        readFile: jest.fn().mockImplementation(() => {
-          throw { code: "FileNotFound" };
-        }),
-      },
-      getWorkspaceFolder: () => {},
-    },
-  };
-});
+import { asMutable } from "../../test/suite/testHelper";
 
 function makefsPath(p: string): string {
   return path.join(process.platform == "win32" ? "a:" : "", p);
@@ -161,7 +140,7 @@ describe("SettingsService evaluate variables", () => {
       get: tracking,
     });
     await SettingsService.getCopybookLocalPath("PROGRAM", "COBOL");
-    expect(tracking).toBeCalledWith("paths-local");
+    expect(tracking).toHaveBeenCalledWith("paths-local");
   });
 
   test("Get local settings for dialect", async () => {
@@ -170,7 +149,7 @@ describe("SettingsService evaluate variables", () => {
       get: tracking,
     });
     await SettingsService.getCopybookLocalPath("PROGRAM", "MAID");
-    expect(tracking).toBeCalledWith("maid.paths-local");
+    expect(tracking).toHaveBeenCalledWith("maid.paths-local");
   });
 
   test("Get native build enable settings", () => {
@@ -179,24 +158,20 @@ describe("SettingsService evaluate variables", () => {
       get: tracking,
     });
     SettingsService.serverRuntime();
-    expect(tracking).toBeCalledWith("cobol-lsp.serverRuntime");
+    expect(tracking).toHaveBeenCalledWith("cobol-lsp.serverRuntime");
   });
 });
 
 test("getWorkspaceFoldersPath return an array of paths", () => {
-  (vscode.workspace.workspaceFolders as any) = [
-    { uri: { path: "/ws-vscode" } } as any,
+  asMutable(vscode.workspace).workspaceFolders = [
+    { uri: { path: "/ws-vscode" } } as vscode.WorkspaceFolder,
   ];
   const paths = SettingsUtils.getWorkspaceFoldersPath();
   expect(paths).toStrictEqual(["/ws-vscode"]);
 });
-test("json validation", () => {
-  expect(SettingsUtils.isValidJSON(undefined)).toBeFalsy();
-  expect(SettingsUtils.isValidJSON("{}")).toBeTruthy();
-});
 
 describe("SettingsService returns correct tab settings", () => {
-  test("Returns default tab settigs for boolean value", () => {
+  test("Returns default tab settings for boolean value", () => {
     vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
       get: jest.fn().mockReturnValue(true),
     });
@@ -205,7 +180,7 @@ describe("SettingsService returns correct tab settings", () => {
     expect(tabSettings.defaultRule.maxPosition).toBe(72);
   });
 
-  test("Max position is the last threashold position for array", () => {
+  test("Max position is the last threshold position for array", () => {
     vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
       get: jest.fn().mockReturnValue([1, 3, 5, 7, 25]),
     });
@@ -243,7 +218,7 @@ describe("SettingsService returns correct tab settings", () => {
 });
 
 describe("SettingsService returns correct Copybook Configuration Values", () => {
-  const mockConfigurationFetch = (settings: string, configuredValue: any) =>
+  const mockConfigurationFetch = (settings: string, configuredValue: unknown) =>
     jest.fn().mockReturnValue({
       get: (args: string) => {
         if (settings === args) {

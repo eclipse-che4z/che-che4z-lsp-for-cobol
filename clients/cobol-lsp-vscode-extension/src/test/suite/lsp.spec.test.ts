@@ -178,15 +178,15 @@ suite("Integration Test Suite", function () {
     await helper.showDocument("ADSORT.cbl");
     const editor = helper.getEditor("ADSORT.cbl");
     await helper.waitFor(async () => {
-      helper.sleep(100);
-      const result: any[] = await vscode.commands.executeCommand(
+      await helper.sleep(100);
+      const result = await vscode.commands.executeCommand<vscode.Location[]>(
         "vscode.executeDefinitionProvider",
         editor.document.uri,
         pos(58, 36),
       );
       return result.length > 0;
     });
-    const result: any[] = await vscode.commands.executeCommand(
+    const result = await vscode.commands.executeCommand<vscode.Location[]>(
       "vscode.executeDefinitionProvider",
       editor.document.uri,
       pos(58, 36),

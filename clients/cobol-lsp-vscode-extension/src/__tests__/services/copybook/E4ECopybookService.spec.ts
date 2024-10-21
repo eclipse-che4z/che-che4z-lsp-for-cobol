@@ -33,12 +33,11 @@ describe("e4e copybook service tests", () => {
     const getExtension = jest.fn();
     const dispose = jest.fn();
     let changeCallback: unknown;
-    const onDidChange = jest.fn((fn) => {
+    vscode.extensions.getExtension = getExtension;
+    jest.spyOn(vscode.extensions, "onDidChange").mockImplementation((fn) => {
       changeCallback = fn;
       return { dispose };
     });
-    vscode.extensions.getExtension = getExtension;
-    (vscode.extensions as any).onDidChange = onDidChange;
 
     const api = await getE4EAPI();
     expect(api).toHaveProperty("futureApi");

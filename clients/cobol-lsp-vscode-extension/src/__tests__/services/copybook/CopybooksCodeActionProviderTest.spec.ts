@@ -19,30 +19,20 @@ import { Utils } from "../../../services/util/Utils";
 
 describe("Test Copybook code action provider", () => {
   const copybooksCodeAction = new CopybooksCodeActionProvider();
-  const doc = { uri: { fsPath: "ws-path" }, fileName: "testFile" } as any;
-  const range = {
-    start: { line: 4, character: 5 },
-    end: { line: 4, character: 6 },
-  };
+  const doc = {
+    uri: vscode.Uri.file("ws-path"),
+    fileName: "testFile",
+  } as vscode.TextDocument;
+  const range = new vscode.Range(
+    new vscode.Position(4, 5),
+    new vscode.Position(4, 6),
+  );
   const token = {
     isCancellationRequested: false,
     onCancellationRequested: jest.fn(),
   };
 
   beforeAll(() => {
-    (vscode.extensions as any) = {
-      getExtension: jest.fn().mockReturnValue({
-        extensionPath: "/test",
-        packageJSON: {
-          version: 1,
-        },
-      }),
-    };
-
-    (vscode.CodeActionKind as any) = {
-      QuickFix: 1,
-    };
-    (vscode.CodeAction as any) = jest.fn();
     TelemetryService.registerEvent = jest.fn();
     Utils.getZoweExplorerAPI = jest.fn();
   });
@@ -51,21 +41,18 @@ describe("Test Copybook code action provider", () => {
     jest.clearAllMocks();
   });
 
-  test("code action is not triggred when diaognosis not completed", async () => {
-    const context = { triggerKind: {}, diagnostics: [], only: undefined };
+  test("code action is not triggered when diagnosis not completed", () => {
+    const context = {
+      triggerKind: {},
+      diagnostics: [],
+      only: undefined,
+    } as unknown as vscode.CodeActionContext;
     expect(
-      (
-        await copybooksCodeAction.provideCodeActions(
-          doc,
-          range as any,
-          context as any,
-          token,
-        )
-      ).length,
+      copybooksCodeAction.provideCodeActions(doc, range, context, token).length,
     ).toBe(0);
   });
 
-  test("code action is not triggred even if diaognosis is completed with code different then `missing copybook` ", async () => {
+  test("code action is not triggered even if diagnosis is completed with code different then `missing copybook` ", () => {
     const context = {
       triggerKind: {},
       diagnostics: [
@@ -78,20 +65,13 @@ describe("Test Copybook code action provider", () => {
         },
       ],
       only: undefined,
-    };
+    } as unknown as vscode.CodeActionContext;
     expect(
-      (
-        await copybooksCodeAction.provideCodeActions(
-          doc,
-          range as any,
-          context as any,
-          token,
-        )
-      ).length,
+      copybooksCodeAction.provideCodeActions(doc, range, context, token).length,
     ).toBe(0);
   });
 
-  test("code action is triggred when diaognosis completed and diaognis code is `missing copybook`", async () => {
+  test("code action is triggered when diagnosis completed and diagnosis code is `missing copybook`", () => {
     const context = {
       triggerKind: {},
       diagnostics: [
@@ -104,16 +84,9 @@ describe("Test Copybook code action provider", () => {
         },
       ],
       only: undefined,
-    };
+    } as unknown as vscode.CodeActionContext;
     expect(
-      (
-        await copybooksCodeAction.provideCodeActions(
-          doc,
-          range as any,
-          context as any,
-          token,
-        )
-      ).length,
+      copybooksCodeAction.provideCodeActions(doc, range, context, token).length,
     ).toBe(1);
     expect(TelemetryService.registerEvent).toHaveBeenCalledWith(
       "QuickFix for copybook activation",

@@ -36,12 +36,10 @@ export class SnippetCompletionProvider
   snippetsCompletionItems: vscode.CompletionItem[] | null = null;
 
   constructor(context: vscode.ExtensionContext) {
-    const disposable = vscode.workspace.onDidChangeConfiguration(
-      async (event) => {
-        if (event.affectsConfiguration(SETTINGS_DIALECT))
-          this.resetSnippetsCompletionItems();
-      },
-    );
+    const disposable = vscode.workspace.onDidChangeConfiguration((event) => {
+      if (event.affectsConfiguration(SETTINGS_DIALECT))
+        this.resetSnippetsCompletionItems();
+    });
     context.subscriptions.push(disposable);
   }
 

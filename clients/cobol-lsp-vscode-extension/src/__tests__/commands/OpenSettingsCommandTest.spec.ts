@@ -27,12 +27,12 @@ test("check gotoCopybookSettings calls telemetry services and vscode execute com
   expect(gotoCopybookSettings).toBeTruthy();
   gotoCopybookSettings();
 
-  expect(TelemetryService.registerEvent).toBeCalledWith(
+  expect(TelemetryService.registerEvent).toHaveBeenCalledWith(
     "Open copybook settings",
     ["COBOL", "copybook", "settings"],
     "The user invokes the open settings quick fix to see the copybook locations stored in the settings file",
   );
-  expect(vscode.commands.executeCommand).toBeCalledWith(
+  expect(vscode.commands.executeCommand).toHaveBeenCalledWith(
     "workbench.action.openSettings",
     "cobol-lsp.cpy-manager",
   );

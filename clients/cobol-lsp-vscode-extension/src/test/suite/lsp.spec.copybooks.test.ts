@@ -170,7 +170,7 @@ suite("Integration Test Suite: Copybooks", function () {
     .timeout(helper.TEST_TIMEOUT)
     .slow(1000);
 
-  test("TC247497 - Local Copybooks - check hidden folders under c4z", async () => {
+  test("TC247497 - Local Copybooks - check hidden folders under c4z", () => {
     const extSrcPath = path.join(getWorkspacePath(), ".c4z", ".extsrcs");
     const extSrcUri = vscode.Uri.file(extSrcPath);
     const hiddenFolder = vscode.workspace.getWorkspaceFolder(extSrcUri);

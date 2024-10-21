@@ -47,9 +47,10 @@ import { ConfigurationWatcher } from "./services/util/ConfigurationWatcher";
 import * as path from "node:path";
 import { Utils } from "./services/util/Utils";
 import { getE4EAPI } from "./services/copybook/E4ECopybookService";
+import { getErrorMessage } from "./services/util/ErrorsUtils";
 
 interface __AnalysisApi {
-  analysis(uri: string, text: string, pos?: vscode.Position): Promise<any>;
+  analysis(uri: string, text: string, pos?: vscode.Position): Promise<unknown>;
 }
 
 let languageClientService: LanguageClientService;
@@ -62,7 +63,9 @@ async function initialize(context: vscode.ExtensionContext) {
   try {
     await vscode.workspace.fs.createDirectory(context.globalStorageUri);
   } catch (error) {
-    const message = `${FAIL_CREATE_GLOBAL_STORAGE_MSG}: ${error}`;
+    const message = `${FAIL_CREATE_GLOBAL_STORAGE_MSG}: ${getErrorMessage(
+      error,
+    )}`;
     outputChannel.appendLine(message);
     throw Error(message);
   }
@@ -75,14 +78,14 @@ async function initialize(context: vscode.ExtensionContext) {
     outputChannel,
   );
   if (maybeZowe && "futureApi" in maybeZowe) {
-    maybeZowe.futureApi.then((api) => {
+    void maybeZowe.futureApi.then((api) => {
       if (api) copyBooksDownloader.explorerAppeared(api.api);
     });
   }
 
   if (!maybeE4E) outputChannel.appendLine(E4E_INCOMPATIBLE);
   else if ("futureApi" in maybeE4E)
-    maybeE4E.futureApi.then((api) => {
+    void maybeE4E.futureApi.then((api) => {
       if (api) copyBooksDownloader.e4eAppeared(api.api);
       else outputChannel.appendLine(E4E_INCOMPATIBLE);
     });
@@ -138,15 +141,17 @@ export async function activate(
     } else {
       await languageClientService.checkPrerequisites();
     }
-  } catch (err: any) {
-    outputChannel.appendLine(err.toString());
-    languageClientService.enableNativeBuild();
-    TelemetryService.registerExceptionEvent(
-      "RuntimeException",
-      err.toString(),
-      ["bootstrap", "experiment-tag"],
-      "Client has wrong Java version installed. Native builds activated.",
-    );
+  } catch (err) {
+    if (err instanceof Error) {
+      outputChannel.appendLine(err.toString());
+      languageClientService.enableNativeBuild();
+      TelemetryService.registerExceptionEvent(
+        "RuntimeException",
+        err.toString(),
+        ["bootstrap", "experiment-tag"],
+        "Client has wrong Java version installed. Native builds activated.",
+      );
+    }
   }
 
   // Custom client handlers
@@ -188,7 +193,7 @@ export async function activate(
       },
     },
     version: API_VERSION,
-    analysis(uri: string, text: string, pos?: vscode.Position): Promise<any> {
+    analysis(uri: string, text: string, pos?: vscode.Position) {
       return languageClientService.retrieveAnalysis(
         uri,
         text,
@@ -248,11 +253,11 @@ const registerNewDialect = async (
     dialect.snippets.fsPath,
   );
   outputChannel.appendLine("Restart analysis");
-  languageClientService.invalidateConfiguration();
+  await languageClientService.invalidateConfiguration();
 
-  const unregisterDialect = () => {
+  const unregisterDialect = async () => {
     DialectRegistry.unregister(dialect.name);
-    languageClientService.invalidateConfiguration();
+    await languageClientService.invalidateConfiguration();
   };
 
   return unregisterDialect;
@@ -265,8 +270,8 @@ function registerCommands(
   context.subscriptions.push(
     vscode.commands.registerCommand(
       "cobol-lsp.cpy-manager.fetch-copybook",
-      (copybook, programName) => {
-        fetchCopybookCommand(copybook, copyBooksDownloader, programName);
+      async (copybook: string, programName: string) => {
+        await fetchCopybookCommand(copybook, copyBooksDownloader, programName);
       },
     ),
   );
@@ -288,8 +293,8 @@ function registerCommands(
   context.subscriptions.push(
     vscode.commands.registerCommand(
       "cobol-lsp.clear.downloaded.copybooks",
-      () => {
-        clearCache(context.globalStorageUri);
+      async () => {
+        await clearCache(context.globalStorageUri);
         copyBooksDownloader.clearCache();
       },
     ),
@@ -311,9 +316,12 @@ function registerCommands(
     }),
   );
   context.subscriptions.push(
-    vscode.commands.registerCommand("cobol-lsp.snippets.insertSnippets", () => {
-      pickSnippet();
-    }),
+    vscode.commands.registerCommand(
+      "cobol-lsp.snippets.insertSnippets",
+      async () => {
+        await pickSnippet();
+      },
+    ),
   );
   context.subscriptions.push(
     vscode.commands.registerCommand("cobol-lsp.dialects.goto-settings", () =>
@@ -352,13 +360,13 @@ function registerCommands(
             );
           } else {
             vscode.window.showInformationMessage(
-              "Internal copybooks folder: '" + copybookFolder + "'",
+              `Internal copybooks folder: '${copybookFolder.toString()}'`,
             );
           }
         } catch (error) {
           vscode.window.showErrorMessage(FAIL_CREATE_COPYBOOK_FOLDER_MSG);
           outputChannel.appendLine(
-            `${FAIL_CREATE_COPYBOOK_FOLDER_MSG} : ${error}`,
+            `${FAIL_CREATE_COPYBOOK_FOLDER_MSG} : ${getErrorMessage(error)}`,
           );
         }
       },

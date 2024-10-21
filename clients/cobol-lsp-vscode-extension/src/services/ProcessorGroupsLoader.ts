@@ -75,7 +75,7 @@ export async function readProgramConfigFileContent(
   }
   const pgmCfgPath = Uri.joinPath(ws.uri, PG_FOLDER, PGR_PGM_FILE);
   try {
-    const json = JSON.parse(
+    const json: unknown = JSON.parse(
       new TextDecoder().decode(await workspace.fs.readFile(pgmCfgPath)),
     );
     const decoded = ProgramsConfigModel.decode(json);
@@ -85,8 +85,13 @@ export async function readProgramConfigFileContent(
       );
     }
     return decoded.right;
-  } catch (e: any) {
-    if (e.code !== "FileNotFound") {
+  } catch (e) {
+    if (
+      e &&
+      typeof e === "object" &&
+      "code" in e &&
+      e.code !== "FileNotFound"
+    ) {
       console.error(e);
     }
     return EMPTY;
@@ -106,7 +111,7 @@ export async function readProcessorGroupsFileContent(
     const ProcessorGrpupsModel = t.type({
       pgroups: t.array(ProcessorGroupModel),
     });
-    const json = JSON.parse(
+    const json: unknown = JSON.parse(
       new TextDecoder().decode(await workspace.fs.readFile(procCfgPath)),
     );
 
@@ -117,8 +122,13 @@ export async function readProcessorGroupsFileContent(
       );
     }
     return decoded.right.pgroups;
-  } catch (e: any) {
-    if (e.code !== "FileNotFound") {
+  } catch (e) {
+    if (
+      e &&
+      typeof e === "object" &&
+      "code" in e &&
+      e.code !== "FileNotFound"
+    ) {
       console.error(e);
     }
     return [];
