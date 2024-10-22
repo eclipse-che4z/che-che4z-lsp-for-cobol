@@ -203,7 +203,6 @@ public class TransformTreeStage implements Stage<AnalysisContext, ProcessingResu
         stack.pop();
         stack.peek().addChild(node);
         stack.push(node);
-        return;
     }
   }
 
@@ -214,7 +213,7 @@ public class TransformTreeStage implements Stage<AnalysisContext, ProcessingResu
     ProcessingContext processingContext =
             new ProcessingContext(new ArrayList<>(), symbolAccumulatorService, getCompilerDirectiveContext(analysisConfig), ctx.getConfig().getDialectsSettings());
     registerProcessors(analysisConfig, processingContext, symbolAccumulatorService, ctx.getLanguageId());
-    ctx.getAccumulatedErrors().addAll(astProcessor.processSyntaxTree(processingContext, rootNode));
+    ctx.getAccumulatedErrors().addAll(astProcessor.processSyntaxTree(analysisConfig, processingContext, ctx, rootNode));
   }
 
   private CompilerDirectiveContext getCompilerDirectiveContext(AnalysisConfig analysisConfig) {
