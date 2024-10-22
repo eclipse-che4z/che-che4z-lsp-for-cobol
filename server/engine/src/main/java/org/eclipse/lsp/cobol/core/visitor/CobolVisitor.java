@@ -1248,6 +1248,11 @@ public class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   }
 
   @Override
+  public List<Node> visitProcedureDivisionUsingClause(ProcedureDivisionUsingClauseContext ctx) {
+      return addTreeNode(ctx, ProcedureDivisionUsingNode::new);
+  }
+
+  @Override
   public List<Node> visitParagraphDefinitionName(ParagraphDefinitionNameContext ctx) {
     return addTreeNode(ctx, locality -> new ParagraphNameNode(locality, ctx.getText()));
   }
