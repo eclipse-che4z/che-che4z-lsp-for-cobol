@@ -245,8 +245,8 @@ cics_assign_parameter2: MAPLINE cics_data_area | MAPWIDTH cics_data_area | MSRCO
 
 /** BIF DEEDIT / BIF DIGEST */
 cics_bif: BIF (cics_bif_deedit | cics_bif_digest);
-cics_bif_deedit: DEEDIT (FIELD cics_data_area | LENGTH cics_data_value | cics_handle_response)+;
-cics_bif_digest: DIGEST (RECORD cics_data_value | RECORDLEN cics_data_value | HEX | BINARY | BASE64 | DIGESTTYPE cics_cvda |
+cics_bif_deedit: (DEEDIT | FIELD cics_data_area | LENGTH cics_data_value | cics_handle_response)+;
+cics_bif_digest: (DIGEST | RECORD cics_data_value | RECORDLEN cics_data_value | HEX | BINARY | BASE64 | DIGESTTYPE cics_cvda |
                  RESULT cics_data_area | cics_handle_response)+;
 
 /** BUILD ATTACH (both of them) */
