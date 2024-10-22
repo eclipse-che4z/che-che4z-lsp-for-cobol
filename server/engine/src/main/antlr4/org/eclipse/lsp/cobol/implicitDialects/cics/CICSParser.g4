@@ -19,7 +19,7 @@ compilerDirective: (.*? compilerXOpts)* .*? EOF;
 cicsExecBlock: EXEC_CICS (allCicsRule)* END_EXEC ;
 
 allCicsRule: cics_send | cics_receive | cics_add | cics_address | cics_allocate | cics_asktime | cics_assign | cics_bif |
-                       cics_build | cics_cancel | cics_change | cics_change_task | cics_check | cics_connect | cics_converttime |
+                       cics_build | cics_cancel | cics_change  | cics_check | cics_connect | cics_converttime |
                        cics_define | cics_delay | cics_delete | cics_deleteq | cics_deq | cics_document | cics_dump | cics_endbr |
                        cics_endbrowse | cics_enq | cics_enter | cics_extract | cics_force | cics_formattime | cics_free |
                        cics_freemain | cics_gds | cics_get | cics_getmain | cics_getnext | cics_handle | cics_ignore | cics_inquire |
@@ -261,12 +261,12 @@ cics_cancel_bts: (ACTIVITY cics_data_value | ACQACTIVITY | ACQPROCESS) cics_hand
 cics_cancel_reqid: REQID cics_name (SYSID cics_data_area | TRANSID cics_name | cics_handle_response)*;
 
 /** CHANGE PHRASE / PASSWORD / TASK */
-cics_change: CHANGE (cics_change_phrase | cics_change_password);
-cics_change_phrase: PHRASE cics_data_area (PHRASELEN cics_data_value | NEWPHRASE cics_data_area | NEWPHRASELEN cics_data_value |
-                    USERID cics_data_value | ESMREASON cics_data_area | ESMRESP cics_data_area | cics_handle_response)+;
-cics_change_password: PASSWORD cics_data_value (NEWPASSWORD cics_data_value | USERID cics_data_value |
-                      ESMREASON cics_data_area | ESMRESP cics_data_area | cics_handle_response)+;
-cics_change_task: TASK (PRIORITY cics_data_value)? cics_handle_response?;
+cics_change: CHANGE (cics_change_phrase | cics_change_password | cics_change_task );
+cics_change_phrase: (PHRASE cics_data_area | cics_password_phrase |  ((NEWPHRASE |  NEWPHRASELEN | PHRASELEN  | USERID ) cics_data_value) | cics_handle_response)*;
+cics_change_password: (((PASSWORD | NEWPASSWORD | USERID ) cics_data_value) | cics_password_phrase | cics_handle_response)*;
+cics_change_task: (TASK (PRIORITY cics_data_value)? cics_handle_response?);
+
+cics_password_phrase:((CHANGETIME | DAYSLEFT | ESMREASON | ESMRESP | EXPIRYTIME | INVALIDCOUNT | LASTUSETIME ) cics_data_area | cics_handle_response);
 
 /** CHECK ACQPROCESS / ACTIVITY / TIMER */
 cics_check: CHECK (cics_check_activity | cics_check_timer);
