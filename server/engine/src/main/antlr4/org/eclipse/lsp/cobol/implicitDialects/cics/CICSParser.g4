@@ -262,8 +262,8 @@ cics_cancel_reqid: REQID cics_name (SYSID cics_data_area | TRANSID cics_name | c
 
 /** CHANGE PHRASE / PASSWORD / TASK */
 cics_change: CHANGE (cics_change_phrase | cics_change_password | cics_change_task );
-cics_change_phrase: (PHRASE cics_data_area | cics_password_phrase |  NEWPHRASE | cics_data_value NEWPHRASELEN cics_data_value | PHRASELEN cics_data_value | USERID cics_data_value)*;
-cics_change_password: (PASSWORD cics_data_value | cics_password_phrase | NEWPASSWORD cics_data_value | USERID cics_data_value)*;
+cics_change_phrase: (PHRASE cics_data_area | cics_password_phrase |  ((NEWPHRASE |  NEWPHRASELEN | PHRASELEN  | USERID ) cics_data_value) | cics_handle_response)*;
+cics_change_password: (((PASSWORD | NEWPASSWORD | USERID ) cics_data_value) | cics_password_phrase | cics_handle_response)*;
 cics_change_task: (TASK (PRIORITY cics_data_value)? cics_handle_response?);
 
 cics_password_phrase:((CHANGETIME | DAYSLEFT | ESMREASON | ESMRESP | EXPIRYTIME | INVALIDCOUNT | LASTUSETIME ) cics_data_area | cics_handle_response);
