@@ -210,8 +210,9 @@ cics_allocate_lut61_session: (SESSION  cics_name | PROFILE cics_name | NOQUEUE |
 cics_allocate_appc_partner: (PARTNER cics_name | NOQUEUE | STATE cics_cvda | cics_handle_response)+;
 
 /** ASKTIME */
-cics_asktime: ASKTIME cics_handle_response? (ABSTIME (cics_data_area | cics_handle_response)+)?;
-
+cics_asktime:ASKTIME cics_asktime_abstime;
+cics_asktime_abstime: (ABSTIME cics_data_area | cics_handle_response)*;
+ 
 /** ASSIGN */
 cics_assign: ASSIGN (cics_assign_parameter1 | cics_assign_parameter2) *;
 
