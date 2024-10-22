@@ -163,21 +163,22 @@ public class TestFunction {
                 ErrorSource.PARSING.getText())));
   }
 
-  public static final String DIAGNOSE_MISSING_FUNCTION = ""
-      // ----+----1----+----2----+----3----+----4----+----5----+----6
-      + "       IDENTIFICATION DIVISION.                             \n"
-      + "       PROGRAM-ID. PGM.                                     \n"
-      + "       ENVIRONMENT DIVISION.                                \n"
-      + "       CONFIGURATION SECTION.                               \n"
-      + "       REPOSITORY.                                          \n"
-      + "               FUNCTION {FUNC1|1}.                              \n"
-      + "       DATA DIVISION.                                       \n"
-      + "       WORKING-STORAGE SECTION.                             \n"
-      + "       01  {$*RETVAL}.                                          \n"
-      + "           05  {$*NUM}              PIC X(1234).                \n"
-      + "       PROCEDURE DIVISION RETURNING {$RETVAL}.                 \n"
-      + "             MOVE FUNCTION {FUNC1|2} TO {$NUM}.                    \n"
-      + "       END PROGRAM PGM.                                     \n";
+  public static final String DIAGNOSE_MISSING_FUNCTION =
+      ""
+          // ----+----1----+----2----+----3----+----4----+----5----+----6
+          + "       IDENTIFICATION DIVISION.                             \n"
+          + "       PROGRAM-ID. PGM.                                     \n"
+          + "       ENVIRONMENT DIVISION.                                \n"
+          + "       CONFIGURATION SECTION.                               \n"
+          + "       REPOSITORY.                                          \n"
+          + "               FUNCTION {FUNC1|1}.                              \n"
+          + "       DATA DIVISION.                                       \n"
+          + "       WORKING-STORAGE SECTION.                             \n"
+          + "       01  {$*RETVAL}.                                          \n"
+          + "           05  {$*NUM}              PIC X(1234).                \n"
+          + "       PROCEDURE DIVISION RETURNING {_{$RETVAL}|3_}.                 \n"
+          + "             MOVE FUNCTION {FUNC1|2} TO {$NUM}.                    \n"
+          + "       END PROGRAM PGM.                                     \n";
 
   @Test
   void diagnose_missing_function() {
@@ -195,6 +196,12 @@ public class TestFunction {
             new Diagnostic(
                 new Range(),
                 "Expected a function name, but found 'FUNC1'",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()),
+            "3",
+            new Diagnostic(
+                new Range(),
+                "Operand 'RETVAL' was not defined in the LINKAGE SECTION",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())));
   }
@@ -265,27 +272,28 @@ public class TestFunction {
                 ErrorSource.PARSING.getText())));
   }
 
-  public static final String DIAGNOSE_DEFINED_AFTER = ""
-      // ----+----1----+----2----+----3----+----4----+----5----+----6
-      + "       IDENTIFICATION DIVISION.                             \n"
-      + "       PROGRAM-ID. PGM.                                     \n"
-      + "       DATA DIVISION.                                       \n"
-      + "       WORKING-STORAGE SECTION.                             \n"
-      + "       01  {$*RETVAL}.                                          \n"
-      + "           05  {$*NUM}              PIC X(1234).                \n"
-      + "       PROCEDURE DIVISION RETURNING {$RETVAL}.                 \n"
-      + "             MOVE FUNCTION {FUNC1|1} TO {$RETVAL}.                 \n"
-      + "       END PROGRAM PGM.                                     \n"
-      + "                                                            \n"
-      + "       IDENTIFICATION DIVISION.                             \n"
-      + "       FUNCTION-ID. FUNC1.                                  \n"
-      + "       DATA DIVISION.                                       \n"
-      + "       LINKAGE SECTION.                                     \n"
-      + "       01  {$*RETVAL}.                                          \n"
-      + "           05  {$*NUM}              PIC X(1234).                \n"
-      + "       PROCEDURE DIVISION RETURNING {$RETVAL}.                 \n"
-      + "             MOVE 1234 to {$NUM}.                              \n"
-      + "       END FUNCTION FUNC1.                                  \n";
+  public static final String DIAGNOSE_DEFINED_AFTER =
+      ""
+          // ----+----1----+----2----+----3----+----4----+----5----+----6
+          + "       IDENTIFICATION DIVISION.                             \n"
+          + "       PROGRAM-ID. PGM.                                     \n"
+          + "       DATA DIVISION.                                       \n"
+          + "       WORKING-STORAGE SECTION.                             \n"
+          + "       01  {$*RETVAL}.                                          \n"
+          + "           05  {$*NUM}              PIC X(1234).                \n"
+          + "       PROCEDURE DIVISION RETURNING {_{$RETVAL}|2_}.                 \n"
+          + "             MOVE FUNCTION {FUNC1|1} TO {$RETVAL}.                 \n"
+          + "       END PROGRAM PGM.                                     \n"
+          + "                                                            \n"
+          + "       IDENTIFICATION DIVISION.                             \n"
+          + "       FUNCTION-ID. FUNC1.                                  \n"
+          + "       DATA DIVISION.                                       \n"
+          + "       LINKAGE SECTION.                                     \n"
+          + "       01  {$*RETVAL}.                                          \n"
+          + "           05  {$*NUM}              PIC X(1234).                \n"
+          + "       PROCEDURE DIVISION RETURNING {$RETVAL}.                 \n"
+          + "             MOVE 1234 to {$NUM}.                              \n"
+          + "       END FUNCTION FUNC1.                                  \n";
 
   @Test
   void diagnose_defined_after() {
@@ -298,6 +306,12 @@ public class TestFunction {
             new Diagnostic(
                 new Range(),
                 "Expected a function name, but found 'FUNC1'",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()),
+            "2",
+            new Diagnostic(
+                new Range(),
+                "Operand 'RETVAL' was not defined in the LINKAGE SECTION",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())));
   }

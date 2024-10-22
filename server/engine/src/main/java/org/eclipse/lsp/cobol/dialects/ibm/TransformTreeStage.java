@@ -283,7 +283,8 @@ public class TransformTreeStage implements Stage<AnalysisContext, ProcessingResu
     ctx.register(v, XMLParseNode.class, new XMLParseProcess(symbolAccumulatorService));
     ctx.register(v, FileOperationStatementNode.class, new FileOperationProcess());
     ctx.register(v, XmlGenerateNode.class, new XmlGenerateProcess(symbolAccumulatorService));
-
+    ctx.register(v, ProcedureDivisionUsingNode.class, new ProcedureDivisionHeaderProcess());
+    ctx.register(v, ProcedureDivisionReturningNode.class, new ProcedureDivisionHeaderProcess());
     // Implicit Dialects
     dialectService.getActiveImplicitDialects(analysisConfig)
             .stream().map(CobolDialect::getProcessors)
