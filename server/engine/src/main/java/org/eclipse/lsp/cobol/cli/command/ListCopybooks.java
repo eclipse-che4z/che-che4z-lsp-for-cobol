@@ -107,7 +107,7 @@ public class ListCopybooks implements Callable<Integer> {
 
     Gson gson = new GsonBuilder().setPrettyPrinting().create();
     JsonObject result = new JsonObject();
-    Cli.Result analysisResult = parent.runAnalysis(src, dialect, diCtx, false);
+    Cli.Result analysisResult = parent.runAnalysis(src, dialect, diCtx, false, false);
     parent.addTiming(result, analysisResult.ctx.getBenchmarkSession());
     StageResult<CopybooksRepository> copybooksResult =
         (StageResult<CopybooksRepository>) analysisResult.pipelineResult.getLastStageResult();

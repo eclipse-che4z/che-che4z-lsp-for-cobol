@@ -27,7 +27,6 @@ import org.eclipse.lsp.cobol.common.model.NodeType;
 @Getter
 @EqualsAndHashCode(callSuper = true)
 public class LiteralNode extends Node {
-  private final String text;
 
   public LiteralNode(Locality location, String text) {
     super(location, NodeType.LITERAL);
