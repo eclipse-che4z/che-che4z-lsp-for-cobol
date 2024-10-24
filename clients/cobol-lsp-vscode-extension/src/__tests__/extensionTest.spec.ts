@@ -61,7 +61,10 @@ jest.mock("vscode", () => ({
     registerCompletionItemProvider: jest.fn(),
   },
   Position: class {
-    constructor(private line: number, private character: number) {}
+    constructor(
+      private line: number,
+      private character: number,
+    ) {}
   },
   window: {
     visibleTextEditors: [],

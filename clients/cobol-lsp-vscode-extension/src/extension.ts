@@ -47,6 +47,7 @@ import { ConfigurationWatcher } from "./services/util/ConfigurationWatcher";
 import * as path from "node:path";
 import { Utils } from "./services/util/Utils";
 import { getE4EAPI } from "./services/copybook/E4ECopybookService";
+import { openOutputWindow } from "./commands/OpenOutputWindow";
 
 interface __AnalysisApi {
   analysis(uri: string, text: string, pos?: vscode.Position): Promise<any>;
@@ -107,9 +108,8 @@ export async function activate(
   context: vscode.ExtensionContext,
 ): Promise<__ExtensionApi & __AnalysisApi> {
   DialectRegistry.clear();
-  const { copyBooksDownloader, configurationWatcher } = await initialize(
-    context,
-  );
+  const { copyBooksDownloader, configurationWatcher } =
+    await initialize(context);
   initSmartTab(context);
 
   TelemetryService.registerEvent(
@@ -374,6 +374,15 @@ function registerCommands(
           context.extensionUri,
         );
         await tempAnalysis.runCobolAnalysisCommand();
+      },
+    ),
+  );
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand(
+      "cobol-lsp.debug.openOutputWindow",
+      async () => {
+        openOutputWindow(outputChannel);
       },
     ),
   );
