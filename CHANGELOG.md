@@ -30,7 +30,6 @@ All notable changes to the COBOL Language Support extension are documented in th
 * Provide unknown node name for document symbol without name ([dc3bab5](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/dc3bab53a9ba91fe5cd627a3bdf7274bd97edc7f))
 * Remove expcobol language id ([7b02e0b](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/7b02e0b7fd6b1bc38f55cba012b537cec7f41437))
 * Remove Java 9 function call ([#2461](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/issues/2461)) ([c52021b](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/c52021b3223e2d9c179e97ef66acb6443dc1335f))
-* Tests ([357595f](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/357595f280a02875ffc13d868cb9708957104116))
 * Timestamp specification not allowed in the DECLARE TABLE statement ([#2468](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/issues/2468)) ([08ba90e](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/08ba90ec37b6bdb50f812c5d8d9257e74bc8d9d7))
 * Update reflection config for native build ([348b036](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/348b036186373411b58131b390eb7b53ceab9adf))
 * Use VSCode API to read processor groups files ([ec80188](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/ec801883ee4ad479f9d8df9772b0d9e6ab522b77))
