@@ -523,6 +523,16 @@
             "NATIVE - Use platform binary"
           ],
           "description": "COBOL LS server runtime."
+        },
+        "cobol-lsp.formatting": {
+          "type": "string",
+          "default": "Uppercase",
+          "enum": [
+            "Uppercase",
+            "Lowercase",
+            "None"
+          ],
+          "description": "Formatting settings"
         }
       }
     },

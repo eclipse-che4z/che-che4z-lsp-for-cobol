@@ -33,7 +33,7 @@ public class TrimFormation implements Formation {
   }
 
   @Override
-  public List<TextEdit> format(@NonNull List<CobolDocumentModel.Line> lines) {
+  public List<TextEdit> format(@NonNull List<CobolDocumentModel.Line> lines, List<String> settings) {
     List<TextEdit> formattedText = new ArrayList<>();
     for (CobolDocumentModel.Line line : lines) {
       String newText = rtrim(line.getText());

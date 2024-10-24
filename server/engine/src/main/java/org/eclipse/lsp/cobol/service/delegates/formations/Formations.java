@@ -17,6 +17,7 @@ package org.eclipse.lsp.cobol.service.delegates.formations;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import org.eclipse.lsp.cobol.service.settings.SettingsService;
 import org.eclipse.lsp4j.TextEdit;
 
 import java.util.Collections;
@@ -29,21 +30,35 @@ import java.util.stream.Collectors;
 @Singleton
 public class Formations {
 
-  private Set<Formation> formatters;
+  private static final String FORMATTING = "formatting";
+  private final Set<Formation> formatters;
+  private final SettingsService settingsService;
 
   @Inject
-  public Formations(Set<Formation> formations) {
+  public Formations(Set<Formation> formations, SettingsService settingsService) {
     this.formatters = formations;
+    this.settingsService = settingsService;
   }
 
   public List<TextEdit> format(CobolDocumentModel model) {
-    return Optional.ofNullable(model).map(applyFormatting()).orElse(Collections.emptyList());
+    List<String> settings;
+    try {
+      settings = settingsService.fetchConfiguration(FORMATTING)
+          .get()
+          .stream()
+          .map(Object::toString)
+          .collect(Collectors.toList());
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+
+    return Optional.ofNullable(model).map(applyFormatting(settings)).orElse(Collections.emptyList());
   }
 
-  private Function<CobolDocumentModel, List<TextEdit>> applyFormatting() {
+  private Function<CobolDocumentModel, List<TextEdit>> applyFormatting(List<String> settings) {
     return document ->
         formatters.stream()
-            .map(it -> it.format(document.getLines()))
+            .map(it -> it.format(document.getLines(), settings))
             .flatMap(List::stream)
             .collect(Collectors.toList());
   }
