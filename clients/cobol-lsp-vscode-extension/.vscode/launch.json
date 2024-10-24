@@ -23,9 +23,25 @@
       "type": "extensionHost",
       "request": "launch",
       "runtimeExecutable": "${execPath}",
-      "args": ["--extensionDevelopmentPath=${workspaceFolder}"],
+      "args": [
+        "--extensionDevelopmentPath=${workspaceFolder}",
+        "--disable-extensions"
+      ],
       "outFiles": ["${workspaceFolder}/dist/*"],
       "preLaunchTask": "npm: build"
+    },
+    {
+      "name": "Run Web Extension",
+      "request": "launch",
+      "type": "node",
+      "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/vscode-test-web",
+      "args": [
+        "--browserType=chromium",
+        "--extensionDevelopmentPath=${workspaceFolder}",
+        "${workspaceFolder}/../../tests/test_files/project"
+      ],
+      "outFiles": ["${workspaceFolder}/dist/*"],
+      "preLaunchTask": "npm: build:web"
     },
     {
       "name": "Debug Tests",
