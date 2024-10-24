@@ -4,11 +4,9 @@ All notable changes to the COBOL Language Support extension are documented in th
 ## [2.3.0](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/compare/2.2.0...2.3.0) (2024-10-24)
 
 #### Fixed
-- Miscellaneous bug fixes
-
-#### Performance Improvements
 - Parser optimization
 - Grammar optimization
+- Miscellaneous bug fixes
 
 ## [2.2.0](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/compare/2.1.2...2.2.0) (2024-08-19)
 
