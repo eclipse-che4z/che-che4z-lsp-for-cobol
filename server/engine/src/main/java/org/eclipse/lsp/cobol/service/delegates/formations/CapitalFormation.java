@@ -114,8 +114,16 @@ public class CapitalFormation implements Formation {
       }
     }
 
-    for (int i = 7; i < maxLen; i++) {
+    for (int i = MIN_LEN; i < maxLen; i++) {
       Character ch = line.getText().charAt(i);
+
+      // Check for inline comment
+      if (i > MIN_LEN) {
+        if (ch == '>' && line.getText().charAt(i - 1) == '*') {
+          break;
+        }
+      }
+
       // Check for literal variable
       boolean literal = context.insideLiteralValue();
       context.checkLiteralValue(ch);

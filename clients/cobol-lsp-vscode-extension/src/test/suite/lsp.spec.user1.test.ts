@@ -152,6 +152,9 @@ suite("Tests with USER1.cbl", function () {
       vscode.languages.getDiagnostics(editor.document.uri).length,
       1,
     );
+    await vscode.workspace
+      .getConfiguration()
+      .update("cobol-lsp.formatting", "None");
     const result: any[] = await vscode.commands.executeCommand(
       "vscode.executeFormatDocumentProvider",
       editor.document.uri,

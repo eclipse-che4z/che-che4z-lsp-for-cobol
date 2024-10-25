@@ -63,25 +63,25 @@ class CapitalFormationTest {
 
   @Test
   void whenFormatIsCalledEmptyListParam_thenGetEmptyCollection() {
-    CapitalFormation trimFormation = new CapitalFormation();
+    CapitalFormation formation = new CapitalFormation();
     List<CobolDocumentModel.Line> inputLines = new ArrayList<>();
-    List<TextEdit> format = trimFormation.format(inputLines, ImmutableList.of());
+    List<TextEdit> format = formation.format(inputLines, ImmutableList.of());
     assertEquals(0, format.size());
   }
 
   @Test
   void whenFormatIsCalledWithEmptyParams_thenGetEmptyCollection() {
-    CapitalFormation trimFormation = new CapitalFormation();
+    CapitalFormation formation = new CapitalFormation();
     CobolDocumentModel model = new CobolDocumentModel("", TEXT);
-    List<TextEdit> format = trimFormation.format(model.getLines(), ImmutableList.of());
+    List<TextEdit> format = formation.format(model.getLines(), ImmutableList.of());
     assertEquals(0, format.size());
   }
 
   @Test
   void whenFormatIsCalledWithUppercaseParamsNearLeftBorders_thenGetProperCollection() {
-    CapitalFormation trimFormation = new CapitalFormation();
+    CapitalFormation formation = new CapitalFormation();
     CobolDocumentModel model = new CobolDocumentModel("", " a    aaaAAA AAA  aaa");
-    List<TextEdit> format = trimFormation.format(model.getLines(), ImmutableList.of(CapitalFormation.UPPERCASE));
+    List<TextEdit> format = formation.format(model.getLines(), ImmutableList.of(CapitalFormation.UPPERCASE));
 
     assertEquals(2, format.size());
 
@@ -94,9 +94,9 @@ class CapitalFormationTest {
 
   @Test
   void whenFormatIsCalledWithUppercaseParamsNearRightBorders_thenGetProperCollection() {
-    CapitalFormation trimFormation = new CapitalFormation();
+    CapitalFormation formation = new CapitalFormation();
     CobolDocumentModel model = new CobolDocumentModel("", "                                                                      aabb");
-    List<TextEdit> format = trimFormation.format(model.getLines(), ImmutableList.of(CapitalFormation.UPPERCASE));
+    List<TextEdit> format = formation.format(model.getLines(), ImmutableList.of(CapitalFormation.UPPERCASE));
 
     assertEquals(1, format.size());
 
@@ -106,9 +106,9 @@ class CapitalFormationTest {
 
   @Test
   void whenFormatIsCalledWithUppercaseParamsNearLiteralVaruable_thenGetProperCollection() {
-    CapitalFormation trimFormation = new CapitalFormation();
+    CapitalFormation formation = new CapitalFormation();
     CobolDocumentModel model = new CobolDocumentModel("", "          aa'fhjhsdjh'bb");
-    List<TextEdit> format = trimFormation.format(model.getLines(), ImmutableList.of(CapitalFormation.UPPERCASE));
+    List<TextEdit> format = formation.format(model.getLines(), ImmutableList.of(CapitalFormation.UPPERCASE));
 
     assertEquals(2, format.size());
 
@@ -127,10 +127,10 @@ class CapitalFormationTest {
         + "           xml5.\n"
         + "       data DIVISION.\n";
 
-    CapitalFormation trimFormation = new CapitalFormation();
+    CapitalFormation formation = new CapitalFormation();
     CobolDocumentModel model = new CobolDocumentModel("", text);
 
-    List<TextEdit> format = trimFormation.format(model.getLines(), ImmutableList.of(CapitalFormation.UPPERCASE));
+    List<TextEdit> format = formation.format(model.getLines(), ImmutableList.of(CapitalFormation.UPPERCASE));
     assertEquals(2, format.size());
 
     assertEquals("ID", format.get(0).getNewText());
@@ -144,10 +144,10 @@ class CapitalFormationTest {
   void whenFormatIsCalledForLiteralValue_thenGetProperCollection() {
     String text = "       DISPLAY '\"'. move A TO B";
 
-    CapitalFormation trimFormation = new CapitalFormation();
+    CapitalFormation formation = new CapitalFormation();
     CobolDocumentModel model = new CobolDocumentModel("", text);
 
-    List<TextEdit> format = trimFormation.format(model.getLines(), ImmutableList.of(CapitalFormation.UPPERCASE));
+    List<TextEdit> format = formation.format(model.getLines(), ImmutableList.of(CapitalFormation.UPPERCASE));
     assertEquals(1, format.size());
 
     assertEquals("MOVE", format.get(0).getNewText());
@@ -156,11 +156,30 @@ class CapitalFormationTest {
 
   @Test
   void whenFormatIsCalledWithUppercaseParams_thenGetProperCollection() {
-    CapitalFormation trimFormation = new CapitalFormation();
+    CapitalFormation formation = new CapitalFormation();
     CobolDocumentModel model = new CobolDocumentModel("", TEXT);
-    List<TextEdit> format = trimFormation.format(model.getLines(), ImmutableList.of(CapitalFormation.UPPERCASE));
+    List<TextEdit> format = formation.format(model.getLines(), ImmutableList.of(CapitalFormation.UPPERCASE));
     assertEquals(8, format.size());
   }
 
+  @Test
+  void whenFormatIsCalledWithUppercaseParamsForInlineComment_thenGetProperCollection() {
+    CapitalFormation formation = new CapitalFormation();
+    CobolDocumentModel model = new CobolDocumentModel("", "       *>aAA AAA  aaa");
+    List<TextEdit> format = formation.format(model.getLines(), ImmutableList.of(CapitalFormation.UPPERCASE));
 
+    assertEquals(0, format.size());
+  }
+
+  @Test
+  void whenFormatIsCalledWithUppercaseParamsForInlineCommentInTheMiddle_thenGetProperCollection() {
+    CapitalFormation formation = new CapitalFormation();
+    CobolDocumentModel model = new CobolDocumentModel("", "       aa*>aAA AAA  aaa");
+    List<TextEdit> format = formation.format(model.getLines(), ImmutableList.of(CapitalFormation.UPPERCASE));
+
+    assertEquals(1, format.size());
+
+    assertEquals("AA", format.get(0).getNewText());
+    assertEquals(new Range(new Position(0, 7), new Position(0, 9)), format.get(0).getRange());
+  }
 }

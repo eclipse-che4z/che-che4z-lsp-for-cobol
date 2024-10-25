@@ -526,7 +526,7 @@
         },
         "cobol-lsp.formatting": {
           "type": "string",
-          "default": "Uppercase",
+          "default": "None",
           "enum": [
             "Uppercase",
             "Lowercase",
