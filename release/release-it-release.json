@@ -6,9 +6,7 @@
     ],
     "after:bump": [
       "git add ../../CHANGELOG.md",
-      "echo $THE_KEY > resources/TELEMETRY_KEY",
-      "npx vsce package",
-      "git checkout -- resources/TELEMETRY_KEY"
+      "npx vsce package"
     ]
   },
   "github": {
@@ -17,13 +15,11 @@
   },
   "git": {
     "commitMessage": "Release: ${version}"
-  }, 
+  },
   "npm": {
-          "publish": false
+    "publish": false
   },
   "plugins": {
-    "../../release/version-extract.js": {
-
-    }
+    "../../release/version-extract.js": {}
   }
 }

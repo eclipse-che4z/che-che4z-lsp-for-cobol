@@ -120,11 +120,6 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 16
-      - name: Inject telemetry key
-        run: |
-          export TEL_KEY=`node -e "console.log(Buffer.from('${{ secrets.TELEMETRY_KEY }}').toString('base64'))"`
-          sed -i "s/const TELEMETRY_KEY_ENCODED = TELEMETRY_DEFAULT_CONTENT/const TELEMETRY_KEY_ENCODED = '$TEL_KEY'/" src/services/reporter/TelemetryReporterImpl.ts
-        working-directory: clients/cobol-lsp-vscode-extension
       - name: Build VS Code extension dialect API
         working-directory: clients/cobol-dialect-api
         run: |
@@ -339,10 +334,6 @@ jobs:
       - name: Deploy server jar
         working-directory: clients/cobol-lsp-vscode-extension
         run: cp ../../jar/server.jar ./server/jar
-      - name: Setup telemetry key
-        working-directory: clients/cobol-lsp-vscode-extension
-        if: github.event.inputs.with_telemetry == 'true'
-        run: echo ${{ secrets.TELEMETRY_INSTRUMENTATION_KEY }} > resources/TELEMETRY_KEY
       - name: Deploy windows executable
         working-directory: clients/cobol-lsp-vscode-extension
         if: startsWith( matrix.os, 'windows')
@@ -379,6 +370,19 @@ jobs:
       - name: Build COBOL LS extension 
         run: npm ci
         working-directory: clients/cobol-lsp-vscode-extension
+      - name: Inject telemetry key to COBOL LS extension
+        shell: pwsh
+        run: |
+          $telKey = node -e "console.log(Buffer.from('${{ secrets.TELEMETRY_INSTRUMENTATION_KEY }}').toString('base64'))"
+          if ([string]::IsNullOrEmpty($telKey)) {
+              Write-Host 'TELEMETRY_INSTRUMENTATION_KEY secret not configured, skipping injection'
+              exit 0
+          }
+          $filePath = "src/services/reporter/TelemetryReporterImpl.ts"
+          $content = Get-Content $filePath -Raw
+          $newContent = $content -replace 'const TELEMETRY_KEY_ENCODED: string = TELEMETRY_DEFAULT_CONTENT', "const TELEMETRY_KEY_ENCODED: string = '$telKey'"
+          $newContent | Set-Content $filePath -NoNewline
+        working-directory: clients/cobol-lsp-vscode-extension        
       - name: Package COBOL LS vsix for ${{ env.target }}
         working-directory: clients/cobol-lsp-vscode-extension
         run: |

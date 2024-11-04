@@ -14,9 +14,14 @@
 import { Uri } from "../../__mocks__/UriMock";
 import * as path from "path";
 import * as vscode from "vscode";
-import { SettingsService } from "../../services/Settings";
+import { lspConfigHandler, SettingsService } from "../../services/Settings";
 import { SettingsUtils } from "../../services/util/SettingsUtils";
 import { getTabSettings } from "../../services/SmartTabSettings";
+import {
+  DIALECT_REGISTRY_SECTION,
+  DialectInfo,
+  DialectRegistry,
+} from "../../services/DialectRegistry";
 
 const fsPath = "tmp-ws";
 beforeAll(() => {
@@ -289,5 +294,39 @@ describe("SettingsService prepares local search folders", () => {
       makefsPath("/workspacePath/relative"),
       makefsPath("/workspacePath2/relative"),
     ]);
+  });
+});
+
+describe("SettingService lspConfigHandler", () => {
+  describe("dialects configuration", () => {
+    const dialect: DialectInfo = {
+      name: "testDialect",
+      uri: vscode.Uri.file(""),
+      description: "test-dialect",
+      snippetPath: "",
+      extensionId: "",
+    };
+
+    beforeAll(() => {
+      DialectRegistry.register(
+        dialect.extensionId,
+        dialect.name,
+        dialect.uri,
+        dialect.description,
+        dialect.snippetPath,
+      );
+    });
+
+    afterAll(() => {
+      DialectRegistry.clear();
+    });
+
+    test("returns dialects configuration", async () => {
+      const result = await lspConfigHandler({
+        items: [{ section: DIALECT_REGISTRY_SECTION }],
+      });
+
+      expect(result).toEqual(expect.arrayContaining([[dialect]]));
+    });
   });
 });
