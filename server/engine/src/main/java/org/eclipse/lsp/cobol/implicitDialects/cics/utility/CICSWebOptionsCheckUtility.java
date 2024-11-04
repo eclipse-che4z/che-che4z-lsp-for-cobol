@@ -16,7 +16,6 @@
 package org.eclipse.lsp.cobol.implicitDialects.cics.utility;
 
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.tree.TerminalNode;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
@@ -287,9 +286,7 @@ public class CICSWebOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
 
     // Main rules
     private void checkClose(CICSParser.Cics_web_closeContext ctx) {
-        List<TerminalNode> ruleList = new ArrayList<>();
-        ruleList.add(ctx.SESSTOKEN()); // SESSTOKEN in CLOSE does not utilize the repeat notation.
-        checkHasMandatoryOptions(ruleList, ctx, "SESSTOKEN");
+        checkHasMandatoryOptions(ctx.SESSTOKEN(), ctx, "SESSTOKEN");
         iterateSubrules(ctx);
     }
 
