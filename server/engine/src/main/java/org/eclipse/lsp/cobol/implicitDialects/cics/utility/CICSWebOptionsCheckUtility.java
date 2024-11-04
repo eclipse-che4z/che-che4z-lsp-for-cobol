@@ -302,7 +302,7 @@ public class CICSWebOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
 
     private void checkEndbrowse(CICSParser.Cics_web_endbrowseContext ctx) {
         checkMutuallyExclusiveOptions("FORMFIELD, HTTPHEADER, QUERYPARM", ctx.FORMFIELD(), ctx.HTTPHEADER(), ctx.QUERYPARM());
-        checkHasRequiredOption(ctx.HTTPHEADER(), ctx.SESSTOKEN(), ctx, "HTTPHEADER");
+        checkPrerequisiteIsMet(ctx.HTTPHEADER(), ctx.SESSTOKEN(), ctx, "HTTPHEADER");
 
         iterateSubrules(ctx);
     }
@@ -312,13 +312,13 @@ public class CICSWebOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     private void checkOpen(CICSParser.Cics_web_openContext ctx) {
         checkMutuallyExclusiveOptions("URIMAP or HOST", ctx.cics_web_urimap(), ctx.cics_web_host_portnumber());
         checkHasMandatoryOptions(ctx.SESSTOKEN(), ctx, "SESSTOKEN");
-        checkHasRequiredOption(ctx.HTTPVNUM(), ctx.HTTPRNUM(), ctx, "HTTPVNUM");
+        checkPrerequisiteIsMet(ctx.HTTPVNUM(), ctx.HTTPRNUM(), ctx, "HTTPVNUM");
 
         iterateSubrules(ctx);
     }
 
     private void checkParse(CICSParser.Cics_web_parseContext ctx) {
-        checkHasRequiredOption(ctx.URL(), ctx.URLLENGTH(), ctx, "URL");
+        checkPrerequisiteIsMet(ctx.URL(), ctx.URLLENGTH(), ctx, "URL");
 
         iterateSubrules(ctx);
     }
@@ -348,7 +348,7 @@ public class CICSWebOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
             checkHasMandatoryOptions(ctx.VALUELENGTH(), ctx, "VALUELENGTH");
         }
 
-        checkHasRequiredOption(ctx.FORMFIELD(), ctx.CHARACTERSET(), ctx, "FORMFIELD");
+        checkPrerequisiteIsMet(ctx.FORMFIELD(), ctx.CHARACTERSET(), ctx, "FORMFIELD");
 
         iterateSubrules(ctx);
     }
@@ -402,7 +402,7 @@ public class CICSWebOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     // STARTBROWSE does not need any checks other than the helper rules.
 
     private void checkStartbrowseFormfieldQueryparm(CICSParser.Cics_web_startbrowse_formfield_queryparmContext ctx) {
-        checkHasRequiredOption(ctx.FORMFIELD(), ctx.CHARACTERSET(), ctx, "FORMFIELD");
+        checkPrerequisiteIsMet(ctx.FORMFIELD(), ctx.CHARACTERSET(), ctx, "FORMFIELD");
 
         iterateSubrules(ctx);
     }
@@ -417,7 +417,7 @@ public class CICSWebOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
 
     // ----- Helper rules -----
     private void checkWebPath(CICSParser.Cics_web_pathContext ctx) {
-        checkHasRequiredOption(ctx.PATH(), ctx.PATHLENGTH(), ctx, "PATH");
+        checkPrerequisiteIsMet(ctx.PATH(), ctx.PATHLENGTH(), ctx, "PATH");
     }
 
     private void checkWebBodyDoctoken(CICSParser.Cics_web_body_doctokenContext ctx) {
@@ -428,7 +428,7 @@ public class CICSWebOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     }
 
     private void checkWebQuerystring(CICSParser.Cics_web_querystringContext ctx) {
-        checkHasRequiredOption(ctx.QUERYSTRING(), ctx.QUERYSTRLEN(), ctx, "QUERYSTRING");
+        checkPrerequisiteIsMet(ctx.QUERYSTRING(), ctx.QUERYSTRLEN(), ctx, "QUERYSTRING");
     }
 
     private void checkWebCloseOptions(CICSParser.Cics_web_close_optionsContext ctx) {
@@ -436,11 +436,11 @@ public class CICSWebOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     }
 
     private void checkWebAuthUsernameOptions(CICSParser.Cics_web_auth_usernameContext ctx) {
-        checkHasRequiredOption(ctx.USERNAME(), ctx.USERNAMELEN(), ctx, "USERNAME");
+        checkPrerequisiteIsMet(ctx.USERNAME(), ctx.USERNAMELEN(), ctx, "USERNAME");
     }
 
     private void checkWebAuthPasswordOptions(CICSParser.Cics_web_auth_passwordContext ctx) {
-        checkHasRequiredOption(ctx.PASSWORD(), ctx.PASSWORDLEN(), ctx, "PASSWORD");
+        checkPrerequisiteIsMet(ctx.PASSWORD(), ctx.PASSWORDLEN(), ctx, "PASSWORD");
     }
 
     private void checkWebClientAuthType(CICSParser.Cics_web_client_auth_typeContext ctx) {
@@ -453,31 +453,31 @@ public class CICSWebOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
 
     private void checkIntoSetTocontainer(CICSParser.Cics_web_into_set_tocontainerContext ctx) {
         checkMutuallyExclusiveOptions("INTO, SET, TOCONTAINER TOCHANNEL", ctx.INTO(), ctx.SET(), ctx.TOCONTAINER());
-        checkHasRequiredOption(ctx.TOCONTAINER(), ctx.TOCHANNEL(), ctx, "TOCONTAINER");
+        checkPrerequisiteIsMet(ctx.TOCONTAINER(), ctx.TOCHANNEL(), ctx, "TOCONTAINER");
     }
 
     private void checkSendContainerSubrule(CICSParser.Cics_web_send_container_subruleContext ctx) {
-        checkHasRequiredOption(ctx.CONTAINER(), ctx.CHANNEL(), ctx, "CONTAINER");
+        checkPrerequisiteIsMet(ctx.CONTAINER(), ctx.CHANNEL(), ctx, "CONTAINER");
     }
 
     private void checkHost(CICSParser.Cics_web_hostContext ctx) {
-        checkHasRequiredOption(ctx.HOST(), ctx.HOSTLENGTH(), ctx, "HOST");
+        checkPrerequisiteIsMet(ctx.HOST(), ctx.HOSTLENGTH(), ctx, "HOST");
     }
 
     private void checkHostHosttype(CICSParser.Cics_web_host_hosttypeContext ctx) {
-        checkHasRequiredOption(ctx.cics_web_host(), ctx.HOSTTYPE(), ctx, "HOSTTYPE");
+        checkPrerequisiteIsMet(ctx.cics_web_host(), ctx.HOSTTYPE(), ctx, "HOSTTYPE");
     }
 
     private void checkHTTPMethod(CICSParser.Cics_web_httpmethodContext ctx) {
-        checkHasRequiredOption(ctx.HTTPMETHOD(), ctx.METHODLENGTH(), ctx, "HTTPMETHOD");
+        checkPrerequisiteIsMet(ctx.HTTPMETHOD(), ctx.METHODLENGTH(), ctx, "HTTPMETHOD");
     }
 
     private void checkHTTPVersion(CICSParser.Cics_web_httpversionContext ctx) {
-        checkHasRequiredOption(ctx.HTTPVERSION(), ctx.VERSIONLEN(), ctx, "HTTPVERSION");
+        checkPrerequisiteIsMet(ctx.HTTPVERSION(), ctx.VERSIONLEN(), ctx, "HTTPVERSION");
     }
 
     private void checkRealm(CICSParser.Cics_web_realmContext ctx) {
-        checkHasRequiredOption(ctx.REALM(), ctx.REALMLEN(), ctx, "REALM");
+        checkPrerequisiteIsMet(ctx.REALM(), ctx.REALMLEN(), ctx, "REALM");
     }
 
     private void checkWebServerConvert(CICSParser.Cics_web_server_convertContext ctx) {
@@ -489,13 +489,13 @@ public class CICSWebOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     }
 
     private void checkStatuscode(CICSParser.Cics_web_statuscodeContext ctx) {
-        checkHasRequiredOption(ctx.STATUSCODE(), ctx.STATUSTEXT(), ctx, "STATUSCODE");
-        checkHasRequiredOption(ctx.STATUSTEXT(), ctx.STATUSCODE(), ctx, "STATUSTEXT");
+        checkPrerequisiteIsMet(ctx.STATUSCODE(), ctx.STATUSTEXT(), ctx, "STATUSCODE");
+        checkPrerequisiteIsMet(ctx.STATUSTEXT(), ctx.STATUSCODE(), ctx, "STATUSTEXT");
     }
     private void checkSendDoctoken(CICSParser.Cics_web_send_doctokenContext ctx) {
-        checkHasRequiredOption(ctx.DOCTOKEN(), ctx.NODOCDELETE(), ctx, "DOCTOKEN");
-        checkHasRequiredOption(ctx.DOCTOKEN(), ctx.DOCDELETE(), ctx, "DOCTOKEN");
-        checkHasRequiredOption(ctx.DOCTOKEN(), ctx.DOCSTATUS(), ctx, "DOCTOKEN");
+        checkPrerequisiteIsMet(ctx.DOCTOKEN(), ctx.NODOCDELETE(), ctx, "DOCTOKEN");
+        checkPrerequisiteIsMet(ctx.DOCTOKEN(), ctx.DOCDELETE(), ctx, "DOCTOKEN");
+        checkPrerequisiteIsMet(ctx.DOCTOKEN(), ctx.DOCSTATUS(), ctx, "DOCTOKEN");
     }
 
     private void checkSendServerBody(CICSParser.Cics_web_send_server_bodyContext ctx) {

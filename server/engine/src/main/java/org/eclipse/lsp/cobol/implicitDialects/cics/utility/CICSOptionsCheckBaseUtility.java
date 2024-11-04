@@ -124,20 +124,20 @@ public abstract class CICSOptionsCheckBaseUtility {
    * @param ctx - The overall context.
    * @param options - String of the element that is required.
    */
-  protected <E extends ParseTree> void checkHasRequiredOption(List<E> requiredContext, List<E> optionalContext, ParserRuleContext ctx, String options) {
-    checkHasRequiredOption(isNodePresent(requiredContext), isNodePresent(optionalContext), ctx, options);
+  protected <E extends ParseTree> void checkPrerequisiteIsMet(List<E> requiredContext, List<E> optionalContext, ParserRuleContext ctx, String options) {
+    checkPrerequisiteIsMet(isNodePresent(requiredContext), isNodePresent(optionalContext), ctx, options);
   }
 
-  protected <E extends ParseTree> void checkHasRequiredOption(E requiredContext, List<TerminalNode> optionalContext, ParserRuleContext ctx, String options) {
-    checkHasRequiredOption(isNodePresent(requiredContext), isNodePresent(optionalContext), ctx, options);
+  protected <E extends ParseTree> void checkPrerequisiteIsMet(E requiredContext, List<TerminalNode> optionalContext, ParserRuleContext ctx, String options) {
+    checkPrerequisiteIsMet(isNodePresent(requiredContext), isNodePresent(optionalContext), ctx, options);
   }
 
-  protected <E extends ParseTree> void checkHasRequiredOption(List<E> requiredContext, E optionalContext, ParserRuleContext ctx, String options) {
-    checkHasRequiredOption(isNodePresent(requiredContext), isNodePresent(optionalContext), ctx, options);
+  protected <E extends ParseTree> void checkPrerequisiteIsMet(List<E> requiredContext, E optionalContext, ParserRuleContext ctx, String options) {
+    checkPrerequisiteIsMet(isNodePresent(requiredContext), isNodePresent(optionalContext), ctx, options);
   }
 
-  protected <E extends ParseTree> void checkHasRequiredOption(E requiredContext, E optionalContext, ParserRuleContext ctx, String options) {
-    checkHasRequiredOption(isNodePresent(requiredContext), isNodePresent(optionalContext), ctx, options);
+  protected <E extends ParseTree> void checkPrerequisiteIsMet(E requiredContext, E optionalContext, ParserRuleContext ctx, String options) {
+    checkPrerequisiteIsMet(isNodePresent(requiredContext), isNodePresent(optionalContext), ctx, options);
   }
 
   private <E extends ParseTree> Boolean isNodePresent(E node) {
@@ -157,7 +157,7 @@ public abstract class CICSOptionsCheckBaseUtility {
     return false;
   }
 
-  private void checkHasRequiredOption(Boolean isRequiredContextPresent, Boolean isOptionalContextPresent, ParserRuleContext ctx, String options) {
+  private void checkPrerequisiteIsMet(Boolean isRequiredContextPresent, Boolean isOptionalContextPresent, ParserRuleContext ctx, String options) {
       if (!isRequiredContextPresent && isOptionalContextPresent) {
         throwException(
                 ErrorSeverity.ERROR,
