@@ -113,6 +113,7 @@ local.properties
 /server/test/gen
 /server/parser/gen
 .antlr/
+gen/
 
 # TeXlipse plugin
 .texlipse
