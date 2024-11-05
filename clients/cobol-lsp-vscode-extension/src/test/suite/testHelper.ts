@@ -195,21 +195,19 @@ export function range(p0: vscode.Position, p1: vscode.Position): vscode.Range {
 
 export async function updateConfig(configFileName: string) {
   // update the settings.json with this file content
-  const settinsFileLoc = path.join(
-    vscode.workspace.workspaceFolders![0].uri.fsPath,
+  const settingsFileLoc = vscode.Uri.joinPath(
+    vscode.Uri.file(vscode.workspace.workspaceFolders![0].uri.fsPath),
     ".vscode",
     "settings.json",
   );
-  const settingvalueLoc = path.join(
-    getWorkspacePath(),
+  const settingsValueLoc = vscode.Uri.joinPath(
+    vscode.Uri.file(getWorkspacePath()),
     "settings",
     configFileName,
   );
-  await vscode.workspace.fs.copy(
-    vscode.Uri.file(settingvalueLoc),
-    vscode.Uri.file(settinsFileLoc),
-    { overwrite: true },
-  );
+  await vscode.workspace.fs.copy(settingsValueLoc, settingsFileLoc, {
+    overwrite: true,
+  });
 }
 
 export async function deleteFile(path: string) {
