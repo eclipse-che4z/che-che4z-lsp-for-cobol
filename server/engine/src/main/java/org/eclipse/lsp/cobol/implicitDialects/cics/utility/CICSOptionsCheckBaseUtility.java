@@ -184,18 +184,6 @@ public abstract class CICSOptionsCheckBaseUtility {
   }
 
   /**
-   * Helper method to collect analysis errors if the rule context contains illegal options
-   *
-   * @param rule Generic rule to check
-   * @param options Options checked to insert into error message
-   */
-  protected void checkHasIllegalOptions(TerminalNode rule, String options) {
-    if (!rule.getText().isEmpty()) {
-      throwException(ErrorSeverity.ERROR, getLocality(rule), "Invalid option provided: ", options);
-    }
-  }
-
-  /**
    * Helper function to check and see if more than one rule was visited out of a set provided.
    *
    * @param options Options checked to insert into error message
