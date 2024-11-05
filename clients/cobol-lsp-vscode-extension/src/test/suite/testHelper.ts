@@ -210,10 +210,6 @@ export async function updateConfig(configFileName: string) {
   });
 }
 
-export async function deleteFile(path: string) {
-  await vscode.workspace.fs.delete(vscode.Uri.file(path));
-}
-
 export function assertRangeIsEqual(
   providedRange: vscode.Range,
   expectedRange: vscode.Range,
