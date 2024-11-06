@@ -109,7 +109,9 @@ public class CICSConverseOptionsCheckUtility extends CICSOptionsCheckBaseUtility
         }
 
         checkHasMandatoryOptions(ctx.cics_into(), ctx, "INTO or SET");
-        checkHasMandatoryOptions(ctx.cics_converse_tolength(), ctx, "TOLENGTH OR TOFLENGTH");
+
+        if (!ctx.cics_maxlength().isEmpty())
+            checkHasMandatoryOptions(ctx.cics_converse_tolength(), ctx, "TOLENGTH OR TOFLENGTH");
 
         checkDuplicates(ctx);
     }
