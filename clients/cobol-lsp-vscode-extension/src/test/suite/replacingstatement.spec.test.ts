@@ -24,6 +24,7 @@ suite("TF35623: Support for Replacing and Mapping statement", function () {
   suiteSetup(async function () {
     helper.updateConfig("basic.json");
     await helper.activate();
+    await helper.sleep(1000);
   });
 
   this.afterEach(async () => {

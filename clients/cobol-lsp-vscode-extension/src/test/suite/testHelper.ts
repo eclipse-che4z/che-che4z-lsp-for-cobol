@@ -23,19 +23,19 @@ export async function activate() {
   const cobol = vscode.extensions.getExtension(
     "BroadcomMFD.cobol-language-support",
   )!;
-  if (!cobol.isActive) {
+  if (cobol && !cobol.isActive) {
     await cobol.activate();
   }
   const idms = vscode.extensions.getExtension(
     "BroadcomMFD.cobol-language-support-for-idms",
   )!;
-  if (!idms.isActive) {
+  if (idms && !idms.isActive) {
     await idms.activate();
   }
   const daco = vscode.extensions.getExtension(
     "BroadcomMFD.cobol-language-support-for-daco",
   )!;
-  if (!daco.isActive) {
+  if (daco && !daco.isActive) {
     await daco.activate();
   }
 }
@@ -63,7 +63,6 @@ export function getEditor(workspace_file: string): vscode.TextEditor {
 
 export async function getUri(workspace_file: string): Promise<vscode.Uri> {
   const files = await vscode.workspace.findFiles(workspace_file);
-
   assert.ok(files && files[0], `Cannot find file ${workspace_file}`);
   return files[0];
 }
@@ -346,4 +345,35 @@ export async function waitForDiagnosticsChange(file: string | vscode.Uri) {
   });
 
   return result;
+}
+
+export async function triggerCompletionsAndWaitForResults() {
+  while (true) {
+    // Get the active text editor
+    const editor = vscode.window.activeTextEditor;
+    if (!editor) {
+      throw new Error("No active editor found");
+    }
+
+    await vscode.commands.executeCommand(
+      "editor.action.triggerSuggest",
+      editor.document.uri,
+    );
+
+    const position = editor.selection.active;
+    const document = editor.document;
+
+    // Trigger the completion provider manually
+    const completions =
+      await vscode.commands.executeCommand<vscode.CompletionList>(
+        "vscode.executeCompletionItemProvider",
+        document.uri,
+        position,
+      );
+
+    if (completions && completions.items.length > 0) {
+      return completions;
+    }
+    await sleep(100);
+  }
 }

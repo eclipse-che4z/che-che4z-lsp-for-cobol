@@ -34,7 +34,6 @@ import {
   COBOL_PRGM_LAYOUT,
   SETTINGS_CPY_NDVR_DEPENDENCIES,
 } from "../constants";
-import cobolSnippets = require("../services/snippetcompletion/cobolSnippets.json");
 import { DialectRegistry, DIALECT_REGISTRY_SECTION } from "./DialectRegistry";
 import {
   loadProcessorGroupCompileOptionsConfig,
@@ -276,25 +275,6 @@ export class SettingsService {
     return vscode.workspace
       .getConfiguration(SETTINGS_CPY_SECTION)
       .get("copybook-file-encoding");
-  }
-
-  /**
-   * Return the dialect type supplied by user
-   * @returns Map of snippets
-   */
-  public static async getSnippetsForCobol(): Promise<Map<any, any>> {
-    const map: Map<any, any> = new Map<any, any>([
-      ...Object.entries(cobolSnippets),
-    ]);
-    return map;
-  }
-
-  /**
-   * Gets list of desired fialects
-   * @returns a list of desired fialects
-   */
-  public static getDialects(): string[] | undefined {
-    return vscode.workspace.getConfiguration().get(SETTINGS_DIALECT);
   }
 
   /**
