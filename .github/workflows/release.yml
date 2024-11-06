@@ -47,3 +47,4 @@ jobs:
       run: export NODE_PATH=`npm root -g`; release-it --ci --config ../../release/release-it-release.json
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        THE_KEY: ${{ secrets.TELEMETRY_INSTRUMENTATION_KEY }}
