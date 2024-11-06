@@ -80,12 +80,13 @@ export async function showDocument(workspace_file: string) {
 }
 
 export async function openUntitledDocument(languageId = LANGUAGE_ID) {
-  await vscode.commands.executeCommand(
-    "workbench.action.files.newUntitledFile",
-    { languageId },
-  );
+  const document = await vscode.workspace.openTextDocument({
+    language: languageId,
+  });
 
-  return vscode.window.activeTextEditor!;
+  return await vscode.window.showTextDocument(document, {
+    preview: false,
+  });
 }
 
 export async function closeActiveEditor() {
