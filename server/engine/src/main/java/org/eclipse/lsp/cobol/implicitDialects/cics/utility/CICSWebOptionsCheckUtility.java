@@ -196,6 +196,8 @@ public class CICSWebOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
             default:
                 break;
         }
+
+        checkDuplicates(ctx);
     }
 
     private <E extends ParserRuleContext> void iterateSubrules(E ctx) {
@@ -418,9 +420,10 @@ public class CICSWebOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     }
 
     private void checkWebBodyDoctoken(CICSParser.Cics_web_body_doctokenContext ctx) {
-        if (!ctx.NODOCDELETE().getText().isEmpty() || !ctx.DOCDELETE().getText().isEmpty() || !ctx.DOCSTATUS().getText().isEmpty()) {
-            checkHasMandatoryOptions(ctx.DOCTOKEN(), ctx, "DOCTOKEN");
-        }
+        checkPrerequisiteIsMet(ctx.DOCTOKEN(), ctx.NODOCDELETE(), ctx, "DOCTOKEN");
+        checkPrerequisiteIsMet(ctx.DOCTOKEN(), ctx.DOCDELETE(), ctx, "DOCTOKEN");
+        checkPrerequisiteIsMet(ctx.DOCTOKEN(), ctx.DOCSTATUS(), ctx, "DOCTOKEN");
+
         checkMutuallyExclusiveOptions("DOCDELETE, NODOCDELETE, DOCSTATUS", ctx.DOCDELETE(), ctx.NODOCDELETE(), ctx.DOCSTATUS());
     }
 

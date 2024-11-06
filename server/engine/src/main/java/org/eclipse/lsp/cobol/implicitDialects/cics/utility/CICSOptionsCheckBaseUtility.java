@@ -111,12 +111,6 @@ public abstract class CICSOptionsCheckBaseUtility {
     return true;
   }
 
-  protected void checkHasMandatoryOptions(TerminalNode rules, ParserRuleContext ctx, String options) {
-    ArrayList<TerminalNode> tempList = new ArrayList<>();
-    tempList.add(rules);
-    checkHasMandatoryOptions(tempList, ctx, options);
-  }
-
   /**
    *
    * @param requiredContext - The rule that is required
