@@ -371,18 +371,10 @@ jobs:
         run: npm ci
         working-directory: clients/cobol-lsp-vscode-extension
       - name: Inject telemetry key to COBOL LS extension
-        shell: pwsh
+        shell: bash
         run: |
-          $telKey = node -e "console.log(Buffer.from('${{ secrets.TELEMETRY_INSTRUMENTATION_KEY }}').toString('base64'))"
-          if ([string]::IsNullOrEmpty($telKey)) {
-              Write-Host 'TELEMETRY_INSTRUMENTATION_KEY secret not configured, skipping injection'
-              exit 0
-          }
-          $filePath = "src/services/reporter/TelemetryReporterImpl.ts"
-          $content = Get-Content $filePath -Raw
-          $newContent = $content -replace 'const TELEMETRY_KEY_ENCODED: string = TELEMETRY_DEFAULT_CONTENT', "const TELEMETRY_KEY_ENCODED: string = '$telKey'"
-          $newContent | Set-Content $filePath -NoNewline
-        working-directory: clients/cobol-lsp-vscode-extension        
+          sed -i '' "s/const TELEMETRY_KEY_ENCODED: string = TELEMETRY_DEFAULT_CONTENT/const TELEMETRY_KEY_ENCODED: string = '${{ secrets.TELEMETRY_KEY }}'/" src/services/reporter/TelemetryReporterImpl.ts
+        working-directory: clients/cobol-lsp-vscode-extension         
       - name: Package COBOL LS vsix for ${{ env.target }}
         working-directory: clients/cobol-lsp-vscode-extension
         run: |
