@@ -108,9 +108,6 @@ local.properties
 
 # ANTLR plugin
 /server/engine/gen
-/server/dialect-idms/gen
-/server/dialect-daco/gen
-/server/test/gen
 /server/parser/gen
 .antlr/
 gen/
