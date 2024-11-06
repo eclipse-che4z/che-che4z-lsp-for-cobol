@@ -84,6 +84,8 @@ export async function openUntitledDocument(languageId = LANGUAGE_ID) {
     "workbench.action.files.newUntitledFile",
     { languageId },
   );
+
+  return vscode.window.activeTextEditor!;
 }
 
 export async function closeActiveEditor() {

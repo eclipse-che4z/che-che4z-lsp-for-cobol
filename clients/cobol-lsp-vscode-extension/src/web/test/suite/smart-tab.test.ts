@@ -42,9 +42,7 @@ suite("Web Extension Test Suite: Smart Tab", () => {
     });
 
     test("Simulates tab presses", async function () {
-      await helper.openUntitledDocument();
-
-      const editor = vscode.window.activeTextEditor!;
+      const editor = await helper.openUntitledDocument();
 
       assert.strictEqual(editor.selection.active.character, 0);
 
@@ -76,9 +74,7 @@ suite("Web Extension Test Suite: Smart Tab", () => {
     });
 
     test("Default custom configuration", async function () {
-      await helper.openUntitledDocument();
-
-      const editor = vscode.window.activeTextEditor!;
+      const editor = await helper.openUntitledDocument();
 
       assert.strictEqual(editor.selection.active.character, 0);
 
@@ -93,9 +89,7 @@ suite("Web Extension Test Suite: Smart Tab", () => {
     });
 
     test("Anchor custom configuration", async function () {
-      await helper.openUntitledDocument();
-
-      const editor = vscode.window.activeTextEditor!;
+      const editor = await helper.openUntitledDocument();
 
       await vscode.commands.executeCommand("type", {
         text: "DATA DIVISION.\n",
