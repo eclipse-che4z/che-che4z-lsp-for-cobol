@@ -373,7 +373,7 @@ jobs:
       - name: Inject telemetry key to COBOL LS extension
         shell: bash
         run: |
-          sed -i '' "s/const TELEMETRY_KEY_ENCODED: string = TELEMETRY_DEFAULT_CONTENT/const TELEMETRY_KEY_ENCODED: string = '${{ secrets.TELEMETRY_KEY }}'/" src/services/reporter/TelemetryReporterImpl.ts
+          sed -i "s/const TELEMETRY_KEY_ENCODED: string = TELEMETRY_DEFAULT_CONTENT/const TELEMETRY_KEY_ENCODED: string = '${{ secrets.TELEMETRY_KEY }}'/" src/services/reporter/TelemetryReporterImpl.ts
         working-directory: clients/cobol-lsp-vscode-extension         
       - name: Package COBOL LS vsix for ${{ env.target }}
         working-directory: clients/cobol-lsp-vscode-extension
