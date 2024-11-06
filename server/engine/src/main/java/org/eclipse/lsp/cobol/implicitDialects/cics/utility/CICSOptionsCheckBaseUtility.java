@@ -56,7 +56,7 @@ public abstract class CICSOptionsCheckBaseUtility {
         }
       };
 
-  private final Map<Integer, String> baseDupilicateRulesOptions = new HashMap<Integer, String>() {
+  private final Map<Integer, String> baseDuplicateRulesOptions = new HashMap<Integer, String>() {
     {
       put(CICSParser.RULE_cics_into, "INTO or SET");
     }
@@ -79,7 +79,7 @@ public abstract class CICSOptionsCheckBaseUtility {
     this.context = context;
     this.errors = errors;
     this.baseDuplicateOptions.putAll(duplicateOptions);
-    this.baseDupilicateRulesOptions.putAll(duplicateRulesOptions);
+    this.baseDuplicateRulesOptions.putAll(duplicateRulesOptions);
   }
 
   /**
@@ -328,7 +328,7 @@ public abstract class CICSOptionsCheckBaseUtility {
     checkDuplicateEntries(ctx, foundEntries, updatedDuplicateOptions);
 
     // Check for duplicate rules
-    Map<Integer, String> updatedRuleOptions = new HashMap<>(baseDupilicateRulesOptions);
+    Map<Integer, String> updatedRuleOptions = new HashMap<>(baseDuplicateRulesOptions);
     if (customDuplicateRuleOptions != null) updatedRuleOptions.putAll(customDuplicateRuleOptions);
     processDuplicateRules(ctx, updatedRuleOptions);
   }
