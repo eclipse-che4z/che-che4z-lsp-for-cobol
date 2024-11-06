@@ -1,7 +1,7 @@
 import * as vscode from "vscode";
 import { SETTINGS_TAB_CONFIG } from "../constants";
 import * as t from "io-ts";
-import { decodeUnknown, DecodingError } from "./util/decoder";
+import { decodeUnknown } from "./util/decoder";
 
 export class TabRule {
   public constructor(
@@ -35,11 +35,8 @@ const TabSettingsType = t.union([
 function parseConfiguration(input: unknown) {
   try {
     return decodeUnknown(TabSettingsType, input);
-  } catch (err) {
-    if (err instanceof DecodingError) {
-      return void 0;
-    }
-    throw err;
+  } catch (_err) {
+    return void 0;
   }
 }
 

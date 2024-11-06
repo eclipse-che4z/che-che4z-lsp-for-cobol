@@ -231,6 +231,15 @@ describe("SettingsService returns correct tab settings", () => {
     expect(tabSettings.defaultRule.stops[3]).toBe(40);
     expect(tabSettings.rules.length).toBe(2);
   });
+
+  test("Returns default tab settings for invalid configuration", () => {
+    vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
+      get: jest.fn().mockReturnValue("invalid configuration"),
+    });
+
+    const tabSettings = getTabSettings();
+    expect(tabSettings.defaultRule.maxPosition).toBe(72);
+  });
 });
 
 describe("SettingsService returns correct Copybook Configuration Values", () => {
@@ -327,6 +336,27 @@ describe("SettingService lspConfigHandler", () => {
       });
 
       expect(result).toEqual(expect.arrayContaining([[dialect]]));
+    });
+  });
+
+  describe("unknown section", () => {
+    test("returns matching vscode configuration item", async () => {
+      const configurationValue = { random: "configuration" };
+
+      let configKey: string | undefined;
+      vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
+        get: jest.fn().mockImplementation((key: string) => {
+          configKey = key;
+          return configurationValue;
+        }),
+      });
+
+      const result = await lspConfigHandler({
+        items: [{ section: "unknown.config.section" }],
+      });
+
+      expect(result).toEqual(expect.arrayContaining([configurationValue]));
+      expect(configKey).toEqual("unknown.config.section");
     });
   });
 });
