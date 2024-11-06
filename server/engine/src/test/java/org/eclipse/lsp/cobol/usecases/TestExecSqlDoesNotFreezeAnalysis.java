@@ -35,7 +35,7 @@ class TestExecSqlDoesNotFreezeAnalysis {
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
           + "       PROCEDURE DIVISION.\n"
-          + "           {EXEC|3} SQL{|1}\n";
+          + "           {|1}{|2}EXEC SQL\n";
 
   @Test
   void test() {
@@ -49,10 +49,10 @@ class TestExecSqlDoesNotFreezeAnalysis {
                 "Unexpected end of line",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()),
-            "3",
+            "2",
             new Diagnostic(
                 new Range(),
-                "Missing token END-EXEC for the EXEC block",
+                "Missing token END-EXEC at execRule",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())),
         ImmutableList.of(),

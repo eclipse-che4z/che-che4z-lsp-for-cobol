@@ -31,8 +31,8 @@ public class TestExecBlockWithoutEndExec {
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
           + "       PROCEDURE DIVISION .\n"
-          + "           {EXEC|1} SQL \n"
-          + "               SELECT DIAG_CODE FROM DIAG_CODES WHERE COPAY > 100;.";
+          + "           EXEC SQL \n"
+          + "               SELECT DIAG_CODE FROM DIAG_CODES WHERE COPAY > 100;{|1}{|2}.";
 
   public static final String TEXT2 =
       "       IDENTIFICATION DIVISION.\n"
@@ -54,9 +54,15 @@ public class TestExecBlockWithoutEndExec {
             "1",
             new Diagnostic(
                 new Range(),
-                "Missing token END-EXEC for the EXEC block",
+                "Missing token END-EXEC at execRule",
                 DiagnosticSeverity.Error,
-                ErrorSource.PARSING.getText())));
+                ErrorSource.PARSING.getText()),
+            "2",
+            new Diagnostic(
+                    new Range(),
+                    "Extraneous input .",
+                    DiagnosticSeverity.Error,
+                    ErrorSource.PARSING.getText())));
   }
 
   @Test

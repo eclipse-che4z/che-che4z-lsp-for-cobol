@@ -15,23 +15,22 @@
 parser grammar Db2SqlParser;
 options {tokenVocab = Db2SqlLexer; superClass = MessageServiceParser;}
 
-startRule: .*? ((execRule | nonExecRule) .*?) * EOF;
+startRule: (
+      execRule
+    | ( nonExecRule | SINGLEDIGIT_1 | DOUBLEDIGIT_1 | INTEGERLITERAL | SINGLEDIGITLITERAL)
+    | ~( EXEC_SQL | EXEC_SQLIMS | SINGLEDIGIT_1 | DOUBLEDIGIT_1 | INTEGERLITERAL | SINGLEDIGITLITERAL)
+    )* EOF;
+//startRule: .*? ((execRule | nonExecRule) .*?) * EOF;
 //startIncludeRule: .*? (includeStatement .*?)* EOF;
 
-execRule: EXEC SQL sqlCode END_EXEC
-         | EXEC SQL END_EXEC
-         | EXEC SQLIMS sqlCode END_EXEC // TODO: check when should this grammar be activated. Probably based on some compiler directives
-         | {notifyError("cobolParser.missingEndExec");} EXEC SQL sqlCode DOT_FS? EOF
-         | {notifyError("cobolParser.missingEndExec");} EXEC SQL;
+execRule: (EXEC_SQL | EXEC_SQLIMS) sqlCode END_EXEC;
 
-nonExecRule: host_variable_rule;
+nonExecRule: sql_host_variables | binary_host_variable | binary_host_variable_array;
 
-host_variable_rule: (sql_host_variables | binary_host_variable | binary_host_variable_array);
+binary_host_variable_array: dbs_host_var_levels entry_name SQL TYPE IS binary_host_variable_type host_variable_array_times;
 
 binary_host_variable: dbs_level_01 entry_name host_variable_usage binary_host_variable_type;
 binary_host_variable_type: BINARY LPARENCHAR binary_host_variable_binary_size RPARENCHAR | (VARBINARY | BINARY VARYING) LPARENCHAR binary_host_variable_varbinary_size RPARENCHAR;
-
-binary_host_variable_array: dbs_host_var_levels entry_name SQL TYPE IS binary_host_variable_type host_variable_array_times;
 
 binary_host_variable_binary_size: T=dbs_integerliteral_expanded {validateIntegerRange($T.start, $T.text, 1, 255);};
 binary_host_variable_varbinary_size: T=dbs_integerliteral_expanded {validateIntegerRange($T.start, $T.text, 1, 32704);};
@@ -90,12 +89,49 @@ startSqlRule : (dataDivisionRules | procedureDivisionRules | rulesAllowedInDataD
 /*Allowable SQL statements for COBOL program specific dvisions or sections*/
 dataDivisionRules: dbs_declare_variable+ | rulesAllowedInWorkingStorageAndLinkageSection;
 
-procedureDivisionRules: ((dbs_allocate | dbs_alter | dbs_associate | dbs_call | dbs_close | dbs_comment | dbs_commit |
-          dbs_connect | dbs_create | dbs_declare | dbs_delete | dbs_describe | dbs_drop | dbs_exchange | dbs_execute | dbs_explain |
-          dbs_fetch | dbs_free | dbs_get | dbs_grant | dbs_hold | dbs_insert |
-          dbs_label | dbs_lock | dbs_merge | dbs_open | dbs_prepare | dbs_refresh | dbs_release | dbs_rename |
-          dbs_revoke | dbs_rollback | dbs_savepoint | dbs_select | dbs_set | dbs_signal | dbs_transfer | dbs_truncate |
-          dbs_update | dbs_values) dbs_semicolon_end?)+;
+procedureDivisionRule: dbs_allocate
+    | dbs_alter
+    | dbs_associate
+    | dbs_call
+    | dbs_close
+    | dbs_comment
+    | dbs_commit
+    | dbs_connect
+    | dbs_create
+    | dbs_declare
+    | dbs_delete
+    | dbs_describe
+    | dbs_drop
+    | dbs_exchange
+    | dbs_execute
+    | dbs_explain
+    | dbs_fetch
+    | dbs_free
+    | dbs_get
+    | dbs_grant
+    | dbs_hold
+    | dbs_insert
+    | dbs_label
+    | dbs_lock
+    | dbs_merge
+    | dbs_open
+    | dbs_prepare
+    | dbs_refresh
+    | dbs_release
+    | dbs_rename
+    | dbs_revoke
+    | dbs_rollback
+    | dbs_savepoint
+    | dbs_select
+    | dbs_set
+    | dbs_signal
+    | dbs_transfer
+    | dbs_truncate
+    | dbs_update
+    | dbs_values
+    ;
+
+procedureDivisionRules: (procedureDivisionRule dbs_semicolon_end?)+;
 
 rulesAllowedInDataDivisionAndProcedureDivision: ((dbs_declare_cursor | dbs_whenever | dbs_declare_table | dbs_include | DECLARE dbs_declare_statement) dbs_semicolon_end?)+;
 
@@ -971,8 +1007,8 @@ dbs_select: dbs_select_unpack_function_invocation | (WITH common_table_expressio
              | dbs_select_readOnly
              | dbs_select_optimize
              | dbs_select_statement_isolation_clause
-             | (QUERYNO dbs_integer)
-             | (SKIPCHAR LOCKED DATA))*;
+             | QUERYNO dbs_integer
+             | SKIPCHAR LOCKED DATA)*;
 dbs_select_update: FOR UPDATE (OF dbs_column_name (dbs_comma_separator dbs_column_name)*)? ;
 dbs_select_readOnly: FOR (READ | FETCH) ONLY;
 dbs_select_optimize:OPTIMIZE FOR dbs_integer (ROWS | ROW);
@@ -1114,8 +1150,16 @@ dbs_set_schema: (CURRENT? SCHEMA | CURRENT_SCHEMA) EQUALCHAR? (dbs_schema_name |
 dbs_set_session_tz : SESSION? TIME ZONE EQUALCHAR? (dbs_string_constant | dbs_variable);
 
 /*SIGNAL - this is a statement and is referenced in other rules*/
-dbs_signal: dbs_label? SIGNAL (dbs_sql_condition_name | SQLSTATE VALUE? (dbs_sqlstate_string_constant | dbs_sql_variable_name |
-            dbs_sql_parameter_name)) (SET MESSAGE_TEXT EQUALCHAR)? dbs_diagnostic_string_expression;
+dbs_signal: dbs_label? SIGNAL
+            (
+                  dbs_sql_condition_name
+                | SQLSTATE VALUE? (
+                                     dbs_sqlstate_string_constant
+                                   | dbs_sql_variable_name
+                                   | dbs_sql_parameter_name
+                                  )
+            )
+            (SET MESSAGE_TEXT EQUALCHAR)? dbs_diagnostic_string_expression;
 
 
 /*TRANSFER OWNERSHIP */

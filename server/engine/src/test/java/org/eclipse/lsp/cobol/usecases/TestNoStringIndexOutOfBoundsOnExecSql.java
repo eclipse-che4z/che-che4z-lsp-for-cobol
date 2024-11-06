@@ -34,8 +34,8 @@ class TestNoStringIndexOutOfBoundsOnExecSql {
           + "        DATA DIVISION.\n"
           + "        WORKING-STORAGE SECTION.\n"
           + "        PROCEDURE DIVISION.\n"
-          + "            {EXEC|2} SQL\n"
-          + "       {|1}\n";
+          + "            EXEC SQL\n"
+          + "       {|1}{|2}\n";
 
   @Test
   void test() {
@@ -52,7 +52,7 @@ class TestNoStringIndexOutOfBoundsOnExecSql {
             "2",
             new Diagnostic(
                 new Range(),
-                "Missing token END-EXEC for the EXEC block",
+                "Missing token END-EXEC at execRule",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())),
         ImmutableList.of(),
