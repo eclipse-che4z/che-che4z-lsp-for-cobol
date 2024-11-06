@@ -105,7 +105,7 @@ public class CICSConverseOptionsCheckUtility extends CICSOptionsCheckBaseUtility
             checkHasIllegalOptions(ctx.STRFIELD(), "STRFIELD");
         }
         if (!ctx.STRFIELD().isEmpty()) {
-            checkHasIllegalOptions(ctx.cics_converse_erase(), "CTLCHAR");
+            checkHasIllegalOptions(ctx.cics_converse_erase(), "ERASE");
         }
 
         checkHasMandatoryOptions(ctx.cics_into(), ctx, "INTO or SET");
