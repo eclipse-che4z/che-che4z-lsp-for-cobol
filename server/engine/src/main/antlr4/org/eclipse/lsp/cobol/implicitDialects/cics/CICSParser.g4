@@ -270,9 +270,9 @@ cics_change_task: TASK (PRIORITY cics_data_value)? cics_handle_response?;
 
 /** CHECK ACQPROCESS / ACTIVITY / TIMER */
 cics_check: CHECK (cics_check_activity | cics_check_timer);
-cics_check_activity: (ACQPROCESS | ACTIVITY cics_data_value | ACQACTIVITY | COMPSTATUS cics_cvda | ABCODE cics_data_area |
+cics_check_activity: (ACQPROCESS | ACTIVITY cics_data_value)+ ( ACQACTIVITY | COMPSTATUS cics_cvda | ABCODE cics_data_area |
                      ABPROGRAM cics_data_area | MODE cics_cvda | SUSPSTATUS cics_cvda | cics_handle_response)+;
-cics_check_timer: TIMER cics_data_value cics_handle_response? STATUS cics_cvda cics_handle_response?;
+cics_check_timer: (TIMER cics_data_value cics_handle_response? STATUS cics_cvda cics_handle_response?)*;
 
 cics_conditions: EOC | EODS | INVMPSZ | INVPARTN | INVREQ | MAPFAIL | PARTNFAIL | RDATT | UNEXPIN | ERROR | DUPREC;
 
