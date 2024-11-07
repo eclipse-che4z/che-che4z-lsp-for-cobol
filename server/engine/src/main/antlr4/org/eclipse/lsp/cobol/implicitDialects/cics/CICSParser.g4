@@ -277,9 +277,10 @@ cics_check_timer: TIMER cics_data_value cics_handle_response? STATUS cics_cvda c
 cics_conditions: EOC | EODS | INVMPSZ | INVPARTN | INVREQ | MAPFAIL | PARTNFAIL | RDATT | UNEXPIN | ERROR | DUPREC;
 
 /** CONNECT PROCESS */
-cics_connect: CONNECT PROCESS (CONVID cics_name | SESSION cics_name | PROCNAME cics_data_area |
-              PROCLENGTH cics_data_value | PARTNER cics_name | cics_connect_piplist | SYNCLEVEL |
-              cics_data_value | STATE cics_cvda | cics_handle_response)+;
+cics_connect: CONNECT cics_connect_process;
+cics_connect_process: PROCESS (CONVID cics_name | SESSION cics_name | PROCNAME cics_data_area |
+                                            PROCLENGTH cics_data_value | PARTNER cics_name | cics_connect_piplist | SYNCLEVEL cics_data_area |
+                                            cics_data_value | STATE cics_cvda | cics_handle_response)*;
 cics_connect_piplist: PIPLIST cics_data_area cics_handle_response? (PIPLENGTH cics_data_value)? cics_handle_response?;
 
 /** CONVERTTIME */
