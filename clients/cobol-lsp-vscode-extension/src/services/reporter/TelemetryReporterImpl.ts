@@ -34,7 +34,7 @@ export class TelemetryReporterImpl implements TelemetryReport {
     // The following line is replaced by base64 encoded telemetry key in the CI
     const TELEMETRY_KEY_ENCODED: string = TELEMETRY_DEFAULT_CONTENT;
 
-    if (TELEMETRY_KEY_ENCODED !== TELEMETRY_DEFAULT_CONTENT) {
+    if (TELEMETRY_KEY_ENCODED !== "") {
       return Buffer.from(TELEMETRY_KEY_ENCODED, "base64").toString();
     }
     return TELEMETRY_DEFAULT_CONTENT;

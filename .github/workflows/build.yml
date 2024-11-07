@@ -371,9 +371,10 @@ jobs:
         run: npm ci
         working-directory: clients/cobol-lsp-vscode-extension
       - name: Inject telemetry key to COBOL LS extension
+        if: github.event.inputs.with_telemetry == 'true'
         shell: bash
         run: |
-          sed -i ${{ startsWith( matrix.os, 'macos') && '""' || '' }} "s/const TELEMETRY_KEY_ENCODED: string = TELEMETRY_DEFAULT_CONTENT/const TELEMETRY_KEY_ENCODED: string = '${{ secrets.TELEMETRY_KEY }}'/" src/services/reporter/TelemetryReporterImpl.ts
+          sed -i ${{ startsWith( matrix.os, 'macos') && '""' || '' }} "s/const TELEMETRY_KEY_ENCODED: string = TELEMETRY_DEFAULT_CONTENT/const TELEMETRY_KEY_ENCODED: string = '${{ secrets.TELEMETRY_INSTRUMENTATION_KEY }}'/" src/services/reporter/TelemetryReporterImpl.ts
         working-directory: clients/cobol-lsp-vscode-extension         
       - name: Package COBOL LS vsix for ${{ env.target }}
         working-directory: clients/cobol-lsp-vscode-extension
