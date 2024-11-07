@@ -24,7 +24,7 @@ suite("Tests with USER1.cbl", function () {
   suiteSetup(async function () {
     this.timeout(0);
     this.slow(2000);
-    helper.updateConfig("basic.json");
+    await helper.updateConfig("basic.json");
     await helper.activate();
   });
 

@@ -66,6 +66,15 @@ public class CICSOptionsCheckUtility {
     optionsMap.put(
             CICSConnectProcessOptionsCheckUtility.RULE_INDEX,
         new CICSConnectProcessOptionsCheckUtility(context, errors));
+    optionsMap.put(
+        CICSDeleteOptionsCheckUtility.RULE_INDEX,
+        new CICSDeleteOptionsCheckUtility(context, errors));
+    optionsMap.put(
+        CICSDeleteqDeqOptionsCheckUtility.RULE_INDEX_DELETEQ,
+        new CICSDeleteqDeqOptionsCheckUtility(context, errors));
+    optionsMap.put(
+        CICSDeleteqDeqOptionsCheckUtility.RULE_INDEX_DEQ,
+        new CICSDeleteqDeqOptionsCheckUtility(context, errors));
   }
 
   /**

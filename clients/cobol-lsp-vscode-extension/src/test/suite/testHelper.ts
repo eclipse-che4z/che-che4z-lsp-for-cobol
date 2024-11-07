@@ -14,7 +14,7 @@
 import * as assert from "assert";
 import * as vscode from "vscode";
 import * as path from "path";
-import * as fs from "fs";
+import { LANGUAGE_ID } from "../../constants";
 
 export const TEST_TIMEOUT = 150000;
 
@@ -77,6 +77,16 @@ export async function showDocument(workspace_file: string) {
   });
 
   return editor;
+}
+
+export async function openUntitledDocument(languageId = LANGUAGE_ID) {
+  const document = await vscode.workspace.openTextDocument({
+    language: languageId,
+  });
+
+  return await vscode.window.showTextDocument(document, {
+    preview: false,
+  });
 }
 
 export async function closeActiveEditor() {
@@ -186,39 +196,21 @@ export function range(p0: vscode.Position, p1: vscode.Position): vscode.Range {
   return new vscode.Range(p0, p1);
 }
 
-export function updateConfig(configFileName: string) {
+export async function updateConfig(configFileName: string) {
   // update the settings.json with this file content
-  const settinsFileLoc = path.join(
-    vscode.workspace.workspaceFolders![0].uri.fsPath,
+  const settingsFileLoc = vscode.Uri.joinPath(
+    vscode.workspace.workspaceFolders![0].uri,
     ".vscode",
     "settings.json",
   );
-  const settingvalueLoc = path.join(
-    getWorkspacePath(),
+  const settingsValueLoc = vscode.Uri.joinPath(
+    vscode.Uri.file(getWorkspacePath()),
     "settings",
     configFileName,
   );
-  recursiveCopySync(settingvalueLoc, settinsFileLoc);
-}
-
-export function deleteFile(path: string) {
-  fs.rmSync(path);
-}
-
-export function recursiveCopySync(origin: string, dest: string) {
-  if (fs.existsSync(origin)) {
-    if (fs.statSync(origin).isDirectory()) {
-      fs.mkdirSync(dest, { recursive: true });
-      fs.readdirSync(origin).forEach((file) =>
-        recursiveCopySync(path.join(origin, file), path.join(dest, file)),
-      );
-    } else {
-      const destFolder = path.dirname(dest);
-      if (!fs.existsSync(destFolder))
-        fs.mkdirSync(destFolder, { recursive: true });
-      fs.copyFileSync(origin, dest);
-    }
-  }
+  await vscode.workspace.fs.copy(settingsValueLoc, settingsFileLoc, {
+    overwrite: true,
+  });
 }
 
 export function assertRangeIsEqual(
@@ -377,3 +369,6 @@ export async function triggerCompletionsAndWaitForResults() {
     await sleep(100);
   }
 }
+
+export type Mutable<T> = { -readonly [P in keyof T]: T[P] };
+export const asMutable = <T>(value: T): Mutable<T> => value as Mutable<T>;
