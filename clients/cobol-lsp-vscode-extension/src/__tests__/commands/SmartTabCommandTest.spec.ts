@@ -15,7 +15,7 @@
 import * as vscode from "../../__mocks__/vscode";
 import * as smartTab from "../../commands/SmartTabCommand";
 import { initSmartTab } from "../../commands/SmartTabCommand";
-import { TabRule, TabSettings } from "../../services/Settings";
+import { TabRule, TabSettings } from "../../services/SmartTabSettings";
 import { Position, Selection, TextEditor } from "vscode";
 
 const context: any = {

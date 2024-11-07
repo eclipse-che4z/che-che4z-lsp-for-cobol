@@ -74,7 +74,7 @@ public class Cli implements Callable<Integer> {
     return SUCCESS;
   }
 
-  Result runAnalysis(File src, CobolLanguageId dialect, Injector diCtx, boolean isAnalysisRequired) throws IOException {
+  Result runAnalysis(File src, CobolLanguageId dialect, Injector diCtx, boolean isAnalysisRequired, boolean collectAstChanges) throws IOException {
     String documentUri = src.toURI().toString();
     Pipeline<AnalysisContext> pipeline = setupPipeline(diCtx, isAnalysisRequired, dialect);
 
@@ -84,7 +84,10 @@ public class Cli implements Callable<Integer> {
 
     String text = new String(Files.readAllBytes(src.toPath()));
     ResultWithErrors<ExtendedText> resultWithErrors = preprocessor.cleanUpCode(documentUri, text);
-    AnalysisContext ctx = new AnalysisContext(new ExtendedDocument(resultWithErrors.getResult(), text), createAnalysisConfiguration(), benchmarkService.startSession(), documentUri, text, dialect);
+    AnalysisConfig config = AnalysisConfig.defaultConfig(CopybookProcessingMode.ENABLED, collectAstChanges);
+    ExtendedDocument extendedDocument = new ExtendedDocument(resultWithErrors.getResult(), text);
+    BenchmarkSession benchmarkSession = benchmarkService.startSession();
+    AnalysisContext ctx = new AnalysisContext(extendedDocument, config, benchmarkSession, documentUri, text, dialect);
     ctx.getAccumulatedErrors().addAll(resultWithErrors.getErrors());
     PipelineResult pipelineResult = pipeline.run(ctx);
     return new Result(ctx, pipelineResult);
@@ -127,9 +130,5 @@ public class Cli implements Callable<Integer> {
     benchmarkSession.getMeasurements().forEach(m -> tObj.add(m.getId(), new JsonPrimitive(m.getTime() / 1_000_000_000.0)));
     result.add("timings", tObj);
     benchmarkSession.getMeasurements().stream().map(Measurement::getTime).reduce(Long::sum).ifPresent(totalTime -> tObj.add("total", new JsonPrimitive(totalTime / 1_000_000_000.0)));
-  }
-
-  private static AnalysisConfig createAnalysisConfiguration() {
-    return AnalysisConfig.defaultConfig(CopybookProcessingMode.ENABLED);
   }
 }

@@ -38,7 +38,7 @@ public abstract class Node {
   private final String dialect;
 
   @EqualsAndHashCode.Exclude private final List<Node> children = new CopyOnWriteArrayList<>();
-  @EqualsAndHashCode.Exclude @ToString.Exclude @Setter private Node parent;
+  @EqualsAndHashCode.Exclude @ToString.Exclude @Setter private transient Node parent;
 
   protected Node(Locality location, NodeType nodeType, String dialect) {
     this.locality = location;
