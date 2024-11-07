@@ -208,7 +208,7 @@ cics_allocate_appc_partner: (PARTNER cics_name | NOQUEUE | STATE cics_cvda | cic
 /** ASKTIME */
 cics_asktime:ASKTIME cics_asktime_abstime;
 cics_asktime_abstime: (ABSTIME cics_data_area | cics_handle_response)*;
- 
+
 /** ASSIGN */
 cics_assign: ASSIGN (cics_assign_parameter1 | cics_assign_parameter2) *;
 
@@ -390,19 +390,14 @@ cics_free: FREE (CONVID cics_name | SESSION cics_name | STATE cics_cvda | cics_h
 /** FREEMAIN */
 cics_freemain: FREEMAIN (DATA cics_data_area | DATAPOINTER cics_value | cics_handle_response)+;
 
-/** GET CONTAINER (both of them) / GET COUNTER / GET DCOUNTER */
-cics_get: GET (cics_get_container | cics_get_counter | cics_get_dcounter);
-cics_get_container: CONTAINER cics_data_value (cics_get_bts | cics_get_channel);
-cics_get_bts: (ACTIVITY cics_data_value | ACQACTIVITY | PROCESS | ACQPROCESS | INTO cics_data_area | SET cics_ref |
-               NODATA | FLENGTH cics_data_area | cics_handle_response)+;
-cics_get_channel: (CHANNEL cics_data_value | INTO cics_data_area | FLENGTH cics_data_area | SET cics_ref | FLENGTH cics_data_area |
-                  NODATA | FLENGTH cics_data_area | INTOCCSID cics_data_value | INTOCODEPAGE cics_data_value | cics_get_convertst |
-                  cics_handle_response)+;
-cics_get_convertst: CONVERTST cics_cvda (CCSID cics_data_area)?;
-cics_get_counter: COUNTER cics_name (POOL cics_name | VALUE cics_data_area | INCREMENT cics_data_value | REDUCE | WRAP |
-                  COMPAREMIN cics_data_value | COMPAREMAX cics_data_value | cics_handle_response)+;
-cics_get_dcounter: DCOUNTER cics_name (POOL cics_name | VALUE cics_data_area | INCREMENT cics_data_area | REDUCE | WRAP |
-                   COMPAREMIN cics_data_area | COMPAREMAX cics_data_area | cics_handle_response)+;
+/** GET CONTAINER / GET COUNTER / GET DCOUNTER */
+cics_get: GET (cics_get_container_bts | cics_get_container_channel | cics_get_counter_dcounter);
+cics_get_container_bts: ((CONTAINER | ACTIVITY) cics_data_value | ACQACTIVITY | PROCESS | ACQPROCESS | (INTO | FLENGTH) cics_data_area |
+                    SET cics_ref | NODATA  | cics_handle_response)*;
+cics_get_container_channel: ((CONTAINER | CHANNEL | BYTEOFFSET | INTOCCSID | INTOCODEPAGE) cics_data_value | (INTO | FLENGTH | CCSID) cics_data_area |
+                    SET cics_ref | NODATA | CONVERTST cics_cvda | cics_handle_response)*;
+cics_get_counter_dcounter: ((COUNTER | DCOUNTER | POOL) cics_name | VALUE cics_data_area | (INCREMENT | COMPAREMIN | COMPAREMAX) cics_data_value |
+                  WRAP | NOSUSPEND | REDUCE | cics_handle_response)*;
 
 /** GETMAIN */
 cics_getmain: GETMAIN (SET cics_ref | FLENGTH cics_data_value | BELOW | LENGTH cics_data_value | INITIMG cics_data_value |
