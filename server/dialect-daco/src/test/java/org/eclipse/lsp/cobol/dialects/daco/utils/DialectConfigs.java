@@ -37,7 +37,7 @@ public class DialectConfigs {
   public AnalysisConfig getDaCoAnalysisConfig() {
     return new AnalysisConfig(
             CopybookProcessingMode.DISABLED,
-            ImmutableList.of(DaCoDialect.NAME, IdmsDialect.NAME), true,
+            ImmutableList.of(DaCoDialect.NAME, IdmsDialect.NAME), true, false,
             ImmutableList.of(),
             createPredefinedSectionsConfig(ImmutableList.of("S930", "S940", "S950",
                 "S990", "S991", "S997", "S999")));
@@ -51,7 +51,7 @@ public class DialectConfigs {
    */
   public AnalysisConfig getDaCoAnalysisConfig(CopybookProcessingMode copybookProcessingMode, List<String> predefinedSections) {
     return new AnalysisConfig(copybookProcessingMode, ImmutableList.of(DaCoDialect.NAME, IdmsDialect.NAME),
-        true, ImmutableList.of(), createPredefinedSectionsConfig(predefinedSections));
+        true, false, ImmutableList.of(), createPredefinedSectionsConfig(predefinedSections));
   }
 
   private Map<String, JsonElement> createPredefinedSectionsConfig(List<String> predefinedSections) {

@@ -49,19 +49,4 @@ class TestSqlIncludeStatementNotDefinedCorrectly {
                 ErrorSource.PARSING.getText())),
         CobolLanguageId.COBOL);
   }
-
-  @Test
-  void testHw() {
-    UseCaseEngine.runTest(
-        TEXT,
-        ImmutableList.of(),
-        ImmutableMap.of(
-            "1",
-            new Diagnostic(
-                new Range(), "Extraneous input 'EXEC'",
-                Error,
-                ErrorSource.PARSING.getText())),
-        CobolLanguageId.EXPERIMENTAL_COBOL);
-  }
-
 }

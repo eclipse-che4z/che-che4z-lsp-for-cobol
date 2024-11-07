@@ -69,6 +69,12 @@ public class CICSOptionsCheckUtility {
     optionsMap.put(
         CICSEndBrowseOptionsUtility.RULE_ENDBROWSE_INDEX,
         new CICSEndBrowseOptionsUtility(context, errors));
+    optionsMap.put(
+        CICSDeleteqDeqOptionsCheckUtility.RULE_INDEX_DELETEQ,
+        new CICSDeleteqDeqOptionsCheckUtility(context, errors));
+    optionsMap.put(
+        CICSDeleteqDeqOptionsCheckUtility.RULE_INDEX_DEQ,
+        new CICSDeleteqDeqOptionsCheckUtility(context, errors));
   }
 
   /**

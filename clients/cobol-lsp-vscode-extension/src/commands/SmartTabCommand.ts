@@ -14,7 +14,7 @@
 
 import * as vscode from "vscode";
 import { Selection } from "vscode";
-import { SettingsService, TabSettings } from "../services/Settings";
+import { getTabSettings, TabSettings } from "../services/SmartTabSettings";
 
 const SMART_TAB_COMMAND: string = "cobol-lsp.smart-tab";
 const SMART_OUTDENT_COMMAND: string = "cobol-lsp.smart-outdent";
@@ -128,7 +128,7 @@ export class SmartOutdentCommandProvider extends SmartCommandProvider {
     let prevPosition = getPrevPosition(
       editor,
       charPosition,
-      SettingsService.getTabSettings(),
+      getTabSettings(),
       position.line,
     );
     if (
@@ -315,7 +315,7 @@ function handleIndividualTab(
     const nextPosition = getNextPosition(
       editor,
       column,
-      SettingsService.getTabSettings(),
+      getTabSettings(),
       position.line,
     );
     const lineLen = getCurrentLine(editor, position.line).length;
@@ -328,7 +328,7 @@ function handleIndividualTab(
     const nextPosition = getNextPosition(
       editor,
       column,
-      SettingsService.getTabSettings(),
+      getTabSettings(),
       position.line,
     );
     const insertSize = nextPosition - column;
@@ -619,12 +619,7 @@ function getCurrentPositionToNextPositionMap(
     const column = currentLine.firstNonWhitespaceCharacterIndex;
     result.set(
       currentLine,
-      getNextPosition(
-        editor,
-        column,
-        SettingsService.getTabSettings(),
-        currentLine.lineNumber,
-      ),
+      getNextPosition(editor, column, getTabSettings(), currentLine.lineNumber),
     );
   }
   return result;

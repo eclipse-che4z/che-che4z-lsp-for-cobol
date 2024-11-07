@@ -271,7 +271,7 @@ class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
    * @param uri is an uri of the document
    * @return locality object
    */
-  public Locality buildNameRangeLocality(ParserRuleContext ctx, String name, String uri) {
+  private Locality buildNameRangeLocality(ParserRuleContext ctx, String name, String uri) {
     Range range =
         new Range(
             new Position(ctx.start.getLine() - 1, ctx.start.getCharPositionInLine()),
@@ -309,7 +309,7 @@ class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
     return result;
   }
 
-  public Range constructRange(ParserRuleContext ctx) {
+  private Range constructRange(ParserRuleContext ctx) {
     return new Range(
         new Position(ctx.start.getLine() - 1, ctx.start.getCharPositionInLine()),
         new Position(
@@ -319,7 +319,7 @@ class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
                 - ctx.stop.getStartIndex()));
   }
 
-  public Range constructRange(TerminalNode ctx) {
+  private Range constructRange(TerminalNode ctx) {
     return new Range(
         new Position(ctx.getSymbol().getLine() - 1, ctx.getSymbol().getCharPositionInLine()),
         new Position(
@@ -390,14 +390,14 @@ class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
    * @param token is a token
    * @return range object
    */
-  public Range buildTokenRange(Token token) {
+  private Range buildTokenRange(Token token) {
     return new Range(
         new Position(token.getLine() - 1, token.getCharPositionInLine()),
         new Position(
             token.getLine() - 1, token.getCharPositionInLine() + token.getText().length()));
   }
 
-  public Range buildTokenEndRange(Token token) {
+  private Range buildTokenEndRange(Token token) {
     Position p = new Position(token.getLine() - 1, token.getCharPositionInLine() + token.getStopIndex() - token.getStartIndex() + 1);
     return new Range(p, p);
   }

@@ -23,7 +23,6 @@ import lombok.Getter;
  * Area>
  */
 @Getter
-@Builder
 public class CobolProgramLayout {
   private final Integer sequenceLength;
   private final Integer indicatorLength;
@@ -36,17 +35,13 @@ public class CobolProgramLayout {
     return getSourceCodeLength() + commentAreaLength;
   }
 
-  public Pattern getCobolLinePattern() {
-    return Pattern.compile(
-        String.format(
-            "^(?<sequence>.{0,%s})(?<indicator>.{0,%s})(?<contentA>.{0,%s})(?<contentB>.{0,%s})(?<comment>.{0,%s})(?<extra>.*)$",
-            sequenceLength, indicatorLength, areaALength, areaBLength, commentAreaLength));
-  }
-
   private final Integer areaALength;
   private final Integer areaBLength;
   private final Integer commentAreaLength;
 
+  private final Pattern cobolLinePattern;
+
+  @Builder
   public CobolProgramLayout(
       Integer sequenceLength,
       Integer indicatorLength,
@@ -58,5 +53,9 @@ public class CobolProgramLayout {
     this.areaALength = areaALength;
     this.areaBLength = areaBLength;
     this.commentAreaLength = commentAreaLength;
+    this.cobolLinePattern = Pattern.compile(
+        String.format(
+            "^(?<sequence>.{0,%s})(?<indicator>.{0,%s})(?<contentA>.{0,%s})(?<contentB>.{0,%s})(?<comment>.{0,%s})(?<extra>.*)$",
+            sequenceLength, indicatorLength, areaALength, areaBLength, commentAreaLength));
   }
 }
