@@ -166,15 +166,11 @@ cics_send_terminal: (TERMINAL | WAIT | LAST)+;
 cics_send_autopage: AUTOPAGE (CURRENT | ALL)?;
 
 /** CONVERSE: */
-cics_converse: CONVERSE (cics_converse_group_one | cics_converse_group_two);
+cics_converse: CONVERSE cics_converse_group?;
+cics_converse_group:  (FROM cics_data_area | cics_converse_fromlength | cics_into | cics_converse_tolength | cics_maxlength | NOTRUNCATE | DEFRESP | STRFIELD | FMH | ((CTLCHAR | LINEADDR) cics_data_value) | STATE cics_cvda | (CONVID | SESSION | ATTACHID | LDC) cics_name | LEAVEKB | cics_converse_erase | ASIS | cics_handle_response)+ ;
 
-// CONVERSE Group 1: Default zOS, Lu4, SCS,Lu23, 3270/3601/3614/3653/3767/3650/3770/3650_int/3270/3680/3790/3270disp/2260
-cics_converse_group_one:  (FROM cics_data_area | cics_converse_fromlength | cics_into | cics_converse_tolength | cics_maxlength | NOTRUNCATE | DEFRESP | STRFIELD | ((CTLCHAR | LINEADDR) cics_data_value) | LDC cics_name | FMH | LEAVEKB | cics_converse_erase | ASIS | cics_handle_response)+ ;
 
-// CONVERSE Group 2: APPC, LU61, MRO
-cics_converse_group_two: (FROM cics_data_area | cics_into | cics_converse_tolength | cics_converse_fromlength | cics_maxlength | ((CONVID | SESSION | ATTACHID) cics_name) | NOTRUNCATE | STATE cics_cvda | DEFRESP | FMH | cics_handle_response)+;
-
-cics_converse_erase: ERASE (DEFAULT | ALTERNATE)?;
+cics_converse_erase: (ERASE | DEFAULT | ALTERNATE)+;
 cics_converse_fromlength: (FROMLENGTH | FROMFLENGTH) cics_data_value;
 cics_into: (INTO cics_data_area | SET cics_ref);
 cics_converse_tolength: (TOLENGTH | TOFLENGTH) cics_data_area;
@@ -300,14 +296,23 @@ cics_delay_for: FOR (HOURS cics_data_value | MINUTES cics_data_value | SECONDS c
 cics_dealy_until: UNTIL (HOURS cics_data_value | MINUTES cics_data_value | SECONDS cics_data_value)+;
 
 /** DELETE (all of them) */
-cics_delete: DELETE (cics_delete_file | ACTIVITY cics_data_value | cics_delete_container | cics_delete_counter |
-             EVENT cics_data_value | TIMER cics_data_value | cics_handle_response)+;
-cics_delete_file: cics_file_name (TOKEN cics_data_area | cics_delete_ridfld | SYSID cics_data_area | NOSUSPEND |
-                  RBA | RRN | cics_handle_response)*;
-cics_delete_ridfld: RIDFLD cics_data_area (KEYLENGTH cics_data_value | GENERIC | NUMREC cics_data_area | cics_handle_response)*;
-cics_delete_container: CONTAINER cics_data_value (ACTIVITY cics_data_value | ACQACTIVITY | PROCESS | ACQPROCESS |
-                       CHANNEL cics_data_value | cics_handle_response)*;
-cics_delete_counter: (COUNTER cics_name | DCOUNTER cics_name | POOL cics_name | cics_handle_response)+;
+cics_delete: DELETE (cics_delete_group_one | cics_delete_group_two | cics_delete_group_three | cics_delete_group_four);
+
+cics_keylength: KEYLENGTH cics_data_value;
+cics_counter_dcounter: (COUNTER | DCOUNTER) cics_name;
+
+// CICS Delete Group 1
+cics_delete_group_one:  (cics_file_name | TOKEN cics_data_area  | cics_keylength | GENERIC |
+                         ((SYSID | RIDFLD | NUMREC) cics_data_area) | NOSUSPEND | RBA | RRN | cics_handle_response)+;
+
+// CICS Delete Group 2 (Activity, Channel, Event, Timer)
+cics_delete_group_two:  ((CHANNEL | EVENT | TIMER) cics_data_value | cics_handle_response)+;
+
+// CICS Delete Group 3 (Container (BTS), Container (Channel))
+cics_delete_group_three:  ((CONTAINER | ACTIVITY | CHANNEL | RETCODE) cics_data_value | ACQACTIVITY | PROCESS | ACQPROCESS | cics_handle_response)+;
+
+// CICS Delete Group 4 (Counter, Dcounter)
+cics_delete_group_four:  (cics_counter_dcounter | POOL cics_name | NOSUSPEND | cics_handle_response)+;
 
 /** DELETEQ TD/TS */
 cics_deleteq: DELETEQ (cics_deleteq_td | cics_deleteq_ts);
@@ -332,7 +337,7 @@ cics_document_insert: INSERT (DOCTOKEN cics_data_area | FROM cics_data_area | TE
                       BOOKMARK cics_name | DOCSIZE cics_data_value | HOSTCODEPAGE cics_name | AT cics_name | TO cics_name | cics_handle_response)+;
 cics_document_retrieve: RETRIEVE (DOCTOKEN cics_data_area | INTO cics_data_area | LENGTH cics_data_value |
                         MAXLENGTH cics_data_value | CHARACTERSET cics_name | DATAONLY | cics_handle_response)+;
-cics_document_set: SET (DOCTOKEN cics_data_area | SYMBOL cics_name | VALUE cics_data_area | cics_document_set_symbollist
+cics_document_set: SET (DOCTOKEN cics_data_area | SYMBOL cics_name | VALUE cics_data_area | SYMBOLLIST cics_data_area | DELIMITER cics_data_value |
                    LENGTH cics_data_value | UNESCAPED | cics_handle_response)+;
 
 /** DUMP TRANSACTION */
