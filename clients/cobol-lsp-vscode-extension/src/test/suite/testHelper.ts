@@ -199,7 +199,7 @@ export function range(p0: vscode.Position, p1: vscode.Position): vscode.Range {
 export async function updateConfig(configFileName: string) {
   // update the settings.json with this file content
   const settingsFileLoc = vscode.Uri.joinPath(
-    vscode.Uri.file(vscode.workspace.workspaceFolders![0].uri.fsPath),
+    vscode.workspace.workspaceFolders![0].uri,
     ".vscode",
     "settings.json",
   );
