@@ -43,7 +43,7 @@ public class Locality {
   @Builder.Default private Range range = new Range(new Position(), new Position());
   @Builder.Default private String copybookId = null;
   @Builder.Default private String token = null;
-  @Builder.Default private Class<?> recognizer = Object.class;
+  @Builder.Default private transient Class<?> recognizer = Object.class;
 
   /**
    * Convert this Locality instance to Location using its URI and Range

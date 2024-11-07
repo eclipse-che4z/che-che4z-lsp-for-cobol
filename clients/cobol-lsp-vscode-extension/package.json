@@ -101,68 +101,57 @@
         {
           "command": "cobol-lsp.cpy-manager.fetch-copybook",
           "category": "COBOL",
-          "title": "Fetch Copybook",
-          "when": "!isWeb"
+          "title": "Fetch Copybook"
         },
         {
           "command": "cobol-lsp.cpy-manager.goto-settings",
           "category": "COBOL",
-          "title": "Open Copybook Location Settings",
-          "when": "!isWeb"
+          "title": "Open Copybook Location Settings"
         },
         {
           "command": "cobol-lsp.serverRuntime.goto-settings",
           "category": "COBOL",
-          "title": "Open Server Runtime Settings",
-          "when": "!isWeb"
+          "title": "Open Server Runtime Settings"
         },
         {
           "command": "cobol-lsp.dialects.goto-settings",
           "category": "COBOL",
-          "title": "Open Dialect Settings",
-          "when": "!isWeb"
+          "title": "Open Dialect Settings"
         },
         {
           "command": "cobol-lsp.commentLine.toggle",
           "category": "COBOL",
-          "title": "Toggle COBOL Line Comment",
-          "when": "!isWeb"
+          "title": "Toggle COBOL Line Comment"
         },
         {
           "command": "cobol-lsp.commentLine.comment",
           "category": "COBOL",
-          "title": "Add COBOL Line Comment",
-          "when": "!isWeb"
+          "title": "Add COBOL Line Comment"
         },
         {
           "command": "cobol-lsp.commentLine.uncomment",
           "category": "COBOL",
-          "title": "Remove COBOL Line Comment",
-          "when": "!isWeb"
+          "title": "Remove COBOL Line Comment"
         },
         {
           "command": "cobol-lsp.clear.downloaded.copybooks",
           "category": "COBOL",
-          "title": "Clear Downloaded Copybooks",
-          "when": "!isWeb"
+          "title": "Clear Downloaded Copybooks"
         },
         {
           "command": "cobol-lsp.analysis.runAnalysis",
           "category": "COBOL",
-          "title": "Run Analysis in CLI",
-          "when": "!isWeb"
+          "title": "Run Analysis in CLI"
         },
         {
           "command": "cobol-lsp.snippets.insertSnippets",
           "title": "Insert COBOL Snippet",
-          "category": "Snippets",
-          "when": "!isWeb"
+          "category": "Snippets"
         },
         {
           "command": "cobol-lsp.open.copybook.internalfolder",
           "title": "Open Copybooks Internal Folder",
-          "category": "COBOL",
-          "when": "!isWeb"
+          "category": "COBOL"
         }
       ]
     },
@@ -534,6 +523,16 @@
             "NATIVE - Use platform binary"
           ],
           "description": "COBOL LS server runtime."
+        },
+        "cobol-lsp.formatting": {
+          "type": "string",
+          "default": "None",
+          "enum": [
+            "Uppercase",
+            "Lowercase",
+            "None"
+          ],
+          "description": "Formatting settings"
         }
       }
     },
@@ -613,7 +612,6 @@
     "vscode-languageclient": "^8.1.0"
   },
   "devDependencies": {
-    "@esbuild-plugins/node-globals-polyfill": "^0.2.3",
     "@eslint/js": "^9.11.1",
     "@types/assert": "^1.5.10",
     "@types/fs-extra": "^9.0.13",
@@ -628,6 +626,7 @@
     "assert": "^2.1.0",
     "decache": "^4.6.1",
     "esbuild": "^0.20.2",
+    "esbuild-plugin-polyfill-node": "^0.3.0",
     "eslint": "^9.11.1",
     "fs-extra": "10.1.0",
     "globals": "^15.10.0",

@@ -113,7 +113,7 @@ class TestIdmsControlSectionAll {
         ImmutableList.of(),
         new AnalysisConfig(
                 CopybookProcessingMode.ENABLED,
-            ImmutableList.of(IdmsDialect.NAME), true,
+            ImmutableList.of(IdmsDialect.NAME), true, false,
             ImmutableList.of(),
             ImmutableMap.of()));
   }
