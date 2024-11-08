@@ -51,7 +51,7 @@ class CachingConfigurationServiceTest {
         new AnalysisConfig(
                 CopybookProcessingMode.ENABLED,
             ImmutableList.of(),
-            true, ImmutableList.of(), ImmutableMap.of()),
+            true, false, ImmutableList.of(), ImmutableMap.of()),
         configuration.getConfig(null, CopybookProcessingMode.ENABLED));
   }
 
@@ -93,7 +93,7 @@ class CachingConfigurationServiceTest {
         new AnalysisConfig(
                 CopybookProcessingMode.DISABLED,
             ImmutableList.of("Dialect"),
-            true, ImmutableList.of(),
+            true, false, ImmutableList.of(),
             ImmutableMap.of("dialect", predefinedParagraphs)),
         configuration.getConfig("", CopybookProcessingMode.DISABLED));
   }
@@ -134,7 +134,7 @@ class CachingConfigurationServiceTest {
         new AnalysisConfig(
                 CopybookProcessingMode.DISABLED,
             ImmutableList.of("Dialect"),
-            false,
+            false, false,
             ImmutableList.of(),
             ImmutableMap.of("dialect", dialectsSettings)),
         configuration.getConfig("", CopybookProcessingMode.DISABLED));

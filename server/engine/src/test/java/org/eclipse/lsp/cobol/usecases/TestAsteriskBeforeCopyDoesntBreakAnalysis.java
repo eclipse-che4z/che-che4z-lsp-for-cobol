@@ -24,7 +24,6 @@ import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.eclipse.lsp4j.Range;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -58,22 +57,6 @@ class TestAsteriskBeforeCopyDoesntBreakAnalysis {
                             DiagnosticSeverity.Error,
                             ErrorSource.PARSING.getText())),
         CobolLanguageId.COBOL);
-  }
-
-  @Test
-  @Disabled("Experimental parser")
-  void testEx() {
-
-    UseCaseEngine.runTest(
-        TEXT,
-        ImmutableList.of(new CobolText(CPY_NAME, CPY)),
-        ImmutableMap.of(
-            "1",
-            new Diagnostic(
-                new Range(), "Extraneous input '*'",
-                DiagnosticSeverity.Error,
-                ErrorSource.PARSING.getText())),
-        CobolLanguageId.EXPERIMENTAL_COBOL);
   }
 
 }

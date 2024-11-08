@@ -24,7 +24,7 @@ suite("Tests with USER1.cbl", function () {
   suiteSetup(async function () {
     this.timeout(0);
     this.slow(2000);
-    helper.updateConfig("basic.json");
+    await helper.updateConfig("basic.json");
     await helper.activate();
   });
 
@@ -152,6 +152,9 @@ suite("Tests with USER1.cbl", function () {
       vscode.languages.getDiagnostics(editor.document.uri).length,
       1,
     );
+    await vscode.workspace
+      .getConfiguration()
+      .update("cobol-lsp.formatting", "None");
     const result: any[] = await vscode.commands.executeCommand(
       "vscode.executeFormatDocumentProvider",
       editor.document.uri,

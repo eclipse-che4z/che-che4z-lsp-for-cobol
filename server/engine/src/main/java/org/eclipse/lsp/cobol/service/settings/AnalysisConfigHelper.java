@@ -36,6 +36,7 @@ class AnalysisConfigHelper {
 
     AnalysisConfig analysisConfig = new AnalysisConfig(mode, entity.getDialects(),
             entity.isCicsTranslatorEnabled(),
+            false,
             entity.getDialectRegistry(),
             entity.getDialectsSettings());
     analysisConfig.getCompilerOptions().addAll(entity.getCompilerOptions());

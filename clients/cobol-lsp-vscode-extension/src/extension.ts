@@ -126,7 +126,7 @@ export async function activate(
   context.subscriptions.push(
     vscode.languages.registerCompletionItemProvider(
       { language: LANGUAGE_ID },
-      new SnippetCompletionProvider(),
+      new SnippetCompletionProvider(context),
     ),
   );
 
@@ -343,10 +343,18 @@ function registerCommands(
         );
         try {
           await vscode.workspace.fs.createDirectory(copybookFolder);
-          await vscode.commands.executeCommand(
-            "revealFileInOS",
-            copybookFolder,
-          );
+          if (
+            (await vscode.commands.getCommands()).includes("revealFileInOS")
+          ) {
+            await vscode.commands.executeCommand(
+              "revealFileInOS",
+              copybookFolder,
+            );
+          } else {
+            vscode.window.showInformationMessage(
+              "Internal copybooks folder: '" + copybookFolder + "'",
+            );
+          }
         } catch (error) {
           vscode.window.showErrorMessage(FAIL_CREATE_COPYBOOK_FOLDER_MSG);
           outputChannel.appendLine(

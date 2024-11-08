@@ -20,5 +20,5 @@ import org.eclipse.lsp4j.TextEdit;
 import java.util.List;
 
 public interface Formation {
-  List<TextEdit> format(List<CobolDocumentModel.Line> lines);
+  List<TextEdit> format(List<CobolDocumentModel.Line> lines, List<String> settings);
 }

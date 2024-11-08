@@ -34,8 +34,6 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 public abstract class CodeBlockDefinitionNode extends Node {
   String name;
-  @Setter
-  String text;
   Locality definition;
   List<Locality> usages = new ArrayList<>();
 
