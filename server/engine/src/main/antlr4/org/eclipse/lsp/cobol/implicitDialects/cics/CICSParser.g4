@@ -346,7 +346,7 @@ cics_dump: DUMP (TRANSACTION | DUMPCODE cics_name |  FROM cics_data_area | LENGT
            TASK | STORAGE | PROGRAM | TERMINAL | TABLES | FCT | PCT | PPT | SIT | TCT | DUMPID cics_data_area | cics_handle_response)+;
 
 /** ENDBR */
-cics_endbr: ENDBR (FILE cics_name | REQID cics_data_value | SYSID cics_data_area | cics_handle_response)*;
+cics_endbr: ENDBR ((FILE | DATASET) cics_name | REQID cics_data_value | SYSID cics_data_area | cics_handle_response)*;
 
 /** ENDBROWSE (all of them) */
 cics_endbrowse: ENDBROWSE (ACTIVITY | CONTAINER | EVENT | PROCESS | TIMER | (BROWSETOKEN | RETCODE) cics_data_value | cics_handle_response)*;

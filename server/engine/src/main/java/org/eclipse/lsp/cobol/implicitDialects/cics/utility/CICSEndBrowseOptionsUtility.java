@@ -76,8 +76,9 @@ public class CICSEndBrowseOptionsUtility extends CICSOptionsCheckBaseUtility {
     checkDuplicates(ctx.getParent());
   }
 
+  @SuppressWarnings("unchecked")
   private void checkEndbr(CICSParser.Cics_endbrContext ctx) {
-    checkHasMandatoryOptions(ctx.FILE(), ctx, "FILE");
+    checkHasExactlyOneOption("FILE or DATASET", ctx, ctx.FILE(), ctx.DATASET());
   }
 
   @SuppressWarnings("unchecked")

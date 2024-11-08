@@ -34,6 +34,8 @@ import java.util.Map;
 public class TestCICSEndBrowse {
   //  ENDBR
   private static final String ENDBR_FILE_VALID = "ENDBR  FILE({$varFour})";
+  private static final String ENDBR_DATASET_VALID = "ENDBR  DATASET({$varFour})";
+  private static final String ENDBR_FILE_DATASET_INVALID = "ENDBR  {FILE|error1}({$varFour}) {DATASET|error2}({$varFour})";
   private static final String ENDBR_FILE_REQID_VALID = "ENDBR FILE({$varFour}) REQID({$varOne})";
   private static final String ENDBR_FILE_SYSID_VALID = "ENDBR FILE({$varFour}) SYSID({$varOne})";
   private static final String ENDBR_FILE_REQID_SYSID_VALID = "ENDBR FILE({$varFour}) REQID({$varOne}) SYSID({$varFive})";
@@ -53,6 +55,29 @@ public class TestCICSEndBrowse {
     CICSTestUtils.noErrorTest(ENDBR_FILE_VALID);
   }
 
+  @Test
+  void testEndbrDatasetValid() {
+    CICSTestUtils.noErrorTest(ENDBR_DATASET_VALID);
+  }
+
+  @Test
+  void testEndbrFileDatasetInvalid() {
+    Map<String, Diagnostic> expectedDiagnostics =
+            ImmutableMap.of(
+                    "error1",
+                    new Diagnostic(
+                            new Range(),
+                            "Exactly one option required, options are mutually exclusive: FILE or DATASET",
+                            DiagnosticSeverity.Error,
+                            ErrorSource.PARSING.getText()),
+                    "error2",
+                    new Diagnostic(
+                            new Range(),
+                            "Exactly one option required, options are mutually exclusive: FILE or DATASET",
+                            DiagnosticSeverity.Error,
+                            ErrorSource.PARSING.getText()));
+    CICSTestUtils.errorTest(ENDBR_FILE_DATASET_INVALID, expectedDiagnostics);
+  }
   @Test
   void testEndbrFileReqidValid() {
     CICSTestUtils.noErrorTest(ENDBR_FILE_REQID_VALID);
