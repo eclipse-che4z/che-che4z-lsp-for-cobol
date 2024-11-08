@@ -34,7 +34,6 @@ public class TestCicsExciDeleteChannelStatement {
           + "       PROCEDURE DIVISION.\n"
           + "           EXEC CICS \n"
           + "               DELETE CHANNEL({$EVALUATE-VAR}) \n"
-          + "               RETCODE({$CHECK})\n"
           + "           END-EXEC.";
 
     @Test

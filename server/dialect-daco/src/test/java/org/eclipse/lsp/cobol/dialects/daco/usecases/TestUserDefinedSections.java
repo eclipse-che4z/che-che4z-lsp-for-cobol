@@ -77,7 +77,7 @@ class TestUserDefinedSections {
   void testGoTo() {
     Map<String, JsonElement> dialectConfig = ImmutableMap.of(DaCoDialect.DACO_PREDEFINED_SECTIONS, new Gson().toJsonTree(ImmutableList.of("USERLABEL")));
     AnalysisConfig analysisConfig = new AnalysisConfig(CopybookProcessingMode.ENABLED, ImmutableList.of("DaCo", "IDMS"),
-        true, ImmutableList.of(), dialectConfig);
+        true, false, ImmutableList.of(), dialectConfig);
     UseCaseEngine.runTestForDiagnostics(TEXT_GOTO, ImmutableList.of(), ImmutableMap.of(), ImmutableList.of(), analysisConfig);
   }
 

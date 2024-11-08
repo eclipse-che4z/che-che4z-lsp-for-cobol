@@ -152,7 +152,7 @@ public class ServerCommunications implements Communications {
     WorkDoneProgressBegin workDoneProgressBegin = new WorkDoneProgressBegin();
     workDoneProgressBegin.setTitle(messageService.getMessage(
             "Communications.syntaxAnalysisInProgressTitle",
-            files.getNameFromURI(uri)));
+            files.getNameFromURI(files.decodeURI(uri))));
     workDoneProgressBegin.setCancellable(true);
     params.setValue(Either.forLeft(workDoneProgressBegin));
     getClient().notifyProgress(params);

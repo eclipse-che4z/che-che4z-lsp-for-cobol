@@ -18,7 +18,7 @@ import * as vscode from "vscode";
 suite("Integration Test Suite: CFAST generation", function () {
   suiteSetup(async function () {
     this.timeout(0);
-    helper.updateConfig("basic.json");
+    await helper.updateConfig("basic.json");
     await helper.activate();
   });
 

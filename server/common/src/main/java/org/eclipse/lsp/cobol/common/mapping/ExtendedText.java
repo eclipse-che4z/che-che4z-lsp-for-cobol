@@ -162,7 +162,9 @@ public class ExtendedText {
       ExtendedTextLine copybookLine = copybook.lines.get(0);
       ExtendedTextLine firstLine = lines.get(initialLine);
       copybookLine.trim();
-      firstLine.insert(copyStatementRange.getEnd().getCharacter(), updateLine(copybookLine, initialLocation));
+
+      delete(copyStatementRange);
+      firstLine.insert(copyStatementRange.getStart().getCharacter(), updateLine(copybookLine, initialLocation));
 
       for (int i = 1; i < copybook.lines.size() - 1; i++) {
         copybookLine = copybook.lines.get(i);

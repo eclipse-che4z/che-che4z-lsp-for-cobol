@@ -34,6 +34,12 @@ public class CICSOptionsCheckUtility {
         CICSAllocateOptionsCheckUtility.RULE_INDEX,
         new CICSAllocateOptionsCheckUtility(context, errors));
     optionsMap.put(
+        CICSAsktimeOptionsCheckUtility.RULE_INDEX,
+        new CICSAsktimeOptionsCheckUtility(context, errors));
+    optionsMap.put(
+        CICSAbendOptionsCheckUtility.RULE_INDEX,
+        new CICSAbendOptionsCheckUtility(context, errors));
+    optionsMap.put(
         CICSConverseOptionsCheckUtility.RULE_INDEX,
         new CICSConverseOptionsCheckUtility(context, errors));
     optionsMap.put(
@@ -44,7 +50,13 @@ public class CICSOptionsCheckUtility {
         new CICSDefineOptionsCheckUtility(context, errors));
     optionsMap.put(
         CICSIssueOptionsCheckUtility.RULE_INDEX,
-         new CICSIssueOptionsCheckUtility(context, errors));
+        new CICSIssueOptionsCheckUtility(context, errors));
+    optionsMap.put(
+        CICSAddSubeventOptionsCheckUtility.RULE_INDEX,
+        new CICSAddSubeventOptionsCheckUtility(context, errors));
+    optionsMap.put(
+        CICSBuildOptionsCheckUtility.RULE_INDEX,
+        new CICSBuildOptionsCheckUtility(context, errors));
     optionsMap.put(
         CICSAcquireOptionsCheckUtility.RULE_INDEX,
         new CICSAcquireOptionsCheckUtility(context, errors));
@@ -52,11 +64,30 @@ public class CICSOptionsCheckUtility {
         CICSWaitOptionsCheckUtility.RULE_INDEX,
         new CICSWaitOptionsCheckUtility(context, errors));
     optionsMap.put(
-        CICSCancelOptionsCheckUtility.RULE_INDEX, new CICSCancelOptionsCheckUtility(context, errors));
-    optionsMap.put(
         CICSAssignOptionsCheckUtility.RULE_INDEX,
+    optionsMap.put(
         new CICSAssignOptionsCheckUtility(context, errors));
-
+    optionsMap.put(
+        CICSCancelOptionsCheckUtility.RULE_INDEX,
+        new CICSCancelOptionsCheckUtility(context, errors));
+    optionsMap.put(
+        CICSEndBrowseOptionsUtility.RULE_ENDBR_INDEX,
+        new CICSEndBrowseOptionsUtility(context, errors));
+    optionsMap.put(
+        CICSEndBrowseOptionsUtility.RULE_ENDBROWSE_INDEX,
+        new CICSEndBrowseOptionsUtility(context, errors));
+    optionsMap.put(
+        CICSDeleteOptionsCheckUtility.RULE_INDEX,
+        new CICSDeleteOptionsCheckUtility(context, errors));
+    optionsMap.put(
+        CICSDeleteqDeqOptionsCheckUtility.RULE_INDEX_DELETEQ,
+        new CICSDeleteqDeqOptionsCheckUtility(context, errors));
+    optionsMap.put(
+        CICSDeleteqDeqOptionsCheckUtility.RULE_INDEX_DEQ,
+        new CICSDeleteqDeqOptionsCheckUtility(context, errors));
+    optionsMap.put(
+        CICSReadNextReadPrevOptionsUtility.RULE_INDEX,
+        new CICSReadNextReadPrevOptionsUtility(context, errors));
   }
 
   /**
