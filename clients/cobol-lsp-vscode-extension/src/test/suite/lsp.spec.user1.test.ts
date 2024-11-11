@@ -90,7 +90,7 @@ suite("Tests with USER1.cbl", function () {
       async () =>
         (
           (await vscode.commands.executeCommand(
-            "vscode.executeDefinitionProvider",
+            "vscode.executeReferenceProvider",
             editor.document.uri,
             pos(20, 15),
           )) as any[]
@@ -130,7 +130,7 @@ suite("Tests with USER1.cbl", function () {
       async () =>
         (
           (await vscode.commands.executeCommand(
-            "vscode.executeDefinitionProvider",
+            "vscode.executeReferenceProvider",
             editor.document.uri,
             pos(20, 10),
           )) as any[]
