@@ -111,7 +111,7 @@ ASCIISTR=
 ASENSITIVE=
 ASIN=
 ASIS=
-ASKTIME=
+ASKTIME=The ASKTIME updates the date (EIBDATE) and CICS® time-of-day clock (EIBTIME) fields in the EIB. These two fields initially contain the date and time when the task started. <br>[Read more](https://www.ibm.com/docs/en/cics-ts/6.x?topic=summary-asktime)<br>\u00A9 Copyright IBM Corporation 1994, 2019.<br>U.S. Government Users Restricted Rights - Use, duplication or disclosure restricted by GSA ADP Schedule Contract with IBM Corp.
 ASRAINTRPT=
 ASRAKEY=
 ASRAPSW=

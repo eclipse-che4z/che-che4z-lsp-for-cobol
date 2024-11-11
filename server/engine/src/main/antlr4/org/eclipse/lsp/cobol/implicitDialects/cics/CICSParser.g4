@@ -22,9 +22,9 @@ allCicsRule: cics_send | cics_receive | cics_add | cics_address | cics_allocate 
                        cics_build | cics_cancel | cics_change | cics_change_task | cics_check | cics_connect | cics_converttime |
                        cics_define | cics_delay | cics_delete | cics_deleteq | cics_deq | cics_document | cics_dump | cics_endbr |
                        cics_endbrowse | cics_enq | cics_enter | cics_extract | cics_force | cics_formattime | cics_free |
-                       cics_freemain | cics_gds | cics_get | cics_getmain | cics_getnext | cics_handle | cics_ignore | cics_inquire |
+                       cics_freemain | cics_get | cics_getmain | cics_getnext | cics_handle | cics_ignore | cics_inquire |
                        cics_invoke | cics_issue | cics_link | cics_load | cics_monitor | cics_move | cics_point | cics_pop |
-                       cics_post | cics_purge | cics_push | cics_put | cics_query | cics_read | cics_readnext |
+                       cics_post | cics_purge | cics_push | cics_put | cics_query | cics_read | cics_readnext_readprev |
                        cics_readq | cics_release | cics_remove | cics_reset | cics_resetbr | cics_resume | cics_retrieve |
                        cics_return | cics_rewind | cics_rewrite | cics_route | cics_run | cics_signal | cics_signoff | cics_signon |
                        cics_soapfault | cics_spoolclose | cics_spoolopen | cics_spoolread | cics_spoolwrite | cics_start |
@@ -166,15 +166,11 @@ cics_send_terminal: (TERMINAL | WAIT | LAST)+;
 cics_send_autopage: AUTOPAGE (CURRENT | ALL)?;
 
 /** CONVERSE: */
-cics_converse: CONVERSE (cics_converse_group_one | cics_converse_group_two);
+cics_converse: CONVERSE cics_converse_group?;
+cics_converse_group:  (FROM cics_data_area | cics_converse_fromlength | cics_into | cics_converse_tolength | cics_maxlength | NOTRUNCATE | DEFRESP | STRFIELD | FMH | ((CTLCHAR | LINEADDR) cics_data_value) | STATE cics_cvda | (CONVID | SESSION | ATTACHID | LDC) cics_name | LEAVEKB | cics_converse_erase | ASIS | cics_handle_response)+ ;
 
-// CONVERSE Group 1: Default zOS, Lu4, SCS,Lu23, 3270/3601/3614/3653/3767/3650/3770/3650_int/3270/3680/3790/3270disp/2260
-cics_converse_group_one:  (FROM cics_data_area | cics_converse_fromlength | cics_into | cics_converse_tolength | cics_maxlength | NOTRUNCATE | DEFRESP | STRFIELD | ((CTLCHAR | LINEADDR) cics_data_value) | LDC cics_name | FMH | LEAVEKB | cics_converse_erase | ASIS | cics_handle_response)+ ;
 
-// CONVERSE Group 2: APPC, LU61, MRO
-cics_converse_group_two: (FROM cics_data_area | cics_into | cics_converse_tolength | cics_converse_fromlength | cics_maxlength | ((CONVID | SESSION | ATTACHID) cics_name) | NOTRUNCATE | STATE cics_cvda | DEFRESP | FMH | cics_handle_response)+;
-
-cics_converse_erase: ERASE (DEFAULT | ALTERNATE)?;
+cics_converse_erase: (ERASE | DEFAULT | ALTERNATE)+;
 cics_converse_fromlength: (FROMLENGTH | FROMFLENGTH) cics_data_value;
 cics_into: (INTO cics_data_area | SET cics_ref);
 cics_converse_tolength: (TOLENGTH | TOFLENGTH) cics_data_area;
@@ -210,8 +206,9 @@ cics_allocate_lut61_session: (SESSION  cics_name | PROFILE cics_name | NOQUEUE |
 cics_allocate_appc_partner: (PARTNER cics_name | NOQUEUE | STATE cics_cvda | cics_handle_response)+;
 
 /** ASKTIME */
-cics_asktime: ASKTIME cics_handle_response? (ABSTIME (cics_data_area | cics_handle_response)+)?;
-
+cics_asktime:ASKTIME cics_asktime_abstime;
+cics_asktime_abstime: (ABSTIME cics_data_area | cics_handle_response)*;
+ 
 /** ASSIGN */
 cics_assign: ASSIGN (cics_assign_parameter1 | cics_assign_parameter2) *;
 
@@ -300,20 +297,33 @@ cics_delay_for: FOR (HOURS cics_data_value | MINUTES cics_data_value | SECONDS c
 cics_dealy_until: UNTIL (HOURS cics_data_value | MINUTES cics_data_value | SECONDS cics_data_value)+;
 
 /** DELETE (all of them) */
-cics_delete: DELETE (cics_delete_file | ACTIVITY cics_data_value | cics_delete_container | cics_delete_counter |
-             EVENT cics_data_value | TIMER cics_data_value | cics_handle_response)+;
-cics_delete_file: cics_file_name (TOKEN cics_data_area | cics_delete_ridfld | SYSID cics_data_area | NOSUSPEND |
-                  RBA | RRN | cics_handle_response)*;
-cics_delete_ridfld: RIDFLD cics_data_area (KEYLENGTH cics_data_value | GENERIC | NUMREC cics_data_area | cics_handle_response)*;
-cics_delete_container: CONTAINER cics_data_value (ACTIVITY cics_data_value | ACQACTIVITY | PROCESS | ACQPROCESS |
-                       CHANNEL cics_data_value | cics_handle_response)*;
-cics_delete_counter: (COUNTER cics_name | DCOUNTER cics_name | POOL cics_name | cics_handle_response)+;
+cics_delete: DELETE (cics_delete_group_one | cics_delete_group_two | cics_delete_group_three | cics_delete_group_four);
+
+cics_keylength: KEYLENGTH cics_data_value;
+cics_counter_dcounter: (COUNTER | DCOUNTER) cics_name;
+
+// CICS Delete Group 1
+cics_delete_group_one:  (cics_file_name | TOKEN cics_data_area  | cics_keylength | GENERIC |
+                         ((SYSID | RIDFLD | NUMREC) cics_data_area) | NOSUSPEND | RBA | RRN | cics_handle_response)+;
+
+// CICS Delete Group 2 (Activity, Channel, Event, Timer)
+cics_delete_group_two:  ((CHANNEL | EVENT | TIMER) cics_data_value | cics_handle_response)+;
+
+// CICS Delete Group 3 (Container (BTS), Container (Channel))
+cics_delete_group_three:  ((CONTAINER | ACTIVITY | CHANNEL | RETCODE) cics_data_value | ACQACTIVITY | PROCESS | ACQPROCESS | cics_handle_response)+;
+
+// CICS Delete Group 4 (Counter, Dcounter)
+cics_delete_group_four:  (cics_counter_dcounter | POOL cics_name | NOSUSPEND | cics_handle_response)+;
 
 /** DELETEQ TD/TS */
-cics_deleteq: DELETEQ (TD | TS | QUEUE cics_name | QNAME cics_name | SYSID cics_data_area | cics_handle_response)+;
+cics_deleteq: DELETEQ (cics_deleteq_td | cics_deleteq_ts);
+cics_deleteq_td: (TD | QUEUE cics_name | SYSID cics_data_area | cics_handle_response)+;
+cics_deleteq_ts: (TS | cics_queue_qname | SYSID cics_data_area | cics_handle_response)+;
+cics_queue_qname: (QUEUE | QNAME) cics_name;
 
 /** DEQ */
-cics_deq: DEQ (RESOURCE cics_data_area | LENGTH cics_data_value | UOW | MAXLIFETIME cics_cvda | TASK | cics_handle_response)+;
+cics_deq: DEQ (cics_deq_cmds | cics_handle_response);
+cics_deq_cmds : (RESOURCE cics_data_area | LENGTH cics_data_value | MAXLIFETIME cics_cvda | TASK | UOW)+;
 
 /** DOCUMENT CREATE / DELETE / INSERT / RETRIEVE / SET */
 cics_document: DOCUMENT (cics_document_create | DELETE DOCTOKEN cics_data_area | cics_document_insert |
@@ -328,7 +338,7 @@ cics_document_insert: INSERT (DOCTOKEN cics_data_area | FROM cics_data_area | TE
                       BOOKMARK cics_name | DOCSIZE cics_data_value | HOSTCODEPAGE cics_name | AT cics_name | TO cics_name | cics_handle_response)+;
 cics_document_retrieve: RETRIEVE (DOCTOKEN cics_data_area | INTO cics_data_area | LENGTH cics_data_value |
                         MAXLENGTH cics_data_value | CHARACTERSET cics_name | DATAONLY | cics_handle_response)+;
-cics_document_set: SET (DOCTOKEN cics_data_area | SYMBOL cics_name | VALUE cics_data_area | cics_document_set_symbollist
+cics_document_set: SET (DOCTOKEN cics_data_area | SYMBOL cics_name | VALUE cics_data_area | SYMBOLLIST cics_data_area | DELIMITER cics_data_value |
                    LENGTH cics_data_value | UNESCAPED | cics_handle_response)+;
 
 /** DUMP TRANSACTION */
@@ -337,10 +347,10 @@ cics_dump: DUMP (TRANSACTION | DUMPCODE cics_name |  FROM cics_data_area | LENGT
            TASK | STORAGE | PROGRAM | TERMINAL | TABLES | FCT | PCT | PPT | SIT | TCT | DUMPID cics_data_area | cics_handle_response)+;
 
 /** ENDBR */
-cics_endbr: ENDBR cics_file_name (REQID cics_data_value | SYSID cics_data_area | cics_handle_response)*;
+cics_endbr: ENDBR ((FILE | DATASET) cics_name | REQID cics_data_value | SYSID cics_data_area | cics_handle_response)*;
 
 /** ENDBROWSE (all of them) */
-cics_endbrowse: ENDBROWSE (ACTIVITY | CONTAINER | EVENT | PROCESS | BROWSETOKEN cics_data_value | cics_handle_response)+;
+cics_endbrowse: ENDBROWSE (ACTIVITY | CONTAINER | EVENT | PROCESS | TIMER | (BROWSETOKEN | RETCODE) cics_data_value | cics_handle_response)*;
 
 /** ENQ */
 cics_enq: ENQ (RESOURCE cics_data_area | LENGTH cics_data_value | UOW | TASK | MAXLIFETIME cics_cvda | NOSUSPEND | cics_handle_response)+;
@@ -378,28 +388,6 @@ cics_free: FREE (CONVID cics_name | SESSION cics_name | STATE cics_cvda | cics_h
 
 /** FREEMAIN */
 cics_freemain: FREEMAIN (DATA cics_data_area | DATAPOINTER cics_value | cics_handle_response)+;
-
-/** GDS (all) */
-cics_gds: GDS (cics_gds_allocate | cics_gds_assign | cics_gds_connect | cics_gds_extract | cics_gds_free |
-          cics_gds_issue | cics_gds_receive | cics_gds_send | cics_gds_wait);
-cics_gds_allocate: ALLOCATE (SYSID cics_data_area | MODENAME cics_name | PARTNER cics_name | CONVID cics_data_area |
-                   RETCORD cics_data_area | NOQUEUE | STATE cics_cvda | cics_handle_response)+;
-cics_gds_assign: ASSIGN (PRINCONVID cics_data_area | PRINSYSID cics_data_area | RETCODE cics_data_area | cics_handle_response)+;
-cics_gds_connect: CONNECT (PROCESS | CONVID cics_name | PROCNAME cics_name | PROCLENGTH cics_data_value | PARTNER cics_name |
-                  PIPLIST cics_data_area | PIPLENGTH cics_data_value | SYNCLEVEL cics_data_value | CONVDATA cics_data_area |
-                  RETCODE cics_data_area | STATE cics_cvda | cics_handle_response)+;
-cics_gds_extract: EXTRACT (cics_gds_attributes | cics_gds_process);
-cics_gds_attributes: ATTRIBUTES (CONVID cics_name | STATE cics_cvda | CONVDATA cics_data_area | RETCODE cics_data_area | cics_handle_response)+;
-cics_gds_process: PROCESS (CONVID cics_name | (PROCNAME cics_data_area (PROCLENGTH cics_data_area | MAXPROCLEN cics_data_value | cics_handle_response)+) | SYNCLEVEL cics_data_area |
-                  (PIPLIST cics_ref PIPLENGTH cics_data_area) | RETCODE cics_data_area | cics_handle_response)+;
-cics_gds_free: FREE (CONVID cics_name | CONVDATA cics_data_area | RETCODE cics_data_area | STATE cics_cvda | cics_handle_response)+;
-cics_gds_issue: ISSUE (ABEND | CONFIRMATION | ERROR | PREPARE | SIGNAL) (CONVID cics_name | CONVDATA cics_data_area |
-                RETCODE cics_data_area | STATE cics_cvda | cics_handle_response)+;
-cics_gds_receive: RECEIVE (CONVID cics_name | cics_into | FLENGTH cics_data_area | MAXFLENGTH
-                  cics_data_value | BUFFER | LLID | CONVDATA cics_data_area | RETCODE cics_data_area | STATE cics_cvda | cics_handle_response)+;
-cics_gds_send: SEND (CONVID cics_name | FROM cics_data_area | FLENGTH cics_data_value | INVITE | LAST | CONFIRM | WAIT |
-               CONVDATA cics_data_area | RETCODE cics_data_area | STATE cics_cvda | cics_handle_response)+;
-cics_gds_wait: WAIT (CONVID cics_name | CONVDATA cics_data_area | RETCODE cics_data_area | STATE cics_cvda | cics_handle_response)+;
 
 /** GET CONTAINER (both of them) / GET COUNTER / GET DCOUNTER */
 cics_get: GET (cics_get_container | cics_get_counter | cics_get_dcounter);
@@ -611,9 +599,9 @@ cics_read: READ (cics_file_name | UNCOMMITTED | CONSISTENT | REPEATABLE | UPDATE
            XRBA | EQUAL | GTEQ | NOSUSPEND | cics_handle_response)+;
 
 /** READNEXT | READPREV*/
-cics_readnext: (READNEXT | READPREV | cics_file_name | cics_into | UNCOMMITTED | CONSISTENT | REPETABLE |
-               UPDATE TOKEN cics_data_area | RIDFLD cics_data_area | KEYLENGTH cics_data_value | REQID cics_data_value |
-               SYSID cics_data_area | LENGTH cics_data_area | LENGTH cics_data_area | RBA | RRN | XRBA | NOSUSPEND | cics_handle_response)+;
+cics_readnext_readprev: (READNEXT | READPREV)  (cics_file_name | INTO cics_data_area | SET cics_ref | UNCOMMITTED | CONSISTENT | REPEATABLE |
+               UPDATE | TOKEN cics_data_area | RIDFLD cics_data_area | KEYLENGTH cics_data_value | REQID cics_data_value |
+               SYSID cics_data_area | LENGTH cics_data_area | RBA | RRN | XRBA | NOSUSPEND | cics_handle_response)*;
 
 /** READQ TD / TS */
 cics_readq: READQ (cics_readq_td | cics_readq_ts);

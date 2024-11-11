@@ -6,9 +6,9 @@
     ],
     "after:bump": [
       "git add ../../CHANGELOG.md",
-      "echo $THE_KEY > resources/TELEMETRY_KEY",
+      "sed -i \"s/const TELEMETRY_KEY_ENCODED: string = TELEMETRY_DEFAULT_CONTENT/const TELEMETRY_KEY_ENCODED: string = '$THE_KEY'/\" src/services/reporter/TelemetryReporterImpl.ts",
       "npx vsce package",
-      "git checkout -- resources/TELEMETRY_KEY"
+      "git checkout -- src/services/reporter/TelemetryReporterImpl.ts"
     ]
   },
   "github": {
@@ -17,13 +17,11 @@
   },
   "git": {
     "commitMessage": "Release: ${version}"
-  }, 
+  },
   "npm": {
-          "publish": false
+    "publish": false
   },
   "plugins": {
-    "../../release/version-extract.js": {
-
-    }
+    "../../release/version-extract.js": {}
   }
 }
