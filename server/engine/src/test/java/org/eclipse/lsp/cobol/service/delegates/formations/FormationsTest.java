@@ -18,13 +18,17 @@ package org.eclipse.lsp.cobol.service.delegates.formations;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
+import org.eclipse.lsp.cobol.service.settings.SettingsService;
 import org.eclipse.lsp4j.TextEdit;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -33,7 +37,14 @@ class FormationsTest {
 
   private static final Formation FORMATION_1 = mock(Formation.class);
   private static final Formation FORMATION_2 = mock(Formation.class);
-  private static final Formations FORMATIONS = new Formations(ImmutableSet.of(FORMATION_1, FORMATION_2));
+  private static final SettingsService SETTINGS_SERVICE = mock(SettingsService.class);
+  private static final Formations FORMATIONS = new Formations(ImmutableSet.of(FORMATION_1, FORMATION_2), SETTINGS_SERVICE);
+
+  @BeforeEach
+  void init() {
+    when(SETTINGS_SERVICE.fetchConfiguration(anyString()))
+        .thenReturn(CompletableFuture.completedFuture(ImmutableList.of()));
+  }
 
   @Test
   void WhenCobolDocumentModelNull_thenFormatReturnsEmptyList() {
@@ -46,8 +57,8 @@ class FormationsTest {
     CobolDocumentModel model = new CobolDocumentModel("", "SAMPLE TEXT FOR TEST");
     List<TextEdit> response1 = ImmutableList.of(new TextEdit());
     List<TextEdit> response2 = ImmutableList.of(new TextEdit(), new TextEdit());
-    when(FORMATION_1.format(anyList())).thenReturn(response1);
-    when(FORMATION_2.format(anyList())).thenReturn(response2);
+    when(FORMATION_1.format(anyList(), anyList())).thenReturn(response1);
+    when(FORMATION_2.format(anyList(), anyList())).thenReturn(response2);
     List<TextEdit> format = FORMATIONS.format(model);
     // expect a flattened list of 2 responses.
     assertEquals(3, format.size());
