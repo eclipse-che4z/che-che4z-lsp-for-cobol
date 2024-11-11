@@ -102,13 +102,26 @@ suite("Tests with USER1.cbl", function () {
       editor.document.uri,
       pos(20, 15),
     );
+    assert.strictEqual(result.length, 3, "Check references count");
     assert.ok(
-      result.length === 3 &&
-        result[0].uri.fsPath.includes(editor.document.fileName) &&
-        result[0].range.start.line === 20 &&
-        result[1].range.start.line === 34 &&
-        result[2].range.start.line === 42,
-      "Checks that LSP can find all references and navigate by them",
+      result[0].uri.fsPath.includes(editor.document.fileName),
+      "Check references path",
+    );
+    assert.strictEqual(result[0].range.start.line, 20, "Check reference line");
+    assert.strictEqual(
+      result[0].range.start.line,
+      20,
+      "Check 1 reference line",
+    );
+    assert.strictEqual(
+      result[1].range.start.line,
+      34,
+      "Check 2 reference line",
+    );
+    assert.strictEqual(
+      result[2].range.start.line,
+      42,
+      "Check 3 reference line",
     );
   });
 
