@@ -30,12 +30,10 @@ public class AntlrRangeUtils {
      */
     public static Range constructRange(ParserRuleContext ctx) {
       Token start = ctx.start;
-      Token end = ctx.stop;
+      Token end = ctx.stop == null ? start : ctx.stop;
 
-      // FIXME: why its possible?
       if (start.getLine() > end.getLine()) {
-        start = ctx.stop;
-        end = ctx.start;
+        end = start;
       }
 
       return new Range(
