@@ -139,8 +139,24 @@ public class CICSWebOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
                 }
             };
 
+    private static final Map<Integer, String> DUPLICATE_RULE_OPTIONS =
+            new HashMap<Integer, String>() {
+                {
+                    put(CICSParser.RULE_cics_web_http_call_method, "GET, HEAD, PATCH, POST, PUT, TRACE, OPTIONS, DELETE, METHOD");
+                    put(CICSParser.RULE_cics_web_action_expect, "ACTION or EXPECT");
+                    put(CICSParser.RULE_cics_web_close_options, "CLOSE, NOCLOSE or CLOSESTATUS");
+                    put(CICSParser.RULE_cics_web_into_set_tocontainer, "INTO, SET, TOCONTAINER or TOCHANNEL");
+                    put(CICSParser.RULE_cics_web_into_set, "INTO or SET");
+                    put(CICSParser.RULE_cics_web_server_convert, "SRVCONVERT, NOSRVCONVERT, SERVERCONV");
+                    put(CICSParser.RULE_cics_web_client_convert, "CLICONVERT, NOCLICONVERT, CLIENTCONV, ");
+                    put(CICSParser.RULE_cics_web_client_auth_type, "NONE, BASICAUTH, AUTHENTICATE");
+                    put(CICSParser.RULE_cics_web_send_server_body, "DOCTOKEN, FROM or CONTAINER");
+                    put(CICSParser.RULE_cics_web_send_client_body, "DOCTOKEN, FROM or CONTAINER");
+                }
+            };
+
     public CICSWebOptionsCheckUtility(DialectProcessingContext context, List<SyntaxError> errors) {
-        super(context, errors, DUPLICATE_CHECK_OPTIONS);
+        super(context, errors, DUPLICATE_CHECK_OPTIONS, DUPLICATE_RULE_OPTIONS);
     }
 
     /**
@@ -187,6 +203,9 @@ public class CICSWebOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
             case CICSParser.RULE_cics_web_receive_client_container:
                 checkReceiveClientContainer((CICSParser.Cics_web_receive_client_containerContext) ctx);
                 break;
+            case CICSParser.RULE_cics_send:
+                checkSend((CICSParser.Cics_web_sendContext) ctx);
+                break;
             case CICSParser.RULE_cics_web_startbrowse_formfield_queryparm:
                 checkStartbrowseFormfieldQueryparm((CICSParser.Cics_web_startbrowse_formfield_queryparmContext) ctx);
                 break;
@@ -197,6 +216,7 @@ public class CICSWebOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
                 break;
         }
 
+        iterateSubrules(ctx);
         checkDuplicates(ctx);
     }
 
@@ -281,6 +301,8 @@ public class CICSWebOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
             case CICSParser.RULE_cics_web_send_server_body:
                 checkSendServerBody((CICSParser.Cics_web_send_server_bodyContext) ctx);
                 break;
+            case CICSParser.RULE_cics_web_send_client_body:
+                checkSendClientBody((CICSParser.Cics_web_send_client_bodyContext) ctx);
             default:
                 break;
         }
@@ -289,21 +311,16 @@ public class CICSWebOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     // Main rules
     private void checkClose(CICSParser.Cics_web_closeContext ctx) {
         checkHasMandatoryOptions(ctx.SESSTOKEN(), ctx, "SESSTOKEN");
-        iterateSubrules(ctx);
     }
 
     private void checkConverse(CICSParser.Cics_web_converseContext ctx) {
         checkHasMandatoryOptions(ctx.SESSTOKEN(), ctx, "SESSTOKEN");
         checkMutuallyExclusiveOptions("PATH PATHLENGTH or URIMAP", ctx.cics_web_path(), ctx.cics_web_urimap());
-
-        iterateSubrules(ctx);
     }
 
     private void checkEndbrowse(CICSParser.Cics_web_endbrowseContext ctx) {
         checkMutuallyExclusiveOptions("FORMFIELD, HTTPHEADER, QUERYPARM", ctx.FORMFIELD(), ctx.HTTPHEADER(), ctx.QUERYPARM());
         checkPrerequisiteIsMet(ctx.HTTPHEADER(), ctx.SESSTOKEN(), ctx, "HTTPHEADER");
-
-        iterateSubrules(ctx);
     }
 
     // EXTRACT does not need any checks other than the helper rules.
@@ -312,14 +329,10 @@ public class CICSWebOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
         checkMutuallyExclusiveOptions("URIMAP or HOST", ctx.cics_web_urimap(), ctx.cics_web_host_portnumber());
         checkHasMandatoryOptions(ctx.SESSTOKEN(), ctx, "SESSTOKEN");
         checkPrerequisiteIsMet(ctx.HTTPVNUM(), ctx.HTTPRNUM(), ctx, "HTTPVNUM");
-
-        iterateSubrules(ctx);
     }
 
     private void checkParse(CICSParser.Cics_web_parseContext ctx) {
         checkPrerequisiteIsMet(ctx.URL(), ctx.URLLENGTH(), ctx, "URL");
-
-        iterateSubrules(ctx);
     }
 
     private void checkRead(CICSParser.Cics_web_readContext ctx) {
@@ -348,8 +361,6 @@ public class CICSWebOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
         }
 
         checkPrerequisiteIsMet(ctx.FORMFIELD(), ctx.CHARACTERSET(), ctx, "FORMFIELD");
-
-        iterateSubrules(ctx);
     }
 
     private void checkReadnextFormfieldQueryparm(CICSParser.Cics_web_readnext_formfield_queryparmContext ctx) {
@@ -358,59 +369,47 @@ public class CICSWebOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
         checkHasMandatoryOptions(ctx.NAMELENGTH(), ctx, "NAMELENGTH");
         checkHasMandatoryOptions(ctx.VALUE(), ctx, "VALUE");
         checkHasMandatoryOptions(ctx.VALUELENGTH(), ctx, "VALUELENGTH");
-
-        iterateSubrules(ctx);
     }
 
     private void checkReadnextHTTPHeader(CICSParser.Cics_web_readnext_httpheaderContext ctx) {
         checkHasMandatoryOptions(ctx.NAMELENGTH(), ctx, "NAMELENGTH");
         checkHasMandatoryOptions(ctx.VALUE(), ctx, "VALUE");
         checkHasMandatoryOptions(ctx.VALUELENGTH(), ctx, "VALUELENGTH");
-
-        iterateSubrules(ctx);
     }
 
     private void checkReceiveServerBuffer(CICSParser.Cics_web_receive_server_bufferContext ctx) {
         checkHasMandatoryOptions(ctx.LENGTH(), ctx, "LENGTH");
-
-        iterateSubrules(ctx);
     }
 
     private void checkReceiveServerContainer(CICSParser.Cics_web_receive_server_containerContext ctx) {
         checkHasMandatoryOptions(ctx.TOCONTAINER(), ctx, "TOCONTAINER");
-
-        iterateSubrules(ctx);
     }
 
     private void checkReceiveClient(CICSParser.Cics_web_receive_clientContext ctx) {
         checkHasMandatoryOptions(ctx.SESSTOKEN(), ctx, "SESSTOKEN");
-
-        iterateSubrules(ctx);
     }
 
     // RECEIVE Client (Buffer) does not need any checks.
 
     private void checkReceiveClientContainer(CICSParser.Cics_web_receive_client_containerContext ctx) {
         checkHasMandatoryOptions(ctx.TOCONTAINER(), ctx, "TOCONTAINER");
-
-        iterateSubrules(ctx);
     }
 
     // RETRIEVE does not need any checks.
+
+    private void checkSend(CICSParser.Cics_web_sendContext ctx) {
+        iterateSubrules(ctx);
+    }
 
     // STARTBROWSE does not need any checks other than the helper rules.
 
     private void checkStartbrowseFormfieldQueryparm(CICSParser.Cics_web_startbrowse_formfield_queryparmContext ctx) {
         checkPrerequisiteIsMet(ctx.FORMFIELD(), ctx.CHARACTERSET(), ctx, "FORMFIELD");
-
-        iterateSubrules(ctx);
     }
 
     private void checkWrite(CICSParser.Cics_web_writeContext ctx) {
         checkHasMandatoryOptions(ctx.HTTPHEADER(), ctx, "HTTPHEADER");
         checkHasMandatoryOptions(ctx.VALUE(), ctx, "VALUE");
-
-        iterateSubrules(ctx);
     }
 
 
@@ -501,5 +500,9 @@ public class CICSWebOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     private void checkSendServerBody(CICSParser.Cics_web_send_server_bodyContext ctx) {
         checkMutuallyExclusiveOptions("DOCTOKEN, FROM or CONTAINER", ctx.cics_web_send_doctoken(), ctx.cics_web_send_from_chunk(), ctx.cics_web_send_container_subrule());
         checkPrerequisiteIsMet(ctx.cics_web_send_from_chunk(), ctx.HOSTCODEPAGE(), ctx, "HOSTCODEPAGE");
+    }
+
+    private void checkSendClientBody(CICSParser.Cics_web_send_client_bodyContext ctx) {
+        checkMutuallyExclusiveOptions("DOCTOKEN, FROM or CONTAINER", ctx.cics_web_send_doctoken(), ctx.cics_web_send_from_chunk(), ctx.cics_web_send_container_subrule());
     }
 }
