@@ -16,8 +16,16 @@ package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
+import org.eclipse.lsp.cobol.usecases.common.CICSTestUtils;
+import org.eclipse.lsp4j.Diagnostic;
+import org.eclipse.lsp4j.DiagnosticSeverity;
+import org.eclipse.lsp4j.Position;
+import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
+
+import java.util.Map;
 
 /** Test CICS DELAY statement as per https://www.ibm.com/docs/en/cics-ts/6.1?topic=summary-delay */
 public class TestCicsDelayStatement {
@@ -63,4 +71,46 @@ public class TestCicsDelayStatement {
   void test_delayStatement_flow3() {
     UseCaseEngine.runTest(TEXT3, ImmutableList.of(), ImmutableMap.of());
   }
+
+  private static final String DELAY_VALID =
+          "DELAY REQID({$varFour})";
+  private static final String DELAY_VALID_ALL =
+          "DELAY FOR HOURS(100) MINUTES(20) SECONDS(10) MILLISECS(1)";
+  private static final String DELAY_FOR_UNTIL_INVALID =
+          "DELAY FOR HOURS({$varOne}) {UNTIL | error} ";
+  private static final String DELAY_INTERVAL_TIME_INVALID =
+          "DELAY INTERVAL({$varOne}) {TIME | error} ";
+  @Test
+  void testDelayReqidValid() {
+    CICSTestUtils.noErrorTest(DELAY_VALID);
+  }
+  @Test
+  void testDelayAllValid() {
+    CICSTestUtils.noErrorTest(DELAY_VALID_ALL);
+  }
+  @Test
+  void testDelayForUntilInvalid() {
+    Map<String, Diagnostic> expectedDiagnostic =
+            ImmutableMap.of(
+                    "error",
+                    new Diagnostic(
+                            new Range(new Position(16, 12), new Position(16, 20)),
+                            "Syntax error on 'END-EXEC'",
+                            DiagnosticSeverity.Error,
+                            ErrorSource.PARSING.getText()));
+    CICSTestUtils.errorTest(DELAY_FOR_UNTIL_INVALID, expectedDiagnostic);
+  }
+  @Test
+  void testDelayIntervalTimeInvalid() {
+    Map<String, Diagnostic> expectedDiagnostic =
+            ImmutableMap.of(
+                    "error",
+                    new Diagnostic(
+                            new Range(new Position(15, 12), new Position(15, 20)),
+                            "Syntax error on 'END-EXEC'",
+                            DiagnosticSeverity.Error,
+                            ErrorSource.PARSING.getText()));
+    CICSTestUtils.errorTest(DELAY_INTERVAL_TIME_INVALID, expectedDiagnostic);
+  }
+
 }
