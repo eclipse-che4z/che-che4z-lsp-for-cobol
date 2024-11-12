@@ -122,7 +122,7 @@ public abstract class CICSOptionsCheckBaseUtility {
     checkPrerequisiteIsMet(isNodePresent(requiredContext), isNodePresent(optionalContext), ctx, options);
   }
 
-  protected <E extends ParseTree> void checkPrerequisiteIsMet(E requiredContext, List<TerminalNode> optionalContext, ParserRuleContext ctx, String options) {
+  protected <E extends ParseTree> void checkPrerequisiteIsMet(E requiredContext, List<E> optionalContext, ParserRuleContext ctx, String options) {
     checkPrerequisiteIsMet(isNodePresent(requiredContext), isNodePresent(optionalContext), ctx, options);
   }
 
@@ -156,7 +156,7 @@ public abstract class CICSOptionsCheckBaseUtility {
         throwException(
                 ErrorSeverity.ERROR,
                 VisitorUtility.constructLocality(ctx, context),
-                "Missing required option for: " + options,
+                "Missing required option for: ",
                 options);
       }
   }
