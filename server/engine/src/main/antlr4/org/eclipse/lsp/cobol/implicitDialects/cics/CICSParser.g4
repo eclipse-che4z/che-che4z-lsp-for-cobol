@@ -293,9 +293,9 @@ cics_define_process: (PROCESS cics_data_value | (PROCESSTYPE | TRANSID | PROGRAM
 cics_define_timer: TIMER cics_data_value ((EVENT | DAYS | HOURS | MINUTES | SECONDS | YEAR | MONTH | DAYOFMONTH | DAYOFYEAR) cics_data_value | AFTER  | AT | ON | cics_handle_response)+;
 
 /** DELAY */
-cics_delay: (DELAY (INTERVAL cics_zero_digit | (INTERVAL | TIME) cics_hhmmss | cics_delay_for | cics_delay_until | cics_handle_response)?) (REQID cics_name)?;
-cics_delay_for: FOR ((HOURS  | MINUTES  | SECONDS  | MILLISECS ) cics_data_value)*;
-cics_delay_until: UNTIL ((HOURS | MINUTES | SECONDS) cics_data_value)*;
+cics_delay: DELAY (INTERVAL cics_zero_digit | (INTERVAL | TIME) cics_hhmmss | cics_delay_for | cics_delay_until)? (REQID cics_name)? cics_handle_response?;
+cics_delay_for: FOR ((HOURS  | MINUTES  | SECONDS  | MILLISECS ) cics_data_value cics_handle_response?)*;
+cics_delay_until: UNTIL ((HOURS | MINUTES | SECONDS) cics_data_value cics_handle_response?)*;
 
 /** DELETE (all of them) */
 cics_delete: DELETE (cics_delete_group_one | cics_delete_group_two | cics_delete_group_three | cics_delete_group_four);

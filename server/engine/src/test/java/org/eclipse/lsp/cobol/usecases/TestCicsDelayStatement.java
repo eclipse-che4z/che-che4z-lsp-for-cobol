@@ -21,13 +21,17 @@ import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.eclipse.lsp.cobol.usecases.common.CICSTestUtils;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
-import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
 import java.util.Map;
 
-/** Test CICS DELAY statement as per https://www.ibm.com/docs/en/cics-ts/6.1?topic=summary-delay */
+/**
+ * Test CICS DELAY commands. Documentation link: <a
+ * href="https://www.ibm.com/docs/en/cics-ts/6.1?topic=summary-delay">DELAY Command</a>
+ *
+ * <p>This class tests all variations of the DELAY command found in the link above.
+ */
 public class TestCicsDelayStatement {
   private static final String PREFIX =
       "       IDENTIFICATION DIVISION.\n"
@@ -94,8 +98,8 @@ public class TestCicsDelayStatement {
             ImmutableMap.of(
                     "error",
                     new Diagnostic(
-                            new Range(new Position(16, 12), new Position(16, 20)),
-                            "Syntax error on 'END-EXEC'",
+                            new Range(),
+                            "Extraneous input UNTIL",
                             DiagnosticSeverity.Error,
                             ErrorSource.PARSING.getText()));
     CICSTestUtils.errorTest(DELAY_FOR_UNTIL_INVALID, expectedDiagnostic);
@@ -106,8 +110,8 @@ public class TestCicsDelayStatement {
             ImmutableMap.of(
                     "error",
                     new Diagnostic(
-                            new Range(new Position(15, 12), new Position(15, 20)),
-                            "Syntax error on 'END-EXEC'",
+                            new Range(),
+                            "Extraneous input TIME",
                             DiagnosticSeverity.Error,
                             ErrorSource.PARSING.getText()));
     CICSTestUtils.errorTest(DELAY_INTERVAL_TIME_INVALID, expectedDiagnostic);
