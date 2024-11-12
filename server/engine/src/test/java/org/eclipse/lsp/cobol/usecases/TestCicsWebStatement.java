@@ -98,7 +98,7 @@ public class TestCicsWebStatement {
     private static final String RECEIVE_CLIENT_BUFFER_VALID = RECEIVE_BODY + "INTO(123) LENGTH(123) MAXLENGTH(123) NOTRUNCATE CLICONVERT BODYCHARSET(1)";
     private static final String RECEIVE_CLIENT_CONTAINER_VALID = RECEIVE_BODY + "TOCONTAINER(1) TOCHANNEL(3) BODYCHARSET(1)";
 
-    private static final String RETRIVE_VALID = WEB + "RETRIEVE DOCTOKEN(123)";
+    private static final String RETRIEVE_VALID = WEB + "RETRIEVE DOCTOKEN(123)";
 
     private static final String SEND_SERVER_VALID_1 = WEB + "SEND DOCTOKEN(123) NODOCDELETE MEDIATYPE(123) SRVCONVERT CHARACTERSET(1) STATUSCODE(123) STATUSTEXT(123) STATUSLEN(123) IMMEDIATE NOCLOSE";
     private static final String SEND_SERVER_VALID_2 = WEB + "SEND FROM(123) FROMLENGTH(123) CHUNKNO HOSTCODEPAGE(123) MEDIATYPE(123) SRVCONVERT CHARACTERSET(1) STATUSCODE(123) STATUSTEXT(123) STATUSLEN(123) IMMEDIATE NOCLOSE";
@@ -116,6 +116,7 @@ public class TestCicsWebStatement {
 
     // Invalid use cases
     private static final String READ_QUERYPARM_INVALID = WEB_READ + "QUERYPARM(123) NAMELENGTH(123) {SESSTOKEN|errorOne}(123) VALUE(123) VALUELENGTH(123)";
+    private static final String READNEXT_QUERYPARM_INVALID = WEB_READNEXT + "QUERYPARM(123) NAMELENGTH(123) {SESSTOKEN|errorOne}(123) VALUE(123) VALUELENGTH(123)";
 
     // Utility Functions
     private static void noErrorTest(String newCommand) {
@@ -189,6 +190,13 @@ public class TestCicsWebStatement {
     }
 
     @Test
+    void testReadNextInvalid() {
+        HashMap<String, Diagnostic> expectedDiagnostics = new HashMap<>();
+        expectedDiagnostics.put("errorOne", new Diagnostic(new Range(), "Extraneous input SESSTOKEN", DiagnosticSeverity.Error, ErrorSource.PARSING.getText()));
+        CICSTestUtils.errorTest(READNEXT_QUERYPARM_INVALID, expectedDiagnostics);
+    }
+
+    @Test
     void testReceiveServerValid() {
         noErrorTest(RECEIVE_SERVER_BUFFER_VALID);
         noErrorTest(RECEIVE_SERVER_CONTAINER_VALID);
@@ -202,7 +210,7 @@ public class TestCicsWebStatement {
 
     @Test
     void testRetrieveValid() {
-        noErrorTest(RETRIVE_VALID);
+        noErrorTest(RETRIEVE_VALID);
     }
 
     @Test
