@@ -837,7 +837,7 @@ cics_web_action_expect: (ACTION cics_cvda | EXPECT);
 cics_web_close_options: (CLOSE | NOCLOSE | CLOSESTATUS cics_cvda);
 
 cics_web_into_set_tocontainer: (INTO cics_data_area | SET ptr_ref | (TOCONTAINER|TOCHANNEL) cics_data_value);
-cics_web_statuscode: (((STATUSCODE|STATUSTEXT) cics_data_area) | STATUSLEN cics_data_value)+;
+cics_web_statuscode: (((STATUSCODE|STATUSTEXT) cics_data_area) | (STATUSLEN|LENGTH) cics_data_value)+;
 
 cics_web_translation: (CHARACTERSET cics_data_value) | (CLICONVERT | NOINCONVERT | NOOUTCONVERT | NOCLICONVERT | CLIENTCONV cics_cvda);
 
