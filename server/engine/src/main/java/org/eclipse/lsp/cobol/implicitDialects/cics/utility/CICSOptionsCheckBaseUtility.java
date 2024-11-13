@@ -191,18 +191,23 @@ public abstract class CICSOptionsCheckBaseUtility {
     }
 
     int rulesSeen = 0;
+    boolean isRuleList = false;
 
     for (E rule : rules) {
+      isRuleList = false;
       if (rule == null) {
           continue;
       }
 
       if (ParserRuleContext.class.isAssignableFrom(rule.getClass()) || TerminalNode.class.isAssignableFrom(rule.getClass())) {
         rulesSeen++;
+      } else if (List.class.isAssignableFrom(rule.getClass())) {
+        rulesSeen++;
+        isRuleList = true;
       }
 
       if (rulesSeen > 1) {
-        throwException(ErrorSeverity.ERROR, getLocality(rule), "Options \"" + options + "\" are mutually exclusive, ", "");
+        throwException(ErrorSeverity.ERROR, getLocality(isRuleList ? ((List<?>)rule).get(0) : rule), "Options \"" + options + "\" are mutually exclusive.", "");
         break;
       }
     }
