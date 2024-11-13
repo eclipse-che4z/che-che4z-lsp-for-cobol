@@ -117,6 +117,9 @@ public class TestCicsWebStatement {
     // Invalid use cases
     private static final String READ_QUERYPARM_INVALID = WEB_READ + "QUERYPARM(123) NAMELENGTH(123) {SESSTOKEN|errorOne}(123) VALUE(123) VALUELENGTH(123)";
     private static final String READNEXT_QUERYPARM_INVALID = WEB_READNEXT + "QUERYPARM(123) NAMELENGTH(123) {SESSTOKEN|errorOne}(123) VALUE(123) VALUELENGTH(123)";
+    private static final String SEND_SERVER_INVALID = WEB + "SEND DOCTOKEN(123) {FROM(123)|errorOne} NODOCDELETE MEDIATYPE(123) SRVCONVERT CHARACTERSET(1) STATUSCODE(123) STATUSTEXT(123) STATUSLEN(123) IMMEDIATE NOCLOSE";
+
+
 
     // Utility Functions
     private static void noErrorTest(String newCommand) {
@@ -218,6 +221,13 @@ public class TestCicsWebStatement {
         noErrorTest(SEND_SERVER_VALID_1);
         noErrorTest(SEND_SERVER_VALID_2);
         noErrorTest(SEND_SERVER_VALID_3);
+    }
+
+    @Test
+    void testSendServerInvalid() {
+        HashMap<String, Diagnostic> expectedDiagnostics = new HashMap<>();
+        expectedDiagnostics.put("errorOne", new Diagnostic(new Range(), "Options \"DOCTOKEN, FROM or CONTAINER\" are mutually exclusive.", DiagnosticSeverity.Error, ErrorSource.PARSING.getText()));
+        CICSTestUtils.errorTest(SEND_SERVER_INVALID, expectedDiagnostics);
     }
 
     @Test
