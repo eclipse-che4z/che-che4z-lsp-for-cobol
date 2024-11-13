@@ -150,8 +150,6 @@ public class CICSWebOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
                     put(CICSParser.RULE_cics_web_server_convert, "SRVCONVERT, NOSRVCONVERT, SERVERCONV");
                     put(CICSParser.RULE_cics_web_client_convert, "CLICONVERT, NOCLICONVERT, CLIENTCONV, ");
                     put(CICSParser.RULE_cics_web_client_auth_type, "NONE, BASICAUTH, AUTHENTICATE");
-                    put(CICSParser.RULE_cics_web_send_server_body, "DOCTOKEN, FROM or CONTAINER");
-                    put(CICSParser.RULE_cics_web_send_client_body, "DOCTOKEN, FROM or CONTAINER");
                 }
             };
 
@@ -166,6 +164,7 @@ public class CICSWebOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
      * @param <E> A subclass of ParserRuleContext
      */
     public <E extends ParserRuleContext> void checkOptions(E ctx) {
+        int ruleIndex = ctx.getRuleIndex();
         switch (ctx.getRuleIndex()) {
             case CICSParser.RULE_cics_web_close:
                 checkClose((CICSParser.Cics_web_closeContext) ctx);
@@ -203,7 +202,7 @@ public class CICSWebOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
             case CICSParser.RULE_cics_web_receive_client_container:
                 checkReceiveClientContainer((CICSParser.Cics_web_receive_client_containerContext) ctx);
                 break;
-            case CICSParser.RULE_cics_send:
+            case CICSParser.RULE_cics_web_send:
                 checkSend((CICSParser.Cics_web_sendContext) ctx);
                 break;
             case CICSParser.RULE_cics_web_startbrowse_formfield_queryparm:
@@ -298,11 +297,6 @@ public class CICSWebOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
             case CICSParser.RULE_cics_web_send_doctoken:
                 checkSendDoctoken((CICSParser.Cics_web_send_doctokenContext) ctx);
                 break;
-            case CICSParser.RULE_cics_web_send_server_body:
-                checkSendServerBody((CICSParser.Cics_web_send_server_bodyContext) ctx);
-                break;
-            case CICSParser.RULE_cics_web_send_client_body:
-                checkSendClientBody((CICSParser.Cics_web_send_client_bodyContext) ctx);
             default:
                 break;
         }
@@ -316,6 +310,8 @@ public class CICSWebOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     private void checkConverse(CICSParser.Cics_web_converseContext ctx) {
         checkHasMandatoryOptions(ctx.SESSTOKEN(), ctx, "SESSTOKEN");
         checkMutuallyExclusiveOptions("PATH PATHLENGTH or URIMAP", ctx.cics_web_path(), ctx.cics_web_urimap());
+
+
     }
 
     private void checkEndbrowse(CICSParser.Cics_web_endbrowseContext ctx) {
@@ -398,7 +394,22 @@ public class CICSWebOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     // RETRIEVE does not need any checks.
 
     private void checkSend(CICSParser.Cics_web_sendContext ctx) {
-        iterateSubrules(ctx);
+        if (ctx.cics_web_send_client() != null) {
+            checkSendClient(ctx.cics_web_send_client());
+        } else if (ctx.cics_web_send_server() != null) {
+            checkSendServer(ctx.cics_web_send_server());
+        }
+    }
+
+    private void checkSendServer(CICSParser.Cics_web_send_serverContext ctx) {
+        checkMutuallyExclusiveOptions("DOCTOKEN, FROM or CONTAINER", ctx.cics_web_send_doctoken(), ctx.cics_web_send_from_chunk(), ctx.cics_web_send_container_subrule());
+        if (ctx.cics_web_send_from_chunk() != null) {
+            checkHasIllegalOptions(ctx.HOSTCODEPAGE(), "HOSTCODEPAGE");
+        }
+    }
+
+    private void checkSendClient(CICSParser.Cics_web_send_clientContext ctx) {
+        checkMutuallyExclusiveOptions("DOCTOKEN, FROM or CONTAINER", ctx.cics_web_send_doctoken(), ctx.cics_web_send_from_chunk(), ctx.cics_web_send_container_subrule());
     }
 
     // STARTBROWSE does not need any checks other than the helper rules.
@@ -495,14 +506,5 @@ public class CICSWebOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
         checkPrerequisiteIsMet(ctx.DOCTOKEN(), ctx.NODOCDELETE(), ctx, "DOCTOKEN");
         checkPrerequisiteIsMet(ctx.DOCTOKEN(), ctx.DOCDELETE(), ctx, "DOCTOKEN");
         checkPrerequisiteIsMet(ctx.DOCTOKEN(), ctx.DOCSTATUS(), ctx, "DOCTOKEN");
-    }
-
-    private void checkSendServerBody(CICSParser.Cics_web_send_server_bodyContext ctx) {
-        checkMutuallyExclusiveOptions("DOCTOKEN, FROM or CONTAINER", ctx.cics_web_send_doctoken(), ctx.cics_web_send_from_chunk(), ctx.cics_web_send_container_subrule());
-        checkPrerequisiteIsMet(ctx.cics_web_send_from_chunk(), ctx.HOSTCODEPAGE(), ctx, "HOSTCODEPAGE");
-    }
-
-    private void checkSendClientBody(CICSParser.Cics_web_send_client_bodyContext ctx) {
-        checkMutuallyExclusiveOptions("DOCTOKEN, FROM or CONTAINER", ctx.cics_web_send_doctoken(), ctx.cics_web_send_from_chunk(), ctx.cics_web_send_container_subrule());
     }
 }

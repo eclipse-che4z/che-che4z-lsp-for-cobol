@@ -810,9 +810,9 @@ cics_web_receive_client_container: (TOCONTAINER cics_data_value | (TOCHANNEL cic
 cics_web_retrieve: RETRIEVE DOCTOKEN cics_data_area cics_handle_response*;
 
 cics_web_send: SEND (cics_web_send_server | cics_web_send_client);
-cics_web_send_server: (cics_web_send_server_body | ((MEDIATYPE|CHARACTERSET) cics_data_value) | cics_web_server_convert | cics_web_statuscode |
+cics_web_send_server: ((cics_web_send_doctoken | cics_web_send_from_chunk | (HOSTCODEPAGE cics_data_value) | cics_web_send_container_subrule) | ((MEDIATYPE|CHARACTERSET) cics_data_value) | cics_web_server_convert | cics_web_statuscode |
                         (IMMEDIATE | EVENTUAL | ACTION cics_cvda) | (NOCLOSE | CLOSE | CLOSESTATUS cics_cvda) | cics_handle_response)+;
-cics_web_send_client: SESSTOKEN cics_data_value (cics_web_http_call_method | cics_web_path | cics_web_urimap | cics_web_querystring | cics_web_send_client_body | cics_web_client_convert |
+cics_web_send_client: SESSTOKEN cics_data_value (cics_web_http_call_method | cics_web_path | cics_web_urimap | cics_web_querystring | (cics_web_send_doctoken | cics_web_send_from_chunk | cics_web_send_container_subrule) | cics_web_client_convert |
                         (CHARACTERSET cics_data_value) | EXPECT | NOCLOSE | CLOSE | ((ACTION | CLOSESTATUS) cics_cvda) | cics_web_server_client_credentials | cics_handle_response)+;
 
 cics_web_startbrowse: STARTBROWSE (cics_web_startbrowse_formfield_queryparm | cics_web_startbrowse_httpheader);
@@ -863,9 +863,6 @@ cics_web_auth_password: (PASSWORD|PASSWORDLEN) cics_data_value;
 cics_web_send_doctoken: (DOCTOKEN cics_data_value | (NODOCDELETE | DOCDELETE | DOCSTATUS cics_cvda));
 cics_web_send_from_chunk: FROM cics_data_area | FROMLENGTH cics_data_value | (CHUNKNO | CHUNKYES | CHUNKEND | CHUNKING cics_cvda);
 cics_web_send_container_subrule: (CONTAINER cics_data_value | CHANNEL cics_data_value)+;
-
-cics_web_send_server_body: (cics_web_send_doctoken | cics_web_send_from_chunk | (HOSTCODEPAGE cics_data_value) | cics_web_send_container_subrule);
-cics_web_send_client_body: (cics_web_send_doctoken | cics_web_send_from_chunk | cics_web_send_container_subrule)+;
 
 /** WRITE / WRITE JOURNALNAME / WRITE OPERATOR */
 cics_write: WRITE (cics_write_file | cics_write_journalname | cics_write_operator);
