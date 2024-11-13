@@ -403,7 +403,7 @@ public class CICSWebOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
 
     private void checkSendServer(CICSParser.Cics_web_send_serverContext ctx) {
         checkMutuallyExclusiveOptions("DOCTOKEN, FROM or CONTAINER", ctx.cics_web_send_doctoken(), ctx.cics_web_send_from_chunk(), ctx.cics_web_send_container_subrule());
-        if (ctx.cics_web_send_from_chunk() != null) {
+        if (ctx.cics_web_send_from_chunk() == null) {
             checkHasIllegalOptions(ctx.HOSTCODEPAGE(), "HOSTCODEPAGE");
         }
     }
