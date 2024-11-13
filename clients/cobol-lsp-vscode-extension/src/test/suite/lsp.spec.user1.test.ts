@@ -52,9 +52,15 @@ suite("Tests with USER1.cbl", function () {
     if (vscode.window.activeTextEditor === undefined) {
       assert.fail("activeTextEditor in undefined");
     }
-    const diagnostics = vscode.languages.getDiagnostics(
-      vscode.window.activeTextEditor.document.uri,
-    );
+    let diagnostics: vscode.Diagnostic[] = [];
+
+    await helper.waitFor(async () => {
+      diagnostics = await vscode.languages.getDiagnostics(
+        vscode.window.activeTextEditor!.document.uri,
+      );
+      return diagnostics.length === 0;
+    });
+
     const expectedMsg =
       "Checks that when opening Cobol file with correct syntax there is an appropriate message is shown";
     assert.strictEqual(diagnostics.length, 0, expectedMsg);
