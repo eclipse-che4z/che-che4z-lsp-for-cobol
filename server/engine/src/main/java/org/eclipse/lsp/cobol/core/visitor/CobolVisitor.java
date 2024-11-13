@@ -32,10 +32,7 @@ import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.model.*;
 import org.eclipse.lsp.cobol.common.model.tree.*;
-import org.eclipse.lsp.cobol.common.model.tree.statements.SetToBooleanStatement;
-import org.eclipse.lsp.cobol.common.model.tree.statements.SetToOnOffStatement;
-import org.eclipse.lsp.cobol.common.model.tree.statements.SetUpDownByStatement;
-import org.eclipse.lsp.cobol.common.model.tree.statements.StatementNode;
+import org.eclipse.lsp.cobol.common.model.tree.statements.*;
 import org.eclipse.lsp.cobol.common.model.tree.variable.*;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableDefinitionNode.Builder;
 import org.eclipse.lsp.cobol.common.model.variables.DivisionType;
@@ -1086,6 +1083,30 @@ public final class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
                                     .isPresent())
                     .build(),
             visitChildren(ctx));
+  }
+
+  @Override
+  public List<Node> visitSetToStatement(SetToStatementContext ctx) {
+    List<Node> receivingField =
+            ctx.receivingField().stream().map(this::visit).flatMap(List::stream).collect(toList());
+
+    boolean address = ctx.receivingField().stream().flatMap(f -> f.children.stream())
+            .filter(c -> c instanceof GeneralIdentifierContext)
+            .flatMap(c -> ((GeneralIdentifierContext) c).children.stream())
+            .anyMatch(c -> c instanceof SpecialRegisterContext);
+
+    List<Node> sendingField =
+            ofNullable(ctx.sendingField()).map(this::visit).orElseGet(ImmutableList::of);
+    List<Node> children = new ArrayList<>();
+    children.addAll(receivingField);
+    children.addAll(sendingField);
+    if (sendingField.size() != 1) return children;
+    SetToStatement statement =
+            new SetToStatement(address,
+                    retrieveLocality(ctx, extendedDocument, copybooks).orElse(null),
+                    receivingField,
+                    sendingField.get(0));
+    return addTreeNode(statement, children);
   }
 
   @Override
