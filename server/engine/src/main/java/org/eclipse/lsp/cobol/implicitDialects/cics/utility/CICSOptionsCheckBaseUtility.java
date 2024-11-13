@@ -207,7 +207,7 @@ public abstract class CICSOptionsCheckBaseUtility {
       }
 
       if (rulesSeen > 1) {
-        throwException(ErrorSeverity.ERROR, getLocality(isRuleList ? ((List<?>)rule).get(0) : rule), "Options \"" + options + "\" are mutually exclusive.", "");
+        throwException(ErrorSeverity.ERROR, getLocality(isRuleList ? ((List<?>) rule).get(0) : rule), "Options \"" + options + "\" are mutually exclusive.", "");
         break;
       }
     }
