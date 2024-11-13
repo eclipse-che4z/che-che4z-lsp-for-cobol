@@ -202,6 +202,13 @@ public abstract class CICSOptionsCheckBaseUtility {
       if (ParserRuleContext.class.isAssignableFrom(rule.getClass()) || TerminalNode.class.isAssignableFrom(rule.getClass())) {
         rulesSeen++;
       } else if (List.class.isAssignableFrom(rule.getClass())) {
+        @SuppressWarnings("unchecked")
+        List<E> list = (List<E>) rule;
+
+        if (list.isEmpty()) {
+          continue;
+        }
+
         rulesSeen++;
         isRuleList = true;
       }
