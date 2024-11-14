@@ -61,7 +61,7 @@ describe("Test Analysis CLI command functionality", () => {
 
     expect(runCobolAnalysisCommandSpy).toHaveBeenCalled();
     expect(getCurrentFileLocationSpy).toHaveBeenCalled();
-    expect(buildJavaCommandSpy).toHaveBeenCalledWith("/storagePath", true);
+    expect(buildJavaCommandSpy).toHaveBeenCalledWith("/storagePath");
     expect(buildJavaCommandSpy).toHaveReturnedWith(
       'java -jar "/test/server/jar/server.jar" analysis -s "/storagePath" -cf=.',
     );
@@ -115,7 +115,6 @@ describe("Test Analysis CLI command functionality", () => {
     expect(buildNativeCommandSpy).toHaveBeenCalledWith(
       "/storagePath",
       process.platform,
-      true,
     );
     expect(buildAnalysisCommandPortionSpy).toHaveReturnedWith(
       'analysis -s "/storagePath" -cf=.',
@@ -187,7 +186,7 @@ describe("Test Analysis CLI command functionality", () => {
       context.extensionUri,
     );
 
-    const result = testAnalysis["buildJavaCommand"]("", false);
+    const result = testAnalysis["buildJavaCommand"]("");
 
     expect(result).toBe("");
   });
