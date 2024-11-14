@@ -115,6 +115,7 @@ public class TestCicsWebStatement {
     private static final String WRITE_HTTPHEADER_VALID = WEB + "WRITE HTTPHEADER(123) NAMELENGTH(123) SESSTOKEN({$sessVar}) VALUE(123) VALUELENGTH(123)";
 
     // Invalid use cases
+    private static final String CLOSE_INVALID = WEB + "{CLOSE|errorOne} {FROM|errorTwo}(123) SESSTOKEN(123)";
     private static final String READ_QUERYPARM_INVALID = WEB_READ + "QUERYPARM(123) NAMELENGTH(123) {SESSTOKEN|errorOne}(123) VALUE(123) VALUELENGTH(123)";
     private static final String READNEXT_QUERYPARM_INVALID = WEB_READNEXT + "QUERYPARM(123) NAMELENGTH(123) {SESSTOKEN|errorOne}(123) VALUE(123) VALUELENGTH(123)";
     private static final String SEND_SERVER_INVALID = WEB + "SEND DOCTOKEN(123) {FROM(123)|errorOne} NODOCDELETE MEDIATYPE(123) SRVCONVERT CHARACTERSET(1) STATUSCODE(123) STATUSTEXT(123) STATUSLEN(123) IMMEDIATE NOCLOSE";
@@ -138,6 +139,14 @@ public class TestCicsWebStatement {
     @Test
     void testCloseValid() {
         noErrorTest(CLOSE_VALID);
+    }
+
+    @Test
+    void testCloseInvalid() {
+        HashMap<String, Diagnostic> expectedDiagnostics = new HashMap<>();
+        expectedDiagnostics.put("errorOne", new Diagnostic(new Range(), "Missing required option: SESSTOKEN", DiagnosticSeverity.Error, ErrorSource.PARSING.getText()));
+        expectedDiagnostics.put("errorTwo", new Diagnostic(new Range(), "Syntax error on 'FROM'", DiagnosticSeverity.Error, ErrorSource.PARSING.getText()));
+        CICSTestUtils.errorTest(CLOSE_INVALID, expectedDiagnostics);
     }
 
     @Test
