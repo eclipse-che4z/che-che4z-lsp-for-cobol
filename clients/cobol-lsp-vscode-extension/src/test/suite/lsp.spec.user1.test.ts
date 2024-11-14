@@ -54,7 +54,7 @@ suite("Tests with USER1.cbl", function () {
     }
     let diagnostics: vscode.Diagnostic[] = [];
 
-    await helper.waitFor(async () => {
+    await helper.waitFor(() => {
       diagnostics = vscode.languages.getDiagnostics(
         vscode.window.activeTextEditor!.document.uri,
       );
