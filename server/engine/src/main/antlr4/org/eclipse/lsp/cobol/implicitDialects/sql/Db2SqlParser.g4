@@ -83,7 +83,7 @@ dbs_host_var_size_arrays: T=dbs_integer {validateIntegerRange($T.text, 1, 32767)
 
 entry_name : (FILLER |dbs_host_names);
 sqlCode
-   : ~END_EXEC*?
+   : ~END_EXEC*
    ;
 
 startSqlRule : (dataDivisionRules | procedureDivisionRules | rulesAllowedInDataDivisionAndProcedureDivision)+ EOF;
