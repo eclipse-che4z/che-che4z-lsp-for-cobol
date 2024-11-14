@@ -30,7 +30,9 @@ nonExecRule: sql_host_variables | binary_host_variable | binary_host_variable_ar
 binary_host_variable_array: dbs_host_var_levels entry_name SQL TYPE IS binary_host_variable_type host_variable_array_times;
 
 binary_host_variable: dbs_level_01 entry_name host_variable_usage binary_host_variable_type;
-binary_host_variable_type: BINARY LPARENCHAR binary_host_variable_binary_size RPARENCHAR | (VARBINARY | BINARY VARYING) LPARENCHAR binary_host_variable_varbinary_size RPARENCHAR;
+binary_host_variable_type:
+    VARBINARY LPARENCHAR binary_host_variable_varbinary_size RPARENCHAR
+    | BINARY (VARYING LPARENCHAR binary_host_variable_varbinary_size RPARENCHAR | LPARENCHAR binary_host_variable_binary_size RPARENCHAR);
 
 binary_host_variable_binary_size: T=dbs_integerliteral_expanded {validateIntegerRange($T.start, $T.text, 1, 255);};
 binary_host_variable_varbinary_size: T=dbs_integerliteral_expanded {validateIntegerRange($T.start, $T.text, 1, 32704);};
