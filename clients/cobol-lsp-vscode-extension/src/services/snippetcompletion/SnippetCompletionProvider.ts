@@ -187,7 +187,10 @@ function getCurrentLineText(
   document: vscode.TextDocument,
   position: vscode.Position,
 ) {
-  return document.lineAt(position).text.slice(0, position.character).trim();
+  return document
+    .lineAt(position.line)
+    .text.slice(0, position.character)
+    .trim();
 }
 
 function getMatchedWords(words1: string[], words2: string[]) {
