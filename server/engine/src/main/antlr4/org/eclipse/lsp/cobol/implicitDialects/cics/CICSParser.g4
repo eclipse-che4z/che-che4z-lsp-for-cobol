@@ -692,10 +692,9 @@ cics_query_security: (SECURITY | (RESTYPE | RESCLASS | RESIDLENGTH | RESID | USE
                      (LOGMESSAGE | READ | UPDATE | CONTROL |ALTER) cics_cvda | cics_handle_response)+;
 
 /** READ */
-cics_read: READ (cics_file_name | UNCOMMITTED | CONSISTENT | REPEATABLE | UPDATE | TOKEN cics_data_area |
-           INTO cics_data_area | SET cics_ref | RIDFLD cics_data_area | KEYLENGTH cics_data_value | GENERIC |
-           SYSID cics_data_area LENGTH cics_data_area | LENGTH cics_data_area | DEBKEY | DEBREC | RBA | RBN |
-           XRBA | EQUAL | GTEQ | NOSUSPEND | cics_handle_response)+;
+cics_read: READ cics_read_body;
+cics_read_body: ((UNCOMMITTED | CONSISTENT | REPEATABLE | UPDATE | GENERIC | DEBKEY | DEBREC | RBA | RRN | XRBA | EQUAL | GTEQ | NOSUSPEND) | (FILE | SYSID) cics_name
+                            | (KEYLENGTH) cics_data_value | (TOKEN | INTO | RIDFLD | LENGTH) cics_data_area | SET cics_ref | cics_handle_response)+;
 
 /** READNEXT | READPREV*/
 cics_readnext_readprev: (READNEXT | READPREV)  cics_readnext_readprev_body;
