@@ -164,7 +164,6 @@ public class CICSWebOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
      * @param <E> A subclass of ParserRuleContext
      */
     public <E extends ParserRuleContext> void checkOptions(E ctx) {
-        int ruleIndex = ctx.getRuleIndex();
         switch (ctx.getRuleIndex()) {
             case CICSParser.RULE_cics_web_close:
                 checkClose((CICSParser.Cics_web_closeContext) ctx);
