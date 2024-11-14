@@ -6,9 +6,9 @@ export class Uri {
   }
 
   static file(str: string): Uri {
-    const p = str.replace(/\\/g, "/");
-
-    return new Uri((p[1] === ":" ? "/" : "") + p);
+    // const p = str.replace(/\\/g, "/");
+    return new Uri(str);
+    // return new Uri((p[1] === ":" ? "/" : "") + p);
   }
 
   static joinPath(base: Uri, ...pathSegments: string[]): Uri {
