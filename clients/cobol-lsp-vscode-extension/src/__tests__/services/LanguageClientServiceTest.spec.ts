@@ -238,12 +238,12 @@ describe("LanguageClientService positive scenario", () => {
     const spy = jest.spyOn(os, "type");
     spy.mockReturnValue("Windows_NT");
     languageClientService["executableService"] = new NativeExecutableService(
-      "/test",
+      "C:\\test",
     );
     const executable =
       languageClientService["executableService"].getNativeLanguageClient();
     expect(executable?.command).toBe("engine.exe");
-    expect(executable?.options?.cwd).toBe(join("/test", "native"));
+    expect(executable?.options?.cwd).toBe(join("C:\\test", "native"));
   });
 
   test("LanguageClientServer detects executable path for Linux", () => {
