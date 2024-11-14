@@ -56,12 +56,11 @@ public class TestCICSDumpTransactionStatement {
                     + "{FLENGTH(100) | errorMissingFrom} \n";
     private static final String DUMP_TRANSACTION_FROM_INVALID2 =
             "DUMP TRANSACTION DUMPCODE({$varFour}) \n"
-                    + "{FROM({$varFour}) | errorMissingLength} \n";
+                    + "{FROM(100) | errorMissingLength} \n";
 
     private static final String DUMP_TRANSACTION_SEGMENTLIST_INVALID =
             "DUMP TRANSACTION DUMPCODE({$varFour}) \n"
-                    + "LENGTHLIST({$varFour}) \n"
-                    + "{NUMSEGMENTS({$varFour}) | errorMissingSegmentList}";
+                    + "{ NUMSEGMENTS(100) LENGTHLIST(100) | errorMissingSegmentList}";
 
     @Test
     void testDumpTransactionAllValid() {
@@ -82,7 +81,7 @@ public class TestCICSDumpTransactionStatement {
                         "errorMissingFrom",
                         new Diagnostic(
                                 new Range(),
-                                "Missing FROM",
+                                "Missing required option: FROM",
                                 DiagnosticSeverity.Error,
                                 ErrorSource.PARSING.getText()));
         CICSTestUtils.errorTest(DUMP_TRANSACTION_FROM_INVALID, expectedDiagnostic);
@@ -94,7 +93,7 @@ public class TestCICSDumpTransactionStatement {
                         "errorMissingLength",
                         new Diagnostic(
                                 new Range(),
-                                "Missing FROM",
+                                "Exactly one option required, none provided: LENGTH or FLENGTH",
                                 DiagnosticSeverity.Error,
                                 ErrorSource.PARSING.getText()));
         CICSTestUtils.errorTest(DUMP_TRANSACTION_FROM_INVALID2, expectedDiagnostic);
@@ -106,7 +105,7 @@ public class TestCICSDumpTransactionStatement {
                         "errorMissingSegmentList",
                         new Diagnostic(
                                 new Range(),
-                                "Missing FROM",
+                                "Missing required option: SEGMENTLIST",
                                 DiagnosticSeverity.Error,
                                 ErrorSource.PARSING.getText()));
         CICSTestUtils.errorTest(DUMP_TRANSACTION_SEGMENTLIST_INVALID, expectedDiagnostic);

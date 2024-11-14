@@ -94,6 +94,6 @@ public class CICSDumpTransactionOptionsCheckUtility extends CICSOptionsCheckBase
     private void checkDumpTransactionSegmentList(CICSParser.Cics_dump_transaction_segmentlistContext ctx) {
         checkHasMandatoryOptions(ctx.LENGTHLIST(), ctx, "LENGTHLIST");
         checkHasMandatoryOptions(ctx.NUMSEGMENTS(), ctx, "NUMSEGMENTS");
-
+        checkHasMandatoryOptions(ctx.SEGMENTLIST(), ctx, "SEGMENTLIST");
     }
 }
