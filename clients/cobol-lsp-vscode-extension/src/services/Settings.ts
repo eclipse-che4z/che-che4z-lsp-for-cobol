@@ -32,6 +32,7 @@ import {
   DIALECT_LIBS,
   COBOL_PRGM_LAYOUT,
   SETTINGS_CPY_NDVR_DEPENDENCIES,
+  SETTINGS_LSPCONFIG_SECTION,
 } from "../constants";
 import { DialectRegistry, DIALECT_REGISTRY_SECTION } from "./DialectRegistry";
 import {
@@ -297,6 +298,25 @@ export class SettingsService {
     return vscode.workspace
       .getConfiguration(SETTINGS_CPY_SECTION)
       .get("copybook-file-encoding");
+  }
+
+  public static getLspConfigCompiler(): string | undefined {
+    const c = vscode.workspace
+      .getConfiguration(SETTINGS_LSPCONFIG_SECTION)
+      .get("compiler", "")
+      .trim();
+
+    return c.length === 0 ? undefined : c;
+  }
+
+  public static getLspConfigPreprocessors(): string[] | undefined {
+    const c = vscode.workspace
+      .getConfiguration(SETTINGS_LSPCONFIG_SECTION)
+      .get<string[]>("preprocessors", [])
+      .map((x) => x.trim())
+      .filter((x) => x.length > 0);
+
+    return c.length === 0 ? undefined : c;
   }
 
   /**
