@@ -15,9 +15,10 @@
 import * as vscode from "vscode";
 import { Terminal } from "vscode";
 
-export interface AnalysisResults {
-  typeToRun: string;
-  copybookLocation: string;
+export interface AnalysisConfiguration {
+  typeToRun?: string;
+  copybookLocation?: string;
+  showDiagnosticsResult?: string;
 }
 
 /**
@@ -29,12 +30,14 @@ export class RunAnalysis {
   protected copybookConfigLocation: string;
   protected globalStorageUri: vscode.Uri;
   protected extensionUri: vscode.Uri;
+  protected showDiagnostics: boolean;
 
   constructor(globalStorageUri: vscode.Uri, extensionPath: vscode.Uri) {
     this.runNative = false;
     this.copybookConfigLocation = "";
     this.globalStorageUri = globalStorageUri;
     this.extensionUri = extensionPath;
+    this.showDiagnostics = false;
   }
 
   /**
@@ -46,24 +49,25 @@ export class RunAnalysis {
       return;
     }
 
-    const result = {} as Partial<AnalysisResults>;
-    await this.getVersionToRun(result);
-    await this.getCopybookConfigLocation(result);
-    const showDiagnosticsResult = await this.getShowDiagnosticsChoice();
+    const result: AnalysisConfiguration = {
+      typeToRun: await this.getVersionToRun(),
+      copybookLocation: this.getCopybookConfigLocation(),
+      showDiagnosticsResult: await this.getShowDiagnosticsChoice(),
+    };
 
     if (
       result.typeToRun === undefined ||
       result.copybookLocation === undefined ||
-      showDiagnosticsResult === undefined
+      result.showDiagnosticsResult === undefined
     ) {
       return;
     }
 
     this.runNative = result.typeToRun === "Native";
     this.copybookConfigLocation = result.copybookLocation;
-    const showDiagnostics: boolean = showDiagnosticsResult === "Show";
+    this.showDiagnostics = result.showDiagnosticsResult === "Show";
 
-    const command = await this.buildCommand(showDiagnostics);
+    const command = await this.buildCommand();
     if (command !== "") {
       this.sendToTerminal(command);
     }
@@ -72,8 +76,8 @@ export class RunAnalysis {
   /**
    *  Prompt the user for whether to run the Java or Native version.
    */
-  public async getVersionToRun(result: Partial<AnalysisResults>) {
-    result.typeToRun = await vscode.window.showQuickPick(["Java", "Native"], {
+  public async getVersionToRun() {
+    return await vscode.window.showQuickPick(["Java", "Native"], {
       placeHolder: "Select Java or Native",
     });
   }
@@ -81,8 +85,8 @@ export class RunAnalysis {
   /**
    * Prompt the user for the location of the copybook config file.
    */
-  public async getCopybookConfigLocation(result: Partial<AnalysisResults>) {
-    result.copybookLocation = "";
+  public getCopybookConfigLocation() {
+    return "";
   }
 
   public async getShowDiagnosticsChoice() {
@@ -96,21 +100,17 @@ export class RunAnalysis {
    * @param showDiagnostics - Option to show/hide diagnostics
    * @protected
    */
-  protected async buildCommand(showDiagnostics: boolean) {
+  protected async buildCommand() {
     const currentFileLocation = await this.getCurrentFileLocation();
     if (!currentFileLocation || currentFileLocation === "") {
       return "";
     }
 
     if (this.runNative) {
-      return this.buildNativeCommand(
-        currentFileLocation,
-        process.platform,
-        showDiagnostics,
-      );
+      return this.buildNativeCommand(currentFileLocation, process.platform);
     }
 
-    return this.buildJavaCommand(currentFileLocation, showDiagnostics);
+    return this.buildJavaCommand(currentFileLocation);
   }
 
   /**
@@ -120,11 +120,7 @@ export class RunAnalysis {
    * @param showDiagnostics - Option to show/hide diagnostics
    * @protected
    */
-  protected buildNativeCommand(
-    currentFileLocation: string,
-    platform: string,
-    showDiagnostics: boolean,
-  ) {
+  protected buildNativeCommand(currentFileLocation: string, platform: string) {
     const serverPath = this.extensionUri.fsPath + "/server/native";
     const result = this.getServerPath(serverPath, platform);
 
@@ -132,11 +128,7 @@ export class RunAnalysis {
       return "";
     }
 
-    return (
-      result +
-      " " +
-      this.buildAnalysisCommandPortion(currentFileLocation, showDiagnostics)
-    );
+    return result + " " + this.buildAnalysisCommandPortion(currentFileLocation);
   }
 
   protected getServerPath(serverPath: string, platform: string) {
@@ -158,10 +150,7 @@ export class RunAnalysis {
    * @param showDiagnostics - Option to show/hide diagnostics
    * @protected
    */
-  protected buildJavaCommand(
-    currentFileLocation: string,
-    showDiagnostics: boolean,
-  ) {
+  protected buildJavaCommand(currentFileLocation: string) {
     const extensionFolder: string | undefined =
       this.extensionUri.fsPath + "/server/jar/server.jar";
 
@@ -170,7 +159,7 @@ export class RunAnalysis {
         'java -jar "' +
         extensionFolder +
         '" ' +
-        this.buildAnalysisCommandPortion(currentFileLocation, showDiagnostics)
+        this.buildAnalysisCommandPortion(currentFileLocation)
       );
     }
 
@@ -184,10 +173,7 @@ export class RunAnalysis {
    * @param showDiagnostics - Option to show/hide diagnostics
    * @protected
    */
-  protected buildAnalysisCommandPortion(
-    currentFileLocation: string,
-    showDiagnostics: boolean,
-  ) {
+  protected buildAnalysisCommandPortion(currentFileLocation: string) {
     const copyBookCommand = `-cf=${
       this.copybookConfigLocation === ""
         ? "."
@@ -199,7 +185,7 @@ export class RunAnalysis {
       currentFileLocation +
       '" ' +
       copyBookCommand +
-      (showDiagnostics ? "" : " -nd")
+      (this.showDiagnostics ? "" : " -nd")
     );
   }
 

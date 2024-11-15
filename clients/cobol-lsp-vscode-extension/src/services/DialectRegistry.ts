@@ -16,7 +16,7 @@ import { Uri } from "vscode";
 import * as vscode from "vscode";
 import { SETTINGS_DIALECT } from "../constants";
 
-export const DIALECT_REGISTRY_SECTION: string = "cobol-lsp.dialect.registry";
+export const DIALECT_REGISTRY_SECTION = "cobol-lsp.dialect.registry";
 
 /**
  * Holds information about registered dialect

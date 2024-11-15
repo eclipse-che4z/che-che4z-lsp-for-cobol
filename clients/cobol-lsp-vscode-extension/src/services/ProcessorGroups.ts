@@ -22,7 +22,7 @@ import {
   getVariablesFromUri,
   normalizePath,
 } from "./util/FSUtils";
-import { SettingsService } from "./Settings";
+import { DialectsConfiguration, SettingsService } from "./Settings";
 import {
   B4GTypeMetadata,
   decodeBridgeJson,
@@ -119,9 +119,9 @@ export async function loadProcessorGroupSqlBackendConfig(
 }
 
 export async function loadProcessorGroupDialectConfig(
-  item: { scopeUri: string; section: string },
-  configObject: unknown,
-): Promise<unknown> {
+  item: { scopeUri: string },
+  dialectConfig: DialectsConfiguration,
+) {
   try {
     const pgCfg = loadProcessorsConfigForDocument(
       item.scopeUri,
@@ -130,7 +130,7 @@ export async function loadProcessorGroupDialectConfig(
       decodeBridgeJson(await loadBridgeJsonContent(Uri.parse(item.scopeUri))),
     );
     if (pgCfg === undefined || pgCfg.preprocessor == undefined) {
-      return configObject;
+      return dialectConfig;
     }
 
     const dialects: Preprocessor[] = [];
@@ -149,10 +149,10 @@ export async function loadProcessorGroupDialectConfig(
 
     // "SQL" is not a real dialect, we will use it only to set up sql backend for now
     const result = dialects.filter((name) => name != "SQL");
-    return result.length > 0 ? result : configObject;
+    return result.length > 0 ? result : dialectConfig;
   } catch (e) {
     console.error(JSON.stringify(e));
-    return configObject;
+    return dialectConfig;
   }
 }
 

@@ -22,30 +22,34 @@ export class JavaCheck {
     return versionPattern.test(versionString);
   }
   public async isJavaInstalled() {
-    return new Promise<any>((resolve, reject) => {
+    return new Promise((resolve, reject) => {
       let resolved = false;
       const ls = cp.spawn("java", ["-version"]);
-      ls.stderr.on("data", (data: any) => {
+      ls.stderr.on("data", (data: Buffer) => {
         if (JavaCheck.isJavaVersionSupported(data.toString())) {
           resolved = true;
           resolve(resolved);
         }
       });
-      ls.on("error", (code: any) => {
+      ls.on("error", (code) => {
         if ("Error: spawn java ENOENT" === code.toString()) {
-          reject("Java 8 not found. Switching to native builds");
+          reject(new Error("Java 8 not found. Switching to native builds"));
         }
         reject(code);
       });
       ls.on("close", (code: number) => {
         if (code !== 0) {
           reject(
-            "An error occurred when checking if Java was installed. Switching to native build.",
+            new Error(
+              "An error occurred when checking if Java was installed. Switching to native build.",
+            ),
           );
         }
         if (!resolved) {
           reject(
-            "Minimum expected Java version is 8. Switching to native builds",
+            new Error(
+              "Minimum expected Java version is 8. Switching to native builds",
+            ),
           );
         }
       });

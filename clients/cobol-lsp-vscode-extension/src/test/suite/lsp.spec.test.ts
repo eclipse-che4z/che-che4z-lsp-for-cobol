@@ -36,8 +36,7 @@ suite("Integration Test Suite", function () {
   test("TC152047, TC152052, TC152051, TC152050, TC152053: Error case - file has syntax errors and are marked with detailed hints", async () => {
     await helper.showDocument("USER2.cbl");
     const editor = helper.getEditor("USER2.cbl");
-    await helper.waitForDiagnostics(editor.document.uri);
-    const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
+    const diagnostics = await helper.waitForDiagnostics(editor.document.uri);
     assert.strictEqual(diagnostics.length, 1);
     const d0 = diagnostics[0];
     assert.strictEqual(d0.message, "Syntax error on 'Program1-id'");
@@ -47,8 +46,7 @@ suite("Integration Test Suite", function () {
   test("TC152050, TC152053: Error case - file has semantic errors and are marked with detailed hints", async () => {
     await helper.showDocument("REPLACING.CBL");
     const editor = helper.getEditor("REPLACING.CBL");
-    await helper.waitForDiagnostics(editor.document.uri);
-    const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
+    const diagnostics = await helper.waitForDiagnostics(editor.document.uri);
     assert.strictEqual(diagnostics.length, 1);
     const d0 = diagnostics[0];
 
@@ -90,8 +88,7 @@ suite("Integration Test Suite", function () {
       pos(34, 11),
       "           EXEC CICS XCTL PROGRAM (XCTL1) END-EXEC.",
     );
-    await helper.waitForDiagnostics(editor.document.uri);
-    const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
+    const diagnostics = await helper.waitForDiagnostics(editor.document.uri);
     assert.strictEqual(diagnostics.length, 1);
     helper.assertRangeIsEqual(
       diagnostics[0].range,
@@ -178,15 +175,15 @@ suite("Integration Test Suite", function () {
     await helper.showDocument("ADSORT.cbl");
     const editor = helper.getEditor("ADSORT.cbl");
     await helper.waitFor(async () => {
-      helper.sleep(100);
-      const result: any[] = await vscode.commands.executeCommand(
+      await helper.sleep(100);
+      const result = await vscode.commands.executeCommand<vscode.Location[]>(
         "vscode.executeDefinitionProvider",
         editor.document.uri,
         pos(58, 36),
       );
       return result.length > 0;
     });
-    const result: any[] = await vscode.commands.executeCommand(
+    const result = await vscode.commands.executeCommand<vscode.Location[]>(
       "vscode.executeDefinitionProvider",
       editor.document.uri,
       pos(58, 36),
@@ -252,8 +249,7 @@ suite("Integration Test Suite", function () {
   test("TC266094 Underline the entire incorrect variable structure", async () => {
     await helper.showDocument("VAR.cbl");
     const editor = helper.getEditor("VAR.cbl");
-    await helper.waitForDiagnostics(editor.document.uri);
-    const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
+    const diagnostics = await helper.waitForDiagnostics(editor.document.uri);
     assert.strictEqual(diagnostics.length, 2);
     helper.assertRangeIsEqual(
       diagnostics[0].range,
@@ -277,8 +273,7 @@ suite("Integration Test Suite", function () {
 
   test("Load resource file", async () => {
     const editor = await helper.showDocument("RES.cbl");
-    await helper.waitForDiagnostics(editor.document.uri);
-    const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
+    const diagnostics = await helper.waitForDiagnostics(editor.document.uri);
 
     assert.strictEqual(diagnostics.length, 1);
     assert.ok(
@@ -366,8 +361,7 @@ suite("Integration Test Suite", function () {
     await editor.edit((edit) => {
       edit.replace(range(pos(48, 30), pos(48, 32)), "1.");
     });
-    await helper.waitForDiagnostics(editor.document.uri);
-    const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
+    const diagnostics = await helper.waitForDiagnostics(editor.document.uri);
     assert.strictEqual(diagnostics.length, 1);
     assert.strictEqual(
       diagnostics[0].message,

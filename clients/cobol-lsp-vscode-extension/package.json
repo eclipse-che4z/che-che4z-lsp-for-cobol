@@ -598,6 +598,7 @@
     "pretty": "prettier -w .",
     "watch": "tsc -watch -p ./",
     "test": "jest -w 1 --unhandled-rejections=strict",
+    "test-watch": "jest --watchAll -w 1 --unhandled-rejections=strict",
     "coverage": "jest --coverage --runInBand",
     "package": "vsce package --no-dependencies",
     "package:web": "vsce package --target web --no-dependencies"
