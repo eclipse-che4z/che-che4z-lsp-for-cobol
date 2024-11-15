@@ -49,11 +49,11 @@ export async function getExtensionApi<T>(
   }
   return {
     futureApi: new Promise((res, _) => {
-      const extAdded = vscode.extensions.onDidChange(async () => {
+      const extAdded = vscode.extensions.onDidChange(() => {
         const ext = vscode.extensions.getExtension(extName);
         if (!ext) return;
         extAdded.dispose();
-        await extractApi<T>(ext, validate).then((api) => res(asAPI<T>(api)));
+        void extractApi<T>(ext, validate).then((api) => res(asAPI<T>(api)));
       });
     }),
   };
