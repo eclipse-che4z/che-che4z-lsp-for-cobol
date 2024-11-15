@@ -782,17 +782,10 @@ cics_signon: SIGNON (USERID cics_data_value | ESMREASON cics_data_area | ESMRESP
              NEWPHRASE cics_data_area | NEWPHRASELEN cics_data_value | OIDCARD cics_data_value | cics_handle_response)*;
 
 /** SOAPFAULT ADD / CREATE / DELETE */
-cics_soapfault: SOAPFAULT (cics_soapfault_add | cics_soapfault_create | DELETE);
-cics_soapfault_add: ADD (cics_soapfault_faultstring | cics_soapfault_subcodestr | FROMCCSID cics_data_value | cics_handle_response)+;
-cics_soapfault_faultstring: (FAULTSTRING cics_data_value | FAULTSTRLEN cics_data_value | NATLANG cics_data_value)+;
-cics_soapfault_subcodestr: (SUBCODESTR cics_data_value | SUBCODELEN cics_data_value)+;
-cics_soapfault_create: CREATE (FAULTCODE cics_cvda | CLIENT | SERVER | SENDER | RECEIVER | cics_soapfault_faultcodestr |
-                       cics_soapfault_faultstring | cics_soapfault_role | cics_soapfault_faultactor |
-                       cics_soapfault_detail | FROMCCSID cics_data_value | cics_handle_response)+;
-cics_soapfault_faultcodestr: (FAULTCODESTR cics_data_value | FAULTCODELEN cics_data_value)+;
-cics_soapfault_role: (ROLE cics_data_value | ROLELENGTH cics_data_value)+;
-cics_soapfault_faultactor: (FAULTACTOR cics_data_value | FAULTACTLEN cics_data_value)+;
-cics_soapfault_detail: (DETAIL cics_data_value | DETAILLENGTH cics_data_value)+;
+cics_soapfault: SOAPFAULT (cics_soapfault_add | cics_soapfault_create | DELETE cics_handle_response*);
+cics_soapfault_add: ADD ((FAULTSTRING | FAULTSTRLEN |NATLANG | SUBCODESTR | SUBCODELEN | FROMCCSID) cics_data_value | cics_handle_response)+;
+cics_soapfault_create: CREATE ((CLIENT | SERVER | SENDER | RECEIVER | NATLANG) | (FAULTCODESTR | FAULTCODELEN | FAULTSTRING | FAULTSTRLEN | NATLANG | ROLE | ROLELENGTH | FAULTACTOR | FAULTACTLEN | DETAIL | DETAILLENGTH | FROMCCSID) cics_data_value
+                        | (FAULTCODE) cics_cvda | cics_handle_response)+;
 
 /** SPOOLCLOSE */
 cics_spoolclose: SPOOLCLOSE cics_spoolclose_options;
