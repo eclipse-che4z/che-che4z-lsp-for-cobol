@@ -38,7 +38,6 @@ export async function run(): Promise<void> {
       cwd: sourceRoot,
     })
     .forEach((file) => {
-      console.log(`Decaching: ${file}`);
       decache(path.join(sourceRoot, file));
     });
 
