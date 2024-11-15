@@ -15,28 +15,6 @@
 import { clearCache } from "../../commands/ClearCopybookCacheCommand";
 import * as vscode from "vscode";
 
-jest.mock("vscode", () => ({
-  Uri: {
-    joinPath: (uri: { path: string }, ...segments: string[]) => {
-      const result = { ...uri };
-      result.path =
-        uri.path + (uri.path.endsWith("/") ? "" : "/") + segments.join("/");
-      return result;
-    },
-  },
-  window: {
-    setStatusBarMessage: jest.fn().mockResolvedValue(true),
-    showInformationMessage: jest
-      .fn()
-      .mockImplementation((message: string) => Promise.resolve(message)),
-  },
-  workspace: {
-    fs: {
-      delete: jest.fn().mockReturnValue(true),
-      readDirectory: jest.fn().mockResolvedValue([["fileName", 2]]),
-    },
-  },
-}));
 beforeEach(() => {
   jest.clearAllMocks();
 });
@@ -47,7 +25,7 @@ afterAll(() => {
 
 describe("Tests downloaded copybook cache clear", () => {
   it("verify that the clearCache tries to delete cache directories", async () => {
-    await clearCache({ path: "/storagePath" } as any as vscode.Uri);
+    await clearCache(vscode.Uri.file("/storagePath"));
     expect(vscode.workspace.fs.readDirectory).toHaveBeenNthCalledWith(1, {
       path: "/storagePath/zowe/copybooks",
     });

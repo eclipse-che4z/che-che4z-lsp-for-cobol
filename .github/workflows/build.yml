@@ -41,6 +41,11 @@ jobs:
       - name: Install dependencies for COBOL LS
         working-directory: clients/cobol-lsp-vscode-extension
         run: npm ci
+      - name: Install & Build VS Code extension dialect API
+        working-directory: clients/cobol-dialect-api
+        run: |
+          npm ci
+          npm run compile     
       - name: Check code formatting for COBOL LS
         working-directory: clients/cobol-lsp-vscode-extension
         run: npm run lint-format
@@ -406,13 +411,14 @@ jobs:
           unzip -j dialects-daco/*.vsix extension/dist/extension.js extension/dist/extension.js.map -d clients/daco-dialect-support/dist/
           unzip -j dialects-daco/*.vsix extension/server/jar/dialect-daco.jar -d clients/daco-dialect-support/server/jar
         shell: bash
+      - name: Run extension unit tests
+        run: npm run test
+        working-directory: clients/cobol-lsp-vscode-extension
       - name: Run integration tests
         if: github.event.inputs.skip_ui_tests != 'true'
         uses: coactions/setup-xvfb@v1
         with:
-          run: |
-            npm run compile
-            npm run test:integration
+          run: npm run test:integration
           working-directory: clients/cobol-lsp-vscode-extension          
       - name: Run native executable test code
         working-directory: tests/native-executable-tests

@@ -15,6 +15,7 @@ import * as vscode from "vscode";
 import * as iconv from "iconv-lite";
 import { SettingsService } from "../../Settings";
 import { CopybookURI } from "../CopybookURI";
+import { getErrorMessage } from "../../util/ErrorsUtils";
 
 export abstract class ZoweExplorerDownloader {
   public static profileStore: Map<string, "locked-profile" | "valid-profile"> =
@@ -95,8 +96,11 @@ export abstract class ZoweExplorerDownloader {
       return queueResponse;
     }
     const response = this.downloadCopybookContent(dataset, member, profileName)
-      .catch((err) => {
-        vscode.window.showErrorMessage(err.message);
+      .catch((err: unknown) => {
+        const message = getErrorMessage(err);
+        vscode.window.showErrorMessage(
+          message ?? "Unable to download copybook",
+        );
         return false;
       })
       .finally(() => this.ZoweDownloadQueue.delete(copybookPath));

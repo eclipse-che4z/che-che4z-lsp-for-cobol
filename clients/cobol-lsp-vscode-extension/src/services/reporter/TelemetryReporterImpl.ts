@@ -76,8 +76,8 @@ export class TelemetryReporterImpl implements TelemetryReport {
     }
   }
 
-  public dispose(): any {
-    this.reporter.dispose();
+  public async dispose(): Promise<void> {
+    await this.reporter.dispose();
   }
 
   private isValidTelemetryKey(): boolean {

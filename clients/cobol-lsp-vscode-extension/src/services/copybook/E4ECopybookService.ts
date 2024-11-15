@@ -16,7 +16,7 @@ import { E4E } from "../../type/e4eApi.d";
 import { getExtensionApi } from "../util/Utils";
 
 const nameof = <T>(name: keyof T) => name;
-function validateE4E(e4e: any): e4e is E4E {
+function validateE4E(e4e: unknown): e4e is E4E {
   return (
     e4e instanceof Object &&
     nameof<E4E>("listElements") in e4e &&
