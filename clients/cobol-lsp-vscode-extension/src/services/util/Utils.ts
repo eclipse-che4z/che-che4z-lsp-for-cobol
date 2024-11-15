@@ -101,3 +101,10 @@ export class Utils {
     return `${profile.instance}.${profile.profile}`;
   }
 }
+
+export function hasMember<
+  M extends PropertyKey,
+  T extends object = { [K in M]: unknown },
+>(e: unknown, m: M): e is T {
+  return typeof e === "object" && e !== null && m in e;
+}

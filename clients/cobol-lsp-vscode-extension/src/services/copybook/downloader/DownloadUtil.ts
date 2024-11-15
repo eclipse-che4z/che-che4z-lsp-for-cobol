@@ -22,6 +22,7 @@ import {
 import { ZoweExplorerDownloader } from "./ZoweExplorerDownloader";
 import { CopybookName } from "../CopybookDownloadService";
 import { SettingsService } from "../../Settings";
+import { hasMember } from "../../util/Utils";
 
 /**
  * Utility class for downloading copybooks
@@ -184,13 +185,9 @@ export class DownloadUtil {
 
   private static isInvalidCredentials(e: unknown) {
     return (
-      e &&
-      typeof e === "object" &&
-      "mDetails" in e &&
-      e.mDetails &&
-      typeof e.mDetails === "object" &&
-      "errorCode" in e.mDetails &&
-      e.mDetails?.errorCode === 401
+      hasMember(e, "mDetails") &&
+      hasMember(e.mDetails, "errorCode") &&
+      e.mDetails.errorCode === 401
     );
   }
 }

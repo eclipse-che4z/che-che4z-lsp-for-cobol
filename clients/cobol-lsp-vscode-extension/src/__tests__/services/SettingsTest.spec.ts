@@ -23,6 +23,8 @@ import {
 } from "../../services/DialectRegistry";
 
 import { asMutable } from "../../test/suite/testHelper";
+import { SETTINGS_CPY_LOCAL_PATH } from "../../constants";
+import * as extension from "../../extension";
 
 function makefsPath(p: string): string {
   return path.join(process.platform == "win32" ? "a:" : "", p);
@@ -314,6 +316,27 @@ describe("SettingService lspConfigHandler", () => {
     });
   });
 
+  describe("setting local copybook path section", () => {
+    beforeAll(() => {
+      jest.spyOn(vscode.workspace, "getConfiguration").mockReturnValue({
+        get: () => ["local-copybooks"],
+      } as unknown as vscode.WorkspaceConfiguration);
+    });
+
+    test("returns local copybook path setting", async () => {
+      const result = await lspConfigHandler({
+        items: [
+          {
+            section: SETTINGS_CPY_LOCAL_PATH,
+            scopeUri: "file:///workspace/program.cob",
+          },
+        ],
+      });
+
+      expect(result).toEqual(expect.arrayContaining([["local-copybooks"]]));
+    });
+  });
+
   describe("unknown section", () => {
     test("returns matching vscode configuration item", async () => {
       const configurationValue = { random: "configuration" };
@@ -332,6 +355,36 @@ describe("SettingService lspConfigHandler", () => {
 
       expect(result).toEqual(expect.arrayContaining([configurationValue]));
       expect(configKey).toEqual("unknown.config.section");
+    });
+  });
+
+  describe("Invalid configuration provided", () => {
+    let outputChannelMock: jest.SpyInstance;
+    beforeAll(() => {
+      jest.spyOn(vscode.workspace, "getConfiguration").mockReturnValue({
+        get: () => ["correct-path", 2, false],
+      } as unknown as vscode.WorkspaceConfiguration);
+
+      outputChannelMock = jest.fn();
+      jest.spyOn(extension, "getChannel").mockReturnValue({
+        appendLine: outputChannelMock,
+      } as unknown as vscode.OutputChannel);
+    });
+
+    test("returns empty setting instead of wrong configuration", async () => {
+      const result = await lspConfigHandler({
+        items: [
+          {
+            section: SETTINGS_CPY_LOCAL_PATH,
+            scopeUri: "file:///workspace/program.cob",
+          },
+        ],
+      });
+
+      expect(result).toEqual(expect.arrayContaining([]));
+      expect(outputChannelMock).toHaveBeenCalledWith(
+        "Invalid settings: cobol-lsp.cpy-manager.paths-local - Invalid value 2 supplied to : Array<string>/1: string\nInvalid value false supplied to : Array<string>/2: string",
+      );
     });
   });
 });

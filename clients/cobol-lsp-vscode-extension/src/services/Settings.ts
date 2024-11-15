@@ -77,7 +77,7 @@ async function handleProcessorGroupConfigurationRequest<Type, Output, R>(
     cfg: Type,
   ) => Promise<R>,
   item: Item,
-  result: unknown[],
+  result: R[],
 ) {
   if (item.scopeUri) {
     try {
@@ -98,7 +98,6 @@ async function handleProcessorGroupConfigurationRequest<Type, Output, R>(
       }
     } catch (err) {
       if (err instanceof DecodingError) {
-        console.log(`Invalid settings: ${item.section} - ${err.message}`);
         getChannel().appendLine(
           `Invalid settings: ${item.section} - ${err.message}`,
         );
