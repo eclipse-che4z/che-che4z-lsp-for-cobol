@@ -34,6 +34,9 @@ public class CICSOptionsCheckUtility {
         CICSAllocateOptionsCheckUtility.RULE_INDEX,
         new CICSAllocateOptionsCheckUtility(context, errors));
     optionsMap.put(
+      CICSBifOptionsCheckUtility.RULE_INDEX,
+        new CICSBifOptionsCheckUtility(context, errors));
+    optionsMap.put(
         CICSAsktimeOptionsCheckUtility.RULE_INDEX,
         new CICSAsktimeOptionsCheckUtility(context, errors));
     optionsMap.put(
