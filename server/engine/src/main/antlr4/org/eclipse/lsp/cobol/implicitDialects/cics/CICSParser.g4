@@ -343,7 +343,7 @@ cics_document_set: SET (DOCTOKEN cics_data_area | SYMBOL cics_name | VALUE cics_
                    LENGTH cics_data_value | UNESCAPED | cics_handle_response)+;
 
 /** DUMP TRANSACTION */
-cics_dump: DUMP TRANSACTION (cics_dump_transaction_from  | cics_dump_transaction_segmentlist | cics_dump_code_opts | DUMPCODE cics_name)+;
+cics_dump: DUMP TRANSACTION (DUMPCODE cics_name | cics_dump_transaction_from  | cics_dump_transaction_segmentlist | cics_dump_code_opts)+;
 cics_dump_transaction_from: (FROM cics_data_area | cics_length_flength | cics_handle_response)+;
 cics_dump_code_opts: (COMPLETE | TRT | TASK | STORAGE | PROGRAM | TERMINAL | TABLES | FCT | PCT | PPT | SIT | TCT | DUMPID cics_data_area | cics_handle_response)+;
 cics_dump_transaction_segmentlist: ((SEGMENTLIST | LENGTHLIST | NUMSEGMENTS) cics_data_area | cics_handle_response)+;

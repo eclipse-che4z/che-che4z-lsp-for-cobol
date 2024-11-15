@@ -71,12 +71,13 @@ public class CICSDumpTransactionOptionsCheckUtility extends CICSOptionsCheckBase
      * @param <E> A subclass of ParserRuleContext
      */
     public <E extends ParserRuleContext> void checkOptions(E ctx) {
-         if (ctx.getRuleIndex() == RULE_cics_dump)
-            checkDumpTransaction((CICSParser.Cics_dumpContext) ctx);
-         else if (ctx.getRuleIndex() == RULE_cics_dump_transaction_from)
-            checkDumpTransactionFrom((CICSParser.Cics_dump_transaction_fromContext) ctx);
-         else if (ctx.getRuleIndex() == RULE_cics_dump_transaction_segmentlist)
-            checkDumpTransactionSegmentList((CICSParser.Cics_dump_transaction_segmentlistContext) ctx);
+          if (ctx.getRuleIndex() == RULE_cics_dump_transaction_from) {
+              checkDumpTransactionFrom((CICSParser.Cics_dump_transaction_fromContext) ctx);
+              checkDumpTransaction((CICSParser.Cics_dumpContext) ctx.getParent());
+          } else if (ctx.getRuleIndex() == RULE_cics_dump_transaction_segmentlist) {
+              checkDumpTransactionSegmentList((CICSParser.Cics_dump_transaction_segmentlistContext) ctx);
+              checkDumpTransaction((CICSParser.Cics_dumpContext) ctx.getParent());
+         }
 
         checkDuplicates(ctx);
     }
