@@ -29,7 +29,7 @@ public class Db2ErrorStrategy extends DefaultErrorStrategy implements MessageSer
   private static final String REPORT_NO_VIABLE_ALTERNATIVE =
       "ErrorStrategy.reportNoViableAlternative";
   private static final String REPORT_MISSING_TOKEN = "ErrorStrategy.reportMissingToken";
-
+  private static final String REPORT_MISSING_END_EXEC = "db2Parser.missingEndExec";
   @Getter @Setter private MessageService messageService;
   @Getter @Setter private ErrorMessageHelper errorMessageHelper;
 
@@ -94,12 +94,14 @@ public class Db2ErrorStrategy extends DefaultErrorStrategy implements MessageSer
     if (inErrorRecoveryMode(recognizer)) {
       return;
     }
+
     beginErrorCondition(recognizer);
-    String msg =
-        messageService.getMessage(
-            REPORT_MISSING_TOKEN,
-            errorMessageHelper.getExpectedText(recognizer),
-            ErrorMessageHelper.getRule(recognizer));
+    String msg = recognizer.getExpectedTokens().contains(Db2SqlLexer.END_EXEC)
+              ? messageService.getMessage(REPORT_MISSING_END_EXEC)
+              : messageService.getMessage(
+                      REPORT_MISSING_TOKEN,
+                      errorMessageHelper.getExpectedText(recognizer),
+                      ErrorMessageHelper.getRule(recognizer));
     recognizer.notifyErrorListeners(recognizer.getCurrentToken(), msg, null);
   }
 

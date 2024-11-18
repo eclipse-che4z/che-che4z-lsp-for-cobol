@@ -52,7 +52,7 @@ class TestExecSqlDoesNotFreezeAnalysis {
             "2",
             new Diagnostic(
                 new Range(),
-                "Missing token END-EXEC at execRule",
+                "Missing token END-EXEC for the EXEC block",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())),
         ImmutableList.of(),
