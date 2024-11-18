@@ -124,7 +124,7 @@ jobs:
           path: server/engine/target/server.jar
       - uses: actions/setup-node@v3
         with:
-          node-version: 18
+          node-version: 20
       - name: Build VS Code extension dialect API
         working-directory: clients/cobol-dialect-api
         run: |
@@ -361,7 +361,7 @@ jobs:
           cp ./server/native/server-linux ../../tests/native-executable-tests/server/linux/
       - uses: actions/setup-node@v3
         with:
-          node-version: 18
+          node-version: 20
       - name: Download VS Code extension dialect API
         uses: actions/download-artifact@v4
         with:
