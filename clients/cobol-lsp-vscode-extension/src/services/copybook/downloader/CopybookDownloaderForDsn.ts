@@ -87,7 +87,7 @@ export class CopybookDownloaderForDsn extends ZoweExplorerDownloader {
     const response = await this.explorerAPI
       .getMvsApi(profile)
       .allMembers(dataset);
-    const members = response.apiResponse.items.map((item: any) => item.member);
+    const members = response.apiResponse.items.map((item) => item.member);
 
     this.memberListCache.set(id, members);
     return members;

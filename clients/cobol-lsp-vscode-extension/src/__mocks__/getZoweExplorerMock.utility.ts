@@ -24,10 +24,20 @@ export const allMemberMock = jest.fn().mockReturnValue({
     ],
   },
 });
-const error = new Error("Error");
-(error as any).mDetails = {
-  errorCode: 401,
-};
+class MemberError extends Error {
+  mDetails: {
+    errorCode: number;
+  };
+
+  constructor(message: string) {
+    super(message);
+    this.mDetails = {
+      errorCode: 401,
+    };
+  }
+}
+const error = new MemberError("Error");
+
 export const allMemberErrorMock = jest.fn().mockRejectedValue(error);
 export const mvsApiMock = jest.fn().mockReturnValue({
   allMembers: allMemberMock,

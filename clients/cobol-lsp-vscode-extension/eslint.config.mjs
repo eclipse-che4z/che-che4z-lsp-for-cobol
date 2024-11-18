@@ -8,10 +8,16 @@ export default [
     languageOptions: {
       ecmaVersion: 8,
       globals: { ...globals.node, ...globals.jest },
+      parserOptions: {
+        projectService: true,
+        tsconfigRootDir: import.meta.dirname,
+        allowDefaultProject: ["*.mjs"],
+      },
     },
   },
   pluginJs.configs.recommended,
   ...tseslint.configs.recommended,
+  ...tseslint.configs.recommendedTypeChecked,
   {
     rules: {
       "prefer-const": [
@@ -20,7 +26,6 @@ export default [
           destructuring: "all",
         },
       ],
-      "@typescript-eslint/no-explicit-any": "warn",
       "@typescript-eslint/no-unused-vars": [
         "error",
         {
@@ -32,6 +37,12 @@ export default [
         "error",
         { allowAsImport: true },
       ],
+    },
+  },
+  {
+    files: ["**/*.spec.ts"],
+    rules: {
+      "@typescript-eslint/unbound-method": "off",
     },
   },
 ];

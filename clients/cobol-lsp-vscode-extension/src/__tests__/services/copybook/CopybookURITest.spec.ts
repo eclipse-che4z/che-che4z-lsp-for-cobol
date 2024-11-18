@@ -15,6 +15,7 @@ import * as path from "path";
 import * as vscode from "vscode";
 import { CopybookURI } from "../../../services/copybook/CopybookURI";
 import { Utils } from "../../../services/util/Utils";
+import { asMutable } from "../../../test/suite/testHelper";
 
 Utils.getZoweExplorerAPI = jest.fn();
 
@@ -22,7 +23,12 @@ describe("CopybooksPathGenerator tests", () => {
   const fsPath = "/projects";
   const profile = "profile";
   const dataset = "dataset";
-  (vscode.workspace.workspaceFolders as any) = [{ uri: { fsPath } } as any];
+
+  beforeEach(() => {
+    asMutable(vscode.workspace).workspaceFolders = [
+      { uri: { fsPath } } as unknown as vscode.WorkspaceFolder,
+    ];
+  });
 
   it("creates copybook path", () => {
     expect(

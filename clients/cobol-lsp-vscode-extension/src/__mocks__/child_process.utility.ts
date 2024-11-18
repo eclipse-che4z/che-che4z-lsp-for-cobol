@@ -14,7 +14,12 @@
 import * as cp from "child_process";
 import { PassThrough } from "stream";
 
-export function mockSpawnProcess(stdout: string, stderr: string, exitCode = 0) {
+export function mockSpawnProcess(
+  stdout: string,
+  stderr: string,
+  exitCode = 0,
+  error?: string,
+) {
   const stdoutStream = new PassThrough();
   const stderrStream = new PassThrough();
 
@@ -22,6 +27,11 @@ export function mockSpawnProcess(stdout: string, stderr: string, exitCode = 0) {
     stdout: stdoutStream,
     stderr: stderrStream,
     on: (event, callback) => {
+      if (event === "error" && error) {
+        stdoutStream.emit("data", stdout);
+        stderrStream.emit("data", stderr);
+        callback(error, null);
+      }
       if (event === "close") {
         stdoutStream.emit("data", stdout);
         stderrStream.emit("data", stderr);

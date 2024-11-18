@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Broadcom.
+ * Copyright (c) 2024 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -12,6 +12,14 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
-export const sync = (x: unknown) => [x];
-export const hasMagic = (x: string) => x.includes("*");
-export const globSync = (x: unknown) => [x];
+export function getErrorMessage(error: unknown) {
+  if (
+    !!error &&
+    typeof error === "object" &&
+    "message" in error &&
+    typeof error.message === "string"
+  ) {
+    return error.message;
+  }
+  return JSON.stringify(error);
+}

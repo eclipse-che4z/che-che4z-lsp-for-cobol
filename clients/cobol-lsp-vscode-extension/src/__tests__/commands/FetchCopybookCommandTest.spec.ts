@@ -30,11 +30,11 @@ test("Test fetchCopybookCommand calls telementry services and copybook download 
   const copybookDownloadService: CopybookDownloadService =
     new CopybookDownloadService(
       "./storage-path",
-      {} as any as IApiRegisterClient,
+      {} as unknown as IApiRegisterClient,
     );
   copybookDownloadService.downloadCopybooks = jest.fn();
   expect(fetchCopybookCommand).toBeTruthy();
-  fetchCopybookCommand(copybook, copybookDownloadService, progName);
+  await fetchCopybookCommand(copybook, copybookDownloadService, progName);
   expect(TelemetryService.registerEvent).toHaveBeenCalledWith(
     "Fetch copybook",
     ["COBOL", "copybook", "quickfix"],

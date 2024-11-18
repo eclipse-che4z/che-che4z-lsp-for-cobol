@@ -15,90 +15,9 @@
 import { RunAnalysis } from "../../commands/RunAnalysisCLI";
 import * as vscode from "vscode";
 
-jest.mock("vscode", () => ({
-  commands: {
-    registerCommand: jest
-      .fn()
-      .mockImplementation((command, callback) => callback()),
-    executeCommand: jest.fn(),
-  },
-  extensions: {
-    getExtension: jest.fn().mockReturnValue({ extensionPath: "/test" }),
-  },
-  FileType: {
-    Directory: 2,
-  },
-  languages: {
-    registerCodeActionsProvider: jest.fn(),
-    registerCompletionItemProvider: jest.fn(),
-  },
-  window: {
-    activeTextEditor: {
-      document: {
-        uri: {
-          path: "/storagePath",
-          fsPath: "/storagePath",
-          scheme: "file",
-        },
-        getText: jest.fn(),
-      },
-    },
-    setStatusBarMessage: jest
-      .fn()
-      .mockImplementation(
-        async (_text: string, _hideWhenDone: Thenable<any>) => {
-          return Promise.resolve(true);
-        },
-      ),
-    showErrorMessage: jest.fn().mockReturnValue("test"),
-    showInformationMessage: jest
-      .fn()
-      .mockImplementation((message: string) => Promise.resolve(message)),
-    showQuickPick: jest.fn(),
-    onDidChangeActiveTextEditor: jest.fn(),
-    createQuickPick: jest
-      .fn()
-      .mockReturnValue({ onDidChangeSelection: jest.fn(), show: jest.fn() }),
-    createOutputChannel: jest.fn().mockReturnValue({
-      appendLine: jest.fn(),
-    }),
-    terminals: {
-      find: jest.fn(),
-    },
-    createTerminal: jest.fn().mockReturnValue({
-      sendText: jest.fn(),
-      show: jest.fn(),
-    }),
-  },
-  workspace: {
-    getConfiguration: jest.fn().mockReturnValue({
-      get: jest.fn().mockReturnValue(9),
-    }),
-    getWorkspaceFolder: jest.fn().mockReturnValue({ name: "workspaceFolder1" }),
-    onDidChangeConfiguration: jest
-      .fn()
-      .mockReturnValue("onDidChangeConfiguration"),
-    workspaceFolders: [{ uri: { fsPath: "ws-path" } } as any],
-    fs: {
-      createDirectory: jest.fn(),
-      readDirectory: jest.fn().mockReturnValue([]),
-      stat: jest.fn().mockReturnValue(2),
-      writeFile: jest.fn(),
-    },
-  },
-  Uri: {
-    joinPath: jest.fn().mockImplementation((inputUri: vscode.Uri, path) => {
-      return {
-        path: inputUri.path + path,
-        fsPath: inputUri.fsPath + path,
-      };
-    }),
-  },
-}));
-
-const context: any = {
-  extensionUri: { fsPath: "/test" },
-  globalStorageUri: { fsPath: "/storagePath" },
+const context = {
+  extensionUri: vscode.Uri.file("/test"),
+  globalStorageUri: vscode.Uri.file("/storagePath"),
   subscriptions: [],
 };
 
@@ -114,32 +33,35 @@ describe("Test Analysis CLI command functionality", () => {
       .mockReturnValue("Show");
 
     const runCobolAnalysisCommandSpy = jest.spyOn(
-      testAnalysis as any,
+      testAnalysis,
       "runCobolAnalysisCommand",
     );
     const getCurrentFileLocationSpy = jest.spyOn(
-      testAnalysis as any,
-      "getCurrentFileLocation",
+      testAnalysis,
+      "getCurrentFileLocation" as keyof RunAnalysis,
     );
     const buildJavaCommandSpy = jest.spyOn(
-      testAnalysis as any,
-      "buildJavaCommand",
+      testAnalysis,
+      "buildJavaCommand" as keyof RunAnalysis,
     );
     const buildNativeCommandSpy = jest.spyOn(
-      testAnalysis as any,
-      "buildNativeCommand",
+      testAnalysis,
+      "buildNativeCommand" as keyof RunAnalysis,
     );
     const buildAnalysisCommandPortionSpy = jest.spyOn(
-      testAnalysis as any,
-      "buildAnalysisCommandPortion",
+      testAnalysis,
+      "buildAnalysisCommandPortion" as keyof RunAnalysis,
     );
-    const sendToTerminalSpy = jest.spyOn(testAnalysis as any, "sendToTerminal");
+    const sendToTerminalSpy = jest.spyOn(
+      testAnalysis,
+      "sendToTerminal" as keyof RunAnalysis,
+    );
 
     await testAnalysis.runCobolAnalysisCommand();
 
     expect(runCobolAnalysisCommandSpy).toHaveBeenCalled();
     expect(getCurrentFileLocationSpy).toHaveBeenCalled();
-    expect(buildJavaCommandSpy).toHaveBeenCalledWith("/storagePath", true);
+    expect(buildJavaCommandSpy).toHaveBeenCalledWith("/storagePath");
     expect(buildJavaCommandSpy).toHaveReturnedWith(
       'java -jar "/test/server/jar/server.jar" analysis -s "/storagePath" -cf=.',
     );
@@ -162,26 +84,29 @@ describe("Test Analysis CLI command functionality", () => {
       .mockReturnValue("Show");
 
     const runCobolAnalysisCommandSpy = jest.spyOn(
-      testAnalysis as any,
+      testAnalysis,
       "runCobolAnalysisCommand",
     );
     const getCurrentFileLocationSpy = jest.spyOn(
-      testAnalysis as any,
-      "getCurrentFileLocation",
+      testAnalysis,
+      "getCurrentFileLocation" as keyof RunAnalysis,
     );
     const buildJavaCommandSpy = jest.spyOn(
-      testAnalysis as any,
-      "buildJavaCommand",
+      testAnalysis,
+      "buildJavaCommand" as keyof RunAnalysis,
     );
     const buildNativeCommandSpy = jest.spyOn(
-      testAnalysis as any,
-      "buildNativeCommand",
+      testAnalysis,
+      "buildNativeCommand" as keyof RunAnalysis,
     );
     const buildAnalysisCommandPortionSpy = jest.spyOn(
-      testAnalysis as any,
-      "buildAnalysisCommandPortion",
+      testAnalysis,
+      "buildAnalysisCommandPortion" as keyof RunAnalysis,
     );
-    const sendToTerminalSpy = jest.spyOn(testAnalysis as any, "sendToTerminal");
+    const sendToTerminalSpy = jest.spyOn(
+      testAnalysis,
+      "sendToTerminal" as keyof RunAnalysis,
+    );
 
     await testAnalysis.runCobolAnalysisCommand();
 
@@ -190,7 +115,6 @@ describe("Test Analysis CLI command functionality", () => {
     expect(buildNativeCommandSpy).toHaveBeenCalledWith(
       "/storagePath",
       process.platform,
-      true,
     );
     expect(buildAnalysisCommandPortionSpy).toHaveReturnedWith(
       'analysis -s "/storagePath" -cf=.',
@@ -208,20 +132,17 @@ describe("Test Analysis CLI command functionality", () => {
     vscode.window.showQuickPick = jest.fn().mockReturnValue(undefined);
 
     const runCobolAnalysisCommandSpy = jest.spyOn(
-      testAnalysis as any,
+      testAnalysis,
       "runCobolAnalysisCommand",
     );
-    const getVersionToRunSpy = jest.spyOn(
-      testAnalysis as any,
-      "getVersionToRun",
-    );
+    const getVersionToRunSpy = jest.spyOn(testAnalysis, "getVersionToRun");
     const buildJavaCommandSpy = jest.spyOn(
-      testAnalysis as any,
-      "buildJavaCommand",
+      testAnalysis,
+      "buildJavaCommand" as keyof RunAnalysis,
     );
     const buildNativeCommandSpy = jest.spyOn(
-      testAnalysis as any,
-      "buildNativeCommand",
+      testAnalysis,
+      "buildNativeCommand" as keyof RunAnalysis,
     );
 
     await testAnalysis.runCobolAnalysisCommand();
@@ -249,7 +170,10 @@ describe("Test Analysis CLI command functionality", () => {
       );
     }
 
-    const saveTempFileSpy = jest.spyOn(testAnalysis as any, "saveTempFile");
+    const saveTempFileSpy = jest.spyOn(
+      testAnalysis,
+      "saveTempFile" as keyof RunAnalysis,
+    );
 
     await testAnalysis.runCobolAnalysisCommand();
 
@@ -262,7 +186,7 @@ describe("Test Analysis CLI command functionality", () => {
       context.extensionUri,
     );
 
-    const result = (testAnalysis as any).buildJavaCommand("");
+    const result = testAnalysis["buildJavaCommand"]("");
 
     expect(result).toBe("");
   });
@@ -273,16 +197,16 @@ describe("Test Analysis CLI command functionality", () => {
       context.extensionUri,
     );
 
-    let result = (testAnalysis as any).getServerPath("initialPath", "win32");
+    let result = testAnalysis["getServerPath"]("initialPath", "win32");
     expect(result).toBe("initialPath");
 
-    result = (testAnalysis as any).getServerPath("initialPath", "linux");
+    result = testAnalysis["getServerPath"]("initialPath", "linux");
     expect(result).toBe("initialPath/server-linux");
 
-    result = (testAnalysis as any).getServerPath("initialPath", "darwin");
+    result = testAnalysis["getServerPath"]("initialPath", "darwin");
     expect(result).toBe("initialPath/server-mac");
 
-    result = (testAnalysis as any).getServerPath("initialPath", "other");
+    result = testAnalysis["getServerPath"]("initialPath", "other");
     expect(result).toBe("");
   });
 });

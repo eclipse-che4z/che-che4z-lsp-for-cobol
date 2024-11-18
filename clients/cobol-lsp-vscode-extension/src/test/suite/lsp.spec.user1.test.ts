@@ -52,30 +52,47 @@ suite("Tests with USER1.cbl", function () {
     if (vscode.window.activeTextEditor === undefined) {
       assert.fail("activeTextEditor in undefined");
     }
-    const diagnostics = vscode.languages.getDiagnostics(
-      vscode.window.activeTextEditor.document.uri,
-    );
+    let diagnostics: vscode.Diagnostic[] = [];
+
+    await helper.waitFor(() => {
+      diagnostics = vscode.languages.getDiagnostics(
+        vscode.window.activeTextEditor!.document.uri,
+      );
+      return diagnostics.length === 0;
+    });
+
     const expectedMsg =
       "Checks that when opening Cobol file with correct syntax there is an appropriate message is shown";
     assert.strictEqual(diagnostics.length, 0, expectedMsg);
   });
 
+  async function executeProvider(
+    provider:
+      | "vscode.executeDefinitionProvider"
+      | "vscode.executeReferenceProvider",
+    line: number,
+    char: number,
+  ) {
+    let locations: vscode.Location[] = [];
+    await helper.waitFor(async () => {
+      locations = await vscode.commands.executeCommand(
+        provider,
+        editor.document.uri,
+        pos(line, char),
+      );
+
+      return locations.length > 0;
+    });
+    return locations;
+  }
+
   test("TC152049: Navigate through definitions", async () => {
-    await helper.waitFor(
-      async () =>
-        (
-          (await vscode.commands.executeCommand(
-            "vscode.executeDefinitionProvider",
-            editor.document.uri,
-            pos(28, 24),
-          )) as any[]
-        ).length > 0,
-    );
-    const result: any[] = await vscode.commands.executeCommand(
+    const result = await executeProvider(
       "vscode.executeDefinitionProvider",
-      editor.document.uri,
-      pos(28, 24),
+      28,
+      24,
     );
+
     assert.strictEqual(result.length, 1);
     assert.ok(
       result[0].uri.fsPath.includes(editor.document.fileName) &&
@@ -86,49 +103,42 @@ suite("Tests with USER1.cbl", function () {
   });
 
   test("TC152080: Find all references from the word middle", async () => {
-    await helper.waitFor(
-      async () =>
-        (
-          (await vscode.commands.executeCommand(
-            "vscode.executeDefinitionProvider",
-            editor.document.uri,
-            pos(20, 15),
-          )) as any[]
-        ).length > 0,
+    const result = await executeProvider(
+      "vscode.executeReferenceProvider",
+      20,
+      15,
     );
 
-    const result: any[] = await vscode.commands.executeCommand(
-      "vscode.executeReferenceProvider",
-      editor.document.uri,
-      pos(20, 15),
-    );
+    assert.strictEqual(result.length, 3, "Check references count");
     assert.ok(
-      result.length === 3 &&
-        result[0].uri.fsPath.includes(editor.document.fileName) &&
-        result[0].range.start.line === 20 &&
-        result[1].range.start.line === 34 &&
-        result[2].range.start.line === 42,
-      "Checks that LSP can find all references and navigate by them",
+      result[0].uri.fsPath.includes(editor.document.fileName),
+      "Check references path",
+    );
+    assert.strictEqual(result[0].range.start.line, 20, "Check reference line");
+    assert.strictEqual(
+      result[0].range.start.line,
+      20,
+      "Check 1 reference line",
+    );
+    assert.strictEqual(
+      result[1].range.start.line,
+      34,
+      "Check 2 reference line",
+    );
+    assert.strictEqual(
+      result[2].range.start.line,
+      42,
+      "Check 3 reference line",
     );
   });
 
   test("TC152080: Find all references from the word begin", async () => {
-    await helper.waitFor(
-      async () =>
-        (
-          (await vscode.commands.executeCommand(
-            "vscode.executeDefinitionProvider",
-            editor.document.uri,
-            pos(20, 10),
-          )) as any[]
-        ).length > 0,
+    const result = await executeProvider(
+      "vscode.executeReferenceProvider",
+      20,
+      10,
     );
 
-    const result: any[] = await vscode.commands.executeCommand(
-      "vscode.executeReferenceProvider",
-      editor.document.uri,
-      pos(20, 10),
-    );
     assert.ok(
       result.length === 3 &&
         result[0].uri.fsPath.includes(editor.document.fileName) &&
@@ -155,7 +165,7 @@ suite("Tests with USER1.cbl", function () {
     await vscode.workspace
       .getConfiguration()
       .update("cobol-lsp.formatting", "None");
-    const result: any[] = await vscode.commands.executeCommand(
+    const result = await vscode.commands.executeCommand<vscode.TextEdit[]>(
       "vscode.executeFormatDocumentProvider",
       editor.document.uri,
       { tabSize: 4, insertSpaces: true },

@@ -3,14 +3,22 @@
     "name": "[Ljava.lang.Object;"
   },
   {
-    "name":"[Ljava.lang.String;"
+    "name": "[Ljava.lang.String;"
   },
   {
-    "name":"ch.qos.logback.core.ConsoleAppender",
-    "queryAllPublicMethods":true,
-    "methods":[
-      {"name":"<init>","parameterTypes":[] },
-      {"name":"setTarget","parameterTypes":["java.lang.String"] }
+    "name": "ch.qos.logback.core.ConsoleAppender",
+    "queryAllPublicMethods": true,
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      },
+      {
+        "name": "setTarget",
+        "parameterTypes": [
+          "java.lang.String"
+        ]
+      }
     ]
   },
   {
@@ -3756,6 +3764,12 @@
       {
         "name": "shutdown",
         "parameterTypes": []
+      },
+      {
+        "name": "setTrace",
+        "parameterTypes": [
+          "org.eclipse.lsp4j.SetTraceParams"
+        ]
       }
     ]
   },
@@ -3931,13 +3945,17 @@
     ]
   },
   {
-    "name":"org.eclipse.lsp4j.SetTraceParams",
-    "allDeclaredFields":true,
-    "methods":[{"name":"<init>","parameterTypes":[] }]
+    "name": "org.eclipse.lsp4j.SetTraceParams",
+    "allDeclaredFields": true,
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
   },
-  {"name":"setTrace","parameterTypes":["org.eclipse.lsp4j.SetTraceParams"] },
   {
-    "name":"org.eclipse.lsp.cobol.common.copybook.CopyBookDTO",
-    "allDeclaredFields":true
+    "name": "org.eclipse.lsp.cobol.common.copybook.CopyBookDTO",
+    "allDeclaredFields": true
   }
 ]
