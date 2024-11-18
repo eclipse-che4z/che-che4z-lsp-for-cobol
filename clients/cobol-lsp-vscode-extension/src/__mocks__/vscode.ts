@@ -133,11 +133,17 @@ export enum EndOfLine {
 }
 
 export class Range {
-  constructor(public start: Position, public end: Position) {}
+  constructor(
+    public start: Position,
+    public end: Position,
+  ) {}
 }
 
 export class Position {
-  constructor(public line: number, public character: number) {}
+  constructor(
+    public line: number,
+    public character: number,
+  ) {}
 }
 
 // eslint-disable-next-line @typescript-eslint/no-namespace
@@ -158,7 +164,10 @@ export const TextEditor = {
 export class Selection {
   public start?: PositionType;
   public end?: PositionType;
-  constructor(public anchor: PositionType, public active: PositionType) {}
+  constructor(
+    public anchor: PositionType,
+    public active: PositionType,
+  ) {}
 }
 
 export const CodeActionKind = {

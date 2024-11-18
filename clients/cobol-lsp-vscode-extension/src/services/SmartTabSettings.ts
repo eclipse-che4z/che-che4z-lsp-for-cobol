@@ -12,7 +12,10 @@ export class TabRule {
 }
 
 export class TabSettings {
-  public constructor(public rules: TabRule[], public defaultRule: TabRule) {}
+  public constructor(
+    public rules: TabRule[],
+    public defaultRule: TabRule,
+  ) {}
 }
 
 const TabSettingsBoolean = t.boolean;
