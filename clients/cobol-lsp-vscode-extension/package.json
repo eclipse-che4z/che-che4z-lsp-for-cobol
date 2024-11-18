@@ -636,7 +636,7 @@
     "jest-sonar-reporter": "^2.0.0",
     "mocha": "^10.0.0",
     "nyc": "^15.1.0",
-    "patch-package": "^6.4.7",
+    "patch-package": "^8.0.0",
     "prettier": "2.8.7",
     "ts-jest": "^29.0.1",
     "typescript": "^4.9.4",
