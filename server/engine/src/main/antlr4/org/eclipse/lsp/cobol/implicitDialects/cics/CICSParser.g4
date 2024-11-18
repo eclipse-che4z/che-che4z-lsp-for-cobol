@@ -628,12 +628,10 @@ cics_resetbr: RESETBR cics_file_name (RIDFLD cics_data_area | KEYLENGTH cics_dat
 cics_resume: RESUME (ACQACTIVITY | ACQPROCESS | ACTIVITY cics_data_value | cics_handle_response)+;
 
 /** RETRIEVE - / REATTACH EVENT / SUBEVENT */
-cics_retrieve: RETRIEVE (cics_retrieve_null | cics_retrieve_event);
-cics_retrieve_null: cics_into (LENGTH cics_data_area | RTRANSID cics_data_area | RTERMID cics_data_area |
-                    QUEUE cics_data_area | WAIT | cics_handle_response)*;
-cics_retrieve_event: (REATTACH | SUBEVENT cics_data_area | EVENT cics_data_area | EVENTTYPE cics_cvda | cics_handle_response)+;
-
-
+cics_retrieve: RETRIEVE (cics_retrieve_standard | cics_retrieve_reattach | cics_retrieve_subevent);
+cics_retrieve_standard: ((INTO | LENGTH | RTRANSID  | RTERMID  | QUEUE) cics_data_area | SET cics_ref | WAIT | cics_handle_response)*;
+cics_retrieve_reattach: (REATTACH | EVENT cics_data_area | EVENTTYPE cics_cvda |  cics_handle_response)*;
+cics_retrieve_subevent: (SUBEVENT cics_data_area | EVENT cics_data_value |  EVENTTYPE cics_cvda | cics_handle_response)*;
 
 /** RETURN */
 cics_return: RETURN cics_return_transid? cics_return_inputmsg? ENDACTIVITY?;
