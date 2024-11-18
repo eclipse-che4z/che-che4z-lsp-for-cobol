@@ -72,7 +72,12 @@ public class CICSReadOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     }
 
     private void checkRule(CICSParser.Cics_read_bodyContext ctx) {
-        checkHasMandatoryOptions(ctx.FILE(), ctx, "FILE");
+        if (ctx.DATASET().isEmpty()) {
+            checkHasMandatoryOptions(ctx.FILE(), ctx, "FILE");
+        }
+
+        checkMutuallyExclusiveOptions("FILE instead of DATASET", ctx.FILE(), ctx.DATASET());
+        
         checkHasMandatoryOptions(ctx.RIDFLD(), ctx, "RIDFLD");
 
         checkMutuallyExclusiveOptions("UNCOMMITTED, CONSISTENT, REPEATABLE or UPDATE", ctx.UNCOMMITTED(), ctx.CONSISTENT(), ctx.REPEATABLE(), ctx.UPDATE());
@@ -87,7 +92,7 @@ public class CICSReadOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
 
         checkMutuallyExclusiveOptions("EQUAL or GTEQ", ctx.EQUAL(), ctx.GTEQ());
 
-    checkDuplicates(ctx);
+        checkDuplicates(ctx);
     }
 
 }
