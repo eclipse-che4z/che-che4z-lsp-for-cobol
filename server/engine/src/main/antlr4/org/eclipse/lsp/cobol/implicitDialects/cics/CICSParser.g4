@@ -757,10 +757,15 @@ cics_unlock: UNLOCK cics_file_name (TOKEN cics_data_area | SYSID cics_data_area 
 cics_update: UPDATE (cics_update_counter | cics_update_dcounter);
 cics_update_counter: COUNTER cics_name (POOL cics_name | VALUE cics_data_value | COMPAREMIN cics_data_value | COMPAREMAX cics_data_value | cics_handle_response)+;
 cics_update_dcounter: DCOUNTER cics_name (POOL cics_name | VALUE cics_data_area | COMPAREMIN cics_data_area | COMPAREMAX cics_data_area | cics_handle_response)+;
-/** VERIFY PASSWORD / PHRASE */
-cics_verify: VERIFY (PASSWORD cics_data_value | PHRASE cics_data_area PHRASELEN cics_data_value | USERID cics_data_value |
-             CHANGETIME cics_data_area | DAYSLEFT cics_data_area | ESMREASON cics_data_area | ESMRESP cics_data_area |
-             EXPIRYTIME cics_data_area | INVALIDCOUNT cics_data_area | LASTUSETIME cics_data_area | cics_handle_response)+;
+
+/** VERIFY PASSWORD / VERIFY PHRASE / VERIFY TOKEN */
+cics_verify: VERIFY (cics_verify_password | cics_verify_phrase | cics_verify_token);
+cics_verify_password: ((PASSWORD | USERID | GROUPID) cics_data_value | (CHANGETIME | DAYSLEFT | ESMREASON | ESMRESP | EXPIRYTIME |
+                INVALIDCOUNT | LASTUSETIME) cics_data_area | cics_handle_response)*;
+cics_verify_phrase: ((PHRASE | CHANGETIME | DAYSLEFT | ESMREASON | ESMRESP | EXPIRYTIME | INVALIDCOUNT | LASTUSETIME ) cics_data_area |
+                (PHRASELEN | USERID | GROUPID) cics_data_value  | cics_handle_response)*;
+cics_verify_token: ((TOKEN | ISUSERID | ENCRYPTKEY | OUTTOKENLEN | ESMRESP | ESMREASON) cics_data_area | TOKENLEN cics_data_value |
+                (TOKENTYPE | DATATYPE) cics_cvda | BASICAUTH | JWT | KERBEROS | BIT | BASE64 | OUTTOKEN cics_ref | cics_handle_response)*;
 
 /** WAIT CONVID / EVENT / EXTERNAL / JOURNALNAME / JOURNALNUM / SIGNAL / TERMINAL */
 cics_wait: WAIT (cics_wait_convid | cics_wait_event | cics_wait_external | cics_wait_journalname | cics_wait_signal | cics_wait_terminal);
