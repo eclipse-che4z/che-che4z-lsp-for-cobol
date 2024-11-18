@@ -20,6 +20,7 @@ package org.eclipse.lsp.cobol.implicitDialects.cics.utility;
         import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
         import org.eclipse.lsp.cobol.common.error.SyntaxError;
         import org.eclipse.lsp.cobol.implicitDialects.cics.CICSLexer;
+        import org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser;
 
         import java.util.HashMap;
         import java.util.List;
@@ -60,7 +61,26 @@ public class CICSDelayOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
      * @param <E> A subclass of ParserRuleContext
      */
     public <E extends ParserRuleContext> void checkOptions(E ctx) {
-        checkMutuallyExclusiveOptions("INTERVAL, TIME, FOR or UNTIL", ctx.INTERVAL(), ctx.TIME(), ctx.FOR(), ctx.UNTIL());
-        checkDuplicates(ctx);
+        if (ctx.getRuleIndex() == RULE_cics_delay_opts) {
+            checkOpts((CICSParser.Cics_delay_optsContext) ctx);
+
+            checkDuplicates(ctx);
+        }
     }
-}
+
+    private void checkOpts(CICSParser.Cics_delay_optsContext ctx) {
+
+        if (!ctx.UNTIL().isEmpty())
+            checkHasIllegalOptions(ctx.MILLISECS(), "MILLISECS");
+
+        checkHasMutuallyExclusiveOptions("INTERVAL, TIME, UNTIL, FOR", ctx.INTERVAL(),
+                    ctx.TIME(), ctx.UNTIL(), ctx.FOR());
+
+        if (!ctx.INTERVAL().isEmpty() || !ctx.TIME().isEmpty()) {
+            checkHasIllegalOptions(ctx.HOURS(), "HOURS");
+            checkHasIllegalOptions(ctx.MINUTES(), "MINUTES");
+            checkHasIllegalOptions(ctx.SECONDS(), "SECONDS");
+            checkHasIllegalOptions(ctx.MILLISECS(), "MILLISECS");
+        }
+    }
+    }
