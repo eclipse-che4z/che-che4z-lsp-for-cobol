@@ -60,6 +60,7 @@ public class CICSDelayOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
      * @param <E> A subclass of ParserRuleContext
      */
     public <E extends ParserRuleContext> void checkOptions(E ctx) {
+        checkMutuallyExclusiveOptions("INTERVAL, TIME, FOR or UNTIL", ctx.INTERVAL(), ctx.TIME(), ctx.FOR(), ctx.UNTIL());
         checkDuplicates(ctx);
     }
 }
