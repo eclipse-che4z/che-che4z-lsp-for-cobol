@@ -77,7 +77,7 @@ public class CICSReadOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
         }
 
         checkMutuallyExclusiveOptions("FILE instead of DATASET", ctx.FILE(), ctx.DATASET());
-        
+
         checkHasMandatoryOptions(ctx.RIDFLD(), ctx, "RIDFLD");
 
         checkMutuallyExclusiveOptions("UNCOMMITTED, CONSISTENT, REPEATABLE or UPDATE", ctx.UNCOMMITTED(), ctx.CONSISTENT(), ctx.REPEATABLE(), ctx.UPDATE());
