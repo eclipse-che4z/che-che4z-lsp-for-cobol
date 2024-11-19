@@ -554,12 +554,14 @@ cics_put_bts: (ACTIVITY cics_data_value | ACQACTIVITY | PROCESS | ACQPROCESS | F
 cics_put_channel: (CHANNEL cics_data_value | FROM cics_data_area | FLENGTH cics_data_value | BIT | DATATYPE cics_cvda |
                   CHAR | FROMCCSID cics_data_value | FROMCODEPAGE cics_data_value | cics_handle_response)+;
 
-/** QUERY COUNTER / DCOUNTER / SECURITY */
-cics_query: QUERY (cics_query_counter | cics_query_security);
-cics_query_counter: (COUNTER cics_name | DCOUNTER cics_name) (POOL cics_name | VALUE cics_data_area | MINIMUM cics_data_area |
-                    MAXIMUM cics_data_area | cics_handle_response)*;
-cics_query_security: SECURITY (RESTYPE cics_data_value | RESCLASS cics_data_value | RESIDLENGTH cics_data_value | RESID cics_data_value |
-                     LOGMESSAGE cics_cvda | READ cics_cvda | UPDATE cics_cvda | CONTROL cics_cvda | ALTER cics_cvda | cics_handle_response)+;
+/** QUERY CHANNEL / COUNTER / DCOUNTER / SECURITY */
+cics_query: QUERY (cics_query_channel | cics_query_counter | cics_query_security);
+cics_query_channel: (CHANNEL cics_data_value | CONTAINERCNT cics_data_area | cics_handle_response)+;
+cics_query_counter: (cics_counter_dcounter | POOL cics_name | VALUE cics_data_area | MINIMUM cics_data_area |
+                    MAXIMUM cics_data_area | NOSUSPEND | cics_handle_response)+;
+cics_query_security: (SECURITY | RESTYPE cics_data_value | RESCLASS cics_data_value | RESIDLENGTH cics_data_value |
+                    RESID cics_data_value | LOGMESSAGE cics_cvda | USERID cics_data_value | READ cics_cvda | UPDATE cics_cvda |
+                    CONTROL cics_cvda | ALTER cics_cvda | cics_handle_response)+;
 /** READ */
 cics_read: READ (cics_file_name | UNCOMMITTED | CONSISTENT | REPEATABLE | UPDATE | TOKEN cics_data_area |
            INTO cics_data_area | SET cics_ref | RIDFLD cics_data_area | KEYLENGTH cics_data_value | GENERIC |
