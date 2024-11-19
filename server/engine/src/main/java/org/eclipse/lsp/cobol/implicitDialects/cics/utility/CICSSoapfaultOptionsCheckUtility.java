@@ -99,8 +99,6 @@ public class CICSSoapfaultOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
     private void checkAdd(CICSParser.Cics_soapfault_addContext ctx) {
         checkPrerequisiteIsMet(ctx.FAULTSTRING(), ctx.FAULTSTRLEN(), ctx, "FAULTSTRLEN without FAULTSTRING");
 
-        checkMutuallyExclusiveOptions("NATLANG or NATLANG", ctx.NATLANG(), ctx.NATLANG());
-
         checkPrerequisiteIsMet(ctx.SUBCODESTR(), ctx.SUBCODELEN(), ctx, "SUBCODELEN without SUBCODESTR");
     }
 
