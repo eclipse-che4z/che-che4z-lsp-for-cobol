@@ -58,6 +58,7 @@ public class TestCICSSoapfaultStatement {
     // Invalid Tests
     private static final String SOAPFAULT_DELETE_INVALID = "SOAPFAULT DELETE {FILE|errorOne}(123)";
     private static final String SOAPFAULT_ADD_INVALID = "SOAPFAULT ADD FAULTSTRING(123) {SUBCODESTR|errorOne}(123)";
+    private static final String SOAPFAULT_CREATE_INVALID = "SOAPFAULT CREATE {CLIENT|errorOne} FAULTCODESTR(123) FAULTSTRING(123)";
 
     // Utility Functions
     private static void noErrorTest(String newCommand) {
@@ -103,5 +104,12 @@ public class TestCICSSoapfaultStatement {
         HashMap<String, Diagnostic> expectedDiagnostics = new HashMap<>();
         expectedDiagnostics.put("errorOne", new Diagnostic(new Range(), "Options \"FAULTSTRING or SUBCODESTR\" are mutually exclusive.", DiagnosticSeverity.Error, ErrorSource.PARSING.getText()));
         CICSTestUtils.errorTest(SOAPFAULT_ADD_INVALID, expectedDiagnostics);
+    }
+
+    @Test
+    void testCreateInvalid() {
+        HashMap<String, Diagnostic> expectedDiagnostics = new HashMap<>();
+        expectedDiagnostics.put("errorOne", new Diagnostic(new Range(), "Options \"FAULTCODESTR, CLIENT, SERVER, SENDER or RECEIVER\" are mutually exclusive.", DiagnosticSeverity.Error, ErrorSource.PARSING.getText()));
+        CICSTestUtils.errorTest(SOAPFAULT_CREATE_INVALID, expectedDiagnostics);
     }
 }

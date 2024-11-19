@@ -79,7 +79,7 @@ public class CICSSoapfaultOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
     }
 
     private void checkCreate(CICSParser.Cics_soapfault_createContext ctx) {
-        checkMutuallyExclusiveOptions("FAULTCODE, CLIENT, SERVER, SENDER or RECEIVER", ctx.FAULTCODE(), ctx.CLIENT(), ctx.SERVER(), ctx.SENDER(), ctx.RECEIVER());
+        checkMutuallyExclusiveOptions("FAULTCODESTR, CLIENT, SERVER, SENDER or RECEIVER", ctx.FAULTCODESTR(), ctx.CLIENT(), ctx.SERVER(), ctx.SENDER(), ctx.RECEIVER());
 
         checkPrerequisiteIsMet(ctx.FAULTCODESTR(), ctx.FAULTCODELEN(), ctx, "FAULTCODELEN without FAULTCODESTR");
 
