@@ -57,6 +57,7 @@ public class TestCICSSoapfaultStatement {
 
     // Invalid Tests
     private static final String SOAPFAULT_DELETE_INVALID = "SOAPFAULT DELETE {FILE|errorOne}(123)";
+    private static final String SOAPFAULT_ADD_INVALID = "SOAPFAULT ADD FAULTSTRING(123) {SUBCODESTR|errorOne}(123)";
 
     // Utility Functions
     private static void noErrorTest(String newCommand) {
@@ -95,5 +96,12 @@ public class TestCICSSoapfaultStatement {
         HashMap<String, Diagnostic> expectedDiagnostics = new HashMap<>();
         expectedDiagnostics.put("errorOne", new Diagnostic(new Range(), "Extraneous input FILE", DiagnosticSeverity.Error, ErrorSource.PARSING.getText()));
         CICSTestUtils.errorTest(SOAPFAULT_DELETE_INVALID, expectedDiagnostics);
+    }
+
+    @Test
+    void testAddInvalid() {
+        HashMap<String, Diagnostic> expectedDiagnostics = new HashMap<>();
+        expectedDiagnostics.put("errorOne", new Diagnostic(new Range(), "Options \"FAULTSTRING or SUBCODESTR\" are mutually exclusive.", DiagnosticSeverity.Error, ErrorSource.PARSING.getText()));
+        CICSTestUtils.errorTest(SOAPFAULT_ADD_INVALID, expectedDiagnostics);
     }
 }

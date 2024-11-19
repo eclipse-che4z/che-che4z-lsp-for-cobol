@@ -23,7 +23,7 @@ import org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser;
 
 import java.util.*;
 
-import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_soapfault;
+import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.*;
 
 /** Checks CICS SOAPFAULT rules for required and invalid options */
 public class CICSSoapfaultOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
@@ -83,8 +83,6 @@ public class CICSSoapfaultOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
 
         checkPrerequisiteIsMet(ctx.FAULTCODESTR(), ctx.FAULTCODELEN(), ctx, "FAULTCODELEN without FAULTCODESTR");
 
-        checkMutuallyExclusiveOptions("NATLANG or NATLANG", ctx.NATLANG(), ctx.NATLANG());
-
         checkPrerequisiteIsMet(ctx.ROLE(), ctx.ROLELENGTH(), ctx, "ROLELENGTH without ROLE");
 
         checkPrerequisiteIsMet(ctx.FAULTACTOR(), ctx.FAULTACTLEN(), ctx, "FAULTACTLEN without FAULTACTOR");
@@ -100,6 +98,8 @@ public class CICSSoapfaultOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
         checkPrerequisiteIsMet(ctx.FAULTSTRING(), ctx.FAULTSTRLEN(), ctx, "FAULTSTRLEN without FAULTSTRING");
 
         checkPrerequisiteIsMet(ctx.SUBCODESTR(), ctx.SUBCODELEN(), ctx, "SUBCODELEN without SUBCODESTR");
+
+        checkMutuallyExclusiveOptions("FAULTSTRING or SUBCODESTR", ctx.FAULTSTRING(), ctx.SUBCODESTR());
     }
 
 }
