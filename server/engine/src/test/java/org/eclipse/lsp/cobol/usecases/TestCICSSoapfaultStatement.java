@@ -55,6 +55,8 @@ public class TestCICSSoapfaultStatement {
     private static final String SOAPFAULT_CREATE_1 = "SOAPFAULT CREATE FAULTCODE(123) FAULTSTRING(123) FAULTSTRLEN(123) NATLANG(123) ROLE(123) ROLELENGTH(123) FAULTACTOR(123) FAULTACTLEN(123) DETAIL(123) DETAILLENGTH(123) FROMCCSID(123)";
     private static final String SOAPFAULT_CREATE_2 = "SOAPFAULT CREATE CLIENT FAULTSTRING(123)";
 
+    // Invalid Tests
+    private static final String SOAPFAULT_DELETE_INVALID = "SOAPFAULT DELETE {FILE|errorOne}(123)";
 
     // Utility Functions
     private static void noErrorTest(String newCommand) {
@@ -87,4 +89,11 @@ public class TestCICSSoapfaultStatement {
         noErrorTest(SOAPFAULT_CREATE_2);
     }
 
+
+    @Test
+    void testDeleteInvalid() {
+        HashMap<String, Diagnostic> expectedDiagnostics = new HashMap<>();
+        expectedDiagnostics.put("errorOne", new Diagnostic(new Range(), "Extraneous input FILE", DiagnosticSeverity.Error, ErrorSource.PARSING.getText()));
+        CICSTestUtils.errorTest(SOAPFAULT_DELETE_INVALID, expectedDiagnostics);
+    }
 }

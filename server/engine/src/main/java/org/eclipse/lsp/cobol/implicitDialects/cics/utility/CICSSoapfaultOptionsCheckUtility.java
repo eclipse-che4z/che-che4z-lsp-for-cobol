@@ -23,13 +23,12 @@ import org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser;
 
 import java.util.*;
 
-import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_soapfault_add;
-import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_soapfault_create;
+import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_soapfault;
 
 /** Checks CICS SOAPFAULT rules for required and invalid options */
 public class CICSSoapfaultOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
 
-    public static final int RULE_INDEX = RULE_cics_soapfault_create;
+    public static final int RULE_INDEX = RULE_cics_soapfault;
 
     private static final Map<Integer, ErrorSeverity> DUPLICATE_CHECK_OPTIONS =
             new HashMap<Integer, ErrorSeverity>() {
@@ -43,7 +42,6 @@ public class CICSSoapfaultOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
                     put(CICSLexer.FAULTCODELEN, ErrorSeverity.ERROR);
                     put(CICSLexer.FAULTSTRING, ErrorSeverity.ERROR);
                     put(CICSLexer.FAULTSTRLEN, ErrorSeverity.ERROR);
-                    put(CICSLexer.NATLANG, ErrorSeverity.ERROR);
                     put(CICSLexer.NATLANG, ErrorSeverity.ERROR);
                     put(CICSLexer.ROLE, ErrorSeverity.ERROR);
                     put(CICSLexer.ROLELENGTH, ErrorSeverity.ERROR);
@@ -65,6 +63,7 @@ public class CICSSoapfaultOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
      * @param <E> A subclass of ParserRuleContext
      */
     public <E extends ParserRuleContext> void checkOptions(E ctx) {
+        int rIndex = ctx.getRuleIndex();
         switch (ctx.getRuleIndex()) {
             case RULE_cics_soapfault_create:
                 checkCreate((CICSParser.Cics_soapfault_createContext) ctx);
