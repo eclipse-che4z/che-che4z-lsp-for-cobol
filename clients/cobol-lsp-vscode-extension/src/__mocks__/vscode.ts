@@ -192,3 +192,17 @@ export const languages = {
   registerCodeActionsProvider: jest.fn(),
   registerCompletionItemProvider: jest.fn(),
 };
+
+class FileNotFound extends Error {
+  code: string;
+  constructor() {
+    super();
+    this.code = "FileNotFound";
+  }
+}
+
+export const FileSystemError = {
+  FileNotFound: () => {
+    return new FileNotFound();
+  },
+};
