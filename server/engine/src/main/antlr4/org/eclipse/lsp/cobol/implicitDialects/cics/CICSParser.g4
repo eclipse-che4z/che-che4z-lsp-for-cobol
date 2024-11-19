@@ -354,7 +354,8 @@ cics_endbr: ENDBR ((FILE | DATASET) cics_name | REQID cics_data_value | SYSID ci
 cics_endbrowse: ENDBROWSE (ACTIVITY | CONTAINER | EVENT | PROCESS | TIMER | (BROWSETOKEN | RETCODE) cics_data_value | cics_handle_response)*;
 
 /** ENQ */
-cics_enq: ENQ (RESOURCE cics_data_area | LENGTH cics_data_value | UOW | TASK | MAXLIFETIME cics_cvda | NOSUSPEND | cics_handle_response)+;
+cics_enq: ENQ cics_enq_opts;
+cics_enq_opts:(RESOURCE cics_data_area | LENGTH cics_data_value | UOW | TASK | MAXLIFETIME cics_cvda | NOSUSPEND | cics_handle_response)+;
 
 /** ENTER TRACENUM */
 cics_enter: ENTER (TRACENUM cics_data_value | FROM cics_data_area | FROMLENGTH cics_data_area | RESOURCE cics_name | EXCEPTION | cics_handle_response)+;
