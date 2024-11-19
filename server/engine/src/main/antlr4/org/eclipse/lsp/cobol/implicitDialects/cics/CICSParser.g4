@@ -192,12 +192,9 @@ cics_add: ADD ( ciss_add_event_subevent | cics_handle_response)+;
 ciss_add_event_subevent: ((SUBEVENT  | EVENT) cics_data_value)+;
 
 /** ADDRESS / ADDRESS SET */
-cics_address: ADDRESS (cics_address_null | cics_address_set);
-cics_address_null: (ACEE cics_ref | COMMAREA cics_ref |
-                   CWA cics_ref | EIB cics_ref |
-                   TCTUA cics_ref | TWA cics_ref | cics_handle_response)+;
-cics_address_set: (SET cics_data_area USING cics_ref |
-                  SET cics_ref USING cics_data_area) cics_handle_response?;
+cics_address: ADDRESS (cics_address_standard | cics_address_set);
+cics_address_standard: ((ACEE | COMMAREA | CWA | EIB | TCTUA | TWA) cics_ref | cics_handle_response)*;
+cics_address_set: (SET (cics_data_area | cics_ref) | USING (cics_ref | cics_data_area) | cics_handle_response)*;
 
 /** ALLOCATE (all of them) */
 cics_allocate: ALLOCATE (cics_allocate_appc_partner | cics_allocate_appc_mro_lut61_sysid | cics_allocate_lut61_session);
