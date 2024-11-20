@@ -228,7 +228,7 @@ jobs:
 #        run: |
 #          sudo xcode-select -s /Applications/Xcode_12.5.1.app/Contents/Developer
 #          xcodebuild -version
-      - uses: al-cheb/configure-pagefile-action@v1.2
+      - uses: al-cheb/configure-pagefile-action@v1.4
         if: matrix.os == 'windows-latest'
         with:
           minimum-size: 16GB
