@@ -122,7 +122,7 @@ jobs:
         with:
           name: jar
           path: server/engine/target/server.jar
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
           node-version: 20
       - name: Build VS Code extension dialect API
@@ -359,7 +359,7 @@ jobs:
           cp -p ../../staging/${{ env.target }}/engine ./server/native/server-linux
           chmod +x ./server/native/server-linux
           cp ./server/native/server-linux ../../tests/native-executable-tests/server/linux/
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
           node-version: 20
       - name: Download VS Code extension dialect API
