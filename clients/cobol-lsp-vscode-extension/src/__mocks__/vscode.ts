@@ -109,6 +109,7 @@ export namespace window {
     find: jest.fn(),
   };
   export const visibleTextEditors = [];
+  export const withProgress = jest.fn();
 }
 export enum StatusBarAlignment {
   Right,

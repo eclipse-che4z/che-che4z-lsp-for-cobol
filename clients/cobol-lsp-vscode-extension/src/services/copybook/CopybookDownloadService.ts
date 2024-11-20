@@ -268,13 +268,6 @@ export class CopybookDownloadService {
     if (this.handleAsEndevorElement(documentUri)) {
       return !!(await this.e4eDownloader?.getE4EConfig(documentUri));
     }
-    if (
-      !DownloadUtil.areCopybookDownloadConfigurationsPresent(
-        documentUri,
-        copybookNames,
-      )
-    )
-      return false;
     if (!this.explorerApi) return false;
     const profile = ProfileUtils.getProfileNameForCopybook(
       documentUri,
@@ -295,6 +288,8 @@ export class CopybookDownloadService {
       !(await DownloadUtil.checkForInvalidCredProfile(
         profile,
         this.explorerApi,
+        documentUri,
+        copybookNames,
       ))
     );
   }

@@ -72,6 +72,8 @@ export class DownloadUtil {
   public static async checkForInvalidCredProfile(
     profileName: string,
     explorerAPI: IApiRegisterClient,
+    documentUri: string,
+    copybookNames: CopybookName[],
   ): Promise<boolean> {
     if (
       ZoweExplorerDownloader.profileStore.get(profileName) === "valid-profile"
@@ -79,9 +81,23 @@ export class DownloadUtil {
       return false;
     }
 
+    // get remote location of copybooks from settings
+    const copybookLocation = this.areCopybookDownloadConfigurationsPresent(
+      documentUri,
+      copybookNames,
+    );
+
+    if (!copybookLocation) {
+      return true;
+    }
+
     try {
       const profile = this.loadProfile(profileName, explorerAPI);
-      await explorerAPI.getUssApi(profile).fileList("/");
+      if (copybookLocation.uss) {
+        await explorerAPI.getUssApi(profile).fileList(copybookLocation.uss);
+      } else if (copybookLocation.dsn) {
+        await explorerAPI.getMvsApi(profile).allMembers(copybookLocation.dsn);
+      }
     } catch (error) {
       this.checkForInvalidCredentials(error, profileName);
       return true;
@@ -148,12 +164,12 @@ export class DownloadUtil {
    * checks if copybook download configurations are present
    * @param documentUri
    * @param copybookNames
-   * @returns true if if copybook download configurations are present, false otherwise
+   * @returns copybook location if if copybook download configurations are present, null otherwise
    */
   public static areCopybookDownloadConfigurationsPresent(
     documentUri: string,
     copybookNames: CopybookName[],
-  ): boolean {
+  ) {
     const dialects = new Set(
       copybookNames.map((n) => n.dialect?.toLocaleUpperCase()).filter(Boolean),
     );
@@ -161,12 +177,15 @@ export class DownloadUtil {
     for (const dialect of dialects) {
       const dsnPath = SettingsService.getDsnPath(documentUri, dialect);
       const ussPath = SettingsService.getUssPath(documentUri, dialect);
-      if ((dsnPath?.length ?? 0) > 0 || (ussPath?.length ?? 0) > 0) {
-        return true;
+      if ((dsnPath?.length ?? 0) > 0) {
+        return { dsn: dsnPath[0] };
+      }
+      if ((ussPath?.length ?? 0) > 0) {
+        return { uss: ussPath[0] };
       }
     }
 
-    return false;
+    return null;
   }
 
   private static async showQueueLockedDialog(
