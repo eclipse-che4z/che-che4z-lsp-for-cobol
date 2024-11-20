@@ -419,15 +419,11 @@ cics_getnext_container: (CONTAINER cics_data_area | BROWSETOKEN cics_data_value 
 
 /** HANDLE CONDITION / HANDLE AID / HANDLE ABEND: */
 cics_handle: HANDLE (cics_handle_abend | cics_handle_aid | cics_handle_condition);
-cics_handle_abend: ABEND (CANCEL | PROGRAM cics_name | LABEL cics_label | RESET | cics_handle_response)*;
-cics_handle_aid: AID (ANYKEY (cics_label)? | CLEAR (empty_parens | cics_label)? | CLRPARTN (cics_label)? | ENTER (cics_label)? |
-                 LIGHTPEN (cics_label)? | OPERID  (cics_label)? | pa_option (cics_label)? | pf_option (cics_label)? |
-                 TRIGGER  (cics_label)? | cics_handle_response)*;
-cics_handle_condition: CONDITION ((cics_conditions | cicsWord) cics_label? | cics_handle_response)+;
-
-pa_option: PA1 | PA2 | PA3;
-pf_option: PF1 | PF2 | PF3 | PF4 | PF5 | PF6 | PF7 | PF8 | PF9 | PF10 | PF11 | PF12 | PF13 | PF14 | PF15 | PF16 | PF17 |
-           PF18 | PF19 | PF20 | PF21 | PF22 | PF23 | PF24;
+cics_handle_abend: (ABEND | CANCEL | PROGRAM cics_name | LABEL cics_label | RESET | cics_handle_response)*;
+cics_handle_aid: (AID | (ANYKEY | CLEAR | CLRPARTN | ENTER | LIGHTPEN | OPERID | PA1 | PA2 | PA3 | PF1 | PF2 | PF3 | PF4 | PF5 |
+                PF6 | PF7 | PF8 | PF9 | PF10 | PF11 | PF12 | PF13 | PF14 | PF15 | PF16 | PF17 | PF18 | PF19 | PF20 | PF21 | PF22 |
+                PF23 | PF24 | TRIGGER)  (cics_label)? | cics_handle_response)*;
+cics_handle_condition: (CONDITION | cics_conditions (cics_label)? | cics_handle_response)*;
 
 /** IGNORE CONDITION */
 cics_ignore: IGNORE CONDITION (cics_conditions | cicsWord | cics_handle_response)+;

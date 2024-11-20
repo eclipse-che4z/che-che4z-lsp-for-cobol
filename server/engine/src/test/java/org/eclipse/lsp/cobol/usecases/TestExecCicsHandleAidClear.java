@@ -35,7 +35,7 @@ class TestExecCicsHandleAidClear {
           + "       {#*10-EXIT}.\n"
           + "            EXIT.\n"
           + "       {#*NACT}.\n"
-          + "           EXEC CICS HANDLE AID CLEAR() END-EXEC.\n"
+          + "           EXEC CICS HANDLE AID CLEAR END-EXEC.\n"
           + "           EXEC CICS HANDLE AID CLEAR({#10-EXIT}) END-EXEC.\n";
 
   @Test

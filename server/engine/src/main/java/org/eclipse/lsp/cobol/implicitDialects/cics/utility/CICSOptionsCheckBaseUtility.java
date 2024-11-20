@@ -399,6 +399,17 @@ public abstract class CICSOptionsCheckBaseUtility {
     }
   }
 
+  protected void checkHasToManyOneOptions(ParserRuleContext parentCtx) {
+    List<ParseTree> commandOoptions = parentCtx.children.stream()
+            .filter(node -> node instanceof TerminalNode)
+            .filter(node -> !node.getText().equals("AID"))
+            .collect(Collectors.toList());
+    if (commandOoptions.size() > 16) {
+      throwException(
+              ErrorSeverity.ERROR, getLocality(parentCtx), "To many options provided for: ", "HANDLE AID");
+    }
+  }
+
   protected void getAllTokenChildren(
       ParserRuleContext ctx, List<TerminalNode> children, boolean validateResponseHandler) {
     if (ctx.children == null) return;

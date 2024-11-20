@@ -52,7 +52,7 @@ public class TestCICSAsktime {
                 ImmutableMap.of(
                         "error",
                         new Diagnostic(
-                                new Range(new Position(14, 12), new Position(14, 20)),
+                                new Range(new Position(15, 12), new Position(15, 20)),
                                 "Syntax error on 'END-EXEC'",
                                 DiagnosticSeverity.Error,
                                 ErrorSource.PARSING.getText()));

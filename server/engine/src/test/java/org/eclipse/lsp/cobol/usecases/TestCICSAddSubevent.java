@@ -56,7 +56,7 @@ public class TestCICSAddSubevent {
                 ImmutableMap.of(
                         "error",
                         new Diagnostic(
-                                new Range(new Position(13, 12), new Position(13, 20)),
+                                new Range(new Position(14, 12), new Position(14, 20)),
                                 "Syntax error on 'END-EXEC'",
                                 DiagnosticSeverity.Error,
                                 ErrorSource.PARSING.getText()));

@@ -104,19 +104,19 @@ public class TestCICSBif {
                 ImmutableMap.of(
                         "errorResultMissing",
                         new Diagnostic(
-                                new Range(new Position(13, 12), new Position(17, 18)),
+                                new Range(new Position(14, 12), new Position(18, 18)),
                                 "Missing required option: RESULT",
                                 DiagnosticSeverity.Error,
                                 ErrorSource.PARSING.getText()),
                         "errorDigestType",
                         new Diagnostic(
-                                new Range(new Position(16, 12), new Position(16, 15)),
+                                new Range(new Position(17, 12), new Position(17, 15)),
                                 "Exactly one option required, options are mutually exclusive: HEX or BINARY or BASE64 or DIGESTTYPE",
                                 DiagnosticSeverity.Error,
                                 ErrorSource.PARSING.getText()),
                         "errorDigestType2",
                         new Diagnostic(
-                                new Range(new Position(17, 12), new Position(17, 18)),
+                                new Range(new Position(18, 12), new Position(18, 18)),
                                 "Exactly one option required, options are mutually exclusive: HEX or BINARY or BASE64 or DIGESTTYPE",
                                 DiagnosticSeverity.Error,
                                 ErrorSource.PARSING.getText())
@@ -129,7 +129,7 @@ public class TestCICSBif {
                 ImmutableMap.of(
                         "errorResultMissing",
                         new Diagnostic(
-                                new Range(new Position(13, 12), new Position(15, 26)),
+                                new Range(new Position(14, 12), new Position(16, 26)),
                                 "Missing required option: RESULT",
                                 DiagnosticSeverity.Error,
                                 ErrorSource.PARSING.getText()));
