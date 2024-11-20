@@ -416,7 +416,7 @@ jobs:
         working-directory: clients/cobol-lsp-vscode-extension
       - name: Run integration tests
         if: github.event.inputs.skip_ui_tests != 'true'
-        run: ${{ runner.os === 'Linux' && 'xvfb-run' || '' }} npm run test:integration
+        run: ${{ matrix.os == 'ubuntu-latest' && 'xvfb-run' || '' }} npm run test:integration
         working-directory: clients/cobol-lsp-vscode-extension          
       - name: Run native executable test code
         working-directory: tests/native-executable-tests
