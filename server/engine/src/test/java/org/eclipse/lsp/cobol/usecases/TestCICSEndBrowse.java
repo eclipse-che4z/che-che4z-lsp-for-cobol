@@ -34,6 +34,7 @@ import java.util.Map;
 public class TestCICSEndBrowse {
   //  ENDBR
   private static final String ENDBR_FILE_VALID = "ENDBR  FILE({$varFour})";
+  private static final String ENDBR_INVALID = "{ENDBR|error1}";
   private static final String ENDBR_DATASET_VALID = "ENDBR  DATASET({$varFour})";
   private static final String ENDBR_FILE_DATASET_INVALID = "ENDBR  {FILE|error1}({$varFour}) {DATASET|error2}({$varFour})";
   private static final String ENDBR_FILE_REQID_VALID = "ENDBR FILE({$varFour}) REQID({$varOne})";
@@ -54,6 +55,18 @@ public class TestCICSEndBrowse {
   void testEndbrFileValid() {
     CICSTestUtils.noErrorTest(ENDBR_FILE_VALID);
   }
+
+  @Test
+  void testEndbrInvalid() {
+    CICSTestUtils.errorTest(ENDBR_INVALID,
+            ImmutableMap.of(
+                    "error1",
+                    new Diagnostic(
+                            new Range(),
+                            "Exactly one option required, none provided: FILE or DATASET",
+                            DiagnosticSeverity.Error,
+                            ErrorSource.PARSING.getText())));
+    }
 
   @Test
   void testEndbrDatasetValid() {

@@ -26,14 +26,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_endbr;
-import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_endbrowse;
+import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_endbr_endbrowse;
 
 /** Checks CICS Extract rules for required and invalid options */
-public class CICSEndBrowseOptionsUtility extends CICSOptionsCheckBaseUtility {
+public class CICSEndbrEndBrowseOptionsUtility extends CICSOptionsCheckBaseUtility {
 
-  public static final int RULE_ENDBROWSE_INDEX = RULE_cics_endbrowse;
-  public static final int RULE_ENDBR_INDEX = RULE_cics_endbr;
+  public static final int RULE_INDEX = RULE_cics_endbr_endbrowse;
 
   private static final Map<Integer, ErrorSeverity> DUPLICATE_CHECK_OPTIONS =
       new HashMap<Integer, ErrorSeverity>() {
@@ -52,7 +50,7 @@ public class CICSEndBrowseOptionsUtility extends CICSOptionsCheckBaseUtility {
         }
       };
 
-  public CICSEndBrowseOptionsUtility(DialectProcessingContext context, List<SyntaxError> errors) {
+  public CICSEndbrEndBrowseOptionsUtility(DialectProcessingContext context, List<SyntaxError> errors) {
     super(context, errors, DUPLICATE_CHECK_OPTIONS);
   }
 
@@ -63,17 +61,17 @@ public class CICSEndBrowseOptionsUtility extends CICSOptionsCheckBaseUtility {
    * @param <E> A subclass of ParserRuleContext
    */
   public <E extends ParserRuleContext> void checkOptions(E ctx) {
-    switch (ctx.getParent().getRuleIndex()) {
+    switch (ctx.getRuleIndex()) {
       case CICSParser.RULE_cics_endbr:
-        checkEndbr((CICSParser.Cics_endbrContext) ctx.getParent());
+        checkEndbr((CICSParser.Cics_endbrContext) ctx);
         break;
       case CICSParser.RULE_cics_endbrowse:
-        checkEndBrowse((CICSParser.Cics_endbrowseContext) ctx.getParent());
+        checkEndBrowse((CICSParser.Cics_endbrowseContext) ctx);
         break;
       default:
         break;
     }
-    checkDuplicates(ctx.getParent());
+    checkDuplicates(ctx);
   }
 
   @SuppressWarnings("unchecked")
