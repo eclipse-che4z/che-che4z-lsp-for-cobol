@@ -373,7 +373,8 @@ cics_extract_web_client: (WEB | (SESSTOKEN | PORTNUMBER | URIMAP | REALM | REALM
 
 
 /** FORCE TIMER */
-cics_force: FORCE (TIMER cics_data_value | ACQUACTIVITY | ACQPROCESS | cics_handle_response)+;
+cics_force: FORCE cics_force_opts;
+cics_force_opts: (TIMER cics_data_value | ACQACTIVITY | ACQPROCESS | cics_handle_response)+;
 
 /** FORMATTIME */
 cics_formattime: FORMATTIME (ABSTIME cics_data_area | DATE cics_data_area | FULLDATE cics_data_area | DATEFORM cics_data_area
