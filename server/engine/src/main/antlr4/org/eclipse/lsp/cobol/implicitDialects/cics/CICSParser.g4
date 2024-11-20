@@ -24,7 +24,7 @@ allCicsRule: cics_send | cics_receive | cics_add | cics_address | cics_allocate 
                        cics_endbrowse | cics_enq | cics_enter | cics_extract | cics_force | cics_formattime | cics_free |
                        cics_freemain | cics_get | cics_getmain | cics_getmain64 | cics_getnext | cics_handle | cics_ignore | cics_inquire |
                        cics_invoke | cics_issue | cics_link | cics_load | cics_monitor | cics_move | cics_point | cics_pop |
-                       cics_post | cics_purge | cics_push | cics_put | cics_query | cics_read | cics_readnext_readprev |
+                       cics_post | cics_purge | cics_push | cics_put_container | cics_query | cics_read | cics_readnext_readprev |
                        cics_readq | cics_release | cics_remove | cics_request | cics_reset | cics_resetbr | cics_resume | cics_retrieve |
                        cics_return | cics_rewind | cics_rewrite | cics_route | cics_run | cics_signal | cics_signoff | cics_signon |
                        cics_soapfault | cics_spoolclose | cics_spoolopen | cics_spoolread | cics_spoolwrite | cics_start |
@@ -679,10 +679,9 @@ cics_purge: PURGE cics_handle_response? MESSAGE cics_handle_response?;
 cics_push: PUSH cics_handle_response? HANDLE cics_handle_response?;
 
 /** PUT CONTAINER (both of them): */
-cics_put: PUT CONTAINER cics_data_value (cics_put_bts | cics_put_channel);
-cics_put_bts: (ACTIVITY cics_data_value | ACQACTIVITY | PROCESS | ACQPROCESS | FROM cics_data_area | FLENGTH cics_data_value | cics_handle_response)+;
-cics_put_channel: (CHANNEL cics_data_value | FROM cics_data_area | FLENGTH cics_data_value | BIT | DATATYPE cics_cvda |
-                  CHAR | FROMCCSID cics_data_value | FROMCODEPAGE cics_data_value | cics_handle_response)+;
+cics_put_container: PUT CONTAINER cics_data_value (cics_put_container_bts | cics_put_container_channel);
+cics_put_container_bts: ((ACQACTIVITY | PROCESS | ACQPROCESS) | (ACTIVITY | FLENGTH) cics_data_value | (FROM) cics_data_area | cics_handle_response)+;
+cics_put_container_channel: ((BIT | CHAR | APPEND | PREPEND) | (CHANNEL | FLENGTH | FROMCCSID | FROMCODEPAGE) cics_data_value | FROM cics_data_area | DATATYPE cics_cvda | cics_handle_response)+;
 
 /** QUERY CHANNEL / COUNTER / DCOUNTER / SECURITY */
 cics_query: QUERY (cics_query_channel | cics_query_counter | cics_query_security);
