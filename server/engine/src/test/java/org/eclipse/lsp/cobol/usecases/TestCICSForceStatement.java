@@ -69,15 +69,15 @@ public class TestCICSForceStatement {
                         "errorMutualEx",
                         new Diagnostic(
                                 new Range(),
-                                "Exactly one option required, options are mutually exclusive:" +
-                                        " ACQACTIVITY or ACQPROCESS",
+                                "Exactly one option required, options are mutually exclusive:"
+                                        + " ACQACTIVITY or ACQPROCESS",
                                 DiagnosticSeverity.Error,
                                 ErrorSource.PARSING.getText()),
                         "errorMutualEx2",
                         new Diagnostic(
                                 new Range(),
-                                "Exactly one option required, options are mutually exclusive:" +
-                                        " ACQACTIVITY or ACQPROCESS",
+                                "Exactly one option required, options are mutually exclusive:"
+                                        +  " ACQACTIVITY or ACQPROCESS",
                                 DiagnosticSeverity.Error,
                                 ErrorSource.PARSING.getText())
                         );
