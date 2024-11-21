@@ -20,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
+import org.apache.commons.lang3.ArrayUtils;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
@@ -418,5 +419,147 @@ public abstract class CICSOptionsCheckBaseUtility {
             }
           }
         });
+  }
+
+  /**
+   * Throws error for commands without correct translator options
+   *
+   * @param rule Context to throw the error on
+   * @param missingTranslatorOption The option name that is missing
+   * @param <E> Generic for rule type
+   */
+  public <E> void throwIfMissingTranslatorOption(E rule, String missingTranslatorOption) {
+    throwException(
+        ErrorSeverity.ERROR,
+        getLocality(rule),
+        "Invalid CICS command without translator option: ",
+        missingTranslatorOption);
+  }
+
+  /**
+   * Throws error for commands with incorrect browse usage
+   *
+   * @param rule Context to throw the error on
+   * @param message Invalid Browse Usage Message
+   * @param <E> Generic for rule type
+   */
+  public <E> void throwBrowsingViolation(E rule, String message) {
+    throwException(
+        ErrorSeverity.ERROR, getLocality(rule), "Invalid option or parameter provided: ", message);
+  }
+
+  /**
+   * Validates parser rules to ensure browser functionality
+   *
+   * @param ctx Context to evaluate
+   * @param coreRuleIndex The CICSParser index(ices) for the core rule(s)
+   */
+  public void checkBrowsingInvalidOptions(ParserRuleContext ctx, int... coreRuleIndex) {
+    for (int index = 0; index < ctx.children.size(); index++) { // ParseTree rule : ctx.children
+      int ruleIndex =
+          TerminalNode.class.isAssignableFrom(ctx.children.get(index).getClass())
+              ? ((TerminalNode) ctx.children.get(index)).getSymbol().getType()
+              : ((ParserRuleContext) ctx.children.get(index)).getRuleIndex();
+      boolean isCoreRule = ArrayUtils.contains(coreRuleIndex, ruleIndex);
+      if (!isCoreRule
+          && !ctx.children.get(index).getText().contains("(")
+          && ruleIndex != CICSParser.START
+          && ruleIndex != CICSParser.AT
+          && ruleIndex != CICSParser.END
+          && ruleIndex != CICSParser.NEXT
+          && ruleIndex != CICSParser.RULE_cics_handle_response) {
+        throwBrowsingViolation(
+            ctx.children.get(index),
+            "Accessory options not allowed when browsing with START or END");
+      } else if (isCoreRule
+          && index + 1 < ctx.children.size()
+          && ctx.children.get(index + 1).getText().contains("(")) {
+        // Skip ahead for core rules that require parameters
+        index++;
+      }
+    }
+  }
+
+  /**
+   * Ensures the main option has it's required parameter when not browsing with START or END
+   *
+   * @param ctx Context to evaluate
+   * @param coreRuleIndex The CICSParser index for the core rules with required parameter
+   */
+  public void checkStatementHasParameter(ParserRuleContext ctx, int... coreRuleIndex) {
+    // Make sure the main option has it's required parameter if not browsing with START or END
+    int traversalIndex = 0;
+    for (ParseTree rule : ctx.children) {
+      if (TerminalNode.class.isAssignableFrom(rule.getClass())) {
+        if (ArrayUtils.contains(coreRuleIndex, ((TerminalNode) rule).getSymbol().getType())) {
+          if (traversalIndex + 1 < ctx.children.size()) {
+            if (!ctx.children
+                .get(traversalIndex + 1)
+                .getText()
+                .contains("(")) { // TODO: Find a better strategy for detecting parameters
+              throwBrowsingViolation(
+                  ctx.children.get(traversalIndex), "Missing required option parameter");
+            }
+          } else
+            throwBrowsingViolation(
+                ctx.children.get(traversalIndex), "Missing required option parameter");
+          break;
+        }
+      }
+      traversalIndex++;
+    }
+  }
+
+  /**
+   * Ensures the main option does not have parameter if browsing with START or END
+   *
+   * @param ctx Context to evaluate
+   * @param coreRuleIndex The CICSParser index for the core rules without parameters
+   */
+  public void checkBrowsingHasNotParameter(ParserRuleContext ctx, int... coreRuleIndex) {
+    // Make sure the main option does not have parameter if browsing with START or END
+    int traversalIndex = 0;
+    for (ParseTree rule : ctx.children) {
+      if (TerminalNode.class.isAssignableFrom(rule.getClass())) {
+        if (ArrayUtils.contains(coreRuleIndex, ((TerminalNode) rule).getSymbol().getType())) {
+          if (traversalIndex + 1 < ctx.children.size()
+              && ctx.children
+                  .get(traversalIndex + 1)
+                  .getText()
+                  .contains("(")) { // TODO: Find a better strategy for detecting parameters
+            throwBrowsingViolation(
+                ctx.children.get(traversalIndex + 1),
+                "Parameter usage when browsing with START or END");
+          }
+          break;
+        }
+      }
+      traversalIndex++;
+    }
+  }
+
+  /**
+   * Checks common Browsing options of START, END, NEXT for mutual exclusivity
+   *
+   * @param ctx ParserRuleContext to validate
+   * @param <E> Generic type of ParserRuleContext subclass
+   */
+  public <E extends ParserRuleContext> void checkBrowseMutuallyExclusive(E ctx) {
+    int[] browsingIndices = {CICSParser.START, CICSParser.END, CICSParser.NEXT};
+    List<TerminalNode> browsingContexts =
+        ctx.children.stream()
+            .map(
+                rule -> {
+                  if (TerminalNode.class.isAssignableFrom(rule.getClass())) {
+                    if (ArrayUtils.contains(
+                        browsingIndices, ((TerminalNode) rule).getSymbol().getType())) {
+                      return (TerminalNode) rule;
+                    }
+                  }
+                  return null;
+                })
+            .filter(Objects::nonNull)
+            .collect(Collectors.toList());
+    checkHasMutuallyExclusiveOptions("START or END or NEXT", browsingContexts);
   }
 }

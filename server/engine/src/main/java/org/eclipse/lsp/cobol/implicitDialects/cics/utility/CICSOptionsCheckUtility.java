@@ -27,9 +27,11 @@ import org.eclipse.lsp.cobol.common.error.SyntaxError;
 public class CICSOptionsCheckUtility {
   private final Map<Integer, CICSOptionsCheckBaseUtility> optionsMap = new HashMap<>();
 
-  @Setter private boolean exciOptionsEnabled = false;
+  private final Map<Integer, CICSOptionsCheckBaseUtility> spOptionsMap = new HashMap<>();
 
-  @Setter private boolean spOptionsEnabled = false;
+  @Setter private static boolean exciOptionsEnabled = false;
+
+  @Setter private static boolean spOptionsEnabled = true;
 
   public CICSOptionsCheckUtility(DialectProcessingContext context, List<SyntaxError> errors) {
     optionsMap.put(
@@ -173,6 +175,12 @@ public class CICSOptionsCheckUtility {
     optionsMap.put(
         CICSRunOptionsCheckUtility.RULE_INDEX,
         new CICSRunOptionsCheckUtility(context, errors));
+    spOptionsMap.put(CICSInquireSPOptionsUtiltiy.RULE_INDEX. new CICSInquireSPOptionsUtiltiy(context, errors));
+        CICSInquireOptionsCheckUtility.RULE_INDEX,
+        new CICSInquireOptionsCheckUtility(context, errors));
+    spOptionsMap.put(
+        CICSInquireSPOptionsCheckUtility.RULE_INDEX,
+        new CICSInquireSPOptionsCheckUtility(context, errors));
   }
 
   /**
@@ -183,6 +191,11 @@ public class CICSOptionsCheckUtility {
    */
   public <E extends ParserRuleContext> void checkOptions(E ctx) {
     CICSOptionsCheckBaseUtility utility = optionsMap.get(ctx.parent.getRuleIndex());
+    CICSOptionsCheckBaseUtility spOptions = spOptionsMap.get(ctx.parent.getRuleIndex());
     if (utility != null) utility.checkOptions(ctx);
+    else if (spOptions != null) {
+      if (spOptionsEnabled) spOptions.checkOptions(ctx);
+      else spOptions.throwIfMissingTranslatorOption(ctx, "\"SP\"");
+    }
   }
 }

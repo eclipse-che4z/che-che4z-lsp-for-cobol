@@ -14,10 +14,10 @@
  */
 package org.eclipse.lsp.cobol.usecases;
 
-// import com.google.common.collect.ImmutableList;
-// import com.google.common.collect.ImmutableMap;
-// import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
-// import org.junit.jupiter.api.Test;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test CICS INQUIRE URIMAP Ref:
@@ -26,7 +26,8 @@ package org.eclipse.lsp.cobol.usecases;
 public class TestCicsInquireUrimap {
   /** below program is a generated code from the grammar. Do not showcase the actual code */
   public static final String TEXT =
-      "       IDENTIFICATION DIVISION.\n"
+      "       CBL CICS(\"SP\")\n"
+          + "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID. ABCDEF.\n"
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
@@ -42,12 +43,11 @@ public class TestCicsInquireUrimap {
           + "                  IpreSolved ( {$variable} )  \n"
           + "                  teMplAteNaME ( +,92E-9   )  \n"
           + "                  anALyZersTAT ( AdDresS of liNaGE-CoUNTEr       )\n"
-          + "                  anALyZersTAT ( AdDresS of liNaGE-CoUNTEr       )\n"
           + "                  iNSTAlLAGENt ( Z\"\"   )     \n"
           + "            END-EXEC.";
 
-  //  @Test
-  //  void test() {
-  //    UseCaseEngine.runTest(TEXT, ImmutableList.of(), ImmutableMap.of());
-  //  }
+  @Test
+  void test() {
+    UseCaseEngine.runTest(TEXT, ImmutableList.of(), ImmutableMap.of());
+  }
 }
