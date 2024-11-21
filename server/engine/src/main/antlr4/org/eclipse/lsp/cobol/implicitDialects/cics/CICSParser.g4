@@ -25,7 +25,7 @@ allCicsRule: cics_send | cics_receive | cics_add | cics_address | cics_allocate 
                        cics_freemain | cics_get | cics_getmain | cics_getmain64 | cics_getnext | cics_handle | cics_ignore | cics_inquire |
                        cics_invoke | cics_issue | cics_link | cics_load | cics_monitor | cics_move | cics_point | cics_pop |
                        cics_post | cics_purge | cics_push | cics_put | cics_query | cics_read | cics_readnext_readprev |
-                       cics_readq | cics_release | cics_remove | cics_reset | cics_resetbr | cics_resume | cics_retrieve |
+                       cics_readq | cics_release | cics_remove | cics_request | cics_reset | cics_resetbr | cics_resume | cics_retrieve |
                        cics_return | cics_rewind | cics_rewrite | cics_route | cics_run | cics_signal | cics_signoff | cics_signon |
                        cics_soapfault | cics_spoolclose | cics_spoolopen | cics_spoolread | cics_spoolwrite | cics_start |
                        cics_startbr | cics_startbrowse | cics_suspend | cics_syncpoint | cics_test | cics_transform | cics_unlock |
@@ -715,6 +715,11 @@ cics_release_option: (PROGRAM cics_name | cics_handle_response)+;
 /** REMOVE SUBEVENT */
 cics_remove: REMOVE cics_remove_option;
 cics_remove_option: ((SUBEVENT | EVENT) cics_data_value | cics_handle_response)+;
+
+/** REQUEST */
+cics_request: REQUEST (cics_request_encryptptkt | cics_request_passticket | cics_handle_response)+;
+cics_request_encryptptkt: ENCRYPTPTKT cics_ref (ESMAPPNAME cics_data_value | (FLENGTH | ENCRYPTKEY | ESMREASON | ESMRESP) cics_data_area | cics_handle_response)+;
+cics_request_passticket: PASSTICKET cics_data_area ((ESMAPPNAME | ESMRESP | ESMREASON) cics_data_area | cics_handle_response)+;
 
 /** RESET ACQPROCESS / RESET ACTIVITY */
 cics_reset: RESET (cics_reset_acqprocess | cics_reset_activity);
