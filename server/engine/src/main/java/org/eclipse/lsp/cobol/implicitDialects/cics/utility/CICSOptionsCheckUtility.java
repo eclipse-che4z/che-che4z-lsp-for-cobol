@@ -150,6 +150,9 @@ public class CICSOptionsCheckUtility {
     optionsMap.put(
         CICSTestOptionsUtility.RULE_INDEX,
         new CICSTestOptionsUtility(context, errors));
+    optionsMap.put(
+        CICSMoveOptionsCheckUtility.RULE_INDEX,
+        new CICSMoveOptionsCheckUtility(context, errors));
   }
 
   /**
