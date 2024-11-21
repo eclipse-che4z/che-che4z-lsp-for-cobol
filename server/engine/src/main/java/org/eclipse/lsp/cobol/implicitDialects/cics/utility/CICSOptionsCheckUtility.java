@@ -18,6 +18,7 @@ package org.eclipse.lsp.cobol.implicitDialects.cics.utility;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import lombok.Setter;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
@@ -25,6 +26,10 @@ import org.eclipse.lsp.cobol.common.error.SyntaxError;
 /** Manages traffic for CICS parser options checking */
 public class CICSOptionsCheckUtility {
   private final Map<Integer, CICSOptionsCheckBaseUtility> optionsMap = new HashMap<>();
+
+  @Setter private boolean exciOptionsEnabled = false;
+
+  @Setter private boolean spOptionsEnabled = false;
 
   public CICSOptionsCheckUtility(DialectProcessingContext context, List<SyntaxError> errors) {
     optionsMap.put(
