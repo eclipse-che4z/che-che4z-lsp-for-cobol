@@ -376,13 +376,12 @@ cics_extract_web_client: (WEB | (SESSTOKEN | PORTNUMBER | URIMAP | REALM | REALM
 cics_force: FORCE (TIMER cics_data_value | ACQUACTIVITY | ACQPROCESS | cics_handle_response)+;
 
 /** FORMATTIME */
-cics_formattime: FORMATTIME (ABSTIME cics_data_area | DATE cics_data_area | FULLDATE cics_data_area | DATEFORM cics_data_area
-                 | DATESEP (cics_data_area)? | DAYCOUNT cics_data_area | DAYOFMONTH cics_data_area | DAYOFWEEK cics_data_area
-                 | DDMMYY cics_data_area | DDMMYYYY cics_data_area | MILLISECONDS cics_data_area | MMDDYY cics_data_area
-                 | MMDDYYYY cics_data_area | MONTHOFYEAR cics_data_area | cics_formattime_time | YEAR cics_data_area
-                 | YYDDD cics_data_area | YYDDMM cics_data_area| YYMMDD cics_data_area | YYYYDDD cics_data_area | YYYYDDMM cics_data_area
-                 | YYYYMMDD cics_data_area | DATESTRING cics_data_area | STRINGFORMAT cics_cvda | cics_handle_response)+;
-cics_formattime_time: (TIME cics_data_area | (TIMESEP (cics_data_area)?))+;
+cics_formattime: FORMATTIME cics_formattime_opts;
+cics_formattime_opts: ((ABSTIME  | DATE  | FULLDATE  | DATEFORM | DAYCOUNT | DAYOFMONTH | DAYOFWEEK | DDMMYY | DDMMYYYY
+                    | MILLISECONDS | MMDDYY | MMDDYYYY | MONTHOFYEAR | YYDDMM | YYDDD | YYMMDD | YYYYDDD | YYYYDDMM
+                    | YYYYMMDD | DATESTRING | TIME | YEAR) cics_data_area | DATESEP (cics_data_area)?
+                    | (STRINGFORMAT | STRINGZONE) cics_cvda | TIMESEP cics_data_area?
+                    | cics_handle_response)+;
 
 /** FREE (all of them) */
 cics_free: FREE (CONVID cics_name | SESSION cics_name | STATE cics_cvda | cics_handle_response)*;
