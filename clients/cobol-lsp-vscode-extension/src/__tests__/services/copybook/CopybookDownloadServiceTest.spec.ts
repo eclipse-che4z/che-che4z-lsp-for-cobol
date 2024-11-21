@@ -39,7 +39,7 @@ Utils.getZoweExplorerAPI = jest.fn().mockReturnValue({ api: zoweExplorerMock });
 describe("Tests copybook download service", () => {
   let downloadService: CopybookDownloadService;
 
-  let workspaceConfigurationMock: Record<string, unknown>;
+  let workspaceConfigurationMock: Record<string, string[] | undefined>;
   let profileName: string;
 
   beforeEach(() => {
@@ -110,7 +110,6 @@ describe("Tests copybook download service", () => {
           zoweExplorerErrorMock,
         );
         downloadService["processDownloadError"] = jest.fn();
-        jest.clearAllMocks();
       });
 
       describe("uss configuration", () => {
@@ -164,7 +163,6 @@ describe("Tests copybook download service", () => {
           "storage-path",
           zoweExplorerMock,
         );
-        // jest.clearAllMocks();
       });
 
       it("checks profile with invalid credentials do not trigger download", async () => {

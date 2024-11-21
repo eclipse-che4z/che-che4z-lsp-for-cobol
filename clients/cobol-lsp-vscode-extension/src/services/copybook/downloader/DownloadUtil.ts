@@ -81,7 +81,6 @@ export class DownloadUtil {
       return false;
     }
 
-    // get remote location of copybooks from settings
     const copybookLocation = this.areCopybookDownloadConfigurationsPresent(
       documentUri,
       copybookNames,
