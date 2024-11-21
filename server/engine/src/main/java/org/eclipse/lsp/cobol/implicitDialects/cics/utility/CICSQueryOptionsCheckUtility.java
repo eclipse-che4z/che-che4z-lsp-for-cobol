@@ -33,7 +33,7 @@ public class CICSQueryOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     public static final int RULE_INDEX = RULE_cics_query;
 
     private static final Map<Integer, ErrorSeverity> DUPLICATE_CHECK_OPTIONS =
-            new HashMap<>() {
+            new HashMap<Integer, ErrorSeverity>() {
                 {
                     put(CICSLexer.QUERY, ErrorSeverity.ERROR);
                     put(CICSLexer.CHANNEL, ErrorSeverity.ERROR);

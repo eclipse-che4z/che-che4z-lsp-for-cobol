@@ -51,13 +51,13 @@ public class TestCicsQuery {
             "QUERY NOSUSPEND POOL({$varFive}) MINIMUM({$varTwo}) DCOUNTER({$varOne}) MAXIMUM({$varTwo}) VALUE({$varSix})";
 
 
-    private static final String QUERY_COUNTER_VALID_SOME_ONE = 
+    private static final String QUERY_COUNTER_VALID_SOME_ONE =
             "QUERY COUNTER({$varOne}) NOSUSPEND";
     private static final String QUERY_COUNTER_VALID_SOME_TWO =
             "QUERY MINIMUM({$varTwo}) MAXIMUM({$varTwo}) COUNTER({$varOne})";
 
     private static final String QUERY_DCOUNTER_VALID_SOME_ONE =
-            "QUERY POOL({$varFive}) VALUE({$varSix}) DCOUNTER({$varOne}) NOSUSPEND"; 
+            "QUERY POOL({$varFive}) VALUE({$varSix}) DCOUNTER({$varOne}) NOSUSPEND";
     private static final String QUERY_DCOUNTER_VALID_SOME_TWO =
             "QUERY VALUE({$varSix}) DCOUNTER({$varOne}) POOL({$varFive}) MAXIMUM({$varTwo})";
 
@@ -68,17 +68,17 @@ public class TestCicsQuery {
     private static final String QUERY_DCOUNTER_VALID_BARE = "QUERY DCOUNTER({$varFour})";
 
     private static final String QUERY_SECURITY_VALID_ALL_ONE =
-            "QUERY SECURITY RESTYPE({$varTwo}) RESID({$varThree}) LOGMESSAGE({$varFour}) USERID({$varFour}) READ({$varSix}) " +
-                    "UPDATE({$varFour}) CONTROL({$varTwo}) ALTER({$varFive})";
+            "QUERY SECURITY RESTYPE({$varTwo}) RESID({$varThree}) LOGMESSAGE({$varFour}) USERID({$varFour}) READ({$varSix}) "
+                    + "UPDATE({$varFour}) CONTROL({$varTwo}) ALTER({$varFive})";
     private static final String QUERY_SECURITY_VALID_ALL_TWO =
-            "QUERY RESID({$varThree}) CONTROL({$varTwo}) USERID({$varFour}) RESIDLENGTH({$varSix}) ALTER({$varFive}) " +
-                    "RESCLASS({$varFour}) UPDATE({$varFour}) SECURITY LOGMESSAGE({$varFour}) READ({$varSix})";
+            "QUERY RESID({$varThree}) CONTROL({$varTwo}) USERID({$varFour}) RESIDLENGTH({$varSix}) ALTER({$varFive}) "
+                    + "RESCLASS({$varFour}) UPDATE({$varFour}) SECURITY LOGMESSAGE({$varFour}) READ({$varSix})";
     private static final String QUERY_SECURITY_VALID_ALL_THREE =
-            "QUERY ALTER({$varFive}) LOGMESSAGE({$varFour}) READ({$varSix}) SECURITY RESID({$varThree}) UPDATE({$varFour})" +
-                    "RESTYPE({$varTwo}) USERID({$varFour}) CONTROL({$varTwo})";
+            "QUERY ALTER({$varFive}) LOGMESSAGE({$varFour}) READ({$varSix}) SECURITY RESID({$varThree}) UPDATE({$varFour})"
+                    + "RESTYPE({$varTwo}) USERID({$varFour}) CONTROL({$varTwo})";
     private static final String QUERY_SECURITY_VALID_ALL_FOUR =
-            "QUERY RESCLASS({$varFour}) SECURITY RESID({$varThree}) RESIDLENGTH({$varSix}) CONTROL({$varTwo}) USERID({$varFour})" +
-                    "LOGMESSAGE({$varFour}) READ({$varSix}) ALTER({$varFive}) UPDATE({$varFour})";
+            "QUERY RESCLASS({$varFour}) SECURITY RESID({$varThree}) RESIDLENGTH({$varSix}) CONTROL({$varTwo}) USERID({$varFour})"
+                    + "LOGMESSAGE({$varFour}) READ({$varSix}) ALTER({$varFive}) UPDATE({$varFour})";
 
     private static final String QUERY_SECURITY_VALID_SOME_ONE =
             "QUERY SECURITY RESTYPE({$varTwo}) LOGMESSAGE({$varFour}) ALTER({$varFive}) RESID({$varThree})";
@@ -168,7 +168,7 @@ public class TestCicsQuery {
     }
 
     @Test
-    void testQueryCounterInvalidDCounter(){
+    void testQueryCounterInvalidDCounter() {
         Map<String, Diagnostic> expectedDiagnostics =
                 ImmutableMap.of(
                         "error1",
@@ -183,7 +183,7 @@ public class TestCicsQuery {
     }
 
     @Test
-    void testQueryCounterInvalidDuplicateValue(){
+    void testQueryCounterInvalidDuplicateValue() {
         Map<String, Diagnostic> expectedDiagnostics =
                 ImmutableMap.of(
                         "error1",
@@ -273,7 +273,7 @@ public class TestCicsQuery {
     }
 
     @Test
-    void testQuerySecurityInvalidRestypeAndResclass(){
+    void testQuerySecurityInvalidRestypeAndResclass() {
         Map<String, Diagnostic> expectedDiagnostic =
                 ImmutableMap.of(
                         "error1",
