@@ -781,31 +781,6 @@ public final class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
     return visitChildren(ctx);
   }
 
-  protected boolean expectedInAriaA(ParserRuleContext ctx) {
-    // https://www.ibm.com/docs/en/cobol-zos/6.4?topic=format-area
-    //    Certain items must begin in Area A:
-    //    Division headers
-
-    if (ctx instanceof IdentificationDivisionContext) {
-      return true;
-    }
-    if (ctx instanceof EnvironmentDivisionContext) {
-      return true;
-    }
-    if (ctx instanceof DataDivisionContext) {
-      return true;
-    }
-    if (ctx instanceof ProcedureDeclarativeContext) {
-      return true;
-    }
-    //    Section headers
-    //    Paragraph headers or paragraph names
-    //    Level indicators or level-numbers (01 and 77)
-    //    DECLARATIVES and END DECLARATIVES
-    //    End program, end class, and end method markers
-    return false;
-  }
-
   @Override
   public List<Node> visitIfThen(IfThenContext ctx) {
     throwWarning(ctx.getStart());

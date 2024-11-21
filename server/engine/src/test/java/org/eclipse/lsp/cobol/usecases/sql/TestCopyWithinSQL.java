@@ -12,7 +12,7 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package org.eclipse.lsp.cobol.usecases;
+package org.eclipse.lsp.cobol.usecases.sql;
 
 import static org.eclipse.lsp.cobol.common.error.ErrorCodes.MISSING_COPYBOOK;
 

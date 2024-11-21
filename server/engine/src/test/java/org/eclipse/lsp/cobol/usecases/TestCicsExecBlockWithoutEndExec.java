@@ -24,16 +24,7 @@ import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
 /** Tests that a mandatory END-EXEC is required for an exec block */
-public class TestExecBlockWithoutEndExec {
-  public static final String TEXT =
-      "       IDENTIFICATION DIVISION.\n"
-          + "       PROGRAM-ID. TEST1.\n"
-          + "       DATA DIVISION.\n"
-          + "       WORKING-STORAGE SECTION.\n"
-          + "       PROCEDURE DIVISION .\n"
-          + "           EXEC SQL \n"
-          + "               SELECT DIAG_CODE FROM DIAG_CODES WHERE COPAY > 100{|1};";
-
+public class TestCicsExecBlockWithoutEndExec {
   public static final String TEXT2 =
       "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID.    TEST1.\n"
@@ -44,20 +35,6 @@ public class TestExecBlockWithoutEndExec {
           + "       PROCEDURE DIVISION.\n"
           + "           EXEC CICS ASKTIME\n"
           + "                     ABSTIME({$WS-TIME}){|1}{.|2}\n";
-
-  @Test
-  void testEndExecBlockRequiredForExecSQL() {
-    UseCaseEngine.runTest(
-        TEXT,
-        ImmutableList.of(),
-        ImmutableMap.of(
-            "1",
-            new Diagnostic(
-                new Range(),
-                "Missing token END-EXEC for the EXEC block",
-                DiagnosticSeverity.Error,
-                ErrorSource.PARSING.getText())));
-  }
 
   @Test
   void testEndExecBlockRequiredForExecCics() {

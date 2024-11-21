@@ -21,6 +21,10 @@ import org.antlr.v4.runtime.*;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.message.MessageServiceProvider;
 
+import java.util.List;
+
+import static java.util.Optional.ofNullable;
+
 /**
  * Error strategy
  */
@@ -107,5 +111,45 @@ public class Db2ErrorStrategy extends DefaultErrorStrategy implements MessageSer
 
   private String getOffendingToken(InputMismatchException e) {
     return getTokenErrorDisplay(e.getOffendingToken());
+  }
+
+  @Override
+  public Token recoverInline(Parser recognizer) throws RecognitionException {
+    ParserRuleContext context = recognizer.getContext();
+    if (context instanceof Db2SqlParser.ExecRuleContext) {
+      int startIdx = context.start.getTokenIndex();
+      TokenStream input = recognizer.getInputStream();
+      input.seek(startIdx + 1); // SKIP EXEC_SQL
+      Token t = input.LT(1);
+      Db2SqlParser.SqlCodeContext sqlCodeContext = ((Db2SqlParser.ExecRuleContext) context).sqlCode();
+      ofNullable(sqlCodeContext.children).ifPresent(List::clear);
+      while (!isInAriaA(t) && !isSqlStopChar(t)
+              && t.getType() != Db2SqlLexer.DOT_FS
+              && t.getType() != Token.EOF) {
+          input.consume();
+          sqlCodeContext.addChild(recognizer.createTerminalNode(sqlCodeContext, t));
+          sqlCodeContext.stop = t;
+          t = input.LT(1);
+      }
+      // Consume ';'
+      if (isSqlStopChar(t)) {
+        input.consume();
+        sqlCodeContext.addChild(recognizer.createTerminalNode(sqlCodeContext, t));
+        sqlCodeContext.stop = t;
+      }
+      Token missingSymbol = getMissingSymbol(recognizer);
+      recognizer.notifyErrorListeners(missingSymbol, messageService.getMessage(REPORT_MISSING_END_EXEC), null);
+      return missingSymbol;
+    }
+    return super.recoverInline(recognizer);
+  }
+
+  private static boolean isSqlStopChar(Token t) {
+    return t.getType() == Db2SqlLexer.SEMICOLON_FS || t.getType() == Db2SqlLexer.SEMICOLONSEPARATORSQL;
+  }
+
+  private boolean isInAriaA(Token t) {
+    int pos = t.getCharPositionInLine() + 1;
+    return 8 <= pos && pos <= 11;
   }
 }
