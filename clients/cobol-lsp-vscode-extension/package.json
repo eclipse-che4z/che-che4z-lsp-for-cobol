@@ -8,7 +8,7 @@
   "preview": false,
   "publisher": "BroadcomMFD",
   "engines": {
-    "vscode": "^1.71.0"
+    "vscode": "^1.82.0"
   },
   "repository": {
     "type": "git",
@@ -584,7 +584,7 @@
   "scripts": {
     "vscode:prepublish": "npm run -S build -- --minify && npm run -S build:web -- --production -- --minify",
     "postinstall": "node -e \"if (process.env.NODE_ENV === 'production'){process.exit(1)} \" && patch-package || echo skip patching",
-    "build": "esbuild src/extension.ts --bundle --sourcemap --platform=node --target=node20 --outdir=dist --external:vscode --format=cjs",
+    "build": "esbuild src/extension.ts --bundle --sourcemap --platform=node --target=node18 --outdir=dist --external:vscode --format=cjs",
     "build:web": "node build.web.js",
     "build:watch": "npm run build -- --watch",
     "test:integration": "npm run compile && node ./out/test/runTest.js",
@@ -620,7 +620,7 @@
     "@types/minimatch": "5.1.2",
     "@types/mocha": "^10.0.9",
     "@types/node": "^22.9.0",
-    "@types/vscode": "^1.71.0",
+    "@types/vscode": "1.82",
     "@vscode/test-electron": "^2.4.1",
     "@vscode/test-web": "^0.0.63",
     "@vscode/vsce": "3.2.1",
