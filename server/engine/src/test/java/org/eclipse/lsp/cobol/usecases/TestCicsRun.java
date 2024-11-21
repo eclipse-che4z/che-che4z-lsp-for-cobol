@@ -1,3 +1,17 @@
+/*
+ * Copyright (c) 2024 Broadcom.
+ * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
+ *
+ * This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License 2.0
+ * which is available at https://www.eclipse.org/legal/epl-2.0/
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ *
+ * Contributors:
+ *    Broadcom, Inc. - initial API and implementation
+ *
+ */
 package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableMap;
@@ -10,6 +24,13 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Map;
 
+/**
+ * Test CICS RUN command. Documentation link: <a
+ * href="https://www.ibm.com/docs/en/cics-ts/6.x?topic=summary-run">RUN
+ * Command</a>
+ *
+ * <p>This class tests all variations of the RUN command found in the link above.
+ */
 public class TestCicsRun {
     private static final String DEFAULT_ALL_VALID_ONE = "RUN ACQACTIVITY ASYNCHRONOUS INPUTEVENT(12) FACILITYTOKN(123)";
     private static final String DEFAULT_ALL_VALID_TWO = "RUN ACQPROCESS INPUTEVENT(2) SYNCHRONOUS";
