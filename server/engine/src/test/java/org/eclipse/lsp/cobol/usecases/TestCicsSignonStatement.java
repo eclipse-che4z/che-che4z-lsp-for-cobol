@@ -38,7 +38,7 @@ public class TestCicsSignonStatement {
     private static final String SIGNON_VALID_2 = "SIGNON USERID(123)";
 
     private static final String SIGNON_INVALID_1 = "SIGNON {CHANGETIME(123)|errorOne}";
-    private static final String SIGNON_INVALID_2 = "SIGNON ";
+    private static final String SIGNON_INVALID_2 = "SIGNON USERID(123) PASSWORD(123) {PHRASE|errorOne}(123)";
 
     // Test Functions
     @Test
@@ -58,7 +58,7 @@ public class TestCicsSignonStatement {
     @Test
     void testCicsSignonInvalid_2() {
         HashMap<String, Diagnostic> expectedDiagnostics = new HashMap<>();
-        expectedDiagnostics.put("errorOne", new Diagnostic(new Range(), "putErrorMessageHere", DiagnosticSeverity.Error, ErrorSource.PARSING.getText()));
+        expectedDiagnostics.put("errorOne", new Diagnostic(new Range(), "Options \"PASSWORD or PHRASE\" are mutually exclusive.", DiagnosticSeverity.Error, ErrorSource.PARSING.getText()));
         CICSTestUtils.errorTest(SIGNON_INVALID_2, expectedDiagnostics);
     }
 
