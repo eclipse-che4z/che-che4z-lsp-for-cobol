@@ -22,7 +22,7 @@ allCicsRule: cics_send | cics_receive | cics_add | cics_address | cics_allocate 
                        cics_build | cics_cancel | cics_change | cics_check | cics_connect | cics_converttime |
                        cics_define | cics_delay | cics_delete | cics_deleteq | cics_deq | cics_document | cics_dump | cics_endbr |
                        cics_endbrowse | cics_enq | cics_enter | cics_extract | cics_force | cics_formattime | cics_free |
-                       cics_freemain | cics_get | cics_getmain | cics_getmain64 | cics_getnext | cics_handle | cics_ignore | cics_inquire |
+                       cics_freemain | cics_get | cics_get64 | cics_getmain | cics_getmain64 | cics_getnext | cics_handle | cics_ignore | cics_inquire |
                        cics_invoke | cics_issue | cics_link | cics_load | cics_monitor | cics_move | cics_point | cics_pop |
                        cics_post | cics_purge | cics_push | cics_put_container | cics_query | cics_read | cics_readnext_readprev |
                        cics_readq | cics_release | cics_remove | cics_request | cics_reset | cics_resetbr | cics_resume | cics_retrieve |
@@ -402,6 +402,9 @@ cics_get_container_channel: ((CONTAINER | CHANNEL | BYTEOFFSET | INTOCCSID | INT
                     SET cics_ref | NODATA | CONVERTST cics_cvda | cics_handle_response)*;
 cics_get_counter_dcounter: ((COUNTER | DCOUNTER | POOL) cics_name | VALUE cics_data_area | (INCREMENT | COMPAREMIN | COMPAREMAX) cics_data_value |
                   WRAP | NOSUSPEND | REDUCE | cics_handle_response)*;
+
+cics_get64: GET64 (cics_get64_body | cics_handle_response)+;
+cics_get64_body: CONTAINER cics_data_value ((FLENGTH | SET | FLENGTH | NODATA) | (CHANNEL | BYTEOFFSET | FLENGTH | INTOCCSID | INTOCODEPAGE) cics_data_value | (INTO | BYTEOFFSET | CCSID) cics_data_area | CONVERTST cics_cvda | cics_handle_response)+;
 
 /** GETMAIN */
 cics_getmain: GETMAIN cics_getmain_body;
