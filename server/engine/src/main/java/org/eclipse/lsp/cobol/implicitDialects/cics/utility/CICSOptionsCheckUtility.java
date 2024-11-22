@@ -180,6 +180,9 @@ public class CICSOptionsCheckUtility {
       optionsMap.put(
         CICSGetMainOptionsUtility.RULE_INDEX,
         new CICSGetMainOptionsUtility(context, errors));
+    optionsMap.put(
+        CICSGetMain64OptionsUtility.RULE_INDEX,
+        new CICSGetMain64OptionsUtility(context, errors));
   }
 
   /**
