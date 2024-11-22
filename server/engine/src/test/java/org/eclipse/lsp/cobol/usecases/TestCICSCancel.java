@@ -19,6 +19,7 @@ package org.eclipse.lsp.cobol.usecases;
         import org.eclipse.lsp.cobol.usecases.common.CICSTestUtils;
         import org.eclipse.lsp4j.Diagnostic;
         import org.eclipse.lsp4j.DiagnosticSeverity;
+        import org.eclipse.lsp4j.Position;
         import org.eclipse.lsp4j.Range;
         import org.junit.jupiter.api.Test;
 
@@ -54,7 +55,7 @@ public class TestCICSCancel {
     private static final String CANCEL_TRANSID_INVALID =
             "CANCEL {TRANSID | errorTransid} ";
     private static final String CANCEL_ACQACTIVITY_ACQPROCESS_INVALID =
-            "CANCEL ACQACTIVITY {ACQPROCESS | errorAcqactivityAcqProcess} ";
+            "CANCEL {ACQACTIVITY | errorAcqactivityAcqProcess} {ACQPROCESS | errorAcqactivityAcqProcess2} ";
 
     private static final String CANCEL_ACTIVITY_ACQPROCESS_INVALID =
             "CANCEL ACTIVITY({$varOne}) {ACQPROCESS | errorActivityAcqProcess} ";
@@ -119,7 +120,13 @@ public class TestCICSCancel {
                         "errorAcqactivityAcqProcess",
                         new Diagnostic(
                                 new Range(),
-                                "Extraneous input ACQPROCESS",
+                                "Exactly one option required, options are mutually exclusive: ACTIVITY or ACQACTIVITY or ACQPROCESS",
+                                DiagnosticSeverity.Error,
+                                ErrorSource.PARSING.getText()),
+                        "errorAcqactivityAcqProcess2",
+                        new Diagnostic(
+                                new Range(new Position(14, 12), new Position(14, 22)),
+                                "Exactly one option required, options are mutually exclusive: ACTIVITY or ACQACTIVITY or ACQPROCESS",
                                 DiagnosticSeverity.Error,
                                 ErrorSource.PARSING.getText()));
         CICSTestUtils.errorTest(CANCEL_ACQACTIVITY_ACQPROCESS_INVALID, expectedDiagnostics);
