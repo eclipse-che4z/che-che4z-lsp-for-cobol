@@ -174,6 +174,9 @@ public class CICSOptionsCheckUtility {
     optionsMap.put(
         CICSRunOptionsCheckUtility.RULE_INDEX,
         new CICSRunOptionsCheckUtility(context, errors));
+      optionsMap.put(
+        CICSXctlOptionsUtility.RULE_INDEX,
+        new CICSXctlOptionsUtility(context, errors));
   }
 
   /**
