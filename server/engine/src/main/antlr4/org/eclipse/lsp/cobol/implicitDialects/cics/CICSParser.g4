@@ -664,10 +664,9 @@ cics_signal: SIGNAL (EVENT cics_data_value | FROMCHANNEL cics_data_value | FROM 
 cics_signoff: SIGNOFF cics_handle_response?;
 
 /** SIGNON */
-cics_signon: SIGNON (USERID cics_data_value | ESMREASON cics_data_area | ESMRESP cics_data_area | GROUPID cics_data_value |
-             LANGUAGECODE cics_data_value | NATLANG cics_data_value | LANGINUSE cics_data_area | NATLANGINUSE cics_data_area |
-             PASSWORD cics_data_value | NEWPASSWORD cics_data_value | PHRASE cics_data_area | PHRASELEN cics_data_value |
-             NEWPHRASE cics_data_area | NEWPHRASELEN cics_data_value | OIDCARD cics_data_value | cics_handle_response)*;
+cics_signon: SIGNON (cics_signon_body | cics_handle_response)+;
+cics_signon_body: ((USERID | GROUPID | LANGUAGECODE | NATLANG | PASSWORD | NEWPASSWORD | PHRASELEN | NEWPHRASELEN | OIDCARD) cics_data_value |
+                    (CHANGETIME | DAYSLEFT | ESMREASON | ESMRESP | EXPIRYTIME | INVALIDCOUNT | LANGINUSE | LASTUSETIME | NATLANGINUSE | PHRASE | NEWPHRASE) cics_data_area | cics_handle_response)+;
 
 /** SOAPFAULT ADD / CREATE / DELETE */
 cics_soapfault: SOAPFAULT (cics_soapfault_add | cics_soapfault_create | DELETE);
