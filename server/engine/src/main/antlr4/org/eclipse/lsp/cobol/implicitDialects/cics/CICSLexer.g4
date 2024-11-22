@@ -677,6 +677,7 @@ GDS : G D S;
 GENERIC : G E N E R I C;
 GENERICTCPS : G E N E R I C T C P S;
 GET : G E T;
+GET64: G E T '6' '4';
 GETMAIN : G E T M A I N;
 GETMAIN64 : G E T M A I N '6' '4';
 GETNEXT : G E T N E X T;
@@ -1988,7 +1989,6 @@ COMPILERLINE : DOUBLEMORETHANCHAR ~('\n' | '\r')* -> channel(HIDDEN);
 ERRORCHAR : . ;
 
 ZERO_DIGIT: '0';
-
 
 fragment HEXNUMBER :
 	X '"' [0-9A-Fa-f]+ '"'
