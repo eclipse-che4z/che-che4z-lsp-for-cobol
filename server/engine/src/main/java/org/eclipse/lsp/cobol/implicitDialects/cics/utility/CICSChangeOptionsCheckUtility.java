@@ -68,9 +68,10 @@ public class CICSChangeOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     public <E extends ParserRuleContext> void checkOptions(E ctx) {
         if (ctx.getRuleIndex() == RULE_cics_change_phrase) {
             checkChangePhrase((CICSParser.Cics_change_phraseContext) ctx);
-        }
-        if (ctx.getRuleIndex() == RULE_cics_change_password) {
+        } else if (ctx.getRuleIndex() == RULE_cics_change_password) {
             checkChangePassword((CICSParser.Cics_change_passwordContext) ctx);
+        } else if (ctx.getRuleIndex() == RULE_cics_change_task) {
+            checkChangeTask((CICSParser.Cics_change_taskContext) ctx);
         }
         checkDuplicates(ctx);
     }
@@ -80,9 +81,14 @@ public class CICSChangeOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
         checkHasMandatoryOptions(ctx.NEWPHRASELEN(), ctx, "NEWPHRASELEN");
         checkHasMandatoryOptions(ctx.PHRASELEN(), ctx, "PHRASELEN");
         checkHasMandatoryOptions(ctx.USERID(), ctx, "USERID");
+        checkHasMandatoryOptions(ctx.PHRASE(), ctx, "PHRASE");
     }
     private void checkChangePassword(CICSParser.Cics_change_passwordContext ctx) {
         checkHasMandatoryOptions(ctx.NEWPASSWORD(), ctx, "NEWPASSWORD");
         checkHasMandatoryOptions(ctx.USERID(), ctx, "USERID");
+        checkHasMandatoryOptions(ctx.PASSWORD(), ctx, "PASSWORD");
+    }
+    private void checkChangeTask(CICSParser.Cics_change_taskContext ctx) {
+        checkHasMandatoryOptions(ctx.TASK(), ctx, "TASK");
     }
 }
