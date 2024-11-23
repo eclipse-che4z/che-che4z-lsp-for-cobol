@@ -240,6 +240,9 @@ public class CICSOptionsCheckUtility {
     optionsMap.put(
         CICSSpoolreadOptionsCheckUtility.RULE_INDEX,
         new CICSSpoolreadOptionsCheckUtility(context, errors));
+    optionsMap.put(
+        CICSUpdateOptionsCheckUtility.RULE_INDEX,
+        new CICSUpdateOptionsCheckUtility(context, errors));
     spOptionsMap.put(
         CICSInquireSPOptionsCheckUtility.RULE_INDEX,
         new CICSInquireSPOptionsCheckUtility(context, errors));
@@ -247,7 +250,6 @@ public class CICSOptionsCheckUtility {
         CICSDiscardOptionsUtility.RULE_INDEX,
         new CICSDiscardOptionsUtility(context, errors));
   }
-
     /**
      * Entrypoint to check CICS rule options
      *

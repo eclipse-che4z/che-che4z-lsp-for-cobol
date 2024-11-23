@@ -831,10 +831,10 @@ cics_transform_xmltodata: XMLTODATA (CHANNEL cics_data_value | DATCONTAINER cics
 /** UNLOCK */
 cics_unlock: UNLOCK (cics_file_name | TOKEN cics_data_area | SYSID cics_data_area | cics_handle_response)+;
 
-/** UPDATE COUNTER / DCOUNTER */
+/** UPDATE COUNTER / UPDATE DCOUNTER */
 cics_update: UPDATE (cics_update_counter | cics_update_dcounter);
-cics_update_counter: COUNTER cics_name (POOL cics_name | VALUE cics_data_value | COMPAREMIN cics_data_value | COMPAREMAX cics_data_value | cics_handle_response)+;
-cics_update_dcounter: DCOUNTER cics_name (POOL cics_name | VALUE cics_data_area | COMPAREMIN cics_data_area | COMPAREMAX cics_data_area | cics_handle_response)+;
+cics_update_counter: ((COUNTER | POOL) cics_name | (VALUE  | COMPAREMIN  | COMPAREMAX) cics_data_value | NOSUSPEND | cics_handle_response)+;
+cics_update_dcounter: ((DCOUNTER | POOL) cics_name | (VALUE  | COMPAREMIN  | COMPAREMAX) cics_data_area | NOSUSPEND | cics_handle_response)+;
 
 /** VERIFY PASSWORD / VERIFY PHRASE / VERIFY TOKEN */
 cics_verify: VERIFY (cics_verify_password | cics_verify_phrase | cics_verify_token);
