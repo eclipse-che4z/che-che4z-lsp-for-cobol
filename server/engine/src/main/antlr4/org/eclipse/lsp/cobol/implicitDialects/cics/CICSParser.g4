@@ -730,7 +730,8 @@ cics_startbrowse_process: PROCESS (PROCESSTYPE cics_data_value | BROWSETOKEN cic
 cics_suspend: SUSPEND (ACQACTIVITY | ACQPROCESS | ACTIVITY cics_data_value | cics_handle_response)*;
 
 /** SYNCPOINT / SYNCPOINT ROLLBACK */
-cics_syncpoint: SYNCPOINT (cics_handle_response | ROLLBACK)*;
+cics_syncpoint: SYNCPOINT cics_syncpoint_rollback;
+cics_syncpoint_rollback: (ROLLBACK | cics_handle_response)*;
 
 /** TEST EVENT */
 cics_test: TEST (EVENT cics_data_value | FIRESTATUS cics_cvda | cics_handle_response)+;
