@@ -53,12 +53,12 @@ public class TestCICSCancel {
     private static final String CANCEL_REQID_ACTIVITY_INVALID =
             "CANCEL REQID({$varFour}) {ACTIVITY | error} ";
     private static final String CANCEL_TRANSID_INVALID =
-            "CANCEL {TRANSID | errorTransid} ";
+            "CANCEL {TRANSID(100) | errorTransid} ";
     private static final String CANCEL_ACQACTIVITY_ACQPROCESS_INVALID =
             "CANCEL {ACQACTIVITY | errorAcqactivityAcqProcess} {ACQPROCESS | errorAcqactivityAcqProcess2} ";
 
     private static final String CANCEL_ACTIVITY_ACQPROCESS_INVALID =
-            "CANCEL ACTIVITY({$varOne}) {ACQPROCESS | errorActivityAcqProcess} ";
+            "CANCEL {ACTIVITY | errorActivityAcqProcess }(100) {ACQPROCESS | errorActivityAcqProcess2} ";
     @Test
     void testCancelActivityValid() {
 
@@ -108,7 +108,7 @@ public class TestCICSCancel {
                         "errorTransid",
                         new Diagnostic(
                                 new Range(),
-                                "Extraneous input TRANSID",
+                                "Missing required option: REQID",
                                 DiagnosticSeverity.Error,
                                 ErrorSource.PARSING.getText()));
         CICSTestUtils.errorTest(CANCEL_TRANSID_INVALID, expectedDiagnostics);
@@ -138,7 +138,13 @@ public class TestCICSCancel {
                         "errorActivityAcqProcess",
                         new Diagnostic(
                                 new Range(),
-                                "Extraneous input ACQPROCESS",
+                                "Exactly one option required, options are mutually exclusive: ACTIVITY or ACQACTIVITY or ACQPROCESS",
+                                DiagnosticSeverity.Error,
+                                ErrorSource.PARSING.getText()),
+                        "errorActivityAcqProcess2",
+                        new Diagnostic(
+                                new Range(new Position(14, 12), new Position(14, 22)),
+                                "Exactly one option required, options are mutually exclusive: ACTIVITY or ACQACTIVITY or ACQPROCESS",
                                 DiagnosticSeverity.Error,
                                 ErrorSource.PARSING.getText()));
         CICSTestUtils.errorTest(CANCEL_ACTIVITY_ACQPROCESS_INVALID, expectedDiagnostics);
