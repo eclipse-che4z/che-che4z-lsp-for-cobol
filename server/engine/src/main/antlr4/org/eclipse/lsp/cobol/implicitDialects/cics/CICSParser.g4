@@ -388,7 +388,8 @@ cics_formattime_time: (TIME cics_data_area | (TIMESEP (cics_data_area)?))+;
 cics_free: FREE (CONVID cics_name | SESSION cics_name | STATE cics_cvda | cics_handle_response)*;
 
 /** FREEMAIN */
-cics_freemain: FREEMAIN (DATA cics_data_area | DATAPOINTER cics_value | cics_handle_response)+;
+cics_freemain: (FREEMAIN | FREEMAIN64) cics_freemain_opts;
+cics_freemain_opts:(DATA cics_data_area | DATAPOINTER cics_value | cics_handle_response)+;
 
 /** GET CONTAINER (both of them) / GET COUNTER / GET DCOUNTER */
 cics_get: GET (cics_get_container | cics_get_counter | cics_get_dcounter);
