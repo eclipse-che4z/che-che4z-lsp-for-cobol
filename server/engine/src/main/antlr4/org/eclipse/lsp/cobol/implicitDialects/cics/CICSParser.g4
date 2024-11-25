@@ -557,7 +557,8 @@ cics_exci_startbrowse_container: STARTBROWSE CONTAINER CHANNEL cics_data_value B
 cics_load: LOAD (PROGRAM cics_name | SET cics_ref | LENGTH cics_data_area | FLENGTH cics_data_area | ENTRY cics_ref | HOLD | cics_handle_response)*;
 
 /** MONITOR */
-cics_monitor: MONITOR (POINT cics_data_value | DATA1 cics_data_area | DATA2 cics_data_area | ENTRYNAME cics_data_area | cics_handle_response)+;
+cics_monitor: MONITOR cics_monitor_options;
+cics_monitor_options: (POINT cics_data_value | (DATA1 | DATA2 | ENTRYNAME) cics_data_area | cics_handle_response)*;
 
 /** MOVE CONTAINER (both) */
 cics_move: MOVE cics_handle_response? CONTAINER cics_data_value cics_handle_response? AS cics_data_value cics_handle_response? (cics_move_bts | cics_move_channel);
