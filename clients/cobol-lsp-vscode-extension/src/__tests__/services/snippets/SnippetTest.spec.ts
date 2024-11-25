@@ -18,10 +18,12 @@ import { DialectRegistry } from "../../../services/DialectRegistry";
 import path = require("path");
 import { createExtensionContextMock } from "../../../__mocks__/ExtensionContext.utility";
 
-jest.mock("vscode");
-
 describe("Test CompletionProvider", () => {
-  const context = { triggerKind: {}, diagnostics: [], only: undefined };
+  const context = {
+    triggerKind: {},
+    diagnostics: [],
+    only: undefined,
+  } as unknown as vscode.CompletionContext;
   const snippetcompletion = new SnippetCompletionProvider(
     createExtensionContextMock(),
   );
@@ -57,11 +59,8 @@ describe("Test CompletionProvider", () => {
       uri: { fsPath: "ws-path" },
       fileName: SNIPPET_CBL,
       lineAt: jest.fn().mockReturnValue({ text: "" }),
-    } as any;
-    const position = jest.fn().mockImplementation((line, character) => ({
-      line: line,
-      character: character,
-    }));
+    } as unknown as vscode.TextDocument;
+
     const token = {
       isCancellationRequested: false,
       onCancellationRequested: jest.fn(),
@@ -74,9 +73,9 @@ describe("Test CompletionProvider", () => {
       (
         await snippetcompletion.provideCompletionItems(
           doc,
-          position as any,
+          new vscode.Position(0, 0),
           token,
-          context as any,
+          context,
         )
       ).length,
     ).toBe(301);
@@ -86,11 +85,8 @@ describe("Test CompletionProvider", () => {
       uri: { fsPath: "ws-path" },
       fileName: SNIPPET_CBL,
       lineAt: jest.fn().mockReturnValue({ text: "" }),
-    } as any;
-    const position = jest.fn().mockImplementation((line, character) => ({
-      line: line,
-      character: character,
-    }));
+    } as unknown as vscode.TextDocument;
+
     const token = {
       isCancellationRequested: false,
       onCancellationRequested: jest.fn(),
@@ -103,9 +99,9 @@ describe("Test CompletionProvider", () => {
       (
         await snippetcompletion.provideCompletionItems(
           doc,
-          position as any,
+          new vscode.Position(0, 0),
           token,
-          context as any,
+          context,
         )
       ).length,
     ).toBe(232);
@@ -116,11 +112,8 @@ describe("Test CompletionProvider", () => {
       uri: { fsPath: "ws-path" },
       fileName: SNIPPET_CBL,
       lineAt: jest.fn().mockReturnValue({ text: "" }),
-    } as any;
-    const position = jest.fn().mockImplementation((line, character) => ({
-      line: line,
-      character: character,
-    }));
+    } as unknown as vscode.TextDocument;
+
     const token = {
       isCancellationRequested: false,
       onCancellationRequested: jest.fn(),
@@ -133,9 +126,9 @@ describe("Test CompletionProvider", () => {
       (
         await snippetcompletion.provideCompletionItems(
           doc,
-          position as any,
+          new vscode.Position(0, 0),
           token,
-          context as any,
+          context,
         )
       ).length,
     ).toBe(222);
@@ -146,11 +139,8 @@ describe("Test CompletionProvider", () => {
       uri: { fsPath: "ws-path" },
       fileName: SNIPPET_CBL,
       lineAt: jest.fn().mockReturnValue({ text: "" }),
-    } as any;
-    const position = jest.fn().mockImplementation((line, character) => ({
-      line: line,
-      character: character,
-    }));
+    } as unknown as vscode.TextDocument;
+
     const token = {
       isCancellationRequested: false,
       onCancellationRequested: jest.fn(),
@@ -163,9 +153,9 @@ describe("Test CompletionProvider", () => {
       (
         await snippetcompletion.provideCompletionItems(
           doc,
-          position as any,
+          new vscode.Position(0, 0),
           token,
-          context as any,
+          context,
         )
       ).length,
     ).toBe(311);
@@ -176,10 +166,8 @@ describe("Test CompletionProvider", () => {
       uri: { fsPath: "ws-path" },
       fileName: SNIPPET_CBL,
       lineAt: jest.fn().mockReturnValue({ text: "COPY" }),
-    } as any;
-    const position = jest
-      .fn()
-      .mockImplementation(() => ({ line: 0, character: 4 }));
+    } as unknown as vscode.TextDocument;
+
     const token = {
       isCancellationRequested: false,
       onCancellationRequested: jest.fn(),
@@ -192,9 +180,9 @@ describe("Test CompletionProvider", () => {
       (
         await snippetcompletion.provideCompletionItems(
           doc,
-          position as any,
+          new vscode.Position(0, 4),
           token,
-          context as any,
+          context,
         )
       ).length,
     ).toBe(1);
@@ -205,10 +193,7 @@ describe("Test CompletionProvider", () => {
       uri: { fsPath: "ws-path" },
       fileName: SNIPPET_CBL,
       lineAt: jest.fn().mockReturnValue({ text: "COPY" }),
-    } as any;
-    const position = jest
-      .fn()
-      .mockImplementation(() => ({ line: 0, character: 4 }));
+    } as unknown as vscode.TextDocument;
     const token = {
       isCancellationRequested: false,
       onCancellationRequested: jest.fn(),
@@ -219,9 +204,9 @@ describe("Test CompletionProvider", () => {
     });
     const completions = await snippetcompletion.provideCompletionItems(
       doc,
-      position as any,
+      new vscode.Position(0, 4),
       token,
-      context as any,
+      context,
     );
     expect(completions.length).toBe(7);
   });
@@ -231,10 +216,8 @@ describe("Test CompletionProvider", () => {
       uri: { fsPath: "ws-path" },
       fileName: "SNIPPET.cbl",
       lineAt: jest.fn().mockReturnValue({ text: "WRITE" }),
-    } as any;
-    const position = jest.fn().mockImplementation(() => {
-      return { line: 0, character: 4 };
-    });
+    } as unknown as vscode.TextDocument;
+
     const token = {
       isCancellationRequested: false,
       onCancellationRequested: jest.fn(),
@@ -247,9 +230,9 @@ describe("Test CompletionProvider", () => {
       (
         await snippetcompletion.provideCompletionItems(
           doc,
-          position as any,
+          new vscode.Position(0, 5),
           token,
-          context as any,
+          context,
         )
       ).length,
     ).toBe(1);
@@ -260,10 +243,7 @@ describe("Test CompletionProvider", () => {
       uri: { fsPath: "ws-path" },
       fileName: SNIPPET_CBL,
       lineAt: jest.fn().mockReturnValue({ text: "WRITE" }),
-    } as any;
-    const position = jest
-      .fn()
-      .mockImplementation(() => ({ line: 0, character: 4 }));
+    } as unknown as vscode.TextDocument;
     const token = {
       isCancellationRequested: false,
       onCancellationRequested: jest.fn(),
@@ -274,9 +254,9 @@ describe("Test CompletionProvider", () => {
     });
     const completions = await snippetcompletion.provideCompletionItems(
       doc,
-      position as any,
+      new vscode.Position(0, 5),
       token,
-      context as any,
+      context,
     );
     expect(completions.length).toBe(10);
   });

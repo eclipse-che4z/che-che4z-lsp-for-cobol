@@ -76,6 +76,9 @@ public class CICSOptionsCheckUtility {
         CICSCheckOptionsUtility.RULE_INDEX,
         new CICSCheckOptionsUtility(context, errors));
     optionsMap.put(
+        CICSWebOptionsCheckUtility.RULE_INDEX,
+        new CICSWebOptionsCheckUtility(context, errors));
+    optionsMap.put(
         CICSEndBrowseOptionsUtility.RULE_ENDBR_INDEX,
         new CICSEndBrowseOptionsUtility(context, errors));
     optionsMap.put(
