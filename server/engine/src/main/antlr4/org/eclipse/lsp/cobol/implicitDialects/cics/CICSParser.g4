@@ -410,7 +410,8 @@ pf_option: PF1 | PF2 | PF3 | PF4 | PF5 | PF6 | PF7 | PF8 | PF9 | PF10 | PF11 | P
            PF18 | PF19 | PF20 | PF21 | PF22 | PF23 | PF24;
 
 /** IGNORE CONDITION */
-cics_ignore: IGNORE CONDITION (cics_conditions | cicsWord | cics_handle_response)+;
+cics_ignore: IGNORE cics_ignore_options;
+cics_ignore_options :  (CONDITION | cics_conditions | cics_handle_response)+;
 
 /** INQUIRE, Application Commands ACTIVITYID / CONTAINER / EVENT / PROCESS / TIMER */
 cics_inquire: INQUIRE (cics_inquire_process | cics_inquire_activityid | cics_inquire_container | cics_inquire_event | cics_inquire_timer);
