@@ -54,9 +54,9 @@ public class AntlrRangeUtils {
         int position = token.getCharPositionInLine();
 
         Position start = new Position(line, position);
-        boolean eof = token.getStopIndex() < token.getStartIndex();
-        Position end = eof
-                ? new Position(line, position)
+        boolean zeroSize = token.getStopIndex() == -1 || token.getStopIndex() < token.getStartIndex();
+        Position end = zeroSize
+                ? start
                 : new Position(line, position + token.getStopIndex() - token.getStartIndex() + 1);
         return new Range(start, end);
     }

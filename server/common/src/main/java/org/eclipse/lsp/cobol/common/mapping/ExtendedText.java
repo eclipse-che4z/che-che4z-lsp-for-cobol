@@ -263,12 +263,12 @@ public class ExtendedText {
       lines.get(start.getLine()).fillArea(start.getCharacter(), end.getCharacter(), c);
     } else {
       ExtendedTextLine line = lines.get(start.getLine());
-      line.clear(start.getCharacter(), line.size());
+      line.fillArea(start.getCharacter(), line.size() + 1, c);
 
       if (start.getLine() + 1 <= end.getLine() - 1) {
         lines.subList(start.getLine() + 1, end.getLine()).forEach((l) -> l.fillLine(c));
       }
-      lines.get(end.getLine()).clear(0, end.getCharacter());
+      lines.get(end.getLine()).fillArea(0, end.getCharacter(), c);
     }
   }
 

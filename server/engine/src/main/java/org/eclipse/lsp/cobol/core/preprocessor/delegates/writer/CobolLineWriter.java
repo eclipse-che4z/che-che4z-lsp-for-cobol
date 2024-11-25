@@ -59,7 +59,7 @@ public abstract class CobolLineWriter {
       if (!isContinuationLine) {
         if (start != null) {
           Position stop =
-                  new Position(line.getNumber() - 1, sb.length() - sb.lastIndexOf("\n"));
+                  new Position(line.getNumber() - 1, sb.length() - sb.lastIndexOf("\n") - 1);
           Range range = new Range(start, stop);
           acc.put(range, clSb);
           clSb = null;

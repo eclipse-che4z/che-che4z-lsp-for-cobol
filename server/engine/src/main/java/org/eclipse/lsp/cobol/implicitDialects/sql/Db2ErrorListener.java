@@ -86,11 +86,13 @@ public class Db2ErrorListener extends BaseErrorListener {
   }
 
   private int getOffendingSymbolSize(Object offendingSymbol) {
-    return Optional.ofNullable(offendingSymbol)
-        .filter(t -> t instanceof CommonToken)
-        .map(CommonToken.class::cast)
-        .map(token -> token.getStopIndex() - token.getStartIndex() + 1)
-        .orElse(0);
+      if (offendingSymbol instanceof CommonToken) {
+          CommonToken token = (CommonToken) offendingSymbol;
+          return  token.getStartIndex() != -1
+                  ? token.getStopIndex() - token.getStartIndex() + 1
+                  : 0;
+      }
+      return 0;
   }
 
   private int getOffendingSymbolSize(String offendingSymbol) {
