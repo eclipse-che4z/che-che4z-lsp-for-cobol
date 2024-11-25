@@ -145,8 +145,11 @@ public class CICSOptionsCheckUtility {
         CICSWSAEPRUtility.RULE_INDEX,
         new CICSWSAEPRUtility(context, errors));
     optionsMap.put(
-            CICSWaitCicsOptionsUtility.RULE_INDEX,
-            new CICSWaitCicsOptionsUtility(context, errors));
+        CICSWaitCicsOptionsUtility.RULE_INDEX,
+        new CICSWaitCicsOptionsUtility(context, errors));
+    optionsMap.put(
+        CICSTestOptionsUtility.RULE_INDEX,
+        new CICSTestOptionsUtility(context, errors));
   }
 
   /**
