@@ -892,7 +892,7 @@ cics_wsacontext_grelatesuri: RELATESURI cics_data_area (RELATESTYPE cics_data_ar
 cics_wsacontext_geprtype: EPRTYPE cics_cvda (EPRFIELD cics_cvda | EPRINTO cics_data_area | EPRSET cics_ref | EPRLENGTH cics_data_area | cics_handle_response)+;
 
 /** WSAEPR CREATE */
-cics_wsaepr: WSAEPR CREATE (EPRINTO cics_data_area | EPRSET cics_data_area | EPRLENGTH cics_data_area | ADDRESS cics_data_value |
+cics_wsaepr: WSAEPR (CREATE | EPRINTO cics_data_area | EPRSET cics_data_area | EPRLENGTH cics_data_area | ADDRESS cics_data_value |
              REFPARMS cics_data_value | REFPARMSLEN cics_data_value | METADATA cics_data_value | METADATALEN cics_data_value |
              FROMCCSID cics_data_value | FROMCODEPAGE cics_data_value | cics_handle_response)+;
 
