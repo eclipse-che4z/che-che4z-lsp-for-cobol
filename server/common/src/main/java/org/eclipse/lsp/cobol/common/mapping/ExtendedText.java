@@ -263,7 +263,7 @@ public class ExtendedText {
       lines.get(start.getLine()).fillArea(start.getCharacter(), end.getCharacter(), c);
     } else {
       ExtendedTextLine line = lines.get(start.getLine());
-      line.fillArea(start.getCharacter(), line.size() + 1, c);
+      line.fillArea(start.getCharacter(), line.size(), c);
 
       if (start.getLine() + 1 <= end.getLine() - 1) {
         lines.subList(start.getLine() + 1, end.getLine()).forEach((l) -> l.fillLine(c));
