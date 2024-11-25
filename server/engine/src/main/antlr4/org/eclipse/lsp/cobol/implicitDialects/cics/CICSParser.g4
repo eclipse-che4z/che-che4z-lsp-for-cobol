@@ -571,8 +571,10 @@ cics_point: POINT (CONVID cics_name | SESSION cics_name | cics_handle_response)?
 cics_pop: POP cics_handle_response? HANDLE cics_handle_response?;
 
 /** POST */
-cics_post: POST (INTERVAL cics_zero_digit | INTERVAL cics_hhmmss | TIME cics_hhmmss | cics_post_after | SET cics_ref
-           REQID cics_name | cics_handle_response)*;
+cics_post: POST cics_post_options;
+cics_post_options: (INTERVAL (cics_zero_digit | cics_hhmmss) | TIME cics_hhmmss | AFTER | (HOURS | MINUTES | SECONDS) cics_data_value |
+                 AT | (HOURS | MINUTES | SECONDS) cics_data_value | SET cics_ref | REQID cics_name | cics_handle_response)*;
+
 cics_post_after: (AFTER | AT | HOURS cics_data_value | MINUTES cics_data_value | SECONDS cics_data_value | cics_handle_response)+;
 
 /** PURGE MESSAGE */
