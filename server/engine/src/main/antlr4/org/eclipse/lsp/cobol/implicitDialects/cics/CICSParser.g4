@@ -565,7 +565,8 @@ cics_move_bts: (FROMPROCESS | FROMACTIVITY cics_data_value | TOPROCESS | TOACTIV
 cics_move_channel: (CHANNEL cics_data_value | TOCHANNEL cics_data_value | cics_handle_response)+;
 
 /** POINT */
-cics_point: POINT (CONVID cics_name | SESSION cics_name | cics_handle_response)?;
+cics_point: POINT cics_point_options;
+cics_point_options: ((CONVID | SESSION) cics_name | cics_handle_response)*;
 
 /** POP HANDLE */
 cics_pop: POP cics_handle_response? HANDLE cics_handle_response?;

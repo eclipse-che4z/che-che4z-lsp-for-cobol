@@ -93,7 +93,9 @@ public class CICSOptionsCheckUtility {
     optionsMap.put(
         CICSReadNextReadPrevOptionsUtility.RULE_INDEX,
         new CICSReadNextReadPrevOptionsUtility(context, errors));
-  }
+    optionsMap.put(
+        CICSPointOptionsCheckUtility.RULE_INDEX,
+        new CICSPointOptionsCheckUtility(context, errors)); }
 
   /**
    * Entrypoint to check CICS rule options
