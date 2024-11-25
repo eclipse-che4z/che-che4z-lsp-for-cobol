@@ -679,7 +679,7 @@ cics_purge: PURGE cics_handle_response? MESSAGE cics_handle_response?;
 cics_push: PUSH cics_handle_response? HANDLE cics_handle_response?;
 
 /** PUT CONTAINER (both of them): */
-cics_put_container: PUT CONTAINER cics_data_value (cics_put_container_bts | cics_put_container_channel);
+cics_put_container: ((PUT CONTAINER cics_data_value cics_put_container_bts) | (PUT|PUT64) CONTAINER cics_data_value cics_put_container_channel);
 cics_put_container_bts: ((ACQACTIVITY | PROCESS | ACQPROCESS) | (ACTIVITY | FLENGTH) cics_data_value | (FROM) cics_data_area | cics_handle_response)+;
 cics_put_container_channel: ((BIT | CHAR | APPEND | PREPEND) | (CHANNEL | FLENGTH | FROMCCSID | FROMCODEPAGE) cics_data_value | FROM cics_data_area | DATATYPE cics_cvda | cics_handle_response)+;
 
