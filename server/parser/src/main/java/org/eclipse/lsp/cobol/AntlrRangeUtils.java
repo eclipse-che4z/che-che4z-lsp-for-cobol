@@ -30,16 +30,16 @@ public class AntlrRangeUtils {
      */
     public static Range constructRange(ParserRuleContext ctx) {
       Token start = ctx.start;
-      Token end = ctx.stop == null ? start : ctx.stop;
+      Token stop = ctx.stop == null ? start : ctx.stop;
 
-      if (start.getLine() > end.getLine()) {
-        end = start;
+      if (start.getLine() > stop.getLine()) {
+        stop = start;
       }
 
       return new Range(
               new Position(start.getLine() - 1, start.getCharPositionInLine()),
-              new Position(end.getLine() - 1,
-                      end.getCharPositionInLine() + end.getStopIndex() - end.getStartIndex() + 1)
+              new Position(stop.getLine() - 1,
+                      stop.getCharPositionInLine() + stop.getStopIndex() - stop.getStartIndex() + 1)
       );
     }
 
