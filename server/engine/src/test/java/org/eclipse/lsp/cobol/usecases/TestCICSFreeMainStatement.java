@@ -26,8 +26,8 @@ package org.eclipse.lsp.cobol.usecases;
 
 /**
  * Test CICS Freemain & Freemain64 commands. Documentation link:
- *<a ">BIF Freemain Command</a>
- *<a ">BIF Freemain64 Command</a>
+ *<a https://www.ibm.com/docs/en/cics-ts/6.x?topic=summary-freemain"> Freemain Command</a>
+ *<a https://www.ibm.com/docs/en/cics-ts/6.x?topic=summary-freemain64"> Freemain64 Command</a>
  * <p>This class tests all variations of the Freemain commands found in the links above.
  */
 public class TestCICSFreeMainStatement {
