@@ -222,13 +222,15 @@ public class CICSOptionsCheckUtility {
     optionsMap.put(
         CICSPopHandleOptionsCheckUtility.RULE_INDEX,
         new CICSPopHandleOptionsCheckUtility(context, errors));
+    optionsMap.put(
+        CICSReleaseOptionsCheckUtility.RULE_INDEX,
+        new CICSReleaseOptionsCheckUtility(context, errors));
     spOptionsMap.put(
         CICSInquireSPOptionsCheckUtility.RULE_INDEX,
         new CICSInquireSPOptionsCheckUtility(context, errors));
     spOptionsMap.put(
         CICSDiscardOptionsUtility.RULE_INDEX,
         new CICSDiscardOptionsUtility(context, errors));
-
   }
 
     /**
