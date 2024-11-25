@@ -372,7 +372,7 @@ jobs:
           name: lib
           path: clients/cobol-dialect-api
       - name: update version with PR or build number
-        if: github.event.inputs.include_build_number == 'true'
+        if: github.event_name == 'pull_request' || github.event.inputs.include_build_number == 'true'
         working-directory: clients/cobol-lsp-vscode-extension
         env:
           BUILD_ID: ${{github.event_name == 'pull_request' && format('pr-{0}', github.event.pull_request.number) || github.run_number }}
