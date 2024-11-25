@@ -64,15 +64,17 @@ public class CICSCheckOptionsUtility extends CICSOptionsCheckBaseUtility {
     public <E extends ParserRuleContext> void checkOptions(E ctx) {
         if (ctx.getRuleIndex() == RULE_cics_check_activity)
             checkActivity((CICSParser.Cics_check_activityContext) ctx);
-        if (ctx.getRuleIndex() == RULE_cics_check_timer)
+        else if (ctx.getRuleIndex() == RULE_cics_check_timer)
             checkTimer((CICSParser.Cics_check_timerContext) ctx);
 
         checkDuplicates(ctx);
     }
     private void checkActivity(CICSParser.Cics_check_activityContext ctx) {
+        checkHasExactlyOneOption("ACTIVITY or ACQACTIVITY or ACQPROCESS", ctx,  ctx.ACTIVITY(), ctx.ACQACTIVITY(), ctx.ACQPROCESS());
         checkHasMandatoryOptions(ctx.COMPSTATUS(), ctx, "COMPSTATUS");
     }
     private void checkTimer(CICSParser.Cics_check_timerContext ctx) {
         checkHasMandatoryOptions(ctx.STATUS(), ctx, "STATUS");
+        checkHasMandatoryOptions(ctx.TIMER(), ctx, "TIMER");
     }
 }

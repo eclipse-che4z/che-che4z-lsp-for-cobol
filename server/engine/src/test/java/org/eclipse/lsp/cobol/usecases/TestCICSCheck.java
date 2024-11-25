@@ -43,7 +43,7 @@ public class TestCICSCheck {
     private static final String CHECK_TIMER_VALID =
             "CHECK TIMER({$varFour}) STATUS({$varOne}) ";
     private static final String CHECK_ACTIVITY_ACQPROCESS_INVALID =
-            "CHECK ACTIVITY({$varOne}) COMPSTATUS({$varOne}) {ACQPROCESS | errorAcqprocess} ";
+            "CHECK COMPSTATUS({$varOne}) {ACTIVITY(100) ACQPROCESS | errorAcqprocess | errorAcqprocess2} ";
     private static final String CHECK_ACTIVITY_INVALID_COMPSTATUS =
             "CHECK ACTIVITY ({$varOne}) {SUSPSTATUS(100) | errorMissingCompstatus }";
     @Test
@@ -65,8 +65,14 @@ public class TestCICSCheck {
                 ImmutableMap.of(
                         "errorAcqprocess",
                         new Diagnostic(
-                                new Range(),
-                                "Extraneous input ACQPROCESS",
+                                new Range(new Position(14, 12), new Position(14, 20)),
+                                "Exactly one option required, options are mutually exclusive: ACTIVITY or ACQACTIVITY or ACQPROCESS",
+                                DiagnosticSeverity.Error,
+                                ErrorSource.PARSING.getText()),
+                        "errorAcqprocess2",
+                        new Diagnostic(
+                                new Range(new Position(14, 25), new Position(14, 35)),
+                                "Exactly one option required, options are mutually exclusive: ACTIVITY or ACQACTIVITY or ACQPROCESS",
                                 DiagnosticSeverity.Error,
                                 ErrorSource.PARSING.getText()));
         CICSTestUtils.errorTest(CHECK_ACTIVITY_ACQPROCESS_INVALID, expectedDiagnostics);
