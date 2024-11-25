@@ -36,6 +36,7 @@ import {
 import { CopybookName } from "../CopybookDownloadService";
 import { Utils } from "../../util/Utils";
 import { searchCopybookInExtensionFolder } from "../../util/FSUtils";
+import { getErrorMessage } from "../../util/ErrorsUtils";
 
 const defaultConfigs: ExternalConfigurationOptions = {
   compiler: "IGYCRCTL",
@@ -62,20 +63,19 @@ export class CopybookDownloaderForE4E {
     const profile = await this.e4e.getProfileInfo(uri);
     if (profile instanceof Error) throw profile;
 
-    const result: E4EExternalConfigurationResponse | Error =
+    const promise: E4EExternalConfigurationResponse | Error =
       await this.e4e.getConfiguration(uri, defaultConfigs);
-    if (result instanceof Error) throw result;
+    if (promise instanceof Error) throw promise;
 
-    const candidate = result.pgroups.find(
-      (x) => x.name === result.pgms[0].pgroup,
+    const candidate = promise.pgroups.find(
+      (x) => x.name === promise.pgms[0].pgroup,
     );
     if (!candidate) throw Error("Invalid configuration");
 
-    const libs = candidate.libs as (EndevorElement | EndevorMember)[];
     const elements: { [key: string]: EndevorElement | EndevorMember } = {};
     const promises: Promise<EndevorMember[] | EndevorElement[] | Error>[] = [];
 
-    for (const lib of libs) {
+    for (const lib of candidate.libs) {
       if (DATASET in lib) {
         promises.push(this.getMembers(profile, lib.dataset));
       }
@@ -83,7 +83,8 @@ export class CopybookDownloaderForE4E {
         promises.push(this.getElements(profile, lib));
       }
     }
-    for await (const promise of promises) {
+
+    for (const promise of await Promise.all(promises)) {
       if (promise instanceof Error) {
         this.outputChannel?.appendLine(promise.message);
       } else {
@@ -120,7 +121,7 @@ export class CopybookDownloaderForE4E {
     return response;
   }
 
-  private writeLocationLogs(entries: any[]) {
+  private writeLocationLogs(entries: unknown[]) {
     const ch = this.outputChannel;
     if (!ch) return;
     entries.forEach((libEntry) => {
@@ -169,7 +170,7 @@ export class CopybookDownloaderForE4E {
 
     if (!first) {
       this.outputChannel?.appendLine(
-        `Failed to find ${copybookName} in Endevor`,
+        `Failed to find ${copybookName.name} in Endevor`,
       );
     } else if (DATASET in first)
       return await this.downloadDatasetE4E(response, first);
@@ -205,8 +206,8 @@ export class CopybookDownloaderForE4E {
         await fs.promises.writeFile(filePath, resultElement[0]);
         return true;
       }
-    } catch (err: any) {
-      vscode.window.showErrorMessage(err.message);
+    } catch (err) {
+      vscode.window.showErrorMessage(getErrorMessage(err));
     }
     return false;
   }
@@ -235,8 +236,8 @@ export class CopybookDownloaderForE4E {
         await fs.promises.writeFile(filePath, memberContent);
         return true;
       }
-    } catch (err: any) {
-      vscode.window.showErrorMessage(err.message);
+    } catch (err) {
+      vscode.window.showErrorMessage(getErrorMessage(err));
     }
     return false;
   }
@@ -273,7 +274,7 @@ export class CopybookDownloaderForE4E {
   ) {
     const config = await this.getE4EConfig(documentUri);
     if (!config) {
-      throw Error;
+      throw new Error();
     }
     const first = config.elements[copybookName];
     if (!first) return;

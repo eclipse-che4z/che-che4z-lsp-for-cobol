@@ -31,7 +31,6 @@ import org.eclipse.lsp.cobol.core.preprocessor.delegates.GrammarPreprocessor;
 import org.eclipse.lsp.cobol.dialects.hp.HpTrueCobolDialect;
 import org.eclipse.lsp.cobol.dialects.ibm.*;
 import org.eclipse.lsp.cobol.common.dialects.CobolLanguageId;
-import org.eclipse.lsp.cobol.dialects.ibm.experimental.EnterpriseCobol64;
 import org.eclipse.lsp.cobol.service.settings.CachingConfigurationService;
 import org.eclipse.lsp.cobol.service.settings.layout.CodeLayoutStore;
 
@@ -61,10 +60,6 @@ public class TrueDialectServiceImpl implements TrueDialectService<AnalysisContex
                             CopybookService copybookService) {
     dialects = new HashMap<>();
     dialects.put(CobolLanguageId.COBOL, new IbmTrueCobolDialect(grammarPreprocessor,
-        messageService, treeListener, subroutineService, cachingConfigurationService, dialectService,
-        astProcessor, symbolsRepository, codeLayoutStore));
-
-    dialects.put(CobolLanguageId.EXPERIMENTAL_COBOL, new EnterpriseCobol64(grammarPreprocessor,
         messageService, treeListener, subroutineService, cachingConfigurationService, dialectService,
         astProcessor, symbolsRepository, codeLayoutStore));
 

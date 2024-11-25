@@ -13,8 +13,10 @@
  */
 
 import { Uri } from "vscode";
+import * as vscode from "vscode";
+import { SETTINGS_DIALECT } from "../constants";
 
-export const DIALECT_REGISTRY_SECTION: string = "cobol-lsp.dialect.registry";
+export const DIALECT_REGISTRY_SECTION = "cobol-lsp.dialect.registry";
 
 /**
  * Holds information about registered dialect
@@ -39,6 +41,20 @@ export class DialectRegistry {
    */
   public static getDialects(): DialectInfo[] {
     return Array.from(dialectInfoes.values());
+  }
+
+  /**
+   * List of dialect infoes filtered to only dialects enabled in VSCode settings
+   */
+  public static getActiveDialects(): DialectInfo[] {
+    const activeDialectsNames: string[] | undefined = vscode.workspace
+      .getConfiguration()
+      .get(SETTINGS_DIALECT);
+    const registeredDialects = DialectRegistry.getDialects();
+    const activeDialects = registeredDialects.filter((dialect) =>
+      activeDialectsNames?.includes(dialect.name),
+    );
+    return activeDialects;
   }
 
   /**

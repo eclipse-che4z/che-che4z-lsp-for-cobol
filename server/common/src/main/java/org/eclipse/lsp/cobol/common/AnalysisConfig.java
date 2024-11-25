@@ -33,6 +33,7 @@ public class AnalysisConfig {
   CopybookProcessingMode copybookProcessingMode;
   List<String> dialects;
   boolean isCicsTranslatorEnabled;
+  boolean collectAstChanges;
   List<DialectRegistryItem> dialectRegistry;
   Map<String, JsonElement> dialectsSettings;
   List<String> compilerOptions = new ArrayList<>();
@@ -47,9 +48,19 @@ public class AnalysisConfig {
   public static AnalysisConfig defaultConfig(CopybookProcessingMode mode) {
     return new AnalysisConfig(
             mode,
-        ImmutableList.of(),
-        true,
-        ImmutableList.of(),
-        ImmutableMap.of("target-sql-backend", new Gson().toJsonTree(SQLBackend.DB2_SERVER)));
+            ImmutableList.of(),
+            true,
+            false,
+            ImmutableList.of(),
+            ImmutableMap.of("target-sql-backend", new Gson().toJsonTree(SQLBackend.DB2_SERVER)));
+  }
+  public static AnalysisConfig defaultConfig(CopybookProcessingMode mode, boolean collectAstChanges) {
+    return new AnalysisConfig(
+            mode,
+            ImmutableList.of(),
+            true,
+            collectAstChanges,
+            ImmutableList.of(),
+            ImmutableMap.of("target-sql-backend", new Gson().toJsonTree(SQLBackend.DB2_SERVER)));
   }
 }

@@ -48,7 +48,6 @@ public abstract class CICSOptionsCheckBaseUtility {
           put(CICSLexer.LEAVEKB, ErrorSeverity.WARNING);
           put(CICSLexer.NOTRUNCATE, ErrorSeverity.WARNING);
           put(CICSLexer.NOQUEUE, ErrorSeverity.WARNING);
-          put(CICSLexer.NOTRUNCATE, ErrorSeverity.WARNING);
           // handle response options
           put(CICSLexer.RESP, ErrorSeverity.ERROR);
           put(CICSLexer.RESP2, ErrorSeverity.ERROR);
@@ -57,6 +56,12 @@ public abstract class CICSOptionsCheckBaseUtility {
         }
       };
 
+  private final Map<Integer, String> baseDuplicateRulesOptions = new HashMap<Integer, String>() {
+    {
+      put(CICSParser.RULE_cics_into, "INTO or SET");
+    }
+  };
+
   public CICSOptionsCheckBaseUtility(
       DialectProcessingContext context,
       List<SyntaxError> errors,
@@ -64,6 +69,17 @@ public abstract class CICSOptionsCheckBaseUtility {
     this.context = context;
     this.errors = errors;
     this.baseDuplicateOptions.putAll(duplicateOptions);
+  }
+
+  public CICSOptionsCheckBaseUtility(
+      DialectProcessingContext context,
+      List<SyntaxError> errors,
+      Map<Integer, ErrorSeverity> duplicateOptions,
+      Map<Integer, String> duplicateRulesOptions) {
+    this.context = context;
+    this.errors = errors;
+    this.baseDuplicateOptions.putAll(duplicateOptions);
+    this.baseDuplicateRulesOptions.putAll(duplicateRulesOptions);
   }
 
   /**
@@ -96,18 +112,108 @@ public abstract class CICSOptionsCheckBaseUtility {
   }
 
   /**
+   *
+   * @param requiredContext - The rule that is required
+   * @param optionalContext - The rule that is optional
+   * @param ctx - The overall context.
+   * @param options - String of the element that is required.
+   */
+  protected <E extends ParseTree> void checkPrerequisiteIsMet(List<E> requiredContext, List<E> optionalContext, ParserRuleContext ctx, String options) {
+    checkPrerequisiteIsMet(isNodePresent(requiredContext), isNodePresent(optionalContext), ctx, options);
+  }
+
+  protected <E extends ParseTree> void checkPrerequisiteIsMet(E requiredContext, List<E> optionalContext, ParserRuleContext ctx, String options) {
+    checkPrerequisiteIsMet(isNodePresent(requiredContext), isNodePresent(optionalContext), ctx, options);
+  }
+
+  protected <E extends ParseTree> void checkPrerequisiteIsMet(List<E> requiredContext, E optionalContext, ParserRuleContext ctx, String options) {
+    checkPrerequisiteIsMet(isNodePresent(requiredContext), isNodePresent(optionalContext), ctx, options);
+  }
+
+  protected <E extends ParseTree> void checkPrerequisiteIsMet(E requiredContext, E optionalContext, ParserRuleContext ctx, String options) {
+    checkPrerequisiteIsMet(isNodePresent(requiredContext), isNodePresent(optionalContext), ctx, options);
+  }
+
+  private <E extends ParseTree> Boolean isNodePresent(E node) {
+    return node != null;
+  }
+
+  private <E extends ParseTree> boolean isNodePresent(List<E> node) {
+    if (node == null || node.isEmpty()) {
+      return false;
+    }
+
+    for (E e : node) {
+      if (e != null) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private void checkPrerequisiteIsMet(Boolean isRequiredContextPresent, Boolean isOptionalContextPresent, ParserRuleContext ctx, String options) {
+      if (!isRequiredContextPresent && isOptionalContextPresent) {
+        throwException(
+                ErrorSeverity.ERROR,
+                VisitorUtility.constructLocality(ctx, context),
+                "Missing required option for: ",
+                options);
+      }
+  }
+
+  /**
    * Helper method to collect analysis errors if the rule context contains illegal options
    *
    * @param rules Generic list of rules to check. Will either be a collection of ParserRuleContext
    *     or TerminalNode
    * @param options Options checked to insert into error message
    */
-  protected void checkHasIllegalOptions(List<?> rules, String options) {
+  protected <E extends ParseTree> void checkHasIllegalOptions(List<E> rules, String options) {
     if (!rules.isEmpty()) {
       rules.forEach(
-          error ->
-              throwException(
-                  ErrorSeverity.ERROR, getLocality(error), "Invalid option provided: ", options));
+              error ->
+                      throwException(
+                              ErrorSeverity.ERROR, getLocality(error), "Invalid option provided: ", options));
+    }
+  }
+
+  /**
+   * Helper function to check and see if more than one rule was visited out of a set provided.
+   *
+   * @param options Options checked to insert into error message
+   * @param rules Generic list of rules to check. Will be a collection of ParserRuleContext and/or TerminalNode objects.
+   * @param <E> Generic type to allow cross-rule context collection.
+   */
+  @SafeVarargs
+  protected final <E> void checkMutuallyExclusiveOptions(String options, E... rules) {
+    if (rules.length <= 1) {
+      return;
+    }
+
+    int rulesSeen = 0;
+    boolean isRuleList = false;
+
+    for (E rule : rules) {
+      isRuleList = false;
+      if (rule == null) {
+          continue;
+      }
+
+      if (ParserRuleContext.class.isAssignableFrom(rule.getClass()) || TerminalNode.class.isAssignableFrom(rule.getClass())) {
+        rulesSeen++;
+      } else if (List.class.isAssignableFrom(rule.getClass())) {
+        if (((List<?>) rule).isEmpty()) {
+          continue;
+        }
+
+        rulesSeen++;
+        isRuleList = true;
+      }
+
+      if (rulesSeen > 1) {
+        throwException(ErrorSeverity.ERROR, getLocality(isRuleList ? ((List<?>) rule).get(0) : rule), "Options \"" + options + "\" are mutually exclusive.", "");
+        break;
+      }
     }
   }
 
@@ -191,6 +297,17 @@ public abstract class CICSOptionsCheckBaseUtility {
         });
   }
 
+  private void processDuplicateRules(ParserRuleContext ctx, Map<Integer, String> subruleOptions) {
+    Set<Integer> seenRules = new HashSet<>();
+    for (ParserRuleContext child : ctx.getRuleContexts(ParserRuleContext.class)) {
+      int ruleId = child.getRuleIndex();
+      String name = subruleOptions.get(ruleId);
+      if (name == null) continue;
+      if (seenRules.add(ruleId)) continue;
+      throwException(ErrorSeverity.ERROR, getLocality(child), "Options \"" + name + "\" cannot be used more than once in a given command.", "");
+    }
+  }
+
   /**
    * Client accessible entrypoint to check for duplicates.
    *
@@ -209,12 +326,21 @@ public abstract class CICSOptionsCheckBaseUtility {
    */
   protected void checkDuplicates(
       ParserRuleContext ctx, Map<Integer, ErrorSeverity> customDuplicateOptions) {
+    checkDuplicates(ctx, customDuplicateOptions, null);
+  }
+
+  protected void checkDuplicates(ParserRuleContext ctx, Map<Integer, ErrorSeverity> customDuplicateOptions, Map<Integer, String> customDuplicateRuleOptions) {
+    // Check for duplicate options
     Set<Integer> foundEntries = new HashSet<>();
     Map<Integer, ErrorSeverity> updatedDuplicateOptions = new HashMap<>(baseDuplicateOptions);
     if (customDuplicateOptions != null) updatedDuplicateOptions.putAll(customDuplicateOptions);
     checkDuplicateEntries(ctx, foundEntries, updatedDuplicateOptions);
-  }
 
+    // Check for duplicate rules
+    Map<Integer, String> updatedRuleOptions = new HashMap<>(baseDuplicateRulesOptions);
+    if (customDuplicateRuleOptions != null) updatedRuleOptions.putAll(customDuplicateRuleOptions);
+    processDuplicateRules(ctx, updatedRuleOptions);
+  }
   /**
    * Flags errors for rule lists passed as parameters if there are multiple instances of mutually
    * exclusive options.
@@ -273,19 +399,23 @@ public abstract class CICSOptionsCheckBaseUtility {
     }
   }
 
-  private void getAllTokenChildren(
+  protected void getAllTokenChildren(
       ParserRuleContext ctx, List<TerminalNode> children, boolean validateResponseHandler) {
     if (ctx.children == null) return;
     ctx.children.forEach(
         child -> {
           if (TerminalNode.class.isAssignableFrom(child.getClass())
-              && baseDuplicateOptions.containsKey(((TerminalNode) child).getSymbol().getType()))
+                  && baseDuplicateOptions.containsKey(((TerminalNode) child).getSymbol().getType()))
             children.add((TerminalNode) child);
           else if (ParserRuleContext.class.isAssignableFrom(child.getClass())) {
             if (validateResponseHandler
-                && child.getClass().getSimpleName().equals("Cics_handle_responseContext"))
+                    && child.getClass().getSimpleName().equals("Cics_handle_responseContext"))
               checkResponseHandlers((CICSParser.Cics_handle_responseContext) child);
-            getAllTokenChildren((ParserRuleContext) child, children, validateResponseHandler);
+            if (!CICSParser.Cics_data_areaContext.class.isAssignableFrom(child.getClass())
+                    && !CICSParser.Cics_nameContext.class.isAssignableFrom(child.getClass())
+                    && !CICSParser.Cics_data_valueContext.class.isAssignableFrom(child.getClass())) {
+              getAllTokenChildren((ParserRuleContext) child, children, validateResponseHandler);
+            }
           }
         });
   }

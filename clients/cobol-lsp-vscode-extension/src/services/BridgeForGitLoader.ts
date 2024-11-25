@@ -35,9 +35,7 @@ const B4GTypeMetadataModel = t.type({
 
 export type B4GTypeMetadata = t.TypeOf<typeof B4GTypeMetadataModel>;
 
-export function decodeBridgeJson(
-  json: unknown | undefined,
-): B4GTypeMetadata | undefined {
+export function decodeBridgeJson(json: unknown): B4GTypeMetadata | undefined {
   if (json === undefined) {
     return undefined;
   }
@@ -57,14 +55,19 @@ export function decodeBridgeJson(
 
 export async function loadBridgeJsonContent(
   documentUri: Uri,
-): Promise<unknown | undefined> {
+): Promise<unknown> {
   const b4gPath = Uri.joinPath(documentUri, "../.bridge.json");
   try {
     return JSON.parse(
       new TextDecoder().decode(await workspace.fs.readFile(b4gPath)),
     );
-  } catch (e: any) {
-    if (e.code !== "FileNotFound") {
+  } catch (e) {
+    if (
+      e &&
+      typeof e === "object" &&
+      "code" in e &&
+      e.code !== "FileNotFound"
+    ) {
       console.error(e);
     }
     return undefined;

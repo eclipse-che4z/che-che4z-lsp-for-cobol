@@ -12,5 +12,6 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
-export const sync = jest.fn((x) => [x]);
-export const hasMagic = jest.fn((x) => x.includes("*"));
+export const sync = (x: unknown) => [x];
+export const hasMagic = (x: string) => x.includes("*");
+export const globSync = (x: unknown) => [x];

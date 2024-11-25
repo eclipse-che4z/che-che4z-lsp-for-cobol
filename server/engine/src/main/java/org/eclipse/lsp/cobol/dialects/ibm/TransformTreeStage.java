@@ -203,7 +203,6 @@ public class TransformTreeStage implements Stage<AnalysisContext, ProcessingResu
         stack.pop();
         stack.peek().addChild(node);
         stack.push(node);
-        return;
     }
   }
 
@@ -214,7 +213,7 @@ public class TransformTreeStage implements Stage<AnalysisContext, ProcessingResu
     ProcessingContext processingContext =
             new ProcessingContext(new ArrayList<>(), symbolAccumulatorService, getCompilerDirectiveContext(analysisConfig), ctx.getConfig().getDialectsSettings());
     registerProcessors(analysisConfig, processingContext, symbolAccumulatorService, ctx.getLanguageId());
-    ctx.getAccumulatedErrors().addAll(astProcessor.processSyntaxTree(processingContext, rootNode));
+    ctx.getAccumulatedErrors().addAll(astProcessor.processSyntaxTree(analysisConfig, processingContext, ctx, rootNode));
   }
 
   private CompilerDirectiveContext getCompilerDirectiveContext(AnalysisConfig analysisConfig) {
@@ -284,7 +283,8 @@ public class TransformTreeStage implements Stage<AnalysisContext, ProcessingResu
     ctx.register(v, XMLParseNode.class, new XMLParseProcess(symbolAccumulatorService));
     ctx.register(v, FileOperationStatementNode.class, new FileOperationProcess());
     ctx.register(v, XmlGenerateNode.class, new XmlGenerateProcess(symbolAccumulatorService));
-
+    ctx.register(v, ProcedureDivisionUsingNode.class, new LinkageArgumentsOriginCheck());
+    ctx.register(v, ProcedureDivisionReturningNode.class, new LinkageArgumentsOriginCheck());
     // Implicit Dialects
     dialectService.getActiveImplicitDialects(analysisConfig)
             .stream().map(CobolDialect::getProcessors)

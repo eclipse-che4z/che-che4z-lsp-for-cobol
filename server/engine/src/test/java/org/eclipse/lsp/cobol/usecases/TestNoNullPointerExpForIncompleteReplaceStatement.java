@@ -62,20 +62,6 @@ class TestNoNullPointerExpForIncompleteReplaceStatement {
   }
 
   @Test
-  void testHwWhenTypingEndsAtDoubleEqualChar() {
-    UseCaseEngine.runTest(
-        TEXT,
-        ImmutableList.of(),
-        ImmutableMap.of(
-            "1",
-            new Diagnostic(
-                new Range(), "Extraneous input 'copy'",
-                DiagnosticSeverity.Error,
-                ErrorSource.PARSING.getText())),
-        CobolLanguageId.EXPERIMENTAL_COBOL);
-  }
-
-  @Test
   void testWhenTypingEndsAtSingleEqualChar() {
     UseCaseEngine.runTest(
             TEXT2,
@@ -88,19 +74,4 @@ class TestNoNullPointerExpForIncompleteReplaceStatement {
                             ErrorSource.PARSING.getText())),
         CobolLanguageId.COBOL);
   }
-
-  @Test
-  void testHwWhenTypingEndsAtSingleEqualChar() {
-    UseCaseEngine.runTest(
-        TEXT2,
-        ImmutableList.of(),
-        ImmutableMap.of(
-            "1",
-            new Diagnostic(
-                new Range(), "Extraneous input 'copy'",
-                DiagnosticSeverity.Error,
-                ErrorSource.PARSING.getText())),
-        CobolLanguageId.EXPERIMENTAL_COBOL);
-  }
-
 }

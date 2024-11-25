@@ -660,11 +660,12 @@ dataOccursSort
    ;
 
 dataPictureClause
-   : (PICTURE | PIC) PICTUREIS? pictureString+
+   : (PICTURE | PIC) PICTUREIS? pictureString
    ;
 
 pictureString
    : charString
+   | SINGLE_U_CHAR_BYTE_LENGTH IS? integerLiteral // this case specifically handles single U and BYTE-LENGTH clause
    ;
 
 dataDynamicLengthClause
@@ -1351,7 +1352,13 @@ dialectIfStatment
    : DIALECT_IF dialectNodeFiller* ifThen ifElse? END_IF?
    ;
 ifStatement
-   : IF condition ifThen ifElse? (END_IF | {_input.LA(1)==DOT_FS || _input.LA(1)==ELSE || _input.LA(1)==EOF}?)
+   : IF condition ifThen
+   (
+      ifElse
+      |
+      {_input.LA(1)!=ELSE}?
+   )
+   (END_IF | {_input.LA(1)==DOT_FS || _input.LA(1)==ELSE || _input.LA(1)==EOF}?)
    ;
 
 ifThen
@@ -1567,7 +1574,7 @@ performStatement
    ;
 
 performInlineStatement
-   : performType? conditionalStatementCall*? (EXIT PERFORM CYCLE?)? END_PERFORM
+   : performType? conditionalStatementCall* END_PERFORM
    ;
 
 performProcedureStatement
