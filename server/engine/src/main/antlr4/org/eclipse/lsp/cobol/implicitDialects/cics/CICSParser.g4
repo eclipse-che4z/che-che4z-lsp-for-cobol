@@ -737,7 +737,8 @@ cics_restype: RESTYPE cics_cvda | ASYNCSERVICE | ATOMSERVICE | BUNDLE | DB2CONN 
 cics_subrestype: SUBRESTYPE cics_cvda | CAPTURESPEC | POLICYRULE;
 
 /** RESUME */
-cics_resume: RESUME (ACQACTIVITY | ACQPROCESS | ACTIVITY cics_data_value | cics_handle_response)+;
+cics_resume: RESUME (cics_resume_body | cics_handle_response)+;
+cics_resume_body: ((ACQACTIVITY | ACQPROCESS) | ACTIVITY cics_data_value | cics_handle_response)+;
 
 /** RETRIEVE - / REATTACH EVENT / SUBEVENT */
 cics_retrieve: RETRIEVE (cics_retrieve_standard | cics_retrieve_reattach | cics_retrieve_subevent);
