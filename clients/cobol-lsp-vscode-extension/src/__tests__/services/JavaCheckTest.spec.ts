@@ -12,12 +12,12 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
-import * as cp from "child_process";
 import { JavaCheck } from "../../services/JavaCheck";
+import { mockSpawnProcess } from "../../__mocks__/child_process.utility";
 
 jest.mock("../../services/reporter/TelemetryService");
 describe("Checks Java version", () => {
-  it("If Java version is supported", async () => {
+  it("If Java version is supported", () => {
     expect(
       JavaCheck.isJavaVersionSupported('openjdk version "1.8.0-internal"'),
     ).toBeTruthy();
@@ -49,7 +49,7 @@ describe("Checks Java version", () => {
     expect(JavaCheck.isJavaVersionSupported("java 14 2020-03-17")).toBeTruthy();
   });
 
-  it("If Java version is not supported", async () => {
+  it("If Java version is not supported", () => {
     expect(
       JavaCheck.isJavaVersionSupported('java version "1.7.0_131"'),
     ).toBeFalsy();
@@ -61,9 +61,6 @@ describe("Checks Java version", () => {
 
 describe("Checks Java installation", () => {
   let javaCheck: JavaCheck;
-  let map: any;
-  let checkFn: any;
-  let stderrFn: any;
   const expectedErrMsgSupportedJavaVersion =
     "Minimum expected Java version is 8. Switching to native builds";
   const expectedErrMsgJavaVersionNotFound =
@@ -71,86 +68,68 @@ describe("Checks Java installation", () => {
 
   beforeEach(() => {
     javaCheck = new JavaCheck();
-    checkFn = (event: any, callbackFn: () => void) => {
-      map[event] = callbackFn;
-    };
-    stderrFn = (event: any, callbackFn: () => void) => {
-      map[event] = callbackFn;
-    };
-    map = {};
   });
 
   it("when required version is supported", async () => {
-    (cp as any).spawn = jest
-      .fn()
-      .mockReturnValue({ stderr: { on: stderrFn }, on: jest.fn() });
+    mockSpawnProcess("", "java 11 2018-09-25", 0);
     const promise = javaCheck.isJavaInstalled();
-    map.data("java 11 2018-09-25");
-
     await expect(promise).resolves.toEqual(true);
   });
 
   it("should skip not relevant lines", async () => {
-    (cp as any).spawn = jest
-      .fn()
-      .mockReturnValue({ stderr: { on: stderrFn }, on: checkFn });
+    mockSpawnProcess(
+      "",
+      "Picked up JAVA_TOOL_OPTIONS: -Xmx2254m\njava 11 2018-09-25",
+      0,
+    );
     const promise = javaCheck.isJavaInstalled();
-    map.data("Picked up JAVA_TOOL_OPTIONS: -Xmx2254m");
-    map.data("java 11 2018-09-25");
-    map.close(0);
     await expect(promise).resolves.toEqual(true);
   });
 
   it("should skip not relevant lines and fail", async () => {
-    (cp as any).spawn = jest
-      .fn()
-      .mockReturnValue({ stderr: { on: stderrFn }, on: checkFn });
+    mockSpawnProcess(
+      "",
+      `Picked up JAVA_TOOL_OPTIONS: -Xmx2254m\njava version "1.5.0_22"`,
+      0,
+    );
     const promise = javaCheck.isJavaInstalled();
-    map.data("Picked up JAVA_TOOL_OPTIONS: -Xmx2254m");
-    map.data('java version "1.5.0_22"');
-    map.close(0);
-    await expect(promise).rejects.toEqual(expectedErrMsgSupportedJavaVersion);
+    await expect(promise).rejects.toEqual(
+      new Error(expectedErrMsgSupportedJavaVersion),
+    );
   });
 
   it("when required version is not supported", async () => {
-    (cp as any).spawn = jest
-      .fn()
-      .mockReturnValue({ stderr: { on: stderrFn }, on: checkFn });
+    mockSpawnProcess("", `java version "1.5.0_22"`, 0);
     const promise = javaCheck.isJavaInstalled();
-    map.data('java version "1.5.0_22"');
-    map.close(0);
-    await expect(promise).rejects.toEqual(expectedErrMsgSupportedJavaVersion);
+    await expect(promise).rejects.toEqual(
+      new Error(expectedErrMsgSupportedJavaVersion),
+    );
   });
 
   it("when 'error' event is emitted  - spawned", async () => {
-    (cp as any).spawn = jest
-      .fn()
-      .mockReturnValue({ stderr: { on: jest.fn() }, on: checkFn });
+    mockSpawnProcess("", "", 0, "Error: spawn java ENOENT");
     const promise = javaCheck.isJavaInstalled();
-    map.error("Error: spawn java ENOENT");
 
-    await expect(promise).rejects.toEqual(expectedErrMsgJavaVersionNotFound);
+    await expect(promise).rejects.toEqual(
+      new Error(expectedErrMsgJavaVersionNotFound),
+    );
   });
 
   it("when 'error' event is emitted  - not be spawned", async () => {
-    (cp as any).spawn = jest
-      .fn()
-      .mockReturnValue({ stderr: { on: jest.fn() }, on: checkFn });
+    mockSpawnProcess("", "", 0, "Other error");
     const promise = javaCheck.isJavaInstalled();
-    map.error("Other error");
 
     await expect(promise).rejects.toEqual("Other error");
   });
 
   it("when 'close' event is emitted", async () => {
-    (cp as any).spawn = jest
-      .fn()
-      .mockReturnValue({ stderr: { on: jest.fn() }, on: checkFn });
+    mockSpawnProcess("", "", 23);
     const promise = javaCheck.isJavaInstalled();
-    map.close(23);
 
     await expect(promise).rejects.toEqual(
-      "An error occurred when checking if Java was installed. Switching to native build.",
+      new Error(
+        "An error occurred when checking if Java was installed. Switching to native build.",
+      ),
     );
   });
 });

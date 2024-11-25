@@ -48,9 +48,7 @@ describe("Tests ConfigurationWatcher utility", () => {
       .mockReturnValue("NATIVE");
     vscode.window.showInformationMessage = jest.fn().mockReturnValue("Ok");
     const configurationWatcher = new ConfigurationWatcher();
-    await (
-      configurationWatcher as any
-    ).handleServerRuntimeConfigurationChange();
+    await configurationWatcher["handleServerRuntimeConfigurationChange"]();
     expect(vscode.commands.executeCommand).toBeCalled();
   });
 
@@ -61,9 +59,7 @@ describe("Tests ConfigurationWatcher utility", () => {
       .mockReturnValue("JAVA");
     vscode.window.showInformationMessage = jest.fn().mockReturnValue("Ok");
     const configurationWatcher = new ConfigurationWatcher();
-    await (
-      configurationWatcher as any
-    ).handleServerRuntimeConfigurationChange();
+    await configurationWatcher["handleServerRuntimeConfigurationChange"]();
     expect(vscode.commands.executeCommand).not.toBeCalled();
   });
 });

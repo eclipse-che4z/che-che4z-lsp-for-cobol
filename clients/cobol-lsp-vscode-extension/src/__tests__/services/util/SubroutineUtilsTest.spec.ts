@@ -13,7 +13,7 @@
  */
 
 import * as vscode from "vscode";
-import { searchCopybookInExtensionFolder } from "../../../services/util/FSUtils";
+import * as FSUtils from "../../../services/util/FSUtils";
 import { COBOL_EXT_ARRAY } from "../../../constants";
 import { resolveSubroutineURI } from "../../../services/util/SubroutineUtils";
 
@@ -23,13 +23,14 @@ describe("SubroutineUtils", () => {
     vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
       get: jest.fn().mockReturnValue(folders),
     });
-    (searchCopybookInExtensionFolder as any) = jest
-      .fn()
-      .mockReturnValue("theURI");
+    const mockUri = vscode.Uri.file("theURI");
+    const spy = jest
+      .spyOn(FSUtils, "searchCopybookInExtensionFolder")
+      .mockReturnValue(mockUri);
 
     const uri = resolveSubroutineURI("/storagePath", "name");
-    expect(uri).toBe("theURI");
-    expect(searchCopybookInExtensionFolder).toBeCalledWith(
+    expect(uri).toStrictEqual(mockUri);
+    expect(spy).toHaveBeenCalledWith(
       "name",
       folders,
       COBOL_EXT_ARRAY,

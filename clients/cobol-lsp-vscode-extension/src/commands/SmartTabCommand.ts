@@ -43,7 +43,7 @@ abstract class SmartCommandProvider {
         (
           editor: vscode.TextEditor,
           edit: vscode.TextEditorEdit,
-          ...args: any[]
+          ...args: unknown[]
         ) => {
           this.execute(editor, edit, args);
         },
@@ -60,7 +60,7 @@ abstract class SmartCommandProvider {
   public abstract execute(
     editor: vscode.TextEditor,
     edit: vscode.TextEditorEdit,
-    args: any[],
+    args: unknown[],
   ): void;
 }
 
@@ -290,11 +290,11 @@ export class RangeTabShiftStore {
     }
   }
 
-  static clearCache(key: any) {
+  static clearCache(key: vscode.Uri) {
     this.store.delete(key);
   }
 
-  static getCachedShifts(key: any) {
+  static getCachedShifts(key: vscode.Uri) {
     return this.store.get(key);
   }
 

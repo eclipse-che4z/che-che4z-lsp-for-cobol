@@ -30,9 +30,13 @@ import { searchCopybook } from "./CopybookMessageHandler";
 import { searchCopybookInExtensionFolder } from "../util/FSUtils";
 import { CopybookURI } from "./CopybookURI";
 import path = require("path");
+import { getErrorMessage } from "../util/ErrorsUtils";
 
 export class CopybookName {
-  constructor(public name: string, public dialect: string) {}
+  constructor(
+    public name: string,
+    public dialect: string,
+  ) {}
 }
 
 export class CopybookDownloadService {
@@ -252,7 +256,7 @@ export class CopybookDownloadService {
       }),
     ).catch((err) => {
       this.outputChannel?.appendLine(
-        `Error downloading copybooks : ${err.message}`,
+        `Error downloading copybooks : ${getErrorMessage(err)}`,
       );
     });
   }
@@ -289,7 +293,7 @@ export class CopybookDownloadService {
     return (
       !(await DownloadUtil.isProfileLocked(profile)) &&
       !(await DownloadUtil.checkForInvalidCredProfile(
-        profile!,
+        profile,
         this.explorerApi,
       ))
     );

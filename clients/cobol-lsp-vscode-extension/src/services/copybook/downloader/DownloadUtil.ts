@@ -22,6 +22,7 @@ import {
 import { ZoweExplorerDownloader } from "./ZoweExplorerDownloader";
 import { CopybookName } from "../CopybookDownloadService";
 import { SettingsService } from "../../Settings";
+import { hasMember } from "../../util/Utils";
 
 /**
  * Utility class for downloading copybooks
@@ -106,7 +107,7 @@ export class DownloadUtil {
       .loadNamedProfile(profileName);
   }
 
-  private static checkForInvalidCredentials(e: any, profileName: string) {
+  private static checkForInvalidCredentials(e: unknown, profileName: string) {
     if (this.isInvalidCredentials(e)) {
       ZoweExplorerDownloader.profileStore.set(profileName, "locked-profile");
       const errorMessage = INVALID_CREDENTIALS_ERROR_MSG.replace(
@@ -147,7 +148,7 @@ export class DownloadUtil {
    * checks if copybook download configurations are present
    * @param documentUri
    * @param copybookNames
-   * @returns true if if copybook download configurations are present, fasle otherwise
+   * @returns true if if copybook download configurations are present, false otherwise
    */
   public static areCopybookDownloadConfigurationsPresent(
     documentUri: string,
@@ -182,7 +183,11 @@ export class DownloadUtil {
     return action === UNLOCK_DOWNLOAD_QUEUE_MSG;
   }
 
-  private static isInvalidCredentials(e: any) {
-    return e?.mDetails?.errorCode === 401;
+  private static isInvalidCredentials(e: unknown) {
+    return (
+      hasMember(e, "mDetails") &&
+      hasMember(e.mDetails, "errorCode") &&
+      e.mDetails.errorCode === 401
+    );
   }
 }

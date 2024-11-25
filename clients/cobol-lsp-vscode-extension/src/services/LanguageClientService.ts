@@ -96,7 +96,7 @@ export class LanguageClientService {
     uri: string,
     text: string,
     position: vscode.Position,
-  ): Promise<any> {
+  ) {
     const params = {
       uri,
       text,
@@ -107,11 +107,14 @@ export class LanguageClientService {
     return languageClient.sendRequest("extended/analysis", params);
   }
 
-  public invalidateConfiguration() {
+  public async invalidateConfiguration() {
     const languageClient = this.getLanguageClient();
-    languageClient.sendNotification(DidChangeConfigurationNotification.type, {
-      settings: null,
-    });
+    await languageClient.sendNotification(
+      DidChangeConfigurationNotification.type,
+      {
+        settings: null,
+      },
+    );
   }
 
   public async start() {

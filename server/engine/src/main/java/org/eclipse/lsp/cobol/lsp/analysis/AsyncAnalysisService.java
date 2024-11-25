@@ -103,6 +103,7 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
    * @return document model with analysis result
    */
   public synchronized FutureTask<CobolDocumentModel> scheduleAnalysis(String uri, String text, Integer currentRevision, boolean open, SourceUnitGraph.EventSource eventSource) {
+    documentModelService.changeDocument(uri, text);
     return scheduleAnalysis(uri, text, currentRevision, open, false, eventSource);
   }
 

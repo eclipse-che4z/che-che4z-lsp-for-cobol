@@ -87,7 +87,7 @@ export class CopybookDownloaderForUss extends ZoweExplorerDownloader {
     const response = await this.explorerAPI
       .getUssApi(profile)
       .fileList(dataset);
-    const members = response.apiResponse.items.map((el: any) => el.name);
+    const members = response.apiResponse.items.map((el) => el.name);
 
     this.memberListCache.set(id, members);
     return members;

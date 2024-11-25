@@ -660,11 +660,12 @@ dataOccursSort
    ;
 
 dataPictureClause
-   : (PICTURE | PIC) PICTUREIS? pictureString+
+   : (PICTURE | PIC) PICTUREIS? pictureString
    ;
 
 pictureString
    : charString
+   | SINGLE_U_CHAR_BYTE_LENGTH IS? integerLiteral // this case specifically handles single U and BYTE-LENGTH clause
    ;
 
 dataDynamicLengthClause
