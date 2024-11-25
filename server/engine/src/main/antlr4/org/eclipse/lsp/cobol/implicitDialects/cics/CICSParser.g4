@@ -716,7 +716,7 @@ cics_transform_xmltodata: XMLTODATA (CHANNEL cics_data_value | DATCONTAINER cics
                           cics_transform_typens | XMLCONTAINER cics_data_value | XMLTRANSFORM cics_name | cics_handle_response)+;
 
 /** UNLOCK */
-cics_unlock: UNLOCK cics_file_name (TOKEN cics_data_area | SYSID cics_data_area | cics_handle_response)*;
+cics_unlock: UNLOCK (cics_file_name | TOKEN cics_data_area | SYSID cics_data_area | cics_handle_response)+;
 
 /** UPDATE COUNTER / DCOUNTER */
 cics_update: UPDATE (cics_update_counter | cics_update_dcounter);
