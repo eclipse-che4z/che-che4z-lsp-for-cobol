@@ -697,8 +697,8 @@ cics_spoolread: SPOOLREAD (TOKEN cics_data_area | INTO cics_data_area | MAXFLENG
                 TOFLENGTH cics_data_area | NOHANDLE | cics_spoolclose_resp | cics_handle_response)+;
 
 /** SPOOLWRITE */
-cics_spoolwrite: SPOOLWRITE (TOKEN cics_data_area | FROM cics_data_area | FLENGTH cics_data_value | LINE | PAGE |
-                 NOHANDLE | cics_spoolclose_resp | cics_handle_response)+;
+cics_spoolwrite: SPOOLWRITE cics_spoolwrite_options;
+cics_spoolwrite_options: ((TOKEN | FROM) cics_data_area | FLENGTH cics_data_value | LINE | PAGE | NOHANDLE | cics_handle_response)+;
 
 /** START - / ATTACH / BREXIT / CHANNEL */
 cics_start: START (cics_start_transid | cics_start_attach | cics_start_brexit);
