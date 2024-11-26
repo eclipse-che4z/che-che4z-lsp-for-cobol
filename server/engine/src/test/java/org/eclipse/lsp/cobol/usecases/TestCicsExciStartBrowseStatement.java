@@ -30,16 +30,7 @@ import java.util.Map;
  */
 public class TestCicsExciStartBrowseStatement {
 
-  // Main Building Blocks
-  private static final String BASE_TEXT =
-          "       IDENTIFICATION DIVISION.\n"
-          + "       PROGRAM-ID. ABCDEF.\n"
-          + "       DATA DIVISION.\n"
-          + "       WORKING-STORAGE SECTION.\n"
-          + "       PROCEDURE DIVISION.\n"
-          + "            EXEC CICS \n"
-          + "            END-EXEC.";
-
+  // Test Strings
   private static final String STARTBROWSE_ACTIVITY_VALID = "STARTBROWSE ACTIVITY ACTIVITYID(123) BROWSETOKEN(123)";
   private static final String STARTBROWSE_CONTAINER_VALID = "STARTBROWSE CONTAINER PROCESS(123) PROCESSTYPE(123) BROWSETOKEN(123)";
   private static final String STARTBROWSE_EVENT_VALID = "STARTBROWSE EVENT ACTIVITYID(123) BROWSETOKEN(123)";
@@ -47,6 +38,9 @@ public class TestCicsExciStartBrowseStatement {
   private static final String STARTBROWSE_TIMER_VALID = "STARTBROWSE TIMER(123) BROWSETOKEN(123)";
 
   private static final String STARTBROWSE_INVALID_PROCESS_CHANNEL = "STARTBROWSE CONTAINER {PROCESS(123)|errorOne} {PROCESSTYPE(123)|errorTwo} CHANNEL(3) BROWSETOKEN(123)";
+  private static final String STARTBROWSE_INVALID_ACTIVITY = "STARTBROWSE {_ACTIVITY ACTIVITYID(123)|errorOne_}";
+  private static final String STARTBROWSE_INVALID_EVENT = "STARTBROWSE {_EVENT ACTIVITYID(123)|errorOne_}";
+  private static final String STARTBROWSE_INVALID_PROCESS = "STARTBROWSE {_PROCESS BROWSETOKEN(123)|errorOne_}";
 
   // Test Functions
   @Test
@@ -74,7 +68,7 @@ public class TestCicsExciStartBrowseStatement {
     CICSTestUtils.noErrorTest(STARTBROWSE_TIMER_VALID);
   }
 
-  // Invalid Test
+  // Invalid Tests
   @Test
   void testStartBrowseContainerInvalid() {
     Map<String, Diagnostic> tempDiagnostic = new HashMap<>();
@@ -92,5 +86,41 @@ public class TestCicsExciStartBrowseStatement {
                     ErrorSource.PARSING.getText()));
 
     CICSTestUtils.errorTest(STARTBROWSE_INVALID_PROCESS_CHANNEL, tempDiagnostic);
+  }
+
+  @Test
+  void testStartBrowseActivityInvalid() {
+    Map<String, Diagnostic> tempDiagnostic = new HashMap<>();
+    tempDiagnostic.put("errorOne",
+            new Diagnostic(
+                    new Range(),
+                    "Missing required option: BROWSETOKEN",
+                    DiagnosticSeverity.Error,
+                    ErrorSource.PARSING.getText()));
+    CICSTestUtils.errorTest(STARTBROWSE_INVALID_ACTIVITY, tempDiagnostic);
+  }
+
+  @Test
+  void testStartBrowseEventInvalid() {
+    Map<String, Diagnostic> tempDiagnostic = new HashMap<>();
+    tempDiagnostic.put("errorOne",
+            new Diagnostic(
+                    new Range(),
+                    "Missing required option: BROWSETOKEN",
+                    DiagnosticSeverity.Error,
+                    ErrorSource.PARSING.getText()));
+    CICSTestUtils.errorTest(STARTBROWSE_INVALID_EVENT, tempDiagnostic);
+  }
+
+  @Test
+  void testStartBrowseProcessInvalid() {
+    Map<String, Diagnostic> tempDiagnostic = new HashMap<>();
+    tempDiagnostic.put("errorOne",
+            new Diagnostic(
+                    new Range(),
+                    "Missing required option: PROCESSTYPE",
+                    DiagnosticSeverity.Error,
+                    ErrorSource.PARSING.getText()));
+    CICSTestUtils.errorTest(STARTBROWSE_INVALID_PROCESS, tempDiagnostic);
   }
 }
