@@ -15,6 +15,8 @@ import { searchCopybookInExtensionFolder } from "./FSUtils";
 import { COBOL_EXT_ARRAY } from "../../constants";
 import { SettingsService } from "../Settings";
 import { Uri } from "vscode";
+import { getChannel } from "../../extension";
+import { SettingsUtils } from "./SettingsUtils";
 
 /**
  * This function try to resolve a given subroutine by searching COBOL source file with the same name
@@ -25,10 +27,18 @@ import { Uri } from "vscode";
 export function resolveSubroutineURI(storagePath: string, name: string): Uri {
   const folders: string[] | undefined =
     SettingsService.getSubroutineLocalPath();
-  return searchCopybookInExtensionFolder(
+  const workspacePath = SettingsUtils.getWorkspaceFoldersPath(true);
+  getChannel().appendLine(
+    `Resolving subroutine - ${storagePath} [${workspacePath.join(", ")}] ${name} [${folders?.join(", ")}]`,
+  );
+  const uri = searchCopybookInExtensionFolder(
     name,
     folders,
     COBOL_EXT_ARRAY,
-    storagePath,
+    workspacePath[0],
   )!;
+
+  getChannel().appendLine(`Subroutine resolved - ${name} = ${uri.toString()}`);
+
+  return uri;
 }
