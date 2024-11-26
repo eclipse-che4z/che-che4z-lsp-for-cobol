@@ -1720,6 +1720,7 @@ READ=For sequential access, the READ statement makes the next logical record fro
 READER=
 READNEXT=
 READPREV=
+READQ=
 READS=
 REAL=
 REALM=
