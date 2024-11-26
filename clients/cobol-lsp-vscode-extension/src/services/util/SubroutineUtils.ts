@@ -14,7 +14,6 @@
 import { searchCopybookInExtensionFolder } from "./FSUtils";
 import { COBOL_EXT_ARRAY } from "../../constants";
 import { SettingsService } from "../Settings";
-import { Uri } from "vscode";
 import { getChannel } from "../../extension";
 import { SettingsUtils } from "./SettingsUtils";
 
@@ -24,7 +23,10 @@ import { SettingsUtils } from "./SettingsUtils";
  * @param name the name of subroutine
  * @return subroutine file URI if it was found or undefined otherwise
  */
-export function resolveSubroutineURI(storagePath: string, name: string): Uri {
+export function resolveSubroutineURI(
+  storagePath: string,
+  name: string,
+): string {
   const folders: string[] | undefined =
     SettingsService.getSubroutineLocalPath();
   const workspacePath = SettingsUtils.getWorkspaceFoldersPath(true);
@@ -40,5 +42,5 @@ export function resolveSubroutineURI(storagePath: string, name: string): Uri {
 
   getChannel().appendLine(`Subroutine resolved - ${name} = ${uri.toString()}`);
 
-  return uri;
+  return uri.toString();
 }
