@@ -713,8 +713,9 @@ cics_start_brexit: BREXIT name? (TRANSID cics_name | BRDATA cics_data_area | BRD
 cics_zero_digit: LPARENCHAR ZERO_DIGIT RPARENCHAR;
 
 /** STARTBR */
-cics_startbr: STARTBR cics_file_name (RIDFLD cics_data_area | KEYLENGTH cics_data_value | GENERIC | REQID cics_data_value |
-              SYSID cics_data_area | DEBKEY | DEBREC | RBA | RBN | XRBA | GTEQ | EQUAL | cics_handle_response)+;
+cics_startbr: STARTBR cics_startbr_options;
+cics_startbr_options: ((FILE | DATASET) cics_name | (RIDFLD | SYSID) cics_data_area | (KEYLENGTH | REQID) cics_data_value | GENERIC |
+              DEBKEY | DEBREC | RBA | RRN | XRBA | GTEQ | EQUAL | cics_handle_response)+;
 
 /** STARTBROWSE ACTIVITY / CONTAINER / EVENT / PROCESS */
 cics_startbrowse: STARTBROWSE (cics_startbrowse_activity | cics_startbrowse_container | cics_startbrowse_event |
