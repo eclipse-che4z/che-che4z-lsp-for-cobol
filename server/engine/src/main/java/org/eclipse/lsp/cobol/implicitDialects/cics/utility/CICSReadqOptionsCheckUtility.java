@@ -43,7 +43,6 @@ public class CICSReadqOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
                     put(CICSLexer.SET, ErrorSeverity.ERROR);
                     put(CICSLexer.LENGTH, ErrorSeverity.ERROR);
                     put(CICSLexer.TS, ErrorSeverity.ERROR);
-                    put(CICSLexer.QUEUE, ErrorSeverity.ERROR);
                     put(CICSLexer.QNAME, ErrorSeverity.ERROR);
                     put(CICSLexer.NUMITEMS, ErrorSeverity.ERROR);
                     put(CICSLexer.ITEM, ErrorSeverity.ERROR);
