@@ -84,7 +84,7 @@ public class CICSReadOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
 
         checkPrerequisiteIsMet(ctx.UPDATE(), ctx.TOKEN(), ctx, "TOKEN without UPDATE");
 
-        checkMutuallyExclusiveOptions("INTO or SET", ctx.INTO(), ctx.SET());
+        checkHasExactlyOneOption("INTO or SET", ctx, ctx.INTO(), ctx.SET());
 
         checkPrerequisiteIsMet(ctx.KEYLENGTH(), ctx.GENERIC(), ctx, "GENERIC without KEYLENGTH");
 
