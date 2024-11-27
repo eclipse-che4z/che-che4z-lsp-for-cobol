@@ -26,9 +26,7 @@ package org.eclipse.lsp.cobol.implicitDialects.cics.utility;
         import java.util.List;
         import java.util.Map;
 
-        import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_readq;
-        import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_readq_td;
-        import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_readq_ts;
+        import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.*;
 
 /** Checks CICS Readq rules for required and invalid options */
 public class CICSReadqOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
@@ -75,13 +73,23 @@ public class CICSReadqOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
             checkHasMandatoryOptions(ctx.QUEUE(), ctx, "QUEUE");
         if (!ctx.NOSUSPEND().isEmpty())
             checkHasMandatoryOptions(ctx.TD(), ctx, "TD");
+        if (!ctx.cics_into_set().isEmpty())
+            checkSetTd(ctx.cics_into_set().listIterator().next());
 
         checkHasExactlyOneOption("INTO or SET", ctx, ctx.cics_into_set());
     }
     private void checkTs(CICSParser.Cics_readq_tsContext ctx) {
+        if (!ctx.cics_into_set().isEmpty())
+            checkSetTs(ctx.cics_into_set().listIterator().next());
+
         checkHasExactlyOneOption("QUEUE or QNAME", ctx, ctx.QUEUE(), ctx.QNAME());
         checkHasExactlyOneOption("INTO or SET", ctx, ctx.cics_into_set());
         checkHasMutuallyExclusiveOptions("NEXT or ITEM", ctx.NEXT(), ctx.ITEM());
     }
-
+    private void checkSetTd(CICSParser.Cics_into_setContext ctx) {
+        if (ctx.SET() != null) checkHasMandatoryOptions(((Cics_readq_tdContext) ctx.getParent().getRuleContext()).LENGTH(), ctx, "LENGTH");
+    }
+    private void checkSetTs(CICSParser.Cics_into_setContext ctx) {
+        if (ctx.SET() != null) checkHasMandatoryOptions(((Cics_readq_tsContext) ctx.getParent().getRuleContext()).LENGTH(), ctx, "LENGTH");
+    }
 }

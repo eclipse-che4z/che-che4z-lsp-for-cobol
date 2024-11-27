@@ -61,8 +61,10 @@ public class TestCICSReadqStatements {
             "READQ TS INTO({$varFour}) {QNAME|errorExclusiveQueue}(100) \n "
                     + "{QUEUE|errorExclusiveQueue2}(100)";
     private static final String READQ_NEXT_ITEM_INVALID =
-            "READQ SET({$varFour}) {NEXT|errorExclusiveNext} \n "
+            "READQ SET({$varFour}) LENGTH({$varFour}) {NEXT|errorExclusiveNext} \n "
                     + "{ITEM|errorExclusiveNext2}(100) QNAME({$varFour})";
+    private static final String READQ_SET_LENGTH_INVALID =
+            "READQ QNAME({$varFour}) {SET(100)|errorMissingLength}";
 
     @Test
     void testReadqTdValid() {
@@ -153,5 +155,18 @@ public class TestCICSReadqStatements {
                                 ErrorSource.PARSING.getText()));
 
         CICSTestUtils.errorTest(READQ_NEXT_ITEM_INVALID, expectedDiagnostic);
+    }
+    @Test
+    void testReadqSetMissingLengthInvalid() {
+        Map<String, Diagnostic> expectedDiagnostic =
+                ImmutableMap.of(
+                        "errorMissingLength",
+                        new Diagnostic(
+                                new Range(),
+                                "Missing required option: LENGTH",
+                                DiagnosticSeverity.Error,
+                                ErrorSource.PARSING.getText()));
+
+        CICSTestUtils.errorTest(READQ_SET_LENGTH_INVALID, expectedDiagnostic);
     }
 }
