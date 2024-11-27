@@ -37,16 +37,17 @@ public class CICSReadqOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
             new HashMap<Integer, ErrorSeverity>() {
                 {
                     put(CICSLexer.READQ, ErrorSeverity.ERROR);
-                    put(CICSLexer.TD, ErrorSeverity.ERROR);
+                    put(CICSLexer.TD, ErrorSeverity.WARNING);
                     put(CICSLexer.QUEUE, ErrorSeverity.ERROR);
                     put(CICSLexer.INTO, ErrorSeverity.ERROR);
                     put(CICSLexer.SET, ErrorSeverity.ERROR);
                     put(CICSLexer.LENGTH, ErrorSeverity.ERROR);
-                    put(CICSLexer.TS, ErrorSeverity.ERROR);
+                    put(CICSLexer.TS, ErrorSeverity.WARNING);
                     put(CICSLexer.QNAME, ErrorSeverity.ERROR);
                     put(CICSLexer.NUMITEMS, ErrorSeverity.ERROR);
                     put(CICSLexer.ITEM, ErrorSeverity.ERROR);
-                    put(CICSLexer.NEXT, ErrorSeverity.ERROR);
+                    put(CICSLexer.NEXT, ErrorSeverity.WARNING);
+                    put(CICSLexer.NOSUSPEND, ErrorSeverity.WARNING);
                 }
             };
     public CICSReadqOptionsCheckUtility(
