@@ -133,9 +133,9 @@ export class DownloadUtil {
     }
 
     registerExceptionEvent(
-      undefined,
+      "InvalidCredentialsException",
       JSON.stringify(e),
-      ["copybook", "COBOL", "experiment-tag"],
+      ["copybook", "COBOL", "invalid-credentials-check"],
       "There is an issue with zowe api layer",
     );
   }
