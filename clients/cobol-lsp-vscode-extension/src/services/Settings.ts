@@ -77,7 +77,7 @@ async function handleProcessorGroupConfigurationRequest<Type, Output, R>(
     cfg: Type,
   ) => Promise<R>,
   item: Item,
-  result: unknown[],
+  result: (R | undefined)[],
 ) {
   if (item.scopeUri) {
     try {
@@ -96,7 +96,7 @@ async function handleProcessorGroupConfigurationRequest<Type, Output, R>(
         );
         result.push(object);
       } else {
-        result.push(undefined);
+        result.push(configuration);
       }
     } catch (err) {
       if (err instanceof DecodingError) {
