@@ -154,28 +154,29 @@ public class CICSSendOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     checkHasMutuallyExclusiveOptions("INVITE or LAST", ctx.INVITE(), ctx.LAST());
     checkHasMutuallyExclusiveOptions("STRFIELD or ERASE", ctx.STRFIELD(), ctx.ERASE());
     checkHasMutuallyExclusiveOptions("DEFAULT or ALTERNATE", ctx.DEFAULT(), ctx.ALTERNATE());
-    if (!ctx.DEFAULT().isEmpty() || !ctx.ALTERNATE().isEmpty()) {
-      checkHasMandatoryOptions(ctx.ERASE(), ctx, "ERASE");
+    if (!ctx.LENGTH().isEmpty() || !ctx.FLENGTH().isEmpty() || !ctx.FMH().isEmpty()) {
+      checkHasMandatoryOptions(ctx.FROM(), ctx, "FROM");
     }
     checkHasMutuallyExclusiveOptions("STRFIELD or CTLCHAR", ctx.STRFIELD(), ctx.CTLCHAR());
+    checkHasMutuallyExclusiveOptions("ATTACHID  or CTLCHAR", ctx.ATTACHID(), ctx.CTLCHAR());
     checkHasMutuallyExclusiveOptions("CONFIRM or WAIT", ctx.CONFIRM(), ctx.WAIT());
     checkHasMutuallyExclusiveOptions("CNOTCOMPL or DEFRESP", ctx.CNOTCOMPL(), ctx.DEFRESP());
     checkHasMutuallyExclusiveOptions("LDC or FMH", ctx.LDC(), ctx.FMH());
-    checkHasMutuallyExclusiveOptions("PASSBK or CBUFF", ctx.PASSBK(), ctx.CBUFF());
+    checkHasMutuallyExclusiveOptions("PASSBK or CBUFF or CNOTCOMPL ", ctx.PASSBK(), ctx.CBUFF(), ctx.CNOTCOMPL());
   }
 
   @SuppressWarnings("unchecked")
   private void checkControl(CICSParser.Cics_send_control_mapContext ctx) {
     checkHasExactlyOneOption("CONTROL or MAP", ctx, ctx.CONTROL(), ctx.MAP());
     checkHasMutuallyExclusiveOptions("ERASE or ERASEAUP", ctx.ERASE(), ctx.ERASEAUP());
-    if (!ctx.DEFAULT().isEmpty() || !ctx.ALTERNATE().isEmpty()) {
-      checkHasMandatoryOptions(ctx.ERASE(), ctx, "ERASE");
-    }
     checkHasMutuallyExclusiveOptions("OUTPARTN or LDC", ctx.OUTPARTN(), ctx.LDC());
     checkHasMutuallyExclusiveOptions("ACTPARTN or LDC", ctx.ACTPARTN(), ctx.LDC());
     checkHasMutuallyExclusiveOptions("TERMINAL or SET or PAGING", ctx.TERMINAL(), ctx.SET(), ctx.PAGING());
     if (!ctx.WAIT().isEmpty() || !ctx.LAST().isEmpty()) {
       checkHasMandatoryOptions(ctx.TERMINAL(), ctx, "TERMINAL");
+    }
+    if (!ctx.LENGTH().isEmpty()) {
+      checkHasMandatoryOptions(ctx.FROM(), ctx, "FROM");
     }
     checkHasMutuallyExclusiveOptions("HONEOM or L40 or L64 or L80", ctx.HONEOM(), ctx.L40(), ctx.L64(), ctx.L80());
     checkHasMutuallyExclusiveOptions("DATAONLY or MAPONLY", ctx.DATAONLY(), ctx.MAPONLY());
@@ -196,6 +197,10 @@ public class CICSSendOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     checkHasMutuallyExclusiveOptions("FROM or MAPONLY", ctx.FROM(), ctx.MAPONLY());
     checkHasMutuallyExclusiveOptions("LENGTH or MAPONLY", ctx.LENGTH(), ctx.MAPONLY());
     checkHasMutuallyExclusiveOptions("ERASE or ERASEAUP", ctx.ERASE(), ctx.ERASEAUP());
+    if (!ctx.LENGTH().isEmpty()) {
+      checkHasMandatoryOptions(ctx.FROM(), ctx, "FROM");
+    }
+
   }
 
   @SuppressWarnings("unchecked")
@@ -217,8 +222,8 @@ public class CICSSendOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     checkHasMandatoryOptions(ctx.TEXT(), ctx, "TEXT");
     checkHasMandatoryOptions(ctx.FROM(), ctx, "FROM");
     checkHasMutuallyExclusiveOptions("DEFAULT or ALTERNATE", ctx.DEFAULT(), ctx.ALTERNATE());
-    if (!ctx.DEFAULT().isEmpty() || !ctx.ALTERNATE().isEmpty()) {
-      checkHasMandatoryOptions(ctx.ERASE(), ctx, "ERASE");
+    if (!ctx.LENGTH().isEmpty()) {
+      checkHasMandatoryOptions(ctx.FROM(), ctx, "FROM");
     }
     checkHasMutuallyExclusiveOptions("LDC or OUTPARTN", ctx.LDC(), ctx.OUTPARTN());
     checkHasMutuallyExclusiveOptions("LDC or ACTPARTN", ctx.LDC(), ctx.ACTPARTN());
@@ -233,6 +238,9 @@ public class CICSSendOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     checkHasMandatoryOptions(ctx.MAPPED(), ctx, "MAPPED");
     checkHasMandatoryOptions(ctx.FROM(), ctx, "FROM");
     checkHasMutuallyExclusiveOptions("TERMINAL or PAGING", ctx.TERMINAL(), ctx.PAGING());
+    if (!ctx.LENGTH().isEmpty()) {
+      checkHasMandatoryOptions(ctx.FROM(), ctx, "FROM");
+    }
   }
 
   @SuppressWarnings("unchecked")
@@ -246,5 +254,8 @@ public class CICSSendOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     }
     checkHasMutuallyExclusiveOptions("TERMINAL or PAGING", ctx.TERMINAL(), ctx.PAGING());
     checkHasMutuallyExclusiveOptions("HONEOM or L40 or L64 or L80", ctx.HONEOM(), ctx.L40(), ctx.L64(), ctx.L80());
+    if (!ctx.LENGTH().isEmpty()) {
+      checkHasMandatoryOptions(ctx.FROM(), ctx, "FROM");
+    }
   }
 }
