@@ -32,7 +32,7 @@ import org.junit.jupiter.api.Test;
  */
 public class TestCicsSendStatement {
   private static final String SEND_FROM_LENGTH_VALID = "SEND FROM({$varFour}) LENGTH({$varOne})";
-  private static final String SEND_LENGTH_VALID = "SEND LENGTH({$varOne})";
+  private static final String SEND_LENGTH_VALID = "SEND FROM({$varFour}) LENGTH({$varOne}) FMH";
   private static final String SEND_FROM_FLENGTH_VALID = "SEND FROM({$varFour}) FLENGTH({$varOne})";
   private static final String SEND_FROM_VALID = "SEND FROM({$varOne})";
   private static final String SEND_WAIT_VALID = "SEND WAIT";
@@ -48,7 +48,7 @@ public class TestCicsSendStatement {
 
   private static final String SEND_FROM_LENGTH_ERASE_VALID = "SEND FROM({$varFour}) LENGTH({$varOne}) ERASE";
   private static final String SEND_FROM_LENGTH_ERASE_STRFIELD_INVALID = "SEND FROM({$varFour}) LENGTH({$varOne}) {ERASE|error1} {STRFIELD|error2}";
-  private static final String SEND_FROM_FLENGTH_ALTERNATE_INVALID = "SEND {FROM(123) FLENGTH(123) ALTERNATE|error1}";
+  private static final String SEND_FROM_FLENGTH_ALTERNATE_INVALID = "SEND {FLENGTH(123) FMH|error1}";
   private static final String SEND_FROM_LENGTH_CTLCHAR_VALID = "SEND FROM({$varFour}) LENGTH({$varOne}) CTLCHAR({$varTwo})";
   private static final String SEND_FROM_FLENGTH_STRFIELD_VALID = "SEND FROM({$varFour}) FLENGTH({$varOne}) STRFIELD";
 
@@ -109,7 +109,6 @@ public class TestCicsSendStatement {
   private static final String SEND_TEXT_FROM_LENGTH_VALID = "SEND TEXT FROM({$varOne}) LENGTH({$varTwo})";
   private static final String SEND_TEXT_FROM_CURSOR_FORMFEED_VALID = "SEND TEXT FROM({$varOne}) CURSOR({$varTwo}) FORMFEED";
   private static final String SEND_TEXT_FROM_ERASE_DEFAULT_VALID = "SEND TEXT FROM({$varOne}) ERASE DEFAULT";
-  private static final String SEND_TEXT_FROM_ALTERNATE_INVALID = "SEND {_TEXT FROM({$varOne}) ALTERNATE|error1_}";
   private static final String SEND_TEXT_FROM_PRINT_FREEKB_ALARM_VALID = "SEND TEXT FROM({$varOne}) PRINT FREEKB ALARM";
   private static final String SEND_TEXT_FROM_OUTPARTN_LDC_INVALID = "SEND TEXT FROM({$varOne}) {OUTPARTN|error1}({$varTwo}) {LDC|error2}({$varThree})";
   private static final String SEND_TEXT_FROM_TERMINAL_SET_INVALID = "SEND TEXT FROM({$varOne}) {TERMINAL|error1} {SET|error2}({$varTwo})";
@@ -247,7 +246,7 @@ public class TestCicsSendStatement {
                     "error1",
                     new Diagnostic(
                             new Range(),
-                            "Missing required option: ERASE",
+                            "Missing required option: FROM",
                             DiagnosticSeverity.Error,
                             ErrorSource.PARSING.getText())));
 
@@ -645,19 +644,6 @@ public class TestCicsSendStatement {
   @Test
   void testSendTextFromEraseDefaultValid() {
     CICSTestUtils.noErrorTest(SEND_TEXT_FROM_ERASE_DEFAULT_VALID);
-  }
-
-  @Test
-  void testSendTextFromAlternateInvalid() {
-    CICSTestUtils.errorTest(
-            SEND_TEXT_FROM_ALTERNATE_INVALID,
-            ImmutableMap.of(
-                    "error1",
-                    new Diagnostic(
-                            new Range(),
-                            "Missing required option: ERASE",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText())));
   }
 
   @Test
