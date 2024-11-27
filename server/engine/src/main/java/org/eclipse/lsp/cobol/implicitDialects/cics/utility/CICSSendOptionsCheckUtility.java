@@ -158,7 +158,7 @@ public class CICSSendOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
       checkHasMandatoryOptions(ctx.FROM(), ctx, "FROM");
     }
     checkHasMutuallyExclusiveOptions("STRFIELD or CTLCHAR", ctx.STRFIELD(), ctx.CTLCHAR());
-    checkHasMutuallyExclusiveOptions("ATTACHID  or CTLCHAR", ctx.ATTACHID (), ctx.CTLCHAR());
+    checkHasMutuallyExclusiveOptions("ATTACHID  or CTLCHAR", ctx.ATTACHID(), ctx.CTLCHAR());
     checkHasMutuallyExclusiveOptions("CONFIRM or WAIT", ctx.CONFIRM(), ctx.WAIT());
     checkHasMutuallyExclusiveOptions("CNOTCOMPL or DEFRESP", ctx.CNOTCOMPL(), ctx.DEFRESP());
     checkHasMutuallyExclusiveOptions("LDC or FMH", ctx.LDC(), ctx.FMH());
