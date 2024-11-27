@@ -76,6 +76,9 @@ public class CICSOptionsCheckUtility {
         CICSConnectProcessOptionsCheckUtility.RULE_INDEX,
         new CICSConnectProcessOptionsCheckUtility(context, errors));
     optionsMap.put(
+        CICSChangeOptionsCheckUtility.RULE_INDEX,
+        new CICSChangeOptionsCheckUtility(context, errors));
+    optionsMap.put(
         CICSWebOptionsCheckUtility.RULE_INDEX,
         new CICSWebOptionsCheckUtility(context, errors));
     optionsMap.put(

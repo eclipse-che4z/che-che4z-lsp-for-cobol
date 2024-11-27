@@ -23,6 +23,10 @@ on:
         description: "Skip UI tests"
         required: true
         default: 'false'
+      include_build_number:
+        description: "Include build number"
+        required: false
+        default: 'true'
   pull_request:
     branches:
       - development
@@ -367,11 +371,13 @@ jobs:
         with:
           name: lib
           path: clients/cobol-dialect-api
-      - name: update version for PR
+      - name: update version with PR or build number
+        if: github.event_name == 'pull_request' || github.event.inputs.include_build_number == 'true'
         working-directory: clients/cobol-lsp-vscode-extension
-        if: github.event_name == 'pull_request'
+        env:
+          BUILD_ID: ${{github.event_name == 'pull_request' && format('pr-{0}', github.event.pull_request.number) || github.run_number }}
         run: |
-          node -e "const fs=require('fs');const fileName='./package.json';var content=require(fileName);content.version=content.version+'\+pr-'+${{ github.event.pull_request.number }};fs.writeFileSync(fileName,JSON.stringify(content,null,2));"
+          node -e "const fs=require('fs');const fileName='./package.json';var content=require(fileName);content.version=content.version+'\+'+'${{ env.BUILD_ID }}';fs.writeFileSync(fileName,JSON.stringify(content,null,2));"
       - name: Build COBOL LS extension 
         run: npm ci
         working-directory: clients/cobol-lsp-vscode-extension
