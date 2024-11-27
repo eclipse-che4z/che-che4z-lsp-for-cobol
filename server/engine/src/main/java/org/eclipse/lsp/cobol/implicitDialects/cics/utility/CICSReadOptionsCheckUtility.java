@@ -34,26 +34,26 @@ public class CICSReadOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
         new HashMap<Integer, ErrorSeverity>() {
             {
                 put(CICSLexer.FILE, ErrorSeverity.ERROR);
-                put(CICSLexer.UNCOMMITTED, ErrorSeverity.ERROR);
-                put(CICSLexer.CONSISTENT, ErrorSeverity.ERROR);
-                put(CICSLexer.REPEATABLE, ErrorSeverity.ERROR);
-                put(CICSLexer.UPDATE, ErrorSeverity.ERROR);
+                put(CICSLexer.UNCOMMITTED, ErrorSeverity.WARNING);
+                put(CICSLexer.CONSISTENT, ErrorSeverity.WARNING);
+                put(CICSLexer.REPEATABLE, ErrorSeverity.WARNING);
+                put(CICSLexer.UPDATE, ErrorSeverity.WARNING);
                 put(CICSLexer.TOKEN, ErrorSeverity.ERROR);
                 put(CICSLexer.INTO, ErrorSeverity.ERROR);
                 put(CICSLexer.SET, ErrorSeverity.ERROR);
                 put(CICSLexer.RIDFLD, ErrorSeverity.ERROR);
                 put(CICSLexer.KEYLENGTH, ErrorSeverity.ERROR);
-                put(CICSLexer.GENERIC, ErrorSeverity.ERROR);
+                put(CICSLexer.GENERIC, ErrorSeverity.WARNING);
                 put(CICSLexer.SYSID, ErrorSeverity.ERROR);
                 put(CICSLexer.LENGTH, ErrorSeverity.ERROR);
-                put(CICSLexer.DEBKEY, ErrorSeverity.ERROR);
-                put(CICSLexer.DEBREC, ErrorSeverity.ERROR);
-                put(CICSLexer.RBA, ErrorSeverity.ERROR);
-                put(CICSLexer.RRN, ErrorSeverity.ERROR);
-                put(CICSLexer.XRBA, ErrorSeverity.ERROR);
-                put(CICSLexer.EQUAL, ErrorSeverity.ERROR);
-                put(CICSLexer.GTEQ, ErrorSeverity.ERROR);
-                put(CICSLexer.NOSUSPEND, ErrorSeverity.ERROR);
+                put(CICSLexer.DEBKEY, ErrorSeverity.WARNING);
+                put(CICSLexer.DEBREC, ErrorSeverity.WARNING);
+                put(CICSLexer.RBA, ErrorSeverity.WARNING);
+                put(CICSLexer.RRN, ErrorSeverity.WARNING);
+                put(CICSLexer.XRBA, ErrorSeverity.WARNING);
+                put(CICSLexer.EQUAL, ErrorSeverity.WARNING);
+                put(CICSLexer.GTEQ, ErrorSeverity.WARNING);
+                put(CICSLexer.NOSUSPEND, ErrorSeverity.WARNING);
             }
         };
 
