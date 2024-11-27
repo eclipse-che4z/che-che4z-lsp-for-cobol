@@ -79,8 +79,8 @@ public class CICSConnectProcessOptionsCheckUtility extends CICSOptionsCheckBaseU
         if (!ctx.PROCLENGTH().isEmpty()) {
             checkHasMandatoryOptions(ctx.PROCNAME(), ctx, "PROCNAME");
         }
-        if (!ctx.cics_connect_piplist().isEmpty()) {
-            checkHasMandatoryOptions(ctx.cics_connect_piplist(), ctx, "PIPLIST");
+        if (!ctx.PIPLENGTH().isEmpty()) {
+            checkHasMandatoryOptions(ctx.PIPLIST(), ctx, "PIPLIST");
         }
 
         checkHasMandatoryOptions(ctx.SYNCLEVEL(), ctx, "SYNCLEVEL");

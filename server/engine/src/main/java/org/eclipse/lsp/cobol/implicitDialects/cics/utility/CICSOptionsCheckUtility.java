@@ -82,11 +82,8 @@ public class CICSOptionsCheckUtility {
         CICSEndBrowseOptionsUtility.RULE_ENDBR_INDEX,
         new CICSEndBrowseOptionsUtility(context, errors));
     optionsMap.put(
-            CICSEndBrowseOptionsUtility.RULE_ENDBR_INDEX,
-            new CICSEndBrowseOptionsUtility(context, errors));
-    optionsMap.put(
-            CICSEndBrowseOptionsUtility.RULE_ENDBROWSE_INDEX,
-            new CICSEndBrowseOptionsUtility(context, errors));
+        CICSEndBrowseOptionsUtility.RULE_ENDBROWSE_INDEX,
+        new CICSEndBrowseOptionsUtility(context, errors));
     optionsMap.put(
         CICSDeleteOptionsCheckUtility.RULE_INDEX,
         new CICSDeleteOptionsCheckUtility(context, errors));

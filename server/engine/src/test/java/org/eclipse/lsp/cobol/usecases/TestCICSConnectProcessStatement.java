@@ -41,15 +41,15 @@ public class TestCICSConnectProcessStatement {
     private static final String CONNECT_PROCESS_INVALID =
             "CONNECT PROCESS SESSION({$varFour}) SYNCLEVEL({$varFour}) {PARTNER | errorMissingProc | errorPartner}(100)";
     private static final String CONNECT_PROCESS_PIPLENGTH_INVALID =
-            "CONNECT PROCESS CONVID({$varFour}) SYNCLEVEL({$varFour}) PROCNAME({$varFour})"
-                    + " {PIPLENGTH | errorPiplength }(100)";
+            "CONNECT {_PROCESS CONVID(100) PIPLENGTH(100) \n "
+                    +"SYNCLEVEL(100) PROCNAME(100)|errorPiplength_}";
 
     @Test
-    void testAbendValid() {
+    void testConnectProcessValid() {
         CICSTestUtils.noErrorTest(CONNECT_PROCESS_VALID_PATH_ONE);
     }
     @Test
-    void testAbendValidAbcode() {
+    void testConnectProcessPathTwoValidT() {
         CICSTestUtils.noErrorTest(CONNECT_PROCESS_VALID_PATH_TWO);
     }
     @Test
@@ -79,7 +79,7 @@ public class TestCICSConnectProcessStatement {
                         "errorPiplength",
                         new Diagnostic(
                                 new Range(),
-                                "Extraneous input PIPLENGTH",
+                                "Missing required option: PIPLIST",
                                 DiagnosticSeverity.Error,
                                 ErrorSource.PARSING.getText())
                 );
