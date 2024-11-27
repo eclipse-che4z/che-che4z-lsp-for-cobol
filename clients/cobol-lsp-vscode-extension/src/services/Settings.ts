@@ -55,7 +55,7 @@ interface Request {
 
 interface Item {
   section: string;
-  scopeUri: string;
+  scopeUri?: string;
   dialect?: string;
 }
 
@@ -77,7 +77,7 @@ async function handleProcessorGroupConfigurationRequest<Type, Output, R>(
     cfg: Type,
   ) => Promise<R>,
   item: Item,
-  result: R[],
+  result: unknown[],
 ) {
   if (item.scopeUri) {
     try {
@@ -96,7 +96,7 @@ async function handleProcessorGroupConfigurationRequest<Type, Output, R>(
         );
         result.push(object);
       } else {
-        result.push(undefined as R);
+        result.push(undefined);
       }
     } catch (err) {
       if (err instanceof DecodingError) {
@@ -106,91 +106,11 @@ async function handleProcessorGroupConfigurationRequest<Type, Output, R>(
       }
     }
   } else {
-    const x = vscode.workspace.getConfiguration().get(item.section);
-    result.push(x as R);
+    result.push(vscode.workspace.getConfiguration().get(item.section));
   }
 }
 
-export async function lspConfigHandlerOriginal(
-  request: Request,
-): Promise<Array<unknown>> {
-  const result = new Array<unknown>();
-  for (const item of request.items) {
-    try {
-      if (item.section === DIALECT_REGISTRY_SECTION) {
-        const object = DialectRegistry.getDialects();
-        result.push(object);
-      } else if (item.scopeUri) {
-        const cfg = vscode.workspace.getConfiguration().get(item.section);
-        if (item.section === SETTINGS_DIALECT) {
-          const object = await loadProcessorGroupDialectConfig(
-            item,
-            cfg as string[],
-          );
-          result.push(object);
-        } else if (item.section === SETTINGS_CPY_LOCAL_PATH) {
-          const object = await loadProcessorGroupCopybookPathsConfig(
-            item,
-            cfg as string[],
-          );
-          result.push(object);
-        } else if (item.section === DIALECT_LIBS && !!item.dialect) {
-          const dialectLibs: string[] =
-            await SettingsService.getCopybookLocalPath(
-              item.scopeUri,
-              item.dialect,
-            );
-          result.push(dialectLibs);
-        } else if (item.section === SETTINGS_CPY_EXTENSIONS) {
-          const object = await loadProcessorGroupCopybookExtensionsConfig(
-            item,
-            cfg as string[],
-          );
-          result.push(object);
-        } else if (item.section === SETTINGS_SQL_BACKEND) {
-          const object = await loadProcessorGroupSqlBackendConfig(
-            item,
-            cfg as string,
-          );
-          result.push(object);
-        } else if (item.section === SETTINGS_CPY_FILE_ENCODING) {
-          const object = await loadProcessorGroupCopybookEncodingConfig(
-            item,
-            cfg as string,
-          );
-          result.push(object);
-        } else if (item.section === SETTINGS_COMPILE_OPTIONS) {
-          const object = await loadProcessorGroupCompileOptionsConfig(
-            item,
-            cfg as string,
-          );
-          result.push(object);
-        } else {
-          result.push(cfg);
-        }
-      } else if (item.section === COBOL_PRGM_LAYOUT) {
-        result.push(SettingsService.getCobolProgramLayout());
-      } else {
-        result.push(vscode.workspace.getConfiguration().get(item.section));
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  }
-  return result;
-}
 export async function lspConfigHandler(request: Request) {
-  const myResult = await lspConfigHandlerMy(request);
-  const originalResult = await lspConfigHandlerOriginal(request);
-
-  if (JSON.stringify(myResult) === JSON.stringify(originalResult)) {
-    return myResult;
-  } else {
-    return originalResult;
-  }
-}
-
-export async function lspConfigHandlerMy(request: Request) {
   const result: unknown[] = [];
   for (const item of request.items) {
     try {

@@ -13,28 +13,31 @@
  */
 
 import * as vscode from "vscode";
-import * as FSUtils from "../../../services/util/FSUtils";
-import { COBOL_EXT_ARRAY } from "../../../constants";
 import { resolveSubroutineURI } from "../../../services/util/SubroutineUtils";
 
 describe("SubroutineUtils", () => {
-  it("search in workspace by name", () => {
-    const folders = ["folder"];
-    vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
-      get: jest.fn().mockReturnValue(folders),
-    });
-    const mockUri = vscode.Uri.file("theURI");
-    const spy = jest
-      .spyOn(FSUtils, "searchCopybookInExtensionFolder")
-      .mockReturnValue(mockUri);
+  beforeEach(() => {
+    jest.spyOn(vscode.workspace, "getConfiguration").mockReturnValue({
+      get: () => ["subroutines", "more-subroutines"],
+    } as unknown as vscode.WorkspaceConfiguration);
+  });
 
-    const uri = resolveSubroutineURI("/storagePath", "name");
-    expect(uri).toStrictEqual(mockUri);
-    expect(spy).toHaveBeenCalledWith(
-      "name",
-      folders,
-      COBOL_EXT_ARRAY,
-      "/storagePath",
-    );
+  let findFilesSpy: jest.SpyInstance;
+  describe("subroutine file exists in workspace", () => {
+    findFilesSpy = jest
+      .spyOn(vscode.workspace, "findFiles")
+      .mockResolvedValue([
+        vscode.Uri.file("/coding/cobol/subroutines/SUB1.cob"),
+      ]);
+
+    it("finds subroutine file in workspace folder by name", async () => {
+      const uri = await resolveSubroutineURI("SUB1");
+      expect(uri).toEqual("file:///coding/cobol/subroutines/SUB1.cob");
+      expect(findFilesSpy).toHaveBeenCalledWith(
+        "{subroutines,more-subroutines}/**/SUB1{.CBL,.COB,.COBOL,.cbl,.cob,.cobol}",
+        null,
+        1,
+      );
+    });
   });
 });

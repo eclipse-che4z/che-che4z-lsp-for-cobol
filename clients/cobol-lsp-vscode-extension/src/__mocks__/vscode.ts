@@ -51,6 +51,7 @@ export namespace workspace {
   export function onDidChangeConfiguration() {}
   export const textDocuments = [];
   export function getWorkspaceFolder() {}
+  export async function findFiles() {}
 }
 
 // eslint-disable-next-line @typescript-eslint/no-namespace

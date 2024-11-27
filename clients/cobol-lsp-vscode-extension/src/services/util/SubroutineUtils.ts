@@ -11,36 +11,25 @@
  * Contributors:
  *   Broadcom, Inc. - initial API and implementation
  */
-import { searchCopybookInExtensionFolder } from "./FSUtils";
-import { COBOL_EXT_ARRAY } from "../../constants";
+import { COBOL_EXT_ARRAY_CASE_INSENSITIVE } from "../../constants";
 import { SettingsService } from "../Settings";
-import { getChannel } from "../../extension";
-import { SettingsUtils } from "./SettingsUtils";
-
+import * as vscode from "vscode";
 /**
- * This function try to resolve a given subroutine by searching COBOL source file with the same name
- * in local file system in directories specified in settings.
+ * This function try to resolve a given subroutine by searching COBOL source file
+ * with the same name in local workspace directories specified in settings.
  * @param name the name of subroutine
  * @return subroutine file URI if it was found or undefined otherwise
  */
-export function resolveSubroutineURI(
-  storagePath: string,
-  name: string,
-): string {
+export async function resolveSubroutineURI(name: string) {
   const folders: string[] | undefined =
     SettingsService.getSubroutineLocalPath();
-  const workspacePath = SettingsUtils.getWorkspaceFoldersPath(true);
-  getChannel().appendLine(
-    `Resolving subroutine - ${storagePath} [${workspacePath.join(", ")}] ${name} [${folders?.join(", ")}]`,
-  );
-  const uri = searchCopybookInExtensionFolder(
-    name,
-    folders,
-    COBOL_EXT_ARRAY,
-    workspacePath[0],
-  )!;
 
-  getChannel().appendLine(`Subroutine resolved - ${name} = ${uri.toString()}`);
+  const pattern = `{${folders?.join(",")}}/**/${name}{${COBOL_EXT_ARRAY_CASE_INSENSITIVE.join(",")}}`;
+  const uris = await vscode.workspace.findFiles(pattern, null, 1);
 
-  return uri.toString();
+  if (uris.length > 0) {
+    return uris[0].toString();
+  }
+
+  return undefined;
 }
