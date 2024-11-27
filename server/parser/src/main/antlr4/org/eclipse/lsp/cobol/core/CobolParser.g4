@@ -156,15 +156,11 @@ classRepositoryClause
     ;
 
 functionRepositoryClause
-    : functionReference | intrinsicClause
+    : FUNCTION (functionName+ INTRINSIC? | ALL INTRINSIC)
     ;
 
 functionReference
     : FUNCTION functionName
-    ;
-
-intrinsicClause
-    : (functionName* | ALL) INTRINSIC
     ;
 
 // - source computer paragraph ----------------------------------
@@ -2188,8 +2184,10 @@ length
    ;
 
 argument
-   : arithmeticExpression
-   | TRAILING | LEADING
+   : ALL
+   | arithmeticExpression
+   | TRAILING
+   | LEADING
    ;
 
 // qualified data name ----------------------------------
@@ -2199,7 +2197,7 @@ qualifiedDataName
    ;
 
 tableCall
-   : LPARENCHAR (ALL | arithmeticExpression) (COMMACHAR? (ALL | arithmeticExpression))* RPARENCHAR
+   : LPARENCHAR argument (COMMACHAR? argument)* RPARENCHAR
    ;
 
 specialRegister
