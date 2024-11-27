@@ -16,28 +16,58 @@ import * as vscode from "vscode";
 import { resolveSubroutineURI } from "../../../services/util/SubroutineUtils";
 
 describe("SubroutineUtils", () => {
-  beforeEach(() => {
-    jest.spyOn(vscode.workspace, "getConfiguration").mockReturnValue({
-      get: () => ["subroutines", "more-subroutines"],
-    } as unknown as vscode.WorkspaceConfiguration);
+  describe("Subroutines configuration exists", () => {
+    beforeEach(() => {
+      jest.spyOn(vscode.workspace, "getConfiguration").mockReturnValue({
+        get: () => ["subroutines", "more-subroutines"],
+      } as unknown as vscode.WorkspaceConfiguration);
+    });
+
+    let findFilesSpy: jest.SpyInstance;
+    describe("subroutine file exists in workspace", () => {
+      beforeEach(() => {
+        findFilesSpy = jest
+          .spyOn(vscode.workspace, "findFiles")
+          .mockResolvedValue([
+            vscode.Uri.file("/coding/cobol/subroutines/SUB1.cob"),
+          ]);
+      });
+
+      it("finds subroutine file in workspace folder by name and returns full path", async () => {
+        const uri = await resolveSubroutineURI("SUB1");
+        expect(uri).toEqual("file:///coding/cobol/subroutines/SUB1.cob");
+        expect(findFilesSpy).toHaveBeenCalledWith(
+          "{subroutines,more-subroutines}/**/SUB1{.CBL,.COB,.COBOL,.cbl,.cob,.cobol}",
+          null,
+          1,
+        );
+      });
+    });
+
+    describe("subroutine file doesn't exist in the subroutines folders", () => {
+      beforeEach(() => {
+        findFilesSpy = jest
+          .spyOn(vscode.workspace, "findFiles")
+          .mockResolvedValue([]);
+      });
+
+      it("returns undefined", async () => {
+        const uri = await resolveSubroutineURI("SUB1");
+        expect(uri).toBeUndefined();
+      });
+    });
   });
 
-  let findFilesSpy: jest.SpyInstance;
-  describe("subroutine file exists in workspace", () => {
-    findFilesSpy = jest
-      .spyOn(vscode.workspace, "findFiles")
-      .mockResolvedValue([
-        vscode.Uri.file("/coding/cobol/subroutines/SUB1.cob"),
-      ]);
+  describe("No subroutines folders are configured", () => {
+    beforeEach(() => {
+      jest.spyOn(vscode.workspace, "getConfiguration").mockReturnValue({
+        get: () => undefined,
+      } as unknown as vscode.WorkspaceConfiguration);
+    });
 
-    it("finds subroutine file in workspace folder by name", async () => {
+    it("subroutine path is resolved as undefined", async () => {
       const uri = await resolveSubroutineURI("SUB1");
-      expect(uri).toEqual("file:///coding/cobol/subroutines/SUB1.cob");
-      expect(findFilesSpy).toHaveBeenCalledWith(
-        "{subroutines,more-subroutines}/**/SUB1{.CBL,.COB,.COBOL,.cbl,.cob,.cobol}",
-        null,
-        1,
-      );
+      expect(uri).toBeUndefined();
     });
   });
 });

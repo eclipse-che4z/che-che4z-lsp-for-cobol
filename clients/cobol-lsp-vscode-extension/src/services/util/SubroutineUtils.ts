@@ -21,14 +21,15 @@ import * as vscode from "vscode";
  * @return subroutine file URI if it was found or undefined otherwise
  */
 export async function resolveSubroutineURI(name: string) {
-  const folders: string[] | undefined =
-    SettingsService.getSubroutineLocalPath();
+  const subroutinePaths = SettingsService.getSubroutineLocalPath();
 
-  const pattern = `{${folders?.join(",")}}/**/${name}{${COBOL_EXT_ARRAY_CASE_INSENSITIVE.join(",")}}`;
-  const uris = await vscode.workspace.findFiles(pattern, null, 1);
+  if (subroutinePaths && subroutinePaths.length > 0) {
+    const pattern = `{${subroutinePaths.join(",")}}/**/${name}{${COBOL_EXT_ARRAY_CASE_INSENSITIVE.join(",")}}`;
+    const uris = await vscode.workspace.findFiles(pattern, null, 1);
 
-  if (uris.length > 0) {
-    return uris[0].toString();
+    if (uris.length > 0) {
+      return uris[0].toString();
+    }
   }
 
   return undefined;
