@@ -57,7 +57,7 @@ describe("Tests copybook download service", () => {
       () =>
         ({
           get: (key: string) => workspaceConfigurationMock[key],
-        } as unknown as vscode.WorkspaceConfiguration),
+        }) as unknown as vscode.WorkspaceConfiguration,
     );
 
     jest
