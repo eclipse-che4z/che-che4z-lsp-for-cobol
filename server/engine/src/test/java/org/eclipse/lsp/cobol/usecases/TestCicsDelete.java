@@ -69,7 +69,7 @@ public class TestCicsDelete {
 
   private static final String GROUP_ONE_PARTIAL_OPTIONS_VALID_TEN = "DELETE FILE({$varFour}) NOSUSPEND RRN";
 
-  private static final String GROUP_TWO_ACTIVITY_INVALID = "DELETE {ACTIVITY(123)|error1|error2}";
+  private static final String GROUP_TWO_ACTIVITY_INVALID = "DELETE {ACTIVITY(123)|error1}";
 
   private static final String GROUP_TWO_CHANNEL_VALID = "DELETE CHANNEL({$varFour})";
 
@@ -77,17 +77,17 @@ public class TestCicsDelete {
 
   private static final String GROUP_TWO_TIMER_VALID = "DELETE TIMER({$varFour})";
 
-  private static final String GROUP_THREE_CONTAINER_BTS_VALID = "DELETE CONTAINER({$varFour}) RETCODE({$varOne})";
+  private static final String GROUP_THREE_CONTAINER_BTS_VALID = "DELETE CONTAINER({$varFour})";
 
-  private static final String GROUP_THREE_CONTAINER_BTS_ACTIVITY_VALID = "DELETE CONTAINER({$varFour}) ACTIVITY({$varFive}) RETCODE({$varOne})";
+  private static final String GROUP_THREE_CONTAINER_BTS_ACTIVITY_VALID = "DELETE CONTAINER({$varFour}) ACTIVITY({$varFive})";
 
-  private static final String GROUP_THREE_CONTAINER_BTS_ACQACTIVITY_VALID = "DELETE CONTAINER({$varFour}) ACQACTIVITY RETCODE({$varOne})";
+  private static final String GROUP_THREE_CONTAINER_BTS_ACQACTIVITY_VALID = "DELETE CONTAINER({$varFour}) ACQACTIVITY";
 
-  private static final String GROUP_THREE_CONTAINER_BTS_PROCESS_VALID = "DELETE CONTAINER({$varFour}) PROCESS RETCODE({$varOne})";
+  private static final String GROUP_THREE_CONTAINER_BTS_PROCESS_VALID = "DELETE CONTAINER({$varFour}) PROCESS";
 
-  private static final String GROUP_THREE_CONTAINER_BTS_ACQPROCESS_VALID = "DELETE CONTAINER({$varFour}) ACQPROCESS RETCODE({$varOne})";
+  private static final String GROUP_THREE_CONTAINER_BTS_ACQPROCESS_VALID = "DELETE CONTAINER({$varFour}) ACQPROCESS";
 
-  private static final String GROUP_THREE_CONTAINER_CHANNEL_VALID = "DELETE CONTAINER({$varFour}) CHANNEL({$varSix}) RETCODE({$varOne})";
+  private static final String GROUP_THREE_CONTAINER_CHANNEL_VALID = "DELETE CONTAINER({$varFour}) CHANNEL({$varSix})";
 
   private static final String GROUP_FOUR_DELETE_COUNTER_VALID = "DELETE COUNTER({$varFour})";
 
@@ -250,12 +250,6 @@ public class TestCicsDelete {
                     new Diagnostic(
                             new Range(),
                             "Missing required option: CONTAINER",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText()),
-                    "error2",
-                    new Diagnostic(
-                            new Range(),
-                            "Missing required option: RETCODE",
                             DiagnosticSeverity.Error,
                             ErrorSource.PARSING.getText()));
     CICSTestUtils.errorTest(GROUP_TWO_ACTIVITY_INVALID, expectedDiagnostic);

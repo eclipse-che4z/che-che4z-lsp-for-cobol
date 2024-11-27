@@ -311,7 +311,7 @@ cics_delete_group_one:  (cics_file_name | TOKEN cics_data_area  | cics_keylength
 cics_delete_group_two:  ((CHANNEL | EVENT | TIMER) cics_data_value | cics_handle_response)+;
 
 // CICS Delete Group 3 (Container (BTS), Container (Channel))
-cics_delete_group_three:  ((CONTAINER | ACTIVITY | CHANNEL | RETCODE) cics_data_value | ACQACTIVITY | PROCESS | ACQPROCESS | cics_handle_response)+;
+cics_delete_group_three:  ((CONTAINER | ACTIVITY | CHANNEL) cics_data_value | ACQACTIVITY | PROCESS | ACQPROCESS | cics_handle_response)+;
 
 // CICS Delete Group 4 (Counter, Dcounter)
 cics_delete_group_four:  (cics_counter_dcounter | POOL cics_name | NOSUSPEND | cics_handle_response)+;
