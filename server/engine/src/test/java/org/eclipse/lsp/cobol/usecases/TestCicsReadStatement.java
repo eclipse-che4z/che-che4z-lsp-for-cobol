@@ -38,7 +38,11 @@ public class TestCicsReadStatement {
     private static final String READ_VALID_1 = "READ FILE(123) UNCOMMITTED INTO(123) RIDFLD(123) KEYLENGTH(123) GENERIC SYSID(123) LENGTH(123) DEBKEY EQUAL NOSUSPEND";
     private static final String READ_VALID_2 = "READ FILE(123) INTO(123) RIDFLD(123)";
 
-    private static final String READ_INVALID_1 = "READ {RIDFLD(123)|errorOne}";
+    private static final String READ_INVALID_1 = "READ {RIDFLD(123)|errorOne} INTO(123)";
+    private static final String READ_INVALID_2 = "READ FILE(123) {DATASET|errorOne}(123) RIDFLD(123) INTO(123)";
+    private static final String READ_INVALID_3 = "READ {_FILE(123) INTO(123) RIDFLD(123) GENERIC|errorOne_}";
+    private static final String READ_INVALID_4 = "READ FILE(123) UNCOMMITTED {CONSISTENT|errorOne} INTO(123) RIDFLD(123) DEBKEY {RBA|errorTwo} EQUAL {GTEQ|errorThree}";
+    private static final String READ_INVALID_5 = "READ {_FILE(123) INTO(123) RIDFLD(123) TOKEN(123)|errorOne_}";
 
     // Test Functions
     @Test
@@ -56,5 +60,35 @@ public class TestCicsReadStatement {
         HashMap<String, Diagnostic> expectedDiagnostics = new HashMap<>();
         expectedDiagnostics.put("errorOne", new Diagnostic(new Range(), "Missing required option: FILE", DiagnosticSeverity.Error, ErrorSource.PARSING.getText()));
         CICSTestUtils.errorTest(READ_INVALID_1, expectedDiagnostics);
+    }
+
+    @Test
+    void testReadInvalid2() {
+        HashMap<String, Diagnostic> expectedDiagnostics = new HashMap<>();
+        expectedDiagnostics.put("errorOne", new Diagnostic(new Range(), "Options \"FILE instead of DATASET\" are mutually exclusive.", DiagnosticSeverity.Error, ErrorSource.PARSING.getText()));
+        CICSTestUtils.errorTest(READ_INVALID_2, expectedDiagnostics);
+    }
+
+    @Test
+    void testReadInvalid3() {
+        HashMap<String, Diagnostic> expectedDiagnostics = new HashMap<>();
+        expectedDiagnostics.put("errorOne", new Diagnostic(new Range(), "Missing required option for: GENERIC without KEYLENGTH", DiagnosticSeverity.Error, ErrorSource.PARSING.getText()));
+        CICSTestUtils.errorTest(READ_INVALID_3, expectedDiagnostics);
+    }
+
+    @Test
+    void testReadInvalid4() {
+        HashMap<String, Diagnostic> expectedDiagnostics = new HashMap<>();
+        expectedDiagnostics.put("errorOne", new Diagnostic(new Range(), "Options \"UNCOMMITTED, CONSISTENT, REPEATABLE or UPDATE\" are mutually exclusive.", DiagnosticSeverity.Error, ErrorSource.PARSING.getText()));
+        expectedDiagnostics.put("errorTwo", new Diagnostic(new Range(), "Options \"DEBKEY, DEBREC, RBA, RRN or XRBA\" are mutually exclusive.", DiagnosticSeverity.Error, ErrorSource.PARSING.getText()));
+        expectedDiagnostics.put("errorThree", new Diagnostic(new Range(), "Options \"EQUAL or GTEQ\" are mutually exclusive.", DiagnosticSeverity.Error, ErrorSource.PARSING.getText()));
+        CICSTestUtils.errorTest(READ_INVALID_4, expectedDiagnostics);
+    }
+
+    @Test
+    void testReadInvalid5() {
+        HashMap<String, Diagnostic> expectedDiagnostics = new HashMap<>();
+        expectedDiagnostics.put("errorOne", new Diagnostic(new Range(), "Missing required option for: TOKEN without UPDATE", DiagnosticSeverity.Error, ErrorSource.PARSING.getText()));
+        CICSTestUtils.errorTest(READ_INVALID_5, expectedDiagnostics);
     }
 }
