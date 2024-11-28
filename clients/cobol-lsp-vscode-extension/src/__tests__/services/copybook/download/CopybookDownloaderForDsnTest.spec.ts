@@ -23,19 +23,14 @@ import * as vscode from "vscode";
 import { TextEncoder } from "util";
 import { SettingsService } from "../../../../services/Settings";
 
-(vscode.workspace as any) = {
-  fs: {
-    readFile: jest
-      .fn()
-      .mockReturnValue(new TextEncoder().encode("copybook content")),
-    writeFile: jest.fn(),
-  },
-  workspaceFolders: [{ uri: { fsPath: "/projects" } } as any],
-};
-jest.mock("../../../../services/reporter/TelemetryService");
 describe("Tests Copybook download from DNS", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    jest
+      .spyOn(vscode.workspace.fs, "readFile")
+      .mockReturnValue(
+        Promise.resolve(new TextEncoder().encode("copybook content")),
+      );
   });
 
   describe("checks if the copybook is eligible to dowload passed on user settings", () => {
@@ -47,11 +42,11 @@ describe("Tests Copybook download from DNS", () => {
       jest.clearAllMocks();
     });
 
-    it("checks eligibility based on profile settings", async () => {
+    it("checks eligibility based on profile settings", () => {
       ProfileUtils.getProfileNameForCopybook = jest
         .fn()
         .mockReturnValue(undefined);
-      let isEligible = await downloader.isEligibleForDownload(
+      let isEligible = downloader.isEligibleForDownload(
         { name: "copybook-name", dialect: "COBOL" },
         "document-uri",
         "DNS.PATH",
@@ -60,7 +55,7 @@ describe("Tests Copybook download from DNS", () => {
       ProfileUtils.getProfileNameForCopybook = jest
         .fn()
         .mockReturnValue("test-profile");
-      isEligible = await downloader.isEligibleForDownload(
+      isEligible = downloader.isEligibleForDownload(
         { name: "copybook-name", dialect: "COBOL" },
         "document-uri",
         "DNS.PATH",
@@ -68,17 +63,17 @@ describe("Tests Copybook download from DNS", () => {
       expect(isEligible).toBeTruthy();
     });
 
-    it("checks eligibility based on DSN settings", async () => {
+    it("checks eligibility based on DSN settings", () => {
       ProfileUtils.getProfileNameForCopybook = jest
         .fn()
         .mockReturnValue("test-profile");
-      let isEligible = await downloader.isEligibleForDownload(
+      let isEligible = downloader.isEligibleForDownload(
         { name: "copybook-name", dialect: "COBOL" },
         "document-uri",
         undefined,
       );
       expect(isEligible).toBeFalsy();
-      isEligible = await downloader.isEligibleForDownload(
+      isEligible = downloader.isEligibleForDownload(
         { name: "copybook-name", dialect: "COBOL" },
         "document-uri",
         "DNS.PATH",
@@ -117,9 +112,6 @@ describe("Tests Copybook download from DNS", () => {
         .fn()
         .mockReturnValue("test-profile");
       downloader.isEligibleForDownload = jest.fn().mockReturnValue(true);
-      (downloader as any).checkForLockedProfile = jest
-        .fn()
-        .mockReturnValue(true);
       SettingsService.getCopybookFileEncoding = jest
         .fn()
         .mockReturnValue("utf8");

@@ -54,8 +54,8 @@ suite("Tests with USER1.cbl", function () {
     }
     let diagnostics: vscode.Diagnostic[] = [];
 
-    await helper.waitFor(async () => {
-      diagnostics = await vscode.languages.getDiagnostics(
+    await helper.waitFor(() => {
+      diagnostics = vscode.languages.getDiagnostics(
         vscode.window.activeTextEditor!.document.uri,
       );
       return diagnostics.length === 0;
@@ -66,22 +66,33 @@ suite("Tests with USER1.cbl", function () {
     assert.strictEqual(diagnostics.length, 0, expectedMsg);
   });
 
+  async function executeProvider(
+    provider:
+      | "vscode.executeDefinitionProvider"
+      | "vscode.executeReferenceProvider",
+    line: number,
+    char: number,
+  ) {
+    let locations: vscode.Location[] = [];
+    await helper.waitFor(async () => {
+      locations = await vscode.commands.executeCommand(
+        provider,
+        editor.document.uri,
+        pos(line, char),
+      );
+
+      return locations.length > 0;
+    });
+    return locations;
+  }
+
   test("TC152049: Navigate through definitions", async () => {
-    await helper.waitFor(
-      async () =>
-        (
-          (await vscode.commands.executeCommand(
-            "vscode.executeDefinitionProvider",
-            editor.document.uri,
-            pos(28, 24),
-          )) as any[]
-        ).length > 0,
-    );
-    const result: any[] = await vscode.commands.executeCommand(
+    const result = await executeProvider(
       "vscode.executeDefinitionProvider",
-      editor.document.uri,
-      pos(28, 24),
+      28,
+      24,
     );
+
     assert.strictEqual(result.length, 1);
     assert.ok(
       result[0].uri.fsPath.includes(editor.document.fileName) &&
@@ -92,22 +103,12 @@ suite("Tests with USER1.cbl", function () {
   });
 
   test("TC152080: Find all references from the word middle", async () => {
-    await helper.waitFor(
-      async () =>
-        (
-          (await vscode.commands.executeCommand(
-            "vscode.executeReferenceProvider",
-            editor.document.uri,
-            pos(20, 15),
-          )) as any[]
-        ).length > 0,
+    const result = await executeProvider(
+      "vscode.executeReferenceProvider",
+      20,
+      15,
     );
 
-    const result: any[] = await vscode.commands.executeCommand(
-      "vscode.executeReferenceProvider",
-      editor.document.uri,
-      pos(20, 15),
-    );
     assert.strictEqual(result.length, 3, "Check references count");
     assert.ok(
       result[0].uri.fsPath.includes(editor.document.fileName),
@@ -132,22 +133,12 @@ suite("Tests with USER1.cbl", function () {
   });
 
   test("TC152080: Find all references from the word begin", async () => {
-    await helper.waitFor(
-      async () =>
-        (
-          (await vscode.commands.executeCommand(
-            "vscode.executeReferenceProvider",
-            editor.document.uri,
-            pos(20, 10),
-          )) as any[]
-        ).length > 0,
+    const result = await executeProvider(
+      "vscode.executeReferenceProvider",
+      20,
+      10,
     );
 
-    const result: any[] = await vscode.commands.executeCommand(
-      "vscode.executeReferenceProvider",
-      editor.document.uri,
-      pos(20, 10),
-    );
     assert.ok(
       result.length === 3 &&
         result[0].uri.fsPath.includes(editor.document.fileName) &&
@@ -174,7 +165,7 @@ suite("Tests with USER1.cbl", function () {
     await vscode.workspace
       .getConfiguration()
       .update("cobol-lsp.formatting", "None");
-    const result: any[] = await vscode.commands.executeCommand(
+    const result = await vscode.commands.executeCommand<vscode.TextEdit[]>(
       "vscode.executeFormatDocumentProvider",
       editor.document.uri,
       { tabSize: 4, insertSpaces: true },

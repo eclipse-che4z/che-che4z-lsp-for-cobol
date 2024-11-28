@@ -50,7 +50,7 @@ class TestErrorRecovery {
             new Diagnostic(
                 new Range(), "No viable alternative at input VALUES",
                 DiagnosticSeverity.Error,
-                ErrorSource.PARSING.getText())));
+                ErrorSource.PREPROCESSING.getText())));
 
     String paragraphName = result.getRootNode().findFirstProgramNode()
         .getDepthFirstStream()

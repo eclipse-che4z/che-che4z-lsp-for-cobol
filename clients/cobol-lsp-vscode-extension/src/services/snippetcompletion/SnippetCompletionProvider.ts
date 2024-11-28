@@ -36,12 +36,10 @@ export class SnippetCompletionProvider
   snippetsCompletionItems: vscode.CompletionItem[] | null = null;
 
   constructor(context: vscode.ExtensionContext) {
-    const disposable = vscode.workspace.onDidChangeConfiguration(
-      async (event) => {
-        if (event.affectsConfiguration(SETTINGS_DIALECT))
-          this.resetSnippetsCompletionItems();
-      },
-    );
+    const disposable = vscode.workspace.onDidChangeConfiguration((event) => {
+      if (event.affectsConfiguration(SETTINGS_DIALECT))
+        this.resetSnippetsCompletionItems();
+    });
     context.subscriptions.push(disposable);
   }
 
@@ -189,7 +187,10 @@ function getCurrentLineText(
   document: vscode.TextDocument,
   position: vscode.Position,
 ) {
-  return document.lineAt(position).text.slice(0, position.character).trim();
+  return document
+    .lineAt(position.line)
+    .text.slice(0, position.character)
+    .trim();
 }
 
 function getMatchedWords(words1: string[], words2: string[]) {

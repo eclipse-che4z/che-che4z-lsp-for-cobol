@@ -36,8 +36,7 @@ suite("Integration Test Suite", function () {
   test("TC152047, TC152052, TC152051, TC152050, TC152053: Error case - file has syntax errors and are marked with detailed hints", async () => {
     await helper.showDocument("USER2.cbl");
     const editor = helper.getEditor("USER2.cbl");
-    await helper.waitForDiagnostics(editor.document.uri);
-    const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
+    const diagnostics = await helper.waitForDiagnostics(editor.document.uri);
     assert.strictEqual(diagnostics.length, 1);
     const d0 = diagnostics[0];
     assert.strictEqual(d0.message, "Syntax error on 'Program1-id'");
@@ -47,8 +46,7 @@ suite("Integration Test Suite", function () {
   test("TC152050, TC152053: Error case - file has semantic errors and are marked with detailed hints", async () => {
     await helper.showDocument("REPLACING.CBL");
     const editor = helper.getEditor("REPLACING.CBL");
-    await helper.waitForDiagnostics(editor.document.uri);
-    const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
+    const diagnostics = await helper.waitForDiagnostics(editor.document.uri);
     assert.strictEqual(diagnostics.length, 1);
     const d0 = diagnostics[0];
 
@@ -90,8 +88,7 @@ suite("Integration Test Suite", function () {
       pos(34, 11),
       "           EXEC CICS XCTL PROGRAM (XCTL1) END-EXEC.",
     );
-    await helper.waitForDiagnostics(editor.document.uri);
-    const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
+    const diagnostics = await helper.waitForDiagnostics(editor.document.uri);
     assert.strictEqual(diagnostics.length, 1);
     helper.assertRangeIsEqual(
       diagnostics[0].range,
@@ -178,15 +175,15 @@ suite("Integration Test Suite", function () {
     await helper.showDocument("ADSORT.cbl");
     const editor = helper.getEditor("ADSORT.cbl");
     await helper.waitFor(async () => {
-      helper.sleep(100);
-      const result: any[] = await vscode.commands.executeCommand(
+      await helper.sleep(100);
+      const result = await vscode.commands.executeCommand<vscode.Location[]>(
         "vscode.executeDefinitionProvider",
         editor.document.uri,
         pos(58, 36),
       );
       return result.length > 0;
     });
-    const result: any[] = await vscode.commands.executeCommand(
+    const result = await vscode.commands.executeCommand<vscode.Location[]>(
       "vscode.executeDefinitionProvider",
       editor.document.uri,
       pos(58, 36),
@@ -252,8 +249,7 @@ suite("Integration Test Suite", function () {
   test("TC266094 Underline the entire incorrect variable structure", async () => {
     await helper.showDocument("VAR.cbl");
     const editor = helper.getEditor("VAR.cbl");
-    await helper.waitForDiagnostics(editor.document.uri);
-    const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
+    const diagnostics = await helper.waitForDiagnostics(editor.document.uri);
     assert.strictEqual(diagnostics.length, 2);
     helper.assertRangeIsEqual(
       diagnostics[0].range,
@@ -277,8 +273,7 @@ suite("Integration Test Suite", function () {
 
   test("Load resource file", async () => {
     const editor = await helper.showDocument("RES.cbl");
-    await helper.waitForDiagnostics(editor.document.uri);
-    const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
+    const diagnostics = await helper.waitForDiagnostics(editor.document.uri);
 
     assert.strictEqual(diagnostics.length, 1);
     assert.ok(
@@ -292,72 +287,69 @@ suite("Integration Test Suite", function () {
     .timeout(helper.TEST_TIMEOUT)
     .slow(1000);
 
-  test(
-    "TC266074 LSP analysis for extended sources - basic scenario",
-    async () => {
-      const extSrcUser1FilePath = path.join(".c4z", ".extsrcs", "USER1.cbl");
-      const user1FilePath = "USER1.cbl";
-      await vscode.workspace.fs.copy(
-        vscode.Uri.joinPath(vscode.Uri.file(getWorkspacePath()), user1FilePath),
-        vscode.Uri.joinPath(
-          vscode.Uri.file(getWorkspacePath()),
-          extSrcUser1FilePath,
-        ),
-        { overwrite: true },
-      );
+  test("TC266074 LSP analysis for extended sources - basic scenario", async () => {
+    const extSrcUser1FilePath = path.join(".c4z", ".extsrcs", "USER1.cbl");
+    const user1FilePath = "USER1.cbl";
+    await vscode.workspace.fs.copy(
+      vscode.Uri.joinPath(vscode.Uri.file(getWorkspacePath()), user1FilePath),
+      vscode.Uri.joinPath(
+        vscode.Uri.file(getWorkspacePath()),
+        extSrcUser1FilePath,
+      ),
+      { overwrite: true },
+    );
 
-      let editor = await helper.showDocument(extSrcUser1FilePath);
-      await helper.insertString(editor, pos(25, 0), "           COPY ABC.");
+    let editor = await helper.showDocument(extSrcUser1FilePath);
+    await helper.insertString(editor, pos(25, 0), "           COPY ABC.");
 
-      let diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
-      assert.strictEqual(diagnostics.length, 0);
+    let diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
+    assert.strictEqual(diagnostics.length, 0);
 
-      await editor.edit((edit) => {
-        edit.delete(range(pos(25, 19), pos(25, 20)));
-      });
-      await helper.waitForDiagnostics(editor.document.uri);
-      diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
-      assert.strictEqual(diagnostics.length, 1);
-      assert.ok(diagnostics[0].message.includes("Syntax error on 'COPY'"));
+    await editor.edit((edit) => {
+      edit.delete(range(pos(25, 19), pos(25, 20)));
+    });
+    await helper.waitForDiagnostics(editor.document.uri);
+    diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
+    assert.strictEqual(diagnostics.length, 1);
+    assert.ok(diagnostics[0].message.includes("Syntax error on 'COPY'"));
 
-      await helper.insertString(editor, pos(25, 20), "\n           Mov");
-      await helper.waitFor(
-        () => vscode.languages.getDiagnostics(editor.document.uri).length > 0,
-      );
-      assert.strictEqual(
-        vscode.languages.getDiagnostics(editor.document.uri).length,
-        1,
-      );
+    await helper.insertString(editor, pos(25, 20), "\n           Mov");
+    await helper.waitFor(
+      () => vscode.languages.getDiagnostics(editor.document.uri).length > 0,
+    );
+    assert.strictEqual(
+      vscode.languages.getDiagnostics(editor.document.uri).length,
+      1,
+    );
 
-      editor = await helper.showDocument("USER1.cbl");
-      await helper.insertString(editor, pos(40, 0), "           COPY ABC.");
-      await helper.waitFor(
-        () => vscode.languages.getDiagnostics(editor.document.uri).length > 0,
-      );
-      diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
+    editor = await helper.showDocument("USER1.cbl");
+    await helper.insertString(editor, pos(40, 0), "           COPY ABC.");
+    await helper.waitFor(
+      () => vscode.languages.getDiagnostics(editor.document.uri).length > 0,
+    );
+    diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
 
-      assert.strictEqual(diagnostics.length, 1);
-      const d0 = diagnostics[0];
-      assert.ok(d0.message.includes("ABC: Copybook not found"));
-      assert.ok(
-        d0 &&
-          d0.source &&
-          d0.source.includes("COBOL Language Support (copybook)"),
-      );
+    assert.strictEqual(diagnostics.length, 1);
+    const d0 = diagnostics[0];
+    assert.ok(d0.message.includes("ABC: Copybook not found"));
+    assert.ok(
+      d0 &&
+        d0.source &&
+        d0.source.includes("COBOL Language Support (copybook)"),
+    );
 
-      await helper.insertString(editor, pos(40, 21), "\n           Mov");
-      await helper.waitFor(
-        () => vscode.languages.getDiagnostics(editor.document.uri).length === 3,
-      );
-      diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
-      assert.strictEqual(diagnostics.length, 3);
-      assert.ok(
-        diagnostics[2].message.includes(
-          "The following token must start in Area A: Mov",
-        ),
-      );
-    },
-  )
+    await helper.insertString(editor, pos(40, 21), "\n           Mov");
+    await helper.waitFor(
+      () => vscode.languages.getDiagnostics(editor.document.uri).length === 3,
+    );
+    diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
+    assert.strictEqual(diagnostics.length, 3);
+    assert.ok(
+      diagnostics[2].message.includes(
+        "The following token must start in Area A: Mov",
+      ),
+    );
+  })
     ?.timeout(helper.TEST_TIMEOUT)
     ?.slow(1000);
 
@@ -366,8 +358,7 @@ suite("Integration Test Suite", function () {
     await editor.edit((edit) => {
       edit.replace(range(pos(48, 30), pos(48, 32)), "1.");
     });
-    await helper.waitForDiagnostics(editor.document.uri);
-    const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
+    const diagnostics = await helper.waitForDiagnostics(editor.document.uri);
     assert.strictEqual(diagnostics.length, 1);
     assert.strictEqual(
       diagnostics[0].message,

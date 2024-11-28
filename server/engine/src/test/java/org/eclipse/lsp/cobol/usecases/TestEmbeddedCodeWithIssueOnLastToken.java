@@ -54,7 +54,7 @@ public class TestEmbeddedCodeWithIssueOnLastToken {
                 new Range(),
                 "No viable alternative at input abc\n           into\n           asas, \n           ajsjs, \n           :testing, ",
                 DiagnosticSeverity.Error,
-                ErrorSource.PARSING.getText())));
+                ErrorSource.PREPROCESSING.getText())));
   }
 
   @Test
@@ -68,7 +68,7 @@ public class TestEmbeddedCodeWithIssueOnLastToken {
                 new Range(),
                 "No viable alternative at input (",
                 DiagnosticSeverity.Error,
-                ErrorSource.PARSING.getText())));
+                ErrorSource.PREPROCESSING.getText())));
   }
 
   @Test

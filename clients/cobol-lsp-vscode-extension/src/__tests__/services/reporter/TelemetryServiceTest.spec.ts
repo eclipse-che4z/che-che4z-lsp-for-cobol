@@ -27,8 +27,8 @@ const FAKE_ROOT_PATH: string = path.join(
   "folder2",
   "folder3",
 );
-let spySendTelemetry: any;
-let spySendExceptionTelemetry: any;
+let spySendTelemetry: jest.SpyInstance;
+let spySendExceptionTelemetry: jest.SpyInstance;
 jest.mock("@vscode/extension-telemetry");
 
 function runScenario(
@@ -46,18 +46,20 @@ function runScenario(
       undefined,
       telemetryMeasurements,
     );
-    expect(spySendTelemetry).toBeCalledTimes(expectedNumberOfCalls);
+    expect(spySendTelemetry).toHaveBeenCalledTimes(expectedNumberOfCalls);
   } else {
     TelemetryService.registerExceptionEvent(eventName, rootCause!, categories);
-    expect(spySendExceptionTelemetry).toBeCalledTimes(expectedNumberOfCalls);
+    expect(spySendExceptionTelemetry).toHaveBeenCalledTimes(
+      expectedNumberOfCalls,
+    );
   }
 }
 
 function setupScenario() {
-  (TelemetryReporterImpl as any).getTelemetryKeyId = jest
+  TelemetryReporterImpl["getTelemetryKeyId"] = jest
     .fn()
     .mockReturnValue("key_id_for_testing_purposes");
-  (TelemetryService as any).getUsername = jest.fn().mockReturnValue(USERNAME);
+  TelemetryService["getUsername"] = jest.fn().mockReturnValue(USERNAME);
   spySendTelemetry = jest.spyOn(
     TelemetryReporter.prototype,
     "sendTelemetryEvent",
@@ -86,7 +88,7 @@ describe("TelemetryService information are consistent before send them to the te
       "time elapsed": TelemetryService.calculateTimeElapsed(
         startTime - 100,
         startTime,
-      )!,
+      ),
     });
   });
 
@@ -96,7 +98,7 @@ describe("TelemetryService information are consistent before send them to the te
       "time elapsed": TelemetryService.calculateTimeElapsed(
         startTime + 100,
         startTime,
-      )!,
+      ),
     });
   });
 
@@ -123,7 +125,7 @@ describe("TelemetryService information are consistent before send them to the te
 
 describe("Anonymize content", () => {
   test("Given a verbose exception log content, then the information about the user is obfuscated", () => {
-    (TelemetryService as any).getUsername = jest.fn().mockReturnValue(USERNAME);
+    TelemetryService["getUsername"] = jest.fn().mockReturnValue(USERNAME);
 
     // construct a cross-platform example path to validate the anonymization functionality
     const fakePath: string = path.format({
@@ -165,7 +167,7 @@ describe("Anonymize content", () => {
       "\tat async Promise.all (index 0)\n";
 
     expect(
-      (TelemetryService as any).anonymizeContent(input).includes(USERNAME),
+      TelemetryService["anonymizeContent"](input).includes(USERNAME),
     ).toBeFalsy();
   });
 });

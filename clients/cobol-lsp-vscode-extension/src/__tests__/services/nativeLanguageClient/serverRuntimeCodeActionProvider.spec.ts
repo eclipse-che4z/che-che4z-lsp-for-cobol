@@ -13,59 +13,62 @@
  */
 
 import * as vscode from "vscode";
-import { Range } from "../../../__mocks__/vscode";
 import { ServerRuntimeCodeActionProvider } from "../../../services/nativeLanguageClient/serverRuntimeCodeActionProvider";
 
 jest.mock("../../../services/reporter/TelemetryService");
 describe("Tests the server code actions", () => {
-  it("checks that no code action is provided when diagnostics is empty", async () => {
+  let range: vscode.Range;
+  beforeAll(() => {
+    range = new vscode.Range(
+      new vscode.Position(0, 0),
+      new vscode.Position(0, 0),
+    );
+  });
+
+  it("checks that no code action is provided when diagnostics is empty", () => {
     const codeActionProvider = new ServerRuntimeCodeActionProvider();
     const { doc, context, token } = getCodeactionMockObjects([]);
-    const codeActions = await codeActionProvider.provideCodeActions(
+    const codeActions = codeActionProvider.provideCodeActions(
       doc,
-      new Range(),
+      range,
       context,
       token,
     );
     expect(codeActions.length).toBe(0);
   });
 
-  it("checks that no code action is provided when diagnostics is a syntax error and not a setup  issue", async () => {
+  it("checks that no code action is provided when diagnostics is a syntax error and not a setup  issue", () => {
     const codeActionProvider = new ServerRuntimeCodeActionProvider();
     const { doc, context, token } = getCodeactionMockObjects([
       {
-        range: new Range(),
+        range,
         message: "some syntax error",
         severity: 0,
         code: "syntax error",
       },
     ]);
-    const codeActions = await codeActionProvider.provideCodeActions(
+    const codeActions = codeActionProvider.provideCodeActions(
       doc,
-      new Range(),
+      range,
       context,
       token,
     );
     expect(codeActions.length).toBe(0);
   });
 
-  it("checks that code actions are provided when the diagnostics are related to the server type configuration", async () => {
+  it("checks that code actions are provided when the diagnostics are related to the server type configuration", () => {
     const codeActionProvider = new ServerRuntimeCodeActionProvider();
     const { doc, context, token } = getCodeactionMockObjects([
       {
-        range: new Range(),
+        range,
         message: "server configuration error",
         severity: 0,
         code: "incompatible server type",
       },
     ]);
-    (vscode.CodeActionKind as any) = {
-      QuickFix: "quickfix",
-    };
-    (vscode.CodeAction as any) = jest.fn();
-    const codeActions = await codeActionProvider.provideCodeActions(
+    const codeActions = codeActionProvider.provideCodeActions(
       doc,
-      new Range(),
+      range,
       context,
       token,
     );
@@ -78,7 +81,7 @@ function getCodeactionMockObjects(diagnostics: vscode.Diagnostic[]) {
     uri: { fsPath: "ws-path" },
     fileName: "test-file",
     lineAt: jest.fn().mockReturnValue({ text: "" }),
-  } as any;
+  } as unknown as vscode.TextDocument;
   const context = {
     triggerKind: 1,
     diagnostics: diagnostics,
