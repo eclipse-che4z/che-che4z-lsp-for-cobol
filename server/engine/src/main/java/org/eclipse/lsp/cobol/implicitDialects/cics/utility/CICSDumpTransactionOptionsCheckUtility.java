@@ -37,25 +37,25 @@ public class CICSDumpTransactionOptionsCheckUtility extends CICSOptionsCheckBase
             new HashMap<Integer, ErrorSeverity>() {
                 {
                     put(CICSLexer.DUMP, ErrorSeverity.ERROR);
-                    put(CICSLexer.TRANSACTION, ErrorSeverity.ERROR);
+                    put(CICSLexer.TRANSACTION, ErrorSeverity.WARNING);
                     put(CICSLexer.FROM, ErrorSeverity.ERROR);
                     put(CICSLexer.LENGTH, ErrorSeverity.ERROR);
                     put(CICSLexer.FLENGTH, ErrorSeverity.ERROR);
-                    put(CICSLexer.COMPLETE, ErrorSeverity.ERROR);
-                    put(CICSLexer.TRT, ErrorSeverity.ERROR);
+                    put(CICSLexer.COMPLETE, ErrorSeverity.WARNING);
+                    put(CICSLexer.TRT, ErrorSeverity.WARNING);
                     put(CICSLexer.SEGMENTLIST, ErrorSeverity.ERROR);
                     put(CICSLexer.LENGTHLIST, ErrorSeverity.ERROR);
                     put(CICSLexer.NUMSEGMENTS, ErrorSeverity.ERROR);
-                    put(CICSLexer.TASK, ErrorSeverity.ERROR);
-                    put(CICSLexer.STORAGE, ErrorSeverity.ERROR);
-                    put(CICSLexer.PROGRAM, ErrorSeverity.ERROR);
-                    put(CICSLexer.TERMINAL, ErrorSeverity.ERROR);
-                    put(CICSLexer.TABLES, ErrorSeverity.ERROR);
-                    put(CICSLexer.FCT, ErrorSeverity.ERROR);
-                    put(CICSLexer.PCT, ErrorSeverity.ERROR);
-                    put(CICSLexer.PPT, ErrorSeverity.ERROR);
-                    put(CICSLexer.SIT, ErrorSeverity.ERROR);
-                    put(CICSLexer.TCT, ErrorSeverity.ERROR);
+                    put(CICSLexer.TASK, ErrorSeverity.WARNING);
+                    put(CICSLexer.STORAGE, ErrorSeverity.WARNING);
+                    put(CICSLexer.PROGRAM, ErrorSeverity.WARNING);
+                    put(CICSLexer.TERMINAL, ErrorSeverity.WARNING);
+                    put(CICSLexer.TABLES, ErrorSeverity.WARNING);
+                    put(CICSLexer.FCT, ErrorSeverity.WARNING);
+                    put(CICSLexer.PCT, ErrorSeverity.WARNING);
+                    put(CICSLexer.PPT, ErrorSeverity.WARNING);
+                    put(CICSLexer.SIT, ErrorSeverity.WARNING);
+                    put(CICSLexer.TCT, ErrorSeverity.WARNING);
                     put(CICSLexer.DUMPID, ErrorSeverity.ERROR);
                 }
             };
