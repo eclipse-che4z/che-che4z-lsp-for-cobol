@@ -281,7 +281,8 @@ cics_connect_process: (PROCESS | (CONVID | SESSION | PARTNER) cics_name | PROCNA
                        STATE cics_cvda | cics_handle_response)+;
 
 /** CONVERTTIME */
-cics_converttime: CONVERTTIME (DATESTRING cics_data_area | ABSTIME cics_data_area | cics_handle_response)+;
+cics_converttime: CONVERTTIME cics_converttime_opts;
+cics_converttime_opts:(DATESTRING cics_data_area | ABSTIME cics_data_area | cics_handle_response)+;
 
 /** DEFINE (all of them) */
 cics_define: DEFINE (cics_define_activity | cics_define_composite_event | cics_define_counter_dcounter | cics_define_input_event | cics_define_process | cics_define_timer);
