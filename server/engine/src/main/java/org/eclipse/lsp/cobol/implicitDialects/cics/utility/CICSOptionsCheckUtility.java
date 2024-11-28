@@ -73,6 +73,9 @@ public class CICSOptionsCheckUtility {
         CICSCancelOptionsCheckUtility.RULE_INDEX,
         new CICSCancelOptionsCheckUtility(context, errors));
     optionsMap.put(
+        CICSConnectProcessOptionsCheckUtility.RULE_INDEX,
+        new CICSConnectProcessOptionsCheckUtility(context, errors));
+    optionsMap.put(
         CICSCheckOptionsUtility.RULE_INDEX,
         new CICSCheckOptionsUtility(context, errors));
     optionsMap.put(
@@ -102,6 +105,9 @@ public class CICSOptionsCheckUtility {
     optionsMap.put(
         CICSInvokeOptionsCheckUtility.RULE_INDEX,
         new CICSInvokeOptionsCheckUtility(context, errors));
+    optionsMap.put(
+        CICSConvertTimeOptionsCheckUtility.RULE_INDEX,
+        new CICSConvertTimeOptionsCheckUtility(context, errors));
   }
 
   /**
