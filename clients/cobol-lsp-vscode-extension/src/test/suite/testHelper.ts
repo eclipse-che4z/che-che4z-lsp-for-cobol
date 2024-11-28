@@ -155,11 +155,16 @@ export async function waitForDiagnostics(
   uri: vscode.Uri,
   timeout: number = 50000,
 ) {
-  return waitFor(
-    () => vscode.languages.getDiagnostics(uri).length > 0,
+  let diagnostics: vscode.Diagnostic[] = [];
+  await waitFor(
+    () => {
+      diagnostics = vscode.languages.getDiagnostics(uri);
+      return diagnostics.length > 0;
+    },
     timeout,
     "diagnostics (" + path.basename(uri.fsPath) + ")",
   );
+  return diagnostics;
 }
 
 export async function waitFor(

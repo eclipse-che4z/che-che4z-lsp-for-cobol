@@ -19,6 +19,7 @@ package org.eclipse.lsp.cobol.usecases;
         import org.eclipse.lsp.cobol.usecases.common.CICSTestUtils;
         import org.eclipse.lsp4j.Diagnostic;
         import org.eclipse.lsp4j.DiagnosticSeverity;
+        import org.eclipse.lsp4j.Position;
         import org.eclipse.lsp4j.Range;
         import org.junit.jupiter.api.Test;
 
@@ -51,16 +52,13 @@ public class TestCICSCancel {
 
     private static final String CANCEL_REQID_ACTIVITY_INVALID =
             "CANCEL REQID({$varFour}) {ACTIVITY | error} ";
-
-    private static final String CANCEL_SYSID_INVALID =
-            "CANCEL {SYSID | errorSysid} ";
     private static final String CANCEL_TRANSID_INVALID =
-            "CANCEL {TRANSID | errorTransid} ";
+            "CANCEL {TRANSID(100) | errorTransid} ";
     private static final String CANCEL_ACQACTIVITY_ACQPROCESS_INVALID =
-            "CANCEL ACQACTIVITY {ACQPROCESS | errorAcqactivityAcqProcess} ";
+            "CANCEL {ACQACTIVITY | errorAcqactivityAcqProcess} {ACQPROCESS | errorAcqactivityAcqProcess2} ";
 
     private static final String CANCEL_ACTIVITY_ACQPROCESS_INVALID =
-            "CANCEL ACTIVITY({$varOne}) {ACQPROCESS | errorActivityAcqProcess} ";
+            "CANCEL {ACTIVITY | errorActivityAcqProcess }(100) {ACQPROCESS | errorActivityAcqProcess2} ";
     @Test
     void testCancelActivityValid() {
 
@@ -104,25 +102,13 @@ public class TestCICSCancel {
         CICSTestUtils.errorTest(CANCEL_REQID_ACTIVITY_INVALID, expectedDiagnostics);
     }
     @Test
-    void testCancelSysidInvalid() {
-        Map<String, Diagnostic> expectedDiagnostics =
-                ImmutableMap.of(
-                        "errorSysid",
-                        new Diagnostic(
-                                new Range(),
-                                "Syntax error on 'SYSID'",
-                                DiagnosticSeverity.Error,
-                                ErrorSource.PARSING.getText()));
-        CICSTestUtils.errorTest(CANCEL_SYSID_INVALID, expectedDiagnostics);
-    }
-    @Test
     void testCancelTransidInvalid() {
         Map<String, Diagnostic> expectedDiagnostics =
                 ImmutableMap.of(
                         "errorTransid",
                         new Diagnostic(
                                 new Range(),
-                                "Syntax error on 'TRANSID'",
+                                "Missing required option: REQID",
                                 DiagnosticSeverity.Error,
                                 ErrorSource.PARSING.getText()));
         CICSTestUtils.errorTest(CANCEL_TRANSID_INVALID, expectedDiagnostics);
@@ -134,7 +120,13 @@ public class TestCICSCancel {
                         "errorAcqactivityAcqProcess",
                         new Diagnostic(
                                 new Range(),
-                                "Extraneous input ACQPROCESS",
+                                "Exactly one option required, options are mutually exclusive: ACTIVITY or ACQACTIVITY or ACQPROCESS",
+                                DiagnosticSeverity.Error,
+                                ErrorSource.PARSING.getText()),
+                        "errorAcqactivityAcqProcess2",
+                        new Diagnostic(
+                                new Range(new Position(14, 12), new Position(14, 22)),
+                                "Exactly one option required, options are mutually exclusive: ACTIVITY or ACQACTIVITY or ACQPROCESS",
                                 DiagnosticSeverity.Error,
                                 ErrorSource.PARSING.getText()));
         CICSTestUtils.errorTest(CANCEL_ACQACTIVITY_ACQPROCESS_INVALID, expectedDiagnostics);
@@ -146,7 +138,13 @@ public class TestCICSCancel {
                         "errorActivityAcqProcess",
                         new Diagnostic(
                                 new Range(),
-                                "Extraneous input ACQPROCESS",
+                                "Exactly one option required, options are mutually exclusive: ACTIVITY or ACQACTIVITY or ACQPROCESS",
+                                DiagnosticSeverity.Error,
+                                ErrorSource.PARSING.getText()),
+                        "errorActivityAcqProcess2",
+                        new Diagnostic(
+                                new Range(new Position(14, 12), new Position(14, 22)),
+                                "Exactly one option required, options are mutually exclusive: ACTIVITY or ACQACTIVITY or ACQPROCESS",
                                 DiagnosticSeverity.Error,
                                 ErrorSource.PARSING.getText()));
         CICSTestUtils.errorTest(CANCEL_ACTIVITY_ACQPROCESS_INVALID, expectedDiagnostics);

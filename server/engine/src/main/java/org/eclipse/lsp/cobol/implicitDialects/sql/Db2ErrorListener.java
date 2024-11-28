@@ -64,7 +64,7 @@ public class Db2ErrorListener extends BaseErrorListener {
 
     SyntaxError error =
         SyntaxError.syntaxError()
-            .errorSource(ErrorSource.PARSING)
+            .errorSource(ErrorSource.PREPROCESSING)
             .location(
                 Locality.builder()
                     .uri(uri)

@@ -14,10 +14,6 @@
 import * as vscode from "vscode";
 
 export class SettingsUtils {
-  public static isValidJSON(json: string | undefined): boolean {
-    return json !== undefined ? JSON.parse(json) : false;
-  }
-
   public static getWorkspaceFoldersPath(
     fsPath: boolean | undefined = undefined,
   ): string[] {

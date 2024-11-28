@@ -35,10 +35,13 @@ export function activate(context: ExtensionContext) {
   );
 
   context.subscriptions.push(
-    vscode.commands.registerCommand("cobol-lsp.snippets.insertSnippets", () => {
-      outputChannel.appendLine("Executing Insert Cobol Snippet command");
-      pickSnippet();
-    }),
+    vscode.commands.registerCommand(
+      "cobol-lsp.snippets.insertSnippets",
+      async () => {
+        outputChannel.appendLine("Executing Insert Cobol Snippet command");
+        await pickSnippet();
+      },
+    ),
   );
 
   initSmartTab(context);
