@@ -110,9 +110,8 @@ export async function activate(
   context: vscode.ExtensionContext,
 ): Promise<__ExtensionApi & __AnalysisApi> {
   DialectRegistry.clear();
-  const { copyBooksDownloader, configurationWatcher } = await initialize(
-    context,
-  );
+  const { copyBooksDownloader, configurationWatcher } =
+    await initialize(context);
   initSmartTab(context);
 
   TelemetryService.registerEvent(

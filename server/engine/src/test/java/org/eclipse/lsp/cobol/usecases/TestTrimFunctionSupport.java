@@ -30,9 +30,9 @@ public class TestTrimFunctionSupport {
           + "       LINKAGE SECTION.\n"
           + "       PROCEDURE DIVISION.\n"
           + "       {@*MAIN} SECTION.\n"
-          + "           MOVE FUNCTION TRIM('TEST123   ', TRAILING)\n"
+          + "           MOVE FUNCTION {$$TRIM}('TEST123   ', TRAILING)\n"
           + "             TO {$TRIM-OUT-VAL}\n"
-          + "           MOVE FUNCTION TRIM('   TEST123', LEADING)\n"
+          + "           MOVE FUNCTION {$$TRIM}('   TEST123', LEADING)\n"
           + "             TO {$TRIM-OUT-VAL}\n"
           + "           GOBACK.";
 

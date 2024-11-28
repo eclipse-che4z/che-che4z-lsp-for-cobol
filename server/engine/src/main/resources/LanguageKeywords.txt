@@ -254,6 +254,7 @@ CHARACTER=The PADDING CHARACTER clause specifies a character to be used for bloc
 CHARACTER_LENGTH=
 CHARACTERS=The CHARACTERS keyword has several functions.<br>[Search IBM documentation](https://www.ibm.com/support/knowledgecenter/SS6SG3_6.2.0/welcome.html)<br>\u00A9 Copyright IBM Corporation 1994, 2019.<br>U.S. Government Users Restricted Rights - Use, duplication or disclosure restricted by GSA ADP Schedule Contract with IBM Corp.
 CHARACTERSET=
+CHECK=
 CHECKED=
 CHR=
 CHUNKEND=
