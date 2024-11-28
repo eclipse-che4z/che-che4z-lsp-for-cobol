@@ -87,8 +87,11 @@ public class TestCicsDelayStatement {
           "DELAY { INTERVAL | errorIntervalTime2 }(100) {TIME | errorIntervalTime }(100)";
 
   private static final String DELAY_UNTIL_MILLISEC_INVALID =
-          "DELAY UNTIL {MILLISECS |  errorMillisecs}(100)";
-
+          "DELAY UNTIL HOURS({$varFour}) {MILLISECS |  errorMillisecs}(100)";
+  private static final String DELAY_UNTIL_MISSING_INVALID =
+          "DELAY {UNTIL|errorMissingTimeInterval}";
+  private static final String DELAY_FOR_MISSING_INVALID =
+          "DELAY {FOR|errorMissingTimeIntervalFor}";
   @Test
   void testDelayReqidValid() {
     CICSTestUtils.noErrorTest(DELAY_VALID);
@@ -145,5 +148,29 @@ public class TestCicsDelayStatement {
                             DiagnosticSeverity.Error,
                             ErrorSource.PARSING.getText()));
     CICSTestUtils.errorTest(DELAY_UNTIL_MILLISEC_INVALID, expectedDiagnostic);
+  }
+  @Test
+  void testDelayUntilMissingTimeIntervalInvalid() {
+    Map<String, Diagnostic> expectedDiagnostic =
+            ImmutableMap.of(
+                    "errorMissingTimeInterval",
+                    new Diagnostic(
+                            new Range(),
+                            "Missing required option: HOURS or MINUTES or SECONDS",
+                            DiagnosticSeverity.Error,
+                            ErrorSource.PARSING.getText()));
+    CICSTestUtils.errorTest(DELAY_UNTIL_MISSING_INVALID, expectedDiagnostic);
+  }
+  @Test
+  void testDelayForMissingTimeIntervalInvalid() {
+    Map<String, Diagnostic> expectedDiagnostic =
+            ImmutableMap.of(
+                    "errorMissingTimeIntervalFor",
+                    new Diagnostic(
+                            new Range(),
+                            "Missing required option: HOURS or MINUTES or SECONDS or MILLISECS",
+                            DiagnosticSeverity.Error,
+                            ErrorSource.PARSING.getText()));
+    CICSTestUtils.errorTest(DELAY_FOR_MISSING_INVALID, expectedDiagnostic);
   }
 }

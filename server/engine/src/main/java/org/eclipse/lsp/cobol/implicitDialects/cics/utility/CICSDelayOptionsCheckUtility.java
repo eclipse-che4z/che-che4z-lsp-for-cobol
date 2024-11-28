@@ -39,12 +39,12 @@ public class CICSDelayOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
                     put(CICSLexer.DELAY, ErrorSeverity.ERROR);
                     put(CICSLexer.INTERVAL, ErrorSeverity.ERROR);
                     put(CICSLexer.TIME, ErrorSeverity.ERROR);
-                    put(CICSLexer.FOR, ErrorSeverity.ERROR);
+                    put(CICSLexer.FOR, ErrorSeverity.WARNING);
                     put(CICSLexer.HOURS, ErrorSeverity.ERROR);
                     put(CICSLexer.MINUTES, ErrorSeverity.ERROR);
                     put(CICSLexer.SECONDS, ErrorSeverity.ERROR);
                     put(CICSLexer.MILLISECS, ErrorSeverity.ERROR);
-                    put(CICSLexer.UNTIL, ErrorSeverity.ERROR);
+                    put(CICSLexer.UNTIL, ErrorSeverity.WARNING);
                     put(CICSLexer.REQID, ErrorSeverity.ERROR);
                 }
             };
@@ -70,8 +70,11 @@ public class CICSDelayOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
 
     private void checkOpts(CICSParser.Cics_delay_optsContext ctx) {
 
-        if (!ctx.UNTIL().isEmpty())
+        if (!ctx.UNTIL().isEmpty()) {
             checkHasIllegalOptions(ctx.MILLISECS(), "MILLISECS");
+            if (ctx.HOURS().isEmpty() && ctx.MINUTES().isEmpty() && ctx.SECONDS().isEmpty())
+                checkHasMandatoryOptions(ctx.HOURS(), ctx, "HOURS or MINUTES or SECONDS");
+        }
 
         checkHasMutuallyExclusiveOptions("INTERVAL, TIME, UNTIL, FOR", ctx.INTERVAL(),
                     ctx.TIME(), ctx.UNTIL(), ctx.FOR());
@@ -82,5 +85,8 @@ public class CICSDelayOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
             checkHasIllegalOptions(ctx.SECONDS(), "SECONDS");
             checkHasIllegalOptions(ctx.MILLISECS(), "MILLISECS");
         }
+        if (!ctx.FOR().isEmpty() && ctx.HOURS().isEmpty() && ctx.MINUTES().isEmpty() && ctx.SECONDS().isEmpty()
+        && ctx.MILLISECS().isEmpty())
+            checkHasMandatoryOptions(ctx.HOURS(), ctx, "HOURS or MINUTES or SECONDS or MILLISECS");
     }
     }
