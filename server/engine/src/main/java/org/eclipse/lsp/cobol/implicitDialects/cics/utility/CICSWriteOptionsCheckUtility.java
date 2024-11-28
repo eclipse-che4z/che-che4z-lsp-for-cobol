@@ -121,6 +121,7 @@ public class CICSWriteOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
 
   @SuppressWarnings("unchecked")
   private void checkWriteOperator(CICSParser.Cics_write_operatorContext ctx) {
+    checkHasMandatoryOptions(ctx.OPERATOR(), ctx, "OPERATOR");
     checkHasMandatoryOptions(ctx.TEXT(), ctx, "TEXT");
     if (!ctx.NUMROUTES().isEmpty()) {
       checkHasMandatoryOptions(ctx.ROUTECODES(), ctx, "ROUTECODES");
