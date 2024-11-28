@@ -15,6 +15,7 @@
 package org.eclipse.lsp.cobol.cfg;
 
 import com.google.gson.Gson;
+import com.google.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.common.model.tree.*;
 import org.eclipse.lsp.cobol.common.model.tree.statements.StatementNode;
@@ -27,6 +28,8 @@ import org.eclipse.lsp.cobol.implicitDialects.cics.nodes.ExecCicsReturnNode;
 import org.eclipse.lsp.cobol.implicitDialects.sql.node.Db2DataAndProcedureDivisionNode;
 import org.eclipse.lsp.cobol.implicitDialects.sql.node.ExecSqlNode;
 import org.eclipse.lsp.cobol.implicitDialects.sql.node.ExecSqlWheneverNode;
+import org.eclipse.lsp.cobol.service.CobolDocumentModel;
+import org.eclipse.lsp.cobol.service.DocumentModelService;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
@@ -39,6 +42,13 @@ import static org.eclipse.lsp.cobol.common.model.NodeType.*;
 @Slf4j
 public class CFASTBuilderImpl implements CFASTBuilder {
   private static final int SNIPPET_LENGTH = 10;
+
+  private final DocumentModelService documentModelService;
+
+  @Inject
+  public CFASTBuilderImpl(DocumentModelService documentModelService) {
+    this.documentModelService = documentModelService;
+  }
 
   @Override
   public ExtendedApiResult build(ProgramNode programNode) {
@@ -55,8 +65,8 @@ public class CFASTBuilderImpl implements CFASTBuilder {
     if (node instanceof ParagraphNode) {
       Paragraph paragraph =
           new Paragraph(
-              cutSnippet(((ParagraphNode) node).getText()),
               ((ParagraphNode) node).getName(),
+              cutSnippet(node),
               convertLocation(node));
       addChild(parent, paragraph);
       node.getChildren().forEach(child -> traverse(paragraph, child));
@@ -64,7 +74,7 @@ public class CFASTBuilderImpl implements CFASTBuilder {
       Section section =
           new Section(
               ((ProcedureSectionNode) node).getName(),
-              cutSnippet(((ProcedureSectionNode) node).getText()),
+              cutSnippet(node),
               convertLocation(node));
       addChild(parent, section);
       node.getChildren().forEach(child -> traverse(section, child));
@@ -243,15 +253,24 @@ public class CFASTBuilderImpl implements CFASTBuilder {
     return new Location(location.getUri(), startPosition, endPosition);
   }
 
-  private static String cutSnippet(String text) {
-    String[] lines = text.split("\\r?\\n");
+  private String cutSnippet(Node node) {
+    CobolDocumentModel doc = documentModelService.get(node.getLocality().getUri());
+    if (doc == null) {
+      LOG.error("cutSnippet failed: " + node.getLocality().getUri() + " not found.");
+      return "<snippet creation error>";
+    }
+    List<CobolDocumentModel.Line> lines = doc.getLines();
     StringBuilder sb = new StringBuilder();
-    for (int i = 0; i < SNIPPET_LENGTH && i < lines.length; i++) {
-      if (i > 0) {
+    int startLine = node.getLocality().getRange().getStart().getLine();
+    int stopLine = node.getLocality().getRange().getEnd().getLine() - startLine + 1 > SNIPPET_LENGTH
+            ? startLine + SNIPPET_LENGTH
+            : node.getLocality().getRange().getEnd().getLine() + 1;
+    lines.subList(startLine, stopLine).forEach(line -> {
+      if (sb.length() > 0) {
         sb.append("\r\n");
       }
-      sb.append(lines[i]);
-    }
+      sb.append(line.getText());
+    });
     return sb.toString();
   }
 }

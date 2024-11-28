@@ -24,6 +24,7 @@ import org.eclipse.lsp.cobol.common.model.tree.InputNode;
 import org.eclipse.lsp.cobol.common.model.tree.SortNode;
 import org.eclipse.lsp.cobol.common.model.tree.OutputNode;
 import org.eclipse.lsp.cobol.core.model.extendedapi.ExtendedApiResult;
+import org.eclipse.lsp.cobol.service.DocumentModelService;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.junit.jupiter.api.Test;
 
@@ -114,7 +115,8 @@ class TestSortStatement {
 
     assertNull(outputNode);
 
-    CFASTBuilder builder = new CFASTBuilderImpl();
+    DocumentModelService documentModelService = new DocumentModelService();
+    CFASTBuilder builder = new CFASTBuilderImpl(documentModelService);
     ExtendedApiResult extendedApiResult = builder.build(result.getRootNode().findFirstProgramNode());
 
     assertEquals(1, extendedApiResult.getControlFlowAST().size());
