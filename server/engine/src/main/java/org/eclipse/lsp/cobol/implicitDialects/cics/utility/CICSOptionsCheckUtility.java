@@ -73,6 +73,18 @@ public class CICSOptionsCheckUtility {
         CICSCancelOptionsCheckUtility.RULE_INDEX,
         new CICSCancelOptionsCheckUtility(context, errors));
     optionsMap.put(
+        CICSConnectProcessOptionsCheckUtility.RULE_INDEX,
+        new CICSConnectProcessOptionsCheckUtility(context, errors));
+    optionsMap.put(
+        CICSCheckOptionsUtility.RULE_INDEX,
+        new CICSCheckOptionsUtility(context, errors));
+    optionsMap.put(
+        CICSChangeOptionsCheckUtility.RULE_INDEX,
+        new CICSChangeOptionsCheckUtility(context, errors));
+    optionsMap.put(
+        CICSWebOptionsCheckUtility.RULE_INDEX,
+        new CICSWebOptionsCheckUtility(context, errors));
+    optionsMap.put(
         CICSEndBrowseOptionsUtility.RULE_ENDBR_INDEX,
         new CICSEndBrowseOptionsUtility(context, errors));
     optionsMap.put(
@@ -93,6 +105,9 @@ public class CICSOptionsCheckUtility {
     optionsMap.put(
         CICSDumpTransactionOptionsCheckUtility.RULE_INDEX,
         new CICSDumpTransactionOptionsCheckUtility(context, errors));
+    optionsMap.put(
+        CICSConvertTimeOptionsCheckUtility.RULE_INDEX,
+        new CICSConvertTimeOptionsCheckUtility(context, errors));
   }
 
   /**
