@@ -33,12 +33,14 @@ package org.eclipse.lsp.cobol.usecases;
 public class TestCICSEnqStatement {
     private static final String ENQ_ALL_VALID =
             "ENQ RESOURCE({$varFour}) LENGTH({$varFour})  \n"
-                   + "UOW TASK NOHANDLE \n"
+                   + "NOHANDLE \n"
                    + "MAXLIFETIME({$varFour}) NOSUSPEND";
     private static final String ENQ_VALID =
             "ENQ RESOURCE({$varFour})";
     private static final String ENQ_RESOURCE_INVALID =
             "ENQ {LENGTH(100) | errorMissingRes }";
+    private static final String ENQ_RESOURCE_MUTUALEX_INVALID =
+            "ENQ RESOURCE({$varFour}) {UOW|errorMutualEx} {TASK|errorMutualEx}";
 
     @Test
     void testEnqAllValid() {
@@ -59,5 +61,17 @@ public class TestCICSEnqStatement {
                                 DiagnosticSeverity.Error,
                                 ErrorSource.PARSING.getText()));
         CICSTestUtils.errorTest(ENQ_RESOURCE_INVALID, expectedDiagnostic);
+    }
+    @Test
+    void testEnqMutualExInvalid() {
+        Map<String, Diagnostic> expectedDiagnostic =
+                ImmutableMap.of(
+                        "errorMutualEx",
+                        new Diagnostic(
+                                new Range(),
+                                "Exactly one option required, options are mutually exclusive: UOW or MAXLIFETIME or TASK",
+                                DiagnosticSeverity.Error,
+                                ErrorSource.PARSING.getText()));
+        CICSTestUtils.errorTest(ENQ_RESOURCE_MUTUALEX_INVALID, expectedDiagnostic);
     }
 }

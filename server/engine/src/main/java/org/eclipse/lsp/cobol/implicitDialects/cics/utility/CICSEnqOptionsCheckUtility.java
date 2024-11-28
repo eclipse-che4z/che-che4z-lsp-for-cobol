@@ -39,9 +39,9 @@ public class CICSEnqOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
                 {
                     put(CICSLexer.ENQ, ErrorSeverity.ERROR);
                     put(CICSLexer.RESOURCE, ErrorSeverity.ERROR);
-                    put(CICSLexer.LENGTH, ErrorSeverity.WARNING);
+                    put(CICSLexer.LENGTH, ErrorSeverity.ERROR);
                     put(CICSLexer.UOW, ErrorSeverity.WARNING);
-                    put(CICSLexer.MAXLIFETIME, ErrorSeverity.WARNING);
+                    put(CICSLexer.MAXLIFETIME, ErrorSeverity.ERROR);
                     put(CICSLexer.TASK, ErrorSeverity.WARNING);
                     put(CICSLexer.NOSUSPEND, ErrorSeverity.WARNING);
                 }
@@ -66,5 +66,6 @@ public class CICSEnqOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     }
     private void checkEnq(CICSParser.Cics_enq_optsContext ctx) {
         checkHasMandatoryOptions(ctx.RESOURCE(), ctx, "RESOURCE");
+        checkHasMutuallyExclusiveOptions("UOW or MAXLIFETIME or TASK", ctx.UOW(), ctx.MAXLIFETIME(), ctx.TASK());
     }
 }
