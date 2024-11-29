@@ -115,7 +115,7 @@ public class CICSHandleOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
 
   private void checkHandleAid(CICSParser.Cics_handle_aidContext ctx) {
     checkHasMandatoryOptions(ctx.AID(), ctx, "AID");
-    checkHasToManyOneOptions(ctx);
+    checkHasTooManyOptions(ctx);
   }
 
   private void checkHandleCondition(CICSParser.Cics_handle_conditionContext ctx) {
