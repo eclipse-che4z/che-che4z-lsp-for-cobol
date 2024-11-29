@@ -106,6 +106,9 @@ public class CICSOptionsCheckUtility {
         CICSAddressOptionsCheckUtility.RULE_INDEX,
         new CICSAddressOptionsCheckUtility(context, errors));
     optionsMap.put(
+        CICSLinkOptionsCheckUtility.RULE_INDEX,
+        new CICSLinkOptionsCheckUtility(context, errors));
+    optionsMap.put(
         CICSDelayOptionsCheckUtility.RULE_INDEX,
         new CICSDelayOptionsCheckUtility(context, errors));
     optionsMap.put(
