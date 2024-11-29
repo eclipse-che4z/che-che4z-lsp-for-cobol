@@ -406,7 +406,7 @@ public abstract class CICSOptionsCheckBaseUtility {
             .collect(Collectors.toList());
     if (commandOoptions.size() > 16) {
       throwException(
-              ErrorSeverity.ERROR, getLocality(parentCtx), "To many options provided for: ", "HANDLE AID");
+              ErrorSeverity.ERROR, getLocality(parentCtx), "Too many options provided for: ", "HANDLE AID");
     }
   }
 
