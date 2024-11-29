@@ -130,6 +130,6 @@ public class TestMappingMaintainedForEmbeddedCode {
         ImmutableMap.of(
             "1",
             new Diagnostic(
-                new Range(), "Syntax error on 'PERFORM'", Error, ErrorSource.PARSING.getText())));
+                new Range(), "Syntax error on 'PERFORM'", Error, ErrorSource.PREPROCESSING.getText())));
   }
 }
