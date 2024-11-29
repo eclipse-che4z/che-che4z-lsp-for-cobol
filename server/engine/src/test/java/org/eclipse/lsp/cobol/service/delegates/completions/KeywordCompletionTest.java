@@ -101,12 +101,10 @@ class KeywordCompletionTest {
     when(dialectService.getDialectByName("DaCo")).thenReturn(Optional.of(dacoDialect));
 
     Keywords keywords = new Keywords(mock(SettingsService.class), dialectService);
-    
     int baseKeywordsCount = keywords.getDataMap(ImmutableList.of()).size();
     assertEquals(baseKeywordsCount + 1, keywords.getDataMap(ImmutableList.of("IDMS")).size());
     assertEquals(baseKeywordsCount + 2, keywords.getDataMap(ImmutableList.of("DaCo")).size());
     assertEquals(baseKeywordsCount + 2 + 1, keywords.getDataMap(ImmutableList.of("DaCo", "IDMS")).size());
-
   }
 
   @Test
