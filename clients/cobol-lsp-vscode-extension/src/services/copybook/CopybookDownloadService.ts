@@ -33,7 +33,10 @@ import path = require("path");
 import { getErrorMessage } from "../util/ErrorsUtils";
 
 export class CopybookName {
-  constructor(public name: string, public dialect: string) {}
+  constructor(
+    public name: string,
+    public dialect: string,
+  ) {}
 }
 
 export class CopybookDownloadService {
