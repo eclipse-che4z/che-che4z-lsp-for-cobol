@@ -125,7 +125,7 @@ public class StatementValidate implements Processor<StatementNode> {
 
   private boolean hasSendingFieldProducesError(SetUpDownByStatement node) {
     if (node.getSendingField().getNodeType() == NodeType.LITERAL) {
-      return literalProducesError(((LiteralNode) node.getSendingField()).getText());
+      return literalProducesError(node.getSendingField().getText());
     }
     if (node.getSendingField().getNodeType() == NodeType.QUALIFIED_REFERENCE_NODE) {
       return variableProducesError((QualifiedReferenceNode) node.getSendingField());
