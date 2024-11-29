@@ -211,27 +211,10 @@ public class ExtendedDocument {
       if(Objects.equals(range.getStart(), range.getEnd())) {
         range = new Range(updatePositionDueToChanges(range.getStart()), updatePositionDueToChanges(range.getEnd()));
       } else {
-        range = new Range(updatePositionDueToChanges(range.getStart()), shiftRight(updatePositionDueToChanges(shiftLeft(range.getEnd()))));
+        range = new Range(updatePositionDueToChanges(range.getStart()), updateEndPositionDueToChanges(range.getEnd()));
       }
     }
     return range;
-  }
-
-  private Position shiftRight(Position position) {
-    return new Position(position.getLine(), position.getCharacter() + 1);
-  }
-
-  private Position shiftLeft(Position position) {
-    if(position.getLine() == 0 && position.getCharacter() == 0) {
-      return position;
-    }
-
-    if (position.getCharacter() == 0) {
-      return new Position(
-              position.getLine() - 1,
-              baseText.getLines().get(position.getLine() - 1).size() - 1);
-    }
-    return new Position(position.getLine(), position.getCharacter() - 1);
   }
 
   private int updateLineDueToChanges(int lineNumber) {
@@ -259,5 +242,28 @@ public class ExtendedDocument {
       }
     }
     return new Position(currentLine, currentChar);
+  }
+
+  private Position updateEndPositionDueToChanges(Position position) {
+    // Shift position to left to make range end inclusive.
+    int linePos = position.getCharacter() == 0 ? position.getLine() - 1 : position.getLine();
+    int charPos = position.getCharacter() == 0
+            ? baseText.getLines().get(position.getLine() - 1).size() - 1
+            : position.getCharacter() - 1;
+
+    int currentLine = updateLineDueToChanges(linePos);
+    int currentChar = charPos;
+
+    ExtendedTextLine line = baseText.getLines().get(linePos);
+    if (charPos < line.size()) {
+      MappedCharacter character = line.getCharacterAt(charPos);
+      currentChar = currentText.getLines().get(currentLine).getCharacters().indexOf(character);
+      if (currentChar < 0) {
+        currentChar = charPos;
+      }
+    }
+
+    // Shift position to right to make range end exclusive.
+    return new Position(currentLine, currentChar + 1);
   }
 }
