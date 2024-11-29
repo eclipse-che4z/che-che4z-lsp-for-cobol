@@ -19,7 +19,7 @@ compilerDirective: (.*? compilerXOpts)* .*? EOF;
 cicsExecBlock: EXEC_CICS (allCicsRule)* END_EXEC ;
 
 allCicsRule: cics_send | cics_receive | cics_add | cics_address | cics_allocate | cics_asktime | cics_assign | cics_bif |
-                       cics_build | cics_cancel | cics_change | cics_change_task | cics_check | cics_connect | cics_converttime |
+                       cics_build | cics_cancel | cics_change  | cics_check | cics_connect | cics_converttime |
                        cics_define | cics_delay | cics_delete | cics_deleteq | cics_deq | cics_document | cics_dump | cics_endbr |
                        cics_endbrowse | cics_enq | cics_enter | cics_extract | cics_force | cics_formattime | cics_free |
                        cics_freemain | cics_get | cics_getmain | cics_getnext | cics_handle | cics_ignore | cics_inquire |
@@ -255,33 +255,34 @@ cics_build_attach: (ATTACH | (ATTACHID  | PROCESS  | RESOURCE  | RPROCESS  |
 
 /** CANCEL (both of them) */
 cics_cancel: CANCEL (cics_cancel_bts | cics_cancel_reqid);
-cics_cancel_bts: (ACTIVITY cics_data_value | ACQACTIVITY | ACQPROCESS) cics_handle_response?;
-cics_cancel_reqid: REQID cics_name (SYSID cics_data_area | TRANSID cics_name | cics_handle_response)*;
+cics_cancel_bts: (ACTIVITY cics_data_value | ACQACTIVITY | ACQPROCESS | cics_handle_response)+;
+cics_cancel_reqid: ((REQID | TRANSID) cics_name | SYSID cics_data_area | cics_handle_response)+;
 
 /** CHANGE PHRASE / PASSWORD / TASK */
-cics_change: CHANGE (cics_change_phrase | cics_change_password);
-cics_change_phrase: PHRASE cics_data_area (PHRASELEN cics_data_value | NEWPHRASE cics_data_area | NEWPHRASELEN cics_data_value |
-                    USERID cics_data_value | ESMREASON cics_data_area | ESMRESP cics_data_area | cics_handle_response)+;
-cics_change_password: PASSWORD cics_data_value (NEWPASSWORD cics_data_value | USERID cics_data_value |
-                      ESMREASON cics_data_area | ESMRESP cics_data_area | cics_handle_response)+;
-cics_change_task: TASK (PRIORITY cics_data_value)? cics_handle_response?;
+cics_change: CHANGE (cics_change_phrase | cics_change_password | cics_change_task );
+cics_change_phrase: (PHRASE cics_data_area | cics_password_phrase |  (NEWPHRASE |  NEWPHRASELEN | PHRASELEN  | USERID) cics_data_value | cics_handle_response)*;
+cics_change_password: ((PASSWORD | NEWPASSWORD | USERID ) cics_data_value | cics_password_phrase | cics_handle_response)*;
+cics_change_task: (TASK | PRIORITY cics_data_value | cics_handle_response)*;
+
+cics_password_phrase:((CHANGETIME | DAYSLEFT | ESMREASON | ESMRESP | EXPIRYTIME | INVALIDCOUNT | LASTUSETIME ) cics_data_area | cics_handle_response);
 
 /** CHECK ACQPROCESS / ACTIVITY / TIMER */
 cics_check: CHECK (cics_check_activity | cics_check_timer);
-cics_check_activity: (ACQPROCESS | ACTIVITY cics_data_value | ACQACTIVITY | COMPSTATUS cics_cvda | ABCODE cics_data_area |
-                     ABPROGRAM cics_data_area | MODE cics_cvda | SUSPSTATUS cics_cvda | cics_handle_response)+;
-cics_check_timer: TIMER cics_data_value cics_handle_response? STATUS cics_cvda cics_handle_response?;
+cics_check_activity: (ACQPROCESS | ACTIVITY cics_data_value | ACQACTIVITY | (ABCODE | ABPROGRAM) cics_data_area |
+                     (MODE | SUSPSTATUS | COMPSTATUS) cics_cvda | cics_handle_response)+;
+cics_check_timer: (TIMER cics_data_value | STATUS cics_cvda | cics_handle_response)*;
 
 cics_conditions: EOC | EODS | INVMPSZ | INVPARTN | INVREQ | MAPFAIL | PARTNFAIL | RDATT | UNEXPIN | ERROR | DUPREC;
 
 /** CONNECT PROCESS */
-cics_connect: CONNECT PROCESS (CONVID cics_name | SESSION cics_name | PROCNAME cics_data_area |
-              PROCLENGTH cics_data_value | PARTNER cics_name | cics_connect_piplist | SYNCLEVEL |
-              cics_data_value | STATE cics_cvda | cics_handle_response)+;
-cics_connect_piplist: PIPLIST cics_data_area cics_handle_response? (PIPLENGTH cics_data_value)? cics_handle_response?;
+cics_connect: CONNECT cics_connect_process;
+cics_connect_process: (PROCESS | (CONVID | SESSION | PARTNER) cics_name | PROCNAME cics_data_area |
+                      (PROCLENGTH | PIPLENGTH) cics_data_value | (SYNCLEVEL | PIPLIST) cics_data_area |
+                       STATE cics_cvda | cics_handle_response)+;
 
 /** CONVERTTIME */
-cics_converttime: CONVERTTIME (DATESTRING cics_data_area | ABSTIME cics_data_area | cics_handle_response)+;
+cics_converttime: CONVERTTIME cics_converttime_opts;
+cics_converttime_opts:(DATESTRING cics_data_area | ABSTIME cics_data_area | cics_handle_response)+;
 
 /** DEFINE (all of them) */
 cics_define: DEFINE (cics_define_activity | cics_define_composite_event | cics_define_counter_dcounter | cics_define_input_event | cics_define_process | cics_define_timer);
@@ -293,9 +294,9 @@ cics_define_process: (PROCESS cics_data_value | (PROCESSTYPE | TRANSID | PROGRAM
 cics_define_timer: TIMER cics_data_value ((EVENT | DAYS | HOURS | MINUTES | SECONDS | YEAR | MONTH | DAYOFMONTH | DAYOFYEAR) cics_data_value | AFTER  | AT | ON | cics_handle_response)+;
 
 /** DELAY */
-cics_delay: DELAY (INTERVAL cics_zero_digit | INTERVAL cics_hhmmss | TIME cics_hhmmss | cics_delay_for | cics_dealy_until | REQID cics_name | cics_handle_response)+;
-cics_delay_for: FOR (HOURS cics_data_value | MINUTES cics_data_value | SECONDS cics_data_value | MILLISECS cics_data_value)+;
-cics_dealy_until: UNTIL (HOURS cics_data_value | MINUTES cics_data_value | SECONDS cics_data_value)+;
+cics_delay: DELAY cics_delay_opts;
+cics_delay_opts: (INTERVAL cics_zero_digit | (INTERVAL | TIME) cics_hhmmss
+ | FOR | (HOURS | MINUTES | SECONDS | MILLISECS) cics_data_value | UNTIL | REQID cics_name | cics_handle_response)+;
 
 /** DELETE (all of them) */
 cics_delete: DELETE (cics_delete_group_one | cics_delete_group_two | cics_delete_group_three | cics_delete_group_four);
@@ -602,9 +603,9 @@ cics_readnext_readprev: (READNEXT | READPREV)  (cics_file_name | INTO cics_data_
 
 /** READQ TD / TS */
 cics_readq: READQ (cics_readq_td | cics_readq_ts);
-cics_readq_td: TD (QUEUE cics_name | cics_into | LENGTH cics_data_area | SYSID cics_data_area | NOSUSPEND | cics_handle_response)+;
-cics_readq_ts: TS? (QUEUE cics_name | QNAME cics_name | cics_into | LENGTH cics_data_area | NUMITEMS cics_data_area |
-               NEXT | ITEM cics_data_value | SYSID cics_data_area | cics_handle_response)+;
+cics_readq_td: (TD | QUEUE cics_name | cics_into_set | LENGTH cics_data_area | SYSID cics_data_area | NOSUSPEND | cics_handle_response)+;
+cics_readq_ts: (TS | (QUEUE | QNAME) cics_name | cics_into_set | NEXT | (LENGTH | NUMITEMS | SYSID) cics_data_area |
+                ITEM cics_data_value | cics_handle_response)+;
 
 /** RELEASE */
 cics_release: RELEASE cics_handle_response? PROGRAM cics_name cics_handle_response?;
@@ -864,15 +865,12 @@ cics_web_send_container_subrule: (CONTAINER cics_data_value | CHANNEL cics_data_
 
 /** WRITE / WRITE JOURNALNAME / WRITE OPERATOR */
 cics_write: WRITE (cics_write_file | cics_write_journalname | cics_write_operator);
-cics_write_file: cics_file_name (MASSINSERT | FROM cics_data_area | RIDFLD cics_data_area | KEYLENGTH cics_data_value |
-                 SYSID cics_data_area | LENGTH cics_data_value | LENGTH cics_data_value | RBA | RBN | XRBA | NOSUSPEND | cics_handle_response)+;
-cics_write_journalname: JOURNALNAME cics_data_value (JTYPEID cics_data_value | FROM cics_data_area | FLENGTH cics_data_value |
-                        REQID cics_data_area | cics_write_prefix | WAIT | NOSUSPEND | cics_handle_response)+;
-cics_write_prefix: (PREFIX cics_data_value | PFXLENG cics_data_value | cics_handle_response)+;
-cics_write_operator: OPERATOR (TEXT cics_data_value | TEXTLENGTH cics_data_value | cics_write_routecodes |
-                     EVENTUAL | ACTION cics_cvda | CRITICAL | IMMEDIATE | cics_write_reply | cics_handle_response)+;
-cics_write_routecodes: (ROUTECODES cics_data_value | NUMROUTES cics_data_value | cics_handle_response)+;
-cics_write_reply: REPLY cics_data_area (MAXLENGTH cics_data_value | REPLYLENGTH cics_data_area | TIMEOUT cics_data_value | cics_handle_response)+;
+cics_write_file: ((FILE | DATASET | SYSID) cics_name | MASSINSERT | (FROM | RIDFLD) cics_data_area |
+                (KEYLENGTH | LENGTH) cics_data_value | RBA | RRN | XRBA | NOSUSPEND | cics_handle_response)*;
+cics_write_journalname: ((JOURNALNAME | JTYPEID | FLENGTH) cics_data_value | (FROM | REQID) cics_data_area |
+                (PREFIX | PFXLENG) cics_data_value | WAIT | NOSUSPEND | cics_handle_response)*;
+cics_write_operator: (OPERATOR | (TEXT | TEXTLENGTH | ROUTECODES  | NUMROUTES | CONSNAME | MAXLENGTH | TIMEOUT) cics_data_value |
+                EVENTUAL | ACTION cics_cvda | CRITICAL | IMMEDIATE | (REPLY | REPLYLENGTH) cics_data_area | cics_handle_response)*;
 
 /** WRITEQ TD/TS */
 cics_writeq: WRITEQ (cics_writeq_td | cics_writeq_ts);

@@ -150,11 +150,35 @@ public final class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
     String name = fnCtx.getText();
 
     return retrieveLocality(fnCtx, extendedDocument, copybooks)
-        .map(l -> new FunctionReference(l, name))
+        .map(l -> new FunctionReference(l, name, true))
         .map(Node.class::cast)
-        .map(n -> ImmutableList.of(n))
+        .map(ImmutableList::of)
         .orElse(ImmutableList.of());
   }
+
+  @Override
+  public List<Node> visitFunctionRepositoryClause(FunctionRepositoryClauseContext ctx) {
+    Optional<Locality> statementLocality = retrieveLocality(ctx, extendedDocument, copybooks);
+    if (!statementLocality.isPresent()) {
+      return ImmutableList.of();
+    }
+      boolean isIntrinsic = ctx.INTRINSIC() != null;
+      TerminalNode all = ctx.ALL();
+      if (Objects.nonNull(all)) {
+        return retrieveLocality(ctx.ALL(), extendedDocument, copybooks)
+                .map(FunctionDeclaration::new)
+                .map(Node.class::cast)
+                .map(Collections::singletonList).get();
+      }
+      List<Node> functionNames =
+          ctx.functionName().stream()
+            .map(this::makeFunctionReferenceNodes)
+            .flatMap(List::stream)
+              .collect(Collectors.toList());
+      return ImmutableList.of(
+          new FunctionDeclaration(statementLocality.get(), functionNames, isIntrinsic));
+    }
+
 
   @Override
   public List<Node> visitFunctionReference(FunctionReferenceContext ctx) {
@@ -781,31 +805,6 @@ public final class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
     return visitChildren(ctx);
   }
 
-  protected boolean expectedInAriaA(ParserRuleContext ctx) {
-    // https://www.ibm.com/docs/en/cobol-zos/6.4?topic=format-area
-    //    Certain items must begin in Area A:
-    //    Division headers
-
-    if (ctx instanceof IdentificationDivisionContext) {
-      return true;
-    }
-    if (ctx instanceof EnvironmentDivisionContext) {
-      return true;
-    }
-    if (ctx instanceof DataDivisionContext) {
-      return true;
-    }
-    if (ctx instanceof ProcedureDeclarativeContext) {
-      return true;
-    }
-    //    Section headers
-    //    Paragraph headers or paragraph names
-    //    Level indicators or level-numbers (01 and 77)
-    //    DECLARATIVES and END DECLARATIVES
-    //    End program, end class, and end method markers
-    return false;
-  }
-
   @Override
   public List<Node> visitIfThen(IfThenContext ctx) {
     throwWarning(ctx.getStart());
@@ -1241,6 +1240,11 @@ public final class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
     qualifiedReferenceNode.addChild(variableUsageNode);
     returningNode.addChild(qualifiedReferenceNode);
     return ImmutableList.of(returningNode);
+  }
+
+  @Override
+  public List<Node> visitProcedureDivisionUsingClause(ProcedureDivisionUsingClauseContext ctx) {
+      return addTreeNode(ctx, ProcedureDivisionUsingNode::new);
   }
 
   @Override

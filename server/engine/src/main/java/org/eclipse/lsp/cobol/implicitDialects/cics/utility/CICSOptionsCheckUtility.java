@@ -73,6 +73,15 @@ public class CICSOptionsCheckUtility {
         CICSCancelOptionsCheckUtility.RULE_INDEX,
         new CICSCancelOptionsCheckUtility(context, errors));
     optionsMap.put(
+        CICSConnectProcessOptionsCheckUtility.RULE_INDEX,
+        new CICSConnectProcessOptionsCheckUtility(context, errors));
+    optionsMap.put(
+        CICSCheckOptionsUtility.RULE_INDEX,
+        new CICSCheckOptionsUtility(context, errors));
+    optionsMap.put(
+        CICSChangeOptionsCheckUtility.RULE_INDEX,
+        new CICSChangeOptionsCheckUtility(context, errors));
+    optionsMap.put(
         CICSWebOptionsCheckUtility.RULE_INDEX,
         new CICSWebOptionsCheckUtility(context, errors));
     optionsMap.put(
@@ -96,6 +105,18 @@ public class CICSOptionsCheckUtility {
     optionsMap.put(
         CICSHandleOptionsCheckUtility.RULE_INDEX,
         new CICSHandleOptionsCheckUtility(context, errors));
+    optionsMap.put(
+        CICSDelayOptionsCheckUtility.RULE_INDEX,
+        new CICSDelayOptionsCheckUtility(context, errors));
+    optionsMap.put(
+        CICSReadqOptionsCheckUtility.RULE_INDEX,
+        new CICSReadqOptionsCheckUtility(context, errors));
+    optionsMap.put(
+        CICSConvertTimeOptionsCheckUtility.RULE_INDEX,
+        new CICSConvertTimeOptionsCheckUtility(context, errors));
+    optionsMap.put(
+        CICSWriteOptionsCheckUtility.RULE_INDEX,
+        new CICSWriteOptionsCheckUtility(context, errors));
   }
 
   /**
