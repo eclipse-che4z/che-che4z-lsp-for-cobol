@@ -497,12 +497,10 @@ cics_issue_common: ((DESTID | DESTIDLENG | VOLUME | VOLUMELENG | SUBADDR) cics_d
 
 /** LINK / LINK ACQPROCESS / LINK ACTIVITY: */
 cics_link: LINK (cics_link_program | cics_link_acqprocess | cics_link_activity);
-cics_link_program: PROGRAM cics_name (cics_link_commarea | CHANNEL cics_name | cics_link_inputmsg |
-                   SYSID cics_data_area | SYNCONRETURN | TRANSID cics_name | cics_handle_response)+;
-cics_link_commarea: COMMAREA cics_data_area (LENGTH cics_data_value | DATALENGTH cics_data_value)*;
-cics_link_inputmsg: INPUTMSG cics_data_area (INPUTMSGLEN cics_data_value)?;
-cics_link_acqprocess: (ACQPROCESS | INPUTEVENT cics_data_value | cics_handle_response)+;
-cics_link_activity: (ACTIVITY cics_data_value | ACQACTIVITY | INPUTEVENT cics_data_value | cics_handle_response)+;
+cics_link_program: ((PROGRAM | SYSID | TRANSID | CHANNEL) cics_name | (COMMAREA | INPUTMSG) cics_data_area |
+                (LENGTH | DATALENGTH | INPUTMSGLEN) cics_data_value | SYNCONRETURN | cics_handle_response)*;
+cics_link_acqprocess: (ACQPROCESS | INPUTEVENT cics_data_value | cics_handle_response)*;
+cics_link_activity: (ACQACTIVITY | (ACTIVITY | INPUTEVENT) cics_data_value | cics_handle_response)*;
 
 /** EXCI LINK, ref: https://www.ibm.com/docs/en/cics-ts/6.1?topic=interface-exec-cics-link-command-exci*/
 cics_exci_link: LINK cics_link_program_exci;
