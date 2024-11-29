@@ -43,4 +43,18 @@ describe("Tests downloaded copybook cache clear", () => {
       { recursive: true, useTrash: false },
     );
   });
+
+  describe("Cache clear errors", () => {
+    beforeAll(() => {
+      jest
+        .spyOn(vscode.workspace.fs, "readDirectory")
+        .mockImplementation(() => {
+          throw vscode.FileSystemError.FileNotFound();
+        });
+    });
+
+    it("doesn't fail if cache folder doesn't exist", async () => {
+      await clearCache(vscode.Uri.file("/storagePath"));
+    });
+  });
 });

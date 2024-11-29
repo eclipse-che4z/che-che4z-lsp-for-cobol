@@ -20,6 +20,7 @@ import {
   E4E_FOLDER,
   ZOWE_FOLDER,
 } from "../constants";
+import { hasMember } from "../services/util/Utils";
 
 /**
  * Clears the downloaded copybook cache folder ({globalStoragePath}/zowe/copybooks).
@@ -45,7 +46,17 @@ export function clearCache(uri: vscode.Uri) {
 }
 
 async function deleteFolderContent(fileUri: vscode.Uri) {
-  const files = await vscode.workspace.fs.readDirectory(fileUri);
+  let files: [string, vscode.FileType][] = [];
+  try {
+    files = await vscode.workspace.fs.readDirectory(fileUri);
+  } catch (err) {
+    if (hasMember(err, "code") && err.code === "FileNotFound") {
+      // directory doesn't exists - ignore
+    } else {
+      throw err;
+    }
+  }
+
   return files.map(([name, _]) =>
     vscode.workspace.fs.delete(vscode.Uri.joinPath(fileUri, name), {
       recursive: true,

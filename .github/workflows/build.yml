@@ -23,6 +23,10 @@ on:
         description: "Skip UI tests"
         required: true
         default: 'false'
+      include_build_number:
+        description: "Include build number"
+        required: false
+        default: 'true'
   pull_request:
     branches:
       - development
@@ -122,9 +126,9 @@ jobs:
         with:
           name: jar
           path: server/engine/target/server.jar
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
-          node-version: 16
+          node-version: 20
       - name: Build VS Code extension dialect API
         working-directory: clients/cobol-dialect-api
         run: |
@@ -228,13 +232,13 @@ jobs:
 #        run: |
 #          sudo xcode-select -s /Applications/Xcode_12.5.1.app/Contents/Developer
 #          xcodebuild -version
-      - uses: al-cheb/configure-pagefile-action@v1.2
+      - uses: al-cheb/configure-pagefile-action@v1.4
         if: matrix.os == 'windows-latest'
         with:
           minimum-size: 16GB
           maximum-size: 16GB
           disk-root: "C:"
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: graalvm/setup-graalvm@v1
         if: matrix.os == 'ubuntu-latest' && matrix.arch == 'x64'
         with:
@@ -325,7 +329,7 @@ jobs:
       - shell: sh
         if: matrix.os == 'ubuntu-latest'
         run: echo "target=linux-${{ matrix.arch }}" >> $GITHUB_ENV
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Retrieve native build
         uses: actions/download-artifact@v4
         with:
@@ -359,19 +363,21 @@ jobs:
           cp -p ../../staging/${{ env.target }}/engine ./server/native/server-linux
           chmod +x ./server/native/server-linux
           cp ./server/native/server-linux ../../tests/native-executable-tests/server/linux/
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
-          node-version: 16
+          node-version: 20
       - name: Download VS Code extension dialect API
         uses: actions/download-artifact@v4
         with:
           name: lib
           path: clients/cobol-dialect-api
-      - name: update version for PR
+      - name: update version with PR or build number
+        if: github.event_name == 'pull_request' || github.event.inputs.include_build_number == 'true'
         working-directory: clients/cobol-lsp-vscode-extension
-        if: github.event_name == 'pull_request'
+        env:
+          BUILD_ID: ${{github.event_name == 'pull_request' && format('pr-{0}', github.event.pull_request.number) || github.run_number }}
         run: |
-          node -e "const fs=require('fs');const fileName='./package.json';var content=require(fileName);content.version=content.version+'\+pr-'+${{ github.event.pull_request.number }};fs.writeFileSync(fileName,JSON.stringify(content,null,2));"
+          node -e "const fs=require('fs');const fileName='./package.json';var content=require(fileName);content.version=content.version+'\+'+'${{ env.BUILD_ID }}';fs.writeFileSync(fileName,JSON.stringify(content,null,2));"
       - name: Build COBOL LS extension 
         run: npm ci
         working-directory: clients/cobol-lsp-vscode-extension
@@ -416,10 +422,8 @@ jobs:
         working-directory: clients/cobol-lsp-vscode-extension
       - name: Run integration tests
         if: github.event.inputs.skip_ui_tests != 'true'
-        uses: coactions/setup-xvfb@v1
-        with:
-          run: npm run test:integration
-          working-directory: clients/cobol-lsp-vscode-extension          
+        run: ${{ matrix.os == 'ubuntu-latest' && 'xvfb-run' || '' }} npm run test:integration
+        working-directory: clients/cobol-lsp-vscode-extension          
       - name: Run native executable test code
         working-directory: tests/native-executable-tests
         run: |

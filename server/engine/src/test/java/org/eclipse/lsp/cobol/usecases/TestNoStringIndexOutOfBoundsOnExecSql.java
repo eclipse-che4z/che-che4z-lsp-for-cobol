@@ -34,7 +34,7 @@ class TestNoStringIndexOutOfBoundsOnExecSql {
           + "        DATA DIVISION.\n"
           + "        WORKING-STORAGE SECTION.\n"
           + "        PROCEDURE DIVISION.\n"
-          + "            {EXEC|2} SQL\n"
+          + "            {|2}EXEC SQL\n"
           + "       {|1}\n";
 
   @Test
@@ -48,13 +48,13 @@ class TestNoStringIndexOutOfBoundsOnExecSql {
                 new Range(),
                 "Unexpected end of line",
                 DiagnosticSeverity.Error,
-                ErrorSource.PARSING.getText()),
+                ErrorSource.PREPROCESSING.getText()),
             "2",
             new Diagnostic(
                 new Range(),
                 "Missing token END-EXEC for the EXEC block",
                 DiagnosticSeverity.Error,
-                ErrorSource.PARSING.getText())),
+                ErrorSource.PREPROCESSING.getText())),
         ImmutableList.of(),
         AnalysisConfig.defaultConfig(CopybookProcessingMode.ENABLED));
   }
