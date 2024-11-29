@@ -17,7 +17,7 @@ import * as assert from "assert";
 
 suite("Integration Test Suite: Subroutines resolving", () => {
   suiteSetup(async function () {
-    this.timeout(0);
+    this.timeout(helper.TEST_TIMEOUT);
     await helper.updateConfig("subroutines.json");
     await helper.activate();
   });
