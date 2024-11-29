@@ -51,6 +51,7 @@ class KeywordCompletionTest {
           + "U.S. Government Users Restricted Rights - "
           + "Use, duplication or disclosure restricted by GSA ADP Schedule Contract with IBM Corp.";
   private static final String LABEL = "ACCEPT";
+  public static final int BASE_KEYWORDS_COUNT = 2375;
 
   private KeywordCompletion completion;
 
@@ -84,29 +85,28 @@ class KeywordCompletionTest {
   @Test
   void testGetStreamDataMap() {
     DialectService dialectService = mock(DialectService.class);
+
+    // Implicit dialect
     CobolDialect implicitDialect = mock(CobolDialect.class);
-    CobolDialect idmsDialect = mock(CobolDialect.class);
     when(implicitDialect.getKeywords()).thenReturn(ImmutableMap.of("implicit", "implicit desc1"));
+    when(dialectService.getImplicitCobolDialects()).thenReturn(ImmutableList.of(implicitDialect));
+
+    // IDMS
+    CobolDialect idmsDialect = mock(CobolDialect.class);
     when(idmsDialect.getKeywords()).thenReturn(ImmutableMap.of("idms1", "desc1"));
     when(dialectService.getDialectByName("IDMS")).thenReturn(Optional.of(idmsDialect));
-    when(dialectService.getImplicitCobolDialects()).thenReturn(ImmutableList.of(implicitDialect));
+
+    // DaCo
     CobolDialect dacoDialect = mock(CobolDialect.class);
     when(dacoDialect.getKeywords()).thenReturn(ImmutableMap.of("daco1", "desc1", "daco2", "desc2"));
     when(dialectService.getDialectByName("DaCo")).thenReturn(Optional.of(dacoDialect));
 
     Keywords keywords = new Keywords(mock(SettingsService.class), dialectService);
-    List<String> dialectType = ImmutableList.of();
 
-    assertEquals(2376, keywords.getDataMap(dialectType).size());
-
-    dialectType = ImmutableList.of("IDMS");
-    assertEquals(2377, keywords.getDataMap(dialectType).size());
-
-    dialectType = ImmutableList.of("DaCo");
-    assertEquals(2378, keywords.getDataMap(dialectType).size());
-
-    dialectType = ImmutableList.of("DaCo", "IDMS");
-    assertEquals(2379, keywords.getDataMap(dialectType).size());
+    assertEquals(BASE_KEYWORDS_COUNT, keywords.getDataMap(ImmutableList.of()).size());
+    assertEquals(BASE_KEYWORDS_COUNT + 1, keywords.getDataMap(ImmutableList.of("IDMS")).size());
+    assertEquals(BASE_KEYWORDS_COUNT + 2, keywords.getDataMap(ImmutableList.of("DaCo")).size());
+    assertEquals(BASE_KEYWORDS_COUNT + 2 + 1, keywords.getDataMap(ImmutableList.of("DaCo", "IDMS")).size());
   }
 
   @Test
