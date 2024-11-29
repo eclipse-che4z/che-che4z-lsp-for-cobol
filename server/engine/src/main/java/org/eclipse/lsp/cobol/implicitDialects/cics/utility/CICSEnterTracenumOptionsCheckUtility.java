@@ -42,7 +42,7 @@ public class CICSEnterTracenumOptionsCheckUtility extends CICSOptionsCheckBaseUt
                     put(CICSLexer.FROM, ErrorSeverity.ERROR);
                     put(CICSLexer.FROMLENGTH, ErrorSeverity.ERROR);
                     put(CICSLexer.RESOURCE, ErrorSeverity.ERROR);
-                    put(CICSLexer.EXCEPTION, ErrorSeverity.ERROR);
+                    put(CICSLexer.EXCEPTION, ErrorSeverity.WARNING);
                 }
             };
 
