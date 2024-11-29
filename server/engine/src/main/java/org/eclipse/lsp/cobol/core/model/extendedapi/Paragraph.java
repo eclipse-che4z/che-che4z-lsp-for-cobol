@@ -24,7 +24,7 @@ public class Paragraph extends CFASTNode {
   String snippet;
   String name;
 
-  public Paragraph(String snippet, String name, Location location) {
+  public Paragraph(String name, String snippet, Location location) {
     super(CFASTNodeType.PARAGRAPH.getValue(), location);
     this.snippet = snippet;
     this.name = name;
