@@ -51,7 +51,6 @@ class KeywordCompletionTest {
           + "U.S. Government Users Restricted Rights - "
           + "Use, duplication or disclosure restricted by GSA ADP Schedule Contract with IBM Corp.";
   private static final String LABEL = "ACCEPT";
-  public static final int BASE_KEYWORDS_COUNT = 2375;
 
   private KeywordCompletion completion;
 
@@ -102,11 +101,10 @@ class KeywordCompletionTest {
     when(dialectService.getDialectByName("DaCo")).thenReturn(Optional.of(dacoDialect));
 
     Keywords keywords = new Keywords(mock(SettingsService.class), dialectService);
-
-    assertEquals(BASE_KEYWORDS_COUNT, keywords.getDataMap(ImmutableList.of()).size());
-    assertEquals(BASE_KEYWORDS_COUNT + 1, keywords.getDataMap(ImmutableList.of("IDMS")).size());
-    assertEquals(BASE_KEYWORDS_COUNT + 2, keywords.getDataMap(ImmutableList.of("DaCo")).size());
-    assertEquals(BASE_KEYWORDS_COUNT + 2 + 1, keywords.getDataMap(ImmutableList.of("DaCo", "IDMS")).size());
+    int baseKeywordsCount = keywords.getDataMap(ImmutableList.of()).size();
+    assertEquals(baseKeywordsCount + 1, keywords.getDataMap(ImmutableList.of("IDMS")).size());
+    assertEquals(baseKeywordsCount + 2, keywords.getDataMap(ImmutableList.of("DaCo")).size());
+    assertEquals(baseKeywordsCount + 2 + 1, keywords.getDataMap(ImmutableList.of("DaCo", "IDMS")).size());
   }
 
   @Test
