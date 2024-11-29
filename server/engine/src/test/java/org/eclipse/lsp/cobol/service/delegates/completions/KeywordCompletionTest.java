@@ -84,29 +84,27 @@ class KeywordCompletionTest {
   @Test
   void testGetStreamDataMap() {
     DialectService dialectService = mock(DialectService.class);
+
+    // Implicit dialect
     CobolDialect implicitDialect = mock(CobolDialect.class);
-    CobolDialect idmsDialect = mock(CobolDialect.class);
     when(implicitDialect.getKeywords()).thenReturn(ImmutableMap.of("implicit", "implicit desc1"));
+    when(dialectService.getImplicitCobolDialects()).thenReturn(ImmutableList.of(implicitDialect));
+
+    // IDMS
+    CobolDialect idmsDialect = mock(CobolDialect.class);
     when(idmsDialect.getKeywords()).thenReturn(ImmutableMap.of("idms1", "desc1"));
     when(dialectService.getDialectByName("IDMS")).thenReturn(Optional.of(idmsDialect));
-    when(dialectService.getImplicitCobolDialects()).thenReturn(ImmutableList.of(implicitDialect));
+
+    // DaCo
     CobolDialect dacoDialect = mock(CobolDialect.class);
     when(dacoDialect.getKeywords()).thenReturn(ImmutableMap.of("daco1", "desc1", "daco2", "desc2"));
     when(dialectService.getDialectByName("DaCo")).thenReturn(Optional.of(dacoDialect));
 
     Keywords keywords = new Keywords(mock(SettingsService.class), dialectService);
-    List<String> dialectType = ImmutableList.of();
-
-    assertEquals(2377, keywords.getDataMap(dialectType).size());
-
-    dialectType = ImmutableList.of("IDMS");
-    assertEquals(2378, keywords.getDataMap(dialectType).size());
-
-    dialectType = ImmutableList.of("DaCo");
-    assertEquals(2379, keywords.getDataMap(dialectType).size());
-
-    dialectType = ImmutableList.of("DaCo", "IDMS");
-    assertEquals(2380, keywords.getDataMap(dialectType).size());
+    int baseKeywordsCount = keywords.getDataMap(ImmutableList.of()).size();
+    assertEquals(baseKeywordsCount + 1, keywords.getDataMap(ImmutableList.of("IDMS")).size());
+    assertEquals(baseKeywordsCount + 2, keywords.getDataMap(ImmutableList.of("DaCo")).size());
+    assertEquals(baseKeywordsCount + 2 + 1, keywords.getDataMap(ImmutableList.of("DaCo", "IDMS")).size());
   }
 
   @Test
