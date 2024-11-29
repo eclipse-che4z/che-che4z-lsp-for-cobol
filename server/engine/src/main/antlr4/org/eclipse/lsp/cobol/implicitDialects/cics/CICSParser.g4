@@ -192,12 +192,9 @@ cics_add: ADD ( ciss_add_event_subevent | cics_handle_response)+;
 ciss_add_event_subevent: ((SUBEVENT  | EVENT) cics_data_value)+;
 
 /** ADDRESS / ADDRESS SET */
-cics_address: ADDRESS (cics_address_null | cics_address_set);
-cics_address_null: (ACEE cics_ref | COMMAREA cics_ref |
-                   CWA cics_ref | EIB cics_ref |
-                   TCTUA cics_ref | TWA cics_ref | cics_handle_response)+;
-cics_address_set: (SET cics_data_area USING cics_ref |
-                  SET cics_ref USING cics_data_area) cics_handle_response?;
+cics_address: ADDRESS (cics_address_standard | cics_address_set);
+cics_address_standard: ((ACEE | COMMAREA | CWA | EIB | TCTUA | TWA) cics_ref | cics_handle_response)*;
+cics_address_set: (SET (cics_data_area | cics_ref) | USING (cics_ref | cics_data_area) | cics_handle_response)*;
 
 /** ALLOCATE (all of them) */
 cics_allocate: ALLOCATE (cics_allocate_appc_partner | cics_allocate_appc_mro_lut61_sysid | cics_allocate_lut61_session);
@@ -492,12 +489,10 @@ cics_issue_common: ((DESTID | DESTIDLENG | VOLUME | VOLUMELENG | SUBADDR) cics_d
 
 /** LINK / LINK ACQPROCESS / LINK ACTIVITY: */
 cics_link: LINK (cics_link_program | cics_link_acqprocess | cics_link_activity);
-cics_link_program: PROGRAM cics_name (cics_link_commarea | CHANNEL cics_name | cics_link_inputmsg |
-                   SYSID cics_data_area | SYNCONRETURN | TRANSID cics_name | cics_handle_response)+;
-cics_link_commarea: COMMAREA cics_data_area (LENGTH cics_data_value | DATALENGTH cics_data_value)*;
-cics_link_inputmsg: INPUTMSG cics_data_area (INPUTMSGLEN cics_data_value)?;
-cics_link_acqprocess: (ACQPROCESS | INPUTEVENT cics_data_value | cics_handle_response)+;
-cics_link_activity: (ACTIVITY cics_data_value | ACQACTIVITY | INPUTEVENT cics_data_value | cics_handle_response)+;
+cics_link_program: ((PROGRAM | SYSID | TRANSID | CHANNEL) cics_name | (COMMAREA | INPUTMSG) cics_data_area |
+                (LENGTH | DATALENGTH | INPUTMSGLEN) cics_data_value | SYNCONRETURN | cics_handle_response)*;
+cics_link_acqprocess: (ACQPROCESS | INPUTEVENT cics_data_value | cics_handle_response)*;
+cics_link_activity: (ACQACTIVITY | (ACTIVITY | INPUTEVENT) cics_data_value | cics_handle_response)*;
 
 /** EXCI LINK, ref: https://www.ibm.com/docs/en/cics-ts/6.1?topic=interface-exec-cics-link-command-exci*/
 cics_exci_link: LINK cics_link_program_exci;
@@ -873,9 +868,9 @@ cics_write_operator: (OPERATOR | (TEXT | TEXTLENGTH | ROUTECODES  | NUMROUTES | 
 
 /** WRITEQ TD/TS */
 cics_writeq: WRITEQ (cics_writeq_td | cics_writeq_ts);
-cics_writeq_td: TD (QUEUE cics_name | FROM cics_data_area | LENGTH cics_data_value | SYSID cics_data_area | cics_handle_response)+;
-cics_writeq_ts: TS? (QUEUE cics_name | QNAME cics_name | FROM cics_data_area | LENGTH cics_data_value |
-                NUMITEMS cics_data_area | ITEM cics_data_area | REWRITE | SYSID cics_data_area | AUXILIARY | MAIN | NOSUSPEND | cics_handle_response)+;
+cics_writeq_td: (TD | (QUEUE | SYSID) cics_name | FROM cics_data_area | LENGTH cics_data_value | cics_handle_response)*;
+cics_writeq_ts: (TS | (QNAME | QUEUE | SYSID) cics_name | (FROM | NUMITEMS | ITEM) cics_data_area |
+                LENGTH cics_data_value | REWRITE | AUXILIARY | MAIN | NOSUSPEND | cics_handle_response)*;
 
 /** WSACONTEXT BUILD / DELETE / GET */
 cics_wsacontext: WSACONTEXT (cics_wsacontext_build | cics_wsacontext_delete | cics_wsacontext_get);
