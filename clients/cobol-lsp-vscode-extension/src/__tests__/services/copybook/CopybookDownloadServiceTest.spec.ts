@@ -24,9 +24,10 @@ import { ProfileUtils } from "../../../services/util/ProfileUtils";
 import { Utils } from "../../../services/util/Utils";
 import * as vscode from "vscode";
 import {
-  allMemberErrorMock,
-  zoweExplorerErrorMock,
-  zoweExplorerMock,
+  notFoundErrorMock,
+  permissionsErrorMock,
+  unauthorizedErrorMock,
+  createZoweExplorerMock,
 } from "../../../__mocks__/getZoweExplorerMock.utility";
 import { DownloadUtil } from "../../../services/copybook/downloader/DownloadUtil";
 import { SettingsService } from "../../../services/Settings";
@@ -34,13 +35,31 @@ import { E4E } from "../../../type/e4eApi";
 import { e4eMock } from "../../../__mocks__/getE4EMock.utility";
 
 jest.mock("../../../services/reporter");
-Utils.getZoweExplorerAPI = jest.fn().mockReturnValue({ api: zoweExplorerMock });
+Utils.getZoweExplorerAPI = jest
+  .fn()
+  .mockReturnValue({ api: createZoweExplorerMock });
 
 describe("Tests copybook download service", () => {
   let downloadService: CopybookDownloadService;
 
   let workspaceConfigurationMock: Record<string, string[] | undefined>;
   let profileName: string;
+
+  let zoweExplorerMock: IApiRegisterClient;
+  let zoweMockUnauthorizedError: IApiRegisterClient;
+  let zoweMockNotFoundError: IApiRegisterClient;
+
+  beforeAll(() => {
+    zoweExplorerMock = createZoweExplorerMock();
+    zoweMockUnauthorizedError = createZoweExplorerMock(
+      unauthorizedErrorMock,
+      unauthorizedErrorMock,
+    );
+    zoweMockNotFoundError = createZoweExplorerMock(
+      notFoundErrorMock,
+      notFoundErrorMock,
+    );
+  });
 
   beforeEach(() => {
     downloadService = new CopybookDownloadService(
@@ -103,60 +122,106 @@ describe("Tests copybook download service", () => {
       });
     });
 
-    describe("invalid credentials", () => {
-      beforeEach(() => {
-        downloadService = new CopybookDownloadService(
-          "storage-path",
-          zoweExplorerErrorMock,
-        );
-        downloadService["processDownloadError"] = jest.fn();
-      });
-
-      describe("uss configuration", () => {
+    describe("credentials check", () => {
+      describe("invalid credentials", () => {
         beforeEach(() => {
-          workspaceConfigurationMock[PATHS_DSN] = undefined;
-          workspaceConfigurationMock[PATHS_USS] = ["/u/test/copybooks"];
-        });
-
-        it("checks profile with invalid credentials do not trigger download", async () => {
-          await downloadService.downloadCopybooks("document-uri", [
-            { name: "copybook-name", dialect: DEFAULT_DIALECT },
-          ]);
-
-          expect(allMemberErrorMock).toHaveBeenCalledWith("/u/test/copybooks");
-          expect(zoweExplorerErrorMock.getUssApi).toHaveBeenCalled();
-          expect(zoweExplorerErrorMock.getMvsApi).not.toHaveBeenCalled();
-
-          expect(vscode.window.showErrorMessage).toHaveBeenCalledWith(
-            "Incorrect credentials in Zowe profile profile.",
+          downloadService = new CopybookDownloadService(
+            "storage-path",
+            zoweMockUnauthorizedError,
           );
+          downloadService["processDownloadError"] = jest.fn();
+        });
+
+        describe("uss configuration", () => {
+          beforeEach(() => {
+            workspaceConfigurationMock[PATHS_DSN] = undefined;
+            workspaceConfigurationMock[PATHS_USS] = ["/u/test/copybooks"];
+          });
+
+          it("checks profile with invalid credentials do not trigger download", async () => {
+            await downloadService.downloadCopybooks("document-uri", [
+              { name: "copybook-name", dialect: DEFAULT_DIALECT },
+            ]);
+
+            expect(unauthorizedErrorMock).toHaveBeenCalledWith(
+              "/u/test/copybooks",
+            );
+            expect(zoweMockUnauthorizedError.getUssApi).toHaveBeenCalled();
+            expect(zoweMockUnauthorizedError.getMvsApi).not.toHaveBeenCalled();
+
+            expect(vscode.window.showErrorMessage).toHaveBeenCalledWith(
+              "Incorrect credentials in Zowe profile profile.",
+            );
+          });
+        });
+
+        describe("mvs configuration", () => {
+          beforeEach(() => {
+            workspaceConfigurationMock[PATHS_DSN] = ["TEST.COBOL.COPYBOOKS"];
+            workspaceConfigurationMock[PATHS_USS] = ["/u/test/copybooks"];
+          });
+
+          it("checks profile with invalid credentials do not trigger download", async () => {
+            await downloadService.downloadCopybooks("document-uri", [
+              { name: "copybook-name", dialect: DEFAULT_DIALECT },
+            ]);
+
+            expect(unauthorizedErrorMock).toHaveBeenCalledWith(
+              "TEST.COBOL.COPYBOOKS",
+            );
+            expect(zoweMockUnauthorizedError.getUssApi).not.toHaveBeenCalled();
+            expect(zoweMockUnauthorizedError.getMvsApi).toHaveBeenCalled();
+
+            expect(vscode.window.showErrorMessage).toHaveBeenCalledWith(
+              "Incorrect credentials in Zowe profile profile.",
+            );
+          });
         });
       });
 
-      describe("mvs configuration", () => {
+      describe("credentials are valid but copybook dataset doesn't exists", () => {
         beforeEach(() => {
+          downloadService = new CopybookDownloadService(
+            "storage-path",
+            zoweMockNotFoundError,
+          );
           workspaceConfigurationMock[PATHS_DSN] = ["TEST.COBOL.COPYBOOKS"];
           workspaceConfigurationMock[PATHS_USS] = ["/u/test/copybooks"];
+
+          downloadService.downloadCopybook = jest.fn().mockResolvedValue(true);
         });
 
-        it("checks profile with invalid credentials do not trigger download", async () => {
+        it("credentials are considered valid, copybooks can be downloaded", async () => {
           await downloadService.downloadCopybooks("document-uri", [
             { name: "copybook-name", dialect: DEFAULT_DIALECT },
           ]);
 
-          expect(allMemberErrorMock).toHaveBeenCalledWith(
-            "TEST.COBOL.COPYBOOKS",
-          );
-          expect(zoweExplorerErrorMock.getUssApi).not.toHaveBeenCalled();
-          expect(zoweExplorerErrorMock.getMvsApi).toHaveBeenCalled();
+          expect(vscode.window.withProgress).toHaveBeenCalled();
+        });
+      });
 
-          expect(vscode.window.showErrorMessage).toHaveBeenCalledWith(
-            "Incorrect credentials in Zowe profile profile.",
+      describe("credentials are valid and dataset exists, but user doesn't have permissions for the dataset", () => {
+        beforeEach(() => {
+          downloadService = new CopybookDownloadService(
+            "storage-path",
+            createZoweExplorerMock(permissionsErrorMock),
           );
+          workspaceConfigurationMock[PATHS_DSN] = ["TEST.COBOL.COPYBOOKS"];
+          workspaceConfigurationMock[PATHS_USS] = ["/u/test/copybooks"];
+
+          downloadService.downloadCopybook = jest.fn().mockResolvedValue(true);
+        });
+
+        it("credentials are considered valid, copybooks can be downloaded", async () => {
+          await downloadService.downloadCopybooks("document-uri", [
+            { name: "copybook-name", dialect: DEFAULT_DIALECT },
+          ]);
+
+          expect(downloadService.downloadCopybook).toHaveBeenCalled();
+          expect(vscode.window.withProgress).toHaveBeenCalled();
         });
       });
     });
-
     describe("if user is able to list the configured copybook dataset, credentials are considered as valid", () => {
       beforeEach(() => {
         downloadService = new CopybookDownloadService(
@@ -180,7 +245,7 @@ describe("Tests copybook download service", () => {
       vscode.window.showErrorMessage = jest.fn();
       const downloadService = new CopybookDownloadService(
         "storage-path",
-        zoweExplorerErrorMock,
+        zoweExplorerMock,
       );
       ProfileUtils.getAvailableProfiles = jest.fn().mockReturnValue("profile");
       downloadService["processDownloadError"] = jest.fn();
@@ -199,7 +264,7 @@ describe("Tests copybook download service", () => {
     it("checks locked profile do not trigger download", async () => {
       const downloadService = new CopybookDownloadService(
         "storage-path",
-        zoweExplorerErrorMock,
+        zoweExplorerMock,
       );
       ProfileUtils.getAvailableProfiles = jest.fn().mockReturnValue("profile");
       DownloadUtil.isProfileLocked = jest.fn().mockReturnValue(true);

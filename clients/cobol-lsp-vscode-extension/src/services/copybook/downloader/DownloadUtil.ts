@@ -98,8 +98,9 @@ export class DownloadUtil {
         await explorerAPI.getMvsApi(profile).allMembers(copybookLocation.dsn);
       }
     } catch (error) {
-      this.checkForInvalidCredentials(error, profileName);
-      return true;
+      if (this.checkForInvalidCredentials(error, profileName)) {
+        return true;
+      }
     }
 
     ZoweExplorerDownloader.profileStore.set(profileName, "valid-profile");
@@ -122,7 +123,15 @@ export class DownloadUtil {
       .loadNamedProfile(profileName);
   }
 
-  private static checkForInvalidCredentials(e: unknown, profileName: string) {
+  private static checkForInvalidCredentials(
+    e: unknown,
+    profileName: string,
+  ): boolean {
+    if (this.isNotFoundError(e) || this.isPermissionError(e)) {
+      // Cannot access the dataset, but credentials are working fine
+      return false;
+    }
+
     if (this.isInvalidCredentials(e)) {
       ZoweExplorerDownloader.profileStore.set(profileName, "locked-profile");
       const errorMessage = INVALID_CREDENTIALS_ERROR_MSG.replace(
@@ -130,6 +139,7 @@ export class DownloadUtil {
         profileName,
       );
       vscode.window.showErrorMessage(errorMessage);
+      return true;
     }
 
     registerExceptionEvent(
@@ -138,6 +148,7 @@ export class DownloadUtil {
       ["copybook", "COBOL", "invalid-credentials-check"],
       "There is an issue with zowe api layer",
     );
+    return true;
   }
 
   /**
@@ -201,11 +212,45 @@ export class DownloadUtil {
     return action === UNLOCK_DOWNLOAD_QUEUE_MSG;
   }
 
+  /**
+   * Checks if the error returned by Zowe Explorer is caused
+   * by invalid credentials. Error with status code 401 is returned
+   * in that case.
+   */
   private static isInvalidCredentials(e: unknown) {
     return (
       hasMember(e, "mDetails") &&
       hasMember(e.mDetails, "errorCode") &&
       e.mDetails.errorCode === 401
+    );
+  }
+
+  /**
+   * Returns true if provided credentials are correct but user doesn't
+   * have permission to access selected dataset (ISRZ002)
+   * or uss directory (EDC5111I).
+   */
+  private static isPermissionError(e: unknown) {
+    return (
+      hasMember(e, "mDetails") &&
+      hasMember(e.mDetails, "errorCode") &&
+      e.mDetails.errorCode === 500 &&
+      hasMember(e, "message") &&
+      typeof e.message === "string" &&
+      (e.message.includes("EDC5111I Permission denied") ||
+        e.message.includes("ISRZ002 Authorization failed"))
+    );
+  }
+
+  /**
+   * Returns true if provided credentials are correct but
+   * selected dataset or uss folder doesn't exist.
+   */
+  private static isNotFoundError(e: unknown) {
+    return (
+      hasMember(e, "mDetails") &&
+      hasMember(e.mDetails, "errorCode") &&
+      e.mDetails.errorCode === 404
     );
   }
 }

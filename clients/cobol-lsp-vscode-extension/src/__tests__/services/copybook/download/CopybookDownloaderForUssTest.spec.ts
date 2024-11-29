@@ -14,7 +14,7 @@
 
 import { ProfileUtils } from "../../../../services/util/ProfileUtils";
 import {
-  zoweExplorerMock,
+  createZoweExplorerMock,
   allUSSFilemembers,
   getUSSContentsMock,
 } from "../../../../__mocks__/getZoweExplorerMock.utility";
@@ -36,7 +36,7 @@ describe("Tests Copybook download from USS", () => {
   describe("checks if the copybook is eligible to dowload passed on user settings", () => {
     const downloader = new CopybookDownloaderForUss(
       "storage-path",
-      zoweExplorerMock,
+      createZoweExplorerMock(),
     );
     beforeEach(() => {
       jest.clearAllMocks();
@@ -85,7 +85,7 @@ describe("Tests Copybook download from USS", () => {
   describe("checks the copybook download using ZE USS API's", () => {
     const downloader = new CopybookDownloaderForUss(
       "storage-path",
-      zoweExplorerMock,
+      createZoweExplorerMock(),
     );
     it("checks not eligible copybook are not downloaded", async () => {
       downloader.isEligibleForDownload = jest.fn().mockReturnValue(false);
