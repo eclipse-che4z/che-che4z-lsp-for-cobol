@@ -262,9 +262,7 @@ public class CFASTBuilderImpl implements CFASTBuilder {
     List<CobolDocumentModel.Line> lines = doc.getLines();
     StringBuilder sb = new StringBuilder();
     int startLine = node.getLocality().getRange().getStart().getLine();
-    int stopLine = node.getLocality().getRange().getEnd().getLine() - startLine + 1 > SNIPPET_LENGTH
-            ? startLine + SNIPPET_LENGTH
-            : node.getLocality().getRange().getEnd().getLine() + 1;
+    int stopLine = Math.min(startLine + SNIPPET_LENGTH, node.getLocality().getRange().getEnd().getLine() + 1);
     lines.subList(startLine, stopLine).forEach(line -> {
       if (sb.length() > 0) {
         sb.append("\r\n");
