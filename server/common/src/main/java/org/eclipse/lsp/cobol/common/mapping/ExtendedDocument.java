@@ -17,6 +17,7 @@ package org.eclipse.lsp.cobol.common.mapping;
 import lombok.Getter;
 
 import java.util.List;
+import java.util.Objects;
 
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp4j.Location;
@@ -207,9 +208,30 @@ public class ExtendedDocument {
 
   private Range updateRangeDueToChanges(Range range) {
     if (isDirty()) {
-      range = new Range(updatePositionDueToChanges(range.getStart()), updatePositionDueToChanges(range.getEnd()));
+      if(Objects.equals(range.getStart(), range.getEnd())) {
+        range = new Range(updatePositionDueToChanges(range.getStart()), updatePositionDueToChanges(range.getEnd()));
+      } else {
+        range = new Range(updatePositionDueToChanges(range.getStart()), shiftRight(updatePositionDueToChanges(shiftLeft(range.getEnd()))));
+      }
     }
     return range;
+  }
+
+  private Position shiftRight(Position position) {
+    return new Position(position.getLine(), position.getCharacter() + 1);
+  }
+
+  private Position shiftLeft(Position position) {
+    if(position.getLine() == 0 && position.getCharacter() == 0) {
+      return position;
+    }
+
+    if (position.getCharacter() == 0) {
+      return new Position(
+              position.getLine() - 1,
+              baseText.getLines().get(position.getLine() - 1).size() - 1);
+    }
+    return new Position(position.getLine(), position.getCharacter() - 1);
   }
 
   private int updateLineDueToChanges(int lineNumber) {
