@@ -42,4 +42,6 @@ public class TestData {
   Map<String, List<Location>> copybookUsages;
   Map<String, List<Location>> subroutineDefinitions;
   Map<String, List<Location>> subroutineUsages;
+  Map<String, List<Location>> functionDefinitions;
+  Map<String, List<Location>> functionUsages;
 }
