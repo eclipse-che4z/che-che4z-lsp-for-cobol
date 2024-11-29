@@ -156,15 +156,11 @@ classRepositoryClause
     ;
 
 functionRepositoryClause
-    : functionReference | intrinsicClause
+    : FUNCTION (functionName+ INTRINSIC? | ALL INTRINSIC)
     ;
 
 functionReference
     : FUNCTION functionName
-    ;
-
-intrinsicClause
-    : (functionName* | ALL) INTRINSIC
     ;
 
 // - source computer paragraph ----------------------------------
@@ -660,11 +656,12 @@ dataOccursSort
    ;
 
 dataPictureClause
-   : (PICTURE | PIC) PICTUREIS? pictureString+
+   : (PICTURE | PIC) PICTUREIS? pictureString
    ;
 
 pictureString
    : charString
+   | SINGLE_U_CHAR_BYTE_LENGTH IS? integerLiteral // this case specifically handles single U and BYTE-LENGTH clause
    ;
 
 dataDynamicLengthClause
@@ -2187,8 +2184,10 @@ length
    ;
 
 argument
-   : arithmeticExpression
-   | TRAILING | LEADING
+   : ALL
+   | arithmeticExpression
+   | TRAILING
+   | LEADING
    ;
 
 // qualified data name ----------------------------------
@@ -2198,7 +2197,7 @@ qualifiedDataName
    ;
 
 tableCall
-   : LPARENCHAR (ALL | arithmeticExpression) (COMMACHAR? (ALL | arithmeticExpression))* RPARENCHAR
+   : LPARENCHAR argument (COMMACHAR? argument)* RPARENCHAR
    ;
 
 specialRegister

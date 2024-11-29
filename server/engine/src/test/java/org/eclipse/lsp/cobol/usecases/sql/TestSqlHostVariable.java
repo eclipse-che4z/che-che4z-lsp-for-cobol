@@ -398,7 +398,7 @@ public class TestSqlHostVariable {
                             new Range(),
                             "Allowed range is 1 to 255",
                             DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText())));
+                            ErrorSource.PREPROCESSING.getText())));
   }
 
   @Test
@@ -412,7 +412,7 @@ public class TestSqlHostVariable {
                             new Range(),
                             "Allowed range is 1 to 255",
                             DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText()
+                            ErrorSource.PREPROCESSING.getText()
                     )
             )
     );
@@ -429,7 +429,7 @@ public class TestSqlHostVariable {
                             new Range(),
                             "Allowed range is 1 to 32704",
                             DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText()
+                            ErrorSource.PREPROCESSING.getText()
                     )
             )
     );
@@ -446,7 +446,7 @@ public class TestSqlHostVariable {
                             new Range(),
                             "Allowed range is 1 to 32704",
                             DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText()
+                            ErrorSource.PREPROCESSING.getText()
                     )
             )
     );
@@ -505,7 +505,7 @@ public class TestSqlHostVariable {
                     new Range(),
                     "Allowed range is 2 to 48",
                     DiagnosticSeverity.Error,
-                    ErrorSource.PARSING.getText()
+                    ErrorSource.PREPROCESSING.getText()
             )
     ));
   }
@@ -523,7 +523,7 @@ public class TestSqlHostVariable {
                     new Range(),
                     "Allowed range is 2 to 48",
                     DiagnosticSeverity.Error,
-                    ErrorSource.PARSING.getText()
+                    ErrorSource.PREPROCESSING.getText()
             )
     ));
   }
@@ -541,7 +541,7 @@ public class TestSqlHostVariable {
                     new Range(),
                     "Allowed range is 2 to 48",
                     DiagnosticSeverity.Error,
-                    ErrorSource.PARSING.getText()
+                    ErrorSource.PREPROCESSING.getText()
             )
     ));
   }
@@ -554,7 +554,7 @@ public class TestSqlHostVariable {
                     new Range(),
                     "Allowed range is 1 to 32767",
                     DiagnosticSeverity.Error,
-                    ErrorSource.PARSING.getText()
+                    ErrorSource.PREPROCESSING.getText()
             )
     ));
   }
@@ -572,7 +572,7 @@ public class TestSqlHostVariable {
                     new Range(),
                     "Allowed range is 1 to 32767",
                     DiagnosticSeverity.Error,
-                    ErrorSource.PARSING.getText()
+                    ErrorSource.PREPROCESSING.getText()
             )
     ));
   }
@@ -585,7 +585,7 @@ public class TestSqlHostVariable {
                     new Range(),
                     "Allowed range is 2 to 48",
                     DiagnosticSeverity.Error,
-                    ErrorSource.PARSING.getText()
+                    ErrorSource.PREPROCESSING.getText()
             )
     ));
   }
@@ -644,7 +644,7 @@ public class TestSqlHostVariable {
                             new Range(),
                             "Allowed range is 1 to 32767",
                             DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText()
+                            ErrorSource.PREPROCESSING.getText()
                     )
             )
     );
@@ -661,7 +661,7 @@ public class TestSqlHostVariable {
                 new Range(),
                 "Allowed range is 1 to 32767",
                 DiagnosticSeverity.Error,
-                ErrorSource.PARSING.getText())));
+                ErrorSource.PREPROCESSING.getText())));
   }
 
   @Test
