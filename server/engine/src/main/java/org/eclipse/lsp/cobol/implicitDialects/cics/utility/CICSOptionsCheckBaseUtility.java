@@ -399,7 +399,7 @@ public abstract class CICSOptionsCheckBaseUtility {
     }
   }
 
-  protected void checkHasToManyOneOptions(ParserRuleContext parentCtx) {
+  protected void checkHasTooManyOptions(ParserRuleContext parentCtx) {
     List<ParseTree> commandOoptions = parentCtx.children.stream()
             .filter(node -> node instanceof TerminalNode)
             .filter(node -> !node.getText().equals("AID"))
