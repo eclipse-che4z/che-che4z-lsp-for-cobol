@@ -238,7 +238,7 @@
       },
       {
         "name": "SECTION1",
-        "snippet": "       SECTION1 SECTION.\r\n       \r\n       OUTPUT-PAR1.\r\n           PERFORM PAR3.",
+        "snippet": "       SECTION1 SECTION.\r\n\r\n       OUTPUT-PAR1.\r\n           PERFORM PAR3.",
         "type": "section",
         "location": {
           "uri": "fake/path",
