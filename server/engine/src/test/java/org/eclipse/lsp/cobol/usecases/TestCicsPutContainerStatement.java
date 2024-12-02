@@ -71,8 +71,8 @@ public class TestCicsPutContainerStatement {
     // Test Functions
     @Test
     void testBTSValid() {
-        noErrorTest(PUT_BTS_VALID_1);
-        noErrorTest(PUT_BTS_VALID_2);
+        CICSTestUtils.noErrorTest(PUT_BTS_VALID_1);
+        CICSTestUtils.noErrorTest(PUT_BTS_VALID_2);
     }
 
     @Test
