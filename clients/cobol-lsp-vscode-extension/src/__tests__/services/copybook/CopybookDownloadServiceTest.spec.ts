@@ -196,7 +196,11 @@ describe("Tests copybook download service", () => {
             { name: "copybook-name", dialect: DEFAULT_DIALECT },
           ]);
 
-          expect(vscode.window.withProgress).toHaveBeenCalled();
+          expect(vscode.window.showErrorMessage).not.toHaveBeenCalledWith(
+            "Incorrect credentials in Zowe profile profile.",
+          );
+
+          expect(downloadService.downloadCopybook).toHaveBeenCalled();
         });
       });
 
@@ -217,8 +221,11 @@ describe("Tests copybook download service", () => {
             { name: "copybook-name", dialect: DEFAULT_DIALECT },
           ]);
 
+          expect(vscode.window.showErrorMessage).not.toHaveBeenCalledWith(
+            "Incorrect credentials in Zowe profile profile.",
+          );
+
           expect(downloadService.downloadCopybook).toHaveBeenCalled();
-          expect(vscode.window.withProgress).toHaveBeenCalled();
         });
       });
     });
