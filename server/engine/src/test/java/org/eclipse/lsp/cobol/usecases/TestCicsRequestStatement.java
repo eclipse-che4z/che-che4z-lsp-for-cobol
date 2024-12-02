@@ -29,7 +29,7 @@ import java.util.*;
  * href="https://www.ibm.com/docs/en/cics-ts/6.x?topic=summary-request-passticket">REQUEST PASSTICKET
  * Command</a>
  *
- * <p>This class tests all variations of the CONVERSE command found in the link above.
+ * <p>This class tests all variations of the REQUEST command found in the link above.
  */
 public class TestCicsRequestStatement {
 
