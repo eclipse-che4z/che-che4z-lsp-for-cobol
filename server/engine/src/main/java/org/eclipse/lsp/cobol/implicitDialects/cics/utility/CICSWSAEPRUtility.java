@@ -52,7 +52,7 @@ public class CICSWSAEPRUtility extends CICSOptionsCheckBaseUtility {
         }
       };
 
-  public CICSRWSAEPRUtility(DialectProcessingContext context, List<SyntaxError> errors) {
+  public CICSWSAEPRUtility(DialectProcessingContext context, List<SyntaxError> errors) {
     super(context, errors, DUPLICATE_CHECK_OPTIONS);
   }
 
