@@ -46,18 +46,6 @@ public class TestCicsPutContainerStatement {
     private static final String PUT_BTS_INVALID = "PUT CONTAINER(123) ACTIVITY(123) {ACQACTIVITY|errorOne} FROM(123) FLENGTH(123)";
     private static final String PUT_CHANNEL_INVALID = "PUT CONTAINER(123) CHANNEL(123) FROM(123) FLENGTH(123) BIT {DATATYPE|errorOne}(123) APPEND";
 
-    // Utility Functions
-    private static void noErrorTest(String newCommand) {
-        UseCaseEngine.runTest(getTestString(newCommand), ImmutableList.of(), ImmutableMap.of());
-    }
-
-    private static String getTestString(String newCommand) {
-        List<String> instances = Arrays.asList(newCommand.split("\\s"));
-        instances.replaceAll(String.join("", Collections.nCopies(12, " "))::concat);
-        ArrayList<String> base = new ArrayList<String>(Arrays.asList(BASE_TEXT.split("\n")));
-        base.addAll(base.size() - 1, instances);
-        return String.join("\n", base);
-    }
 
     // Test Functions
     @Test
