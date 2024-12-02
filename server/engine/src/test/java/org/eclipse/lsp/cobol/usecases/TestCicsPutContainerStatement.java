@@ -35,15 +35,6 @@ import java.util.*;
  * <p>This class tests all variations of the CONVERSE command found in the link above.
  */
 public class TestCicsPutContainerStatement {
-    // Main Building Blocks
-    private static final String BASE_TEXT =
-            "       IDENTIFICATION DIVISION.\n"
-                    + "       PROGRAM-ID. ABCDEF.\n"
-                    + "       DATA DIVISION.\n"
-                    + "       WORKING-STORAGE SECTION.\n"
-                    + "       PROCEDURE DIVISION.\n"
-                    + "            EXEC CICS \n"
-                    + "            END-EXEC.";
 
     // Test Strings
     private static final String PUT_BTS_VALID_1 = "PUT CONTAINER(123) ACTIVITY(123) FROM(123) FLENGTH(123)";
