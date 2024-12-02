@@ -23,6 +23,7 @@ suite("Integration Test Suite: Subroutines resolving", () => {
   });
 
   test("Diagnostics report missing subroutine", async function () {
+    this.timeout(helper.TEST_TIMEOUT);
     await helper.showDocument("CALL.cbl");
     const editor = helper.getEditor("CALL.cbl");
     const diagnostics = await helper.waitForDiagnostics(editor.document.uri);
