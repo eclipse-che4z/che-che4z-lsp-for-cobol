@@ -77,8 +77,8 @@ public class TestCicsPutContainerStatement {
 
     @Test
     void testChannelValid() {
-        noErrorTest(PUT_CHANNEL_VALID_1);
-        noErrorTest(PUT_CHANNEL_VALID_2);
+        CICSTestUtils.noErrorTest(PUT_CHANNEL_VALID_1);
+        CICSTestUtils.noErrorTest(PUT_CHANNEL_VALID_2);
     }
 
     // Invalid Tests
