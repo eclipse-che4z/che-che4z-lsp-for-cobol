@@ -70,12 +70,15 @@ public class CICSPutContainerOptionsCheckUtility extends CICSOptionsCheckBaseUti
 
     private void checkBTS(CICSParser.Cics_put_container_btsContext ctx) {
         checkMutuallyExclusiveOptions("ACTIVITY, ACQACTIVITY, PROCESS or ACQPROCESS", ctx.ACTIVITY(), ctx.ACQACTIVITY(), ctx.PROCESS(), ctx.ACQPROCESS());
+        checkHasMandatoryOptions(ctx.FROM(), ctx, "FROM");
     }
 
     private void checkChannel(CICSParser.Cics_put_container_channelContext ctx) {
         checkMutuallyExclusiveOptions("BIT, DATATYPE or CHAR", ctx.BIT(), ctx.DATATYPE(), ctx.CHAR());
 
         checkMutuallyExclusiveOptions("FROMCCSID or FROMCODEPAGE", ctx.FROMCCSID(), ctx.FROMCODEPAGE());
+
+        checkHasMandatoryOptions(ctx.FROM(), ctx, "FROM");
     }
 
 }

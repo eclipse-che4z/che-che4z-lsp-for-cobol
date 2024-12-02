@@ -15,10 +15,7 @@
 
 package org.eclipse.lsp.cobol.usecases;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
-import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.eclipse.lsp.cobol.usecases.common.CICSTestUtils;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
@@ -45,7 +42,7 @@ public class TestCicsPutContainerStatement {
 
     private static final String PUT_BTS_INVALID = "PUT CONTAINER(123) ACTIVITY(123) {ACQACTIVITY|errorOne} FROM(123) FLENGTH(123)";
     private static final String PUT_CHANNEL_INVALID = "PUT CONTAINER(123) CHANNEL(123) FROM(123) FLENGTH(123) BIT {DATATYPE|errorOne}(123) APPEND";
-
+    private static final String PUT_BTS_INVALID_2 = "PUT CONTAINER(123) {ACQACTIVITY|errorOne}";
 
     // Test Functions
     @Test
@@ -66,6 +63,13 @@ public class TestCicsPutContainerStatement {
         HashMap<String, Diagnostic> expectedDiagnostics = new HashMap<>();
         expectedDiagnostics.put("errorOne", new Diagnostic(new Range(), "Options \"ACTIVITY, ACQACTIVITY, PROCESS or ACQPROCESS\" are mutually exclusive.", DiagnosticSeverity.Error, ErrorSource.PARSING.getText()));
         CICSTestUtils.errorTest(PUT_BTS_INVALID, expectedDiagnostics);
+    }
+
+    @Test
+    void testBTSInvalid2() {
+        HashMap<String, Diagnostic> expectedDiagnostics = new HashMap<>();
+        expectedDiagnostics.put("errorOne", new Diagnostic(new Range(), "Missing required option: FROM", DiagnosticSeverity.Error, ErrorSource.PARSING.getText()));
+        CICSTestUtils.errorTest(PUT_BTS_INVALID_2, expectedDiagnostics);
     }
 
     @Test
