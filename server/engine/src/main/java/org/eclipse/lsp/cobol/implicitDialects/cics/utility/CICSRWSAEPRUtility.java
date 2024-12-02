@@ -29,8 +29,8 @@ import java.util.stream.Stream;
 
 import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_wsaepr;
 
-/** Checks CICS WSAREPR rules for required and invalid options */
-public class CICSRWSAEPRUtility extends CICSOptionsCheckBaseUtility {
+/** Checks CICS WSAEPR rules for required and invalid options */
+public class CICSWSAEPRUtility extends CICSOptionsCheckBaseUtility {
 
   public static final int RULE_INDEX = RULE_cics_wsaepr;
 
