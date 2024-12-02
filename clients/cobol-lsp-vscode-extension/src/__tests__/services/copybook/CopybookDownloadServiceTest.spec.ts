@@ -69,7 +69,7 @@ describe("Tests copybook download service", () => {
     downloadService["processDownloadError"] = jest.fn();
 
     workspaceConfigurationMock = {
-      "paths-dsn": ["TESTUSER.COPYBOOKS", "TESTUSER.COPYBKS2"],
+      "paths-dsn": ["TESTUSER.COPYBOOK", "TESTUSER.COPYBKS2"],
       "paths-uss": ["/u/test/copybooks"],
     };
     jest.spyOn(vscode.workspace, "getConfiguration").mockImplementation(
@@ -157,7 +157,7 @@ describe("Tests copybook download service", () => {
 
         describe("mvs configuration", () => {
           beforeEach(() => {
-            workspaceConfigurationMock[PATHS_DSN] = ["TEST.COBOL.COPYBOOKS"];
+            workspaceConfigurationMock[PATHS_DSN] = ["TEST.COBOL.COPYBOOK"];
             workspaceConfigurationMock[PATHS_USS] = ["/u/test/copybooks"];
           });
 
@@ -167,7 +167,7 @@ describe("Tests copybook download service", () => {
             ]);
 
             expect(unauthorizedErrorMock).toHaveBeenCalledWith(
-              "TEST.COBOL.COPYBOOKS",
+              "TEST.COBOL.COPYBOOK",
             );
             expect(zoweMockUnauthorizedError.getUssApi).not.toHaveBeenCalled();
             expect(zoweMockUnauthorizedError.getMvsApi).toHaveBeenCalled();
@@ -185,7 +185,7 @@ describe("Tests copybook download service", () => {
             "storage-path",
             zoweMockNotFoundError,
           );
-          workspaceConfigurationMock[PATHS_DSN] = ["TEST.COBOL.COPYBOOKS"];
+          workspaceConfigurationMock[PATHS_DSN] = ["TEST.COBOL.COPYBOOK"];
           workspaceConfigurationMock[PATHS_USS] = ["/u/test/copybooks"];
 
           downloadService.downloadCopybook = jest.fn().mockResolvedValue(true);
@@ -210,7 +210,7 @@ describe("Tests copybook download service", () => {
             "storage-path",
             createZoweExplorerMock(permissionsErrorMock),
           );
-          workspaceConfigurationMock[PATHS_DSN] = ["TEST.COBOL.COPYBOOKS"];
+          workspaceConfigurationMock[PATHS_DSN] = ["TEST.COBOL.COPYBOOK"];
           workspaceConfigurationMock[PATHS_USS] = ["/u/test/copybooks"];
 
           downloadService.downloadCopybook = jest.fn().mockResolvedValue(true);
@@ -355,7 +355,7 @@ describe("Tests copybook download service", () => {
       ).toHaveBeenCalledWith(
         { name: "copybook", dialect: "COBOL" },
         "document-uri",
-        "TESTUSER.COPYBOOKS",
+        "TESTUSER.COPYBOOK",
       );
       expect(
         downloader["ussDownloader"]!.downloadCopybook,
@@ -385,7 +385,7 @@ describe("Tests copybook download service", () => {
       ).toHaveBeenCalledWith(
         { name: "copybook", dialect: "COBOL" },
         "document-uri",
-        "TESTUSER.COPYBOOKS",
+        "TESTUSER.COPYBOOK",
       );
       expect(
         downloader["ussDownloader"]!.downloadCopybook,
@@ -448,7 +448,7 @@ describe("Tests copybook download service", () => {
     expect(downloader["dsnDownloader"]!.downloadCopybook).toHaveBeenCalledWith(
       { name: "copybook", dialect: "COBOL" },
       "document-uri",
-      "TESTUSER.COPYBOOKS",
+      "TESTUSER.COPYBOOK",
     );
     expect(downloader["dsnDownloader"]!.downloadCopybook).toHaveBeenCalledWith(
       { name: "copybook", dialect: "COBOL" },
