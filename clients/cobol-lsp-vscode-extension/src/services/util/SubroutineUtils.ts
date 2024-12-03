@@ -11,6 +11,7 @@
  * Contributors:
  *   Broadcom, Inc. - initial API and implementation
  */
+import { isAbsolute } from "path";
 import { COBOL_EXT_ARRAY_CASE_INSENSITIVE } from "../../constants";
 import { SettingsService } from "../Settings";
 import * as vscode from "vscode";
@@ -23,12 +24,23 @@ import * as vscode from "vscode";
 export async function resolveSubroutineURI(name: string) {
   const subroutinePaths = SettingsService.getSubroutineLocalPath();
 
-  if (subroutinePaths && subroutinePaths.length > 0) {
-    const pattern = `{${subroutinePaths.join(",")}}/**/${name}{${COBOL_EXT_ARRAY_CASE_INSENSITIVE.join(",")}}`;
-    const uris = await vscode.workspace.findFiles(pattern, null, 1);
+  if (subroutinePaths) {
+    for (const subroutinePath of subroutinePaths) {
+      let pattern: vscode.RelativePattern | string;
+      if (isAbsolute(subroutinePath)) {
+        pattern = new vscode.RelativePattern(
+          subroutinePath,
+          `**/${name}{${COBOL_EXT_ARRAY_CASE_INSENSITIVE.join(",")}}`,
+        );
+      } else {
+        pattern = `${subroutinePath}/**/${name}{${COBOL_EXT_ARRAY_CASE_INSENSITIVE.join(",")}}`;
+      }
 
-    if (uris.length > 0) {
-      return uris[0].toString();
+      const uris = await vscode.workspace.findFiles(pattern, null, 1);
+
+      if (uris.length > 0) {
+        return uris[0].toString();
+      }
     }
   }
 

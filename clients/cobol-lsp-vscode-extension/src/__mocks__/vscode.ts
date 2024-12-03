@@ -216,3 +216,7 @@ export const FileSystemError = {
     return new FileNotFound();
   },
 };
+
+export const RelativePattern = jest
+  .fn()
+  .mockImplementation((base: string, pattern: string) => ({ base, pattern }));

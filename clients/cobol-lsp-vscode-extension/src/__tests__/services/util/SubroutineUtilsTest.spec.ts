@@ -16,6 +16,10 @@ import * as vscode from "vscode";
 import { resolveSubroutineURI } from "../../../services/util/SubroutineUtils";
 
 describe("SubroutineUtils", () => {
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
   describe("Subroutines configuration exists", () => {
     beforeEach(() => {
       jest.spyOn(vscode.workspace, "getConfiguration").mockReturnValue({
@@ -37,7 +41,7 @@ describe("SubroutineUtils", () => {
         const uri = await resolveSubroutineURI("SUB1");
         expect(uri).toEqual("file:///coding/cobol/subroutines/SUB1.cob");
         expect(findFilesSpy).toHaveBeenCalledWith(
-          "{subroutines,more-subroutines}/**/SUB1{.CBL,.COB,.COBOL,.cbl,.cob,.cobol}",
+          "subroutines/**/SUB1{.CBL,.COB,.COBOL,.cbl,.cob,.cobol}",
           null,
           1,
         );
@@ -68,6 +72,34 @@ describe("SubroutineUtils", () => {
     it("subroutine path is resolved as undefined", async () => {
       const uri = await resolveSubroutineURI("SUB1");
       expect(uri).toBeUndefined();
+    });
+  });
+
+  describe("Absolute subroutines folders are configured", () => {
+    beforeEach(() => {
+      jest.spyOn(vscode.workspace, "getConfiguration").mockReturnValue({
+        get: () => ["/absolute/subroutines"],
+      } as unknown as vscode.WorkspaceConfiguration);
+    });
+
+    let findFilesSpy: jest.SpyInstance;
+    beforeEach(() => {
+      findFilesSpy = jest
+        .spyOn(vscode.workspace, "findFiles")
+        .mockResolvedValue([vscode.Uri.file("/absolute/subroutines/SUB1.cob")]);
+    });
+
+    it("subroutine path is resolved", async () => {
+      const uri = await resolveSubroutineURI("SUB1");
+      expect(uri).toEqual("file:///absolute/subroutines/SUB1.cob");
+      expect(findFilesSpy).toHaveBeenCalledWith(
+        {
+          base: "/absolute/subroutines",
+          pattern: "**/SUB1{.CBL,.COB,.COBOL,.cbl,.cob,.cobol}",
+        },
+        null,
+        1,
+      );
     });
   });
 });
