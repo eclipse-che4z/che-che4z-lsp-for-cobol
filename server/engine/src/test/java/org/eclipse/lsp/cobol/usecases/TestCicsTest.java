@@ -14,7 +14,13 @@
  */
 package org.eclipse.lsp.cobol.usecases;
 
+import com.google.common.collect.ImmutableMap;
+import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.usecases.common.CICSTestUtils;
+import org.eclipse.lsp4j.Diagnostic;
+import org.eclipse.lsp4j.DiagnosticSeverity;
+import org.eclipse.lsp4j.Position;
+import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -25,8 +31,11 @@ import org.junit.jupiter.api.Test;
  * <p>This class tests all variations of the TEST EVENT command found in the link above.
  */
 public class TestCicsTest {
-  private static final String TEST_EVENT_VALID_ONE = "TEST EVENT(1) FIRESTATUS(1)";
-  private static final String TEST_EVENT_VALID_TWO = "TEST FIRESTATUS(100) EVENT(100)";
+  private static final String TEST_EVENT_VALID_ONE = "TEST EVENT({$varOne}) FIRESTATUS({$varTwo})";
+  private static final String TEST_EVENT_VALID_TWO = "TEST FIRESTATUS({$varTwo}) EVENT({$varOne})";
+
+  private static final String TEST_EVENT_INVALID_ONE = "TEST {EVENT|error1}({$varOne})";
+  private static final String TEST_EVENT_INVALID_TWO = "TEST {FIRESTATUS|error1}({$varTwo})";
 
 
   @Test
@@ -37,5 +46,29 @@ public class TestCicsTest {
   @Test
   void testCicsTestValidTwo() {
     CICSTestUtils.noErrorTest(TEST_EVENT_VALID_TWO);
+  }
+
+  @Test
+  void testCicsTestInvalidOne() {
+    CICSTestUtils.errorTest(TEST_EVENT_INVALID_ONE,
+            ImmutableMap.of(
+            "error1",
+            new Diagnostic(
+                    new Range(new Position(12, 12), new Position(13, 25)),
+                    "Missing required option: FIRESTATUS",
+                    DiagnosticSeverity.Error,
+                    ErrorSource.PARSING.getText())));
+  }
+
+  @Test
+  void testCicsTestInvalidTwo() {
+    CICSTestUtils.errorTest(TEST_EVENT_INVALID_TWO,
+            ImmutableMap.of(
+                    "error1",
+                    new Diagnostic(
+                            new Range(new Position(12, 12), new Position(13, 30)),
+                            "Missing required option: EVENT",
+                            DiagnosticSeverity.Error,
+                            ErrorSource.PARSING.getText())));
   }
 }
