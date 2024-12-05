@@ -38,10 +38,10 @@ public class CICSMoveOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
                     put(CICSLexer.MOVE, ErrorSeverity.ERROR);
                     put(CICSLexer.CONTAINER, ErrorSeverity.ERROR);
                     put(CICSLexer.AS, ErrorSeverity.ERROR);
-                    put(CICSLexer.FROMPROCESS, ErrorSeverity.ERROR);
+                    put(CICSLexer.FROMPROCESS, ErrorSeverity.WARNING);
                     put(CICSLexer.FROMACTIVITY, ErrorSeverity.ERROR);
                     put(CICSLexer.CHANNEL, ErrorSeverity.ERROR);
-                    put(CICSLexer.TOPROCESS, ErrorSeverity.ERROR);
+                    put(CICSLexer.TOPROCESS, ErrorSeverity.WARNING);
                     put(CICSLexer.TOACTIVITY, ErrorSeverity.ERROR);
                     put(CICSLexer.TOCHANNEL, ErrorSeverity.ERROR);
                 }
@@ -69,14 +69,23 @@ public class CICSMoveOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     private void checkMoveOptions(CICSParser.Cics_moveContext ctx) {
         checkHasMandatoryOptions(ctx.CONTAINER(), ctx, "CONTAINER");
         checkHasMandatoryOptions(ctx.AS(), ctx, "AS");
-        checkHasMutuallyExclusiveOptions("FROMPROCESS or FROMACTIVITY or CHANNEL", ctx.FROMPROCESS(), ctx.FROMACTIVITY(), ctx.CHANNEL());
-        checkHasMutuallyExclusiveOptions("TOPROCESS or TOACTIVITY or TOCHANNEL", ctx.TOPROCESS(), ctx.TOACTIVITY(), ctx.TOCHANNEL());
-        if (!ctx.CHANNEL().isEmpty()) {
-            checkHasIllegalOptions(ctx.TOPROCESS(), "TOPROCESS with CHANNEL");
-            checkHasIllegalOptions(ctx.TOACTIVITY(), "TOACTIVITY with CHANNEL");
+        checkHasMutuallyExclusiveOptions("FROMPROCESS or FROMACTIVITY", ctx.FROMPROCESS(), ctx.FROMACTIVITY());
+        checkHasMutuallyExclusiveOptions("TOPROCESS or TOACTIVITY", ctx.TOPROCESS(), ctx.TOACTIVITY());
+        if (!ctx.FROMPROCESS().isEmpty()) {
+            checkHasIllegalOptions(ctx.TOCHANNEL(), "TOCHANNEL with FROMPROCESS");
+            checkHasIllegalOptions(ctx.CHANNEL(), "CHANNEL with FROMPROCESS");
         }
-        if (!ctx.FROMPROCESS().isEmpty() || !ctx.FROMACTIVITY().isEmpty()) {
-            checkHasIllegalOptions(ctx.TOCHANNEL(), "TOCHANNEL without CHANNEL");
+        if (!ctx.TOPROCESS().isEmpty()) {
+            checkHasIllegalOptions(ctx.TOCHANNEL(), "TOCHANNEL with TOPROCESS");
+            checkHasIllegalOptions(ctx.CHANNEL(), "CHANNEL with TOPROCESS");
+        }
+        if (!ctx.FROMACTIVITY().isEmpty()) {
+            checkHasIllegalOptions(ctx.TOCHANNEL(), "TOCHANNEL with FROMACTIVITY");
+            checkHasIllegalOptions(ctx.CHANNEL(), "CHANNEL with FROMACTIVITY");
+        }
+        if (!ctx.TOACTIVITY().isEmpty()) {
+            checkHasIllegalOptions(ctx.TOCHANNEL(), "TOCHANNEL with TOACTIVITY");
+            checkHasIllegalOptions(ctx.CHANNEL(), "CHANNEL with TOACTIVITY");
         }
     }
 

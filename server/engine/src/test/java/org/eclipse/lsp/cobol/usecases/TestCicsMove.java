@@ -39,10 +39,10 @@ public class TestCicsMove {
 
     private static final String MOVE_BARE_VALID = "MOVE CONTAINER(1) AS(2)";
 
-    private static final String MOVE_INVALID_ONE = "MOVE CONTAINER(1) AS(2) CHANNEL(1) {TOPROCESS|error1}";
+    private static final String MOVE_INVALID_ONE = "MOVE CONTAINER(1) AS(2) {CHANNEL|error1}(1) TOPROCESS";
     private static final String MOVE_INVALID_TWO = "MOVE {FROMACTIVITY|error1}(2) AS(3) CONTAINER(1) {FROMPROCESS|error1}";
     private static final String MOVE_INVALID_THREE = "MOVE FROMPROCESS CONTAINER(1) AS(2) {TOCHANNEL|error1}(3)";
-    private static final String MOVE_INVALID_FOUR = "MOVE AS(2) CONTAINER(1) CHANNEL(3) {TOACTIVITY|error1}(4)";
+    private static final String MOVE_INVALID_FOUR = "MOVE AS(2) CONTAINER(1) {CHANNEL|error1}(3) TOACTIVITY(4)";
 
     @Test
     void testMoveAllValidOne() {
@@ -96,7 +96,7 @@ public class TestCicsMove {
                         "error1",
                         new Diagnostic(
                                 new Range(),
-                                "Invalid option provided: TOPROCESS with CHANNEL",
+                                "Invalid option provided: CHANNEL with TOPROCESS",
                                 DiagnosticSeverity.Error,
                                 ErrorSource.PARSING.getText()
                         )
@@ -111,7 +111,7 @@ public class TestCicsMove {
                         "error1",
                         new Diagnostic(
                                 new Range(),
-                                "Exactly one option required, options are mutually exclusive: FROMPROCESS or FROMACTIVITY or CHANNEL",
+                                "Exactly one option required, options are mutually exclusive: FROMPROCESS or FROMACTIVITY",
                                 DiagnosticSeverity.Error,
                                 ErrorSource.PARSING.getText()
                         )
@@ -126,7 +126,7 @@ public class TestCicsMove {
                         "error1",
                         new Diagnostic(
                                 new Range(),
-                                "Invalid option provided: TOCHANNEL without CHANNEL",
+                                "Invalid option provided: TOCHANNEL with FROMPROCESS",
                                 DiagnosticSeverity.Error,
                                 ErrorSource.PARSING.getText()
                         )
@@ -141,7 +141,7 @@ public class TestCicsMove {
                         "error1",
                         new Diagnostic(
                                 new Range(),
-                                "Invalid option provided: TOACTIVITY with CHANNEL",
+                                "Invalid option provided: CHANNEL with TOACTIVITY",
                                 DiagnosticSeverity.Error,
                                 ErrorSource.PARSING.getText()
                         )
