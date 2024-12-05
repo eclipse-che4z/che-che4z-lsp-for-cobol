@@ -53,7 +53,7 @@ public class TestCicsGet64ContainerStatement {
     @Test
     void testCicsGet64ContainerInvalid_1() {
         HashMap<String, Diagnostic> expectedDiagnostics = new HashMap<>();
-        expectedDiagnostics.put("errorOne", new Diagnostic(new Range(), "Options \"INTO, SET, NODATA\" are mutually exclusive.", DiagnosticSeverity.Error, ErrorSource.PARSING.getText()));
+        expectedDiagnostics.put("errorOne", new Diagnostic(new Range(), "Options \"INTO, SET or NODATA\" are mutually exclusive.", DiagnosticSeverity.Error, ErrorSource.PARSING.getText()));
         CICSTestUtils.errorTest(GET64CONTAINER_INVALID_1, expectedDiagnostics);
     }
 
@@ -74,7 +74,7 @@ public class TestCicsGet64ContainerStatement {
     @Test
     void testCicsGet64ContainerInvalid_4() {
         HashMap<String, Diagnostic> expectedDiagnostics = new HashMap<>();
-        expectedDiagnostics.put("errorOne", new Diagnostic(new Range(), "Options \"INTOCCSID, INTOCODEPAGE, CONVERTST\" are mutually exclusive.", DiagnosticSeverity.Error, ErrorSource.PARSING.getText()));
+        expectedDiagnostics.put("errorOne", new Diagnostic(new Range(), "Options \"INTOCCSID, INTOCODEPAGE or CONVERTST\" are mutually exclusive.", DiagnosticSeverity.Error, ErrorSource.PARSING.getText()));
         CICSTestUtils.errorTest(GET64CONTAINER_INVALID_4, expectedDiagnostics);
     }
 

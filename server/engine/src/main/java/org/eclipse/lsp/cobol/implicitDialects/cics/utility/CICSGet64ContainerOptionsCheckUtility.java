@@ -64,9 +64,9 @@ public class CICSGet64ContainerOptionsCheckUtility extends CICSOptionsCheckBaseU
     }
 
     private void checkContainerBody(CICSParser.Cics_get64_bodyContext ctx) {
-        checkMutuallyExclusiveOptions("INTO, SET, NODATA", ctx.INTO(), ctx.SET(), ctx.NODATA());
+        checkMutuallyExclusiveOptions("INTO, SET or NODATA", ctx.INTO(), ctx.SET(), ctx.NODATA());
 
-        checkMutuallyExclusiveOptions("INTOCCSID, INTOCODEPAGE, CONVERTST", ctx.INTOCCSID(), ctx.INTOCODEPAGE(), ctx.CONVERTST());
+        checkMutuallyExclusiveOptions("INTOCCSID, INTOCODEPAGE or CONVERTST", ctx.INTOCCSID(), ctx.INTOCODEPAGE(), ctx.CONVERTST());
 
         checkPrerequisiteIsMet(ctx.CONVERTST(), ctx.CCSID(), ctx, "CCSID without CONVERTST");
 
