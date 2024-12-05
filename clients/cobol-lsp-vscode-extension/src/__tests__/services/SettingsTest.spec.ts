@@ -23,7 +23,11 @@ import {
 } from "../../services/DialectRegistry";
 
 import { asMutable } from "../../test/suite/testHelper";
-import { SETTINGS_CPY_LOCAL_PATH } from "../../constants";
+import {
+  SETTINGS_COMPILE_OPTIONS,
+  SETTINGS_CPY_LOCAL_PATH,
+  SETTINGS_DIALECT,
+} from "../../constants";
 import * as extension from "../../extension";
 
 function makefsPath(p: string): string {
@@ -284,7 +288,7 @@ describe("SettingsService prepares local search folders", () => {
 });
 
 describe("SettingService lspConfigHandler", () => {
-  describe("dialects configuration", () => {
+  describe("dialects registry configuration", () => {
     const dialect: DialectInfo = {
       name: "testDialect",
       uri: vscode.Uri.file(""),
@@ -313,6 +317,43 @@ describe("SettingService lspConfigHandler", () => {
       });
 
       expect(result).toEqual(expect.arrayContaining([[dialect]]));
+    });
+  });
+
+  describe("enabled dialects section", () => {
+    beforeAll(() => {
+      jest.spyOn(vscode.workspace, "getConfiguration").mockReturnValue({
+        get: () => [],
+      } as unknown as vscode.WorkspaceConfiguration);
+    });
+
+    test("return empty array in default configuration", async () => {
+      const result = await lspConfigHandler({
+        items: [{ section: SETTINGS_DIALECT }],
+      });
+
+      expect(result).toEqual(expect.arrayContaining([[]]));
+    });
+  });
+
+  describe("compiler options section", () => {
+    beforeAll(() => {
+      jest.spyOn(vscode.workspace, "getConfiguration").mockReturnValue({
+        get: () => undefined,
+      } as unknown as vscode.WorkspaceConfiguration);
+    });
+
+    test("returns undefined in default configuration", async () => {
+      const result = await lspConfigHandler({
+        items: [
+          {
+            section: SETTINGS_COMPILE_OPTIONS,
+            scopeUri: "file:///workspace/program.cob",
+          },
+        ],
+      });
+
+      expect(result).toEqual(expect.arrayContaining([undefined]));
     });
   });
 
