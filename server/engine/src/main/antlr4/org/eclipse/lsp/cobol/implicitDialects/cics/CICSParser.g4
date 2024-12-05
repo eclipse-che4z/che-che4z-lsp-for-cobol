@@ -404,7 +404,7 @@ cics_get_counter_dcounter: ((COUNTER | DCOUNTER | POOL) cics_name | VALUE cics_d
                   WRAP | NOSUSPEND | REDUCE | cics_handle_response)*;
 
 cics_get64: GET64 (cics_get64_body | cics_handle_response)+;
-cics_get64_body: CONTAINER cics_data_value ((FLENGTH | SET | FLENGTH | NODATA) | (CHANNEL | BYTEOFFSET | FLENGTH | INTOCCSID | INTOCODEPAGE) cics_data_value | (INTO | BYTEOFFSET | CCSID) cics_data_area | CONVERTST cics_cvda | cics_handle_response)+;
+cics_get64_body: CONTAINER cics_data_value ((FLENGTH | FLENGTH | NODATA) | SET cics_ref | (CHANNEL | BYTEOFFSET | FLENGTH | INTOCCSID | INTOCODEPAGE) cics_data_value | (INTO | BYTEOFFSET | CCSID) cics_data_area | CONVERTST cics_cvda | cics_handle_response)+;
 
 /** GETMAIN */
 cics_getmain: GETMAIN cics_getmain_body;

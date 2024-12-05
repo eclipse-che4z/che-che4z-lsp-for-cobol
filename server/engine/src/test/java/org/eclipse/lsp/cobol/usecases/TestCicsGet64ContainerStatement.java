@@ -39,6 +39,8 @@ public class TestCicsGet64ContainerStatement {
 
     private static final String GET64CONTAINER_INVALID_1 = "GET64 CONTAINER(123) INTO(123) {NODATA|errorOne} FLENGTH(123)";
     private static final String GET64CONTAINER_INVALID_2 = "GET64 CONTAINER(123) NODATA FLENGTH(123) {BYTEOFFSET|errorOne}(123)";
+    private static final String GET64CONTAINER_INVALID_3 = "GET64 {_CONTAINER(123) NODATA FLENGTH(123) CCSID(123)|errorOne_}";
+    private static final String GET64CONTAINER_INVALID_4 = "GET64 CONTAINER(123) INTO(123) FLENGTH(123) BYTEOFFSET(8) {CONVERTST|errorOne}(123) INTOCODEPAGE(1) CCSID(123)";;
 
     // Test Functions
     @Test
@@ -60,6 +62,20 @@ public class TestCicsGet64ContainerStatement {
         HashMap<String, Diagnostic> expectedDiagnostics = new HashMap<>();
         expectedDiagnostics.put("errorOne", new Diagnostic(new Range(), "Invalid option provided: BYTEOFFSET", DiagnosticSeverity.Error, ErrorSource.PARSING.getText()));
         CICSTestUtils.errorTest(GET64CONTAINER_INVALID_2, expectedDiagnostics);
+    }
+
+    @Test
+    void testCicsGet64ContainerInvalid_3() {
+        HashMap<String, Diagnostic> expectedDiagnostics = new HashMap<>();
+        expectedDiagnostics.put("errorOne", new Diagnostic(new Range(), "Missing required option for: CCSID without CONVERTST", DiagnosticSeverity.Error, ErrorSource.PARSING.getText()));
+        CICSTestUtils.errorTest(GET64CONTAINER_INVALID_3, expectedDiagnostics);
+    }
+
+    @Test
+    void testCicsGet64ContainerInvalid_4() {
+        HashMap<String, Diagnostic> expectedDiagnostics = new HashMap<>();
+        expectedDiagnostics.put("errorOne", new Diagnostic(new Range(), "Options \"INTOCCSID, INTOCODEPAGE, CONVERTST\" are mutually exclusive.", DiagnosticSeverity.Error, ErrorSource.PARSING.getText()));
+        CICSTestUtils.errorTest(GET64CONTAINER_INVALID_4, expectedDiagnostics);
     }
 
 }
