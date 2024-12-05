@@ -32,18 +32,18 @@ import java.util.Map;
  * <p>This class tests all variations of the WAITCICS command found in the link above.
  */
 public class TestCicsWaitCics {
-    private static final String WAITCICS_VALID_ALL_OPTIONS_ONE = "WAITCICS ECBLIST(1) NUMEVENTS(2) NAME(3) PURGEABLE";
-    private static final String WAITCICS_VALID_ALL_OPTIONS_TWO = "WAITCICS ECBLIST(1) NUMEVENTS(2) PURGEABILITY(4) NAME(3)";
-    private static final String WAITCICS_VALID_ALL_OPTIONS_THREE = "WAITCICS NUMEVENTS(2) ECBLIST(1) NAME(3) NOTPURGEABLE";
+    private static final String WAITCICS_VALID_ALL_OPTIONS_ONE = "WAITCICS ECBLIST({$varOne}) NUMEVENTS({$varTwo}) NAME({$varThree}) PURGEABLE";
+    private static final String WAITCICS_VALID_ALL_OPTIONS_TWO = "WAITCICS ECBLIST({$varOne}) NUMEVENTS({$varTwo}) PURGEABILITY({$varFive}) NAME({$varThree})";
+    private static final String WAITCICS_VALID_ALL_OPTIONS_THREE = "WAITCICS NUMEVENTS({$varTwo}) ECBLIST({$varOne}) NAME({$varThree}) NOTPURGEABLE";
 
-    private static final String WAITCICS_VALID_SOME_OPTIONS_ONE = "WAITCICS NAME(3) ECBLIST(1) NUMEVENTS(2)";
-    private static final String WAITCICS_VALID_SOME_OPTIONS_TWO = "WAITCICS NUMEVENTS(2) PURGEABILITY(4) ECBLIST(1) ";
+    private static final String WAITCICS_VALID_SOME_OPTIONS_ONE = "WAITCICS NAME({$varThree}) ECBLIST({$varOne}) NUMEVENTS({$varTwo})";
+    private static final String WAITCICS_VALID_SOME_OPTIONS_TWO = "WAITCICS NUMEVENTS({$varTwo}) PURGEABILITY({$varFive}) ECBLIST({$varOne}) ";
 
-    private static final String WAITCICS_VALID_BARE = "WAITCICS NUMEVENTS(2) ECBLIST(1)";
+    private static final String WAITCICS_VALID_BARE = "WAITCICS NUMEVENTS({$varTwo}) ECBLIST({$varOne})";
 
-    private static final String WAITCICS_INVALID_ONE = "WAITCICS ECBLIST(1) NUMEVENTS(2) {NOTPURGEABLE|error1} {PURGEABLE|error1}";
-    private static final String WAITCICS_INVALID_TWO = "WAITCICS ECBLIST(1) NUMEVENTS(2) {PURGEABILITY|error1}(4) NAME(3) {PURGEABLE|error1}";
-    private static final String WAITCICS_INVALID_THREE = "WAITCICS {PURGEABILITY|error1}(4) ECBLIST(1) NUMEVENTS(2) {NOTPURGEABLE|error1}";
+    private static final String WAITCICS_INVALID_ONE = "WAITCICS ECBLIST({$varOne}) NUMEVENTS({$varTwo}) {NOTPURGEABLE|error1} {PURGEABLE|error1}";
+    private static final String WAITCICS_INVALID_TWO = "WAITCICS ECBLIST({$varOne}) NUMEVENTS({$varTwo}) {PURGEABILITY|error1}({$varFive}) NAME({$varThree}) {PURGEABLE|error1}";
+    private static final String WAITCICS_INVALID_THREE = "WAITCICS {PURGEABILITY|error1}({$varFive}) ECBLIST({$varOne}) NUMEVENTS({$varTwo}) {NOTPURGEABLE|error1}";
 
   @Test
   void testAllValidOne() {
