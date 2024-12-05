@@ -109,6 +109,9 @@ public class CICSOptionsCheckUtility {
         CICSSpoolOpenOptionsCheckUtility.RULE_INDEX,
         new CICSSpoolOpenOptionsCheckUtility(context, errors));
     optionsMap.put(
+        CICSDumpTransactionOptionsCheckUtility.RULE_INDEX,
+        new CICSDumpTransactionOptionsCheckUtility(context, errors));
+    optionsMap.put(
         CICSGetOptionsCheckUtility.RULE_INDEX,
         new CICSGetOptionsCheckUtility(context, errors));
     optionsMap.put(
@@ -130,11 +133,20 @@ public class CICSOptionsCheckUtility {
         CICSConvertTimeOptionsCheckUtility.RULE_INDEX,
         new CICSConvertTimeOptionsCheckUtility(context, errors));
     optionsMap.put(
+        CICSEnqOptionsCheckUtility.RULE_INDEX,
+        new CICSEnqOptionsCheckUtility(context, errors));
+    optionsMap.put(
         CICSWriteOptionsCheckUtility.RULE_INDEX,
         new CICSWriteOptionsCheckUtility(context, errors));
     optionsMap.put(
-            CICSWSAEPRUtility.RULE_INDEX,
-            new CICSWSAEPRUtility(context, errors));
+        CICSRetrieveOptionsCheckUtility.RULE_INDEX,
+        new CICSRetrieveOptionsCheckUtility(context, errors));
+    optionsMap.put(
+        CICSInvokeOptionsCheckUtility.RULE_INDEX,
+        new CICSInvokeOptionsCheckUtility(context, errors));
+    optionsMap.put(
+        CICSWSAEPRUtility.RULE_INDEX,
+        new CICSWSAEPRUtility(context, errors));
   }
 
   /**
