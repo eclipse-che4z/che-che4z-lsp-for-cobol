@@ -312,9 +312,10 @@ cics_document_set: SET (DOCTOKEN cics_data_area | SYMBOL cics_name | VALUE cics_
                    LENGTH cics_data_value | UNESCAPED | cics_handle_response)+;
 
 /** DUMP TRANSACTION */
-cics_dump: DUMP (TRANSACTION | DUMPCODE cics_name |  FROM cics_data_area | LENGTH cics_data_value | FLENGTH cics_data_value |
-           COMPLETE | TRT |  SEGMENTLIST cics_data_area | LENGTHLIST cics_data_area | NUMSEGMENTS cics_data_area |
-           TASK | STORAGE | PROGRAM | TERMINAL | TABLES | FCT | PCT | PPT | SIT | TCT | DUMPID cics_data_area | cics_handle_response)+;
+cics_dump: DUMP TRANSACTION (DUMPCODE cics_name | cics_dump_transaction_from  | cics_dump_transaction_segmentlist | cics_dump_code_opts)+;
+cics_dump_transaction_from: (FROM cics_data_area | cics_length_flength | cics_handle_response)+;
+cics_dump_code_opts: (COMPLETE | TRT | TASK | STORAGE | PROGRAM | TERMINAL | TABLES | FCT | PCT | PPT | SIT | TCT | DUMPID cics_data_area | cics_handle_response)+;
+cics_dump_transaction_segmentlist: ((SEGMENTLIST | LENGTHLIST | NUMSEGMENTS) cics_data_area | cics_handle_response)+;
 
 /** ENDBR */
 cics_endbr: ENDBR ((FILE | DATASET) cics_name | REQID cics_data_value | SYSID cics_data_area | cics_handle_response)*;
@@ -323,7 +324,8 @@ cics_endbr: ENDBR ((FILE | DATASET) cics_name | REQID cics_data_value | SYSID ci
 cics_endbrowse: ENDBROWSE (ACTIVITY | CONTAINER | EVENT | PROCESS | TIMER | (BROWSETOKEN | RETCODE) cics_data_value | cics_handle_response)*;
 
 /** ENQ */
-cics_enq: ENQ (RESOURCE cics_data_area | LENGTH cics_data_value | UOW | TASK | MAXLIFETIME cics_cvda | NOSUSPEND | cics_handle_response)+;
+cics_enq: ENQ cics_enq_opts;
+cics_enq_opts:(RESOURCE cics_data_area | LENGTH cics_data_value | UOW | TASK | MAXLIFETIME cics_cvda | NOSUSPEND | cics_handle_response)+;
 
 /** ENTER TRACENUM */
 cics_enter: ENTER (TRACENUM cics_data_value | FROM cics_data_area | FROMLENGTH cics_data_area | RESOURCE cics_name | EXCEPTION | cics_handle_response)+;
@@ -422,9 +424,13 @@ cics_inquire_urimap_data_area_args:(ATOMSERVICE | CERTIFICATE | CHANGEAGREL | CH
 cics_inquire_urimap_data_cvda_args: (ANALYZERSTAT | AUTHENTICATE | AVAILSTATUS | CHANGEAGENT | ENABLESTATUS | HOSTTYPE |
                                  INSTALLAGENT | IPFAMILY | REDIRECTTYPE | SCHEME | USAGE) cics_cvda;
 
-/** INVOKE SERVICE */
-cics_invoke: INVOKE (SERVICE cics_data_value | CHANNEL cics_data_value | OPERATION cics_data_value | URI cics_data_value |
-             URIMAP cics_data_value | SCOPE cics_data_value | SCOPELEN cics_data_value | cics_handle_response)+;
+/** INVOKE APPLICATION / INVOKE SERVICE */
+cics_invoke: INVOKE (cics_invoke_application | cics_invoke_service);
+
+cics_invoke_application: ((APPLICATION | OPERATION | PLATFORM | CHANNEL) cics_name | (MAJORVERSION | MINORVERSION | COMMAREA | LENGTH) cics_data_value |
+                EXACTMATCH | MINIMUM | cics_handle_response)*;
+
+cics_invoke_service: ((SERVICE | WEBSERVICE | CHANNEL | OPERATION | URI | URIMAP | SCOPE | SCOPELEN) cics_data_value | cics_handle_response)*;
 
 /** ISSUE (all of them) */
 cics_issue:
@@ -918,7 +924,7 @@ cicsLexerDefinedVariableUsageTokens: ABCODE | ABDUMP | ABEND | ABORT | ABPROGRAM
     | ECADDR | ECBLIST | EIB | ELEMNAME | ELEMNAMELEN | ELEMNS | ELEMNSLEN | ENDACTIVITY | ENDBR | ENDBROWSE | ENDFILE
     | ENDOUTPUT | ENQ | ENTRYNAME | EOC | EODS | EPRFIELD | EPRFROM | EPRINTO | EPRLENGTH | EPRSET | EPRTYPE | ERASE
     | ERASEAUP | ERRTERM | ESMREASON | ESMRESP | EVENT | EVENTTYPE | EVENTUAL | EWASUPP | EXPECT | EXPIRYTIME | EXTDS
-    | EXTRACT | FACILITY | FACILITYTOKN | FAULTACTLEN | FAULTACTOR | FAULTCODE | FAULTCODELEN | FAULTCODESTR
+    | EXTRACT | EXACTMATCH | FACILITY | FACILITYTOKN | FAULTACTLEN | FAULTACTOR | FAULTCODE | FAULTCODELEN | FAULTCODESTR
     | FAULTSTRING | FAULTSTRLEN | FCI | FCT | FIELD | FIRESTATUS | FLENGTH | FMH | FMHPARM | FORCE | FORMATTIME
     | FORMFEED | FORMFIELD | FREEKB | FREEMAIN | FROMACTIVITY | FROMCCSID | FROMCHANNEL | FROMCODEPAGE | FROMDOC
     | FROMFLENGTH | FROMLENGTH | FROMPROCESS | FRSET | FULLDATE | GCHARS | GCODES | GDS | GENERIC | GET | GETMAIN
@@ -933,7 +939,7 @@ cicsLexerDefinedVariableUsageTokens: ABCODE | ABDUMP | ABEND | ABORT | ABPROGRAM
     | LOGMESSAGE | LOGMODE | LOGONLOGMODE | LOGONMSG | LOW_VALUE
     | LOW_VALUES | LUNAME | MAIN | MAJORVERSION | MAP | MAPCOLUMN | MAPFAIL | MAPHEIGHT | MAPLINE | MAPONLY | MAPPED
     | MAPPINGDEV | MAPSET | MAPWIDTH | MASSINSERT | MAXDATALEN | MAXFLENGTH | MAXIMUM | MAXLENGTH | MAXLIFETIME
-    | MAXPROCLEN | MCC | MEDIATYPE | MESSAGEID | METADATA | METADATALEN | METHODLENGTH | MILLISECONDS | MINIMUM
+    | MAXPROCLEN | MCC | MEDIATYPE | MESSAGEID | METADATA | METADATALEN | METHODLENGTH | MILLISECONDS | MINIMUM | MINORVERSION
     | MINUTES | MMDDYY | MMDDYYYY | MODENAME | MONITOR | MONTH | MONTHOFYEAR | MSR | MSRCONTROL | NAME | NAMELENGTH
     | NATLANG | NATLANGINUSE | NETNAME | NEWPASSWORD | NEWPHRASE | NEWPHRASELEN | NEXTTRANSID | NLEOM | NOAUTOPAGE
     | NOCC | NOCHECK | NOCLICONVERT | NOCLOSE | NODATA | NODE | NODOCDELETE | NODUMP | NOEDIT | NOFLUSH | NOHANDLE
