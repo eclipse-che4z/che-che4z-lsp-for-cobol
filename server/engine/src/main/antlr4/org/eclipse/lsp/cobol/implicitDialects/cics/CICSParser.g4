@@ -19,7 +19,7 @@ compilerDirective: (.*? compilerXOpts)* .*? EOF;
 cicsExecBlock: EXEC_CICS (allCicsRule)* END_EXEC ;
 
 allCicsRule: cics_send | cics_receive | cics_add | cics_address | cics_allocate | cics_asktime | cics_assign | cics_bif |
-                       cics_build | cics_cancel | cics_change | cics_change_task | cics_check | cics_connect | cics_converttime |
+                       cics_build | cics_cancel | cics_change  | cics_check | cics_connect | cics_converttime |
                        cics_define | cics_delay | cics_delete | cics_deleteq | cics_deq | cics_document | cics_dump | cics_endbr |
                        cics_endbrowse | cics_enq | cics_enter | cics_extract | cics_force | cics_formattime | cics_free |
                        cics_freemain | cics_get | cics_getmain | cics_getnext | cics_handle | cics_ignore | cics_inquire |
@@ -109,61 +109,32 @@ cics_receive_map_mappingdev:    ((MAP | MAPSET) cics_name | (MAPPINGDEV | FROM |
 
 
 /** SEND: */
-cics_send: SEND (cics_send_group | cics_send_mro | cics_send_appc | cics_send_control | cics_send_map | cics_send_page |
-           cics_send_partnset | cics_send_text | cics_len_map);
-cics_send_group: cics_send_from (cics_send_from_wait | cics_send_from_ctlchar | cics_send_3600_01 | cics_send_2980);
+cics_send: SEND (cics_send_group1 | cics_send_control_map | cics_send_mappingdev | cics_send_page | cics_send_partnset | cics_send_text | cics_send_text_mapped | cics_send_text_noedit);
 
-cics_send_from_wait: WAIT? (INVITE | LAST | cics_send_defaultmax | cics_send_lu23 | cics_handle_response)*;
-cics_send_defaultmax: (CNOTCOMPL | DEFRESP | STRFIELD | FMH | cics_handle_response)+;
-cics_send_lu23: (cics_send_erase | CTLCHAR cics_data_value | STRFIELD | DEFRESP | cics_handle_response)+;
-cics_send_from_ctlchar: (CTLCHAR cics_data_value)? (cics_send_3560_3270 | cics_send_2260);
-cics_send_3560_3270: WAIT? (cics_send_erase | INVITE | LAST | CNOTCOMPL | DEFRESP | FMH | cics_handle_response)*;
-cics_send_2260: (LINEADDR cics_data_value | WAIT | LEAVEKB | cics_handle_response)+;
-cics_send_3600_01: (LDC cics_name | FMH | WAIT | INVITE | LAST | CNOTCOMPL | DEFRESP | cics_handle_response)+;
-cics_send_2980: (PASSBK | CBUFF)?;
-cics_len_map: ((LENGTH cics_data_value | FLENGTH cics_data_value) | cics_send_map | cics_handle_response)+;
-cics_send_mro: (SESSION cics_name | WAIT | INVITE | LAST | ATTACHID cics_name | FROM cics_data_area |
-               LENGTH cics_data_value | FLENGTH cics_data_value | FMH | DEFRESP | STATE cics_cvda | cics_send_erase | cics_handle_response)+;
-cics_send_appc: (CONVID cics_name | cics_send_from | INVITE | LAST | CONFIRM | WAIT | STATE cics_cvda | cics_handle_response)+;
-cics_send_control: CONTROL (cics_send_control_min | cics_send_control_std | cics_send_control_full);
-cics_send_control_min: (cics_send_cursor | FORMFEED | cics_send_erase | ERASEAUP | PRINT | FREEKB | ALARM | FRSET | cics_handle_response)+;
-cics_send_control_std: (MSR cics_data_value | OUTPARTN cics_name | ACTPARTN cics_name | LDC cics_name | cics_handle_response)+;
-cics_send_control_full: (ACCUM | cics_send_terminal | SET cics_ref | PAGING | REQID cics_name | HONEOM | L40 | L64 | L80 | cics_handle_response)+;
-cics_send_map: MAP cics_name (cics_send_map_null | cics_send_map_mappingdev);
-cics_send_map_null: (cics_send_map_min | cics_send_map_std | cics_send_map_full);
-cics_send_map_min: (MAPSET cics_name | MAPONLY | FROM cics_data_area | DATAONLY | LENGTH cics_data_value
-                   | cics_send_cursor | FORMFEED | cics_send_erase | ERASEAUP | PRINT | FREEKB | ALARM | FRSET | cics_handle_response)+;
-cics_send_map_std: (NLEOM | MSR cics_data_value | FMHPARM cics_name | OUTPARTN cics_name | ACTPARTN cics_name |
-                   LDC cics_name | cics_handle_response)+;
-cics_send_map_full: (ACCUM | cics_send_terminal | SET cics_ref | PAGING | REQID cics_name | NOFLUSH
-                    | HONEOM | L40 | L64 | L80 | cics_handle_response)+;
-cics_send_map_mappingdev: MAPPINGDEV cics_data_value (SET cics_ref | MAPSET cics_name | MAPONLY | FROM cics_data_area |
-                          DATAONLY | LENGTH cics_data_value | cics_send_cursor | FORMFEED | ERASE | ERASEAUP | PRINT |
-                          FREEKB | ALARM | FRSET | cics_handle_response)+;
+// CICS SEND Group1 (zOS DEFAULT, APPC, LUTYPE2/LUTYPE3, LUTYPE4, LUTYPE6.1, SCS, 3270, 3600, 3601, 3614, 3650, 3270, 3653, 3680, 3767, 3770, 3790, 3790 SCS,
+//                      3270-display, 3270-printer, Server default, MRO, 2260, 2280)
+cics_send_group1 : ((FROM | LENGTH | FLENGTH) cics_data_area | (CONVID | SESSION | ATTACHID | LDC ) cics_name | WAIT | INVITE | LAST | CONFIRM | ERASE | DEFAULT | ALTERNATE
+                | (CTLCHAR | LINEADDR) cics_data_value | STRFIELD | STATE cics_cvda | CNOTCOMPL | DEFRESP | FMH | LEAVEKB | PASSBK | CBUFF | cics_handle_response)*;
 
-cics_send_page: PAGE (RELEASE | TRANSID cics_name | RETAIN | TRAILER cics_data_area | SET cics_ref |
-                cics_send_autopage | NOAUTOPAGE | OPERPURGE | FMHPARM cics_name | LAST | cics_handle_response)*;
-cics_send_partnset: PARTNSET cics_name?;
-cics_send_text: TEXT (cics_send_text_null | cics_send_text_mapped | cics_send_text_noedit);
-cics_send_text_null: (cics_send_text_std | cics_send_text_full);
-cics_send_text_std: FROM cics_data_area cics_send_text_std_args*;
-cics_send_text_std_args: LENGTH cics_data_value | CURSOR cics_data_value | FORMFEED | cics_send_erase |
-                     PRINT | FREEKB | ALARM | NLEOM | FMHPARM cics_name | OUTPARTN cics_name | ACTPARTN cics_name |
-                     LDC cics_name | MSR cics_data_value | cics_handle_response;
-cics_send_text_full: FROM cics_data_area (cics_send_text_std_args | cics_send_terminal | SET cics_ref | PAGING | REQID cics_name | HEADER cics_data_area |
-                     TRAILER cics_data_area | JUSTIFY cics_data_value | JUSFIRST | JUSLAST | ACCUM |
-                     HONEOM | L40 | L64 | L80 | cics_handle_response)*;
-cics_send_text_mapped: MAPPED (FROM cics_data_area | LENGTH cics_data_value | cics_send_terminal |
-                       SET cics_ref | PAGING | REQID cics_name | cics_handle_response)*;
-cics_send_text_noedit: NOEDIT (FROM cics_data_area | LENGTH cics_data_value | cics_send_erase | PRINT | FREEKB | ALARM |
-                       OUTPARTN cics_name | cics_send_terminal | PAGING | REQID cics_name |
-                       HONEOM | L40 | L64 | L80 | cics_handle_response)*;
+cics_send_control_map : (CONTROL | CURSOR cics_data_value? | FORMFEED | ERASE | DEFAULT | ALTERNATE | ERASEAUP | PRINT | FREEKB | ALARM | FRSET | (MSR | LENGTH) cics_data_value
+                | (MAP | OUTPARTN | ACTPARTN | LDC | REQID | MAPSET | FMHPARM) cics_name | ACCUM | TERMINAL | SET cics_ref | PAGING | WAIT | LAST | HONEOM | L40 | L64 | L80
+                | FROM cics_data_area | NLEOM | NOFLUSH | DATAONLY | MAPONLY | cics_handle_response)*;
 
-cics_send_from: FROM cics_data_area (LENGTH cics_data_value | FLENGTH cics_data_value) cics_handle_response?;
-cics_send_erase: ERASE (DEFAULT | ALTERNATE)?;
-cics_send_cursor: CURSOR cics_data_value?;
-cics_send_terminal: (TERMINAL | WAIT | LAST)+;
-cics_send_autopage: AUTOPAGE (CURRENT | ALL)?;
+cics_send_mappingdev : ((MAP | MAPSET) cics_name | (MAPPINGDEV | LENGTH | FROM) cics_data_area | SET cics_ref | DATAONLY | MAPONLY | CURSOR cics_data_value?
+                | FORMFEED | ERASE | ERASEAUP| PRINT | FREEKB | ALARM | FRSET | cics_handle_response)*;
+
+cics_send_page : (PAGE | RELEASE | RETAIN | TRANSID cics_name | TRAILER cics_data_area | SET cics_ref | AUTOPAGE | CURRENT | ALL | NOAUTOPAGE | OPERPURGE | FMHPARM cics_name | LAST | cics_handle_response)*;
+
+cics_send_partnset : (PARTNSET cics_name? | cics_handle_response)*;
+
+cics_send_text : (TEXT | (FROM | LENGTH | CURSOR | HEADER | TRAILER) cics_data_area | FORMFEED | ERASE | DEFAULT | ALTERNATE | PRINT | FREEKB | ALARM | NLEOM
+                | (FMHPARM | OUTPARTN | ACTPARTN | LDC | REQID) cics_name | (MSR | JUSTIFY) cics_data_value | TERMINAL | SET cics_ref | PAGING | WAIT | LAST
+                | JUSFIRST | JUSLAST | ACCUM | HONEOM | L40 | L64 | L80 | cics_handle_response)*;
+
+cics_send_text_mapped: (TEXT | MAPPED | (FROM | LENGTH) cics_data_area | PAGING | TERMINAL | WAIT | LAST | REQID cics_name | cics_handle_response)*;
+
+cics_send_text_noedit: (TEXT | NOEDIT | (FROM | LENGTH) cics_data_area | ERASE | DEFAULT | ALTERNATE | PRINT | FREEKB | ALARM | (OUTPARTN | REQID) cics_name | PAGING
+                | TERMINAL | WAIT | LAST | HONEOM | L40 | L64 | L80 | cics_handle_response)*;
 
 /** CONVERSE: */
 cics_converse: CONVERSE cics_converse_group?;
@@ -192,12 +163,9 @@ cics_add: ADD ( ciss_add_event_subevent | cics_handle_response)+;
 ciss_add_event_subevent: ((SUBEVENT  | EVENT) cics_data_value)+;
 
 /** ADDRESS / ADDRESS SET */
-cics_address: ADDRESS (cics_address_null | cics_address_set);
-cics_address_null: (ACEE cics_ref | COMMAREA cics_ref |
-                   CWA cics_ref | EIB cics_ref |
-                   TCTUA cics_ref | TWA cics_ref | cics_handle_response)+;
-cics_address_set: (SET cics_data_area USING cics_ref |
-                  SET cics_ref USING cics_data_area) cics_handle_response?;
+cics_address: ADDRESS (cics_address_standard | cics_address_set);
+cics_address_standard: ((ACEE | COMMAREA | CWA | EIB | TCTUA | TWA) cics_ref | cics_handle_response)*;
+cics_address_set: (SET (cics_data_area | cics_ref) | USING (cics_ref | cics_data_area) | cics_handle_response)*;
 
 /** ALLOCATE (all of them) */
 cics_allocate: ALLOCATE (cics_allocate_appc_partner | cics_allocate_appc_mro_lut61_sysid | cics_allocate_lut61_session);
@@ -208,7 +176,7 @@ cics_allocate_appc_partner: (PARTNER cics_name | NOQUEUE | STATE cics_cvda | cic
 /** ASKTIME */
 cics_asktime:ASKTIME cics_asktime_abstime;
 cics_asktime_abstime: (ABSTIME cics_data_area | cics_handle_response)*;
- 
+
 /** ASSIGN */
 cics_assign: ASSIGN (cics_assign_parameter1 | cics_assign_parameter2) *;
 
@@ -255,33 +223,34 @@ cics_build_attach: (ATTACH | (ATTACHID  | PROCESS  | RESOURCE  | RPROCESS  |
 
 /** CANCEL (both of them) */
 cics_cancel: CANCEL (cics_cancel_bts | cics_cancel_reqid);
-cics_cancel_bts: (ACTIVITY cics_data_value | ACQACTIVITY | ACQPROCESS) cics_handle_response?;
-cics_cancel_reqid: REQID cics_name (SYSID cics_data_area | TRANSID cics_name | cics_handle_response)*;
+cics_cancel_bts: (ACTIVITY cics_data_value | ACQACTIVITY | ACQPROCESS | cics_handle_response)+;
+cics_cancel_reqid: ((REQID | TRANSID) cics_name | SYSID cics_data_area | cics_handle_response)+;
 
 /** CHANGE PHRASE / PASSWORD / TASK */
-cics_change: CHANGE (cics_change_phrase | cics_change_password);
-cics_change_phrase: PHRASE cics_data_area (PHRASELEN cics_data_value | NEWPHRASE cics_data_area | NEWPHRASELEN cics_data_value |
-                    USERID cics_data_value | ESMREASON cics_data_area | ESMRESP cics_data_area | cics_handle_response)+;
-cics_change_password: PASSWORD cics_data_value (NEWPASSWORD cics_data_value | USERID cics_data_value |
-                      ESMREASON cics_data_area | ESMRESP cics_data_area | cics_handle_response)+;
-cics_change_task: TASK (PRIORITY cics_data_value)? cics_handle_response?;
+cics_change: CHANGE (cics_change_phrase | cics_change_password | cics_change_task );
+cics_change_phrase: (PHRASE cics_data_area | cics_password_phrase |  (NEWPHRASE |  NEWPHRASELEN | PHRASELEN  | USERID) cics_data_value | cics_handle_response)*;
+cics_change_password: ((PASSWORD | NEWPASSWORD | USERID ) cics_data_value | cics_password_phrase | cics_handle_response)*;
+cics_change_task: (TASK | PRIORITY cics_data_value | cics_handle_response)*;
+
+cics_password_phrase:((CHANGETIME | DAYSLEFT | ESMREASON | ESMRESP | EXPIRYTIME | INVALIDCOUNT | LASTUSETIME ) cics_data_area | cics_handle_response);
 
 /** CHECK ACQPROCESS / ACTIVITY / TIMER */
 cics_check: CHECK (cics_check_activity | cics_check_timer);
-cics_check_activity: (ACQPROCESS | ACTIVITY cics_data_value | ACQACTIVITY | COMPSTATUS cics_cvda | ABCODE cics_data_area |
-                     ABPROGRAM cics_data_area | MODE cics_cvda | SUSPSTATUS cics_cvda | cics_handle_response)+;
-cics_check_timer: TIMER cics_data_value cics_handle_response? STATUS cics_cvda cics_handle_response?;
+cics_check_activity: (ACQPROCESS | ACTIVITY cics_data_value | ACQACTIVITY | (ABCODE | ABPROGRAM) cics_data_area |
+                     (MODE | SUSPSTATUS | COMPSTATUS) cics_cvda | cics_handle_response)+;
+cics_check_timer: (TIMER cics_data_value | STATUS cics_cvda | cics_handle_response)*;
 
 cics_conditions: EOC | EODS | INVMPSZ | INVPARTN | INVREQ | MAPFAIL | PARTNFAIL | RDATT | UNEXPIN | ERROR | DUPREC;
 
 /** CONNECT PROCESS */
-cics_connect: CONNECT PROCESS (CONVID cics_name | SESSION cics_name | PROCNAME cics_data_area |
-              PROCLENGTH cics_data_value | PARTNER cics_name | cics_connect_piplist | SYNCLEVEL |
-              cics_data_value | STATE cics_cvda | cics_handle_response)+;
-cics_connect_piplist: PIPLIST cics_data_area cics_handle_response? (PIPLENGTH cics_data_value)? cics_handle_response?;
+cics_connect: CONNECT cics_connect_process;
+cics_connect_process: (PROCESS | (CONVID | SESSION | PARTNER) cics_name | PROCNAME cics_data_area |
+                      (PROCLENGTH | PIPLENGTH) cics_data_value | (SYNCLEVEL | PIPLIST) cics_data_area |
+                       STATE cics_cvda | cics_handle_response)+;
 
 /** CONVERTTIME */
-cics_converttime: CONVERTTIME (DATESTRING cics_data_area | ABSTIME cics_data_area | cics_handle_response)+;
+cics_converttime: CONVERTTIME cics_converttime_opts;
+cics_converttime_opts:(DATESTRING cics_data_area | ABSTIME cics_data_area | cics_handle_response)+;
 
 /** DEFINE (all of them) */
 cics_define: DEFINE (cics_define_activity | cics_define_composite_event | cics_define_counter_dcounter | cics_define_input_event | cics_define_process | cics_define_timer);
@@ -293,9 +262,9 @@ cics_define_process: (PROCESS cics_data_value | (PROCESSTYPE | TRANSID | PROGRAM
 cics_define_timer: TIMER cics_data_value ((EVENT | DAYS | HOURS | MINUTES | SECONDS | YEAR | MONTH | DAYOFMONTH | DAYOFYEAR) cics_data_value | AFTER  | AT | ON | cics_handle_response)+;
 
 /** DELAY */
-cics_delay: DELAY (INTERVAL cics_zero_digit | INTERVAL cics_hhmmss | TIME cics_hhmmss | cics_delay_for | cics_dealy_until | REQID cics_name | cics_handle_response)+;
-cics_delay_for: FOR (HOURS cics_data_value | MINUTES cics_data_value | SECONDS cics_data_value | MILLISECS cics_data_value)+;
-cics_dealy_until: UNTIL (HOURS cics_data_value | MINUTES cics_data_value | SECONDS cics_data_value)+;
+cics_delay: DELAY cics_delay_opts;
+cics_delay_opts: (INTERVAL cics_zero_digit | (INTERVAL | TIME) cics_hhmmss
+ | FOR | (HOURS | MINUTES | SECONDS | MILLISECS) cics_data_value | UNTIL | REQID cics_name | cics_handle_response)+;
 
 /** DELETE (all of them) */
 cics_delete: DELETE (cics_delete_group_one | cics_delete_group_two | cics_delete_group_three | cics_delete_group_four);
@@ -390,19 +359,14 @@ cics_free: FREE (CONVID cics_name | SESSION cics_name | STATE cics_cvda | cics_h
 /** FREEMAIN */
 cics_freemain: FREEMAIN (DATA cics_data_area | DATAPOINTER cics_value | cics_handle_response)+;
 
-/** GET CONTAINER (both of them) / GET COUNTER / GET DCOUNTER */
-cics_get: GET (cics_get_container | cics_get_counter | cics_get_dcounter);
-cics_get_container: CONTAINER cics_data_value (cics_get_bts | cics_get_channel);
-cics_get_bts: (ACTIVITY cics_data_value | ACQACTIVITY | PROCESS | ACQPROCESS | INTO cics_data_area | SET cics_ref |
-               NODATA | FLENGTH cics_data_area | cics_handle_response)+;
-cics_get_channel: (CHANNEL cics_data_value | INTO cics_data_area | FLENGTH cics_data_area | SET cics_ref | FLENGTH cics_data_area |
-                  NODATA | FLENGTH cics_data_area | INTOCCSID cics_data_value | INTOCODEPAGE cics_data_value | cics_get_convertst |
-                  cics_handle_response)+;
-cics_get_convertst: CONVERTST cics_cvda (CCSID cics_data_area)?;
-cics_get_counter: COUNTER cics_name (POOL cics_name | VALUE cics_data_area | INCREMENT cics_data_value | REDUCE | WRAP |
-                  COMPAREMIN cics_data_value | COMPAREMAX cics_data_value | cics_handle_response)+;
-cics_get_dcounter: DCOUNTER cics_name (POOL cics_name | VALUE cics_data_area | INCREMENT cics_data_area | REDUCE | WRAP |
-                   COMPAREMIN cics_data_area | COMPAREMAX cics_data_area | cics_handle_response)+;
+/** GET CONTAINER / GET COUNTER / GET DCOUNTER */
+cics_get: GET (cics_get_container_bts | cics_get_container_channel | cics_get_counter_dcounter);
+cics_get_container_bts: ((CONTAINER | ACTIVITY) cics_data_value | ACQACTIVITY | PROCESS | ACQPROCESS | (INTO | FLENGTH) cics_data_area |
+                    SET cics_ref | NODATA  | cics_handle_response)*;
+cics_get_container_channel: ((CONTAINER | CHANNEL | BYTEOFFSET | INTOCCSID | INTOCODEPAGE) cics_data_value | (INTO | FLENGTH | CCSID) cics_data_area |
+                    SET cics_ref | NODATA | CONVERTST cics_cvda | cics_handle_response)*;
+cics_get_counter_dcounter: ((COUNTER | DCOUNTER | POOL) cics_name | VALUE cics_data_area | (INCREMENT | COMPAREMIN | COMPAREMAX) cics_data_value |
+                  WRAP | NOSUSPEND | REDUCE | cics_handle_response)*;
 
 /** GETMAIN */
 cics_getmain: GETMAIN (SET cics_ref | FLENGTH cics_data_value | BELOW | LENGTH cics_data_value | INITIMG cics_data_value |
@@ -496,12 +460,10 @@ cics_issue_common: ((DESTID | DESTIDLENG | VOLUME | VOLUMELENG | SUBADDR) cics_d
 
 /** LINK / LINK ACQPROCESS / LINK ACTIVITY: */
 cics_link: LINK (cics_link_program | cics_link_acqprocess | cics_link_activity);
-cics_link_program: PROGRAM cics_name (cics_link_commarea | CHANNEL cics_name | cics_link_inputmsg |
-                   SYSID cics_data_area | SYNCONRETURN | TRANSID cics_name | cics_handle_response)+;
-cics_link_commarea: COMMAREA cics_data_area (LENGTH cics_data_value | DATALENGTH cics_data_value)*;
-cics_link_inputmsg: INPUTMSG cics_data_area (INPUTMSGLEN cics_data_value)?;
-cics_link_acqprocess: (ACQPROCESS | INPUTEVENT cics_data_value | cics_handle_response)+;
-cics_link_activity: (ACTIVITY cics_data_value | ACQACTIVITY | INPUTEVENT cics_data_value | cics_handle_response)+;
+cics_link_program: ((PROGRAM | SYSID | TRANSID | CHANNEL) cics_name | (COMMAREA | INPUTMSG) cics_data_area |
+                (LENGTH | DATALENGTH | INPUTMSGLEN) cics_data_value | SYNCONRETURN | cics_handle_response)*;
+cics_link_acqprocess: (ACQPROCESS | INPUTEVENT cics_data_value | cics_handle_response)*;
+cics_link_activity: (ACQACTIVITY | (ACTIVITY | INPUTEVENT) cics_data_value | cics_handle_response)*;
 
 /** EXCI LINK, ref: https://www.ibm.com/docs/en/cics-ts/6.1?topic=interface-exec-cics-link-command-exci*/
 cics_exci_link: LINK cics_link_program_exci;
@@ -606,9 +568,9 @@ cics_readnext_readprev: (READNEXT | READPREV)  (cics_file_name | INTO cics_data_
 
 /** READQ TD / TS */
 cics_readq: READQ (cics_readq_td | cics_readq_ts);
-cics_readq_td: TD (QUEUE cics_name | cics_into | LENGTH cics_data_area | SYSID cics_data_area | NOSUSPEND | cics_handle_response)+;
-cics_readq_ts: TS? (QUEUE cics_name | QNAME cics_name | cics_into | LENGTH cics_data_area | NUMITEMS cics_data_area |
-               NEXT | ITEM cics_data_value | SYSID cics_data_area | cics_handle_response)+;
+cics_readq_td: (TD | QUEUE cics_name | cics_into_set | LENGTH cics_data_area | SYSID cics_data_area | NOSUSPEND | cics_handle_response)+;
+cics_readq_ts: (TS | (QUEUE | QNAME) cics_name | cics_into_set | NEXT | (LENGTH | NUMITEMS | SYSID) cics_data_area |
+                ITEM cics_data_value | cics_handle_response)+;
 
 /** RELEASE */
 cics_release: RELEASE cics_handle_response? PROGRAM cics_name cics_handle_response?;
@@ -868,21 +830,18 @@ cics_web_send_container_subrule: (CONTAINER cics_data_value | CHANNEL cics_data_
 
 /** WRITE / WRITE JOURNALNAME / WRITE OPERATOR */
 cics_write: WRITE (cics_write_file | cics_write_journalname | cics_write_operator);
-cics_write_file: cics_file_name (MASSINSERT | FROM cics_data_area | RIDFLD cics_data_area | KEYLENGTH cics_data_value |
-                 SYSID cics_data_area | LENGTH cics_data_value | LENGTH cics_data_value | RBA | RBN | XRBA | NOSUSPEND | cics_handle_response)+;
-cics_write_journalname: JOURNALNAME cics_data_value (JTYPEID cics_data_value | FROM cics_data_area | FLENGTH cics_data_value |
-                        REQID cics_data_area | cics_write_prefix | WAIT | NOSUSPEND | cics_handle_response)+;
-cics_write_prefix: (PREFIX cics_data_value | PFXLENG cics_data_value | cics_handle_response)+;
-cics_write_operator: OPERATOR (TEXT cics_data_value | TEXTLENGTH cics_data_value | cics_write_routecodes |
-                     EVENTUAL | ACTION cics_cvda | CRITICAL | IMMEDIATE | cics_write_reply | cics_handle_response)+;
-cics_write_routecodes: (ROUTECODES cics_data_value | NUMROUTES cics_data_value | cics_handle_response)+;
-cics_write_reply: REPLY cics_data_area (MAXLENGTH cics_data_value | REPLYLENGTH cics_data_area | TIMEOUT cics_data_value | cics_handle_response)+;
+cics_write_file: ((FILE | DATASET | SYSID) cics_name | MASSINSERT | (FROM | RIDFLD) cics_data_area |
+                (KEYLENGTH | LENGTH) cics_data_value | RBA | RRN | XRBA | NOSUSPEND | cics_handle_response)*;
+cics_write_journalname: ((JOURNALNAME | JTYPEID | FLENGTH) cics_data_value | (FROM | REQID) cics_data_area |
+                (PREFIX | PFXLENG) cics_data_value | WAIT | NOSUSPEND | cics_handle_response)*;
+cics_write_operator: (OPERATOR | (TEXT | TEXTLENGTH | ROUTECODES  | NUMROUTES | CONSNAME | MAXLENGTH | TIMEOUT) cics_data_value |
+                EVENTUAL | ACTION cics_cvda | CRITICAL | IMMEDIATE | (REPLY | REPLYLENGTH) cics_data_area | cics_handle_response)*;
 
 /** WRITEQ TD/TS */
 cics_writeq: WRITEQ (cics_writeq_td | cics_writeq_ts);
-cics_writeq_td: TD (QUEUE cics_name | FROM cics_data_area | LENGTH cics_data_value | SYSID cics_data_area | cics_handle_response)+;
-cics_writeq_ts: TS? (QUEUE cics_name | QNAME cics_name | FROM cics_data_area | LENGTH cics_data_value |
-                NUMITEMS cics_data_area | ITEM cics_data_area | REWRITE | SYSID cics_data_area | AUXILIARY | MAIN | NOSUSPEND | cics_handle_response)+;
+cics_writeq_td: (TD | (QUEUE | SYSID) cics_name | FROM cics_data_area | LENGTH cics_data_value | cics_handle_response)*;
+cics_writeq_ts: (TS | (QNAME | QUEUE | SYSID) cics_name | (FROM | NUMITEMS | ITEM) cics_data_area |
+                LENGTH cics_data_value | REWRITE | AUXILIARY | MAIN | NOSUSPEND | cics_handle_response)*;
 
 /** WSACONTEXT BUILD / DELETE / GET */
 cics_wsacontext: WSACONTEXT (cics_wsacontext_build | cics_wsacontext_delete | cics_wsacontext_get);
@@ -899,7 +858,7 @@ cics_wsacontext_grelatesuri: RELATESURI cics_data_area (RELATESTYPE cics_data_ar
 cics_wsacontext_geprtype: EPRTYPE cics_cvda (EPRFIELD cics_cvda | EPRINTO cics_data_area | EPRSET cics_ref | EPRLENGTH cics_data_area | cics_handle_response)+;
 
 /** WSAEPR CREATE */
-cics_wsaepr: WSAEPR CREATE (EPRINTO cics_data_area | EPRSET cics_data_area | EPRLENGTH cics_data_area | ADDRESS cics_data_value |
+cics_wsaepr: WSAEPR (CREATE | EPRINTO cics_data_area | EPRSET cics_data_area | EPRLENGTH cics_data_area | ADDRESS cics_data_value |
              REFPARMS cics_data_value | REFPARMSLEN cics_data_value | METADATA cics_data_value | METADATALEN cics_data_value |
              FROMCCSID cics_data_value | FROMCODEPAGE cics_data_value | cics_handle_response)+;
 

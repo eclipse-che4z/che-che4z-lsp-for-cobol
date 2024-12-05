@@ -77,7 +77,7 @@ async function handleProcessorGroupConfigurationRequest<Type, Output, R>(
     cfg: Type,
   ) => Promise<R>,
   item: Item,
-  result: R[],
+  result: (R | undefined)[],
 ) {
   if (item.scopeUri) {
     try {
@@ -95,6 +95,8 @@ async function handleProcessorGroupConfigurationRequest<Type, Output, R>(
           decodedConfiguration,
         );
         result.push(object);
+      } else {
+        result.push(configuration);
       }
     } catch (err) {
       if (err instanceof DecodingError) {
@@ -103,6 +105,8 @@ async function handleProcessorGroupConfigurationRequest<Type, Output, R>(
         );
       }
     }
+  } else {
+    result.push(vscode.workspace.getConfiguration().get(item.section));
   }
 }
 
