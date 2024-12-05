@@ -16,6 +16,8 @@ package org.eclipse.lsp.cobol;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.tree.ParseTree;
+import org.antlr.v4.runtime.tree.TerminalNode;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 /**
@@ -23,6 +25,22 @@ import org.eclipse.lsp4j.Range;
  */
 public class AntlrRangeUtils {
     /**
+     * Construct the range from ANTLR context
+     *
+     * @param ctx the ANTLR context
+     * @return the range
+     */
+    public static Range constructRange(ParseTree ctx) {
+        if (ctx instanceof ParserRuleContext) {
+            return constructRange((ParserRuleContext) ctx);
+        }
+        if (ctx instanceof TerminalNode) {
+            return constructRange(((TerminalNode) ctx).getSymbol());
+        }
+        throw new AssertionError("Unexpected token: " + ctx.getText());
+    }
+
+    /**Ï
      * Construct the range from ANTLR context
      *
      * @param ctx the ANTLR context

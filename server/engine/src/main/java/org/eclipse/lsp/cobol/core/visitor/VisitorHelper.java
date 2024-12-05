@@ -29,6 +29,7 @@ import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
+import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.eclipse.lsp.cobol.AntlrRangeUtils;
 import org.eclipse.lsp.cobol.common.model.Locality;
@@ -250,7 +251,7 @@ public class VisitorHelper {
    * @param ctx ParserRuleContext to extract locality
    * @return locality which has a range from the start to the end of the rule
    */
-  public static Optional<Range> retrieveRangeLocality(ParserRuleContext ctx) {
+  public static Optional<Range> retrieveRangeLocality(ParseTree ctx) {
     if (ctx == null) {
       return Optional.empty();
     }
