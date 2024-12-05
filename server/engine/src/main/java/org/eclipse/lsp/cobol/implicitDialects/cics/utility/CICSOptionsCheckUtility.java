@@ -73,6 +73,9 @@ public class CICSOptionsCheckUtility {
         CICSCancelOptionsCheckUtility.RULE_INDEX,
         new CICSCancelOptionsCheckUtility(context, errors));
     optionsMap.put(
+        CICSSendOptionsCheckUtility.RULE_INDEX,
+        new CICSSendOptionsCheckUtility(context, errors));
+    optionsMap.put(
         CICSConnectProcessOptionsCheckUtility.RULE_INDEX,
         new CICSConnectProcessOptionsCheckUtility(context, errors));
     optionsMap.put(
@@ -103,14 +106,38 @@ public class CICSOptionsCheckUtility {
         CICSReadNextReadPrevOptionsUtility.RULE_INDEX,
         new CICSReadNextReadPrevOptionsUtility(context, errors));
     optionsMap.put(
+        CICSDumpTransactionOptionsCheckUtility.RULE_INDEX,
+        new CICSDumpTransactionOptionsCheckUtility(context, errors));
+    optionsMap.put(
+        CICSGetOptionsCheckUtility.RULE_INDEX,
+        new CICSGetOptionsCheckUtility(context, errors));
+    optionsMap.put(
+        CICSAddressOptionsCheckUtility.RULE_INDEX,
+        new CICSAddressOptionsCheckUtility(context, errors));
+    optionsMap.put(
+        CICSWriteqOptionsCheckUtility.RULE_INDEX,
+        new CICSWriteqOptionsCheckUtility(context, errors));
+    optionsMap.put(
+        CICSLinkOptionsCheckUtility.RULE_INDEX,
+        new CICSLinkOptionsCheckUtility(context, errors));
+    optionsMap.put(
+        CICSDelayOptionsCheckUtility.RULE_INDEX,
+        new CICSDelayOptionsCheckUtility(context, errors));
+    optionsMap.put(
         CICSReadqOptionsCheckUtility.RULE_INDEX,
         new CICSReadqOptionsCheckUtility(context, errors));
     optionsMap.put(
         CICSConvertTimeOptionsCheckUtility.RULE_INDEX,
         new CICSConvertTimeOptionsCheckUtility(context, errors));
     optionsMap.put(
+        CICSEnqOptionsCheckUtility.RULE_INDEX,
+        new CICSEnqOptionsCheckUtility(context, errors));
+    optionsMap.put(
         CICSWriteOptionsCheckUtility.RULE_INDEX,
         new CICSWriteOptionsCheckUtility(context, errors));
+    optionsMap.put(
+        CICSWSAEPRUtility.RULE_INDEX,
+        new CICSWSAEPRUtility(context, errors));
     optionsMap.put(
         CICSVerifyOptionsCheckUtility.RULE_INDEX,
         new CICSVerifyOptionsCheckUtility(context, errors));
