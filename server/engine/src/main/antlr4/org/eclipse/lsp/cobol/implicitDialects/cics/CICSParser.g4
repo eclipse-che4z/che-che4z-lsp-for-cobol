@@ -623,6 +623,84 @@ cics_route: ROUTE (INTERVAL cics_zero_digit | INTERVAL cics_hhmmss | TIME cics_h
 cics_run: RUN (ACTIVITY cics_data_value | ACQACTIVITY | ACQPROCESS | SYNCHRONOUS | ASYNCHRONOUS | FACILITYTOKN cics_data_value |
           INPUTEVENT cics_data_value | cics_handle_response)+;
 
+/** SET */
+cics_set: SET (cics_set_association_usercorrdata | cics_set_atomservice | cics_set_autoinstall | cics_set_brfacility | cics_set_bundle | cics_set_connection |
+        cics_set_db2conn | cics_set_db2entry | cics_set_db2tran | cics_set_deletshipped | cics_set_dispatcher | cics_set_doctemplate | cics_set_dsname | cics_set_dumpds |
+        cics_set_enqmodel | cics_set_epadapter | cics_set_epadapterset | cics_set_eventbinding | cics_set_eventprocess |
+        cics_set_file | cics_set_host | cics_set_ipconn | cics_set_irc | cics_set_journalname | cics_set_journalnum | cics_set_jvmendpoint | cics_set_jvmserver |
+        cics_set_library | cics_set_modename | cics_set_monitor | cics_set_mqconn | cics_set_mqmonitor | cics_set_netname | cics_set_pipeline | cics_set_processtype | cics_set_program |
+        cics_set_secdiscovery | cics_set_secrecording | cics_set_statistics | cics_set_sysdumpcode | cics_set_system | cics_set_tags_refresh | cics_set_task |
+        cics_set_tclass | cics_set_tcpip | cics_set_tcpipservice | cics_set_tdqueue | cics_set_tempstorage | cics_set_terminal | cics_set_tracedest | cics_set_traceflag |
+        cics_set_tracetype | cics_set_tranclass | cics_set_trandumpcode | cics_set_transaction | cics_set_tsqueue | cics_set_tsqname |
+        cics_set_uow | cics_set_uowlink | cics_set_urimap | cics_set_volume | cics_set_vtam | cics_set_web | cics_set_webservice | cics_set_wlmhealth | cics_set_xmltransform);
+
+cics_set_association_usercorrdata: ASSOCIATION (USERCORRDATA cics_data_value| cics_handle_response)+;
+cics_set_atomservice: ATOMSERVICE ((ENABLED | DISABLED) | ENABLESTATUS cics_cvda | cics_handle_response)+;
+cics_set_autoinstall: AUTOINSTALL ((AIRBRIDGE | CONSOLES) cics_cvda | (MAXREQS | PROGRAM) cics_data_value | cics_handle_response)+;
+cics_set_brfacility: BRFACILITY ( | cics_handle_response)+;
+cics_set_bundle: BUNDLE ( | cics_handle_response)+;
+cics_set_connection: CONNECTION ( | cics_handle_response)+;
+cics_set_db2conn: DB2CONN ( | cics_handle_response)+;
+cics_set_db2entry: DB2ENTRY ( | cics_handle_response)+;
+cics_set_db2tran: DB2TRAN ( | cics_handle_response)+;
+cics_set_deletshipped: DELETSHIPPED ( | cics_handle_response)+;
+cics_set_dispatcher: DISPATCHER ( | cics_handle_response)+;
+cics_set_doctemplate: DOCTEMPLATE ( | cics_handle_response)+;
+cics_set_dsname: DSNAME ( | cics_handle_response)+;
+cics_set_dumpds: DUMPDS ( | cics_handle_response)+;
+cics_set_enqmodel: ENQMODEL ( | cics_handle_response)+;
+cics_set_epadapter: EPADAPTER ( | cics_handle_response)+;
+cics_set_epadapterset: EPADAPTERSET ( | cics_handle_response)+;
+cics_set_eventbinding: EVENTBINDING ( | cics_handle_response)+;
+cics_set_eventprocess: EVENTPROCESS ( | cics_handle_response)+;
+cics_set_file: FILE ( | cics_handle_response)+;
+cics_set_host: HOST ( | cics_handle_response)+;
+cics_set_ipconn: IPCONN ( | cics_handle_response)+;
+cics_set_irc: IRC ( | cics_handle_response)+;
+cics_set_journalname: JOURNALNAME ( | cics_handle_response)+;
+cics_set_journalnum: JOURNALNUM ( | cics_handle_response)+;
+cics_set_jvmendpoint: JVMENDPOINT ( | cics_handle_response)+;
+cics_set_jvmserver: JVMSERVER ( | cics_handle_response)+;
+cics_set_library: LIBRARY ( | cics_handle_response)+;
+cics_set_modename: MODENAME ( | cics_handle_response)+;
+cics_set_monitor: MONITOR ( | cics_handle_response)+;
+cics_set_mqconn: MQCONN ( | cics_handle_response)+;
+cics_set_mqmonitor: MQMONITOR ( | cics_handle_response)+;
+cics_set_netname: NETNAME ( | cics_handle_response)+;
+cics_set_pipeline: PIPELINE ( | cics_handle_response)+;
+cics_set_processtype: PROCESSTYPE ( | cics_handle_response)+;
+cics_set_program: PROGRAM ( | cics_handle_response)+;
+cics_set_secdiscovery: SECDISCOVERY ( | cics_handle_response)+;
+cics_set_secrecording: SECRECORDING ( | cics_handle_response)+;
+cics_set_statistics: STATISTICS ( | cics_handle_response)+;
+cics_set_sysdumpcode: SYSDUMPCODE ( | cics_handle_response)+;
+cics_set_system: SYSTEM ( | cics_handle_response)+;
+cics_set_tags_refresh: REFRESH ( | cics_handle_response)+;
+cics_set_task: TASK ( | cics_handle_response)+;
+cics_set_tclass: TCLASS ( | cics_handle_response)+;
+cics_set_tcpip: TCPIP ( | cics_handle_response)+;
+cics_set_tcpipservice: TCPIPSERVICE ( | cics_handle_response)+;
+cics_set_tdqueue: TDQUEUE ( | cics_handle_response)+;
+cics_set_tempstorage: TEMPSTORAGE ( | cics_handle_response)+;
+cics_set_terminal: TERMINAL ( | cics_handle_response)+;
+cics_set_tracedest: TRACEDEST ( | cics_handle_response)+;
+cics_set_traceflag: TRACEFLAG ( | cics_handle_response)+;
+cics_set_tracetype: TRACETYPE ( | cics_handle_response)+;
+cics_set_tranclass: TRANCLASS ( | cics_handle_response)+;
+cics_set_trandumpcode: TRANDUMPCODE ( | cics_handle_response)+;
+cics_set_transaction: TRANSACTION ( | cics_handle_response)+;
+cics_set_tsqueue: TSQUEUE ( | cics_handle_response)+;
+cics_set_tsqname: TSQNAME ( | cics_handle_response)+;
+cics_set_uow: UOW ( | cics_handle_response)+;
+cics_set_uowlink: UOWLINK ( | cics_handle_response)+;
+cics_set_urimap: URIMAP ( | cics_handle_response)+;
+cics_set_volume: VOLUME ( | cics_handle_response)+;
+cics_set_vtam: VTAM ( | cics_handle_response)+;
+cics_set_web: WEB ( | cics_handle_response)+;
+cics_set_webservice: WEBSERVICE ( | cics_handle_response)+;
+cics_set_wlmhealth: WLMHEALTH ( | cics_handle_response)+;
+cics_set_xmltransform: XMLTRANSFORM ( | cics_handle_response)+;
+
 /** SIGNAL EVENT */
 cics_signal: SIGNAL (EVENT cics_data_value | FROMCHANNEL cics_data_value | FROM cics_data_area | FROMLENGTH cics_data_value | cics_handle_response)*;
 
