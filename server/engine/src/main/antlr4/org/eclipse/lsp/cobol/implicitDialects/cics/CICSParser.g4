@@ -621,8 +621,7 @@ cics_route: ROUTE (INTERVAL cics_zero_digit | INTERVAL cics_hhmmss | TIME cics_h
 
 /** RUN */
 cics_run: RUN (cics_run_default | cics_run_transid);
-cics_run_default: ((ACTIVITY cics_data_value | ACQACTIVITY | ACQPROCESS)+ | (SYNCHRONOUS | ASYNCHRONOUS | FACILITYTOKN cics_data_value)+ |
-          INPUTEVENT cics_data_value | cics_handle_response)+;
+cics_run_default: ((ACTIVITY | FACILITYTOKN | INPUTEVENT) cics_data_value | ACQACTIVITY | ACQPROCESS | SYNCHRONOUS | ASYNCHRONOUS | cics_handle_response)+;
 cics_run_transid: (TRANSID cics_name | CHANNEL cics_name | CHILD cics_data_area | cics_handle_response)+;
 
 /** SIGNAL EVENT */

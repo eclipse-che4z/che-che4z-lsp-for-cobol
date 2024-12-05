@@ -37,10 +37,10 @@ public class CICSRunOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
                 {
                     put(CICSLexer.RUN, ErrorSeverity.ERROR);
                     put(CICSLexer.ACTIVITY, ErrorSeverity.ERROR);
-                    put(CICSLexer.ACQACTIVITY, ErrorSeverity.ERROR);
-                    put(CICSLexer.ACQPROCESS, ErrorSeverity.ERROR);
-                    put(CICSLexer.SYNCHRONOUS, ErrorSeverity.ERROR);
-                    put(CICSLexer.ASYNCHRONOUS, ErrorSeverity.ERROR);
+                    put(CICSLexer.ACQACTIVITY, ErrorSeverity.WARNING);
+                    put(CICSLexer.ACQPROCESS, ErrorSeverity.WARNING);
+                    put(CICSLexer.SYNCHRONOUS, ErrorSeverity.WARNING);
+                    put(CICSLexer.ASYNCHRONOUS, ErrorSeverity.WARNING);
                     put(CICSLexer.FACILITYTOKN, ErrorSeverity.ERROR);
                     put(CICSLexer.INPUTEVENT, ErrorSeverity.ERROR);
                     put(CICSLexer.TRANSID, ErrorSeverity.ERROR);
