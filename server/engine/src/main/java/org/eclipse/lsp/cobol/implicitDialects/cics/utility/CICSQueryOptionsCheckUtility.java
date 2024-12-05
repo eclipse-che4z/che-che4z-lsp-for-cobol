@@ -55,6 +55,7 @@ public class CICSQueryOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
                     put(CICSLexer.UPDATE, ErrorSeverity.ERROR);
                     put(CICSLexer.CONTROL, ErrorSeverity.ERROR);
                     put(CICSLexer.ALTER, ErrorSeverity.ERROR);
+                    put(CICSLexer.NOSUSPEND, ErrorSeverity.WARNING);
                 }
             };
 
@@ -101,6 +102,9 @@ public class CICSQueryOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
         checkHasExactlyOneOption("RESTYPE or RESCLASS", ctx, ctx.RESTYPE(), ctx.RESCLASS());
         if (!ctx.RESCLASS().isEmpty()) {
             checkHasMandatoryOptions(ctx.RESIDLENGTH(), ctx, "RESIDLENGTH");
+        }
+        if (!ctx.RESIDLENGTH().isEmpty()) {
+            checkHasMandatoryOptions(ctx.RESCLASS(), ctx, "RESCLASS");
         }
         checkHasMandatoryOptions(ctx.RESID(), ctx, "RESID");
     }
