@@ -28,7 +28,7 @@ import java.util.Map;
 
 import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_suspend;
 
-/** Checks CICS ReadNext ReadPrev rules for required and invalid options */
+/** Checks CICS Suspend rules for required and invalid options */
 public class CICSSuspendOptionsUtility extends CICSOptionsCheckBaseUtility {
 
   public static final int RULE_INDEX = RULE_cics_suspend;
@@ -37,8 +37,8 @@ public class CICSSuspendOptionsUtility extends CICSOptionsCheckBaseUtility {
       new HashMap<Integer, ErrorSeverity>() {
         {
           put(CICSLexer.SUSPEND, ErrorSeverity.ERROR);
-          put(CICSLexer.ACQACTIVITY, ErrorSeverity.ERROR);
-          put(CICSLexer.ACQPROCESS, ErrorSeverity.ERROR);
+          put(CICSLexer.ACQACTIVITY, ErrorSeverity.WARNING);
+          put(CICSLexer.ACQPROCESS, ErrorSeverity.WARNING);
           put(CICSLexer.ACTIVITY, ErrorSeverity.ERROR);
         }
       };
