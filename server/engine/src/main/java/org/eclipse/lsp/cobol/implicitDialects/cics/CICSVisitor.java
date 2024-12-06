@@ -52,6 +52,7 @@ import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.model.tree.StopNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.QualifiedReferenceNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableUsageNode;
+import org.eclipse.lsp.cobol.common.utils.RangeUtils;
 import org.eclipse.lsp.cobol.common.utils.ThreadInterruptionUtil;
 import org.eclipse.lsp.cobol.implicitDialects.cics.nodes.ExecCicsHandleNode;
 import org.eclipse.lsp.cobol.implicitDialects.cics.nodes.ExecCicsNode;
@@ -254,9 +255,14 @@ class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
   }
 
   private List<Node> addTreeNode(ParserRuleContext ctx, Function<Locality, Node> nodeConstructor) {
-    Node node = nodeConstructor.apply(VisitorUtility.constructLocality(ctx, context));
+    Node node = nodeConstructor.apply(getOriginalLocality(ctx));
     visitChildren(ctx).forEach(node::addChild);
     return ImmutableList.of(node);
+  }
+
+  private Locality getOriginalLocality(ParserRuleContext ctx) {
+    Location location = context.getExtendedDocument().mapLocation(VisitorUtility.constructRange(ctx));
+    return Locality.builder().uri(location.getUri()).range(location.getRange()).build();
   }
 
   private String getName(ParserRuleContext context) {
@@ -282,7 +288,7 @@ class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
   }
 
   private void changeContextToDialectStatement(ParserRuleContext ctx) {
-    context.getExtendedDocument().fillArea(constructRange(ctx), CobolDialect.FILLER.charAt(0));
+    context.getExtendedDocument().fillArea(RangeUtils.extendByCharacter(VisitorUtility.constructRange(ctx), -1), CobolDialect.FILLER.charAt(0));
   }
 
   private void addReplacementContext(ParserRuleContext ctx) {
@@ -292,7 +298,7 @@ class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
                 context
                     .getExtendedDocument()
                     .replace(
-                        constructRange(node),
+                            RangeUtils.extendByCharacter(VisitorUtility.constructRange(node), -1),
                         StringUtils.repeat(CobolDialect.FILLER, node.getText().length())));
   }
 
@@ -307,26 +313,6 @@ class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
       }
     }
     return result;
-  }
-
-  private Range constructRange(ParserRuleContext ctx) {
-    return new Range(
-        new Position(ctx.start.getLine() - 1, ctx.start.getCharPositionInLine()),
-        new Position(
-            ctx.stop.getLine() - 1,
-            ctx.stop.getCharPositionInLine()
-                + ctx.stop.getStopIndex()
-                - ctx.stop.getStartIndex()));
-  }
-
-  private Range constructRange(TerminalNode ctx) {
-    return new Range(
-        new Position(ctx.getSymbol().getLine() - 1, ctx.getSymbol().getCharPositionInLine()),
-        new Position(
-            ctx.getSymbol().getLine() - 1,
-            ctx.getSymbol().getCharPositionInLine()
-                + ctx.getSymbol().getStopIndex()
-                - ctx.getSymbol().getStartIndex()));
   }
 
   private void areaBWarning(ParserRuleContext ctx) {

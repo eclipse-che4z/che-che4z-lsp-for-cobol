@@ -19,7 +19,6 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.model.Locality;
-import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
@@ -29,27 +28,25 @@ import org.eclipse.lsp4j.Range;
 @UtilityClass
 public class VisitorUtility {
   /**
-   * Construct locality
+   * Construct locality in extended document
    *
    * @param ctx
    * @param context
    * @return locality
    */
   public Locality constructLocality(ParserRuleContext ctx, DialectProcessingContext context) {
-    Location location = context.getExtendedDocument().mapLocation(constructRange(ctx));
-    return Locality.builder().uri(location.getUri()).range(location.getRange()).build();
+    return Locality.builder().uri(context.getExtendedDocument().getUri()).range(constructRange(ctx)).build();
   }
 
   /**
-   * Construct Locality from a Terminal Node
+   * Construct Locality from a Terminal Node in extended document
    *
    * @param node
    * @param context
    * @return locality
    */
   public Locality constructLocality(TerminalNode node, DialectProcessingContext context) {
-    Location location = context.getExtendedDocument().mapLocation(constructRange(node));
-    return Locality.builder().uri(location.getUri()).range(location.getRange()).build();
+    return Locality.builder().uri(context.getExtendedDocument().getUri()).range(constructRange(node)).build();
   }
 
   /**
