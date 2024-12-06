@@ -257,6 +257,7 @@ CHARACTERS=The CHARACTERS keyword has several functions.<br>[Search IBM document
 CHARACTERSET=
 CHECK=
 CHECKED=
+CHILD=
 CHR=
 CHUNKEND=
 CHUNKING=
