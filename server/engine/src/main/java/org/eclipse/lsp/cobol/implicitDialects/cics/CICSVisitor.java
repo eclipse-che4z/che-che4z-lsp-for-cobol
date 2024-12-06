@@ -40,6 +40,7 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.RuleNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.lsp.cobol.AntlrRangeUtils;
 import org.eclipse.lsp.cobol.common.dialects.CobolDialect;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
@@ -53,14 +54,12 @@ import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.model.tree.StopNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.QualifiedReferenceNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableUsageNode;
-import org.eclipse.lsp.cobol.common.utils.RangeUtils;
 import org.eclipse.lsp.cobol.common.utils.ThreadInterruptionUtil;
 import org.eclipse.lsp.cobol.core.visitor.VisitorHelper;
 import org.eclipse.lsp.cobol.implicitDialects.cics.nodes.ExecCicsHandleNode;
 import org.eclipse.lsp.cobol.implicitDialects.cics.nodes.ExecCicsNode;
 import org.eclipse.lsp.cobol.implicitDialects.cics.nodes.ExecCicsReturnNode;
 import org.eclipse.lsp.cobol.implicitDialects.cics.utility.CICSOptionsCheckUtility;
-import org.eclipse.lsp.cobol.implicitDialects.cics.utility.VisitorUtility;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
@@ -261,7 +260,7 @@ class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
   }
 
   private Locality getOriginalLocality(ParserRuleContext ctx) {
-    Location location = context.getExtendedDocument().mapLocation(VisitorUtility.constructRange(ctx));
+    Location location = context.getExtendedDocument().mapLocation(AntlrRangeUtils.constructRange(ctx));
     return Locality.builder().uri(location.getUri()).range(location.getRange()).build();
   }
 
@@ -282,7 +281,7 @@ class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
   }
 
   private void changeContextToDialectStatement(ParserRuleContext ctx) {
-    context.getExtendedDocument().fillArea(RangeUtils.extendByCharacter(VisitorUtility.constructRange(ctx), -1), CobolDialect.FILLER.charAt(0));
+    context.getExtendedDocument().fillArea(AntlrRangeUtils.constructRange(ctx), CobolDialect.FILLER.charAt(0));
   }
 
   private void addReplacementContext(ParserRuleContext ctx) {
