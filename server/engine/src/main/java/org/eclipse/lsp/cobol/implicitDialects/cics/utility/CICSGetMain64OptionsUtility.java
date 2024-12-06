@@ -40,11 +40,11 @@ public class CICSGetMain64OptionsUtility extends CICSOptionsCheckBaseUtility {
           put(CICSLexer.SET, ErrorSeverity.ERROR);
           put(CICSLexer.FLENGTH, ErrorSeverity.ERROR);
           put(CICSLexer.LOCATION, ErrorSeverity.ERROR);
-          put(CICSLexer.EXECUTABLE, ErrorSeverity.ERROR);
-          put(CICSLexer.SHARED, ErrorSeverity.ERROR);
-          put(CICSLexer.NOSUSPEND, ErrorSeverity.ERROR);
-          put(CICSLexer.USERDATAKEY, ErrorSeverity.ERROR);
-          put(CICSLexer.CICSDATAKEY, ErrorSeverity.ERROR);
+          put(CICSLexer.EXECUTABLE, ErrorSeverity.WARNING);
+          put(CICSLexer.SHARED, ErrorSeverity.WARNING);
+          put(CICSLexer.NOSUSPEND, ErrorSeverity.WARNING);
+          put(CICSLexer.USERDATAKEY, ErrorSeverity.WARNING);
+          put(CICSLexer.CICSDATAKEY, ErrorSeverity.WARNING);
         }
       };
 

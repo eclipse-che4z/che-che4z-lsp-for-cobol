@@ -32,17 +32,17 @@ import java.util.Map;
  * <p>This class tests all variations of the GETMAIN64 command found in the link above.
  */
 public class TestCicsGetMain64 {
-    private static final String ALL_VALID_ONE = "GETMAIN64 SET(1) FLENGTH(2)  LOCATION(3) EXECUTABLE SHARED NOSUSPEND USERDATAKEY";
-    private static final String ALL_VALID_TWO = "GETMAIN64 FLENGTH(2) SHARED EXECUTABLE LOCATION(2) NOSUSPEND CICSDATAKEY SET(1)";
+    private static final String ALL_VALID_ONE = "GETMAIN64 SET({$varOne}) FLENGTH({$varTwo})  LOCATION({$varThree}) EXECUTABLE SHARED NOSUSPEND USERDATAKEY";
+    private static final String ALL_VALID_TWO = "GETMAIN64 FLENGTH({$varTwo}) SHARED EXECUTABLE LOCATION({$varTwo}) NOSUSPEND CICSDATAKEY SET({$varOne})";
 
-    private static final String SOME_VALID_ONE = "GETMAIN64 FLENGTH(3) SHARED CICSDATAKEY SET(1) LOCATION(2)";
-    private static final String SOME_VALID_TWO = "GETMAIN64 NOSUSPEND FLENGTH(3) SET(1) LOCATION(2) EXECUTABLE";
-    private static final String SOME_VALID_THREE = "GETMAIN64 SET(1) NOSUSPEND FLENGTH(2) USERDATAKEY";
+    private static final String SOME_VALID_ONE = "GETMAIN64 FLENGTH({$varThree}) SHARED CICSDATAKEY SET({$varOne}) LOCATION({$varTwo})";
+    private static final String SOME_VALID_TWO = "GETMAIN64 NOSUSPEND FLENGTH({$varThree}) SET({$varOne}) LOCATION({$varTwo}) EXECUTABLE";
+    private static final String SOME_VALID_THREE = "GETMAIN64 SET({$varOne}) NOSUSPEND FLENGTH({$varTwo}) USERDATAKEY";
 
-    private static final String BARE_VALID = "GETMAIN64 FLENGTH(2) SET(1)";
+    private static final String BARE_VALID = "GETMAIN64 FLENGTH({$varTwo}) SET({$varOne})";
 
-    private static final String INVALID_ONE = "GETMAIN64 SET(2) FLENGTH(3) {EXECUTABLE|error1} SHARED";
-    private static final String INVALID_TWO = "GETMAIN64 {USERDATAKEY|error1} FLENGTH(2) SET(1) {CICSDATAKEY|error1}";
+    private static final String INVALID_ONE = "GETMAIN64 SET({$varTwo}) FLENGTH({$varThree}) {EXECUTABLE|error1} SHARED";
+    private static final String INVALID_TWO = "GETMAIN64 {USERDATAKEY|error1} FLENGTH({$varTwo}) SET({$varOne}) {CICSDATAKEY|error1}";
 
     @Test
     void testAllValidOne() {

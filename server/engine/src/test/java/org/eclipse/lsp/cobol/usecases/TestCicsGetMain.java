@@ -32,20 +32,20 @@ import java.util.Map;
  * <p>This class tests all variations of the GETMAIN command found in the link above.
  */
 public class TestCicsGetMain {
-    private static final String ALL_VALID_ONE = "GETMAIN SET(1) FLENGTH(2) BELOW INITIMG(3) EXECUTABLE SHARED NOSUSPEND USERDATAKEY";
-    private static final String ALL_VALID_TWO = "GETMAIN LENGTH(2) SHARED EXECUTABLE INITIMG(2) NOSUSPEND USERDATAKEY SET(1)";
-    private static final String ALL_VALID_THREE = "GETMAIN CICSDATAKEY NOSUSPEND SHARED FLENGTH(2) SET(1) EXECUTABLE INITIMG(2) BELOW";
+    private static final String ALL_VALID_ONE = "GETMAIN SET({$varOne}) FLENGTH({$varTwo}) BELOW INITIMG({$varThree}) EXECUTABLE SHARED NOSUSPEND USERDATAKEY";
+    private static final String ALL_VALID_TWO = "GETMAIN LENGTH({$varTwo}) SHARED EXECUTABLE INITIMG({$varTwo}) NOSUSPEND USERDATAKEY SET({$varOne})";
+    private static final String ALL_VALID_THREE = "GETMAIN CICSDATAKEY NOSUSPEND SHARED FLENGTH({$varTwo}) SET({$varOne}) EXECUTABLE INITIMG({$varTwo}) BELOW";
 
-    private static final String SOME_VALID_ONE = "GETMAIN BELOW FLENGTH(3) SHARED CICSDATAKEY SET(1)";
-    private static final String SOME_VALID_TWO = "GETMAIN NOSUSPEND LENGTH(3) SET(1) INITIMG(2) EXECUTABLE";
-    private static final String SOME_VALID_THREE = "GETMAIN SET(1) EXECUTABLE FLENGTH(2) USERDATAKEY";
+    private static final String SOME_VALID_ONE = "GETMAIN BELOW FLENGTH({$varThree}) SHARED CICSDATAKEY SET({$varOne})";
+    private static final String SOME_VALID_TWO = "GETMAIN NOSUSPEND LENGTH({$varThree}) SET({$varOne}) INITIMG({$varTwo}) EXECUTABLE";
+    private static final String SOME_VALID_THREE = "GETMAIN SET({$varOne}) EXECUTABLE FLENGTH({$varTwo}) USERDATAKEY";
 
-    private static final String BARE_VALID_ONE = "GETMAIN LENGTH(2) SET(1)";
-    private static final String BARE_VALID_TWO = "GETMAIN SET(1) FLENGTH(2)";
+    private static final String BARE_VALID_ONE = "GETMAIN LENGTH({$varTwo}) SET({$varOne})";
+    private static final String BARE_VALID_TWO = "GETMAIN SET({$varOne}) FLENGTH({$varTwo})";
 
-    private static final String INVALID_ONE = "GETMAIN SET(2) LENGTH(3) {BELOW|error1} SHARED";
-    private static final String INVALID_TWO = "GETMAIN {LENGTH|error1}(2) SET(1) {FLENGTH|error1}(2) NOSUSPEND";
-    private static final String INVALID_THREE = "GETMAIN {USERDATAKEY|error1} FLENGTH(2) SET(1) BELOW {CICSDATAKEY|error1}";
+    private static final String INVALID_ONE = "GETMAIN SET({$varTwo}) LENGTH({$varThree}) {BELOW|error1} SHARED";
+    private static final String INVALID_TWO = "GETMAIN {LENGTH|error1}({$varTwo}) SET({$varOne}) {FLENGTH|error1}({$varTwo}) NOSUSPEND";
+    private static final String INVALID_THREE = "GETMAIN {USERDATAKEY|error1} FLENGTH({$varTwo}) SET({$varOne}) BELOW {CICSDATAKEY|error1}";
 
     @Test
     void testAllValidOne() {
