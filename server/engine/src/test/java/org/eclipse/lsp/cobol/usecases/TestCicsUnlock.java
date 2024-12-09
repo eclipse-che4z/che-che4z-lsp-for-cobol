@@ -35,14 +35,15 @@ public class TestCicsUnlock {
           "UNLOCK FILE({$varOne}) TOKEN({$varTwo}) SYSID({$varThree})";
 
   private static final String SOME_OPTIONS_ONE =
-          "UNLOCK TOKEN({$varTwo}) FILE({$varOne})";
+          "UNLOCK TOKEN({$varTwo}) DATASET({$varOne})";
   private static final String SOME_OPTIONS_TWO =
           "UNLOCK SYSID({$varThree}) FILE({$varOne})";
 
   private static final String BARE_OPTIONS =
-          "UNLOCK FILE({$varOne})";
+          "UNLOCK DATASET({$varOne})";
 
-  private static final String INVALID = "UNLOCK {SYSID(3) | error}";
+  private static final String INVALID = "UNLOCK {_SYSID({$varThree})|error_}";
+  private static final String INVALID_FILE = "UNLOCK {FILE|error}({$varOne}) {DATASET|error}({$varOne})";
 
   @Test
   void testAllOptions() {
@@ -69,8 +70,19 @@ public class TestCicsUnlock {
     CICSTestUtils.errorTest(INVALID, ImmutableMap.of(
             "error",
             new Diagnostic(
-                    new Range(new Position(12, 12), new Position(13, 20)),
+                    new Range(new Position(12, 12), new Position(13, 27)),
                     "Missing required option: FILE",
+                    DiagnosticSeverity.Error,
+                    ErrorSource.PARSING.getText())));
+  }
+
+  @Test
+  void testInvalidFile() {
+    CICSTestUtils.errorTest(INVALID_FILE, ImmutableMap.of(
+            "error",
+            new Diagnostic(
+                    new Range(),
+                    "Exactly one option required, options are mutually exclusive: FILE or DATASET",
                     DiagnosticSeverity.Error,
                     ErrorSource.PARSING.getText())));
   }
