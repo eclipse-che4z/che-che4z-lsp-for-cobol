@@ -48,17 +48,12 @@ public class AntlrRangeUtils {
      */
     public static Range constructRange(ParserRuleContext ctx) {
       Token start = ctx.start;
-      Token stop = ctx.stop == null ? start : ctx.stop;
-
-      if (start.getLine() > stop.getLine()) {
-        stop = start;
-      }
-
-      return new Range(
-              new Position(start.getLine() - 1, start.getCharPositionInLine()),
-              new Position(stop.getLine() - 1,
-                      stop.getCharPositionInLine() + stop.getStopIndex() - stop.getStartIndex() + 1)
-      );
+      Token stop = ctx.stop;
+      Position startPosition = new Position(start.getLine() - 1, start.getCharPositionInLine());
+      Position stopPosition = ctx.stop == null || start.getLine() > stop.getLine()
+              ? startPosition
+              : new Position(stop.getLine() - 1, stop.getCharPositionInLine() + stop.getStopIndex() - stop.getStartIndex() + 1);
+      return new Range(startPosition, stopPosition);
     }
 
     /**
