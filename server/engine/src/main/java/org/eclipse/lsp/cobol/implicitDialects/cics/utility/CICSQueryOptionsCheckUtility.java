@@ -45,7 +45,7 @@ public class CICSQueryOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
                     put(CICSLexer.VALUE, ErrorSeverity.ERROR);
                     put(CICSLexer.MINIMUM, ErrorSeverity.ERROR);
                     put(CICSLexer.MAXIMUM, ErrorSeverity.ERROR);
-                    put(CICSLexer.SECURITY, ErrorSeverity.ERROR);
+                    put(CICSLexer.SECURITY, ErrorSeverity.WARNING);
                     put(CICSLexer.RESTYPE, ErrorSeverity.ERROR);
                     put(CICSLexer.RESCLASS, ErrorSeverity.ERROR);
                     put(CICSLexer.RESIDLENGTH, ErrorSeverity.ERROR);
@@ -90,7 +90,6 @@ public class CICSQueryOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
 
     private void checkQueryChannel(CICSParser.Cics_query_channelContext ctx) {
         checkHasMandatoryOptions(ctx.CHANNEL(), ctx, "CHANNEL");
-        checkHasMandatoryOptions(ctx.CONTAINERCNT(), ctx, "CONTAINERCNT");
     }
 
     private void checkQueryCounter(CICSParser.Cics_query_counterContext ctx) {
@@ -100,12 +99,6 @@ public class CICSQueryOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     private void checkQuerySecurity(CICSParser.Cics_query_securityContext ctx) {
         checkHasMandatoryOptions(ctx.SECURITY(), ctx, "SECURITY");
         checkHasExactlyOneOption("RESTYPE or RESCLASS", ctx, ctx.RESTYPE(), ctx.RESCLASS());
-        if (!ctx.RESCLASS().isEmpty()) {
-            checkHasMandatoryOptions(ctx.RESIDLENGTH(), ctx, "RESIDLENGTH");
-        }
-        if (!ctx.RESIDLENGTH().isEmpty()) {
-            checkHasMandatoryOptions(ctx.RESCLASS(), ctx, "RESCLASS");
-        }
         checkHasMandatoryOptions(ctx.RESID(), ctx, "RESID");
     }
 
