@@ -71,14 +71,14 @@ public class CopybookNameServiceImpl implements CopybookNameService {
   }
 
   @Override
-  public List<CopybookName> getNames(String uri) {
-    List<CopybookName> copybookNamesList = createCopybookNamesList(uri, n -> true);
+  public List<CopybookName> getNames(String programUri) {
+    List<CopybookName> copybookNamesList = createCopybookNamesList(programUri, n -> true);
     return ImmutableList.copyOf(copybookNamesList);
   }
 
   @Override
-  public Optional<CopybookName> findByName(String uri, final String displayName) {
-    List<CopybookName> copybookNamesList = createCopybookNamesList(uri,
+  public Optional<CopybookName> findByName(String programUri, final String displayName) {
+    List<CopybookName> copybookNamesList = createCopybookNamesList(programUri,
             copybookName -> displayName.equalsIgnoreCase(copybookName.getDisplayName()));
     return copybookNamesList.isEmpty() ? Optional.empty() : Optional.of(copybookNamesList.get(0));
   }
@@ -190,12 +190,12 @@ public class CopybookNameServiceImpl implements CopybookNameService {
             .collect(Collectors.toList());
   }
 
-  private List<CopybookName> createCopybookNamesList(String uri, Predicate<CopybookName> predicate) {
+  private List<CopybookName> createCopybookNamesList(String programUri, Predicate<CopybookName> predicate) {
     CobolLanguageClient cobolLanguageClient = clientProvider.get();
     CompletableFuture<List<WorkspaceFolder>> copybookWorkspaces = cobolLanguageClient.workspaceFolders();
-    CompletableFuture<List<String>> copybooksExtensions = settingsService.fetchTextConfigurationWithScope(uri, CPY_EXTENSIONS.label);
-    CompletableFuture<List<String>> copybookLocalFolders = copybookLocalFolders(uri);
+    CompletableFuture<List<String>> copybooksExtensions = settingsService.fetchTextConfigurationWithScope(programUri, CPY_EXTENSIONS.label);
+    CompletableFuture<List<String>> copybookLocalFolders = copybookLocalFolders(programUri);
     return resolveNames(copybookWorkspaces.join(), copybookLocalFolders.join(), copybooksExtensions.join(),
-            extractProgramName(uri), predicate);
+            extractProgramName(programUri), predicate);
   }
 }
