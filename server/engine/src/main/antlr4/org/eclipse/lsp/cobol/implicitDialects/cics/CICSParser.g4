@@ -658,13 +658,15 @@ cics_set_epadapter: EPADAPTER cics_data_value ((ENABLED | DISABLED) | ENABLESTAT
 cics_set_epadapterset: EPADAPTERSET cics_data_value ((ENABLED | DISABLED) | ENABLESTATUS cics_cvda | cics_handle_response)+;
 cics_set_eventbinding: EVENTBINDING cics_data_value ((ENABLED | DISABLED) | ENABLESTATUS cics_cvda | cics_handle_response)+;
 cics_set_eventprocess: EVENTPROCESS ((STARTED | DRAIN | STOPPED) | (EPSTATUS) cics_cvda | cics_handle_response)+;
-cics_set_file: ((FILE | DATASET) cics_data_value) ((ADDABLE | NOTADDBALE | BROWSABLE | NOTBROWSABLE | WAIT | FORCE | NOWAIT | DELETABLE | NOTDELETABLE | OLD | SHARE | EMPTY | EMPTYREQ | NOEMPTYREQ | ENABLED | DISABLED | OPEN | CLOSED | EXCTL | NOEXCTL | LOAD | NOLOAD | READABLE | NOTREADABLE | UNCOMMITTED | CONSISTENT | REPEATABLE | RLS | NOTRLS | CFTABLE | CICSTABLE | NOTTABLE | USERTABLE | UPDATABLE | NOTUPDATABLE | CONTENTION | LOCKING) |
+cics_set_file: ((FILE | DATASET) cics_data_value) ((ADDABLE | NOTADDBALE | BROWSABLE | NOTBROWSABLE | WAIT | FORCE | NOWAIT | DELETABLE | NOTDELETABLE | OLD | SHARE | EMPTY | EMPTYREQ | NOEMPTYREQ | ENABLED | DISABLED | OPEN | CLOSED | EXCTL | NOEXCTL | LOAD | NOLOAD |
+                                                    READABLE | NOTREADABLE | UNCOMMITTED | CONSISTENT | REPEATABLE | RLS | NOTRLS | CFTABLE | CICSTABLE | NOTTABLE | USERTABLE | UPDATABLE | NOTUPDATABLE | CONTENTION | LOCKING) |
                                                   (ADD | BROWSE | BUSY | DELETE | DISPOSITION | EMPTYSTATUS | ENABLESTATUS | OPENSTATUS | EXCLUSIVE | LOADTYPE | READ | READINTEG | RLSACCESS | TABLE | UPDATE | UPDATEMODEL) cics_cvda |
                                                    (CFDTPOOL | DSNAME | OBJECTNAME | KEYLENGTH | LSRPOOLNUM | MAXNUMRECS | RECORDSIZE | STRINGS | TABLENAME) cics_data_value | cics_handle_response)*;
-cics_set_host: HOST (A | cics_handle_response)+;
-cics_set_ipconn: IPCONN (A | cics_handle_response)+;
-cics_set_irc: IRC (A | cics_handle_response)+;
-cics_set_journalname: JOURNALNAME (A | cics_handle_response)+;
+cics_set_host: HOST cics_data_area (ENABLESTATUS cics_cvda | cics_handle_response)+;
+cics_set_ipconn: IPCONN cics_data_value ((ACQUIRED | RELEASED | NOTPENDING | CANCEL | FORCECANCEL | FORCEPURGE | KILL | PURGE | NORECOVDATA | INSERVICE | OUTSERVICE | BACKOUT | COMMIT | FORCEUOW | RESYNC) |
+                                        (CONNSTATUS | PENDSTATUS | PURGETYPE | RECOVSTATUS | SERVSTATUS | UOWACTION) cics_cvda | cics_handle_response)+;
+cics_set_irc: IRC ((CLOSED | IMMCLOSE | OPEN) | OPENSTATUS cics_cvda | cics_handle_response)+;
+cics_set_journalname: JOURNALNAME cics_data_value ((FLUSH | RESET | DISABLED | ENABLED) | (ACTION | STATUS) cics_cvda | cics_handle_response)+;
 cics_set_journalnum: JOURNALNUM (A | cics_handle_response)+;
 cics_set_jvmendpoint: JVMENDPOINT (A | cics_handle_response)+;
 cics_set_jvmserver: JVMSERVER (A | cics_handle_response)+;

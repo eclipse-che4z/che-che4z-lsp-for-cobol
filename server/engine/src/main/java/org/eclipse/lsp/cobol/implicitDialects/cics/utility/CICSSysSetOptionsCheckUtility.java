@@ -760,13 +760,27 @@ public class CICSSysSetOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
 
     private void checkHost(CICSParser.Cics_set_hostContext ctx) {}
 
-    private void checkIpconn(CICSParser.Cics_set_ipconnContext ctx) {}
+    private void checkIpconn(CICSParser.Cics_set_ipconnContext ctx) {
+        checkMutuallyExclusiveOptions("CONNSTATUS, ACQUIRED or RELEASED", ctx.CONNSTATUS(), ctx.ACQUIRED(), ctx.RELEASED());
+        checkMutuallyExclusiveOptions("PENDSTATUS or NOTPENDING", ctx.PENDSTATUS(), ctx.NOTPENDING());
+        checkMutuallyExclusiveOptions("PURGETYPE, CANCEL, FORCECANCEL, FORCEPURGE, KILL or PURGE", ctx.PURGETYPE(), ctx.CANCEL(), ctx.FORCECANCEL(), ctx.FORCEPURGE(), ctx.KILL(), ctx.PURGE());
+        checkMutuallyExclusiveOptions("RECOVSTATUS or NORECOVDATA", ctx.RECOVSTATUS(), ctx.NORECOVDATA());
+        checkMutuallyExclusiveOptions("SERVSTATUS, INSERVICE or OUTSERVICE", ctx.SERVSTATUS(), ctx.INSERVICE(), ctx.OUTSERVICE());
+        checkMutuallyExclusiveOptions("UOWACTION, BACKOUT, COMMIT, FORCEUOW or RESYNC", ctx.UOWACTION(), ctx.BACKOUT(), ctx.COMMIT(), ctx.FORCEUOW(), ctx.RESYNC());
+    }
 
-    private void checkIrc(CICSParser.Cics_set_ircContext ctx) {}
+    private void checkIrc(CICSParser.Cics_set_ircContext ctx) {
+        checkMutuallyExclusiveOptions("OPENSTATUS, CLOSED, IMMCLOSE or OPEN", ctx.OPENSTATUS(), ctx.CLOSED(), ctx.IMMCLOSE(), ctx.OPEN());
+    }
 
-    private void checkJournalname(CICSParser.Cics_set_journalnameContext ctx) {}
+    private void checkJournalname(CICSParser.Cics_set_journalnameContext ctx) {
+        checkHasExactlyOneOption("ACTION, FLUSH or RESET", ctx, ctx.ACTION(), ctx.FLUSH(), ctx.RESET());
+        checkHasExactlyOneOption("STATUS, DISABLED or ENABLED", ctx, ctx.STATUS(), ctx.DISABLED(), ctx.ENABLED());
+    }
 
-    private void checkJournalnum(CICSParser.Cics_set_journalnumContext ctx) {}
+    private void checkJournalnum(CICSParser.Cics_set_journalnumContext ctx) {
+        // Outdated, replaced with SET JOURNALNAME
+    }
 
     private void checkJvmendpoint(CICSParser.Cics_set_jvmendpointContext ctx) {}
 
