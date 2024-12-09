@@ -50,7 +50,7 @@ public class AntlrRangeUtils {
       Token start = ctx.start;
       Token stop = ctx.stop;
       Position startPosition = new Position(start.getLine() - 1, start.getCharPositionInLine());
-      Position stopPosition = ctx.stop == null || start.getLine() > stop.getLine()
+      Position stopPosition = ctx.stop == null || start.getStartIndex() > stop.getStopIndex()
               ? startPosition
               : new Position(stop.getLine() - 1, stop.getCharPositionInLine() + stop.getStopIndex() - stop.getStartIndex() + 1);
       return new Range(startPosition, stopPosition);
