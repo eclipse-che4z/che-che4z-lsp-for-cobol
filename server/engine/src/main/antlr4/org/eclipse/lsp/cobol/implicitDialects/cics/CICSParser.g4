@@ -597,7 +597,7 @@ cics_resume: RESUME (ACQACTIVITY | ACQPROCESS | ACTIVITY cics_data_value | cics_
 /** RETRIEVE - / REATTACH EVENT / SUBEVENT */
 cics_retrieve: RETRIEVE (cics_retrieve_standard | cics_retrieve_reattach | cics_retrieve_subevent);
 cics_retrieve_standard: ((INTO | LENGTH | RTRANSID  | RTERMID  | QUEUE) cics_data_area | SET cics_ref | WAIT | cics_handle_response)*;
-cics_retrieve_reattach: (REATTACH | EVENT cics_data_area | EVENTTYPE cics_cvda |  cics_handle_response)*;
+cics_retrieve_reattach: (REATTACH | EVENT cics_data_area | EVENTTYPE cics_cvda | cics_handle_response)*;
 cics_retrieve_subevent: (SUBEVENT cics_data_area | EVENT cics_data_value |  EVENTTYPE cics_cvda | cics_handle_response)*;
 
 /** RETURN */
@@ -634,72 +634,79 @@ cics_set: SET (cics_set_association_usercorrdata | cics_set_atomservice | cics_s
         cics_set_tracetype | cics_set_tranclass | cics_set_trandumpcode | cics_set_transaction | cics_set_tsqueue | cics_set_tsqname |
         cics_set_uow | cics_set_uowlink | cics_set_urimap | cics_set_volume | cics_set_vtam | cics_set_web | cics_set_webservice | cics_set_wlmhealth | cics_set_xmltransform);
 
-cics_set_association_usercorrdata: ASSOCIATION (USERCORRDATA cics_data_value| cics_handle_response)+;
-cics_set_atomservice: ATOMSERVICE ((ENABLED | DISABLED) | ENABLESTATUS cics_cvda | cics_handle_response)+;
+cics_set_association_usercorrdata: ASSOCIATION (USERCORRDATA cics_data_value | cics_handle_response)+;
+cics_set_atomservice: ATOMSERVICE cics_data_area ((ENABLED | DISABLED) | ENABLESTATUS cics_cvda | cics_handle_response)+;
 cics_set_autoinstall: AUTOINSTALL ((AIRBRIDGE | CONSOLES) cics_cvda | (MAXREQS | PROGRAM) cics_data_value | cics_handle_response)+;
-cics_set_brfacility: BRFACILITY ( | cics_handle_response)+;
-cics_set_bundle: BUNDLE ( | cics_handle_response)+;
-cics_set_connection: CONNECTION ( | cics_handle_response)+;
-cics_set_db2conn: DB2CONN ( | cics_handle_response)+;
-cics_set_db2entry: DB2ENTRY ( | cics_handle_response)+;
-cics_set_db2tran: DB2TRAN ( | cics_handle_response)+;
-cics_set_deletshipped: DELETSHIPPED ( | cics_handle_response)+;
-cics_set_dispatcher: DISPATCHER ( | cics_handle_response)+;
-cics_set_doctemplate: DOCTEMPLATE ( | cics_handle_response)+;
-cics_set_dsname: DSNAME ( | cics_handle_response)+;
-cics_set_dumpds: DUMPDS ( | cics_handle_response)+;
-cics_set_enqmodel: ENQMODEL ( | cics_handle_response)+;
-cics_set_epadapter: EPADAPTER ( | cics_handle_response)+;
-cics_set_epadapterset: EPADAPTERSET ( | cics_handle_response)+;
-cics_set_eventbinding: EVENTBINDING ( | cics_handle_response)+;
-cics_set_eventprocess: EVENTPROCESS ( | cics_handle_response)+;
-cics_set_file: FILE ( | cics_handle_response)+;
-cics_set_host: HOST ( | cics_handle_response)+;
-cics_set_ipconn: IPCONN ( | cics_handle_response)+;
-cics_set_irc: IRC ( | cics_handle_response)+;
-cics_set_journalname: JOURNALNAME ( | cics_handle_response)+;
-cics_set_journalnum: JOURNALNUM ( | cics_handle_response)+;
-cics_set_jvmendpoint: JVMENDPOINT ( | cics_handle_response)+;
-cics_set_jvmserver: JVMSERVER ( | cics_handle_response)+;
-cics_set_library: LIBRARY ( | cics_handle_response)+;
-cics_set_modename: MODENAME ( | cics_handle_response)+;
-cics_set_monitor: MONITOR ( | cics_handle_response)+;
-cics_set_mqconn: MQCONN ( | cics_handle_response)+;
-cics_set_mqmonitor: MQMONITOR ( | cics_handle_response)+;
-cics_set_netname: NETNAME ( | cics_handle_response)+;
-cics_set_pipeline: PIPELINE ( | cics_handle_response)+;
-cics_set_processtype: PROCESSTYPE ( | cics_handle_response)+;
-cics_set_program: PROGRAM ( | cics_handle_response)+;
-cics_set_secdiscovery: SECDISCOVERY ( | cics_handle_response)+;
-cics_set_secrecording: SECRECORDING ( | cics_handle_response)+;
-cics_set_statistics: STATISTICS ( | cics_handle_response)+;
-cics_set_sysdumpcode: SYSDUMPCODE ( | cics_handle_response)+;
-cics_set_system: SYSTEM ( | cics_handle_response)+;
-cics_set_tags_refresh: REFRESH ( | cics_handle_response)+;
-cics_set_task: TASK ( | cics_handle_response)+;
-cics_set_tclass: TCLASS ( | cics_handle_response)+;
-cics_set_tcpip: TCPIP ( | cics_handle_response)+;
-cics_set_tcpipservice: TCPIPSERVICE ( | cics_handle_response)+;
-cics_set_tdqueue: TDQUEUE ( | cics_handle_response)+;
-cics_set_tempstorage: TEMPSTORAGE ( | cics_handle_response)+;
-cics_set_terminal: TERMINAL ( | cics_handle_response)+;
-cics_set_tracedest: TRACEDEST ( | cics_handle_response)+;
-cics_set_traceflag: TRACEFLAG ( | cics_handle_response)+;
-cics_set_tracetype: TRACETYPE ( | cics_handle_response)+;
-cics_set_tranclass: TRANCLASS ( | cics_handle_response)+;
-cics_set_trandumpcode: TRANDUMPCODE ( | cics_handle_response)+;
-cics_set_transaction: TRANSACTION ( | cics_handle_response)+;
-cics_set_tsqueue: TSQUEUE ( | cics_handle_response)+;
-cics_set_tsqname: TSQNAME ( | cics_handle_response)+;
-cics_set_uow: UOW ( | cics_handle_response)+;
-cics_set_uowlink: UOWLINK ( | cics_handle_response)+;
-cics_set_urimap: URIMAP ( | cics_handle_response)+;
-cics_set_volume: VOLUME ( | cics_handle_response)+;
-cics_set_vtam: VTAM ( | cics_handle_response)+;
-cics_set_web: WEB ( | cics_handle_response)+;
-cics_set_webservice: WEBSERVICE ( | cics_handle_response)+;
-cics_set_wlmhealth: WLMHEALTH ( | cics_handle_response)+;
-cics_set_xmltransform: XMLTRANSFORM ( | cics_handle_response)+;
+cics_set_brfacility: BRFACILITY cics_data_value (RELEASED | TERMSTATUS cics_cvda | cics_handle_response)+;
+cics_set_bundle: BUNDLE ((AVAILABLE | UNAVAILABLE | ENABLED | DISABLED | PHASEIN) | (AVAILSTATUS | ENABLESTATUS | COPY) cics_cvda | cics_handle_response)+;
+cics_set_connection: CONNECTION cics_data_area ((ACQUIRED | RELEASED | ENDAFFINITY | EXITTRACE | NOEXITTRACE | NOTPENDING | CANCEL | FORCECANCEL | FORCEPURGE | KILL | PURGE | NORECOVDATA | INSERVICE | OUTSERVICE | BACKOUT | COMMIT | FORCEUOW | RESYNC | NOZCPTRACE | ZCPTRACE) |
+                        (ACQSTATUS | CONNSTATUS | AFFINITY | EXITTRACING | PENDSTATUS | PURGETYPE | RECOVSTATUS | SERVSTATUS | UOWACTION | ZCPTRACING) cics_cvda | cics_handle_response)+;
+cics_set_db2conn: DB2CONN ((UOW | TASK | TXID | NONE | GROUP | SIGN | TERM | TX | OPID | USERID | WAIT | NOWAIT | FORCE | CGROUP | CSIGN | CTERM | CTX | COPID | CUSERID | ABEND | SQLCODE | CONNECTED | NOTCONNECTED | RELEASE | NORELEASE | HIGH | EQUAL | LOW | RESYNC | NORESYNC | SECURITY | NOCONNECT | CONNECT | RECONNECT | TWAIT | NOTWAIT) |
+                            (AUTHID | COMAUTHID | COMTHREADLIM | DB2GROUPID | DB2GROUPID | DB2ID | MSGQUEUE1 | MSGQUEUE2 | MSGQUEUE3 | PLAN | PLANEXITNAME | PURGECYCLEM | PURGECYCLES | REUSELIMIT | SIGNID | STATSQUEUE | TCBLIMIT | THREADLIMIT) cics_data_value |
+                            (ACCOUNTREC | ACCOUNTREC | AUTHTYPE | BUSY | COMAUTHTYPE | CONNECTERROR | CONNECTST | NONTERMREL | PRIORITY | RESYNCMEMBER | STANDBYMODE | THREADWAIT) cics_cvda | cics_handle_response)+;
+cics_set_db2entry: DB2ENTRY cics_data_area? ((UOW | TASK | TXID | NONE | GROUP | SIGN | TERM | TX | OPID | USERID | WAIT | NOWAIT | FORCE | ABEND | SQLCODE | POOL | ENABLED | DISABLED | HIGH | EQUAL | LOW | YES | NO | TWAIT | NOTWAIT | TPOOL) |
+                            (AUTHID | PLAN | PLANEXITNAME | PROTECTNUM | THREADLIMIT) cics_data_area | (ACCOUNTREC | AUTHTYPE | BUSY | DISABLEDACT | ENABLESTATUS | PRIORITY | SHARELOCKS | THREADWAIT | ACCOUNTREC) cics_cvda | cics_handle_response)+;
+cics_set_db2tran: DB2TRAN ((DB2ENTRY | TRANSID | DB2ENTRY) cics_data_area | cics_handle_response)+;
+cics_set_deletshipped: DELETSHIPPED ((IDLE | IDLEHRS | IDLEMINS | IDLESECS | IDLEHRS | INTERVAL | INTERVALHRS | INTERVALMINS | INTERVALSECS | INTERVALHRS) cics_data_value | cics_handle_response)+;
+cics_set_dispatcher: DISPATCHER ((MAXOPENTCBS | MAXSSLTCBS | MAXXPTCBS | MROBATCH | PRTYAGING | RUNAWAY | SCANDELAY | TIME | MAXOPENTCBS) cics_data_value | cics_handle_response)+;
+cics_set_doctemplate: DOCTEMPLATE cics_data_value (NEWCOPY | COPY cics_cvda | cics_handle_response)+;
+cics_set_dsname: DSNAME cics_data_value ((REMOVE | RECOVERED | RESETLOCKS | RETRY | AVAILABLE | RREPL | UNAVAILABLE | QUIESCED | IMMQUIESCED | UNQUIESCED | WAIT | NOWAIT | BACKOUT | COMMIT | FORCE) |
+                            (ACTION | AVAILABILITY | QUESCESTATE | BUSY | UOWACTION) cics_cvda | cics_handle_response)+;
+cics_set_dumpds: DUMPDS ((CLOSED | OPEN | SWITCH | NOSWITCH | SWITCHNEXT | SWITCHALL) | INITIALDDS cics_data_value | (OPENSTATUS | SWITCHSTATUS) cics_cvda | cics_handle_response)+;
+cics_set_enqmodel: ENQMODEL cics_data_value ((ENABLED | DISABLED) | STATUS cics_cvda | cics_handle_response)+;
+cics_set_epadapter: EPADAPTER cics_data_value ((ENABLED | DISABLED) | ENABLESTATUS cics_cvda | cics_handle_response)+;
+cics_set_epadapterset: EPADAPTERSET cics_data_value ((ENABLED | DISABLED) | ENABLESTATUS cics_cvda | cics_handle_response)+;
+cics_set_eventbinding: EVENTBINDING cics_data_value ((ENABLED | DISABLED) | ENABLESTATUS cics_cvda | cics_handle_response)+;
+cics_set_eventprocess: EVENTPROCESS ((STARTED | DRAIN | STOPPED) | (EPSTATUS) cics_cvda | cics_handle_response)+;
+cics_set_file: ((FILE | DATASET) cics_data_value) ((ADDABLE | NOTADDBALE | BROWSABLE | NOTBROWSABLE | WAIT | FORCE | NOWAIT | DELETABLE | NOTDELETABLE | OLD | SHARE | EMPTY | EMPTYREQ | NOEMPTYREQ | ENABLED | DISABLED | OPEN | CLOSED | EXCTL | NOEXCTL | LOAD | NOLOAD | READABLE | NOTREADABLE | UNCOMMITTED | CONSISTENT | REPEATABLE | RLS | NOTRLS | CFTABLE | CICSTABLE | NOTTABLE | USERTABLE | UPDATABLE | NOTUPDATABLE | CONTENTION | LOCKING) |
+                                                  (ADD | BROWSE | BUSY | DELETE | DISPOSITION | EMPTYSTATUS | ENABLESTATUS | OPENSTATUS | EXCLUSIVE | LOADTYPE | READ | READINTEG | RLSACCESS | TABLE | UPDATE | UPDATEMODEL) cics_cvda |
+                                                   (CFDTPOOL | DSNAME | OBJECTNAME | KEYLENGTH | LSRPOOLNUM | MAXNUMRECS | RECORDSIZE | STRINGS | TABLENAME) cics_data_value | cics_handle_response)*;
+cics_set_host: HOST (A | cics_handle_response)+;
+cics_set_ipconn: IPCONN (A | cics_handle_response)+;
+cics_set_irc: IRC (A | cics_handle_response)+;
+cics_set_journalname: JOURNALNAME (A | cics_handle_response)+;
+cics_set_journalnum: JOURNALNUM (A | cics_handle_response)+;
+cics_set_jvmendpoint: JVMENDPOINT (A | cics_handle_response)+;
+cics_set_jvmserver: JVMSERVER (A | cics_handle_response)+;
+cics_set_library: LIBRARY (A | cics_handle_response)+;
+cics_set_modename: MODENAME (A | cics_handle_response)+;
+cics_set_monitor: MONITOR (A | cics_handle_response)+;
+cics_set_mqconn: MQCONN (A | cics_handle_response)+;
+cics_set_mqmonitor: MQMONITOR (A | cics_handle_response)+;
+cics_set_netname: NETNAME (A | cics_handle_response)+;
+cics_set_pipeline: PIPELINE (A | cics_handle_response)+;
+cics_set_processtype: PROCESSTYPE (A | cics_handle_response)+;
+cics_set_program: PROGRAM (A | cics_handle_response)+;
+cics_set_secdiscovery: SECDISCOVERY (A | cics_handle_response)+;
+cics_set_secrecording: SECRECORDING (A | cics_handle_response)+;
+cics_set_statistics: STATISTICS (A | cics_handle_response)+;
+cics_set_sysdumpcode: SYSDUMPCODE (A | cics_handle_response)+;
+cics_set_system: SYSTEM (A | cics_handle_response)+;
+cics_set_tags_refresh: REFRESH (A | cics_handle_response)+;
+cics_set_task: TASK (A | cics_handle_response)+;
+cics_set_tclass: TCLASS (A | cics_handle_response)+;
+cics_set_tcpip: TCPIP (A | cics_handle_response)+;
+cics_set_tcpipservice: TCPIPSERVICE (A | cics_handle_response)+;
+cics_set_tdqueue: TDQUEUE (A | cics_handle_response)+;
+cics_set_tempstorage: TEMPSTORAGE (A | cics_handle_response)+;
+cics_set_terminal: TERMINAL (A | cics_handle_response)+;
+cics_set_tracedest: TRACEDEST (A | cics_handle_response)+;
+cics_set_traceflag: TRACEFLAG (A | cics_handle_response)+;
+cics_set_tracetype: TRACETYPE (A | cics_handle_response)+;
+cics_set_tranclass: TRANCLASS (A | cics_handle_response)+;
+cics_set_trandumpcode: TRANDUMPCODE (A | cics_handle_response)+;
+cics_set_transaction: TRANSACTION (A | cics_handle_response)+;
+cics_set_tsqueue: TSQUEUE (A | cics_handle_response)+;
+cics_set_tsqname: TSQNAME (A | cics_handle_response)+;
+cics_set_uow: UOW (A | cics_handle_response)+;
+cics_set_uowlink: UOWLINK (A | cics_handle_response)+;
+cics_set_urimap: URIMAP (A | cics_handle_response)+;
+cics_set_volume: VOLUME (A | cics_handle_response)+;
+cics_set_vtam: VTAM (A | cics_handle_response)+;
+cics_set_web: WEB (A | cics_handle_response)+;
+cics_set_webservice: WEBSERVICE (A | cics_handle_response)+;
+cics_set_wlmhealth: WLMHEALTH (A | cics_handle_response)+;
+cics_set_xmltransform: XMLTRANSFORM (A | cics_handle_response)+;
 
 /** SIGNAL EVENT */
 cics_signal: SIGNAL (EVENT cics_data_value | FROMCHANNEL cics_data_value | FROM cics_data_area | FROMLENGTH cics_data_value | cics_handle_response)*;
