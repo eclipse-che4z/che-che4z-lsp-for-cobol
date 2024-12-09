@@ -34,10 +34,12 @@ import {
   USE_MAP,
 } from "../../../constants";
 import { CopybookName } from "../CopybookDownloadService";
-import { Utils } from "../../util/Utils";
+import { hasMember, Utils } from "../../util/Utils";
 import { searchCopybookInExtensionFolder } from "../../util/FSUtils";
 import { getErrorMessage } from "../../util/ErrorsUtils";
 import { SettingsService } from "../../Settings";
+import path = require("node:path");
+import { getChannel } from "../../../extension";
 
 const defaultConfigs: ExternalConfigurationOptions = {
   compiler: "IGYCRCTL",
@@ -197,7 +199,7 @@ export class CopybookDownloaderForE4E {
         element,
         endevorApi.profile,
       );
-      const filePath: string = CopybookDownloaderForE4E.getCopybookPath(
+      const filePath: string = await CopybookDownloaderForE4E.getCopybookPath(
         instance,
         use_map,
         this.storagePath,
@@ -226,7 +228,7 @@ export class CopybookDownloaderForE4E {
   ): Promise<boolean> {
     try {
       const instance = Utils.profileAsString(endevorApi.profile);
-      const filePath: string = CopybookDownloaderForE4E.getCopybookPath(
+      const filePath: string = await CopybookDownloaderForE4E.getCopybookPath(
         instance,
         member.dataset,
         this.storagePath,
@@ -250,12 +252,12 @@ export class CopybookDownloaderForE4E {
     return false;
   }
 
-  private static getCopybookPath(
+  private static async getCopybookPath(
     instance: string,
     mapped: string,
     downloadFolder: string,
     copybook: string,
-  ): string {
+  ): Promise<string> {
     let folder = CopybookURI.createDatasetPath(
       instance,
       mapped,
@@ -263,7 +265,39 @@ export class CopybookDownloaderForE4E {
       E4E_FOLDER,
     );
 
-    if (!fs.existsSync(folder)) fs.mkdirSync(folder, { recursive: true });
+    /**
+     * There is an issue with VSCode File Watcher on Linux where it
+     * fails to watch subfolders changes when more subfolders are created
+     * all at once.
+     * https://github.com/microsoft/vscode/issues/142694
+     *
+     * As a workaround, the path is splitted into individual subfolders
+     * are they are created one by one.
+     */
+    const subfoldersPath = folder.replace(downloadFolder, "");
+    const subfolders = subfoldersPath.split(path.sep);
+    let finishedPath = downloadFolder;
+    for (const subfolder of subfolders) {
+      finishedPath = path.join(finishedPath, subfolder);
+
+      try {
+        await vscode.workspace.fs.createDirectory(
+          vscode.Uri.file(finishedPath),
+        );
+      } catch (err) {
+        if (err instanceof vscode.FileSystemError.FileExists) {
+          // ok - directory already exists, nothing to do
+          getChannel().appendLine(
+            `FileExists error while allocating '${finishedPath}' directory for copybooks: ${JSON.stringify(err)}`,
+          );
+        } else {
+          getChannel().appendLine(
+            `Unable to allocate ${finishedPath} - ${hasMember(err, "msg") && typeof err.msg === "string" && err.msg} ${JSON.stringify(err)}`,
+          );
+          break;
+        }
+      }
+    }
 
     folder = Path.join(
       folder,
@@ -272,7 +306,6 @@ export class CopybookDownloaderForE4E {
         copybook.indexOf(".") !== -1 ? copybook.indexOf(".") : copybook.length,
       ),
     );
-
     return folder;
   }
 

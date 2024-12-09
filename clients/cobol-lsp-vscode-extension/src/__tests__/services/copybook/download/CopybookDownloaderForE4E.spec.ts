@@ -19,6 +19,9 @@ import {
   e4eResponseDatasetFirst,
   e4eResponseEndevorFirst,
 } from "../../../../__mocks__/getE4EMock.utility";
+import * as extension from "../../../../extension";
+import * as vscode from "vscode";
+import * as os from "os";
 
 jest.mock("node:fs", () => ({
   promises: {
@@ -33,19 +36,26 @@ describe("e4e copybook downloader tests", () => {
 
   beforeEach(() => {
     e4e = {} as E4E;
+    jest.clearAllMocks();
   });
 
-  it("checks copybook downloaded into correct path", () => {
+  it("checks copybook downloaded into correct path - windows", async () => {
+    jest.spyOn(os, "type").mockReturnValue("Windows_NT");
+
+    jest.spyOn(extension, "getChannel").mockReturnValue({
+      appendLine: jest.fn(),
+    } as unknown as vscode.OutputChannel);
+
     expect(
-      CopybookDownloaderForE4E["getCopybookPath"](
+      await CopybookDownloaderForE4E["getCopybookPath"](
         "Instance.Instance",
         "pgm",
-        "/storagePath",
+        "C:\\Users\\Developer\\globalStorage",
         "Copy.cpy",
       ),
     ).toEqual(
       path.join(
-        "/storagePath",
+        "C:\\Users\\Developer\\globalStorage",
         "e4e",
         "copybooks",
         "Instance.Instance",
@@ -53,11 +63,89 @@ describe("e4e copybook downloader tests", () => {
         "Copy",
       ),
     );
-    expect(fs.mkdirSync).toHaveBeenCalledWith(
-      path.join("/storagePath", "e4e", "copybooks", "Instance.Instance", "pgm"),
-      { recursive: true },
-    );
+    expect(vscode.workspace.fs.createDirectory).toHaveBeenCalledWith({
+      path: path.join("C:\\Users\\Developer\\globalStorage"),
+    });
+    expect(vscode.workspace.fs.createDirectory).toHaveBeenCalledWith({
+      path: path.join("C:\\Users\\Developer\\globalStorage", "e4e"),
+    });
+    expect(vscode.workspace.fs.createDirectory).toHaveBeenCalledWith({
+      path: path.join(
+        "C:\\Users\\Developer\\globalStorage",
+        "e4e",
+        "copybooks",
+      ),
+    });
+    expect(vscode.workspace.fs.createDirectory).toHaveBeenCalledWith({
+      path: path.join(
+        "C:\\Users\\Developer\\globalStorage",
+        "e4e",
+        "copybooks",
+        "Instance.Instance",
+      ),
+    });
+    expect(vscode.workspace.fs.createDirectory).toHaveBeenCalledWith({
+      path: path.join(
+        "C:\\Users\\Developer\\globalStorage",
+        "e4e",
+        "copybooks",
+        "Instance.Instance",
+        "pgm",
+      ),
+    });
   });
+
+  it("checks copybook downloaded into correct path - unix", async () => {
+    jest.spyOn(os, "type").mockReturnValue("Linux");
+    jest.spyOn(extension, "getChannel").mockReturnValue({
+      appendLine: jest.fn(),
+    } as unknown as vscode.OutputChannel);
+
+    expect(
+      await CopybookDownloaderForE4E["getCopybookPath"](
+        "Instance.Instance",
+        "pgm",
+        "/home/developer/globalStorage",
+        "Copy.cpy",
+      ),
+    ).toEqual(
+      path.join(
+        "/home/developer/globalStorage",
+        "e4e",
+        "copybooks",
+        "Instance.Instance",
+        "pgm",
+        "Copy",
+      ),
+    );
+    expect(vscode.workspace.fs.createDirectory).toHaveBeenCalledWith({
+      path: path.join("/home/developer/globalStorage"),
+    });
+    expect(vscode.workspace.fs.createDirectory).toHaveBeenCalledWith({
+      path: path.join("/home/developer/globalStorage", "e4e"),
+    });
+    expect(vscode.workspace.fs.createDirectory).toHaveBeenCalledWith({
+      path: path.join("/home/developer/globalStorage", "e4e", "copybooks"),
+    });
+    expect(vscode.workspace.fs.createDirectory).toHaveBeenCalledWith({
+      path: path.join(
+        "/home/developer/globalStorage",
+        "e4e",
+        "copybooks",
+        "Instance.Instance",
+      ),
+    });
+    expect(vscode.workspace.fs.createDirectory).toHaveBeenCalledWith({
+      path: path.join(
+        "/home/developer/globalStorage",
+        "e4e",
+        "copybooks",
+        "Instance.Instance",
+        "pgm",
+      ),
+    });
+  });
+
   it("checks not to try to download any if member or element not available in e4e", async () => {
     const e4eDownloader = new CopybookDownloaderForE4E("/storagePath", e4e);
     const spyDownloadDataset = jest.spyOn(e4eDownloader, "downloadDatasetE4E");
