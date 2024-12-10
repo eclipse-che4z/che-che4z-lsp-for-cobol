@@ -667,20 +667,25 @@ cics_set_ipconn: IPCONN cics_data_value ((ACQUIRED | RELEASED | NOTPENDING | CAN
                                         (CONNSTATUS | PENDSTATUS | PURGETYPE | RECOVSTATUS | SERVSTATUS | UOWACTION) cics_cvda | cics_handle_response)+;
 cics_set_irc: IRC ((CLOSED | IMMCLOSE | OPEN) | OPENSTATUS cics_cvda | cics_handle_response)+;
 cics_set_journalname: JOURNALNAME cics_data_value ((FLUSH | RESET | DISABLED | ENABLED) | (ACTION | STATUS) cics_cvda | cics_handle_response)+;
-cics_set_journalnum: JOURNALNUM (A | cics_handle_response)+;
-cics_set_jvmendpoint: JVMENDPOINT (A | cics_handle_response)+;
-cics_set_jvmserver: JVMSERVER (A | cics_handle_response)+;
-cics_set_library: LIBRARY (A | cics_handle_response)+;
-cics_set_modename: MODENAME (A | cics_handle_response)+;
-cics_set_monitor: MONITOR (A | cics_handle_response)+;
-cics_set_mqconn: MQCONN (A | cics_handle_response)+;
-cics_set_mqmonitor: MQMONITOR (A | cics_handle_response)+;
-cics_set_netname: NETNAME (A | cics_handle_response)+;
-cics_set_pipeline: PIPELINE (A | cics_handle_response)+;
-cics_set_processtype: PROCESSTYPE (A | cics_handle_response)+;
-cics_set_program: PROGRAM (A | cics_handle_response)+;
-cics_set_secdiscovery: SECDISCOVERY (A | cics_handle_response)+;
-cics_set_secrecording: SECRECORDING (A | cics_handle_response)+;
+cics_set_journalnum: JOURNALNUM cics_data_value ((FLUSH | RESET | DISABLED | ENABLED) | (ACTION | STATUS) cics_cvda | cics_handle_response)+;
+cics_set_jvmendpoint: JVMENDPOINT cics_data_value ((ENABLED | DISABLED) | JVMSERVER cics_data_value | ENABLESTATUS cics_cvda | cics_handle_response)+;
+cics_set_jvmserver: JVMSERVER cics_data_value ((ENABLED | DISABLED | PHASEOUT | PURGE | FORCEPURGE | KILL) | THREADLIMIT cics_data_value | (ENABLESTATUS | PURGETYPE) cics_cvda | cics_handle_response)+;
+cics_set_library: LIBRARY cics_data_value ((CRITICAL | NONCRITICAL | ENABLED | DISABLED) | RANKING cics_data_value | (CRITICALST | ENABLESTATUS) cics_cvda | cics_handle_response)+;
+cics_set_modename: MODENAME cics_data_value ((ACQUIRED | CLOSED) | (AVAILABLE | CONNECTION) cics_data_value | ACQSTATUS cics_cvda | cics_handle_response)+;
+cics_set_monitor: MONITOR ((COMPRESS | NOCOMPRESS | CONVERSE | NOCONVERSE | EXCEPT | NOEXCEPT | FREQUENCYMIN | IDNTY | NOIDNTY | PERF | NOPERF | RESRCE | NORESRCE | ON | OFF | SYNCPOINT | NOSYNCPOINT) |
+                            (DPLLIMIT | FILELIMIT | FREQUENCY | FREQUENCYHRS | FREQUENCYMIN | FREQUENCYSEC | FREQUENCYHRS | TSQUEUELIMIT | URIMAPLIMIT | WEBSERVLIMIT) cics_data_value |
+                            (COMPRESSST | CONVERSEST | EXCEPTCLASS | IDNTYCLASS | PERFCLASS | RESRCECLASS | STATUS | SYNCPOINTST) cics_cvda | cics_handle_response)+;
+cics_set_mqconn: MQCONN ((WAIT | NOWAIT | FORCE | CONNECTED | NOTCONNECTED | RESYNC | NORESYNC | GROUPRESYNC) | MQNAME cics_data_area | (BUSY | CONNECTST | RESYNCMEMBER) cics_cvda | cics_handle_response)+;
+cics_set_mqmonitor: MQMONITOR cics_data_value ((AUTOSTART | NOAUTOSTART | ENABLED | DISABLED | STARTED | STOPPED) | (AUTOSTATUS | ENABLESTATUS | MONSTATUS | AUTOSTATUS) cics_cvda | cics_handle_response)+;
+cics_set_netname: NETNAME cics_data_value ((EXITTRACE | NOEXITTRACE) | EXITTRACING cics_cvda | cics_handle_response)+;
+cics_set_pipeline: PIPELINE cics_data_value ((ENABLED | DISABLED) cics_data_value | RESPWAIT cics_data_area | ENABLESTATUS cics_cvda | cics_handle_response)+;
+cics_set_processtype: PROCESSTYPE cics_data_value ((SET | DISABLED | ENABLED | ACTIVITY | FULL | OFF | PROCESS) | (STATUS | AUDITLEVEL) cics_cvda | cics_handle_response)+;
+cics_set_program: PROGRAM cics_data_value ((CEDF | NOCEDF | NEWCOPY | PHASEIN | DPLSUBSET | FULLAPI | REPLICATOR | NOREPLICATOR | JVM | NOJVM | PRIVATE | SHARED | DISABLED | ENABLED) |
+                                          (JVMCLASS | JVMPROFILE | OPERATION) cics_data_value | (CEDFSTATUS | COPY | EXECUTIONSET | REPLICATION | RUNTIME | SHARESTATUS | STATUS | VERSION) cics_cvda | cics_handle_response)+;
+cics_set_secdiscovery: SECDISCOVERY ((ON | OFF | DISCOVERALL | DISCOVERALL) | (STATUS | CMD | DB2 | DCT | FCT | HFS | JCT | PCT | PPT | PSB | RES | TST | USER | CMD) cics_cvda | cics_handle_response)+;
+cics_set_secrecording: SECRECORDING cics_data_value ((ADD | MODIFY | REMOVE) | MAXIMUM cics_data_area | ACTION cics_cvda |
+                                    (ODADPTRID | ODADPTRDATA1 | ODADPTRDATA2 | ODADPTRDATA3 | ODAPPLID | ODCLNTIPADDR | ODCLNTPORT | ODFACILNAME |
+                                          ODFACILTYPE | ODIPFAMILY | ODLUNAME | ODNETID | ODNETWORKID | ODSERVERPORT | ODTCPIPS | ODTRANSID | ODUSERID) cics_data_value | cics_handle_response)+;
 cics_set_statistics: STATISTICS (A | cics_handle_response)+;
 cics_set_sysdumpcode: SYSDUMPCODE (A | cics_handle_response)+;
 cics_set_system: SYSTEM (A | cics_handle_response)+;

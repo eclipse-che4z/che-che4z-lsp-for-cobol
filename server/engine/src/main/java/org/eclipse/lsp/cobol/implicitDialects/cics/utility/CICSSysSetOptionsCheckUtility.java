@@ -779,34 +779,113 @@ public class CICSSysSetOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     }
 
     private void checkJournalnum(CICSParser.Cics_set_journalnumContext ctx) {
-        // Outdated, replaced with SET JOURNALNAME
+        checkHasIllegalOptions(ctx.JOURNALNUM(), "JOURNALNUM. Replace with JOURNALNAME.");
+        checkHasExactlyOneOption("ACTION, FLUSH or RESET", ctx, ctx.ACTION(), ctx.FLUSH(), ctx.RESET());
+        checkHasExactlyOneOption("STATUS, DISABLED or ENABLED", ctx, ctx.STATUS(), ctx.DISABLED(), ctx.ENABLED());
     }
 
-    private void checkJvmendpoint(CICSParser.Cics_set_jvmendpointContext ctx) {}
+    private void checkJvmendpoint(CICSParser.Cics_set_jvmendpointContext ctx) {
+        checkHasMandatoryOptions(ctx.JVMSERVER(), ctx, "JVMSERVER");
+        checkHasExactlyOneOption("ENABLESTATUS, ENABLED or DISABLED", ctx, ctx.ENABLESTATUS(), ctx.DISABLED(), ctx.ENABLED());
+    }
 
-    private void checkJvmserver(CICSParser.Cics_set_jvmserverContext ctx) {}
+    private void checkJvmserver(CICSParser.Cics_set_jvmserverContext ctx) {
+        checkMutuallyExclusiveOptions("PHASEOUT, PURGETYPE, PURGE, FORCEPURGE or KILL", ctx.PHASEOUT(), ctx.PURGETYPE(), ctx.PURGE(), ctx.FORCEPURGE(), ctx.KILL());
+        checkHasExactlyOneOption("ENABLESTATUS, ENABLED or DISABLED", ctx, ctx.ENABLESTATUS(), ctx.DISABLED(), ctx.ENABLED());
+    }
 
-    private void checkLibrary(CICSParser.Cics_set_libraryContext ctx) {}
+    private void checkLibrary(CICSParser.Cics_set_libraryContext ctx) {
+        checkMutuallyExclusiveOptions("CRITICALST, CRITICAL or NONCRITICAL", ctx.CRITICALST(), ctx.CRITICAL(), ctx.NONCRITICAL());
+        checkMutuallyExclusiveOptions("ENABLESTATUS, ENABLED or DISABLED", ctx.ENABLESTATUS(), ctx.ENABLED(), ctx.DISABLED());
+    }
 
-    private void checkModename(CICSParser.Cics_set_modenameContext ctx) {}
+    private void checkModename(CICSParser.Cics_set_modenameContext ctx) {
+        checkHasMandatoryOptions(ctx.CONNECTION(), ctx, "CONNECTION");
+        checkPrerequisiteIsMet(ctx.AVAILABLE(), ctx.ACQUIRED(), ctx, "ACQUIRED without AVAILABLE");
+        checkMutuallyExclusiveOptions("ACQSTATUS or ACQUIRED", ctx.ACQSTATUS(), ctx.ACQUIRED());
+        checkMutuallyExclusiveOptions("ACQSTATUS or CLOSED", ctx.ACQSTATUS(), ctx.CLOSED());
+    }
 
-    private void checkMonitor(CICSParser.Cics_set_monitorContext ctx) {}
+    private void checkMonitor(CICSParser.Cics_set_monitorContext ctx) {
+        checkMutuallyExclusiveOptions("COMPRESSST, COMPRESS or NOCOMPRESS", ctx.COMPRESSST(), ctx.COMPRESS(), ctx.NOCOMPRESS());
+        checkMutuallyExclusiveOptions("CONVERSEST, CONVERSE or NOCONVERSE", ctx.CONVERSEST(), ctx.CONVERSE(), ctx.NOCONVERSE());
+        checkMutuallyExclusiveOptions("EXCEPTCLASS, EXCEPT or NOEXCEPT", ctx.EXCEPTCLASS(), ctx.EXCEPT(), ctx.NOEXCEPT());
+        checkMutuallyExclusiveOptions("FREQUENCY or FREQUENCYHRS", ctx.FREQUENCY(), ctx.FREQUENCYHRS());
+        checkMutuallyExclusiveOptions("FREQUENCY or FREQUENCYMIN", ctx.FREQUENCY(), ctx.FREQUENCYMIN());
+        checkMutuallyExclusiveOptions("FREQUENCY or FREQUENCYSEC", ctx.FREQUENCY(), ctx.FREQUENCYSEC());
+        checkMutuallyExclusiveOptions("IDNTYCLASS, IDNTY or NOIDNTY", ctx.IDNTYCLASS(), ctx.IDNTY(), ctx.NOIDNTY());
+        checkMutuallyExclusiveOptions("PERFCLASS, PERF or NOPERF", ctx.PERFCLASS(), ctx.PERF(), ctx.NOPERF());
+        checkMutuallyExclusiveOptions("RESRCECLASS, RESRCE or NORESRCE", ctx.RESRCECLASS(), ctx.RESRCE(), ctx.NORESRCE());
+        checkMutuallyExclusiveOptions("STATUS, ON or OFF", ctx.STATUS(), ctx.ON(), ctx.OFF());
+        checkMutuallyExclusiveOptions("SYNCPOINTST, SYNCPOINT or NOSYNCPOINT", ctx.SYNCPOINTST(), ctx.SYNCPOINT(), ctx.NOSYNCPOINT());
+    }
 
-    private void checkMqconn(CICSParser.Cics_set_mqconnContext ctx) {}
+    private void checkMqconn(CICSParser.Cics_set_mqconnContext ctx) {
+        if (ctx.WAIT() != null || ctx.BUSY() != null || ctx.NOWAIT() != null || ctx.FORCE() != null)
+            checkHasExactlyOneOption("CONNECTST, CONNECTED or NOTCONNECTED", ctx, ctx.CONNECTST(), ctx.CONNECTED(), ctx.NOTCONNECTED());
 
-    private void checkMqmonitor(CICSParser.Cics_set_mqmonitorContext ctx) {}
+        checkMutuallyExclusiveOptions("WAIT, BUSY, NOWAIT or FORCE", ctx.WAIT(), ctx.BUSY(), ctx.NOWAIT(), ctx.FORCE());
+        checkMutuallyExclusiveOptions("CONNECTST, CONNECTED or NOTCONNECTED", ctx.CONNECTST(), ctx.CONNECTED(), ctx.NOTCONNECTED());
+        checkMutuallyExclusiveOptions("RESYNCMEMBER, RESYNC, NORESYNC or GROUPRESYNC", ctx.RESYNCMEMBER(), ctx.RESYNC(), ctx.NORESYNC(), ctx.GROUPRESYNC());
+    }
 
-    private void checkNetname(CICSParser.Cics_set_netnameContext ctx) {}
+    private void checkMqmonitor(CICSParser.Cics_set_mqmonitorContext ctx) {
+        checkMutuallyExclusiveOptions("AUTOSTATUS, AUTOSTART or NOAUTOSTART", ctx.AUTOSTATUS(), ctx.AUTOSTART(), ctx.NOAUTOSTART());
 
-    private void checkPipeline(CICSParser.Cics_set_pipelineContext ctx) {}
+        if (ctx.AUTOSTATUS() != null || ctx.AUTOSTART() != null ||  ctx.NOAUTOSTART() != null){
+            checkHasExactlyOneOption("ENABLESTATUS, ENABLED or DISABLED", ctx, ctx.ENABLESTATUS(), ctx.ENABLED(), ctx.DISABLED());
+            checkHasExactlyOneOption("MONSTATUS, STARTED or STOPPED", ctx, ctx.MONSTATUS(), ctx.STARTED(), ctx.STOPPED());
+        }
+    }
 
-    private void checkProcesstype(CICSParser.Cics_set_processtypeContext ctx) {}
+    private void checkNetname(CICSParser.Cics_set_netnameContext ctx) {
+        checkMutuallyExclusiveOptions("EXITTRACING, EXITTRACE or NOEXITTRACE", ctx.EXITTRACING(), ctx.EXITTRACE(), ctx.NOEXITTRACE());
+    }
 
-    private void checkProgram(CICSParser.Cics_set_programContext ctx) {}
+    private void checkPipeline(CICSParser.Cics_set_pipelineContext ctx) {
+        checkMutuallyExclusiveOptions("ENABLESTATUS, ENABLED or DISABLED", ctx.ENABLESTATUS(), ctx.ENABLED(), ctx.DISABLED());
+    }
 
-    private void checkSecdiscovery(CICSParser.Cics_set_secdiscoveryContext ctx) {}
+    private void checkProcesstype(CICSParser.Cics_set_processtypeContext ctx) {
+        checkMutuallyExclusiveOptions("STATUS, DISABLED or ENABLED", ctx.STATUS(), ctx.DISABLED(), ctx.ENABLED());
+        checkMutuallyExclusiveOptions("AUDITLEVEL, ACTIVITY, FULL, OFF or PROCESS", ctx.AUDITLEVEL(), ctx.ACTIVITY(), ctx.FULL(), ctx.OFF(), ctx.PROCESS());
+    }
 
-    private void checkSecrecording(CICSParser.Cics_set_secrecordingContext ctx) {}
+    private void checkProgram(CICSParser.Cics_set_programContext ctx) {
+        checkMutuallyExclusiveOptions("CEDFSTATUS, CEDF or NOCEDF", ctx.CEDFSTATUS(), ctx.CEDF(), ctx.NOCEDF());
+        checkMutuallyExclusiveOptions("COPY, NEWCOPY or PHASEIN", ctx.COPY(), ctx.NEWCOPY(), ctx.PHASEIN());
+        checkMutuallyExclusiveOptions("EXECUTIONSET, DPLSUBSET or FULLAPI", ctx.EXECUTIONSET(), ctx.DPLSUBSET(), ctx.FULLAPI());
+        checkMutuallyExclusiveOptions("REPLICATION, REPLICATOR or NOREPLICATOR", ctx.REPLICATION(), ctx.REPLICATOR(), ctx.NOREPLICATOR());
+        checkMutuallyExclusiveOptions("RUNTIME, JVM or NOJVM", ctx.RUNTIME(), ctx.JVM(), ctx.NOJVM());
+        checkMutuallyExclusiveOptions("SHARESTATUS, PRIVATE or SHARED", ctx.SHARESTATUS(), ctx.PRIVATE(), ctx.SHARED());
+        checkMutuallyExclusiveOptions("STATUS, DISABLED or ENABLED", ctx.STATUS(), ctx.DISABLED(), ctx.ENABLED());
+    }
+
+    private void checkSecdiscovery(CICSParser.Cics_set_secdiscoveryContext ctx) {
+        checkMutuallyExclusiveOptions("ON, OFF or STATUS", ctx.ON(), ctx.OFF(), ctx.STATUS());
+
+        checkMutuallyExclusiveOptions("CMD or DISCOVERALL", ctx.CMD(), ctx.DISCOVERALL());
+        checkMutuallyExclusiveOptions("DB2 or DISCOVERALL", ctx.DB2(), ctx.DISCOVERALL());
+        checkMutuallyExclusiveOptions("DCT or DISCOVERALL", ctx.DCT(), ctx.DISCOVERALL());
+        checkMutuallyExclusiveOptions("FCT or DISCOVERALL", ctx.FCT(), ctx.DISCOVERALL());
+        checkMutuallyExclusiveOptions("HFS or DISCOVERALL", ctx.HFS(), ctx.DISCOVERALL());
+        checkMutuallyExclusiveOptions("JCT or DISCOVERALL", ctx.JCT(), ctx.DISCOVERALL());
+        checkMutuallyExclusiveOptions("PCT or DISCOVERALL", ctx.PCT(), ctx.DISCOVERALL());
+        checkMutuallyExclusiveOptions("PPT or DISCOVERALL", ctx.PPT(), ctx.DISCOVERALL());
+        checkMutuallyExclusiveOptions("PSB or DISCOVERALL", ctx.PSB(), ctx.DISCOVERALL());
+        checkMutuallyExclusiveOptions("RES or DISCOVERALL", ctx.RES(), ctx.DISCOVERALL());
+        checkMutuallyExclusiveOptions("TST or DISCOVERALL", ctx.TST(), ctx.DISCOVERALL());
+        checkMutuallyExclusiveOptions("USER or DISCOVERALL", ctx.USER(), ctx.DISCOVERALL());
+    }
+
+    private void checkSecrecording(CICSParser.Cics_set_secrecordingContext ctx) {
+        checkPrerequisiteIsMet(ctx.ADD(), ctx.MAXIMUM(), ctx, "MAXIMUM without ADD");
+
+        checkMutuallyExclusiveOptions("ACTION, ADD MAXIMUM, MODIFY or REMOVE", ctx.ACTION(), ctx.ADD(), ctx.MODIFY(), ctx.REMOVE());
+        checkMutuallyExclusiveOptions("ODADPTRID, ODADPTRDATA1, ODADPTRDATA2, ODADPTRDATA3, ODAPPLID, ODCLNTIPADDR, ODCLNTPORT, ODFACILNAME, ODFACILTYPE, ODIPFAMILY, ODLUNAME, ODNETID, ODNETWORKID, ODSERVERPORT, ODTCPIPS, ODTRANSID or ODUSERID",
+                ctx.ODADPTRID(), ctx.ODADPTRDATA1(), ctx.ODADPTRDATA2(), ctx.ODADPTRDATA3(), ctx.ODAPPLID(), ctx.ODCLNTIPADDR(), ctx.ODCLNTPORT(), ctx.ODFACILNAME(), ctx.ODFACILTYPE(), ctx.ODIPFAMILY(), ctx.ODLUNAME(), ctx.ODNETID(),
+                ctx.ODNETWORKID(), ctx.ODSERVERPORT(), ctx.ODTCPIPS(), ctx.ODTRANSID(), ctx.ODUSERID());
+    }
 
     private void checkStatistics(CICSParser.Cics_set_statisticsContext ctx) {}
 
