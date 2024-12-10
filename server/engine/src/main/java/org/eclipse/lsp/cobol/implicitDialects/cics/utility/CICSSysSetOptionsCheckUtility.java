@@ -449,7 +449,7 @@ public class CICSSysSetOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     public <E extends ParserRuleContext> void checkOptions(E ctx) {
         switch (ctx.getRuleIndex()) {
             case RULE_cics_set_association_usercorrdata:
-                checkAssociation_usercorrdata((CICSParser.Cics_set_association_usercorrdataContext) ctx);
+                checkAssociationUsercorrdata((CICSParser.Cics_set_association_usercorrdataContext) ctx);
                 break;
             case RULE_cics_set_atomservice:
                 checkAtomservice((CICSParser.Cics_set_atomserviceContext) ctx);
@@ -572,7 +572,7 @@ public class CICSSysSetOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
                 checkSystem((CICSParser.Cics_set_systemContext) ctx);
                 break;
             case RULE_cics_set_tags_refresh:
-                checkTags_refresh((CICSParser.Cics_set_tags_refreshContext) ctx);
+                checkTagsRefresh((CICSParser.Cics_set_tags_refreshContext) ctx);
                 break;
             case RULE_cics_set_task:
                 checkTask((CICSParser.Cics_set_taskContext) ctx);
@@ -616,9 +616,6 @@ public class CICSSysSetOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
             case RULE_cics_set_tsqueue:
                 checkTsqueue((CICSParser.Cics_set_tsqueueContext) ctx);
                 break;
-            case RULE_cics_set_tsqname:
-                checkTsqname((CICSParser.Cics_set_tsqnameContext) ctx);
-                break;
             case RULE_cics_set_uow:
                 checkUow((CICSParser.Cics_set_uowContext) ctx);
                 break;
@@ -653,12 +650,12 @@ public class CICSSysSetOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     }
 
     // Helper Functions
-    private void checkAssociation_usercorrdata(CICSParser.Cics_set_association_usercorrdataContext ctx) {
+    private void checkAssociationUsercorrdata(CICSParser.Cics_set_association_usercorrdataContext ctx) {
         checkPrerequisiteIsMet(ctx.ASSOCIATION(), ctx.USERCORRDATA(), ctx, "ASSOCIATION");
     }
 
     private void checkAtomservice(CICSParser.Cics_set_atomserviceContext ctx) {
-        checkHasMutuallyExclusiveOptions("ENABLESTATUS, ENABLED or DISABLED", ctx.ENABLESTATUS(), ctx.ENABLED(), ctx.DISABLED());
+        checkMutuallyExclusiveOptions("ENABLESTATUS, ENABLED or DISABLED", ctx.ENABLESTATUS(), ctx.ENABLED(), ctx.DISABLED());
     }
 
     private void checkAutoinstall(CICSParser.Cics_set_autoinstallContext ctx) {
@@ -666,11 +663,11 @@ public class CICSSysSetOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     }
 
     private void checkBrfacility(CICSParser.Cics_set_brfacilityContext ctx) {
-        checkHasMutuallyExclusiveOptions("TERMSTATUS or RELEASED", ctx.TERMSTATUS(), ctx.RELEASED());
+        checkMutuallyExclusiveOptions("TERMSTATUS or RELEASED", ctx.TERMSTATUS(), ctx.RELEASED());
     }
 
     private void checkBundle(CICSParser.Cics_set_bundleContext ctx) {
-        checkHasMutuallyExclusiveOptions("AVAILSTATUS, AVAILABLE, UNAVAILABLE, ENABLESTATUS, ENABLED, DISABLED, COPY or PHASEIN", ctx.AVAILSTATUS(), ctx.AVAILABLE(), ctx.UNAVAILABLE(), ctx.ENABLESTATUS(), ctx.ENABLED(), ctx.DISABLED(), ctx.COPY(), ctx.PHASEIN());
+        checkMutuallyExclusiveOptions("AVAILSTATUS, AVAILABLE, UNAVAILABLE, ENABLESTATUS, ENABLED, DISABLED, COPY or PHASEIN", ctx.AVAILSTATUS(), ctx.AVAILABLE(), ctx.UNAVAILABLE(), ctx.ENABLESTATUS(), ctx.ENABLED(), ctx.DISABLED(), ctx.COPY(), ctx.PHASEIN());
     }
 
     private void checkConnection(CICSParser.Cics_set_connectionContext ctx) {
@@ -694,19 +691,19 @@ public class CICSSysSetOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     private void checkDb2tran(CICSParser.Cics_set_db2tranContext ctx) {}
 
     private void checkDeletshipped(CICSParser.Cics_set_deletshippedContext ctx) {
-        checkHasMutuallyExclusiveOptions("IDLE or IDLEHRS", ctx.IDLE(), ctx.IDLEHRS());
-        checkHasMutuallyExclusiveOptions("IDLE or IDLEMINS", ctx.IDLE(), ctx.IDLEMINS());
-        checkHasMutuallyExclusiveOptions("IDLE or IDLESECS", ctx.IDLE(), ctx.IDLESECS());
+        checkMutuallyExclusiveOptions("IDLE or IDLEHRS", ctx.IDLE(), ctx.IDLEHRS());
+        checkMutuallyExclusiveOptions("IDLE or IDLEMINS", ctx.IDLE(), ctx.IDLEMINS());
+        checkMutuallyExclusiveOptions("IDLE or IDLESECS", ctx.IDLE(), ctx.IDLESECS());
 
-        checkHasMutuallyExclusiveOptions("INTERVAL or INTERVALHRS", ctx.INTERVAL(), ctx.INTERVALHRS());
-        checkHasMutuallyExclusiveOptions("INTERVAL or INTERVALMINS", ctx.INTERVAL(), ctx.INTERVALMINS());
-        checkHasMutuallyExclusiveOptions("INTERVAL or INTERVALSECS", ctx.INTERVAL(), ctx.INTERVALSECS());
+        checkMutuallyExclusiveOptions("INTERVAL or INTERVALHRS", ctx.INTERVAL(), ctx.INTERVALHRS());
+        checkMutuallyExclusiveOptions("INTERVAL or INTERVALMINS", ctx.INTERVAL(), ctx.INTERVALMINS());
+        checkMutuallyExclusiveOptions("INTERVAL or INTERVALSECS", ctx.INTERVAL(), ctx.INTERVALSECS());
     }
 
     private void checkDispatcher(CICSParser.Cics_set_dispatcherContext ctx) {}
 
     private void checkDoctemplate(CICSParser.Cics_set_doctemplateContext ctx) {
-        checkHasExactlyOneOption("COPY or NEWCOPY", ctx, ctx.COPY(), ctx.NEWCOPY());
+        checkForExactlyOne("COPY or NEWCOPY", ctx, ctx.COPY(), ctx.NEWCOPY());
     }
 
     private void checkDsname(CICSParser.Cics_set_dsnameContext ctx) {
@@ -723,7 +720,7 @@ public class CICSSysSetOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     }
 
     private void checkEnqmodel(CICSParser.Cics_set_enqmodelContext ctx) {
-        checkHasExactlyOneOption("STATUS, ENABLED or DISABLED", ctx, ctx.STATUS(), ctx.ENABLED(), ctx.DISABLED());
+        checkForExactlyOne("STATUS, ENABLED or DISABLED", ctx, ctx.STATUS(), ctx.ENABLED(), ctx.DISABLED());
     }
 
     private void checkEpadapter(CICSParser.Cics_set_epadapterContext ctx) {
@@ -737,7 +734,7 @@ public class CICSSysSetOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     }
 
     private void checkEventprocess(CICSParser.Cics_set_eventprocessContext ctx) {
-        checkHasExactlyOneOption("EPSTATUS, STARTED, DRAIN or STOPPED", ctx, ctx.EPSTATUS(), ctx.STARTED(), ctx.DRAIN(), ctx.STOPPED());
+        checkForExactlyOne("EPSTATUS, STARTED, DRAIN or STOPPED", ctx, ctx.EPSTATUS(), ctx.STARTED(), ctx.DRAIN(), ctx.STOPPED());
     }
 
     private void checkFile(CICSParser.Cics_set_fileContext ctx) {
@@ -774,24 +771,24 @@ public class CICSSysSetOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     }
 
     private void checkJournalname(CICSParser.Cics_set_journalnameContext ctx) {
-        checkHasExactlyOneOption("ACTION, FLUSH or RESET", ctx, ctx.ACTION(), ctx.FLUSH(), ctx.RESET());
-        checkHasExactlyOneOption("STATUS, DISABLED or ENABLED", ctx, ctx.STATUS(), ctx.DISABLED(), ctx.ENABLED());
+        checkForExactlyOne("ACTION, FLUSH or RESET", ctx, ctx.ACTION(), ctx.FLUSH(), ctx.RESET());
+        checkForExactlyOne("STATUS, DISABLED or ENABLED", ctx, ctx.STATUS(), ctx.DISABLED(), ctx.ENABLED());
     }
 
     private void checkJournalnum(CICSParser.Cics_set_journalnumContext ctx) {
         checkHasIllegalOptions(ctx.JOURNALNUM(), "JOURNALNUM. Replace with JOURNALNAME.");
-        checkHasExactlyOneOption("ACTION, FLUSH or RESET", ctx, ctx.ACTION(), ctx.FLUSH(), ctx.RESET());
-        checkHasExactlyOneOption("STATUS, DISABLED or ENABLED", ctx, ctx.STATUS(), ctx.DISABLED(), ctx.ENABLED());
+        checkForExactlyOne("ACTION, FLUSH or RESET", ctx, ctx.ACTION(), ctx.FLUSH(), ctx.RESET());
+        checkForExactlyOne("STATUS, DISABLED or ENABLED", ctx, ctx.STATUS(), ctx.DISABLED(), ctx.ENABLED());
     }
 
     private void checkJvmendpoint(CICSParser.Cics_set_jvmendpointContext ctx) {
         checkHasMandatoryOptions(ctx.JVMSERVER(), ctx, "JVMSERVER");
-        checkHasExactlyOneOption("ENABLESTATUS, ENABLED or DISABLED", ctx, ctx.ENABLESTATUS(), ctx.DISABLED(), ctx.ENABLED());
+        checkForExactlyOne("ENABLESTATUS, ENABLED or DISABLED", ctx, ctx.ENABLESTATUS(), ctx.DISABLED(), ctx.ENABLED());
     }
 
     private void checkJvmserver(CICSParser.Cics_set_jvmserverContext ctx) {
         checkMutuallyExclusiveOptions("PHASEOUT, PURGETYPE, PURGE, FORCEPURGE or KILL", ctx.PHASEOUT(), ctx.PURGETYPE(), ctx.PURGE(), ctx.FORCEPURGE(), ctx.KILL());
-        checkHasExactlyOneOption("ENABLESTATUS, ENABLED or DISABLED", ctx, ctx.ENABLESTATUS(), ctx.DISABLED(), ctx.ENABLED());
+        checkForExactlyOne("ENABLESTATUS, ENABLED or DISABLED", ctx, ctx.ENABLESTATUS(), ctx.DISABLED(), ctx.ENABLED());
     }
 
     private void checkLibrary(CICSParser.Cics_set_libraryContext ctx) {
@@ -822,7 +819,7 @@ public class CICSSysSetOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
 
     private void checkMqconn(CICSParser.Cics_set_mqconnContext ctx) {
         if (ctx.WAIT() != null || ctx.BUSY() != null || ctx.NOWAIT() != null || ctx.FORCE() != null)
-            checkHasExactlyOneOption("CONNECTST, CONNECTED or NOTCONNECTED", ctx, ctx.CONNECTST(), ctx.CONNECTED(), ctx.NOTCONNECTED());
+            checkForExactlyOne("CONNECTST, CONNECTED or NOTCONNECTED", ctx, ctx.CONNECTST(), ctx.CONNECTED(), ctx.NOTCONNECTED());
 
         checkMutuallyExclusiveOptions("WAIT, BUSY, NOWAIT or FORCE", ctx.WAIT(), ctx.BUSY(), ctx.NOWAIT(), ctx.FORCE());
         checkMutuallyExclusiveOptions("CONNECTST, CONNECTED or NOTCONNECTED", ctx.CONNECTST(), ctx.CONNECTED(), ctx.NOTCONNECTED());
@@ -832,9 +829,9 @@ public class CICSSysSetOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     private void checkMqmonitor(CICSParser.Cics_set_mqmonitorContext ctx) {
         checkMutuallyExclusiveOptions("AUTOSTATUS, AUTOSTART or NOAUTOSTART", ctx.AUTOSTATUS(), ctx.AUTOSTART(), ctx.NOAUTOSTART());
 
-        if (ctx.AUTOSTATUS() != null || ctx.AUTOSTART() != null ||  ctx.NOAUTOSTART() != null){
-            checkHasExactlyOneOption("ENABLESTATUS, ENABLED or DISABLED", ctx, ctx.ENABLESTATUS(), ctx.ENABLED(), ctx.DISABLED());
-            checkHasExactlyOneOption("MONSTATUS, STARTED or STOPPED", ctx, ctx.MONSTATUS(), ctx.STARTED(), ctx.STOPPED());
+        if (ctx.AUTOSTATUS() != null || ctx.AUTOSTART() != null ||  ctx.NOAUTOSTART() != null) {
+            checkForExactlyOne("ENABLESTATUS, ENABLED or DISABLED", ctx, ctx.ENABLESTATUS(), ctx.ENABLED(), ctx.DISABLED());
+            checkForExactlyOne("MONSTATUS, STARTED or STOPPED", ctx, ctx.MONSTATUS(), ctx.STARTED(), ctx.STOPPED());
         }
     }
 
@@ -887,61 +884,172 @@ public class CICSSysSetOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
                 ctx.ODNETWORKID(), ctx.ODSERVERPORT(), ctx.ODTCPIPS(), ctx.ODTRANSID(), ctx.ODUSERID());
     }
 
-    private void checkStatistics(CICSParser.Cics_set_statisticsContext ctx) {}
+    private void checkStatistics(CICSParser.Cics_set_statisticsContext ctx) {
+        checkMutuallyExclusiveOptions("ENDOFDAY or ENDOFDAYHRS", ctx.ENDOFDAY(), ctx.ENDOFDAYHRS());
+        checkMutuallyExclusiveOptions("ENDOFDAY or ENDOFDAYMINS", ctx.ENDOFDAY(), ctx.ENDOFDAYMINS());
+        checkMutuallyExclusiveOptions("ENDOFDAY or ENDOFDAYSECS", ctx.ENDOFDAY(), ctx.ENDOFDAYSECS());
 
-    private void checkSysdumpcode(CICSParser.Cics_set_sysdumpcodeContext ctx) {}
+        checkMutuallyExclusiveOptions("INTERVAL or INTERVALHRS", ctx.INTERVAL(), ctx.INTERVALHRS());
+        checkMutuallyExclusiveOptions("INTERVAL or INTERVALMINS", ctx.INTERVAL(), ctx.INTERVALMINS());
+        checkMutuallyExclusiveOptions("INTERVAL or INTERVALSECS", ctx.INTERVAL(), ctx.INTERVALSECS());
 
-    private void checkSystem(CICSParser.Cics_set_systemContext ctx) {}
+        checkMutuallyExclusiveOptions("RECORDING, ON or OFF", ctx.RECORDING(), ctx.ON(), ctx.OFF());
+        if (ctx.RECORDNOW() != null || ctx.RESETNOW() != null) {
+            checkForExactlyOne("RECORDING, ON or OFF", ctx, ctx.RECORDING(), ctx.ON(), ctx.OFF());
+        }
+    }
 
-    private void checkTags_refresh(CICSParser.Cics_set_tags_refreshContext ctx) {}
+    private void checkSysdumpcode(CICSParser.Cics_set_sysdumpcodeContext ctx) {
+        checkMutuallyExclusiveOptions("ACTION, ADD, REMOVE or RESET", ctx.ACTION(), ctx.ADD(), ctx.REMOVE(), ctx.RESET());
+        checkMutuallyExclusiveOptions("DAEOPTION, DAE or NODAE", ctx.DAEOPTION(), ctx.DAE(), ctx.NODAE());
+        checkMutuallyExclusiveOptions("DUMPSCOPE, LOCAL or RELATED", ctx.DUMPSCOPE(), ctx.LOCAL(), ctx.RELATED());
+        checkMutuallyExclusiveOptions("SHUTOPTION, NOSHUTDOWN or SHUTDOWN", ctx.SHUTOPTION(), ctx.NOSHUTDOWN(), ctx.SHUTDOWN());
+        checkMutuallyExclusiveOptions("SYSDUMPING, NOSYSDUMP or SYSDUMP", ctx.SYSDUMPING(), ctx.NOSYSDUMP(), ctx.SYSDUMP());
+    }
 
-    private void checkTask(CICSParser.Cics_set_taskContext ctx) {}
+    private void checkSystem(CICSParser.Cics_set_systemContext ctx) {
+        // No checks due to repeat nature.
+    }
 
-    private void checkTclass(CICSParser.Cics_set_tclassContext ctx) {}
+    private void checkTagsRefresh(CICSParser.Cics_set_tags_refreshContext ctx) {
+        checkHasMandatoryOptions(ctx.REFRESH(), ctx, "REFRESH");
+    }
 
-    private void checkTcpip(CICSParser.Cics_set_tcpipContext ctx) {}
+    private void checkTask(CICSParser.Cics_set_taskContext ctx) {
+        checkMutuallyExclusiveOptions("PURGETYPE, FORCEPURGE, KILL or PURGE", ctx.PURGETYPE(), ctx.FORCEPURGE(), ctx.KILL(), ctx.PURGE());
+        checkMutuallyExclusiveOptions("SRRSTATUS, SRRACTIVE or SRRINACTIVE", ctx.SRRSTATUS(), ctx.SRRACTIVE(), ctx.SRRINACTIVE());
+    }
 
-    private void checkTcpipservice(CICSParser.Cics_set_tcpipserviceContext ctx) {}
+    private void checkTclass(CICSParser.Cics_set_tclassContext ctx) {
+        // No checks needed
+    }
 
-    private void checkTdqueue(CICSParser.Cics_set_tdqueueContext ctx) {}
+    private void checkTcpip(CICSParser.Cics_set_tcpipContext ctx) {
+        checkHasMandatoryOptions(ctx.MAXSOCKETS(), ctx, "MAXSOCKETS");
+        checkHasMandatoryOptions(ctx.NEWMAXSOCKET(), ctx, "NEWMAXSOCKET");
+        checkMutuallyExclusiveOptions("OPENSTATUS, CLOSED, IMMCLOSE or OPEN", ctx.OPENSTATUS(), ctx.CLOSED(), ctx.IMMCLOSE(), ctx.OPEN());
+    }
 
-    private void checkTempstorage(CICSParser.Cics_set_tempstorageContext ctx) {}
+    private void checkTcpipservice(CICSParser.Cics_set_tcpipserviceContext ctx) {
+        checkHasMandatoryOptions(ctx.BACKLOG(), ctx, "BACKLOG");
+        checkHasMandatoryOptions(ctx.MAXDATALEN(), ctx, "MAXDATALEN");
+        checkMutuallyExclusiveOptions("OPENSTATUS, CLOSED, IMMCLOSE or OPEN", ctx.OPENSTATUS(), ctx.CLOSED(), ctx.IMMCLOSE(), ctx.OPEN());
+    }
 
-    private void checkTerminal(CICSParser.Cics_set_terminalContext ctx) {}
+    private void checkTdqueue(CICSParser.Cics_set_tdqueueContext ctx) {
+        checkMutuallyExclusiveOptions("ATIFACILITY, NOTERMINAL or TERMINAL", ctx.ATIFACILITY(), ctx.NOTERMINAL(), ctx.TERMINAL());
+        checkMutuallyExclusiveOptions("ENABLESTATUS, DISABLED or ENABLED", ctx.ENABLESTATUS(), ctx.DISABLED(), ctx.ENABLED());
+        checkMutuallyExclusiveOptions("OPENSTATUS, CLOSED or OPEN", ctx.OPENSTATUS(), ctx.CLOSED(), ctx.OPEN());
+    }
 
-    private void checkTracedest(CICSParser.Cics_set_tracedestContext ctx) {}
+    private void checkTempstorage(CICSParser.Cics_set_tempstorageContext ctx) {
+        checkHasMandatoryOptions(ctx.TSMAINLIMIT(), ctx, "TSMAINLIMIT");
+    }
 
-    private void checkTraceflag(CICSParser.Cics_set_traceflagContext ctx) {}
+    private void checkTerminal(CICSParser.Cics_set_terminalContext ctx) {
+        checkMutuallyExclusiveOptions("ACQSTATUS, TERMSTATUS, ACQUIRED, COLDACQ or RELEASED", ctx.ACQSTATUS(), ctx.TERMSTATUS(), ctx.ACQUIRED(), ctx.COLDACQ(), ctx.RELEASED());
+        checkMutuallyExclusiveOptions("ALTPRTCOPYST, ALTPRTCOPY or NOALTPRTCOPY", ctx.ALTPRTCOPYST(), ctx.ALTPRTCOPY(), ctx.NOALTPRTCOPY());
+        checkMutuallyExclusiveOptions("ATISTATUS, ATI or NOATI", ctx.ATISTATUS(), ctx.ATI(), ctx.NOATI());
+        checkMutuallyExclusiveOptions("CREATESESS, CREATE or NOCREATE", ctx.CREATESESS(), ctx.CREATE(), ctx.NOCREATE());
+        checkMutuallyExclusiveOptions("DISCREQST, DISCREQ or NODISCREQ", ctx.DISCREQST(), ctx.DISCREQ(), ctx.NODISCREQ());
+        checkMutuallyExclusiveOptions("EXITTRACING, EXITTRACE or NOEXITTRACE", ctx.EXITTRACING(), ctx.EXITTRACE(), ctx.NOEXITTRACE());
+        checkMutuallyExclusiveOptions("OBFORMATST, OBFORMAT or NOOBFORMAT", ctx.OBFORMATST(), ctx.OBFORMAT(), ctx.NOOBFORMAT());
+        checkMutuallyExclusiveOptions("PAGESTATUS, AUTOPAGEABLE or PAGEABLE", ctx.PAGESTATUS(), ctx.AUTOPAGEABLE(), ctx.PAGEABLE());
+        checkMutuallyExclusiveOptions("PRTCOPYST, PRTCOPY or NOPRTCOPY", ctx.PRTCOPYST(), ctx.PRTCOPY(), ctx.NOPRTCOPY());
+        checkMutuallyExclusiveOptions("PURGETYPE, FORCEPURGE, KILL, PURGEFORCE or CANCEL", ctx.PURGETYPE(), ctx.FORCEPURGE(), ctx.KILL(), ctx.PURGEFORCE(), ctx.CANCEL());
+        checkPrerequisiteIsMet(ctx.PURGE(), ctx.FORCE(), ctx, "FORCE without PURGE");
+        checkMutuallyExclusiveOptions("RELREQST, RELREQ or NORELREQ", ctx.RELREQST(), ctx.RELREQ(), ctx.NORELREQ());
+        checkMutuallyExclusiveOptions("SERVSTATUS, INSERVICE or OUTSERVICE", ctx.SERVSTATUS(), ctx.INSERVICE(), ctx.OUTSERVICE());
+        checkMutuallyExclusiveOptions("TRACING, SPECTRACE or STANTRACE", ctx.TRACING(), ctx.SPECTRACE(), ctx.STANTRACE());
+        checkMutuallyExclusiveOptions("TTISTATUS, NOTTI or TTI", ctx.TTISTATUS(), ctx.NOTTI(), ctx.TTI());
+        checkMutuallyExclusiveOptions("UCTRANST, UCTRAN, NOUCTRAN or TRANIDONLY", ctx.UCTRANST(), ctx.UCTRAN(), ctx.NOUCTRAN(), ctx.TRANIDONLY());
+        checkMutuallyExclusiveOptions("ZCPTRACING, NOZCPTRACE or ZCPTRACE", ctx.ZCPTRACING(), ctx.NOZCPTRACE(), ctx.ZCPTRACE());
+    }
 
-    private void checkTracetype(CICSParser.Cics_set_tracetypeContext ctx) {}
+    private void checkTracedest(CICSParser.Cics_set_tracedestContext ctx) {
+        checkMutuallyExclusiveOptions("AUXSTATUS, AUXPAUSE, AUXSTART or AUXSTOP", ctx.AUXSTATUS(), ctx.AUXPAUSE(), ctx.AUXSTART(), ctx.AUXSTOP());
+        checkMutuallyExclusiveOptions("GTFSTATUS, GTFSTART or GTFSTOP", ctx.GTFSTATUS(), ctx.GTFSTART(), ctx.GTFSTOP());
+        checkMutuallyExclusiveOptions("INTSTATUS, INTSTART or INTSTOP", ctx.INTSTATUS(), ctx.INTSTART(), ctx.INTSTOP());
+        checkMutuallyExclusiveOptions("SWITCHACTION or SWITCH", ctx.SWITCHACTION(), ctx.SWITCH());
+        checkMutuallyExclusiveOptions("SWITCHSTATUS, NOSWITCH, SWITCHNEXT or SWITCHALL", ctx.SWITCHSTATUS(), ctx.NOSWITCH(), ctx.SWITCHNEXT(), ctx.SWITCHALL());
+    }
 
-    private void checkTranclass(CICSParser.Cics_set_tranclassContext ctx) {}
+    private void checkTraceflag(CICSParser.Cics_set_traceflagContext ctx) {
+        checkMutuallyExclusiveOptions("SINGLESTATUS, SINGLEOFF or SINGLEON", ctx.SINGLESTATUS(), ctx.SINGLEOFF(), ctx.SINGLEON());
+        checkMutuallyExclusiveOptions("SYSTEMSTATUS, SYSTEMOFF or SYSTEMON", ctx.SYSTEMSTATUS(), ctx.SYSTEMOFF(), ctx.SYSTEMON());
+        checkMutuallyExclusiveOptions("TCEXITSTATUS, TCEXITALL, TCEXITALLOFF, TCEXITNONE or TCEXITSYSTEM", ctx.TCEXITSTATUS(), ctx.TCEXITALL(), ctx.TCEXITALLOFF(), ctx.TCEXITNONE(), ctx.TCEXITSYSTEM());
+        checkMutuallyExclusiveOptions("USERSTATUS, USEROFF or USERON", ctx.USERSTATUS(), ctx.USEROFF(), ctx.USERON());
+    }
 
-    private void checkTrandumpcode(CICSParser.Cics_set_trandumpcodeContext ctx) {}
+    private void checkTracetype(CICSParser.Cics_set_tracetypeContext ctx) {
+        checkForExactlyOne("FLAGSET, SPECIAL or STANDARD", ctx, ctx.FLAGSET(), ctx.SPECIAL(), ctx.STANDARD());
+    }
 
-    private void checkTransaction(CICSParser.Cics_set_transactionContext ctx) {}
+    private void checkTranclass(CICSParser.Cics_set_tranclassContext ctx) {
+        checkMutuallyExclusiveOptions("PURGEACTION, ABEND or DISCARD", ctx.PURGEACTION(), ctx.ABEND(), ctx.DISCARD());
+    }
 
-    private void checkTsqueue(CICSParser.Cics_set_tsqueueContext ctx) {}
+    private void checkTrandumpcode(CICSParser.Cics_set_trandumpcodeContext ctx) {
+        checkMutuallyExclusiveOptions("ACTION, ADD, REMOVE or RESET", ctx.ACTION(), ctx.ADD(), ctx.REMOVE(), ctx.RESET());
+        checkMutuallyExclusiveOptions("DUMPSCOPE, LOCAL or RELATED", ctx.DUMPSCOPE(), ctx.LOCAL(), ctx.RELATED());
+        checkMutuallyExclusiveOptions("SHUTOPTION, NOSHUTDOWN or SHUTDOWN", ctx.SHUTOPTION(), ctx.NOSHUTDOWN(), ctx.SHUTDOWN());
+        checkMutuallyExclusiveOptions("SYSDUMPING, NOSYSDUMP or SYSDUMP", ctx.SYSDUMPING(), ctx.NOSYSDUMP(), ctx.SYSDUMP());
+        checkMutuallyExclusiveOptions("TRANDUMPING, NOTRANDUMP or TRANDUMP", ctx.TRANDUMPING(), ctx.NOTRANDUMP(), ctx.TRANDUMP());
+    }
 
-    private void checkTsqname(CICSParser.Cics_set_tsqnameContext ctx) {}
+    private void checkTransaction(CICSParser.Cics_set_transactionContext ctx) {
+        checkMutuallyExclusiveOptions("DUMPING, TRANDUMP or NOTRANDUMP", ctx.DUMPING(), ctx.TRANDUMP(), ctx.NOTRANDUMP());
+        checkMutuallyExclusiveOptions("PURGEABILITY, NOTPURGEABLE or PURGEABLE", ctx.PURGEABILITY(), ctx.NOTPURGEABLE(), ctx.PURGEABLE());
+        checkMutuallyExclusiveOptions("RUNAWAYTYPE, SYSTEM or USER", ctx.RUNAWAYTYPE(), ctx.SYSTEM(), ctx.USER());
+        checkMutuallyExclusiveOptions("SHUTDOWN, SHUTDISABLED or SHUTENABLED", ctx.SHUTDOWN(), ctx.SHUTDISABLED(), ctx.SHUTENABLED());
+        checkMutuallyExclusiveOptions("STATUS, DISABLED or ENABLED", ctx.STATUS(), ctx.DISABLED(), ctx.ENABLED());
+        checkMutuallyExclusiveOptions("TCLASS or TRANCLASS", ctx.TCLASS(), ctx.TRANCLASS());
+        checkMutuallyExclusiveOptions("TRACING, SPECTRACE, SPRSTRACE or STANTRACE", ctx.TRACING(), ctx.SPECTRACE(), ctx.SPRSTRACE(), ctx.STANTRACE());
+    }
 
-    private void checkUow(CICSParser.Cics_set_uowContext ctx) {}
+    private void checkTsqueue(CICSParser.Cics_set_tsqueueContext ctx) {
+        checkForExactlyOne("TSQUEUE or TSQNAME", ctx, ctx.TSQUEUE(), ctx.TSQNAME());
+        checkMutuallyExclusiveOptions("SYSID or POOLNAME", ctx.TSQUEUE(), ctx.TSQNAME());
+        checkPrerequisiteIsMet(ctx.ACTION(), ctx.LASTUSEDINT(), ctx, "LASTUSEDINT without ACTION");
+    }
 
-    private void checkUowlink(CICSParser.Cics_set_uowlinkContext ctx) {}
+    private void checkUow(CICSParser.Cics_set_uowContext ctx) {
+        checkForExactlyOne("UOWSTATE, COMMIT, BACKOUT or FORCE", ctx, ctx.UOWSTATE(), ctx.COMMIT(), ctx.BACKOUT(), ctx.FORCE());
+    }
 
-    private void checkUrimap(CICSParser.Cics_set_urimapContext ctx) {}
+    private void checkUowlink(CICSParser.Cics_set_uowlinkContext ctx) {
+        checkMutuallyExclusiveOptions("ACTION or DELETE", ctx.ACTION(), ctx.DELETE());
+    }
+
+    private void checkUrimap(CICSParser.Cics_set_urimapContext ctx) {
+        checkMutuallyExclusiveOptions("ENABLESTATUS, DISABLED or ENABLED", ctx.ENABLESTATUS(), ctx.DISABLED(), ctx.ENABLED());
+        checkMutuallyExclusiveOptions("REDIRECTTYPE, NONE, PERMANENT or TEMPORARY", ctx.REDIRECTTYPE(), ctx.NONE(), ctx.PERMANENT(), ctx.TEMPORARY());
+    }
 
     private void checkVolume(CICSParser.Cics_set_volumeContext ctx) {}
 
-    private void checkVtam(CICSParser.Cics_set_vtamContext ctx) {}
+    private void checkVtam(CICSParser.Cics_set_vtamContext ctx) {
+        checkMutuallyExclusiveOptions("OPENSTATUS, CLOSED, FORCECLOSE, IMMCLOSE or OPEN", ctx.OPENSTATUS(), ctx.CLOSED(), ctx.FORCECLOSE(), ctx.IMMCLOSE(), ctx.OPEN());
+        checkMutuallyExclusiveOptions("PSDINTERVAL or PSDINTHRS", ctx.PSDINTERVAL(), ctx.PSDINTHRS());
+        checkMutuallyExclusiveOptions("PSDINTERVAL or PSDINTMINS", ctx.PSDINTERVAL(), ctx.PSDINTMINS());
+        checkMutuallyExclusiveOptions("PSDINTERVAL or PSDINTSECS", ctx.PSDINTERVAL(), ctx.PSDINTSECS());
+    }
 
-    private void checkWeb(CICSParser.Cics_set_webContext ctx) {}
+    private void checkWeb(CICSParser.Cics_set_webContext ctx) {
+        // No checks needed
+    }
 
-    private void checkWebservice(CICSParser.Cics_set_webserviceContext ctx) {}
+    private void checkWebservice(CICSParser.Cics_set_webserviceContext ctx) {
+        checkMutuallyExclusiveOptions("VALIDATIONST, VALIDATION or NOVALIDATION", ctx.VALIDATIONST(), ctx.VALIDATION(), ctx.NOVALIDATION());
+    }
 
-    private void checkWlmhealth(CICSParser.Cics_set_wlmhealthContext ctx) {}
+    private void checkWlmhealth(CICSParser.Cics_set_wlmhealthContext ctx) {
+        checkMutuallyExclusiveOptions("ADJUSTMENT, INTERVAL or OPENSTATUS", ctx.ADJUSTMENT(), ctx.INTERVAL(), ctx.OPENSTATUS());
+    }
 
-    private void checkXmltransform(CICSParser.Cics_set_xmltransformContext ctx) {}
+    private void checkXmltransform(CICSParser.Cics_set_xmltransformContext ctx) {
+        checkMutuallyExclusiveOptions("VALIDATIONST, VALIDATION or NOVALIDATION", ctx.VALIDATIONST(), ctx.VALIDATION(), ctx.NOVALIDATION());
+    }
 
 
 }

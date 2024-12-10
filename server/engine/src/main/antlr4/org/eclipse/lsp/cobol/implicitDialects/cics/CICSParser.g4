@@ -631,7 +631,7 @@ cics_set: SET (cics_set_association_usercorrdata | cics_set_atomservice | cics_s
         cics_set_library | cics_set_modename | cics_set_monitor | cics_set_mqconn | cics_set_mqmonitor | cics_set_netname | cics_set_pipeline | cics_set_processtype | cics_set_program |
         cics_set_secdiscovery | cics_set_secrecording | cics_set_statistics | cics_set_sysdumpcode | cics_set_system | cics_set_tags_refresh | cics_set_task |
         cics_set_tclass | cics_set_tcpip | cics_set_tcpipservice | cics_set_tdqueue | cics_set_tempstorage | cics_set_terminal | cics_set_tracedest | cics_set_traceflag |
-        cics_set_tracetype | cics_set_tranclass | cics_set_trandumpcode | cics_set_transaction | cics_set_tsqueue | cics_set_tsqname |
+        cics_set_tracetype | cics_set_tranclass | cics_set_trandumpcode | cics_set_transaction | cics_set_tsqueue |
         cics_set_uow | cics_set_uowlink | cics_set_urimap | cics_set_volume | cics_set_vtam | cics_set_web | cics_set_webservice | cics_set_wlmhealth | cics_set_xmltransform);
 
 cics_set_association_usercorrdata: ASSOCIATION (USERCORRDATA cics_data_value | cics_handle_response)+;
@@ -685,35 +685,43 @@ cics_set_program: PROGRAM cics_data_value ((CEDF | NOCEDF | NEWCOPY | PHASEIN | 
 cics_set_secdiscovery: SECDISCOVERY ((ON | OFF | DISCOVERALL | DISCOVERALL) | (STATUS | CMD | DB2 | DCT | FCT | HFS | JCT | PCT | PPT | PSB | RES | TST | USER | CMD) cics_cvda | cics_handle_response)+;
 cics_set_secrecording: SECRECORDING cics_data_value ((ADD | MODIFY | REMOVE) | MAXIMUM cics_data_area | ACTION cics_cvda |
                                     (ODADPTRID | ODADPTRDATA1 | ODADPTRDATA2 | ODADPTRDATA3 | ODAPPLID | ODCLNTIPADDR | ODCLNTPORT | ODFACILNAME |
-                                          ODFACILTYPE | ODIPFAMILY | ODLUNAME | ODNETID | ODNETWORKID | ODSERVERPORT | ODTCPIPS | ODTRANSID | ODUSERID) cics_data_value | cics_handle_response)+;
-cics_set_statistics: STATISTICS (A | cics_handle_response)+;
-cics_set_sysdumpcode: SYSDUMPCODE (A | cics_handle_response)+;
-cics_set_system: SYSTEM (A | cics_handle_response)+;
-cics_set_tags_refresh: REFRESH (A | cics_handle_response)+;
-cics_set_task: TASK (A | cics_handle_response)+;
-cics_set_tclass: TCLASS (A | cics_handle_response)+;
-cics_set_tcpip: TCPIP (A | cics_handle_response)+;
-cics_set_tcpipservice: TCPIPSERVICE (A | cics_handle_response)+;
-cics_set_tdqueue: TDQUEUE (A | cics_handle_response)+;
-cics_set_tempstorage: TEMPSTORAGE (A | cics_handle_response)+;
-cics_set_terminal: TERMINAL (A | cics_handle_response)+;
-cics_set_tracedest: TRACEDEST (A | cics_handle_response)+;
-cics_set_traceflag: TRACEFLAG (A | cics_handle_response)+;
-cics_set_tracetype: TRACETYPE (A | cics_handle_response)+;
-cics_set_tranclass: TRANCLASS (A | cics_handle_response)+;
-cics_set_trandumpcode: TRANDUMPCODE (A | cics_handle_response)+;
-cics_set_transaction: TRANSACTION (A | cics_handle_response)+;
-cics_set_tsqueue: TSQUEUE (A | cics_handle_response)+;
-cics_set_tsqname: TSQNAME (A | cics_handle_response)+;
-cics_set_uow: UOW (A | cics_handle_response)+;
-cics_set_uowlink: UOWLINK (A | cics_handle_response)+;
-cics_set_urimap: URIMAP (A | cics_handle_response)+;
+                                      ODFACILTYPE | ODIPFAMILY | ODLUNAME | ODNETID | ODNETWORKID | ODSERVERPORT | ODTCPIPS | ODTRANSID | ODUSERID) cics_data_value | cics_handle_response)+;
+cics_set_statistics: STATISTICS ((ON | OFF | RECORDNOW | RESETNOW) |
+                            (ENDOFDAY | ENDOFDAYHRS | ENDOFDAYMINS | ENDOFDAYSECS | ENDOFDAYHRS | INTERVAL | INTERVALHRS | INTERVALMINS | INTERVALSECS | INTERVALHRS) cics_data_value |
+                            (RECORDING | RECORDING) cics_cvda | cics_handle_response)+;
+cics_set_sysdumpcode: SYSDUMPCODE cics_data_value ((ADD | REMOVE | RESET | DAE | NODAE | LOCAL | RELATED | NOSHUTDOWN | SHUTDOWN | NOSYSDUMP | SYSDUMP) | (DSPLIST | JOBLIST | MAXIMUM) cics_data_value | (ACTION | DAEOPTION | DUMPSCOPE | SHUTOPTION | SYSDUMPING) cics_cvda | cics_handle_response)+;
+cics_set_system: SYSTEM ((DEBUG | NODEBUG | NOSYSDUMP | TABLEONLY | SYSDUMP | FORCE | NOFORCE | CTLGALL | CTLGMODIFY | CTLGNONE | AUTOACTIVE | AUTOINACTIVE) |
+                        (AKP | DSALIMIT | DSRTPROGRAM | DTRPROGRAM | EDSALIMIT | GMMTEXT | GMMLENGTH | GMMTEXT | MAXTASKS | MAXTASKS | MROBATCH | PROGAUTOEXIT | PRTYAGING | RUNAWAY | SCANDELAY | SDTMEMLIMIT | TIME | AKP) cics_data_value |
+                         (LOGDEFER | NEWMAXTASKS) cics_data_area | (DEBUGTOOL | DUMPING | FORCEQR | PROGAUTOCTLG | PROGAUTOINST) cics_cvda | cics_handle_response)+;
+cics_set_tags_refresh: TAGS (REFRESH | cics_handle_response)+;
+cics_set_task: TASK cics_data_value ((FORCEPURGE | KILL | PURGE | SRRACTIVE | SRRINACTIVE) | PRIORITY cics_data_value | (PURGETYPE | SRRSTATUS) cics_cvda | cics_handle_response)+;
+cics_set_tclass: TCLASS cics_data_value (MAXIMUM cics_data_value | cics_handle_response)+;
+cics_set_tcpip: TCPIP ((CLOSED | IMMCLOSE | OPEN) | (MAXSOCKETS | OPENSTATUS) cics_data_value | NEWMAXSOCKET cics_data_area | cics_handle_response)+;
+cics_set_tcpipservice: TCPIPSERVICE cics_data_value ((CLOSED | IMMCLOSE | OPEN) | (BACKLOG | MAXDATALEN) cics_data_area | URM cics_data_value | OPENSTATUS cics_cvda | cics_handle_response)+;
+cics_set_tdqueue: TDQUEUE cics_data_value ((NOTERMINAL | TERMINAL | DISABLED | ENABLED | CLOSED | OPEN) | (ATITERMID | ATITRANID | ATIUSERID | TRIGGERLEVEL) cics_data_value | (ATIFACILITY | ENABLESTATUS | OPENSTATUS) cics_cvda | cics_handle_response)+;
+cics_set_tempstorage: TEMPSTORAGE (TSMAINLIMIT cics_data_value | cics_handle_response)+;
+cics_set_terminal: TERMINAL cics_data_value ((ACQUIRED | COLDACQ | RELEASED | ALTPRTCOPY | NOALTPRTCOPY | ATI | NOATI | CREATE | NOCREATE | DISCREQ | NODISCREQ | EXITTRACE | NOEXITTRACE | OBFORMAT | NOOBFORMAT | AUTOPAGEABLE | PAGEABLE | PRTCOPY | NOPRTCOPY | FORCEPURGE | KILL | PURGE | FORCE |
+                                            PURGEFORCE | CANCEL | RELREQ | NORELREQ | INSERVICE | OUTSERVICE | SPECTRACE | STANTRACE | NOTTI | TTI | UCTRAN | NOUCTRAN | TRANIDONLY | NOZCPTRACE | ZCPTRACE) |
+                                            (ALTPRINTER | MAPNAME | MAPSETNAME | NEXTTRANSID | OPERID | PRINTER | TCAMCONTROL | TERMPRIORITY) cics_data_value |
+                                            (ACQSTATUS | TERMSTATUS | ALTPRTCOPYST | ATISTATUS | CREATESESS | DISCREQST | EXITTRACING | OBFORMATST | PAGESTATUS | PRTCOPYST | PURGETYPE | RELREQST | SERVSTATUS | TRACING | TTISTATUS | UCTRANST | ZCPTRACING) cics_cvda | cics_handle_response)+;
+cics_set_tracedest: TRACEDEST ((AUXPAUSE | AUXSTART | AUXSTOP | GTFSTART | GTFSTOP | INTSTART | INTSTOP | SWITCH | NOSWITCH | SWITCHNEXT | SWITCHALL) | TABLESIZE cics_data_value | (AUXSTATUS | GTFSTATUS | INTSTATUS | SWITCHACTION | SWITCHSTATUS) cics_cvda | cics_handle_response)+;
+cics_set_traceflag: TRACEFLAG ((SINGLEOFF | SINGLEON | SYSTEMOFF | SYSTEMON | TCEXITALL | TCEXITALLOFF | TCEXITNONE | TCEXITSYSTEM | USEROFF | USERON) | (SINGLESTATUS | SYSTEMSTATUS | TCEXITSTATUS | USERSTATUS) cics_cvda | cics_handle_response)+;
+cics_set_tracetype: TRACETYPE ((SPECIAL | STANDARD) | COMPID cics_data_value | FLAGSET cics_cvda | cics_handle_response)+;
+cics_set_tranclass: TRANCLASS cics_data_value ((ABEND | DISCARD) | (MAXACTIVE | PURGETHRESH) cics_data_value | PURGEACTION cics_cvda | cics_handle_response)+;
+cics_set_trandumpcode: TRANDUMPCODE cics_data_value ((ADD | REMOVE | RESET | LOCAL | RELATED | NOSHUTDOWN | SHUTDOWN | NOSYSDUMP | SYSDUMP | NOTRANDUMP | TRANDUMP) |
+                                    MAXIMUM cics_data_value | (ACTION | DUMPSCOPE | SHUTOPTION | SYSDUMPING | TRANDUMPING) cics_cvda | cics_handle_response)+;
+cics_set_transaction: TRANSACTION cics_data_value ((TRANDUMP | NOTRANDUMP | NOTPURGEABLE | PURGEABLE | SYSTEM | USER | SHUTDISABLED | SHUTENABLED | DISABLED | ENABLED | SPECTRACE | SPRSTRACE | STANTRACE) |
+                                    (PRIORITY | PRIORITY | RUNAWAY | RUNAWAY | TCLASS | TRANCLASS) cics_data_value | (DUMPING | PURGEABILITY | RUNAWAYTYPE | SHUTDOWN | STATUS | TRACING) cics_cvda | cics_handle_response)+;
+cics_set_tsqueue: (TSQUEUE | TSQNAME) cics_data_value ((SYSID | POOLNAME | LASTUSEDINT) cics_data_value | ACTION cics_cvda | cics_handle_response)+;
+cics_set_uow: UOW cics_data_value ((COMMIT | BACKOUT | FORCE) | UOWSTATE cics_cvda | cics_handle_response)+;
+cics_set_uowlink: UOWLINK cics_data_value (DELETE | ACTION cics_cvda | cics_handle_response)+;
+cics_set_urimap: URIMAP cics_data_area ((DISABLED | ENABLED | NONE | PERMANENT | TEMPORARY) | LOCATION cics_data_area | (ENABLESTATUS | REDIRECTTYPE) cics_cvda | cics_handle_response)+;
 cics_set_volume: VOLUME (A | cics_handle_response)+;
-cics_set_vtam: VTAM (A | cics_handle_response)+;
-cics_set_web: WEB (A | cics_handle_response)+;
-cics_set_webservice: WEBSERVICE (A | cics_handle_response)+;
-cics_set_wlmhealth: WLMHEALTH (A | cics_handle_response)+;
-cics_set_xmltransform: XMLTRANSFORM (A | cics_handle_response)+;
+cics_set_vtam: VTAM ((CLOSED | FORCECLOSE | IMMCLOSE | OPEN | DEREGISTERED | DEREGISTERED) | (PSDINTERVAL | PSDINTHRS | PSDINTMINS | PSDINTSECS | PSDINTHRS) cics_data_value | (OPENSTATUS) cics_cvda | cics_handle_response)+;
+cics_set_web: WEB ((GARBAGEINT | TIMEOUTINT) cics_data_value | cics_handle_response)+;
+cics_set_webservice: WEBSERVICE cics_name ((VALIDATION | NOVALIDATION) | VALIDATIONST cics_cvda | cics_handle_response)+;
+cics_set_wlmhealth: WLMHEALTH ((ADJUSTMENT | INTERVAL) cics_data_value | OPENSTATUS cics_cvda | cics_handle_response)+;
+cics_set_xmltransform: XMLTRANSFORM ((VALIDATION | NOVALIDATION) | VALIDATIONST cics_cvda | cics_handle_response)+;
 
 /** SIGNAL EVENT */
 cics_signal: SIGNAL (EVENT cics_data_value | FROMCHANNEL cics_data_value | FROM cics_data_area | FROMLENGTH cics_data_value | cics_handle_response)*;
