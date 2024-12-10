@@ -101,7 +101,6 @@ public class CICSInquireSPOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
           put(CICSLexer.AUTHUSERID, ErrorSeverity.ERROR);
           put(CICSLexer.AUTINSTMODEL, ErrorSeverity.ERROR);
           put(CICSLexer.AUTOCONNECT, ErrorSeverity.ERROR);
-          put(CICSLexer.AUTOSTART, ErrorSeverity.ERROR);
           put(CICSLexer.AUXSTATUS, ErrorSeverity.ERROR);
           put(CICSLexer.AVAILABILITY, ErrorSeverity.ERROR);
           put(CICSLexer.AVAILABLE, ErrorSeverity.ERROR);
