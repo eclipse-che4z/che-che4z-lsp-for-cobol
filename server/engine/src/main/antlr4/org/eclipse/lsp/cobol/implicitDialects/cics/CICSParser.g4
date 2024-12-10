@@ -528,9 +528,8 @@ cics_load: LOAD (PROGRAM cics_name | SET cics_ref | LENGTH cics_data_area | FLEN
 cics_monitor: MONITOR (POINT cics_data_value | DATA1 cics_data_area | DATA2 cics_data_area | ENTRYNAME cics_data_area | cics_handle_response)+;
 
 /** MOVE CONTAINER (both) */
-cics_move: MOVE cics_handle_response? CONTAINER cics_data_value cics_handle_response? AS cics_data_value cics_handle_response? (cics_move_bts | cics_move_channel);
-cics_move_bts: (FROMPROCESS | FROMACTIVITY cics_data_value | TOPROCESS | TOACTIVITY cics_data_value | cics_handle_response)+;
-cics_move_channel: (CHANNEL cics_data_value | TOCHANNEL cics_data_value | cics_handle_response)+;
+cics_move: MOVE ((CONTAINER | FROMACTIVITY | TOACTIVITY | AS | CHANNEL | TOCHANNEL) cics_data_value | FROMPROCESS |
+           TOPROCESS | cics_handle_response)+;
 
 /** POINT */
 cics_point: POINT (CONVID cics_name | SESSION cics_name | cics_handle_response)?;
