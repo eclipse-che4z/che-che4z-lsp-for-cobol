@@ -45,10 +45,12 @@ public class TestCicsRun {
     private static final String DEFAULT_BARE_VALID_ONE = "RUN SYNCHRONOUS ACQPROCESS";
     private static final String DEFAULT_BARE_VALID_TWO = "RUN ACQACTIVITY ASYNCHRONOUS";
     private static final String DEFAULT_BARE_VALID_THREE = "RUN SYNCHRONOUS ACQACTIVITY";
+    private static final String DEFAULT_BARE_VALID_FOUR = "RUN FACILITYTOKN(123) ACQACTIVITY";
 
     private static final String DEFAULT_INVALID_ONE = "RUN SYNCHRONOUS ACTIVITY(12) {FACILITYTOKN|error1}(123)";
     private static final String DEFAULT_INVALID_TWO = "RUN ASYNCHRONOUS {ACQPROCESS|error1}  {ACQACTIVITY|error1} INPUTEVENT(12)";
-    private static final String DEFAULT_INVALID_THREE = "RUN ACTIVITY(12) {SYNCHRONOUS|error1} INPUTEVENT(12) {ASYNCHRONOUS|error1}";
+    private static final String DEFAULT_INVALID_THREE = "RUN ACTIVITY(12) SYNCHRONOUS INPUTEVENT(12) {ASYNCHRONOUS|error1}";
+    private static final String DEFAULT_INVALID_FOUR = "RUN {ACQACTIVITY|error1}";
 
     private static final String TRANSID_ALL = "RUN TRANSID(12) CHANNEL(123) CHILD(1)";
     private static final String TRANSID_BARE = "RUN CHILD(1) TRANSID(12)";
@@ -109,13 +111,18 @@ public class TestCicsRun {
     }
 
     @Test
+    void testDefaultBareValidFour() {
+        CICSTestUtils.noErrorTest(DEFAULT_BARE_VALID_FOUR);
+    }
+
+    @Test
     void testDefaultInvalidOne() {
         Map<String, Diagnostic> expectedDiagnostic =
                 ImmutableMap.of(
                         "error1",
                         new Diagnostic(
                                 new Range(),
-                                "Invalid option provided: FACILITYTOKN",
+                                "Options \"SYNCHRONOUS or FACILITYTOKN\" are mutually exclusive.",
                                 DiagnosticSeverity.Error,
                                 ErrorSource.PARSING.getText()
                         )
@@ -145,12 +152,27 @@ public class TestCicsRun {
                         "error1",
                         new Diagnostic(
                                 new Range(),
-                                "Exactly one option required, options are mutually exclusive: SYNCHRONOUS or ASYNCHRONOUS",
+                                "Options \"SYNCHRONOUS or ASYNCHRONOUS\" are mutually exclusive.",
                                 DiagnosticSeverity.Error,
                                 ErrorSource.PARSING.getText()
                         )
                 );
         CICSTestUtils.errorTest(DEFAULT_INVALID_THREE, expectedDiagnostic);
+    }
+
+    @Test
+    void testDefaultInvalidFour() {
+        Map<String, Diagnostic> expectedDiagnostic =
+                ImmutableMap.of(
+                        "error1",
+                        new Diagnostic(
+                                new Range(),
+                                "Missing required option: SYNCHRONOUS or ASYNCHRONOUS or FACILITYTOKN",
+                                DiagnosticSeverity.Error,
+                                ErrorSource.PARSING.getText()
+                        )
+                );
+        CICSTestUtils.errorTest(DEFAULT_INVALID_FOUR, expectedDiagnostic);
     }
 
     @Test
