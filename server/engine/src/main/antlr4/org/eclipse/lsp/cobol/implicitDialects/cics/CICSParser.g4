@@ -38,7 +38,7 @@ allExciRules: cics_exci_link | cics_exci_delete | cics_exci_delete_container | c
               cics_exci_get_container | cics_exci_get_next_container | cics_exci_move_container |
               cics_exci_put_container | cics_exci_query_channel | cics_exci_startbrowse_container ;
 
-allSPRules: cics_disable | cics_discard | cics_enable | cics_extract_system_programming | cics_inquire_system_programming | cics_create;
+allSPRules: cics_acquire_terminal | cics_disable | cics_discard | cics_enable | cics_extract_system_programming | cics_inquire_system_programming | cics_create;
 
 // compiler options
 compilerOpts
@@ -160,6 +160,10 @@ cics_acquire:ACQUIRE (cics_acquire_process | cics_acquire_activityId ) ;
 cics_acquire_process: ((PROCESS | PROCESSTYPE) cics_data_value | cics_handle_response)+;
 
 cics_acquire_activityId: (ACTIVITYID cics_data_value | cics_handle_response)+;
+
+/** ACQUIRE TERMINAL System command */
+cics_acquire_terminal: ACQUIRE cics_acquire_terminal_body;
+cics_acquire_terminal_body: ((TERMINAL | USERDATA | USERDATALEN) cics_data_value | NOQUEUE | QALL  | QNOTENAB | QSESSLIM | RELREQ |cics_handle_response)+;
 
 /** ADD SUBEVENT */
 cics_add: ADD ( ciss_add_event_subevent | cics_handle_response)+;
@@ -2395,9 +2399,12 @@ ABCODE
   | PUSH
   | PUT
   | PUT64
+  | QALL
   | QBUSY
   | QIDERR
   | QNAME
+  | QNOTENAB
+  | QSESSLIM
   | QUALIFIER
   | QUALLEN
   | QUASIRENT
@@ -2450,6 +2457,7 @@ ABCODE
   | RELATESURI
   | RELATION
   | RELEASE
+  | RELREQ
   | RELREQST
   | RELTYPE
   | REMOTENAME
@@ -2867,7 +2875,9 @@ ABCODE
   | USERAREALEN
   | USERAUTH
   | USERCORRDATA
+  | USERDATA
   | USERDATAKEY
+  | USERDATALEN
   | USERID
   | USERIDERR
   | USERNAME
