@@ -139,8 +139,23 @@ public class CICSOptionsCheckUtility {
         CICSWriteOptionsCheckUtility.RULE_INDEX,
         new CICSWriteOptionsCheckUtility(context, errors));
     optionsMap.put(
-            CICSWSAEPRUtility.RULE_INDEX,
-            new CICSWSAEPRUtility(context, errors));
+        CICSRetrieveOptionsCheckUtility.RULE_INDEX,
+        new CICSRetrieveOptionsCheckUtility(context, errors));
+    optionsMap.put(
+        CICSInvokeOptionsCheckUtility.RULE_INDEX,
+        new CICSInvokeOptionsCheckUtility(context, errors));
+    optionsMap.put(
+        CICSWSAEPRUtility.RULE_INDEX,
+        new CICSWSAEPRUtility(context, errors));
+    optionsMap.put(
+        CICSWaitCicsOptionsUtility.RULE_INDEX,
+        new CICSWaitCicsOptionsUtility(context, errors));
+    optionsMap.put(
+        CICSTestOptionsUtility.RULE_INDEX,
+        new CICSTestOptionsUtility(context, errors));
+    optionsMap.put(
+        CICSMoveOptionsCheckUtility.RULE_INDEX,
+        new CICSMoveOptionsCheckUtility(context, errors));
   }
 
   /**

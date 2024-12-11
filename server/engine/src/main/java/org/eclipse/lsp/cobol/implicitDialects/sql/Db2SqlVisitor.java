@@ -15,6 +15,7 @@
 package org.eclipse.lsp.cobol.implicitDialects.sql;
 
 import static java.util.stream.Collectors.toList;
+import static org.eclipse.lsp.cobol.AntlrRangeUtils.constructRange;
 
 import com.google.common.collect.ImmutableList;
 
@@ -284,28 +285,10 @@ class Db2SqlVisitor extends Db2SqlParserBaseVisitor<List<Node>> {
     }
 
     private void addReplacementContext(ParserRuleContext ctx) {
-        getAllTerminalNodes(ctx)
-                .forEach(
-                        node ->
-                                context
-                                        .getExtendedDocument()
-                                        .replace(
-                                                constructRange(node),
-                                                StringUtils.repeat(CobolDialect.FILLER, node.getText().length())));
-    }
-
-    public Range constructRange(TerminalNode ctx) {
-        Position start =
-                new Position(ctx.getSymbol().getLine() - 1, ctx.getSymbol().getCharPositionInLine());
-        Position end =
-                ctx.getSymbol().getStopIndex() > ctx.getSymbol().getStartIndex()
-                        ? new Position(
-                        ctx.getSymbol().getLine() - 1,
-                        ctx.getSymbol().getCharPositionInLine()
-                                + ctx.getSymbol().getStopIndex()
-                                - ctx.getSymbol().getStartIndex())
-                        : start;
-        return new Range(start, end);
+        getAllTerminalNodes(ctx).forEach(node ->
+                context.getExtendedDocument().replace(
+                        constructRange(node.getSymbol()),
+                        StringUtils.repeat(CobolDialect.FILLER, node.getText().length())));
     }
 
     private List<TerminalNode> getAllTerminalNodes(ParserRuleContext ctx) {
@@ -319,17 +302,6 @@ class Db2SqlVisitor extends Db2SqlParserBaseVisitor<List<Node>> {
             }
         }
         return result;
-    }
-
-    public Range constructRange(ParserRuleContext ctx) {
-        return new Range(
-                new Position(ctx.getStart().getLine() - 1, ctx.getStart().getCharPositionInLine()),
-                new Position(
-                        ctx.getStop().getLine() - 1,
-                        ctx.getStop().getCharPositionInLine()
-                                + ctx.getStop().getStopIndex()
-                                - ctx.getStop().getStartIndex()
-                                + 1));
     }
 
     @Override
@@ -363,7 +335,7 @@ class Db2SqlVisitor extends Db2SqlParserBaseVisitor<List<Node>> {
         Matcher matcher = DOUBLE_DASH_SQL_COMMENT.matcher(sqlCode);
         while (matcher.find()) {
             Position start = findPosition(sqlCode, matcher.start());
-            Position end = findPosition(sqlCode, matcher.end() - 1);
+            Position end = findPosition(sqlCode, matcher.end());
             String replace = StringUtils.repeat(CobolDialect.FILLER, matcher.end() - matcher.start() - 1);
             start = Db2SqlVisitorHelper.getAdjustedStartPosition(ctx, start);
             end = Db2SqlVisitorHelper.getAdjustedEndPosition(ctx, end);
@@ -377,7 +349,7 @@ class Db2SqlVisitor extends Db2SqlParserBaseVisitor<List<Node>> {
         int c = 1;
         int line = 0;
         int col = 1;
-        while (c <= pos) {
+        while (c < pos) {
             if (text.charAt(c) == '\n') {
                 ++line;
                 col = 1;
