@@ -39,7 +39,7 @@ public class CICSSysSetOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
                     put(CICSLexer.ADD, ErrorSeverity.ERROR);
                     put(CICSLexer.ADJUSTMENT, ErrorSeverity.ERROR);
                     put(CICSLexer.AFFINITY, ErrorSeverity.ERROR);
-                    put(CICSLexer.AIRBRIDGE, ErrorSeverity.ERROR);
+                    put(CICSLexer.AIBRIDGE, ErrorSeverity.ERROR);
                     put(CICSLexer.AKP, ErrorSeverity.ERROR);
                     put(CICSLexer.ALTPRINTER, ErrorSeverity.ERROR);
                     put(CICSLexer.ALTPRTCOPYST, ErrorSeverity.ERROR);

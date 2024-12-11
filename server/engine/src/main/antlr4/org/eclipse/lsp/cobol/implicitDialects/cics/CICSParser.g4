@@ -636,7 +636,7 @@ cics_set: SET (cics_set_association_usercorrdata | cics_set_atomservice | cics_s
 
 cics_set_association_usercorrdata: ASSOCIATION (USERCORRDATA cics_data_value | cics_handle_response)+;
 cics_set_atomservice: ATOMSERVICE cics_data_area ((ENABLED | DISABLED) | ENABLESTATUS cics_cvda | cics_handle_response)*;
-cics_set_autoinstall: AUTOINSTALL ((AIRBRIDGE | CONSOLES) cics_cvda | (MAXREQS | PROGRAM) cics_data_value | cics_handle_response)*;
+cics_set_autoinstall: AUTOINSTALL ((AIBRIDGE | CONSOLES) cics_cvda | (MAXREQS | PROGRAM) cics_data_value | cics_handle_response)*;
 cics_set_brfacility: BRFACILITY cics_data_value (RELEASED | TERMSTATUS cics_cvda | cics_handle_response)*;
 cics_set_bundle: BUNDLE cics_data_value ((AVAILABLE | UNAVAILABLE | ENABLED | DISABLED | PHASEIN) | (AVAILSTATUS | ENABLESTATUS | COPY) cics_cvda | cics_handle_response)*;
 cics_set_connection: CONNECTION cics_data_area ((ACQUIRED | RELEASED | ENDAFFINITY | EXITTRACE | NOEXITTRACE | NOTPENDING | CANCEL | FORCECANCEL | FORCEPURGE | KILL | PURGE | NORECOVDATA | INSERVICE | OUTSERVICE | BACKOUT | COMMIT | FORCEUOW | RESYNC | NOZCPTRACE | ZCPTRACE) |
