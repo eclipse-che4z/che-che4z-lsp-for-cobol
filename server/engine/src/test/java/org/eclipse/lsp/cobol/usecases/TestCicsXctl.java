@@ -32,17 +32,17 @@ import java.util.Map;
  * <p>This class tests all variations of the XCTL command found in the link above.
  */
 public class TestCicsXctl {
-    private static final String ALL_OPTIONS_VALID_ONE = "XCTL PROGRAM(1) COMMAREA(2) LENGTH(4) INPUTMSG(5) INPUTMSGLEN(6)";
-    private static final String ALL_OPTIONS_VALID_TWO = "XCTL PROGRAM(1) CHANNEL(3) INPUTMSG(5) INPUTMSGLEN(6)";
+    private static final String ALL_OPTIONS_VALID_ONE = "XCTL PROGRAM({$varOne}) COMMAREA({$varTwo}) LENGTH({$varFour}) INPUTMSG({$varFive}) INPUTMSGLEN({$varSix})";
+    private static final String ALL_OPTIONS_VALID_TWO = "XCTL PROGRAM({$varOne}) CHANNEL({$varThree}) INPUTMSG({$varFive}) INPUTMSGLEN({$varSix})";
 
-    private static final String SOME_OPTIONS_VALID_ONE = "XCTL PROGRAM(1) CHANNEL(3) INPUTMSG(5)";
-    private static final String SOME_OPTIONS_VALID_TWO = "XCTL PROGRAM(1) COMMAREA(4) INPUTMSG(5) INPUTMSGLEN(6)";
+    private static final String SOME_OPTIONS_VALID_ONE = "XCTL PROGRAM({$varOne}) CHANNEL({$varThree}) INPUTMSG({$varFive})";
+    private static final String SOME_OPTIONS_VALID_TWO = "XCTL PROGRAM({$varOne}) COMMAREA({$varFour}) INPUTMSG({$varFive}) INPUTMSGLEN({$varSix})";
 
-    private static final String BARE_VALID = "XCTL PROGRAM(1)";
+    private static final String BARE_VALID = "XCTL PROGRAM({$varOne})";
 
-    private static final String INVALID_ONE = "XCTL PROGRAM(1) {COMMAREA|error1}(2) {CHANNEL|error1}(3) LENGTH(4) INPUTMSG(5) INPUTMSGLEN(6)";
-    private static final String INVALID_TWO = "XCTL PROGRAM(1) CHANNEL(3) {INPUTMSGLEN|error1}(6)";
-    private static final String INVALID_THREE = "XCTL PROGRAM(1) {LENGTH|error1}(3)";
+    private static final String INVALID_ONE = "XCTL PROGRAM({$varOne}) {COMMAREA|error1}({$varTwo}) {CHANNEL|error1}({$varThree}) LENGTH({$varFour}) INPUTMSG({$varFive}) INPUTMSGLEN({$varSix})";
+    private static final String INVALID_TWO = "XCTL PROGRAM({$varOne}) CHANNEL({$varThree}) {INPUTMSGLEN|error1}({$varSix})";
+    private static final String INVALID_THREE = "XCTL PROGRAM({$varOne}) {LENGTH|error1}({$varThree})";
 
     @Test
     void testAllOptionsValidOne() {
