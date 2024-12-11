@@ -842,7 +842,16 @@ public class CICSSysSetOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
         checkMutuallyExclusiveOptions("THREADWAIT, TWAIT or NOTWAIT", ctx.THREADWAIT(), ctx.TWAIT(), ctx.NOTWAIT());
     }
 
-    private void checkDb2entry(CICSParser.Cics_set_db2entryContext ctx) {}
+    private void checkDb2entry(CICSParser.Cics_set_db2entryContext ctx) {
+        checkMutuallyExclusiveOptions("ACCOUNTREC, UOW, TASK, TXID or NONE", ctx.ACCOUNTREC(), ctx.UOW(), ctx.TASK(), ctx.TXID(), ctx.NONE());
+        checkMutuallyExclusiveOptions("AUTHTYPE, GROUP, SIGN, TERM, TX, OPID or USERID", ctx.AUTHTYPE(), ctx.GROUP(), ctx.SIGN(), ctx.TERM(), ctx.TX(), ctx.OPID(), ctx.USERID());
+        checkMutuallyExclusiveOptions("BUSY, WAIT, NOWAIT or FORCE", ctx.BUSY(), ctx.WAIT(), ctx.NOWAIT(), ctx.FORCE());
+        checkMutuallyExclusiveOptions("DISABLEDACT, ABEND, SQLCODE or POOL", ctx.DISABLEDACT(), ctx.ABEND(), ctx.SQLCODE(), ctx.POOL());
+        checkMutuallyExclusiveOptions("ENABLESTATUS, ENABLED or DISABLED", ctx.ENABLESTATUS(), ctx.ENABLED(), ctx.DISABLED());
+        checkMutuallyExclusiveOptions("PRIORITY, HIGH, EQUAL or LOW", ctx.PRIORITY(), ctx.HIGH(), ctx.EQUAL(), ctx.LOW());
+        checkMutuallyExclusiveOptions("SHARELOCKS, YES or NO", ctx.SHARELOCKS(), ctx.YES(), ctx.NO());
+        checkMutuallyExclusiveOptions("THREADWAIT, TWAIT, NOTWAIT or TPOOL", ctx.THREADWAIT(), ctx.TWAIT(), ctx.NOTWAIT(), ctx.TPOOL());
+    }
 
     private void checkDb2tran(CICSParser.Cics_set_db2tranContext ctx) {}
 
