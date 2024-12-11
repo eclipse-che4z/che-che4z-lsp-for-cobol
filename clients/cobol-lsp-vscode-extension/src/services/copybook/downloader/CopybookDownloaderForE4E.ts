@@ -13,7 +13,6 @@
  */
 import * as vscode from "vscode";
 import * as fs from "node:fs";
-import * as Path from "node:path";
 import {
   EndevorElement,
   EndevorMember,
@@ -274,11 +273,14 @@ export class CopybookDownloaderForE4E {
      * As a workaround, the path is splitted into individual subfolders
      * are they are created one by one.
      */
-    const subfoldersPath = folder.replace(downloadFolder, "");
+    const subfoldersPath = folder.replace(`${downloadFolder}${path.sep}`, "");
     const subfolders = subfoldersPath.split(path.sep);
     let finishedPath = downloadFolder;
     for (const subfolder of subfolders) {
-      finishedPath = path.join(finishedPath, subfolder);
+      finishedPath = vscode.Uri.joinPath(
+        vscode.Uri.file(finishedPath),
+        subfolder,
+      ).fsPath;
 
       try {
         await vscode.workspace.fs.createDirectory(
@@ -299,13 +301,13 @@ export class CopybookDownloaderForE4E {
       }
     }
 
-    folder = Path.join(
-      folder,
+    folder = vscode.Uri.joinPath(
+      vscode.Uri.file(folder),
       copybook.substring(
         0,
         copybook.indexOf(".") !== -1 ? copybook.indexOf(".") : copybook.length,
       ),
-    );
+    ).fsPath;
     return folder;
   }
 
