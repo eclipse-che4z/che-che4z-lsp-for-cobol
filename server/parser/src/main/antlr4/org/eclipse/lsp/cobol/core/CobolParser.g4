@@ -1321,8 +1321,12 @@ freeStatement
 // exit statement
 
 exitStatement
-   : EXIT (PROGRAM | SECTION | PARAGRAPH | PERFORM CYCLE? | METHOD)?
+   : EXIT (PROGRAM | SECTION | PARAGRAPH | exitPerform | METHOD)?
    ;
+
+exitPerform
+    : PERFORM CYCLE?
+    ;
 
 // generate statement
 
