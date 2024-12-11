@@ -37,7 +37,7 @@ public class TestCicsEnterTracenumStatement {
             "ENTER TRACENUM({$varFour}) FROM({$varFour}) \n"
                    + "FROMLENGTH({$varFour}) RESOURCE({$varFour}) EXCEPTION";
     private static final String ENTER_TRACENUM_FROMLENGTH_INVALID =
-            "ENTER  {_TRACENUM(100) FROMLENGTH(100)|errorMissingFrom_}";
+            "ENTER  {_TRACENUM({$varOne})FROMLENGTH({$varTwo})|errorMissingFrom_}";
 
     @Test
     void testEnterTracenumValid() {
