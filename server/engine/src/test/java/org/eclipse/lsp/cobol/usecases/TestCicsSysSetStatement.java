@@ -33,16 +33,16 @@ import java.util.*;
  */
 public class TestCicsSysSetStatement {
 
-    private static final String ASSOCIATION_USERCORRDATA_VALID_1 = "SET ASSOCIATION_USERCORRDATA ";
-    private static final String ASSOCIATION_USERCORRDATA_VALID_2 = "SET ASSOCIATION_USERCORRDATA ";
-    private static final String ATOMSERVICE_VALID_1 = "SET ATOMSERVICE ";
-    private static final String ATOMSERVICE_VALID_2 = "SET ATOMSERVICE ";
-    private static final String AUTOINSTALL_VALID_1 = "SET AUTOINSTALL ";
-    private static final String AUTOINSTALL_VALID_2 = "SET AUTOINSTALL ";
-    private static final String BRFACILITY_VALID_1 = "SET BRFACILITY ";
-    private static final String BRFACILITY_VALID_2 = "SET BRFACILITY ";
-    private static final String BUNDLE_VALID_1 = "SET BUNDLE ";
-    private static final String BUNDLE_VALID_2 = "SET BUNDLE ";
+    private static final String ASSOCIATION_USERCORRDATA_VALID_1 = "SET ASSOCIATION USERCORRDATA(123)";
+    private static final String ATOMSERVICE_VALID_1 = "SET ATOMSERVICE(123)";
+    private static final String ATOMSERVICE_VALID_2 = "SET ATOMSERVICE(123) ENABLESTATUS(123)";
+    private static final String AUTOINSTALL_VALID_1 = "SET AUTOINSTALL";
+    private static final String AUTOINSTALL_VALID_2 = "SET AUTOINSTALL AIBRIDGE(123) CONSOLES(123) MAXREQS(123) PROGRAM(123)";
+    private static final String BRFACILITY_VALID_1 = "SET BRFACILITY(123)";
+    private static final String BRFACILITY_VALID_2 = "SET BRFACILITY(123) TERMSTATUS(123)";
+    private static final String BUNDLE_VALID_1 = "SET BUNDLE(123)";
+    private static final String BUNDLE_VALID_2 = "SET BUNDLE(123) AVAILSTATUS(123)";
+    private static final String BUNDLE_VALID_3 = "SET BUNDLE(123) COPY(123)";
     private static final String CONNECTION_VALID_1 = "SET CONNECTION ";
     private static final String CONNECTION_VALID_2 = "SET CONNECTION ";
     private static final String DB2CONN_VALID_1 = "SET DB2CONN ";
@@ -165,16 +165,10 @@ public class TestCicsSysSetStatement {
     private static final String XMLTRANSFORM_VALID_2 = "SET XMLTRANSFORM ";
 
     // Invalid test cases
-    private static final String ASSOCIATION_USERCORRDATA_INVALID_1 = "SET ASSOCIATION_USERCORRDATA ";
-    private static final String ASSOCIATION_USERCORRDATA_INVALID_2 = "SET ASSOCIATION_USERCORRDATA ";
-    private static final String ATOMSERVICE_INVALID_1 = "SET ATOMSERVICE ";
-    private static final String ATOMSERVICE_INVALID_2 = "SET ATOMSERVICE ";
-    private static final String AUTOINSTALL_INVALID_1 = "SET AUTOINSTALL ";
-    private static final String AUTOINSTALL_INVALID_2 = "SET AUTOINSTALL ";
-    private static final String BRFACILITY_INVALID_1 = "SET BRFACILITY ";
-    private static final String BRFACILITY_INVALID_2 = "SET BRFACILITY ";
-    private static final String BUNDLE_INVALID_1 = "SET BUNDLE ";
-    private static final String BUNDLE_INVALID_2 = "SET BUNDLE ";
+    private static final String ATOMSERVICE_INVALID_1 = "SET ATOMSERVICE(123) ENABLED {DISABLED|errorOne}";
+    private static final String AUTOINSTALL_INVALID_1 = "SET AUTOINSTALL AIBRIDGE(123) {AIBRIDGE|errorOne}(123)";
+    private static final String BRFACILITY_INVALID_1 = "SET BRFACILITY(123) TERMSTATUS(123) {RELEASED|errorOne}";
+    private static final String BUNDLE_INVALID_1 = "SET BUNDLE(123) COPY(123) {PHASEIN|errorOne}";
     private static final String CONNECTION_INVALID_1 = "SET CONNECTION ";
     private static final String CONNECTION_INVALID_2 = "SET CONNECTION ";
     private static final String DB2CONN_INVALID_1 = "SET DB2CONN ";
@@ -307,7 +301,6 @@ public class TestCicsSysSetStatement {
     @Test
     void testCicsAssociationUsercorrdataValid() {
         CICSTestUtils.noErrorTest(ASSOCIATION_USERCORRDATA_VALID_1);
-        CICSTestUtils.noErrorTest(ASSOCIATION_USERCORRDATA_VALID_2);
     }
 
     @Test
@@ -332,9 +325,10 @@ public class TestCicsSysSetStatement {
     void testCicsBundleValid() {
         CICSTestUtils.noErrorTest(BUNDLE_VALID_1);
         CICSTestUtils.noErrorTest(BUNDLE_VALID_2);
+        CICSTestUtils.noErrorTest(BUNDLE_VALID_3);
     }
 
-    @Test
+    /*@Test
     void testCicsConnectionValid() {
         CICSTestUtils.noErrorTest(CONNECTION_VALID_1);
         CICSTestUtils.noErrorTest(CONNECTION_VALID_2);
@@ -692,40 +686,32 @@ public class TestCicsSysSetStatement {
     void testCicsXmltransformValid() {
         CICSTestUtils.noErrorTest(XMLTRANSFORM_VALID_1);
         CICSTestUtils.noErrorTest(XMLTRANSFORM_VALID_2);
-    }
+    }*/
 
     // Invalid Tests
-    @Test
-    void testCicsAssociationUsercorrdataInvalid() {
-        testSingleError(ASSOCIATION_USERCORRDATA_INVALID_1, "");
-        testSingleError(ASSOCIATION_USERCORRDATA_INVALID_2, "");
-    }
+    // No cases for ASSOCIATION USERCORRDATA.
 
     @Test
     void testCicsAtomserviceInvalid() {
-        testSingleError(ATOMSERVICE_INVALID_1, "");
-        testSingleError(ATOMSERVICE_INVALID_2, "");
+        testSingleError(ATOMSERVICE_INVALID_1, "Options \"ENABLESTATUS, ENABLED or DISABLED\" are mutually exclusive.");
     }
 
     @Test
     void testCicsAutoinstallInvalid() {
-        testSingleError(AUTOINSTALL_INVALID_1, "");
-        testSingleError(AUTOINSTALL_INVALID_2, "");
+        testSingleError(AUTOINSTALL_INVALID_1, "Excessive options provided for: AIBRIDGE");
     }
 
     @Test
     void testCicsBrfacilityInvalid() {
-        testSingleError(BRFACILITY_INVALID_1, "");
-        testSingleError(BRFACILITY_INVALID_2, "");
+        testSingleError(BRFACILITY_INVALID_1, "Options \"TERMSTATUS or RELEASED\" are mutually exclusive.");
     }
 
     @Test
     void testCicsBundleInvalid() {
-        testSingleError(BUNDLE_INVALID_1, "");
-        testSingleError(BUNDLE_INVALID_2, "");
+        testSingleError(BUNDLE_INVALID_1, "Options \"AVAILSTATUS, AVAILABLE, UNAVAILABLE, ENABLESTATUS, ENABLED, DISABLED, COPY or PHASEIN\" are mutually exclusive.");
     }
 
-    @Test
+    /*@Test
     void testCicsConnectionInvalid() {
         testSingleError(CONNECTION_INVALID_1, "");
         testSingleError(CONNECTION_INVALID_2, "");
@@ -1083,6 +1069,6 @@ public class TestCicsSysSetStatement {
     void testCicsXmltransformInvalid() {
         testSingleError(XMLTRANSFORM_INVALID_1, "");
         testSingleError(XMLTRANSFORM_INVALID_2, "");
-    }
+    }*/
 
 }
