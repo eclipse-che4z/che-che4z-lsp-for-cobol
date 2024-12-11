@@ -47,11 +47,11 @@ public class TestCICSFormatTimeStatement {
     private static final String FORMAT_TIME_VALID =
             "FORMATTIME ABSTIME({$varFour})";
     private static final String FORMAT_TIME_MISSING_ABSTIME_INVALID =
-            "FORMATTIME {DATE(100) | errorMissingAbstime}";
+            "FORMATTIME {_DATE({$varOne})|errorMissingAbstime_}";
     private static final String FORMAT_TIME_MISSING_DATESTRING_INVALID =
-            "FORMATTIME {ABSTIME(100) STRINGZONE(100) | errorMissingDatestring}";
+            "FORMATTIME {_ABSTIME({$varOne})STRINGZONE({$varTwo})|errorMissingDatestring_}";
     private static final String FORMAT_TIME_MISSING_TIME_INVALID =
-            "FORMATTIME {ABSTIME(100) TIMESEP | errorMissingTime}";
+            "FORMATTIME {_ABSTIME({$varFour})TIMESEP|errorMissingTime_}";
 
     @Test
     void testFormatTimeAllValid() {
