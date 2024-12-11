@@ -1,0 +1,1088 @@
+/*
+ * Copyright (c) 2024 Broadcom.
+ * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
+ *
+ * This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License 2.0
+ * which is available at https://www.eclipse.org/legal/epl-2.0/
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ *
+ * Contributors:
+ *    Broadcom, Inc. - initial API and implementation
+ *
+ */
+
+package org.eclipse.lsp.cobol.usecases;
+
+import org.eclipse.lsp.cobol.common.error.ErrorSource;
+import org.eclipse.lsp.cobol.usecases.common.CICSTestUtils;
+import org.eclipse.lsp4j.Diagnostic;
+import org.eclipse.lsp4j.DiagnosticSeverity;
+import org.eclipse.lsp4j.Range;
+import org.junit.jupiter.api.Test;
+
+import java.util.*;
+
+/**
+ * Test SET commands. Documentation link: <a
+ * href="https://www.ibm.com/docs/en/cics-ts/6.x?topic=commands-set-association-usercorrdata">SET
+ * Command</a>
+ *
+ * <p>This class tests all variations of the SET command found in the link above.
+ */
+public class TestCicsSysSetStatement {
+
+    private static final String ASSOCIATION_USERCORRDATA_VALID_1 = "SET ASSOCIATION_USERCORRDATA ";
+    private static final String ASSOCIATION_USERCORRDATA_VALID_2 = "SET ASSOCIATION_USERCORRDATA ";
+    private static final String ATOMSERVICE_VALID_1 = "SET ATOMSERVICE ";
+    private static final String ATOMSERVICE_VALID_2 = "SET ATOMSERVICE ";
+    private static final String AUTOINSTALL_VALID_1 = "SET AUTOINSTALL ";
+    private static final String AUTOINSTALL_VALID_2 = "SET AUTOINSTALL ";
+    private static final String BRFACILITY_VALID_1 = "SET BRFACILITY ";
+    private static final String BRFACILITY_VALID_2 = "SET BRFACILITY ";
+    private static final String BUNDLE_VALID_1 = "SET BUNDLE ";
+    private static final String BUNDLE_VALID_2 = "SET BUNDLE ";
+    private static final String CONNECTION_VALID_1 = "SET CONNECTION ";
+    private static final String CONNECTION_VALID_2 = "SET CONNECTION ";
+    private static final String DB2CONN_VALID_1 = "SET DB2CONN ";
+    private static final String DB2CONN_VALID_2 = "SET DB2CONN ";
+    private static final String DB2ENTRY_VALID_1 = "SET DB2ENTRY ";
+    private static final String DB2ENTRY_VALID_2 = "SET DB2ENTRY ";
+    private static final String DB2TRAN_VALID_1 = "SET DB2TRAN ";
+    private static final String DB2TRAN_VALID_2 = "SET DB2TRAN ";
+    private static final String DELETSHIPPED_VALID_1 = "SET DELETSHIPPED ";
+    private static final String DELETSHIPPED_VALID_2 = "SET DELETSHIPPED ";
+    private static final String DISPATCHER_VALID_1 = "SET DISPATCHER ";
+    private static final String DISPATCHER_VALID_2 = "SET DISPATCHER ";
+    private static final String DOCTEMPLATE_VALID_1 = "SET DOCTEMPLATE ";
+    private static final String DOCTEMPLATE_VALID_2 = "SET DOCTEMPLATE ";
+    private static final String DSNAME_VALID_1 = "SET DSNAME ";
+    private static final String DSNAME_VALID_2 = "SET DSNAME ";
+    private static final String DUMPDS_VALID_1 = "SET DUMPDS ";
+    private static final String DUMPDS_VALID_2 = "SET DUMPDS ";
+    private static final String ENQMODEL_VALID_1 = "SET ENQMODEL ";
+    private static final String ENQMODEL_VALID_2 = "SET ENQMODEL ";
+    private static final String EPADAPTER_VALID_1 = "SET EPADAPTER ";
+    private static final String EPADAPTER_VALID_2 = "SET EPADAPTER ";
+    private static final String EPADAPTERSET_VALID_1 = "SET EPADAPTERSET ";
+    private static final String EPADAPTERSET_VALID_2 = "SET EPADAPTERSET ";
+    private static final String EVENTBINDING_VALID_1 = "SET EVENTBINDING ";
+    private static final String EVENTBINDING_VALID_2 = "SET EVENTBINDING ";
+    private static final String EVENTPROCESS_VALID_1 = "SET EVENTPROCESS ";
+    private static final String EVENTPROCESS_VALID_2 = "SET EVENTPROCESS ";
+    private static final String FILE_VALID_1 = "SET FILE ";
+    private static final String FILE_VALID_2 = "SET FILE ";
+    private static final String HOST_VALID_1 = "SET HOST ";
+    private static final String HOST_VALID_2 = "SET HOST ";
+    private static final String IPCONN_VALID_1 = "SET IPCONN ";
+    private static final String IPCONN_VALID_2 = "SET IPCONN ";
+    private static final String IRC_VALID_1 = "SET IRC ";
+    private static final String IRC_VALID_2 = "SET IRC ";
+    private static final String JOURNALNAME_VALID_1 = "SET JOURNALNAME ";
+    private static final String JOURNALNAME_VALID_2 = "SET JOURNALNAME ";
+    private static final String JOURNALNUM_VALID_1 = "SET JOURNALNUM ";
+    private static final String JOURNALNUM_VALID_2 = "SET JOURNALNUM ";
+    private static final String JVMENDPOINT_VALID_1 = "SET JVMENDPOINT ";
+    private static final String JVMENDPOINT_VALID_2 = "SET JVMENDPOINT ";
+    private static final String JVMSERVER_VALID_1 = "SET JVMSERVER ";
+    private static final String JVMSERVER_VALID_2 = "SET JVMSERVER ";
+    private static final String LIBRARY_VALID_1 = "SET LIBRARY ";
+    private static final String LIBRARY_VALID_2 = "SET LIBRARY ";
+    private static final String MODENAME_VALID_1 = "SET MODENAME ";
+    private static final String MODENAME_VALID_2 = "SET MODENAME ";
+    private static final String MONITOR_VALID_1 = "SET MONITOR ";
+    private static final String MONITOR_VALID_2 = "SET MONITOR ";
+    private static final String MQCONN_VALID_1 = "SET MQCONN ";
+    private static final String MQCONN_VALID_2 = "SET MQCONN ";
+    private static final String MQMONITOR_VALID_1 = "SET MQMONITOR ";
+    private static final String MQMONITOR_VALID_2 = "SET MQMONITOR ";
+    private static final String NETNAME_VALID_1 = "SET NETNAME ";
+    private static final String NETNAME_VALID_2 = "SET NETNAME ";
+    private static final String PIPELINE_VALID_1 = "SET PIPELINE ";
+    private static final String PIPELINE_VALID_2 = "SET PIPELINE ";
+    private static final String PROCESSTYPE_VALID_1 = "SET PROCESSTYPE ";
+    private static final String PROCESSTYPE_VALID_2 = "SET PROCESSTYPE ";
+    private static final String PROGRAM_VALID_1 = "SET PROGRAM ";
+    private static final String PROGRAM_VALID_2 = "SET PROGRAM ";
+    private static final String SECDISCOVERY_VALID_1 = "SET SECDISCOVERY ";
+    private static final String SECDISCOVERY_VALID_2 = "SET SECDISCOVERY ";
+    private static final String SECRECORDING_VALID_1 = "SET SECRECORDING ";
+    private static final String SECRECORDING_VALID_2 = "SET SECRECORDING ";
+    private static final String STATISTICS_VALID_1 = "SET STATISTICS ";
+    private static final String STATISTICS_VALID_2 = "SET STATISTICS ";
+    private static final String SYSDUMPCODE_VALID_1 = "SET SYSDUMPCODE ";
+    private static final String SYSDUMPCODE_VALID_2 = "SET SYSDUMPCODE ";
+    private static final String SYSTEM_VALID_1 = "SET SYSTEM ";
+    private static final String SYSTEM_VALID_2 = "SET SYSTEM ";
+    private static final String TAGS_REFRESH_VALID_1 = "SET TAGS_REFRESH ";
+    private static final String TAGS_REFRESH_VALID_2 = "SET TAGS_REFRESH ";
+    private static final String TASK_VALID_1 = "SET TASK ";
+    private static final String TASK_VALID_2 = "SET TASK ";
+    private static final String TCLASS_VALID_1 = "SET TCLASS ";
+    private static final String TCLASS_VALID_2 = "SET TCLASS ";
+    private static final String TCPIP_VALID_1 = "SET TCPIP ";
+    private static final String TCPIP_VALID_2 = "SET TCPIP ";
+    private static final String TCPIPSERVICE_VALID_1 = "SET TCPIPSERVICE ";
+    private static final String TCPIPSERVICE_VALID_2 = "SET TCPIPSERVICE ";
+    private static final String TDQUEUE_VALID_1 = "SET TDQUEUE ";
+    private static final String TDQUEUE_VALID_2 = "SET TDQUEUE ";
+    private static final String TEMPSTORAGE_VALID_1 = "SET TEMPSTORAGE ";
+    private static final String TEMPSTORAGE_VALID_2 = "SET TEMPSTORAGE ";
+    private static final String TERMINAL_VALID_1 = "SET TERMINAL ";
+    private static final String TERMINAL_VALID_2 = "SET TERMINAL ";
+    private static final String TRACEDEST_VALID_1 = "SET TRACEDEST ";
+    private static final String TRACEDEST_VALID_2 = "SET TRACEDEST ";
+    private static final String TRACEFLAG_VALID_1 = "SET TRACEFLAG ";
+    private static final String TRACEFLAG_VALID_2 = "SET TRACEFLAG ";
+    private static final String TRACETYPE_VALID_1 = "SET TRACETYPE ";
+    private static final String TRACETYPE_VALID_2 = "SET TRACETYPE ";
+    private static final String TRANCLASS_VALID_1 = "SET TRANCLASS ";
+    private static final String TRANCLASS_VALID_2 = "SET TRANCLASS ";
+    private static final String TRANDUMPCODE_VALID_1 = "SET TRANDUMPCODE ";
+    private static final String TRANDUMPCODE_VALID_2 = "SET TRANDUMPCODE ";
+    private static final String TRANSACTION_VALID_1 = "SET TRANSACTION ";
+    private static final String TRANSACTION_VALID_2 = "SET TRANSACTION ";
+    private static final String TSQUEUE_VALID_1 = "SET TSQUEUE ";
+    private static final String TSQUEUE_VALID_2 = "SET TSQUEUE ";
+    private static final String UOW_VALID_1 = "SET UOW ";
+    private static final String UOW_VALID_2 = "SET UOW ";
+    private static final String UOWLINK_VALID_1 = "SET UOWLINK ";
+    private static final String UOWLINK_VALID_2 = "SET UOWLINK ";
+    private static final String URIMAP_VALID_1 = "SET URIMAP ";
+    private static final String URIMAP_VALID_2 = "SET URIMAP ";
+    private static final String VOLUME_VALID_1 = "SET VOLUME ";
+    private static final String VOLUME_VALID_2 = "SET VOLUME ";
+    private static final String VTAM_VALID_1 = "SET VTAM ";
+    private static final String VTAM_VALID_2 = "SET VTAM ";
+    private static final String WEB_VALID_1 = "SET WEB ";
+    private static final String WEB_VALID_2 = "SET WEB ";
+    private static final String WEBSERVICE_VALID_1 = "SET WEBSERVICE ";
+    private static final String WEBSERVICE_VALID_2 = "SET WEBSERVICE ";
+    private static final String WLMHEALTH_VALID_1 = "SET WLMHEALTH ";
+    private static final String WLMHEALTH_VALID_2 = "SET WLMHEALTH ";
+    private static final String XMLTRANSFORM_VALID_1 = "SET XMLTRANSFORM ";
+    private static final String XMLTRANSFORM_VALID_2 = "SET XMLTRANSFORM ";
+
+    // Invalid test cases
+    private static final String ASSOCIATION_USERCORRDATA_INVALID_1 = "SET ASSOCIATION_USERCORRDATA ";
+    private static final String ASSOCIATION_USERCORRDATA_INVALID_2 = "SET ASSOCIATION_USERCORRDATA ";
+    private static final String ATOMSERVICE_INVALID_1 = "SET ATOMSERVICE ";
+    private static final String ATOMSERVICE_INVALID_2 = "SET ATOMSERVICE ";
+    private static final String AUTOINSTALL_INVALID_1 = "SET AUTOINSTALL ";
+    private static final String AUTOINSTALL_INVALID_2 = "SET AUTOINSTALL ";
+    private static final String BRFACILITY_INVALID_1 = "SET BRFACILITY ";
+    private static final String BRFACILITY_INVALID_2 = "SET BRFACILITY ";
+    private static final String BUNDLE_INVALID_1 = "SET BUNDLE ";
+    private static final String BUNDLE_INVALID_2 = "SET BUNDLE ";
+    private static final String CONNECTION_INVALID_1 = "SET CONNECTION ";
+    private static final String CONNECTION_INVALID_2 = "SET CONNECTION ";
+    private static final String DB2CONN_INVALID_1 = "SET DB2CONN ";
+    private static final String DB2CONN_INVALID_2 = "SET DB2CONN ";
+    private static final String DB2ENTRY_INVALID_1 = "SET DB2ENTRY ";
+    private static final String DB2ENTRY_INVALID_2 = "SET DB2ENTRY ";
+    private static final String DB2TRAN_INVALID_1 = "SET DB2TRAN ";
+    private static final String DB2TRAN_INVALID_2 = "SET DB2TRAN ";
+    private static final String DELETSHIPPED_INVALID_1 = "SET DELETSHIPPED ";
+    private static final String DELETSHIPPED_INVALID_2 = "SET DELETSHIPPED ";
+    private static final String DISPATCHER_INVALID_1 = "SET DISPATCHER ";
+    private static final String DISPATCHER_INVALID_2 = "SET DISPATCHER ";
+    private static final String DOCTEMPLATE_INVALID_1 = "SET DOCTEMPLATE ";
+    private static final String DOCTEMPLATE_INVALID_2 = "SET DOCTEMPLATE ";
+    private static final String DSNAME_INVALID_1 = "SET DSNAME ";
+    private static final String DSNAME_INVALID_2 = "SET DSNAME ";
+    private static final String DUMPDS_INVALID_1 = "SET DUMPDS ";
+    private static final String DUMPDS_INVALID_2 = "SET DUMPDS ";
+    private static final String ENQMODEL_INVALID_1 = "SET ENQMODEL ";
+    private static final String ENQMODEL_INVALID_2 = "SET ENQMODEL ";
+    private static final String EPADAPTER_INVALID_1 = "SET EPADAPTER ";
+    private static final String EPADAPTER_INVALID_2 = "SET EPADAPTER ";
+    private static final String EPADAPTERSET_INVALID_1 = "SET EPADAPTERSET ";
+    private static final String EPADAPTERSET_INVALID_2 = "SET EPADAPTERSET ";
+    private static final String EVENTBINDING_INVALID_1 = "SET EVENTBINDING ";
+    private static final String EVENTBINDING_INVALID_2 = "SET EVENTBINDING ";
+    private static final String EVENTPROCESS_INVALID_1 = "SET EVENTPROCESS ";
+    private static final String EVENTPROCESS_INVALID_2 = "SET EVENTPROCESS ";
+    private static final String FILE_INVALID_1 = "SET FILE ";
+    private static final String FILE_INVALID_2 = "SET FILE ";
+    private static final String HOST_INVALID_1 = "SET HOST ";
+    private static final String HOST_INVALID_2 = "SET HOST ";
+    private static final String IPCONN_INVALID_1 = "SET IPCONN ";
+    private static final String IPCONN_INVALID_2 = "SET IPCONN ";
+    private static final String IRC_INVALID_1 = "SET IRC ";
+    private static final String IRC_INVALID_2 = "SET IRC ";
+    private static final String JOURNALNAME_INVALID_1 = "SET JOURNALNAME ";
+    private static final String JOURNALNAME_INVALID_2 = "SET JOURNALNAME ";
+    private static final String JOURNALNUM_INVALID_1 = "SET JOURNALNUM ";
+    private static final String JOURNALNUM_INVALID_2 = "SET JOURNALNUM ";
+    private static final String JVMENDPOINT_INVALID_1 = "SET JVMENDPOINT ";
+    private static final String JVMENDPOINT_INVALID_2 = "SET JVMENDPOINT ";
+    private static final String JVMSERVER_INVALID_1 = "SET JVMSERVER ";
+    private static final String JVMSERVER_INVALID_2 = "SET JVMSERVER ";
+    private static final String LIBRARY_INVALID_1 = "SET LIBRARY ";
+    private static final String LIBRARY_INVALID_2 = "SET LIBRARY ";
+    private static final String MODENAME_INVALID_1 = "SET MODENAME ";
+    private static final String MODENAME_INVALID_2 = "SET MODENAME ";
+    private static final String MONITOR_INVALID_1 = "SET MONITOR ";
+    private static final String MONITOR_INVALID_2 = "SET MONITOR ";
+    private static final String MQCONN_INVALID_1 = "SET MQCONN ";
+    private static final String MQCONN_INVALID_2 = "SET MQCONN ";
+    private static final String MQMONITOR_INVALID_1 = "SET MQMONITOR ";
+    private static final String MQMONITOR_INVALID_2 = "SET MQMONITOR ";
+    private static final String NETNAME_INVALID_1 = "SET NETNAME ";
+    private static final String NETNAME_INVALID_2 = "SET NETNAME ";
+    private static final String PIPELINE_INVALID_1 = "SET PIPELINE ";
+    private static final String PIPELINE_INVALID_2 = "SET PIPELINE ";
+    private static final String PROCESSTYPE_INVALID_1 = "SET PROCESSTYPE ";
+    private static final String PROCESSTYPE_INVALID_2 = "SET PROCESSTYPE ";
+    private static final String PROGRAM_INVALID_1 = "SET PROGRAM ";
+    private static final String PROGRAM_INVALID_2 = "SET PROGRAM ";
+    private static final String SECDISCOVERY_INVALID_1 = "SET SECDISCOVERY ";
+    private static final String SECDISCOVERY_INVALID_2 = "SET SECDISCOVERY ";
+    private static final String SECRECORDING_INVALID_1 = "SET SECRECORDING ";
+    private static final String SECRECORDING_INVALID_2 = "SET SECRECORDING ";
+    private static final String STATISTICS_INVALID_1 = "SET STATISTICS ";
+    private static final String STATISTICS_INVALID_2 = "SET STATISTICS ";
+    private static final String SYSDUMPCODE_INVALID_1 = "SET SYSDUMPCODE ";
+    private static final String SYSDUMPCODE_INVALID_2 = "SET SYSDUMPCODE ";
+    private static final String SYSTEM_INVALID_1 = "SET SYSTEM ";
+    private static final String SYSTEM_INVALID_2 = "SET SYSTEM ";
+    private static final String TAGS_REFRESH_INVALID_1 = "SET TAGS_REFRESH ";
+    private static final String TAGS_REFRESH_INVALID_2 = "SET TAGS_REFRESH ";
+    private static final String TASK_INVALID_1 = "SET TASK ";
+    private static final String TASK_INVALID_2 = "SET TASK ";
+    private static final String TCLASS_INVALID_1 = "SET TCLASS ";
+    private static final String TCLASS_INVALID_2 = "SET TCLASS ";
+    private static final String TCPIP_INVALID_1 = "SET TCPIP ";
+    private static final String TCPIP_INVALID_2 = "SET TCPIP ";
+    private static final String TCPIPSERVICE_INVALID_1 = "SET TCPIPSERVICE ";
+    private static final String TCPIPSERVICE_INVALID_2 = "SET TCPIPSERVICE ";
+    private static final String TDQUEUE_INVALID_1 = "SET TDQUEUE ";
+    private static final String TDQUEUE_INVALID_2 = "SET TDQUEUE ";
+    private static final String TEMPSTORAGE_INVALID_1 = "SET TEMPSTORAGE ";
+    private static final String TEMPSTORAGE_INVALID_2 = "SET TEMPSTORAGE ";
+    private static final String TERMINAL_INVALID_1 = "SET TERMINAL ";
+    private static final String TERMINAL_INVALID_2 = "SET TERMINAL ";
+    private static final String TRACEDEST_INVALID_1 = "SET TRACEDEST ";
+    private static final String TRACEDEST_INVALID_2 = "SET TRACEDEST ";
+    private static final String TRACEFLAG_INVALID_1 = "SET TRACEFLAG ";
+    private static final String TRACEFLAG_INVALID_2 = "SET TRACEFLAG ";
+    private static final String TRACETYPE_INVALID_1 = "SET TRACETYPE ";
+    private static final String TRACETYPE_INVALID_2 = "SET TRACETYPE ";
+    private static final String TRANCLASS_INVALID_1 = "SET TRANCLASS ";
+    private static final String TRANCLASS_INVALID_2 = "SET TRANCLASS ";
+    private static final String TRANDUMPCODE_INVALID_1 = "SET TRANDUMPCODE ";
+    private static final String TRANDUMPCODE_INVALID_2 = "SET TRANDUMPCODE ";
+    private static final String TRANSACTION_INVALID_1 = "SET TRANSACTION ";
+    private static final String TRANSACTION_INVALID_2 = "SET TRANSACTION ";
+    private static final String TSQUEUE_INVALID_1 = "SET TSQUEUE ";
+    private static final String TSQUEUE_INVALID_2 = "SET TSQUEUE ";
+    private static final String UOW_INVALID_1 = "SET UOW ";
+    private static final String UOW_INVALID_2 = "SET UOW ";
+    private static final String UOWLINK_INVALID_1 = "SET UOWLINK ";
+    private static final String UOWLINK_INVALID_2 = "SET UOWLINK ";
+    private static final String URIMAP_INVALID_1 = "SET URIMAP ";
+    private static final String URIMAP_INVALID_2 = "SET URIMAP ";
+    private static final String VOLUME_INVALID_1 = "SET VOLUME ";
+    private static final String VOLUME_INVALID_2 = "SET VOLUME ";
+    private static final String VTAM_INVALID_1 = "SET VTAM ";
+    private static final String VTAM_INVALID_2 = "SET VTAM ";
+    private static final String WEB_INVALID_1 = "SET WEB ";
+    private static final String WEB_INVALID_2 = "SET WEB ";
+    private static final String WEBSERVICE_INVALID_1 = "SET WEBSERVICE ";
+    private static final String WEBSERVICE_INVALID_2 = "SET WEBSERVICE ";
+    private static final String WLMHEALTH_INVALID_1 = "SET WLMHEALTH ";
+    private static final String WLMHEALTH_INVALID_2 = "SET WLMHEALTH ";
+    private static final String XMLTRANSFORM_INVALID_1 = "SET XMLTRANSFORM ";
+    private static final String XMLTRANSFORM_INVALID_2 = "SET XMLTRANSFORM ";
+
+    // Utility
+    void testSingleError(String invalidStatement, String errorMessage) {
+        HashMap<String, Diagnostic> expectedDiagnostics = new HashMap<>();
+        expectedDiagnostics.put("errorOne", new Diagnostic(new Range(), errorMessage, DiagnosticSeverity.Error, ErrorSource.PARSING.getText()));
+        CICSTestUtils.errorTest(invalidStatement, expectedDiagnostics);
+    }
+
+    // Test Functions
+    @Test
+    void testCicsAssociationUsercorrdataValid() {
+        CICSTestUtils.noErrorTest(ASSOCIATION_USERCORRDATA_VALID_1);
+        CICSTestUtils.noErrorTest(ASSOCIATION_USERCORRDATA_VALID_2);
+    }
+
+    @Test
+    void testCicsAtomserviceValid() {
+        CICSTestUtils.noErrorTest(ATOMSERVICE_VALID_1);
+        CICSTestUtils.noErrorTest(ATOMSERVICE_VALID_2);
+    }
+
+    @Test
+    void testCicsAutoinstallValid() {
+        CICSTestUtils.noErrorTest(AUTOINSTALL_VALID_1);
+        CICSTestUtils.noErrorTest(AUTOINSTALL_VALID_2);
+    }
+
+    @Test
+    void testCicsBrfacilityValid() {
+        CICSTestUtils.noErrorTest(BRFACILITY_VALID_1);
+        CICSTestUtils.noErrorTest(BRFACILITY_VALID_2);
+    }
+
+    @Test
+    void testCicsBundleValid() {
+        CICSTestUtils.noErrorTest(BUNDLE_VALID_1);
+        CICSTestUtils.noErrorTest(BUNDLE_VALID_2);
+    }
+
+    @Test
+    void testCicsConnectionValid() {
+        CICSTestUtils.noErrorTest(CONNECTION_VALID_1);
+        CICSTestUtils.noErrorTest(CONNECTION_VALID_2);
+    }
+
+    @Test
+    void testCicsDb2connValid() {
+        CICSTestUtils.noErrorTest(DB2CONN_VALID_1);
+        CICSTestUtils.noErrorTest(DB2CONN_VALID_2);
+    }
+
+    @Test
+    void testCicsDb2entryValid() {
+        CICSTestUtils.noErrorTest(DB2ENTRY_VALID_1);
+        CICSTestUtils.noErrorTest(DB2ENTRY_VALID_2);
+    }
+
+    @Test
+    void testCicsDb2tranValid() {
+        CICSTestUtils.noErrorTest(DB2TRAN_VALID_1);
+        CICSTestUtils.noErrorTest(DB2TRAN_VALID_2);
+    }
+
+    @Test
+    void testCicsDeletshippedValid() {
+        CICSTestUtils.noErrorTest(DELETSHIPPED_VALID_1);
+        CICSTestUtils.noErrorTest(DELETSHIPPED_VALID_2);
+    }
+
+    @Test
+    void testCicsDispatcherValid() {
+        CICSTestUtils.noErrorTest(DISPATCHER_VALID_1);
+        CICSTestUtils.noErrorTest(DISPATCHER_VALID_2);
+    }
+
+    @Test
+    void testCicsDoctemplateValid() {
+        CICSTestUtils.noErrorTest(DOCTEMPLATE_VALID_1);
+        CICSTestUtils.noErrorTest(DOCTEMPLATE_VALID_2);
+    }
+
+    @Test
+    void testCicsDsnameValid() {
+        CICSTestUtils.noErrorTest(DSNAME_VALID_1);
+        CICSTestUtils.noErrorTest(DSNAME_VALID_2);
+    }
+
+    @Test
+    void testCicsDumpdsValid() {
+        CICSTestUtils.noErrorTest(DUMPDS_VALID_1);
+        CICSTestUtils.noErrorTest(DUMPDS_VALID_2);
+    }
+
+    @Test
+    void testCicsEnqmodelValid() {
+        CICSTestUtils.noErrorTest(ENQMODEL_VALID_1);
+        CICSTestUtils.noErrorTest(ENQMODEL_VALID_2);
+    }
+
+    @Test
+    void testCicsEpadapterValid() {
+        CICSTestUtils.noErrorTest(EPADAPTER_VALID_1);
+        CICSTestUtils.noErrorTest(EPADAPTER_VALID_2);
+    }
+
+    @Test
+    void testCicsEpadaptersetValid() {
+        CICSTestUtils.noErrorTest(EPADAPTERSET_VALID_1);
+        CICSTestUtils.noErrorTest(EPADAPTERSET_VALID_2);
+    }
+
+    @Test
+    void testCicsEventbindingValid() {
+        CICSTestUtils.noErrorTest(EVENTBINDING_VALID_1);
+        CICSTestUtils.noErrorTest(EVENTBINDING_VALID_2);
+    }
+
+    @Test
+    void testCicsEventprocessValid() {
+        CICSTestUtils.noErrorTest(EVENTPROCESS_VALID_1);
+        CICSTestUtils.noErrorTest(EVENTPROCESS_VALID_2);
+    }
+
+    @Test
+    void testCicsFileValid() {
+        CICSTestUtils.noErrorTest(FILE_VALID_1);
+        CICSTestUtils.noErrorTest(FILE_VALID_2);
+    }
+
+    @Test
+    void testCicsHostValid() {
+        CICSTestUtils.noErrorTest(HOST_VALID_1);
+        CICSTestUtils.noErrorTest(HOST_VALID_2);
+    }
+
+    @Test
+    void testCicsIpconnValid() {
+        CICSTestUtils.noErrorTest(IPCONN_VALID_1);
+        CICSTestUtils.noErrorTest(IPCONN_VALID_2);
+    }
+
+    @Test
+    void testCicsIrcValid() {
+        CICSTestUtils.noErrorTest(IRC_VALID_1);
+        CICSTestUtils.noErrorTest(IRC_VALID_2);
+    }
+
+    @Test
+    void testCicsJournalnameValid() {
+        CICSTestUtils.noErrorTest(JOURNALNAME_VALID_1);
+        CICSTestUtils.noErrorTest(JOURNALNAME_VALID_2);
+    }
+
+    @Test
+    void testCicsJournalnumValid() {
+        CICSTestUtils.noErrorTest(JOURNALNUM_VALID_1);
+        CICSTestUtils.noErrorTest(JOURNALNUM_VALID_2);
+    }
+
+    @Test
+    void testCicsJvmendpointValid() {
+        CICSTestUtils.noErrorTest(JVMENDPOINT_VALID_1);
+        CICSTestUtils.noErrorTest(JVMENDPOINT_VALID_2);
+    }
+
+    @Test
+    void testCicsJvmserverValid() {
+        CICSTestUtils.noErrorTest(JVMSERVER_VALID_1);
+        CICSTestUtils.noErrorTest(JVMSERVER_VALID_2);
+    }
+
+    @Test
+    void testCicsLibraryValid() {
+        CICSTestUtils.noErrorTest(LIBRARY_VALID_1);
+        CICSTestUtils.noErrorTest(LIBRARY_VALID_2);
+    }
+
+    @Test
+    void testCicsModenameValid() {
+        CICSTestUtils.noErrorTest(MODENAME_VALID_1);
+        CICSTestUtils.noErrorTest(MODENAME_VALID_2);
+    }
+
+    @Test
+    void testCicsMonitorValid() {
+        CICSTestUtils.noErrorTest(MONITOR_VALID_1);
+        CICSTestUtils.noErrorTest(MONITOR_VALID_2);
+    }
+
+    @Test
+    void testCicsMqconnValid() {
+        CICSTestUtils.noErrorTest(MQCONN_VALID_1);
+        CICSTestUtils.noErrorTest(MQCONN_VALID_2);
+    }
+
+    @Test
+    void testCicsMqmonitorValid() {
+        CICSTestUtils.noErrorTest(MQMONITOR_VALID_1);
+        CICSTestUtils.noErrorTest(MQMONITOR_VALID_2);
+    }
+
+    @Test
+    void testCicsNetnameValid() {
+        CICSTestUtils.noErrorTest(NETNAME_VALID_1);
+        CICSTestUtils.noErrorTest(NETNAME_VALID_2);
+    }
+
+    @Test
+    void testCicsPipelineValid() {
+        CICSTestUtils.noErrorTest(PIPELINE_VALID_1);
+        CICSTestUtils.noErrorTest(PIPELINE_VALID_2);
+    }
+
+    @Test
+    void testCicsProcesstypeValid() {
+        CICSTestUtils.noErrorTest(PROCESSTYPE_VALID_1);
+        CICSTestUtils.noErrorTest(PROCESSTYPE_VALID_2);
+    }
+
+    @Test
+    void testCicsProgramValid() {
+        CICSTestUtils.noErrorTest(PROGRAM_VALID_1);
+        CICSTestUtils.noErrorTest(PROGRAM_VALID_2);
+    }
+
+    @Test
+    void testCicsSecdiscoveryValid() {
+        CICSTestUtils.noErrorTest(SECDISCOVERY_VALID_1);
+        CICSTestUtils.noErrorTest(SECDISCOVERY_VALID_2);
+    }
+
+    @Test
+    void testCicsSecrecordingValid() {
+        CICSTestUtils.noErrorTest(SECRECORDING_VALID_1);
+        CICSTestUtils.noErrorTest(SECRECORDING_VALID_2);
+    }
+
+    @Test
+    void testCicsStatisticsValid() {
+        CICSTestUtils.noErrorTest(STATISTICS_VALID_1);
+        CICSTestUtils.noErrorTest(STATISTICS_VALID_2);
+    }
+
+    @Test
+    void testCicsSysdumpcodeValid() {
+        CICSTestUtils.noErrorTest(SYSDUMPCODE_VALID_1);
+        CICSTestUtils.noErrorTest(SYSDUMPCODE_VALID_2);
+    }
+
+    @Test
+    void testCicsSystemValid() {
+        CICSTestUtils.noErrorTest(SYSTEM_VALID_1);
+        CICSTestUtils.noErrorTest(SYSTEM_VALID_2);
+    }
+
+    @Test
+    void testCicsTags_refreshValid() {
+        CICSTestUtils.noErrorTest(TAGS_REFRESH_VALID_1);
+        CICSTestUtils.noErrorTest(TAGS_REFRESH_VALID_2);
+    }
+
+    @Test
+    void testCicsTaskValid() {
+        CICSTestUtils.noErrorTest(TASK_VALID_1);
+        CICSTestUtils.noErrorTest(TASK_VALID_2);
+    }
+
+    @Test
+    void testCicsTclassValid() {
+        CICSTestUtils.noErrorTest(TCLASS_VALID_1);
+        CICSTestUtils.noErrorTest(TCLASS_VALID_2);
+    }
+
+    @Test
+    void testCicsTcpipValid() {
+        CICSTestUtils.noErrorTest(TCPIP_VALID_1);
+        CICSTestUtils.noErrorTest(TCPIP_VALID_2);
+    }
+
+    @Test
+    void testCicsTcpipserviceValid() {
+        CICSTestUtils.noErrorTest(TCPIPSERVICE_VALID_1);
+        CICSTestUtils.noErrorTest(TCPIPSERVICE_VALID_2);
+    }
+
+    @Test
+    void testCicsTdqueueValid() {
+        CICSTestUtils.noErrorTest(TDQUEUE_VALID_1);
+        CICSTestUtils.noErrorTest(TDQUEUE_VALID_2);
+    }
+
+    @Test
+    void testCicsTempstorageValid() {
+        CICSTestUtils.noErrorTest(TEMPSTORAGE_VALID_1);
+        CICSTestUtils.noErrorTest(TEMPSTORAGE_VALID_2);
+    }
+
+    @Test
+    void testCicsTerminalValid() {
+        CICSTestUtils.noErrorTest(TERMINAL_VALID_1);
+        CICSTestUtils.noErrorTest(TERMINAL_VALID_2);
+    }
+
+    @Test
+    void testCicsTracedestValid() {
+        CICSTestUtils.noErrorTest(TRACEDEST_VALID_1);
+        CICSTestUtils.noErrorTest(TRACEDEST_VALID_2);
+    }
+
+    @Test
+    void testCicsTraceflagValid() {
+        CICSTestUtils.noErrorTest(TRACEFLAG_VALID_1);
+        CICSTestUtils.noErrorTest(TRACEFLAG_VALID_2);
+    }
+
+    @Test
+    void testCicsTracetypeValid() {
+        CICSTestUtils.noErrorTest(TRACETYPE_VALID_1);
+        CICSTestUtils.noErrorTest(TRACETYPE_VALID_2);
+    }
+
+    @Test
+    void testCicsTranclassValid() {
+        CICSTestUtils.noErrorTest(TRANCLASS_VALID_1);
+        CICSTestUtils.noErrorTest(TRANCLASS_VALID_2);
+    }
+
+    @Test
+    void testCicsTrandumpcodeValid() {
+        CICSTestUtils.noErrorTest(TRANDUMPCODE_VALID_1);
+        CICSTestUtils.noErrorTest(TRANDUMPCODE_VALID_2);
+    }
+
+    @Test
+    void testCicsTransactionValid() {
+        CICSTestUtils.noErrorTest(TRANSACTION_VALID_1);
+        CICSTestUtils.noErrorTest(TRANSACTION_VALID_2);
+    }
+
+    @Test
+    void testCicsTsqueueValid() {
+        CICSTestUtils.noErrorTest(TSQUEUE_VALID_1);
+        CICSTestUtils.noErrorTest(TSQUEUE_VALID_2);
+    }
+
+    @Test
+    void testCicsUowValid() {
+        CICSTestUtils.noErrorTest(UOW_VALID_1);
+        CICSTestUtils.noErrorTest(UOW_VALID_2);
+    }
+
+    @Test
+    void testCicsUowlinkValid() {
+        CICSTestUtils.noErrorTest(UOWLINK_VALID_1);
+        CICSTestUtils.noErrorTest(UOWLINK_VALID_2);
+    }
+
+    @Test
+    void testCicsUrimapValid() {
+        CICSTestUtils.noErrorTest(URIMAP_VALID_1);
+        CICSTestUtils.noErrorTest(URIMAP_VALID_2);
+    }
+
+    @Test
+    void testCicsVolumeValid() {
+        CICSTestUtils.noErrorTest(VOLUME_VALID_1);
+        CICSTestUtils.noErrorTest(VOLUME_VALID_2);
+    }
+
+    @Test
+    void testCicsVtamValid() {
+        CICSTestUtils.noErrorTest(VTAM_VALID_1);
+        CICSTestUtils.noErrorTest(VTAM_VALID_2);
+    }
+
+    @Test
+    void testCicsWebValid() {
+        CICSTestUtils.noErrorTest(WEB_VALID_1);
+        CICSTestUtils.noErrorTest(WEB_VALID_2);
+    }
+
+    @Test
+    void testCicsWebserviceValid() {
+        CICSTestUtils.noErrorTest(WEBSERVICE_VALID_1);
+        CICSTestUtils.noErrorTest(WEBSERVICE_VALID_2);
+    }
+
+    @Test
+    void testCicsWlmhealthValid() {
+        CICSTestUtils.noErrorTest(WLMHEALTH_VALID_1);
+        CICSTestUtils.noErrorTest(WLMHEALTH_VALID_2);
+    }
+
+    @Test
+    void testCicsXmltransformValid() {
+        CICSTestUtils.noErrorTest(XMLTRANSFORM_VALID_1);
+        CICSTestUtils.noErrorTest(XMLTRANSFORM_VALID_2);
+    }
+
+    // Invalid Tests
+    @Test
+    void testCicsAssociationUsercorrdataInvalid() {
+        testSingleError(ASSOCIATION_USERCORRDATA_INVALID_1, "");
+        testSingleError(ASSOCIATION_USERCORRDATA_INVALID_2, "");
+    }
+
+    @Test
+    void testCicsAtomserviceInvalid() {
+        testSingleError(ATOMSERVICE_INVALID_1, "");
+        testSingleError(ATOMSERVICE_INVALID_2, "");
+    }
+
+    @Test
+    void testCicsAutoinstallInvalid() {
+        testSingleError(AUTOINSTALL_INVALID_1, "");
+        testSingleError(AUTOINSTALL_INVALID_2, "");
+    }
+
+    @Test
+    void testCicsBrfacilityInvalid() {
+        testSingleError(BRFACILITY_INVALID_1, "");
+        testSingleError(BRFACILITY_INVALID_2, "");
+    }
+
+    @Test
+    void testCicsBundleInvalid() {
+        testSingleError(BUNDLE_INVALID_1, "");
+        testSingleError(BUNDLE_INVALID_2, "");
+    }
+
+    @Test
+    void testCicsConnectionInvalid() {
+        testSingleError(CONNECTION_INVALID_1, "");
+        testSingleError(CONNECTION_INVALID_2, "");
+    }
+
+    @Test
+    void testCicsDb2connInvalid() {
+        testSingleError(DB2CONN_INVALID_1, "");
+        testSingleError(DB2CONN_INVALID_2, "");
+    }
+
+    @Test
+    void testCicsDb2entryInvalid() {
+        testSingleError(DB2ENTRY_INVALID_1, "");
+        testSingleError(DB2ENTRY_INVALID_2, "");
+    }
+
+    @Test
+    void testCicsDb2tranInvalid() {
+        testSingleError(DB2TRAN_INVALID_1, "");
+        testSingleError(DB2TRAN_INVALID_2, "");
+    }
+
+    @Test
+    void testCicsDeletshippedInvalid() {
+        testSingleError(DELETSHIPPED_INVALID_1, "");
+        testSingleError(DELETSHIPPED_INVALID_2, "");
+    }
+
+    @Test
+    void testCicsDispatcherInvalid() {
+        testSingleError(DISPATCHER_INVALID_1, "");
+        testSingleError(DISPATCHER_INVALID_2, "");
+    }
+
+    @Test
+    void testCicsDoctemplateInvalid() {
+        testSingleError(DOCTEMPLATE_INVALID_1, "");
+        testSingleError(DOCTEMPLATE_INVALID_2, "");
+    }
+
+    @Test
+    void testCicsDsnameInvalid() {
+        testSingleError(DSNAME_INVALID_1, "");
+        testSingleError(DSNAME_INVALID_2, "");
+    }
+
+    @Test
+    void testCicsDumpdsInvalid() {
+        testSingleError(DUMPDS_INVALID_1, "");
+        testSingleError(DUMPDS_INVALID_2, "");
+    }
+
+    @Test
+    void testCicsEnqmodelInvalid() {
+        testSingleError(ENQMODEL_INVALID_1, "");
+        testSingleError(ENQMODEL_INVALID_2, "");
+    }
+
+    @Test
+    void testCicsEpadapterInvalid() {
+        testSingleError(EPADAPTER_INVALID_1, "");
+        testSingleError(EPADAPTER_INVALID_2, "");
+    }
+
+    @Test
+    void testCicsEpadaptersetInvalid() {
+        testSingleError(EPADAPTERSET_INVALID_1, "");
+        testSingleError(EPADAPTERSET_INVALID_2, "");
+    }
+
+    @Test
+    void testCicsEventbindingInvalid() {
+        testSingleError(EVENTBINDING_INVALID_1, "");
+        testSingleError(EVENTBINDING_INVALID_2, "");
+    }
+
+    @Test
+    void testCicsEventprocessInvalid() {
+        testSingleError(EVENTPROCESS_INVALID_1, "");
+        testSingleError(EVENTPROCESS_INVALID_2, "");
+    }
+
+    @Test
+    void testCicsFileInvalid() {
+        testSingleError(FILE_INVALID_1, "");
+        testSingleError(FILE_INVALID_2, "");
+    }
+
+    @Test
+    void testCicsHostInvalid() {
+        testSingleError(HOST_INVALID_1, "");
+        testSingleError(HOST_INVALID_2, "");
+    }
+
+    @Test
+    void testCicsIpconnInvalid() {
+        testSingleError(IPCONN_INVALID_1, "");
+        testSingleError(IPCONN_INVALID_2, "");
+    }
+
+    @Test
+    void testCicsIrcInvalid() {
+        testSingleError(IRC_INVALID_1, "");
+        testSingleError(IRC_INVALID_2, "");
+    }
+
+    @Test
+    void testCicsJournalnameInvalid() {
+        testSingleError(JOURNALNAME_INVALID_1, "");
+        testSingleError(JOURNALNAME_INVALID_2, "");
+    }
+
+    @Test
+    void testCicsJournalnumInvalid() {
+        testSingleError(JOURNALNUM_INVALID_1, "");
+        testSingleError(JOURNALNUM_INVALID_2, "");
+    }
+
+    @Test
+    void testCicsJvmendpointInvalid() {
+        testSingleError(JVMENDPOINT_INVALID_1, "");
+        testSingleError(JVMENDPOINT_INVALID_2, "");
+    }
+
+    @Test
+    void testCicsJvmserverInvalid() {
+        testSingleError(JVMSERVER_INVALID_1, "");
+        testSingleError(JVMSERVER_INVALID_2, "");
+    }
+
+    @Test
+    void testCicsLibraryInvalid() {
+        testSingleError(LIBRARY_INVALID_1, "");
+        testSingleError(LIBRARY_INVALID_2, "");
+    }
+
+    @Test
+    void testCicsModenameInvalid() {
+        testSingleError(MODENAME_INVALID_1, "");
+        testSingleError(MODENAME_INVALID_2, "");
+    }
+
+    @Test
+    void testCicsMonitorInvalid() {
+        testSingleError(MONITOR_INVALID_1, "");
+        testSingleError(MONITOR_INVALID_2, "");
+    }
+
+    @Test
+    void testCicsMqconnInvalid() {
+        testSingleError(MQCONN_INVALID_1, "");
+        testSingleError(MQCONN_INVALID_2, "");
+    }
+
+    @Test
+    void testCicsMqmonitorInvalid() {
+        testSingleError(MQMONITOR_INVALID_1, "");
+        testSingleError(MQMONITOR_INVALID_2, "");
+    }
+
+    @Test
+    void testCicsNetnameInvalid() {
+        testSingleError(NETNAME_INVALID_1, "");
+        testSingleError(NETNAME_INVALID_2, "");
+    }
+
+    @Test
+    void testCicsPipelineInvalid() {
+        testSingleError(PIPELINE_INVALID_1, "");
+        testSingleError(PIPELINE_INVALID_2, "");
+    }
+
+    @Test
+    void testCicsProcesstypeInvalid() {
+        testSingleError(PROCESSTYPE_INVALID_1, "");
+        testSingleError(PROCESSTYPE_INVALID_2, "");
+    }
+
+    @Test
+    void testCicsProgramInvalid() {
+        testSingleError(PROGRAM_INVALID_1, "");
+        testSingleError(PROGRAM_INVALID_2, "");
+    }
+
+    @Test
+    void testCicsSecdiscoveryInvalid() {
+        testSingleError(SECDISCOVERY_INVALID_1, "");
+        testSingleError(SECDISCOVERY_INVALID_2, "");
+    }
+
+    @Test
+    void testCicsSecrecordingInvalid() {
+        testSingleError(SECRECORDING_INVALID_1, "");
+        testSingleError(SECRECORDING_INVALID_2, "");
+    }
+
+    @Test
+    void testCicsStatisticsInvalid() {
+        testSingleError(STATISTICS_INVALID_1, "");
+        testSingleError(STATISTICS_INVALID_2, "");
+    }
+
+    @Test
+    void testCicsSysdumpcodeInvalid() {
+        testSingleError(SYSDUMPCODE_INVALID_1, "");
+        testSingleError(SYSDUMPCODE_INVALID_2, "");
+    }
+
+    @Test
+    void testCicsSystemInvalid() {
+        testSingleError(SYSTEM_INVALID_1, "");
+        testSingleError(SYSTEM_INVALID_2, "");
+    }
+
+    @Test
+    void testCicsTags_refreshInvalid() {
+        testSingleError(TAGS_REFRESH_INVALID_1, "");
+        testSingleError(TAGS_REFRESH_INVALID_2, "");
+    }
+
+    @Test
+    void testCicsTaskInvalid() {
+        testSingleError(TASK_INVALID_1, "");
+        testSingleError(TASK_INVALID_2, "");
+    }
+
+    @Test
+    void testCicsTclassInvalid() {
+        testSingleError(TCLASS_INVALID_1, "");
+        testSingleError(TCLASS_INVALID_2, "");
+    }
+
+    @Test
+    void testCicsTcpipInvalid() {
+        testSingleError(TCPIP_INVALID_1, "");
+        testSingleError(TCPIP_INVALID_2, "");
+    }
+
+    @Test
+    void testCicsTcpipserviceInvalid() {
+        testSingleError(TCPIPSERVICE_INVALID_1, "");
+        testSingleError(TCPIPSERVICE_INVALID_2, "");
+    }
+
+    @Test
+    void testCicsTdqueueInvalid() {
+        testSingleError(TDQUEUE_INVALID_1, "");
+        testSingleError(TDQUEUE_INVALID_2, "");
+    }
+
+    @Test
+    void testCicsTempstorageInvalid() {
+        testSingleError(TEMPSTORAGE_INVALID_1, "");
+        testSingleError(TEMPSTORAGE_INVALID_2, "");
+    }
+
+    @Test
+    void testCicsTerminalInvalid() {
+        testSingleError(TERMINAL_INVALID_1, "");
+        testSingleError(TERMINAL_INVALID_2, "");
+    }
+
+    @Test
+    void testCicsTracedestInvalid() {
+        testSingleError(TRACEDEST_INVALID_1, "");
+        testSingleError(TRACEDEST_INVALID_2, "");
+    }
+
+    @Test
+    void testCicsTraceflagInvalid() {
+        testSingleError(TRACEFLAG_INVALID_1, "");
+        testSingleError(TRACEFLAG_INVALID_2, "");
+    }
+
+    @Test
+    void testCicsTracetypeInvalid() {
+        testSingleError(TRACETYPE_INVALID_1, "");
+        testSingleError(TRACETYPE_INVALID_2, "");
+    }
+
+    @Test
+    void testCicsTranclassInvalid() {
+        testSingleError(TRANCLASS_INVALID_1, "");
+        testSingleError(TRANCLASS_INVALID_2, "");
+    }
+
+    @Test
+    void testCicsTrandumpcodeInvalid() {
+        testSingleError(TRANDUMPCODE_INVALID_1, "");
+        testSingleError(TRANDUMPCODE_INVALID_2, "");
+    }
+
+    @Test
+    void testCicsTransactionInvalid() {
+        testSingleError(TRANSACTION_INVALID_1, "");
+        testSingleError(TRANSACTION_INVALID_2, "");
+    }
+
+    @Test
+    void testCicsTsqueueInvalid() {
+        testSingleError(TSQUEUE_INVALID_1, "");
+        testSingleError(TSQUEUE_INVALID_2, "");
+    }
+
+    @Test
+    void testCicsUowInvalid() {
+        testSingleError(UOW_INVALID_1, "");
+        testSingleError(UOW_INVALID_2, "");
+    }
+
+    @Test
+    void testCicsUowlinkInvalid() {
+        testSingleError(UOWLINK_INVALID_1, "");
+        testSingleError(UOWLINK_INVALID_2, "");
+    }
+
+    @Test
+    void testCicsUrimapInvalid() {
+        testSingleError(URIMAP_INVALID_1, "");
+        testSingleError(URIMAP_INVALID_2, "");
+    }
+
+    @Test
+    void testCicsVolumeInvalid() {
+        testSingleError(VOLUME_INVALID_1, "");
+        testSingleError(VOLUME_INVALID_2, "");
+    }
+
+    @Test
+    void testCicsVtamInvalid() {
+        testSingleError(VTAM_INVALID_1, "");
+        testSingleError(VTAM_INVALID_2, "");
+    }
+
+    @Test
+    void testCicsWebInvalid() {
+        testSingleError(WEB_INVALID_1, "");
+        testSingleError(WEB_INVALID_2, "");
+    }
+
+    @Test
+    void testCicsWebserviceInvalid() {
+        testSingleError(WEBSERVICE_INVALID_1, "");
+        testSingleError(WEBSERVICE_INVALID_2, "");
+    }
+
+    @Test
+    void testCicsWlmhealthInvalid() {
+        testSingleError(WLMHEALTH_INVALID_1, "");
+        testSingleError(WLMHEALTH_INVALID_2, "");
+    }
+
+    @Test
+    void testCicsXmltransformInvalid() {
+        testSingleError(XMLTRANSFORM_INVALID_1, "");
+        testSingleError(XMLTRANSFORM_INVALID_2, "");
+    }
+
+}
