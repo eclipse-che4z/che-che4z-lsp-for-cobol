@@ -43,10 +43,10 @@ public class TestCicsSysSetStatement {
     private static final String BUNDLE_VALID_1 = "SET BUNDLE(123)";
     private static final String BUNDLE_VALID_2 = "SET BUNDLE(123) AVAILSTATUS(123)";
     private static final String BUNDLE_VALID_3 = "SET BUNDLE(123) COPY(123)";
-    private static final String CONNECTION_VALID_1 = "SET CONNECTION ";
-    private static final String CONNECTION_VALID_2 = "SET CONNECTION ";
-    private static final String DB2CONN_VALID_1 = "SET DB2CONN ";
-    private static final String DB2CONN_VALID_2 = "SET DB2CONN ";
+    private static final String CONNECTION_VALID_1 = "SET CONNECTION(123)";
+    private static final String CONNECTION_VALID_2 = "SET CONNECTION(123) ACQSTATUS(123) AFFINITY(123) EXITTRACING(123) PENDSTATUS(123) CANCEL NORECOVDATA INSERVICE UOWACTION(123) ZCPTRACE";
+    private static final String DB2CONN_VALID_1 = "SET DB2CONN";
+    private static final String DB2CONN_VALID_2 = "SET DB2CONN ACCOUNTREC(123) AUTHID(123) AUTHTYPE(123) BUSY(123) COMAUTHID(123) COMAUTHTYPE(123) COMTHREADLIM(123) CONNECTERROR(123) CONNECTST(123) DB2GROUPID(123) DB2ID(123) MSGQUEUE1(1) MSGQUEUE2(2) MSGQUEUE3(3) NONTERMREL(123) PLAN(1) PLANEXITNAME(2) PRIORITY(123) PURGECYCLEM(123) PURGECYCLES(2) RESYNCMEMBER(123) REUSELIMIT(1) SECURITY(REBUILD) SIGNID(123) STANDBYMODE(123) STATSQUEUE(2) TCBLIMIT(1) THREADLIMIT(9001) THREADWAIT(3)";
     private static final String DB2ENTRY_VALID_1 = "SET DB2ENTRY ";
     private static final String DB2ENTRY_VALID_2 = "SET DB2ENTRY ";
     private static final String DB2TRAN_VALID_1 = "SET DB2TRAN ";
@@ -169,10 +169,10 @@ public class TestCicsSysSetStatement {
     private static final String AUTOINSTALL_INVALID_1 = "SET AUTOINSTALL AIBRIDGE(123) {AIBRIDGE|errorOne}(123)";
     private static final String BRFACILITY_INVALID_1 = "SET BRFACILITY(123) TERMSTATUS(123) {RELEASED|errorOne}";
     private static final String BUNDLE_INVALID_1 = "SET BUNDLE(123) COPY(123) {PHASEIN|errorOne}";
-    private static final String CONNECTION_INVALID_1 = "SET CONNECTION ";
-    private static final String CONNECTION_INVALID_2 = "SET CONNECTION ";
-    private static final String DB2CONN_INVALID_1 = "SET DB2CONN ";
-    private static final String DB2CONN_INVALID_2 = "SET DB2CONN ";
+    private static final String CONNECTION_INVALID_1 = "SET CONNECTION(123) ACQSTATUS(123) {ACQUIRED|errorOne}";
+    private static final String CONNECTION_INVALID_2 = "SET CONNECTION(123) BACKOUT {COMMIT|errorOne}";
+    private static final String DB2CONN_INVALID_1 = "SET DB2CONN TASK {NONE|errorOne}";
+    private static final String DB2CONN_INVALID_2 = "SET DB2CONN TWAIT {NOTWAIT|errorOne}";
     private static final String DB2ENTRY_INVALID_1 = "SET DB2ENTRY ";
     private static final String DB2ENTRY_INVALID_2 = "SET DB2ENTRY ";
     private static final String DB2TRAN_INVALID_1 = "SET DB2TRAN ";
@@ -328,7 +328,7 @@ public class TestCicsSysSetStatement {
         CICSTestUtils.noErrorTest(BUNDLE_VALID_3);
     }
 
-    /*@Test
+    @Test
     void testCicsConnectionValid() {
         CICSTestUtils.noErrorTest(CONNECTION_VALID_1);
         CICSTestUtils.noErrorTest(CONNECTION_VALID_2);
@@ -340,7 +340,7 @@ public class TestCicsSysSetStatement {
         CICSTestUtils.noErrorTest(DB2CONN_VALID_2);
     }
 
-    @Test
+    /*@Test
     void testCicsDb2entryValid() {
         CICSTestUtils.noErrorTest(DB2ENTRY_VALID_1);
         CICSTestUtils.noErrorTest(DB2ENTRY_VALID_2);
@@ -711,19 +711,19 @@ public class TestCicsSysSetStatement {
         testSingleError(BUNDLE_INVALID_1, "Options \"AVAILSTATUS, AVAILABLE, UNAVAILABLE, ENABLESTATUS, ENABLED, DISABLED, COPY or PHASEIN\" are mutually exclusive.");
     }
 
-    /*@Test
+    @Test
     void testCicsConnectionInvalid() {
-        testSingleError(CONNECTION_INVALID_1, "");
-        testSingleError(CONNECTION_INVALID_2, "");
+        testSingleError(CONNECTION_INVALID_1, "Options \"ACQSTATUS, CONNSTATUS, ACQUIRED or RELEASED\" are mutually exclusive.");
+        testSingleError(CONNECTION_INVALID_2, "Options \"UOWACTION, BACKOUT, COMMIT, FORCEUOW or RESYNC\" are mutually exclusive.");
     }
 
     @Test
     void testCicsDb2connInvalid() {
-        testSingleError(DB2CONN_INVALID_1, "");
-        testSingleError(DB2CONN_INVALID_2, "");
+        testSingleError(DB2CONN_INVALID_1, "Options \"ACCOUNTREC, UOW, TASK, TXID or NONE\" are mutually exclusive.");
+        testSingleError(DB2CONN_INVALID_2, "Options \"THREADWAIT, TWAIT or NOTWAIT\" are mutually exclusive.");
     }
 
-    @Test
+    /*@Test
     void testCicsDb2entryInvalid() {
         testSingleError(DB2ENTRY_INVALID_1, "");
         testSingleError(DB2ENTRY_INVALID_2, "");
