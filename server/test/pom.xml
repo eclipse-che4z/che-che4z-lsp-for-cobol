@@ -17,12 +17,13 @@
         <maven.antlr4.plugin.version>4.13.2</maven.antlr4.plugin.version>
         <antlr.version>4.13.2</antlr.version>
         <lombok.version>1.18.30</lombok.version>
+        <maven.compiler.plugin.version>3.13.0</maven.compiler.plugin.version>
         <maven.resources.plugin.version>3.0.2</maven.resources.plugin.version>
         <maven.checkstyle.plugin.version>3.1.1</maven.checkstyle.plugin.version>
         <junit-jupiter.version>5.6.0</junit-jupiter.version>
         <junit.platform.version>1.6.0</junit.platform.version>
-        <mockito.core.version>5.10.0</mockito.core.version>
-        <maven.jacoco.plugin.version>0.8.11</maven.jacoco.plugin.version>
+        <mockito.core.version>5.14.2</mockito.core.version>
+        <maven.jacoco.plugin.version>0.8.12</maven.jacoco.plugin.version>
         <maven.surefire.plugin.version>3.0.0-M3</maven.surefire.plugin.version>
         <guice.version>4.2.2</guice.version>
         <autoservice.version>1.0.1</autoservice.version>
@@ -157,6 +158,14 @@
         </resources>
 
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven.compiler.plugin.version}</version>
+                <configuration>
+                    <proc>full</proc>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>

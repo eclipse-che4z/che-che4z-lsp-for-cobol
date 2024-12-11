@@ -11,7 +11,8 @@
 #   Broadcom, Inc. - initial API and implementation
 
 name: build
-
+env:
+  graalvm-version: '21'
 on:
   workflow_dispatch:
     inputs:
@@ -84,7 +85,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: graalvm/setup-graalvm@v1
         with:
-          java-version: '17'
+          java-version: ${{ env.graalvm-version }}
           components: 'native-image'
           distribution: 'graalvm-community'
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -242,7 +243,7 @@ jobs:
       - uses: graalvm/setup-graalvm@v1
         if: matrix.os == 'ubuntu-latest' && matrix.arch == 'x64'
         with:
-          java-version: '17'
+          java-version: ${{ env.graalvm-version }}
           components: 'native-image'
           distribution: 'graalvm-community'
           native-image-musl: 'true'
@@ -253,7 +254,7 @@ jobs:
       - uses: graalvm/setup-graalvm@v1
         if: matrix.os != 'ubuntu-latest' || matrix.arch != 'x64'
         with:
-          java-version: '17'
+          java-version: ${{ env.graalvm-version }}
           components: 'native-image'
           distribution: 'graalvm-community'
           github-token: ${{ secrets.GITHUB_TOKEN }}
