@@ -26,7 +26,7 @@ allCicsRule: cics_send | cics_receive | cics_add | cics_address | cics_allocate 
                        cics_invoke | cics_issue | cics_link | cics_load | cics_monitor | cics_move | cics_point | cics_pop |
                        cics_post | cics_purge | cics_push | cics_put | cics_query | cics_read | cics_readnext_readprev |
                        cics_readq | cics_release | cics_remove | cics_reset | cics_resetbr | cics_resume | cics_retrieve |
-                       cics_return | cics_rewind | cics_rewrite | cics_route | cics_run | cics_signal | cics_signoff | cics_signon |
+                       cics_return | cics_rewind | cics_rewrite | cics_route | cics_run | cics_set | cics_signal | cics_signoff | cics_signon |
                        cics_soapfault | cics_spoolclose | cics_spoolopen | cics_spoolread | cics_spoolwrite | cics_start |
                        cics_startbr | cics_startbrowse | cics_suspend | cics_syncpoint | cics_test | cics_transform | cics_unlock |
                        cics_update | cics_verify | cics_wait | cics_waitcics | cics_web | cics_write | cics_writeq | cics_wsacontext |
@@ -716,7 +716,7 @@ cics_set_tsqueue: (TSQUEUE | TSQNAME) cics_data_value ((SYSID | POOLNAME | LASTU
 cics_set_uow: UOW cics_data_value ((COMMIT | BACKOUT | FORCE) | UOWSTATE cics_cvda | cics_handle_response)+;
 cics_set_uowlink: UOWLINK cics_data_value (DELETE | ACTION cics_cvda | cics_handle_response)*;
 cics_set_urimap: URIMAP cics_data_area ((DISABLED | ENABLED | NONE | PERMANENT | TEMPORARY) | LOCATION cics_data_area | (ENABLESTATUS | REDIRECTTYPE) cics_cvda | cics_handle_response)*;
-cics_set_volume: VOLUME (A | cics_handle_response)+;
+cics_set_volume: VOLUME (cics_handle_response)*;
 cics_set_vtam: VTAM ((CLOSED | FORCECLOSE | IMMCLOSE | OPEN | DEREGISTERED | DEREGISTERED) | (PSDINTERVAL | PSDINTHRS | PSDINTMINS | PSDINTSECS | PSDINTHRS) cics_data_value | (OPENSTATUS) cics_cvda | cics_handle_response)*;
 cics_set_web: WEB ((GARBAGEINT | TIMEOUTINT) cics_data_value | cics_handle_response)*;
 cics_set_webservice: WEBSERVICE cics_name ((VALIDATION | NOVALIDATION) | VALIDATIONST cics_cvda | cics_handle_response)*;
