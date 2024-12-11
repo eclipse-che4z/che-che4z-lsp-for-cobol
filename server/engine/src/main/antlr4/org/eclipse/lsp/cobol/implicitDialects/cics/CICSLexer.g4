@@ -13,9 +13,7 @@
  */
 
 lexer grammar CICSLexer;
-channels{
-	COMMENTS
-}
+channels{COMMENTS}
 
 ABCODE : A B C O D E;
 ABDUMP : A B D U M P;
@@ -1698,104 +1696,101 @@ ZERO : Z E R O;
 ZEROES : Z E R O E S;
 ZEROS : Z E R O S;
 
-
 // symbols
-ASTERISKCHAR: '*';
-DOUBLEASTERISKCHAR: '**';
-COLONCHAR: ':';
-COMMACHAR: ',';
-COMMENTTAG: '*>' -> channel(COMMENTS);
-DOUBLEMORETHANCHAR: '>>';
+ASTERISKCHAR : '*';
+DOUBLEASTERISKCHAR : '**';
+COLONCHAR : ':';
+COMMACHAR : ',';
+COMMENTTAG : '*>' -> channel(COMMENTS);
+DOUBLEMORETHANCHAR : '>>';
 
 // period full stopPosition
-DOT: '.';
-LPARENCHAR: '(';
-MINUSCHAR: '-';
-PLUSCHAR: '+';
-RPARENCHAR: ')';
-SLASHCHAR: '/';
+DOT : '.';
+LPARENCHAR : '(';
+MINUSCHAR : '-';
+PLUSCHAR : '+';
+RPARENCHAR : ')';
+SLASHCHAR : '/';
 
-INTEGERLITERAL: (PLUSCHAR | MINUSCHAR)? DIGIT+;
+INTEGERLITERAL : (PLUSCHAR | MINUSCHAR)? DIGIT+ ;
 
-SINGLEDIGITLITERAL: DIGIT;
+SINGLEDIGITLITERAL : DIGIT;
 
-NUMERICLITERAL: (PLUSCHAR | MINUSCHAR)? DIGIT* (DOT | COMMACHAR) DIGIT+ (
-		('e' | 'E') (PLUSCHAR | MINUSCHAR)? DIGIT+
-	)?;
+NUMERICLITERAL : (PLUSCHAR | MINUSCHAR)? DIGIT* (DOT | COMMACHAR) DIGIT+ (('e' | 'E') (PLUSCHAR | MINUSCHAR)? DIGIT+)?;
 
-NONNUMERICLITERAL:
-	UNTRMSTRINGLITERAL
-	| STRINGLITERAL
-	| DBCSLITERAL
-	| HEXNUMBER
-	| NULLTERMINATED;
+NONNUMERICLITERAL : UNTRMSTRINGLITERAL | STRINGLITERAL | DBCSLITERAL | HEXNUMBER | NULLTERMINATED;
 
-WORD_IDENTIFIER: [a-zA-Z0-9][-_a-zA-Z0-9]*;
-COPYBOOK_IDENTIFIER: [a-zA-Z0-9#@$][-_a-zA-Z0-9#@$]*;
+IDENTIFIER : [a-zA-Z0-9][-_a-zA-Z0-9]*;
+COPYBOOK_IDENTIFIER : [a-zA-Z0-9#@$][-_a-zA-Z0-9#@$]*;
 
-OCTDIGITS: OCT_DIGIT;
-HEX_NUMBERS: HEXNUMBER;
+OCTDIGITS : OCT_DIGIT;
+HEX_NUMBERS : HEXNUMBER;
 
 // whitespace, line breaks, comments, ...
-NEWLINE: '\r'? '\n' -> channel(HIDDEN);
-COMMASEPARATOR: ', ' -> channel(HIDDEN);
-COMMENTLINE: COMMENTTAG ~('\n' | '\r')* -> channel(COMMENTS);
-WS: [ \t\f]+ -> channel(HIDDEN);
-COMPILERLINE:
-	DOUBLEMORETHANCHAR ~('\n' | '\r')* -> channel(HIDDEN);
+NEWLINE : '\r'? '\n' -> channel(HIDDEN);
+COMMASEPARATOR : ', ' -> channel(HIDDEN);
+COMMENTLINE : COMMENTTAG ~('\n' | '\r')* -> channel(COMMENTS);
+WS : [ \t\f]+ -> channel(HIDDEN);
+COMPILERLINE : DOUBLEMORETHANCHAR ~('\n' | '\r')* -> channel(HIDDEN);
 
 // treat all the non-processed tokens as errors
-ERRORCHAR: .;
+ERRORCHAR : . ;
 
 ZERO_DIGIT: '0';
 
-fragment HEXNUMBER:
+
+fragment HEXNUMBER :
 	X '"' [0-9A-Fa-f]+ '"'
-	| X '\'' [0-9A-Fa-f]+ '\'';
+	| X '\'' [0-9A-Fa-f]+ '\''
+;
 
-fragment NULLTERMINATED:
+fragment NULLTERMINATED :
 	Z '"' (~["\n\r] | '""' | '\'')* '"'
-	| Z '\'' (~['\n\r] | '\'\'' | '"')* '\'';
+	| Z '\'' (~['\n\r] | '\'\'' | '"')* '\''
+;
 
-fragment STRINGLITERAL:
+fragment STRINGLITERAL :
 	'"' (~["\n\r] | '""' | '\'')* '"'
-	| '\'' (~['\n\r] | '\'\'' | '"')* '\'';
+	| '\'' (~['\n\r] | '\'\'' | '"')* '\''
+;
 
-fragment UNTRMSTRINGLITERAL:
+fragment UNTRMSTRINGLITERAL :
 	'"' (~["\n\r] | '""' | '\'')*
-	| '\'' (~['\n\r] | '\'\'' | '"')*;
+	| '\'' (~['\n\r] | '\'\'' | '"')*
+;
 
-fragment DBCSLITERAL:
+fragment DBCSLITERAL :
 	[GN] '"' (~["\n\r] | '""' | '\'')* '"'
-	| [GN] '\'' (~['\n\r] | '\'\'' | '"')* '\'';
+	| [GN] '\'' (~['\n\r] | '\'\'' | '"')* '\''
+;
 
-fragment OCT_DIGIT: [0-8];
-
+fragment
+OCT_DIGIT        : [0-8] ;
 fragment DIGIT: OCT_DIGIT | [9];
 // case insensitive chars
-fragment A: ('a' | 'A');
-fragment B: ('b' | 'B');
-fragment C: ('c' | 'C');
-fragment D: ('d' | 'D');
-fragment E: ('e' | 'E');
-fragment F: ('f' | 'F');
-fragment G: ('g' | 'G');
-fragment H: ('h' | 'H');
-fragment I: ('i' | 'I');
-fragment J: ('j' | 'J');
-fragment K: ('k' | 'K');
-fragment L: ('l' | 'L');
-fragment M: ('m' | 'M');
-fragment N: ('n' | 'N');
-fragment O: ('o' | 'O');
-fragment P: ('p' | 'P');
-fragment Q: ('q' | 'Q');
-fragment R: ('r' | 'R');
-fragment S: ('s' | 'S');
-fragment T: ('t' | 'T');
-fragment U: ('u' | 'U');
-fragment V: ('v' | 'V');
-fragment W: ('w' | 'W');
-fragment X: ('x' | 'X');
-fragment Y: ('y' | 'Y');
-fragment Z: ('z' | 'Z');
+fragment A:('a'|'A');
+fragment B:('b'|'B');
+fragment C:('c'|'C');
+fragment D:('d'|'D');
+fragment E:('e'|'E');
+fragment F:('f'|'F');
+fragment G:('g'|'G');
+fragment H:('h'|'H');
+fragment I:('i'|'I');
+fragment J:('j'|'J');
+fragment K:('k'|'K');
+fragment L:('l'|'L');
+fragment M:('m'|'M');
+fragment N:('n'|'N');
+fragment O:('o'|'O');
+fragment P:('p'|'P');
+fragment Q:('q'|'Q');
+fragment R:('r'|'R');
+fragment S:('s'|'S');
+fragment T:('t'|'T');
+fragment U:('u'|'U');
+fragment V:('v'|'V');
+fragment W:('w'|'W');
+fragment X:('x'|'X');
+fragment Y:('y'|'Y');
+fragment Z:('z'|'Z');
