@@ -144,6 +144,9 @@ public class CICSOptionsCheckUtility {
     optionsMap.put(
         CICSWSAEPRUtility.RULE_INDEX,
         new CICSWSAEPRUtility(context, errors));
+    optionsMap.put(
+        CICSSysSetOptionsCheckUtility.RULE_INDEX,
+        new CICSSysSetOptionsCheckUtility(context, errors));
   }
 
   /**
