@@ -33,13 +33,13 @@ import java.util.Map;
  */
 public class TestCicsSuspend {
     private static final String SUSPEND_BARE = "SUSPEND";
-    private static final String SUSPEND_ACTIVITY = "SUSPEND ACTIVITY(1)";
+    private static final String SUSPEND_ACTIVITY = "SUSPEND ACTIVITY({$varOne})";
     private static final String SUSPEND_ACQACTIVITY = "SUSPEND ACQACTIVITY";
     private static final String SUSPEND_ACQPROCESS = "SUSPEND ACQPROCESS";
 
     private static final String SUSPEND_INVALID_ONE = "SUSPEND {ACQACTIVITY|error1} {ACQPROCESS|error1}";
-    private static final String SUSPEND_INVALID_TWO = "SUSPEND {ACTIVITY|error1}(1) {ACQPROCESS|error1}";
-    private static final String SUSPEND_INVALID_THREE = "SUSPEND {ACQACTIVITY|error1} {ACTIVITY|error1}(1)";
+    private static final String SUSPEND_INVALID_TWO = "SUSPEND {ACTIVITY|error1}({$varOne}) {ACQPROCESS|error1}";
+    private static final String SUSPEND_INVALID_THREE = "SUSPEND {ACQACTIVITY|error1} {ACTIVITY|error1}({$varOne})";
 
     @Test
     void testSuspend() {
