@@ -1701,7 +1701,7 @@ dbs_special_name: ABSOLUTE | ACCELERATION | ACCELERATOR | ACCESS | ACCESSCTRL | 
                   | XML | XMLCAST| XMLNAMESPACES| XMLPATTERN| XMLQUERY| XMLSCHEMA| XMLTABLE | YEAR | YEARS | YES
                   | ZONE;
 dbs_column_name: (dbs_generic_name DOT_FS)? T=dbs_generic_name {validateLength($T.text, "Column name", 30);};
-dbs_constant : (dbs_string_constant | dbs_integer_constant | DATELITERAL);
+dbs_constant : (dbs_string_constant | dbs_integer_constant | dbs_decimal_constant | DATELITERAL);
 dbs_constraint_name: T=dbs_sql_identifier {validateLength($T.text, "Constraint name", 128);};
 dbs_context: dbs_sql_identifier;
 dbs_context_name: T=dbs_host_name_container {validateLength($T.text, "Profile name", 127);};
@@ -1741,6 +1741,7 @@ dbs_index_identifier: IDENTIFIER;
 dbs_index_name: T=dbs_sql_identifier {validateLength($T.text, "Index name", 128);};
 dbs_integer: INTEGERLITERAL | SINGLEDIGIT_1 | DOUBLEDIGIT_1 | SINGLEDIGITLITERAL;
 dbs_integer_constant: dbs_integer | NUMERICLITERAL; //range 1 - 32767
+dbs_decimal_constant: dbs_integer DOT_FS dbs_integer?;
 dbs_jar_name: T=dbs_hostname_identifier {validateLength($T.text, "Jar name", 128);};
 dbs_jobname_value: IDENTIFIER | NONNUMERICLITERAL;
 dbs_key_label_name: IDENTIFIER;
