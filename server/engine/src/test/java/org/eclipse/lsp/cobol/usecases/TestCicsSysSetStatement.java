@@ -48,9 +48,9 @@ public class TestCicsSysSetStatement {
     private static final String DB2CONN_VALID_1 = "SET DB2CONN";
     private static final String DB2CONN_VALID_2 = "SET DB2CONN ACCOUNTREC(123) AUTHID(123) AUTHTYPE(123) BUSY(123) COMAUTHID(123) COMAUTHTYPE(123) COMTHREADLIM(123) CONNECTERROR(123) CONNECTST(123) DB2GROUPID(123) DB2ID(123) MSGQUEUE1(1) MSGQUEUE2(2) MSGQUEUE3(3) NONTERMREL(123) PLAN(1) PLANEXITNAME(2) PRIORITY(123) PURGECYCLEM(123) PURGECYCLES(2) RESYNCMEMBER(123) REUSELIMIT(1) SECURITY(REBUILD) SIGNID(123) STANDBYMODE(123) STATSQUEUE(2) TCBLIMIT(1) THREADLIMIT(9001) THREADWAIT(3)";
     private static final String DB2ENTRY_VALID_1 = "SET DB2ENTRY ";
-    private static final String DB2ENTRY_VALID_2 = "SET DB2ENTRY ";
-    private static final String DB2TRAN_VALID_1 = "SET DB2TRAN ";
-    private static final String DB2TRAN_VALID_2 = "SET DB2TRAN ";
+    private static final String DB2ENTRY_VALID_2 = "SET DB2ENTRY(123) ACCOUNTREC(123) AUTHID(123) AUTHTYPE(123) BUSY(123) DISABLEDACT(123) ENABLESTATUS(123) PLAN(123) PLANEXITNAME(123) PRIORITY(123) SHARELOCKS(123) THREADLIMIT(1) THREADWAIT(1)";
+    private static final String DB2TRAN_VALID_1 = "SET DB2TRAN";
+    private static final String DB2TRAN_VALID_2 = "SET DB2TRAN DB2ENTRY(123) TRANSID(123)";
     private static final String DELETSHIPPED_VALID_1 = "SET DELETSHIPPED ";
     private static final String DELETSHIPPED_VALID_2 = "SET DELETSHIPPED ";
     private static final String DISPATCHER_VALID_1 = "SET DISPATCHER ";
@@ -173,10 +173,9 @@ public class TestCicsSysSetStatement {
     private static final String CONNECTION_INVALID_2 = "SET CONNECTION(123) BACKOUT {COMMIT|errorOne}";
     private static final String DB2CONN_INVALID_1 = "SET DB2CONN TASK {NONE|errorOne}";
     private static final String DB2CONN_INVALID_2 = "SET DB2CONN TWAIT {NOTWAIT|errorOne}";
-    private static final String DB2ENTRY_INVALID_1 = "SET DB2ENTRY ";
-    private static final String DB2ENTRY_INVALID_2 = "SET DB2ENTRY ";
-    private static final String DB2TRAN_INVALID_1 = "SET DB2TRAN ";
-    private static final String DB2TRAN_INVALID_2 = "SET DB2TRAN ";
+    private static final String DB2ENTRY_INVALID_1 = "SET DB2ENTRY ABEND {SQLCODE|errorOne}";
+    private static final String DB2ENTRY_INVALID_2 = "SET DB2ENTRY(123) YES {NO|errorOne}";
+    private static final String DB2TRAN_INVALID_1 = "SET DB2TRAN DB2ENTRY(123) {DB2ENTRY|errorOne}(123)";
     private static final String DELETSHIPPED_INVALID_1 = "SET DELETSHIPPED ";
     private static final String DELETSHIPPED_INVALID_2 = "SET DELETSHIPPED ";
     private static final String DISPATCHER_INVALID_1 = "SET DISPATCHER ";
@@ -340,7 +339,7 @@ public class TestCicsSysSetStatement {
         CICSTestUtils.noErrorTest(DB2CONN_VALID_2);
     }
 
-    /*@Test
+    @Test
     void testCicsDb2entryValid() {
         CICSTestUtils.noErrorTest(DB2ENTRY_VALID_1);
         CICSTestUtils.noErrorTest(DB2ENTRY_VALID_2);
@@ -352,7 +351,7 @@ public class TestCicsSysSetStatement {
         CICSTestUtils.noErrorTest(DB2TRAN_VALID_2);
     }
 
-    @Test
+    /*@Test
     void testCicsDeletshippedValid() {
         CICSTestUtils.noErrorTest(DELETSHIPPED_VALID_1);
         CICSTestUtils.noErrorTest(DELETSHIPPED_VALID_2);
@@ -723,19 +722,18 @@ public class TestCicsSysSetStatement {
         testSingleError(DB2CONN_INVALID_2, "Options \"THREADWAIT, TWAIT or NOTWAIT\" are mutually exclusive.");
     }
 
-    /*@Test
+    @Test
     void testCicsDb2entryInvalid() {
-        testSingleError(DB2ENTRY_INVALID_1, "");
-        testSingleError(DB2ENTRY_INVALID_2, "");
+        testSingleError(DB2ENTRY_INVALID_1, "Options \"DISABLEDACT, ABEND, SQLCODE or POOL\" are mutually exclusive.");
+        testSingleError(DB2ENTRY_INVALID_2, "Options \"SHARELOCKS, YES or NO\" are mutually exclusive.");
     }
 
     @Test
     void testCicsDb2tranInvalid() {
-        testSingleError(DB2TRAN_INVALID_1, "");
-        testSingleError(DB2TRAN_INVALID_2, "");
+        testSingleError(DB2TRAN_INVALID_1, "Excessive options provided for: DB2ENTRY");
     }
 
-    @Test
+    /*@Test
     void testCicsDeletshippedInvalid() {
         testSingleError(DELETSHIPPED_INVALID_1, "");
         testSingleError(DELETSHIPPED_INVALID_2, "");
