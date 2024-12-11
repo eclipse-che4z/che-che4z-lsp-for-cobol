@@ -343,6 +343,11 @@ cics_extract_tct: (TCT | NETNAME cics_name | (SYSID | TERMID) cics_data_area | c
 cics_extract_web_server: (WEB | (REQUESTTYPE | HOSTTYPE | SCHEME) cics_cvda | HOSTLENGTH cics_data_value | (HOST | HTTPVERSION | VERSIONLEN | PATH | PATHLENGTH | HTTPMETHOD | METHODLENGTH | PORTNUMBER | QUERYSTRING | QUERYSTRLEN | URIMAP) cics_data_area | cics_handle_response)+;
 cics_extract_web_client: (WEB | (SESSTOKEN | PORTNUMBER | URIMAP | REALM | REALMLEN | HOST | HTTPVERSION | VERSIONLEN | PATH | PATHLENGTH) cics_data_area | HOSTLENGTH cics_data_value | (HOSTTYPE | SCHEME) cics_cvda | cics_handle_response)+;
 
+/** EXTRACT (System Commands) */
+cics_extract_system_programming: EXIT (cics_extract_exit | cics_extract_statistics);
+cics_extract_exit: ((PROGRAM | ENTRYNAME) cics_data_value | GALENGTH cics_data_area | GASET cics_ref | cics_handle_response)+;
+cics_extract_statistics: (STATISTICS | (RESTYPE | SUBRESTYPE) cics_cvda | (RESID | SUBRESID | LASTRESET | LASTRESETABS | LASTRESETHRS | LASTRESETMIN | LASTRESETSEC) cics_data_area |
+                          SET cics_ref | (SUBRESIDLEN | APPLICATION | APPLMAJORVER | APPLMINORVER | APPLMICROVER | PLATFORM) cics_data_value | cics_handle_response)+;
 
 /** FORCE TIMER */
 cics_force: FORCE cics_force_opts;
