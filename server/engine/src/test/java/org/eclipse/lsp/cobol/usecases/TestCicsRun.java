@@ -32,28 +32,28 @@ import java.util.Map;
  * <p>This class tests all variations of the RUN command found in the link above.
  */
 public class TestCicsRun {
-    private static final String DEFAULT_ALL_VALID_ONE = "RUN ACQACTIVITY ASYNCHRONOUS INPUTEVENT(12) FACILITYTOKN(123)";
-    private static final String DEFAULT_ALL_VALID_TWO = "RUN ACQPROCESS INPUTEVENT(2) SYNCHRONOUS";
-    private static final String DEFAULT_ALL_VALID_THREE = "RUN SYNCHRONOUS ACTIVITY(12) INPUTEVENT(12)";
-    private static final String DEFAULT_ALL_VALID_FOUR = "RUN INPUTEVENT(12) ASYNCHRONOUS FACILITYTOKN(123) ACTIVITY(12)";
-    private static final String DEFAULT_ALL_VALID_FIVE = "RUN FACILITYTOKN(123) ACQACTIVITY INPUTEVENT(12) ASYNCHRONOUS";
+    private static final String DEFAULT_ALL_VALID_ONE = "RUN ACQACTIVITY ASYNCHRONOUS INPUTEVENT({$varThree}) FACILITYTOKN({$varTwo})";
+    private static final String DEFAULT_ALL_VALID_TWO = "RUN ACQPROCESS INPUTEVENT({$varFour}) SYNCHRONOUS";
+    private static final String DEFAULT_ALL_VALID_THREE = "RUN SYNCHRONOUS ACTIVITY({$varThree}) INPUTEVENT({$varThree})";
+    private static final String DEFAULT_ALL_VALID_FOUR = "RUN INPUTEVENT({$varThree}) ASYNCHRONOUS FACILITYTOKN({$varTwo}) ACTIVITY({$varThree})";
+    private static final String DEFAULT_ALL_VALID_FIVE = "RUN FACILITYTOKN({$varTwo}) ACQACTIVITY INPUTEVENT({$varThree}) ASYNCHRONOUS";
 
-    private static final String DEFAULT_SOME_VALID_ONE = "RUN ASYNCHRONOUS ACTIVITY(12) INPUTEVENT(12)";
-    private static final String DEFAULT_SOME_VALID_TWO = "RUN ASYNCHRONOUS FACILITYTOKN(123) ACQACTIVITY";
-    private static final String DEFAULT_SOME_VALID_THREE = "RUN ACQPROCESS ASYNCHRONOUS INPUTEVENT(12)";
+    private static final String DEFAULT_SOME_VALID_ONE = "RUN ASYNCHRONOUS ACTIVITY({$varThree}) INPUTEVENT({$varThree})";
+    private static final String DEFAULT_SOME_VALID_TWO = "RUN ASYNCHRONOUS FACILITYTOKN({$varTwo}) ACQACTIVITY";
+    private static final String DEFAULT_SOME_VALID_THREE = "RUN ACQPROCESS ASYNCHRONOUS INPUTEVENT({$varThree})";
 
     private static final String DEFAULT_BARE_VALID_ONE = "RUN SYNCHRONOUS ACQPROCESS";
     private static final String DEFAULT_BARE_VALID_TWO = "RUN ACQACTIVITY ASYNCHRONOUS";
     private static final String DEFAULT_BARE_VALID_THREE = "RUN SYNCHRONOUS ACQACTIVITY";
-    private static final String DEFAULT_BARE_VALID_FOUR = "RUN FACILITYTOKN(123) ACQACTIVITY";
+    private static final String DEFAULT_BARE_VALID_FOUR = "RUN FACILITYTOKN({$varTwo}) ACQACTIVITY";
 
-    private static final String DEFAULT_INVALID_ONE = "RUN SYNCHRONOUS ACTIVITY(12) {FACILITYTOKN|error1}(123)";
-    private static final String DEFAULT_INVALID_TWO = "RUN ASYNCHRONOUS {ACQPROCESS|error1}  {ACQACTIVITY|error1} INPUTEVENT(12)";
-    private static final String DEFAULT_INVALID_THREE = "RUN ACTIVITY(12) SYNCHRONOUS INPUTEVENT(12) {ASYNCHRONOUS|error1}";
+    private static final String DEFAULT_INVALID_ONE = "RUN SYNCHRONOUS ACTIVITY({$varThree}) {FACILITYTOKN|error1}({$varTwo})";
+    private static final String DEFAULT_INVALID_TWO = "RUN ASYNCHRONOUS {ACQPROCESS|error1}  {ACQACTIVITY|error1} INPUTEVENT({$varThree})";
+    private static final String DEFAULT_INVALID_THREE = "RUN ACTIVITY({$varThree}) SYNCHRONOUS INPUTEVENT({$varThree}) {ASYNCHRONOUS|error1}";
     private static final String DEFAULT_INVALID_FOUR = "RUN {ACQACTIVITY|error1}";
 
-    private static final String TRANSID_ALL = "RUN TRANSID(12) CHANNEL(123) CHILD(1)";
-    private static final String TRANSID_BARE = "RUN CHILD(1) TRANSID(12)";
+    private static final String TRANSID_ALL = "RUN TRANSID({$varThree}) CHANNEL({$varTwo}) CHILD({$varOne})";
+    private static final String TRANSID_BARE = "RUN CHILD({$varOne}) TRANSID({$varThree})";
 
     @Test
     void testDefaultAllValidOne() {
