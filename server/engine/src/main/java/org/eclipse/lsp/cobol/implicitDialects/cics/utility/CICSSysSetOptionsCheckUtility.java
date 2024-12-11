@@ -829,7 +829,17 @@ public class CICSSysSetOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     }
 
     private void checkDb2conn(CICSParser.Cics_set_db2connContext ctx) {
-        // No checks needed due to the repeat nature of the keywords
+        checkMutuallyExclusiveOptions("ACCOUNTREC, UOW, TASK, TXID or NONE", ctx.ACCOUNTREC(), ctx.UOW(), ctx.TASK(), ctx.TXID(), ctx.NONE());
+        checkMutuallyExclusiveOptions("AUTHTYPE, GROUP, SIGN, TERM, TX, OPID or USERID", ctx.AUTHTYPE(), ctx.GROUP(), ctx.SIGN(), ctx.TERM(), ctx.TX(), ctx.OPID(), ctx.USERID());
+        checkMutuallyExclusiveOptions("BUSY, WAIT, NOWAIT or FORCE", ctx.BUSY(), ctx.WAIT(), ctx.NOWAIT(), ctx.FORCE());
+        checkMutuallyExclusiveOptions("COMAUTHTYPE, CGROUP, CSIGN, CTERM, CTX, COPID or CUSERID", ctx.COMAUTHTYPE(), ctx.CGROUP(), ctx.CSIGN(), ctx.CTERM(), ctx.CTX(), ctx.COPID(), ctx.CUSERID());
+        checkMutuallyExclusiveOptions("CONNECTERROR, ABEND or SQLCODE", ctx.CONNECTERROR(), ctx.ABEND(), ctx.SQLCODE());
+        checkMutuallyExclusiveOptions("CONNECTST, CONNECTED or NOTCONNECTED", ctx.CONNECTST(), ctx.CONNECTED(), ctx.NOTCONNECTED());
+        checkMutuallyExclusiveOptions("NONTERMREL, RELEASE or NORELEASE", ctx.NONTERMREL(), ctx.RELEASE(), ctx.NORELEASE());
+        checkMutuallyExclusiveOptions("PRIORITY, HIGH, EQUAL or LOW", ctx.PRIORITY(), ctx.HIGH(), ctx.EQUAL(), ctx.LOW());
+        checkMutuallyExclusiveOptions("RESYNCMEMBER, RESYNC or NORESYNC", ctx.RESYNCMEMBER(), ctx.RESYNC(), ctx.NORESYNC());
+        checkMutuallyExclusiveOptions("STANDBYMODE, NOCONNECT, CONNECT or RECONNECT", ctx.STANDBYMODE(), ctx.NOCONNECT(), ctx.CONNECT(), ctx.RECONNECT());
+        checkMutuallyExclusiveOptions("THREADWAIT, TWAIT or NOTWAIT", ctx.THREADWAIT(), ctx.TWAIT(), ctx.NOTWAIT());
     }
 
     private void checkDb2entry(CICSParser.Cics_set_db2entryContext ctx) {}
