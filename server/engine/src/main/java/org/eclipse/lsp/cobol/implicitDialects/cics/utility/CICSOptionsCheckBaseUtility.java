@@ -467,8 +467,7 @@ public abstract class CICSOptionsCheckBaseUtility {
                     && tokenIndex != CICSParser.START
                     && tokenIndex != CICSParser.AT
                     && tokenIndex != CICSParser.END
-                    && tokenIndex != CICSParser.NEXT
-                    && tokenIndex != CICSParser.RULE_cics_handle_response) {
+                    && tokenIndex != CICSParser.NEXT) {
                 throwBrowsingViolation(
                         ctx.children.get(index),
                         "Accessory options not allowed when browsing with START or END");
@@ -476,10 +475,9 @@ public abstract class CICSOptionsCheckBaseUtility {
                     && index + 1 < ctx.children.size()
                     && ctx.children.get(index + 1).getText().contains("(")) {
                 if (TerminalNode.class.isAssignableFrom(ctx.children.get(index + 1).getChild(0).getClass()) && ((TerminalNode) ctx.children.get(index + 1).getChild(0)).getSymbol().getType() == CICSLexer.LPARENCHAR) {
+                    // Skip ahead for core rules that require parameters
                     index++;
                 }
-                // Skip ahead for core rules that require parameters
-                index++;
             }
         }
     }
@@ -526,13 +524,14 @@ public abstract class CICSOptionsCheckBaseUtility {
         for (ParseTree rule : ctx.children) {
             if (TerminalNode.class.isAssignableFrom(rule.getClass())) {
                 if (ArrayUtils.contains(coreTokenIndex, ((TerminalNode) rule).getSymbol().getType())) {
-                    ParseTree child = ctx.children.get(traversalIndex + 1).getChild(0);
-                    if (traversalIndex + 1 < ctx.children.size()
-                            && child != null
-                            && (TerminalNode.class.isAssignableFrom(child.getClass()) && ((TerminalNode) child).getSymbol().getType() == CICSLexer.LPARENCHAR)) {
-                        throwBrowsingViolation(
-                                ctx.children.get(traversalIndex + 1),
-                                "Parameter usage when browsing with START or END");
+                    if (traversalIndex + 1 < ctx.children.size()) {
+                        ParseTree child = ctx.children.get(traversalIndex + 1).getChild(0);
+                        if (child != null
+                                && (TerminalNode.class.isAssignableFrom(child.getClass()) && ((TerminalNode) child).getSymbol().getType() == CICSLexer.LPARENCHAR)) {
+                            throwBrowsingViolation(
+                                    ctx.children.get(traversalIndex + 1),
+                                    "Parameter usage when browsing with START or END");
+                        }
                     }
                     break;
                 }
@@ -551,18 +550,9 @@ public abstract class CICSOptionsCheckBaseUtility {
         if (ctx.children == null) return;
         int[] browsingIndices = {CICSParser.START, CICSParser.END, CICSParser.NEXT};
         List<TerminalNode> browsingContexts =
-                ctx.children.stream()
-                        .map(
-                                rule -> {
-                                    if (TerminalNode.class.isAssignableFrom(rule.getClass())) {
-                                        if (ArrayUtils.contains(
-                                                browsingIndices, ((TerminalNode) rule).getSymbol().getType())) {
-                                            return (TerminalNode) rule;
-                                        }
-                                    }
-                                    return null;
-                                })
-                        .filter(Objects::nonNull)
+                ctx.children.stream().filter(TerminalNode.class::isInstance)
+                        .map(TerminalNode.class::cast)
+                        .filter(t -> ArrayUtils.contains(browsingIndices, t.getSymbol().getType()))
                         .collect(Collectors.toList());
         checkHasMutuallyExclusiveOptions("START or END or NEXT", browsingContexts);
     }
