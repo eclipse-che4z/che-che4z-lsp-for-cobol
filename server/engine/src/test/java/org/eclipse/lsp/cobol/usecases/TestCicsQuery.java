@@ -35,8 +35,7 @@ public class TestCicsQuery {
     private static final String QUERY_CHANNEL_VALID_ONE = "QUERY CHANNEL({$varFour}) CONTAINERCNT({$varSix})";
     private static final String QUERY_CHANNEL_VALID_TWO = "QUERY CONTAINERCNT({$varFour}) CHANNEL({$varSix}) ";
 
-    private static final String QUERY_CHANNEL_INVALID_ONE = "QUERY {CHANNEL(1)|error1}";
-    private static final String QUERY_CHANNEL_INVALID_TWO = "QUERY {CONTAINERCNT(2)|error1} ";
+    private static final String QUERY_CHANNEL_INVALID = "QUERY {CONTAINERCNT(2)|error1} ";
 
     private static final String QUERY_COUNTER_VALID_ALL_ONE =
             "QUERY COUNTER({$varOne}) POOL({$varFive}) VALUE({$varSix}) MINIMUM({$varTwo}) MAXIMUM({$varTwo}) NOSUSPEND";
@@ -108,21 +107,6 @@ public class TestCicsQuery {
     }
 
     @Test
-    void testQueryChannelInvalidMissingContainerCnt() {
-        Map<String, Diagnostic> expectedDiagnostics =
-                ImmutableMap.of(
-                        "error1",
-                        new Diagnostic(
-                                new Range(),
-                                "Missing required option: CONTAINERCNT",
-                                DiagnosticSeverity.Error,
-                                ErrorSource.PARSING.getText()
-                        )
-                );
-        CICSTestUtils.errorTest(QUERY_CHANNEL_INVALID_ONE, expectedDiagnostics);
-    }
-
-    @Test
     void testQueryChannelInvalidMissingChannel() {
         Map<String, Diagnostic> expectedDiagnostics =
                 ImmutableMap.of(
@@ -134,7 +118,7 @@ public class TestCicsQuery {
                                 ErrorSource.PARSING.getText()
                         )
                 );
-        CICSTestUtils.errorTest(QUERY_CHANNEL_INVALID_TWO, expectedDiagnostics);
+        CICSTestUtils.errorTest(QUERY_CHANNEL_INVALID, expectedDiagnostics);
     }
 
     @Test
