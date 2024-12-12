@@ -157,8 +157,14 @@ public class CICSOptionsCheckUtility {
         CICSTestOptionsUtility.RULE_INDEX,
         new CICSTestOptionsUtility(context, errors));
     optionsMap.put(
+        CICSUnlockOptionsUtility.RULE_INDEX,
+        new CICSUnlockOptionsUtility(context, errors));
+    optionsMap.put(
         CICSMoveOptionsCheckUtility.RULE_INDEX,
         new CICSMoveOptionsCheckUtility(context, errors));
+    optionsMap.put(
+        CICSRunOptionsCheckUtility.RULE_INDEX,
+        new CICSRunOptionsCheckUtility(context, errors));
   }
 
   /**

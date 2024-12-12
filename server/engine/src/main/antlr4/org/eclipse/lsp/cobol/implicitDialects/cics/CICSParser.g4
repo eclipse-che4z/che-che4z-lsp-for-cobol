@@ -619,8 +619,9 @@ cics_route: ROUTE (INTERVAL cics_zero_digit | INTERVAL cics_hhmmss | TIME cics_h
             REQID cics_name | LDC cics_name | NLEOM | cics_handle_response)*;
 
 /** RUN */
-cics_run: RUN (ACTIVITY cics_data_value | ACQACTIVITY | ACQPROCESS | SYNCHRONOUS | ASYNCHRONOUS | FACILITYTOKN cics_data_value |
-          INPUTEVENT cics_data_value | cics_handle_response)+;
+cics_run: RUN (cics_run_default | cics_run_transid);
+cics_run_default: ((ACTIVITY | FACILITYTOKN | INPUTEVENT) cics_data_value | ACQACTIVITY | ACQPROCESS | SYNCHRONOUS | ASYNCHRONOUS | cics_handle_response)+;
+cics_run_transid: (TRANSID cics_name | CHANNEL cics_name | CHILD cics_data_area | cics_handle_response)+;
 
 /** SIGNAL EVENT */
 cics_signal: SIGNAL (EVENT cics_data_value | FROMCHANNEL cics_data_value | FROM cics_data_area | FROMLENGTH cics_data_value | cics_handle_response)*;
@@ -715,7 +716,7 @@ cics_transform_xmltodata: XMLTODATA (CHANNEL cics_data_value | DATCONTAINER cics
                           cics_transform_typens | XMLCONTAINER cics_data_value | XMLTRANSFORM cics_name | cics_handle_response)+;
 
 /** UNLOCK */
-cics_unlock: UNLOCK cics_file_name (TOKEN cics_data_area | SYSID cics_data_area | cics_handle_response)*;
+cics_unlock: UNLOCK (cics_file_name | TOKEN cics_data_area | SYSID cics_data_area | cics_handle_response)+;
 
 /** UPDATE COUNTER / DCOUNTER */
 cics_update: UPDATE (cics_update_counter | cics_update_dcounter);
@@ -908,8 +909,8 @@ cicsLexerDefinedVariableUsageTokens: ABCODE | ABDUMP | ABEND | ABORT | ABPROGRAM
     | ANYKEY | APLKYBD | APLTEXT | APPLID | AS | ASA | ASIS | ASKTIME | ASRAINTRPT | ASRAKEY | ASRAPSW | ASRAREGS | ASRASPC
     | ASRASTG | ASYNCHRONOUS | ATTACHID | ATTRIBUTES | AUTHENTICATE | AUTOPAGE | AUXILIARY | BASE64
     | BASICAUTH | BELOW | BIF | BODYCHARSET | BOOKMARK | BRDATA | BRDATALENGTH | BREXIT | BRIDGE | BROWSETOKEN
-    | BTRANS | BUFFER | BUILD | CADDRLENGTH | CARD | CBUFF | CCSID | CERTIFICATE | CHANGE | CHANGETIME
-    | CHANNEL | CHAR | CHARACTERSET | CHECK | CHUNKEND | CHUNKING | CHUNKNO | CHUNKYES | CICSDATAKEY | CIPHERS | CLEAR
+    | BTRANS | BUFFER | BUILD | CADDRLENGTH | CARD | CBUFF | CCSID | CERTIFICATE | CHANGE | CHANGETIME | CHANNEL
+    | CHAR | CHARACTERSET | CHECK | CHILD | CHUNKEND | CHUNKING | CHUNKNO | CHUNKYES | CICSDATAKEY | CIPHERS | CLEAR
     | CLICONVERT | CLIENT | CLIENTADDR | CLIENTADDRNU | CLIENTCONV | CLNTCODEPAGE | CLIENTNAME | CLNTADDR6NU | CLNTIPFAMILY
     | CLOSESTATUS | CLRPARTN | CMDSEC | CNAMELENGTH | CNOTCOMPL | CODEPAGE | COLOR | COMMAREA | COMMONNAME
     | COMMONNAMLEN | COMPAREMAX | COMPAREMIN | COMPLETE | COMPOSITE | COMPSTATUS | CONFIRM | CONFIRMATION | CONNECT
