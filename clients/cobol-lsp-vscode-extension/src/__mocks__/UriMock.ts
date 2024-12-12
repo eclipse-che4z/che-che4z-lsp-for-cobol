@@ -1,5 +1,3 @@
-import path = require("path");
-
 export class Uri {
   constructor(public path: string) {}
   static parse(str: string): Uri {
@@ -27,7 +25,7 @@ export class Uri {
         ? this.joinPath(uri, ...pathSegments)
         : uri;
     }
-    const uri = new Uri(base.path + path.sep + segment);
+    const uri = new Uri(base.path + "/" + segment);
     return pathSegments.length > 0 ? this.joinPath(uri, ...pathSegments) : uri;
   }
 

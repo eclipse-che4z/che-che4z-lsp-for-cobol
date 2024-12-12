@@ -12,8 +12,7 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 import { CopybookDownloaderForE4E } from "../../../../services/copybook/downloader/CopybookDownloaderForE4E";
-import * as path from "node:path";
-import * as fs from "node:fs";
+import * as path from "path";
 import { E4E } from "../../../../type/e4eApi";
 import {
   e4eResponseDatasetFirst,
@@ -22,14 +21,6 @@ import {
 import * as extension from "../../../../extension";
 import * as vscode from "vscode";
 import { asMutable } from "../../../../test/suite/testHelper";
-
-jest.mock("node:fs", () => ({
-  promises: {
-    writeFile: jest.fn(),
-  },
-  mkdirSync: jest.fn(),
-  existsSync: jest.fn(),
-}));
 
 describe("e4e copybook downloader tests", () => {
   let e4e: E4E;
@@ -49,15 +40,20 @@ describe("e4e copybook downloader tests", () => {
 
     describe("windows", () => {
       const separator = path.sep;
-      beforeAll(() => {
+      beforeEach(() => {
         asMutable(path).sep = "\\";
+        jest
+          .spyOn(vscode.Uri, "joinPath")
+          .mockImplementation((base, ...args) =>
+            vscode.Uri.parse(base.fsPath + "\\" + args.join("\\")),
+          );
       });
 
       afterAll(() => {
         asMutable(path).sep = separator;
       });
 
-      it("downloaded into correct path", async () => {
+      it("allocates the copybook path incrementally", async () => {
         expect(
           await CopybookDownloaderForE4E["getCopybookPath"](
             "Instance.Instance",
@@ -92,7 +88,7 @@ describe("e4e copybook downloader tests", () => {
       afterAll(() => {
         asMutable(path).sep = separator;
       });
-      it("downloaded into correct path", async () => {
+      it("allocates the copybook path incrementally", async () => {
         expect(
           await CopybookDownloaderForE4E["getCopybookPath"](
             "Instance.Instance",
@@ -187,7 +183,7 @@ describe("e4e copybook downloader tests", () => {
       dialect: "COBOL",
     });
     expect(getMember).toHaveBeenCalled();
-    expect(fs.promises.writeFile).not.toHaveBeenCalled();
+    expect(vscode.workspace.fs.writeFile).not.toHaveBeenCalled();
   });
 
   it("check downloadElementE4E does not perform IO in case of Error", async () => {
@@ -202,34 +198,40 @@ describe("e4e copybook downloader tests", () => {
       dialect: "COBOL",
     });
     expect(getElement).toHaveBeenCalled();
-    expect(fs.promises.writeFile).not.toHaveBeenCalled();
+    expect(vscode.workspace.fs.writeFile).not.toHaveBeenCalled();
   });
 
-  it("check downloadDatasetE4E nominal performs writeFile with correct path and content", async () => {
-    const getMember = jest.fn(() => "content");
-    const e4eDownloader = new CopybookDownloaderForE4E("/storagePath", {
-      getMember,
-    } as unknown as E4E);
-    e4eDownloader.getE4EConfig = async () =>
-      Promise.resolve(e4eResponseDatasetFirst);
-    await e4eDownloader.downloadCopybookE4E("uri", {
-      name: "copybook",
-      dialect: "COBOL",
+  describe("check downloadDatasetE4E nominal performs writeFile with correct path and content", () => {
+    const separator = path.sep;
+    beforeAll(() => {
+      asMutable(path).sep = "/";
     });
-    expect(getMember).toHaveBeenCalledWith(
-      { instance: "instance", profile: "profile" },
-      { dataset: "dataset", member: "copybook" },
-    );
-    expect(fs.promises.writeFile).toHaveBeenCalledWith(
-      path.join(
-        "/storagePath",
-        "e4e",
-        "copybooks",
-        "instance.profile",
-        "dataset",
-        "copybook",
-      ),
-      "content",
-    );
+
+    afterAll(() => {
+      asMutable(path).sep = separator;
+    });
+
+    it("writes to correct path and content", async () => {
+      const getMember = jest.fn(() => "content");
+      const e4eDownloader = new CopybookDownloaderForE4E("/storagePath", {
+        getMember,
+      } as unknown as E4E);
+      e4eDownloader.getE4EConfig = async () =>
+        Promise.resolve(e4eResponseDatasetFirst);
+      await e4eDownloader.downloadCopybookE4E("uri", {
+        name: "copybook",
+        dialect: "COBOL",
+      });
+      expect(getMember).toHaveBeenCalledWith(
+        { instance: "instance", profile: "profile" },
+        { dataset: "dataset", member: "copybook" },
+      );
+      expect(vscode.workspace.fs.writeFile).toHaveBeenCalledWith(
+        {
+          path: "/storagePath/e4e/copybooks/instance.profile/dataset/copybook",
+        },
+        Buffer.from("content"),
+      );
+    });
   });
 });

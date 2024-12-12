@@ -12,7 +12,6 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 import * as vscode from "vscode";
-import * as fs from "node:fs";
 import {
   EndevorElement,
   EndevorMember,
@@ -212,7 +211,10 @@ export class CopybookDownloaderForE4E {
       if (resultElement instanceof Error) {
         this.outputChannel?.appendLine(resultElement.message);
       } else {
-        await fs.promises.writeFile(filePath, resultElement[0]);
+        await vscode.workspace.fs.writeFile(
+          vscode.Uri.file(filePath),
+          Buffer.from(resultElement[0]),
+        );
         return true;
       }
     } catch (err) {
@@ -242,7 +244,10 @@ export class CopybookDownloaderForE4E {
       if (memberContent instanceof Error) {
         this.outputChannel?.appendLine(memberContent.message);
       } else {
-        await fs.promises.writeFile(filePath, memberContent);
+        await vscode.workspace.fs.writeFile(
+          vscode.Uri.file(filePath),
+          Buffer.from(memberContent),
+        );
         return true;
       }
     } catch (err) {
@@ -271,7 +276,7 @@ export class CopybookDownloaderForE4E {
      * https://github.com/microsoft/vscode/issues/142694
      *
      * As a workaround, the path is splitted into individual subfolders
-     * are they are created one by one.
+     * are they are created incrementally one by one.
      */
     const subfoldersPath = folder.replace(`${downloadFolder}${path.sep}`, "");
     const subfolders = subfoldersPath.split(path.sep);
