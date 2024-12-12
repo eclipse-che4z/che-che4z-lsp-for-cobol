@@ -62,7 +62,7 @@ class ExtendedTextLineTest {
   @Test
   void testDelete() {
     ExtendedTextLine line = new ExtendedTextLine("text DELETE end", 5, "uri");
-    line.delete(5, 10);
+    line.delete(5, 11);
     assertEquals("text  end", line.toString());
   }
 
@@ -90,7 +90,7 @@ class ExtendedTextLineTest {
   @Test
   void testClear() {
     ExtendedTextLine line = new ExtendedTextLine("text end", 7, "uri");
-    line.clear(2, 5);
+    line.clear(2, 6);
     assertEquals("te    nd", line.toString());
   }
 
