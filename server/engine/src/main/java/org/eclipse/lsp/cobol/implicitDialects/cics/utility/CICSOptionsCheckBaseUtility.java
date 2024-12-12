@@ -463,7 +463,6 @@ public abstract class CICSOptionsCheckBaseUtility {
             int tokenIndex = ((TerminalNode) ctx.children.get(index)).getSymbol().getType();
             boolean isCoreToken = ArrayUtils.contains(coreTokenIndex, tokenIndex);
             if (!isCoreToken
-                    && tokenIndex != CICSLexer.LPARENCHAR
                     && tokenIndex != CICSParser.START
                     && tokenIndex != CICSParser.AT
                     && tokenIndex != CICSParser.END
@@ -471,13 +470,6 @@ public abstract class CICSOptionsCheckBaseUtility {
                 throwBrowsingViolation(
                         ctx.children.get(index),
                         "Accessory options not allowed when browsing with START or END");
-            } else if (isCoreToken
-                    && index + 1 < ctx.children.size()
-                    && ctx.children.get(index + 1).getText().contains("(")) {
-                if (TerminalNode.class.isAssignableFrom(ctx.children.get(index + 1).getChild(0).getClass()) && ((TerminalNode) ctx.children.get(index + 1).getChild(0)).getSymbol().getType() == CICSLexer.LPARENCHAR) {
-                    // Skip ahead for core rules that require parameters
-                    index++;
-                }
             }
         }
     }

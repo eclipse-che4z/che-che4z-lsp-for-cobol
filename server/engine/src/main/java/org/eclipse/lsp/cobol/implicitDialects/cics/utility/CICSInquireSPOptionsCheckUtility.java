@@ -1432,7 +1432,12 @@ public class CICSInquireSPOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
             case CICSParser.RULE_cics_inquire_mvstcb:
                 CICSParser.Cics_inquire_mvstcbContext mvstcbContext =
                         (CICSParser.Cics_inquire_mvstcbContext) ctx;
-                checkBrowseMutuallyExclusive(mvstcbContext);
+                checkHasExactlyOneOption(
+                        "START or END or NEXT",
+                        mvstcbContext,
+                        mvstcbContext.START(),
+                        mvstcbContext.END(),
+                        mvstcbContext.NEXT());
                 if (!mvstcbContext.START().isEmpty() || !mvstcbContext.END().isEmpty()) {
                     checkBrowsingInvalidOptions(mvstcbContext, CICSParser.MVSTCB);
                     checkBrowsingHasNotParameter(mvstcbContext, CICSParser.MVSTCB);
