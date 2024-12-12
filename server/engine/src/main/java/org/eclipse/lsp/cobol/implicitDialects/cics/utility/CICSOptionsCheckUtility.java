@@ -42,136 +42,142 @@ public class CICSOptionsCheckUtility {
         optionsMap.put(
                 CICSReceiveOptionsCheckUtility.RULE_INDEX,
                 new CICSReceiveOptionsCheckUtility(context, errors));
-        optionsMap.put(
+            optionsMap.put(
                 CICSAllocateOptionsCheckUtility.RULE_INDEX,
                 new CICSAllocateOptionsCheckUtility(context, errors));
-        optionsMap.put(
-                CICSBifOptionsCheckUtility.RULE_INDEX,
+            optionsMap.put(
+              CICSBifOptionsCheckUtility.RULE_INDEX,
                 new CICSBifOptionsCheckUtility(context, errors));
-        optionsMap.put(
+            optionsMap.put(
                 CICSAsktimeOptionsCheckUtility.RULE_INDEX,
                 new CICSAsktimeOptionsCheckUtility(context, errors));
-        optionsMap.put(
+            optionsMap.put(
                 CICSAbendOptionsCheckUtility.RULE_INDEX,
                 new CICSAbendOptionsCheckUtility(context, errors));
-        optionsMap.put(
+            optionsMap.put(
                 CICSConverseOptionsCheckUtility.RULE_INDEX,
                 new CICSConverseOptionsCheckUtility(context, errors));
-        optionsMap.put(
+            optionsMap.put(
                 CICSExtractOptionsUtility.RULE_INDEX,
                 new CICSExtractOptionsUtility(context, errors));
-        optionsMap.put(
+            optionsMap.put(
                 CICSDefineOptionsCheckUtility.RULE_INDEX,
                 new CICSDefineOptionsCheckUtility(context, errors));
-        optionsMap.put(
+            optionsMap.put(
                 CICSIssueOptionsCheckUtility.RULE_INDEX,
                 new CICSIssueOptionsCheckUtility(context, errors));
-        optionsMap.put(
+            optionsMap.put(
                 CICSAddSubeventOptionsCheckUtility.RULE_INDEX,
                 new CICSAddSubeventOptionsCheckUtility(context, errors));
-        optionsMap.put(
+            optionsMap.put(
                 CICSBuildOptionsCheckUtility.RULE_INDEX,
                 new CICSBuildOptionsCheckUtility(context, errors));
-        optionsMap.put(
+            optionsMap.put(
                 CICSAcquireOptionsCheckUtility.RULE_INDEX,
                 new CICSAcquireOptionsCheckUtility(context, errors));
-        optionsMap.put(
+            optionsMap.put(
                 CICSWaitOptionsCheckUtility.RULE_INDEX,
                 new CICSWaitOptionsCheckUtility(context, errors));
-        optionsMap.put(
+            optionsMap.put(
                 CICSAssignOptionsCheckUtility.RULE_INDEX,
                 new CICSAssignOptionsCheckUtility(context, errors));
-        optionsMap.put(
+            optionsMap.put(
                 CICSCancelOptionsCheckUtility.RULE_INDEX,
                 new CICSCancelOptionsCheckUtility(context, errors));
-        optionsMap.put(
+            optionsMap.put(
                 CICSSendOptionsCheckUtility.RULE_INDEX,
                 new CICSSendOptionsCheckUtility(context, errors));
-        optionsMap.put(
+            optionsMap.put(
                 CICSConnectProcessOptionsCheckUtility.RULE_INDEX,
                 new CICSConnectProcessOptionsCheckUtility(context, errors));
-        optionsMap.put(
+            optionsMap.put(
                 CICSCheckOptionsUtility.RULE_INDEX,
                 new CICSCheckOptionsUtility(context, errors));
-        optionsMap.put(
+            optionsMap.put(
                 CICSChangeOptionsCheckUtility.RULE_INDEX,
                 new CICSChangeOptionsCheckUtility(context, errors));
-        optionsMap.put(
+            optionsMap.put(
                 CICSWebOptionsCheckUtility.RULE_INDEX,
                 new CICSWebOptionsCheckUtility(context, errors));
-        optionsMap.put(
+            optionsMap.put(
                 CICSEndBrowseOptionsUtility.RULE_ENDBR_INDEX,
                 new CICSEndBrowseOptionsUtility(context, errors));
-        optionsMap.put(
+            optionsMap.put(
                 CICSEndBrowseOptionsUtility.RULE_ENDBROWSE_INDEX,
                 new CICSEndBrowseOptionsUtility(context, errors));
-        optionsMap.put(
+            optionsMap.put(
                 CICSDeleteOptionsCheckUtility.RULE_INDEX,
                 new CICSDeleteOptionsCheckUtility(context, errors));
-        optionsMap.put(
+            optionsMap.put(
                 CICSDeleteqDeqOptionsCheckUtility.RULE_INDEX_DELETEQ,
                 new CICSDeleteqDeqOptionsCheckUtility(context, errors));
-        optionsMap.put(
+            optionsMap.put(
                 CICSDeleteqDeqOptionsCheckUtility.RULE_INDEX_DEQ,
                 new CICSDeleteqDeqOptionsCheckUtility(context, errors));
-        optionsMap.put(
+            optionsMap.put(
                 CICSReadNextReadPrevOptionsUtility.RULE_INDEX,
                 new CICSReadNextReadPrevOptionsUtility(context, errors));
-        optionsMap.put(
+            optionsMap.put(
                 CICSForceOptionsCheckUtility.RULE_INDEX,
                 new CICSForceOptionsCheckUtility(context, errors));
-        optionsMap.put(
+            optionsMap.put(
                 CICSDumpTransactionOptionsCheckUtility.RULE_INDEX,
                 new CICSDumpTransactionOptionsCheckUtility(context, errors));
-        optionsMap.put(
+            optionsMap.put(
                 CICSGetOptionsCheckUtility.RULE_INDEX,
                 new CICSGetOptionsCheckUtility(context, errors));
-        optionsMap.put(
+            optionsMap.put(
+                CICSFreeMainOptionsCheckUtility.RULE_INDEX,
+                new CICSFreeMainOptionsCheckUtility(context, errors));
+            optionsMap.put(
                 CICSAddressOptionsCheckUtility.RULE_INDEX,
                 new CICSAddressOptionsCheckUtility(context, errors));
-        optionsMap.put(
+            optionsMap.put(
                 CICSWriteqOptionsCheckUtility.RULE_INDEX,
                 new CICSWriteqOptionsCheckUtility(context, errors));
-        optionsMap.put(
+            optionsMap.put(
                 CICSLinkOptionsCheckUtility.RULE_INDEX,
                 new CICSLinkOptionsCheckUtility(context, errors));
-        optionsMap.put(
+            optionsMap.put(
+                CICSFormatTimeOptionsCheckUtility.RULE_INDEX,
+                new CICSFormatTimeOptionsCheckUtility(context, errors));
+            optionsMap.put(
                 CICSDelayOptionsCheckUtility.RULE_INDEX,
                 new CICSDelayOptionsCheckUtility(context, errors));
-        optionsMap.put(
+            optionsMap.put(
                 CICSReadqOptionsCheckUtility.RULE_INDEX,
                 new CICSReadqOptionsCheckUtility(context, errors));
-        optionsMap.put(
+            optionsMap.put(
                 CICSConvertTimeOptionsCheckUtility.RULE_INDEX,
                 new CICSConvertTimeOptionsCheckUtility(context, errors));
-        optionsMap.put(
+            optionsMap.put(
                 CICSEnqOptionsCheckUtility.RULE_INDEX,
                 new CICSEnqOptionsCheckUtility(context, errors));
-        optionsMap.put(
+            optionsMap.put(
                 CICSWriteOptionsCheckUtility.RULE_INDEX,
                 new CICSWriteOptionsCheckUtility(context, errors));
-        optionsMap.put(
+            optionsMap.put(
                 CICSRetrieveOptionsCheckUtility.RULE_INDEX,
                 new CICSRetrieveOptionsCheckUtility(context, errors));
-        optionsMap.put(
+            optionsMap.put(
                 CICSInvokeOptionsCheckUtility.RULE_INDEX,
                 new CICSInvokeOptionsCheckUtility(context, errors));
-        optionsMap.put(
+            optionsMap.put(
                 CICSWSAEPRUtility.RULE_INDEX,
                 new CICSWSAEPRUtility(context, errors));
-        optionsMap.put(
+            optionsMap.put(
                 CICSWaitCicsOptionsUtility.RULE_INDEX,
                 new CICSWaitCicsOptionsUtility(context, errors));
-        optionsMap.put(
+            optionsMap.put(
                 CICSTestOptionsUtility.RULE_INDEX,
                 new CICSTestOptionsUtility(context, errors));
-        optionsMap.put(
+            optionsMap.put(
                 CICSUnlockOptionsUtility.RULE_INDEX,
                 new CICSUnlockOptionsUtility(context, errors));
-        optionsMap.put(
+            optionsMap.put(
                 CICSMoveOptionsCheckUtility.RULE_INDEX,
                 new CICSMoveOptionsCheckUtility(context, errors));
-        optionsMap.put(
+            optionsMap.put(
                 CICSRunOptionsCheckUtility.RULE_INDEX,
                 new CICSRunOptionsCheckUtility(context, errors));
         optionsMap.put(
