@@ -124,6 +124,9 @@ public class CICSOptionsCheckUtility {
         CICSLinkOptionsCheckUtility.RULE_INDEX,
         new CICSLinkOptionsCheckUtility(context, errors));
     optionsMap.put(
+        CICSFormatTimeOptionsCheckUtility.RULE_INDEX,
+        new CICSFormatTimeOptionsCheckUtility(context, errors));
+    optionsMap.put(
         CICSDelayOptionsCheckUtility.RULE_INDEX,
         new CICSDelayOptionsCheckUtility(context, errors));
     optionsMap.put(
@@ -154,8 +157,14 @@ public class CICSOptionsCheckUtility {
         CICSTestOptionsUtility.RULE_INDEX,
         new CICSTestOptionsUtility(context, errors));
     optionsMap.put(
+        CICSUnlockOptionsUtility.RULE_INDEX,
+        new CICSUnlockOptionsUtility(context, errors));
+    optionsMap.put(
         CICSMoveOptionsCheckUtility.RULE_INDEX,
         new CICSMoveOptionsCheckUtility(context, errors));
+    optionsMap.put(
+        CICSRunOptionsCheckUtility.RULE_INDEX,
+        new CICSRunOptionsCheckUtility(context, errors));
   }
 
   /**

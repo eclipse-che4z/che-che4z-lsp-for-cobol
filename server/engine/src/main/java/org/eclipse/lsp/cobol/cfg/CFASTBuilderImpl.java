@@ -119,6 +119,9 @@ public class CFASTBuilderImpl implements CFASTBuilder {
                 convertLocation(node)
             ));
       }
+    } else if (node instanceof ExitPerformNode) {
+      ExitPerformNode exitPerformNode = (ExitPerformNode) node;
+      addChild(parent, new ExitPerform(exitPerformNode.isCycle(), exitPerformNode.isInsideInlinePerform(), convertLocation(node)));
     } else if (node instanceof ExitParagraphNode) {
       addChild(parent, new CFASTNode(CFASTNodeType.EXIT_PARAGRAPH.getValue(), convertLocation(node)));
     } else if (node instanceof ExitSectionNode) {
