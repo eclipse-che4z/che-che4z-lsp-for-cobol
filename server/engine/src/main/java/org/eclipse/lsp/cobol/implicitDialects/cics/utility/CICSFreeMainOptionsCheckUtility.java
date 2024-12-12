@@ -37,7 +37,6 @@ public class CICSFreeMainOptionsCheckUtility extends CICSOptionsCheckBaseUtility
     private static final Map<Integer, ErrorSeverity> DUPLICATE_CHECK_OPTIONS =
             new HashMap<Integer, ErrorSeverity>() {
                 {
-                    put(CICSLexer.FREEMAIN, ErrorSeverity.ERROR);
                     put(CICSLexer.DATA, ErrorSeverity.ERROR);
                     put(CICSLexer.DATAPOINTER, ErrorSeverity.ERROR);
                 }
