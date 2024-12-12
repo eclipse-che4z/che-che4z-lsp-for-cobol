@@ -95,6 +95,8 @@ public class TestCicsQuery {
 
     private static final String QUERY_SECURITY_INVALID =
             "QUERY {RESTYPE|error1}(1) {RESCLASS|error1}(1) SECURITY RESIDLENGTH({$varSix}) RESID({$varThree})";
+    private static final String QUERY_SECURITY_INVALID_TWO =
+            "QUERY {_RESCLASS(1) SECURITY RESID(1)|error1_}";
 
     @Test
     void testQueryChannelValidCasesReturnNoErrorsOne() {
@@ -269,5 +271,20 @@ public class TestCicsQuery {
                         )
                 );
         CICSTestUtils.errorTest(QUERY_SECURITY_INVALID, expectedDiagnostic);
+    }
+
+    @Test
+    void testQuerySecurityResclassWithoutResidLength() {
+        Map<String, Diagnostic> expectedDiagnostic =
+                ImmutableMap.of(
+                        "error1",
+                        new Diagnostic(
+                                new Range(),
+                                "Missing required option: RESIDLENGTH",
+                                DiagnosticSeverity.Error,
+                                ErrorSource.PARSING.getText()
+                        )
+                );
+        CICSTestUtils.errorTest(QUERY_SECURITY_INVALID_TWO, expectedDiagnostic);
     }
 }

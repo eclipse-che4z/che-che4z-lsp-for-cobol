@@ -35,7 +35,6 @@ public class CICSQueryOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     private static final Map<Integer, ErrorSeverity> DUPLICATE_CHECK_OPTIONS =
             new HashMap<Integer, ErrorSeverity>() {
                 {
-                    put(CICSLexer.QUERY, ErrorSeverity.ERROR);
                     put(CICSLexer.CHANNEL, ErrorSeverity.ERROR);
                     put(CICSLexer.CONTAINERCNT, ErrorSeverity.ERROR);
                     put(CICSLexer.RETCODE, ErrorSeverity.ERROR);
@@ -99,6 +98,12 @@ public class CICSQueryOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     private void checkQuerySecurity(CICSParser.Cics_query_securityContext ctx) {
         checkHasMandatoryOptions(ctx.SECURITY(), ctx, "SECURITY");
         checkHasExactlyOneOption("RESTYPE or RESCLASS", ctx, ctx.RESTYPE(), ctx.RESCLASS());
+        if (!ctx.RESCLASS().isEmpty()) {
+            checkHasMandatoryOptions(ctx.RESIDLENGTH(), ctx, "RESIDLENGTH");
+        }
+        if (!ctx.RESIDLENGTH().isEmpty()) {
+            checkHasMandatoryOptions(ctx.RESCLASS(), ctx, "RESCLASS");
+        }
         checkHasMandatoryOptions(ctx.RESID(), ctx, "RESID");
     }
 
