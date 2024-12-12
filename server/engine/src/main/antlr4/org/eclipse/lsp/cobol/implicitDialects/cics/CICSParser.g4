@@ -716,7 +716,7 @@ cics_set_tsqueue: (TSQUEUE | TSQNAME) cics_data_value ((SYSID | POOLNAME | LASTU
 cics_set_uow: UOW cics_data_value ((COMMIT | BACKOUT | FORCE) | UOWSTATE cics_cvda | cics_handle_response)+;
 cics_set_uowlink: UOWLINK cics_data_value (DELETE | ACTION cics_cvda | cics_handle_response)*;
 cics_set_urimap: URIMAP cics_data_area ((DISABLED | ENABLED | NONE | PERMANENT | TEMPORARY) | LOCATION cics_data_area | (ENABLESTATUS | REDIRECTTYPE) cics_cvda | cics_handle_response)*;
-cics_set_volume: VOLUME (cics_handle_response)*;
+cics_set_volume: VOLUME cics_data_value ((ADD|REMOVE|OK|NOWRITE) | JRNL cics_data_value | (ACTION | AVAIL) cics_cvda)*;
 cics_set_vtam: VTAM ((CLOSED | FORCECLOSE | IMMCLOSE | OPEN | DEREGISTERED | DEREGISTERED) | (PSDINTERVAL | PSDINTHRS | PSDINTMINS | PSDINTSECS | PSDINTHRS) cics_data_value | (OPENSTATUS) cics_cvda | cics_handle_response)*;
 cics_set_web: WEB ((GARBAGEINT | TIMEOUTINT) cics_data_value | cics_handle_response)*;
 cics_set_webservice: WEBSERVICE cics_name ((VALIDATION | NOVALIDATION) | VALIDATIONST cics_cvda | cics_handle_response)*;

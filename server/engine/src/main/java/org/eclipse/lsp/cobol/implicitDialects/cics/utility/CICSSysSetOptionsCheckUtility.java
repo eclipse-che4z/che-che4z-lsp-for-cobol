@@ -1193,6 +1193,15 @@ public class CICSSysSetOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
 
     private void checkVolume(CICSParser.Cics_set_volumeContext ctx) {
         checkHasObsoleteOptions(ctx.VOLUME(), "VOLUME");
+        checkPrerequisiteIsMet(ctx.ACTION(), ctx.JRNL(), ctx, "JRNL without ACTION");
+        checkMutuallyExclusiveOptions("ACTION, ADD or REMOVE", ctx.ACTION(), ctx.ADD(), ctx.REMOVE());
+        checkMutuallyExclusiveOptions("AVAIL, OK or NOWRITE", ctx.AVAIL(), ctx.OK(), ctx.NOWRITE());
+        if (ctx.REMOVE() != null) {
+            checkHasIllegalOptions(ctx.JRNL(), "JRNL");
+            checkHasIllegalOptions(ctx.AVAIL(), "AVAIL");
+            checkHasIllegalOptions(ctx.OK(), "OK");
+            checkHasIllegalOptions(ctx.NOWRITE(), "NOWRITE");
+        }
     }
 
     private void checkVtam(CICSParser.Cics_set_vtamContext ctx) {
