@@ -36,7 +36,6 @@ public class CICSXctlOptionsUtility extends CICSOptionsCheckBaseUtility {
   private static final Map<Integer, ErrorSeverity> DUPLICATE_CHECK_OPTIONS =
       new HashMap<Integer, ErrorSeverity>() {
         {
-          put(CICSLexer.XCTL, ErrorSeverity.ERROR);
           put(CICSLexer.PROGRAM, ErrorSeverity.ERROR);
           put(CICSLexer.COMMAREA, ErrorSeverity.ERROR);
           put(CICSLexer.CHANNEL, ErrorSeverity.ERROR);
@@ -58,16 +57,15 @@ public class CICSXctlOptionsUtility extends CICSOptionsCheckBaseUtility {
    */
   public <E extends ParserRuleContext> void checkOptions(E ctx) {
     if (ctx.getParent().getRuleIndex() == CICSParser.RULE_cics_xctl) {
-      checkReadNextReadPrev((CICSParser.Cics_xctlContext) ctx.getParent());
+      checkXctl((CICSParser.Cics_xctlContext) ctx.getParent());
     }
     checkDuplicates(ctx.getParent());
   }
 
   @SuppressWarnings("unchecked")
-  private void checkReadNextReadPrev(CICSParser.Cics_xctlContext ctx) {
+  private void checkXctl(CICSParser.Cics_xctlContext ctx) {
     checkHasMandatoryOptions(ctx.PROGRAM(), ctx, "PROGRAM");
-    checkHasMutuallyExclusiveOptions(
-            "COMMAREA or CHANNEL", ctx.COMMAREA(), ctx.CHANNEL());
+    checkHasMutuallyExclusiveOptions("COMMAREA or CHANNEL", ctx.COMMAREA(), ctx.CHANNEL());
 
     if (ctx.COMMAREA().isEmpty()) checkHasIllegalOptions(ctx.LENGTH(), "LENGTH without COMMAREA");
     if (ctx.INPUTMSG().isEmpty()) checkHasIllegalOptions(ctx.INPUTMSGLEN(), "INPUTMSGLEN without INPUTMSG");
