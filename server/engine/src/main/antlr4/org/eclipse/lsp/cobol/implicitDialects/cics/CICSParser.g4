@@ -649,7 +649,7 @@ cics_set_db2entry: DB2ENTRY cics_data_area? ((UOW | TASK | TXID | NONE | GROUP |
 cics_set_db2tran: DB2TRAN ((DB2ENTRY | TRANSID | DB2ENTRY) cics_data_area | cics_handle_response)*;
 cics_set_deletshipped: DELETSHIPPED ((IDLE | IDLEHRS | IDLEMINS | IDLESECS | IDLEHRS | INTERVAL | INTERVALHRS | INTERVALMINS | INTERVALSECS | INTERVALHRS) cics_data_value | cics_handle_response)*;
 cics_set_dispatcher: DISPATCHER ((MAXOPENTCBS | MAXSSLTCBS | MAXXPTCBS | MROBATCH | PRTYAGING | RUNAWAY | SCANDELAY | TIME | MAXOPENTCBS) cics_data_value | cics_handle_response)*;
-cics_set_doctemplate: DOCTEMPLATE cics_data_value (NEWCOPY | COPY cics_cvda | cics_handle_response)+;
+cics_set_doctemplate: DOCTEMPLATE cics_data_value ((NEWCOPY) | COPY cics_cvda | cics_handle_response)+;
 cics_set_dsname: DSNAME cics_data_value ((REMOVE | RECOVERED | RESETLOCKS | RETRY | AVAILABLE | RREPL | UNAVAILABLE | QUIESCED | IMMQUIESCED | UNQUIESCED | WAIT | NOWAIT | BACKOUT | COMMIT | FORCE) |
                             (ACTION | AVAILABILITY | QUESCESTATE | BUSY | UOWACTION) cics_cvda | cics_handle_response)*;
 cics_set_dumpds: DUMPDS ((CLOSED | OPEN | SWITCH | NOSWITCH | SWITCHNEXT | SWITCHALL) | INITIALDDS cics_data_value | (OPENSTATUS | SWITCHSTATUS) cics_cvda | cics_handle_response)*;
