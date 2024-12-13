@@ -36,7 +36,6 @@ public class CICSGetMain64OptionsUtility extends CICSOptionsCheckBaseUtility {
   private static final Map<Integer, ErrorSeverity> DUPLICATE_CHECK_OPTIONS =
       new HashMap<Integer, ErrorSeverity>() {
         {
-          put(CICSLexer.GETMAIN64, ErrorSeverity.ERROR);
           put(CICSLexer.SET, ErrorSeverity.ERROR);
           put(CICSLexer.FLENGTH, ErrorSeverity.ERROR);
           put(CICSLexer.LOCATION, ErrorSeverity.ERROR);
@@ -68,6 +67,7 @@ public class CICSGetMain64OptionsUtility extends CICSOptionsCheckBaseUtility {
   @SuppressWarnings("unchecked")
   private void checkGetMain(CICSParser.Cics_getmain64Context ctx) {
     checkHasMandatoryOptions(ctx.SET(), ctx, "SET");
+    checkHasMandatoryOptions(ctx.FLENGTH(), ctx, "FLENGTH");
     if (ctx.LOCATION().isEmpty()) checkHasIllegalOptions(ctx.EXECUTABLE(), "EXECUTABLE without LOCATION");
     checkHasMutuallyExclusiveOptions("USERDATAKEY or CICSDATAKEY", ctx.USERDATAKEY(), ctx.CICSDATAKEY());
   }
