@@ -51,26 +51,24 @@ public class TestCicsSysSetStatement {
     private static final String DB2ENTRY_VALID_2 = "SET DB2ENTRY(123) ACCOUNTREC(123) AUTHID(123) AUTHTYPE(123) BUSY(123) DISABLEDACT(123) ENABLESTATUS(123) PLAN(123) PLANEXITNAME(123) PRIORITY(123) SHARELOCKS(123) THREADLIMIT(1) THREADWAIT(1)";
     private static final String DB2TRAN_VALID_1 = "SET DB2TRAN";
     private static final String DB2TRAN_VALID_2 = "SET DB2TRAN DB2ENTRY(123) TRANSID(123)";
-    private static final String DELETSHIPPED_VALID_1 = "SET DELETSHIPPED ";
-    private static final String DELETSHIPPED_VALID_2 = "SET DELETSHIPPED ";
-    private static final String DISPATCHER_VALID_1 = "SET DISPATCHER ";
-    private static final String DISPATCHER_VALID_2 = "SET DISPATCHER ";
-    private static final String DOCTEMPLATE_VALID_1 = "SET DOCTEMPLATE ";
-    private static final String DOCTEMPLATE_VALID_2 = "SET DOCTEMPLATE ";
-    private static final String DSNAME_VALID_1 = "SET DSNAME ";
-    private static final String DSNAME_VALID_2 = "SET DSNAME ";
-    private static final String DUMPDS_VALID_1 = "SET DUMPDS ";
-    private static final String DUMPDS_VALID_2 = "SET DUMPDS ";
-    private static final String ENQMODEL_VALID_1 = "SET ENQMODEL ";
-    private static final String ENQMODEL_VALID_2 = "SET ENQMODEL ";
-    private static final String EPADAPTER_VALID_1 = "SET EPADAPTER ";
-    private static final String EPADAPTER_VALID_2 = "SET EPADAPTER ";
-    private static final String EPADAPTERSET_VALID_1 = "SET EPADAPTERSET ";
-    private static final String EPADAPTERSET_VALID_2 = "SET EPADAPTERSET ";
-    private static final String EVENTBINDING_VALID_1 = "SET EVENTBINDING ";
-    private static final String EVENTBINDING_VALID_2 = "SET EVENTBINDING ";
-    private static final String EVENTPROCESS_VALID_1 = "SET EVENTPROCESS ";
-    private static final String EVENTPROCESS_VALID_2 = "SET EVENTPROCESS ";
+    private static final String DELETSHIPPED_VALID_1 = "SET DELETSHIPPED";
+    private static final String DELETSHIPPED_VALID_2 = "SET DELETSHIPPED IDLE(123) INTERVALHRS(1) INTERVALMINS(12) INTERVALSECS(50)";
+    private static final String DISPATCHER_VALID_1 = "SET DISPATCHER";
+    private static final String DISPATCHER_VALID_2 = "SET DISPATCHER MAXOPENTCBS(123) MAXSSLTCBS(123) MAXXPTCBS(123) MROBATCH(123) PRTYAGING(123) RUNAWAY(123) SCANDELAY(123) TIME(123)";
+    private static final String DOCTEMPLATE_VALID_1 = "SET DOCTEMPLATE(123) COPY(3)";
+    private static final String DOCTEMPLATE_VALID_2 = "SET DOCTEMPLATE(123) NEWCOPY";
+    private static final String DSNAME_VALID_1 = "SET DSNAME(123)";
+    private static final String DSNAME_VALID_2 = "SET DSNAME(123) ACTION(123) AVAILABILITY(123) QUESCESTATE(123) BUSY(123) UOWACTION(123)";
+    private static final String DUMPDS_VALID_1 = "SET DUMPDS";
+    private static final String DUMPDS_VALID_2 = "SET DUMPDS OPEN NOSWITCH";
+    private static final String ENQMODEL_VALID_1 = "SET ENQMODEL(123) STATUS(1)";
+    private static final String ENQMODEL_VALID_2 = "SET ENQMODEL(123) DISABLED";
+    private static final String EPADAPTER_VALID_1 = "SET EPADAPTER(123) ENABLESTATUS(123)";
+    private static final String EPADAPTER_VALID_2 = "SET EPADAPTER(123) ENABLED";
+    private static final String EPADAPTERSET_VALID_1 = "SET EPADAPTERSET(123) ENABLESTATUS(123) ENABLED";
+    private static final String EVENTBINDING_VALID_1 = "SET EVENTBINDING(123) ENABLESTATUS(123)";
+    private static final String EVENTBINDING_VALID_2 = "SET EVENTBINDING(123) ENABLED";
+    private static final String EVENTPROCESS_VALID_1 = "SET EVENTPROCESS STARTED";
     private static final String FILE_VALID_1 = "SET FILE ";
     private static final String FILE_VALID_2 = "SET FILE ";
     private static final String HOST_VALID_1 = "SET HOST ";
@@ -176,26 +174,19 @@ public class TestCicsSysSetStatement {
     private static final String DB2ENTRY_INVALID_1 = "SET DB2ENTRY ABEND {SQLCODE|errorOne}";
     private static final String DB2ENTRY_INVALID_2 = "SET DB2ENTRY(123) YES {NO|errorOne}";
     private static final String DB2TRAN_INVALID_1 = "SET DB2TRAN DB2ENTRY(123) {DB2ENTRY|errorOne}(123)";
-    private static final String DELETSHIPPED_INVALID_1 = "SET DELETSHIPPED ";
-    private static final String DELETSHIPPED_INVALID_2 = "SET DELETSHIPPED ";
-    private static final String DISPATCHER_INVALID_1 = "SET DISPATCHER ";
-    private static final String DISPATCHER_INVALID_2 = "SET DISPATCHER ";
-    private static final String DOCTEMPLATE_INVALID_1 = "SET DOCTEMPLATE ";
-    private static final String DOCTEMPLATE_INVALID_2 = "SET DOCTEMPLATE ";
-    private static final String DSNAME_INVALID_1 = "SET DSNAME ";
-    private static final String DSNAME_INVALID_2 = "SET DSNAME ";
-    private static final String DUMPDS_INVALID_1 = "SET DUMPDS ";
-    private static final String DUMPDS_INVALID_2 = "SET DUMPDS ";
-    private static final String ENQMODEL_INVALID_1 = "SET ENQMODEL ";
-    private static final String ENQMODEL_INVALID_2 = "SET ENQMODEL ";
-    private static final String EPADAPTER_INVALID_1 = "SET EPADAPTER ";
-    private static final String EPADAPTER_INVALID_2 = "SET EPADAPTER ";
-    private static final String EPADAPTERSET_INVALID_1 = "SET EPADAPTERSET ";
-    private static final String EPADAPTERSET_INVALID_2 = "SET EPADAPTERSET ";
-    private static final String EVENTBINDING_INVALID_1 = "SET EVENTBINDING ";
-    private static final String EVENTBINDING_INVALID_2 = "SET EVENTBINDING ";
-    private static final String EVENTPROCESS_INVALID_1 = "SET EVENTPROCESS ";
-    private static final String EVENTPROCESS_INVALID_2 = "SET EVENTPROCESS ";
+    private static final String DELETSHIPPED_INVALID_1 = "SET DELETSHIPPED IDLE(3) {IDLEHRS|errorOne}(3)";
+    private static final String DELETSHIPPED_INVALID_2 = "SET DELETSHIPPED INTERVAL(3) {INTERVALHRS|errorOne}(3)";
+    private static final String DISPATCHER_INVALID_1 = "SET DISPATCHER TIME(123) {TIME|errorOne}(123)";
+    private static final String DOCTEMPLATE_INVALID_1 = "SET {DOCTEMPLATE|errorOne} {NEWCOPY|errorTwo} COPY(123)";
+    private static final String DSNAME_INVALID_1 = "SET DSNAME(123) REMOVE {RECOVERED|errorOne}";
+    private static final String DSNAME_INVALID_2 = "SET DSNAME(123) QUIESCED {UNQUIESCED|errorOne}";
+    private static final String DUMPDS_INVALID_1 = "SET DUMPDS {OPEN|errorOne} CLOSED";
+    private static final String DUMPDS_INVALID_2 = "SET DUMPDS NOSWITCH {SWITCHNEXT|errorOne}";
+    private static final String ENQMODEL_INVALID_1 = "SET {_ENQMODEL(123) STATUS(123) DISABLED|errorOne_}";
+    private static final String EPADAPTER_INVALID_1 = "SET EPADAPTER(123) ENABLESTATUS(123) {ENABLED|errorOne}";
+    //private static final String EPADAPTERSET_INVALID_1 = "SET EPADAPTERSET ";
+    private static final String EVENTBINDING_INVALID_1 = "SET EVENTBINDING(123) ENABLESTATUS(123) {DISABLED|errorOne}";
+    private static final String EVENTPROCESS_INVALID_1 = "SET {_EVENTPROCESS STARTED STOPPED|errorOne_}";
     private static final String FILE_INVALID_1 = "SET FILE ";
     private static final String FILE_INVALID_2 = "SET FILE ";
     private static final String HOST_INVALID_1 = "SET HOST ";
@@ -296,6 +287,13 @@ public class TestCicsSysSetStatement {
         CICSTestUtils.errorTest(invalidStatement, expectedDiagnostics);
     }
 
+    void testTwoErrors(String invalidStatement, String errorMessage1, String errorMessage2) {
+        HashMap<String, Diagnostic> expectedDiagnostics = new HashMap<>();
+        expectedDiagnostics.put("errorOne", new Diagnostic(new Range(), errorMessage1, DiagnosticSeverity.Error, ErrorSource.PARSING.getText()));
+        expectedDiagnostics.put("errorTwo", new Diagnostic(new Range(), errorMessage2, DiagnosticSeverity.Error, ErrorSource.PARSING.getText()));
+        CICSTestUtils.errorTest(invalidStatement, expectedDiagnostics);
+    }
+
     // Test Functions
     @Test
     void testCicsAssociationUsercorrdataValid() {
@@ -351,7 +349,7 @@ public class TestCicsSysSetStatement {
         CICSTestUtils.noErrorTest(DB2TRAN_VALID_2);
     }
 
-    /*@Test
+    @Test
     void testCicsDeletshippedValid() {
         CICSTestUtils.noErrorTest(DELETSHIPPED_VALID_1);
         CICSTestUtils.noErrorTest(DELETSHIPPED_VALID_2);
@@ -396,7 +394,6 @@ public class TestCicsSysSetStatement {
     @Test
     void testCicsEpadaptersetValid() {
         CICSTestUtils.noErrorTest(EPADAPTERSET_VALID_1);
-        CICSTestUtils.noErrorTest(EPADAPTERSET_VALID_2);
     }
 
     @Test
@@ -408,10 +405,9 @@ public class TestCicsSysSetStatement {
     @Test
     void testCicsEventprocessValid() {
         CICSTestUtils.noErrorTest(EVENTPROCESS_VALID_1);
-        CICSTestUtils.noErrorTest(EVENTPROCESS_VALID_2);
     }
 
-    @Test
+    /*@Test
     void testCicsFileValid() {
         CICSTestUtils.noErrorTest(FILE_VALID_1);
         CICSTestUtils.noErrorTest(FILE_VALID_2);
@@ -687,6 +683,8 @@ public class TestCicsSysSetStatement {
         CICSTestUtils.noErrorTest(XMLTRANSFORM_VALID_2);
     }*/
 
+/* ---------------------------------------------------------------- */
+
     // Invalid Tests
     // No cases for ASSOCIATION USERCORRDATA.
 
@@ -733,67 +731,57 @@ public class TestCicsSysSetStatement {
         testSingleError(DB2TRAN_INVALID_1, "Excessive options provided for: DB2ENTRY");
     }
 
-    /*@Test
+    @Test
     void testCicsDeletshippedInvalid() {
-        testSingleError(DELETSHIPPED_INVALID_1, "");
-        testSingleError(DELETSHIPPED_INVALID_2, "");
+        testSingleError(DELETSHIPPED_INVALID_1, "Options \"IDLE or IDLEHRS\" are mutually exclusive.");
+        testSingleError(DELETSHIPPED_INVALID_2, "Options \"INTERVAL or INTERVALHRS\" are mutually exclusive.");
     }
 
     @Test
     void testCicsDispatcherInvalid() {
-        testSingleError(DISPATCHER_INVALID_1, "");
-        testSingleError(DISPATCHER_INVALID_2, "");
+        testSingleError(DISPATCHER_INVALID_1, "Excessive options provided for: TIME");
     }
 
     @Test
     void testCicsDoctemplateInvalid() {
-        testSingleError(DOCTEMPLATE_INVALID_1, "");
-        testSingleError(DOCTEMPLATE_INVALID_2, "");
+        testTwoErrors(DOCTEMPLATE_INVALID_1, "Must use exactly one of the following: COPY or NEWCOPY", "Syntax error on 'NEWCOPY'");
     }
 
     @Test
     void testCicsDsnameInvalid() {
-        testSingleError(DSNAME_INVALID_1, "");
-        testSingleError(DSNAME_INVALID_2, "");
+        testSingleError(DSNAME_INVALID_1, "Options \"ACTION, REMOVE, RECOVERED, RESETLOCKS or RETRY\" are mutually exclusive.");
+        testSingleError(DSNAME_INVALID_2, "Options \"QUESCESTATE, QUIESCED, IMMQUIESCED or UNQUIESCED\" are mutually exclusive.");
     }
 
     @Test
     void testCicsDumpdsInvalid() {
-        testSingleError(DUMPDS_INVALID_1, "");
-        testSingleError(DUMPDS_INVALID_2, "");
+        testSingleError(DUMPDS_INVALID_1, "Options \"OPENSTATUS, CLOSED, OPEN or SWITCH\" are mutually exclusive.");
+        testSingleError(DUMPDS_INVALID_2, "Options \"SWITCHSTATUS, NOSWITCH, SWITCHNEXT or SWITCHALL\" are mutually exclusive.");
     }
 
     @Test
     void testCicsEnqmodelInvalid() {
-        testSingleError(ENQMODEL_INVALID_1, "");
-        testSingleError(ENQMODEL_INVALID_2, "");
+        testSingleError(ENQMODEL_INVALID_1, "Must use exactly one of the following: STATUS, ENABLED or DISABLED");
     }
 
     @Test
     void testCicsEpadapterInvalid() {
-        testSingleError(EPADAPTER_INVALID_1, "");
-        testSingleError(EPADAPTER_INVALID_2, "");
+        testSingleError(EPADAPTER_INVALID_1, "Options \"ENABLESTATUS, ENABLED or DISABLED\" are mutually exclusive.");
     }
 
-    @Test
-    void testCicsEpadaptersetInvalid() {
-        testSingleError(EPADAPTERSET_INVALID_1, "");
-        testSingleError(EPADAPTERSET_INVALID_2, "");
-    }
+    // No invalid cases for EPADAPTERSET.
 
     @Test
     void testCicsEventbindingInvalid() {
-        testSingleError(EVENTBINDING_INVALID_1, "");
-        testSingleError(EVENTBINDING_INVALID_2, "");
+        testSingleError(EVENTBINDING_INVALID_1, "Options \"ENABLESTATUS, ENABLED or DISABLED\" are mutually exclusive.");
     }
 
     @Test
     void testCicsEventprocessInvalid() {
-        testSingleError(EVENTPROCESS_INVALID_1, "");
-        testSingleError(EVENTPROCESS_INVALID_2, "");
+        testSingleError(EVENTPROCESS_INVALID_1, "Must use exactly one of the following: EPSTATUS, STARTED, DRAIN or STOPPED");
     }
 
-    @Test
+    /*@Test
     void testCicsFileInvalid() {
         testSingleError(FILE_INVALID_1, "");
         testSingleError(FILE_INVALID_2, "");
