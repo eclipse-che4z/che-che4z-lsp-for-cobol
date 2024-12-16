@@ -26,17 +26,15 @@ import static java.util.Optional.ofNullable;
 /**
  * Error strategy
  */
+@Setter
+@Getter
 @Slf4j
 public class Db2ErrorStrategy extends DefaultErrorStrategy implements MessageServiceProvider {
     private static final String REPORT_NO_VIABLE_ALTERNATIVE =
             "ErrorStrategy.reportNoViableAlternative";
     private static final String REPORT_MISSING_TOKEN = "ErrorStrategy.reportMissingToken";
     private static final String REPORT_MISSING_END_EXEC = "db2Parser.missingEndExec";
-    @Getter
-    @Setter
     private MessageService messageService;
-    @Getter
-    @Setter
     private ErrorMessageHelper errorMessageHelper;
 
     Db2ErrorStrategy(MessageService messageService) {
