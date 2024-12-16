@@ -18,6 +18,8 @@ import com.google.common.collect.ImmutableList;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.RuleNode;
@@ -25,14 +27,18 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.lsp.cobol.AntlrRangeUtils;
 import org.eclipse.lsp.cobol.common.copybook.CopybookService;
+import org.eclipse.lsp.cobol.common.dialects.CobolDialect;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
+import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.model.tree.variable.*;
 import org.eclipse.lsp.cobol.core.visitor.VisitorHelper;
 import org.eclipse.lsp.cobol.implicitDialects.sql.node.*;
 import org.eclipse.lsp4j.Location;
+import org.eclipse.lsp4j.Position;
+import org.eclipse.lsp4j.Range;
 
 import java.util.*;
 import java.util.function.Function;
@@ -49,10 +55,13 @@ import static org.eclipse.lsp.cobol.AntlrRangeUtils.constructRange;
  */
 @Slf4j
 @AllArgsConstructor
-class Db2SqlVisitor extends Db2SqlExecParserBaseVisitor<List<Node>> {
+class Db2SqlVisitor extends Db2SqlParserBaseVisitor<List<Node>> {
 
     private final DialectProcessingContext context;
+    private final MessageService messageService;
     private final CopybookService copybookService;
+    private static final Pattern DOUBLE_DASH_SQL_COMMENT =
+            Pattern.compile("--\\s[^\\r\\n]*", Pattern.MULTILINE);
 
     @Getter
     private final List<SyntaxError> errors = new LinkedList<>();
@@ -97,10 +106,19 @@ class Db2SqlVisitor extends Db2SqlExecParserBaseVisitor<List<Node>> {
         if (ctx.xml_lobNO_size() != null) {
             addXmlLobNodes(variableDefinitionNode, generatedVariableLevel);
         } else if (ctx.lobWithSize() != null) {
-            addLobWithSizeNodes(variableDefinitionNode, generatedVariableLevel, lobSize(ctx.lobWithSize()));
+            addLobWithSizeNodes(variableDefinitionNode, generatedVariableLevel, lobSize(ctx.lobWithSize().lobSize()));
         }
 
         return hostVariableDefinitionNode;
+    }
+
+    private String lobSize(Db2SqlParser.LobSizeContext ctx) {
+        // lobSize: (dbs_integer k_m_g?| T=IDENTIFIER {validateTokenWithRegex($T.text, "\\d+[kKmMgG]", "unexpected token");} );
+        if (ctx.IDENTIFIER() != null) {
+            return ctx.IDENTIFIER().getText();
+        }
+        String sizePrefix = ctx.k_m_g() != null ? " " + ctx.k_m_g().getText() : "";
+        return ctx.dbs_integer().getText() + sizePrefix;
     }
 
     private void addXmlLobNodes(VariableDefinitionNode variableDefinitionNode, int generatedVariableLevel) {
@@ -147,7 +165,7 @@ class Db2SqlVisitor extends Db2SqlExecParserBaseVisitor<List<Node>> {
         List<Node> hostVariableDefinitionNode = createHostVariableDefinitionNode(ctx, ctx.dbs_integer(), ctx.entry_name());
         if (ctx.lobWithSize() != null) {
             generateVarbinVariables((VariableDefinitionNode) hostVariableDefinitionNode.get(0),
-                    lobSize(ctx.lobWithSize()), ctx);
+                    lobSize(ctx.lobWithSize().lobSize()), ctx);
         }
         return hostVariableDefinitionNode;
     }
@@ -157,7 +175,7 @@ class Db2SqlVisitor extends Db2SqlExecParserBaseVisitor<List<Node>> {
         List<Node> hostVariableDefinitionNode = createHostVariableDefinitionNode(ctx, ctx.dbs_host_var_levels_arrays(), ctx.entry_name());
         if (ctx.lobWithSize() != null) {
             generateVarbinVariables((VariableDefinitionNode) hostVariableDefinitionNode.get(0),
-                    lobSize(ctx.lobWithSize()), ctx);
+                    lobSize(ctx.lobWithSize().lobSize()), ctx);
         }
         return hostVariableDefinitionNode;
     }
@@ -291,7 +309,7 @@ class Db2SqlVisitor extends Db2SqlExecParserBaseVisitor<List<Node>> {
     public List<Node> visitSqlCode(Db2SqlParser.SqlCodeContext ctx) {
         String sqlCode = preProcessSqlComment(ctx);
 
-        List<Node> nodes = new Db2SqlExecVisitor(context, copybookService).visitStartSqlRule(parseSQL(sqlCode, ctx));
+        List<Node> nodes = new Db2SqlExecVisitor(context).visitStartSqlRule(parseSQL(sqlCode, ctx));
         Db2SqlVisitorHelper.adjustNodeLocations(ctx, context, nodes);
         Location location = context.getExtendedDocument().mapLocation(AntlrRangeUtils.constructRange(ctx.getParent()));
         Locality locality = Locality.builder().range(location.getRange()).uri(location.getUri()).build();
@@ -368,11 +386,6 @@ class Db2SqlVisitor extends Db2SqlExecParserBaseVisitor<List<Node>> {
     @Override
     protected List<Node> aggregateResult(List<Node> aggregate, List<Node> nextResult) {
         return Stream.concat(aggregate.stream(), nextResult.stream()).collect(toList());
-    }
-
-    private String lobSize(Db2SqlParser.LobWithSizeContext ctx) {
-        String sizePrefix = ctx.k_m_g() != null ? " " + ctx.k_m_g().getText() : "";
-        return ctx.dbs_integer().getText() + sizePrefix;
     }
 
     private List<Node> addTreeNode(ParserRuleContext ctx, Function<Locality, Node> nodeConstructor) {

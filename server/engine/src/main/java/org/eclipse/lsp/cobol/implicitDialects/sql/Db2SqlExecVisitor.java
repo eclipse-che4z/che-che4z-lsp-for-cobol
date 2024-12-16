@@ -30,7 +30,6 @@ import org.antlr.v4.runtime.tree.RuleNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp.cobol.AntlrRangeUtils;
-import org.eclipse.lsp.cobol.common.copybook.CopybookService;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
@@ -48,7 +47,6 @@ import org.eclipse.lsp4j.Location;
 class Db2SqlExecVisitor extends Db2SqlExecParserBaseVisitor<List<Node>> {
 
     private final DialectProcessingContext context;
-    private final CopybookService copybookService;
 
     @Override
     public List<Node> visitDbs_host_variable(Db2SqlExecParser.Dbs_host_variableContext ctx) {
