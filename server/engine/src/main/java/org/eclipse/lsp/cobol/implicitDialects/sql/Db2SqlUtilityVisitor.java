@@ -18,23 +18,30 @@ import com.google.common.collect.ImmutableList;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.RuleNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.lsp.cobol.AntlrRangeUtils;
 import org.eclipse.lsp.cobol.common.copybook.CopybookService;
+import org.eclipse.lsp.cobol.common.dialects.CobolDialect;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
+import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.model.tree.variable.*;
 import org.eclipse.lsp.cobol.core.visitor.VisitorHelper;
 import org.eclipse.lsp.cobol.implicitDialects.sql.node.*;
 import org.eclipse.lsp4j.Location;
+import org.eclipse.lsp4j.Position;
+import org.eclipse.lsp4j.Range;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -49,10 +56,13 @@ import static org.eclipse.lsp.cobol.AntlrRangeUtils.constructRange;
  */
 @Slf4j
 @AllArgsConstructor
-class Db2SqlVisitor extends Db2SqlExecParserBaseVisitor<List<Node>> {
+class Db2SqlUtilityVisitor extends Db2SqlParserBaseVisitor<List<Node>> {
 
     private final DialectProcessingContext context;
+    private final MessageService messageService;
     private final CopybookService copybookService;
+    private static final Pattern DOUBLE_DASH_SQL_COMMENT =
+            Pattern.compile("--\\s[^\\r\\n]*", Pattern.MULTILINE);
 
     @Getter
     private final List<SyntaxError> errors = new LinkedList<>();
@@ -289,16 +299,28 @@ class Db2SqlVisitor extends Db2SqlExecParserBaseVisitor<List<Node>> {
 
     @Override
     public List<Node> visitSqlCode(Db2SqlParser.SqlCodeContext ctx) {
+        //    String intervalText = VisitorHelper.getIntervalText(ctx);
         String sqlCode = preProcessSqlComment(ctx);
 
-        List<Node> nodes = new Db2SqlExecVisitor(context, copybookService).visitStartSqlRule(parseSQL(sqlCode, ctx));
+        List<Node> nodes = new Db2SqlVisitor(context, copybookService).visitStartSqlRule(parseSQL(sqlCode, ctx));
         Db2SqlVisitorHelper.adjustNodeLocations(ctx, context, nodes);
-        Location location = context.getExtendedDocument().mapLocation(AntlrRangeUtils.constructRange(ctx.getParent()));
-        Locality locality = Locality.builder().range(location.getRange()).uri(location.getUri()).build();
 
-        Node sqlNode = new ExecSqlNode(locality);
-        nodes.forEach(sqlNode::addChild);
-        return Collections.singletonList(sqlNode);
+        Locality locality =
+            VisitorHelper.buildNameRangeLocality(
+                ctx.getParent(), VisitorHelper.getName(ctx.getParent()), context.getProgramDocumentUri());
+        Location location = context.getExtendedDocument().mapLocation(locality.getRange());
+        locality = Locality.builder().range(location.getRange()).uri(location.getUri()).build();
+
+        boolean isWhenever = nodes.stream().anyMatch(n ->
+            n.getDepthFirstStream().anyMatch(nd -> nd instanceof ExecSqlWheneverNode));
+
+        if (!isWhenever) {
+            Node sqlNode = new ExecSqlNode(locality);
+            nodes = new LinkedList<>(nodes);
+            nodes.add(0, sqlNode);
+        }
+
+        return nodes;
     }
 
     private String preProcessSqlComment(Db2SqlParser.SqlCodeContext ctx) {
@@ -370,15 +392,59 @@ class Db2SqlVisitor extends Db2SqlExecParserBaseVisitor<List<Node>> {
         return Stream.concat(aggregate.stream(), nextResult.stream()).collect(toList());
     }
 
+    private boolean isVariableUsage(ParserRuleContext ctx) {
+        if (hasColumn(ctx)) {
+            return true;
+        }
+
+        if (ctx instanceof Db2SqlExecParser.Dbs_host_names_varContext && !isSpecialName(ctx)) {
+            return true;
+        }
+
+        for (ParseTree child : ctx.children) {
+            if (child instanceof ParserRuleContext) {
+                if (isVariableUsage((ParserRuleContext) child)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private boolean hasColumn(ParserRuleContext ctx) {
+        for (ParseTree child : ctx.children) {
+            if (child instanceof TerminalNode && child.getText().equals(":")) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private String lobSize(Db2SqlParser.LobWithSizeContext ctx) {
         String sizePrefix = ctx.k_m_g() != null ? " " + ctx.k_m_g().getText() : "";
         return ctx.dbs_integer().getText() + sizePrefix;
+    }
+
+    private boolean isSpecialName(ParserRuleContext ctx) {
+        if (ctx instanceof Db2SqlExecParser.Dbs_special_nameContext) {
+            return true;
+        }
+        for (ParseTree child : ctx.children) {
+            if (child instanceof ParserRuleContext) {
+                if (isSpecialName((ParserRuleContext) child)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     private List<Node> addTreeNode(ParserRuleContext ctx, Function<Locality, Node> nodeConstructor) {
         Locality locality =
                 VisitorHelper.buildNameRangeLocality(
                         ctx, VisitorHelper.getName(ctx), context.getProgramDocumentUri());
+        //    locality.setRange(RangeUtils.shiftRangeWithPosition(position, locality.getRange()));
+        //
         Location location = context.getExtendedDocument().mapLocation(locality.getRange());
 
         Node node =
@@ -387,4 +453,22 @@ class Db2SqlVisitor extends Db2SqlExecParserBaseVisitor<List<Node>> {
         visitChildren(ctx).forEach(node::addChild);
         return ImmutableList.of(node);
     }
+
+    private List<Node> addVariableUsageNodes(ParserRuleContext ctx) {
+        String name = VisitorHelper.getName(ctx);
+        boolean hasColumn = name.startsWith(":");
+        if (hasColumn) {
+            name = name.substring(1);
+        }
+
+        if (Db2SqlVisitorHelper.isGroupName(name)) {
+            Locality locality =
+                    VisitorHelper.buildNameRangeLocality(ctx, name, context.getExtendedDocument().getUri());
+
+            return Db2SqlVisitorHelper.generateGroupNodes(name, locality);
+        }
+        String finalName = name;
+        return addTreeNode(ctx, locality -> new VariableUsageNode(finalName, locality));
+    }
  }
+
