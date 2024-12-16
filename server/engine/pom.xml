@@ -474,8 +474,9 @@
                             </buildArgs>
                             <agent>
                                 <options>
-                                    <option>access-filter-file=${basedir}/src/test/resources/access-filter.json</option>
-                                    <option>experimental-class-loader-support</option>
+                                    <accessFilterFiles>
+                                        <filterFile>${basedir}/src/test/resources/access-filter.json</filterFile>
+                                    </accessFilterFiles>
                                 </options>
                             </agent>
                         </configuration>
@@ -490,7 +491,7 @@
                     <plugin>
                         <groupId>org.graalvm.buildtools</groupId>
                         <artifactId>native-maven-plugin</artifactId>
-                        <version>0.9.13</version>
+                        <version>0.10.3</version>
                         <extensions>true</extensions>
                         <executions>
                             <execution>
@@ -514,8 +515,9 @@
                             </buildArgs>
                             <agent>
                                 <options>
-                                    <option>access-filter-file=${basedir}/src/test/resources/access-filter.json</option>
-                                    <option>experimental-class-loader-support</option>
+                                    <accessFilterFiles>
+                                        <filterFile>${basedir}/src/test/resources/access-filter.json</filterFile>
+                                    </accessFilterFiles>
                                 </options>
                             </agent>
                         </configuration>
