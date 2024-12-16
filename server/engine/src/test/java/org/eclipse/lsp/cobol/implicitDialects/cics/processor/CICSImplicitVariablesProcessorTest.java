@@ -61,7 +61,7 @@ class CICSImplicitVariablesProcessorTest {
 
   @Test
   void testWorkingSectionWhenCicsTranslateEnabled() {
-    when(processingContext.getVariableAccumulator()).thenReturn(variableAccumulator);
+    doReturn(variableAccumulator).when(processingContext).getVariableAccumulator();
     SectionNode sectionNode =
             new SectionNode(Locality.builder().build(), SectionType.WORKING_STORAGE);
     sectionNode.setParent(new ProgramNode(Locality.builder().build(), ProgramSubtype.Program, 0));
