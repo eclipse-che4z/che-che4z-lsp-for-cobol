@@ -903,7 +903,7 @@ public class CICSSysSetOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     }
 
     private void checkFile(CICSParser.Cics_set_fileContext ctx) {
-        checkMutuallyExclusiveOptions("ADD, ADDABLE or NOTADDABLE", ctx.ADD(), ctx.ADDABLE(), ctx.NOTADDBALE());
+        checkMutuallyExclusiveOptions("ADD, ADDABLE or NOTADDABLE", ctx.ADD(), ctx.ADDABLE(), ctx.NOTADDABLE());
         checkMutuallyExclusiveOptions("BROWSE, BROWSABLE or NOTBROWSABLE", ctx.BROWSE(), ctx.BROWSABLE(), ctx.NOTBROWSABLE());
         checkMutuallyExclusiveOptions("BUSY, WAIT, FORCE or NOWAIT", ctx.BUSY(), ctx.WAIT(), ctx.FORCE(), ctx.NOWAIT());
         checkMutuallyExclusiveOptions("DELETE, DELETABLE or NOTDELETABLE", ctx.DELETE(), ctx.DELETABLE(), ctx.NOTDELETABLE());

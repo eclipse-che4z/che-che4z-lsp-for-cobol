@@ -69,16 +69,22 @@ public class TestCicsSysSetStatement {
     private static final String EVENTBINDING_VALID_1 = "SET EVENTBINDING(123) ENABLESTATUS(123)";
     private static final String EVENTBINDING_VALID_2 = "SET EVENTBINDING(123) ENABLED";
     private static final String EVENTPROCESS_VALID_1 = "SET EVENTPROCESS STARTED";
-    private static final String FILE_VALID_1 = "SET FILE ";
-    private static final String FILE_VALID_2 = "SET FILE ";
-    private static final String HOST_VALID_1 = "SET HOST ";
-    private static final String HOST_VALID_2 = "SET HOST ";
-    private static final String IPCONN_VALID_1 = "SET IPCONN ";
-    private static final String IPCONN_VALID_2 = "SET IPCONN ";
-    private static final String IRC_VALID_1 = "SET IRC ";
-    private static final String IRC_VALID_2 = "SET IRC ";
-    private static final String JOURNALNAME_VALID_1 = "SET JOURNALNAME ";
-    private static final String JOURNALNAME_VALID_2 = "SET JOURNALNAME ";
+
+    private static final String FILE_VALID_1 = "SET FILE(123)";
+    private static final String FILE_VALID_2 = "SET FILE(123) ADD(123) BROWSE(123) WAIT CFDTPOOL(123) DELETE(123) DISPOSITION(123) DSNAME(123) EMPTYSTATUS(123) ENABLESTATUS(123) OPENSTATUS(123) EXCLUSIVE(123) KEYLENGTH(1) LOADTYPE(1) LSRPOOLNUM(3) MAXNUMRECS(3) READABLE RECORDSIZE(1) CONSISTENT RLS STRINGS(123) TABLE(123) TABLENAME(123) UPDATE(3) UPDATEMODEL(1)";
+    private static final String FILE_VALID_3 = "SET FILE(123) ENABLED";
+    private static final String FILE_VALID_4 = "SET FILE(123) DISABLED WAIT";
+    private static final String FILE_VALID_5 = "SET FILE(123) OPEN EMPTY";
+    private static final String FILE_VALID_6 = "SET FILE(123) CLOSED EMPTY FORCE";
+
+    private static final String HOST_VALID_1 = "SET HOST(123)";
+    private static final String HOST_VALID_2 = "SET HOST(123) ENABLESTATUS(123)";
+    private static final String IPCONN_VALID_1 = "SET IPCONN(123)";
+    private static final String IPCONN_VALID_2 = "SET IPCONN(123) CONNSTATUS(123) PENDSTATUS(123) CANCEL NORECOVDATA INSERVICE BACKOUT";
+    private static final String IRC_VALID_1 = "SET IRC";
+    private static final String IRC_VALID_2 = "SET IRC OPENSTATUS(123)";
+    private static final String JOURNALNAME_VALID_1 = "SET JOURNALNAME(123) ACTION(123) STATUS(123)";
+    private static final String JOURNALNAME_VALID_2 = "SET JOURNALNAME(123) FLUSH ENABLED";
     private static final String JOURNALNUM_VALID_1 = "SET JOURNALNUM ";
     private static final String JOURNALNUM_VALID_2 = "SET JOURNALNUM ";
     private static final String JVMENDPOINT_VALID_1 = "SET JVMENDPOINT ";
@@ -162,6 +168,7 @@ public class TestCicsSysSetStatement {
     private static final String XMLTRANSFORM_VALID_1 = "SET XMLTRANSFORM ";
     private static final String XMLTRANSFORM_VALID_2 = "SET XMLTRANSFORM ";
 
+    /* --------------------------------------------------- */
     // Invalid test cases
     private static final String ATOMSERVICE_INVALID_1 = "SET ATOMSERVICE(123) ENABLED {DISABLED|errorOne}";
     private static final String AUTOINSTALL_INVALID_1 = "SET AUTOINSTALL AIBRIDGE(123) {AIBRIDGE|errorOne}(123)";
@@ -187,16 +194,14 @@ public class TestCicsSysSetStatement {
     //private static final String EPADAPTERSET_INVALID_1 = "SET EPADAPTERSET ";
     private static final String EVENTBINDING_INVALID_1 = "SET EVENTBINDING(123) ENABLESTATUS(123) {DISABLED|errorOne}";
     private static final String EVENTPROCESS_INVALID_1 = "SET {_EVENTPROCESS STARTED STOPPED|errorOne_}";
-    private static final String FILE_INVALID_1 = "SET FILE ";
-    private static final String FILE_INVALID_2 = "SET FILE ";
-    private static final String HOST_INVALID_1 = "SET HOST ";
-    private static final String HOST_INVALID_2 = "SET HOST ";
-    private static final String IPCONN_INVALID_1 = "SET IPCONN ";
-    private static final String IPCONN_INVALID_2 = "SET IPCONN ";
-    private static final String IRC_INVALID_1 = "SET IRC ";
-    private static final String IRC_INVALID_2 = "SET IRC ";
-    private static final String JOURNALNAME_INVALID_1 = "SET JOURNALNAME ";
-    private static final String JOURNALNAME_INVALID_2 = "SET JOURNALNAME ";
+    private static final String FILE_INVALID_1 = "SET FILE(3) ADDABLE {NOTADDABLE|errorOne}";
+    private static final String FILE_INVALID_2 = "SET FILE(3) CICSTABLE {NOTTABLE|errorOne}";
+    //private static final String HOST_INVALID_1 = "SET HOST ";
+    private static final String IPCONN_INVALID_1 = "SET IPCONN(123) ACQUIRED {RELEASED|errorOne}";
+    private static final String IPCONN_INVALID_2 = "SET IPCONN(123) CANCEL {FORCECANCEL|errorOne}";
+    private static final String IRC_INVALID_1 = "SET IRC CLOSED {OPEN|errorOne}";
+    private static final String JOURNALNAME_INVALID_1 = "SET {_JOURNALNAME(123) FLUSH RESET ENABLED|errorOne_}";
+    private static final String JOURNALNAME_INVALID_2 = "SET {_JOURNALNAME(123) FLUSH|errorOne_}";
     private static final String JOURNALNUM_INVALID_1 = "SET JOURNALNUM ";
     private static final String JOURNALNUM_INVALID_2 = "SET JOURNALNUM ";
     private static final String JVMENDPOINT_INVALID_1 = "SET JVMENDPOINT ";
@@ -407,10 +412,14 @@ public class TestCicsSysSetStatement {
         CICSTestUtils.noErrorTest(EVENTPROCESS_VALID_1);
     }
 
-    /*@Test
+    @Test
     void testCicsFileValid() {
         CICSTestUtils.noErrorTest(FILE_VALID_1);
         CICSTestUtils.noErrorTest(FILE_VALID_2);
+        CICSTestUtils.noErrorTest(FILE_VALID_3);
+        CICSTestUtils.noErrorTest(FILE_VALID_4);
+        CICSTestUtils.noErrorTest(FILE_VALID_5);
+        CICSTestUtils.noErrorTest(FILE_VALID_6);
     }
 
     @Test
@@ -437,7 +446,7 @@ public class TestCicsSysSetStatement {
         CICSTestUtils.noErrorTest(JOURNALNAME_VALID_2);
     }
 
-    @Test
+    /*@Test
     void testCicsJournalnumValid() {
         CICSTestUtils.noErrorTest(JOURNALNUM_VALID_1);
         CICSTestUtils.noErrorTest(JOURNALNUM_VALID_2);
@@ -781,37 +790,33 @@ public class TestCicsSysSetStatement {
         testSingleError(EVENTPROCESS_INVALID_1, "Must use exactly one of the following: EPSTATUS, STARTED, DRAIN or STOPPED");
     }
 
-    /*@Test
+    @Test
     void testCicsFileInvalid() {
-        testSingleError(FILE_INVALID_1, "");
-        testSingleError(FILE_INVALID_2, "");
+        testSingleError(FILE_INVALID_1, "Options \"ADD, ADDABLE or NOTADDABLE\" are mutually exclusive.");
+        testSingleError(FILE_INVALID_2, "Options \"TABLE, CFTABLE, CICSTABLE, NOTTABLE or USERTABLE\" are mutually exclusive.");
     }
 
-    @Test
-    void testCicsHostInvalid() {
-        testSingleError(HOST_INVALID_1, "");
-        testSingleError(HOST_INVALID_2, "");
-    }
+    //@Test
+    //void testCicsHostInvalid() {}
 
     @Test
     void testCicsIpconnInvalid() {
-        testSingleError(IPCONN_INVALID_1, "");
-        testSingleError(IPCONN_INVALID_2, "");
+        testSingleError(IPCONN_INVALID_1, "Options \"CONNSTATUS, ACQUIRED or RELEASED\" are mutually exclusive.");
+        testSingleError(IPCONN_INVALID_2, "Options \"PURGETYPE, CANCEL, FORCECANCEL, FORCEPURGE, KILL or PURGE\" are mutually exclusive.");
     }
 
     @Test
     void testCicsIrcInvalid() {
-        testSingleError(IRC_INVALID_1, "");
-        testSingleError(IRC_INVALID_2, "");
+        testSingleError(IRC_INVALID_1, "Options \"OPENSTATUS, CLOSED, IMMCLOSE or OPEN\" are mutually exclusive.");
     }
 
     @Test
     void testCicsJournalnameInvalid() {
-        testSingleError(JOURNALNAME_INVALID_1, "");
-        testSingleError(JOURNALNAME_INVALID_2, "");
+        testSingleError(JOURNALNAME_INVALID_1, "Must use exactly one of the following: ACTION, FLUSH or RESET");
+        testSingleError(JOURNALNAME_INVALID_2, "Must use exactly one of the following: STATUS, DISABLED or ENABLED");
     }
 
-    @Test
+    /*@Test
     void testCicsJournalnumInvalid() {
         testSingleError(JOURNALNUM_INVALID_1, "");
         testSingleError(JOURNALNUM_INVALID_2, "");

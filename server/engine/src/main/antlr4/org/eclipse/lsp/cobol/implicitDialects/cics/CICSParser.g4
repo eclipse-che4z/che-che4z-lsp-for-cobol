@@ -658,7 +658,7 @@ cics_set_epadapter: EPADAPTER cics_data_value ((ENABLED | DISABLED) | ENABLESTAT
 cics_set_epadapterset: EPADAPTERSET cics_data_value ((ENABLED | DISABLED) | ENABLESTATUS cics_cvda | cics_handle_response)*;
 cics_set_eventbinding: EVENTBINDING cics_data_value ((ENABLED | DISABLED) | ENABLESTATUS cics_cvda | cics_handle_response)*;
 cics_set_eventprocess: EVENTPROCESS ((STARTED | DRAIN | STOPPED) | (EPSTATUS) cics_cvda | cics_handle_response)+;
-cics_set_file: ((FILE | DATASET) cics_data_value) ((ADDABLE | NOTADDBALE | BROWSABLE | NOTBROWSABLE | WAIT | FORCE | NOWAIT | DELETABLE | NOTDELETABLE | OLD | SHARE | EMPTY | EMPTYREQ | NOEMPTYREQ | ENABLED | DISABLED | OPEN | CLOSED | EXCTL | NOEXCTL | LOAD | NOLOAD |
+cics_set_file: ((FILE | DATASET) cics_data_value) ((ADDABLE | NOTADDABLE | BROWSABLE | NOTBROWSABLE | WAIT | FORCE | NOWAIT | DELETABLE | NOTDELETABLE | OLD | SHARE | EMPTY | EMPTYREQ | NOEMPTYREQ | ENABLED | DISABLED | OPEN | CLOSED | EXCTL | NOEXCTL | LOAD | NOLOAD |
                                                     READABLE | NOTREADABLE | UNCOMMITTED | CONSISTENT | REPEATABLE | RLS | NOTRLS | CFTABLE | CICSTABLE | NOTTABLE | USERTABLE | UPDATABLE | NOTUPDATABLE | CONTENTION | LOCKING) |
                                                   (ADD | BROWSE | BUSY | DELETE | DISPOSITION | EMPTYSTATUS | ENABLESTATUS | OPENSTATUS | EXCLUSIVE | LOADTYPE | READ | READINTEG | RLSACCESS | TABLE | UPDATE | UPDATEMODEL) cics_cvda |
                                                    (CFDTPOOL | DSNAME | OBJECTNAME | KEYLENGTH | LSRPOOLNUM | MAXNUMRECS | RECORDSIZE | STRINGS | TABLENAME) cics_data_value | cics_handle_response)*;
