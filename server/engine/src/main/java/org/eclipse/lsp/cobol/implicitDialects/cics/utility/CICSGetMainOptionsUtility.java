@@ -36,7 +36,6 @@ public class CICSGetMainOptionsUtility extends CICSOptionsCheckBaseUtility {
   private static final Map<Integer, ErrorSeverity> DUPLICATE_CHECK_OPTIONS =
       new HashMap<Integer, ErrorSeverity>() {
         {
-          put(CICSLexer.GETMAIN, ErrorSeverity.ERROR);
           put(CICSLexer.FLENGTH, ErrorSeverity.ERROR);
           put(CICSLexer.LENGTH, ErrorSeverity.ERROR);
           put(CICSLexer.BELOW, ErrorSeverity.WARNING);
