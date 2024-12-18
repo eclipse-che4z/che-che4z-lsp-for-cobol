@@ -85,14 +85,13 @@ public class TestCicsSysSetStatement {
     private static final String IRC_VALID_2 = "SET IRC OPENSTATUS(123)";
     private static final String JOURNALNAME_VALID_1 = "SET JOURNALNAME(123) ACTION(123) STATUS(123)";
     private static final String JOURNALNAME_VALID_2 = "SET JOURNALNAME(123) FLUSH ENABLED";
-    private static final String JOURNALNUM_VALID_1 = "SET JOURNALNUM ";
-    private static final String JOURNALNUM_VALID_2 = "SET JOURNALNUM ";
-    private static final String JVMENDPOINT_VALID_1 = "SET JVMENDPOINT ";
-    private static final String JVMENDPOINT_VALID_2 = "SET JVMENDPOINT ";
-    private static final String JVMSERVER_VALID_1 = "SET JVMSERVER ";
-    private static final String JVMSERVER_VALID_2 = "SET JVMSERVER ";
-    private static final String LIBRARY_VALID_1 = "SET LIBRARY ";
-    private static final String LIBRARY_VALID_2 = "SET LIBRARY ";
+    //private static final String JOURNALNUM_VALID_1 = "SET JOURNALNUM ";
+    private static final String JVMENDPOINT_VALID_1 = "SET JVMENDPOINT(1) JVMSERVER(1) DISABLED";
+    private static final String JVMENDPOINT_VALID_2 = "SET JVMENDPOINT(1) JVMSERVER(1) ENABLED";
+    private static final String JVMSERVER_VALID_1 = "SET JVMSERVER(123) ENABLED";
+    private static final String JVMSERVER_VALID_2 = "SET JVMSERVER(123) THREADLIMIT(1) ENABLED PHASEOUT";
+    private static final String LIBRARY_VALID_1 = "SET LIBRARY(1)";
+    private static final String LIBRARY_VALID_2 = "SET LIBRARY(1) CRITICALST(1) ENABLESTATUS(1) RANKING(3)";
     private static final String MODENAME_VALID_1 = "SET MODENAME ";
     private static final String MODENAME_VALID_2 = "SET MODENAME ";
     private static final String MONITOR_VALID_1 = "SET MONITOR ";
@@ -202,12 +201,11 @@ public class TestCicsSysSetStatement {
     private static final String IRC_INVALID_1 = "SET IRC CLOSED {OPEN|errorOne}";
     private static final String JOURNALNAME_INVALID_1 = "SET {_JOURNALNAME(123) FLUSH RESET ENABLED|errorOne_}";
     private static final String JOURNALNAME_INVALID_2 = "SET {_JOURNALNAME(123) FLUSH|errorOne_}";
-    private static final String JOURNALNUM_INVALID_1 = "SET JOURNALNUM ";
-    private static final String JOURNALNUM_INVALID_2 = "SET JOURNALNUM ";
-    private static final String JVMENDPOINT_INVALID_1 = "SET JVMENDPOINT ";
-    private static final String JVMENDPOINT_INVALID_2 = "SET JVMENDPOINT ";
-    private static final String JVMSERVER_INVALID_1 = "SET JVMSERVER ";
-    private static final String JVMSERVER_INVALID_2 = "SET JVMSERVER ";
+    //private static final String JOURNALNUM_INVALID_1 = "SET JOURNALNUM ";
+    private static final String JVMENDPOINT_INVALID_1 = "SET {_JVMENDPOINT(1) ENABLED|errorOne_}";
+    private static final String JVMENDPOINT_INVALID_2 = "SET {_JVMENDPOINT(1) JVMSERVER(1)|errorOne_}";
+    private static final String JVMSERVER_INVALID_1 = "SET {_JVMSERVER(123) ENABLED DISABLED|errorOne_}";
+    private static final String JVMSERVER_INVALID_2 = "SET JVMSERVER(123) ENABLED PHASEOUT {PURGE|errorOne} ";
     private static final String LIBRARY_INVALID_1 = "SET LIBRARY ";
     private static final String LIBRARY_INVALID_2 = "SET LIBRARY ";
     private static final String MODENAME_INVALID_1 = "SET MODENAME ";
@@ -446,14 +444,10 @@ public class TestCicsSysSetStatement {
         CICSTestUtils.noErrorTest(JOURNALNAME_VALID_2);
     }
 
-    /*@Test
-    void testCicsJournalnumValid() {
-        CICSTestUtils.noErrorTest(JOURNALNUM_VALID_1);
-        CICSTestUtils.noErrorTest(JOURNALNUM_VALID_2);
-    }
+    // See JOURNALNUM for JOURNALNAME tests due to NAME being obsolete.
 
     @Test
-    void testCicsJvmendpointValid() {
+    void testJvmendpointValid() {
         CICSTestUtils.noErrorTest(JVMENDPOINT_VALID_1);
         CICSTestUtils.noErrorTest(JVMENDPOINT_VALID_2);
     }
@@ -690,7 +684,7 @@ public class TestCicsSysSetStatement {
     void testCicsXmltransformValid() {
         CICSTestUtils.noErrorTest(XMLTRANSFORM_VALID_1);
         CICSTestUtils.noErrorTest(XMLTRANSFORM_VALID_2);
-    }*/
+    }
 
 /* ---------------------------------------------------------------- */
 
@@ -816,22 +810,18 @@ public class TestCicsSysSetStatement {
         testSingleError(JOURNALNAME_INVALID_2, "Must use exactly one of the following: STATUS, DISABLED or ENABLED");
     }
 
-    /*@Test
-    void testCicsJournalnumInvalid() {
-        testSingleError(JOURNALNUM_INVALID_1, "");
-        testSingleError(JOURNALNUM_INVALID_2, "");
-    }
+    // See JOURNALNUM for JOURNALNAME tests due to NAME being obsolete.
 
     @Test
     void testCicsJvmendpointInvalid() {
-        testSingleError(JVMENDPOINT_INVALID_1, "");
-        testSingleError(JVMENDPOINT_INVALID_2, "");
+        testSingleError(JVMENDPOINT_INVALID_1, "Missing required option: JVMSERVER");
+        testSingleError(JVMENDPOINT_INVALID_2, "Must use exactly one of the following: ENABLESTATUS, ENABLED or DISABLED");
     }
 
     @Test
     void testCicsJvmserverInvalid() {
-        testSingleError(JVMSERVER_INVALID_1, "");
-        testSingleError(JVMSERVER_INVALID_2, "");
+        testSingleError(JVMSERVER_INVALID_1, "Must use exactly one of the following: ENABLESTATUS, ENABLED or DISABLED");
+        testSingleError(JVMSERVER_INVALID_2, "Options \"PHASEOUT, PURGETYPE, PURGE, FORCEPURGE or KILL\" are mutually exclusive.");
     }
 
     @Test
@@ -1060,6 +1050,6 @@ public class TestCicsSysSetStatement {
     void testCicsXmltransformInvalid() {
         testSingleError(XMLTRANSFORM_INVALID_1, "");
         testSingleError(XMLTRANSFORM_INVALID_2, "");
-    }*/
+    }
 
 }
