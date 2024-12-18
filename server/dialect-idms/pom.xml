@@ -36,12 +36,12 @@
         <lombok.version>1.18.36</lombok.version>
         <maven.resources.plugin.version>3.0.2</maven.resources.plugin.version>
         <maven.checkstyle.plugin.version>3.1.1</maven.checkstyle.plugin.version>
-        <junit-jupiter.version>5.6.0</junit-jupiter.version>
+        <junit-jupiter.version>5.11.0-M2</junit-jupiter.version>
         <junit.platform.version>1.6.0</junit.platform.version>
         <mockito.core.version>5.14.2</mockito.core.version>
         <maven.compiler.plugin.version>3.13.0</maven.compiler.plugin.version>
         <maven.jacoco.plugin.version>0.8.12</maven.jacoco.plugin.version>
-        <maven.surefire.plugin.version>3.0.0-M3</maven.surefire.plugin.version>
+        <maven.surefire.plugin.version>3.5.2</maven.surefire.plugin.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     </properties>
@@ -179,9 +179,21 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>properties</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>${maven.surefire.plugin.version}</version>
                 <configuration>
+                    <argLine>@{argLine} -javaagent:${org.mockito:mockito-core:jar}</argLine>
                     <parallel>all</parallel>
                     <systemPropertyVariables>
                         <property>
