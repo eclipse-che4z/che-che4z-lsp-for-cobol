@@ -18,13 +18,25 @@ package org.eclipse.lsp.cobol.implicitDialects.cics.utility;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import lombok.Setter;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 
-/** Manages traffic for CICS parser options checking */
+/**
+ * Manages traffic for CICS parser options checking
+ */
 public class CICSOptionsCheckUtility {
-  private final Map<Integer, CICSOptionsCheckBaseUtility> optionsMap = new HashMap<>();
+    private final Map<Integer, CICSOptionsCheckBaseUtility> optionsMap = new HashMap<>();
+
+  private final Map<Integer, CICSOptionsCheckBaseUtility> spOptionsMap = new HashMap<>();
+
+  @Setter
+  private static boolean exciOptionsEnabled = false;
+
+  @Setter
+  private static boolean spOptionsEnabled = false;
 
   public CICSOptionsCheckUtility(DialectProcessingContext context, List<SyntaxError> errors) {
     optionsMap.put(
@@ -183,16 +195,28 @@ public class CICSOptionsCheckUtility {
       optionsMap.put(
         CICSGetMain64OptionsUtility.RULE_INDEX,
         new CICSGetMain64OptionsUtility(context, errors));
+      optionsMap.put(
+        CICSInquireOptionsCheckUtility.RULE_INDEX,
+        new CICSInquireOptionsCheckUtility(context, errors));
+      spOptionsMap.put(
+         CICSInquireSPOptionsCheckUtility.RULE_INDEX,
+         new CICSInquireSPOptionsCheckUtility(context, errors));
+
   }
 
-  /**
-   * Entrypoint to check CICS rule options
-   *
-   * @param ctx ParserRuleContext subclass containing options
-   * @param <E> A subclass of ParserRuleContext
-   */
-  public <E extends ParserRuleContext> void checkOptions(E ctx) {
-    CICSOptionsCheckBaseUtility utility = optionsMap.get(ctx.parent.getRuleIndex());
-    if (utility != null) utility.checkOptions(ctx);
-  }
+    /**
+     * Entrypoint to check CICS rule options
+     *
+     * @param ctx ParserRuleContext subclass containing options
+     * @param <E> A subclass of ParserRuleContext
+     */
+    public <E extends ParserRuleContext> void checkOptions(E ctx) {
+        CICSOptionsCheckBaseUtility utility = optionsMap.get(ctx.parent.getRuleIndex());
+        CICSOptionsCheckBaseUtility spOptions = spOptionsMap.get(ctx.parent.getRuleIndex());
+        if (utility != null) utility.checkOptions(ctx);
+        else if (spOptions != null) {
+            if (spOptionsEnabled) spOptions.checkOptions(ctx);
+            else spOptions.throwIfMissingTranslatorOption(ctx, "\"SP\"");
+        }
+    }
 }
