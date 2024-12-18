@@ -78,8 +78,12 @@ rulesAllowedInWorkingStorageAndLinkageSection: ((dbs_begin | dbs_end | dbs_inclu
 //copySource: (dbs_member_name | SQLCA | SQLDA) ((OF | IN) dbs_member_name)?;
 
 //used in working-storage section of cobol program
-dbs_declare_variable: DECLARE dbs_host_variable (dbs_comma_separator dbs_host_variable)* VARIABLE (CCSID (dbs_integer_constant | (EBCDIC|ASCII|UNICODE) (FOR (SBCS|MIXED|BIT) DATA)?))? dbs_semicolon_end?;
+dbs_declare_variable: DECLARE dbs_host_variable (dbs_comma_separator dbs_host_variable)*
+    VARIABLE (
+        CCSID (dbs_integer_constant | (EBCDIC|ASCII|UNICODE) dbs_declare_variable_for?) | dbs_declare_variable_for
+    )? dbs_semicolon_end?;
 
+dbs_declare_variable_for: FOR (SBCS|MIXED|BIT) DATA;
 
 /*ALLOCATE CURSOR */
 dbs_allocate: ALLOCATE dbs_cursor_name CURSOR FOR RESULT SET dbs_rs_locator_variable;

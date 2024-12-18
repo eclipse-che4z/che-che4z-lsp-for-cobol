@@ -20,7 +20,7 @@ import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.junit.jupiter.api.Test;
 
 /**
- * Check for 1. decimal case
+ * Test class for verifying the declaration of a DB2 variable in COBOL code.
  */
 class TestDb2DeclareVariable {
     public static final String TEXT =

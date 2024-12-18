@@ -12,6 +12,9 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 lexer grammar Db2SqlExecLexer;
+@lexer::members {
+   boolean commaCharAllowed = true;
+}
 channels{COMMENTS}
 
 // DB2 SQL Reserved Keywords
@@ -859,15 +862,23 @@ DATELITERAL: '\'' (DIGIT DIGIT DIGIT DIGIT '-' DIGIT DIGIT '-' DIGIT DIGIT | //y
 SINGLEDIGITLITERAL : DIGIT;
 INTEGERLITERAL : DIGIT+;
 IDENTIFIER : [\p{Alnum}\p{General_Category=Other_Letter}] [-_\p{Alnum}\p{General_Category=Other_Letter}]*;
-COPYBOOK_IDENTIFIER : [a-zA-Z0-9#@$][_a-zA-Z0-9#@$]*;
 
-NUMERICLITERAL : (PLUSCHAR | MINUSCHAR)? DIGIT*
+NUMERICLITERAL : (PLUSCHAR | MINUSCHAR)?
     (
-        DIGIT? (DOT_FS | COMMACHAR {_input.LA(1) != ' ' && _input.LA(1) != NEWLINE}?) DIGIT
+        (DOT_FS | COMMACHAR { commaCharAllowed }?) DIGIT+ (('e' | 'E') (PLUSCHAR | MINUSCHAR)? DIGIT+)?
         |
-        DIGIT (DOT_FS | COMMACHAR {_input.LA(1) != ' '&& _input.LA(1) != NEWLINE }?) DIGIT?
-    ) DIGIT*
-    (('e' | 'E') (PLUSCHAR | MINUSCHAR)? DIGIT+)?;
+        DIGIT+
+        (
+            DOT_FS DIGIT* (('e' | 'E') (PLUSCHAR | MINUSCHAR)? DIGIT+)?
+            |
+            COMMACHAR { commaCharAllowed }?
+            (
+                DIGIT+ (('e' | 'E') (PLUSCHAR | MINUSCHAR)? DIGIT+)?
+                |
+                ('e' | 'E') (PLUSCHAR | MINUSCHAR)? DIGIT+
+            )
+        )
+    );
 
 NONNUMERICLITERAL : UNTRMSTRINGLITERAL | STRINGLITERAL | DBCSLITERAL | HEXNUMBER | NULLTERMINATED;
 
