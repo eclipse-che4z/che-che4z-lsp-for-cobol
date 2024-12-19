@@ -699,7 +699,8 @@ cics_startbrowse_event: EVENT (BROWSETOKEN cics_data_area | ACTIVITYID cics_data
 cics_startbrowse_process: PROCESS (PROCESSTYPE cics_data_value | BROWSETOKEN cics_data_area | cics_handle_response)+;
 
 /** SUSPEND (both) */
-cics_suspend: SUSPEND (ACQACTIVITY | ACQPROCESS | ACTIVITY cics_data_value | cics_handle_response)*;
+cics_suspend: SUSPEND cics_suspend_body;
+cics_suspend_body: (ACQACTIVITY | ACQPROCESS | ACTIVITY cics_data_value | cics_handle_response)*;
 
 /** SYNCPOINT / SYNCPOINT ROLLBACK */
 cics_syncpoint: SYNCPOINT (cics_handle_response | ROLLBACK)*;

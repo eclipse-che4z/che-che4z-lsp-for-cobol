@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_suspend;
+import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_suspend_body;
 
 /** Checks CICS Suspend rules for required and invalid options */
 public class CICSSuspendOptionsUtility extends CICSOptionsCheckBaseUtility {
@@ -36,7 +37,6 @@ public class CICSSuspendOptionsUtility extends CICSOptionsCheckBaseUtility {
   private static final Map<Integer, ErrorSeverity> DUPLICATE_CHECK_OPTIONS =
       new HashMap<Integer, ErrorSeverity>() {
         {
-          put(CICSLexer.SUSPEND, ErrorSeverity.ERROR);
           put(CICSLexer.ACQACTIVITY, ErrorSeverity.WARNING);
           put(CICSLexer.ACQPROCESS, ErrorSeverity.WARNING);
           put(CICSLexer.ACTIVITY, ErrorSeverity.ERROR);
@@ -54,14 +54,14 @@ public class CICSSuspendOptionsUtility extends CICSOptionsCheckBaseUtility {
    * @param <E> A subclass of ParserRuleContext
    */
   public <E extends ParserRuleContext> void checkOptions(E ctx) {
-    if (ctx.getParent().getRuleIndex() == RULE_cics_suspend) {
-      checkSuspend((CICSParser.Cics_suspendContext) ctx.getParent());
+    if (ctx.getRuleIndex() == RULE_cics_suspend_body) {
+      checkSuspend((CICSParser.Cics_suspend_bodyContext) ctx);
     }
-    checkDuplicates(ctx.getParent());
+    checkDuplicates(ctx);
   }
 
   @SuppressWarnings("unchecked")
-  private void checkSuspend(CICSParser.Cics_suspendContext ctx) {
+  private void checkSuspend(CICSParser.Cics_suspend_bodyContext ctx) {
     checkHasMutuallyExclusiveOptions("ACQACTIVITY or ACQPROCESS or ACTIVITY",
             ctx.ACQACTIVITY(), ctx.ACQPROCESS(), ctx.ACTIVITY());
   }
