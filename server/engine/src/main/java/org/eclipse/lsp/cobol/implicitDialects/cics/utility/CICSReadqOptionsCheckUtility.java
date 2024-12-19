@@ -73,8 +73,6 @@ public class CICSReadqOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
             checkHasMandatoryOptions(ctx.QUEUE(), ctx, "QUEUE");
         if (!ctx.NOSUSPEND().isEmpty())
             checkHasMandatoryOptions(ctx.TD(), ctx, "TD");
-        if (!ctx.cics_into_set().isEmpty())
-            checkSetTd(ctx.cics_into_set().listIterator().next());
 
         checkHasExactlyOneOption("INTO or SET", ctx, ctx.cics_into_set());
     }
@@ -85,9 +83,6 @@ public class CICSReadqOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
         checkHasExactlyOneOption("QUEUE or QNAME", ctx, ctx.QUEUE(), ctx.QNAME());
         checkHasExactlyOneOption("INTO or SET", ctx, ctx.cics_into_set());
         checkHasMutuallyExclusiveOptions("NEXT or ITEM", ctx.NEXT(), ctx.ITEM());
-    }
-    private void checkSetTd(CICSParser.Cics_into_setContext ctx) {
-        if (ctx.SET() != null) checkHasMandatoryOptions(((Cics_readq_tdContext) ctx.getParent().getRuleContext()).LENGTH(), ctx, "LENGTH");
     }
     private void checkSetTs(CICSParser.Cics_into_setContext ctx) {
         if (ctx.SET() != null) checkHasMandatoryOptions(((Cics_readq_tsContext) ctx.getParent().getRuleContext()).LENGTH(), ctx, "LENGTH");
