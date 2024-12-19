@@ -22,7 +22,7 @@ allCicsRule: cics_send | cics_receive | cics_add | cics_address | cics_allocate 
                        cics_build | cics_cancel | cics_change  | cics_check | cics_connect | cics_converttime |
                        cics_define | cics_delay | cics_delete | cics_deleteq | cics_deq | cics_document | cics_dump | cics_endbr |
                        cics_endbrowse | cics_enq | cics_enter | cics_extract | cics_force | cics_formattime | cics_free |
-                       cics_freemain | cics_get | cics_getmain | cics_getnext | cics_handle | cics_ignore | cics_inquire |
+                       cics_freemain | cics_get | cics_getmain | cics_getmain64 | cics_getnext | cics_handle | cics_ignore | cics_inquire |
                        cics_invoke | cics_issue | cics_link | cics_load | cics_monitor | cics_move | cics_point | cics_pop |
                        cics_post | cics_purge | cics_push | cics_put | cics_query | cics_read | cics_readnext_readprev |
                        cics_readq | cics_release | cics_remove | cics_reset | cics_resetbr | cics_resume | cics_retrieve |
@@ -331,7 +331,8 @@ cics_enq: ENQ cics_enq_opts;
 cics_enq_opts:(RESOURCE cics_data_area | LENGTH cics_data_value | UOW | TASK | MAXLIFETIME cics_cvda | NOSUSPEND | cics_handle_response)+;
 
 /** ENTER TRACENUM */
-cics_enter: ENTER (TRACENUM cics_data_value | FROM cics_data_area | FROMLENGTH cics_data_area | RESOURCE cics_name | EXCEPTION | cics_handle_response)+;
+cics_enter: ENTER cics_enter_opts;
+cics_enter_opts:(TRACENUM cics_data_value | FROM cics_data_area | FROMLENGTH cics_data_area | RESOURCE cics_name | EXCEPTION | cics_handle_response)+;
 
 /** EXTRACT (all of them) */
 cics_extract: EXTRACT (cics_extract_attach | cics_extract_attributes | cics_extract_certificate | cics_extract_logonmessage | cics_extract_process | cics_extract_tcpip | cics_extract_tct | cics_extract_web_server | cics_extract_web_client);
@@ -376,7 +377,10 @@ cics_get_counter_dcounter: ((COUNTER | DCOUNTER | POOL) cics_name | VALUE cics_d
 
 /** GETMAIN */
 cics_getmain: GETMAIN (SET cics_ref | FLENGTH cics_data_value | BELOW | LENGTH cics_data_value | INITIMG cics_data_value |
-              SHARED | NOSUSPEND | USERDATAKEY | CICSDATAKEY | cics_handle_response)+;
+              EXECUTABLE | SHARED | NOSUSPEND | USERDATAKEY | CICSDATAKEY | cics_handle_response)+;
+cics_getmain64: GETMAIN64 (SET cics_ref | FLENGTH cics_data_value | LOCATION cics_cvda |
+                  EXECUTABLE | SHARED | NOSUSPEND | USERDATAKEY | CICSDATAKEY | cics_handle_response)+;
+
 
 /** GETNEXT ACTIVITY / CONTAINER / EVENT / PROCESS */
 cics_getnext: GETNEXT (cics_getnext_activity | cics_getnext_container | cics_getnext_event | cics_getnext_process);
@@ -646,12 +650,13 @@ cics_put_bts: (ACTIVITY cics_data_value | ACQACTIVITY | PROCESS | ACQPROCESS | F
 cics_put_channel: (CHANNEL cics_data_value | FROM cics_data_area | FLENGTH cics_data_value | BIT | DATATYPE cics_cvda |
                   CHAR | FROMCCSID cics_data_value | FROMCODEPAGE cics_data_value | cics_handle_response)+;
 
-/** QUERY COUNTER / DCOUNTER / SECURITY */
-cics_query: QUERY (cics_query_counter | cics_query_security);
-cics_query_counter: (COUNTER cics_name | DCOUNTER cics_name) (POOL cics_name | VALUE cics_data_area | MINIMUM cics_data_area |
-                    MAXIMUM cics_data_area | cics_handle_response)*;
-cics_query_security: SECURITY (RESTYPE cics_data_value | RESCLASS cics_data_value | RESIDLENGTH cics_data_value | RESID cics_data_value |
-                     LOGMESSAGE cics_cvda | READ cics_cvda | UPDATE cics_cvda | CONTROL cics_cvda | ALTER cics_cvda | cics_handle_response)+;
+/** QUERY CHANNEL / COUNTER / DCOUNTER / SECURITY */
+cics_query: QUERY (cics_query_channel | cics_query_counter | cics_query_security);
+cics_query_channel: (CHANNEL cics_data_value | CONTAINERCNT cics_data_area | cics_handle_response)+;
+cics_query_counter: (cics_counter_dcounter | POOL cics_name | (VALUE | MINIMUM | MAXIMUM) cics_data_area | NOSUSPEND | cics_handle_response)+;
+cics_query_security: (SECURITY | (RESTYPE | RESCLASS | RESIDLENGTH | RESID | USERID) cics_data_value |
+                     (LOGMESSAGE | READ | UPDATE | CONTROL |ALTER) cics_cvda | cics_handle_response)+;
+
 /** READ */
 cics_read: READ (cics_file_name | UNCOMMITTED | CONSISTENT | REPEATABLE | UPDATE | TOKEN cics_data_area |
            INTO cics_data_area | SET cics_ref | RIDFLD cics_data_area | KEYLENGTH cics_data_value | GENERIC |
@@ -1114,6 +1119,7 @@ ABCODE
  | ABDUMP
  | ABEND
  | ABENDCODE
+ | ABOFFSET
  | ABORT
  | ABPROGRAM
  | ABSTIME
@@ -1185,7 +1191,9 @@ ABCODE
  | ASRAINTRPT
  | ASRAKEY
  | ASRAPSW
+ | ASRAPSW16
  | ASRAREGS
+ | ASRAREGS64
  | ASRASPC
  | ASRASTG
  | ASSOCIATION
@@ -1274,6 +1282,7 @@ ABCODE
  | CHAR
  | CHARACTERSET
  | CHECK
+ | CHILD
  | CHUNKEND
  | CHUNKING
  | CHUNKNO
@@ -1538,6 +1547,8 @@ ABCODE
  | ERASE
  | ERASEAUP
  | ERDSASIZE
+ | ERRORMSG
+ | ERRORMSGLEN
  | ERROROPTION
  | ERRTERM
  | ESDSASIZE
@@ -1550,9 +1561,11 @@ ABCODE
  | EVENTTYPE
  | EVENTUAL
  | EWASUPP
+ | EXACTMATCH
  | EXCEPTCLASS
  | EXCLUSIVE
  | EXECKEY
+ | EXECUTABLE
  | EXECUTIONSET
  | EXIT
  | EXITPGM
@@ -1604,7 +1617,7 @@ ABCODE
  | FORMFIELD
  | FREEKB
  | FREEMAIN
- | FREEMAIN64 
+ | FREEMAIN64
  | FREQUENCY
  | FREQUENCYHRS
  | FREQUENCYMINS
@@ -1635,7 +1648,9 @@ ABCODE
  | GENERICTCPS
  | GET
  | GETMAIN
+ | GETMAIN64
  | GETNEXT
+ | GMEXITOPT
  | GMMI
  | GMMLENGTH
  | GMMTEXT
@@ -2042,6 +2057,7 @@ ABCODE
  | PASS
  | PASSBK
  | PASSWORDLEN
+ | PATCH
  | PATH
  | PATHLENGTH
  | PCDSASIZE
@@ -2385,6 +2401,7 @@ ABCODE
  | STRFIELD
  | STRINGFORMAT
  | STRINGS
+ | STRINGZONE
  | STRUCTNAME
  | SUBADDR
  | SUBCODELEN
