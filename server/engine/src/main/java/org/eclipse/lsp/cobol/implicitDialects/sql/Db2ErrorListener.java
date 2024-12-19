@@ -74,7 +74,7 @@ public class Db2ErrorListener extends BaseErrorListener {
                                 line - 1 + offendingSymbolRelativeLine,
                                 offendingSymbolRelativeLine == 0
                                     ? charPositionInLine + offendingSymbolSize
-                                    : offendingSymbolSize - 1)))
+                                    : offendingSymbolSize)))
                     .build()
                     .toOriginalLocation())
             .suggestion(msg)

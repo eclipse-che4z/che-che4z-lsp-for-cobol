@@ -18,22 +18,20 @@ import static java.util.stream.Collectors.toList;
 
 import com.google.common.collect.ImmutableList;
 
-import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.RuleNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.apache.commons.lang3.tuple.Pair;
+import org.eclipse.lsp.cobol.AntlrRangeUtils;
 import org.eclipse.lsp.cobol.common.copybook.CopybookService;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
-import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.model.tree.variable.*;
@@ -51,9 +49,6 @@ class Db2SqlExecVisitor extends Db2SqlExecParserBaseVisitor<List<Node>> {
 
     private final DialectProcessingContext context;
     private final CopybookService copybookService;
-
-    @Getter
-    private final List<SyntaxError> errors = new LinkedList<>();
 
     @Override
     public List<Node> visitDbs_host_variable(Db2SqlExecParser.Dbs_host_variableContext ctx) {
@@ -170,13 +165,7 @@ class Db2SqlExecVisitor extends Db2SqlExecParserBaseVisitor<List<Node>> {
     }
 
     private List<Node> addTreeNode(ParserRuleContext ctx, Function<Locality, Node> nodeConstructor) {
-        Locality locality =
-                VisitorHelper.buildNameRangeLocality(
-                        ctx, VisitorHelper.getName(ctx), context.getProgramDocumentUri());
-        //    locality.setRange(RangeUtils.shiftRangeWithPosition(position, locality.getRange()));
-        //
-        Location location = context.getExtendedDocument().mapLocation(locality.getRange());
-
+        Location location = context.getExtendedDocument().mapLocation(AntlrRangeUtils.constructRange(ctx));
         Node node =
                 nodeConstructor.apply(
                         Locality.builder().range(location.getRange()).uri(location.getUri()).build());

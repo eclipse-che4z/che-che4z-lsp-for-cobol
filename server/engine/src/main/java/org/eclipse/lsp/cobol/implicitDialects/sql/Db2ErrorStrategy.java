@@ -152,7 +152,7 @@ public class Db2ErrorStrategy extends DefaultErrorStrategy implements MessageSer
     }
 
     private static boolean isSqlStopChar(Token t) {
-        return t.getType() == Db2SqlLexer.SEMICOLON_FS || t.getType() == Db2SqlLexer.SEMICOLONSEPARATORSQL;
+        return t.getType() == Db2SqlLexer.SEMICOLON_FS;
     }
 
     private boolean isInAriaA(Token t) {
