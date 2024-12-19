@@ -170,6 +170,7 @@ public class CFASTBuilderImpl implements CFASTBuilder {
     } else if (node instanceof ExecSqlNode) {
       boolean isWhenever = node.getChildren().stream().anyMatch(n ->
               n.getDepthFirstStream().anyMatch(nd -> nd instanceof ExecSqlWheneverNode));
+      // CCF expects to have "execwhenever" instead of "execsql" in case of whenever SQL statement.
       if (!isWhenever) {
         addChild(parent, new CFASTNode(CFASTNodeType.EXEC_SQL.getValue(), convertLocation(node)));
       }
