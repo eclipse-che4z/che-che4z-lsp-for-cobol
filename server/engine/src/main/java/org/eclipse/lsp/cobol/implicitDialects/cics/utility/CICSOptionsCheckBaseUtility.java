@@ -548,4 +548,21 @@ public abstract class CICSOptionsCheckBaseUtility {
                         .collect(Collectors.toList());
         checkHasMutuallyExclusiveOptions("START or END or NEXT", browsingContexts);
     }
+
+    /**
+     * Performs a common BROWSING check to validate parameters and options for certain BROWSING scenarios
+     * with START and END
+     *
+     * @param ctx       Context to validate
+     * @param coreToken The core token of the rule
+     * @param <E>       Generic type of ParserRuleContext subclass
+     */
+    public <E extends ParserRuleContext> void checkBrowsingCommon(E ctx, int coreToken) {
+        checkBrowseMutuallyExclusive(ctx);
+        CICSParser.Cics_browse_start_endContext startEndCtx = ctx.getChild(CICSParser.Cics_browse_start_endContext.class, 0);
+        if (startEndCtx != null) {
+            checkBrowsingInvalidOptions(ctx, coreToken);
+            checkBrowsingHasNotParameter(ctx, coreToken);
+        } else checkStatementHasParameter(ctx, coreToken);
+    }
 }

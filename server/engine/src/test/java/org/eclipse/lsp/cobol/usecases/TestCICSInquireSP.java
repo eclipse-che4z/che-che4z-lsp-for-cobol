@@ -14,8 +14,10 @@
  */
 package org.eclipse.lsp.cobol.usecases;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
+import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.eclipse.lsp.cobol.usecases.common.CICSTestUtils;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
@@ -463,5 +465,19 @@ public class TestCICSInquireSP {
                                 DiagnosticSeverity.Error,
                                 ErrorSource.PARSING.getText()));
         CICSTestUtils.errorTest(INVALID_BROWSE_BRFACILITY_TWO, expectedDiagnostics, "SP");
+    }
+
+    @Test
+    void testTranslatorOptionsWithoutParens() {
+        UseCaseEngine.runTest(
+                "       CBL CICS(SP)\n"
+                        + "       IDENTIFICATION DIVISION.\n"
+                        + "       PROGRAM-ID. ABCDEF.\n"
+                        + "       DATA DIVISION.\n"
+                        + "       WORKING-STORAGE SECTION.\n"
+                        + "       PROCEDURE DIVISION.\n"
+                        + "            EXEC CICS \n"
+                        + "            INQUIRE AUTINSTMODEL START\n"
+                        + "            END-EXEC.", ImmutableList.of(), ImmutableMap.of());
     }
 }
