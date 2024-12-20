@@ -1444,7 +1444,7 @@ public class CICSInquireSPOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
 
                 break;
 
-            case CICSParser.RULE_cics_inquire_transaction: //TODO: COMMON
+            case CICSParser.RULE_cics_inquire_transaction:
                 CICSParser.Cics_inquire_transactionContext transactionContext =
                         (CICSParser.Cics_inquire_transactionContext) ctx;
                 checkBrowsingCommon(transactionContext, CICSParser.TRANSACTION);
