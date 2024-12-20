@@ -31,13 +31,54 @@ import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_i
  */
 public class CICSInquireSPOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     public static final int RULE_INDEX = RULE_cics_inquire_system_programming;
+
+    private static final Map<Integer, Integer> COMMON_INQUIRE_BROWSE_RULES = new HashMap<Integer, Integer>() {
+        {
+            put(CICSParser.RULE_cics_inquire_atomservice, CICSParser.ATOMSERVICE);
+            put(CICSParser.RULE_cics_inquire_autinstmodel, CICSParser.AUTINSTMODEL);
+            put(CICSParser.RULE_cics_inquire_brfacility, CICSParser.BRFACILITY);
+            put(CICSParser.RULE_cics_inquire_connection, CICSParser.CONNECTION);
+            put(CICSParser.RULE_cics_inquire_cfdtpool, CICSParser.CFDTPOOL);
+            put(CICSParser.RULE_cics_inquire_db2entry, CICSParser.DB2ENTRY);
+            put(CICSParser.RULE_cics_inquire_db2tran, CICSParser.DB2TRAN);
+            put(CICSParser.RULE_cics_inquire_doctemplate, CICSParser.DOCTEMPLATE);
+            put(CICSParser.RULE_cics_inquire_dsname, CICSParser.DSNAME);
+            put(CICSParser.RULE_cics_inquire_enqmodel, CICSParser.ENQMODEL);
+            put(CICSParser.RULE_cics_inquire_epadapter, CICSParser.EPADAPTER);
+            put(CICSParser.RULE_cics_inquire_epadapterset, CICSParser.EPADAPTERSET);
+            put(CICSParser.RULE_cics_inquire_eventbinding, CICSParser.EVENTBINDING);
+            put(CICSParser.RULE_cics_inquire_file, CICSParser.FILE);
+            put(CICSParser.RULE_cics_inquire_host, CICSParser.HOST);
+            put(CICSParser.RULE_cics_inquire_ipconn, CICSParser.IPCONN);
+            put(CICSParser.RULE_cics_inquire_journalmodel, CICSParser.JOURNALMODEL);
+            put(CICSParser.RULE_cics_inquire_journalname, CICSParser.JOURNALNAME);
+            put(CICSParser.RULE_cics_inquire_jvmserver, CICSParser.JVMSERVER);
+            put(CICSParser.RULE_cics_inquire_library, CICSParser.LIBRARY);
+            put(CICSParser.RULE_cics_inquire_mqmonitor, CICSParser.MQMONITOR);
+            put(CICSParser.RULE_cics_inquire_nodejsapp, CICSParser.NODEJSAPP);
+            put(CICSParser.RULE_cics_inquire_partner, CICSParser.PARTNER);
+            put(CICSParser.RULE_cics_inquire_pipeline, CICSParser.PIPELINE);
+            put(CICSParser.RULE_cics_inquire_policy, CICSParser.POLICY);
+            put(CICSParser.RULE_cics_inquire_processtype, CICSParser.PROCESSTYPE);
+            put(CICSParser.RULE_cics_inquire_profile, CICSParser.PROFILE);
+            put(CICSParser.RULE_cics_inquire_secrecording, CICSParser.SECRECORDING);
+            put(CICSParser.RULE_cics_inquire_streamname, CICSParser.STREAMNAME);
+            put(CICSParser.RULE_cics_inquire_sysdumpcode, CICSParser.SYSDUMPCODE);
+            put(CICSParser.RULE_cics_inquire_tdqueue, CICSParser.TDQUEUE);
+            put(CICSParser.RULE_cics_inquire_trandumpcode, CICSParser.TRANDUMPCODE);
+            put(CICSParser.RULE_cics_inquire_tsmodel, CICSParser.TSMODEL);
+            put(CICSParser.RULE_cics_inquire_tspool, CICSParser.TSPOOL);
+            put(CICSParser.RULE_cics_inquire_uow, CICSParser.UOW);
+            put(CICSParser.RULE_cics_inquire_uowlink, CICSParser.UOWLINK);
+            put(CICSParser.RULE_cics_inquire_urimap, CICSParser.URIMAP);
+            put(CICSParser.RULE_cics_inquire_webservice, CICSParser.WEBSERVICE);
+
+        }
+    };
+
     private static final Map<Integer, ErrorSeverity> DUPLICATE_CHECK_OPTIONS =
             new HashMap<Integer, ErrorSeverity>() {
                 {
-                    put(CICSLexer.START, ErrorSeverity.ERROR);
-                    put(CICSLexer.END, ErrorSeverity.ERROR);
-                    put(CICSLexer.NEXT, ErrorSeverity.ERROR);
-                    put(CICSLexer.AT, ErrorSeverity.ERROR);
                     put(CICSLexer.ABENDCODE, ErrorSeverity.ERROR);
                     put(CICSLexer.ACCESSMETHOD, ErrorSeverity.ERROR);
                     put(CICSLexer.ACCOUNTREC, ErrorSeverity.ERROR);
@@ -663,11 +704,7 @@ public class CICSInquireSPOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
                     put(CICSLexer.RES, ErrorSeverity.ERROR);
                     put(CICSLexer.RESCOUNT, ErrorSeverity.ERROR);
                     put(CICSLexer.RESIDENCY, ErrorSeverity.ERROR);
-                    // CICS inquire enq has two instances of Reslen
-                    // put(CICSLexer.RESLEN, ErrorSeverity.ERROR);
                     put(CICSLexer.RESNAME, ErrorSeverity.ERROR);
-                    // CICS inquire enq has two instances of Resource
-                    // put(CICSLexer.RESOURCE, ErrorSeverity.ERROR);
                     put(CICSLexer.RESOURCENAME, ErrorSeverity.ERROR);
                     put(CICSLexer.RESOURCETYPE, ErrorSeverity.ERROR);
                     put(CICSLexer.RESPWAIT, ErrorSeverity.ERROR);
@@ -845,8 +882,6 @@ public class CICSInquireSPOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
                     put(CICSLexer.TYPE, ErrorSeverity.ERROR);
                     put(CICSLexer.UCTRANST, ErrorSeverity.ERROR);
                     put(CICSLexer.UDSASIZE, ErrorSeverity.ERROR);
-                    // CICS inquire enq has two instances of UOW
-                    // put(CICSLexer.UOW, ErrorSeverity.ERROR);
                     put(CICSLexer.UOWLINK, ErrorSeverity.ERROR);
                     put(CICSLexer.UOWSTATE, ErrorSeverity.ERROR);
                     put(CICSLexer.UPDATE, ErrorSeverity.ERROR);
@@ -954,26 +989,6 @@ public class CICSInquireSPOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
                         (CICSParser.Cics_inquire_association_listContext) ctx;
                 checkHasMandatoryOptions(listContext.LIST(), ctx, "LIST");
                 checkHasMandatoryOptions(listContext.LISTSIZE(), ctx, "LISTSIZE");
-                break;
-
-            case CICSParser.RULE_cics_inquire_atomservice:
-                CICSParser.Cics_inquire_atomserviceContext atomserviceContext =
-                        (CICSParser.Cics_inquire_atomserviceContext) ctx;
-                checkBrowseMutuallyExclusive(atomserviceContext);
-                if (!atomserviceContext.START().isEmpty() || !atomserviceContext.END().isEmpty()) {
-                    checkBrowsingInvalidOptions(atomserviceContext, CICSParser.ATOMSERVICE);
-                    checkBrowsingHasNotParameter(atomserviceContext, CICSParser.ATOMSERVICE);
-                } else checkStatementHasParameter(atomserviceContext, CICSParser.ATOMSERVICE);
-                break;
-
-            case CICSParser.RULE_cics_inquire_brfacility:
-                CICSParser.Cics_inquire_brfacilityContext brfacilityContext =
-                        (CICSParser.Cics_inquire_brfacilityContext) ctx;
-                checkBrowseMutuallyExclusive(brfacilityContext);
-                if (!brfacilityContext.START().isEmpty() || !brfacilityContext.END().isEmpty()) {
-                    checkBrowsingInvalidOptions(brfacilityContext, CICSParser.BRFACILITY);
-                    checkBrowsingHasNotParameter(brfacilityContext, CICSParser.BRFACILITY);
-                } else checkStatementHasParameter(brfacilityContext, CICSParser.BRFACILITY);
                 break;
 
             case CICSParser.RULE_cics_inquire_bundle:
@@ -1088,7 +1103,6 @@ public class CICSInquireSPOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
                 }
                 break;
 
-            // TODO: USE AS TEMPLATE FOR BROWSE EXAMPLE WITH TWO MANDATORY OPTIONS
             case CICSParser.RULE_cics_inquire_capturespec:
                 CICSParser.Cics_inquire_capturespecContext capturespecContext =
                         (CICSParser.Cics_inquire_capturespecContext) ctx;
@@ -1102,47 +1116,6 @@ public class CICSInquireSPOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
                             capturespecContext, CICSParser.CAPTURESPEC, CICSParser.EVENTBINDING);
                     checkBrowsingHasNotParameter(capturespecContext, CICSParser.CAPTURESPEC);
                 } else checkStatementHasParameter(capturespecContext, CICSParser.CAPTURESPEC);
-                break;
-
-            // TODO: USE AS TEMPLATE FOR REGULAR BROWSE EXAMPLE
-            case CICSParser.RULE_cics_inquire_connection:
-                CICSParser.Cics_inquire_connectionContext connectionContext =
-                        (CICSParser.Cics_inquire_connectionContext) ctx;
-                checkBrowseMutuallyExclusive(connectionContext);
-                if (!connectionContext.START().isEmpty() || !connectionContext.END().isEmpty()) {
-                    checkBrowsingInvalidOptions(connectionContext, CICSParser.CONNECTION);
-                    checkBrowsingHasNotParameter(connectionContext, CICSParser.CONNECTION);
-                } else checkStatementHasParameter(connectionContext, CICSParser.CONNECTION);
-                break;
-
-            case CICSParser.RULE_cics_inquire_cfdtpool:
-                CICSParser.Cics_inquire_cfdtpoolContext cfdtpoolContext =
-                        (CICSParser.Cics_inquire_cfdtpoolContext) ctx;
-                checkBrowseMutuallyExclusive(cfdtpoolContext);
-                if (!cfdtpoolContext.START().isEmpty() || !cfdtpoolContext.END().isEmpty()) {
-                    checkBrowsingInvalidOptions(cfdtpoolContext, CICSParser.CFDTPOOL);
-                    checkBrowsingHasNotParameter(cfdtpoolContext, CICSParser.CFDTPOOL);
-                } else checkStatementHasParameter(cfdtpoolContext, CICSParser.CFDTPOOL);
-                break;
-
-            case CICSParser.RULE_cics_inquire_db2entry:
-                CICSParser.Cics_inquire_db2entryContext db2entryContext =
-                        (CICSParser.Cics_inquire_db2entryContext) ctx;
-                checkBrowseMutuallyExclusive(db2entryContext);
-                if (!db2entryContext.START().isEmpty() || !db2entryContext.END().isEmpty()) {
-                    checkBrowsingInvalidOptions(db2entryContext, CICSParser.DB2ENTRY);
-                    checkBrowsingHasNotParameter(db2entryContext, CICSParser.DB2ENTRY);
-                } else checkStatementHasParameter(db2entryContext, CICSParser.DB2ENTRY);
-                break;
-
-            case CICSParser.RULE_cics_inquire_db2tran:
-                CICSParser.Cics_inquire_db2tranContext db2tranContext =
-                        (CICSParser.Cics_inquire_db2tranContext) ctx;
-                checkBrowseMutuallyExclusive(db2tranContext);
-                if (!db2tranContext.START().isEmpty() || !db2tranContext.END().isEmpty()) {
-                    checkBrowsingInvalidOptions(db2tranContext, CICSParser.DB2TRAN);
-                    checkBrowsingHasNotParameter(db2tranContext, CICSParser.DB2TRAN);
-                } else checkStatementHasParameter(db2tranContext, CICSParser.DB2TRAN);
                 break;
 
             case CICSParser.RULE_cics_inquire_deletshipped:
@@ -1186,26 +1159,6 @@ public class CICSInquireSPOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
                 }
                 break;
 
-            case CICSParser.RULE_cics_inquire_doctemplate:
-                CICSParser.Cics_inquire_doctemplateContext doctemplateContext =
-                        (CICSParser.Cics_inquire_doctemplateContext) ctx;
-                checkBrowseMutuallyExclusive(doctemplateContext);
-                if (!doctemplateContext.START().isEmpty() || !doctemplateContext.END().isEmpty()) {
-                    checkBrowsingInvalidOptions(doctemplateContext, CICSParser.DOCTEMPLATE);
-                    checkBrowsingHasNotParameter(doctemplateContext, CICSParser.DOCTEMPLATE);
-                } else checkStatementHasParameter(doctemplateContext, CICSParser.DOCTEMPLATE);
-                break;
-
-            case CICSParser.RULE_cics_inquire_dsname:
-                CICSParser.Cics_inquire_dsnameContext dsnameContext =
-                        (CICSParser.Cics_inquire_dsnameContext) ctx;
-                checkBrowseMutuallyExclusive(dsnameContext);
-                if (!dsnameContext.START().isEmpty() || !dsnameContext.END().isEmpty()) {
-                    checkBrowsingInvalidOptions(dsnameContext, CICSParser.DSNAME);
-                    checkBrowsingHasNotParameter(dsnameContext, CICSParser.DSNAME);
-                } else checkStatementHasParameter(dsnameContext, CICSParser.DSNAME);
-                break;
-
             case CICSParser.RULE_cics_inquire_enq:
                 CICSParser.Cics_inquire_enqContext enqContext = (CICSParser.Cics_inquire_enqContext) ctx;
                 checkHasExactlyOneOption(
@@ -1236,36 +1189,6 @@ public class CICSInquireSPOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
 
                 break;
 
-            case CICSParser.RULE_cics_inquire_enqmodel:
-                CICSParser.Cics_inquire_enqmodelContext enqmodelContext =
-                        (CICSParser.Cics_inquire_enqmodelContext) ctx;
-                checkBrowseMutuallyExclusive(enqmodelContext);
-                if (!enqmodelContext.START().isEmpty() || !enqmodelContext.END().isEmpty()) {
-                    checkBrowsingInvalidOptions(enqmodelContext, CICSParser.ENQMODEL);
-                    checkBrowsingHasNotParameter(enqmodelContext, CICSParser.ENQMODEL);
-                } else checkStatementHasParameter(enqmodelContext, CICSParser.ENQMODEL);
-                break;
-
-            case CICSParser.RULE_cics_inquire_epadapter:
-                CICSParser.Cics_inquire_epadapterContext epadapterContext =
-                        (CICSParser.Cics_inquire_epadapterContext) ctx;
-                checkBrowseMutuallyExclusive(epadapterContext);
-                if (!epadapterContext.START().isEmpty() || !epadapterContext.END().isEmpty()) {
-                    checkBrowsingInvalidOptions(epadapterContext, CICSParser.EPADAPTER);
-                    checkBrowsingHasNotParameter(epadapterContext, CICSParser.EPADAPTER);
-                } else checkStatementHasParameter(epadapterContext, CICSParser.EPADAPTER);
-                break;
-
-            case CICSParser.RULE_cics_inquire_epadapterset:
-                CICSParser.Cics_inquire_epadaptersetContext epadaptersetContext =
-                        (CICSParser.Cics_inquire_epadaptersetContext) ctx;
-                checkBrowseMutuallyExclusive(epadaptersetContext);
-                if (!epadaptersetContext.START().isEmpty() || !epadaptersetContext.END().isEmpty()) {
-                    checkBrowsingInvalidOptions(epadaptersetContext, CICSParser.EPADAPTERSET);
-                    checkBrowsingHasNotParameter(epadaptersetContext, CICSParser.EPADAPTERSET);
-                } else checkStatementHasParameter(epadaptersetContext, CICSParser.EPADAPTERSET);
-                break;
-
             case CICSParser.RULE_cics_inquire_epadaptinset:
                 CICSParser.Cics_inquire_epadaptinsetContext epadaptinsetContext =
                         (CICSParser.Cics_inquire_epadaptinsetContext) ctx;
@@ -1285,16 +1208,6 @@ public class CICSInquireSPOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
                     checkHasMandatoryOptions(
                             epadaptinsetContext.EPADAPTER(), epadaptinsetContext, "EPADAPTER without Browsing");
                 }
-                break;
-
-            case CICSParser.RULE_cics_inquire_eventbinding:
-                CICSParser.Cics_inquire_eventbindingContext eventbindingContext =
-                        (CICSParser.Cics_inquire_eventbindingContext) ctx;
-                checkBrowseMutuallyExclusive(eventbindingContext);
-                if (!eventbindingContext.START().isEmpty() || !eventbindingContext.END().isEmpty()) {
-                    checkBrowsingInvalidOptions(eventbindingContext, CICSParser.EVENTBINDING);
-                    checkBrowsingHasNotParameter(eventbindingContext, CICSParser.EVENTBINDING);
-                } else checkStatementHasParameter(eventbindingContext, CICSParser.EVENTBINDING);
                 break;
 
             case CICSParser.RULE_cics_inquire_exitprogram:
@@ -1325,54 +1238,6 @@ public class CICSInquireSPOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
                 }
                 break;
 
-            case CICSParser.RULE_cics_inquire_file:
-                CICSParser.Cics_inquire_fileContext fileContext = (CICSParser.Cics_inquire_fileContext) ctx;
-                checkBrowseMutuallyExclusive(fileContext);
-                if (!fileContext.START().isEmpty() || !fileContext.END().isEmpty()) {
-                    checkBrowsingInvalidOptions(fileContext, CICSParser.FILE);
-                    checkBrowsingHasNotParameter(fileContext, CICSParser.FILE);
-                } else checkStatementHasParameter(fileContext, CICSParser.FILE);
-                break;
-
-            case CICSParser.RULE_cics_inquire_host:
-                CICSParser.Cics_inquire_hostContext hostContext = (CICSParser.Cics_inquire_hostContext) ctx;
-                checkBrowseMutuallyExclusive(hostContext);
-                if (!hostContext.START().isEmpty() || !hostContext.END().isEmpty()) {
-                    checkBrowsingInvalidOptions(hostContext, CICSParser.HOST);
-                    checkBrowsingHasNotParameter(hostContext, CICSParser.HOST);
-                } else checkStatementHasParameter(hostContext, CICSParser.HOST);
-                break;
-
-            case CICSParser.RULE_cics_inquire_ipconn:
-                CICSParser.Cics_inquire_ipconnContext ipconnContext =
-                        (CICSParser.Cics_inquire_ipconnContext) ctx;
-                checkBrowseMutuallyExclusive(ipconnContext);
-                if (!ipconnContext.START().isEmpty() || !ipconnContext.END().isEmpty()) {
-                    checkBrowsingInvalidOptions(ipconnContext, CICSParser.IPCONN);
-                    checkBrowsingHasNotParameter(ipconnContext, CICSParser.IPCONN);
-                } else checkStatementHasParameter(ipconnContext, CICSParser.IPCONN);
-                break;
-
-            case CICSParser.RULE_cics_inquire_journalmodel:
-                CICSParser.Cics_inquire_journalmodelContext journalmodelContext =
-                        (CICSParser.Cics_inquire_journalmodelContext) ctx;
-                checkBrowseMutuallyExclusive(journalmodelContext);
-                if (!journalmodelContext.START().isEmpty() || !journalmodelContext.END().isEmpty()) {
-                    checkBrowsingInvalidOptions(journalmodelContext, CICSParser.JOURNALMODEL);
-                    checkBrowsingHasNotParameter(journalmodelContext, CICSParser.JOURNALMODEL);
-                } else checkStatementHasParameter(journalmodelContext, CICSParser.JOURNALMODEL);
-                break;
-
-            case CICSParser.RULE_cics_inquire_journalname:
-                CICSParser.Cics_inquire_journalnameContext journalnameContext =
-                        (CICSParser.Cics_inquire_journalnameContext) ctx;
-                checkBrowseMutuallyExclusive(journalnameContext);
-                if (!journalnameContext.START().isEmpty() || !journalnameContext.END().isEmpty()) {
-                    checkBrowsingInvalidOptions(journalnameContext, CICSParser.JOURNALNAME);
-                    checkBrowsingHasNotParameter(journalnameContext, CICSParser.JOURNALNAME);
-                } else checkStatementHasParameter(journalnameContext, CICSParser.JOURNALNAME);
-                break;
-
             case CICSParser.RULE_cics_inquire_jvmendpoint:
                 CICSParser.Cics_inquire_jvmendpointContext jvmendpointContext =
                         (CICSParser.Cics_inquire_jvmendpointContext) ctx;
@@ -1388,26 +1253,6 @@ public class CICSInquireSPOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
                 } else checkStatementHasParameter(jvmendpointContext, CICSParser.JVMENDPOINT);
                 break;
 
-            case CICSParser.RULE_cics_inquire_jvmserver:
-                CICSParser.Cics_inquire_jvmserverContext jvmserverContext =
-                        (CICSParser.Cics_inquire_jvmserverContext) ctx;
-                checkBrowseMutuallyExclusive(jvmserverContext);
-                if (!jvmserverContext.START().isEmpty() || !jvmserverContext.END().isEmpty()) {
-                    checkBrowsingInvalidOptions(jvmserverContext, CICSParser.JVMSERVER);
-                    checkBrowsingHasNotParameter(jvmserverContext, CICSParser.JVMSERVER);
-                } else checkStatementHasParameter(jvmserverContext, CICSParser.JVMSERVER);
-                break;
-
-            case CICSParser.RULE_cics_inquire_library:
-                CICSParser.Cics_inquire_libraryContext libraryContext =
-                        (CICSParser.Cics_inquire_libraryContext) ctx;
-                checkBrowseMutuallyExclusive(libraryContext);
-                if (!libraryContext.START().isEmpty() || !libraryContext.END().isEmpty()) {
-                    checkBrowsingInvalidOptions(libraryContext, CICSParser.LIBRARY);
-                    checkBrowsingHasNotParameter(libraryContext, CICSParser.LIBRARY);
-                } else checkStatementHasParameter(libraryContext, CICSParser.LIBRARY);
-                break;
-
             case CICSParser.RULE_cics_inquire_modename:
                 CICSParser.Cics_inquire_modenameContext modenameContext =
                         (CICSParser.Cics_inquire_modenameContext) ctx;
@@ -1417,16 +1262,6 @@ public class CICSInquireSPOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
                     checkBrowsingInvalidOptions(modenameContext, CICSParser.MODENAME, CICSParser.CONNECTION);
                     checkBrowsingHasNotParameter(modenameContext, CICSParser.MODENAME);
                 } else checkStatementHasParameter(modenameContext, CICSParser.MODENAME);
-                break;
-
-            case CICSParser.RULE_cics_inquire_mqmonitor:
-                CICSParser.Cics_inquire_mqmonitorContext mqmonitorContext =
-                        (CICSParser.Cics_inquire_mqmonitorContext) ctx;
-                checkBrowseMutuallyExclusive(mqmonitorContext);
-                if (!mqmonitorContext.START().isEmpty() || !mqmonitorContext.END().isEmpty()) {
-                    checkBrowsingInvalidOptions(mqmonitorContext, CICSParser.MQMONITOR);
-                    checkBrowsingHasNotParameter(mqmonitorContext, CICSParser.MQMONITOR);
-                } else checkStatementHasParameter(mqmonitorContext, CICSParser.MQMONITOR);
                 break;
 
             case CICSParser.RULE_cics_inquire_mvstcb:
@@ -1455,16 +1290,6 @@ public class CICSInquireSPOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
                     checkBrowsingHasNotParameter(netnameContext, CICSParser.NETNAME);
                     checkStatementHasParameter(netnameContext, CICSParser.TERMINAL);
                 } else checkStatementHasParameter(netnameContext, CICSParser.NETNAME);
-                break;
-
-            case CICSParser.RULE_cics_inquire_nodejsapp:
-                CICSParser.Cics_inquire_nodejsappContext nodejsappContext =
-                        (CICSParser.Cics_inquire_nodejsappContext) ctx;
-                checkBrowseMutuallyExclusive(nodejsappContext);
-                if (!nodejsappContext.START().isEmpty() || !nodejsappContext.END().isEmpty()) {
-                    checkBrowsingInvalidOptions(nodejsappContext, CICSParser.NODEJSAPP);
-                    checkBrowsingHasNotParameter(nodejsappContext, CICSParser.NODEJSAPP);
-                } else checkStatementHasParameter(nodejsappContext, CICSParser.NODEJSAPP);
                 break;
 
             case CICSParser.RULE_cics_inquire_osgibundle:
@@ -1505,36 +1330,6 @@ public class CICSInquireSPOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
                 } else checkStatementHasParameter(osgiserviceContext, CICSParser.OSGISERVICE);
                 break;
 
-            case CICSParser.RULE_cics_inquire_partner:
-                CICSParser.Cics_inquire_partnerContext partnerContext =
-                        (CICSParser.Cics_inquire_partnerContext) ctx;
-                checkBrowseMutuallyExclusive(partnerContext);
-                if (!partnerContext.START().isEmpty() || !partnerContext.END().isEmpty()) {
-                    checkBrowsingInvalidOptions(partnerContext, CICSParser.PARTNER);
-                    checkBrowsingHasNotParameter(partnerContext, CICSParser.PARTNER);
-                } else checkStatementHasParameter(partnerContext, CICSParser.PARTNER);
-                break;
-
-            case CICSParser.RULE_cics_inquire_pipeline:
-                CICSParser.Cics_inquire_pipelineContext pipelineContext =
-                        (CICSParser.Cics_inquire_pipelineContext) ctx;
-                checkBrowseMutuallyExclusive(pipelineContext);
-                if (!pipelineContext.START().isEmpty() || !pipelineContext.END().isEmpty()) {
-                    checkBrowsingInvalidOptions(pipelineContext, CICSParser.PIPELINE);
-                    checkBrowsingHasNotParameter(pipelineContext, CICSParser.PIPELINE);
-                } else checkStatementHasParameter(pipelineContext, CICSParser.PIPELINE);
-                break;
-
-            case CICSParser.RULE_cics_inquire_policy:
-                CICSParser.Cics_inquire_policyContext policyContext =
-                        (CICSParser.Cics_inquire_policyContext) ctx;
-                checkBrowseMutuallyExclusive(policyContext);
-                if (!policyContext.START().isEmpty() || !policyContext.END().isEmpty()) {
-                    checkBrowsingInvalidOptions(policyContext, CICSParser.POLICY);
-                    checkBrowsingHasNotParameter(policyContext, CICSParser.POLICY);
-                } else checkStatementHasParameter(policyContext, CICSParser.POLICY);
-                break;
-
             case CICSParser.RULE_cics_inquire_policyrule:
                 CICSParser.Cics_inquire_policyruleContext policyruleContext =
                         (CICSParser.Cics_inquire_policyruleContext) ctx;
@@ -1549,26 +1344,6 @@ public class CICSInquireSPOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
                     checkBrowsingInvalidOptions(policyruleContext, CICSParser.POLICYRULE, CICSParser.POLICY);
                     checkBrowsingHasNotParameter(policyruleContext, CICSParser.POLICYRULE);
                 } else checkStatementHasParameter(policyruleContext, CICSParser.POLICYRULE);
-                break;
-
-            case CICSParser.RULE_cics_inquire_processtype:
-                CICSParser.Cics_inquire_processtypeContext processtypeContext =
-                        (CICSParser.Cics_inquire_processtypeContext) ctx;
-                checkBrowseMutuallyExclusive(processtypeContext);
-                if (!processtypeContext.START().isEmpty() || !processtypeContext.END().isEmpty()) {
-                    checkBrowsingInvalidOptions(processtypeContext, CICSParser.PROCESSTYPE);
-                    checkBrowsingHasNotParameter(processtypeContext, CICSParser.PROCESSTYPE);
-                } else checkStatementHasParameter(processtypeContext, CICSParser.PROCESSTYPE);
-                break;
-
-            case CICSParser.RULE_cics_inquire_profile:
-                CICSParser.Cics_inquire_profileContext profileContext =
-                        (CICSParser.Cics_inquire_profileContext) ctx;
-                checkBrowseMutuallyExclusive(profileContext);
-                if (!profileContext.START().isEmpty() || !profileContext.END().isEmpty()) {
-                    checkBrowsingInvalidOptions(profileContext, CICSParser.PROFILE);
-                    checkBrowsingHasNotParameter(profileContext, CICSParser.PROFILE);
-                } else checkStatementHasParameter(profileContext, CICSParser.PROFILE);
                 break;
 
             case CICSParser.RULE_cics_inquire_program:
@@ -1642,46 +1417,6 @@ public class CICSInquireSPOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
                 }
                 break;
 
-            case CICSParser.RULE_cics_inquire_secrecording:
-                CICSParser.Cics_inquire_secrecordingContext secrecordingContext =
-                        (CICSParser.Cics_inquire_secrecordingContext) ctx;
-                checkBrowseMutuallyExclusive(secrecordingContext);
-                if (!secrecordingContext.START().isEmpty() || !secrecordingContext.END().isEmpty()) {
-                    checkBrowsingInvalidOptions(secrecordingContext, CICSParser.SECRECORDING);
-                    checkBrowsingHasNotParameter(secrecordingContext, CICSParser.SECRECORDING);
-                } else checkStatementHasParameter(secrecordingContext, CICSParser.SECRECORDING);
-                break;
-
-            case CICSParser.RULE_cics_inquire_streamname:
-                CICSParser.Cics_inquire_streamnameContext streamnameContext =
-                        (CICSParser.Cics_inquire_streamnameContext) ctx;
-                checkBrowseMutuallyExclusive(streamnameContext);
-                if (!streamnameContext.START().isEmpty() || !streamnameContext.END().isEmpty()) {
-                    checkBrowsingInvalidOptions(streamnameContext, CICSParser.STREAMNAME);
-                    checkBrowsingHasNotParameter(streamnameContext, CICSParser.STREAMNAME);
-                } else checkStatementHasParameter(streamnameContext, CICSParser.STREAMNAME);
-                break;
-
-            case CICSParser.RULE_cics_inquire_sysdumpcode:
-                CICSParser.Cics_inquire_sysdumpcodeContext sysdumpcodeContext =
-                        (CICSParser.Cics_inquire_sysdumpcodeContext) ctx;
-                checkBrowseMutuallyExclusive(sysdumpcodeContext);
-                if (!sysdumpcodeContext.START().isEmpty() || !sysdumpcodeContext.END().isEmpty()) {
-                    checkBrowsingInvalidOptions(sysdumpcodeContext, CICSParser.SYSDUMPCODE);
-                    checkBrowsingHasNotParameter(sysdumpcodeContext, CICSParser.SYSDUMPCODE);
-                } else checkStatementHasParameter(sysdumpcodeContext, CICSParser.SYSDUMPCODE);
-                break;
-
-            case CICSParser.RULE_cics_inquire_tdqueue:
-                CICSParser.Cics_inquire_tdqueueContext tdqueueContext =
-                        (CICSParser.Cics_inquire_tdqueueContext) ctx;
-                checkBrowseMutuallyExclusive(tdqueueContext);
-                if (!tdqueueContext.START().isEmpty() || !tdqueueContext.END().isEmpty()) {
-                    checkBrowsingInvalidOptions(tdqueueContext, CICSParser.TDQUEUE);
-                    checkBrowsingHasNotParameter(tdqueueContext, CICSParser.TDQUEUE);
-                } else checkStatementHasParameter(tdqueueContext, CICSParser.TDQUEUE);
-                break;
-
             case CICSParser.RULE_cics_inquire_terminal:
                 CICSParser.Cics_inquire_terminalContext terminalContext =
                         (CICSParser.Cics_inquire_terminalContext) ctx;
@@ -1691,16 +1426,6 @@ public class CICSInquireSPOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
                     checkBrowsingHasNotParameter(terminalContext, CICSParser.TERMINAL);
                     checkStatementHasParameter(terminalContext, CICSParser.NETNAME);
                 } else checkStatementHasParameter(terminalContext, CICSParser.TERMINAL);
-                break;
-
-            case CICSParser.RULE_cics_inquire_trandumpcode:
-                CICSParser.Cics_inquire_trandumpcodeContext trandumpcodeContext =
-                        (CICSParser.Cics_inquire_trandumpcodeContext) ctx;
-                checkBrowseMutuallyExclusive(trandumpcodeContext);
-                if (!trandumpcodeContext.START().isEmpty() || !trandumpcodeContext.END().isEmpty()) {
-                    checkBrowsingInvalidOptions(trandumpcodeContext, CICSParser.TRANDUMPCODE);
-                    checkBrowsingHasNotParameter(trandumpcodeContext, CICSParser.TRANDUMPCODE);
-                } else checkStatementHasParameter(trandumpcodeContext, CICSParser.TRANDUMPCODE);
                 break;
 
             case CICSParser.RULE_cics_inquire_tranclass:
@@ -1719,37 +1444,12 @@ public class CICSInquireSPOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
 
                 break;
 
-            case CICSParser.RULE_cics_inquire_transaction:
+            case CICSParser.RULE_cics_inquire_transaction: //TODO: COMMON
                 CICSParser.Cics_inquire_transactionContext transactionContext =
                         (CICSParser.Cics_inquire_transactionContext) ctx;
-                checkBrowseMutuallyExclusive(transactionContext);
-                if (!transactionContext.START().isEmpty() || !transactionContext.END().isEmpty()) {
-                    checkBrowsingInvalidOptions(transactionContext, CICSParser.TRANSACTION);
-                    checkBrowsingHasNotParameter(transactionContext, CICSParser.TRANSACTION);
-                } else checkStatementHasParameter(transactionContext, CICSParser.TRANSACTION);
-
+                checkBrowsingCommon(transactionContext, CICSParser.TRANSACTION);
                 if (!transactionContext.NEXT().isEmpty())
                     checkHasIllegalOptions(transactionContext.AT(), "AT with NEXT");
-                break;
-
-            case CICSParser.RULE_cics_inquire_tsmodel:
-                CICSParser.Cics_inquire_tsmodelContext tsmodelContext =
-                        (CICSParser.Cics_inquire_tsmodelContext) ctx;
-                checkBrowseMutuallyExclusive(tsmodelContext);
-                if (!tsmodelContext.START().isEmpty() || !tsmodelContext.END().isEmpty()) {
-                    checkBrowsingInvalidOptions(tsmodelContext, CICSParser.TSMODEL);
-                    checkBrowsingHasNotParameter(tsmodelContext, CICSParser.TSMODEL);
-                } else checkStatementHasParameter(tsmodelContext, CICSParser.TSMODEL);
-                break;
-
-            case CICSParser.RULE_cics_inquire_tspool:
-                CICSParser.Cics_inquire_tspoolContext tspoolContext =
-                        (CICSParser.Cics_inquire_tspoolContext) ctx;
-                checkBrowseMutuallyExclusive(tspoolContext);
-                if (!tspoolContext.START().isEmpty() || !tspoolContext.END().isEmpty()) {
-                    checkBrowsingInvalidOptions(tspoolContext, CICSParser.TSPOOL);
-                    checkBrowsingHasNotParameter(tspoolContext, CICSParser.TSPOOL);
-                } else checkStatementHasParameter(tspoolContext, CICSParser.TSPOOL);
                 break;
 
             case CICSParser.RULE_cics_inquire_tsqueue:
@@ -1772,15 +1472,6 @@ public class CICSInquireSPOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
 
                 if (!tsqueueContext.NEXT().isEmpty())
                     checkHasIllegalOptions(tsqueueContext.AT(), "AT with NEXT");
-                break;
-
-            case CICSParser.RULE_cics_inquire_uow:
-                CICSParser.Cics_inquire_uowContext uowContext = (CICSParser.Cics_inquire_uowContext) ctx;
-                checkBrowseMutuallyExclusive(uowContext);
-                if (!uowContext.START().isEmpty() || !uowContext.END().isEmpty()) {
-                    checkBrowsingInvalidOptions(uowContext, CICSParser.UOW);
-                    checkBrowsingHasNotParameter(uowContext, CICSParser.UOW);
-                } else checkStatementHasParameter(uowContext, CICSParser.UOW);
                 break;
 
             case CICSParser.RULE_cics_inquire_uowdsnfail:
@@ -1827,47 +1518,9 @@ public class CICSInquireSPOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
 
                 break;
 
-            case CICSParser.RULE_cics_inquire_uowlink:
-                CICSParser.Cics_inquire_uowlinkContext uowlinkContext =
-                        (CICSParser.Cics_inquire_uowlinkContext) ctx;
-                checkBrowseMutuallyExclusive(uowlinkContext);
-                if (!uowlinkContext.START().isEmpty() || !uowlinkContext.END().isEmpty()) {
-                    checkBrowsingInvalidOptions(uowlinkContext, CICSParser.UOWLINK);
-                    checkBrowsingHasNotParameter(uowlinkContext, CICSParser.UOWLINK);
-                } else checkStatementHasParameter(uowlinkContext, CICSParser.UOWLINK);
-                break;
-
-            case CICSParser.RULE_cics_inquire_urimap:
-                CICSParser.Cics_inquire_urimapContext urimapContext =
-                        (CICSParser.Cics_inquire_urimapContext) ctx;
-                checkBrowseMutuallyExclusive(urimapContext);
-                if (!urimapContext.START().isEmpty() || !urimapContext.END().isEmpty()) {
-                    checkBrowsingInvalidOptions(urimapContext, CICSParser.URIMAP);
-                    checkBrowsingHasNotParameter(urimapContext, CICSParser.URIMAP);
-                } else checkStatementHasParameter(urimapContext, CICSParser.URIMAP);
-                break;
-
-            case CICSParser.RULE_cics_inquire_webservice:
-                CICSParser.Cics_inquire_webserviceContext webserviceContext =
-                        (CICSParser.Cics_inquire_webserviceContext) ctx;
-                checkBrowseMutuallyExclusive(webserviceContext);
-                if (!webserviceContext.START().isEmpty() || !webserviceContext.END().isEmpty()) {
-                    checkBrowsingInvalidOptions(webserviceContext, CICSParser.WEBSERVICE);
-                    checkBrowsingHasNotParameter(webserviceContext, CICSParser.WEBSERVICE);
-                } else checkStatementHasParameter(webserviceContext, CICSParser.WEBSERVICE);
-                break;
-
-            case CICSParser.RULE_cics_inquire_xmltransform:
-                CICSParser.Cics_inquire_xmltransformContext xmltransformContext =
-                        (CICSParser.Cics_inquire_xmltransformContext) ctx;
-                checkBrowseMutuallyExclusive(xmltransformContext);
-                if (!xmltransformContext.START().isEmpty() || !xmltransformContext.END().isEmpty()) {
-                    checkBrowsingInvalidOptions(xmltransformContext, CICSParser.XMLTRANSFORM);
-                    checkBrowsingHasNotParameter(xmltransformContext, CICSParser.XMLTRANSFORM);
-                } else checkStatementHasParameter(xmltransformContext, CICSParser.XMLTRANSFORM);
-                break;
-
             default:
+                Integer ruleToken = COMMON_INQUIRE_BROWSE_RULES.get(ctx.getRuleIndex());
+                if (ruleToken != null) checkBrowsingCommon(ctx, ruleToken);
                 break;
         }
         checkDuplicates(ctx);

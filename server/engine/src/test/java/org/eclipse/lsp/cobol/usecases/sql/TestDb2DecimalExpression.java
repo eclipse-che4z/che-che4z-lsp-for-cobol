@@ -20,20 +20,20 @@ import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.junit.jupiter.api.Test;
 
 /**
- * Test class for verifying the declaration of a DB2 variable in COBOL code.
+ * Check for 1. decimal case
  */
-class TestDb2DeclareVariable {
+class TestDb2DecimalExpression {
     public static final String TEXT =
             "       IDENTIFICATION DIVISION.\n"
                     + "       PROGRAM-ID. TEST1.\n"
                     + "       DATA DIVISION.\n"
                     + "       WORKING-STORAGE SECTION.\n"
-                    + "       01 {$*A} PIC X."
-                    + "       EXEC SQL\n"
-                    + "           DECLARE :{$A} VARIABLE FOR BIT DATA\n"
-                    + "       END-EXEC.\n"
                     + "       PROCEDURE DIVISION.\n"
-                    + "           DISPLAY 'HELLO'.\n";
+                    + "           EXEC SQL\n"
+                    + "           UPDATE DSN8C10.EMP\n"
+                    + "               SET SALARY = SALARY + 100.\n"
+                    + "               WHERE WORKDEPT = 'D11'\n"
+                    + "           END-EXEC.\n";
 
     @Test
     void test() {
