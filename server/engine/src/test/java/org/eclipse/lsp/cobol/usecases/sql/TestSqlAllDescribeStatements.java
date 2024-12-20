@@ -13,7 +13,7 @@
  *
  */
 
-package org.eclipse.lsp.cobol.usecases;
+package org.eclipse.lsp.cobol.usecases.sql;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -47,22 +47,22 @@ class TestSqlAllDescribeStatements {
           + "           EXEC SQL\n";
 
   private static final String DESCRIBE_CURSOR =
-      TEXT + "            DESCRIBE CURSOR C1 INTO SQLDA\n" + "           END-EXEC.";
+      TEXT + "            DESCRIBE CURSOR C1 INTO :{$HOSTVAR}\n" + "           END-EXEC.";
 
   private static final String DESCRIBE_INPUT =
-      TEXT + "            DESCRIBE INPUT STMT1_NAME INTO SQLDA;\n" + "           END-EXEC.";
+      TEXT + "            DESCRIBE INPUT STMT1_NAME INTO :{$HOSTVAR};\n" + "           END-EXEC.";
 
   private static final String DESCRIBE_OUTPUT =
       TEXT
-          + "            DESCRIBE OUTPUT STMT1_NAME INTO SQLDA USING LABELS;\n"
+          + "            DESCRIBE OUTPUT STMT1_NAME INTO :{$HOSTVAR} USING LABELS;\n"
           + "           END-EXEC.";
 
   private static final String DESCRIBE_PROCEDURE =
-      TEXT + "           DESCRIBE PROCEDURE MyProc INTO procDesc;\n" + "           END-EXEC.";
+      TEXT + "           DESCRIBE PROCEDURE MyProc INTO :{$HOSTVAR};\n" + "           END-EXEC.";
 
   private static final String DESCRIBE_TABLE =
       TEXT
-          + "            DESCRIBE TABLE {$HOSTVAR} INTO tabDesc USING BOTH;\n"
+          + "            DESCRIBE TABLE :{$HOSTVAR} INTO :{$HOSTVAR} USING BOTH;\n"
           + "           END-EXEC.";
 
   private static Stream<String> textsToTest() {

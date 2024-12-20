@@ -161,10 +161,10 @@ class Db2SqlVisitorHelper {
     if (ctx.CONTINUE() != null) {
       return Pair.of(ExecSqlWheneverNode.WheneverType.CONTINUE, null);
     }
-    return Optional.ofNullable(ctx.dbs_host_name_container())
-        .map(c -> c.dbs_host_names())
+    return Optional.ofNullable(ctx.dbs_host_label())
+        .map(Db2SqlExecParser.Dbs_host_labelContext::dbs_sql_identifier)
         .filter(hn -> !hn.isEmpty())
-        .map(c -> c.get(0))
+//        .map(c -> c.get(0))
         .map(ParseTree::getText)
         .map(t -> Pair.of(ExecSqlWheneverNode.WheneverType.GOTO, t))
         .orElse(Pair.of(ExecSqlWheneverNode.WheneverType.CONTINUE, null));

@@ -15,6 +15,7 @@
 package org.eclipse.lsp.cobol.implicitDialects.sql;
 
 import static java.util.stream.Collectors.toList;
+import static org.eclipse.lsp.cobol.core.visitor.VisitorHelper.getName;
 
 import com.google.common.collect.ImmutableList;
 
@@ -49,7 +50,7 @@ class Db2SqlExecVisitor extends Db2SqlExecParserBaseVisitor<List<Node>> {
     private final DialectProcessingContext context;
 
     @Override
-    public List<Node> visitDbs_host_variable(Db2SqlExecParser.Dbs_host_variableContext ctx) {
+    public List<Node> visitDbs_procedure_name(Db2SqlExecParser.Dbs_procedure_nameContext ctx) {
         return addTreeNode(ctx, QualifiedReferenceNode::new);
     }
 
@@ -87,17 +88,30 @@ class Db2SqlExecVisitor extends Db2SqlExecParserBaseVisitor<List<Node>> {
     }
 
     @Override
-    public List<Node> visitDbs_rs_locator_variable(Db2SqlExecParser.Dbs_rs_locator_variableContext ctx) {
+    public List<Node> visitDbs_host_identifier(Db2SqlExecParser.Dbs_host_identifierContext ctx) {
+        Location location = context.getExtendedDocument().mapLocation(AntlrRangeUtils.constructRange(ctx));
+        Locality locality = Locality.builder().range(location.getRange()).uri(location.getUri()).build();
+        QualifiedReferenceNode groupNode = new QualifiedReferenceNode(locality);
+        List<Db2SqlExecParser.Dbs_sql_identifierContext> identifiers = ctx.dbs_sql_identifier();
+        for (int i = identifiers.size() - 1; i >= 0; i--) {
+            addVariableUsageNode(groupNode, identifiers.get(i));
+        }
+        return ImmutableList.of(groupNode);
+    }
+
+    private void addVariableUsageNode(QualifiedReferenceNode groupNode, Db2SqlExecParser.Dbs_sql_identifierContext identifierCtx) {
+        Location varLocation = context.getExtendedDocument().mapLocation(AntlrRangeUtils.constructRange(identifierCtx));
+        Locality varLocality = Locality.builder().range(varLocation.getRange()).uri(varLocation.getUri()).build();
+        groupNode.addChild(new VariableUsageNode(getName(identifierCtx), varLocality));
+    }
+
+    @Override
+    public List<Node> visitDbs_sql_variable_reference(Db2SqlExecParser.Dbs_sql_variable_referenceContext ctx) {
         return addTreeNode(ctx, QualifiedReferenceNode::new);
     }
 
     @Override
-    public List<Node> visitDbs_host_names_var(Db2SqlExecParser.Dbs_host_names_varContext ctx) {
-        return addTreeNode(ctx, QualifiedReferenceNode::new);
-    }
-
-    @Override
-    public List<Node> visitDbs_host_name_container(Db2SqlExecParser.Dbs_host_name_containerContext ctx) {
+    public List<Node> visitDbs_host_label(Db2SqlExecParser.Dbs_host_labelContext ctx) {
         if (isVariableUsage(ctx.getParent())) {
             return addVariableUsageNodes(ctx);
         }
@@ -125,7 +139,7 @@ class Db2SqlExecVisitor extends Db2SqlExecParserBaseVisitor<List<Node>> {
             return true;
         }
 
-        if (ctx instanceof Db2SqlExecParser.Dbs_host_names_varContext && !isSpecialName(ctx)) {
+        if (ctx instanceof Db2SqlExecParser.Dbs_sql_variable_referenceContext && !isSpecialName(ctx)) {
             return true;
         }
 
@@ -172,7 +186,7 @@ class Db2SqlExecVisitor extends Db2SqlExecParserBaseVisitor<List<Node>> {
     }
 
     private List<Node> addVariableUsageNodes(ParserRuleContext ctx) {
-        String name = VisitorHelper.getName(ctx);
+        String name = getName(ctx);
         boolean hasColumn = name.startsWith(":");
         if (hasColumn) {
             name = name.substring(1);

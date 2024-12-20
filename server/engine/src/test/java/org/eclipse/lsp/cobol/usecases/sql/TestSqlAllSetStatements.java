@@ -13,7 +13,7 @@
  *
  */
 
-package org.eclipse.lsp.cobol.usecases;
+package org.eclipse.lsp.cobol.usecases.sql;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -226,7 +226,7 @@ class TestSqlAllSetStatements {
       TEXT + "             SET CURRENT TEMPORAL BUSINESS_TIME = NULL\n" + "           END-EXEC.";
 
   private static final String SET_ENCRYPTION_PASSWORD =
-      TEXT + "             SET ENCRYPTION PASSWORD = :hv1\n" + "           END-EXEC.";
+      TEXT + "             SET ENCRYPTION PASSWORD = :{$hv1}\n" + "           END-EXEC.";
 
   private static final String SET_ENCRYPTION_PASSWORD2 =
       TEXT

@@ -72,7 +72,6 @@ BEGIN : B E G I N;
 BETWEEN : B E T W E E N;
 BIGINT : B I G I N T;
 BINARY : B I N A R Y;
-BINARY_STRING_CONSTANT : BXNUMBER;
 BIND : B I N D;
 BINDADD : B I N D A D D;
 BINDAGENT : B I N D A G E N T;
@@ -339,7 +338,7 @@ FREEPAGE : F R E E P A G E;
 FROM : F R O M;
 FULL : F U L L;
 FUNCTION : F U N C T I O N;
-FUNCTION_LEVEL_10: V '1' ZERO_DIGIT R '1';
+FUNCTION_LEVEL_10: V '1' '0' R '1';
 FUNCTION_LEVEL_11: V '1' '1' R '1';
 FUNCTION_LEVEL_12: V DIGIT DIGIT R DIGIT M DIGIT DIGIT DIGIT;
 GBPCACHE : G B P C A C H E;
@@ -839,7 +838,6 @@ SEMICOLONSEPARATORSQL : '; ' ;
 COMMASEPARATORDB2 : ', ' ;
 
 // Constructors symbols
-GRAPHIC_CONSTANT : GRAPHICUNICODE | GRAHICCHAR;
 DOUBLESLASHCHAR : '//';
 LSQUAREBRACKET :     '[';
 RSQUAREBRACKET :     ']';
@@ -847,9 +845,6 @@ PIPECHAR : '||';
 PIPECHAR2 : '!!';
 QUESTIONMARK : '?';
 PERCENT : '%';
-SELECT_ALL : '.*';
-SINGLEDIGIT_1: '1';
-DOUBLEDIGIT_1: '01';
 TIMESTAMPLITERAL: DIGIT DIGIT '.' DIGIT DIGIT '.' DIGIT DIGIT | // hh.mm.ss;
                   DIGIT DIGIT '.' DIGIT DIGIT (A M | P M) | //hh:mm AM /PM
                   DIGIT DIGIT '.' DIGIT DIGIT ':' DIGIT DIGIT |// hh.mm:ss
@@ -859,10 +854,8 @@ DATELITERAL: '\'' (DIGIT DIGIT DIGIT DIGIT '-' DIGIT DIGIT '-' DIGIT DIGIT | //y
                    DIGIT DIGIT '.' DIGIT DIGIT '.' DIGIT DIGIT DIGIT DIGIT |//dd.mm.yyyy
                    DIGIT DIGIT '-' DIGIT DIGIT '-' DIGIT DIGIT DIGIT DIGIT) TIMESTAMPLITERAL? '\'';//yyyy-mm-dd
 
-SINGLEDIGITLITERAL : DIGIT;
 INTEGERLITERAL : DIGIT+;
 IDENTIFIER : [\p{Alnum}\p{General_Category=Other_Letter}] [-_\p{Alnum}\p{General_Category=Other_Letter}]*;
-
 NUMERICLITERAL : (PLUSCHAR | MINUSCHAR)?
     (
         (DOT_FS | COMMACHAR { commaCharAllowed }?) DIGIT+ (('e' | 'E') (PLUSCHAR | MINUSCHAR)? DIGIT+)?
@@ -880,14 +873,11 @@ NUMERICLITERAL : (PLUSCHAR | MINUSCHAR)?
         )
     );
 
-NONNUMERICLITERAL : UNTRMSTRINGLITERAL | STRINGLITERAL | DBCSLITERAL | HEXNUMBER | NULLTERMINATED;
+CHAR_STRING_LITERAL: STRINGLITERAL;
+HEXSTRING: HEXNUMBER;
+BXSTRING: BXNUMBER;
+GRAPHIC_CONSTANT : GRAPHICUNICODE | GRAHICCHAR;
 
-CHAR_STRING_CONSTANT : HEXNUMBER | STRINGLITERAL;
-
-FILENAME : IDENTIFIER+ '.' IDENTIFIER+;
-
-OCTDIGITS : OCT_DIGIT;
-HEX_NUMBERS : HEXNUMBER;
 // whitespace, line breaks, comments, ...
 NEWLINE : '\r'? '\n' -> channel(HIDDEN);
 WS : [ \t\f]+ -> channel(HIDDEN);
@@ -900,16 +890,24 @@ SQLLINECOMMENT
 // treat all the non-processed tokens as errors
 ERRORCHAR : . ;
 
-ZERO_DIGIT: '0';
-
 fragment HEXNUMBER :
 	X '"' [0-9A-Fa-f]+ '"'
 	| X '\'' [0-9A-Fa-f]+ '\''
 ;
 
-fragment NULLTERMINATED :
-	Z '"' (~["\n\r] | '""' | '\'')* '"'
-	| Z '\'' (~['\n\r] | '\'\'' | '"')* '\''
+fragment BXNUMBER :
+	B X '"' [0-9A-Fa-f]+ '"'
+	| B X '\'' [0-9A-Fa-f]+ '\''
+;
+
+fragment GRAPHICUNICODE :
+	U X '"' [0-9A-Fa-f]+ '"'
+	| U X '\'' [0-9A-Fa-f]+ '\''
+;
+
+fragment GRAHICCHAR :
+	G X '"' [0-9A-Fa-f]+ '"'
+	| G X '\'' [0-9A-Fa-f]+ '\''
 ;
 
 fragment STRINGLITERAL :
@@ -917,33 +915,8 @@ fragment STRINGLITERAL :
 	| '\'' (~['\n\r] | '\'\'' | '"')* '\''
 ;
 
-fragment UNTRMSTRINGLITERAL :
-	'"' (~["\n\r] | '""' | '\'')*
-	| '\'' (~['\n\r] | '\'\'' | '"')*
-;
-
-fragment DBCSLITERAL :
-	[GN] '"' (~["\n\r] | '""' | '\'')* '"'
-	| [GN] '\'' (~['\n\r] | '\'\'' | '"')* '\''
-;
-
-fragment BXNUMBER :
-	B X '"' [0-9A-F]+ '"'
-	| B X '\'' [0-9A-F]+ '\''
-;
-
-fragment GRAPHICUNICODE :
-	U X '"' [0-9A-F]+ '"'
-	| U X '\'' [0-9A-F]+ '\''
-;
-
-fragment GRAHICCHAR :
-	G X '"' [0-9A-F]+ '"'
-	| G X '\'' [0-9A-F]+ '\''
-;
-
 fragment
- OCT_DIGIT        : [0-8] ;
+ OCT_DIGIT        : [0-9] ;
  fragment DIGIT: OCT_DIGIT | [9];
  // case insensitive chars
  fragment A:('a'|'A');
