@@ -38,7 +38,7 @@ allExciRules: cics_exci_link | cics_exci_delete | cics_exci_delete_container | c
               cics_exci_get_container | cics_exci_get_next_container | cics_exci_move_container |
               cics_exci_put_container | cics_exci_query_channel | cics_exci_startbrowse_container ;
 
-allSPRules: cics_inquire_system_programming;
+allSPRules: cics_extract_system_programming | cics_inquire_system_programming;
 
 // compiler options
 compilerOpts
@@ -347,10 +347,10 @@ cics_extract_web_server: (WEB | (REQUESTTYPE | HOSTTYPE | SCHEME) cics_cvda | HO
 cics_extract_web_client: (WEB | (SESSTOKEN | PORTNUMBER | URIMAP | REALM | REALMLEN | HOST | HTTPVERSION | VERSIONLEN | PATH | PATHLENGTH) cics_data_area | HOSTLENGTH cics_data_value | (HOSTTYPE | SCHEME) cics_cvda | cics_handle_response)+;
 
 /** EXTRACT (System Commands) */
-cics_extract_system_programming: EXIT (cics_extract_exit | cics_extract_statistics);
-cics_extract_exit: ((PROGRAM | ENTRYNAME) cics_data_value | GALENGTH cics_data_area | GASET cics_ref | cics_handle_response)+;
+cics_extract_system_programming: EXTRACT (cics_extract_exit | cics_extract_statistics);
+cics_extract_exit: (EXIT | (PROGRAM | ENTRYNAME) cics_data_value | GALENGTH cics_data_area | GASET cics_ref | cics_handle_response)+;
 cics_extract_statistics: (STATISTICS | (RESTYPE | SUBRESTYPE) cics_cvda | (RESID | SUBRESID | LASTRESET | LASTRESETABS | LASTRESETHRS | LASTRESETMIN | LASTRESETSEC) cics_data_area |
-                          SET cics_ref | (SUBRESIDLEN | APPLICATION | APPLMAJORVER | APPLMINORVER | APPLMICROVER | PLATFORM) cics_data_value | cics_handle_response)+;
+                          SET cics_ref | (RESIDLEN | SUBRESIDLEN | APPLICATION | APPLMAJORVER | APPLMINORVER | APPLMICROVER | PLATFORM) cics_data_value | cics_handle_response)+;
 
 /** FORCE TIMER */
 cics_force: FORCE cics_force_opts;
@@ -1643,6 +1643,7 @@ ABCODE
  | GAENTRYNAME
  | GALENGTH
  | GARBAGEINT
+ | GASET
  | GAUSECOUNT
  | GCDSASIZE
  | GCHARS
@@ -1788,6 +1789,11 @@ ABCODE
  | LASTEMERTIME
  | LASTINITTIME
  | LASTMODTIME
+ | LASTRESET
+ | LASTRESETABS
+ | LASTRESETHRS
+ | LASTRESETMIN
+ | LASTRESETSEC
  | LASTUSEDINT
  | LASTUSETIME
  | LASTWARMTIME
@@ -2244,6 +2250,7 @@ ABCODE
  | RESETBR
  | RESID
  | RESIDENCY
+ | RESIDLEN
  | RESIDLENGTH
  | RESLEN
  | RESNAME
@@ -2420,6 +2427,9 @@ ABCODE
  | SUBEVENT6
  | SUBEVENT7
  | SUBEVENT8
+ | SUBRESID
+ | SUBRESIDLEN
+ | SUBRESTYPE
  | SUBTASKS
  | SUSPEND
  | SUSPENDTIME

@@ -19,6 +19,7 @@ import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.implicitDialects.cics.CICSLexer;
+import org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser;
 
 import java.util.HashMap;
 import java.util.List;
@@ -27,7 +28,7 @@ import java.util.Map;
 /** Checks CICS Extract System Command rules for required and invalid options */
 public class CICSExtractSPOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
 
-    public static final int RULE_INDEX = RULE_extract_system_programming;
+    public static final int RULE_INDEX = CICSParser.RULE_cics_extract_system_programming;
 
     private static final Map<Integer, ErrorSeverity> DUPLICATE_CHECK_OPTIONS =
             new HashMap<Integer, ErrorSeverity>() {
@@ -71,24 +72,28 @@ public class CICSExtractSPOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
      */
     public <E extends ParserRuleContext> void checkOptions(E ctx) {
         switch (ctx.getRuleIndex()) {
-            case RULE_extract_exit:
-                checkExtractExit((Cics_extract_exitContext) ctx);
+            case CICSParser.RULE_cics_extract_exit:
+                checkExtractExit((CICSParser.Cics_extract_exitContext) ctx);
                 break;
-            case RULE_extract_program:
-                checkExtractProgram((Cics_extract_programContext) ctx);
+            case CICSParser.RULE_cics_extract_statistics:
+                checkExtractStatistics((CICSParser.Cics_extract_statisticsContext) ctx);
+                break;
+            default:
                 break;
         }
             checkDuplicates(ctx);
     }
 
-    private void checkExtractExit(Cics_extract_exitContext ctx) {
+    private void checkExtractExit(CICSParser.Cics_extract_exitContext ctx) {
         checkHasMandatoryOptions(ctx.EXIT(), ctx, "EXIT");
         checkHasMandatoryOptions(ctx.GALENGTH(), ctx, "GALENGTH");
         checkHasMandatoryOptions(ctx.GASET(), ctx, "GASET");
+        checkHasMandatoryOptions(ctx.PROGRAM(), ctx, "PROGRAM");
     }
 
-    private void checkExtractProgram(Cics_extract_programContext ctx) {
-        checkHasMandatoryOptions(ctx.PROGRAM(), ctx, "PROGRAM");
+    private void checkExtractStatistics(CICSParser.Cics_extract_statisticsContext ctx) {
+        checkHasMandatoryOptions(ctx.STATISTICS(), ctx, "STATISTICS");
+        checkHasMandatoryOptions(ctx.RESTYPE(), ctx, "RESTYPE");
         checkHasMandatoryOptions(ctx.SET(), ctx, "SET");
         if (ctx.RESID().isEmpty()) {
             checkForResidRequiredOptions(ctx);
@@ -99,11 +104,8 @@ public class CICSExtractSPOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
         checkLastTimeOptions(ctx);
     }
 
-    private void checkForResidRequiredOptions(Cics_extract_programContext ctx) {
+    private void checkForResidRequiredOptions(CICSParser.Cics_extract_statisticsContext ctx) {
         checkHasIllegalOptions(ctx.RESIDLEN(), "RESIDLEN without RESID");
-        checkHasIllegalOptions(ctx.SUBRESTYPE(), "SUBRESTYPE without RESID");
-        checkHasIllegalOptions(ctx.SUBRESID(), "SUBRESID without RESID");
-        checkHasIllegalOptions(ctx.SUBRESIDLEN(), "SUBRESIDLEN without RESID");
         checkHasIllegalOptions(ctx.APPLICATION(), "APPLICATION without RESID");
         checkHasIllegalOptions(ctx.APPLMAJORVER(), "APPLMAJORVER without RESID");
         checkHasIllegalOptions(ctx.APPLMINORVER(), "APPLMINORVER without RESID");
@@ -111,8 +113,8 @@ public class CICSExtractSPOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
         checkHasIllegalOptions(ctx.PLATFORM(), "PLATFORM without RESID");
     }
 
-    private void checkSubResidOptions(Cics_extract_programContext ctx) {
-        if(ctx.SUBRESID().isEmpty()) {
+    private void checkSubResidOptions(CICSParser.Cics_extract_statisticsContext ctx) {
+        if (ctx.SUBRESID().isEmpty()) {
             checkHasIllegalOptions(ctx.SUBRESIDLEN(), "SUBRESIDLEN without SUBRESID");
             checkHasIllegalOptions(ctx.SUBRESTYPE(), "SUBRESTYPE without SUBRESID");
         }
@@ -122,7 +124,7 @@ public class CICSExtractSPOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
         }
     }
 
-    private void checkLastTimeOptions(Cics_extract_programContext ctx) {
+    private void checkLastTimeOptions(CICSParser.Cics_extract_statisticsContext ctx) {
         if (!ctx.LASTRESET().isEmpty()) {
             checkHasIllegalOptions(ctx.LASTRESETABS(), "LASTRESETABS with LASTRESET");
             checkHasIllegalOptions(ctx.LASTRESETHRS(), "LASTRESETHRS with LASTRESET");
@@ -130,7 +132,7 @@ public class CICSExtractSPOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
             checkHasIllegalOptions(ctx.LASTRESETSEC(), "LASTRESETSEC with LASTRESET");
         }
         if (!ctx.LASTRESETABS().isEmpty()) {
-            checkHasIllegalOptions(ctx.LASTRESET, "LASTRESET with LASTRESETABS");
+            checkHasIllegalOptions(ctx.LASTRESET(), "LASTRESET with LASTRESETABS");
             checkHasIllegalOptions(ctx.LASTRESETHRS(), "LASTRESETHRS with LASTRESETABS");
             checkHasIllegalOptions(ctx.LASTRESETMIN(), "LASTRESETMIN with LASTRESETABS");
             checkHasIllegalOptions(ctx.LASTRESETSEC(), "LASTRESETSEC with LASTRESETABS");
