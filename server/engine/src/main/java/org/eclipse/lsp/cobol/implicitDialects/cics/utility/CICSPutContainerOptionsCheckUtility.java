@@ -77,6 +77,7 @@ public class CICSPutContainerOptionsCheckUtility extends CICSOptionsCheckBaseUti
         checkMutuallyExclusiveOptions("BIT, DATATYPE or CHAR", ctx.BIT(), ctx.DATATYPE(), ctx.CHAR());
 
         checkMutuallyExclusiveOptions("FROMCCSID or FROMCODEPAGE", ctx.FROMCCSID(), ctx.FROMCODEPAGE());
+        checkMutuallyExclusiveOptions("APPEND or PREPEND", ctx.APPEND(), ctx.PREPEND());
 
         checkHasMandatoryOptions(ctx.FROM(), ctx, "FROM");
     }
