@@ -34,8 +34,6 @@ public class CICSReadqOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     private static final Map<Integer, ErrorSeverity> DUPLICATE_CHECK_OPTIONS =
             new HashMap<Integer, ErrorSeverity>() {
                 {
-                    put(CICSLexer.READQ, ErrorSeverity.ERROR);
-                    put(CICSLexer.TD, ErrorSeverity.WARNING);
                     put(CICSLexer.QUEUE, ErrorSeverity.ERROR);
                     put(CICSLexer.INTO, ErrorSeverity.ERROR);
                     put(CICSLexer.SET, ErrorSeverity.ERROR);
@@ -69,12 +67,9 @@ public class CICSReadqOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     }
 
     private void checkTd(CICSParser.Cics_readq_tdContext ctx) {
-        if (!ctx.TD().isEmpty())
-            checkHasMandatoryOptions(ctx.QUEUE(), ctx, "QUEUE");
-        if (!ctx.NOSUSPEND().isEmpty())
-            checkHasMandatoryOptions(ctx.TD(), ctx, "TD");
-
+        checkHasMandatoryOptions(ctx.QUEUE(), ctx, "QUEUE");
         checkHasExactlyOneOption("INTO or SET", ctx, ctx.cics_into_set());
+
     }
     private void checkTs(CICSParser.Cics_readq_tsContext ctx) {
         if (!ctx.cics_into_set().isEmpty())
