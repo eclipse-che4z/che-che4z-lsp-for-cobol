@@ -111,7 +111,7 @@ class Db2SqlVisitorHelper {
 
   public OriginalLocation adjustLocation(
           OriginalLocation originalLocation,
-          Db2SqlParser.SqlCodeContext sqlCodeContext) {
+          ParserRuleContext sqlCodeContext) {
     Location location = originalLocation.getLocation();
     Range updatedRange =
             new Range(
@@ -148,7 +148,7 @@ class Db2SqlVisitorHelper {
     return new Position(position.getLine() + sqlCodeContext.start.getLine() - 1, character);
   }
 
-  public static ExecSqlWheneverNode.WheneverConditionType getConditionType(Db2SqlParser.Dbs_wheneverContext ctx) {
+  public static ExecSqlWheneverNode.WheneverConditionType getConditionType(Db2SqlExecParser.Dbs_wheneverContext ctx) {
     if (ctx.SQLERROR() != null)
       return ExecSqlWheneverNode.WheneverConditionType.SQLERROR;
     else if (ctx.SQLWARNING() != null)
@@ -157,7 +157,7 @@ class Db2SqlVisitorHelper {
       return ExecSqlWheneverNode.WheneverConditionType.NOT_FOUND;
   }
 
-  public static Pair<ExecSqlWheneverNode.WheneverType, String> getWheneverType(Db2SqlParser.Dbs_wheneverContext ctx) {
+  public static Pair<ExecSqlWheneverNode.WheneverType, String> getWheneverType(Db2SqlExecParser.Dbs_wheneverContext ctx) {
     if (ctx.CONTINUE() != null) {
       return Pair.of(ExecSqlWheneverNode.WheneverType.CONTINUE, null);
     }
