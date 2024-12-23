@@ -70,6 +70,8 @@ public class CICSOptionsCheckUtility {
         CICSAddSubeventOptionsCheckUtility.RULE_INDEX,
         new CICSAddSubeventOptionsCheckUtility(context, errors));
     optionsMap.put(
+        CICSGetnextOptionsCheckUtility.RULE_INDEX, new CICSGetnextOptionsCheckUtility(context, errors));
+    optionsMap.put(
         CICSBuildOptionsCheckUtility.RULE_INDEX,
         new CICSBuildOptionsCheckUtility(context, errors));
     optionsMap.put(
