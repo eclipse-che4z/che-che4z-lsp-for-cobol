@@ -15,8 +15,14 @@
 
 package org.eclipse.lsp.cobol.usecases;
 
+import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.usecases.common.CICSTestUtils;
+import org.eclipse.lsp4j.Diagnostic;
+import org.eclipse.lsp4j.DiagnosticSeverity;
+import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
+
+import java.util.*;
 
 /**
  * Test GETNEXT command. Documentation link: <a
@@ -43,29 +49,39 @@ public class TestCicsGetnextStatement {
     private static final String GETNEXT_PROCESS_VALID = "GETNEXT PROCESS(123) BROWSETOKEN(123) ACTIVITYID(123)";
     private static final String GETNEXT_TIMER_VALID = "GETNEXT TIMER(123) BROWSETOKEN(123) ACTIVITYID(123) EVENT(123) STATUS(123) ABSTIME(123)";
 
+    private static final String GETNEXT_ACTIVITY_INVALID = "GETNEXT {_ACTIVITY(123) ACTIVITYID(123) LEVEL(123)|errorOne_}";
+
     // Test Functions
     @Test
-    void testGetnextActivity() {
+    void testGetnextActivityValid() {
         CICSTestUtils.noErrorTest(GETNEXT_ACTIVITY_VALID);
     }
 
     @Test
-    void testGetnextContainer() {
+    void testGetnextContainerValid() {
         CICSTestUtils.noErrorTest(GETNEXT_CONTAINER_VALID);
     }
 
     @Test
-    void testGetnextEvent() {
+    void testGetnextEventValid() {
         CICSTestUtils.noErrorTest(GETNEXT_EVENT_VALID);
     }
 
     @Test
-    void testGetnextProcess() {
+    void testGetnextProcessValid() {
         CICSTestUtils.noErrorTest(GETNEXT_PROCESS_VALID);
     }
 
     @Test
-    void testGetnextTimer() {
+    void testGetnextTimerValid() {
         CICSTestUtils.noErrorTest(GETNEXT_TIMER_VALID);
+    }
+
+    // Invalid Tests
+    @Test
+    void testGetnextActivityInvalid() {
+        HashMap<String, Diagnostic> expectedDiagnostics = new HashMap<>();
+        expectedDiagnostics.put("errorOne", new Diagnostic(new Range(), "Missing required option: BROWSETOKEN", DiagnosticSeverity.Error, ErrorSource.PARSING.getText()));
+        CICSTestUtils.errorTest(GETNEXT_ACTIVITY_INVALID, expectedDiagnostics);
     }
 }

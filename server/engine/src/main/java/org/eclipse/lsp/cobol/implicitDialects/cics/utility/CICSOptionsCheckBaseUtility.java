@@ -102,6 +102,9 @@ public abstract class CICSOptionsCheckBaseUtility {
   protected final void checkHasRequiredOption(ParserRuleContext ctx, String options, List<TerminalNode> requiredContext, List<TerminalNode>... optionalContext) {
     for (TerminalNode required : requiredContext) {
       for (List<TerminalNode> terminalNodes : optionalContext) {
+          if (terminalNodes == null || terminalNodes.isEmpty()) {
+              continue;
+          }
         String optionalContextText = terminalNodes.get(0).getText();
         if (required.getText().isEmpty() && !optionalContextText.isEmpty()) {
           throwException(
@@ -109,12 +112,38 @@ public abstract class CICSOptionsCheckBaseUtility {
                   VisitorUtility.constructLocality(ctx, context),
                   "Missing required option: " + options,
                   optionalContextText);
-          return;
+          break;
         }
       }
     }
 
   }
+
+    /**
+     *
+     * @param ctx - The overall context.
+     * @param options - String of the element that is required.
+     * @param requiredContext - The required rule
+     * @param optionalContext - The optional rule(s)
+     */
+    @SafeVarargs
+    protected final void checkHasRequiredOption(ParserRuleContext ctx, String options, TerminalNode requiredContext, List<TerminalNode>... optionalContext) {
+        for (List<TerminalNode> terminalNodes : optionalContext) {
+            if (terminalNodes == null || terminalNodes.isEmpty()) {
+                continue;
+            }
+            String optionalContextText = terminalNodes.get(0).getText();
+            if (requiredContext.getText().isEmpty() && !optionalContextText.isEmpty()) {
+                throwException(
+                        ErrorSeverity.ERROR,
+                        VisitorUtility.constructLocality(ctx, context),
+                        "Missing required option: " + options,
+                        optionalContextText);
+                break;
+            }
+        }
+
+    }
 
     /**
      * General entrypoint to check CICS rule options

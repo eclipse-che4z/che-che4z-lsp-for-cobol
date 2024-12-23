@@ -62,20 +62,45 @@ public class CICSGetnextOptionsCheckUtility extends CICSOptionsCheckBaseUtility 
      * @param <E> A subclass of ParserRuleContext
      */
     public <E extends ParserRuleContext> void checkOptions(E ctx) {
-        if (ctx.getRuleIndex() == CICSParser.RULE_cics_getnext) {
-            checkGetNext((CICSParser.Cics_getnextContext) ctx);
+        switch (ctx.getRuleIndex()) {
+            case CICSParser.RULE_cics_getnext_activity:
+                checkActivity((CICSParser.Cics_getnext_activityContext) ctx);
+                break;
+            case CICSParser.RULE_cics_getnext_container:
+                checkContainer((CICSParser.Cics_getnext_containerContext) ctx);
+                break;
+            case CICSParser.RULE_cics_getnext_event:
+                checkEvent((CICSParser.Cics_getnext_eventContext) ctx);
+                break;
+            case CICSParser.RULE_cics_getnext_process:
+                checkProcess((CICSParser.Cics_getnext_processContext) ctx);
+                break;
+            case CICSParser.RULE_cics_getnext_timer:
+                checkTimer((CICSParser.Cics_getnext_timerContext) ctx);
+                break;
+            default:
+                break;
         }
     }
 
-    private void checkGetNext(CICSParser.Cics_getnextContext ctx) {
-        checkMutuallyExclusiveOptions("ACTIVITY, CONTAINER, EVENT, PROCESS, TIMER", ctx.ACTIVITY(), ctx.CONTAINER(), ctx.EVENT(), ctx.PROCESS(), ctx.TIMER());
-
-        // Distinct elements for a given command subset:
-        checkHasRequiredOption(ctx, "ACTIVITY", ctx.ACTIVITY(), ctx.LEVEL());
-
+    private void checkActivity(CICSParser.Cics_getnext_activityContext ctx) {
         checkHasMandatoryOptions(ctx.BROWSETOKEN(), ctx, "BROWSETOKEN");
-
-        checkHasRequiredOption(ctx, "EVENT", ctx.EVENT(), ctx.COMPOSITE(), ctx.EVENTTYPE(), ctx.FIRESTATUS(), ctx.PREDICATE());
-        checkHasRequiredOption(ctx, "TIMER", ctx.TIMER(), ctx.ABSTIME());
     }
+
+    private void checkContainer(CICSParser.Cics_getnext_containerContext ctx) {
+        checkHasMandatoryOptions(ctx.BROWSETOKEN(), ctx, "BROWSETOKEN");
+    }
+
+    private void checkEvent(CICSParser.Cics_getnext_eventContext ctx) {
+        checkHasMandatoryOptions(ctx.BROWSETOKEN(), ctx, "BROWSETOKEN");
+    }
+
+    private void checkProcess(CICSParser.Cics_getnext_processContext ctx) {
+        checkHasMandatoryOptions(ctx.BROWSETOKEN(), ctx, "BROWSETOKEN");
+    }
+
+    private void checkTimer(CICSParser.Cics_getnext_timerContext ctx) {
+        checkHasMandatoryOptions(ctx.BROWSETOKEN(), ctx, "BROWSETOKEN");
+    }
+
 }
