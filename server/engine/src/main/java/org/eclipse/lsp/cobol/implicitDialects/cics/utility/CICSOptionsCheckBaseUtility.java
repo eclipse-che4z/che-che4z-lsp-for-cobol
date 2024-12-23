@@ -116,21 +116,6 @@ public abstract class CICSOptionsCheckBaseUtility {
 
   }
 
-  /**
-   * Helper method to collect analysis errors if the rule context contains illegal options
-   *
-   * @param rules Generic list of rules to check. Will either be a collection of ParserRuleContext
-   *     or TerminalNode
-   * @param options Options checked to insert into error message
-   */
-  protected void checkHasIllegalOptions(List<?> rules, String options) {
-    if (!rules.isEmpty()) {
-      rules.forEach(
-          error ->
-              throwException(
-                  ErrorSeverity.ERROR, getLocality(error), "Invalid option provided: ", options));
-    }
-
     /**
      * General entrypoint to check CICS rule options
      *
@@ -496,64 +481,16 @@ public abstract class CICSOptionsCheckBaseUtility {
     }
   }
 
-  /**
-   * Helper function to check and see if more than one rule was visited out of a set provided.
-   *
-   * @param options Options checked to insert into error message
-   * @param rules Generic list of rules to check. Will be a collection of ParserRuleContext and/or TerminalNode objects.
-   * @param <E> Generic type to allow cross-rule context collection.
-   */
-  @SafeVarargs
-  protected final <E> void checkMutuallyExclusiveOptions(String options, E... rules) {
-    if (rules.length <= 1) {
-      return;
-    }
-
-    int rulesSeen = 0;
-
-    for (E rule : rules) {
-      if (ParserRuleContext.class.isAssignableFrom(rule.getClass())) {
-        if (!((ParserRuleContext) rule).isEmpty()) {
-          rulesSeen++;
-        }
-      } else if (TerminalNode.class.isAssignableFrom(rule.getClass())) {
-        if (!((TerminalNode) rule).getText().isEmpty()) {
-          rulesSeen++;
-        }
-      }
-
-      if (rulesSeen > 1) {
-        throwException(ErrorSeverity.ERROR, getLocality(rule), "Options \"" + options + "\" are mutually exclusive, ", "");
-        break;
-      }
-    }
-  }
-
-
-
-  protected <E extends ParseTree> void checkHasExactlyOneOption(
-      String options, ParserRuleContext parentCtx, List<E>... rules) {
-
-    List<TerminalNode> children = new ArrayList<>();
-
-    Stream.of(rules)
-        .filter(rule -> !rule.isEmpty())
-        .forEach(
-            rule -> {
-              rule.removeIf(Objects::isNull);
-              if (TerminalNode.class.isAssignableFrom(rule.get(0).getClass()))
-                children.addAll((List<TerminalNode>) rule);
-              else
-                rule.forEach(
-                    context -> getAllTokenChildren((ParserRuleContext) context, children, false));
-            });
-
-    if (checkHasMutuallyExclusiveOptions(options, children) == 0) {
-      throwException(
-          ErrorSeverity.ERROR,
-          getLocality(parentCtx),
-          "Exactly one option required, none provided: ",
-          options);
+    /**
+     * Throws error for commands with incorrect browse usage
+     *
+     * @param rule    Context to throw the error on
+     * @param message Invalid Browse Usage Message
+     * @param <E>     Generic for rule type
+     */
+    public <E> void throwBrowsingViolation(E rule, String message) {
+        throwException(
+                ErrorSeverity.ERROR, getLocality(rule), "Invalid option or parameter provided: ", message);
     }
 
     /**
