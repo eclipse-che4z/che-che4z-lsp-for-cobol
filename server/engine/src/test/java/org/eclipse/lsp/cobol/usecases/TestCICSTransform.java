@@ -40,7 +40,13 @@ public class TestCICSTransform {
 
 
     private static final String TRANSFORM_DATATOXML_INVALID = "TRANSFORM DATATOXML CHANNEL(3) DATCONTAINER(123) {NSCONTAINER|errorOne}(123) XMLCONTAINER(123) XMLTRANSFORM(123)";
+    private static final String TRANSFORM_XMLTODATA_INVALID = "TRANSFORM {_XMLTODATA DATCONTAINER(123) ELEMNAME(123) ELEMNAMELEN(123) ELEMNS(123) ELEMNSLEN(123) NSCONTAINER(123) TYPENAME(123) TYPENAMELEN(123) TYPENS(123) TYPENSLEN(123) XMLCONTAINER(123) XMLTRANSFORM(123)|errorOne_}";
 
+    private void callErrorTest(String newCommand, String errorMessage) {
+        HashMap<String, Diagnostic> tempDiagnostic = new HashMap<>();
+        tempDiagnostic.put("errorOne", new Diagnostic(new Range(), errorMessage, DiagnosticSeverity.Error, ErrorSource.PARSING.getText()));
+        CICSTestUtils.errorTest(newCommand, tempDiagnostic);
+    }
 
     @Test
     protected void testDataToJSON() {
@@ -65,14 +71,10 @@ public class TestCICSTransform {
 
     @Test
     protected void testInvalidDataToXML() {
-        HashMap<String, Diagnostic> tempDiagnostic = new HashMap<>();
-        tempDiagnostic.put("errorOne",
-                new Diagnostic(
-                        new Range(),
-                        "Invalid option provided: NSCONTAINER",
-                        DiagnosticSeverity.Error,
-                        ErrorSource.PARSING.getText()));
+        callErrorTest(TRANSFORM_DATATOXML_INVALID, "Invalid option provided: NSCONTAINER");
+    }
 
-        CICSTestUtils.errorTest(TRANSFORM_DATATOXML_INVALID, tempDiagnostic);
+    @Test protected void testInvalidXMLToData() {
+        callErrorTest(TRANSFORM_XMLTODATA_INVALID, "Missing required option: CHANNEL");
     }
 }

@@ -106,13 +106,9 @@ public class CICSTransformOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
             checkHasMandatoryOptions(ctx.XMLTRANSFORM(), ctx, "XMLTRANSFORM");
         }
 
-        if (ctx.ELEMNAME() == null)
-            checkHasIllegalOptions(ctx.ELEMNAMELEN(), "ELEMNAMELEN without ELEMNAME");
-        if (ctx.ELEMNS() == null)
-            checkHasIllegalOptions(ctx.ELEMNSLEN(), "ELEMNSLEN without ELEMNS");
-        if (ctx.TYPENAME() == null)
-            checkHasIllegalOptions(ctx.TYPENAMELEN(), "TYPENAMELEN without TYPENAME");
-        if (ctx.TYPENS() == null)
-            checkHasIllegalOptions(ctx.TYPENSLEN(), "TYPENSLEN without TYPENS");
+        checkPrerequisiteIsMet(ctx.ELEMNAME(), ctx.ELEMNAMELEN(), ctx, "ELEMNAME");
+        checkPrerequisiteIsMet(ctx.ELEMNS(), ctx.ELEMNSLEN(), ctx, "ELEMNS");
+        checkPrerequisiteIsMet(ctx.TYPENAME(), ctx.TYPENAMELEN(), ctx, "TYPENAME");
+        checkPrerequisiteIsMet(ctx.TYPENS(), ctx.TYPENSLEN(), ctx, "TYPENS");
     }
 }
