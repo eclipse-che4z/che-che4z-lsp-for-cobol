@@ -96,6 +96,7 @@ public class CICSTransformOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
             checkHasMandatoryOptions(ctx.CHANNEL(), ctx, "CHANNEL");
             checkHasMandatoryOptions(ctx.DATCONTAINER(), ctx, "DATCONTAINER");
             checkHasMandatoryOptions(ctx.XMLTRANSFORM(), ctx, "XMLTRANSFORM");
+            checkHasMandatoryOptions(ctx.XMLCONTAINER(), ctx, "XMLCONTAINER");
 
             if (!ctx.TYPENAMELEN().isEmpty() || !ctx.TYPENS().isEmpty() || !ctx.TYPENSLEN().isEmpty()) {
                 checkHasMandatoryOptions(ctx.TYPENAME(), ctx, "TYPENAME");
