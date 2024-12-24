@@ -32,17 +32,6 @@ import java.util.HashMap;
  * <p>This class tests all variations of the TRANSFORM command found in the link above.
  */
 public class TestCICSTransform {
-
-    // Main Building Blocks
-    private static final String BASE_TEXT =
-            "       IDENTIFICATION DIVISION.\n"
-                    + "       PROGRAM-ID. ABCDEF.\n"
-                    + "       DATA DIVISION.\n"
-                    + "       WORKING-STORAGE SECTION.\n"
-                    + "       PROCEDURE DIVISION.\n"
-                    + "            EXEC CICS \n"
-                    + "            END-EXEC.";
-
     private static final String TRANSFORM_DATATOJSON_VALID = "TRANSFORM DATATOJSON CHANNEL(3) INCONTAINER(123) OUTCONTAINER(123) TRANSFORMER(123)";
     private static final String TRANSFORM_JSONTODATA_VALID = "TRANSFORM JSONTODATA CHANNEL(3) INCONTAINER(123) OUTCONTAINER(123) TRANSFORMER(123)";
 
@@ -50,7 +39,7 @@ public class TestCICSTransform {
     private static final String TRANSFORM_XMLTODATA_VALID = "TRANSFORM XMLTODATA CHANNEL(3) DATCONTAINER(123) ELEMNAME(123) ELEMNAMELEN(123) ELEMNS(123) ELEMNSLEN(123) NSCONTAINER(123) TYPENAME(123) TYPENAMELEN(123) TYPENS(123) TYPENSLEN(123) XMLCONTAINER(123) XMLTRANSFORM(123)";
 
 
-    private static final String TRANSFORM_DATATOXML_INVALID = "TRANSFORM DATATOXML CHANNEL(3) DATCONTAINER(123) {NSCONTAINER|errorOne}(123) XMLTRANSFORM(123)";
+    private static final String TRANSFORM_DATATOXML_INVALID = "TRANSFORM DATATOXML CHANNEL(3) DATCONTAINER(123) {NSCONTAINER|errorOne}(123) XMLCONTAINER(123) XMLTRANSFORM(123)";
 
 
     @Test
