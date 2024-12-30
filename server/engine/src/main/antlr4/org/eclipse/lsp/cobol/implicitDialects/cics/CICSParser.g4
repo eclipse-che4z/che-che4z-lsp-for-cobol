@@ -578,10 +578,9 @@ cics_readnext_readprev: (READNEXT | READPREV)  (cics_file_name | INTO cics_data_
                SYSID cics_data_area | LENGTH cics_data_area | RBA | RRN | XRBA | NOSUSPEND | cics_handle_response)*;
 
 /** READQ TD / TS */
-cics_readq: READQ (cics_readq_td | cics_readq_ts);
-cics_readq_td: TD (QUEUE cics_name | cics_into_set | LENGTH cics_data_area | SYSID cics_data_area | NOSUSPEND | cics_handle_response)+;
-cics_readq_ts: (TS | (QUEUE | QNAME) cics_name | cics_into_set | NEXT | (LENGTH | NUMITEMS | SYSID) cics_data_area |
-                ITEM cics_data_value | cics_handle_response)+;
+cics_readq: READQ cics_readq_ts_td;
+cics_readq_ts_td: (TS | TD | (QUEUE | QNAME) cics_name | cics_into_set | NEXT | (LENGTH | NUMITEMS | SYSID) cics_data_area |
+                   ITEM cics_data_value | NOSUSPEND | cics_handle_response)+;
 
 /** RELEASE */
 cics_release: RELEASE cics_handle_response? PROGRAM cics_name cics_handle_response?;

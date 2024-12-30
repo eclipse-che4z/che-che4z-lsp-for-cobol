@@ -58,28 +58,41 @@ public class CICSReadqOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
      * @param <E> A subclass of ParserRuleContext
      */
     public <E extends ParserRuleContext> void checkOptions(E ctx) {
-        if (ctx.getRuleIndex() == RULE_cics_readq_td)
-            checkTd((CICSParser.Cics_readq_tdContext) ctx);
-        else if (ctx.getRuleIndex() == RULE_cics_readq_ts)
-            checkTs((CICSParser.Cics_readq_tsContext) ctx);
+        if (ctx.getRuleIndex() == RULE_cics_readq_ts_td) {
+            checkOpts((CICSParser.Cics_readq_ts_tdContext) ctx);
+        }
 
         checkDuplicates(ctx);
     }
 
-    private void checkTd(CICSParser.Cics_readq_tdContext ctx) {
+    private void checkOpts(CICSParser.Cics_readq_ts_tdContext ctx) {
+        if (!ctx.TD().isEmpty()) {
+            checkTd(ctx);
+        } else {
+            checkTs(ctx);
+        }
+    }
+    private void checkTd(CICSParser.Cics_readq_ts_tdContext ctx) {
         checkHasMandatoryOptions(ctx.QUEUE(), ctx, "QUEUE");
         checkHasExactlyOneOption("INTO or SET", ctx, ctx.cics_into_set());
+        checkHasIllegalOptions(ctx.ITEM(), "ITEM");
+        checkHasIllegalOptions(ctx.NEXT(), "NEXT");
+        checkHasIllegalOptions(ctx.NUMITEMS(), "NUMITEMS");
+        checkHasIllegalOptions(ctx.QNAME(), "QNAME");
+        checkHasIllegalOptions(ctx.TS(), "TS");
 
     }
-    private void checkTs(CICSParser.Cics_readq_tsContext ctx) {
+    private void checkTs(CICSParser.Cics_readq_ts_tdContext ctx) {
         if (!ctx.cics_into_set().isEmpty())
             checkSetTs(ctx.cics_into_set().listIterator().next());
 
         checkHasExactlyOneOption("QUEUE or QNAME", ctx, ctx.QUEUE(), ctx.QNAME());
         checkHasExactlyOneOption("INTO or SET", ctx, ctx.cics_into_set());
         checkHasMutuallyExclusiveOptions("NEXT or ITEM", ctx.NEXT(), ctx.ITEM());
+        checkHasIllegalOptions(ctx.TD(), "TD");
+        checkHasIllegalOptions(ctx.NOSUSPEND(), "NOSUSPEND");
     }
     private void checkSetTs(CICSParser.Cics_into_setContext ctx) {
-        if (ctx.SET() != null) checkHasMandatoryOptions(((Cics_readq_tsContext) ctx.getParent().getRuleContext()).LENGTH(), ctx, "LENGTH");
+        if (ctx.SET() != null) checkHasMandatoryOptions(((Cics_readq_ts_tdContext) ctx.getParent().getRuleContext()).LENGTH(), ctx, "LENGTH");
     }
 }
