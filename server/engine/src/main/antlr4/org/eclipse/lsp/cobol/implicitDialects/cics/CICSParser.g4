@@ -692,6 +692,14 @@ cics_reset: RESET (ACQPROCESS | ACTIVITY cics_data_value | cics_handle_response)
 cics_resetbr: RESETBR cics_file_name (RIDFLD cics_data_area | KEYLENGTH cics_data_value | GENERIC | REQID cics_data_value |
               SYSID cics_data_area | GTEQ | EQUAL | RBA | RRN |XRBA | cics_handle_response)+;
 
+/** RESTYPE HELPER */
+cics_restype: RESTYPE cics_data_value | ASYNCSERVICE | ATOMSERVICE | BUNDLE | DB2CONN | DB2ENTRY | DISPATCHER | DOCTEMPLATE |
+              EPADAPTER | ENQUEUE | EVENTBINDING | EVENTPROCESS | FILE | IPCONN | JOURNALNAME | JVMPROGRAM | JVMSERVER |
+              LIBRARY | LSRPOOL | MONITOR | MQCONN | MQMONITOR | MVSTCB | NODEJSAPP | PIPELINE | POLICY | PROGAUTO |
+              PROGRAM | PROGRAMDEF | RECOVERY | SECURITY | STATS | STORAGE | STREAMNAME | SUBPOOL | SYSDUMPCODE | TASKSUBPOOL |
+              TCPIP | TCPIPSERVICE | TDQUEUE | TRANCLASS | TRANDUMPCODE | TRANSACTION | TSQUEUE | URIMAP | USER | WEBSERVICE |
+              XMLTRANSFORM;
+
 /** RESUME */
 cics_resume: RESUME (ACQACTIVITY | ACQPROCESS | ACTIVITY cics_data_value | cics_handle_response)+;
 
