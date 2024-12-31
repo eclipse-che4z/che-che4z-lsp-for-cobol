@@ -272,9 +272,10 @@ public class VisitorHelper {
    * @return range object
    */
   public static Range buildTokenRange(Token token) {
+    int line = token.getLine() - 1;
+    int tokenLen = token.getStopIndex() - token.getStartIndex() + 1;
     return new Range(
-        new Position(token.getLine() - 1, token.getCharPositionInLine()),
-        new Position(token.getLine() - 1, token.getCharPositionInLine() + token.getText().length()));
+        new Position(line, token.getCharPositionInLine()),
+        new Position(line, token.getCharPositionInLine() + tokenLen));
   }
-
 }

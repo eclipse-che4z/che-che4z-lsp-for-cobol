@@ -43,19 +43,17 @@ public class VariableUsageUtils {
    * @return the list of all matched variables
    */
   public static List<VariableNode> findVariablesForUsage(
-      Multimap<String, VariableNode> definedVariables, List<VariableUsageNode> usageNodes) {
-    Map<VariableNode, Integer> variableToStepCountsToMatchParentsMap =
-        findDefinedVariable(usageNodes.get(0).getName(), definedVariables).stream()
-            .map(
-                it ->
-                    mapVariableToStepCountsToMatchParents(
-                        it, usageNodes.subList(1, usageNodes.size())))
-            .reduce(
-                (firstMap, secondMap) -> {
-                  firstMap.putAll(secondMap);
-                  return firstMap;
-                })
-            .orElse(Collections.emptyMap());
+    Multimap<String, VariableNode> definedVariables, List<VariableUsageNode> usageNodes) {
+    Map<VariableNode, Integer> acc = null;
+    for (VariableNode it : findDefinedVariable(usageNodes.get(0).getName(), definedVariables)) {
+      Map<VariableNode, Integer> varMap = mapVariableToStepCountsToMatchParents(it, usageNodes.subList(1, usageNodes.size()));
+      if (acc == null) {
+        acc = varMap;
+      } else {
+        acc.putAll(varMap);
+      }
+    }
+    Map<VariableNode, Integer> variableToStepCountsToMatchParentsMap = acc != null ? acc : Collections.emptyMap();
 
     List<VariableNode> exactHierarchyMatchedVariables =
         variableToStepCountsToMatchParentsMap.entrySet().stream()
@@ -70,17 +68,16 @@ public class VariableUsageUtils {
 
   private Collection<VariableNode> findDefinedVariable(String name, Multimap<String, VariableNode> definedVariables) {
     Collection<VariableNode> foundVariable =  definedVariables.get(name);
-    if (foundVariable.size() > 0) {
+    if (!foundVariable.isEmpty()) {
       return foundVariable;
     }
-    Optional<VariableNode> node = definedVariables.values()
-            .stream().flatMap(Node::getDepthFirstStream)
-            .filter(VariableNode.class::isInstance)
-            .map(VariableNode.class::cast)
-            .filter(var -> var.getName().equals(name))
-            .findFirst();
-    if (node.isPresent()) {
-      foundVariable.add(node.get());
+
+    for (VariableNode node: definedVariables.values()) {
+      Node r = node.getDepthFirstFirstNode(n -> n instanceof VariableNode && ((VariableNode) n).getName().equals(name));
+      if (r != null) {
+        foundVariable.add((VariableNode) r);
+        break;
+      }
     }
     return foundVariable;
   }

@@ -153,13 +153,15 @@ public class SymbolAccumulatorService implements VariableAccumulator {
       ProgramNode program, CodeBlockUsageNode node) {
     SymbolTable symbolTable = createOrGetSymbolTable(program);
 
-    List<CodeBlockDefinitionNode> definitions =
-        symbolTable.getCodeBlocks().stream()
-            .filter(it -> filterNodes(it, node))
-            .collect(Collectors.toList());
+      List<CodeBlockDefinitionNode> definitions = new ArrayList<>();
+      for (CodeBlockDefinitionNode codeBlockDefinitionNode : symbolTable.getCodeBlocks()) {
+          if (filterNodes(codeBlockDefinitionNode, node)) {
+              definitions.add(codeBlockDefinitionNode);
+          }
+      }
 
-    if (definitions.isEmpty()) {
-      return Optional.of(
+      if (definitions.isEmpty()) {
+        return Optional.of(
           SyntaxError.syntaxError()
               .errorSource(ErrorSource.PARSING)
               .messageTemplate(
@@ -476,25 +478,25 @@ public class SymbolAccumulatorService implements VariableAccumulator {
   public List<VariableNode> getVariableDefinition(
       ProgramNode programNode, List<VariableUsageNode> usageNodes) {
     Multimap<String, VariableNode> variables = createOrGetSymbolTable(programNode).getVariables();
-    List<VariableNode> foundDefinitions =
-        VariableUsageUtils.findVariablesForUsage(variables, usageNodes);
+    List<VariableNode> foundDefinitions = VariableUsageUtils.findVariablesForUsage(variables, usageNodes);
     if (!foundDefinitions.isEmpty()) {
       return foundDefinitions;
     }
 
     Multimap<String, VariableNode> globals = ArrayListMultimap.create();
-    getMapOfGlobalVariables(programNode)
-        .values()
-        .forEach(variableNode -> globals.put(variableNode.getName(), variableNode));
+    for (VariableNode variableNode : getMapOfGlobalVariables(programNode).values()) {
+          globals.put(variableNode.getName(), variableNode);
+    }
     return VariableUsageUtils.findVariablesForUsage(globals, usageNodes);
   }
 
   private Map<String, VariableNode> getMapOfGlobalVariables(ProgramNode programNode) {
-    Map<String, VariableNode> result =
-        programNode.getProgram().map(this::getMapOfGlobalVariables).orElseGet(HashMap::new);
-    createOrGetSymbolTable(programNode).getVariables().values().stream()
-        .filter(VariableNode::isGlobal)
-        .forEach(variableNode -> result.put(variableNode.getName(), variableNode));
+    Map<String, VariableNode> result = programNode.getProgram().map(this::getMapOfGlobalVariables).orElseGet(HashMap::new);
+    for (VariableNode variableNode : createOrGetSymbolTable(programNode).getVariables().values()) {
+      if (variableNode.isGlobal()) {
+        result.put(variableNode.getName(), variableNode);
+      }
+    }
     return result;
   }
 

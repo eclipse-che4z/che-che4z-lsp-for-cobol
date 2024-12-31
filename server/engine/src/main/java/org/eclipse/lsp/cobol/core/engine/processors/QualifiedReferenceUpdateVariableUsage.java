@@ -22,6 +22,7 @@ import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.message.MessageTemplate;
 import org.eclipse.lsp.cobol.common.model.NodeType;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
+import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.QualifiedReferenceNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableUsageNode;
@@ -32,7 +33,9 @@ import org.eclipse.lsp.cobol.common.processor.Processor;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulatorService;
 import org.eclipse.lsp.cobol.common.model.tree.FigurativeConstants;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /** QualifiedReferenceNode processor */
@@ -49,23 +52,22 @@ public class QualifiedReferenceUpdateVariableUsage implements Processor<Qualifie
 
   @Override
   public void accept(QualifiedReferenceNode node, ProcessingContext ctx) {
-    List<VariableUsageNode> variableUsageNodes =
-            node.getChildren().stream()
-                    .filter(Node.hasType(NodeType.VARIABLE_USAGE))
-                    .map(VariableUsageNode.class::cast)
-                    .collect(Collectors.toList());
+    List<VariableUsageNode> variableUsageNodes = new ArrayList<>();
+    for (Node child : node.getChildren()) {
+      if (child.getNodeType() == NodeType.VARIABLE_USAGE) {
+        variableUsageNodes.add((VariableUsageNode) child);
+      }
+    }
 
     if (variableUsageNodes.isEmpty()) {
       LOG.warn("Qualified reference node don't have any variable usages. {}", node);
       return;
     }
 
-    List<VariableNode> foundDefinitions =
-            node.getProgram()
-                    .map(
-                            programNode ->
-                                    symbolAccumulatorService.getVariableDefinition(programNode, variableUsageNodes))
-                    .orElseGet(ImmutableList::of);
+    Optional<ProgramNode> program = node.getProgram();
+    List<VariableNode> foundDefinitions = program.map(programNode ->
+                    symbolAccumulatorService.getVariableDefinition(programNode, variableUsageNodes))
+            .orElseGet(ImmutableList::of);
 
     if (isQualifyExtendedDirectiveEnabled(ctx) && foundDefinitions.size() > 1) {
       foundDefinitions = updateDefinitionForQualifyExtended(node, foundDefinitions);

@@ -23,7 +23,9 @@ import org.eclipse.lsp.cobol.common.processor.Processor;
 import org.eclipse.lsp.cobol.common.model.tree.FileEntryNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableDefinitionNode;
 
+import java.util.List;
 import java.util.Optional;
+
 /** FileEntryNode processor */
 public class FileEntryProcess implements Processor<FileEntryNode> {
   @Override
@@ -34,12 +36,18 @@ public class FileEntryProcess implements Processor<FileEntryNode> {
       return;
     }
     ProgramNode program = programOpt.get();
-    program
-        .getDepthFirstStream()
-        .filter(Node.hasType(NodeType.VARIABLE_DEFINITION))
-        .map(VariableDefinitionNode.class::cast)
-        .filter(n -> n.getLevel() == VariableConstants.LEVEL_FD_SD)
-        .filter(n -> n.getVariableName().getName().equals(node.getFileName()))
-        .forEach(n -> n.setFileControlClause(node.getFileControlClause()));
+    List<Node> collected = program.getDepthFirstList(n -> {
+      if (n.getNodeType() != NodeType.VARIABLE_DEFINITION) {
+        return false;
+      }
+      if (((VariableDefinitionNode) n).getLevel() != VariableConstants.LEVEL_FD_SD) {
+        return false;
+      }
+      return ((VariableDefinitionNode) n).getVariableName().getName().equals(node.getFileName());
+    });
+
+    for (Node n : collected) {
+      ((VariableDefinitionNode) n).setFileControlClause(node.getFileControlClause());
+    }
   }
 }
