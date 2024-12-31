@@ -103,16 +103,25 @@ public class FileOperationProcess implements Processor<FileOperationStatementNod
   }
 
   private boolean fileIsExternal(FileOperationStatementNode node) {
-    if (!node.getNearestParentByType(PROGRAM).isPresent()) return false;
-    Optional<FileDescriptionNode> fileDescriptionNode =
-        node.getNearestParentByType(PROGRAM)
-            .get()
-            .getDepthFirstStream()
-            .filter(FileDescriptionNode.class::isInstance)
-            .map(FileDescriptionNode.class::cast)
-            .filter(fdNode -> fdNode.getName().equalsIgnoreCase(node.getFilename().getName()))
-            .findFirst();
-    return fileDescriptionNode.map(FileDescriptionNode::isExternal).orElse(false);
+    if (!node.getNearestParentByType(PROGRAM).isPresent()) {
+        return false;
+    }
+    Node programNode = node.getNearestParentByType(PROGRAM).orElse(null);
+    if (programNode == null) {
+      return false;
+    }
+
+    Node fd = programNode.getDepthFirstFirstNode(n -> {
+      if (n.getClass() != FileDescriptionNode.class) {
+        return false;
+      }
+      FileDescriptionNode fdNode = (FileDescriptionNode) n;
+      if (!fdNode.isExternal()) {
+          return false;
+      }
+      return fdNode.getName().equalsIgnoreCase(node.getFilename().getName());
+    });
+    return fd != null;
   }
 
   private void checkFileOpenedBeforeOperation(
@@ -122,29 +131,36 @@ public class FileOperationProcess implements Processor<FileOperationStatementNod
       List<FileOperationKind> expectedFileKind,
       ProcessingContext ctx,
       String messageTemplate) {
-    node.getNearestParentByType(NodeType.PROGRAM)
-        .ifPresent(
-            pnode -> {
-              boolean isFileOpened =
-                  pnode
-                      .getDepthFirstStream()
-                      .filter(Node.hasType(OPEN_STATEMENT))
-                      .map(OpenStatementNode.class::cast)
-                      .anyMatch(
-                          n ->
-                              n.getFilename().getName().equalsIgnoreCase(filename)
-                                  && expectedFileKind.contains(n.getFileOperationKind()));
-              if (!isFileOpened && Objects.nonNull(errorLocality)) {
-                ctx.getErrors()
-                    .add(
-                        SyntaxError.syntaxError()
-                            .errorSource(ErrorSource.PARSING)
-                            .severity(ErrorSeverity.WARNING)
-                            .location(errorLocality.toOriginalLocation())
-                            .messageTemplate(MessageTemplate.of(messageTemplate))
-                            .build());
-              }
-            });
+
+    Boolean isFileOpened = isFileOpen(node, filename, expectedFileKind);
+    if (isFileOpened == null) {
+      return;
+    }
+
+    if (!isFileOpened && Objects.nonNull(errorLocality)) {
+      ctx.getErrors().add(SyntaxError.syntaxError().errorSource(ErrorSource.PARSING).severity(ErrorSeverity.WARNING)
+                     .location(errorLocality.toOriginalLocation()).messageTemplate(MessageTemplate.of(messageTemplate))
+                     .build());
+    }
+  }
+
+  private static Boolean isFileOpen(Node node, String filename, List<FileOperationKind> expectedFileKind) {
+    Optional<Node> nearestParentByType = node.getNearestParentByType(PROGRAM);
+    if (!nearestParentByType.isPresent()) {
+      return null;
+    }
+
+    Node result = nearestParentByType.get().getDepthFirstFirstNode(n -> {
+      if (n.getNodeType() != OPEN_STATEMENT) {
+        return false;
+      }
+      OpenStatementNode osn = (OpenStatementNode) n;
+      if (!expectedFileKind.contains(osn.getFileOperationKind())) {
+        return false;
+      }
+      return osn.getFilename().getName().equalsIgnoreCase(filename);
+    });
+    return result != null;
   }
 
   private void checkFileOpenedForWrite(

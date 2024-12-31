@@ -102,48 +102,14 @@ public class VisitorHelper {
    * @param clauses a list of ANTLR picture clauses
    * @return the list of picture texts
    */
-  public static List<String> retrievePicTexts(List<DataPictureClauseContext> clauses) {
-    return clauses.stream()
-            .map(clause -> clause.getText().replaceAll(clause.getStart().getText(), "").trim())
-            .collect(toList());
-  }
-  /**
-   * Extract picture texts
-   *
-   * @param clauses a list of ANTLR picture clauses
-   * @return the list of picture texts
-   */
   public static List<String> retrievePicTextsOld(List<org.eclipse.lsp.cobol.core.CobolParser.DataPictureClauseContext> clauses) {
-    return clauses.stream()
-            .map(clause -> clause.getText().replaceAll(clause.getStart().getText(), "").trim())
-            .collect(toList());
+      List<String> list = new ArrayList<>(clauses.size());
+      for (CobolParser.DataPictureClauseContext clause : clauses) {
+        list.add(clause.getText().substring(clause.getStart().getText().length()).trim());
+      }
+      return list;
   }
 
-  /**
-   * Extract value intervals. It's also applicable for raw values. In case of just a value `to`
-   * field will be `null`.
-   *
-   * @param contexts a list of ANTLR value intervals
-   * @return the list of value intervals
-   */
-  public static List<ValueInterval> retrieveValueIntervals(List<DataValueIntervalContext> contexts) {
-    return contexts.stream()
-            .map(
-                    context ->
-                            new ValueInterval(
-                                    context.dataValueIntervalFrom().getText(),
-                                    ofNullable(context.dataValueIntervalTo())
-                                            .map(DataValueIntervalToContext::literal)
-                                            .map(ParserRuleContext::getText)
-                                            .map(String::toUpperCase)
-                                            .orElse(null),
-                                    ofNullable(context.dataValueIntervalTo())
-                                            .map(DataValueIntervalToContext::thruToken)
-                                            .map(ParserRuleContext::getText)
-                                            .map(String::toUpperCase)
-                                            .orElse(null)))
-            .collect(toList());
-  }
   /**
    * Extract value intervals. It's also applicable for raw values. In case of just a value `to`
    * field will be `null`.
@@ -152,39 +118,20 @@ public class VisitorHelper {
    * @return the list of value intervals
    */
   public static List<ValueInterval> retrieveValueIntervalsOld(List<org.eclipse.lsp.cobol.core.CobolParser.DataValueIntervalContext> contexts) {
-    return contexts.stream()
-            .map(
-                    context ->
-                            new ValueInterval(
-                                    context.dataValueIntervalFrom().getText(),
-                                    ofNullable(context.dataValueIntervalTo())
-                                            .map(org.eclipse.lsp.cobol.core.CobolParser.DataValueIntervalToContext::literal)
-                                            .map(ParserRuleContext::getText)
-                                            .map(String::toUpperCase)
-                                            .orElse(null),
-                                    ofNullable(context.dataValueIntervalTo())
-                                            .map(org.eclipse.lsp.cobol.core.CobolParser.DataValueIntervalToContext::thruToken)
-                                            .map(ParserRuleContext::getText)
-                                            .map(String::toUpperCase)
-                                            .orElse(null)))
-            .collect(toList());
+      List<ValueInterval> list = new ArrayList<>();
+      for (CobolParser.DataValueIntervalContext context: contexts) {
+        String from = context.dataValueIntervalFrom().getText();
+        String to = context.dataValueIntervalTo() != null
+                ? context.dataValueIntervalTo().literal().getText().toUpperCase()
+                : null;
+        String thruToken = context.dataValueIntervalTo() != null
+                ? context.dataValueIntervalTo().thruToken().getText().toUpperCase()
+                : null;
+        list.add(new ValueInterval(from, to, thruToken));
+      }
+      return list;
   }
 
-  /**
-   * Extract usage format from ANTLR usage clause
-   *
-   * @param contexts a list of ANTLR usage clauses
-   * @return the list of usage formats
-   */
-  public static List<UsageFormat> retrieveUsageFormat(List<DataUsageClauseContext> contexts) {
-    return contexts.stream()
-            .map(DataUsageClauseContext::usageFormat)
-            .filter(Objects::nonNull)
-            .map(UsageFormatContext::getStart)
-            .map(Token::getText)
-            .map(UsageFormat::of)
-            .collect(toList());
-  }
   /**
    * Extract usage format from ANTLR usage clause
    *
@@ -312,20 +259,6 @@ public class VisitorHelper {
    * @param ctx a context object
    * @return extracted value
    */
-  public static String retrieveValueToken(ValueIsTokenContext ctx) {
-    return ctx.valueToken().getText().toUpperCase()
-            + Optional.ofNullable(ctx.isAreToken())
-            .map(ParserRuleContext::getText)
-            .map(String::toUpperCase)
-            .map(" "::concat)
-            .orElse("");
-  }
-
-  /**
-   * Gets value from ValueIsTokenContext context
-   * @param ctx a context object
-   * @return extracted value
-   */
   public static String retrieveValueTokenOld(CobolParser.ValueIsTokenContext ctx) {
     return ctx.valueToken().getText().toUpperCase()
             + Optional.ofNullable(ctx.isAreToken())
@@ -363,9 +296,10 @@ public class VisitorHelper {
    * @return range object
    */
   public static Range buildTokenRange(Token token) {
+    int line = token.getLine() - 1;
+    int tokenLen = token.getStopIndex() - token.getStartIndex() + 1;
     return new Range(
-        new Position(token.getLine() - 1, token.getCharPositionInLine()),
-        new Position(token.getLine() - 1, token.getCharPositionInLine() + token.getText().length()));
+        new Position(line, token.getCharPositionInLine()),
+        new Position(line, token.getCharPositionInLine() + tokenLen));
   }
-
 }

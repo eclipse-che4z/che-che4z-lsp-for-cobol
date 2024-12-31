@@ -476,8 +476,7 @@ public class SymbolAccumulatorService implements VariableAccumulator {
   public List<VariableNode> getVariableDefinition(
       ProgramNode programNode, List<VariableUsageNode> usageNodes) {
     Multimap<String, VariableNode> variables = createOrGetSymbolTable(programNode).getVariables();
-    List<VariableNode> foundDefinitions =
-        VariableUsageUtils.findVariablesForUsage(variables, usageNodes);
+    List<VariableNode> foundDefinitions = VariableUsageUtils.findVariablesForUsage(variables, usageNodes);
     if (!foundDefinitions.isEmpty()) {
       return foundDefinitions;
     }

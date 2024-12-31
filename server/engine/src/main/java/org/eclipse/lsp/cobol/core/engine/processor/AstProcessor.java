@@ -34,14 +34,13 @@ import java.util.Map;
  */
 @Slf4j
 public class AstProcessor {
-
   /**
    * The entry point to AST processing
    *
-   * @param analysisConfig
-   * @param ctx             processing context
-   * @param analysisContext
-   * @param rootNode        the root node of AST
+   * @param analysisConfig analysis config
+   * @param ctx processing context
+   * @param analysisContext analysis context
+   * @param rootNode the root node of AST
    * @return a list of errors
    */
   public List<SyntaxError> processSyntaxTree(AnalysisConfig analysisConfig, ProcessingContext ctx, AnalysisContext analysisContext, Node rootNode) {
@@ -58,7 +57,7 @@ public class AstProcessor {
     return ctx.getErrors();
   }
 
-  /**
+    /**
    * Process tree node and its children after tree construction.
    *
    * @param phase processing phase
@@ -74,7 +73,7 @@ public class AstProcessor {
   /**
    * Process tree node and its children after tree construction.
    *
-   * @param processor list of available processors
+   * @param processors list of available processors
    * @param node a node to process
    * @param ctx processing context
    */
@@ -82,12 +81,16 @@ public class AstProcessor {
       Node node, ProcessingContext ctx) {
     ThreadInterruptionUtil.checkThreadInterrupted();
     final Class<? extends Node> nodeClass = node.getClass();
-    processors.forEach((key, value) -> {
-      if (!key.isAssignableFrom(nodeClass))
-        return;
-      for (Processor<? extends Node> p : value)
-        ((Processor<Node>) p).accept(node, ctx);
-    });
-    node.getChildren().forEach(n -> process(processors, n, ctx));
+    for (Map.Entry<Class<? extends Node>, List<Processor<? extends Node>>> entry : processors.entrySet()) {
+          Class<? extends Node> key = entry.getKey();
+          List<Processor<? extends Node>> value = entry.getValue();
+          if (!key.isAssignableFrom(nodeClass))
+              continue;
+          for (Processor<? extends Node> p : value)
+              ((Processor<Node>) p).accept(node, ctx);
+    }
+    for (Node n : node.getChildren()) {
+        process(processors, n, ctx);
+    }
   }
 }

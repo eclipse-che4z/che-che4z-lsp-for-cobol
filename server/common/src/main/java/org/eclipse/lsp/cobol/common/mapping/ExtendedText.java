@@ -78,9 +78,8 @@ public class ExtendedText {
       return new Location(uri, range);
     }
     for (Mapper mapper : mappers) {
-      Location result = mapper.apply(startCharacter, endCharacter);
-      if (result != null) {
-        return result;
+      if (mapper.canApply(startCharacter, endCharacter)) {
+        return mapper.apply(startCharacter, endCharacter);
       }
     }
     throw new RuntimeException("Cannot find original position");

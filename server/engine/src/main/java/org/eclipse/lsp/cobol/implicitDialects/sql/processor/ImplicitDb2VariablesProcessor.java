@@ -65,14 +65,19 @@ public class ImplicitDb2VariablesProcessor implements Processor<SectionNode> {
   }
 
   private static boolean hasSqlCa(ProgramNode programNode) {
-    return programNode
-        .getDepthFirstStream()
-        .anyMatch(
-            node ->
-                node.getNodeType().equals(NodeType.VARIABLE)
-                    && ((VariableNode) node).getName().equalsIgnoreCase("SQLCA")
-                    && (node instanceof VariableWithLevelNode)
-                    && ((VariableWithLevelNode) node).getLevel() == 1);
+    return null != programNode.getDepthFirstFirstNode(node -> {
+      if (!node.getNodeType().equals(NodeType.VARIABLE)) {
+        return false;
+      }
+      if (!(node instanceof VariableWithLevelNode)) {
+        return false;
+      }
+      VariableWithLevelNode vwl = (VariableWithLevelNode) node;
+      if (vwl.getLevel() != 1) {
+        return false;
+      }
+      return vwl.getName().equalsIgnoreCase("SQLCA");
+    });
   }
 
   private void registerVariables(

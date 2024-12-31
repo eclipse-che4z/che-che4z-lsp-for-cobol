@@ -20,6 +20,8 @@ import lombok.Value;
 import org.eclipse.lsp.cobol.common.model.tree.CodeBlockDefinitionNode;
 import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNode;
+import org.eclipse.lsp4j.Range;
+import org.eclipse.xtext.xbase.lib.util.ToStringBuilder;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -40,6 +42,12 @@ public class SymbolTable {
    * @return string value of a generated key
    */
   public static String generateKey(ProgramNode program) {
-    return program.getProgramName() + "%" + program.getLocality().getUri() + "%" + program.getLocality().getRange();
+    Range range = program.getLocality().getRange();
+    String rangeString = "["
+            + range.getStart().getLine() + ", " + range.getStart().getCharacter()
+            + "-"
+            + range.getEnd().getLine() + ", " + range.getEnd().getCharacter()
+            + "]";
+    return program.getProgramName() + "%" + program.getLocality().getUri() + "%" + rangeString;
   }
 }

@@ -90,7 +90,9 @@ public class SectionNodeProcessorHelper {
    */
   public List<SyntaxError> processNodeWithVariableDefinitions(Node node) {
     Deque<VariableDefinitionNode> variableDefinitionNodes = new LinkedList<>(unwrapVariables(node));
-    variableDefinitionNodes.forEach(n -> n.getParent().removeChild(n));
+    for (VariableDefinitionNode n : variableDefinitionNodes) {
+      n.getParent().removeChild(n);
+    }
     List<SyntaxError> errors = new ArrayList<>();
     errors.addAll(processDefinition(node, 1, variableDefinitionNodes));
     errors.addAll(checkGlobalUniqueNames(node));
@@ -109,16 +111,14 @@ public class SectionNodeProcessorHelper {
     List<Node> variables = new ArrayList<>();
     List<CopyNode> copybooks = new LinkedList<>();
 
-    node.getChildren()
-        .forEach(
-            c -> {
-              if (c.getNodeType() == NodeType.VARIABLE_DEFINITION) {
-                variables.add(c);
-              }
-              if (c.getNodeType() == NodeType.COPY) {
-                copybooks.add((CopyNode) c);
-              }
-            });
+    for (Node child : node.getChildren()) {
+      if (child.getNodeType() == NodeType.VARIABLE_DEFINITION) {
+        variables.add(child);
+      }
+      if (child.getNodeType() == NodeType.COPY) {
+        copybooks.add((CopyNode) child);
+      }
+    }
 
     copybooks.sort(Comparator.comparingInt(c -> c.getLocality().getRange().getStart().getLine()));
 
@@ -173,7 +173,7 @@ public class SectionNodeProcessorHelper {
       Node variable = nodes.get(i);
       String variableNodeUri = variable.getLocality().getUri();
       String copybookNodeUri = copyNode.getUri();
-      if (variableNodeUri.equals(copybookNodeUri)) {
+      if (Objects.equals(variableNodeUri, copybookNodeUri)) {
         adjustVariableNodeInsideCopyNode(copyNode, variables, i, variable);
         areNodesAdjusted = true;
       } else {
@@ -205,11 +205,16 @@ public class SectionNodeProcessorHelper {
   }
 
     private static boolean isVariableNodeAlreadyPresentIn(CopyNode copyNode, VariableDefinitionNode variable) {
-        return copyNode.getChildren().stream()
-                .filter(VariableDefinitionNode.class::isInstance)
-                .map(VariableDefinitionNode.class::cast)
-                .anyMatch(n -> n.getLocality().equals(variable.getLocality())
-                        && n.getVariableName().equals(variable.getVariableName()));
+      for (Node node : copyNode.getChildren()) {
+        if (node instanceof VariableDefinitionNode) {
+          VariableDefinitionNode varNode = (VariableDefinitionNode) node;
+          if (varNode.getLocality().equals(variable.getLocality())
+                  && varNode.getVariableName().equals(variable.getVariableName())) {
+            return true;
+          }
+        }
+      }
+      return false;
     }
 
     private static boolean canInsertCopyNodeAtIndex(
@@ -324,12 +329,15 @@ public class SectionNodeProcessorHelper {
   }
 
   private Optional<ResultWithErrors<VariableNode>> convert(VariableDefinitionNode definitionNode) {
-    return matchers.stream()
-        .map(matcher -> matcher.apply(definitionNode))
-        .filter(Objects::nonNull)
-        .map(result -> handleGeneralErrors(result, definitionNode))
-        .map(result -> handleRedefines(result, definitionNode))
-        .findFirst();
+      for (Function<VariableDefinitionNode, ResultWithErrors<VariableNode>> matcher : matchers) {
+          ResultWithErrors<VariableNode> result = matcher.apply(definitionNode);
+          if (result != null) {
+              ResultWithErrors<VariableNode> variableNodeResultWithErrors = handleGeneralErrors(result, definitionNode);
+              ResultWithErrors<VariableNode> nodeResultWithErrors = handleRedefines(variableNodeResultWithErrors, definitionNode);
+              return Optional.of(nodeResultWithErrors);
+          }
+      }
+      return Optional.empty();
   }
 
   private ResultWithErrors<VariableNode> handleGeneralErrors(

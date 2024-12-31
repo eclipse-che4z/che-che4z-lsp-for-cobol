@@ -1291,15 +1291,13 @@ public final class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
 
   @Override
   protected List<Node> defaultResult() {
-    return ImmutableList.of();
+    return new ArrayList<>();
   }
 
   @Override
   protected List<Node> aggregateResult(List<Node> aggregate, List<Node> nextResult) {
-    List<Node> result = new ArrayList<>(aggregate.size() + nextResult.size());
-    result.addAll(aggregate);
-    result.addAll(nextResult);
-    return result;
+    aggregate.addAll(nextResult);
+    return aggregate;
   }
 
   /**
@@ -1793,13 +1791,13 @@ public final class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   }
 
   private List<ValueClause> retrieveValues(List<DataValueClauseContext> clauses) {
-    return clauses.stream().map(this::retrieveValue).collect(toList());
-  }
-
-  private ValueClause retrieveValue(DataValueClauseContext context) {
-    return new ValueClause(
-            retrieveValueIntervalsOld(context.dataValueClauseLiteral().dataValueInterval()),
-            getLocality(context.getStart()).orElse(null));
+      List<ValueClause> list = new ArrayList<>();
+      for (DataValueClauseContext clause : clauses) {
+        List<ValueInterval> valueIntervals = retrieveValueIntervalsOld(clause.dataValueClauseLiteral().dataValueInterval());
+        Locality locality = getLocality(clause.getStart()).orElse(null);
+        list.add(new ValueClause(valueIntervals, locality));
+      }
+      return list;
   }
 
   private Locality getLevelLocality(TerminalNode terminalNode) {

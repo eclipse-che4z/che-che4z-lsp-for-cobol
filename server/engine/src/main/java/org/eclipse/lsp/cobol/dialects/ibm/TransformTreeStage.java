@@ -68,6 +68,8 @@ public class TransformTreeStage implements Stage<AnalysisContext, ProcessingResu
   public StageResult<ProcessingResult> run(AnalysisContext context, StageResult<ParserStageResult> prevStageResult) {
     // Transform parsed tree to AST
     // We expect only the root node here
+//    while(true) {
+
     RootNode rootNode = (RootNode) transformAST(
             context,
             context.getCopybooksRepository(),
@@ -78,6 +80,7 @@ public class TransformTreeStage implements Stage<AnalysisContext, ProcessingResu
     processSyntaxTree(context.getConfig(), symbolAccumulatorService, context, rootNode);
 
     symbolsRepository.updateSymbols(symbolAccumulatorService.getProgramSymbols());
+//    }
 
     return new StageResult<>(new ProcessingResult(symbolAccumulatorService.getProgramSymbols(), rootNode));
   }
@@ -141,7 +144,7 @@ public class TransformTreeStage implements Stage<AnalysisContext, ProcessingResu
   private void shapeSectionsAndParagraphs(Node parent) {
     LinkedList<Node> stack = new LinkedList<>();
     for (Node node : parent.getChildren()) {
-      parent.removeChild(node);
+      parent.getChildren().remove(0);
       if (!node.getChildren().isEmpty()) {
           shapeSectionsAndParagraphs(node);
       }

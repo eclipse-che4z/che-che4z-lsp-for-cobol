@@ -24,6 +24,11 @@ import org.eclipse.lsp4j.Range;
 class StraightforwardMapper implements Mapper {
 
   @Override
+  public boolean canApply(MappedCharacter startCharacter, MappedCharacter endCharacter) {
+    return true;
+  }
+
+  @Override
   public Location apply(MappedCharacter startCharacter, MappedCharacter endCharacter) {
     Position startPosition = new Position(startCharacter.getOriginalPosition().getLine(), startCharacter.getOriginalPosition().getCharacter());
     Position endPosition = new Position(endCharacter.getOriginalPosition().getLine(), endCharacter.getOriginalPosition().getCharacter());

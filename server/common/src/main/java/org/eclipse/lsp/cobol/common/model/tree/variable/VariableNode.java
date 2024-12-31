@@ -31,6 +31,7 @@ import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 
 import static java.util.stream.Collectors.toList;
@@ -39,16 +40,14 @@ import static org.eclipse.lsp.cobol.common.model.NodeType.VARIABLE;
 import static org.eclipse.lsp.cobol.common.model.NodeType.VARIABLE_DEFINITION_NAME;
 
 /** The abstract class for all variable definitions. */
-@Getter
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 public abstract class VariableNode extends Node implements DefinedAndUsedStructure {
-
   public static final String PREFIX = "  ";
-  private final VariableType variableType;
-  private final String name;
-  @Setter private boolean global;
-  @EqualsAndHashCode.Exclude private final List<Location> usages = new ArrayList<>();
+  @Getter private final VariableType variableType;
+  @Getter private final String name;
+  @Getter @Setter private boolean global;
+  @EqualsAndHashCode.Exclude private final LinkedHashSet<Location> usages = new LinkedHashSet<>();
 
   protected VariableNode(
       Locality location, String name, VariableType variableType, boolean global) {
@@ -187,6 +186,11 @@ public abstract class VariableNode extends Node implements DefinedAndUsedStructu
         .map(displayString -> prepend(PREFIX, displayString))
         .forEach(result::add);
     return String.join("\n", result);
+  }
+
+  @Override
+  public List<Location> getUsages() {
+    return new ArrayList<>(usages);
   }
 
   private static String prepend(String prefix, String text) {
