@@ -53,13 +53,13 @@ public class CICSTestOptionsUtility extends CICSOptionsCheckBaseUtility {
    * @param <E> A subclass of ParserRuleContext
    */
   public <E extends ParserRuleContext> void checkOptions(E ctx) {
-    if (ctx.getParent().getRuleIndex() == CICSParser.RULE_cics_test) {
-      checkTestEvent((CICSParser.Cics_testContext) ctx.getParent());
+    if (ctx.getRuleIndex() == CICSParser.RULE_cics_test_body) {
+      checkTestEvent((CICSParser.Cics_test_bodyContext) ctx);
     }
-    checkDuplicates(ctx.getParent());
+    checkDuplicates(ctx);
   }
 
-  private void checkTestEvent(CICSParser.Cics_testContext ctx) {
+  private void checkTestEvent(CICSParser.Cics_test_bodyContext ctx) {
     checkHasMandatoryOptions(ctx.EVENT(), ctx, "EVENT");
     checkHasMandatoryOptions(ctx.FIRESTATUS(), ctx, "FIRESTATUS");
   }
