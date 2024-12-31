@@ -104,19 +104,17 @@ public final class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   public List<Node> visitStartRule(StartRuleContext ctx) {
     // we can skip the other nodes, but not the root
     try {
-      return ImmutableList.of(
-            retrieveLocality(ctx, extendedDocument, copybooks)
-                    .map(RootNode::new)
-                    .map(
-                            rootNode -> {
-                              visitChildren(ctx).forEach(rootNode::addChild);
-                              return rootNode;
-                            })
-                    .orElseGet(
-                            () -> {
-                              LOG.warn("The root node for syntax tree was not constructed");
-                              return new RootNode();
-                            }));
+      Optional<Locality> localityOpt = retrieveLocality(ctx, extendedDocument, copybooks);
+      if (!localityOpt.isPresent()) {
+        LOG.warn("The root node for syntax tree was not constructed");
+        return ImmutableList.of(new RootNode());
+      }
+
+      RootNode result = new RootNode(localityOpt.get());
+      for (Node child: visitChildren(ctx)) {
+        result.addChild(child);
+      }
+      return ImmutableList.of(result);
     } finally {
       text.flush();
     }
@@ -1325,15 +1323,13 @@ public final class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
 
   @Override
   protected List<Node> defaultResult() {
-    return ImmutableList.of();
+    return new ArrayList<>();
   }
 
   @Override
   protected List<Node> aggregateResult(List<Node> aggregate, List<Node> nextResult) {
-    List<Node> result = new ArrayList<>(aggregate.size() + nextResult.size());
-    result.addAll(aggregate);
-    result.addAll(nextResult);
-    return result;
+    aggregate.addAll(nextResult);
+    return aggregate;
   }
 
   /**

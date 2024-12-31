@@ -141,7 +141,7 @@ public class TransformTreeStage implements Stage<AnalysisContext, ProcessingResu
   private void shapeSectionsAndParagraphs(Node parent) {
     LinkedList<Node> stack = new LinkedList<>();
     for (Node node : parent.getChildren()) {
-      parent.removeChild(node);
+      parent.getChildren().remove(0);
       if (!node.getChildren().isEmpty()) {
           shapeSectionsAndParagraphs(node);
       }

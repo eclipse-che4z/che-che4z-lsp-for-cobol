@@ -25,9 +25,9 @@ import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.Processor;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulatorService;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 /**
  * Enriches the @{@link QualifiedReferenceNode}'s children by replacing the Variable node
@@ -41,11 +41,12 @@ public class FunctionUsageReferenceEnricher implements Processor<QualifiedRefere
   public void accept(QualifiedReferenceNode node, ProcessingContext processingContext) {
     Optional<ProgramNode> program = node.getProgram();
     if (!program.isPresent()) return;
-    List<VariableUsageNode> usageNodes =
-        node.getChildren().stream()
-            .filter(Node.hasType(NodeType.VARIABLE_USAGE))
-            .map(VariableUsageNode.class::cast)
-            .collect(Collectors.toList());
+    List<VariableUsageNode> usageNodes = new ArrayList<>();
+    for (Node child : node.getChildren()) {
+      if (child.getNodeType() == NodeType.VARIABLE_USAGE) {
+          usageNodes.add((VariableUsageNode) child);
+      }
+    }
 
     if (usageNodes.isEmpty()) {
       return;

@@ -83,10 +83,12 @@ public class CICSTranslateMandatorySectionProcess implements Processor<ProgramNo
   }
 
   private boolean sectionExists(ProgramNode programNode, SectionType sectionType) {
-    return programNode
-        .getDepthFirstStream()
-        .filter(SectionNode.class::isInstance)
-        .map(SectionNode.class::cast)
-        .anyMatch(node -> node.getSectionType() == sectionType);
+    return null != programNode.getDepthFirstFirstNode(
+            n -> n instanceof SectionNode && ((SectionNode) n).getSectionType() == sectionType);
+//    return programNode
+//        .getDepthFirstStream()
+//        .filter(SectionNode.class::isInstance)
+//        .map(SectionNode.class::cast)
+//        .anyMatch(node -> node.getSectionType() == sectionType);
   }
 }

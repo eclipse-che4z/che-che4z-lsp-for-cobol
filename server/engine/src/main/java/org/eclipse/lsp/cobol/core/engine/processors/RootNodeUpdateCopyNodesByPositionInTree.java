@@ -21,10 +21,10 @@ import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.Processor;
 import org.eclipse.lsp.cobol.common.model.tree.RootNode;
 import org.eclipse.lsp.cobol.common.utils.RangeUtils;
-import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Range;
 
 import java.util.List;
+import java.util.Objects;
 
 import static java.util.stream.Collectors.toList;
 
@@ -38,22 +38,26 @@ public class RootNodeUpdateCopyNodesByPositionInTree implements Processor<RootNo
   private void updateCopyNodes(RootNode node) {
     List<Node> nodes =
         node.getChildren().stream().filter(Node.hasType(NodeType.COPY)).collect(toList());
-    nodes.forEach(node::removeChild);
-    nodes.forEach(
-        it -> {
-          Node parentNode =
-              RangeUtils.findNodeByPosition(
-                      node, it.getLocality().getUri(), it.getLocality().getRange().getStart())
+    node.getChildren().removeAll(nodes);
+    for (Node it : nodes) {
+      Node parentNode = RangeUtils.findNodeByPosition(node,
+                          it.getLocality().getUri(), it.getLocality().getRange().getStart())
                   .orElse(node);
-            parentNode.addChildAt(getNodeInsertionIndex(parentNode.getChildren(), it), it);
-        });
+      parentNode.addChildAt(getNodeInsertionIndex(parentNode.getChildren(), it), it);
+    }
 
-    List<CopyNode> copyNodes = node.getDepthFirstStream()
-        .filter(Node.hasType(NodeType.COPY))
-        .map(CopyNode.class::cast)
-        .collect(toList());
-
-    copyNodes.forEach(c -> registerCopyUsage(copyNodes, c.getNameLocation(), c.getUri()));
+    List<Node> copyNodes = node.getDepthFirstList(n ->
+            n.getNodeType() == NodeType.COPY && ((CopyNode) n).getUri() != null);
+    for (Node c : copyNodes) {
+      for (Node n : copyNodes) {
+        CopyNode cn1 = (CopyNode) c;
+        CopyNode cn2 = (CopyNode) n;
+        if (!Objects.equals(cn2.getNameLocation(), cn1.getNameLocation())
+                && Objects.equals(cn2.getUri(), cn1.getUri())) {
+          cn2.addUsage(cn1.getNameLocation());
+        }
+      }
+    }
   }
 
   private int getNodeInsertionIndex(List<Node> nodes, Node nodeToInsert) {
@@ -82,11 +86,4 @@ public class RootNodeUpdateCopyNodesByPositionInTree implements Processor<RootNo
     return nodeSize;
   }
 
-  private void registerCopyUsage(List<CopyNode> node, Location nameLocation, String uri) {
-    node.forEach(n -> {
-      if (n.getUri() != null && !n.getNameLocation().equals(nameLocation) && n.getUri().equals(uri)) {
-        n.addUsage(nameLocation);
-      }
-    });
-  }
 }
