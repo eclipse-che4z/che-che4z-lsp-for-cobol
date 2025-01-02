@@ -299,42 +299,10 @@ cics_deq: DEQ (cics_deq_cmds | cics_handle_response);
 cics_deq_cmds : (RESOURCE cics_data_area | LENGTH cics_data_value | MAXLIFETIME cics_cvda | TASK | UOW)+;
 
 /** DISCARD System Commands **/
-cics_discard: DISCARD (cics_discard_atomservice | cics_discard_autinstmodel | cics_discard_bundle | cics_discard_connection | cics_discard_db2conn |
-                   cics_discard_db2entry | cics_discard_db2tran | cics_discard_doctemplate | cics_discard_enqmodel | cics_discard_file |
-                   cics_discard_ipconn | cics_discard_journalmodel | cics_discard_journalname | cics_discard_jvmserver | cics_discard_library |
-                   cics_discard_mqconn | cics_discard_mqmonitor | cics_discard_partner | cics_discard_pipeline | cics_discard_processtype |
-                   cics_discard_profile | cics_discard_program | cics_discard_tcpipservice | cics_discard_tdqueue | cics_discard_terminal |
-                   cics_discard_tranclass | cics_discard_transaction | cics_discard_tsmodel | cics_discard_urimap | cics_discard_webservice);
-cics_discard_atomservice: cics_handle_response* ATOMSERVICE cics_data_value cics_handle_response*;
-cics_discard_autinstmodel: cics_handle_response* AUTINSTMODEL cics_data_value cics_handle_response*;
-cics_discard_bundle: cics_handle_response* BUNDLE cics_data_value cics_handle_response*;
-cics_discard_connection: cics_handle_response* CONNECTION cics_data_value cics_handle_response*;
-cics_discard_db2conn: cics_handle_response* DB2CONN cics_data_value cics_handle_response*;
-cics_discard_db2entry: cics_handle_response* DB2ENTRY cics_data_value cics_handle_response*;
-cics_discard_db2tran: cics_handle_response* DB2TRAN cics_data_value cics_handle_response*;
-cics_discard_doctemplate: cics_handle_response* DOCTEMPLATE cics_data_value cics_handle_response*;
-cics_discard_enqmodel: cics_handle_response* ENQMODEL cics_data_value cics_handle_response*;
-cics_discard_file: cics_handle_response* FILE cics_data_value cics_handle_response*; //TODO maybe others?
-cics_discard_ipconn: cics_handle_response* IPCONN cics_data_value cics_handle_response*;
-cics_discard_journalmodel: cics_handle_response* JOURNALMODEL cics_data_value cics_handle_response*;
-cics_discard_journalname: cics_handle_response* JOURNALNAME cics_data_value cics_handle_response*;
-cics_discard_jvmserver: cics_handle_response* JVMSERVER cics_data_value cics_handle_response*;
-cics_discard_library: cics_handle_response* LIBRARY cics_data_value cics_handle_response*;
-cics_discard_mqconn: cics_handle_response* MQCONN cics_data_value cics_handle_response*;
-cics_discard_mqmonitor: cics_handle_response* MQMONITOR cics_data_value cics_handle_response*;
-cics_discard_partner: cics_handle_response* PARTNER cics_data_value cics_handle_response*;
-cics_discard_pipeline: cics_handle_response* PIPELINE cics_data_value cics_handle_response*;
-cics_discard_processtype: cics_handle_response* PROCESSTYPE cics_data_value cics_handle_response*;
-cics_discard_profile: cics_handle_response* PROFILE cics_data_value cics_handle_response*;
-cics_discard_program: cics_handle_response* PROGRAM cics_data_value cics_handle_response*;
-cics_discard_tcpipservice: cics_handle_response* TCPIPSERVICE cics_data_value cics_handle_response*;
-cics_discard_tdqueue: cics_handle_response* TDQUEUE cics_data_value cics_handle_response*;
-cics_discard_terminal: cics_handle_response* TERMINAL cics_data_value cics_handle_response*;
-cics_discard_tranclass: cics_handle_response* TRANCLASS cics_data_value cics_handle_response*;
-cics_discard_transaction: cics_handle_response* TRANSACTION cics_data_value cics_handle_response*;
-cics_discard_tsmodel: cics_handle_response* TSMODEL cics_data_value cics_handle_response*;
-cics_discard_urimap: cics_handle_response* URIMAP cics_data_value cics_handle_response*;
-cics_discard_webservice: cics_handle_response* WEBSERVICE cics_data_value cics_handle_response*;
+cics_discard: DISCARD cics_discard_body;
+cics_discard_body: cics_handle_response* (ATOMSERVICE | AUTINSTMODEL | BUNDLE | CONNECTION | DB2CONN | DB2ENTRY | DB2TRAN | DOCTEMPLATE |
+                   ENQMODEL | FILE | IPCONN | JOURNALMODEL | JOURNALNAME | JVMSERVER | LIBRARY | MQCONN | MQMONITOR | PARTNER | PIPELINE |
+                   PROCESSTYPE | PROFILE | PROGRAM | TCPIPSERVICE | TDQUEUE | TERMINAL | TRANCLASS | TRANSACTION | TSMODEL | URIMAP | WEBSERVICE) cics_data_value cics_handle_response*;
 
 /** DOCUMENT CREATE / DELETE / INSERT / RETRIEVE / SET */
 cics_document: DOCUMENT (cics_document_create | DELETE DOCTOKEN cics_data_area | cics_document_insert |

@@ -14,7 +14,12 @@
  */
 package org.eclipse.lsp.cobol.usecases;
 
+import com.google.common.collect.ImmutableMap;
+import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.usecases.common.CICSTestUtils;
+import org.eclipse.lsp4j.Diagnostic;
+import org.eclipse.lsp4j.DiagnosticSeverity;
+import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -29,7 +34,7 @@ public class TestCicsDiscard {
   private static final String DISCARD_ATOMSERVICE_VALID = "DISCARD ATOMSERVICE({$varFour})";
   private static final String DISCARD_AUTINSTMODEL_VALID = "DISCARD AUTINSTMODEL({$varFour}) RESP({$varOne})";
   private static final String DISCARD_BUNDLE_VALID = "DISCARD BUNDLE({$varFour})";
-  private static final String DISCARD_CONNECTION_VALID = "DISCARD RESP2({$varOne}) CONNECTION({$varFour})";
+  private static final String DISCARD_CONNECTION_VALID = "DISCARD RESP({$varOne}) CONNECTION({$varFour})";
   private static final String DISCARD_DB2CONN_VALID = "DISCARD DB2CONN({$varFour})";
   private static final String DISCARD_DB2ENTRY_VALID = "DISCARD DB2ENTRY({$varFour}) NOHANDLE";
   private static final String DISCARD_DB2TRAN_VALID = "DISCARD DB2TRAN({$varFour})";
@@ -47,166 +52,179 @@ public class TestCicsDiscard {
   private static final String DISCARD_PIPELINE_VALID = "DISCARD RESP({$varOne}) PIPELINE({$varFour})";
   private static final String DISCARD_PROCESSTYPE_VALID = "DISCARD PROCESSTYPE({$varFour})";
   private static final String DISCARD_PROFILE_VALID = "DISCARD PROFILE({$varFour})";
-  private static final String DISCARD_PROGRAM_VALID = "DISCARD PROGRAM({$varFour}) RESP2({$varOne})";
+  private static final String DISCARD_PROGRAM_VALID = "DISCARD PROGRAM({$varFour}) RESP({$varOne})";
   private static final String DISCARD_TCPIPSERVICE_VALID = "DISCARD TCPIPSERVICE({$varFour})";
   private static final String DISCARD_TDQUEUE_VALID = "DISCARD TDQUEUE({$varFour})";
-  private static final String DISCARD_TERMINAL_VALID = "DISCARD RESP2({$varOne}) TERMINAL({$varFour})";
+  private static final String DISCARD_TERMINAL_VALID = "DISCARD RESP({$varOne}) TERMINAL({$varFour})";
   private static final String DISCARD_TRANCLASS_VALID = "DISCARD TRANCLASS({$varFour}) NOHANDLE";
   private static final String DISCARD_TRANSACTION_VALID = "DISCARD TRANSACTION({$varFour})";
   private static final String DISCARD_TSMODEL_VALID = "DISCARD TSMODEL({$varFour})";
   private static final String DISCARD_URIMAP_VALID = "DISCARD URIMAP({$varFour})";
   private static final String DISCARD_WEBSERVICE_VALID = "DISCARD WEBSERVICE({$varFour})";
 
+  private static final String DISCARD_DUPLICATE_INVALID = "DISCARD ATOMSERVICE({$varFour}) {ATOMSERVICE|error}(ignored)";
+
   @Test
   void testDiscardAtomService() {
-    CICSTestUtils.noErrorTest(DISCARD_ATOMSERVICE_VALID);
+    CICSTestUtils.noErrorTest(DISCARD_ATOMSERVICE_VALID, "SP");
   }
 
   @Test
   void testDiscardAutInstModel() {
-    CICSTestUtils.noErrorTest(DISCARD_AUTINSTMODEL_VALID);
+    CICSTestUtils.noErrorTest(DISCARD_AUTINSTMODEL_VALID, "SP");
   }
 
   @Test
   void testDiscardBundle() {
-    CICSTestUtils.noErrorTest(DISCARD_BUNDLE_VALID);
+    CICSTestUtils.noErrorTest(DISCARD_BUNDLE_VALID, "SP");
   }
 
   @Test
   void testDiscardConnection() {
-    CICSTestUtils.noErrorTest(DISCARD_CONNECTION_VALID);
+    CICSTestUtils.noErrorTest(DISCARD_CONNECTION_VALID, "SP");
   }
 
   @Test
   void testDiscardDb2Conn() {
-    CICSTestUtils.noErrorTest(DISCARD_DB2CONN_VALID);
+    CICSTestUtils.noErrorTest(DISCARD_DB2CONN_VALID, "SP");
   }
 
   @Test
   void testDiscardDb2Entry() {
-    CICSTestUtils.noErrorTest(DISCARD_DB2ENTRY_VALID);
+    CICSTestUtils.noErrorTest(DISCARD_DB2ENTRY_VALID, "SP");
   }
 
   @Test
   void testDiscardDb2Tran() {
-    CICSTestUtils.noErrorTest(DISCARD_DB2TRAN_VALID);
+    CICSTestUtils.noErrorTest(DISCARD_DB2TRAN_VALID, "SP");
   }
 
   @Test
   void testDiscardDocTemplate() {
-    CICSTestUtils.noErrorTest(DISCARD_DOCTEMPLATE_VALID);
+    CICSTestUtils.noErrorTest(DISCARD_DOCTEMPLATE_VALID, "SP");
   }
 
   @Test
   void testDiscardEnqModel() {
-    CICSTestUtils.noErrorTest(DISCARD_ENQMODEL_VALID);
+    CICSTestUtils.noErrorTest(DISCARD_ENQMODEL_VALID, "SP");
   }
 
   @Test
   void testDiscardFile() {
-    CICSTestUtils.noErrorTest(DISCARD_FILE_VALID);
+    CICSTestUtils.noErrorTest(DISCARD_FILE_VALID, "SP");
   }
 
   @Test
   void testDiscardIpConn() {
-    CICSTestUtils.noErrorTest(DISCARD_IPCONN_VALID);
+    CICSTestUtils.noErrorTest(DISCARD_IPCONN_VALID, "SP");
   }
 
   @Test
   void testDiscardJournalModel() {
-    CICSTestUtils.noErrorTest(DISCARD_JOURNALMODEL_VALID);
+    CICSTestUtils.noErrorTest(DISCARD_JOURNALMODEL_VALID, "SP");
   }
 
   @Test
   void testDiscardJournalName() {
-    CICSTestUtils.noErrorTest(DISCARD_JOURNALNAME_VALID);
+    CICSTestUtils.noErrorTest(DISCARD_JOURNALNAME_VALID, "SP");
   }
 
   @Test
   void testDiscardJvmServer() {
-    CICSTestUtils.noErrorTest(DISCARD_JVMSERVER_VALID);
+    CICSTestUtils.noErrorTest(DISCARD_JVMSERVER_VALID, "SP");
   }
 
   @Test
   void testDiscardLibrary() {
-    CICSTestUtils.noErrorTest(DISCARD_LIBRARY_VALID);
+    CICSTestUtils.noErrorTest(DISCARD_LIBRARY_VALID, "SP");
   }
 
   @Test
   void testDiscardMqConn() {
-    CICSTestUtils.noErrorTest(DISCARD_MQCONN_VALID);
+    CICSTestUtils.noErrorTest(DISCARD_MQCONN_VALID, "SP");
   }
 
   @Test
   void testDiscardMqMonitor() {
-    CICSTestUtils.noErrorTest(DISCARD_MQMONITOR_VALID);
+    CICSTestUtils.noErrorTest(DISCARD_MQMONITOR_VALID, "SP");
   }
 
   @Test
   void testDiscardPartner() {
-    CICSTestUtils.noErrorTest(DISCARD_PARTNER_VALID);
+    CICSTestUtils.noErrorTest(DISCARD_PARTNER_VALID, "SP");
   }
 
   @Test
   void testDiscardPipeline() {
-    CICSTestUtils.noErrorTest(DISCARD_PIPELINE_VALID);
+    CICSTestUtils.noErrorTest(DISCARD_PIPELINE_VALID, "SP");
   }
 
   @Test
   void testDiscardProcessType() {
-    CICSTestUtils.noErrorTest(DISCARD_PROCESSTYPE_VALID);
+    CICSTestUtils.noErrorTest(DISCARD_PROCESSTYPE_VALID, "SP");
   }
 
   @Test
   void testDiscardProfile() {
-    CICSTestUtils.noErrorTest(DISCARD_PROFILE_VALID);
+    CICSTestUtils.noErrorTest(DISCARD_PROFILE_VALID, "SP");
   }
 
   @Test
   void testDiscardProgram() {
-    CICSTestUtils.noErrorTest(DISCARD_PROGRAM_VALID);
+    CICSTestUtils.noErrorTest(DISCARD_PROGRAM_VALID, "SP");
   }
 
   @Test
   void testDiscardTcpIpService() {
-    CICSTestUtils.noErrorTest(DISCARD_TCPIPSERVICE_VALID);
+    CICSTestUtils.noErrorTest(DISCARD_TCPIPSERVICE_VALID, "SP");
   }
 
   @Test
   void testDiscardTdQueue() {
-    CICSTestUtils.noErrorTest(DISCARD_TDQUEUE_VALID);
+    CICSTestUtils.noErrorTest(DISCARD_TDQUEUE_VALID, "SP");
   }
 
   @Test
   void testDiscardTerminal() {
-    CICSTestUtils.noErrorTest(DISCARD_TERMINAL_VALID);
+    CICSTestUtils.noErrorTest(DISCARD_TERMINAL_VALID, "SP");
   }
 
   @Test
   void testDiscardTransClass() {
-    CICSTestUtils.noErrorTest(DISCARD_TRANCLASS_VALID);
+    CICSTestUtils.noErrorTest(DISCARD_TRANCLASS_VALID, "SP");
   }
 
   @Test
   void testDiscardTransaction() {
-    CICSTestUtils.noErrorTest(DISCARD_TRANSACTION_VALID);
+    CICSTestUtils.noErrorTest(DISCARD_TRANSACTION_VALID, "SP");
   }
 
   @Test
   void testDiscardTsmodel() {
-    CICSTestUtils.noErrorTest(DISCARD_TSMODEL_VALID);
+    CICSTestUtils.noErrorTest(DISCARD_TSMODEL_VALID, "SP");
   }
 
   @Test
   void testDiscardUrimap() {
-    CICSTestUtils.noErrorTest(DISCARD_URIMAP_VALID);
+    CICSTestUtils.noErrorTest(DISCARD_URIMAP_VALID, "SP");
   }
 
   @Test
   void testDiscardWebservice() {
-    CICSTestUtils.noErrorTest(DISCARD_WEBSERVICE_VALID);
+    CICSTestUtils.noErrorTest(DISCARD_WEBSERVICE_VALID, "SP");
   }
 
-
+  @Test
+  void testDiscardDuplicate() {
+    CICSTestUtils.errorTest(DISCARD_DUPLICATE_INVALID, ImmutableMap.of(
+        "error",
+            new Diagnostic(
+                    new Range(),
+                    "Extraneous input ATOMSERVICE",
+                    DiagnosticSeverity.Error,
+                    ErrorSource.PARSING.getText()
+            )
+    ),  "SP");
+  }
 
 }
