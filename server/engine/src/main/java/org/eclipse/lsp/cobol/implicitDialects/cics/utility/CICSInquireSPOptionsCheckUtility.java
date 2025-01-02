@@ -1015,6 +1015,7 @@ public class CICSInquireSPOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
                                 bundlepartContext.BUNDLE(), bundlepartContext, "BUNDLE with START");
                     else checkHasIllegalOptions(bundlepartContext.BUNDLE(), "BUNDLE with END");
                     checkBrowsingInvalidOptions(bundlepartContext, CICSParser.BUNDLEPART, CICSParser.BUNDLE);
+                    checkBrowsingHasNotParameter(bundlepartContext, CICSParser.BUNDLEPART);
                 } else checkStatementHasParameter(bundlepartContext, CICSParser.BUNDLEPART);
                 break;
 

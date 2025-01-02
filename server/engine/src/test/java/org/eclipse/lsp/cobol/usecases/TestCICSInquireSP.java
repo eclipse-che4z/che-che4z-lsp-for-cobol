@@ -203,6 +203,21 @@ public class TestCICSInquireSP {
 
     private static final String BUNDLEPART_INVALID = "INQUIRE {_BUNDLEPART(1) BUNDLE(1)|errorOne_}";
 
+    private static final String BUNDLEPART_BROWSE_WITH_PARAM_INVALID = "INQUIRE BUNDLEPART{(1)|errorOne} START BUNDLE(1)";
+
+    @Test
+    void testInvalidBundlepartBrowseWithParam() {
+        Map<String, Diagnostic> expectedDiagnostics =
+                ImmutableMap.of(
+                        "errorOne",
+                        new Diagnostic(
+                                new Range(),
+                                "Invalid option or parameter provided: Parameter usage when browsing with START or END",
+                                DiagnosticSeverity.Error,
+                                ErrorSource.PARSING.getText()));
+        CICSTestUtils.errorTest(BUNDLEPART_BROWSE_WITH_PARAM_INVALID, expectedDiagnostics, "SP");
+    }
+
     @Test
     void testInvalidBundlepartBrowseOnly() {
         Map<String, Diagnostic> expectedDiagnostics =
