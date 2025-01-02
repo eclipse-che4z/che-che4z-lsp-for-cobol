@@ -105,5 +105,11 @@ public class CICSVerifyOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     checkHasMandatoryOptions(ctx.TOKENLEN(), ctx, "TOKENLEN");
     checkHasExactlyOneOption("TOKENTYPE or BASICAUTH or JWT or KERBEROS", ctx, ctx.TOKENTYPE(), ctx.BASICAUTH(), ctx.JWT(), ctx.KERBEROS());
     checkHasMutuallyExclusiveOptions("BIT or DATATYPE or BASE64", ctx.BIT(), ctx.DATATYPE(), ctx.BASE64());
+    if (!ctx.OUTTOKENLEN().isEmpty()) {
+      checkHasMandatoryOptions(ctx.OUTTOKEN(), ctx, "OUTTOKEN");
+    }
+    if (!ctx.OUTTOKEN().isEmpty()) {
+      checkHasMandatoryOptions(ctx.OUTTOKENLEN(), ctx, "OUTTOKENLEN");
+    }
   }
 }

@@ -56,6 +56,12 @@ public class TestCICSVerify {
   private static final String VERIFY_TOKEN_INVALID_THREE =
           "VERIFY TOKEN({$varOne}) TOKENLEN({$varTwo}) JWT {DATATYPE|errorOne}({$varTwo}) {BIT|errorTwo} {BASE64|errorThree}";
 
+  private static final String VERIFY_TOKEN_INVALID_FOUR =
+          "VERIFY {_TOKEN({$varOne}) TOKENLEN({$varTwo}) OUTTOKENLEN({$varTwo}) JWT|errorOne_}";
+
+  private static final String VERIFY_TOKEN_INVALID_FIVE =
+          "VERIFY {_TOKEN({$varOne}) TOKENLEN({$varTwo}) OUTTOKEN({$varTwo}) JWT|errorOne_}";
+
   @Test
   void testVerifyPasswordValid() {
     CICSTestUtils.noErrorTest(VERIFY_PASSWORD_VALID);
@@ -161,6 +167,32 @@ public class TestCICSVerify {
                     new Diagnostic(
                             new Range(),
                             "Exactly one option required, options are mutually exclusive: BIT or DATATYPE or BASE64",
+                            DiagnosticSeverity.Error,
+                            ErrorSource.PARSING.getText())));
+  }
+
+  @Test
+  void testVerifyTokenInvalidFour() {
+    CICSTestUtils.errorTest(
+            VERIFY_TOKEN_INVALID_FOUR,
+            ImmutableMap.of(
+                    "errorOne",
+                    new Diagnostic(
+                            new Range(),
+                            "Missing required option: OUTTOKEN",
+                            DiagnosticSeverity.Error,
+                            ErrorSource.PARSING.getText())));
+  }
+
+  @Test
+  void testVerifyTokenInvalidFive() {
+    CICSTestUtils.errorTest(
+            VERIFY_TOKEN_INVALID_FIVE,
+            ImmutableMap.of(
+                    "errorOne",
+                    new Diagnostic(
+                            new Range(),
+                            "Missing required option: OUTTOKENLEN",
                             DiagnosticSeverity.Error,
                             ErrorSource.PARSING.getText())));
   }
