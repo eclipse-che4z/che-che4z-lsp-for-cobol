@@ -56,7 +56,7 @@ public class TestCICSReset {
             ImmutableMap.of(
                     "errorOne",
                     new Diagnostic(
-                            new Range(new Position(14, 12), new Position(12, 17)),
+                            new Range(new Position(14, 12), new Position(14, 12)),
                             "Missing required option: ACQPROCESS",
                             DiagnosticSeverity.Error,
                             ErrorSource.PARSING.getText())));

@@ -34,7 +34,6 @@ public class CICSResetOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
   private static final Map<Integer, ErrorSeverity> DUPLICATE_CHECK_OPTIONS =
           new HashMap<Integer, ErrorSeverity>() {
             {
-              put(CICSLexer.RESET, ErrorSeverity.ERROR);
               put(CICSLexer.ACQPROCESS, ErrorSeverity.ERROR);
               put(CICSLexer.ACTIVITY, ErrorSeverity.ERROR);
             }
