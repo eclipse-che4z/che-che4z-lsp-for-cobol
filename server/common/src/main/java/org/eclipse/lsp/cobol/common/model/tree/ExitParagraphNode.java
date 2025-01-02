@@ -22,6 +22,6 @@ import org.eclipse.lsp.cobol.common.model.NodeType;
 @ToString(callSuper = true)
 public class ExitParagraphNode extends Node {
   public ExitParagraphNode(Locality location) {
-    super(location, NodeType.EXIT_SECTION);
+    super(location, NodeType.EXIT_PARAGRAPH);
   }
 }

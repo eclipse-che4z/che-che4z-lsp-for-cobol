@@ -77,6 +77,6 @@ public class TestIssueWithEmbeddedCodePresentInCopybook {
                 new Range(),
                 "No viable alternative at input for detch",
                 DiagnosticSeverity.Error,
-                ErrorSource.PARSING.getText())));
+                ErrorSource.PREPROCESSING.getText())));
   }
 }

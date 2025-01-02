@@ -29,7 +29,6 @@ import org.eclipse.lsp4j.Range;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Error Listener
@@ -64,7 +63,7 @@ public class Db2ErrorListener extends BaseErrorListener {
 
     SyntaxError error =
         SyntaxError.syntaxError()
-            .errorSource(ErrorSource.PARSING)
+            .errorSource(ErrorSource.PREPROCESSING)
             .location(
                 Locality.builder()
                     .uri(uri)
@@ -75,7 +74,7 @@ public class Db2ErrorListener extends BaseErrorListener {
                                 line - 1 + offendingSymbolRelativeLine,
                                 offendingSymbolRelativeLine == 0
                                     ? charPositionInLine + offendingSymbolSize
-                                    : offendingSymbolSize - 1)))
+                                    : offendingSymbolSize)))
                     .build()
                     .toOriginalLocation())
             .suggestion(msg)
@@ -86,11 +85,13 @@ public class Db2ErrorListener extends BaseErrorListener {
   }
 
   private int getOffendingSymbolSize(Object offendingSymbol) {
-    return Optional.ofNullable(offendingSymbol)
-        .filter(t -> t instanceof CommonToken)
-        .map(CommonToken.class::cast)
-        .map(token -> token.getStopIndex() - token.getStartIndex() + 1)
-        .orElse(0);
+      if (offendingSymbol instanceof CommonToken) {
+          CommonToken token = (CommonToken) offendingSymbol;
+          return  token.getStartIndex() != -1
+                  ? token.getStopIndex() - token.getStartIndex() + 1
+                  : 0;
+      }
+      return 0;
   }
 
   private int getOffendingSymbolSize(String offendingSymbol) {
