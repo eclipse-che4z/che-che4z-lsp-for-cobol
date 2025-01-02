@@ -29,6 +29,9 @@ import org.junit.jupiter.api.Test;
  * <p>This class tests the POINT command.
  */
 public class TestCICSPoint {
+  private static final String POINT_VALID =
+          "POINT";
+
   private static final String POINT_VALID_CONVID =
           "POINT CONVID({$varOne})";
 
@@ -40,6 +43,11 @@ public class TestCICSPoint {
 
   private static final String POINT_INVALID_BOTH_OPTIONS =
           "POINT {CONVID|errorOne}({$varOne}) {SESSION|errorTwo}({$varTwo})";
+
+  @Test
+  void testPointValid() {
+    CICSTestUtils.noErrorTest(POINT_VALID);
+  }
 
   @Test
   void testPointValidConvid() {
