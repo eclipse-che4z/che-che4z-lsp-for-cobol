@@ -38,9 +38,6 @@ public abstract class MessageServiceParser extends Parser {
    * Extend the functionality of {@link org.eclipse.lsp.cobol.common.message.MessageService} for
    * {@link CICSParser}
    *
-   * <p>Example: notifyError("db2SqlParser.validValueMsg", input, value); would notify errorListener
-   * with the externalized messages.
-   *
    * @param messageId Unique ID for each message in externalized message file.
    * @param parameters Arguments referenced by the format specifiers in the format string in
    *     externalized message file.

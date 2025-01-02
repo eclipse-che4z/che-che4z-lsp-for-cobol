@@ -25,11 +25,9 @@ import org.junit.jupiter.api.Test;
 
 /** Test that tokens are not skipped for embedded language. */
 public class TestEmbeddedCodeWithIssueOnLastToken {
-  private static final String ISSUE_1 = "           :testing,|1_}\n" + "           END-EXEC.";
   private static final String ISSUE_2 = "           :{$testing}{(|1}\n" + "           END-EXEC.";
   private static final String NO_ISSUE = "           :{$testing}\n" + "           END-EXEC.";
   private static final String FETCH_STMT_START = "           fetch abc \n";
-  private static final String FETCH_STMT_START_ISSUE_1 = "           fetch {_abc \n";
   private static final String TEXT_HEAD =
       "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID. TEST12.\n"
@@ -43,18 +41,33 @@ public class TestEmbeddedCodeWithIssueOnLastToken {
       "           into \n" + "           asas,\n" + "           ajsjs, \n";
   public static final String TEXT = TEXT_HEAD + FETCH_STMT_START + TEXT_TAIL;
 
+  private static final String TEXT_DONT_EAT_EMB_TOKEN =
+          "       IDENTIFICATION DIVISION.\n"
+          + "       PROGRAM-ID. TEST12.\n"
+          + "       ENVIRONMENT DIVISION.\n"
+          + "       DATA DIVISION.\n"
+          + "       WORKING-STORAGE SECTION.\n"
+          + "       01 {$*testing} pic x.\n"
+          + "       PROCEDURE DIVISION.\n"
+          + "           EXEC SQL \n"
+          + "           fetch {_abc \n"
+          + "           into \n"
+          + "           asas,\n"
+          + "           ajsjs,\n"
+          + "           :testing,|1_}\n"
+          + "           END-EXEC.";
   @Test
   void testCobolParserDontEatEmbeddedToken() {
     UseCaseEngine.runTest(
-        TEXT_HEAD + FETCH_STMT_START_ISSUE_1 + TEXT_TAIL + ISSUE_1,
+            TEXT_DONT_EAT_EMB_TOKEN,
         ImmutableList.of(),
         ImmutableMap.of(
             "1",
             new Diagnostic(
                 new Range(),
-                "No viable alternative at input abc\n           into\n           asas, \n           ajsjs, \n           :testing, ",
+                "No viable alternative at input abc\n           into\n           asas, \n           ajsjs, \n           :testing,",
                 DiagnosticSeverity.Error,
-                ErrorSource.PARSING.getText())));
+                ErrorSource.PREPROCESSING.getText())));
   }
 
   @Test
@@ -68,7 +81,7 @@ public class TestEmbeddedCodeWithIssueOnLastToken {
                 new Range(),
                 "No viable alternative at input (",
                 DiagnosticSeverity.Error,
-                ErrorSource.PARSING.getText())));
+                ErrorSource.PREPROCESSING.getText())));
   }
 
   @Test
