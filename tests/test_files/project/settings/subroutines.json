@@ -1,3 +1,6 @@
 {
-    "cobol-lsp.subroutine-manager.paths-local": ["subroutines"]
+    "cobol-lsp.subroutine-manager.paths-local": [
+        "nonexisting/subroutines/folder",
+        "subroutines"
+    ]
 }

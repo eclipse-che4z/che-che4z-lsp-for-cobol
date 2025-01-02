@@ -69,7 +69,7 @@ class ExtendedDocumentTest {
   void testOneLineCopybook() {
     copybook = new ExtendedText(ONE_LINE_COPY, copybookUri);
 
-    Range statementRange = new Range(new Position(4, 8), new Position(4, 15));
+    Range statementRange = new Range(new Position(4, 8), new Position(4, 16));
     document.insertCopybook(statementRange, copybook);
     assertEquals("        IDENTIFICATION DIVISION.\n"
         + "        PROGRAM-ID. test1.\n"
