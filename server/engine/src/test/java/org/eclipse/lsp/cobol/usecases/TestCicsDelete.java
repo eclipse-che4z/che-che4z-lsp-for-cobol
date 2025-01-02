@@ -14,8 +14,11 @@
  */
 package org.eclipse.lsp.cobol.usecases;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
+import org.eclipse.lsp.cobol.test.CobolText;
+import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.eclipse.lsp.cobol.usecases.common.CICSTestUtils;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
@@ -69,7 +72,7 @@ public class TestCicsDelete {
 
   private static final String GROUP_ONE_PARTIAL_OPTIONS_VALID_TEN = "DELETE FILE({$varFour}) NOSUSPEND RRN";
 
-  private static final String GROUP_TWO_ACTIVITY_INVALID = "DELETE {ACTIVITY(123)|error1|error2}";
+  private static final String GROUP_TWO_ACTIVITY_INVALID = "DELETE {ACTIVITY(123)|error1}";
 
   private static final String GROUP_TWO_CHANNEL_VALID = "DELETE CHANNEL({$varFour})";
 
@@ -77,17 +80,17 @@ public class TestCicsDelete {
 
   private static final String GROUP_TWO_TIMER_VALID = "DELETE TIMER({$varFour})";
 
-  private static final String GROUP_THREE_CONTAINER_BTS_VALID = "DELETE CONTAINER({$varFour}) RETCODE({$varOne})";
+  private static final String GROUP_THREE_CONTAINER_BTS_VALID = "DELETE CONTAINER({$varFour})";
 
-  private static final String GROUP_THREE_CONTAINER_BTS_ACTIVITY_VALID = "DELETE CONTAINER({$varFour}) ACTIVITY({$varFive}) RETCODE({$varOne})";
+  private static final String GROUP_THREE_CONTAINER_BTS_ACTIVITY_VALID = "DELETE CONTAINER({$varFour}) ACTIVITY({$varFive})";
 
-  private static final String GROUP_THREE_CONTAINER_BTS_ACQACTIVITY_VALID = "DELETE CONTAINER({$varFour}) ACQACTIVITY RETCODE({$varOne})";
+  private static final String GROUP_THREE_CONTAINER_BTS_ACQACTIVITY_VALID = "DELETE CONTAINER({$varFour}) ACQACTIVITY";
 
-  private static final String GROUP_THREE_CONTAINER_BTS_PROCESS_VALID = "DELETE CONTAINER({$varFour}) PROCESS RETCODE({$varOne})";
+  private static final String GROUP_THREE_CONTAINER_BTS_PROCESS_VALID = "DELETE CONTAINER({$varFour}) PROCESS";
 
-  private static final String GROUP_THREE_CONTAINER_BTS_ACQPROCESS_VALID = "DELETE CONTAINER({$varFour}) ACQPROCESS RETCODE({$varOne})";
+  private static final String GROUP_THREE_CONTAINER_BTS_ACQPROCESS_VALID = "DELETE CONTAINER({$varFour}) ACQPROCESS ";
 
-  private static final String GROUP_THREE_CONTAINER_CHANNEL_VALID = "DELETE CONTAINER({$varFour}) CHANNEL({$varSix}) RETCODE({$varOne})";
+  private static final String GROUP_THREE_CONTAINER_CHANNEL_VALID = "DELETE CONTAINER({$varFour}) CHANNEL({$varSix})";
 
   private static final String GROUP_FOUR_DELETE_COUNTER_VALID = "DELETE COUNTER({$varFour})";
 
@@ -251,12 +254,6 @@ public class TestCicsDelete {
                             new Range(),
                             "Missing required option: CONTAINER",
                             DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText()),
-                    "error2",
-                    new Diagnostic(
-                            new Range(),
-                            "Missing required option: RETCODE",
-                            DiagnosticSeverity.Error,
                             ErrorSource.PARSING.getText()));
     CICSTestUtils.errorTest(GROUP_TWO_ACTIVITY_INVALID, expectedDiagnostic);
   }
@@ -376,5 +373,71 @@ public class TestCicsDelete {
                             DiagnosticSeverity.Error,
                             ErrorSource.PARSING.getText()));
     CICSTestUtils.errorTest(GROUP_FOUR_COUNTER_DCOUNTER_POOL_NOSUSPEND_INVALID, expectedDiagnostic);
+  }
+
+  @Test
+  void test_withCopyStatements() {
+    String text =
+        "       IDENTIFICATION DIVISION.\n"
+            + "       PROGRAM-ID. ABCDEF.\n"
+            + "       DATA DIVISION.\n"
+            + "       WORKING-STORAGE SECTION.\n"
+            + "       copy {~abc}.\n"
+            + "       PROCEDURE DIVISION.\n"
+            + "           EXEC CICS DELETE {_ACTIVITY(123)|error1_}\n"
+            + "           END-EXEC.";
+    String copybookText =
+        "       01 {$*varOne}   PIC S9 VALUE +10.\n"
+            + "       01 {$*varTwo}   PIC S9 VALUE +100.\n"
+            + "       01 {$*varThree} PIC S9 VALUE +1000.\n"
+            + "       01 {$*varFour}  PIC X VALUE 'NAME_ONE'.\n"
+            + "       01 {$*varFive}  PIC X VALUE 'NAME_TWO'.\n"
+            + "       01 {$*varSix}   PIC X VALUE 'NAME_THREE'.";
+    UseCaseEngine.runTest(
+        text,
+        ImmutableList.of(new CobolText("ABC", copybookText)),
+        ImmutableMap.of("error1",
+                new Diagnostic(
+                        new Range(),
+                        "Missing required option: CONTAINER",
+                        DiagnosticSeverity.Error,
+                        ErrorSource.PARSING.getText())));
+  }
+
+  @Test
+  void test_withCopyStatements_when_exec_block_in_copybook() {
+    String text =
+        "       IDENTIFICATION DIVISION.\n"
+            + "       PROGRAM-ID. ABCDEF.\n"
+            + "       DATA DIVISION.\n"
+            + "       WORKING-STORAGE SECTION.\n"
+            + "       copy {~abc}.\n"
+            + "       PROCEDURE DIVISION.\n"
+            + "       {_copy {~abcd}.|error_main_}";
+    String copybookText =
+            "       01 {$*varOne}   PIC S9 VALUE +10.\n"
+                    + "       01 {$*varTwo}   PIC S9 VALUE +100.\n"
+                    + "       01 {$*varThree} PIC S9 VALUE +1000.\n"
+                    + "       01 {$*varFour}  PIC X VALUE 'NAME_ONE'.\n"
+                    + "       01 {$*varFive}  PIC X VALUE 'NAME_TWO'.\n"
+                    + "       01 {$*varSix}   PIC X VALUE 'NAME_THREE'.";
+
+    String execTextInCopybook = "           EXEC CICS DELETE {_ACTIVITY(123)|error1_}\n"
+            + "           END-EXEC.";
+    UseCaseEngine.runTest(
+            text,
+            ImmutableList.of(new CobolText("ABC", copybookText), new CobolText("ABCD", execTextInCopybook)),
+            ImmutableMap.of("error_main",
+                    new Diagnostic(
+                            new Range(),
+                            "Errors inside the copybook",
+                            DiagnosticSeverity.Error,
+                            ErrorSource.COPYBOOK.getText()),
+                    "error1",
+                    new Diagnostic(
+                            new Range(),
+                            "Missing required option: CONTAINER",
+                            DiagnosticSeverity.Error,
+                            ErrorSource.PARSING.getText())));
   }
 }
