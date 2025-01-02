@@ -214,8 +214,8 @@ public class CICSOptionsCheckUtility {
         CICSResetOptionsCheckUtility.RULE_INDEX,
         new CICSResetOptionsCheckUtility(context, errors));
     spOptionsMap.put(
-         CICSInquireSPOptionsCheckUtility.RULE_INDEX,
-         new CICSInquireSPOptionsCheckUtility(context, errors));
+        CICSInquireSPOptionsCheckUtility.RULE_INDEX,
+        new CICSInquireSPOptionsCheckUtility(context, errors));
   }
 
     /**

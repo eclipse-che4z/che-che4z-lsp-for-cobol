@@ -683,8 +683,8 @@ cics_remove: REMOVE (SUBEVENT cics_data_value | EVENT cics_data_value | cics_han
 
 /** RESET ACQPROCESS / RESET ACTIVITY */
 cics_reset: RESET (cics_reset_acqprocess | cics_reset_activity);
-cics_reset_acqprocess: (ACQPROCESS | cics_handle_response)*;
-cics_reset_activity: (ACTIVITY cics_data_value | cics_handle_response)*;
+cics_reset_acqprocess: (ACQPROCESS | cics_handle_response)+;
+cics_reset_activity: (ACTIVITY cics_data_value | cics_handle_response)+;
 
 /** RESETBR */
 cics_resetbr: RESETBR cics_file_name (RIDFLD cics_data_area | KEYLENGTH cics_data_value | GENERIC | REQID cics_data_value |
