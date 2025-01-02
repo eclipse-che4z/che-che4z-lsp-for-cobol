@@ -68,7 +68,7 @@ public class VariableUsageNode extends Node implements DefinedAndUsedStructure, 
    * @param definition the definition node
    */
   public void addDefinition(VariableNode definition) {
-    definitions.add(definition);
+      definitions.add(definition);
   }
 
   public Optional<VariableNode> getDefinition() {

@@ -156,15 +156,11 @@ classRepositoryClause
     ;
 
 functionRepositoryClause
-    : functionReference | intrinsicClause
+    : FUNCTION (functionName+ INTRINSIC? | ALL INTRINSIC)
     ;
 
 functionReference
     : FUNCTION functionName
-    ;
-
-intrinsicClause
-    : (functionName* | ALL) INTRINSIC
     ;
 
 // - source computer paragraph ----------------------------------
@@ -1325,8 +1321,12 @@ freeStatement
 // exit statement
 
 exitStatement
-   : EXIT (PROGRAM | SECTION | PARAGRAPH | PERFORM CYCLE? | METHOD)?
+   : EXIT (PROGRAM | SECTION | PARAGRAPH | exitPerform | METHOD)?
    ;
+
+exitPerform
+    : PERFORM CYCLE?
+    ;
 
 // generate statement
 
@@ -2188,8 +2188,10 @@ length
    ;
 
 argument
-   : arithmeticExpression
-   | TRAILING | LEADING
+   : ALL
+   | arithmeticExpression
+   | TRAILING
+   | LEADING
    ;
 
 // qualified data name ----------------------------------
@@ -2199,12 +2201,13 @@ qualifiedDataName
    ;
 
 tableCall
-   : LPARENCHAR (ALL | arithmeticExpression) (COMMACHAR? (ALL | arithmeticExpression))* RPARENCHAR
+   : LPARENCHAR argument (COMMACHAR? argument)* RPARENCHAR
    ;
 
 specialRegister
    : ADDRESS OF generalIdentifier
-   | LENGTH OF? generalIdentifier | LINAGE_COUNTER
+   | LENGTH OF? generalIdentifier
+   | LINAGE_COUNTER
    ;
 
 // in ----------------------------------

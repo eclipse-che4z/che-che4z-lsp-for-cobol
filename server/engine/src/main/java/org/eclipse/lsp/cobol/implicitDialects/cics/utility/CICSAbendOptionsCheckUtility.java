@@ -37,8 +37,8 @@ public class CICSAbendOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
                 {
                     put(CICSLexer.ABEND, ErrorSeverity.ERROR);
                     put(CICSLexer.ABCODE, ErrorSeverity.ERROR);
-                    put(CICSLexer.CANCEL, ErrorSeverity.ERROR);
-                    put(CICSLexer.NODUMP, ErrorSeverity.ERROR);
+                    put(CICSLexer.CANCEL, ErrorSeverity.WARNING);
+                    put(CICSLexer.NODUMP, ErrorSeverity.WARNING);
                 }
             };
 
