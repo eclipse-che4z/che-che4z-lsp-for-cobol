@@ -1379,28 +1379,29 @@ dbs_select_statement_skip_locked_data: SKIPCHAR LOCKED DATA;
 
 
 ///////////////// DBS EXPRESSION STARTS/////////////
-dbs_expression: (PLUSCHAR | MINUSCHAR)? (dbs_function_invocation |
- LPARENCHAR dbs_expressions RPARENCHAR  |
- dbs_constant |
- dbs_column_name |
- dbs_special_register |
- dbs_scalar_fullselect |
- dbs_time_zone_specific_expression |
- dbs_labeled_duration |
- dbs_case_expression |
- dbs_cast_specification |
- dbs_XMLCAST_specification |
- dbs_XMLQUERY_func|
- dbs_array_element_specification |
- dbs_array_constructor |
- dbs_OLAP_specification |
- dbs_row_change_expression |
- dbs_sequence_reference |
- dbs_host_variable);
+dbs_expression: dbs_function_invocation
+ | dbs_constant
+ | dbs_column_name
+ | dbs_special_register
+ | dbs_scalar_fullselect
+ | dbs_time_zone_specific_expression
+ | dbs_labeled_duration
+ | dbs_case_expression
+ | dbs_cast_specification
+ | dbs_XMLCAST_specification
+ | dbs_XMLQUERY_func
+ | dbs_array_element_specification
+ | dbs_array_constructor
+ | dbs_OLAP_specification
+ | dbs_row_change_expression
+ | dbs_sequence_reference
+ | dbs_host_variable
+ | (PLUSCHAR | MINUSCHAR) dbs_expression
+ | LPARENCHAR dbs_expressions RPARENCHAR  ;
 
 dbs_expression_operator: (CONCAT | PIPECHAR | PIPECHAR2 | SLASHCHAR | ASTERISKCHAR | PLUSCHAR | MINUSCHAR);
 
-dbs_expressions: (dbs_expression| LPARENCHAR dbs_expressions RPARENCHAR) (dbs_expression_operator dbs_expression)* (AS common_built_in_type_core)?;
+dbs_expressions: dbs_expression (dbs_expression_operator dbs_expression)* (AS common_built_in_type_core)?;
 //https://www.ibm.com/support/knowledgecenter/SSEPEK_12.0.0/sqlref/src/tpc/db2z_predicatesoverview.html
 dbs_predicate_condition: (EQUALCHAR | ERRORCHAR EQUALCHAR | LESSTHANCHAR | MORETHANCHAR | MORETHANOREQUAL | LESSTHANOREQUAL | NOTEQUALCHAR);
 dbs_basic_predicate: dbs_expressions dbs_predicate_condition dbs_expressions | dbs_expressions IS NULL;
