@@ -906,9 +906,7 @@ fragment STRINGLITERAL :
 	| '\'' (~['\n\r] | '\'\'' | '"')* '\''
 ;
 
-fragment
- OCT_DIGIT        : [0-9] ;
- fragment DIGIT: OCT_DIGIT | [9];
+ fragment DIGIT: [0-9];
  // case insensitive chars
  fragment A:('a'|'A');
  fragment B:('b'|'B');
