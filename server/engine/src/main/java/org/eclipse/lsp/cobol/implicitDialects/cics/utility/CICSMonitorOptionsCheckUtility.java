@@ -34,7 +34,6 @@ public class CICSMonitorOptionsCheckUtility extends CICSOptionsCheckBaseUtility 
   private static final Map<Integer, ErrorSeverity> DUPLICATE_CHECK_OPTIONS =
           new HashMap<Integer, ErrorSeverity>() {
             {
-              put(CICSLexer.MONITOR, ErrorSeverity.ERROR);
               put(CICSLexer.POINT, ErrorSeverity.ERROR);
               put(CICSLexer.DATA1, ErrorSeverity.ERROR);
               put(CICSLexer.DATA2, ErrorSeverity.ERROR);

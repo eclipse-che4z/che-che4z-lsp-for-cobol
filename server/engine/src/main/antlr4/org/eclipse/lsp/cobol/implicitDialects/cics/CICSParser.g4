@@ -558,7 +558,7 @@ cics_load: LOAD (PROGRAM cics_name | SET cics_ref | LENGTH cics_data_area | FLEN
 
 /** MONITOR */
 cics_monitor: MONITOR cics_monitor_options;
-cics_monitor_options: (POINT cics_data_value | (DATA1 | DATA2 | ENTRYNAME) cics_data_area | cics_handle_response)*;
+cics_monitor_options: (POINT cics_data_value | (DATA1 | DATA2 | ENTRYNAME) cics_data_area | cics_handle_response)+;
 
 /** MOVE CONTAINER (both) */
 cics_move: MOVE cics_handle_response? CONTAINER cics_data_value cics_handle_response? AS cics_data_value cics_handle_response? (cics_move_bts | cics_move_channel);
