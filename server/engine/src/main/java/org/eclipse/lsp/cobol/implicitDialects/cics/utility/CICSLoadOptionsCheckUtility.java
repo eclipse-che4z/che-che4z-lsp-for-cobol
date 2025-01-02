@@ -34,7 +34,6 @@ public class CICSLoadOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
   private static final Map<Integer, ErrorSeverity> DUPLICATE_CHECK_OPTIONS =
           new HashMap<Integer, ErrorSeverity>() {
             {
-              put(CICSLexer.LOAD, ErrorSeverity.ERROR);
               put(CICSLexer.PROGRAM, ErrorSeverity.ERROR);
               put(CICSLexer.SET, ErrorSeverity.ERROR);
               put(CICSLexer.LENGTH, ErrorSeverity.ERROR);
