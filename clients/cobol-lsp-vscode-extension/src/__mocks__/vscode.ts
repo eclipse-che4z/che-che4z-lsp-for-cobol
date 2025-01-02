@@ -51,6 +51,7 @@ export namespace workspace {
   export function onDidChangeConfiguration() {}
   export const textDocuments = [];
   export function getWorkspaceFolder() {}
+  export async function findFiles() {}
 }
 
 // eslint-disable-next-line @typescript-eslint/no-namespace
@@ -215,3 +216,7 @@ export const FileSystemError = {
     return new FileNotFound();
   },
 };
+
+export const RelativePattern = jest
+  .fn()
+  .mockImplementation((base: string, pattern: string) => ({ base, pattern }));

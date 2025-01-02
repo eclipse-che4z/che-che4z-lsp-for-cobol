@@ -58,7 +58,7 @@ public class TestDb2ExecBlockWithoutEndExec {
                     + "       PROCEDURE DIVISION .\n"
                     + "           EXEC SQL \n"
                     + "               SELECT DIAG_CODE FROM DIAG_CODES WHERE COPAY > 100;\n"
-                    + "       {|1}A.\n"
+                    + "       {|1}{#*A}.\n"
                     + "               DISPLAY {A|2}.\n";
 
     @Test
@@ -120,7 +120,7 @@ public class TestDb2ExecBlockWithoutEndExec {
                     + "       PROCEDURE DIVISION .\n"
                     + "           EXEC SQL \n"
                     + "               SELECT DIAG_CODE FROM DIAG_CODES WHERE COPAY > 100\n"
-                    + "       {|1}A.\n"
+                    + "       {|1}{#*A}.\n"
                     + "               DISPLAY {A|2}.\n";
     @Test
     void testEndByParagraph() {
