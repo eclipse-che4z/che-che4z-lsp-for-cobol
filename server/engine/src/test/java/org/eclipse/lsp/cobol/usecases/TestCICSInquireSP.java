@@ -44,14 +44,14 @@ public class TestCICSInquireSP {
 
     private static Stream<String> getValidOptions() {
         return Stream.of(
-                "ASSOCIATION({$varOne}) CLNTIPFAMILY({$varOne})",
+                "ASSOCIATION({$varOne}) CLNTIPFAMILY({$varOne}) ODCLNTIPADDR({$varOne})",
                 "ASSOCIATION LIST LISTSIZE({$varOne}) DNAME({$varOne}) DNAMELEN({$varOne}) REALM({$varOne}) REALMLEN({$varOne}) USERCORRDATA({$varOne}) SET({$varOne})",
                 "ATOMSERVICE({$varOne}) ATOMTYPE({$varOne}) CHANGEAGENT({$varOne}) ENABLESTATUS({$varOne}) INSTALLAGENT({$varOne}) RESOURCETYPE({$varOne}) BINDFILE({$varOne}) CHANGEAGREL({$varOne}) CHANGETIME({$varOne}) CHANGEUSRID({$varOne}) CONFIGFILE({$varOne}) DEFINESOURCE({$varOne}) DEFINETIME({$varOne}) INSTALLTIME({$varOne}) INSTALLUSRID({$varOne}) RESOURCENAME({$varOne}) URIMAP({$varOne}) XMLTRANSFORM({$varOne})",
                 "AUTINSTMODEL({$varOne})",
                 "AUTOINSTALL AIBRIDGE({$varOne}) CONSOLES({$varOne}) ENABLESTATUS({$varOne}) CURREQS({$varOne}) MAXREQS({$varOne}) PROGRAM({$varOne})",
-                "BRFACILITY({$varOne}) KEEPTIME({$varOne}) LINKSYSTEM({$varOne}) LINKSYSNET({$varOne}) NETNAME({$varOne}) REMOTESYSNET({$varOne}) REMOTESYSTEM({$varOne}) TASKID({$varOne}) TERMID({$varOne}) TRANSACTION({$varOne}) NAMESPACE({$varOne}) TERMSTATUS({$varOne})",
+                "BRFACILITY({$varOne}) USERID({$varOne}) KEEPTIME({$varOne}) LINKSYSTEM({$varOne}) LINKSYSNET({$varOne}) NETNAME({$varOne}) REMOTESYSNET({$varOne}) REMOTESYSTEM({$varOne}) TASKID({$varOne}) TERMID({$varOne}) TRANSACTION({$varOne}) NAMESPACE({$varOne}) TERMSTATUS({$varOne})",
                 "BUNDLE({$varOne}) BUNDLEID({$varOne}) MAJORVERSION({$varOne}) MGMTPART({$varOne}) MICROVERSION({$varOne}) MINORVERSION({$varOne}) AVAILSTATUS({$varOne}) CHANGEAGENT({$varOne}) ENABLESTATUS({$varOne}) INSTALLAGENT({$varOne}) BASESCOPE({$varOne}) BUNDLEDIR({$varOne}) CHANGEAGREL({$varOne}) CHANGETIME({$varOne}) CHANGEUSRID({$varOne}) DEFINESOURCE({$varOne}) DEFINETIME({$varOne}) ENABLEDCOUNT({$varOne}) INSTALLTIME({$varOne}) INSTALLUSRID({$varOne}) PARTCOUNT({$varOne}) TARGETCOUNT({$varOne})",
-                "BUNDLEPART({$varOne}) BUNDLE({$varOne}) METADATAFILE({$varOne}) PARTTYPE({$varOne}) AVAILSTATUS({$varOne}) ENABLESTATUS({$varOne}) PARTCLASS({$varOne})",
+                "BUNDLEPART({$varOne}) NEXT BUNDLE({$varOne}) METADATAFILE({$varOne}) PARTTYPE({$varOne}) AVAILSTATUS({$varOne}) ENABLESTATUS({$varOne}) PARTCLASS({$varOne})",
                 "CAPDATAPRED NEXT CONTAINER({$varOne}) FIELDLENGTH({$varOne}) FIELDOFFSET({$varOne}) FILENAME({$varOne}) FILTERVALUE({$varOne}) LOCATION({$varOne}) STRUCTNAME({$varOne}) VARIABLENAME({$varOne}) OPERATOR({$varOne})",
                 "CAPINFOSRCE START CAPTURESPEC({$varOne}) EVENTBINDING({$varOne})",
                 "CAPOPTPRED NEXT FILTERVALUE({$varOne}) OPTIONNAME({$varOne}) OPERATOR({$varOne})",
@@ -200,6 +200,21 @@ public class TestCICSInquireSP {
             "INQUIRE REQID {START|errorOne} {NEXT|errorTwo} {END|errorThree}";
 
     private static final String VALID_PROGRAM = "INQUIRE PROGRAM START AT({$varOne})";
+
+    private static final String BUNDLEPART_INVALID = "INQUIRE {_BUNDLEPART(1) BUNDLE(1)|errorOne_}";
+
+    @Test
+    void testInvalidBundlepartBrowseOnly() {
+        Map<String, Diagnostic> expectedDiagnostics =
+                ImmutableMap.of(
+                        "errorOne",
+                        new Diagnostic(
+                                new Range(),
+                                "Exactly one option required, none provided: START or END or NEXT",
+                                DiagnosticSeverity.Error,
+                                ErrorSource.PARSING.getText()));
+        CICSTestUtils.errorTest(BUNDLEPART_INVALID, expectedDiagnostics, "SP");
+    }
 
     @Test
     void testValidProgram() {

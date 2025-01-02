@@ -1003,7 +1003,12 @@ public class CICSInquireSPOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
             case CICSParser.RULE_cics_inquire_bundlepart:
                 CICSParser.Cics_inquire_bundlepartContext bundlepartContext =
                         (CICSParser.Cics_inquire_bundlepartContext) ctx;
-                checkBrowseMutuallyExclusive(bundlepartContext);
+                checkHasExactlyOneOption(
+                        "START or END or NEXT",
+                        bundlepartContext,
+                        bundlepartContext.START(),
+                        bundlepartContext.END(),
+                        bundlepartContext.NEXT());
                 if (!bundlepartContext.START().isEmpty() || !bundlepartContext.END().isEmpty()) {
                     if (bundlepartContext.END().isEmpty())
                         checkHasMandatoryOptions(
