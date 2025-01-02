@@ -18,13 +18,25 @@ package org.eclipse.lsp.cobol.implicitDialects.cics.utility;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import lombok.Setter;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 
-/** Manages traffic for CICS parser options checking */
+/**
+ * Manages traffic for CICS parser options checking
+ */
 public class CICSOptionsCheckUtility {
-  private final Map<Integer, CICSOptionsCheckBaseUtility> optionsMap = new HashMap<>();
+    private final Map<Integer, CICSOptionsCheckBaseUtility> optionsMap = new HashMap<>();
+
+  private final Map<Integer, CICSOptionsCheckBaseUtility> spOptionsMap = new HashMap<>();
+
+  @Setter
+  private static boolean exciOptionsEnabled = false;
+
+  @Setter
+  private static boolean spOptionsEnabled = false;
 
   public CICSOptionsCheckUtility(DialectProcessingContext context, List<SyntaxError> errors) {
     optionsMap.put(
@@ -106,11 +118,20 @@ public class CICSOptionsCheckUtility {
         CICSReadNextReadPrevOptionsUtility.RULE_INDEX,
         new CICSReadNextReadPrevOptionsUtility(context, errors));
     optionsMap.put(
+        CICSForceOptionsCheckUtility.RULE_INDEX,
+        new CICSForceOptionsCheckUtility(context, errors));
+    optionsMap.put(
+       CICSEnterTracenumOptionsCheckUtility.RULE_INDEX,
+       new CICSEnterTracenumOptionsCheckUtility(context, errors));
+    optionsMap.put(
         CICSDumpTransactionOptionsCheckUtility.RULE_INDEX,
         new CICSDumpTransactionOptionsCheckUtility(context, errors));
     optionsMap.put(
         CICSGetOptionsCheckUtility.RULE_INDEX,
         new CICSGetOptionsCheckUtility(context, errors));
+    optionsMap.put(
+        CICSFreeMainOptionsCheckUtility.RULE_INDEX,
+        new CICSFreeMainOptionsCheckUtility(context, errors));
     optionsMap.put(
         CICSAddressOptionsCheckUtility.RULE_INDEX,
         new CICSAddressOptionsCheckUtility(context, errors));
@@ -120,6 +141,9 @@ public class CICSOptionsCheckUtility {
     optionsMap.put(
         CICSLinkOptionsCheckUtility.RULE_INDEX,
         new CICSLinkOptionsCheckUtility(context, errors));
+    optionsMap.put(
+        CICSFormatTimeOptionsCheckUtility.RULE_INDEX,
+        new CICSFormatTimeOptionsCheckUtility(context, errors));
     optionsMap.put(
         CICSDelayOptionsCheckUtility.RULE_INDEX,
         new CICSDelayOptionsCheckUtility(context, errors));
@@ -136,24 +160,68 @@ public class CICSOptionsCheckUtility {
         CICSWriteOptionsCheckUtility.RULE_INDEX,
         new CICSWriteOptionsCheckUtility(context, errors));
     optionsMap.put(
+        CICSRetrieveOptionsCheckUtility.RULE_INDEX,
+        new CICSRetrieveOptionsCheckUtility(context, errors));
+    optionsMap.put(
         CICSInvokeOptionsCheckUtility.RULE_INDEX,
         new CICSInvokeOptionsCheckUtility(context, errors));
     optionsMap.put(
         CICSWSAEPRUtility.RULE_INDEX,
         new CICSWSAEPRUtility(context, errors));
     optionsMap.put(
+        CICSWaitCicsOptionsUtility.RULE_INDEX,
+        new CICSWaitCicsOptionsUtility(context, errors));
+    optionsMap.put(
+        CICSTestOptionsUtility.RULE_INDEX,
+        new CICSTestOptionsUtility(context, errors));
+    optionsMap.put(
+        CICSUnlockOptionsUtility.RULE_INDEX,
+        new CICSUnlockOptionsUtility(context, errors));
+    optionsMap.put(
+        CICSMoveOptionsCheckUtility.RULE_INDEX,
+        new CICSMoveOptionsCheckUtility(context, errors));
+    optionsMap.put(
+        CICSQueryOptionsCheckUtility.RULE_INDEX,
+        new CICSQueryOptionsCheckUtility(context, errors));
+    optionsMap.put(
+        CICSRunOptionsCheckUtility.RULE_INDEX,
+        new CICSRunOptionsCheckUtility(context, errors));
+    optionsMap.put(
+        CICSXctlOptionsUtility.RULE_INDEX,
+        new CICSXctlOptionsUtility(context, errors));
+    optionsMap.put(
+        CICSSuspendOptionsUtility.RULE_INDEX,
+        new CICSSuspendOptionsUtility(context, errors));
+    optionsMap.put(
+        CICSGetMainOptionsUtility.RULE_INDEX,
+        new CICSGetMainOptionsUtility(context, errors));
+    optionsMap.put(
+        CICSGetMain64OptionsUtility.RULE_INDEX,
+        new CICSGetMain64OptionsUtility(context, errors));
+    optionsMap.put(
+        CICSInquireOptionsCheckUtility.RULE_INDEX,
+        new CICSInquireOptionsCheckUtility(context, errors));
+    optionsMap.put(
         CICSVerifyOptionsCheckUtility.RULE_INDEX,
         new CICSVerifyOptionsCheckUtility(context, errors));
+    spOptionsMap.put(
+        CICSInquireSPOptionsCheckUtility.RULE_INDEX,
+        new CICSInquireSPOptionsCheckUtility(context, errors));
   }
 
-  /**
-   * Entrypoint to check CICS rule options
-   *
-   * @param ctx ParserRuleContext subclass containing options
-   * @param <E> A subclass of ParserRuleContext
-   */
-  public <E extends ParserRuleContext> void checkOptions(E ctx) {
-    CICSOptionsCheckBaseUtility utility = optionsMap.get(ctx.parent.getRuleIndex());
-    if (utility != null) utility.checkOptions(ctx);
-  }
+    /**
+     * Entrypoint to check CICS rule options
+     *
+     * @param ctx ParserRuleContext subclass containing options
+     * @param <E> A subclass of ParserRuleContext
+     */
+    public <E extends ParserRuleContext> void checkOptions(E ctx) {
+        CICSOptionsCheckBaseUtility utility = optionsMap.get(ctx.parent.getRuleIndex());
+        CICSOptionsCheckBaseUtility spOptions = spOptionsMap.get(ctx.parent.getRuleIndex());
+        if (utility != null) utility.checkOptions(ctx);
+        else if (spOptions != null) {
+            if (spOptionsEnabled) spOptions.checkOptions(ctx);
+            else spOptions.throwIfMissingTranslatorOption(ctx, "\"SP\"");
+        }
+    }
 }

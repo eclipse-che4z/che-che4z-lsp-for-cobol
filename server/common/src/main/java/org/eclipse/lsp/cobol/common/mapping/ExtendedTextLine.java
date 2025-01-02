@@ -79,12 +79,12 @@ public class ExtendedTextLine {
   }
 
   /**
-   * Removes characters from line
+   * Removes characters from line. [start, end)
    * @param start - start position
-   * @param end - end position
+   * @param end - end position exclusive
    */
   void delete(int start, int end) {
-    characters.subList(start, Math.min(characters.size(), end + 1)).clear();
+    characters.subList(start, Math.min(characters.size(), end)).clear();
   }
 
   /**
@@ -133,29 +133,29 @@ public class ExtendedTextLine {
   }
 
   /**
-   * Clears the line from start to end position
+   * Clears the line from start to end position. [start, end)
    * @param start - start position
-   * @param end - end position
+   * @param end - end position exclusive
    */
   void clear(int start, int end) {
-    characters.subList(start, Math.min(end + 1, characters.size())).forEach(c -> c.setCharacter(' '));
+    characters.subList(start, Math.min(end, characters.size())).forEach(c -> c.setCharacter(' '));
   }
 
   /**
    * Clears whole line
    */
   void clear() {
-    clear(0, size() - 1);
+    clear(0, size());
   }
 
   /**
-   * Fill area
+   * Fill area. [start, end)
    * @param start - start position
-   * @param end - end position
+   * @param end - end position exclusive
    * @param c - character to fill the area with
    */
   void fillArea(int start, int end, char c) {
-    characters.subList(start, Math.min(end + 1, characters.size())).forEach(l -> l.setCharacter(c));
+    characters.subList(start, Math.min(end, characters.size())).forEach(l -> l.setCharacter(c));
   }
 
   /**
@@ -163,7 +163,7 @@ public class ExtendedTextLine {
    * @param c - character to fill the area with
    */
   void fillLine(char c) {
-    fillArea(0, size() - 1, c);
+    fillArea(0, size(), c);
   }
 
   /**

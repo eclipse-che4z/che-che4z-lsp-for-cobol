@@ -119,6 +119,9 @@ public class CFASTBuilderImpl implements CFASTBuilder {
                 convertLocation(node)
             ));
       }
+    } else if (node instanceof ExitPerformNode) {
+      ExitPerformNode exitPerformNode = (ExitPerformNode) node;
+      addChild(parent, new ExitPerform(exitPerformNode.isCycle(), exitPerformNode.isInsideInlinePerform(), convertLocation(node)));
     } else if (node instanceof ExitParagraphNode) {
       addChild(parent, new CFASTNode(CFASTNodeType.EXIT_PARAGRAPH.getValue(), convertLocation(node)));
     } else if (node instanceof ExitSectionNode) {
@@ -165,7 +168,12 @@ public class CFASTBuilderImpl implements CFASTBuilder {
       node.getChildren().forEach(child -> traverse(parent, child));
       addChild(parent, new CFASTNode(CFASTNodeType.END_EXEC.getValue(), convertLocation(node)));
     } else if (node instanceof ExecSqlNode) {
-      addChild(parent, new CFASTNode(CFASTNodeType.EXEC_SQL.getValue(), convertLocation(node)));
+      boolean isWhenever = node.getChildren().stream().anyMatch(n ->
+              n.getDepthFirstStream().anyMatch(nd -> nd instanceof ExecSqlWheneverNode));
+      // CCF expects to have "execwhenever" instead of "execsql" in case of whenever SQL statement.
+      if (!isWhenever) {
+        addChild(parent, new CFASTNode(CFASTNodeType.EXEC_SQL.getValue(), convertLocation(node)));
+      }
       node.getChildren().forEach(child -> traverse(parent, child));
       addChild(parent, new CFASTNode(CFASTNodeType.END_EXEC.getValue(), convertLocation(node)));
     } else if (node instanceof ExecSqlWheneverNode) {
@@ -177,7 +185,6 @@ public class CFASTBuilderImpl implements CFASTBuilder {
 
       addChild(parent, cfastNode);
       node.getChildren().forEach(child -> traverse(parent, child));
-      addChild(parent, new CFASTNode(CFASTNodeType.END_EXEC.getValue(), convertLocation(node)));
     } else if (node instanceof StopNode) {
       addChild(parent, new CFASTNode(CFASTNodeType.STOP.getValue(), convertLocation(node)));
     } else if (node instanceof ParagraphsNode || node instanceof ProcedureDivisionBodyNode) {
