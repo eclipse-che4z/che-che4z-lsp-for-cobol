@@ -751,7 +751,7 @@ cics_spoolclose_resp: RESP RESP2?;
 
 /** SPOOLOPEN INPUT / SPOOLOPEN OUTPUT */
 cics_spoolopen: SPOOLOPEN (cics_spoolopen_input | cics_spoolopen_output);
-cics_spoolopen_input: (INPUT | TOKEN cics_data_area | USERID cics_data_value | CLASS cics_data_value | NOHANDLE | cics_handle_response)*;
+cics_spoolopen_input: (INPUT | TOKEN cics_data_area | USERID cics_data_value | CLASS cics_data_value | cics_handle_response)*;
 cics_spoolopen_output: (OUTPUT | TOKEN cics_data_area | (USERID | NODE | CLASS | RECORDLENGTH) cics_data_value | OUTDESCR cics_ref |
                 NOCC | ASA | MCC | PRINT | PUNCH | NOHANDLE | cics_handle_response)*;
 
