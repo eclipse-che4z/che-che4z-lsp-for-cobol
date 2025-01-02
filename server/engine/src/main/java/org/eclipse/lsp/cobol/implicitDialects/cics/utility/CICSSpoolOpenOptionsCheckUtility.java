@@ -34,7 +34,6 @@ public class CICSSpoolOpenOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
   private static final Map<Integer, ErrorSeverity> DUPLICATE_CHECK_OPTIONS =
           new HashMap<Integer, ErrorSeverity>() {
             {
-              put(CICSLexer.SPOOLOPEN, ErrorSeverity.ERROR);
               put(CICSLexer.INPUT, ErrorSeverity.ERROR);
               put(CICSLexer.OUTPUT, ErrorSeverity.ERROR);
               put(CICSLexer.TOKEN, ErrorSeverity.ERROR);
@@ -79,12 +78,14 @@ public class CICSSpoolOpenOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
   private void checkSpoolopenInput(CICSParser.Cics_spoolopen_inputContext ctx) {
     checkHasMandatoryOptions(ctx.INPUT(), ctx, "INPUT");
     checkHasMandatoryOptions(ctx.TOKEN(), ctx, "TOKEN");
+    checkHasMandatoryOptions(ctx.USERID(), ctx, "USERID");
   }
 
   @SuppressWarnings("unchecked")
   private void checkSpoolopenOutput(CICSParser.Cics_spoolopen_outputContext ctx) {
     checkHasMandatoryOptions(ctx.OUTPUT(), ctx, "OUTPUT");
     checkHasMandatoryOptions(ctx.TOKEN(), ctx, "TOKEN");
+    checkHasMandatoryOptions(ctx.USERID(), ctx, "USERID");
     checkHasMandatoryOptions(ctx.NODE(), ctx, "NODE");
     checkHasMutuallyExclusiveOptions("NOCC, ASA, or MCC", ctx.NOCC(), ctx.ASA(), ctx.MCC());
     checkHasMutuallyExclusiveOptions("PRINT or PUNCH", ctx.PRINT(), ctx.PUNCH());

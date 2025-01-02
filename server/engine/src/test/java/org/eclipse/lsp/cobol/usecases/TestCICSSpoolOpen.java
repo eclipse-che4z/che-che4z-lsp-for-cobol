@@ -32,8 +32,11 @@ public class TestCICSSpoolOpen {
   private static final String SPOOLOPEN_INPUT_VALID =
           "SPOOLOPEN INPUT TOKEN({$varOne}) USERID({$varTwo}) CLASS({$varThree})";
 
-  private static final String SPOOLOPEN_INPUT_INVALID =
+  private static final String SPOOLOPEN_INPUT_INVALID_ONE =
           "SPOOLOPEN  {_USERID({$varTwo})|errorOne|errorTwo_}";
+
+  private static final String SPOOLOPEN_INPUT_INVALID_TWO =
+          "SPOOLOPEN {_INPUT TOKEN({$varOne}) CLASS(123)|errorOne_}";
 
   private static final String SPOOLOPEN_OUTPUT_VALID =
           "SPOOLOPEN OUTPUT TOKEN({$varOne}) USERID({$varTwo}) NODE({$varThree}) CLASS({$varFour}) PRINT RECORDLENGTH({$varFive})";
@@ -42,13 +45,16 @@ public class TestCICSSpoolOpen {
           "SPOOLOPEN {_USERID({$varThree}) PRINT|errorOne|errorTwo|errorThree_}";
 
   private static final String SPOOLOPEN_OUTPUT_INVALID_TWO =
-          "SPOOLOPEN OUTPUT TOKEN({$varOne}) NODE({$varTwo}) {NOCC|errorOne} {ASA|errorTwo} {MCC|errorThree}";
+          "SPOOLOPEN OUTPUT TOKEN({$varOne}) USERID({$varTwo}) NODE({$varTwo}) {NOCC|errorOne} {ASA|errorTwo} {MCC|errorThree}";
 
   private static final String SPOOLOPEN_OUTPUT_INVALID_THREE =
-          "SPOOLOPEN OUTPUT TOKEN({$varOne}) NODE({$varTwo}) {PRINT|errorOne} {PUNCH|errorTwo}";
+          "SPOOLOPEN OUTPUT TOKEN({$varOne}) USERID({$varTwo}) NODE({$varTwo}) {PRINT|errorOne} {PUNCH|errorTwo}";
 
   private static final String SPOOLOPEN_OUTPUT_INVALID_FOUR =
           "SPOOLOPEN {_OUTPUT TOKEN({$varOne}) USERID({$varTwo}) NODE({$varThree}) CLASS({$varFour}) RECORDLENGTH(123)|errorOne_}";
+
+  private static final String SPOOLOPEN_OUTPUT_INVALID_FIVE =
+          "SPOOLOPEN {_OUTPUT TOKEN({$varOne}) NODE(123)|errorOne_}";
 
   @Test
   void testSpoolopenInputValid() {
@@ -56,9 +62,9 @@ public class TestCICSSpoolOpen {
   }
 
   @Test
-  void testSpoolopenInputInvalid() {
+  void testSpoolopenInputInvalidOne() {
     CICSTestUtils.errorTest(
-            SPOOLOPEN_INPUT_INVALID,
+            SPOOLOPEN_INPUT_INVALID_ONE,
             ImmutableMap.of(
                     "errorOne",
                     new Diagnostic(
@@ -70,6 +76,19 @@ public class TestCICSSpoolOpen {
                     new Diagnostic(
                             new Range(),
                             "Missing required option: TOKEN",
+                            DiagnosticSeverity.Error,
+                            ErrorSource.PARSING.getText())));
+  }
+
+  @Test
+  void testSpoolopenInputInvalidTwo() {
+    CICSTestUtils.errorTest(
+            SPOOLOPEN_INPUT_INVALID_TWO,
+            ImmutableMap.of(
+                    "errorOne",
+                    new Diagnostic(
+                            new Range(),
+                            "Missing required option: USERID",
                             DiagnosticSeverity.Error,
                             ErrorSource.PARSING.getText())));
   }
@@ -157,6 +176,19 @@ public class TestCICSSpoolOpen {
                     new Diagnostic(
                             new Range(),
                             "Missing required option: PRINT",
+                            DiagnosticSeverity.Error,
+                            ErrorSource.PARSING.getText())));
+  }
+
+  @Test
+  void testSpoolopenOutputInvalidFive() {
+    CICSTestUtils.errorTest(
+            SPOOLOPEN_OUTPUT_INVALID_FIVE,
+            ImmutableMap.of(
+                    "errorOne",
+                    new Diagnostic(
+                            new Range(),
+                            "Missing required option: USERID",
                             DiagnosticSeverity.Error,
                             ErrorSource.PARSING.getText())));
   }
