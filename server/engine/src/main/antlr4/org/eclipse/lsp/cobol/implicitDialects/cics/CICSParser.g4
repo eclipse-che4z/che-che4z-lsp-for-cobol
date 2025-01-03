@@ -38,7 +38,7 @@ allExciRules: cics_exci_link | cics_exci_delete | cics_exci_delete_container | c
               cics_exci_get_container | cics_exci_get_next_container | cics_exci_move_container |
               cics_exci_put_container | cics_exci_query_channel | cics_exci_startbrowse_container ;
 
-allSPRules: cics_inquire_system_programming;
+allSPRules: cics_discard | cics_inquire_system_programming;
 
 // compiler options
 compilerOpts
@@ -297,6 +297,12 @@ cics_queue_qname: (QUEUE | QNAME) cics_name;
 /** DEQ */
 cics_deq: DEQ (cics_deq_cmds | cics_handle_response);
 cics_deq_cmds : (RESOURCE cics_data_area | LENGTH cics_data_value | MAXLIFETIME cics_cvda | TASK | UOW)+;
+
+/** DISCARD System Commands **/
+cics_discard: DISCARD cics_discard_body;
+cics_discard_body: cics_handle_response* (ATOMSERVICE | AUTINSTMODEL | BUNDLE | CONNECTION | DB2CONN | DB2ENTRY | DB2TRAN | DOCTEMPLATE |
+                   ENQMODEL | FILE | IPCONN | JOURNALMODEL | JOURNALNAME | JVMSERVER | LIBRARY | MQCONN | MQMONITOR | PARTNER | PIPELINE |
+                   PROCESSTYPE | PROFILE | PROGRAM | TCPIPSERVICE | TDQUEUE | TERMINAL | TRANCLASS | TRANSACTION | TSMODEL | URIMAP | WEBSERVICE) cics_data_value cics_handle_response*;
 
 /** DOCUMENT CREATE / DELETE / INSERT / RETRIEVE / SET */
 cics_document: DOCUMENT (cics_document_create | DELETE DOCTOKEN cics_data_area | cics_document_insert |
@@ -622,14 +628,16 @@ cics_load: LOAD cics_load_options;
 cics_load_options: (PROGRAM cics_name | (SET |  ENTRY) cics_ref | (LENGTH | FLENGTH) cics_data_area | HOLD | cics_handle_response)+;
 
 /** MONITOR */
-cics_monitor: MONITOR (POINT cics_data_value | DATA1 cics_data_area | DATA2 cics_data_area | ENTRYNAME cics_data_area | cics_handle_response)+;
+cics_monitor: MONITOR cics_monitor_options;
+cics_monitor_options: (POINT cics_data_value | (DATA1 | DATA2 | ENTRYNAME) cics_data_area | cics_handle_response)+;
 
 /** MOVE CONTAINER (both) */
 cics_move: MOVE ((CONTAINER | FROMACTIVITY | TOACTIVITY | AS | CHANNEL | TOCHANNEL) cics_data_value | FROMPROCESS |
            TOPROCESS | cics_handle_response)+;
 
 /** POINT */
-cics_point: POINT (CONVID cics_name | SESSION cics_name | cics_handle_response)?;
+cics_point: POINT cics_point_options;
+cics_point_options: ((CONVID | SESSION) cics_name | cics_handle_response)*;
 
 /** POP HANDLE */
 cics_pop: POP cics_handle_response? HANDLE cics_handle_response?;
@@ -1458,6 +1466,7 @@ ABCODE
  | DIGEST
  | DIGESTTYPE
  | DISABLEDACT
+ | DISCARD
  | DISCONNECT
  | DISCREQST
  | DISPOSITION

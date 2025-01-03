@@ -208,14 +208,24 @@ public class CICSOptionsCheckUtility {
         CICSSpoolOpenOptionsCheckUtility.RULE_INDEX,
         new CICSSpoolOpenOptionsCheckUtility(context, errors));
     optionsMap.put(
+        CICSMonitorOptionsCheckUtility.RULE_INDEX,
+        new CICSMonitorOptionsCheckUtility(context, errors));
+    optionsMap.put(
         CICSLoadOptionsCheckUtility.RULE_INDEX,
         new CICSLoadOptionsCheckUtility(context, errors));
+    optionsMap.put(
+        CICSPointOptionsCheckUtility.RULE_INDEX,
+        new CICSPointOptionsCheckUtility(context, errors));
     optionsMap.put(
         CICSResetOptionsCheckUtility.RULE_INDEX,
         new CICSResetOptionsCheckUtility(context, errors));
     spOptionsMap.put(
         CICSInquireSPOptionsCheckUtility.RULE_INDEX,
         new CICSInquireSPOptionsCheckUtility(context, errors));
+    spOptionsMap.put(
+        CICSDiscardOptionsUtility.RULE_INDEX,
+        new CICSDiscardOptionsUtility(context, errors));
+
   }
 
     /**
