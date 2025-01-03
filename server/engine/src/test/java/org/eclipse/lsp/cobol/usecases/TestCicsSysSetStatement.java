@@ -96,20 +96,20 @@ public class TestCicsSysSetStatement {
     private static final String MODENAME_VALID_2 = "SET MODENAME(123) CONNECTION(123) AVAILABLE(123) ACQUIRED";
     private static final String MONITOR_VALID_1 = "SET MONITOR";
     private static final String MONITOR_VALID_2 = "SET MONITOR COMPRESS CONVERSE DPLLIMIT(123) EXCEPT FILELIMIT(1) FREQUENCY(1) IDNTY PERF NORESRCE OFF SYNCPOINT TSQUEUELIMIT(1) URIMAPLIMIT(1) WEBSERVLIMIT(1)";
-    private static final String MQCONN_VALID_1 = "SET MQCONN ";
-    private static final String MQCONN_VALID_2 = "SET MQCONN ";
-    private static final String MQMONITOR_VALID_1 = "SET MQMONITOR ";
-    private static final String MQMONITOR_VALID_2 = "SET MQMONITOR ";
-    private static final String NETNAME_VALID_1 = "SET NETNAME ";
-    private static final String NETNAME_VALID_2 = "SET NETNAME ";
-    private static final String PIPELINE_VALID_1 = "SET PIPELINE ";
-    private static final String PIPELINE_VALID_2 = "SET PIPELINE ";
-    private static final String PROCESSTYPE_VALID_1 = "SET PROCESSTYPE ";
-    private static final String PROCESSTYPE_VALID_2 = "SET PROCESSTYPE ";
-    private static final String PROGRAM_VALID_1 = "SET PROGRAM ";
-    private static final String PROGRAM_VALID_2 = "SET PROGRAM ";
-    private static final String SECDISCOVERY_VALID_1 = "SET SECDISCOVERY ";
-    private static final String SECDISCOVERY_VALID_2 = "SET SECDISCOVERY ";
+    private static final String MQCONN_VALID_1 = "SET MQCONN";
+    private static final String MQCONN_VALID_2 = "SET MQCONN NOWAIT CONNECTED MQNAME(3) RESYNC";
+    private static final String MQMONITOR_VALID_1 = "SET MQMONITOR(123)";
+    private static final String MQMONITOR_VALID_2 = "SET MQMONITOR(123) AUTOSTATUS(1) ENABLED STARTED";
+    private static final String NETNAME_VALID_1 = "SET NETNAME(123)";
+    private static final String NETNAME_VALID_2 = "SET NETNAME(123) EXITTRACE";
+    private static final String PIPELINE_VALID_1 = "SET PIPELINE(1)";
+    private static final String PIPELINE_VALID_2 = "SET PIPELINE(1) ENABLESTATUS(1) RESPWAIT(1)";
+    private static final String PROCESSTYPE_VALID_1 = "SET PROCESSTYPE(123)";
+    private static final String PROCESSTYPE_VALID_2 = "SET PROCESSTYPE(123) STATUS(3) ACTIVITY";
+    private static final String PROGRAM_VALID_1 = "SET PROGRAM(123)";
+    private static final String PROGRAM_VALID_2 = "SET PROGRAM(123) CEDF NEWCOPY DPLSUBSET JVMCLASS(1) JVMPROFILE(1) OPERATION(1) REPLICATOR JVM SHARESTATUS(1) STATUS(1) VERSION(1)";
+    private static final String SECDISCOVERY_VALID_1 = "SET SECDISCOVERY";
+    private static final String SECDISCOVERY_VALID_2 = "SET SECDISCOVERY STATUS(1) CMD(123) DB2(123) DCT(123) FCT(123) HFS(123) JCT(123) PCT(123) PPT(123) PSB(123) RES(123) TST(123) USER(123)";
     private static final String SECRECORDING_VALID_1 = "SET SECRECORDING ";
     private static final String SECRECORDING_VALID_2 = "SET SECRECORDING ";
     private static final String STATISTICS_VALID_1 = "SET STATISTICS ";
@@ -212,20 +212,18 @@ public class TestCicsSysSetStatement {
     private static final String MODENAME_INVALID_2 = "SET {_MODENAME(123) CONNECTION(1) CLOSED ACQUIRED|errorOne_}";
     private static final String MONITOR_INVALID_1 = "SET MONITOR ON {OFF|errorOne}";
     private static final String MONITOR_INVALID_2 = "SET MONITOR FREQUENCY(1) {FREQUENCYMIN|errorOne}(1)";
-    private static final String MQCONN_INVALID_1 = "SET MQCONN ";
-    private static final String MQCONN_INVALID_2 = "SET MQCONN ";
-    private static final String MQMONITOR_INVALID_1 = "SET MQMONITOR ";
-    private static final String MQMONITOR_INVALID_2 = "SET MQMONITOR ";
-    private static final String NETNAME_INVALID_1 = "SET NETNAME ";
-    private static final String NETNAME_INVALID_2 = "SET NETNAME ";
-    private static final String PIPELINE_INVALID_1 = "SET PIPELINE ";
-    private static final String PIPELINE_INVALID_2 = "SET PIPELINE ";
-    private static final String PROCESSTYPE_INVALID_1 = "SET PROCESSTYPE ";
-    private static final String PROCESSTYPE_INVALID_2 = "SET PROCESSTYPE ";
-    private static final String PROGRAM_INVALID_1 = "SET PROGRAM ";
-    private static final String PROGRAM_INVALID_2 = "SET PROGRAM ";
-    private static final String SECDISCOVERY_INVALID_1 = "SET SECDISCOVERY ";
-    private static final String SECDISCOVERY_INVALID_2 = "SET SECDISCOVERY ";
+    private static final String MQCONN_INVALID_1 = "SET {_MQCONN WAIT RESYNC|errorOne_}";
+    private static final String MQCONN_INVALID_2 = "SET MQCONN RESYNC {NORESYNC|errorOne}";
+    private static final String MQMONITOR_INVALID_1 = "SET {_MQMONITOR(123) AUTOSTATUS(1) STOPPED|errorOne_}";
+    private static final String MQMONITOR_INVALID_2 = "SET {_MQMONITOR(123) ENABLED MONSTATUS(1)|errorOne_}";
+    private static final String NETNAME_INVALID_1 = "SET NETNAME(123) EXITTRACE {NOEXITTRACE|errorOne}";
+    private static final String PIPELINE_INVALID_1 = "SET PIPELINE(1) ENABLED {DISABLED|errorOne}";
+    private static final String PROCESSTYPE_INVALID_1 = "SET PROCESSTYPE(123) {ENABLED|errorOne} DISABLED";
+    private static final String PROCESSTYPE_INVALID_2 = "SET PROCESSTYPE(123) FULL {OFF|errorOne}";
+    private static final String PROGRAM_INVALID_1 = "SET PROGRAM(123) CEDF {NOCEDF|errorOne} ";
+    private static final String PROGRAM_INVALID_2 = "SET PROGRAM(123) JVM {NOJVM|errorOne}";
+    private static final String SECDISCOVERY_INVALID_1 = "SET SECDISCOVERY ON {OFF|errorOne}";
+    private static final String SECDISCOVERY_INVALID_2 = "SET SECDISCOVERY CMD(1) {DISCOVERALL|errorOne}";
     private static final String SECRECORDING_INVALID_1 = "SET SECRECORDING ";
     private static final String SECRECORDING_INVALID_2 = "SET SECRECORDING ";
     private static final String STATISTICS_INVALID_1 = "SET STATISTICS ";
@@ -844,44 +842,42 @@ public class TestCicsSysSetStatement {
 
     @Test
     void testCicsMqconnInvalid() {
-        testSingleError(MQCONN_INVALID_1, "");
-        testSingleError(MQCONN_INVALID_2, "");
+        testSingleError(MQCONN_INVALID_1, "Must use exactly one of the following: CONNECTST, CONNECTED or NOTCONNECTED");
+        testSingleError(MQCONN_INVALID_2, "Options \"RESYNCMEMBER, RESYNC, NORESYNC or GROUPRESYNC\" are mutually exclusive.");
     }
 
     @Test
     void testCicsMqmonitorInvalid() {
-        testSingleError(MQMONITOR_INVALID_1, "");
-        testSingleError(MQMONITOR_INVALID_2, "");
+        testSingleError(MQMONITOR_INVALID_1, "Must use exactly one of the following: ENABLESTATUS, ENABLED or DISABLED");
+        testSingleError(MQMONITOR_INVALID_2, "Must use exactly one of the following: AUTOSTATUS, AUTOSTART or NOAUTOSTART");
     }
 
     @Test
     void testCicsNetnameInvalid() {
-        testSingleError(NETNAME_INVALID_1, "");
-        testSingleError(NETNAME_INVALID_2, "");
+        testSingleError(NETNAME_INVALID_1, "Options \"EXITTRACING, EXITTRACE or NOEXITTRACE\" are mutually exclusive.");
     }
 
     @Test
     void testCicsPipelineInvalid() {
-        testSingleError(PIPELINE_INVALID_1, "");
-        testSingleError(PIPELINE_INVALID_2, "");
+        testSingleError(PIPELINE_INVALID_1, "Options \"ENABLESTATUS, ENABLED or DISABLED\" are mutually exclusive.");
     }
 
     @Test
     void testCicsProcesstypeInvalid() {
-        testSingleError(PROCESSTYPE_INVALID_1, "");
-        testSingleError(PROCESSTYPE_INVALID_2, "");
+        testSingleError(PROCESSTYPE_INVALID_1, "Options \"STATUS, DISABLED or ENABLED\" are mutually exclusive.");
+        testSingleError(PROCESSTYPE_INVALID_2, "Options \"AUDITLEVEL, ACTIVITY, FULL, OFF or PROCESS\" are mutually exclusive.");
     }
 
     @Test
     void testCicsProgramInvalid() {
-        testSingleError(PROGRAM_INVALID_1, "");
-        testSingleError(PROGRAM_INVALID_2, "");
+        testSingleError(PROGRAM_INVALID_1, "Options \"CEDFSTATUS, CEDF or NOCEDF\" are mutually exclusive.");
+        testSingleError(PROGRAM_INVALID_2, "Options \"RUNTIME, JVM or NOJVM\" are mutually exclusive.");
     }
 
     @Test
     void testCicsSecdiscoveryInvalid() {
-        testSingleError(SECDISCOVERY_INVALID_1, "");
-        testSingleError(SECDISCOVERY_INVALID_2, "");
+        testSingleError(SECDISCOVERY_INVALID_1, "Options \"ON, OFF or STATUS\" are mutually exclusive.");
+        testSingleError(SECDISCOVERY_INVALID_2, "Options \"CMD or DISCOVERALL\" are mutually exclusive.");
     }
 
     @Test

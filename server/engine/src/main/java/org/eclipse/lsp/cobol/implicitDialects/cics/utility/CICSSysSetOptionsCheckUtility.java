@@ -994,7 +994,9 @@ public class CICSSysSetOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     private void checkMqmonitor(CICSParser.Cics_set_mqmonitorContext ctx) {
         checkMutuallyExclusiveOptions("AUTOSTATUS, AUTOSTART or NOAUTOSTART", ctx.AUTOSTATUS(), ctx.AUTOSTART(), ctx.NOAUTOSTART());
 
-        if (ctx.AUTOSTATUS() != null || ctx.AUTOSTART() != null ||  ctx.NOAUTOSTART() != null) {
+        if (!ctx.AUTOSTATUS().isEmpty() || !ctx.AUTOSTART().isEmpty() || !ctx.NOAUTOSTART().isEmpty() || !ctx.ENABLESTATUS().isEmpty() || !ctx.ENABLED().isEmpty()
+                || !ctx.DISABLED().isEmpty() || !ctx.MONSTATUS().isEmpty() || !ctx.STARTED().isEmpty() || !ctx.STOPPED().isEmpty()) {
+            checkForExactlyOne("AUTOSTATUS, AUTOSTART or NOAUTOSTART", ctx, ctx.AUTOSTATUS(), ctx.AUTOSTART(), ctx.NOAUTOSTART());
             checkForExactlyOne("ENABLESTATUS, ENABLED or DISABLED", ctx, ctx.ENABLESTATUS(), ctx.ENABLED(), ctx.DISABLED());
             checkForExactlyOne("MONSTATUS, STARTED or STOPPED", ctx, ctx.MONSTATUS(), ctx.STARTED(), ctx.STOPPED());
         }

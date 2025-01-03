@@ -678,7 +678,7 @@ cics_set_monitor: MONITOR ((COMPRESS | NOCOMPRESS | CONVERSE | NOCONVERSE | EXCE
 cics_set_mqconn: MQCONN ((WAIT | NOWAIT | FORCE | CONNECTED | NOTCONNECTED | RESYNC | NORESYNC | GROUPRESYNC) | MQNAME cics_data_area | (BUSY | CONNECTST | RESYNCMEMBER) cics_cvda | cics_handle_response)*;
 cics_set_mqmonitor: MQMONITOR cics_data_value ((AUTOSTART | NOAUTOSTART | ENABLED | DISABLED | STARTED | STOPPED) | (AUTOSTATUS | ENABLESTATUS | MONSTATUS | AUTOSTATUS) cics_cvda | cics_handle_response)*;
 cics_set_netname: NETNAME cics_data_value ((EXITTRACE | NOEXITTRACE) | EXITTRACING cics_cvda | cics_handle_response)*;
-cics_set_pipeline: PIPELINE cics_data_value ((ENABLED | DISABLED) cics_data_value | RESPWAIT cics_data_area | ENABLESTATUS cics_cvda | cics_handle_response)*;
+cics_set_pipeline: PIPELINE cics_data_value ((ENABLED | DISABLED) | RESPWAIT cics_data_area | ENABLESTATUS cics_cvda | cics_handle_response)*;
 cics_set_processtype: PROCESSTYPE cics_data_value ((SET | DISABLED | ENABLED | ACTIVITY | FULL | OFF | PROCESS) | (STATUS | AUDITLEVEL) cics_cvda | cics_handle_response)*;
 cics_set_program: PROGRAM cics_data_value ((CEDF | NOCEDF | NEWCOPY | PHASEIN | DPLSUBSET | FULLAPI | REPLICATOR | NOREPLICATOR | JVM | NOJVM | PRIVATE | SHARED | DISABLED | ENABLED) |
                                           (JVMCLASS | JVMPROFILE | OPERATION) cics_data_value | (CEDFSTATUS | COPY | EXECUTIONSET | REPLICATION | RUNTIME | SHARESTATUS | STATUS | VERSION) cics_cvda | cics_handle_response)*;
