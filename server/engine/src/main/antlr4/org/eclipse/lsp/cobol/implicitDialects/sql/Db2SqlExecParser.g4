@@ -193,10 +193,10 @@ dbs_alter_sequence: SEQUENCE dbs_sequence_name dbs_alter_sequence_loop (dbs_comm
 dbs_alter_sequence_loop: (RESTART (WITH INTEGERLITERAL)? | (INCREMENT BY|MINVALUE|MAXVALUE) INTEGERLITERAL | NO (MINVALUE|MAXVALUE) | NO? (CYCLE|ORDER) | NO CACHE | CACHE dbs_integer_constant);
 
 /*ALTER STOGROUP */
-dbs_alter_stogroup: STOGROUP dbs_stogroup_name (NO KEY LABEL | KEY LABEL IDENTIFIER | (ADD|REMOVE) VOLUMES LPARENCHAR (IDENTIFIER (dbs_comma_separator IDENTIFIER)* |
-                    SINGLEQUOTE ASTERISKCHAR SINGLEQUOTE (dbs_comma_separator SINGLEQUOTE ASTERISKCHAR SINGLEQUOTE)*) RPARENCHAR)+ (DATACLAS dbs_host_variable)? (MGMTCLAS IDENTIFIER)? (STORCLAS IDENTIFIER)?;//*ALTER TABLE */
+dbs_alter_stogroup: STOGROUP dbs_stogroup_name (NO KEY LABEL | KEY LABEL dbs_sql_identifier | (ADD|REMOVE) VOLUMES LPARENCHAR (dbs_sql_identifier (dbs_comma_separator dbs_sql_identifier)* |
+                    SINGLEQUOTE ASTERISKCHAR SINGLEQUOTE (dbs_comma_separator SINGLEQUOTE ASTERISKCHAR SINGLEQUOTE)*) RPARENCHAR)+ (DATACLAS dbs_host_variable)? (MGMTCLAS dbs_sql_identifier)? (STORCLAS dbs_sql_identifier)?;//*ALTER TABLE */
 dbs_alter_table: TABLE dbs_table_name (dbs_alter_table_add | dbs_alter_table_alter | dbs_alter_table_rename | dbs_alter_table_drop | dbs_alter_table_rotate | DATA CAPTURE (NONE|CHANGES) | NOT? VOLATILE CARDINALITY? |
-                (ACTIVATE|DEACTIVATE) (ROW|COLUMN) ACCESS CONTROL | APPEND (NO|YES) | AUDIT (NONE|CHANGES|ALL) | VALIDPROC (dbs_program_name | NULL) | ENABLE ARCHIVE USE dbs_table_name | DISABLE ARCHIVE | NO KEY LABEL | KEY LABEL IDENTIFIER)+;
+                (ACTIVATE|DEACTIVATE) (ROW|COLUMN) ACCESS CONTROL | APPEND (NO|YES) | AUDIT (NONE|CHANGES|ALL) | VALIDPROC (dbs_program_name | NULL) | ENABLE ARCHIVE USE dbs_table_name | DISABLE ARCHIVE | NO KEY LABEL | KEY LABEL dbs_sql_identifier)+;
 dbs_alter_table_add: ADD (COLUMN? dbs_alter_table_coldef | dbs_alter_table_unique | dbs_alter_table_check | PARTITION (BY dbs_alter_table_partitioning | dbs_alter_table_partition)? |
                      SYSTEM? VERSIONING USE HISTORY TABLE dsb_alias_name (ON DELETE ADD EXTRA ROW)? | (MATERIALIZED? QUERY)? dbs_alter_table_mq | CLONE dbs_clone_table_name | RESTRICT ON DROP) | ADD? dbs_alter_table_referential;
 dbs_alter_table_coldef: dbs_column_name (dbs_distinct_type_name | dbs_alter_table_bit)? (dbs_alter_table_defclause | NOT NULL | dbs_alter_table_check | common_reference_clause | dbs_alter_table_generated |
@@ -216,7 +216,7 @@ dbs_alter_table_bit_cloba: (LPARENCHAR kmg_blob_parameter RPARENCHAR)? dbs_alter
 dbs_alter_table_bit_graphic: (GRAPHIC (LPARENCHAR INTEGERLITERAL RPARENCHAR)? | VARGRAPHIC LPARENCHAR INTEGERLITERAL RPARENCHAR | DBCLOB (LPARENCHAR kmg_blob_parameter RPARENCHAR)?) (CCSID dbs_integer1200)?;
 dbs_alter_table_bit_binary: (BINARY (LPARENCHAR INTEGERLITERAL RPARENCHAR)? | (BINARY VARYING | VARBINARY) LPARENCHAR INTEGERLITERAL RPARENCHAR | (BINARY LARGE OBJECT | BLOB) (LPARENCHAR kmg_blob_parameter RPARENCHAR)?);
 dbs_alter_table_bit_timestamp: TIMESTAMP (LPARENCHAR INTEGERLITERAL RPARENCHAR)? option_timezone?;
-dbs_alter_table_bit_xml: XML (LPARENCHAR XMLSCHEMA dbs_alter_table_bit_xmlspec (ELEMENT IDENTIFIER)? (dbs_comma_separator dbs_alter_table_bit_xmlspec (ELEMENT IDENTIFIER)?)* RPARENCHAR)?;
+dbs_alter_table_bit_xml: XML (LPARENCHAR XMLSCHEMA dbs_alter_table_bit_xmlspec (ELEMENT dbs_sql_identifier)? (dbs_comma_separator dbs_alter_table_bit_xmlspec (ELEMENT dbs_sql_identifier)?)* RPARENCHAR)?;
 dbs_alter_table_bit_xmlspec: (ID dbs_registered_xml_schema_name | (URL dbs_host_variable | NO NAMESPACE) (LOCATION dbs_schema_location)?);
 dbs_alter_table_defclause: WITH? DEFAULT (dbs_constant | SESSION_USER | USER | CURRENT SQLID | NULL | dbs_cast_function_name LPARENCHAR (dbs_constant | SESSION_USER | USER | CURRENT SQLID | NULL) RPARENCHAR)?;
 dbs_alter_table_check: (CONSTRAINT dbs_constraint_name)? CHECK LPARENCHAR dbs_search_condition RPARENCHAR;
@@ -279,16 +279,16 @@ dbs_alter_trigger_drop: DROP VERSION dbs_trigger_version_id;
 dbs_alter_trusted: TRUSTED CONTEXT dbs_context_name (dbs_alter_trusted_alter | dbs_alter_trusted_add | dbs_alter_trusted_drop | dbs_alter_trusted_replace)+;
 dbs_alter_trusted_alter: (ALTER (SYSTEM AUTHID dbs_authorization_name | NO DEFAULT ROLE | DEFAULT ROLE dbs_role_name (WITHOUT ROLE AS OBJECT OWNER | WITH ROLE AS OBJECT OWNER AND QUALIFIER)? |
                          NO DEFAULT SECURITY LABEL | DEFAULT SECURITY LABEL dbs_seclabel_name | ATTRIBUTES LPARENCHAR (JOBNAME dbs_jobname_value RPARENCHAR | (ADDRESS dbs_address_value |
-                         ENCRYPTION dbs_encryption_value | SERVAUTH IDENTIFIER) (dbs_comma_separator (ADDRESS dbs_address_value | ENCRYPTION dbs_encryption_value | SERVAUTH IDENTIFIER))* RPARENCHAR))| ALTER? (ENABLE |DISABLE))+;
+                         ENCRYPTION dbs_encryption_value | SERVAUTH dbs_sql_identifier) (dbs_comma_separator (ADDRESS dbs_address_value | ENCRYPTION dbs_encryption_value | SERVAUTH dbs_sql_identifier))* RPARENCHAR))| ALTER? (ENABLE |DISABLE))+;
 dbs_alter_trusted_add: ADD (dbs_alter_trusted_add_attributes | dbs_alter_trusted_add_use);
 dbs_alter_trusted_add_attributes: ATTRIBUTES LPARENCHAR (JOBNAME dbs_jobname_value RPARENCHAR | (ADDRESS dbs_address_value |
-                                    SERVAUTH IDENTIFIER) (dbs_comma_separator (ADDRESS dbs_address_value | SERVAUTH IDENTIFIER))* RPARENCHAR);
+                                    SERVAUTH dbs_sql_identifier) (dbs_comma_separator (ADDRESS dbs_address_value | SERVAUTH dbs_sql_identifier))* RPARENCHAR);
 dbs_alter_trusted_add_use: USE FOR dbs_alter_trusted_useloop (dbs_comma_separator dbs_alter_trusted_useloop)*;
 dbs_alter_trusted_useloop: (dbs_authorization_name dbs_alter_trusted_useopts | EXTERNAL SECURITY PROFILE dbs_profile_name dbs_alter_trusted_useopts | PUBLIC (WITH | WITHOUT) AUTHENTICATION);
 dbs_alter_trusted_useopts: (ROLE dbs_role_name)? (SECURITY LABEL dbs_seclabel_name)? ((WITH|WITHOUT) AUTHENTICATION)?;
 dbs_alter_trusted_drop: DROP (dbs_alter_trusted_drop_attributes | dbs_alter_trusted_drop_use);
-dbs_alter_trusted_drop_attributes: ATTRIBUTES LPARENCHAR (JOBNAME dbs_jobname_value? RPARENCHAR | (ADDRESS dbs_address_value? | SERVAUTH IDENTIFIER?) (dbs_comma_separator (ADDRESS dbs_address_value? |
-                                    SERVAUTH IDENTIFIER?))* RPARENCHAR);
+dbs_alter_trusted_drop_attributes: ATTRIBUTES LPARENCHAR (JOBNAME dbs_jobname_value? RPARENCHAR | (ADDRESS dbs_address_value? | SERVAUTH dbs_sql_identifier?) (dbs_comma_separator (ADDRESS dbs_address_value? |
+                                    SERVAUTH dbs_sql_identifier?))* RPARENCHAR);
 dbs_alter_trusted_drop_use: USE FOR (dbs_authorization_name | EXTERNAL SECURITY PROFILE dbs_profile_name | PUBLIC) (dbs_comma_separator (dbs_authorization_name | EXTERNAL SECURITY PROFILE dbs_profile_name | PUBLIC))*;
 dbs_alter_trusted_replace: REPLACE dbs_alter_trusted_add_use;
 
@@ -333,7 +333,7 @@ dbs_comment_role: ROLE dbs_role_name;
 dbs_comment_sequence: SEQUENCE dbs_sequence_name;
 dbs_comment_table: TABLE (dbs_table_name | dbs_view_name);
 dbs_comment_trigger: TRIGGER dbs_trigger_name (ACTIVE VERSION | VERSION dbs_routine_version_id)?;
-dbs_comment_trusted: TRUSTED CONTEXT dbs_context_name IDENTIFIER;
+dbs_comment_trusted: TRUSTED CONTEXT dbs_context_name dbs_sql_identifier;
 dbs_comment_type: TYPE dbs_object_name;
 dbs_comment_mask: MASK dbs_mask_name;
 dbs_comment_permission: PERMISSION dbs_permission_name;
@@ -426,7 +426,7 @@ pattern_expression: ( (SLASHCHAR | DOUBLESLASHCHAR)  )*;
 other_opt_part1: (NOT? CLUSTER | PARTITIONED | NOT? PADDED | using_specification | free_specification | gbpcache_specification | DEFINE yes_or_no |  COMPRESS yes_or_no | (INCLUDE | EXCLUDE) NULL KEYS)*;
 other_opt_part2: (PARTITION BY (RANGE)? LPARENCHAR (partition_using_specification (dbs_comma_separator  partition_using_specification)*)? RPARENCHAR)?;
 other_opt_part3: (BUFFERPOOL dbs_bp_name | CLOSE yes_or_no | DEFER no_or_yes | DSSIZE dbs_dsize_parameter
-               | PIECESIZE IDENTIFIER {validateTokenWithRegex($IDENTIFIER.text, "\\d+[MmGgKk]", "db2SqlParser.pieceSize");}
+               | PIECESIZE T=dbs_sql_identifier {validateTokenWithRegex($T.text, "\\d+[MmGgKk]", "db2SqlParser.pieceSize");}
                | COPY no_or_yes)*;
 partition_using_specification: partition_element (using_specification | free_specification | gbpcache_specification | DSSIZE dbs_dsize_parameter)*;
 using_specification: USING (VCAT dbs_catalog_name | STOGROUP dbs_stogroup_name (PRIQTY INTEGERLITERAL? | SECQTY INTEGERLITERAL | ERASE yes_or_no?)*);
@@ -471,8 +471,8 @@ dbs_create_sequence_body: AS (INTEGER | dbs_distinct_type_name | common_bit_int 
                 (NO MINVALUE | MINVALUE INTEGERLITERAL) | (NO MAXVALUE | MAXVALUE INTEGERLITERAL) | NO? CYCLE | (CACHE dbs_integer_constant | NO CACHE) | NO? ORDER;
 //CREATE STOGROUP
 dbs_create_stogroup: STOGROUP dbs_stogroup_name (VOLUMES LPARENCHAR dbs_volume_loop RPARENCHAR)? VCAT dbs_volume_cat;
-dbs_volume_loop:  IDENTIFIER (dbs_comma_separator IDENTIFIER)* | ASTERISKCHAR (dbs_comma_separator ASTERISKCHAR)*;
-dbs_volume_cat: dbs_catalog_name (DATACLAS dbs_host_variable)? (MGMTCLAS IDENTIFIER)? (STORCLAS IDENTIFIER)? (NO KEY LABEL | KEY LABEL IDENTIFIER)?;
+dbs_volume_loop:  dbs_sql_identifier (dbs_comma_separator dbs_sql_identifier)* | ASTERISKCHAR (dbs_comma_separator ASTERISKCHAR)*;
+dbs_volume_cat: dbs_catalog_name (DATACLAS dbs_host_variable)? (MGMTCLAS dbs_sql_identifier)? (STORCLAS dbs_sql_identifier)? (NO KEY LABEL | KEY LABEL dbs_sql_identifier)?;
 
 //CREATE SYNONYM deprecated, use CREATE ALIAS
 
@@ -485,7 +485,7 @@ columnn_def: dbs_column_name (common_built_in_type_core3 | dbs_distinct_type_nam
              (LPARENCHAR dbs_constant (dbs_comma_separator dbs_constant)* RPARENCHAR)? |  AS SECURITY LABEL | IMPLICITLY HIDDENCHAR | INLINE LENGTH INTEGERLITERAL)*;//built-in-type change
 column_def_clause : WITH? DEFAULT default_options?;
 xml_type_modifier: XMLSCHEMA  xml_type_modifier_body (dbs_comma_separator xml_type_modifier_body)*;
-xml_type_modifier_body: xml_schema_spec (ELEMENT IDENTIFIER)?;
+xml_type_modifier_body: xml_schema_spec (ELEMENT dbs_sql_identifier)?;
 xml_schema_spec: ID dbs_registered_xml_schema_name | (URL dbs_host_variable | NO NAMESPACE) (LOCATION dbs_schema_location)?;
 generated_clause: GENERATED (ALWAYS | BY DEFAULT)?  (common_as_identity_clause | as_row_change_timestamp_clause)? | GENERATED  ALWAYS? (as_row_transaction_start_id_clause |
                     as_row_transaction_timestamp_clause |  as_generated_expression_clause);
@@ -515,11 +515,11 @@ refreshable_table_options: DATA INITIALLY DEFERRED REFRESH DEFERRED ( MAINTAINED
 dbs_create_table_data_def: in_clause_def | partitioning_clause | organization_clause | EDITPROC dbs_program_name (WITH | WITHOUT) ROW ATTRIBUTES  | VALIDPROC  dbs_program_name | AUDIT (NONE | CHANGES | ALL)
                     | OBID INTEGERLITERAL | DATA CAPTURE (NONE | CHANGES)? | WITH RESTRICT ON DROP | CCSID oneof_encoding |  NOT? VOLATILE CARDINALITY? |
                     NOT? LOGGED | COMPRESS no_or_yes | APPEND no_or_yes | DSSIZE dbs_dsize_parameter | BUFFERPOOL dbs_bp_name |  MEMBER CLUSTER |
-                    TRACKMOD (yes_or_no | dbs_imptkmod_param)  | PAGENUM (dbs_pageset_pagenum_param | RELATIVE | ABSOLUTE) | (NO KEY LABEL | KEY LABEL IDENTIFIER) ;
+                    TRACKMOD (yes_or_no | dbs_imptkmod_param)  | PAGENUM (dbs_pageset_pagenum_param | RELATIVE | ABSOLUTE) | (NO KEY LABEL | KEY LABEL dbs_sql_identifier) ;
 in_clause_def: (IN (dbs_database_name DOT_FS)? dbs_table_space_name | IN DATABASE dbs_database_name | IN ACCELERATOR dbs_accelerator_name);
 partitioning_clause:  PARTITION BY (RANGE? LPARENCHAR partition_expression (dbs_comma_separator partition_expression)*  RPARENCHAR
                         LPARENCHAR partitioning_element (dbs_comma_separator partitioning_element)*  RPARENCHAR
-                        |  SIZE (EVERY IDENTIFIER {validateTokenWithRegex($IDENTIFIER.text, "\\d+[Gg]", "db2SqlParser.size");})?);
+                        |  SIZE (EVERY T=dbs_sql_identifier {validateTokenWithRegex($T.text, "\\d+[Gg]", "db2SqlParser.size");})?);
 partition_expression: dbs_column_name (NULLS LAST)? (ASC | DESC)?;
 partitioning_element: PARTITION INTEGERLITERAL ENDING AT? partition_element_loop partition_hash_space? INCLUSIVE?;
 partition_hash_space: HASH SPACE kmg_blob_parameter;
@@ -584,7 +584,7 @@ dbs_declare: DECLARE dbs_declare_global;
 
 dbs_declare_cursor: DECLARE dbs_cursor_name ((NO|ASENSITIVE|INSENSITIVE|SENSITIVE (DYNAMIC|STATIC)?) SCROLL)? CURSOR ((WITH|WITHOUT) HOLD |
                     (WITHOUT RETURN|WITH RETURN TO (CALLER|CLIENT)) | (WITH|WITHOUT) ROWSET POSITIONING)* /*random ordering req*/
-                    FOR (dbs_select | IDENTIFIER);
+                    FOR (dbs_select | dbs_sql_identifier);
 
 dbs_declare_global: GLOBAL TEMPORARY TABLE dbs_table_name (LPARENCHAR dbs_declare_global_coldef (dbs_comma_separator dbs_declare_global_coldef)* RPARENCHAR |
                     (LIKE (dbs_table_name | dbs_view_name) | AS LPARENCHAR dbs_fullselect RPARENCHAR WITH NO DATA) dbs_declare_global_copyopts) (CCSID (ASCII|EBCDIC|UNICODE) |
@@ -609,7 +609,7 @@ dbs_declare_global_copyopts: (dbs_declare_global_identity dbs_declare_global_def
 dbs_declare_global_defaults: (USING TYPE DEFAULTS | (INCLUDING|EXCLUDING) COLUMN? DEFAULTS);
 dbs_declare_global_identity: (EXCLUDING|INCLUDING) IDENTITY (COLUMN ATTRIBUTES)?;
 
-dbs_declare_statement: IDENTIFIER (dbs_comma_separator IDENTIFIER)* STATEMENT;
+dbs_declare_statement: dbs_sql_identifier (dbs_comma_separator dbs_sql_identifier)* STATEMENT; // WHAT DOES THIS REPRESENT????
 
 dbs_declare_table: DECLARE (dbs_table_name | dbs_view_name) TABLE LPARENCHAR dbs_declare_table_loop (dbs_comma_separator dbs_declare_table_loop)* RPARENCHAR;
 dbs_declare_table_loop: dbs_column_name (dbs_distinct_type_name | dbs_declare_table_bit) (NOT NULL (WITH DEFAULT)?)?;
@@ -648,8 +648,8 @@ dbs_delete_positioned: dbs_correlation_name? WHERE CURRENT OF dbs_cursor_name (F
  /*DESCRIBE (all) */
 dbs_describe: DESCRIBE (dbs_describe_cursor | dbs_describe_input | dbs_describe_output | dbs_describe_procedure | dbs_describe_table);
 dbs_describe_cursor: CURSOR (dbs_cursor_name | dbs_host_variable) INTO dbs_descriptor_name;
-dbs_describe_input: INPUT IDENTIFIER INTO dbs_descriptor_name;
-dbs_describe_output: OUTPUT? IDENTIFIER INTO dbs_descriptor_name (USING (NAMES | LABELS | ANY | BOTH))?;
+dbs_describe_input: INPUT dbs_sql_identifier INTO dbs_descriptor_name;
+dbs_describe_output: OUTPUT? dbs_sql_identifier INTO dbs_descriptor_name (USING (NAMES | LABELS | ANY | BOTH))?;
 dbs_describe_procedure: PROCEDURE (dbs_procedure_name | dbs_host_variable) INTO dbs_descriptor_name;
 dbs_describe_table: TABLE dbs_sql_variable_reference INTO dbs_descriptor_name (USING (NAMES | LABELS | ANY | BOTH))?;
 
@@ -692,7 +692,7 @@ dbs_exchange: EXCHANGE DATA BETWEEN TABLE dbs_table_name AND dbs_table_name;
 
 /*EXECUTE / EXECUTE IMMEDIATE - note LSQUAREBRACKET and RSQUAREBRACKET are new additions to the lexer!*/
 dbs_execute: EXECUTE (dbs_execute_statement | dbs_execute_immediate);
-dbs_execute_statement: IDENTIFIER (USING (dbs_execute_varloop | dbs_execute_hostloop | dbs_execute_descriptor))?;
+dbs_execute_statement: dbs_sql_identifier (USING (dbs_execute_varloop | dbs_execute_hostloop | dbs_execute_descriptor))?;
 dbs_execute_varloop: (dbs_host_variable | dbs_array_variable LSQUAREBRACKET INTEGERLITERAL RSQUAREBRACKET) (dbs_comma_separator (dbs_host_variable |
                         dbs_array_variable LSQUAREBRACKET INTEGERLITERAL RSQUAREBRACKET))*;
 dbs_execute_hostloop: (dbs_array_type_name | dbs_host_variable) (dbs_comma_separator (dbs_array_type_name |
@@ -852,10 +852,10 @@ dbs_refresh: REFRESH TABLE dbs_table_name (QUERYNO INTEGERLITERAL)?;
 dbs_release: RELEASE (dbs_location_name | CURRENT | ALL dbs_exact_match_identifier_sql? | TO? SAVEPOINT dbs_savepoint_name | dbs_host_variable);
 
 dbs_savepoint_name: T=dbs_savepoint_name_rule {validateLength($T.text, "Savepoint name", 128);};
-dbs_savepoint_name_rule: NUMERICLITERAL+ | IDENTIFIER;
+dbs_savepoint_name_rule: NUMERICLITERAL+ | dbs_sql_identifier;
 
 /*RENAME */
-dbs_rename: RENAME (TABLE? dbs_table_name TO dbs_table_name | INDEX dbs_index_name TO IDENTIFIER);
+dbs_rename: RENAME (TABLE? dbs_table_name TO dbs_table_name | INDEX dbs_index_name TO dbs_sql_identifier);
 
 
 /*REVOKE (all) */
@@ -1080,7 +1080,7 @@ dbs_set_current_temp_business_time: CURRENT TEMPORAL BUSINESS_TIME EQUALCHAR? (N
 dbs_set_current_temp_system_time: CURRENT TEMPORAL SYSTEM_TIME EQUALCHAR? (NULL | dbs_expression);
 
 //SET CURRENT ENCRIPTION PASSWORD
-dbs_set_current_enc_pwd: ENCRYPTION PASSWORD EQUALCHAR? (dbs_sql_variable_reference | dbs_constant) (WITH HINT EQUALCHAR? (dbs_host_variable | IDENTIFIER))?;
+dbs_set_current_enc_pwd: ENCRYPTION PASSWORD EQUALCHAR? (dbs_sql_variable_reference | dbs_constant) (WITH HINT EQUALCHAR? (dbs_host_variable | dbs_sql_identifier))?;
 
 //SET PATH
 dbs_set_path: (CURRENT)? PATH EQUALCHAR? set_path_opts_loop;
@@ -1163,13 +1163,13 @@ common_bit_charopts: (CCSID oneof_encoding)? common_bit_fordata?;
 common_bit_varchar: VARCHAR common_bit_varandchar;
 common_bit_varandchar: LPARENCHAR INTEGERLITERAL RPARENCHAR common_bit_charopts;
 common_bit_clob: CLOB common_bit_clobandobj;
-common_bit_clobandobj: (LPARENCHAR (IDENTIFIER {validateTokenWithRegex($IDENTIFIER.text, "\\d+[MmGgKk]", "db2SqlParser.pieceSize");})? RPARENCHAR)?
+common_bit_clobandobj: (LPARENCHAR (T=dbs_sql_identifier {validateTokenWithRegex($T.text, "\\d+[MmGgKk]", "db2SqlParser.pieceSize");})? RPARENCHAR)?
                         (CCSID oneof_encoding)? (FOR (SBCS | MIXED ) DATA)?;
 common_bit_graphic_core: GRAPHIC (LPARENCHAR INTEGERLITERAL RPARENCHAR)? | VARGRAPHIC LPARENCHAR INTEGERLITERAL RPARENCHAR;
 common_bit_graphic: (common_bit_graphic_core | DBCLOB (LPARENCHAR kmg_blob_parameter RPARENCHAR)?) (CCSID oneof_encoding)?;
 common_bit_graphic2: common_bit_graphic_core CCSID dbs_integer1200;
 common_bit_binary_core: BINARY (LPARENCHAR INTEGERLITERAL RPARENCHAR)? | (BINARY VARYING | VARBINARY) LPARENCHAR INTEGERLITERAL RPARENCHAR;
-common_bit_binary: (common_bit_binary_core | (BINARY LARGE OBJECT | BLOB) (LPARENCHAR (IDENTIFIER {validateTokenWithRegex($IDENTIFIER.text, "\\d+[MmGgKk]", "db2SqlParser.pieceSize");})? RPARENCHAR)?);
+common_bit_binary: (common_bit_binary_core | (BINARY LARGE OBJECT | BLOB) (LPARENCHAR (T=dbs_sql_identifier {validateTokenWithRegex($T.text, "\\d+[MmGgKk]", "db2SqlParser.pieceSize");})? RPARENCHAR)?);
 common_bit_timestamp: TIMESTAMP (LPARENCHAR INTEGERLITERAL RPARENCHAR)? (without_or_with TIME ZONE)?;
 common_bit_date_time: (DATE |  TIME | common_bit_timestamp);
 
@@ -1322,14 +1322,14 @@ dbs_control_statement: dbs_assignment_statement
 
 dbs_assignment_statement : SET (dbs_parameter | dbs_sql_variable_reference) EQUALCHAR (CURRENT SERVER | CURRENT PACKAGESET | CURRENT PACKAGE PATH | dbs_expression | NULL);
 dbs_procedure_argument_list : dbs_sql_variable_reference| dbs_parameter | dbs_expression| NULL;
-dbs_call_control : (IDENTIFIER COLONCHAR)? CALL dbs_procedure_name (LPARENCHAR dbs_procedure_argument_list (dbs_comma_separator dbs_procedure_argument_list)*  RPARENCHAR)?;
-dbs_case_statement_pl_sql: (IDENTIFIER COLONCHAR)? CASE (dbs_simple_when_clause_pl_sql | dbs_searched_when_clause_pl_sql) ELSE (dbs_sql_procedure_statement dbs_semicolon_end)+ END CASE;
+dbs_call_control : (dbs_sql_identifier COLONCHAR)? CALL dbs_procedure_name (LPARENCHAR dbs_procedure_argument_list (dbs_comma_separator dbs_procedure_argument_list)*  RPARENCHAR)?;
+dbs_case_statement_pl_sql: (dbs_sql_identifier COLONCHAR)? CASE (dbs_simple_when_clause_pl_sql | dbs_searched_when_clause_pl_sql) ELSE (dbs_sql_procedure_statement dbs_semicolon_end)+ END CASE;
 dbs_simple_when_clause_pl_sql: dbs_expressions (WHEN dbs_expressions THEN (dbs_sql_procedure_statement dbs_semicolon_end)+)+;
 dbs_searched_when_clause_pl_sql: (WHEN dbs_search_condition THEN (dbs_sql_procedure_statement dbs_semicolon_end)+)+;
-dbs_compund_statement: (IDENTIFIER COLONCHAR)? BEGIN (NOT ATOMIC | ATOMIC)? ((dbs_sql_variable_declaration|dbs_sql_condition_declaration
+dbs_compund_statement: (dbs_sql_identifier COLONCHAR)? BEGIN (NOT ATOMIC | ATOMIC)? ((dbs_sql_variable_declaration|dbs_sql_condition_declaration
                         | dbs_return_code_declaration) dbs_semicolon_end)* (dbs_declare_statement dbs_semicolon_end)*
                         (DECLARE dbs_declare_cursor dbs_semicolon_end)* (dbs_handler_declaration dbs_semicolon_end)*
-                        (dbs_sql_procedure_statement dbs_semicolon_end)* END IDENTIFIER?; // check the labelname matches.
+                        (dbs_sql_procedure_statement dbs_semicolon_end)* END dbs_sql_identifier?; // check the labelname matches.
 dbs_sql_variable_declaration: DECLARE dbs_sql_variable_reference (dbs_comma_separator dbs_sql_variable_reference)* (RESULT_SET_LOCATOR VARYING | dbs_insert_data_type (DEFAULT NULL | CONSTANT NULL | (DEFAULT | CONSTANT) dbs_constant)?) ;
 dbs_sql_condition_declaration: DECLARE dbs_constraint_name CONDITION FOR (SQLSTATE VALUE?)? dbs_string_constant;
 dbs_return_code_declaration: DECLARE (SQLSTATE (CHAR LPARENCHAR dbs_integer5 RPARENCHAR | CHARACTER LPARENCHAR dbs_integer5 RPARENCHAR) (DEFAULT dbs_string_constant)? | SQLCODE (INTEGER | INT) (DEFAULT dbs_integer_constant)?);
@@ -1339,19 +1339,19 @@ dbs_general_condition_value: (SQLEXCEPTION | SQLWARNING | NOT FOUND) (dbs_comma_
 //dbs_for_statement: (IDENTIFIER COLONCHAR)? FOR (dbs_for_loop_name AS)? (dbs_cursor_name CURSOR (WITHOUT HOLD | WITH HOLD) FOR)?
 //                    dbs_select_clause DO (dbs_sql_procedure_statement dbs_semicolon_end)+ END FOR  IDENTIFIER; // check label name matches
 //dbs_for_loop_name: dbs_generic_name;
-dbs_goto_statement: (IDENTIFIER COLONCHAR)? GOTO IDENTIFIER;
+dbs_goto_statement: (dbs_sql_identifier COLONCHAR)? GOTO dbs_sql_identifier;
 dbs_if_else_conditional_statement: dbs_search_condition THEN (dbs_sql_procedure_statement dbs_semicolon_end)+;
-dbs_if_statement: (IDENTIFIER COLONCHAR)? IF dbs_if_else_conditional_statement (ELSEIF dbs_if_else_conditional_statement )* (ELSE (dbs_sql_procedure_statement dbs_semicolon_end)+)? END IF;
-dbs_iterate_statement: (IDENTIFIER COLONCHAR)? ITERATE IDENTIFIER;
-dbs_leave_statement: (IDENTIFIER COLONCHAR)? LEAVE IDENTIFIER;
-dbs_loop_statement:  (IDENTIFIER COLONCHAR)? LOOP (dbs_sql_procedure_statement dbs_semicolon_end)+ END LOOP IDENTIFIER?; // label name should match
-dbs_repeat_statement:  (IDENTIFIER COLONCHAR)? REPEAT (dbs_sql_procedure_statement dbs_semicolon_end)+ UNTIL dbs_search_condition END REPEAT IDENTIFIER?; // check that label name matches.
+dbs_if_statement: (dbs_sql_identifier COLONCHAR)? IF dbs_if_else_conditional_statement (ELSEIF dbs_if_else_conditional_statement )* (ELSE (dbs_sql_procedure_statement dbs_semicolon_end)+)? END IF;
+dbs_iterate_statement: (dbs_sql_identifier COLONCHAR)? ITERATE dbs_sql_identifier;
+dbs_leave_statement: (dbs_sql_identifier COLONCHAR)? LEAVE dbs_sql_identifier;
+dbs_loop_statement:  (dbs_sql_identifier COLONCHAR)? LOOP (dbs_sql_procedure_statement dbs_semicolon_end)+ END LOOP dbs_sql_identifier?; // label name should match
+dbs_repeat_statement:  (dbs_sql_identifier COLONCHAR)? REPEAT (dbs_sql_procedure_statement dbs_semicolon_end)+ UNTIL dbs_search_condition END REPEAT dbs_sql_identifier?; // check that label name matches.
 dbs_signal_arg1: (SQLSTATE VALUE? (dbs_string_constant | dbs_sql_variable_reference | dbs_parameter)| dbs_constraint_name);
-dbs_resignal_statement: (IDENTIFIER COLONCHAR)? RESIGNAL (dbs_signal_arg1 dbs_signal_information? )?;
+dbs_resignal_statement: (dbs_sql_identifier COLONCHAR)? RESIGNAL (dbs_signal_arg1 dbs_signal_information? )?;
 dbs_signal_information:SET MESSAGE_TEXT EQUALCHAR dbs_diagnostic_string_expression | LPARENCHAR dbs_diagnostic_string_expression RPARENCHAR;
-dbs_return_statement: (IDENTIFIER COLONCHAR)? RETURN (dbs_expressions | NULL | dbs_fullselect);
-dbs_signal_statement: (IDENTIFIER COLONCHAR)?  SIGNAL dbs_signal_arg1 dbs_signal_information;
-dbs_while_statement: (IDENTIFIER COLONCHAR)? WHILE dbs_search_condition DO (dbs_sql_procedure_statement dbs_semicolon_end)+ END WHILE IDENTIFIER?;
+dbs_return_statement: (dbs_sql_identifier COLONCHAR)? RETURN (dbs_expressions | NULL | dbs_fullselect);
+dbs_signal_statement: (dbs_sql_identifier COLONCHAR)?  SIGNAL dbs_signal_arg1 dbs_signal_information;
+dbs_while_statement: (dbs_sql_identifier COLONCHAR)? WHILE dbs_search_condition DO (dbs_sql_procedure_statement dbs_semicolon_end)+ END WHILE dbs_sql_identifier?;
 /// End STATEMENTS ///
 
 ///SQL-routine-body: DB2 SQL PROCEDURE STATEMENT
@@ -1658,17 +1658,17 @@ dbs_parameter_marker: ( QUESTIONMARK | COLONCHAR dbs_host_variable);
 dbs_parameter_name: T=dbs_sql_identifier {validateLength($T.text, "Parameter name", 128);};
 dbs_permission_name: dbs_sql_identifier;
 dbs_plan_name: T=dbs_sql_identifier {validateLength($T.text, "Plan name", 8);} ;
-dbs_program_name: IDENTIFIER {validateLength($IDENTIFIER.text, "Program name", 8);};
+dbs_program_name: T=dbs_sql_identifier {validateLength($T.text, "Program name", 8);};
 dbs_registered_xml_schema_name: dbs_sql_identifier;
 dbs_result_expression1: dbs_expressions;
 dbs_role_name: T=dbs_sql_identifier+ {validateLength($T.text, "Role name", 128);};
-dbs_routine_version_id: IDENTIFIER {validateLength($IDENTIFIER.text, "Routine version identifier in UTF-8", 122);};
+dbs_routine_version_id: T=dbs_sql_identifier {validateLength($T.text, "Routine version dbs_sql_identifier in UTF-8", 122);};
 dbs_scalar_fullselect : LPARENCHAR dbs_fullselect RPARENCHAR;
 dbs_schema_location: dbs_host_identifier;
-dbs_schema_name: IDENTIFIER {validateLength($IDENTIFIER.text, "Schema name", 128);} | SYSIBM;
+dbs_schema_name: T=dbs_sql_identifier {validateLength($T.text, "Schema name", 128);};
 dbs_search_condition: (NOT? dbs_predicate (SELECTIVITY dbs_integer_constant)? | LPARENCHAR dbs_search_condition RPARENCHAR) ((AND|OR) NOT?
                       (dbs_predicate | dbs_search_condition))* ;
-dbs_seclabel_name: IDENTIFIER {validateLength($IDENTIFIER.text, "Security label", 8);};
+dbs_seclabel_name: T=dbs_sql_identifier {validateLength($T.text, "Security label", 8);};
 dbs_simple_when_clause: (dbs_expressions) (WHEN (dbs_basic_predicate | dbs_expressions) THEN (dbs_result_expression1 | NULL))+;
 dbs_smallint: T=dbs_integer_constant {validateTextInRange($T.text, -2, 100);};//MINUSCHAR? SINGLEDIGITLITERAL SINGLEDIGITLITERAL?;// java ref - -1 to 99
 dbs_specific_name: dbs_object_name;
@@ -1724,11 +1724,11 @@ dbs_xquery_variable_expression : dbs_expression;
 dbs_xml_namespace_declaration : XMLNAMESPACES LPARENCHAR  dbs_xml_namespace_args (dbs_comma_separator dbs_xml_namespace_args)* RPARENCHAR;
 dbs_row_query_expression_constant: dbs_string_constant; //  must not contain an empty string or a string of all blanks.
 dbs_column_xquery_expression_constant: dbs_string_constant; // must not be an empty string or a string of all blanks
-dbs_row_xquery_argument : dbs_xquery_context_item_expression | dbs_xquery_variable_expression AS (dbs_string_constant | IDENTIFIER) (BY REF)?;
+dbs_row_xquery_argument : dbs_xquery_context_item_expression | dbs_xquery_variable_expression AS (dbs_string_constant | dbs_sql_identifier) (BY REF)?;
 dbs_xml_table_regular_column_defn : dbs_column_name dbs_insert_data_type (column_def_clause | PATH dbs_column_xquery_expression_constant)?;
 dbs_xml_table_ordinality_column_defn: dbs_column_name FOR ORDINALITY;
 dbs_collection_derived_table :  UNNEST LPARENCHAR (dbs_ordinary_array_expression (dbs_comma_separator dbs_ordinary_array_expression)* | dbs_assosiative_array_expression) RPARENCHAR (WITH ORDINALITY)? dbs_correlation_clause?;
-dbs_ordinary_array_expression : IDENTIFIER;
+dbs_ordinary_array_expression : dbs_sql_identifier;
 dbs_assosiative_array_expression : dbs_string_constant;
 dbs_join_condition: dbs_inner_left_outer_join | dbs_full_join_expression;
 dbs_inner_left_outer_join : dbs_search_condition;
@@ -1744,7 +1744,7 @@ dbs_triggered_sql_statement_adv: dbs_call | dbs_delete | dbs_get_diagnostics_sta
 dbs_triggered_sql_statement_basic: dbs_triggered_sql_statement;
 dbs_version_id: dbs_host_variable | dbs_sql_identifier | dbs_string_constant;
 dbs_view_name: dbs_host_variable | dsb_alias_name;
-dbs_pieceSize : IDENTIFIER {validateTokenWithRegex($IDENTIFIER.text, "\\d+[MmGgKk]", "db2SqlParser.pieceSize");};
+dbs_pieceSize : T=dbs_sql_identifier {validateTokenWithRegex($T.text, "\\d+[MmGgKk]", "db2SqlParser.pieceSize");};
 dbs_comma_separator: (COMMASEPARATORDB2 | COMMACHAR);
 dbs_semicolon_end: SEMICOLON_FS | SEMICOLONSEPARATORSQL;
 
@@ -1794,7 +1794,7 @@ dbs_trigger_name :  dbs_sql_identifier (DOT_FS dbs_sql_identifier)?; // {validat
 dbs_version_name: CHAR_STRING_LITERAL | dbs_host_variable | ;//empty alternative;
 dbs_object_name: dbs_sql_identifier (DOT_FS dbs_sql_identifier)?;
 dbs_sql_variable_reference: dbs_host_variable | dbs_object_name;
-dbs_statement_name: IDENTIFIER;
+dbs_statement_name: dbs_sql_identifier;
 dbs_xquery_context_item_expression: dbs_generic_name;
 /////  validation rules /////
 dbs_integer5: T=INTEGERLITERAL  {validateValue($T.text, "5");};
