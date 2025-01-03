@@ -686,7 +686,7 @@ cics_readq_ts: (TS | (QUEUE | QNAME) cics_name | cics_into_set | NEXT | (LENGTH 
 
 /** RELEASE */
 cics_release: RELEASE cics_release_option;
-cics_release_option: (PROGRAM cics_name | cics_handle_response)*;
+cics_release_option: (PROGRAM cics_name | cics_handle_response)+;
 
 /** REMOVE SUBEVENT */
 cics_remove: REMOVE (SUBEVENT cics_data_value | EVENT cics_data_value | cics_handle_response)+;
