@@ -983,7 +983,7 @@ public class CICSSysSetOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     }
 
     private void checkMqconn(CICSParser.Cics_set_mqconnContext ctx) {
-        if (ctx.WAIT() != null || ctx.BUSY() != null || ctx.NOWAIT() != null || ctx.FORCE() != null)
+        if (!ctx.WAIT().isEmpty() || !ctx.BUSY().isEmpty() || !ctx.NOWAIT().isEmpty() || !ctx.FORCE().isEmpty())
             checkForExactlyOne("CONNECTST, CONNECTED or NOTCONNECTED", ctx, ctx.CONNECTST(), ctx.CONNECTED(), ctx.NOTCONNECTED());
 
         checkMutuallyExclusiveOptions("WAIT, BUSY, NOWAIT or FORCE", ctx.WAIT(), ctx.BUSY(), ctx.NOWAIT(), ctx.FORCE());
