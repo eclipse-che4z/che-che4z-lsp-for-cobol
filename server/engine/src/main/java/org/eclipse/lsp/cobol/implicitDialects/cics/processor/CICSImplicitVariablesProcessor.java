@@ -15,6 +15,7 @@
 package org.eclipse.lsp.cobol.implicitDialects.cics.processor;
 
 import org.eclipse.lsp.cobol.common.model.SectionType;
+import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
 import org.eclipse.lsp.cobol.common.model.tree.SectionNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.*;
@@ -24,51 +25,32 @@ import org.eclipse.lsp.cobol.common.symbols.VariableAccumulator;
 import org.eclipse.lsp.cobol.implicitDialects.cics.generator.CICSBulkImplicitVariablesGenerator;
 import org.eclipse.lsp.cobol.implicitDialects.cics.generator.CICSSRImplicitVariablesGenerator;
 
-import java.util.List;
-
 /** Enrich symbolic table with predefined variables */
 public class CICSImplicitVariablesProcessor implements Processor<SectionNode> {
 
   @Override
   public void accept(SectionNode sectionNode, ProcessingContext processingContext) {
+    if (sectionNode.getSectionType() != SectionType.LINKAGE
+            && sectionNode.getSectionType() != SectionType.WORKING_STORAGE) {
+      return;
+    }
+
+    ProgramNode programNode = sectionNode.getProgram()
+            .orElseThrow(() -> new RuntimeException("Program for section " + sectionNode.getSectionType() + " not found"));
+    VariableAccumulator variableAccumulator = processingContext.getVariableAccumulator();
+
     if (sectionNode.getSectionType() == SectionType.LINKAGE) {
-      VariableAccumulator variableAccumulator = processingContext.getVariableAccumulator();
-      ProgramNode programNode =
-          sectionNode
-              .getProgram()
-              .orElseThrow(
-                  () ->
-                      new RuntimeException(
-                          "Program for section " + sectionNode.getSectionType() + " not found"));
-        registerVariable(
-            variableAccumulator, programNode, CICSBulkImplicitVariablesGenerator.generate());
+      registerVariable(variableAccumulator, programNode, CICSBulkImplicitVariablesGenerator.generate());
     }
-
     if (sectionNode.getSectionType() == SectionType.WORKING_STORAGE) {
-      VariableAccumulator variableAccumulator = processingContext.getVariableAccumulator();
-      ProgramNode programNode =
-          sectionNode
-              .getProgram()
-              .orElseThrow(
-                  () ->
-                      new RuntimeException(
-                          "Program for section " + sectionNode.getSectionType() + " not found"));
-        registerVariables(
-            variableAccumulator, programNode, CICSSRImplicitVariablesGenerator.generate());
+      CICSSRImplicitVariablesGenerator.generate().forEach(n -> registerVariable(variableAccumulator, programNode, n));
     }
   }
 
-
-  private void registerVariables(
-      VariableAccumulator variableAccumulator, ProgramNode programNode, List<VariableNode> nodes) {
-    nodes.forEach(n -> registerVariable(variableAccumulator, programNode, n));
-  }
-
-  private void registerVariable(
-      VariableAccumulator variableAccumulator, ProgramNode programNode, VariableNode variable) {
+  private void registerVariable(VariableAccumulator variableAccumulator, ProgramNode programNode, VariableNode variable) {
     variableAccumulator.addVariableDefinition(programNode, variable);
-    variable.getChildren().stream()
-        .map(VariableNode.class::cast)
-        .forEach(c -> variableAccumulator.addVariableDefinition(programNode, c));
+    for (Node node : variable.getChildren()) {
+      variableAccumulator.addVariableDefinition(programNode, (VariableNode) node);
+    }
   }
 }
