@@ -38,7 +38,7 @@ allExciRules: cics_exci_link | cics_exci_delete | cics_exci_delete_container | c
               cics_exci_get_container | cics_exci_get_next_container | cics_exci_move_container |
               cics_exci_put_container | cics_exci_query_channel | cics_exci_startbrowse_container ;
 
-allSPRules: cics_inquire_system_programming;
+allSPRules: cics_inquire_system_programming | cics_create;
 
 // compiler options
 compilerOpts
@@ -254,6 +254,14 @@ cics_connect_process: (PROCESS | (CONVID | SESSION | PARTNER) cics_name | PROCNA
 /** CONVERTTIME */
 cics_converttime: CONVERTTIME cics_converttime_opts;
 cics_converttime_opts:(DATESTRING cics_data_area | ABSTIME cics_data_area | cics_handle_response)+;
+
+/** CREATE System Commands */
+cics_create: CREATE cics_create_opts;
+cics_create_opts:((ATOMSERVICE | BUNDLE | DB2CONN | DB2ENTRY | DB2TRAN | DOCTEMPLATE | DUMPCODE | ENQMODEL | FILE |
+                                      IPCONN | JOURNALMODEL | JVMSERVER | LIBRARY | LSRSPOOL | MAPSET | MQCONN | MQMONITOR | PARTITIONSET |
+                                      PARTNER |  PIPELINE | PROCESSTYPE | PROFILE | PROGRAM | TCPIPSERVICE | TDQUEUE | TRANCLASS |
+                                      TRANSACTION | TSMODEL | TYPETERM | URIMAP | WEBSERVICE | SESSIONS | TERMINAL | CONNECTION) cics_data_value |
+                                      (ATTRIBUTES cics_attributes | COMPLETE | DISCARD | ATTRLEN cics_data_value | LOG | NOLOG | LOGMESSAGE cics_cvda | cics_handle_response))+;
 
 /** DEFINE (all of them) */
 cics_define: DEFINE (cics_define_activity | cics_define_composite_event | cics_define_counter_dcounter | cics_define_input_event | cics_define_process | cics_define_timer);
@@ -986,6 +994,7 @@ cics_hhmmss: LPARENCHAR hhmmss RPARENCHAR;
 cics_label: LPARENCHAR paragraphNameUsage RPARENCHAR;
 cics_value: LPARENCHAR ptr_value RPARENCHAR;
 empty_parens: LPARENCHAR RPARENCHAR;
+cics_attributes: LPARENCHAR (.* | LPARENCHAR .* RPARENCHAR) RPARENCHAR;
 
 cicsWord
     : WORD_IDENTIFIER | cicsWords
@@ -1213,6 +1222,7 @@ ABCODE
  | ATTACHTIME
  | ATTLS
  | ATTRIBUTES
+ | ATTRLEN
  | AUDALARMST
  | AUDITLEVEL
  | AUDITLOG
@@ -1450,6 +1460,7 @@ ABCODE
  | DIGEST
  | DIGESTTYPE
  | DISABLEDACT
+ | DISCARD
  | DISCONNECT
  | DISCREQST
  | DISPOSITION
@@ -1832,6 +1843,7 @@ ABCODE
  | LOW_VALUES
  | LPASTATUS
  | LSRPOOLNUM
+ | LSRSPOOL
  | LUNAME
  | MAIN
  | MAJORVERSION
@@ -1955,6 +1967,7 @@ ABCODE
  | NOFLUSH
  | NOHANDLE
  | NOINCONVERT
+ | NOLOG
  | NONE
  | NONTERMREL
  | NOOUTCONVERT
@@ -2047,6 +2060,7 @@ ABCODE
  | PARSE
  | PARTCLASS
  | PARTCOUNT
+ | PARTITIONSET
  | PARTITIONSST
  | PARTN
  | PARTNER
@@ -2328,6 +2342,7 @@ ABCODE
  | SERVERPORT
  | SERVSTATUS
  | SESSION
+ | SESSIONS
  | SESSIONTYPE
  | SESSTOKEN
  | SET
@@ -2536,6 +2551,7 @@ ABCODE
  | TYPENAMELEN
  | TYPENS
  | TYPENSLEN
+ | TYPETERM
  | UCTRANST
  | UDSASIZE
  | UNATTEND
