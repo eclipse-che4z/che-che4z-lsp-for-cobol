@@ -30,8 +30,7 @@
     </parent>
 
     <properties>
-        <maven.compiler.source>8</maven.compiler.source>
-        <maven.compiler.target>8</maven.compiler.target>
+        <maven.compiler.release>11</maven.compiler.release>
         <antlr.version>4.13.2</antlr.version>
         <awaitility.version>3.0.0</awaitility.version>
         <commons.io.version>2.14.0</commons.io.version>
@@ -52,7 +51,7 @@
         <maven.jacoco.plugin.version>0.8.12</maven.jacoco.plugin.version>
         <maven.resources.plugin.version>3.0.2</maven.resources.plugin.version>
         <maven.surefire.plugin.version>3.5.2</maven.surefire.plugin.version>
-        <mockito.core.version>5.14.2</mockito.core.version>
+        <mockito.core.version>5.15.2</mockito.core.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <slf4j.api.version>2.0.9</slf4j.api.version>
