@@ -46,9 +46,6 @@ class CICSImplicitVariablesProcessorTest {
   @BeforeEach
   void init() {
     processor = new CICSImplicitVariablesProcessor();
-    when(processingContext.getVariableAccumulator()).thenReturn(variableAccumulator);
-
-    assertNotNull(processingContext.getVariableAccumulator());
   }
 
   @Test
