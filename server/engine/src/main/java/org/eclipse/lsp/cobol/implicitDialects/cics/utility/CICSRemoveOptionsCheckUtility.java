@@ -34,7 +34,6 @@ public class CICSRemoveOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
   private static final Map<Integer, ErrorSeverity> DUPLICATE_CHECK_OPTIONS =
           new HashMap<Integer, ErrorSeverity>() {
             {
-              put(CICSLexer.REMOVE, ErrorSeverity.ERROR);
               put(CICSLexer.SUBEVENT, ErrorSeverity.ERROR);
               put(CICSLexer.EVENT, ErrorSeverity.ERROR);
             }
