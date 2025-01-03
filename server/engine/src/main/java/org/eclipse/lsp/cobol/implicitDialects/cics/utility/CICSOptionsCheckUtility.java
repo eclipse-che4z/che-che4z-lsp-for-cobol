@@ -223,6 +223,9 @@ public class CICSOptionsCheckUtility {
         CICSPopHandleOptionsCheckUtility.RULE_INDEX,
         new CICSPopHandleOptionsCheckUtility(context, errors));
     optionsMap.put(
+        CICSReleaseOptionsCheckUtility.RULE_INDEX,
+        new CICSReleaseOptionsCheckUtility(context, errors));
+    optionsMap.put(
         CICSPostOptionsCheckUtility.RULE_INDEX,
         new CICSPostOptionsCheckUtility(context, errors));
     spOptionsMap.put(
@@ -231,6 +234,7 @@ public class CICSOptionsCheckUtility {
     spOptionsMap.put(
         CICSDiscardOptionsUtility.RULE_INDEX,
         new CICSDiscardOptionsUtility(context, errors));
+
   }
 
     /**
