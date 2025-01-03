@@ -690,8 +690,10 @@ cics_release: RELEASE cics_handle_response? PROGRAM cics_name cics_handle_respon
 /** REMOVE SUBEVENT */
 cics_remove: REMOVE (SUBEVENT cics_data_value | EVENT cics_data_value | cics_handle_response)+;
 
-/** RESET ACQPROCESS / ACTIVITY */
-cics_reset: RESET (ACQPROCESS | ACTIVITY cics_data_value | cics_handle_response)+;
+/** RESET ACQPROCESS / RESET ACTIVITY */
+cics_reset: RESET (cics_reset_acqprocess | cics_reset_activity);
+cics_reset_acqprocess: (ACQPROCESS | cics_handle_response)+;
+cics_reset_activity: (ACTIVITY cics_data_value | cics_handle_response)+;
 
 /** RESETBR */
 cics_resetbr: RESETBR cics_file_name (RIDFLD cics_data_area | KEYLENGTH cics_data_value | GENERIC | REQID cics_data_value |
