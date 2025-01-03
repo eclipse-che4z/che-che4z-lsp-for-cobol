@@ -34,7 +34,6 @@ public class CICSPostOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
   private static final Map<Integer, ErrorSeverity> DUPLICATE_CHECK_OPTIONS =
           new HashMap<Integer, ErrorSeverity>() {
             {
-              put(CICSLexer.POST, ErrorSeverity.ERROR);
               put(CICSLexer.INTERVAL, ErrorSeverity.ERROR);
               put(CICSLexer.TIME, ErrorSeverity.ERROR);
               put(CICSLexer.AFTER, ErrorSeverity.WARNING);
