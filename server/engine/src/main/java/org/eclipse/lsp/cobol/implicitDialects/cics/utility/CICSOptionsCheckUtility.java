@@ -216,10 +216,28 @@ public class CICSOptionsCheckUtility {
     optionsMap.put(
         CICSPointOptionsCheckUtility.RULE_INDEX,
         new CICSPointOptionsCheckUtility(context, errors));
+    optionsMap.put(
+        CICSResetOptionsCheckUtility.RULE_INDEX,
+        new CICSResetOptionsCheckUtility(context, errors));
+    optionsMap.put(
+        CICSPopHandleOptionsCheckUtility.RULE_INDEX,
+        new CICSPopHandleOptionsCheckUtility(context, errors));
+    optionsMap.put(
+        CICSReleaseOptionsCheckUtility.RULE_INDEX,
+        new CICSReleaseOptionsCheckUtility(context, errors));
+    optionsMap.put(
+        CICSPostOptionsCheckUtility.RULE_INDEX,
+        new CICSPostOptionsCheckUtility(context, errors));
+    optionsMap.put(
+        CICSRemoveOptionsCheckUtility.RULE_INDEX,
+        new CICSRemoveOptionsCheckUtility(context, errors));
     spOptionsMap.put(
         CICSInquireSPOptionsCheckUtility.RULE_INDEX,
         new CICSInquireSPOptionsCheckUtility(context, errors));
-      spOptionsMap.put(
+    spOptionsMap.put(
+        CICSDiscardOptionsUtility.RULE_INDEX,
+        new CICSDiscardOptionsUtility(context, errors));
+    spOptionsMap.put(
         CICSExtractSPOptionsCheckUtility.RULE_INDEX,
         new CICSExtractSPOptionsCheckUtility(context, errors));
   }

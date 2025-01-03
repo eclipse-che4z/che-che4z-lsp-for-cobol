@@ -38,7 +38,7 @@ allExciRules: cics_exci_link | cics_exci_delete | cics_exci_delete_container | c
               cics_exci_get_container | cics_exci_get_next_container | cics_exci_move_container |
               cics_exci_put_container | cics_exci_query_channel | cics_exci_startbrowse_container ;
 
-allSPRules: cics_extract_system_programming | cics_inquire_system_programming;
+allSPRules: cics_discard | cics_extract_system_programming | cics_inquire_system_programming;
 
 // compiler options
 compilerOpts
@@ -297,6 +297,12 @@ cics_queue_qname: (QUEUE | QNAME) cics_name;
 /** DEQ */
 cics_deq: DEQ (cics_deq_cmds | cics_handle_response);
 cics_deq_cmds : (RESOURCE cics_data_area | LENGTH cics_data_value | MAXLIFETIME cics_cvda | TASK | UOW)+;
+
+/** DISCARD System Commands **/
+cics_discard: DISCARD cics_discard_body;
+cics_discard_body: cics_handle_response* (ATOMSERVICE | AUTINSTMODEL | BUNDLE | CONNECTION | DB2CONN | DB2ENTRY | DB2TRAN | DOCTEMPLATE |
+                   ENQMODEL | FILE | IPCONN | JOURNALMODEL | JOURNALNAME | JVMSERVER | LIBRARY | MQCONN | MQMONITOR | PARTNER | PIPELINE |
+                   PROCESSTYPE | PROFILE | PROGRAM | TCPIPSERVICE | TDQUEUE | TERMINAL | TRANCLASS | TRANSACTION | TSMODEL | URIMAP | WEBSERVICE) cics_data_value cics_handle_response*;
 
 /** DOCUMENT CREATE / DELETE / INSERT / RETRIEVE / SET */
 cics_document: DOCUMENT (cics_document_create | DELETE DOCTOKEN cics_data_area | cics_document_insert |
@@ -639,11 +645,14 @@ cics_point: POINT cics_point_options;
 cics_point_options: ((CONVID | SESSION) cics_name | cics_handle_response)*;
 
 /** POP HANDLE */
-cics_pop: POP cics_handle_response? HANDLE cics_handle_response?;
+cics_pop: POP cics_pop_option;
+cics_pop_option: (HANDLE | cics_handle_response)*;
 
 /** POST */
-cics_post: POST (INTERVAL cics_zero_digit | INTERVAL cics_hhmmss | TIME cics_hhmmss | cics_post_after | SET cics_ref
-           REQID cics_name | cics_handle_response)*;
+cics_post: POST cics_post_options;
+cics_post_options: (INTERVAL (cics_zero_digit | cics_hhmmss) | TIME cics_hhmmss | AFTER | (HOURS | MINUTES | SECONDS) cics_data_value |
+                 AT | SET cics_ref | REQID cics_name | cics_handle_response)+;
+
 cics_post_after: (AFTER | AT | HOURS cics_data_value | MINUTES cics_data_value | SECONDS cics_data_value | cics_handle_response)+;
 
 /** PURGE MESSAGE */
@@ -683,13 +692,17 @@ cics_readq_ts: (TS | (QUEUE | QNAME) cics_name | cics_into_set | NEXT | (LENGTH 
                 ITEM cics_data_value | cics_handle_response)+;
 
 /** RELEASE */
-cics_release: RELEASE cics_handle_response? PROGRAM cics_name cics_handle_response?;
+cics_release: RELEASE cics_release_option;
+cics_release_option: (PROGRAM cics_name | cics_handle_response)+;
 
 /** REMOVE SUBEVENT */
-cics_remove: REMOVE (SUBEVENT cics_data_value | EVENT cics_data_value | cics_handle_response)+;
+cics_remove: REMOVE cics_remove_option;
+cics_remove_option: ((SUBEVENT | EVENT) cics_data_value | cics_handle_response)+;
 
-/** RESET ACQPROCESS / ACTIVITY */
-cics_reset: RESET (ACQPROCESS | ACTIVITY cics_data_value | cics_handle_response)+;
+/** RESET ACQPROCESS / RESET ACTIVITY */
+cics_reset: RESET (cics_reset_acqprocess | cics_reset_activity);
+cics_reset_acqprocess: (ACQPROCESS | cics_handle_response)+;
+cics_reset_activity: (ACTIVITY cics_data_value | cics_handle_response)+;
 
 /** RESETBR */
 cics_resetbr: RESETBR cics_file_name (RIDFLD cics_data_area | KEYLENGTH cics_data_value | GENERIC | REQID cics_data_value |
@@ -1473,6 +1486,7 @@ ABCODE
  | DIGEST
  | DIGESTTYPE
  | DISABLEDACT
+ | DISCARD
  | DISCONNECT
  | DISCREQST
  | DISPOSITION
