@@ -57,7 +57,7 @@ public class TestCICSPopHandle {
                     new Diagnostic(
                             new Range(),
                             "Excessive options provided for: HANDLE",
-                            DiagnosticSeverity.Error,
+                            DiagnosticSeverity.Warning,
                             ErrorSource.PARSING.getText())));
   }
 }
