@@ -27,33 +27,30 @@ import org.junit.jupiter.api.Test;
 /** Tests {@link LinkageArgumentsOriginCheck} */
 public class TestProcedureDivisonHeadersArgumentsOriginCheck {
   public static final String TEXT =
-      "       IDENTIFICATION DIVISION.\n"
+      "       {$$*IDENTIFICATION DIVISION.\n"
           + "       FUNCTION-ID. HEXOF.\n"
           + "       DATA DIVISION.\n"
           + "       LINKAGE SECTION.\n"
           + "       01  {$*NUM}         PIC X(1234).\n"
           + "       PROCEDURE DIVISION RETURNING {$NUM}.\n"
-          + "       END FUNCTION HEXOF.\n"
+          + "       END FUNCTION HEXOF.|HEXOF}\n"
           + "\n"
           + "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID. PGM.\n"
           + "       ENVIRONMENT DIVISION.\n"
           + "       CONFIGURATION SECTION.                               \n"
           + "       REPOSITORY.                                          \n"
-          + "               FUNCTION HEXOF.\n"
+          + "               FUNCTION {$$HEXOF}.\n"
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
           + "       01 {$*num} pic x.\n"
           + "       01 {$*num2} pic x.\n"
           + "       LINKAGE SECTION.\n"
           + "       01 {$*num3} pic x.\n"
-          + "       PROCEDURE DIVISION using {_{$num}|1_} {_{$num2}|2_} {hexof|3} {$num3} RETURNING {_{$num}|4_}.\n"
-          + "           display function HEXOF.\n"
+          + "       PROCEDURE DIVISION using {_{$num}|1_} {_{$num2}|2_} {$$hexof|3} {$num3} RETURNING {_{$num}|4_}.\n"
+          + "           display function {$$HEXOF}.\n"
           + "       END PROGRAM PGM.";
 
-  // TODO:
-  // After usecase engine is updated to capture function definition and usage. Below Test need to
-  // be modified to capture those and update error message for the wrong function usage.
   @Test
   void test() {
     UseCaseEngine.runTest(
@@ -75,7 +72,7 @@ public class TestProcedureDivisonHeadersArgumentsOriginCheck {
             "3",
             new Diagnostic(
                 new Range(),
-                "Variable HEXOF is not defined",
+                "'HEXOF' was not defined as a data-name",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()),
             "4",

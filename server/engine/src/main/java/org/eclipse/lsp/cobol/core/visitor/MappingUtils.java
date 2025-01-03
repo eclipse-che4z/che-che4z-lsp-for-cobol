@@ -15,7 +15,7 @@
 package org.eclipse.lsp.cobol.core.visitor;
 
 import lombok.experimental.UtilityClass;
-import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.tree.ParseTree;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
@@ -29,22 +29,24 @@ import static org.eclipse.lsp.cobol.core.visitor.VisitorHelper.retrieveRangeLoca
  */
 @UtilityClass
 public class MappingUtils {
-    /**
-     * Retrieve a locality from the given context with a range from the start to the end
-     *
-     * @param ctx ParserRuleContext to extract locality
-     * @param extendedDocument an extended document.
-     * @param copybooks a copybook registry.
-     * @return locality which has a range from the start to the end of the rule
-     */
-
-    public static Optional<Locality> retrieveLocality(ParserRuleContext ctx, ExtendedDocument extendedDocument, CopybooksRepository copybooks) {
-        return retrieveRangeLocality(ctx)
-                .map(extendedDocument::mapLocation)
-                .map(loc -> Locality.builder()
-                        .range(loc.getRange())
-                        .uri(loc.getUri())
-                        .copybookId(copybooks.getCopybookIdByUri(loc.getUri()))
-                        .build());
-    }
+  /**
+   * Retrieve a locality from the given context with a range from the start to the end
+   *
+   * @param ctx ParserRuleContext to extract locality
+   * @param extendedDocument an extended document.
+   * @param copybooks a copybook registry.
+   * @return locality which has a range from the start to the end of the rule
+   */
+  public static Optional<Locality> retrieveLocality(
+          ParseTree ctx, ExtendedDocument extendedDocument, CopybooksRepository copybooks) {
+    return retrieveRangeLocality(ctx)
+        .map(extendedDocument::mapLocation)
+        .map(
+            loc ->
+                Locality.builder()
+                    .range(loc.getRange())
+                    .uri(loc.getUri())
+                    .copybookId(copybooks.getCopybookIdByUri(loc.getUri()))
+                    .build());
+  }
 }
