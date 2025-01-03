@@ -92,10 +92,10 @@ public class TestCicsSysSetStatement {
     private static final String JVMSERVER_VALID_2 = "SET JVMSERVER(123) THREADLIMIT(1) ENABLED PHASEOUT";
     private static final String LIBRARY_VALID_1 = "SET LIBRARY(1)";
     private static final String LIBRARY_VALID_2 = "SET LIBRARY(1) CRITICALST(1) ENABLESTATUS(1) RANKING(3)";
-    private static final String MODENAME_VALID_1 = "SET MODENAME ";
-    private static final String MODENAME_VALID_2 = "SET MODENAME ";
-    private static final String MONITOR_VALID_1 = "SET MONITOR ";
-    private static final String MONITOR_VALID_2 = "SET MONITOR ";
+    private static final String MODENAME_VALID_1 = "SET MODENAME(123) CONNECTION(123)";
+    private static final String MODENAME_VALID_2 = "SET MODENAME(123) CONNECTION(123) AVAILABLE(123) ACQUIRED";
+    private static final String MONITOR_VALID_1 = "SET MONITOR";
+    private static final String MONITOR_VALID_2 = "SET MONITOR COMPRESS CONVERSE DPLLIMIT(123) EXCEPT FILELIMIT(1) FREQUENCY(1) IDNTY PERF NORESRCE OFF SYNCPOINT TSQUEUELIMIT(1) URIMAPLIMIT(1) WEBSERVLIMIT(1)";
     private static final String MQCONN_VALID_1 = "SET MQCONN ";
     private static final String MQCONN_VALID_2 = "SET MQCONN ";
     private static final String MQMONITOR_VALID_1 = "SET MQMONITOR ";
@@ -206,12 +206,12 @@ public class TestCicsSysSetStatement {
     private static final String JVMENDPOINT_INVALID_2 = "SET {_JVMENDPOINT(1) JVMSERVER(1)|errorOne_}";
     private static final String JVMSERVER_INVALID_1 = "SET {_JVMSERVER(123) ENABLED DISABLED|errorOne_}";
     private static final String JVMSERVER_INVALID_2 = "SET JVMSERVER(123) ENABLED PHASEOUT {PURGE|errorOne} ";
-    private static final String LIBRARY_INVALID_1 = "SET LIBRARY ";
-    private static final String LIBRARY_INVALID_2 = "SET LIBRARY ";
-    private static final String MODENAME_INVALID_1 = "SET MODENAME ";
-    private static final String MODENAME_INVALID_2 = "SET MODENAME ";
-    private static final String MONITOR_INVALID_1 = "SET MONITOR ";
-    private static final String MONITOR_INVALID_2 = "SET MONITOR ";
+    private static final String LIBRARY_INVALID_1 = "SET LIBRARY(123) CRITICAL {NONCRITICAL|errorOne}";
+    private static final String LIBRARY_INVALID_2 = "SET LIBRARY(123) ENABLED {DISABLED|errorOne}";
+    private static final String MODENAME_INVALID_1 = "SET {_MODENAME(123) CLOSED|errorOne_}";
+    private static final String MODENAME_INVALID_2 = "SET {_MODENAME(123) CONNECTION(1) CLOSED ACQUIRED|errorOne_}";
+    private static final String MONITOR_INVALID_1 = "SET MONITOR ON {OFF|errorOne}";
+    private static final String MONITOR_INVALID_2 = "SET MONITOR FREQUENCY(1) {FREQUENCYMIN|errorOne}(1)";
     private static final String MQCONN_INVALID_1 = "SET MQCONN ";
     private static final String MQCONN_INVALID_2 = "SET MQCONN ";
     private static final String MQMONITOR_INVALID_1 = "SET MQMONITOR ";
@@ -826,20 +826,20 @@ public class TestCicsSysSetStatement {
 
     @Test
     void testCicsLibraryInvalid() {
-        testSingleError(LIBRARY_INVALID_1, "");
-        testSingleError(LIBRARY_INVALID_2, "");
+        testSingleError(LIBRARY_INVALID_1, "Options \"CRITICALST, CRITICAL or NONCRITICAL\" are mutually exclusive.");
+        testSingleError(LIBRARY_INVALID_2, "Options \"ENABLESTATUS, ENABLED or DISABLED\" are mutually exclusive.");
     }
 
     @Test
     void testCicsModenameInvalid() {
-        testSingleError(MODENAME_INVALID_1, "");
-        testSingleError(MODENAME_INVALID_2, "");
+        testSingleError(MODENAME_INVALID_1, "Missing required option: CONNECTION");
+        testSingleError(MODENAME_INVALID_2, "Missing required option for: ACQUIRED without AVAILABLE");
     }
 
     @Test
     void testCicsMonitorInvalid() {
-        testSingleError(MONITOR_INVALID_1, "");
-        testSingleError(MONITOR_INVALID_2, "");
+        testSingleError(MONITOR_INVALID_1, "Options \"STATUS, ON or OFF\" are mutually exclusive.");
+        testSingleError(MONITOR_INVALID_2, "Options \"FREQUENCY or FREQUENCYMIN\" are mutually exclusive.");
     }
 
     @Test
