@@ -56,8 +56,8 @@ public class TestCICSReset {
             ImmutableMap.of(
                     "errorOne",
                     new Diagnostic(
-                            new Range(new Position(14, 12), new Position(14, 12)),
-                            "Missing required option: ACQPROCESS",
+                            new Range(new Position(14, 12), new Position(14, 20)),
+                            "Syntax error on 'END-EXEC'",
                             DiagnosticSeverity.Error,
                             ErrorSource.PARSING.getText())));
   }
