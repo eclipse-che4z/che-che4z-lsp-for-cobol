@@ -19,7 +19,6 @@ import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.implicitDialects.cics.CICSLexer;
-import org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser;
 
 import java.util.HashMap;
 import java.util.List;
@@ -34,7 +33,6 @@ public class CICSPopHandleOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
   private static final Map<Integer, ErrorSeverity> DUPLICATE_CHECK_OPTIONS =
           new HashMap<Integer, ErrorSeverity>() {
             {
-              put(CICSLexer.POP, ErrorSeverity.ERROR);
               put(CICSLexer.HANDLE, ErrorSeverity.ERROR);
             }
           };
@@ -50,13 +48,6 @@ public class CICSPopHandleOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
    * @param <E> A subclass of ParserRuleContext
    */
   public <E extends ParserRuleContext> void checkOptions(E ctx) {
-    if (ctx instanceof CICSParser.Cics_pop_optionContext) {
-      checkPopHandle((CICSParser.Cics_pop_optionContext) ctx);
-    }
     checkDuplicates(ctx);
-  }
-
-  private void checkPopHandle(CICSParser.Cics_pop_optionContext ctx) {
-    checkHasMandatoryOptions(ctx.HANDLE(), ctx, "HANDLE");
   }
 }

@@ -19,7 +19,6 @@ import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.usecases.common.CICSTestUtils;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
-import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
@@ -30,14 +29,19 @@ import org.junit.jupiter.api.Test;
  * <p>This class tests the POP HANDLE command.
  */
 public class TestCICSPopHandle {
+  private static final String POP_VALID =
+          "POP";
+
   private static final String POP_HANDLE_VALID =
           "POP HANDLE";
 
   private static final String POP_HANDLE_INVALID =
           "POP HANDLE {HANDLE|errorOne}";
 
-  private static final String POP_HANDLE_INVALID_MISSING_HANDLE =
-          "{POP|errorOne}";
+  @Test
+  void testPopValid() {
+    CICSTestUtils.noErrorTest(POP_VALID);
+  }
 
   @Test
   void testPopHandleValid() {
@@ -53,19 +57,6 @@ public class TestCICSPopHandle {
                     new Diagnostic(
                             new Range(),
                             "Excessive options provided for: HANDLE",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText())));
-  }
-
-  @Test
-  void testPopHandleInvalidMissingHandle() {
-    CICSTestUtils.errorTest(
-            POP_HANDLE_INVALID_MISSING_HANDLE,
-            ImmutableMap.of(
-                    "errorOne",
-                    new Diagnostic(
-                            new Range(new Position(13, 12), new Position(12, 15)),
-                            "Missing required option: HANDLE",
                             DiagnosticSeverity.Error,
                             ErrorSource.PARSING.getText())));
   }
