@@ -156,7 +156,7 @@ export async function activate(
   // Custom client handlers
   languageClientService.addRequestHandler(
     "cobol/resolveSubroutine",
-    resolveSubroutineURI.bind(undefined, context.globalStorageUri.fsPath),
+    resolveSubroutineURI,
   );
   languageClientService.addRequestHandler(
     "copybook/resolve",

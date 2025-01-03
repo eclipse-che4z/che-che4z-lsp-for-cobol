@@ -40,12 +40,15 @@ public class Keywords extends CompletionStorage<String> {
   @Override
   protected Map<String, String> getDataMap(List<String> dialectTypes) {
     Map<String, String> result = new HashMap<>(KeywordsUtils.getKeywords(KEYWORDS_FILE_PATH));
-    Optional.ofNullable(this.dialectService)
-            .ifPresent(service -> service.getImplicitCobolDialects()
-                    .forEach(dialect ->  result.putAll(dialect.getKeywords())));
-    dialectTypes.forEach(
-        dialectType -> result.putAll(dialectService.getDialectByName(dialectType)
-                .map(CobolDialect::getKeywords).orElse(Collections.emptyMap()))
+    if (dialectService == null) {
+      return result;
+    }
+    dialectService
+            .getImplicitCobolDialects().forEach(dialect -> result.putAll(dialect.getKeywords()));
+
+    dialectTypes
+            .forEach(dialectType -> result.putAll(dialectService.getDialectByName(dialectType)
+            .map(CobolDialect::getKeywords).orElse(Collections.emptyMap()))
     );
 
     return result;
