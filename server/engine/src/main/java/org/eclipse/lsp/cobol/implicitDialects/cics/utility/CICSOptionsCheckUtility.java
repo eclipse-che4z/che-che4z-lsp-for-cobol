@@ -186,27 +186,51 @@ public class CICSOptionsCheckUtility {
     optionsMap.put(
         CICSRunOptionsCheckUtility.RULE_INDEX,
         new CICSRunOptionsCheckUtility(context, errors));
-      optionsMap.put(
+    optionsMap.put(
         CICSXctlOptionsUtility.RULE_INDEX,
         new CICSXctlOptionsUtility(context, errors));
-      optionsMap.put(
+    optionsMap.put(
         CICSSuspendOptionsUtility.RULE_INDEX,
         new CICSSuspendOptionsUtility(context, errors));
-      optionsMap.put(
+    optionsMap.put(
         CICSGetMainOptionsUtility.RULE_INDEX,
         new CICSGetMainOptionsUtility(context, errors));
-      optionsMap.put(
+    optionsMap.put(
         CICSGetMain64OptionsUtility.RULE_INDEX,
         new CICSGetMain64OptionsUtility(context, errors));
-      optionsMap.put(
+    optionsMap.put(
         CICSInquireOptionsCheckUtility.RULE_INDEX,
         new CICSInquireOptionsCheckUtility(context, errors));
-      spOptionsMap.put(
-         CICSInquireSPOptionsCheckUtility.RULE_INDEX,
-         new CICSInquireSPOptionsCheckUtility(context, errors));
-      spOptionsMap.put(
-         CICSCreateSPOptionsCheckUtility.RULE_INDEX,
-         new CICSCreateSPOptionsCheckUtility(context, errors));
+    optionsMap.put(
+        CICSVerifyOptionsCheckUtility.RULE_INDEX,
+        new CICSVerifyOptionsCheckUtility(context, errors));
+    optionsMap.put(
+        CICSSpoolOpenOptionsCheckUtility.RULE_INDEX,
+        new CICSSpoolOpenOptionsCheckUtility(context, errors));
+    optionsMap.put(
+        CICSMonitorOptionsCheckUtility.RULE_INDEX,
+        new CICSMonitorOptionsCheckUtility(context, errors));
+    optionsMap.put(
+        CICSLoadOptionsCheckUtility.RULE_INDEX,
+        new CICSLoadOptionsCheckUtility(context, errors));
+    optionsMap.put(
+        CICSPointOptionsCheckUtility.RULE_INDEX,
+        new CICSPointOptionsCheckUtility(context, errors));
+    optionsMap.put(
+        CICSResetOptionsCheckUtility.RULE_INDEX,
+        new CICSResetOptionsCheckUtility(context, errors));
+    optionsMap.put(
+        CICSPopHandleOptionsCheckUtility.RULE_INDEX,
+        new CICSPopHandleOptionsCheckUtility(context, errors));
+    spOptionsMap.put(
+        CICSInquireSPOptionsCheckUtility.RULE_INDEX,
+        new CICSInquireSPOptionsCheckUtility(context, errors));
+    spOptionsMap.put(
+        CICSDiscardOptionsUtility.RULE_INDEX,
+        new CICSDiscardOptionsUtility(context, errors));
+    spOptionsMap.put(
+        CICSCreateSPOptionsCheckUtility.RULE_INDEX,
+        new CICSCreateSPOptionsCheckUtility(context, errors));
   }
 
     /**

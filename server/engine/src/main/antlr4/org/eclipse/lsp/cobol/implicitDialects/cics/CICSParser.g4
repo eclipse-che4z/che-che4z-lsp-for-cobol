@@ -38,7 +38,7 @@ allExciRules: cics_exci_link | cics_exci_delete | cics_exci_delete_container | c
               cics_exci_get_container | cics_exci_get_next_container | cics_exci_move_container |
               cics_exci_put_container | cics_exci_query_channel | cics_exci_startbrowse_container ;
 
-allSPRules: cics_inquire_system_programming | cics_create;
+allSPRules: cics_discard | cics_inquire_system_programming | cics_create;
 
 // compiler options
 compilerOpts
@@ -306,6 +306,12 @@ cics_queue_qname: (QUEUE | QNAME) cics_name;
 cics_deq: DEQ (cics_deq_cmds | cics_handle_response);
 cics_deq_cmds : (RESOURCE cics_data_area | LENGTH cics_data_value | MAXLIFETIME cics_cvda | TASK | UOW)+;
 
+/** DISCARD System Commands **/
+cics_discard: DISCARD cics_discard_body;
+cics_discard_body: cics_handle_response* (ATOMSERVICE | AUTINSTMODEL | BUNDLE | CONNECTION | DB2CONN | DB2ENTRY | DB2TRAN | DOCTEMPLATE |
+                   ENQMODEL | FILE | IPCONN | JOURNALMODEL | JOURNALNAME | JVMSERVER | LIBRARY | MQCONN | MQMONITOR | PARTNER | PIPELINE |
+                   PROCESSTYPE | PROFILE | PROGRAM | TCPIPSERVICE | TDQUEUE | TERMINAL | TRANCLASS | TRANSACTION | TSMODEL | URIMAP | WEBSERVICE) cics_data_value cics_handle_response*;
+
 /** DOCUMENT CREATE / DELETE / INSERT / RETRIEVE / SET */
 cics_document: DOCUMENT (cics_document_create | DELETE DOCTOKEN cics_data_area | cics_document_insert |
                cics_document_retrieve | cics_document_set);
@@ -427,12 +433,12 @@ cics_browse_start_end: (START | END);
 /** INQUIRE, System Commands */
 cics_inquire_system_programming: INQUIRE (cics_inquire_profile | cics_inquire_association | cics_inquire_association_list | cics_inquire_atomservice | cics_inquire_autinstmodel | cics_inquire_autoinstall | cics_inquire_brfacility | cics_inquire_bundle | cics_inquire_bundlepart | cics_inquire_capdatapred | cics_inquire_capinfosrce | cics_inquire_capoptpred | cics_inquire_capturespec | cics_inquire_connection | cics_inquire_cfdtpool | cics_inquire_db2conn | cics_inquire_db2entry | cics_inquire_db2tran | cics_inquire_deletshipped | cics_inquire_dispatcher | cics_inquire_doctemplate | cics_inquire_dsname | cics_inquire_dumpds | cics_inquire_enq | cics_inquire_enqmodel | cics_inquire_epadapter | cics_inquire_epadapterset | cics_inquire_epadaptinset | cics_inquire_eventbinding | cics_inquire_eventprocess | cics_inquire_exci | cics_inquire_exitprogram | cics_inquire_featurekey | cics_inquire_file | cics_inquire_host | cics_inquire_ipconn | cics_inquire_ipfacility | cics_inquire_irc | cics_inquire_journalmodel | cics_inquire_journalname | cics_inquire_jvmendpoint | cics_inquire_jvmserver | cics_inquire_library | cics_inquire_modename | cics_inquire_monitor | cics_inquire_mqconn | cics_inquire_mqini | cics_inquire_mqmonitor | cics_inquire_mvstcb | cics_inquire_netname | cics_inquire_nodejsapp | cics_inquire_osgibundle | cics_inquire_osgiservice | cics_inquire_partner | cics_inquire_pipeline | cics_inquire_policy | cics_inquire_policyrule | cics_inquire_processtype | cics_inquire_program | cics_inquire_reqid | cics_inquire_rrms | cics_inquire_secdiscovery | cics_inquire_secrecording | cics_inquire_statistics | cics_inquire_storage | cics_inquire_storage64 | cics_inquire_streamname | cics_inquire_subpool | cics_inquire_sysdumpcode | cics_inquire_system | cics_inquire_tag | cics_inquire_task | cics_inquire_task_list | cics_inquire_tclass | cics_inquire_tcpip | cics_inquire_tcpipservice | cics_inquire_tdqueue | cics_inquire_tempstorage | cics_inquire_terminal | cics_inquire_tracedest | cics_inquire_traceflag | cics_inquire_tracetype | cics_inquire_tranclass | cics_inquire_trandumpcode | cics_inquire_transaction | cics_inquire_tsmodel | cics_inquire_tspool | cics_inquire_tsqueue | cics_inquire_uow | cics_inquire_uowdsnfail | cics_inquire_uowenq | cics_inquire_uowlink | cics_inquire_urimap | cics_inquire_vtam | cics_inquire_web | cics_inquire_webservice | cics_inquire_wlmhealth | cics_inquire_xmltransform);
 
-cics_inquire_association: ASSOCIATION cics_data_value ((ACAPPLNAME | ACMAJORVER | ACMICROVER | ACMINORVER | ACOPERNAME | ACPLATNAME | APPLDATA | APPLID | CLIENTIPADDR | CLIENTLOC | CLIENTPORT | DNAME | FACILNAME | INITUSERID | IPCONN | LUNAME | MVSIMAGE | NETID | ODADPTRDATA1 | ODADPTRDATA2 | ODADPTRDATA3 | ODADPTRID| ODAPPLID | ODCLNTPORT | ODFACILNAME | ODLUNAME | ODNETID | ODNETWORKID | ODSERVERPORT | ODSTARTTIME | ODTASKID | ODTCPIPS | ODTRANSID | ODUSERID | PHAPPLID | PHCOUNT | PHNETWORKID | PHSTARTTIME | PHTASKID | PHTRANSID | PROGRAM | PTCOUNT | PTSTARTTIME | PTTASKID | PTTRANSID | REALM | SERVERIPADDR | SERVERPORT | STARTTIME | TCPIPJOB | TCPIPSERVICE | TCPIPZONE | TRNGRPID | TRANSACTION | USERCORRDATA | USERID) cics_data_area | (CLNTIPFAMILY | FACILTYPE | IPFAMILY | ODFACILTYPE | ODIPFAMILY | SRVRIPFAMILY) cics_cvda | cics_handle_response)*;
+cics_inquire_association: ASSOCIATION cics_data_value ((ACAPPLNAME | ACMAJORVER | ACMICROVER | ACMINORVER | ACOPERNAME | ACPLATNAME | APPLDATA | APPLID | CLIENTIPADDR | CLIENTLOC | CLIENTPORT | DNAME | FACILNAME | INITUSERID | IPCONN | LUNAME | MVSIMAGE | NETID | ODADPTRDATA1 | ODADPTRDATA2 | ODADPTRDATA3 | ODADPTRID| ODAPPLID | ODCLNTIPADDR | ODCLNTPORT | ODFACILNAME | ODLUNAME | ODNETID | ODNETWORKID | ODSERVERPORT | ODSTARTTIME | ODTASKID | ODTCPIPS | ODTRANSID | ODUSERID | PHAPPLID | PHCOUNT | PHNETWORKID | PHSTARTTIME | PHTASKID | PHTRANSID | PROGRAM | PTCOUNT | PTSTARTTIME | PTTASKID | PTTRANSID | REALM | SERVERIPADDR | SERVERPORT | STARTTIME | TCPIPJOB | TCPIPSERVICE | TCPIPZONE | TRNGRPID | TRANSACTION | USERCORRDATA | USERID) cics_data_area | (CLNTIPFAMILY | FACILTYPE | IPFAMILY | ODFACILTYPE | ODIPFAMILY | SRVRIPFAMILY) cics_cvda | cics_handle_response)*;
 cics_inquire_association_list: ASSOCIATION (LIST (LISTSIZE cics_data_area)? | (DNAME | DNAMELEN | REALM | REALMLEN | USERCORRDATA) cics_data_value | SET cics_ref | cics_handle_response)*;
 cics_inquire_atomservice: ATOMSERVICE cics_data_value? ((cics_browse_start_end | NEXT) | (ATOMTYPE | CHANGEAGENT | ENABLESTATUS | INSTALLAGENT | RESOURCETYPE) cics_cvda | (BINDFILE | CHANGEAGREL | CHANGETIME | CHANGEUSRID | CONFIGFILE | DEFINESOURCE | DEFINETIME | INSTALLTIME | INSTALLUSRID | RESOURCENAME | URIMAP | XMLTRANSFORM) cics_data_area | cics_handle_response)*;
 cics_inquire_autinstmodel: AUTINSTMODEL cics_data_value? ((cics_browse_start_end | NEXT) | cics_handle_response)*;
 cics_inquire_autoinstall: AUTOINSTALL ((AIBRIDGE | CONSOLES | ENABLESTATUS) cics_cvda | (CURREQS | MAXREQS | PROGRAM) cics_data_area | cics_handle_response)*;
-cics_inquire_brfacility: BRFACILITY cics_data_value? ((cics_browse_start_end | NEXT) | (KEEPTIME | LINKSYSTEM | LINKSYSNET | NETNAME | REMOTESYSNET | REMOTESYSTEM | TASKID | TERMID | TRANSACTION) cics_data_area | (NAMESPACE | TERMSTATUS) cics_cvda | cics_handle_response)*;
+cics_inquire_brfacility: BRFACILITY cics_data_value? ((cics_browse_start_end | NEXT) | (KEEPTIME | LINKSYSTEM | LINKSYSNET | NETNAME | REMOTESYSNET | REMOTESYSTEM | TASKID | TERMID | TRANSACTION | USERID) cics_data_area | (NAMESPACE | TERMSTATUS) cics_cvda | cics_handle_response)*;
 cics_inquire_bundle: BUNDLE cics_data_value? ((START | END | NEXT) | (BUNDLEID | MAJORVERSION | MGMTPART | MICROVERSION | MINORVERSION) cics_data_value | (AVAILSTATUS | CHANGEAGENT | ENABLESTATUS | INSTALLAGENT) cics_cvda | (BASESCOPE | BUNDLEDIR | CHANGEAGREL | CHANGETIME | CHANGEUSRID | DEFINESOURCE | DEFINETIME | ENABLEDCOUNT | INSTALLTIME | INSTALLUSRID | PARTCOUNT | TARGETCOUNT) cics_data_area | cics_handle_response)*;
 cics_inquire_bundlepart: BUNDLEPART cics_data_area? (BUNDLE cics_data_value | (START | END | NEXT) | (METADATAFILE | PARTTYPE) cics_data_area | (AVAILSTATUS | ENABLESTATUS | PARTCLASS) cics_cvda | cics_handle_response)*;
 cics_inquire_capdatapred: CAPDATAPRED ((START | END | NEXT) | (CAPTURESPEC | EVENTBINDING) cics_data_value | (CONTAINER | FIELDLENGTH | FIELDOFFSET | FILENAME | FILTERVALUE | LOCATION | STRUCTNAME | VARIABLENAME) cics_data_area | OPERATOR cics_cvda | cics_handle_response)*;
@@ -626,20 +632,24 @@ cics_exci_query_channel: QUERY CHANNEL cics_data_value CONTAINERCNT cics_data_ar
 cics_exci_startbrowse_container: STARTBROWSE CONTAINER CHANNEL cics_data_value BROWSETOKEN cics_data_area RETCODE cics_data_area;
 
 /** LOAD */
-cics_load: LOAD (PROGRAM cics_name | SET cics_ref | LENGTH cics_data_area | FLENGTH cics_data_area | ENTRY cics_ref | HOLD | cics_handle_response)*;
+cics_load: LOAD cics_load_options;
+cics_load_options: (PROGRAM cics_name | (SET |  ENTRY) cics_ref | (LENGTH | FLENGTH) cics_data_area | HOLD | cics_handle_response)+;
 
 /** MONITOR */
-cics_monitor: MONITOR (POINT cics_data_value | DATA1 cics_data_area | DATA2 cics_data_area | ENTRYNAME cics_data_area | cics_handle_response)+;
+cics_monitor: MONITOR cics_monitor_options;
+cics_monitor_options: (POINT cics_data_value | (DATA1 | DATA2 | ENTRYNAME) cics_data_area | cics_handle_response)+;
 
 /** MOVE CONTAINER (both) */
 cics_move: MOVE ((CONTAINER | FROMACTIVITY | TOACTIVITY | AS | CHANNEL | TOCHANNEL) cics_data_value | FROMPROCESS |
            TOPROCESS | cics_handle_response)+;
 
 /** POINT */
-cics_point: POINT (CONVID cics_name | SESSION cics_name | cics_handle_response)?;
+cics_point: POINT cics_point_options;
+cics_point_options: ((CONVID | SESSION) cics_name | cics_handle_response)*;
 
 /** POP HANDLE */
-cics_pop: POP cics_handle_response? HANDLE cics_handle_response?;
+cics_pop: POP cics_pop_option;
+cics_pop_option: (HANDLE | cics_handle_response)*;
 
 /** POST */
 cics_post: POST (INTERVAL cics_zero_digit | INTERVAL cics_hhmmss | TIME cics_hhmmss | cics_post_after | SET cics_ref
@@ -688,8 +698,10 @@ cics_release: RELEASE cics_handle_response? PROGRAM cics_name cics_handle_respon
 /** REMOVE SUBEVENT */
 cics_remove: REMOVE (SUBEVENT cics_data_value | EVENT cics_data_value | cics_handle_response)+;
 
-/** RESET ACQPROCESS / ACTIVITY */
-cics_reset: RESET (ACQPROCESS | ACTIVITY cics_data_value | cics_handle_response)+;
+/** RESET ACQPROCESS / RESET ACTIVITY */
+cics_reset: RESET (cics_reset_acqprocess | cics_reset_activity);
+cics_reset_acqprocess: (ACQPROCESS | cics_handle_response)+;
+cics_reset_activity: (ACTIVITY cics_data_value | cics_handle_response)+;
 
 /** RESETBR */
 cics_resetbr: RESETBR cics_file_name (RIDFLD cics_data_area | KEYLENGTH cics_data_value | GENERIC | REQID cics_data_value |
@@ -757,11 +769,11 @@ cics_soapfault_detail: (DETAIL cics_data_value | DETAILLENGTH cics_data_value)+;
 cics_spoolclose: SPOOLCLOSE (TOKEN cics_data_area | KEEP | DELETE | NOHANDLE | cics_spoolclose_resp | cics_handle_response)+;
 cics_spoolclose_resp: RESP RESP2?;
 
-/** SPOOLOPEN INPUT / OUTPUT */
+/** SPOOLOPEN INPUT / SPOOLOPEN OUTPUT */
 cics_spoolopen: SPOOLOPEN (cics_spoolopen_input | cics_spoolopen_output);
-cics_spoolopen_input: INPUT (TOKEN cics_data_area | USERID cics_data_value | CLASS cics_data_value |NOHANDLE | cics_spoolclose_resp | cics_handle_response)+;
-cics_spoolopen_output: OUTPUT (TOKEN cics_data_area | USERID cics_data_value | NODE cics_data_value | CLASS cics_data_value |
-                       OUTDESCR cics_ref | NOCC | ASA | MCC | PRINT | RECORDLENGTH cics_data_value | PUNCH | NOHANDLE | cics_spoolclose_resp | cics_handle_response)+;
+cics_spoolopen_input: (INPUT | TOKEN cics_data_area | USERID cics_data_value | CLASS cics_data_value | cics_handle_response)+;
+cics_spoolopen_output: (OUTPUT | TOKEN cics_data_area | (USERID | NODE | CLASS | RECORDLENGTH) cics_data_value | OUTDESCR cics_ref |
+                NOCC | ASA | MCC | PRINT | PUNCH | NOHANDLE | cics_handle_response)+;
 
 /** SPOOLREAD */
 cics_spoolread: SPOOLREAD (TOKEN cics_data_area | INTO cics_data_area | MAXFLENGTH cics_data_value |
@@ -828,10 +840,15 @@ cics_unlock: UNLOCK (cics_file_name | TOKEN cics_data_area | SYSID cics_data_are
 cics_update: UPDATE (cics_update_counter | cics_update_dcounter);
 cics_update_counter: COUNTER cics_name (POOL cics_name | VALUE cics_data_value | COMPAREMIN cics_data_value | COMPAREMAX cics_data_value | cics_handle_response)+;
 cics_update_dcounter: DCOUNTER cics_name (POOL cics_name | VALUE cics_data_area | COMPAREMIN cics_data_area | COMPAREMAX cics_data_area | cics_handle_response)+;
-/** VERIFY PASSWORD / PHRASE */
-cics_verify: VERIFY (PASSWORD cics_data_value | PHRASE cics_data_area PHRASELEN cics_data_value | USERID cics_data_value |
-             CHANGETIME cics_data_area | DAYSLEFT cics_data_area | ESMREASON cics_data_area | ESMRESP cics_data_area |
-             EXPIRYTIME cics_data_area | INVALIDCOUNT cics_data_area | LASTUSETIME cics_data_area | cics_handle_response)+;
+
+/** VERIFY PASSWORD / VERIFY PHRASE / VERIFY TOKEN */
+cics_verify: VERIFY (cics_verify_password | cics_verify_phrase | cics_verify_token);
+cics_verify_password: ((PASSWORD | USERID | GROUPID) cics_data_value | (CHANGETIME | DAYSLEFT | ESMREASON | ESMRESP | EXPIRYTIME |
+                INVALIDCOUNT | LASTUSETIME) cics_data_area | cics_handle_response)+;
+cics_verify_phrase: ((PHRASE | CHANGETIME | DAYSLEFT | ESMREASON | ESMRESP | EXPIRYTIME | INVALIDCOUNT | LASTUSETIME ) cics_data_area |
+                (PHRASELEN | USERID | GROUPID) cics_data_value  | cics_handle_response)+;
+cics_verify_token: ((TOKEN | ISUSERID | ENCRYPTKEY | OUTTOKENLEN | ESMRESP | ESMREASON) cics_data_area | TOKENLEN cics_data_value |
+                (TOKENTYPE | DATATYPE) cics_cvda | BASICAUTH | JWT | KERBEROS | BIT | BASE64 | OUTTOKEN cics_ref | cics_handle_response)+;
 
 /** WAIT CONVID / EVENT / EXTERNAL / JOURNALNAME / JOURNALNUM / SIGNAL / TERMINAL */
 cics_wait: WAIT (cics_wait_convid | cics_wait_event | cics_wait_external | cics_wait_journalname | cics_wait_signal | cics_wait_terminal);
@@ -1524,6 +1541,7 @@ ABCODE
  | EMPTYSTATUS
  | ENABLEDCOUNT
  | ENABLESTATUS
+ | ENCRYPTKEY
  | ENDACTIVITY
  | ENDBR
  | ENDBROWSE
@@ -1760,6 +1778,7 @@ ABCODE
  | ISOLATEST
  | ISSUE
  | ISSUER
+ | ISUSERID
  | ITEM
  | ITEMNAME
  | IUTYPE
@@ -1776,10 +1795,12 @@ ABCODE
  | JVMCLASS
  | JVMPROFILE
  | JVMSERVER
+ | JWT
  | KATAKANA
  | KATAKANAST
  | KEEP
  | KEEPTIME
+ | KERBEROS
  | KEYLENGTH
  | KEYNUMBER
  | KEYPOSITION
@@ -2047,6 +2068,8 @@ ABCODE
  | OUTLINE
  | OUTLINEST
  | OUTPARTN
+ | OUTTOKEN
+ | OUTTOKENLEN
  | OWNER
  | PA1
  | PA2
@@ -2512,6 +2535,8 @@ ABCODE
  | TOCONTAINER
  | TOFLENGTH
  | TOKEN
+ | TOKENLEN
+ | TOKENTYPE
  | TOLENGTH
  | TOPROCESS
  | TPNAME
