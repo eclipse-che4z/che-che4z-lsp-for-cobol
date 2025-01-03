@@ -249,13 +249,13 @@ public abstract class CICSOptionsCheckBaseUtility {
      * @param <E>  Generic locality source type
      * @return The locality of the rule
      */
-    private <E> Locality getLocality(E rule) {
+    protected  <E> Locality getLocality(E rule) {
         if (ParserRuleContext.class.isAssignableFrom(rule.getClass()))
             return VisitorUtility.constructLocality((ParserRuleContext) rule, context);
         else return VisitorUtility.constructLocality((TerminalNode) rule, context);
     }
 
-    private void throwException(
+    protected void throwException(
             ErrorSeverity errorSeverity, @NonNull Locality locality, String message, String wrongToken) {
         SyntaxError error =
                 SyntaxError.syntaxError()

@@ -38,9 +38,10 @@ public class TestCicsExtractSP {
   private static final String STATISTICS_ALL_OPTIONS = "EXTRACT STATISTICS RESTYPE({$varOne}) RESID({$varTwo}) RESIDLEN({$varThree}) SET({$varFour})"
           + " SUBRESTYPE({$varFive}) SUBRESID({$varSix}) SUBRESIDLEN({$varOne}) APPLICATION({$varTwo}) APPLMAJORVER({$varThree}) APPLMINORVER({$varFour})"
           + " APPLMICROVER({$varFive}) PLATFORM({$varSix}) LASTRESET({$varThree})";
-  private static final String STATISTICS_SOME_ONE = "EXTRACT RESTYPE({$varOne}) SUBRESID({$varSix}) SUBRESIDLEN({$varOne}) SET({$varFour}) STATISTICS SUBRESTYPE({$varFive})";
+  private static final String STATISTICS_SOME_ONE = "EXTRACT ASYNCSERVICE SUBRESID({$varSix}) SUBRESIDLEN({$varOne}) SET({$varFour}) STATISTICS SUBRESTYPE({$varFive})";
   private static final String STATISTICS_SOME_TWO = "EXTRACT RESID({$varTwo}) APPLMAJORVER({$varThree}) APPLICATION({$varTwo}) RESTYPE({$varOne}) STATISTICS APPLMINORVER({$varFour}) APPLMICROVER({$varFive}) SET({$varFour}) PLATFORM({$varSix})";
-  private static final String STATISTICS_SOME_THREE = "EXTRACT RESIDLEN({$varThree}) STATISTICS LASTRESETMIN({$varFive}) LASTRESETHRS({$varSix}) SET({$varFour}) LASTRESETSEC({$varOne}) RESTYPE({$varOne}) RESID({$varTwo})";
+  private static final String STATISTICS_SOME_THREE = "EXTRACT RESIDLEN({$varThree}) STATISTICS LASTRESETMIN({$varFive}) LASTRESETHRS({$varSix}) SET({$varFour}) LASTRESETSEC({$varOne}) TASKSUBPOOL RESID({$varTwo})";
+  private static final String STATISTICS_SOME_FOUR = "EXTRACT STATISTICS SET({$varFour}) BUNDLE RESID({$varTwo}) SUBRESID({$varSix}) POLICYRULE";
   private static final String STATISTICS_BARE = "EXTRACT SET({$varFour}) RESTYPE({$varOne}) STATISTICS";
 
   private static final String EXIT_INVALID_MISSING_EXIT = "EXTRACT {_GASET({$varFour}) GALENGTH({$varThree}) PROGRAM({$varOne})|error_}";
@@ -54,13 +55,17 @@ public class TestCicsExtractSP {
   private static final String STATISTICS_INVALID_MISSING_RESID_ONE = "EXTRACT SET({$varFour}) RESTYPE({$varOne}) STATISTICS {RESIDLEN|error}({$varThree})";
   private static final String STATISTICS_INVALID_MISSING_RESID_TWO = "EXTRACT SET({$varFour}) RESTYPE({$varOne}) STATISTICS {APPLMAJORVER|errorOne}({$varThree}) {APPLICATION|errorTwo}({$varTwo}) {APPLMINORVER|errorThree}({$varFour}) {APPLMICROVER|errorFour}({$varFive})";
   private static final String STATISTICS_INVALID_MISSING_SUBRESID_ONE = "EXTRACT SET({$varFour}) RESTYPE({$varOne}) STATISTICS {SUBRESIDLEN|errorOne|errorTwo}({$varOne})";
-  private static final String STATISTICS_INVALID_MISSING_SUBRESID_TWO = "EXTRACT SET({$varFour}) RESTYPE({$varOne}) STATISTICS {SUBRESTYPE|error}({$varFive})";
+  private static final String STATISTICS_INVALID_MISSING_SUBRESID_TWO = "EXTRACT SET({$varFour}) RESTYPE({$varOne}) STATISTICS {_SUBRESTYPE({$varFive})|error_}";
   private static final String STATISTICS_INVALID_MISSING_SUBRESTYPE = "EXTRACT SET({$varFour}) RESTYPE({$varOne}) STATISTICS {SUBRESID|errorOne}({$varSix}) {SUBRESIDLEN|errorTwo}({$varOne})";
   private static final String STATISTICS_INVALID_APPLCONTEXT_ONE = "EXTRACT {_SET({$varFour}) RESTYPE({$varOne}) STATISTICS PLATFORM({$varSix}) RESID({$varTwo})|error_}";
   private static final String STATISTICS_INVALID_APPLCONTEXT_TWO = "EXTRACT {_SET({$varFour}) RESID({$varTwo}) RESTYPE({$varOne}) STATISTICS APPLICATION({$varSix}) APPLMAJORVER({$varThree}) APPLMINORVER({$varFour}) APPLMICROVER({$varFive})|error_}";
   private static final String STATISTICS_INVALID_LAST_TIME_ONE = "EXTRACT SET({$varFour}) RESTYPE({$varOne}) STATISTICS LASTRESET({$varThree}) {LASTRESETMIN|errorOne}({$varFive}) {LASTRESETHRS|errorTwo}({$varSix}) {LASTRESETSEC|errorThree}({$varOne})";
   private static final String STATISTICS_INVALID_LAST_TIME_TWO = "EXTRACT SET({$varFour}) RESTYPE({$varOne}) STATISTICS {LASTRESET|errorOne}({$varThree}) {LASTRESETABS|errorTwo}({$varOne})";
   private static final String STATISTICS_INVALID_LAST_TIME_THREE = "EXTRACT {_SET({$varFour}) RESTYPE({$varOne}) STATISTICS LASTRESETHRS({$varOne})|error_}";
+  private static final String STATISTICS_INVALID_DUPLICATE_RESTYPE_ONE = "EXTRACT SET({$varFour}) {_RESTYPE({$varOne})|error_} STATISTICS ATOMSERVICE";
+  private static final String STATISTICS_INVALID_DUPLICATE_RESTYPE_TWO = "EXTRACT SET({$varFour}) {BUNDLE|error} STATISTICS ASYNCSERVICE";
+  private static final String STATISTICS_INVALID_DUPLICATE_SUBRESTYPE = "EXTRACT SUBRESID({$varSix}) SET({$varFour}) RESTYPE({$varOne}) {SUBRESTYPE|error}({$varFive}) {CAPTURESPEC|error} STATISTICS";
+  private static final String STATISTICS_WARNING_DUPLICATE_RESTYPE = "EXTRACT SET({$varFour}) STATISTICS ASYNCSERVICE {ASYNCSERVICE|warning}";
 
   @Test
   void testAllExitOptions() {
@@ -90,6 +95,11 @@ public class TestCicsExtractSP {
   @Test
   void testSomeStatisticsOptionsThree() {
     CICSTestUtils.noErrorTest(STATISTICS_SOME_THREE, "SP");
+  }
+
+  @Test
+  void testSomeStatisticsOptionsFour() {
+    CICSTestUtils.noErrorTest(STATISTICS_SOME_FOUR, "SP");
   }
 
   @Test
@@ -331,4 +341,49 @@ public class TestCicsExtractSP {
                     DiagnosticSeverity.Error,
                     ErrorSource.PARSING.getText())), "SP");
   }
+
+  @Test
+  void testInvalidDuplicateRestypeOne() {
+    CICSTestUtils.errorTest(STATISTICS_INVALID_DUPLICATE_RESTYPE_ONE, ImmutableMap.of(
+            "error",
+            new Diagnostic(
+                    new Range(),
+                    "Multiple RESTYPE options are not allowed",
+                    DiagnosticSeverity.Error,
+                    ErrorSource.PARSING.getText())), "SP");
+  }
+
+  @Test
+  void testInvalidDuplicateRestypeTwo() {
+    CICSTestUtils.errorTest(STATISTICS_INVALID_DUPLICATE_RESTYPE_TWO, ImmutableMap.of(
+            "error",
+            new Diagnostic(
+                    new Range(),
+                    "Multiple RESTYPE options are not allowed",
+                    DiagnosticSeverity.Error,
+                    ErrorSource.PARSING.getText())), "SP");
+  }
+
+  @Test
+  void testInvalidDuplicateSubrestype() {
+    CICSTestUtils.errorTest(STATISTICS_INVALID_DUPLICATE_SUBRESTYPE, ImmutableMap.of(
+            "error",
+            new Diagnostic(
+                    new Range(),
+                    "Exactly one option required, options are mutually exclusive: SUBRESTYPE or CAPTURESPEC or POLICYRULE",
+                    DiagnosticSeverity.Error,
+                    ErrorSource.PARSING.getText())), "SP");
+  }
+
+  @Test
+  void tesWarningDuplicateRestype() {
+    CICSTestUtils.errorTest(STATISTICS_WARNING_DUPLICATE_RESTYPE, ImmutableMap.of(
+            "warning",
+            new Diagnostic(
+                    new Range(),
+                    "Excessive options provided for: ASYNCSERVICE",
+                    DiagnosticSeverity.Warning,
+                    ErrorSource.PARSING.getText())), "SP");
+  }
+
 }

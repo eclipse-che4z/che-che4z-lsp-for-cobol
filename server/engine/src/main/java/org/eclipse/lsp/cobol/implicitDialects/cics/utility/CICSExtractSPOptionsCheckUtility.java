@@ -15,6 +15,8 @@
 package org.eclipse.lsp.cobol.implicitDialects.cics.utility;
 
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.tree.ParseTree;
+import org.antlr.v4.runtime.tree.TerminalNode;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
@@ -24,6 +26,8 @@ import org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 /** Checks CICS Extract System Command rules for required and invalid options */
 public class CICSExtractSPOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
@@ -56,6 +60,53 @@ public class CICSExtractSPOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
                     put(CICSLexer.LASTRESETHRS, ErrorSeverity.ERROR);
                     put(CICSLexer.LASTRESETMIN, ErrorSeverity.ERROR);
                     put(CICSLexer.LASTRESETSEC, ErrorSeverity.ERROR);
+                    //RESTYPE options//
+                    put(CICSLexer.ASYNCSERVICE, ErrorSeverity.WARNING);
+                    put(CICSLexer.ATOMSERVICE, ErrorSeverity.WARNING);
+                    put(CICSLexer.BUNDLE, ErrorSeverity.WARNING);
+                    put(CICSLexer.DB2CONN, ErrorSeverity.WARNING);
+                    put(CICSLexer.DB2ENTRY, ErrorSeverity.WARNING);
+                    put(CICSLexer.DISPATCHER, ErrorSeverity.WARNING);
+                    put(CICSLexer.DOCTEMPLATE, ErrorSeverity.WARNING);
+                    put(CICSLexer.EPADAPTER, ErrorSeverity.WARNING);
+                    put(CICSLexer.ENQUEUE, ErrorSeverity.WARNING);
+                    put(CICSLexer.EVENTBINDING, ErrorSeverity.WARNING);
+                    put(CICSLexer.EVENTPROCESS, ErrorSeverity.WARNING);
+                    put(CICSLexer.FILE, ErrorSeverity.WARNING);
+                    put(CICSLexer.IPCONN, ErrorSeverity.WARNING);
+                    put(CICSLexer.JOURNALNAME, ErrorSeverity.WARNING);
+                    put(CICSLexer.JVMPROGRAM, ErrorSeverity.WARNING);
+                    put(CICSLexer.JVMSERVER, ErrorSeverity.WARNING);
+                    put(CICSLexer.LIBRARY, ErrorSeverity.WARNING);
+                    put(CICSLexer.LSRPOOL, ErrorSeverity.WARNING);
+                    put(CICSLexer.MONITOR, ErrorSeverity.WARNING);
+                    put(CICSLexer.MQCONN, ErrorSeverity.WARNING);
+                    put(CICSLexer.MQMONITOR, ErrorSeverity.WARNING);
+                    put(CICSLexer.MVSTCB, ErrorSeverity.WARNING);
+                    put(CICSLexer.NODEJSAPP, ErrorSeverity.WARNING);
+                    put(CICSLexer.PIPELINE, ErrorSeverity.WARNING);
+                    put(CICSLexer.POLICY, ErrorSeverity.WARNING);
+                    put(CICSLexer.PROGAUTO, ErrorSeverity.WARNING);
+                    put(CICSLexer.PROGRAMDEF, ErrorSeverity.WARNING);
+                    put(CICSLexer.RECOVERY, ErrorSeverity.WARNING);
+                    put(CICSLexer.SECURITY, ErrorSeverity.WARNING);
+                    put(CICSLexer.STATS, ErrorSeverity.WARNING);
+                    put(CICSLexer.STORAGE, ErrorSeverity.WARNING);
+                    put(CICSLexer.STREAMNAME, ErrorSeverity.WARNING);
+                    put(CICSLexer.SUBPOOL, ErrorSeverity.WARNING);
+                    put(CICSLexer.SYSDUMPCODE, ErrorSeverity.WARNING);
+                    put(CICSLexer.TASKSUBPOOL, ErrorSeverity.WARNING);
+                    put(CICSLexer.TCPIP, ErrorSeverity.WARNING);
+                    put(CICSLexer.TCPIPSERVICE, ErrorSeverity.WARNING);
+                    put(CICSLexer.TDQUEUE, ErrorSeverity.WARNING);
+                    put(CICSLexer.TRANCLASS, ErrorSeverity.WARNING);
+                    put(CICSLexer.TRANDUMPCODE, ErrorSeverity.WARNING);
+                    put(CICSLexer.TRANSACTION, ErrorSeverity.WARNING);
+                    put(CICSLexer.TSQUEUE, ErrorSeverity.WARNING);
+                    put(CICSLexer.URIMAP, ErrorSeverity.WARNING);
+                    put(CICSLexer.USER, ErrorSeverity.WARNING);
+                    put(CICSLexer.WEBSERVICE, ErrorSeverity.WARNING);
+                    put(CICSLexer.XMLTRANSFORM, ErrorSeverity.WARNING);
                 }
             };
 
@@ -93,7 +144,8 @@ public class CICSExtractSPOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
 
     private void checkExtractStatistics(CICSParser.Cics_extract_statisticsContext ctx) {
         checkHasMandatoryOptions(ctx.STATISTICS(), ctx, "STATISTICS");
-        checkHasMandatoryOptions(ctx.RESTYPE(), ctx, "RESTYPE");
+        checkHasMandatoryOptions(ctx.cics_restype(), ctx, "RESTYPE");
+        checkRestypeOptions(ctx.cics_restype());
         checkHasMandatoryOptions(ctx.SET(), ctx, "SET");
         if (ctx.RESID().isEmpty()) {
             checkForResidRequiredOptions(ctx);
@@ -102,6 +154,24 @@ public class CICSExtractSPOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
         }
         checkSubResidOptions(ctx);
         checkLastTimeOptions(ctx);
+    }
+
+    /**
+     * Helper function to enforce mututally exclusive RESTYPE options
+     * @param ctx
+     */
+    private void checkRestypeOptions(List<CICSParser.Cics_restypeContext> ctx) {
+        long distinctOptions = ctx.stream()
+                .map(child -> child.children)
+                .flatMap(List::stream)
+                .map(ParseTree::getText)
+                .distinct().count();
+        boolean removeCvda = ctx.stream().map(CICSParser.Cics_restypeContext::cics_cvda).anyMatch(Objects::nonNull);
+        if (removeCvda) distinctOptions--;
+
+        if (distinctOptions > 1) {
+            throwException(ErrorSeverity.ERROR, getLocality(ctx.get(0)), "Multiple RESTYPE options are not allowed", "");
+        }
     }
 
     private void checkForResidRequiredOptions(CICSParser.Cics_extract_statisticsContext ctx) {
@@ -116,9 +186,15 @@ public class CICSExtractSPOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
     private void checkSubResidOptions(CICSParser.Cics_extract_statisticsContext ctx) {
         if (ctx.SUBRESID().isEmpty()) {
             checkHasIllegalOptions(ctx.SUBRESIDLEN(), "SUBRESIDLEN without SUBRESID");
-            checkHasIllegalOptions(ctx.SUBRESTYPE(), "SUBRESTYPE without SUBRESID");
+            checkHasIllegalOptions(ctx.cics_subrestype(), "SUBRESTYPE without SUBRESID");
         }
-        if (ctx.SUBRESTYPE().isEmpty()) {
+        List<TerminalNode> subrestype = ctx.cics_subrestype().stream().map(CICSParser.Cics_subrestypeContext::SUBRESTYPE).collect(Collectors.toList());
+        List<TerminalNode> capturespec = ctx.cics_subrestype().stream().map(CICSParser.Cics_subrestypeContext::CAPTURESPEC).collect(Collectors.toList());
+        List<TerminalNode> policyrule = ctx.cics_subrestype().stream().map(CICSParser.Cics_subrestypeContext::POLICYRULE).collect(Collectors.toList());
+
+        checkHasMutuallyExclusiveOptions("SUBRESTYPE or CAPTURESPEC or POLICYRULE", subrestype, capturespec, policyrule);
+
+        if (ctx.cics_subrestype().isEmpty()) {
             checkHasIllegalOptions(ctx.SUBRESID(), "SUBRESID without SUBRESTYPE");
             checkHasIllegalOptions(ctx.SUBRESIDLEN(), "SUBRESIDLEN without SUBRESTYPE");
         }
