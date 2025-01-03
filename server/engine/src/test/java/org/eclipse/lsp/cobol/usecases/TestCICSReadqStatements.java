@@ -70,7 +70,7 @@ public class TestCICSReadqStatements {
     private static final String READQ_SET_LENGTH_INVALID =
             "READQ QNAME({$varFour}) {_SET({$varFour})|errorMissingLength_}";
     private static final String READQ_TS_TD_INVALID =
-            "READQ QUEUE({$varFour}) INTO({$varFour}) TD {TS|errorInvalidTs}";
+            "READQ QUEUE({$varFour}) INTO({$varFour}) {TD|errorInvalidTd} {TS|errorInvalidTs}";
     private static final String READQ_TD_ILLEGAL_OPTS_INVALID =
             "READQ TD QUEUE({$varFour}) INTO({$varFour}) {_ITEM|errorItemIllegal_}({$varFour})"
             + "{_NEXT|errorNextIllegal_} {_NUMITEMS|errorNumItemIllegal_}({$varFour})"
@@ -191,7 +191,13 @@ public class TestCICSReadqStatements {
                         "errorInvalidTs",
                         new Diagnostic(
                                 new Range(),
-                                "Invalid option provided: TS",
+                                "Exactly one option required, options are mutually exclusive: TD or TS",
+                                DiagnosticSeverity.Error,
+                                ErrorSource.PARSING.getText()),
+                        "errorInvalidTd",
+                        new Diagnostic(
+                                new Range(),
+                                "Exactly one option required, options are mutually exclusive: TD or TS",
                                 DiagnosticSeverity.Error,
                                 ErrorSource.PARSING.getText()));
 

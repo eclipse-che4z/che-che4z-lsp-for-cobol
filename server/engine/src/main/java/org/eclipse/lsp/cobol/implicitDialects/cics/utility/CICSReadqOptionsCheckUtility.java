@@ -34,6 +34,7 @@ public class CICSReadqOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     private static final Map<Integer, ErrorSeverity> DUPLICATE_CHECK_OPTIONS =
             new HashMap<Integer, ErrorSeverity>() {
                 {
+                    put(CICSLexer.TD, ErrorSeverity.WARNING);
                     put(CICSLexer.QUEUE, ErrorSeverity.ERROR);
                     put(CICSLexer.INTO, ErrorSeverity.ERROR);
                     put(CICSLexer.SET, ErrorSeverity.ERROR);
@@ -66,11 +67,13 @@ public class CICSReadqOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     }
 
     private void checkOpts(CICSParser.Cics_readq_ts_tdContext ctx) {
-        if (!ctx.TD().isEmpty()) {
-            checkTd(ctx);
-        } else {
-            checkTs(ctx);
-        }
+       if (checkHasMutuallyExclusiveOptions("TD or TS", ctx.TD(), ctx.TS()) != 2) {
+           if (!ctx.TD().isEmpty()) {
+               checkTd(ctx);
+           } else {
+               checkTs(ctx);
+           }
+       }
     }
     private void checkTd(CICSParser.Cics_readq_ts_tdContext ctx) {
         checkHasMandatoryOptions(ctx.QUEUE(), ctx, "QUEUE");
@@ -79,7 +82,6 @@ public class CICSReadqOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
         checkHasIllegalOptions(ctx.NEXT(), "NEXT");
         checkHasIllegalOptions(ctx.NUMITEMS(), "NUMITEMS");
         checkHasIllegalOptions(ctx.QNAME(), "QNAME");
-        checkHasIllegalOptions(ctx.TS(), "TS");
 
     }
     private void checkTs(CICSParser.Cics_readq_ts_tdContext ctx) {
@@ -89,7 +91,6 @@ public class CICSReadqOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
         checkHasExactlyOneOption("QUEUE or QNAME", ctx, ctx.QUEUE(), ctx.QNAME());
         checkHasExactlyOneOption("INTO or SET", ctx, ctx.cics_into_set());
         checkHasMutuallyExclusiveOptions("NEXT or ITEM", ctx.NEXT(), ctx.ITEM());
-        checkHasIllegalOptions(ctx.TD(), "TD");
         checkHasIllegalOptions(ctx.NOSUSPEND(), "NOSUSPEND");
     }
     private void checkSetTs(CICSParser.Cics_into_setContext ctx) {
