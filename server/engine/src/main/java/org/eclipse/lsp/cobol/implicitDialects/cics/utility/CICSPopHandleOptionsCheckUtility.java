@@ -33,7 +33,7 @@ public class CICSPopHandleOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
   private static final Map<Integer, ErrorSeverity> DUPLICATE_CHECK_OPTIONS =
           new HashMap<Integer, ErrorSeverity>() {
             {
-              put(CICSLexer.HANDLE, ErrorSeverity.ERROR);
+              put(CICSLexer.HANDLE, ErrorSeverity.WARNING);
             }
           };
 
