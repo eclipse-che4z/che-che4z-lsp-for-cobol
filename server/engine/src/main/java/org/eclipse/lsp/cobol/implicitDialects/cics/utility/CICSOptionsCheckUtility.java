@@ -225,6 +225,9 @@ public class CICSOptionsCheckUtility {
     optionsMap.put(
         CICSPostOptionsCheckUtility.RULE_INDEX,
         new CICSPostOptionsCheckUtility(context, errors));
+    optionsMap.put(
+        CICSReleaseOptionsCheckUtility.RULE_INDEX,
+        new CICSReleaseOptionsCheckUtility(context, errors));
     spOptionsMap.put(
         CICSInquireSPOptionsCheckUtility.RULE_INDEX,
         new CICSInquireSPOptionsCheckUtility(context, errors));
