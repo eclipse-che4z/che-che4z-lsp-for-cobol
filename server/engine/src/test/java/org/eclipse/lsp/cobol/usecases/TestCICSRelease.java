@@ -35,7 +35,7 @@ public class TestCICSRelease {
           "RELEASE PROGRAM({$varOne})";
 
   private static final String RELEASE_INVALID_NO_PROGRAM =
-          "{_RELEASE|errorOne_}";
+          "{_RELEASE|errorOne|errorTwo_}";
 
   private static final String RELEASE_INVALID_EXTRA_OPTION =
           "RELEASE PROGRAM({$varOne}) {PROGRAM|errorOne}({$varOne})";
@@ -52,8 +52,14 @@ public class TestCICSRelease {
             ImmutableMap.of(
                     "errorOne",
                     new Diagnostic(
-                            new Range(new Position(13, 12), new Position(12, 19)),
+                            new Range(new Position(13, 12), new Position(13, 12)),
                             "Missing required option: PROGRAM",
+                            DiagnosticSeverity.Error,
+                            ErrorSource.PARSING.getText()),
+                    "errorTwo",
+                    new Diagnostic(
+                            new Range(new Position(13, 12), new Position(13, 20)),
+                            "Syntax error on 'END-EXEC'",
                             DiagnosticSeverity.Error,
                             ErrorSource.PARSING.getText())));
   }
