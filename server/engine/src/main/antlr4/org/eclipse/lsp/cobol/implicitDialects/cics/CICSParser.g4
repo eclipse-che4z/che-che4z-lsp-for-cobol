@@ -20,8 +20,8 @@ cicsExecBlock: EXEC_CICS (allCicsRule)* END_EXEC ;
 
 allCicsRule: cics_send | cics_receive | cics_add | cics_address | cics_allocate | cics_asktime | cics_assign | cics_bif |
                        cics_build | cics_cancel | cics_change | cics_check | cics_connect | cics_converttime |
-                       cics_define | cics_delay | cics_delete | cics_deleteq | cics_deq | cics_document | cics_dump |
-                       cics_endbr_endbrowse | cics_enq | cics_enter | cics_extract | cics_force | cics_formattime | cics_free |
+                       cics_define | cics_delay | cics_delete | cics_deleteq | cics_deq | cics_document | cics_dump | cics_endbr |
+                       cics_endbrowse | cics_enq | cics_enter | cics_extract | cics_force | cics_formattime | cics_free |
                        cics_freemain | cics_get | cics_getmain | cics_getnext | cics_handle | cics_ignore | cics_inquire |
                        cics_invoke | cics_issue | cics_link | cics_load | cics_monitor | cics_move | cics_point | cics_pop |
                        cics_post | cics_purge | cics_push | cics_put | cics_query | cics_read | cics_readnext_readprev |
@@ -318,9 +318,10 @@ cics_dump_code_opts: (COMPLETE | TRT | TASK | STORAGE | PROGRAM | TERMINAL | TAB
 cics_dump_transaction_segmentlist: ((SEGMENTLIST | LENGTHLIST | NUMSEGMENTS) cics_data_area | cics_handle_response)+;
 
 /** ENDBR / ENDBROWSE */
-cics_endbr_endbrowse: cics_endbr | cics_endbrowse;
-cics_endbr: ENDBR ((FILE | DATASET) cics_name | REQID cics_data_value | SYSID cics_data_area | cics_handle_response)*;
-cics_endbrowse: ENDBROWSE (ACTIVITY | CONTAINER | EVENT | PROCESS | TIMER | (BROWSETOKEN | RETCODE) cics_data_value | cics_handle_response)*;
+cics_endbr: ENDBR cics_endbr_opts;
+cics_endbr_opts: ((FILE | DATASET) cics_name | REQID cics_data_value | SYSID cics_data_area | cics_handle_response)+;
+cics_endbrowse: ENDBROWSE cics_endbrowse_opts;
+cics_endbrowse_opts: (ACTIVITY | CONTAINER | EVENT | PROCESS | TIMER | (BROWSETOKEN | RETCODE) cics_data_value | cics_handle_response)+;
 
 /** ENQ */
 cics_enq: ENQ cics_enq_opts;

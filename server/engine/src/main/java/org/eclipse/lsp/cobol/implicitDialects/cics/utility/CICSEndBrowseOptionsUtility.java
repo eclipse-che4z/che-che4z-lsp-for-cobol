@@ -26,21 +26,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_endbr_endbrowse;
+import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_endbrowse;
+import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_endbrowse_opts;
 
 /** Checks CICS Extract rules for required and invalid options */
-public class CICSEndbrEndBrowseOptionsUtility extends CICSOptionsCheckBaseUtility {
+public class CICSEndBrowseOptionsUtility extends CICSOptionsCheckBaseUtility {
 
-  public static final int RULE_INDEX = RULE_cics_endbr_endbrowse;
+  public static final int RULE_INDEX = RULE_cics_endbrowse;
 
   private static final Map<Integer, ErrorSeverity> DUPLICATE_CHECK_OPTIONS =
       new HashMap<Integer, ErrorSeverity>() {
         {
-          put(CICSLexer.ENDBR, ErrorSeverity.ERROR);
-          put(CICSLexer.FILE, ErrorSeverity.ERROR);
-          put(CICSLexer.REQID, ErrorSeverity.ERROR);
-          put(CICSLexer.SYSID, ErrorSeverity.ERROR);
-          put(CICSLexer.ENDBROWSE, ErrorSeverity.ERROR);
           put(CICSLexer.ACTIVITY, ErrorSeverity.WARNING);
           put(CICSLexer.BROWSETOKEN, ErrorSeverity.ERROR);
           put(CICSLexer.CONTAINER, ErrorSeverity.WARNING);
@@ -50,7 +46,7 @@ public class CICSEndbrEndBrowseOptionsUtility extends CICSOptionsCheckBaseUtilit
         }
       };
 
-  public CICSEndbrEndBrowseOptionsUtility(DialectProcessingContext context, List<SyntaxError> errors) {
+  public CICSEndBrowseOptionsUtility(DialectProcessingContext context, List<SyntaxError> errors) {
     super(context, errors, DUPLICATE_CHECK_OPTIONS);
   }
 
@@ -61,26 +57,14 @@ public class CICSEndbrEndBrowseOptionsUtility extends CICSOptionsCheckBaseUtilit
    * @param <E> A subclass of ParserRuleContext
    */
   public <E extends ParserRuleContext> void checkOptions(E ctx) {
-    switch (ctx.getRuleIndex()) {
-      case CICSParser.RULE_cics_endbr:
-        checkEndbr((CICSParser.Cics_endbrContext) ctx);
-        break;
-      case CICSParser.RULE_cics_endbrowse:
-        checkEndBrowse((CICSParser.Cics_endbrowseContext) ctx);
-        break;
-      default:
-        break;
-    }
+      if (ctx.getRuleIndex() == RULE_cics_endbrowse_opts) {
+          checkEndBrowse((CICSParser.Cics_endbrowse_optsContext) ctx);
+      }
     checkDuplicates(ctx);
   }
 
   @SuppressWarnings("unchecked")
-  private void checkEndbr(CICSParser.Cics_endbrContext ctx) {
-    checkHasExactlyOneOption("FILE or DATASET", ctx, ctx.FILE(), ctx.DATASET());
-  }
-
-  @SuppressWarnings("unchecked")
-  private void checkEndBrowse(CICSParser.Cics_endbrowseContext ctx) {
+  private void checkEndBrowse(CICSParser.Cics_endbrowse_optsContext ctx) {
     checkHasExactlyOneOption("ACTIVITY or CONTAINER or EVENT or PROCESS or TIMER", ctx,
             ctx.ACTIVITY(), ctx.CONTAINER(), ctx.EVENT(), ctx.PROCESS(), ctx.TIMER());
 
