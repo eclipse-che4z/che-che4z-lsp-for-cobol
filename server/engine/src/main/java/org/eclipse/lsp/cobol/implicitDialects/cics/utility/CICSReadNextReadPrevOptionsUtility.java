@@ -69,18 +69,10 @@ public class CICSReadNextReadPrevOptionsUtility extends CICSOptionsCheckBaseUtil
    * @param <E> A subclass of ParserRuleContext
    */
   public <E extends ParserRuleContext> void checkOptions(E ctx) {
-    if (ctx.getRuleIndex() == CICSParser.RULE_cics_readnext_readprev) {
-      checkReadNextReadPrev((CICSParser.Cics_readnext_readprevContext) ctx);
-    }
     if (ctx.getRuleIndex() == CICSParser.RULE_cics_readnext_readprev_body) {
       checkReadNextReadPrevBody((CICSParser.Cics_readnext_readprev_bodyContext) ctx);
     }
     checkDuplicates(ctx);
-  }
-
-  private void checkReadNextReadPrev(CICSParser.Cics_readnext_readprevContext ctx) {
-    checkHasMutuallyExclusiveOptions(
-            "READNEXT or READPREV", Collections.singletonList(ctx.READNEXT()), Collections.singletonList(ctx.READPREV()));
   }
 
   @SuppressWarnings("unchecked")
