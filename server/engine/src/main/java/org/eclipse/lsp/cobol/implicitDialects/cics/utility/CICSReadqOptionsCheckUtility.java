@@ -67,13 +67,13 @@ public class CICSReadqOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     }
 
     private void checkOpts(CICSParser.Cics_readq_ts_tdContext ctx) {
-       if (checkHasMutuallyExclusiveOptions("TD or TS", ctx.TD(), ctx.TS()) != 2) {
-           if (!ctx.TD().isEmpty()) {
-               checkTd(ctx);
-           } else {
-               checkTs(ctx);
-           }
-       }
+       final List<TerminalNode> TDs = ctx.TD();
+       final List<TerminalNode> TSs = ctx.TS();
+       checkHasMutuallyExclusiveOptions("TD or TS", TDs, TSs);
+       if (TDs.isEmpty())
+           checkTs(ctx);
+       else if (TSs.isEmpty())
+           checkTd(ctx);
     }
     private void checkTd(CICSParser.Cics_readq_ts_tdContext ctx) {
         checkHasMandatoryOptions(ctx.QUEUE(), ctx, "QUEUE");
