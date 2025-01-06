@@ -34,7 +34,6 @@ public class CICSSpoolcloseOptionsCheckUtility extends CICSOptionsCheckBaseUtili
   private static final Map<Integer, ErrorSeverity> DUPLICATE_CHECK_OPTIONS =
           new HashMap<Integer, ErrorSeverity>() {
             {
-              put(CICSLexer.SPOOLCLOSE, ErrorSeverity.ERROR);
               put(CICSLexer.TOKEN, ErrorSeverity.ERROR);
               put(CICSLexer.KEEP, ErrorSeverity.WARNING);
               put(CICSLexer.DELETE, ErrorSeverity.WARNING);
