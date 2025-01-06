@@ -243,7 +243,15 @@ cics_check_activity: (ACQPROCESS | ACTIVITY cics_data_value | ACQACTIVITY | (ABC
                      (MODE | SUSPSTATUS | COMPSTATUS) cics_cvda | cics_handle_response)+;
 cics_check_timer: (TIMER cics_data_value | STATUS cics_cvda | cics_handle_response)*;
 
-cics_conditions: EOC | EODS | INVMPSZ | INVPARTN | INVREQ | MAPFAIL | PARTNFAIL | RDATT | UNEXPIN | ERROR | DUPREC;
+cics_conditions: NORMAL | ERROR | RDATT | WRBRK | EODS | EOC | INBFMH | ENDINPT | NONVAL | NOSTART | TERMIDERR | FILENOTFOUND | NOTFND | DUPREC | DUPKEY |
+                INVREQ | IOERR | NOSPACE | NOTOPEN | ENDFILE | ILLOGIC | LENGERR | QZERO | SIGNAL | QBUSY | ITEMERR | PGMIDERR | TRANSIDERR | ENDDATA | INVTSREQ |
+                EXPIRED | RETPAGE | RTEFAIL | RTESOME | TSIOERR | MAPFAIL | INVERRTERM | INVMPSZ | IGREQID | OVERFLOW | INVLDC | NOSTG | JIDERR | QIDERR | NOJBUFSP |
+                DSSTAT | SELNERR | FUNCERR | UNEXPIN | NOPASSBKRD | NOPASSBKWR | SEGIDERR | SYSIDERR | ISCINVREQ | ENQBUSY | ENVDEFERR | IGREQCD | SESSIONERR | SYSBUSY |
+                SESSBUSY | NOTALLOC | CBIDERR | INVEXITREQ | INVPARTNSET | INVPARTN | PARTNFAIL | USERIDERR | NOTAUTH | VOLIDERR | SUPPRESSED | RESIDERR | NOSPOOL |
+                TERMERR | ROLLEDBACK | END | DISABLED | ALLOCERR | STRELERR | OPENERR | SPOLBUSY | SPOLERR | NODEIDERR | TASKIDERR | TCIDERR | DSNNOTFOUND | LOADING |
+                MODELIDERR | OUTDESCRERR | PARTNERIDERR | PROFILEIDERR | NETNAMEIDERR | LOCKED | RECORDBUSY | UOWNOTFOUND | UOWLNOTFOUND | LINKABEND | CHANGED | PROCESSBUSY |
+                ACTIVITYBUSY | PROCESSERR | ACTIVITYERR | CONTAINERERR | EVENTERR | TOKENERR | NOTFINISHED | POOLERR | TIMERERR | SYMBOLERR | TEMPLATERR | NOTSUPERUSER | CSDERR |
+                DUPRES | RESUNAVAIL | CHANNELERR | CCSIDERR | TIMEDOUT | CODEPAGEERR | INCOMPLETE | APPNOTFOUND | BUSY;
 
 /** CONNECT PROCESS */
 cics_connect: CONNECT cics_connect_process;
@@ -403,7 +411,7 @@ cics_handle_abend: ABEND (CANCEL | PROGRAM cics_name | LABEL cics_label | RESET 
 cics_handle_aid: AID (ANYKEY (cics_label)? | CLEAR (empty_parens | cics_label)? | CLRPARTN (cics_label)? | ENTER (cics_label)? |
                  LIGHTPEN (cics_label)? | OPERID  (cics_label)? | pa_option (cics_label)? | pf_option (cics_label)? |
                  TRIGGER  (cics_label)? | cics_handle_response)*;
-cics_handle_condition: CONDITION ((cics_conditions | cicsWord) cics_label? | cics_handle_response)+;
+cics_handle_condition: CONDITION ((cics_conditions | cicsWord) cics_label? | cics_handle_response)+ EOF?;
 
 pa_option: PA1 | PA2 | PA3;
 pf_option: PF1 | PF2 | PF3 | PF4 | PF5 | PF6 | PF7 | PF8 | PF9 | PF10 | PF11 | PF12 | PF13 | PF14 | PF15 | PF16 | PF17 |
@@ -411,7 +419,7 @@ pf_option: PF1 | PF2 | PF3 | PF4 | PF5 | PF6 | PF7 | PF8 | PF9 | PF10 | PF11 | P
 
 /** IGNORE CONDITION */
 cics_ignore: IGNORE cics_ignore_options;
-cics_ignore_options :  (CONDITION | cics_conditions | cics_handle_response)+;
+cics_ignore_options :  (CONDITION | cics_conditions | cics_handle_response)+ EOF?;
 
 /** INQUIRE, Application Commands ACTIVITYID / CONTAINER / EVENT / PROCESS / TIMER */
 cics_inquire: INQUIRE (cics_inquire_process | cics_inquire_activityid | cics_inquire_container | cics_inquire_event | cics_inquire_timer);
@@ -2651,7 +2659,113 @@ ABCODE
  | YYYYDDD
  | YYYYDDMM
  | YYYYMMDD
- | ZCPTRACING;
+ | ZCPTRACING
+ | NORMAL
+ | WRBRK
+ | INBFMH
+ | ENDINPT
+ | NONVAL
+ | NOSTART
+ | TERMIDERR
+ | FILENOTFOUND
+ | NOTFND
+ | DUPKEY
+ | IOERR
+ | NOSPACE
+ | NOTOPEN
+ | ILLOGIC
+ | LENGERR
+ | QZERO
+ | QBUSY
+ | ITEMERR
+ | PGMIDERR
+ | TRANSIDERR
+ | ENDDATA
+ | INVTSREQ
+ | EXPIRED
+ | RETPAGE
+ | RTEFAIL
+ | RTESOME
+ | TSIOERR
+ | INVERRTERM
+ | IGREQID
+ | OVERFLOW
+ | INVLDC
+ | NOSTG
+ | JIDERR
+ | QIDERR
+ | NOJBUFSP
+ | DSSTAT
+ | SELNERR
+ | FUNCERR
+ | NOPASSBKRD
+ | NOPASSBKWR
+ | SEGIDERR
+ | SYSIDERR
+ | ISCINVREQ
+ | ENQBUSY
+ | ENVDEFERR
+ | IGREQCD
+ | SESSIONERR
+ | SYSBUSY
+ | SESSBUSY
+ | NOTALLOC
+ | CBIDERR
+ | INVEXITREQ
+ | INVPARTNSET
+ | USERIDERR
+ | NOTAUTH
+ | VOLIDERR
+ | SUPPRESSED
+ | RESIDERR
+ | NOSPOOL
+ | TERMERR
+ | ROLLEDBACK
+ | DISABLED
+ | ALLOCERR
+ | STRELERR
+ | OPENERR
+ | SPOLBUSY
+ | SPOLERR
+ | NODEIDERR
+ | TASKIDERR
+ | TCIDERR
+ | DSNNOTFOUND
+ | LOADING
+ | MODELIDERR
+ | OUTDESCRERR
+ | PARTNERIDERR
+ | PROFILEIDERR
+ | NETNAMEIDERR
+ | LOCKED
+ | RECORDBUSY
+ | UOWNOTFOUND
+ | UOWLNOTFOUND
+ | LINKABEND
+ | CHANGED
+ | PROCESSBUSY
+ | ACTIVITYBUSY
+ | PROCESSERR
+ | ACTIVITYERR
+ | CONTAINERERR
+ | EVENTERR
+ | TOKENERR
+ | NOTFINISHED
+ | POOLERR
+ | TIMERERR
+ | SYMBOLERR
+ | TEMPLATERR
+ | NOTSUPERUSER
+ | CSDERR
+ | DUPRES
+ | RESUNAVAIL
+ | CHANNELERR
+ | CCSIDERR
+ | TIMEDOUT
+ | CODEPAGEERR
+ | INCOMPLETE
+ | APPNOTFOUND
+ | BUSY;
 
 name: variableNameUsage+;
 data_value: variableNameUsage+;

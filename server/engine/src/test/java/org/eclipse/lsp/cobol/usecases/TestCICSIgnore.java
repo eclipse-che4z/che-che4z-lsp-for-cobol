@@ -41,6 +41,42 @@ public class TestCICSIgnore {
   private static final String IGNORE_CONDITION_INVALID_TWO =
           "IGNORE CONDITION {CONDITION|errorOne} ERROR";
 
+  private static final String IGNORE_CONDITION_INVALID_THREE =
+          "IGNORE CONDITION NORMAL {NORMAL|errorOne}";
+
+  private static final String IGNORE_CONDITION_INVALID_WRBRK =
+          "IGNORE CONDITION WRBRK {WRBRK|errorOne}";
+
+  private static final String IGNORE_CONDITION_INVALID_INBFMH =
+          "IGNORE CONDITION INBFMH {INBFMH|errorOne}";
+
+  private static final String IGNORE_CONDITION_INVALID_ENDINPT =
+          "IGNORE CONDITION ENDINPT {ENDINPT|errorOne}";
+
+  private static final String IGNORE_CONDITION_INVALID_NONVAL =
+          "IGNORE CONDITION NONVAL {NONVAL|errorOne}";
+
+  private static final String IGNORE_CONDITION_INVALID_NOSTART =
+          "IGNORE CONDITION NOSTART {NOSTART|errorOne}";
+
+  private static final String IGNORE_CONDITION_INVALID_TERMIDERR =
+          "IGNORE CONDITION TERMIDERR {TERMIDERR|errorOne}";
+
+  private static final String IGNORE_CONDITION_INVALID_FILENOTFOUND =
+          "IGNORE CONDITION FILENOTFOUND {FILENOTFOUND|errorOne}";
+
+  private static final String IGNORE_CONDITION_INVALID_NOTFND =
+          "IGNORE CONDITION NOTFND {NOTFND|errorOne}";
+
+  private static final String IGNORE_CONDITION_INVALID_DUPKEY =
+          "IGNORE CONDITION DUPKEY {DUPKEY|errorOne}";
+
+  private static final String IGNORE_CONDITION_INVALID_INVREQ =
+          "IGNORE CONDITION INVREQ {INVREQ|errorOne}";
+
+  private static final String IGNORE_CONDITION_INVALID_IOERR =
+          "IGNORE CONDITION IOERR {IOERR|errorOne}";
+
   @Test
   void testIgnoreConditionValidOne() {
     CICSTestUtils.noErrorTest(IGNORE_CONDITION_VALID_ONE);
@@ -73,6 +109,162 @@ public class TestCICSIgnore {
                     new Diagnostic(
                             new Range(),
                             "Excessive options provided for: CONDITION",
+                            DiagnosticSeverity.Error,
+                            ErrorSource.PARSING.getText())));
+  }
+
+  @Test
+  void testIgnoreConditionInvalidThree() {
+    CICSTestUtils.errorTest(
+            IGNORE_CONDITION_INVALID_THREE,
+            ImmutableMap.of(
+                    "errorOne",
+                    new Diagnostic(
+                            new Range(),
+                            "Excessive options provided for: NORMAL",
+                            DiagnosticSeverity.Error,
+                            ErrorSource.PARSING.getText())));
+  }
+
+  @Test
+  void testIgnoreConditionInvalidWrbrk() {
+    CICSTestUtils.errorTest(
+            IGNORE_CONDITION_INVALID_WRBRK,
+            ImmutableMap.of(
+                    "errorOne",
+                    new Diagnostic(
+                            new Range(),
+                            "Excessive options provided for: WRBRK",
+                            DiagnosticSeverity.Error,
+                            ErrorSource.PARSING.getText())));
+  }
+
+  @Test
+  void testIgnoreConditionInvalidInbfmh() {
+    CICSTestUtils.errorTest(
+            IGNORE_CONDITION_INVALID_INBFMH,
+            ImmutableMap.of(
+                    "errorOne",
+                    new Diagnostic(
+                            new Range(),
+                            "Excessive options provided for: INBFMH",
+                            DiagnosticSeverity.Error,
+                            ErrorSource.PARSING.getText())));
+  }
+
+  @Test
+  void testIgnoreConditionInvalidEndinpt() {
+    CICSTestUtils.errorTest(
+            IGNORE_CONDITION_INVALID_ENDINPT,
+            ImmutableMap.of(
+                    "errorOne",
+                    new Diagnostic(
+                            new Range(),
+                            "Excessive options provided for: ENDINPT",
+                            DiagnosticSeverity.Error,
+                            ErrorSource.PARSING.getText())));
+  }
+
+  @Test
+  void testIgnoreConditionInvalidNonval() {
+    CICSTestUtils.errorTest(
+            IGNORE_CONDITION_INVALID_NONVAL,
+            ImmutableMap.of(
+                    "errorOne",
+                    new Diagnostic(
+                            new Range(),
+                            "Excessive options provided for: NONVAL",
+                            DiagnosticSeverity.Error,
+                            ErrorSource.PARSING.getText())));
+  }
+
+  @Test
+  void testIgnoreConditionInvalidNostart() {
+    CICSTestUtils.errorTest(
+            IGNORE_CONDITION_INVALID_NOSTART,
+            ImmutableMap.of(
+                    "errorOne",
+                    new Diagnostic(
+                            new Range(),
+                            "Excessive options provided for: NOSTART",
+                            DiagnosticSeverity.Error,
+                            ErrorSource.PARSING.getText())));
+  }
+
+  @Test
+  void testIgnoreConditionInvalidTermiderr() {
+    CICSTestUtils.errorTest(
+            IGNORE_CONDITION_INVALID_TERMIDERR,
+            ImmutableMap.of(
+                    "errorOne",
+                    new Diagnostic(
+                            new Range(),
+                            "Excessive options provided for: TERMIDERR",
+                            DiagnosticSeverity.Error,
+                            ErrorSource.PARSING.getText())));
+  }
+
+  @Test
+  void testIgnoreConditionInvalidFilenotfound() {
+    CICSTestUtils.errorTest(
+            IGNORE_CONDITION_INVALID_FILENOTFOUND,
+            ImmutableMap.of(
+                    "errorOne",
+                    new Diagnostic(
+                            new Range(),
+                            "Excessive options provided for: FILENOTFOUND",
+                            DiagnosticSeverity.Error,
+                            ErrorSource.PARSING.getText())));
+  }
+
+  @Test
+  void testIgnoreConditionInvalidNotfnd() {
+    CICSTestUtils.errorTest(
+            IGNORE_CONDITION_INVALID_NOTFND,
+            ImmutableMap.of(
+                    "errorOne",
+                    new Diagnostic(
+                            new Range(),
+                            "Excessive options provided for: NOTFND",
+                            DiagnosticSeverity.Error,
+                            ErrorSource.PARSING.getText())));
+  }
+
+  @Test
+  void testIgnoreConditionInvalidDupkey() {
+    CICSTestUtils.errorTest(
+            IGNORE_CONDITION_INVALID_DUPKEY,
+            ImmutableMap.of(
+                    "errorOne",
+                    new Diagnostic(
+                            new Range(),
+                            "Excessive options provided for: DUPKEY",
+                            DiagnosticSeverity.Error,
+                            ErrorSource.PARSING.getText())));
+  }
+
+  @Test
+  void testIgnoreConditionInvalidInvreq() {
+    CICSTestUtils.errorTest(
+            IGNORE_CONDITION_INVALID_INVREQ,
+            ImmutableMap.of(
+                    "errorOne",
+                    new Diagnostic(
+                            new Range(),
+                            "Excessive options provided for: INVREQ",
+                            DiagnosticSeverity.Error,
+                            ErrorSource.PARSING.getText())));
+  }
+
+  @Test
+  void testIgnoreConditionInvalidIoerr() {
+    CICSTestUtils.errorTest(
+            IGNORE_CONDITION_INVALID_IOERR,
+            ImmutableMap.of(
+                    "errorOne",
+                    new Diagnostic(
+                            new Range(),
+                            "Excessive options provided for: IOERR",
                             DiagnosticSeverity.Error,
                             ErrorSource.PARSING.getText())));
   }
