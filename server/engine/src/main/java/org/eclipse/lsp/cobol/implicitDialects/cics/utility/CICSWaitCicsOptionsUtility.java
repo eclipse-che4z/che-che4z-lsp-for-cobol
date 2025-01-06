@@ -57,14 +57,14 @@ public class CICSWaitCicsOptionsUtility extends CICSOptionsCheckBaseUtility {
    * @param <E> A subclass of ParserRuleContext
    */
   public <E extends ParserRuleContext> void checkOptions(E ctx) {
-    if (ctx.getParent().getRuleIndex() == CICSParser.RULE_cics_waitcics) {
-      checkWaitCics((CICSParser.Cics_waitcicsContext) ctx.getParent());
+    if (ctx.getRuleIndex() == CICSParser.RULE_cics_waitcics_body) {
+      checkWaitCics((CICSParser.Cics_waitcics_bodyContext) ctx);
     }
-    checkDuplicates(ctx.getParent());
+    checkDuplicates(ctx);
   }
 
   @SuppressWarnings("unchecked")
-  private void checkWaitCics(CICSParser.Cics_waitcicsContext ctx) {
+  private void checkWaitCics(CICSParser.Cics_waitcics_bodyContext ctx) {
     checkHasMandatoryOptions(ctx.ECBLIST(), ctx, "ECBLIST");
     checkHasMandatoryOptions(ctx.NUMEVENTS(), ctx, "NUMEVENTS");
     checkHasMutuallyExclusiveOptions("PURGEABLE or NOTPURGEABLE or PURGEABILITY", ctx.PURGEABLE(), ctx.NOTPURGEABLE(), ctx.PURGEABILITY());

@@ -63,13 +63,13 @@ public class CICSWSAEPRUtility extends CICSOptionsCheckBaseUtility {
    * @param <E> A subclass of ParserRuleContext
    */
   public <E extends ParserRuleContext> void checkOptions(E ctx) {
-    if (ctx.getParent().getRuleIndex() == CICSParser.RULE_cics_wsaepr) {
-      checkWSAEPR((CICSParser.Cics_wsaeprContext) ctx.getParent());
+    if (ctx.getRuleIndex() == CICSParser.RULE_cics_wsaepr_body) {
+      checkWSAEPR((CICSParser.Cics_wsaepr_bodyContext) ctx);
     }
-    checkDuplicates(ctx.getParent());
+    checkDuplicates(ctx);
   }
 
-  private void checkWSAEPR(CICSParser.Cics_wsaeprContext ctx) {
+  private void checkWSAEPR(CICSParser.Cics_wsaepr_bodyContext ctx) {
     checkHasMandatoryOptions(ctx.CREATE(), ctx, "CREATE");
     checkHasExactlyOneOption("EPRINTO or EPRSET", ctx, ctx.EPRINTO(), ctx.EPRSET());
     checkHasMandatoryOptions(ctx.EPRLENGTH(), ctx, "EPRLENGTH");

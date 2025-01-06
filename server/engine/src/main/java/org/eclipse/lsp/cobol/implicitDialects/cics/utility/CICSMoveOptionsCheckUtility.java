@@ -60,13 +60,13 @@ public class CICSMoveOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
      */
     @Override
     public <E extends ParserRuleContext> void checkOptions(E ctx) {
-        if (RULE_cics_move == (ctx.getParent().getRuleIndex())) {
-            checkMoveOptions((CICSParser.Cics_moveContext) ctx.getParent());
+        if (CICSParser.RULE_cics_move_body == (ctx.getRuleIndex())) {
+            checkMoveOptions((CICSParser.Cics_move_bodyContext) ctx);
         }
-        checkDuplicates(ctx.getParent());
+        checkDuplicates(ctx);
     }
 
-    private void checkMoveOptions(CICSParser.Cics_moveContext ctx) {
+    private void checkMoveOptions(CICSParser.Cics_move_bodyContext ctx) {
         checkHasMandatoryOptions(ctx.CONTAINER(), ctx, "CONTAINER");
         checkHasMandatoryOptions(ctx.AS(), ctx, "AS");
         checkHasMutuallyExclusiveOptions("FROMPROCESS or FROMACTIVITY", ctx.FROMPROCESS(), ctx.FROMACTIVITY());

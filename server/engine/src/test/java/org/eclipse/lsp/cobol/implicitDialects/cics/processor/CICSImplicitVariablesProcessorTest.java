@@ -32,13 +32,15 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+import java.util.HashMap;
+import java.util.LinkedList;
+
 /**
  * Test for CICSImplicitVariablesProcessor
  */
 @ExtendWith(MockitoExtension.class)
 class CICSImplicitVariablesProcessorTest {
   private static final int CICS_INTRODUCED_REGISTERS_COUNT = 72;
-  @Mock
   private ProcessingContext processingContext;
   @Mock private VariableAccumulator variableAccumulator;
   CICSImplicitVariablesProcessor processor;
@@ -46,13 +48,13 @@ class CICSImplicitVariablesProcessorTest {
   @BeforeEach
   void init() {
     processor = new CICSImplicitVariablesProcessor();
+    processingContext = new ProcessingContext(new LinkedList<>(), variableAccumulator, new HashMap<>());
   }
 
   @Test
   void testLinkageSectionWhenCicsTranslateEnabled() {
     SectionNode sectionNode = new SectionNode(Locality.builder().build(), SectionType.LINKAGE);
     sectionNode.setParent(new ProgramNode(Locality.builder().build(), ProgramSubtype.Program, 0));
-    when(processingContext.getVariableAccumulator()).thenReturn(variableAccumulator);
     assertNotNull(processingContext.getVariableAccumulator());
     assertEquals(variableAccumulator, processingContext.getVariableAccumulator());
     processor.accept(sectionNode, processingContext);
@@ -61,7 +63,6 @@ class CICSImplicitVariablesProcessorTest {
 
   @Test
   void testWorkingSectionWhenCicsTranslateEnabled() {
-    doReturn(variableAccumulator).when(processingContext).getVariableAccumulator();
     SectionNode sectionNode =
             new SectionNode(Locality.builder().build(), SectionType.WORKING_STORAGE);
     sectionNode.setParent(new ProgramNode(Locality.builder().build(), ProgramSubtype.Program, 0));
