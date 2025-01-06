@@ -27,6 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.cfg.CFASTBuilder;
 import org.eclipse.lsp.cobol.cfg.CFASTBuilderImpl;
 import org.eclipse.lsp.cobol.common.AnalysisResult;
+import org.eclipse.lsp.cobol.service.DocumentModelService;
 import org.eclipse.lsp.cobol.test.engine.UseCase;
 import org.eclipse.lsp.cobol.test.engine.UseCaseUtils;
 import org.junit.jupiter.api.Assertions;
@@ -65,7 +66,9 @@ class CFASTBuilderTest {
                 .documentUri("fake/path")
                 .text(src)
                 .build());
-    CFASTBuilder builder = new CFASTBuilderImpl();
+    DocumentModelService documentModelService = new DocumentModelService();
+    documentModelService.openDocument("fake/path", src, "COBOL");
+    CFASTBuilder builder = new CFASTBuilderImpl(documentModelService);
     Assertions.assertEquals(
         GSON.toJson(GSON.fromJson(jsonTree, List.class)),
         GSON.toJson(
