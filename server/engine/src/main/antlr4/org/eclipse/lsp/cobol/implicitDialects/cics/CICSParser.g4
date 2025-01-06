@@ -684,7 +684,7 @@ cics_soapfault_detail: (DETAIL cics_data_value | DETAILLENGTH cics_data_value)+;
 
 /** SPOOLCLOSE */
 cics_spoolclose: SPOOLCLOSE cics_spoolclose_options;
-cics_spoolclose_options: (TOKEN cics_data_area | KEEP | DELETE | NOHANDLE | cics_handle_response)+;
+cics_spoolclose_options: (TOKEN cics_data_area | KEEP | DELETE | cics_handle_response)+;
 cics_spoolclose_resp: RESP RESP2?;
 
 /** SPOOLOPEN INPUT / OUTPUT */
