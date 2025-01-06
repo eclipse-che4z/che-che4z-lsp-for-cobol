@@ -37,7 +37,6 @@ public class CICSSpoolcloseOptionsCheckUtility extends CICSOptionsCheckBaseUtili
               put(CICSLexer.TOKEN, ErrorSeverity.ERROR);
               put(CICSLexer.KEEP, ErrorSeverity.WARNING);
               put(CICSLexer.DELETE, ErrorSeverity.WARNING);
-              put(CICSLexer.NOHANDLE, ErrorSeverity.WARNING);
             }
           };
 
