@@ -47,7 +47,7 @@ public class CICSCreateSPOptionsCheckUtility extends CICSOptionsCheckBaseUtility
                     put(CICSLexer.JOURNALMODEL, ErrorSeverity.ERROR);
                     put(CICSLexer.JVMSERVER, ErrorSeverity.ERROR);
                     put(CICSLexer.LIBRARY, ErrorSeverity.ERROR);
-                    put(CICSLexer.LSRSPOOL, ErrorSeverity.ERROR);
+                    put(CICSLexer.LSRPOOL, ErrorSeverity.ERROR);
                     put(CICSLexer.MAPSET, ErrorSeverity.ERROR);
                     put(CICSLexer.MQCONN, ErrorSeverity.ERROR);
                     put(CICSLexer.MQMONITOR, ErrorSeverity.ERROR);

@@ -258,7 +258,7 @@ cics_converttime_opts:(DATESTRING cics_data_area | ABSTIME cics_data_area | cics
 /** CREATE System Commands */
 cics_create: CREATE cics_create_opts;
 cics_create_opts:((ATOMSERVICE | BUNDLE | DB2CONN | DB2ENTRY | DB2TRAN | DOCTEMPLATE | DUMPCODE | ENQMODEL | FILE |
-                                      IPCONN | JOURNALMODEL | JVMSERVER | LIBRARY | LSRSPOOL | MAPSET | MQCONN | MQMONITOR | PARTITIONSET |
+                                      IPCONN | JOURNALMODEL | JVMSERVER | LIBRARY | LSRPOOL | MAPSET | MQCONN | MQMONITOR | PARTITIONSET |
                                       PARTNER |  PIPELINE | PROCESSTYPE | PROFILE | PROGRAM | TCPIPSERVICE | TDQUEUE | TRANCLASS |
                                       TRANSACTION | TSMODEL | TYPETERM | URIMAP | WEBSERVICE | SESSIONS | TERMINAL | CONNECTION) cics_data_value |
                                       (ATTRIBUTES cics_attributes | COMPLETE | DISCARD | ATTRLEN cics_data_value | LOG | NOLOG | LOGMESSAGE cics_cvda | cics_handle_response))+;
@@ -1866,8 +1866,8 @@ ABCODE
  | LOW_VALUE
  | LOW_VALUES
  | LPASTATUS
+ | LSRPOOL
  | LSRPOOLNUM
- | LSRSPOOL
  | LUNAME
  | MAIN
  | MAJORVERSION

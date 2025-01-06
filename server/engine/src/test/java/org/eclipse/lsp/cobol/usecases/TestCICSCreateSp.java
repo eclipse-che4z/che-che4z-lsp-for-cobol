@@ -51,7 +51,7 @@ public class TestCICSCreateSp {
                 "CREATE JOURNALMODEL({$varFour}) NOLOG ATTRLEN({$varOne}) ATTRIBUTES(anything)",
                 "CREATE JVMSERVER({$varFour}) NOLOG ATTRLEN({$varOne}) ATTRIBUTES(anything)",
                 "CREATE LIBRARY({$varFour}) NOLOG ATTRLEN({$varOne}) ATTRIBUTES(anything)",
-                "CREATE LSRSPOOL({$varFour}) NOLOG ATTRLEN({$varOne}) ATTRIBUTES(anything)",
+                "CREATE LSRPOOL({$varFour}) NOLOG ATTRLEN({$varOne}) ATTRIBUTES(anything)",
                 "CREATE MAPSET({$varFour}) NOLOG ATTRLEN({$varOne}) ATTRIBUTES(anything)",
                 "CREATE MQCONN({$varFour}) NOLOG ATTRLEN({$varOne}) ATTRIBUTES(anything)",
                 "CREATE MQMONITOR({$varFour}) NOLOG ATTRLEN({$varOne}) ATTRIBUTES(anything)",
