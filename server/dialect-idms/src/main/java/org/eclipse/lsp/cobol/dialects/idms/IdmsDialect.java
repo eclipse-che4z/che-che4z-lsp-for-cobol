@@ -33,7 +33,6 @@ import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.utils.KeywordsUtils;
-import org.eclipse.lsp.cobol.common.utils.RangeUtils;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
@@ -162,8 +161,7 @@ public final class IdmsDialect implements CobolDialect {
               if (copybookLevel > 0 && p.getRight() != null) {
                 CopyIdmsAdjustmentProcessor copyIdmsAdjustmentProcessor = new CopyIdmsAdjustmentProcessor(copyNode,
                     currentDocument.getUri(), copybookLevel, firstLevel, p, messageService);
-                currentDocument.replace(
-                    RangeUtils.extendByCharacter(p.getLeft(), -1),
+                currentDocument.replace(p.getLeft(),
                     String.format("%02d", copyIdmsAdjustmentProcessor.calculateLevel(copybookLevel, firstLevel, p.getRight())));
                 copyIdmsAdjustmentProcessor.processError(errors);
               }

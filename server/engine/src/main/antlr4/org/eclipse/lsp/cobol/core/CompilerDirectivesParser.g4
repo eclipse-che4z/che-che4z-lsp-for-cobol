@@ -19,9 +19,12 @@ compilerOptions: compilerOption | (compilerOption COMMACHAR compilerOptions)+;
 compilerOption
     : deprecatedCompilerOptions
     | compilerXOpts
-    | cicsTranslatorCompileDirectivedKeywords
+    | cicsTranslatorOptions
     | cobolCompilerOption
     ;
+
+// compiler translator options
+cicsTranslatorOptions:  CICS LPARENCHAR (cicsTranslatorCompileDirectivedKeywords | NONNUMERICLITERAL)  RPARENCHAR;
 
 // compiler options
 compilerXOpts
