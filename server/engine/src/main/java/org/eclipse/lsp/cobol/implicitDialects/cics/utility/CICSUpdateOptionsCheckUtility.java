@@ -34,13 +34,12 @@ public class CICSUpdateOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
   private static final Map<Integer, ErrorSeverity> DUPLICATE_CHECK_OPTIONS =
           new HashMap<Integer, ErrorSeverity>() {
             {
-              put(CICSLexer.UPDATE, ErrorSeverity.ERROR);
               put(CICSLexer.COUNTER, ErrorSeverity.ERROR);
               put(CICSLexer.DCOUNTER, ErrorSeverity.ERROR);
-              put(CICSLexer.POOL, ErrorSeverity.ERROR);
+              put(CICSLexer.POOL, ErrorSeverity.WARNING);
               put(CICSLexer.VALUE, ErrorSeverity.ERROR);
-              put(CICSLexer.COMPAREMIN, ErrorSeverity.ERROR);
-              put(CICSLexer.COMPAREMAX, ErrorSeverity.ERROR);
+              put(CICSLexer.COMPAREMIN, ErrorSeverity.WARNING);
+              put(CICSLexer.COMPAREMAX, ErrorSeverity.WARNING);
               put(CICSLexer.NOSUSPEND, ErrorSeverity.WARNING);
             }
           };
