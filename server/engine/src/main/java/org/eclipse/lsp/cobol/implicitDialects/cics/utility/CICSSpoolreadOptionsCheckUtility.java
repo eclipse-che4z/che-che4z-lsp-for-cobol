@@ -34,12 +34,10 @@ public class CICSSpoolreadOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
   private static final Map<Integer, ErrorSeverity> DUPLICATE_CHECK_OPTIONS =
           new HashMap<Integer, ErrorSeverity>() {
             {
-              put(CICSLexer.SPOOLREAD, ErrorSeverity.ERROR);
               put(CICSLexer.TOKEN, ErrorSeverity.ERROR);
               put(CICSLexer.INTO, ErrorSeverity.ERROR);
               put(CICSLexer.MAXFLENGTH, ErrorSeverity.ERROR);
               put(CICSLexer.TOFLENGTH, ErrorSeverity.ERROR);
-              put(CICSLexer.NOHANDLE, ErrorSeverity.WARNING);
             }
           };
 
