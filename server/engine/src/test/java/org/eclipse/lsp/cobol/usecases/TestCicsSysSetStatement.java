@@ -110,18 +110,17 @@ public class TestCicsSysSetStatement {
     private static final String PROGRAM_VALID_2 = "SET PROGRAM(123) CEDF NEWCOPY DPLSUBSET JVMCLASS(1) JVMPROFILE(1) OPERATION(1) REPLICATOR JVM SHARESTATUS(1) STATUS(1) VERSION(1)";
     private static final String SECDISCOVERY_VALID_1 = "SET SECDISCOVERY";
     private static final String SECDISCOVERY_VALID_2 = "SET SECDISCOVERY STATUS(1) CMD(123) DB2(123) DCT(123) FCT(123) HFS(123) JCT(123) PCT(123) PPT(123) PSB(123) RES(123) TST(123) USER(123)";
-    private static final String SECRECORDING_VALID_1 = "SET SECRECORDING ";
-    private static final String SECRECORDING_VALID_2 = "SET SECRECORDING ";
-    private static final String STATISTICS_VALID_1 = "SET STATISTICS ";
-    private static final String STATISTICS_VALID_2 = "SET STATISTICS ";
-    private static final String SYSDUMPCODE_VALID_1 = "SET SYSDUMPCODE ";
-    private static final String SYSDUMPCODE_VALID_2 = "SET SYSDUMPCODE ";
-    private static final String SYSTEM_VALID_1 = "SET SYSTEM ";
-    private static final String SYSTEM_VALID_2 = "SET SYSTEM ";
-    private static final String TAGS_REFRESH_VALID_1 = "SET TAGS_REFRESH ";
-    private static final String TAGS_REFRESH_VALID_2 = "SET TAGS_REFRESH ";
-    private static final String TASK_VALID_1 = "SET TASK ";
-    private static final String TASK_VALID_2 = "SET TASK ";
+    private static final String SECRECORDING_VALID_1 = "SET SECRECORDING(1)";
+    private static final String SECRECORDING_VALID_2 = "SET SECRECORDING(1) ADD MAXIMUM(123) ODTCPIPS(1)";
+    private static final String STATISTICS_VALID_1 = "SET STATISTICS";
+    private static final String STATISTICS_VALID_2 = "SET STATISTICS ENDOFDAY(120101) INTERVAL(001122) RECORDING(1) RECORDNOW RESETNOW";
+    private static final String SYSDUMPCODE_VALID_1 = "SET SYSDUMPCODE(4)";
+    private static final String SYSDUMPCODE_VALID_2 = "SET SYSDUMPCODE(4) ACTION(1) DAEOPTION(1) DSPLIST(1) DUMPSCOPE(1) JOBLIST(1) MAXIMUM(1) SHUTOPTION(1) SYSDUMPING(1)";
+    private static final String SYSTEM_VALID_1 = "SET SYSTEM";
+    private static final String SYSTEM_VALID_2 = "SET SYSTEM AKP(1) DEBUGTOOL(1) DSALIMIT(1) DSRTPROGRAM(1) DTRPROGRAM(1) DUMPING(1) EDSALIMIT(1) FORCEQR(1) GMMTEXT(1)";
+    private static final String TAGS_REFRESH_VALID_1 = "SET TAGS REFRESH";
+    private static final String TASK_VALID_1 = "SET TASK(123)";
+    private static final String TASK_VALID_2 = "SET TASK(123) PRIORITY(1) PURGETYPE(1) SRRSTATUS(1)";
     private static final String TCLASS_VALID_1 = "SET TCLASS ";
     private static final String TCLASS_VALID_2 = "SET TCLASS ";
     private static final String TCPIP_VALID_1 = "SET TCPIP ";
@@ -224,16 +223,15 @@ public class TestCicsSysSetStatement {
     private static final String PROGRAM_INVALID_2 = "SET PROGRAM(123) JVM {NOJVM|errorOne}";
     private static final String SECDISCOVERY_INVALID_1 = "SET SECDISCOVERY ON {OFF|errorOne}";
     private static final String SECDISCOVERY_INVALID_2 = "SET SECDISCOVERY CMD(1) {DISCOVERALL|errorOne}";
-    private static final String SECRECORDING_INVALID_1 = "SET SECRECORDING ";
-    private static final String SECRECORDING_INVALID_2 = "SET SECRECORDING ";
-    private static final String STATISTICS_INVALID_1 = "SET STATISTICS ";
-    private static final String STATISTICS_INVALID_2 = "SET STATISTICS ";
-    private static final String SYSDUMPCODE_INVALID_1 = "SET SYSDUMPCODE ";
-    private static final String SYSDUMPCODE_INVALID_2 = "SET SYSDUMPCODE ";
-    private static final String SYSTEM_INVALID_1 = "SET SYSTEM ";
-    private static final String SYSTEM_INVALID_2 = "SET SYSTEM ";
-    private static final String TAGS_REFRESH_INVALID_1 = "SET TAGS_REFRESH ";
-    private static final String TAGS_REFRESH_INVALID_2 = "SET TAGS_REFRESH ";
+    private static final String SECRECORDING_INVALID_1 = "SET {_SECRECORDING(1) MAXIMUM(1)|errorOne_}";
+    private static final String SECRECORDING_INVALID_2 = "SET SECRECORDING(1) ODADPTRID(1) {ODADPTRDATA1|errorOne}(2)";
+    private static final String STATISTICS_INVALID_1 = "SET STATISTICS ENDOFDAY(123) {ENDOFDAYHRS|errorOne}(2)";
+    private static final String STATISTICS_INVALID_2 = "SET {_STATISTICS RECORDNOW|errorOne_}";
+    private static final String SYSDUMPCODE_INVALID_1 = "SET SYSDUMPCODE(4) ADD {REMOVE|errorOne}";
+    private static final String SYSDUMPCODE_INVALID_2 = "SET SYSDUMPCODE(4) NOSHUTDOWN {SHUTDOWN|errorOne}";
+    private static final String SYSTEM_INVALID_1 = "SET SYSTEM DEBUG {NODEBUG|errorOne}";
+    private static final String SYSTEM_INVALID_2 = "SET SYSTEM FORCE {NOFORCE|errorOne}";
+    //private static final String TAGS_REFRESH_INVALID_1 = "SET TAGS";
     private static final String TASK_INVALID_1 = "SET TASK ";
     private static final String TASK_INVALID_2 = "SET TASK ";
     private static final String TCLASS_INVALID_1 = "SET TCLASS ";
@@ -543,7 +541,6 @@ public class TestCicsSysSetStatement {
     @Test
     void testCicsTags_refreshValid() {
         CICSTestUtils.noErrorTest(TAGS_REFRESH_VALID_1);
-        CICSTestUtils.noErrorTest(TAGS_REFRESH_VALID_2);
     }
 
     @Test
@@ -882,32 +879,31 @@ public class TestCicsSysSetStatement {
 
     @Test
     void testCicsSecrecordingInvalid() {
-        testSingleError(SECRECORDING_INVALID_1, "");
-        testSingleError(SECRECORDING_INVALID_2, "");
+        testSingleError(SECRECORDING_INVALID_1, "Missing required option for: MAXIMUM without ADD");
+        testSingleError(SECRECORDING_INVALID_2, "Options \"ODADPTRID, ODADPTRDATA1, ODADPTRDATA2, ODADPTRDATA3, ODAPPLID, ODCLNTIPADDR, ODCLNTPORT, ODFACILNAME, ODFACILTYPE, ODIPFAMILY, ODLUNAME, ODNETID, ODNETWORKID, ODSERVERPORT, ODTCPIPS, ODTRANSID or ODUSERID\" are mutually exclusive.");
     }
 
     @Test
     void testCicsStatisticsInvalid() {
-        testSingleError(STATISTICS_INVALID_1, "");
-        testSingleError(STATISTICS_INVALID_2, "");
+        testSingleError(STATISTICS_INVALID_1, "Options \"ENDOFDAY or ENDOFDAYHRS\" are mutually exclusive.");
+        testSingleError(STATISTICS_INVALID_2, "Must use exactly one of the following: RECORDING, ON or OFF");
     }
 
     @Test
     void testCicsSysdumpcodeInvalid() {
-        testSingleError(SYSDUMPCODE_INVALID_1, "");
+        testSingleError(SYSDUMPCODE_INVALID_1, "Options \"ACTION, ADD, REMOVE or RESET\" are mutually exclusive.");
         testSingleError(SYSDUMPCODE_INVALID_2, "");
     }
 
     @Test
     void testCicsSystemInvalid() {
-        testSingleError(SYSTEM_INVALID_1, "");
-        testSingleError(SYSTEM_INVALID_2, "");
+        testSingleError(SYSTEM_INVALID_1, "Options \"DEBUGTOOL, DEBUG or NODEBUG\" are mutually exclusive.");
+        testSingleError(SYSTEM_INVALID_2, "Options \"FORCEQR, FORCE or NOFORCE\" are mutually exclusive.");
     }
 
     @Test
     void testCicsTags_refreshInvalid() {
-        testSingleError(TAGS_REFRESH_INVALID_1, "");
-        testSingleError(TAGS_REFRESH_INVALID_2, "");
+        // REFRESH missing adds an error onto END-EXEC.
     }
 
     @Test
