@@ -76,7 +76,6 @@ INTEGERLITERAL : DIGIT+;
 IDENTIFIER : [\p{Alnum}\p{General_Category=Other_Letter}] [-_\p{Alnum}\p{General_Category=Other_Letter}]*;
 
 NUMERICLITERAL : (PLUSCHAR | MINUSCHAR)? DIGIT* (DOT_FS | COMMACHAR) DIGIT+ (('e' | 'E') (PLUSCHAR | MINUSCHAR)? DIGIT+)?;
-
 // whitespace, line breaks, comments, ...
 NEWLINE : '\r'? '\n' -> channel(HIDDEN);
 WS : [ \t\f]+ -> channel(HIDDEN);

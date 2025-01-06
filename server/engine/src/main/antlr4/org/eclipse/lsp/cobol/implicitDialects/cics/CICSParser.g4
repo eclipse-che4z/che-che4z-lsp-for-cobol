@@ -652,8 +652,10 @@ cics_pop: POP cics_pop_option;
 cics_pop_option: (HANDLE | cics_handle_response)*;
 
 /** POST */
-cics_post: POST (INTERVAL cics_zero_digit | INTERVAL cics_hhmmss | TIME cics_hhmmss | cics_post_after | SET cics_ref
-           REQID cics_name | cics_handle_response)*;
+cics_post: POST cics_post_options;
+cics_post_options: (INTERVAL (cics_zero_digit | cics_hhmmss) | TIME cics_hhmmss | AFTER | (HOURS | MINUTES | SECONDS) cics_data_value |
+                 AT | SET cics_ref | REQID cics_name | cics_handle_response)+;
+
 cics_post_after: (AFTER | AT | HOURS cics_data_value | MINUTES cics_data_value | SECONDS cics_data_value | cics_handle_response)+;
 
 /** PURGE MESSAGE */
@@ -687,16 +689,17 @@ cics_readnext_readprev: (READNEXT | READPREV)  (cics_file_name | INTO cics_data_
                SYSID cics_data_area | LENGTH cics_data_area | RBA | RRN | XRBA | NOSUSPEND | cics_handle_response)*;
 
 /** READQ TD / TS */
-cics_readq: READQ (cics_readq_td | cics_readq_ts);
-cics_readq_td: (TD | QUEUE cics_name | cics_into_set | LENGTH cics_data_area | SYSID cics_data_area | NOSUSPEND | cics_handle_response)+;
-cics_readq_ts: (TS | (QUEUE | QNAME) cics_name | cics_into_set | NEXT | (LENGTH | NUMITEMS | SYSID) cics_data_area |
-                ITEM cics_data_value | cics_handle_response)+;
+cics_readq: READQ cics_readq_ts_td;
+cics_readq_ts_td: (TS | TD | (QUEUE | QNAME) cics_name | cics_into_set | NEXT | (LENGTH | NUMITEMS | SYSID) cics_data_area |
+                   ITEM cics_data_value | NOSUSPEND | cics_handle_response)+;
 
 /** RELEASE */
-cics_release: RELEASE cics_handle_response? PROGRAM cics_name cics_handle_response?;
+cics_release: RELEASE cics_release_option;
+cics_release_option: (PROGRAM cics_name | cics_handle_response)+;
 
 /** REMOVE SUBEVENT */
-cics_remove: REMOVE (SUBEVENT cics_data_value | EVENT cics_data_value | cics_handle_response)+;
+cics_remove: REMOVE cics_remove_option;
+cics_remove_option: ((SUBEVENT | EVENT) cics_data_value | cics_handle_response)+;
 
 /** RESET ACQPROCESS / RESET ACTIVITY */
 cics_reset: RESET (cics_reset_acqprocess | cics_reset_activity);
@@ -766,8 +769,8 @@ cics_soapfault_faultactor: (FAULTACTOR cics_data_value | FAULTACTLEN cics_data_v
 cics_soapfault_detail: (DETAIL cics_data_value | DETAILLENGTH cics_data_value)+;
 
 /** SPOOLCLOSE */
-cics_spoolclose: SPOOLCLOSE (TOKEN cics_data_area | KEEP | DELETE | NOHANDLE | cics_spoolclose_resp | cics_handle_response)+;
-cics_spoolclose_resp: RESP RESP2?;
+cics_spoolclose: SPOOLCLOSE cics_spoolclose_options;
+cics_spoolclose_options: (TOKEN cics_data_area | KEEP | DELETE | cics_handle_response)+;
 
 /** SPOOLOPEN INPUT / SPOOLOPEN OUTPUT */
 cics_spoolopen: SPOOLOPEN (cics_spoolopen_input | cics_spoolopen_output);
@@ -776,12 +779,12 @@ cics_spoolopen_output: (OUTPUT | TOKEN cics_data_area | (USERID | NODE | CLASS |
                 NOCC | ASA | MCC | PRINT | PUNCH | NOHANDLE | cics_handle_response)+;
 
 /** SPOOLREAD */
-cics_spoolread: SPOOLREAD (TOKEN cics_data_area | INTO cics_data_area | MAXFLENGTH cics_data_value |
-                TOFLENGTH cics_data_area | NOHANDLE | cics_spoolclose_resp | cics_handle_response)+;
+cics_spoolread: SPOOLREAD cics_spoolread_options;
+cics_spoolread_options: ((TOKEN | INTO | TOFLENGTH) cics_data_area | MAXFLENGTH cics_data_value | cics_handle_response)+;
 
 /** SPOOLWRITE */
-cics_spoolwrite: SPOOLWRITE (TOKEN cics_data_area | FROM cics_data_area | FLENGTH cics_data_value | LINE | PAGE |
-                 NOHANDLE | cics_spoolclose_resp | cics_handle_response)+;
+cics_spoolwrite: SPOOLWRITE cics_spoolwrite_options;
+cics_spoolwrite_options: ((TOKEN | FROM) cics_data_area | FLENGTH cics_data_value | LINE | PAGE  | cics_handle_response)+;
 
 /** START - / ATTACH / BREXIT / CHANNEL */
 cics_start: START (cics_start_transid | cics_start_attach | cics_start_brexit);
