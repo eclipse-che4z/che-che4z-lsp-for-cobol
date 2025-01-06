@@ -659,7 +659,7 @@ cics_run: RUN (ACTIVITY cics_data_value | ACQACTIVITY | ACQPROCESS | SYNCHRONOUS
 
 /** SIGNAL EVENT */
 cics_signal: SIGNAL cics_signal_options;
-cics_signal_options: ((EVENT | FROMCHANNEL | FROMLENGTH) cics_data_value | FROM cics_data_area  | cics_handle_response)*;
+cics_signal_options: ((EVENT | FROMCHANNEL | FROMLENGTH) cics_data_value | FROM cics_data_area  | cics_handle_response)+;
 
 /** SIGNOFF */
 cics_signoff: SIGNOFF cics_handle_response?;
