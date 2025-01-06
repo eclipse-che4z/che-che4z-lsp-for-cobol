@@ -54,7 +54,7 @@ public class TestCICSUpdate {
                     "errorOne",
                     new Diagnostic(
                             new Range(),
-                            "Missing required option: COUNTER",
+                            "Exactly one option required, none provided: COUNTER or DCOUNTER",
                             DiagnosticSeverity.Error,
                             ErrorSource.PARSING.getText()),
                     "errorTwo",

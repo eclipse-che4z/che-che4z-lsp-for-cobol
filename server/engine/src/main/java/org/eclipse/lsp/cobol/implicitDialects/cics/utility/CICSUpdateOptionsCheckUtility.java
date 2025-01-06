@@ -36,10 +36,10 @@ public class CICSUpdateOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
             {
               put(CICSLexer.COUNTER, ErrorSeverity.ERROR);
               put(CICSLexer.DCOUNTER, ErrorSeverity.ERROR);
-              put(CICSLexer.POOL, ErrorSeverity.WARNING);
+              put(CICSLexer.POOL, ErrorSeverity.ERROR);
               put(CICSLexer.VALUE, ErrorSeverity.ERROR);
-              put(CICSLexer.COMPAREMIN, ErrorSeverity.WARNING);
-              put(CICSLexer.COMPAREMAX, ErrorSeverity.WARNING);
+              put(CICSLexer.COMPAREMIN, ErrorSeverity.ERROR);
+              put(CICSLexer.COMPAREMAX, ErrorSeverity.ERROR);
               put(CICSLexer.NOSUSPEND, ErrorSeverity.WARNING);
             }
           };
@@ -55,26 +55,14 @@ public class CICSUpdateOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
    * @param <E> A subclass of ParserRuleContext
    */
   public <E extends ParserRuleContext> void checkOptions(E ctx) {
-    switch (ctx.getRuleIndex()) {
-      case CICSParser.RULE_cics_update_counter:
-        checkUpdateCounter((CICSParser.Cics_update_counterContext) ctx);
-        break;
-      case CICSParser.RULE_cics_update_dcounter:
-        checkUpdateDcounter((CICSParser.Cics_update_dcounterContext) ctx);
-        break;
-      default:
-        break;
-    }
+      if (ctx.getRuleIndex() == CICSParser.RULE_cics_update_counter_dcounter) {
+          checkUpdateCounterDcounter((CICSParser.Cics_update_counter_dcounterContext) ctx);
+      }
     checkDuplicates(ctx);
   }
 
-  private void checkUpdateCounter(CICSParser.Cics_update_counterContext ctx) {
-    checkHasMandatoryOptions(ctx.COUNTER(), ctx, "COUNTER");
-    checkHasMandatoryOptions(ctx.VALUE(), ctx, "VALUE");
-  }
-
-  private void checkUpdateDcounter(CICSParser.Cics_update_dcounterContext ctx) {
-    checkHasMandatoryOptions(ctx.DCOUNTER(), ctx, "DCOUNTER");
+  private void checkUpdateCounterDcounter(CICSParser.Cics_update_counter_dcounterContext ctx) {
+    checkHasExactlyOneOption("COUNTER or DCOUNTER", ctx, ctx.COUNTER(), ctx.DCOUNTER());
     checkHasMandatoryOptions(ctx.VALUE(), ctx, "VALUE");
   }
 }
