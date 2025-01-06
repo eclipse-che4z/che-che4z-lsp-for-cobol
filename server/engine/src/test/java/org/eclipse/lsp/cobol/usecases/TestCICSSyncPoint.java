@@ -57,7 +57,7 @@ public class TestCICSSyncPoint {
                     new Diagnostic(
                             new Range(),
                             "Excessive options provided for: ROLLBACK",
-                            DiagnosticSeverity.Error,
+                            DiagnosticSeverity.Warning,
                             ErrorSource.PARSING.getText())));
   }
 }
