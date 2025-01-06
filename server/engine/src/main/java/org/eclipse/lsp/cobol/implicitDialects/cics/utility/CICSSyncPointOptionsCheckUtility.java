@@ -33,7 +33,6 @@ public class CICSSyncPointOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
   private static final Map<Integer, ErrorSeverity> DUPLICATE_CHECK_OPTIONS =
           new HashMap<Integer, ErrorSeverity>() {
             {
-              put(CICSLexer.SYNCPOINT, ErrorSeverity.ERROR);
               put(CICSLexer.ROLLBACK, ErrorSeverity.ERROR);
             }
           };
