@@ -179,9 +179,9 @@ dbs_alter_procedure_bit_charopts: (FOR (SBCS | MIXED | BIT) DATA)? (CCSID oneof_
 dbs_alter_procedure_bit_varchar: VARCHAR dbs_alter_procedure_bit_varchara;
 dbs_alter_procedure_bit_varchara: LPARENCHAR dbs_integer RPARENCHAR dbs_alter_procedure_bit_charopts;
 dbs_alter_procedure_bit_clob: CLOB dbs_alter_procedure_bit_cloba;
-dbs_alter_procedure_bit_cloba: (LPARENCHAR dbs_integer k_m_g? RPARENCHAR)? (FOR (SBCS | MIXED ) DATA)? (CCSID oneof_encoding)?;
-dbs_alter_procedure_bit_graphic: (GRAPHIC (LPARENCHAR dbs_integer RPARENCHAR)? | VARGRAPHIC LPARENCHAR dbs_integer RPARENCHAR | DBCLOB (LPARENCHAR dbs_integer k_m_g? RPARENCHAR)?) (CCSID oneof_encoding)?;
-dbs_alter_procedure_bit_binary: (BINARY (LPARENCHAR dbs_integer RPARENCHAR)? | (BINARY VARYING | VARBINARY) LPARENCHAR dbs_integer RPARENCHAR | (BINARY LARGE OBJECT | BLOB) (LPARENCHAR dbs_integer k_m_g? RPARENCHAR)?);
+dbs_alter_procedure_bit_cloba: (LPARENCHAR lobSize RPARENCHAR)? (FOR (SBCS | MIXED ) DATA)? (CCSID oneof_encoding)?;
+dbs_alter_procedure_bit_graphic: (GRAPHIC (LPARENCHAR dbs_integer RPARENCHAR)? | VARGRAPHIC LPARENCHAR dbs_integer RPARENCHAR | DBCLOB (LPARENCHAR lobSize RPARENCHAR)?) (CCSID oneof_encoding)?;
+dbs_alter_procedure_bit_binary: (BINARY (LPARENCHAR dbs_integer RPARENCHAR)? | (BINARY VARYING | VARBINARY) LPARENCHAR dbs_integer RPARENCHAR | (BINARY LARGE OBJECT | BLOB) (LPARENCHAR lobSize RPARENCHAR)?);
 dbs_alter_procedure_bit_timestamp: TIMESTAMP (LPARENCHAR dbs_integer RPARENCHAR)? option_timezone?;
 dbs_alter_procedure_add: ADD VERSION dbs_routine_version_id (LPARENCHAR dbs_alter_procedure_paramdec (dbs_comma_separator dbs_alter_procedure_paramdec)* RPARENCHAR)? dbs_alter_procedure_options dbs_sql_procedure_statement;
 dbs_alter_procedure_activate: ACTIVATE VERSION dbs_routine_version_id;
@@ -212,9 +212,9 @@ dbs_alter_table_bit_charopts: (FOR (SBCS | MIXED | BIT) DATA | CCSID dbs_integer
 dbs_alter_table_bit_varchar: VARCHAR dbs_alter_table_bit_varchara;
 dbs_alter_table_bit_varchara: LPARENCHAR dbs_integer RPARENCHAR dbs_alter_table_bit_charopts;
 dbs_alter_table_bit_clob: CLOB dbs_alter_table_bit_cloba;
-dbs_alter_table_bit_cloba: (LPARENCHAR dbs_integer k_m_g? RPARENCHAR)? dbs_alter_table_bit_charopts;
-dbs_alter_table_bit_graphic: (GRAPHIC (LPARENCHAR dbs_integer RPARENCHAR)? | VARGRAPHIC LPARENCHAR dbs_integer RPARENCHAR | DBCLOB (LPARENCHAR dbs_integer k_m_g? RPARENCHAR)?) (CCSID dbs_integer1200)?;
-dbs_alter_table_bit_binary: (BINARY (LPARENCHAR dbs_integer RPARENCHAR)? | (BINARY VARYING | VARBINARY) LPARENCHAR dbs_integer RPARENCHAR | (BINARY LARGE OBJECT | BLOB) (LPARENCHAR dbs_integer k_m_g? RPARENCHAR)?);
+dbs_alter_table_bit_cloba: (LPARENCHAR lobSize RPARENCHAR)? dbs_alter_table_bit_charopts;
+dbs_alter_table_bit_graphic: (GRAPHIC (LPARENCHAR dbs_integer RPARENCHAR)? | VARGRAPHIC LPARENCHAR dbs_integer RPARENCHAR | DBCLOB (LPARENCHAR lobSize RPARENCHAR)?) (CCSID dbs_integer1200)?;
+dbs_alter_table_bit_binary: (BINARY (LPARENCHAR dbs_integer RPARENCHAR)? | (BINARY VARYING | VARBINARY) LPARENCHAR dbs_integer RPARENCHAR | (BINARY LARGE OBJECT | BLOB) (LPARENCHAR lobSize RPARENCHAR)?);
 dbs_alter_table_bit_timestamp: TIMESTAMP (LPARENCHAR dbs_integer RPARENCHAR)? option_timezone?;
 dbs_alter_table_bit_xml: XML (LPARENCHAR XMLSCHEMA dbs_alter_table_bit_xmlspec (ELEMENT dbs_element_name)? (dbs_comma_separator dbs_alter_table_bit_xmlspec (ELEMENT dbs_element_name)?)* RPARENCHAR)?;
 dbs_alter_table_bit_xmlspec: (ID dbs_registered_xml_schema_name | (URL dbs_target_namespace | NO NAMESPACE) (LOCATION dbs_schema_location)?);
@@ -624,9 +624,9 @@ dbs_declare_table_bit_char: (CHARACTER | CHAR) (VARYING dbs_declare_table_bit_va
 dbs_declare_table_bit_varchar: VARCHAR dbs_declare_table_bit_varchara;
 dbs_declare_table_bit_varchara: LPARENCHAR dbs_integer RPARENCHAR;
 dbs_declare_table_bit_clob: CLOB dbs_declare_table_bit_cloba;
-dbs_declare_table_bit_cloba: (LPARENCHAR dbs_integer k_m_g? RPARENCHAR)?;
-dbs_declare_table_bit_graphic: (GRAPHIC (LPARENCHAR dbs_integer RPARENCHAR)? | VARGRAPHIC LPARENCHAR dbs_integer RPARENCHAR | DBCLOB (LPARENCHAR dbs_integer k_m_g? RPARENCHAR)?);
-dbs_declare_table_bit_binary: (BINARY (LPARENCHAR dbs_integer RPARENCHAR)? | (BINARY VARYING | VARBINARY) LPARENCHAR dbs_integer RPARENCHAR | (BINARY LARGE OBJECT | BLOB) (LPARENCHAR dbs_integer k_m_g? RPARENCHAR)?);
+dbs_declare_table_bit_cloba: (LPARENCHAR lobSize RPARENCHAR)?;
+dbs_declare_table_bit_graphic: (GRAPHIC (LPARENCHAR dbs_integer RPARENCHAR)? | VARGRAPHIC LPARENCHAR dbs_integer RPARENCHAR | DBCLOB (LPARENCHAR lobSize RPARENCHAR)?);
+dbs_declare_table_bit_binary: (BINARY (LPARENCHAR dbs_integer RPARENCHAR)? | (BINARY VARYING | VARBINARY) LPARENCHAR dbs_integer RPARENCHAR | (BINARY LARGE OBJECT | BLOB) (LPARENCHAR lobSize RPARENCHAR)?);
 dbs_declare_table_bit_timestamp: TIMESTAMP (LPARENCHAR dbs_integer RPARENCHAR)? ((WITH|WITHOUT) (TIME ZONE|TIMEZONE))?;
 /*DELETE */
 dbs_delete: DELETE FROM (dbs_table_name | dbs_view_name) (dbs_delete_period | dbs_delete_noperiod | dbs_delete_positioned);
@@ -1168,7 +1168,7 @@ common_bit_clob: CLOB common_bit_clobandobj;
 common_bit_clobandobj: (LPARENCHAR (IDENTIFIER {validateTokenWithRegex($IDENTIFIER.text, "\\d+[MmGgKk]", "db2SqlParser.pieceSize");})? RPARENCHAR)?
                         (CCSID oneof_encoding)? (FOR (SBCS | MIXED ) DATA)?;
 common_bit_graphic_core: GRAPHIC (LPARENCHAR dbs_integer RPARENCHAR)? | VARGRAPHIC LPARENCHAR dbs_integer RPARENCHAR;
-common_bit_graphic: (common_bit_graphic_core | DBCLOB (LPARENCHAR dbs_integer k_m_g? RPARENCHAR)?) (CCSID oneof_encoding)?;
+common_bit_graphic: (common_bit_graphic_core | DBCLOB (LPARENCHAR lobSize RPARENCHAR)?) (CCSID oneof_encoding)?;
 common_bit_graphic2: common_bit_graphic_core CCSID dbs_integer256;
 common_bit_binary_core: BINARY (LPARENCHAR dbs_integer RPARENCHAR)? | (BINARY VARYING | VARBINARY) LPARENCHAR dbs_integer RPARENCHAR;
 common_bit_binary: (common_bit_binary_core | (BINARY LARGE OBJECT | BLOB) (LPARENCHAR (IDENTIFIER {validateTokenWithRegex($IDENTIFIER.text, "\\d+[MmGgKk]", "db2SqlParser.pieceSize");})? RPARENCHAR)?);
@@ -1292,6 +1292,7 @@ option_wlm_env_short: wlm_env (dbs_name | LPARENCHAR dbs_name RPARENCHAR);
 option_wlm_env_debug: wlm_env FOR DEBUG MODE dbs_name;
 
 k_m_g: (K_CHAR | M_CHAR | G_CHAR);
+lobSize: (dbs_integer k_m_g?| T=IDENTIFIER {validateTokenWithRegex($T.text, "\\d+[kKmMgG]", "unexpected token");} );
 no_or_yes: (NO | YES);
 oneof_encoding: (ASCII | EBCDIC | UNICODE);
 oneof_lang: (ASSEMBLE | LANGUAGE_C | COBOL | JAVA | PLI | REXX | SQL);

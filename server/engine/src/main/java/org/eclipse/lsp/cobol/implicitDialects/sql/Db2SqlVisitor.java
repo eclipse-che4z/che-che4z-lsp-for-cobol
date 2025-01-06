@@ -106,10 +106,19 @@ class Db2SqlVisitor extends Db2SqlParserBaseVisitor<List<Node>> {
         if (ctx.xml_lobNO_size() != null) {
             addXmlLobNodes(variableDefinitionNode, generatedVariableLevel);
         } else if (ctx.lobWithSize() != null) {
-            addLobWithSizeNodes(variableDefinitionNode, generatedVariableLevel, lobSize(ctx.lobWithSize()));
+            addLobWithSizeNodes(variableDefinitionNode, generatedVariableLevel, lobSize(ctx.lobWithSize().lobSize()));
         }
 
         return hostVariableDefinitionNode;
+    }
+
+    private String lobSize(Db2SqlParser.LobSizeContext ctx) {
+        // lobSize: (dbs_integer k_m_g?| T=IDENTIFIER {validateTokenWithRegex($T.text, "\\d+[kKmMgG]", "unexpected token");} );
+        if (ctx.IDENTIFIER() != null) {
+            return ctx.IDENTIFIER().getText();
+        }
+        String sizePrefix = ctx.k_m_g() != null ? " " + ctx.k_m_g().getText() : "";
+        return ctx.dbs_integer().getText() + sizePrefix;
     }
 
     private void addXmlLobNodes(VariableDefinitionNode variableDefinitionNode, int generatedVariableLevel) {
@@ -156,7 +165,7 @@ class Db2SqlVisitor extends Db2SqlParserBaseVisitor<List<Node>> {
         List<Node> hostVariableDefinitionNode = createHostVariableDefinitionNode(ctx, ctx.dbs_integer(), ctx.entry_name());
         if (ctx.lobWithSize() != null) {
             generateVarbinVariables((VariableDefinitionNode) hostVariableDefinitionNode.get(0),
-                    lobSize(ctx.lobWithSize()), ctx);
+                    lobSize(ctx.lobWithSize().lobSize()), ctx);
         }
         return hostVariableDefinitionNode;
     }
@@ -166,7 +175,7 @@ class Db2SqlVisitor extends Db2SqlParserBaseVisitor<List<Node>> {
         List<Node> hostVariableDefinitionNode = createHostVariableDefinitionNode(ctx, ctx.dbs_host_var_levels_arrays(), ctx.entry_name());
         if (ctx.lobWithSize() != null) {
             generateVarbinVariables((VariableDefinitionNode) hostVariableDefinitionNode.get(0),
-                    lobSize(ctx.lobWithSize()), ctx);
+                    lobSize(ctx.lobWithSize().lobSize()), ctx);
         }
         return hostVariableDefinitionNode;
     }
@@ -300,7 +309,7 @@ class Db2SqlVisitor extends Db2SqlParserBaseVisitor<List<Node>> {
     public List<Node> visitSqlCode(Db2SqlParser.SqlCodeContext ctx) {
         String sqlCode = preProcessSqlComment(ctx);
 
-        List<Node> nodes = new Db2SqlExecVisitor(context, copybookService).visitStartSqlRule(parseSQL(sqlCode, ctx));
+        List<Node> nodes = new Db2SqlExecVisitor(context).visitStartSqlRule(parseSQL(sqlCode, ctx));
         Db2SqlVisitorHelper.adjustNodeLocations(ctx, context, nodes);
         Location location = context.getExtendedDocument().mapLocation(AntlrRangeUtils.constructRange(ctx.getParent()));
         Locality locality = Locality.builder().range(location.getRange()).uri(location.getUri()).build();
@@ -379,11 +388,6 @@ class Db2SqlVisitor extends Db2SqlParserBaseVisitor<List<Node>> {
         return Stream.concat(aggregate.stream(), nextResult.stream()).collect(toList());
     }
 
-    private String lobSize(Db2SqlParser.LobWithSizeContext ctx) {
-        String sizePrefix = ctx.k_m_g() != null ? " " + ctx.k_m_g().getText() : "";
-        return ctx.dbs_integer().getText() + sizePrefix;
-    }
-
     private List<Node> addTreeNode(ParserRuleContext ctx, Function<Locality, Node> nodeConstructor) {
         Locality locality =
                 VisitorHelper.buildNameRangeLocality(
@@ -397,4 +401,3 @@ class Db2SqlVisitor extends Db2SqlParserBaseVisitor<List<Node>> {
         return ImmutableList.of(node);
     }
  }
-
