@@ -16,7 +16,7 @@
     "children": [
       {
         "name": "INPUT-PROBLEM",
-        "snippet": "INPUT-PROBLEM SECTION.\r\n            USE AFTER STANDARD EXCEPTION PROCEDURE ON INPUT.\r\n            DISPLAY \"EXCEPTION\".",
+        "snippet": "        INPUT-PROBLEM SECTION.\r\n            USE AFTER STANDARD EXCEPTION PROCEDURE ON INPUT.\r\n            DISPLAY \"EXCEPTION\".",
         "type": "section",
         "location": {
           "uri": "fake/path",

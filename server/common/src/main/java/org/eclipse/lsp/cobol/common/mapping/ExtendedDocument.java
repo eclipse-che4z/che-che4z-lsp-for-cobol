@@ -17,6 +17,7 @@ package org.eclipse.lsp.cobol.common.mapping;
 import lombok.Getter;
 
 import java.util.List;
+import java.util.Objects;
 
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp4j.Location;
@@ -173,8 +174,7 @@ public class ExtendedDocument {
    * @param c - the character
    */
   public void fillArea(Range range, char c) {
-    range = updateRangeDueToChanges(range);
-    currentText.fillArea(range, c);
+    currentText.fillArea(updateRangeDueToChanges(range), c);
     dirty = true;
   }
 
@@ -208,7 +208,11 @@ public class ExtendedDocument {
 
   private Range updateRangeDueToChanges(Range range) {
     if (isDirty()) {
-      range = new Range(updatePositionDueToChanges(range.getStart()), updatePositionDueToChanges(range.getEnd()));
+      if(Objects.equals(range.getStart(), range.getEnd())) {
+        range = new Range(updatePositionDueToChanges(range.getStart()), updatePositionDueToChanges(range.getEnd()));
+      } else {
+        range = new Range(updatePositionDueToChanges(range.getStart()), updateEndPositionDueToChanges(range.getEnd()));
+      }
     }
     return range;
   }
@@ -217,7 +221,7 @@ public class ExtendedDocument {
     int result = lineNumber;
     if (isDirty()) {
       ExtendedTextLine line = baseText.getLines().get(lineNumber);
-      if (line.getCharacters().size() > 0) {
+      if (!line.getCharacters().isEmpty()) {
         ExtendedTextLine parentLine = line.getCharacters().get(0).getParent();
         result = currentText.getLines().indexOf(parentLine);
       }
@@ -238,5 +242,28 @@ public class ExtendedDocument {
       }
     }
     return new Position(currentLine, currentChar);
+  }
+
+  private Position updateEndPositionDueToChanges(Position position) {
+    // Shift position to left to make range end inclusive.
+    int linePos = position.getCharacter() == 0 ? position.getLine() - 1 : position.getLine();
+    int charPos = position.getCharacter() == 0
+            ? baseText.getLines().get(position.getLine() - 1).size() - 1
+            : position.getCharacter() - 1;
+
+    int currentLine = updateLineDueToChanges(linePos);
+    int currentChar = charPos;
+
+    ExtendedTextLine line = baseText.getLines().get(linePos);
+    if (charPos < line.size()) {
+      MappedCharacter character = line.getCharacterAt(charPos);
+      currentChar = currentText.getLines().get(currentLine).getCharacters().indexOf(character);
+      if (currentChar < 0) {
+        currentChar = charPos;
+      }
+    }
+
+    // Shift position to right to make range end exclusive.
+    return new Position(currentLine, currentChar + 1);
   }
 }

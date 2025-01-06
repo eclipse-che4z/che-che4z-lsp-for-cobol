@@ -74,7 +74,6 @@ class TestExecCicsContainerStatementsArgumentsOrder {
           + "           END-EXEC\n"
           + "           exec cics delete container({$xml-cont})\n"
               + "                     channel({$outbound-channel})\n"
-              + "                     retcode({$RESULT-LENGTH})\n"
           + "                         resp({$command-resp})\n"
           + "                         resp2({$command-resp2})\n"
           + "           end-exec.\n"

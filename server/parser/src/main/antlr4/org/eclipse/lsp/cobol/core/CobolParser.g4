@@ -1321,8 +1321,12 @@ freeStatement
 // exit statement
 
 exitStatement
-   : EXIT (PROGRAM | SECTION | PARAGRAPH | PERFORM CYCLE? | METHOD)?
+   : EXIT (PROGRAM | SECTION | PARAGRAPH | exitPerform | METHOD)?
    ;
+
+exitPerform
+    : PERFORM CYCLE?
+    ;
 
 // generate statement
 
@@ -2202,7 +2206,8 @@ tableCall
 
 specialRegister
    : ADDRESS OF generalIdentifier
-   | LENGTH OF? generalIdentifier | LINAGE_COUNTER
+   | LENGTH OF? generalIdentifier
+   | LINAGE_COUNTER
    ;
 
 // in ----------------------------------
