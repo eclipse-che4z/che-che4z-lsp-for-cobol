@@ -19,7 +19,6 @@ import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.usecases.common.CICSTestUtils;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
-import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
@@ -60,7 +59,7 @@ public class TestCicsDisableProgram {
             ImmutableMap.of(
             "error1",
             new Diagnostic(
-                    new Range(new Position(14, 12), new Position(15, 24)),
+                    new Range(),
                     "Missing required option: PROGRAM",
                     DiagnosticSeverity.Error,
                     ErrorSource.PARSING.getText())), "SP");
