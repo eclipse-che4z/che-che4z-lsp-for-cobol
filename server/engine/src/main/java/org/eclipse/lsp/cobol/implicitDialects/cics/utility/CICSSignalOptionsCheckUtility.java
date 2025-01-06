@@ -34,7 +34,6 @@ public class CICSSignalOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
   private static final Map<Integer, ErrorSeverity> DUPLICATE_CHECK_OPTIONS =
           new HashMap<Integer, ErrorSeverity>() {
             {
-              put(CICSLexer.SIGNAL, ErrorSeverity.ERROR);
               put(CICSLexer.EVENT, ErrorSeverity.ERROR);
               put(CICSLexer.FROMCHANNEL, ErrorSeverity.ERROR);
               put(CICSLexer.FROM, ErrorSeverity.ERROR);
