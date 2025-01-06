@@ -19,25 +19,37 @@ import static org.eclipse.lsp.cobol.core.visitor.VisitorHelper.getName;
 
 import com.google.common.collect.ImmutableList;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.RuleNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp.cobol.AntlrRangeUtils;
+import org.eclipse.lsp.cobol.common.copybook.CopybookService;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
+import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
+import org.eclipse.lsp.cobol.common.error.ErrorSource;
+import org.eclipse.lsp.cobol.common.error.SyntaxError;
+import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.model.tree.variable.*;
 import org.eclipse.lsp.cobol.core.visitor.VisitorHelper;
 import org.eclipse.lsp.cobol.implicitDialects.sql.node.*;
 import org.eclipse.lsp4j.Location;
+import org.eclipse.lsp4j.Position;
+import org.eclipse.lsp4j.Range;
 
 /**
  * This visitor analyzes the parser tree for DB2 SQL and returns its semantic context as a syntax
@@ -48,6 +60,11 @@ import org.eclipse.lsp4j.Location;
 class Db2SqlExecVisitor extends Db2SqlExecParserBaseVisitor<List<Node>> {
 
     private final DialectProcessingContext context;
+    private final CopybookService copybookService;
+    private final MessageService messageService;
+    private static final Pattern DSIZE_REGEX = Pattern.compile("(\\d+)\\s*[Gg]");
+    @Getter
+    private final List<SyntaxError> errors = new ArrayList<>();
 
     @Override
     public List<Node> visitDbs_procedure_name(Db2SqlExecParser.Dbs_procedure_nameContext ctx) {
@@ -134,6 +151,35 @@ class Db2SqlExecVisitor extends Db2SqlExecParserBaseVisitor<List<Node>> {
         return Stream.concat(aggregate.stream(), nextResult.stream()).collect(toList());
     }
 
+    @Override
+    public List<Node> visitDbs_dsize_parameter(Db2SqlExecParser.Dbs_dsize_parameterContext ctx) {
+        String text = ctx.getText();
+        Matcher matcher = DSIZE_REGEX.matcher(text);
+        if (matcher.matches()) {
+            int size = Integer.parseInt(matcher.group(1));
+            if (!dsizeValidation(size)) {
+                addSyntaxError(ctx, "dsize should be a power-of-two integer in the range 1–256");
+            }
+        } else {
+            addSyntaxError(ctx, "unknown token");
+        }
+        return visitChildren(ctx);
+    }
+
+    private void addSyntaxError(ParserRuleContext ctx, String messageKey, Object... messageArgs) {
+        SyntaxError error = SyntaxError.syntaxError()
+                .errorSource(ErrorSource.PARSING)
+                .location(getTokenEndLocality(ctx.stop).toOriginalLocation())
+                .suggestion(messageService.getMessage(messageKey, messageArgs))
+                .severity(ErrorSeverity.ERROR)
+                .build();
+        errors.add(error);
+    }
+
+    private static boolean dsizeValidation(int n) {
+        return n > 0 && n <= 256 && (n & (n - 1)) == 0;
+    }
+
     private boolean isVariableUsage(ParserRuleContext ctx) {
         if (hasColumn(ctx)) {
             return true;
@@ -200,5 +246,17 @@ class Db2SqlExecVisitor extends Db2SqlExecParserBaseVisitor<List<Node>> {
         }
         String finalName = name;
         return addTreeNode(ctx, locality -> new VariableUsageNode(finalName, locality));
+    }
+
+    private Locality getTokenEndLocality(Token token) {
+        return Locality.builder()
+                .uri(context.getProgramDocumentUri())
+                .range(buildTokenEndRange(token))
+                .build();
+    }
+
+    private Range buildTokenEndRange(Token token) {
+        Position p = new Position(token.getLine() - 1, token.getCharPositionInLine() + token.getStopIndex() - token.getStartIndex() + 1);
+        return new Range(p, p);
     }
  }

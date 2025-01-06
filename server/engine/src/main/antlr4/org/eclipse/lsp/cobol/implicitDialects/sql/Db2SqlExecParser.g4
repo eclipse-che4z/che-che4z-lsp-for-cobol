@@ -246,7 +246,7 @@ dbs_alter_tablespace: TABLESPACE (dbs_database_name DOT_FS)? dbs_table_space_nam
                       dbs_alter_tablespace_move /*these first five are piped separately from the big loop due to note 1 in IBM doc*/
                       | (BUFFERPOOL dbs_bp_name | CCSID INTEGERLITERAL | CLOSE (YES|NO) | COMPRESS (YES|NO) |
                       INSERT ALGORITHM dbs_insert_algorithm_level | LOCKMAX (SYSTEM | INTEGERLITERAL) | LOCKSIZE (ANY | TABLESPACE | TABLE | PAGE | ROW | LOB)
-                      | NOT? LOGGED | MAXROWS INTEGERLITERAL | MAXPARTITIONS INTEGERLITERAL |
+                      | NOT? LOGGED | MAXROWS INTEGERLITERAL | MAXPARTITIONS dbs_maxPartition |
                       MEMBER CLUSTER (YES|NO) | TRACKMOD (YES|NO) | dbs_alter_tablespace_using | dbs_alter_tablespace_free | dbs_alter_tablespace_gbpcache)+) dbs_alter_tablespace_alter?;
 
 dbs_alter_tablespace_move: MOVE TABLE dbs_table_name TO TABLESPACE (dbs_database_name DOT_FS)? dbs_table_space_name;
@@ -530,7 +530,7 @@ dbs_create_tablespace: TABLESPACE dbs_table_space_name dbs_create_tablespace_opt
 dbs_create_tablespace_opts : IN (DSNDB04  | dbs_database_name) | BUFFERPOOL dbs_bp_name | partition_by_growth_spec  | partition_by_range_spec |
                SEGSIZE INTEGERLITERAL | DSSIZE dbs_dsize_parameter  | CCSID oneof_encoding | CLOSE yes_or_no | COMPRESS no_or_yes | DEFINE no_or_yes | free_block  |  gbpcache_block
                | INSERT ALGORITHM dbs_create_algorithm_level | LOCKMAX (SYSTEM | INTEGERLITERAL) | locksize_block_tbl  | TRACKMOD (yes_or_no | dbs_imptkmod_param) | using_block;
-partition_by_growth_spec: MAXPARTITIONS INTEGERLITERAL (NUMPARTS INTEGERLITERAL)?;
+partition_by_growth_spec: MAXPARTITIONS dbs_maxPartition (NUMPARTS INTEGERLITERAL)?;
 partition_by_range_spec: NUMPARTS INTEGERLITERAL partition_by_range_spec_body*;
 partition_by_range_spec_body: LPARENCHAR partitions_opts (dbs_comma_separator partitions_opts)*  RPARENCHAR | PAGENUM (dbs_pageset_pagenum_param | ABSOLUTE | RELATIVE);
 partitions_opts: PARTITION INTEGERLITERAL (using_block | free_block | gbpcache_block | COMPRESS  yes_or_no | ERASE yes_or_no?  | dbs_imptkmod_param | TRACKMOD yes_or_no
@@ -1813,5 +1813,6 @@ dbs_exact_match_identifier_sql: IDENTIFIER {validateTokenWithRegex($IDENTIFIER.t
 dbs_k_m_g_identifier: IDENTIFIER {validateTokenWithRegex($IDENTIFIER.text, "(?i)\\b(K|M|G)\\b", "unknown token. Supported tokens is K, M, G");};
 kmg_blob_parameter: INTEGERLITERAL dbs_k_m_g_identifier? | IDENTIFIER {validateTokenWithRegex($IDENTIFIER.text, "(?i)^\\d+[KMG]?$", "unknown token");};
 dbs_g_char_identifier: IDENTIFIER {validateTokenWithRegex($IDENTIFIER.text, "^[gG]$", "unknown token. Expected G");};
-dbs_dsize_parameter: INTEGERLITERAL dbs_g_char_identifier | IDENTIFIER {validateTokenWithRegex($IDENTIFIER.text, "\\d+[Gg]", "unknown token");};
+dbs_dsize_parameter: INTEGERLITERAL dbs_g_char_identifier | IDENTIFIER;
+dbs_maxPartition: INTEGERLITERAL {validateIntegerRange($INTEGERLITERAL.text, 1, 4096);};
 /////
