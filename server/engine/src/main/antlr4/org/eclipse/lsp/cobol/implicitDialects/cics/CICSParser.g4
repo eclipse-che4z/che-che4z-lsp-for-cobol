@@ -694,7 +694,7 @@ cics_spoolopen_output: OUTPUT (TOKEN cics_data_area | USERID cics_data_value | N
 
 /** SPOOLREAD */
 cics_spoolread: SPOOLREAD cics_spoolread_options;
-cics_spoolread_options: ((TOKEN | INTO | TOFLENGTH) cics_data_area | MAXFLENGTH cics_data_value | NOHANDLE | cics_handle_response)+;
+cics_spoolread_options: ((TOKEN | INTO | TOFLENGTH) cics_data_area | MAXFLENGTH cics_data_value | cics_handle_response)+;
 
 /** SPOOLWRITE */
 cics_spoolwrite: SPOOLWRITE (TOKEN cics_data_area | FROM cics_data_area | FLENGTH cics_data_value | LINE | PAGE |
