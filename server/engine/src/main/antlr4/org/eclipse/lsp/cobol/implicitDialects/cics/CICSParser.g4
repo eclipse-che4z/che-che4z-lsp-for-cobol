@@ -833,7 +833,7 @@ cics_transform_xmltodata: XMLTODATA (CHANNEL cics_data_value | DATCONTAINER cics
 cics_unlock: UNLOCK (cics_file_name | TOKEN cics_data_area | SYSID cics_data_area | cics_handle_response)+;
 
 /** UPDATE COUNTER / UPDATE DCOUNTER */
-cics_update: UPDATE (cics_update_counter_dcounter);
+cics_update: UPDATE cics_update_counter_dcounter;
 cics_update_counter_dcounter: ((COUNTER | DCOUNTER | POOL) cics_name | (VALUE  | COMPAREMIN  | COMPAREMAX) cics_data_value | NOSUSPEND | cics_handle_response)+;
 
 /** VERIFY PASSWORD / VERIFY PHRASE / VERIFY TOKEN */
