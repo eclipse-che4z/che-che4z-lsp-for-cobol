@@ -26,7 +26,8 @@ import org.junit.jupiter.api.Test;
 public class TestCicsInquireUrimap {
   /** below program is a generated code from the grammar. Do not showcase the actual code */
   public static final String TEXT =
-      "       IDENTIFICATION DIVISION.\n"
+      "       CBL CICS(\"SP\")\n"
+          + "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID. ABCDEF.\n"
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
@@ -41,7 +42,6 @@ public class TestCicsInquireUrimap {
           + "                  DeFINetimE ( 12990    )\n"
           + "                  IpreSolved ( {$variable} )  \n"
           + "                  teMplAteNaME ( +,92E-9   )  \n"
-          + "                  anALyZersTAT ( AdDresS of liNaGE-CoUNTEr       )\n"
           + "                  anALyZersTAT ( AdDresS of liNaGE-CoUNTEr       )\n"
           + "                  iNSTAlLAGENt ( Z\"\"   )     \n"
           + "            END-EXEC.";
