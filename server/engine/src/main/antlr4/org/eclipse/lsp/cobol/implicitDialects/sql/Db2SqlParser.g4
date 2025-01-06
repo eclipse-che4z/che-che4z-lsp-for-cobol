@@ -67,8 +67,11 @@ result_set_locator: RESULT_SET_LOCATOR VARYING;
 tableLocators: TABLE LIKE entry_name AS LOCATOR;
 
 lobWithSize
-    : (BINARY LARGE OBJECT | BLOB | CHARACTER LARGE OBJECT | CHAR LARGE OBJECT | CLOB | DBCLOB) LPARENCHAR dbs_integer k_m_g? RPARENCHAR
+    : (BINARY LARGE OBJECT | BLOB | CHARACTER LARGE OBJECT | CHAR LARGE OBJECT | CLOB | DBCLOB) LPARENCHAR lobSize RPARENCHAR
     ;
+
+lobSize: (dbs_integer k_m_g?| T=IDENTIFIER {validateTokenWithRegex($T.text, "\\d+[kKmMgG]", "unexpected token");} );
+
 lobNoSize
     : BLOB_LOCATOR | CLOB_LOCATOR | DBCLOB_LOCATOR |  xml_lobNO_size
     ;

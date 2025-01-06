@@ -686,10 +686,9 @@ cics_readnext_readprev: (READNEXT | READPREV)  (cics_file_name | INTO cics_data_
                SYSID cics_data_area | LENGTH cics_data_area | RBA | RRN | XRBA | NOSUSPEND | cics_handle_response)*;
 
 /** READQ TD / TS */
-cics_readq: READQ (cics_readq_td | cics_readq_ts);
-cics_readq_td: (TD | QUEUE cics_name | cics_into_set | LENGTH cics_data_area | SYSID cics_data_area | NOSUSPEND | cics_handle_response)+;
-cics_readq_ts: (TS | (QUEUE | QNAME) cics_name | cics_into_set | NEXT | (LENGTH | NUMITEMS | SYSID) cics_data_area |
-                ITEM cics_data_value | cics_handle_response)+;
+cics_readq: READQ cics_readq_ts_td;
+cics_readq_ts_td: (TS | TD | (QUEUE | QNAME) cics_name | cics_into_set | NEXT | (LENGTH | NUMITEMS | SYSID) cics_data_area |
+                   ITEM cics_data_value | NOSUSPEND | cics_handle_response)+;
 
 /** RELEASE */
 cics_release: RELEASE cics_release_option;
@@ -776,8 +775,8 @@ cics_soapfault_faultactor: (FAULTACTOR cics_data_value | FAULTACTLEN cics_data_v
 cics_soapfault_detail: (DETAIL cics_data_value | DETAILLENGTH cics_data_value)+;
 
 /** SPOOLCLOSE */
-cics_spoolclose: SPOOLCLOSE (TOKEN cics_data_area | KEEP | DELETE | NOHANDLE | cics_spoolclose_resp | cics_handle_response)+;
-cics_spoolclose_resp: RESP RESP2?;
+cics_spoolclose: SPOOLCLOSE cics_spoolclose_options;
+cics_spoolclose_options: (TOKEN cics_data_area | KEEP | DELETE | cics_handle_response)+;
 
 /** SPOOLOPEN INPUT / SPOOLOPEN OUTPUT */
 cics_spoolopen: SPOOLOPEN (cics_spoolopen_input | cics_spoolopen_output);
@@ -786,12 +785,12 @@ cics_spoolopen_output: (OUTPUT | TOKEN cics_data_area | (USERID | NODE | CLASS |
                 NOCC | ASA | MCC | PRINT | PUNCH | NOHANDLE | cics_handle_response)+;
 
 /** SPOOLREAD */
-cics_spoolread: SPOOLREAD (TOKEN cics_data_area | INTO cics_data_area | MAXFLENGTH cics_data_value |
-                TOFLENGTH cics_data_area | NOHANDLE | cics_spoolclose_resp | cics_handle_response)+;
+cics_spoolread: SPOOLREAD cics_spoolread_options;
+cics_spoolread_options: ((TOKEN | INTO | TOFLENGTH) cics_data_area | MAXFLENGTH cics_data_value | cics_handle_response)+;
 
 /** SPOOLWRITE */
-cics_spoolwrite: SPOOLWRITE (TOKEN cics_data_area | FROM cics_data_area | FLENGTH cics_data_value | LINE | PAGE |
-                 NOHANDLE | cics_spoolclose_resp | cics_handle_response)+;
+cics_spoolwrite: SPOOLWRITE cics_spoolwrite_options;
+cics_spoolwrite_options: ((TOKEN | FROM) cics_data_area | FLENGTH cics_data_value | LINE | PAGE  | cics_handle_response)+;
 
 /** START - / ATTACH / BREXIT / CHANNEL */
 cics_start: START (cics_start_transid | cics_start_attach | cics_start_brexit);
@@ -824,7 +823,8 @@ cics_suspend: SUSPEND cics_suspend_body;
 cics_suspend_body: (ACQACTIVITY | ACQPROCESS | ACTIVITY cics_data_value | cics_handle_response)*;
 
 /** SYNCPOINT / SYNCPOINT ROLLBACK */
-cics_syncpoint: SYNCPOINT (cics_handle_response | ROLLBACK)*;
+cics_syncpoint: SYNCPOINT cics_syncpoint_rollback;
+cics_syncpoint_rollback: (ROLLBACK | cics_handle_response)*;
 
 /** TEST EVENT */
 cics_test: TEST (EVENT cics_data_value | FIRESTATUS cics_cvda | cics_handle_response)+;
