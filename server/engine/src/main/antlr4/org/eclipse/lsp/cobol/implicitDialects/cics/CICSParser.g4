@@ -38,7 +38,7 @@ allExciRules: cics_exci_link | cics_exci_delete | cics_exci_delete_container | c
               cics_exci_get_container | cics_exci_get_next_container | cics_exci_move_container |
               cics_exci_put_container | cics_exci_query_channel | cics_exci_startbrowse_container ;
 
-allSPRules: cics_discard | cics_extract_system_programming | cics_inquire_system_programming | cics_create;
+allSPRules: cics_disable | cics_discard | cics_extract_system_programming | cics_inquire_system_programming | cics_create;
 
 // compiler options
 compilerOpts
@@ -314,6 +314,11 @@ cics_queue_qname: (QUEUE | QNAME) cics_name;
 /** DEQ */
 cics_deq: DEQ (cics_deq_cmds | cics_handle_response);
 cics_deq_cmds : (RESOURCE cics_data_area | LENGTH cics_data_value | MAXLIFETIME cics_cvda | TASK | UOW)+;
+
+/** DISABLE PROGRAM */
+cics_disable: DISABLE cics_disable_program;
+cics_disable_program: ((PROGRAM | ENTRYNAME | EXIT) cics_data_value | EXITALL | FORMATEDF | PURGEABLE |
+              SHUTDOWN | SPI | STOP | TASKSTART | cics_handle_response)+;
 
 /** DISCARD System Commands **/
 cics_discard: DISCARD cics_discard_body;
@@ -1519,6 +1524,7 @@ ABCODE
   | DIGEST
   | DIGESTTYPE
   | DIRMGR
+  | DISABLE
   | DISABLED
   | DISABLEDACT
   | DISCARD
@@ -1667,6 +1673,7 @@ ABCODE
   | EXECUTABLE
   | EXECUTIONSET
   | EXIT
+  | EXITALL
   | EXITPGM
   | EXITTRACING
   | EXPECT
@@ -1712,6 +1719,7 @@ ABCODE
   | FMHSTATUS
   | FORCE
   | FORCEQR
+  | FORMATEDF
   | FORMATEDFST
   | FORMATTIME
   | FORMFEED
@@ -2603,6 +2611,7 @@ ABCODE
   | SOSIST
   | SOSSTATUS
   | SPECIFTCPS
+  | SPI
   | SPIST
   | SPOLBUSY
   | SPOLERR
@@ -2640,6 +2649,7 @@ ABCODE
   | STATUSTEXT
   | STDERR
   | STDOUT
+  | STOP
   | STORAGE
   | STORAGECLEAR
   | STOREPROTECT
@@ -2702,6 +2712,7 @@ ABCODE
   | TASKIDERR
   | TASKPRIORITY
   | TASKS
+  | TASKSTART
   | TASKSTARTST
   | TASKSUBPOOL
   | TC
