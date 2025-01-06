@@ -1061,7 +1061,7 @@ public class CICSSysSetOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
         checkMutuallyExclusiveOptions("INTERVAL or INTERVALSECS", ctx.INTERVAL(), ctx.INTERVALSECS());
 
         checkMutuallyExclusiveOptions("RECORDING, ON or OFF", ctx.RECORDING(), ctx.ON(), ctx.OFF());
-        if (ctx.RECORDNOW() != null || ctx.RESETNOW() != null) {
+        if (!ctx.RECORDNOW().isEmpty() || !ctx.RESETNOW().isEmpty()) {
             checkForExactlyOne("RECORDING, ON or OFF", ctx, ctx.RECORDING(), ctx.ON(), ctx.OFF());
         }
     }
@@ -1075,7 +1075,14 @@ public class CICSSysSetOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     }
 
     private void checkSystem(CICSParser.Cics_set_systemContext ctx) {
-        // No checks due to repeat nature.
+        checkMutuallyExclusiveOptions("DEBUGTOOL, DEBUG or NODEBUG", ctx.DEBUGTOOL(), ctx.DEBUG(), ctx.NODEBUG());
+        checkMutuallyExclusiveOptions("DUMPING, NOSYSDUMP, TABLEONLY or SYSDUMP", ctx.DUMPING(), ctx.NOSYSDUMP(), ctx.TABLEONLY(), ctx.SYSDUMP());
+        checkMutuallyExclusiveOptions("FORCEQR, FORCE or NOFORCE", ctx.FORCEQR(), ctx.FORCE(), ctx.NOFORCE());
+        checkMutuallyExclusiveOptions("PROGAUTOCTLG, CTLGALL, CTLGMODIFY or CTLGNONE", ctx.PROGAUTOCTLG(), ctx.CTLGALL(), ctx.CTLGMODIFY(), ctx.CTLGNONE());
+        checkMutuallyExclusiveOptions("PROGAUTOINST, AUTOACTIVE or AUTOINACTIVE", ctx.PROGAUTOINST(), ctx.AUTOACTIVE(), ctx.AUTOINACTIVE());
+
+        checkPrerequisiteIsMet(ctx.GMMTEXT(), ctx.GMMLENGTH(), ctx, "GMMLENGTH without GMMTEXT");
+        checkPrerequisiteIsMet(ctx.MAXTASKS(), ctx.NEWMAXTASKS(), ctx, "NEWMAXTASKS without MAXTASKS");
     }
 
     private void checkTagsRefresh(CICSParser.Cics_set_tags_refreshContext ctx) {
