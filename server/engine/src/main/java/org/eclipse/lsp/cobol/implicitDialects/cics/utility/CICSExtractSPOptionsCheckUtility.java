@@ -132,7 +132,7 @@ public class CICSExtractSPOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
             default:
                 break;
         }
-            checkDuplicates(ctx);
+        checkDuplicates(ctx);
     }
 
     private void checkExtractExit(CICSParser.Cics_extract_exitContext ctx) {
@@ -188,9 +188,10 @@ public class CICSExtractSPOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
             checkHasIllegalOptions(ctx.SUBRESIDLEN(), "SUBRESIDLEN without SUBRESID");
             checkHasIllegalOptions(ctx.cics_subrestype(), "SUBRESTYPE without SUBRESID");
         }
-        List<TerminalNode> subrestype = ctx.cics_subrestype().stream().map(CICSParser.Cics_subrestypeContext::SUBRESTYPE).collect(Collectors.toList());
-        List<TerminalNode> capturespec = ctx.cics_subrestype().stream().map(CICSParser.Cics_subrestypeContext::CAPTURESPEC).collect(Collectors.toList());
-        List<TerminalNode> policyrule = ctx.cics_subrestype().stream().map(CICSParser.Cics_subrestypeContext::POLICYRULE).collect(Collectors.toList());
+        List<CICSParser.Cics_subrestypeContext> subrestypes = ctx.cics_subrestype();
+        List<TerminalNode> subrestype = subrestypes.stream().map(CICSParser.Cics_subrestypeContext::SUBRESTYPE).collect(Collectors.toList());
+        List<TerminalNode> capturespec = subrestypes.stream().map(CICSParser.Cics_subrestypeContext::CAPTURESPEC).collect(Collectors.toList());
+        List<TerminalNode> policyrule = subrestypes.stream().map(CICSParser.Cics_subrestypeContext::POLICYRULE).collect(Collectors.toList());
 
         checkHasMutuallyExclusiveOptions("SUBRESTYPE or CAPTURESPEC or POLICYRULE", subrestype, capturespec, policyrule);
 
