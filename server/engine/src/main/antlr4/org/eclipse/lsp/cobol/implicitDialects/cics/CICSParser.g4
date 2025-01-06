@@ -714,9 +714,8 @@ cics_return_transid: (TRANSID cics_name | CHANNEL cics_name | COMMAREA cics_data
 cics_return_inputmsg: (INPUTMSG cics_data_area | INPUTMSGLEN cics_data_value | cics_handle_response)+;
 
 /** REWIND COUNTER / DCOUNTER */
-cics_rewind: REWIND (cics_rewind_counter | cics_rewind_dcounter);
-cics_rewind_counter: COUNTER cics_name (POOL cics_name | INCREMENT cics_data_value | cics_handle_response)*;
-cics_rewind_dcounter: DCOUNTER cics_name (POOL cics_name | INCREMENT cics_data_area | cics_handle_response)*;
+cics_rewind: REWIND cics_rewind_opts;
+cics_rewind_opts:(COUNTER cics_name | DCOUNTER cics_name | NOSUSPEND | POOL cics_name | INCREMENT cics_data_value | cics_handle_response)+;
 
 /** REWRITE: */
 cics_rewrite: REWRITE cics_file_name (TOKEN cics_data_area | FROM cics_data_area | SYSID cics_data_area
