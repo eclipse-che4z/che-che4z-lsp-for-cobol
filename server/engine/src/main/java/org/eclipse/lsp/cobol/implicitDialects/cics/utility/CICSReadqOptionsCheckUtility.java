@@ -16,6 +16,7 @@ package org.eclipse.lsp.cobol.implicitDialects.cics.utility;
 
         import org.antlr.v4.runtime.ParserRuleContext;
 
+        import org.antlr.v4.runtime.tree.TerminalNode;
         import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
         import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
         import org.eclipse.lsp.cobol.common.error.SyntaxError;
@@ -67,12 +68,12 @@ public class CICSReadqOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     }
 
     private void checkOpts(CICSParser.Cics_readq_ts_tdContext ctx) {
-       final List<TerminalNode> TDs = ctx.TD();
-       final List<TerminalNode> TSs = ctx.TS();
-       checkHasMutuallyExclusiveOptions("TD or TS", TDs, TSs);
-       if (TDs.isEmpty())
+       final List<TerminalNode> tds = ctx.TD();
+       final List<TerminalNode> tss = ctx.TS();
+       checkHasMutuallyExclusiveOptions("TD or TS", tds, tss);
+       if (tds.isEmpty())
            checkTs(ctx);
-       else if (TSs.isEmpty())
+       else if (tss.isEmpty())
            checkTd(ctx);
     }
     private void checkTd(CICSParser.Cics_readq_ts_tdContext ctx) {
