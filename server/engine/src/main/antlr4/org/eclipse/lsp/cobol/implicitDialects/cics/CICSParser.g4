@@ -1014,7 +1014,7 @@ cics_hhmmss: LPARENCHAR hhmmss RPARENCHAR;
 cics_label: LPARENCHAR paragraphNameUsage RPARENCHAR;
 cics_value: LPARENCHAR ptr_value RPARENCHAR;
 empty_parens: LPARENCHAR RPARENCHAR;
-cics_attributes: LPARENCHAR (.* | LPARENCHAR .* RPARENCHAR) RPARENCHAR;
+cics_attributes: LPARENCHAR ( WORD_IDENTIFIER | literal | LPARENCHAR (WORD_IDENTIFIER | literal) RPARENCHAR )+ RPARENCHAR;
 
 cicsWord
     : WORD_IDENTIFIER | cicsWords
