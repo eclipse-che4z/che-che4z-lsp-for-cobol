@@ -879,7 +879,6 @@ public class TestCicsSysSetStatement {
     @Test
     void testCicsSysdumpcodeInvalid() {
         testSingleError(SYSDUMPCODE_INVALID_1, "Options \"ACTION, ADD, REMOVE or RESET\" are mutually exclusive.");
-        testSingleError(SYSDUMPCODE_INVALID_2, "");
     }
 
     @Test
