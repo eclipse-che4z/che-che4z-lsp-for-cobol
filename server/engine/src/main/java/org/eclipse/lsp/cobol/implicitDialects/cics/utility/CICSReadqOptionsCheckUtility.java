@@ -16,6 +16,7 @@ package org.eclipse.lsp.cobol.implicitDialects.cics.utility;
 
         import org.antlr.v4.runtime.ParserRuleContext;
 
+        import org.antlr.v4.runtime.tree.TerminalNode;
         import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
         import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
         import org.eclipse.lsp.cobol.common.error.SyntaxError;
@@ -34,7 +35,6 @@ public class CICSReadqOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     private static final Map<Integer, ErrorSeverity> DUPLICATE_CHECK_OPTIONS =
             new HashMap<Integer, ErrorSeverity>() {
                 {
-                    put(CICSLexer.READQ, ErrorSeverity.ERROR);
                     put(CICSLexer.TD, ErrorSeverity.WARNING);
                     put(CICSLexer.QUEUE, ErrorSeverity.ERROR);
                     put(CICSLexer.INTO, ErrorSeverity.ERROR);
@@ -60,36 +60,41 @@ public class CICSReadqOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
      * @param <E> A subclass of ParserRuleContext
      */
     public <E extends ParserRuleContext> void checkOptions(E ctx) {
-        if (ctx.getRuleIndex() == RULE_cics_readq_td)
-            checkTd((CICSParser.Cics_readq_tdContext) ctx);
-        else if (ctx.getRuleIndex() == RULE_cics_readq_ts)
-            checkTs((CICSParser.Cics_readq_tsContext) ctx);
+        if (ctx.getRuleIndex() == RULE_cics_readq_ts_td) {
+            checkOpts((CICSParser.Cics_readq_ts_tdContext) ctx);
+        }
 
         checkDuplicates(ctx);
     }
 
-    private void checkTd(CICSParser.Cics_readq_tdContext ctx) {
-        if (!ctx.TD().isEmpty())
-            checkHasMandatoryOptions(ctx.QUEUE(), ctx, "QUEUE");
-        if (!ctx.NOSUSPEND().isEmpty())
-            checkHasMandatoryOptions(ctx.TD(), ctx, "TD");
-        if (!ctx.cics_into_set().isEmpty())
-            checkSetTd(ctx.cics_into_set().listIterator().next());
-
-        checkHasExactlyOneOption("INTO or SET", ctx, ctx.cics_into_set());
+    private void checkOpts(CICSParser.Cics_readq_ts_tdContext ctx) {
+       final List<TerminalNode> tds = ctx.TD();
+       final List<TerminalNode> tss = ctx.TS();
+       checkHasMutuallyExclusiveOptions("TD or TS", tds, tss);
+       if (tds.isEmpty())
+           checkTs(ctx);
+       else if (tss.isEmpty())
+           checkTd(ctx);
     }
-    private void checkTs(CICSParser.Cics_readq_tsContext ctx) {
+    private void checkTd(CICSParser.Cics_readq_ts_tdContext ctx) {
+        checkHasMandatoryOptions(ctx.QUEUE(), ctx, "QUEUE");
+        checkHasExactlyOneOption("INTO or SET", ctx, ctx.cics_into_set());
+        checkHasIllegalOptions(ctx.ITEM(), "ITEM");
+        checkHasIllegalOptions(ctx.NEXT(), "NEXT");
+        checkHasIllegalOptions(ctx.NUMITEMS(), "NUMITEMS");
+        checkHasIllegalOptions(ctx.QNAME(), "QNAME");
+
+    }
+    private void checkTs(CICSParser.Cics_readq_ts_tdContext ctx) {
         if (!ctx.cics_into_set().isEmpty())
             checkSetTs(ctx.cics_into_set().listIterator().next());
 
         checkHasExactlyOneOption("QUEUE or QNAME", ctx, ctx.QUEUE(), ctx.QNAME());
         checkHasExactlyOneOption("INTO or SET", ctx, ctx.cics_into_set());
         checkHasMutuallyExclusiveOptions("NEXT or ITEM", ctx.NEXT(), ctx.ITEM());
-    }
-    private void checkSetTd(CICSParser.Cics_into_setContext ctx) {
-        if (ctx.SET() != null) checkHasMandatoryOptions(((Cics_readq_tdContext) ctx.getParent().getRuleContext()).LENGTH(), ctx, "LENGTH");
+        checkHasIllegalOptions(ctx.NOSUSPEND(), "NOSUSPEND");
     }
     private void checkSetTs(CICSParser.Cics_into_setContext ctx) {
-        if (ctx.SET() != null) checkHasMandatoryOptions(((Cics_readq_tsContext) ctx.getParent().getRuleContext()).LENGTH(), ctx, "LENGTH");
+        if (ctx.SET() != null) checkHasMandatoryOptions(((Cics_readq_ts_tdContext) ctx.getParent().getRuleContext()).LENGTH(), ctx, "LENGTH");
     }
 }

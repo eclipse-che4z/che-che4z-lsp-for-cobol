@@ -21,7 +21,7 @@ import lombok.ToString;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.NodeType;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
-import org.eclipse.lsp.cobol.implicitDialects.sql.Db2SqlDialect;
+import org.eclipse.lsp.cobol.implicitDialects.cics.CICSDialect;
 
 /** EXEC CICS HANDLE node */
 @ToString(callSuper = true)
@@ -42,7 +42,7 @@ public class ExecCicsHandleNode extends Node {
   private final HandleAbendType type;
 
   public ExecCicsHandleNode(Locality location, HandleAbendType type) {
-    super(location, NodeType.STATEMENT, Db2SqlDialect.DIALECT_NAME);
+    super(location, NodeType.STATEMENT, CICSDialect.DIALECT_NAME);
     this.type = type;
   }
 }
