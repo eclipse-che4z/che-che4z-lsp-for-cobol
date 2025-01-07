@@ -382,12 +382,14 @@ public abstract class CICSOptionsCheckBaseUtility {
      * @param rules   Lists of TerminalNode to iterate through
      * @return Number of TerminalNode instances found
      */
-    protected int checkHasMutuallyExclusiveOptions(List<TerminalNode>... rules) {
-        List<TerminalNode> nodes =
-                Stream.of(rules)
-                        .filter(rule -> !rule.isEmpty())
-                        .flatMap(Collection::stream)
-                        .collect(Collectors.toList());
+    @SafeVarargs
+    protected final int checkHasMutuallyExclusiveOptions(List<TerminalNode>... rules) {
+        List<TerminalNode> nodes = new ArrayList<>(Stream.of(rules)
+                .filter(rule -> !rule.isEmpty())
+                .flatMap(Collection::stream)
+                .collect(Collectors.toCollection(
+                        () -> new TreeSet<>(Comparator.comparing(ParseTree::getText))
+                )));
         nodes.removeIf(Objects::isNull);
 
         if (!nodes.stream()
