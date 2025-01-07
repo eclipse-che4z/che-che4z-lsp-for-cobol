@@ -51,7 +51,7 @@ public class TestCICSEndbr {
             ImmutableMap.of(
                     "error1",
                     new Diagnostic(
-                            new Range(new Position(13, 12), new Position(12, 17)),
+                            new Range(new Position(13, 12), new Position(13, 12)),
                             "Exactly one option required, none provided: FILE or DATASET",
                             DiagnosticSeverity.Error,
                             ErrorSource.PARSING.getText()),
