@@ -1614,9 +1614,7 @@ public class CICSInquireSPOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
                 CICSParser.Cics_inquire_task_listContext taskListContext =
                         (CICSParser.Cics_inquire_task_listContext) ctx;
                 checkHasMandatoryOptions(taskListContext.LISTSIZE(), taskListContext, "LISTSIZE");
-                if (!taskListContext.SETTRANSID().isEmpty() && taskListContext.SET().isEmpty()) {
-                    checkHasIllegalOptions(taskListContext.SETTRANSID(), "SETTRANSID without SET");
-                }
+                checkPrerequisiteIsMet(taskListContext.SET(), taskListContext.SETTRANSID(), taskListContext, "SETTRANSID without SET");
                 break;
 
             case CICSParser.RULE_cics_inquire_terminal:

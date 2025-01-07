@@ -213,7 +213,7 @@ public class TestCICSInquireSP {
 
     private static final String TCPIPSERVICE_VALID = "INQUIRE TCPIPSERVICE START";
 
-    private static final String TASKLIST_INVALID = "INQUIRE {_TASK LIST DISPATCHABLE RUNNING {SETTRANSID|errorTwo}(1) SUSPENDED|errorOne_}";
+    private static final String TASKLIST_INVALID = "INQUIRE {_TASK LIST DISPATCHABLE RUNNING SETTRANSID(1) SUSPENDED|errorOne|errorTwo_}";
 
     private static final String TASK_VALID = "INQUIRE TASK";
 
@@ -377,7 +377,7 @@ public class TestCICSInquireSP {
                         "errorTwo",
                         new Diagnostic(
                                 new Range(),
-                                "Invalid option provided: SETTRANSID without SET",
+                                "Missing required option for: SETTRANSID without SET",
                                 DiagnosticSeverity.Error,
                                 ErrorSource.PARSING.getText()));
         CICSTestUtils.errorTest(TASKLIST_INVALID, expectedDiagnostics, "SP");
