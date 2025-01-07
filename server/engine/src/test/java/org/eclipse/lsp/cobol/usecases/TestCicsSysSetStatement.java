@@ -136,16 +136,16 @@ public class TestCicsSysSetStatement {
     private static final String TRACEDEST_VALID_2 = "SET TRACEDEST AUXPAUSE GTFSTART INTSTART SWITCH SWITCHNEXT TABLESIZE(1)";
     private static final String TRACEFLAG_VALID_1 = "SET TRACEFLAG";
     private static final String TRACEFLAG_VALID_2 = "SET TRACEFLAG SINGLEOFF SYSTEMOFF TCEXITALLOFF USEROFF";
-    private static final String TRACETYPE_VALID_1 = "SET TRACETYPE ";
-    private static final String TRACETYPE_VALID_2 = "SET TRACETYPE ";
-    private static final String TRANCLASS_VALID_1 = "SET TRANCLASS ";
-    private static final String TRANCLASS_VALID_2 = "SET TRANCLASS ";
-    private static final String TRANDUMPCODE_VALID_1 = "SET TRANDUMPCODE ";
-    private static final String TRANDUMPCODE_VALID_2 = "SET TRANDUMPCODE ";
-    private static final String TRANSACTION_VALID_1 = "SET TRANSACTION ";
-    private static final String TRANSACTION_VALID_2 = "SET TRANSACTION ";
-    private static final String TSQUEUE_VALID_1 = "SET TSQUEUE ";
-    private static final String TSQUEUE_VALID_2 = "SET TSQUEUE ";
+    private static final String TRACETYPE_VALID_1 = "SET TRACETYPE STANDARD";
+    private static final String TRACETYPE_VALID_2 = "SET TRACETYPE SPECIAL APPLICATION(1) ASYNCSERVICE(1) BM(1) BRIDGE(1) BUSAPPMGR(1) CPI(1) DC(1) DEBUGTOOL(1) DIRMGR(1) DISPATCHER(1) DOCUMENT(1) DOMAINMGR(1) DUMP(1) EI(1) ENQUEUE(1) ENTJAVA(1) EVENTCAPTURE(1) EVENTMGR(1) EVENTPROC(1) FC(1) GLOBALCATLG(1) IC(1) IPECI(1) IS(1) KC(1) KERNEL(1) LOADER(1) LOCALCATLG(1) LOCKMGR(1) LOGGER(1) MANAGEDPLAT(1) MESSAGE(1) ML(1) MONITOR(1) OBJECTTRAN(1) PARAMGR(1) PARTNER(1) PC(1) PIPEMGR(1) PROGMGR(1) RECOVERY(1) REGIONSTAT(1) REQUESTSTRM(1) RESLIFEMGR(1) RMI(1) RMIADAPTERS(1) RRS(1) SC(1) SCHEDULER(1) SECURITY(1) SJVM(1) SOCKETS(1) STATISTICS(1) STORAGE(1) SZ(1) TC(1) TD(1) TEMPSTORAGE(1) TIMER(1) TRACE(1) TRANMGR(1) UE(1) USER(1) WEB(1) WEB2(1) WEBRESTMGR(1)";
+    private static final String TRANCLASS_VALID_1 = "SET TRANCLASS(1)";
+    private static final String TRANCLASS_VALID_2 = "SET TRANCLASS(1) MAXACTIVE(1) ABEND PURGETHRESH(1)";
+    private static final String TRANDUMPCODE_VALID_1 = "SET TRANDUMPCODE(1)";
+    private static final String TRANDUMPCODE_VALID_2 = "SET TRANDUMPCODE(1) ADD LOCAL MAXIMUM(1) SHUTDOWN SYSDUMP TRANDUMP";
+    private static final String TRANSACTION_VALID_1 = "SET TRANSACTION(1)";
+    private static final String TRANSACTION_VALID_2 = "SET TRANSACTION(1) TRANDUMP PRIORITY(1) PURGEABLE RUNAWAY(1) SYSTEM SHUTDISABLED DISABLED TRANCLASS(1) SPECTRACE";
+    private static final String TSQUEUE_VALID_1 = "SET TSQUEUE(1)";
+    private static final String TSQUEUE_VALID_2 = "SET TSQNAME(1) SYSID(1) ACTION(1) LASTUSEDINT(1)";
     private static final String UOW_VALID_1 = "SET UOW ";
     private static final String UOW_VALID_2 = "SET UOW ";
     private static final String UOWLINK_VALID_1 = "SET UOWLINK ";
@@ -248,16 +248,15 @@ public class TestCicsSysSetStatement {
     private static final String TRACEDEST_INVALID_2 = "SET TRACEDEST AUXPAUSE {AUXSTART|errorOne}";
     private static final String TRACEFLAG_INVALID_1 = "SET TRACEFLAG SINGLEOFF {SINGLEON|errorOne}";
     private static final String TRACEFLAG_INVALID_2 = "SET TRACEFLAG SYSTEMOFF {SYSTEMON|errorOne}";
-    private static final String TRACETYPE_INVALID_1 = "SET TRACETYPE ";
-    private static final String TRACETYPE_INVALID_2 = "SET TRACETYPE ";
-    private static final String TRANCLASS_INVALID_1 = "SET TRANCLASS ";
-    private static final String TRANCLASS_INVALID_2 = "SET TRANCLASS ";
-    private static final String TRANDUMPCODE_INVALID_1 = "SET TRANDUMPCODE ";
-    private static final String TRANDUMPCODE_INVALID_2 = "SET TRANDUMPCODE ";
-    private static final String TRANSACTION_INVALID_1 = "SET TRANSACTION ";
-    private static final String TRANSACTION_INVALID_2 = "SET TRANSACTION ";
-    private static final String TSQUEUE_INVALID_1 = "SET TSQUEUE ";
-    private static final String TSQUEUE_INVALID_2 = "SET TSQUEUE ";
+    private static final String TRACETYPE_INVALID_1 = "SET {TRACETYPE|errorOne} {NORESP|errorTwo}";
+    private static final String TRACETYPE_INVALID_2 = "SET TRACETYPE STANDARD AP(1) {APPLICATION|errorOne}(1)";
+    private static final String TRANCLASS_INVALID_1 = "SET TRANCLASS(1) ABEND {DISCARD|errorOne}";
+    private static final String TRANDUMPCODE_INVALID_1 = "SET TRANDUMPCODE(1) ADD {REMOVE|errorOne}";
+    private static final String TRANDUMPCODE_INVALID_2 = "SET TRANDUMPCODE(1) NOSHUTDOWN {SHUTDOWN|errorOne}";
+    private static final String TRANSACTION_INVALID_1 = "SET TRANSACTION(1) TRANDUMP {NOTRANDUMP|errorOne}";
+    private static final String TRANSACTION_INVALID_2 = "SET TRANSACTION(1) SPECTRACE {SPRSTRACE|errorOne}";
+    private static final String TSQUEUE_INVALID_1 = "SET TSQUEUE(1) {TSQNAME|errorOne}(1) SYSID(1)";
+    private static final String TSQUEUE_INVALID_2 = "SET {_TSQUEUE(1) LASTUSEDINT(1)|errorOne_}";
     private static final String UOW_INVALID_1 = "SET UOW ";
     private static final String UOW_INVALID_2 = "SET UOW ";
     private static final String UOWLINK_INVALID_1 = "SET UOWLINK ";
@@ -957,32 +956,31 @@ public class TestCicsSysSetStatement {
 
     @Test
     void testCicsTracetypeInvalid() {
-        testSingleError(TRACETYPE_INVALID_1, "");
-        testSingleError(TRACETYPE_INVALID_2, "");
+        testTwoErrors(TRACETYPE_INVALID_1, "Must use exactly one of the following: FLAGSET, SPECIAL or STANDARD", "Syntax error on 'NORESP'");
+        testSingleError(TRACETYPE_INVALID_2, "Options \"AP or APPLICATION\" are mutually exclusive.");
     }
 
     @Test
     void testCicsTranclassInvalid() {
-        testSingleError(TRANCLASS_INVALID_1, "");
-        testSingleError(TRANCLASS_INVALID_2, "");
+        testSingleError(TRANCLASS_INVALID_1, "Options \"PURGEACTION, ABEND or DISCARD\" are mutually exclusive.");
     }
 
     @Test
     void testCicsTrandumpcodeInvalid() {
-        testSingleError(TRANDUMPCODE_INVALID_1, "");
-        testSingleError(TRANDUMPCODE_INVALID_2, "");
+        testSingleError(TRANDUMPCODE_INVALID_1, "Options \"ACTION, ADD, REMOVE or RESET\" are mutually exclusive.");
+        testSingleError(TRANDUMPCODE_INVALID_2, "Options \"SHUTOPTION, NOSHUTDOWN or SHUTDOWN\" are mutually exclusive.");
     }
 
     @Test
     void testCicsTransactionInvalid() {
-        testSingleError(TRANSACTION_INVALID_1, "");
-        testSingleError(TRANSACTION_INVALID_2, "");
+        testSingleError(TRANSACTION_INVALID_1, "Options \"DUMPING, TRANDUMP or NOTRANDUMP\" are mutually exclusive.");
+        testSingleError(TRANSACTION_INVALID_2, "Options \"TRACING, SPECTRACE, SPRSTRACE or STANTRACE\" are mutually exclusive.");
     }
 
     @Test
     void testCicsTsqueueInvalid() {
-        testSingleError(TSQUEUE_INVALID_1, "");
-        testSingleError(TSQUEUE_INVALID_2, "");
+        testSingleError(TSQUEUE_INVALID_1, "Extraneous input TSQNAME");
+        testSingleError(TSQUEUE_INVALID_2, "Missing required option for: LASTUSEDINT without ACTION");
     }
 
     @Test
