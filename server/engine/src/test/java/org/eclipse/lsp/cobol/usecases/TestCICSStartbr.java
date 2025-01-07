@@ -32,6 +32,9 @@ public class TestCICSStartbr {
   private static final String STARTBR_VALID_MINIMAL =
           "STARTBR FILE({$varOne}) RIDFLD({$varTwo})";
 
+  private static final String STARTBR_DATASET_VALID =
+          "STARTBR DATASET({$varOne}) RIDFLD({$varTwo})";
+
   private static final String STARTBR_INVALID_NO_KEYLENGTH =
           "STARTBR {_FILE({$varOne}) RIDFLD({$varTwo}) GENERIC|errorOne_}";
 
@@ -56,6 +59,11 @@ public class TestCICSStartbr {
   @Test
   void testStartbrValidMinimal() {
     CICSTestUtils.noErrorTest(STARTBR_VALID_MINIMAL);
+  }
+
+  @Test
+  void testStartbrDatasetValid() {
+    CICSTestUtils.noErrorTest(STARTBR_DATASET_VALID);
   }
 
   @Test
