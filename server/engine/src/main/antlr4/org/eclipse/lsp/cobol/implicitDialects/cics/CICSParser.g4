@@ -269,7 +269,7 @@ cics_create_opts:((ATOMSERVICE | BUNDLE | DB2CONN | DB2ENTRY | DB2TRAN | DOCTEMP
                                       IPCONN | JOURNALMODEL | JVMSERVER | LIBRARY | LSRPOOL | MAPSET | MQCONN | MQMONITOR | PARTITIONSET |
                                       PARTNER |  PIPELINE | PROCESSTYPE | PROFILE | PROGRAM | TCPIPSERVICE | TDQUEUE | TRANCLASS |
                                       TRANSACTION | TSMODEL | TYPETERM | URIMAP | WEBSERVICE | SESSIONS | TERMINAL | CONNECTION) cics_data_value |
-                                      (ATTRIBUTES cics_data_area | COMPLETE | DISCARD | ATTRLEN cics_data_value | LOG | NOLOG | LOGMESSAGE cics_cvda | cics_handle_response))+;
+                                      ATTRIBUTES cics_data_area | COMPLETE | DISCARD | ATTRLEN cics_data_value | LOG | NOLOG | LOGMESSAGE cics_cvda | cics_handle_response)+;
 
 /** DEFINE (all of them) */
 cics_define: DEFINE (cics_define_activity | cics_define_composite_event | cics_define_counter_dcounter | cics_define_input_event | cics_define_process | cics_define_timer);
