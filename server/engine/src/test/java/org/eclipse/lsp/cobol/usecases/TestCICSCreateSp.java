@@ -37,41 +37,41 @@ public class TestCICSCreateSp {
 
     private static Stream<String> getValidOptions() {
         return Stream.of(
-                "CREATE ATOMSERVICE({$varFour}) NOLOG ATTRLEN({$varFour}) ATTRIBUTES(anything)",
-                "CREATE BUNDLE({$varFour}) NOLOG ATTRLEN({$varOne}) ATTRIBUTES(anything)",
-                "CREATE CONNECTION({$varFour}) NOLOG ATTRLEN({$varOne}) ATTRIBUTES(anything)",
-                "CREATE DB2CONN({$varFour}) NOLOG ATTRLEN({$varOne}) ATTRIBUTES(anything)",
-                "CREATE DB2ENTRY({$varFour}) NOLOG ATTRLEN({$varOne}) ATTRIBUTES(anything)",
-                "CREATE DB2TRAN({$varFour}) NOLOG ATTRLEN({$varOne}) ATTRIBUTES(anything)",
-                "CREATE DOCTEMPLATE({$varFour}) NOLOG ATTRLEN({$varOne}) ATTRIBUTES(anything)",
-                "CREATE DUMPCODE({$varFour}) NOLOG ATTRLEN({$varOne}) ATTRIBUTES(anything)",
-                "CREATE ENQMODEL({$varFour}) NOLOG ATTRLEN({$varOne}) ATTRIBUTES(anything)",
-                "CREATE FILE({$varFour}) NOLOG ATTRLEN({$varOne}) ATTRIBUTES(anything)",
-                "CREATE IPCONN({$varFour}) NOLOG ATTRLEN({$varOne}) ATTRIBUTES(anything)",
-                "CREATE JOURNALMODEL({$varFour}) NOLOG ATTRLEN({$varOne}) ATTRIBUTES(anything)",
-                "CREATE JVMSERVER({$varFour}) NOLOG ATTRLEN({$varOne}) ATTRIBUTES(anything)",
-                "CREATE LIBRARY({$varFour}) NOLOG ATTRLEN({$varOne}) ATTRIBUTES(anything)",
-                "CREATE LSRPOOL({$varFour}) NOLOG ATTRLEN({$varOne}) ATTRIBUTES(anything)",
-                "CREATE MAPSET({$varFour}) NOLOG ATTRLEN({$varOne}) ATTRIBUTES(anything)",
-                "CREATE MQCONN({$varFour}) NOLOG ATTRLEN({$varOne}) ATTRIBUTES(anything)",
-                "CREATE MQMONITOR({$varFour}) NOLOG ATTRLEN({$varOne}) ATTRIBUTES(anything)",
-                "CREATE PARTITIONSET({$varFour}) NOLOG ATTRLEN({$varOne}) ATTRIBUTES(anything)",
-                "CREATE PARTNER({$varFour}) NOLOG ATTRLEN({$varOne}) ATTRIBUTES(anything)",
-                "CREATE PIPELINE({$varFour}) NOLOG ATTRLEN({$varOne}) ATTRIBUTES(anything)",
-                "CREATE PROCESSTYPE({$varFour}) NOLOG ATTRLEN({$varOne}) ATTRIBUTES(anything)",
-                "CREATE PROFILE({$varFour}) NOLOG ATTRLEN({$varOne}) ATTRIBUTES(anything)",
-                "CREATE PROGRAM({$varFour}) NOLOG ATTRLEN({$varOne}) ATTRIBUTES(anything)",
-                "CREATE TCPIPSERVICE({$varFour}) NOLOG ATTRLEN({$varOne}) ATTRIBUTES(anything)",
-                "CREATE TDQUEUE({$varFour}) NOLOG ATTRLEN({$varOne}) ATTRIBUTES(anything)",
-                "CREATE TRANCLASS({$varFour}) NOLOG ATTRLEN({$varOne}) ATTRIBUTES(anything)",
-                "CREATE TRANSACTION({$varFour}) NOLOG ATTRLEN({$varOne}) ATTRIBUTES(anything)",
-                "CREATE TSMODEL({$varFour}) NOLOG ATTRLEN({$varOne}) ATTRIBUTES(anything)",
-                "CREATE TYPETERM({$varFour}) NOLOG ATTRLEN({$varOne}) ATTRIBUTES(anything)",
-                "CREATE URIMAP({$varFour}) NOLOG ATTRLEN({$varOne}) ATTRIBUTES(anything)",
-                "CREATE WEBSERVICE({$varFour}) NOLOG ATTRLEN({$varOne}) ATTRIBUTES(anything)",
-                "CREATE SESSIONS({$varFour}) NOLOG ATTRLEN({$varOne}) ATTRIBUTES(anything)",
-                "CREATE TERMINAL({$varFour}) NOLOG ATTRLEN({$varOne}) ATTRIBUTES(anything)",
-                "CREATE CONNECTION({$varFour}) ATTRLEN({$varOne}) ATTRIBUTES(anything) NOLOG");
+                "CREATE ATOMSERVICE({$varFour}) NOLOG ATTRLEN({$varFour}) ATTRIBUTES({$varFour})",
+                "CREATE BUNDLE({$varFour}) NOLOG ATTRLEN({$varOne}) ATTRIBUTES({$varFour})",
+                "CREATE CONNECTION({$varFour}) NOLOG ATTRLEN({$varOne}) ATTRIBUTES({$varFour})",
+                "CREATE DB2CONN({$varFour}) NOLOG ATTRLEN({$varOne}) ATTRIBUTES({$varFour})",
+                "CREATE DB2ENTRY({$varFour}) NOLOG ATTRLEN({$varOne}) ATTRIBUTES({$varFour})",
+                "CREATE DB2TRAN({$varFour}) NOLOG ATTRLEN({$varOne}) ATTRIBUTES({$varFour})",
+                "CREATE DOCTEMPLATE({$varFour}) NOLOG ATTRLEN({$varOne}) ATTRIBUTES({$varFour})",
+                "CREATE DUMPCODE({$varFour}) NOLOG ATTRLEN({$varOne}) ATTRIBUTES({$varFour})",
+                "CREATE ENQMODEL({$varFour}) NOLOG ATTRLEN({$varOne}) ATTRIBUTES({$varFour})",
+                "CREATE FILE({$varFour}) NOLOG ATTRLEN({$varOne}) ATTRIBUTES({$varFour})",
+                "CREATE IPCONN({$varFour}) NOLOG ATTRLEN({$varOne}) ATTRIBUTES({$varFour})",
+                "CREATE JOURNALMODEL({$varFour}) NOLOG ATTRLEN({$varOne}) ATTRIBUTES({$varFour})",
+                "CREATE JVMSERVER({$varFour}) NOLOG ATTRLEN({$varOne}) ATTRIBUTES({$varFour})",
+                "CREATE LIBRARY({$varFour}) NOLOG ATTRLEN({$varOne}) ATTRIBUTES({$varFour})",
+                "CREATE LSRPOOL({$varFour}) NOLOG ATTRLEN({$varOne}) ATTRIBUTES({$varFour})",
+                "CREATE MAPSET({$varFour}) NOLOG ATTRLEN({$varOne}) ATTRIBUTES({$varFour})",
+                "CREATE MQCONN({$varFour}) NOLOG ATTRLEN({$varOne}) ATTRIBUTES({$varFour})",
+                "CREATE MQMONITOR({$varFour}) NOLOG ATTRLEN({$varOne}) ATTRIBUTES({$varFour})",
+                "CREATE PARTITIONSET({$varFour}) NOLOG ATTRLEN({$varOne}) ATTRIBUTES({$varFour})",
+                "CREATE PARTNER({$varFour}) NOLOG ATTRLEN({$varOne}) ATTRIBUTES({$varFour})",
+                "CREATE PIPELINE({$varFour}) NOLOG ATTRLEN({$varOne}) ATTRIBUTES({$varFour})",
+                "CREATE PROCESSTYPE({$varFour}) NOLOG ATTRLEN({$varOne}) ATTRIBUTES({$varFour})",
+                "CREATE PROFILE({$varFour}) NOLOG ATTRLEN({$varOne}) ATTRIBUTES({$varFour})",
+                "CREATE PROGRAM({$varFour}) NOLOG ATTRLEN({$varOne}) ATTRIBUTES({$varFour})",
+                "CREATE TCPIPSERVICE({$varFour}) NOLOG ATTRLEN({$varOne}) ATTRIBUTES({$varFour})",
+                "CREATE TDQUEUE({$varFour}) NOLOG ATTRLEN({$varOne}) ATTRIBUTES({$varFour})",
+                "CREATE TRANCLASS({$varFour}) NOLOG ATTRLEN({$varOne}) ATTRIBUTES({$varFour})",
+                "CREATE TRANSACTION({$varFour}) NOLOG ATTRLEN({$varOne}) ATTRIBUTES({$varFour})",
+                "CREATE TSMODEL({$varFour}) NOLOG ATTRLEN({$varOne}) ATTRIBUTES({$varFour})",
+                "CREATE TYPETERM({$varFour}) NOLOG ATTRLEN({$varOne}) ATTRIBUTES({$varFour})",
+                "CREATE URIMAP({$varFour}) NOLOG ATTRLEN({$varOne}) ATTRIBUTES({$varFour})",
+                "CREATE WEBSERVICE({$varFour}) NOLOG ATTRLEN({$varOne}) ATTRIBUTES({$varFour})",
+                "CREATE SESSIONS({$varFour}) NOLOG ATTRLEN({$varOne}) ATTRIBUTES({$varFour})",
+                "CREATE TERMINAL({$varFour}) NOLOG ATTRLEN({$varOne}) ATTRIBUTES({$varFour})",
+                "CREATE CONNECTION({$varFour}) ATTRLEN({$varOne}) ATTRIBUTES({$varFour}) NOLOG");
     };
 
     private static final String CREATE_INVALID =
@@ -83,9 +83,11 @@ public class TestCICSCreateSp {
     private static final String CREATE_CONNECTION_MUTUALEX_INVALID =
             "CREATE CONNECTION({$varFour}) {COMPLETE|error} {DISCARD|error2}";
     private static final String CREATE_DB2CONN_MUTUALEX_INVALID =
-            "CREATE DB2CONN({$varFour}) ATTRIBUTES(anything) {LOG|error} {NOLOG|error2}";
+            "CREATE DB2CONN({$varFour}) ATTRIBUTES({$varFour}) {LOG|error} {NOLOG|error2}";
     private static final String CREATE_DB2ENTRY_DISCARD_INVALID =
-            "CREATE DB2ENTRY({$varFour}) ATTRIBUTES(anything) {DISCARD|error}";
+            "CREATE DB2ENTRY({$varFour}) ATTRIBUTES({$varFour}) {DISCARD|error}";
+    private static final String CREATE_DB2ENTRY_FILE_INVALID =
+            "CREATE NOHANDLE {DB2ENTRY|error}({$varFour}) ATTRIBUTES({$varFour}) {FILE|error2}({$varFour})";
     @ParameterizedTest
     @MethodSource("getValidOptions")
     void testCreateSpAllValid(String valid) {
@@ -171,6 +173,25 @@ public class TestCICSCreateSp {
                                 ErrorSource.PARSING.getText()));
 
         CICSTestUtils.errorTest(CREATE_DB2ENTRY_DISCARD_INVALID, expectedDiagnostic, "SP");
+    }
+    @Test
+    void testCreateMutualExSpInvalid() {
+        Map<String, Diagnostic> expectedDiagnostic =
+                ImmutableMap.of(
+                        "error",
+                        new Diagnostic(
+                                new Range(),
+                                "Exactly one option required, options are mutually exclusive: DB2ENTRY or FILE",
+                                DiagnosticSeverity.Error,
+                                ErrorSource.PARSING.getText()),
+                        "error2",
+                        new Diagnostic(
+                                new Range(),
+                                "Exactly one option required, options are mutually exclusive: DB2ENTRY or FILE",
+                                DiagnosticSeverity.Error,
+                                ErrorSource.PARSING.getText()));
+
+        CICSTestUtils.errorTest(CREATE_DB2ENTRY_FILE_INVALID, expectedDiagnostic, "SP");
     }
 }
 

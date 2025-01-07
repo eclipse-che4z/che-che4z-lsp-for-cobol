@@ -375,6 +375,34 @@ public abstract class CICSOptionsCheckBaseUtility {
         }
         return nodes.size();
     }
+    /**
+     * Flags errors for rule lists passed as parameters if there are multiple instances of mutually
+     * exclusive options.
+     *
+     * @param rules   Lists of TerminalNode to iterate through
+     * @return Number of TerminalNode instances found
+     */
+    protected int checkHasMutuallyExclusiveOptions(List<TerminalNode>... rules) {
+        List<TerminalNode> nodes =
+                Stream.of(rules)
+                        .filter(rule -> !rule.isEmpty())
+                        .flatMap(Collection::stream)
+                        .collect(Collectors.toList());
+        nodes.removeIf(Objects::isNull);
+
+        if (!nodes.stream()
+                .allMatch(e -> e.getSymbol().getType() == nodes.get(0).getSymbol().getType())) {
+            nodes.forEach(
+                    node -> {
+                        throwException(
+                                ErrorSeverity.ERROR,
+                                getLocality(node),
+                                "Exactly one option required, options are mutually exclusive: ",
+                               nodes.toString().replace(",", " or").replace("[", "").replace("]", ""));
+                    });
+        }
+        return nodes.size();
+    }
 
     protected <E extends ParseTree> void checkHasExactlyOneOption(
             String options, ParserRuleContext parentCtx, List<E>... rules) {

@@ -94,6 +94,13 @@ public class CICSCreateSPOptionsCheckUtility extends CICSOptionsCheckBaseUtility
         checkDuplicates(ctx);
     }
     private void checkOpts(CICSParser.Cics_create_optsContext ctx) {
+        checkHasMutuallyExclusiveOptions(ctx.ATOMSERVICE(), ctx.BUNDLE(), ctx.DB2CONN(), ctx.DB2ENTRY(), ctx.DB2TRAN(), ctx.DOCTEMPLATE(), ctx.DUMPCODE(),
+                ctx.ENQMODEL(), ctx.FILE(), ctx.IPCONN(), ctx.JOURNALMODEL(), ctx.JVMSERVER(), ctx.LIBRARY(),
+                ctx.LSRPOOL(), ctx.MAPSET(), ctx.MQCONN(), ctx.MQMONITOR(), ctx.PARTITIONSET(), ctx.PARTNER(),
+                ctx.PROCESSTYPE(), ctx.PROFILE(), ctx.PROGRAM(), ctx.TCPIPSERVICE(), ctx.TDQUEUE(), ctx.TRANCLASS(),
+                ctx.TRANSACTION(), ctx.TSMODEL(), ctx.TYPETERM(), ctx.URIMAP(), ctx.WEBSERVICE(), ctx.SESSIONS(),
+                ctx.TERMINAL(), ctx.CONNECTION());
+
                 if (!ctx.CONNECTION().isEmpty()  || !ctx.TERMINAL().isEmpty()) {
             checkHasExactlyOneOption("ATTRIBUTES or COMPLETE or DISCARD", ctx, ctx.ATTRIBUTES(), ctx.COMPLETE(), ctx.DISCARD());
             if (!ctx.DISCARD().isEmpty() || !ctx.COMPLETE().isEmpty()) {
