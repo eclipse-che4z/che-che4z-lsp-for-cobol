@@ -19,6 +19,7 @@ import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.usecases.common.CICSTestUtils;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
+import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
@@ -51,7 +52,7 @@ public class TestCICSAsktime {
                 ImmutableMap.of(
                         "error",
                         new Diagnostic(
-                                new Range(),
+                                new Range(new Position(15, 12), new Position(15, 20)),
                                 "Syntax error on 'END-EXEC'",
                                 DiagnosticSeverity.Error,
                                 ErrorSource.PARSING.getText()));

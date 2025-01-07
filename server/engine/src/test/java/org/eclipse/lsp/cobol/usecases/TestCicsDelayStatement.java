@@ -106,7 +106,7 @@ public class TestCicsDelayStatement {
             ImmutableMap.of(
                     "error",
                     new Diagnostic(
-                            new Range(new Position(15, 12), new Position(15, 17)),
+                            new Range(new Position(16, 12), new Position(16, 17)),
                             "Exactly one option required, options are mutually exclusive: INTERVAL, TIME, UNTIL, FOR",
                             DiagnosticSeverity.Error,
                             ErrorSource.PARSING.getText()),
@@ -124,13 +124,13 @@ public class TestCicsDelayStatement {
             ImmutableMap.of(
                     "errorIntervalTime",
                     new Diagnostic(
-                            new Range(new Position(14, 12), new Position(14, 16)),
+                            new Range(new Position(14, 12), new Position(14, 20)),
                             "Exactly one option required, options are mutually exclusive: INTERVAL, TIME, UNTIL, FOR",
                             DiagnosticSeverity.Error,
                             ErrorSource.PARSING.getText()),
                     "errorIntervalTime2",
                     new Diagnostic(
-                            new Range(),
+                            new Range(new Position(15, 12), new Position(15, 16)),
                             "Exactly one option required, options are mutually exclusive: INTERVAL, TIME, UNTIL, FOR",
                             DiagnosticSeverity.Error,
                             ErrorSource.PARSING.getText()));

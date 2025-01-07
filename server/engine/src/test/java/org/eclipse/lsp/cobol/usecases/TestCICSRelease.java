@@ -52,13 +52,13 @@ public class TestCICSRelease {
             ImmutableMap.of(
                     "errorOne",
                     new Diagnostic(
-                            new Range(new Position(13, 12), new Position(13, 12)),
+                            new Range(new Position(14, 12), new Position(14, 12)),
                             "Missing required option: PROGRAM",
                             DiagnosticSeverity.Error,
                             ErrorSource.PARSING.getText()),
                     "errorTwo",
                     new Diagnostic(
-                            new Range(new Position(13, 12), new Position(13, 20)),
+                            new Range(new Position(14, 12), new Position(14, 20)),
                             "Syntax error on 'END-EXEC'",
                             DiagnosticSeverity.Error,
                             ErrorSource.PARSING.getText())));

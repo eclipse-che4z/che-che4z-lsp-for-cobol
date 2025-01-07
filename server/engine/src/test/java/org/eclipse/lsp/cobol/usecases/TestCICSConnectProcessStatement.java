@@ -58,13 +58,13 @@ public class TestCICSConnectProcessStatement {
                 ImmutableMap.of(
                         "errorMissingProc",
                         new Diagnostic(
-                                new Range(new Position(13, 12), new Position(16, 24)),
+                                new Range(new Position(14, 12), new Position(17, 24)),
                                 "Missing required option: PROCNAME",
                                 DiagnosticSeverity.Error,
                                 ErrorSource.PARSING.getText()),
                         "errorPartner",
                         new Diagnostic(
-                                new Range(new Position(16, 12), new Position(16,  19)),
+                                new Range(new Position(17, 12), new Position(17,  19)),
                                 "Invalid option provided: PARTNER",
                                 DiagnosticSeverity.Error,
                                 ErrorSource.PARSING.getText()

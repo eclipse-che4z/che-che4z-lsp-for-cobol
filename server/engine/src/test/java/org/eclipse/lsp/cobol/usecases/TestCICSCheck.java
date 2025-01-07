@@ -65,13 +65,13 @@ public class TestCICSCheck {
                 ImmutableMap.of(
                         "errorAcqprocess",
                         new Diagnostic(
-                                new Range(new Position(14, 12), new Position(14, 20)),
+                                new Range(new Position(15, 12), new Position(15, 20)),
                                 "Exactly one option required, options are mutually exclusive: ACTIVITY or ACQACTIVITY or ACQPROCESS",
                                 DiagnosticSeverity.Error,
                                 ErrorSource.PARSING.getText()),
                         "errorAcqprocess2",
                         new Diagnostic(
-                                new Range(new Position(14, 25), new Position(14, 35)),
+                                new Range(new Position(15, 25), new Position(15, 35)),
                                 "Exactly one option required, options are mutually exclusive: ACTIVITY or ACQACTIVITY or ACQPROCESS",
                                 DiagnosticSeverity.Error,
                                 ErrorSource.PARSING.getText()));
@@ -84,7 +84,7 @@ public class TestCICSCheck {
                 ImmutableMap.of(
                         "errorMissingCompstatus",
                         new Diagnostic(
-                                new Range(new Position(13, 12), new Position(15, 27)),
+                                new Range(new Position(14, 12), new Position(16, 27)),
                                 "Missing required option: COMPSTATUS",
                                 DiagnosticSeverity.Error,
                                 ErrorSource.PARSING.getText()));
