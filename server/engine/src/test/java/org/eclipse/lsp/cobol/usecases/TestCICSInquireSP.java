@@ -248,6 +248,21 @@ public class TestCICSInquireSP {
 
     private static final String VTAM_INVALID = "INQUIRE VTAM {PSDINTERVAL|errorOne}(1) {PSDINTHRS|errorTwo}(1) PSDINTMINS(1) PSDINTSECS(1)";
 
+    private static final String TASKLIST_INVALID_LIST = "INQUIRE {_TASK LISTSIZE(1)|errorOne_}";
+
+    @Test
+    void testInvalidTaskListTwo() {
+        Map<String, Diagnostic> expectedDiagnostics =
+                ImmutableMap.of(
+                        "errorOne",
+                        new Diagnostic(
+                                new Range(),
+                                "Missing required option: LIST",
+                                DiagnosticSeverity.Error,
+                                ErrorSource.PARSING.getText()));
+        CICSTestUtils.errorTest(TASKLIST_INVALID_LIST, expectedDiagnostics, "SP");
+    }
+
     @Test
     void testInvalidVTAM() {
         Map<String, Diagnostic> expectedDiagnostics =
