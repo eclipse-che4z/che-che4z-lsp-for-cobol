@@ -32,6 +32,9 @@ public class TestCICSSignalEvent {
   private static final String SIGNAL_EVENT_VALID_MINIMAL =
           "SIGNAL EVENT({$varOne})";
 
+  private static final String SIGNAL_FROM_INVALID =
+          "SIGNAL {FROM(123)|errorOne}";
+
   private static final String SIGNAL_EVENT_VALID_FROMCHANNEL =
           "SIGNAL EVENT({$varOne}) FROMCHANNEL({$varTwo})";
 
@@ -47,6 +50,19 @@ public class TestCICSSignalEvent {
   @Test
   void testSignalEventValidMinimal() {
     CICSTestUtils.noErrorTest(SIGNAL_EVENT_VALID_MINIMAL);
+  }
+
+  @Test
+  void testSignalFromInvalid() {
+    CICSTestUtils.errorTest(
+            SIGNAL_FROM_INVALID,
+            ImmutableMap.of(
+                    "errorOne",
+                    new Diagnostic(
+                            new Range(),
+                            "Missing required option: EVENT",
+                            DiagnosticSeverity.Error,
+                            ErrorSource.PARSING.getText())));
   }
 
   @Test
