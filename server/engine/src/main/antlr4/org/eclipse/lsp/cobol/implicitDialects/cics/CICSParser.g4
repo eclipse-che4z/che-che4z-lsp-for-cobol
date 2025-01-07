@@ -426,8 +426,8 @@ cics_ignore_options :  (CONDITION | cics_conditions | cics_handle_response)+;
 /** INQUIRE, Application Commands ACTIVITYID / CONTAINER / EVENT / PROCESS / TIMER */
 cics_inquire: INQUIRE (cics_inquire_process | cics_inquire_activityid | cics_inquire_container | cics_inquire_event | cics_inquire_timer);
 cics_inquire_activityid: ((COMPSTATUS | MODE | SUSPSTATUS) cics_cvda | (ABCODE | ABPROGRAM | ACTIVITY | EVENT | PROCESS | PROCESSTYPE | PROGRAM | TRANSID | USERID) cics_data_area | cics_handle_response)* ACTIVITYID cics_data_value ((COMPSTATUS | MODE | SUSPSTATUS) cics_cvda | (ABCODE | ABPROGRAM | ACTIVITY | EVENT | PROCESS | PROCESSTYPE | PROGRAM | TRANSID | USERID) cics_data_area | cics_handle_response)*;
-cics_inquire_container: CONTAINER cics_data_value ((ACTIVITYID | PROCESS | PROCESSTYPE) cics_data_value | (DATALENTH | SET) cics_data_area | cics_handle_response)*;
-cics_inquire_event: ((EVENT | ACTIVITYID) | cics_data_value | (EVENTTYPE | FIRESTATUS | PREDICATE) cics_cvda | (COMPOSITE | TIMER) cics_data_area | cics_handle_response)+;
+cics_inquire_container: CONTAINER cics_data_value ((ACTIVITYID | PROCESS | PROCESSTYPE) cics_data_value | (DATALENGTH | SET) cics_data_area | cics_handle_response)*;
+cics_inquire_event: EVENT cics_data_value (ACTIVITYID cics_data_value | (EVENTTYPE | FIRESTATUS | PREDICATE) cics_cvda | (COMPOSITE | TIMER) cics_data_area | cics_handle_response)*;
 cics_inquire_process: PROCESS cics_data_value (PROCESSTYPE cics_data_value | ACTIVITYID cics_data_area | cics_handle_response)*;
 cics_inquire_timer: TIMER cics_data_value (ACTIVITYID cics_data_value | (EVENT | ABSTIME) cics_data_area| STATUS cics_cvda | cics_handle_response)*;
 
@@ -1451,7 +1451,6 @@ ABCODE
   | DATABUFFERS
   | DATAFORMAT
   | DATALENGTH
-  | DATALENTH
   | DATALOCATION
   | DATAONLY
   | DATAPOINTER

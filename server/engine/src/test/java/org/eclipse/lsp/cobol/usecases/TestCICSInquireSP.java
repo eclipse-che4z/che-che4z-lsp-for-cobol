@@ -136,11 +136,14 @@ public class TestCICSInquireSP {
                 "UOWENQ NEXT DURATION({$varOne}) ENQFAILS({$varOne}) NETUOWID({$varOne}) QUALIFIER({$varOne}) QUALLEN({$varOne}) TASKID({$varOne}) TRANSID({$varOne}) RESOURCE({$varOne}) RESLEN({$varOne}) RELATION({$varOne}) STATE({$varOne}) TYPE({$varOne})",
                 "UOWLINK({$varOne}) HOST({$varOne}) PORT({$varOne}) BRANCHQUAL({$varOne}) LINK({$varOne}) NETUOWID({$varOne}) RMIQFY({$varOne}) SYSID({$varOne}) UOW({$varOne}) URID({$varOne}) XID({$varOne}) PROTOCOL({$varOne}) RESYNCSTATUS({$varOne}) ROLE({$varOne}) TYPE({$varOne})",
                 "URIMAP({$varOne}) ATOMSERVICE({$varOne}) CERTIFICATE({$varOne}) CHANGEAGREL({$varOne}) CHANGETIME({$varOne}) CHANGEUSRID({$varOne}) CHARACTERSET({$varOne}) CIPHERS({$varOne}) CONVERTER({$varOne}) DEFINESOURCE({$varOne}) DEFINETIME({$varOne}) HFSFILE({$varOne}) HOST({$varOne}) HOSTCODEPAGE({$varOne}) INSTALLTIME({$varOne}) INSTALLUSRID({$varOne}) IPRESOLVED({$varOne}) LOCATION({$varOne}) MEDIATYPE({$varOne}) NUMCIPHERS({$varOne}) PATH({$varOne}) PIPELINE({$varOne}) PORT({$varOne}) PROGRAM({$varOne}) SOCKETCLOSE({$varOne}) SOCKPOOLSIZE({$varOne}) TCPIPSERVICE({$varOne}) TEMPLATENAME({$varOne}) TRANSACTION({$varOne}) USERID({$varOne}) WEBSERVICE({$varOne}) APPLICATION({$varOne}) APPLMAJORVER({$varOne}) APPLMINORVER({$varOne}) APPLMICROVER({$varOne}) OPERATION({$varOne}) PLATFORM({$varOne}) ANALYZERSTAT({$varOne}) AUTHENTICATE({$varOne}) AVAILSTATUS({$varOne}) CHANGEAGENT({$varOne}) ENABLESTATUS({$varOne}) HOSTTYPE({$varOne}) INSTALLAGENT({$varOne}) IPFAMILY({$varOne}) REDIRECTTYPE({$varOne}) SCHEME({$varOne}) USAGE({$varOne})",
-                "VTAM GRNAME({$varOne}) PSDINTERVAL({$varOne}) PSDINTHRS({$varOne}) PSDINTMINS({$varOne}) PSDINTSECS({$varOne}) GRSTATUS({$varOne}) OPENSTATUS({$varOne}) PSTYPE({$varOne})",
+                "VTAM GRNAME({$varOne}) PSDINTHRS({$varOne}) PSDINTMINS({$varOne}) PSDINTSECS({$varOne}) GRSTATUS({$varOne}) OPENSTATUS({$varOne}) PSTYPE({$varOne})",
                 "WEB GARBAGEINT({$varOne}) TIMEOUTINT({$varOne})",
                 "WEBSERVICE({$varOne}) ARCHIVEFILE({$varOne}) BINDING({$varOne}) CCSID({$varOne}) CHANGEAGREL({$varOne}) CHANGETIME({$varOne}) CHANGEUSRID({$varOne}) CONTAINER({$varOne}) DEFINESOURCE({$varOne}) DEFINETIME({$varOne}) ENDPOINT({$varOne}) INSTALLTIME({$varOne}) INSTALLUSRID({$varOne}) LASTMODTIME({$varOne}) MAPPINGLEVEL({$varOne}) MAPPINGRNUM({$varOne}) MAPPINGVNUM({$varOne}) MINRUNLEVEL({$varOne}) MINRUNRNUM({$varOne}) MINRUNVNUM({$varOne}) PIPELINE({$varOne}) PROGRAM({$varOne}) URIMAP({$varOne}) WSBIND({$varOne}) WSDLFILE({$varOne}) CHANGEAGENT({$varOne}) INSTALLAGENT({$varOne}) PGMINTERFACE({$varOne}) STATE({$varOne}) VALIDATIONST({$varOne}) XOPDIRECTST({$varOne}) XOPSUPPORTST({$varOne})",
                 "WLMHEALTH ADJUSTMENT({$varOne}) HEALTH({$varOne}) HEALTHABSTIM({$varOne}) INTERVAL({$varOne}) OPENSTATUS({$varOne})",
-                "XMLTRANSFORM({$varOne})BUNDLE({$varOne}) CCSID({$varOne}) MAPPINGLEVEL({$varOne}) MAPPINGRNUM({$varOne}) MAPPINGVNUM({$varOne}) MINRUNLEVEL({$varOne}) MINRUNRNUM({$varOne}) MINRUNVNUM({$varOne}) XMLSCHEMA({$varOne}) XSDBIND({$varOne}) CHANGEAGREL({$varOne}) CHANGETIME({$varOne}) CHANGEUSRID({$varOne}) DEFINESOURCE({$varOne}) DEFINETIME({$varOne}) INSTALLTIME({$varOne}) INSTALLUSRID({$varOne}) VALIDATIONST({$varOne}) CHANGEAGENT({$varOne}) ENABLESTATUS({$varOne}) INSTALLAGENT({$varOne})");
+                "XMLTRANSFORM({$varOne}) BUNDLE({$varOne}) CCSID({$varOne}) MAPPINGLEVEL({$varOne}) MAPPINGRNUM({$varOne}) MAPPINGVNUM({$varOne}) MINRUNLEVEL({$varOne}) MINRUNRNUM({$varOne}) MINRUNVNUM({$varOne}) XMLSCHEMA({$varOne}) XSDBIND({$varOne}) CHANGEAGREL({$varOne}) CHANGETIME({$varOne}) CHANGEUSRID({$varOne}) DEFINESOURCE({$varOne}) DEFINETIME({$varOne}) INSTALLTIME({$varOne}) INSTALLUSRID({$varOne}) VALIDATIONST({$varOne}) CHANGEAGENT({$varOne}) ENABLESTATUS({$varOne}) INSTALLAGENT({$varOne})",
+                "UOWENQ NEXT ENQSCOPE({$varOne}) RESOURCE({$varOne}) RESLEN({$varOne}) UOW({$varOne})",
+                "UOWENQ START",
+                "UOWDSNFAIL START");
     }
 
     private static final String INVALID_BROWSE_BRFACILITY =
@@ -240,6 +243,48 @@ public class TestCICSInquireSP {
     private static final String MQCONN_VALID = "INQUIRE MQCONN RESYNCMEMBER({$varOne})";
 
     private static final String SECDISCOVERY_VALID = "INQUIRE SECDISCOVERY STATUS({$varOne}) LASTSECDTIME({$varOne})";
+
+    private static final String XMLTRANS_INVALID = "INQUIRE {XMLTRANSFORM|errorOne}";
+
+    private static final String VTAM_INVALID = "INQUIRE VTAM {PSDINTERVAL|errorOne}(1) {PSDINTHRS|errorTwo}(1) PSDINTMINS(1) PSDINTSECS(1)";
+
+    @Test
+    void testInvalidVTAM() {
+        Map<String, Diagnostic> expectedDiagnostics =
+                ImmutableMap.of(
+                        "errorOne",
+                        new Diagnostic(
+                                new Range(),
+                                "Exactly one option required, options are mutually exclusive: PSDINTHRS with PSDINTERVAL",
+                                DiagnosticSeverity.Error,
+                                ErrorSource.PARSING.getText()),
+                        "errorTwo",
+                        new Diagnostic(
+                                new Range(),
+                                "Exactly one option required, options are mutually exclusive: PSDINTHRS with PSDINTERVAL",
+                                DiagnosticSeverity.Error,
+                                ErrorSource.PARSING.getText()),
+                        "errorThree",
+                        new Diagnostic(
+                                new Range(),
+                                "Invalid option or parameter provided: Missing required option parameter",
+                                DiagnosticSeverity.Error,
+                                ErrorSource.PARSING.getText()));
+        CICSTestUtils.errorTest(VTAM_INVALID, expectedDiagnostics, "SP");
+    }
+
+    @Test
+    void testInvalidXMLTrans() {
+        Map<String, Diagnostic> expectedDiagnostics =
+                ImmutableMap.of(
+                        "errorOne",
+                        new Diagnostic(
+                                new Range(),
+                                "Invalid option or parameter provided: Missing required option parameter",
+                                DiagnosticSeverity.Error,
+                                ErrorSource.PARSING.getText()));
+        CICSTestUtils.errorTest(XMLTRANS_INVALID, expectedDiagnostics, "SP");
+    }
 
     @Test
     void testLastSecD() {

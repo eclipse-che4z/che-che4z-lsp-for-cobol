@@ -38,10 +38,12 @@ public class TestCICSInquire {
     private static Stream<String> getValidOptions() {
         return Stream.of(
                 "ACTIVITYID({$varOne}) COMPSTATUS({$varOne}) MODE({$varOne}) SUSPSTATUS({$varOne}) ABCODE({$varOne}) ABPROGRAM({$varOne}) ACTIVITY({$varOne}) EVENT({$varOne}) PROCESS({$varOne}) PROCESSTYPE({$varOne}) PROGRAM({$varOne}) TRANSID({$varOne}) USERID({$varOne})",
-                "CONTAINER({$varOne}) PROCESS({$varOne}) PROCESSTYPE({$varOne}) DATALENTH({$varOne}) SET({$varOne})",
+                "CONTAINER({$varOne}) PROCESS({$varOne}) PROCESSTYPE({$varOne}) DATALENGTH({$varOne}) SET({$varOne})",
                 "EVENT({$varOne}) ACTIVITYID({$varOne}) EVENTTYPE({$varOne}) FIRESTATUS({$varOne}) PREDICATE({$varOne}) COMPOSITE({$varOne}) TIMER({$varOne})",
                 "PROCESS({$varOne}) PROCESSTYPE({$varOne}) ACTIVITYID({$varOne})",
-                "TIMER({$varOne}) ACTIVITYID({$varOne}) EVENT({$varOne}) ABSTIME({$varOne})");
+                "TIMER({$varOne}) ACTIVITYID({$varOne}) EVENT({$varOne}) ABSTIME({$varOne})",
+                "TIMER({$varOne})",
+                "EVENT({$varOne})");
     }
 
     private static final String CONTAINER_INVALID =

@@ -44,7 +44,7 @@ public class CICSInquireOptionsCheckUtility extends CICSOptionsCheckBaseUtility 
                     put(CICSLexer.COMPOSITE, ErrorSeverity.ERROR);
                     put(CICSLexer.COMPSTATUS, ErrorSeverity.ERROR);
                     put(CICSLexer.CONTAINER, ErrorSeverity.ERROR);
-                    put(CICSLexer.DATALENTH, ErrorSeverity.ERROR);
+                    put(CICSLexer.DATALENGTH, ErrorSeverity.ERROR);
                     put(CICSLexer.EVENT, ErrorSeverity.ERROR);
                     put(CICSLexer.EVENTTYPE, ErrorSeverity.ERROR);
                     put(CICSLexer.FIRESTATUS, ErrorSeverity.ERROR);

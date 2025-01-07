@@ -23,6 +23,7 @@ import org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser;
 
 import java.util.*;
 
+import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.PSDINTERVAL;
 import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_inquire_system_programming;
 
 /**
@@ -74,6 +75,7 @@ public class CICSInquireSPOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
             put(CICSParser.RULE_cics_inquire_uowlink, CICSParser.UOWLINK);
             put(CICSParser.RULE_cics_inquire_urimap, CICSParser.URIMAP);
             put(CICSParser.RULE_cics_inquire_webservice, CICSParser.WEBSERVICE);
+            put(CICSParser.RULE_cics_inquire_xmltransform, CICSParser.XMLTRANSFORM);
 
         }
     };
@@ -1692,7 +1694,7 @@ public class CICSInquireSPOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
                         uowdsnfailContext.END(),
                         uowdsnfailContext.NEXT());
                 if (!uowdsnfailContext.START().isEmpty() || !uowdsnfailContext.END().isEmpty()) {
-                    checkBrowsingInvalidOptions(uowdsnfailContext, CICSParser.UOW);
+                    checkBrowsingInvalidOptions(uowdsnfailContext, CICSParser.UOWDSNFAIL);
                 }
                 break;
 
@@ -1705,16 +1707,19 @@ public class CICSInquireSPOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
                         uowenqContext.START(),
                         uowenqContext.END(),
                         uowenqContext.NEXT());
-                checkHasMutuallyExclusiveOptions(
-                        "ENQSCOPE or RESOURCE or UOW or END",
-                        uowenqContext.ENQSCOPE(),
-                        uowenqContext.RESOURCE(),
-                        uowenqContext.UOW(),
-                        uowenqContext.END());
+
+                if (!uowenqContext.END().isEmpty()) {
+                    checkHasMutuallyExclusiveOptions(
+                            "ENQSCOPE or RESOURCE or UOW or END",
+                            uowenqContext.ENQSCOPE(),
+                            uowenqContext.RESOURCE(),
+                            uowenqContext.UOW(),
+                            uowenqContext.END());
+                }
                 if (!uowenqContext.START().isEmpty() || !uowenqContext.END().isEmpty()) {
                     checkBrowsingInvalidOptions(
                             uowenqContext,
-                            CICSParser.ENQ,
+                            CICSParser.UOWENQ,
                             CICSParser.ENQSCOPE,
                             CICSParser.RESOURCE,
                             CICSParser.RESLEN,
@@ -1724,6 +1729,13 @@ public class CICSInquireSPOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
                     checkHasMandatoryOptions(uowenqContext.RESLEN(), ctx, "RESLEN with RESOURCE");
                 else checkHasIllegalOptions(uowenqContext.RESLEN(), "RESLEN without RESOURCE");
 
+                break;
+
+            case CICSParser.RULE_cics_inquire_vtam:
+                CICSParser.Cics_inquire_vtamContext vtamContext = (CICSParser.Cics_inquire_vtamContext) ctx;
+                checkHasMutuallyExclusiveOptions("PSDINTHRS with PSDINTERVAL", vtamContext.PSDINTERVAL(), vtamContext.PSDINTHRS());
+                checkPrerequisiteIsMet(vtamContext.PSDINTHRS(), vtamContext.PSDINTMINS(), vtamContext, "PSDINTMINS without PSDINTMINS");
+                checkPrerequisiteIsMet(vtamContext.PSDINTMINS(), vtamContext.PSDINTSECS(), vtamContext, "PSDINTMINS without PSDINTMINS");
                 break;
 
             default:
