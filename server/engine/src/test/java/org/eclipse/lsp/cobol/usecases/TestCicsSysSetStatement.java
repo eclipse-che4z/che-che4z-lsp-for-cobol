@@ -121,22 +121,21 @@ public class TestCicsSysSetStatement {
     private static final String TAGS_REFRESH_VALID_1 = "SET TAGS REFRESH";
     private static final String TASK_VALID_1 = "SET TASK(123)";
     private static final String TASK_VALID_2 = "SET TASK(123) PRIORITY(1) PURGETYPE(1) SRRSTATUS(1)";
-    private static final String TCLASS_VALID_1 = "SET TCLASS ";
-    private static final String TCLASS_VALID_2 = "SET TCLASS ";
-    private static final String TCPIP_VALID_1 = "SET TCPIP ";
-    private static final String TCPIP_VALID_2 = "SET TCPIP ";
-    private static final String TCPIPSERVICE_VALID_1 = "SET TCPIPSERVICE ";
-    private static final String TCPIPSERVICE_VALID_2 = "SET TCPIPSERVICE ";
-    private static final String TDQUEUE_VALID_1 = "SET TDQUEUE ";
-    private static final String TDQUEUE_VALID_2 = "SET TDQUEUE ";
-    private static final String TEMPSTORAGE_VALID_1 = "SET TEMPSTORAGE ";
-    private static final String TEMPSTORAGE_VALID_2 = "SET TEMPSTORAGE ";
-    private static final String TERMINAL_VALID_1 = "SET TERMINAL ";
-    private static final String TERMINAL_VALID_2 = "SET TERMINAL ";
-    private static final String TRACEDEST_VALID_1 = "SET TRACEDEST ";
-    private static final String TRACEDEST_VALID_2 = "SET TRACEDEST ";
-    private static final String TRACEFLAG_VALID_1 = "SET TRACEFLAG ";
-    private static final String TRACEFLAG_VALID_2 = "SET TRACEFLAG ";
+    private static final String TCLASS_VALID_1 = "SET TCLASS(123)";
+    private static final String TCLASS_VALID_2 = "SET TCLASS(123) MAXIMUM(123)";
+    private static final String TCPIP_VALID_1 = "SET TCPIP MAXSOCKETS(1) NEWMAXSOCKET(2) OPENSTATUS(1)";
+    private static final String TCPIP_VALID_2 = "SET TCPIP MAXSOCKETS(1) NEWMAXSOCKET(2) CLOSED";
+    private static final String TCPIPSERVICE_VALID_1 = "SET TCPIPSERVICE(123) BACKLOG(1) MAXDATALEN(1)";
+    private static final String TCPIPSERVICE_VALID_2 = "SET TCPIPSERVICE(123) BACKLOG(1) MAXDATALEN(1) OPENSTATUS(1) URM(1)";
+    private static final String TDQUEUE_VALID_1 = "SET TDQUEUE(1)";
+    private static final String TDQUEUE_VALID_2 = "SET TDQUEUE(1) ATIFACILITY(1) ATITERMID(1) ATITRANID(1) ATIUSERID(1) ENABLESTATUS(1) OPENSTATUS(1) TRIGGERLEVEL(1)";
+    private static final String TEMPSTORAGE_VALID_1 = "SET TEMPSTORAGE TSMAINLIMIT(1)";
+    private static final String TERMINAL_VALID_1 = "SET TERMINAL(1)";
+    private static final String TERMINAL_VALID_2 = "SET TERMINAL(1) ACQSTATUS(1) ALTPRINTER(1) ALTPRTCOPYST(1) ATISTATUS(1) EXITTRACING(1) MAPNAME(1) MAPSETNAME(1) NEXTTRANSID(1) OBFORMATST(1) OPERID(1) AUTOPAGEABLE PRINTER(2) PRTCOPYST(1) PURGE FORCE RELREQ INSERVICE TCAMCONTROL(1) TERMPRIORITY(1) TRACING(1) TTISTATUS(1) UCTRANST(1) ZCPTRACE";
+    private static final String TRACEDEST_VALID_1 = "SET TRACEDEST";
+    private static final String TRACEDEST_VALID_2 = "SET TRACEDEST AUXPAUSE GTFSTART INTSTART SWITCH SWITCHNEXT TABLESIZE(1)";
+    private static final String TRACEFLAG_VALID_1 = "SET TRACEFLAG";
+    private static final String TRACEFLAG_VALID_2 = "SET TRACEFLAG SINGLEOFF SYSTEMOFF TCEXITALLOFF USEROFF";
     private static final String TRACETYPE_VALID_1 = "SET TRACETYPE ";
     private static final String TRACETYPE_VALID_2 = "SET TRACETYPE ";
     private static final String TRANCLASS_VALID_1 = "SET TRANCLASS ";
@@ -232,24 +231,23 @@ public class TestCicsSysSetStatement {
     private static final String SYSTEM_INVALID_1 = "SET SYSTEM DEBUG {NODEBUG|errorOne}";
     private static final String SYSTEM_INVALID_2 = "SET SYSTEM FORCE {NOFORCE|errorOne}";
     //private static final String TAGS_REFRESH_INVALID_1 = "SET TAGS";
-    private static final String TASK_INVALID_1 = "SET TASK ";
-    private static final String TASK_INVALID_2 = "SET TASK ";
-    private static final String TCLASS_INVALID_1 = "SET TCLASS ";
-    private static final String TCLASS_INVALID_2 = "SET TCLASS ";
-    private static final String TCPIP_INVALID_1 = "SET TCPIP ";
-    private static final String TCPIP_INVALID_2 = "SET TCPIP ";
-    private static final String TCPIPSERVICE_INVALID_1 = "SET TCPIPSERVICE ";
-    private static final String TCPIPSERVICE_INVALID_2 = "SET TCPIPSERVICE ";
-    private static final String TDQUEUE_INVALID_1 = "SET TDQUEUE ";
-    private static final String TDQUEUE_INVALID_2 = "SET TDQUEUE ";
-    private static final String TEMPSTORAGE_INVALID_1 = "SET TEMPSTORAGE ";
-    private static final String TEMPSTORAGE_INVALID_2 = "SET TEMPSTORAGE ";
-    private static final String TERMINAL_INVALID_1 = "SET TERMINAL ";
-    private static final String TERMINAL_INVALID_2 = "SET TERMINAL ";
-    private static final String TRACEDEST_INVALID_1 = "SET TRACEDEST ";
-    private static final String TRACEDEST_INVALID_2 = "SET TRACEDEST ";
-    private static final String TRACEFLAG_INVALID_1 = "SET TRACEFLAG ";
-    private static final String TRACEFLAG_INVALID_2 = "SET TRACEFLAG ";
+    private static final String TASK_INVALID_1 = "SET TASK(123) KILL {PURGE|errorOne}";
+    private static final String TASK_INVALID_2 = "SET TASK(123) SRRACTIVE {SRRINACTIVE|errorOne}";
+    //private static final String TCLASS_INVALID_1 = "SET TCLASS ";
+    //private static final String TCLASS_INVALID_2 = "SET TCLASS ";
+    private static final String TCPIP_INVALID_1 = "SET {_TCPIP NEWMAXSOCKET(1) CLOSED|errorOne_}";
+    private static final String TCPIP_INVALID_2 = "SET TCPIP MAXSOCKETS(1) NEWMAXSOCKET(2) CLOSED {OPEN|errorOne} ";
+    private static final String TCPIPSERVICE_INVALID_1 = "SET {_TCPIPSERVICE(123) MAXDATALEN(1)|errorOne_}";
+    private static final String TCPIPSERVICE_INVALID_2 = "SET TCPIPSERVICE(123) BACKLOG(1) MAXDATALEN(1) CLOSED {OPEN|errorOne}";
+    private static final String TDQUEUE_INVALID_1 = "SET TDQUEUE(1) TERMINAL {NOTERMINAL|errorOne}";
+    private static final String TDQUEUE_INVALID_2 = "SET TDQUEUE(1) {DISABLED|errorOne} ENABLED";
+    private static final String TEMPSTORAGE_INVALID_1 = "SET {TEMPSTORAGE|errorOne} {NORESP|errorTwo}";
+    private static final String TERMINAL_INVALID_1 = "SET TERMINAL(1) NOTTI {TTI|errorOne}";
+    private static final String TERMINAL_INVALID_2 = "SET {_TERMINAL(1) FORCE|errorOne_}";
+    private static final String TRACEDEST_INVALID_1 = "SET TRACEDEST INTSTART {INTSTOP|errorOne}";
+    private static final String TRACEDEST_INVALID_2 = "SET TRACEDEST AUXPAUSE {AUXSTART|errorOne}";
+    private static final String TRACEFLAG_INVALID_1 = "SET TRACEFLAG SINGLEOFF {SINGLEON|errorOne}";
+    private static final String TRACEFLAG_INVALID_2 = "SET TRACEFLAG SYSTEMOFF {SYSTEMON|errorOne}";
     private static final String TRACETYPE_INVALID_1 = "SET TRACETYPE ";
     private static final String TRACETYPE_INVALID_2 = "SET TRACETYPE ";
     private static final String TRANCLASS_INVALID_1 = "SET TRANCLASS ";
@@ -576,7 +574,6 @@ public class TestCicsSysSetStatement {
     @Test
     void testCicsTempstorageValid() {
         CICSTestUtils.noErrorTest(TEMPSTORAGE_VALID_1);
-        CICSTestUtils.noErrorTest(TEMPSTORAGE_VALID_2);
     }
 
     @Test
@@ -908,56 +905,54 @@ public class TestCicsSysSetStatement {
 
     @Test
     void testCicsTaskInvalid() {
-        testSingleError(TASK_INVALID_1, "");
-        testSingleError(TASK_INVALID_2, "");
+        testSingleError(TASK_INVALID_1, "Options \"PURGETYPE, FORCEPURGE, KILL or PURGE\" are mutually exclusive.");
+        testSingleError(TASK_INVALID_2, "Options \"SRRSTATUS, SRRACTIVE or SRRINACTIVE\" are mutually exclusive.");
     }
 
     @Test
     void testCicsTclassInvalid() {
-        testSingleError(TCLASS_INVALID_1, "");
-        testSingleError(TCLASS_INVALID_2, "");
+        // No checks other than duplicates
     }
 
     @Test
     void testCicsTcpipInvalid() {
-        testSingleError(TCPIP_INVALID_1, "");
-        testSingleError(TCPIP_INVALID_2, "");
+        testSingleError(TCPIP_INVALID_1, "Missing required option: MAXSOCKETS");
+        testSingleError(TCPIP_INVALID_2, "Options \"OPENSTATUS, CLOSED, IMMCLOSE or OPEN\" are mutually exclusive.");
     }
 
     @Test
     void testCicsTcpipserviceInvalid() {
-        testSingleError(TCPIPSERVICE_INVALID_1, "");
-        testSingleError(TCPIPSERVICE_INVALID_2, "");
+        testSingleError(TCPIPSERVICE_INVALID_1, "Missing required option: BACKLOG");
+        testSingleError(TCPIPSERVICE_INVALID_2, "Options \"OPENSTATUS, CLOSED, IMMCLOSE or OPEN\" are mutually exclusive.");
     }
 
     @Test
     void testCicsTdqueueInvalid() {
-        testSingleError(TDQUEUE_INVALID_1, "");
-        testSingleError(TDQUEUE_INVALID_2, "");
+        testSingleError(TDQUEUE_INVALID_1, "Options \"ATIFACILITY, TERMINAL or NOTERMINAL\" are mutually exclusive.");
+        testSingleError(TDQUEUE_INVALID_2, "Options \"ENABLESTATUS, ENABLED or DISABLED\" are mutually exclusive.");
     }
 
     @Test
     void testCicsTempstorageInvalid() {
-        testSingleError(TEMPSTORAGE_INVALID_1, "");
-        testSingleError(TEMPSTORAGE_INVALID_2, "");
+        testTwoErrors(TEMPSTORAGE_INVALID_1, "Missing required option: TSMAINLIMIT", "Syntax error on 'NORESP'");
     }
 
     @Test
     void testCicsTerminalInvalid() {
-        testSingleError(TERMINAL_INVALID_1, "");
-        testSingleError(TERMINAL_INVALID_2, "");
+        testSingleError(TERMINAL_INVALID_1, "Options \"TTISTATUS, NOTTI or TTI\" are mutually exclusive.");
+        testSingleError(TERMINAL_INVALID_2, "Missing required option for: FORCE without PURGE");
     }
 
     @Test
     void testCicsTracedestInvalid() {
-        testSingleError(TRACEDEST_INVALID_1, "");
-        testSingleError(TRACEDEST_INVALID_2, "");
+        testSingleError(TRACEDEST_INVALID_1, "Options \"INTSTATUS, INTSTART or INTSTOP\" are mutually exclusive.");
+        testSingleError(TRACEDEST_INVALID_2, "Options \"AUXSTATUS, AUXPAUSE, AUXSTART or AUXSTOP\" are mutually exclusive.");
     }
 
     @Test
     void testCicsTraceflagInvalid() {
-        testSingleError(TRACEFLAG_INVALID_1, "");
-        testSingleError(TRACEFLAG_INVALID_2, "");
+        testSingleError(TRACEFLAG_INVALID_1, "Options \"SINGLESTATUS, SINGLEOFF or SINGLEON\" are mutually exclusive.");
+        testSingleError(TRACEFLAG_INVALID_2, "Options \"SYSTEMSTATUS, SYSTEMOFF or SYSTEMON\" are mutually exclusive.");
     }
 
     @Test
