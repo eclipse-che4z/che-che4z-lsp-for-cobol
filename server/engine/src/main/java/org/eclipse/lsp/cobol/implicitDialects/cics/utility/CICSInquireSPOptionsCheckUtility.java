@@ -23,7 +23,6 @@ import org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser;
 
 import java.util.*;
 
-import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.PSDINTERVAL;
 import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_inquire_system_programming;
 
 /**
