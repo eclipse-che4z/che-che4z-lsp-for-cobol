@@ -43,6 +43,7 @@ public class CICSCreateSPOptionsCheckUtility extends CICSOptionsCheckBaseUtility
                     put(CICSLexer.DUMPCODE, ErrorSeverity.ERROR);
                     put(CICSLexer.ENQMODEL, ErrorSeverity.ERROR);
                     put(CICSLexer.FILE, ErrorSeverity.ERROR);
+                    put(CICSLexer.PIPELINE, ErrorSeverity.ERROR);
                     put(CICSLexer.IPCONN, ErrorSeverity.ERROR);
                     put(CICSLexer.JOURNALMODEL, ErrorSeverity.ERROR);
                     put(CICSLexer.JVMSERVER, ErrorSeverity.ERROR);
@@ -95,7 +96,7 @@ public class CICSCreateSPOptionsCheckUtility extends CICSOptionsCheckBaseUtility
     }
     private void checkOpts(CICSParser.Cics_create_optsContext ctx) {
         checkHasMutuallyExclusiveOptions(ctx.ATOMSERVICE(), ctx.BUNDLE(), ctx.DB2CONN(), ctx.DB2ENTRY(), ctx.DB2TRAN(), ctx.DOCTEMPLATE(), ctx.DUMPCODE(),
-                ctx.ENQMODEL(), ctx.FILE(), ctx.IPCONN(), ctx.JOURNALMODEL(), ctx.JVMSERVER(), ctx.LIBRARY(),
+                ctx.ENQMODEL(), ctx.FILE(), ctx.PIPELINE(), ctx.IPCONN(), ctx.JOURNALMODEL(), ctx.JVMSERVER(), ctx.LIBRARY(),
                 ctx.LSRPOOL(), ctx.MAPSET(), ctx.MQCONN(), ctx.MQMONITOR(), ctx.PARTITIONSET(), ctx.PARTNER(),
                 ctx.PROCESSTYPE(), ctx.PROFILE(), ctx.PROGRAM(), ctx.TCPIPSERVICE(), ctx.TDQUEUE(), ctx.TRANCLASS(),
                 ctx.TRANSACTION(), ctx.TSMODEL(), ctx.TYPETERM(), ctx.URIMAP(), ctx.WEBSERVICE(), ctx.SESSIONS(),
