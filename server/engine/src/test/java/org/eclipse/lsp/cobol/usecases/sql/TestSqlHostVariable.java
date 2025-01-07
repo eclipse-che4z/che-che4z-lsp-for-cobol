@@ -220,7 +220,7 @@ public class TestSqlHostVariable {
                   + "         Working-Storage Section.\n"
                   + "       01 {$*VAR1}.\n"
                   + "          04 {$*VAR5`->VAR5`->VAR5-LENGTH`->VAR5-DATA} USAGE IS SQL TYPE IS CLOB (20) OCCURS 30 TIMES.\n"
-                  + "          04 {$*VAR6`->VAR6`->VAR6-LENGTH`->VAR6-DATA} USAGE IS SQL TYPE IS DBCLOB (30 K) OCCURS 40.\n"
+                  + "          04 {$*VAR6`->VAR6`->VAR6-LENGTH`->VAR6-DATA} USAGE IS SQL TYPE IS DBCLOB (30K) OCCURS 40.\n"
                   + "        PROCEDURE DIVISION.\n"
                   + "           DISPLAY {$VAR1}.\n";
 

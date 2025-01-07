@@ -21,6 +21,7 @@ import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * CICS Test Utils.
@@ -28,7 +29,7 @@ import java.util.*;
  * <p>This class provides helper methods for generating CICS example test strings.
  */
 public class CICSTestUtils {
-  private static final String GROUP_ONE_BASE_TEXT =
+  private static final String BASE_TEXT =
       "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID. ABCDEF.\n"
           + "       DATA DIVISION.\n"
@@ -47,12 +48,19 @@ public class CICSTestUtils {
    * Retrieves a formatted test string for CICS command testing
    *
    * @param components Components to add to the EXEC CICS block of the test string
+   * @param compilerOptions Compiler options fo translator specification
    * @return Formatted test string
    */
-  public static String getTestString(String components) {
+  public static String getTestString(String components, String... compilerOptions) {
     List<String> instances = Arrays.asList(components.split("\\s"));
     instances.replaceAll(String.join("", Collections.nCopies(12, " "))::concat);
-    ArrayList<String> base = new ArrayList<String>(Arrays.asList(GROUP_ONE_BASE_TEXT.split("\n")));
+    List<String> compilerOptionsList =
+        Arrays.stream(compilerOptions)
+            .map(compilerOption -> compilerOption = "       CBL CICS(\"" + compilerOption + "\")")
+            .collect(Collectors.toList());
+
+    ArrayList<String> base = new ArrayList<String>(Arrays.asList(BASE_TEXT.split("\n")));
+    base.addAll(0, compilerOptionsList);
     base.addAll(base.size() - 1, instances);
     return String.join("\n", base);
   }
@@ -61,9 +69,11 @@ public class CICSTestUtils {
    * Runs a test asserting no errors
    *
    * @param newCommand Command string to test
+   * @param options Compiler options fo translator specification
    */
-  public static void noErrorTest(String newCommand) {
-    UseCaseEngine.runTest(getTestString(newCommand), ImmutableList.of(), ImmutableMap.of());
+  public static void noErrorTest(String newCommand, String... options) {
+    UseCaseEngine.runTest(
+        getTestString(newCommand, options), ImmutableList.of(), ImmutableMap.of());
   }
 
   /**
@@ -71,8 +81,11 @@ public class CICSTestUtils {
    *
    * @param newCommand Error command to execute
    * @param expectedDiagnostic Errors to match
+   * @param options Compiler options fo translator specification
    */
-  public static void errorTest(String newCommand, Map<String, Diagnostic> expectedDiagnostic) {
-    UseCaseEngine.runTest(getTestString(newCommand), ImmutableList.of(), expectedDiagnostic);
+  public static void errorTest(
+      String newCommand, Map<String, Diagnostic> expectedDiagnostic, String... options) {
+    UseCaseEngine.runTest(
+        getTestString(newCommand, options), ImmutableList.of(), expectedDiagnostic);
   }
 }
