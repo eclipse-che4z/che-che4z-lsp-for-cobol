@@ -53,7 +53,6 @@ AS : A S;
 ASC : A S C;
 ASCII : A S C I I;
 ASENSITIVE : A S E N S I T I V E;
-ASSEMBLE : A S S E M B L E;
 ASSOCIATE : A S S O C I A T E;
 ASUTIME : A S U T I M E;
 AT : A T;
@@ -72,7 +71,6 @@ BEGIN : B E G I N;
 BETWEEN : B E T W E E N;
 BIGINT : B I G I N T;
 BINARY : B I N A R Y;
-BINARY_STRING_CONSTANT : BXNUMBER;
 BIND : B I N D;
 BINDADD : B I N D A D D;
 BINDAGENT : B I N D A G E N T;
@@ -120,7 +118,6 @@ CLONE : C L O N E;
 CLOSE : C L O S E;
 CLUSTER : C L U S T E R;
 COALESCE : C O A L E S C E;
-COBOL : C O B O L;
 COLLECTION : C O L L E C T I O N;
 COLLID : C O L L I D;
 COLUMN : C O L U M N;
@@ -339,7 +336,7 @@ FREEPAGE : F R E E P A G E;
 FROM : F R O M;
 FULL : F U L L;
 FUNCTION : F U N C T I O N;
-FUNCTION_LEVEL_10: V '1' ZERO_DIGIT R '1';
+FUNCTION_LEVEL_10: V '1' '0' R '1';
 FUNCTION_LEVEL_11: V '1' '1' R '1';
 FUNCTION_LEVEL_12: V DIGIT DIGIT R DIGIT M DIGIT DIGIT DIGIT;
 GBPCACHE : G B P C A C H E;
@@ -356,7 +353,6 @@ GRANT : G R A N T;
 GRAPHIC : G R A P H I C;
 GROUP : G R O U P;
 GROUPING : G R O U P I N G;
-G_CHAR: G;
 HANDLER : H A N D L E R;
 HASH : H A S H;
 HAVING : H A V I N G;
@@ -404,19 +400,16 @@ ISO : I S O;
 ISOLATION : I S O L A T I O N;
 ITERATE : I T E R A T E;
 JAR : J A R;
-JAVA : J A V A;
 JIS : J I S;
 JOBNAME: J O B N A M E;
 JOIN : J O I N;
 KEEP : K E E P;
 KEY : K E Y;
 KEYS : K E Y S;
-K_CHAR: K;
 LABEL : L A B E L;
 LABELS : L A B E L S;
 LAG: L A G;
 LANGUAGE : L A N G U A G E;
-LANGUAGE_C : C;
 LARGE : L A R G E;
 LAST : L A S T;
 LAST_VALUE: L A S T UNDERSCORECHAR V A L U E;
@@ -475,7 +468,6 @@ MONTHS : M O N T H S;
 MORECHAR : M O R E;
 MOVE : M O V E;
 MULTIPLIER : M U L T I P L I E R;
-M_CHAR: M;
 NAME : N A M E;
 NAMES : N A M E S;
 NAMESPACE : N A M E S P A C E;
@@ -553,7 +545,6 @@ PERIOD : P E R I O D;
 PERMISSION : P E R M I S S I O N;
 PIECESIZE : P I E C E S I Z E;
 PLAN : P L A N;
-PLI : P L I;
 PORTION : P O R T I O N;
 POSITION : P O S I T I O N;
 POSITIONING : P O S I T I O N I N G;
@@ -675,7 +666,6 @@ SOURCE : S O U R C E;
 SPACE : S P A C E;
 SPECIAL : S P E C I A L;
 SPECIFIC : S P E C I F I C;
-SQL : S Q L;
 SQLIMS: S Q L I M S;
 SQLADM : S Q L A D M;
 SQLCA : S Q L C A;
@@ -839,7 +829,6 @@ SEMICOLONSEPARATORSQL : '; ' ;
 COMMASEPARATORDB2 : ', ' ;
 
 // Constructors symbols
-GRAPHIC_CONSTANT : GRAPHICUNICODE | GRAHICCHAR;
 DOUBLESLASHCHAR : '//';
 LSQUAREBRACKET :     '[';
 RSQUAREBRACKET :     ']';
@@ -847,9 +836,6 @@ PIPECHAR : '||';
 PIPECHAR2 : '!!';
 QUESTIONMARK : '?';
 PERCENT : '%';
-SELECT_ALL : '.*';
-SINGLEDIGIT_1: '1';
-DOUBLEDIGIT_1: '01';
 TIMESTAMPLITERAL: DIGIT DIGIT '.' DIGIT DIGIT '.' DIGIT DIGIT | // hh.mm.ss;
                   DIGIT DIGIT '.' DIGIT DIGIT (A M | P M) | //hh:mm AM /PM
                   DIGIT DIGIT '.' DIGIT DIGIT ':' DIGIT DIGIT |// hh.mm:ss
@@ -859,10 +845,8 @@ DATELITERAL: '\'' (DIGIT DIGIT DIGIT DIGIT '-' DIGIT DIGIT '-' DIGIT DIGIT | //y
                    DIGIT DIGIT '.' DIGIT DIGIT '.' DIGIT DIGIT DIGIT DIGIT |//dd.mm.yyyy
                    DIGIT DIGIT '-' DIGIT DIGIT '-' DIGIT DIGIT DIGIT DIGIT) TIMESTAMPLITERAL? '\'';//yyyy-mm-dd
 
-SINGLEDIGITLITERAL : DIGIT;
 INTEGERLITERAL : DIGIT+;
 IDENTIFIER : [\p{Alnum}\p{General_Category=Other_Letter}] [-_\p{Alnum}\p{General_Category=Other_Letter}]*;
-
 NUMERICLITERAL : (PLUSCHAR | MINUSCHAR)?
     (
         (DOT_FS | COMMACHAR { commaCharAllowed }?) DIGIT+ (('e' | 'E') (PLUSCHAR | MINUSCHAR)? DIGIT+)?
@@ -880,14 +864,11 @@ NUMERICLITERAL : (PLUSCHAR | MINUSCHAR)?
         )
     );
 
-NONNUMERICLITERAL : UNTRMSTRINGLITERAL | STRINGLITERAL | DBCSLITERAL | HEXNUMBER | NULLTERMINATED;
+CHAR_STRING_LITERAL: STRINGLITERAL;
+HEXSTRING: HEXNUMBER;
+BXSTRING: BXNUMBER;
+GRAPHIC_CONSTANT : GRAPHICUNICODE | GRAHICCHAR;
 
-CHAR_STRING_CONSTANT : HEXNUMBER | STRINGLITERAL;
-
-FILENAME : IDENTIFIER+ '.' IDENTIFIER+;
-
-OCTDIGITS : OCT_DIGIT;
-HEX_NUMBERS : HEXNUMBER;
 // whitespace, line breaks, comments, ...
 NEWLINE : '\r'? '\n' -> channel(HIDDEN);
 WS : [ \t\f]+ -> channel(HIDDEN);
@@ -900,16 +881,24 @@ SQLLINECOMMENT
 // treat all the non-processed tokens as errors
 ERRORCHAR : . ;
 
-ZERO_DIGIT: '0';
-
 fragment HEXNUMBER :
 	X '"' [0-9A-Fa-f]+ '"'
 	| X '\'' [0-9A-Fa-f]+ '\''
 ;
 
-fragment NULLTERMINATED :
-	Z '"' (~["\n\r] | '""' | '\'')* '"'
-	| Z '\'' (~['\n\r] | '\'\'' | '"')* '\''
+fragment BXNUMBER :
+	B X '"' [0-9A-Fa-f]+ '"'
+	| B X '\'' [0-9A-Fa-f]+ '\''
+;
+
+fragment GRAPHICUNICODE :
+	U X '"' [0-9A-Fa-f]+ '"'
+	| U X '\'' [0-9A-Fa-f]+ '\''
+;
+
+fragment GRAHICCHAR :
+	G X '"' [0-9A-Fa-f]+ '"'
+	| G X '\'' [0-9A-Fa-f]+ '\''
 ;
 
 fragment STRINGLITERAL :
@@ -917,34 +906,7 @@ fragment STRINGLITERAL :
 	| '\'' (~['\n\r] | '\'\'' | '"')* '\''
 ;
 
-fragment UNTRMSTRINGLITERAL :
-	'"' (~["\n\r] | '""' | '\'')*
-	| '\'' (~['\n\r] | '\'\'' | '"')*
-;
-
-fragment DBCSLITERAL :
-	[GN] '"' (~["\n\r] | '""' | '\'')* '"'
-	| [GN] '\'' (~['\n\r] | '\'\'' | '"')* '\''
-;
-
-fragment BXNUMBER :
-	B X '"' [0-9A-F]+ '"'
-	| B X '\'' [0-9A-F]+ '\''
-;
-
-fragment GRAPHICUNICODE :
-	U X '"' [0-9A-F]+ '"'
-	| U X '\'' [0-9A-F]+ '\''
-;
-
-fragment GRAHICCHAR :
-	G X '"' [0-9A-F]+ '"'
-	| G X '\'' [0-9A-F]+ '\''
-;
-
-fragment
- OCT_DIGIT        : [0-8] ;
- fragment DIGIT: OCT_DIGIT | [9];
+ fragment DIGIT: [0-9];
  // case insensitive chars
  fragment A:('a'|'A');
  fragment B:('b'|'B');

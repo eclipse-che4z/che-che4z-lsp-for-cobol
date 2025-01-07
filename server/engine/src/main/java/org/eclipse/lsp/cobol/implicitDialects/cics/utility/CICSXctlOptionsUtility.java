@@ -56,14 +56,14 @@ public class CICSXctlOptionsUtility extends CICSOptionsCheckBaseUtility {
    * @param <E> A subclass of ParserRuleContext
    */
   public <E extends ParserRuleContext> void checkOptions(E ctx) {
-    if (ctx.getParent().getRuleIndex() == CICSParser.RULE_cics_xctl) {
-      checkXctl((CICSParser.Cics_xctlContext) ctx.getParent());
+    if (ctx.getRuleIndex() == CICSParser.RULE_cics_xctl_body) {
+      checkXctl((CICSParser.Cics_xctl_bodyContext) ctx);
     }
-    checkDuplicates(ctx.getParent());
+    checkDuplicates(ctx);
   }
 
   @SuppressWarnings("unchecked")
-  private void checkXctl(CICSParser.Cics_xctlContext ctx) {
+  private void checkXctl(CICSParser.Cics_xctl_bodyContext ctx) {
     checkHasMandatoryOptions(ctx.PROGRAM(), ctx, "PROGRAM");
     checkHasMutuallyExclusiveOptions("COMMAREA or CHANNEL", ctx.COMMAREA(), ctx.CHANNEL());
 

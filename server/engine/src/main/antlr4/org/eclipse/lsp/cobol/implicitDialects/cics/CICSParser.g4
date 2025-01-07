@@ -382,9 +382,11 @@ cics_get_counter_dcounter: ((COUNTER | DCOUNTER | POOL) cics_name | VALUE cics_d
                   WRAP | NOSUSPEND | REDUCE | cics_handle_response)*;
 
 /** GETMAIN */
-cics_getmain: GETMAIN (SET cics_ref | FLENGTH cics_data_value | BELOW | LENGTH cics_data_value | INITIMG cics_data_value |
+cics_getmain: GETMAIN cics_getmain_body;
+cics_getmain_body: (SET cics_ref | FLENGTH cics_data_value | BELOW | LENGTH cics_data_value | INITIMG cics_data_value |
               EXECUTABLE | SHARED | NOSUSPEND | USERDATAKEY | CICSDATAKEY | cics_handle_response)+;
-cics_getmain64: GETMAIN64 (SET cics_ref | FLENGTH cics_data_value | LOCATION cics_cvda |
+cics_getmain64: GETMAIN64 cics_getmain64_body;
+cics_getmain64_body: (SET cics_ref | FLENGTH cics_data_value | LOCATION cics_cvda |
                   EXECUTABLE | SHARED | NOSUSPEND | USERDATAKEY | CICSDATAKEY | cics_handle_response)+;
 
 
@@ -632,7 +634,8 @@ cics_monitor: MONITOR cics_monitor_options;
 cics_monitor_options: (POINT cics_data_value | (DATA1 | DATA2 | ENTRYNAME) cics_data_area | cics_handle_response)+;
 
 /** MOVE CONTAINER (both) */
-cics_move: MOVE ((CONTAINER | FROMACTIVITY | TOACTIVITY | AS | CHANNEL | TOCHANNEL) cics_data_value | FROMPROCESS |
+cics_move: MOVE cics_move_body;
+cics_move_body: ((CONTAINER | FROMACTIVITY | TOACTIVITY | AS | CHANNEL | TOCHANNEL) cics_data_value | FROMPROCESS |
            TOPROCESS | cics_handle_response)+;
 
 /** POINT */
@@ -644,8 +647,10 @@ cics_pop: POP cics_pop_option;
 cics_pop_option: (HANDLE | cics_handle_response)*;
 
 /** POST */
-cics_post: POST (INTERVAL cics_zero_digit | INTERVAL cics_hhmmss | TIME cics_hhmmss | cics_post_after | SET cics_ref
-           REQID cics_name | cics_handle_response)*;
+cics_post: POST cics_post_options;
+cics_post_options: (INTERVAL (cics_zero_digit | cics_hhmmss) | TIME cics_hhmmss | AFTER | (HOURS | MINUTES | SECONDS) cics_data_value |
+                 AT | SET cics_ref | REQID cics_name | cics_handle_response)+;
+
 cics_post_after: (AFTER | AT | HOURS cics_data_value | MINUTES cics_data_value | SECONDS cics_data_value | cics_handle_response)+;
 
 /** PURGE MESSAGE */
@@ -674,21 +679,23 @@ cics_read: READ (cics_file_name | UNCOMMITTED | CONSISTENT | REPEATABLE | UPDATE
            XRBA | EQUAL | GTEQ | NOSUSPEND | cics_handle_response)+;
 
 /** READNEXT | READPREV*/
-cics_readnext_readprev: (READNEXT | READPREV)  (cics_file_name | INTO cics_data_area | SET cics_ref | UNCOMMITTED | CONSISTENT | REPEATABLE |
+cics_readnext_readprev: (READNEXT | READPREV)  cics_readnext_readprev_body;
+cics_readnext_readprev_body: (cics_file_name | INTO cics_data_area | SET cics_ref | UNCOMMITTED | CONSISTENT | REPEATABLE |
                UPDATE | TOKEN cics_data_area | RIDFLD cics_data_area | KEYLENGTH cics_data_value | REQID cics_data_value |
                SYSID cics_data_area | LENGTH cics_data_area | RBA | RRN | XRBA | NOSUSPEND | cics_handle_response)*;
 
 /** READQ TD / TS */
-cics_readq: READQ (cics_readq_td | cics_readq_ts);
-cics_readq_td: (TD | QUEUE cics_name | cics_into_set | LENGTH cics_data_area | SYSID cics_data_area | NOSUSPEND | cics_handle_response)+;
-cics_readq_ts: (TS | (QUEUE | QNAME) cics_name | cics_into_set | NEXT | (LENGTH | NUMITEMS | SYSID) cics_data_area |
-                ITEM cics_data_value | cics_handle_response)+;
+cics_readq: READQ cics_readq_ts_td;
+cics_readq_ts_td: (TS | TD | (QUEUE | QNAME) cics_name | cics_into_set | NEXT | (LENGTH | NUMITEMS | SYSID) cics_data_area |
+                   ITEM cics_data_value | NOSUSPEND | cics_handle_response)+;
 
 /** RELEASE */
-cics_release: RELEASE cics_handle_response? PROGRAM cics_name cics_handle_response?;
+cics_release: RELEASE cics_release_option;
+cics_release_option: (PROGRAM cics_name | cics_handle_response)+;
 
 /** REMOVE SUBEVENT */
-cics_remove: REMOVE (SUBEVENT cics_data_value | EVENT cics_data_value | cics_handle_response)+;
+cics_remove: REMOVE cics_remove_option;
+cics_remove_option: ((SUBEVENT | EVENT) cics_data_value | cics_handle_response)+;
 
 /** RESET ACQPROCESS / RESET ACTIVITY */
 cics_reset: RESET (cics_reset_acqprocess | cics_reset_activity);
@@ -714,9 +721,8 @@ cics_return_transid: (TRANSID cics_name | CHANNEL cics_name | COMMAREA cics_data
 cics_return_inputmsg: (INPUTMSG cics_data_area | INPUTMSGLEN cics_data_value | cics_handle_response)+;
 
 /** REWIND COUNTER / DCOUNTER */
-cics_rewind: REWIND (cics_rewind_counter | cics_rewind_dcounter);
-cics_rewind_counter: COUNTER cics_name (POOL cics_name | INCREMENT cics_data_value | cics_handle_response)*;
-cics_rewind_dcounter: DCOUNTER cics_name (POOL cics_name | INCREMENT cics_data_area | cics_handle_response)*;
+cics_rewind: REWIND cics_rewind_opts;
+cics_rewind_opts:(COUNTER cics_name | DCOUNTER cics_name | NOSUSPEND | POOL cics_name | INCREMENT cics_data_value | cics_handle_response)+;
 
 /** REWRITE: */
 cics_rewrite: REWRITE cics_file_name (TOKEN cics_data_area | FROM cics_data_area | SYSID cics_data_area
@@ -759,8 +765,8 @@ cics_soapfault_faultactor: (FAULTACTOR cics_data_value | FAULTACTLEN cics_data_v
 cics_soapfault_detail: (DETAIL cics_data_value | DETAILLENGTH cics_data_value)+;
 
 /** SPOOLCLOSE */
-cics_spoolclose: SPOOLCLOSE (TOKEN cics_data_area | KEEP | DELETE | NOHANDLE | cics_spoolclose_resp | cics_handle_response)+;
-cics_spoolclose_resp: RESP RESP2?;
+cics_spoolclose: SPOOLCLOSE cics_spoolclose_options;
+cics_spoolclose_options: (TOKEN cics_data_area | KEEP | DELETE | cics_handle_response)+;
 
 /** SPOOLOPEN INPUT / SPOOLOPEN OUTPUT */
 cics_spoolopen: SPOOLOPEN (cics_spoolopen_input | cics_spoolopen_output);
@@ -769,12 +775,12 @@ cics_spoolopen_output: (OUTPUT | TOKEN cics_data_area | (USERID | NODE | CLASS |
                 NOCC | ASA | MCC | PRINT | PUNCH | NOHANDLE | cics_handle_response)+;
 
 /** SPOOLREAD */
-cics_spoolread: SPOOLREAD (TOKEN cics_data_area | INTO cics_data_area | MAXFLENGTH cics_data_value |
-                TOFLENGTH cics_data_area | NOHANDLE | cics_spoolclose_resp | cics_handle_response)+;
+cics_spoolread: SPOOLREAD cics_spoolread_options;
+cics_spoolread_options: ((TOKEN | INTO | TOFLENGTH) cics_data_area | MAXFLENGTH cics_data_value | cics_handle_response)+;
 
 /** SPOOLWRITE */
-cics_spoolwrite: SPOOLWRITE (TOKEN cics_data_area | FROM cics_data_area | FLENGTH cics_data_value | LINE | PAGE |
-                 NOHANDLE | cics_spoolclose_resp | cics_handle_response)+;
+cics_spoolwrite: SPOOLWRITE cics_spoolwrite_options;
+cics_spoolwrite_options: ((TOKEN | FROM) cics_data_area | FLENGTH cics_data_value | LINE | PAGE  | cics_handle_response)+;
 
 /** START - / ATTACH / BREXIT / CHANNEL */
 cics_start: START (cics_start_transid | cics_start_attach | cics_start_brexit);
@@ -807,10 +813,12 @@ cics_suspend: SUSPEND cics_suspend_body;
 cics_suspend_body: (ACQACTIVITY | ACQPROCESS | ACTIVITY cics_data_value | cics_handle_response)*;
 
 /** SYNCPOINT / SYNCPOINT ROLLBACK */
-cics_syncpoint: SYNCPOINT (cics_handle_response | ROLLBACK)*;
+cics_syncpoint: SYNCPOINT cics_syncpoint_rollback;
+cics_syncpoint_rollback: (ROLLBACK | cics_handle_response)*;
 
 /** TEST EVENT */
-cics_test: TEST (EVENT cics_data_value | FIRESTATUS cics_cvda | cics_handle_response)+;
+cics_test: TEST cics_test_body;
+cics_test_body: (EVENT cics_data_value | FIRESTATUS cics_cvda | cics_handle_response)+;
 
 /** TRANSFORM DATATOXML / XMLTODATA */
 cics_transform: TRANSFORM (cics_transform_datatoxml | cics_transform_xmltodata);
@@ -827,12 +835,12 @@ cics_transform_xmltodata: XMLTODATA (CHANNEL cics_data_value | DATCONTAINER cics
                           cics_transform_typens | XMLCONTAINER cics_data_value | XMLTRANSFORM cics_name | cics_handle_response)+;
 
 /** UNLOCK */
-cics_unlock: UNLOCK (cics_file_name | TOKEN cics_data_area | SYSID cics_data_area | cics_handle_response)+;
+cics_unlock: UNLOCK cics_unlock_body;
+cics_unlock_body: (cics_file_name | TOKEN cics_data_area | SYSID cics_data_area | cics_handle_response)+;
 
-/** UPDATE COUNTER / DCOUNTER */
-cics_update: UPDATE (cics_update_counter | cics_update_dcounter);
-cics_update_counter: COUNTER cics_name (POOL cics_name | VALUE cics_data_value | COMPAREMIN cics_data_value | COMPAREMAX cics_data_value | cics_handle_response)+;
-cics_update_dcounter: DCOUNTER cics_name (POOL cics_name | VALUE cics_data_area | COMPAREMIN cics_data_area | COMPAREMAX cics_data_area | cics_handle_response)+;
+/** UPDATE COUNTER / UPDATE DCOUNTER */
+cics_update: UPDATE cics_update_counter_dcounter;
+cics_update_counter_dcounter: ((COUNTER | DCOUNTER | POOL) cics_name | (VALUE  | COMPAREMIN  | COMPAREMAX) cics_data_value | NOSUSPEND | cics_handle_response)+;
 
 /** VERIFY PASSWORD / VERIFY PHRASE / VERIFY TOKEN */
 cics_verify: VERIFY (cics_verify_password | cics_verify_phrase | cics_verify_token);
@@ -853,7 +861,8 @@ cics_wait_signal: (SIGNAL | cics_handle_response)+;
 cics_wait_terminal: (TERMINAL | (CONVID | SESSION) cics_name | cics_handle_response)+;
 
 /** WAITCICS */
-cics_waitcics: WAITCICS (ECBLIST cics_value | NUMEVENTS cics_data_value | PURGEABLE | PURGEABILITY cics_cvda |
+cics_waitcics: WAITCICS cics_waitcics_body;
+cics_waitcics_body: (ECBLIST cics_value | NUMEVENTS cics_data_value | PURGEABLE | PURGEABILITY cics_cvda |
                NOTPURGEABLE | NAME cics_name | cics_handle_response)+;
 
 /** WEB (all) */
@@ -978,12 +987,14 @@ cics_wsacontext_grelatesuri: RELATESURI cics_data_area (RELATESTYPE cics_data_ar
 cics_wsacontext_geprtype: EPRTYPE cics_cvda (EPRFIELD cics_cvda | EPRINTO cics_data_area | EPRSET cics_ref | EPRLENGTH cics_data_area | cics_handle_response)+;
 
 /** WSAEPR CREATE */
-cics_wsaepr: WSAEPR (CREATE | EPRINTO cics_data_area | EPRSET cics_data_area | EPRLENGTH cics_data_area | ADDRESS cics_data_value |
+cics_wsaepr: WSAEPR cics_wsaepr_body;
+cics_wsaepr_body: (CREATE | EPRINTO cics_data_area | EPRSET cics_data_area | EPRLENGTH cics_data_area | ADDRESS cics_data_value |
              REFPARMS cics_data_value | REFPARMSLEN cics_data_value | METADATA cics_data_value | METADATALEN cics_data_value |
              FROMCCSID cics_data_value | FROMCODEPAGE cics_data_value | cics_handle_response)+;
 
 /** XCTL: */
-cics_xctl: XCTL (PROGRAM cics_name | COMMAREA cics_data_area | LENGTH cics_data_value | CHANNEL cics_name | INPUTMSG cics_data_area |
+cics_xctl: XCTL cics_xctl_body;
+cics_xctl_body: (PROGRAM cics_name | COMMAREA cics_data_area | LENGTH cics_data_value | CHANNEL cics_name | INPUTMSG cics_data_area |
            INPUTMSGLEN cics_data_value | cics_handle_response)+;
 
 /** FILE or DATASET */

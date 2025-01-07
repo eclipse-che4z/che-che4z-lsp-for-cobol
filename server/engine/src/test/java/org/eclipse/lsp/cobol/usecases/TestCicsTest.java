@@ -19,7 +19,6 @@ import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.usecases.common.CICSTestUtils;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
-import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
@@ -34,8 +33,8 @@ public class TestCicsTest {
   private static final String TEST_EVENT_VALID_ONE = "TEST EVENT({$varOne}) FIRESTATUS({$varTwo})";
   private static final String TEST_EVENT_VALID_TWO = "TEST FIRESTATUS({$varTwo}) EVENT({$varOne})";
 
-  private static final String TEST_EVENT_INVALID_ONE = "TEST {EVENT|error1}({$varOne})";
-  private static final String TEST_EVENT_INVALID_TWO = "TEST {FIRESTATUS|error1}({$varTwo})";
+  private static final String TEST_EVENT_INVALID_ONE = "TEST {_EVENT({$varOne})|error1_}";
+  private static final String TEST_EVENT_INVALID_TWO = "TEST {_FIRESTATUS({$varTwo})|error1_}";
 
 
   @Test
@@ -54,7 +53,7 @@ public class TestCicsTest {
             ImmutableMap.of(
             "error1",
             new Diagnostic(
-                    new Range(new Position(12, 12), new Position(13, 25)),
+                    new Range(),
                     "Missing required option: FIRESTATUS",
                     DiagnosticSeverity.Error,
                     ErrorSource.PARSING.getText())));
@@ -66,7 +65,7 @@ public class TestCicsTest {
             ImmutableMap.of(
                     "error1",
                     new Diagnostic(
-                            new Range(new Position(12, 12), new Position(13, 30)),
+                            new Range(),
                             "Missing required option: EVENT",
                             DiagnosticSeverity.Error,
                             ErrorSource.PARSING.getText())));

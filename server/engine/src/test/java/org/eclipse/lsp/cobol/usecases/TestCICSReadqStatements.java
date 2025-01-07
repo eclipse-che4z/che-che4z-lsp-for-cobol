@@ -36,6 +36,10 @@ public class TestCICSReadqStatements {
             "READQ TD QUEUE({$varFour}) NOHANDLE INTO({$varFour})\n "
                    + "LENGTH({$varFour}) SYSID({$varFour})\n "
                    + "NOSUSPEND ";
+    private static final String READQ_TD_TWEAK_VALID =
+            "READQ  QUEUE({$varFour}) NOHANDLE INTO({$varFour})\n "
+                    + "LENGTH({$varFour}) SYSID({$varFour})\n "
+                    + "NOSUSPEND TD";
     private static final String READQ_TD_SET_VALID =
             "READQ TD QUEUE({$varFour}) NOHANDLE SET({$varFour})\n "
                     + "LENGTH({$varFour}) SYSID({$varFour})\n "
@@ -53,22 +57,33 @@ public class TestCICSReadqStatements {
                     + "LENGTH({$varFour}) NUMITEMS({$varFour})\n "
                     + "NEXT SYSID({$varFour})";
     private static final String READQ_QUEUE_INVALID =
-            "READQ {QUEUE(100)|errorMissingTd}";
+            "READQ {_QUEUE({$varFour})|errorMissingTd_}";
     private static final String READQ_QUEUE_INTO_SET_INVALID =
-            "READQ TD QUEUE({$varFour}) {INTO|errorExclusiveInto}(100) \n "
-                    + "{SET|errorExclusiveInto2}(100)";
+            "READQ TD QUEUE({$varFour}) {INTO|errorExclusiveInto}({$varFour}) \n "
+                    + "{SET|errorExclusiveInto2}({$varFour})";
     private static final String READQ_QUEUE_QNAME_INVALID =
-            "READQ TS INTO({$varFour}) {QNAME|errorExclusiveQueue}(100) \n "
-                    + "{QUEUE|errorExclusiveQueue2}(100)";
+            "READQ TS INTO({$varFour}) {QNAME|errorExclusiveQueue}({$varFour}) \n "
+                    + "{QUEUE|errorExclusiveQueue2}({$varFour})";
     private static final String READQ_NEXT_ITEM_INVALID =
             "READQ SET({$varFour}) LENGTH({$varFour}) {NEXT|errorExclusiveNext} \n "
-                    + "{ITEM|errorExclusiveNext2}(100) QNAME({$varFour})";
+                    + "{ITEM|errorExclusiveNext2}({$varFour}) QNAME({$varFour})";
     private static final String READQ_SET_LENGTH_INVALID =
-            "READQ QNAME({$varFour}) {SET(100)|errorMissingLength}";
+            "READQ QNAME({$varFour}) {_SET({$varFour})|errorMissingLength_}";
+    private static final String READQ_TS_TD_INVALID =
+            "READQ QUEUE({$varFour}) INTO({$varFour}) {TD|errorInvalidTd} {TS|errorInvalidTs}";
+    private static final String READQ_TD_ILLEGAL_OPTS_INVALID =
+            "READQ TD QUEUE({$varFour}) INTO({$varFour}) {_ITEM|errorItemIllegal_}({$varFour})"
+            + "{_NEXT|errorNextIllegal_} {_NUMITEMS|errorNumItemIllegal_}({$varFour})"
+            + "{_QNAME|errorQnameIllegal_}({$varFour})";
+
 
     @Test
     void testReadqTdValid() {
         CICSTestUtils.noErrorTest(READQ_TD_VALID);
+    }
+    @Test
+    void testReadqTdTweakValid() {
+        CICSTestUtils.noErrorTest(READQ_TD_TWEAK_VALID);
     }
     @Test
     void testReadqTdSetValid() {
@@ -169,4 +184,55 @@ public class TestCICSReadqStatements {
 
         CICSTestUtils.errorTest(READQ_SET_LENGTH_INVALID, expectedDiagnostic);
     }
+    @Test
+    void testReadqTdTsInvalid() {
+        Map<String, Diagnostic> expectedDiagnostic =
+                ImmutableMap.of(
+                        "errorInvalidTs",
+                        new Diagnostic(
+                                new Range(),
+                                "Exactly one option required, options are mutually exclusive: TD or TS",
+                                DiagnosticSeverity.Error,
+                                ErrorSource.PARSING.getText()),
+                        "errorInvalidTd",
+                        new Diagnostic(
+                                new Range(),
+                                "Exactly one option required, options are mutually exclusive: TD or TS",
+                                DiagnosticSeverity.Error,
+                                ErrorSource.PARSING.getText()));
+
+        CICSTestUtils.errorTest(READQ_TS_TD_INVALID, expectedDiagnostic);
+    }
+    @Test
+    void testReadqTdIllegalOptsInvalid() {
+        Map<String, Diagnostic> expectedDiagnostic =
+                ImmutableMap.of(
+                        "errorItemIllegal",
+                        new Diagnostic(
+                                new Range(),
+                                "Invalid option provided: ITEM",
+                                DiagnosticSeverity.Error,
+                                ErrorSource.PARSING.getText()),
+                        "errorNextIllegal",
+                        new Diagnostic(
+                                new Range(),
+                                "Invalid option provided: NEXT",
+                                DiagnosticSeverity.Error,
+                                ErrorSource.PARSING.getText()),
+                        "errorNumItemIllegal",
+                        new Diagnostic(
+                                new Range(),
+                                "Invalid option provided: NUMITEMS",
+                                DiagnosticSeverity.Error,
+                                ErrorSource.PARSING.getText()),
+                        "errorQnameIllegal",
+                        new Diagnostic(
+                                new Range(),
+                                "Invalid option provided: QNAME",
+                                DiagnosticSeverity.Error,
+                                ErrorSource.PARSING.getText()));
+
+        CICSTestUtils.errorTest(READQ_TD_ILLEGAL_OPTS_INVALID, expectedDiagnostic);
+    }
+
 }

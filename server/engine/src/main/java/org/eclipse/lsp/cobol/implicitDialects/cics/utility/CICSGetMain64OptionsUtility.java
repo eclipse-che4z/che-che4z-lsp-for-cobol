@@ -58,14 +58,14 @@ public class CICSGetMain64OptionsUtility extends CICSOptionsCheckBaseUtility {
    * @param <E> A subclass of ParserRuleContext
    */
   public <E extends ParserRuleContext> void checkOptions(E ctx) {
-    if (ctx.getParent().getRuleIndex() == CICSParser.RULE_cics_getmain64) {
-      checkGetMain((CICSParser.Cics_getmain64Context) ctx.getParent());
+    if (ctx.getRuleIndex() == CICSParser.RULE_cics_getmain64_body) {
+      checkGetMain((CICSParser.Cics_getmain64_bodyContext) ctx);
     }
-    checkDuplicates(ctx.getParent());
+    checkDuplicates(ctx);
   }
 
   @SuppressWarnings("unchecked")
-  private void checkGetMain(CICSParser.Cics_getmain64Context ctx) {
+  private void checkGetMain(CICSParser.Cics_getmain64_bodyContext ctx) {
     checkHasMandatoryOptions(ctx.SET(), ctx, "SET");
     checkHasMandatoryOptions(ctx.FLENGTH(), ctx, "FLENGTH");
     if (ctx.LOCATION().isEmpty()) checkHasIllegalOptions(ctx.EXECUTABLE(), "EXECUTABLE without LOCATION");
