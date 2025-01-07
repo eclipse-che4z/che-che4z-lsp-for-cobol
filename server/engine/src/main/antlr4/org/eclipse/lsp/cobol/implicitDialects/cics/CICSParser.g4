@@ -706,7 +706,12 @@ cics_set_terminal: TERMINAL cics_data_value ((ACQUIRED | COLDACQ | RELEASED | AL
                                             (ACQSTATUS | TERMSTATUS | ALTPRTCOPYST | ATISTATUS | CREATESESS | DISCREQST | EXITTRACING | OBFORMATST | PAGESTATUS | PRTCOPYST | PURGETYPE | RELREQST | SERVSTATUS | TRACING | TTISTATUS | UCTRANST | ZCPTRACING) cics_cvda | cics_handle_response)*;
 cics_set_tracedest: TRACEDEST ((AUXPAUSE | AUXSTART | AUXSTOP | GTFSTART | GTFSTOP | INTSTART | INTSTOP | SWITCH | NOSWITCH | SWITCHNEXT | SWITCHALL) | TABLESIZE cics_data_value | (AUXSTATUS | GTFSTATUS | INTSTATUS | SWITCHACTION | SWITCHSTATUS) cics_cvda | cics_handle_response)*;
 cics_set_traceflag: TRACEFLAG ((SINGLEOFF | SINGLEON | SYSTEMOFF | SYSTEMON | TCEXITALL | TCEXITALLOFF | TCEXITNONE | TCEXITSYSTEM | USEROFF | USERON) | (SINGLESTATUS | SYSTEMSTATUS | TCEXITSTATUS | USERSTATUS) cics_cvda | cics_handle_response)*;
-cics_set_tracetype: TRACETYPE ((SPECIAL | STANDARD) | COMPID cics_data_value | FLAGSET cics_cvda | cics_handle_response)+;
+cics_set_tracetype: TRACETYPE ((SPECIAL | STANDARD) |
+                        (AP | APPLICATION | AS | ASYNCSERVICE | BA | BUSAPPMGR | BR | BRIDGE | CP | CPI | DD | DIRMGR | DH | DOCUMENT | DM | DOMAINMGR | DP | DEBUGTOOL | DS | DISPATCHER | DU | DUMP | EC | EVENTCAPTURE | EJ | ENTJAVA | EM | EVENTMGR | EP | EVENTPROC |
+                            GC | GLOBALCATLG | IE | IPECI | KE | KERNEL | LC | LOCALCATLG | LD | LOADER | LG | LOGGER | LM | LOCKMGR | ME | MESSAGE | MN | MONITOR | MP | MANAGEDPLAT | NQ | ENQUEUE | OT | OBJECTTRAN | PA | PARAMGR | PG | PROGMGR | PI | PIPEMGR | PT | PARTNER | RA | RMIADAPTERS | RI | RMI | RL |
+                            RESLIFEMGR | RM | RECOVERY | RS | REGIONSTAT | RX | RRS | RZ | REQUESTSTRM | SH | SCHEDULER | SJ | SJVM | SM | STORAGE | SO | SOCKETS | ST | STATISTICS | TI | TIMER | TR | TRACE | TS | TEMPSTORAGE | US | USER | WB | WEB | WU | WEBRESTMGR | W2 | WEB2 | XM | TRANMGR | XS | SECURITY |
+                            BM | SZ | TC | TD | UE | SC | PC | ML | IS | KC | IC | FC | EI | DC) cics_data_value
+                        | FLAGSET cics_cvda | cics_handle_response)+;
 cics_set_tranclass: TRANCLASS cics_data_value ((ABEND | DISCARD) | (MAXACTIVE | PURGETHRESH) cics_data_value | PURGEACTION cics_cvda | cics_handle_response)*;
 cics_set_trandumpcode: TRANDUMPCODE cics_data_value ((ADD | REMOVE | RESET | LOCAL | RELATED | NOSHUTDOWN | SHUTDOWN | NOSYSDUMP | SYSDUMP | NOTRANDUMP | TRANDUMP) |
                                     MAXIMUM cics_data_value | (ACTION | DUMPSCOPE | SHUTOPTION | SYSDUMPING | TRANDUMPING) cics_cvda | cics_handle_response)*;
