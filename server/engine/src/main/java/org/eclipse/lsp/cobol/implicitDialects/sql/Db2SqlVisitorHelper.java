@@ -111,7 +111,7 @@ class Db2SqlVisitorHelper {
 
   public OriginalLocation adjustLocation(
           OriginalLocation originalLocation,
-          Db2SqlParser.SqlCodeContext sqlCodeContext) {
+          ParserRuleContext sqlCodeContext) {
     Location location = originalLocation.getLocation();
     Range updatedRange =
             new Range(
@@ -141,23 +141,14 @@ class Db2SqlVisitorHelper {
 
   public static Position getAdjustedEndPosition(
           ParserRuleContext sqlCodeContext, Position position) {
-    Position end;
-    if (position.getLine() == 0) {
-      end =
-              new Position(
-                      position.getLine() + sqlCodeContext.start.getLine() - 1,
-                      position.getCharacter()
-                              + sqlCodeContext.start.getCharPositionInLine());
-    } else {
-      end =
-              new Position(
-                      position.getLine() + sqlCodeContext.start.getLine() - 1,
-                      position.getCharacter());
-    }
-    return end;
+      int character = position.getCharacter() + (
+            position.getLine() == 0
+                    ? sqlCodeContext.start.getCharPositionInLine()
+                    : 0);
+    return new Position(position.getLine() + sqlCodeContext.start.getLine() - 1, character);
   }
 
-  public static ExecSqlWheneverNode.WheneverConditionType getConditionType(Db2SqlParser.Dbs_wheneverContext ctx) {
+  public static ExecSqlWheneverNode.WheneverConditionType getConditionType(Db2SqlExecParser.Dbs_wheneverContext ctx) {
     if (ctx.SQLERROR() != null)
       return ExecSqlWheneverNode.WheneverConditionType.SQLERROR;
     else if (ctx.SQLWARNING() != null)
@@ -166,14 +157,14 @@ class Db2SqlVisitorHelper {
       return ExecSqlWheneverNode.WheneverConditionType.NOT_FOUND;
   }
 
-  public static Pair<ExecSqlWheneverNode.WheneverType, String> getWheneverType(Db2SqlParser.Dbs_wheneverContext ctx) {
+  public static Pair<ExecSqlWheneverNode.WheneverType, String> getWheneverType(Db2SqlExecParser.Dbs_wheneverContext ctx) {
     if (ctx.CONTINUE() != null) {
       return Pair.of(ExecSqlWheneverNode.WheneverType.CONTINUE, null);
     }
-    return Optional.ofNullable(ctx.dbs_host_name_container())
-        .map(c -> c.dbs_host_names())
+    return Optional.ofNullable(ctx.dbs_host_label())
+        .map(Db2SqlExecParser.Dbs_host_labelContext::dbs_sql_identifier)
         .filter(hn -> !hn.isEmpty())
-        .map(c -> c.get(0))
+//        .map(c -> c.get(0))
         .map(ParseTree::getText)
         .map(t -> Pair.of(ExecSqlWheneverNode.WheneverType.GOTO, t))
         .orElse(Pair.of(ExecSqlWheneverNode.WheneverType.CONTINUE, null));

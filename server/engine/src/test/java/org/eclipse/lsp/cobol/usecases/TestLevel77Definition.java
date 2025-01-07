@@ -32,7 +32,7 @@ class TestLevel77Definition {
           + "       77  {$*RESPONSE}     PIC 9(9)  COMP.\n"
           + "       PROCEDURE DIVISION.\n"
           + "           MOVE 'RECORD UPDATED' TO {$MESSAGES}.\n"
-          + "           EXEC CICS LINK RESP({$RESPONSE}) END-EXEC.";
+          + "           EXEC CICS LINK PROGRAM({$MESSAGES}) RESP({$RESPONSE}) END-EXEC.";
 
   @Test
   void test() {
