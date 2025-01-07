@@ -566,12 +566,12 @@ public abstract class CICSOptionsCheckBaseUtility {
         } else checkStatementHasParameter(ctx, coreToken);
     }
 
-    protected void checkHasTooManyOptions(ParserRuleContext parentCtx) {
+    protected void checkHasTooManyOptions(ParserRuleContext parentCtx, int maxOptions) {
         List<ParseTree> commandOoptions = parentCtx.children.stream()
                 .filter(node -> node instanceof TerminalNode)
                 .filter(node -> !node.getText().equals("AID"))
                 .collect(Collectors.toList());
-        if (commandOoptions.size() > 16) {
+        if (commandOoptions.size() > maxOptions) {
             throwException(
                     ErrorSeverity.ERROR, getLocality(parentCtx), "Too many options provided for: ", "HANDLE AID");
         }
