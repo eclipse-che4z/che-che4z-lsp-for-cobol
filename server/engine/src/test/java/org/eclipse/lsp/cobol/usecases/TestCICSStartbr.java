@@ -38,6 +38,9 @@ public class TestCICSStartbr {
   private static final String STARTBR_VALID_FULL =
           "STARTBR FILE({$varOne}) RIDFLD({$varTwo}) KEYLENGTH({$varThree}) GENERIC REQID({$varFour}) SYSID({$varFive}) DEBKEY GTEQ";
 
+  private static final String STARTBR_SYSID_INVALID =
+          "STARTBR {_FILE({$varOne}) RIDFLD({$varTwo}) SYSID({$varFive}) GTEQ|errorOne_}";
+
   private static final String STARTBR_INVALID_NO_FILE =
           "STARTBR {_RIDFLD({$varTwo}) KEYLENGTH({$varOne}) GENERIC|errorOne_}";
 
@@ -64,6 +67,19 @@ public class TestCICSStartbr {
                     new Diagnostic(
                             new Range(),
                             "Missing required option: KEYLENGTH",
+                            DiagnosticSeverity.Error,
+                            ErrorSource.PARSING.getText())));
+  }
+
+  @Test
+  void testStartbrSysidInvalid() {
+    CICSTestUtils.errorTest(
+            STARTBR_SYSID_INVALID,
+            ImmutableMap.of(
+                    "errorOne",
+                    new Diagnostic(
+                            new Range(),
+                            "Exactly one option required, none provided: KEYLENGTH, RBA, RRN, or XRBA",
                             DiagnosticSeverity.Error,
                             ErrorSource.PARSING.getText())));
   }
