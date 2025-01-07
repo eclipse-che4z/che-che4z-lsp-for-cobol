@@ -748,7 +748,8 @@ cics_run_default: ((ACTIVITY | FACILITYTOKN | INPUTEVENT) cics_data_value | ACQA
 cics_run_transid: (TRANSID cics_name | CHANNEL cics_name | CHILD cics_data_area | cics_handle_response)+;
 
 /** SIGNAL EVENT */
-cics_signal: SIGNAL (EVENT cics_data_value | FROMCHANNEL cics_data_value | FROM cics_data_area | FROMLENGTH cics_data_value | cics_handle_response)*;
+cics_signal: SIGNAL cics_signal_options;
+cics_signal_options: ((EVENT | FROMCHANNEL | FROMLENGTH) cics_data_value | FROM cics_data_area  | cics_handle_response)+;
 
 /** SIGNOFF */
 cics_signoff: SIGNOFF cics_handle_response?;
