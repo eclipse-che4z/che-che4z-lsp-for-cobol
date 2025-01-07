@@ -51,13 +51,13 @@ public class TestCICSEndbr {
             ImmutableMap.of(
                     "error1",
                     new Diagnostic(
-                            new Range(new Position(13, 12), new Position(12,17)),
+                            new Range(new Position(13, 12), new Position(12, 17)),
                             "Exactly one option required, none provided: FILE or DATASET",
                             DiagnosticSeverity.Error,
                             ErrorSource.PARSING.getText()),
                     "error2",
                     new Diagnostic(
-                            new Range(new Position(13, 12), new Position(13,20)),
+                            new Range(new Position(13, 12), new Position(13, 20)),
                             "Syntax error on 'END-EXEC'",
                             DiagnosticSeverity.Error,
                             ErrorSource.PARSING.getText())));
