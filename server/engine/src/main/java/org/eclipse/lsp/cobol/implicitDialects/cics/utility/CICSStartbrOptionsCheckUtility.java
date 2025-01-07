@@ -34,7 +34,6 @@ public class CICSStartbrOptionsCheckUtility extends CICSOptionsCheckBaseUtility 
   private static final Map<Integer, ErrorSeverity> DUPLICATE_CHECK_OPTIONS =
           new HashMap<Integer, ErrorSeverity>() {
             {
-              put(CICSLexer.STARTBR, ErrorSeverity.ERROR);
               put(CICSLexer.FILE, ErrorSeverity.ERROR);
               put(CICSLexer.RIDFLD, ErrorSeverity.ERROR);
               put(CICSLexer.KEYLENGTH, ErrorSeverity.ERROR);
