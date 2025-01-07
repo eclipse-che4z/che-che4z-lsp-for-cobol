@@ -38,6 +38,7 @@ public class CICSEndbrOptionsUtility extends CICSOptionsCheckBaseUtility {
       new HashMap<Integer, ErrorSeverity>() {
         {
           put(CICSLexer.FILE, ErrorSeverity.ERROR);
+          put(CICSLexer.DATASET, ErrorSeverity.ERROR);
           put(CICSLexer.REQID, ErrorSeverity.ERROR);
           put(CICSLexer.SYSID, ErrorSeverity.ERROR);
         }

@@ -43,6 +43,7 @@ public class CICSEndBrowseOptionsUtility extends CICSOptionsCheckBaseUtility {
           put(CICSLexer.EVENT, ErrorSeverity.WARNING);
           put(CICSLexer.PROCESS, ErrorSeverity.WARNING);
           put(CICSLexer.TIMER, ErrorSeverity.WARNING);
+          put(CICSLexer.RETCODE, ErrorSeverity.ERROR);
         }
       };
 
@@ -69,8 +70,9 @@ public class CICSEndBrowseOptionsUtility extends CICSOptionsCheckBaseUtility {
             ctx.ACTIVITY(), ctx.CONTAINER(), ctx.EVENT(), ctx.PROCESS(), ctx.TIMER());
 
     checkHasMandatoryOptions(ctx.BROWSETOKEN(), ctx, "BROWSETOKEN");
-    if (!ctx.CONTAINER().isEmpty()) {
-      checkHasMandatoryOptions(ctx.RETCODE(), ctx, "RETCODE");
-    }
+//    TODO: https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/pull/2596 (RETCODE is only mandatory in the EXCI mode.)
+//    if (!ctx.CONTAINER().isEmpty()) {
+//      checkHasMandatoryOptions(ctx.RETCODE(), ctx, "RETCODE");
+//    }
   }
 }
