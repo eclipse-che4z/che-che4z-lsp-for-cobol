@@ -390,7 +390,7 @@ public abstract class CICSOptionsCheckBaseUtility {
           throwException(
               ErrorSeverity.ERROR,
               getLocality(ctx),
-              "If one option is required, all options must be present: ",
+              "If one option is specified, all options must be present: ",
               options);
         }
     }

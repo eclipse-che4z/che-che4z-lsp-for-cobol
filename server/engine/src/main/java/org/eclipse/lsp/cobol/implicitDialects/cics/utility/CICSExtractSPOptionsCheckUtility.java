@@ -15,7 +15,7 @@
 package org.eclipse.lsp.cobol.implicitDialects.cics.utility;
 
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.tree.ParseTree;
+import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
@@ -144,8 +144,7 @@ public class CICSExtractSPOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
 
     private void checkExtractStatistics(CICSParser.Cics_extract_statisticsContext ctx) {
         checkHasMandatoryOptions(ctx.STATISTICS(), ctx, "STATISTICS");
-        checkHasMandatoryOptions(ctx.cics_restype(), ctx, "RESTYPE");
-        checkRestypeOptions(ctx.cics_restype());
+        checkRestypeOptions(ctx);
         checkHasMandatoryOptions(ctx.SET(), ctx, "SET");
         if (ctx.RESID().isEmpty()) {
             checkForResidRequiredOptions(ctx);
@@ -160,17 +159,23 @@ public class CICSExtractSPOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
      * Helper function to enforce mututally exclusive RESTYPE options
      * @param ctx
      */
-    private void checkRestypeOptions(List<CICSParser.Cics_restypeContext> ctx) {
-        long distinctOptions = ctx.stream()
-                .map(child -> child.children)
+    private void checkRestypeOptions(CICSParser.Cics_extract_statisticsContext ctx) {
+        List<CICSParser.Cics_restypeContext> restypes = ctx.cics_restype();
+        checkHasMandatoryOptions(restypes, ctx, "RESTYPE");
+        long distinctOptions = restypes.stream()
+                .map(parent -> parent.children)
                 .flatMap(List::stream)
-                .map(ParseTree::getText)
+                .map(child -> {
+                    if (TerminalNode.class.isAssignableFrom(child.getClass())) return (TerminalNode) child;
+                    return null;
+                })
+                .filter(Objects::nonNull)
+                .map(TerminalNode::getSymbol)
+                .map(Token::getType)
                 .distinct().count();
-        boolean removeCvda = ctx.stream().map(CICSParser.Cics_restypeContext::cics_cvda).anyMatch(Objects::nonNull);
-        if (removeCvda) distinctOptions--;
 
         if (distinctOptions > 1) {
-            throwException(ErrorSeverity.ERROR, getLocality(ctx.get(0)), "Multiple RESTYPE options are not allowed", "");
+            throwException(ErrorSeverity.ERROR, getLocality(ctx), "Multiple RESTYPE options are not allowed", "");
         }
     }
 
@@ -184,18 +189,18 @@ public class CICSExtractSPOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
     }
 
     private void checkSubResidOptions(CICSParser.Cics_extract_statisticsContext ctx) {
+        List<CICSParser.Cics_subrestypeContext> subrestypes = ctx.cics_subrestype();
         if (ctx.SUBRESID().isEmpty()) {
             checkHasIllegalOptions(ctx.SUBRESIDLEN(), "SUBRESIDLEN without SUBRESID");
-            checkHasIllegalOptions(ctx.cics_subrestype(), "SUBRESTYPE without SUBRESID");
+            checkHasIllegalOptions(subrestypes, "SUBRESTYPE without SUBRESID");
         }
-        List<CICSParser.Cics_subrestypeContext> subrestypes = ctx.cics_subrestype();
         List<TerminalNode> subrestype = subrestypes.stream().map(CICSParser.Cics_subrestypeContext::SUBRESTYPE).collect(Collectors.toList());
         List<TerminalNode> capturespec = subrestypes.stream().map(CICSParser.Cics_subrestypeContext::CAPTURESPEC).collect(Collectors.toList());
         List<TerminalNode> policyrule = subrestypes.stream().map(CICSParser.Cics_subrestypeContext::POLICYRULE).collect(Collectors.toList());
 
         checkHasMutuallyExclusiveOptions("SUBRESTYPE or CAPTURESPEC or POLICYRULE", subrestype, capturespec, policyrule);
 
-        if (ctx.cics_subrestype().isEmpty()) {
+        if (subrestypes.isEmpty()) {
             checkHasIllegalOptions(ctx.SUBRESID(), "SUBRESID without SUBRESTYPE");
             checkHasIllegalOptions(ctx.SUBRESIDLEN(), "SUBRESIDLEN without SUBRESTYPE");
         }

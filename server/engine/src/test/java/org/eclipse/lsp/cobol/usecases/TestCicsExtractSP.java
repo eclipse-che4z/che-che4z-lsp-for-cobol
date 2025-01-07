@@ -62,8 +62,8 @@ public class TestCicsExtractSP {
   private static final String STATISTICS_INVALID_LAST_TIME_ONE = "EXTRACT SET({$varFour}) RESTYPE({$varOne}) STATISTICS LASTRESET({$varThree}) {LASTRESETMIN|errorOne}({$varFive}) {LASTRESETHRS|errorTwo}({$varSix}) {LASTRESETSEC|errorThree}({$varOne})";
   private static final String STATISTICS_INVALID_LAST_TIME_TWO = "EXTRACT SET({$varFour}) RESTYPE({$varOne}) STATISTICS {LASTRESET|errorOne}({$varThree}) {LASTRESETABS|errorTwo}({$varOne})";
   private static final String STATISTICS_INVALID_LAST_TIME_THREE = "EXTRACT {_SET({$varFour}) RESTYPE({$varOne}) STATISTICS LASTRESETHRS({$varOne})|error_}";
-  private static final String STATISTICS_INVALID_DUPLICATE_RESTYPE_ONE = "EXTRACT SET({$varFour}) {_RESTYPE({$varOne})|error_} STATISTICS ATOMSERVICE";
-  private static final String STATISTICS_INVALID_DUPLICATE_RESTYPE_TWO = "EXTRACT SET({$varFour}) {BUNDLE|error} STATISTICS ASYNCSERVICE";
+  private static final String STATISTICS_INVALID_DUPLICATE_RESTYPE_ONE = "EXTRACT {_SET({$varFour}) RESTYPE({$varOne}) STATISTICS ATOMSERVICE|error_}";
+  private static final String STATISTICS_INVALID_DUPLICATE_RESTYPE_TWO = "EXTRACT {_SET({$varFour}) BUNDLE STATISTICS ASYNCSERVICE|error_}";
   private static final String STATISTICS_INVALID_DUPLICATE_SUBRESTYPE = "EXTRACT SUBRESID({$varSix}) SET({$varFour}) RESTYPE({$varOne}) {SUBRESTYPE|error}({$varFive}) {CAPTURESPEC|error} STATISTICS";
   private static final String STATISTICS_WARNING_DUPLICATE_RESTYPE = "EXTRACT SET({$varFour}) STATISTICS ASYNCSERVICE {ASYNCSERVICE|warning}";
 
@@ -236,7 +236,7 @@ public class TestCicsExtractSP {
             "error",
             new Diagnostic(
                     new Range(new Position(14, 12), new Position(17, 32)),
-                    "If one option is required, all options must be present: LASTRESETHRS, LASTRESETMIN, LASTRESETSEC",
+                    "If one option is specified, all options must be present: LASTRESETHRS, LASTRESETMIN, LASTRESETSEC",
                     DiagnosticSeverity.Error,
                     ErrorSource.PARSING.getText())), "SP");
   }
@@ -326,7 +326,7 @@ public class TestCicsExtractSP {
             "error",
             new Diagnostic(
                     new Range(new Position(14, 12), new Position(18, 25)),
-                    "If one option is required, all options must be present: APPLICATION, APPLMAJORVER, APPLMINORVER, APPLMICROVER, PLATFORM",
+                    "If one option is specified, all options must be present: APPLICATION, APPLMAJORVER, APPLMINORVER, APPLMICROVER, PLATFORM",
                     DiagnosticSeverity.Error,
                     ErrorSource.PARSING.getText())), "SP");
   }
@@ -337,7 +337,7 @@ public class TestCicsExtractSP {
             "error",
             new Diagnostic(
                     new Range(new Position(14, 12), new Position(21, 33)),
-                    "If one option is required, all options must be present: APPLICATION, APPLMAJORVER, APPLMINORVER, APPLMICROVER, PLATFORM",
+                    "If one option is specified, all options must be present: APPLICATION, APPLMAJORVER, APPLMINORVER, APPLMICROVER, PLATFORM",
                     DiagnosticSeverity.Error,
                     ErrorSource.PARSING.getText())), "SP");
   }
