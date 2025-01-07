@@ -47,6 +47,7 @@ public class CICSInquireSPOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
             put(CICSParser.RULE_cics_inquire_epadapter, CICSParser.EPADAPTER);
             put(CICSParser.RULE_cics_inquire_epadapterset, CICSParser.EPADAPTERSET);
             put(CICSParser.RULE_cics_inquire_eventbinding, CICSParser.EVENTBINDING);
+            put(CICSParser.RULE_cics_inquire_exci, CICSParser.EXCI);
             put(CICSParser.RULE_cics_inquire_file, CICSParser.FILE);
             put(CICSParser.RULE_cics_inquire_host, CICSParser.HOST);
             put(CICSParser.RULE_cics_inquire_ipconn, CICSParser.IPCONN);
@@ -557,7 +558,7 @@ public class CICSInquireSPOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
                     put(CICSLexer.NONTERMREL, ErrorSeverity.ERROR);
                     put(CICSLexer.NQNAME, ErrorSeverity.ERROR);
                     put(CICSLexer.NUMCIPHERS, ErrorSeverity.ERROR);
-                    put(CICSLexer.NUMDATAPRD, ErrorSeverity.ERROR);
+                    put(CICSLexer.NUMDATAPRED, ErrorSeverity.ERROR);
                     put(CICSLexer.NUMDSNAMES, ErrorSeverity.ERROR);
                     put(CICSLexer.NUMELEMENTS, ErrorSeverity.ERROR);
                     put(CICSLexer.NUMEXITS, ErrorSeverity.ERROR);
@@ -1173,12 +1174,14 @@ public class CICSInquireSPOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
                         enqContext.START(),
                         enqContext.END(),
                         enqContext.NEXT());
-                checkHasMutuallyExclusiveOptions(
-                        "ENQSCOPE or RESOURCE or UOW or END",
-                        enqContext.ENQSCOPE(),
-                        enqContext.RESOURCE(),
-                        enqContext.UOW(),
-                        enqContext.END());
+                if (!enqContext.END().isEmpty()) {
+                    checkHasMutuallyExclusiveOptions(
+                            "ENQSCOPE or RESOURCE or UOW with END",
+                            enqContext.ENQSCOPE(),
+                            enqContext.RESOURCE(),
+                            enqContext.UOW(),
+                            enqContext.END());
+                }
                 if (!enqContext.START().isEmpty() || !enqContext.END().isEmpty()) {
                     checkBrowsingInvalidOptions(
                             enqContext,

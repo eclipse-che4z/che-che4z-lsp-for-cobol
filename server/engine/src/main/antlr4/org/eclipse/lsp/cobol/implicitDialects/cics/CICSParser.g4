@@ -447,7 +447,7 @@ cics_inquire_bundlepart: BUNDLEPART cics_data_area? (BUNDLE cics_data_value | (S
 cics_inquire_capdatapred: CAPDATAPRED ((START | END | NEXT) | (CAPTURESPEC | EVENTBINDING) cics_data_value | (CONTAINER | FIELDLENGTH | FIELDOFFSET | FILENAME | FILTERVALUE | LOCATION | STRUCTNAME | VARIABLENAME) cics_data_area | OPERATOR cics_cvda | cics_handle_response)*;
 cics_inquire_capinfosrce: CAPINFOSRCE ((START | END | NEXT) | (CAPTURESPEC | EVENTBINDING) cics_data_value | (CONTAINER | FIELDLENGTH | FIELDOFFSET | FILENAME | ITEMNAME | LOCATION | STRUCTNAME | VARIABLENAME) cics_data_area | cics_handle_response)*;
 cics_inquire_capoptpred: CAPOPTPRED ((START | END | NEXT) | (CAPTURESPEC | EVENTBINDING)  cics_data_value | (FILTERVALUE | OPTIONNAME) cics_data_area | OPERATOR cics_cvda | cics_handle_response)*;
-cics_inquire_capturespec: CAPTURESPEC cics_data_area? ((START | END | NEXT) | (CAPTUREPOINT | CURRPGM | CURRTRANID | CURRUSERID | EVENTNAME | NUMDATAPRD | NUMINFOSRCE | NUMOPTPRED | PRIMPRED) cics_data_area | EVENTBINDING cics_data_value | (CAPTUREPTYPE | CURRPGMOP | CURRTRANIDOP | CURRUSERIDOP | PRIMPREDOP | PRIMPREDTYPE) cics_cvda | cics_handle_response)*;
+cics_inquire_capturespec: CAPTURESPEC cics_data_area? ((START | END | NEXT) | (CAPTUREPOINT | CURRPGM | CURRTRANID | CURRUSERID | EVENTNAME | NUMDATAPRED | NUMINFOSRCE | NUMOPTPRED | PRIMPRED) cics_data_area | EVENTBINDING cics_data_value | (CAPTUREPTYPE | CURRPGMOP | CURRTRANIDOP | CURRUSERIDOP | PRIMPREDOP | PRIMPREDTYPE) cics_cvda | cics_handle_response)*;
 cics_inquire_connection: CONNECTION cics_data_value? ((cics_browse_start_end | NEXT) | (ACCESSMETHOD | ACQSTATUS | AUTOCONNECT | CHANGEAGENT | CONNSTATUS | CONNTYPE | CQP | EXITTRACING | INSTALLAGENT | PENDSTATUS | PROTOCOL | RECOVSTATUS | SERVSTATUS | XLNSTATUS | ZCPTRACING) cics_cvda | (AIDCOUNT | CHANGEAGREL | CHANGETIME | CHANGEUSRID | DEFINESOURCE | DEFINETIME | GRNAME | INSTALLTIME | INSTALLUSRID | LINKSYSTEM | MEMBERNAME | NETNAME | NQNAME | RECEIVECOUNT | REMOTENAME | REMOTESYSNET | REMOTESYSTEM | SENDCOUNT) cics_data_area | cics_handle_response)*;
 cics_inquire_cfdtpool: CFDTPOOL cics_data_value? ((cics_browse_start_end | NEXT) | CONNSTATUS cics_cvda | cics_handle_response)*;
 cics_inquire_db2conn: DB2CONN ((ACCOUNTREC | AUTHTYPE | CHANGEAGENT | COMAUTHTYPE | CONNECTERROR | CONNECTST | DROLLBACK | INSTALLAGENT | NONTERMREL | PRIORITY | RESYNCMEMBER | STANDBYMODE | THREADERROR | THREADWAIT) cics_cvda | (AUTHID | CHANGEAGREL | CHANGETIME | CHANGEUSRID | COMAUTHID | COMTHREADLIM | COMTHREADS | DB2GROUPID | DB2ID | DB2RELEASE | DEFINESOURCE | DEFINETIME | INSTALLTIME | INSTALLUSRID | MSGQUEUE1 | MSGQUEUE2 | MSGQUEUE3 | PLAN | PLANEXITNAME | PURGECYCLEM | PURGECYCLES | REUSELIMIT | SIGNID | STATSQUEUE | TCBLIMIT | TCBS | THREADLIMIT | THREADS) cics_data_area | cics_handle_response)*;
@@ -465,7 +465,7 @@ cics_inquire_epadapterset: EPADAPTERSET cics_data_area? ((cics_browse_start_end 
 cics_inquire_epadaptinset: EPADAPTINSET ((START | END | NEXT) | EPADAPTERSET cics_data_value | EPADAPTER cics_data_area | cics_handle_response)*;
 cics_inquire_eventbinding: EVENTBINDING cics_data_value? ((cics_browse_start_end | NEXT) | (CHANGEAGENT | ENABLESTATUS | EPADAPTERRES | INSTALLAGENT) cics_cvda | (CHANGEAGREL | CHANGETIME | CHANGEUSRID | DEFINESOURCE | DEFINETIME | EPADAPTER | EPADAPTERSET | INSTALLTIME | INSTALLUSRID | USERTAG) cics_data_area | cics_handle_response)*;
 cics_inquire_eventprocess: EVENTPROCESS (EPSTATUS cics_cvda | SCHEMALEVEL cics_data_area | cics_handle_response)*;
-cics_inquire_exci: EXCI cics_data_value ((TASK | UTIL) cics_data_value | cics_handle_response)*;
+cics_inquire_exci: EXCI cics_data_value? ((START | END | NEXT) | (TASK | UTIL) cics_data_value | cics_handle_response)*;
 cics_inquire_exitprogram: EXITPROGRAM cics_data_value? ((START | END | NEXT) | EXIT cics_data_value | (ENTRYNAME | GAENTRYNAME | GALENGTH | GAUSECOUNT | NUMEXITS | QUALIFIER | TALENGTH | USECOUNT) cics_data_area | (APIST | CONCURRENTST | CONNECTST | FORMATEDFST | INDOUBTST | PURGEABLEST | SHUTDOWNST | SPIST | STARTSTATUS | TASKSTARTST) cics_cvda | ENTRY cics_ref | cics_handle_response)*;
 cics_inquire_featurekey: FEATUREKEY cics_data_value? ((START | END | NEXT) | (VALUE | FILEPATH) cics_data_area | cics_handle_response)*;
 cics_inquire_file: FILE cics_data_value? ((cics_browse_start_end | NEXT) | (ACCESSMETHOD | ADD | BLOCKFORMAT | BROWSE | CHANGEAGENT | DELETE | DISPOSITION | EMPTYSTATUS | ENABLESTATUS | EXCLUSIVE | FWDRECSTATUS | INSTALLAGENT | LOADTYPE | OBJECT | OPENSTATUS | RBATYPE | READ | READINTEG | RECORDFORMAT | RECOVSTATUS | RELTYPE | REMOTETABLE | RLSACCESS | TABLE | TYPE | UPDATE | UPDATEMODEL) cics_cvda |(BASEDSNAME | BLOCKKEYLEN | BLOCKSIZE | CFDTPOOL | CHANGEAGREL | CHANGETIME | CHANGEUSRID | DEFINESOURCE | DEFINETIME | DSNAME | INSTALLTIME | INSTALLUSRID | JOURNALNUM | KEYLENGTH | KEYPOSITION | LSRPOOLNUM | MAXNUMRECS | RECORDSIZE | REMOTENAME | REMOTESYSTEM | STRINGS | TABLENAME) cics_data_area | cics_handle_response)*;
@@ -2075,7 +2075,7 @@ ABCODE
  | NQNAME
  | NSCONTAINER
  | NUMCIPHERS
- | NUMDATAPRD
+ | NUMDATAPRED
  | NUMDSNAMES
  | NUMELEMENTS
  | NUMEVENTS

@@ -55,7 +55,7 @@ public class TestCICSInquireSP {
                 "CAPDATAPRED NEXT CONTAINER({$varOne}) FIELDLENGTH({$varOne}) FIELDOFFSET({$varOne}) FILENAME({$varOne}) FILTERVALUE({$varOne}) LOCATION({$varOne}) STRUCTNAME({$varOne}) VARIABLENAME({$varOne}) OPERATOR({$varOne})",
                 "CAPINFOSRCE START CAPTURESPEC({$varOne}) EVENTBINDING({$varOne})",
                 "CAPOPTPRED NEXT FILTERVALUE({$varOne}) OPTIONNAME({$varOne}) OPERATOR({$varOne})",
-                "CAPTURESPEC({$varOne}) CAPTUREPOINT({$varOne}) CURRPGM({$varOne}) CURRTRANID({$varOne}) CURRUSERID({$varOne}) EVENTNAME({$varOne}) NUMDATAPRD({$varOne}) NUMINFOSRCE({$varOne}) NUMOPTPRED({$varOne}) PRIMPRED({$varOne}) EVENTBINDING({$varOne}) CAPTUREPTYPE({$varOne}) CURRPGMOP({$varOne}) CURRTRANIDOP({$varOne}) CURRUSERIDOP({$varOne}) PRIMPREDOP({$varOne}) PRIMPREDTYPE({$varOne})",
+                "CAPTURESPEC({$varOne}) CAPTUREPOINT({$varOne}) CURRPGM({$varOne}) CURRTRANID({$varOne}) CURRUSERID({$varOne}) EVENTNAME({$varOne}) NUMDATAPRED({$varOne}) NUMINFOSRCE({$varOne}) NUMOPTPRED({$varOne}) PRIMPRED({$varOne}) EVENTBINDING({$varOne}) CAPTUREPTYPE({$varOne}) CURRPGMOP({$varOne}) CURRTRANIDOP({$varOne}) CURRUSERIDOP({$varOne}) PRIMPREDOP({$varOne}) PRIMPREDTYPE({$varOne})",
                 "CONNECTION({$varOne}) ACCESSMETHOD({$varOne}) ACQSTATUS({$varOne}) AUTOCONNECT({$varOne}) CHANGEAGENT({$varOne}) CONNSTATUS({$varOne}) CONNTYPE({$varOne}) CQP({$varOne}) EXITTRACING({$varOne}) INSTALLAGENT({$varOne}) PENDSTATUS({$varOne}) PROTOCOL({$varOne}) RECOVSTATUS({$varOne}) SERVSTATUS({$varOne}) XLNSTATUS({$varOne}) ZCPTRACING({$varOne}) AIDCOUNT({$varOne}) CHANGEAGREL({$varOne}) CHANGETIME({$varOne}) CHANGEUSRID({$varOne}) DEFINESOURCE({$varOne}) DEFINETIME({$varOne}) GRNAME({$varOne}) INSTALLTIME({$varOne}) INSTALLUSRID({$varOne}) LINKSYSTEM({$varOne}) MEMBERNAME({$varOne}) NETNAME({$varOne}) NQNAME({$varOne}) RECEIVECOUNT({$varOne}) REMOTENAME({$varOne}) REMOTESYSNET({$varOne}) REMOTESYSTEM({$varOne}) SENDCOUNT({$varOne})",
                 "CFDTPOOL({$varOne}) CONNSTATUS({$varOne})",
                 "DB2CONN ACCOUNTREC({$varOne}) AUTHTYPE({$varOne}) CHANGEAGENT({$varOne}) COMAUTHTYPE({$varOne}) CONNECTERROR({$varOne}) CONNECTST({$varOne}) DROLLBACK({$varOne}) INSTALLAGENT({$varOne}) NONTERMREL({$varOne}) PRIORITY({$varOne}) RESYNCMEMBER({$varOne}) STANDBYMODE({$varOne}) THREADERROR({$varOne}) THREADWAIT({$varOne}) AUTHID({$varOne}) CHANGEAGREL({$varOne}) CHANGETIME({$varOne}) CHANGEUSRID({$varOne}) COMAUTHID({$varOne}) COMTHREADLIM({$varOne}) COMTHREADS({$varOne}) DB2GROUPID({$varOne}) DB2ID({$varOne}) DB2RELEASE({$varOne}) DEFINESOURCE({$varOne}) DEFINETIME({$varOne}) INSTALLTIME({$varOne}) INSTALLUSRID({$varOne}) MSGQUEUE1({$varOne}) MSGQUEUE2({$varOne}) MSGQUEUE3({$varOne}) PLAN({$varOne}) PLANEXITNAME({$varOne}) PURGECYCLEM({$varOne}) PURGECYCLES({$varOne}) REUSELIMIT({$varOne}) SIGNID({$varOne}) STATSQUEUE({$varOne}) TCBLIMIT({$varOne}) TCBS({$varOne}) THREADLIMIT({$varOne}) THREADS({$varOne})",
@@ -73,7 +73,7 @@ public class TestCICSInquireSP {
                 "EPADAPTINSET EPADAPTERSET({$varOne}) EPADAPTER({$varOne})",
                 "EVENTBINDING({$varOne}) CHANGEAGENT({$varOne}) ENABLESTATUS({$varOne}) EPADAPTERRES({$varOne}) INSTALLAGENT({$varOne}) CHANGEAGREL({$varOne}) CHANGETIME({$varOne}) CHANGEUSRID({$varOne}) DEFINESOURCE({$varOne}) DEFINETIME({$varOne}) EPADAPTER({$varOne}) EPADAPTERSET({$varOne}) INSTALLTIME({$varOne}) INSTALLUSRID({$varOne}) USERTAG({$varOne})",
                 "EVENTPROCESS EPSTATUS({$varOne}) SCHEMALEVEL({$varOne})",
-                "EXCI({$varOne}) TASK({$varOne}) UTIL({$varOne})",
+                "EXCI({$varOne}) NEXT TASK({$varOne}) UTIL({$varOne})",
                 "EXITPROGRAM({$varOne}) EXIT({$varOne}) ENTRYNAME({$varOne}) GAENTRYNAME({$varOne}) GALENGTH({$varOne}) GAUSECOUNT({$varOne}) NUMEXITS({$varOne}) QUALIFIER({$varOne}) TALENGTH({$varOne}) USECOUNT({$varOne}) APIST({$varOne}) CONCURRENTST({$varOne}) CONNECTST({$varOne}) FORMATEDFST({$varOne}) INDOUBTST({$varOne}) PURGEABLEST({$varOne}) SHUTDOWNST({$varOne}) SPIST({$varOne}) STARTSTATUS({$varOne}) TASKSTARTST({$varOne}) ENTRY({$varOne})",
                 "FEATUREKEY({$varOne}) VALUE({$varOne}) FILEPATH({$varOne})",
                 "FILE({$varOne}) ACCESSMETHOD({$varOne}) ADD({$varOne}) BLOCKFORMAT({$varOne}) BROWSE({$varOne}) CHANGEAGENT({$varOne}) DELETE({$varOne}) DISPOSITION({$varOne}) EMPTYSTATUS({$varOne}) ENABLESTATUS({$varOne}) EXCLUSIVE({$varOne}) FWDRECSTATUS({$varOne}) INSTALLAGENT({$varOne}) LOADTYPE({$varOne}) OBJECT({$varOne}) OPENSTATUS({$varOne}) RBATYPE({$varOne}) READ({$varOne}) READINTEG({$varOne}) RECORDFORMAT({$varOne}) RECOVSTATUS({$varOne}) RELTYPE({$varOne}) REMOTETABLE({$varOne}) RLSACCESS({$varOne}) TABLE({$varOne}) TYPE({$varOne}) UPDATE({$varOne}) UPDATEMODEL({$varOne}) BASEDSNAME({$varOne}) BLOCKKEYLEN({$varOne}) BLOCKSIZE({$varOne}) CFDTPOOL({$varOne}) CHANGEAGREL({$varOne}) CHANGETIME({$varOne}) CHANGEUSRID({$varOne}) DEFINESOURCE({$varOne}) DEFINETIME({$varOne}) DSNAME({$varOne}) INSTALLTIME({$varOne}) INSTALLUSRID({$varOne}) JOURNALNUM({$varOne}) KEYLENGTH({$varOne}) KEYPOSITION({$varOne}) LSRPOOLNUM({$varOne}) MAXNUMRECS({$varOne}) RECORDSIZE({$varOne}) REMOTENAME({$varOne}) REMOTESYSTEM({$varOne}) STRINGS({$varOne}) TABLENAME({$varOne})",
@@ -204,6 +204,13 @@ public class TestCICSInquireSP {
     private static final String BUNDLEPART_INVALID = "INQUIRE {_BUNDLEPART(1) BUNDLE(1)|errorOne_}";
 
     private static final String BUNDLEPART_BROWSE_WITH_PARAM_INVALID = "INQUIRE BUNDLEPART{(1)|errorOne} START BUNDLE(1)";
+
+    private static final String ENQ_VALID = "INQUIRE ENQ NEXT RESOURCE({$varOne}) RESLEN({$varOne}) UOW({$varOne})";
+
+    @Test
+    void testENQValid() {
+        CICSTestUtils.noErrorTest(ENQ_VALID, "SP");
+    }
 
     @Test
     void testInvalidBundlepartBrowseWithParam() {
