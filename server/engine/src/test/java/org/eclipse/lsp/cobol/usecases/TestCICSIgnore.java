@@ -109,7 +109,7 @@ public class TestCICSIgnore {
                     new Diagnostic(
                             new Range(),
                             "Excessive options provided for: CONDITION",
-                            DiagnosticSeverity.Error,
+                            DiagnosticSeverity.Warning,
                             ErrorSource.PARSING.getText())));
   }
 

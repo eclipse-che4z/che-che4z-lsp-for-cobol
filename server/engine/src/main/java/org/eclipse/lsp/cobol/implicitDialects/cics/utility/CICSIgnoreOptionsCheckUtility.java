@@ -34,7 +34,7 @@ public class CICSIgnoreOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     private static final Map<Integer, ErrorSeverity> DUPLICATE_CHECK_OPTIONS =
             new HashMap<Integer, ErrorSeverity>() {
                 {
-                    put(CICSLexer.CONDITION, ErrorSeverity.ERROR);
+                    put(CICSLexer.CONDITION, ErrorSeverity.WARNING);
                     put(CICSLexer.NORMAL, ErrorSeverity.ERROR);
                     put(CICSLexer.ERROR, ErrorSeverity.ERROR);
                     put(CICSLexer.RDATT, ErrorSeverity.ERROR);
