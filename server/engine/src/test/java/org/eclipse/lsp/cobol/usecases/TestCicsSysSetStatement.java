@@ -146,24 +146,23 @@ public class TestCicsSysSetStatement {
     private static final String TRANSACTION_VALID_2 = "SET TRANSACTION(1) TRANDUMP PRIORITY(1) PURGEABLE RUNAWAY(1) SYSTEM SHUTDISABLED DISABLED TRANCLASS(1) SPECTRACE";
     private static final String TSQUEUE_VALID_1 = "SET TSQUEUE(1)";
     private static final String TSQUEUE_VALID_2 = "SET TSQNAME(1) SYSID(1) ACTION(1) LASTUSEDINT(1)";
-    private static final String UOW_VALID_1 = "SET UOW ";
-    private static final String UOW_VALID_2 = "SET UOW ";
-    private static final String UOWLINK_VALID_1 = "SET UOWLINK ";
-    private static final String UOWLINK_VALID_2 = "SET UOWLINK ";
-    private static final String URIMAP_VALID_1 = "SET URIMAP ";
-    private static final String URIMAP_VALID_2 = "SET URIMAP ";
-    private static final String VOLUME_VALID_1 = "SET VOLUME ";
-    private static final String VOLUME_VALID_2 = "SET VOLUME ";
-    private static final String VTAM_VALID_1 = "SET VTAM ";
-    private static final String VTAM_VALID_2 = "SET VTAM ";
-    private static final String WEB_VALID_1 = "SET WEB ";
-    private static final String WEB_VALID_2 = "SET WEB ";
-    private static final String WEBSERVICE_VALID_1 = "SET WEBSERVICE ";
-    private static final String WEBSERVICE_VALID_2 = "SET WEBSERVICE ";
-    private static final String WLMHEALTH_VALID_1 = "SET WLMHEALTH ";
-    private static final String WLMHEALTH_VALID_2 = "SET WLMHEALTH ";
-    private static final String XMLTRANSFORM_VALID_1 = "SET XMLTRANSFORM ";
-    private static final String XMLTRANSFORM_VALID_2 = "SET XMLTRANSFORM ";
+    private static final String UOW_VALID_1 = "SET UOW(1) UOWSTATE(1)";
+    private static final String UOW_VALID_2 = "SET UOW(1) COMMIT";
+    private static final String UOWLINK_VALID_1 = "SET UOWLINK(1)";
+    private static final String UOWLINK_VALID_2 = "SET UOWLINK(1) DELETE";
+    private static final String URIMAP_VALID_1 = "SET URIMAP(1)";
+    private static final String URIMAP_VALID_2 = "SET URIMAP(1) ENABLED NONE LOCATION(1)";
+    //private static final String VOLUME_VALID_1 = "SET VOLUME "; // No valid instances of VOLUME exist
+    private static final String VTAM_VALID_1 = "SET VTAM";
+    private static final String VTAM_VALID_2 = "SET VTAM CLOSED PSDINTERVAL(1) DEREGISTERED";
+    private static final String WEB_VALID_1 = "SET WEB";
+    private static final String WEB_VALID_2 = "SET WEB GARBAGEINT(1) TIMEOUTINT(1)";
+    private static final String WEBSERVICE_VALID_1 = "SET WEBSERVICE(1)";
+    private static final String WEBSERVICE_VALID_2 = "SET WEBSERVICE(1) VALIDATION";
+    private static final String WLMHEALTH_VALID_1 = "SET WLMHEALTH";
+    private static final String WLMHEALTH_VALID_2 = "SET WLMHEALTH ADJUSTMENT(1)";
+    private static final String XMLTRANSFORM_VALID_1 = "SET XMLTRANSFORM(1)";
+    private static final String XMLTRANSFORM_VALID_2 = "SET XMLTRANSFORM(1) NOVALIDATION";
 
     /* --------------------------------------------------- */
     // Invalid test cases
@@ -257,24 +256,17 @@ public class TestCicsSysSetStatement {
     private static final String TRANSACTION_INVALID_2 = "SET TRANSACTION(1) SPECTRACE {SPRSTRACE|errorOne}";
     private static final String TSQUEUE_INVALID_1 = "SET TSQUEUE(1) {TSQNAME|errorOne}(1) SYSID(1)";
     private static final String TSQUEUE_INVALID_2 = "SET {_TSQUEUE(1) LASTUSEDINT(1)|errorOne_}";
-    private static final String UOW_INVALID_1 = "SET UOW ";
-    private static final String UOW_INVALID_2 = "SET UOW ";
-    private static final String UOWLINK_INVALID_1 = "SET UOWLINK ";
-    private static final String UOWLINK_INVALID_2 = "SET UOWLINK ";
-    private static final String URIMAP_INVALID_1 = "SET URIMAP ";
-    private static final String URIMAP_INVALID_2 = "SET URIMAP ";
-    private static final String VOLUME_INVALID_1 = "SET VOLUME ";
-    private static final String VOLUME_INVALID_2 = "SET VOLUME ";
-    private static final String VTAM_INVALID_1 = "SET VTAM ";
-    private static final String VTAM_INVALID_2 = "SET VTAM ";
-    private static final String WEB_INVALID_1 = "SET WEB ";
-    private static final String WEB_INVALID_2 = "SET WEB ";
-    private static final String WEBSERVICE_INVALID_1 = "SET WEBSERVICE ";
-    private static final String WEBSERVICE_INVALID_2 = "SET WEBSERVICE ";
-    private static final String WLMHEALTH_INVALID_1 = "SET WLMHEALTH ";
-    private static final String WLMHEALTH_INVALID_2 = "SET WLMHEALTH ";
-    private static final String XMLTRANSFORM_INVALID_1 = "SET XMLTRANSFORM ";
-    private static final String XMLTRANSFORM_INVALID_2 = "SET XMLTRANSFORM ";
+    private static final String UOW_INVALID_1 = "SET {_UOW(1) COMMIT FORCE|errorOne_}";
+    private static final String UOWLINK_INVALID_1 = "SET UOWLINK(1) ACTION(1) {DELETE|errorOne}";
+    private static final String URIMAP_INVALID_1 = "SET URIMAP(1) DISABLED {ENABLED|errorOne}";
+    private static final String URIMAP_INVALID_2 = "SET URIMAP(1) PERMANENT {TEMPORARY|errorOne}";
+    private static final String VOLUME_INVALID_1 = "SET {VOLUME|errorOne} {NORESP|errorTwo}(1)";
+    private static final String VTAM_INVALID_1 = "SET VTAM CLOSED {FORCECLOSE|errorOne}";
+    private static final String VTAM_INVALID_2 = "SET VTAM PSDINTERVAL(1) {PSDINTHRS|errorOne}(1)";
+    //private static final String WEB_INVALID_1 = "SET WEB ";
+    private static final String WEBSERVICE_INVALID_1 = "SET WEBSERVICE(1) VALIDATION {NOVALIDATION|errorOne}";
+    private static final String WLMHEALTH_INVALID_1 = "SET WLMHEALTH INTERVAL(1) {OPENSTATUS|errorOne}(1)";
+    private static final String XMLTRANSFORM_INVALID_1 = "SET XMLTRANSFORM(1) VALIDATION {NOVALIDATION|errorOne}";
 
     // Utility
     void testSingleError(String invalidStatement, String errorMessage) {
@@ -643,8 +635,7 @@ public class TestCicsSysSetStatement {
 
     @Test
     void testCicsVolumeValid() {
-        CICSTestUtils.noErrorTest(VOLUME_VALID_1);
-        CICSTestUtils.noErrorTest(VOLUME_VALID_2);
+        // No valid instances of VOLUME exist
     }
 
     @Test
@@ -985,56 +976,49 @@ public class TestCicsSysSetStatement {
 
     @Test
     void testCicsUowInvalid() {
-        testSingleError(UOW_INVALID_1, "");
-        testSingleError(UOW_INVALID_2, "");
+        testSingleError(UOW_INVALID_1, "Must use exactly one of the following: UOWSTATE, COMMIT, BACKOUT or FORCE");
     }
 
     @Test
     void testCicsUowlinkInvalid() {
-        testSingleError(UOWLINK_INVALID_1, "");
-        testSingleError(UOWLINK_INVALID_2, "");
+        testSingleError(UOWLINK_INVALID_1, "Options \"ACTION or DELETE\" are mutually exclusive.");
     }
 
     @Test
     void testCicsUrimapInvalid() {
-        testSingleError(URIMAP_INVALID_1, "");
-        testSingleError(URIMAP_INVALID_2, "");
+        testSingleError(URIMAP_INVALID_1, "Options \"ENABLESTATUS, DISABLED or ENABLED\" are mutually exclusive.");
+        testSingleError(URIMAP_INVALID_2, "Options \"REDIRECTTYPE, NONE, PERMANENT or TEMPORARY\" are mutually exclusive.");
     }
 
     @Test
     void testCicsVolumeInvalid() {
-        testSingleError(VOLUME_INVALID_1, "");
-        testSingleError(VOLUME_INVALID_2, "");
+        testTwoErrors(VOLUME_INVALID_1, "Obsolete option provided: VOLUME", "Extraneous input NORESP");
     }
 
     @Test
     void testCicsVtamInvalid() {
-        testSingleError(VTAM_INVALID_1, "");
-        testSingleError(VTAM_INVALID_2, "");
+        testSingleError(VTAM_INVALID_1, "Options \"OPENSTATUS, CLOSED, FORCECLOSE, IMMCLOSE or OPEN\" are mutually exclusive.");
+        testSingleError(VTAM_INVALID_2, "Options \"PSDINTERVAL or PSDINTHRS\" are mutually exclusive.");
     }
 
     @Test
     void testCicsWebInvalid() {
-        testSingleError(WEB_INVALID_1, "");
-        testSingleError(WEB_INVALID_2, "");
+        // Nothing to test outside of duplicates
     }
 
     @Test
     void testCicsWebserviceInvalid() {
-        testSingleError(WEBSERVICE_INVALID_1, "");
-        testSingleError(WEBSERVICE_INVALID_2, "");
+        testSingleError(WEBSERVICE_INVALID_1, "Options \"VALIDATIONST, VALIDATION or NOVALIDATION\" are mutually exclusive.");
     }
 
     @Test
     void testCicsWlmhealthInvalid() {
-        testSingleError(WLMHEALTH_INVALID_1, "");
-        testSingleError(WLMHEALTH_INVALID_2, "");
+        testSingleError(WLMHEALTH_INVALID_1, "Options \"ADJUSTMENT, INTERVAL or OPENSTATUS\" are mutually exclusive.");
     }
 
     @Test
     void testCicsXmltransformInvalid() {
-        testSingleError(XMLTRANSFORM_INVALID_1, "");
-        testSingleError(XMLTRANSFORM_INVALID_2, "");
+        testSingleError(XMLTRANSFORM_INVALID_1, "Options \"VALIDATIONST, VALIDATION or NOVALIDATION\" are mutually exclusive.");
     }
 
 }

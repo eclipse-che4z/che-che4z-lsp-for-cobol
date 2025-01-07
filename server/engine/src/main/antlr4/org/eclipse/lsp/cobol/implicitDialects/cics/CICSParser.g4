@@ -726,7 +726,7 @@ cics_set_vtam: VTAM ((CLOSED | FORCECLOSE | IMMCLOSE | OPEN | DEREGISTERED | DER
 cics_set_web: WEB ((GARBAGEINT | TIMEOUTINT) cics_data_value | cics_handle_response)*;
 cics_set_webservice: WEBSERVICE cics_name ((VALIDATION | NOVALIDATION) | VALIDATIONST cics_cvda | cics_handle_response)*;
 cics_set_wlmhealth: WLMHEALTH ((ADJUSTMENT | INTERVAL) cics_data_value | OPENSTATUS cics_cvda | cics_handle_response)*;
-cics_set_xmltransform: XMLTRANSFORM ((VALIDATION | NOVALIDATION) | VALIDATIONST cics_cvda | cics_handle_response)*;
+cics_set_xmltransform: XMLTRANSFORM cics_name ((VALIDATION | NOVALIDATION) | VALIDATIONST cics_cvda | cics_handle_response)*;
 
 /** SIGNAL EVENT */
 cics_signal: SIGNAL (EVENT cics_data_value | FROMCHANNEL cics_data_value | FROM cics_data_area | FROMLENGTH cics_data_value | cics_handle_response)*;
