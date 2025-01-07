@@ -1,25 +1,24 @@
 /*
- * Copyright (c) 2020 Broadcom. The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
- * 
+ * Copyright (c) 2020 Broadcom.
+ * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
- * This program and the accompanying materials are made available under the terms of the Eclipse
- * Public License 2.0 which is available at https://www.eclipse.org/legal/epl-2.0/
- * 
+ * This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License 2.0
+ * which is available at https://www.eclipse.org/legal/epl-2.0/
  *
  * SPDX-License-Identifier: EPL-2.0
- * 
- * Contributors: Broadcom, Inc. - initial API and implementation
+ *
+ * Contributors:
+ *   Broadcom, Inc. - initial API and implementation
  */
 
 lexer grammar CICSLexer;
-channels{
-	COMMENTS
-}
+channels{COMMENTS}
 
-ABCODE: A B C O D E;
-ABDUMP: A B D U M P;
-ABEND: A B E N D;
-ABENDCODE: A B E N D C O D E;
+ABCODE : A B C O D E;
+ABDUMP : A B D U M P;
+ABEND : A B E N D;
+ABENDCODE : A B E N D C O D E;
 ABOFFSET: A B O F F S E T;
 ABORT : A B O R T;
 ABPROGRAM : A B P R O G R A M;
@@ -216,24 +215,24 @@ CHUNKING : C H U N K I N G;
 CHUNKNO : C H U N K N O;
 CHUNKYES : C H U N K Y E S;
 CICS: C I C S;
-CICSDATAKEY: C I C S D A T A K E Y;
-CICSSTATUS: C I C S S T A T U S;
-CICSSYS: C I C S S Y S;
-CICSTSLEVEL: C I C S T S L E V E L;
-CIDDOMAIN: C I D D O M A I N;
-CIPHERS: C I P H E R S;
-CLASS: C L A S S;
-CLEAR: C L E A R;
-CLICONVERT: C L I C O N V E R T;
-CLIENT: C L I E N T;
-CLIENTADDR: C L I E N T A D D R;
-CLIENTADDRNU: C L I E N T A D D R N U;
-CLIENTCONV: C L I E N T C O N V;
-CLIENTIPADDR: C L I E N T I P A D D R;
-CLIENTLOC: C L I E N T L O C;
-CLIENTNAME: C L I E N T N A M E;
-CLIENTPORT: C L I E N T P O R T;
-CLNTADDR6NU: C L N T A D D R '6' N U;
+CICSDATAKEY : C I C S D A T A K E Y;
+CICSSTATUS : C I C S S T A T U S;
+CICSSYS : C I C S S Y S;
+CICSTSLEVEL : C I C S T S L E V E L;
+CIDDOMAIN : C I D D O M A I N;
+CIPHERS : C I P H E R S;
+CLASS : C L A S S;
+CLEAR : C L E A R;
+CLICONVERT : C L I C O N V E R T;
+CLIENT : C L I E N T;
+CLIENTADDR : C L I E N T A D D R;
+CLIENTADDRNU : C L I E N T A D D R N U;
+CLIENTCONV : C L I E N T C O N V;
+CLIENTIPADDR : C L I E N T I P A D D R;
+CLIENTLOC : C L I E N T L O C;
+CLIENTNAME : C L I E N T N A M E;
+CLIENTPORT : C L I E N T P O R T;
+CLNTADDR6NU : C L N T A D D R '6' N U;
 CLNTCODEPAGE: C L N T C O D E P A G E;
 CLNTIPFAMILY : C L N T I P F A M I L Y;
 CLOSE : C L O S E;
@@ -545,9 +544,9 @@ EXCEPTION : E X C E P T I O N;
 EXCI : E X C I;
 EXCLUSIVE : E X C L U S I V E;
 EXEC: E X E C;
-EXECKEY: E X E C K E Y;
-EXECUTABLE: E X E C U T A B L E;
-EXECUTIONSET: E X E C U T I O N S E T;
+EXECKEY : E X E C K E Y;
+EXECUTABLE : E X E C U T A B L E;
+EXECUTIONSET : E X E C U T I O N S E T;
 EXEC_CICS: E X E C [ \t\f\r\n]+ C I C S;
 EXIT : E X I T;
 EXITPGM : E X I T P G M;
@@ -869,56 +868,56 @@ MAJORVERSION : M A J O R V E R S I O N;
 MAP : M A P;
 MAPCOLUMN : M A P C O L U M N;
 MAPFAIL: M A P F A I L;
-MAPHEIGHT: M A P H E I G H T;
-MAPLINE: M A P L I N E;
-MAPNAME: M A P N A M E;
-MAPONLY: M A P O N L Y;
-MAPPED: M A P P E D;
-MAPPINGDEV: M A P P I N G D E V;
-MAPPINGLEVEL: M A P P I N G L E V E L;
-MAPPINGRNUM: M A P P I N G R N U M;
-MAPPINGVNUM: M A P P I N G V N U M;
-MAPSET: M A P S E T;
-MAPSETNAME: M A P S E T N A M E;
-MAPWIDTH: M A P W I D T H;
-MASSINSERT: M A S S I N S E R T;
-MAXACTIVE: M A X A C T I V E;
-MAXDATALEN: M A X D A T A L E N;
-MAXFLENGTH: M A X F L E N G T H;
-MAXHEAP: M A X H E A P;
-MAXIMUM: M A X I M U M;
-MAXITEMLEN: M A X I T E M L E N;
-MAXLENGTH: M A X L E N G T H;
-MAXLIFETIME: M A X L I F E T I M E;
-MAXNUMRECS: M A X N U M R E C S;
-MAXOPENTCBS: M A X O P E N T C B S;
-MAXPERSIST: M A X P E R S I S T;
-MAXPROCLEN: M A X P R O C L E N;
-MAXQTIME: M A X Q T I M E;
-MAXREQS: M A X R E Q S;
-MAXSOCKETS: M A X S O C K E T S;
-MAXSSLTCBS: M A X S S L T C B S;
-MAXTASKS: M A X T A S K S;
-MAXTHRDTCBS: M A X T H R D T C B S;
-MAXWINNERS: M A X W I N N E R S;
-MAXXPTCBS: M A X X P T C B S;
-MCC: M C C;
-ME: M E;
-MEDIATYPE: M E D I A T Y P E;
-MEMBER: M E M B E R;
-MEMBERNAME: M E M B E R N A M E;
-MEMLIMIT: M E M L I M I T;
-MESSAGE: M E S S A G E;
-MESSAGECASE: M E S S A G E C A S E;
-MESSAGEID: M E S S A G E I D;
-METADATA: M E T A D A T A;
-METADATAFILE: M E T A D A T A F I L E;
-METADATALEN: M E T A D A T A L E N;
-METHOD: M E T H O D;
-METHODLENGTH: M E T H O D L E N G T H;
-MGMTPART: M G M T P A R T;
-MICROVERSION: M I C R O V E R S I O N;
-MILLISECONDS: M I L L I S E C O N D S;
+MAPHEIGHT : M A P H E I G H T;
+MAPLINE : M A P L I N E;
+MAPNAME : M A P N A M E;
+MAPONLY : M A P O N L Y;
+MAPPED : M A P P E D;
+MAPPINGDEV : M A P P I N G D E V;
+MAPPINGLEVEL : M A P P I N G L E V E L;
+MAPPINGRNUM : M A P P I N G R N U M;
+MAPPINGVNUM : M A P P I N G V N U M;
+MAPSET : M A P S E T;
+MAPSETNAME : M A P S E T N A M E;
+MAPWIDTH : M A P W I D T H;
+MASSINSERT : M A S S I N S E R T;
+MAXACTIVE : M A X A C T I V E;
+MAXDATALEN : M A X D A T A L E N;
+MAXFLENGTH : M A X F L E N G T H;
+MAXHEAP : M A X H E A P;
+MAXIMUM : M A X I M U M;
+MAXITEMLEN : M A X I T E M L E N;
+MAXLENGTH : M A X L E N G T H;
+MAXLIFETIME : M A X L I F E T I M E;
+MAXNUMRECS : M A X N U M R E C S;
+MAXOPENTCBS : M A X O P E N T C B S;
+MAXPERSIST : M A X P E R S I S T;
+MAXPROCLEN : M A X P R O C L E N;
+MAXQTIME : M A X Q T I M E;
+MAXREQS : M A X R E Q S;
+MAXSOCKETS : M A X S O C K E T S;
+MAXSSLTCBS : M A X S S L T C B S;
+MAXTASKS : M A X T A S K S;
+MAXTHRDTCBS : M A X T H R D T C B S;
+MAXWINNERS : M A X W I N N E R S;
+MAXXPTCBS : M A X X P T C B S;
+MCC : M C C;
+ME : M E;
+MEDIATYPE : M E D I A T Y P E;
+MEMBER : M E M B E R;
+MEMBERNAME : M E M B E R N A M E;
+MEMLIMIT : M E M L I M I T;
+MESSAGE : M E S S A G E;
+MESSAGECASE : M E S S A G E C A S E;
+MESSAGEID : M E S S A G E I D;
+METADATA : M E T A D A T A;
+METADATAFILE : M E T A D A T A F I L E;
+METADATALEN : M E T A D A T A L E N;
+METHOD : M E T H O D;
+METHODLENGTH : M E T H O D L E N G T H;
+MGMTPART : M G M T P A R T;
+MICROVERSION : M I C R O V E R S I O N;
+MILLISECONDS : M I L L I S E C O N D S;
 MILLISECS: M I L L I S E C S;
 MINIMUM : M I N I M U M;
 MINITEMLEN : M I N I T E M L E N;
@@ -1124,30 +1123,30 @@ OWNER : O W N E R;
 PA1: P A '1';
 PA2: P A '2';
 PA3: P A '3';
-PAGE: P A G E;
-PAGEHT: P A G E H T;
-PAGENUM: P A G E N U M;
-PAGESTATUS: P A G E S T A T U S;
-PAGEWD: P A G E W D;
-PAGE_COUNTER: P A G E MINUSCHAR C O U N T E R;
-PAGING: P A G I N G;
-PARAMGR: P A R A M G R;
-PARSE: P A R S E;
-PARTCLASS: P A R T C L A S S;
-PARTCOUNT: P A R T C O U N T;
-PARTITIONSST: P A R T I T I O N S S T;
+PAGE : P A G E;
+PAGEHT : P A G E H T;
+PAGENUM : P A G E N U M;
+PAGESTATUS : P A G E S T A T U S;
+PAGEWD : P A G E W D;
+PAGE_COUNTER : P A G E MINUSCHAR C O U N T E R;
+PAGING : P A G I N G;
+PARAMGR : P A R A M G R;
+PARSE : P A R S E;
+PARTCLASS : P A R T C L A S S;
+PARTCOUNT : P A R T C O U N T;
+PARTITIONSST : P A R T I T I O N S S T;
 PARTN: P A R T N;
 PARTNER : P A R T N E R;
 PARTNERIDERR : P A R T N E R I D E R R;
 PARTNFAIL: P A R T N F A I L;
-PARTNPAGE: P A R T N P A G E;
-PARTNS: P A R T N S;
-PARTNSET: P A R T N S E T;
-PARTTYPE: P A R T T Y P E;
-PASS: P A S S;
-PASSBK: P A S S B K;
-PASSWORD: P A S S W O R D;
-PASSWORDLEN: P A S S W O R D L E N;
+PARTNPAGE : P A R T N P A G E;
+PARTNS : P A R T N S;
+PARTNSET : P A R T N S E T;
+PARTTYPE : P A R T T Y P E;
+PASS : P A S S;
+PASSBK : P A S S B K;
+PASSWORD : P A S S W O R D;
+PASSWORDLEN : P A S S W O R D L E N;
 PATCH: P A T C H;
 PATH : P A T H;
 PATHLENGTH : P A T H L E N G T H;
@@ -1804,118 +1803,117 @@ XMLTRANSFORM : X M L T R A N S F O R M;
 XOPDIRECTST : X O P D I R E C T S T;
 XOPSUPPORTST : X O P S U P P O R T S T;
 XOPTS: X O P T S;
-XRBA: X R B A;
-XRFSTATUS: X R F S T A T U S;
-XS: X S;
-XSDBIND: X S D B I N D;
-YEAR: Y E A R;
-YYDDD: Y Y D D D;
-YYDDMM: Y Y D D M M;
-YYMMDD: Y Y M M D D;
-YYYYDDD: Y Y Y Y D D D;
-YYYYDDMM: Y Y Y Y D D M M;
-YYYYMMDD: Y Y Y Y M M D D;
-ZCPTRACING: Z C P T R A C I N G;
-ZERO: Z E R O;
-ZEROES: Z E R O E S;
-ZEROS: Z E R O S;
+XRBA : X R B A;
+XRFSTATUS : X R F S T A T U S;
+XS : X S;
+XSDBIND : X S D B I N D;
+YEAR : Y E A R;
+YYDDD : Y Y D D D;
+YYDDMM : Y Y D D M M;
+YYMMDD : Y Y M M D D;
+YYYYDDD : Y Y Y Y D D D;
+YYYYDDMM : Y Y Y Y D D M M;
+YYYYMMDD : Y Y Y Y M M D D;
+ZCPTRACING : Z C P T R A C I N G;
+ZERO : Z E R O;
+ZEROES : Z E R O E S;
+ZEROS : Z E R O S;
 
 // symbols
-ASTERISKCHAR: '*';
-DOUBLEASTERISKCHAR: '**';
-COLONCHAR: ':';
-COMMACHAR: ',';
-COMMENTTAG: '*>' -> channel(COMMENTS);
-DOUBLEMORETHANCHAR: '>>';
+ASTERISKCHAR : '*';
+DOUBLEASTERISKCHAR : '**';
+COLONCHAR : ':';
+COMMACHAR : ',';
+COMMENTTAG : '*>' -> channel(COMMENTS);
+DOUBLEMORETHANCHAR : '>>';
 
 // period full stopPosition
-DOT: '.';
-LPARENCHAR: '(';
-MINUSCHAR: '-';
-PLUSCHAR: '+';
-RPARENCHAR: ')';
-SLASHCHAR: '/';
+DOT : '.';
+LPARENCHAR : '(';
+MINUSCHAR : '-';
+PLUSCHAR : '+';
+RPARENCHAR : ')';
+SLASHCHAR : '/';
 
-INTEGERLITERAL: (PLUSCHAR | MINUSCHAR)? DIGIT+;
+INTEGERLITERAL : (PLUSCHAR | MINUSCHAR)? DIGIT+ ;
 
-SINGLEDIGITLITERAL: DIGIT;
+SINGLEDIGITLITERAL : DIGIT;
 
-NUMERICLITERAL: (PLUSCHAR | MINUSCHAR)? DIGIT* (DOT | COMMACHAR) DIGIT+ (
-		('e' | 'E') (PLUSCHAR | MINUSCHAR)? DIGIT+
-	)?;
+NUMERICLITERAL : (PLUSCHAR | MINUSCHAR)? DIGIT* (DOT | COMMACHAR) DIGIT+ (('e' | 'E') (PLUSCHAR | MINUSCHAR)? DIGIT+)?;
 
-NONNUMERICLITERAL:
-	UNTRMSTRINGLITERAL
-	| STRINGLITERAL
-	| DBCSLITERAL
-	| HEXNUMBER
-	| NULLTERMINATED;
+NONNUMERICLITERAL : UNTRMSTRINGLITERAL | STRINGLITERAL | DBCSLITERAL | HEXNUMBER | NULLTERMINATED;
 
-WORD_IDENTIFIER: [a-zA-Z0-9][-_a-zA-Z0-9]*;
-COPYBOOK_IDENTIFIER: [a-zA-Z0-9#@$][-_a-zA-Z0-9#@$]*;
+WORD_IDENTIFIER : [a-zA-Z0-9][-_a-zA-Z0-9]*;
+COPYBOOK_IDENTIFIER : [a-zA-Z0-9#@$][-_a-zA-Z0-9#@$]*;
 
-OCTDIGITS: OCT_DIGIT;
-HEX_NUMBERS: HEXNUMBER;
+OCTDIGITS : OCT_DIGIT;
+HEX_NUMBERS : HEXNUMBER;
 
 // whitespace, line breaks, comments, ...
-NEWLINE: '\r'? '\n' -> channel(HIDDEN);
-COMMASEPARATOR: ', ' -> channel(HIDDEN);
-COMMENTLINE: COMMENTTAG ~('\n' | '\r')* -> channel(COMMENTS);
-WS: [ \t\f]+ -> channel(HIDDEN);
-COMPILERLINE:
-	DOUBLEMORETHANCHAR ~('\n' | '\r')* -> channel(HIDDEN);
+NEWLINE : '\r'? '\n' -> channel(HIDDEN);
+COMMASEPARATOR : ', ' -> channel(HIDDEN);
+COMMENTLINE : COMMENTTAG ~('\n' | '\r')* -> channel(COMMENTS);
+WS : [ \t\f]+ -> channel(HIDDEN);
+COMPILERLINE : DOUBLEMORETHANCHAR ~('\n' | '\r')* -> channel(HIDDEN);
 
 // treat all the non-processed tokens as errors
-ERRORCHAR: .;
+ERRORCHAR : . ;
 
 ZERO_DIGIT: '0';
 
-fragment HEXNUMBER:
+
+fragment HEXNUMBER :
 	X '"' [0-9A-Fa-f]+ '"'
-	| X '\'' [0-9A-Fa-f]+ '\'';
+	| X '\'' [0-9A-Fa-f]+ '\''
+;
 
-fragment NULLTERMINATED:
+fragment NULLTERMINATED :
 	Z '"' (~["\n\r] | '""' | '\'')* '"'
-	| Z '\'' (~['\n\r] | '\'\'' | '"')* '\'';
+	| Z '\'' (~['\n\r] | '\'\'' | '"')* '\''
+;
 
-fragment STRINGLITERAL:
+fragment STRINGLITERAL :
 	'"' (~["\n\r] | '""' | '\'')* '"'
-	| '\'' (~['\n\r] | '\'\'' | '"')* '\'';
+	| '\'' (~['\n\r] | '\'\'' | '"')* '\''
+;
 
-fragment UNTRMSTRINGLITERAL:
+fragment UNTRMSTRINGLITERAL :
 	'"' (~["\n\r] | '""' | '\'')*
-	| '\'' (~['\n\r] | '\'\'' | '"')*;
+	| '\'' (~['\n\r] | '\'\'' | '"')*
+;
 
-fragment DBCSLITERAL:
+fragment DBCSLITERAL :
 	[GN] '"' (~["\n\r] | '""' | '\'')* '"'
-	| [GN] '\'' (~['\n\r] | '\'\'' | '"')* '\'';
+	| [GN] '\'' (~['\n\r] | '\'\'' | '"')* '\''
+;
 
-fragment OCT_DIGIT: [0-8];
+fragment
+OCT_DIGIT        : [0-8] ;
 fragment DIGIT: OCT_DIGIT | [9];
 // case insensitive chars
-fragment A: ('a' | 'A');
-fragment B: ('b' | 'B');
-fragment C: ('c' | 'C');
-fragment D: ('d' | 'D');
-fragment E: ('e' | 'E');
-fragment F: ('f' | 'F');
-fragment G: ('g' | 'G');
-fragment H: ('h' | 'H');
-fragment I: ('i' | 'I');
-fragment J: ('j' | 'J');
-fragment K: ('k' | 'K');
-fragment L: ('l' | 'L');
-fragment M: ('m' | 'M');
-fragment N: ('n' | 'N');
-fragment O: ('o' | 'O');
-fragment P: ('p' | 'P');
-fragment Q: ('q' | 'Q');
-fragment R: ('r' | 'R');
-fragment S: ('s' | 'S');
-fragment T: ('t' | 'T');
-fragment U: ('u' | 'U');
-fragment V: ('v' | 'V');
-fragment W: ('w' | 'W');
-fragment X: ('x' | 'X');
-fragment Y: ('y' | 'Y');
-fragment Z: ('z' | 'Z');
+fragment A:('a'|'A');
+fragment B:('b'|'B');
+fragment C:('c'|'C');
+fragment D:('d'|'D');
+fragment E:('e'|'E');
+fragment F:('f'|'F');
+fragment G:('g'|'G');
+fragment H:('h'|'H');
+fragment I:('i'|'I');
+fragment J:('j'|'J');
+fragment K:('k'|'K');
+fragment L:('l'|'L');
+fragment M:('m'|'M');
+fragment N:('n'|'N');
+fragment O:('o'|'O');
+fragment P:('p'|'P');
+fragment Q:('q'|'Q');
+fragment R:('r'|'R');
+fragment S:('s'|'S');
+fragment T:('t'|'T');
+fragment U:('u'|'U');
+fragment V:('v'|'V');
+fragment W:('w'|'W');
+fragment X:('x'|'X');
+fragment Y:('y'|'Y');
+fragment Z:('z'|'Z');
