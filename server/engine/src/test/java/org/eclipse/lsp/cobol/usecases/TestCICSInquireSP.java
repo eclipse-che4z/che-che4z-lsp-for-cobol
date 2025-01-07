@@ -88,7 +88,7 @@ public class TestCICSInquireSP {
                 "LIBRARY({$varOne}) APPLICATION({$varOne}) APPLMAJORVER({$varOne}) APPLMINORVER({$varOne}) APPLMICROVER({$varOne}) CHANGEAGREL({$varOne}) CHANGETIME({$varOne}) CHANGEUSRID({$varOne}) DEFINESOURCE({$varOne}) DEFINETIME({$varOne}) DSNAME01({$varOne}) DSNAME02({$varOne}) DSNAME03({$varOne}) DSNAME04({$varOne}) DSNAME05({$varOne}) DSNAME06({$varOne}) DSNAME07({$varOne}) DSNAME08({$varOne}) DSNAME09({$varOne}) DSNAME10({$varOne}) DSNAME11({$varOne}) DSNAME12({$varOne}) DSNAME13({$varOne}) DSNAME14({$varOne}) DSNAME15({$varOne}) DSNAME16({$varOne}) INSTALLUSRID({$varOne}) INSTALLTIME({$varOne}) NUMDSNAMES({$varOne}) PLATFORM({$varOne}) RANKING({$varOne}) SEARCHPOS({$varOne}) CHANGEAGENT({$varOne}) CRITICALST({$varOne}) ENABLESTATUS({$varOne}) INSTALLAGENT({$varOne}) DSNAMELIST({$varOne})",
                 "MODENAME({$varOne}) CONNECTION({$varOne}) ACTIVE({$varOne}) AVAILABLE({$varOne}) MAXIMUM({$varOne}) MAXWINNERS({$varOne}) AUTOCONNECT({$varOne})",
                 "MONITOR APPLNAMEST({$varOne}) COMPRESSST({$varOne}) CONVERSEST({$varOne}) EXCEPTCLASS({$varOne}) IDNTYCLASS({$varOne}) PERFCLASS({$varOne}) RESRCECLASS({$varOne}) RMIST({$varOne}) STATUS({$varOne}) SYNCPOINTST({$varOne}) TIME({$varOne}) DPLLIMIT({$varOne}) FILELIMIT({$varOne}) FREQUENCY({$varOne}) FREQUENCYHRS({$varOne}) FREQUENCYMINS({$varOne}) FREQUENCYSECS({$varOne}) TSQUEUELIMIT({$varOne}) URIMAPLIMIT({$varOne}) WEBSERVLIMIT({$varOne})",
-                "MQCONN CHANGEAGENT({$varOne}) CONNECTST({$varOne}) INSTALLAGENT({$varOne}) RESYNCNUMBER({$varOne}) CHANGEAGREL({$varOne}) CHANGETIME({$varOne}) CHANGEUSRID({$varOne}) DEFINESOURCE({$varOne}) DEFINETIME({$varOne}) INSTALLTIME({$varOne}) INSTALLUSRID({$varOne}) MQNAME({$varOne}) MQQMGR({$varOne}) MQRELEASE({$varOne}) TASKS({$varOne}) TRIGMONTASKS({$varOne})",
+                "MQCONN CHANGEAGENT({$varOne}) CONNECTST({$varOne}) INSTALLAGENT({$varOne}) RESYNCMEMBER({$varOne}) CHANGEAGREL({$varOne}) CHANGETIME({$varOne}) CHANGEUSRID({$varOne}) DEFINESOURCE({$varOne}) DEFINETIME({$varOne}) INSTALLTIME({$varOne}) INSTALLUSRID({$varOne}) MQNAME({$varOne}) MQQMGR({$varOne}) MQRELEASE({$varOne}) TASKS({$varOne}) TRIGMONTASKS({$varOne})",
                 "MQINI({$varOne}) CHANGEAGENT({$varOne}) INSTALLAGENT({$varOne}) CHANGEAGREL({$varOne}) CHANGETIME({$varOne}) CHANGEUSRID({$varOne}) DEFINESOURCE({$varOne}) DEFINETIME({$varOne}) INITQNAME({$varOne}) INSTALLTIME({$varOne}) INSTALLUSRID({$varOne})",
                 "MQMONITOR({$varOne}) CHANGEAGENT({$varOne}) ENABLESTATUS({$varOne}) INSTALLAGENT({$varOne}) MONSTATUS({$varOne}) CHANGEAGREL({$varOne}) CHANGETIME({$varOne}) CHANGEUSRID({$varOne}) DEFINESOURCE({$varOne}) DEFINETIME({$varOne}) INSTALLTIME({$varOne}) INSTALLUSRID({$varOne}) MONDATA({$varOne}) MONUSERID({$varOne}) QNAME({$varOne}) TASKID({$varOne}) TRANSACTION({$varOne}) USERID({$varOne})",
                 "MVSTCB({$varOne}) NEXT SET({$varOne}) NUMELEMENTS({$varOne})",
@@ -104,30 +104,30 @@ public class TestCICSInquireSP {
                 "PROGRAM({$varOne}) APIST({$varOne}) CEDFSTATUS({$varOne}) CHANGEAGENT({$varOne}) COBOLTYPE({$varOne}) COPY({$varOne}) CONCURRENCY({$varOne}) DATALOCATION({$varOne}) DYNAMSTATUS({$varOne}) EXECKEY({$varOne}) EXECUTIONSET({$varOne}) HOLDSTATUS({$varOne}) INSTALLAGENT({$varOne}) LANGDEDUCED({$varOne}) LANGUAGE({$varOne}) LPASTATUS({$varOne}) PROGTYPE({$varOne}) REPLICATION({$varOne}) RESIDENCY({$varOne}) RUNTIME({$varOne}) SHARESTATUS({$varOne}) STATUS({$varOne}) APPLICATION({$varOne}) APPLMAJORVER({$varOne}) APPLMINORVER({$varOne}) APPLMICROVER({$varOne}) CHANGEAGREL({$varOne}) CHANGETIME({$varOne}) CHANGEUSRID({$varOne}) DEFINESOURCE({$varOne}) DEFINETIME({$varOne}) INSTALLTIME({$varOne}) INSTALLUSRID({$varOne}) JVMCLASS({$varOne}) JVMPROFILE({$varOne}) JVMSERVER({$varOne}) LENGTH({$varOne}) LIBRARY({$varOne}) LIBRARYDSN({$varOne}) OPERATION({$varOne}) PLATFORM({$varOne}) REMOTENAME({$varOne}) REMOTESYSTEM({$varOne}) RESCOUNT({$varOne}) TRANSID({$varOne}) USECOUNT({$varOne}) ENTRYPOINT({$varOne}) LOADPOINT({$varOne})",
                 "REQID({$varOne}) AFTER REQTYPE({$varOne}) FMHSTATUS({$varOne}) SET({$varOne}) TERMID({$varOne}) TRANSID({$varOne}) TIME({$varOne}) HOURS({$varOne}) MINUTES({$varOne}) SECONDS({$varOne}) LENGTH({$varOne}) RTRANSID({$varOne}) RTERMID({$varOne}) QUEUE({$varOne}) USERID({$varOne})",
                 "RRMS OPENSTATUS({$varOne})",
-                "SECDISCOVERY STATUS({$varOne}) CMD({$varOne}) DB2({$varOne}) DCT({$varOne}) FCT({$varOne}) HFS({$varOne}) JCT({$varOne}) PCT({$varOne}) PPT({$varOne}) PSB({$varOne}) RES({$varOne}) TRAN({$varOne}) TST({$varOne}) USER({$varOne}) LATSECDTIME({$varOne}) LASTWRITTIME({$varOne}) SECDCOUNT({$varOne}) NEWSECDCOUNT({$varOne})",
+                "SECDISCOVERY STATUS({$varOne}) CMD({$varOne}) DB2({$varOne}) DCT({$varOne}) FCT({$varOne}) HFS({$varOne}) JCT({$varOne}) PCT({$varOne}) PPT({$varOne}) PSB({$varOne}) RES({$varOne}) TRAN({$varOne}) TST({$varOne}) USER({$varOne}) LASTSECDTIME({$varOne}) LASTWRITTIME({$varOne}) SECDCOUNT({$varOne}) NEWSECDCOUNT({$varOne})",
                 "SECRECORDING({$varOne}) ODADPTRID({$varOne}) ODADPTRDATA1({$varOne}) ODADPTRDATA2({$varOne}) ODADPTRDATA3({$varOne}) ODAPPLID({$varOne}) ODCLNTIPADDR({$varOne}) ODCLNTPORT({$varOne}) ODFACILNAME({$varOne}) ODFACILTYPE({$varOne}) ODIPFAMILY({$varOne}) ODLUNAME({$varOne}) ODNETID({$varOne}) ODNETWORKID({$varOne}) ODSERVERPORT({$varOne}) ODTCPIPS({$varOne}) ODTRANSID({$varOne}) ODUSERID({$varOne}) MAXIMUM({$varOne}) CURRENT({$varOne})",
-                "STATISTICS RECORDING({$varOne}) ENDOFDAY({$varOne}) ENDOFDAYHRS({$varOne}) ENDOFDAYMINS({$varOne}) ENDOFDAYSECS({$varOne}) INTERVAL({$varOne}) INTERVALHRS({$varOne}) INTERVALMINS({$varOne}) INTERVALSECS({$varOne}) NEXTTIME({$varOne}) NEXTTIMEHRS({$varOne}) NEXTTIMEMINS({$varOne}) NEXTTIMESECS({$varOne})",
-                "STORAGE ADDRESS({$varOne}) ELEMENT({$varOne}) ELEMENTLIST({$varOne}) LENGTHLIST({$varOne}) FLENGTH({$varOne}) NUMELEMENTS({$varOne}) TASK({$varOne})",
-                "STORAGE64 ELEMENT64({$varOne}) ELEMENTLIST({$varOne}) LENGTHLIST({$varOne}) ADRESS64({$varOne}) DSANAME({$varOne}) TASK({$varOne}) FLENGTH({$varOne}) NUMELEMENTS({$varOne})",
+                "STATISTICS RECORDING({$varOne}) ENDOFDAYHRS({$varOne}) ENDOFDAYMINS({$varOne}) ENDOFDAYSECS({$varOne}) INTERVALHRS({$varOne}) INTERVALMINS({$varOne}) INTERVALSECS({$varOne}) NEXTTIME({$varOne})",
+                "STORAGE ADDRESS({$varOne}) ELEMENT({$varOne}) FLENGTH({$varOne})",
+                "STORAGE64 ELEMENT64({$varOne}) ADDRESS64({$varOne}) DSANAME({$varOne}) FLENGTH({$varOne})",
                 "STREAMNAME({$varOne}) STATUS({$varOne}) SYSTEMLOG({$varOne}) USECOUNT({$varOne})",
-                "SUBPOOL({$varOne}) DSANAME({$varOne})",
+                "SUBPOOL({$varOne}) NEXT DSANAME({$varOne})",
                 "SYSDUMPCODE({$varOne}) CHANGEAGENT({$varOne}) DAEOPTION({$varOne}) DUMPSCOPE({$varOne}) INSTALLAGENT({$varOne}) SHUTOPTION({$varOne}) SYSDUMPING({$varOne}) CHANGEAGREL({$varOne}) CHANGETIME({$varOne}) CHANGEUSRID({$varOne}) CURRENT({$varOne}) DEFINESOURCE({$varOne}) DEFINETIME({$varOne}) DSPLIST({$varOne}) INSTALLTIME({$varOne}) INSTALLUSRID({$varOne}) JOBLIST({$varOne}) MAXIMUM({$varOne})",
                 "SYSTEM ACTOPENTCBS({$varOne}) AIDCOUNT({$varOne}) AKP({$varOne}) CDSASIZE({$varOne}) CICSSYS({$varOne}) CICSTSLEVEL({$varOne}) DB2CONN({$varOne}) DFLTUSER({$varOne}) DSALIMIT({$varOne}) DSRTPROGRAM({$varOne}) DTRPROGRAM({$varOne}) ECDSASIZE({$varOne}) EDSALIMIT({$varOne}) EPCDSASIZE({$varOne}) EPUDSASIZE({$varOne}) ERDSASIZE({$varOne}) ESDSASIZE({$varOne}) EUDSASIZE({$varOne}) GCDSASIZE({$varOne}) GMMTEXT({$varOne}) GMMLENGTH({$varOne}) GSDSASIZE({$varOne}) GUDSASIZE({$varOne}) GMMTRANID({$varOne}) JOBNAME({$varOne}) LASTCOLDTIME({$varOne}) LASTEMERTIME({$varOne}) LASTINITTIME({$varOne}) LASTWARMTIME({$varOne}) LOGDEFER({$varOne}) MAXOPENTCBS({$varOne}) MAXTASKS({$varOne}) MEMLIMIT({$varOne}) MQCONN({$varOne}) MROBATCH({$varOne}) MVSSMFID({$varOne}) MVSSYSNAME({$varOne}) OPREL({$varOne}) OPSYS({$varOne}) OSLEVEL({$varOne}) PCDSASIZE({$varOne}) PLTPIUSR({$varOne}) PROGAUTOEXIT({$varOne}) PRTYAGING({$varOne}) PUDSASIZE({$varOne}) RDSASIZE({$varOne}) REGIONUSERID({$varOne}) RELEASE({$varOne}) RUNAWAY({$varOne}) SCANDELAY({$varOne}) SDSASIZE({$varOne}) SDTMEMLIMIT({$varOne}) SDTRAN({$varOne}) STARTUPDATE({$varOne}) TIME({$varOne}) UDSASIZE({$varOne}) SRRTASKS({$varOne}) CICSSTATUS({$varOne}) CMDPROTECT({$varOne}) COLDSTATUS({$varOne}) DEBUGTOOL({$varOne}) DUMPING({$varOne}) FORCEQR({$varOne}) HEALTHCHECK({$varOne}) INITSTATUS({$varOne}) MESSAGECASE({$varOne}) PROGAUTOCTLG({$varOne}) PROGAUTOINST({$varOne}) REENTPROTECT({$varOne}) RLSSTATUS({$varOne}) SECURITYMGR({$varOne}) SHUTSTATUS({$varOne}) SOSABOVEBAR({$varOne}) SOSABOVELINE({$varOne}) SOSBELOWLINE({$varOne}) SOSSTATUS({$varOne}) STARTUP({$varOne}) STOREPROTECT({$varOne}) TRANISOLATE({$varOne}) XRFSTATUS({$varOne})",
-                "TAG START NEXT END",
+                "TAG START",
                 "TASK ACTIVITY({$varOne}) ACTIVITYID({$varOne}) ATTACHTIME({$varOne}) BRFACILITY({$varOne}) BRIDGE({$varOne}) CURRENTPROG({$varOne}) DB2PLAN({$varOne}) DTIMEOUT({$varOne}) FACILITY({$varOne}) IDENTIFIER({$varOne}) INDOUBTMINS({$varOne}) IPFLISTSIZE({$varOne}) PRIORITY({$varOne}) PROCESS({$varOne}) PROCESSTYPE({$varOne}) PROFILE({$varOne}) PROGRAM({$varOne}) REMOTENAME({$varOne}) REMOTESYSTEM({$varOne}) RTIMEOUT({$varOne}) RUNAWAY({$varOne}) STARTCODE({$varOne}) SUSPENDTIME({$varOne}) SUSPENDTYPE({$varOne}) SUSPENDVALUE({$varOne}) RESNAME({$varOne}) TRANCLASS({$varOne}) TCLASS({$varOne}) TRANPRIORITY({$varOne}) TRANSACTION({$varOne}) TRPROF({$varOne}) TWASIZE({$varOne}) UOW({$varOne}) USERID({$varOne}) CMDSEC({$varOne}) DUMPING({$varOne}) FACILITYTYPE({$varOne}) INDOUBT({$varOne}) INDOUBTWAIT({$varOne}) ISOLATEST({$varOne}) PURGEABILITY({$varOne}) RESSEC({$varOne}) ROUTING({$varOne}) RUNSTATUS({$varOne}) SCRNSIZE({$varOne}) SRRSTATUS({$varOne}) STORAGECLEAR({$varOne}) TASKDATAKEY({$varOne}) TASKDATALOC({$varOne}) TCB({$varOne}) TRACING({$varOne}) IPFACILITIES({$varOne})",
                 "TASK LIST DISPATCHABLE RUNNING SUSPENDED LISTSIZE({$varOne}) SET({$varOne}) SETTRANSID({$varOne})",
                 "TCLASS({$varOne}) CURRENT({$varOne}) MAXIMUM({$varOne})",
                 "TCPIP ACTSOCKETS({$varOne}) CRLPROFILE({$varOne}) MAXSOCKETS({$varOne}) OPENSTATUS({$varOne}) SSLCACHE({$varOne})",
                 "TCPIPSERVICE({$varOne}) CERTIFICATE({$varOne}) CHANGEAGREL({$varOne}) CHANGETIME({$varOne}) CHANGEUSRID({$varOne}) CIPHERS({$varOne}) CLOSETIMEOUT({$varOne}) CONNECTIONS({$varOne}) DEFINESOURCE({$varOne}) DEFINETIME({$varOne}) GENERICTCPS({$varOne}) HOST({$varOne}) INSTALLTIME({$varOne}) INSTALLUSRID({$varOne}) IPADDRESS({$varOne}) IPRESOLVED({$varOne}) MAXDATALEN({$varOne}) MAXPERSIST({$varOne}) NUMCIPHERS({$varOne}) OPTIONSPGM({$varOne}) PORT({$varOne}) REALM({$varOne}) SPECIFTCPS({$varOne}) TRANSID({$varOne}) URM({$varOne}) BACKLOG({$varOne}) ATTACHSEC({$varOne}) ATTLS({$varOne}) AUTHENTICATE({$varOne}) CHANGEAGENT({$varOne}) HOSTTYPE({$varOne}) INSTALLAGENT({$varOne}) IPFAMILY({$varOne}) OPENSTATUS({$varOne}) PRIVACY({$varOne}) PROTOCOL({$varOne}) SOCKETCLOSE({$varOne}) SSLTYPE({$varOne})",
-                "TDQUEUE({$varOne}) ATITERMID({$varOne}) ATITRANID({$varOne}) ATIUSERID({$varOne}) BLOCKSIZE({$varOne}) DATABUFFERS({$varOne}) DDNAME({$varOne}) DSNAME({$varOne}) INDIRECTNAME({$varOne}) MEMBER({$varOne}) NUMITEMS({$varOne}) RECORDLENGTH({$varOne}) REMOTENAME({$varOne}) REMOTESYSTEM({$varOne}) TRIGGERLEVEL({$varOne}) ATIFACILITY({$varOne}) BLOCKFORMAT({$varOne}) DISPOSITION({$varOne}) EMPTYSTATUS({$varOne}) ENABLESTATUS({$varOne}) ERROROPTION({$varOne}) INDOUBT({$varOne}) INDOUBTWAIT({$varOne}) IOTYPE({$varOne}) OPENSTATUS({$varOne}) PRINTCONTROL({$varOne}) RECORDFORMAT({$varOne}) RECOVSTATUS({$varOne}) REWIND({$varOne}) SYSOUTCLASS({$varOne}) TYPE({$varOne})",
+                "TDQUEUE({$varOne}) CHANGEAGENT({$varOne}) CHANGEAGREL({$varOne}) CHANGETIME({$varOne}) CHANGEUSRID({$varOne}) DEFINESOURCE({$varOne}) DEFINETIME({$varOne}) INSTALLAGENT({$varOne}) INSTALLTIME({$varOne}) INSTALLUSRID({$varOne}) ATITERMID({$varOne}) ATITRANID({$varOne}) ATIUSERID({$varOne}) BLOCKSIZE({$varOne}) DATABUFFERS({$varOne}) DDNAME({$varOne}) DSNAME({$varOne}) INDIRECTNAME({$varOne}) MEMBER({$varOne}) NUMITEMS({$varOne}) RECORDLENGTH({$varOne}) REMOTENAME({$varOne}) REMOTESYSTEM({$varOne}) TRIGGERLEVEL({$varOne}) ATIFACILITY({$varOne}) BLOCKFORMAT({$varOne}) DISPOSITION({$varOne}) EMPTYSTATUS({$varOne}) ENABLESTATUS({$varOne}) ERROROPTION({$varOne}) INDOUBT({$varOne}) INDOUBTWAIT({$varOne}) IOTYPE({$varOne}) OPENSTATUS({$varOne}) PRINTCONTROL({$varOne}) RECORDFORMAT({$varOne}) RECOVSTATUS({$varOne}) REWIND({$varOne}) SYSOUTCLASS({$varOne}) TYPE({$varOne})",
                 "TEMPSTORAGE TSMAININUSE({$varOne}) TSMAINLIMIT({$varOne})",
                 "TERMINAL({$varOne}) NETNAME({$varOne}) AIDCOUNT({$varOne}) ALTPAGEHT({$varOne}) ALTPAGEWD({$varOne}) ALTPRINTER({$varOne}) ALTSCRNHT({$varOne}) ALTSCRNWD({$varOne}) ALTSUFFIX({$varOne}) CONSOLE({$varOne}) CORRELID({$varOne}) DEFPAGEHT({$varOne}) DEFPAGEWD({$varOne}) DEFSCRNHT({$varOne}) DEFSCRNWD({$varOne}) GCHARS({$varOne}) GCODES({$varOne}) LINKSYSTEM({$varOne}) MAPNAME({$varOne}) MAPSETNAME({$varOne}) MODENAME({$varOne}) NATLANG({$varOne}) NEXTTRANSID({$varOne}) NQNAME({$varOne}) OPERID({$varOne}) PAGEHT({$varOne}) PAGEWD({$varOne}) PRINTER({$varOne}) REMOTENAME({$varOne}) REMOTESYSNET({$varOne}) REMOTESYSTEM({$varOne}) SCRNHT({$varOne}) SCRNWD({$varOne}) TASKID({$varOne}) TCAMCONTROL({$varOne}) TERMMODEL({$varOne}) TERMPRIORITY({$varOne}) TNADDR({$varOne}) TNPORT({$varOne}) TRANSACTION({$varOne}) USERAREALEN({$varOne}) USERID({$varOne}) USERNAME({$varOne}) ACCESSMETHOD({$varOne}) ACQSTATUS({$varOne}) ALTPRTCOPYST({$varOne}) APLKYBDST({$varOne}) APLTEXTST({$varOne}) ASCII({$varOne}) ATISTATUS({$varOne}) AUDALARMST({$varOne}) AUTOCONNECT({$varOne}) BACKTRANSST({$varOne}) COLORST({$varOne}) COPYST({$varOne}) CREATESESS({$varOne}) DATASTREAM({$varOne}) DEVICE({$varOne}) DISCREQST({$varOne}) DUALCASEST({$varOne}) EXITTRACING({$varOne}) EXTENDEDDSST({$varOne}) FMHPARMST({$varOne}) FORMFEEDST({$varOne}) HFORMST({$varOne}) HILIGHTST({$varOne}) KATAKANAST({$varOne}) LIGHTPENST({$varOne}) MSRCONTROLST({$varOne}) NATURE({$varOne}) OBFORMATST({$varOne}) OBOPERIDST({$varOne}) OUTLINEST({$varOne}) PAGESTATUS({$varOne}) PARTITIONSST({$varOne}) PRINTADAPTST({$varOne}) PROGSYMBOLST({$varOne}) PRTCOPYST({$varOne}) QUERYST({$varOne}) RELREQST({$varOne}) SECURITY({$varOne}) SERVSTATUS({$varOne}) SESSIONTYPE({$varOne}) SIGNONSTATUS({$varOne}) SOSIST({$varOne}) TERMSTATUS({$varOne}) TEXTKYBDST({$varOne}) TEXTPRINTST({$varOne}) TNIPFAMILY({$varOne}) TRACING({$varOne}) TTISTATUS({$varOne}) UCTRANST({$varOne}) VALIDATIONST({$varOne}) VFORMST({$varOne}) ZCPTRACING({$varOne}) USERAREA({$varOne})",
                 "TRACEDEST CURAUXDS({$varOne}) TABLESIZE({$varOne}) AUXSTATUS({$varOne}) GTFSTATUS({$varOne}) INTSTATUS({$varOne}) SWITCHSTATUS({$varOne})",
                 "TRACEFLAG SINGLESTATUS({$varOne}) SYSTEMSTATUS({$varOne}) TCEXITSTATUS({$varOne}) USERSTATUS({$varOne})",
-                "TRACETYPE SPECIAL STANDARD COMPID({$varOne}) FLAGSET({$varOne})",
+                "TRACETYPE DD({$varOne}) FLAGSET({$varOne})",
                 "TRANCLASS({$varOne}) ACTIVE({$varOne}) MAXACTIVE({$varOne}) PURGETHRESH({$varOne}) QUEUED({$varOne}) CHANGEAGREL({$varOne}) CHANGETIME({$varOne}) CHANGEUSRID({$varOne}) DEFINESOURCE({$varOne}) DEFINETIME({$varOne}) INSTALLTIME({$varOne}) INSTALLUSRID({$varOne}) CHANGEAGENT({$varOne}) INSTALLAGENT({$varOne}) PURGEACTION({$varOne})",
                 "TRANDUMPCODE({$varOne}) CURRENT({$varOne}) MAXIMUM({$varOne}) CHANGEAGREL({$varOne}) CHANGETIME({$varOne}) CHANGEUSRID({$varOne}) DEFINESOURCE({$varOne}) DEFINETIME({$varOne}) INSTALLTIME({$varOne}) INSTALLUSRID({$varOne}) DUMPSCOPE({$varOne}) SHUTOPTION({$varOne}) SYSDUMPING({$varOne}) TRANDUMPING({$varOne}) CHANGEAGENT({$varOne}) INSTALLAGENT({$varOne})",
-                "TRANSACTION({$varOne}) BREXIT({$varOne}) DTIMEOUT({$varOne}) FACILITYLIKE({$varOne}) INDOUBTMINS({$varOne}) OTSTIMEOUT({$varOne}) PRIORITY({$varOne}) PROFILE({$varOne}) PROGRAM({$varOne}) REMOTENAME({$varOne}) REMOTESYSTEM({$varOne}) RTIMEOUT({$varOne}) RUNAWAY({$varOne}) TCLASS({$varOne}) TRANCLASS({$varOne}) TRPROF({$varOne}) TWASIZE({$varOne}) CHANGEAGREL({$varOne}) CHANGETIME({$varOne}) CHANGEUSRID({$varOne}) DEFINESOURCE({$varOne}) DEFINETIME({$varOne}) INSTALLTIME({$varOne}) INSTALLUSRID({$varOne}) APPLICATION({$varOne}) APPLMAJORVER({$varOne}) APPLMICROVER({$varOne}) APPLMINORVER({$varOne}) OPERATION({$varOne}) PLATFORM({$varOne}) AVAILSTATUS({$varOne}) CMDSEC({$varOne}) DUMPING({$varOne}) INDOUBT({$varOne}) INDOUBTWAIT({$varOne}) ISOLATEST({$varOne}) PURGEABILITY({$varOne}) RESSEC({$varOne}) ROUTING({$varOne}) ROUTESTATUS({$varOne}) RUNAWAYTYPE({$varOne}) SCRNSIZE({$varOne}) SHUTDOWN({$varOne}) STATUS({$varOne}) STORAGECLEAR({$varOne}) TASKDATAKEY({$varOne}) TASKDATALOC({$varOne}) TRACING({$varOne}) CHANGEAGENT({$varOne}) INSTALLAGENT({$varOne})",
+                "TRANSACTION({$varOne}) BREXIT({$varOne}) DTIMEOUT({$varOne}) FACILITYLIKE({$varOne}) INDOUBTMINS({$varOne}) OTSTIMEOUT({$varOne}) PRIORITY({$varOne}) PROFILE({$varOne}) PROGRAM({$varOne}) REMOTENAME({$varOne}) REMOTESYSTEM({$varOne}) RTIMEOUT({$varOne}) RUNAWAY({$varOne}) TRANCLASS({$varOne}) TRPROF({$varOne}) TWASIZE({$varOne}) CHANGEAGREL({$varOne}) CHANGETIME({$varOne}) CHANGEUSRID({$varOne}) DEFINESOURCE({$varOne}) DEFINETIME({$varOne}) INSTALLTIME({$varOne}) INSTALLUSRID({$varOne}) APPLICATION({$varOne}) APPLMAJORVER({$varOne}) APPLMICROVER({$varOne}) APPLMINORVER({$varOne}) OPERATION({$varOne}) PLATFORM({$varOne}) AVAILSTATUS({$varOne}) CMDSEC({$varOne}) DUMPING({$varOne}) INDOUBT({$varOne}) INDOUBTWAIT({$varOne}) ISOLATEST({$varOne}) PURGEABILITY({$varOne}) RESSEC({$varOne}) ROUTING({$varOne}) ROUTESTATUS({$varOne}) RUNAWAYTYPE({$varOne}) SCRNSIZE({$varOne}) SHUTDOWN({$varOne}) STATUS({$varOne}) STORAGECLEAR({$varOne}) TASKDATAKEY({$varOne}) TASKDATALOC({$varOne}) TRACING({$varOne}) CHANGEAGENT({$varOne}) INSTALLAGENT({$varOne})",
                 "TSMODEL({$varOne}) CHANGEAGREL({$varOne}) CHANGETIME({$varOne}) CHANGEUSRID({$varOne}) DEFINESOURCE({$varOne}) DEFINETIME({$varOne}) EXPIRYINT({$varOne}) EXPIRYINTMIN({$varOne}) INSTALLTIME({$varOne}) INSTALLUSRID({$varOne}) POOLNAME({$varOne}) PREFIX({$varOne}) REMOTEPREFIX({$varOne}) REMOTESYSTEM({$varOne}) CHANGEAGENT({$varOne}) INSTALLAGENT({$varOne}) LOCATION({$varOne}) RECOVSTATUS({$varOne}) SECURITYST({$varOne})",
                 "TSPOOL({$varOne}) CONNSTATUS({$varOne})",
                 "TSQUEUE({$varOne}) EXPIRYINT({$varOne}) EXPIRYINTMIN({$varOne}) FLENGTH({$varOne}) LASTUSEDINT({$varOne}) MAXITEMLEN({$varOne}) MINITEMLEN({$varOne}) NUMITEMS({$varOne}) TRANSID({$varOne}) POOLNAME({$varOne}) TSMODEL({$varOne}) LOCATION({$varOne}) RECOVSTATUS({$varOne})",
@@ -206,6 +206,237 @@ public class TestCICSInquireSP {
     private static final String BUNDLEPART_BROWSE_WITH_PARAM_INVALID = "INQUIRE BUNDLEPART{(1)|errorOne} START BUNDLE(1)";
 
     private static final String ENQ_VALID = "INQUIRE ENQ NEXT RESOURCE({$varOne}) RESLEN({$varOne}) UOW({$varOne})";
+
+    private static final String TRACETYPE_INVALID = "INQUIRE TRACETYPE {SPECIAL|errorOne} {FLAGSET|errorTwo}(1) {AP|errorThree}(1) {APPLICATION|errorFour}(1)";
+
+    private static final String TRANSACTION_INVALID = "INQUIRE TRANSACTION(1) {TCLASS|errorOne}(1) {TRANCLASS|errorTwo}(1)";
+
+    private static final String TCPIPSERVICE_VALID = "INQUIRE TCPIPSERVICE START";
+
+    private static final String TASKLIST_INVALID = "INQUIRE {_TASK LIST DISPATCHABLE RUNNING {SETTRANSID|errorTwo}(1) SUSPENDED|errorOne_}";
+
+    private static final String TASK_VALID = "INQUIRE TASK";
+
+    private static final String TAG_VALID = "INQUIRE TAG({$varOne}) NEXT";
+
+    private static final String TAG_INVALID = "INQUIRE {TAG|errorOne} NEXT";
+
+    private static final String SUBPOOL_VALID = "INQUIRE SUBPOOL START";
+
+    private static final String STORAGE64_INVALID = "INQUIRE STORAGE64 NUMELEMENTS(1) {DSANAME|errorOne}(1)";
+
+    private static final String STORAGE_INVALID = "INQUIRE STORAGE NUMELEMENTS(1) {ELEMENT|errorOne}(1)";
+
+    private static final String STATS_INVALID = "INQUIRE {_STATISTICS {ENDOFDAY|errorOne}(1) {ENDOFDAYHRS|errorTwo}(1) RECORDING(1)|errorThree|errorFour_}";
+
+    private static final String PROGRAM_INVALID = "INQUIRE {_PROGRAM(1) APPLICATION(1) APPLMAJORVER(1) APPLMICROVER(1) APPLMINORVER(1)|errorOne_}";
+
+    private static final String PROGRAM_VALID = "INQUIRE PROGRAM({$varOne})";
+
+    private static final String PROCESSTYPE_VALID = "INQUIRE PROCESSTYPE({$varOne})";
+
+    private static final String NETNAME_VALID = "INQUIRE NETNAME({$varOne}) NEXT TERMINAL({$varOne})";
+
+    private static final String MQCONN_VALID = "INQUIRE MQCONN RESYNCMEMBER({$varOne})";
+
+    private static final String SECDISCOVERY_VALID = "INQUIRE SECDISCOVERY STATUS({$varOne}) LASTSECDTIME({$varOne})";
+
+    @Test
+    void testLastSecD() {
+        CICSTestUtils.noErrorTest(SECDISCOVERY_VALID, "SP");
+    }
+
+    @Test
+    void testMQConn() {
+        CICSTestUtils.noErrorTest(MQCONN_VALID, "SP");
+    }
+
+    @Test
+    void testNetname() {
+        CICSTestUtils.noErrorTest(NETNAME_VALID, "SP");
+    }
+
+    @Test
+    void testProcesstype() {
+        CICSTestUtils.noErrorTest(PROCESSTYPE_VALID, "SP");
+    }
+
+    @Test
+    void testProgram() {
+        CICSTestUtils.noErrorTest(PROGRAM_VALID, "SP");
+    }
+
+    @Test
+    void testInvalidProgram() {
+        Map<String, Diagnostic> expectedDiagnostics =
+                ImmutableMap.of(
+                        "errorOne",
+                        new Diagnostic(
+                                new Range(),
+                                "Missing required option: PLATFORM with APPLICATION",
+                                DiagnosticSeverity.Error,
+                                ErrorSource.PARSING.getText()));
+        CICSTestUtils.errorTest(PROGRAM_INVALID, expectedDiagnostics, "SP");
+    }
+
+    @Test
+    void testInvalidStatistics() {
+        Map<String, Diagnostic> expectedDiagnostics =
+                ImmutableMap.of(
+                        "errorOne",
+                        new Diagnostic(
+                                new Range(),
+                                "Exactly one option required, options are mutually exclusive: ENDOFDAY or ENDOFDAYHRS",
+                                DiagnosticSeverity.Error,
+                                ErrorSource.PARSING.getText()),
+                        "errorTwo",
+                        new Diagnostic(
+                                new Range(),
+                                "Exactly one option required, options are mutually exclusive: ENDOFDAY or ENDOFDAYHRS",
+                                DiagnosticSeverity.Error,
+                                ErrorSource.PARSING.getText()),
+                        "errorThree",
+                        new Diagnostic(
+                                new Range(),
+                                "Missing required option: ENDOFDAYMINS with ENDOFDAYHRS",
+                                DiagnosticSeverity.Error,
+                                ErrorSource.PARSING.getText()),
+                        "errorFour",
+                        new Diagnostic(
+                                new Range(),
+                                "Missing required option: ENDOFDAYSECS with ENDOFDAYHRS",
+                                DiagnosticSeverity.Error,
+                                ErrorSource.PARSING.getText()));
+        CICSTestUtils.errorTest(STATS_INVALID, expectedDiagnostics, "SP");
+    }
+
+    @Test
+    void testInvalidStorage() {
+        Map<String, Diagnostic> expectedDiagnostics =
+                ImmutableMap.of(
+                        "errorOne",
+                        new Diagnostic(
+                                new Range(),
+                                "Invalid option provided: ELEMENT with NUMELEMENTS",
+                                DiagnosticSeverity.Error,
+                                ErrorSource.PARSING.getText()));
+        CICSTestUtils.errorTest(STORAGE_INVALID, expectedDiagnostics, "SP");
+    }
+
+    @Test
+    void testInvalidS64() {
+        Map<String, Diagnostic> expectedDiagnostics =
+                ImmutableMap.of(
+                        "errorOne",
+                        new Diagnostic(
+                                new Range(),
+                                "Invalid option provided: DSANAME with NUMELEMENTS",
+                                DiagnosticSeverity.Error,
+                                ErrorSource.PARSING.getText()));
+        CICSTestUtils.errorTest(STORAGE64_INVALID, expectedDiagnostics, "SP");
+    }
+
+    @Test
+    void testSubPool() {
+        CICSTestUtils.noErrorTest(SUBPOOL_VALID, "SP");
+    }
+
+    @Test
+    void testInvalidTag() {
+        Map<String, Diagnostic> expectedDiagnostics =
+                ImmutableMap.of(
+                        "errorOne",
+                        new Diagnostic(
+                                new Range(),
+                                "Invalid option or parameter provided: Missing required option parameter",
+                                DiagnosticSeverity.Error,
+                                ErrorSource.PARSING.getText()));
+        CICSTestUtils.errorTest(TAG_INVALID, expectedDiagnostics, "SP");
+    }
+
+    @Test
+    void testTagValid() {
+        CICSTestUtils.noErrorTest(TAG_VALID, "SP");
+    }
+
+    @Test
+    void testTaskValid() {
+        CICSTestUtils.noErrorTest(TASK_VALID, "SP");
+    }
+
+    @Test
+    void testInvalidTaskList() {
+        Map<String, Diagnostic> expectedDiagnostics =
+                ImmutableMap.of(
+                        "errorOne",
+                        new Diagnostic(
+                                new Range(),
+                                "Missing required option: LISTSIZE",
+                                DiagnosticSeverity.Error,
+                                ErrorSource.PARSING.getText()),
+                        "errorTwo",
+                        new Diagnostic(
+                                new Range(),
+                                "Invalid option provided: SETTRANSID without SET",
+                                DiagnosticSeverity.Error,
+                                ErrorSource.PARSING.getText()));
+        CICSTestUtils.errorTest(TASKLIST_INVALID, expectedDiagnostics, "SP");
+    }
+
+    @Test
+    void testTCPIPServValid() {
+        CICSTestUtils.noErrorTest(TCPIPSERVICE_VALID, "SP");
+    }
+
+    @Test
+    void testInvalidTransaction() {
+        Map<String, Diagnostic> expectedDiagnostics =
+                ImmutableMap.of(
+                        "errorOne",
+                        new Diagnostic(
+                                new Range(),
+                                "Exactly one option required, options are mutually exclusive: TCLASS and TRANCLASS",
+                                DiagnosticSeverity.Error,
+                                ErrorSource.PARSING.getText()),
+                        "errorTwo",
+                        new Diagnostic(
+                                new Range(),
+                                "Exactly one option required, options are mutually exclusive: TCLASS and TRANCLASS",
+                                DiagnosticSeverity.Error,
+                                ErrorSource.PARSING.getText()));
+        CICSTestUtils.errorTest(TRANSACTION_INVALID, expectedDiagnostics, "SP");
+    }
+
+    @Test
+    void testInvalidTracetype() {
+        Map<String, Diagnostic> expectedDiagnostics =
+                ImmutableMap.of(
+                        "errorOne",
+                        new Diagnostic(
+                                new Range(),
+                                "Exactly one option required, options are mutually exclusive: FLAGSET or SPECIAL or STANDARD",
+                                DiagnosticSeverity.Error,
+                                ErrorSource.PARSING.getText()),
+                        "errorTwo",
+                        new Diagnostic(
+                                new Range(),
+                                "Exactly one option required, options are mutually exclusive: FLAGSET or SPECIAL or STANDARD",
+                                DiagnosticSeverity.Error,
+                                ErrorSource.PARSING.getText()),
+                        "errorThree",
+                        new Diagnostic(
+                                new Range(),
+                                "Exactly one option required, options are mutually exclusive: AP and APPLICATION",
+                                DiagnosticSeverity.Error,
+                                ErrorSource.PARSING.getText()),
+                        "errorFour",
+                        new Diagnostic(
+                                new Range(),
+                                "Exactly one option required, options are mutually exclusive: AP and APPLICATION",
+                                DiagnosticSeverity.Error,
+                                ErrorSource.PARSING.getText()));
+        CICSTestUtils.errorTest(TRACETYPE_INVALID, expectedDiagnostics, "SP");
+    }
 
     @Test
     void testENQValid() {
