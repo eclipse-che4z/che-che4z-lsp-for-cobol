@@ -1333,7 +1333,7 @@ public class CICSSysSetOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
 
     private void checkTsqueue(CICSParser.Cics_set_tsqueueContext ctx) {
         checkForExactlyOne("TSQUEUE or TSQNAME", ctx, ctx.TSQUEUE(), ctx.TSQNAME());
-        checkMutuallyExclusiveOptions("SYSID or POOLNAME", ctx.TSQUEUE(), ctx.TSQNAME());
+        checkMutuallyExclusiveOptions("SYSID or POOLNAME", ctx.SYSID(), ctx.POOLNAME());
         checkPrerequisiteIsMet(ctx.ACTION(), ctx.LASTUSEDINT(), ctx, "LASTUSEDINT without ACTION");
     }
 
