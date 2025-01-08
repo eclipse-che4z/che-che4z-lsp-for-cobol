@@ -15,6 +15,8 @@ import * as assert from "assert";
 import * as vscode from "vscode";
 import * as path from "path";
 import { LANGUAGE_ID } from "../../constants";
+import * as t from "io-ts";
+import { isRight } from "fp-ts/Either";
 
 export const TEST_TIMEOUT = 150000;
 
@@ -216,6 +218,27 @@ export async function updateConfig(configFileName: string) {
   await vscode.workspace.fs.copy(settingsValueLoc, settingsFileLoc, {
     overwrite: true,
   });
+}
+
+const SettingsCodec = t.record(t.string, t.unknown);
+
+export async function updateConfigValue(key: string, value: unknown) {
+  const settingsFileLoc = vscode.Uri.joinPath(
+    vscode.workspace.workspaceFolders![0].uri,
+    ".vscode",
+    "settings.json",
+  );
+  const settingsFileData = await vscode.workspace.fs.readFile(settingsFileLoc);
+  const settingsText = new TextDecoder().decode(settingsFileData);
+  const decodedSettings = SettingsCodec.decode(JSON.parse(settingsText));
+  if (isRight(decodedSettings)) {
+    const settings = decodedSettings.right;
+    settings[key] = value;
+    await vscode.workspace.fs.writeFile(
+      settingsFileLoc,
+      Buffer.from(JSON.stringify(settings)),
+    );
+  }
 }
 
 export function assertRangeIsEqual(

@@ -266,9 +266,6 @@
           "items": {
             "type": "string"
           },
-          "default": [
-            "**"
-          ],
           "description": "Default list of local paths to search for copybooks",
           "uniqueItems": true
         },

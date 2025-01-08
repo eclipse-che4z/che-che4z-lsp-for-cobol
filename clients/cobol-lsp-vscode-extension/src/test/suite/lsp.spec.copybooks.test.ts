@@ -224,5 +224,34 @@ suite("Integration Test Suite: Copybooks", function () {
         );
       });
     });
+
+    suite("remote dns copybook path is configured", () => {
+      suiteSetup(async () => {
+        await helper.updateConfig("default.json");
+        await helper.updateConfigValue("cobol-lsp.cpy-manager.paths-dsn", [
+          "DATASET.WITH.CPYBOOKS",
+        ]);
+        await helper.activate();
+      });
+
+      test("Only folder from configuration is used for local copybook resolution", async () => {
+        const editor = await helper.showDocument("USERC1N1.cbl");
+
+        let diagnostics: vscode.Diagnostic[] = [];
+        await helper.waitFor(() => {
+          diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
+          return (
+            diagnostics.length > 0 &&
+            diagnostics.some((d) => d.message === "BOOK1N: Copybook not found")
+          );
+        });
+
+        assert.strictEqual(
+          diagnostics.filter((d) => d.message === "BOOK1N: Copybook not found")
+            .length,
+          1,
+        );
+      });
+    });
   });
 });

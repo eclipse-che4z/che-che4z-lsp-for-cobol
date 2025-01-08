@@ -32,6 +32,7 @@ import {
   DIALECT_LIBS,
   COBOL_PRGM_LAYOUT,
   SETTINGS_CPY_NDVR_DEPENDENCIES,
+  ENDEVOR_PROCESSOR,
 } from "../constants";
 import { DialectRegistry, DIALECT_REGISTRY_SECTION } from "./DialectRegistry";
 import {
@@ -130,12 +131,29 @@ export async function lspConfigHandler(request: Request) {
           );
           break;
         case SETTINGS_CPY_LOCAL_PATH:
-          await handleProcessorGroupConfigurationRequest(
-            CopybooksLocalPathsConfigurationCodec,
-            loadProcessorGroupCopybookPathsConfig,
-            item,
-            result,
-          );
+          if (vscode.workspace.getConfiguration().get(item.section)) {
+            await handleProcessorGroupConfigurationRequest(
+              CopybooksLocalPathsConfigurationCodec,
+              loadProcessorGroupCopybookPathsConfig,
+              item,
+              result,
+            );
+          } else {
+            // if no configuration for local or remote copybook paths is provided
+            // use pattern for workspace folder and subfolders as a default value
+            if (
+              SettingsService.getCopybookEndevorDependencySettings() !==
+                ENDEVOR_PROCESSOR &&
+              !vscode.workspace
+                .getConfiguration(SETTINGS_CPY_SECTION)
+                .get(PATHS_DSN) &&
+              !vscode.workspace
+                .getConfiguration(SETTINGS_CPY_SECTION)
+                .get(PATHS_USS)
+            ) {
+              result.push(["**"]);
+            }
+          }
           break;
         case SETTINGS_CPY_EXTENSIONS:
           await handleProcessorGroupConfigurationRequest(
