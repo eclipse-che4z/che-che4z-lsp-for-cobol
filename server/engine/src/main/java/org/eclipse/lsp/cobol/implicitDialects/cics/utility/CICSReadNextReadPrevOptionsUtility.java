@@ -69,14 +69,14 @@ public class CICSReadNextReadPrevOptionsUtility extends CICSOptionsCheckBaseUtil
    * @param <E> A subclass of ParserRuleContext
    */
   public <E extends ParserRuleContext> void checkOptions(E ctx) {
-    if (ctx.getParent().getRuleIndex() == CICSParser.RULE_cics_readnext_readprev) {
-      checkReadNextReadPrev((CICSParser.Cics_readnext_readprevContext) ctx.getParent());
+    if (ctx.getRuleIndex() == CICSParser.RULE_cics_readnext_readprev_body) {
+      checkReadNextReadPrevBody((CICSParser.Cics_readnext_readprev_bodyContext) ctx);
     }
-    checkDuplicates(ctx.getParent());
+    checkDuplicates(ctx);
   }
 
   @SuppressWarnings("unchecked")
-  private void checkReadNextReadPrev(CICSParser.Cics_readnext_readprevContext ctx) {
+  private void checkReadNextReadPrevBody(CICSParser.Cics_readnext_readprev_bodyContext ctx) {
     checkHasMandatoryOptions(ctx.cics_file_name(), ctx, "FILE");
     List<TerminalNode> file = ctx.cics_file_name().stream().map(CICSParser.Cics_file_nameContext::FILE).collect(Collectors.toList());
     List<TerminalNode> dataset = ctx.cics_file_name().stream().map(CICSParser.Cics_file_nameContext::DATASET).collect(Collectors.toList());
@@ -84,8 +84,6 @@ public class CICSReadNextReadPrevOptionsUtility extends CICSOptionsCheckBaseUtil
 
     checkHasMandatoryOptions(ctx.RIDFLD(), ctx, "RIDFLD");
     checkHasExactlyOneOption("INTO or SET", ctx, ctx.INTO(), ctx.SET());
-    checkHasMutuallyExclusiveOptions(
-            "READNEXT or READPREV", Collections.singletonList(ctx.READNEXT()), Collections.singletonList(ctx.READPREV()));
     checkHasMutuallyExclusiveOptions(
             "UNCOMMITTED or CONSISTENT or REPEATABLE or UPDATE", ctx.UNCOMMITTED(), ctx.CONSISTENT(), ctx.REPEATABLE(), ctx.UPDATE());
 

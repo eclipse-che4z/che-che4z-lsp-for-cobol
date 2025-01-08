@@ -56,14 +56,14 @@ public class CICSUnlockOptionsUtility extends CICSOptionsCheckBaseUtility {
    * @param <E> A subclass of ParserRuleContext
    */
   public <E extends ParserRuleContext> void checkOptions(E ctx) {
-    if (ctx.getParent().getRuleIndex() == CICSParser.RULE_cics_unlock) {
-      checkUnlock((CICSParser.Cics_unlockContext) ctx.getParent());
+    if (ctx.getRuleIndex() == CICSParser.RULE_cics_unlock_body) {
+      checkUnlock((CICSParser.Cics_unlock_bodyContext) ctx);
     }
-    checkDuplicates(ctx.getParent());
+    checkDuplicates(ctx);
   }
 
   @SuppressWarnings("unchecked")
-  private void checkUnlock(CICSParser.Cics_unlockContext ctx) {
+  private void checkUnlock(CICSParser.Cics_unlock_bodyContext ctx) {
     checkHasMandatoryOptions(ctx.cics_file_name(), ctx, "FILE");
     List<TerminalNode> file = ctx.cics_file_name().stream().map(CICSParser.Cics_file_nameContext::FILE).collect(Collectors.toList());
     List<TerminalNode> dataset = ctx.cics_file_name().stream().map(CICSParser.Cics_file_nameContext::DATASET).collect(Collectors.toList());

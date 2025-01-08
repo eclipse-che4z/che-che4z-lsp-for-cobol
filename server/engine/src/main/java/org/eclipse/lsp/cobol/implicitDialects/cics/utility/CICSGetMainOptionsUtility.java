@@ -59,14 +59,14 @@ public class CICSGetMainOptionsUtility extends CICSOptionsCheckBaseUtility {
    * @param <E> A subclass of ParserRuleContext
    */
   public <E extends ParserRuleContext> void checkOptions(E ctx) {
-    if (ctx.getParent().getRuleIndex() == CICSParser.RULE_cics_getmain) {
-      checkGetMain((CICSParser.Cics_getmainContext) ctx.getParent());
+    if (ctx.getRuleIndex() == CICSParser.RULE_cics_getmain_body) {
+      checkGetMain((CICSParser.Cics_getmain_bodyContext) ctx);
     }
-    checkDuplicates(ctx.getParent());
+    checkDuplicates(ctx);
   }
 
   @SuppressWarnings("unchecked")
-  private void checkGetMain(CICSParser.Cics_getmainContext ctx) {
+  private void checkGetMain(CICSParser.Cics_getmain_bodyContext ctx) {
     checkHasMandatoryOptions(ctx.SET(), ctx, "SET");
     checkHasExactlyOneOption("FLENGTH or LENGTH", ctx, ctx.FLENGTH(), ctx.LENGTH());
     if (ctx.FLENGTH().isEmpty()) checkHasIllegalOptions(ctx.BELOW(), "BELOW without FLENGTH");

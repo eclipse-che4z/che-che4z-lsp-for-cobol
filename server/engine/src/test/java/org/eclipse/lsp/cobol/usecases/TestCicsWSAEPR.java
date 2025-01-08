@@ -40,6 +40,7 @@ public class TestCicsWSAEPR {
   private static final String WSAEPR_CREATE_SOME_OPTIONS_VALID_THREE = "WSAEPR EPRINTO(1) EPRLENGTH(1) METADATA(2) CREATE METADATALEN(2)";
 
   private static final String WSAEPR_CREATE_BARE_VALID = "WSAEPR CREATE EPRINTO(2) EPRLENGTH(1) METADATA(1)";
+  private static final String WSAEPR_CREATE_BARE_INVALID = "WSAEPR {CREATE|error1|error2|error3}";
 
   private static final String WSAEPR_CREATE_INVALID_ONE = "WSAEPR CREATE {EPRINTO|error1}(1) EPRLENGTH(1) {EPRSET|error1}(1) ADDRESS(2)";
   private static final String WSAEPR_CREATE_INVALID_TWO = "WSAEPR {REFPARMSLEN|error1}(2) CREATE EPRLENGTH(1) EPRSET(1) ADDRESS(2)";
@@ -70,6 +71,34 @@ public class TestCicsWSAEPR {
   @Test
   void testWSAEPRCreateBareValid() {
     CICSTestUtils.noErrorTest(WSAEPR_CREATE_BARE_VALID);
+  }
+
+  @Test
+  void testWSAEPRCreateBareInvalid() {
+    Map<String, Diagnostic> expectedDiagnostic =
+            ImmutableMap.of(
+                    "error1",
+                    new Diagnostic(
+                            new Range(),
+                            "Exactly one option required, none provided: EPRINTO or EPRSET",
+                            DiagnosticSeverity.Error,
+                            ErrorSource.PARSING.getText()
+                    ),
+                    "error2",
+                    new Diagnostic(
+                            new Range(),
+                            "Missing required option: ADDRESS or REFPARMS or METADATA",
+                            DiagnosticSeverity.Error,
+                            ErrorSource.PARSING.getText()
+                    ),
+                    "error3",
+                    new Diagnostic(
+                            new Range(),
+                            "Missing required option: EPRLENGTH",
+                            DiagnosticSeverity.Error,
+                            ErrorSource.PARSING.getText()
+                    ));
+    CICSTestUtils.errorTest(WSAEPR_CREATE_BARE_INVALID, expectedDiagnostic);
   }
 
   @Test

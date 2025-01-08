@@ -100,10 +100,10 @@ public class CICSOptionsCheckUtility {
         CICSWebOptionsCheckUtility.RULE_INDEX,
         new CICSWebOptionsCheckUtility(context, errors));
     optionsMap.put(
-        CICSEndBrowseOptionsUtility.RULE_ENDBR_INDEX,
-        new CICSEndBrowseOptionsUtility(context, errors));
+        CICSEndbrOptionsUtility.RULE_INDEX,
+        new CICSEndbrOptionsUtility(context, errors));
     optionsMap.put(
-        CICSEndBrowseOptionsUtility.RULE_ENDBROWSE_INDEX,
+        CICSEndBrowseOptionsUtility.RULE_INDEX,
         new CICSEndBrowseOptionsUtility(context, errors));
     optionsMap.put(
         CICSDeleteOptionsCheckUtility.RULE_INDEX,
@@ -207,12 +207,67 @@ public class CICSOptionsCheckUtility {
     optionsMap.put(
         CICSGetnextOptionsCheckUtility.RULE_INDEX,
         new CICSGetnextOptionsCheckUtility(context, errors));
-
+    optionsMap.put(
+        CICSSpoolOpenOptionsCheckUtility.RULE_INDEX,
+        new CICSSpoolOpenOptionsCheckUtility(context, errors));
+    optionsMap.put(
+        CICSMonitorOptionsCheckUtility.RULE_INDEX,
+        new CICSMonitorOptionsCheckUtility(context, errors));
+    optionsMap.put(
+        CICSLoadOptionsCheckUtility.RULE_INDEX,
+        new CICSLoadOptionsCheckUtility(context, errors));
+    optionsMap.put(
+        CICSPointOptionsCheckUtility.RULE_INDEX,
+        new CICSPointOptionsCheckUtility(context, errors));
+    optionsMap.put(
+        CICSResetOptionsCheckUtility.RULE_INDEX,
+        new CICSResetOptionsCheckUtility(context, errors));
+    optionsMap.put(
+        CICSPopHandleOptionsCheckUtility.RULE_INDEX,
+        new CICSPopHandleOptionsCheckUtility(context, errors));
+    optionsMap.put(
+        CICSRewindCounterOptionsCheckUtility.RULE_INDEX,
+        new CICSRewindCounterOptionsCheckUtility(context, errors));
+    optionsMap.put(
+        CICSReleaseOptionsCheckUtility.RULE_INDEX,
+        new CICSReleaseOptionsCheckUtility(context, errors));
+    optionsMap.put(
+        CICSPostOptionsCheckUtility.RULE_INDEX,
+        new CICSPostOptionsCheckUtility(context, errors));
+    optionsMap.put(
+        CICSRemoveOptionsCheckUtility.RULE_INDEX,
+        new CICSRemoveOptionsCheckUtility(context, errors));
+    optionsMap.put(
+        CICSSpoolWriteOptionsCheckUtility.RULE_INDEX,
+        new CICSSpoolWriteOptionsCheckUtility(context, errors));
+    optionsMap.put(
+        CICSSpoolcloseOptionsCheckUtility.RULE_INDEX,
+        new CICSSpoolcloseOptionsCheckUtility(context, errors));
+    optionsMap.put(
+        CICSSpoolreadOptionsCheckUtility.RULE_INDEX,
+        new CICSSpoolreadOptionsCheckUtility(context, errors));
+    optionsMap.put(
+        CICSUpdateOptionsCheckUtility.RULE_INDEX,
+        new CICSUpdateOptionsCheckUtility(context, errors));
+    optionsMap.put(
+        CICSSyncPointOptionsCheckUtility.RULE_INDEX,
+        new CICSSyncPointOptionsCheckUtility(context, errors));
+    optionsMap.put(
+        CICSSignalOptionsCheckUtility.RULE_INDEX,
+        new CICSSignalOptionsCheckUtility(context, errors));
+    optionsMap.put(
+        CICSStartbrOptionsCheckUtility.RULE_INDEX,
+        new CICSStartbrOptionsCheckUtility(context, errors));
+    optionsMap.put(
+        CICSIgnoreOptionsCheckUtility.RULE_INDEX,
+        new CICSIgnoreOptionsCheckUtility(context, errors));
     spOptionsMap.put(
         CICSInquireSPOptionsCheckUtility.RULE_INDEX,
         new CICSInquireSPOptionsCheckUtility(context, errors));
+    spOptionsMap.put(
+        CICSDiscardOptionsUtility.RULE_INDEX,
+        new CICSDiscardOptionsUtility(context, errors));
   }
-
     /**
      * Entrypoint to check CICS rule options
      *

@@ -47,6 +47,7 @@ public class CICSInquireSPOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
             put(CICSParser.RULE_cics_inquire_epadapter, CICSParser.EPADAPTER);
             put(CICSParser.RULE_cics_inquire_epadapterset, CICSParser.EPADAPTERSET);
             put(CICSParser.RULE_cics_inquire_eventbinding, CICSParser.EVENTBINDING);
+            put(CICSParser.RULE_cics_inquire_exci, CICSParser.EXCI);
             put(CICSParser.RULE_cics_inquire_file, CICSParser.FILE);
             put(CICSParser.RULE_cics_inquire_host, CICSParser.HOST);
             put(CICSParser.RULE_cics_inquire_ipconn, CICSParser.IPCONN);
@@ -64,6 +65,7 @@ public class CICSInquireSPOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
             put(CICSParser.RULE_cics_inquire_secrecording, CICSParser.SECRECORDING);
             put(CICSParser.RULE_cics_inquire_streamname, CICSParser.STREAMNAME);
             put(CICSParser.RULE_cics_inquire_sysdumpcode, CICSParser.SYSDUMPCODE);
+            put(CICSParser.RULE_cics_inquire_tcpipservice, CICSParser.TCPIPSERVICE);
             put(CICSParser.RULE_cics_inquire_tdqueue, CICSParser.TDQUEUE);
             put(CICSParser.RULE_cics_inquire_trandumpcode, CICSParser.TRANDUMPCODE);
             put(CICSParser.RULE_cics_inquire_tsmodel, CICSParser.TSMODEL);
@@ -72,6 +74,7 @@ public class CICSInquireSPOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
             put(CICSParser.RULE_cics_inquire_uowlink, CICSParser.UOWLINK);
             put(CICSParser.RULE_cics_inquire_urimap, CICSParser.URIMAP);
             put(CICSParser.RULE_cics_inquire_webservice, CICSParser.WEBSERVICE);
+            put(CICSParser.RULE_cics_inquire_xmltransform, CICSParser.XMLTRANSFORM);
 
         }
     };
@@ -97,7 +100,7 @@ public class CICSInquireSPOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
                     put(CICSLexer.ADD, ErrorSeverity.ERROR);
                     put(CICSLexer.ADDRESS, ErrorSeverity.ERROR);
                     put(CICSLexer.ADJUSTMENT, ErrorSeverity.ERROR);
-                    put(CICSLexer.ADRESS64, ErrorSeverity.ERROR);
+                    put(CICSLexer.ADDRESS64, ErrorSeverity.ERROR);
                     put(CICSLexer.AGE, ErrorSeverity.ERROR);
                     put(CICSLexer.AIBRIDGE, ErrorSeverity.ERROR);
                     put(CICSLexer.AIDCOUNT, ErrorSeverity.ERROR);
@@ -459,7 +462,7 @@ public class CICSInquireSPOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
                     put(CICSLexer.LASTUSEDINT, ErrorSeverity.ERROR);
                     put(CICSLexer.LASTWARMTIME, ErrorSeverity.ERROR);
                     put(CICSLexer.LASTWRITTIME, ErrorSeverity.ERROR);
-                    put(CICSLexer.LATSECDTIME, ErrorSeverity.ERROR);
+                    put(CICSLexer.LASTSECDTIME, ErrorSeverity.ERROR);
                     put(CICSLexer.LENGTH, ErrorSeverity.ERROR);
                     put(CICSLexer.LENGTHLIST, ErrorSeverity.ERROR);
                     put(CICSLexer.LERUNOPTS, ErrorSeverity.ERROR);
@@ -557,7 +560,7 @@ public class CICSInquireSPOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
                     put(CICSLexer.NONTERMREL, ErrorSeverity.ERROR);
                     put(CICSLexer.NQNAME, ErrorSeverity.ERROR);
                     put(CICSLexer.NUMCIPHERS, ErrorSeverity.ERROR);
-                    put(CICSLexer.NUMDATAPRD, ErrorSeverity.ERROR);
+                    put(CICSLexer.NUMDATAPRED, ErrorSeverity.ERROR);
                     put(CICSLexer.NUMDSNAMES, ErrorSeverity.ERROR);
                     put(CICSLexer.NUMELEMENTS, ErrorSeverity.ERROR);
                     put(CICSLexer.NUMEXITS, ErrorSeverity.ERROR);
@@ -711,7 +714,6 @@ public class CICSInquireSPOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
                     put(CICSLexer.RESRCECLASS, ErrorSeverity.ERROR);
                     put(CICSLexer.RESSEC, ErrorSeverity.ERROR);
                     put(CICSLexer.RESYNCMEMBER, ErrorSeverity.ERROR);
-                    put(CICSLexer.RESYNCNUMBER, ErrorSeverity.ERROR);
                     put(CICSLexer.RESYNCSTATUS, ErrorSeverity.ERROR);
                     put(CICSLexer.RETLOCKS, ErrorSeverity.ERROR);
                     put(CICSLexer.REUSELIMIT, ErrorSeverity.ERROR);
@@ -968,6 +970,103 @@ public class CICSInquireSPOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
                     put(CICSLexer.VTAM, ErrorSeverity.WARNING);
                     put(CICSLexer.WEB, ErrorSeverity.WARNING);
                     put(CICSLexer.WLMHEALTH, ErrorSeverity.WARNING);
+                    put(CICSLexer.AP, ErrorSeverity.ERROR);
+                    put(CICSLexer.ASYNCSERVICE, ErrorSeverity.ERROR);
+                    put(CICSLexer.BA, ErrorSeverity.ERROR);
+                    put(CICSLexer.BM, ErrorSeverity.ERROR);
+                    put(CICSLexer.BR, ErrorSeverity.ERROR);
+                    put(CICSLexer.BUSAPPMGR, ErrorSeverity.ERROR);
+                    put(CICSLexer.CP, ErrorSeverity.ERROR);
+                    put(CICSLexer.CPI, ErrorSeverity.ERROR);
+                    put(CICSLexer.DC, ErrorSeverity.ERROR);
+                    put(CICSLexer.DD, ErrorSeverity.ERROR);
+                    put(CICSLexer.DH, ErrorSeverity.ERROR);
+                    put(CICSLexer.DIRMGR, ErrorSeverity.ERROR);
+                    put(CICSLexer.DM, ErrorSeverity.ERROR);
+                    put(CICSLexer.DOMAINMGR, ErrorSeverity.ERROR);
+                    put(CICSLexer.DP, ErrorSeverity.ERROR);
+                    put(CICSLexer.DS, ErrorSeverity.ERROR);
+                    put(CICSLexer.DU, ErrorSeverity.ERROR);
+                    put(CICSLexer.EC, ErrorSeverity.ERROR);
+                    put(CICSLexer.EI, ErrorSeverity.ERROR);
+                    put(CICSLexer.EJ, ErrorSeverity.ERROR);
+                    put(CICSLexer.EM, ErrorSeverity.ERROR);
+                    put(CICSLexer.ENQUEUE, ErrorSeverity.ERROR);
+                    put(CICSLexer.ENTJAVA, ErrorSeverity.ERROR);
+                    put(CICSLexer.EP, ErrorSeverity.ERROR);
+                    put(CICSLexer.EVENTCAPTURE, ErrorSeverity.ERROR);
+                    put(CICSLexer.EVENTMGR, ErrorSeverity.ERROR);
+                    put(CICSLexer.EVENTPROC, ErrorSeverity.ERROR);
+                    put(CICSLexer.FC, ErrorSeverity.ERROR);
+                    put(CICSLexer.GC, ErrorSeverity.ERROR);
+                    put(CICSLexer.GLOBALCATLG, ErrorSeverity.ERROR);
+                    put(CICSLexer.IC, ErrorSeverity.ERROR);
+                    put(CICSLexer.IE, ErrorSeverity.ERROR);
+                    put(CICSLexer.IPECI, ErrorSeverity.ERROR);
+                    put(CICSLexer.IS, ErrorSeverity.ERROR);
+                    put(CICSLexer.KC, ErrorSeverity.ERROR);
+                    put(CICSLexer.KE, ErrorSeverity.ERROR);
+                    put(CICSLexer.KERNEL, ErrorSeverity.ERROR);
+                    put(CICSLexer.LD, ErrorSeverity.ERROR);
+                    put(CICSLexer.LG, ErrorSeverity.ERROR);
+                    put(CICSLexer.LM, ErrorSeverity.ERROR);
+                    put(CICSLexer.LOADER, ErrorSeverity.ERROR);
+                    put(CICSLexer.LOCALCATLG, ErrorSeverity.ERROR);
+                    put(CICSLexer.LOCKMGR, ErrorSeverity.ERROR);
+                    put(CICSLexer.LOGGER, ErrorSeverity.ERROR);
+                    put(CICSLexer.MANAGEDPLAT, ErrorSeverity.ERROR);
+                    put(CICSLexer.ME, ErrorSeverity.ERROR);
+                    put(CICSLexer.ML, ErrorSeverity.ERROR);
+                    put(CICSLexer.MN, ErrorSeverity.ERROR);
+                    put(CICSLexer.MP, ErrorSeverity.ERROR);
+                    put(CICSLexer.NQ, ErrorSeverity.ERROR);
+                    put(CICSLexer.OBJECTTRAN, ErrorSeverity.ERROR);
+                    put(CICSLexer.OT, ErrorSeverity.ERROR);
+                    put(CICSLexer.PA, ErrorSeverity.ERROR);
+                    put(CICSLexer.PARAMGR, ErrorSeverity.ERROR);
+                    put(CICSLexer.PC, ErrorSeverity.ERROR);
+                    put(CICSLexer.PG, ErrorSeverity.ERROR);
+                    put(CICSLexer.PI, ErrorSeverity.ERROR);
+                    put(CICSLexer.PIPEMGR, ErrorSeverity.ERROR);
+                    put(CICSLexer.PROGMGR, ErrorSeverity.ERROR);
+                    put(CICSLexer.PT, ErrorSeverity.ERROR);
+                    put(CICSLexer.RA, ErrorSeverity.ERROR);
+                    put(CICSLexer.RECOVERY, ErrorSeverity.ERROR);
+                    put(CICSLexer.REGIONSTAT, ErrorSeverity.ERROR);
+                    put(CICSLexer.REQUESTSTRM, ErrorSeverity.ERROR);
+                    put(CICSLexer.RESLIFEMGR, ErrorSeverity.ERROR);
+                    put(CICSLexer.RI, ErrorSeverity.ERROR);
+                    put(CICSLexer.RL, ErrorSeverity.ERROR);
+                    put(CICSLexer.RM, ErrorSeverity.ERROR);
+                    put(CICSLexer.RMI, ErrorSeverity.ERROR);
+                    put(CICSLexer.RMIADAPTERS, ErrorSeverity.ERROR);
+                    put(CICSLexer.RRS, ErrorSeverity.ERROR);
+                    put(CICSLexer.RS, ErrorSeverity.ERROR);
+                    put(CICSLexer.RX, ErrorSeverity.ERROR);
+                    put(CICSLexer.RZ, ErrorSeverity.ERROR);
+                    put(CICSLexer.SC, ErrorSeverity.ERROR);
+                    put(CICSLexer.SCHEDULER, ErrorSeverity.ERROR);
+                    put(CICSLexer.SH, ErrorSeverity.ERROR);
+                    put(CICSLexer.SJ, ErrorSeverity.ERROR);
+                    put(CICSLexer.SJVM, ErrorSeverity.ERROR);
+                    put(CICSLexer.SM, ErrorSeverity.ERROR);
+                    put(CICSLexer.SO, ErrorSeverity.ERROR);
+                    put(CICSLexer.SOCKETS, ErrorSeverity.ERROR);
+                    put(CICSLexer.ST, ErrorSeverity.ERROR);
+                    put(CICSLexer.SZ, ErrorSeverity.ERROR);
+                    put(CICSLexer.TC, ErrorSeverity.ERROR);
+                    put(CICSLexer.TI, ErrorSeverity.ERROR);
+                    put(CICSLexer.TR, ErrorSeverity.ERROR);
+                    put(CICSLexer.TRANMGR, ErrorSeverity.ERROR);
+                    put(CICSLexer.UE, ErrorSeverity.ERROR);
+                    put(CICSLexer.US, ErrorSeverity.ERROR);
+                    put(CICSLexer.W2, ErrorSeverity.ERROR);
+                    put(CICSLexer.WB, ErrorSeverity.ERROR);
+                    put(CICSLexer.WEB2, ErrorSeverity.ERROR);
+                    put(CICSLexer.WEBRESTMGR, ErrorSeverity.ERROR);
+                    put(CICSLexer.WU, ErrorSeverity.ERROR);
+                    put(CICSLexer.XM, ErrorSeverity.ERROR);
+                    put(CICSLexer.XS, ErrorSeverity.ERROR);
                 }
             };
 
@@ -1015,6 +1114,7 @@ public class CICSInquireSPOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
                                 bundlepartContext.BUNDLE(), bundlepartContext, "BUNDLE with START");
                     else checkHasIllegalOptions(bundlepartContext.BUNDLE(), "BUNDLE with END");
                     checkBrowsingInvalidOptions(bundlepartContext, CICSParser.BUNDLEPART, CICSParser.BUNDLE);
+                    checkBrowsingHasNotParameter(bundlepartContext, CICSParser.BUNDLEPART);
                 } else checkStatementHasParameter(bundlepartContext, CICSParser.BUNDLEPART);
                 break;
 
@@ -1172,12 +1272,14 @@ public class CICSInquireSPOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
                         enqContext.START(),
                         enqContext.END(),
                         enqContext.NEXT());
-                checkHasMutuallyExclusiveOptions(
-                        "ENQSCOPE or RESOURCE or UOW or END",
-                        enqContext.ENQSCOPE(),
-                        enqContext.RESOURCE(),
-                        enqContext.UOW(),
-                        enqContext.END());
+                if (!enqContext.END().isEmpty()) {
+                    checkHasMutuallyExclusiveOptions(
+                            "ENQSCOPE or RESOURCE or UOW with END",
+                            enqContext.ENQSCOPE(),
+                            enqContext.RESOURCE(),
+                            enqContext.UOW(),
+                            enqContext.END());
+                }
                 if (!enqContext.START().isEmpty() || !enqContext.END().isEmpty()) {
                     checkBrowsingInvalidOptions(
                             enqContext,
@@ -1241,6 +1343,38 @@ public class CICSInquireSPOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
                     checkHasMandatoryOptions(
                             featurekeyContext.VALUE(), featurekeyContext, "VALUE without START or END");
                 }
+                break;
+
+            case CICSParser.RULE_cics_inquire_statistics:
+                CICSParser.Cics_inquire_statisticsContext statsContext = (CICSParser.Cics_inquire_statisticsContext) ctx;
+
+                checkHasMutuallyExclusiveOptions("ENDOFDAY or ENDOFDAYHRS", statsContext.ENDOFDAY(), statsContext.ENDOFDAYHRS());
+                if (!statsContext.ENDOFDAYHRS().isEmpty()) {
+                    checkHasMandatoryOptions(statsContext.ENDOFDAYMINS(), statsContext, "ENDOFDAYMINS with ENDOFDAYHRS");
+                    checkHasMandatoryOptions(statsContext.ENDOFDAYSECS(), statsContext, "ENDOFDAYSECS with ENDOFDAYHRS");
+                } else {
+                    checkHasIllegalOptions(statsContext.ENDOFDAYMINS(), "ENDOFDAYMINS without ENDOFDAYHRS");
+                    checkHasIllegalOptions(statsContext.ENDOFDAYSECS(), "ENDOFDAYSECS without ENDOFDAYHRS");
+                }
+
+                checkHasMutuallyExclusiveOptions("INTERVAL or INTERVALHRS", statsContext.INTERVAL(), statsContext.INTERVALHRS());
+                if (!statsContext.INTERVALHRS().isEmpty()) {
+                    checkHasMandatoryOptions(statsContext.INTERVALMINS(), statsContext, "INTERVALMINS with INTERVALHRS");
+                    checkHasMandatoryOptions(statsContext.INTERVALSECS(), statsContext, "INTERVALSECS with INTERVALHRS");
+                } else {
+                    checkHasIllegalOptions(statsContext.INTERVALMINS(), "INTERVALMINS without INTERVALHRS");
+                    checkHasIllegalOptions(statsContext.INTERVALSECS(), "INTERVALSECS without INTERVALHRS");
+                }
+
+                checkHasMutuallyExclusiveOptions("NEXTTIME or NEXTTIMEHRS", statsContext.NEXTTIME(), statsContext.NEXTTIMEHRS());
+                if (!statsContext.NEXTTIMEHRS().isEmpty()) {
+                    checkHasMandatoryOptions(statsContext.NEXTTIMEMINS(), statsContext, "NEXTTIMEMINS with NEXTTIMEHRS");
+                    checkHasMandatoryOptions(statsContext.NEXTTIMESECS(), statsContext, "NEXTTIMESECS with NEXTTIMEHRS");
+                } else {
+                    checkHasIllegalOptions(statsContext.NEXTTIMEMINS(), "NEXTTIMEMINS without NEXTTIMEHRS");
+                    checkHasIllegalOptions(statsContext.NEXTTIMESECS(), "NEXTTIMESECS without NEXTTIMEHRS");
+                }
+
                 break;
 
             case CICSParser.RULE_cics_inquire_jvmendpoint:
@@ -1378,6 +1512,7 @@ public class CICSInquireSPOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
                     checkHasIllegalOptions(programContext.APPLMAJORVER(), "APPLMAJORVER without APPLICATION");
                     checkHasIllegalOptions(programContext.APPLMINORVER(), "APPLMINORVER without APPLICATION");
                     checkHasIllegalOptions(programContext.APPLMICROVER(), "APPLMICROVER without APPLICATION");
+                    checkHasIllegalOptions(programContext.PLATFORM(), "PLATFORM without APPLICATION");
                 } else {
                     checkHasMandatoryOptions(
                             programContext.APPLMAJORVER(), programContext, "APPLMAJORVER with APPLICATION");
@@ -1385,6 +1520,8 @@ public class CICSInquireSPOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
                             programContext.APPLMINORVER(), programContext, "APPLMINORVER with APPLICATION");
                     checkHasMandatoryOptions(
                             programContext.APPLMICROVER(), programContext, "APPLMICROVER with APPLICATION");
+                    checkHasMandatoryOptions(
+                            programContext.PLATFORM(), programContext, "PLATFORM with APPLICATION");
                 }
                 break;
 
@@ -1404,7 +1541,7 @@ public class CICSInquireSPOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
                         checkHasIllegalOptions(reqidContext.FMHSTATUS(), "FMHSTATUS without LENGTH");
                     }
                     checkHasMutuallyExclusiveOptions(
-                            "INTERVAL with AT or AFTER",
+                            "INTERVAL or AT or AFTER",
                             reqidContext.INTERVAL(),
                             reqidContext.AT(),
                             reqidContext.AFTER());
@@ -1422,6 +1559,66 @@ public class CICSInquireSPOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
                 }
                 break;
 
+            case CICSParser.RULE_cics_inquire_storage:
+                CICSParser.Cics_inquire_storageContext storageContext = (CICSParser.Cics_inquire_storageContext) ctx;
+                checkHasExactlyOneOption("ADDRESS or NUMELEMENTS", storageContext, storageContext.ADDRESS(), storageContext.NUMELEMENTS());
+                if (!storageContext.ADDRESS().isEmpty()) {
+                    checkHasIllegalOptions(storageContext.ELEMENTLIST(), "ELEMENTLIST with ADDRESS");
+                    checkHasIllegalOptions(storageContext.LENGTHLIST(), "LENGTHLIST with ADDRESS");
+                    checkHasIllegalOptions(storageContext.TASK(), "TASK with ADDRESS");
+                } else if (!storageContext.NUMELEMENTS().isEmpty()) {
+                    checkHasIllegalOptions(storageContext.ELEMENT(), "ELEMENT with NUMELEMENTS");
+                    checkHasIllegalOptions(storageContext.FLENGTH(), "FLENGTH with NUMELEMENTS");
+                }
+                break;
+
+            case CICSParser.RULE_cics_inquire_storage64:
+                CICSParser.Cics_inquire_storage64Context s64Context = (CICSParser.Cics_inquire_storage64Context) ctx;
+                checkHasExactlyOneOption("ADDRESS64 or NUMELEMENTS", s64Context, s64Context.ADDRESS64(), s64Context.NUMELEMENTS());
+                if (!s64Context.ADDRESS64().isEmpty()) {
+                    checkHasIllegalOptions(s64Context.ELEMENTLIST(), "ELEMENTLIST with ADDRESS64");
+                    checkHasIllegalOptions(s64Context.LENGTHLIST(), "LENGTHLIST with ADDRESS64");
+                    checkHasIllegalOptions(s64Context.TASK(), "TASK with ADDRESS64");
+                } else if (!s64Context.NUMELEMENTS().isEmpty()) {
+                    checkHasIllegalOptions(s64Context.DSANAME(), "DSANAME with NUMELEMENTS");
+                    checkHasIllegalOptions(s64Context.ELEMENT64(), "ELEMENT64 with NUMELEMENTS");
+                    checkHasIllegalOptions(s64Context.FLENGTH(), "FLENGTH with NUMELEMENTS");
+                }
+                break;
+
+
+            case CICSParser.RULE_cics_inquire_subpool:
+                CICSParser.Cics_inquire_subpoolContext subpoolContext =
+                        (CICSParser.Cics_inquire_subpoolContext) ctx;
+                checkBrowseMutuallyExclusive(subpoolContext);
+                if (!subpoolContext.START().isEmpty() || !subpoolContext.END().isEmpty()) {
+                    if (!subpoolContext.END().isEmpty())
+                        checkHasIllegalOptions(subpoolContext.AT(), "AT with END");
+                    checkBrowsingInvalidOptions(subpoolContext, CICSParser.SUBPOOL);
+                    checkBrowsingHasNotParameter(subpoolContext, CICSParser.SUBPOOL);
+                } else checkStatementHasParameter(subpoolContext, CICSParser.SUBPOOL);
+
+                if (!subpoolContext.NEXT().isEmpty())
+                    checkHasIllegalOptions(subpoolContext.AT(), "AT with NEXT");
+
+                break;
+
+            case CICSParser.RULE_cics_inquire_tag:
+                CICSParser.Cics_inquire_tagContext tagContext = (CICSParser.Cics_inquire_tagContext) ctx;
+                checkHasExactlyOneOption("START or END or NEXT", tagContext, tagContext.START(), tagContext.END(), tagContext.NEXT());
+                if (!tagContext.START().isEmpty() || !tagContext.END().isEmpty()) {
+                    checkBrowsingHasNotParameter(tagContext, CICSParser.TAG);
+                } else checkStatementHasParameter(tagContext, CICSParser.TAG);
+                break;
+
+            case CICSParser.RULE_cics_inquire_task_list:
+                CICSParser.Cics_inquire_task_listContext taskListContext =
+                        (CICSParser.Cics_inquire_task_listContext) ctx;
+                checkHasMandatoryOptions(taskListContext.LIST(), taskListContext, "LIST");
+                checkHasMandatoryOptions(taskListContext.LISTSIZE(), taskListContext, "LISTSIZE");
+                checkPrerequisiteIsMet(taskListContext.SET(), taskListContext.SETTRANSID(), taskListContext, "SETTRANSID without SET");
+                break;
+
             case CICSParser.RULE_cics_inquire_terminal:
                 CICSParser.Cics_inquire_terminalContext terminalContext =
                         (CICSParser.Cics_inquire_terminalContext) ctx;
@@ -1431,6 +1628,13 @@ public class CICSInquireSPOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
                     checkBrowsingHasNotParameter(terminalContext, CICSParser.TERMINAL);
                     checkStatementHasParameter(terminalContext, CICSParser.NETNAME);
                 } else checkStatementHasParameter(terminalContext, CICSParser.TERMINAL);
+                break;
+
+            case CICSParser.RULE_cics_inquire_tracetype:
+                CICSParser.Cics_inquire_tracetypeContext tracetypeContext =
+                        (CICSParser.Cics_inquire_tracetypeContext) ctx;
+                checkCompIDMutuallyExclusive(tracetypeContext);
+                checkHasExactlyOneOption("FLAGSET or SPECIAL or STANDARD", tracetypeContext, tracetypeContext.FLAGSET(), tracetypeContext.SPECIAL(), tracetypeContext.STANDARD());
                 break;
 
             case CICSParser.RULE_cics_inquire_tranclass:
@@ -1455,6 +1659,7 @@ public class CICSInquireSPOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
                 checkBrowsingCommon(transactionContext, CICSParser.TRANSACTION);
                 if (!transactionContext.NEXT().isEmpty())
                     checkHasIllegalOptions(transactionContext.AT(), "AT with NEXT");
+                checkHasMutuallyExclusiveOptions("TCLASS and TRANCLASS", transactionContext.TCLASS(), transactionContext.TRANCLASS());
                 break;
 
             case CICSParser.RULE_cics_inquire_tsqueue:
@@ -1489,7 +1694,7 @@ public class CICSInquireSPOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
                         uowdsnfailContext.END(),
                         uowdsnfailContext.NEXT());
                 if (!uowdsnfailContext.START().isEmpty() || !uowdsnfailContext.END().isEmpty()) {
-                    checkBrowsingInvalidOptions(uowdsnfailContext, CICSParser.UOW);
+                    checkBrowsingInvalidOptions(uowdsnfailContext, CICSParser.UOWDSNFAIL);
                 }
                 break;
 
@@ -1502,16 +1707,19 @@ public class CICSInquireSPOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
                         uowenqContext.START(),
                         uowenqContext.END(),
                         uowenqContext.NEXT());
-                checkHasMutuallyExclusiveOptions(
-                        "ENQSCOPE or RESOURCE or UOW or END",
-                        uowenqContext.ENQSCOPE(),
-                        uowenqContext.RESOURCE(),
-                        uowenqContext.UOW(),
-                        uowenqContext.END());
+
+                if (!uowenqContext.END().isEmpty()) {
+                    checkHasMutuallyExclusiveOptions(
+                            "ENQSCOPE or RESOURCE or UOW or END",
+                            uowenqContext.ENQSCOPE(),
+                            uowenqContext.RESOURCE(),
+                            uowenqContext.UOW(),
+                            uowenqContext.END());
+                }
                 if (!uowenqContext.START().isEmpty() || !uowenqContext.END().isEmpty()) {
                     checkBrowsingInvalidOptions(
                             uowenqContext,
-                            CICSParser.ENQ,
+                            CICSParser.UOWENQ,
                             CICSParser.ENQSCOPE,
                             CICSParser.RESOURCE,
                             CICSParser.RESLEN,
@@ -1523,11 +1731,79 @@ public class CICSInquireSPOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
 
                 break;
 
+            case CICSParser.RULE_cics_inquire_vtam:
+                CICSParser.Cics_inquire_vtamContext vtamContext = (CICSParser.Cics_inquire_vtamContext) ctx;
+                checkHasMutuallyExclusiveOptions("PSDINTHRS with PSDINTERVAL", vtamContext.PSDINTERVAL(), vtamContext.PSDINTHRS());
+                checkPrerequisiteIsMet(vtamContext.PSDINTHRS(), vtamContext.PSDINTMINS(), vtamContext, "PSDINTMINS without PSDINTMINS");
+                checkPrerequisiteIsMet(vtamContext.PSDINTMINS(), vtamContext.PSDINTSECS(), vtamContext, "PSDINTMINS without PSDINTMINS");
+                break;
+
             default:
                 Integer ruleToken = COMMON_INQUIRE_BROWSE_RULES.get(ctx.getRuleIndex());
                 if (ruleToken != null) checkBrowsingCommon(ctx, ruleToken);
                 break;
         }
         checkDuplicates(ctx);
+    }
+
+    /**
+     * Check mutually exclusive COMPID identifiers
+     *
+     * @param ctx Context Including COMPID identifiers
+     */
+    public void checkCompIDMutuallyExclusive(CICSParser.Cics_inquire_tracetypeContext ctx) {
+        checkHasMutuallyExclusiveOptions("AP and APPLICATION", ctx.AP(), ctx.APPLICATION());
+        checkHasMutuallyExclusiveOptions("AS and ASYNCSERVICE", ctx.AS(), ctx.ASYNCSERVICE());
+        checkHasMutuallyExclusiveOptions("BA and BUSAPPMGR", ctx.BA(), ctx.BUSAPPMGR());
+        checkHasMutuallyExclusiveOptions("BR and BRIDGE", ctx.BR(), ctx.BRIDGE());
+        checkHasMutuallyExclusiveOptions("CP and CPI", ctx.CP(), ctx.CPI());
+        checkHasMutuallyExclusiveOptions("DD and DIRMGR", ctx.DD(), ctx.DIRMGR());
+        checkHasMutuallyExclusiveOptions("DH and DOCUMENT", ctx.DH(), ctx.DOCUMENT());
+        checkHasMutuallyExclusiveOptions("DM and DOMAINMGR", ctx.DM(), ctx.DOMAINMGR());
+        checkHasMutuallyExclusiveOptions("DP and DEBUGTOOL", ctx.DP(), ctx.DEBUGTOOL());
+        checkHasMutuallyExclusiveOptions("DS and DISPATCHER", ctx.DS(), ctx.DISPATCHER());
+        checkHasMutuallyExclusiveOptions("DU and DUMP", ctx.DU(), ctx.DUMP());
+        checkHasMutuallyExclusiveOptions("EC and EVENTCAPTURE", ctx.EC(), ctx.EVENTCAPTURE());
+        checkHasMutuallyExclusiveOptions("EJ and ENTJAVA", ctx.EJ(), ctx.ENTJAVA());
+        checkHasMutuallyExclusiveOptions("EM and EVENTMGR", ctx.EM(), ctx.EVENTMGR());
+        checkHasMutuallyExclusiveOptions("EP and EVENTPROC", ctx.EP(), ctx.EVENTPROC());
+        checkHasMutuallyExclusiveOptions("GC and GLOBALCATLG", ctx.GC(), ctx.GLOBALCATLG());
+        checkHasMutuallyExclusiveOptions("IE and IPECI", ctx.IE(), ctx.IPECI());
+        checkHasMutuallyExclusiveOptions("KE and KERNEL", ctx.KE(), ctx.KERNEL());
+        checkHasMutuallyExclusiveOptions("LC and LOCALCATLG", ctx.LC(), ctx.LOCALCATLG());
+        checkHasMutuallyExclusiveOptions("LD and LOADER", ctx.LD(), ctx.LOADER());
+        checkHasMutuallyExclusiveOptions("LG and LOGGER", ctx.LG(), ctx.LOGGER());
+        checkHasMutuallyExclusiveOptions("LM and LOCKMGR", ctx.LM(), ctx.LOCKMGR());
+        checkHasMutuallyExclusiveOptions("ME and MESSAGE", ctx.ME(), ctx.MESSAGE());
+        checkHasMutuallyExclusiveOptions("MN and MONITOR", ctx.MN(), ctx.MONITOR());
+        checkHasMutuallyExclusiveOptions("MP and MANAGEDPLAT", ctx.MP(), ctx.MANAGEDPLAT());
+        checkHasMutuallyExclusiveOptions("NQ and ENQUEUE", ctx.NQ(), ctx.ENQUEUE());
+        checkHasMutuallyExclusiveOptions("OT and OBJECTTRAN", ctx.OT(), ctx.OBJECTTRAN());
+        checkHasMutuallyExclusiveOptions("PA and PARAMGR", ctx.PA(), ctx.PARAMGR());
+        checkHasMutuallyExclusiveOptions("PG and PROGMGR", ctx.PG(), ctx.PROGMGR());
+        checkHasMutuallyExclusiveOptions("PI and PIPEMGR", ctx.PI(), ctx.PIPEMGR());
+        checkHasMutuallyExclusiveOptions("PT and PARTNER", ctx.PT(), ctx.PARTNER());
+        checkHasMutuallyExclusiveOptions("RA and RMIADAPTERS", ctx.RA(), ctx.RMIADAPTERS());
+        checkHasMutuallyExclusiveOptions("RI and RMI", ctx.RI(), ctx.RMI());
+        checkHasMutuallyExclusiveOptions("RL and RESLIFEMGR", ctx.RL(), ctx.RESLIFEMGR());
+        checkHasMutuallyExclusiveOptions("RM and RECOVERY", ctx.RM(), ctx.RECOVERY());
+        checkHasMutuallyExclusiveOptions("RS and REGIONSTAT", ctx.RS(), ctx.REGIONSTAT());
+        checkHasMutuallyExclusiveOptions("RX and RRS", ctx.RX(), ctx.RRS());
+        checkHasMutuallyExclusiveOptions("RZ and REQUESTSTRM", ctx.RZ(), ctx.REQUESTSTRM());
+        checkHasMutuallyExclusiveOptions("SH and SCHEDULER", ctx.SH(), ctx.SCHEDULER());
+        checkHasMutuallyExclusiveOptions("SJ and SJVM", ctx.SJ(), ctx.SJVM());
+        checkHasMutuallyExclusiveOptions("SM and STORAGE", ctx.SM(), ctx.STORAGE());
+        checkHasMutuallyExclusiveOptions("SO and SOCKETS", ctx.SO(), ctx.SOCKETS());
+        checkHasMutuallyExclusiveOptions("ST and STATISTICS", ctx.ST(), ctx.STATISTICS());
+        checkHasMutuallyExclusiveOptions("TI and TIMER", ctx.TI(), ctx.TIMER());
+        checkHasMutuallyExclusiveOptions("TR and TRACE", ctx.TR(), ctx.TRACE());
+        checkHasMutuallyExclusiveOptions("TS and TEMPSTORAGE", ctx.TS(), ctx.TEMPSTORAGE());
+        checkHasMutuallyExclusiveOptions("US and USER", ctx.US(), ctx.USER());
+        checkHasMutuallyExclusiveOptions("WB and WEB", ctx.WB(), ctx.WEB());
+        checkHasMutuallyExclusiveOptions("WU and WEBRESTMGR", ctx.WU(), ctx.WEBRESTMGR());
+        checkHasMutuallyExclusiveOptions("W2 and WEB2", ctx.W2(), ctx.WEB2());
+        checkHasMutuallyExclusiveOptions("XM and TRANMGR", ctx.XM(), ctx.TRANMGR());
+        checkHasMutuallyExclusiveOptions("XS and SECURITY", ctx.XS(), ctx.SECURITY());
+
     }
 }
