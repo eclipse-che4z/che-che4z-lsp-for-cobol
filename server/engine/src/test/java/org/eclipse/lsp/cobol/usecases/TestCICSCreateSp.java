@@ -88,6 +88,9 @@ public class TestCICSCreateSp {
             "CREATE DB2ENTRY({$varFour}) ATTRIBUTES({$varFour}) {DISCARD|error}";
     private static final String CREATE_DB2ENTRY_FILE_INVALID =
             "CREATE NOHANDLE {DB2ENTRY|error}({$varFour}) ATTRIBUTES({$varFour}) {FILE|error2}({$varFour})";
+    private static final String CREATE_DB2ENTRY_FILE_CASE_SENSITIVE_INVALID =
+            "CREATE NOHANDLE {DB2ENTRY|error}({$varFour}) ATTRIBUTES({$varFour}) {FILE|error2}({$varFour})"
+                    +"{FiLe|error3}({$varFour})";
     @ParameterizedTest
     @MethodSource("getValidOptions")
     void testCreateSpAllValid(String valid) {
@@ -192,6 +195,31 @@ public class TestCICSCreateSp {
                                 ErrorSource.PARSING.getText()));
 
         CICSTestUtils.errorTest(CREATE_DB2ENTRY_FILE_INVALID, expectedDiagnostic, "SP");
+    }
+    @Test
+    void testCreateMutualExCaseSensitiveSpInvalid() {
+        Map<String, Diagnostic> expectedDiagnostic =
+                ImmutableMap.of(
+                        "error",
+                        new Diagnostic(
+                                new Range(),
+                                "Exactly one option required, options are mutually exclusive: DB2ENTRY or FILE",
+                                DiagnosticSeverity.Error,
+                                ErrorSource.PARSING.getText()),
+                        "error2",
+                        new Diagnostic(
+                                new Range(),
+                                "Exactly one option required, options are mutually exclusive: DB2ENTRY or FILE",
+                                DiagnosticSeverity.Error,
+                                ErrorSource.PARSING.getText()),
+                        "error3",
+                        new Diagnostic(
+                                new Range(),
+                                "Excessive options provided for: FiLe",
+                                DiagnosticSeverity.Error,
+                                ErrorSource.PARSING.getText()));
+
+        CICSTestUtils.errorTest(CREATE_DB2ENTRY_FILE_CASE_SENSITIVE_INVALID, expectedDiagnostic, "SP");
     }
 }
 

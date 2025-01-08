@@ -388,7 +388,7 @@ public abstract class CICSOptionsCheckBaseUtility {
                 .filter(rule -> !rule.isEmpty())
                 .flatMap(Collection::stream)
                 .collect(Collectors.toCollection(
-                        () -> new TreeSet<>(Comparator.comparing(ParseTree::getText))
+                        () -> new TreeSet<>(Comparator.comparing(node -> node.getSymbol().getType()))
                 )));
         nodes.removeIf(Objects::isNull);
 
@@ -400,7 +400,7 @@ public abstract class CICSOptionsCheckBaseUtility {
                                 ErrorSeverity.ERROR,
                                 getLocality(node),
                                 "Exactly one option required, options are mutually exclusive: ",
-                               nodes.toString().replace(",", " or").replace("[", "").replace("]", ""));
+                               nodes.toString().toUpperCase().replace(",", " or").replace("[", "").replace("]", ""));
                     });
         }
         return nodes.size();
