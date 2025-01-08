@@ -254,7 +254,7 @@ public class TestCicsSysSetStatement {
     private static final String TRANDUMPCODE_INVALID_2 = "SET TRANDUMPCODE(1) NOSHUTDOWN {SHUTDOWN|errorOne}";
     private static final String TRANSACTION_INVALID_1 = "SET TRANSACTION(1) TRANDUMP {NOTRANDUMP|errorOne}";
     private static final String TRANSACTION_INVALID_2 = "SET TRANSACTION(1) SPECTRACE {SPRSTRACE|errorOne}";
-    private static final String TSQUEUE_INVALID_1 = "SET TSQUEUE(1) {TSQNAME|errorOne}(1) SYSID(1)";
+    private static final String TSQUEUE_INVALID_1 = "SET {_TSQUEUE(1) TSQNAME(1) SYSID(1)|errorOne_}";
     private static final String TSQUEUE_INVALID_2 = "SET {_TSQUEUE(1) LASTUSEDINT(1)|errorOne_}";
     private static final String UOW_INVALID_1 = "SET {_UOW(1) COMMIT FORCE|errorOne_}";
     private static final String UOWLINK_INVALID_1 = "SET UOWLINK(1) ACTION(1) {DELETE|errorOne}";
@@ -923,7 +923,7 @@ public class TestCicsSysSetStatement {
 
     @Test
     void testCicsTempstorageInvalid() {
-        testTwoErrors(TEMPSTORAGE_INVALID_1, "Missing required option: TSMAINLIMIT", "Syntax error on 'NORESP'");
+        testTwoErrors(TEMPSTORAGE_INVALID_1, "Missing required option: TSMAINLIMIT", "Extraneous input NORESP");
     }
 
     @Test
@@ -946,7 +946,7 @@ public class TestCicsSysSetStatement {
 
     @Test
     void testCicsTracetypeInvalid() {
-        testTwoErrors(TRACETYPE_INVALID_1, "Must use exactly one of the following: FLAGSET, SPECIAL or STANDARD", "Syntax error on 'NORESP'");
+        testTwoErrors(TRACETYPE_INVALID_1, "Must use exactly one of the following: FLAGSET, SPECIAL or STANDARD", "Extraneous input NORESP");
         testSingleError(TRACETYPE_INVALID_2, "Options \"AP or APPLICATION\" are mutually exclusive.");
     }
 
@@ -969,7 +969,7 @@ public class TestCicsSysSetStatement {
 
     @Test
     void testCicsTsqueueInvalid() {
-        testSingleError(TSQUEUE_INVALID_1, "Extraneous input TSQNAME");
+        testSingleError(TSQUEUE_INVALID_1, "Must use exactly one of the following: TSQUEUE or TSQNAME");
         testSingleError(TSQUEUE_INVALID_2, "Missing required option for: LASTUSEDINT without ACTION");
     }
 
