@@ -427,7 +427,7 @@ pattern_expression: ( (SLASHCHAR | DOUBLESLASHCHAR)  )*;
 other_opt_part1: (NOT? CLUSTER | PARTITIONED | NOT? PADDED | using_specification | free_specification | gbpcache_specification | DEFINE yes_or_no |  COMPRESS yes_or_no | (INCLUDE | EXCLUDE) NULL KEYS)*;
 other_opt_part2: (PARTITION BY (RANGE)? LPARENCHAR (partition_using_specification (dbs_comma_separator  partition_using_specification)*)? RPARENCHAR)?;
 other_opt_part3: (BUFFERPOOL dbs_bp_name | CLOSE yes_or_no | DEFER no_or_yes | DSSIZE dbs_dsize_parameter
-               | PIECESIZE T=dbs_sql_identifier {validateTokenWithRegex($T.text, "\\d+[MmGgKk]", "db2SqlParser.pieceSize");}
+               | PIECESIZE dbs_pieceSize
                | COPY no_or_yes)*;
 partition_using_specification: partition_element (using_specification | free_specification | gbpcache_specification | DSSIZE dbs_dsize_parameter)*;
 using_specification: USING (VCAT dbs_catalog_name | STOGROUP dbs_stogroup_name (PRIQTY INTEGERLITERAL? | SECQTY INTEGERLITERAL | ERASE yes_or_no?)*);
@@ -520,7 +520,7 @@ dbs_create_table_data_def: in_clause_def | partitioning_clause | organization_cl
 in_clause_def: (IN (dbs_database_name DOT_FS)? dbs_table_space_name | IN DATABASE dbs_database_name | IN ACCELERATOR dbs_accelerator_name);
 partitioning_clause:  PARTITION BY (RANGE? LPARENCHAR partition_expression (dbs_comma_separator partition_expression)*  RPARENCHAR
                         LPARENCHAR partitioning_element (dbs_comma_separator partitioning_element)*  RPARENCHAR
-                        |  SIZE (EVERY T=dbs_sql_identifier {validateTokenWithRegex($T.text, "\\d+[Gg]", "db2SqlParser.size");})?);
+                        |  SIZE (EVERY dbs_dsize_parameter)?);
 partition_expression: dbs_column_name (NULLS LAST)? (ASC | DESC)?;
 partitioning_element: PARTITION INTEGERLITERAL ENDING AT? partition_element_loop partition_hash_space? INCLUSIVE?;
 partition_hash_space: HASH SPACE kmg_blob_parameter;
@@ -1174,7 +1174,7 @@ common_bit_graphic_core: GRAPHIC (LPARENCHAR INTEGERLITERAL RPARENCHAR)? | VARGR
 common_bit_graphic: (common_bit_graphic_core | DBCLOB (LPARENCHAR kmg_blob_parameter RPARENCHAR)?) (CCSID oneof_encoding)?;
 common_bit_graphic2: common_bit_graphic_core CCSID dbs_integer1200;
 common_bit_binary_core: BINARY (LPARENCHAR INTEGERLITERAL RPARENCHAR)? | (BINARY VARYING | VARBINARY) LPARENCHAR INTEGERLITERAL RPARENCHAR;
-common_bit_binary: (common_bit_binary_core | (BINARY LARGE OBJECT | BLOB) (LPARENCHAR (T=dbs_sql_identifier {validateTokenWithRegex($T.text, "\\d+[MmGgKk]", "db2SqlParser.pieceSize");})? RPARENCHAR)?);
+common_bit_binary: (common_bit_binary_core | (BINARY LARGE OBJECT | BLOB) (LPARENCHAR dbs_pieceSize? RPARENCHAR)?);
 common_bit_timestamp: TIMESTAMP (LPARENCHAR INTEGERLITERAL RPARENCHAR)? (without_or_with TIME ZONE)?;
 common_bit_date_time: (DATE |  TIME | common_bit_timestamp);
 
@@ -1687,7 +1687,7 @@ dbs_boolean_primary
     ;
 dbs_seclabel_name: T=dbs_sql_identifier {validateLength($T.text, "Security label", 8);};
 dbs_simple_when_clause: (dbs_expressions) (WHEN dbs_expressions THEN (dbs_result_expression1 | NULL))+;
-dbs_smallint: T=dbs_integer_constant {validateTextInRange($T.text, -2, 100);};//MINUSCHAR? SINGLEDIGITLITERAL SINGLEDIGITLITERAL?;// java ref - -1 to 99
+dbs_smallint: dbs_integer_constant;//MINUSCHAR? SINGLEDIGITLITERAL SINGLEDIGITLITERAL?;// java ref - -1 to 99
 dbs_specific_name: dbs_object_name;
 dbs_sql_control_statement: dbs_control_statement;
 dbs_stogroup_name: T=dbs_sql_identifier {validateLength($T.text, "Storage group name", 128);};
@@ -1764,7 +1764,7 @@ dbs_triggered_sql_statement_adv: dbs_call | dbs_delete | dbs_get_diagnostics_sta
 dbs_triggered_sql_statement_basic: dbs_triggered_sql_statement;
 dbs_version_id: dbs_host_variable | dbs_sql_identifier | dbs_string_constant;
 dbs_view_name: dbs_host_variable | dsb_alias_name;
-dbs_pieceSize : T=dbs_sql_identifier {validateTokenWithRegex($T.text, "\\d+[MmGgKk]", "db2SqlParser.pieceSize");};
+dbs_pieceSize : dbs_sql_identifier;
 dbs_comma_separator: (COMMASEPARATORDB2 | COMMACHAR);
 dbs_semicolon_end: SEMICOLON_FS | SEMICOLONSEPARATORSQL;
 
@@ -1817,22 +1817,21 @@ dbs_sql_variable_reference: dbs_host_variable | dbs_object_name;
 dbs_statement_name: dbs_sql_identifier;
 dbs_xquery_context_item_expression: dbs_generic_name;
 /////  validation rules /////
-dbs_integer5: T=INTEGERLITERAL  {validateValue($T.text, "5");};
-dbs_integer12: T=INTEGERLITERAL  {validateValue($T.text, "12");};
-dbs_integer1200: T=INTEGERLITERAL  {validateValue($T.text, "1200");};
-dbs_integer1208: T=INTEGERLITERAL  {validateValue($T.text, "1208");};
-dbs_decfloat_integer: INTEGERLITERAL {validate34or16($INTEGERLITERAL.text);};
-dbs_decimal_15_31: INTEGERLITERAL {validateTokenWithRegex($INTEGERLITERAL.text, "\\b(15|31)\\b", "15 or 31 are only allowed");};
-dbs_pagenum_char_a_r: IDENTIFIER  {validateTokenWithRegex($IDENTIFIER.text, "^[aArR]$", "unknown token. Expected A, R");};
-dbs_char_s: T=IDENTIFIER {validateValue($T.text, "S");};
-dbs_function_language: IDENTIFIER {validateTokenWithRegex($IDENTIFIER.text, "(?i)\\b(ASSEMBLE|C|COBOL|JAVA|PLI)\\b", "unknown token. Supported tokens are JAVA, ASSEMBLE, C, COBOL, PLI");};
-dbs_function_parameter_style: IDENTIFIER {validateTokenWithRegex($IDENTIFIER.text, "(?i)\\b(SQL|JAVA)\\b", "unknown token. Supported tokens are JAVA, SQL");};
-dbs_procedure_language: IDENTIFIER {validateTokenWithRegex($IDENTIFIER.text, "(?i)\\b(ASSEMBLE|C|COBOL|JAVA|PLI|REXX)\\b", "unknown token. Supported tokens are JAVA, ASSEMBLE, C, COBOL, PLI, REXX");};
-oneof_lang: IDENTIFIER {validateTokenWithRegex($IDENTIFIER.text, "(?i)\\b(ASSEMBLE|C|COBOL|JAVA|PLI|REXX|SQL)\\b", "unknown token. Supported tokens are JAVA, ASSEMBLE, C, COBOL, PLI, REXX, SQL");};
-dbs_exact_match_identifier_sql: IDENTIFIER {validateTokenWithRegex($IDENTIFIER.text, "(?i)\\b(SQL)\\b", "unknown token. Supported tokens is SQL");};
-dbs_k_m_g_identifier: IDENTIFIER {validateTokenWithRegex($IDENTIFIER.text, "(?i)\\b(K|M|G)\\b", "unknown token. Supported tokens is K, M, G");};
-kmg_blob_parameter: INTEGERLITERAL dbs_k_m_g_identifier? | IDENTIFIER {validateTokenWithRegex($IDENTIFIER.text, "(?i)^\\d+[KMG]?$", "unknown token");};
-dbs_g_char_identifier: IDENTIFIER {validateTokenWithRegex($IDENTIFIER.text, "^[gG]$", "unknown token. Expected G");};
-dbs_dsize_parameter: INTEGERLITERAL dbs_g_char_identifier | IDENTIFIER;
-dbs_maxPartition: INTEGERLITERAL {validateIntegerRange($INTEGERLITERAL.text, 1, 4096);};
+dbs_integer5: INTEGERLITERAL;
+dbs_integer12: INTEGERLITERAL;
+dbs_integer1200: INTEGERLITERAL;
+dbs_integer1208: INTEGERLITERAL;
+dbs_decfloat_integer: INTEGERLITERAL ;
+dbs_decimal_15_31: INTEGERLITERAL;
+dbs_pagenum_char_a_r: IDENTIFIER;
+dbs_char_s: IDENTIFIER;
+dbs_function_language: IDENTIFIER ;
+dbs_function_parameter_style: IDENTIFIER;
+dbs_procedure_language: IDENTIFIER;
+oneof_lang: IDENTIFIER;
+dbs_exact_match_identifier_sql: IDENTIFIER;
+dbs_k_m_g_identifier: IDENTIFIER;
+kmg_blob_parameter: INTEGERLITERAL dbs_k_m_g_identifier? | IDENTIFIER;
+dbs_dsize_parameter: INTEGERLITERAL IDENTIFIER | IDENTIFIER;
+dbs_maxPartition: INTEGERLITERAL;
 /////
