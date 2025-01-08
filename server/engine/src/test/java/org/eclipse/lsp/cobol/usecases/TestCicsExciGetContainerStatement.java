@@ -36,7 +36,7 @@ public class TestCicsExciGetContainerStatement {
           + "\n"
           + "       PROCEDURE DIVISION.\n"
           + "           EXEC CICS HANDLE CONDITION \n"
-          + "                   ERRORS \n"
+          + "                   ERROR \n"
           + "                   RESP({$RETURN-CODE})\n"
           + "           END-EXEC.\n"
           + "\n"
