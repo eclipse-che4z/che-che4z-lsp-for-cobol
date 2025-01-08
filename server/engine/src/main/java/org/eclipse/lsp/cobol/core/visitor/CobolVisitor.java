@@ -915,6 +915,16 @@ public final class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   }
 
   @Override
+  public List<Node> visitPerformUntil(PerformUntilContext ctx) {
+    boolean untilExit = Optional.of(ctx)
+        .map(PerformUntilContext::performUntilCondition)
+        .map(PerformUntilConditionContext::EXIT)
+        .isPresent();
+
+    return addTreeNode(ctx, locality -> new PerformUntilNode(locality, untilExit));
+  }
+
+  @Override
   public List<Node> visitPerformProcedureStatement(PerformProcedureStatementContext ctx) {
     final ProcedureName targetName = parseProcedureName(ctx.procedureName());
     final ProcedureName thruName = parseProcedureName(Optional.ofNullable(ctx.through())
