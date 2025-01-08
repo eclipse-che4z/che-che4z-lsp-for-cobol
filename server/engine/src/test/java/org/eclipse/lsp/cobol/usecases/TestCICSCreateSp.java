@@ -90,7 +90,7 @@ public class TestCICSCreateSp {
             "CREATE NOHANDLE {DB2ENTRY|error}({$varFour}) ATTRIBUTES({$varFour}) {FILE|error2}({$varFour})";
     private static final String CREATE_DB2ENTRY_FILE_CASE_SENSITIVE_INVALID =
             "CREATE NOHANDLE {DB2ENTRY|error}({$varFour}) ATTRIBUTES({$varFour}) {FILE|error2}({$varFour})"
-                    +"{FiLe|error3}({$varFour})";
+                    + "{FiLe|error3}({$varFour})";
     @ParameterizedTest
     @MethodSource("getValidOptions")
     void testCreateSpAllValid(String valid) {
