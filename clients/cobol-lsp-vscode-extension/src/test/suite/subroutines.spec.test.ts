@@ -13,6 +13,7 @@
  */
 
 import * as helper from "./testHelper";
+import * as vscode from "vscode";
 import * as assert from "assert";
 
 suite("Integration Test Suite: Subroutines resolving", () => {
@@ -29,5 +30,20 @@ suite("Integration Test Suite: Subroutines resolving", () => {
     const diagnostics = await helper.waitForDiagnostics(editor.document.uri);
     assert.strictEqual(diagnostics.length, 1);
     assert.strictEqual(diagnostics[0].message, "SUB2: Subroutine not found");
+  });
+
+  test("Subroutines auto completions are provided", async function () {
+    const editor = await helper.showDocument("CALL.cbl");
+    await helper.insertString(
+      editor,
+      helper.pos(23, 0),
+      "           CALL ''.\n",
+    );
+    helper.moveCursor(editor, helper.pos(23, 17));
+    await helper.triggerCompletionsAndWaitForResults();
+    await helper.executeCommandMultipleTimes("selectNextSuggestion", 2);
+    await vscode.commands.executeCommand("acceptSelectedSuggestion");
+    const line = editor.document.lineAt(23).text.trim();
+    assert.strictEqual(line, "CALL 'SUB1'.");
   });
 });

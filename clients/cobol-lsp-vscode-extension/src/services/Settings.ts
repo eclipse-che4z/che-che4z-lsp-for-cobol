@@ -228,6 +228,7 @@ export class SettingsService {
   public static async getCopybookLocalPath(
     documentUri: string,
     dialectType: string,
+    convertToAbsolutePaths = true,
   ): Promise<string[]> {
     const pgPaths = await loadProcessorGroupCopybookPaths(
       documentUri,
@@ -244,11 +245,14 @@ export class SettingsService {
     ];
     const wsFolders = SettingsUtils.getWorkspaceFoldersPath(true);
 
-    return SettingsService.prepareLocalSearchFolders(paths, wsFolders);
+    if (convertToAbsolutePaths) {
+      return SettingsService.prepareLocalSearchFolders(paths, wsFolders);
+    }
+    return paths;
   }
 
   public static async getCopybookExtension(
-    documentUri: string,
+    documentUri?: string,
   ): Promise<string[] | undefined> {
     const global: string[] | undefined = vscode.workspace
       .getConfiguration(SETTINGS_CPY_SECTION)
@@ -404,6 +408,21 @@ export class SettingsService {
       else
         wsFolders.forEach((wsFolder) => {
           result.push(path.join(wsFolder, p));
+        });
+    }
+    return result;
+  }
+
+  public static prepareLocalSearchUris(
+    paths: string[],
+    wsFolders: readonly vscode.WorkspaceFolder[],
+  ): vscode.Uri[] {
+    const result: vscode.Uri[] = [];
+    for (const p of paths) {
+      if (path.isAbsolute(p)) result.push(vscode.Uri.file(p));
+      else
+        wsFolders.forEach((wsFolder) => {
+          result.push(vscode.Uri.joinPath(wsFolder.uri, p));
         });
     }
     return result;

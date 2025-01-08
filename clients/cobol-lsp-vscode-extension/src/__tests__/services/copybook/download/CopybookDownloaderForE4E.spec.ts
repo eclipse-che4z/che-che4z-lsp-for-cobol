@@ -224,4 +224,21 @@ describe("e4e copybook downloader tests", () => {
       );
     });
   });
+
+  describe("listRemoteCopybooksE4E", () => {
+    let e4eDownloader: CopybookDownloaderForE4E;
+    beforeAll(() => {
+      e4eDownloader = new CopybookDownloaderForE4E(
+        "/storagePath",
+        {} as unknown as E4E,
+      );
+      e4eDownloader.getE4EConfig = async () =>
+        Promise.resolve(e4eResponseDatasetFirst);
+    });
+
+    it("list all remote copybooks", async () => {
+      const results = await e4eDownloader.listRemoteCopybooksE4E("uri");
+      expect(results).toEqual(["copybook", "copybook2"]);
+    });
+  });
 });

@@ -76,7 +76,7 @@ export class CopybookDownloaderForDsn extends ZoweExplorerDownloader {
     return false;
   }
 
-  private async getAllMembers(profileName: string, dataset: string) {
+  public async getAllMembers(profileName: string, dataset: string) {
     const id = this.createId(profileName, dataset);
 
     if (this.memberListCache.has(id)) {
@@ -84,12 +84,20 @@ export class CopybookDownloaderForDsn extends ZoweExplorerDownloader {
     }
 
     const profile = DownloadUtil.loadProfile(profileName, this.explorerAPI);
-    const response = await this.explorerAPI
-      .getMvsApi(profile)
-      .allMembers(dataset);
-    const members = response.apiResponse.items.map((item) => item.member);
 
-    this.memberListCache.set(id, members);
+    let members: string[] = [];
+    await this.limitFailedRequests(
+      `list dataset members ${profileName}/${dataset}`,
+      async () => {
+        const response = await this.explorerAPI
+          .getMvsApi(profile)
+          .allMembers(dataset);
+        members = response.apiResponse.items.map((item) => item.member);
+
+        this.memberListCache.set(id, members);
+      },
+    );
+
     return members;
   }
 

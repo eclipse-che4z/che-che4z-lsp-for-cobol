@@ -61,6 +61,7 @@ export const getV1Api = async (extensionId: string): Promise<V1Api | Error> => {
             description: dialect.description,
             jar: dialect.jar.toString(),
             snippets: dialect.snippets.toString(),
+            isCopyStatement: dialect.isCopyStatement,
           });
         } catch (error) {
           if (error instanceof Error) return error;
@@ -125,7 +126,13 @@ export interface __ExtensionV1DialectDetail {
   description: string;
   jar: string;
   snippets: string;
+  isCopyStatement?: CopyStatementParser;
 }
+
+export type CopyStatementParser = (statement: string) => {
+  isCopy: boolean;
+  prefix?: string;
+};
 
 export interface V1Api {
   registerDialect(dialect: V1DialectDetail): Promise<V1Unregister | Error>;
@@ -135,6 +142,7 @@ export interface V1DialectDetail {
   description: string;
   jar: vscode.Uri;
   snippets: vscode.Uri;
+  isCopyStatement?: CopyStatementParser;
 }
 export interface V1Unregister {
   (): void;

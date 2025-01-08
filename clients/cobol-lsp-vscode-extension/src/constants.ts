@@ -65,6 +65,8 @@ export const COBOL_EXT_ARRAY_CASE_INSENSITIVE = [
 export const COPYBOOK_CPY_EXT = ".CPY";
 export const COPYBOOK_EXTENSIONS = "copybook-extensions";
 export const COPYBOOK_EXT_ARRAY = [COPYBOOK_CPY_EXT];
+export const COPYBOOK_COMPLETIONS_SORT_PREFIX = 3;
+export const SUBROUTINE_COMPLETIONS_SORT_PREFIX = 4;
 export const EXTENSION_ID = "broadcommfd.cobol-language-support";
 export const ZOWE_EXT_MISSING_MSG =
   "Zowe Explorer version 1.15.0 or higher is required to download copybooks from the mainframe.";
@@ -84,6 +86,7 @@ export const USE_MAP = "MAP";
 export const SETTINGS_CPY_NDVR_DEPENDENCIES = "endevor-dependencies";
 export const ENDEVOR_PROCESSOR = "ENDEVOR_PROCESSOR";
 export const E4E_INCOMPATIBLE = "E4E interface is not compatible";
+export const FAILED_REQUESTS_LIMIT = 3;
 
 export enum PUNCH_CARD {
   SEQUENCE_AREA_END_POS = 6,

@@ -228,4 +228,21 @@ suite("Integration Test Suite: Copybooks", function () {
       });
     });
   });
+
+  suite("Copybooks auto completions", () => {
+    suiteSetup(async () => {
+      await helper.updateConfig("basic.json");
+      await helper.activate();
+    });
+
+    test("Copybooks auto completions are provided", async function () {
+      const editor = await helper.showDocument("USERC1N1.cbl");
+      await helper.insertString(editor, helper.pos(19, 0), "       COPY PAY\n");
+      helper.moveCursor(editor, helper.pos(19, 18));
+      await helper.triggerCompletionsAndWaitForResults();
+      await vscode.commands.executeCommand("acceptSelectedSuggestion");
+      const lines = editor.document.getText().split(/\r\n|\r|\n/);
+      assert.strictEqual(lines[19].trim(), "COPY PAYLIB");
+    });
+  });
 });

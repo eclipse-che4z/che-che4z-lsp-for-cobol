@@ -19,7 +19,6 @@ import {
   UNLOCK_DOWNLOAD_QUEUE_MSG,
 } from "../../../constants";
 import { ZoweExplorerDownloader } from "./ZoweExplorerDownloader";
-import { CopybookName } from "../CopybookDownloadService";
 import { SettingsService } from "../../Settings";
 import { hasMember } from "../../util/Utils";
 import { registerExceptionEvent } from "../../reporter";
@@ -73,7 +72,7 @@ export class DownloadUtil {
     profileName: string,
     explorerAPI: IApiRegisterClient,
     documentUri: string,
-    copybookNames: CopybookName[],
+    dialects: string[],
   ): Promise<boolean> {
     if (
       ZoweExplorerDownloader.profileStore.get(profileName) === "valid-profile"
@@ -83,7 +82,7 @@ export class DownloadUtil {
 
     const copybookLocation = this.areCopybookDownloadConfigurationsPresent(
       documentUri,
-      copybookNames,
+      dialects,
     );
 
     if (!copybookLocation) {
@@ -173,18 +172,18 @@ export class DownloadUtil {
   /**
    * checks if copybook download configurations are present
    * @param documentUri
-   * @param copybookNames
-   * @returns copybook location if if copybook download configurations are present, null otherwise
+   * @param dialects
+   * @returns true if if copybook download configurations are present, false otherwise
    */
   public static areCopybookDownloadConfigurationsPresent(
     documentUri: string,
-    copybookNames: CopybookName[],
+    dialects: string[],
   ) {
-    const dialects = new Set(
-      copybookNames.map((n) => n.dialect?.toLocaleUpperCase()).filter(Boolean),
+    const uniqueDialects = new Set(
+      dialects.map((dialect) => dialect?.toUpperCase()).filter(Boolean),
     );
 
-    for (const dialect of dialects) {
+    for (const dialect of uniqueDialects) {
       const dsnPath = SettingsService.getDsnPath(documentUri, dialect);
       const ussPath = SettingsService.getUssPath(documentUri, dialect);
       if ((dsnPath?.length ?? 0) > 0) {

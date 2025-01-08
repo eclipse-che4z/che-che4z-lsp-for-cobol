@@ -11,6 +11,8 @@
  * Contributors:
  *   Broadcom, Inc. - initial API and implementation
  */
+import { SettingsService } from "../../Settings";
+import { splitFilename } from "../../util/FSUtils";
 import { ProfileUtils } from "../../util/ProfileUtils";
 import { CopybookName } from "../CopybookDownloadService";
 import { DownloadUtil } from "./DownloadUtil";
@@ -76,7 +78,11 @@ export class CopybookDownloaderForUss extends ZoweExplorerDownloader {
     return false;
   }
 
-  private async getAllMembers(profileName: string, dataset: string) {
+  public async getAllMembers(
+    profileName: string,
+    dataset: string,
+    returnExtensions = true,
+  ) {
     const id = this.createId(profileName, dataset);
 
     if (this.memberListCache.has(id)) {
@@ -84,10 +90,35 @@ export class CopybookDownloaderForUss extends ZoweExplorerDownloader {
     }
 
     const profile = DownloadUtil.loadProfile(profileName, this.explorerAPI);
-    const response = await this.explorerAPI
-      .getUssApi(profile)
-      .fileList(dataset);
-    const members = response.apiResponse.items.map((el) => el.name);
+
+    const allowedCopybooksExtensions =
+      await SettingsService.getCopybookExtension();
+    const allowedNoExtension = allowedCopybooksExtensions?.includes("");
+
+    const members: string[] = [];
+
+    await this.limitFailedRequests(
+      `list USS directory ${profileName}/${dataset}`,
+      async () => {
+        const response = await this.explorerAPI
+          .getUssApi(profile)
+          .fileList(dataset);
+
+        for (const file of response.apiResponse.items) {
+          if (file.mode.charAt(0) === "-") {
+            const [name, extension] = splitFilename(file.name);
+
+            if (extension) {
+              if (allowedCopybooksExtensions?.includes(extension)) {
+                members.push(returnExtensions ? file.name : name);
+              }
+            } else if (allowedNoExtension) {
+              members.push(file.name);
+            }
+          }
+        }
+      },
+    );
 
     this.memberListCache.set(id, members);
     return members;
