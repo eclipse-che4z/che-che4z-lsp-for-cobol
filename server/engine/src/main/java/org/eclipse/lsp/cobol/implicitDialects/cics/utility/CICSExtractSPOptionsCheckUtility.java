@@ -26,7 +26,6 @@ import org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 /** Checks CICS Extract System Command rules for required and invalid options */
@@ -163,13 +162,7 @@ public class CICSExtractSPOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
         List<CICSParser.Cics_restypeContext> restypes = ctx.cics_restype();
         checkHasMandatoryOptions(restypes, ctx, "RESTYPE");
         long distinctOptions = restypes.stream()
-                .map(parent -> parent.children)
-                .flatMap(List::stream)
-                .map(child -> {
-                    if (TerminalNode.class.isAssignableFrom(child.getClass())) return (TerminalNode) child;
-                    return null;
-                })
-                .filter(Objects::nonNull)
+                .map(node -> (TerminalNode) node.getChild(0))
                 .map(TerminalNode::getSymbol)
                 .map(Token::getType)
                 .distinct().count();
