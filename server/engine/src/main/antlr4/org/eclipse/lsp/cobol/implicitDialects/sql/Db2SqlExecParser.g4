@@ -960,7 +960,7 @@ dbs_select_item: (dbs_expressions AS? dbs_sql_identifier? | dbs_unpacked_row | d
 dbs_unpacked_row: dbs_select_unpack_function_invocation DOT_FS ASTERISKCHAR AS LPARENCHAR (dbs_generic_name db2sql_data_types)
 (dbs_comma_separator dbs_generic_name db2sql_data_types)* RPARENCHAR;
 dbs_from_clause: FROM dbs_table_reference  (dbs_comma_separator dbs_table_reference)*;
-dbs_where_clause: WHERE (dbs_search_condition | LPARENCHAR dbs_search_condition RPARENCHAR);
+dbs_where_clause: WHERE dbs_search_condition;
 dbs_groupby_alternatives: (dbs_grouping_expression| dbs_groupingset_alternative);
 dbs_groupby_clause: GROUP BY dbs_groupby_alternatives (dbs_comma_separator dbs_groupby_alternatives)*;
 dbs_groupingset_alternative: (dbs_grouping_sets | dbs_super_group);
@@ -1384,25 +1384,19 @@ dbs_select_statement_skip_locked_data: SKIPCHAR LOCKED DATA;
 
 
 ///////////////// DBS EXPRESSION STARTS/////////////
-dbs_expression: dbs_function_invocation
- | dbs_constant
- | dbs_column_name
+dbs_expression: (dbs_function_invocation | dbs_constant| dbs_column_name | dbs_host_variable | LPARENCHAR dbs_expressions RPARENCHAR) dbs_time_unit?
  | dbs_special_register
  | dbs_scalar_fullselect
- | dbs_time_zone_specific_expression
- | dbs_labeled_duration
  | dbs_case_expression
  | dbs_cast_specification
- | dbs_XMLCAST_specification
  | dbs_XMLQUERY_func
  | dbs_array_element_specification
  | dbs_array_constructor
  | dbs_OLAP_specification
  | dbs_row_change_expression
  | dbs_sequence_reference
- | dbs_host_variable
  | (PLUSCHAR | MINUSCHAR) dbs_expression
- | LPARENCHAR dbs_expressions RPARENCHAR  ;
+ | dbs_expression ( AT LOCAL | AT TIME ZONE dbs_expression);
 
 dbs_expression_operator: (CONCAT | PIPECHAR | PIPECHAR2 | SLASHCHAR | ASTERISKCHAR | PLUSCHAR | MINUSCHAR);
 
@@ -1436,16 +1430,9 @@ dbs_searched_when_clause : (WHEN ((LPARENCHAR dbs_predicate RPARENCHAR) | dbs_pr
 
 dbs_function_invocation : dbs_function_name LPARENCHAR (ALL | DISTINCT)? (TABLE dbs_transition_table_name |
 (dbs_expressions | DATELITERAL | ASTERISKCHAR) (dbs_comma_separator (dbs_expressions | DATELITERAL | ASTERISKCHAR) | NUMERICLITERAL)*)? RPARENCHAR;
-dbs_cast_specification: CAST LPARENCHAR (dbs_expression | NULL | dbs_parameter_marker) AS dbs_comment_parameter_type RPARENCHAR;
-dbs_time_zone_expression : ( dbs_function_invocation | LPARENCHAR dbs_expression RPARENCHAR | dbs_constant |
-dbs_column_name | dbs_host_variable | dbs_special_register | dbs_scalar_fullselect | dbs_case_expression | dbs_cast_specification);
-
-dbs_time_zone_specific_expression : dbs_time_zone_expression ( AT LOCAL | AT TIME ZONE dbs_time_zone_expression);
+dbs_cast_specification: (CAST | XMLCAST) LPARENCHAR (dbs_expression | NULL | dbs_parameter_marker) AS dbs_comment_parameter_type RPARENCHAR;
 dbs_time_unit: (YEAR | YEARS | MONTH | MONTHS | DAY | DAYS | HOUR | HOURS | MINUTE | MINUTES | SECOND | SECONDS | MICROSECOND | MICROSECONDS );
-dbs_labeled_duration: (dbs_function_invocation | LPARENCHAR dbs_expressions RPARENCHAR | dbs_constant |
-dbs_column_name | dbs_host_variable) dbs_time_unit;
 
-dbs_XMLCAST_specification: XMLCAST LPARENCHAR (dbs_expression | NULL | dbs_parameter_marker) AS dbs_comment_parameter_type RPARENCHAR;
 dbs_array_element_specification: dbs_array_variable;
 dbs_XMLQUERY_func: XMLQUERY LPARENCHAR  dbs_xquery_expression_constant (PASSING (BY REF)? dbs_row_xquery_argument  (dbs_comma_separator dbs_row_xquery_argument)*)? (RETURNING SEQUENCE (BY REF)?)? (EMPTY ON EMPTY)? RPARENCHAR;
 dbs_xquery_expression_constant: (dbs_expression|COLONCHAR|LSQUAREBRACKET|RSQUAREBRACKET|LPARENCHAR|RPARENCHAR|SLASHCHAR|EQUALCHAR|DOLLARCHAR)+; //TODO: https://www.ibm.com/support/knowledgecenter/SSEPEK_12.0.0/xml/src/tpc/db2z_xpxqprologexpression.html
