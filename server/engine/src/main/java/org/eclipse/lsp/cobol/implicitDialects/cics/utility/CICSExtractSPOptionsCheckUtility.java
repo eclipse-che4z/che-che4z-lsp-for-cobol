@@ -168,7 +168,9 @@ public class CICSExtractSPOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
                 .distinct().count();
 
         if (distinctOptions > 1) {
-            throwException(ErrorSeverity.ERROR, getLocality(ctx), "Multiple RESTYPE options are not allowed", "");
+            restypes.forEach(
+                    node -> throwException(ErrorSeverity.ERROR, getLocality(node), "Multiple RESTYPE options are not allowed", "")
+            );
         }
     }
 
