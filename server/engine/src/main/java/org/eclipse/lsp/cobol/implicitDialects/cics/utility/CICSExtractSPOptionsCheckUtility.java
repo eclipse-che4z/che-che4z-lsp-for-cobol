@@ -149,7 +149,7 @@ public class CICSExtractSPOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
         if (ctx.RESID().isEmpty()) {
             checkForResidRequiredOptions(ctx);
         } else {
-            checkHasMutuallyRequiredOptions("APPLICATION, APPLMAJORVER, APPLMINORVER, APPLMICROVER, PLATFORM", ctx, ctx.APPLICATION(), ctx.APPLMAJORVER(), ctx.APPLMINORVER(), ctx.APPLMICROVER(), ctx.PLATFORM());
+            checkAllOptionsArePresentOrAbsent("APPLICATION, APPLMAJORVER, APPLMINORVER, APPLMICROVER, PLATFORM", ctx, ctx.APPLICATION(), ctx.APPLMAJORVER(), ctx.APPLMINORVER(), ctx.APPLMICROVER(), ctx.PLATFORM());
         }
         checkSubResidOptions(ctx);
         checkLastTimeOptions(ctx);
@@ -219,7 +219,7 @@ public class CICSExtractSPOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
             checkHasIllegalOptions(ctx.LASTRESETMIN(), "LASTRESETMIN with LASTRESETABS");
             checkHasIllegalOptions(ctx.LASTRESETSEC(), "LASTRESETSEC with LASTRESETABS");
         }
-        checkHasMutuallyRequiredOptions("LASTRESETHRS, LASTRESETMIN, LASTRESETSEC", ctx, ctx.LASTRESETHRS(), ctx.LASTRESETMIN(), ctx.LASTRESETSEC());
+        checkAllOptionsArePresentOrAbsent("LASTRESETHRS, LASTRESETMIN, LASTRESETSEC", ctx, ctx.LASTRESETHRS(), ctx.LASTRESETMIN(), ctx.LASTRESETSEC());
     }
 
 }
