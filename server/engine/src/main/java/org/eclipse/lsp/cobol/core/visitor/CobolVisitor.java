@@ -1090,7 +1090,10 @@ public final class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
     List<Node> receivingField =
             ctx.receivingField().stream().map(this::visit).flatMap(List::stream).collect(toList());
 
-    boolean address = ctx.receivingField().stream().flatMap(f -> f.children.stream())
+    boolean address = ctx.receivingField().stream()
+        .map(f -> f.children)
+        .filter(Objects::nonNull)
+        .flatMap(Collection::stream)
             .filter(c -> c instanceof GeneralIdentifierContext)
             .flatMap(c -> ((GeneralIdentifierContext) c).children.stream())
             .anyMatch(c -> c instanceof SpecialRegisterContext);
