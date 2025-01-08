@@ -15,6 +15,7 @@
     },
     "children": [
       {
+        "untilExit": false,
         "type": "inlineperform",
         "location": {
           "uri": "fake/path",

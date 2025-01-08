@@ -100,10 +100,10 @@ public class CICSOptionsCheckUtility {
         CICSWebOptionsCheckUtility.RULE_INDEX,
         new CICSWebOptionsCheckUtility(context, errors));
     optionsMap.put(
-        CICSEndBrowseOptionsUtility.RULE_ENDBR_INDEX,
-        new CICSEndBrowseOptionsUtility(context, errors));
+        CICSEndbrOptionsUtility.RULE_INDEX,
+        new CICSEndbrOptionsUtility(context, errors));
     optionsMap.put(
-        CICSEndBrowseOptionsUtility.RULE_ENDBROWSE_INDEX,
+        CICSEndBrowseOptionsUtility.RULE_INDEX,
         new CICSEndBrowseOptionsUtility(context, errors));
     optionsMap.put(
         CICSDeleteOptionsCheckUtility.RULE_INDEX,
@@ -223,6 +223,9 @@ public class CICSOptionsCheckUtility {
         CICSPopHandleOptionsCheckUtility.RULE_INDEX,
         new CICSPopHandleOptionsCheckUtility(context, errors));
     optionsMap.put(
+        CICSRewindCounterOptionsCheckUtility.RULE_INDEX,
+        new CICSRewindCounterOptionsCheckUtility(context, errors));
+    optionsMap.put(
         CICSReleaseOptionsCheckUtility.RULE_INDEX,
         new CICSReleaseOptionsCheckUtility(context, errors));
     optionsMap.put(
@@ -241,8 +244,20 @@ public class CICSOptionsCheckUtility {
         CICSSpoolreadOptionsCheckUtility.RULE_INDEX,
         new CICSSpoolreadOptionsCheckUtility(context, errors));
     optionsMap.put(
+        CICSUpdateOptionsCheckUtility.RULE_INDEX,
+        new CICSUpdateOptionsCheckUtility(context, errors));
+    optionsMap.put(
         CICSSyncPointOptionsCheckUtility.RULE_INDEX,
         new CICSSyncPointOptionsCheckUtility(context, errors));
+    optionsMap.put(
+        CICSSignalOptionsCheckUtility.RULE_INDEX,
+        new CICSSignalOptionsCheckUtility(context, errors));
+    optionsMap.put(
+        CICSStartbrOptionsCheckUtility.RULE_INDEX,
+        new CICSStartbrOptionsCheckUtility(context, errors));
+    optionsMap.put(
+        CICSIgnoreOptionsCheckUtility.RULE_INDEX,
+        new CICSIgnoreOptionsCheckUtility(context, errors));
     spOptionsMap.put(
         CICSInquireSPOptionsCheckUtility.RULE_INDEX,
         new CICSInquireSPOptionsCheckUtility(context, errors));
@@ -253,7 +268,6 @@ public class CICSOptionsCheckUtility {
         CICSExtractSPOptionsCheckUtility.RULE_INDEX,
         new CICSExtractSPOptionsCheckUtility(context, errors));
   }
-
     /**
      * Entrypoint to check CICS rule options
      *

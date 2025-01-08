@@ -309,7 +309,7 @@ class Db2SqlVisitor extends Db2SqlParserBaseVisitor<List<Node>> {
     public List<Node> visitSqlCode(Db2SqlParser.SqlCodeContext ctx) {
         String sqlCode = preProcessSqlComment(ctx);
 
-        List<Node> nodes = new Db2SqlExecVisitor(context).visitStartSqlRule(parseSQL(sqlCode, ctx));
+        List<Node> nodes = new Db2SqlExecVisitor(context, copybookService, messageService).visitStartSqlRule(parseSQL(sqlCode, ctx));
         Db2SqlVisitorHelper.adjustNodeLocations(ctx, context, nodes);
         Location location = context.getExtendedDocument().mapLocation(AntlrRangeUtils.constructRange(ctx.getParent()));
         Locality locality = Locality.builder().range(location.getRange()).uri(location.getUri()).build();

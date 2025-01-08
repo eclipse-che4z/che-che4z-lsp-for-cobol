@@ -19,7 +19,6 @@ import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.usecases.common.CICSTestUtils;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
-import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
@@ -70,7 +69,7 @@ public class TestCicsUnlock {
     CICSTestUtils.errorTest(INVALID, ImmutableMap.of(
             "error",
             new Diagnostic(
-                    new Range(new Position(12, 12), new Position(13, 27)),
+                    new Range(),
                     "Missing required option: FILE",
                     DiagnosticSeverity.Error,
                     ErrorSource.PARSING.getText())));
