@@ -249,13 +249,13 @@ public abstract class CICSOptionsCheckBaseUtility {
      * @param <E>  Generic locality source type
      * @return The locality of the rule
      */
-    private <E> Locality getLocality(E rule) {
+    protected <E> Locality getLocality(E rule) {
         if (ParserRuleContext.class.isAssignableFrom(rule.getClass()))
             return VisitorUtility.constructLocality((ParserRuleContext) rule, context);
         else return VisitorUtility.constructLocality((TerminalNode) rule, context);
     }
 
-    private void throwException(
+    protected void throwException(
             ErrorSeverity errorSeverity, @NonNull Locality locality, String message, String wrongToken) {
         SyntaxError error =
                 SyntaxError.syntaxError()
@@ -564,16 +564,5 @@ public abstract class CICSOptionsCheckBaseUtility {
             checkBrowsingInvalidOptions(ctx, coreToken);
             checkBrowsingHasNotParameter(ctx, coreToken);
         } else checkStatementHasParameter(ctx, coreToken);
-    }
-
-    protected void checkHasTooManyOptions(ParserRuleContext parentCtx, int maxOptions) {
-        List<ParseTree> commandOoptions = parentCtx.children.stream()
-                .filter(node -> node instanceof TerminalNode)
-                .filter(node -> !node.getText().equals("AID"))
-                .collect(Collectors.toList());
-        if (commandOoptions.size() > maxOptions) {
-            throwException(
-                    ErrorSeverity.ERROR, getLocality(parentCtx), "Too many options provided for: ", "HANDLE AID");
-        }
     }
 }

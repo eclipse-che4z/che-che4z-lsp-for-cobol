@@ -16,6 +16,8 @@
 package org.eclipse.lsp.cobol.implicitDialects.cics.utility;
 
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.tree.ParseTree;
+import org.antlr.v4.runtime.tree.TerminalNode;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
@@ -25,6 +27,7 @@ import org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_handle;
 
@@ -41,7 +44,7 @@ public class CICSHandleOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
               put(CICSLexer.PROGRAM, ErrorSeverity.ERROR);
               put(CICSLexer.LABEL, ErrorSeverity.ERROR);
               put(CICSLexer.RESET, ErrorSeverity.WARNING);
-              put(CICSLexer.AID, ErrorSeverity.ERROR);
+              put(CICSLexer.AID, ErrorSeverity.WARNING);
               put(CICSLexer.ANYKEY, ErrorSeverity.ERROR);
               put(CICSLexer.CLEAR, ErrorSeverity.ERROR);
               put(CICSLexer.CLRPARTN, ErrorSeverity.ERROR);
@@ -235,10 +238,21 @@ public class CICSHandleOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
 
   private void checkHandleAid(CICSParser.Cics_handle_aidContext ctx) {
     checkHasMandatoryOptions(ctx.AID(), ctx, "AID");
-    checkHasTooManyOptions(ctx, 16);
+    checkHasTooManyOptions(ctx);
   }
 
   private void checkHandleCondition(CICSParser.Cics_handle_conditionContext ctx) {
-    checkHasMandatoryOptions(ctx.cics_conditions(), ctx, "CICS CONDITION");
+    checkHasMandatoryOptions(ctx.CONDITION(), ctx, "CONDITION");
+  }
+
+  private void checkHasTooManyOptions(ParserRuleContext parentCtx) {
+    List<ParseTree> commandOoptions = parentCtx.children.stream()
+            .filter(node -> node instanceof TerminalNode)
+            .filter(node -> !node.getText().equalsIgnoreCase("AID"))
+            .collect(Collectors.toList());
+    if (commandOoptions.size() > 16) {
+      throwException(
+              ErrorSeverity.ERROR, getLocality(parentCtx), "Too many options provided for: ", "HANDLE AID");
+    }
   }
 }

@@ -57,46 +57,51 @@ public class TestCICSHandle {
   private static final String HANDLE_CONDITION_VALID_ONE =
           "HANDLE CONDITION ERROR";
 
-  private static final String HANDLE_CONDITION_INVALID =
-          "HANDLE {CONDITION|errorOne}";
 
-  private static final String IGNORE_CONDITION_INVALID_TWO =
+  private static final String HANDLE_CONDITION_VALID_TWO =
+          "HANDLE CONDITION";
+
+
+  private static final String HANDLE_CONDITION_INVALID_ONE =
+          "HANDLE {ERROR|errorOne}";
+
+  private static final String HANDLE_CONDITION_INVALID_TWO =
           "HANDLE CONDITION {CONDITION|errorOne} ERROR";
 
-  private static final String IGNORE_CONDITION_INVALID_THREE =
+  private static final String HANDLE_CONDITION_INVALID_THREE =
           "HANDLE CONDITION NORMAL {NORMAL|errorOne}";
 
-  private static final String IGNORE_CONDITION_INVALID_WRBRK =
+  private static final String HANDLE_CONDITION_INVALID_WRBRK =
           "HANDLE CONDITION WRBRK {WRBRK|errorOne}";
 
-  private static final String IGNORE_CONDITION_INVALID_INBFMH =
+  private static final String HANDLE_CONDITION_INVALID_INBFMH =
           "HANDLE CONDITION INBFMH {INBFMH|errorOne}";
 
-  private static final String IGNORE_CONDITION_INVALID_ENDINPT =
+  private static final String HANDLE_CONDITION_INVALID_ENDINPT =
           "HANDLE CONDITION ENDINPT {ENDINPT|errorOne}";
 
-  private static final String IGNORE_CONDITION_INVALID_NONVAL =
+  private static final String HANDLE_CONDITION_INVALID_NONVAL =
           "HANDLE CONDITION NONVAL {NONVAL|errorOne}";
 
-  private static final String IGNORE_CONDITION_INVALID_NOSTART =
+  private static final String HANDLE_CONDITION_INVALID_NOSTART =
           "HANDLE CONDITION NOSTART {NOSTART|errorOne}";
 
-  private static final String IGNORE_CONDITION_INVALID_TERMIDERR =
+  private static final String HANDLE_CONDITION_INVALID_TERMIDERR =
           "HANDLE CONDITION TERMIDERR {TERMIDERR|errorOne}";
 
-  private static final String IGNORE_CONDITION_INVALID_FILENOTFOUND =
+  private static final String HANDLE_CONDITION_INVALID_FILENOTFOUND =
           "HANDLE CONDITION FILENOTFOUND {FILENOTFOUND|errorOne}";
 
-  private static final String IGNORE_CONDITION_INVALID_NOTFND =
+  private static final String HANDLE_CONDITION_INVALID_NOTFND =
           "HANDLE CONDITION NOTFND {NOTFND|errorOne}";
 
-  private static final String IGNORE_CONDITION_INVALID_DUPKEY =
+  private static final String HANDLE_CONDITION_INVALID_DUPKEY =
           "HANDLE CONDITION DUPKEY {DUPKEY|errorOne}";
 
-  private static final String IGNORE_CONDITION_INVALID_INVREQ =
+  private static final String HANDLE_CONDITION_INVALID_INVREQ =
           "HANDLE CONDITION INVREQ {INVREQ|errorOne}";
 
-  private static final String IGNORE_CONDITION_INVALID_IOERR =
+  private static final String HANDLE_CONDITION_INVALID_IOERR =
           "HANDLE CONDITION IOERR {IOERR|errorOne}";
 
   @Test
@@ -169,14 +174,19 @@ public class TestCICSHandle {
   }
 
   @Test
-  void testHandleConditionInvalid() {
+  void testHandleConditionValidTwo() {
+    CICSTestUtils.noErrorTest(HANDLE_CONDITION_VALID_TWO);
+  }
+
+  @Test
+  void testHandleConditionInvalidOne() {
     CICSTestUtils.errorTest(
-            HANDLE_CONDITION_INVALID,
+            HANDLE_CONDITION_INVALID_ONE,
             ImmutableMap.of(
                     "errorOne",
                     new Diagnostic(
                             new Range(),
-                            "Missing required option: CICS CONDITION",
+                            "Missing required option: CONDITION",
                             DiagnosticSeverity.Error,
                             ErrorSource.PARSING.getText())));
   }
@@ -184,7 +194,7 @@ public class TestCICSHandle {
   @Test
   void testHandleConditionInvalidTwo() {
     CICSTestUtils.errorTest(
-            IGNORE_CONDITION_INVALID_TWO,
+            HANDLE_CONDITION_INVALID_TWO,
             ImmutableMap.of(
                     "errorOne",
                     new Diagnostic(
@@ -197,7 +207,7 @@ public class TestCICSHandle {
   @Test
   void testHandleConditionInvalidThree() {
     CICSTestUtils.errorTest(
-            IGNORE_CONDITION_INVALID_THREE,
+            HANDLE_CONDITION_INVALID_THREE,
             ImmutableMap.of(
                     "errorOne",
                     new Diagnostic(
@@ -210,7 +220,7 @@ public class TestCICSHandle {
   @Test
   void testHandleConditionInvalidWrbrk() {
     CICSTestUtils.errorTest(
-            IGNORE_CONDITION_INVALID_WRBRK,
+            HANDLE_CONDITION_INVALID_WRBRK,
             ImmutableMap.of(
                     "errorOne",
                     new Diagnostic(
@@ -223,7 +233,7 @@ public class TestCICSHandle {
   @Test
   void testHandleConditionInvalidInbfmh() {
     CICSTestUtils.errorTest(
-            IGNORE_CONDITION_INVALID_INBFMH,
+            HANDLE_CONDITION_INVALID_INBFMH,
             ImmutableMap.of(
                     "errorOne",
                     new Diagnostic(
@@ -236,7 +246,7 @@ public class TestCICSHandle {
   @Test
   void testHandleConditionInvalidEndinpt() {
     CICSTestUtils.errorTest(
-            IGNORE_CONDITION_INVALID_ENDINPT,
+            HANDLE_CONDITION_INVALID_ENDINPT,
             ImmutableMap.of(
                     "errorOne",
                     new Diagnostic(
@@ -249,7 +259,7 @@ public class TestCICSHandle {
   @Test
   void testHandleConditionInvalidNonval() {
     CICSTestUtils.errorTest(
-            IGNORE_CONDITION_INVALID_NONVAL,
+            HANDLE_CONDITION_INVALID_NONVAL,
             ImmutableMap.of(
                     "errorOne",
                     new Diagnostic(
@@ -262,7 +272,7 @@ public class TestCICSHandle {
   @Test
   void testHandleConditionInvalidNostart() {
     CICSTestUtils.errorTest(
-            IGNORE_CONDITION_INVALID_NOSTART,
+            HANDLE_CONDITION_INVALID_NOSTART,
             ImmutableMap.of(
                     "errorOne",
                     new Diagnostic(
@@ -275,7 +285,7 @@ public class TestCICSHandle {
   @Test
   void testHandleConditionInvalidTermiderr() {
     CICSTestUtils.errorTest(
-            IGNORE_CONDITION_INVALID_TERMIDERR,
+            HANDLE_CONDITION_INVALID_TERMIDERR,
             ImmutableMap.of(
                     "errorOne",
                     new Diagnostic(
@@ -288,7 +298,7 @@ public class TestCICSHandle {
   @Test
   void testHandleConditionInvalidFilenotfound() {
     CICSTestUtils.errorTest(
-            IGNORE_CONDITION_INVALID_FILENOTFOUND,
+            HANDLE_CONDITION_INVALID_FILENOTFOUND,
             ImmutableMap.of(
                     "errorOne",
                     new Diagnostic(
@@ -301,7 +311,7 @@ public class TestCICSHandle {
   @Test
   void testHandleConditionInvalidNotfnd() {
     CICSTestUtils.errorTest(
-            IGNORE_CONDITION_INVALID_NOTFND,
+            HANDLE_CONDITION_INVALID_NOTFND,
             ImmutableMap.of(
                     "errorOne",
                     new Diagnostic(
@@ -314,7 +324,7 @@ public class TestCICSHandle {
   @Test
   void testHandleConditionInvalidDupkey() {
     CICSTestUtils.errorTest(
-            IGNORE_CONDITION_INVALID_DUPKEY,
+            HANDLE_CONDITION_INVALID_DUPKEY,
             ImmutableMap.of(
                     "errorOne",
                     new Diagnostic(
@@ -327,7 +337,7 @@ public class TestCICSHandle {
   @Test
   void testHandleConditionInvalidInvreq() {
     CICSTestUtils.errorTest(
-            IGNORE_CONDITION_INVALID_INVREQ,
+            HANDLE_CONDITION_INVALID_INVREQ,
             ImmutableMap.of(
                     "errorOne",
                     new Diagnostic(
@@ -340,7 +350,7 @@ public class TestCICSHandle {
   @Test
   void testHandleConditionInvalidIoerr() {
     CICSTestUtils.errorTest(
-            IGNORE_CONDITION_INVALID_IOERR,
+            HANDLE_CONDITION_INVALID_IOERR,
             ImmutableMap.of(
                     "errorOne",
                     new Diagnostic(
