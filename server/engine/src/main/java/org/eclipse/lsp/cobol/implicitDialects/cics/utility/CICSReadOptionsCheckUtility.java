@@ -72,11 +72,7 @@ public class CICSReadOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     }
 
     private void checkRule(CICSParser.Cics_read_bodyContext ctx) {
-        if (ctx.DATASET().isEmpty()) {
-            checkHasMandatoryOptions(ctx.FILE(), ctx, "FILE");
-        }
-
-        checkMutuallyExclusiveOptions("FILE instead of DATASET", ctx.FILE(), ctx.DATASET());
+        checkHasExactlyOneOption("FILE instead of DATASET", ctx, ctx.FILE(), ctx.DATASET());
 
         checkHasMandatoryOptions(ctx.RIDFLD(), ctx, "RIDFLD");
 
