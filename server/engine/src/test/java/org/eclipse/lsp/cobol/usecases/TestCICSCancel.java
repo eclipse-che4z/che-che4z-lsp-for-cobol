@@ -118,7 +118,7 @@ public class TestCICSCancel {
                 ImmutableMap.of(
                         "errorAcqactivityAcqProcess",
                         new Diagnostic(
-                                new Range(new Position(15, 12), new Position(15, 22)),
+                                new Range(),
                                 "Exactly one option required, options are mutually exclusive: ACTIVITY or ACQACTIVITY or ACQPROCESS",
                                 DiagnosticSeverity.Error,
                                 ErrorSource.PARSING.getText()),

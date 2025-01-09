@@ -44,6 +44,8 @@ public class CICSTestUtils {
           + "       01 {$*varFive}  PIC X VALUE 'NAME_TWO'.\n"
           + "       01 {$*varSix}   PIC X VALUE 'NAME_THREE'.\n"
           + "       PROCEDURE DIVISION.\n"
+          + "            {@*SEC1} SECTION.\n"
+          + "               DISPLAY \"Text: \".\n"
           + "            EXEC CICS ";
 
   private static final String END_EXEC = "            END-EXEC.";

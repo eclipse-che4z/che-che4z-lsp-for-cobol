@@ -129,7 +129,7 @@ public class TestCicsDelayStatement {
                             ErrorSource.PARSING.getText()),
                     "errorIntervalTime2",
                     new Diagnostic(
-                            new Range(new Position(15, 12), new Position(15, 16)),
+                            new Range(),
                             "Exactly one option required, options are mutually exclusive: INTERVAL, TIME, UNTIL, FOR",
                             DiagnosticSeverity.Error,
                             ErrorSource.PARSING.getText()));
