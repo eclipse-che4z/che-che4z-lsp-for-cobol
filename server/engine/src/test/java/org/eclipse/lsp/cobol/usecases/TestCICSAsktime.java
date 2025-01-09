@@ -14,6 +14,7 @@
  */
 package org.eclipse.lsp.cobol.usecases;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.usecases.common.CICSTestUtils;
@@ -55,6 +56,6 @@ public class TestCICSAsktime {
                                 "Syntax error on 'END-EXEC'",
                                 DiagnosticSeverity.Error,
                                 ErrorSource.PARSING.getText()));
-        CICSTestUtils.errorTestWithEndExecError(ASKTIME_INVALID, expectedDiagnostic);
+        CICSTestUtils.errorTestWithEndExecError(ASKTIME_INVALID, ImmutableList.of(), expectedDiagnostic);
     }
 }

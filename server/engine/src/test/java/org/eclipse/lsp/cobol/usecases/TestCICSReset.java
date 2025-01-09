@@ -14,6 +14,7 @@
  */
 package org.eclipse.lsp.cobol.usecases;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.usecases.common.CICSTestUtils;
@@ -52,6 +53,7 @@ public class TestCICSReset {
   void testResetInvalid() {
     CICSTestUtils.errorTestWithEndExecError(
             RESET_INVALID,
+            ImmutableList.of(),
             ImmutableMap.of(
                     "end-exec-error",
                     new Diagnostic(

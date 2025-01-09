@@ -19,7 +19,6 @@ import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.usecases.common.CICSTestUtils;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
-import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
@@ -112,7 +111,7 @@ public class TestCicsExtractSP {
     CICSTestUtils.errorTest(EXIT_INVALID_MISSING_EXIT, ImmutableMap.of(
             "error",
             new Diagnostic(
-                    new Range(new Position(14, 12), new Position(16, 27)),
+                    new Range(),
                     "Missing required option: EXIT",
                     DiagnosticSeverity.Error,
                     ErrorSource.PARSING.getText())), "SP");
@@ -123,7 +122,7 @@ public class TestCicsExtractSP {
     CICSTestUtils.errorTest(EXIT_INVALID_MISSING_PROGRAM, ImmutableMap.of(
             "error",
             new Diagnostic(
-                    new Range(new Position(14, 12), new Position(17, 26)),
+                    new Range(),
                     "Missing required option: PROGRAM",
                     DiagnosticSeverity.Error,
                     ErrorSource.PARSING.getText())), "SP");
@@ -134,7 +133,7 @@ public class TestCicsExtractSP {
     CICSTestUtils.errorTest(EXIT_INVALID_MISSING_GALENGTH, ImmutableMap.of(
             "error",
             new Diagnostic(
-                    new Range(new Position(14, 12), new Position(16, 27)),
+                    new Range(),
                     "Missing required option: GALENGTH",
                     DiagnosticSeverity.Error,
                     ErrorSource.PARSING.getText())), "SP");
@@ -145,7 +144,7 @@ public class TestCicsExtractSP {
     CICSTestUtils.errorTest(EXIT_INVALID_MISSING_GASET, ImmutableMap.of(
             "error",
             new Diagnostic(
-                    new Range(new Position(14, 12), new Position(16, 30)),
+                    new Range(),
                     "Missing required option: GASET",
                     DiagnosticSeverity.Error,
                     ErrorSource.PARSING.getText())), "SP");
@@ -235,7 +234,7 @@ public class TestCicsExtractSP {
     CICSTestUtils.errorTest(STATISTICS_INVALID_LAST_TIME_THREE, ImmutableMap.of(
             "error",
             new Diagnostic(
-                    new Range(new Position(14, 12), new Position(17, 32)),
+                    new Range(),
                     "If one option is specified, all options must be present: LASTRESETHRS, LASTRESETMIN, LASTRESETSEC",
                     DiagnosticSeverity.Error,
                     ErrorSource.PARSING.getText())), "SP");
@@ -246,7 +245,7 @@ public class TestCicsExtractSP {
     CICSTestUtils.errorTest(STATISTICS_INVALID_MISSING_STATISTICS, ImmutableMap.of(
             "error",
             new Diagnostic(
-                    new Range(new Position(14, 12), new Position(15, 27)),
+                    new Range(),
                     "Missing required option: STATISTICS",
                     DiagnosticSeverity.Error,
                     ErrorSource.PARSING.getText())), "SP");
@@ -325,7 +324,7 @@ public class TestCicsExtractSP {
     CICSTestUtils.errorTest(STATISTICS_INVALID_APPLCONTEXT_ONE, ImmutableMap.of(
             "error",
             new Diagnostic(
-                    new Range(new Position(14, 12), new Position(18, 25)),
+                    new Range(),
                     "If one option is specified, all options must be present: APPLICATION, APPLMAJORVER, APPLMINORVER, APPLMICROVER, PLATFORM",
                     DiagnosticSeverity.Error,
                     ErrorSource.PARSING.getText())), "SP");
@@ -336,7 +335,7 @@ public class TestCicsExtractSP {
     CICSTestUtils.errorTest(STATISTICS_INVALID_APPLCONTEXT_TWO, ImmutableMap.of(
             "error",
             new Diagnostic(
-                    new Range(new Position(14, 12), new Position(21, 33)),
+                    new Range(),
                     "If one option is specified, all options must be present: APPLICATION, APPLMAJORVER, APPLMINORVER, APPLMICROVER, PLATFORM",
                     DiagnosticSeverity.Error,
                     ErrorSource.PARSING.getText())), "SP");

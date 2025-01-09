@@ -14,12 +14,12 @@
  */
 package org.eclipse.lsp.cobol.usecases;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.usecases.common.CICSTestUtils;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
-import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
@@ -35,7 +35,7 @@ public class TestCICSRelease {
           "RELEASE PROGRAM({$varOne})";
 
   private static final String RELEASE_INVALID_NO_PROGRAM =
-          "{RELEASE|errorOne}";
+          "RELEASE";
 
   private static final String RELEASE_INVALID_EXTRA_OPTION =
           "RELEASE PROGRAM({$varOne}) {PROGRAM|errorOne}({$varOne})";
@@ -49,10 +49,11 @@ public class TestCICSRelease {
   void testReleaseInvalidNoProgram() {
     CICSTestUtils.errorTestWithEndExecError(
             RELEASE_INVALID_NO_PROGRAM,
+            ImmutableList.of("errorOne"),
             ImmutableMap.of(
                     "errorOne",
                     new Diagnostic(
-                            new Range(new Position(13, 12), new Position(13, 12)),
+                            new Range(),
                             "Missing required option: PROGRAM",
                             DiagnosticSeverity.Error,
                             ErrorSource.PARSING.getText()),

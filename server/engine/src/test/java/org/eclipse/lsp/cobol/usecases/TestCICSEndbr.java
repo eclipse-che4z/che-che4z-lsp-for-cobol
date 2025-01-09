@@ -14,12 +14,12 @@
  */
 package org.eclipse.lsp.cobol.usecases;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.usecases.common.CICSTestUtils;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
-import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
@@ -33,7 +33,7 @@ import java.util.Map;
  */
 public class TestCICSEndbr {
   private static final String ENDBR_FILE_VALID = "ENDBR  FILE({$varFour})";
-  private static final String ENDBR_INVALID = "{ENDBR|error1}";
+  private static final String ENDBR_INVALID = "ENDBR";
   private static final String ENDBR_DATASET_VALID = "ENDBR  DATASET({$varFour})";
   private static final String ENDBR_FILE_DATASET_INVALID = "ENDBR  {FILE|error1}({$varFour}) {DATASET|error2}({$varFour})";
   private static final String ENDBR_FILE_REQID_VALID = "ENDBR FILE({$varFour}) REQID({$varOne})";
@@ -48,10 +48,11 @@ public class TestCICSEndbr {
   @Test
   void testEndbrInvalid() {
     CICSTestUtils.errorTestWithEndExecError(ENDBR_INVALID,
+            ImmutableList.of("error1"),
             ImmutableMap.of(
                     "error1",
                     new Diagnostic(
-                            new Range(new Position(13, 12), new Position(13, 12)),
+                            new Range(),
                             "Exactly one option required, none provided: FILE or DATASET",
                             DiagnosticSeverity.Error,
                             ErrorSource.PARSING.getText()),

@@ -19,7 +19,6 @@ package org.eclipse.lsp.cobol.usecases;
         import org.eclipse.lsp.cobol.usecases.common.CICSTestUtils;
         import org.eclipse.lsp4j.Diagnostic;
         import org.eclipse.lsp4j.DiagnosticSeverity;
-        import org.eclipse.lsp4j.Position;
         import org.eclipse.lsp4j.Range;
         import org.junit.jupiter.api.Test;
 
@@ -39,7 +38,7 @@ public class TestCICSConnectProcessStatement {
             "CONNECT PROCESS CONVID({$varFour}) PARTNER({$varFour}) "
                     + "SYNCLEVEL({$varFour}) ";
     private static final String CONNECT_PROCESS_INVALID =
-            "CONNECT PROCESS SESSION({$varFour}) SYNCLEVEL({$varFour}) {PARTNER | errorMissingProc | errorPartner}(100)";
+            "CONNECT {_PROCESS SESSION({$varFour}) SYNCLEVEL({$varFour}) {PARTNER|errorPartner}(100)|errorMissingProc_}";
     private static final String CONNECT_PROCESS_PIPLENGTH_INVALID =
             "CONNECT {_PROCESS CONVID(100) PIPLENGTH(100) \n "
                    + "SYNCLEVEL(100) PROCNAME(100)|errorPiplength_}";
@@ -58,13 +57,13 @@ public class TestCICSConnectProcessStatement {
                 ImmutableMap.of(
                         "errorMissingProc",
                         new Diagnostic(
-                                new Range(new Position(13, 12), new Position(16, 24)),
+                                new Range(),
                                 "Missing required option: PROCNAME",
                                 DiagnosticSeverity.Error,
                                 ErrorSource.PARSING.getText()),
                         "errorPartner",
                         new Diagnostic(
-                                new Range(new Position(16, 12), new Position(16,  19)),
+                                new Range(),
                                 "Invalid option provided: PARTNER",
                                 DiagnosticSeverity.Error,
                                 ErrorSource.PARSING.getText()

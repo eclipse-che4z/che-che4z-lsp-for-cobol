@@ -19,7 +19,6 @@ import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.usecases.common.CICSTestUtils;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
-import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
@@ -43,9 +42,9 @@ public class TestCICSCheck {
     private static final String CHECK_TIMER_VALID =
             "CHECK TIMER({$varFour}) STATUS({$varOne}) ";
     private static final String CHECK_ACTIVITY_ACQPROCESS_INVALID =
-            "CHECK COMPSTATUS({$varOne}) {ACTIVITY(100) ACQPROCESS | errorAcqprocess | errorAcqprocess2} ";
+            "CHECK COMPSTATUS({$varOne}) {ACTIVITY|errorAcqprocess}(100) {ACQPROCESS|errorAcqprocess2} ";
     private static final String CHECK_ACTIVITY_INVALID_COMPSTATUS =
-            "CHECK ACTIVITY ({$varOne}) {SUSPSTATUS(100) | errorMissingCompstatus }";
+            "CHECK {_ACTIVITY ({$varOne}) SUSPSTATUS(100)|errorMissingCompstatus_}";
     @Test
     void testCheckAcqprocessValid() {
         CICSTestUtils.noErrorTest(CHECK_ACQPROCESS_VALID);
@@ -65,13 +64,13 @@ public class TestCICSCheck {
                 ImmutableMap.of(
                         "errorAcqprocess",
                         new Diagnostic(
-                                new Range(new Position(14, 12), new Position(14, 20)),
+                                new Range(),
                                 "Exactly one option required, options are mutually exclusive: ACTIVITY or ACQACTIVITY or ACQPROCESS",
                                 DiagnosticSeverity.Error,
                                 ErrorSource.PARSING.getText()),
                         "errorAcqprocess2",
                         new Diagnostic(
-                                new Range(new Position(14, 25), new Position(14, 35)),
+                                new Range(),
                                 "Exactly one option required, options are mutually exclusive: ACTIVITY or ACQACTIVITY or ACQPROCESS",
                                 DiagnosticSeverity.Error,
                                 ErrorSource.PARSING.getText()));
@@ -84,7 +83,7 @@ public class TestCICSCheck {
                 ImmutableMap.of(
                         "errorMissingCompstatus",
                         new Diagnostic(
-                                new Range(new Position(13, 12), new Position(15, 27)),
+                                new Range(),
                                 "Missing required option: COMPSTATUS",
                                 DiagnosticSeverity.Error,
                                 ErrorSource.PARSING.getText()));

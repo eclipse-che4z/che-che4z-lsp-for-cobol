@@ -17,6 +17,9 @@ package org.eclipse.lsp.cobol.usecases.common;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+
+import lombok.NonNull;
+
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 
@@ -50,11 +53,11 @@ public class CICSTestUtils {
    * Retrieves a formatted test string for CICS command testing
    *
    * @param components Components to add to the EXEC CICS block of the test string
-   * @param endExecError Indicate to generate test case with expected syntax error on END-EXEC
+   * @param errorTags Error tages to inject before END-EXEC or null
    * @param compilerOptions Compiler options fo translator specification
    * @return Formatted test string
    */
-  public static String getTestString(String components, boolean endExecError, String... compilerOptions) {
+  public static String getTestString(String components, List<String> errorTags, String... compilerOptions) {
     List<String> instances = Arrays.asList(components.split("\\s"));
     instances.replaceAll(String.join("", Collections.nCopies(12, " "))::concat);
     List<String> compilerOptionsList =
@@ -65,7 +68,13 @@ public class CICSTestUtils {
     ArrayList<String> base = new ArrayList<String>(Arrays.asList(BASE_TEXT.split("\n")));
     base.addAll(0, compilerOptionsList);
     base.addAll(instances);
-    base.add(endExecError ? END_EXEC_ERROR : END_EXEC);
+    if (errorTags == null)
+      base.add(END_EXEC);
+    else if (errorTags.isEmpty())
+      base.add(END_EXEC_ERROR);
+    else {
+      base.add(END_EXEC_ERROR.replace("{", "{|" + String.join("|", errorTags) + "}{"));
+    }
     return String.join("\n", base);
   }
 
@@ -77,7 +86,7 @@ public class CICSTestUtils {
    */
   public static void noErrorTest(String newCommand, String... options) {
     UseCaseEngine.runTest(
-        getTestString(newCommand, false, options), ImmutableList.of(), ImmutableMap.of());
+        getTestString(newCommand, null, options), ImmutableList.of(), ImmutableMap.of());
   }
 
   /**
@@ -90,19 +99,20 @@ public class CICSTestUtils {
   public static void errorTest(
       String newCommand, Map<String, Diagnostic> expectedDiagnostic, String... options) {
     UseCaseEngine.runTest(
-        getTestString(newCommand, false, options), ImmutableList.of(), expectedDiagnostic);
+        getTestString(newCommand, null, options), ImmutableList.of(), expectedDiagnostic);
   }
 
   /**
    * Runs a test with asserting error conditions passed as argument
    *
    * @param newCommand Error command to execute
+   * @param errorTags Error tages to inject before END-EXEC
    * @param expectedDiagnostic Errors to match
    * @param options Compiler options fo translator specification
    */
   public static void errorTestWithEndExecError(
-      String newCommand, Map<String, Diagnostic> expectedDiagnostic, String... options) {
+      String newCommand, @NonNull List<String> errorTags, Map<String, Diagnostic> expectedDiagnostic, String... options) {
     UseCaseEngine.runTest(
-        getTestString(newCommand, true, options), ImmutableList.of(), expectedDiagnostic);
+        getTestString(newCommand, errorTags, options), ImmutableList.of(), expectedDiagnostic);
   }
 }

@@ -21,7 +21,6 @@ import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.eclipse.lsp.cobol.usecases.common.CICSTestUtils;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
-import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
@@ -82,9 +81,9 @@ public class TestCicsDelayStatement {
   private static final String DELAY_VALID_ALL =
           "DELAY FOR HOURS(100) MINUTES(20) SECONDS(10) MILLISECS(1)";
   private static final String DELAY_FOR_UNTIL_INVALID =
-          "DELAY { FOR | error2 } HOURS(1) {UNTIL | error} ";
+          "DELAY {FOR|error2} HOURS(1) {UNTIL|error} ";
   private static final String DELAY_INTERVAL_TIME_INVALID =
-          "DELAY { INTERVAL | errorIntervalTime2 }(100) {TIME | errorIntervalTime }(100)";
+          "DELAY {INTERVAL|errorIntervalTime2}(100) {TIME|errorIntervalTime}(100)";
 
   private static final String DELAY_UNTIL_MILLISEC_INVALID =
           "DELAY UNTIL HOURS({$varFour}) {MILLISECS |  errorMillisecs}(100)";
@@ -106,7 +105,7 @@ public class TestCicsDelayStatement {
             ImmutableMap.of(
                     "error",
                     new Diagnostic(
-                            new Range(new Position(15, 12), new Position(15, 17)),
+                            new Range(),
                             "Exactly one option required, options are mutually exclusive: INTERVAL, TIME, UNTIL, FOR",
                             DiagnosticSeverity.Error,
                             ErrorSource.PARSING.getText()),
@@ -124,7 +123,7 @@ public class TestCicsDelayStatement {
             ImmutableMap.of(
                     "errorIntervalTime",
                     new Diagnostic(
-                            new Range(new Position(14, 12), new Position(14, 16)),
+                            new Range(),
                             "Exactly one option required, options are mutually exclusive: INTERVAL, TIME, UNTIL, FOR",
                             DiagnosticSeverity.Error,
                             ErrorSource.PARSING.getText()),
