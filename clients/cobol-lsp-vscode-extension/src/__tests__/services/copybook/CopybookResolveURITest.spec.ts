@@ -208,7 +208,11 @@ describe("With allowed input parameters, the list of URI that represent copybook
 });
 describe("Prioritize search criteria for copybooks test suite", () => {
   let settingsMockProperties: Record<string, unknown> = {};
-  let spySearchInWorkspace: jest.SpyInstance;
+  let spySearchInWorkspace: jest.SpyInstance<
+    ReturnType<typeof fsUtils.searchCopybookInExtensionFolder>,
+    Parameters<typeof fsUtils.searchCopybookInExtensionFolder>
+  >;
+
   let globSyncMockResult: string[] = [];
 
   beforeEach(() => {
@@ -280,30 +284,16 @@ describe("Prioritize search criteria for copybooks test suite", () => {
     );
     expect(uri).not.toBe("");
     expect(spySearchInWorkspace).toHaveBeenCalledTimes(7);
-    // check that call searching in local folder is first
-    expect(
-      spySearchInWorkspace.mock.calls
-        .map((call: string[][], index: number) => ({
-          folder: call[1][0],
-          index,
-        }))
-        .filter(
-          (call) => call.folder && call.folder.includes(CPY_FOLDER_NAME),
-        )[0].index,
-    ).toEqual(0);
+
+    // check that first call searching in local folder
+    expect(spySearchInWorkspace.mock.calls[0][1]![0]).toEqual(
+      expect.stringContaining(CPY_FOLDER_NAME),
+    );
 
     // check that call searching in dsn folder is second
-    expect(
-      spySearchInWorkspace.mock.calls
-        .map((call: string[][], index: number) => ({
-          folder: call[1][0],
-          index,
-        }))
-        .filter(
-          (call) =>
-            call.folder && call.folder.includes("DATASET.WITH.COPYBOOK"),
-        )[0].index,
-    ).toEqual(1);
+    expect(spySearchInWorkspace.mock.calls[1][1]![0]).toEqual(
+      expect.stringContaining("DATASET.WITH.COPYBOOK"),
+    );
   });
 
   test("With only a local folder defined for the dialect in the settings.json, the search is applied locally", async () => {
