@@ -38,7 +38,7 @@ allExciRules: cics_exci_link | cics_exci_delete | cics_exci_delete_container | c
               cics_exci_get_container | cics_exci_get_next_container | cics_exci_move_container |
               cics_exci_put_container | cics_exci_query_channel | cics_exci_startbrowse_container ;
 
-allSPRules: cics_discard | cics_inquire_system_programming | cics_create;
+allSPRules: cics_discard | cics_extract_system_programming | cics_inquire_system_programming | cics_create;
 
 // compiler options
 compilerOpts
@@ -369,6 +369,11 @@ cics_extract_tct: (TCT | NETNAME cics_name | (SYSID | TERMID) cics_data_area | c
 cics_extract_web_server: (WEB | (REQUESTTYPE | HOSTTYPE | SCHEME) cics_cvda | HOSTLENGTH cics_data_value | (HOST | HTTPVERSION | VERSIONLEN | PATH | PATHLENGTH | HTTPMETHOD | METHODLENGTH | PORTNUMBER | QUERYSTRING | QUERYSTRLEN | URIMAP) cics_data_area | cics_handle_response)+;
 cics_extract_web_client: (WEB | (SESSTOKEN | PORTNUMBER | URIMAP | REALM | REALMLEN | HOST | HTTPVERSION | VERSIONLEN | PATH | PATHLENGTH) cics_data_area | HOSTLENGTH cics_data_value | (HOSTTYPE | SCHEME) cics_cvda | cics_handle_response)+;
 
+/** EXTRACT (System Commands) */
+cics_extract_system_programming: EXTRACT (cics_extract_exit | cics_extract_statistics);
+cics_extract_exit: (EXIT | (PROGRAM | ENTRYNAME) cics_data_value | GALENGTH cics_data_area | GASET cics_ref | cics_handle_response)+;
+cics_extract_statistics: (STATISTICS | cics_restype | cics_subrestype | (RESID | SUBRESID | LASTRESET | LASTRESETABS | LASTRESETHRS | LASTRESETMIN | LASTRESETSEC) cics_data_area |
+                          SET cics_ref | (RESIDLEN | SUBRESIDLEN | APPLICATION | APPLMAJORVER | APPLMINORVER | APPLMICROVER | PLATFORM) cics_data_value | cics_handle_response)+;
 
 /** FORCE TIMER */
 cics_force: FORCE cics_force_opts;
@@ -723,6 +728,15 @@ cics_reset_activity: (ACTIVITY cics_data_value | cics_handle_response)+;
 /** RESETBR */
 cics_resetbr: RESETBR cics_file_name (RIDFLD cics_data_area | KEYLENGTH cics_data_value | GENERIC | REQID cics_data_value |
               SYSID cics_data_area | GTEQ | EQUAL | RBA | RRN |XRBA | cics_handle_response)+;
+
+/** RESTYPE HELPER */
+cics_restype: RESTYPE cics_cvda | ASYNCSERVICE | ATOMSERVICE | BUNDLE | DB2CONN | DB2ENTRY | DISPATCHER | DOCTEMPLATE |
+              EPADAPTER | ENQUEUE | EVENTBINDING | EVENTPROCESS | FILE | IPCONN | JOURNALNAME | JVMPROGRAM | JVMSERVER |
+              LIBRARY | LSRPOOL | MONITOR | MQCONN | MQMONITOR | MVSTCB | NODEJSAPP | PIPELINE | POLICY | PROGAUTO |
+              PROGRAM | PROGRAMDEF | RECOVERY | SECURITY | STATS | STORAGE | STREAMNAME | SUBPOOL | SYSDUMPCODE | TASKSUBPOOL |
+              TCPIP | TCPIPSERVICE | TDQUEUE | TRANCLASS | TRANDUMPCODE | TRANSACTION | TSQUEUE | URIMAP | USER | WEBSERVICE |
+              XMLTRANSFORM;
+cics_subrestype: SUBRESTYPE cics_cvda | CAPTURESPEC | POLICYRULE;
 
 /** RESUME */
 cics_resume: RESUME (ACQACTIVITY | ACQPROCESS | ACTIVITY cics_data_value | cics_handle_response)+;
@@ -1743,6 +1757,7 @@ ABCODE
   | GAENTRYNAME
   | GALENGTH
   | GARBAGEINT
+  | GASET
   | GAUSECOUNT
   | GC
   | GCDSASIZE
@@ -1889,6 +1904,7 @@ ABCODE
   | JUSTIFY
   | JVMCLASS
   | JVMPROFILE
+  | JVMPROGRAM
   | JVMSERVER
   | JWT
   | KATAKANA
@@ -1914,6 +1930,11 @@ ABCODE
   | LASTEMERTIME
   | LASTINITTIME
   | LASTMODTIME
+  | LASTRESET
+  | LASTRESETABS
+  | LASTRESETHRS
+  | LASTRESETMIN
+  | LASTRESETSEC
   | LASTUSEDINT
   | LASTUSETIME
   | LASTWARMTIME
@@ -2324,11 +2345,13 @@ ABCODE
   | PROFILE
   | PROFILEDIR
   | PROFILEIDERR
+  | PROGAUTO
   | PROGAUTOCTLG
   | PROGAUTOEXIT
   | PROGAUTOINST
   | PROGMGR
   | PROGRAM
+  | PROGRAMDEF
   | PROGSYMBOLST
   | PROGTYPE
   | PROTECT
@@ -2438,6 +2461,7 @@ ABCODE
   | RESID
   | RESIDENCY
   | RESIDERR
+  | RESIDLEN
   | RESIDLENGTH
   | RESLEN
   | RESLIFEMGR
@@ -2617,6 +2641,7 @@ ABCODE
   | STATE
   | STATELEN
   | STATIONID
+  | STATS
   | STATSQUEUE
   | STATUS
   | STATUSCODE
@@ -2646,6 +2671,10 @@ ABCODE
   | SUBEVENT6
   | SUBEVENT7
   | SUBEVENT8
+  | SUBRESID
+  | SUBRESIDLEN
+  | SUBRESTYPE
+  | SUBTASKS
   | SUBTASKS
   | SUPPRESSED
   | SUSPEND
@@ -2684,6 +2713,7 @@ ABCODE
   | TASKPRIORITY
   | TASKS
   | TASKSTARTST
+  | TASKSUBPOOL
   | TC
   | TCAMCONTROL
   | TCB

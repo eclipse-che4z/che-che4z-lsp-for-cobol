@@ -107,16 +107,20 @@ public class CFASTBuilderImpl implements CFASTBuilder {
       node.getChildren().forEach(child -> traverse(parent, child));
     } else if (node instanceof PerformNode) {
       if (((PerformNode) node).isInline()) {
-        addChild(parent, new CFASTNode(CFASTNodeType.INLINE_PERFORM.getValue(), convertLocation(node)));
+
+        PerformUntilType performUntilType = getPerformUntilType((PerformNode) node);
+        addChild(parent, new InlinePerform(convertLocation(node), performUntilType == PerformUntilType.UNTIL_EXIT));
         node.getChildren().forEach(child -> traverse(parent, child));
         addChild(parent, new CFASTNode(CFASTNodeType.END_INLINE_PERFORM.getValue(), convertLocation(node)));
       } else {
         PerformNode performNode = ((PerformNode) node);
-        addChild(
-            parent,
+        PerformUntilType performUntilType = getPerformUntilType((PerformNode) node);
+
+        addChild(parent,
             new Perform(performNode.getTarget(),
                 performNode.getThru(),
-                convertLocation(node)
+                convertLocation(node),
+                performUntilType
             ));
       }
     } else if (node instanceof ExitPerformNode) {
@@ -277,5 +281,15 @@ public class CFASTBuilderImpl implements CFASTBuilder {
       sb.append(line.getText());
     });
     return sb.toString();
+  }
+
+  private PerformUntilType getPerformUntilType(PerformNode performNode) {
+    return performNode.getDepthFirstStream()
+        .filter(n -> n instanceof PerformUntilNode)
+        .findFirst()
+        .map(PerformUntilNode.class::cast)
+        .map(PerformUntilNode::isUntilExit)
+        .map(n -> n ? PerformUntilType.UNTIL_EXIT : PerformUntilType.UNTIL_CONDITION)
+        .orElse(null);
   }
 }

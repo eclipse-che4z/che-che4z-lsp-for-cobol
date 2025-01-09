@@ -15,6 +15,7 @@
 package org.eclipse.lsp.cobol.core.engine.processors;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
@@ -22,17 +23,13 @@ import org.eclipse.lsp.cobol.common.message.MessageTemplate;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.model.NodeType;
+import org.eclipse.lsp.cobol.common.model.tree.statements.*;
 import org.eclipse.lsp.cobol.common.model.tree.variable.*;
 import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.Processor;
 import org.eclipse.lsp.cobol.common.model.tree.LiteralNode;
-import org.eclipse.lsp.cobol.common.model.tree.statements.SetToBooleanStatement;
-import org.eclipse.lsp.cobol.common.model.tree.statements.SetToOnOffStatement;
-import org.eclipse.lsp.cobol.common.model.tree.statements.SetUpDownByStatement;
-import org.eclipse.lsp.cobol.common.model.tree.statements.StatementNode;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -53,6 +50,10 @@ public class StatementValidate implements Processor<StatementNode> {
     MessageTemplate.of("variables.elementaryWithType", MessageTemplate.of("variables.integer")),
     MessageTemplate.of("variables.nonzeroInteger")
   };
+  private static final Set<UsageFormat> POINTER_USAGE_FORMATS = ImmutableSet.of(
+          UsageFormat.PROCEDURE_POINTER,
+          UsageFormat.POINTER,
+          UsageFormat.FUNCTION_POINTER);
 
   @Override
   public void accept(StatementNode node, ProcessingContext ctx) {
@@ -87,6 +88,36 @@ public class StatementValidate implements Processor<StatementNode> {
                     INVALID_SENDING_FIELD_TEMPLATE,
                     SENDING_FIELD_TYPES));
     }
+
+    if (node instanceof SetToStatement && !((SetToStatement) node).isAddress()) {
+      SetToStatement setToStatementNode = (SetToStatement) node;
+      if (!(setToStatementNode.getSendingField() instanceof QualifiedReferenceNode)) {
+        ctx.getErrors().addAll(validateVariableUsageFormat(setToStatementNode.getReceivingFields()));
+      }
+    }
+  }
+
+  private List<SyntaxError> validateVariableUsageFormat(List<Node> fields) {
+    return fields.stream()
+            .filter(Node.hasType(QUALIFIED_REFERENCE_NODE))
+            .map(QualifiedReferenceNode.class::cast)
+            .filter(
+                    reference ->
+                            reference
+                                    .getVariableDefinitionNode()
+                                    .map(variableNode -> {
+                                      if (variableNode.getVariableType() != VariableType.INDEX_ITEM
+                                              && variableNode.getVariableType() != VariableType.GROUP_ITEM) {
+                                        return true;
+                                      }
+                                      if (variableNode instanceof GroupItemNode && variableNode.getVariableType() == VariableType.GROUP_ITEM) {
+                                        return !POINTER_USAGE_FORMATS.contains(((GroupItemNode) variableNode).getUsageFormat());
+                                      }
+                                      return false;
+                                    })
+                                    .orElse(false))
+            .map(variableNode -> createError(variableNode.getLocality(), INVALID_RECEIVING_FIELD_TEMPLATE, VariableType.INDEX_ITEM.getTemplate()))
+            .collect(Collectors.toList());
   }
 
   private List<SyntaxError> validateVariableType(

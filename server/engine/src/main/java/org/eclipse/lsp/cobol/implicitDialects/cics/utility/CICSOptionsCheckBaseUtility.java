@@ -249,13 +249,13 @@ public abstract class CICSOptionsCheckBaseUtility {
      * @param <E>  Generic locality source type
      * @return The locality of the rule
      */
-    private <E> Locality getLocality(E rule) {
+    protected  <E> Locality getLocality(E rule) {
         if (ParserRuleContext.class.isAssignableFrom(rule.getClass()))
             return VisitorUtility.constructLocality((ParserRuleContext) rule, context);
         else return VisitorUtility.constructLocality((TerminalNode) rule, context);
     }
 
-    private void throwException(
+    protected void throwException(
             ErrorSeverity errorSeverity, @NonNull Locality locality, String message, String wrongToken) {
         SyntaxError error =
                 SyntaxError.syntaxError()
@@ -405,8 +405,29 @@ public abstract class CICSOptionsCheckBaseUtility {
         return nodes.size();
     }
 
-    protected <E extends ParseTree> void checkHasExactlyOneOption(
-            String options, ParserRuleContext parentCtx, List<E>... rules) {
+  /**
+   * Checks whether list of options is either empty or contains all options
+   * @param options Options checked to insert into error message
+   * @param ctx ParserRuleContext
+   * @param rules Lists of rules to iterate through
+   */
+  protected <E extends ParseTree> void checkAllOptionsArePresentOrAbsent(String options, ParserRuleContext ctx, List<E>... rules) {
+    boolean noOptions = Arrays.stream(rules).allMatch(List::isEmpty);
+    if (!noOptions) {
+        boolean allOptions = Arrays.stream(rules).noneMatch(List::isEmpty);
+        if (!allOptions) {
+          throwException(
+              ErrorSeverity.ERROR,
+              getLocality(ctx),
+              "If one option is specified, all options must be present: ",
+              options);
+        }
+    }
+  }
+
+
+  protected <E extends ParseTree> void checkHasExactlyOneOption(
+      String options, ParserRuleContext parentCtx, List<E>... rules) {
 
         List<TerminalNode> children = new ArrayList<>();
 

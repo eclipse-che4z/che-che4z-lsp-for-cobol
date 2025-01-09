@@ -1590,8 +1590,12 @@ performTimes
    ;
 
 performUntil
-   : performTestClause? UNTIL condition
+   : performTestClause? performUntilCondition
    ;
+
+performUntilCondition
+    : UNTIL (EXIT | condition)
+    ;
 
 performVarying
    : performTestClause performVaryingClause | performVaryingClause performTestClause?
