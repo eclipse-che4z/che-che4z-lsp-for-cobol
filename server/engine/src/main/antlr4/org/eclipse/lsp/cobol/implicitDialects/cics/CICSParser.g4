@@ -1010,13 +1010,11 @@ cics_startbr_options: ((FILE | DATASET) cics_name | (RIDFLD | SYSID) cics_data_a
 /** STARTBROWSE ACTIVITY / CONTAINER / EVENT / PROCESS / TIMER */
 cics_startbrowse: STARTBROWSE (cics_startbrowse_activity | cics_startbrowse_container | cics_startbrowse_event |
                   cics_startbrowse_process | cics_startbrowse_timer);
-cics_startbrowse_activity: (ACTIVITY | cics_startbrowse_activityid_process | BROWSETOKEN cics_data_area | cics_handle_response)+;
-cics_startbrowse_container: (CONTAINER | cics_startbrowse_activityid_process | CHANNEL cics_data_value | (BROWSETOKEN | RETCODE) cics_data_area | cics_handle_response)+;
+cics_startbrowse_activity: (ACTIVITY | (ACTIVITYID|PROCESS|PROCESSTYPE) cics_data_value | BROWSETOKEN cics_data_area | cics_handle_response)+;
+cics_startbrowse_container: (CONTAINER | (ACTIVITYID|PROCESS|PROCESSTYPE|CHANNEL) cics_data_value | (BROWSETOKEN | RETCODE) cics_data_area | cics_handle_response)+;
 cics_startbrowse_event: (EVENT | BROWSETOKEN cics_data_area | ACTIVITYID cics_data_value | cics_handle_response)+;
 cics_startbrowse_process: (PROCESS | PROCESSTYPE cics_data_value | BROWSETOKEN cics_data_area | cics_handle_response)+;
-cics_startbrowse_timer: (TIMER cics_data_value | BROWSETOKEN cics_data_area | cics_handle_response)+;
-
-cics_startbrowse_activityid_process: (ACTIVITYID|PROCESS|PROCESSTYPE) cics_data_value;
+cics_startbrowse_timer: (TIMER | BROWSETOKEN cics_data_area | cics_handle_response)+;
 
 /** SUSPEND (both) */
 cics_suspend: SUSPEND cics_suspend_body;

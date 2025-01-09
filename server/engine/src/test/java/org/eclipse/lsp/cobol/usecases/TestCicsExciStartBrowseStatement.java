@@ -26,7 +26,7 @@ import java.util.Map;
 
 /**
  * Tests CICS STARTBROWSE CONTAINER (EXCI) statement. Ref:
- * https://www.ibm.com/docs/en/cics-ts/6.1?topic=interface-exec-cics-link-command-exci
+ * https://www.ibm.com/docs/en/cics-ts/6.x?topic=summary-startbrowse-activity
  */
 public class TestCicsExciStartBrowseStatement {
 
@@ -35,9 +35,9 @@ public class TestCicsExciStartBrowseStatement {
   private static final String STARTBROWSE_CONTAINER_VALID = "STARTBROWSE CONTAINER PROCESS(123) PROCESSTYPE(123) BROWSETOKEN(123)";
   private static final String STARTBROWSE_EVENT_VALID = "STARTBROWSE EVENT ACTIVITYID(123) BROWSETOKEN(123)";
   private static final String STARTBROWSE_PROCESS_VALID = "STARTBROWSE PROCESS PROCESSTYPE(123) BROWSETOKEN(123)";
-  private static final String STARTBROWSE_TIMER_VALID = "STARTBROWSE TIMER(123) BROWSETOKEN(123)";
+  private static final String STARTBROWSE_TIMER_VALID = "STARTBROWSE TIMER BROWSETOKEN(123)";
 
-  private static final String STARTBROWSE_INVALID_PROCESS_CHANNEL = "STARTBROWSE CONTAINER {PROCESS(123)|errorOne} {PROCESSTYPE(123)|errorTwo} CHANNEL(3) BROWSETOKEN(123)";
+  private static final String STARTBROWSE_INVALID_CONTAINER = "STARTBROWSE CONTAINER {PROCESS|errorOne}(123) PROCESSTYPE(123) CHANNEL(3) BROWSETOKEN(123)";
   private static final String STARTBROWSE_INVALID_ACTIVITY = "STARTBROWSE {_ACTIVITY ACTIVITYID(123)|errorOne_}";
   private static final String STARTBROWSE_INVALID_EVENT = "STARTBROWSE {_EVENT ACTIVITYID(123)|errorOne_}";
   private static final String STARTBROWSE_INVALID_PROCESS = "STARTBROWSE {_PROCESS BROWSETOKEN(123)|errorOne_}";
@@ -75,17 +75,11 @@ public class TestCicsExciStartBrowseStatement {
     tempDiagnostic.put("errorOne",
             new Diagnostic(
                     new Range(),
-                    "Invalid option provided: ACTIVITYID or PROCESS",
-                    DiagnosticSeverity.Error,
-                    ErrorSource.PARSING.getText()));
-    tempDiagnostic.put("errorTwo",
-            new Diagnostic(
-                    new Range(),
-                    "Invalid option provided: ACTIVITYID or PROCESS",
+                    "Invalid option provided: PROCESS",
                     DiagnosticSeverity.Error,
                     ErrorSource.PARSING.getText()));
 
-    CICSTestUtils.errorTest(STARTBROWSE_INVALID_PROCESS_CHANNEL, tempDiagnostic);
+    CICSTestUtils.errorTest(STARTBROWSE_INVALID_CONTAINER, tempDiagnostic);
   }
 
   @Test

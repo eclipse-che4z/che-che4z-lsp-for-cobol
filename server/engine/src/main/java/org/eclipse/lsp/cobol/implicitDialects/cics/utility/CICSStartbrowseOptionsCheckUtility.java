@@ -35,7 +35,6 @@ public class CICSStartbrowseOptionsCheckUtility extends CICSOptionsCheckBaseUtil
 
     private static final Map<Integer, ErrorSeverity> DUPLICATE_CHECK_OPTIONS = new HashMap<Integer, ErrorSeverity>() {
         {
-            put(CICSLexer.STARTBROWSE, ErrorSeverity.ERROR);
             put(CICSLexer.ACTIVITYID, ErrorSeverity.ERROR);
             put(CICSLexer.PROCESS, ErrorSeverity.ERROR);
             put(CICSLexer.PROCESSTYPE, ErrorSeverity.ERROR);
@@ -83,9 +82,6 @@ public class CICSStartbrowseOptionsCheckUtility extends CICSOptionsCheckBaseUtil
             case CICSParser.RULE_cics_startbrowse_timer:
                 checkTimer((CICSParser.Cics_startbrowse_timerContext) ctx);
                 break;
-            case CICSParser.RULE_cics_startbrowse_activityid_process:
-                checkActivityIdProcess((CICSParser.Cics_startbrowse_activityid_processContext) ctx);
-                break;
             default:
                 break;
         }
@@ -93,12 +89,15 @@ public class CICSStartbrowseOptionsCheckUtility extends CICSOptionsCheckBaseUtil
 
     private void checkActivity(CICSParser.Cics_startbrowse_activityContext ctx) {
         checkHasMandatoryOptions(ctx.BROWSETOKEN(), ctx, "BROWSETOKEN");
+        checkPrerequisiteIsMet(ctx.PROCESS(), ctx.PROCESSTYPE(), ctx, "PROCESSTYPE without PROCESS");
     }
 
     private void checkContainer(CICSParser.Cics_startbrowse_containerContext ctx) {
         checkHasMandatoryOptions(ctx.BROWSETOKEN(), ctx, "BROWSETOKEN");
+        checkPrerequisiteIsMet(ctx.PROCESS(), ctx.PROCESSTYPE(), ctx, "PROCESSTYPE without PROCESS");
         if (!ctx.CHANNEL().isEmpty()) {
-            checkHasIllegalOptions(ctx.cics_startbrowse_activityid_process(), "ACTIVITYID or PROCESS");
+            checkHasIllegalOptions(ctx.ACTIVITYID(), "ACTIVITYID");
+            checkHasIllegalOptions(ctx.PROCESS(), "PROCESS");
         }
     }
 
@@ -113,9 +112,5 @@ public class CICSStartbrowseOptionsCheckUtility extends CICSOptionsCheckBaseUtil
 
     private void checkTimer(CICSParser.Cics_startbrowse_timerContext ctx) {
         checkHasMandatoryOptions(ctx.BROWSETOKEN(), ctx, "BROWSETOKEN");
-    }
-
-    private void checkActivityIdProcess(CICSParser.Cics_startbrowse_activityid_processContext ctx) {
-        checkMutuallyExclusiveOptions("ACTIVITYID or PROCESS", ctx.ACTIVITYID(), ctx.PROCESS());
     }
 }
