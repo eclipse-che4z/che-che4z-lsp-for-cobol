@@ -903,7 +903,6 @@ public class CICSInquireSPOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
                     put(CICSLexer.USERNAME, ErrorSeverity.ERROR);
                     put(CICSLexer.USERSTATUS, ErrorSeverity.ERROR);
                     put(CICSLexer.USERTAG, ErrorSeverity.ERROR);
-                    put(CICSLexer.UTIL, ErrorSeverity.ERROR);
                     put(CICSLexer.VALIDATIONST, ErrorSeverity.ERROR);
                     put(CICSLexer.VALIDITY, ErrorSeverity.ERROR);
                     put(CICSLexer.VALUE, ErrorSeverity.ERROR);
