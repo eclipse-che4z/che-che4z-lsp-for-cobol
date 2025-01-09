@@ -35,7 +35,7 @@ public class TestCICSRelease {
           "RELEASE PROGRAM({$varOne})";
 
   private static final String RELEASE_INVALID_NO_PROGRAM =
-          "{_RELEASE|errorOne|errorTwo_}";
+          "{RELEASE|errorOne}";
 
   private static final String RELEASE_INVALID_EXTRA_OPTION =
           "RELEASE PROGRAM({$varOne}) {PROGRAM|errorOne}({$varOne})";
@@ -47,7 +47,7 @@ public class TestCICSRelease {
 
   @Test
   void testReleaseInvalidNoProgram() {
-    CICSTestUtils.errorTest(
+    CICSTestUtils.errorTestWithEndExecError(
             RELEASE_INVALID_NO_PROGRAM,
             ImmutableMap.of(
                     "errorOne",
@@ -56,9 +56,9 @@ public class TestCICSRelease {
                             "Missing required option: PROGRAM",
                             DiagnosticSeverity.Error,
                             ErrorSource.PARSING.getText()),
-                    "errorTwo",
+                    "end-exec-error",
                     new Diagnostic(
-                            new Range(new Position(13, 12), new Position(13, 20)),
+                            new Range(),
                             "Syntax error on 'END-EXEC'",
                             DiagnosticSeverity.Error,
                             ErrorSource.PARSING.getText())));

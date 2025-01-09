@@ -41,17 +41,20 @@ public class CICSTestUtils {
           + "       01 {$*varFive}  PIC X VALUE 'NAME_TWO'.\n"
           + "       01 {$*varSix}   PIC X VALUE 'NAME_THREE'.\n"
           + "       PROCEDURE DIVISION.\n"
-          + "            EXEC CICS \n"
-          + "            END-EXEC.";
+          + "            EXEC CICS ";
+
+  private static final String END_EXEC = "            END-EXEC.";
+  private static final String END_EXEC_ERROR = "            {END-EXEC|end-exec-error}.";
 
   /**
    * Retrieves a formatted test string for CICS command testing
    *
    * @param components Components to add to the EXEC CICS block of the test string
+   * @param endExecError Indicate to generate test case with expected syntax error on END-EXEC
    * @param compilerOptions Compiler options fo translator specification
    * @return Formatted test string
    */
-  public static String getTestString(String components, String... compilerOptions) {
+  public static String getTestString(String components, boolean endExecError, String... compilerOptions) {
     List<String> instances = Arrays.asList(components.split("\\s"));
     instances.replaceAll(String.join("", Collections.nCopies(12, " "))::concat);
     List<String> compilerOptionsList =
@@ -61,7 +64,8 @@ public class CICSTestUtils {
 
     ArrayList<String> base = new ArrayList<String>(Arrays.asList(BASE_TEXT.split("\n")));
     base.addAll(0, compilerOptionsList);
-    base.addAll(base.size() - 1, instances);
+    base.addAll(instances);
+    base.add(endExecError ? END_EXEC_ERROR : END_EXEC);
     return String.join("\n", base);
   }
 
@@ -73,7 +77,7 @@ public class CICSTestUtils {
    */
   public static void noErrorTest(String newCommand, String... options) {
     UseCaseEngine.runTest(
-        getTestString(newCommand, options), ImmutableList.of(), ImmutableMap.of());
+        getTestString(newCommand, false, options), ImmutableList.of(), ImmutableMap.of());
   }
 
   /**
@@ -86,6 +90,19 @@ public class CICSTestUtils {
   public static void errorTest(
       String newCommand, Map<String, Diagnostic> expectedDiagnostic, String... options) {
     UseCaseEngine.runTest(
-        getTestString(newCommand, options), ImmutableList.of(), expectedDiagnostic);
+        getTestString(newCommand, false, options), ImmutableList.of(), expectedDiagnostic);
+  }
+
+  /**
+   * Runs a test with asserting error conditions passed as argument
+   *
+   * @param newCommand Error command to execute
+   * @param expectedDiagnostic Errors to match
+   * @param options Compiler options fo translator specification
+   */
+  public static void errorTestWithEndExecError(
+      String newCommand, Map<String, Diagnostic> expectedDiagnostic, String... options) {
+    UseCaseEngine.runTest(
+        getTestString(newCommand, true, options), ImmutableList.of(), expectedDiagnostic);
   }
 }
