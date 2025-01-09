@@ -246,11 +246,14 @@ public class CICSHandleOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     }
 
     private void checkHasTooManyOptions(ParserRuleContext parentCtx) {
-        List<ParseTree> commandOoptions = parentCtx.children.stream()
+        if (parentCtx.children == null)
+            return;
+        long commandOptionsCount = parentCtx.children.stream()
                 .filter(node -> node instanceof TerminalNode)
-                .filter(node -> !node.getText().equalsIgnoreCase("AID"))
-                .collect(Collectors.toList());
-        if (commandOoptions.size() > 16) {
+                .map(TerminalNode.class::cast)
+                .filter(node -> node.getSymbol().getType() != CICSLexer.AID)
+                .count();
+        if (commandOptionsCount > 16) {
             throwException(
                     ErrorSeverity.ERROR, getLocality(parentCtx), "Too many options provided for: ", "HANDLE AID");
         }
