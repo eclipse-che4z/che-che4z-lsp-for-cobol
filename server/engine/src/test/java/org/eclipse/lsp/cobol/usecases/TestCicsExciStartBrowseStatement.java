@@ -37,7 +37,7 @@ public class TestCicsExciStartBrowseStatement {
   private static final String STARTBROWSE_PROCESS_VALID = "STARTBROWSE PROCESS PROCESSTYPE(123) BROWSETOKEN(123)";
   private static final String STARTBROWSE_TIMER_VALID = "STARTBROWSE TIMER BROWSETOKEN(123)";
 
-  private static final String STARTBROWSE_INVALID_CONTAINER = "STARTBROWSE CONTAINER {PROCESS|errorOne}(123) PROCESSTYPE(123) CHANNEL(3) BROWSETOKEN(123)";
+  private static final String STARTBROWSE_INVALID_CONTAINER = "STARTBROWSE CONTAINER PROCESS(123) PROCESSTYPE(123) {CHANNEL|errorOne}(3) BROWSETOKEN(123)";
   private static final String STARTBROWSE_INVALID_ACTIVITY = "STARTBROWSE {_ACTIVITY ACTIVITYID(123)|errorOne_}";
   private static final String STARTBROWSE_INVALID_EVENT = "STARTBROWSE {_EVENT ACTIVITYID(123)|errorOne_}";
   private static final String STARTBROWSE_INVALID_PROCESS = "STARTBROWSE {_PROCESS BROWSETOKEN(123)|errorOne_}";
@@ -75,7 +75,7 @@ public class TestCicsExciStartBrowseStatement {
     tempDiagnostic.put("errorOne",
             new Diagnostic(
                     new Range(),
-                    "Invalid option provided: PROCESS",
+                    "Options \"ACTIVITYID, PROCESS or CHANNEL\" are mutually exclusive.",
                     DiagnosticSeverity.Error,
                     ErrorSource.PARSING.getText()));
 
