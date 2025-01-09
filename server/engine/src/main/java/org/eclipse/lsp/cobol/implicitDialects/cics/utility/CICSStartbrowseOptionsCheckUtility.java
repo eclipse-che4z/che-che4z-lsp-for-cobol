@@ -38,12 +38,12 @@ public class CICSStartbrowseOptionsCheckUtility extends CICSOptionsCheckBaseUtil
             put(CICSLexer.ACTIVITYID, ErrorSeverity.ERROR);
             put(CICSLexer.PROCESS, ErrorSeverity.ERROR);
             put(CICSLexer.PROCESSTYPE, ErrorSeverity.ERROR);
-            put(CICSLexer.ACTIVITY, ErrorSeverity.ERROR);
+            put(CICSLexer.ACTIVITY, ErrorSeverity.WARNING);
             put(CICSLexer.BROWSETOKEN, ErrorSeverity.ERROR);
-            put(CICSLexer.CONTAINER, ErrorSeverity.ERROR);
-            put(CICSLexer.CHANNEL, ErrorSeverity.ERROR);
-            put(CICSLexer.EVENT, ErrorSeverity.ERROR);
-            put(CICSLexer.TIMER, ErrorSeverity.ERROR);
+            put(CICSLexer.CONTAINER, ErrorSeverity.WARNING);
+            put(CICSLexer.CHANNEL, ErrorSeverity.WARNING);
+            put(CICSLexer.EVENT, ErrorSeverity.WARNING);
+            put(CICSLexer.TIMER, ErrorSeverity.WARNING);
             put(CICSLexer.RETCODE, ErrorSeverity.ERROR);
         }
     };
@@ -90,15 +90,13 @@ public class CICSStartbrowseOptionsCheckUtility extends CICSOptionsCheckBaseUtil
     private void checkActivity(CICSParser.Cics_startbrowse_activityContext ctx) {
         checkHasMandatoryOptions(ctx.BROWSETOKEN(), ctx, "BROWSETOKEN");
         checkPrerequisiteIsMet(ctx.PROCESS(), ctx.PROCESSTYPE(), ctx, "PROCESSTYPE without PROCESS");
+        checkMutuallyExclusiveOptions("ACTIVITYID or PROCESS", ctx.ACTIVITYID(), ctx.PROCESS());
     }
 
     private void checkContainer(CICSParser.Cics_startbrowse_containerContext ctx) {
         checkHasMandatoryOptions(ctx.BROWSETOKEN(), ctx, "BROWSETOKEN");
         checkPrerequisiteIsMet(ctx.PROCESS(), ctx.PROCESSTYPE(), ctx, "PROCESSTYPE without PROCESS");
-        if (!ctx.CHANNEL().isEmpty()) {
-            checkHasIllegalOptions(ctx.ACTIVITYID(), "ACTIVITYID");
-            checkHasIllegalOptions(ctx.PROCESS(), "PROCESS");
-        }
+        checkMutuallyExclusiveOptions("ACTIVITYID, PROCESS or CHANNEL", ctx.ACTIVITYID(), ctx.PROCESS(), ctx.CHANNEL());
     }
 
     private void checkEvent(CICSParser.Cics_startbrowse_eventContext ctx) {
