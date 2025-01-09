@@ -53,7 +53,7 @@ public class CICSTestUtils {
    * Retrieves a formatted test string for CICS command testing
    *
    * @param components Components to add to the EXEC CICS block of the test string
-   * @param errorTags Error tages to inject before END-EXEC or null
+   * @param errorTags Error tags to inject before END-EXEC or null
    * @param compilerOptions Compiler options fo translator specification
    * @return Formatted test string
    */
@@ -106,7 +106,7 @@ public class CICSTestUtils {
    * Runs a test with asserting error conditions passed as argument
    *
    * @param newCommand Error command to execute
-   * @param errorTags Error tages to inject before END-EXEC
+   * @param errorTags Error tags to inject before END-EXEC
    * @param expectedDiagnostic Errors to match
    * @param options Compiler options fo translator specification
    */
