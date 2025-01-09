@@ -205,7 +205,7 @@ suite("Integration Test Suite: Copybooks", function () {
         await helper.activate();
       });
 
-      test.skip("Local copybooks are resolved from local subfolders if no configuration is provided", async () => {
+      test("Local copybooks are resolved from local subfolders if no configuration is provided", async () => {
         const editor = await helper.showDocument("USERC1N1.cbl");
 
         let diagnostics: vscode.Diagnostic[] = [];
