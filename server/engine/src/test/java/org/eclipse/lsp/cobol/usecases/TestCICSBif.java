@@ -33,10 +33,12 @@ package org.eclipse.lsp.cobol.usecases;
 public class TestCICSBif {
     private static final String BIF_DEEDIT_FIELD_VALID =
             "BIF DEEDIT FIELD({$varFour})";
+
     private static final String BIF_DEEDIT_FIELD_LENGTH_VALID =
             "BIF DEEDIT FIELD({$varFour}) LENGTH(100)";
+
     private static final String BIF_DEEDIT_INVALID =
-            "BIF {DEEDIT|errorMissingField }";
+            "BIF {DEEDIT | errorMissingField }";
     private static final String BIF_DIGEST_RECORD_RECORDLEN_RESULT_VALID =
             "BIF DIGEST RECORD(100) RECORDLEN(100) RESULT({$varFour})";
     private static final String BIF_DIGEST_RECORD_RECORDLEN_HEX_RESULT_VALID =
@@ -56,10 +58,12 @@ public class TestCICSBif {
     void testBifDeeditField() {
         CICSTestUtils.noErrorTest(BIF_DEEDIT_FIELD_VALID);
     }
+
     @Test
     void testBifDeeditFieldLengthValid() {
         CICSTestUtils.noErrorTest(BIF_DEEDIT_FIELD_LENGTH_VALID);
     }
+
     @Test
     void testBifDeeditDigestInvalid() {
         Map<String, Diagnostic> expectedDiagnostic =
@@ -70,6 +74,7 @@ public class TestCICSBif {
                                 "Missing required option: FIELD",
                                 DiagnosticSeverity.Error,
                                 ErrorSource.PARSING.getText()));
+
         CICSTestUtils.errorTest(BIF_DEEDIT_INVALID, expectedDiagnostic);
     }
     @Test
@@ -114,7 +119,7 @@ public class TestCICSBif {
                                 "Exactly one option required, options are mutually exclusive: HEX or BINARY or BASE64 or DIGESTTYPE",
                                 DiagnosticSeverity.Error,
                                 ErrorSource.PARSING.getText())
-                );
+                        );
         CICSTestUtils.errorTest(BIF_DIGEST_DIGESTTYPE_INVALID, expectedDiagnostic);
     }
     @Test
@@ -130,21 +135,3 @@ public class TestCICSBif {
         CICSTestUtils.errorTest(BIF_DIGEST_RESULT_MISSING_INVALID, expectedDiagnostic);
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
