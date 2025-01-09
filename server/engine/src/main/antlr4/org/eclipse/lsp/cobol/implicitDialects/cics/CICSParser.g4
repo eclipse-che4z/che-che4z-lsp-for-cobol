@@ -266,10 +266,11 @@ cics_converttime_opts:(DATESTRING cics_data_area | ABSTIME cics_data_area | cics
 /** CREATE System Commands */
 cics_create: CREATE cics_create_opts;
 cics_create_opts:((ATOMSERVICE | BUNDLE | DB2CONN | DB2ENTRY | DB2TRAN | DOCTEMPLATE | DUMPCODE | ENQMODEL | FILE |
-                                      IPCONN | JOURNALMODEL | JVMSERVER | LIBRARY | LSRPOOL | MAPSET | MQCONN | MQMONITOR | PARTITIONSET |
-                                      PARTNER |  PIPELINE | PROCESSTYPE | PROFILE | PROGRAM | TCPIPSERVICE | TDQUEUE | TRANCLASS |
-                                      TRANSACTION | TSMODEL | TYPETERM | URIMAP | WEBSERVICE | SESSIONS | TERMINAL | CONNECTION) cics_data_value |
-                                      ATTRIBUTES cics_data_area | COMPLETE | DISCARD | ATTRLEN cics_data_value | LOG | NOLOG | LOGMESSAGE cics_cvda | cics_handle_response)+;
+                   IPCONN | JOURNALMODEL | JVMSERVER | LIBRARY | LSRPOOL | MAPSET | MQCONN | MQMONITOR | PARTITIONSET |
+                   PARTNER |  PIPELINE | PROCESSTYPE | PROFILE | PROGRAM | TCPIPSERVICE | TDQUEUE | TRANCLASS |
+                   TRANSACTION | TSMODEL | TYPETERM | URIMAP | WEBSERVICE | SESSIONS | TERMINAL | CONNECTION) cics_data_value |
+                   ATTRIBUTES cics_data_area | COMPLETE | DISCARD | ATTRLEN cics_data_value | LOG | NOLOG |
+                   LOGMESSAGE cics_cvda | cics_handle_response)+;
 
 /** DEFINE (all of them) */
 cics_define: DEFINE (cics_define_activity | cics_define_composite_event | cics_define_counter_dcounter | cics_define_input_event | cics_define_process | cics_define_timer);
@@ -1267,7 +1268,7 @@ ABCODE
   | ATTLS
   | ATTRIBUTES
   | ATTRLEN
- | AUDALARMST
+  | AUDALARMST
   | AUDITLEVEL
   | AUDITLOG
   | AUTHENTICATE
@@ -1972,7 +1973,7 @@ ABCODE
   | LOW_VALUES
   | LPASTATUS
   | LSRPOOL
- | LSRPOOLNUM
+  | LSRPOOLNUM
   | LUNAME
   | MAIN
   | MAJORVERSION
@@ -2104,8 +2105,8 @@ ABCODE
   | NOFLUSH
   | NOHANDLE
   | NOINCONVERT
+  | NOJBUFSP
   | NOLOG
- | NOJBUFSP
   | NONE
   | NONTERMREL
   | NONVAL
@@ -2212,18 +2213,18 @@ ABCODE
   | PA1
   | PA2
   | PA3
+  | PAGE_COUNTER
   | PAGEHT
   | PAGENUM
   | PAGESTATUS
   | PAGEWD
-  | PAGE_COUNTER
   | PAGING
   | PARAMGR
   | PARSE
   | PARTCLASS
   | PARTCOUNT
   | PARTITIONSET
- | PARTITIONSST
+  | PARTITIONSST
   | PARTN
   | PARTNER
   | PARTNERIDERR
@@ -2547,7 +2548,7 @@ ABCODE
   | SESSION
   | SESSIONERR
   | SESSIONS
- | SESSIONTYPE
+  | SESSIONTYPE
   | SESSTOKEN
   | SET
   | SETTRANSID
@@ -2760,7 +2761,7 @@ ABCODE
   | TRANPRIORITY
   | TRANSACTION
   | TRANSCLASS
- | TRANSFORM
+  | TRANSFORM
   | TRANSID
   | TRANSIDERR
   | TRANSMODE
@@ -2788,7 +2789,7 @@ ABCODE
   | TYPENS
   | TYPENSLEN
   | TYPETERM
- | UCTRANST
+  | UCTRANST
   | UDSASIZE
   | UE
   | UNATTEND

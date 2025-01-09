@@ -385,7 +385,6 @@ public abstract class CICSOptionsCheckBaseUtility {
     @SafeVarargs
     protected final int checkHasMutuallyExclusiveOptions(List<TerminalNode>... rules) {
         List<TerminalNode> nodes = new ArrayList<>(Stream.of(rules)
-                .filter(rule -> !rule.isEmpty())
                 .flatMap(Collection::stream)
                 .collect(Collectors.toCollection(
                         () -> new TreeSet<>(Comparator.comparing(node -> node.getSymbol().getType()))
