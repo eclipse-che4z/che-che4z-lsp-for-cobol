@@ -746,7 +746,7 @@ cics_retrieve_reattach: (REATTACH | EVENT cics_data_area | EVENTTYPE cics_cvda |
 cics_retrieve_subevent: (SUBEVENT cics_data_area | EVENT cics_data_value |  EVENTTYPE cics_cvda | cics_handle_response)*;
 
 /** RETURN */
-cics_return: RETURN (cics_return_body | cics_handle_response)*;
+cics_return: RETURN (cics_return_body)*;
 cics_return_body: ((IMMEDIATE | ENDACTIVITY) | (TRANSID | CHANNEL) cics_name | (LENGTH | INPUTMSGLEN) cics_data_value | (COMMAREA | INPUTMSG) cics_data_area | cics_handle_response)+;
 
 /** REWIND COUNTER / DCOUNTER */
