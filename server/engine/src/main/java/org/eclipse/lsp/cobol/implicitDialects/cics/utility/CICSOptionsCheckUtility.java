@@ -100,10 +100,10 @@ public class CICSOptionsCheckUtility {
         CICSWebOptionsCheckUtility.RULE_INDEX,
         new CICSWebOptionsCheckUtility(context, errors));
     optionsMap.put(
-        CICSEndBrowseOptionsUtility.RULE_ENDBR_INDEX,
-        new CICSEndBrowseOptionsUtility(context, errors));
+        CICSEndbrOptionsUtility.RULE_INDEX,
+        new CICSEndbrOptionsUtility(context, errors));
     optionsMap.put(
-        CICSEndBrowseOptionsUtility.RULE_ENDBROWSE_INDEX,
+        CICSEndBrowseOptionsUtility.RULE_INDEX,
         new CICSEndBrowseOptionsUtility(context, errors));
     optionsMap.put(
         CICSDeleteOptionsCheckUtility.RULE_INDEX,
@@ -267,6 +267,12 @@ public class CICSOptionsCheckUtility {
     spOptionsMap.put(
         CICSDiscardOptionsUtility.RULE_INDEX,
         new CICSDiscardOptionsUtility(context, errors));
+    spOptionsMap.put(
+        CICSCreateSPOptionsCheckUtility.RULE_INDEX,
+        new CICSCreateSPOptionsCheckUtility(context, errors));
+    spOptionsMap.put(
+        CICSExtractSPOptionsCheckUtility.RULE_INDEX,
+        new CICSExtractSPOptionsCheckUtility(context, errors));
   }
     /**
      * Entrypoint to check CICS rule options

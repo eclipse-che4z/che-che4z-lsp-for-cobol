@@ -19,7 +19,7 @@ compilerDirective: (.*? compilerOpts)* .*? EOF;
 cicsExecBlock: EXEC_CICS (allCicsRule)* END_EXEC ;
 
 allCicsRule: cics_send | cics_receive | cics_add | cics_address | cics_allocate | cics_asktime | cics_assign | cics_bif |
-                       cics_build | cics_cancel | cics_change  | cics_check | cics_connect | cics_converttime |
+                       cics_build | cics_cancel | cics_change | cics_check | cics_connect | cics_converttime |
                        cics_define | cics_delay | cics_delete | cics_deleteq | cics_deq | cics_document | cics_dump | cics_endbr |
                        cics_endbrowse | cics_enq | cics_enter | cics_extract | cics_force | cics_formattime | cics_free |
                        cics_freemain | cics_get | cics_getmain | cics_getmain64 | cics_getnext | cics_handle | cics_ignore | cics_inquire |
@@ -38,7 +38,7 @@ allExciRules: cics_exci_link | cics_exci_delete | cics_exci_delete_container | c
               cics_exci_get_container | cics_exci_get_next_container | cics_exci_move_container |
               cics_exci_put_container | cics_exci_query_channel | cics_exci_startbrowse_container ;
 
-allSPRules: cics_discard | cics_inquire_system_programming;
+allSPRules: cics_discard | cics_extract_system_programming | cics_inquire_system_programming | cics_create;
 
 // compiler options
 compilerOpts
@@ -263,6 +263,15 @@ cics_connect_process: (PROCESS | (CONVID | SESSION | PARTNER) cics_name | PROCNA
 cics_converttime: CONVERTTIME cics_converttime_opts;
 cics_converttime_opts:(DATESTRING cics_data_area | ABSTIME cics_data_area | cics_handle_response)+;
 
+/** CREATE System Commands */
+cics_create: CREATE cics_create_opts;
+cics_create_opts:((ATOMSERVICE | BUNDLE | DB2CONN | DB2ENTRY | DB2TRAN | DOCTEMPLATE | DUMPCODE | ENQMODEL | FILE |
+                   IPCONN | JOURNALMODEL | JVMSERVER | LIBRARY | LSRPOOL | MAPSET | MQCONN | MQMONITOR | PARTITIONSET |
+                   PARTNER |  PIPELINE | PROCESSTYPE | PROFILE | PROGRAM | TCPIPSERVICE | TDQUEUE | TRANCLASS |
+                   TRANSACTION | TSMODEL | TYPETERM | URIMAP | WEBSERVICE | SESSIONS | TERMINAL | CONNECTION) cics_data_value |
+                   ATTRIBUTES cics_data_area | COMPLETE | DISCARD | ATTRLEN cics_data_value | LOG | NOLOG |
+                   LOGMESSAGE cics_cvda | cics_handle_response)+;
+
 /** DEFINE (all of them) */
 cics_define: DEFINE (cics_define_activity | cics_define_composite_event | cics_define_counter_dcounter | cics_define_input_event | cics_define_process | cics_define_timer);
 cics_define_activity: ACTIVITY cics_data_value ((EVENT | TRANSID | PROGRAM | USERID) cics_data_value | ACTIVITYID cics_data_area | cics_handle_response)+;
@@ -334,11 +343,11 @@ cics_dump_transaction_from: (FROM cics_data_area | cics_length_flength | cics_ha
 cics_dump_code_opts: (COMPLETE | TRT | TASK | STORAGE | PROGRAM | TERMINAL | TABLES | FCT | PCT | PPT | SIT | TCT | DUMPID cics_data_area | cics_handle_response)+;
 cics_dump_transaction_segmentlist: ((SEGMENTLIST | LENGTHLIST | NUMSEGMENTS) cics_data_area | cics_handle_response)+;
 
-/** ENDBR */
-cics_endbr: ENDBR ((FILE | DATASET) cics_name | REQID cics_data_value | SYSID cics_data_area | cics_handle_response)*;
-
-/** ENDBROWSE (all of them) */
-cics_endbrowse: ENDBROWSE (ACTIVITY | CONTAINER | EVENT | PROCESS | TIMER | (BROWSETOKEN | RETCODE) cics_data_value | cics_handle_response)*;
+/** ENDBR / ENDBROWSE */
+cics_endbr: ENDBR cics_endbr_opts;
+cics_endbr_opts: ((FILE | DATASET) cics_name | REQID cics_data_value | SYSID cics_data_area | cics_handle_response)+;
+cics_endbrowse: ENDBROWSE cics_endbrowse_opts;
+cics_endbrowse_opts: (ACTIVITY | CONTAINER | EVENT | PROCESS | TIMER | (BROWSETOKEN | RETCODE) cics_data_value | cics_handle_response)+;
 
 /** ENQ */
 cics_enq: ENQ cics_enq_opts;
@@ -360,6 +369,11 @@ cics_extract_tct: (TCT | NETNAME cics_name | (SYSID | TERMID) cics_data_area | c
 cics_extract_web_server: (WEB | (REQUESTTYPE | HOSTTYPE | SCHEME) cics_cvda | HOSTLENGTH cics_data_value | (HOST | HTTPVERSION | VERSIONLEN | PATH | PATHLENGTH | HTTPMETHOD | METHODLENGTH | PORTNUMBER | QUERYSTRING | QUERYSTRLEN | URIMAP) cics_data_area | cics_handle_response)+;
 cics_extract_web_client: (WEB | (SESSTOKEN | PORTNUMBER | URIMAP | REALM | REALMLEN | HOST | HTTPVERSION | VERSIONLEN | PATH | PATHLENGTH) cics_data_area | HOSTLENGTH cics_data_value | (HOSTTYPE | SCHEME) cics_cvda | cics_handle_response)+;
 
+/** EXTRACT (System Commands) */
+cics_extract_system_programming: EXTRACT (cics_extract_exit | cics_extract_statistics);
+cics_extract_exit: (EXIT | (PROGRAM | ENTRYNAME) cics_data_value | GALENGTH cics_data_area | GASET cics_ref | cics_handle_response)+;
+cics_extract_statistics: (STATISTICS | cics_restype | cics_subrestype | (RESID | SUBRESID | LASTRESET | LASTRESETABS | LASTRESETHRS | LASTRESETMIN | LASTRESETSEC) cics_data_area |
+                          SET cics_ref | (RESIDLEN | SUBRESIDLEN | APPLICATION | APPLMAJORVER | APPLMINORVER | APPLMICROVER | PLATFORM) cics_data_value | cics_handle_response)+;
 
 /** FORCE TIMER */
 cics_force: FORCE cics_force_opts;
@@ -710,6 +724,15 @@ cics_reset_activity: (ACTIVITY cics_data_value | cics_handle_response)+;
 /** RESETBR */
 cics_resetbr: RESETBR cics_file_name (RIDFLD cics_data_area | KEYLENGTH cics_data_value | GENERIC | REQID cics_data_value |
               SYSID cics_data_area | GTEQ | EQUAL | RBA | RRN |XRBA | cics_handle_response)+;
+
+/** RESTYPE HELPER */
+cics_restype: RESTYPE cics_cvda | ASYNCSERVICE | ATOMSERVICE | BUNDLE | DB2CONN | DB2ENTRY | DISPATCHER | DOCTEMPLATE |
+              EPADAPTER | ENQUEUE | EVENTBINDING | EVENTPROCESS | FILE | IPCONN | JOURNALNAME | JVMPROGRAM | JVMSERVER |
+              LIBRARY | LSRPOOL | MONITOR | MQCONN | MQMONITOR | MVSTCB | NODEJSAPP | PIPELINE | POLICY | PROGAUTO |
+              PROGRAM | PROGRAMDEF | RECOVERY | SECURITY | STATS | STORAGE | STREAMNAME | SUBPOOL | SYSDUMPCODE | TASKSUBPOOL |
+              TCPIP | TCPIPSERVICE | TDQUEUE | TRANCLASS | TRANDUMPCODE | TRANSACTION | TSQUEUE | URIMAP | USER | WEBSERVICE |
+              XMLTRANSFORM;
+cics_subrestype: SUBRESTYPE cics_cvda | CAPTURESPEC | POLICYRULE;
 
 /** RESUME */
 cics_resume: RESUME (ACQACTIVITY | ACQPROCESS | ACTIVITY cics_data_value | cics_handle_response)+;
@@ -1254,6 +1277,7 @@ ABCODE
   | ATTACHTIME
   | ATTLS
   | ATTRIBUTES
+  | ATTRLEN
   | AUDALARMST
   | AUDITLEVEL
   | AUDITLOG
@@ -1729,6 +1753,7 @@ ABCODE
   | GAENTRYNAME
   | GALENGTH
   | GARBAGEINT
+  | GASET
   | GAUSECOUNT
   | GC
   | GCDSASIZE
@@ -1875,6 +1900,7 @@ ABCODE
   | JUSTIFY
   | JVMCLASS
   | JVMPROFILE
+  | JVMPROGRAM
   | JVMSERVER
   | JWT
   | KATAKANA
@@ -1900,6 +1926,11 @@ ABCODE
   | LASTEMERTIME
   | LASTINITTIME
   | LASTMODTIME
+  | LASTRESET
+  | LASTRESETABS
+  | LASTRESETHRS
+  | LASTRESETMIN
+  | LASTRESETSEC
   | LASTUSEDINT
   | LASTUSETIME
   | LASTWARMTIME
@@ -1958,6 +1989,7 @@ ABCODE
   | LOW_VALUE
   | LOW_VALUES
   | LPASTATUS
+  | LSRPOOL
   | LSRPOOLNUM
   | LUNAME
   | MAIN
@@ -2091,6 +2123,7 @@ ABCODE
   | NOHANDLE
   | NOINCONVERT
   | NOJBUFSP
+  | NOLOG
   | NONE
   | NONTERMREL
   | NONVAL
@@ -2197,16 +2230,17 @@ ABCODE
   | PA1
   | PA2
   | PA3
+  | PAGE_COUNTER
   | PAGEHT
   | PAGENUM
   | PAGESTATUS
   | PAGEWD
-  | PAGE_COUNTER
   | PAGING
   | PARAMGR
   | PARSE
   | PARTCLASS
   | PARTCOUNT
+  | PARTITIONSET
   | PARTITIONSST
   | PARTN
   | PARTNER
@@ -2307,11 +2341,13 @@ ABCODE
   | PROFILE
   | PROFILEDIR
   | PROFILEIDERR
+  | PROGAUTO
   | PROGAUTOCTLG
   | PROGAUTOEXIT
   | PROGAUTOINST
   | PROGMGR
   | PROGRAM
+  | PROGRAMDEF
   | PROGSYMBOLST
   | PROGTYPE
   | PROTECT
@@ -2421,6 +2457,7 @@ ABCODE
   | RESID
   | RESIDENCY
   | RESIDERR
+  | RESIDLEN
   | RESIDLENGTH
   | RESLEN
   | RESLIFEMGR
@@ -2530,6 +2567,7 @@ ABCODE
   | SESSBUSY
   | SESSION
   | SESSIONERR
+  | SESSIONS
   | SESSIONTYPE
   | SESSTOKEN
   | SET
@@ -2599,6 +2637,7 @@ ABCODE
   | STATE
   | STATELEN
   | STATIONID
+  | STATS
   | STATSQUEUE
   | STATUS
   | STATUSCODE
@@ -2628,6 +2667,10 @@ ABCODE
   | SUBEVENT6
   | SUBEVENT7
   | SUBEVENT8
+  | SUBRESID
+  | SUBRESIDLEN
+  | SUBRESTYPE
+  | SUBTASKS
   | SUBTASKS
   | SUPPRESSED
   | SUSPEND
@@ -2666,6 +2709,7 @@ ABCODE
   | TASKPRIORITY
   | TASKS
   | TASKSTARTST
+  | TASKSUBPOOL
   | TC
   | TCAMCONTROL
   | TCB
@@ -2742,6 +2786,7 @@ ABCODE
   | TRANMGR
   | TRANPRIORITY
   | TRANSACTION
+  | TRANSCLASS
   | TRANSFORM
   | TRANSID
   | TRANSIDERR
@@ -2769,6 +2814,7 @@ ABCODE
   | TYPENAMELEN
   | TYPENS
   | TYPENSLEN
+  | TYPETERM
   | UCTRANST
   | UDSASIZE
   | UE

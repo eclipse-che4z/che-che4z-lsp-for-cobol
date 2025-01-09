@@ -375,9 +375,59 @@ public abstract class CICSOptionsCheckBaseUtility {
         }
         return nodes.size();
     }
+    /**
+     * Flags errors for rule lists passed as parameters if there are multiple instances of mutually
+     * exclusive options.
+     *
+     * @param rules   Lists of TerminalNode to iterate through
+     * @return Number of TerminalNode instances found
+     */
+    @SafeVarargs
+    protected final int checkHasMutuallyExclusiveOptions(List<TerminalNode>... rules) {
+        List<TerminalNode> nodes = new ArrayList<>(Stream.of(rules)
+                .flatMap(Collection::stream)
+                .collect(Collectors.toCollection(
+                        () -> new TreeSet<>(Comparator.comparing(node -> node.getSymbol().getType()))
+                )));
+        nodes.removeIf(Objects::isNull);
 
-    protected <E extends ParseTree> void checkHasExactlyOneOption(
-            String options, ParserRuleContext parentCtx, List<E>... rules) {
+        if (!nodes.stream()
+                .allMatch(e -> e.getSymbol().getType() == nodes.get(0).getSymbol().getType())) {
+            nodes.forEach(
+                    node -> {
+                        throwException(
+                                ErrorSeverity.ERROR,
+                                getLocality(node),
+                                "Exactly one option required, options are mutually exclusive: ",
+                               nodes.toString().toUpperCase().replace(",", " or").replace("[", "").replace("]", ""));
+                    });
+        }
+        return nodes.size();
+    }
+
+  /**
+   * Checks whether list of options is either empty or contains all options
+   * @param options Options checked to insert into error message
+   * @param ctx ParserRuleContext
+   * @param rules Lists of rules to iterate through
+   */
+  protected <E extends ParseTree> void checkAllOptionsArePresentOrAbsent(String options, ParserRuleContext ctx, List<E>... rules) {
+    boolean noOptions = Arrays.stream(rules).allMatch(List::isEmpty);
+    if (!noOptions) {
+        boolean allOptions = Arrays.stream(rules).noneMatch(List::isEmpty);
+        if (!allOptions) {
+          throwException(
+              ErrorSeverity.ERROR,
+              getLocality(ctx),
+              "If one option is specified, all options must be present: ",
+              options);
+        }
+    }
+  }
+
+
+  protected <E extends ParseTree> void checkHasExactlyOneOption(
+      String options, ParserRuleContext parentCtx, List<E>... rules) {
 
         List<TerminalNode> children = new ArrayList<>();
 

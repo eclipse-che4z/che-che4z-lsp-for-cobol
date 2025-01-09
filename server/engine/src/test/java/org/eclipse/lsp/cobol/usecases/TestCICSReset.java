@@ -14,12 +14,12 @@
  */
 package org.eclipse.lsp.cobol.usecases;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.usecases.common.CICSTestUtils;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
-import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
@@ -37,7 +37,7 @@ public class TestCICSReset {
           "RESET ACTIVITY({$varOne})";
 
   private static final String RESET_INVALID =
-          "RESET {|errorOne}";
+          "RESET ";
 
   @Test
   void testResetAcqprocessValid() {
@@ -51,12 +51,13 @@ public class TestCICSReset {
 
   @Test
   void testResetInvalid() {
-    CICSTestUtils.errorTest(
+    CICSTestUtils.errorTestWithEndExecError(
             RESET_INVALID,
+            ImmutableList.of(),
             ImmutableMap.of(
-                    "errorOne",
+                    "end-exec-error",
                     new Diagnostic(
-                            new Range(new Position(15, 12), new Position(15, 20)),
+                            new Range(),
                             "Syntax error on 'END-EXEC'",
                             DiagnosticSeverity.Error,
                             ErrorSource.PARSING.getText())));

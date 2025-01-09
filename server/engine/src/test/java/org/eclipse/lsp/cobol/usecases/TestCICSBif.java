@@ -13,14 +13,17 @@
  *
  */
 package org.eclipse.lsp.cobol.usecases;
-import com.google.common.collect.ImmutableMap;
-import org.eclipse.lsp.cobol.common.error.ErrorSource;
-import org.eclipse.lsp.cobol.usecases.common.CICSTestUtils;
-import org.eclipse.lsp4j.Diagnostic;
-import org.eclipse.lsp4j.DiagnosticSeverity;
-import org.eclipse.lsp4j.Range;
-import org.junit.jupiter.api.Test;
-import java.util.Map;
+
+        import com.google.common.collect.ImmutableMap;
+        import org.eclipse.lsp.cobol.common.error.ErrorSource;
+        import org.eclipse.lsp.cobol.usecases.common.CICSTestUtils;
+        import org.eclipse.lsp4j.Diagnostic;
+        import org.eclipse.lsp4j.DiagnosticSeverity;
+        import org.eclipse.lsp4j.Range;
+        import org.junit.jupiter.api.Test;
+
+        import java.util.Map;
+
 /**
  * Test CICS BIF commands. Documentation link:
  *<a href="https://www.ibm.com/docs/en/cics-ts/6.x?topic=summary-bif-deedit">BIF DEEDIT Command</a>
@@ -45,9 +48,10 @@ public class TestCICSBif {
     private static final String BIF_DIGEST_RECORD_RECORDLEN_DIGESTTYPE_RESULT_VALID =
             "BIF DIGEST RECORD(100) RECORDLEN(100) DIGESTTYPE({$varFour}) RESULT({$varFour})";
     private static final String BIF_DIGEST_DIGESTTYPE_INVALID =
-            "BIF DIGEST RESULT({$varFour}) RECORD({$varFour}) RECORDLEN({$varFour}) {HEX|errorDigestType} {BASE64|errorDigestType2}";
+            "BIF {_DIGEST RECORD(100) RECORDLEN(100) {HEX|errorDigestType} {BASE64|errorDigestType2}|errorResultMissing_}";
     private static final String BIF_DIGEST_RESULT_MISSING_INVALID =
             "BIF {_DIGEST RECORD(100) RECORDLEN(100)|errorResultMissing_}";
+
     @Test
     void testBifDeeditField() {
         CICSTestUtils.noErrorTest(BIF_DEEDIT_FIELD_VALID);
@@ -92,6 +96,12 @@ public class TestCICSBif {
     void testBifDigestDigesttypeInvalid() {
         Map<String, Diagnostic> expectedDiagnostic =
                 ImmutableMap.of(
+                        "errorResultMissing",
+                        new Diagnostic(
+                                new Range(),
+                                "Missing required option: RESULT",
+                                DiagnosticSeverity.Error,
+                                ErrorSource.PARSING.getText()),
                         "errorDigestType",
                         new Diagnostic(
                                 new Range(),

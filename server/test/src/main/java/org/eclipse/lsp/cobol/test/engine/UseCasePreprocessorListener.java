@@ -373,7 +373,7 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
       stop = closingOfMultiToken.getCharPositionInLine() + stopMarkLen - lineShifts[startLine];
       start = stop - affectedTokens.length();
     } else {
-      stop = closingOfMultiToken.getCharPositionInLine() + stopMarkLen;
+      stop = closingOfMultiToken.getCharPositionInLine() + stopMarkLen - lineShifts[stopLine];
       start = ctx.getStart().getCharPositionInLine();
     }
     lineShifts[startLine] += ctx.getStop().getText().length();

@@ -15,7 +15,7 @@
     },
     "children": [
       {
-        "untilExit": false,
+        "untilExit": true,
         "type": "inlineperform",
         "location": {
           "uri": "fake/path",
@@ -61,7 +61,7 @@
         }
       },
       {
-        "snippet": "       PAR1.\r\n           CONTINUE.",
+        "snippet": "       PAR1.\r\n           STOP RUN.",
         "name": "PAR1",
         "type": "paragraph",
         "location": {
@@ -77,7 +77,7 @@
         },
         "children": [
           {
-            "type": "statement",
+            "type": "stop",
             "location": {
               "uri": "fake/path",
               "start": {

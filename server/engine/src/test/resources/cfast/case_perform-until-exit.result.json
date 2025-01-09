@@ -9,83 +9,53 @@
         "character": 8
       },
       "end": {
-        "line": 23,
+        "line": 21,
         "character": 21
       }
     },
     "children": [
       {
-        "untilExit": false,
-        "type": "inlineperform",
+        "targetName": "PAR1",
+        "performUntilType": "UNTIL_EXIT",
+        "type": "perform",
         "location": {
           "uri": "fake/path",
           "start": {
             "line": 19,
-            "character": 20
+            "character": 12
           },
           "end": {
-            "line": 21,
-            "character": 23
-          }
-        }
-      },
-      {
-        "targetName": [
-          "PAR1"
-        ],
-        "type": "goto",
-        "location": {
-          "uri": "fake/path",
-          "start": {
-            "line": 20,
-            "character": 16
-          },
-          "end": {
-            "line": 20,
-            "character": 26
-          }
-        }
-      },
-      {
-        "type": "endinlineperform",
-        "location": {
-          "uri": "fake/path",
-          "start": {
             "line": 19,
-            "character": 20
-          },
-          "end": {
-            "line": 21,
-            "character": 23
+            "character": 35
           }
         }
       },
       {
-        "snippet": "       PAR1.\r\n           CONTINUE.",
+        "snippet": "       PAR1.\r\n           STOP RUN.",
         "name": "PAR1",
         "type": "paragraph",
         "location": {
           "uri": "fake/path",
           "start": {
-            "line": 22,
+            "line": 20,
             "character": 8
           },
           "end": {
-            "line": 23,
+            "line": 21,
             "character": 21
           }
         },
         "children": [
           {
-            "type": "statement",
+            "type": "stop",
             "location": {
               "uri": "fake/path",
               "start": {
-                "line": 23,
+                "line": 21,
                 "character": 12
               },
               "end": {
-                "line": 23,
+                "line": 21,
                 "character": 20
               }
             }
