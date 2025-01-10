@@ -41,8 +41,9 @@ public class TestCicsRequestStatement {
     private static final String PASSTICKET_VALID_2 = "REQUEST PASSTICKET({$varOne}) ESMAPPNAME({$varOne})";
 
     // Invalid Test Strings
-    private static final String ENCRYPTPTKT_INVALID = "REQUEST {_ENCRYPTPTKT({$varOne}) ENCRYPTKEY({$varTwo}) ESMAPPNAME({$varThree} )|errorOne_}";
-    private static final String PASSTICKET_INVALID = "REQUEST {_PASSTICKET({$varOne}) ESMREASON({$varOne} )|errorOne_}";
+    private static final String ENCRYPTPTKT_INVALID = "REQUEST {_ENCRYPTPTKT({$varOne}) ENCRYPTKEY({$varTwo}) ESMAPPNAME({$varThree})|errorOne_}";
+    private static final String PASSTICKET_INVALID = "REQUEST {_PASSTICKET({$varOne}) ESMREASON({$varOne})|errorOne_}";
+    private static final String BOTH_MISSING_INVALID = "REQUEST {|errorOne}{NORESP|errorTwo}";
 
     @Test
     void testEncryptptkt() {
@@ -69,5 +70,13 @@ public class TestCicsRequestStatement {
         HashMap<String, Diagnostic> expectedDiagnostics = new HashMap<>();
         expectedDiagnostics.put("errorOne", new Diagnostic(new Range(), "Missing required option: ESMAPPNAME", DiagnosticSeverity.Error, ErrorSource.PARSING.getText()));
         CICSTestUtils.errorTest(PASSTICKET_INVALID, expectedDiagnostics);
+    }
+
+    @Test
+    void testBothMissingInvalid() {
+        HashMap<String, Diagnostic> expectedDiagnostics = new HashMap<>();
+        expectedDiagnostics.put("errorOne", new Diagnostic(new Range(), "Exactly one option required, none provided: ENCRYPTPTKT or PASSTICKET", DiagnosticSeverity.Error, ErrorSource.PARSING.getText()));
+        expectedDiagnostics.put("errorTwo", new Diagnostic(new Range(), "Syntax error on 'NORESP'", DiagnosticSeverity.Error, ErrorSource.PARSING.getText()));
+        CICSTestUtils.errorTest(BOTH_MISSING_INVALID, expectedDiagnostics);
     }
 }

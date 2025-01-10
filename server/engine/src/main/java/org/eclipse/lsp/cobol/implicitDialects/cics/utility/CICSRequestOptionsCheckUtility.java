@@ -53,32 +53,25 @@ public class CICSRequestOptionsCheckUtility extends CICSOptionsCheckBaseUtility 
      * @param <E> A subclass of ParserRuleContext
      */
     public <E extends ParserRuleContext> void checkOptions(E ctx) {
-        switch (ctx.getRuleIndex()) {
-            case RULE_cics_request_encryptptkt:
-                checkEncryptptkt((CICSParser.Cics_request_encryptptktContext) ctx);
-                break;
-            case RULE_cics_request_passticket:
-                checkPassticket((CICSParser.Cics_request_passticketContext) ctx);
-                break;
-            default:
-                break;
+        if (ctx.getRuleIndex() == RULE_cics_request_body) {
+            checkRequestBody((CICSParser.Cics_request_bodyContext) ctx);
         }
 
         checkDuplicates(ctx);
     }
 
-    private void checkEncryptptkt(CICSParser.Cics_request_encryptptktContext ctx) {
-        if (ctx.ENCRYPTPTKT().isEmpty()) return;
+    private void checkRequestBody(CICSParser.Cics_request_bodyContext ctx) {
+        if (!ctx.ENCRYPTPTKT().isEmpty()) {
+            checkHasMandatoryOptions(ctx.FLENGTH(), ctx, "FLENGTH");
+            checkHasMandatoryOptions(ctx.ENCRYPTKEY(), ctx, "ENCRYPTKEY");
+            checkHasMandatoryOptions(ctx.ESMAPPNAME(), ctx, "ESMAPPNAME");
+        }
 
-        checkHasMandatoryOptions(ctx.FLENGTH(), ctx, "FLENGTH");
-        checkHasMandatoryOptions(ctx.ENCRYPTKEY(), ctx, "ENCRYPTKEY");
-        checkHasMandatoryOptions(ctx.ESMAPPNAME(), ctx, "ESMAPPNAME");
-    }
+        if (!ctx.PASSTICKET().isEmpty()) {
+            checkHasMandatoryOptions(ctx.ESMAPPNAME(), ctx, "ESMAPPNAME");
+        }
 
-    private void checkPassticket(CICSParser.Cics_request_passticketContext ctx) {
-        if (ctx.PASSTICKET().isEmpty()) return;
-
-        checkHasMandatoryOptions(ctx.ESMAPPNAME(), ctx, "ESMAPPNAME");
+        checkHasExactlyOneOption("ENCRYPTPTKT or PASSTICKET", ctx, ctx.ENCRYPTPTKT(), ctx.PASSTICKET());
     }
 
 }
