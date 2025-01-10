@@ -9,13 +9,12 @@
         "character": 8
       },
       "end": {
-        "line": 23,
+        "line": 22,
         "character": 21
       }
     },
     "children": [
       {
-        "performUntilType": "UNTIL_CONDITION",
         "type": "inlineperform",
         "location": {
           "uri": "fake/path",
@@ -24,25 +23,22 @@
             "character": 20
           },
           "end": {
-            "line": 21,
+            "line": 20,
             "character": 23
           }
         }
       },
       {
-        "targetName": [
-          "PAR1"
-        ],
-        "type": "goto",
+        "type": "statement",
         "location": {
           "uri": "fake/path",
           "start": {
-            "line": 20,
-            "character": 16
+            "line": 19,
+            "character": 20
           },
           "end": {
-            "line": 20,
-            "character": 26
+            "line": 19,
+            "character": 41
           }
         }
       },
@@ -55,37 +51,37 @@
             "character": 20
           },
           "end": {
-            "line": 21,
+            "line": 20,
             "character": 23
           }
         }
       },
       {
-        "snippet": "       PAR1.\r\n           CONTINUE.",
+        "snippet": "       PAR1.\r\n           STOP RUN.",
         "name": "PAR1",
         "type": "paragraph",
         "location": {
           "uri": "fake/path",
           "start": {
-            "line": 22,
+            "line": 21,
             "character": 8
           },
           "end": {
-            "line": 23,
+            "line": 22,
             "character": 21
           }
         },
         "children": [
           {
-            "type": "statement",
+            "type": "stop",
             "location": {
               "uri": "fake/path",
               "start": {
-                "line": 23,
+                "line": 22,
                 "character": 12
               },
               "end": {
-                "line": 23,
+                "line": 22,
                 "character": 20
               }
             }
