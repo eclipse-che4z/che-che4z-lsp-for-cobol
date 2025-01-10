@@ -22,7 +22,6 @@ import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.message.MessageTemplate;
 import org.eclipse.lsp.cobol.common.model.NodeType;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
-import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.QualifiedReferenceNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableUsageNode;
@@ -35,7 +34,6 @@ import org.eclipse.lsp.cobol.common.model.tree.FigurativeConstants;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 /** QualifiedReferenceNode processor */
@@ -52,29 +50,28 @@ public class QualifiedReferenceUpdateVariableUsage implements Processor<Qualifie
 
   @Override
   public void accept(QualifiedReferenceNode node, ProcessingContext ctx) {
-    List<VariableUsageNode> variableUsageNodes = new ArrayList<>();
+    List<VariableUsageNode> variableUsageChain = new ArrayList<>();
     for (Node child : node.getChildren()) {
       if (child.getNodeType() == NodeType.VARIABLE_USAGE) {
-        variableUsageNodes.add((VariableUsageNode) child);
+        variableUsageChain.add((VariableUsageNode) child);
       }
     }
 
-    if (variableUsageNodes.isEmpty()) {
+    if (variableUsageChain.isEmpty()) {
       LOG.warn("Qualified reference node don't have any variable usages. {}", node);
       return;
     }
 
-    Optional<ProgramNode> program = node.getProgram();
-    List<VariableNode> foundDefinitions = program.map(programNode ->
-                    symbolAccumulatorService.getVariableDefinition(programNode, variableUsageNodes))
-            .orElseGet(ImmutableList::of);
+    List<VariableNode> foundDefinitions = ctx.getCurrentProgramNode() != null
+        ? symbolAccumulatorService.getVariableDefinition(ctx.getCurrentProgramNode(), variableUsageChain)
+        : ImmutableList.of();
 
     if (isQualifyExtendedDirectiveEnabled(ctx) && foundDefinitions.size() > 1) {
       foundDefinitions = updateDefinitionForQualifyExtended(node, foundDefinitions);
     }
     for (VariableNode definitionNode : foundDefinitions) {
       node.setVariableDefinitionNode(definitionNode);
-      for (VariableUsageNode usageNode : variableUsageNodes) {
+      for (VariableUsageNode usageNode : variableUsageChain) {
         while (definitionNode != null
                 && !usageNode.getName().equalsIgnoreCase(definitionNode.getName())) {
           definitionNode =
@@ -101,13 +98,13 @@ public class QualifiedReferenceUpdateVariableUsage implements Processor<Qualifie
     if (foundDefinitions.size() == 1) {
       return;
     }
-    String dataName = variableUsageNodes.get(0).getName();
+    String dataName = variableUsageChain.get(0).getName();
     if (FigurativeConstants.FIGURATIVE_CONSTANTS.stream()
             .anyMatch(e -> dataName.toUpperCase().equals(e))) {
       return;
     }
 
-    if (!variableUsageNodes.get(0).isDefinitionMandatory()) {
+    if (!variableUsageChain.get(0).isDefinitionMandatory()) {
       return;
     }
 

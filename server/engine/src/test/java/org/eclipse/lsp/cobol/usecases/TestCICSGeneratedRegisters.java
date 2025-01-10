@@ -27,7 +27,7 @@ import org.junit.jupiter.api.Test;
 
 /**
  * Tests the usage of special registers implicitly introduced by CICS translator. Check {@link
- * org.eclipse.lsp.cobol.core.model.tree.logic.implicit.SRImplicitVariablesGenerator} for complete
+ * org.eclipse.lsp.cobol.implicitDialects.cics.generator.CICSSRImplicitVariablesGenerator} for complete
  * list of implicit registers.
  */
 public class TestCICSGeneratedRegisters {

@@ -18,7 +18,6 @@ import lombok.AllArgsConstructor;
 import org.eclipse.lsp.cobol.common.model.NodeType;
 import org.eclipse.lsp.cobol.common.model.tree.FunctionReference;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
-import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.QualifiedReferenceNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableUsageNode;
 import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
@@ -27,7 +26,6 @@ import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulatorService;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Enriches the @{@link QualifiedReferenceNode}'s children by replacing the Variable node
@@ -38,9 +36,10 @@ public class FunctionUsageReferenceEnricher implements Processor<QualifiedRefere
   private final SymbolAccumulatorService symbolAccumulatorService;
 
   @Override
-  public void accept(QualifiedReferenceNode node, ProcessingContext processingContext) {
-    Optional<ProgramNode> program = node.getProgram();
-    if (!program.isPresent()) return;
+  public void accept(QualifiedReferenceNode node, ProcessingContext ctx) {
+    if (ctx.getCurrentProgramNode() == null) {
+      return;
+    }
     List<VariableUsageNode> usageNodes = new ArrayList<>();
     for (Node child : node.getChildren()) {
       if (child.getNodeType() == NodeType.VARIABLE_USAGE) {
@@ -61,7 +60,7 @@ public class FunctionUsageReferenceEnricher implements Processor<QualifiedRefere
       return;
     }
     SymbolAccumulatorService.FunctionInfo functionInfo =
-        symbolAccumulatorService.getFunctionReference(dataNameNode.getName(), program.get(), false);
+        symbolAccumulatorService.getFunctionReference(dataNameNode.getName(), ctx.getCurrentProgramNode(), false);
 
     if (functionInfo == null) {
       return;

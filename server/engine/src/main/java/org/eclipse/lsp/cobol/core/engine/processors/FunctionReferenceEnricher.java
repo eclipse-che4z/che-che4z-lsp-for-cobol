@@ -21,14 +21,16 @@ import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulatorService;
 
 import org.eclipse.lsp.cobol.common.model.tree.FunctionReference;
 
+import java.util.Optional;
+
 /** Enrich FunctionReference nodes */
 @AllArgsConstructor
 public class FunctionReferenceEnricher implements Processor<FunctionReference> {
   private final SymbolAccumulatorService symbolAccumulatorService;
 
   @Override
-  public void accept(FunctionReference node, ProcessingContext processingContext) {
-      node.getProgram()
+  public void accept(FunctionReference node, ProcessingContext ctx) {
+      Optional.ofNullable(ctx.getCurrentProgramNode())
           .map(
               programNode ->
                   symbolAccumulatorService.getFunctionReference(node.getName(), programNode, node.isFunctionPrefixed()))

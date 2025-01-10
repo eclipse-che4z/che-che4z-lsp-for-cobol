@@ -49,7 +49,7 @@ class ObsoleteNodeTest {
     ProcessingContext ctx = new ProcessingContext(errors, new SymbolAccumulatorService(), ImmutableMap.of());
     ctx.register(
         new ProcessorDescription(
-            ObsoleteNode.class, ProcessingPhase.TRANSFORMATION, new ObsoleteNodeCheck()));
+                RemarksNode.class, ProcessingPhase.TRANSFORMATION, new ObsoleteNodeCheck()));
     rootNode.addChild(remarksNode);
     astProcessor.process(ProcessingPhase.TRANSFORMATION, rootNode, ctx);
 

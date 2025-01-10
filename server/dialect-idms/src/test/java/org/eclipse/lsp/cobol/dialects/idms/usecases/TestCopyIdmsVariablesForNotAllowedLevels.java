@@ -92,8 +92,7 @@ public class TestCopyIdmsVariablesForNotAllowedLevels {
     result
         .getSymbolTableMap()
         .get(generateKey)
-        .getVariables()
-        .get("VAR3")
+        .getVariables().get("VAR3")
         .forEach(
             ele ->
                 Assertions.assertEquals(ele.getVariableType(), VariableType.CONDITION_DATA_NAME));

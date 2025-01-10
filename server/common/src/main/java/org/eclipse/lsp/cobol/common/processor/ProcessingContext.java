@@ -19,6 +19,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
+import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
 import org.eclipse.lsp.cobol.common.symbols.VariableAccumulator;
 
 import java.util.*;
@@ -39,8 +40,14 @@ public class ProcessingContext {
     private final CompilerDirectiveContext compilerDirectiveContext;
     private final Map<String, JsonElement> dialectsConfig;
 
+    private final LinkedList<ProgramNode> currentProgramNodeStack = new LinkedList<>();
+
     public ProcessingContext(List<SyntaxError> errors, VariableAccumulator variableAccumulator, Map<String, JsonElement> dialectsConfig) {
         this(errors, variableAccumulator, new CompilerDirectiveContext(), dialectsConfig);
+    }
+
+    public ProgramNode getCurrentProgramNode() {
+        return currentProgramNodeStack.peek();
     }
 
     /**
@@ -50,7 +57,7 @@ public class ProcessingContext {
      */
     public void register(ProcessorDescription processorDesc) {
         processors
-                .computeIfAbsent(processorDesc.getPhase(), v -> new LinkedHashMap<>())
+                .computeIfAbsent(processorDesc.getPhase(), v -> new HashMap<>())
                 .computeIfAbsent(processorDesc.getNodeClass(), v -> new ArrayList<>())
                 .add(processorDesc.getProcessor());
     }

@@ -27,9 +27,11 @@ import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.NodeType;
 import org.eclipse.lsp.cobol.common.model.tree.*;
-import org.eclipse.lsp.cobol.common.model.tree.statements.StatementNode;
+import org.eclipse.lsp.cobol.common.model.tree.statements.*;
 import org.eclipse.lsp.cobol.common.model.tree.variable.*;
+import org.eclipse.lsp.cobol.common.model.tree.variables.ConditionDataNameNode;
 import org.eclipse.lsp.cobol.common.model.tree.variables.FileDescriptionNode;
+import org.eclipse.lsp.cobol.common.model.tree.variables.RenameItemNode;
 import org.eclipse.lsp.cobol.common.pipeline.Stage;
 import org.eclipse.lsp.cobol.common.pipeline.StageResult;
 import org.eclipse.lsp.cobol.common.processor.*;
@@ -275,12 +277,52 @@ public class TransformTreeStage implements Stage<AnalysisContext, ProcessingResu
 
     // Phase VALIDATION
     ProcessingPhase v = ProcessingPhase.VALIDATION;
-    ctx.register(v, VariableWithLevelNode.class, new VariableWithLevelCheck(CodeLayoutUtil.getProgramLayout(languageId, layoutStore)));
-    ctx.register(v, VariableWithLevelNode.class, new VariableNameCheck());
-    ctx.register(v, StatementNode.class, new StatementValidate());
-    ctx.register(v, ElementaryNode.class, new ElementaryNodeCheck());
+    VariableWithLevelCheck variableWithLevelCheck = new VariableWithLevelCheck(CodeLayoutUtil.getProgramLayout(languageId, layoutStore));
+    ctx.register(v, VariableWithLevelNode.class, variableWithLevelCheck);
+    ctx.register(v, ConditionDataNameNode.class, variableWithLevelCheck);
+    ctx.register(v, ElementaryItemNode.class, variableWithLevelCheck);
+    ctx.register(v, ElementaryNode.class, variableWithLevelCheck);
+    ctx.register(v, GroupItemNode.class, variableWithLevelCheck);
+    ctx.register(v, MultiTableDataNameNode.class, variableWithLevelCheck);
+    ctx.register(v, RenameItemNode.class, variableWithLevelCheck);
+    ctx.register(v, StandAloneDataItemNode.class, variableWithLevelCheck);
+    ctx.register(v, TableDataNameNode.class, variableWithLevelCheck);
+
+    VariableNameCheck variableNameCheck = new VariableNameCheck();
+    ctx.register(v, VariableWithLevelNode.class, variableNameCheck);
+    ctx.register(v, ConditionDataNameNode.class, variableNameCheck);
+    ctx.register(v, ElementaryItemNode.class, variableNameCheck);
+    ctx.register(v, ElementaryNode.class, variableNameCheck);
+    ctx.register(v, GroupItemNode.class, variableNameCheck);
+    ctx.register(v, MultiTableDataNameNode.class, variableNameCheck);
+    ctx.register(v, RenameItemNode.class, variableNameCheck);
+    ctx.register(v, StandAloneDataItemNode.class, variableNameCheck);
+    ctx.register(v, TableDataNameNode.class, variableNameCheck);
+
+    StatementValidate processor = new StatementValidate();
+    ctx.register(v, StatementNode.class, processor);
+    ctx.register(v, OpenStatementNode.class, processor);
+    ctx.register(v, SetToStatement.class, processor);
+    ctx.register(v, JsonParseNode.class, processor);
+    ctx.register(v, XMLParseNode.class, processor);
+    ctx.register(v, SetUpDownByStatement.class, processor);
+    ctx.register(v, SetToOnOffStatement.class, processor);
+    ctx.register(v, JsonGenerateNode.class, processor);
+    ctx.register(v, SetToBooleanStatement.class, processor);
+    ctx.register(v, FileOperationStatementNode.class, processor);
+
+    ElementaryNodeCheck elementaryNodeCheck = new ElementaryNodeCheck();
+    ctx.register(v, ElementaryNode.class, elementaryNodeCheck);
+    ctx.register(v, ElementaryItemNode.class, elementaryNodeCheck);
+    ctx.register(v, StandAloneDataItemNode.class, elementaryNodeCheck);
+    ctx.register(v, TableDataNameNode.class, elementaryNodeCheck);
+
     ctx.register(v, GroupItemNode.class, new GroupItemCheck());
-    ctx.register(v, ObsoleteNode.class, new ObsoleteNodeCheck());
+
+    ObsoleteNodeCheck obsoleteNodeCheck = new ObsoleteNodeCheck();
+    ctx.register(v, ObsoleteNode.class, obsoleteNodeCheck);
+    ctx.register(v, RemarksNode.class, obsoleteNodeCheck);
+
     ctx.register(v, StandAloneDataItemNode.class, new StandAloneDataItemCheck());
     ctx.register(v, ProcedureDivisionNode.class, new FunctionReturningClauseCheck());
     ctx.register(v, ProgramEndNode.class, new ProgramEndCheck());
