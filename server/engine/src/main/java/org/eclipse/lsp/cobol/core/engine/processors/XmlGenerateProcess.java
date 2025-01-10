@@ -23,7 +23,7 @@ import org.eclipse.lsp.cobol.common.model.tree.XmlGenerateNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.*;
 import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.Processor;
-import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulatorService;
+import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulator;
 import org.eclipse.lsp.cobol.core.model.NodeUtils;
 import org.eclipse.lsp.cobol.core.model.VariableUsageUtils;
 
@@ -42,10 +42,10 @@ public class XmlGenerateProcess implements Processor<XmlGenerateNode> {
   public static final ImmutableList<EffectiveDataType> IDENTIFIER3_DATA_TYPES =
       ImmutableList.of(
           EffectiveDataType.INTEGER, EffectiveDataType.REAL, EffectiveDataType.UNDETERMINED);
-  private final SymbolAccumulatorService symbolAccumulatorService;
+  private final SymbolAccumulator symbolAccumulator;
 
-  public XmlGenerateProcess(SymbolAccumulatorService symbolAccumulatorService) {
-    this.symbolAccumulatorService = symbolAccumulatorService;
+  public XmlGenerateProcess(SymbolAccumulator symbolAccumulator) {
+    this.symbolAccumulator = symbolAccumulator;
   }
 
   @Override
@@ -55,7 +55,7 @@ public class XmlGenerateProcess implements Processor<XmlGenerateNode> {
     if (identifier1Nodes.isEmpty()) return;
     List<VariableNode> identifier1FoundDefinitions =
         VariableUsageUtils.getDefinitionNode(
-            symbolAccumulatorService, xmlGenerateNode, identifier1Nodes);
+                symbolAccumulator, xmlGenerateNode, identifier1Nodes);
 
     semanticAnalysisForIdentifier1(
         processingContext, identifier1Nodes, identifier1FoundDefinitions);
@@ -64,7 +64,7 @@ public class XmlGenerateProcess implements Processor<XmlGenerateNode> {
     if (identifier2Nodes.isEmpty()) return;
     List<VariableNode> identifier2FoundDefinitions =
         VariableUsageUtils.getDefinitionNode(
-            symbolAccumulatorService, xmlGenerateNode, identifier2Nodes);
+                symbolAccumulator, xmlGenerateNode, identifier2Nodes);
     if (identifier2FoundDefinitions.isEmpty()) return;
     semanticAnalysisForIdentifier2(
         processingContext,
@@ -79,7 +79,7 @@ public class XmlGenerateProcess implements Processor<XmlGenerateNode> {
       if (identifier3Nodes.isEmpty()) return;
       List<VariableNode> identifier3FoundDefinitions =
           VariableUsageUtils.getDefinitionNode(
-              symbolAccumulatorService, xmlGenerateNode, identifier3Nodes);
+                  symbolAccumulator, xmlGenerateNode, identifier3Nodes);
       semanticAnalysisForIdentifier3(
           processingContext,
           identifier3Nodes,
@@ -95,7 +95,7 @@ public class XmlGenerateProcess implements Processor<XmlGenerateNode> {
         if (identifier4Nodes.isEmpty()) return;
         List<VariableNode> identifier4FoundDefinitions =
             VariableUsageUtils.getDefinitionNode(
-                symbolAccumulatorService, xmlGenerateNode, identifier4Nodes);
+                    symbolAccumulator, xmlGenerateNode, identifier4Nodes);
         semanticAnalysisForIdentifier4(
             processingContext,
             identifier4Nodes,
@@ -111,7 +111,7 @@ public class XmlGenerateProcess implements Processor<XmlGenerateNode> {
         if (identifier5Nodes.isEmpty()) return;
         List<VariableNode> identifier5FoundDefinitions =
             VariableUsageUtils.getDefinitionNode(
-                symbolAccumulatorService, xmlGenerateNode, identifier5Nodes);
+                    symbolAccumulator, xmlGenerateNode, identifier5Nodes);
         semanticAnalysisForIdentifier5(
             processingContext,
             identifier5Nodes,
@@ -150,7 +150,7 @@ public class XmlGenerateProcess implements Processor<XmlGenerateNode> {
         identifier8 -> {
           List<VariableNode> foundDefinitionsForIdentifier8 =
               VariableUsageUtils.getDefinitionNode(
-                  symbolAccumulatorService,
+                      symbolAccumulator,
                   xmlGenerateNode,
                   Collections.singletonList(identifier8));
           if (foundDefinitionsForIdentifier8.isEmpty() || identifier2FoundDefinitions.isEmpty()) {
@@ -190,7 +190,7 @@ public class XmlGenerateProcess implements Processor<XmlGenerateNode> {
         identifier7 -> {
           List<VariableNode> foundDefinitionsForIdentifier7 =
               VariableUsageUtils.getDefinitionNode(
-                  symbolAccumulatorService,
+                      symbolAccumulator,
                   xmlGenerateNode,
                   Collections.singletonList(identifier7));
           if (foundDefinitionsForIdentifier7.isEmpty() || identifier2FoundDefinitions.isEmpty()) {
@@ -229,7 +229,7 @@ public class XmlGenerateProcess implements Processor<XmlGenerateNode> {
         identifier6 -> {
           List<VariableNode> foundDefinitionsForIdentifier6 =
               VariableUsageUtils.getDefinitionNode(
-                  symbolAccumulatorService,
+                      symbolAccumulator,
                   xmlGenerateNode,
                   Collections.singletonList(identifier6));
           if (foundDefinitionsForIdentifier6.isEmpty() || identifier2FoundDefinitions.isEmpty()) {

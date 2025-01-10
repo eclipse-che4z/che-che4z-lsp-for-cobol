@@ -16,23 +16,23 @@ package org.eclipse.lsp.cobol.core.engine.processors;
 
 import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.Processor;
-import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulatorService;
+import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulator;
 import org.eclipse.lsp.cobol.common.model.tree.FunctionReference;
 
 import java.util.Optional;
 
 /** FunctionReference processor */
 public class FunctionReferenceProcessor implements Processor<FunctionReference> {
-  private final SymbolAccumulatorService symbolAccumulatorService;
+  private final SymbolAccumulator symbolAccumulator;
 
-  public FunctionReferenceProcessor(SymbolAccumulatorService symbolAccumulatorService) {
-    this.symbolAccumulatorService = symbolAccumulatorService;
+  public FunctionReferenceProcessor(SymbolAccumulator symbolAccumulator) {
+    this.symbolAccumulator = symbolAccumulator;
   }
 
   @Override
   public void accept(FunctionReference node, ProcessingContext ctx) {
     Optional.ofNullable(ctx.getCurrentProgramNode())
-        .flatMap(p -> symbolAccumulatorService.registerFunctionReferenceNode(p, node))
+        .flatMap(p -> symbolAccumulator.registerFunctionReferenceNode(p, node))
         .ifPresent(err -> ctx.getErrors().add(err));
   }
 }

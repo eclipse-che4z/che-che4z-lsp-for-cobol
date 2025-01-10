@@ -16,24 +16,48 @@ package org.eclipse.lsp.cobol.common.symbols;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
-import lombok.Value;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import org.eclipse.lsp.cobol.common.model.NodeType;
 import org.eclipse.lsp.cobol.common.model.tree.CodeBlockDefinitionNode;
+import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNode;
 import org.eclipse.lsp4j.Range;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
+import static org.eclipse.lsp.cobol.common.model.tree.Node.hasType;
 
 /** A container for symbol information */
-@Value
+@RequiredArgsConstructor
 public class SymbolTable {
-  List<CodeBlockDefinitionNode> codeBlocks = new ArrayList<>();
-  Map<String, CodeBlockReference> paragraphMap = new HashMap<>();
-  Map<String, CodeBlockReference> sectionMap = new HashMap<>();
-  Multimap<String, VariableNode> variables = ArrayListMultimap.create();
+  @Getter
+  private final List<CodeBlockDefinitionNode> codeBlocks = new ArrayList<>();
+  @Getter
+  private final Map<String, CodeBlockReference> paragraphMap = new HashMap<>();
+  @Getter
+  private final Map<String, CodeBlockReference> sectionMap = new HashMap<>();
+  @Getter
+  private final Multimap<String, VariableNode> variablesMap = ArrayListMultimap.create();
+  @Getter
+  private final Multimap<String, VariableNode> variablesGlobalsMap = ArrayListMultimap.create();
+  @Getter
+  private final SymbolTable parent;
+
+  public Collection<VariableNode> getVariables() {
+    List<VariableNode> result = new ArrayList<>();
+    result.addAll(variablesGlobalsMap.values());
+    result.addAll(variablesMap.values());
+    return result;
+  }
+
+  public Collection<VariableNode> findVariables(String name) {
+    Collection<VariableNode> result = new ArrayList<>();
+    result.addAll(variablesGlobalsMap.get(name));
+    result.addAll(variablesMap.get(name));
+    return result;
+  }
 
   /**
    * Generates unique key for the prorgam
@@ -48,5 +72,24 @@ public class SymbolTable {
             + range.getEnd().getLine() + ", " + range.getEnd().getCharacter()
             + "]";
     return program.getProgramName() + "%" + program.getLocality().getUri() + "%" + rangeString;
+  }
+
+  public void register(VariableNode node) {
+    Multimap<String, VariableNode> targetMap = isGlobal(node) ? variablesGlobalsMap : variablesMap;
+    targetMap.put(node.getName().toUpperCase(Locale.ROOT), node);
+  }
+
+  private static boolean isGlobal(VariableNode node) {
+    if(node.isGlobal()) {
+      return true;
+    }
+    Node parent = node.getParent();
+    while (parent != null) {
+      if(parent instanceof VariableNode && ((VariableNode) parent).isGlobal()) {
+        return true;
+      }
+      parent = parent.getParent();
+    }
+    return false;
   }
 }

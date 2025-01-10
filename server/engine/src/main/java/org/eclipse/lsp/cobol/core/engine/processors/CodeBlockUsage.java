@@ -17,17 +17,17 @@ package org.eclipse.lsp.cobol.core.engine.processors;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.Processor;
-import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulatorService;
+import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulator;
 import org.eclipse.lsp.cobol.common.model.tree.CodeBlockUsageNode;
 
 import java.util.Optional;
 
 /** CodeBlockUsageNode processor */
 public class CodeBlockUsage implements Processor<CodeBlockUsageNode> {
-  private final SymbolAccumulatorService symbolAccumulatorService;
+  private final SymbolAccumulator symbolAccumulator;
 
-  public CodeBlockUsage(SymbolAccumulatorService symbolAccumulatorService) {
-    this.symbolAccumulatorService = symbolAccumulatorService;
+  public CodeBlockUsage(SymbolAccumulator symbolAccumulator) {
+    this.symbolAccumulator = symbolAccumulator;
   }
 
   @Override
@@ -35,7 +35,7 @@ public class CodeBlockUsage implements Processor<CodeBlockUsageNode> {
     if (ctx.getCurrentProgramNode() == null) {
       return;
     }
-    Optional<SyntaxError> syntaxError = symbolAccumulatorService.registerCodeBlockUsage(ctx.getCurrentProgramNode(), node);
+    Optional<SyntaxError> syntaxError = symbolAccumulator.registerCodeBlockUsage(ctx.getCurrentProgramNode(), node);
     syntaxError.ifPresent(error -> ctx.getErrors().add(error));
   }
 }
