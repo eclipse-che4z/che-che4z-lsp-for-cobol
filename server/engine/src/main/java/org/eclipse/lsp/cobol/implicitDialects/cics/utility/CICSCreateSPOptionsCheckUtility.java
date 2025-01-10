@@ -16,12 +16,14 @@ package org.eclipse.lsp.cobol.implicitDialects.cics.utility;
 
         import org.antlr.v4.runtime.ParserRuleContext;
 
+        import org.antlr.v4.runtime.tree.TerminalNode;
         import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
         import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
         import org.eclipse.lsp.cobol.common.error.SyntaxError;
         import org.eclipse.lsp.cobol.implicitDialects.cics.CICSLexer;
         import org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser;
 
+        import java.util.Arrays;
         import java.util.HashMap;
         import java.util.List;
         import java.util.Map;
@@ -31,6 +33,41 @@ package org.eclipse.lsp.cobol.implicitDialects.cics.utility;
 /** Checks CICS Create System Command rules for required and invalid options */
 public class CICSCreateSPOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     public static final int RULE_INDEX = RULE_cics_create;
+    private static final int[] COMMANDS = {
+            CICSParser.ATOMSERVICE,
+            CICSParser.BUNDLE,
+            CICSParser.DB2CONN,
+            CICSParser.DB2ENTRY,
+            CICSParser.DB2TRAN,
+            CICSParser.DOCTEMPLATE,
+            CICSParser.DUMPCODE,
+            CICSParser.ENQMODEL,
+            CICSParser.FILE,
+            CICSParser.IPCONN,
+            CICSParser.JOURNALMODEL,
+            CICSParser.JVMSERVER,
+            CICSParser.LIBRARY,
+            CICSParser.LSRPOOL,
+            CICSParser.MAPSET,
+            CICSParser.MQCONN,
+            CICSParser.MQMONITOR,
+            CICSParser.PARTITIONSET,
+            CICSParser.PARTNER,
+            CICSParser.PIPELINE,
+            CICSParser.PROCESSTYPE,
+            CICSParser.PROFILE,
+            CICSParser.PROGRAM,
+            CICSParser.TCPIPSERVICE,
+            CICSParser.TDQUEUE,
+            CICSParser.TRANCLASS,
+            CICSParser.TRANSACTION,
+            CICSParser.TSMODEL,
+            CICSParser.TYPETERM,
+            CICSParser.URIMAP,
+            CICSParser.WEBSERVICE,
+            CICSParser.SESSIONS,
+            CICSParser.TERMINAL,
+            CICSParser.CONNECTION};
     private static final Map<Integer, ErrorSeverity> DUPLICATE_CHECK_OPTIONS =
             new HashMap<Integer, ErrorSeverity>() {
                 {
@@ -109,13 +146,44 @@ public class CICSCreateSPOptionsCheckUtility extends CICSOptionsCheckBaseUtility
                 checkHasIllegalOptions(ctx.LOG(), "LOG");
                 checkHasIllegalOptions(ctx.NOLOG(), "NOLOG");
                 checkHasIllegalOptions(ctx.LOGMESSAGE(), "LOGMESSAGE");
+                checkDataValueCompleteDiscard(ctx);
+            } else {
+                checkRequiredSubOperand(ctx);
             }
         } else {
             checkHasIllegalOptions(ctx.DISCARD(), "DISCARD");
             checkHasIllegalOptions(ctx.COMPLETE(), "COMPLETE");
             checkHasMandatoryOptions(ctx.ATTRIBUTES(), ctx, "ATTRIBUTES");
+            checkRequiredSubOperand(ctx);
         }
         checkHasMutuallyExclusiveOptions("LOG or NOLOG or LOGMESSAGE", ctx.LOG(), ctx.NOLOG(), ctx.LOGMESSAGE());
+    }
+
+ private void checkDataValueCompleteDiscard(CICSParser.Cics_create_optsContext ctx) {
+        if (ctx.children == null) return;
+        for (int index = 0; index < ctx.children.size() - 1; index++) {
+            if (!TerminalNode.class.isAssignableFrom(ctx.children.get(index).getClass())
+                || !CICSParser.Cics_data_valueContext.class.isAssignableFrom(ctx.children.get(index + 1).getClass())) continue;
+           int tokenIndex = ((TerminalNode) ctx.children.get(index)).getSymbol().getType();
+            if (Arrays.stream(COMMANDS).anyMatch(i -> i == tokenIndex)
+        ) {
+                throwBrowsingViolation(
+                        ctx.children.get(index),
+                        "Sub Operand");
+            }
+        }
+    }
+    private void checkRequiredSubOperand(CICSParser.Cics_create_optsContext ctx) {
+        if (ctx.children == null) return;
+        for (int index = 0; index < ctx.children.size() - 1; index++) {
+            if (!TerminalNode.class.isAssignableFrom(ctx.children.get(index).getClass())
+                    || CICSParser.Cics_data_valueContext.class.isAssignableFrom(ctx.children.get(index + 1).getClass())) continue;
+            int tokenIndex = ((TerminalNode) ctx.children.get(index)).getSymbol().getType();
+            if (Arrays.stream(COMMANDS).anyMatch(i -> i == tokenIndex)
+            ) {
+                throwRequiredSubOperand(ctx.children.get(index));
+            }
+        }
     }
 }
 

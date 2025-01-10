@@ -71,17 +71,57 @@ public class TestCICSCreateSp {
                 "CREATE WEBSERVICE({$varFour}) NOLOG ATTRLEN({$varOne}) ATTRIBUTES({$varFour})",
                 "CREATE SESSIONS({$varFour}) NOLOG ATTRLEN({$varOne}) ATTRIBUTES({$varFour})",
                 "CREATE TERMINAL({$varFour}) NOLOG ATTRLEN({$varOne}) ATTRIBUTES({$varFour})",
-                "CREATE CONNECTION({$varFour}) ATTRLEN({$varOne}) ATTRIBUTES({$varFour}) NOLOG");
+                "CREATE CONNECTION({$varFour}) ATTRLEN({$varOne}) ATTRIBUTES({$varFour}) NOLOG",
+                "CREATE CONNECTION COMPLETE NOHANDLE",
+                "CREATE NOHANDLE TERMINAL DISCARD");
+    };
+    private static Stream<String> getInValidSubOperandOptions() {
+        return Stream.of(
+                "CREATE {ATOMSERVICE|error} ATTRLEN({$varFour}) ATTRIBUTES({$varFour})",
+                "CREATE {BUNDLE|error} ATTRLEN({$varOne}) ATTRIBUTES({$varFour})",
+                "CREATE {CONNECTION|error} ATTRLEN({$varOne}) ATTRIBUTES({$varFour})",
+                "CREATE {DB2CONN|error} ATTRLEN({$varOne}) ATTRIBUTES({$varFour})",
+                "CREATE {DB2ENTRY|error} ATTRLEN({$varOne}) ATTRIBUTES({$varFour})",
+                "CREATE {DB2TRAN|error} ATTRLEN({$varOne}) ATTRIBUTES({$varFour})",
+                "CREATE {DOCTEMPLATE|error} ATTRLEN({$varOne}) ATTRIBUTES({$varFour})",
+                "CREATE {DUMPCODE|error} ATTRLEN({$varOne}) ATTRIBUTES({$varFour})",
+                "CREATE {ENQMODEL|error} ATTRLEN({$varOne}) ATTRIBUTES({$varFour})",
+                "CREATE {FILE|error} ATTRLEN({$varOne}) ATTRIBUTES({$varFour})",
+                "CREATE {IPCONN|error} ATTRLEN({$varOne}) ATTRIBUTES({$varFour})",
+                "CREATE {JOURNALMODEL|error} ATTRLEN({$varOne}) ATTRIBUTES({$varFour})",
+                "CREATE {JVMSERVER|error} ATTRLEN({$varOne}) ATTRIBUTES({$varFour})",
+                "CREATE {LIBRARY|error} ATTRLEN({$varOne}) ATTRIBUTES({$varFour})",
+                "CREATE {LSRPOOL|error} ATTRLEN({$varOne}) ATTRIBUTES({$varFour})",
+                "CREATE {MAPSET|error} ATTRLEN({$varOne}) ATTRIBUTES({$varFour})",
+                "CREATE {MQCONN|error} ATTRLEN({$varOne}) ATTRIBUTES({$varFour})",
+                "CREATE {MQMONITOR|error} ATTRLEN({$varOne}) ATTRIBUTES({$varFour})",
+                "CREATE {PARTITIONSET|error} ATTRLEN({$varOne}) ATTRIBUTES({$varFour})",
+                "CREATE {PARTNER|error} ATTRLEN({$varOne}) ATTRIBUTES({$varFour})",
+                "CREATE {PIPELINE|error} ATTRLEN({$varOne}) ATTRIBUTES({$varFour})",
+                "CREATE {PROCESSTYPE|error} ATTRLEN({$varOne}) ATTRIBUTES({$varFour})",
+                "CREATE {PROFILE|error} ATTRLEN({$varOne}) ATTRIBUTES({$varFour})",
+                "CREATE {PROGRAM|error} ATTRLEN({$varOne}) ATTRIBUTES({$varFour})",
+                "CREATE {TCPIPSERVICE|error} ATTRLEN({$varOne}) ATTRIBUTES({$varFour})",
+                "CREATE {TDQUEUE|error} ATTRLEN({$varOne}) ATTRIBUTES({$varFour})",
+                "CREATE {TRANCLASS|error} ATTRLEN({$varOne}) ATTRIBUTES({$varFour})",
+                "CREATE {TRANSACTION|error} ATTRLEN({$varOne}) ATTRIBUTES({$varFour})",
+                "CREATE {TSMODEL|error} ATTRLEN({$varOne}) ATTRIBUTES({$varFour})",
+                "CREATE {TYPETERM|error} ATTRLEN({$varOne}) ATTRIBUTES({$varFour})",
+                "CREATE {URIMAP|error} ATTRLEN({$varOne}) ATTRIBUTES({$varFour})",
+                "CREATE {WEBSERVICE|error} ATTRLEN({$varOne}) ATTRIBUTES({$varFour})",
+                "CREATE {SESSIONS|error} ATTRLEN({$varOne}) ATTRIBUTES({$varFour})",
+                "CREATE {TERMINAL|error} ATTRLEN({$varOne}) ATTRIBUTES({$varFour})",
+                "CREATE {CONNECTION|error} ATTRLEN({$varOne}) ATTRIBUTES({$varFour})");
     };
 
     private static final String CREATE_INVALID =
-            "CREATE CONNECTION({$varFour})"
+            "CREATE {CONNECTION|errorSubOperand}({$varFour})"
                    + "{ATTRIBUTES|errorInvalidDiscard}(1)"
                    + "{DISCARD|errorInvalidDiscard2}";
     private static final String CREATE_BUNDLE_MISSING_ATTRIBUTES_INVALID =
             "CREATE {_BUNDLE({$varFour}) NOLOG |error_}";
     private static final String CREATE_CONNECTION_MUTUALEX_INVALID =
-            "CREATE CONNECTION({$varFour}) {COMPLETE|error} {DISCARD|error2}";
+            "CREATE CONNECTION {COMPLETE|error} {DISCARD|error2}";
     private static final String CREATE_DB2CONN_MUTUALEX_INVALID =
             "CREATE DB2CONN({$varFour}) ATTRIBUTES({$varFour}) {LOG|error} {NOLOG|error2}";
     private static final String CREATE_DB2ENTRY_DISCARD_INVALID =
@@ -91,15 +131,38 @@ public class TestCICSCreateSp {
     private static final String CREATE_DB2ENTRY_FILE_CASE_SENSITIVE_INVALID =
             "CREATE NOHANDLE {DB2ENTRY|error}({$varFour}) ATTRIBUTES({$varFour}) {FILE|error2}({$varFour})"
                     + "{FiLe|error3}({$varFour})";
+    private static final String CREATE_TERMINAL_SUBOPERAND_INVALID = "CREATE {TERMINAL|error}({$varFour}) DISCARD";
+
     @ParameterizedTest
     @MethodSource("getValidOptions")
     void testCreateSpAllValid(String valid) {
         CICSTestUtils.noErrorTest(valid, "SP");
     }
+    @ParameterizedTest
+    @MethodSource("getInValidSubOperandOptions")
+    void testCreateSubOperandSpInValid(String invalid) {
+        Map<String, Diagnostic> expectedDiagnostic =
+                ImmutableMap.of(
+                        "error",
+                        new Diagnostic(
+                                new Range(),
+                                "Sub Operand Required",
+                                DiagnosticSeverity.Error,
+                                ErrorSource.PARSING.getText())
+                );
+
+        CICSTestUtils.errorTest(invalid, expectedDiagnostic, "SP");
+    }
     @Test
     void testCreateSpInvalid() {
         Map<String, Diagnostic> expectedDiagnostic =
                 ImmutableMap.of(
+                        "errorSubOperand",
+                        new Diagnostic(
+                                new Range(),
+                                "Invalid option or parameter provided: Sub Operand",
+                                DiagnosticSeverity.Error,
+                                ErrorSource.PARSING.getText()),
                         "errorInvalidDiscard",
                         new Diagnostic(
                                 new Range(),
@@ -149,6 +212,12 @@ public class TestCICSCreateSp {
     void testCreateDb2ConnSpInvalid() {
         Map<String, Diagnostic> expectedDiagnostic =
                 ImmutableMap.of(
+                        "errorOperand",
+                        new Diagnostic(
+                                new Range(),
+                                "Invalid option or parameter provided: Sub Operand",
+                                DiagnosticSeverity.Error,
+                                ErrorSource.PARSING.getText()),
                         "error",
                         new Diagnostic(
                                 new Range(),
@@ -220,6 +289,20 @@ public class TestCICSCreateSp {
                                 ErrorSource.PARSING.getText()));
 
         CICSTestUtils.errorTest(CREATE_DB2ENTRY_FILE_CASE_SENSITIVE_INVALID, expectedDiagnostic, "SP");
+    }
+    @Test
+    void testCreateTerminalSubOperandSpInvalid() {
+        Map<String, Diagnostic> expectedDiagnostic =
+                ImmutableMap.of(
+                        "error",
+                        new Diagnostic(
+                                new Range(),
+                                "Invalid option or parameter provided: Sub Operand",
+                                DiagnosticSeverity.Error,
+                                ErrorSource.PARSING.getText())
+                       );
+
+        CICSTestUtils.errorTest(CREATE_TERMINAL_SUBOPERAND_INVALID, expectedDiagnostic, "SP");
     }
 }
 
