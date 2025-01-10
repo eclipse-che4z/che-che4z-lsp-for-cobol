@@ -29,7 +29,7 @@ import org.eclipse.lsp.cobol.common.model.tree.variable.VariableWithLevelNode;
 import org.eclipse.lsp.cobol.common.processor.CompilerDirectiveName;
 import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.Processor;
-import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulatorService;
+import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulator;
 import org.eclipse.lsp.cobol.common.model.tree.FigurativeConstants;
 
 import java.util.ArrayList;
@@ -42,10 +42,10 @@ public class QualifiedReferenceUpdateVariableUsage implements Processor<Qualifie
   private static final String NOT_DEFINED_ERROR = "semantics.notDefined";
   private static final String AMBIGUOUS_REFERENCE_ERROR = "semantics.ambiguous";
 
-  private final SymbolAccumulatorService symbolAccumulatorService;
+  private final SymbolAccumulator symbolAccumulator;
 
-  public QualifiedReferenceUpdateVariableUsage(SymbolAccumulatorService symbolAccumulatorService) {
-    this.symbolAccumulatorService = symbolAccumulatorService;
+  public QualifiedReferenceUpdateVariableUsage(SymbolAccumulator symbolAccumulator) {
+    this.symbolAccumulator = symbolAccumulator;
   }
 
   @Override
@@ -63,7 +63,7 @@ public class QualifiedReferenceUpdateVariableUsage implements Processor<Qualifie
     }
 
     List<VariableNode> foundDefinitions = ctx.getCurrentProgramNode() != null
-        ? symbolAccumulatorService.getVariableDefinition(ctx.getCurrentProgramNode(), variableUsageChain)
+        ? symbolAccumulator.getVariableDefinition(ctx.getCurrentProgramNode(), variableUsageChain)
         : ImmutableList.of();
 
     if (isQualifyExtendedDirectiveEnabled(ctx) && foundDefinitions.size() > 1) {

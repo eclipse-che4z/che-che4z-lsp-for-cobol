@@ -24,7 +24,7 @@ import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.ProcessingPhase;
 import org.eclipse.lsp.cobol.common.processor.ProcessorDescription;
 import org.eclipse.lsp.cobol.core.engine.processor.AstProcessor;
-import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulatorService;
+import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulator;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -55,7 +55,7 @@ class NodeProcessingTest {
         .process(
             ProcessingPhase.TRANSFORMATION,
             node,
-            new ProcessingContext(errors, new SymbolAccumulatorService(), ImmutableMap.of()));
+            new ProcessingContext(errors, new SymbolAccumulator(), ImmutableMap.of()));
     assertTrue(errors.isEmpty());
   }
 
@@ -71,7 +71,7 @@ class NodeProcessingTest {
     ErrorNode node = new ErrorNode();
     List<SyntaxError> errors = new ArrayList<>();
     AstProcessor astProcessor = new AstProcessor();
-    ProcessingContext processingContext = new ProcessingContext(errors, new SymbolAccumulatorService(), ImmutableMap.of());
+    ProcessingContext processingContext = new ProcessingContext(errors, new SymbolAccumulator(), ImmutableMap.of());
     processingContext.register(
         new ProcessorDescription(
             ErrorNode.class, ProcessingPhase.VALIDATION, (n, ctx) -> ctx.getErrors().add(ERROR_1)));
@@ -90,7 +90,7 @@ class NodeProcessingTest {
 
     ErrorNode node = new ErrorNode();
     ArrayList<SyntaxError> errors = new ArrayList<>();
-    ProcessingContext ctx = new ProcessingContext(errors, new SymbolAccumulatorService(), ImmutableMap.of());
+    ProcessingContext ctx = new ProcessingContext(errors, new SymbolAccumulator(), ImmutableMap.of());
     AstProcessor astProcessor = new AstProcessor();
     ctx.register(
         new ProcessorDescription(

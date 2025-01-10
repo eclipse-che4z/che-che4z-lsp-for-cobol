@@ -14,10 +14,7 @@
  */
 package org.eclipse.lsp.cobol.core.engine.symbols;
 
-import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Multimap;
-import lombok.Getter;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
@@ -50,53 +47,13 @@ import java.util.stream.Stream;
 import static org.eclipse.lsp.cobol.common.model.tree.Node.hasType;
 
 /** Service to handle symbol information and dependencies */
-public class SymbolAccumulatorService implements VariableAccumulator {
+public class SymbolAccumulator implements VariableAccumulator {
   private final Map<String, SymbolTable> programSymbols;
 
-  /** Information related to function definition and references */
-  public static class FunctionInfo {
-    ProgramNode node;
-    List<Location> usage = new ArrayList<>();
+  private final Map<String, FunctionInfo> userDefinedFunctions;
+  private final Map<String, FunctionInfo> implicitFunctions;
 
-    @Getter boolean isImplicit;
-
-    public FunctionInfo() {}
-
-    public FunctionInfo(ProgramNode node) {
-      this(node, false);
-    }
-
-    public FunctionInfo(ProgramNode node, boolean isImplicit) {
-      this.node = node;
-      this.isImplicit = isImplicit;
-    }
-
-    /**
-     * Retrieve definition location
-     *
-     * @return Definitions
-     */
-    public List<Location> getDefinition() {
-      if (node == null)
-        return ImmutableList.of();
-      else
-        return ImmutableList.of(node.getLocality().toLocation());
-    }
-
-    /**
-     * Retrieve reference locations
-     *
-     * @return References
-     */
-    public List<Location> getReferences() {
-      return usage;
-    }
-  }
-
-    private final Map<String, FunctionInfo> userDefinedFunctions;
-    private final Map<String, FunctionInfo> implicitFunctions;
-
-  public SymbolAccumulatorService() {
+  public SymbolAccumulator() {
     this.programSymbols = Collections.synchronizedMap(new HashMap<>());
     this.userDefinedFunctions = Collections.synchronizedMap(new HashMap<>());
     this.implicitFunctions = getImplicitFunctions();
@@ -109,7 +66,7 @@ public class SymbolAccumulatorService implements VariableAccumulator {
    * @param node the variable definition node
    */
   public void addVariableDefinition(ProgramNode programNode, VariableNode node) {
-    createOrGetSymbolTable(programNode).getVariables().put(node.getName().toUpperCase(Locale.ROOT), node);
+    createOrGetSymbolTable(programNode).register(node);
   }
 
   /**
@@ -242,8 +199,14 @@ public class SymbolAccumulatorService implements VariableAccumulator {
   }
 
   private SymbolTable createOrGetSymbolTable(ProgramNode program) {
-    return programSymbols.computeIfAbsent(
-        SymbolTable.generateKey(program), p -> new SymbolTable());
+    String key = SymbolTable.generateKey(program);
+    synchronized (this.programSymbols) {
+      if (!programSymbols.containsKey(key)) {
+        programSymbols.put(key, new SymbolTable(
+                program.getProgram().map(this::createOrGetSymbolTable).orElse(null)));
+      }
+      return programSymbols.get(key);
+    }
   }
 
   /**
@@ -472,27 +435,35 @@ public class SymbolAccumulatorService implements VariableAccumulator {
    * Get variable definition node based on list of variable usage nodes.
    *
    * @param programNode the program node
-   * @param usageNodes represents variable name and its parents
+   * @param usagePath represents variable name and its parents
    * @return the list of founded variable definitions
    */
   public List<VariableNode> getVariableDefinition(
-      ProgramNode programNode, List<VariableUsageNode> usageNodes) {
-    Multimap<String, VariableNode> variables = createOrGetSymbolTable(programNode).getVariables();
-    List<VariableNode> foundDefinitions = VariableUsageUtils.findVariablesForUsage(variables, usageNodes);
+      ProgramNode programNode, List<VariableUsageNode> usagePath) {
+    SymbolTable symbolTable = createOrGetSymbolTable(programNode);
+    List<VariableNode> foundDefinitions =
+            VariableUsageUtils.findVariablesForUsage(symbolTable.getVariablesMap(), usagePath);
     if (!foundDefinitions.isEmpty()) {
       return foundDefinitions;
     }
 
-    Multimap<String, VariableNode> globals = ArrayListMultimap.create();
-    for (VariableNode variableNode : getMapOfGlobalVariables(programNode).values()) {
-          globals.put(variableNode.getName(), variableNode);
-    }
-    return VariableUsageUtils.findVariablesForUsage(globals, usageNodes);
+//    return VariableUsageUtils.findVariablesForUsage(symbolTable.getVariablesGlobalsMap(), usagePath);
+    return globalVariableSearch(symbolTable, usagePath);
   }
 
+  private List<VariableNode> globalVariableSearch(SymbolTable symbolTable, List<VariableUsageNode> usagePath) {
+    if (symbolTable.getParent() == null) {
+      return VariableUsageUtils.findVariablesForUsage(symbolTable.getVariablesGlobalsMap(), usagePath);
+    }
+    List<VariableNode> result = globalVariableSearch(symbolTable.getParent(), usagePath);
+    if (!result.isEmpty()) {
+      return result;
+    }
+    return VariableUsageUtils.findVariablesForUsage(symbolTable.getVariablesGlobalsMap(), usagePath);
+  }
   private Map<String, VariableNode> getMapOfGlobalVariables(ProgramNode programNode) {
     Map<String, VariableNode> result = programNode.getProgram().map(this::getMapOfGlobalVariables).orElseGet(HashMap::new);
-    for (VariableNode variableNode : createOrGetSymbolTable(programNode).getVariables().values()) {
+    for (VariableNode variableNode : createOrGetSymbolTable(programNode).getVariables()) {
       if (variableNode.isGlobal()) {
         result.put(variableNode.getName(), variableNode);
       }

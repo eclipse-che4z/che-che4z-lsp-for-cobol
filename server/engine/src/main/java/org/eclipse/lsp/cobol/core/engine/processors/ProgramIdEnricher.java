@@ -17,7 +17,8 @@ package org.eclipse.lsp.cobol.core.engine.processors;
 import lombok.AllArgsConstructor;
 import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.Processor;
-import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulatorService;
+import org.eclipse.lsp.cobol.core.engine.symbols.FunctionInfo;
+import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulator;
 
 import org.eclipse.lsp.cobol.common.model.tree.ProgramIdNode;
 import org.eclipse.lsp.cobol.common.model.tree.ProgramSubtype;
@@ -25,7 +26,7 @@ import org.eclipse.lsp.cobol.common.model.tree.ProgramSubtype;
 /** Enrich ProgramId nodes */
 @AllArgsConstructor
 public class ProgramIdEnricher implements Processor<ProgramIdNode> {
-  private final SymbolAccumulatorService symbolAccumulatorService;
+  private final SymbolAccumulator symbolAccumulator;
 
   @Override
   public void accept(ProgramIdNode node, ProcessingContext ctx) {
@@ -33,8 +34,11 @@ public class ProgramIdEnricher implements Processor<ProgramIdNode> {
       return;
     }
 
-    SymbolAccumulatorService.FunctionInfo fi = symbolAccumulatorService
-            .getUserDefinedFunctionReference(ctx.getCurrentProgramNode().getProgramName());
+    FunctionInfo fi = node.getProgram()
+        .map(p -> symbolAccumulator.getUserDefinedFunctionReference(ctx.getCurrentProgramNode().getProgramName()))
+        .orElse(null);
+    if (fi == null)
+      return;
     node.setDefinitions(fi.getDefinition());
     node.setUsages(fi.getReferences());
   }

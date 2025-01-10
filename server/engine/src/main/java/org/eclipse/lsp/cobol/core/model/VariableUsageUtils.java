@@ -25,7 +25,7 @@ import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableUsageNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableWithLevelNode;
 import org.eclipse.lsp.cobol.common.utils.RangeUtils;
-import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulatorService;
+import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulator;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -45,7 +45,7 @@ public class VariableUsageUtils {
   public static List<VariableNode> findVariablesForUsage(
     Multimap<String, VariableNode> definedVariables, List<VariableUsageNode> usageNodes) {
     Map<VariableNode, Integer> acc = null;
-    for (VariableNode it : findDefinedVariable(usageNodes.get(0).getName(), definedVariables)) {
+    for (VariableNode it : definedVariables.get(usageNodes.get(0).getName())) {
       Map<VariableNode, Integer> varMap = mapVariableToStepCountsToMatchParents(it, usageNodes.subList(1, usageNodes.size()));
       if (acc == null) {
         acc = varMap;
@@ -64,22 +64,6 @@ public class VariableUsageUtils {
     return exactHierarchyMatchedVariables.isEmpty()
         ? new ArrayList<>(variableToStepCountsToMatchParentsMap.keySet())
         : exactHierarchyMatchedVariables;
-  }
-
-  private Collection<VariableNode> findDefinedVariable(String name, Multimap<String, VariableNode> definedVariables) {
-    Collection<VariableNode> foundVariable =  definedVariables.get(name);
-    if (!foundVariable.isEmpty()) {
-      return foundVariable;
-    }
-
-    for (VariableNode node: definedVariables.values()) {
-      Node r = node.getDepthFirstFirstNode(n -> n instanceof VariableNode && ((VariableNode) n).getName().equals(name));
-      if (r != null) {
-        foundVariable.add((VariableNode) r);
-        break;
-      }
-    }
-    return foundVariable;
   }
 
   private static Map<VariableNode, Integer> mapVariableToStepCountsToMatchParents(
@@ -163,16 +147,16 @@ public class VariableUsageUtils {
 
   /**
    * Retrieves variable definition nodes for the passed {@link VariableUsageNode}
-   * @param symbolAccumulatorService instance of {@link SymbolAccumulatorService}
+   * @param symbolAccumulator instance of {@link SymbolAccumulator}
    * @param containerNode  container node for the variableUsage node
    * @param identifiers List of {@link VariableUsageNode}
    * @return List of {@link VariableNode}
    */
-  public List<VariableNode> getDefinitionNode(SymbolAccumulatorService symbolAccumulatorService,
-                                               Node containerNode, List<VariableUsageNode> identifiers) {
+  public List<VariableNode> getDefinitionNode(SymbolAccumulator symbolAccumulator,
+                                              Node containerNode, List<VariableUsageNode> identifiers) {
     return containerNode.getProgram()
             .map(
-                    programNode -> identifiers.stream().map(id -> symbolAccumulatorService.getVariableDefinition(
+                    programNode -> identifiers.stream().map(id -> symbolAccumulator.getVariableDefinition(
                             programNode, Collections.singletonList(id))).collect(Collectors.toList()))
             .map(e -> e.stream().flatMap(Collection::stream))
             .map(e1 -> e1.collect(Collectors.toList()))

@@ -15,6 +15,7 @@
 package org.eclipse.lsp.cobol.core.engine.symbols;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import com.google.inject.Singleton;
 import lombok.Synchronized;
@@ -69,7 +70,10 @@ public class SymbolsRepository {
    * @return Collection of variables nodes
    */
   public Multimap<String, VariableNode> getVariables(ProgramNode program) {
-    return getSymbolTable(program).getVariables();
+    Multimap<String, VariableNode> result = ArrayListMultimap.create();
+    result.putAll(getSymbolTable(program).getVariablesMap());
+    result.putAll(getSymbolTable(program).getVariablesGlobalsMap());
+    return result;
   }
 
   /**
@@ -125,7 +129,7 @@ public class SymbolsRepository {
   @Synchronized
   private SymbolTable getSymbolTable(ProgramNode program) {
     return programSymbols.computeIfAbsent(
-        SymbolTable.generateKey(program), p -> new SymbolTable());
+        SymbolTable.generateKey(program), p -> new SymbolTable(program.getProgram().map(this::getSymbolTable).orElse(null)));
   }
 
   @Value

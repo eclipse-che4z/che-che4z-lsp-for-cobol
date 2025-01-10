@@ -42,7 +42,7 @@ import org.eclipse.lsp.cobol.core.engine.dialects.DialectService;
 import org.eclipse.lsp.cobol.core.engine.processor.AstProcessor;
 import org.eclipse.lsp.cobol.core.engine.processors.*;
 import org.eclipse.lsp.cobol.core.engine.processors.implicit.ImplicitVariablesProcessor;
-import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulatorService;
+import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulator;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolsRepository;
 import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
 import org.eclipse.lsp.cobol.core.visitor.CobolVisitor;
@@ -76,12 +76,12 @@ public class TransformTreeStage implements Stage<AnalysisContext, ProcessingResu
             prevStageResult.getData().getTokens(),
             prevStageResult.getData().getTree()).get(0);
 
-    SymbolAccumulatorService symbolAccumulatorService = new SymbolAccumulatorService();
-    processSyntaxTree(context.getConfig(), symbolAccumulatorService, context, rootNode);
+    SymbolAccumulator symbolAccumulator = new SymbolAccumulator();
+    processSyntaxTree(context.getConfig(), symbolAccumulator, context, rootNode);
 
-    symbolsRepository.updateSymbols(symbolAccumulatorService.getProgramSymbols());
+    symbolsRepository.updateSymbols(symbolAccumulator.getProgramSymbols());
 
-    return new StageResult<>(new ProcessingResult(symbolAccumulatorService.getProgramSymbols(), rootNode));
+    return new StageResult<>(new ProcessingResult(symbolAccumulator.getProgramSymbols(), rootNode));
   }
 
   @Override
@@ -208,13 +208,13 @@ public class TransformTreeStage implements Stage<AnalysisContext, ProcessingResu
     }
   }
 
-  private void processSyntaxTree(AnalysisConfig analysisConfig, SymbolAccumulatorService symbolAccumulatorService, AnalysisContext ctx, Node rootNode) {
+  private void processSyntaxTree(AnalysisConfig analysisConfig, SymbolAccumulator symbolAccumulator, AnalysisContext ctx, Node rootNode) {
     addCopyNodes(ctx, rootNode);
     addDialectsNode(ctx, rootNode);
 
     ProcessingContext processingContext =
-            new ProcessingContext(new ArrayList<>(), symbolAccumulatorService, getCompilerDirectiveContext(analysisConfig), ctx.getConfig().getDialectsSettings());
-    registerProcessors(analysisConfig, processingContext, symbolAccumulatorService, ctx.getLanguageId());
+            new ProcessingContext(new ArrayList<>(), symbolAccumulator, getCompilerDirectiveContext(analysisConfig), ctx.getConfig().getDialectsSettings());
+    registerProcessors(analysisConfig, processingContext, symbolAccumulator, ctx.getLanguageId());
     ctx.getAccumulatedErrors().addAll(astProcessor.processSyntaxTree(analysisConfig, processingContext, ctx, rootNode));
   }
 
@@ -234,45 +234,45 @@ public class TransformTreeStage implements Stage<AnalysisContext, ProcessingResu
             .findFirst();
   }
 
-  private void registerProcessors(AnalysisConfig analysisConfig, ProcessingContext ctx, SymbolAccumulatorService symbolAccumulatorService, CobolLanguageId languageId) {
+  private void registerProcessors(AnalysisConfig analysisConfig, ProcessingContext ctx, SymbolAccumulator symbolAccumulator, CobolLanguageId languageId) {
     // Phase TRANSFORMATION
     ProcessingPhase t = ProcessingPhase.TRANSFORMATION;
     ctx.register(t, ProgramIdNode.class, new ProgramIdProcess());
-    ctx.register(t, SectionNode.class, new SectionNodeProcessor(symbolAccumulatorService));
+    ctx.register(t, SectionNode.class, new SectionNodeProcessor(symbolAccumulator));
     ctx.register(t, FileEntryNode.class, new FileEntryProcess());
-    ctx.register(t, FileDescriptionNode.class, new FileDescriptionProcess(symbolAccumulatorService));
-    ctx.register(t, DeclarativeProcedureSectionNode.class, new DeclarativeProcedureSectionRegister(symbolAccumulatorService));
+    ctx.register(t, FileDescriptionNode.class, new FileDescriptionProcess(symbolAccumulator));
+    ctx.register(t, DeclarativeProcedureSectionNode.class, new DeclarativeProcedureSectionRegister(symbolAccumulator));
     ctx.register(t, RootNode.class, new RootNodeUpdateCopyNodesByPositionInTree());
     ctx.register(t, ProcedureDivisionReturningNode.class, new ProcedureDivisionReturningProcess());
 
     // Phase DEFINITION
     ProcessingPhase d = ProcessingPhase.DEFINITION;
-    ctx.register(d, ProgramNode.class, new FunctionNodeProcess(symbolAccumulatorService));
-    ctx.register(d, ParagraphsNode.class, new DefineCodeBlock(symbolAccumulatorService));
-    ctx.register(d, SectionNameNode.class, new SectionNameRegister(symbolAccumulatorService));
-    ctx.register(d, ParagraphNameNode.class, new ParagraphNameRegister(symbolAccumulatorService));
-    ctx.register(d, ProcedureDivisionBodyNode.class, new DefineCodeBlock(symbolAccumulatorService));
+    ctx.register(d, ProgramNode.class, new FunctionNodeProcess(symbolAccumulator));
+    ctx.register(d, ParagraphsNode.class, new DefineCodeBlock(symbolAccumulator));
+    ctx.register(d, SectionNameNode.class, new SectionNameRegister(symbolAccumulator));
+    ctx.register(d, ParagraphNameNode.class, new ParagraphNameRegister(symbolAccumulator));
+    ctx.register(d, ProcedureDivisionBodyNode.class, new DefineCodeBlock(symbolAccumulator));
 
     // Phase POST DEFINITION
     ctx.register(ProcessingPhase.POST_DEFINITION, SectionNode.class, new ImplicitVariablesProcessor());
-    ctx.register(ProcessingPhase.POST_DEFINITION, FunctionDeclaration.class, new ProgramRepositoryEnricher(symbolAccumulatorService));
+    ctx.register(ProcessingPhase.POST_DEFINITION, FunctionDeclaration.class, new ProgramRepositoryEnricher(symbolAccumulator));
 
     // Phase PRE USAGE
-    ctx.register(ProcessingPhase.PRE_USAGE, QualifiedReferenceNode.class, new FunctionUsageReferenceEnricher(symbolAccumulatorService));
+    ctx.register(ProcessingPhase.PRE_USAGE, QualifiedReferenceNode.class, new FunctionUsageReferenceEnricher(symbolAccumulator));
 
     // Phase USAGE
     ProcessingPhase u = ProcessingPhase.USAGE;
-    ctx.register(u, CodeBlockUsageNode.class, new CodeBlockUsage(symbolAccumulatorService));
-    ctx.register(u, QualifiedReferenceNode.class, new QualifiedReferenceUpdateVariableUsage(symbolAccumulatorService));
-    ctx.register(u, FunctionReference.class, new FunctionReferenceProcessor(symbolAccumulatorService));
+    ctx.register(u, CodeBlockUsageNode.class, new CodeBlockUsage(symbolAccumulator));
+    ctx.register(u, QualifiedReferenceNode.class, new QualifiedReferenceUpdateVariableUsage(symbolAccumulator));
+    ctx.register(u, FunctionReference.class, new FunctionReferenceProcessor(symbolAccumulator));
 
     // ENRICHMENT
     ProcessingPhase e = ProcessingPhase.ENRICHMENT;
-    ctx.register(e, SectionNameNode.class, new SectionNameNodeEnricher(symbolAccumulatorService));
-    ctx.register(e, ParagraphNameNode.class, new ParagraphNameNodeEnricher(symbolAccumulatorService));
-    ctx.register(e, CodeBlockUsageNode.class, new CodeBlockUsageNodeEnricher(symbolAccumulatorService));
-    ctx.register(e, FunctionReference.class, new FunctionReferenceEnricher(symbolAccumulatorService));
-    ctx.register(e, ProgramIdNode.class, new ProgramIdEnricher(symbolAccumulatorService));
+    ctx.register(e, SectionNameNode.class, new SectionNameNodeEnricher(symbolAccumulator));
+    ctx.register(e, ParagraphNameNode.class, new ParagraphNameNodeEnricher(symbolAccumulator));
+    ctx.register(e, CodeBlockUsageNode.class, new CodeBlockUsageNodeEnricher(symbolAccumulator));
+    ctx.register(e, FunctionReference.class, new FunctionReferenceEnricher(symbolAccumulator));
+    ctx.register(e, ProgramIdNode.class, new ProgramIdEnricher(symbolAccumulator));
     ctx.register(e, ExitPerformNode.class, new ExitPerformEnricher());
 
     // Phase VALIDATION
@@ -326,11 +326,11 @@ public class TransformTreeStage implements Stage<AnalysisContext, ProcessingResu
     ctx.register(v, StandAloneDataItemNode.class, new StandAloneDataItemCheck());
     ctx.register(v, ProcedureDivisionNode.class, new FunctionReturningClauseCheck());
     ctx.register(v, ProgramEndNode.class, new ProgramEndCheck());
-    ctx.register(v, JsonParseNode.class, new JsonParseProcess(symbolAccumulatorService));
-    ctx.register(v, JsonGenerateNode.class, new JsonGenerateProcess(symbolAccumulatorService));
-    ctx.register(v, XMLParseNode.class, new XMLParseProcess(symbolAccumulatorService));
+    ctx.register(v, JsonParseNode.class, new JsonParseProcess(symbolAccumulator));
+    ctx.register(v, JsonGenerateNode.class, new JsonGenerateProcess(symbolAccumulator));
+    ctx.register(v, XMLParseNode.class, new XMLParseProcess(symbolAccumulator));
     ctx.register(v, FileOperationStatementNode.class, new FileOperationProcess());
-    ctx.register(v, XmlGenerateNode.class, new XmlGenerateProcess(symbolAccumulatorService));
+    ctx.register(v, XmlGenerateNode.class, new XmlGenerateProcess(symbolAccumulator));
     ctx.register(v, FunctionDeclaration.class, new FunctionDeclarationValidator());
     ctx.register(v, ExitPerformNode.class, new ExitPerformValidator());
 

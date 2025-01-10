@@ -92,7 +92,7 @@ public class TestCopyIdmsVariablesForNotAllowedLevels {
     result
         .getSymbolTableMap()
         .get(generateKey)
-        .getVariables().get("VAR3")
+        .findVariables("VAR3")
         .forEach(
             ele ->
                 Assertions.assertEquals(ele.getVariableType(), VariableType.CONDITION_DATA_NAME));
@@ -133,7 +133,7 @@ public class TestCopyIdmsVariablesForNotAllowedLevels {
     Assertions.assertNotNull(program);
     String generateKey = SymbolTable.generateKey(program);
     List<ElementaryItemNode> var3 =
-        result.getSymbolTableMap().get(generateKey).getVariables().get("VAR3").stream()
+        result.getSymbolTableMap().get(generateKey).findVariables("VAR3").stream()
             .filter(ElementaryItemNode.class::isInstance)
             .map(ElementaryItemNode.class::cast)
             .collect(Collectors.toList());

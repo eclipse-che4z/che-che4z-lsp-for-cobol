@@ -22,7 +22,8 @@ import org.eclipse.lsp.cobol.common.model.tree.variable.QualifiedReferenceNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableUsageNode;
 import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.Processor;
-import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulatorService;
+import org.eclipse.lsp.cobol.core.engine.symbols.FunctionInfo;
+import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +34,7 @@ import java.util.List;
  */
 @AllArgsConstructor
 public class FunctionUsageReferenceEnricher implements Processor<QualifiedReferenceNode> {
-  private final SymbolAccumulatorService symbolAccumulatorService;
+  private final SymbolAccumulator symbolAccumulator;
 
   @Override
   public void accept(QualifiedReferenceNode node, ProcessingContext ctx) {
@@ -59,8 +60,8 @@ public class FunctionUsageReferenceEnricher implements Processor<QualifiedRefere
     if (!dataNameNode.getDefinitions().isEmpty()) {
       return;
     }
-    SymbolAccumulatorService.FunctionInfo functionInfo =
-        symbolAccumulatorService.getFunctionReference(dataNameNode.getName(), ctx.getCurrentProgramNode(), false);
+    FunctionInfo functionInfo =
+        symbolAccumulator.getFunctionReference(dataNameNode.getName(), ctx.getCurrentProgramNode(), false);
 
     if (functionInfo == null) {
       return;

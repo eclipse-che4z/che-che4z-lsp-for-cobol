@@ -14,6 +14,7 @@
  */
 package org.eclipse.lsp.cobol.implicitDialects.cics.processor;
 
+import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.SectionType;
 import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
 import org.eclipse.lsp.cobol.common.model.tree.SectionNode;
@@ -46,8 +47,9 @@ public class CICSTranslateMandatorySectionProcess implements Processor<ProgramNo
     if (dataDivisionNode.isPresent()) {
       addLinkageNode(dataDivisionNode.get());
     } else {
+      Locality locality = Locality.builder().uri(programNode.getLocality().getUri()).build();
       DivisionNode divisionNode =
-          new DivisionNode(programNode.getLocality(), DivisionType.DATA_DIVISION);
+          new DivisionNode(locality, DivisionType.DATA_DIVISION);
       addLinkageNode(divisionNode);
       divisionNode.setParent(programNode);
       programNode.getChildren().add(0, divisionNode);
@@ -76,8 +78,9 @@ public class CICSTranslateMandatorySectionProcess implements Processor<ProgramNo
     if (dataDivisionNode.isPresent()) {
       addWorkingStorageNode(dataDivisionNode.get());
     } else {
+      Locality locality = Locality.builder().uri(programNode.getLocality().getUri()).build();
       DivisionNode divisionNode =
-          new DivisionNode(programNode.getLocality(), DivisionType.DATA_DIVISION);
+          new DivisionNode(locality, DivisionType.DATA_DIVISION);
       addWorkingStorageNode(divisionNode);
       programNode.addChild(divisionNode);
     }

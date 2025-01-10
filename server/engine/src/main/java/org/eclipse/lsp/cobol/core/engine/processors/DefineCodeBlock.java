@@ -18,14 +18,14 @@ import org.eclipse.lsp.cobol.common.model.tree.*;
 import org.eclipse.lsp.cobol.common.model.NodeType;
 import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.Processor;
-import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulatorService;
+import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulator;
 
 /** Processor for ProcedureDivisionBodyNode and ParagraphsNode nodes */
 public class DefineCodeBlock implements Processor<Node> {
-  private final SymbolAccumulatorService symbolAccumulatorService;
+  private final SymbolAccumulator symbolAccumulator;
 
-  public DefineCodeBlock(SymbolAccumulatorService symbolAccumulatorService) {
-    this.symbolAccumulatorService = symbolAccumulatorService;
+  public DefineCodeBlock(SymbolAccumulator symbolAccumulator) {
+    this.symbolAccumulator = symbolAccumulator;
   }
 
   @Override
@@ -39,7 +39,7 @@ public class DefineCodeBlock implements Processor<Node> {
     for (Node child : node.getChildren()) {
       if (child.getNodeType() == NodeType.PARAGRAPH
               || child.getNodeType() == NodeType.PROCEDURE_SECTION) {
-        symbolAccumulatorService.registerCodeBlock(ctx.getCurrentProgramNode(), (CodeBlockDefinitionNode) child);
+        symbolAccumulator.registerCodeBlock(ctx.getCurrentProgramNode(), (CodeBlockDefinitionNode) child);
       }
     }
   }

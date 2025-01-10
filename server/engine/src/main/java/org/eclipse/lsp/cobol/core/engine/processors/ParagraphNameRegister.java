@@ -17,23 +17,23 @@ package org.eclipse.lsp.cobol.core.engine.processors;
 import com.google.common.collect.ImmutableList;
 import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.Processor;
-import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulatorService;
+import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulator;
 import org.eclipse.lsp.cobol.common.model.tree.ParagraphNameNode;
 
 import java.util.Optional;
 
 /** ParagraphNameNode processor */
 public class ParagraphNameRegister implements Processor<ParagraphNameNode> {
-  private final SymbolAccumulatorService symbolAccumulatorService;
+  private final SymbolAccumulator symbolAccumulator;
 
-  public ParagraphNameRegister(SymbolAccumulatorService symbolAccumulatorService) {
-    this.symbolAccumulatorService = symbolAccumulatorService;
+  public ParagraphNameRegister(SymbolAccumulator symbolAccumulator) {
+    this.symbolAccumulator = symbolAccumulator;
   }
 
   @Override
   public void accept(ParagraphNameNode node, ProcessingContext ctx) {
     Optional.ofNullable(ctx.getCurrentProgramNode())
-        .flatMap(parent -> symbolAccumulatorService.registerParagraphNameNode(parent, node))
+        .flatMap(parent -> symbolAccumulator.registerParagraphNameNode(parent, node))
         .map(ImmutableList::of)
         .orElseGet(ImmutableList::of)
         .forEach(ctx.getErrors()::add);

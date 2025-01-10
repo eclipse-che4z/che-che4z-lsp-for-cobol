@@ -16,17 +16,17 @@ package org.eclipse.lsp.cobol.core.engine.processors;
 
 import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.Processor;
-import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulatorService;
+import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulator;
 import org.eclipse.lsp.cobol.common.model.tree.SectionNameNode;
 
 import static org.eclipse.lsp.cobol.common.model.NodeType.PROCEDURE_SECTION;
 
 /** SectionNameNode processor */
 public class SectionNameRegister implements Processor<SectionNameNode> {
-  private final SymbolAccumulatorService symbolAccumulatorService;
+  private final SymbolAccumulator symbolAccumulator;
 
-  public SectionNameRegister(SymbolAccumulatorService symbolAccumulatorService) {
-    this.symbolAccumulatorService = symbolAccumulatorService;
+  public SectionNameRegister(SymbolAccumulator symbolAccumulator) {
+    this.symbolAccumulator = symbolAccumulator;
   }
 
   @Override
@@ -35,7 +35,7 @@ public class SectionNameRegister implements Processor<SectionNameNode> {
       // TODO: register usage
       return;
     }
-    symbolAccumulatorService.registerSectionNameNode(ctx.getCurrentProgramNode(), node)
+    symbolAccumulator.registerSectionNameNode(ctx.getCurrentProgramNode(), node)
             .ifPresent(ctx.getErrors()::add);
   }
 }
