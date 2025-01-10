@@ -717,9 +717,9 @@ cics_remove: REMOVE cics_remove_option;
 cics_remove_option: ((SUBEVENT | EVENT) cics_data_value | cics_handle_response)+;
 
 /** REQUEST */
-cics_request: REQUEST (cics_request_encryptptkt | cics_request_passticket | cics_handle_response)+;
-cics_request_encryptptkt: ENCRYPTPTKT cics_ref (ESMAPPNAME cics_data_value | (FLENGTH | ENCRYPTKEY | ESMREASON | ESMRESP) cics_data_area | cics_handle_response)+;
-cics_request_passticket: PASSTICKET cics_data_area ((ESMAPPNAME | ESMRESP | ESMREASON) cics_data_area | cics_handle_response)+;
+cics_request: REQUEST (cics_request_encryptptkt | cics_request_passticket);
+cics_request_encryptptkt: (ENCRYPTPTKT cics_ref | ESMAPPNAME cics_data_value | (FLENGTH | ENCRYPTKEY | ESMREASON | ESMRESP) cics_data_area | cics_handle_response)+;
+cics_request_passticket: ((PASSTICKET | ESMAPPNAME | ESMRESP | ESMREASON) cics_data_area | cics_handle_response)+;
 
 /** RESET ACQPROCESS / RESET ACTIVITY */
 cics_reset: RESET (cics_reset_acqprocess | cics_reset_activity);

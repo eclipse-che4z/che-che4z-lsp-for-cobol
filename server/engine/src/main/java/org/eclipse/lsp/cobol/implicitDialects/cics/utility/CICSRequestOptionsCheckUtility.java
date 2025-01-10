@@ -68,12 +68,16 @@ public class CICSRequestOptionsCheckUtility extends CICSOptionsCheckBaseUtility 
     }
 
     private void checkEncryptptkt(CICSParser.Cics_request_encryptptktContext ctx) {
+        if (ctx.ENCRYPTPTKT().isEmpty()) return;
+
         checkHasMandatoryOptions(ctx.FLENGTH(), ctx, "FLENGTH");
         checkHasMandatoryOptions(ctx.ENCRYPTKEY(), ctx, "ENCRYPTKEY");
         checkHasMandatoryOptions(ctx.ESMAPPNAME(), ctx, "ESMAPPNAME");
     }
 
     private void checkPassticket(CICSParser.Cics_request_passticketContext ctx) {
+        if (ctx.PASSTICKET().isEmpty()) return;
+
         checkHasMandatoryOptions(ctx.ESMAPPNAME(), ctx, "ESMAPPNAME");
     }
 
