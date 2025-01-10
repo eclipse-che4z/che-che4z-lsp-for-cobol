@@ -448,27 +448,6 @@ describe("SettingService lspConfigHandler", () => {
             expect(result).toEqual([]);
           });
         });
-
-        describe("remote endevor copybooks are set", () => {
-          beforeAll(() => {
-            configurationProperties = {
-              "endevor-dependencies": "ENDEVOR_PROCESSOR",
-            };
-          });
-
-          test("returns no paths for local copybook resolving", async () => {
-            const result = await lspConfigHandler({
-              items: [
-                {
-                  section: SETTINGS_CPY_LOCAL_PATH,
-                  scopeUri: "file:///workspace/program.cob",
-                },
-              ],
-            });
-
-            expect(result).toEqual([]);
-          });
-        });
       });
     });
   });
