@@ -34,15 +34,15 @@ import java.util.*;
 public class TestCicsRequestStatement {
 
     // Test Strings
-    private static final String ENCRYPTPTKT_VALID_1 = "REQUEST ENCRYPTPTKT(123) FLENGTH(3) ENCRYPTKEY(123) ESMAPPNAME(123) ESMREASON(123) ESMRESP(123)";
-    private static final String ENCRYPTPTKT_VALID_2 = "REQUEST ENCRYPTPTKT(123) FLENGTH(3) ENCRYPTKEY(123) ESMAPPNAME(123)";
+    private static final String ENCRYPTPTKT_VALID_1 = "REQUEST ENCRYPTPTKT({$varOne}) FLENGTH({$varOne}) ENCRYPTKEY({$varOne}) ESMAPPNAME({$varOne}) ESMREASON({$varOne}) ESMRESP({$varOne})";
+    private static final String ENCRYPTPTKT_VALID_2 = "REQUEST ENCRYPTPTKT({$varOne}) FLENGTH({$varOne}) ENCRYPTKEY({$varOne}) ESMAPPNAME({$varOne})";
 
-    private static final String PASSTICKET_VALID_1 = "REQUEST PASSTICKET(123) ESMAPPNAME(123) ESMRESP(123) ESMREASON(123)";
-    private static final String PASSTICKET_VALID_2 = "REQUEST PASSTICKET(123) ESMAPPNAME(123)";
+    private static final String PASSTICKET_VALID_1 = "REQUEST PASSTICKET({$varOne}) ESMAPPNAME({$varOne}) ESMRESP({$varOne}) ESMREASON({$varOne})";
+    private static final String PASSTICKET_VALID_2 = "REQUEST PASSTICKET({$varOne}) ESMAPPNAME({$varOne})";
 
     // Invalid Test Strings
-    private static final String ENCRYPTPTKT_INVALID = "REQUEST {ENCRYPTPTKT(123) ENCRYPTKEY(123) ESMAPPNAME(123)|errorOne}";
-    private static final String PASSTICKET_INVALID = "REQUEST {PASSTICKET(123) ESMREASON(123)|errorOne}";
+    private static final String ENCRYPTPTKT_INVALID = "REQUEST {_ENCRYPTPTKT({$varOne}) ENCRYPTKEY({$varTwo}) ESMAPPNAME({$varThree} )|errorOne_}";
+    private static final String PASSTICKET_INVALID = "REQUEST {_PASSTICKET({$varOne}) ESMREASON({$varOne} )|errorOne_}";
 
     @Test
     void testEncryptptkt() {
