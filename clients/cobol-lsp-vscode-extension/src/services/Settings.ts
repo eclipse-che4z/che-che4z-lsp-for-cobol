@@ -32,7 +32,6 @@ import {
   DIALECT_LIBS,
   COBOL_PRGM_LAYOUT,
   SETTINGS_CPY_NDVR_DEPENDENCIES,
-  ENDEVOR_PROCESSOR,
 } from "../constants";
 import { DialectRegistry, DIALECT_REGISTRY_SECTION } from "./DialectRegistry";
 import {
