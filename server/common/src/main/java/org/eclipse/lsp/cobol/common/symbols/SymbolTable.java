@@ -21,7 +21,6 @@ import org.eclipse.lsp.cobol.common.model.tree.CodeBlockDefinitionNode;
 import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNode;
 import org.eclipse.lsp4j.Range;
-import org.eclipse.xtext.xbase.lib.util.ToStringBuilder;
 
 import java.util.ArrayList;
 import java.util.HashMap;

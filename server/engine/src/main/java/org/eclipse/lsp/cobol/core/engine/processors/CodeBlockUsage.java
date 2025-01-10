@@ -15,7 +15,6 @@
 package org.eclipse.lsp.cobol.core.engine.processors;
 
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
-import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
 import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.Processor;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulatorService;
@@ -33,13 +32,10 @@ public class CodeBlockUsage implements Processor<CodeBlockUsageNode> {
 
   @Override
   public void accept(CodeBlockUsageNode node, ProcessingContext ctx) {
-    Optional<ProgramNode> programOpt = node.getProgram();
-    if (!programOpt.isPresent()) {
-      // TODO: error?
+    if (ctx.getCurrentProgramNode() == null) {
       return;
     }
-    ProgramNode program = programOpt.get();
-    Optional<SyntaxError> syntaxError = symbolAccumulatorService.registerCodeBlockUsage(program, node);
+    Optional<SyntaxError> syntaxError = symbolAccumulatorService.registerCodeBlockUsage(ctx.getCurrentProgramNode(), node);
     syntaxError.ifPresent(error -> ctx.getErrors().add(error));
   }
 }

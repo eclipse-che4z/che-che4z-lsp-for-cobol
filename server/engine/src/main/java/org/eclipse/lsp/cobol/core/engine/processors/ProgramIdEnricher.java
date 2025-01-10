@@ -28,15 +28,13 @@ public class ProgramIdEnricher implements Processor<ProgramIdNode> {
   private final SymbolAccumulatorService symbolAccumulatorService;
 
   @Override
-  public void accept(ProgramIdNode node, ProcessingContext processingContext) {
-    if (node.getSubtype() != ProgramSubtype.Function)
+  public void accept(ProgramIdNode node, ProcessingContext ctx) {
+    if (node.getSubtype() != ProgramSubtype.Function || ctx.getCurrentProgramNode() == null) {
       return;
+    }
 
-    SymbolAccumulatorService.FunctionInfo fi = node.getProgram()
-        .map(p -> symbolAccumulatorService.getUserDefinedFunctionReference(p.getProgramName()))
-        .orElse(null);
-    if (fi == null)
-      return;
+    SymbolAccumulatorService.FunctionInfo fi = symbolAccumulatorService
+            .getUserDefinedFunctionReference(ctx.getCurrentProgramNode().getProgramName());
     node.setDefinitions(fi.getDefinition());
     node.setUsages(fi.getReferences());
   }

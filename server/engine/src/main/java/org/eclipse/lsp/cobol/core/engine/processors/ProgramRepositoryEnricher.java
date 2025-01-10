@@ -29,6 +29,7 @@ import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulatorService;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /** Adds repository information to the program nodes */
@@ -42,10 +43,8 @@ public class ProgramRepositoryEnricher implements Processor<FunctionDeclaration>
   }
 
   private void addFunctionDeclarationsToProgramRepository(
-      FunctionDeclaration functionDeclaration, ProcessingContext processingContext) {
-    functionDeclaration
-        .getProgram()
-         .map(ProgramNode::getRepository)
+      FunctionDeclaration functionDeclaration, ProcessingContext ctx) {
+      Optional.ofNullable(ctx.getCurrentProgramNode()).map(ProgramNode::getRepository)
         .ifPresent(
                 repository  -> {
                 //  function-name collision with the implicitly available function names is possible.
@@ -66,7 +65,7 @@ public class ProgramRepositoryEnricher implements Processor<FunctionDeclaration>
                           .forEach(
                                   reference ->
                                           addOrValidateFunction(
-                                                  repository, reference, functionDeclaration, processingContext));
+                                                  repository, reference, functionDeclaration, ctx));
               }
             });
   }

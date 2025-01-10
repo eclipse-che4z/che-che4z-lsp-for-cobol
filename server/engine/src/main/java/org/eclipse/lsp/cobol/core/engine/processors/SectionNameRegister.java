@@ -14,8 +14,6 @@
  */
 package org.eclipse.lsp.cobol.core.engine.processors;
 
-import com.google.common.collect.ImmutableList;
-import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.Processor;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulatorService;
@@ -33,16 +31,11 @@ public class SectionNameRegister implements Processor<SectionNameNode> {
 
   @Override
   public void accept(SectionNameNode node, ProcessingContext ctx) {
-    if (node.getParent().getNodeType() != PROCEDURE_SECTION) {
+    if (node.getParent().getNodeType() != PROCEDURE_SECTION || ctx.getCurrentProgramNode() == null) {
       // TODO: register usage
       return;
     }
-    ImmutableList<SyntaxError> errors =
-        node.getProgram()
-            .flatMap(program -> symbolAccumulatorService.registerSectionNameNode(program, node))
-            .map(ImmutableList::of)
-            .orElseGet(ImmutableList::of);
-
-    ctx.getErrors().addAll(errors);
+    symbolAccumulatorService.registerSectionNameNode(ctx.getCurrentProgramNode(), node)
+            .ifPresent(ctx.getErrors()::add);
   }
 }

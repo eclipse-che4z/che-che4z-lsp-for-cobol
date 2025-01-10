@@ -17,26 +17,22 @@ package org.eclipse.lsp.cobol.core.engine.processors;
 import org.eclipse.lsp.cobol.common.VariableConstants;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.model.NodeType;
-import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
 import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.Processor;
 import org.eclipse.lsp.cobol.common.model.tree.FileEntryNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableDefinitionNode;
 
 import java.util.List;
-import java.util.Optional;
 
 /** FileEntryNode processor */
 public class FileEntryProcess implements Processor<FileEntryNode> {
   @Override
   public void accept(FileEntryNode node, ProcessingContext ctx) {
-    Optional<ProgramNode> programOpt = node.getProgram();
-    if (!programOpt.isPresent()) {
+    if (ctx.getCurrentProgramNode() == null) {
       // TODO: error?
       return;
     }
-    ProgramNode program = programOpt.get();
-    List<Node> collected = program.getDepthFirstList(n -> {
+    List<Node> collected = ctx.getCurrentProgramNode().getDepthFirstList(n -> {
       if (n.getNodeType() != NodeType.VARIABLE_DEFINITION) {
         return false;
       }

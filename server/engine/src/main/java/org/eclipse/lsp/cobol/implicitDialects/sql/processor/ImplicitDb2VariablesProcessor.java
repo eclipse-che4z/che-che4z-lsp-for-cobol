@@ -36,22 +36,19 @@ import static org.eclipse.lsp.cobol.implicitDialects.sql.Db2SqlDialect.SQL_BACKE
 public class ImplicitDb2VariablesProcessor implements Processor<SectionNode> {
 
   @Override
-  public void accept(SectionNode sectionNode, ProcessingContext processingContext) {
+  public void accept(SectionNode sectionNode, ProcessingContext ctx) {
+    if (ctx.getCurrentProgramNode() == null) {
+      throw new RuntimeException("Program for section " + sectionNode.getSectionType() + " not found");
+    }
     if (sectionNode.getSectionType() == SectionType.WORKING_STORAGE) {
-      VariableAccumulator variableAccumulator = processingContext.getVariableAccumulator();
-      ProgramNode programNode =
-          sectionNode
-              .getProgram()
-              .orElseThrow(
-                  () ->
-                      new RuntimeException(
-                          "Program for section " + sectionNode.getSectionType() + " not found"));
-      if (getSqlBackendConfig(processingContext).equalsIgnoreCase(SQLBackend.DB2_SERVER.toString()) && !hasSqlCa(programNode)) {
+      VariableAccumulator variableAccumulator = ctx.getVariableAccumulator();
+      ProgramNode programNode = ctx.getCurrentProgramNode();
+      if (getSqlBackendConfig(ctx).equalsIgnoreCase(SQLBackend.DB2_SERVER.toString()) && !hasSqlCa(programNode)) {
         registerVariables(
             variableAccumulator, programNode, Db2ImplicitVariablesGenerator.generateDb2Nodes(
-                        processingContext.getCompilerDirectiveContext().getCompilerDirectiveMap()));
+                        ctx.getCompilerDirectiveContext().getCompilerDirectiveMap()));
       }
-      if (getSqlBackendConfig(processingContext).equalsIgnoreCase(SQLBackend.DATACOM_SERVER.toString()) && !hasSqlCa(programNode)) {
+      if (getSqlBackendConfig(ctx).equalsIgnoreCase(SQLBackend.DATACOM_SERVER.toString()) && !hasSqlCa(programNode)) {
         registerVariables(
             variableAccumulator, programNode, Db2ImplicitVariablesGenerator.generateDatacomNodes());
       }

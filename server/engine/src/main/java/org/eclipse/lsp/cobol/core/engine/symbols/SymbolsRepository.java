@@ -66,7 +66,7 @@ public class SymbolsRepository {
    * Get variable data
    *
    * @param program the program node
-   * @return map of variables
+   * @return Collection of variables nodes
    */
   public Multimap<String, VariableNode> getVariables(ProgramNode program) {
     return getSymbolTable(program).getVariables();

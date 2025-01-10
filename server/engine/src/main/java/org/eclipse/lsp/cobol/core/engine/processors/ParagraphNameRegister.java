@@ -20,6 +20,8 @@ import org.eclipse.lsp.cobol.common.processor.Processor;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulatorService;
 import org.eclipse.lsp.cobol.common.model.tree.ParagraphNameNode;
 
+import java.util.Optional;
+
 /** ParagraphNameNode processor */
 public class ParagraphNameRegister implements Processor<ParagraphNameNode> {
   private final SymbolAccumulatorService symbolAccumulatorService;
@@ -30,7 +32,7 @@ public class ParagraphNameRegister implements Processor<ParagraphNameNode> {
 
   @Override
   public void accept(ParagraphNameNode node, ProcessingContext ctx) {
-    node.getProgram()
+    Optional.ofNullable(ctx.getCurrentProgramNode())
         .flatMap(parent -> symbolAccumulatorService.registerParagraphNameNode(parent, node))
         .map(ImmutableList::of)
         .orElseGet(ImmutableList::of)

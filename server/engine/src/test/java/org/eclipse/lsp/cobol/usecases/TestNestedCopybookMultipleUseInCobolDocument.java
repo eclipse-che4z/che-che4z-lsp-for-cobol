@@ -82,10 +82,10 @@ public class TestNestedCopybookMultipleUseInCobolDocument {
             .findFirst();
     Assertions.assertTrue(programNode.isPresent());
     Multimap<String, VariableNode> variables =
-        analysisResult
-            .getSymbolTableMap()
-            .get(SymbolTable.generateKey(programNode.get()))
-            .getVariables();
+            analysisResult
+                    .getSymbolTableMap()
+                    .get(SymbolTable.generateKey(programNode.get()))
+                    .getVariables();
     Assertions.assertTrue(variables.containsKey("FILE2_OBJECT"));
     Assertions.assertTrue(variables.containsKey("FILE1_OBJECT"));
     Assertions.assertTrue(variables.containsKey("DAT2"));

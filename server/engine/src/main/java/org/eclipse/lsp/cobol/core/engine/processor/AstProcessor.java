@@ -19,12 +19,15 @@ import org.eclipse.lsp.cobol.cli.command.CliUtils;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
+import org.eclipse.lsp.cobol.common.model.tree.ProgramEndNode;
+import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
 import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.ProcessingPhase;
 import org.eclipse.lsp.cobol.common.processor.Processor;
 import org.eclipse.lsp.cobol.common.utils.ThreadInterruptionUtil;
 import org.eclipse.lsp.cobol.core.engine.analysis.AnalysisContext;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -50,6 +53,7 @@ public class AstProcessor {
     for (ProcessingPhase phase : ProcessingPhase.values()) {
       ThreadInterruptionUtil.checkThreadInterrupted();
       process(phase, rootNode, ctx);
+      ctx.getCurrentProgramNodeStack().clear();
       if (analysisConfig.isCollectAstChanges()) {
         analysisContext.logAst(phase, CliUtils.GSON.toJsonTree(rootNode));
       }
@@ -81,16 +85,17 @@ public class AstProcessor {
       Node node, ProcessingContext ctx) {
     ThreadInterruptionUtil.checkThreadInterrupted();
     final Class<? extends Node> nodeClass = node.getClass();
-    for (Map.Entry<Class<? extends Node>, List<Processor<? extends Node>>> entry : processors.entrySet()) {
-          Class<? extends Node> key = entry.getKey();
-          List<Processor<? extends Node>> value = entry.getValue();
-          if (!key.isAssignableFrom(nodeClass))
-              continue;
-          for (Processor<? extends Node> p : value)
-              ((Processor<Node>) p).accept(node, ctx);
+    if (nodeClass == ProgramNode.class) {
+      ctx.getCurrentProgramNodeStack().push((ProgramNode) node);
+    }
+    for (Processor<? extends Node> processor : processors.getOrDefault(nodeClass, Collections.emptyList())) {
+      ((Processor<Node>) processor).accept(node, ctx);
     }
     for (Node n : node.getChildren()) {
         process(processors, n, ctx);
+    }
+    if (nodeClass == ProgramEndNode.class) {
+      ctx.getCurrentProgramNodeStack().pop();
     }
   }
 }

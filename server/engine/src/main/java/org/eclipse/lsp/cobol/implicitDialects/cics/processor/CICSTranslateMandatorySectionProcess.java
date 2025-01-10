@@ -49,7 +49,8 @@ public class CICSTranslateMandatorySectionProcess implements Processor<ProgramNo
       DivisionNode divisionNode =
           new DivisionNode(programNode.getLocality(), DivisionType.DATA_DIVISION);
       addLinkageNode(divisionNode);
-      programNode.addChild(divisionNode);
+      divisionNode.setParent(programNode);
+      programNode.getChildren().add(0, divisionNode);
     }
   }
 

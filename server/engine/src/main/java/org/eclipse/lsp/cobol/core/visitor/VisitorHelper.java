@@ -102,9 +102,11 @@ public class VisitorHelper {
    * @return the list of picture texts
    */
   public static List<String> retrievePicTexts(List<org.eclipse.lsp.cobol.core.CobolParser.DataPictureClauseContext> clauses) {
-    return clauses.stream()
-            .map(clause -> clause.getText().replaceAll(clause.getStart().getText(), "").trim())
-            .collect(toList());
+    List<String> list = new ArrayList<>(clauses.size());
+    for (CobolParser.DataPictureClauseContext clause : clauses) {
+      list.add(clause.getText().substring(clause.getStart().getText().length()).trim());
+    }
+    return list;
   }
 
   /**
@@ -115,22 +117,18 @@ public class VisitorHelper {
    * @return the list of value intervals
    */
   public static List<ValueInterval> retrieveValueIntervals(List<org.eclipse.lsp.cobol.core.CobolParser.DataValueIntervalContext> contexts) {
-    return contexts.stream()
-            .map(
-                    context ->
-                            new ValueInterval(
-                                    context.dataValueIntervalFrom().getText(),
-                                    ofNullable(context.dataValueIntervalTo())
-                                            .map(org.eclipse.lsp.cobol.core.CobolParser.DataValueIntervalToContext::literal)
-                                            .map(ParserRuleContext::getText)
-                                            .map(String::toUpperCase)
-                                            .orElse(null),
-                                    ofNullable(context.dataValueIntervalTo())
-                                            .map(org.eclipse.lsp.cobol.core.CobolParser.DataValueIntervalToContext::thruToken)
-                                            .map(ParserRuleContext::getText)
-                                            .map(String::toUpperCase)
-                                            .orElse(null)))
-            .collect(toList());
+    List<ValueInterval> list = new ArrayList<>();
+    for (CobolParser.DataValueIntervalContext context: contexts) {
+      String from = context.dataValueIntervalFrom().getText();
+      String to = context.dataValueIntervalTo() != null
+              ? context.dataValueIntervalTo().literal().getText().toUpperCase()
+              : null;
+      String thruToken = context.dataValueIntervalTo() != null
+              ? context.dataValueIntervalTo().thruToken().getText().toUpperCase()
+              : null;
+      list.add(new ValueInterval(from, to, thruToken));
+    }
+    return list;
   }
 
   /**
