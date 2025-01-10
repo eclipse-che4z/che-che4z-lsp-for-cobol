@@ -156,7 +156,7 @@ The COBOL Language Support extension automatically supports copybooks used in yo
 
 If you have copybooks stored in mainframe data sets or USS directories, you can use a Zowe Explorer profile to automatically download them from the mainframe to your workspace. You specify the data sets that contain copybooks used in your project in the workspace settings. If you need to restrict copybook support to certain subfolders in your workspace, you can also specify local folders that contain copybooks in the workspace settings.
 
-When a copybook is used in the program, the folders and data sets are searched in the order they are listed for files and members that match the name of the copybook. If a copybook with the same file name is located in both a local folder and a remote location, the one in the local folder is used.
+When a copybook is used in the program, the folders and data sets are searched in the order they are listed for files and members that match the name of the copybook. If a copybook with the same file name is located in both a local folder that you specify in the workspace settings and a remote location, the one in the local folder is used.
 
 Copybook support features are disabled for files stored in the folder **.c4z/.extsrcs** in your workspace. If you also use the [Debugger for Mainframe](https://github.com/BroadcomMFD/debugger-for-mainframe) extension to debug your COBOL programs, you might have some files stored in this folder.
 
