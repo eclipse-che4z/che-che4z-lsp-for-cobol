@@ -33,39 +33,7 @@ package org.eclipse.lsp.cobol.implicitDialects.cics.utility;
 /** Checks CICS Create System Command rules for required and invalid options */
 public class CICSCreateSPOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     public static final int RULE_INDEX = RULE_cics_create;
-    private static final int[] COMMANDS = {
-            CICSParser.ATOMSERVICE,
-            CICSParser.BUNDLE,
-            CICSParser.DB2CONN,
-            CICSParser.DB2ENTRY,
-            CICSParser.DB2TRAN,
-            CICSParser.DOCTEMPLATE,
-            CICSParser.DUMPCODE,
-            CICSParser.ENQMODEL,
-            CICSParser.FILE,
-            CICSParser.IPCONN,
-            CICSParser.JOURNALMODEL,
-            CICSParser.JVMSERVER,
-            CICSParser.LIBRARY,
-            CICSParser.LSRPOOL,
-            CICSParser.MAPSET,
-            CICSParser.MQCONN,
-            CICSParser.MQMONITOR,
-            CICSParser.PARTITIONSET,
-            CICSParser.PARTNER,
-            CICSParser.PIPELINE,
-            CICSParser.PROCESSTYPE,
-            CICSParser.PROFILE,
-            CICSParser.PROGRAM,
-            CICSParser.TCPIPSERVICE,
-            CICSParser.TDQUEUE,
-            CICSParser.TRANCLASS,
-            CICSParser.TRANSACTION,
-            CICSParser.TSMODEL,
-            CICSParser.TYPETERM,
-            CICSParser.URIMAP,
-            CICSParser.WEBSERVICE,
-            CICSParser.SESSIONS,
+    private static final int[] COMMANDS_WITH_DISCARD_COMPLETE_OPTS = {
             CICSParser.TERMINAL,
             CICSParser.CONNECTION};
     private static final Map<Integer, ErrorSeverity> DUPLICATE_CHECK_OPTIONS =
@@ -165,7 +133,7 @@ public class CICSCreateSPOptionsCheckUtility extends CICSOptionsCheckBaseUtility
             if (!TerminalNode.class.isAssignableFrom(ctx.children.get(index).getClass())
                 || !CICSParser.Cics_data_valueContext.class.isAssignableFrom(ctx.children.get(index + 1).getClass())) continue;
            int tokenIndex = ((TerminalNode) ctx.children.get(index)).getSymbol().getType();
-            if (Arrays.stream(COMMANDS).anyMatch(i -> i == tokenIndex)
+            if (Arrays.stream(COMMANDS_WITH_DISCARD_COMPLETE_OPTS).anyMatch(i -> i == tokenIndex)
         ) {
                 throwBrowsingViolation(
                         ctx.children.get(index),
@@ -179,7 +147,7 @@ public class CICSCreateSPOptionsCheckUtility extends CICSOptionsCheckBaseUtility
             if (!TerminalNode.class.isAssignableFrom(ctx.children.get(index).getClass())
                     || CICSParser.Cics_data_valueContext.class.isAssignableFrom(ctx.children.get(index + 1).getClass())) continue;
             int tokenIndex = ((TerminalNode) ctx.children.get(index)).getSymbol().getType();
-            if (Arrays.stream(COMMANDS).anyMatch(i -> i == tokenIndex)
+            if (Arrays.stream(COMMANDS_WITH_DISCARD_COMPLETE_OPTS).anyMatch(i -> i == tokenIndex)
             ) {
                 throwRequiredSubOperand(ctx.children.get(index));
             }
