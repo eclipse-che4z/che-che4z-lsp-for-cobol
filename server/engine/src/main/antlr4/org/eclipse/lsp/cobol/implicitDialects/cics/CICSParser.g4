@@ -854,8 +854,8 @@ cics_test_body: (EVENT cics_data_value | FIRESTATUS cics_cvda | cics_handle_resp
 
 /** TRANSFORM DATATOXML / XMLTODATA */
 cics_transform: TRANSFORM (cics_transform_json | cics_transform_xml);
-cics_transform_json: (DATATOJSON|JSONTODATA) ((CHANNEL | INCONTAINER | OUTCONTAINER) cics_data_value | TRANSFORMER cics_name | cics_handle_response)+;
-cics_transform_xml: (DATATOXML|XMLTODATA) ((CHANNEL | DATCONTAINER | XMLCONTAINER | NSCONTAINER) cics_data_value | (ELEMNAME | ELEMNAMELEN | ELEMNS | ELEMNSLEN | TYPENAME | TYPENAMELEN | TYPENS | TYPENSLEN) cics_data_area | XMLTRANSFORM cics_name | cics_handle_response)+;
+cics_transform_json: ((DATATOJSON|JSONTODATA) | (CHANNEL | INCONTAINER | OUTCONTAINER) cics_data_value | TRANSFORMER cics_name | cics_handle_response)+;
+cics_transform_xml: ((DATATOXML|XMLTODATA) | (CHANNEL | DATCONTAINER | XMLCONTAINER | NSCONTAINER) cics_data_value | (ELEMNAME | ELEMNAMELEN | ELEMNS | ELEMNSLEN | TYPENAME | TYPENAMELEN | TYPENS | TYPENSLEN) cics_data_area | XMLTRANSFORM cics_name | cics_handle_response)+;
 
 /** UNLOCK */
 cics_unlock: UNLOCK cics_unlock_body;

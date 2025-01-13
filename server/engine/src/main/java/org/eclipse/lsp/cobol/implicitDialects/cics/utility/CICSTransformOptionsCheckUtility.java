@@ -40,19 +40,19 @@ public class CICSTransformOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
                     put(CICSLexer.INCONTAINER, ErrorSeverity.ERROR);
                     put(CICSLexer.OUTCONTAINER, ErrorSeverity.ERROR);
                     put(CICSLexer.TRANSFORMER, ErrorSeverity.ERROR);
-
-                    put(CICSLexer.DATCONTAINER, ErrorSeverity.ERROR);
-                    put(CICSLexer.ELEMNAME, ErrorSeverity.ERROR);
-                    put(CICSLexer.ELEMNAMELEN, ErrorSeverity.ERROR);
-                    put(CICSLexer.ELEMNS, ErrorSeverity.ERROR);
-                    put(CICSLexer.ELEMNSLEN, ErrorSeverity.ERROR);
-                    put(CICSLexer.TYPENAME, ErrorSeverity.ERROR);
-                    put(CICSLexer.TYPENAMELEN, ErrorSeverity.ERROR);
-                    put(CICSLexer.TYPENS, ErrorSeverity.ERROR);
-                    put(CICSLexer.TYPENSLEN, ErrorSeverity.ERROR);
                     put(CICSLexer.XMLCONTAINER, ErrorSeverity.ERROR);
-                    put(CICSLexer.XMLTRANSFORM, ErrorSeverity.ERROR);
                     put(CICSLexer.NSCONTAINER, ErrorSeverity.ERROR);
+
+                    put(CICSLexer.DATCONTAINER, ErrorSeverity.WARNING);
+                    put(CICSLexer.ELEMNAME, ErrorSeverity.WARNING);
+                    put(CICSLexer.ELEMNAMELEN, ErrorSeverity.WARNING);
+                    put(CICSLexer.ELEMNS, ErrorSeverity.WARNING);
+                    put(CICSLexer.ELEMNSLEN, ErrorSeverity.WARNING);
+                    put(CICSLexer.TYPENAME, ErrorSeverity.WARNING);
+                    put(CICSLexer.TYPENAMELEN, ErrorSeverity.WARNING);
+                    put(CICSLexer.TYPENS, ErrorSeverity.WARNING);
+                    put(CICSLexer.TYPENSLEN, ErrorSeverity.WARNING);
+                    put(CICSLexer.XMLTRANSFORM, ErrorSeverity.WARNING);
                 }
             };
 
@@ -91,7 +91,7 @@ public class CICSTransformOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
     }
 
     private void checkXML(CICSParser.Cics_transform_xmlContext ctx) {
-        if (ctx.DATATOXML() != null) {
+        if (!ctx.DATATOXML().isEmpty()) {
             checkHasIllegalOptions(ctx.NSCONTAINER(), "NSCONTAINER");
             checkHasMandatoryOptions(ctx.CHANNEL(), ctx, "CHANNEL");
             checkHasMandatoryOptions(ctx.DATCONTAINER(), ctx, "DATCONTAINER");
@@ -101,7 +101,7 @@ public class CICSTransformOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
             if (!ctx.TYPENAMELEN().isEmpty() || !ctx.TYPENS().isEmpty() || !ctx.TYPENSLEN().isEmpty()) {
                 checkHasMandatoryOptions(ctx.TYPENAME(), ctx, "TYPENAME");
             }
-        } else if (ctx.XMLTODATA() != null) {
+        } else if (!ctx.XMLTODATA().isEmpty()) {
             checkHasMandatoryOptions(ctx.CHANNEL(), ctx, "CHANNEL");
             checkHasMandatoryOptions(ctx.XMLTRANSFORM(), ctx, "XMLTRANSFORM");
         }
