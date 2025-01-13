@@ -970,8 +970,7 @@ dbs_grouping_expression_alternative: dbs_grouping_expression | LPARENCHAR dbs_gr
 dbs_grouping_expression_list: dbs_grouping_expression_alternative (dbs_comma_separator dbs_grouping_expression_alternative)*;
 dbs_grouping_expression: dbs_expression;
 dbs_having_clause: HAVING dbs_search_condition;
-dbs_orderby_clause: ORDER BY (INPUT SEQUENCE | ORDER OF dbs_table_designator | dbs_sort_key (ASC | DESC)? (dbs_comma_separator dbs_sort_key (ASC | DESC)?)*);
-dbs_sort_key:  INTEGERLITERAL | dbs_sort_key_expression;
+dbs_orderby_clause: ORDER BY (INPUT SEQUENCE | ORDER OF dbs_table_designator | dbs_sort_key_expression (ASC | DESC)? (dbs_comma_separator dbs_sort_key_expression (ASC | DESC)?)*);
 dbs_offset_clause: OFFSET INTEGERLITERAL (ROW | ROWS);
 
 dbs_fullselect: (dbs_value_clause dbs_offset_clause?)
@@ -1576,16 +1575,16 @@ dbs_special_name: ABSOLUTE | ACCELERATION | ACCELERATOR | ACCESS | ACCESSCTRL | 
                 | DISALLOW | DISPATCH | DISPLAY | DISPLAYDB | DISTINCT | DO | DROP | DROPIN | DSNDB04 | DSSIZE
                 | DYNAMIC | DYNAMICRULES | EACH | EBCDIC | EDITPROC | ELEMENT | ELIGIBLE | ELSE | ELSEIF | EMPTY
                 | ENABLE | ENCODING | ENCRYPTION | END | ENDING | ENFORCED | ENVIRONMENT | ERASE | ESCAPE | EUR
-                | EVERY | EXCEPT | EXCHANGE | EXCLUDE | EXCLUDING | EXCLUSIVE | EXECUTE | EXISTS | EXPLAIN | EXTERNAL
+                | EVERY | EXCHANGE | EXCLUDE | EXCLUDING | EXCLUSIVE | EXECUTE | EXISTS | EXPLAIN | EXTERNAL
                 | EXTRA | FAILBACK | FAILURE | FAILURES | FENCED | FETCH | FIELDPROC | FINAL | FIRST | FIRST_VALUE
                 | FOLLOWING | FOR | FOREIGN | FORMAT | FOUND | FREE | FREEPAGE | FULL | FUNCTION | FUNCTION_LEVEL_10
                 | FUNCTION_LEVEL_11 | FUNCTION_LEVEL_12 | GBPCACHE | GENERAL | GENERATE | GENERATED | GENERIC | GET
                 | GET_ACCEL_ARCHIVE | GLOBAL | GO | GOTO | GRANT | HANDLER | HAVING | HIDDENCHAR | HIGH | HINT
                 | HISTORY | HOLD | HOURS | ID | IDENTITY | IF | IGNORE | IMAGCOPY | IMMEDIATE | IMPLICITLY | IN
-                | INCLUDE | INCLUDING | INCLUSIVE | INCREMENT | INDEX | INDEXBP | INDICATOR | INHERIT | INITIALLY
-                | INLINE | INOUT | INPUT | INSENSITIVE | INSTEAD | INTERSECT | INVALID | INVOKEBIND | INVOKERUN | IS
-                | ISO | ISOLATION | ITERATE | JAR | JIS | JOBNAME | JOIN | KEEP | KEY | KEYS | LABEL | LABELS | LAG
-                | LANGUAGE | LARGE | LAST | LAST_VALUE | LC_CTYPE | LEAD | LEAVE | LEVEL | LIKE | LIMIT | LITERALS
+                | INCLUDE | INCLUDING | INCLUSIVE | INCREMENT | INDEX | INDEXBP | INDICATOR | INNER | INHERIT | INITIALLY
+                | INLINE | INOUT | INPUT | INSENSITIVE | INSTEAD | INVALID | INVOKEBIND | INVOKERUN | IS
+                | ISO | ISOLATION | ITERATE | JAR | JIS | JOBNAME | KEEP | KEY | KEYS | LABEL | LABELS | LAG
+                | LANGUAGE | LARGE | LAST | LAST_VALUE | LC_CTYPE | LEAD | LEAVE | LEVEL | LEFT | LIKE | LIMIT | LITERALS
                 | LOAD | LOB | LOCAL | LOCALE | LOCATION | LOCATOR | LOCATORS | LOCK | LOCKED | LOCKMAX | LOCKS
                 | LOCKSIZE | LOGGED | LOOP | LOW | MAIN | MAINTAINED | MASK | MATCHED | MATERIALIZED | MAXPARTITIONS
                 | MAXROWS | MAXVALUE | MEMBER | MERGE | MESSAGE_TEXT | MGMTCLAS | MICROSECONDS | MINUTES | MINVALUE
@@ -1602,7 +1601,7 @@ dbs_special_name: ABSOLUTE | ACCELERATION | ACCELERATOR | ACCESS | ACCESSCTRL | 
                 | QUERYNO | QUOTED_NONE | RANGE | RANK | RATIO_TO_REPORT | READ | READS | RECORDS | RECOVER
                 | RECOVERDB | REF | REFERENCES | REFERENCING | REFRESH | REGENERATE | REGISTERS | RELATIVE | RELEASE
                 | REMOVE | RENAME | REOPT | REORG | REPAIR | REQUIRED | RESET | RESIDENT | RESIGNAL | RESOLUTION
-                | RESPECT | RESTART | RESTRICT | RESULT | RESULT_SET_LOCATOR | RETAIN | RETURN | RETURNED_SQLSTATE
+                | RESPECT | RESTART | RESTRICT | RIGHT | RESULT | RESULT_SET_LOCATOR | RETAIN | RETURN | RETURNED_SQLSTATE
                 | RETURNING | RETURNS | REUSE | REVOKE | REXX | ROLE | ROLLBACK | ROLLUP | ROTATE | ROUND_CEILING
                 | ROUND_DOWN | ROUND_FLOOR | ROUND_HALF_DOWN | ROUND_HALF_EVEN | ROUND_HALF_UP | ROUND_UP | ROUNDING
                 | ROUTINE | ROW | ROW_COUNT | ROWS | ROWSET | RR | RS | RULES | RUN | SAVEPOINT | SBCS | SCHEMA
@@ -1615,7 +1614,7 @@ dbs_special_name: ABSOLUTE | ACCELERATION | ACCELERATOR | ACCESS | ACCESSCTRL | 
                 | STORCLAS | STORES | STOSPACE | STRUCTURE | STYLE | SUB | SYNONYM | SYSADM | SYSCTRL | SYSDEFLT
                 | SYSIBM | SYSOPR | SYSTEM | SYSTEM_TIME | TABLE | TABLESPACE | TEMPORAL | TEMPORARY | THEN | TIMEZONE
                 | TO | TOKEN | TRACE | TRACKMOD | TRANSACTION | TRANSFER | TRANSLATION | TRIGGER | TRIGGERS | TRUSTED
-                | TYPE | TYPES | UNBOUNDED | UNION | UNIQUE | UNNEST | UNTIL | UPDATE | UPON | UR | URL | USA | USAGE
+                | TYPE | TYPES | UNBOUNDED | UNIQUE | UNNEST | UNTIL | UPDATE | UPON | UR | URL | USA | USAGE
                 | USE | USER | USERID | USING | V1 | VALIDATE | VALIDPROC | VALUES | VARIABLE | VARYING | VCAT | VERSION
                 | VERSIONING | VERSIONS | VIEW | VOLATILE | VOLUMES | WAIT | WAITFORDATA | WHENEVER | WHILE | WITH
                 | WITHOUT | WLM | WORK | WORKFILE | WRAPPED | WRITE | WRKSTNNAME | XML | XMLCAST | XMLPATTERN | XMLQUERY
@@ -1704,11 +1703,11 @@ dbs_braced_join: LPARENCHAR dbs_joined_table RPARENCHAR;
 //dbs_cross_join_alpha: CROSS JOIN dbs_table_reference;
 //dbs_cross_join: dbs_table_reference_non_join dbs_cross_join_prime;
 //dbs_cross_join_prime: dbs_cross_join_alpha dbs_cross_join_prime | empty_rule;
-empty_rule: /* epsilon */;
+empty_rule:/* epsilon */;
 
 dbs_table_reference_non_join : dbs_single_table_ref | dbs_nested_table_expression | dbs_data_change_table_ref | dbs_table_function_ref |
  dbs_table_locator_ref | dbs_xmltable_expression | dbs_collection_derived_table;
-dbs_single_table_ref : dbs_table_name dbs_period_specification* dbs_correlation_clause?;
+dbs_single_table_ref : dbs_table_name | dbs_table_name dbs_period_specification* dbs_correlation_clause?;
 dbs_period_specification : FOR (SYSTEM_TIME | BUSINESS_TIME) (AS OF dbs_expressions | FROM dbs_expressions TO dbs_expressions  | BETWEEN dbs_expressions AND dbs_expressions);
 dbs_correlation_clause : AS? dbs_correlation_name (LPARENCHAR dbs_column_name (dbs_comma_separator dbs_column_name)* RPARENCHAR)?;
 //dbs_single_view_ref : dbs_single_table_ref;
@@ -1757,7 +1756,7 @@ dbs_semicolon_end: SEMICOLON_FS | SEMICOLONSEPARATORSQL;
 ///////  Ref: https://www.ibm.com/docs/en/db2-for-zos/12?topic=elements-naming-conventions ////
 dbs_integer_constant: INTEGERLITERAL | NUMERICLITERAL; //range 1 - 32767
 dbs_sql_identifier: dbs_generic_identifier_without_inbuild_function_names | dbs_inbuild_functions;
-dbs_generic_identifier_without_inbuild_function_names : IDENTIFIER | DSNDB04 | TRANSACTION | RECORDS | dbs_special_name ;
+dbs_generic_identifier_without_inbuild_function_names : IDENTIFIER | JOIN | UNION| EXCEPT | INTERSECT | dbs_special_name ;
 dbs_constant : (dbs_string_constant | dbs_integer_constant);
 dbs_generic_name: dbs_host_variable | dbs_string_constant | dbs_sql_identifier; //TODO : check this
 dbs_string_constant: CHAR_STRING_LITERAL | HEXSTRING | BXSTRING | GRAPHIC_CONSTANT | DATELITERAL;
@@ -1776,7 +1775,7 @@ dbs_collection_id: dbs_sql_identifier;
 dbs_column_name: dbs_sql_identifier (DOT_FS  (dbs_sql_identifier (DOT_FS dbs_sql_identifier)?)?  dbs_sql_identifier)?; //TODO {validateLength($T.text, "Column name", 30);};
 dbs_constraint_name: dbs_sql_identifier; //todo {validateLength($T.text, "Constraint name", 128);};
 dbs_context_name: dbs_sql_identifier; //TODO {validateLength($T.text, "Profile name", 127);};
-dbs_correlation_name: dbs_sql_identifier; //todo {validateLength($T.text, "Correlation name", 128);};
+dbs_correlation_name: IDENTIFIER | dbs_special_name | dbs_inbuild_functions | UNION| EXCEPT | INTERSECT; //todo {validateLength($T.text, "Correlation name", 128);};
 dbs_cursor_name: dbs_sql_identifier;
 dbs_host_identifier: COLONCHAR dbs_sql_identifier (DOT_FS dbs_sql_identifier)?; //todo: {validateLength($T.text, "Cursor name", 128);};
 dbs_database_name: dbs_sql_identifier; //TODO check identifier must start with a letter and must not include special characters
