@@ -24,6 +24,7 @@ export const SETTINGS_COMPILE_OPTIONS = "cobol-lsp.compiler.options";
 export const SETTINGS_SUBROUTINE_LOCAL_KEY =
   "cobol-lsp.subroutine-manager.paths-local";
 export const SETTINGS_TAB_CONFIG: string = "cobol-lsp.smart-tab";
+export const SETTINGS_LSPCONFIG_SECTION: string = "cobol-lsp.lspconfig";
 
 export const SERVER_PORT = "cobol-lsp.server.port";
 export const SERVER_RUNTIME = "cobol-lsp.serverRuntime";

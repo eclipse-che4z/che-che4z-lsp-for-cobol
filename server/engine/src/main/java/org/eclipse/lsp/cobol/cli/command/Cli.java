@@ -42,6 +42,7 @@ import org.eclipse.lsp.cobol.common.pipeline.Pipeline;
 import org.eclipse.lsp.cobol.common.pipeline.PipelineResult;
 import org.eclipse.lsp.cobol.core.engine.analysis.AnalysisContext;
 import org.eclipse.lsp.cobol.dialects.TrueDialectServiceImpl;
+import org.eclipse.lsp.cobol.service.DocumentModelService;
 import picocli.CommandLine;
 
 import static org.eclipse.lsp.cobol.cli.command.CliUtils.setupPipeline;
@@ -78,11 +79,14 @@ public class Cli implements Callable<Integer> {
     String documentUri = src.toURI().toString();
     Pipeline<AnalysisContext> pipeline = setupPipeline(diCtx, isAnalysisRequired, dialect);
 
+    String text = new String(Files.readAllBytes(src.toPath()));
+    DocumentModelService documentModelService = diCtx.getInstance(DocumentModelService.class);
+    documentModelService.openDocument(documentUri, text, "COBOL");
+
     // Cleaning up
     CleanerPreprocessor preprocessor = diCtx.getInstance(TrueDialectServiceImpl.class).getPreprocessor(dialect);
     BenchmarkService benchmarkService = diCtx.getInstance(BenchmarkService.class);
 
-    String text = new String(Files.readAllBytes(src.toPath()));
     ResultWithErrors<ExtendedText> resultWithErrors = preprocessor.cleanUpCode(documentUri, text);
     AnalysisConfig config = AnalysisConfig.defaultConfig(CopybookProcessingMode.ENABLED, collectAstChanges);
     ExtendedDocument extendedDocument = new ExtendedDocument(resultWithErrors.getResult(), text);
@@ -90,6 +94,8 @@ public class Cli implements Callable<Integer> {
     AnalysisContext ctx = new AnalysisContext(extendedDocument, config, benchmarkSession, documentUri, text, dialect);
     ctx.getAccumulatedErrors().addAll(resultWithErrors.getErrors());
     PipelineResult pipelineResult = pipeline.run(ctx);
+
+    documentModelService.closeDocument(documentUri);
     return new Result(ctx, pipelineResult);
   }
 

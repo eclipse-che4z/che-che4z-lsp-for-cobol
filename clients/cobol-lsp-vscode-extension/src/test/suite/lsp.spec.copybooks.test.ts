@@ -172,22 +172,28 @@ suite("Integration Test Suite: Copybooks", function () {
     .timeout(helper.TEST_TIMEOUT)
     .slow(1000);
 
-  suite("Default copybook configuration", () => {
-    suite("default configuration - local configuration path not set", () => {
+  suite("Default local copybooks paths configuration", () => {
+    suite("local or remote copybook paths not set", () => {
       suiteSetup(async () => {
         await helper.updateConfig("default.json");
         await helper.activate();
       });
 
-      test("Local copybooks are resolved from local subfolders if no configuration is provided", async () => {
+      test("Local copybooks are resolved from workspace subfolders if no configuration is provided", async () => {
         const editor = await helper.showDocument("USERC1N1.cbl");
 
         let diagnostics: vscode.Diagnostic[] = [];
         await helper.waitFor(() => {
           diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
+
           return (
             diagnostics.length > 0 &&
-            diagnostics.some((d) => d.message === "Errors inside the copybook")
+            diagnostics.some(
+              (d) => d.message === "Errors inside the copybook",
+            ) &&
+            diagnostics.filter(
+              (d) => d.message === "BOOK1N: Copybook not found",
+            ).length === 0
           );
         });
 
@@ -205,7 +211,36 @@ suite("Integration Test Suite: Copybooks", function () {
         await helper.activate();
       });
 
-      test("Only folder from configuration is used for local copybook resolution", async () => {
+      test("Only folder from configuration is used for local copybook resolution, copybooks outside of the selected folder are not resolved", async () => {
+        const editor = await helper.showDocument("USERC1N1.cbl");
+
+        let diagnostics: vscode.Diagnostic[] = [];
+        await helper.waitFor(() => {
+          diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
+          return (
+            diagnostics.length > 0 &&
+            diagnostics.some((d) => d.message === "BOOK1N: Copybook not found")
+          );
+        });
+
+        assert.strictEqual(
+          diagnostics.filter((d) => d.message === "BOOK1N: Copybook not found")
+            .length,
+          1,
+        );
+      });
+    });
+
+    suite("remote dns copybook path is configured", () => {
+      suiteSetup(async () => {
+        await helper.updateConfig("default.json");
+        await helper.updateConfigValue("cobol-lsp.cpy-manager.paths-dsn", [
+          "DATASET.WITH.CPYBOOKS",
+        ]);
+        await helper.activate();
+      });
+
+      test("No local copybooks folder is used for local copybook resolution, copybook not found error is reported", async () => {
         const editor = await helper.showDocument("USERC1N1.cbl");
 
         let diagnostics: vscode.Diagnostic[] = [];

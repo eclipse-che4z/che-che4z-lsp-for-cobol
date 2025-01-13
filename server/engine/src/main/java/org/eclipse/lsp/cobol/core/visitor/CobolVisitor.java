@@ -967,9 +967,9 @@ public final class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
                     .statementLocality(retrieveLocality(ctx, extendedDocument, copybooks).orElse(null))
                     .variableNameAndLocality(extractNameAndLocality(ctx.entryName()))
                     .global(!ctx.dataGlobalClause().isEmpty())
-                    .picClauses(retrievePicTextsOld(ctx.dataPictureClause()))
+                    .picClauses(retrievePicTexts(ctx.dataPictureClause()))
                     .valueClauses(retrieveValues(ctx.dataValueClause()))
-                    .usageClauses(retrieveUsageFormatOld(ctx.dataUsageClause()))
+                    .usageClauses(retrieveUsageFormat(ctx.dataUsageClause()))
                     .occursClauses(retrieveOccursValues(ctx.dataOccursClause()))
                     .redefinesClauses(
                             ctx.dataRedefinesClause().stream()
@@ -1047,7 +1047,7 @@ public final class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
                                             .variableNameAndLocality(extractNameAndLocality(ctx.entryName()))
                                             .statementLocality(retrieveLocality(ctx, extendedDocument, copybooks).orElse(null))
                                             .valueClauses(retrieveValues(ImmutableList.of(ctx.dataValueClause())))
-                                            .valueToken(retrieveValueTokenOld(valueToken))
+                                            .valueToken(retrieveValueToken(valueToken))
                                             .build(),
                                     visitChildren(ctx)))
             .orElse(ImmutableList.of());
@@ -1063,9 +1063,9 @@ public final class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
                     .variableNameAndLocality(extractNameAndLocality(ctx.entryName()))
                     .statementLocality(retrieveLocality(ctx, extendedDocument, copybooks).orElse(null))
                     .global(!ctx.dataGlobalClause().isEmpty())
-                    .picClauses(retrievePicTextsOld(ctx.dataPictureClause()))
+                    .picClauses(retrievePicTexts(ctx.dataPictureClause()))
                     .valueClauses(retrieveValues(ctx.dataValueClause()))
-                    .usageClauses(retrieveUsageFormatOld(ctx.dataUsageClause()))
+                    .usageClauses(retrieveUsageFormat(ctx.dataUsageClause()))
                     .occursClauses(retrieveOccursValues(ctx.dataOccursClause()))
                     .redefinesClauses(
                             ctx.dataRedefinesClause().stream()
@@ -1810,11 +1810,11 @@ public final class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   }
 
   private Optional<OccursClause> toOccursClause(DataOccursClauseContext ctx) {
-    return ofNullable(VisitorHelper.getIntegerOld(ctx.integerLiteral()))
+    return ofNullable(VisitorHelper.getInteger(ctx.integerLiteral()))
             .map(
                     intLit ->
                             new OccursClause(
-                                    intLit, retrieveOccursToValueOld(ctx).orElse(null),
+                                    intLit, retrieveOccursToValue(ctx).orElse(null),
                                     Optional.ofNullable(ctx.dataOccursTo()).map(DataOccursToContext::UNBOUNDED).isPresent(),
                                     retrieveIndexNames(ctx)));
   }
@@ -1832,7 +1832,7 @@ public final class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
 
   private ValueClause retrieveValue(DataValueClauseContext context) {
     return new ValueClause(
-            retrieveValueIntervalsOld(context.dataValueClauseLiteral().dataValueInterval()),
+            retrieveValueIntervals(context.dataValueClauseLiteral().dataValueInterval()),
             getLocality(context.getStart()).orElse(null));
   }
 

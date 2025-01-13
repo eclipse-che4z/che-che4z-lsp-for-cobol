@@ -21,10 +21,10 @@ import lombok.Value;
 @Value
 @EqualsAndHashCode(callSuper = true)
 public class InlinePerform extends CFASTNode {
-  boolean untilExit;
+  PerformUntilType performUntilType;
 
-  public InlinePerform(Location location, boolean untilExit) {
+  public InlinePerform(Location location, PerformUntilType performUntilType) {
     super(CFASTNodeType.INLINE_PERFORM.getValue(), location);
-    this.untilExit = untilExit;
+    this.performUntilType = performUntilType;
   }
 }

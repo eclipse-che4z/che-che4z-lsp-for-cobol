@@ -107,9 +107,8 @@ public class CFASTBuilderImpl implements CFASTBuilder {
       node.getChildren().forEach(child -> traverse(parent, child));
     } else if (node instanceof PerformNode) {
       if (((PerformNode) node).isInline()) {
-
         PerformUntilType performUntilType = getPerformUntilType((PerformNode) node);
-        addChild(parent, new InlinePerform(convertLocation(node), performUntilType == PerformUntilType.UNTIL_EXIT));
+        addChild(parent, new InlinePerform(convertLocation(node), performUntilType));
         node.getChildren().forEach(child -> traverse(parent, child));
         addChild(parent, new CFASTNode(CFASTNodeType.END_INLINE_PERFORM.getValue(), convertLocation(node)));
       } else {

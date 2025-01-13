@@ -30,8 +30,7 @@
     </parent>
 
     <properties>
-        <maven.compiler.source>8</maven.compiler.source>
-        <maven.compiler.target>8</maven.compiler.target>
+        <maven.compiler.release>8</maven.compiler.release>
         <antlr.version>4.13.2</antlr.version>
         <awaitility.version>3.0.0</awaitility.version>
         <commons.io.version>2.14.0</commons.io.version>

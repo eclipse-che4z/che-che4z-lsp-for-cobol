@@ -474,7 +474,7 @@ cics_inquire_epadapterset: EPADAPTERSET cics_data_area? ((cics_browse_start_end 
 cics_inquire_epadaptinset: EPADAPTINSET ((START | END | NEXT) | EPADAPTERSET cics_data_value | EPADAPTER cics_data_area | cics_handle_response)*;
 cics_inquire_eventbinding: EVENTBINDING cics_data_value? ((cics_browse_start_end | NEXT) | (CHANGEAGENT | ENABLESTATUS | EPADAPTERRES | INSTALLAGENT) cics_cvda | (CHANGEAGREL | CHANGETIME | CHANGEUSRID | DEFINESOURCE | DEFINETIME | EPADAPTER | EPADAPTERSET | INSTALLTIME | INSTALLUSRID | USERTAG) cics_data_area | cics_handle_response)*;
 cics_inquire_eventprocess: EVENTPROCESS (EPSTATUS cics_cvda | SCHEMALEVEL cics_data_area | cics_handle_response)*;
-cics_inquire_exci: EXCI cics_data_value? ((START | END | NEXT) | (TASK | UTIL) cics_data_value | cics_handle_response)*;
+cics_inquire_exci: EXCI cics_data_value? ((START | END | NEXT) | (TASK | URID) cics_data_value | cics_handle_response)*;
 cics_inquire_exitprogram: EXITPROGRAM cics_data_value? ((START | END | NEXT) | EXIT cics_data_value | (ENTRYNAME | GAENTRYNAME | GALENGTH | GAUSECOUNT | NUMEXITS | QUALIFIER | TALENGTH | USECOUNT) cics_data_area | (APIST | CONCURRENTST | CONNECTST | FORMATEDFST | INDOUBTST | PURGEABLEST | SHUTDOWNST | SPIST | STARTSTATUS | TASKSTARTST) cics_cvda | ENTRY cics_ref | cics_handle_response)*;
 cics_inquire_featurekey: FEATUREKEY cics_data_value? ((START | END | NEXT) | (VALUE | FILEPATH) cics_data_area | cics_handle_response)*;
 cics_inquire_file: FILE cics_data_value? ((cics_browse_start_end | NEXT) | (ACCESSMETHOD | ADD | BLOCKFORMAT | BROWSE | CHANGEAGENT | DELETE | DISPOSITION | EMPTYSTATUS | ENABLESTATUS | EXCLUSIVE | FWDRECSTATUS | INSTALLAGENT | LOADTYPE | OBJECT | OPENSTATUS | RBATYPE | READ | READINTEG | RECORDFORMAT | RECOVSTATUS | RELTYPE | REMOTETABLE | RLSACCESS | TABLE | TYPE | UPDATE | UPDATEMODEL) cics_cvda |(BASEDSNAME | BLOCKKEYLEN | BLOCKSIZE | CFDTPOOL | CHANGEAGREL | CHANGETIME | CHANGEUSRID | DEFINESOURCE | DEFINETIME | DSNAME | INSTALLTIME | INSTALLUSRID | JOURNALNUM | KEYLENGTH | KEYPOSITION | LSRPOOLNUM | MAXNUMRECS | RECORDSIZE | REMOTENAME | REMOTESYSTEM | STRINGS | TABLENAME) cics_data_area | cics_handle_response)*;
@@ -2852,7 +2852,6 @@ ABCODE
   | USERPRIORITY
   | USERSTATUS
   | USERTAG
-  | UTIL
   | VALIDATION
   | VALIDATIONST
   | VALIDITY

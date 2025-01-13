@@ -3858,6 +3858,15 @@
     ]
   },
   {
+    "name": "org.eclipse.lsp4j.DidChangeConfigurationParams",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
     "name": "org.eclipse.lsp4j.services.WorkspaceService",
     "queryAllDeclaredMethods": true,
     "methods": [

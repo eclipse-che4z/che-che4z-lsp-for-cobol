@@ -680,6 +680,7 @@ PROCEDURE              : P R O C E D U R E ;
 PROCEDURE_POINTER      : P R O C E D U R E MINUSCHAR P O I N T E R ;
 PROCEDURES             : P R O C E D U R E S ;
 PROCEED                : P R O C E E D ;
+PROCESS                : P R O C E S S;
 PROCESSING             : P R O C E S S I N G {enableCobolSpecialSeparators = false;};
 PROGRAM                : P R O G R A M ;
 PROGRAM_ID             : P R O G R A M MINUSCHAR I D ;

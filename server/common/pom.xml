@@ -24,8 +24,7 @@
     <version>1.0.12</version>
 
     <properties>
-        <maven.compiler.source>8</maven.compiler.source>
-        <maven.compiler.target>8</maven.compiler.target>
+        <maven.compiler.release>8</maven.compiler.release>
         <lombok.version>1.18.36</lombok.version>
         <maven.compiler.plugin.version>3.13.0</maven.compiler.plugin.version>
         <google.guava.version>33.2.1-jre</google.guava.version>
@@ -79,8 +78,7 @@
         <profile>
             <id>release</id>
             <properties>
-                <maven.compiler.source>8</maven.compiler.source>
-                <maven.compiler.target>8</maven.compiler.target>
+                <maven.compiler.release>8</maven.compiler.release>
             </properties>
             <build>
                 <plugins>
