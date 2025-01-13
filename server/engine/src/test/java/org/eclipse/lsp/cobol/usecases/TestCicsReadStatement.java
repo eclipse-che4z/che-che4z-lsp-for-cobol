@@ -35,14 +35,14 @@ import java.util.HashMap;
 public class TestCicsReadStatement {
 
     // Test Strings
-    private static final String READ_VALID_1 = "READ FILE(123) UNCOMMITTED INTO(123) RIDFLD(123) KEYLENGTH(123) GENERIC SYSID(123) LENGTH(123) DEBKEY EQUAL NOSUSPEND";
-    private static final String READ_VALID_2 = "READ FILE(123) INTO(123) RIDFLD(123)";
+    private static final String READ_VALID_1 = "READ FILE({$varOne}) UNCOMMITTED INTO({$varOne}) RIDFLD({$varOne}) KEYLENGTH({$varOne}) GENERIC SYSID({$varOne}) LENGTH({$varOne}) DEBKEY EQUAL NOSUSPEND";
+    private static final String READ_VALID_2 = "READ FILE({$varOne}) INTO({$varOne}) RIDFLD({$varOne})";
 
-    private static final String READ_INVALID_1 = "READ {_RIDFLD(123) INTO(123)|errorOne_}";
-    private static final String READ_INVALID_2 = "READ {FILE|errorOne}(123) {DATASET|errorTwo}(123) RIDFLD(123) INTO(123)";
-    private static final String READ_INVALID_3 = "READ {_FILE(123) INTO(123) RIDFLD(123) GENERIC|errorOne_}";
-    private static final String READ_INVALID_4 = "READ FILE(123) UNCOMMITTED {CONSISTENT|errorOne} INTO(123) RIDFLD(123) DEBKEY {RBA|errorTwo} EQUAL {GTEQ|errorThree}";
-    private static final String READ_INVALID_5 = "READ {_FILE(123) INTO(123) RIDFLD(123) TOKEN(123)|errorOne_}";
+    private static final String READ_INVALID_1 = "READ {_RIDFLD({$varOne}) INTO({$varOne})|errorOne_}";
+    private static final String READ_INVALID_2 = "READ {FILE|errorOne}({$varOne}) {DATASET|errorTwo}({$varOne}) RIDFLD({$varOne}) INTO({$varOne})";
+    private static final String READ_INVALID_3 = "READ {_FILE({$varOne}) INTO({$varOne}) RIDFLD({$varOne}) GENERIC|errorOne_}";
+    private static final String READ_INVALID_4 = "READ FILE({$varOne}) UNCOMMITTED {CONSISTENT|errorOne} INTO({$varOne}) RIDFLD({$varOne}) DEBKEY {RBA|errorTwo} EQUAL {GTEQ|errorThree}";
+    private static final String READ_INVALID_5 = "READ {_FILE({$varOne}) INTO({$varOne}) RIDFLD({$varOne}) TOKEN({$varOne} )|errorOne_}";
 
     // Test Functions
     @Test
