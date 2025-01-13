@@ -955,7 +955,7 @@ dbs_select_unpack_function_invocation: UNPACK LPARENCHAR dbs_expression RPARENCH
 dbs_subselect: dbs_select_clause dbs_from_clause dbs_where_clause? dbs_groupby_clause? dbs_having_clause? dbs_orderby_offset_fetch;
 dbs_orderby_offset_fetch: dbs_orderby_clause? dbs_offset_clause? dbs_fetch_clause?;
 dbs_select_clause: SELECT (ALL | DISTINCT)? ( ASTERISKCHAR | dbs_select_item (dbs_comma_separator dbs_select_item)*);
-dbs_select_item: (dbs_expressions AS? dbs_sql_identifier? | dbs_unpacked_row | dbs_generic_name DOT_FS ASTERISKCHAR);
+dbs_select_item: (dbs_expressions AS? dbs_sql_identifier? | dbs_unpacked_row | dsb_alias_name DOT_FS ASTERISKCHAR);
 dbs_unpacked_row: dbs_select_unpack_function_invocation DOT_FS ASTERISKCHAR AS LPARENCHAR (dbs_generic_name db2sql_data_types)
 (dbs_comma_separator dbs_generic_name db2sql_data_types)* RPARENCHAR;
 dbs_from_clause: FROM dbs_table_reference  (dbs_comma_separator dbs_table_reference)*;
@@ -1772,7 +1772,8 @@ dbs_aux_table_name: dsb_alias_name; //TODO {validateLength($T.text, "Auxiliary t
 dbs_table_name: dsb_alias_name;
 //dbs_bpname: ('B' | 'b') ('P' |' p') INTEGERLITERAL (('K' | 'k') INTEGERLITERAL)?;
 dbs_collection_id: dbs_sql_identifier;
-dbs_column_name: (dsb_alias_name DOT_FS)?  dbs_sql_identifier; //TODO {validateLength($T.text, "Column name", 30);};
+//dbs_column_name: (dsb_alias_name DOT_FS)?  IDENTIFIER;
+dbs_column_name: dbs_sql_identifier (DOT_FS  (dbs_sql_identifier (DOT_FS dbs_sql_identifier)?)?  dbs_sql_identifier)?; //TODO {validateLength($T.text, "Column name", 30);};
 dbs_constraint_name: dbs_sql_identifier; //todo {validateLength($T.text, "Constraint name", 128);};
 dbs_context_name: dbs_sql_identifier; //TODO {validateLength($T.text, "Profile name", 127);};
 dbs_correlation_name: dbs_sql_identifier; //todo {validateLength($T.text, "Correlation name", 128);};
