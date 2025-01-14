@@ -952,7 +952,7 @@ dbs_select_readOnly: FOR (READ | FETCH) ONLY;
 dbs_select_optimize:OPTIMIZE FOR INTEGERLITERAL (ROWS | ROW);
 /*Queries Subselects (all)*/
 dbs_select_unpack_function_invocation: UNPACK LPARENCHAR dbs_expression RPARENCHAR DOT_FS ASTERISKCHAR AS LPARENCHAR dbs_sql_identifier db2sql_data_types (dbs_comma_separator dbs_sql_identifier db2sql_data_types)* RPARENCHAR;
-dbs_subselect: dbs_select_clause dbs_from_clause dbs_where_clause? dbs_groupby_clause? dbs_having_clause? dbs_orderby_offset_fetch;
+dbs_subselect: dbs_select_clause dbs_from_clause dbs_where_clause? dbs_groupby_clause? dbs_having_clause?; // dbs_orderby_offset_fetch;
 dbs_orderby_offset_fetch: dbs_orderby_clause? dbs_offset_clause? dbs_fetch_clause?;
 dbs_select_clause: SELECT (ALL | DISTINCT)? ( ASTERISKCHAR | dbs_select_item (dbs_comma_separator dbs_select_item)*);
 dbs_select_item: (dbs_expressions AS? dbs_sql_identifier? | dbs_unpacked_row | dsb_alias_name DOT_FS ASTERISKCHAR);
