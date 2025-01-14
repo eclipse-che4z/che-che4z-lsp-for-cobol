@@ -42,17 +42,16 @@ public class CICSTransformOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
                     put(CICSLexer.TRANSFORMER, ErrorSeverity.ERROR);
                     put(CICSLexer.XMLCONTAINER, ErrorSeverity.ERROR);
                     put(CICSLexer.NSCONTAINER, ErrorSeverity.ERROR);
-
-                    put(CICSLexer.DATCONTAINER, ErrorSeverity.WARNING);
-                    put(CICSLexer.ELEMNAME, ErrorSeverity.WARNING);
-                    put(CICSLexer.ELEMNAMELEN, ErrorSeverity.WARNING);
-                    put(CICSLexer.ELEMNS, ErrorSeverity.WARNING);
-                    put(CICSLexer.ELEMNSLEN, ErrorSeverity.WARNING);
-                    put(CICSLexer.TYPENAME, ErrorSeverity.WARNING);
-                    put(CICSLexer.TYPENAMELEN, ErrorSeverity.WARNING);
-                    put(CICSLexer.TYPENS, ErrorSeverity.WARNING);
-                    put(CICSLexer.TYPENSLEN, ErrorSeverity.WARNING);
-                    put(CICSLexer.XMLTRANSFORM, ErrorSeverity.WARNING);
+                    put(CICSLexer.DATCONTAINER, ErrorSeverity.ERROR);
+                    put(CICSLexer.ELEMNAME, ErrorSeverity.ERROR);
+                    put(CICSLexer.ELEMNAMELEN, ErrorSeverity.ERROR);
+                    put(CICSLexer.ELEMNS, ErrorSeverity.ERROR);
+                    put(CICSLexer.ELEMNSLEN, ErrorSeverity.ERROR);
+                    put(CICSLexer.TYPENAME, ErrorSeverity.ERROR);
+                    put(CICSLexer.TYPENAMELEN, ErrorSeverity.ERROR);
+                    put(CICSLexer.TYPENS, ErrorSeverity.ERROR);
+                    put(CICSLexer.TYPENSLEN, ErrorSeverity.ERROR);
+                    put(CICSLexer.XMLTRANSFORM, ErrorSeverity.ERROR);
                 }
             };
 
