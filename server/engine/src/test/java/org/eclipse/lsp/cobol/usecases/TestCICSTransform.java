@@ -38,6 +38,8 @@ public class TestCICSTransform {
     private static final String TRANSFORM_DATATOXML_VALID = "TRANSFORM DATATOXML CHANNEL({$varOne}) DATCONTAINER({$varOne}) ELEMNAME({$varOne}) ELEMNAMELEN({$varOne}) ELEMNS({$varOne}) ELEMNSLEN({$varOne}) TYPENAME({$varOne}) TYPENAMELEN({$varOne}) TYPENS({$varOne}) TYPENSLEN({$varOne}) XMLCONTAINER({$varOne}) XMLTRANSFORM({$varOne})";
     private static final String TRANSFORM_XMLTODATA_VALID = "TRANSFORM XMLTODATA CHANNEL({$varOne}) DATCONTAINER({$varOne}) ELEMNAME({$varOne}) ELEMNAMELEN({$varOne}) ELEMNS({$varOne}) ELEMNSLEN({$varOne}) NSCONTAINER({$varOne}) TYPENAME({$varOne}) TYPENAMELEN({$varOne}) TYPENS({$varOne}) TYPENSLEN({$varOne}) XMLCONTAINER({$varOne}) XMLTRANSFORM({$varOne})";
 
+    private static final String TRANSFORM_JSONTODATA_INVALID = "TRANSFORM {_DATATOJSON INCONTAINER({$varOne}) OUTCONTAINER({$varOne}) TRANSFORMER({$varOne} )|errorOne_}";
+    private static final String TRANSFORM_DATATOJSON_INVALID = "TRANSFORM {_JSONTODATA CHANNEL({$varOne}) OUTCONTAINER({$varOne}) TRANSFORMER({$varOne} )|errorOne_}";
 
     private static final String TRANSFORM_DATATOXML_INVALID = "TRANSFORM DATATOXML CHANNEL({$varOne}) DATCONTAINER({$varOne}) {NSCONTAINER|errorOne}({$varOne}) XMLCONTAINER({$varOne}) XMLTRANSFORM({$varOne})";
     private static final String TRANSFORM_XMLTODATA_INVALID = "TRANSFORM {_XMLTODATA DATCONTAINER({$varOne}) ELEMNAME({$varOne}) ELEMNAMELEN({$varOne}) ELEMNS({$varOne}) ELEMNSLEN({$varOne}) NSCONTAINER({$varOne}) TYPENAME({$varOne}) TYPENAMELEN({$varOne}) TYPENS({$varOne}) TYPENSLEN({$varOne}) XMLCONTAINER({$varOne}) XMLTRANSFORM({$varOne} )|errorOne_}";
@@ -68,6 +70,17 @@ public class TestCICSTransform {
         CICSTestUtils.noErrorTest(TRANSFORM_XMLTODATA_VALID);
     }
 
+
+    // Invalid tests
+    @Test
+    protected void testInvalidDatatoJSON() {
+        callErrorTest(TRANSFORM_DATATOJSON_INVALID, "Missing required option: INCONTAINER");
+    }
+
+    @Test
+    protected void testInvalidJSONToData() {
+        callErrorTest(TRANSFORM_JSONTODATA_INVALID, "Missing required option: CHANNEL");
+    }
 
     @Test
     protected void testInvalidDataToXML() {
