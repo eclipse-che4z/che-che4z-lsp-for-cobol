@@ -97,7 +97,7 @@ public class TestCICSCreateSp {
             "CREATE NOHANDLE {DB2ENTRY|error}({$varFour}) ATTRIBUTES({$varFour}) {FILE|error2}({$varFour})";
     private static final String CREATE_DB2ENTRY_FILE_CASE_SENSITIVE_INVALID =
             "CREATE NOHANDLE {DB2ENTRY|error}({$varFour}) ATTRIBUTES({$varFour}) {FILE|error2}({$varFour})"
-                    + "{FiLe|error3}({$varFour})";
+                    + "{FiLe|error3|error4}({$varFour})";
     private static final String CREATE_TERMINAL_SUBOPERAND_INVALID = "CREATE {TERMINAL|error}({$varFour}) DISCARD";
 
     @ParameterizedTest
@@ -220,13 +220,21 @@ public class TestCICSCreateSp {
                         "error",
                         new Diagnostic(
                                 new Range(),
-                                "Exactly one option required, options are mutually exclusive: DB2ENTRY or FILE",
+                                "Exactly one option required, options are mutually exclusive: ATOMSERVICE or BUNDLE"
+                                        + " or DB2CONN or DB2ENTRY or DB2TRAN or DOCTEMPLATE or DUMPCODE or ENQMODEL or FILEPIPELINE"
+                                        + " or IPCONN or JOURNALMODEL or JVMSERVER or LIBRARY or LSRPOOL or MAPSET or MQCONN"
+                                        + " or MQMONITOR or PARTITIONSET or PARTNERPROCESSTYPE or PROFILE or PROGRAM or TCPIPSERVICE"
+                                        + " or TDQUEUE or TRANCLASS or TRANSACTION or TSMODEL or TYPETERM or URIMAP or WEBSERVICESESSIONS or TERMINAL or CONNECTION",
                                 DiagnosticSeverity.Error,
                                 ErrorSource.PARSING.getText()),
                         "error2",
                         new Diagnostic(
                                 new Range(),
-                                "Exactly one option required, options are mutually exclusive: DB2ENTRY or FILE",
+                                "Exactly one option required, options are mutually exclusive: ATOMSERVICE or BUNDLE"
+                                        + " or DB2CONN or DB2ENTRY or DB2TRAN or DOCTEMPLATE or DUMPCODE or ENQMODEL or FILEPIPELINE"
+                                        + " or IPCONN or JOURNALMODEL or JVMSERVER or LIBRARY or LSRPOOL or MAPSET or MQCONN"
+                                        + " or MQMONITOR or PARTITIONSET or PARTNERPROCESSTYPE or PROFILE or PROGRAM or TCPIPSERVICE"
+                                        + " or TDQUEUE or TRANCLASS or TRANSACTION or TSMODEL or TYPETERM or URIMAP or WEBSERVICESESSIONS or TERMINAL or CONNECTION",
                                 DiagnosticSeverity.Error,
                                 ErrorSource.PARSING.getText()));
 
@@ -239,13 +247,21 @@ public class TestCICSCreateSp {
                         "error",
                         new Diagnostic(
                                 new Range(),
-                                "Exactly one option required, options are mutually exclusive: DB2ENTRY or FILE",
+                                "Exactly one option required, options are mutually exclusive: ATOMSERVICE or BUNDLE"
+                                        + " or DB2CONN or DB2ENTRY or DB2TRAN or DOCTEMPLATE or DUMPCODE or ENQMODEL or FILEPIPELINE"
+                                        + " or IPCONN or JOURNALMODEL or JVMSERVER or LIBRARY or LSRPOOL or MAPSET or MQCONN"
+                                        + " or MQMONITOR or PARTITIONSET or PARTNERPROCESSTYPE or PROFILE or PROGRAM or TCPIPSERVICE"
+                                        + " or TDQUEUE or TRANCLASS or TRANSACTION or TSMODEL or TYPETERM or URIMAP or WEBSERVICESESSIONS or TERMINAL or CONNECTION",
                                 DiagnosticSeverity.Error,
                                 ErrorSource.PARSING.getText()),
                         "error2",
                         new Diagnostic(
                                 new Range(),
-                                "Exactly one option required, options are mutually exclusive: DB2ENTRY or FILE",
+                                "Exactly one option required, options are mutually exclusive: ATOMSERVICE or BUNDLE"
+                                        + " or DB2CONN or DB2ENTRY or DB2TRAN or DOCTEMPLATE or DUMPCODE or ENQMODEL or FILEPIPELINE"
+                                        + " or IPCONN or JOURNALMODEL or JVMSERVER or LIBRARY or LSRPOOL or MAPSET or MQCONN"
+                                        + " or MQMONITOR or PARTITIONSET or PARTNERPROCESSTYPE or PROFILE or PROGRAM or TCPIPSERVICE"
+                                        + " or TDQUEUE or TRANCLASS or TRANSACTION or TSMODEL or TYPETERM or URIMAP or WEBSERVICESESSIONS or TERMINAL or CONNECTION",
                                 DiagnosticSeverity.Error,
                                 ErrorSource.PARSING.getText()),
                         "error3",
@@ -253,7 +269,18 @@ public class TestCICSCreateSp {
                                 new Range(),
                                 "Excessive options provided for: FiLe",
                                 DiagnosticSeverity.Error,
-                                ErrorSource.PARSING.getText()));
+                                ErrorSource.PARSING.getText()),
+                        "error4",
+                        new Diagnostic(
+                                new Range(),
+                                "Exactly one option required, options are mutually exclusive: ATOMSERVICE or BUNDLE"
+                                        + " or DB2CONN or DB2ENTRY or DB2TRAN or DOCTEMPLATE or DUMPCODE or ENQMODEL or FILEPIPELINE"
+                                        + " or IPCONN or JOURNALMODEL or JVMSERVER or LIBRARY or LSRPOOL or MAPSET or MQCONN"
+                                        + " or MQMONITOR or PARTITIONSET or PARTNERPROCESSTYPE or PROFILE or PROGRAM or TCPIPSERVICE"
+                                        + " or TDQUEUE or TRANCLASS or TRANSACTION or TSMODEL or TYPETERM or URIMAP or WEBSERVICESESSIONS or TERMINAL or CONNECTION",
+                                DiagnosticSeverity.Error,
+                                ErrorSource.PARSING.getText())
+                        );
 
         CICSTestUtils.errorTest(CREATE_DB2ENTRY_FILE_CASE_SENSITIVE_INVALID, expectedDiagnostic, "SP");
     }

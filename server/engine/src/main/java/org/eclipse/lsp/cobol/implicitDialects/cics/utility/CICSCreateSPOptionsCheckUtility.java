@@ -100,8 +100,11 @@ public class CICSCreateSPOptionsCheckUtility extends CICSOptionsCheckBaseUtility
         checkDuplicates(ctx);
     }
     private void checkOpts(CICSParser.Cics_create_optsContext ctx) {
-        checkHasMutuallyExclusiveOptions(ctx.ATOMSERVICE(), ctx.BUNDLE(), ctx.DB2CONN(), ctx.DB2ENTRY(), ctx.DB2TRAN(), ctx.DOCTEMPLATE(), ctx.DUMPCODE(),
-                ctx.ENQMODEL(), ctx.FILE(), ctx.PIPELINE(), ctx.IPCONN(), ctx.JOURNALMODEL(), ctx.JVMSERVER(), ctx.LIBRARY(),
+        checkHasExactlyOneOption("ATOMSERVICE or BUNDLE or DB2CONN or DB2ENTRY or DB2TRAN or DOCTEMPLATE or DUMPCODE or ENQMODEL or FILE"
+                + "PIPELINE or IPCONN or JOURNALMODEL or JVMSERVER or LIBRARY or LSRPOOL or MAPSET or MQCONN or MQMONITOR or PARTITIONSET or PARTNER"
+                + "PROCESSTYPE or PROFILE or PROGRAM or TCPIPSERVICE or TDQUEUE or TRANCLASS or TRANSACTION or TSMODEL or TYPETERM or URIMAP or WEBSERVICE"
+                + "SESSIONS or TERMINAL or CONNECTION", ctx, ctx.ATOMSERVICE(), ctx.BUNDLE(), ctx.DB2CONN(), ctx.DB2ENTRY(), ctx.DB2TRAN(), ctx.DOCTEMPLATE(),
+                ctx.DUMPCODE(), ctx.ENQMODEL(), ctx.FILE(), ctx.PIPELINE(), ctx.IPCONN(), ctx.JOURNALMODEL(), ctx.JVMSERVER(), ctx.LIBRARY(),
                 ctx.LSRPOOL(), ctx.MAPSET(), ctx.MQCONN(), ctx.MQMONITOR(), ctx.PARTITIONSET(), ctx.PARTNER(),
                 ctx.PROCESSTYPE(), ctx.PROFILE(), ctx.PROGRAM(), ctx.TCPIPSERVICE(), ctx.TDQUEUE(), ctx.TRANCLASS(),
                 ctx.TRANSACTION(), ctx.TSMODEL(), ctx.TYPETERM(), ctx.URIMAP(), ctx.WEBSERVICE(), ctx.SESSIONS(),
@@ -122,7 +125,6 @@ public class CICSCreateSPOptionsCheckUtility extends CICSOptionsCheckBaseUtility
             checkHasIllegalOptions(ctx.DISCARD(), "DISCARD");
             checkHasIllegalOptions(ctx.COMPLETE(), "COMPLETE");
             checkHasMandatoryOptions(ctx.ATTRIBUTES(), ctx, "ATTRIBUTES");
-            checkRequiredSubOperand(ctx);
         }
         checkHasMutuallyExclusiveOptions("LOG or NOLOG or LOGMESSAGE", ctx.LOG(), ctx.NOLOG(), ctx.LOGMESSAGE());
     }
