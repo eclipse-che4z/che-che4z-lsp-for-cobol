@@ -44,9 +44,19 @@ public class TestCICSTransform {
     private static final String TRANSFORM_DATATOXML_INVALID = "TRANSFORM DATATOXML CHANNEL({$varOne}) DATCONTAINER({$varOne}) {NSCONTAINER|errorOne}({$varOne}) XMLCONTAINER({$varOne}) XMLTRANSFORM({$varOne})";
     private static final String TRANSFORM_XMLTODATA_INVALID = "TRANSFORM {_XMLTODATA DATCONTAINER({$varOne}) ELEMNAME({$varOne}) ELEMNAMELEN({$varOne}) ELEMNS({$varOne}) ELEMNSLEN({$varOne}) NSCONTAINER({$varOne}) TYPENAME({$varOne}) TYPENAMELEN({$varOne}) TYPENS({$varOne}) TYPENSLEN({$varOne}) XMLCONTAINER({$varOne}) XMLTRANSFORM({$varOne} )|errorOne_}";
 
+    private static final String TRANSFORM_BOTH_JSON_INVALID = "TRANSFORM {DATATOJSON|errorOne} {JSONTODATA|errorTwo} CHANNEL({$varOne}) INCONTAINER({$varOne}) OUTCONTAINER({$varOne}) TRANSFORMER({$varOne})";
+    private static final String TRANSFORM_BOTH_XML_INVALID = "TRANSFORM {DATATOXML|errorOne} {XMLTODATA|errorTwo} CHANNEL({$varOne}) DATCONTAINER({$varOne}) ELEMNAME({$varOne}) ELEMNAMELEN({$varOne}) ELEMNS({$varOne}) ELEMNSLEN({$varOne}) TYPENAME({$varOne}) TYPENAMELEN({$varOne}) TYPENS({$varOne}) TYPENSLEN({$varOne}) XMLCONTAINER({$varOne}) XMLTRANSFORM({$varOne})";
+
     private void callErrorTest(String newCommand, String errorMessage) {
         HashMap<String, Diagnostic> tempDiagnostic = new HashMap<>();
         tempDiagnostic.put("errorOne", new Diagnostic(new Range(), errorMessage, DiagnosticSeverity.Error, ErrorSource.PARSING.getText()));
+        CICSTestUtils.errorTest(newCommand, tempDiagnostic);
+    }
+
+    private void twoErrorTest(String newCommand, String errorMsg1, String errorMsg2) {
+        HashMap<String, Diagnostic> tempDiagnostic = new HashMap<>();
+        tempDiagnostic.put("errorOne", new Diagnostic(new Range(), errorMsg1, DiagnosticSeverity.Error, ErrorSource.PARSING.getText()));
+        tempDiagnostic.put("errorTwo", new Diagnostic(new Range(), errorMsg2, DiagnosticSeverity.Error, ErrorSource.PARSING.getText()));
         CICSTestUtils.errorTest(newCommand, tempDiagnostic);
     }
 
@@ -87,7 +97,18 @@ public class TestCICSTransform {
         callErrorTest(TRANSFORM_DATATOXML_INVALID, "Invalid option provided: NSCONTAINER");
     }
 
-    @Test protected void testInvalidXMLToData() {
+    @Test
+    protected void testInvalidXMLToData() {
         callErrorTest(TRANSFORM_XMLTODATA_INVALID, "Missing required option: CHANNEL");
+    }
+
+    @Test
+    protected void testInvalidBothJSON() {
+        twoErrorTest(TRANSFORM_BOTH_JSON_INVALID, "Exactly one option required, options are mutually exclusive: DATATOJSON or JSONTODATA", "Exactly one option required, options are mutually exclusive: DATATOJSON or JSONTODATA");
+    }
+
+    @Test
+    protected void testInvalidBothXML() {
+        twoErrorTest(TRANSFORM_BOTH_XML_INVALID, "Exactly one option required, options are mutually exclusive: DATATOXML or XMLTODATA", "Exactly one option required, options are mutually exclusive: DATATOXML or XMLTODATA");
     }
 }
