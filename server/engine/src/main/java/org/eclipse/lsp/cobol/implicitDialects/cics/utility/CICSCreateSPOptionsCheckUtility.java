@@ -16,6 +16,7 @@ package org.eclipse.lsp.cobol.implicitDialects.cics.utility;
 
         import org.antlr.v4.runtime.ParserRuleContext;
 
+        import org.antlr.v4.runtime.tree.ParseTree;
         import org.antlr.v4.runtime.tree.TerminalNode;
         import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
         import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
@@ -137,21 +138,27 @@ public class CICSCreateSPOptionsCheckUtility extends CICSOptionsCheckBaseUtility
            int tokenIndex = ((TerminalNode) ctx.children.get(index)).getSymbol().getType();
             if (Arrays.stream(COMMANDS_WITH_DISCARD_COMPLETE_OPTS).anyMatch(i -> i == tokenIndex)
         ) {
-                throwBrowsingViolation(
-                        ctx.children.get(index),
-                        "Sub Operand");
+                throwException(ErrorSeverity.ERROR, getLocality(ctx.children.get(index)),
+                        "",
+                        "Operand value not allowed");
             }
         }
     }
     private void checkRequiredSubOperand(CICSParser.Cics_create_optsContext ctx) {
         if (ctx.children == null) return;
+        ParseTree last = ctx.children.get(ctx.children.size() - 1);
+        if (TerminalNode.class.isAssignableFrom(last.getClass())
+                && Arrays.stream(COMMANDS_WITH_DISCARD_COMPLETE_OPTS).anyMatch(i -> i == ((TerminalNode) last).getSymbol().getType())) {
+            throwException(ErrorSeverity.ERROR, getLocality(last), "", "Operand value required");
+            return;
+        }
         for (int index = 0; index < ctx.children.size() - 1; index++) {
             if (!TerminalNode.class.isAssignableFrom(ctx.children.get(index).getClass())
                     || CICSParser.Cics_data_valueContext.class.isAssignableFrom(ctx.children.get(index + 1).getClass())) continue;
             int tokenIndex = ((TerminalNode) ctx.children.get(index)).getSymbol().getType();
             if (Arrays.stream(COMMANDS_WITH_DISCARD_COMPLETE_OPTS).anyMatch(i -> i == tokenIndex)
             ) {
-                throwRequiredSubOperand(ctx.children.get(index));
+                throwException(ErrorSeverity.ERROR, getLocality(ctx.children.get(index)), "", "Operand value required");
             }
         }
     }

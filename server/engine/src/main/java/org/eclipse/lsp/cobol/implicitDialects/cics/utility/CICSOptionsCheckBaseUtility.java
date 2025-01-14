@@ -586,14 +586,4 @@ public abstract class CICSOptionsCheckBaseUtility {
             checkBrowsingHasNotParameter(ctx, coreToken);
         } else checkStatementHasParameter(ctx, coreToken);
     }
-    /**
-     * Throws error for commands with required suboperands
-     *
-     * @param rule    Context to throw the error on
-     * @param <E>     Generic for rule type
-     */
-    public <E> void throwRequiredSubOperand(E rule) {
-        throwException(
-                ErrorSeverity.ERROR, getLocality(rule), "Sub Operand Required", "");
-    }
 }

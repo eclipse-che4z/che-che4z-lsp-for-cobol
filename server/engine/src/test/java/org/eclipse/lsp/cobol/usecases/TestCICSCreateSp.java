@@ -78,7 +78,8 @@ public class TestCICSCreateSp {
     private static Stream<String> getInValidSubOperandOptions() {
         return Stream.of(
                 "CREATE {TERMINAL|error} ATTRLEN({$varOne}) ATTRIBUTES({$varFour})",
-                "CREATE {CONNECTION|error} ATTRLEN({$varOne}) ATTRIBUTES({$varFour})");
+                "CREATE {CONNECTION|error} ATTRLEN({$varOne}) ATTRIBUTES({$varFour})",
+                "CREATE ATTRIBUTES({$varFour}) {TERMINAL|error}");
     };
 
     private static final String CREATE_INVALID =
@@ -113,7 +114,7 @@ public class TestCICSCreateSp {
                         "error",
                         new Diagnostic(
                                 new Range(),
-                                "Sub Operand Required",
+                                "Operand value required",
                                 DiagnosticSeverity.Error,
                                 ErrorSource.PARSING.getText())
                 );
@@ -127,7 +128,7 @@ public class TestCICSCreateSp {
                         "errorSubOperand",
                         new Diagnostic(
                                 new Range(),
-                                "Invalid option or parameter provided: Sub Operand",
+                                "Operand value not allowed",
                                 DiagnosticSeverity.Error,
                                 ErrorSource.PARSING.getText()),
                         "errorInvalidDiscard",
@@ -291,7 +292,7 @@ public class TestCICSCreateSp {
                         "error",
                         new Diagnostic(
                                 new Range(),
-                                "Invalid option or parameter provided: Sub Operand",
+                                "Operand value not allowed",
                                 DiagnosticSeverity.Error,
                                 ErrorSource.PARSING.getText())
                        );
