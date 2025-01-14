@@ -81,5 +81,6 @@ public class CICSStartbrOptionsCheckUtility extends CICSOptionsCheckBaseUtility 
     if (!ctx.SYSID().isEmpty()) {
       checkHasExactlyOneOption("KEYLENGTH, RBA, RRN, or XRBA", ctx, ctx.KEYLENGTH(), ctx.RBA(), ctx.RRN(), ctx.XRBA());
     }
+    checkHasMutuallyExclusiveOptions("GTEQ or DEBKEY", ctx.GTEQ(), ctx.DEBKEY());
   }
 }
