@@ -85,6 +85,8 @@ public class CICSTransformOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
 
 
     private void checkJSON(CICSParser.Cics_transform_jsonContext ctx) {
+        checkHasExactlyOneOption("DATATOJSON or JSONTODATA", ctx, ctx.DATATOJSON(), ctx.JSONTODATA());
+
         checkHasMandatoryOptions(ctx.CHANNEL(), ctx, "CHANNEL");
         checkHasMandatoryOptions(ctx.INCONTAINER(), ctx, "INCONTAINER");
         checkHasMandatoryOptions(ctx.TRANSFORMER(), ctx, "TRANSFORMER");
@@ -106,9 +108,10 @@ public class CICSTransformOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
             checkHasMandatoryOptions(ctx.XMLTRANSFORM(), ctx, "XMLTRANSFORM");
         }
 
-        checkPrerequisiteIsMet(ctx.ELEMNAME(), ctx.ELEMNAMELEN(), ctx, "ELEMNAME");
-        checkPrerequisiteIsMet(ctx.ELEMNS(), ctx.ELEMNSLEN(), ctx, "ELEMNS");
-        checkPrerequisiteIsMet(ctx.TYPENAME(), ctx.TYPENAMELEN(), ctx, "TYPENAME");
-        checkPrerequisiteIsMet(ctx.TYPENS(), ctx.TYPENSLEN(), ctx, "TYPENS");
+        checkHasExactlyOneOption("DATATOXML or XMLTODATA", ctx, ctx.DATATOXML(), ctx.XMLTODATA());
+        checkPrerequisiteIsMet(ctx.ELEMNAME(), ctx.ELEMNAMELEN(), ctx, "ELEMNAMELEN without ELEMNAME");
+        checkPrerequisiteIsMet(ctx.ELEMNS(), ctx.ELEMNSLEN(), ctx, "ELEMNSLEN without ELEMNS");
+        checkPrerequisiteIsMet(ctx.TYPENAME(), ctx.TYPENAMELEN(), ctx, "TYPENAMELEN without TYPENAME");
+        checkPrerequisiteIsMet(ctx.TYPENS(), ctx.TYPENSLEN(), ctx, "TYPENSLEN without TYPENS");
     }
 }
