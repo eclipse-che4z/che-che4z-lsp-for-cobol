@@ -14,7 +14,10 @@
  */
 package org.eclipse.lsp.cobol.usecases;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
+import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.eclipse.lsp.cobol.usecases.common.CICSTestUtils;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
@@ -31,6 +34,24 @@ import java.util.Map;
 public class TestCicsExciStartBrowseStatement {
 
   // Test Strings
+  private static final String EXCI_TEXT =
+          "       IDENTIFICATION DIVISION.\n"
+          + "       PROGRAM-ID. EXCISTMTTEST.\n"
+          + "       DATA DIVISION.\n"
+          + "       WORKING-STORAGE SECTION.\n"
+          + "       01  {$*DATA-AREA}       PIC X(50).\n"
+          + "       01  {$*DATA-VAL}       PIC X(50).\n"
+          + "       01  {$*RETURN-CODE}           PIC S9(8) COMP.\n"
+          + "\n"
+          + "       PROCEDURE DIVISION.\n"
+          + "           EXEC CICS \n"
+          + "           STARTBROWSE\n"
+          + "           CONTAINER\n"
+          + "           CHANNEL({$DATA-VAL})\n"
+          + "           BROWSETOKEN({$DATA-AREA})\n"
+          + "           RETCODE({$RETURN-CODE})\n"
+          + "           END-EXEC.";
+
   private static final String STARTBROWSE_ACTIVITY_VALID = "STARTBROWSE ACTIVITY ACTIVITYID({$varOne}) BROWSETOKEN({$varOne})";
   private static final String STARTBROWSE_CONTAINER_VALID = "STARTBROWSE CONTAINER PROCESS({$varOne}) PROCESSTYPE({$varOne}) BROWSETOKEN({$varOne})";
   private static final String STARTBROWSE_EVENT_VALID = "STARTBROWSE EVENT ACTIVITYID({$varOne}) BROWSETOKEN({$varOne})";
@@ -43,6 +64,11 @@ public class TestCicsExciStartBrowseStatement {
   private static final String STARTBROWSE_INVALID_PROCESS = "STARTBROWSE {_PROCESS BROWSETOKEN({$varOne} )|errorOne_}";
 
   // Test Functions
+  @Test
+  void testEXCIvariant() {
+    UseCaseEngine.runTest(EXCI_TEXT, ImmutableList.of(), ImmutableMap.of());
+  }
+
   @Test
   void testStartBrowseActivity() {
     CICSTestUtils.noErrorTest(STARTBROWSE_ACTIVITY_VALID);
