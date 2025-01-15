@@ -14,9 +14,8 @@
  */
 package org.eclipse.lsp.cobol.extendedapi;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.ToNumberPolicy;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -30,6 +29,7 @@ import org.eclipse.lsp.cobol.common.AnalysisResult;
 import org.eclipse.lsp.cobol.service.DocumentModelService;
 import org.eclipse.lsp.cobol.test.engine.UseCase;
 import org.eclipse.lsp.cobol.test.engine.UseCaseUtils;
+import org.eclipse.lsp4j.jsonrpc.json.MessageJsonHandler;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -38,12 +38,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 /** Test for @link({@link CFASTBuilderImpl}. */
 @Slf4j
 class CFASTBuilderTest {
-  private static final Gson GSON =
-      new GsonBuilder()
-          .setPrettyPrinting()
-          .setObjectToNumberStrategy(ToNumberPolicy.LONG_OR_DOUBLE)
-          .create();
-
   static Stream<Arguments> casesToTest() throws IOException {
     return Files.list(Paths.get("src", "test", "resources", "cfast"))
         .filter(p -> p.toString().endsWith(".cbl"))
@@ -69,11 +63,14 @@ class CFASTBuilderTest {
     DocumentModelService documentModelService = new DocumentModelService();
     documentModelService.openDocument("fake/path", src, "COBOL");
     CFASTBuilder builder = new CFASTBuilderImpl(documentModelService);
+    MessageJsonHandler handler = new MessageJsonHandler(ImmutableMap.of());
+    Gson gson = handler.getGson();
+
     Assertions.assertEquals(
-        GSON.toJson(GSON.fromJson(jsonTree, List.class)),
-        GSON.toJson(
-            GSON.fromJson(
-                GSON.toJson(builder.build(analysisResult.getRootNode().findFirstProgramNode()).getControlFlowAST()),
+        gson.toJson(gson.fromJson(jsonTree, List.class)),
+        gson.toJson(
+            gson.fromJson(
+                gson.toJson(builder.build(analysisResult.getRootNode().findFirstProgramNode()).getControlFlowAST()),
                 List.class)));
   }
 
