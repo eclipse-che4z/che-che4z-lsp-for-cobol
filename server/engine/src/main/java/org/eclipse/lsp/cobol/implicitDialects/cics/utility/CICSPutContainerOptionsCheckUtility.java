@@ -48,7 +48,7 @@ public class CICSPutContainerOptionsCheckUtility extends CICSOptionsCheckBaseUti
                 put(CICSLexer.BIT, ErrorSeverity.WARNING);
                 put(CICSLexer.CHAR, ErrorSeverity.WARNING);
                 put(CICSLexer.PREPEND, ErrorSeverity.WARNING);
-                put(CICSLexer.PROCESS, ErrorSeverity.WARNING)
+                put(CICSLexer.PROCESS, ErrorSeverity.WARNING);
             }
         };
 
