@@ -45,6 +45,7 @@ public class FunctionUsageReferenceEnricher implements Processor<QualifiedRefere
     for (Node child : node.getChildren()) {
       if (child.getNodeType() == NodeType.VARIABLE_USAGE) {
           usageNodes.add((VariableUsageNode) child);
+          break;
       }
     }
 

@@ -116,9 +116,7 @@ public abstract class Node {
       if (nodePredicate.test(node)) {
         result.add(node);
       }
-      for (Node child : node.getChildren()) {
-        queue.addFirst(child);
-      }
+      queue.addAll(0, node.getChildren());
     }
     return result;
   }
@@ -132,22 +130,13 @@ public abstract class Node {
     if (nodePredicate.test(this)) {
       return this;
     }
-    LinkedList<Node> queue = new LinkedList<>();
-    for (Node child: getChildren()) {
-      if (nodePredicate.test(child)) {
-        return child;
-      }
-      queue.add(child);
-    }
-
+    LinkedList<Node> queue = new LinkedList<>(getChildren());
     while (!queue.isEmpty()) {
       Node node = queue.remove();
-      for (Node child : node.getChildren()) {
-        if (nodePredicate.test(child)) {
-          return child;
-        }
-        queue.addFirst(child);
+      if (nodePredicate.test(node)) {
+        return node;
       }
+      queue.addAll(0, node.getChildren());
     }
     return null;
   }

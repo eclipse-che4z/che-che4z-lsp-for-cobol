@@ -461,15 +461,6 @@ public class SymbolAccumulator implements VariableAccumulator {
     }
     return VariableUsageUtils.findVariablesForUsage(symbolTable.getVariablesGlobalsMap(), usagePath);
   }
-  private Map<String, VariableNode> getMapOfGlobalVariables(ProgramNode programNode) {
-    Map<String, VariableNode> result = programNode.getProgram().map(this::getMapOfGlobalVariables).orElseGet(HashMap::new);
-    for (VariableNode variableNode : createOrGetSymbolTable(programNode).getVariables()) {
-      if (variableNode.isGlobal()) {
-        result.put(variableNode.getName(), variableNode);
-      }
-    }
-    return result;
-  }
 
   private FunctionInfo createImplicitFunctionInfo(String implicitFunctionName) {
     ProgramNode implicitProgramName = new ProgramNode(Locality.builder().uri("implicit://" + implicitFunctionName).build(), ProgramSubtype.Function, 0);

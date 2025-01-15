@@ -27,6 +27,7 @@ import org.eclipse.lsp.cobol.common.model.NodeType;
 import org.eclipse.lsp.cobol.common.model.tree.FileOperationStatementNode;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.model.tree.OpenStatementNode;
+import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.QualifiedReferenceNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableWithLevelNode;
@@ -90,7 +91,10 @@ public class FileOperationProcess implements Processor<FileOperationStatementNod
       List<FileOperationKind> expectedFileKind,
       ProcessingContext ctx,
       String messageTemplate) {
-    if (fileIsExternal(node)) {
+    if (ctx.getCurrentProgramNode() == null) {
+      return;
+    }
+    if (fileIsExternal(node, ctx.getCurrentProgramNode())) {
       return;
     }
     checkFileOpenedBeforeOperation(
@@ -102,15 +106,7 @@ public class FileOperationProcess implements Processor<FileOperationStatementNod
         messageTemplate);
   }
 
-  private boolean fileIsExternal(FileOperationStatementNode node) {
-    if (!node.getNearestParentByType(PROGRAM).isPresent()) {
-        return false;
-    }
-    Node programNode = node.getNearestParentByType(PROGRAM).orElse(null);
-    if (programNode == null) {
-      return false;
-    }
-
+  private boolean fileIsExternal(FileOperationStatementNode node, ProgramNode programNode) {
     Node fd = programNode.getDepthFirstFirstNode(n -> {
       if (n.getClass() != FileDescriptionNode.class) {
         return false;
