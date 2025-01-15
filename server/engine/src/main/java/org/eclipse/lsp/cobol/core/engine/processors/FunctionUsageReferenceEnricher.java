@@ -41,19 +41,18 @@ public class FunctionUsageReferenceEnricher implements Processor<QualifiedRefere
     if (ctx.getCurrentProgramNode() == null) {
       return;
     }
-    List<VariableUsageNode> usageNodes = new ArrayList<>();
+
+    VariableUsageNode dataNameNode = null;
     for (Node child : node.getChildren()) {
       if (child.getNodeType() == NodeType.VARIABLE_USAGE) {
-          usageNodes.add((VariableUsageNode) child);
-          break;
+        dataNameNode = (VariableUsageNode) child;
+        break;
       }
     }
 
-    if (usageNodes.isEmpty()) {
+    if (dataNameNode == null) {
       return;
     }
-
-    VariableUsageNode dataNameNode = usageNodes.get(0);
 
     // If definition of a data node is present, this signifies that this dataNode already has a variable definition
     // and shouldn't try to enrich it further.
