@@ -34,15 +34,15 @@ import java.util.*;
 public class TestCicsPutContainerStatement {
 
     // Test Strings
-    private static final String PUT_BTS_VALID_1 = "PUT CONTAINER(123) ACTIVITY(123) FROM(123) FLENGTH(123)";
-    private static final String PUT_BTS_VALID_2 = "PUT CONTAINER(123) ACQACTIVITY FROM(123)";
+    private static final String PUT_BTS_VALID_1 = "PUT CONTAINER({$varOne}) ACTIVITY({$varOne}) FROM({$varOne}) FLENGTH({$varOne})";
+    private static final String PUT_BTS_VALID_2 = "PUT CONTAINER({$varOne}) ACQACTIVITY FROM({$varOne})";
 
-    private static final String PUT_CHANNEL_VALID_1 = "PUT CONTAINER(123) CHANNEL(123) FROM(123) FLENGTH(123) BIT FROMCCSID(123) APPEND";
-    private static final String PUT_CHANNEL_VALID_2 = "PUT CONTAINER(123) FROM(123)";
+    private static final String PUT_CHANNEL_VALID_1 = "PUT CONTAINER({$varOne}) CHANNEL({$varOne}) FROM({$varOne}) FLENGTH({$varOne}) BIT FROMCCSID({$varOne}) APPEND";
+    private static final String PUT_CHANNEL_VALID_2 = "PUT CONTAINER({$varOne}) FROM({$varOne})";
 
-    private static final String PUT_BTS_INVALID = "PUT CONTAINER(123) ACTIVITY(123) {ACQACTIVITY|errorOne} FROM(123) FLENGTH(123)";
-    private static final String PUT_CHANNEL_INVALID = "PUT CONTAINER(123) CHANNEL(123) FROM(123) FLENGTH(123) BIT {DATATYPE|errorOne}(123) APPEND";
-    private static final String PUT_BTS_INVALID_2 = "PUT CONTAINER(123) {ACQACTIVITY|errorOne}";
+    private static final String PUT_BTS_INVALID = "PUT CONTAINER({$varOne}) ACTIVITY({$varOne}) {ACQACTIVITY|errorOne} FROM({$varOne}) FLENGTH({$varOne})";
+    private static final String PUT_CHANNEL_INVALID = "PUT CONTAINER({$varOne}) CHANNEL({$varOne}) FROM({$varOne}) FLENGTH({$varOne}) BIT {DATATYPE|errorOne}({$varOne}) APPEND";
+    private static final String PUT_BTS_INVALID_2 = "PUT CONTAINER({$varOne}) {ACQACTIVITY|errorOne}";
 
     // Test Functions
     @Test
