@@ -33,14 +33,22 @@ public class CICSPutContainerOptionsCheckUtility extends CICSOptionsCheckBaseUti
     private static final Map<Integer, ErrorSeverity> DUPLICATE_CHECK_OPTIONS =
         new HashMap<Integer, ErrorSeverity>() {
             {
-                put(CICSLexer.PUT, ErrorSeverity.ERROR);
-                put(CICSLexer.CONTAINER, ErrorSeverity.ERROR);
-                put(CICSLexer.ACTIVITY, ErrorSeverity.ERROR);
                 put(CICSLexer.ACQACTIVITY, ErrorSeverity.ERROR);
-                put(CICSLexer.PROCESS, ErrorSeverity.ERROR);
-                put(CICSLexer.ACQPROCESS, ErrorSeverity.ERROR);
-                put(CICSLexer.FROM, ErrorSeverity.ERROR);
+                put(CICSLexer.ACTIVITY, ErrorSeverity.ERROR);
+                put(CICSLexer.CHANNEL, ErrorSeverity.ERROR);
+                put(CICSLexer.CONTAINER, ErrorSeverity.ERROR);
+                put(CICSLexer.DATATYPE, ErrorSeverity.ERROR);
                 put(CICSLexer.FLENGTH, ErrorSeverity.ERROR);
+                put(CICSLexer.FROM, ErrorSeverity.ERROR);
+                put(CICSLexer.FROMCCSID, ErrorSeverity.ERROR);
+                put(CICSLexer.FROMCODEPAGE, ErrorSeverity.ERROR);
+
+                put(CICSLexer.ACQPROCESS, ErrorSeverity.WARNING);
+                put(CICSLexer.APPEND, ErrorSeverity.WARNING);
+                put(CICSLexer.BIT, ErrorSeverity.WARNING);
+                put(CICSLexer.CHAR, ErrorSeverity.WARNING);
+                put(CICSLexer.PREPEND, ErrorSeverity.WARNING);
+                put(CICSLexer.PROCESS, ErrorSeverity.WARNING)
             }
         };
 
