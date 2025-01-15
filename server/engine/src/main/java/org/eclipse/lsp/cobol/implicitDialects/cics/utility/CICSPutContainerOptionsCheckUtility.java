@@ -62,6 +62,10 @@ public class CICSPutContainerOptionsCheckUtility extends CICSOptionsCheckBaseUti
      * @param <E> A subclass of ParserRuleContext
      */
     public <E extends ParserRuleContext> void checkOptions(E ctx) {
+        CICSParser.Cics_put_containerContext mainCtx = (CICSParser.Cics_put_containerContext) ctx.getParent();
+        if (mainCtx.getRuleIndex() == RULE_INDEX)
+            checkHasIllegalOptions(mainCtx.PUT64(), "PUT64 is only available in Assembly");
+
         switch (ctx.getRuleIndex()) {
             case CICSParser.RULE_cics_put_container_bts:
                 checkBTS((CICSParser.Cics_put_container_btsContext) ctx);

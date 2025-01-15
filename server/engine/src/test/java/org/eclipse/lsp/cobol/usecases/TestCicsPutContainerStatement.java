@@ -39,6 +39,7 @@ public class TestCicsPutContainerStatement {
 
     private static final String PUT_CHANNEL_VALID_1 = "PUT CONTAINER({$varOne}) CHANNEL({$varOne}) FROM({$varOne}) FLENGTH({$varOne}) BIT FROMCCSID({$varOne}) APPEND";
     private static final String PUT_CHANNEL_VALID_2 = "PUT CONTAINER({$varOne}) FROM({$varOne})";
+    private static final String PUT64_CHANNEL = "{PUT64|errorOne} CONTAINER({$varOne}) FROM({$varOne})";
 
     private static final String PUT_BTS_INVALID = "PUT CONTAINER({$varOne}) ACTIVITY({$varOne}) {ACQACTIVITY|errorOne} FROM({$varOne}) FLENGTH({$varOne})";
     private static final String PUT_CHANNEL_INVALID = "PUT CONTAINER({$varOne}) CHANNEL({$varOne}) FROM({$varOne}) FLENGTH({$varOne}) BIT {DATATYPE|errorOne}({$varOne}) APPEND";
@@ -58,6 +59,13 @@ public class TestCicsPutContainerStatement {
     }
 
     // Invalid Tests
+    @Test
+    void testPut64() {
+        HashMap<String, Diagnostic> expectedDiagnostics = new HashMap<>();
+        expectedDiagnostics.put("errorOne", new Diagnostic(new Range(), "Invalid option provided: PUT64 is only available in Assembly", DiagnosticSeverity.Error, ErrorSource.PARSING.getText()));
+        CICSTestUtils.errorTest(PUT64_CHANNEL, expectedDiagnostics);
+    }
+
     @Test
     void testBTSInvalid() {
         HashMap<String, Diagnostic> expectedDiagnostics = new HashMap<>();

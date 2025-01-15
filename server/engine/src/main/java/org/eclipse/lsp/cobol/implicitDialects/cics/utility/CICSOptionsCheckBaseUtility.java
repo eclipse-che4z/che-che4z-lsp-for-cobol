@@ -179,6 +179,12 @@ public abstract class CICSOptionsCheckBaseUtility {
         }
     }
 
+    protected <E extends ParseTree> void checkHasIllegalOptions(E rule, String options) {
+        if (rule != null) {
+            throwException(ErrorSeverity.ERROR, getLocality(rule), "Invalid option provided: ", options);
+        }
+    }
+
     /**
      * Helper function to check and see if more than one rule was visited out of a set provided.
      *
