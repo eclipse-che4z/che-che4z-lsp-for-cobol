@@ -33,7 +33,6 @@ public class CICSPutContainerOptionsCheckUtility extends CICSOptionsCheckBaseUti
     private static final Map<Integer, ErrorSeverity> DUPLICATE_CHECK_OPTIONS =
         new HashMap<Integer, ErrorSeverity>() {
             {
-                put(CICSLexer.ACQACTIVITY, ErrorSeverity.ERROR);
                 put(CICSLexer.ACTIVITY, ErrorSeverity.ERROR);
                 put(CICSLexer.CHANNEL, ErrorSeverity.ERROR);
                 put(CICSLexer.CONTAINER, ErrorSeverity.ERROR);
@@ -43,6 +42,7 @@ public class CICSPutContainerOptionsCheckUtility extends CICSOptionsCheckBaseUti
                 put(CICSLexer.FROMCCSID, ErrorSeverity.ERROR);
                 put(CICSLexer.FROMCODEPAGE, ErrorSeverity.ERROR);
 
+                put(CICSLexer.ACQACTIVITY, ErrorSeverity.WARNING);
                 put(CICSLexer.ACQPROCESS, ErrorSeverity.WARNING);
                 put(CICSLexer.APPEND, ErrorSeverity.WARNING);
                 put(CICSLexer.BIT, ErrorSeverity.WARNING);
@@ -79,6 +79,7 @@ public class CICSPutContainerOptionsCheckUtility extends CICSOptionsCheckBaseUti
     private void checkBTS(CICSParser.Cics_put_container_btsContext ctx) {
         checkMutuallyExclusiveOptions("ACTIVITY, ACQACTIVITY, PROCESS or ACQPROCESS", ctx.ACTIVITY(), ctx.ACQACTIVITY(), ctx.PROCESS(), ctx.ACQPROCESS());
         checkHasMandatoryOptions(ctx.FROM(), ctx, "FROM");
+        checkHasMandatoryOptions(ctx.CONTAINER(), ctx, "CONTAINER");
     }
 
     private void checkChannel(CICSParser.Cics_put_container_channelContext ctx) {
@@ -88,6 +89,7 @@ public class CICSPutContainerOptionsCheckUtility extends CICSOptionsCheckBaseUti
         checkMutuallyExclusiveOptions("APPEND or PREPEND", ctx.APPEND(), ctx.PREPEND());
 
         checkHasMandatoryOptions(ctx.FROM(), ctx, "FROM");
+        checkHasMandatoryOptions(ctx.CONTAINER(), ctx, "CONTAINER");
     }
 
 }

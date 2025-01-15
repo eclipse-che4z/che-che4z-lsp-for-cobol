@@ -42,7 +42,7 @@ public class TestCicsPutContainerStatement {
 
     private static final String PUT_BTS_INVALID = "PUT CONTAINER({$varOne}) ACTIVITY({$varOne}) {ACQACTIVITY|errorOne} FROM({$varOne}) FLENGTH({$varOne})";
     private static final String PUT_CHANNEL_INVALID = "PUT CONTAINER({$varOne}) CHANNEL({$varOne}) FROM({$varOne}) FLENGTH({$varOne}) BIT {DATATYPE|errorOne}({$varOne}) APPEND";
-    private static final String PUT_BTS_INVALID_2 = "PUT CONTAINER({$varOne}) {ACQACTIVITY|errorOne}";
+    private static final String PUT_BTS_INVALID_2 = "PUT {_CONTAINER({$varOne}) ACQACTIVITY|errorOne_}";
 
     // Test Functions
     @Test
