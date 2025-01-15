@@ -15,10 +15,7 @@
 
 package org.eclipse.lsp.cobol.usecases;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
-import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.eclipse.lsp.cobol.usecases.common.CICSTestUtils;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
@@ -36,66 +33,43 @@ import java.util.*;
  */
 
 public class TestCICSSoapfaultStatement {
-    // Main Building Blocks
-    private static final String BASE_TEXT =
-            "       IDENTIFICATION DIVISION.\n"
-                    + "       PROGRAM-ID. ABCDEF.\n"
-                    + "       DATA DIVISION.\n"
-                    + "       WORKING-STORAGE SECTION.\n"
-                    + "       PROCEDURE DIVISION.\n"
-                    + "            EXEC CICS \n"
-                    + "            END-EXEC.";
-
     // Test Strings
     private static final String SOAPFAULT_DELETE_VALID = "SOAPFAULT DELETE";
 
-    private static final String SOAPFAULT_ADD_1 = "SOAPFAULT ADD FAULTSTRING(123) FAULTSTRLEN(123) NATLANG(123) FROMCCSID(123)";
-    private static final String SOAPFAULT_ADD_2 = "SOAPFAULT ADD FAULTSTRING(123)";
+    private static final String SOAPFAULT_ADD_1 = "SOAPFAULT ADD FAULTSTRING({$varOne}) FAULTSTRLEN({$varOne}) NATLANG({$varOne}) FROMCCSID({$varOne})";
+    private static final String SOAPFAULT_ADD_2 = "SOAPFAULT ADD FAULTSTRING({$varOne})";
 
-    private static final String SOAPFAULT_CREATE_1 = "SOAPFAULT CREATE FAULTCODE(123) FAULTSTRING(123) FAULTSTRLEN(123) NATLANG(123) ROLE(123) ROLELENGTH(123) FAULTACTOR(123) FAULTACTLEN(123) DETAIL(123) DETAILLENGTH(123) FROMCCSID(123)";
-    private static final String SOAPFAULT_CREATE_2 = "SOAPFAULT CREATE CLIENT FAULTSTRING(123)";
+    private static final String SOAPFAULT_CREATE_1 = "SOAPFAULT CREATE FAULTCODE({$varOne}) FAULTSTRING({$varOne}) FAULTSTRLEN({$varOne}) NATLANG({$varOne}) ROLE({$varOne}) ROLELENGTH({$varOne}) FAULTACTOR({$varOne}) FAULTACTLEN({$varOne}) DETAIL({$varOne}) DETAILLENGTH({$varOne}) FROMCCSID({$varOne})";
+    private static final String SOAPFAULT_CREATE_2 = "SOAPFAULT CREATE CLIENT FAULTSTRING({$varOne})";
 
     // Invalid Tests
-    private static final String SOAPFAULT_DELETE_INVALID = "SOAPFAULT DELETE {FILE|errorOne}(123)";
-    private static final String SOAPFAULT_ADD_INVALID = "SOAPFAULT ADD FAULTSTRING(123) {SUBCODESTR|errorOne}(123)";
-    private static final String SOAPFAULT_CREATE_INVALID = "SOAPFAULT CREATE {CLIENT|errorOne} FAULTCODESTR(123) FAULTSTRING(123)";
-
-    // Utility Functions
-    private static void noErrorTest(String newCommand) {
-        UseCaseEngine.runTest(getTestString(newCommand), ImmutableList.of(), ImmutableMap.of());
-    }
-
-    private static String getTestString(String newCommand) {
-        List<String> instances = Arrays.asList(newCommand.split("\\s"));
-        instances.replaceAll(String.join("", Collections.nCopies(12, " "))::concat);
-        ArrayList<String> base = new ArrayList<String>(Arrays.asList(BASE_TEXT.split("\n")));
-        base.addAll(base.size() - 1, instances);
-        return String.join("\n", base);
-    }
+    private static final String SOAPFAULT_DELETE_INVALID = "SOAPFAULT DELETE {CLIENT|errorOne}";
+    private static final String SOAPFAULT_ADD_INVALID = "SOAPFAULT ADD FAULTSTRING({$varOne}) {SUBCODESTR|errorOne}({$varOne})";
+    private static final String SOAPFAULT_CREATE_INVALID = "SOAPFAULT CREATE {CLIENT|errorOne} FAULTCODESTR({$varOne}) FAULTSTRING({$varOne})";
 
     // Valid Test Cases
     @Test
     void testDelete() {
-        noErrorTest(SOAPFAULT_DELETE_VALID);
+        CICSTestUtils.noErrorTest(SOAPFAULT_DELETE_VALID);
     }
 
     @Test
     void testAdd() {
-        noErrorTest(SOAPFAULT_ADD_1);
-        noErrorTest(SOAPFAULT_ADD_2);
+        CICSTestUtils.noErrorTest(SOAPFAULT_ADD_1);
+        CICSTestUtils.noErrorTest(SOAPFAULT_ADD_2);
     }
 
     @Test
     void testCreate() {
-        noErrorTest(SOAPFAULT_CREATE_1);
-        noErrorTest(SOAPFAULT_CREATE_2);
+        CICSTestUtils.noErrorTest(SOAPFAULT_CREATE_1);
+        CICSTestUtils.noErrorTest(SOAPFAULT_CREATE_2);
     }
 
     // Invalid Tests
     @Test
     void testDeleteInvalid() {
         HashMap<String, Diagnostic> expectedDiagnostics = new HashMap<>();
-        expectedDiagnostics.put("errorOne", new Diagnostic(new Range(), "Extraneous input FILE", DiagnosticSeverity.Error, ErrorSource.PARSING.getText()));
+        expectedDiagnostics.put("errorOne", new Diagnostic(new Range(), "Extraneous input CLIENT", DiagnosticSeverity.Error, ErrorSource.PARSING.getText()));
         CICSTestUtils.errorTest(SOAPFAULT_DELETE_INVALID, expectedDiagnostics);
     }
 

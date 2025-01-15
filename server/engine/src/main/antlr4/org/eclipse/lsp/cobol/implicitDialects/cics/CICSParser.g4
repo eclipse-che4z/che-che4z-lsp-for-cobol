@@ -784,7 +784,7 @@ cics_signon: SIGNON (USERID cics_data_value | ESMREASON cics_data_area | ESMRESP
 /** SOAPFAULT ADD / CREATE / DELETE */
 cics_soapfault: SOAPFAULT (cics_soapfault_add | cics_soapfault_create | DELETE cics_handle_response*);
 cics_soapfault_add: ADD ((FAULTSTRING | FAULTSTRLEN |NATLANG | SUBCODESTR | SUBCODELEN | FROMCCSID) cics_data_value | cics_handle_response)+;
-cics_soapfault_create: CREATE ((CLIENT | SERVER | SENDER | RECEIVER | NATLANG) | (FAULTCODESTR | FAULTCODELEN | FAULTSTRING | FAULTSTRLEN | NATLANG | ROLE | ROLELENGTH | FAULTACTOR | FAULTACTLEN | DETAIL | DETAILLENGTH | FROMCCSID) cics_data_value
+cics_soapfault_create: CREATE ((CLIENT | SERVER | SENDER | RECEIVER) | (FAULTCODESTR | FAULTCODELEN | FAULTSTRING | FAULTSTRLEN | NATLANG | ROLE | ROLELENGTH | FAULTACTOR | FAULTACTLEN | DETAIL | DETAILLENGTH | FROMCCSID) cics_data_value
                         | (FAULTCODE) cics_cvda | cics_handle_response)+;
 
 /** SPOOLCLOSE */
