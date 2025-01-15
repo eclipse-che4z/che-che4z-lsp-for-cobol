@@ -25,6 +25,7 @@ import java.util.*;
 
 import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_signon;
 import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_signon_body;
+import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_signon_token_body;
 
 /** Checks CICS SIGNON rules for required and invalid options */
 public class CICSSignonOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
@@ -34,26 +35,33 @@ public class CICSSignonOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     private static final Map<Integer, ErrorSeverity> DUPLICATE_CHECK_OPTIONS =
         new HashMap<Integer, ErrorSeverity>() {
             {
-                put(CICSLexer.USERID, ErrorSeverity.ERROR);
+                put(CICSLexer.BASE64, ErrorSeverity.WARNING);
+                put(CICSLexer.BIT, ErrorSeverity.WARNING);
                 put(CICSLexer.CHANGETIME, ErrorSeverity.ERROR);
+                put(CICSLexer.DATATYPE, ErrorSeverity.ERROR);
                 put(CICSLexer.DAYSLEFT, ErrorSeverity.ERROR);
                 put(CICSLexer.ESMREASON, ErrorSeverity.ERROR);
                 put(CICSLexer.ESMRESP, ErrorSeverity.ERROR);
                 put(CICSLexer.EXPIRYTIME, ErrorSeverity.ERROR);
                 put(CICSLexer.GROUPID, ErrorSeverity.ERROR);
                 put(CICSLexer.INVALIDCOUNT, ErrorSeverity.ERROR);
-                put(CICSLexer.LANGUAGECODE, ErrorSeverity.ERROR);
-                put(CICSLexer.NATLANG, ErrorSeverity.ERROR);
+                put(CICSLexer.KERBEROS, ErrorSeverity.WARNING);
                 put(CICSLexer.LANGINUSE, ErrorSeverity.ERROR);
+                put(CICSLexer.LANGUAGECODE, ErrorSeverity.ERROR);
                 put(CICSLexer.LASTUSETIME, ErrorSeverity.ERROR);
+                put(CICSLexer.NATLANG, ErrorSeverity.ERROR);
                 put(CICSLexer.NATLANGINUSE, ErrorSeverity.ERROR);
-                put(CICSLexer.PASSWORD, ErrorSeverity.ERROR);
                 put(CICSLexer.NEWPASSWORD, ErrorSeverity.ERROR);
-                put(CICSLexer.PHRASE, ErrorSeverity.ERROR);
-                put(CICSLexer.PHRASELEN, ErrorSeverity.ERROR);
                 put(CICSLexer.NEWPHRASE, ErrorSeverity.ERROR);
                 put(CICSLexer.NEWPHRASELEN, ErrorSeverity.ERROR);
                 put(CICSLexer.OIDCARD, ErrorSeverity.ERROR);
+                put(CICSLexer.PASSWORD, ErrorSeverity.ERROR);
+                put(CICSLexer.PHRASE, ErrorSeverity.ERROR);
+                put(CICSLexer.PHRASELEN, ErrorSeverity.ERROR);
+                put(CICSLexer.TOKEN, ErrorSeverity.ERROR);
+                put(CICSLexer.TOKENLEN, ErrorSeverity.ERROR);
+                put(CICSLexer.TOKENTYPE, ErrorSeverity.ERROR);
+                put(CICSLexer.USERID, ErrorSeverity.ERROR);
             }
         };
 
@@ -67,29 +75,37 @@ public class CICSSignonOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
      * @param <E> A subclass of ParserRuleContext
      */
     public <E extends ParserRuleContext> void checkOptions(E ctx) {
-        if (ctx.getRuleIndex() == RULE_cics_signon_body) {
-            checkRule((CICSParser.Cics_signon_bodyContext) ctx);
-            checkDuplicates(ctx);
+        switch (ctx.getRuleIndex()) {
+            case RULE_cics_signon_body:
+                checkMainBody((CICSParser.Cics_signon_bodyContext) ctx);
+                break;
+            case RULE_cics_signon_token_body:
+                checkToken((CICSParser.Cics_signon_token_bodyContext) ctx);
+                break;
+            default:
+                break;
         }
+        checkDuplicates(ctx);
     }
 
-    private void checkRule(CICSParser.Cics_signon_bodyContext ctx) {
+    private void checkMainBody(CICSParser.Cics_signon_bodyContext ctx) {
         checkHasMandatoryOptions(ctx.USERID(), ctx, "USERID");
 
-        if (!ctx.NEWPHRASE().isEmpty())
-            checkHasMandatoryOptions(ctx.NEWPHRASELEN(), ctx, "NEWPHRASELEN");
-
         checkMutuallyExclusiveOptions("LANGUAGECODE or NATLANG", ctx.LANGUAGECODE(), ctx.NATLANG());
-
         checkMutuallyExclusiveOptions("PASSWORD or PHRASE", ctx.PASSWORD(), ctx.PHRASE());
 
         checkPrerequisiteIsMet(ctx.PASSWORD(), ctx.NEWPASSWORD(), ctx, "NEWPASSWORD without PASSWORD");
-
         checkPrerequisiteIsMet(ctx.PHRASE(), ctx.PHRASELEN(), ctx, "PHRASELEN without PHRASE");
-
         checkPrerequisiteIsMet(ctx.PHRASE(), ctx.NEWPHRASE(), ctx, "NEWPHRASE without PHRASE");
-
         checkPrerequisiteIsMet(ctx.NEWPHRASE(), ctx.NEWPHRASELEN(), ctx, "NEWPHRASELEN without NEWPHRASE");
+    }
+
+    private void checkToken(CICSParser.Cics_signon_token_bodyContext ctx) {
+        checkHasExactlyOneOption("TOKENTYPE or KERBEROS", ctx, ctx.TOKENTYPE(), ctx.KERBEROS());
+        checkMutuallyExclusiveOptions("BIT, DATATYPE or BASE64", ctx.BIT(), ctx.DATATYPE(), ctx.BASE64());
+        checkMutuallyExclusiveOptions("LANGUAGECODE or NATLANG", ctx.LANGUAGECODE(), ctx.NATLANG());
+
+        checkPrerequisiteIsMet(ctx.TOKEN(), ctx.TOKENLEN(), ctx, "TOKENLEN without TOKEN");
     }
 
 }

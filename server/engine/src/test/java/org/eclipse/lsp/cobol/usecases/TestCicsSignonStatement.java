@@ -37,14 +37,26 @@ public class TestCicsSignonStatement {
     private static final String SIGNON_VALID_1 = "SIGNON USERID(123) CHANGETIME(123) DAYSLEFT(999) ESMREASON(123) ESMRESP(123) EXPIRYTIME(123) GROUPID(568) INVALIDCOUNT(2) LANGUAGECODE(123) LANGINUSE(1) LASTUSETIME(123) NATLANGINUSE(123) PHRASE(3) PHRASELEN(3) NEWPHRASE(123) NEWPHRASELEN(123) OIDCARD(123)";
     private static final String SIGNON_VALID_2 = "SIGNON USERID(123)";
 
+    private static final String SIGNONTOKEN_VALID_1 = "SIGNON TOKEN(123) TOKENLEN(123) KERBEROS";
+    private static final String SIGNONTOKEN_VALID_2 = "SIGNON TOKEN(123) TOKENLEN(123) TOKENTYPE(1) DATATYPE(1) GROUPID(1) LANGUAGECODE(1) LANGINUSE(1) NATLANGINUSE(1) ESMREASON(1) ESMRESP(1)";
+
     private static final String SIGNON_INVALID_1 = "SIGNON {CHANGETIME(123)|errorOne}";
     private static final String SIGNON_INVALID_2 = "SIGNON USERID(123) PASSWORD(123) {PHRASE|errorOne}(123)";
+
+    private static final String SIGNONTOKEN_INVALID_1 = "SIGNON TOKEN(123) TOKENLEN(123) {TOKENTYPE|errorOne}(1) {KERBEROS|errorTwo}";
+    private static final String SIGNONTOKEN_INVALID_2 = "SIGNON TOKEN(123) TOKENLEN(123) TOKENTYPE(1) BIT {BASE64|errorOne}";
 
     // Test Functions
     @Test
     void testCicsSignonValid() {
         CICSTestUtils.noErrorTest(SIGNON_VALID_1);
         CICSTestUtils.noErrorTest(SIGNON_VALID_2);
+    }
+
+    @Test
+    void testCicsSignonTokenValid() {
+        CICSTestUtils.noErrorTest(SIGNONTOKEN_VALID_1);
+        CICSTestUtils.noErrorTest(SIGNONTOKEN_VALID_2);
     }
 
     // Invalid Tests
@@ -60,6 +72,21 @@ public class TestCicsSignonStatement {
         HashMap<String, Diagnostic> expectedDiagnostics = new HashMap<>();
         expectedDiagnostics.put("errorOne", new Diagnostic(new Range(), "Options \"PASSWORD or PHRASE\" are mutually exclusive.", DiagnosticSeverity.Error, ErrorSource.PARSING.getText()));
         CICSTestUtils.errorTest(SIGNON_INVALID_2, expectedDiagnostics);
+    }
+
+    @Test
+    void testCicsSignonTokenInvalid_1() {
+        HashMap<String, Diagnostic> expectedDiagnostics = new HashMap<>();
+        expectedDiagnostics.put("errorOne", new Diagnostic(new Range(), "Exactly one option required, options are mutually exclusive: TOKENTYPE or KERBEROS", DiagnosticSeverity.Error, ErrorSource.PARSING.getText()));
+        expectedDiagnostics.put("errorTwo", new Diagnostic(new Range(), "Exactly one option required, options are mutually exclusive: TOKENTYPE or KERBEROS", DiagnosticSeverity.Error, ErrorSource.PARSING.getText()));
+        CICSTestUtils.errorTest(SIGNONTOKEN_INVALID_1, expectedDiagnostics);
+    }
+
+    @Test
+    void testCicsSignonTokenInvalid_2() {
+        HashMap<String, Diagnostic> expectedDiagnostics = new HashMap<>();
+        expectedDiagnostics.put("errorOne", new Diagnostic(new Range(), "Options \"BIT, DATATYPE or BASE64\" are mutually exclusive.", DiagnosticSeverity.Error, ErrorSource.PARSING.getText()));
+        CICSTestUtils.errorTest(SIGNONTOKEN_INVALID_2, expectedDiagnostics);
     }
 
 }
