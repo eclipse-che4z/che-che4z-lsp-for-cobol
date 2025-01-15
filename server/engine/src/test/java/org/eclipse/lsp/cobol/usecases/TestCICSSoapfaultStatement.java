@@ -44,8 +44,9 @@ public class TestCICSSoapfaultStatement {
 
     // Invalid Tests
     private static final String SOAPFAULT_DELETE_INVALID = "SOAPFAULT DELETE {CLIENT|errorOne}";
-    private static final String SOAPFAULT_ADD_INVALID = "SOAPFAULT ADD FAULTSTRING({$varOne}) {SUBCODESTR|errorOne}({$varOne})";
-    private static final String SOAPFAULT_CREATE_INVALID = "SOAPFAULT CREATE {CLIENT|errorOne} FAULTCODESTR({$varOne}) FAULTSTRING({$varOne})";
+    private static final String SOAPFAULT_DELETE_INVALID_2 = "SOAPFAULT DELETE DELETE {NORESP|errorOne}";
+    private static final String SOAPFAULT_ADD_INVALID = "SOAPFAULT ADD {FAULTSTRING|errorOne}({$varOne}) {SUBCODESTR|errorTwo}({$varOne})";
+    private static final String SOAPFAULT_CREATE_INVALID = "SOAPFAULT CREATE {CLIENT|errorOne} {FAULTCODESTR|errorTwo}({$varOne}) FAULTSTRING({$varOne})";
 
     // Valid Test Cases
     @Test
@@ -74,16 +75,25 @@ public class TestCICSSoapfaultStatement {
     }
 
     @Test
+    void testDeleteInvalid2() {
+        HashMap<String, Diagnostic> expectedDiagnostics = new HashMap<>();
+        expectedDiagnostics.put("errorOne", new Diagnostic(new Range(), "No viable alternative at input DELETE\n            NORESP", DiagnosticSeverity.Error, ErrorSource.PARSING.getText()));
+        CICSTestUtils.errorTest(SOAPFAULT_DELETE_INVALID_2, expectedDiagnostics);
+    }
+
+    @Test
     void testAddInvalid() {
         HashMap<String, Diagnostic> expectedDiagnostics = new HashMap<>();
-        expectedDiagnostics.put("errorOne", new Diagnostic(new Range(), "Options \"FAULTSTRING or SUBCODESTR\" are mutually exclusive.", DiagnosticSeverity.Error, ErrorSource.PARSING.getText()));
+        expectedDiagnostics.put("errorOne", new Diagnostic(new Range(), "Exactly one option required, options are mutually exclusive: FAULTSTRING or SUBCODESTR", DiagnosticSeverity.Error, ErrorSource.PARSING.getText()));
+        expectedDiagnostics.put("errorTwo", new Diagnostic(new Range(), "Exactly one option required, options are mutually exclusive: FAULTSTRING or SUBCODESTR", DiagnosticSeverity.Error, ErrorSource.PARSING.getText()));
         CICSTestUtils.errorTest(SOAPFAULT_ADD_INVALID, expectedDiagnostics);
     }
 
     @Test
     void testCreateInvalid() {
         HashMap<String, Diagnostic> expectedDiagnostics = new HashMap<>();
-        expectedDiagnostics.put("errorOne", new Diagnostic(new Range(), "Options \"FAULTCODESTR, CLIENT, SERVER, SENDER or RECEIVER\" are mutually exclusive.", DiagnosticSeverity.Error, ErrorSource.PARSING.getText()));
+        expectedDiagnostics.put("errorOne", new Diagnostic(new Range(), "Exactly one option required, options are mutually exclusive: FAULTCODE, FAULTCODESTR, CLIENT, SERVER, SENDER or RECEIVER", DiagnosticSeverity.Error, ErrorSource.PARSING.getText()));
+        expectedDiagnostics.put("errorTwo", new Diagnostic(new Range(), "Exactly one option required, options are mutually exclusive: FAULTCODE, FAULTCODESTR, CLIENT, SERVER, SENDER or RECEIVER", DiagnosticSeverity.Error, ErrorSource.PARSING.getText()));
         CICSTestUtils.errorTest(SOAPFAULT_CREATE_INVALID, expectedDiagnostics);
     }
 }

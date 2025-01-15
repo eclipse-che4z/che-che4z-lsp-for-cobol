@@ -50,6 +50,10 @@ public class CICSSoapfaultOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
                     put(CICSLexer.DETAIL, ErrorSeverity.ERROR);
                     put(CICSLexer.DETAILLENGTH, ErrorSeverity.ERROR);
                     put(CICSLexer.FROMCCSID, ErrorSeverity.ERROR);
+
+                    put(CICSLexer.DELETE, ErrorSeverity.ERROR);
+                    put(CICSLexer.CREATE, ErrorSeverity.ERROR);
+                    put(CICSLexer.ADD, ErrorSeverity.ERROR);
                 }
             };
 
@@ -63,7 +67,6 @@ public class CICSSoapfaultOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
      * @param <E> A subclass of ParserRuleContext
      */
     public <E extends ParserRuleContext> void checkOptions(E ctx) {
-        int rIndex = ctx.getRuleIndex();
         switch (ctx.getRuleIndex()) {
             case RULE_cics_soapfault_create:
                 checkCreate((CICSParser.Cics_soapfault_createContext) ctx);
@@ -79,7 +82,9 @@ public class CICSSoapfaultOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
     }
 
     private void checkCreate(CICSParser.Cics_soapfault_createContext ctx) {
-        checkMutuallyExclusiveOptions("FAULTCODESTR, CLIENT, SERVER, SENDER or RECEIVER", ctx.FAULTCODESTR(), ctx.CLIENT(), ctx.SERVER(), ctx.SENDER(), ctx.RECEIVER());
+        checkHasExactlyOneOption("FAULTCODE, FAULTCODESTR, CLIENT, SERVER, SENDER or RECEIVER", ctx, ctx.FAULTCODE(), ctx.FAULTCODESTR(), ctx.CLIENT(), ctx.SERVER(), ctx.SENDER(), ctx.RECEIVER());
+
+        checkHasMandatoryOptions(ctx.FAULTSTRING(), ctx, "FAULTSTRING");
 
         checkPrerequisiteIsMet(ctx.FAULTCODESTR(), ctx.FAULTCODELEN(), ctx, "FAULTCODELEN without FAULTCODESTR");
 
@@ -99,7 +104,7 @@ public class CICSSoapfaultOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
 
         checkPrerequisiteIsMet(ctx.SUBCODESTR(), ctx.SUBCODELEN(), ctx, "SUBCODELEN without SUBCODESTR");
 
-        checkMutuallyExclusiveOptions("FAULTSTRING or SUBCODESTR", ctx.FAULTSTRING(), ctx.SUBCODESTR());
+        checkHasExactlyOneOption("FAULTSTRING or SUBCODESTR", ctx, ctx.FAULTSTRING(), ctx.SUBCODESTR());
     }
 
 }
