@@ -25,9 +25,6 @@ import org.eclipse.lsp.cobol.common.processor.Processor;
 import org.eclipse.lsp.cobol.core.engine.symbols.FunctionInfo;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulator;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Enriches the @{@link QualifiedReferenceNode}'s children by replacing the Variable node
  * with @{@link FunctionReference} node.

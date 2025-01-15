@@ -447,7 +447,6 @@ public class SymbolAccumulator implements VariableAccumulator {
       return foundDefinitions;
     }
 
-//    return VariableUsageUtils.findVariablesForUsage(symbolTable.getVariablesGlobalsMap(), usagePath);
     return globalVariableSearch(symbolTable, usagePath);
   }
 
