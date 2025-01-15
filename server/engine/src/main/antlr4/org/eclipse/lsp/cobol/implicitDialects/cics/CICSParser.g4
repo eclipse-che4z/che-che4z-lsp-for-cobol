@@ -727,7 +727,7 @@ cics_signal: SIGNAL (EVENT cics_data_value | FROMCHANNEL cics_data_value | FROM 
 cics_signoff: SIGNOFF cics_handle_response?;
 
 /** SIGNON */
-cics_signon: SIGNON (cics_signon_body | cics_handle_response)+;
+cics_signon: SIGNON cics_signon_body;
 cics_signon_body: ((USERID | GROUPID | LANGUAGECODE | NATLANG | PASSWORD | NEWPASSWORD | PHRASELEN | NEWPHRASELEN | OIDCARD) cics_data_value |
                     (CHANGETIME | DAYSLEFT | ESMREASON | ESMRESP | EXPIRYTIME | INVALIDCOUNT | LANGINUSE | LASTUSETIME | NATLANGINUSE | PHRASE | NEWPHRASE) cics_data_area | cics_handle_response)+;
 
