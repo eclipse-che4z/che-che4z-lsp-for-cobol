@@ -17,14 +17,18 @@ package org.eclipse.lsp.cobol.core.model.extendedapi;
 import lombok.EqualsAndHashCode;
 import lombok.Value;
 
+import java.util.Optional;
+
 /** Data transport object of CF AST. InlinePerform type represents PERFORM UNTIL COBOL statement */
 @Value
 @EqualsAndHashCode(callSuper = true)
 public class InlinePerform extends CFASTNode {
-  PerformUntilType performUntilType;
+  String performUntilType;
 
   public InlinePerform(Location location, PerformUntilType performUntilType) {
     super(CFASTNodeType.INLINE_PERFORM.getValue(), location);
-    this.performUntilType = performUntilType;
+    this.performUntilType = Optional.ofNullable(performUntilType)
+        .map(PerformUntilType::name)
+        .orElse(null);
   }
 }
