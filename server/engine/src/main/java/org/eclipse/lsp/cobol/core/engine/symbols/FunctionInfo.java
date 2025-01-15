@@ -25,22 +25,24 @@ import java.util.List;
 /**
  * Information related to function definition and references
  */
-public class FunctionInfo {
-    ProgramNode node;
-    List<Location> usage = new ArrayList<>();
+public final class FunctionInfo {
+    @Getter
+    private final ProgramNode programNode;
+    private final List<Location> usage = new ArrayList<>();
 
     @Getter
-    boolean isImplicit;
+    private final boolean isImplicit;
 
     public FunctionInfo() {
+        this(null, false);
     }
 
-    public FunctionInfo(ProgramNode node) {
-        this(node, false);
+    public FunctionInfo(ProgramNode programNode) {
+        this(programNode, false);
     }
 
-    public FunctionInfo(ProgramNode node, boolean isImplicit) {
-        this.node = node;
+    public FunctionInfo(ProgramNode programNode, boolean isImplicit) {
+        this.programNode = programNode;
         this.isImplicit = isImplicit;
     }
 
@@ -50,10 +52,10 @@ public class FunctionInfo {
      * @return Definitions
      */
     public List<Location> getDefinition() {
-        if (node == null)
+        if (programNode == null)
             return ImmutableList.of();
         else
-            return ImmutableList.of(node.getLocality().toLocation());
+            return ImmutableList.of(programNode.getLocality().toLocation());
     }
 
     /**

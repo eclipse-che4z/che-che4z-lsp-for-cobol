@@ -259,9 +259,9 @@ public class SymbolAccumulator implements VariableAccumulator {
             .map(repo -> repo.get(functionName))
             .orElse(null);
     FunctionInfo fi = getFunctionInfo(functionName, isImplicit != null, isImplicit != null && isImplicit);
-    fi.usage.add(function.getLocality().toLocation());
+    fi.getReferences().add(function.getLocality().toLocation());
     function.setDefinitions(fi.getDefinition());
-    if (fi.node == null || fi.node.getOrdinal() > callingProgram.getOrdinal()) {
+    if (fi.getProgramNode() == null || fi.getProgramNode().getOrdinal() > callingProgram.getOrdinal()) {
       return Optional.of(
           SyntaxError.syntaxError()
               .errorSource(ErrorSource.PARSING)
@@ -284,7 +284,7 @@ public class SymbolAccumulator implements VariableAccumulator {
     assert function.getSubtype() == ProgramSubtype.Function;
     String functionName = function.getProgramName().toUpperCase();
     FunctionInfo fi = userDefinedFunctions.computeIfAbsent(functionName, (String) -> new FunctionInfo(function));
-    if (fi.node != function) {
+    if (fi.getProgramNode() != function) {
       return Optional.of(
           SyntaxError.syntaxError()
               .errorSource(ErrorSource.PARSING)
