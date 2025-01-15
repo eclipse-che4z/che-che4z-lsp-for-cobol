@@ -47,7 +47,7 @@ public abstract class VariableNode extends Node implements DefinedAndUsedStructu
   @Getter private final VariableType variableType;
   @Getter private final String name;
   @Getter @Setter private boolean global;
-  @EqualsAndHashCode.Exclude private final LinkedHashSet<Location> usages = new LinkedHashSet<>();
+  @Getter @EqualsAndHashCode.Exclude private final List<Location> usages = new ArrayList<>();
 
   protected VariableNode(
       Locality location, String name, VariableType variableType, boolean global) {
@@ -186,11 +186,6 @@ public abstract class VariableNode extends Node implements DefinedAndUsedStructu
         .map(displayString -> prepend(PREFIX, displayString))
         .forEach(result::add);
     return String.join("\n", result);
-  }
-
-  @Override
-  public List<Location> getUsages() {
-    return new ArrayList<>(usages);
   }
 
   private static String prepend(String prefix, String text) {

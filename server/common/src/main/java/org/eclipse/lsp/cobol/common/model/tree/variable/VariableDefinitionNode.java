@@ -38,7 +38,6 @@ import java.util.stream.Stream;
 @Getter
 @ToString(callSuper = true)
 @SuppressWarnings("squid:S107")
-//@EqualsAndHashCode(callSuper = true)
 public final class VariableDefinitionNode extends Node {
   private static final String SPACES_AFTER_NEWLINE_REGEX = "[\\r\\n|\\r|\\n]\\s+";
   private final int level;
