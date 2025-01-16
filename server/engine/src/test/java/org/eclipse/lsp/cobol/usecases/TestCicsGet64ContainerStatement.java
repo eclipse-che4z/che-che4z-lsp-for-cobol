@@ -34,13 +34,13 @@ import java.util.*;
 public class TestCicsGet64ContainerStatement {
 
     // Test Strings
-    private static final String GET64CONTAINER_VALID_1 = "GET64 CONTAINER(123) INTO(123) FLENGTH(123) BYTEOFFSET(8) CONVERTST(123) CCSID(123)";
-    private static final String GET64CONTAINER_VALID_2 = "GET64 CONTAINER(123) NODATA FLENGTH(123)";
+    private static final String GET64CONTAINER_VALID_1 = "GET64 CONTAINER({$varOne}) INTO({$varOne}) FLENGTH({$varOne}) BYTEOFFSET({$varOne}) CONVERTST({$varOne}) CCSID({$varOne})";
+    private static final String GET64CONTAINER_VALID_2 = "GET64 CONTAINER({$varOne}) NODATA FLENGTH({$varOne})";
 
-    private static final String GET64CONTAINER_INVALID_1 = "GET64 CONTAINER(123) INTO(123) {NODATA|errorOne} FLENGTH(123)";
-    private static final String GET64CONTAINER_INVALID_2 = "GET64 CONTAINER(123) NODATA FLENGTH(123) {BYTEOFFSET|errorOne}(123)";
-    private static final String GET64CONTAINER_INVALID_3 = "GET64 {_CONTAINER(123) NODATA FLENGTH(123) CCSID(123)|errorOne_}";
-    private static final String GET64CONTAINER_INVALID_4 = "GET64 CONTAINER(123) INTO(123) FLENGTH(123) BYTEOFFSET(8) {CONVERTST|errorOne}(123) INTOCODEPAGE(1) CCSID(123)";;
+    private static final String GET64CONTAINER_INVALID_1 = "GET64 CONTAINER({$varOne}) INTO({$varOne}) {NODATA|errorOne} FLENGTH({$varOne})";
+    private static final String GET64CONTAINER_INVALID_2 = "GET64 CONTAINER({$varOne}) NODATA FLENGTH({$varOne}) {BYTEOFFSET|errorOne}({$varOne})";
+    private static final String GET64CONTAINER_INVALID_3 = "GET64 {_CONTAINER({$varOne}) NODATA FLENGTH({$varOne}) CCSID({$varOne} )|errorOne_}";
+    private static final String GET64CONTAINER_INVALID_4 = "GET64 CONTAINER({$varOne}) INTO({$varOne}) FLENGTH({$varOne}) BYTEOFFSET({$varOne}) {CONVERTST|errorOne}({$varOne}) INTOCODEPAGE({$varOne}) CCSID({$varOne})";;
 
     // Test Functions
     @Test
