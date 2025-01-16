@@ -18,7 +18,6 @@ package org.eclipse.lsp.cobol.core.visitor;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.text.similarity.LevenshteinDistance;
 
-import java.util.ArrayList;
 import java.util.Optional;
 
 import static java.util.Comparator.comparingInt;
@@ -46,20 +45,18 @@ public class MisspelledKeywordDistance {
    * @return the closest keyword or null if nothing found
    */
   public Optional<String> calculateDistance(String wrongToken) {
-      List<Object[]> toSort = new ArrayList<>();
+      int minDistance = DIST_LIMIT;
+      String keyword = null;
       for (String s : SORTED_KEYWORDS) {
-          if (Math.abs(s.length() - wrongToken.length()) < DIST_LIMIT) {
-              Object[] item = new Object[]{s, DISTANCE.apply(wrongToken, s)};
-              if ((int) item[1] < DIST_LIMIT) {
-                  toSort.add(item);
-              }
+          if (Math.abs(s.length() - wrongToken.length()) >= DIST_LIMIT) {
+              continue;
+          }
+          int distance = DISTANCE.apply(wrongToken, s);
+          if (minDistance > distance) {
+              minDistance = distance;
+              keyword = s;
           }
       }
-      toSort.sort(comparingInt(o -> (int) o[1]));
-      for (Object[] item : toSort) {
-          String string = item[0].toString();
-          return Optional.of(string);
-      }
-      return Optional.empty();
+      return Optional.ofNullable(keyword);
   }
 }
