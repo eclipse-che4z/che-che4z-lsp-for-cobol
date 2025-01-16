@@ -77,7 +77,7 @@ public class TestCICSSoapfaultStatement {
     @Test
     void testDeleteInvalid2() {
         HashMap<String, Diagnostic> expectedDiagnostics = new HashMap<>();
-        expectedDiagnostics.put("errorOne", new Diagnostic(new Range(), "Excessive options provided for: DELETE", DiagnosticSeverity.Error, ErrorSource.PARSING.getText()));
+        expectedDiagnostics.put("errorOne", new Diagnostic(new Range(), "Excessive options provided for: DELETE", DiagnosticSeverity.Warning, ErrorSource.PARSING.getText()));
         CICSTestUtils.errorTest(SOAPFAULT_DELETE_INVALID_2, expectedDiagnostics);
     }
 
