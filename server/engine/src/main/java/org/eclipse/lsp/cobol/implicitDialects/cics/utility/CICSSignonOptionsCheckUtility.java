@@ -105,7 +105,8 @@ public class CICSSignonOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
         checkMutuallyExclusiveOptions("BIT, DATATYPE or BASE64", ctx.BIT(), ctx.DATATYPE(), ctx.BASE64());
         checkMutuallyExclusiveOptions("LANGUAGECODE or NATLANG", ctx.LANGUAGECODE(), ctx.NATLANG());
 
-        checkPrerequisiteIsMet(ctx.TOKEN(), ctx.TOKENLEN(), ctx, "TOKENLEN without TOKEN");
+        checkHasMandatoryOptions(ctx.TOKEN(), ctx, "TOKEN");
+        checkHasMandatoryOptions(ctx.TOKENLEN(), ctx, "TOKENLEN");
     }
 
 }
