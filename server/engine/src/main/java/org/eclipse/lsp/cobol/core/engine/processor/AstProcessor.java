@@ -19,7 +19,6 @@ import org.eclipse.lsp.cobol.cli.command.CliUtils;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
-import org.eclipse.lsp.cobol.common.model.tree.ProgramEndNode;
 import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
 import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.ProcessingPhase;
@@ -88,14 +87,17 @@ public class AstProcessor {
     if (nodeClass == ProgramNode.class) {
       ctx.getCurrentProgramNodeStack().push((ProgramNode) node);
     }
-    for (Processor<? extends Node> processor : processors.getOrDefault(nodeClass, Collections.emptyList())) {
-      ((Processor<Node>) processor).accept(node, ctx);
-    }
-    for (Node n : node.getChildren()) {
+    try {
+      for (Processor<? extends Node> processor : processors.getOrDefault(nodeClass, Collections.emptyList())) {
+        ((Processor<Node>) processor).accept(node, ctx);
+      }
+      for (Node n : node.getChildren()) {
         process(processors, n, ctx);
-    }
-    if (nodeClass == ProgramEndNode.class) {
-      ctx.getCurrentProgramNodeStack().pop();
+      }
+    } finally {
+      if (nodeClass == ProgramNode.class) {
+        ctx.getCurrentProgramNodeStack().pop();
+      }
     }
   }
 }
