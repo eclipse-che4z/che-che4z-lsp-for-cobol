@@ -37,10 +37,10 @@ public class CICSReturnOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
                 put(CICSLexer.COMMAREA, ErrorSeverity.ERROR);
                 put(CICSLexer.LENGTH, ErrorSeverity.ERROR);
                 put(CICSLexer.CHANNEL, ErrorSeverity.ERROR);
-                put(CICSLexer.IMMEDIATE, ErrorSeverity.ERROR);
+                put(CICSLexer.IMMEDIATE, ErrorSeverity.WARNING);
                 put(CICSLexer.INPUTMSG, ErrorSeverity.ERROR);
                 put(CICSLexer.INPUTMSGLEN, ErrorSeverity.ERROR);
-                put(CICSLexer.ENDACTIVITY, ErrorSeverity.ERROR);
+                put(CICSLexer.ENDACTIVITY, ErrorSeverity.WARNING);
             }
         };
 

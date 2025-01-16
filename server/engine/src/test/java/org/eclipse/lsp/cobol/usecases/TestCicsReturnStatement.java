@@ -34,11 +34,11 @@ import java.util.*;
 public class TestCicsReturnStatement {
 
     // Test Strings
-    private static final String RETURN_VALID_1 = "RETURN TRANSID(123) COMMAREA(123) LENGTH(123) IMMEDIATE INPUTMSG(123) INPUTMSGLEN(123) ENDACTIVITY";
+    private static final String RETURN_VALID_1 = "RETURN TRANSID({$varOne}) COMMAREA({$varOne}) LENGTH({$varOne}) IMMEDIATE INPUTMSG({$varOne}) INPUTMSGLEN({$varOne}) ENDACTIVITY";
     private static final String RETURN_VALID_2 = "RETURN";
 
-    private static final String RETURN_INVALID_1 = "RETURN TRANSID(123) COMMAREA(123) {CHANNEL|errorOne}(123)";
-    private static final String RETURN_INVALID_2 = "RETURN {CHANNEL(3)|errorOne}";
+    private static final String RETURN_INVALID_1 = "RETURN TRANSID({$varOne}) COMMAREA({$varOne}) {CHANNEL|errorOne}({$varOne})";
+    private static final String RETURN_INVALID_2 = "RETURN {_CHANNEL({$varOne})|errorOne_}";
 
     // Test Functions
     @Test
