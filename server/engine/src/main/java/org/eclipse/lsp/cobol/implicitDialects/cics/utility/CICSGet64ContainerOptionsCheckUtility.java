@@ -57,6 +57,10 @@ public class CICSGet64ContainerOptionsCheckUtility extends CICSOptionsCheckBaseU
      * @param <E> A subclass of ParserRuleContext
      */
     public <E extends ParserRuleContext> void checkOptions(E ctx) {
+        CICSParser.Cics_get64Context mainCtx = (CICSParser.Cics_get64Context) ctx.getParent();
+        if (mainCtx.getRuleIndex() == RULE_INDEX)
+            checkHasIllegalOptions(mainCtx.GET64(), "GET64 is only available in Assembly");
+
         if (ctx.getRuleIndex() == RULE_cics_get64_body) {
             checkContainerBody((CICSParser.Cics_get64_bodyContext) ctx);
             checkDuplicates(ctx);
