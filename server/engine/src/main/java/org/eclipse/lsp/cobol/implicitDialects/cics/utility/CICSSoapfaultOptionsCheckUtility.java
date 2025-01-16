@@ -51,9 +51,9 @@ public class CICSSoapfaultOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
                     put(CICSLexer.DETAILLENGTH, ErrorSeverity.ERROR);
                     put(CICSLexer.FROMCCSID, ErrorSeverity.ERROR);
 
-                    put(CICSLexer.DELETE, ErrorSeverity.ERROR);
-                    put(CICSLexer.CREATE, ErrorSeverity.ERROR);
-                    put(CICSLexer.ADD, ErrorSeverity.ERROR);
+                    put(CICSLexer.DELETE, ErrorSeverity.WARNING);
+                    put(CICSLexer.CREATE, ErrorSeverity.WARNING);
+                    put(CICSLexer.ADD, ErrorSeverity.WARNING);
                 }
             };
 
