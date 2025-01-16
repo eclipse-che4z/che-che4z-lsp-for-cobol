@@ -201,7 +201,7 @@ public class TestCicsSysSetStatement {
     //private static final String JOURNALNUM_INVALID_1 = "SET JOURNALNUM ";
     private static final String JVMENDPOINT_INVALID_1 = "SET {_JVMENDPOINT(1) ENABLED|errorOne_}";
     private static final String JVMENDPOINT_INVALID_2 = "SET {_JVMENDPOINT(1) JVMSERVER(1)|errorOne_}";
-    private static final String JVMSERVER_INVALID_1 = "SET {_JVMSERVER(123) ENABLED DISABLED|errorOne_}";
+    private static final String JVMSERVER_INVALID_1 = "SET {_JVMSERVER(123) ENABLED DISABLED PHASEOUT|errorOne_}";
     private static final String JVMSERVER_INVALID_2 = "SET JVMSERVER(123) ENABLED PHASEOUT {PURGE|errorOne} ";
     private static final String LIBRARY_INVALID_1 = "SET LIBRARY(123) CRITICAL {NONCRITICAL|errorOne}";
     private static final String LIBRARY_INVALID_2 = "SET LIBRARY(123) ENABLED {DISABLED|errorOne}";
