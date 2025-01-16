@@ -38,6 +38,7 @@ public class TestCicsResumeStatement {
     private static final String RESUME_VALID_2 = "RESUME ACQPROCESS";
 
     private static final String RESUME_INVALID_1 = "RESUME {ACQACTIVITY|errorOne} {ACQPROCESS|errorTwo}";
+    private static final String RESUME_INVALID_2 = "RESUME {NOHANDLE|errorOne}";
 
     // Test Functions
     @Test
@@ -53,6 +54,13 @@ public class TestCicsResumeStatement {
         expectedDiagnostics.put("errorOne", new Diagnostic(new Range(), "Exactly one option required, options are mutually exclusive: ACQACTIVITY, ACQPROCESS or ACTIVITY", DiagnosticSeverity.Error, ErrorSource.PARSING.getText()));
         expectedDiagnostics.put("errorTwo", new Diagnostic(new Range(), "Exactly one option required, options are mutually exclusive: ACQACTIVITY, ACQPROCESS or ACTIVITY", DiagnosticSeverity.Error, ErrorSource.PARSING.getText()));
         CICSTestUtils.errorTest(RESUME_INVALID_1, expectedDiagnostics);
+    }
+
+    @Test
+    void testCicsResumeInvalid_2() {
+        HashMap<String, Diagnostic> expectedDiagnostics = new HashMap<>();
+        expectedDiagnostics.put("errorOne", new Diagnostic(new Range(), "Exactly one option required, none provided: ACQACTIVITY, ACQPROCESS or ACTIVITY", DiagnosticSeverity.Error, ErrorSource.PARSING.getText()));
+        CICSTestUtils.errorTest(RESUME_INVALID_2, expectedDiagnostics);
     }
 
 }
