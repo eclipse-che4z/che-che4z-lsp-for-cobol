@@ -34,10 +34,10 @@ import java.util.*;
 public class TestCicsRouteStatement {
 
     // Test Strings
-    private static final String ROUTE_VALID_1 = "ROUTE AFTER HOURS(1) MINUTES(1) SECONDS(1) ERRTERM(123) TITLE(123) LIST(123) OPCLASS(123) REQID(123) LDC(123) NLEOM";
+    private static final String ROUTE_VALID_1 = "ROUTE AFTER HOURS({$varOne}) MINUTES({$varOne}) SECONDS({$varOne}) ERRTERM({$varOne}) TITLE({$varOne}) LIST({$varOne}) OPCLASS({$varOne}) REQID({$varOne}) LDC({$varOne}) NLEOM";
     private static final String ROUTE_VALID_2 = "ROUTE";
 
-    private static final String ROUTE_INVALID_1 = "ROUTE {INTERVAL|errorOne}(0) AFTER HOURS(1)";
+    private static final String ROUTE_INVALID_1 = "ROUTE {INTERVAL|errorOne}({$varOne}) AFTER HOURS({$varOne})";
     private static final String ROUTE_INVALID_2 = "ROUTE {AFTER|errorOne}";
 
     // Test Functions
