@@ -74,6 +74,9 @@ public class CICSSoapfaultOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
             case RULE_cics_soapfault_add:
                 checkAdd((CICSParser.Cics_soapfault_addContext) ctx);
                 break;
+            case RULE_cics_soapfault_delete:
+                checkDelete((CICSParser.Cics_soapfault_deleteContext) ctx);
+                break;
             default:
                 break;
         }
@@ -105,6 +108,10 @@ public class CICSSoapfaultOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
         checkPrerequisiteIsMet(ctx.SUBCODESTR(), ctx.SUBCODELEN(), ctx, "SUBCODELEN without SUBCODESTR");
 
         checkHasExactlyOneOption("FAULTSTRING or SUBCODESTR", ctx, ctx.FAULTSTRING(), ctx.SUBCODESTR());
+    }
+
+    private void checkDelete(CICSParser.Cics_soapfault_deleteContext ctx) {
+        checkHasMandatoryOptions(ctx.DELETE(), ctx, "DELETE");
     }
 
 }

@@ -44,7 +44,7 @@ public class TestCICSSoapfaultStatement {
 
     // Invalid Tests
     private static final String SOAPFAULT_DELETE_INVALID = "SOAPFAULT DELETE {CLIENT|errorOne}";
-    private static final String SOAPFAULT_DELETE_INVALID_2 = "SOAPFAULT DELETE DELETE {NORESP|errorOne}";
+    private static final String SOAPFAULT_DELETE_INVALID_2 = "SOAPFAULT DELETE {DELETE|errorOne} NOHANDLE";
     private static final String SOAPFAULT_ADD_INVALID = "SOAPFAULT ADD {FAULTSTRING|errorOne}({$varOne}) {SUBCODESTR|errorTwo}({$varOne})";
     private static final String SOAPFAULT_CREATE_INVALID = "SOAPFAULT CREATE {CLIENT|errorOne} {FAULTCODESTR|errorTwo}({$varOne}) FAULTSTRING({$varOne})";
 
@@ -77,7 +77,7 @@ public class TestCICSSoapfaultStatement {
     @Test
     void testDeleteInvalid2() {
         HashMap<String, Diagnostic> expectedDiagnostics = new HashMap<>();
-        expectedDiagnostics.put("errorOne", new Diagnostic(new Range(), "No viable alternative at input DELETE\n            NORESP", DiagnosticSeverity.Error, ErrorSource.PARSING.getText()));
+        expectedDiagnostics.put("errorOne", new Diagnostic(new Range(), "Excessive options provided for: DELETE", DiagnosticSeverity.Error, ErrorSource.PARSING.getText()));
         CICSTestUtils.errorTest(SOAPFAULT_DELETE_INVALID_2, expectedDiagnostics);
     }
 
