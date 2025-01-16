@@ -43,16 +43,16 @@ public class TestCicsGetnextStatement {
                     + "            EXEC CICS \n"
                     + "            END-EXEC.";
 
-    private static final String GETNEXT_ACTIVITY_VALID = "GETNEXT ACTIVITY(123) BROWSETOKEN(123) ACTIVITYID(123) LEVEL(123)";
-    private static final String GETNEXT_CONTAINER_VALID = "GETNEXT CONTAINER(123) BROWSETOKEN(123)";
-    private static final String GETNEXT_EVENT_VALID = "GETNEXT EVENT(123) BROWSETOKEN(123) COMPOSITE(123) EVENTTYPE(123) FIRESTATUS(123) PREDICATE(123) TIMER(123)";
-    private static final String GETNEXT_PROCESS_VALID = "GETNEXT PROCESS(123) BROWSETOKEN(123) ACTIVITYID(123)";
-    private static final String GETNEXT_TIMER_VALID = "GETNEXT TIMER(123) BROWSETOKEN(123) ACTIVITYID(123) EVENT(123) STATUS(123) ABSTIME(123)";
+    private static final String GETNEXT_ACTIVITY_VALID = "GETNEXT ACTIVITY({$varOne}) BROWSETOKEN({$varOne}) ACTIVITYID({$varOne}) LEVEL({$varOne})";
+    private static final String GETNEXT_CONTAINER_VALID = "GETNEXT CONTAINER({$varOne}) BROWSETOKEN({$varOne})";
+    private static final String GETNEXT_EVENT_VALID = "GETNEXT EVENT({$varOne}) BROWSETOKEN({$varOne}) COMPOSITE({$varOne}) EVENTTYPE({$varOne}) FIRESTATUS({$varOne}) PREDICATE({$varOne}) TIMER({$varOne})";
+    private static final String GETNEXT_PROCESS_VALID = "GETNEXT PROCESS({$varOne}) BROWSETOKEN({$varOne}) ACTIVITYID({$varOne})";
+    private static final String GETNEXT_TIMER_VALID = "GETNEXT TIMER({$varOne}) BROWSETOKEN({$varOne}) ACTIVITYID({$varOne}) EVENT({$varOne}) STATUS({$varOne}) ABSTIME({$varOne})";
 
-    private static final String GETNEXT_ACTIVITY_INVALID = "GETNEXT {_ACTIVITY(123) ACTIVITYID(123) LEVEL(123)|errorOne_}";
+    private static final String GETNEXT_ACTIVITY_INVALID = "GETNEXT {_ACTIVITY({$varOne}) LEVEL({$varOne} )|errorOne_}";
 
-    private static final String GETNEXT_EVENT_MISSING_INVALID = "GETNEXT {_BROWSETOKEN(123) COMPOSITE(123) EVENTTYPE(123) FIRESTATUS(123) PREDICATE(123) TIMER(123)|errorOne_}";
-    private static final String GETNEXT_TIMER_MISSING_INVALID = "GETNEXT {_ABSTIME(123) BROWSETOKEN(123)|errorOne_}";
+    private static final String GETNEXT_EVENT_MISSING_INVALID = "GETNEXT {_BROWSETOKEN({$varOne}) COMPOSITE({$varOne}) EVENTTYPE({$varOne}) FIRESTATUS({$varOne}) PREDICATE({$varOne}) TIMER({$varOne} )|errorOne_}";
+    private static final String GETNEXT_TIMER_MISSING_INVALID = "GETNEXT {_ABSTIME({$varOne}) BROWSETOKEN({$varOne} )|errorOne_}";
 
     // Test Functions
     @Test
