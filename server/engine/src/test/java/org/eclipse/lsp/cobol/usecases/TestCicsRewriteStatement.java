@@ -34,11 +34,11 @@ import java.util.*;
 public class TestCicsRewriteStatement {
 
     // Test Strings
-    private static final String REWRITE_VALID_1 = "REWRITE FILE(123) TOKEN(123) FROM(123) SYSID(123) LENGTH(123) NOSUSPEND";
-    private static final String REWRITE_VALID_2 = "REWRITE FILE(123) FROM(123)";
+    private static final String REWRITE_VALID_1 = "REWRITE FILE({$varOne}) TOKEN({$varOne}) FROM({$varOne}) SYSID({$varOne}) LENGTH({$varOne}) NOSUSPEND";
+    private static final String REWRITE_VALID_2 = "REWRITE FILE({$varOne}) FROM({$varOne})";
 
-    private static final String REWRITE_INVALID_1 = "REWRITE {FILE(123)|errorOne}";
-    private static final String REWRITE_INVALID_2 = "REWRITE {FROM(123)|errorOne}";
+    private static final String REWRITE_INVALID_1 = "REWRITE {_FILE({$varOne})|errorOne_}";
+    private static final String REWRITE_INVALID_2 = "REWRITE {_FROM({$varOne})|errorOne_}";
 
     // Test Functions
     @Test
@@ -58,7 +58,7 @@ public class TestCicsRewriteStatement {
     @Test
     void testCicsRewriteInvalid_2() {
         HashMap<String, Diagnostic> expectedDiagnostics = new HashMap<>();
-        expectedDiagnostics.put("errorOne", new Diagnostic(new Range(), "Missing required option: FILE", DiagnosticSeverity.Error, ErrorSource.PARSING.getText()));
+        expectedDiagnostics.put("errorOne", new Diagnostic(new Range(), "Exactly one option required, none provided: FILE or DATASET", DiagnosticSeverity.Error, ErrorSource.PARSING.getText()));
         CICSTestUtils.errorTest(REWRITE_INVALID_2, expectedDiagnostics);
     }
 

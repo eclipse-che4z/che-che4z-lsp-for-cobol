@@ -59,9 +59,8 @@ public class CICSRewriteOptionsCheckUtility extends CICSOptionsCheckBaseUtility 
     }
 
     private void checkRule(CICSParser.Cics_rewrite_bodyContext ctx) {
-        checkHasMandatoryOptions(ctx.FILE(), ctx, "FILE");
+        checkHasExactlyOneOption("FILE or DATASET", ctx, ctx.FILE(), ctx.DATASET());
         checkHasMandatoryOptions(ctx.FROM(), ctx, "FROM");
-
     }
 
 }
