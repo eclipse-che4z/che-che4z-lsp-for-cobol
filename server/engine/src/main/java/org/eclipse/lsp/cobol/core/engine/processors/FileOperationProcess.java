@@ -29,6 +29,7 @@ import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.model.tree.OpenStatementNode;
 import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.QualifiedReferenceNode;
+import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNameAndLocality;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableWithLevelNode;
 import org.eclipse.lsp.cobol.common.model.tree.variables.FileDescriptionNode;
@@ -36,13 +37,11 @@ import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.Processor;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import static org.eclipse.lsp.cobol.common.model.NodeType.OPEN_STATEMENT;
-import static org.eclipse.lsp.cobol.common.model.NodeType.PROGRAM;
 
 /** File operation process */
 @Slf4j
@@ -50,6 +49,9 @@ public class FileOperationProcess implements Processor<FileOperationStatementNod
 
   @Override
   public void accept(FileOperationStatementNode node, ProcessingContext ctx) {
+    if (ctx.getCurrentProgramNode() == null) {
+      return;
+    }
     if (node.getNodeType() == NodeType.READ_STATEMENT) {
       checkFileOpenedBeforeOperation(
           node,
@@ -91,22 +93,19 @@ public class FileOperationProcess implements Processor<FileOperationStatementNod
       List<FileOperationKind> expectedFileKind,
       ProcessingContext ctx,
       String messageTemplate) {
-    if (ctx.getCurrentProgramNode() == null) {
-      return;
-    }
-    if (fileIsExternal(node, ctx.getCurrentProgramNode())) {
+    VariableNameAndLocality filename = node.getFilename();
+    if (fileIsExternal(filename.getName(), ctx.getCurrentProgramNode())) {
       return;
     }
     checkFileOpenedBeforeOperation(
-        node,
-        node.getFilename().getName(),
-        node.getFilename().getLocality(),
-        expectedFileKind,
-        ctx,
-        messageTemplate);
+            filename.getName(),
+            filename.getLocality(),
+            expectedFileKind,
+            ctx.getCurrentProgramNode(),
+            messageTemplate).ifPresent(ctx.getErrors()::add);
   }
 
-  private boolean fileIsExternal(FileOperationStatementNode node, ProgramNode programNode) {
+  private boolean fileIsExternal(String fileName, ProgramNode programNode) {
     Node fd = programNode.getDepthFirstFirstNode(n -> {
       if (n.getClass() != FileDescriptionNode.class) {
         return false;
@@ -115,48 +114,45 @@ public class FileOperationProcess implements Processor<FileOperationStatementNod
       if (!fdNode.isExternal()) {
           return false;
       }
-      return fdNode.getName().equalsIgnoreCase(node.getFilename().getName());
+      return fdNode.getName().equalsIgnoreCase(fileName);
     });
     return fd != null;
   }
 
-  private void checkFileOpenedBeforeOperation(
-      Node node,
+  private Optional<SyntaxError> checkFileOpenedBeforeOperation(
       String filename,
       Locality errorLocality,
       List<FileOperationKind> expectedFileKind,
-      ProcessingContext ctx,
+      ProgramNode programNode,
       String messageTemplate) {
 
-    Boolean isFileOpened = isFileOpen(node, filename, expectedFileKind);
-    if (isFileOpened == null) {
-      return;
+    if (errorLocality == null) {
+      return Optional.empty();
     }
 
-    if (!isFileOpened && Objects.nonNull(errorLocality)) {
-      ctx.getErrors().add(SyntaxError.syntaxError().errorSource(ErrorSource.PARSING).severity(ErrorSeverity.WARNING)
-                     .location(errorLocality.toOriginalLocation()).messageTemplate(MessageTemplate.of(messageTemplate))
-                     .build());
+    if (!isFileOpen(programNode, filename, expectedFileKind)) {
+      return Optional.of(
+          SyntaxError.syntaxError()
+              .errorSource(ErrorSource.PARSING)
+              .severity(ErrorSeverity.WARNING)
+              .location(errorLocality.toOriginalLocation())
+              .messageTemplate(MessageTemplate.of(messageTemplate))
+              .build());
     }
+    return Optional.empty();
   }
 
-  private static Boolean isFileOpen(Node node, String filename, List<FileOperationKind> expectedFileKind) {
-    Optional<Node> nearestParentByType = node.getNearestParentByType(PROGRAM);
-    if (!nearestParentByType.isPresent()) {
-      return null;
-    }
-
-    Node result = nearestParentByType.get().getDepthFirstFirstNode(n -> {
-      if (n.getNodeType() != OPEN_STATEMENT) {
-        return false;
-      }
-      OpenStatementNode osn = (OpenStatementNode) n;
-      if (!expectedFileKind.contains(osn.getFileOperationKind())) {
-        return false;
-      }
-      return osn.getFilename().getName().equalsIgnoreCase(filename);
+  private static boolean isFileOpen(ProgramNode programNode, String filename, List<FileOperationKind> expectedFileKind) {
+    return null != programNode.getDepthFirstFirstNode(n -> {
+        if (n.getNodeType() != OPEN_STATEMENT) {
+          return false;
+        }
+        OpenStatementNode osn = (OpenStatementNode) n;
+        if (!expectedFileKind.contains(osn.getFileOperationKind())) {
+          return false;
+        }
+        return osn.getFilename().getName().equalsIgnoreCase(filename);
     });
-    return result != null;
   }
 
   private void checkFileOpenedForWrite(
@@ -211,12 +207,11 @@ public class FileOperationProcess implements Processor<FileOperationStatementNod
           node1 -> {
             if (!node1.isExternal())
               checkFileOpenedBeforeOperation(
-                  node,
                   node1.getName(),
                   node.getFilename().getLocality(),
                   expectedFileKind,
-                  ctx,
-                  messageTemplate);
+                  ctx.getCurrentProgramNode(),
+                  messageTemplate).ifPresent(ctx.getErrors()::add);
           });
     };
   }

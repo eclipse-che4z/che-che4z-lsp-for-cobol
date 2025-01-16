@@ -36,12 +36,12 @@ public class CICSTranslateMandatorySectionProcess implements Processor<ProgramNo
   public void accept(ProgramNode programNode, ProcessingContext processingContext) {
       if (isSectionMissing(programNode, SectionType.LINKAGE)) {
         addSectionNode(
-                getDataDivisionTypeNode(programNode).orElse(createVirtualDivisionNode(programNode)),
+                getDataDivisionTypeNode(programNode).orElseGet(() -> createVirtualDivisionNode(programNode)),
                 SectionType.LINKAGE);
       }
       if (isSectionMissing(programNode, SectionType.WORKING_STORAGE)) {
         addSectionNode(
-                getDataDivisionTypeNode(programNode).orElse(createVirtualDivisionNode(programNode)),
+                getDataDivisionTypeNode(programNode).orElseGet(() -> createVirtualDivisionNode(programNode)),
                 SectionType.WORKING_STORAGE);
       }
   }
