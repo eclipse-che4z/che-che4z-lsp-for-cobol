@@ -72,7 +72,7 @@ public class TestCicsDelete {
 
   private static final String GROUP_ONE_PARTIAL_OPTIONS_VALID_TEN = "DELETE FILE({$varFour}) NOSUSPEND RRN";
 
-  private static final String GROUP_TWO_ACTIVITY_INVALID = "DELETE {ACTIVITY(123)|error1}";
+  private static final String GROUP_TWO_ACTIVITY_VALID = "DELETE ACTIVITY({$varFour})";
 
   private static final String GROUP_TWO_CHANNEL_VALID = "DELETE CHANNEL({$varFour})";
 
@@ -246,16 +246,8 @@ public class TestCicsDelete {
   }
 
   @Test
-  void testGroupTwoActivityInvalid() {
-    Map<String, Diagnostic> expectedDiagnostic =
-            ImmutableMap.of(
-                    "error1",
-                    new Diagnostic(
-                            new Range(),
-                            "Missing required option: CONTAINER",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText()));
-    CICSTestUtils.errorTest(GROUP_TWO_ACTIVITY_INVALID, expectedDiagnostic);
+  void testGroupTwoActivityValid() {
+    CICSTestUtils.noErrorTest(GROUP_TWO_ACTIVITY_VALID);
   }
 
   @Test
@@ -384,7 +376,7 @@ public class TestCicsDelete {
             + "       WORKING-STORAGE SECTION.\n"
             + "       copy {~abc}.\n"
             + "       PROCEDURE DIVISION.\n"
-            + "           EXEC CICS DELETE {_ACTIVITY(123)|error1_}\n"
+            + "           EXEC CICS DELETE ACTIVITY(123)\n"
             + "           END-EXEC.";
     String copybookText =
         "       01 {$*varOne}   PIC S9 VALUE +10.\n"
@@ -396,12 +388,7 @@ public class TestCicsDelete {
     UseCaseEngine.runTest(
         text,
         ImmutableList.of(new CobolText("ABC", copybookText)),
-        ImmutableMap.of("error1",
-                new Diagnostic(
-                        new Range(),
-                        "Missing required option: CONTAINER",
-                        DiagnosticSeverity.Error,
-                        ErrorSource.PARSING.getText())));
+        ImmutableMap.of());
   }
 
   @Test
@@ -413,7 +400,7 @@ public class TestCicsDelete {
             + "       WORKING-STORAGE SECTION.\n"
             + "       copy {~abc}.\n"
             + "       PROCEDURE DIVISION.\n"
-            + "       {_copy {~abcd}.|error_main_}";
+            + "       copy {~abcd}.";
     String copybookText =
             "       01 {$*varOne}   PIC S9 VALUE +10.\n"
                     + "       01 {$*varTwo}   PIC S9 VALUE +100.\n"
@@ -422,22 +409,11 @@ public class TestCicsDelete {
                     + "       01 {$*varFive}  PIC X VALUE 'NAME_TWO'.\n"
                     + "       01 {$*varSix}   PIC X VALUE 'NAME_THREE'.";
 
-    String execTextInCopybook = "           EXEC CICS DELETE {_ACTIVITY(123)|error1_}\n"
+    String execTextInCopybook = "           EXEC CICS DELETE ACTIVITY(123)\n"
             + "           END-EXEC.";
     UseCaseEngine.runTest(
             text,
             ImmutableList.of(new CobolText("ABC", copybookText), new CobolText("ABCD", execTextInCopybook)),
-            ImmutableMap.of("error_main",
-                    new Diagnostic(
-                            new Range(),
-                            "Errors inside the copybook",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.COPYBOOK.getText()),
-                    "error1",
-                    new Diagnostic(
-                            new Range(),
-                            "Missing required option: CONTAINER",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText())));
+            ImmutableMap.of());
   }
 }
