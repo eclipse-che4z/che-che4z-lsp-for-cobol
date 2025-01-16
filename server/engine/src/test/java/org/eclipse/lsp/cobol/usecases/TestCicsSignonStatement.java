@@ -34,17 +34,17 @@ import java.util.*;
 public class TestCicsSignonStatement {
 
     // Test Strings
-    private static final String SIGNON_VALID_1 = "SIGNON USERID(123) CHANGETIME(123) DAYSLEFT(999) ESMREASON(123) ESMRESP(123) EXPIRYTIME(123) GROUPID(568) INVALIDCOUNT(2) LANGUAGECODE(123) LANGINUSE(1) LASTUSETIME(123) NATLANGINUSE(123) PHRASE(3) PHRASELEN(3) NEWPHRASE(123) NEWPHRASELEN(123) OIDCARD(123)";
-    private static final String SIGNON_VALID_2 = "SIGNON USERID(123)";
+    private static final String SIGNON_VALID_1 = "SIGNON USERID({$varOne}) CHANGETIME({$varOne}) DAYSLEFT({$varOne}) ESMREASON({$varOne}) ESMRESP({$varOne}) EXPIRYTIME({$varOne}) GROUPID({$varOne}) INVALIDCOUNT({$varOne}) LANGUAGECODE({$varOne}) LANGINUSE({$varOne}) LASTUSETIME({$varOne}) NATLANGINUSE({$varOne}) PHRASE({$varOne}) PHRASELEN({$varOne}) NEWPHRASE({$varOne}) NEWPHRASELEN({$varOne}) OIDCARD({$varOne})";
+    private static final String SIGNON_VALID_2 = "SIGNON USERID({$varOne})";
 
-    private static final String SIGNONTOKEN_VALID_1 = "SIGNON TOKEN(123) TOKENLEN(123) KERBEROS";
-    private static final String SIGNONTOKEN_VALID_2 = "SIGNON TOKEN(123) TOKENLEN(123) TOKENTYPE(1) DATATYPE(1) GROUPID(1) LANGUAGECODE(1) LANGINUSE(1) NATLANGINUSE(1) ESMREASON(1) ESMRESP(1)";
+    private static final String SIGNONTOKEN_VALID_1 = "SIGNON TOKEN({$varOne}) TOKENLEN({$varOne}) KERBEROS";
+    private static final String SIGNONTOKEN_VALID_2 = "SIGNON TOKEN({$varOne}) TOKENLEN({$varOne}) TOKENTYPE({$varOne}) DATATYPE({$varOne}) GROUPID({$varOne}) LANGUAGECODE({$varOne}) LANGINUSE({$varOne}) NATLANGINUSE({$varOne}) ESMREASON({$varOne}) ESMRESP({$varOne})";
 
-    private static final String SIGNON_INVALID_1 = "SIGNON {CHANGETIME(123)|errorOne}";
-    private static final String SIGNON_INVALID_2 = "SIGNON USERID(123) PASSWORD(123) {PHRASE|errorOne}(123)";
+    private static final String SIGNON_INVALID_1 = "SIGNON {_CHANGETIME({$varOne})|errorOne_}";
+    private static final String SIGNON_INVALID_2 = "SIGNON USERID({$varOne}) PASSWORD({$varOne}) {PHRASE|errorOne}({$varOne})";
 
-    private static final String SIGNONTOKEN_INVALID_1 = "SIGNON TOKEN(123) TOKENLEN(123) {TOKENTYPE|errorOne}(1) {KERBEROS|errorTwo}";
-    private static final String SIGNONTOKEN_INVALID_2 = "SIGNON TOKEN(123) TOKENLEN(123) TOKENTYPE(1) BIT {BASE64|errorOne}";
+    private static final String SIGNONTOKEN_INVALID_1 = "SIGNON TOKEN({$varOne}) TOKENLEN({$varOne}) {TOKENTYPE|errorOne}({$varOne}) {KERBEROS|errorTwo}";
+    private static final String SIGNONTOKEN_INVALID_2 = "SIGNON TOKEN({$varOne}) TOKENLEN({$varOne}) TOKENTYPE({$varOne}) BIT {BASE64|errorOne}";
 
     // Test Functions
     @Test
