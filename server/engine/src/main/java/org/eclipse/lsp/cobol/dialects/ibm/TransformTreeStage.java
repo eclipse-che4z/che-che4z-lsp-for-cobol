@@ -278,10 +278,8 @@ public class TransformTreeStage implements Stage<AnalysisContext, ProcessingResu
     // Phase VALIDATION
     ProcessingPhase v = ProcessingPhase.VALIDATION;
     VariableWithLevelCheck variableWithLevelCheck = new VariableWithLevelCheck(CodeLayoutUtil.getProgramLayout(languageId, layoutStore));
-    ctx.register(v, VariableWithLevelNode.class, variableWithLevelCheck);
     ctx.register(v, ConditionDataNameNode.class, variableWithLevelCheck);
     ctx.register(v, ElementaryItemNode.class, variableWithLevelCheck);
-    ctx.register(v, ElementaryNode.class, variableWithLevelCheck);
     ctx.register(v, GroupItemNode.class, variableWithLevelCheck);
     ctx.register(v, MultiTableDataNameNode.class, variableWithLevelCheck);
     ctx.register(v, RenameItemNode.class, variableWithLevelCheck);
@@ -289,10 +287,8 @@ public class TransformTreeStage implements Stage<AnalysisContext, ProcessingResu
     ctx.register(v, TableDataNameNode.class, variableWithLevelCheck);
 
     VariableNameCheck variableNameCheck = new VariableNameCheck();
-    ctx.register(v, VariableWithLevelNode.class, variableNameCheck);
     ctx.register(v, ConditionDataNameNode.class, variableNameCheck);
     ctx.register(v, ElementaryItemNode.class, variableNameCheck);
-    ctx.register(v, ElementaryNode.class, variableNameCheck);
     ctx.register(v, GroupItemNode.class, variableNameCheck);
     ctx.register(v, MultiTableDataNameNode.class, variableNameCheck);
     ctx.register(v, RenameItemNode.class, variableNameCheck);
@@ -312,7 +308,6 @@ public class TransformTreeStage implements Stage<AnalysisContext, ProcessingResu
     ctx.register(v, FileOperationStatementNode.class, processor);
 
     ElementaryNodeCheck elementaryNodeCheck = new ElementaryNodeCheck();
-    ctx.register(v, ElementaryNode.class, elementaryNodeCheck);
     ctx.register(v, ElementaryItemNode.class, elementaryNodeCheck);
     ctx.register(v, StandAloneDataItemNode.class, elementaryNodeCheck);
     ctx.register(v, TableDataNameNode.class, elementaryNodeCheck);
@@ -320,7 +315,6 @@ public class TransformTreeStage implements Stage<AnalysisContext, ProcessingResu
     ctx.register(v, GroupItemNode.class, new GroupItemCheck());
 
     ObsoleteNodeCheck obsoleteNodeCheck = new ObsoleteNodeCheck();
-    ctx.register(v, ObsoleteNode.class, obsoleteNodeCheck);
     ctx.register(v, RemarksNode.class, obsoleteNodeCheck);
 
     ctx.register(v, StandAloneDataItemNode.class, new StandAloneDataItemCheck());

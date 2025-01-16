@@ -22,6 +22,7 @@ import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
 import org.eclipse.lsp.cobol.common.symbols.VariableAccumulator;
 
+import java.lang.reflect.Modifier;
 import java.util.*;
 
 /**
@@ -56,6 +57,10 @@ public class ProcessingContext {
      * @param processorDesc Processor descriptor.
      */
     public void register(ProcessorDescription processorDesc) {
+        if (Modifier.isAbstract(processorDesc.getNodeClass().getModifiers())) {
+            throw new RuntimeException("Can't register processor for node class: "
+                    + processorDesc.getNodeClass().getName() + ". Node class should be concrete.");
+        }
         processors
                 .computeIfAbsent(processorDesc.getPhase(), v -> new HashMap<>())
                 .computeIfAbsent(processorDesc.getNodeClass(), v -> new ArrayList<>())
