@@ -730,8 +730,8 @@ cics_signoff: SIGNOFF cics_handle_response?;
 cics_signon: SIGNON (cics_signon_body|cics_signon_token_body);
 cics_signon_body: ((USERID | GROUPID | LANGUAGECODE | NATLANG | PASSWORD | NEWPASSWORD | PHRASELEN | NEWPHRASELEN | OIDCARD) cics_data_value |
                     (CHANGETIME | DAYSLEFT | ESMREASON | ESMRESP | EXPIRYTIME | INVALIDCOUNT | LANGINUSE | LASTUSETIME | NATLANGINUSE | PHRASE | NEWPHRASE) cics_data_area | cics_handle_response)+;
-cics_signon_token_body: ((KERBEROS | KERBEROS | BIT | BIT | BASE64 | BASE64) | (TOKENLEN | GROUPID | GROUPID | LANGUAGECODE | NATLANG) cics_data_value |
-                    (TOKEN | LANGINUSE | LANGINUSE | NATLANGINUSE | NATLANGINUSE | ESMREASON | ESMREASON | ESMRESP | ESMRESP) cics_data_area | (TOKENTYPE | TOKENTYPE | DATATYPE) cics_cvda | cics_handle_response)+;
+cics_signon_token_body: ((KERBEROS | BIT | BASE64) | (TOKENLEN | GROUPID | LANGUAGECODE | NATLANG) cics_data_value |
+                    (TOKEN | LANGINUSE | NATLANGINUSE | ESMREASON | ESMRESP) cics_data_area | (TOKENTYPE | DATATYPE) cics_cvda | cics_handle_response)+;
 
 /** SOAPFAULT ADD / CREATE / DELETE */
 cics_soapfault: SOAPFAULT (cics_soapfault_add | cics_soapfault_create | DELETE);
