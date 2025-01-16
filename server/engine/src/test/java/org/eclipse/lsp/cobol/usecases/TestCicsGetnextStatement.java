@@ -51,6 +51,9 @@ public class TestCicsGetnextStatement {
 
     private static final String GETNEXT_ACTIVITY_INVALID = "GETNEXT {_ACTIVITY(123) ACTIVITYID(123) LEVEL(123)|errorOne_}";
 
+    private static final String GETNEXT_EVENT_MISSING_INVALID = "GETNEXT {_BROWSETOKEN(123) COMPOSITE(123) EVENTTYPE(123) FIRESTATUS(123) PREDICATE(123) TIMER(123)|errorOne_}";
+    private static final String GETNEXT_TIMER_MISSING_INVALID = "GETNEXT {_ABSTIME(123) BROWSETOKEN(123)|errorOne_}";
+
     // Test Functions
     @Test
     void testGetnextActivityValid() {
@@ -83,5 +86,19 @@ public class TestCicsGetnextStatement {
         HashMap<String, Diagnostic> expectedDiagnostics = new HashMap<>();
         expectedDiagnostics.put("errorOne", new Diagnostic(new Range(), "Missing required option: BROWSETOKEN", DiagnosticSeverity.Error, ErrorSource.PARSING.getText()));
         CICSTestUtils.errorTest(GETNEXT_ACTIVITY_INVALID, expectedDiagnostics);
+    }
+
+    @Test
+    void testGetNextEventMissingInvalid() {
+        HashMap<String, Diagnostic> expectedDiagnostics = new HashMap<>();
+        expectedDiagnostics.put("errorOne", new Diagnostic(new Range(), "Missing required option: EVENT", DiagnosticSeverity.Error, ErrorSource.PARSING.getText()));
+        CICSTestUtils.errorTest(GETNEXT_EVENT_MISSING_INVALID, expectedDiagnostics);
+    }
+
+    @Test
+    void testGetNextTimerMissingInvalid() {
+        HashMap<String, Diagnostic> expectedDiagnostics = new HashMap<>();
+        expectedDiagnostics.put("errorOne", new Diagnostic(new Range(), "Missing required option: TIMER", DiagnosticSeverity.Error, ErrorSource.PARSING.getText()));
+        CICSTestUtils.errorTest(GETNEXT_TIMER_MISSING_INVALID, expectedDiagnostics);
     }
 }

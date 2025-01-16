@@ -84,22 +84,27 @@ public class CICSGetnextOptionsCheckUtility extends CICSOptionsCheckBaseUtility 
     }
 
     private void checkActivity(CICSParser.Cics_getnext_activityContext ctx) {
+        checkHasMandatoryOptions(ctx.ACTIVITY(), ctx, "ACTIVITY");
         checkHasMandatoryOptions(ctx.BROWSETOKEN(), ctx, "BROWSETOKEN");
     }
 
     private void checkContainer(CICSParser.Cics_getnext_containerContext ctx) {
+        checkHasMandatoryOptions(ctx.CONTAINER(), ctx, "CONTAINER");
         checkHasMandatoryOptions(ctx.BROWSETOKEN(), ctx, "BROWSETOKEN");
     }
 
     private void checkEvent(CICSParser.Cics_getnext_eventContext ctx) {
+        checkHasMandatoryOptions(ctx.EVENT(), ctx, "EVENT");
         checkHasMandatoryOptions(ctx.BROWSETOKEN(), ctx, "BROWSETOKEN");
     }
 
     private void checkProcess(CICSParser.Cics_getnext_processContext ctx) {
+        checkHasMandatoryOptions(ctx.PROCESS(), ctx, "PROCESS");
         checkHasMandatoryOptions(ctx.BROWSETOKEN(), ctx, "BROWSETOKEN");
     }
 
     private void checkTimer(CICSParser.Cics_getnext_timerContext ctx) {
+        checkHasMandatoryOptions(ctx.TIMER(), ctx, "TIMER");
         checkHasMandatoryOptions(ctx.BROWSETOKEN(), ctx, "BROWSETOKEN");
     }
 
