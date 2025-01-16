@@ -35,18 +35,15 @@ public class CICSRouteOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
             {
                 put(CICSLexer.INTERVAL, ErrorSeverity.ERROR);
                 put(CICSLexer.TIME, ErrorSeverity.ERROR);
-                put(CICSLexer.AFTER, ErrorSeverity.ERROR);
-                put(CICSLexer.HOURS, ErrorSeverity.ERROR);
-                put(CICSLexer.MINUTES, ErrorSeverity.ERROR);
-                put(CICSLexer.SECONDS, ErrorSeverity.ERROR);
-                put(CICSLexer.AT, ErrorSeverity.ERROR);
-                put(CICSLexer.ERRTERM, ErrorSeverity.ERROR);
+                put(CICSLexer.AFTER, ErrorSeverity.WARNING);
+                put(CICSLexer.AT, ErrorSeverity.WARNING);
+                put(CICSLexer.ERRTERM, ErrorSeverity.WARNING);
                 put(CICSLexer.TITLE, ErrorSeverity.ERROR);
                 put(CICSLexer.LIST, ErrorSeverity.ERROR);
                 put(CICSLexer.OPCLASS, ErrorSeverity.ERROR);
                 put(CICSLexer.REQID, ErrorSeverity.ERROR);
                 put(CICSLexer.LDC, ErrorSeverity.ERROR);
-                put(CICSLexer.NLEOM, ErrorSeverity.ERROR);
+                put(CICSLexer.NLEOM, ErrorSeverity.WARNING);
             }
         };
 
@@ -70,7 +67,7 @@ public class CICSRouteOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
         checkMutuallyExclusiveOptions("INTERVAL, INTERVAL, TIME, AFTER or AT", ctx.INTERVAL(), ctx.INTERVAL(), ctx.TIME(), ctx.AFTER(), ctx.AT());
 
         if (!ctx.AFTER().isEmpty() || !ctx.AT().isEmpty()) {
-            checkHasAtLeastOne("HOURS, MINUTES or SECONDS", ctx, ctx.HOURS(), ctx.MINUTES(), ctx.SECONDS());
+            checkHasAtLeastOneOption("HOURS, MINUTES or SECONDS", ctx, ctx.HOURS(), ctx.MINUTES(), ctx.SECONDS());
         }
 
     }
