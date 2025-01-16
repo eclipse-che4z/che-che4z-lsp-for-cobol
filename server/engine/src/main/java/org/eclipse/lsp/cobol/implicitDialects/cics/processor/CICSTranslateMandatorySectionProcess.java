@@ -22,6 +22,7 @@ import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.Processor;
 import org.eclipse.lsp.cobol.common.model.tree.DivisionNode;
 import org.eclipse.lsp.cobol.common.model.variables.DivisionType;
+import org.eclipse.lsp4j.Range;
 
 import java.util.Optional;
 
@@ -33,61 +34,48 @@ public class CICSTranslateMandatorySectionProcess implements Processor<ProgramNo
 
   @Override
   public void accept(ProgramNode programNode, ProcessingContext processingContext) {
-      if (!sectionExists(programNode, SectionType.LINKAGE)) {
-        insertLinkageSection(programNode);
+      if (isSectionMissing(programNode, SectionType.LINKAGE)) {
+        addSectionNode(
+                getDataDivisionTypeNode(programNode).orElse(createVirtualDivisionNode(programNode)),
+                SectionType.LINKAGE);
       }
-
-      if (!sectionExists(programNode, SectionType.WORKING_STORAGE)) {
-        insertWorkingStorageSection(programNode);
+      if (isSectionMissing(programNode, SectionType.WORKING_STORAGE)) {
+        addSectionNode(
+                getDataDivisionTypeNode(programNode).orElse(createVirtualDivisionNode(programNode)),
+                SectionType.WORKING_STORAGE);
       }
   }
 
-  private void insertLinkageSection(ProgramNode programNode) {
-    Optional<DivisionNode> dataDivisionNode = getDataDivisionTypeNode(programNode);
-    if (dataDivisionNode.isPresent()) {
-      addLinkageNode(dataDivisionNode.get());
-    } else {
-      Locality locality = Locality.builder().uri(programNode.getLocality().getUri()).build();
-      DivisionNode divisionNode =
-          new DivisionNode(locality, DivisionType.DATA_DIVISION);
-      addLinkageNode(divisionNode);
-      divisionNode.setParent(programNode);
-      programNode.getChildren().add(0, divisionNode);
-    }
-  }
-
-  private void addLinkageNode(DivisionNode divisionNode) {
-    divisionNode.addChild(new SectionNode(divisionNode.getLocality(), SectionType.LINKAGE));
-  }
-
-  private void addWorkingStorageNode(DivisionNode divisionNode) {
-    divisionNode.addChild(new SectionNode(divisionNode.getLocality(), SectionType.WORKING_STORAGE));
+  private void addSectionNode(DivisionNode divisionNode, SectionType type) {
+    divisionNode.addChild(new SectionNode(divisionNode.getLocality(), type));
   }
 
   private Optional<DivisionNode> getDataDivisionTypeNode(ProgramNode programNode) {
-    return programNode
-        .getDepthFirstStream()
-        .filter(DivisionNode.class::isInstance)
-        .map(DivisionNode.class::cast)
-        .filter(node -> node.getDivisionType() == DivisionType.DATA_DIVISION)
-        .findAny();
+    return Optional.ofNullable(
+            programNode.getDepthFirstFirstNode(n -> n instanceof DivisionNode
+                    && ((DivisionNode) n).getDivisionType() == DivisionType.DATA_DIVISION))
+            .map(DivisionNode.class::cast);
   }
 
-  private void insertWorkingStorageSection(ProgramNode programNode) {
-    Optional<DivisionNode> dataDivisionNode = getDataDivisionTypeNode(programNode);
-    if (dataDivisionNode.isPresent()) {
-      addWorkingStorageNode(dataDivisionNode.get());
-    } else {
-      Locality locality = Locality.builder().uri(programNode.getLocality().getUri()).build();
-      DivisionNode divisionNode =
-          new DivisionNode(locality, DivisionType.DATA_DIVISION);
-      addWorkingStorageNode(divisionNode);
-      programNode.addChild(divisionNode);
-    }
-  }
-
-  private boolean sectionExists(ProgramNode programNode, SectionType sectionType) {
-    return null != programNode.getDepthFirstFirstNode(
+  private boolean isSectionMissing(ProgramNode programNode, SectionType sectionType) {
+    return null == programNode.getDepthFirstFirstNode(
             n -> n instanceof SectionNode && ((SectionNode) n).getSectionType() == sectionType);
   }
+
+
+  private static DivisionNode createVirtualDivisionNode(ProgramNode programNode) {
+    Locality locality = Locality.builder()
+            .uri(programNode.getLocality().getUri())
+            // Empty range for virtual node
+            .range(new Range(
+                    programNode.getLocality().getRange().getStart(),
+                    programNode.getLocality().getRange().getStart()
+            ))
+            .build();
+    DivisionNode divisionNode = new DivisionNode(locality, DivisionType.DATA_DIVISION);
+    divisionNode.setParent(programNode);
+    programNode.getChildren().add(0, divisionNode);
+    return divisionNode;
+  }
+
 }
