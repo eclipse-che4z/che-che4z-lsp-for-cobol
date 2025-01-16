@@ -118,9 +118,9 @@ cics_send: SEND (cics_send_group1 | cics_send_control | cics_send_map | cics_sen
 cics_send_group1 : ((FROM | LENGTH | FLENGTH) cics_data_area | (CONVID | SESSION | ATTACHID | LDC ) cics_name | WAIT | INVITE | LAST | CONFIRM | ERASE | DEFAULT | ALTERNATE
                 | (CTLCHAR | LINEADDR) cics_data_value | STRFIELD | STATE cics_cvda | CNOTCOMPL | DEFRESP | FMH | LEAVEKB | PASSBK | CBUFF | cics_handle_response)*;
 cics_send_control: (CONTROL | CURSOR cics_data_value? | FORMFEED | ERASE | DEFAULT | ALTERNATE | ERASEAUP | PRINT | FREEKB | ALARM | FRSET | MSR cics_data_value | (OUTPARTN | ACTPARTN | LDC | REQID) cics_name |
-                 ACCUM | TERMINAL | SET cics_ref | PAGING | WAIT | LAST | HONEOM | L40 | L64 | L80)+;
+                 ACCUM | TERMINAL | SET cics_ref | PAGING | WAIT | LAST | HONEOM | L40 | L64 | L80 | cics_handle_response)+;
 cics_send_map: ((MAP | MAPSET | FMHPARM | OUTPARTN | ACTPARTN | LDC | REQID) cics_name | FROM cics_data_area | DATAONLY | MAPONLY | CURSOR cics_data_value? | FORMFEED | ERASE | DEFAULT | ALTERNATE |
-                ERASEAUP | PRINT | FREEKB | ALARM | FRSET | NLEOM | (MSR | LENGTH) cics_data_value | ACCUM | TERMINAL | SET cics_ref | PAGING | WAIT | LAST | NOFLUSH | HONEOM | L40 | L64 | L80)+;
+                ERASEAUP | PRINT | FREEKB | ALARM | FRSET | NLEOM | (MSR | LENGTH) cics_data_value | ACCUM | TERMINAL | SET cics_ref | PAGING | WAIT | LAST | NOFLUSH | HONEOM | L40 | L64 | L80 | cics_handle_response)+;
 cics_send_mappingdev : ((MAP | MAPSET) cics_name | (MAPPINGDEV | LENGTH | FROM) cics_data_area | SET cics_ref | DATAONLY | MAPONLY | CURSOR cics_data_value?
                 | FORMFEED | ERASE | ERASEAUP| PRINT | FREEKB | ALARM | FRSET | cics_handle_response)*;
 cics_send_page : (PAGE | RELEASE | RETAIN | TRANSID cics_name | TRAILER cics_data_area | SET cics_ref | AUTOPAGE | CURRENT | ALL | NOAUTOPAGE | OPERPURGE | FMHPARM cics_name | LAST | cics_handle_response)*;
