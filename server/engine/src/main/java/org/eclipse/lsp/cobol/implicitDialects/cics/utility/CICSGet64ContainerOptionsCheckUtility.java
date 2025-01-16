@@ -64,6 +64,8 @@ public class CICSGet64ContainerOptionsCheckUtility extends CICSOptionsCheckBaseU
     }
 
     private void checkContainerBody(CICSParser.Cics_get64_bodyContext ctx) {
+        checkHasMandatoryOptions(ctx.CONTAINER(), ctx, "CONTAINER");
+
         checkMutuallyExclusiveOptions("INTO, SET or NODATA", ctx.INTO(), ctx.SET(), ctx.NODATA());
 
         checkMutuallyExclusiveOptions("INTOCCSID, INTOCODEPAGE or CONVERTST", ctx.INTOCCSID(), ctx.INTOCODEPAGE(), ctx.CONVERTST());

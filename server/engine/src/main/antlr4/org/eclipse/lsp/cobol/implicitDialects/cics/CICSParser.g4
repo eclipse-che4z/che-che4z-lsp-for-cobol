@@ -403,8 +403,8 @@ cics_get_container_channel: ((CONTAINER | CHANNEL | BYTEOFFSET | INTOCCSID | INT
 cics_get_counter_dcounter: ((COUNTER | DCOUNTER | POOL) cics_name | VALUE cics_data_area | (INCREMENT | COMPAREMIN | COMPAREMAX) cics_data_value |
                   WRAP | NOSUSPEND | REDUCE | cics_handle_response)*;
 
-cics_get64: GET64 (cics_get64_body | cics_handle_response)+;
-cics_get64_body: CONTAINER cics_data_value ((FLENGTH | FLENGTH | NODATA) | SET cics_ref | (CHANNEL | BYTEOFFSET | FLENGTH | INTOCCSID | INTOCODEPAGE) cics_data_value | (INTO | BYTEOFFSET | CCSID) cics_data_area | CONVERTST cics_cvda | cics_handle_response)+;
+cics_get64: GET64 cics_get64_body;
+cics_get64_body: ((FLENGTH | FLENGTH | NODATA) | SET cics_ref | (CONTAINER | CHANNEL | BYTEOFFSET | FLENGTH | INTOCCSID | INTOCODEPAGE) cics_data_value | (INTO | BYTEOFFSET | CCSID) cics_data_area | CONVERTST cics_cvda | cics_handle_response)+;
 
 /** GETMAIN */
 cics_getmain: GETMAIN cics_getmain_body;
