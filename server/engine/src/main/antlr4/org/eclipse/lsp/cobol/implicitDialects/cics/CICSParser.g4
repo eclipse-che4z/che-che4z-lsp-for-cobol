@@ -760,7 +760,7 @@ cics_rewrite: REWRITE cics_file_name (TOKEN cics_data_area | FROM cics_data_area
 
 /** ROUTE */
 cics_route: ROUTE (cics_route_body | cics_handle_response)*;
-cics_route_body: ((TIME | AFTER | AT | NLEOM) | (REQID | LDC) cics_name | INTERVAL (cics_hhmmss | cics_zero_digit) |  ERRTERM cics_name* | (HOURS | MINUTES | SECONDS) cics_data_value | (TITLE | LIST | OPCLASS) cics_data_area | cics_handle_response)+;
+cics_route_body: ((TIME | AFTER | AT | NLEOM) | (REQID | LDC) cics_name | INTERVAL (cics_hhmmss | cics_zero_digit) |  ERRTERM cics_name? | (HOURS | MINUTES | SECONDS) cics_data_value | (TITLE | LIST | OPCLASS) cics_data_area | cics_handle_response)+;
 
 /** RUN */
 cics_run: RUN (cics_run_default | cics_run_transid);
