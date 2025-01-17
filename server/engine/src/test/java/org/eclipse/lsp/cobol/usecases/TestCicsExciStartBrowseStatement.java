@@ -59,9 +59,11 @@ public class TestCicsExciStartBrowseStatement {
   private static final String STARTBROWSE_TIMER_VALID = "STARTBROWSE TIMER({$varOne}) BROWSETOKEN({$varOne})";
 
   private static final String STARTBROWSE_INVALID_CONTAINER = "STARTBROWSE CONTAINER PROCESS({$varOne}) PROCESSTYPE({$varOne}) {CHANNEL|errorOne}({$varOne}) BROWSETOKEN({$varOne})";
+  private static final String STARTBROWSE_INVALID_CONTAINER_2 = "STARTBROWSE CONTAINER {PROCESS|errorOne} PROCESSTYPE({$varOne}) BROWSETOKEN({$varOne})";
   private static final String STARTBROWSE_INVALID_ACTIVITY = "STARTBROWSE {_ACTIVITY ACTIVITYID({$varOne} )|errorOne_}";
   private static final String STARTBROWSE_INVALID_EVENT = "STARTBROWSE {_EVENT ACTIVITYID({$varOne} )|errorOne_}";
   private static final String STARTBROWSE_INVALID_PROCESS = "STARTBROWSE {_PROCESS BROWSETOKEN({$varOne} )|errorOne_}";
+  private static final String STARTBROWSE_INVALID_PROCESS_2 = "STARTBROWSE PROCESS {_PROCESS({$varOne})|errorOne_} PROCESSTYPE({$varOne}) BROWSETOKEN({$varOne})";
 
   // Test Functions
   @Test
@@ -109,6 +111,19 @@ public class TestCicsExciStartBrowseStatement {
   }
 
   @Test
+  void testStartBrowseContainerInvalid_2() {
+    Map<String, Diagnostic> tempDiagnostic = new HashMap<>();
+    tempDiagnostic.put("errorOne",
+            new Diagnostic(
+                    new Range(),
+                    "Invalid option provided: PROCESS, in this context, requires a value",
+                    DiagnosticSeverity.Error,
+                    ErrorSource.PARSING.getText()));
+
+    CICSTestUtils.errorTest(STARTBROWSE_INVALID_CONTAINER_2, tempDiagnostic);
+  }
+
+  @Test
   void testStartBrowseActivityInvalid() {
     Map<String, Diagnostic> tempDiagnostic = new HashMap<>();
     tempDiagnostic.put("errorOne",
@@ -142,5 +157,17 @@ public class TestCicsExciStartBrowseStatement {
                     DiagnosticSeverity.Error,
                     ErrorSource.PARSING.getText()));
     CICSTestUtils.errorTest(STARTBROWSE_INVALID_PROCESS, tempDiagnostic);
+  }
+
+  @Test
+  void testStartBrowseProcessInvalid_2() {
+    Map<String, Diagnostic> tempDiagnostic = new HashMap<>();
+    tempDiagnostic.put("errorOne",
+            new Diagnostic(
+                    new Range(),
+                    "Invalid option provided: PROCESS, in this context, cannot have a value",
+                    DiagnosticSeverity.Error,
+                    ErrorSource.PARSING.getText()));
+    CICSTestUtils.errorTest(STARTBROWSE_INVALID_PROCESS_2, tempDiagnostic);
   }
 }

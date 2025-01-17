@@ -73,20 +73,25 @@ public class CICSStartbrowseOptionsCheckUtility extends CICSOptionsCheckBaseUtil
 
     private void checkBody(CICSParser.Cics_startbrowse_bodyContext ctx) {
         if (!ctx.ACTIVITY().isEmpty()) {
-            checkPrerequisiteIsMet(ctx.PROCESS(), ctx.PROCESSTYPE(), ctx, "PROCESSTYPE without PROCESS");
+            checkPrerequisiteIsMet(ctx.cics_startbrowse_processWithValue_subrule(), ctx.PROCESSTYPE(), ctx, "PROCESSTYPE without PROCESS");
+            checkHasIllegalOptions(ctx.PROCESS(), "PROCESS, in this context, requires a value");
             checkMutuallyExclusiveOptions("ACTIVITYID or PROCESS", ctx.ACTIVITYID(), ctx.PROCESS());
         } else if (!ctx.CONTAINER().isEmpty()) {
-            checkPrerequisiteIsMet(ctx.PROCESS(), ctx.PROCESSTYPE(), ctx, "PROCESSTYPE without PROCESS");
+            checkPrerequisiteIsMet(ctx.cics_startbrowse_processWithValue_subrule(), ctx.PROCESSTYPE(), ctx, "PROCESSTYPE without PROCESS");
+            checkHasIllegalOptions(ctx.PROCESS(), "PROCESS, in this context, requires a value");
             checkMutuallyExclusiveOptions("ACTIVITYID, PROCESS or CHANNEL", ctx.ACTIVITYID(), ctx.PROCESS(), ctx.CHANNEL());
         } else if (!ctx.EVENT().isEmpty()) {
             checkHasIllegalOptions(ctx.CHANNEL(), "CHANNEL");
             checkHasIllegalOptions(ctx.PROCESS(), "PROCESS");
+            checkHasIllegalOptions(ctx.cics_startbrowse_processWithValue_subrule(), "PROCESS");
             checkHasIllegalOptions(ctx.PROCESSTYPE(), "PROCESSTYPE");
         } else if (!ctx.PROCESS().isEmpty()) {
             checkHasMandatoryOptions(ctx.PROCESSTYPE(), ctx, "PROCESSTYPE");
+            checkHasIllegalOptions(ctx.cics_startbrowse_processWithValue_subrule(), "PROCESS, in this context, cannot have a value");
         } else if (!ctx.TIMER().isEmpty()) {
             checkHasIllegalOptions(ctx.CHANNEL(), "CHANNEL");
             checkHasIllegalOptions(ctx.PROCESS(), "PROCESS");
+            checkHasIllegalOptions(ctx.cics_startbrowse_processWithValue_subrule(), "PROCESS");
             checkHasIllegalOptions(ctx.PROCESSTYPE(), "PROCESSTYPE");
         }
 
@@ -97,6 +102,10 @@ public class CICSStartbrowseOptionsCheckUtility extends CICSOptionsCheckBaseUtil
             // PROCESS can be its own command outside the context of CONTAINER or as part of that one.
             checkHasExactlyOneOption("ACTIVITY, CONTAINER, EVENT or TIMER", ctx, ctx.ACTIVITY(), ctx.CONTAINER(), ctx.EVENT(), ctx.TIMER());
         }
+
+    }
+
+    private void checkProcessSubrule(CICSParser.Cics_startbrowse_processWithValue_subruleContext ctx) {
 
     }
 }

@@ -120,27 +120,27 @@ public abstract class CICSOptionsCheckBaseUtility {
      * @param ctx             - The overall context.
      * @param options         - String of the element that is required.
      */
-    protected <E extends ParseTree> void checkPrerequisiteIsMet(List<E> requiredContext, List<E> optionalContext, ParserRuleContext ctx, String options) {
+    protected <E> void checkPrerequisiteIsMet(List<E> requiredContext, List<E> optionalContext, ParserRuleContext ctx, String options) {
         checkPrerequisiteIsMet(isNodePresent(requiredContext), isNodePresent(optionalContext), ctx, options);
     }
 
-    protected <E extends ParseTree> void checkPrerequisiteIsMet(E requiredContext, List<E> optionalContext, ParserRuleContext ctx, String options) {
+    protected <E> void checkPrerequisiteIsMet(E requiredContext, List<E> optionalContext, ParserRuleContext ctx, String options) {
         checkPrerequisiteIsMet(isNodePresent(requiredContext), isNodePresent(optionalContext), ctx, options);
     }
 
-    protected <E extends ParseTree> void checkPrerequisiteIsMet(List<E> requiredContext, E optionalContext, ParserRuleContext ctx, String options) {
+    protected <E> void checkPrerequisiteIsMet(List<E> requiredContext, E optionalContext, ParserRuleContext ctx, String options) {
         checkPrerequisiteIsMet(isNodePresent(requiredContext), isNodePresent(optionalContext), ctx, options);
     }
 
-    protected <E extends ParseTree> void checkPrerequisiteIsMet(E requiredContext, E optionalContext, ParserRuleContext ctx, String options) {
+    protected <E> void checkPrerequisiteIsMet(E requiredContext, E optionalContext, ParserRuleContext ctx, String options) {
         checkPrerequisiteIsMet(isNodePresent(requiredContext), isNodePresent(optionalContext), ctx, options);
     }
 
-    private <E extends ParseTree> Boolean isNodePresent(E node) {
+    private <E> Boolean isNodePresent(E node) {
         return node != null;
     }
 
-    private <E extends ParseTree> boolean isNodePresent(List<E> node) {
+    private <E> boolean isNodePresent(List<E> node) {
         if (node == null || node.isEmpty()) {
             return false;
         }
