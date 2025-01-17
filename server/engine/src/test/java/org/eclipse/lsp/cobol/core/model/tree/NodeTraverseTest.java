@@ -57,8 +57,8 @@ class NodeTraverseTest {
     }
 
     @Test
-    void testGetDepthFirstFirstNode() {
-        Node result = ROOT.getDepthFirstFirstNode((n) -> n.toString().length() == 7 && n.toString().startsWith("node11"));
+    void testFindFirstNodeInSubtree() {
+        Node result = ROOT.findFirstNodeInSubtree((n) -> n.toString().length() == 7 && n.toString().startsWith("node11"));
         assertEquals(NODE_111, result);
     }
 }

@@ -14,6 +14,7 @@
  */
 package org.eclipse.lsp.cobol.core.engine.processors;
 
+import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.model.NodeType;
@@ -35,18 +36,16 @@ public class RootNodeUpdateCopyNodesByPositionInTree implements Processor<RootNo
     updateCopyNodes(node);
   }
 
-  private void updateCopyNodes(RootNode node) {
-    List<Node> nodes =
-        node.getChildren().stream().filter(Node.hasType(NodeType.COPY)).collect(toList());
-    node.getChildren().removeAll(nodes);
-    for (Node it : nodes) {
-      Node parentNode = RangeUtils.findNodeByPosition(node,
-                          it.getLocality().getUri(), it.getLocality().getRange().getStart())
-                  .orElse(node);
-      parentNode.addChildAt(getNodeInsertionIndex(parentNode.getChildren(), it), it);
+  private void updateCopyNodes(RootNode root) {
+    List<Node> cpyNodes = root.getChildren().stream().filter(Node.hasType(NodeType.COPY)).collect(toList());
+    root.getChildren().removeAll(cpyNodes);
+    for (Node cpyNode : cpyNodes) {
+      Locality l = cpyNode.getLocality();
+      Node parentNode = RangeUtils.findNodeByPosition(root, l.getUri(), l.getRange().getStart()).orElse(root);
+      parentNode.addChildAt(getNodeInsertionIndex(parentNode.getChildren(), cpyNode), cpyNode);
     }
 
-    List<Node> copyNodes = node.getDepthFirstList(n ->
+    List<Node> copyNodes = root.getDepthFirstList(n ->
             n.getNodeType() == NodeType.COPY && ((CopyNode) n).getUri() != null);
     for (Node c : copyNodes) {
       for (Node n : copyNodes) {

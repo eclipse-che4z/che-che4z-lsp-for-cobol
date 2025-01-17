@@ -52,13 +52,13 @@ public class CICSTranslateMandatorySectionProcess implements Processor<ProgramNo
 
   private Optional<DivisionNode> getDataDivisionTypeNode(ProgramNode programNode) {
     return Optional.ofNullable(
-            programNode.getDepthFirstFirstNode(n -> n instanceof DivisionNode
+            programNode.findFirstNodeInSubtree(n -> n instanceof DivisionNode
                     && ((DivisionNode) n).getDivisionType() == DivisionType.DATA_DIVISION))
             .map(DivisionNode.class::cast);
   }
 
   private boolean isSectionMissing(ProgramNode programNode, SectionType sectionType) {
-    return null == programNode.getDepthFirstFirstNode(
+    return null == programNode.findFirstNodeInSubtree(
             n -> n instanceof SectionNode && ((SectionNode) n).getSectionType() == sectionType);
   }
 

@@ -61,7 +61,7 @@ public class ImplicitDb2VariablesProcessor implements Processor<SectionNode> {
   }
 
   private static boolean hasSqlCa(ProgramNode programNode) {
-    return null != programNode.getDepthFirstFirstNode(node -> {
+    return null != programNode.findFirstNodeInSubtree(node -> {
       if (!(node instanceof VariableWithLevelNode)) {
         return false;
       }

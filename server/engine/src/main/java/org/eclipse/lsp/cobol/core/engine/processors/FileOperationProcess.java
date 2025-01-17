@@ -31,17 +31,17 @@ import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.QualifiedReferenceNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNameAndLocality;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNode;
-import org.eclipse.lsp.cobol.common.model.tree.variable.VariableWithLevelNode;
 import org.eclipse.lsp.cobol.common.model.tree.variables.FileDescriptionNode;
 import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.Processor;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 import static org.eclipse.lsp.cobol.common.model.NodeType.OPEN_STATEMENT;
+import static org.eclipse.lsp.cobol.common.model.NodeType.QUALIFIED_REFERENCE_NODE;
 
 /** File operation process */
 @Slf4j
@@ -106,7 +106,7 @@ public class FileOperationProcess implements Processor<FileOperationStatementNod
   }
 
   private boolean fileIsExternal(String fileName, ProgramNode programNode) {
-    Node fd = programNode.getDepthFirstFirstNode(n -> {
+    Node fd = programNode.findFirstNodeInSubtree(n -> {
       if (n.getClass() != FileDescriptionNode.class) {
         return false;
       }
@@ -143,7 +143,7 @@ public class FileOperationProcess implements Processor<FileOperationStatementNod
   }
 
   private static boolean isFileOpen(ProgramNode programNode, String filename, List<FileOperationKind> expectedFileKind) {
-    return null != programNode.getDepthFirstFirstNode(n -> {
+    return null != programNode.findFirstNodeInSubtree(n -> {
         if (n.getNodeType() != OPEN_STATEMENT) {
           return false;
         }
@@ -160,19 +160,18 @@ public class FileOperationProcess implements Processor<FileOperationStatementNod
       List<FileOperationKind> expectedFileKind,
       ProcessingContext ctx,
       String messageTemplate) {
-    List<QualifiedReferenceNode> listOfWriteVariables =
-        node.getChildren().stream()
-            .filter(n -> node.getFilename().getLocality().equals(n.getLocality()))
-            .filter(Node.hasType(NodeType.QUALIFIED_REFERENCE_NODE))
-            .map(QualifiedReferenceNode.class::cast)
-            .collect(Collectors.toList());
-    if (listOfWriteVariables.size() != 1) {
-      return;
-    }
+      List<QualifiedReferenceNode> listOfWriteVariables = new ArrayList<>();
+      for (Node child : node.getChildren()) {
+          if (child.getNodeType() == QUALIFIED_REFERENCE_NODE
+                  && node.getFilename().getLocality().equals(child.getLocality())) {
+              listOfWriteVariables.add((QualifiedReferenceNode) child);
+          }
+      }
+      if (listOfWriteVariables.size() != 1) {
+        return;
+      }
 
-    QualifiedReferenceNode writeVariable = listOfWriteVariables.get(0);
-
-    writeVariable
+      listOfWriteVariables.get(0)
         .getVariableDefinitionNode()
         .ifPresent(
             defNode ->
@@ -189,30 +188,20 @@ public class FileOperationProcess implements Processor<FileOperationStatementNod
       String messageTemplate,
       VariableNode defNode) {
     return programNode -> {
-      Optional<FileDescriptionNode> fileDescriptionNode =
-          programNode
-              .getDepthFirstStream()
-              .filter(FileDescriptionNode.class::isInstance)
-              .map(FileDescriptionNode.class::cast)
-              .filter(
-                  n ->
-                      n.getChildren().stream()
-                          .filter(VariableWithLevelNode.class::isInstance)
-                          .map(VariableWithLevelNode.class::cast)
-                          .collect(Collectors.toList())
-                          .contains(defNode))
-              .findFirst();
-
-      fileDescriptionNode.ifPresent(
-          node1 -> {
-            if (!node1.isExternal())
-              checkFileOpenedBeforeOperation(
-                  node1.getName(),
-                  node.getFilename().getLocality(),
-                  expectedFileKind,
-                  ctx.getCurrentProgramNode(),
-                  messageTemplate).ifPresent(ctx.getErrors()::add);
-          });
+      FileDescriptionNode fileDescriptionNode = (FileDescriptionNode) programNode.findFirstNodeInSubtree(n -> {
+          if (!(n instanceof FileDescriptionNode)) {
+              return false;
+          }
+          return n.getChildren().contains(defNode);
+      });
+      if (fileDescriptionNode == null || fileDescriptionNode.isExternal()) {
+          return;
+      }
+      checkFileOpenedBeforeOperation(
+              fileDescriptionNode.getName(),
+              node.getFilename().getLocality(),
+              expectedFileKind, ctx.getCurrentProgramNode(), messageTemplate)
+                .ifPresent(ctx.getErrors()::add);
     };
   }
 }

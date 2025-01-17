@@ -126,7 +126,7 @@ public abstract class Node {
    *
    * @return a node if there is any or null.
    */
-  public Node getDepthFirstFirstNode(Predicate<Node> nodePredicate) {
+  public Node findFirstNodeInSubtree(Predicate<Node> nodePredicate) {
     if (nodePredicate.test(this)) {
       return this;
     }
