@@ -45,13 +45,16 @@ public class TestCICSGet {
       "GET CONTAINER({$varOne}) CHANNEL({$varTwo}) INTO({$varThree}) FLENGTH({$varFour})";
 
   private static final String CONTAINER_CHANNEL_VALID_TWO =
-      "GET CONTAINER({$varOne}) INTO({$varTwo}) INTOCCSID({$varThree})";
+          "GET CONTAINER({$varOne}) INTO({$varTwo}) INTOCCSID({$varThree})";
 
   private static final String CONTAINER_CHANNEL_INVALID_ONE =
       "GET CONTAINER(100) {CONTAINER|errorTwo}(100) INTO({$varFour})";
 
   private static final String CONTAINER_CHANNEL_INVALID_TWO =
       "GET CONTAINER(10) INTO({$varFour}) {INTOCCSID|errorOne}(100) {INTOCODEPAGE|errorTwo}(100)";
+
+  private static final String CONTAINER_CHANNEL_INVALID_THREE =
+          "{GET64|errorOne} CONTAINER({$varOne}) INTO({$varTwo}) INTOCCSID({$varThree})";
 
   private static final String COUNTER_VALID_ONE =
       "GET COUNTER({$varOne}) POOL({$varTwo}) VALUE({$varThree}) INCREMENT({$varFour}) WRAP";
@@ -162,6 +165,19 @@ public class TestCICSGet {
                 "Exactly one option required, options are mutually exclusive: INTOCCSID or INTOCODEPAGE or CONVERTST",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())));
+  }
+
+  @Test
+  void testContainerChannelInvalidThree() {
+    CICSTestUtils.errorTest(
+            CONTAINER_CHANNEL_INVALID_THREE,
+            ImmutableMap.of(
+                    "errorOne",
+                    new Diagnostic(
+                            new Range(),
+                            "Invalid option provided: GET64 is only available in Assembly",
+                            DiagnosticSeverity.Error,
+                            ErrorSource.PARSING.getText())));
   }
 
   @Test
