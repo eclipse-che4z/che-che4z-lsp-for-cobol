@@ -35,7 +35,6 @@ import org.eclipse.lsp.cobol.common.model.tree.variables.FileDescriptionNode;
 import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.Processor;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -106,17 +105,16 @@ public class FileOperationProcess implements Processor<FileOperationStatementNod
   }
 
   private boolean fileIsExternal(String fileName, ProgramNode programNode) {
-    Node fd = programNode.findFirstNodeInSubtree(n -> {
-      if (n.getClass() != FileDescriptionNode.class) {
-        return false;
-      }
-      FileDescriptionNode fdNode = (FileDescriptionNode) n;
-      if (!fdNode.isExternal()) {
+      return null != programNode.findFirstNodeInSubtree(n -> {
+        if (n.getClass() != FileDescriptionNode.class) {
           return false;
-      }
-      return fdNode.getName().equalsIgnoreCase(fileName);
-    });
-    return fd != null;
+        }
+        FileDescriptionNode fdNode = (FileDescriptionNode) n;
+        if (!fdNode.isExternal()) {
+            return false;
+        }
+        return fdNode.getName().equalsIgnoreCase(fileName);
+      });
   }
 
   private Optional<SyntaxError> checkFileOpenedBeforeOperation(
@@ -160,18 +158,21 @@ public class FileOperationProcess implements Processor<FileOperationStatementNod
       List<FileOperationKind> expectedFileKind,
       ProcessingContext ctx,
       String messageTemplate) {
-      List<QualifiedReferenceNode> listOfWriteVariables = new ArrayList<>();
+      QualifiedReferenceNode qrn = null;
       for (Node child : node.getChildren()) {
           if (child.getNodeType() == QUALIFIED_REFERENCE_NODE
                   && node.getFilename().getLocality().equals(child.getLocality())) {
-              listOfWriteVariables.add((QualifiedReferenceNode) child);
+              if (qrn != null) {
+                  return;
+              } else {
+                  qrn = (QualifiedReferenceNode) child;
+              }
           }
       }
-      if (listOfWriteVariables.size() != 1) {
-        return;
+      if (qrn == null) {
+          return;
       }
-
-      listOfWriteVariables.get(0)
+      qrn
         .getVariableDefinitionNode()
         .ifPresent(
             defNode ->
