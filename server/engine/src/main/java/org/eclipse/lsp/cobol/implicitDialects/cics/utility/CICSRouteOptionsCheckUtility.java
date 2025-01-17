@@ -37,7 +37,7 @@ public class CICSRouteOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
                 put(CICSLexer.TIME, ErrorSeverity.ERROR);
                 put(CICSLexer.AFTER, ErrorSeverity.WARNING);
                 put(CICSLexer.AT, ErrorSeverity.WARNING);
-                put(CICSLexer.ERRTERM, ErrorSeverity.WARNING);
+                put(CICSLexer.ERRTERM, ErrorSeverity.ERROR);
                 put(CICSLexer.TITLE, ErrorSeverity.ERROR);
                 put(CICSLexer.LIST, ErrorSeverity.ERROR);
                 put(CICSLexer.OPCLASS, ErrorSeverity.ERROR);
