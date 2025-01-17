@@ -395,7 +395,7 @@ cics_freemain: (FREEMAIN | FREEMAIN64) cics_freemain_opts;
 cics_freemain_opts:(DATA cics_data_area | DATAPOINTER cics_value | cics_handle_response)+;
 
 /** GET CONTAINER / GET COUNTER / GET DCOUNTER */
-cics_get: GET (cics_get_container_bts | cics_get_container_channel | cics_get_counter_dcounter);
+cics_get: (GET (cics_get_container_bts | cics_get_counter_dcounter)) | (GET|GET64) cics_get_container_channel;
 cics_get_container_bts: ((CONTAINER | ACTIVITY) cics_data_value | ACQACTIVITY | PROCESS | ACQPROCESS | (INTO | FLENGTH) cics_data_area |
                     SET cics_ref | NODATA  | cics_handle_response)*;
 cics_get_container_channel: ((CONTAINER | CHANNEL | BYTEOFFSET | INTOCCSID | INTOCODEPAGE) cics_data_value | (INTO | FLENGTH | CCSID) cics_data_area |
