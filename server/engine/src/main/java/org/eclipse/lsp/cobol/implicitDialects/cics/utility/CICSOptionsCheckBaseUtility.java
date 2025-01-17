@@ -233,9 +233,7 @@ public abstract class CICSOptionsCheckBaseUtility {
      * @param <E>     Generic type to allow cross-rule context collection.
      */
     @SafeVarargs
-    @SuppressWarnings("unchecked")
     protected final <E> void checkHasAtLeastOneOption(String options, ParserRuleContext ctx, E... rules) {
-
         int rulesSeen = 0;
 
         for (E rule : rules) {
@@ -243,15 +241,11 @@ public abstract class CICSOptionsCheckBaseUtility {
                 continue;
             }
 
-            if (ParserRuleContext.class.isAssignableFrom(rule.getClass()) || TerminalNode.class.isAssignableFrom(rule.getClass())) {
-                rulesSeen++;
-            } else if (List.class.isAssignableFrom(rule.getClass())) {
-                if (((List<?>) rule).isEmpty()) {
-                    continue;
-                }
-
-                rulesSeen++;
+            if (List.class.isAssignableFrom(rule.getClass()) && ((List<?>) rule).isEmpty()) {
+                continue;
             }
+
+            rulesSeen++;
         }
 
         if (rulesSeen < 1) {

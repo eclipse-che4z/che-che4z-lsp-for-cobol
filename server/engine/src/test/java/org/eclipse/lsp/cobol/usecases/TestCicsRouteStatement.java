@@ -37,7 +37,7 @@ public class TestCicsRouteStatement {
     private static final String ROUTE_VALID_1 = "ROUTE AFTER HOURS({$varOne}) MINUTES({$varOne}) SECONDS({$varOne}) ERRTERM({$varOne}) TITLE({$varOne}) LIST({$varOne}) OPCLASS({$varOne}) REQID({$varOne}) LDC({$varOne}) NLEOM";
     private static final String ROUTE_VALID_2 = "ROUTE";
 
-    private static final String ROUTE_INVALID_1 = "ROUTE {INTERVAL|errorOne}({$varOne}) AFTER HOURS({$varOne})";
+    private static final String ROUTE_INVALID_1 = "ROUTE INTERVAL({$varOne}) {AFTER|errorOne} HOURS({$varOne})";
     private static final String ROUTE_INVALID_2 = "ROUTE {AFTER|errorOne}";
 
     // Test Functions
@@ -51,7 +51,7 @@ public class TestCicsRouteStatement {
     @Test
     void testCicsRouteInvalid_1() {
         HashMap<String, Diagnostic> expectedDiagnostics = new HashMap<>();
-        expectedDiagnostics.put("errorOne", new Diagnostic(new Range(), "Options \"INTERVAL, INTERVAL, TIME, AFTER or AT\" are mutually exclusive.", DiagnosticSeverity.Error, ErrorSource.PARSING.getText()));
+        expectedDiagnostics.put("errorOne", new Diagnostic(new Range(), "Options \"INTERVAL, TIME, AFTER or AT\" are mutually exclusive.", DiagnosticSeverity.Error, ErrorSource.PARSING.getText()));
         CICSTestUtils.errorTest(ROUTE_INVALID_1, expectedDiagnostics);
     }
 
