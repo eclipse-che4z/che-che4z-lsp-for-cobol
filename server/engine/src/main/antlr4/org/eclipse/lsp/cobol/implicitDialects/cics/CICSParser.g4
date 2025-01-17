@@ -645,7 +645,7 @@ cics_rewind_counter: COUNTER cics_name (POOL cics_name | INCREMENT cics_data_val
 cics_rewind_dcounter: DCOUNTER cics_name (POOL cics_name | INCREMENT cics_data_area | cics_handle_response)*;
 
 /** REWRITE: */
-cics_rewrite: REWRITE (cics_rewrite_body | cics_handle_response)+;
+cics_rewrite: REWRITE cics_rewrite_body;
 cics_rewrite_body: (NOSUSPEND | (FILE | DATASET | SYSID) cics_name | LENGTH cics_data_value | (TOKEN | FROM) cics_data_area | cics_handle_response)+;
 
 /** ROUTE */
