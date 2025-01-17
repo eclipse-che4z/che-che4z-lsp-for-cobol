@@ -79,7 +79,7 @@ public class CICSStartbrowseOptionsCheckUtility extends CICSOptionsCheckBaseUtil
         } else if (!ctx.CONTAINER().isEmpty()) {
             checkPrerequisiteIsMet(ctx.cics_startbrowse_processWithValue_subrule(), ctx.PROCESSTYPE(), ctx, "PROCESSTYPE without PROCESS");
             checkHasIllegalOptions(ctx.PROCESS(), "PROCESS, in this context, requires a value");
-            checkMutuallyExclusiveOptions("ACTIVITYID, PROCESS or CHANNEL", ctx.ACTIVITYID(), ctx.PROCESS(), ctx.CHANNEL());
+            checkMutuallyExclusiveOptions("ACTIVITYID, PROCESS or CHANNEL", ctx.ACTIVITYID(), ctx.PROCESS(), ctx.cics_startbrowse_processWithValue_subrule(), ctx.CHANNEL());
         } else if (!ctx.EVENT().isEmpty()) {
             checkHasIllegalOptions(ctx.CHANNEL(), "CHANNEL");
             checkHasIllegalOptions(ctx.PROCESS(), "PROCESS");
