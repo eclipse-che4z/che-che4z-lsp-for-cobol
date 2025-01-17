@@ -34,6 +34,7 @@ public class CICSRewriteOptionsCheckUtility extends CICSOptionsCheckBaseUtility 
         new HashMap<Integer, ErrorSeverity>() {
             {
                 put(CICSLexer.FILE, ErrorSeverity.ERROR);
+                put(CICSLexer.DATASET, ErrorSeverity.ERROR);
                 put(CICSLexer.TOKEN, ErrorSeverity.ERROR);
                 put(CICSLexer.FROM, ErrorSeverity.ERROR);
                 put(CICSLexer.SYSID, ErrorSeverity.ERROR);
