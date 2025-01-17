@@ -28,12 +28,16 @@ public class Perform extends CFASTNode {
   String targetSectionName;
   String thruName;
   String thruSectionName;
+  String performUntilType;
 
-  public Perform(ProcedureName target, ProcedureName thru, Location location) {
+  public Perform(ProcedureName target, ProcedureName thru, Location location, PerformUntilType performUntilType) {
     super(CFASTNodeType.PERFORM.getValue(), location);
     this.targetName = Optional.ofNullable(target).map(ProcedureName::getName).orElse(null);
     this.targetSectionName = Optional.ofNullable(target).map(ProcedureName::getInSection).orElse(null);
     this.thruName = Optional.ofNullable(thru).map(ProcedureName::getName).orElse(null);
     this.thruSectionName = Optional.ofNullable(thru).map(ProcedureName::getInSection).orElse(null);
+    this.performUntilType = Optional.ofNullable(performUntilType)
+        .map(PerformUntilType::name)
+        .orElse(null);
   }
 }

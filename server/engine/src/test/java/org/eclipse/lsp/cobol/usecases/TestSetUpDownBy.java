@@ -53,6 +53,8 @@ class TestSetUpDownBy {
           + "           SET {$IND1} {$IND2} {$IND3} DOWN BY 1.\n"
           + "           SET {$IND1} {$INTVAL|1} DOWN BY -1.\n"
           + "           SET {$NOT-A-TABLE|1} UP BY 1.\n"
+          + "           SET {$NOT-A-TABLE|1} TO 4.\n"
+          + "           SET {$INTVAL} TO {$IND3}.\n"
           + "           SET {$NOT-A-TABLE|1} DOWN BY 1.\n"
           + "           SET {$NOT-A-TABLE|1} {$IND1} UP BY 1.\n"
           + "           SET {$IND1} UP BY {$INTVAL}.\n"

@@ -487,7 +487,7 @@ recordContainsClauseFormat1
    ;
 
 recordContainsClauseFormat2
-   : IS? VARYING IN? SIZE? ((FROM? integerLiteral)? recordContainsTo? CHARACTERS?)? (DEPENDING ON? qualifiedDataName)?
+   : IS? VARYING IN? SIZE? (FROM? integerLiteral)? recordContainsTo? CHARACTERS? (DEPENDING ON? qualifiedDataName)?
    ;
 
 recordContainsClauseFormat3
@@ -1321,8 +1321,12 @@ freeStatement
 // exit statement
 
 exitStatement
-   : EXIT (PROGRAM | SECTION | PARAGRAPH | PERFORM CYCLE? | METHOD)?
+   : EXIT (PROGRAM | SECTION | PARAGRAPH | exitPerform | METHOD)?
    ;
+
+exitPerform
+    : PERFORM CYCLE?
+    ;
 
 // generate statement
 
@@ -1586,8 +1590,12 @@ performTimes
    ;
 
 performUntil
-   : performTestClause? UNTIL condition
+   : performTestClause? performUntilCondition
    ;
+
+performUntilCondition
+    : UNTIL (EXIT | condition)
+    ;
 
 performVarying
    : performTestClause performVaryingClause | performVaryingClause performTestClause?
@@ -2202,7 +2210,8 @@ tableCall
 
 specialRegister
    : ADDRESS OF generalIdentifier
-   | LENGTH OF? generalIdentifier | LINAGE_COUNTER
+   | LENGTH OF? generalIdentifier
+   | LINAGE_COUNTER
    ;
 
 // in ----------------------------------

@@ -37,6 +37,7 @@ import { CopybookName } from "../CopybookDownloadService";
 import { Utils } from "../../util/Utils";
 import { searchCopybookInExtensionFolder } from "../../util/FSUtils";
 import { getErrorMessage } from "../../util/ErrorsUtils";
+import { SettingsService } from "../../Settings";
 
 const defaultConfigs: ExternalConfigurationOptions = {
   compiler: "IGYCRCTL",
@@ -63,8 +64,15 @@ export class CopybookDownloaderForE4E {
     const profile = await this.e4e.getProfileInfo(uri);
     if (profile instanceof Error) throw profile;
 
+    const compiler = SettingsService.getLspConfigCompiler();
+    const preprocessor = SettingsService.getLspConfigPreprocessors();
+
     const promise: E4EExternalConfigurationResponse | Error =
-      await this.e4e.getConfiguration(uri, defaultConfigs);
+      await this.e4e.getConfiguration(uri, {
+        compiler: compiler ?? defaultConfigs.compiler,
+        preprocessor: preprocessor ?? defaultConfigs.preprocessor,
+        type: defaultConfigs.type,
+      });
     if (promise instanceof Error) throw promise;
 
     const candidate = promise.pgroups.find(

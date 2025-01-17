@@ -15,6 +15,7 @@
 package org.eclipse.lsp.cobol.cfg;
 
 import com.google.gson.Gson;
+import com.google.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.common.model.tree.*;
 import org.eclipse.lsp.cobol.common.model.tree.statements.StatementNode;
@@ -27,6 +28,8 @@ import org.eclipse.lsp.cobol.implicitDialects.cics.nodes.ExecCicsReturnNode;
 import org.eclipse.lsp.cobol.implicitDialects.sql.node.Db2DataAndProcedureDivisionNode;
 import org.eclipse.lsp.cobol.implicitDialects.sql.node.ExecSqlNode;
 import org.eclipse.lsp.cobol.implicitDialects.sql.node.ExecSqlWheneverNode;
+import org.eclipse.lsp.cobol.service.CobolDocumentModel;
+import org.eclipse.lsp.cobol.service.DocumentModelService;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
@@ -39,6 +42,13 @@ import static org.eclipse.lsp.cobol.common.model.NodeType.*;
 @Slf4j
 public class CFASTBuilderImpl implements CFASTBuilder {
   private static final int SNIPPET_LENGTH = 10;
+
+  private final DocumentModelService documentModelService;
+
+  @Inject
+  public CFASTBuilderImpl(DocumentModelService documentModelService) {
+    this.documentModelService = documentModelService;
+  }
 
   @Override
   public ExtendedApiResult build(ProgramNode programNode) {
@@ -55,8 +65,8 @@ public class CFASTBuilderImpl implements CFASTBuilder {
     if (node instanceof ParagraphNode) {
       Paragraph paragraph =
           new Paragraph(
-              cutSnippet(((ParagraphNode) node).getText()),
               ((ParagraphNode) node).getName(),
+              cutSnippet(node),
               convertLocation(node));
       addChild(parent, paragraph);
       node.getChildren().forEach(child -> traverse(paragraph, child));
@@ -64,7 +74,7 @@ public class CFASTBuilderImpl implements CFASTBuilder {
       Section section =
           new Section(
               ((ProcedureSectionNode) node).getName(),
-              cutSnippet(((ProcedureSectionNode) node).getText()),
+              cutSnippet(node),
               convertLocation(node));
       addChild(parent, section);
       node.getChildren().forEach(child -> traverse(section, child));
@@ -97,18 +107,24 @@ public class CFASTBuilderImpl implements CFASTBuilder {
       node.getChildren().forEach(child -> traverse(parent, child));
     } else if (node instanceof PerformNode) {
       if (((PerformNode) node).isInline()) {
-        addChild(parent, new CFASTNode(CFASTNodeType.INLINE_PERFORM.getValue(), convertLocation(node)));
+        PerformUntilType performUntilType = getPerformUntilType((PerformNode) node);
+        addChild(parent, new InlinePerform(convertLocation(node), performUntilType));
         node.getChildren().forEach(child -> traverse(parent, child));
         addChild(parent, new CFASTNode(CFASTNodeType.END_INLINE_PERFORM.getValue(), convertLocation(node)));
       } else {
         PerformNode performNode = ((PerformNode) node);
-        addChild(
-            parent,
+        PerformUntilType performUntilType = getPerformUntilType((PerformNode) node);
+
+        addChild(parent,
             new Perform(performNode.getTarget(),
                 performNode.getThru(),
-                convertLocation(node)
+                convertLocation(node),
+                performUntilType
             ));
       }
+    } else if (node instanceof ExitPerformNode) {
+      ExitPerformNode exitPerformNode = (ExitPerformNode) node;
+      addChild(parent, new ExitPerform(exitPerformNode.isCycle(), exitPerformNode.isInsideInlinePerform(), convertLocation(node)));
     } else if (node instanceof ExitParagraphNode) {
       addChild(parent, new CFASTNode(CFASTNodeType.EXIT_PARAGRAPH.getValue(), convertLocation(node)));
     } else if (node instanceof ExitSectionNode) {
@@ -155,7 +171,12 @@ public class CFASTBuilderImpl implements CFASTBuilder {
       node.getChildren().forEach(child -> traverse(parent, child));
       addChild(parent, new CFASTNode(CFASTNodeType.END_EXEC.getValue(), convertLocation(node)));
     } else if (node instanceof ExecSqlNode) {
-      addChild(parent, new CFASTNode(CFASTNodeType.EXEC_SQL.getValue(), convertLocation(node)));
+      boolean isWhenever = node.getChildren().stream().anyMatch(n ->
+              n.getDepthFirstStream().anyMatch(nd -> nd instanceof ExecSqlWheneverNode));
+      // CCF expects to have "execwhenever" instead of "execsql" in case of whenever SQL statement.
+      if (!isWhenever) {
+        addChild(parent, new CFASTNode(CFASTNodeType.EXEC_SQL.getValue(), convertLocation(node)));
+      }
       node.getChildren().forEach(child -> traverse(parent, child));
       addChild(parent, new CFASTNode(CFASTNodeType.END_EXEC.getValue(), convertLocation(node)));
     } else if (node instanceof ExecSqlWheneverNode) {
@@ -167,7 +188,6 @@ public class CFASTBuilderImpl implements CFASTBuilder {
 
       addChild(parent, cfastNode);
       node.getChildren().forEach(child -> traverse(parent, child));
-      addChild(parent, new CFASTNode(CFASTNodeType.END_EXEC.getValue(), convertLocation(node)));
     } else if (node instanceof StopNode) {
       addChild(parent, new CFASTNode(CFASTNodeType.STOP.getValue(), convertLocation(node)));
     } else if (node instanceof ParagraphsNode || node instanceof ProcedureDivisionBodyNode) {
@@ -243,15 +263,32 @@ public class CFASTBuilderImpl implements CFASTBuilder {
     return new Location(location.getUri(), startPosition, endPosition);
   }
 
-  private static String cutSnippet(String text) {
-    String[] lines = text.split("\\r?\\n");
+  private String cutSnippet(Node node) {
+    CobolDocumentModel doc = documentModelService.get(node.getLocality().getUri());
+    if (doc == null) {
+      LOG.error("cutSnippet failed: " + node.getLocality().getUri() + " not found.");
+      return "<snippet creation error>";
+    }
+    List<CobolDocumentModel.Line> lines = doc.getLines();
     StringBuilder sb = new StringBuilder();
-    for (int i = 0; i < SNIPPET_LENGTH && i < lines.length; i++) {
-      if (i > 0) {
+    int startLine = node.getLocality().getRange().getStart().getLine();
+    int stopLine = Math.min(startLine + SNIPPET_LENGTH, node.getLocality().getRange().getEnd().getLine() + 1);
+    lines.subList(startLine, stopLine).forEach(line -> {
+      if (sb.length() > 0) {
         sb.append("\r\n");
       }
-      sb.append(lines[i]);
-    }
+      sb.append(line.getText());
+    });
     return sb.toString();
+  }
+
+  private PerformUntilType getPerformUntilType(PerformNode performNode) {
+    return performNode.getDepthFirstStream()
+        .filter(n -> n instanceof PerformUntilNode)
+        .findFirst()
+        .map(PerformUntilNode.class::cast)
+        .map(PerformUntilNode::isUntilExit)
+        .map(n -> n ? PerformUntilType.UNTIL_EXIT : PerformUntilType.UNTIL_CONDITION)
+        .orElse(null);
   }
 }

@@ -533,6 +533,19 @@
             "None"
           ],
           "description": "Formatting settings"
+        },
+        "cobol-lsp.lspconfig.compiler": {
+          "type": "string",
+          "default": "",
+          "description": "Name of the COBOL compiler used by the LSPConfig"
+        },
+        "cobol-lsp.lspconfig.preprocessors": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "List of preprocessors used by the LSPConfig",
+          "uniqueItems": true
         }
       }
     },

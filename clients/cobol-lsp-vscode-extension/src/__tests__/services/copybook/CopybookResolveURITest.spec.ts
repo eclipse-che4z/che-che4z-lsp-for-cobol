@@ -207,29 +207,34 @@ describe("With allowed input parameters, the list of URI that represent copybook
   });
 });
 describe("Prioritize search criteria for copybooks test suite", () => {
-  function provideMockValueForLocalAndDSN(localPath: string, dsnPath: string) {
-    vscode.workspace.getConfiguration = jest
-      .fn()
-      .mockReturnValueOnce({
-        get: jest.fn().mockReturnValueOnce([localPath]),
-      })
-      .mockReturnValue({
-        get: jest.fn().mockReturnValueOnce([dsnPath]),
-      });
-  }
+  let settingsMockProperties: Record<string, unknown> = {};
+  let spySearchInWorkspace: jest.SpyInstance<
+    ReturnType<typeof fsUtils.searchCopybookInExtensionFolder>,
+    Parameters<typeof fsUtils.searchCopybookInExtensionFolder>
+  >;
 
-  const spySearchInWorkspace = jest.spyOn(
-    fsUtils,
-    "searchCopybookInExtensionFolder",
-  );
+  let globSyncMockResult: string[] = [];
+
+  beforeEach(() => {
+    jest.spyOn(vscode.workspace, "getConfiguration").mockReturnValue({
+      get: (key: string) => settingsMockProperties[key],
+    } as unknown as vscode.WorkspaceConfiguration);
+
+    spySearchInWorkspace = jest.spyOn(
+      fsUtils,
+      "searchCopybookInExtensionFolder",
+    );
+
+    jest.spyOn(glob, "globSync").mockImplementation(() => globSyncMockResult);
+  });
+
   test("With only a local folder defined in the settings.json, the search is applied locally", async () => {
-    vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
-      get: jest.fn().mockReturnValue([CPY_FOLDER_NAME]),
-    });
-    SettingsService.getCopybookExtension = jest
-      .fn()
-      .mockReturnValue(Promise.resolve([""]));
-    jest.spyOn(glob, "globSync").mockImplementation(() => [copybookName]);
+    settingsMockProperties = {
+      "paths-local": [CPY_FOLDER_NAME],
+      "copybook-extensions": [""],
+    };
+    globSyncMockResult = [copybookName];
+
     const downloader = new CopybookDownloadService("/storagePath");
     const uri: string | undefined = await downloader.resolveCopybookHandler(
       copybookName,
@@ -239,9 +244,11 @@ describe("Prioritize search criteria for copybooks test suite", () => {
     expect(uri).toMatch(CPY_FOLDER_NAME);
     expect(spySearchInWorkspace).toHaveBeenCalledTimes(1);
   });
+
   test("With no settings provided, two search strategies are applied and function return undefined", async () => {
-    jest.spyOn(glob, "globSync").mockImplementation(() => []);
-    provideMockValueForLocalAndDSN("", "");
+    globSyncMockResult = [];
+    settingsMockProperties = {};
+
     ProfileUtils.getProfileNameForCopybook = jest
       .fn()
       .mockReturnValue(undefined);
@@ -259,8 +266,15 @@ describe("Prioritize search criteria for copybooks test suite", () => {
 
     expect(spySearchInWorkspace).toHaveBeenCalledTimes(7);
   });
+
   test("With both local and dsn references defined in the settings.json, the search is applied on local resources first", async () => {
-    jest.spyOn(glob, "globSync").mockImplementation(() => [copybookName]);
+    globSyncMockResult = [];
+    settingsMockProperties = {
+      "paths-local": [CPY_FOLDER_NAME],
+      "paths-dsn": ["DATASET.WITH.COPYBOOK"],
+      profiles: "zosmf",
+      "copybook-extensions": [""],
+    };
     const downloader = new CopybookDownloadService("/storagePath");
 
     const uri: string | undefined = await downloader.resolveCopybookHandler(
@@ -270,13 +284,25 @@ describe("Prioritize search criteria for copybooks test suite", () => {
     );
     expect(uri).not.toBe("");
     expect(spySearchInWorkspace).toHaveBeenCalledTimes(7);
-  });
-  test("With only a local folder defined for the dialect in the settings.json, the search is applied locally", async () => {
-    vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
-      get: jest.fn().mockReturnValue([CPY_FOLDER_NAME]),
-    });
 
-    jest.spyOn(glob, "globSync").mockImplementation(() => [copybookName]);
+    // check that first call searching in local folder
+    expect(spySearchInWorkspace.mock.calls[0][1]![0]).toEqual(
+      expect.stringContaining(CPY_FOLDER_NAME),
+    );
+
+    // check that call searching in dsn folder is second
+    expect(spySearchInWorkspace.mock.calls[1][1]![0]).toEqual(
+      expect.stringContaining("DATASET.WITH.COPYBOOK"),
+    );
+  });
+
+  test("With only a local folder defined for the dialect in the settings.json, the search is applied locally", async () => {
+    settingsMockProperties = {
+      "dialect.paths-local": [CPY_FOLDER_NAME],
+      "copybook-extensions": [""],
+    };
+    globSyncMockResult = [copybookName];
+
     const downloader = new CopybookDownloadService("/storagePath");
     const uri: string | undefined = await downloader.resolveCopybookHandler(
       copybookName,

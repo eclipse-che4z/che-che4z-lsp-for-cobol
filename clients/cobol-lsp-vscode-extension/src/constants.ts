@@ -24,6 +24,7 @@ export const SETTINGS_COMPILE_OPTIONS = "cobol-lsp.compiler.options";
 export const SETTINGS_SUBROUTINE_LOCAL_KEY =
   "cobol-lsp.subroutine-manager.paths-local";
 export const SETTINGS_TAB_CONFIG: string = "cobol-lsp.smart-tab";
+export const SETTINGS_LSPCONFIG_SECTION: string = "cobol-lsp.lspconfig";
 
 export const SERVER_PORT = "cobol-lsp.server.port";
 export const SERVER_RUNTIME = "cobol-lsp.serverRuntime";
@@ -57,6 +58,10 @@ export const COBOL_CBL_EXT = ".CBL";
 export const COBOL_COB_EXT = ".COB";
 export const COBOL_COBOL_EXT = ".COBOL";
 export const COBOL_EXT_ARRAY = [COBOL_CBL_EXT, COBOL_COB_EXT, COBOL_COBOL_EXT];
+export const COBOL_EXT_ARRAY_CASE_INSENSITIVE = [
+  ...COBOL_EXT_ARRAY,
+  ...COBOL_EXT_ARRAY.map((s) => s.toLowerCase()),
+];
 export const COPYBOOK_CPY_EXT = ".CPY";
 export const COPYBOOK_EXTENSIONS = "copybook-extensions";
 export const COPYBOOK_EXT_ARRAY = [COPYBOOK_CPY_EXT];

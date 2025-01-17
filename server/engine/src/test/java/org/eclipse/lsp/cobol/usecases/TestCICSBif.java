@@ -19,7 +19,6 @@ package org.eclipse.lsp.cobol.usecases;
         import org.eclipse.lsp.cobol.usecases.common.CICSTestUtils;
         import org.eclipse.lsp4j.Diagnostic;
         import org.eclipse.lsp4j.DiagnosticSeverity;
-        import org.eclipse.lsp4j.Position;
         import org.eclipse.lsp4j.Range;
         import org.junit.jupiter.api.Test;
 
@@ -51,9 +50,9 @@ public class TestCICSBif {
     private static final String BIF_DIGEST_RECORD_RECORDLEN_DIGESTTYPE_RESULT_VALID =
             "BIF DIGEST RECORD(100) RECORDLEN(100) DIGESTTYPE({$varFour}) RESULT({$varFour})";
     private static final String BIF_DIGEST_DIGESTTYPE_INVALID =
-            "BIF DIGEST {RECORD |errorResultMissing }(100) RECORDLEN(100) {HEX | errorDigestType} {BASE64 | errorDigestType2}";
+            "BIF {_DIGEST RECORD(100) RECORDLEN(100) {HEX|errorDigestType} {BASE64|errorDigestType2}|errorResultMissing_}";
     private static final String BIF_DIGEST_RESULT_MISSING_INVALID =
-            "BIF DIGEST RECORD(100) {RECORDLEN | errorResultMissing}(100)";
+            "BIF {_DIGEST RECORD(100) RECORDLEN(100)|errorResultMissing_}";
 
     @Test
     void testBifDeeditField() {
@@ -104,19 +103,19 @@ public class TestCICSBif {
                 ImmutableMap.of(
                         "errorResultMissing",
                         new Diagnostic(
-                                new Range(new Position(13, 12), new Position(17, 18)),
+                                new Range(),
                                 "Missing required option: RESULT",
                                 DiagnosticSeverity.Error,
                                 ErrorSource.PARSING.getText()),
                         "errorDigestType",
                         new Diagnostic(
-                                new Range(new Position(16, 12), new Position(16, 15)),
+                                new Range(),
                                 "Exactly one option required, options are mutually exclusive: HEX or BINARY or BASE64 or DIGESTTYPE",
                                 DiagnosticSeverity.Error,
                                 ErrorSource.PARSING.getText()),
                         "errorDigestType2",
                         new Diagnostic(
-                                new Range(new Position(17, 12), new Position(17, 18)),
+                                new Range(),
                                 "Exactly one option required, options are mutually exclusive: HEX or BINARY or BASE64 or DIGESTTYPE",
                                 DiagnosticSeverity.Error,
                                 ErrorSource.PARSING.getText())
@@ -129,7 +128,7 @@ public class TestCICSBif {
                 ImmutableMap.of(
                         "errorResultMissing",
                         new Diagnostic(
-                                new Range(new Position(13, 12), new Position(15, 26)),
+                                new Range(),
                                 "Missing required option: RESULT",
                                 DiagnosticSeverity.Error,
                                 ErrorSource.PARSING.getText()));

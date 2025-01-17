@@ -17,7 +17,7 @@ package org.eclipse.lsp.cobol.core.visitor;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static org.eclipse.lsp.cobol.common.OutlineNodeNames.FILLER_NAME;
-import static org.eclipse.lsp.cobol.core.CobolDataDivisionParser.*;
+import static org.eclipse.lsp.cobol.core.CobolParser.*;
 
 import com.google.common.collect.ImmutableList;
 import java.util.*;
@@ -29,12 +29,13 @@ import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
+import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
+import org.eclipse.lsp.cobol.AntlrRangeUtils;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.model.tree.variable.UsageFormat;
 import org.eclipse.lsp.cobol.common.model.tree.variable.ValueInterval;
-import org.eclipse.lsp.cobol.core.CobolDataDivisionParser;
 import org.eclipse.lsp.cobol.core.CobolParser;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
@@ -100,18 +101,7 @@ public class VisitorHelper {
    * @param clauses a list of ANTLR picture clauses
    * @return the list of picture texts
    */
-  public static List<String> retrievePicTexts(List<DataPictureClauseContext> clauses) {
-    return clauses.stream()
-            .map(clause -> clause.getText().replaceAll(clause.getStart().getText(), "").trim())
-            .collect(toList());
-  }
-  /**
-   * Extract picture texts
-   *
-   * @param clauses a list of ANTLR picture clauses
-   * @return the list of picture texts
-   */
-  public static List<String> retrievePicTextsOld(List<org.eclipse.lsp.cobol.core.CobolParser.DataPictureClauseContext> clauses) {
+  public static List<String> retrievePicTexts(List<org.eclipse.lsp.cobol.core.CobolParser.DataPictureClauseContext> clauses) {
     return clauses.stream()
             .map(clause -> clause.getText().replaceAll(clause.getStart().getText(), "").trim())
             .collect(toList());
@@ -124,32 +114,7 @@ public class VisitorHelper {
    * @param contexts a list of ANTLR value intervals
    * @return the list of value intervals
    */
-  public static List<ValueInterval> retrieveValueIntervals(List<DataValueIntervalContext> contexts) {
-    return contexts.stream()
-            .map(
-                    context ->
-                            new ValueInterval(
-                                    context.dataValueIntervalFrom().getText(),
-                                    ofNullable(context.dataValueIntervalTo())
-                                            .map(DataValueIntervalToContext::literal)
-                                            .map(ParserRuleContext::getText)
-                                            .map(String::toUpperCase)
-                                            .orElse(null),
-                                    ofNullable(context.dataValueIntervalTo())
-                                            .map(DataValueIntervalToContext::thruToken)
-                                            .map(ParserRuleContext::getText)
-                                            .map(String::toUpperCase)
-                                            .orElse(null)))
-            .collect(toList());
-  }
-  /**
-   * Extract value intervals. It's also applicable for raw values. In case of just a value `to`
-   * field will be `null`.
-   *
-   * @param contexts a list of ANTLR value intervals
-   * @return the list of value intervals
-   */
-  public static List<ValueInterval> retrieveValueIntervalsOld(List<org.eclipse.lsp.cobol.core.CobolParser.DataValueIntervalContext> contexts) {
+  public static List<ValueInterval> retrieveValueIntervals(List<org.eclipse.lsp.cobol.core.CobolParser.DataValueIntervalContext> contexts) {
     return contexts.stream()
             .map(
                     context ->
@@ -174,22 +139,7 @@ public class VisitorHelper {
    * @param contexts a list of ANTLR usage clauses
    * @return the list of usage formats
    */
-  public static List<UsageFormat> retrieveUsageFormat(List<DataUsageClauseContext> contexts) {
-    return contexts.stream()
-            .map(DataUsageClauseContext::usageFormat)
-            .filter(Objects::nonNull)
-            .map(UsageFormatContext::getStart)
-            .map(Token::getText)
-            .map(UsageFormat::of)
-            .collect(toList());
-  }
-  /**
-   * Extract usage format from ANTLR usage clause
-   *
-   * @param contexts a list of ANTLR usage clauses
-   * @return the list of usage formats
-   */
-  public static List<UsageFormat> retrieveUsageFormatOld(List<org.eclipse.lsp.cobol.core.CobolParser.DataUsageClauseContext> contexts) {
+  public static List<UsageFormat> retrieveUsageFormat(List<org.eclipse.lsp.cobol.core.CobolParser.DataUsageClauseContext> contexts) {
     return contexts.stream()
             .map(org.eclipse.lsp.cobol.core.CobolParser.DataUsageClauseContext::usageFormat)
             .filter(Objects::nonNull)
@@ -204,21 +154,7 @@ public class VisitorHelper {
    * @param context the IntegerLiteralContext, may be null
    * @return converted Integer or null if the context is empty
    */
-  public static Integer getInteger(IntegerLiteralContext context) {
-    return ofNullable(context)
-            .map(ParserRuleContext::getText)
-            .filter(it -> !it.isEmpty())
-            .map(Integer::parseInt)
-            .orElse(null);
-  }
-
-  /**
-   * Convert IntegerLiteralContext into an Integer
-   *
-   * @param context the IntegerLiteralContext, may be null
-   * @return converted Integer or null if the context is empty
-   */
-  public static Integer getIntegerOld(CobolParser.IntegerLiteralContext context) {
+  public static Integer getInteger(CobolParser.IntegerLiteralContext context) {
     return ofNullable(context)
             .map(ParserRuleContext::getText)
             .filter(it -> !it.isEmpty())
@@ -249,53 +185,11 @@ public class VisitorHelper {
    * @param ctx ParserRuleContext to extract locality
    * @return locality which has a range from the start to the end of the rule
    */
-  public static Optional<Range> retrieveRangeLocality(ParserRuleContext ctx) {
+  public static Optional<Range> retrieveRangeLocality(ParseTree ctx) {
     if (ctx == null) {
       return Optional.empty();
     }
-    return Optional.of(constructRange(ctx));
-  }
-
-  /**
-   * Construct the range from ANTLR context
-   *
-   * @param ctx the ANTLR context
-   * @return the range
-   */
-  public static Range constructRange(ParserRuleContext ctx) {
-    Token start = ctx.start;
-    Token end = ctx.stop;
-
-    if (start.getLine() > end.getLine()) {
-      start = ctx.stop;
-      end = ctx.start;
-    }
-
-    return new Range(
-        new Position(
-            start.getLine() - 1,
-            start.getCharPositionInLine()),
-        new Position(
-            end.getLine() - 1,
-            end.getCharPositionInLine() + end.getStopIndex() - end.getStartIndex() + 1)
-    );
-  }
-
-  /**
-   * Construct the range from ANTLR token
-   *
-   * @param token the ANTLR token
-   * @return the range
-   */
-  public static Range constructRange(Token token) {
-    return new Range(
-            new Position(
-                    token.getLine() - 1,
-                    token.getCharPositionInLine()),
-            new Position(
-                    token.getLine() - 1,
-                    token.getCharPositionInLine() + token.getStopIndex() - token.getStartIndex() + 1)
-    );
+    return Optional.of(AntlrRangeUtils.constructRange(ctx));
   }
 
   /**
@@ -330,21 +224,10 @@ public class VisitorHelper {
    * @param ctx a context object
    * @return extracted value
    */
-  public static Optional<Integer> retrieveOccursToValue(CobolDataDivisionParser.DataOccursClauseContext ctx) {
+  public static Optional<Integer> retrieveOccursToValue(DataOccursClauseContext ctx) {
     return ofNullable(ctx.dataOccursTo())
-        .map(CobolDataDivisionParser.DataOccursToContext::integerLiteral)
-        .map(VisitorHelper::getInteger);
-  }
-
-  /**
-   * Gets a value from DataOccursClauseContext context
-   * @param ctx a context object
-   * @return extracted value
-   */
-  public static Optional<Integer> retrieveOccursToValueOld(CobolParser.DataOccursClauseContext ctx) {
-    return ofNullable(ctx.dataOccursTo())
-            .map(CobolParser.DataOccursToContext::integerLiteral)
-            .map(VisitorHelper::getIntegerOld);
+            .map(DataOccursToContext::integerLiteral)
+            .map(VisitorHelper::getInteger);
   }
 
   /**
@@ -352,21 +235,7 @@ public class VisitorHelper {
    * @param ctx a context object
    * @return extracted value
    */
-  public static String retrieveValueToken(ValueIsTokenContext ctx) {
-    return ctx.valueToken().getText().toUpperCase()
-            + Optional.ofNullable(ctx.isAreToken())
-            .map(ParserRuleContext::getText)
-            .map(String::toUpperCase)
-            .map(" "::concat)
-            .orElse("");
-  }
-
-  /**
-   * Gets value from ValueIsTokenContext context
-   * @param ctx a context object
-   * @return extracted value
-   */
-  public static String retrieveValueTokenOld(CobolParser.ValueIsTokenContext ctx) {
+  public static String retrieveValueToken(CobolParser.ValueIsTokenContext ctx) {
     return ctx.valueToken().getText().toUpperCase()
             + Optional.ofNullable(ctx.isAreToken())
             .map(ParserRuleContext::getText)

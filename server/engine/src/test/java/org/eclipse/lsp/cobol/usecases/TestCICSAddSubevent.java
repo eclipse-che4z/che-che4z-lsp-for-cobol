@@ -14,12 +14,12 @@
  */
 package org.eclipse.lsp.cobol.usecases;
 
+        import com.google.common.collect.ImmutableList;
         import com.google.common.collect.ImmutableMap;
         import org.eclipse.lsp.cobol.common.error.ErrorSource;
         import org.eclipse.lsp.cobol.usecases.common.CICSTestUtils;
         import org.eclipse.lsp4j.Diagnostic;
         import org.eclipse.lsp4j.DiagnosticSeverity;
-        import org.eclipse.lsp4j.Position;
         import org.eclipse.lsp4j.Range;
         import org.junit.jupiter.api.Test;
 
@@ -37,7 +37,7 @@ public class TestCICSAddSubevent {
     private static final String ADD_EVENT_SUBEVENT =
             "ADD EVENT({$varFour}) SUBEVENT({$varFour})";
     private static final String ADD_INVALID =
-            "{ADD | error} ";
+            "ADD ";
     private static final String ADD_EVENT_INVALID =
             "ADD {EVENT(100) | errorMissingSubevent} ";
     private static final String ADD_SUBEVENT_INVALID =
@@ -54,13 +54,13 @@ public class TestCICSAddSubevent {
     void testAddInvalid() {
         Map<String, Diagnostic> expectedDiagnostic =
                 ImmutableMap.of(
-                        "error",
+                        "end-exec-error",
                         new Diagnostic(
-                                new Range(new Position(13, 12), new Position(13, 20)),
+                                new Range(),
                                 "Syntax error on 'END-EXEC'",
                                 DiagnosticSeverity.Error,
                                 ErrorSource.PARSING.getText()));
-        CICSTestUtils.errorTest(ADD_INVALID, expectedDiagnostic);
+        CICSTestUtils.errorTestWithEndExecError(ADD_INVALID, ImmutableList.of(), expectedDiagnostic);
     }
     @Test
     void testAddSubEventInvalid() {
