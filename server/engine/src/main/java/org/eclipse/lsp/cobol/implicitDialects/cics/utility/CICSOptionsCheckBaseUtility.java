@@ -235,14 +235,6 @@ public abstract class CICSOptionsCheckBaseUtility {
     @SafeVarargs
     @SuppressWarnings("unchecked")
     protected final <E> void checkHasAtLeastOneOption(String options, ParserRuleContext ctx, E... rules) {
-        if (rules.length <= 1) {
-            if (rules[0] != null) {
-                if (List.class.isAssignableFrom(rules[0].getClass())) {
-                    checkHasMandatoryOptions((List<E>) rules[0], ctx, options);
-                }
-            }
-            return;
-        }
 
         int rulesSeen = 0;
 
