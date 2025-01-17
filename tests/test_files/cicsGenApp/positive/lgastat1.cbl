@@ -77,11 +77,13 @@
            MOVE EIBCALEN TO WS-CALEN.
       *
            Exec CICS Get Container(WS-CHANname1)
+                         FLENGTH(WS-Data-Req)
                          Into(WS-Data-Req)
                          Resp(WS-RESP)
            End-Exec.
       *
            Exec CICS Get Container(WS-CHANname2)
+                         FLENGTH(WS-Data-Req)
                          Into(WS-Data-RC)
                          Resp(WS-RESP)
            End-Exec.
