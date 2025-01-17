@@ -17,7 +17,6 @@ package org.eclipse.lsp.cobol.common;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Value;
-import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.symbols.SymbolTable;
 import org.eclipse.lsp.cobol.common.model.tree.RootNode;
 import org.eclipse.lsp4j.Diagnostic;

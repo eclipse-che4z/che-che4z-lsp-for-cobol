@@ -15,6 +15,7 @@
     },
     "children": [
       {
+        "performUntilType": "UNTIL_CONDITION",
         "type": "inlineperform",
         "location": {
           "uri": "fake/path",

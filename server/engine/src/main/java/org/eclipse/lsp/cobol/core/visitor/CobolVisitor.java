@@ -21,6 +21,7 @@ import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.eclipse.lsp.cobol.AntlrRangeUtils;
 import org.eclipse.lsp.cobol.common.SubroutineService;
 import org.eclipse.lsp.cobol.common.dialects.CobolDialect;
 import org.eclipse.lsp.cobol.common.dialects.CobolProgramLayout;
@@ -31,10 +32,7 @@ import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.model.*;
 import org.eclipse.lsp.cobol.common.model.tree.*;
-import org.eclipse.lsp.cobol.common.model.tree.statements.SetToBooleanStatement;
-import org.eclipse.lsp.cobol.common.model.tree.statements.SetToOnOffStatement;
-import org.eclipse.lsp.cobol.common.model.tree.statements.SetUpDownByStatement;
-import org.eclipse.lsp.cobol.common.model.tree.statements.StatementNode;
+import org.eclipse.lsp.cobol.common.model.tree.statements.*;
 import org.eclipse.lsp.cobol.common.model.tree.variable.*;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableDefinitionNode.Builder;
 import org.eclipse.lsp.cobol.common.model.variables.DivisionType;
@@ -914,6 +912,16 @@ public final class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   }
 
   @Override
+  public List<Node> visitPerformUntil(PerformUntilContext ctx) {
+    boolean untilExit = Optional.of(ctx)
+        .map(PerformUntilContext::performUntilCondition)
+        .map(PerformUntilConditionContext::EXIT)
+        .isPresent();
+
+    return addTreeNode(ctx, locality -> new PerformUntilNode(locality, untilExit));
+  }
+
+  @Override
   public List<Node> visitPerformProcedureStatement(PerformProcedureStatementContext ctx) {
     final ProcedureName targetName = parseProcedureName(ctx.procedureName());
     final ProcedureName thruName = parseProcedureName(Optional.ofNullable(ctx.through())
@@ -959,9 +967,9 @@ public final class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
                     .statementLocality(retrieveLocality(ctx, extendedDocument, copybooks).orElse(null))
                     .variableNameAndLocality(extractNameAndLocality(ctx.entryName()))
                     .global(!ctx.dataGlobalClause().isEmpty())
-                    .picClauses(retrievePicTextsOld(ctx.dataPictureClause()))
+                    .picClauses(retrievePicTexts(ctx.dataPictureClause()))
                     .valueClauses(retrieveValues(ctx.dataValueClause()))
-                    .usageClauses(retrieveUsageFormatOld(ctx.dataUsageClause()))
+                    .usageClauses(retrieveUsageFormat(ctx.dataUsageClause()))
                     .occursClauses(retrieveOccursValues(ctx.dataOccursClause()))
                     .redefinesClauses(
                             ctx.dataRedefinesClause().stream()
@@ -1039,7 +1047,7 @@ public final class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
                                             .variableNameAndLocality(extractNameAndLocality(ctx.entryName()))
                                             .statementLocality(retrieveLocality(ctx, extendedDocument, copybooks).orElse(null))
                                             .valueClauses(retrieveValues(ImmutableList.of(ctx.dataValueClause())))
-                                            .valueToken(retrieveValueTokenOld(valueToken))
+                                            .valueToken(retrieveValueToken(valueToken))
                                             .build(),
                                     visitChildren(ctx)))
             .orElse(ImmutableList.of());
@@ -1055,9 +1063,9 @@ public final class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
                     .variableNameAndLocality(extractNameAndLocality(ctx.entryName()))
                     .statementLocality(retrieveLocality(ctx, extendedDocument, copybooks).orElse(null))
                     .global(!ctx.dataGlobalClause().isEmpty())
-                    .picClauses(retrievePicTextsOld(ctx.dataPictureClause()))
+                    .picClauses(retrievePicTexts(ctx.dataPictureClause()))
                     .valueClauses(retrieveValues(ctx.dataValueClause()))
-                    .usageClauses(retrieveUsageFormatOld(ctx.dataUsageClause()))
+                    .usageClauses(retrieveUsageFormat(ctx.dataUsageClause()))
                     .occursClauses(retrieveOccursValues(ctx.dataOccursClause()))
                     .redefinesClauses(
                             ctx.dataRedefinesClause().stream()
@@ -1075,6 +1083,33 @@ public final class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
                                     .isPresent())
                     .build(),
             visitChildren(ctx));
+  }
+
+  @Override
+  public List<Node> visitSetToStatement(SetToStatementContext ctx) {
+    List<Node> receivingField =
+            ctx.receivingField().stream().map(this::visit).flatMap(List::stream).collect(toList());
+
+    boolean address = ctx.receivingField().stream()
+        .map(f -> f.children)
+        .filter(Objects::nonNull)
+        .flatMap(Collection::stream)
+            .filter(c -> c instanceof GeneralIdentifierContext)
+            .flatMap(c -> ((GeneralIdentifierContext) c).children.stream())
+            .anyMatch(c -> c instanceof SpecialRegisterContext);
+
+    List<Node> sendingField =
+            ofNullable(ctx.sendingField()).map(this::visit).orElseGet(ImmutableList::of);
+    List<Node> children = new ArrayList<>();
+    children.addAll(receivingField);
+    children.addAll(sendingField);
+    if (sendingField.size() != 1) return children;
+    SetToStatement statement =
+            new SetToStatement(address,
+                    retrieveLocality(ctx, extendedDocument, copybooks).orElse(null),
+                    receivingField,
+                    sendingField.get(0));
+    return addTreeNode(statement, children);
   }
 
   @Override
@@ -1178,6 +1213,10 @@ public final class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
     if (ctx.PARAGRAPH() != null) {
       return addTreeNode(ctx, ExitParagraphNode::new);
     }
+    if (ctx.exitPerform() != null) {
+      return addTreeNode(ctx, locality ->  new ExitPerformNode(locality, ctx.exitPerform().CYCLE() != null));
+    }
+
     return addTreeNode(ctx, ExitNode::new);
   }
 
@@ -1771,11 +1810,11 @@ public final class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   }
 
   private Optional<OccursClause> toOccursClause(DataOccursClauseContext ctx) {
-    return ofNullable(VisitorHelper.getIntegerOld(ctx.integerLiteral()))
+    return ofNullable(VisitorHelper.getInteger(ctx.integerLiteral()))
             .map(
                     intLit ->
                             new OccursClause(
-                                    intLit, retrieveOccursToValueOld(ctx).orElse(null),
+                                    intLit, retrieveOccursToValue(ctx).orElse(null),
                                     Optional.ofNullable(ctx.dataOccursTo()).map(DataOccursToContext::UNBOUNDED).isPresent(),
                                     retrieveIndexNames(ctx)));
   }
@@ -1793,7 +1832,7 @@ public final class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
 
   private ValueClause retrieveValue(DataValueClauseContext context) {
     return new ValueClause(
-            retrieveValueIntervalsOld(context.dataValueClauseLiteral().dataValueInterval()),
+            retrieveValueIntervals(context.dataValueClauseLiteral().dataValueInterval()),
             getLocality(context.getStart()).orElse(null));
   }
 
@@ -1858,7 +1897,7 @@ public final class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
 
     void update(Token lastToken) {
       lastSentenseToken = lastToken;
-      lastSentensePosition = extendedDocument.mapLocation(constructRange(lastSentenseToken))
+      lastSentensePosition = extendedDocument.mapLocation(AntlrRangeUtils.constructRange(lastSentenseToken))
               .getRange().getEnd();
     }
 

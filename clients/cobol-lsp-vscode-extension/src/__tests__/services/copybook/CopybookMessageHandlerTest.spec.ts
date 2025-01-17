@@ -188,7 +188,11 @@ describe("Test the copybook message handler", () => {
 
   it("checks E4E downloaded member copybooks are resolved", async () => {
     vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
-      get: jest.fn().mockReturnValue("ENDEVOR_PROCESSOR"),
+      get: (key: string, defaultValue?: unknown) => {
+        if (key === "compiler") return defaultValue;
+        if (key === "preprocessors") return defaultValue;
+        return "ENDEVOR_PROCESSOR";
+      },
     });
     const downloader = new CopybookDownloadService("/storagePath", undefined, {
       isEndevorElement(uri: string) {
@@ -239,7 +243,11 @@ describe("Test the copybook message handler", () => {
   });
   it("checks E4E downloaded element copybooks are resolved", async () => {
     vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
-      get: jest.fn().mockReturnValue("ENDEVOR_PROCESSOR"),
+      get: (key: string, defaultValue?: unknown) => {
+        if (key === "compiler") return defaultValue;
+        if (key === "preprocessors") return defaultValue;
+        return "ENDEVOR_PROCESSOR";
+      },
     });
     const downloader = new CopybookDownloadService("/storagePath", undefined, {
       isEndevorElement(uri: string) {

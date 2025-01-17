@@ -14,12 +14,12 @@
  */
 package org.eclipse.lsp.cobol.usecases;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.usecases.common.CICSTestUtils;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
-import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
@@ -37,7 +37,7 @@ public class TestCICSAsktime {
     private static final String ASKTIME_ABSTIME_VALID =
             "ASKTIME ABSTIME({$varFour})";
     private static final String ASKTIME_INVALID =
-            "ASKTIME {ABSTIME | error} ";
+            "ASKTIME ABSTIME ";
     @Test
     void testAsktimeValid() {
         CICSTestUtils.noErrorTest(ASKTIME_VALID);
@@ -50,12 +50,12 @@ public class TestCICSAsktime {
     void testAsktimeInvalid() {
         Map<String, Diagnostic> expectedDiagnostic =
                 ImmutableMap.of(
-                        "error",
+                        "end-exec-error",
                         new Diagnostic(
-                                new Range(new Position(14, 12), new Position(14, 20)),
+                                new Range(),
                                 "Syntax error on 'END-EXEC'",
                                 DiagnosticSeverity.Error,
                                 ErrorSource.PARSING.getText()));
-        CICSTestUtils.errorTest(ASKTIME_INVALID, expectedDiagnostic);
+        CICSTestUtils.errorTestWithEndExecError(ASKTIME_INVALID, ImmutableList.of(), expectedDiagnostic);
     }
 }

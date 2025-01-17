@@ -20,12 +20,15 @@ import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.implicitDialects.cics.CICSLexer;
-
-import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_cancel;
+import org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_cancel;
+import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_cancel_bts;
+import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_cancel_reqid;
 
 /** Checks CICS Cancel rules for required and invalid options */
 public class CICSCancelOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
@@ -56,6 +59,21 @@ public class CICSCancelOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
      * @param <E> A subclass of ParserRuleContext
      */
     public <E extends ParserRuleContext> void checkOptions(E ctx) {
+        if (ctx.getRuleIndex() == RULE_cics_cancel_bts) {
+            checkBts((CICSParser.Cics_cancel_btsContext) ctx);
+        } else if (ctx.getRuleIndex() == RULE_cics_cancel_reqid) {
+            checkReq((CICSParser.Cics_cancel_reqidContext) ctx);
+        }
         checkDuplicates(ctx);
+    }
+
+    private void checkBts(CICSParser.Cics_cancel_btsContext ctx) {
+    checkHasExactlyOneOption("ACTIVITY or ACQACTIVITY or ACQPROCESS", ctx, ctx.ACTIVITY(), ctx.ACQACTIVITY(), ctx.ACQPROCESS());
+    }
+
+    private void checkReq(CICSParser.Cics_cancel_reqidContext ctx) {
+    if (!ctx.SYSID().isEmpty() || !ctx.TRANSID().isEmpty()) {
+        checkHasMandatoryOptions(ctx.REQID(), ctx, "REQID");
+    }
     }
 }

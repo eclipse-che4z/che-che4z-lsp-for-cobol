@@ -152,9 +152,11 @@ If you specify your subroutine folders using absolute paths or paths containing 
 
 ## Copybook Support
 
-The COBOL Language Support extension supports copybooks used in your source code that are stored in a local folder in your workspace. If you have copybooks stored in mainframe data sets or USS directories, you can use a Zowe Explorer profile to automatically download them from the mainframe to your workspace.
+The COBOL Language Support extension automatically supports copybooks used in your source code that are stored in a folder in your workspace. 
 
-To enable copybook support, you specify the folders and data sets that contain copybooks used in your project in the workspace settings. When a copybook is used in the program, the folders and data sets are searched in the order they are listed for files and members that match the name of the copybook. If a copybook with the same file name is located in both a local folder and a remote location, the one in the local folder is used.
+If you have copybooks stored in mainframe data sets or USS directories, you can use a Zowe Explorer profile to automatically download them from the mainframe to your workspace. You specify the data sets that contain copybooks used in your project in the workspace settings. If you need to restrict copybook support to certain subfolders in your workspace, you can also specify local folders that contain copybooks in the workspace settings.
+
+When a copybook is used in the program, the folders and data sets are searched in the order they are listed for files and members that match the name of the copybook. If a copybook with the same file name is located in both a local folder that you specify in the workspace settings and a remote location, the one in the local folder is used.
 
 Copybook support features are disabled for files stored in the folder **.c4z/.extsrcs** in your workspace. If you also use the [Debugger for Mainframe](https://github.com/BroadcomMFD/debugger-for-mainframe) extension to debug your COBOL programs, you might have some files stored in this folder.
 
@@ -169,13 +171,19 @@ COBOL Language Support supports the following copybook types:
 
 ### Storing Copybooks Locally
 
-You can store your copybooks locally in folders in your workspace and specify those folder paths in your workspace extension settings.
+You can store your copybooks locally in folders in your workspace. Copybook support is enabled by default for the entire workspace. If you need to restrict copybook support to individual folders, specify the folder paths in your workspace extension settings.
 
 1. Open the COBOL Language Support extension settings.
 2. Switch from **User** to **Workspace**.
 3. Specify the paths of the folders containing copybooks under **Cpy-manager: Paths-local**.
    - **Tip:** We recommend that you specify relative paths from the workspace root. To obtain the relative path of a folder in your workspace, right-click it in the folder tree and select **Copy Relative Path**.
-   - You can use [Glob](https://www.npmjs.com/package/glob) wildcards, such as * to substitute one whole level of the path. For example, specifying the path `*/copybooks` searches all subfolders named "copybooks" in  subfolders of your workspace root, while the path `copybooks/*` searches all subfolders one level below the `copybooks` folder in the workspace root. For more information on available wildcards, see the [Glob Primer](https://www.npmjs.com/package/glob#Glob-Primer)
+   - You can use [Glob](https://www.npmjs.com/package/glob) wildcards, such as * to substitute one whole level of the path. For example, specifying the path `*/copybooks` searches all subfolders named "copybooks" in  subfolders of your workspace root, while the path `copybooks/*` searches all subfolders one level below the `copybooks` folder in the workspace root. For more information on available wildcards, see the [Glob Primer](https://www.npmjs.com/package/glob#Glob-Primer).
+   - You can also use the following VS Code predefined variables:
+     - **${fileBasenameNoExtension}**
+     - **${fileDirname}**
+     - **${fileDirnameBasename}**
+     - **${workspaceFolder}**
+     - For more information, see the [VS Code documentation](https://code.visualstudio.com/docs/editor/variables-reference#_predefined-variables).
    - The folders are searched in the order they are listed, or in alphabetical order if multiple paths are indexed by a wildcard. If two folders contain a copybook with the same file name, the one from the folder higher on the list is used.
 4. (Optional) Under **Cpy-manager: Copybook-extensions**, specify the file extensions used for your copybooks. The default supported file extensions are `.cpy` and `.copy`.
 5. Open a file or folder.  
@@ -371,40 +379,3 @@ To enable troubleshooting logs for the LSP server, specify a value for the param
 These values are ordered from returning the least information ("ERROR"; errors only) to the most information ("ALL"; all details).
 
 To view troubleshooting logs, open the output panel and select **COBOL Language Support** from the drop-down menu.
-
-## Technical Assistance and Support for COBOL Language Support
-
-The COBOL Language Support extension is made available to customers on the Visual Studio Code Marketplace in accordance with the terms and conditions contained in the provided End-User License Agreement (EULA).
-
-If you are on active support for Brightside, you get technical assistance and support in accordance with the terms, guidelines, details, and parameters that are located within the Broadcom [Working with Support](https://support.broadcom.com/external/content/release-announcements/CA-Support-Policies/6933) guide.
-
-This support generally includes:
-
-* Telephone and online access to technical support
-* Ability to submit new incidents 24x7x365
-* 24x7x365 continuous support for Severity 1 incidents
-* 24x7x365 access to Broadcom Support
-* Interactive remote diagnostic support
-* Technical support cases must be submitted to Broadcom in accordance with guidance provided in “Working with Support”.
-
-Note: To receive technical assistance and support, you must remain compliant with “Working with Support”, be current on all applicable licensing and maintenance requirements, and maintain an environment in which all computer hardware, operating systems, and third party software associated with the affected Broadcom software are on the releases and version levels from the manufacturer that Broadcom designates as compatible with the software. Changes you elect to make to your operating environment could detrimentally affect the performance of Broadcom software and Broadcom shall not be responsible for these effects or any resulting degradation in performance of the Broadcom software. Severity 1 cases must be opened via telephone and elevations of lower severity incidents to Severity 1 status must be requested via telephone.
-
-## Privacy Notice
-The extensions for Visual Studio Code developed by Broadcom Inc., including its corporate affiliates and subsidiaries, ("Broadcom") are provided free of charge, but in order to better understand and meet its users’ needs, Broadcom may collect, use, analyze and retain anonymous users’ metadata and interaction data, (collectively, “Usage Data”) and aggregate such Usage Data with similar Usage Data of other Broadcom customers. Please find more detailed information in [License and Service Terms & Repository](https://www.broadcom.com/company/legal/licensing).
-
-This data collection uses built-in Microsoft VS Code Telemetry, which can be disabled, at your sole discretion, if you do not want to send Usage Data.
-
-The current release of COBOL Language Support collects anonymous data for the following events:
-* Activation of this VS Code extension
-* Problem interaction
-* Quick Fix
-* Invalid ZOWE credentials
-* ZOWE connection issues
-* Java version issues
-
-Each such event is logged with the following information:
-* Event time
-* Operating system and version
-* Country or region
-* Anonymous user and session ID
-* Version numbers of Microsoft VS Code and COBOL Language Support
