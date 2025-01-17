@@ -395,7 +395,7 @@ cics_freemain: (FREEMAIN | FREEMAIN64) cics_freemain_opts;
 cics_freemain_opts:(DATA cics_data_area | DATAPOINTER cics_value | cics_handle_response)+;
 
 /** GET CONTAINER / GET COUNTER / GET DCOUNTER */
-cics_get: GET (cics_get_container_bts | cics_get_container_channel | cics_get_counter_dcounter);
+cics_get: (GET (cics_get_container_bts | cics_get_counter_dcounter)) | (GET|GET64) cics_get_container_channel;
 cics_get_container_bts: ((CONTAINER | ACTIVITY) cics_data_value | ACQACTIVITY | PROCESS | ACQPROCESS | (INTO | FLENGTH) cics_data_area |
                     SET cics_ref | NODATA  | cics_handle_response)*;
 cics_get_container_channel: ((CONTAINER | CHANNEL | BYTEOFFSET | INTOCCSID | INTOCODEPAGE) cics_data_value | (INTO | FLENGTH | CCSID) cics_data_area |
@@ -413,13 +413,12 @@ cics_getmain64_body: (SET cics_ref | FLENGTH cics_data_value | LOCATION cics_cvd
 
 
 /** GETNEXT ACTIVITY / CONTAINER / EVENT / PROCESS */
-cics_getnext: GETNEXT (cics_getnext_activity | cics_getnext_container | cics_getnext_event | cics_getnext_process);
-cics_getnext_activity: (ACTIVITY cics_data_area | BROWSETOKEN cics_data_value ACTIVITYID cics_data_area |
-                       LEVEL cics_data_area | cics_handle_response)+;
-cics_getnext_event: (EVENT cics_data_area | BROWSETOKEN cics_data_value | COMPOSITE cics_data_area | EVENTTYPE cics_cvda |
-                    FIRESTATUS cics_cvda | PREDICATE cics_cvda | TIMER cics_data_area | cics_handle_response)+;
-cics_getnext_process: (PROCESS cics_data_area | BROWSETOKEN cics_data_value | ACTIVITYID cics_data_area | cics_handle_response)+;
+cics_getnext: GETNEXT (cics_getnext_activity | cics_getnext_container | cics_getnext_event | cics_getnext_process | cics_getnext_timer);
+cics_getnext_activity: (BROWSETOKEN cics_data_value | (ACTIVITY | ACTIVITYID | LEVEL) cics_data_area | cics_handle_response)+;
 cics_getnext_container: (CONTAINER cics_data_area | BROWSETOKEN cics_data_value | cics_handle_response)+;
+cics_getnext_event: (BROWSETOKEN cics_data_value | (EVENT | COMPOSITE | TIMER) cics_data_area | (EVENTTYPE | FIRESTATUS | PREDICATE) cics_cvda | cics_handle_response)+;
+cics_getnext_process: (BROWSETOKEN cics_data_value | (PROCESS | ACTIVITYID) cics_data_area | cics_handle_response)+;
+cics_getnext_timer: ((TIMER | ACTIVITYID) cics_data_value | (EVENT | ABSTIME | BROWSETOKEN) cics_data_area | STATUS cics_cvda | cics_handle_response)+;
 
 /** HANDLE CONDITION / HANDLE AID / HANDLE ABEND: */
 cics_handle: HANDLE (cics_handle_abend | cics_handle_aid | cics_handle_condition);
@@ -747,9 +746,8 @@ cics_retrieve_reattach: (REATTACH | EVENT cics_data_area | EVENTTYPE cics_cvda |
 cics_retrieve_subevent: (SUBEVENT cics_data_area | EVENT cics_data_value |  EVENTTYPE cics_cvda | cics_handle_response)*;
 
 /** RETURN */
-cics_return: RETURN cics_return_transid? cics_return_inputmsg? ENDACTIVITY?;
-cics_return_transid: (TRANSID cics_name | CHANNEL cics_name | COMMAREA cics_data_area | LENGTH cics_data_value | IMMEDIATE | cics_handle_response)+;
-cics_return_inputmsg: (INPUTMSG cics_data_area | INPUTMSGLEN cics_data_value | cics_handle_response)+;
+cics_return: RETURN cics_return_body?;
+cics_return_body: ((IMMEDIATE | ENDACTIVITY) | (TRANSID | CHANNEL) cics_name | (LENGTH | INPUTMSGLEN) cics_data_value | (COMMAREA | INPUTMSG) cics_data_area | cics_handle_response)+;
 
 /** REWIND COUNTER / DCOUNTER */
 cics_rewind: REWIND cics_rewind_opts;
@@ -760,9 +758,8 @@ cics_rewrite: REWRITE cics_file_name (TOKEN cics_data_area | FROM cics_data_area
               LENGTH cics_data_value | LENGTH cics_data_value | NOSUSPEND | cics_handle_response)+;
 
 /** ROUTE */
-cics_route: ROUTE (INTERVAL cics_zero_digit | INTERVAL cics_hhmmss | TIME cics_hhmmss | cics_post_after |
-            ERRTERM cics_name? | TITLE cics_data_area | LIST cics_data_area | OPCLASS cics_data_area |
-            REQID cics_name | LDC cics_name | NLEOM | cics_handle_response)*;
+cics_route: ROUTE cics_route_body?;
+cics_route_body: ((TIME | AFTER | AT | NLEOM) | (REQID | LDC) cics_name | INTERVAL (cics_hhmmss | cics_zero_digit) |  ERRTERM cics_name? | (HOURS | MINUTES | SECONDS) cics_data_value | (TITLE | LIST | OPCLASS) cics_data_area | cics_handle_response)+;
 
 /** RUN */
 cics_run: RUN (cics_run_default | cics_run_transid);
@@ -1755,6 +1752,7 @@ ABCODE
   | GENERIC
   | GENERICTCPS
   | GET
+  | GET64
   | GETMAIN
   | GETMAIN64
   | GETNEXT
