@@ -66,6 +66,7 @@ public class CICSReturnOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
         checkPrerequisiteIsMet(ctx.TRANSID(), ctx.IMMEDIATE(), ctx, "IMMEDIATE without TRANSID");
 
         checkMutuallyExclusiveOptions("COMMAREA or CHANNEL", ctx.COMMAREA(), ctx.CHANNEL());
+        checkMutuallyExclusiveOptions("TRANSID or ENDACTIVITY", ctx.TRANSID(), ctx.ENDACTIVITY());
 
         checkPrerequisiteIsMet(ctx.COMMAREA(), ctx.LENGTH(), ctx, "LENGTH without COMMAREA");
 

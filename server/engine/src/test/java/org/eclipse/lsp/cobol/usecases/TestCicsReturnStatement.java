@@ -34,11 +34,12 @@ import java.util.*;
 public class TestCicsReturnStatement {
 
     // Test Strings
-    private static final String RETURN_VALID_1 = "RETURN TRANSID({$varOne}) COMMAREA({$varOne}) LENGTH({$varOne}) IMMEDIATE INPUTMSG({$varOne}) INPUTMSGLEN({$varOne}) ENDACTIVITY";
+    private static final String RETURN_VALID_1 = "RETURN TRANSID({$varOne}) COMMAREA({$varOne}) LENGTH({$varOne}) IMMEDIATE INPUTMSG({$varOne}) INPUTMSGLEN({$varOne})";
     private static final String RETURN_VALID_2 = "RETURN";
 
     private static final String RETURN_INVALID_1 = "RETURN TRANSID({$varOne}) COMMAREA({$varOne}) {CHANNEL|errorOne}({$varOne})";
     private static final String RETURN_INVALID_2 = "RETURN {_CHANNEL({$varOne})|errorOne_}";
+    private static final String RETURN_INVALID_3 = "RETURN TRANSID({$varOne}) COMMAREA({$varOne}) LENGTH({$varOne}) IMMEDIATE INPUTMSG({$varOne}) INPUTMSGLEN({$varOne}) {ENDACTIVITY|errorOne}";
 
     // Test Functions
     @Test
@@ -60,6 +61,13 @@ public class TestCicsReturnStatement {
         HashMap<String, Diagnostic> expectedDiagnostics = new HashMap<>();
         expectedDiagnostics.put("errorOne", new Diagnostic(new Range(), "Missing required option for: CHANNEL without TRANSID", DiagnosticSeverity.Error, ErrorSource.PARSING.getText()));
         CICSTestUtils.errorTest(RETURN_INVALID_2, expectedDiagnostics);
+    }
+
+    @Test
+    void testCicsReturnInvalid_3() {
+        HashMap<String, Diagnostic> expectedDiagnostics = new HashMap<>();
+        expectedDiagnostics.put("errorOne", new Diagnostic(new Range(), "Options \"TRANSID or ENDACTIVITY\" are mutually exclusive.", DiagnosticSeverity.Error, ErrorSource.PARSING.getText()));
+        CICSTestUtils.errorTest(RETURN_INVALID_3, expectedDiagnostics);
     }
 
 }
