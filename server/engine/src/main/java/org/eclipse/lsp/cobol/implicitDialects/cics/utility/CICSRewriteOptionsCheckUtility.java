@@ -38,7 +38,7 @@ public class CICSRewriteOptionsCheckUtility extends CICSOptionsCheckBaseUtility 
                 put(CICSLexer.FROM, ErrorSeverity.ERROR);
                 put(CICSLexer.SYSID, ErrorSeverity.ERROR);
                 put(CICSLexer.LENGTH, ErrorSeverity.ERROR);
-                put(CICSLexer.NOSUSPEND, ErrorSeverity.ERROR);
+                put(CICSLexer.NOSUSPEND, ErrorSeverity.WARNING);
             }
         };
 
