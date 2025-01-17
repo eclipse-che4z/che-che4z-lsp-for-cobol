@@ -64,7 +64,7 @@ public class CICSRouteOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     }
 
     private void checkRule(CICSParser.Cics_route_bodyContext ctx) {
-        checkMutuallyExclusiveOptions("INTERVAL, INTERVAL, TIME, AFTER or AT", ctx.INTERVAL(), ctx.INTERVAL(), ctx.TIME(), ctx.AFTER(), ctx.AT());
+        checkMutuallyExclusiveOptions("INTERVAL, TIME, AFTER or AT", ctx.INTERVAL(), ctx.TIME(), ctx.AFTER(), ctx.AT());
 
         if (!ctx.AFTER().isEmpty() || !ctx.AT().isEmpty()) {
             checkHasAtLeastOneOption("HOURS, MINUTES or SECONDS", ctx, ctx.HOURS(), ctx.MINUTES(), ctx.SECONDS());
