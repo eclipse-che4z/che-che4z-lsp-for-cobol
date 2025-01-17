@@ -26,7 +26,6 @@ import org.eclipse.lsp.cobol.common.processor.Processor;
 import org.eclipse.lsp.cobol.common.utils.ThreadInterruptionUtil;
 import org.eclipse.lsp.cobol.core.engine.analysis.AnalysisContext;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -68,7 +67,7 @@ public class AstProcessor {
    * @param ctx processing context
    */
   public void process(ProcessingPhase phase, Node node, ProcessingContext ctx) {
-    Map<Class<? extends Node>, List<Processor<? extends Node>>> processors = ctx.getProcessors().get(phase);
+    List<Map.Entry<Class<? extends Node>, List<Processor<? extends Node>>>> processors = ctx.getProcessors().get(phase);
     if (processors != null)
       process(processors, node, ctx);
   }
@@ -80,17 +79,22 @@ public class AstProcessor {
    * @param node a node to process
    * @param ctx processing context
    */
-  private void process(Map<Class<? extends Node>, List<Processor<? extends Node>>> processors,
-      Node node, ProcessingContext ctx) {
+  private void process(List<Map.Entry<Class<? extends Node>, List<Processor<? extends Node>>>> processors,
+                       Node node, ProcessingContext ctx) {
     ThreadInterruptionUtil.checkThreadInterrupted();
     final Class<? extends Node> nodeClass = node.getClass();
     if (nodeClass == ProgramNode.class) {
       ctx.getCurrentProgramNodeStack().push((ProgramNode) node);
     }
     try {
-      for (Processor<? extends Node> processor : processors.getOrDefault(nodeClass, Collections.emptyList())) {
-        ((Processor<Node>) processor).accept(node, ctx);
+      for (Map.Entry<Class<? extends Node>, List<Processor<? extends Node>>> proc: processors) {
+        if (proc.getKey().isAssignableFrom(nodeClass)) {
+          for (Processor<? extends Node> processor : proc.getValue()) {
+            ((Processor<Node>) processor).accept(node, ctx);
+          }
+        }
       }
+
       for (Node n : node.getChildren()) {
         process(processors, n, ctx);
       }

@@ -295,28 +295,12 @@ public class TransformTreeStage implements Stage<AnalysisContext, ProcessingResu
     ctx.register(v, StandAloneDataItemNode.class, variableNameCheck);
     ctx.register(v, TableDataNameNode.class, variableNameCheck);
 
-    StatementValidate processor = new StatementValidate();
-    ctx.register(v, StatementNode.class, processor);
-    ctx.register(v, OpenStatementNode.class, processor);
-    ctx.register(v, SetToStatement.class, processor);
-    ctx.register(v, JsonParseNode.class, processor);
-    ctx.register(v, XMLParseNode.class, processor);
-    ctx.register(v, SetUpDownByStatement.class, processor);
-    ctx.register(v, SetToOnOffStatement.class, processor);
-    ctx.register(v, JsonGenerateNode.class, processor);
-    ctx.register(v, SetToBooleanStatement.class, processor);
-    ctx.register(v, FileOperationStatementNode.class, processor);
+    ctx.register(v, StatementNode.class, new StatementValidate());
 
-    ElementaryNodeCheck elementaryNodeCheck = new ElementaryNodeCheck();
-    ctx.register(v, ElementaryItemNode.class, elementaryNodeCheck);
-    ctx.register(v, StandAloneDataItemNode.class, elementaryNodeCheck);
-    ctx.register(v, TableDataNameNode.class, elementaryNodeCheck);
+    ctx.register(v, ElementaryNode.class, new ElementaryNodeCheck());
 
     ctx.register(v, GroupItemNode.class, new GroupItemCheck());
-
-    ObsoleteNodeCheck obsoleteNodeCheck = new ObsoleteNodeCheck();
-    ctx.register(v, RemarksNode.class, obsoleteNodeCheck);
-
+    ctx.register(v, RemarksNode.class, new ObsoleteNodeCheck());
     ctx.register(v, StandAloneDataItemNode.class, new StandAloneDataItemCheck());
     ctx.register(v, ProcedureDivisionNode.class, new FunctionReturningClauseCheck());
     ctx.register(v, ProgramEndNode.class, new ProgramEndCheck());

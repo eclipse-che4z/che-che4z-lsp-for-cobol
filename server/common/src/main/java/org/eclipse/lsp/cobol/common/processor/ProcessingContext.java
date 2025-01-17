@@ -33,7 +33,7 @@ import java.util.*;
 public class ProcessingContext {
     private final Map<
         ProcessingPhase,
-            Map<Class<? extends Node>, List<Processor<? extends Node>>>>
+            List<Map.Entry<Class<? extends Node>, List<Processor<? extends Node>>>>>
             processors = new HashMap<>();
 
     final List<SyntaxError> errors;
@@ -57,15 +57,26 @@ public class ProcessingContext {
      * @param processorDesc Processor descriptor.
      */
     public void register(ProcessorDescription processorDesc) {
-        if (Modifier.isAbstract(processorDesc.getNodeClass().getModifiers())) {
-            throw new RuntimeException("Can't register processor for node class: "
-                    + processorDesc.getNodeClass().getName() + ". Node class should be concrete.");
+        List<Map.Entry<Class<? extends Node>, List<Processor<? extends Node>>>> ps = processors.computeIfAbsent(processorDesc.getPhase(), v -> new ArrayList<>());
+        for (Map.Entry<Class<? extends Node>, List<Processor<? extends Node>>> pair : ps) {
+            if (pair.getKey().isAssignableFrom(processorDesc.getNodeClass())
+                    || processorDesc.getNodeClass().isAssignableFrom(pair.getKey())) {
+                if(pair.getValue().contains(processorDesc.processor)) {
+                    throw new RuntimeException("Processor " + processorDesc.getProcessor().getClass().getName()
+                            + " register twice: for classes " + pair.getKey().getName() + " and " + processorDesc.getNodeClass().getName()
+                            + " in " + processorDesc.getPhase() + " phase");
+                }
+            }
+            if (pair.getKey().equals(processorDesc.getNodeClass())) {
+                pair.getValue().add(processorDesc.processor);
+                return;
+            }
         }
-        processors
-                .computeIfAbsent(processorDesc.getPhase(), v -> new HashMap<>())
-                .computeIfAbsent(processorDesc.getNodeClass(), v -> new ArrayList<>())
-                .add(processorDesc.getProcessor());
+        ArrayList<Processor<? extends Node>> pList = new ArrayList<>();
+        pList.add(processorDesc.processor);
+        ps.add(new AbstractMap.SimpleEntry<>(processorDesc.getNodeClass(), pList));
     }
+
     /**
      * Register node type processor
      * @param phase processing phase
