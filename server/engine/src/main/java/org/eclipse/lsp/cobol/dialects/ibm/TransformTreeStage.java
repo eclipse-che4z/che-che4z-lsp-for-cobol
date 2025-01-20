@@ -35,6 +35,7 @@ import org.eclipse.lsp.cobol.common.model.tree.variables.RenameItemNode;
 import org.eclipse.lsp.cobol.common.pipeline.Stage;
 import org.eclipse.lsp.cobol.common.pipeline.StageResult;
 import org.eclipse.lsp.cobol.common.processor.*;
+import org.eclipse.lsp.cobol.common.symbols.SymbolTable;
 import org.eclipse.lsp.cobol.common.utils.RangeUtils;
 import org.eclipse.lsp.cobol.core.CobolParser;
 import org.eclipse.lsp.cobol.core.engine.analysis.AnalysisContext;
@@ -79,9 +80,9 @@ public class TransformTreeStage implements Stage<AnalysisContext, ProcessingResu
     SymbolAccumulator symbolAccumulator = new SymbolAccumulator();
     processSyntaxTree(context.getConfig(), symbolAccumulator, context, rootNode);
 
-    symbolsRepository.updateSymbols(symbolAccumulator.getProgramSymbols());
-
-    return new StageResult<>(new ProcessingResult(symbolAccumulator.getProgramSymbols(), rootNode));
+    Map<String, SymbolTable> programSymbols = symbolAccumulator.getProgramSymbols();
+    symbolsRepository.updateSymbols(programSymbols);
+    return new StageResult<>(new ProcessingResult(programSymbols, rootNode));
   }
 
   @Override

@@ -48,13 +48,12 @@ import static org.eclipse.lsp.cobol.common.model.tree.Node.hasType;
 
 /** Service to handle symbol information and dependencies */
 public class SymbolAccumulator implements VariableAccumulator {
-  private final Map<String, SymbolTable> programSymbols;
+  private final Map<String, SymbolTable> programSymbols = new HashMap<>();
 
   private final Map<String, FunctionInfo> userDefinedFunctions;
   private final Map<String, FunctionInfo> implicitFunctions;
 
   public SymbolAccumulator() {
-    this.programSymbols = Collections.synchronizedMap(new HashMap<>());
     this.userDefinedFunctions = Collections.synchronizedMap(new HashMap<>());
     this.implicitFunctions = getImplicitFunctions();
   }
@@ -200,13 +199,10 @@ public class SymbolAccumulator implements VariableAccumulator {
 
   private SymbolTable createOrGetSymbolTable(ProgramNode program) {
     String key = SymbolTable.generateKey(program);
-    synchronized (this.programSymbols) {
-      if (!programSymbols.containsKey(key)) {
-        programSymbols.put(key, new SymbolTable(
-                program.getProgram().map(this::createOrGetSymbolTable).orElse(null)));
-      }
-      return programSymbols.get(key);
+    if (!programSymbols.containsKey(key)) {
+      programSymbols.put(key, new SymbolTable(program.getProgram().map(this::createOrGetSymbolTable).orElse(null)));
     }
+    return programSymbols.get(key);
   }
 
   /**
@@ -428,7 +424,7 @@ public class SymbolAccumulator implements VariableAccumulator {
    * @return Symbol Tables
    */
   public Map<String, SymbolTable> getProgramSymbols() {
-    return programSymbols;
+    return Collections.unmodifiableMap(programSymbols);
   }
 
   /**

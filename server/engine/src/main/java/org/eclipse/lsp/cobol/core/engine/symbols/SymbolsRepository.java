@@ -42,6 +42,12 @@ import static org.eclipse.lsp.cobol.common.utils.RangeUtils.findNodeByPosition;
 @Singleton
 @Slf4j
 public class SymbolsRepository {
+  private static final SymbolTable EMPTY_SYM_TABLE = new SymbolTable(null) {
+    @Override
+    public void register(VariableNode node) {
+      throw new IllegalStateException("Cannot register symbols in temporary symbol table");
+    }
+  };
   private final Map<String, SymbolTable> programSymbols;
 
   public SymbolsRepository() {
@@ -71,8 +77,9 @@ public class SymbolsRepository {
    */
   public Multimap<String, VariableNode> getVariables(ProgramNode program) {
     Multimap<String, VariableNode> result = ArrayListMultimap.create();
-    result.putAll(getSymbolTable(program).getVariablesMap());
-    result.putAll(getSymbolTable(program).getVariablesGlobalsMap());
+    SymbolTable symbolTable = getSymbolTable(program);
+    result.putAll(symbolTable.getVariablesMap());
+    result.putAll(symbolTable.getVariablesGlobalsMap());
     return result;
   }
 
@@ -128,8 +135,7 @@ public class SymbolsRepository {
 
   @Synchronized
   private SymbolTable getSymbolTable(ProgramNode program) {
-    return programSymbols.computeIfAbsent(
-        SymbolTable.generateKey(program), p -> new SymbolTable(program.getProgram().map(this::getSymbolTable).orElse(null)));
+    return programSymbols.getOrDefault(SymbolTable.generateKey(program), EMPTY_SYM_TABLE);
   }
 
   @Value
