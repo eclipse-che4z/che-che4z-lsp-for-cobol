@@ -50,13 +50,8 @@ import static org.eclipse.lsp.cobol.common.model.tree.Node.hasType;
 public class SymbolAccumulator implements VariableAccumulator {
   private final Map<String, SymbolTable> programSymbols = new HashMap<>();
 
-  private final Map<String, FunctionInfo> userDefinedFunctions;
-  private final Map<String, FunctionInfo> implicitFunctions;
-
-  public SymbolAccumulator() {
-    this.userDefinedFunctions = Collections.synchronizedMap(new HashMap<>());
-    this.implicitFunctions = getImplicitFunctions();
-  }
+  private final Map<String, FunctionInfo> userDefinedFunctions = new HashMap<>();
+  private final Map<String, FunctionInfo> implicitFunctions = getImplicitFunctions();
 
   /**
    * Add the variable definition to that program context.
