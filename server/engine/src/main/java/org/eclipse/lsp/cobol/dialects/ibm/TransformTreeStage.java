@@ -142,18 +142,18 @@ public class TransformTreeStage implements Stage<AnalysisContext, ProcessingResu
 
   private void shapeSectionsAndParagraphs(Node parent) {
     LinkedList<Node> stack = new LinkedList<>();
+    List<Node> children = new ArrayList<>();
     for (Node node : parent.getChildren()) {
-      parent.getChildren().remove(0);
       if (!node.getChildren().isEmpty()) {
           shapeSectionsAndParagraphs(node);
       }
       if (node.getNodeType() == NodeType.PROCEDURE_SECTION && !(node instanceof DeclarativeProcedureSectionNode)) {
-          handleSection(parent, stack, node);
-          parent.addChild(node);
+          handleSection(stack, node);
+          children.add(node);
           continue;
       }
       if (node.getNodeType() == NodeType.PARAGRAPH) {
-          handleParagraph(parent, stack, node);
+          handleParagraph(children, stack, node);
           continue;
       }
 
@@ -161,12 +161,15 @@ public class TransformTreeStage implements Stage<AnalysisContext, ProcessingResu
         CodeBlockDefinitionNode n = (CodeBlockDefinitionNode) stack.peek();
         n.addChild(node);
       } else {
-        parent.addChild(node);
+        children.add(node);
       }
     }
+    parent.getChildren().clear();
+    children.forEach(c -> c.setParent(parent));
+    parent.getChildren().addAll(children);
   }
 
-  private void handleSection(Node parent, LinkedList<Node> stack, Node node) {
+  private void handleSection(LinkedList<Node> stack, Node node) {
       if (stack.isEmpty()) {
           stack.push(node);
           return;
@@ -183,11 +186,11 @@ public class TransformTreeStage implements Stage<AnalysisContext, ProcessingResu
       }
   }
 
-  private static void handleParagraph(Node parent, LinkedList<Node> stack, Node node) {
+  private static void handleParagraph(List<Node> siblings, LinkedList<Node> stack, Node node) {
     if (stack.isEmpty()) {
       ParagraphsNode paragraphsNode = new ParagraphsNode(node.getLocality());
       stack.push(paragraphsNode);
-      parent.addChild(paragraphsNode);
+      siblings.add(paragraphsNode);
       paragraphsNode.addChild(node);
       stack.push(node);
       return;
