@@ -104,7 +104,7 @@ public class VisitorHelper {
   public static List<String> retrievePicTexts(List<org.eclipse.lsp.cobol.core.CobolParser.DataPictureClauseContext> clauses) {
     List<String> list = new ArrayList<>(clauses.size());
     for (CobolParser.DataPictureClauseContext clause : clauses) {
-      list.add(clause.getText().substring(clause.getStart().getText().length()).trim());
+      list.add(clause.pictureString().getText());
     }
     return list;
   }
