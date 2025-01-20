@@ -432,8 +432,7 @@ public class SymbolAccumulator implements VariableAccumulator {
   public List<VariableNode> getVariableDefinition(
       ProgramNode programNode, List<VariableUsageNode> usagePath) {
     SymbolTable symbolTable = createOrGetSymbolTable(programNode);
-    List<VariableNode> foundDefinitions =
-            VariableUsageUtils.findVariablesForUsage(symbolTable.getVariablesMap(), usagePath);
+    List<VariableNode> foundDefinitions = VariableUsageUtils.findVariablesForUsage(symbolTable.getVariablesMap(), usagePath);
     if (!foundDefinitions.isEmpty()) {
       return foundDefinitions;
     }
@@ -442,14 +441,11 @@ public class SymbolAccumulator implements VariableAccumulator {
   }
 
   private List<VariableNode> globalVariableSearch(SymbolTable symbolTable, List<VariableUsageNode> usagePath) {
-    if (symbolTable.getParent() == null) {
-      return VariableUsageUtils.findVariablesForUsage(symbolTable.getVariablesGlobalsMap(), usagePath);
-    }
-    List<VariableNode> result = globalVariableSearch(symbolTable.getParent(), usagePath);
-    if (!result.isEmpty()) {
+    List<VariableNode> result = VariableUsageUtils.findVariablesForUsage(symbolTable.getVariablesGlobalsMap(), usagePath);
+    if (!result.isEmpty() || symbolTable.getParent() == null) {
       return result;
     }
-    return VariableUsageUtils.findVariablesForUsage(symbolTable.getVariablesGlobalsMap(), usagePath);
+    return globalVariableSearch(symbolTable.getParent(), usagePath);
   }
 
   private FunctionInfo createImplicitFunctionInfo(String implicitFunctionName) {
