@@ -35,6 +35,7 @@ public class CICSGetOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
   private static final Map<Integer, ErrorSeverity> DUPLICATE_CHECK_OPTIONS =
       new HashMap<Integer, ErrorSeverity>() {
         {
+          put(CICSLexer.GET, ErrorSeverity.ERROR);
           put(CICSLexer.CONTAINER, ErrorSeverity.ERROR);
           put(CICSLexer.ACTIVITY, ErrorSeverity.ERROR);
           put(CICSLexer.ACQACTIVITY, ErrorSeverity.WARNING);
@@ -93,7 +94,6 @@ public class CICSGetOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
   @SuppressWarnings("unchecked")
   private void checkContainerBTS(CICSParser.Cics_get_container_btsContext ctx) {
     checkHasMandatoryOptions(ctx.CONTAINER(), ctx, "CONTAINER");
-    checkHasMandatoryOptions(ctx.FLENGTH(), ctx, "FLENGTH");
     checkHasMutuallyExclusiveOptions("ACTIVITY or ACQACTIVITY or PROCESS or ACQPROCESS", ctx.ACTIVITY(),
             ctx.ACQACTIVITY(), ctx.PROCESS(), ctx.ACQPROCESS());
     checkHasExactlyOneOption("INTO or SET or NODATA", ctx, ctx.INTO(), ctx.SET(), ctx.NODATA());

@@ -36,10 +36,10 @@ public class TestCICSGet {
       "GET CONTAINER({$varOne}) ACTIVITY({$varOne}) NODATA FLENGTH({$varTwo})";
 
   private static final String CONTAINER_BTS_INVALID_ONE =
-      "GET CONTAINER({$varOne}) ACTIVITY({$varOne}) INTO(100) {INTO|errorOne}(100) FLENGTH({$varFour})";
+      "GET CONTAINER({$varOne}) ACTIVITY({$varOne}) INTO(100) {INTO|errorOne}(100) ";
 
   private static final String CONTAINER_BTS_INVALID_TWO =
-      "GET CONTAINER(100)  {ACQACTIVITY|errorOne} {PROCESS|errorTwo} {ACQPROCESS|errorThree} SET({$varTwo}) FLENGTH({$varFour})";
+      "GET CONTAINER(100)  {ACQACTIVITY|errorOne} {PROCESS|errorTwo} {ACQPROCESS|errorThree} SET({$varTwo})";
 
   private static final String CONTAINER_CHANNEL_VALID_ONE =
       "GET CONTAINER({$varOne}) CHANNEL({$varTwo}) INTO({$varThree}) FLENGTH({$varFour})";
@@ -48,7 +48,7 @@ public class TestCICSGet {
       "GET CONTAINER({$varOne}) INTO({$varTwo}) INTOCCSID({$varThree})";
 
   private static final String CONTAINER_CHANNEL_INVALID_ONE =
-      "GET CONTAINER(100) {CONTAINER|errorTwo}(100) INTO({$varFour}) FLENGTH({$varFour})";
+      "GET CONTAINER(100) {CONTAINER|errorTwo}(100) INTO({$varFour})";
 
   private static final String CONTAINER_CHANNEL_INVALID_TWO =
       "GET CONTAINER(10) INTO({$varFour}) {INTOCCSID|errorOne}(100) {INTOCODEPAGE|errorTwo}(100)";
