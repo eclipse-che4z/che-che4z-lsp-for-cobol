@@ -36,6 +36,7 @@ public class CICSDeleteOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
   private static final Map<Integer, ErrorSeverity> DUPLICATE_CHECK_OPTIONS =
           new HashMap<Integer, ErrorSeverity>() {
             {
+              put(CICSLexer.DELETE, ErrorSeverity.ERROR);
               put(CICSLexer.FILE, ErrorSeverity.ERROR);
               put(CICSLexer.TOKEN, ErrorSeverity.ERROR);
               put(CICSLexer.RIDFLD, ErrorSeverity.ERROR);
@@ -114,6 +115,7 @@ public class CICSDeleteOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
 
   @SuppressWarnings("unchecked")
   private void checkDeleteGroupThree(CICSParser.Cics_delete_group_threeContext ctx) {
+    checkHasMandatoryOptions(ctx.CONTAINER(), ctx, "CONTAINER");
     checkHasMutuallyExclusiveOptions("ACTIVITY or ACQACTIVITY or PROCESS or ACQPROCESS or CHANNEL",
             ctx.ACTIVITY(), ctx.ACQACTIVITY(), ctx.PROCESS(), ctx.ACQPROCESS(), ctx.CHANNEL());
   }
