@@ -192,6 +192,14 @@ public class SymbolAccumulator implements VariableAccumulator {
     return "";
   }
 
+  /**
+   * Get the symbol table for the given program
+   * @param program the program
+   * @return the symbol table
+   */
+  public SymbolTable getSymbolTable(ProgramNode program) {
+    return programSymbols.get(SymbolTable.generateKey(program));
+  }
   private SymbolTable createOrGetSymbolTable(ProgramNode program) {
     String key = SymbolTable.generateKey(program);
     if (!programSymbols.containsKey(key)) {
