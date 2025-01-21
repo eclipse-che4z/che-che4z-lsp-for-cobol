@@ -53,8 +53,12 @@ procedureDivisionRule: dbs_allocate
     | dbs_revoke
     | dbs_rollback
     | dbs_savepoint
-    | dbs_select
-    | dbs_select_into
+    | dbs_select_unpack_function_invocation
+    | dbs_with_clause_for_select?
+        (
+        (dbs_value_clause dbs_offset_clause? | LPARENCHAR dbs_fullselect RPARENCHAR dbs_full_select_base_suffix) dbs_fullselect_suffix*
+         | dbs_select_clause (dbs_subselect_suffix dbs_full_select_base_suffix dbs_fullselect_suffix* |  dbs_select_into_suffix)
+         )
     | dbs_set
     | dbs_signal
     | dbs_transfer
@@ -938,21 +942,23 @@ dbs_savepoint: SAVEPOINT dbs_savepoint_name UNIQUE? ON ROLLBACK RETAIN (CURSORS 
 
 /*SELECT (both) */
 
-
-dbs_select: dbs_select_unpack_function_invocation | (WITH common_table_expression_loop)? dbs_fullselect
-            (dbs_select_update
-             | dbs_select_readOnly
-             | dbs_select_optimize
-             | dbs_select_statement_isolation_clause
-             | QUERYNO INTEGERLITERAL
-             | SKIPCHAR LOCKED DATA
-             )*;
+dbs_with_clause_for_select : WITH common_table_expression_loop;
+dbs_select: dbs_select_unpack_function_invocation | dbs_with_clause_for_select? dbs_select_without_with_clause;
+dbs_select_without_with_clause: dbs_fullselect dbs_fullselect_suffix*;
+dbs_fullselect_suffix: dbs_select_update
+                       | dbs_select_readOnly
+                       | dbs_select_optimize
+                       | dbs_select_statement_isolation_clause
+                       | QUERYNO INTEGERLITERAL
+                       | SKIPCHAR LOCKED DATA
+                       ;
 dbs_select_update: FOR UPDATE (OF dbs_column_name (dbs_comma_separator dbs_column_name)*)? ;
 dbs_select_readOnly: FOR (READ | FETCH) ONLY;
 dbs_select_optimize:OPTIMIZE FOR INTEGERLITERAL (ROWS | ROW);
 /*Queries Subselects (all)*/
 dbs_select_unpack_function_invocation: UNPACK LPARENCHAR dbs_expression RPARENCHAR DOT_FS ASTERISKCHAR AS LPARENCHAR dbs_sql_identifier db2sql_data_types (dbs_comma_separator dbs_sql_identifier db2sql_data_types)* RPARENCHAR;
-dbs_subselect: dbs_select_clause dbs_from_clause dbs_where_clause? dbs_groupby_clause? dbs_having_clause?; // dbs_orderby_offset_fetch;
+dbs_subselect: dbs_select_clause dbs_subselect_suffix; // dbs_orderby_offset_fetch;
+dbs_subselect_suffix: dbs_from_clause dbs_where_clause? dbs_groupby_clause? dbs_having_clause?;
 dbs_orderby_offset_fetch: dbs_orderby_clause? dbs_offset_clause? dbs_fetch_clause?;
 dbs_select_clause: SELECT (ALL | DISTINCT)? ( ASTERISKCHAR | dbs_select_item (dbs_comma_separator dbs_select_item)*);
 dbs_select_item: (dbs_expressions AS? dbs_sql_identifier? | dbs_unpacked_row | dbs_alias_name DOT_FS ASTERISKCHAR);
@@ -974,10 +980,11 @@ dbs_orderby_clause: ORDER BY (INPUT SEQUENCE | ORDER OF dbs_table_designator | d
 dbs_offset_clause: OFFSET INTEGERLITERAL (ROW | ROWS);
 
 dbs_fullselect: (dbs_value_clause dbs_offset_clause?)
-        | dbs_full_select_base ((UNION|EXCEPT|INTERSECT) (DISTINCT|ALL)? dbs_full_select_base)* dbs_orderby_offset_fetch; //TODO: remove ambiguity with dbs_subselect based on https://www.ibm.com/docs/en/db2-for-zos/13?topic=subselect-order-by-clause
+        | dbs_full_select_base dbs_full_select_base_suffix; //TODO: remove ambiguity with dbs_subselect based on https://www.ibm.com/docs/en/db2-for-zos/13?topic=subselect-order-by-clause
 
 
 dbs_full_select_base : (LPARENCHAR dbs_fullselect RPARENCHAR | dbs_subselect) ;
+dbs_full_select_base_suffix: ((UNION|EXCEPT|INTERSECT) (DISTINCT|ALL)? dbs_full_select_base)* dbs_orderby_offset_fetch;
 dbs_value_clause: VALUES dbs_sequence_reference | LPARENCHAR dbs_sequence_reference (dbs_comma_separator dbs_sequence_reference)* RPARENCHAR;
 
 /*SET (all) */
@@ -1368,8 +1375,10 @@ dbs_sql_procedure_statement: (dbs_sql_control_statement | dbs_allocate | ALTER (
  dbs_lock | dbs_merge | dbs_open | dbs_prepare | dbs_refresh | dbs_release | dbs_rename | dbs_revoke | dbs_rollback | dbs_savepoint |
  dbs_select_into | dbs_set | dbs_truncate | dbs_update | VALUES dbs_values_into);
 
-dbs_select_into: (WITH common_table_expression_loop)?  dbs_select_clause INTO (target_variable_names_loop | dbs_array_variable) dbs_from_clause dbs_where_clause? dbs_groupby_clause? dbs_having_clause?
-                 dbs_orderby_clause? dbs_offset_clause?  dbs_fetch_clause?  (dbs_select_statement_isolation_clause | dbs_select_statement_skip_locked_data)* dbs_select_statement_queryno_clause?;
+dbs_select_into: dbs_with_clause_for_select?  dbs_select_into_without_with_clause;
+dbs_select_into_without_with_clause: dbs_select_clause dbs_select_into_suffix;
+dbs_select_into_suffix: INTO (target_variable_names_loop | dbs_array_variable) dbs_from_clause dbs_where_clause? dbs_groupby_clause? dbs_having_clause?
+                                        dbs_orderby_clause? dbs_offset_clause?  dbs_fetch_clause?  (dbs_select_statement_isolation_clause | dbs_select_statement_skip_locked_data)* dbs_select_statement_queryno_clause?;
 common_table_expression_loop: dbs_select_statement_common_table_expression (dbs_comma_separator dbs_select_statement_common_table_expression)*;
 target_variable_names_loop: dbs_sql_variable_reference (dbs_comma_separator dbs_sql_variable_reference)*;
 dbs_select_statement_common_table_expression: dbs_sql_identifier (LPARENCHAR dbs_sql_identifier (dbs_comma_separator dbs_sql_identifier)* RPARENCHAR)? AS dbs_fullselect;
