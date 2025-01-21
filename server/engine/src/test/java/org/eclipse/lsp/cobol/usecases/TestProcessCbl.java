@@ -326,7 +326,7 @@ class TestProcessCbl {
         "SQLIMS",
         "SQLIMS(\"IMS-suboption-string\")",
         "NOSSRANGE",
-        "SSRANGE()",
+        "SSRANGE",
         "SSRANGE(ZLEN)",
         "SSRANGE(NOZLEN,ABD)",
         "SSR(MSG)",

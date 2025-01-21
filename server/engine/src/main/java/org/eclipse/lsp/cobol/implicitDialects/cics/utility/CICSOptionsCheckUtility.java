@@ -118,6 +118,15 @@ public class CICSOptionsCheckUtility {
         CICSReadNextReadPrevOptionsUtility.RULE_INDEX,
         new CICSReadNextReadPrevOptionsUtility(context, errors));
     optionsMap.put(
+        CICSRewriteOptionsCheckUtility.RULE_INDEX,
+        new CICSRewriteOptionsCheckUtility(context, errors));
+    optionsMap.put(
+        CICSReturnOptionsCheckUtility.RULE_INDEX,
+        new CICSReturnOptionsCheckUtility(context, errors));
+    optionsMap.put(
+        CICSSignonOptionsCheckUtility.RULE_INDEX,
+        new CICSSignonOptionsCheckUtility(context, errors));
+    optionsMap.put(
         CICSForceOptionsCheckUtility.RULE_INDEX,
         new CICSForceOptionsCheckUtility(context, errors));
     optionsMap.put(
@@ -208,6 +217,9 @@ public class CICSOptionsCheckUtility {
         CICSVerifyOptionsCheckUtility.RULE_INDEX,
         new CICSVerifyOptionsCheckUtility(context, errors));
     optionsMap.put(
+        CICSGetnextOptionsCheckUtility.RULE_INDEX,
+        new CICSGetnextOptionsCheckUtility(context, errors));
+    optionsMap.put(
         CICSSpoolOpenOptionsCheckUtility.RULE_INDEX,
         new CICSSpoolOpenOptionsCheckUtility(context, errors));
     optionsMap.put(
@@ -273,6 +285,15 @@ public class CICSOptionsCheckUtility {
     optionsMap.put(
         CICSPutContainerOptionsCheckUtility.RULE_INDEX,
         new CICSPutContainerOptionsCheckUtility(context, errors));
+    optionsMap.put(
+        CICSSoapfaultOptionsCheckUtility.RULE_INDEX,
+        new CICSSoapfaultOptionsCheckUtility(context, errors));
+    optionsMap.put(
+        CICSResumeOptionsCheckUtility.RULE_INDEX,
+        new CICSResumeOptionsCheckUtility(context, errors));
+    optionsMap.put(
+        CICSRouteOptionsCheckUtility.RULE_INDEX,
+        new CICSRouteOptionsCheckUtility(context, errors));
     spOptionsMap.put(
         CICSInquireSPOptionsCheckUtility.RULE_INDEX,
         new CICSInquireSPOptionsCheckUtility(context, errors));

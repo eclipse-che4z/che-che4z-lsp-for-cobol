@@ -388,7 +388,7 @@ cics_freemain: (FREEMAIN | FREEMAIN64) cics_freemain_opts;
 cics_freemain_opts:(DATA cics_data_area | DATAPOINTER cics_value | cics_handle_response)+;
 
 /** GET CONTAINER / GET COUNTER / GET DCOUNTER */
-cics_get: GET (cics_get_container_bts | cics_get_container_channel | cics_get_counter_dcounter);
+cics_get: (GET (cics_get_container_bts | cics_get_counter_dcounter)) | (GET|GET64) cics_get_container_channel;
 cics_get_container_bts: ((CONTAINER | ACTIVITY) cics_data_value | ACQACTIVITY | PROCESS | ACQPROCESS | (INTO | FLENGTH) cics_data_area |
                     SET cics_ref | NODATA  | cics_handle_response)*;
 cics_get_container_channel: ((CONTAINER | CHANNEL | BYTEOFFSET | INTOCCSID | INTOCODEPAGE) cics_data_value | (INTO | FLENGTH | CCSID) cics_data_area |
@@ -406,13 +406,12 @@ cics_getmain64_body: (SET cics_ref | FLENGTH cics_data_value | LOCATION cics_cvd
 
 
 /** GETNEXT ACTIVITY / CONTAINER / EVENT / PROCESS */
-cics_getnext: GETNEXT (cics_getnext_activity | cics_getnext_container | cics_getnext_event | cics_getnext_process);
-cics_getnext_activity: (ACTIVITY cics_data_area | BROWSETOKEN cics_data_value ACTIVITYID cics_data_area |
-                       LEVEL cics_data_area | cics_handle_response)+;
-cics_getnext_event: (EVENT cics_data_area | BROWSETOKEN cics_data_value | COMPOSITE cics_data_area | EVENTTYPE cics_cvda |
-                    FIRESTATUS cics_cvda | PREDICATE cics_cvda | TIMER cics_data_area | cics_handle_response)+;
-cics_getnext_process: (PROCESS cics_data_area | BROWSETOKEN cics_data_value | ACTIVITYID cics_data_area | cics_handle_response)+;
+cics_getnext: GETNEXT (cics_getnext_activity | cics_getnext_container | cics_getnext_event | cics_getnext_process | cics_getnext_timer);
+cics_getnext_activity: (BROWSETOKEN cics_data_value | (ACTIVITY | ACTIVITYID | LEVEL) cics_data_area | cics_handle_response)+;
 cics_getnext_container: (CONTAINER cics_data_area | BROWSETOKEN cics_data_value | cics_handle_response)+;
+cics_getnext_event: (BROWSETOKEN cics_data_value | (EVENT | COMPOSITE | TIMER) cics_data_area | (EVENTTYPE | FIRESTATUS | PREDICATE) cics_cvda | cics_handle_response)+;
+cics_getnext_process: (BROWSETOKEN cics_data_value | (PROCESS | ACTIVITYID) cics_data_area | cics_handle_response)+;
+cics_getnext_timer: ((TIMER | ACTIVITYID) cics_data_value | (EVENT | ABSTIME | BROWSETOKEN) cics_data_area | STATUS cics_cvda | cics_handle_response)+;
 
 /** HANDLE CONDITION / HANDLE AID / HANDLE ABEND: */
 cics_handle: HANDLE (cics_handle_abend | cics_handle_aid | cics_handle_condition);
@@ -730,7 +729,8 @@ cics_restype: RESTYPE cics_cvda | ASYNCSERVICE | ATOMSERVICE | BUNDLE | DB2CONN 
 cics_subrestype: SUBRESTYPE cics_cvda | CAPTURESPEC | POLICYRULE;
 
 /** RESUME */
-cics_resume: RESUME (ACQACTIVITY | ACQPROCESS | ACTIVITY cics_data_value | cics_handle_response)+;
+cics_resume: RESUME cics_resume_body;
+cics_resume_body: ((ACQACTIVITY | ACQPROCESS) | ACTIVITY cics_data_value | cics_handle_response)+;
 
 /** RETRIEVE - / REATTACH EVENT / SUBEVENT */
 cics_retrieve: RETRIEVE (cics_retrieve_standard | cics_retrieve_reattach | cics_retrieve_subevent);
@@ -739,22 +739,20 @@ cics_retrieve_reattach: (REATTACH | EVENT cics_data_area | EVENTTYPE cics_cvda |
 cics_retrieve_subevent: (SUBEVENT cics_data_area | EVENT cics_data_value |  EVENTTYPE cics_cvda | cics_handle_response)*;
 
 /** RETURN */
-cics_return: RETURN cics_return_transid? cics_return_inputmsg? ENDACTIVITY?;
-cics_return_transid: (TRANSID cics_name | CHANNEL cics_name | COMMAREA cics_data_area | LENGTH cics_data_value | IMMEDIATE | cics_handle_response)+;
-cics_return_inputmsg: (INPUTMSG cics_data_area | INPUTMSGLEN cics_data_value | cics_handle_response)+;
+cics_return: RETURN cics_return_body?;
+cics_return_body: ((IMMEDIATE | ENDACTIVITY) | (TRANSID | CHANNEL) cics_name | (LENGTH | INPUTMSGLEN) cics_data_value | (COMMAREA | INPUTMSG) cics_data_area | cics_handle_response)+;
 
 /** REWIND COUNTER / DCOUNTER */
 cics_rewind: REWIND cics_rewind_opts;
 cics_rewind_opts:(COUNTER cics_name | DCOUNTER cics_name | NOSUSPEND | POOL cics_name | INCREMENT cics_data_value | cics_handle_response)+;
 
 /** REWRITE: */
-cics_rewrite: REWRITE cics_file_name (TOKEN cics_data_area | FROM cics_data_area | SYSID cics_data_area
-              LENGTH cics_data_value | LENGTH cics_data_value | NOSUSPEND | cics_handle_response)+;
+cics_rewrite: REWRITE cics_rewrite_body;
+cics_rewrite_body: (NOSUSPEND | (FILE | DATASET | SYSID) cics_name | LENGTH cics_data_value | (TOKEN | FROM) cics_data_area | cics_handle_response)+;
 
 /** ROUTE */
-cics_route: ROUTE (INTERVAL cics_zero_digit | INTERVAL cics_hhmmss | TIME cics_hhmmss | cics_post_after |
-            ERRTERM cics_name? | TITLE cics_data_area | LIST cics_data_area | OPCLASS cics_data_area |
-            REQID cics_name | LDC cics_name | NLEOM | cics_handle_response)*;
+cics_route: ROUTE cics_route_body?;
+cics_route_body: ((TIME | AFTER | AT | NLEOM) | (REQID | LDC) cics_name | INTERVAL (cics_hhmmss | cics_zero_digit) |  ERRTERM cics_name? | (HOURS | MINUTES | SECONDS) cics_data_value | (TITLE | LIST | OPCLASS) cics_data_area | cics_handle_response)+;
 
 /** RUN */
 cics_run: RUN (cics_run_default | cics_run_transid);
@@ -769,23 +767,18 @@ cics_signal_options: ((EVENT | FROMCHANNEL | FROMLENGTH) cics_data_value | FROM 
 cics_signoff: SIGNOFF cics_handle_response?;
 
 /** SIGNON */
-cics_signon: SIGNON (USERID cics_data_value | ESMREASON cics_data_area | ESMRESP cics_data_area | GROUPID cics_data_value |
-             LANGUAGECODE cics_data_value | NATLANG cics_data_value | LANGINUSE cics_data_area | NATLANGINUSE cics_data_area |
-             PASSWORD cics_data_value | NEWPASSWORD cics_data_value | PHRASE cics_data_area | PHRASELEN cics_data_value |
-             NEWPHRASE cics_data_area | NEWPHRASELEN cics_data_value | OIDCARD cics_data_value | cics_handle_response)*;
+cics_signon: SIGNON (cics_signon_body|cics_signon_token_body);
+cics_signon_body: ((USERID | GROUPID | LANGUAGECODE | NATLANG | PASSWORD | NEWPASSWORD | PHRASELEN | NEWPHRASELEN | OIDCARD) cics_data_value |
+                    (CHANGETIME | DAYSLEFT | ESMREASON | ESMRESP | EXPIRYTIME | INVALIDCOUNT | LANGINUSE | LASTUSETIME | NATLANGINUSE | PHRASE | NEWPHRASE) cics_data_area | cics_handle_response)+;
+cics_signon_token_body: ((KERBEROS | BIT | BASE64) | (TOKENLEN | GROUPID | LANGUAGECODE | NATLANG) cics_data_value |
+                    (TOKEN | LANGINUSE | NATLANGINUSE | ESMREASON | ESMRESP) cics_data_area | (TOKENTYPE | DATATYPE) cics_cvda | cics_handle_response)+;
 
 /** SOAPFAULT ADD / CREATE / DELETE */
-cics_soapfault: SOAPFAULT (cics_soapfault_add | cics_soapfault_create | DELETE);
-cics_soapfault_add: ADD (cics_soapfault_faultstring | cics_soapfault_subcodestr | FROMCCSID cics_data_value | cics_handle_response)+;
-cics_soapfault_faultstring: (FAULTSTRING cics_data_value | FAULTSTRLEN cics_data_value | NATLANG cics_data_value)+;
-cics_soapfault_subcodestr: (SUBCODESTR cics_data_value | SUBCODELEN cics_data_value)+;
-cics_soapfault_create: CREATE (FAULTCODE cics_cvda | CLIENT | SERVER | SENDER | RECEIVER | cics_soapfault_faultcodestr |
-                       cics_soapfault_faultstring | cics_soapfault_role | cics_soapfault_faultactor |
-                       cics_soapfault_detail | FROMCCSID cics_data_value | cics_handle_response)+;
-cics_soapfault_faultcodestr: (FAULTCODESTR cics_data_value | FAULTCODELEN cics_data_value)+;
-cics_soapfault_role: (ROLE cics_data_value | ROLELENGTH cics_data_value)+;
-cics_soapfault_faultactor: (FAULTACTOR cics_data_value | FAULTACTLEN cics_data_value)+;
-cics_soapfault_detail: (DETAIL cics_data_value | DETAILLENGTH cics_data_value)+;
+cics_soapfault: SOAPFAULT (cics_soapfault_add | cics_soapfault_create | cics_soapfault_delete);
+cics_soapfault_add: ADD ((FAULTSTRING | FAULTSTRLEN |NATLANG | SUBCODESTR | SUBCODELEN | FROMCCSID) cics_data_value | cics_handle_response)+;
+cics_soapfault_create: CREATE ((CLIENT | SERVER | SENDER | RECEIVER) | (FAULTCODESTR | FAULTCODELEN | FAULTSTRING | FAULTSTRLEN | NATLANG | ROLE | ROLELENGTH | FAULTACTOR | FAULTACTLEN | DETAIL | DETAILLENGTH | FROMCCSID) cics_data_value
+                        | (FAULTCODE) cics_cvda | cics_handle_response)+;
+cics_soapfault_delete: (DELETE | cics_handle_response)+;
 
 /** SPOOLCLOSE */
 cics_spoolclose: SPOOLCLOSE cics_spoolclose_options;
@@ -1752,6 +1745,7 @@ ABCODE
   | GENERIC
   | GENERICTCPS
   | GET
+  | GET64
   | GETMAIN
   | GETMAIN64
   | GETNEXT

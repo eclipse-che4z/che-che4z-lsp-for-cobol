@@ -226,6 +226,34 @@ public abstract class CICSOptionsCheckBaseUtility {
     }
 
     /**
+     * Helper function to check and see if more than one rule was visited out of a set provided.
+     *
+     * @param options Options checked to insert into error message
+     * @param rules   Generic list of rules to check. Will be a collection of ParserRuleContext and/or TerminalNode objects.
+     * @param <E>     Generic type to allow cross-rule context collection.
+     */
+    @SafeVarargs
+    protected final <E> void checkHasAtLeastOneOption(String options, ParserRuleContext ctx, E... rules) {
+        int rulesSeen = 0;
+
+        for (E rule : rules) {
+            if (rule == null) {
+                continue;
+            }
+
+            if (List.class.isAssignableFrom(rule.getClass()) && ((List<?>) rule).isEmpty()) {
+                continue;
+            }
+
+            rulesSeen++;
+        }
+
+        if (rulesSeen < 1) {
+            throwException(ErrorSeverity.ERROR, getLocality(ctx), "Must include one or more of the following: ", options);
+        }
+    }
+
+    /**
      * Iterates over the provided response handlers, extracts what is provided, and validates there is
      * not RESP2 without RESP
      *
