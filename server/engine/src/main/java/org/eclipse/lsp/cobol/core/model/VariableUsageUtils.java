@@ -14,7 +14,6 @@
  */
 package org.eclipse.lsp.cobol.core.model;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Multimap;
 import lombok.experimental.UtilityClass;
 import org.eclipse.lsp.cobol.common.model.NodeType;
@@ -44,11 +43,11 @@ public class VariableUsageUtils {
   public static List<VariableNode> findVariablesForUsage(
     Multimap<String, VariableNode> definedVariables, List<VariableUsageNode> usagePath) {
     Collection<VariableNode> candidates = definedVariables.get(usagePath.get(0).getName());
+    List<VariableUsageNode> parents = usagePath.subList(1, usagePath.size());
 
     Map<VariableNode, Integer> stepToMatchParentsMap = new HashMap<>();
     for (VariableNode variable : candidates) {
-      countToMatchParents(variable, usagePath.subList(1, usagePath.size()))
-              .ifPresent(steps -> stepToMatchParentsMap.put(variable, steps + 1));
+      countToMatchParents(variable, parents).ifPresent(steps -> stepToMatchParentsMap.put(variable, steps + 1));
     }
 
     List<VariableNode> exactHierarchyMatchedVariables = new ArrayList<>();
@@ -148,12 +147,13 @@ public class VariableUsageUtils {
    */
   public List<VariableNode> getDefinitionNode(SymbolAccumulator symbolAccumulator,
                                               Node containerNode, List<VariableUsageNode> identifiers) {
-    return containerNode.getProgram()
-            .map(
-                    programNode -> identifiers.stream().map(id -> symbolAccumulator.getVariableDefinition(
-                            programNode, Collections.singletonList(id))).collect(Collectors.toList()))
-            .map(e -> e.stream().flatMap(Collection::stream))
-            .map(e1 -> e1.collect(Collectors.toList()))
-            .orElse(ImmutableList.of());
+    if (!containerNode.getProgram().isPresent()) {
+      return Collections.emptyList();
+    }
+    List<VariableNode> result = new ArrayList<>();
+    for (VariableUsageNode id : identifiers) {
+      result.addAll(symbolAccumulator.getVariableDefinition(containerNode.getProgram().get(), Collections.singletonList(id)));
+    }
+    return result;
   }
 }

@@ -37,7 +37,6 @@ import org.eclipse.lsp.cobol.common.processor.Processor;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Consumer;
 
 import static org.eclipse.lsp.cobol.common.model.NodeType.OPEN_STATEMENT;
 import static org.eclipse.lsp.cobol.common.model.NodeType.QUALIFIED_REFERENCE_NODE;
@@ -117,7 +116,7 @@ public class FileOperationProcess implements Processor<FileOperationStatementNod
       });
   }
 
-  private Optional<SyntaxError> checkFileOpenedBeforeOperation(
+  private static Optional<SyntaxError> checkFileOpenedBeforeOperation(
       String filename,
       Locality errorLocality,
       List<FileOperationKind> expectedFileKind,
@@ -177,18 +176,18 @@ public class FileOperationProcess implements Processor<FileOperationStatementNod
         .ifPresent(
             defNode ->
                 node.getNearestParentByType(NodeType.PROGRAM)
-                    .ifPresent(
-                        checkFileOpenedForWrite(
-                            node, expectedFileKind, ctx, messageTemplate, defNode)));
+                    .ifPresent(program ->
+                        checkFileOpenedForWrite(program, node, expectedFileKind, ctx, messageTemplate, defNode)));
   }
 
-  private Consumer<Node> checkFileOpenedForWrite(
-      FileOperationStatementNode node,
-      List<FileOperationKind> expectedFileKind,
-      ProcessingContext ctx,
-      String messageTemplate,
-      VariableNode defNode) {
-    return programNode -> {
+  private static void checkFileOpenedForWrite(
+          Node programNode,
+          FileOperationStatementNode node,
+          List<FileOperationKind> expectedFileKind,
+          ProcessingContext ctx,
+          String messageTemplate,
+          VariableNode defNode) {
+
       FileDescriptionNode fileDescriptionNode = (FileDescriptionNode) programNode.findFirstNodeInSubtree(n -> {
           if (!(n instanceof FileDescriptionNode)) {
               return false;
@@ -203,6 +202,5 @@ public class FileOperationProcess implements Processor<FileOperationStatementNod
               node.getFilename().getLocality(),
               expectedFileKind, ctx.getCurrentProgramNode(), messageTemplate)
                 .ifPresent(ctx.getErrors()::add);
-    };
   }
 }
