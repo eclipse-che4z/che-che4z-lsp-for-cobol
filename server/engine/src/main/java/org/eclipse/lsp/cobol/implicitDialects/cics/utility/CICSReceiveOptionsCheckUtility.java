@@ -31,143 +31,158 @@ import java.util.stream.Collectors;
 
 import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_receive;
 
-/**
- * Checks CICS Receive rules for required and invalid options
- */
+/** Checks CICS Receive rules for required and invalid options */
 public class CICSReceiveOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
 
-    public static final int RULE_INDEX = RULE_cics_receive;
+  public static final int RULE_INDEX = RULE_cics_receive;
 
-    private static final Map<Integer, ErrorSeverity> DUPLICATE_CHECK_OPTIONS =
-            new HashMap<Integer, ErrorSeverity>() {
-                {
-                    put(CICSLexer.RECEIVE, ErrorSeverity.ERROR);
-                    put(CICSLexer.INTO, ErrorSeverity.ERROR);
-                    put(CICSLexer.SET, ErrorSeverity.ERROR);
-                    put(CICSLexer.LENGTH, ErrorSeverity.ERROR);
-                    put(CICSLexer.FLENGTH, ErrorSeverity.ERROR);
-                    put(CICSLexer.CONVID, ErrorSeverity.ERROR);
-                    put(CICSLexer.SESSION, ErrorSeverity.ERROR);
-                    put(CICSLexer.STATE, ErrorSeverity.ERROR);
-                    put(CICSLexer.MAP, ErrorSeverity.ERROR);
-                    put(CICSLexer.MAPSET, ErrorSeverity.ERROR);
-                    put(CICSLexer.MAXLENGTH, ErrorSeverity.ERROR);
-                    put(CICSLexer.MAXFLENGTH, ErrorSeverity.ERROR);
-                    put(CICSLexer.INPARTN, ErrorSeverity.ERROR);
-                    put(CICSLexer.MAPPINGDEV, ErrorSeverity.ERROR);
-                    put(CICSLexer.ASIS, ErrorSeverity.WARNING);
-                    put(CICSLexer.BUFFER, ErrorSeverity.WARNING);
-                    put(CICSLexer.LEAVEKB, ErrorSeverity.WARNING);
-                    put(CICSLexer.PASSBK, ErrorSeverity.WARNING);
-                    put(CICSLexer.NOTRUNCATE, ErrorSeverity.WARNING);
-                    put(CICSLexer.NOQUEUE, ErrorSeverity.WARNING);
-                    put(CICSLexer.TERMINAL, ErrorSeverity.WARNING);
-                }
-            };
-
-    public CICSReceiveOptionsCheckUtility(
-            DialectProcessingContext context, List<SyntaxError> errors) {
-        super(context, errors, DUPLICATE_CHECK_OPTIONS);
-    }
-
-    /**
-     * Entrypoint to check CICS RECEIVE rule options 0
-     *
-     * @param ctx ParserRuleContext subclass containging options
-     * @param <E> A subclass of ParserRuleContext
-     */
-    public <E extends ParserRuleContext> void checkOptions(E ctx) {
-        switch (ctx.getRuleIndex()) {
-            case CICSParser.RULE_cics_receive_group_one:
-                checkGroupOne((CICSParser.Cics_receive_group_oneContext) ctx);
-                break;
-            case CICSParser.RULE_cics_receive_partn:
-                checkPartn((CICSParser.Cics_receive_partnContext) ctx);
-                break;
-            case CICSParser.RULE_cics_receive_map:
-                checkMap((CICSParser.Cics_receive_mapContext) ctx);
-                break;
-            case CICSParser.RULE_cics_receive_map_mappingdev:
-                checkMapMappingDev((CICSParser.Cics_receive_map_mappingdevContext) ctx);
-                break;
-            default:
-                break;
+  private static final Map<Integer, ErrorSeverity> DUPLICATE_CHECK_OPTIONS =
+      new HashMap<Integer, ErrorSeverity>() {
+        {
+          put(CICSLexer.RECEIVE, ErrorSeverity.ERROR);
+          put(CICSLexer.INTO, ErrorSeverity.ERROR);
+          put(CICSLexer.SET, ErrorSeverity.ERROR);
+          put(CICSLexer.LENGTH, ErrorSeverity.ERROR);
+          put(CICSLexer.FLENGTH, ErrorSeverity.ERROR);
+          put(CICSLexer.CONVID, ErrorSeverity.ERROR);
+          put(CICSLexer.SESSION, ErrorSeverity.ERROR);
+          put(CICSLexer.STATE, ErrorSeverity.ERROR);
+          put(CICSLexer.MAP, ErrorSeverity.ERROR);
+          put(CICSLexer.MAPSET, ErrorSeverity.ERROR);
+          put(CICSLexer.MAXLENGTH, ErrorSeverity.ERROR);
+          put(CICSLexer.MAXFLENGTH, ErrorSeverity.ERROR);
+          put(CICSLexer.INPARTN, ErrorSeverity.ERROR);
+          put(CICSLexer.MAPPINGDEV, ErrorSeverity.ERROR);
+          put(CICSLexer.ASIS, ErrorSeverity.WARNING);
+          put(CICSLexer.BUFFER, ErrorSeverity.WARNING);
+          put(CICSLexer.LEAVEKB, ErrorSeverity.WARNING);
+          put(CICSLexer.PASSBK, ErrorSeverity.WARNING);
+          put(CICSLexer.NOTRUNCATE, ErrorSeverity.WARNING);
+          put(CICSLexer.NOQUEUE, ErrorSeverity.WARNING);
+          put(CICSLexer.TERMINAL, ErrorSeverity.WARNING);
         }
-        checkDuplicates(ctx);
+      };
+
+  public CICSReceiveOptionsCheckUtility(
+      DialectProcessingContext context, List<SyntaxError> errors) {
+    super(context, errors, DUPLICATE_CHECK_OPTIONS);
+  }
+
+  /**
+   * Entrypoint to check CICS RECEIVE rule options 0
+   *
+   * @param ctx ParserRuleContext subclass containging options
+   * @param <E> A subclass of ParserRuleContext
+   */
+  public <E extends ParserRuleContext> void checkOptions(E ctx) {
+    switch (ctx.getRuleIndex()) {
+      case CICSParser.RULE_cics_receive_group_one:
+        checkGroupOne((CICSParser.Cics_receive_group_oneContext) ctx);
+        break;
+      case CICSParser.RULE_cics_receive_partn:
+        checkPartn((CICSParser.Cics_receive_partnContext) ctx);
+        break;
+      case CICSParser.RULE_cics_receive_map:
+        checkMap((CICSParser.Cics_receive_mapContext) ctx);
+        break;
+      case CICSParser.RULE_cics_receive_map_mappingdev:
+        checkMapMappingDev((CICSParser.Cics_receive_map_mappingdevContext) ctx);
+        break;
+      default:
+        break;
     }
+    checkDuplicates(ctx);
+  }
 
-    private void checkGroupOne(CICSParser.Cics_receive_group_oneContext ctx) {
-        checkHasMutuallyExclusiveOptions("INTO or SET", ctx.INTO(), ctx.SET());
-        if (!ctx.SET().isEmpty())
-            checkHasExactlyOneOption("LENGTH or FLENGTH", ctx, ctx.cics_length_flength());
-        else
-            checkLengthFlength(ctx.cics_length_flength());
-        checkMaxLength(ctx.cics_maxlength());
+  private void checkGroupOne(CICSParser.Cics_receive_group_oneContext ctx) {
+    checkHasMutuallyExclusiveOptions("INTO or SET", ctx.INTO(), ctx.SET());
+    if (!ctx.SET().isEmpty())
+      checkHasExactlyOneOption("LENGTH or FLENGTH", ctx, ctx.cics_length_flength());
+    else checkLengthFlength(ctx.cics_length_flength());
+    checkMaxLength(ctx.cics_maxlength());
+  }
+
+  private void checkPartn(CICSParser.Cics_receive_partnContext ctx) {
+    checkHasMandatoryOptions(ctx.PARTN(), ctx, "PARTN");
+    checkHasExactlyOneOption("INTO or SET", ctx, ctx.cics_into_set());
+    checkHasMandatoryOptions(ctx.LENGTH(), ctx, "LENGTH");
+  }
+
+  private void checkMap(CICSParser.Cics_receive_mapContext ctx) {
+    if (ctx.FROM().isEmpty()) checkHasIllegalOptions(ctx.LENGTH(), "LENGTH without FROM");
+    if (!checkMapHasLiteral(ctx)) {
+      checkHasMandatoryOptions(
+          ctx.cics_into_set().stream()
+              .map(CICSParser.Cics_into_setContext::INTO)
+              .collect(Collectors.toList()),
+          ctx,
+          "INTO when specifying MAP param without literal");
     }
+    checkIntoSet(ctx.cics_into_set());
+    checkHasMutuallyExclusiveOptions("TERMINAL or FROM", ctx.TERMINAL(), ctx.FROM());
+  }
 
-    private void checkPartn(CICSParser.Cics_receive_partnContext ctx) {
-        checkHasMandatoryOptions(ctx.PARTN(), ctx, "PARTN");
-        checkHasExactlyOneOption("INTO or SET", ctx, ctx.cics_into_set());
-        checkHasMandatoryOptions(ctx.LENGTH(), ctx, "LENGTH");
+  private void checkMapMappingDev(CICSParser.Cics_receive_map_mappingdevContext ctx) {
+    checkHasMandatoryOptions(ctx.FROM(), ctx, "FROM");
+    if (!checkMapHasLiteral(ctx)) {
+      checkHasMandatoryOptions(
+          ctx.cics_into_set().stream()
+              .map(CICSParser.Cics_into_setContext::INTO)
+              .collect(Collectors.toList()),
+          ctx,
+          "INTO when specifying MAP param without literal");
     }
+  }
 
-    private void checkMap(CICSParser.Cics_receive_mapContext ctx) {
-        if (ctx.FROM().isEmpty()) checkHasIllegalOptions(ctx.LENGTH(), "LENGTH without FROM");
-        if (!checkMapHasLiteral(ctx)) {
-            checkHasMandatoryOptions(ctx.cics_into_set().stream().map(CICSParser.Cics_into_setContext::INTO).collect(Collectors.toList()), ctx, "INTO when specifying MAP param without literal");
-        }
-        checkIntoSet(ctx.cics_into_set());
-        checkHasMutuallyExclusiveOptions("TERMINAL or FROM", ctx.TERMINAL(), ctx.FROM());
-    }
-
-    private void checkMapMappingDev(CICSParser.Cics_receive_map_mappingdevContext ctx) {
-        checkHasMandatoryOptions(ctx.FROM(), ctx, "FROM");
-        checkHasExactlyOneOption("INTO or SET", ctx, ctx.cics_into_set());
-
-    }
-
-    private boolean checkMapHasLiteral(CICSParser.Cics_receive_mapContext ctx) {
-        boolean hasLiteral = false;
-        for (int index = 0; index < ctx.children.size(); index++) {
-            ParseTree item = ctx.children.get(index);
-            if (TerminalNode.class.isAssignableFrom(item.getClass())) {
-                TerminalNode node = (TerminalNode) item;
-                if (node.getSymbol().getType() == CICSParser.MAP && index + 1 < ctx.children.size() - 1) {
-                    ParseTree param = ctx.children.get(index + 1);
-                    if (ParserRuleContext.class.isAssignableFrom(param.getClass())) {
-                        ParserRuleContext name = (ParserRuleContext) param;
-                        if (name.getRuleIndex() == CICSParser.RULE_cics_name) {
-                            if ((((CICSParser.Cics_nameContext) name).name().variableNameUsage().stream().anyMatch(variable -> variable.NONNUMERICLITERAL() != null))) {
-                                hasLiteral = true;
-                            }
-                        }
-                    }
-                }
+  private boolean checkMapHasLiteral(ParserRuleContext ctx) {
+    if (ctx.children == null) return false;
+    boolean hasLiteral = false;
+    for (int index = 0; index < ctx.children.size(); index++) {
+      ParseTree item = ctx.children.get(index);
+      if (TerminalNode.class.isAssignableFrom(item.getClass())) {
+        TerminalNode node = (TerminalNode) item;
+        if (node.getSymbol().getType() == CICSParser.MAP && index + 1 < ctx.children.size() - 1) {
+          ParseTree param = ctx.children.get(index + 1);
+          if (ParserRuleContext.class.isAssignableFrom(param.getClass())) {
+            ParserRuleContext name = (ParserRuleContext) param;
+            if (name.getRuleIndex() == CICSParser.RULE_cics_name) {
+              if ((((CICSParser.Cics_nameContext) name)
+                  .name().variableNameUsage().stream()
+                      .anyMatch(variable -> variable.NONNUMERICLITERAL() != null))) {
+                hasLiteral = true;
+              }
             }
+          }
         }
-        return hasLiteral;
+      }
     }
+    return hasLiteral;
+  }
 
-    private void checkIntoSet(List<CICSParser.Cics_into_setContext> ctx) {
-        checkHasMutuallyExclusiveOptions(
-                "INTO or SET",
-                ctx.stream().map(CICSParser.Cics_into_setContext::INTO).collect(Collectors.toList()),
-                ctx.stream().map(CICSParser.Cics_into_setContext::SET).collect(Collectors.toList()));
-    }
+  private void checkLengthFlength(List<CICSParser.Cics_length_flengthContext> ctx) {
+    checkHasMutuallyExclusiveOptions(
+        "LENGTH or FLENGTH",
+        ctx.stream()
+            .map(CICSParser.Cics_length_flengthContext::LENGTH)
+            .collect(Collectors.toList()),
+        ctx.stream()
+            .map(CICSParser.Cics_length_flengthContext::FLENGTH)
+            .collect(Collectors.toList()));
+  }
 
-    private void checkLengthFlength(List<CICSParser.Cics_length_flengthContext> ctx) {
-        checkHasMutuallyExclusiveOptions(
-                "LENGTH or FLENGTH",
-                ctx.stream().map(CICSParser.Cics_length_flengthContext::LENGTH).collect(Collectors.toList()),
-                ctx.stream().map(CICSParser.Cics_length_flengthContext::FLENGTH).collect(Collectors.toList()));
-    }
+  private void checkIntoSet(List<CICSParser.Cics_into_setContext> ctx) {
+    checkHasMutuallyExclusiveOptions(
+        "INTO or SET",
+        ctx.stream().map(CICSParser.Cics_into_setContext::INTO).collect(Collectors.toList()),
+        ctx.stream().map(CICSParser.Cics_into_setContext::SET).collect(Collectors.toList()));
+  }
 
-    private void checkMaxLength(List<CICSParser.Cics_maxlengthContext> ctx) {
-        checkHasMutuallyExclusiveOptions(
-                "MAXLENGTH or MAXFLENGTH",
-                ctx.stream().map(CICSParser.Cics_maxlengthContext::MAXLENGTH).collect(Collectors.toList()),
-                ctx.stream()
-                        .map(CICSParser.Cics_maxlengthContext::MAXFLENGTH)
-                        .collect(Collectors.toList()));
-    }
+  private void checkMaxLength(List<CICSParser.Cics_maxlengthContext> ctx) {
+    checkHasMutuallyExclusiveOptions(
+        "MAXLENGTH or MAXFLENGTH",
+        ctx.stream().map(CICSParser.Cics_maxlengthContext::MAXLENGTH).collect(Collectors.toList()),
+        ctx.stream()
+            .map(CICSParser.Cics_maxlengthContext::MAXFLENGTH)
+            .collect(Collectors.toList()));
+  }
 }
