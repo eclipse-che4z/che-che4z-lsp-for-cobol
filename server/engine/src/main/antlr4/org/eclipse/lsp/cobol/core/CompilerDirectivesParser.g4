@@ -19,9 +19,12 @@ compilerOptions: compilerOption | (compilerOption COMMACHAR compilerOptions)+;
 compilerOption
     : deprecatedCompilerOptions
     | compilerXOpts
-    | cicsTranslatorCompileDirectivedKeywords
+    | cicsTranslatorOptions
     | cobolCompilerOption
     ;
+
+// compiler translator options
+cicsTranslatorOptions:  CICS LPARENCHAR (cicsTranslatorCompileDirectivedKeywords | NONNUMERICLITERAL)  RPARENCHAR;
 
 // compiler options
 compilerXOpts
@@ -197,7 +200,7 @@ cobolCompilerOption
    | SQL (LPARENCHAR LITERAL RPARENCHAR)? | NOSQL
    | SQLCCSID | SQLC | NOSQLCCSID | NOSQLC
    | SQLIMS (LPARENCHAR LITERAL RPARENCHAR)? | NOSQLIMS
-   | (SSRANGE | SSR) LPARENCHAR (ssrangeSuboptions (COMMACHAR ssrangeSuboptions)*)? RPARENCHAR | (NOSSRANGE | NOSSR)
+   | (SSRANGE | SSR) (LPARENCHAR ssrangeSuboptions (COMMACHAR ssrangeSuboptions)* RPARENCHAR)? | (NOSSRANGE | NOSSR)
    | STGOPT | SO | NOSTGOPT | NOSO
    | SUPPRESS | SUPP | NOSUPPRESS | NOSUPP
    | TERMINAL | TERM | NOTERMINAL | NOTERM

@@ -96,8 +96,7 @@ public abstract class CobolLineWriter {
     if (start != null) {
       CobolLine lastLine = lines.get(lines.size() - 1);
       Position stop = new Position(lastLine.getNumber(), sb.length() - sb.lastIndexOf("\n") - 1);
-      Range range = new Range(start, stop);
-      result.replace(range, clSb.toString());
+      result.replace(new Range(start, stop), clSb.toString());
     }
     result.commitTransformations();
     return result;

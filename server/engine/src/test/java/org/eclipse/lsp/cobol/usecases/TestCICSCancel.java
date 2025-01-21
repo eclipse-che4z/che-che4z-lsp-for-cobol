@@ -19,7 +19,6 @@ package org.eclipse.lsp.cobol.usecases;
         import org.eclipse.lsp.cobol.usecases.common.CICSTestUtils;
         import org.eclipse.lsp4j.Diagnostic;
         import org.eclipse.lsp4j.DiagnosticSeverity;
-        import org.eclipse.lsp4j.Position;
         import org.eclipse.lsp4j.Range;
         import org.junit.jupiter.api.Test;
 
@@ -55,10 +54,10 @@ public class TestCICSCancel {
     private static final String CANCEL_TRANSID_INVALID =
             "CANCEL {TRANSID(100) | errorTransid} ";
     private static final String CANCEL_ACQACTIVITY_ACQPROCESS_INVALID =
-            "CANCEL {ACQACTIVITY | errorAcqactivityAcqProcess} {ACQPROCESS | errorAcqactivityAcqProcess2} ";
+            "CANCEL {ACQACTIVITY|errorAcqactivityAcqProcess} {ACQPROCESS|errorAcqactivityAcqProcess2} ";
 
     private static final String CANCEL_ACTIVITY_ACQPROCESS_INVALID =
-            "CANCEL {ACTIVITY | errorActivityAcqProcess }(100) {ACQPROCESS | errorActivityAcqProcess2} ";
+            "CANCEL {ACTIVITY|errorActivityAcqProcess}(100) {ACQPROCESS|errorActivityAcqProcess2} ";
     @Test
     void testCancelActivityValid() {
 
@@ -125,7 +124,7 @@ public class TestCICSCancel {
                                 ErrorSource.PARSING.getText()),
                         "errorAcqactivityAcqProcess2",
                         new Diagnostic(
-                                new Range(new Position(14, 12), new Position(14, 22)),
+                                new Range(),
                                 "Exactly one option required, options are mutually exclusive: ACTIVITY or ACQACTIVITY or ACQPROCESS",
                                 DiagnosticSeverity.Error,
                                 ErrorSource.PARSING.getText()));
@@ -143,7 +142,7 @@ public class TestCICSCancel {
                                 ErrorSource.PARSING.getText()),
                         "errorActivityAcqProcess2",
                         new Diagnostic(
-                                new Range(new Position(14, 12), new Position(14, 22)),
+                                new Range(),
                                 "Exactly one option required, options are mutually exclusive: ACTIVITY or ACQACTIVITY or ACQPROCESS",
                                 DiagnosticSeverity.Error,
                                 ErrorSource.PARSING.getText()));

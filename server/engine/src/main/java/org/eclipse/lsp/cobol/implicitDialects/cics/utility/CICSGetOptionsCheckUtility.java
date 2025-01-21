@@ -35,7 +35,6 @@ public class CICSGetOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
   private static final Map<Integer, ErrorSeverity> DUPLICATE_CHECK_OPTIONS =
       new HashMap<Integer, ErrorSeverity>() {
         {
-          put(CICSLexer.GET, ErrorSeverity.ERROR);
           put(CICSLexer.CONTAINER, ErrorSeverity.ERROR);
           put(CICSLexer.ACTIVITY, ErrorSeverity.ERROR);
           put(CICSLexer.ACQACTIVITY, ErrorSeverity.WARNING);
@@ -101,6 +100,9 @@ public class CICSGetOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
 
   @SuppressWarnings("unchecked")
   private void checkContainerChannel(CICSParser.Cics_get_container_channelContext ctx) {
+    CICSParser.Cics_getContext parentCtx = (CICSParser.Cics_getContext) ctx.getParent();
+    checkHasIllegalOptions(parentCtx.GET64(), "GET64 is only available in Assembly");
+
     checkHasMandatoryOptions(ctx.CONTAINER(), ctx, "CONTAINER");
     checkHasExactlyOneOption("INTO or SET or NODATA", ctx, ctx.INTO(), ctx.SET(), ctx.NODATA());
     if (!ctx.BYTEOFFSET().isEmpty() || !ctx.SET().isEmpty() || !ctx.NODATA().isEmpty()) {

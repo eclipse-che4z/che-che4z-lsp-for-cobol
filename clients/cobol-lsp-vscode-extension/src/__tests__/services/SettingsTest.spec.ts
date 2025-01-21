@@ -358,23 +358,97 @@ describe("SettingService lspConfigHandler", () => {
   });
 
   describe("setting local copybook path section", () => {
+    let configurationProperties: Record<string, unknown> = {};
+
     beforeAll(() => {
       jest.spyOn(vscode.workspace, "getConfiguration").mockReturnValue({
-        get: () => ["local-copybooks"],
+        get: (key: string) => configurationProperties[key],
       } as unknown as vscode.WorkspaceConfiguration);
     });
 
-    test("returns local copybook path setting", async () => {
-      const result = await lspConfigHandler({
-        items: [
-          {
-            section: SETTINGS_CPY_LOCAL_PATH,
-            scopeUri: "file:///workspace/program.cob",
-          },
-        ],
+    describe("local copybooks path is configured", () => {
+      beforeAll(() => {
+        configurationProperties = {
+          "cobol-lsp.cpy-manager.paths-local": ["local-copybooks"],
+        };
       });
 
-      expect(result).toEqual(expect.arrayContaining([["local-copybooks"]]));
+      test("returns local copybook path setting", async () => {
+        const result = await lspConfigHandler({
+          items: [
+            {
+              section: SETTINGS_CPY_LOCAL_PATH,
+              scopeUri: "file:///workspace/program.cob",
+            },
+          ],
+        });
+
+        expect(result).toEqual(expect.arrayContaining([["local-copybooks"]]));
+      });
+    });
+
+    describe("local copybooks path is not configured", () => {
+      describe("remote copybooks are not configured", () => {
+        beforeAll(() => {
+          configurationProperties = {};
+        });
+
+        test("returns ** pattern as default value for local copybook resolving", async () => {
+          const result = await lspConfigHandler({
+            items: [
+              {
+                section: SETTINGS_CPY_LOCAL_PATH,
+                scopeUri: "file:///workspace/program.cob",
+              },
+            ],
+          });
+
+          expect(result).toEqual(expect.arrayContaining([["**"]]));
+        });
+      });
+      describe("remote copybooks are configured", () => {
+        describe("remove copybooks dsn is set", () => {
+          beforeAll(() => {
+            configurationProperties = {
+              "paths-dsn": ["DATASET.WITH.COPYBOOK"],
+            };
+          });
+
+          test("returns no paths for local copybook resolving", async () => {
+            const result = await lspConfigHandler({
+              items: [
+                {
+                  section: SETTINGS_CPY_LOCAL_PATH,
+                  scopeUri: "file:///workspace/program.cob",
+                },
+              ],
+            });
+
+            expect(result).toEqual([]);
+          });
+        });
+
+        describe("remove copybooks uss directory is set", () => {
+          beforeAll(() => {
+            configurationProperties = {
+              "paths-uss": ["/users/user/copybooks"],
+            };
+          });
+
+          test("returns no paths for local copybook resolving", async () => {
+            const result = await lspConfigHandler({
+              items: [
+                {
+                  section: SETTINGS_CPY_LOCAL_PATH,
+                  scopeUri: "file:///workspace/program.cob",
+                },
+              ],
+            });
+
+            expect(result).toEqual([]);
+          });
+        });
+      });
     });
   });
 
