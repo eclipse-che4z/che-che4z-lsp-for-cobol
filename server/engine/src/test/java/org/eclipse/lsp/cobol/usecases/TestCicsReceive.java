@@ -297,6 +297,10 @@ public class TestCicsReceive {
             "RECEIVE", "{MAP(1)|errorOne}"
     };
 
+    private static final String[] RECEIVE_MAP_VALID = {
+            "RECEIVE", "MAP('abc')", "MAPSET({$def})"
+    };
+
     private static final String[] RECEIVE_INVALID_THREE = {
             "RECEIVE", "MAP(1)", "INTO(1)", "{TERMINAL|errorOne}", "{FROM|errorTwo}(1)"
     };
@@ -334,7 +338,7 @@ public class TestCicsReceive {
                         "errorOne",
                         new Diagnostic(
                                 new Range(),
-                                "Missing required option: INTO",
+                                "Missing required option: INTO when specifying MAP param without literal",
                                 DiagnosticSeverity.Error,
                                 ErrorSource.PARSING.getText())),
                 ImmutableList.of());
@@ -387,6 +391,11 @@ public class TestCicsReceive {
     @Test
     void testReceiveValidOne() {
         UseCaseEngine.runTest(getTestString(RECEIVE_VALID_ONE), ImmutableList.of(), ImmutableMap.of());
+    }
+
+    @Test
+    void testReveiveMapValidOne() {
+        UseCaseEngine.runTest(getTestString(RECEIVE_MAP_VALID), ImmutableList.of(), ImmutableMap.of());
     }
 
     @Test

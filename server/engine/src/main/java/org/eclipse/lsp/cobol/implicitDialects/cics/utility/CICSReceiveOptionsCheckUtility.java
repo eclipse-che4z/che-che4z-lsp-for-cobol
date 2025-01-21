@@ -16,6 +16,8 @@
 package org.eclipse.lsp.cobol.implicitDialects.cics.utility;
 
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.tree.ParseTree;
+import org.antlr.v4.runtime.tree.TerminalNode;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
@@ -111,7 +113,9 @@ public class CICSReceiveOptionsCheckUtility extends CICSOptionsCheckBaseUtility 
 
     private void checkMap(CICSParser.Cics_receive_mapContext ctx) {
         if (ctx.FROM().isEmpty()) checkHasIllegalOptions(ctx.LENGTH(), "LENGTH without FROM");
-        checkHasMandatoryOptions(ctx.cics_into_set().stream().map(CICSParser.Cics_into_setContext::INTO).collect(Collectors.toList()), ctx, "INTO");
+        if (!checkMapHasLiteral(ctx)) {
+            checkHasMandatoryOptions(ctx.cics_into_set().stream().map(CICSParser.Cics_into_setContext::INTO).collect(Collectors.toList()), ctx, "INTO when specifying MAP param without literal");
+        }
         checkIntoSet(ctx.cics_into_set());
         checkHasMutuallyExclusiveOptions("TERMINAL or FROM", ctx.TERMINAL(), ctx.FROM());
     }
@@ -119,6 +123,29 @@ public class CICSReceiveOptionsCheckUtility extends CICSOptionsCheckBaseUtility 
     private void checkMapMappingDev(CICSParser.Cics_receive_map_mappingdevContext ctx) {
         checkHasMandatoryOptions(ctx.FROM(), ctx, "FROM");
         checkHasExactlyOneOption("INTO or SET", ctx, ctx.cics_into_set());
+
+    }
+
+    private boolean checkMapHasLiteral(CICSParser.Cics_receive_mapContext ctx) {
+        boolean hasLiteral = false;
+        for (int index = 0; index < ctx.children.size(); index++) {
+            ParseTree item = ctx.children.get(index);
+            if (TerminalNode.class.isAssignableFrom(item.getClass())) {
+                TerminalNode node = (TerminalNode) item;
+                if (node.getSymbol().getType() == CICSParser.MAP && index + 1 < ctx.children.size() - 1) {
+                    ParseTree param = ctx.children.get(index + 1);
+                    if (ParserRuleContext.class.isAssignableFrom(param.getClass())) {
+                        ParserRuleContext name = (ParserRuleContext) param;
+                        if (name.getRuleIndex() == CICSParser.RULE_cics_name) {
+                            if ((((CICSParser.Cics_nameContext) name).name().variableNameUsage().stream().anyMatch(variable -> variable.NONNUMERICLITERAL() != null))) {
+                                hasLiteral = true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return hasLiteral;
     }
 
     private void checkIntoSet(List<CICSParser.Cics_into_setContext> ctx) {
