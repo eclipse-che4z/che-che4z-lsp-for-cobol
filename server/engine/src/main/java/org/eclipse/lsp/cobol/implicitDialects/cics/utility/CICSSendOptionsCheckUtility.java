@@ -189,6 +189,7 @@ public class CICSSendOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
   @SuppressWarnings("unchecked")
   private void checkMap(CICSParser.Cics_send_mapContext ctx) {
     checkHasMandatoryOptions(ctx.MAP(), ctx, "MAP");
+    checkHasMandatoryOptions(ctx.FROM(), ctx, "FROM");
     checkHasMutuallyExclusiveOptions("ERASE or ERASEAUP", ctx.ERASE(), ctx.ERASEAUP());
     checkHasMutuallyExclusiveOptions("DEFAULT or ALTERNATE", ctx.DEFAULT(), ctx.ALTERNATE());
     if (!ctx.DEFAULT().isEmpty() || !ctx.ALTERNATE().isEmpty()) {
@@ -205,7 +206,6 @@ public class CICSSendOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     }
     checkHasMutuallyExclusiveOptions("HONEOM or L40 or L64 or L80", ctx.HONEOM(), ctx.L40(), ctx.L64(), ctx.L80());
     checkHasMutuallyExclusiveOptions("DATAONLY or MAPONLY", ctx.DATAONLY(), ctx.MAPONLY());
-    checkHasExactlyOneOption("FROM or MAPONLY", ctx, ctx.FROM(), ctx.MAPONLY());
     checkHasMutuallyExclusiveOptions("LENGTH or MAPONLY", ctx.LENGTH(), ctx.MAPONLY());
   }
 

@@ -69,16 +69,16 @@ public class TestCicsSendStatement {
   private static final String SEND_CONTROL_REQID_HONEOM_VALID = "SEND CONTROL REQID({$varOne}) HONEOM";
   private static final String SEND_CONTROL_L80_VALID = "SEND CONTROL L80";
 
-  private static final String SEND_MAP_VALID = "SEND MAP({$varOne}) MAPONLY";
-  private static final String SEND_MAP_MAPSET_VALID = "SEND MAP({$varOne}) MAPONLY MAPSET({$varTwo})";
+  private static final String SEND_MAP_VALID = "SEND MAP({$varOne}) FROM({$varTwo})";
+  private static final String SEND_MAP_MAPSET_VALID = "SEND MAP({$varOne}) FROM({$varTwo}) MAPSET({$varTwo})";
   private static final String SEND_MAP_FROM_LENGTH_VALID = "SEND MAP({$varOne}) FROM({$varTwo}) LENGTH({$varThree})";
   private static final String SEND_MAP_DATAONLY_VALID = "SEND MAP({$varOne}) FROM({$varOne}) DATAONLY";
-  private static final String SEND_MAP_DATAONLY_INVALID = "SEND MAP({$varOne}) {DATAONLY|error1} {MAPONLY|error2}";
+  private static final String SEND_MAP_DATAONLY_INVALID = "SEND MAP({$varOne}) FROM({$varTwo}) {DATAONLY|error1} {MAPONLY|error2}";
   private static final String SEND_MAP_CURSOR_VALID = "SEND MAP({$varOne}) FROM({$varOne}) CURSOR({$varTwo})";
   private static final String SEND_MAP_ERASE_VALID = "SEND MAP({$varOne}) FROM({$varOne}) ERASE";
   private static final String SEND_MAP_ERASE_ALTERNATE_VALID = "SEND MAP({$varOne}) FROM({$varOne}) ERASE ALTERNATE";
-  private static final String SEND_MAP_FREEKB_ALARM_VALID = "SEND MAP({$varOne}) MAPONLY FREEKB ALARM";
-  private static final String SEND_MAP_FORMFEED_PRINT_VALID = "SEND MAP({$varOne}) MAPONLY FORMFEED PRINT";
+  private static final String SEND_MAP_FREEKB_ALARM_VALID = "SEND MAP({$varOne}) FROM({$varTwo}) FREEKB ALARM";
+  private static final String SEND_MAP_FORMFEED_PRINT_VALID = "SEND MAP({$varOne}) FROM({$varTwo}) FORMFEED PRINT";
 
   private static final String SEND_MAP_MAPPINGDEV_INVALID = "SEND {MAP(123) MAPPINGDEV(123)|error1}";
   private static final String SEND_MAP_MAPPINGDEV_SET_VALID = "SEND MAP({$varFour}) MAPPINGDEV({$varTwo}) SET({$varThree})";
