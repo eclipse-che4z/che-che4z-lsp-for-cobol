@@ -247,6 +247,7 @@
 
            Initialize SSMAPC1I.
            EXEC CICS SEND MAP ('SSMAPC1')
+                     FROM ('SMAP1')
                      MAPSET ('SSMAP')
                      MAPONLY
            END-EXEC
