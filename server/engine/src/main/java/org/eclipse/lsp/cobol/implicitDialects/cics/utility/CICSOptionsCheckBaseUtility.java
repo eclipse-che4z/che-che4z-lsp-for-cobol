@@ -232,11 +232,22 @@ public abstract class CICSOptionsCheckBaseUtility {
     * @param options Options checked to insert into error message
     */
     protected void checkHasObsoleteOptions(TerminalNode rule, String options) {
-     if (!rule.getText().trim().isEmpty()) {
-       throwException(ErrorSeverity.ERROR, getLocality(rule), "Obsolete option provided: ", options);
-     }
+        if (!rule.getText().trim().isEmpty()) {
+          throwException(ErrorSeverity.ERROR, getLocality(rule), "Obsolete option provided: ", options);
+        }
     }
-    
+
+    /**
+     * Helper method to collect analysis errors if the rule context contains obsolete options
+     *
+     * @param rule TerminalNode to check.
+     * @param options Options checked to insert into error message
+     */
+    protected void checkHasObsoleteOptions(List<TerminalNode> rule, ParserRuleContext ctx, String options) {
+        if (!rule.isEmpty()) {
+            throwException(ErrorSeverity.ERROR, getLocality(ctx), "Obsolete option provided: ", options);
+        }
+    }
 
     /**
      * Helper function to check and see if more than one rule was visited out of a set provided.

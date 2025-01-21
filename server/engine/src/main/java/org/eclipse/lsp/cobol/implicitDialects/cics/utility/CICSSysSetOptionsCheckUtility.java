@@ -1085,7 +1085,7 @@ public class CICSSysSetOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     private void checkJournalnum(CICSParser.Cics_set_journalnumContext ctx) {
         checkHasMandatoryOptions(ctx.JOURNALNUM(), ctx, "JOURNALNUM");
 
-        checkHasObsoleteOptions(ctx.JOURNALNUM(), "JOURNALNUM. Replace with JOURNALNAME.");
+        checkHasObsoleteOptions(ctx.JOURNALNUM(), ctx, "JOURNALNUM. Replace with JOURNALNAME.");
         checkForExactlyOne("ACTION, FLUSH or RESET", ctx, ctx.ACTION(), ctx.FLUSH(), ctx.RESET());
         checkForExactlyOne("STATUS, DISABLED or ENABLED", ctx, ctx.STATUS(), ctx.DISABLED(), ctx.ENABLED());
     }
@@ -1467,7 +1467,7 @@ public class CICSSysSetOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     private void checkVolume(CICSParser.Cics_set_volumeContext ctx) {
         checkHasMandatoryOptions(ctx.VOLUME(), ctx, "VOLUME");
 
-        checkHasObsoleteOptions(ctx.VOLUME(), "VOLUME");
+        checkHasObsoleteOptions(ctx.VOLUME(), ctx, "VOLUME");
         checkPrerequisiteIsMet(ctx.ACTION(), ctx.JRNL(), ctx, "JRNL without ACTION");
         checkMutuallyExclusiveOptions("ACTION, ADD or REMOVE", ctx.ACTION(), ctx.ADD(), ctx.REMOVE());
         checkMutuallyExclusiveOptions("AVAIL, OK or NOWRITE", ctx.AVAIL(), ctx.OK(), ctx.NOWRITE());

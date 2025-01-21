@@ -260,7 +260,7 @@ public class TestCicsSysSetStatement {
     private static final String UOWLINK_INVALID_1 = "SET UOWLINK({$varOne}) ACTION({$varOne}) {DELETE|errorOne}";
     private static final String URIMAP_INVALID_1 = "SET URIMAP({$varOne}) DISABLED {ENABLED|errorOne}";
     private static final String URIMAP_INVALID_2 = "SET URIMAP({$varOne}) PERMANENT {TEMPORARY|errorOne}";
-    private static final String VOLUME_INVALID_1 = "SET {VOLUME|errorOne} {NORESP|errorTwo}({$varOne})";
+    private static final String VOLUME_INVALID_1 = "SET {_VOLUME {_NORESP|errorTwo_}({$varOne})|errorOne_}";
     private static final String VTAM_INVALID_1 = "SET VTAM CLOSED {FORCECLOSE|errorOne}";
     private static final String VTAM_INVALID_2 = "SET VTAM PSDINTERVAL({$varOne}) {PSDINTHRS|errorOne}({$varOne})";
     //private static final String WEB_INVALID_1 = "SET WEB ";
