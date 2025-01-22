@@ -349,7 +349,7 @@ public final class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
               .map(def -> addTreeNode(ctx, locality -> createParagraphWithNameNode(locality, ctx, def)))
               .orElseGet(() -> visitChildren(ctx));
     } else {
-      throwWarning(ctx.getStart());
+      throwMisspelledWarning(ctx.getStart());
       return visitChildren(ctx);
     }
   }
@@ -786,21 +786,21 @@ public final class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   public List<Node> visitStatement(StatementContext ctx) {
     areaBWarning(ctx);
     if (ctx.exception != null)
-      throwWarning(ctx.exception.getOffendingToken());
+      throwMisspelledWarning(ctx.exception.getOffendingToken());
     return visitChildren(ctx);
   }
 
   @Override
   public List<Node> visitIfThen(IfThenContext ctx) {
     if (ctx.exception != null)
-      throwWarning(ctx.exception.getOffendingToken());
+      throwMisspelledWarning(ctx.exception.getOffendingToken());
     return visitChildren(ctx);
   }
 
   @Override
   public List<Node> visitIfElse(IfElseContext ctx) {
     if (ctx.exception != null)
-      throwWarning(ctx.exception.getOffendingToken());
+      throwMisspelledWarning(ctx.exception.getOffendingToken());
     return addTreeNode(ctx, IfElseNode::new);
   }
 
@@ -932,7 +932,7 @@ public final class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   @Override
   public List<Node> visitEvaluateWhenOther(EvaluateWhenOtherContext ctx) {
     if (ctx.exception != null)
-      throwWarning(ctx.exception.getOffendingToken());
+      throwMisspelledWarning(ctx.exception.getOffendingToken());
     return addTreeNode(ctx, EvaluateWhenOtherNode::new);
   }
 
@@ -1227,7 +1227,7 @@ public final class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   @Override
   public List<Node> visitEvaluateWhen(EvaluateWhenContext ctx) {
     if (ctx.exception != null)
-      throwWarning(ctx.exception.getOffendingToken());
+      throwMisspelledWarning(ctx.exception.getOffendingToken());
     return addTreeNode(ctx, EvaluateWhenNode::new);
   }
 
@@ -1674,7 +1674,7 @@ public final class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
     errors.add(error);
   }
 
-  protected void throwWarning(Token token) {
+  protected void throwMisspelledWarning(Token token) {
     if (token == null)
       return;
     String tokenText = token.getText().toUpperCase();
