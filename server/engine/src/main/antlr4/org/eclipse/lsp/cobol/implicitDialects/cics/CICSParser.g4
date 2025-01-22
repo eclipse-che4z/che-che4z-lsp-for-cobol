@@ -97,18 +97,14 @@ cicsTranslatorCompileDirectivedKeywords
 // Receive all
 cics_receive:                   RECEIVE (cics_receive_group_one | cics_receive_partn | cics_receive_map | cics_receive_map_mappingdev);
 
-//Helpers
-cics_into_set:                  INTO cics_data_area | SET cics_ref;
-cics_length_flength:            (LENGTH | FLENGTH) cics_data_area;
-
 // CICS Group 1 (zOS DEFAULT, LUTYPE (2,3,4), 2260, 3270-logical, 3790 / 3270-display, 3600 pipeline, 3600-3601, 3600-3614, 3650, 3767, 3770, 3790 FF, 2980, Non z Default, APPC, LUTYPE 6.1, MRO)
-cics_receive_group_one:         (INTO cics_data_area | SET cics_ref | cics_length_flength | cics_maxlength | (CONVID | SESSION) cics_name | STATE cics_cvda | ASIS | BUFFER | NOTRUNCATE | LEAVEKB | NOTRUNCATE | PASSBK | cics_handle_response)*;
+cics_receive_group_one:         ((INTO | LENGTH | FLENGTH) cics_data_area | SET cics_ref | (MAXLENGTH | MAXFLENGTH) cics_data_value | (CONVID | SESSION) cics_name | STATE cics_cvda | ASIS | BUFFER | NOTRUNCATE | LEAVEKB | NOTRUNCATE | PASSBK | cics_handle_response)*;
 
-cics_receive_partn:             (PARTN cics_data_area | cics_into_set | LENGTH cics_data_area | ASIS | cics_handle_response)*;
+cics_receive_partn:             (PARTN cics_data_area | SET cics_ref | (INTO | LENGTH | INTO) cics_data_area | ASIS | cics_handle_response)*;
 
 // RECEIVE MAPS
-cics_receive_map: ((MAP | MAPSET | INPARTN) cics_name | cics_into_set | (FROM | LENGTH) cics_data_area | TERMINAL | ASIS | cics_handle_response)*;
-cics_receive_map_mappingdev:    ((MAP | MAPSET) cics_name | (MAPPINGDEV | FROM | LENGTH) cics_data_area  | cics_into_set | cics_handle_response)*;
+cics_receive_map: ((MAP | MAPSET | INPARTN) cics_name | SET cics_ref | (FROM | LENGTH | INTO) cics_data_area | TERMINAL | ASIS | cics_handle_response)*;
+cics_receive_map_mappingdev:    ((MAP | MAPSET) cics_name | (MAPPINGDEV | FROM | LENGTH | INTO) cics_data_area  | SET cics_ref | cics_handle_response)*;
 
 
 /** SEND: */
@@ -337,7 +333,9 @@ cics_document_retrieve: RETRIEVE (DOCTOKEN cics_data_area | INTO cics_data_area 
 cics_document_set: SET (DOCTOKEN cics_data_area | SYMBOL cics_name | VALUE cics_data_area | SYMBOLLIST cics_data_area | DELIMITER cics_data_value |
                    LENGTH cics_data_value | UNESCAPED | cics_handle_response)+;
 
+
 /** DUMP TRANSACTION */
+cics_length_flength:            (LENGTH | FLENGTH) cics_data_area;
 cics_dump: DUMP TRANSACTION (DUMPCODE cics_name | cics_dump_transaction_from  | cics_dump_transaction_segmentlist | cics_dump_code_opts)+;
 cics_dump_transaction_from: (FROM cics_data_area | cics_length_flength | cics_handle_response)+;
 cics_dump_code_opts: (COMPLETE | TRT | TASK | STORAGE | PROGRAM | TERMINAL | TABLES | FCT | PCT | PPT | SIT | TCT | DUMPID cics_data_area | cics_handle_response)+;
@@ -701,6 +699,7 @@ cics_readnext_readprev_body: (cics_file_name | INTO cics_data_area | SET cics_re
                SYSID cics_data_area | LENGTH cics_data_area | RBA | RRN | XRBA | NOSUSPEND | cics_handle_response)*;
 
 /** READQ TD / TS */
+cics_into_set:                  INTO cics_data_area | SET cics_ref;
 cics_readq: READQ cics_readq_ts_td;
 cics_readq_ts_td: (TS | TD | (QUEUE | QNAME) cics_name | cics_into_set | NEXT | (LENGTH | NUMITEMS | SYSID) cics_data_area |
                    ITEM cics_data_value | NOSUSPEND | cics_handle_response)+;
