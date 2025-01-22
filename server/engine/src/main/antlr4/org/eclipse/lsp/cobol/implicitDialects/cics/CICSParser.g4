@@ -322,20 +322,6 @@ cics_discard_body: cics_handle_response* (ATOMSERVICE | AUTINSTMODEL | BUNDLE | 
                    PROCESSTYPE | PROFILE | PROGRAM | TCPIPSERVICE | TDQUEUE | TERMINAL | TRANCLASS | TRANSACTION | TSMODEL | URIMAP | WEBSERVICE) cics_data_value cics_handle_response*;
 
 /** DOCUMENT CREATE / DELETE / INSERT / RETRIEVE / SET */
-//cics_document: DOCUMENT (cics_document_create | DELETE DOCTOKEN cics_data_area | cics_document_insert |
-//               cics_document_retrieve | cics_document_set);
-//cics_document_create: CREATE (DOCTOKEN cics_data_area | FROM cics_data_area | TEXT cics_data_area | BINARY cics_data_area |
-//                      LENGTH cics_data_area | FROMDOC cics_data_area | TEMPLATE cics_name | cics_document_create_symbollist |
-//                      DOCSIZE cics_data_area | HOSTCODEPAGE cics_name | cics_handle_response)+;
-//cics_document_create_symbollist: SYMBOLLIST cics_data_area (LISTLENGTH cics_data_value | DELIMITER cics_data_value |
-//                                 UNESCAPED | cics_handle_response)+;
-//cics_document_insert: INSERT (DOCTOKEN cics_data_area | FROM cics_data_area | TEXT cics_data_area | BINARY cics_data_area |
-//                      LENGTH cics_data_value | SYMBOL cics_name | TEMPLATE cics_name | FROMDOC cics_data_area |
-//                      BOOKMARK cics_name | DOCSIZE cics_data_value | HOSTCODEPAGE cics_name | AT cics_name | TO cics_name | cics_handle_response)+;
-//cics_document_retrieve: RETRIEVE (DOCTOKEN cics_data_area | INTO cics_data_area | LENGTH cics_data_value |
-//                        MAXLENGTH cics_data_value | CHARACTERSET cics_name | DATAONLY | cics_handle_response)+;
-//cics_document_set: SET (DOCTOKEN cics_data_area | SYMBOL cics_name | VALUE cics_data_area | SYMBOLLIST cics_data_area | DELIMITER cics_data_value |
-//                   LENGTH cics_data_value | UNESCAPED | cics_handle_response)+;
 /** DOCUMENT CREATE / DELETE / INSERT / RETRIEVE / SET */
 cics_document: DOCUMENT (cics_document_create | cics_document_delete | cics_document_insert | cics_document_retrieve | cics_document_set);
 cics_document_create: (CREATE | (DOCTOKEN | FROM | TEXT | BINARY | LENGTH | FROMDOC | SYMBOLLIST | LISTLENGTH | DELIMITER | DOCSIZE) cics_data_area |
