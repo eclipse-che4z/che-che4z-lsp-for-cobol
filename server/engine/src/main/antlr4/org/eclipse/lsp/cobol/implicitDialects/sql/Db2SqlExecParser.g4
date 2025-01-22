@@ -722,12 +722,15 @@ dbs_explain_stabilized: STABILIZED DYNAMIC QUERY STMTID (NUMERICLITERAL | dbs_in
 
 /*FETCH */
 //ref: https://www.ibm.com/docs/en/db2-for-zos/13?topic=statements-fetch
-dbs_fetch: FETCH (BEFORE | AFTER) FROM? dbs_cursor_name
-           | FETCH (INSENSITIVE | SENSITIVE)? WITH CONTINUE dbs_fetch_rowpos? FROM? dbs_cursor_name dbs_fetch_singlerow?
-           | FETCH (INSENSITIVE | SENSITIVE)?  (
-                                                (dbs_fetch_rowpos? FROM? dbs_cursor_name dbs_fetch_singlerow?)
-                                                 | (dbs_fetch_rowsetpos FROM? dbs_cursor_name dbs_fetch_multirow)
-                                              );
+dbs_fetch: FETCH (
+                (BEFORE | AFTER) FROM? dbs_cursor_name
+                |  (INSENSITIVE | SENSITIVE)? (WITH CONTINUE dbs_fetch_rowpos? FROM? dbs_cursor_name dbs_fetch_singlerow?
+                                                | (
+                                                     (dbs_fetch_rowpos? FROM? dbs_cursor_name dbs_fetch_singlerow?)
+                                                     | (dbs_fetch_rowsetpos FROM? dbs_cursor_name dbs_fetch_multirow)
+                                                   )
+                                                )
+                );
 dbs_fetch_rowpos: (NEXT | PRIOR | FIRST | LAST | CURRENT CONTINUE? | (ABSOLUTE | RELATIVE) (dbs_host_variable | dbs_integer_constant));
 dbs_fetch_singlerow: INTO (DESCRIPTOR dbs_descriptor_name | dbs_array_variable LSQUAREBRACKET INTEGERLITERAL RSQUAREBRACKET |
                     dbs_sql_variable_reference (dbs_comma_separator dbs_sql_variable_reference)*);
