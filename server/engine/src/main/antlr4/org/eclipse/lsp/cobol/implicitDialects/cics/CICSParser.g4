@@ -38,7 +38,7 @@ allExciRules: cics_exci_link | cics_exci_delete | cics_exci_delete_container | c
               cics_exci_get_container | cics_exci_get_next_container | cics_exci_move_container |
               cics_exci_put_container | cics_exci_query_channel | cics_exci_startbrowse_container ;
 
-allSPRules: cics_discard | cics_extract_system_programming | cics_inquire_system_programming | cics_create;
+allSPRules: cics_discard | cics_extract_system_programming | cics_inquire_system_programming | cics_create | cics_perform;
 
 // compiler options
 compilerOpts
@@ -655,6 +655,28 @@ cics_monitor_options: (POINT cics_data_value | (DATA1 | DATA2 | ENTRYNAME) cics_
 cics_move: MOVE cics_move_body;
 cics_move_body: ((CONTAINER | FROMACTIVITY | TOACTIVITY | AS | CHANNEL | TOCHANNEL) cics_data_value | FROMPROCESS |
            TOPROCESS | cics_handle_response)+;
+
+/** PERFORM System Commands */
+cics_perform:PERFORM (cics_perform_deletshipped | cics_perform_dump | cics_perform_endaffinity | cics_perform_jvmserver | cics_perform_pipeline |
+                      cics_perform_resettime | cics_perform_secdiscovery | cics_perform_security | cics_perform_shutdown | cics_perform_ssl | cics_perform_statistics);
+
+cics_perform_deletshipped:(DELETSHIPPED | cics_handle_response)+;
+cics_perform_dump:(DUMP | (DUMPCODE | TITLELENGTH | CALLER | CALLERLENGTH) cics_data_value | (TITLE | DUMPID) cics_data_area | cics_handle_response)+;
+cics_perform_endaffinity:(ENDAFFINITY | (NETNAME | NETID) cics_data_value | cics_handle_response)+;
+cics_perform_jvmserver:(JVMSERVER cics_data_area | JVMTYPE cics_cvda | JVM | JVMACTION cics_cvda | DUMP | DUMPTYPE cics_cvda | ALL | JAVACORE | HEAP | SNAPTRACE | GATHER | GATHERTYPE cics_cvda |
+                        DIAGNOSTICS | STACKTRACE | TASKID cics_data_value | LIBERTY | LIBRTYACTION cics_cvda | REFRESH | RESOURCETYPE cics_cvda | APPLICATION | APPID cics_data_area | APPIDLEN cics_data_area |
+                        CONFIG | SERVERDUMP | OSGI | OSGIACTION cics_cvda | REFRESHPKGS | cics_handle_response)+;
+cics_perform_pipeline:(PIPELINE cics_data_value | ACTION cics_cvda | SCAN | cics_handle_response)+;
+cics_perform_resettime:(RESETTIME | cics_handle_response)+;
+cics_perform_secdiscovery:(SECDISCOVERY | ACTION cics_cvda | WRITE | cics_handle_response)+;
+cics_perform_security:(SECURITY | REBUILD | ESMRESP cics_data_area | cics_handle_response)+;
+cics_perform_shutdown:(SHUTDOWN | IMMEDIATE | TAKEOVER | DUMP | PLT cics_data_value | PLTNAME cics_data_value | RESTART | NORESTART | SDTRAN cics_data_value | NOSDTRAN |
+                       XLT cics_data_value | cics_handle_response)+;
+cics_perform_ssl:(SSL | REBUILD | GSKRESP cics_data_area |cics_handle_response)+;
+cics_perform_statistics:(STATISTICS | RECORD | ALL | RESETNOW | ASYNCSERVICE | ATOMSERVICE | AUTOINSTALL | BUNDLE | CAPTURESPEC | CIPHER | CONNECTION | DB2 | DISPATCHER | DOCTEMPLATE | ENQUEUE | EPADAPTER |
+                        EVENTBINDING | EVENTPROCESS | FEPI | FILE | IPCONN | JOURNALNAME | JOURNALNUM | JVMPROGRAM | JVMSERVER | LIBRARY | LSRPOOL | MONITOR | MQCONN | MQMONITOR | NODEJSAPP |
+                        PIPELINE | POLICY | PROGAUTO | PROGRAM | PROGRAMDEF | RECOVERY | SECURITY | STATS | STORAGE | STREAMNAME | SYSDUMP | TABLEMGR | TCPIP | TCPIPSERVICE | TDQUEUE |
+                        TERMINAL | TRANCLASS | TCLASS | TRANDUMP | TRANSACTION | TSQUEUE | URIMAP | USER | VTAM | WEBSERVICE | XMLTRANSFORM | cics_handle_response)+;
 
 /** POINT */
 cics_point: POINT cics_point_options;
