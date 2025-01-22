@@ -95,6 +95,7 @@ public class CICSWSAContextOptionsCheckUtility extends CICSOptionsCheckBaseUtili
     }
 
     private void checkWSAContextDelete(CICSParser.Cics_wsacontext_deleteContext ctx) {
+        checkHasMandatoryOptions(ctx.DELETE(), ctx, "DELETE");
         checkHasMandatoryOptions(ctx.CHANNEL(), ctx, "CHANNEL");
     }
 
