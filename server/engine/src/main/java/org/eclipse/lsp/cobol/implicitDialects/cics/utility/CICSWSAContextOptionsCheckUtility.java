@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Broadcom.
+ * Copyright (c) 2025 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -35,26 +35,26 @@ public class CICSWSAContextOptionsCheckUtility extends CICSOptionsCheckBaseUtili
     private static final Map<Integer, ErrorSeverity> DUPLICATE_CHECK_OPTIONS =
             new HashMap<Integer, ErrorSeverity>() {
                 {
-                    put(CICSLexer.BUILD, ErrorSeverity.ERROR);
-                    put(CICSLexer.DELETE, ErrorSeverity.ERROR);
-                    put(CICSLexer.GET, ErrorSeverity.ERROR);
-                    put(CICSLexer.CHANNEL, ErrorSeverity.WARNING);
-                    put(CICSLexer.ACTION, ErrorSeverity.WARNING);
-                    put(CICSLexer.MESSAGEID, ErrorSeverity.WARNING);
-                    put(CICSLexer.RELATESURI, ErrorSeverity.WARNING);
-                    put(CICSLexer.RELATESTYPE, ErrorSeverity.WARNING);
-                    put(CICSLexer.EPRTYPE, ErrorSeverity.WARNING);
-                    put(CICSLexer.EPRFIELD, ErrorSeverity.WARNING);
-                    put(CICSLexer.EPRFROM, ErrorSeverity.WARNING);
-                    put(CICSLexer.EPRLENGTH, ErrorSeverity.WARNING);
-                    put(CICSLexer.FROMCCSID, ErrorSeverity.WARNING);
-                    put(CICSLexer.FROMCODEPAGE, ErrorSeverity.WARNING);
+                    put(CICSLexer.BUILD, ErrorSeverity.WARNING);
+                    put(CICSLexer.DELETE, ErrorSeverity.WARNING);
+                    put(CICSLexer.GET, ErrorSeverity.WARNING);
+                    put(CICSLexer.CHANNEL, ErrorSeverity.ERROR);
+                    put(CICSLexer.ACTION, ErrorSeverity.ERROR);
+                    put(CICSLexer.MESSAGEID, ErrorSeverity.ERROR);
+                    put(CICSLexer.RELATESURI, ErrorSeverity.ERROR);
+                    put(CICSLexer.RELATESTYPE, ErrorSeverity.ERROR);
+                    put(CICSLexer.EPRTYPE, ErrorSeverity.ERROR);
+                    put(CICSLexer.EPRFIELD, ErrorSeverity.ERROR);
+                    put(CICSLexer.EPRFROM, ErrorSeverity.ERROR);
+                    put(CICSLexer.EPRLENGTH, ErrorSeverity.ERROR);
+                    put(CICSLexer.FROMCCSID, ErrorSeverity.ERROR);
+                    put(CICSLexer.FROMCODEPAGE, ErrorSeverity.ERROR);
                     put(CICSLexer.CONTEXTTYPE, ErrorSeverity.ERROR);
-                    put(CICSLexer.RELATESINDEX, ErrorSeverity.WARNING);
-                    put(CICSLexer.EPRINTO, ErrorSeverity.WARNING);
-                    put(CICSLexer.EPRSET, ErrorSeverity.WARNING);
-                    put(CICSLexer.INTOCCSID, ErrorSeverity.WARNING);
-                    put(CICSLexer.INTOCODEPAGE, ErrorSeverity.WARNING);
+                    put(CICSLexer.RELATESINDEX, ErrorSeverity.ERROR);
+                    put(CICSLexer.EPRINTO, ErrorSeverity.ERROR);
+                    put(CICSLexer.EPRSET, ErrorSeverity.ERROR);
+                    put(CICSLexer.INTOCCSID, ErrorSeverity.ERROR);
+                    put(CICSLexer.INTOCODEPAGE, ErrorSeverity.ERROR);
                 }
             };
 
@@ -88,11 +88,7 @@ public class CICSWSAContextOptionsCheckUtility extends CICSOptionsCheckBaseUtili
     @SuppressWarnings("unchecked")
     private void checkWSAContextBuild(CICSParser.Cics_wsacontext_buildContext ctx) {
         checkHasMandatoryOptions(ctx.BUILD(), ctx, "BUILD");
-        checkHasExactlyOneOption("ACTION or MESSAGEID or RELATESURI or EPRTYPE", ctx,
-                ctx.ACTION(), ctx.MESSAGEID(), ctx.RELATESURI(), ctx.EPRTYPE());
-        if (!ctx.RELATESTYPE().isEmpty()) {
-            checkHasMandatoryOptions(ctx.RELATESURI(), ctx, "RELATESURI");
-        }
+        checkPrerequisiteIsMet(ctx.RELATESURI(), ctx.RELATESTYPE(), ctx, "RELATESTYPE");
         checkAllOptionsArePresentOrAbsent("EPRTYPE, EPRFIELD, EPRFROM and EPRLENGTH", ctx,
                 ctx.EPRTYPE(), ctx.EPRFIELD(), ctx.EPRFROM(), ctx.EPRLENGTH());
         checkHasMutuallyExclusiveOptions("FROMCCSID or FROMCODEPAGE", ctx.FROMCCSID(), ctx.FROMCODEPAGE());
@@ -105,8 +101,6 @@ public class CICSWSAContextOptionsCheckUtility extends CICSOptionsCheckBaseUtili
     @SuppressWarnings("unchecked")
     private void checkWSAContextGet(CICSParser.Cics_wsacontext_getContext ctx) {
         checkHasMandatoryOptions(ctx.CONTEXTTYPE(), ctx, "CONTEXTTYPE");
-        checkHasExactlyOneOption("ACTION or MESSAGEID or RELATESURI or EPRTYPE", ctx,
-                ctx.ACTION(), ctx.MESSAGEID(), ctx.RELATESURI(), ctx.EPRTYPE());
         if (!ctx.RELATESTYPE().isEmpty() || !ctx.RELATESINDEX().isEmpty()) {
             checkHasMandatoryOptions(ctx.RELATESURI(), ctx, "RELATESURI");
         }

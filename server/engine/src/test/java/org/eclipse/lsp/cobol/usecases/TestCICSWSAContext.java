@@ -188,7 +188,7 @@ public class TestCICSWSAContext {
                     new Diagnostic(
                             new Range(),
                             "Excessive options provided for: CHANNEL",
-                            DiagnosticSeverity.Warning,
+                            DiagnosticSeverity.Error,
                             ErrorSource.PARSING.getText())));
   }
 
@@ -201,7 +201,7 @@ public class TestCICSWSAContext {
                     new Diagnostic(
                             new Range(),
                             "Excessive options provided for: RELATESURI",
-                            DiagnosticSeverity.Warning,
+                            DiagnosticSeverity.Error,
                             ErrorSource.PARSING.getText())));
   }
 }
