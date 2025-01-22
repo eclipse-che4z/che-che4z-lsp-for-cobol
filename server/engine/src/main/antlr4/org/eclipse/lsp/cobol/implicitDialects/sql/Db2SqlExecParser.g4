@@ -798,11 +798,10 @@ dbs_include_sqlda: INCLUDE SQLDA;
 
 /*INSERT */
 dbs_insert: INSERT INTO dbs_alias_name (LPARENCHAR dbs_column_name (dbs_comma_separator dbs_column_name)* RPARENCHAR)?
-            dbs_fullselect? (OVERRIDING USER VALUE)? dbs_insert_values;
+            dbs_insert_include? (OVERRIDING USER VALUE)? dbs_insert_values;
 
-// Compiler and doc has ambiguity, ref: https://www.ibm.com/docs/en/db2-for-zos/13?topic=statements-insert
-// dbs_fullselect seems to be supported in insert statement
-//dbs_insert_include: INCLUDE LPARENCHAR dbs_column_name dbs_include_data_type (dbs_comma_separator dbs_column_name dbs_include_data_type)* RPARENCHAR;
+// ref: https://www.ibm.com/docs/en/db2-for-zos/13?topic=statements-insert
+dbs_insert_include: INCLUDE LPARENCHAR dbs_column_name dbs_include_data_type (dbs_comma_separator dbs_column_name dbs_include_data_type)* RPARENCHAR;
 //?
 dbs_insert_data_type: (common_short_built_in_type | dbs_distinct_type);
 //dbs_insert_values: VALUES LPARENCHAR (dbs_insert_values_single | dbs_insert_values_multi) RPARENCHAR;
