@@ -83,6 +83,8 @@ export class CopybookDownloaderForE4E {
     const elements: { [key: string]: EndevorElement | EndevorMember } = {};
     const promises: Promise<EndevorMember[] | EndevorElement[] | Error>[] = [];
 
+    this.writeLocationLogs(candidate.libs);
+
     for (const lib of candidate.libs) {
       if (DATASET in lib) {
         promises.push(this.getMembers(profile, lib.dataset));
@@ -92,11 +94,25 @@ export class CopybookDownloaderForE4E {
       }
     }
 
-    for (const promise of await Promise.all(promises)) {
-      if (promise instanceof Error) {
-        this.outputChannel?.appendLine(promise.message);
+    const results = await Promise.allSettled(promises);
+    for (let i = 0; i < results.length; ++i) {
+      const result = results[i];
+      if (result.status === "rejected") {
+        this.outputChannel?.appendLine(
+          "Error occurred while retrieving: " +
+            JSON.stringify(candidate.libs[i]),
+        );
+        if (result.reason instanceof Error)
+          this.outputChannel?.appendLine(result.reason.message);
+        else this.outputChannel?.appendLine(String(result.reason));
+      } else if (result.value instanceof Error) {
+        this.outputChannel?.appendLine(
+          "Error occurred while retrieving: " +
+            JSON.stringify(candidate.libs[i]),
+        );
+        this.outputChannel?.appendLine(result.value.message);
       } else {
-        for (const pro of promise) {
+        for (const pro of result.value) {
           if (DATASET in pro && !elements[pro.member]) {
             elements[pro.member] = pro;
           } else if (ENVIRONMENT in pro && !elements[pro.element])
@@ -104,8 +120,6 @@ export class CopybookDownloaderForE4E {
         }
       }
     }
-
-    this.writeLocationLogs(candidate?.libs);
 
     return {
       profile: profile,
