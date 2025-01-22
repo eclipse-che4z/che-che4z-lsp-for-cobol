@@ -33,10 +33,10 @@ import java.util.List;
 public class MisspelledKeywordDistance {
 
   public static final KeywordSuggestions KEYWORDS = new KeywordSuggestions();
-  private static final LevenshteinDistance DISTANCE = LevenshteinDistance.getDefaultInstance();
+  private static final int DIST_LIMIT = 2;
+  private static final LevenshteinDistance DISTANCE = new LevenshteinDistance(DIST_LIMIT - 1);
   private static final List<String> SORTED_KEYWORDS = KEYWORDS.getSuggestions().stream()
       .sorted(comparingInt(String::length)).collect(toList());
-  private static final int DIST_LIMIT = 2;
 
   /**
    * Calculate a distance between the given token and all the keywords and find the closest one.
@@ -52,6 +52,7 @@ public class MisspelledKeywordDistance {
               continue;
           }
           int distance = DISTANCE.apply(wrongToken, s);
+          if (distance < 0) continue;
           if (minDistance > distance) {
               minDistance = distance;
               keyword = s;
