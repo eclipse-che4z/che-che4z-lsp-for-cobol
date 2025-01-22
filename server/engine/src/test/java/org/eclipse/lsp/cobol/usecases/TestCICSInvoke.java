@@ -35,6 +35,9 @@ public class TestCICSInvoke {
   private static final String INVOKE_APPLICATION_VALID_TWO =
           "INVOKE APPLICATION({$varOne}) OPERATION({$varTwo}) COMMAREA({$varThree}) LENGTH({$varFour})";
 
+  private static final String INVOKE_APPLICATION_INVALID =
+          "INVOKE APPLICATION({$varOne}) OPERATION({$varTwo}) {COMMAREA|errorOne}({$varThree}) {CHANNEL|errorTwo}({$varFour})";
+
   private static final String INVOKE_APPLICATION_INVALID_ONE =
           "INVOKE APPLICATION({$varOne}) {APPLICATION|errorOne}({$varTwo}) OPERATION({$varThree})";
 
@@ -67,6 +70,26 @@ public class TestCICSInvoke {
   @Test
   void testInvokeApplicationValidTwo() {
     CICSTestUtils.noErrorTest(INVOKE_APPLICATION_VALID_TWO);
+  }
+
+  @Test
+  void testInvokeApplicationInvalid() {
+    CICSTestUtils.errorTest(
+            INVOKE_APPLICATION_INVALID,
+            ImmutableMap.of(
+                    "errorOne",
+                    new Diagnostic(
+                            new Range(),
+                            "Exactly one option required, options are mutually exclusive: COMMAREA or CHANNEL",
+                            DiagnosticSeverity.Error,
+                            ErrorSource.PARSING.getText()),
+                    "errorTwo",
+                    new Diagnostic(
+                            new Range(),
+                            "Exactly one option required, options are mutually exclusive: COMMAREA or CHANNEL",
+                            DiagnosticSeverity.Error,
+                            ErrorSource.PARSING.getText())));
+
   }
 
   @Test

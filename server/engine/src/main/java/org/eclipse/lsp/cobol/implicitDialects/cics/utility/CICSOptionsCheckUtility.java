@@ -301,11 +301,17 @@ public class CICSOptionsCheckUtility {
         CICSInquireSPOptionsCheckUtility.RULE_INDEX,
         new CICSInquireSPOptionsCheckUtility(context, errors));
     spOptionsMap.put(
+        CICSDisableProgramOptionsCheckUtility.RULE_INDEX,
+        new CICSDisableProgramOptionsCheckUtility(context, errors));
+    spOptionsMap.put(
         CICSDiscardOptionsUtility.RULE_INDEX,
         new CICSDiscardOptionsUtility(context, errors));
     spOptionsMap.put(
         CICSCreateSPOptionsCheckUtility.RULE_INDEX,
         new CICSCreateSPOptionsCheckUtility(context, errors));
+    spOptionsMap.put(
+        CICSEnableProgramOptionsUtility.RULE_INDEX,
+        new CICSEnableProgramOptionsUtility(context, errors));
     spOptionsMap.put(
         CICSExtractSPOptionsCheckUtility.RULE_INDEX,
         new CICSExtractSPOptionsCheckUtility(context, errors));

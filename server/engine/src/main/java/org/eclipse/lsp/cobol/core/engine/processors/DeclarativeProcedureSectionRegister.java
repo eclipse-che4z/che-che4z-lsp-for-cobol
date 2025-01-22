@@ -14,36 +14,31 @@
  */
 package org.eclipse.lsp.cobol.core.engine.processors;
 
-import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
 import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.Processor;
-import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulatorService;
+import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulator;
 import org.eclipse.lsp.cobol.common.model.tree.DeclarativeProcedureSectionNode;
 import org.eclipse.lsp.cobol.common.model.tree.ParagraphNameNode;
-
-import java.util.Optional;
 
 /** DeclarativeProcedureSectionNode processor */
 public class DeclarativeProcedureSectionRegister
     implements Processor<DeclarativeProcedureSectionNode> {
 
-  private final SymbolAccumulatorService symbolAccumulatorService;
+  private final SymbolAccumulator symbolAccumulator;
 
   public DeclarativeProcedureSectionRegister(
-      SymbolAccumulatorService symbolAccumulatorService) {
-    this.symbolAccumulatorService = symbolAccumulatorService;
+      SymbolAccumulator symbolAccumulator) {
+    this.symbolAccumulator = symbolAccumulator;
   }
 
   @Override
-  public void accept(DeclarativeProcedureSectionNode node, ProcessingContext processingContext) {
-    Optional<ProgramNode> programOpt = node.getProgram();
-    if (!programOpt.isPresent()) {
+  public void accept(DeclarativeProcedureSectionNode node, ProcessingContext ctx) {
+    if (ctx.getCurrentProgramNode() == null) {
       // TODO: error?
       return;
     }
-    ProgramNode program = programOpt.get();
-    symbolAccumulatorService.registerCodeBlock(program, node);
-    symbolAccumulatorService.registerParagraphNameNode(
-        program, new ParagraphNameNode(node.getLocality(), node.getName()));
+    symbolAccumulator.registerCodeBlock(ctx.getCurrentProgramNode(), node);
+    symbolAccumulator.registerParagraphNameNode(ctx.getCurrentProgramNode(),
+            new ParagraphNameNode(node.getLocality(), node.getName()));
   }
 }

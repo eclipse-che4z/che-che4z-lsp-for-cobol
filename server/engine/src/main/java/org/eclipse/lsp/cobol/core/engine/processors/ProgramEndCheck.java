@@ -40,7 +40,10 @@ public class ProgramEndCheck implements Processor<ProgramEndNode> {
 
   @Override
   public void accept(ProgramEndNode programEndNode, ProcessingContext ctx) {
-    ProgramNode node = programEndNode.getProgram().orElseThrow(RuntimeException::new);
+    if (ctx.getCurrentProgramNode() == null) {
+      throw new RuntimeException();
+    }
+    ProgramNode node = ctx.getCurrentProgramNode();
     if (node.getProgramName() == null) {
       LOG.debug("Syntax error: Program name is empty");
       ctx.getErrors()

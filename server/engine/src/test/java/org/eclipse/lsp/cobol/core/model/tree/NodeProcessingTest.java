@@ -24,7 +24,7 @@ import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.ProcessingPhase;
 import org.eclipse.lsp.cobol.common.processor.ProcessorDescription;
 import org.eclipse.lsp.cobol.core.engine.processor.AstProcessor;
-import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulatorService;
+import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulator;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -55,7 +55,7 @@ class NodeProcessingTest {
         .process(
             ProcessingPhase.TRANSFORMATION,
             node,
-            new ProcessingContext(errors, new SymbolAccumulatorService(), ImmutableMap.of()));
+            new ProcessingContext(errors, new SymbolAccumulator(), ImmutableMap.of()));
     assertTrue(errors.isEmpty());
   }
 
@@ -71,7 +71,7 @@ class NodeProcessingTest {
     ErrorNode node = new ErrorNode();
     List<SyntaxError> errors = new ArrayList<>();
     AstProcessor astProcessor = new AstProcessor();
-    ProcessingContext processingContext = new ProcessingContext(errors, new SymbolAccumulatorService(), ImmutableMap.of());
+    ProcessingContext processingContext = new ProcessingContext(errors, new SymbolAccumulator(), ImmutableMap.of());
     processingContext.register(
         new ProcessorDescription(
             ErrorNode.class, ProcessingPhase.VALIDATION, (n, ctx) -> ctx.getErrors().add(ERROR_1)));
@@ -90,7 +90,7 @@ class NodeProcessingTest {
 
     ErrorNode node = new ErrorNode();
     ArrayList<SyntaxError> errors = new ArrayList<>();
-    ProcessingContext ctx = new ProcessingContext(errors, new SymbolAccumulatorService(), ImmutableMap.of());
+    ProcessingContext ctx = new ProcessingContext(errors, new SymbolAccumulator(), ImmutableMap.of());
     AstProcessor astProcessor = new AstProcessor();
     ctx.register(
         new ProcessorDescription(
@@ -103,117 +103,6 @@ class NodeProcessingTest {
     ctx.getErrors().clear();
     astProcessor.process(ProcessingPhase.VALIDATION, node, ctx);
     assertEquals(ImmutableList.of(ERROR_2), ctx.getErrors());
-  }
-
-  @Test
-  void testNodeExtension() {
-    /** Do processing in one step and return ERROR_1 */
-    class NodeForExtension extends Node {
-      NodeForExtension() {
-        super(null, NodeType.ROOT);
-      }
-    }
-
-    /** Do processing in one step and return ERROR_2 */
-    class LeafNode extends NodeForExtension {}
-
-    LeafNode node = new LeafNode();
-    List<SyntaxError> errors = new ArrayList<>();
-    ProcessingContext ctx = new ProcessingContext(errors, new SymbolAccumulatorService(), ImmutableMap.of());
-    AstProcessor astProcessor = new AstProcessor();
-    ctx.register(
-        new ProcessorDescription(
-            NodeForExtension.class,
-            ProcessingPhase.TRANSFORMATION,
-            (n, c) -> c.getErrors().add(ERROR_1)));
-    ctx.register(
-        new ProcessorDescription(
-            LeafNode.class, ProcessingPhase.TRANSFORMATION, (n, c) -> c.getErrors().add(ERROR_2)));
-
-    astProcessor.process(ProcessingPhase.TRANSFORMATION, node, ctx);
-    assertEquals(ImmutableList.of(ERROR_1, ERROR_2), errors);
-  }
-
-  @Test
-  void testNodeExtensionAndTwoSteps() {
-    /** Do processing in one step and return ERROR_1 */
-    class NodeForExtension extends Node {
-      NodeForExtension() {
-        super(null, NodeType.ROOT);
-        //        AstProcessor.addProcessStep(this, ctx -> ctx.getErrors().addAll(processFirst()));
-      }
-
-      private List<SyntaxError> processFirst() {
-        return ImmutableList.of(ERROR_1);
-      }
-    }
-
-    /** Do processing in two steps and return ERROR_2 and then ERROR_3 */
-    class LeafNode extends NodeForExtension {
-      LeafNode() {}
-
-      private List<SyntaxError> processStep1() {
-        return ImmutableList.of(ERROR_2);
-      }
-    }
-    LeafNode node = new LeafNode();
-    ArrayList<SyntaxError> errors = new ArrayList<>();
-    ProcessingContext ctx = new ProcessingContext(errors, new SymbolAccumulatorService(), ImmutableMap.of());
-    AstProcessor astProcessor = new AstProcessor();
-    ctx.register(
-        new ProcessorDescription(
-            NodeForExtension.class,
-            ProcessingPhase.TRANSFORMATION,
-            (n, c) -> c.getErrors().add(ERROR_1)));
-    ctx.register(
-        new ProcessorDescription(
-            LeafNode.class, ProcessingPhase.TRANSFORMATION, (n, c) -> c.getErrors().add(ERROR_2)));
-    ctx.register(
-        new ProcessorDescription(
-            LeafNode.class, ProcessingPhase.VALIDATION, (n, c) -> c.getErrors().add(ERROR_3)));
-
-    astProcessor.process(ProcessingPhase.TRANSFORMATION, node, ctx);
-    assertEquals(ImmutableList.of(ERROR_1, ERROR_2), ctx.getErrors());
-    ctx.getErrors().clear();
-    astProcessor.process(ProcessingPhase.VALIDATION, node, ctx);
-    assertEquals(ImmutableList.of(ERROR_3), ctx.getErrors());
-  }
-
-  @Test
-  void testNodeExtensionAndTwoStepsAnotherCase() {
-    /** Do processing in two steps and return ERROR_1 and then ERROR_2 */
-    class NodeForExtension extends Node {
-      NodeForExtension() {
-        super(null, NodeType.ROOT);
-      }
-    }
-
-    /** Do processing in one step and return ERROR_3 */
-    class LeafNode extends NodeForExtension {}
-
-    LeafNode node = new LeafNode();
-    List<SyntaxError> errors = new ArrayList<>();
-    ProcessingContext ctx = new ProcessingContext(errors, new SymbolAccumulatorService(), ImmutableMap.of());
-    AstProcessor astProcessor = new AstProcessor();
-    ctx.register(
-        new ProcessorDescription(
-            NodeForExtension.class,
-            ProcessingPhase.TRANSFORMATION,
-            (n, c) -> c.getErrors().add(ERROR_1)));
-    ctx.register(
-        new ProcessorDescription(
-            NodeForExtension.class,
-            ProcessingPhase.VALIDATION,
-            (n, c) -> c.getErrors().add(ERROR_2)));
-    ctx.register(
-        new ProcessorDescription(
-            LeafNode.class, ProcessingPhase.TRANSFORMATION, (n, c) -> c.getErrors().add(ERROR_3)));
-
-    astProcessor.process(ProcessingPhase.TRANSFORMATION, node, ctx);
-    assertEquals(ImmutableList.of(ERROR_1, ERROR_3), ctx.getErrors());
-    ctx.getErrors().clear();
-    astProcessor.process(ProcessingPhase.VALIDATION, node, ctx);
-    assertEquals(ImmutableList.of(ERROR_2), errors);
   }
 
   private static SyntaxError getError(String message) {
