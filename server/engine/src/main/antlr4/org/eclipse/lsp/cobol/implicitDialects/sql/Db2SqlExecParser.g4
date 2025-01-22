@@ -272,7 +272,7 @@ dbs_alter_trigger_options: ((DISALLOW | ALLOW | DISABLE) DEBUG MODE | QUALIFIER 
                             FOR UPDATE CLAUSE (REQUIRED|OPTIONAL) | NOT? SECURED | BUSINESS_TIME SENSITIVE (YES|NO) | SYSTEM_TIME SENSITIVE (YES|NO) | ARCHIVE SENSITIVE (YES|NO) | APPLCOMPAT dbs_applcompat_value |
                             CONCENTRATE STATEMENTS (OFF | WITH LITERALS))*; /*random ordering req */
 dbs_alter_trigger_replace: REPLACE (ACTIVE VERSION | VERSION dbs_trigger_version_id)? dbs_alter_trigger_spec;
-dbs_alter_trigger_spec: ((NO CASCADE)? BEFORE | AFTER | INSTEAD OF) (INSERT | DELETE | UPDATE (OF dbs_column_name (dbs_comma_separator dbs_column_name)*)?) ON (dbs_host_variable | dbs_alias_name)
+dbs_alter_trigger_spec: ((NO CASCADE)? BEFORE | AFTER | INSTEAD OF) (INSERT | DELETE | UPDATE (OF dbs_column_name (dbs_comma_separator dbs_column_name)*)?) ON dbs_alias_name
                         (REFERENCING ((OLD|NEW) ROW? AS? dbs_correlation_name | (OLD_TABLE | NEW_TABLE) AS? dbs_table_name)+)? (FOR EACH (STATEMENT|ROW))? dbs_alter_trigger_options
                         (WHEN LPARENCHAR dbs_search_condition RPARENCHAR)? (dbs_sql_control_statement | dbs_triggered_sql_statement);
 dbs_alter_trigger_add: ADD VERSION dbs_trigger_version_id dbs_alter_trigger_spec;
@@ -320,12 +320,13 @@ dbs_comment: COMMENT ON (dbs_comment_multiple_column_list | (dbs_comment_alias_d
              dbs_comment_function | dbs_comment_index | dbs_comment_package | dbs_comment_plan | dbs_comment_procedure |
              dbs_comment_role | dbs_comment_sequence | dbs_comment_table | dbs_comment_trigger | dbs_comment_trusted |
              dbs_comment_type | dbs_comment_mask | dbs_comment_permission | dbs_comment_variable) IS dbs_string_constant);
-dbs_comment_multiple_column_list: (dbs_host_variable | dbs_alias_name) LPARENCHAR dbs_column_name IS
-                                  dbs_string_constant (dbs_comma_separator dbs_column_name IS dbs_string_constant)* RPARENCHAR;
+dbs_comment_multiple_column_list: dbs_alias_name LPARENCHAR dbs_column_name IS
+                                  dbs_string_constant_column_list (dbs_comma_separator dbs_column_name IS dbs_string_constant_column_list)* RPARENCHAR;
+dbs_string_constant_column_list: CHAR_STRING_LITERAL_DOUBLE_QUOTE | HEXSTRING | BXSTRING | GRAPHIC_CONSTANT;
 dbs_comment_alias_designator: (dbs_comment_public_alias_designator | dbs_comment_nonpub_alias_designator);
 dbs_comment_public_alias_designator: PUBLIC ALIAS dbs_alias_name FOR SEQUENCE;
 dbs_comment_nonpub_alias_designator: ALIAS dbs_alias_name (FOR (TABLE | SEQUENCE))?;
-dbs_comment_column: COLUMN (dbs_host_variable | dbs_alias_name) DOT_FS dbs_column_name;
+dbs_comment_column: COLUMN dbs_alias_name DOT_FS dbs_sql_identifier;
 dbs_comment_function: dbs_comment_function_designator (ACTIVE VERSION | VERSION dbs_routine_version_id)?;
 dbs_comment_function_designator: (FUNCTION dbs_function_name (LPARENCHAR dbs_comment_parameter_type
                                  (dbs_comma_separator dbs_comment_parameter_type)* RPARENCHAR)? | SPECIFIC FUNCTION dbs_specific_name);
@@ -336,7 +337,7 @@ dbs_comment_plan: PLAN dbs_plan_name;
 dbs_comment_procedure: PROCEDURE dbs_procedure_name (ACTIVE VERSION | VERSION dbs_routine_version_id)?;
 dbs_comment_role: ROLE dbs_role_name;
 dbs_comment_sequence: SEQUENCE dbs_sequence_name;
-dbs_comment_table: TABLE (dbs_host_variable | dbs_alias_name);
+dbs_comment_table: TABLE dbs_alias_name;
 dbs_comment_trigger: TRIGGER dbs_trigger_name (ACTIVE VERSION | VERSION dbs_routine_version_id)?;
 dbs_comment_trusted: TRUSTED CONTEXT dbs_context_name dbs_sql_identifier;
 dbs_comment_type: TYPE dbs_object_name;
@@ -360,9 +361,10 @@ dbs_create: CREATE (dbs_create_alias | dbs_create_aux_table | dbs_create_db | db
             dbs_create_variable | dbs_create_view);
 
 //CREATE ALIAS
-dbs_create_alias: PUBLIC? ALIAS (table_alias | sequence_alias);
-table_alias: dbs_alias_name FOR TABLE? (dbs_host_variable | dbs_alias_name);
-sequence_alias: dbs_alias_name FOR SEQUENCE dbs_sequence_name;
+dbs_create_alias: PUBLIC? ALIAS table_seq_alias;
+//table_alias: dbs_alias_name FOR TABLE? dbs_alias_name;
+//sequence_alias: dbs_alias_name FOR SEQUENCE dbs_sequence_name;
+table_seq_alias: dbs_alias_name FOR (SEQUENCE | TABLE?) dbs_alias_name;
 
 //CREATE AUX TABLE
 dbs_create_aux_table: (AUXILIARY | AUX) TABLE dbs_table_name IN (dbs_database_name DOT_FS)? dbs_table_space_name
@@ -378,13 +380,13 @@ dbs_create_function: FUNCTION dbs_function_name LPARENCHAR (dbs_create_function_
 dbs_create_function_compiled_scalar: (dbs_create_function_param_decl
         (dbs_comma_separator dbs_create_function_param_decl)*)? RPARENCHAR (dbs_create_function_func_def | WRAPPED dbs_obfuscated_statement_text);
 dbs_create_function_param_decl: dbs_parameter_name dbs_create_function_param_type;
-dbs_create_function_param_type: data_type | (TABLE LIKE (dbs_host_variable | dbs_alias_name) AS LOCATOR);
+dbs_create_function_param_type: data_type | (TABLE LIKE dbs_alias_name AS LOCATOR);
 dbs_create_function_func_def: RETURNS common_built_in_type (VERSION dbs_routine_version_id)? dbs_option_list? dbs_control_statement;
 
 //CREATE EXTERNAL SQL SCALAR FUNCTION
 dbs_create_function_ext_scalar: (function_param_decl (dbs_comma_separator function_param_decl)*)? RPARENCHAR
                             RETURNS (common_built_in_type_source (AS LOCATOR)?  | common_built_in_type_source CAST FROM common_built_in_type_source (AS LOCATOR)?) dbs_option_list_ext;
-function_param_decl: dbs_parameter_name? (ext_data_type (AS LOCATOR)? | TABLE LIKE (dbs_host_variable | dbs_alias_name) AS LOCATOR);
+function_param_decl: dbs_parameter_name? (ext_data_type (AS LOCATOR)? | TABLE LIKE dbs_alias_name AS LOCATOR);
 ext_data_type: common_built_in_type_source | dbs_distinct_type_name;
 
 //CREATE EXTERNAL TABLE FUNCTION
@@ -404,24 +406,26 @@ dbs_create_function_sourced: (dbs_create_function_sourced_param_decl (dbs_comma_
                              RETURNS (common_built_in_type | dbs_distinct_type_name) (AS LOCATOR)? (SPECIFIC dbs_specific_name)? (PARAMETER CCSID oneof_encoding)?
                              SOURCE (dbs_function_name (LPARENCHAR (dbs_create_function_sourced_param_type (dbs_comma_separator dbs_create_function_sourced_param_type)*)? RPARENCHAR)? | SPECIFIC dbs_specific_name);
 dbs_create_function_sourced_param_decl: (dbs_parameter_name)? dbs_create_function_sourced_param_type;
-dbs_create_function_sourced_param_type: (common_built_in_type | dbs_distinct_type_name) (AS LOCATOR)?  | TABLE LIKE (dbs_host_variable | dbs_alias_name) AS LOCATOR;
+dbs_create_function_sourced_param_type: (common_built_in_type | dbs_distinct_type_name) (AS LOCATOR)?  | TABLE LIKE dbs_alias_name AS LOCATOR;
 
 //CREATE FUNCTION - SQL TABLE
 dbs_create_function_sql_table: (dbs_create_function_sql_table_param_decl (dbs_comma_separator dbs_create_function_sql_table_param_decl)*)? RPARENCHAR
                                                              (dbs_create_function_sql_func_def | WRAPPED dbs_obfuscated_statement_text);
 dbs_create_function_sql_table_param_decl: (dbs_parameter_name)? dbs_create_function_sql_table_param_type;
-dbs_create_function_sql_table_param_type: (common_built_in_type | dbs_distinct_type_name)  | TABLE LIKE (dbs_host_variable | dbs_alias_name) AS LOCATOR;
+dbs_create_function_sql_table_param_type: (common_built_in_type | dbs_distinct_type_name)  | TABLE LIKE dbs_alias_name AS LOCATOR;
 dbs_create_function_sql_func_def: RETURNS TABLE LPARENCHAR  dbs_column_name common_built_in_type (dbs_comma_separator dbs_column_name common_built_in_type)* RPARENCHAR dbs_option_list_inl_def dbs_create_function_func_sql_routine;
 dbs_create_function_func_sql_routine: RETURN dbs_control_statement | BEGIN ATOMIC RETURN dbs_control_statement END;
 
 //CREATE GLOBAL TEMP TABLE
-dbs_create_global_temp_table: GLOBAL TEMPORARY TABLE  dbs_table_name LPARENCHAR (dbs_create_global_temp_table_col_def (dbs_comma_separator dbs_create_global_temp_table_col_def)*) RPARENCHAR | LIKE (dbs_host_variable | dbs_alias_name)
-                                (CCSID oneof_encoding)?;
+dbs_create_global_temp_table: GLOBAL TEMPORARY TABLE  dbs_table_name
+                            (LPARENCHAR (dbs_create_global_temp_table_col_def (dbs_comma_separator dbs_create_global_temp_table_col_def)*) RPARENCHAR
+                            | LIKE dbs_alias_name)
+                            (CCSID oneof_encoding)?;
 dbs_create_global_temp_table_col_def: dbs_column_name  common_built_in_type4 (NOT NULL)?;
 
 //CREATE INDEX
-dbs_create_index: (UNIQUE (WHERE NOT NULL)?)? INDEX dbs_index_name ON (dbs_create_index_table_def | dbs_aux_table_name)  dbs_create_index_table_other_opt;
-dbs_create_index_table_def: dbs_table_name LPARENCHAR dbs_create_index_table_def_body (dbs_comma_separator dbs_create_index_table_def_body)* (dbs_comma_separator BUSINESS_TIME  without_or_with OVERLAPS )? RPARENCHAR;
+dbs_create_index: (UNIQUE (WHERE NOT NULL)?)? INDEX dbs_index_name ON dbs_create_index_table_def  dbs_create_index_table_other_opt;
+dbs_create_index_table_def: dbs_table_name (LPARENCHAR dbs_create_index_table_def_body (dbs_comma_separator dbs_create_index_table_def_body)* (dbs_comma_separator BUSINESS_TIME  without_or_with OVERLAPS )? RPARENCHAR)?;
 dbs_create_index_table_def_body: (dbs_column_name | dbs_expression) (ASC | DESC | RANDOM)?;
 dbs_create_index_table_other_opt: xml_index_specification? (INCLUDE dbs_column_name LPARENCHAR (dbs_comma_separator dbs_column_name)* RPARENCHAR)? other_opt_part1 other_opt_part2 other_opt_part3;
 xml_index_specification: GENERATE (KEY | KEYS) USING XMLPATTERN xml_pattern_clause AS sql_data_type;
@@ -458,13 +462,13 @@ dbs_create_permission: PERMISSION dbs_permission_name ON dbs_table_name (AS? dbs
 //CREATE PROCEDURE - EXTERNAL
 dbs_create_procedure_ext: (OR REPLACE)? PROCEDURE? dbs_procedure_name  (LPARENCHAR dbs_create_procedure_ext_pdecl (dbs_comma_separator dbs_create_procedure_ext_pdecl)* RPARENCHAR)? dbs_option_list_proc_ext;
 dbs_create_procedure_ext_pdecl: (IN | OUT | INOUT)? dbs_parameter_name? dbs_create_procedure_ext_ptype;
-dbs_create_procedure_ext_ptype:  (common_built_in_type | dbs_distinct_type_name) (AS LOCATOR)?  | TABLE LIKE (dbs_host_variable | dbs_alias_name) AS LOCATOR; //built-in-type change
+dbs_create_procedure_ext_ptype:  (common_built_in_type | dbs_distinct_type_name) (AS LOCATOR)?  | TABLE LIKE dbs_alias_name AS LOCATOR; //built-in-type change
 
 //CCREATE PROCEDURE - NATIVE
 dbs_create_procedure_native_sql: (OR REPLACE)? PROCEDURE dbs_procedure_name  (LPARENCHAR dbs_create_procedure_native_pdecl (dbs_comma_separator dbs_create_procedure_native_pdecl)* RPARENCHAR)?
                                     procedure_def | WRAPPED dbs_obfuscated_statement_text;
 dbs_create_procedure_native_pdecl: (IN OUT INOUT)? (dbs_parameter_name) dbs_create_procedure_native_ptype;
-dbs_create_procedure_native_ptype: data_type  | TABLE LIKE (dbs_host_variable | dbs_alias_name) AS LOCATOR;//built-in-type change
+dbs_create_procedure_native_ptype: data_type  | TABLE LIKE dbs_alias_name AS LOCATOR;//built-in-type change
 procedure_def: (VERSION dbs_routine_version_id)?  dbs_option_list_proc_native? dbs_sql_procedure_statement;
 
 //CREATE ROLE
@@ -482,7 +486,7 @@ dbs_volume_cat: dbs_catalog_name (DATACLAS dbs_host_variable)? (MGMTCLAS dbs_sql
 //CREATE SYNONYM deprecated, use CREATE ALIAS
 
 //CREATE TABLE
-dbs_create_table: TABLE dbs_table_name ( LPARENCHAR dbs_create_table_elements_def (dbs_comma_separator dbs_create_table_elements_def)* RPARENCHAR | LIKE (dbs_host_variable | dbs_alias_name) copy_options? |
+dbs_create_table: TABLE dbs_table_name ( LPARENCHAR dbs_create_table_elements_def (dbs_comma_separator dbs_create_table_elements_def)* RPARENCHAR | LIKE dbs_alias_name copy_options? |
     as_result_table copy_options? | materialized_query_def) dbs_create_table_data_def*;
 dbs_create_table_elements_def: columnn_def | period_def | unique_constraint | referential_constraint | check_constraint;
 columnn_def: dbs_column_name (common_built_in_type_core3 | dbs_distinct_type_name )? // Data type is optional if as-row-change-timestamp-clause is specified
@@ -545,7 +549,7 @@ locksize_block_tbl: LOCKSIZE (ANY | TABLESPACE | PAGE | ROW);
 
 //CREATE TRIGGER ADVANCED
 dbs_create_trigger_advanced: (OR REPLACE)? TRIGGER dbs_trigger_name (trigger_definition | WRAPPED dbs_obfuscated_statement_text);
-trigger_definition: (VERSION (V1 | dbs_trigger_version_id))? trigger_activation_time trigger_event ON (dbs_host_variable | dbs_alias_name)
+trigger_definition: (VERSION (V1 | dbs_trigger_version_id))? trigger_activation_time trigger_event ON dbs_alias_name
             referencing_opts?  trigger_granularity dbs_option_list_trigger? triggered_action;
 referencing_opts: REFERENCING (OLD ROW? AS? dbs_correlation_name | NEW ROW? AS? dbs_correlation_name | OLD_TABLE AS? dbs_table_name | NEW_TABLE AS? dbs_sql_identifier)+;
 trigger_activation_time: (NO CASCADE)? BEFORE | AFTER | INSTEAD OF;
@@ -556,7 +560,7 @@ sql_trigger_body: dbs_sql_control_statement | dbs_triggered_sql_statement_adv;
 
 //CREATE TRIGGER BASIC
 dbs_create_trigger_basic: TRIGGER dbs_trigger_name (trigger_definition_basic | WRAPPED dbs_obfuscated_statement_text);
-trigger_definition_basic: trigger_activation_time trigger_event ON (dbs_host_variable | dbs_alias_name) referencing_opts?  trigger_granularity MODE DB2SQL ( NOT? SECURED)? triggered_action_basic;
+trigger_definition_basic: trigger_activation_time trigger_event ON dbs_alias_name referencing_opts?  trigger_granularity MODE DB2SQL ( NOT? SECURED)? triggered_action_basic;
 triggered_action_basic: (WHEN dbs_search_condition)? sql_trigger_body_basic;
 sql_trigger_body_basic:  (dbs_triggered_sql_statement_basic | BEGIN ATOMIC (dbs_triggered_sql_statement_basic dbs_semicolon_end)+ END);
 
@@ -592,7 +596,7 @@ dbs_declare_cursor: DECLARE dbs_cursor_name ((NO|ASENSITIVE|INSENSITIVE|SENSITIV
                     FOR (dbs_select | dbs_sql_identifier);
 
 dbs_declare_global: GLOBAL TEMPORARY TABLE dbs_table_name (LPARENCHAR dbs_declare_global_coldef (dbs_comma_separator dbs_declare_global_coldef)* RPARENCHAR |
-                    (LIKE (dbs_host_variable | dbs_alias_name) | AS LPARENCHAR dbs_fullselect RPARENCHAR WITH NO DATA) dbs_declare_global_copyopts) (CCSID (ASCII|EBCDIC|UNICODE) |
+                    (LIKE dbs_alias_name | AS LPARENCHAR dbs_fullselect RPARENCHAR WITH NO DATA) dbs_declare_global_copyopts) (CCSID (ASCII|EBCDIC|UNICODE) |
                     ON COMMIT ((DELETE|PRESERVE) ROWS | DROP TABLE) | (LOGGED | NOT LOGGED (ON ROLLBACK (DELETE|PRESERVE) ROWS)?))*; /*random ordering req */
 dbs_declare_global_coldef: dbs_column_name (dbs_distinct_type_name | dbs_declare_global_bit) (WITH? DEFAULT (dbs_constant | SESSION_USER | USER | CURRENT SQLID | NULL)? |
                         GENERATED (ALWAYS|BY DEFAULT) (AS IDENTITY (LPARENCHAR dbs_declare_global_idopts (dbs_comma_separator? dbs_declare_global_idopts)* RPARENCHAR)?)? | NOT NULL)*; /*random ordering req "one each" rule */
@@ -616,7 +620,7 @@ dbs_declare_global_identity: (EXCLUDING|INCLUDING) IDENTITY (COLUMN ATTRIBUTES)?
 
 dbs_declare_statement: dbs_sql_identifier (dbs_comma_separator dbs_sql_identifier)* STATEMENT; // WHAT DOES THIS REPRESENT????
 
-dbs_declare_table: DECLARE (dbs_host_variable | dbs_alias_name) TABLE LPARENCHAR dbs_declare_table_loop (dbs_comma_separator dbs_declare_table_loop)* RPARENCHAR;
+dbs_declare_table: DECLARE dbs_alias_name TABLE LPARENCHAR dbs_declare_table_loop (dbs_comma_separator dbs_declare_table_loop)* RPARENCHAR;
 dbs_declare_table_loop: dbs_column_name (dbs_distinct_type_name | dbs_declare_table_bit) (NOT NULL (WITH DEFAULT)?)?;
 dbs_declare_table_bit: (dbs_declare_table_bit_int | dbs_declare_table_bit_decimal | dbs_declare_table_bit_float | dbs_declare_table_bit_decfloat | dbs_declare_table_bit_char |
                         dbs_declare_table_bit_clob | dbs_declare_table_bit_varchar | dbs_declare_table_bit_graphic | dbs_declare_table_bit_binary | DATE | TIME |
@@ -634,7 +638,7 @@ dbs_declare_table_bit_graphic: (GRAPHIC (LPARENCHAR INTEGERLITERAL RPARENCHAR)? 
 dbs_declare_table_bit_binary: (BINARY (LPARENCHAR INTEGERLITERAL RPARENCHAR)? | (BINARY VARYING | VARBINARY) LPARENCHAR INTEGERLITERAL RPARENCHAR | (BINARY LARGE OBJECT | BLOB) (LPARENCHAR kmg_blob_parameter RPARENCHAR)?);
 dbs_declare_table_bit_timestamp: TIMESTAMP (LPARENCHAR INTEGERLITERAL RPARENCHAR)? ((WITH|WITHOUT) (TIME ZONE|TIMEZONE))?;
 /*DELETE */
-dbs_delete: DELETE FROM (dbs_host_variable | dbs_alias_name) (dbs_delete_period | dbs_delete_noperiod | dbs_delete_positioned);
+dbs_delete: DELETE FROM dbs_alias_name (dbs_delete_period | dbs_delete_noperiod | dbs_delete_positioned);
 dbs_delete_period: dbs_delete_period_clause dbs_correlation_name? dbs_delete_include_column? (SET dbs_delete_assignment_clause)?
                     (WHERE dbs_search_condition)? (dbs_delete_isolation_clause | SKIPCHAR LOCKED DATA)* (QUERYNO INTEGERLITERAL)?;
 dbs_delete_period_clause: FOR PORTION OF BUSINESS_TIME (FROM dbs_expressions TO dbs_expressions | BETWEEN dbs_expressions AND dbs_expressions)?;
@@ -718,16 +722,16 @@ dbs_explain_stabilized: STABILIZED DYNAMIC QUERY STMTID (NUMERICLITERAL | dbs_in
 
 /*FETCH */
 //ref: https://www.ibm.com/docs/en/db2-for-zos/13?topic=statements-fetch
-dbs_fetch: FETCH (INSENSITIVE | SENSITIVE)? (WITH CONTINUE)? (BEFORE | AFTER | dbs_fetch_rowpos | dbs_fetch_rowsetpos)?
-            FROM? dbs_cursor_name dbs_fetch_single_multi_row;
-dbs_fetch_single_multi_row: (FOR (dbs_host_variable | dbs_integer_constant) ROWS)?  dbs_fetch_singlerow?;
-//dbs_fetch: FETCH (dbs_fetch_beforeafter | dbs_fetch_singlemulti);
-//dbs_fetch_beforeafter: (BEFORE | AFTER) FROM? dbs_cursor_name;
-//dbs_fetch_singlemulti: (INSENSITIVE | SENSITIVE)? (dbs_fetch_single | dbs_fetch_multi);
-//dbs_fetch_single: (WITH CONTINUE)? dbs_fetch_rowpos? FROM? dbs_cursor_name dbs_fetch_singlerow?;
+dbs_fetch: FETCH (BEFORE | AFTER) FROM? dbs_cursor_name
+           | FETCH (INSENSITIVE | SENSITIVE)? WITH CONTINUE dbs_fetch_rowpos? FROM? dbs_cursor_name dbs_fetch_singlerow?
+           | FETCH (INSENSITIVE | SENSITIVE)?  (
+                                                (dbs_fetch_rowpos? FROM? dbs_cursor_name dbs_fetch_singlerow?)
+                                                 | (dbs_fetch_rowsetpos FROM? dbs_cursor_name dbs_fetch_multirow)
+                                              );
 dbs_fetch_rowpos: (NEXT | PRIOR | FIRST | LAST | CURRENT CONTINUE? | (ABSOLUTE | RELATIVE) (dbs_host_variable | dbs_integer_constant));
 dbs_fetch_singlerow: INTO (DESCRIPTOR dbs_descriptor_name | dbs_array_variable LSQUAREBRACKET INTEGERLITERAL RSQUAREBRACKET |
                     dbs_sql_variable_reference (dbs_comma_separator dbs_sql_variable_reference)*);
+dbs_fetch_multirow: (FOR (dbs_host_variable | dbs_integer_constant) ROWS)? (INTO (DESCRIPTOR dbs_descriptor_name | dbs_sql_variable_reference (dbs_comma_separator dbs_sql_variable_reference)*))?;
 //dbs_fetch_multi: dbs_fetch_rowsetpos? FROM? dbs_cursor_name dbs_fetch_multirow;
 dbs_fetch_rowsetpos: (ROWSET STARTING AT (ABSOLUTE | RELATIVE) (dbs_host_variable | dbs_integer_constant) | (NEXT | PRIOR |
                     FIRST | LAST | CURRENT) ROWSET);
@@ -793,9 +797,12 @@ dbs_include_sqlca: INCLUDE SQLCA;
 dbs_include_sqlda: INCLUDE SQLDA;
 
 /*INSERT */
-dbs_insert: INSERT INTO (dbs_host_variable | dbs_alias_name) (LPARENCHAR dbs_column_name (dbs_comma_separator dbs_column_name)* RPARENCHAR)?
-            dbs_insert_include? (OVERRIDING USER VALUE)? dbs_insert_values;
-dbs_insert_include: INCLUDE LPARENCHAR dbs_column_name dbs_include_data_type (dbs_comma_separator dbs_column_name dbs_include_data_type)* RPARENCHAR;
+dbs_insert: INSERT INTO dbs_alias_name (LPARENCHAR dbs_column_name (dbs_comma_separator dbs_column_name)* RPARENCHAR)?
+            dbs_fullselect? (OVERRIDING USER VALUE)? dbs_insert_values;
+
+// Compiler and doc has ambiguity, ref: https://www.ibm.com/docs/en/db2-for-zos/13?topic=statements-insert
+// dbs_fullselect seems to be supported in insert statement
+//dbs_insert_include: INCLUDE LPARENCHAR dbs_column_name dbs_include_data_type (dbs_comma_separator dbs_column_name dbs_include_data_type)* RPARENCHAR;
 //?
 dbs_insert_data_type: (common_short_built_in_type | dbs_distinct_type);
 //dbs_insert_values: VALUES LPARENCHAR (dbs_insert_values_single | dbs_insert_values_multi) RPARENCHAR;
@@ -809,10 +816,10 @@ dbs_insert_fullselect: (WITH dbs_select_statement_common_table_expression (dbs_c
 /*LABEL */
 dbs_label: LABEL ON (dbs_label_sing | dbs_label_loop);
 dbs_label_sing: (dbs_label_table | dbs_label_alias | dbs_label_column) IS dbs_string_constant;
-dbs_label_table: TABLE (dbs_host_variable | dbs_alias_name);
+dbs_label_table: TABLE dbs_alias_name;
 dbs_label_alias: ALIAS dbs_alias_name;
-dbs_label_column: COLUMN (dbs_host_variable | dbs_alias_name) DOT_FS dbs_column_name;
-dbs_label_loop: (dbs_host_variable | dbs_alias_name) LPARENCHAR dbs_column_name IS dbs_string_constant (dbs_comma_separator dbs_column_name IS dbs_string_constant)* RPARENCHAR;
+dbs_label_column: COLUMN dbs_alias_name DOT_FS dbs_sql_identifier;
+dbs_label_loop: dbs_alias_name LPARENCHAR dbs_column_name IS dbs_string_constant (dbs_comma_separator dbs_column_name IS dbs_string_constant)* RPARENCHAR;
 
 /*LOCK TABLE */
 dbs_lock: LOCK TABLE dbs_table_name (PARTITION INTEGERLITERAL)? IN (SHARE | EXCLUSIVE) MODE;
@@ -916,7 +923,7 @@ dbs_revoke_system_prvg: db2sql_system_privileges (dbs_comma_separator db2sql_sys
 //REVOKE TABLE OR VIEW PRIVILEGES
 dbs_revoke_table_or_view_prvg: (ALL PRIVILEGES? | db2sql_table_view_privileges (dbs_comma_separator db2sql_table_view_privileges)*)  ON TABLE? table_or_view_name_loop
                                 FROM auth_name_loop_pub  auth_name_loop_all? dependent_privileges?;
-table_or_view_name_loop: (dbs_host_variable | dbs_alias_name) (dbs_comma_separator (dbs_host_variable | dbs_alias_name))*;
+table_or_view_name_loop: dbs_alias_name (dbs_comma_separator dbs_alias_name)*;
 
 //REVOKE TYPE OR JAR PRIVILEGES
 dbs_revoke_type_or_jar_prvg: USAGE ON (TYPE type_name_loop | JAR jar_name_loop)  FROM auth_name_loop_pub  auth_name_loop_all? dependent_privileges? RESTRICT?;
@@ -1124,7 +1131,7 @@ dbs_transfer: TRANSFER OWNERSHIP OF (DATABASE dbs_database_name | INDEX dbs_inde
 dbs_truncate: TRUNCATE TABLE? dbs_table_name ((DROP | REUSE) STORAGE)? ((IGNORE | RESTRICT WHEN) DELETE TRIGGERS)? IMMEDIATE?;
 
 /*UPDATE */
-dbs_update: UPDATE (dbs_host_variable | dbs_alias_name) (dbs_update_searched | dbs_update_positioned);
+dbs_update: UPDATE dbs_alias_name (dbs_update_searched | dbs_update_positioned);
 dbs_update_searched: dbs_update_period? dbs_correlation_name? dbs_update_include? SET dbs_update_assignment (dbs_comma_separator
                     dbs_update_assignment)* (WHERE dbs_search_condition)? (WITH (RR|RS|CS) | SKIPCHAR LOCKED DATA)* (QUERYNO INTEGERLITERAL)?;
 dbs_update_period: FOR PORTION OF BUSINESS_TIME (FROM dbs_expressions TO dbs_expressions | BETWEEN dbs_expressions AND dbs_expressions);
@@ -1541,7 +1548,7 @@ CURRENT TEMPORAL BUSINESS_TIME | CURRENT TEMPORAL SYSTEM_TIME | (CURRENT TIME | 
 (CURRENT TIME ZONE| CURRENT TIMEZONE | CURRENT_TIMEZONE) | ENCRYPTION PASSWORD | (SESSION TIME ZONE | SESSION TIMEZONE) |
 SESSION_USER );
 
-dbs_ip4: INTEGERLITERAL DOT_FS INTEGERLITERAL DOT_FS INTEGERLITERAL DOT_FS INTEGERLITERAL+ | dbs_string_constant;  // TODO check this
+dbs_ip4: INTEGERLITERAL DOT_FS INTEGERLITERAL DOT_FS INTEGERLITERAL DOT_FS INTEGERLITERAL+ | CHAR_STRING_LITERAL_DOUBLE_QUOTE;  // TODO check this
 dbs_address_value: dbs_ip4 | dbs_host_identifier ;  // TODO check this
 dbs_applcompat_value: FUNCTION_LEVEL_10 | FUNCTION_LEVEL_11 | FUNCTION_LEVEL_12;
 dbs_array_variable: dbs_sql_identifier LSQUAREBRACKET (dbs_expressions) RSQUAREBRACKET;
@@ -1716,7 +1723,7 @@ empty_rule:/* epsilon */;
 
 dbs_table_reference_non_join : dbs_single_table_ref | dbs_nested_table_expression | dbs_data_change_table_ref | dbs_table_function_ref |
  dbs_table_locator_ref | dbs_xmltable_expression | dbs_collection_derived_table;
-dbs_single_table_ref : dbs_table_name | dbs_table_name dbs_period_specification* dbs_correlation_clause?;
+dbs_single_table_ref : dbs_table_name dbs_period_specification* dbs_correlation_clause?;
 dbs_period_specification : FOR (SYSTEM_TIME | BUSINESS_TIME) (AS OF dbs_expressions | FROM dbs_expressions TO dbs_expressions  | BETWEEN dbs_expressions AND dbs_expressions);
 dbs_correlation_clause : AS? dbs_correlation_name (LPARENCHAR dbs_column_name (dbs_comma_separator dbs_column_name)* RPARENCHAR)?;
 //dbs_single_view_ref : dbs_single_table_ref;
@@ -1764,11 +1771,11 @@ dbs_semicolon_end: SEMICOLON_FS | SEMICOLONSEPARATORSQL;
 ////////  BUILDING BLOCKS   ///
 ///////  Ref: https://www.ibm.com/docs/en/db2-for-zos/12?topic=elements-naming-conventions ////
 dbs_integer_constant: INTEGERLITERAL | NUMERICLITERAL; //range 1 - 32767
-dbs_sql_identifier: dbs_generic_identifier_without_inbuild_function_names | dbs_inbuild_functions;
+dbs_sql_identifier: dbs_generic_identifier_without_inbuild_function_names | dbs_inbuild_functions | CHAR_STRING_LITERAL_SINGLE_QUOTE;
 dbs_generic_identifier_without_inbuild_function_names : IDENTIFIER | JOIN | UNION| EXCEPT | INTERSECT | dbs_special_name ;
 dbs_constant : (dbs_string_constant | dbs_integer_constant);
 dbs_generic_name: dbs_host_variable | dbs_string_constant | dbs_sql_identifier; //TODO : check this
-dbs_string_constant: CHAR_STRING_LITERAL | HEXSTRING | BXSTRING | GRAPHIC_CONSTANT | DATELITERAL;
+dbs_string_constant: CHAR_STRING_LITERAL_DOUBLE_QUOTE | HEXSTRING | BXSTRING | GRAPHIC_CONSTANT | DATELITERAL;
 dbs_accelerator_name: dbs_sql_identifier; // TODO {1-8 chars}
 dbs_alias_name
     : dbs_sql_identifier (DOT_FS dbs_sql_identifier (DOT_FS dbs_sql_identifier)?)?
@@ -1781,7 +1788,8 @@ dbs_table_name: dbs_alias_name;
 //dbs_bpname: ('B' | 'b') ('P' |' p') INTEGERLITERAL (('K' | 'k') INTEGERLITERAL)?;
 dbs_collection_id: dbs_sql_identifier;
 //dbs_column_name: (dsb_alias_name DOT_FS)?  IDENTIFIER;
-dbs_column_name: dbs_sql_identifier (DOT_FS  (dbs_sql_identifier (DOT_FS dbs_sql_identifier)?)?  dbs_sql_identifier)?; //TODO {validateLength($T.text, "Column name", 30);};
+//dbs_column_name: dbs_sql_identifier (DOT_FS  (dbs_sql_identifier (DOT_FS dbs_sql_identifier)?)?  dbs_sql_identifier)?; //TODO {validateLength($T.text, "Column name", 30);};
+dbs_column_name: (dbs_alias_name DOT_FS)?  dbs_sql_identifier;
 dbs_constraint_name: dbs_sql_identifier; //todo {validateLength($T.text, "Constraint name", 128);};
 dbs_context_name: dbs_sql_identifier; //TODO {validateLength($T.text, "Profile name", 127);};
 dbs_correlation_name: IDENTIFIER | dbs_special_name | dbs_inbuild_functions | UNION| EXCEPT | INTERSECT; //todo {validateLength($T.text, "Correlation name", 128);};
@@ -1805,7 +1813,7 @@ dbs_parameter: dbs_expression | TABLE dbs_sql_identifier | NULL;
 dbs_package_name:  (dbs_sql_identifier DOT_FS)? dbs_sql_identifier;
 dbs_sequence_name : dbs_sql_identifier (DOT_FS dbs_sql_identifier)?; //  {validateLength($T.text, "Sequence name", 128);};
 dbs_trigger_name :  dbs_sql_identifier (DOT_FS dbs_sql_identifier)?; // {validateLength($T.text, "Trigger name", 128);};
-dbs_version_name: CHAR_STRING_LITERAL | dbs_host_variable | ;//empty alternative;
+dbs_version_name: CHAR_STRING_LITERAL_DOUBLE_QUOTE | dbs_host_variable | ;//empty alternative;
 dbs_object_name: dbs_sql_identifier (DOT_FS dbs_sql_identifier)?;
 dbs_sql_variable_reference: dbs_host_variable | dbs_object_name;
 dbs_statement_name: dbs_sql_identifier;

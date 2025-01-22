@@ -50,23 +50,23 @@ public class TestEmbeddedCodeWithIssueOnLastToken {
           + "       01 {$*testing} pic x.\n"
           + "       PROCEDURE DIVISION.\n"
           + "           EXEC SQL \n"
-          + "           fetch abc \n"
+          + "           {_fetch abc \n"
           + "           into \n"
           + "           asas,\n"
           + "           ajsjs,\n"
-          + "           :{$testing},{|1}\n"
+          + "           :testing,|1_}\n"
           + "           END-EXEC.";
 
   @Test
   void testCobolParserDontEatEmbeddedToken() {
     UseCaseEngine.runTest(
-            TEXT_DONT_EAT_EMB_TOKEN,
+        TEXT_DONT_EAT_EMB_TOKEN,
         ImmutableList.of(),
         ImmutableMap.of(
             "1",
             new Diagnostic(
                 new Range(),
-                "Unexpected end of line",
+                    "No viable alternative at input fetch abc\n           into\n           asas, \n           ajsjs, \n           :testing,",
                 DiagnosticSeverity.Error,
                 ErrorSource.PREPROCESSING.getText())));
   }
