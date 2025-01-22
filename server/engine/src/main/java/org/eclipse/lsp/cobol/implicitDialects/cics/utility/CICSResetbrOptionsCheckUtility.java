@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Broadcom.
+ * Copyright (c) 2025 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -36,10 +36,10 @@ public class CICSResetbrOptionsCheckUtility extends CICSOptionsCheckBaseUtility 
             {
               put(CICSLexer.FILE, ErrorSeverity.ERROR);
               put(CICSLexer.RIDFLD, ErrorSeverity.ERROR);
-              put(CICSLexer.KEYLENGTH, ErrorSeverity.WARNING);
+              put(CICSLexer.KEYLENGTH, ErrorSeverity.ERROR);
               put(CICSLexer.GENERIC, ErrorSeverity.WARNING);
-              put(CICSLexer.REQID, ErrorSeverity.WARNING);
-              put(CICSLexer.SYSID, ErrorSeverity.WARNING);
+              put(CICSLexer.REQID, ErrorSeverity.ERROR);
+              put(CICSLexer.SYSID, ErrorSeverity.ERROR);
               put(CICSLexer.GTEQ, ErrorSeverity.WARNING);
               put(CICSLexer.EQUAL, ErrorSeverity.WARNING);
               put(CICSLexer.RBA, ErrorSeverity.WARNING);
@@ -71,8 +71,6 @@ public class CICSResetbrOptionsCheckUtility extends CICSOptionsCheckBaseUtility 
     checkHasMandatoryOptions(ctx.RIDFLD(), ctx, "RIDFLD");
     checkHasMutuallyExclusiveOptions("RBA, RRN, or XRBA", ctx.RBA(), ctx.RRN(), ctx.XRBA());
     checkHasMutuallyExclusiveOptions("GTEQ or EQUAL", ctx.GTEQ(), ctx.EQUAL());
-    if (!ctx.GENERIC().isEmpty()) {
-      checkHasMandatoryOptions(ctx.KEYLENGTH(), ctx, "KEYLENGTH");
-    }
+    checkPrerequisiteIsMet(ctx.KEYLENGTH(), ctx.GENERIC(), ctx, "GENERIC");
   }
 }

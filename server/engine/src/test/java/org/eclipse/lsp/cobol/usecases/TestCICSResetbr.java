@@ -94,7 +94,7 @@ public class TestCICSResetbr {
                     "errorOne",
                     new Diagnostic(
                             new Range(),
-                            "Missing required option: KEYLENGTH",
+                            "Missing required option for: GENERIC",
                             DiagnosticSeverity.Error,
                             ErrorSource.PARSING.getText())));
   }
