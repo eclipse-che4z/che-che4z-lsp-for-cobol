@@ -40,7 +40,7 @@
 
       * Display Main Menu
            EXEC CICS SEND MAP ('SSMAPP2')
-                     FROM ('SMAP1')
+                     MAPONLY
                      MAPSET ('SSMAP')
                      ERASE
                      END-EXEC.
@@ -257,7 +257,6 @@
 
            Initialize SSMAPP2I.
            EXEC CICS SEND MAP ('SSMAPP2')
-                     FROM ('SMAP1')
                      MAPSET ('SSMAP')
                      MAPONLY
            END-EXEC
