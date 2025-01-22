@@ -101,6 +101,7 @@ public class CICSWSAContextOptionsCheckUtility extends CICSOptionsCheckBaseUtili
 
     @SuppressWarnings("unchecked")
     private void checkWSAContextGet(CICSParser.Cics_wsacontext_getContext ctx) {
+        checkHasMandatoryOptions(ctx.GET(), ctx, "GET");
         checkHasMandatoryOptions(ctx.CONTEXTTYPE(), ctx, "CONTEXTTYPE");
         if (!ctx.RELATESTYPE().isEmpty() || !ctx.RELATESINDEX().isEmpty()) {
             checkHasMandatoryOptions(ctx.RELATESURI(), ctx, "RELATESURI");
