@@ -35,6 +35,7 @@ public class CICSResetbrOptionsCheckUtility extends CICSOptionsCheckBaseUtility 
           new HashMap<Integer, ErrorSeverity>() {
             {
               put(CICSLexer.FILE, ErrorSeverity.ERROR);
+              put(CICSLexer.DATASET, ErrorSeverity.ERROR);
               put(CICSLexer.RIDFLD, ErrorSeverity.ERROR);
               put(CICSLexer.KEYLENGTH, ErrorSeverity.ERROR);
               put(CICSLexer.GENERIC, ErrorSeverity.WARNING);
