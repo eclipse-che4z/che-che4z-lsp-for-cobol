@@ -340,13 +340,13 @@ suite("Integration Test Suite", function () {
 
     await helper.insertString(editor, pos(40, 21), "\n           Mov");
     await helper.waitFor(
-      () => vscode.languages.getDiagnostics(editor.document.uri).length === 4,
+      () => vscode.languages.getDiagnostics(editor.document.uri).length === 3,
     );
     diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
-    assert.strictEqual(diagnostics.length, 4);
+    assert.strictEqual(diagnostics.length, 3);
     assert.ok(
       diagnostics[2].message.includes(
-        "The following token must start in Area A: Mov",
+        "A misspelled word, maybe you want to put MOD",
       ),
     );
   })
