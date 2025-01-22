@@ -50,11 +50,11 @@ public class TestEmbeddedCodeWithIssueOnLastToken {
           + "       01 {$*testing} pic x.\n"
           + "       PROCEDURE DIVISION.\n"
           + "           EXEC SQL \n"
-          + "           {_fetch abc \n"
+          + "           fetch abc \n"
           + "           into \n"
           + "           asas,\n"
           + "           ajsjs,\n"
-          + "           :testing,|1_}\n"
+          + "           :{$testing},{|1}\n"
           + "           END-EXEC.";
 
   @Test
@@ -66,7 +66,7 @@ public class TestEmbeddedCodeWithIssueOnLastToken {
             "1",
             new Diagnostic(
                 new Range(),
-                    "No viable alternative at input fetch abc\n           into\n           asas, \n           ajsjs, \n           :testing,",
+                    "Unexpected end of line",
                 DiagnosticSeverity.Error,
                 ErrorSource.PREPROCESSING.getText())));
   }
