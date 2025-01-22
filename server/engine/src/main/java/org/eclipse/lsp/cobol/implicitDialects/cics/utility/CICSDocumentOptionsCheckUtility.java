@@ -34,33 +34,33 @@ public class CICSDocumentOptionsCheckUtility extends CICSOptionsCheckBaseUtility
     private static final Map<Integer, ErrorSeverity> DUPLICATE_CHECK_OPTIONS =
             new HashMap<Integer, ErrorSeverity>() {
                 {
-                    put(CICSLexer.CREATE, ErrorSeverity.ERROR);
-                    put(CICSLexer.DELETE, ErrorSeverity.ERROR);
-                    put(CICSLexer.INSERT, ErrorSeverity.ERROR);
-                    put(CICSLexer.RETRIEVE, ErrorSeverity.ERROR);
-                    put(CICSLexer.SET, ErrorSeverity.ERROR);
+                    put(CICSLexer.CREATE, ErrorSeverity.WARNING);
+                    put(CICSLexer.DELETE, ErrorSeverity.WARNING);
+                    put(CICSLexer.INSERT, ErrorSeverity.WARNING);
+                    put(CICSLexer.RETRIEVE, ErrorSeverity.WARNING);
+                    put(CICSLexer.SET, ErrorSeverity.WARNING);
                     put(CICSLexer.DOCTOKEN, ErrorSeverity.ERROR);
-                    put(CICSLexer.FROM, ErrorSeverity.WARNING);
-                    put(CICSLexer.TEXT, ErrorSeverity.WARNING);
-                    put(CICSLexer.BINARY, ErrorSeverity.WARNING);
-                    put(CICSLexer.LENGTH, ErrorSeverity.WARNING);
-                    put(CICSLexer.FROMDOC, ErrorSeverity.WARNING);
-                    put(CICSLexer.TEMPLATE, ErrorSeverity.WARNING);
-                    put(CICSLexer.SYMBOLLIST, ErrorSeverity.WARNING);
-                    put(CICSLexer.LISTLENGTH, ErrorSeverity.WARNING);
-                    put(CICSLexer.DELIMITER, ErrorSeverity.WARNING);
+                    put(CICSLexer.FROM, ErrorSeverity.ERROR);
+                    put(CICSLexer.TEXT, ErrorSeverity.ERROR);
+                    put(CICSLexer.BINARY, ErrorSeverity.ERROR);
+                    put(CICSLexer.LENGTH, ErrorSeverity.ERROR);
+                    put(CICSLexer.FROMDOC, ErrorSeverity.ERROR);
+                    put(CICSLexer.TEMPLATE, ErrorSeverity.ERROR);
+                    put(CICSLexer.SYMBOLLIST, ErrorSeverity.ERROR);
+                    put(CICSLexer.LISTLENGTH, ErrorSeverity.ERROR);
+                    put(CICSLexer.DELIMITER, ErrorSeverity.ERROR);
                     put(CICSLexer.UNESCAPED, ErrorSeverity.WARNING);
-                    put(CICSLexer.DOCSIZE, ErrorSeverity.WARNING);
-                    put(CICSLexer.HOSTCODEPAGE, ErrorSeverity.WARNING);
-                    put(CICSLexer.SYMBOL, ErrorSeverity.WARNING);
-                    put(CICSLexer.BOOKMARK, ErrorSeverity.WARNING);
-                    put(CICSLexer.AT, ErrorSeverity.WARNING);
-                    put(CICSLexer.TO, ErrorSeverity.WARNING);
+                    put(CICSLexer.DOCSIZE, ErrorSeverity.ERROR);
+                    put(CICSLexer.HOSTCODEPAGE, ErrorSeverity.ERROR);
+                    put(CICSLexer.SYMBOL, ErrorSeverity.ERROR);
+                    put(CICSLexer.BOOKMARK, ErrorSeverity.ERROR);
+                    put(CICSLexer.AT, ErrorSeverity.ERROR);
+                    put(CICSLexer.TO, ErrorSeverity.ERROR);
                     put(CICSLexer.INTO, ErrorSeverity.ERROR);
-                    put(CICSLexer.MAXLENGTH, ErrorSeverity.WARNING);
-                    put(CICSLexer.CHARACTERSET, ErrorSeverity.WARNING);
+                    put(CICSLexer.MAXLENGTH, ErrorSeverity.ERROR);
+                    put(CICSLexer.CHARACTERSET, ErrorSeverity.ERROR);
                     put(CICSLexer.DATAONLY, ErrorSeverity.WARNING);
-                    put(CICSLexer.VALUE, ErrorSeverity.WARNING);
+                    put(CICSLexer.VALUE, ErrorSeverity.ERROR);
                 }
             };
 
@@ -122,14 +122,13 @@ public class CICSDocumentOptionsCheckUtility extends CICSOptionsCheckBaseUtility
     private void checkDocumentInsert(CICSParser.Cics_document_insertContext ctx) {
         checkHasMandatoryOptions(ctx.INSERT(), ctx, "INSERT");
         checkHasMandatoryOptions(ctx.DOCTOKEN(), ctx, "DOCTOKEN");
-        if (!ctx.LENGTH().isEmpty()) {
-            checkHasExactlyOneOption("FROM, TEXT or BINARY", ctx, ctx.FROM(), ctx.TEXT(), ctx.BINARY());
+        if (!ctx.FROM().isEmpty() || !ctx.TEXT().isEmpty() || !ctx.BINARY().isEmpty()) {
+            checkHasMandatoryOptions(ctx.LENGTH(), ctx, "LENGTH");
         }
+        checkHasMutuallyExclusiveOptions("FROM, TEXT or BINARY", ctx.FROM(), ctx.TEXT(), ctx.BINARY());
         checkHasExactlyOneOption("LENGTH, SYMBOL, TEMPLATE, FROMDOC or BOOKMARK", ctx,
                 ctx.LENGTH(), ctx.SYMBOL(), ctx.TEMPLATE(), ctx.FROMDOC(), ctx.BOOKMARK());
-        if (!ctx.TO().isEmpty()) {
-            checkHasMandatoryOptions(ctx.AT(), ctx, "AT");
-        }
+        checkPrerequisiteIsMet(ctx.AT(), ctx.TO(), ctx, "TO");
     }
 
     private void checkDocumentRetrieve(CICSParser.Cics_document_retrieveContext ctx) {

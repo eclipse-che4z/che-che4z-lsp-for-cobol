@@ -66,7 +66,7 @@ public class TestCICSDocument {
           "DOCUMENT SET DOCTOKEN({$varOne}) SYMBOLLIST({$varTwo}) DELIMITER({$varThree}) LENGTH({$varFour})";
 
   private static final String DOCUMENT_SET_INVALID_NO_DOCTOKEN =
-          "DOCUMENT {_SET DOCTOKEN({$varOne}) SYMBOL({$varTwo}) VALUE(123)|errorOne_}";
+          "DOCUMENT {_SET DOCTOKEN({$varOne}) SYMBOL({$varTwo}) VALUE({$varThree}) UNESCAPED|errorOne_}";
 
   private static final String DOCUMENT_SET_INVALID_BOTH_SYMBOL_AND_SYMBOLLIST =
           "DOCUMENT {_SET DOCTOKEN({$varFour}) LENGTH(123)|errorOne_}";

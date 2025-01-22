@@ -322,14 +322,13 @@ cics_discard_body: cics_handle_response* (ATOMSERVICE | AUTINSTMODEL | BUNDLE | 
                    PROCESSTYPE | PROFILE | PROGRAM | TCPIPSERVICE | TDQUEUE | TERMINAL | TRANCLASS | TRANSACTION | TSMODEL | URIMAP | WEBSERVICE) cics_data_value cics_handle_response*;
 
 /** DOCUMENT CREATE / DELETE / INSERT / RETRIEVE / SET */
-/** DOCUMENT CREATE / DELETE / INSERT / RETRIEVE / SET */
 cics_document: DOCUMENT (cics_document_create | cics_document_delete | cics_document_insert | cics_document_retrieve | cics_document_set);
-cics_document_create: (CREATE | (DOCTOKEN | FROM | TEXT | BINARY | LENGTH | FROMDOC | SYMBOLLIST | LISTLENGTH | DELIMITER | DOCSIZE) cics_data_area |
-                        (TEMPLATE | HOSTCODEPAGE) cics_name | UNESCAPED | cics_handle_response)+;
+cics_document_create: (CREATE | (DOCTOKEN | FROM | TEXT | BINARY | LENGTH | FROMDOC | SYMBOLLIST | DOCSIZE) cics_data_area |
+                        (LISTLENGTH | DELIMITER) cics_data_value | (TEMPLATE | HOSTCODEPAGE) cics_name | UNESCAPED | cics_handle_response)+;
 cics_document_delete: (DELETE | DOCTOKEN | cics_data_area)+;
 cics_document_insert: (INSERT | (DOCTOKEN | TEXT | BINARY | FROM | FROMDOC) cics_data_area | (LENGTH | DOCSIZE) cics_data_value |
                        (SYMBOL | TEMPLATE |  BOOKMARK | HOSTCODEPAGE | AT | TO) cics_name |  cics_handle_response)+;
-cics_document_retrieve: (RETRIEVE | (DOCTOKEN | INTO | LENGTH | MAXLENGTH) cics_data_value | CHARACTERSET cics_name | DATAONLY | cics_handle_response)+;
+cics_document_retrieve: (RETRIEVE | (DOCTOKEN | INTO) cics_data_area | (LENGTH | MAXLENGTH) cics_data_value | CHARACTERSET cics_name | DATAONLY | cics_handle_response)+;
 cics_document_set: (SET | (DOCTOKEN | VALUE | SYMBOLLIST) cics_data_area | SYMBOL cics_name | (DELIMITER | LENGTH) cics_data_value | UNESCAPED | cics_handle_response)+;
 
 /** DUMP TRANSACTION */
