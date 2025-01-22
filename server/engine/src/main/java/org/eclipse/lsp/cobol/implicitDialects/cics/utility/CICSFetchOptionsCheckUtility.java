@@ -37,11 +37,11 @@ public class CICSFetchOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
                 {
                     put(CICSLexer.ANY, ErrorSeverity.ERROR);
                     put(CICSLexer.CHILD, ErrorSeverity.ERROR);
-                    put(CICSLexer.CHANNEL, ErrorSeverity.WARNING);
+                    put(CICSLexer.CHANNEL, ErrorSeverity.ERROR);
                     put(CICSLexer.COMPSTATUS, ErrorSeverity.ERROR);
-                    put(CICSLexer.ABCODE, ErrorSeverity.WARNING);
+                    put(CICSLexer.ABCODE, ErrorSeverity.ERROR);
                     put(CICSLexer.NOSUSPEND, ErrorSeverity.WARNING);
-                    put(CICSLexer.TIMEOUT, ErrorSeverity.WARNING);
+                    put(CICSLexer.TIMEOUT, ErrorSeverity.ERROR);
                 }
             };
 

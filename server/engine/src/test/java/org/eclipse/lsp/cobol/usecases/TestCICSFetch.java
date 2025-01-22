@@ -167,7 +167,7 @@ public class TestCICSFetch {
                     new Diagnostic(
                             new Range(),
                             "Excessive options provided for: CHANNEL",
-                            DiagnosticSeverity.Warning,
+                            DiagnosticSeverity.Error,
                             ErrorSource.PARSING.getText())));
   }
 }
