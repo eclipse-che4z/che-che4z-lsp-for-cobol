@@ -16,6 +16,7 @@ package org.eclipse.lsp.cobol.implicitDialects.sql;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -74,8 +75,8 @@ public class Db2SqlExecValidatorVisitor extends Db2SqlExecParserBaseVisitor<List
 
   @Override
   public List<Node> visitDbs_decfloat_integer(Db2SqlExecParser.Dbs_decfloat_integerContext ctx) {
-    int value = Integer.parseInt(ctx.getText());
-    if (!(value == 34 || value == 16)) {
+    Integer value = parseAsInt(ctx.getText());
+    if (Objects.isNull(value) || !(value == 34 || value == 16)) {
       addSyntaxError(ctx, "parsers.validValueMsg", ctx.getText(), "34 or 16");
     }
     return visitChildren(ctx);
@@ -83,7 +84,9 @@ public class Db2SqlExecValidatorVisitor extends Db2SqlExecParserBaseVisitor<List
 
   @Override
   public List<Node> visitDbs_decimal_15_31(Db2SqlExecParser.Dbs_decimal_15_31Context ctx) {
-    validateTokenWithRegex(ctx, "\\b(15|31)\\b", "15 or 31 are only allowed");
+    if (!(ctx.getText().equals("15") || ctx.getText().equals("31"))) {
+      addSyntaxError(ctx, "15 or 31 are only allowed");
+    }
     return visitChildren(ctx);
   }
 
@@ -150,8 +153,8 @@ public class Db2SqlExecValidatorVisitor extends Db2SqlExecParserBaseVisitor<List
 
   @Override
   public List<Node> visitDbs_maxPartition(Db2SqlExecParser.Dbs_maxPartitionContext ctx) {
-    int intInputValue = Integer.parseInt(ctx.getText());
-    if (!(intInputValue >= 1 && intInputValue <= 4096)) {
+    Integer intInputValue = parseAsInt(ctx.getText());
+    if (Objects.isNull(intInputValue) || !(intInputValue >= 1 && intInputValue <= 4096)) {
       addSyntaxError(ctx, "parsers.intRangeValue", "1", "4096");
     }
     return visitChildren(ctx);
@@ -170,8 +173,8 @@ public class Db2SqlExecValidatorVisitor extends Db2SqlExecParserBaseVisitor<List
   }
 
   protected void validateTextInRange(ParserRuleContext ctx, int min, int max) {
-    int value = Integer.parseInt(ctx.getText());
-    if (!(value > min && value < max)) {
+    Integer value = parseAsInt(ctx.getText());
+    if (Objects.isNull(value) || !(value > min && value < max)) {
       addSyntaxError(
           ctx,
           "parsers.validValueMsg",
@@ -217,5 +220,16 @@ public class Db2SqlExecValidatorVisitor extends Db2SqlExecParserBaseVisitor<List
             token.getLine() - 1,
             token.getCharPositionInLine() + token.getStopIndex() - token.getStartIndex() + 1);
     return new Range(p, p);
+  }
+
+  private Integer parseAsInt(String value) {
+    if (value == null) {
+      return null;
+    }
+    try {
+      return Integer.parseInt(value);
+    } catch (NumberFormatException e) {
+      return null;
+    }
   }
 }
