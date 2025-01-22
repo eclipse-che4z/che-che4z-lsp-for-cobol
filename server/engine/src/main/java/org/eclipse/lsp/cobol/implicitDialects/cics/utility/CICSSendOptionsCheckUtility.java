@@ -152,7 +152,6 @@ public class CICSSendOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
   private void checkGroup1(CICSParser.Cics_send_group1Context ctx) {
     checkHasMutuallyExclusiveOptions("LENGTH or FLENGTH", ctx.LENGTH(), ctx.FLENGTH());
     checkHasMutuallyExclusiveOptions("INVITE or LAST", ctx.INVITE(), ctx.LAST());
-    checkHasMutuallyExclusiveOptions("INVITE or CNOTCOMPL", ctx.INVITE(), ctx.CNOTCOMPL());
     checkHasMutuallyExclusiveOptions("STRFIELD or ERASE", ctx.STRFIELD(), ctx.ERASE());
     checkHasMutuallyExclusiveOptions("DEFAULT or ALTERNATE", ctx.DEFAULT(), ctx.ALTERNATE());
     if (!ctx.LENGTH().isEmpty() || !ctx.FLENGTH().isEmpty() || !ctx.FMH().isEmpty()) {
