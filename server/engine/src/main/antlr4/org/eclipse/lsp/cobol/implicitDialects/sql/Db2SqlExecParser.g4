@@ -73,15 +73,6 @@ rulesAllowedInDataDivisionAndProcedureDivision: ((dbs_declare_cursor | dbs_whene
 
 rulesAllowedInWorkingStorageAndLinkageSection: ((dbs_begin | dbs_end | dbs_include_sqlca | dbs_include_sqlda) dbs_semicolon_end?)+;
 
-// sql include statement
-//includeStatement
-//   : EXEC SQL INCLUDE copySource END_EXEC DOT_FS?
-//   | EXEC {notifyError("db2Parser.missingSql");} INCLUDE copySource END_EXEC DOT_FS?
-//   | {notifyError("cobolParser.missingEndExec");} EXEC SQL INCLUDE copySource DOT_FS?
-//   ;
-
-//copySource: (dbs_member_name | SQLCA | SQLDA) ((OF | IN) dbs_member_name)?;
-
 //used in working-storage section of cobol program
 dbs_declare_variable: DECLARE dbs_host_variable (dbs_comma_separator dbs_host_variable)*
     VARIABLE (
@@ -805,9 +796,8 @@ dbs_insert: INSERT INTO dbs_alias_name (LPARENCHAR dbs_column_name (dbs_comma_se
 
 // ref: https://www.ibm.com/docs/en/db2-for-zos/13?topic=statements-insert
 dbs_insert_include: INCLUDE LPARENCHAR dbs_column_name dbs_include_data_type (dbs_comma_separator dbs_column_name dbs_include_data_type)* RPARENCHAR;
-//?
+
 dbs_insert_data_type: (common_short_built_in_type | dbs_distinct_type);
-//dbs_insert_values: VALUES LPARENCHAR (dbs_insert_values_single | dbs_insert_values_multi) RPARENCHAR;
 dbs_insert_values: (VALUES dbs_insert_values_single
                     (FOR (dbs_host_variable | T=dbs_integer_constant {validateDb2MaxInt($T.text);}) ROWS)?
                     (ATOMIC | NOT ATOMIC CONTINUE ON SQLEXCEPTION)?)| dbs_insert_fullselect;
@@ -853,8 +843,6 @@ dbs_open: OPEN dbs_cursor_name (USING (DESCRIPTOR dbs_descriptor_name) | (dbs_ho
 // removing dbs_string_expression as per doc https://www.ibm.com/docs/en/db2-for-zos/13?topic=statements-prepare
 // string-expression is only supported for PLI.
 dbs_prepare: PREPARE dbs_statement_name (INTO dbs_descriptor_name (USING (NAMES | LABELS | ANY | BOTH))?)?
-//            (FROM dbs_string_expression
-//            | (ATTRIBUTES dbs_attr_host_variable)? FROM dbs_host_variable)
             (ATTRIBUTES dbs_attr_host_variable)? FROM dbs_host_variable;
 
 
@@ -1317,7 +1305,6 @@ cs_rs_rr_ur: (CS | RS | RR | UR);
 
 /// STATEMENTS ///
 // ref: https://www.ibm.com/docs/en/db2-for-zos/13?topic=sql-control-statements-external-procedures
-// deprecated, should we remove it  ????
 dbs_control_statement: dbs_assignment_statement
                        | dbs_call_control
                        | dbs_case_statement_pl_sql
@@ -1354,9 +1341,6 @@ dbs_return_code_declaration: DECLARE (SQLSTATE (CHAR LPARENCHAR dbs_integer5 RPA
 dbs_handler_declaration: DECLARE (CONTINUE | EXIT) HANDLER FOR (dbs_specific_condition_value | dbs_general_condition_value) dbs_sql_procedure_statement;
 dbs_specific_condition_value: (SQLSTATE VALUE? dbs_string_constant | dbs_constraint_name) (dbs_comma_separator (SQLSTATE VALUE? dbs_string_constant | dbs_constraint_name))*;
 dbs_general_condition_value: (SQLEXCEPTION | SQLWARNING | NOT FOUND) (dbs_comma_separator  (SQLEXCEPTION | SQLWARNING | NOT FOUND))*;
-//dbs_for_statement: (IDENTIFIER COLONCHAR)? FOR (dbs_for_loop_name AS)? (dbs_cursor_name CURSOR (WITHOUT HOLD | WITH HOLD) FOR)?
-//                    dbs_select_clause DO (dbs_sql_procedure_statement dbs_semicolon_end)+ END FOR  IDENTIFIER; // check label name matches
-//dbs_for_loop_name: dbs_generic_name;
 dbs_goto_statement: (dbs_sql_identifier COLONCHAR)? GOTO dbs_sql_identifier;
 dbs_if_else_conditional_statement: dbs_search_condition THEN (dbs_sql_procedure_statement dbs_semicolon_end)+;
 dbs_if_statement: (dbs_sql_identifier COLONCHAR)? IF dbs_if_else_conditional_statement (ELSEIF dbs_if_else_conditional_statement )* (ELSE (dbs_sql_procedure_statement dbs_semicolon_end)+)? END IF;
@@ -1416,15 +1400,11 @@ dbs_expression: (dbs_function_invocation | dbs_constant| dbs_column_name | dbs_h
 dbs_expression_operator: (CONCAT | PIPECHAR | PIPECHAR2 | SLASHCHAR | ASTERISKCHAR | PLUSCHAR | MINUSCHAR);
 
 dbs_expressions: dbs_expression (dbs_expression_operator dbs_expression)* (AS common_built_in_type_core)?;
+
 //https://www.ibm.com/support/knowledgecenter/SSEPEK_12.0.0/sqlref/src/tpc/db2z_predicatesoverview.html
 dbs_predicate_condition: (EQUALCHAR | ERRORCHAR EQUALCHAR | LESSTHANCHAR | MORETHANCHAR | MORETHANOREQUAL | LESSTHANOREQUAL | NOTEQUALCHAR);
-//dbs_basic_predicate: dbs_expressions dbs_predicate_condition dbs_expressions;
 dbs_quantified_predicate: dbs_expression dbs_predicate_condition (SOME|ANY|ALL)  LPARENCHAR dbs_select RPARENCHAR;
 dbs_array_exists_predicate: ARRAY_EXISTS LPARENCHAR dbs_sql_identifier dbs_comma_separator INTEGERLITERAL RPARENCHAR;
-//dbs_between_predicate: dbs_expressions NOT? BETWEEN dbs_expressions AND dbs_expressions;
-//dbs_between_date_predicate: DATELITERAL AND DATELITERAL;
-//dbs_distinct_predicate: dbs_expressions IS NOT? DISTINCT FROM dbs_expressions;
-//dbs_basic_predicate: dbs_expressions dbs_predicate_condition dbs_expressions;
 dbs_basic_and_distinct_predicate: dbs_expressions (dbs_predicate_condition | IS NOT? DISTINCT FROM) dbs_expressions;
 dbs_exist_predicate: EXISTS LPARENCHAR dbs_select RPARENCHAR;
 dbs_in_predicate: dbs_expressions NOT? IN LPARENCHAR dbs_expressions (dbs_comma_separator dbs_expressions)* RPARENCHAR;
@@ -1432,11 +1412,9 @@ dbs_between_predicate: dbs_expressions NOT? BETWEEN dbs_expressions AND dbs_expr
 dbs_like_predicate: dbs_sql_identifier NOT? LIKE dbs_expressions (ESCAPE dbs_expressions)?;
 dbs_null_predicate: dbs_expression IS NOT? NULL;
 dbs_predicate: dbs_basic_and_distinct_predicate
-//                | dbs_basic_predicate //
                 | dbs_quantified_predicate //
                 | dbs_array_exists_predicate
                 | dbs_between_predicate // (
-//                | dbs_distinct_predicate
                 | dbs_exist_predicate
                 | dbs_in_predicate // (
                 | dbs_like_predicate
@@ -1460,9 +1438,6 @@ dbs_lag_function: LAG dbs_lag_lead_expression;
 
 dbs_lead_function: LEAD dbs_lag_lead_expression;
 
-// commenting out a part of dbs_partitioning_expression, as it couldn't be found in the documentation
-// ref: https://www.ibm.com/docs/en/db2-for-zos/13?topic=expressions-olap-specifications
-// dbs_partitioning_expression: DOLLARCHAR INTEGERLITERAL? dbs_char_n (PLUSCHAR INTEGERLITERAL (PERCENT INTEGERLITERAL)? | PERCENT INTEGERLITERAL (PLUSCHAR INTEGERLITERAL)?)? | dbs_expression;
 dbs_partitioning_expression: dbs_expression;
 dbs_window_partition_clause: PARTITION BY dbs_partitioning_expression (dbs_comma_separator dbs_partitioning_expression)*
 ;
@@ -1502,20 +1477,13 @@ dbs_aggregation_specification : (dbs_aggregate_function | dbs_OLAP_column_functi
 dbs_window_aggregation_group_clause )?)? RPARENCHAR)?;
 dbs_OLAP_specification: dbs_ordered_OLAP_specification |
  dbs_numbering_specification ;
-// dbs_aggregation_specification --> removing this because this would be covered by dbs_function_invocation
 
 dbs_table_designator: dbs_constant+; // TODO check me
 dbs_row_change_expression: ROW CHANGE (TIMESTAMP | TOKEN) FOR dbs_table_designator;
 dbs_sequence_reference: (NEXT| PREVIOUS) VALUE FOR dbs_sequence_name;
-
 /////////////////DBS EXPRESSION ENDS///////////////////
 
-
-
-
 /////// Variables /////////////
-//literal: dbs_string_constant | NUMERICLITERAL | INTEGERLITERAL;
-
 db2sql_db_privileges: DBADM | DBCTRL | DBMAINT | CREATETAB | CREATETS | DISPLAYDB | DROP | IMAGCOPY | LOAD | RECOVERDB | REORG | REPAIR | STARTDB | STATS | STOPDB;
 db2sql_system_privileges: ACCESSCTRL | ARCHIVE | BINDADD | BINDAGENT | BSDS | CREATEALIAS | CREATEDBA | CREATEDBC | CREATESG | CREATETMTAB | CREATE_SECURE_OBJECT |
                          DATAACCESS | DBADM ((WITH | WITHOUT) ACCESSCTRL )? ((WITH | WITHOUT) DATAACCESS)? | DEBUGSESSION | DISPLAY | EXPLAIN | MONITOR1 | MONITOR2 | RECOVER | SQLADM | STOPALL | STOSPACE | SYSADM | SYSCTRL | SYSOPR | TRACE;
@@ -1642,12 +1610,10 @@ dbs_diagnostic_string_expression: dbs_expressions;
 dbs_distinct_type: db2sql_data_types+;
 // Note: The DPSEGSZ subsystem parameter is not directly specified in a CREATE TABLESPACE statement.
 // ref: https://www.ibm.com/docs/en/db2-for-zos/12?topic=2-default-partition-segsize-field-dpsegsz-subsystem-parameter
-//dbs_dpsegsz_param: INTEGERLITERAL? (dbs_integer2 | dbs_integer4 | dbs_integer6 | dbs_integer8);// DPSEGSZ value, divisible by 4. Range [0,64], must be checked in code.
 dbs_encryption_value: QUOTED_NONE | LOW | HIGH;
 dbs_explainable_sql_statement: ( dbs_allocate | dbs_alter | dbs_associate | dbs_fetch | dbs_insert | dbs_label | dbs_lock | dbs_merge | dbs_open |
  dbs_prepare | dbs_refresh | dbs_release | dbs_rename | dbs_select | dbs_truncate | dbs_select | dbs_set | dbs_delete | dbs_drop); // RE-CHECK
 dbs_fetch_clause: FETCH (FIRST | NEXT) (PLUSCHAR? INTEGERLITERAL)? (ROW | ROWS) ONLY;
-// dbs_function_name: T=dbs_sql_identifier {validateLength($T.text, "Function name", 128);} | dbs_inbuild_functions; //must not be any of the  system-reserved keywords
 dbs_function_name: (dbs_sql_identifier DOT_FS)? dbs_sql_identifier; //must not be any of the  system-reserved keywords
 dbs_imptkmod_param: YES | NO;
 dbs_include_data_type: dbs_alter_procedure_bit_int | dbs_alter_procedure_bit_decimal | dbs_alter_procedure_bit_float | dbs_alter_procedure_bit_decfloat | dbs_alter_procedure_bit_char | dbs_alter_procedure_bit_graphic | dbs_alter_procedure_bit_varchar | DATE | TIME | dbs_alter_procedure_bit_timestamp;
@@ -1672,8 +1638,6 @@ dbs_routine_version_id: T=dbs_sql_identifier {validateLength($T.text, "Routine v
 dbs_scalar_fullselect : LPARENCHAR dbs_fullselect RPARENCHAR;
 dbs_schema_location: dbs_host_identifier;
 dbs_schema_name: T=dbs_sql_identifier {validateLength($T.text, "Schema name", 128);};
-//dbs_search_condition: (NOT? dbs_predicate (SELECTIVITY dbs_integer_constant)? | LPARENCHAR dbs_search_condition RPARENCHAR) ((AND|OR) NOT?
-//                      (dbs_predicate | dbs_search_condition))* ;
 dbs_search_condition
     : dbs_boolean_term (OR dbs_boolean_term)*
     ;
@@ -1701,7 +1665,6 @@ dbs_table_reference: dbs_joined_table;
 
 dbs_joined_table : dbs_join
             | dbs_braced_join
-//            | dbs_cross_join
             ;
 
 // Ref: A : A C | B
@@ -1711,16 +1674,9 @@ dbs_joined_table : dbs_join
 // dbs_normal_join: dbs_table_reference dbs_join_type? JOIN dbs_table_reference ON dbs_join_condition;
 //dbs_normal_join: dbs_table_reference_non_join dbs_normal_join_prime;
 dbs_join: dbs_table_reference_non_join dbs_join_prime;
-//dbs_normal_join_prime: dbs_normal_join_alpha dbs_normal_join_prime | empty_rule;
 dbs_join_prime: dbs_join_alpha dbs_join_prime | empty_rule;
-//dbs_normal_join_alpha: (INNER | (LEFT | RIGHT | FULL) OUTER? | CROSS) JOIN dbs_table_reference (ON dbs_join_condition)?;
 dbs_join_alpha: (INNER | (LEFT | RIGHT | FULL) OUTER? | CROSS) JOIN dbs_table_reference (ON dbs_join_condition)?;
 dbs_braced_join: LPARENCHAR dbs_joined_table RPARENCHAR;
-
-// dbs_cross_join: dbs_table_reference CROSS JOIN dbs_table_reference
-//dbs_cross_join_alpha: CROSS JOIN dbs_table_reference;
-//dbs_cross_join: dbs_table_reference_non_join dbs_cross_join_prime;
-//dbs_cross_join_prime: dbs_cross_join_alpha dbs_cross_join_prime | empty_rule;
 empty_rule:/* epsilon */;
 
 dbs_table_reference_non_join : dbs_single_table_ref | dbs_nested_table_expression | dbs_data_change_table_ref | dbs_table_function_ref |
@@ -1728,7 +1684,6 @@ dbs_table_reference_non_join : dbs_single_table_ref | dbs_nested_table_expressio
 dbs_single_table_ref : dbs_table_name dbs_period_specification* dbs_correlation_clause?;
 dbs_period_specification : FOR (SYSTEM_TIME | BUSINESS_TIME) (AS OF dbs_expressions | FROM dbs_expressions TO dbs_expressions  | BETWEEN dbs_expressions AND dbs_expressions);
 dbs_correlation_clause : AS? dbs_correlation_name (LPARENCHAR dbs_column_name (dbs_comma_separator dbs_column_name)* RPARENCHAR)?;
-//dbs_single_view_ref : dbs_single_table_ref;
 dbs_nested_table_expression : TABLE? LPARENCHAR dbs_fullselect RPARENCHAR dbs_correlation_clause?;
 dbs_data_change_table_ref : (FINAL TABLE LPARENCHAR dbs_insert RPARENCHAR | (FINAL | OLD) TABLE LPARENCHAR dbs_update RPARENCHAR |
  OLD TABLE LPARENCHAR dbs_delete RPARENCHAR | FINAL TABLE LPARENCHAR dbs_merge RPARENCHAR) dbs_correlation_clause?;
@@ -1787,7 +1742,6 @@ dbs_authorization_name: dbs_sql_identifier;
 dbs_authorization_id: dbs_string_constant;
 dbs_aux_table_name: dbs_alias_name; //TODO {validateLength($T.text, "Auxiliary table name", 128);};
 dbs_table_name: dbs_alias_name;
-//dbs_bpname: ('B' | 'b') ('P' |' p') INTEGERLITERAL (('K' | 'k') INTEGERLITERAL)?;
 dbs_collection_id: dbs_sql_identifier;
 dbs_column_name_without_alias: dbs_sql_identifier;
 dbs_column_name: dbs_column_name_without_alias (DOT_FS dbs_sql_identifier (DOT_FS dbs_sql_identifier (DOT_FS dbs_sql_identifier)?)?)? ; //TODO {validateLength($T.text, "Column name", 30);};
@@ -1819,6 +1773,7 @@ dbs_object_name: dbs_sql_identifier (DOT_FS dbs_sql_identifier)?;
 dbs_sql_variable_reference: dbs_host_variable | dbs_object_name;
 dbs_statement_name: dbs_sql_identifier;
 dbs_xquery_context_item_expression: dbs_generic_name;
+
 /////  validation rules /////
 dbs_integer5: INTEGERLITERAL;
 dbs_integer12: INTEGERLITERAL;
