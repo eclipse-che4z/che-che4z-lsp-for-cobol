@@ -19,6 +19,7 @@ import lombok.Getter;
 import lombok.ToString;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.lsp.cobol.common.model.Locality;
+import org.eclipse.lsp.cobol.common.utils.VariableUtils;
 
 /**
  * This value class represents an element item COBOL variable. It has a PIC clause representing its
@@ -91,7 +92,28 @@ public class ElementaryItemNode extends ElementaryNode {
     this.value = value;
   }
 
-  @Override
+    public static ElementaryItemNode fromDefinition(VariableDefinitionNode definitionNode) {
+      ElementaryItemNode variable =
+              new ElementaryItemNode(
+                      definitionNode.getLocality(),
+                      definitionNode.getLevel(),
+                      VariableUtils.getName(definitionNode),
+                      definitionNode.isGlobal(),
+                      definitionNode.getPic(),
+                      definitionNode.getValue(),
+                      definitionNode.getUsage(),
+                      definitionNode.hasRedefines(),
+                      definitionNode.isBlankWhenZeroPresent(),
+                      definitionNode.isSignClausePresent(),
+                      definitionNode.isDynamicLength(),
+                      definitionNode.isJustified(),
+                      definitionNode.isUnBounded());
+      VariableUtils.createVariableNameNode(variable, definitionNode.getVariableName());
+      return variable;
+
+    }
+
+    @Override
   protected String getVariableDisplayString() {
     StringBuilder stringBuilder = new StringBuilder(getFormattedSuffix());
     if (picClause != null) stringBuilder.append(" PIC ").append(picClause);

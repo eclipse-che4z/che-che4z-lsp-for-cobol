@@ -18,8 +18,10 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import org.eclipse.lsp.cobol.common.model.Locality;
+import org.eclipse.lsp.cobol.common.model.tree.variable.VariableDefinitionNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableType;
+import org.eclipse.lsp.cobol.common.utils.VariableUtils;
 
 /** This node represents IDMS MAP name variable */
 @Getter
@@ -30,7 +32,13 @@ public class MapNameNode extends VariableNode {
     super(location, name, VariableType.MAP_NAME, false);
   }
 
-  @Override
+  public static VariableNode fromDefinition(VariableDefinitionNode definitionNode) {
+    MapNameNode variable = new MapNameNode(definitionNode.getLocality(), VariableUtils.getName(definitionNode));
+    VariableUtils.createVariableNameNode(variable, definitionNode.getVariableName());
+    return variable;
+  }
+
+    @Override
   protected String getVariableDisplayString() {
     return String.format("MAP %S.", getName());
   }

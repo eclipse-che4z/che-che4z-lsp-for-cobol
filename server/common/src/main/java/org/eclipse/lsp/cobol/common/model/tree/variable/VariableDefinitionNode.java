@@ -15,24 +15,16 @@
 package org.eclipse.lsp.cobol.common.model.tree.variable;
 
 import com.google.common.collect.ImmutableList;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
-import org.eclipse.lsp.cobol.common.VariableConstants;
-import org.eclipse.lsp.cobol.common.error.SyntaxError;
-import org.eclipse.lsp.cobol.common.message.MessageTemplate;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.NodeType;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /** The node represents a variable definition. */
 @Getter
@@ -110,13 +102,6 @@ public final class VariableDefinitionNode extends Node {
     this.isJustified = isJustified;
     this.isUnBounded = isUnBounded;
     this.isExternal = isExternal;
-  }
-
-  private static SyntaxError checkClauseIsSingle(
-      VariableNode variableNode, Supplier<List<?>> clausesGetter, String clauseName) {
-    if (clausesGetter.get().size() > 1)
-      return variableNode.getError(MessageTemplate.of(VariableConstants.TOO_MANY_CLAUSES_MSG, clauseName));
-    return null;
   }
 
   /**
@@ -283,25 +268,6 @@ public final class VariableDefinitionNode extends Node {
    */
   public boolean doesntHaveRedefines() {
     return redefinesClauses.isEmpty();
-  }
-
-  /**
-   * Return list of errors.
-   *
-   * @param variableNode related variableNode for extracting appropriate locality for errors
-   * @return the list of syntax errors
-   */
-  public List<SyntaxError> getErrors(VariableNode variableNode) {
-    return Stream.of(
-            checkClauseIsSingle(variableNode, this::getPicClauses, "PICTURE"),
-            checkClauseIsSingle(variableNode, this::getOccursClauses, "OCCURS"),
-            checkClauseIsSingle(variableNode, this::getValueClauses, "VALUE"),
-            checkClauseIsSingle(variableNode, this::getRedefinesClauses, "REDEFINES"),
-            checkClauseIsSingle(variableNode, this::getUsageClauses, "USAGE")
-            // TODO: check the same way that the other clauses are singular or absent
-            )
-        .filter(Objects::nonNull)
-        .collect(Collectors.toList());
   }
 
   /**

@@ -14,21 +14,24 @@
  */
 package org.eclipse.lsp.cobol.common.model.tree.variables;
 
+import com.google.common.collect.ImmutableList;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.lsp.cobol.common.error.SyntaxError;
+import org.eclipse.lsp.cobol.common.message.MessageTemplate;
 import org.eclipse.lsp.cobol.common.model.Locality;
-import org.eclipse.lsp.cobol.common.model.tree.variable.ValueInterval;
-import org.eclipse.lsp.cobol.common.model.tree.variable.VariableType;
-import org.eclipse.lsp.cobol.common.model.tree.variable.VariableWithLevelNode;
+import org.eclipse.lsp.cobol.common.model.tree.Node;
+import org.eclipse.lsp.cobol.common.model.tree.variable.*;
+import org.eclipse.lsp.cobol.common.utils.VariableUtils;
 
 import java.util.List;
 import java.util.function.Function;
 
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.joining;
-import static org.eclipse.lsp.cobol.common.VariableConstants.LEVEL_88;
+import static org.eclipse.lsp.cobol.common.VariableConstants.*;
 
 /**
  * This value class represents a conditional data name entry, that has a level number 88. It cannot
@@ -51,6 +54,24 @@ public class ConditionDataNameNode extends VariableWithLevelNode {
     super(location, LEVEL_88, name, redefines, VariableType.CONDITION_DATA_NAME);
     this.valueIntervals = valueIntervals;
     this.valueToken = valueToken;
+  }
+
+  public static ConditionDataNameNode fromDefinition(VariableDefinitionNode definitionNode, List<SyntaxError> errors) {
+    ConditionDataNameNode variable =
+              new ConditionDataNameNode(
+                      definitionNode.getLocality(),
+                      VariableUtils.getName(definitionNode),
+                      definitionNode.hasRedefines(),
+                      definitionNode.getValueIntervals(),
+                      definitionNode.getValueToken());
+    VariableUtils.createVariableNameNode(variable, definitionNode.getVariableName());
+    Node parent = definitionNode.getParent();
+    if (parent instanceof VariableWithLevelNode
+            && ((VariableWithLevelNode) parent).getLevel() == LEVEL_66) {
+          errors.addAll(ImmutableList.of(
+                  variable.getError(MessageTemplate.of(PREVIOUS_WITHOUT_PIC_FOR_88, VariableUtils.getName(definitionNode)))));
+    }
+    return variable;
   }
 
   @Override

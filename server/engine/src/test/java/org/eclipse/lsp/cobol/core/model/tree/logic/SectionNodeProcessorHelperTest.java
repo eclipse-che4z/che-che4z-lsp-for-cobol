@@ -17,11 +17,13 @@ package org.eclipse.lsp.cobol.core.model.tree.logic;
 import com.google.common.collect.ImmutableList;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.NodeType;
+import org.eclipse.lsp.cobol.common.model.SectionType;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
 import org.eclipse.lsp.cobol.common.model.tree.ProgramSubtype;
+import org.eclipse.lsp.cobol.common.model.tree.SectionNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.*;
-import org.eclipse.lsp.cobol.core.engine.processors.SectionNodeProcessorHelper;
+import org.eclipse.lsp.cobol.core.engine.processors.utils.SectionNodeProcessorHelper;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulator;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
@@ -43,52 +45,61 @@ class SectionNodeProcessorHelperTest {
 
   @Test
   void simpleStructureTest() {
-    Node programNode = new ProgramNode(LOCALITY, ProgramSubtype.Program, 0);
+    ProgramNode programNode = new ProgramNode(LOCALITY, ProgramSubtype.Program, 0);
+    SectionNode sectionNode = new SectionNode(LOCALITY, SectionType.WORKING_STORAGE);
+    programNode.addChild(sectionNode);
     // 01 Level-01-order-1
     // 01 Level-01-order-2
     //    05 Level-05-order-1
     //       10 Level-10-order-1
     //    05 Level-05-order-2
     // 01 Level-01-order-3
-    programNode.addChild(
+    sectionNode.addChild(
         VariableDefinitionNode.builder()
             .level(1)
             .statementLocality(LOCALITY)
             .variableNameAndLocality(new VariableNameAndLocality("Level-01-order-1", LOCALITY))
             .build());
-    programNode.addChild(
+    sectionNode.addChild(
         VariableDefinitionNode.builder()
             .level(1)
             .statementLocality(LOCALITY)
             .variableNameAndLocality(new VariableNameAndLocality("Level-01-order-2", LOCALITY))
             .build());
-    programNode.addChild(
+    sectionNode.addChild(
         VariableDefinitionNode.builder()
             .level(5)
             .statementLocality(LOCALITY)
             .variableNameAndLocality(new VariableNameAndLocality("Level-05-order-1", LOCALITY))
             .build());
-    programNode.addChild(
+    sectionNode.addChild(
         VariableDefinitionNode.builder()
             .level(10)
             .statementLocality(LOCALITY)
             .variableNameAndLocality(new VariableNameAndLocality("Level-10-order-1", LOCALITY))
             .build());
-    programNode.addChild(
+    sectionNode.addChild(
         VariableDefinitionNode.builder()
             .level(5)
             .statementLocality(LOCALITY)
             .variableNameAndLocality(new VariableNameAndLocality("Level-05-order-2", LOCALITY))
             .build());
-    programNode.addChild(
+    sectionNode.addChild(
         VariableDefinitionNode.builder()
             .level(1)
             .statementLocality(LOCALITY)
             .variableNameAndLocality(new VariableNameAndLocality("Level-01-order-3", LOCALITY))
             .build());
-    SectionNodeProcessorHelper.processNodeWithVariableDefinitions(programNode);
-    new SymbolAccumulator().registerVariablesInProgram(programNode);
-    List<VariableNode> nodesLevel01 = getVariables(programNode);
+    SectionNodeProcessorHelper.processNodeWithVariableDefinitions(sectionNode);
+
+    SymbolAccumulator symbolAccumulator = new SymbolAccumulator();
+    sectionNode.getChildren().stream()
+                    .flatMap(Node::getDepthFirstStream)
+                    .filter(hasType(NodeType.VARIABLE))
+                    .map(VariableNode.class::cast)
+                    .forEach(v -> symbolAccumulator.addVariable(sectionNode.getProgram().get(), v));
+
+    List<VariableNode> nodesLevel01 = getVariables(sectionNode);
     checkNames(nodesLevel01, "Level-01-order-1", "Level-01-order-2", "Level-01-order-3");
     List<VariableNode> nodesLevel05 = getVariables(nodesLevel01.get(1));
     checkNames(nodesLevel05, "Level-05-order-1", "Level-05-order-2");
@@ -98,38 +109,46 @@ class SectionNodeProcessorHelperTest {
 
   @Test
   void nonCorrectStructures() {
-    Node programNode = new ProgramNode(LOCALITY, ProgramSubtype.Program, 0);
+    ProgramNode programNode = new ProgramNode(LOCALITY, ProgramSubtype.Program, 0);
+    SectionNode sectionNode = new SectionNode(LOCALITY, SectionType.WORKING_STORAGE);
+    programNode.addChild(sectionNode);
+
     // 05 Level-05
     // 01 Level-01
     //   10 Level-10
     //   07 Level-07
-    programNode.addChild(
+    sectionNode.addChild(
         VariableDefinitionNode.builder()
             .level(5)
             .statementLocality(LOCALITY)
             .variableNameAndLocality(new VariableNameAndLocality("Level-05", LOCALITY))
             .build());
-    programNode.addChild(
+    sectionNode.addChild(
         VariableDefinitionNode.builder()
             .level(1)
             .statementLocality(LOCALITY)
             .variableNameAndLocality(new VariableNameAndLocality("Level-01", LOCALITY))
             .build());
-    programNode.addChild(
+    sectionNode.addChild(
         VariableDefinitionNode.builder()
             .level(10)
             .statementLocality(LOCALITY)
             .variableNameAndLocality(new VariableNameAndLocality("Level-10", LOCALITY))
             .build());
-    programNode.addChild(
+    sectionNode.addChild(
         VariableDefinitionNode.builder()
             .level(7)
             .statementLocality(LOCALITY)
             .variableNameAndLocality(new VariableNameAndLocality("Level-07", LOCALITY))
             .build());
-    SectionNodeProcessorHelper.processNodeWithVariableDefinitions(programNode);
-    new SymbolAccumulator().registerVariablesInProgram(programNode);
-    List<VariableNode> nodesLowLevel = getVariables(programNode);
+    SectionNodeProcessorHelper.processNodeWithVariableDefinitions(sectionNode);
+    SymbolAccumulator symbolAccumulator = new SymbolAccumulator();
+    programNode.getChildren().stream()
+                    .flatMap(Node::getDepthFirstStream)
+                    .filter(hasType(NodeType.VARIABLE))
+                    .map(VariableNode.class::cast)
+                    .forEach(v -> symbolAccumulator.addVariable(programNode, v));
+    List<VariableNode> nodesLowLevel = getVariables(sectionNode);
     checkNames(nodesLowLevel, "Level-05", "Level-01");
     List<VariableNode> nodesNestedLevel = getVariables(nodesLowLevel.get(1));
     checkNames(nodesNestedLevel, "Level-10", "Level-07");
@@ -137,31 +156,40 @@ class SectionNodeProcessorHelperTest {
 
   @Test
   void moveLevel66ToTop() {
-    Node programNode = new ProgramNode(LOCALITY, ProgramSubtype.Program, 0);
+    ProgramNode programNode = new ProgramNode(LOCALITY, ProgramSubtype.Program, 0);
+    SectionNode sectionNode = new SectionNode(LOCALITY, SectionType.WORKING_STORAGE);
+    programNode.addChild(sectionNode);
+
     // 01 Level-01
     //    05 Level-05
     // 66 Level-66
-    programNode.addChild(
+    sectionNode.addChild(
         VariableDefinitionNode.builder()
             .level(1)
             .statementLocality(LOCALITY)
             .variableNameAndLocality(new VariableNameAndLocality("Level-01", LOCALITY))
             .build());
-    programNode.addChild(
+    sectionNode.addChild(
         VariableDefinitionNode.builder()
             .level(5)
             .statementLocality(LOCALITY)
             .variableNameAndLocality(new VariableNameAndLocality("Level-05", LOCALITY))
             .build());
-    programNode.addChild(
+    sectionNode.addChild(
         VariableDefinitionNode.builder()
             .level(66)
             .statementLocality(LOCALITY)
             .variableNameAndLocality(new VariableNameAndLocality("Level-66", LOCALITY))
             .build());
-    SectionNodeProcessorHelper.processNodeWithVariableDefinitions(programNode);
-    new SymbolAccumulator().registerVariablesInProgram(programNode);
-    List<VariableNode> nodesLevel01 = getVariables(programNode);
+    SectionNodeProcessorHelper.processNodeWithVariableDefinitions(sectionNode);
+    SymbolAccumulator symbolAccumulator = new SymbolAccumulator();
+    programNode.getChildren().stream()
+                    .flatMap(Node::getDepthFirstStream)
+                    .filter(hasType(NodeType.VARIABLE))
+                    .map(VariableNode.class::cast)
+                    .forEach(v -> symbolAccumulator.addVariable(programNode, v));
+
+    List<VariableNode> nodesLevel01 = getVariables(sectionNode);
     checkNames(nodesLevel01, "Level-01", "Level-66");
   }
 
@@ -170,47 +198,56 @@ class SectionNodeProcessorHelperTest {
     List<ValueClause> valueClauses =
         ImmutableList.of(
             new ValueClause(ImmutableList.of(new ValueInterval("", "", "thru")), LOCALITY));
-    Node programNode = new ProgramNode(LOCALITY, ProgramSubtype.Program, 0);
+    ProgramNode programNode = new ProgramNode(LOCALITY, ProgramSubtype.Program, 0);
+    SectionNode sectionNode = new SectionNode(LOCALITY, SectionType.WORKING_STORAGE);
+    programNode.addChild(sectionNode);
+
     // 01 Level-01
     //      88 Cond-1
     //    05 Level-05-1
     //      88 Cond-2
     //    05 Level-05-1
-    programNode.addChild(
+    sectionNode.addChild(
         VariableDefinitionNode.builder()
             .level(1)
             .statementLocality(LOCALITY)
             .variableNameAndLocality(new VariableNameAndLocality("Level-01", LOCALITY))
             .build());
-    programNode.addChild(
+    sectionNode.addChild(
         VariableDefinitionNode.builder()
             .level(88)
             .statementLocality(LOCALITY)
             .variableNameAndLocality(new VariableNameAndLocality("Cond-1", LOCALITY))
             .valueClauses(valueClauses)
             .build());
-    programNode.addChild(
+    sectionNode.addChild(
         VariableDefinitionNode.builder()
             .level(5)
             .statementLocality(LOCALITY)
             .variableNameAndLocality(new VariableNameAndLocality("Level-05-1", LOCALITY))
             .build());
-    programNode.addChild(
+    sectionNode.addChild(
         VariableDefinitionNode.builder()
             .level(88)
             .statementLocality(LOCALITY)
             .variableNameAndLocality(new VariableNameAndLocality("Cond-2", LOCALITY))
             .valueClauses(valueClauses)
             .build());
-    programNode.addChild(
+    sectionNode.addChild(
         VariableDefinitionNode.builder()
             .level(5)
             .statementLocality(LOCALITY)
             .variableNameAndLocality(new VariableNameAndLocality("Level-05-2", LOCALITY))
             .build());
-    SectionNodeProcessorHelper.processNodeWithVariableDefinitions(programNode);
-    new SymbolAccumulator().registerVariablesInProgram(programNode);
-    List<VariableNode> nodesLevel01 = getVariables(programNode);
+    SectionNodeProcessorHelper.processNodeWithVariableDefinitions(sectionNode);
+    SymbolAccumulator symbolAccumulator = new SymbolAccumulator();
+    programNode.getChildren().stream()
+                    .flatMap(Node::getDepthFirstStream)
+                    .filter(hasType(NodeType.VARIABLE))
+                    .map(VariableNode.class::cast)
+                    .forEach(v -> symbolAccumulator.addVariable(programNode, v));
+
+    List<VariableNode> nodesLevel01 = getVariables(sectionNode);
     checkNames(nodesLevel01, "Level-01");
     List<VariableNode> nodesUnder01 = getVariables(nodesLevel01.get(0));
     checkNames(nodesUnder01, "Cond-1", "Level-05-1", "Level-05-2");

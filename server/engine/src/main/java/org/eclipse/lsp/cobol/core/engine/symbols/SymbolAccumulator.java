@@ -15,6 +15,7 @@
 package org.eclipse.lsp.cobol.core.engine.symbols;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Multimap;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
@@ -28,11 +29,9 @@ import org.eclipse.lsp.cobol.common.model.tree.ProgramIdNode;
 import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
 import org.eclipse.lsp.cobol.common.model.tree.ProgramSubtype;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNode;
-import org.eclipse.lsp.cobol.common.model.tree.variable.VariableUsageNode;
 import org.eclipse.lsp.cobol.common.symbols.CodeBlockReference;
 import org.eclipse.lsp.cobol.common.symbols.SymbolTable;
 import org.eclipse.lsp.cobol.common.symbols.VariableAccumulator;
-import org.eclipse.lsp.cobol.core.model.VariableUsageUtils;
 import org.eclipse.lsp.cobol.common.model.tree.CodeBlockUsageNode;
 import org.eclipse.lsp.cobol.common.model.tree.FunctionReference;
 import org.eclipse.lsp.cobol.common.model.tree.ParagraphNameNode;
@@ -43,8 +42,6 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import static org.eclipse.lsp.cobol.common.model.tree.Node.hasType;
 
 /** Service to handle symbol information and dependencies */
 public class SymbolAccumulator implements VariableAccumulator {
@@ -59,26 +56,8 @@ public class SymbolAccumulator implements VariableAccumulator {
    * @param programNode the program where this variable belongs to.
    * @param node the variable definition node
    */
-  public void addVariableDefinition(ProgramNode programNode, VariableNode node) {
+  public void addVariable(ProgramNode programNode, VariableNode node) {
     createOrGetSymbolTable(programNode).register(node);
-  }
-
-  /**
-   * * Register variable definitions into nearest ProgramNode
-   *
-   * @param node the node with VariableDefinitionNodes
-   */
-  public void registerVariablesInProgram(Node node) {
-    // The variable can have nested variable definitions (like IndexItemNode), we need to
-    // collect them
-    List<VariableNode> variables =
-        node.getChildren().stream()
-            .flatMap(Node::getDepthFirstStream)
-            .filter(hasType(NodeType.VARIABLE))
-            .map(VariableNode.class::cast)
-            .collect(Collectors.toList());
-    node.getProgram()
-        .ifPresent(programNode -> variables.forEach(v -> addVariableDefinition(programNode, v)));
   }
 
   /**
@@ -147,8 +126,10 @@ public class SymbolAccumulator implements VariableAccumulator {
     CodeBlockDefinitionNode definition = definitions.get(0);
     definition.addUsage(node.getLocality());
 
-    Optional.ofNullable(symbolTable.getParagraphMap().get(node.getName()))
-        .ifPresent(it -> it.addUsage(node.getLocality().toLocation()));
+    Collection<CodeBlockReference> codeBlockReferences = symbolTable.getParagraphMap().get(node.getName());
+    codeBlockReferences.stream().filter(v -> v.getDefinitions().contains(definition.getDefinition().toLocation()))
+            .forEach(v -> v.addUsage(node.getLocality().toLocation()));
+
     Optional.ofNullable(symbolTable.getSectionMap().get(node.getName()))
         .ifPresent(it -> it.addUsage(node.getLocality().toLocation()));
 
@@ -216,7 +197,8 @@ public class SymbolAccumulator implements VariableAccumulator {
    * @return syntax error if the code block duplicates
    */
   public Optional<SyntaxError> registerSectionNameNode(ProgramNode program, SectionNameNode node) {
-    createOrGetSymbolTable(program)
+    SymbolTable symbolTable = createOrGetSymbolTable(program);
+    symbolTable
         .getSectionMap()
         .computeIfAbsent(node.getName(), n -> new CodeBlockReference())
         .addDefinition(node.getLocality().toLocation());
@@ -309,8 +291,8 @@ public class SymbolAccumulator implements VariableAccumulator {
    * Null if no reference is found.
    * In case a function is declared within program, try to resolve as per declaration
    * @param functionName the functionName of the function
-   * @param programNode
-   * @param isFunctionPrefixed
+   * @param programNode the program node
+   * @param isFunctionPrefixed if the function is prefixed
    * @return the block reference or null if not found
    */
   public FunctionInfo getFunctionReference(String functionName, ProgramNode programNode, boolean isFunctionPrefixed) {
@@ -366,12 +348,11 @@ public class SymbolAccumulator implements VariableAccumulator {
    * @param node - the section definition node
    * @return syntax error if the code block duplicates
    */
-  public Optional<SyntaxError> registerParagraphNameNode(
-      ProgramNode programNode, ParagraphNameNode node) {
-    createOrGetSymbolTable(programNode)
-        .getParagraphMap()
-        .computeIfAbsent(node.getName(), n -> new CodeBlockReference())
-        .addDefinition(node.getLocality().toLocation());
+  public Optional<SyntaxError> registerParagraphNameNode(ProgramNode programNode, ParagraphNameNode node) {
+    SymbolTable symbolTable = createOrGetSymbolTable(programNode);
+    CodeBlockReference value = new CodeBlockReference();
+    value.addDefinition(node.getLocality().toLocation());
+    symbolTable.getParagraphMap().put(node.getName(), value);
     return Optional.empty();
   }
 
@@ -384,7 +365,14 @@ public class SymbolAccumulator implements VariableAccumulator {
    */
   public CodeBlockReference getCodeBlockReference(ProgramNode programNode, String name) {
     SymbolTable symbolTable = createOrGetSymbolTable(programNode);
-    return symbolTable.getParagraphMap().computeIfAbsent(name, symbolTable.getSectionMap()::get);
+    if (!symbolTable.getParagraphMap().containsKey(name)) {
+      CodeBlockReference value = symbolTable.getSectionMap().get(name);
+      if (value == null) {
+        return null;
+      }
+    }
+    // FIXME
+    return symbolTable.getParagraphMap().get(name).stream().findAny().orElse(null);
   }
 
   /**
@@ -407,18 +395,19 @@ public class SymbolAccumulator implements VariableAccumulator {
   /**
    * Get Paragraph locations
    *
-   * @param node the paragraph node
-   * @param retrieveLocations location extract function
+   * @param paragraphName               the paragraph paragraphName
+   * @param retrieveLocations  location extract function
+   * @param currentProgramNode the current program
    * @return a list of locations
    */
   public List<Location> getParagraphLocations(
-      ParagraphNameNode node, Function<CodeBlockReference, List<Location>> retrieveLocations) {
-    return node.getProgram()
-        .map(this::createOrGetSymbolTable)
-        .map(SymbolTable::getParagraphMap)
-        .map(it -> it.get(node.getName()))
-        .map(retrieveLocations)
-        .orElse(ImmutableList.of());
+          String paragraphName, Function<CodeBlockReference, List<Location>> retrieveLocations, ProgramNode currentProgramNode) {
+    Multimap<String, CodeBlockReference> paragraphMap = createOrGetSymbolTable(currentProgramNode).getParagraphMap();
+    ArrayList<Location> result = new ArrayList<>();
+    for (CodeBlockReference ref: paragraphMap.get(paragraphName)) {
+      result.addAll(retrieveLocations.apply(ref));
+    }
+    return result;
   }
 
   /**
@@ -428,32 +417,6 @@ public class SymbolAccumulator implements VariableAccumulator {
    */
   public Map<String, SymbolTable> getProgramSymbols() {
     return Collections.unmodifiableMap(programSymbols);
-  }
-
-  /**
-   * Get variable definition node based on list of variable usage nodes.
-   *
-   * @param programNode the program node
-   * @param usagePath represents variable name and its parents
-   * @return the list of founded variable definitions
-   */
-  public List<VariableNode> getVariableDefinition(
-      ProgramNode programNode, List<VariableUsageNode> usagePath) {
-    SymbolTable symbolTable = createOrGetSymbolTable(programNode);
-    List<VariableNode> foundDefinitions = VariableUsageUtils.findVariablesForUsage(symbolTable.getVariablesMap(), usagePath);
-    if (!foundDefinitions.isEmpty()) {
-      return foundDefinitions;
-    }
-
-    return globalVariableSearch(symbolTable, usagePath);
-  }
-
-  private List<VariableNode> globalVariableSearch(SymbolTable symbolTable, List<VariableUsageNode> usagePath) {
-    List<VariableNode> result = VariableUsageUtils.findVariablesForUsage(symbolTable.getVariablesGlobalsMap(), usagePath);
-    if (!result.isEmpty() || symbolTable.getParent() == null) {
-      return result;
-    }
-    return globalVariableSearch(symbolTable.getParent(), usagePath);
   }
 
   private FunctionInfo createImplicitFunctionInfo(String implicitFunctionName) {

@@ -14,6 +14,7 @@
  */
 package org.eclipse.lsp.cobol.service.delegates.completions;
 
+import com.google.common.collect.Multimap;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.NonNull;
@@ -24,7 +25,6 @@ import org.eclipse.lsp4j.CompletionItem;
 
 import javax.annotation.Nullable;
 import java.util.Collection;
-import java.util.Map;
 
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
@@ -55,7 +55,7 @@ public class ParagraphCompletion implements Completion {
         .filter(hasType(PROGRAM))
         .map(ProgramNode.class::cast)
         .map(symbolsRepository::getParagraphMap)
-        .map(Map::keySet)
+        .map(Multimap::keySet)
         .flatMap(Collection::stream)
         .filter(DocumentationUtils.startsWithIgnoreCase(token))
         .map(this::toParagraphCompletion)

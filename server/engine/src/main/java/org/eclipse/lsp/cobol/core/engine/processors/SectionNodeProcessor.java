@@ -14,10 +14,16 @@
  */
 package org.eclipse.lsp.cobol.core.engine.processors;
 
+import org.eclipse.lsp.cobol.common.model.NodeType;
+import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.model.tree.SectionNode;
+import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNode;
 import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.Processor;
+import org.eclipse.lsp.cobol.core.engine.processors.utils.SectionNodeProcessorHelper;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulator;
+
+import static org.eclipse.lsp.cobol.common.model.tree.Node.hasType;
 
 /** SectionNode processor */
 public class SectionNodeProcessor implements Processor<SectionNode> {
@@ -30,6 +36,13 @@ public class SectionNodeProcessor implements Processor<SectionNode> {
   @Override
   public void accept(SectionNode node, ProcessingContext ctx) {
     ctx.getErrors().addAll(SectionNodeProcessorHelper.processNodeWithVariableDefinitions(node));
-    symbolAccumulator.registerVariablesInProgram(node);
+    if (ctx.getCurrentProgramNode() == null) {
+      return;
+    }
+    node.getChildren().stream()
+            .flatMap(Node::getDepthFirstStream)
+            .filter(hasType(NodeType.VARIABLE))
+            .map(VariableNode.class::cast)
+            .forEach(v -> symbolAccumulator.addVariable(ctx.getCurrentProgramNode(), v));
   }
 }

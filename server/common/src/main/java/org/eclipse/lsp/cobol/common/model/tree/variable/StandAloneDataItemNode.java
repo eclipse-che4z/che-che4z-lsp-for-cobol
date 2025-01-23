@@ -19,6 +19,7 @@ import lombok.Getter;
 import lombok.ToString;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.lsp.cobol.common.model.Locality;
+import org.eclipse.lsp.cobol.common.utils.VariableUtils;
 
 import static org.eclipse.lsp.cobol.common.VariableConstants.LEVEL_77;
 
@@ -86,6 +87,25 @@ public class StandAloneDataItemNode extends ElementaryNode {
         picClause,
         usageFormat);
     this.value = value;
+  }
+
+  public static StandAloneDataItemNode fromDefinition(VariableDefinitionNode definitionNode) {
+    StandAloneDataItemNode variable =
+            new StandAloneDataItemNode(
+                    definitionNode.getLocality(),
+                    VariableUtils.getName(definitionNode),
+                    definitionNode.isGlobal(),
+                    definitionNode.getPic(),
+                    definitionNode.getValue(),
+                    definitionNode.hasRedefines(),
+                    definitionNode.getUsage(),
+                    definitionNode.isBlankWhenZeroPresent(),
+                    definitionNode.isSignClausePresent(),
+                    definitionNode.isDynamicLength(),
+                    definitionNode.isJustified(),
+                    definitionNode.isUnBounded());
+    VariableUtils.createVariableNameNode(variable, definitionNode.getVariableName());
+    return variable;
   }
 
   @Override

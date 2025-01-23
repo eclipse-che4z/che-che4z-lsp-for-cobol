@@ -18,6 +18,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import org.eclipse.lsp.cobol.common.model.Locality;
+import org.eclipse.lsp.cobol.common.utils.VariableUtils;
 
 /**
  * This value class represents a group item COBOL variable. Group elements can have nested
@@ -60,7 +61,20 @@ public class GroupItemNode extends VariableWithLevelNode implements UsageClause 
     this.usageFormat = usageFormat;
   }
 
-  @Override
+    public static GroupItemNode fromDefinition(VariableDefinitionNode definitionNode) {
+      GroupItemNode variable =
+              new GroupItemNode(
+                      definitionNode.getLocality(),
+                      definitionNode.getLevel(),
+                      VariableUtils.getName(definitionNode),
+                      definitionNode.isGlobal(),
+                      definitionNode.hasRedefines(),
+                      definitionNode.getUsage());
+      VariableUtils.createVariableNameNode(variable, definitionNode.getVariableName());
+      return variable;
+    }
+
+    @Override
   protected String getVariableDisplayString() {
     return getFormattedSuffix() + ".";
   }
