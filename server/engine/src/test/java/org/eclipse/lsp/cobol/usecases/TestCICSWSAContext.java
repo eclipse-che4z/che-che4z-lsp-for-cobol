@@ -39,7 +39,7 @@ public class TestCICSWSAContext {
           "WSACONTEXT BUILD RELATESURI({$varOne}) RELATESTYPE({$varTwo}) {FROMCCSID|errorOne}({$varOne}) {FROMCODEPAGE|errorTwo}({$varTwo})";
 
   private static final String WSACONTEXT_BUILD_INVALID_TWO =
-          "WSACONTEXT {_BUILD EPRTYPE({$varOne}) EPRFIELD({$varTwo}) EPRFROM({123})|errorOne_}";
+          "WSACONTEXT {_BUILD EPRTYPE({$varOne}) EPRFIELD({$varTwo})|errorOne_}";
 
   private static final String WSACONTEXT_DELETE_VALID =
           "WSACONTEXT DELETE CHANNEL({$varOne})";
@@ -105,7 +105,7 @@ public class TestCICSWSAContext {
                     "errorOne",
                     new Diagnostic(
                             new Range(),
-                            "If one option is specified, all options must be present: EPRTYPE, EPRFIELD, EPRFROM and EPRLENGTH",
+                            "If one option is specified, all options must be present: EPRTYPE, EPRFIELD and EPRFROM",
                             DiagnosticSeverity.Error,
                             ErrorSource.PARSING.getText())));
   }

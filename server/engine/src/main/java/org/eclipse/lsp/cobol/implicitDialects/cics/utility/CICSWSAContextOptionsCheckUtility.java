@@ -89,8 +89,8 @@ public class CICSWSAContextOptionsCheckUtility extends CICSOptionsCheckBaseUtili
     private void checkWSAContextBuild(CICSParser.Cics_wsacontext_buildContext ctx) {
         checkHasMandatoryOptions(ctx.BUILD(), ctx, "BUILD");
         checkPrerequisiteIsMet(ctx.RELATESURI(), ctx.RELATESTYPE(), ctx, "RELATESTYPE");
-        checkAllOptionsArePresentOrAbsent("EPRTYPE, EPRFIELD, EPRFROM and EPRLENGTH", ctx,
-                ctx.EPRTYPE(), ctx.EPRFIELD(), ctx.EPRFROM(), ctx.EPRLENGTH());
+        checkAllOptionsArePresentOrAbsent("EPRTYPE, EPRFIELD and EPRFROM", ctx,
+                ctx.EPRTYPE(), ctx.EPRFIELD(), ctx.EPRFROM());
         checkHasMutuallyExclusiveOptions("FROMCCSID or FROMCODEPAGE", ctx.FROMCCSID(), ctx.FROMCODEPAGE());
     }
 
