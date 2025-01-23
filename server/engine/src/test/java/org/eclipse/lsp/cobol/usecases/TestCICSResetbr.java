@@ -33,7 +33,10 @@ public class TestCICSResetbr {
           "RESETBR FILE({$varOne}) RIDFLD({$varTwo})";
 
   private static final String RESETBR_VALID_FULL =
-          "RESETBR FILE({$varOne}) RIDFLD({$varTwo}) KEYLENGTH({$varThree}) GENERIC REQID({$varFour}) SYSID({$varFive}) GTEQ RBA";
+          "RESETBR FILE({$varOne}) RIDFLD({$varTwo}) KEYLENGTH({$varThree}) GENERIC REQID({$varFour}) SYSID({$varFive}) GTEQ";
+
+  private static final String RESETBR_INVALID_FULL =
+          "RESETBR FILE({$varOne}) RIDFLD({$varTwo}) {KEYLENGTH|errorOne}({$varThree}) GENERIC REQID({$varFour}) SYSID({$varFive}) GTEQ {RBA|errorTwo}";
 
   private static final String RESETBR_INVALID_NO_FILE =
           "RESETBR {_RIDFLD({$varOne}) REQID({$varTwo}) EQUAL|errorOne_}";
@@ -58,6 +61,25 @@ public class TestCICSResetbr {
   @Test
   void testResetbrValidFull() {
     CICSTestUtils.noErrorTest(RESETBR_VALID_FULL);
+  }
+
+  @Test
+  void testResetbrInvalidFull() {
+    CICSTestUtils.errorTest(
+            RESETBR_INVALID_FULL,
+            ImmutableMap.of(
+                    "errorOne",
+                    new Diagnostic(
+                            new Range(),
+                            "Exactly one option required, options are mutually exclusive: RBA, RRN, XRBA or KEYLENGTH",
+                            DiagnosticSeverity.Error,
+                            ErrorSource.PARSING.getText()),
+                    "errorTwo",
+                    new Diagnostic(
+                            new Range(),
+                            "Exactly one option required, options are mutually exclusive: RBA, RRN, XRBA or KEYLENGTH",
+                            DiagnosticSeverity.Error,
+                            ErrorSource.PARSING.getText())));
   }
 
   @Test
@@ -107,13 +129,13 @@ public class TestCICSResetbr {
                     "errorOne",
                     new Diagnostic(
                             new Range(),
-                            "Exactly one option required, options are mutually exclusive: RBA, RRN, or XRBA",
+                            "Exactly one option required, options are mutually exclusive: RBA, RRN, XRBA or KEYLENGTH",
                             DiagnosticSeverity.Error,
                             ErrorSource.PARSING.getText()),
                     "errorTwo",
                     new Diagnostic(
                             new Range(),
-                            "Exactly one option required, options are mutually exclusive: RBA, RRN, or XRBA",
+                            "Exactly one option required, options are mutually exclusive: RBA, RRN, XRBA or KEYLENGTH",
                             DiagnosticSeverity.Error,
                             ErrorSource.PARSING.getText())));
   }
