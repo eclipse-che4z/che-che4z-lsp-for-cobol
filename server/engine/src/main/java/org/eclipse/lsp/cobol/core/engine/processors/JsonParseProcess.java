@@ -22,7 +22,7 @@ import org.eclipse.lsp.cobol.common.message.MessageTemplate;
 import org.eclipse.lsp.cobol.common.model.tree.variable.*;
 import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.Processor;
-import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulatorService;
+import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulator;
 import org.eclipse.lsp.cobol.core.model.VariableUsageUtils;
 import org.eclipse.lsp.cobol.common.model.tree.JsonParseNode;
 import org.eclipse.lsp.cobol.common.model.tree.variables.ConditionDataNameNode;
@@ -37,10 +37,10 @@ public class JsonParseProcess implements Processor<JsonParseNode> {
   // TODO: remove undetermined once effective data type calculation is corrected
   public static final ImmutableList<EffectiveDataType> ALPHANUMERIC_DATA_TYPES =
       ImmutableList.of(EffectiveDataType.STRING, EffectiveDataType.INTEGER, EffectiveDataType.UNDETERMINED);
-  private final SymbolAccumulatorService symbolAccumulatorService;
+  private final SymbolAccumulator symbolAccumulator;
 
-  public JsonParseProcess(SymbolAccumulatorService symbolAccumulatorService) {
-    this.symbolAccumulatorService = symbolAccumulatorService;
+  public JsonParseProcess(SymbolAccumulator symbolAccumulator) {
+    this.symbolAccumulator = symbolAccumulator;
   }
 
   /**
@@ -60,7 +60,7 @@ public class JsonParseProcess implements Processor<JsonParseNode> {
       return;
     }
     List<VariableNode> identifierFoundDefinitions =
-            VariableUsageUtils.getDefinitionNode(symbolAccumulatorService, jsonParseNode, identifier1Nodes);
+            VariableUsageUtils.getDefinitionNode(symbolAccumulator, jsonParseNode, identifier1Nodes);
 
     semanticAnalysisForIdentifier1(jsonParseNode, ctx, identifier1Nodes, identifierFoundDefinitions);
     semanticAnalysisForIdentifier2(jsonParseNode, ctx, identifierFoundDefinitions);
@@ -85,12 +85,12 @@ public class JsonParseProcess implements Processor<JsonParseNode> {
   private void semanticAnalysisForCondition(JsonParseNode jsonParseNode, ProcessingContext ctx) {
     List<VariableUsageNode> identifier5Nodes = VariableUsageUtils.getVariableUsageNode(jsonParseNode, jsonParseNode.getIdentifier5());
     List<VariableNode> foundDefinitionsForIdentifier5 =
-            VariableUsageUtils.getDefinitionNode(symbolAccumulatorService, jsonParseNode, identifier5Nodes);
+            VariableUsageUtils.getDefinitionNode(symbolAccumulator, jsonParseNode, identifier5Nodes);
 
     List<VariableUsageNode> conditionNames = VariableUsageUtils.getVariableUsageNode(jsonParseNode, jsonParseNode.getConditionName());
     if (conditionNames.isEmpty()) return;
     List<VariableNode> conditionDefinition =
-            VariableUsageUtils.getDefinitionNode(symbolAccumulatorService, jsonParseNode, conditionNames);
+            VariableUsageUtils.getDefinitionNode(symbolAccumulator, jsonParseNode, conditionNames);
 
     if (foundDefinitionsForIdentifier5.isEmpty() || conditionDefinition.isEmpty()) return;
     conditionDefinition.forEach(
@@ -145,7 +145,7 @@ public class JsonParseProcess implements Processor<JsonParseNode> {
     List<VariableUsageNode> identifier2Nodes = VariableUsageUtils.getVariableUsageNode(jsonParseNode, jsonParseNode.getIdentifier2());
     if (identifier2Nodes.isEmpty()) return;
     List<VariableNode> foundDefinitionsForIdentifier2 =
-            VariableUsageUtils.getDefinitionNode(symbolAccumulatorService, jsonParseNode, identifier2Nodes);
+            VariableUsageUtils.getDefinitionNode(symbolAccumulator, jsonParseNode, identifier2Nodes);
     if (foundDefinitionsForIdentifier2.isEmpty()) return;
     checkValidDefinition(jsonParseNode, ctx, identifier2Nodes, foundDefinitionsForIdentifier2);
     if (!foundDefinitionsForIdentifier2.isEmpty()
@@ -253,7 +253,7 @@ public class JsonParseProcess implements Processor<JsonParseNode> {
     List<VariableUsageNode> identifier5Nodes = VariableUsageUtils.getVariableUsageNode(jsonParseNode, jsonParseNode.getIdentifier5());
     identifier5Nodes.forEach(identifier5 -> {
       List<VariableNode> foundDefinitionsForIdentifier5 =
-              VariableUsageUtils.getDefinitionNode(symbolAccumulatorService, jsonParseNode, Collections.singletonList(identifier5));
+              VariableUsageUtils.getDefinitionNode(symbolAccumulator, jsonParseNode, Collections.singletonList(identifier5));
 
       if (foundDefinitionsForIdentifier5.isEmpty()) {
         return;
@@ -286,13 +286,13 @@ public class JsonParseProcess implements Processor<JsonParseNode> {
       return;
     }
     List<VariableNode> foundDefinitionsForIdentifier2 =
-            VariableUsageUtils.getDefinitionNode(symbolAccumulatorService, jsonParseNode, identifier2Nodes);
+            VariableUsageUtils.getDefinitionNode(symbolAccumulator, jsonParseNode, identifier2Nodes);
 
     List<VariableUsageNode> identifier4Nodes = VariableUsageUtils.getVariableUsageNode(jsonParseNode, jsonParseNode.getIdentifier4());
     if (identifier4Nodes.isEmpty()) return;
     identifier4Nodes.forEach(identifier4 -> {
       List<VariableNode> foundDefinitionsForIdentifier4 =
-              VariableUsageUtils.getDefinitionNode(symbolAccumulatorService, jsonParseNode, Collections.singletonList(identifier4));
+              VariableUsageUtils.getDefinitionNode(symbolAccumulator, jsonParseNode, Collections.singletonList(identifier4));
 
       if (foundDefinitionsForIdentifier2.isEmpty() || foundDefinitionsForIdentifier4.isEmpty()) {
         return;
@@ -327,13 +327,13 @@ public class JsonParseProcess implements Processor<JsonParseNode> {
       return;
     }
     List<VariableNode> foundDefinitionsForIdentifier2 =
-            VariableUsageUtils.getDefinitionNode(symbolAccumulatorService, jsonParseNode, identifier2Nodes);
+            VariableUsageUtils.getDefinitionNode(symbolAccumulator, jsonParseNode, identifier2Nodes);
 
     List<VariableUsageNode> identifier3Nodes = VariableUsageUtils.getVariableUsageNode(jsonParseNode, jsonParseNode.getIdentifier3());
     if (identifier3Nodes.isEmpty()) return;
     identifier3Nodes.forEach(identifier3 -> {
       List<VariableNode> foundDefinitionsForIdentifier3 =
-              VariableUsageUtils.getDefinitionNode(symbolAccumulatorService, jsonParseNode, Collections.singletonList(identifier3));
+              VariableUsageUtils.getDefinitionNode(symbolAccumulator, jsonParseNode, Collections.singletonList(identifier3));
 
       if (foundDefinitionsForIdentifier3.isEmpty() || foundDefinitionsForIdentifier2.isEmpty())
         return;

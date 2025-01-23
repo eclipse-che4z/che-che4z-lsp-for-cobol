@@ -24,15 +24,23 @@ import org.eclipse.lsp4j.Range;
  */
 class InsertMapper implements Mapper {
   @Override
+  public boolean canApply(MappedCharacter startCharacter, MappedCharacter endCharacter) {
+    if (startCharacter == null || endCharacter == null) {
+      return false;
+    }
+    if (startCharacter.getOriginalPosition() == null) {
+      return false;
+    }
+    return !startCharacter.getUri().equals(endCharacter.getUri());
+  }
+
+  @Override
   public Location apply(MappedCharacter startCharacter, MappedCharacter endCharacter) {
-    if (startCharacter != null && !startCharacter.getUri().equals(endCharacter.getUri()) && startCharacter.getOriginalPosition() != null) {
       Map<String, Location> ilm = endCharacter.getInitialLocationMap();
       Location location = ilm != null ? ilm.get(startCharacter.getUri()) : null;
       if (location != null) {
         return new Location(startCharacter.getUri(), new Range(startCharacter.getOriginalPosition(), location.getRange().getEnd()));
       }
       return new Location(startCharacter.getUri(), new Range(startCharacter.getOriginalPosition(), startCharacter.getOriginalPosition()));
-    }
-    return null;
   }
 }

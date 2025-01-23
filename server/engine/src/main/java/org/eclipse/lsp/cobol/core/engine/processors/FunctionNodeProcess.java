@@ -18,20 +18,20 @@ import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
 import org.eclipse.lsp.cobol.common.model.tree.ProgramSubtype;
 import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.Processor;
-import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulatorService;
+import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulator;
 
 /** FunctionNode processor */
 public class FunctionNodeProcess implements Processor<ProgramNode> {
-  private final SymbolAccumulatorService symbolAccumulatorService;
+  private final SymbolAccumulator symbolAccumulator;
 
-  public FunctionNodeProcess(SymbolAccumulatorService symbolAccumulatorService) {
-    this.symbolAccumulatorService = symbolAccumulatorService;
+  public FunctionNodeProcess(SymbolAccumulator symbolAccumulator) {
+    this.symbolAccumulator = symbolAccumulator;
   }
 
   @Override
   public void accept(ProgramNode node, ProcessingContext ctx) {
     if (node.getSubtype() != ProgramSubtype.Function)
       return;
-    symbolAccumulatorService.registerFunctionNode(node).ifPresent(e -> ctx.getErrors().add(e));
+    symbolAccumulator.registerFunctionNode(node).ifPresent(e -> ctx.getErrors().add(e));
   }
 }

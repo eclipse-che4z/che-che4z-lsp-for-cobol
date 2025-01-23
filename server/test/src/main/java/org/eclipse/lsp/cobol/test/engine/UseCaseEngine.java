@@ -25,7 +25,6 @@ import static org.eclipse.lsp.cobol.test.engine.UseCaseUtils.analyze;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Multimap;
 import com.google.gson.JsonElement;
 
 import java.util.*;
@@ -441,7 +440,6 @@ public class UseCaseEngine {
         .map(p -> result.getSymbolTableMap().get(SymbolTable.generateKey(p)))
         .filter(Objects::nonNull)
         .map(SymbolTable::getVariables)
-        .map(Multimap::values)
         .flatMap(Collection::stream)
         .filter(it -> !FILLER_NAME.equals(it.getName()))
         .filter(predicate)

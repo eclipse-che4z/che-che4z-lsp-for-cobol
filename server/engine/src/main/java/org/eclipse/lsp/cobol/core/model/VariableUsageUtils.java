@@ -14,8 +14,6 @@
  */
 package org.eclipse.lsp.cobol.core.model;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import lombok.experimental.UtilityClass;
 import org.eclipse.lsp.cobol.common.model.NodeType;
@@ -25,7 +23,7 @@ import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableUsageNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableWithLevelNode;
 import org.eclipse.lsp.cobol.common.utils.RangeUtils;
-import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulatorService;
+import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulator;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -39,68 +37,44 @@ public class VariableUsageUtils {
    * Return the list of variables matches the list of qualifiers
    *
    * @param definedVariables the map with all defined variables
-   * @param usageNodes usage nodes consists of variable name and parents
+   * @param usagePath usage nodes consists of variable name and parents
    * @return the list of all matched variables
    */
   public static List<VariableNode> findVariablesForUsage(
-      Multimap<String, VariableNode> definedVariables, List<VariableUsageNode> usageNodes) {
-    Map<VariableNode, Integer> variableToStepCountsToMatchParentsMap =
-        findDefinedVariable(usageNodes.get(0).getName(), definedVariables).stream()
-            .map(
-                it ->
-                    mapVariableToStepCountsToMatchParents(
-                        it, usageNodes.subList(1, usageNodes.size())))
-            .reduce(
-                (firstMap, secondMap) -> {
-                  firstMap.putAll(secondMap);
-                  return firstMap;
-                })
-            .orElse(Collections.emptyMap());
+    Multimap<String, VariableNode> definedVariables, List<VariableUsageNode> usagePath) {
+    Collection<VariableNode> candidates = definedVariables.get(usagePath.get(0).getName());
+    List<VariableUsageNode> parents = usagePath.subList(1, usagePath.size());
 
-    List<VariableNode> exactHierarchyMatchedVariables =
-        variableToStepCountsToMatchParentsMap.entrySet().stream()
-            .filter(entry -> entry.getValue().equals(usageNodes.size() - 1))
-            .map(Map.Entry::getKey)
-            .collect(Collectors.toList());
+    Map<VariableNode, Integer> stepToMatchParentsMap = new HashMap<>();
+    for (VariableNode variable : candidates) {
+      countToMatchParents(variable, parents).ifPresent(steps -> stepToMatchParentsMap.put(variable, steps + 1));
+    }
+
+    List<VariableNode> exactHierarchyMatchedVariables = new ArrayList<>();
+    for (Map.Entry<VariableNode, Integer> entry : stepToMatchParentsMap.entrySet()) {
+      if (entry.getValue().equals(usagePath.size())) {
+        exactHierarchyMatchedVariables.add(entry.getKey());
+      }
+    }
 
     return exactHierarchyMatchedVariables.isEmpty()
-        ? new ArrayList<>(variableToStepCountsToMatchParentsMap.keySet())
+        ? new ArrayList<>(stepToMatchParentsMap.keySet())
         : exactHierarchyMatchedVariables;
   }
 
-  private Collection<VariableNode> findDefinedVariable(String name, Multimap<String, VariableNode> definedVariables) {
-    Collection<VariableNode> foundVariable =  definedVariables.get(name);
-    if (foundVariable.size() > 0) {
-      return foundVariable;
-    }
-    Optional<VariableNode> node = definedVariables.values()
-            .stream().flatMap(Node::getDepthFirstStream)
-            .filter(VariableNode.class::isInstance)
-            .map(VariableNode.class::cast)
-            .filter(var -> var.getName().equals(name))
-            .findFirst();
-    if (node.isPresent()) {
-      foundVariable.add(node.get());
-    }
-    return foundVariable;
-  }
-
-  private static Map<VariableNode, Integer> mapVariableToStepCountsToMatchParents(
-      VariableNode variable, List<VariableUsageNode> parents) {
-    VariableNode referredVariable = variable;
+  private static Optional<Integer> countToMatchParents(VariableNode variable, List<VariableUsageNode> usagePath) {
     int count = 0;
-    for (VariableUsageNode parent : parents) {
+    for (VariableUsageNode parent : usagePath) {
       String parentName = parent.getName();
       do {
-
         variable = getNearestParentVariable(variable);
         if (variable == null) {
-          return new HashMap<>();
+          return Optional.empty();
         }
         count++;
       } while (!variable.getName().equals(parentName));
     }
-    return Maps.newHashMap(Collections.singletonMap(referredVariable, count));
+    return Optional.of(count);
   }
 
   private static VariableNode getNearestParentVariable(VariableNode variable) {
@@ -166,19 +140,20 @@ public class VariableUsageUtils {
 
   /**
    * Retrieves variable definition nodes for the passed {@link VariableUsageNode}
-   * @param symbolAccumulatorService instance of {@link SymbolAccumulatorService}
+   * @param symbolAccumulator instance of {@link SymbolAccumulator}
    * @param containerNode  container node for the variableUsage node
    * @param identifiers List of {@link VariableUsageNode}
    * @return List of {@link VariableNode}
    */
-  public List<VariableNode> getDefinitionNode(SymbolAccumulatorService symbolAccumulatorService,
-                                               Node containerNode, List<VariableUsageNode> identifiers) {
-    return containerNode.getProgram()
-            .map(
-                    programNode -> identifiers.stream().map(id -> symbolAccumulatorService.getVariableDefinition(
-                            programNode, Collections.singletonList(id))).collect(Collectors.toList()))
-            .map(e -> e.stream().flatMap(Collection::stream))
-            .map(e1 -> e1.collect(Collectors.toList()))
-            .orElse(ImmutableList.of());
+  public List<VariableNode> getDefinitionNode(SymbolAccumulator symbolAccumulator,
+                                              Node containerNode, List<VariableUsageNode> identifiers) {
+    if (!containerNode.getProgram().isPresent()) {
+      return Collections.emptyList();
+    }
+    List<VariableNode> result = new ArrayList<>();
+    for (VariableUsageNode id : identifiers) {
+      result.addAll(symbolAccumulator.getVariableDefinition(containerNode.getProgram().get(), Collections.singletonList(id)));
+    }
+    return result;
   }
 }

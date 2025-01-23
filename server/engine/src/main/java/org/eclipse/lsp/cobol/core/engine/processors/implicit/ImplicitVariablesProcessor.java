@@ -31,13 +31,15 @@ import org.eclipse.lsp.cobol.common.symbols.VariableAccumulator;
 public class ImplicitVariablesProcessor implements Processor<SectionNode> {
 
   @Override
-  public void accept(SectionNode sectionNode, ProcessingContext processingContext) {
-    if (sectionNode.getSectionType() == SectionType.WORKING_STORAGE) {
-      VariableAccumulator variableAccumulator = processingContext.getVariableAccumulator();
-      ProgramNode programNode = sectionNode.getProgram()
-              .orElseThrow(() -> new RuntimeException("Program for section " + sectionNode.getSectionType() + " not found"));
-      registerVariables(variableAccumulator, programNode, SRImplicitVariablesGenerator.generate());
-    }
+  public void accept(SectionNode sectionNode, ProcessingContext ctx) {
+      if (sectionNode.getSectionType() != SectionType.WORKING_STORAGE) {
+          return;
+      }
+      if (ctx.getCurrentProgramNode() == null) {
+        throw new RuntimeException("Program for section " + sectionNode.getSectionType() + " not found");
+      }
+      VariableAccumulator variableAccumulator = ctx.getVariableAccumulator();
+      registerVariables(variableAccumulator, ctx.getCurrentProgramNode(), SRImplicitVariablesGenerator.generate());
   }
 
   private void registerVariables(VariableAccumulator variableAccumulator, ProgramNode programNode, List<VariableNode> nodes) {

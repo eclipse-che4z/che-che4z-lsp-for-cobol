@@ -17,19 +17,19 @@ package org.eclipse.lsp.cobol.core.engine.processors;
 import org.eclipse.lsp.cobol.common.model.tree.SectionNode;
 import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.Processor;
-import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulatorService;
+import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulator;
 
 /** SectionNode processor */
 public class SectionNodeProcessor implements Processor<SectionNode> {
-  private final SymbolAccumulatorService symbolAccumulatorService;
+  private final SymbolAccumulator symbolAccumulator;
 
-  public SectionNodeProcessor(SymbolAccumulatorService symbolAccumulatorService) {
-    this.symbolAccumulatorService = symbolAccumulatorService;
+  public SectionNodeProcessor(SymbolAccumulator symbolAccumulator) {
+    this.symbolAccumulator = symbolAccumulator;
   }
 
   @Override
   public void accept(SectionNode node, ProcessingContext ctx) {
     ctx.getErrors().addAll(SectionNodeProcessorHelper.processNodeWithVariableDefinitions(node));
-    symbolAccumulatorService.registerVariablesInProgram(node);
+    symbolAccumulator.registerVariablesInProgram(node);
   }
 }

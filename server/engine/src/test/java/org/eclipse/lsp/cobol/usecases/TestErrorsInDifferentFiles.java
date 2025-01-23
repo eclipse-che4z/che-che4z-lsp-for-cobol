@@ -45,7 +45,7 @@ class TestErrorsInDifferentFiles {
           + "8      End program ProgramId.";
 
   private static final String ASDASD =
-          "           {#*03|areaA11}  {#*CHILD1|child11|waria}         {PIC|dot} 9   VALUE IS '0'.";
+          "           03  {CHILD1|child1|child11}         {PIC|dot} 9   VALUE IS '0'.";
 
   private static final String ASDASD_NAME = "ASDASD";
 
@@ -64,20 +64,14 @@ class TestErrorsInDifferentFiles {
                     "child1",
                     new Diagnostic(
                             new Range(),
-                            "Syntax error on 'CHILD1'",
-                            Error,
-                            ErrorSource.COPYBOOK.getText()),
+                            "A misspelled word, maybe you want to put CHILD",
+                            Warning,
+                            ErrorSource.PARSING.getText()),
                     "child11",
                     new Diagnostic(
                             new Range(),
                             "Syntax error on 'CHILD1'",
                             Error,
-                            ErrorSource.PARSING.getText()),
-                    "areaA11",
-                    new Diagnostic(
-                            new Range(),
-                            "The following token must start in Area A: 03",
-                            Warning,
                             ErrorSource.PARSING.getText()),
                     "error",
                     new Diagnostic(
@@ -85,12 +79,6 @@ class TestErrorsInDifferentFiles {
                             "Errors inside the copybook",
                             Error,
                             ErrorSource.COPYBOOK.getText()),
-                    "waria",
-                    new Diagnostic(
-                            new Range(),
-                            "The following token must start in Area A: CHILD1",
-                            Warning,
-                            ErrorSource.PARSING.getText()),
                     "dot",
                     new Diagnostic(
                             new Range(),
