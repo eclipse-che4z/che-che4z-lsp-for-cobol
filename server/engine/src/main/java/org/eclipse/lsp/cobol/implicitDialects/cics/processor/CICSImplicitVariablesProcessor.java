@@ -28,17 +28,19 @@ import org.eclipse.lsp.cobol.implicitDialects.cics.generator.CICSSRImplicitVaria
 public class CICSImplicitVariablesProcessor implements Processor<SectionNode> {
 
   @Override
-  public void accept(SectionNode sectionNode, ProcessingContext processingContext) {
+  public void accept(SectionNode sectionNode, ProcessingContext ctx) {
     final SectionType st = sectionNode.getSectionType();
     final boolean lstor = st == SectionType.LINKAGE;
     final boolean wstor = st == SectionType.WORKING_STORAGE;
     if (!lstor && !wstor)
       return;
 
-    final VariableAccumulator variableAccumulator = processingContext.getVariableAccumulator();
-    final ProgramNode programNode = sectionNode
-        .getProgram()
-        .orElseThrow(() -> new RuntimeException("Program for section " + st + " not found"));
+    final VariableAccumulator variableAccumulator = ctx.getVariableAccumulator();
+    if (ctx.getCurrentProgramNode() == null) {
+      throw new RuntimeException("Program for section " + st + " not found");
+    }
+
+    final ProgramNode programNode = ctx.getCurrentProgramNode();
 
     if (lstor)
       registerVariable(variableAccumulator, programNode, CICSBulkImplicitVariablesGenerator.generate());

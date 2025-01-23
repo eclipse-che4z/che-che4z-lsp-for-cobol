@@ -21,191 +21,179 @@ import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.message.MessageTemplate;
-import org.eclipse.lsp.cobol.common.model.FileOperationKind;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.NodeType;
 import org.eclipse.lsp.cobol.common.model.tree.FileOperationStatementNode;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.model.tree.OpenStatementNode;
+import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.QualifiedReferenceNode;
+import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNameAndLocality;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNode;
-import org.eclipse.lsp.cobol.common.model.tree.variable.VariableWithLevelNode;
 import org.eclipse.lsp.cobol.common.model.tree.variables.FileDescriptionNode;
 import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.Processor;
+import org.eclipse.lsp.cobol.common.symbols.SymbolTable;
+import org.eclipse.lsp.cobol.common.model.FileOperationKind;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
-import static org.eclipse.lsp.cobol.common.model.NodeType.OPEN_STATEMENT;
-import static org.eclipse.lsp.cobol.common.model.NodeType.PROGRAM;
+import static org.eclipse.lsp.cobol.common.model.FileOperationKind.*;
 
 /** File operation process */
 @Slf4j
 public class FileOperationProcess implements Processor<FileOperationStatementNode> {
-
   @Override
   public void accept(FileOperationStatementNode node, ProcessingContext ctx) {
-    if (node.getNodeType() == NodeType.READ_STATEMENT) {
-      checkFileOpenedBeforeOperation(
-          node,
-          ImmutableList.of(FileOperationKind.I_O, FileOperationKind.INPUT),
-          ctx,
-          "readFileOperation.notOpened");
+    if (ctx.getCurrentProgramNode() == null) {
+      return;
     }
-
-    if (node.getNodeType() == NodeType.WRITE_STATEMENT) {
-      checkFileOpenedForWrite(
-          node,
-          ImmutableList.of(
-              FileOperationKind.I_O, FileOperationKind.OUTPUT, FileOperationKind.EXTEND),
-          ctx,
-          "writeFileOperation.notOpened");
-    }
-
-    if (node.getNodeType() == NodeType.REWRITE_STATEMENT) {
-      checkFileOpenedForWrite(
-          node, ImmutableList.of(FileOperationKind.I_O), ctx, "rewriteFileOperation.notOpened");
-    }
-
-    if (node.getNodeType() == NodeType.DELETE_STATEMENT) {
-      checkFileOpenedBeforeOperation(
-          node, ImmutableList.of(FileOperationKind.I_O), ctx, "deleteFileOperation.notOpened");
-    }
-
-    if (node.getNodeType() == NodeType.START_STATEMENT) {
-      checkFileOpenedBeforeOperation(
-          node,
-          ImmutableList.of(FileOperationKind.I_O, FileOperationKind.INPUT),
-          ctx,
-          "startFileOperation.notOpened");
+      switch (node.getNodeType()) {
+        case WRITE_STATEMENT: checkFileOpenedForWrite(node, ImmutableList.of(I_O, OUTPUT, EXTEND), ctx); break;
+        case REWRITE_STATEMENT: checkFileOpenedForWrite(node, ImmutableList.of(I_O), ctx); break;
+        case DELETE_STATEMENT: checkFileOpenedBeforeOperation(findFileDescriptionNode(node.getFilename().getName(), ctx), node, ImmutableList.of(I_O), ctx); break;
+        case READ_STATEMENT:
+        case START_STATEMENT:
+            checkFileOpenedBeforeOperation(findFileDescriptionNode(node.getFilename().getName(), ctx), node, ImmutableList.of(I_O, INPUT), ctx); break;
+        default:
+            break;
     }
   }
 
   private void checkFileOpenedBeforeOperation(
+      FileDescriptionNode fd,
       FileOperationStatementNode node,
       List<FileOperationKind> expectedFileKind,
-      ProcessingContext ctx,
-      String messageTemplate) {
-    if (fileIsExternal(node)) {
+      ProcessingContext ctx) {
+    VariableNameAndLocality filename = node.getFilename();
+    if (fd == null) {
+      reportMissingFileDescription(node, ctx);
+      return;
+    }
+    if (fd.isExternal()) {
       return;
     }
     checkFileOpenedBeforeOperation(
-        node,
-        node.getFilename().getName(),
-        node.getFilename().getLocality(),
-        expectedFileKind,
-        ctx,
-        messageTemplate);
+            filename.getName(),
+            filename.getLocality(),
+            expectedFileKind,
+            ctx.getCurrentProgramNode(),
+            getErrorMessageTemplateId(node.getNodeType())).ifPresent(ctx.getErrors()::add);
   }
 
-  private boolean fileIsExternal(FileOperationStatementNode node) {
-    if (!node.getNearestParentByType(PROGRAM).isPresent()) return false;
-    Optional<FileDescriptionNode> fileDescriptionNode =
-        node.getNearestParentByType(PROGRAM)
-            .get()
-            .getDepthFirstStream()
-            .filter(FileDescriptionNode.class::isInstance)
-            .map(FileDescriptionNode.class::cast)
-            .filter(fdNode -> fdNode.getName().equalsIgnoreCase(node.getFilename().getName()))
-            .findFirst();
-    return fileDescriptionNode.map(FileDescriptionNode::isExternal).orElse(false);
-  }
-
-  private void checkFileOpenedBeforeOperation(
-      Node node,
+    private static Optional<SyntaxError> checkFileOpenedBeforeOperation(
       String filename,
       Locality errorLocality,
       List<FileOperationKind> expectedFileKind,
-      ProcessingContext ctx,
+      ProgramNode programNode,
       String messageTemplate) {
-    node.getNearestParentByType(NodeType.PROGRAM)
-        .ifPresent(
-            pnode -> {
-              boolean isFileOpened =
-                  pnode
-                      .getDepthFirstStream()
-                      .filter(Node.hasType(OPEN_STATEMENT))
-                      .map(OpenStatementNode.class::cast)
-                      .anyMatch(
-                          n ->
-                              n.getFilename().getName().equalsIgnoreCase(filename)
-                                  && expectedFileKind.contains(n.getFileOperationKind()));
-              if (!isFileOpened && Objects.nonNull(errorLocality)) {
-                ctx.getErrors()
-                    .add(
-                        SyntaxError.syntaxError()
-                            .errorSource(ErrorSource.PARSING)
-                            .severity(ErrorSeverity.WARNING)
-                            .location(errorLocality.toOriginalLocation())
-                            .messageTemplate(MessageTemplate.of(messageTemplate))
-                            .build());
-              }
-            });
+
+    if (errorLocality == null) {
+      return Optional.empty();
+    }
+
+    if (!isFileOpen(programNode, filename, expectedFileKind)) {
+      return Optional.of(
+          SyntaxError.syntaxError()
+              .errorSource(ErrorSource.PARSING)
+              .severity(ErrorSeverity.WARNING)
+              .location(errorLocality.toOriginalLocation())
+              .messageTemplate(MessageTemplate.of(messageTemplate))
+              .build());
+    }
+    return Optional.empty();
+  }
+
+  private static boolean isFileOpen(ProgramNode programNode, String filename, List<FileOperationKind> expectedFileKind) {
+    return null != programNode.findFirstNodeInSubtree(n -> {
+        if (n.getNodeType() != NodeType.OPEN_STATEMENT) {
+          return false;
+        }
+        OpenStatementNode osn = (OpenStatementNode) n;
+        if (!expectedFileKind.contains(osn.getFileOperationKind())) {
+          return false;
+        }
+        return osn.getFilename().getName().equalsIgnoreCase(filename);
+    });
   }
 
   private void checkFileOpenedForWrite(
-      FileOperationStatementNode node,
+      FileOperationStatementNode opNode,
       List<FileOperationKind> expectedFileKind,
-      ProcessingContext ctx,
-      String messageTemplate) {
-    List<QualifiedReferenceNode> listOfWriteVariables =
-        node.getChildren().stream()
-            .filter(n -> node.getFilename().getLocality().equals(n.getLocality()))
-            .filter(Node.hasType(NodeType.QUALIFIED_REFERENCE_NODE))
-            .map(QualifiedReferenceNode.class::cast)
-            .collect(Collectors.toList());
-    if (listOfWriteVariables.size() != 1) {
-      return;
-    }
-
-    QualifiedReferenceNode writeVariable = listOfWriteVariables.get(0);
-
-    writeVariable
+      ProcessingContext ctx) {
+      QualifiedReferenceNode qrn = null;
+      for (Node child : opNode.getChildren()) {
+          if (child.getNodeType() == NodeType.QUALIFIED_REFERENCE_NODE
+                  && opNode.getFilename().getLocality().equals(child.getLocality())) {
+              qrn = (QualifiedReferenceNode) child;
+              break;
+          }
+      }
+      if (qrn == null) {
+          return;
+      }
+      qrn
         .getVariableDefinitionNode()
         .ifPresent(
             defNode ->
-                node.getNearestParentByType(NodeType.PROGRAM)
-                    .ifPresent(
-                        checkFileOpenedForWrite(
-                            node, expectedFileKind, ctx, messageTemplate, defNode)));
+                Optional.ofNullable(ctx.getCurrentProgramNode()).ifPresent(program ->
+                        checkFileOpenedForWrite(program, opNode, expectedFileKind, ctx, defNode)));
   }
 
-  private Consumer<Node> checkFileOpenedForWrite(
-      FileOperationStatementNode node,
-      List<FileOperationKind> expectedFileKind,
-      ProcessingContext ctx,
-      String messageTemplate,
-      VariableNode defNode) {
-    return programNode -> {
-      Optional<FileDescriptionNode> fileDescriptionNode =
-          programNode
-              .getDepthFirstStream()
-              .filter(FileDescriptionNode.class::isInstance)
-              .map(FileDescriptionNode.class::cast)
-              .filter(
-                  n ->
-                      n.getChildren().stream()
-                          .filter(VariableWithLevelNode.class::isInstance)
-                          .map(VariableWithLevelNode.class::cast)
-                          .collect(Collectors.toList())
-                          .contains(defNode))
-              .findFirst();
+  private static void checkFileOpenedForWrite(
+          Node programNode,
+          FileOperationStatementNode opNode,
+          List<FileOperationKind> expectedFileKind,
+          ProcessingContext ctx,
+          VariableNode defNode) {
 
-      fileDescriptionNode.ifPresent(
-          node1 -> {
-            if (!node1.isExternal())
-              checkFileOpenedBeforeOperation(
-                  node,
-                  node1.getName(),
-                  node.getFilename().getLocality(),
-                  expectedFileKind,
-                  ctx,
-                  messageTemplate);
-          });
-    };
+      FileDescriptionNode fileDescriptionNode = (FileDescriptionNode) programNode.findFirstNodeInSubtree(n -> {
+          if (!(n instanceof FileDescriptionNode)) {
+              return false;
+          }
+          return n.getChildren().contains(defNode);
+      });
+      if (fileDescriptionNode == null || fileDescriptionNode.isExternal()) {
+          return;
+      }
+      checkFileOpenedBeforeOperation(
+              fileDescriptionNode.getName(),
+              opNode.getFilename().getLocality(),
+              expectedFileKind, ctx.getCurrentProgramNode(), getErrorMessageTemplateId(opNode.getNodeType()))
+                .ifPresent(ctx.getErrors()::add);
+  }
+
+  private static void reportMissingFileDescription(FileOperationStatementNode node, ProcessingContext ctx) {
+    ctx.getErrors().add(SyntaxError.syntaxError()
+            .errorSource(ErrorSource.PARSING)
+            .severity(ErrorSeverity.WARNING)
+            .location(node.getFilename().getLocality().toOriginalLocation())
+            .messageTemplate(MessageTemplate.of(getErrorMessageTemplateId(node.getNodeType())))
+            .build());
+  }
+
+  private static String getErrorMessageTemplateId(NodeType nodeType) {
+    switch (nodeType) {
+      case READ_STATEMENT: return "readFileOperation.notOpened";
+      case WRITE_STATEMENT: return "writeFileOperation.notOpened";
+      case REWRITE_STATEMENT: return "rewriteFileOperation.notOpened";
+      case DELETE_STATEMENT: return "deleteFileOperation.notOpened";
+      case START_STATEMENT: return "startFileOperation.notOpened";
+      default: return null;
+    }
+  }
+
+  private static FileDescriptionNode findFileDescriptionNode(String filename, ProcessingContext ctx) {
+    SymbolTable symTable = ctx.getVariableAccumulator().getSymbolTable(ctx.getCurrentProgramNode());
+    while (symTable != null) {
+      for (VariableNode variableNode : symTable.findVariables(filename)) {
+        if (variableNode instanceof FileDescriptionNode) {
+          return (FileDescriptionNode) variableNode;
+        }
+      }
+      symTable = symTable.getParent();
+    }
+    return null;
   }
 }

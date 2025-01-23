@@ -35,7 +35,7 @@ public class TestCicsDiscard {
   private static final String DISCARD_AUTINSTMODEL_VALID = "DISCARD AUTINSTMODEL({$varFour}) RESP({$varOne})";
   private static final String DISCARD_BUNDLE_VALID = "DISCARD BUNDLE({$varFour})";
   private static final String DISCARD_CONNECTION_VALID = "DISCARD RESP({$varOne}) CONNECTION({$varFour})";
-  private static final String DISCARD_DB2CONN_VALID = "DISCARD DB2CONN({$varFour})";
+  private static final String DISCARD_DB2CONN_VALID = "DISCARD DB2CONN";
   private static final String DISCARD_DB2ENTRY_VALID = "DISCARD DB2ENTRY({$varFour}) NOHANDLE";
   private static final String DISCARD_DB2TRAN_VALID = "DISCARD DB2TRAN({$varFour})";
   private static final String DISCARD_DOCTEMPLATE_VALID = "DISCARD NOHANDLE DOCTEMPLATE({$varFour}) RESP({$varOne})";
@@ -46,7 +46,7 @@ public class TestCicsDiscard {
   private static final String DISCARD_JOURNALNAME_VALID = "DISCARD JOURNALNAME({$varFour})";
   private static final String DISCARD_JVMSERVER_VALID = "DISCARD NOHANDLE JVMSERVER({$varFour})";
   private static final String DISCARD_LIBRARY_VALID = "DISCARD LIBRARY({$varFour})";
-  private static final String DISCARD_MQCONN_VALID = "DISCARD MQCONN({$varFour}) RESP({$varOne})";
+  private static final String DISCARD_MQCONN_VALID = "DISCARD MQCONN RESP({$varOne})";
   private static final String DISCARD_MQMONITOR_VALID = "DISCARD MQMONITOR({$varFour})";
   private static final String DISCARD_PARTNER_VALID = "DISCARD PARTNER({$varFour})";
   private static final String DISCARD_PIPELINE_VALID = "DISCARD RESP({$varOne}) PIPELINE({$varFour})";

@@ -22,7 +22,7 @@ import org.eclipse.lsp.cobol.common.message.MessageTemplate;
 import org.eclipse.lsp.cobol.common.model.tree.variable.*;
 import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.Processor;
-import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulatorService;
+import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulator;
 import org.eclipse.lsp.cobol.core.model.NodeUtils;
 import org.eclipse.lsp.cobol.core.model.VariableUsageUtils;
 import org.eclipse.lsp.cobol.common.model.tree.JsonGenerateNode;
@@ -42,10 +42,10 @@ import static org.eclipse.lsp.cobol.common.OutlineNodeNames.FILLER_NAME;
 public class JsonGenerateProcess implements Processor<JsonGenerateNode> {
   public static final ImmutableList<EffectiveDataType> IDENTIFIER3_DATA_TYPES =
           ImmutableList.of(EffectiveDataType.INTEGER, EffectiveDataType.REAL, EffectiveDataType.UNDETERMINED);
-  private final SymbolAccumulatorService symbolAccumulatorService;
+  private final SymbolAccumulator symbolAccumulator;
 
-  public JsonGenerateProcess(SymbolAccumulatorService symbolAccumulatorService) {
-    this.symbolAccumulatorService = symbolAccumulatorService;
+  public JsonGenerateProcess(SymbolAccumulator symbolAccumulator) {
+    this.symbolAccumulator = symbolAccumulator;
   }
 
   /**
@@ -59,14 +59,14 @@ public class JsonGenerateProcess implements Processor<JsonGenerateNode> {
     List<VariableUsageNode> identifier1Nodes = VariableUsageUtils.getVariableUsageNode(jsonGenerateNode, jsonGenerateNode.getIdentifier1());
     if (identifier1Nodes.isEmpty()) return;
     List<VariableNode> identifier1FoundDefinitions =
-            VariableUsageUtils.getDefinitionNode(symbolAccumulatorService, jsonGenerateNode, identifier1Nodes);
+            VariableUsageUtils.getDefinitionNode(symbolAccumulator, jsonGenerateNode, identifier1Nodes);
     if (identifier1FoundDefinitions.isEmpty()) return;
     semanticAnalysisForIdentifier1(processingContext, identifier1Nodes, identifier1FoundDefinitions);
 
     List<VariableUsageNode> identifier2Nodes = VariableUsageUtils.getVariableUsageNode(jsonGenerateNode, jsonGenerateNode.getIdentifier2());
     if (identifier2Nodes.isEmpty()) return;
     List<VariableNode> identifier2FoundDefinitions =
-            VariableUsageUtils.getDefinitionNode(symbolAccumulatorService, jsonGenerateNode, identifier2Nodes);
+            VariableUsageUtils.getDefinitionNode(symbolAccumulator, jsonGenerateNode, identifier2Nodes);
     if (identifier2FoundDefinitions.isEmpty()) return;
     semanticAnalysisForIdentifier2(processingContext, identifier2Nodes, identifier2FoundDefinitions, identifier1FoundDefinitions);
 
@@ -74,7 +74,7 @@ public class JsonGenerateProcess implements Processor<JsonGenerateNode> {
       List<VariableUsageNode> identifier3Nodes = VariableUsageUtils.getVariableUsageNode(jsonGenerateNode, jsonGenerateNode.getIdentifier3());
       if (identifier3Nodes.isEmpty()) return;
       List<VariableNode> identifier3FoundDefinitions =
-              VariableUsageUtils.getDefinitionNode(symbolAccumulatorService, jsonGenerateNode, identifier3Nodes);
+              VariableUsageUtils.getDefinitionNode(symbolAccumulator, jsonGenerateNode, identifier3Nodes);
       semanticAnalysisForIdentifier3(
           processingContext,
           identifier3Nodes,
@@ -101,7 +101,7 @@ public class JsonGenerateProcess implements Processor<JsonGenerateNode> {
       VariableNameAndLocality identifier6 = phase.getIdentifier6();
       List<VariableUsageNode> identifier6Nodes = VariableUsageUtils.getVariableUsageNode(jsonGenerateNode, identifier6);
       List<VariableNode> foundDefinitionsForIdentifier6 =
-              VariableUsageUtils.getDefinitionNode(symbolAccumulatorService, jsonGenerateNode, identifier6Nodes);
+              VariableUsageUtils.getDefinitionNode(symbolAccumulator, jsonGenerateNode, identifier6Nodes);
       if (foundDefinitionsForIdentifier6.isEmpty()) return;
       if (Objects.nonNull(phase.getConditionNames())) {
         semanticCheckForCondition(jsonGenerateNode, ctx, phase, foundDefinitionsForIdentifier6);
@@ -127,7 +127,7 @@ public class JsonGenerateProcess implements Processor<JsonGenerateNode> {
   private void semanticCheckForCondition(JsonGenerateNode jsonGenerateNode, ProcessingContext ctx, JsonGenerateNode.JsonGenPhase phase, List<VariableNode> foundDefinitionsForIdentifier6) {
     List<VariableUsageNode> conditionNodes = VariableUsageUtils.getVariableUsageNode(jsonGenerateNode, phase.getConditionNames());
     List<VariableNode> conditionNodeDefn =
-            VariableUsageUtils.getDefinitionNode(symbolAccumulatorService, jsonGenerateNode, conditionNodes);
+            VariableUsageUtils.getDefinitionNode(symbolAccumulator, jsonGenerateNode, conditionNodes);
     if (foundDefinitionsForIdentifier6
             .get(0)
             .getDepthFirstStream()
@@ -153,7 +153,7 @@ public class JsonGenerateProcess implements Processor<JsonGenerateNode> {
     List<VariableUsageNode> identifier5Nodes = VariableUsageUtils.getVariableUsageNode(jsonGenerateNode, jsonGenerateNode.getIdentifier5());
     identifier5Nodes.forEach(identifier5 -> {
       List<VariableNode> foundDefinitionsForIdentifier5 =
-              VariableUsageUtils.getDefinitionNode(symbolAccumulatorService, jsonGenerateNode, Collections.singletonList(identifier5));
+              VariableUsageUtils.getDefinitionNode(symbolAccumulator, jsonGenerateNode, Collections.singletonList(identifier5));
       if (foundDefinitionsForIdentifier5.isEmpty() || identifier2FoundDefinitions.isEmpty()) {
         return;
       }
@@ -186,7 +186,7 @@ public class JsonGenerateProcess implements Processor<JsonGenerateNode> {
     List<VariableUsageNode> identifier4Nodes = VariableUsageUtils.getVariableUsageNode(jsonGenerateNode, jsonGenerateNode.getIdentifier4());
     identifier4Nodes.forEach(identifier4 -> {
       List<VariableNode> foundDefinitionsForIdentifier4 =
-              VariableUsageUtils.getDefinitionNode(symbolAccumulatorService, jsonGenerateNode, Collections.singletonList(identifier4));
+              VariableUsageUtils.getDefinitionNode(symbolAccumulator, jsonGenerateNode, Collections.singletonList(identifier4));
       if (foundDefinitionsForIdentifier4.isEmpty() || identifier2FoundDefinitions.isEmpty()) {
         return;
       }

@@ -39,7 +39,13 @@ public class TestCICSGet {
       "GET CONTAINER({$varOne}) ACTIVITY({$varOne}) INTO(100) {INTO|errorOne}(100) ";
 
   private static final String CONTAINER_BTS_INVALID_TWO =
-      "GET CONTAINER(100)  {ACQACTIVITY|errorOne} {PROCESS|errorTwo} {ACQPROCESS|errorThree} SET({$varTwo})";
+      "GET CONTAINER(100)  {ACQACTIVITY|errorOne} {PROCESS|errorTwo} {ACQPROCESS|errorThree} SET({$varTwo}) FLENGTH({$varTwo})";
+
+  private static final String CONTAINER_BTS_INVALID_THREE =
+          "GET {_CONTAINER({$varTwo})  ACQACTIVITY SET(100)|errorOne_}";
+
+  private static final String CONTAINER_BTS_INVALID_FOUR =
+          "GET {_CONTAINER({$varTwo})  ACQPROCESS NODATA|errorOne_}";
 
   private static final String CONTAINER_CHANNEL_VALID_ONE =
       "GET CONTAINER({$varOne}) CHANNEL({$varTwo}) INTO({$varThree}) FLENGTH({$varFour})";
@@ -117,6 +123,32 @@ public class TestCICSGet {
                 "Exactly one option required, options are mutually exclusive: ACTIVITY or ACQACTIVITY or PROCESS or ACQPROCESS",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())));
+  }
+
+  @Test
+  void testContainerBTSInvalidThree() {
+    CICSTestUtils.errorTest(
+            CONTAINER_BTS_INVALID_THREE,
+            ImmutableMap.of(
+                    "errorOne",
+                    new Diagnostic(
+                            new Range(),
+                            "Missing required option: FLENGTH",
+                            DiagnosticSeverity.Error,
+                            ErrorSource.PARSING.getText())));
+  }
+
+  @Test
+  void testContainerBTSInvalidFour() {
+    CICSTestUtils.errorTest(
+            CONTAINER_BTS_INVALID_FOUR,
+            ImmutableMap.of(
+                    "errorOne",
+                    new Diagnostic(
+                            new Range(),
+                            "Missing required option: FLENGTH",
+                            DiagnosticSeverity.Error,
+                            ErrorSource.PARSING.getText())));
   }
 
   @Test

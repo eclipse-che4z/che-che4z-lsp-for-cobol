@@ -19,6 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import com.google.common.collect.ArrayListMultimap;
@@ -38,11 +39,11 @@ public class VariableUsageUtilsTest {
     @Test
     void testFindVariablesForUsage() {
         VariableUsageNode usageNode1 = new VariableUsageNode("SQLCA-ERR-MSG", locality);
-        List<VariableUsageNode> usageNodes = Arrays.asList(usageNode1);
+        List<VariableUsageNode> usageNodes = Collections.singletonList(usageNode1);
         VariableNode variableNode1 = new ElementaryItemNode(locality, 10, "SQLCA-ERR-MSG", false, "X(80)",
                 null, UsageFormat.UNDEFINED, false, false, false);
         Multimap<String, VariableNode> definedVariables = ArrayListMultimap.create();
-        definedVariables.put("SQLCA", datacomNodes.get(0));
+        datacomNodes.forEach(n -> n.getDepthFirstStream().forEach(v -> definedVariables.put(((VariableNode) v).getName(), (VariableNode) v)));
         List<VariableNode> result = VariableUsageUtils.findVariablesForUsage(definedVariables, usageNodes);
 
         assertEquals(1, result.size());

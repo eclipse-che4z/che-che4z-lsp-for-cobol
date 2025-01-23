@@ -47,7 +47,7 @@ class TestSyntaxErrorTraversedThroughHierarchy {
   private static final String CONT = "       {_COPY {~REPL}.|1_}";
   private static final String CONT_NAME = "CONT";
 
-  private static final String REPL = "       {#*05} {#*TAG-ID|3} {PIC|4} 9.\n";
+  private static final String REPL = "       05 {TAG-ID|3} {PIC|4} 9.\n";
   private static final String REPL_NAME = "REPL";
 
   @Test
