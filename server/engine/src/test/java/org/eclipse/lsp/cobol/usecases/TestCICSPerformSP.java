@@ -114,9 +114,9 @@ public class TestCICSPerformSP {
             "PERFORM SECDISCOVERY {WRITE|error} {ACTION|error2}({$varOne})";
     private static final String PERFORM_SECURITY_INVALID =
             "PERFORM {SECURITY|error}";
-    private static final String PERFORM_SHUTDOWN_MUTUALEX_INVALID=
+    private static final String PERFORM_SHUTDOWN_MUTUALEX_INVALID =
             "PERFORM SHUTDOWN {PLT|error}({$varFour}) {PLTNAME|error2}({$varFour})";
-    private static final String PERFORM_SHUTDOWN_MUTUALEX2_INVALID=
+    private static final String PERFORM_SHUTDOWN_MUTUALEX2_INVALID =
             "PERFORM SHUTDOWN {SDTRAN|error}({$varFour}) {NOSDTRAN|error2}";
     private static final String PERFORM_SSL_INVALID =
             "PERFORM {SSL|error}";
