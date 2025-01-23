@@ -52,7 +52,7 @@ public class RootNode extends Node {
    * @return the list of program nodes, can be empty.
    */
   public List<ProgramNode> findPrograms() {
-    return getChildren().stream().filter(hasType(PROGRAM))
+    return getDepthFirstStream().filter(hasType(PROGRAM))
             .map(ProgramNode.class::cast)
             .collect(Collectors.toList());
   }

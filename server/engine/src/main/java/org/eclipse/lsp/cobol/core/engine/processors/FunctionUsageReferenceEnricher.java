@@ -18,16 +18,12 @@ import lombok.AllArgsConstructor;
 import org.eclipse.lsp.cobol.common.model.NodeType;
 import org.eclipse.lsp.cobol.common.model.tree.FunctionReference;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
-import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.QualifiedReferenceNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableUsageNode;
 import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.Processor;
-import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulatorService;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import org.eclipse.lsp.cobol.core.engine.symbols.FunctionInfo;
+import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulator;
 
 /**
  * Enriches the @{@link QualifiedReferenceNode}'s children by replacing the Variable node
@@ -35,23 +31,25 @@ import java.util.stream.Collectors;
  */
 @AllArgsConstructor
 public class FunctionUsageReferenceEnricher implements Processor<QualifiedReferenceNode> {
-  private final SymbolAccumulatorService symbolAccumulatorService;
+  private final SymbolAccumulator symbolAccumulator;
 
   @Override
-  public void accept(QualifiedReferenceNode node, ProcessingContext processingContext) {
-    Optional<ProgramNode> program = node.getProgram();
-    if (!program.isPresent()) return;
-    List<VariableUsageNode> usageNodes =
-        node.getChildren().stream()
-            .filter(Node.hasType(NodeType.VARIABLE_USAGE))
-            .map(VariableUsageNode.class::cast)
-            .collect(Collectors.toList());
-
-    if (usageNodes.isEmpty()) {
+  public void accept(QualifiedReferenceNode node, ProcessingContext ctx) {
+    if (ctx.getCurrentProgramNode() == null) {
       return;
     }
 
-    VariableUsageNode dataNameNode = usageNodes.get(0);
+    VariableUsageNode dataNameNode = null;
+    for (Node child : node.getChildren()) {
+      if (child.getNodeType() == NodeType.VARIABLE_USAGE) {
+        dataNameNode = (VariableUsageNode) child;
+        break;
+      }
+    }
+
+    if (dataNameNode == null) {
+      return;
+    }
 
     // If definition of a data node is present, this signifies that this dataNode already has a variable definition
     // and shouldn't try to enrich it further.
@@ -59,8 +57,8 @@ public class FunctionUsageReferenceEnricher implements Processor<QualifiedRefere
     if (!dataNameNode.getDefinitions().isEmpty()) {
       return;
     }
-    SymbolAccumulatorService.FunctionInfo functionInfo =
-        symbolAccumulatorService.getFunctionReference(dataNameNode.getName(), program.get(), false);
+    FunctionInfo functionInfo =
+        symbolAccumulator.getFunctionReference(dataNameNode.getName(), ctx.getCurrentProgramNode(), false);
 
     if (functionInfo == null) {
       return;

@@ -466,7 +466,7 @@ public class TestSqlHostVariable {
   void testLobVariables_dbclobPicClause_sizePrefix() {
     AnalysisResult actual = UseCaseEngine.runTest(LOD_VARS_TEXT_DBCLOB, ImmutableList.of(), ImmutableMap.of());
     actual.getSymbolTableMap().values().stream()
-            .findFirst().flatMap(firstSymbolTable -> firstSymbolTable.getVariables().values().stream()
+            .findFirst().flatMap(firstSymbolTable -> firstSymbolTable.getVariables().stream()
                     .filter(item -> "VAS-DATA".equals(item.getName()))
                     .findFirst())
             .ifPresent(varNode -> assertEquals("G(10 K)", ((ElementaryNode) varNode).getPicClause()));
@@ -476,7 +476,7 @@ public class TestSqlHostVariable {
   void testLobVariables_dbclobPicClause() {
     AnalysisResult actual = UseCaseEngine.runTest(LOD_VARS_TEXT_DBCLOB, ImmutableList.of(), ImmutableMap.of());
     actual.getSymbolTableMap().values().stream()
-            .findFirst().flatMap(firstSymbolTable -> firstSymbolTable.getVariables().values().stream()
+            .findFirst().flatMap(firstSymbolTable -> firstSymbolTable.getVariables().stream()
                     .filter(item -> "VAR-DATA".equals(item.getName()))
                     .findFirst())
             .ifPresent(varNode -> assertEquals("G(30)", ((ElementaryNode) varNode).getPicClause()));

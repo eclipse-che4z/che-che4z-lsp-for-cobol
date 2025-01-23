@@ -15,7 +15,7 @@
 package org.eclipse.lsp.cobol.core.model.tree.logic.implicit;
 
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNode;
-import org.eclipse.lsp.cobol.core.engine.processors.implicit.BlkImplicitVariablesGenerator;
+import org.eclipse.lsp.cobol.implicitDialects.cics.generator.CICSBulkImplicitVariablesGenerator;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -26,7 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class BlkImplicitVariablesGeneratorTest {
   @Test
   void test() {
-    VariableNode variableNode = BlkImplicitVariablesGenerator.generate();
+    VariableNode variableNode = CICSBulkImplicitVariablesGenerator.generate();
     assertEquals("DFHEIBLK", variableNode.getName());
   }
 }

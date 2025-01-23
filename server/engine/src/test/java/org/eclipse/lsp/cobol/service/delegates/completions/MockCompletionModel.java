@@ -21,7 +21,7 @@ import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
 import org.eclipse.lsp.cobol.common.model.tree.ProgramSubtype;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNode;
-import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulatorService;
+import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulator;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolsRepository;
 import org.eclipse.lsp.cobol.common.model.tree.ParagraphNameNode;
 import org.eclipse.lsp.cobol.common.model.tree.RootNode;
@@ -37,7 +37,7 @@ class MockCompletionModel {
           .rootNode(new RootNode())
           .build();
   static final CobolDocumentModel MODEL = new CobolDocumentModel("", "some text", RESULT);
-  static final SymbolAccumulatorService SYMBOL_SERVICE = new SymbolAccumulatorService();
+  static final SymbolAccumulator SYMBOL_SERVICE = new SymbolAccumulator();
   static final SymbolsRepository REPO = new SymbolsRepository();
 
   static {

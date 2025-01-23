@@ -24,17 +24,18 @@ import org.eclipse.lsp.cobol.common.model.tree.FunctionReference;
 import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
 import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.Processor;
-import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulatorService;
+import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulator;
 
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /** Adds repository information to the program nodes */
 @AllArgsConstructor
 public class ProgramRepositoryEnricher implements Processor<FunctionDeclaration> {
-  private final SymbolAccumulatorService symbolAccumulatorService;
+  private final SymbolAccumulator symbolAccumulator;
 
   @Override
   public void accept(FunctionDeclaration functionDeclaration, ProcessingContext processingContext) {
@@ -42,10 +43,8 @@ public class ProgramRepositoryEnricher implements Processor<FunctionDeclaration>
   }
 
   private void addFunctionDeclarationsToProgramRepository(
-      FunctionDeclaration functionDeclaration, ProcessingContext processingContext) {
-    functionDeclaration
-        .getProgram()
-         .map(ProgramNode::getRepository)
+      FunctionDeclaration functionDeclaration, ProcessingContext ctx) {
+      Optional.ofNullable(ctx.getCurrentProgramNode()).map(ProgramNode::getRepository)
         .ifPresent(
                 repository  -> {
                 //  function-name collision with the implicitly available function names is possible.
@@ -56,7 +55,7 @@ public class ProgramRepositoryEnricher implements Processor<FunctionDeclaration>
                 //                        function all intrinsic.`
                 //  In this case we simply replace any collision (hex-of in above example) as an intrinsic references.
               if (functionDeclaration.isDeclareAllIntrinsicFunctions()) {
-                symbolAccumulatorService
+                symbolAccumulator
                     .getAllImplicitFunctionNames()
                     .forEach(name -> repository.put(name, true));
               } else {
@@ -66,7 +65,7 @@ public class ProgramRepositoryEnricher implements Processor<FunctionDeclaration>
                           .forEach(
                                   reference ->
                                           addOrValidateFunction(
-                                                  repository, reference, functionDeclaration, processingContext));
+                                                  repository, reference, functionDeclaration, ctx));
               }
             });
   }
