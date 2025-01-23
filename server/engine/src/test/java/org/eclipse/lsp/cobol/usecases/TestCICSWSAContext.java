@@ -57,13 +57,16 @@ public class TestCICSWSAContext {
           "WSACONTEXT {_GET ACTION({$varThree}) {INTOCCSID|errorTwo}({$varTwo}) {INTOCODEPAGE|errorThree}(123)|errorOne_}";
 
   private static final String WSACONTEXT_GET_INVALID_TWO =
-          "WSACONTEXT GET CONTEXTTYPE({$varOne}) EPRTYPE({$varTwo}) EPRFIELD({$varThree}) {EPRINTO|errorOne}({$varFour}) {EPRSET|errorTwo}({$varFive}) EPRLENGTH({$varSix})";
+          "WSACONTEXT {_GET CONTEXTTYPE({$varOne}) EPRTYPE({$varTwo}) EPRFIELD({$varThree}) {EPRINTO|errorOne}({$varFour}) {EPRSET|errorTwo}({$varFive}) EPRLENGTH({$varSix})|errorThree_}";
 
   private static final String WSACONTEXT_GET_INVALID_THREE =
           "WSACONTEXT BUILD CHANNEL({$varOne}) {CHANNEL|errorOne}({$varTwo}) ACTION({$varThree})";
 
   private static final String WSACONTEXT_GET_INVALID_FOUR =
           "WSACONTEXT GET CONTEXTTYPE({$varOne}) RELATESURI({$varTwo}) {RELATESURI|errorOne}({$varThree})";
+
+  private static final String WSACONTEXT_GET_INVALID_FIVE =
+          "WSACONTEXT {_GET CONTEXTTYPE({$varOne}) EPRTYPE({$varSix}) EPRFIELD({$varSix}) EPRLENGTH({$varSix})|errorOne_}";
 
   @Test
   void testWSAContextBuildValidOne() {
@@ -176,6 +179,12 @@ public class TestCICSWSAContext {
                             new Range(),
                             "Exactly one option required, options are mutually exclusive: EPRINTO or EPRSET",
                             DiagnosticSeverity.Error,
+                            ErrorSource.PARSING.getText()),
+                    "errorThree",
+                    new Diagnostic(
+                            new Range(),
+                            "Invalid parameters combination. Valid combination is: EPRTYPE, EPRFIELD, (EPRINTO or EPRSET) and EPRLENGTH",
+                            DiagnosticSeverity.Error,
                             ErrorSource.PARSING.getText())));
   }
 
@@ -201,6 +210,19 @@ public class TestCICSWSAContext {
                     new Diagnostic(
                             new Range(),
                             "Excessive options provided for: RELATESURI",
+                            DiagnosticSeverity.Error,
+                            ErrorSource.PARSING.getText())));
+  }
+
+  @Test
+  void testWSAContextGetInvalidFive() {
+    CICSTestUtils.errorTest(
+            WSACONTEXT_GET_INVALID_FIVE,
+            ImmutableMap.of(
+                    "errorOne",
+                    new Diagnostic(
+                            new Range(),
+                            "Invalid parameters combination. Valid combination is: EPRTYPE, EPRFIELD, (EPRINTO or EPRSET) and EPRLENGTH",
                             DiagnosticSeverity.Error,
                             ErrorSource.PARSING.getText())));
   }

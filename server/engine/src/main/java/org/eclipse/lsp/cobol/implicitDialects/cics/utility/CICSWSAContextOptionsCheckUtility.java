@@ -106,9 +106,24 @@ public class CICSWSAContextOptionsCheckUtility extends CICSOptionsCheckBaseUtili
         if (!ctx.RELATESTYPE().isEmpty() || !ctx.RELATESINDEX().isEmpty()) {
             checkHasMandatoryOptions(ctx.RELATESURI(), ctx, "RELATESURI");
         }
-        checkAllOptionsArePresentOrAbsent("EPRTYPE, EPRFIELD, EPRINTO and EPRLENGTH", ctx,
-                ctx.EPRTYPE(), ctx.EPRFIELD(), ctx.EPRINTO(), ctx.EPRLENGTH());
-        checkHasMutuallyExclusiveOptions("EPRINTO or EPRSET", ctx.EPRINTO(), ctx.EPRSET());
+        validateEPRParameters(ctx);
         checkHasMutuallyExclusiveOptions("INTOCCSID or INTOCODEPAGE", ctx.INTOCCSID(), ctx.INTOCODEPAGE());
+    }
+
+    @SuppressWarnings("unchecked")
+    private void validateEPRParameters(CICSParser.Cics_wsacontext_getContext ctx) {
+        if (!ctx.EPRTYPE().isEmpty() || !ctx.EPRFIELD().isEmpty() || !ctx.EPRLENGTH().isEmpty()
+                || !ctx.EPRINTO().isEmpty() || !ctx.EPRSET().isEmpty()) {
+            boolean mandatoryParamsPresent = (!ctx.EPRTYPE().isEmpty() && !ctx.EPRFIELD().isEmpty() && !ctx.EPRLENGTH().isEmpty());
+            boolean exclusiveParamsValid = (!ctx.EPRINTO().isEmpty() ^ !ctx.EPRSET().isEmpty());
+            if (!(mandatoryParamsPresent && exclusiveParamsValid)) {
+                throwException(
+                        ErrorSeverity.ERROR,
+                        getLocality(ctx),
+                        "Invalid parameters combination. Valid combination is: ",
+                        "EPRTYPE, EPRFIELD, (EPRINTO or EPRSET) and EPRLENGTH");
+            }
+            checkHasMutuallyExclusiveOptions("EPRINTO or EPRSET", ctx.EPRINTO(), ctx.EPRSET());
+        }
     }
 }
