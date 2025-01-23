@@ -38,6 +38,9 @@ public class TestCICSDocument {
   private static final String DOCUMENT_CREATE_INVALID_MULTIPLE_SOURCES =
           "DOCUMENT CREATE DOCTOKEN({$varOne}) {FROM|errorOne}({$varTwo}) {TEXT|errorTwo}({$varThree}) LENGTH({$varFour})";
 
+  private static final String DOCUMENT_CREATE_INVALID_NO_LENGTH =
+          "DOCUMENT {_CREATE DOCTOKEN({$varOne}) FROM({$varTwo})|errorOne_}";
+
   private static final String DOCUMENT_DELETE_VALID =
           "DOCUMENT DELETE DOCTOKEN({$varOne})";
 
@@ -104,6 +107,19 @@ public class TestCICSDocument {
                     new Diagnostic(
                             new Range(),
                             "Exactly one option required, options are mutually exclusive: FROM, TEXT or BINARY",
+                            DiagnosticSeverity.Error,
+                            ErrorSource.PARSING.getText())));
+  }
+
+  @Test
+  void testDocumentCreateInvalidNoLength() {
+    CICSTestUtils.errorTest(
+            DOCUMENT_CREATE_INVALID_NO_LENGTH,
+            ImmutableMap.of(
+                    "errorOne",
+                    new Diagnostic(
+                            new Range(),
+                            "Missing required option: LENGTH",
                             DiagnosticSeverity.Error,
                             ErrorSource.PARSING.getText())));
   }

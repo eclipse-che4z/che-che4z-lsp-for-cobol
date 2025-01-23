@@ -104,6 +104,9 @@ public class CICSDocumentOptionsCheckUtility extends CICSOptionsCheckBaseUtility
         if (!ctx.LENGTH().isEmpty()) {
             checkHasExactlyOneOption("FROM, TEXT or BINARY", ctx, ctx.FROM(), ctx.TEXT(), ctx.BINARY());
         }
+        if (!ctx.FROM().isEmpty() || !ctx.TEXT().isEmpty() || !ctx.BINARY().isEmpty()) {
+            checkHasMandatoryOptions(ctx.LENGTH(), ctx, "LENGTH");
+        }
         checkHasMutuallyExclusiveOptions("LENGTH, FROMDOC or TEMPLATE",
                 ctx.LENGTH(), ctx.FROMDOC(), ctx.TEMPLATE());
         if (!ctx.DELIMITER().isEmpty() || !ctx.UNESCAPED().isEmpty()) {
