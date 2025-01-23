@@ -34,6 +34,7 @@ import org.eclipse.lsp.cobol.common.model.tree.FigurativeConstants;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /** QualifiedReferenceNode processor */
@@ -63,7 +64,9 @@ public class QualifiedReferenceUpdateVariableUsage implements Processor<Qualifie
     }
 
     List<VariableNode> foundDefinitions = ctx.getCurrentProgramNode() != null
-        ? symbolAccumulator.getVariableDefinition(ctx.getCurrentProgramNode(), variableUsageChain)
+        ? Optional.ofNullable(symbolAccumulator.getSymbolTable(ctx.getCurrentProgramNode()))
+            .map(st -> st.getVariableDefinition(variableUsageChain))
+            .orElseGet(ImmutableList::of)
         : ImmutableList.of();
 
     if (isQualifyExtendedDirectiveEnabled(ctx) && foundDefinitions.size() > 1) {

@@ -18,6 +18,11 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import org.eclipse.lsp.cobol.common.model.Locality;
+import org.eclipse.lsp.cobol.common.model.tree.variables.IndexItemNode;
+import org.eclipse.lsp.cobol.common.utils.VariableUtils;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This value class represents the multi-dimensional Table variable that may have nested variables,
@@ -41,6 +46,27 @@ public class MultiTableDataNameNode extends VariableWithLevelNode implements Usa
     super(location, level, name, redefines, VariableType.MULTI_TABLE_DATA_NAME, global);
     this.occursClause = occursClause;
     this.usageFormat = usageFormat;
+  }
+
+  public static List<VariableNode> fromDefinition(VariableDefinitionNode definitionNode) {
+    MultiTableDataNameNode variable =
+            new MultiTableDataNameNode(
+                    definitionNode.getLocality(),
+                    definitionNode.getLevel(),
+                    VariableUtils.getName(definitionNode),
+                    definitionNode.hasRedefines(),
+                    definitionNode.getOccursClauses().get(0),
+                    definitionNode.getUsage(),
+                    definitionNode.isGlobal());
+    VariableUtils.createVariableNameNode(variable, definitionNode.getVariableName());
+    List<VariableNode> result = new ArrayList<>();
+    result.add(variable);
+    for (VariableNameAndLocality nameAndLocality : definitionNode.getOccursIndexes()) {
+      IndexItemNode indexItemNode = new IndexItemNode(nameAndLocality.getLocality(), nameAndLocality.getName(), variable.isGlobal());
+      variable.addChild(indexItemNode);
+      result.add(indexItemNode);
+    }
+    return result;
   }
 
   @Override

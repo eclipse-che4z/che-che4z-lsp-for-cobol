@@ -45,6 +45,7 @@ import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.common.model.tree.FunctionReference;
 import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNode;
+import org.eclipse.lsp.cobol.common.symbols.CodeBlockReference;
 import org.eclipse.lsp.cobol.common.symbols.SymbolTable;
 import org.eclipse.lsp.cobol.common.utils.ImplicitCodeUtils;
 import org.eclipse.lsp.cobol.test.CobolText;
@@ -447,6 +448,20 @@ public class UseCaseEngine {
   }
 
   private Map<String, List<Location>> extractDefinitions(AnalysisResult result, NodeType nodeType) {
+    if (PARAGRAPH_NAME_NODE.equals(nodeType) || SECTION_NAME_NODE.equals(nodeType)) {
+      Map<String, List<Location>> defMap = new HashMap<>();
+      for (SymbolTable symbolTable : result.getSymbolTableMap().values()) {
+        Collection<Map.Entry<String, CodeBlockReference>> entries = SECTION_NAME_NODE.equals(nodeType)
+                ? symbolTable.getSectionMap().entrySet()
+                : symbolTable.getParagraphMap().entries();
+        for (Map.Entry<String, CodeBlockReference> entry : entries) {
+          if (!entry.getValue().getDefinitions().isEmpty()) {
+            defMap.computeIfAbsent(entry.getKey().toUpperCase(Locale.ROOT), k -> new ArrayList<>()).addAll(entry.getValue().getDefinitions());
+          }
+        }
+      }
+      return defMap;
+    }
     return extract(
         result,
         nodeType,
@@ -488,6 +503,18 @@ public class UseCaseEngine {
   }
 
   private Map<String, List<Location>> extractUsages(AnalysisResult result, NodeType nodeType) {
+    if (PARAGRAPH_NAME_NODE.equals(nodeType)) {
+      Map<String, List<Location>> usageMap = new HashMap<>();
+      for (SymbolTable symbolTable : result.getSymbolTableMap().values()) {
+        for (Map.Entry<String, CodeBlockReference> entry : symbolTable.getParagraphMap().entries()) {
+          if (!entry.getValue().getUsage().isEmpty()) {
+            usageMap.computeIfAbsent(entry.getKey().toUpperCase(Locale.ROOT), k -> new ArrayList<>()).addAll(entry.getValue().getUsage());
+          }
+        }
+      }
+      return usageMap;
+    }
+
     return extract(
         result,
         nodeType,
@@ -500,6 +527,7 @@ public class UseCaseEngine {
       NodeType nodeType,
       Function<DefinedAndUsedStructure, List<Location>> extractor,
       Predicate<DefinedAndUsedStructure> predicate) {
+
     return result
         .getRootNode()
         .getDepthFirstStream()

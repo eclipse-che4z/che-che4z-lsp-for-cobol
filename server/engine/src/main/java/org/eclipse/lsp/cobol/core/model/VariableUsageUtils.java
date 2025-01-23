@@ -14,14 +14,13 @@
  */
 package org.eclipse.lsp.cobol.core.model;
 
-import com.google.common.collect.Multimap;
 import lombok.experimental.UtilityClass;
-import org.eclipse.lsp.cobol.common.model.NodeType;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNameAndLocality;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableUsageNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableWithLevelNode;
+import org.eclipse.lsp.cobol.common.symbols.SymbolTable;
 import org.eclipse.lsp.cobol.common.utils.RangeUtils;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulator;
 
@@ -33,56 +32,6 @@ import static org.eclipse.lsp.cobol.common.VariableConstants.LEVEL_77;
 /** The class take all defined variables and search through them by partial qualifier */
 @UtilityClass
 public class VariableUsageUtils {
-  /**
-   * Return the list of variables matches the list of qualifiers
-   *
-   * @param definedVariables the map with all defined variables
-   * @param usagePath usage nodes consists of variable name and parents
-   * @return the list of all matched variables
-   */
-  public static List<VariableNode> findVariablesForUsage(
-    Multimap<String, VariableNode> definedVariables, List<VariableUsageNode> usagePath) {
-    Collection<VariableNode> candidates = definedVariables.get(usagePath.get(0).getName());
-    List<VariableUsageNode> parents = usagePath.subList(1, usagePath.size());
-
-    Map<VariableNode, Integer> stepToMatchParentsMap = new HashMap<>();
-    for (VariableNode variable : candidates) {
-      countToMatchParents(variable, parents).ifPresent(steps -> stepToMatchParentsMap.put(variable, steps + 1));
-    }
-
-    List<VariableNode> exactHierarchyMatchedVariables = new ArrayList<>();
-    for (Map.Entry<VariableNode, Integer> entry : stepToMatchParentsMap.entrySet()) {
-      if (entry.getValue().equals(usagePath.size())) {
-        exactHierarchyMatchedVariables.add(entry.getKey());
-      }
-    }
-
-    return exactHierarchyMatchedVariables.isEmpty()
-        ? new ArrayList<>(stepToMatchParentsMap.keySet())
-        : exactHierarchyMatchedVariables;
-  }
-
-  private static Optional<Integer> countToMatchParents(VariableNode variable, List<VariableUsageNode> usagePath) {
-    int count = 0;
-    for (VariableUsageNode parent : usagePath) {
-      String parentName = parent.getName();
-      do {
-        variable = getNearestParentVariable(variable);
-        if (variable == null) {
-          return Optional.empty();
-        }
-        count++;
-      } while (!variable.getName().equals(parentName));
-    }
-    return Optional.of(count);
-  }
-
-  private static VariableNode getNearestParentVariable(VariableNode variable) {
-    return variable.getNearestParentByType(NodeType.VARIABLE)
-            .map(VariableNode.class::cast)
-            .orElse(null);
-  }
-
   /**
    * Checks that there is no overlap between the passed nodes
    * @param node1 First Node
@@ -142,17 +91,18 @@ public class VariableUsageUtils {
    * Retrieves variable definition nodes for the passed {@link VariableUsageNode}
    * @param symbolAccumulator instance of {@link SymbolAccumulator}
    * @param containerNode  container node for the variableUsage node
-   * @param identifiers List of {@link VariableUsageNode}
+   * @param usageNodes List of {@link VariableUsageNode}
    * @return List of {@link VariableNode}
    */
   public List<VariableNode> getDefinitionNode(SymbolAccumulator symbolAccumulator,
-                                              Node containerNode, List<VariableUsageNode> identifiers) {
+                                              Node containerNode, List<VariableUsageNode> usageNodes) {
     if (!containerNode.getProgram().isPresent()) {
       return Collections.emptyList();
     }
+    SymbolTable symbolTable = symbolAccumulator.getSymbolTable(containerNode.getProgram().get());
     List<VariableNode> result = new ArrayList<>();
-    for (VariableUsageNode id : identifiers) {
-      result.addAll(symbolAccumulator.getVariableDefinition(containerNode.getProgram().get(), Collections.singletonList(id)));
+    for (VariableUsageNode usage : usageNodes) {
+      result.addAll(symbolTable.getVariableDefinition(Collections.singletonList(usage)));
     }
     return result;
   }

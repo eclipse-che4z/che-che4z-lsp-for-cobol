@@ -48,12 +48,14 @@ public class TestDeclarativeSectionNameUsageInUseDebugStatement {
           + "            USE FOR DEBUGGING ON {@AT-END-PROC}. \n"
           + "       {#*BEGIN-USE-PROC}.      \n"
           + "            DISPLAY \"TEST\".\n"
-          + "       {@*AT-END-PROC} SECTION.                                     \n"
-          + "            USE AFTER ERROR PROCEDURE ON {$GEN-FILE}. \n"
-          + "       {#*BEGIN-USE-PROC}.      \n"
-          + "            DISPLAY \"TEST\".                      \n"
-          + "        END DECLARATIVES.  \n"
-          + "           perform {@AT-END-PROC} .";
+          + "       {@*AT-END-PROC} SECTION.\n"
+          + "            USE AFTER ERROR PROCEDURE ON {$GEN-FILE}.\n"
+          + "       {@*AT-STD-EXP} SECTION.\n"
+          + "            USE AFTER  STANDARD EXCEPTION PROCEDURE {$GEN-FILE}.\n"
+          + "       {#*BEGIN-USE-PROC}.\n"
+          + "            DISPLAY \"TEST\".\n"
+          + "        END DECLARATIVES.\n"
+          + "           perform {@AT-END-PROC}.\n";
 
   @Test
   void test1() {

@@ -30,7 +30,10 @@ public class ParagraphNameNodeEnricher implements Processor<ParagraphNameNode> {
 
   @Override
   public void accept(ParagraphNameNode paragraphNameNode, ProcessingContext processingContext) {
-    paragraphNameNode.setDefinitions(symbolAccumulator.getParagraphLocations(paragraphNameNode, CodeBlockReference::getDefinitions));
-    paragraphNameNode.setUsages(symbolAccumulator.getParagraphLocations(paragraphNameNode, CodeBlockReference::getUsage));
+    if (processingContext.getCurrentProgramNode() == null) {
+      return;
+    }
+    paragraphNameNode.setDefinitions(symbolAccumulator.getParagraphLocations(paragraphNameNode.getName(), CodeBlockReference::getDefinitions, processingContext.getCurrentProgramNode()));
+    paragraphNameNode.setUsages(symbolAccumulator.getParagraphLocations(paragraphNameNode.getName(), CodeBlockReference::getUsage, processingContext.getCurrentProgramNode()));
   }
 }

@@ -80,9 +80,9 @@ public class ImplicitDb2VariablesProcessor implements Processor<SectionNode> {
 
   private void registerVariable(
       VariableAccumulator variableAccumulator, ProgramNode programNode, VariableNode variable) {
-    variableAccumulator.addVariableDefinition(programNode, variable);
+    variableAccumulator.addVariable(programNode, variable);
     variable.getChildren().stream()
         .map(VariableNode.class::cast)
-        .forEach(c -> variableAccumulator.addVariableDefinition(programNode, c));
+        .forEach(c -> variableAccumulator.addVariable(programNode, c));
   }
 }

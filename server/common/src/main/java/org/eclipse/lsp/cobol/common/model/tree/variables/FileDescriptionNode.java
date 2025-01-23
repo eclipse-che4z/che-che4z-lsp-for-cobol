@@ -19,10 +19,15 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import org.eclipse.lsp.cobol.common.model.Locality;
+import org.eclipse.lsp.cobol.common.model.tree.variable.VariableDefinitionNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableType;
+import org.eclipse.lsp.cobol.common.utils.VariableUtils;
 
 import java.util.List;
+
+import static org.eclipse.lsp.cobol.common.model.tree.variable.VariableType.FD;
+import static org.eclipse.lsp.cobol.common.model.tree.variable.VariableType.SD;
 
 /**
  * Class for all File Description Entry (FD) or Sort File Description (SD) Entry variables. These
@@ -59,5 +64,18 @@ public class FileDescriptionNode extends VariableNode {
   @Override
   protected List<String> getChildrenDescription(String prefix) {
     return ImmutableList.of();
+  }
+
+  public static FileDescriptionNode fromDefinition(VariableDefinitionNode definitionNode) {
+    FileDescriptionNode result = new FileDescriptionNode(
+            definitionNode.getLocality(),
+            VariableUtils.getName(definitionNode),
+            definitionNode.isSortDescription() ? SD : FD,
+            definitionNode.isGlobal(),
+            definitionNode.isExternal(),
+            definitionNode.getFileDescriptor(),
+            definitionNode.getFileControlClause());
+    VariableUtils.createVariableNameNode(result, definitionNode.getVariableName());
+    return result;
   }
 }

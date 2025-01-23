@@ -19,6 +19,11 @@ import lombok.Getter;
 import lombok.ToString;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.lsp.cobol.common.model.Locality;
+import org.eclipse.lsp.cobol.common.model.tree.variables.IndexItemNode;
+import org.eclipse.lsp.cobol.common.utils.VariableUtils;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /** This value class represents the Table variable that may have an optional index */
 @Getter
@@ -91,7 +96,36 @@ public class TableDataNameNode extends ElementaryNode {
     this.occursTimes = occursTimes;
   }
 
-  @Override
+  public static List<VariableNode> fromDefinition(VariableDefinitionNode definitionNode) {
+    List<VariableNode> result = new ArrayList<>();
+    TableDataNameNode variable =
+            new TableDataNameNode(
+                    definitionNode.getLocality(),
+                    definitionNode.getLevel(),
+                    VariableUtils.getName(definitionNode),
+                    definitionNode.hasRedefines(),
+                    definitionNode.isGlobal(),
+                    definitionNode.getPic(),
+                    definitionNode.getValue(),
+                    definitionNode.getOccursNumber(),
+                    definitionNode.getUsage(),
+                    definitionNode.isBlankWhenZeroPresent(),
+                    definitionNode.isSignClausePresent(),
+                    definitionNode.isDynamicLength(),
+                    definitionNode.isJustified(),
+                    definitionNode.isUnBounded());
+    VariableUtils.createVariableNameNode(variable, definitionNode.getVariableName());
+    result.add(variable);
+    for (VariableNameAndLocality nameAndLocality : definitionNode.getOccursIndexes()) {
+      IndexItemNode indexItemNode = new IndexItemNode(nameAndLocality.getLocality(), nameAndLocality.getName(), variable.isGlobal());
+      variable.addChild(indexItemNode);
+      result.add(indexItemNode);
+    }
+    return result;
+
+  }
+
+    @Override
   protected String getVariableDisplayString() {
     StringBuilder stringBuilder = new StringBuilder(getFormattedSuffix());
     stringBuilder.append(String.format(" OCCURS %1$d TIMES", occursTimes));

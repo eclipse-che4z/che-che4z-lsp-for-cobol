@@ -20,6 +20,7 @@ import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.model.NodeType;
+import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.*;
 import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.Processor;
@@ -30,6 +31,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static org.eclipse.lsp.cobol.common.model.tree.Node.hasType;
 
 /** Handle Copy From node */
 public class DaCoCopyFromProcessor implements Processor<DaCoCopyFromNode> {
@@ -62,7 +65,17 @@ public class DaCoCopyFromProcessor implements Processor<DaCoCopyFromNode> {
       return;
     }
     copyFrom(node.getLevel(), protoCandidates.get(0), node.getParent(), node);
-    variableAccumulator.registerVariablesInProgram(node.getParent());
+    Optional<ProgramNode> program = node.getProgram();
+    if (!program.isPresent()) {
+      return;
+    }
+    ProgramNode programNode = program.get();
+            programNode.getChildren().stream()
+                    .flatMap(Node::getDepthFirstStream)
+                    .filter(hasType(NodeType.VARIABLE))
+                    .map(VariableNode.class::cast)
+                    .forEach(v -> variableAccumulator.addVariable(programNode, v));
+
   }
 
   private void copyFrom(
@@ -143,8 +156,7 @@ public class DaCoCopyFromProcessor implements Processor<DaCoCopyFromNode> {
     return Optional.empty();
   }
 
-  private Optional<VariableDefinitionNameNode> createVariableDefinitionNameNode(
-      Node node, String newName) {
+  private Optional<VariableDefinitionNameNode> createVariableDefinitionNameNode(Node node, String newName) {
     if (!(node instanceof VariableNode)) {
       return Optional.empty();
     }

@@ -59,7 +59,7 @@ class CICSImplicitVariablesProcessorTest {
     assertNotNull(processingContext.getVariableAccumulator());
     assertEquals(variableAccumulator, processingContext.getVariableAccumulator());
     processor.accept(sectionNode, processingContext);
-    verify(variableAccumulator, times(33)).addVariableDefinition(any(), any());
+    verify(variableAccumulator, times(33)).addVariable(any(), any());
   }
 
   @Test
@@ -72,6 +72,6 @@ class CICSImplicitVariablesProcessorTest {
     assertEquals(variableAccumulator, processingContext.getVariableAccumulator());
     processor.accept(sectionNode, processingContext);
     verify(variableAccumulator, times(CICS_INTRODUCED_REGISTERS_COUNT))
-            .addVariableDefinition(any(), any());
+            .addVariable(any(), any());
   }
 }

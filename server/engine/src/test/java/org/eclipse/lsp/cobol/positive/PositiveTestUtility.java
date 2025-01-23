@@ -139,14 +139,18 @@ public class PositiveTestUtility {
     sysprintSnaps.forEach(
         snap -> {
           String dataName = snap.getDataName();
-          Optional<Map.Entry<List<Location>, List<Location>>> foundElementFromLSPEngine =
-              paragraphDefFromLSPEngine.get(dataName).stream()
-                  .map(node -> Collections.singletonMap(node.getDefinitions(), node.getUsage()))
-                  .map(Map::entrySet)
-                  .flatMap(Collection::stream)
-                  .filter(ref -> matchParagraphDefinition(snap, ref))
-                  .findFirst();
-          Assertions.assertTrue(
+
+          List<Location> defs = new ArrayList<>();
+          List<Location> usages = new ArrayList<>();
+          for (CodeBlockReference codeBlockReference : paragraphDefFromLSPEngine.get(dataName)) {
+                defs.addAll(codeBlockReference.getDefinitions());
+                usages.addAll(codeBlockReference.getUsage());
+          }
+          Optional<Map.Entry<List<Location>, List<Location>>> foundElementFromLSPEngine = !defs.isEmpty()
+                  ? Optional.of(Collections.singletonMap(defs, usages).entrySet().iterator().next())
+                  : Optional.empty();
+
+            Assertions.assertTrue(
               foundElementFromLSPEngine.isPresent(),
               "["
                   + fileName
@@ -192,7 +196,8 @@ public class PositiveTestUtility {
                         + "Procedure snapReferences for "
                         + snap.getDataName()
                         + " not found at line no: "
-                        + snapRef);
+                        + snapRef
+                        + "\nsnap: " + snap);
               });
     } else {
       snap.getReferences()
@@ -382,8 +387,8 @@ public class PositiveTestUtility {
         .map(ProgramNode.class::cast)
         .forEach(
             programNode -> {
-              Stream.of(repo.getParagraphMap(programNode), repo.getSectionMap(programNode))
-                  .flatMap(entry -> entry.entrySet().stream())
+              Stream.of(repo.getParagraphMap(programNode).entries(), repo.getSectionMap(programNode).entrySet())
+                  .flatMap(Collection::stream)
                   .forEach(
                       entry -> paragraphDefFromLSPEngine.put(entry.getKey(), entry.getValue()));
 
