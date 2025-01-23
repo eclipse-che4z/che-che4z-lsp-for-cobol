@@ -36,7 +36,6 @@ public class CICSDeleteOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
   private static final Map<Integer, ErrorSeverity> DUPLICATE_CHECK_OPTIONS =
           new HashMap<Integer, ErrorSeverity>() {
             {
-              put(CICSLexer.DELETE, ErrorSeverity.ERROR);
               put(CICSLexer.FILE, ErrorSeverity.ERROR);
               put(CICSLexer.TOKEN, ErrorSeverity.ERROR);
               put(CICSLexer.RIDFLD, ErrorSeverity.ERROR);
@@ -110,7 +109,7 @@ public class CICSDeleteOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
 
   @SuppressWarnings("unchecked")
   private void checkDeleteGroupTwo(CICSParser.Cics_delete_group_twoContext ctx) {
-    checkHasExactlyOneOption("CHANNEL or EVENT or TIMER", ctx, ctx.CHANNEL(), ctx.EVENT(), ctx.TIMER());
+    checkHasExactlyOneOption("ACTIVITY or CHANNEL or EVENT or TIMER", ctx, ctx.ACTIVITY(), ctx.CHANNEL(), ctx.EVENT(), ctx.TIMER());
   }
 
   @SuppressWarnings("unchecked")

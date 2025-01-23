@@ -24,7 +24,7 @@ import org.eclipse.lsp.cobol.common.model.tree.variable.*;
 import org.eclipse.lsp.cobol.common.processor.CompilerDirectiveName;
 import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.Processor;
-import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulatorService;
+import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulator;
 import org.eclipse.lsp.cobol.core.model.VariableUsageUtils;
 import org.eclipse.lsp.cobol.common.model.tree.XMLParseNode;
 
@@ -34,7 +34,7 @@ import java.util.Objects;
 
 /** Apply all the validation for the XML Parse statement and return found errors. */
 public class XMLParseProcess implements Processor<XMLParseNode> {
-  private final SymbolAccumulatorService symbolAccumulatorService;
+  private final SymbolAccumulator symbolAccumulator;
 
   // TODO: remove undetermined once effective data type calculation is corrected
   public static final ImmutableList<EffectiveDataType> ALPHANUMERIC_DATA_TYPES =
@@ -45,8 +45,8 @@ public class XMLParseProcess implements Processor<XMLParseNode> {
           "1208", "1047", "1140", "37", "1141", "273", "1142", "277", "1143", "278", "1144", "280",
           "1145", "284", "1146", "285", "1147", "297", "1148", "500", "1149", "871");
 
-  public XMLParseProcess(SymbolAccumulatorService symbolAccumulatorService) {
-    this.symbolAccumulatorService = symbolAccumulatorService;
+  public XMLParseProcess(SymbolAccumulator symbolAccumulator) {
+    this.symbolAccumulator = symbolAccumulator;
   }
 
   @Override
@@ -113,7 +113,7 @@ public class XMLParseProcess implements Processor<XMLParseNode> {
       if (variableUsageNodeForIdentifier.isEmpty()) {
         return Collections.emptyList();
       }
-      return VariableUsageUtils.getDefinitionNode(symbolAccumulatorService, xmlParseNode, variableUsageNodeForIdentifier);
+      return VariableUsageUtils.getDefinitionNode(symbolAccumulator, xmlParseNode, variableUsageNodeForIdentifier);
     }
     return Collections.emptyList();
   }

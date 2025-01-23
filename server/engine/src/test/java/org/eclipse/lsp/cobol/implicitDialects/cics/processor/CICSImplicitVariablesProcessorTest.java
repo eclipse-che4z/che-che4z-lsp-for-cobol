@@ -49,6 +49,7 @@ class CICSImplicitVariablesProcessorTest {
   void init() {
     processor = new CICSImplicitVariablesProcessor();
     processingContext = new ProcessingContext(new LinkedList<>(), variableAccumulator, new HashMap<>());
+    processingContext.getCurrentProgramNodeStack().push(new ProgramNode(null, ProgramSubtype.Program, 0));
   }
 
   @Test
