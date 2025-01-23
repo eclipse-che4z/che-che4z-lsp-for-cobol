@@ -193,14 +193,8 @@ public class CICSPerformSPOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
     private void checkDump(CICSParser.Cics_perform_dumpContext ctx) {
         checkHasMandatoryOptions(ctx.DUMP(), ctx, "DUMP");
         checkHasMandatoryOptions(ctx.DUMPCODE(), ctx, "DUMPCODE");
-        if (!ctx.TITLE().isEmpty() || !ctx.TITLELENGTH().isEmpty()) {
-            checkHasMandatoryOptions(ctx.TITLE(), ctx, "TITLE");
-            checkHasMandatoryOptions(ctx.TITLELENGTH(), ctx, "TITLELENGTH");
-        }
-        if (!ctx.CALLER().isEmpty() || !ctx.CALLERLENGTH().isEmpty()) {
-            checkHasMandatoryOptions(ctx.CALLER(), ctx, "CALLER");
-            checkHasMandatoryOptions(ctx.CALLERLENGTH(), ctx, "CALLERLENGTH");
-        }
+        checkAllOptionsArePresentOrAbsent("TITLE, TITLELENGTH", ctx, ctx.TITLE(), ctx.TITLELENGTH());
+        checkAllOptionsArePresentOrAbsent("CALLER, CALLERLENGTH", ctx, ctx.CALLER(), ctx.CALLERLENGTH());
     }
     private void checkEndAffinity(CICSParser.Cics_perform_endaffinityContext ctx) {
         checkHasMandatoryOptions(ctx.ENDAFFINITY(), ctx, "ENDAFFINITY");
@@ -210,34 +204,64 @@ public class CICSPerformSPOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
         checkHasMandatoryOptions(ctx.JVMSERVER(), ctx, "JVMSERVER");
         checkHasExactlyOneOption("JVMTYPE or JVM or LIBERTY or OSGI", ctx, ctx.JVMTYPE(), ctx.JVM(), ctx.LIBERTY(), ctx.OSGI());
         if (!ctx.JVM().isEmpty()) {
+            checkOptsLibertyPresent(ctx);
+            checkOptsOsgiPresent(ctx);
             checkHasExactlyOneOption("JVMACTION or DUMP or GATHER or STACKTRACE", ctx, ctx.JVMACTION(), ctx.DUMP(), ctx.GATHER(), ctx.STACKTRACE());
             if (!ctx.DUMP().isEmpty()) {
                 checkHasExactlyOneOption("DUMPTYPE or ALL or JAVACORE or HEAP or SNAPTRACE", ctx, ctx.DUMPTYPE(), ctx.ALL(), ctx.JAVACORE(), ctx.HEAP(), ctx.SNAPTRACE());
             } else if (!ctx.GATHER().isEmpty()) {
                 checkHasExactlyOneOption("GATHERTYPE or DIAGNOSTICS", ctx, ctx.GATHERTYPE(), ctx.DIAGNOSTICS());
             } else if (!ctx.STACKTRACE().isEmpty() || !ctx.TASKID().isEmpty()) {
-                checkHasMandatoryOptions(ctx.STACKTRACE(), ctx, "STACKTRACE");
                 checkHasMandatoryOptions(ctx.TASKID(), ctx, "TASKID");
             }
         } else if (!ctx.LIBERTY().isEmpty()) {
+            checkOptsOsgiPresent(ctx);
+            checkOptsJvmPresent(ctx);
             checkHasExactlyOneOption("LIBRTYACTION or REFRESH or SERVERDUMP", ctx, ctx.LIBRTYACTION(), ctx.REFRESH(), ctx.SERVERDUMP());
             if (!ctx.REFRESH().isEmpty()) {
+                checkPrerequisiteIsMet(ctx.APPLICATION(), ctx.APPID(), ctx, "APPID without APPLICATION");
+                checkPrerequisiteIsMet(ctx.APPID(), ctx.APPIDLEN(), ctx, "APPIDLEN without APPID");
                 checkHasExactlyOneOption("RESOURCETYPE or APPLICATION or CONFIG", ctx, ctx.RESOURCETYPE(), ctx.APPLICATION(), ctx.CONFIG());
-                if (!ctx.APPLICATION().isEmpty() || !ctx.APPID().isEmpty()) {
-                    checkHasMandatoryOptions(ctx.APPLICATION(), ctx, "APPLICATION");
-                    checkHasMandatoryOptions(ctx.APPID(), ctx, "APPID");
-                }
             }
-            } else if (!ctx.OSGI().isEmpty()) {
-                checkHasExactlyOneOption("OSGIACTION or REFRESHPKGS", ctx, ctx.OSGIACTION(), ctx.REFRESHPKGS());
+        } else if (!ctx.OSGI().isEmpty()) {
+            checkOptsJvmPresent(ctx);
+            checkOptsLibertyPresent(ctx);
+            checkHasExactlyOneOption("OSGIACTION or REFRESHPKGS", ctx, ctx.OSGIACTION(), ctx.REFRESHPKGS());
             }
+    }
+    private void checkOptsLibertyPresent(CICSParser.Cics_perform_jvmserverContext ctx) {
+        checkHasIllegalOptions(ctx.LIBRTYACTION(), "LIBRTYACTION");
+        checkHasIllegalOptions(ctx.REFRESH(), "REFRESH");
+        checkHasIllegalOptions(ctx.APPLICATION(), "APPLICATION");
+        checkHasIllegalOptions(ctx.APPID(), "APPID");
+        checkHasIllegalOptions(ctx.APPIDLEN(), "APPIDLEN");
+        checkHasIllegalOptions(ctx.CONFIG(), "CONFIG");
+        checkHasIllegalOptions(ctx.SERVERDUMP(), "SERVERDUMP");
+    }
+    private void checkOptsOsgiPresent(CICSParser.Cics_perform_jvmserverContext ctx) {
+        checkHasIllegalOptions(ctx.OSGIACTION(), "OSGIACTION");
+        checkHasIllegalOptions(ctx.REFRESHPKGS(), "REFRESHPKGS");
+    }
+    private void checkOptsJvmPresent(CICSParser.Cics_perform_jvmserverContext ctx) {
+        checkHasIllegalOptions(ctx.JVMACTION(), "JVMACTION");
+        checkHasIllegalOptions(ctx.DUMP(), "DUMP");
+        checkHasIllegalOptions(ctx.DUMPTYPE(), "DUMPTYPE");
+        checkHasIllegalOptions(ctx.ALL(), "ALL");
+        checkHasIllegalOptions(ctx.JAVACORE(), "JAVACORE");
+        checkHasIllegalOptions(ctx.HEAP(), "HEAP");
+        checkHasIllegalOptions(ctx.SNAPTRACE(), "SNAPTRACE");
+        checkHasIllegalOptions(ctx.GATHER(), "GATHER");
+        checkHasIllegalOptions(ctx.GATHERTYPE(), "GATHERTYPE");
+        checkHasIllegalOptions(ctx.DIAGNOSTICS(), "DIAGNOSTICS");
+        checkHasIllegalOptions(ctx.STACKTRACE(), "STACKTRACE");
+        checkHasIllegalOptions(ctx.TASKID(), "TASKID");
     }
     private void checkPipeline(CICSParser.Cics_perform_pipelineContext ctx) {
         checkHasMandatoryOptions(ctx.PIPELINE(), ctx, "PIPELINE");
         checkHasMutuallyExclusiveOptions("ACTION or SCAN", ctx.ACTION(), ctx.SCAN());
     }
     private void checkSecdiscovery(CICSParser.Cics_perform_secdiscoveryContext ctx) {
-        checkHasMandatoryOptions(ctx.SECDISCOVERY(), ctx, "PIPELINE");
+        checkHasMandatoryOptions(ctx.SECDISCOVERY(), ctx, "SECDISCOVERY");
         checkHasExactlyOneOption("ACTION or WRITE", ctx, ctx.ACTION(), ctx.WRITE());
     }
     private void checkSecurity(CICSParser.Cics_perform_securityContext ctx) {
@@ -247,20 +271,19 @@ public class CICSPerformSPOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
     private void checkShutdown(CICSParser.Cics_perform_shutdownContext ctx) {
         checkHasMandatoryOptions(ctx.SHUTDOWN(), ctx, "SHUTDOWN");
         checkHasMutuallyExclusiveOptions("SDTRAN or NOSDTRAN", ctx.SDTRAN(), ctx.NOSDTRAN());
+        checkHasMutuallyExclusiveOptions("IMMEDIATE or TAKEOVER", ctx.IMMEDIATE(), ctx.TAKEOVER());
         if (!ctx.SHUTDOWN().isEmpty()) {
             if (!ctx.IMMEDIATE().isEmpty()) {
                 checkHasIllegalOptions(ctx.RESTART(), "RESTART");
                 checkHasIllegalOptions(ctx.XLT(), "XLT");
                 checkHasIllegalOptions(ctx.PLT(), "PLT");
                 checkHasIllegalOptions(ctx.PLTNAME(), "PLTNAME");
-                checkHasExactlyOneOption("IMMEDIATE or TAKEOVER", ctx, ctx.IMMEDIATE(), ctx.TAKEOVER());
             } else if (!ctx.TAKEOVER().isEmpty()) {
                 checkHasIllegalOptions(ctx.NORESTART(), "NORESTART");
                 checkHasIllegalOptions(ctx.RESTART(), "RESTART");
                 checkHasIllegalOptions(ctx.XLT(), "XLT");
                 checkHasIllegalOptions(ctx.PLT(), "PLT");
                 checkHasIllegalOptions(ctx.PLTNAME(), "PLTNAME");
-                checkHasExactlyOneOption("IMMEDIATE or TAKEOVER", ctx, ctx.IMMEDIATE(), ctx.TAKEOVER());
             } else {
                 checkHasMutuallyExclusiveOptions("PLT or PLTNAME", ctx.PLT(), ctx.PLTNAME());
                 checkHasIllegalOptions(ctx.NORESTART(), "NORESTART");
@@ -274,9 +297,7 @@ public class CICSPerformSPOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
     private void checkstatistics(CICSParser.Cics_perform_statisticsContext ctx) {
         checkHasMandatoryOptions(ctx.STATISTICS(), ctx, "STATISTICS");
         checkHasMandatoryOptions(ctx.RECORD(), ctx, "RECORD");
-        if (!ctx.RESETNOW().isEmpty() && ctx.ALL().isEmpty()) {
-            checkHasIllegalOptions(ctx.RESETNOW(), "RESETNOW without ALL");
-        }
+        checkPrerequisiteIsMet(ctx.ALL(), ctx.RESETNOW(), ctx, "RESETNOW without ALL");
         checkHasMutuallyExclusiveOptions("JOURNALNAME or JOURNALNUM", ctx.JOURNALNAME(), ctx.JOURNALNUM());
         checkHasMutuallyExclusiveOptions("TRANCLASS or TCLASS", ctx.TRANCLASS(), ctx.TCLASS());
     }

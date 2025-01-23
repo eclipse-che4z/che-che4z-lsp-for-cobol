@@ -91,7 +91,7 @@ public class TestCICSPerformSP {
     private static final String PERFORM_JVMSERVER_MUTUALEX_INVALID =
             "PERFORM JVMSERVER({$varFour}) {JVMTYPE|error}({$varOne}) {JVM|error2} JVMACTION({$varFour})";
     private static final String PERFORM_JVMSERVER_MUTUALEX2_INVALID =
-            "PERFORM JVMSERVER({$varFour}) {OSGI|error} REFRESHPKGS {LIBERTY|error2} SERVERDUMP";
+            "PERFORM JVMSERVER({$varFour}) {OSGI|error} {REFRESHPKGS|error3} {LIBERTY|error2} SERVERDUMP";
     private static final String PERFORM_JVMSERVER_JVMMUTUALEX_INVALID =
             "PERFORM JVMSERVER({$varFour}) JVM {JVMACTION|error}({$varOne}) {DUMP|error2} ALL";
     private static final String PERFORM_JVMSERVER_JVM_DUMPMUTUALEX_INVALID =
@@ -123,7 +123,7 @@ public class TestCICSPerformSP {
     private static final String PERFORM_STATISTICS_INVALID =
             "PERFORM {STATISTICS|error}";
     private static final String PERFORM_STATISTICS_ALL_INVALID =
-            "PERFORM STATISTICS RECORD {RESETNOW|error}";
+            "PERFORM {_STATISTICS RECORD RESETNOW|error_}";
     private static final String PERFORM_STATISTICS_MUTUALEX_INVALID =
             "PERFORM STATISTICS RECORD {JOURNALNAME|error} {JOURNALNUM|error2}";
     private static final String PERFORM_STATISTICS_MUTUALEX2_INVALID =
@@ -204,6 +204,12 @@ public class TestCICSPerformSP {
                                 new Range(),
                                 "Exactly one option required, options are mutually exclusive: JVMTYPE or JVM or LIBERTY or OSGI",
                                 DiagnosticSeverity.Error,
+                                ErrorSource.PARSING.getText()),
+                        "error3",
+                        new Diagnostic(
+                                new Range(),
+                                "Invalid option provided: REFRESHPKGS",
+                                DiagnosticSeverity.Error,
                                 ErrorSource.PARSING.getText()));
         CICSTestUtils.errorTest(PERFORM_JVMSERVER_MUTUALEX2_INVALID, expectedDiagnostic, "SP");
     }
@@ -223,6 +229,7 @@ public class TestCICSPerformSP {
                                 "Exactly one option required, options are mutually exclusive: JVMACTION or DUMP or GATHER or STACKTRACE",
                                 DiagnosticSeverity.Error,
                                 ErrorSource.PARSING.getText()));
+
         CICSTestUtils.errorTest(PERFORM_JVMSERVER_JVMMUTUALEX_INVALID, expectedDiagnostic, "SP");
     }
     @Test
@@ -316,7 +323,7 @@ public class TestCICSPerformSP {
                         "error",
                         new Diagnostic(
                                 new Range(),
-                                "Missing required option: APPID",
+                                "Missing required option for: APPIDLEN without APPID",
                                 DiagnosticSeverity.Error,
                                 ErrorSource.PARSING.getText()));
         CICSTestUtils.errorTest(PERFORM_JVMSERVER_LIBERTY_REFRESH_APPLICATION_INVALID, expectedDiagnostic, "SP");
@@ -454,7 +461,7 @@ public class TestCICSPerformSP {
                         "error",
                         new Diagnostic(
                                 new Range(),
-                                "Invalid option provided: RESETNOW without ALL",
+                                "Missing required option for: RESETNOW without ALL",
                                 DiagnosticSeverity.Error,
                                 ErrorSource.PARSING.getText()));
         CICSTestUtils.errorTest(PERFORM_STATISTICS_ALL_INVALID, expectedDiagnostic, "SP");
