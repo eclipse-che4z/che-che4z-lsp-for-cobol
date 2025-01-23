@@ -28,8 +28,8 @@ package org.eclipse.lsp.cobol.usecases;
         import java.util.stream.Stream;
 
 /**
- * Test CICS Create Perform Command. Documentation link: <a
- * href="https://www.ibm.com/docs/en/cics-ts/6.x?topic=commands-perform-dump">Create System Commands</a>
+ * Test CICS Perform Command. Documentation link: <a
+ * href="https://www.ibm.com/docs/en/cics-ts/6.x?topic=commands-perform-dump">Perform System Commands</a>
  *
  * <p>This class tests all variations of the Perform System Commands found in the link above.
  */
