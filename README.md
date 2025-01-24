@@ -379,3 +379,7 @@ To enable troubleshooting logs for the LSP server, specify a value for the param
 These values are ordered from returning the least information ("ERROR"; errors only) to the most information ("ALL"; all details).
 
 To view troubleshooting logs, open the output panel and select **COBOL Language Support** from the drop-down menu.
+
+## Known Issues
+
+If you do not have Java on your workstation, COBOL Language Support uses the native binary (engine.exe) to execute. If your environment does not allow engine.exe to execute, contact your system administrator to add an exception for engine.exe.
