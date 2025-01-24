@@ -189,6 +189,7 @@ public class CICSPerformSPOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
                 break;
         }
         checkDuplicates(ctx);
+        DUPLICATE_CHECK_OPTIONS.put(CICSLexer.DUMP, ErrorSeverity.WARNING);
     }
     private void checkDump(CICSParser.Cics_perform_dumpContext ctx) {
         checkHasMandatoryOptions(ctx.DUMP(), ctx, "DUMP");
@@ -208,6 +209,9 @@ public class CICSPerformSPOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
             checkOptsOsgiPresent(ctx);
             checkHasExactlyOneOption("JVMACTION or DUMP or GATHER or STACKTRACE", ctx, ctx.JVMACTION(), ctx.DUMP(), ctx.GATHER(), ctx.STACKTRACE());
             if (!ctx.DUMP().isEmpty()) {
+                if (ctx.DUMP().size() > 1) {
+                    DUPLICATE_CHECK_OPTIONS.put(CICSLexer.DUMP, ErrorSeverity.ERROR);
+                }
                 checkHasExactlyOneOption("DUMPTYPE or ALL or JAVACORE or HEAP or SNAPTRACE", ctx, ctx.DUMPTYPE(), ctx.ALL(), ctx.JAVACORE(), ctx.HEAP(), ctx.SNAPTRACE());
             } else if (!ctx.GATHER().isEmpty()) {
                 checkHasExactlyOneOption("GATHERTYPE or DIAGNOSTICS", ctx, ctx.GATHERTYPE(), ctx.DIAGNOSTICS());
