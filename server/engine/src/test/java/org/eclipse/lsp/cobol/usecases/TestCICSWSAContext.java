@@ -41,6 +41,9 @@ public class TestCICSWSAContext {
   private static final String WSACONTEXT_BUILD_INVALID_TWO =
           "WSACONTEXT {_BUILD EPRTYPE({$varOne}) EPRFIELD({$varTwo})|errorOne_}";
 
+  private static final String WSACONTEXT_BUILD_INVALID_THREE =
+          "WSACONTEXT {_BUILD EPRLENGTH({$varTwo})|errorOne_}";
+
   private static final String WSACONTEXT_DELETE_VALID =
           "WSACONTEXT DELETE CHANNEL({$varOne})";
 
@@ -106,6 +109,19 @@ public class TestCICSWSAContext {
                     new Diagnostic(
                             new Range(),
                             "If one option is specified, all options must be present: EPRTYPE, EPRFIELD and EPRFROM",
+                            DiagnosticSeverity.Error,
+                            ErrorSource.PARSING.getText())));
+  }
+
+  @Test
+  void testWSAContextBuildInvalidThree() {
+    CICSTestUtils.errorTest(
+            WSACONTEXT_BUILD_INVALID_THREE,
+            ImmutableMap.of(
+                    "errorOne",
+                    new Diagnostic(
+                            new Range(),
+                            "Missing required option: EPRTYPE",
                             DiagnosticSeverity.Error,
                             ErrorSource.PARSING.getText())));
   }
