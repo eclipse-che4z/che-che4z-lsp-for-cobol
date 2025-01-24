@@ -211,7 +211,7 @@ public class CICSPerformSPOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
                 checkHasExactlyOneOption("DUMPTYPE or ALL or JAVACORE or HEAP or SNAPTRACE", ctx, ctx.DUMPTYPE(), ctx.ALL(), ctx.JAVACORE(), ctx.HEAP(), ctx.SNAPTRACE());
             } else if (!ctx.GATHER().isEmpty()) {
                 checkHasExactlyOneOption("GATHERTYPE or DIAGNOSTICS", ctx, ctx.GATHERTYPE(), ctx.DIAGNOSTICS());
-            } else if (!ctx.STACKTRACE().isEmpty() || !ctx.TASKID().isEmpty()) {
+            } else if (!ctx.STACKTRACE().isEmpty()) {
                 checkHasMandatoryOptions(ctx.TASKID(), ctx, "TASKID");
             }
         } else if (!ctx.LIBERTY().isEmpty()) {
