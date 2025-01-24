@@ -117,12 +117,11 @@ export class CopybookDownloaderForE4E {
           "Results for: " + JSON.stringify(candidate.libs[i]),
         );
         for (const pro of result.value) {
+          this.outputChannel?.appendLine("  " + JSON.stringify(pro));
           if (DATASET in pro && !elements[pro.member]) {
             elements[pro.member] = pro;
-            this.outputChannel?.appendLine("  " + JSON.stringify(pro));
           } else if (ENVIRONMENT in pro && !elements[pro.element])
             elements[pro.element] = pro;
-          this.outputChannel?.appendLine("  " + JSON.stringify(pro));
         }
         this.outputChannel?.appendLine(
           "End of results for: " + JSON.stringify(candidate.libs[i]),
