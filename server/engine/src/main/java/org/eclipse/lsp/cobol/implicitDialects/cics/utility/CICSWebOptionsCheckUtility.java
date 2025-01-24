@@ -200,6 +200,7 @@ public class CICSWebOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
 
     // Main rules
     private void checkClose(CICSParser.Cics_web_closeContext ctx) {
+        checkHasMandatoryOptions(ctx.CLOSE(), ctx, "CLOSE");
         checkHasMandatoryOptions(ctx.SESSTOKEN(), ctx, "SESSTOKEN");
     }
 
@@ -257,6 +258,7 @@ public class CICSWebOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     }
 
     private void checkExtract(CICSParser.Cics_web_extractContext ctx) {
+        checkHasMandatoryOptions(ctx.EXTRACT(), ctx, "EXTRACT");
         // HTTP Server
         if (!ctx.REQUESTTYPE().isEmpty() || !ctx.HTTPMETHOD().isEmpty() || !ctx.METHODLENGTH().isEmpty() || !ctx.QUERYSTRING().isEmpty() || !ctx.QUERYSTRLEN().isEmpty()) {
             checkPrerequisiteIsMet(ctx.HTTPMETHOD(), ctx.METHODLENGTH(), ctx, "METHODLENGTH without HTTPMETHOD");
@@ -285,6 +287,7 @@ public class CICSWebOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     }
 
     private void checkOpen(CICSParser.Cics_web_openContext ctx) {
+        checkHasMandatoryOptions(ctx.OPEN(), ctx, "OPEN");
         checkMutuallyExclusiveOptions("URIMAP or HOST", ctx.URIMAP(), ctx.HOST());
         checkPrerequisiteIsMet(ctx.HOST(), ctx.HOSTLENGTH(), ctx, "HOSTLENGTH without HOST");
         checkPrerequisiteIsMet(ctx.HOST(), ctx.PORTNUMBER(), ctx, "PORTNUMBER without HOST");
@@ -501,6 +504,7 @@ public class CICSWebOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     }
 
     private void checkWrite(CICSParser.Cics_web_writeContext ctx) {
+        checkHasMandatoryOptions(ctx.WRITE(), ctx, "WRITE");
         checkHasMandatoryOptions(ctx.HTTPHEADER(), ctx, "HTTPHEADER");
         checkHasMandatoryOptions(ctx.VALUE(), ctx, "VALUE");
     }
