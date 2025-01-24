@@ -139,22 +139,8 @@ public class CICSWebOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
                 }
             };
 
-    private static final Map<Integer, String> DUPLICATE_RULE_OPTIONS =
-            new HashMap<Integer, String>() {
-                {
-                    put(CICSParser.RULE_cics_web_http_call_method, "GET, HEAD, PATCH, POST, PUT, TRACE, OPTIONS, DELETE, METHOD");
-                    put(CICSParser.RULE_cics_web_action_expect, "ACTION or EXPECT");
-                    put(CICSParser.RULE_cics_web_close_options, "CLOSE, NOCLOSE or CLOSESTATUS");
-                    put(CICSParser.RULE_cics_web_into_set_tocontainer, "INTO, SET, TOCONTAINER or TOCHANNEL");
-                    put(CICSParser.RULE_cics_web_into_set, "INTO or SET");
-                    put(CICSParser.RULE_cics_web_server_convert, "SRVCONVERT, NOSRVCONVERT, SERVERCONV");
-                    put(CICSParser.RULE_cics_web_client_convert, "CLICONVERT, NOCLICONVERT, CLIENTCONV, ");
-                    put(CICSParser.RULE_cics_web_client_auth_type, "NONE, BASICAUTH, AUTHENTICATE");
-                }
-            };
-
     public CICSWebOptionsCheckUtility(DialectProcessingContext context, List<SyntaxError> errors) {
-        super(context, errors, DUPLICATE_CHECK_OPTIONS, DUPLICATE_RULE_OPTIONS);
+        super(context, errors, DUPLICATE_CHECK_OPTIONS);
     }
 
     /**
@@ -174,6 +160,9 @@ public class CICSWebOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
             case CICSParser.RULE_cics_web_endbrowse:
                 checkEndbrowse((CICSParser.Cics_web_endbrowseContext) ctx);
                 break;
+            case CICSParser.RULE_cics_web_extract:
+                checkExtract((CICSParser.Cics_web_extractContext) ctx);
+                break;
             case CICSParser.RULE_cics_web_open:
                 checkOpen((CICSParser.Cics_web_openContext) ctx);
                 break;
@@ -183,29 +172,20 @@ public class CICSWebOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
             case CICSParser.RULE_cics_web_read:
                 checkRead((CICSParser.Cics_web_readContext) ctx);
                 break;
-            case CICSParser.RULE_cics_web_readnext_formfield_queryparm:
-                checkReadnextFormfieldQueryparm((CICSParser.Cics_web_readnext_formfield_queryparmContext) ctx);
+            case CICSParser.RULE_cics_web_readnext:
+                checkReadNext((CICSParser.Cics_web_readnextContext) ctx);
                 break;
-            case CICSParser.RULE_cics_web_readnext_httpheader:
-                checkReadnextHTTPHeader((CICSParser.Cics_web_readnext_httpheaderContext) ctx);
+            case CICSParser.RULE_cics_web_retrieve:
+                checkRetrieve((CICSParser.Cics_web_retrieveContext) ctx);
                 break;
-            case CICSParser.RULE_cics_web_receive_server_buffer:
-                checkReceiveServerBuffer((CICSParser.Cics_web_receive_server_bufferContext) ctx);
-                break;
-            case CICSParser.RULE_cics_web_receive_server_container:
-                checkReceiveServerContainer((CICSParser.Cics_web_receive_server_containerContext) ctx);
-                break;
-            case CICSParser.RULE_cics_web_receive_client:
-                checkReceiveClient((CICSParser.Cics_web_receive_clientContext) ctx);
-                break;
-            case CICSParser.RULE_cics_web_receive_client_container:
-                checkReceiveClientContainer((CICSParser.Cics_web_receive_client_containerContext) ctx);
+            case CICSParser.RULE_cics_web_receive:
+                checkReceive((CICSParser.Cics_web_receiveContext) ctx);
                 break;
             case CICSParser.RULE_cics_web_send:
                 checkSend((CICSParser.Cics_web_sendContext) ctx);
                 break;
-            case CICSParser.RULE_cics_web_startbrowse_formfield_queryparm:
-                checkStartbrowseFormfieldQueryparm((CICSParser.Cics_web_startbrowse_formfield_queryparmContext) ctx);
+            case CICSParser.RULE_cics_web_startbrowse:
+                checkStartbrowse((CICSParser.Cics_web_startbrowseContext) ctx);
                 break;
             case CICSParser.RULE_cics_web_write:
                 checkWrite((CICSParser.Cics_web_writeContext) ctx);
@@ -214,92 +194,9 @@ public class CICSWebOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
                 break;
         }
 
-        iterateSubrules(ctx);
         checkDuplicates(ctx);
     }
 
-    private <E extends ParserRuleContext> void iterateSubrules(E ctx) {
-        if (ctx == null) {
-            return;
-        }
-
-        for (ParserRuleContext subrule : getSafeSubruleList(ctx)) {
-            checkSubrules(subrule);
-        }
-    }
-
-    private static <E extends ParserRuleContext> List<ParserRuleContext> getSafeSubruleList(E ctx) {
-        return ctx == null ? new ArrayList<>() : ctx.getRuleContexts(ParserRuleContext.class);
-    }
-    /**
-     * Entrypoint to check CICS WEB rule options
-     *
-     * @param ctx ParserRuleContext subclass containing options
-     * @param <E> A subclass of ParserRuleContext
-     */
-    private <E extends ParserRuleContext> void checkSubrules(E ctx) {
-        switch (ctx.getRuleIndex()) {
-            case CICSParser.RULE_cics_web_path:
-                checkWebPath((CICSParser.Cics_web_pathContext) ctx);
-                break;
-            case CICSParser.RULE_cics_web_body_doctoken:
-                checkWebBodyDoctoken((CICSParser.Cics_web_body_doctokenContext) ctx);
-                break;
-            case CICSParser.RULE_cics_web_querystring:
-                checkWebQuerystring((CICSParser.Cics_web_querystringContext) ctx);
-                break;
-            case CICSParser.RULE_cics_web_close_options:
-                checkWebCloseOptions((CICSParser.Cics_web_close_optionsContext) ctx);
-                break;
-            case CICSParser.RULE_cics_web_auth_username:
-                checkWebAuthUsernameOptions((CICSParser.Cics_web_auth_usernameContext) ctx);
-                break;
-            case CICSParser.RULE_cics_web_auth_password:
-                checkWebAuthPasswordOptions((CICSParser.Cics_web_auth_passwordContext) ctx);
-                break;
-            case CICSParser.RULE_cics_web_client_auth_type:
-                checkWebClientAuthType((CICSParser.Cics_web_client_auth_typeContext) ctx);
-                break;
-            case CICSParser.RULE_cics_web_send_from_chunk:
-                checkSendFromChunk((CICSParser.Cics_web_send_from_chunkContext) ctx);
-                break;
-            case CICSParser.RULE_cics_web_send_container_subrule:
-                checkSendContainerSubrule((CICSParser.Cics_web_send_container_subruleContext) ctx);
-                break;
-            case CICSParser.RULE_cics_web_into_set_tocontainer:
-                checkIntoSetTocontainer((CICSParser.Cics_web_into_set_tocontainerContext) ctx);
-                break;
-            case CICSParser.RULE_cics_web_host:
-                checkHost((CICSParser.Cics_web_hostContext) ctx);
-                break;
-            case CICSParser.RULE_cics_web_host_hosttype:
-                checkHostHosttype((CICSParser.Cics_web_host_hosttypeContext) ctx);
-                break;
-            case CICSParser.RULE_cics_web_httpmethod:
-                checkHTTPMethod((CICSParser.Cics_web_httpmethodContext) ctx);
-                break;
-            case CICSParser.RULE_cics_web_httpversion:
-                checkHTTPVersion((CICSParser.Cics_web_httpversionContext) ctx);
-                break;
-            case CICSParser.RULE_cics_web_realm:
-                checkRealm((CICSParser.Cics_web_realmContext) ctx);
-                break;
-            case CICSParser.RULE_cics_web_server_convert:
-                checkWebServerConvert((CICSParser.Cics_web_server_convertContext) ctx);
-                break;
-            case CICSParser.RULE_cics_web_client_convert:
-                checkWebClientConvert((CICSParser.Cics_web_client_convertContext) ctx);
-                break;
-            case CICSParser.RULE_cics_web_statuscode:
-                checkStatuscode((CICSParser.Cics_web_statuscodeContext) ctx);
-                break;
-            case CICSParser.RULE_cics_web_send_doctoken:
-                checkSendDoctoken((CICSParser.Cics_web_send_doctokenContext) ctx);
-                break;
-            default:
-                break;
-        }
-    }
 
     // Main rules
     private void checkClose(CICSParser.Cics_web_closeContext ctx) {
@@ -307,203 +204,304 @@ public class CICSWebOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     }
 
     private void checkConverse(CICSParser.Cics_web_converseContext ctx) {
+        checkHasMandatoryOptions(ctx.CONVERSE(), ctx, "CONVERSE");
         checkHasMandatoryOptions(ctx.SESSTOKEN(), ctx, "SESSTOKEN");
-        checkMutuallyExclusiveOptions("PATH PATHLENGTH or URIMAP", ctx.cics_web_path(), ctx.cics_web_urimap());
+        checkMutuallyExclusiveOptions("PATH or URIMAP", ctx.PATH(), ctx.URIMAP());
+        checkPrerequisiteIsMet(ctx.PATH(), ctx.PATHLENGTH(), ctx, "PATHLENGTH without PATH");
+        checkHasExactlyOneOption("GET, HEAD, PATCH, POST, PUT, TRACE, OPTIONS, DELETE or METHOD", ctx, ctx.GET(), ctx.HEAD(), ctx.PATCH(), ctx.POST(), ctx.PUT(), ctx.TRACE(), ctx.OPTIONS(), ctx.DELETE(), ctx.METHOD());
+        checkPrerequisiteIsMet(ctx.QUERYSTRING(), ctx.QUERYSTRLEN(), ctx, "QUERYSTRLEN without QUERYSTRING");
+        // Body subsection
+        checkMutuallyExclusiveOptions("DOCTOKEN, FROM or CONTAINER", ctx.DOCTOKEN(), ctx.FROM(), ctx.CONTAINER());
 
+        checkPrerequisiteIsMet(ctx.DOCTOKEN(), ctx.NODOCDELETE(), ctx, "NODOCDELETE without DOCTOKEN");
+        checkPrerequisiteIsMet(ctx.DOCTOKEN(), ctx.DOCDELETE(), ctx, "DOCDELETE without DOCTOKEN");
+        checkPrerequisiteIsMet(ctx.DOCTOKEN(), ctx.DOCSTATUS(), ctx, "DOCSTATUS without DOCTOKEN");
+        checkMutuallyExclusiveOptions("NODOCDELETE, DOCDELETE or DOCSTATUS", ctx.NODOCDELETE(), ctx.DOCDELETE(), ctx.DOCSTATUS());
+
+        checkPrerequisiteIsMet(ctx.FROM(), ctx.FROMLENGTH(), ctx, "FROMLENGTH without FROM");
+        if (!ctx.FROM().isEmpty())
+            checkHasMandatoryOptions(ctx.FROMLENGTH(), ctx, "FROMLENGTH");
+
+        checkPrerequisiteIsMet(ctx.CONTAINER(), ctx.CHANNEL(), ctx, "CHANNEL without CONTAINER");
+        // END - Body subsection
+
+        checkMutuallyExclusiveOptions("ACTION or EXPECT", ctx.ACTION(), ctx.EXPECT());
+        checkMutuallyExclusiveOptions("NOCLOSE, CLOSE or CLOSESTATUS", ctx.NOCLOSE(), ctx.CLOSE(), ctx.CLOSESTATUS());
+
+        checkMutuallyExclusiveOptions("NONE, BASICAUTH, AUTHENTICATE", ctx.NONE(), ctx.BASICAUTH(), ctx.AUTHENTICATE());
+        if (!ctx.NONE().isEmpty() || !ctx.BASICAUTH().isEmpty() || !ctx.AUTHENTICATE().isEmpty()) {
+            checkHasMandatoryOptions(ctx.USERNAME(), ctx, "USERNAME");
+            checkPrerequisiteIsMet(ctx.USERNAME(), ctx.USERNAMELEN(), ctx, "USERNAMELEN without USERNAME");
+        } else {
+            checkHasIllegalOptions(ctx.USERNAME(), "USERNAME without NONE, BASICAUTH or AUTHENTICATE");
+            checkHasIllegalOptions(ctx.USERNAMELEN(), "USERNAMELEN without NONE, BASICAUTH or AUTHENTICATE");
+        }
+
+        checkMutuallyExclusiveOptions("INTO, SET or TOCONTAINER", ctx.INTO(), ctx.SET(), ctx.TOCONTAINER());
+        checkPrerequisiteIsMet(ctx.TOCONTAINER(), ctx.TOCHANNEL(), ctx, "TOCHANNEL without TOCONTAINER");
+
+        checkPrerequisiteIsMet(ctx.STATUSCODE(), ctx.STATUSTEXT(), ctx, "STATUSTEXT without STATUSCODE");
+        checkPrerequisiteIsMet(ctx.STATUSCODE(), ctx.STATUSLEN(), ctx, "STATUSLEN without STATUSCODE");
+
+        checkMutuallyExclusiveOptions("CLICONVERT, NOINCONVERT, NOOUTCONVERT, NOCLICONVERT, CLIENTCONV", ctx.CLICONVERT(), ctx.NOINCONVERT(), ctx.NOOUTCONVERT(), ctx.NOCLICONVERT(), ctx.CLIENTCONV());
 
     }
 
     private void checkEndbrowse(CICSParser.Cics_web_endbrowseContext ctx) {
-        checkMutuallyExclusiveOptions("FORMFIELD, HTTPHEADER, QUERYPARM", ctx.FORMFIELD(), ctx.HTTPHEADER(), ctx.QUERYPARM());
+        checkHasMandatoryOptions(ctx.ENDBROWSE(), ctx, "ENDBROWSE");
+        checkHasExactlyOneOption("FORMFIELD, HTTPHEADER, QUERYPARM", ctx, ctx.FORMFIELD(), ctx.HTTPHEADER(), ctx.QUERYPARM());
         checkPrerequisiteIsMet(ctx.HTTPHEADER(), ctx.SESSTOKEN(), ctx, "HTTPHEADER");
+        if (!ctx.FORMFIELD().isEmpty() || !ctx.HTTPHEADER().isEmpty()) {
+            checkHasIllegalOptions(ctx.SESSTOKEN(), "SESSTOKEN");
+        }
     }
 
-    // EXTRACT does not need any checks other than the helper rules.
+    private void checkExtract(CICSParser.Cics_web_extractContext ctx) {
+        // HTTP Server
+        if (!ctx.REQUESTTYPE().isEmpty() || !ctx.HTTPMETHOD().isEmpty() || !ctx.METHODLENGTH().isEmpty() || !ctx.QUERYSTRING().isEmpty() || !ctx.QUERYSTRLEN().isEmpty()) {
+            checkPrerequisiteIsMet(ctx.HTTPMETHOD(), ctx.METHODLENGTH(), ctx, "METHODLENGTH without HTTPMETHOD");
+            checkPrerequisiteIsMet(ctx.QUERYSTRING(), ctx.QUERYSTRLEN(), ctx, "QUERYSTRLEN without QUERYSTRING");
+
+            checkHasIllegalOptions(ctx.SESSTOKEN(), "SESSTOKEN");
+            checkHasIllegalOptions(ctx.REALM(), "REALM");
+            checkHasIllegalOptions(ctx.REALMLEN(), "REALMLEN");
+        }
+
+        // HTTP Client
+        if (!ctx.SESSTOKEN().isEmpty() || !ctx.REALM().isEmpty() || !ctx.REALMLEN().isEmpty()) {
+            checkHasMandatoryOptions(ctx.SESSTOKEN(), ctx, "SESSTOKEN");
+            checkPrerequisiteIsMet(ctx.REALM(), ctx.REALMLEN(), ctx, "REALMLEN without REALM");
+
+            checkHasIllegalOptions(ctx.REQUESTTYPE(), "REQUESTTYPE");
+            checkHasIllegalOptions(ctx.HTTPMETHOD(), "HTTPMETHOD");
+            checkHasIllegalOptions(ctx.METHODLENGTH(), "METHODLENGTH");
+            checkHasIllegalOptions(ctx.QUERYSTRING(), "QUERYSTRING");
+            checkHasIllegalOptions(ctx.QUERYSTRLEN(), "QUERYSTRLEN");
+        }
+
+        checkPrerequisiteIsMet(ctx.HOST(), ctx.HOSTLENGTH(), ctx, "HOSTLENGTH without HOST");
+        checkPrerequisiteIsMet(ctx.HOST(), ctx.HOSTTYPE(), ctx, "HOSTTYPE without HOST");
+        checkPrerequisiteIsMet(ctx.PATH(), ctx.PATHLENGTH(), ctx, "PATHLENGTH without PATH");
+    }
 
     private void checkOpen(CICSParser.Cics_web_openContext ctx) {
-        checkMutuallyExclusiveOptions("URIMAP or HOST", ctx.cics_web_urimap(), ctx.cics_web_host_portnumber());
+        checkMutuallyExclusiveOptions("URIMAP or HOST", ctx.URIMAP(), ctx.HOST());
+        checkPrerequisiteIsMet(ctx.HOST(), ctx.HOSTLENGTH(), ctx, "HOSTLENGTH without HOST");
+        checkPrerequisiteIsMet(ctx.HOST(), ctx.PORTNUMBER(), ctx, "PORTNUMBER without HOST");
+        checkPrerequisiteIsMet(ctx.HOST(), ctx.SCHEME(), ctx, "SCHEME without HOST");
+
+        if (!ctx.HOST().isEmpty()) {
+            checkHasMandatoryOptions(ctx.HOSTLENGTH(), ctx, "HOSTLENGTH");
+            checkHasMandatoryOptions(ctx.PORTNUMBER(), ctx, "PORTNUMBER");
+            checkHasMandatoryOptions(ctx.SCHEME(), ctx, "SCHEME");
+        }
+
         checkHasMandatoryOptions(ctx.SESSTOKEN(), ctx, "SESSTOKEN");
         checkPrerequisiteIsMet(ctx.HTTPVNUM(), ctx.HTTPRNUM(), ctx, "HTTPVNUM");
     }
 
     private void checkParse(CICSParser.Cics_web_parseContext ctx) {
+        checkHasMandatoryOptions(ctx.PARSE(), ctx, "PARSE");
+        checkHasMandatoryOptions(ctx.URL(), ctx, "URL");
+        checkHasMandatoryOptions(ctx.URLLENGTH(), ctx, "URLLENGTH");
+
         checkPrerequisiteIsMet(ctx.URL(), ctx.URLLENGTH(), ctx, "URL");
+
+        checkPrerequisiteIsMet(ctx.HOST(), ctx.HOSTLENGTH(), ctx, "HOSTLENGTH without HOST");
+        checkPrerequisiteIsMet(ctx.HOST(), ctx.HOSTTYPE(), ctx, "HOSTTYPE without HOST");
+
+        if (!ctx.HOST().isEmpty()) {
+            checkHasMandatoryOptions(ctx.HOSTLENGTH(), ctx, "HOSTLENGTH");
+        }
+
+        checkPrerequisiteIsMet(ctx.PATH(), ctx.PATHLENGTH(), ctx, "PATHLENGTH without PATH");
+        checkPrerequisiteIsMet(ctx.QUERYSTRING(), ctx.QUERYSTRLEN(), ctx, "QUERYSTRLEN without QUERYSTRING");
     }
 
     private void checkRead(CICSParser.Cics_web_readContext ctx) {
-        checkMutuallyExclusiveOptions("FORMFIELD, HTTPHEADER or QUERYPARM", ctx.FORMFIELD(), ctx.HTTPHEADER(), ctx.QUERYPARM());
+        checkHasMandatoryOptions(ctx.READ(), ctx, "READ");
+        checkHasExactlyOneOption("FORMFIELD, HTTPHEADER or QUERYPARM", ctx, ctx.FORMFIELD(), ctx.HTTPHEADER(), ctx.QUERYPARM());
 
-        if (ctx.FORMFIELD() != null) {
-           checkHasIllegalOptions(ctx.SESSTOKEN(), "SESSTOKEN");
+        if (!ctx.FORMFIELD().isEmpty()) {
+            checkHasIllegalOptions(ctx.SESSTOKEN(), "SESSTOKEN");
+            checkHasExactlyOneOption("VALUE or SET", ctx, ctx.VALUE(), ctx.SET());
+            checkHasMandatoryOptions(ctx.VALUELENGTH(), ctx, "VALUELENGTH");
         }
 
-        if (ctx.HTTPHEADER() != null) {
+        if (!ctx.HTTPHEADER().isEmpty()) {
             checkHasMandatoryOptions(ctx.NAMELENGTH(), ctx, "NAMELENGTH");
+            checkHasMandatoryOptions(ctx.VALUE(), ctx, "VALUE");
+            checkHasMandatoryOptions(ctx.VALUELENGTH(), ctx, "VALUELENGTH");
+
             checkHasIllegalOptions(ctx.CHARACTERSET(), "CHARACTERSET");
         }
 
-        if (ctx.QUERYPARM() != null) {
+        if (!ctx.QUERYPARM().isEmpty()) {
+            checkHasExactlyOneOption("VALUE or SET", ctx, ctx.VALUE(), ctx.SET());
+            checkHasMandatoryOptions(ctx.VALUELENGTH(), ctx, "VALUELENGTH");
+
+            checkHasIllegalOptions(ctx.SESSTOKEN(), "SESSTOKEN");
+            checkHasIllegalOptions(ctx.CHARACTERSET(), "CHARACTERSET");
+        }
+
+        checkPrerequisiteIsMet(ctx.FORMFIELD(), ctx.CHARACTERSET(), ctx, "CHARACTERSET without FORMFIELD");
+    }
+
+    private void checkReadNext(CICSParser.Cics_web_readnextContext ctx) {
+        checkHasMandatoryOptions(ctx.READNEXT(), ctx, "READNEXT");
+
+        checkHasExactlyOneOption("FORMFIELD, HTTPHEADER or QUERYPARM", ctx, ctx.FORMFIELD(), ctx.HTTPHEADER(), ctx.QUERYPARM());
+
+        if (!ctx.FORMFIELD().isEmpty() || !ctx.QUERYPARM().isEmpty()) {
             checkHasIllegalOptions(ctx.SESSTOKEN(), "SESSTOKEN");
         }
 
-        checkMutuallyExclusiveOptions("VALUE or SET", ctx.VALUE(), ctx.SET());
-        if (ctx.VALUE() == null) {
-            checkHasMandatoryOptions(ctx.SET(), ctx, "SET");
-            checkHasMandatoryOptions(ctx.VALUELENGTH(), ctx, "VALUELENGTH");
-        } else if (ctx.SET() == null) {
-            checkHasMandatoryOptions(ctx.VALUE(), ctx, "VALUE");
-            checkHasMandatoryOptions(ctx.VALUELENGTH(), ctx, "VALUELENGTH");
+        checkHasMandatoryOptions(ctx.NAMELENGTH(), ctx, "NAMELENGTH");
+        checkHasMandatoryOptions(ctx.VALUE(), ctx, "VALUE");
+        checkHasMandatoryOptions(ctx.VALUELENGTH(), ctx, "VALUELENGTH");
+    }
+
+    private void checkReceive(CICSParser.Cics_web_receiveContext ctx) {
+        checkHasMandatoryOptions(ctx.RECEIVE(), ctx, "RECEIVE");
+
+        if (!ctx.INTO().isEmpty() || !ctx.SET().isEmpty() || !ctx.LENGTH().isEmpty() || !ctx.MAXLENGTH().isEmpty() || !ctx.NOTRUNCATE().isEmpty() || !ctx.SRVCONVERT().isEmpty() || !ctx.NOSRVCONVERT().isEmpty() || !ctx.SERVERCONV().isEmpty()
+                || !ctx.CLICONVERT().isEmpty() || !ctx.NOCLICONVERT().isEmpty() || !ctx.CLIENTCONV().isEmpty() || !ctx.HOSTCODEPAGE().isEmpty()) {
+            // Buffer
+            checkHasIllegalOptions(ctx.TOCONTAINER(), "TOCONTAINER");
+            checkHasIllegalOptions(ctx.TOCHANNEL(), "TOCHANNEL");
+
+            checkHasExactlyOneOption("INTO or SET", ctx, ctx.INTO(), ctx.SET());
+            checkMutuallyExclusiveOptions("SRVCONVERT, NOSRVCONVERT or SERVERCONV", ctx.SRVCONVERT(), ctx.NOSRVCONVERT(), ctx.SERVERCONV());
+
+            checkHasMandatoryOptions(ctx.LENGTH(), ctx, "LENGTH");
+
         }
 
-        checkPrerequisiteIsMet(ctx.FORMFIELD(), ctx.CHARACTERSET(), ctx, "FORMFIELD");
+        if (!ctx.TOCONTAINER().isEmpty() || !ctx.TOCHANNEL().isEmpty()) {
+            // Container
+            checkHasIllegalOptions(ctx.INTO(), "INTO");
+            checkHasIllegalOptions(ctx.SET(), "SET");
+            checkHasIllegalOptions(ctx.LENGTH(), "LENGTH");
+            checkHasIllegalOptions(ctx.MAXLENGTH(), "MAXLENGTH");
+            checkHasIllegalOptions(ctx.NOTRUNCATE(), "NOTRUNCATE");
+            checkHasIllegalOptions(ctx.SRVCONVERT(), "SRVCONVERT");
+            checkHasIllegalOptions(ctx.NOSRVCONVERT(), "NOSRVCONVERT");
+            checkHasIllegalOptions(ctx.SERVERCONV(), "SERVERCONV");
+            checkHasIllegalOptions(ctx.HOSTCODEPAGE(), "HOSTCODEPAGE");
+
+            checkHasMandatoryOptions(ctx.TOCONTAINER(), ctx, "TOCONTAINER");
+            checkPrerequisiteIsMet(ctx.TOCONTAINER(), ctx.TOCHANNEL(), ctx, "TOCHANNEL without TOCONTAINER");
+        }
+
+        if (!ctx.SESSTOKEN().isEmpty() || !ctx.STATUSCODE().isEmpty() || !ctx.STATUSTEXT().isEmpty() || !ctx.STATUSLEN().isEmpty()) {
+            checkHasMandatoryOptions(ctx.SESSTOKEN(), ctx, "SESSTOKEN");
+            checkPrerequisiteIsMet(ctx.STATUSCODE(), ctx.STATUSTEXT(), ctx, "STATUSTEXT without STATUSCODE");
+            checkPrerequisiteIsMet(ctx.STATUSCODE(), ctx.STATUSLEN(), ctx, "STATUSLEN without STATUSCODE");
+        }
     }
 
-    private void checkReadnextFormfieldQueryparm(CICSParser.Cics_web_readnext_formfield_queryparmContext ctx) {
-        checkMutuallyExclusiveOptions("FORMFIELD or QUERYPARM", ctx.FORMFIELD(), ctx.QUERYPARM());
-
-        checkHasMandatoryOptions(ctx.NAMELENGTH(), ctx, "NAMELENGTH");
-        checkHasMandatoryOptions(ctx.VALUE(), ctx, "VALUE");
-        checkHasMandatoryOptions(ctx.VALUELENGTH(), ctx, "VALUELENGTH");
+    private void checkRetrieve(CICSParser.Cics_web_retrieveContext ctx) {
+        checkHasMandatoryOptions(ctx.RETRIEVE(), ctx, "RETRIEVE");
+        checkHasMandatoryOptions(ctx.DOCTOKEN(), ctx, "DOCTOKEN");
     }
-
-    private void checkReadnextHTTPHeader(CICSParser.Cics_web_readnext_httpheaderContext ctx) {
-        checkHasMandatoryOptions(ctx.NAMELENGTH(), ctx, "NAMELENGTH");
-        checkHasMandatoryOptions(ctx.VALUE(), ctx, "VALUE");
-        checkHasMandatoryOptions(ctx.VALUELENGTH(), ctx, "VALUELENGTH");
-    }
-
-    private void checkReceiveServerBuffer(CICSParser.Cics_web_receive_server_bufferContext ctx) {
-        checkHasMandatoryOptions(ctx.LENGTH(), ctx, "LENGTH");
-    }
-
-    private void checkReceiveServerContainer(CICSParser.Cics_web_receive_server_containerContext ctx) {
-        checkHasMandatoryOptions(ctx.TOCONTAINER(), ctx, "TOCONTAINER");
-    }
-
-    private void checkReceiveClient(CICSParser.Cics_web_receive_clientContext ctx) {
-        checkHasMandatoryOptions(ctx.SESSTOKEN(), ctx, "SESSTOKEN");
-    }
-
-    // RECEIVE Client (Buffer) does not need any checks.
-
-    private void checkReceiveClientContainer(CICSParser.Cics_web_receive_client_containerContext ctx) {
-        checkHasMandatoryOptions(ctx.TOCONTAINER(), ctx, "TOCONTAINER");
-    }
-
-    // RETRIEVE does not need any checks.
 
     private void checkSend(CICSParser.Cics_web_sendContext ctx) {
-        if (ctx.cics_web_send_client() != null) {
-            checkSendClient(ctx.cics_web_send_client());
-        } else if (ctx.cics_web_send_server() != null) {
-            checkSendServer(ctx.cics_web_send_server());
+        checkHasMandatoryOptions(ctx.SEND(), ctx, "SEND");
+        if (!ctx.SESSTOKEN().isEmpty()) {
+            // Client
+            checkHasExactlyOneOption("GET, HEAD, PATCH, POST, PUT, TRACE, OPTIONS, DELETE or METHOD", ctx, ctx.GET(), ctx.HEAD(), ctx.PATCH(), ctx.POST(), ctx.PUT(), ctx.TRACE(), ctx.OPTIONS(), ctx.DELETE(), ctx.METHOD());
+
+            checkMutuallyExclusiveOptions("PATH or URIMAP", ctx.PATH(), ctx.URIMAP());
+            checkPrerequisiteIsMet(ctx.PATH(), ctx.PATHLENGTH(), ctx, "PATHLENGTH without PATH");
+
+            checkPrerequisiteIsMet(ctx.QUERYSTRING(), ctx.QUERYSTRLEN(), ctx, "QUERYSTRLEN without QUERYSTRING");
+
+            // Body subsection
+            if (!ctx.MEDIATYPE().isEmpty() || !ctx.DOCTOKEN().isEmpty() || !ctx.FROM().isEmpty() || !ctx.CONTAINER().isEmpty()) {
+                checkHasMandatoryOptions(ctx.MEDIATYPE(), ctx, "MEDIATYPE");
+                checkMutuallyExclusiveOptions("DOCTOKEN, FROM or CONTAINER", ctx.DOCTOKEN(), ctx.FROM(), ctx.CONTAINER());
+
+                checkPrerequisiteIsMet(ctx.DOCTOKEN(), ctx.NODOCDELETE(), ctx, "NODOCDELETE without DOCTOKEN");
+                checkPrerequisiteIsMet(ctx.DOCTOKEN(), ctx.DOCDELETE(), ctx, "DOCDELETE without DOCTOKEN");
+                checkPrerequisiteIsMet(ctx.DOCTOKEN(), ctx.DOCSTATUS(), ctx, "DOCSTATUS without DOCTOKEN");
+                checkMutuallyExclusiveOptions("NODOCDELETE, DOCDELETE or DOCSTATUS", ctx.NODOCDELETE(), ctx.DOCDELETE(), ctx.DOCSTATUS());
+
+                checkPrerequisiteIsMet(ctx.FROM(), ctx.FROMLENGTH(), ctx, "FROMLENGTH without FROM");
+                if (!ctx.FROM().isEmpty())
+                    checkHasMandatoryOptions(ctx.FROMLENGTH(), ctx, "FROMLENGTH");
+
+                checkPrerequisiteIsMet(ctx.CONTAINER(), ctx.CHANNEL(), ctx, "CHANNEL without CONTAINER");
+            }
+            // END - Body subsection
+
+            checkMutuallyExclusiveOptions("ACTION or EXPECT", ctx.ACTION(), ctx.EXPECT());
+            checkMutuallyExclusiveOptions("NOCLOSE, CLOSE or CLOSESTATUS", ctx.NOCLOSE(), ctx.CLOSE(), ctx.CLOSESTATUS());
+
+            checkMutuallyExclusiveOptions("NONE, BASICAUTH, AUTHENTICATE", ctx.NONE(), ctx.BASICAUTH(), ctx.AUTHENTICATE());
+
+            checkPrerequisiteIsMet(ctx.USERNAME(), ctx.USERNAMELEN(), ctx, "USERNAMELEN without USERNAME");
+            checkPrerequisiteIsMet(ctx.USERNAME(), ctx.PASSWORD(), ctx, "PASSWORD without USERNAME");
+            checkPrerequisiteIsMet(ctx.PASSWORD(), ctx.PASSWORDLEN(), ctx, "PASSWORDLEN without PASSWORD");
+
+            checkPrerequisiteIsMet(ctx.CONTAINER(), ctx.CHANNEL(), ctx, "CHANNEL without CONTAINER");
+
+            checkMutuallyExclusiveOptions("CLICONVERT, NOCLICONVERT, CLIENTCONV", ctx.CLICONVERT(), ctx.NOCLICONVERT(), ctx.CLIENTCONV());
+        } else {
+            // Server
+            checkHasExactlyOneOption("DOCTOKEN, FROM or CONTAINER", ctx, ctx.DOCTOKEN(), ctx.FROM(), ctx.CONTAINER());
+
+            checkPrerequisiteIsMet(ctx.DOCTOKEN(), ctx.NODOCDELETE(), ctx, "NODOCDELETE without DOCTOKEN");
+            checkPrerequisiteIsMet(ctx.DOCTOKEN(), ctx.DOCDELETE(), ctx, "DOCDELETE without DOCTOKEN");
+            checkPrerequisiteIsMet(ctx.DOCTOKEN(), ctx.DOCSTATUS(), ctx, "DOCSTATUS without DOCTOKEN");
+            checkMutuallyExclusiveOptions("NODOCDELETE, DOCDELETE or DOCSTATUS", ctx.NODOCDELETE(), ctx.DOCDELETE(), ctx.DOCSTATUS());
+
+            checkPrerequisiteIsMet(ctx.FROM(), ctx.CHUNKNO(), ctx, "CHUNKNO without FROM");
+            checkPrerequisiteIsMet(ctx.FROM(), ctx.CHUNKYES(), ctx, "CHUNKYES without FROM");
+            checkPrerequisiteIsMet(ctx.FROM(), ctx.CHUNKEND(), ctx, "CHUNKEND without FROM");
+            checkPrerequisiteIsMet(ctx.FROM(), ctx.CHUNKING(), ctx, "CHUNKING without FROM");
+            checkMutuallyExclusiveOptions("CHUNKNO, CHUNKYES, CHUNKEND or CHUNKING", ctx.CHUNKNO(), ctx.CHUNKYES(), ctx.CHUNKEND(), ctx.CHUNKING());
+
+            checkPrerequisiteIsMet(ctx.FROM(), ctx.HOSTCODEPAGE(), ctx, "HOSTCODEPAGE without FROM");
+
+            checkPrerequisiteIsMet(ctx.FROM(), ctx.FROMLENGTH(), ctx, "FROMLENGTH without FROM");
+            if (!ctx.FROM().isEmpty())
+                checkHasMandatoryOptions(ctx.FROMLENGTH(), ctx, "FROMLENGTH");
+
+            checkPrerequisiteIsMet(ctx.CONTAINER(), ctx.CHANNEL(), ctx, "CHANNEL without CONTAINER");
+
+            if (!ctx.STATUSCODE().isEmpty() || !ctx.STATUSTEXT().isEmpty() || !ctx.STATUSLEN().isEmpty() || !ctx.LENGTH().isEmpty()) {
+                checkHasMandatoryOptions(ctx.STATUSCODE(), ctx, "STATUSCODE");
+                checkHasMandatoryOptions(ctx.STATUSTEXT(), ctx, "STATUSTEXT");
+                checkHasExactlyOneOption("STATUSLEN or LENGTH", ctx, ctx.STATUSLEN(), ctx.LENGTH());
+            }
+
+            checkMutuallyExclusiveOptions("IMMEDIATE, EVENTUAL or ACTION", ctx.IMMEDIATE(), ctx.EVENTUAL(), ctx.ACTION());
+            checkMutuallyExclusiveOptions("NOCLOSE, CLOSE, CLOSESTATUS", ctx.NOCLOSE(), ctx.CLOSE(), ctx.CLOSESTATUS());
         }
     }
 
-    private void checkSendServer(CICSParser.Cics_web_send_serverContext ctx) {
-        checkMutuallyExclusiveOptions("DOCTOKEN, FROM or CONTAINER", ctx.cics_web_send_doctoken(), ctx.cics_web_send_from_chunk(), ctx.cics_web_send_container_subrule());
-        if (ctx.cics_web_send_from_chunk() == null) {
+    private void checkStartbrowse(CICSParser.Cics_web_startbrowseContext ctx) {
+        checkHasMandatoryOptions(ctx.STARTBROWSE(), ctx, "STARTBROWSE");
+        checkHasExactlyOneOption("FORMFIELD, HTTPHEADER or QUERYPARM", ctx, ctx.FORMFIELD(), ctx.HTTPHEADER(), ctx.QUERYPARM());
+
+        if (!ctx.FORMFIELD().isEmpty()) {
+            checkHasIllegalOptions(ctx.SESSTOKEN(), "SESSTOKEN");
+        }
+
+        if (!ctx.HTTPHEADER().isEmpty()) {
+            checkHasIllegalOptions(ctx.NAMELENGTH(), "NAMELENGTH");
             checkHasIllegalOptions(ctx.HOSTCODEPAGE(), "HOSTCODEPAGE");
+            checkHasIllegalOptions(ctx.CHARACTERSET(), "CHARACTERSET");
         }
-    }
 
-    private void checkSendClient(CICSParser.Cics_web_send_clientContext ctx) {
-        checkMutuallyExclusiveOptions("DOCTOKEN, FROM or CONTAINER", ctx.cics_web_send_doctoken(), ctx.cics_web_send_from_chunk(), ctx.cics_web_send_container_subrule());
-    }
-
-    // STARTBROWSE does not need any checks other than the helper rules.
-
-    private void checkStartbrowseFormfieldQueryparm(CICSParser.Cics_web_startbrowse_formfield_queryparmContext ctx) {
-        checkPrerequisiteIsMet(ctx.FORMFIELD(), ctx.CHARACTERSET(), ctx, "FORMFIELD");
+        if (!ctx.QUERYPARM().isEmpty()) {
+            checkHasIllegalOptions(ctx.SESSTOKEN(), "SESSTOKEN");
+            checkHasIllegalOptions(ctx.CHARACTERSET(), "CHARACTERSET");
+        }
     }
 
     private void checkWrite(CICSParser.Cics_web_writeContext ctx) {
         checkHasMandatoryOptions(ctx.HTTPHEADER(), ctx, "HTTPHEADER");
         checkHasMandatoryOptions(ctx.VALUE(), ctx, "VALUE");
-    }
-
-
-    // ----- Helper rules -----
-    private void checkWebPath(CICSParser.Cics_web_pathContext ctx) {
-        checkPrerequisiteIsMet(ctx.PATH(), ctx.PATHLENGTH(), ctx, "PATH");
-    }
-
-    private void checkWebBodyDoctoken(CICSParser.Cics_web_body_doctokenContext ctx) {
-        checkPrerequisiteIsMet(ctx.DOCTOKEN(), ctx.NODOCDELETE(), ctx, "DOCTOKEN");
-        checkPrerequisiteIsMet(ctx.DOCTOKEN(), ctx.DOCDELETE(), ctx, "DOCTOKEN");
-        checkPrerequisiteIsMet(ctx.DOCTOKEN(), ctx.DOCSTATUS(), ctx, "DOCTOKEN");
-
-        checkMutuallyExclusiveOptions("DOCDELETE, NODOCDELETE, DOCSTATUS", ctx.DOCDELETE(), ctx.NODOCDELETE(), ctx.DOCSTATUS());
-    }
-
-    private void checkWebQuerystring(CICSParser.Cics_web_querystringContext ctx) {
-        checkPrerequisiteIsMet(ctx.QUERYSTRING(), ctx.QUERYSTRLEN(), ctx, "QUERYSTRING");
-    }
-
-    private void checkWebCloseOptions(CICSParser.Cics_web_close_optionsContext ctx) {
-        checkMutuallyExclusiveOptions("NOCLOSE, CLOSE, CLOSESTATUS", ctx.NOCLOSE(), ctx.CLOSE(), ctx.CLOSESTATUS());
-    }
-
-    private void checkWebAuthUsernameOptions(CICSParser.Cics_web_auth_usernameContext ctx) {
-        checkPrerequisiteIsMet(ctx.USERNAME(), ctx.USERNAMELEN(), ctx, "USERNAME");
-    }
-
-    private void checkWebAuthPasswordOptions(CICSParser.Cics_web_auth_passwordContext ctx) {
-        checkPrerequisiteIsMet(ctx.PASSWORD(), ctx.PASSWORDLEN(), ctx, "PASSWORD");
-    }
-
-    private void checkWebClientAuthType(CICSParser.Cics_web_client_auth_typeContext ctx) {
-        checkMutuallyExclusiveOptions("NONE, BASICAUTH, AUTHENTICATE", ctx.NONE(), ctx.BASICAUTH(), ctx.AUTHENTICATE());
-    }
-
-    private void checkSendFromChunk(CICSParser.Cics_web_send_from_chunkContext ctx) {
-        checkMutuallyExclusiveOptions("CHUNKYES, CHUNKNO, CHUNKEND, CHUNKING", ctx.CHUNKYES(), ctx.CHUNKNO(), ctx.CHUNKEND(), ctx.CHUNKING());
-    }
-
-    private void checkIntoSetTocontainer(CICSParser.Cics_web_into_set_tocontainerContext ctx) {
-        checkMutuallyExclusiveOptions("INTO, SET, TOCONTAINER TOCHANNEL", ctx.INTO(), ctx.SET(), ctx.TOCONTAINER());
-        checkPrerequisiteIsMet(ctx.TOCONTAINER(), ctx.TOCHANNEL(), ctx, "TOCONTAINER");
-    }
-
-    private void checkSendContainerSubrule(CICSParser.Cics_web_send_container_subruleContext ctx) {
-        checkPrerequisiteIsMet(ctx.CONTAINER(), ctx.CHANNEL(), ctx, "CONTAINER");
-    }
-
-    private void checkHost(CICSParser.Cics_web_hostContext ctx) {
-        checkPrerequisiteIsMet(ctx.HOST(), ctx.HOSTLENGTH(), ctx, "HOST");
-    }
-
-    private void checkHostHosttype(CICSParser.Cics_web_host_hosttypeContext ctx) {
-        checkPrerequisiteIsMet(ctx.cics_web_host(), ctx.HOSTTYPE(), ctx, "HOSTTYPE");
-    }
-
-    private void checkHTTPMethod(CICSParser.Cics_web_httpmethodContext ctx) {
-        checkPrerequisiteIsMet(ctx.HTTPMETHOD(), ctx.METHODLENGTH(), ctx, "HTTPMETHOD");
-    }
-
-    private void checkHTTPVersion(CICSParser.Cics_web_httpversionContext ctx) {
-        checkPrerequisiteIsMet(ctx.HTTPVERSION(), ctx.VERSIONLEN(), ctx, "HTTPVERSION");
-    }
-
-    private void checkRealm(CICSParser.Cics_web_realmContext ctx) {
-        checkPrerequisiteIsMet(ctx.REALM(), ctx.REALMLEN(), ctx, "REALM");
-    }
-
-    private void checkWebServerConvert(CICSParser.Cics_web_server_convertContext ctx) {
-        checkMutuallyExclusiveOptions("SRVCONVERT, NOSRVCONVERT, SERVERCONV", ctx.SRVCONVERT(), ctx.NOSRVCONVERT(), ctx.SERVERCONV());
-    }
-
-    private void checkWebClientConvert(CICSParser.Cics_web_client_convertContext ctx) {
-        checkMutuallyExclusiveOptions("CLICONVERT, NOCLICONVERT, CLIENTCONV", ctx.CLICONVERT(), ctx.NOCLICONVERT(), ctx.CLIENTCONV());
-    }
-
-    private void checkStatuscode(CICSParser.Cics_web_statuscodeContext ctx) {
-        checkPrerequisiteIsMet(ctx.STATUSCODE(), ctx.STATUSTEXT(), ctx, "STATUSCODE");
-        checkPrerequisiteIsMet(ctx.STATUSTEXT(), ctx.STATUSCODE(), ctx, "STATUSTEXT");
-    }
-    private void checkSendDoctoken(CICSParser.Cics_web_send_doctokenContext ctx) {
-        checkPrerequisiteIsMet(ctx.DOCTOKEN(), ctx.NODOCDELETE(), ctx, "DOCTOKEN");
-        checkPrerequisiteIsMet(ctx.DOCTOKEN(), ctx.DOCDELETE(), ctx, "DOCTOKEN");
-        checkPrerequisiteIsMet(ctx.DOCTOKEN(), ctx.DOCSTATUS(), ctx, "DOCTOKEN");
     }
 }
