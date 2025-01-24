@@ -272,22 +272,20 @@ public class CICSPerformSPOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
         checkHasMandatoryOptions(ctx.SHUTDOWN(), ctx, "SHUTDOWN");
         checkHasMutuallyExclusiveOptions("SDTRAN or NOSDTRAN", ctx.SDTRAN(), ctx.NOSDTRAN());
         checkHasMutuallyExclusiveOptions("IMMEDIATE or TAKEOVER", ctx.IMMEDIATE(), ctx.TAKEOVER());
-        if (!ctx.SHUTDOWN().isEmpty()) {
-            if (!ctx.IMMEDIATE().isEmpty()) {
-                checkHasIllegalOptions(ctx.RESTART(), "RESTART");
-                checkHasIllegalOptions(ctx.XLT(), "XLT");
-                checkHasIllegalOptions(ctx.PLT(), "PLT");
-                checkHasIllegalOptions(ctx.PLTNAME(), "PLTNAME");
-            } else if (!ctx.TAKEOVER().isEmpty()) {
-                checkHasIllegalOptions(ctx.NORESTART(), "NORESTART");
-                checkHasIllegalOptions(ctx.RESTART(), "RESTART");
-                checkHasIllegalOptions(ctx.XLT(), "XLT");
-                checkHasIllegalOptions(ctx.PLT(), "PLT");
-                checkHasIllegalOptions(ctx.PLTNAME(), "PLTNAME");
-            } else {
-                checkHasMutuallyExclusiveOptions("PLT or PLTNAME", ctx.PLT(), ctx.PLTNAME());
-                checkHasIllegalOptions(ctx.NORESTART(), "NORESTART");
-            }
+        if (!ctx.IMMEDIATE().isEmpty()) {
+            checkHasIllegalOptions(ctx.RESTART(), "RESTART");
+            checkHasIllegalOptions(ctx.XLT(), "XLT");
+            checkHasIllegalOptions(ctx.PLT(), "PLT");
+            checkHasIllegalOptions(ctx.PLTNAME(), "PLTNAME");
+        } else if (!ctx.TAKEOVER().isEmpty()) {
+            checkHasIllegalOptions(ctx.NORESTART(), "NORESTART");
+            checkHasIllegalOptions(ctx.RESTART(), "RESTART");
+            checkHasIllegalOptions(ctx.XLT(), "XLT");
+            checkHasIllegalOptions(ctx.PLT(), "PLT");
+            checkHasIllegalOptions(ctx.PLTNAME(), "PLTNAME");
+        } else {
+            checkHasMutuallyExclusiveOptions("PLT or PLTNAME", ctx.PLT(), ctx.PLTNAME());
+            checkHasIllegalOptions(ctx.NORESTART(), "NORESTART");
         }
     }
     private void checkSsl(CICSParser.Cics_perform_sslContext ctx) {
