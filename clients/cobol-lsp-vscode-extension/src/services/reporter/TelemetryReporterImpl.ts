@@ -51,14 +51,17 @@ export class TelemetryReporterImpl implements TelemetryReport {
     };
   }
 
-  private reporter: TelemetryReporter;
+  private reporter: TelemetryReporter | undefined;
 
-  constructor(private telemetryKeyId: string) {
-    this.reporter = new TelemetryReporter(this.telemetryKeyId);
+  constructor(private telemetryKeyId: string | undefined) {
+    /* To disable telemetry for public builds one shouldn't provide a telemetry key. */
+    this.reporter = this.telemetryKeyId
+      ? new TelemetryReporter(this.telemetryKeyId)
+      : undefined;
   }
 
   public reportEvent(content: TelemetryEvent): void {
-    if (this.isValidTelemetryKey()) {
+    if (this.reporter && this.isValidTelemetryKey()) {
       this.reporter.sendTelemetryEvent(
         content.eventName,
         TelemetryReporterImpl.convertData(content),
@@ -68,7 +71,7 @@ export class TelemetryReporterImpl implements TelemetryReport {
   }
 
   public reportExceptionEvent(content: TelemetryEvent): void {
-    if (this.isValidTelemetryKey()) {
+    if (this.reporter && this.isValidTelemetryKey()) {
       this.reporter.sendTelemetryErrorEvent(
         content.eventName,
         TelemetryReporterImpl.convertData(content),
@@ -77,7 +80,7 @@ export class TelemetryReporterImpl implements TelemetryReport {
   }
 
   public async dispose(): Promise<void> {
-    await this.reporter.dispose();
+    this.reporter && (await this.reporter.dispose());
   }
 
   private isValidTelemetryKey(): boolean {
