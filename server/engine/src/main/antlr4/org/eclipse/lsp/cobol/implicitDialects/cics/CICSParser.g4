@@ -38,7 +38,7 @@ allExciRules: cics_exci_link | cics_exci_delete | cics_exci_delete_container | c
               cics_exci_get_container | cics_exci_get_next_container | cics_exci_move_container |
               cics_exci_put_container | cics_exci_query_channel | cics_exci_startbrowse_container ;
 
-allSPRules: cics_acquire_terminal | cics_disable | cics_discard | cics_enable | cics_extract_system_programming | cics_inquire_system_programming | cics_create;
+allSPRules: cics_acquire_terminal | cics_disable | cics_discard | cics_enable | cics_extract_system_programming | cics_inquire_system_programming | cics_create | cics_csd;
 
 // compiler options
 compilerOpts
@@ -211,6 +211,40 @@ cics_assign_parameter2: MAPLINE cics_data_area | MAPWIDTH cics_data_area | MICRO
              TNADDR cics_data_area | TNIPFAMILY cics_cvda | TNPORT cics_data_area |  TRANPRIORITY cics_data_area |
              TWALENG cics_data_area | UNATTEND cics_data_area | USERID cics_data_area |
              USERNAME cics_data_area | USERPRIORITY cics_data_area | VALIDATION cics_data_area | cics_handle_response;
+
+/** CSD System Commands */
+cics_csd: CSD (cics_csd_add | cics_csd_alter | cics_csd_append | cics_csd_copy | cics_csd_define | cics_csd_delete | cics_csd_disconnect | cics_csd_endbrgroup |
+               cics_csd_endbrlist | cics_csd_endbrrsrce | cics_csd_getnextgroup | cics_csd_getnextlist | cics_csd_getnextrsrce | cics_csd_inquiregroup | cics_csd_inquirelist |
+               cics_csd_inquirersrce | cics_csd_install | cics_csd_lock | cics_csd_remove | cics_csd_rename | cics_csd_startbrgroup | cics_csd_startbrlist | cics_csd_startbrrsrce |
+               cics_csd_unlock | cics_csd_userdefine);
+cics_csd_add:           (ADD | (GROUP | LIST | BEFORE | AFTER) cics_data_value | cics_handle_response)+;
+cics_csd_alter:         (ALTER | cics_csd_cvda | RESTYPE | NOCOMPAT | COMPAT | COMPATMODE cics_cvda | (RESID | GROUP | ATTRIBUTES | ATTRLEN) cics_data_value | cics_handle_response)+;
+cics_csd_append:        (APPEND | (LIST | TO) cics_data_value | cics_handle_response)+;
+cics_csd_copy:          (COPY | cics_csd_cvda | ( RESID | AS | TO | GROUP ) cics_data_value | DUPERROR | DUPNOREPLACE | DUPREPLACE | DUPACTION cics_cvda | cics_handle_response)+;
+cics_csd_define:        (DEFINE | cics_csd_cvda | RESTYPE | NOCOMPAT | COMPAT | COMPATMODE cics_cvda | (RESID | GROUP | ATTRIBUTES | ATTRLEN) cics_data_value | cics_handle_response)+;
+cics_csd_delete:        (DELETE | cics_csd_cvda | (RESID | GROUP) cics_data_value | LISTACTION cics_cvda | REMOVE | cics_handle_response)+;
+cics_csd_disconnect:    (DISCONNECT | cics_handle_response)+;
+cics_csd_endbrgroup:    (ENDBRGROUP | LIST | cics_handle_response)+;
+cics_csd_endbrlist:     (ENDBRLIST | cics_handle_response)+;
+cics_csd_endbrrsrce:    (ENDBRRSRCE | cics_handle_response)+;
+cics_csd_getnextgroup:  (GETNEXTGROUP | GROUP cics_data_area | LIST cics_data_value | cics_handle_response)+;
+cics_csd_getnextlist:   (GETNEXTLIST | LIST cics_data_area | cics_handle_response)+;
+cics_csd_getnextrsrce:  (GETNEXTRSRCE | cics_handle_response)+;
+cics_csd_inquiregroup:  (INQUIREGROUP | cics_handle_response)+;
+cics_csd_inquirelist:   (INQUIRELIST | cics_handle_response)+;
+cics_csd_inquirersrce:  (INQUIRERSRCE | cics_handle_response)+;
+cics_csd_install:       (INSTALL | cics_handle_response)+;
+cics_csd_lock:          (LOCK | cics_handle_response)+;
+cics_csd_remove:        (REMOVE | cics_handle_response)+;
+cics_csd_rename:        (RENAME | cics_handle_response)+;
+cics_csd_startbrgroup:  (STARTBRGROUP | cics_handle_response)+;
+cics_csd_startbrlist:   (STARTBRLIST | cics_handle_response)+;
+cics_csd_startbrrsrce:  (STARTBRRSRCE | cics_handle_response)+;
+cics_csd_unlock:        (UNLOCK | cics_handle_response)+;
+cics_csd_userdefine:    (USERDEFINE | cics_handle_response)+;
+cics_csd_cvda:          (RESTYPE cics_cvda | ATOMSERVICE | BUNDLE | CONNECTION | CORBASERVER | DB2CONN | DB2ENTRY | DB2TRAN | DJAR | DOCTEMPLATE | DUMPCODE |
+                         ENQMODEL | FILE | IPCONN | JOURNALMODEL | JVMSERVER | LIBRARY | LSRPOOL | MAPSET | MQCONN | MQMONITOR | PARTITIONSET | PARTNER | PIPELINE |
+                         PROCESSTYPE | PROFILE | PROGRAM | REQUESTMODEL | SESSIONS | TCPIPSERVICE | TDQUEUE | TERMINAL | TRANCLASS | TRANSACTION | TSMODEL | TYPETERM | URIMAP | WEBSERVICE)+;
 
 /** BIF DEEDIT / BIF DIGEST */
 cics_bif: BIF (cics_bif_deedit | cics_bif_digest);
