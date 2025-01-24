@@ -84,6 +84,7 @@ export class CopybookDownloaderForE4E {
     const promises: Promise<EndevorMember[] | EndevorElement[] | Error>[] = [];
 
     this.writeLocationLogs(candidate.libs);
+    this.outputChannel?.appendLine('Extra logging follows');
 
     for (const lib of candidate.libs) {
       if (DATASET in lib) {
@@ -112,12 +113,16 @@ export class CopybookDownloaderForE4E {
         );
         this.outputChannel?.appendLine(result.value.message);
       } else {
+        this.outputChannel?.appendLine("Results for: " + JSON.stringify(candidate.libs[i]));
         for (const pro of result.value) {
           if (DATASET in pro && !elements[pro.member]) {
             elements[pro.member] = pro;
+            this.outputChannel?.appendLine("  " + JSON.stringify(pro));
           } else if (ENVIRONMENT in pro && !elements[pro.element])
             elements[pro.element] = pro;
+            this.outputChannel?.appendLine("  " + JSON.stringify(pro));
         }
+        this.outputChannel?.appendLine("End of results for: " + JSON.stringify(candidate.libs[i]));
       }
     }
 
