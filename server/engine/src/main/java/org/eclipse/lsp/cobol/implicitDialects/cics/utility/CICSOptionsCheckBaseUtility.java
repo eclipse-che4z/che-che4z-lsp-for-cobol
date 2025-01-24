@@ -457,6 +457,28 @@ public abstract class CICSOptionsCheckBaseUtility {
         }
     }
 
+    protected <E extends ParseTree> void checkHasExactlyOneOption(
+            String options, ParserRuleContext parentCtx, E... rules) {
+
+        List<TerminalNode> children = new ArrayList<>();
+
+        Stream.of(rules)
+                .filter(Objects::nonNull)
+                .forEach(
+                        rule -> {
+                            if (TerminalNode.class.isAssignableFrom(rule.getClass()))
+                                children.add((TerminalNode) rule);
+                        });
+
+        if (checkHasMutuallyExclusiveOptions(options, children) == 0) {
+            throwException(
+                    ErrorSeverity.ERROR,
+                    getLocality(parentCtx),
+                    "Exactly one option required, none provided: ",
+                    options);
+        }
+    }
+
     protected void getAllTokenChildren(
             ParserRuleContext ctx, List<TerminalNode> children, boolean validateResponseHandler) {
         if (ctx.children == null) return;

@@ -72,9 +72,9 @@ public class TestCicsWebStatement {
 
     private static final String ENDBROWSE_VALID = WEB + "ENDBROWSE FORMFIELD";
 
-    private static final String EXTRACT_SERVER_VALID = WEB + "EXTRACT SCHEME(123) HOST(123) HOSTLENGTH(123) HOSTTYPE(1) HTTPMETHOD(1) METHODLENGTH(123) "
+    private static final String EXTRACT_SERVER_VALID = WEB + "EXTRACT SCHEME({$queryStr}) HOST(123) HOSTLENGTH(123) HOSTTYPE(1) HTTPMETHOD(1) METHODLENGTH(123) "
             + "HTTPVERSION(2) VERSIONLEN(1) PATH(123) PATHLENGTH(123) PORTNUMBER(80) QUERYSTRING(123) QUERYSTRLEN(10) REQUESTTYPE(123) URIMAP(1)";
-    private static final String EXTRACT_CLIENT_VALID = WEB + "EXTRACT SESSTOKEN({$sessVar}) SCHEME(123) " + HOST_LEN_TYPE + "HTTPVERSION(2) VERSIONLEN(1) PATH(123) PATHLENGTH(123) PORTNUMBER(80)";
+    private static final String EXTRACT_CLIENT_VALID = WEB + "EXTRACT SESSTOKEN({$sessVar}) SCHEME(123) " + HOST_LEN_TYPE + " HTTPVERSION(2) VERSIONLEN(1) PATH(123) PATHLENGTH(123) PORTNUMBER(80)";
 
     private static final String OPEN_VALID = WEB + "OPEN HOST(123) HOSTLENGTH(123) PORTNUMBER(80) SCHEME(123) CERTIFICATE(123) CODEPAGE(12) "
             + "SESSTOKEN({$sessVar}) HTTPVNUM(123) HTTPRNUM(123) CIPHERS(123) NUMCIPHERS(123)";
@@ -104,9 +104,9 @@ public class TestCicsWebStatement {
     private static final String SEND_SERVER_VALID_2 = WEB + "SEND FROM(123) FROMLENGTH(123) CHUNKNO HOSTCODEPAGE(123) MEDIATYPE(123) SRVCONVERT CHARACTERSET(1) STATUSCODE(123) STATUSTEXT(123) STATUSLEN(123) IMMEDIATE NOCLOSE";
     private static final String SEND_SERVER_VALID_3 = WEB + "SEND CONTAINER(1) CHANNEL(3) MEDIATYPE(123) SRVCONVERT CHARACTERSET(1) STATUSCODE(123) STATUSTEXT(123) STATUSLEN(123) EVENTUAL CLOSE";
 
-    private static final String SEND_CLIENT_VALID_1 = WEB + "SEND SESSTOKEN({$sessVar}) GET PATH(123) PATHLENGTH(123) QUERYSTRING(123) QUERYSTRLEN(123) DOCTOKEN(123) DOCDELETE CLICONVERT CHARACTERSET(1)"
+    private static final String SEND_CLIENT_VALID_1 = WEB + "SEND SESSTOKEN({$sessVar}) GET PATH(123) PATHLENGTH(123) QUERYSTRING(123) MEDIATYPE(123) QUERYSTRLEN(123) DOCTOKEN(123) DOCDELETE CLICONVERT CHARACTERSET(1)"
             + " EXPECT NOCLOSE BASICAUTH USERNAME(123) USERNAMELEN(3) PASSWORD(1234) PASSWORDLEN(4)";
-    private static final String SEND_CLIENT_VALID_2 = WEB + "SEND SESSTOKEN({$sessVar}) FROM(123) FROMLENGTH(3) CHUNKYES GET PATH(123) PATHLENGTH(123) QUERYSTRING(123) QUERYSTRLEN(123) CLICONVERT CHARACTERSET(1) EXPECT NOCLOSE BASICAUTH USERNAME(123) USERNAMELEN(3) PASSWORD(1234) PASSWORDLEN(4)";
+    private static final String SEND_CLIENT_VALID_2 = WEB + "SEND SESSTOKEN({$sessVar}) CHUNKYES GET PATH(123) PATHLENGTH(123) QUERYSTRING(123) QUERYSTRLEN(123) CLICONVERT CHARACTERSET(1) EXPECT NOCLOSE BASICAUTH USERNAME(123) USERNAMELEN(3) PASSWORD(1234) PASSWORDLEN(4)";
 
     private static final String STARTBROWSE_FORMFIELD_VALID = WEB + "STARTBROWSE FORMFIELD(123) NAMELENGTH(123) CHARACTERSET(123) HOSTCODEPAGE(123)";
     private static final String STARTBROWSE_HTTPHEADER_VALID = WEB + "STARTBROWSE HTTPHEADER SESSTOKEN({$sessVar})";
@@ -115,10 +115,10 @@ public class TestCicsWebStatement {
     private static final String WRITE_HTTPHEADER_VALID = WEB + "WRITE HTTPHEADER(123) NAMELENGTH(123) SESSTOKEN({$sessVar}) VALUE(123) VALUELENGTH(123)";
 
     // Invalid use cases
-    private static final String CLOSE_INVALID = WEB + "{CLOSE|errorOne} {FROM|errorTwo}(123) SESSTOKEN(123)";
+    private static final String CLOSE_INVALID = WEB + "{CLOSE|errorOne}";
     private static final String READ_QUERYPARM_INVALID = WEB_READ + "QUERYPARM(123) NAMELENGTH(123) {SESSTOKEN|errorOne}(123) VALUE(123) VALUELENGTH(123)";
     private static final String READNEXT_QUERYPARM_INVALID = WEB_READNEXT + "QUERYPARM(123) NAMELENGTH(123) {SESSTOKEN|errorOne}(123) VALUE(123) VALUELENGTH(123)";
-    private static final String SEND_SERVER_INVALID = WEB + "SEND DOCTOKEN(123) {FROM(123)|errorOne} NODOCDELETE MEDIATYPE(123) SRVCONVERT CHARACTERSET(1) STATUSCODE(123) STATUSTEXT(123) STATUSLEN(123) IMMEDIATE NOCLOSE";
+    private static final String SEND_SERVER_INVALID = WEB + "SEND {DOCTOKEN|errorOne}(123) {FROM|errorOne}(123) FROMLENGTH(123) NODOCDELETE MEDIATYPE(123) SRVCONVERT CHARACTERSET(1) STATUSCODE(123) STATUSTEXT(123) STATUSLEN(123) IMMEDIATE NOCLOSE";
 
 
 
@@ -145,7 +145,6 @@ public class TestCicsWebStatement {
     void testCloseInvalid() {
         HashMap<String, Diagnostic> expectedDiagnostics = new HashMap<>();
         expectedDiagnostics.put("errorOne", new Diagnostic(new Range(), "Missing required option: SESSTOKEN", DiagnosticSeverity.Error, ErrorSource.PARSING.getText()));
-        expectedDiagnostics.put("errorTwo", new Diagnostic(new Range(), "Syntax error on 'FROM'", DiagnosticSeverity.Error, ErrorSource.PARSING.getText()));
         CICSTestUtils.errorTest(CLOSE_INVALID, expectedDiagnostics);
     }
 
@@ -204,7 +203,7 @@ public class TestCicsWebStatement {
     @Test
     void testReadNextInvalid() {
         HashMap<String, Diagnostic> expectedDiagnostics = new HashMap<>();
-        expectedDiagnostics.put("errorOne", new Diagnostic(new Range(), "Extraneous input SESSTOKEN", DiagnosticSeverity.Error, ErrorSource.PARSING.getText()));
+        expectedDiagnostics.put("errorOne", new Diagnostic(new Range(), "Invalid option provided: SESSTOKEN", DiagnosticSeverity.Error, ErrorSource.PARSING.getText()));
         CICSTestUtils.errorTest(READNEXT_QUERYPARM_INVALID, expectedDiagnostics);
     }
 
@@ -235,7 +234,7 @@ public class TestCicsWebStatement {
     @Test
     void testSendServerInvalid() {
         HashMap<String, Diagnostic> expectedDiagnostics = new HashMap<>();
-        expectedDiagnostics.put("errorOne", new Diagnostic(new Range(), "Options \"DOCTOKEN, FROM or CONTAINER\" are mutually exclusive.", DiagnosticSeverity.Error, ErrorSource.PARSING.getText()));
+        expectedDiagnostics.put("errorOne", new Diagnostic(new Range(), "Exactly one option required, options are mutually exclusive: DOCTOKEN, FROM or CONTAINER", DiagnosticSeverity.Error, ErrorSource.PARSING.getText()));
         CICSTestUtils.errorTest(SEND_SERVER_INVALID, expectedDiagnostics);
     }
 
