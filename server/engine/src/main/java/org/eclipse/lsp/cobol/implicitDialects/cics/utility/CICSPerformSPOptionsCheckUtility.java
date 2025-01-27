@@ -16,15 +16,15 @@ package org.eclipse.lsp.cobol.implicitDialects.cics.utility;
 
         import org.antlr.v4.runtime.ParserRuleContext;
 
+        import org.antlr.v4.runtime.tree.TerminalNode;
         import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
         import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
         import org.eclipse.lsp.cobol.common.error.SyntaxError;
         import org.eclipse.lsp.cobol.implicitDialects.cics.CICSLexer;
         import org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser;
 
-        import java.util.HashMap;
-        import java.util.List;
-        import java.util.Map;
+        import java.util.*;
+        import java.util.stream.Collectors;
 
         import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.*;
 
@@ -37,7 +37,6 @@ public class CICSPerformSPOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
                 {
                     put(CICSLexer.DELETSHIPPED, ErrorSeverity.WARNING);
                     put(CICSLexer.DUMPCODE, ErrorSeverity.ERROR);
-                    put(CICSLexer.DUMP, ErrorSeverity.WARNING);
                     put(CICSLexer.DUMPID, ErrorSeverity.ERROR);
                     put(CICSLexer.TITLE, ErrorSeverity.ERROR);
                     put(CICSLexer.TITLELENGTH, ErrorSeverity.ERROR);
@@ -189,7 +188,7 @@ public class CICSPerformSPOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
                 break;
         }
         checkDuplicates(ctx);
-        DUPLICATE_CHECK_OPTIONS.put(CICSLexer.DUMP, ErrorSeverity.WARNING);
+        checkDumpDuplicates(ctx);
     }
     private void checkDump(CICSParser.Cics_perform_dumpContext ctx) {
         checkHasMandatoryOptions(ctx.DUMP(), ctx, "DUMP");
@@ -209,9 +208,6 @@ public class CICSPerformSPOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
             checkOptsOsgiPresent(ctx);
             checkHasExactlyOneOption("JVMACTION or DUMP or GATHER or STACKTRACE", ctx, ctx.JVMACTION(), ctx.DUMP(), ctx.GATHER(), ctx.STACKTRACE());
             if (!ctx.DUMP().isEmpty()) {
-                if (ctx.DUMP().size() > 1) {
-                    DUPLICATE_CHECK_OPTIONS.put(CICSLexer.DUMP, ErrorSeverity.ERROR);
-                }
                 checkHasExactlyOneOption("DUMPTYPE or ALL or JAVACORE or HEAP or SNAPTRACE", ctx, ctx.DUMPTYPE(), ctx.ALL(), ctx.JAVACORE(), ctx.HEAP(), ctx.SNAPTRACE());
             } else if (!ctx.GATHER().isEmpty()) {
                 checkHasExactlyOneOption("GATHERTYPE or DIAGNOSTICS", ctx, ctx.GATHERTYPE(), ctx.DIAGNOSTICS());
@@ -302,6 +298,25 @@ public class CICSPerformSPOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
         checkPrerequisiteIsMet(ctx.ALL(), ctx.RESETNOW(), ctx, "RESETNOW without ALL");
         checkHasMutuallyExclusiveOptions("JOURNALNAME or JOURNALNUM", ctx.JOURNALNAME(), ctx.JOURNALNUM());
         checkHasMutuallyExclusiveOptions("TRANCLASS or TCLASS", ctx.TRANCLASS(), ctx.TCLASS());
+    }
+    private void checkDumpDuplicates(ParserRuleContext ctx) {
+        ErrorSeverity severity;
+        Set<Integer> set = new HashSet<>();
+       List<TerminalNode> filteredNodes =  ctx.children.stream().filter(TerminalNode.class::isInstance).map(element -> (TerminalNode) element).collect(Collectors.toList());
+
+       if (filteredNodes.stream().anyMatch(x -> x.getSymbol().getType() == CICSLexer.JVM)) severity = ErrorSeverity.ERROR;
+       else {
+           severity = ErrorSeverity.WARNING;
+       }
+        filteredNodes.forEach(
+                 child -> {
+                    if (child.getSymbol().getType() == CICSLexer.DUMP && !set.add(child.getSymbol().getType())) {
+                            throwException(severity,
+                                    getLocality(child),
+                                    "Excessive options provided for: ",
+                                    child.getText());
+                    }
+                });
     }
 }
 
