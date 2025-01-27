@@ -821,15 +821,12 @@ cics_spoolwrite: SPOOLWRITE cics_spoolwrite_options;
 cics_spoolwrite_options: ((TOKEN | FROM) cics_data_area | FLENGTH cics_data_value | LINE | PAGE  | cics_handle_response)+;
 
 /** START - / ATTACH / BREXIT / CHANNEL */
-cics_start: START (cics_start_transid | cics_start_attach | cics_start_brexit);
-cics_start_transid: (TRANSID cics_name | cics_start_null | cics_start_channel)+;
-cics_start_null: ((INTERVAL cics_zero_digit | INTERVAL cics_hhmmss | TIME cics_hhmmss | cics_post_after) | REQID cics_name | cics_start_from |
-                 (TERMID cics_name | USERID cics_data_value) | SYSID cics_data_area | RTRANSID cics_name | RTERMID cics_name |
-                 QUEUE cics_name | NOCHECK | PROTECT | cics_handle_response)+;
-cics_start_channel: CHANNEL cics_name (TERMID cics_name | USERID cics_data_value | SYSID cics_data_area | cics_handle_response)*;
-cics_start_attach: ATTACH (TRANSID cics_name | cics_start_from | cics_handle_response)+;
-cics_start_from: FROM (cics_data_area | LENGTH cics_data_value | FMH)+;
-cics_start_brexit: BREXIT name? (TRANSID cics_name | BRDATA cics_data_area | BRDATALENGTH cics_data_value |USERID cics_data_value | cics_handle_response)+;
+cics_start: START (cics_start_transid | cics_start_attach | cics_start_brexit | cics_start_channel);
+cics_start_transid: ((FMH | NOCHECK | PROTECT | AFTER | AT) | (TRANSID | REQID | TERMID | RTRANSID | RTERMID | QUEUE | SYSID) cics_name | FROM cics_data_area |
+                    (LENGTH | USERID | HOURS | MINUTES | SECONDS) cics_data_value | (INTERVAL (cics_hhmmss | cics_zero_digit)) | TIME cics_hhmmss | cics_handle_response)+;
+cics_start_attach: (ATTACH | TRANSID cics_name | FROM cics_data_area | LENGTH cics_data_value | cics_handle_response)+;
+cics_start_brexit: (BREXIT cics_name? | TRANSID cics_name | BRDATA cics_data_area | (BRDATALENGTH | USERID) cics_data_value | cics_handle_response)+;
+cics_start_channel: ((NOCHECK | PROTECT) | (TRANSID | CHANNEL | TERMID | SYSID) cics_name | USERID cics_data_value | cics_handle_response)+;
 cics_zero_digit: LPARENCHAR ZERO_DIGIT RPARENCHAR;
 
 /** STARTBR */

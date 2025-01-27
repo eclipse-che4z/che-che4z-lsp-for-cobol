@@ -268,6 +268,7 @@ public class CICSOptionsCheckUtility {
         CICSSignalOptionsCheckUtility.RULE_INDEX,
         new CICSSignalOptionsCheckUtility(context, errors));
     optionsMap.put(
+
         CICSStartbrOptionsCheckUtility.RULE_INDEX,
         new CICSStartbrOptionsCheckUtility(context, errors));
     optionsMap.put(
@@ -306,6 +307,9 @@ public class CICSOptionsCheckUtility {
     optionsMap.put(
         CICSFetchOptionsCheckUtility.RULE_INDEX,
         new CICSFetchOptionsCheckUtility(context, errors));
+    optionsMap.put(
+        CICSStartOptionsCheckUtility.RULE_INDEX,
+        new CICSStartOptionsCheckUtility(context, errors));
     spOptionsMap.put(
         CICSInquireSPOptionsCheckUtility.RULE_INDEX,
         new CICSInquireSPOptionsCheckUtility(context, errors));
