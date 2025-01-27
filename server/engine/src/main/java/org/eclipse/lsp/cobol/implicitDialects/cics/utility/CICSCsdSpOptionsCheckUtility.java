@@ -119,6 +119,7 @@ public class CICSCsdSpOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
                     put(CICSLexer.STARTBRRSRCE, ErrorSeverity.WARNING);
                     put(CICSLexer.UNLOCK, ErrorSeverity.WARNING);
                     put(CICSLexer.USERDEFINE, ErrorSeverity.WARNING);
+                    put(CICSLexer.DELETE, ErrorSeverity.WARNING);
                 }
             };
 
@@ -153,6 +154,45 @@ public class CICSCsdSpOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
                 break;
             case CICSParser.RULE_cics_csd_delete:
                 checkDelete((CICSParser.Cics_csd_deleteContext) ctx);
+                break;
+            case CICSParser.RULE_cics_csd_getnextgroup:
+                checkGetNextGroup((CICSParser.Cics_csd_getnextgroupContext) ctx);
+                break;
+            case CICSParser.RULE_cics_csd_getnextlist:
+                checkGetNextList((CICSParser.Cics_csd_getnextlistContext) ctx);
+                break;
+            case CICSParser.RULE_cics_csd_getnextrsrce:
+                checkGetNextRsrce((CICSParser.Cics_csd_getnextrsrceContext) ctx);
+                break;
+            case CICSParser.RULE_cics_csd_inquiregroup:
+                checkInquireGroup((CICSParser.Cics_csd_inquiregroupContext) ctx);
+                break;
+            case CICSParser.RULE_cics_csd_inquirelist:
+                checkInquireList((CICSParser.Cics_csd_inquirelistContext) ctx);
+                break;
+            case CICSParser.RULE_cics_csd_inquirersrce:
+                checkInquireRsrce((CICSParser.Cics_csd_inquirersrceContext) ctx);
+                break;
+            case CICSParser.RULE_cics_csd_install:
+                checkInstall((CICSParser.Cics_csd_installContext) ctx);
+                break;
+            case CICSParser.RULE_cics_csd_lock:
+                checkLock((CICSParser.Cics_csd_lockContext) ctx);
+                break;
+            case CICSParser.RULE_cics_csd_remove:
+                checkRemove((CICSParser.Cics_csd_removeContext) ctx);
+                break;
+            case CICSParser.RULE_cics_csd_rename:
+                checkRename((CICSParser.Cics_csd_renameContext) ctx);
+                break;
+            case CICSParser.RULE_cics_csd_startbrrsrce:
+                checkStartbrRsrce((CICSParser.Cics_csd_startbrrsrceContext) ctx);
+                break;
+            case CICSParser.RULE_cics_csd_unlock:
+                checkUnlock((CICSParser.Cics_csd_unlockContext) ctx);
+                break;
+            case CICSParser.RULE_cics_csd_userdefine:
+                checkUserDefine((CICSParser.Cics_csd_userdefineContext) ctx);
                 break;
             default:
                 break;
@@ -214,8 +254,88 @@ public class CICSCsdSpOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
         if (!ctx.cics_csd_cvda().isEmpty()) {
             checkHasMandatoryOptions(ctx.RESID(), ctx, "RESID");
             checkCvda(ctx.cics_csd_cvda().get(0));
-        } else if (!ctx.RESID().isEmpty()){
+        } else if (!ctx.RESID().isEmpty()) {
             checkHasMandatoryOptions(ctx.cics_csd_cvda(), ctx, CVDA_OPTS);
         }
+    }
+    private void checkGetNextGroup(CICSParser.Cics_csd_getnextgroupContext ctx) {
+        checkHasMandatoryOptions(ctx.GETNEXTGROUP(), ctx, "GETNEXTGROUP");
+        checkHasMandatoryOptions(ctx.GROUP(), ctx, "GROUP");
+    }
+    private void checkGetNextList(CICSParser.Cics_csd_getnextlistContext ctx) {
+        checkHasMandatoryOptions(ctx.GETNEXTLIST(), ctx, "GETNEXTLIST");
+        checkHasMandatoryOptions(ctx.LIST(), ctx, "LIST");
+    }
+    private void checkGetNextRsrce(CICSParser.Cics_csd_getnextrsrceContext ctx) {
+        checkHasMandatoryOptions(ctx.GETNEXTRSRCE(), ctx, "GETNEXTRSRCE");
+        checkHasMandatoryOptions(ctx.RESTYPE(), ctx, "RESTYPE");
+        checkHasMandatoryOptions(ctx.RESID(), ctx, "RESID");
+        checkHasMandatoryOptions(ctx.GROUP(), ctx, "GROUP");
+        checkHasMutuallyExclusiveOptions("ATTRIBUTES or SET", ctx.ATTRIBUTES(), ctx.ATTRIBUTES(), ctx.SET());
+        if (!ctx.ATTRLEN().isEmpty() && (ctx.ATTRIBUTES().isEmpty() && ctx.SET().isEmpty())) {
+            throwException(
+                    ErrorSeverity.ERROR, getLocality(ctx), "Missing required option for ATTRLEN: ATTRIBUTES or SET", "");
+        }
+    }
+    private void checkInquireGroup(CICSParser.Cics_csd_inquiregroupContext ctx) {
+        checkHasMandatoryOptions(ctx.INQUIREGROUP(), ctx, "INQUIREGROUP");
+        checkHasMandatoryOptions(ctx.GROUP(), ctx, "GROUP");
+    }
+    private void checkInquireList(CICSParser.Cics_csd_inquirelistContext ctx) {
+        checkHasMandatoryOptions(ctx.INQUIRELIST(), ctx, "INQUIRELIST");
+        checkHasMandatoryOptions(ctx.LIST(), ctx, "LIST");
+    }
+    private void checkInquireRsrce(CICSParser.Cics_csd_inquirersrceContext ctx) {
+        checkHasMandatoryOptions(ctx.INQUIRERSRCE(), ctx, "INQUIRERSRCE");
+        checkHasMandatoryOptions(ctx.RESID(), ctx, "RESID");
+        checkHasMandatoryOptions(ctx.GROUP(), ctx, "GROUP");
+        checkHasMandatoryOptions(ctx.cics_csd_cvda(), ctx, CVDA_OPTS);
+        checkHasExactlyOneOption("ATTRIBUTES or SET", ctx, ctx.ATTRIBUTES(), ctx.SET());
+        if (!ctx.ATTRLEN().isEmpty() && (ctx.ATTRIBUTES().isEmpty() && ctx.SET().isEmpty())) {
+            throwException(
+                    ErrorSeverity.ERROR, getLocality(ctx), "Missing required option for ATTRLEN: ATTRIBUTES or SET", "");
+        }
+    }
+    private void  checkInstall(CICSParser.Cics_csd_installContext ctx) {
+        checkHasMandatoryOptions(ctx.INSTALL(), ctx, "INSTALL");
+        checkHasMandatoryOptions(ctx.GROUP(), ctx, "GROUP");
+        if (!ctx.cics_csd_cvda().isEmpty()) {
+            checkCvda(ctx.cics_csd_cvda().get(0));
+            checkHasMandatoryOptions(ctx.RESID(), ctx, "RESID");
+        }
+    }
+    private void checkLock(CICSParser.Cics_csd_lockContext ctx) {
+        checkHasMandatoryOptions(ctx.LOCK(), ctx, "LOCK");
+        checkHasExactlyOneOption("LIST or GROUP", ctx, ctx.LIST(), ctx.GROUP());
+    }
+    private void checkRemove(CICSParser.Cics_csd_removeContext ctx) {
+        checkHasMandatoryOptions(ctx.REMOVE(), ctx, "REMOVE");
+        checkHasMandatoryOptions(ctx.GROUP(), ctx, "GROUP");
+        checkHasMandatoryOptions(ctx.LIST(), ctx, "LIST");
+    }
+    private void checkRename(CICSParser.Cics_csd_renameContext ctx) {
+        checkHasMandatoryOptions(ctx.RENAME(), ctx, "RENAME");
+        checkHasMandatoryOptions(ctx.GROUP(), ctx, "GROUP");
+        checkHasMandatoryOptions(ctx.AS(), ctx, "AS");
+        if (!ctx.cics_csd_cvda().isEmpty())
+            checkCvda(ctx.cics_csd_cvda().get(0));
+        else checkHasMandatoryOptions(ctx.cics_csd_cvda(), ctx, CVDA_OPTS);
+
+    }
+    private void checkStartbrRsrce(CICSParser.Cics_csd_startbrrsrceContext ctx) {
+        checkHasMandatoryOptions(ctx.GROUP(), ctx, "GROUP");
+    }
+    private void checkUnlock(CICSParser.Cics_csd_unlockContext ctx) {
+        checkHasExactlyOneOption("LIST or GROUP", ctx, ctx.LIST(), ctx.GROUP());
+    }
+    private void checkUserDefine(CICSParser.Cics_csd_userdefineContext ctx) {
+        checkHasMandatoryOptions(ctx.GROUP(), ctx, "GROUP");
+        checkHasMandatoryOptions(ctx.ATTRIBUTES(), ctx, "ATTRIBUTES");
+        checkHasMandatoryOptions(ctx.RESID(), ctx, "RESID");
+        checkHasMutuallyExclusiveOptions("NOCOMPAT or COMPATMODE or COMPAT", ctx.NOCOMPAT(), ctx.COMPATMODE(), ctx.COMPAT());
+        checkPrerequisiteIsMet(ctx.ATTRIBUTES(), ctx.ATTRLEN(), ctx, "ATTRLEN without ATTRIBUTES");
+        if (!ctx.cics_csd_cvda().isEmpty())
+            checkCvda(ctx.cics_csd_cvda().get(0));
+        else checkHasMandatoryOptions(ctx.cics_csd_cvda(), ctx, CVDA_OPTS);
     }
 }
