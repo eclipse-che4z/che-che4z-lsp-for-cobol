@@ -21,7 +21,7 @@ cicsExecBlock: EXEC_CICS (allCicsRule)* END_EXEC ;
 allCicsRule: cics_send | cics_receive | cics_add | cics_address | cics_allocate | cics_asktime | cics_assign | cics_bif |
                        cics_build | cics_cancel | cics_change | cics_check | cics_connect | cics_converttime |
                        cics_define | cics_delay | cics_delete | cics_deleteq | cics_deq | cics_document | cics_dump | cics_endbr |
-                       cics_endbrowse | cics_enq | cics_enter | cics_extract | cics_force | cics_formattime | cics_free |
+                       cics_endbrowse | cics_enq | cics_enter | cics_extract | cics_fetch | cics_force | cics_formattime | cics_free |
                        cics_freemain | cics_get | cics_getmain | cics_getmain64 | cics_getnext | cics_handle | cics_ignore | cics_inquire |
                        cics_invoke | cics_issue | cics_link | cics_load | cics_monitor | cics_move | cics_point | cics_pop |
                        cics_post | cics_purge | cics_push | cics_put_container | cics_query | cics_read | cics_readnext_readprev |
@@ -38,7 +38,7 @@ allExciRules: cics_exci_link | cics_exci_delete | cics_exci_delete_container | c
               cics_exci_get_container | cics_exci_get_next_container | cics_exci_move_container |
               cics_exci_put_container | cics_exci_query_channel | cics_exci_startbrowse_container ;
 
-allSPRules: cics_discard | cics_extract_system_programming | cics_inquire_system_programming | cics_create;
+allSPRules: cics_acquire_terminal | cics_disable | cics_discard | cics_enable | cics_extract_system_programming | cics_inquire_system_programming | cics_create;
 
 // compiler options
 compilerOpts
@@ -97,18 +97,14 @@ cicsTranslatorCompileDirectivedKeywords
 // Receive all
 cics_receive:                   RECEIVE (cics_receive_group_one | cics_receive_partn | cics_receive_map | cics_receive_map_mappingdev);
 
-//Helpers
-cics_into_set:                  INTO cics_data_area | SET cics_ref;
-cics_length_flength:            (LENGTH | FLENGTH) cics_data_area;
-
 // CICS Group 1 (zOS DEFAULT, LUTYPE (2,3,4), 2260, 3270-logical, 3790 / 3270-display, 3600 pipeline, 3600-3601, 3600-3614, 3650, 3767, 3770, 3790 FF, 2980, Non z Default, APPC, LUTYPE 6.1, MRO)
-cics_receive_group_one:         (INTO cics_data_area | SET cics_ref | cics_length_flength | cics_maxlength | (CONVID | SESSION) cics_name | STATE cics_cvda | ASIS | BUFFER | NOTRUNCATE | LEAVEKB | NOTRUNCATE | PASSBK | cics_handle_response)+;
+cics_receive_group_one:         ((INTO | LENGTH | FLENGTH) cics_data_area | SET cics_ref | (MAXLENGTH | MAXFLENGTH) cics_data_value | (CONVID | SESSION) cics_name | STATE cics_cvda | ASIS | BUFFER | NOTRUNCATE | LEAVEKB | NOTRUNCATE | PASSBK | cics_handle_response)*;
 
-cics_receive_partn:             (PARTN cics_data_area | cics_into_set | LENGTH cics_data_area | ASIS | cics_handle_response)+;
+cics_receive_partn:             (PARTN cics_data_area | SET cics_ref | (INTO | LENGTH | INTO) cics_data_area | ASIS | cics_handle_response)*;
 
 // RECEIVE MAPS
-cics_receive_map: ((MAP | MAPSET | INPARTN) cics_name | cics_into_set | (FROM | LENGTH) cics_data_area | TERMINAL | ASIS | cics_handle_response)+;
-cics_receive_map_mappingdev:    ((MAP | MAPSET) cics_name | (MAPPINGDEV | FROM | LENGTH) cics_data_area  | cics_into_set | cics_handle_response)+;
+cics_receive_map: ((MAP | MAPSET | INPARTN) cics_name | SET cics_ref | (FROM | LENGTH | INTO) cics_data_area | TERMINAL | ASIS | cics_handle_response)*;
+cics_receive_map_mappingdev:    ((MAP | MAPSET) cics_name | (MAPPINGDEV | FROM | LENGTH | INTO) cics_data_area  | SET cics_ref | cics_handle_response)*;
 
 
 /** SEND: */
@@ -160,6 +156,10 @@ cics_acquire:ACQUIRE (cics_acquire_process | cics_acquire_activityId ) ;
 cics_acquire_process: ((PROCESS | PROCESSTYPE) cics_data_value | cics_handle_response)+;
 
 cics_acquire_activityId: (ACTIVITYID cics_data_value | cics_handle_response)+;
+
+/** ACQUIRE TERMINAL System command */
+cics_acquire_terminal: ACQUIRE cics_acquire_terminal_body;
+cics_acquire_terminal_body: ((TERMINAL | USERDATA | USERDATALEN) cics_data_value | NOQUEUE | QALL  | QNOTENAB | QSESSLIM | RELREQ |cics_handle_response)+;
 
 /** ADD SUBEVENT */
 cics_add: ADD ( ciss_add_event_subevent | cics_handle_response)+;
@@ -297,7 +297,7 @@ cics_delete_group_one:  (cics_file_name | TOKEN cics_data_area  | cics_keylength
                          ((SYSID | RIDFLD | NUMREC) cics_data_area) | NOSUSPEND | RBA | RRN | cics_handle_response)+;
 
 // CICS Delete Group 2 (Activity, Channel, Event, Timer)
-cics_delete_group_two:  ((CHANNEL | EVENT | TIMER) cics_data_value | cics_handle_response)+;
+cics_delete_group_two:  ((ACTIVITY | CHANNEL | EVENT | TIMER) cics_data_value | cics_handle_response)+;
 
 // CICS Delete Group 3 (Container (BTS), Container (Channel))
 cics_delete_group_three:  ((CONTAINER | ACTIVITY | CHANNEL) cics_data_value | ACQACTIVITY | PROCESS | ACQPROCESS | cics_handle_response)+;
@@ -315,33 +315,42 @@ cics_queue_qname: (QUEUE | QNAME) cics_name;
 cics_deq: DEQ (cics_deq_cmds | cics_handle_response);
 cics_deq_cmds : (RESOURCE cics_data_area | LENGTH cics_data_value | MAXLIFETIME cics_cvda | TASK | UOW)+;
 
+/** DISABLE PROGRAM */
+cics_disable: DISABLE cics_disable_program;
+cics_disable_program: ((PROGRAM | ENTRYNAME | EXIT) cics_data_value | EXITALL | FORMATEDF | PURGEABLE |
+              SHUTDOWN | SPI | STOP | TASKSTART | cics_handle_response)+;
+
 /** DISCARD System Commands **/
 cics_discard: DISCARD cics_discard_body;
-cics_discard_body: cics_handle_response* (ATOMSERVICE | AUTINSTMODEL | BUNDLE | CONNECTION | DB2CONN | DB2ENTRY | DB2TRAN | DOCTEMPLATE |
-                   ENQMODEL | FILE | IPCONN | JOURNALMODEL | JOURNALNAME | JVMSERVER | LIBRARY | MQCONN | MQMONITOR | PARTNER | PIPELINE |
-                   PROCESSTYPE | PROFILE | PROGRAM | TCPIPSERVICE | TDQUEUE | TERMINAL | TRANCLASS | TRANSACTION | TSMODEL | URIMAP | WEBSERVICE) cics_data_value cics_handle_response*;
+cics_discard_body: cics_handle_response* ((ATOMSERVICE | AUTINSTMODEL | BUNDLE | CONNECTION | DB2ENTRY | DB2TRAN | DOCTEMPLATE |
+                   ENQMODEL | FILE | IPCONN | JOURNALMODEL | JOURNALNAME | JVMSERVER | LIBRARY | MQMONITOR | PARTNER | PIPELINE |
+                   PROCESSTYPE | PROFILE | PROGRAM | TCPIPSERVICE | TDQUEUE | TERMINAL | TRANCLASS | TRANSACTION | TSMODEL | URIMAP | WEBSERVICE) cics_data_value |
+                   DB2CONN | MQCONN) cics_handle_response*;
 
 /** DOCUMENT CREATE / DELETE / INSERT / RETRIEVE / SET */
-cics_document: DOCUMENT (cics_document_create | DELETE DOCTOKEN cics_data_area | cics_document_insert |
-               cics_document_retrieve | cics_document_set);
-cics_document_create: CREATE (DOCTOKEN cics_data_area | FROM cics_data_area | TEXT cics_data_area | BINARY cics_data_area |
-                      LENGTH cics_data_area | FROMDOC cics_data_area | TEMPLATE cics_name | cics_document_create_symbollist |
-                      DOCSIZE cics_data_area | HOSTCODEPAGE cics_name | cics_handle_response)+;
-cics_document_create_symbollist: SYMBOLLIST cics_data_area (LISTLENGTH cics_data_value | DELIMITER cics_data_value |
-                                 UNESCAPED | cics_handle_response)+;
-cics_document_insert: INSERT (DOCTOKEN cics_data_area | FROM cics_data_area | TEXT cics_data_area | BINARY cics_data_area |
-                      LENGTH cics_data_value | SYMBOL cics_name | TEMPLATE cics_name | FROMDOC cics_data_area |
-                      BOOKMARK cics_name | DOCSIZE cics_data_value | HOSTCODEPAGE cics_name | AT cics_name | TO cics_name | cics_handle_response)+;
-cics_document_retrieve: RETRIEVE (DOCTOKEN cics_data_area | INTO cics_data_area | LENGTH cics_data_value |
-                        MAXLENGTH cics_data_value | CHARACTERSET cics_name | DATAONLY | cics_handle_response)+;
-cics_document_set: SET (DOCTOKEN cics_data_area | SYMBOL cics_name | VALUE cics_data_area | SYMBOLLIST cics_data_area | DELIMITER cics_data_value |
-                   LENGTH cics_data_value | UNESCAPED | cics_handle_response)+;
+cics_document: DOCUMENT (cics_document_create | cics_document_delete | cics_document_insert | cics_document_retrieve | cics_document_set);
+cics_document_create: (CREATE | (DOCTOKEN | FROM | TEXT | BINARY | LENGTH | FROMDOC | SYMBOLLIST | DOCSIZE) cics_data_area |
+                        (LISTLENGTH | DELIMITER) cics_data_value | (TEMPLATE | HOSTCODEPAGE) cics_name | UNESCAPED | cics_handle_response)+;
+cics_document_delete: (DELETE | DOCTOKEN | cics_data_area)+;
+cics_document_insert: (INSERT | (DOCTOKEN | TEXT | BINARY | FROM | FROMDOC) cics_data_area | (LENGTH | DOCSIZE) cics_data_value |
+                       (SYMBOL | TEMPLATE |  BOOKMARK | HOSTCODEPAGE | AT | TO) cics_name |  cics_handle_response)+;
+cics_document_retrieve: (RETRIEVE | (DOCTOKEN | INTO) cics_data_area | (LENGTH | MAXLENGTH) cics_data_value | CHARACTERSET cics_name | DATAONLY | cics_handle_response)+;
+cics_document_set: (SET | (DOCTOKEN | VALUE | SYMBOLLIST) cics_data_area | SYMBOL cics_name | (DELIMITER | LENGTH) cics_data_value | UNESCAPED | cics_handle_response)+;
+
 
 /** DUMP TRANSACTION */
+cics_length_flength:            (LENGTH | FLENGTH) cics_data_area;
 cics_dump: DUMP TRANSACTION (DUMPCODE cics_name | cics_dump_transaction_from  | cics_dump_transaction_segmentlist | cics_dump_code_opts)+;
 cics_dump_transaction_from: (FROM cics_data_area | cics_length_flength | cics_handle_response)+;
 cics_dump_code_opts: (COMPLETE | TRT | TASK | STORAGE | PROGRAM | TERMINAL | TABLES | FCT | PCT | PPT | SIT | TCT | DUMPID cics_data_area | cics_handle_response)+;
 cics_dump_transaction_segmentlist: ((SEGMENTLIST | LENGTHLIST | NUMSEGMENTS) cics_data_area | cics_handle_response)+;
+
+/** ENABLE PROGRAM */
+cics_enable: ENABLE cics_enable_program;
+cics_enable_program: ((PROGRAM | ENTRYNAME | EXIT | GALENGTH | GAENTRYNAME | TALENGTH) cics_data_value |
+                     ENTRY cics_ref | FORMATEDF | GALOCATION cics_cvda | GAEXECUTABLE | INDOUBTWAIT | LINKEDITMODE |
+                     QUASIRENT | THREADSAFE | OPENAPI | REQUIRED | PURGEABLE | SHUTDOWN | SPI | START | TAEXECUTABLE |
+                     TASKSTART | cics_handle_response)+;
 
 /** ENDBR / ENDBROWSE */
 cics_endbr: ENDBR cics_endbr_opts;
@@ -374,6 +383,10 @@ cics_extract_system_programming: EXTRACT (cics_extract_exit | cics_extract_stati
 cics_extract_exit: (EXIT | (PROGRAM | ENTRYNAME) cics_data_value | GALENGTH cics_data_area | GASET cics_ref | cics_handle_response)+;
 cics_extract_statistics: (STATISTICS | cics_restype | cics_subrestype | (RESID | SUBRESID | LASTRESET | LASTRESETABS | LASTRESETHRS | LASTRESETMIN | LASTRESETSEC) cics_data_area |
                           SET cics_ref | (RESIDLEN | SUBRESIDLEN | APPLICATION | APPLMAJORVER | APPLMINORVER | APPLMICROVER | PLATFORM) cics_data_value | cics_handle_response)+;
+
+/** FETCH / ANY / CHILD */
+cics_fetch: FETCH cics_fetch_any_child;
+cics_fetch_any_child: ((ANY | CHANNEL | ABCODE) cics_data_area  | (CHILD | TIMEOUT) cics_data_value | COMPSTATUS cics_cvda | NOSUSPEND | cics_handle_response)+;
 
 /** FORCE TIMER */
 cics_force: FORCE cics_force_opts;
@@ -701,6 +714,7 @@ cics_readnext_readprev_body: (cics_file_name | INTO cics_data_area | SET cics_re
                SYSID cics_data_area | LENGTH cics_data_area | RBA | RRN | XRBA | NOSUSPEND | cics_handle_response)*;
 
 /** READQ TD / TS */
+cics_into_set:                  INTO cics_data_area | SET cics_ref;
 cics_readq: READQ cics_readq_ts_td;
 cics_readq_ts_td: (TS | TD | (QUEUE | QNAME) cics_name | cics_into_set | NEXT | (LENGTH | NUMITEMS | SYSID) cics_data_area |
                    ITEM cics_data_value | NOSUSPEND | cics_handle_response)+;
@@ -723,8 +737,9 @@ cics_reset_acqprocess: (ACQPROCESS | cics_handle_response)+;
 cics_reset_activity: (ACTIVITY cics_data_value | cics_handle_response)+;
 
 /** RESETBR */
-cics_resetbr: RESETBR cics_file_name (RIDFLD cics_data_area | KEYLENGTH cics_data_value | GENERIC | REQID cics_data_value |
-              SYSID cics_data_area | GTEQ | EQUAL | RBA | RRN |XRBA | cics_handle_response)+;
+cics_resetbr: RESETBR cics_resetbr_options;
+cics_resetbr_options: ((FILE | DATASET) cics_name | (RIDFLD | SYSID) cics_data_area | (KEYLENGTH | REQID) cics_data_value | GENERIC |
+              GTEQ | EQUAL | RBA | RRN |XRBA | cics_handle_response)+;
 
 /** RESTYPE HELPER */
 cics_restype: RESTYPE cics_cvda | ASYNCSERVICE | ATOMSERVICE | BUNDLE | DB2CONN | DB2ENTRY | DISPATCHER | DOCTEMPLATE |
@@ -1094,17 +1109,11 @@ cics_writeq_ts: (TS | (QNAME | QUEUE | SYSID) cics_name | (FROM | NUMITEMS | ITE
 
 /** WSACONTEXT BUILD / DELETE / GET */
 cics_wsacontext: WSACONTEXT (cics_wsacontext_build | cics_wsacontext_delete | cics_wsacontext_get);
-cics_wsacontext_build: BUILD (CHANNEL cics_data_value | ACTION cics_data_value | MESSAGEID cics_data_value |
-                       cics_wsacontext_relatesuri | cics_wsacontext_eprtype | FROMCCSID cics_data_value |
-                       FROMCODEPAGE cics_data_value | cics_handle_response)+;
-cics_wsacontext_relatesuri: (RELATESURI cics_data_value | RELATESTYPE cics_data_value | cics_handle_response)+;
-cics_wsacontext_eprtype: (EPRTYPE cics_cvda | EPRFIELD cics_cvda | EPRFROM cics_cvda | EPRLENGTH cics_data_value | cics_handle_response)+;
+cics_wsacontext_build: (BUILD | (CHANNEL | ACTION | MESSAGEID | RELATESURI | RELATESTYPE | EPRFROM | EPRLENGTH | FROMCCSID | FROMCODEPAGE) cics_data_value |
+                    (EPRTYPE | EPRFIELD) cics_cvda | cics_handle_response)+;
 cics_wsacontext_delete: (DELETE | CHANNEL cics_data_value | cics_handle_response)+;
-cics_wsacontext_get: GET (CONTEXTTYPE cics_cvda | CHANNEL cics_data_value | ACTION cics_data_area | MESSAGEID cics_data_area |
-                     cics_wsacontext_grelatesuri | cics_wsacontext_geprtype | INTOCCSID cics_data_value |
-                     INTOCODEPAGE cics_data_value | cics_handle_response)+;
-cics_wsacontext_grelatesuri: RELATESURI cics_data_area (RELATESTYPE cics_data_area | RELATESINDEX cics_data_value | cics_handle_response)+;
-cics_wsacontext_geprtype: EPRTYPE cics_cvda (EPRFIELD cics_cvda | EPRINTO cics_data_area | EPRSET cics_ref | EPRLENGTH cics_data_area | cics_handle_response)+;
+cics_wsacontext_get: (GET | (CONTEXTTYPE | EPRTYPE | EPRFIELD) cics_cvda | (CHANNEL | RELATESINDEX | INTOCCSID | INTOCODEPAGE) cics_data_value |
+                    (ACTION | MESSAGEID | RELATESURI | RELATESTYPE | EPRINTO | EPRLENGTH) cics_data_area | EPRSET cics_ref | cics_handle_response)+;
 
 /** WSAEPR CREATE */
 cics_wsaepr: WSAEPR cics_wsaepr_body;
@@ -1322,6 +1331,7 @@ ABCODE
   | ALTSCRNWD
   | ALTSUFFIX
   | ANALYZERSTAT
+  | ANY
   | ANYKEY
   | AP
   | APIST
@@ -1625,6 +1635,7 @@ ABCODE
   | DIGEST
   | DIGESTTYPE
   | DIRMGR
+  | DISABLE
   | DISABLED
   | DISABLEDACT
   | DISCARD
@@ -1702,6 +1713,7 @@ ABCODE
   | EM
   | EMITMODE
   | EMPTYSTATUS
+  | ENABLE
   | ENABLEDCOUNT
   | ENABLESTATUS
   | ENCRYPTKEY
@@ -1773,6 +1785,7 @@ ABCODE
   | EXECUTABLE
   | EXECUTIONSET
   | EXIT
+  | EXITALL
   | EXITPGM
   | EXITTRACING
   | EXPECT
@@ -1799,6 +1812,7 @@ ABCODE
   | FC
   | FCI
   | FCT
+  | FETCH
   | FIELD
   | FIELDLENGTH
   | FIELDOFFSET
@@ -1818,6 +1832,7 @@ ABCODE
   | FMHSTATUS
   | FORCE
   | FORCEQR
+  | FORMATEDF
   | FORMATEDFST
   | FORMATTIME
   | FORMFEED
@@ -1845,7 +1860,9 @@ ABCODE
   | FWDRECOVLSN
   | FWDRECSTATUS
   | GAENTRYNAME
+  | GAEXECUTABLE
   | GALENGTH
+  | GALOCATION
   | GARBAGEINT
   | GASET
   | GAUSECOUNT
@@ -2054,6 +2071,7 @@ ABCODE
   | LINKABEND
   | LINKAGE
   | LINKAUTH
+  | LINKEDITMODE
   | LINKLEVEL
   | LINKSYSNET
   | LINKSYSTEM
@@ -2289,6 +2307,7 @@ ABCODE
   | ODUSERID
   | OIDCARD
   | OPCLASS
+  | OPENAPI
   | OPENERR
   | OPENSTATUS
   | OPERATION
@@ -2480,11 +2499,15 @@ ABCODE
   | PUSH
   | PUT
   | PUT64
+  | QALL
   | QBUSY
   | QIDERR
   | QNAME
+  | QNOTENAB
+  | QSESSLIM
   | QUALIFIER
   | QUALLEN
+  | QUASIRENT
   | QUERY
   | QUERYPARM
   | QUERYST
@@ -2534,6 +2557,7 @@ ABCODE
   | RELATESURI
   | RELATION
   | RELEASE
+  | RELREQ
   | RELREQST
   | RELTYPE
   | REMOTENAME
@@ -2551,6 +2575,7 @@ ABCODE
   | REQTYPE
   | REQUESTSTRM
   | REQUESTTYPE
+  | REQUIRED
   | RES
   | RESCLASS
   | RESCOUNT
@@ -2709,6 +2734,7 @@ ABCODE
   | SOSIST
   | SOSSTATUS
   | SPECIFTCPS
+  | SPI
   | SPIST
   | SPOLBUSY
   | SPOLERR
@@ -2746,6 +2772,7 @@ ABCODE
   | STATUSTEXT
   | STDERR
   | STDOUT
+  | STOP
   | STORAGE
   | STORAGECLEAR
   | STOREPROTECT
@@ -2799,6 +2826,7 @@ ABCODE
   | TABLENAME
   | TABLES
   | TABLESIZE
+  | TAEXECUTABLE
   | TALENGTH
   | TARGETCOUNT
   | TASK
@@ -2808,6 +2836,7 @@ ABCODE
   | TASKIDERR
   | TASKPRIORITY
   | TASKS
+  | TASKSTART
   | TASKSTARTST
   | TASKSUBPOOL
   | TC
@@ -2849,6 +2878,7 @@ ABCODE
   | THREADERROR
   | THREADLIMIT
   | THREADS
+  | THREADSAFE
   | THREADWAIT
   | THRESHOLD
   | TI
@@ -2945,7 +2975,9 @@ ABCODE
   | USERAREALEN
   | USERAUTH
   | USERCORRDATA
+  | USERDATA
   | USERDATAKEY
+  | USERDATALEN
   | USERID
   | USERIDERR
   | USERNAME

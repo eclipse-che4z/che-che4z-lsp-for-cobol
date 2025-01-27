@@ -17,21 +17,23 @@ package org.eclipse.lsp.cobol.core.engine.processors;
 import lombok.AllArgsConstructor;
 import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.Processor;
-import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulatorService;
+import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulator;
 
 import org.eclipse.lsp.cobol.common.model.tree.FunctionReference;
+
+import java.util.Optional;
 
 /** Enrich FunctionReference nodes */
 @AllArgsConstructor
 public class FunctionReferenceEnricher implements Processor<FunctionReference> {
-  private final SymbolAccumulatorService symbolAccumulatorService;
+  private final SymbolAccumulator symbolAccumulator;
 
   @Override
-  public void accept(FunctionReference node, ProcessingContext processingContext) {
-      node.getProgram()
+  public void accept(FunctionReference node, ProcessingContext ctx) {
+      Optional.ofNullable(ctx.getCurrentProgramNode())
           .map(
               programNode ->
-                  symbolAccumulatorService.getFunctionReference(node.getName(), programNode, node.isFunctionPrefixed()))
+                  symbolAccumulator.getFunctionReference(node.getName(), programNode, node.isFunctionPrefixed()))
           .ifPresent(
               fi -> {
                 node.setDefinitions(fi.getDefinition());

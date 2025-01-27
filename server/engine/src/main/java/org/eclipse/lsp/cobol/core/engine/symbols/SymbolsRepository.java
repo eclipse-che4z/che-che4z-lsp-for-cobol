@@ -15,6 +15,7 @@
 package org.eclipse.lsp.cobol.core.engine.symbols;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import com.google.inject.Singleton;
 import lombok.Synchronized;
@@ -41,6 +42,12 @@ import static org.eclipse.lsp.cobol.common.utils.RangeUtils.findNodeByPosition;
 @Singleton
 @Slf4j
 public class SymbolsRepository {
+  private static final SymbolTable EMPTY_SYM_TABLE = new SymbolTable(null) {
+    @Override
+    public void register(VariableNode node) {
+      throw new IllegalStateException("Cannot register symbols in temporary symbol table");
+    }
+  };
   private final Map<String, SymbolTable> programSymbols;
 
   public SymbolsRepository() {
@@ -66,10 +73,14 @@ public class SymbolsRepository {
    * Get variable data
    *
    * @param program the program node
-   * @return map of variables
+   * @return Collection of variables nodes
    */
   public Multimap<String, VariableNode> getVariables(ProgramNode program) {
-    return getSymbolTable(program).getVariables();
+    Multimap<String, VariableNode> result = ArrayListMultimap.create();
+    SymbolTable symbolTable = getSymbolTable(program);
+    result.putAll(symbolTable.getVariablesMap());
+    result.putAll(symbolTable.getVariablesGlobalsMap());
+    return result;
   }
 
   /**
@@ -124,8 +135,7 @@ public class SymbolsRepository {
 
   @Synchronized
   private SymbolTable getSymbolTable(ProgramNode program) {
-    return programSymbols.computeIfAbsent(
-        SymbolTable.generateKey(program), p -> new SymbolTable());
+    return programSymbols.getOrDefault(SymbolTable.generateKey(program), EMPTY_SYM_TABLE);
   }
 
   @Value

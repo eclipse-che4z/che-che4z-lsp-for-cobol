@@ -72,7 +72,7 @@ public class TestCicsDelete {
 
   private static final String GROUP_ONE_PARTIAL_OPTIONS_VALID_TEN = "DELETE FILE({$varFour}) NOSUSPEND RRN";
 
-  private static final String GROUP_TWO_ACTIVITY_INVALID = "DELETE {ACTIVITY(123)|error1}";
+  private static final String GROUP_TWO_ACTIVITY_INVALID = "DELETE {ACTIVITY|error1}({$varFour}) {CHANNEL|error2}(123)";
 
   private static final String GROUP_TWO_CHANNEL_VALID = "DELETE CHANNEL({$varFour})";
 
@@ -252,7 +252,13 @@ public class TestCicsDelete {
                     "error1",
                     new Diagnostic(
                             new Range(),
-                            "Missing required option: CONTAINER",
+                            "Exactly one option required, options are mutually exclusive: ACTIVITY or CHANNEL or EVENT or TIMER",
+                            DiagnosticSeverity.Error,
+                            ErrorSource.PARSING.getText()),
+                    "error2",
+                    new Diagnostic(
+                            new Range(),
+                            "Exactly one option required, options are mutually exclusive: ACTIVITY or CHANNEL or EVENT or TIMER",
                             DiagnosticSeverity.Error,
                             ErrorSource.PARSING.getText()));
     CICSTestUtils.errorTest(GROUP_TWO_ACTIVITY_INVALID, expectedDiagnostic);
@@ -384,7 +390,7 @@ public class TestCicsDelete {
             + "       WORKING-STORAGE SECTION.\n"
             + "       copy {~abc}.\n"
             + "       PROCEDURE DIVISION.\n"
-            + "           EXEC CICS DELETE {_ACTIVITY(123)|error1_}\n"
+            + "           EXEC CICS DELETE {_POOL(123)|error1_}\n"
             + "           END-EXEC.";
     String copybookText =
         "       01 {$*varOne}   PIC S9 VALUE +10.\n"
@@ -399,7 +405,7 @@ public class TestCicsDelete {
         ImmutableMap.of("error1",
                 new Diagnostic(
                         new Range(),
-                        "Missing required option: CONTAINER",
+                        "Exactly one option required, none provided: COUNTER or DCOUNTER",
                         DiagnosticSeverity.Error,
                         ErrorSource.PARSING.getText())));
   }
@@ -422,7 +428,7 @@ public class TestCicsDelete {
                     + "       01 {$*varFive}  PIC X VALUE 'NAME_TWO'.\n"
                     + "       01 {$*varSix}   PIC X VALUE 'NAME_THREE'.";
 
-    String execTextInCopybook = "           EXEC CICS DELETE {_ACTIVITY(123)|error1_}\n"
+    String execTextInCopybook = "           EXEC CICS DELETE {_POOL(123)|error1_}\n"
             + "           END-EXEC.";
     UseCaseEngine.runTest(
             text,
@@ -436,7 +442,7 @@ public class TestCicsDelete {
                     "error1",
                     new Diagnostic(
                             new Range(),
-                            "Missing required option: CONTAINER",
+                            "Exactly one option required, none provided: COUNTER or DCOUNTER",
                             DiagnosticSeverity.Error,
                             ErrorSource.PARSING.getText())));
   }

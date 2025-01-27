@@ -47,7 +47,7 @@ class TestDeclarativesSection {
                     + "           ADD 1 TO {$VAR1}.\n"
                     + "       {#*PAR-EXIT}.\n"
                     + "           EXIT.\n"
-                    + "       END DECLARATIVES."
+                    + "       END DECLARATIVES.\n"
                     + "       {@*CCVS1} SECTION.\n";
 
     @Test

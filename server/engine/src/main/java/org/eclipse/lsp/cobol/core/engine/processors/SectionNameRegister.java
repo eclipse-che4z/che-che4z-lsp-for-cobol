@@ -14,35 +14,28 @@
  */
 package org.eclipse.lsp.cobol.core.engine.processors;
 
-import com.google.common.collect.ImmutableList;
-import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.Processor;
-import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulatorService;
+import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulator;
 import org.eclipse.lsp.cobol.common.model.tree.SectionNameNode;
 
 import static org.eclipse.lsp.cobol.common.model.NodeType.PROCEDURE_SECTION;
 
 /** SectionNameNode processor */
 public class SectionNameRegister implements Processor<SectionNameNode> {
-  private final SymbolAccumulatorService symbolAccumulatorService;
+  private final SymbolAccumulator symbolAccumulator;
 
-  public SectionNameRegister(SymbolAccumulatorService symbolAccumulatorService) {
-    this.symbolAccumulatorService = symbolAccumulatorService;
+  public SectionNameRegister(SymbolAccumulator symbolAccumulator) {
+    this.symbolAccumulator = symbolAccumulator;
   }
 
   @Override
   public void accept(SectionNameNode node, ProcessingContext ctx) {
-    if (node.getParent().getNodeType() != PROCEDURE_SECTION) {
+    if (node.getParent().getNodeType() != PROCEDURE_SECTION || ctx.getCurrentProgramNode() == null) {
       // TODO: register usage
       return;
     }
-    ImmutableList<SyntaxError> errors =
-        node.getProgram()
-            .flatMap(program -> symbolAccumulatorService.registerSectionNameNode(program, node))
-            .map(ImmutableList::of)
-            .orElseGet(ImmutableList::of);
-
-    ctx.getErrors().addAll(errors);
+    symbolAccumulator.registerSectionNameNode(ctx.getCurrentProgramNode(), node)
+            .ifPresent(ctx.getErrors()::add);
   }
 }
