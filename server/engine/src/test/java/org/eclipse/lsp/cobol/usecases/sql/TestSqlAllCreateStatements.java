@@ -105,7 +105,7 @@ class TestSqlAllCreateStatements {
           + "             RETURNS VARCHAR(4000)\n"
           + "             DETERMINISTIC NO EXTERNAL ACTION CONTAINS SQL\n"
           + "             BEGIN\n"
-          + "             DECLARE REVSTR, RESTSTR VARCHAR(4000) DEFAULT '';\n"
+          + "             DECLARE REVSTR, RESTSTR VARCHAR(4000) DEFAULT \"\";\n"
           + "             DECLARE LEN INT;\n"
           + "             IF INSTR IS NULL THEN\n"
           + "             RETURN NULL;\n"
@@ -315,10 +315,10 @@ class TestSqlAllCreateStatements {
           + "               ERASE NO\n"
           + "               CLUSTER\n"
           + "               PARTITION BY RANGE\n"
-          + "               (PARTITION 1 ENDING AT('H99'),\n"
-          + "               PARTITION 2 ENDING AT('P99'),\n"
-          + "               PARTITION 3 ENDING AT('Z99'),\n"
-          + "               PARTITION 4 ENDING AT('999'))\n"
+          + "               (PARTITION 1 ENDING AT(\"H99\"),\n"
+          + "               PARTITION 2 ENDING AT(\"P99\"),\n"
+          + "               PARTITION 3 ENDING AT(\"Z99\"),\n"
+          + "               PARTITION 4 ENDING AT(\"999\"))\n"
           + "               BUFFERPOOL BP1\n"
           + "               CLOSE YES\n"
           + "               COPY YES;\n"
@@ -583,7 +583,7 @@ class TestSqlAllCreateStatements {
           + "                WLM ENVIRONMENT PARTSA\n"
           + "                DYNAMIC RESULT SETS 1\n"
           + "                RUN OPTIONS \n"
-          + "           'HEAP(,,ANY),BELOW(4K,,),ALL31(ON),STACK(,,ANY,)';\n"
+          + "           \"HEAP(,,ANY),BELOW(4K,,),ALL31(ON),STACK(,,ANY,)\"\n"
           + "           END-EXEC.";
 
   private static final String CREATE_PROCEDURE_EXT3 =
@@ -928,22 +928,22 @@ class TestSqlAllCreateStatements {
       TEXT
           + "            CREATE TRUSTED CONTEXT CTX1\n"
           + "                   BASED UPON CONNECTION USING SYSTEM AUTHID ADMF001\n"
-          + "                   ATTRIBUTES (ADDRESS '9.30.131.203',\n"
-          + "                               ENCRYPTION 'LOW')\n"
+          + "                   ATTRIBUTES (ADDRESS \"9.30.131.203\",\n"
+          + "                               ENCRYPTION \"LOW\")\n"
           + "                   DEFAULT ROLE CTXROLE\n"
           + "                   ENABLE\n"
-          + "                   WITH USE FOR SAM, JOE ROLE ROLE1 WITH AUTHENTICATION;\n"
+          + "                   WITH USE FOR SAM, JOE ROLE ROLE1 WITH AUTHENTICATION\n"
           + "           END-EXEC.";
 
   private static final String CREATE_TRUSTED_CONTEXT2 =
       TEXT
           + "           CREATE TRUSTED CONTEXT CTX2\n"
           + "                BASED UPON CONNECTION USING SYSTEM AUTHID ADMF002\n"
-          + "                ATTRIBUTES (JOBNAME 'WASPROD')\n"
+          + "                ATTRIBUTES (JOBNAME \"WASPROD\")\n"
           + "                DEFAULT ROLE CTXROLE WITH ROLE AS OBJECT OWNER \n"
           + "                AND QUALIFIER\n"
           + "                ENABLE\n"
-          + "                WITH USE FOR SALLY;\n"
+          + "                WITH USE FOR SALLY\n"
           + "           END-EXEC.";
 
   // CREATE TYPE array
@@ -984,13 +984,13 @@ class TestSqlAllCreateStatements {
   private static final String CREATE_VARIABLE =
       TEXT
           + "            CREATE VARIABLE MYSCHEMA.MYJOB_PRINTER VARCHAR(30)\n"
-          + "             DEFAULT 'Default printer';\n"
+          + "             DEFAULT \"Default printer\"\n"
           + "           END-EXEC.";
 
   private static final String CREATE_VARIABLE2 =
       TEXT
           + "            CREATE VARIABLE SCHEMA1.GV_DEPTNO INTEGER\n"
-          + "             DEFAULT 'Unassigned';\n"
+          + "             DEFAULT \"Unassigned\"\n"
           + "           END-EXEC.";
 
   // CREATE VIEW

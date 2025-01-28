@@ -104,6 +104,9 @@ public class CICSDocumentOptionsCheckUtility extends CICSOptionsCheckBaseUtility
         if (!ctx.LENGTH().isEmpty()) {
             checkHasExactlyOneOption("FROM, TEXT or BINARY", ctx, ctx.FROM(), ctx.TEXT(), ctx.BINARY());
         }
+        if (!ctx.FROM().isEmpty() || !ctx.TEXT().isEmpty() || !ctx.BINARY().isEmpty()) {
+            checkHasMandatoryOptions(ctx.LENGTH(), ctx, "LENGTH");
+        }
         checkHasMutuallyExclusiveOptions("LENGTH, FROMDOC or TEMPLATE",
                 ctx.LENGTH(), ctx.FROMDOC(), ctx.TEMPLATE());
         if (!ctx.DELIMITER().isEmpty() || !ctx.UNESCAPED().isEmpty()) {
@@ -124,6 +127,9 @@ public class CICSDocumentOptionsCheckUtility extends CICSOptionsCheckBaseUtility
         checkHasMandatoryOptions(ctx.DOCTOKEN(), ctx, "DOCTOKEN");
         if (!ctx.FROM().isEmpty() || !ctx.TEXT().isEmpty() || !ctx.BINARY().isEmpty()) {
             checkHasMandatoryOptions(ctx.LENGTH(), ctx, "LENGTH");
+        }
+        if (!ctx.LENGTH().isEmpty()) {
+            checkHasExactlyOneOption("FROM, TEXT or BINARY", ctx, ctx.FROM(), ctx.TEXT(), ctx.BINARY());
         }
         checkHasMutuallyExclusiveOptions("FROM, TEXT or BINARY", ctx.FROM(), ctx.TEXT(), ctx.BINARY());
         checkHasExactlyOneOption("LENGTH, SYMBOL, TEMPLATE, FROMDOC or BOOKMARK", ctx,

@@ -19,14 +19,12 @@ import static org.eclipse.lsp.cobol.core.visitor.VisitorHelper.getName;
 
 import com.google.common.collect.ImmutableList;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -38,9 +36,6 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp.cobol.AntlrRangeUtils;
 import org.eclipse.lsp.cobol.common.copybook.CopybookService;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
-import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
-import org.eclipse.lsp.cobol.common.error.ErrorSource;
-import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
@@ -55,16 +50,15 @@ import org.eclipse.lsp4j.Range;
  * This visitor analyzes the parser tree for DB2 SQL and returns its semantic context as a syntax
  * tree
  */
+@Getter
 @Slf4j
-@AllArgsConstructor
-class Db2SqlExecVisitor extends Db2SqlExecParserBaseVisitor<List<Node>> {
+class Db2SqlExecVisitor extends Db2SqlExecValidatorVisitor {
 
-    private final DialectProcessingContext context;
-    private final CopybookService copybookService;
-    private final MessageService messageService;
     private static final Pattern DSIZE_REGEX = Pattern.compile("(\\d+)\\s*[Gg]");
-    @Getter
-    private final List<SyntaxError> errors = new ArrayList<>();
+
+    Db2SqlExecVisitor(DialectProcessingContext context, CopybookService copybookService, MessageService messageService) {
+        super(context, copybookService, messageService);
+    }
 
     @Override
     public List<Node> visitDbs_procedure_name(Db2SqlExecParser.Dbs_procedure_nameContext ctx) {
@@ -164,16 +158,6 @@ class Db2SqlExecVisitor extends Db2SqlExecParserBaseVisitor<List<Node>> {
             addSyntaxError(ctx, "unknown token");
         }
         return visitChildren(ctx);
-    }
-
-    private void addSyntaxError(ParserRuleContext ctx, String messageKey, Object... messageArgs) {
-        SyntaxError error = SyntaxError.syntaxError()
-                .errorSource(ErrorSource.PARSING)
-                .location(getTokenEndLocality(ctx.stop).toOriginalLocation())
-                .suggestion(messageService.getMessage(messageKey, messageArgs))
-                .severity(ErrorSeverity.ERROR)
-                .build();
-        errors.add(error);
     }
 
     private static boolean dsizeValidation(int n) {

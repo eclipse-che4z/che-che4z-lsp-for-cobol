@@ -110,13 +110,13 @@ class TestSqlAllSetStatements {
 
   private static final String SET_CURRENT_APPLICATION_COMPATIBILITY =
       TEXT
-          + "             SET CURRENT APPLICATION COMPATIBILITY = 'V11R1';\n"
+          + "             SET CURRENT APPLICATION COMPATIBILITY = \"V11R1\";\n"
           + "             SET CURRENT APPLICATION COMPATIBILITY = :{$HV1};\n"
           + "           END-EXEC.";
 
   private static final String SET_CURRENT_ENCODING_SCHEMA =
       TEXT
-          + "             SET CURRENT APPLICATION ENCODING SCHEME = 'EBCDIC';\n"
+          + "             SET CURRENT APPLICATION ENCODING SCHEME = \"EBCDIC\";\n"
           + "             SET CURRENT ENCODING SCHEME  = :{$HV1};\n"
           + "           END-EXEC.";
 
@@ -129,10 +129,10 @@ class TestSqlAllSetStatements {
           + "           END-EXEC.";
 
   private static final String SET_CURRENT_DEGREE =
-      TEXT + "             SET CURRENT DEGREE = '1';\n" + "           END-EXEC.";
+      TEXT + "             SET CURRENT DEGREE = \"1\";\n" + "           END-EXEC.";
 
   private static final String SET_CURRENT_DEGREE2 =
-      TEXT + "             SET CURRENT DEGREE = 'ANY';\n" + "           END-EXEC.";
+      TEXT + "             SET CURRENT DEGREE = \"ANY\";\n" + "           END-EXEC.";
 
   private static final String SET_CURRENT_EXPLAIN_MODE =
       TEXT + "             SET CURRENT EXPLAIN MODE = YES;\n" + "           END-EXEC.";
@@ -140,7 +140,7 @@ class TestSqlAllSetStatements {
       TEXT + "             SET CURRENT GET_ACCEL_ARCHIVE=NO;\n" + "           END-EXEC.";
 
   private static final String SET_CURRENT_LOCALE_LC_CTYPE =
-      TEXT + "             SET CURRENT LOCALE LC_CTYPE = 'En_US';\n" + "           END-EXEC.";
+      TEXT + "             SET CURRENT LOCALE LC_CTYPE = \"En_US\";\n" + "           END-EXEC.";
 
   private static final String SET_CURRENT_LOCALE_LC_CTYPE2 =
       TEXT + "             SET CURRENT LOCALE LC_CTYPE = :{$HV1};\n" + "           END-EXEC.";
@@ -156,10 +156,10 @@ class TestSqlAllSetStatements {
       TEXT + "             SET CURRENT MAINTAINED TABLE TYPES NONE;\n" + "           END-EXEC.";
 
   private static final String SET_CURRENT_OPTIMIZATION_HINT =
-      TEXT + "             SET CURRENT OPTIMIZATION HINT = 'NOHYB';\n" + "           END-EXEC.";
+      TEXT + "             SET CURRENT OPTIMIZATION HINT = \"NOHYB\";\n" + "           END-EXEC.";
 
   private static final String SET_CURRENT_OPTIMIZATION_HINT2 =
-      TEXT + "             SET CURRENT OPTIMIZATION HINT = '';\n" + "           END-EXEC.";
+      TEXT + "             SET CURRENT OPTIMIZATION HINT = \"\";\n" + "           END-EXEC.";
 
   private static final String SET_CURRENT_PACKAGE_PATH =
       TEXT + "             SET CURRENT PACKAGE PATH :{$hvar1};\n" + "           END-EXEC.";
@@ -174,13 +174,13 @@ class TestSqlAllSetStatements {
       TEXT + "             SET CURRENT PACKAGE PATH = ' ';\n" + "           END-EXEC.";
 
   private static final String SET_CURRENT_PACKAGESET =
-      TEXT + "             SET CURRENT PACKAGESET = 'PERSONNEL';\n" + "           END-EXEC.";
+      TEXT + "             SET CURRENT PACKAGESET = \"PERSONNEL\";\n" + "           END-EXEC.";
 
   private static final String SET_CURRENT_PACKAGESET2 =
-      TEXT + "             SET CURRENT PACKAGESET = '';\n" + "           END-EXEC.";
+      TEXT + "             SET CURRENT PACKAGESET = \"\";\n" + "           END-EXEC.";
 
   private static final String SET_CURRENT_PRECISION =
-      TEXT + "             SET CURRENT PRECISION = 'DEC15';\n" + "           END-EXEC.";
+      TEXT + "             SET CURRENT PRECISION = \"DEC15\";\n" + "           END-EXEC.";
 
   private static final String SET_CURRENT_QUERY_ACCELERATION =
       TEXT + "             SET CURRENT QUERY ACCELERATION NONE;\n" + "           END-EXEC.";
@@ -202,7 +202,7 @@ class TestSqlAllSetStatements {
       TEXT + "             SET CURRENT ROUTINE VERSION = :{$rvid};\n" + "           END-EXEC.";
 
   private static final String SET_CURRENT_RULES =
-      TEXT + "             SET CURRENT RULES = 'DB2';\n" + "           END-EXEC.";
+      TEXT + "             SET CURRENT RULES = \"DB2\";\n" + "           END-EXEC.";
 
   private static final String SET_CURRENT_SQLID =
       TEXT + "             SET CURRENT SQLID = SESSION_USER;\n" + "           END-EXEC.";
@@ -249,15 +249,15 @@ class TestSqlAllSetStatements {
           + "           END-EXEC.";
   private static final String SET_SCHEMA3 =
       TEXT
-          + "             SET CURRENT SQLID = 'USRT001';\n"
-          + "             SET CURRENT SCHEMA = 'USRT002';\n"
+          + "             SET CURRENT SQLID = \"USRT001\";\n"
+          + "             SET CURRENT SCHEMA = \"USRT002\";\n"
           + "           END-EXEC.";
 
   private static final String SET_SCHEMA4 =
       TEXT + "             SET CURRENT SCHEMA = 'JOHN';\n" + "           END-EXEC.";
 
   private static final String SET_SESSION_TIME_ZONE =
-      TEXT + "             SET SESSION TIME ZONE = '-8:00';\n" + "           END-EXEC.";
+      TEXT + "             SET SESSION TIME ZONE = \"-8:00\";\n" + "           END-EXEC.";
 
   public static final String SET_VRAIABLE_VALUE_EVALUATED_BY_FUNCTION_CALL =
       "       IDENTIFICATION DIVISION.\n"

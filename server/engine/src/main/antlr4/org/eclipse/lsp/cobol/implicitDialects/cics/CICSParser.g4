@@ -38,7 +38,7 @@ allExciRules: cics_exci_link | cics_exci_delete | cics_exci_delete_container | c
               cics_exci_get_container | cics_exci_get_next_container | cics_exci_move_container |
               cics_exci_put_container | cics_exci_query_channel | cics_exci_startbrowse_container ;
 
-allSPRules: cics_acquire_terminal | cics_disable | cics_discard | cics_enable | cics_extract_system_programming | cics_inquire_system_programming | cics_create | cics_perform;
+allSPRules: cics_acquire_terminal | cics_disable | cics_discard | cics_enable | cics_extract_system_programming | cics_inquire_system_programming | cics_create | cics_perform | cics_resync_entryname;
 
 // compiler options
 compilerOpts
@@ -745,6 +745,10 @@ cics_readq_ts_td: (TS | TD | (QUEUE | QNAME) cics_name | cics_into_set | NEXT | 
 cics_release: RELEASE cics_release_option;
 cics_release_option: (PROGRAM cics_name | cics_handle_response)+;
 
+/** RESYNC ENTRYNAME System Command */
+cics_resync_entryname: RESYNC cics_resync_entryname_opts;
+cics_resync_entryname_opts: ((ENTRYNAME| QUALIFIER | IDLIST | IDLISTLENGTH) cics_data_value | PARTIAL | cics_handle_response)+;
+
 /** REMOVE SUBEVENT */
 cics_remove: REMOVE cics_remove_option;
 cics_remove_option: ((SUBEVENT | EVENT) cics_data_value | cics_handle_response)+;
@@ -759,8 +763,9 @@ cics_reset_acqprocess: (ACQPROCESS | cics_handle_response)+;
 cics_reset_activity: (ACTIVITY cics_data_value | cics_handle_response)+;
 
 /** RESETBR */
-cics_resetbr: RESETBR cics_file_name (RIDFLD cics_data_area | KEYLENGTH cics_data_value | GENERIC | REQID cics_data_value |
-              SYSID cics_data_area | GTEQ | EQUAL | RBA | RRN |XRBA | cics_handle_response)+;
+cics_resetbr: RESETBR cics_resetbr_options;
+cics_resetbr_options: ((FILE | DATASET) cics_name | (RIDFLD | SYSID) cics_data_area | (KEYLENGTH | REQID) cics_data_value | GENERIC |
+              GTEQ | EQUAL | RBA | RRN |XRBA | cics_handle_response)+;
 
 /** RESTYPE HELPER */
 cics_restype: RESTYPE cics_cvda | ASYNCSERVICE | ATOMSERVICE | BUNDLE | DB2CONN | DB2ENTRY | DISPATCHER | DOCTEMPLATE |
@@ -1025,17 +1030,11 @@ cics_writeq_ts: (TS | (QNAME | QUEUE | SYSID) cics_name | (FROM | NUMITEMS | ITE
 
 /** WSACONTEXT BUILD / DELETE / GET */
 cics_wsacontext: WSACONTEXT (cics_wsacontext_build | cics_wsacontext_delete | cics_wsacontext_get);
-cics_wsacontext_build: BUILD (CHANNEL cics_data_value | ACTION cics_data_value | MESSAGEID cics_data_value |
-                       cics_wsacontext_relatesuri | cics_wsacontext_eprtype | FROMCCSID cics_data_value |
-                       FROMCODEPAGE cics_data_value | cics_handle_response)+;
-cics_wsacontext_relatesuri: (RELATESURI cics_data_value | RELATESTYPE cics_data_value | cics_handle_response)+;
-cics_wsacontext_eprtype: (EPRTYPE cics_cvda | EPRFIELD cics_cvda | EPRFROM cics_cvda | EPRLENGTH cics_data_value | cics_handle_response)+;
+cics_wsacontext_build: (BUILD | (CHANNEL | ACTION | MESSAGEID | RELATESURI | RELATESTYPE | EPRFROM | EPRLENGTH | FROMCCSID | FROMCODEPAGE) cics_data_value |
+                    (EPRTYPE | EPRFIELD) cics_cvda | cics_handle_response)+;
 cics_wsacontext_delete: (DELETE | CHANNEL cics_data_value | cics_handle_response)+;
-cics_wsacontext_get: GET (CONTEXTTYPE cics_cvda | CHANNEL cics_data_value | ACTION cics_data_area | MESSAGEID cics_data_area |
-                     cics_wsacontext_grelatesuri | cics_wsacontext_geprtype | INTOCCSID cics_data_value |
-                     INTOCODEPAGE cics_data_value | cics_handle_response)+;
-cics_wsacontext_grelatesuri: RELATESURI cics_data_area (RELATESTYPE cics_data_area | RELATESINDEX cics_data_value | cics_handle_response)+;
-cics_wsacontext_geprtype: EPRTYPE cics_cvda (EPRFIELD cics_cvda | EPRINTO cics_data_area | EPRSET cics_ref | EPRLENGTH cics_data_area | cics_handle_response)+;
+cics_wsacontext_get: (GET | (CONTEXTTYPE | EPRTYPE | EPRFIELD) cics_cvda | (CHANNEL | RELATESINDEX | INTOCCSID | INTOCODEPAGE) cics_data_value |
+                    (ACTION | MESSAGEID | RELATESURI | RELATESTYPE | EPRINTO | EPRLENGTH) cics_data_area | EPRSET cics_ref | cics_handle_response)+;
 
 /** WSAEPR CREATE */
 cics_wsaepr: WSAEPR cics_wsaepr_body;
@@ -1860,6 +1859,8 @@ ABCODE
   | IDLEHRS
   | IDLEMINS
   | IDLESECS
+  | IDLIST
+  | IDLISTLENGTH
   | IDNTYCLASS
   | IDPROP
   | IE
@@ -2302,6 +2303,7 @@ ABCODE
   | PARSE
   | PARTCLASS
   | PARTCOUNT
+  | PARTIAL
   | PARTITIONSET
   | PARTITIONSST
   | PARTN
@@ -2553,6 +2555,7 @@ ABCODE
   | RESULT
   | RESUME
   | RESUNAVAIL
+  | RESYNC
   | RESYNCMEMBER
   | RESYNCNUMBER
   | RESYNCSTATUS

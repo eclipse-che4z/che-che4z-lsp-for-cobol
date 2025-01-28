@@ -81,8 +81,10 @@ class TestSqlInsertStatement {
 
   private static final String INSERT6 =
       TEXT
+          + "           SELECT * INTO :{$HV_ENUM} FROM FINAL TABLE (\n"
           + "           INSERT INTO ABC INCLUDE (A SMALLINT, \n"
-          + "           B SMALLINT) VALUEs (:{$TAD}+1);\n"
+          + "           B SMALLINT) VALUEs (:{$TAD}+1)\n"
+          + "           )\n"
           + "           END-EXEC.";
 
   public static final String INSERT7 =
@@ -141,7 +143,9 @@ class TestSqlInsertStatement {
 
   private static Stream<String> textsToTest() {
     return Stream.of(
-        INSERT1, INSERT2, INSERT3, INSERT4, INSERT5, INSERT6, INSERT7, INSERT8, INSERT9, INSERT10);
+        INSERT1, INSERT2, INSERT3, INSERT4, INSERT5,
+             INSERT6,
+            INSERT7, INSERT8, INSERT9, INSERT10);
   }
 
   @ParameterizedTest
