@@ -873,7 +873,7 @@ cics_set_tracetype: ((TRACETYPE | SPECIAL | STANDARD) |
 cics_set_tranclass: ((ABEND | DISCARD) | (TRANCLASS | MAXACTIVE | PURGETHRESH) cics_data_value | PURGEACTION cics_cvda | cics_handle_response)+;
 cics_set_trandumpcode: ((ADD | REMOVE | RESET | LOCAL | RELATED | NOSHUTDOWN | SHUTDOWN | NOSYSDUMP | SYSDUMP | NOTRANDUMP | TRANDUMP) |
                                     (TRANDUMPCODE | MAXIMUM) cics_data_value | (ACTION | DUMPSCOPE | SHUTOPTION | SYSDUMPING | TRANDUMPING) cics_cvda | cics_handle_response)+;
-cics_set_transaction: ((TRANDUMP | NOTRANDUMP | NOTPURGEABLE | PURGEABLE | SYSTEM | USER | SHUTDISABLED | SHUTENABLED | DISABLED | ENABLED | SPECTRACE | SPRSTRACE | STANTRACE) |
+cics_set_transaction: ((TRANDUMP | NOTRANDUMP | NOTPURGEABLE | PURGEABLE | SYSTEM | USER | SHUTDISABLED | SHUTENABLED | DISABLED | ENABLED | SPECTRACE | SPRSTRACE | STANTRACE | OTELTRACE | PROPEMIT | PROP | PROPINIT | PROPINITEMIT | NOOTELTRACE) |
                                     (PRIORITY | RUNAWAY | TCLASS | TRANCLASS | TRANSACTION) cics_data_value | (DUMPING | PURGEABILITY | RUNAWAYTYPE | SHUTDOWN | STATUS | TRACING) cics_cvda | cics_handle_response)+;
 cics_set_tsqueue: ((TSQUEUE | TSQNAME | SYSID | POOLNAME | LASTUSEDINT) cics_data_value | ACTION cics_cvda | cics_handle_response)+;
 cics_set_uow: (UOW cics_data_value | (COMMIT | BACKOUT | FORCE) | UOWSTATE cics_cvda | cics_handle_response)+;

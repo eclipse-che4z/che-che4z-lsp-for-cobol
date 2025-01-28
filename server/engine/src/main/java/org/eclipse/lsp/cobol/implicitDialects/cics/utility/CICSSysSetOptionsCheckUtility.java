@@ -900,8 +900,6 @@ public class CICSSysSetOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     private void checkAssociationUsercorrdata(CICSParser.Cics_set_association_usercorrdataContext ctx) {
         checkHasMandatoryOptions(ctx.ASSOCIATION(), ctx, "ASSOCIATION");
         checkHasMandatoryOptions(ctx.USERCORRDATA(), ctx, "USERCORRDATA");
-
-        checkPrerequisiteIsMet(ctx.ASSOCIATION(), ctx.USERCORRDATA(), ctx, "ASSOCIATION");
     }
 
     private void checkAtomservice(CICSParser.Cics_set_atomserviceContext ctx) {
@@ -910,7 +908,9 @@ public class CICSSysSetOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
         checkMutuallyExclusiveOptions("ENABLESTATUS, ENABLED or DISABLED", ctx.ENABLESTATUS(), ctx.ENABLED(), ctx.DISABLED());
     }
 
-    private void checkAutoinstall(CICSParser.Cics_set_autoinstallContext ctx) {}
+    private void checkAutoinstall(CICSParser.Cics_set_autoinstallContext ctx) {
+        checkHasMandatoryOptions(ctx.AUTOINSTALL(), ctx, "AUTOINSTALL");
+    }
 
     private void checkBrfacility(CICSParser.Cics_set_brfacilityContext ctx) {
         checkHasMandatoryOptions(ctx.BRFACILITY(), ctx, "BRFACILITY");
@@ -1039,7 +1039,8 @@ public class CICSSysSetOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     }
 
     private void checkFile(CICSParser.Cics_set_fileContext ctx) {
-        checkHasMandatoryOptions(ctx.FILE(), ctx, "FILE");
+        if (!ctx.DATASET().isEmpty())
+            checkHasMandatoryOptions(ctx.FILE(), ctx, "FILE");
 
         checkMutuallyExclusiveOptions("ADD, ADDABLE or NOTADDABLE", ctx.ADD(), ctx.ADDABLE(), ctx.NOTADDABLE());
         checkMutuallyExclusiveOptions("BROWSE, BROWSABLE or NOTBROWSABLE", ctx.BROWSE(), ctx.BROWSABLE(), ctx.NOTBROWSABLE());
@@ -1056,6 +1057,8 @@ public class CICSSysSetOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
         checkMutuallyExclusiveOptions("TABLE, CFTABLE, CICSTABLE, NOTTABLE or USERTABLE", ctx.TABLE(), ctx.CFTABLE(), ctx.CICSTABLE(), ctx.NOTTABLE(), ctx.USERTABLE());
         checkMutuallyExclusiveOptions("UPDATE, UPDATABLE or NOTUPDATABLE", ctx.UPDATE(), ctx.UPDATABLE(), ctx.NOTUPDATABLE());
         checkMutuallyExclusiveOptions("UPDATEMODEL, CONTENTION or LOCKING", ctx.UPDATEMODEL(), ctx.CONTENTION(), ctx.LOCKING());
+        checkMutuallyExclusiveOptions("OPEN or CLOSED", ctx.OPEN(), ctx.CLOSED());
+        checkMutuallyExclusiveOptions("ENABLED or DISABLED", ctx.ENABLED(), ctx.DISABLED());
     }
 
     private void checkHost(CICSParser.Cics_set_hostContext ctx) {
@@ -1436,6 +1439,7 @@ public class CICSSysSetOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
         checkHasMandatoryOptions(ctx.TRANSACTION(), ctx, "TRANSACTION");
 
         checkMutuallyExclusiveOptions("DUMPING, TRANDUMP or NOTRANDUMP", ctx.DUMPING(), ctx.TRANDUMP(), ctx.NOTRANDUMP());
+        chceckMutuallyExclusiveOptions("OTELTRACE, PROPEMIT, PROP, PROPINIT, PROPINITEMIT or NOOTELTRACE",  ctx.OTELTRACE(), ctx.PROPEMIT(), ctx.PROP(), ctx.PROPINIT(), ctx.PROPINITEMIT(), ctx.NOOTELTRACE());
         checkMutuallyExclusiveOptions("PURGEABILITY, NOTPURGEABLE or PURGEABLE", ctx.PURGEABILITY(), ctx.NOTPURGEABLE(), ctx.PURGEABLE());
         checkMutuallyExclusiveOptions("RUNAWAYTYPE, SYSTEM or USER", ctx.RUNAWAYTYPE(), ctx.SYSTEM(), ctx.USER());
         checkMutuallyExclusiveOptions("SHUTDOWN, SHUTDISABLED or SHUTENABLED", ctx.SHUTDOWN(), ctx.SHUTDISABLED(), ctx.SHUTENABLED());
