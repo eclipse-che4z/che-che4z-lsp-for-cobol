@@ -102,6 +102,8 @@ public class TestCicsSysSetStatement {
     private static final String MQMONITOR_VALID_2 = "SET MQMONITOR({$varOne}) AUTOSTATUS({$varOne}) ENABLED STARTED";
     private static final String NETNAME_VALID_1 = "SET NETNAME({$varOne})";
     private static final String NETNAME_VALID_2 = "SET NETNAME({$varOne}) EXITTRACE";
+    private static final String OTEL_VALID_1 = "SET OTEL";
+    private static final String OTEL_VALID_2 = "SET OTEL TRACE({$varOne})";
     private static final String PIPELINE_VALID_1 = "SET PIPELINE({$varOne})";
     private static final String PIPELINE_VALID_2 = "SET PIPELINE({$varOne}) ENABLESTATUS({$varOne}) RESPWAIT({$varOne})";
     private static final String PROCESSTYPE_VALID_1 = "SET PROCESSTYPE({$varOne})";
@@ -214,6 +216,7 @@ public class TestCicsSysSetStatement {
     private static final String MQMONITOR_INVALID_1 = "SET {_MQMONITOR({$varOne}) AUTOSTATUS({$varOne}) STOPPED|errorOne_}";
     private static final String MQMONITOR_INVALID_2 = "SET {_MQMONITOR({$varOne}) ENABLED MONSTATUS({$varOne} )|errorOne_}";
     private static final String NETNAME_INVALID_1 = "SET NETNAME({$varOne}) EXITTRACE {NOEXITTRACE|errorOne}";
+    private static final String OTEL_INVALID_1 = "SET OTEL {OTEL|errorOne}";
     private static final String PIPELINE_INVALID_1 = "SET PIPELINE({$varOne}) ENABLED {DISABLED|errorOne}";
     private static final String PROCESSTYPE_INVALID_1 = "SET PROCESSTYPE({$varOne}) {ENABLED|errorOne} DISABLED";
     private static final String PROCESSTYPE_INVALID_2 = "SET PROCESSTYPE({$varOne}) FULL {OFF|errorOne}";
@@ -477,6 +480,12 @@ public class TestCicsSysSetStatement {
     void testCicsNetnameValid() {
         CICSTestUtils.noErrorTest(NETNAME_VALID_1);
         CICSTestUtils.noErrorTest(NETNAME_VALID_2);
+    }
+
+    @Test
+    void testCicsOtelValid() {
+        CICSTestUtils.noErrorTest(OTEL_VALID_1);
+        CICSTestUtils.noErrorTest(OTEL_VALID_2);
     }
 
     @Test
@@ -839,6 +848,11 @@ public class TestCicsSysSetStatement {
     @Test
     void testCicsNetnameInvalid() {
         testSingleError(NETNAME_INVALID_1, "Options \"EXITTRACING, EXITTRACE or NOEXITTRACE\" are mutually exclusive.");
+    }
+
+    @Test
+    void testCicsOtelInvalid() {
+        testSingleError(OTEL_INVALID_1, "Excessive options provided for: OTEL");
     }
 
     @Test

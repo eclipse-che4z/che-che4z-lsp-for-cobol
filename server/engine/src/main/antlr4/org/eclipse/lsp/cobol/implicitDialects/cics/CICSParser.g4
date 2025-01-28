@@ -786,7 +786,7 @@ cics_set: SET (cics_set_association_usercorrdata | cics_set_atomservice | cics_s
         cics_set_db2conn | cics_set_db2entry | cics_set_db2tran | cics_set_deletshipped | cics_set_dispatcher | cics_set_doctemplate | cics_set_dsname | cics_set_dumpds |
         cics_set_enqmodel | cics_set_epadapter | cics_set_epadapterset | cics_set_eventbinding | cics_set_eventprocess |
         cics_set_file | cics_set_host | cics_set_ipconn | cics_set_irc | cics_set_journalname | cics_set_journalnum | cics_set_jvmendpoint | cics_set_jvmserver |
-        cics_set_library | cics_set_modename | cics_set_monitor | cics_set_mqconn | cics_set_mqmonitor | cics_set_netname | cics_set_pipeline | cics_set_processtype | cics_set_program |
+        cics_set_library | cics_set_modename | cics_set_monitor | cics_set_mqconn | cics_set_mqmonitor | cics_set_netname | cics_set_otel | cics_set_pipeline | cics_set_processtype | cics_set_program |
         cics_set_secdiscovery | cics_set_secrecording | cics_set_statistics | cics_set_sysdumpcode | cics_set_system | cics_set_tags_refresh | cics_set_task |
         cics_set_tclass | cics_set_tcpip | cics_set_tcpipservice | cics_set_tdqueue | cics_set_tempstorage | cics_set_terminal | cics_set_tracedest | cics_set_traceflag |
         cics_set_tracetype | cics_set_tranclass | cics_set_trandumpcode | cics_set_transaction | cics_set_tsqueue |
@@ -836,6 +836,7 @@ cics_set_monitor:  ((MONITOR | COMPRESS | NOCOMPRESS | CONVERSE | NOCONVERSE | E
 cics_set_mqconn: ((MQCONN| WAIT | NOWAIT | FORCE | CONNECTED | NOTCONNECTED | RESYNC | NORESYNC | GROUPRESYNC) | MQNAME cics_data_area | (BUSY | CONNECTST | RESYNCMEMBER) cics_cvda | cics_handle_response)+;
 cics_set_mqmonitor: (MQMONITOR cics_data_value | (AUTOSTART | NOAUTOSTART | ENABLED | DISABLED | STARTED | STOPPED) | (AUTOSTATUS | ENABLESTATUS | MONSTATUS | AUTOSTATUS) cics_cvda | cics_handle_response)+;
 cics_set_netname: (NETNAME cics_data_value | (EXITTRACE | NOEXITTRACE) | EXITTRACING cics_cvda | cics_handle_response)+;
+cics_set_otel: (OTEL | TRACE cics_cvda | cics_handle_response)+;
 cics_set_pipeline: (PIPELINE cics_data_value | (ENABLED | DISABLED) | RESPWAIT cics_data_area | ENABLESTATUS cics_cvda | cics_handle_response)+;
 cics_set_processtype: (PROCESSTYPE cics_data_value | (SET | DISABLED | ENABLED | ACTIVITY | FULL | OFF | PROCESS) | (STATUS | AUDITLEVEL) cics_cvda | cics_handle_response)+;
 cics_set_program: ((CEDF | NOCEDF | NEWCOPY | PHASEIN | DPLSUBSET | FULLAPI | REPLICATOR | NOREPLICATOR | JVM | NOJVM | PRIVATE | SHARED | DISABLED | ENABLED) |

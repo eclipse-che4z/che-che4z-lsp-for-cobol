@@ -259,6 +259,7 @@ public class CICSSysSetOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
                     put(CICSLexer.OPERATION, ErrorSeverity.ERROR);
                     put(CICSLexer.OPERID, ErrorSeverity.ERROR);
                     put(CICSLexer.OT, ErrorSeverity.ERROR);
+                    put(CICSLexer.OTEL, ErrorSeverity.ERROR);
                     put(CICSLexer.PA, ErrorSeverity.ERROR);
                     put(CICSLexer.PAGESTATUS, ErrorSeverity.ERROR);
                     put(CICSLexer.PARAMGR, ErrorSeverity.ERROR);
@@ -790,6 +791,9 @@ public class CICSSysSetOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
             case RULE_cics_set_netname:
                 checkNetname((CICSParser.Cics_set_netnameContext) ctx);
                 break;
+            case RULE_cics_set_otel:
+                checkOtel((CICSParser.Cics_set_otelContext) ctx);
+                break;
             case RULE_cics_set_pipeline:
                 checkPipeline((CICSParser.Cics_set_pipelineContext) ctx);
                 break;
@@ -1165,6 +1169,10 @@ public class CICSSysSetOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
         checkHasMandatoryOptions(ctx.NETNAME(), ctx, "NETNAME");
 
         checkMutuallyExclusiveOptions("EXITTRACING, EXITTRACE or NOEXITTRACE", ctx.EXITTRACING(), ctx.EXITTRACE(), ctx.NOEXITTRACE());
+    }
+
+    private void checkOtel(CICSParser.Cics_set_otelContext ctx) {
+        checkHasMandatoryOptions(ctx.OTEL(), ctx, "OTEL");
     }
 
     private void checkPipeline(CICSParser.Cics_set_pipelineContext ctx) {
