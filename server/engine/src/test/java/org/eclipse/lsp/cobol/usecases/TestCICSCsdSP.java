@@ -118,6 +118,8 @@ public class TestCICSCsdSP {
             "CSD {ALTER|error|error2|error3|error4}";
     private static final String CDS_ALTER_MUTUALEX_INVALID =
             "CSD ALTER CONNECTION RESID({$varFour}) GROUP({$varFour}) ATTRIBUTES({$varFour}) {NOCOMPAT|error} {COMPAT|error2}";
+    private static final String CDS_ALTER_MUTUALEX2_INVALID =
+            "CSD ALTER CONNECTION {NOCOMPAT|error} RESID({$varFour}) GROUP({$varFour}) ATTRIBUTES({$varFour}) {COMPAT|error2}";
     private static final String CDS_APPEND_INVALID =
             "CSD {APPEND|error|error2}";
     private static final String CDS_COPY_INVALID =
@@ -237,6 +239,24 @@ public class TestCICSCsdSP {
                                 DiagnosticSeverity.Error,
                                 ErrorSource.PARSING.getText()));
         CICSTestUtils.errorTest(CDS_ALTER_MUTUALEX_INVALID, expectedDiagnostic, "SP");
+    }
+    @Test
+    void testCdsAlterSPMutualEx2Invalid() {
+        Map<String, Diagnostic> expectedDiagnostic =
+                ImmutableMap.of(
+                        "error",
+                        new Diagnostic(
+                                new Range(),
+                                "Exactly one option required, options are mutually exclusive: NOCOMPAT or COMPATMODE or COMPAT",
+                                DiagnosticSeverity.Error,
+                                ErrorSource.PARSING.getText()),
+                        "error2",
+                        new Diagnostic(
+                                new Range(),
+                                "Exactly one option required, options are mutually exclusive: NOCOMPAT or COMPATMODE or COMPAT",
+                                DiagnosticSeverity.Error,
+                                ErrorSource.PARSING.getText()));
+        CICSTestUtils.errorTest(CDS_ALTER_MUTUALEX2_INVALID, expectedDiagnostic, "SP");
     }
     @Test
     void testCdsAppendSpInvalid() {

@@ -31,6 +31,7 @@ package org.eclipse.lsp.cobol.implicitDialects.cics.utility;
 /** Checks CICS CSD System Command rules for required and invalid options */
 public class CICSCsdSpOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
 
+    private static final String MISSING_ATTRBUTES_OR_SET = "Missing required option for ATTRLEN: ATTRIBUTES or SET";
     public static final int RULE_INDEX = RULE_cics_csd;
     private static final String CVDA_OPTS = "RESTYPE or ATOMSERVICE or BUNDLE or CONNECTION or CORBASERVER or DB2CONN or DB2ENTRY or "
             + "DB2TRAN or DJAR or DOCTEMPLATE or DUMPCODE or ENQMODEL or FILE or IPCONN or JOURNALMODEL or JVMSERVER or LIBRARY or LSRPOOL or "
@@ -274,7 +275,7 @@ public class CICSCsdSpOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
         checkHasMutuallyExclusiveOptions("ATTRIBUTES or SET", ctx.ATTRIBUTES(), ctx.ATTRIBUTES(), ctx.SET());
         if (!ctx.ATTRLEN().isEmpty() && (ctx.ATTRIBUTES().isEmpty() && ctx.SET().isEmpty())) {
             throwException(
-                    ErrorSeverity.ERROR, getLocality(ctx), "Missing required option for ATTRLEN: ATTRIBUTES or SET", "");
+                    ErrorSeverity.ERROR, getLocality(ctx), MISSING_ATTRBUTES_OR_SET, "");
         }
     }
     private void checkInquireGroup(CICSParser.Cics_csd_inquiregroupContext ctx) {
@@ -293,7 +294,7 @@ public class CICSCsdSpOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
         checkHasExactlyOneOption("ATTRIBUTES or SET", ctx, ctx.ATTRIBUTES(), ctx.SET());
         if (!ctx.ATTRLEN().isEmpty() && (ctx.ATTRIBUTES().isEmpty() && ctx.SET().isEmpty())) {
             throwException(
-                    ErrorSeverity.ERROR, getLocality(ctx), "Missing required option for ATTRLEN: ATTRIBUTES or SET", "");
+                    ErrorSeverity.ERROR, getLocality(ctx), MISSING_ATTRBUTES_OR_SET, "");
         }
     }
     private void  checkInstall(CICSParser.Cics_csd_installContext ctx) {

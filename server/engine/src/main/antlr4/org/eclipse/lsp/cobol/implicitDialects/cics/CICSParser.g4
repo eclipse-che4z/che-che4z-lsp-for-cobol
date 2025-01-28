@@ -218,10 +218,10 @@ cics_csd: CSD (cics_csd_add | cics_csd_alter | cics_csd_append | cics_csd_copy |
                cics_csd_inquirersrce | cics_csd_install | cics_csd_lock | cics_csd_remove | cics_csd_rename | cics_csd_startbrgroup | cics_csd_startbrlist | cics_csd_startbrrsrce |
                cics_csd_unlock | cics_csd_userdefine);
 cics_csd_add:           (ADD | (GROUP | LIST | BEFORE | AFTER) cics_data_value | cics_handle_response)+;
-cics_csd_alter:         (ALTER | cics_csd_cvda | RESTYPE | NOCOMPAT | COMPAT | COMPATMODE cics_cvda | (RESID | GROUP | ATTRIBUTES | ATTRLEN) cics_data_value | cics_handle_response)+;
+cics_csd_alter:         (ALTER | cics_csd_cvda | NOCOMPAT | COMPAT | COMPATMODE cics_cvda | (RESID | GROUP | ATTRIBUTES | ATTRLEN) cics_data_value | cics_handle_response)+;
 cics_csd_append:        (APPEND | (LIST | TO) cics_data_value | cics_handle_response)+;
 cics_csd_copy:          (COPY | cics_csd_cvda | ( RESID | AS | TO | GROUP ) cics_data_value | DUPERROR | DUPNOREPLACE | DUPREPLACE | DUPACTION cics_cvda | cics_handle_response)+;
-cics_csd_define:        (DEFINE | cics_csd_cvda | RESTYPE | NOCOMPAT | COMPAT | COMPATMODE cics_cvda | (RESID | GROUP | ATTRIBUTES | ATTRLEN) cics_data_value | cics_handle_response)+;
+cics_csd_define:        (DEFINE | cics_csd_cvda | NOCOMPAT | COMPAT | COMPATMODE cics_cvda | (RESID | GROUP | ATTRIBUTES | ATTRLEN) cics_data_value | cics_handle_response)+;
 cics_csd_delete:        (DELETE | cics_csd_cvda | (RESID | GROUP) cics_data_value | LISTACTION cics_cvda | REMOVE | cics_handle_response)+;
 cics_csd_disconnect:    (DISCONNECT | cics_handle_response)+;
 cics_csd_endbrgroup:    (ENDBRGROUP | LIST | cics_handle_response)+;
@@ -229,10 +229,10 @@ cics_csd_endbrlist:     (ENDBRLIST | cics_handle_response)+;
 cics_csd_endbrrsrce:    (ENDBRRSRCE | cics_handle_response)+;
 cics_csd_getnextgroup:  (GETNEXTGROUP | GROUP cics_data_area | LIST cics_data_value | cics_handle_response)+;
 cics_csd_getnextlist:   (GETNEXTLIST | LIST cics_data_area | cics_handle_response)+;
-cics_csd_getnextrsrce:  (GETNEXTRSRCE | RESTYPE cics_cvda | RESID cics_data_area | (GROUP | ATTRIBUTES | ATTRLEN | SET) cics_data_area | cics_handle_response)+;
+cics_csd_getnextrsrce:  (GETNEXTRSRCE | RESTYPE cics_cvda | RESID cics_data_area | SET cics_ref | (GROUP | ATTRIBUTES | ATTRLEN) cics_data_area | cics_handle_response)+;
 cics_csd_inquiregroup:  (INQUIREGROUP | GROUP cics_data_value | LIST cics_data_value | cics_handle_response)+;
 cics_csd_inquirelist:   (INQUIRELIST | LIST cics_cvda | cics_handle_response)+;
-cics_csd_inquirersrce:  (INQUIRERSRCE | cics_csd_cvda | (RESID | GROUP ) cics_data_value | (GROUP | ATTRIBUTES | ATTRLEN | SET) cics_data_area | cics_handle_response)+;
+cics_csd_inquirersrce:  (INQUIRERSRCE | cics_csd_cvda | (RESID | GROUP ) cics_data_value | SET cics_ref | (GROUP | ATTRIBUTES | ATTRLEN) cics_data_area | cics_handle_response)+;
 cics_csd_install:       (INSTALL | cics_csd_cvda | RESID cics_data_area | GROUP cics_data_value | cics_handle_response)+;
 cics_csd_lock:          (LOCK | (LIST | GROUP) cics_data_value | cics_handle_response)+;
 cics_csd_remove:        (REMOVE | (LIST | GROUP) cics_data_value | cics_handle_response)+;
