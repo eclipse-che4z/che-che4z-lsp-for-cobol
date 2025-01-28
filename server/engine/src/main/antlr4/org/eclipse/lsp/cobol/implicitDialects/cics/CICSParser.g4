@@ -812,9 +812,9 @@ cics_set_dsname: (DSNAME cics_data_value | (REMOVE | RECOVERED | RESETLOCKS | RE
                             (ACTION | AVAILABILITY | QUESCESTATE | BUSY | UOWACTION) cics_cvda | cics_handle_response)*;
 cics_set_dumpds: ((DUMPDS | CLOSED | OPEN | SWITCH | NOSWITCH | SWITCHNEXT | SWITCHALL) | INITIALDDS cics_data_value | (OPENSTATUS | SWITCHSTATUS) cics_cvda | cics_handle_response)*;
 cics_set_enqmodel: (ENQMODEL cics_data_value | (ENABLED | DISABLED) | STATUS cics_cvda | cics_handle_response)+;
-cics_set_epadapter: (EPADAPTER cics_data_value | (ENABLED | DISABLED) | ENABLESTATUS cics_cvda | cics_handle_response)*;
-cics_set_epadapterset: (EPADAPTERSET cics_data_value | (ENABLED | DISABLED) | ENABLESTATUS cics_cvda | cics_handle_response)*;
-cics_set_eventbinding: (EVENTBINDING cics_data_value | (ENABLED | DISABLED) | ENABLESTATUS cics_cvda | cics_handle_response)*;
+cics_set_epadapter: (EPADAPTER cics_data_value | (ENABLED | DISABLED) | ENABLESTATUS cics_cvda | cics_handle_response)+;
+cics_set_epadapterset: (EPADAPTERSET cics_data_value | (ENABLED | DISABLED) | ENABLESTATUS cics_cvda | cics_handle_response)+;
+cics_set_eventbinding: (EVENTBINDING cics_data_value | (ENABLED | DISABLED) | ENABLESTATUS cics_cvda | cics_handle_response)+;
 cics_set_eventprocess: ((EVENTPROCESS | STARTED | DRAIN | STOPPED) | (EPSTATUS) cics_cvda | cics_handle_response)+;
 cics_set_file: ((ADDABLE | NOTADDABLE | BROWSABLE | NOTBROWSABLE | WAIT | FORCE | NOWAIT | DELETABLE | NOTDELETABLE | OLD | SHARE | EMPTY | EMPTYREQ | NOEMPTYREQ | ENABLED | DISABLED | OPEN | CLOSED | EXCTL | NOEXCTL | LOAD | NOLOAD |
                                                     READABLE | NOTREADABLE | UNCOMMITTED | CONSISTENT | REPEATABLE | RLS | NOTRLS | CFTABLE | CICSTABLE | NOTTABLE | USERTABLE | UPDATABLE | NOTUPDATABLE | CONTENTION | LOCKING) |
