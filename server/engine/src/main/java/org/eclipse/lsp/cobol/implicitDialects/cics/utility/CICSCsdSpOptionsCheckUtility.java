@@ -318,6 +318,7 @@ public class CICSCsdSpOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
         checkHasMandatoryOptions(ctx.RENAME(), ctx, "RENAME");
         checkHasMandatoryOptions(ctx.GROUP(), ctx, "GROUP");
         checkHasMandatoryOptions(ctx.AS(), ctx, "AS");
+        checkHasMandatoryOptions(ctx.RESID(), ctx, "RESID");
         if (!ctx.cics_csd_cvda().isEmpty())
             checkCvda(ctx.cics_csd_cvda().get(0));
         else checkHasMandatoryOptions(ctx.cics_csd_cvda(), ctx, CVDA_OPTS);
