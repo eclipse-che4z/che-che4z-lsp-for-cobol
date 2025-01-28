@@ -830,7 +830,7 @@ cics_set_jvmendpoint: ((ENABLED | DISABLED) | (JVMENDPOINT | JVMSERVER) cics_dat
 cics_set_jvmserver: ((ENABLED | DISABLED | PHASEOUT | PURGE | FORCEPURGE | KILL) | (JVMSERVER | THREADLIMIT) cics_data_value | (ENABLESTATUS | PURGETYPE) cics_cvda | cics_handle_response)+;
 cics_set_library: ((CRITICAL | NONCRITICAL | ENABLED | DISABLED) | (LIBRARY | RANKING) cics_data_value | (CRITICALST | ENABLESTATUS) cics_cvda | cics_handle_response)+;
 cics_set_modename: ((ACQUIRED | CLOSED) | (MODENAME | AVAILABLE | CONNECTION) cics_data_value | ACQSTATUS cics_cvda | cics_handle_response)+;
-cics_set_monitor:  ((MONITOR | COMPRESS | NOCOMPRESS | CONVERSE | NOCONVERSE | EXCEPT | NOEXCEPT | FREQUENCYMIN | IDNTY | NOIDNTY | PERF | NOPERF | RESRCE | NORESRCE | ON | OFF | SYNCPOINT | NOSYNCPOINT) |
+cics_set_monitor:  ((MONITOR | COMPRESS | NOCOMPRESS | CONVERSE | NOCONVERSE | EXCEPT | NOEXCEPT | IDNTY | NOIDNTY | PERF | NOPERF | RESRCE | NORESRCE | ON | OFF | SYNCPOINT | NOSYNCPOINT) |
                             (DPLLIMIT | FILELIMIT | FREQUENCY | FREQUENCYHRS | FREQUENCYMIN | FREQUENCYSEC | FREQUENCYHRS | TSQUEUELIMIT | URIMAPLIMIT | WEBSERVLIMIT) cics_data_value |
                             (COMPRESSST | CONVERSEST | EXCEPTCLASS | IDNTYCLASS | PERFCLASS | RESRCECLASS | STATUS | SYNCPOINTST) cics_cvda | cics_handle_response)+;
 cics_set_mqconn: ((MQCONN| WAIT | NOWAIT | FORCE | CONNECTED | NOTCONNECTED | RESYNC | NORESYNC | GROUPRESYNC) | MQNAME cics_data_area | (BUSY | CONNECTST | RESYNCMEMBER) cics_cvda | cics_handle_response)+;
