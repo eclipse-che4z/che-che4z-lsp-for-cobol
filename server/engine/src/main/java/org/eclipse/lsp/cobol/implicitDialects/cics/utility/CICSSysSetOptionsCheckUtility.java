@@ -1469,7 +1469,7 @@ public class CICSSysSetOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
         checkPrerequisiteIsMet(ctx.ACTION(), ctx.JRNL(), ctx, "JRNL without ACTION");
         checkMutuallyExclusiveOptions("ACTION, ADD or REMOVE", ctx.ACTION(), ctx.ADD(), ctx.REMOVE());
         checkMutuallyExclusiveOptions("AVAIL, OK or NOWRITE", ctx.AVAIL(), ctx.OK(), ctx.NOWRITE());
-        if (ctx.REMOVE() != null) {
+        if (!ctx.REMOVE().isEmpty()) {
             checkHasIllegalOptions(ctx.JRNL(), "JRNL");
             checkHasIllegalOptions(ctx.AVAIL(), "AVAIL");
             checkHasIllegalOptions(ctx.OK(), "OK");
