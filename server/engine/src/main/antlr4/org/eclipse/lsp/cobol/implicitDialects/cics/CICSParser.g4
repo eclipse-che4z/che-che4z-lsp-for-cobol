@@ -38,7 +38,7 @@ allExciRules: cics_exci_link | cics_exci_delete | cics_exci_delete_container | c
               cics_exci_get_container | cics_exci_get_next_container | cics_exci_move_container |
               cics_exci_put_container | cics_exci_query_channel | cics_exci_startbrowse_container ;
 
-allSPRules: cics_acquire_terminal | cics_disable | cics_discard | cics_enable | cics_extract_system_programming | cics_inquire_system_programming | cics_create | cics_csd;
+allSPRules: cics_acquire_terminal | cics_disable | cics_discard | cics_enable | cics_extract_system_programming | cics_inquire_system_programming | cics_create | cics_resync_entryname | cics_csd;
 
 // compiler options
 compilerOpts
@@ -756,6 +756,10 @@ cics_readq_ts_td: (TS | TD | (QUEUE | QNAME) cics_name | cics_into_set | NEXT | 
 /** RELEASE */
 cics_release: RELEASE cics_release_option;
 cics_release_option: (PROGRAM cics_name | cics_handle_response)+;
+
+/** RESYNC ENTRYNAME System Command */
+cics_resync_entryname: RESYNC cics_resync_entryname_opts;
+cics_resync_entryname_opts: ((ENTRYNAME| QUALIFIER | IDLIST | IDLISTLENGTH) cics_data_value | PARTIAL | cics_handle_response)+;
 
 /** REMOVE SUBEVENT */
 cics_remove: REMOVE cics_remove_option;
@@ -1871,6 +1875,8 @@ ABCODE
   | IDLEHRS
   | IDLEMINS
   | IDLESECS
+  | IDLIST
+  | IDLISTLENGTH
   | IDNTYCLASS
   | IDPROP
   | IE
@@ -2310,6 +2316,7 @@ ABCODE
   | PARSE
   | PARTCLASS
   | PARTCOUNT
+  | PARTIAL
   | PARTITIONSET
   | PARTITIONSST
   | PARTN
@@ -2555,6 +2562,7 @@ ABCODE
   | RESULT
   | RESUME
   | RESUNAVAIL
+  | RESYNC
   | RESYNCMEMBER
   | RESYNCNUMBER
   | RESYNCSTATUS
