@@ -39,7 +39,7 @@ public class TestCICSResyncEntrynameSP {
 
     @Test
     void testResyncValid() {
-        CICSTestUtils.noErrorTest(RESYNC_VALID,"SP");
+        CICSTestUtils.noErrorTest(RESYNC_VALID, "SP");
     }
 
     @Test
@@ -52,6 +52,6 @@ public class TestCICSResyncEntrynameSP {
                                 "Missing required option for: IDLISTLENGTH without IDLIST",
                                 DiagnosticSeverity.Error,
                                 ErrorSource.PARSING.getText()));
-        CICSTestUtils.errorTest(RESYNC_INVALID, expectedDiagnostic,"SP");
+        CICSTestUtils.errorTest(RESYNC_INVALID, expectedDiagnostic, "SP");
     }
 }
