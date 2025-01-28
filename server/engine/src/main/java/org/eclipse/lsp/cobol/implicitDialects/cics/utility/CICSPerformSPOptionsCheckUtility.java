@@ -188,13 +188,15 @@ public class CICSPerformSPOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
                 break;
         }
         checkDuplicates(ctx);
-        checkDumpDuplicates(ctx);
     }
     private void checkDump(CICSParser.Cics_perform_dumpContext ctx) {
         checkHasMandatoryOptions(ctx.DUMP(), ctx, "DUMP");
         checkHasMandatoryOptions(ctx.DUMPCODE(), ctx, "DUMPCODE");
         checkAllOptionsArePresentOrAbsent("TITLE, TITLELENGTH", ctx, ctx.TITLE(), ctx.TITLELENGTH());
         checkAllOptionsArePresentOrAbsent("CALLER, CALLERLENGTH", ctx, ctx.CALLER(), ctx.CALLERLENGTH());
+        List<TerminalNode> filteredNodes = ctx.children.stream().filter(TerminalNode.class::isInstance).map(element -> (TerminalNode) element)
+                .filter(node -> node.getSymbol().getType() == CICSLexer.DUMP).collect(Collectors.toList());
+        checkDumpDuplicates(filteredNodes, ErrorSeverity.WARNING);
     }
     private void checkEndAffinity(CICSParser.Cics_perform_endaffinityContext ctx) {
         checkHasMandatoryOptions(ctx.ENDAFFINITY(), ctx, "ENDAFFINITY");
@@ -208,6 +210,9 @@ public class CICSPerformSPOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
             checkOptsOsgiPresent(ctx);
             checkHasExactlyOneOption("JVMACTION or DUMP or GATHER or STACKTRACE", ctx, ctx.JVMACTION(), ctx.DUMP(), ctx.GATHER(), ctx.STACKTRACE());
             if (!ctx.DUMP().isEmpty()) {
+                List<TerminalNode> filteredNodes = ctx.children.stream().filter(TerminalNode.class::isInstance).map(element -> (TerminalNode) element)
+                        .filter(node -> node.getSymbol().getType() == CICSLexer.DUMP).collect(Collectors.toList());
+                checkDumpDuplicates(filteredNodes, ErrorSeverity.ERROR);
                 checkHasExactlyOneOption("DUMPTYPE or ALL or JAVACORE or HEAP or SNAPTRACE", ctx, ctx.DUMPTYPE(), ctx.ALL(), ctx.JAVACORE(), ctx.HEAP(), ctx.SNAPTRACE());
             } else if (!ctx.GATHER().isEmpty()) {
                 checkHasExactlyOneOption("GATHERTYPE or DIAGNOSTICS", ctx, ctx.GATHERTYPE(), ctx.DIAGNOSTICS());
@@ -272,6 +277,11 @@ public class CICSPerformSPOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
         checkHasMandatoryOptions(ctx.SHUTDOWN(), ctx, "SHUTDOWN");
         checkHasMutuallyExclusiveOptions("SDTRAN or NOSDTRAN", ctx.SDTRAN(), ctx.NOSDTRAN());
         checkHasMutuallyExclusiveOptions("IMMEDIATE or TAKEOVER", ctx.IMMEDIATE(), ctx.TAKEOVER());
+        if (!ctx.DUMP().isEmpty()) {
+            List<TerminalNode> filteredNodes = ctx.children.stream().filter(TerminalNode.class::isInstance).map(element -> (TerminalNode) element)
+                    .filter(node -> node.getSymbol().getType() == CICSLexer.DUMP).collect(Collectors.toList());
+            checkDumpDuplicates(filteredNodes, ErrorSeverity.WARNING);
+        }
         if (!ctx.IMMEDIATE().isEmpty()) {
             checkHasIllegalOptions(ctx.RESTART(), "RESTART");
             checkHasIllegalOptions(ctx.XLT(), "XLT");
@@ -299,16 +309,10 @@ public class CICSPerformSPOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
         checkHasMutuallyExclusiveOptions("JOURNALNAME or JOURNALNUM", ctx.JOURNALNAME(), ctx.JOURNALNUM());
         checkHasMutuallyExclusiveOptions("TRANCLASS or TCLASS", ctx.TRANCLASS(), ctx.TCLASS());
     }
-    private void checkDumpDuplicates(ParserRuleContext ctx) {
-        ErrorSeverity severity;
+    private void checkDumpDuplicates(List<TerminalNode> rules, ErrorSeverity severity) {
         Set<Integer> set = new HashSet<>();
-       List<TerminalNode> filteredNodes =  ctx.children.stream().filter(TerminalNode.class::isInstance).map(element -> (TerminalNode) element).collect(Collectors.toList());
 
-       if (filteredNodes.stream().anyMatch(x -> x.getSymbol().getType() == CICSLexer.JVM)) severity = ErrorSeverity.ERROR;
-       else {
-           severity = ErrorSeverity.WARNING;
-       }
-        filteredNodes.forEach(
+        rules.forEach(
                  child -> {
                     if (child.getSymbol().getType() == CICSLexer.DUMP && !set.add(child.getSymbol().getType())) {
                             throwException(severity,
