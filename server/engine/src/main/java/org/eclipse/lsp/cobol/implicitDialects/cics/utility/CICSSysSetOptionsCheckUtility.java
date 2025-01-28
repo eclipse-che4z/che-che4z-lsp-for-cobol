@@ -1265,8 +1265,6 @@ public class CICSSysSetOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     private void checkTagsRefresh(CICSParser.Cics_set_tags_refreshContext ctx) {
         checkHasMandatoryOptions(ctx.TAGS(), ctx, "TAGS");
         checkHasMandatoryOptions(ctx.REFRESH(), ctx, "REFRESH");
-
-        checkHasMandatoryOptions(ctx.REFRESH(), ctx, "REFRESH");
     }
 
     private void checkTask(CICSParser.Cics_set_taskContext ctx) {
