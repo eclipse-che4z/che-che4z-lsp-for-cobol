@@ -1331,7 +1331,7 @@ public class CICSSysSetOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
         checkMutuallyExclusiveOptions("OBFORMATST, OBFORMAT or NOOBFORMAT", ctx.OBFORMATST(), ctx.OBFORMAT(), ctx.NOOBFORMAT());
         checkMutuallyExclusiveOptions("PAGESTATUS, AUTOPAGEABLE or PAGEABLE", ctx.PAGESTATUS(), ctx.AUTOPAGEABLE(), ctx.PAGEABLE());
         checkMutuallyExclusiveOptions("PRTCOPYST, PRTCOPY or NOPRTCOPY", ctx.PRTCOPYST(), ctx.PRTCOPY(), ctx.NOPRTCOPY());
-        checkMutuallyExclusiveOptions("PURGETYPE, FORCEPURGE, KILL, PURGEFORCE or CANCEL", ctx.PURGETYPE(), ctx.FORCEPURGE(), ctx.KILL(), ctx.PURGEFORCE(), ctx.CANCEL());
+        checkMutuallyExclusiveOptions("PURGETYPE, FORCEPURGE, KILL, PURGE or CANCEL", ctx.PURGETYPE(), ctx.FORCEPURGE(), ctx.KILL(), ctx.PURGE(), ctx.CANCEL());
         checkPrerequisiteIsMet(ctx.PURGE(), ctx.FORCE(), ctx, "FORCE without PURGE");
         checkMutuallyExclusiveOptions("RELREQST, RELREQ or NORELREQ", ctx.RELREQST(), ctx.RELREQ(), ctx.NORELREQ());
         checkMutuallyExclusiveOptions("SERVSTATUS, INSERVICE or OUTSERVICE", ctx.SERVSTATUS(), ctx.INSERVICE(), ctx.OUTSERVICE());
