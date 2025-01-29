@@ -205,7 +205,7 @@ public class CICSPerformSPOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
         if (!ctx.JVM().isEmpty()) {
             checkOptsLibertyPresent(ctx);
             checkOptsOsgiPresent(ctx);
-            checkHasExactlyOneOption("JVMACTION or DUMP or GATHER or STACKTRACE", ctx, ctx.JVMACTION(), ctx.DUMP(), ctx.GATHER(), ctx.STACKTRACE());
+            checkHasMutuallyExclusiveOptions("JVMACTION or DUMP or GATHER or STACKTRACE", ctx.JVMACTION(), ctx.DUMP(), ctx.GATHER(), ctx.STACKTRACE());
             final List<TerminalNode> dumps = ctx.DUMP();
             if (!dumps.isEmpty()) {
                 checkDumpDuplicates(dumps, ErrorSeverity.ERROR);
