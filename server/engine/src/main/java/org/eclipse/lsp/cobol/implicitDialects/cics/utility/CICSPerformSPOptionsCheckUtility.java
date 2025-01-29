@@ -277,11 +277,7 @@ public class CICSPerformSPOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
         checkHasMandatoryOptions(ctx.SHUTDOWN(), ctx, "SHUTDOWN");
         checkHasMutuallyExclusiveOptions("SDTRAN or NOSDTRAN", ctx.SDTRAN(), ctx.NOSDTRAN());
         checkHasMutuallyExclusiveOptions("IMMEDIATE or TAKEOVER", ctx.IMMEDIATE(), ctx.TAKEOVER());
-        if (!ctx.DUMP().isEmpty()) {
-            List<TerminalNode> filteredNodes = ctx.children.stream().filter(TerminalNode.class::isInstance).map(element -> (TerminalNode) element)
-                    .filter(node -> node.getSymbol().getType() == CICSLexer.DUMP).collect(Collectors.toList());
-            checkDumpDuplicates(filteredNodes, ErrorSeverity.WARNING);
-        }
+        checkDumpDuplicates(ctx.DUMP(), ErrorSeverity.WARNING);
         if (!ctx.IMMEDIATE().isEmpty()) {
             checkHasIllegalOptions(ctx.RESTART(), "RESTART");
             checkHasIllegalOptions(ctx.XLT(), "XLT");
