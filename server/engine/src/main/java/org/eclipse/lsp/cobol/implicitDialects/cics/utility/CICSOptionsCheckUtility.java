@@ -334,6 +334,9 @@ public class CICSOptionsCheckUtility {
         CICSPerformSPOptionsCheckUtility.RULE_INDEX,
         new CICSPerformSPOptionsCheckUtility(context, errors));
     spOptionsMap.put(
+        CICSCollectStatisticsSpOptionsCheckUtility.RULE_INDEX,
+        new CICSCollectStatisticsSpOptionsCheckUtility(context, errors));
+    spOptionsMap.put(
         CICSCsdSpOptionsCheckUtility.RULE_INDEX,
         new CICSCsdSpOptionsCheckUtility(context, errors));
   }
