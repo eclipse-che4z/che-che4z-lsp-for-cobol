@@ -245,9 +245,9 @@ cics_check_timer: (TIMER cics_data_value | STATUS cics_cvda | cics_handle_respon
 
 cics_collect_statistics: COLLECT cics_collect_statistics_opts;
 cics_collect_statistics_opts: ((LASTRESET | LASTRESETHRS | LASTRESETMIN | LASTRESETSEC) cics_data_area | SET cics_ref |
-                              (CONNECTION | DB2ENTRY | FILE | JOURNALNAME | JOURNALNUM | JVMPROGRAM | LSRPOOL | POOL | TARGET | STORAGE | SUBPOOL | NODE | TCLASS | TCPIPSERVICE | TERMINAL | TRANCLASS) cics_data_value |
-                               MONITOR cics_data_value? | MVSTCB cics_data_value? | SYSDUMPCODE cics_data_value? | STREAMNAME cics_data_value? | TDQUEUE cics_data_value? | TRANDUMPCODE cics_data_value? | TRANSACTION cics_data_value? | PROGRAM cics_data_value? |
-                               STATISTICS | AUTOINSTALL | PROGAUTO | DB2CONN | DISPATCHER | ENQUEUE | RECOVERY | STATS | STORAGE | TABLEMGR | TASKSUBPOOL | TCPIP | TSQUEUE | VTAM |
+                              (CONNECTION | DB2ENTRY | FILE | JOURNALNAME | JOURNALNUM | JVMPROGRAM | LSRPOOL | POOL | TARGET | SUBPOOL | NODE | TCLASS | TCPIPSERVICE | TERMINAL | TRANCLASS) cics_data_value |
+                               MONITOR cics_data_value? | MVSTCB cics_data_value? | PROGRAM cics_data_value? | STORAGE  cics_data_value? | STREAMNAME cics_data_value? | SYSDUMPCODE cics_data_value? | TDQUEUE cics_data_value? | TRANDUMPCODE cics_data_value? | TRANSACTION cics_data_value? |
+                               STATISTICS | AUTOINSTALL | DB2CONN | DISPATCHER | ENQUEUE | PROGAUTO | RECOVERY | STATS | TABLEMGR | TASKSUBPOOL | TCPIP | TSQUEUE | VTAM |
                                cics_handle_response)+;
 
 cics_conditions: NORMAL | ERROR | RDATT | WRBRK | EOF_TOKEN | EODS | EOC | INBFMH | ENDINPT | NONVAL | NOSTART | TERMIDERR | FILENOTFOUND | NOTFND | DUPREC | DUPKEY |
