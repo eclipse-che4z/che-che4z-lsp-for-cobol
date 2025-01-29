@@ -88,7 +88,7 @@ public class TestCICSCollectStatisticsSP {
     private static final String COLLECT_STATISTICS_SET_INVALID =
             "COLLECT {STATISTICS|error}";
     private static final String COLLECT_STATISTICS_HOURS_INVALID =
-            "COLLECT {_STATISTICS SET({$varFour}) LASTRESETHRS({$varFour})|error|error2_}";
+            "COLLECT {_STATISTICS SET({$varFour}) LASTRESETHRS({$varFour})|error_}";
     private static final String COLLECT_STATISTICS_RESET_INVALID =
             "COLLECT SET({$varFour}) STATISTICS {LASTRESET|error}({$varFour}) {LASTRESETHRS|error2}({$varFour}) LASTRESETMIN({$varFour}) LASTRESETSEC({$varFour})";
     private static final String COLLECT_STATISTICS_MUTUALEX_INVALID =
@@ -123,13 +123,7 @@ public class TestCICSCollectStatisticsSP {
                         "error",
                         new Diagnostic(
                                 new Range(),
-                                "Missing required option: LASTRESETMIN",
-                                DiagnosticSeverity.Error,
-                                ErrorSource.PARSING.getText()),
-                        "error2",
-                        new Diagnostic(
-                                new Range(),
-                                "Missing required option: LASTRESETSEC",
+                                "If one option is specified, all options must be present: LASTRESETHRS, LASTRESETMIN, LASTRESETSEC",
                                 DiagnosticSeverity.Error,
                                 ErrorSource.PARSING.getText()));
         CICSTestUtils.errorTest(COLLECT_STATISTICS_HOURS_INVALID, expectedDiagnostic, "SP");
@@ -211,7 +205,7 @@ public class TestCICSCollectStatisticsSP {
                         "error",
                         new Diagnostic(
                                 new Range(),
-                                "Missing required option: NODE",
+                                "If one option is specified, all options must be present: NODE and TARGET",
                                 DiagnosticSeverity.Error,
                                 ErrorSource.PARSING.getText()));
         CICSTestUtils.errorTest(COLLECT_STATISTICS_TARGET_INVALID, expectedDiagnostic, "SP");
@@ -223,7 +217,7 @@ public class TestCICSCollectStatisticsSP {
                         "error",
                         new Diagnostic(
                                 new Range(),
-                                "Missing required option: TARGET",
+                                "If one option is specified, all options must be present: NODE and TARGET",
                                 DiagnosticSeverity.Error,
                                 ErrorSource.PARSING.getText()));
         CICSTestUtils.errorTest(COLLECT_STATISTICS_NODE_INVALID, expectedDiagnostic, "SP");
