@@ -242,9 +242,9 @@ cics_csd_startbrlist:   (STARTBRLIST | cics_handle_response)+;
 cics_csd_startbrrsrce:  (STARTBRRSRCE | GROUP cics_data_value | cics_handle_response)+;
 cics_csd_unlock:        (UNLOCK | (LIST | GROUP) cics_data_value | cics_handle_response)+;
 cics_csd_userdefine:    (USERDEFINE | cics_csd_cvda | (RESID | GROUP | ATTRIBUTES | ATTRLEN) cics_data_value | NOCOMPAT | COMPAT | COMPATMODE cics_cvda | cics_handle_response)+;
-cics_csd_cvda:          (RESTYPE cics_cvda | ATOMSERVICE | BUNDLE | CONNECTION | CORBASERVER | DB2CONN | DB2ENTRY | DB2TRAN | DJAR | DOCTEMPLATE | DUMPCODE |
+cics_csd_cvda:           RESTYPE cics_cvda | ATOMSERVICE | BUNDLE | CONNECTION | CORBASERVER | DB2CONN | DB2ENTRY | DB2TRAN | DJAR | DOCTEMPLATE | DUMPCODE |
                          ENQMODEL | FILE | IPCONN | JOURNALMODEL | JVMSERVER | LIBRARY | LSRPOOL | MAPSET | MQCONN | MQMONITOR | PARTITIONSET | PARTNER | PIPELINE |
-                         PROCESSTYPE | PROFILE | PROGRAM | REQUESTMODEL | SESSIONS | TCPIPSERVICE | TDQUEUE | TERMINAL | TRANCLASS | TRANSACTION | TSMODEL | TYPETERM | URIMAP | WEBSERVICE)+;
+                         PROCESSTYPE | PROFILE | PROGRAM | REQUESTMODEL | SESSIONS | TCPIPSERVICE | TDQUEUE | TERMINAL | TRANCLASS | TRANSACTION | TSMODEL | TYPETERM | URIMAP | WEBSERVICE;
 
 /** BIF DEEDIT / BIF DIGEST */
 cics_bif: BIF (cics_bif_deedit | cics_bif_digest);

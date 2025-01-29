@@ -124,9 +124,18 @@ public class CICSCsdSpOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
                 }
             };
 
+    private static final Map<Integer, String> DUPLICATE_RULE_OPTIONS =
+            new HashMap<Integer, String>() {
+                {
+                    put(CICSParser.RULE_cics_csd_cvda, "RESTYPE , ATOMSERVICE , BUNDLE , CONNECTION , CORBASERVER , DB2CONN , DB2ENTRY , DB2TRAN , DJAR , DOCTEMPLATE , DUMPCODE ,"
+                            + "ENQMODEL , FILE , IPCONN , JOURNALMODEL , JVMSERVER , LIBRARY , LSRPOOL , MAPSET , MQCONN , MQMONITOR , PARTITIONSET , PARTNER , PIPELINE ,"
+                            + "PROCESSTYPE , PROFILE , PROGRAM , REQUESTMODEL , SESSIONS , TCPIPSERVICE , TDQUEUE , TERMINAL , TRANCLASS , TRANSACTION , TSMODEL , TYPETERM , URIMAP , WEBSERVICE");
+                }
+            };
+
     public CICSCsdSpOptionsCheckUtility(
             DialectProcessingContext context, List<SyntaxError> errors) {
-        super(context, errors, DUPLICATE_CHECK_OPTIONS);
+        super(context, errors, DUPLICATE_CHECK_OPTIONS, DUPLICATE_RULE_OPTIONS);
     }
 
     /**
@@ -212,16 +221,9 @@ public class CICSCsdSpOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
         checkHasMandatoryOptions(ctx.GROUP(), ctx, "GROUP");
         checkHasMandatoryOptions(ctx.ATTRIBUTES(), ctx, "ATTRIBUTES");
         checkHasMutuallyExclusiveOptions("NOCOMPAT or COMPATMODE or COMPAT", ctx.NOCOMPAT(), ctx.COMPATMODE(), ctx.COMPAT());
-        if (!ctx.cics_csd_cvda().isEmpty()) checkCvda(ctx.cics_csd_cvda().get(0));
-        else checkHasMandatoryOptions(ctx.cics_csd_cvda(), ctx, CVDA_OPTS);
+        checkHasMandatoryOptions(ctx.cics_csd_cvda(), ctx, CVDA_OPTS);
     }
-    private void checkCvda(CICSParser.Cics_csd_cvdaContext ctx) {
-            checkHasExactlyOneOption(CVDA_OPTS, ctx, ctx.RESTYPE(), ctx.ATOMSERVICE(), ctx.BUNDLE(),
-                    ctx.CONNECTION(), ctx.CORBASERVER(), ctx.DB2CONN(), ctx.DB2ENTRY(), ctx.DB2TRAN(), ctx.DJAR(), ctx.DOCTEMPLATE(), ctx.DUMPCODE(), ctx.ENQMODEL(), ctx.FILE(),
-                    ctx.IPCONN(), ctx.JOURNALMODEL(), ctx.JVMSERVER(), ctx.LIBRARY(), ctx.LSRPOOL(), ctx.MAPSET(), ctx.MQCONN(), ctx.MQMONITOR(), ctx.PARTITIONSET(), ctx.PARTNER(),
-                    ctx.PIPELINE(), ctx.PROCESSTYPE(), ctx.PROFILE(), ctx.PROGRAM(), ctx.REQUESTMODEL(), ctx.SESSIONS(), ctx.TCPIPSERVICE(), ctx.TDQUEUE(), ctx.TERMINAL(), ctx.TRANCLASS(),
-                    ctx.TRANSACTION(), ctx.TSMODEL(), ctx.TYPETERM(), ctx.URIMAP(), ctx.WEBSERVICE());
-    }
+
     private void checkAppend(CICSParser.Cics_csd_appendContext ctx) {
         checkHasMandatoryOptions(ctx.APPEND(), ctx, "APPEND");
         checkHasMandatoryOptions(ctx.LIST(), ctx, "LIST");
@@ -231,10 +233,9 @@ public class CICSCsdSpOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
         checkHasMandatoryOptions(ctx.COPY(), ctx, "COPY");
         checkHasMandatoryOptions(ctx.GROUP(), ctx, "GROUP");
         checkHasMutuallyExclusiveOptions("DUPERROR or DUPACTION or DUPNOREPLACE or DUPREPLACE", ctx.DUPERROR(), ctx.DUPACTION(), ctx.DUPNOREPLACE(), ctx.DUPREPLACE());
+        checkHasExactlyOneOption("AS or TO", ctx, ctx.AS(), ctx.TO());
         if (!ctx.cics_csd_cvda().isEmpty()) {
             checkHasMandatoryOptions(ctx.RESID(), ctx, "RESID");
-            checkHasExactlyOneOption("AS or TO", ctx, ctx.AS(), ctx.TO());
-            checkCvda(ctx.cics_csd_cvda().get(0));
         } else if (!ctx.AS().isEmpty()) {
             checkHasMandatoryOptions(ctx.cics_csd_cvda(), ctx, CVDA_OPTS);
         }
@@ -245,8 +246,7 @@ public class CICSCsdSpOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
         checkHasMandatoryOptions(ctx.GROUP(), ctx, "GROUP");
         checkHasMandatoryOptions(ctx.ATTRIBUTES(), ctx, "ATTRIBUTES");
         checkHasMutuallyExclusiveOptions("NOCOMPAT or COMPATMODE or COMPAT", ctx.NOCOMPAT(), ctx.COMPATMODE(), ctx.COMPAT());
-        if (!ctx.cics_csd_cvda().isEmpty()) checkCvda(ctx.cics_csd_cvda().get(0));
-        else checkHasMandatoryOptions(ctx.cics_csd_cvda(), ctx, CVDA_OPTS);
+         checkHasMandatoryOptions(ctx.cics_csd_cvda(), ctx, CVDA_OPTS);
     }
     private void checkDelete(CICSParser.Cics_csd_deleteContext ctx) {
         checkHasMandatoryOptions(ctx.DELETE(), ctx, "DELETE");
@@ -254,7 +254,6 @@ public class CICSCsdSpOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
         checkHasMutuallyExclusiveOptions("LISTACTION or REMOVE", ctx.LISTACTION(), ctx.REMOVE());
         if (!ctx.cics_csd_cvda().isEmpty()) {
             checkHasMandatoryOptions(ctx.RESID(), ctx, "RESID");
-            checkCvda(ctx.cics_csd_cvda().get(0));
         } else if (!ctx.RESID().isEmpty()) {
             checkHasMandatoryOptions(ctx.cics_csd_cvda(), ctx, CVDA_OPTS);
         }
@@ -300,8 +299,7 @@ public class CICSCsdSpOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     private void  checkInstall(CICSParser.Cics_csd_installContext ctx) {
         checkHasMandatoryOptions(ctx.INSTALL(), ctx, "INSTALL");
         checkHasMandatoryOptions(ctx.GROUP(), ctx, "GROUP");
-        if (!ctx.cics_csd_cvda().isEmpty()) {
-            checkCvda(ctx.cics_csd_cvda().get(0));
+        if (!ctx.cics_csd_cvda().isEmpty() || !ctx.RESID().isEmpty()) {
             checkHasMandatoryOptions(ctx.RESID(), ctx, "RESID");
         }
     }
@@ -319,9 +317,7 @@ public class CICSCsdSpOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
         checkHasMandatoryOptions(ctx.GROUP(), ctx, "GROUP");
         checkHasMandatoryOptions(ctx.AS(), ctx, "AS");
         checkHasMandatoryOptions(ctx.RESID(), ctx, "RESID");
-        if (!ctx.cics_csd_cvda().isEmpty())
-            checkCvda(ctx.cics_csd_cvda().get(0));
-        else checkHasMandatoryOptions(ctx.cics_csd_cvda(), ctx, CVDA_OPTS);
+        checkHasMandatoryOptions(ctx.cics_csd_cvda(), ctx, CVDA_OPTS);
 
     }
     private void checkStartbrRsrce(CICSParser.Cics_csd_startbrrsrceContext ctx) {
@@ -336,8 +332,6 @@ public class CICSCsdSpOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
         checkHasMandatoryOptions(ctx.RESID(), ctx, "RESID");
         checkHasMutuallyExclusiveOptions("NOCOMPAT or COMPATMODE or COMPAT", ctx.NOCOMPAT(), ctx.COMPATMODE(), ctx.COMPAT());
         checkPrerequisiteIsMet(ctx.ATTRIBUTES(), ctx.ATTRLEN(), ctx, "ATTRLEN without ATTRIBUTES");
-        if (!ctx.cics_csd_cvda().isEmpty())
-            checkCvda(ctx.cics_csd_cvda().get(0));
-        else checkHasMandatoryOptions(ctx.cics_csd_cvda(), ctx, CVDA_OPTS);
+         checkHasMandatoryOptions(ctx.cics_csd_cvda(), ctx, CVDA_OPTS);
     }
 }
