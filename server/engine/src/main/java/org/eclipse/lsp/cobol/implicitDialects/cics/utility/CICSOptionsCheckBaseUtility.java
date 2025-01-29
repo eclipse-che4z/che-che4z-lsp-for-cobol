@@ -417,7 +417,7 @@ public abstract class CICSOptionsCheckBaseUtility {
    * @param rules Lists of rules to iterate through
    */
   @SafeVarargs
-  protected final <E extends ParseTree> void checkAllOptionsArePresentOrAbsent(String options, ParserRuleContext ctx, List<E>... rules) {
+  protected final <E extends ParseTree> void checkAllOptionsArePresentOrAbsent(String options, ParserRuleContext ctx, List<?>... rules) {
     boolean noOptions = Arrays.stream(rules).allMatch(List::isEmpty);
     if (!noOptions) {
         boolean allOptions = Arrays.stream(rules).noneMatch(List::isEmpty);
