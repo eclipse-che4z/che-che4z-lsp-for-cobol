@@ -300,7 +300,7 @@ public class CICSPerformSPOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
         checkPrerequisiteIsMet(ctx.ALL(), ctx.RESETNOW(), ctx, "RESETNOW without ALL");
         checkHasMutuallyExclusiveOptions("JOURNALNAME or JOURNALNUM", ctx.JOURNALNAME(), ctx.JOURNALNUM());
         checkHasMutuallyExclusiveOptions("TRANCLASS or TCLASS", ctx.TRANCLASS(), ctx.TCLASS());
-        if (!ctx.ALL().isEmpty() || !ctx.RESETNOW().isEmpty()){
+        if (!ctx.ALL().isEmpty() || !ctx.RESETNOW().isEmpty()) {
             checkHasIllegalOptions(ctx.ASYNCSERVICE(), "ASYNCSERVICE");
             checkHasIllegalOptions(ctx.ATOMSERVICE(), "ATOMSERVICE");
             checkHasIllegalOptions(ctx.AUTOINSTALL(), "AUTOINSTALL");
@@ -327,7 +327,7 @@ public class CICSPerformSPOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
             checkHasIllegalOptions(ctx.MONITOR(), "MONITOR");
             checkHasIllegalOptions(ctx.MQCONN(), "MQCONN");
             checkHasIllegalOptions(ctx.MQMONITOR(), "MQMONITOR");
-            checkHasIllegalOptions(ctx.NODEJSAPP(), "NODEJSAPP"):
+            checkHasIllegalOptions(ctx.NODEJSAPP(), "NODEJSAPP");
             checkHasIllegalOptions(ctx.PIPELINE(), "PIPELINE");
             checkHasIllegalOptions(ctx.POLICY(), "POLICY");
             checkHasIllegalOptions(ctx.PROGAUTO(), "PROGAUTO");
