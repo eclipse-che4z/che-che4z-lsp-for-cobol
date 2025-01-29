@@ -40,7 +40,6 @@
 
       * Display Main Menu
            EXEC CICS SEND MAP ('SSMAPP2')
-                     MAPONLY
                      MAPSET ('SSMAP')
                      ERASE
                      END-EXEC.
