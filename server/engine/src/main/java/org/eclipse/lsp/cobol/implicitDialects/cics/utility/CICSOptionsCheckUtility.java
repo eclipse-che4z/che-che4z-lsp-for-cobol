@@ -328,7 +328,7 @@ public class CICSOptionsCheckUtility {
         CICSExtractSPOptionsCheckUtility.RULE_INDEX,
         new CICSExtractSPOptionsCheckUtility(context, errors));
     spOptionsMap.put(
-    CICSResyncEntrynameOptionsCheckUtility.RULE_INDEX,
+        CICSResyncEntrynameOptionsCheckUtility.RULE_INDEX,
         new CICSResyncEntrynameOptionsCheckUtility(context, errors));
     spOptionsMap.put(
         CICSPerformSPOptionsCheckUtility.RULE_INDEX,
