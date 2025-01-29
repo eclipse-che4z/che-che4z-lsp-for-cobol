@@ -44,4 +44,12 @@ public interface VariableAccumulator {
    * @param node - the paragraph node
    */
   void registerCodeBlock(ProgramNode program, CodeBlockDefinitionNode node);
-}
+
+  /**
+   * Get the symbol table for the given program
+   * @param program the program
+   * @return the symbol table
+   */
+  SymbolTable getSymbolTable(ProgramNode program);
+
+  }

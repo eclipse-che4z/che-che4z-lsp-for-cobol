@@ -15,31 +15,27 @@
 package org.eclipse.lsp.cobol.core.engine.processors;
 
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
-import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
 import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.Processor;
-import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulatorService;
+import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulator;
 import org.eclipse.lsp.cobol.common.model.tree.CodeBlockUsageNode;
 
 import java.util.Optional;
 
 /** CodeBlockUsageNode processor */
 public class CodeBlockUsage implements Processor<CodeBlockUsageNode> {
-  private final SymbolAccumulatorService symbolAccumulatorService;
+  private final SymbolAccumulator symbolAccumulator;
 
-  public CodeBlockUsage(SymbolAccumulatorService symbolAccumulatorService) {
-    this.symbolAccumulatorService = symbolAccumulatorService;
+  public CodeBlockUsage(SymbolAccumulator symbolAccumulator) {
+    this.symbolAccumulator = symbolAccumulator;
   }
 
   @Override
   public void accept(CodeBlockUsageNode node, ProcessingContext ctx) {
-    Optional<ProgramNode> programOpt = node.getProgram();
-    if (!programOpt.isPresent()) {
-      // TODO: error?
+    if (ctx.getCurrentProgramNode() == null) {
       return;
     }
-    ProgramNode program = programOpt.get();
-    Optional<SyntaxError> syntaxError = symbolAccumulatorService.registerCodeBlockUsage(program, node);
+    Optional<SyntaxError> syntaxError = symbolAccumulator.registerCodeBlockUsage(ctx.getCurrentProgramNode(), node);
     syntaxError.ifPresent(error -> ctx.getErrors().add(error));
   }
 }

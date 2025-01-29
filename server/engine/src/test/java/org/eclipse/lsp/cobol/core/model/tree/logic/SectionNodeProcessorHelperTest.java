@@ -22,7 +22,7 @@ import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
 import org.eclipse.lsp.cobol.common.model.tree.ProgramSubtype;
 import org.eclipse.lsp.cobol.common.model.tree.variable.*;
 import org.eclipse.lsp.cobol.core.engine.processors.SectionNodeProcessorHelper;
-import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulatorService;
+import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulator;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
@@ -87,7 +87,7 @@ class SectionNodeProcessorHelperTest {
             .variableNameAndLocality(new VariableNameAndLocality("Level-01-order-3", LOCALITY))
             .build());
     SectionNodeProcessorHelper.processNodeWithVariableDefinitions(programNode);
-    new SymbolAccumulatorService().registerVariablesInProgram(programNode);
+    new SymbolAccumulator().registerVariablesInProgram(programNode);
     List<VariableNode> nodesLevel01 = getVariables(programNode);
     checkNames(nodesLevel01, "Level-01-order-1", "Level-01-order-2", "Level-01-order-3");
     List<VariableNode> nodesLevel05 = getVariables(nodesLevel01.get(1));
@@ -128,7 +128,7 @@ class SectionNodeProcessorHelperTest {
             .variableNameAndLocality(new VariableNameAndLocality("Level-07", LOCALITY))
             .build());
     SectionNodeProcessorHelper.processNodeWithVariableDefinitions(programNode);
-    new SymbolAccumulatorService().registerVariablesInProgram(programNode);
+    new SymbolAccumulator().registerVariablesInProgram(programNode);
     List<VariableNode> nodesLowLevel = getVariables(programNode);
     checkNames(nodesLowLevel, "Level-05", "Level-01");
     List<VariableNode> nodesNestedLevel = getVariables(nodesLowLevel.get(1));
@@ -160,7 +160,7 @@ class SectionNodeProcessorHelperTest {
             .variableNameAndLocality(new VariableNameAndLocality("Level-66", LOCALITY))
             .build());
     SectionNodeProcessorHelper.processNodeWithVariableDefinitions(programNode);
-    new SymbolAccumulatorService().registerVariablesInProgram(programNode);
+    new SymbolAccumulator().registerVariablesInProgram(programNode);
     List<VariableNode> nodesLevel01 = getVariables(programNode);
     checkNames(nodesLevel01, "Level-01", "Level-66");
   }
@@ -209,7 +209,7 @@ class SectionNodeProcessorHelperTest {
             .variableNameAndLocality(new VariableNameAndLocality("Level-05-2", LOCALITY))
             .build());
     SectionNodeProcessorHelper.processNodeWithVariableDefinitions(programNode);
-    new SymbolAccumulatorService().registerVariablesInProgram(programNode);
+    new SymbolAccumulator().registerVariablesInProgram(programNode);
     List<VariableNode> nodesLevel01 = getVariables(programNode);
     checkNames(nodesLevel01, "Level-01");
     List<VariableNode> nodesUnder01 = getVariables(nodesLevel01.get(0));

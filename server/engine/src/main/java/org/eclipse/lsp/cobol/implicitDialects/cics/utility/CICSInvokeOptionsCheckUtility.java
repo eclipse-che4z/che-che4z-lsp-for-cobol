@@ -35,7 +35,6 @@ public class CICSInvokeOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
   private static final Map<Integer, ErrorSeverity> DUPLICATE_CHECK_OPTIONS =
           new HashMap<Integer, ErrorSeverity>() {
             {
-              put(CICSLexer.INVOKE, ErrorSeverity.ERROR);
               put(CICSLexer.APPLICATION, ErrorSeverity.ERROR);
               put(CICSLexer.OPERATION, ErrorSeverity.ERROR);
               put(CICSLexer.PLATFORM, ErrorSeverity.ERROR);
@@ -84,6 +83,7 @@ public class CICSInvokeOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     checkHasMandatoryOptions(ctx.APPLICATION(), ctx, "APPLICATION");
     checkHasMandatoryOptions(ctx.OPERATION(), ctx, "OPERATION");
     checkHasMutuallyExclusiveOptions("EXACTMATCH or MINIMUM", ctx.EXACTMATCH(), ctx.MINIMUM());
+    checkHasMutuallyExclusiveOptions("COMMAREA or CHANNEL", ctx.COMMAREA(), ctx.CHANNEL());
     if (!ctx.MINORVERSION().isEmpty()) {
       checkHasMandatoryOptions(ctx.MAJORVERSION(), ctx, "MAJORVERSION");
     }

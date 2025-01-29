@@ -809,10 +809,6 @@ procedureDivisionBody
 
 // -- procedure section ----------------------------------
 
-procedureSection
-   : procedureSectionHeader dot_fs paragraphs
-   ;
-
 sentence
    : statement * endClause
    | dialectStatement

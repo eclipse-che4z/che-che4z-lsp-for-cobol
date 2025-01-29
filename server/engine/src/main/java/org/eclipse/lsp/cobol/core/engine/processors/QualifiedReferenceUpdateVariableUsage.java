@@ -29,9 +29,10 @@ import org.eclipse.lsp.cobol.common.model.tree.variable.VariableWithLevelNode;
 import org.eclipse.lsp.cobol.common.processor.CompilerDirectiveName;
 import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.Processor;
-import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulatorService;
+import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulator;
 import org.eclipse.lsp.cobol.common.model.tree.FigurativeConstants;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -41,38 +42,36 @@ public class QualifiedReferenceUpdateVariableUsage implements Processor<Qualifie
   private static final String NOT_DEFINED_ERROR = "semantics.notDefined";
   private static final String AMBIGUOUS_REFERENCE_ERROR = "semantics.ambiguous";
 
-  private final SymbolAccumulatorService symbolAccumulatorService;
+  private final SymbolAccumulator symbolAccumulator;
 
-  public QualifiedReferenceUpdateVariableUsage(SymbolAccumulatorService symbolAccumulatorService) {
-    this.symbolAccumulatorService = symbolAccumulatorService;
+  public QualifiedReferenceUpdateVariableUsage(SymbolAccumulator symbolAccumulator) {
+    this.symbolAccumulator = symbolAccumulator;
   }
 
   @Override
   public void accept(QualifiedReferenceNode node, ProcessingContext ctx) {
-    List<VariableUsageNode> variableUsageNodes =
-            node.getChildren().stream()
-                    .filter(Node.hasType(NodeType.VARIABLE_USAGE))
-                    .map(VariableUsageNode.class::cast)
-                    .collect(Collectors.toList());
+    List<VariableUsageNode> variableUsageChain = new ArrayList<>();
+    for (Node child : node.getChildren()) {
+      if (child.getNodeType() == NodeType.VARIABLE_USAGE) {
+        variableUsageChain.add((VariableUsageNode) child);
+      }
+    }
 
-    if (variableUsageNodes.isEmpty()) {
+    if (variableUsageChain.isEmpty()) {
       LOG.warn("Qualified reference node don't have any variable usages. {}", node);
       return;
     }
 
-    List<VariableNode> foundDefinitions =
-            node.getProgram()
-                    .map(
-                            programNode ->
-                                    symbolAccumulatorService.getVariableDefinition(programNode, variableUsageNodes))
-                    .orElseGet(ImmutableList::of);
+    List<VariableNode> foundDefinitions = ctx.getCurrentProgramNode() != null
+        ? symbolAccumulator.getVariableDefinition(ctx.getCurrentProgramNode(), variableUsageChain)
+        : ImmutableList.of();
 
     if (isQualifyExtendedDirectiveEnabled(ctx) && foundDefinitions.size() > 1) {
       foundDefinitions = updateDefinitionForQualifyExtended(node, foundDefinitions);
     }
     for (VariableNode definitionNode : foundDefinitions) {
       node.setVariableDefinitionNode(definitionNode);
-      for (VariableUsageNode usageNode : variableUsageNodes) {
+      for (VariableUsageNode usageNode : variableUsageChain) {
         while (definitionNode != null
                 && !usageNode.getName().equalsIgnoreCase(definitionNode.getName())) {
           definitionNode =
@@ -99,13 +98,13 @@ public class QualifiedReferenceUpdateVariableUsage implements Processor<Qualifie
     if (foundDefinitions.size() == 1) {
       return;
     }
-    String dataName = variableUsageNodes.get(0).getName();
+    String dataName = variableUsageChain.get(0).getName();
     if (FigurativeConstants.FIGURATIVE_CONSTANTS.stream()
             .anyMatch(e -> dataName.toUpperCase().equals(e))) {
       return;
     }
 
-    if (!variableUsageNodes.get(0).isDefinitionMandatory()) {
+    if (!variableUsageChain.get(0).isDefinitionMandatory()) {
       return;
     }
 

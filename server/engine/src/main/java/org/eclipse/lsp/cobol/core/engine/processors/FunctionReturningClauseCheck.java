@@ -14,7 +14,6 @@
  */
 package org.eclipse.lsp.cobol.core.engine.processors;
 
-import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
 import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.Processor;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
@@ -28,10 +27,12 @@ import org.eclipse.lsp.cobol.common.model.tree.ProgramSubtype;
 public class FunctionReturningClauseCheck implements Processor<ProcedureDivisionNode> {
   @Override
   public void accept(ProcedureDivisionNode proc, ProcessingContext ctx) {
-    ProgramNode node = proc.getProgram().orElseThrow(RuntimeException::new);
-    if (node.getSubtype() != ProgramSubtype.Function || proc.hasReturningClause)
+    if (ctx.getCurrentProgramNode() == null) {
+      throw new RuntimeException();
+    }
+    if (ctx.getCurrentProgramNode().getSubtype() != ProgramSubtype.Function || proc.hasReturningClause) {
       return;
-
+    }
     ctx.getErrors()
         .add(
             SyntaxError.syntaxError()
