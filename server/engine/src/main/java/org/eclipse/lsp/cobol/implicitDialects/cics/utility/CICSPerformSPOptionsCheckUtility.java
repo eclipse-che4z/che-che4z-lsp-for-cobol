@@ -306,16 +306,13 @@ public class CICSPerformSPOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
         checkHasMutuallyExclusiveOptions("TRANCLASS or TCLASS", ctx.TRANCLASS(), ctx.TCLASS());
     }
     private void checkDumpDuplicates(List<TerminalNode> rules, ErrorSeverity severity) {
-        Set<Integer> set = new HashSet<>();
-
-        rules.forEach(
+        if (rules.size() <= 1) return;
+        rules.subList(1, rules.size()).forEach(
                  child -> {
-                    if (child.getSymbol().getType() == CICSLexer.DUMP && !set.add(child.getSymbol().getType())) {
-                            throwException(severity,
-                                    getLocality(child),
-                                    "Excessive options provided for: ",
-                                    child.getText());
-                    }
+                        throwException(severity,
+                                getLocality(child),
+                                "Excessive options provided for: ",
+                                "DUMP");
                 });
     }
 }
