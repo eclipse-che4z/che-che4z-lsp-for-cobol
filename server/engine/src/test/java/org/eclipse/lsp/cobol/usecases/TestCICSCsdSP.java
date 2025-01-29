@@ -536,7 +536,7 @@ public class TestCICSCsdSP {
                         "error",
                         new Diagnostic(
                                 new Range(),
-                                "Missing required option: RESID",
+                                "If one option is specified, all options must be present: RESID and any of RESTYPE or ATOMSERVICE or BUNDLE or CONNECTION or CORBASERVER or DB2CONN or DB2ENTRY or DB2TRAN or DJAR or DOCTEMPLATE or DUMPCODE or ENQMODEL or FILE or IPCONN or JOURNALMODEL or JVMSERVER or LIBRARY or LSRPOOL or MAPSET or MQCONN or MQMONITOR or PARTITIONSET or PARTNER or PIPELINE or PROCESSTYPE or PROFILE or PROGRAM or REQUESTMODEL or SESSIONS or TCPIPSERVICE or TDQUEUE or TERMINAL or TRANCLASS or TRANSACTION or TSMODEL or TYPETERM or URIMAP or WEBSERVICE",
                                 DiagnosticSeverity.Error,
                                 ErrorSource.PARSING.getText()));
         CICSTestUtils.errorTest(CDS_INSTALL_CVDA_INVALID, expectedDiagnostic, "SP");

@@ -236,7 +236,7 @@ public class CICSCsdSpOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
         checkHasExactlyOneOption("AS or TO", ctx, ctx.AS(), ctx.TO());
         if (!ctx.cics_csd_cvda().isEmpty()) {
             checkHasMandatoryOptions(ctx.RESID(), ctx, "RESID");
-        } else if (!ctx.AS().isEmpty()) {
+        } else if (!ctx.AS().isEmpty() || !ctx.RESID().isEmpty()) {
             checkHasMandatoryOptions(ctx.cics_csd_cvda(), ctx, CVDA_OPTS);
         }
     }
