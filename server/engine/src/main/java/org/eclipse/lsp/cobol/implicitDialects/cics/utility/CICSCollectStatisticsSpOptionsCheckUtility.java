@@ -100,11 +100,7 @@ public class CICSCollectStatisticsSpOptionsCheckUtility extends CICSOptionsCheck
     private void checkOpts(CICSParser.Cics_collect_statistics_optsContext ctx) {
         checkHasMandatoryOptions(ctx.SET(), ctx, "SET");
         checkHasMutuallyExclusiveOptions("LASTRESET or LASTRESETHRS", ctx.LASTRESET(), ctx.LASTRESETHRS());
-        if (!ctx.LASTRESETHRS().isEmpty() || !ctx.LASTRESETMIN().isEmpty() || !ctx.LASTRESETSEC().isEmpty()) {
-            checkHasMandatoryOptions(ctx.LASTRESETHRS(), ctx, "LASTRESETHRS");
-            checkHasMandatoryOptions(ctx.LASTRESETMIN(), ctx, "LASTRESETMIN");
-            checkHasMandatoryOptions(ctx.LASTRESETSEC(), ctx, "LASTRESETSEC");
-        }
+        checkAllOptionsArePresentOrAbsent("LASTRESETHRS, LASTRESETMIN, LASTRESETSEC", ctx, ctx.LASTRESETHRS(), ctx.LASTRESETMIN(), ctx.LASTRESETSEC());
         checkHasMutuallyExclusiveOptions("AUTOINSTALL or  CONNECTION or  DB2CONN or "
                         + "DB2ENTRY or  DISPATCHER or  ENQUEUE or  FILE or  JOURNALNAME or  JOURNALNUM or "
                         + "JVMPROGRAM or  LSRPOOL or  MONITOR or  MVSTCB or POOL or "
