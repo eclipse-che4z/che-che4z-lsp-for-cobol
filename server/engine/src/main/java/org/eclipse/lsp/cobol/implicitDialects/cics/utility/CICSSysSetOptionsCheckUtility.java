@@ -589,7 +589,6 @@ public class CICSSysSetOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
                     put(CICSLexer.PRTCOPY, ErrorSeverity.WARNING);
                     put(CICSLexer.PURGE, ErrorSeverity.WARNING);
                     put(CICSLexer.PURGEABLE, ErrorSeverity.WARNING);
-                    put(CICSLexer.PURGEFORCE, ErrorSeverity.WARNING);
                     put(CICSLexer.QUIESCED, ErrorSeverity.WARNING);
                     put(CICSLexer.READABLE, ErrorSeverity.WARNING);
                     put(CICSLexer.RECONNECT, ErrorSeverity.WARNING);
@@ -1439,7 +1438,7 @@ public class CICSSysSetOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
         checkHasMandatoryOptions(ctx.TRANSACTION(), ctx, "TRANSACTION");
 
         checkMutuallyExclusiveOptions("DUMPING, TRANDUMP or NOTRANDUMP", ctx.DUMPING(), ctx.TRANDUMP(), ctx.NOTRANDUMP());
-        chceckMutuallyExclusiveOptions("OTELTRACE, PROPEMIT, PROP, PROPINIT, PROPINITEMIT or NOOTELTRACE",  ctx.OTELTRACE(), ctx.PROPEMIT(), ctx.PROP(), ctx.PROPINIT(), ctx.PROPINITEMIT(), ctx.NOOTELTRACE());
+        checkMutuallyExclusiveOptions("OTELTRACE, PROPEMIT, PROP, PROPINIT, PROPINITEMIT or NOOTELTRACE",  ctx.OTELTRACE(), ctx.PROPEMIT(), ctx.PROP(), ctx.PROPINIT(), ctx.PROPINITEMIT(), ctx.NOOTELTRACE());
         checkMutuallyExclusiveOptions("PURGEABILITY, NOTPURGEABLE or PURGEABLE", ctx.PURGEABILITY(), ctx.NOTPURGEABLE(), ctx.PURGEABLE());
         checkMutuallyExclusiveOptions("RUNAWAYTYPE, SYSTEM or USER", ctx.RUNAWAYTYPE(), ctx.SYSTEM(), ctx.USER());
         checkMutuallyExclusiveOptions("SHUTDOWN, SHUTDISABLED or SHUTENABLED", ctx.SHUTDOWN(), ctx.SHUTDISABLED(), ctx.SHUTENABLED());
@@ -1478,7 +1477,10 @@ public class CICSSysSetOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
         checkHasMandatoryOptions(ctx.VOLUME(), ctx, "VOLUME");
 
         checkHasObsoleteOptions(ctx.VOLUME(), ctx, "VOLUME");
-        checkPrerequisiteIsMet(ctx.ACTION(), ctx.JRNL(), ctx, "JRNL without ACTION");
+        if (!ctx.JRNL().isEmpty()) {
+            checkHasExactlyOneOption("ACTION or ADD", ctx, ctx.ACTION(), ctx.ADD());
+        }
+
         checkMutuallyExclusiveOptions("ACTION, ADD or REMOVE", ctx.ACTION(), ctx.ADD(), ctx.REMOVE());
         checkMutuallyExclusiveOptions("AVAIL, OK or NOWRITE", ctx.AVAIL(), ctx.OK(), ctx.NOWRITE());
         if (!ctx.REMOVE().isEmpty()) {
