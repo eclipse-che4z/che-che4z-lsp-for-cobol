@@ -38,7 +38,7 @@ allExciRules: cics_exci_link | cics_exci_delete | cics_exci_delete_container | c
               cics_exci_get_container | cics_exci_get_next_container | cics_exci_move_container |
               cics_exci_put_container | cics_exci_query_channel | cics_exci_startbrowse_container ;
 
-allSPRules: cics_acquire_terminal | cics_disable | cics_discard | cics_enable | cics_extract_system_programming | cics_inquire_system_programming | cics_create | cics_collect_statistics;
+allSPRules: cics_acquire_terminal | cics_disable | cics_discard | cics_enable | cics_extract_system_programming | cics_inquire_system_programming | cics_create | cics_perform | cics_resync_entryname | cics_collect_statistics;
 
 // compiler options
 compilerOpts
@@ -678,6 +678,28 @@ cics_move: MOVE cics_move_body;
 cics_move_body: ((CONTAINER | FROMACTIVITY | TOACTIVITY | AS | CHANNEL | TOCHANNEL) cics_data_value | FROMPROCESS |
            TOPROCESS | cics_handle_response)+;
 
+/** PERFORM System Commands */
+cics_perform:PERFORM (cics_perform_deletshipped | cics_perform_dump | cics_perform_endaffinity | cics_perform_jvmserver | cics_perform_pipeline |
+                      cics_perform_resettime | cics_perform_secdiscovery | cics_perform_security | cics_perform_shutdown | cics_perform_ssl | cics_perform_statistics);
+
+cics_perform_deletshipped:(DELETSHIPPED | cics_handle_response)+;
+cics_perform_dump:(DUMP | (DUMPCODE | TITLELENGTH | CALLER | CALLERLENGTH) cics_data_value | (TITLE | DUMPID) cics_data_area | cics_handle_response)+;
+cics_perform_endaffinity:(ENDAFFINITY | (NETNAME | NETID) cics_data_value | cics_handle_response)+;
+cics_perform_jvmserver:(JVMSERVER cics_data_area | JVMTYPE cics_cvda | JVM | JVMACTION cics_cvda | DUMP | DUMPTYPE cics_cvda | ALL | JAVACORE | HEAP | SNAPTRACE | GATHER | GATHERTYPE cics_cvda |
+                        DIAGNOSTICS | STACKTRACE | TASKID cics_data_value | LIBERTY | LIBRTYACTION cics_cvda | REFRESH | RESOURCETYPE cics_cvda | APPLICATION | APPID cics_data_area | APPIDLEN cics_data_area |
+                        CONFIG | SERVERDUMP | OSGI | OSGIACTION cics_cvda | REFRESHPKGS | cics_handle_response)+;
+cics_perform_pipeline:(PIPELINE cics_data_value | ACTION cics_cvda | SCAN | cics_handle_response)+;
+cics_perform_resettime:(RESETTIME | cics_handle_response)+;
+cics_perform_secdiscovery:(SECDISCOVERY | ACTION cics_cvda | WRITE | cics_handle_response)+;
+cics_perform_security:(SECURITY | REBUILD | ESMRESP cics_data_area | cics_handle_response)+;
+cics_perform_shutdown:(SHUTDOWN | IMMEDIATE | TAKEOVER | DUMP | PLT cics_data_value | PLTNAME cics_data_value | RESTART | NORESTART | SDTRAN cics_data_value | NOSDTRAN |
+                       XLT cics_data_value | cics_handle_response)+;
+cics_perform_ssl:(SSL | REBUILD | GSKRESP cics_data_area |cics_handle_response)+;
+cics_perform_statistics:(STATISTICS | RECORD | ALL | RESETNOW | ASYNCSERVICE | ATOMSERVICE | AUTOINSTALL | BUNDLE | CAPTURESPEC | CIPHER | CONNECTION | DB2 | DISPATCHER | DOCTEMPLATE | ENQUEUE | EPADAPTER |
+                        EVENTBINDING | EVENTPROCESS | FEPI | FILE | IPCONN | JOURNALNAME | JOURNALNUM | JVMPROGRAM | JVMSERVER | LIBRARY | LSRPOOL | MONITOR | MQCONN | MQMONITOR | NODEJSAPP |
+                        PIPELINE | POLICY | PROGAUTO | PROGRAM | PROGRAMDEF | RECOVERY | SECURITY | STATS | STORAGE | STREAMNAME | SYSDUMP | TABLEMGR | TCPIP | TCPIPSERVICE | TDQUEUE |
+                        TERMINAL | TRANCLASS | TCLASS | TRANDUMP | TRANSACTION | TSQUEUE | URIMAP | USER | VTAM | WEBSERVICE | XMLTRANSFORM | cics_handle_response)+;
+
 /** POINT */
 cics_point: POINT cics_point_options;
 cics_point_options: ((CONVID | SESSION) cics_name | cics_handle_response)*;
@@ -731,6 +753,10 @@ cics_readq_ts_td: (TS | TD | (QUEUE | QNAME) cics_name | cics_into_set | NEXT | 
 /** RELEASE */
 cics_release: RELEASE cics_release_option;
 cics_release_option: (PROGRAM cics_name | cics_handle_response)+;
+
+/** RESYNC ENTRYNAME System Command */
+cics_resync_entryname: RESYNC cics_resync_entryname_opts;
+cics_resync_entryname_opts: ((ENTRYNAME| QUALIFIER | IDLIST | IDLISTLENGTH) cics_data_value | PARTIAL | cics_handle_response)+;
 
 /** REMOVE SUBEVENT */
 cics_remove: REMOVE cics_remove_option;
@@ -1243,6 +1269,8 @@ ABCODE
   | APLTEXT
   | APLTEXTST
   | APPENDCRLF
+  | APPID
+  | APPIDLEN
   | APPLDATA
   | APPLICATION
   | APPLID
@@ -1338,6 +1366,8 @@ ABCODE
   | BUSY
   | CACHESIZE
   | CADDRLENGTH
+  | CALLER
+  | CALLERLENGTH
   | CAPTUREPOINT
   | CAPTUREPTYPE
   | CAPTURESPEC
@@ -1372,6 +1402,7 @@ ABCODE
   | CICSSYS
   | CICSTSLEVEL
   | CIDDOMAIN
+  | CIPHER
   | CIPHERS
   | CLEAR
   | CLICONVERT
@@ -1417,6 +1448,7 @@ ABCODE
   | COMTHREADS
   | CONCURRENCY
   | CONCURRENTST
+  | CONFIG
   | CONFIGDATA1
   | CONFIGFILE
   | CONFIRM
@@ -1536,6 +1568,7 @@ ABCODE
   | DFHVALUE
   | DFLTUSER
   | DH
+  | DIAGNOSTICS
   | DIGEST
   | DIGESTTYPE
   | DIRMGR
@@ -1594,6 +1627,7 @@ ABCODE
   | DUMPID
   | DUMPING
   | DUMPSCOPE
+  | DUMPTYPE
   | DUPKEY
   | DUPREC
   | DUPRES
@@ -1622,6 +1656,7 @@ ABCODE
   | ENABLESTATUS
   | ENCRYPTKEY
   | ENDACTIVITY
+  | ENDAFFINITY
   | ENDBR
   | ENDBROWSE
   | ENDDATA
@@ -1770,6 +1805,8 @@ ABCODE
   | GARBAGEINT
   | GASET
   | GAUSECOUNT
+  | GATHER
+  | GATHERTYPE
   | GC
   | GCDSASIZE
   | GCHARS
@@ -1793,6 +1830,7 @@ ABCODE
   | GROUPID
   | GRSTATUS
   | GSDSASIZE
+  | GSKRESP
   | GTEQ
   | GTFSTATUS
   | GUDSASIZE
@@ -1803,6 +1841,7 @@ ABCODE
   | HEALTH
   | HEALTHABSTIM
   | HEALTHCHECK
+  | HEAP
   | HEX
   | HFORMST
   | HFS
@@ -1830,6 +1869,8 @@ ABCODE
   | IDLEHRS
   | IDLEMINS
   | IDLESECS
+  | IDLIST
+  | IDLISTLENGTH
   | IDNTYCLASS
   | IDPROP
   | IE
@@ -1904,6 +1945,7 @@ ABCODE
   | ITEMERR
   | ITEMNAME
   | IUTYPE
+  | JAVACORE
   | JAVAHOME
   | JCT
   | JIDERR
@@ -1916,10 +1958,13 @@ ABCODE
   | JUSFIRST
   | JUSLAST
   | JUSTIFY
+  | JVM
+  | JVMACTION
   | JVMCLASS
   | JVMPROFILE
   | JVMPROGRAM
   | JVMSERVER
+  | JVMTYPE
   | JWT
   | KATAKANA
   | KATAKANAST
@@ -1965,8 +2010,10 @@ ABCODE
   | LERUNOPTS
   | LEVEL
   | LG
+  | LIBERTY
   | LIBRARY
   | LIBRARYDSN
+  | LIBRTYACTION
   | LIGHTPEN
   | LIGHTPENST
   | LINAGE_COUNTER
@@ -2149,9 +2196,11 @@ ABCODE
   | NOOUTCONVERT
   | NOPASSBKRD
   | NOPASSBKWR
+  | NORESTART
   | NOQUEUE
   | NOQUIESCE
   | NORMAL
+  | NOSDTRAN
   | NOSPACE
   | NOSPOOL
   | NOSRVCONVERT
@@ -2230,6 +2279,8 @@ ABCODE
   | ORGANIZATLEN
   | ORGUNIT
   | ORGUNITLEN
+  | OSGI
+  | OSGIACTION
   | OSGIBUNDLE
   | OSGIBUNDLEID
   | OSGISTATUS
@@ -2262,6 +2313,7 @@ ABCODE
   | PARSE
   | PARTCLASS
   | PARTCOUNT
+  | PARTIAL
   | PARTITIONSET
   | PARTITIONSST
   | PARTN
@@ -2283,6 +2335,7 @@ ABCODE
   | PCT
   | PENDSTATUS
   | PERFCLASS
+  | PERFORM
   | PF1
   | PF10
   | PF11
@@ -2328,6 +2381,8 @@ ABCODE
   | PLAN
   | PLANEXITNAME
   | PLATFORM
+  | PLT
+  | PLTNAME
   | PLTPIUSR
   | POINT
   | POLICY
@@ -2438,6 +2493,7 @@ ABCODE
   | REALMLEN
   | REASON
   | REATTACH
+  | REBUILD
   | RECEIVECOUNT
   | RECEIVER
   | RECFM
@@ -2454,6 +2510,8 @@ ABCODE
   | REENTPROTECT
   | REFPARMS
   | REFPARMSLEN
+  | REFRESH
+  | REFRESHPKGS
   | REGIONSTAT
   | REGIONUSERID
   | RELATESINDEX
@@ -2484,6 +2542,8 @@ ABCODE
   | RESCLASS
   | RESCOUNT
   | RESETBR
+  | RESETNOW
+  | RESETTIME
   | RESID
   | RESIDENCY
   | RESIDERR
@@ -2505,6 +2565,7 @@ ABCODE
   | RESULT
   | RESUME
   | RESUNAVAIL
+  | RESYNC
   | RESYNCMEMBER
   | RESYNCNUMBER
   | RESYNCSTATUS
@@ -2558,6 +2619,7 @@ ABCODE
   | SADDRLENGTH
   | SC
   | SCANDELAY
+  | SCAN
   | SCHEDULER
   | SCHEMALEVEL
   | SCHEME
@@ -2590,6 +2652,7 @@ ABCODE
   | SERVERADDR
   | SERVERADDRNU
   | SERVERCONV
+  | SERVERDUMP
   | SERVERIPADDR
   | SERVERNAME
   | SERVERPORT
@@ -2623,6 +2686,7 @@ ABCODE
   | SJVM
   | SM
   | SNAMELENGTH
+  | SNAPTRACE
   | SO
   | SOAPFAULT
   | SOAPLEVEL
@@ -2653,9 +2717,11 @@ ABCODE
   | SRVCSTATUS
   | SRVRADDR6NU
   | SRVRIPFAMILY
+  | SSL
   | SSLCACHE
   | SSLTYPE
   | ST
+  | STACKTRACE
   | STANDBYMODE
   | STARTBR
   | STARTBROWSE
@@ -2719,6 +2785,7 @@ ABCODE
   | SYNCPOINT
   | SYNCPOINTST
   | SYSBUSY
+  | SYSDUMP
   | SYSDUMPING
   | SYSID
   | SYSIDERR
@@ -2745,6 +2812,7 @@ ABCODE
   | TASKSTART
   | TASKSTARTST
   | TASKSUBPOOL
+  | TAKEOVER
   | TC
   | TCAMCONTROL
   | TCB
@@ -2796,6 +2864,7 @@ ABCODE
   | TIMERERR
   | TIMESEP
   | TNADDR
+  | TITLELENGTH
   | TNIPFAMILY
   | TNPORT
   | TOACTIVITY
@@ -2817,6 +2886,7 @@ ABCODE
   | TRAILER
   | TRAN
   | TRANCLASS
+  | TRANDUMP
   | TRANDUMPING
   | TRANISOLATE
   | TRANMGR
@@ -2935,6 +3005,7 @@ ABCODE
   | XCTL
   | XID
   | XLNSTATUS
+  | XLT
   | XM
   | XMLCONTAINER
   | XMLSCHEMA
