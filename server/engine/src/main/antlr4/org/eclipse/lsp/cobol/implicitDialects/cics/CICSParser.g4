@@ -38,7 +38,7 @@ allExciRules: cics_exci_link | cics_exci_delete | cics_exci_delete_container | c
               cics_exci_get_container | cics_exci_get_next_container | cics_exci_move_container |
               cics_exci_put_container | cics_exci_query_channel | cics_exci_startbrowse_container ;
 
-allSPRules: cics_acquire_terminal | cics_disable | cics_discard | cics_enable | cics_extract_system_programming | cics_inquire_system_programming | cics_create;
+allSPRules: cics_acquire_terminal | cics_disable | cics_discard | cics_enable | cics_extract_system_programming | cics_inquire_system_programming | cics_create | cics_perform | cics_resync_entryname | cics_collect_statistics | cics_csd;
 
 // compiler options
 compilerOpts
@@ -212,6 +212,40 @@ cics_assign_parameter2: MAPLINE cics_data_area | MAPWIDTH cics_data_area | MICRO
              TWALENG cics_data_area | UNATTEND cics_data_area | USERID cics_data_area |
              USERNAME cics_data_area | USERPRIORITY cics_data_area | VALIDATION cics_data_area | cics_handle_response;
 
+/** CSD System Commands */
+cics_csd: CSD (cics_csd_add | cics_csd_alter | cics_csd_append | cics_csd_copy | cics_csd_define | cics_csd_delete | cics_csd_disconnect | cics_csd_endbrgroup |
+               cics_csd_endbrlist | cics_csd_endbrrsrce | cics_csd_getnextgroup | cics_csd_getnextlist | cics_csd_getnextrsrce | cics_csd_inquiregroup | cics_csd_inquirelist |
+               cics_csd_inquirersrce | cics_csd_install | cics_csd_lock | cics_csd_remove | cics_csd_rename | cics_csd_startbrgroup | cics_csd_startbrlist | cics_csd_startbrrsrce |
+               cics_csd_unlock | cics_csd_userdefine);
+cics_csd_add:           (ADD | (GROUP | LIST | BEFORE | AFTER) cics_data_value | cics_handle_response)+;
+cics_csd_alter:         (ALTER | cics_csd_cvda | NOCOMPAT | COMPAT | COMPATMODE cics_cvda | (RESID | GROUP | ATTRIBUTES | ATTRLEN) cics_data_value | cics_handle_response)+;
+cics_csd_append:        (APPEND | (LIST | TO) cics_data_value | cics_handle_response)+;
+cics_csd_copy:          (COPY | cics_csd_cvda | ( RESID | AS | TO | GROUP ) cics_data_value | DUPERROR | DUPNOREPLACE | DUPREPLACE | DUPACTION cics_cvda | cics_handle_response)+;
+cics_csd_define:        (DEFINE | cics_csd_cvda | NOCOMPAT | COMPAT | COMPATMODE cics_cvda | (RESID | GROUP | ATTRIBUTES | ATTRLEN) cics_data_value | cics_handle_response)+;
+cics_csd_delete:        (DELETE | cics_csd_cvda | (RESID | GROUP) cics_data_value | LISTACTION cics_cvda | REMOVE | cics_handle_response)+;
+cics_csd_disconnect:    (DISCONNECT | cics_handle_response)+;
+cics_csd_endbrgroup:    (ENDBRGROUP | LIST | cics_handle_response)+;
+cics_csd_endbrlist:     (ENDBRLIST | cics_handle_response)+;
+cics_csd_endbrrsrce:    (ENDBRRSRCE | cics_handle_response)+;
+cics_csd_getnextgroup:  (GETNEXTGROUP | GROUP cics_data_area | LIST cics_data_value | cics_handle_response)+;
+cics_csd_getnextlist:   (GETNEXTLIST | LIST cics_data_area | cics_handle_response)+;
+cics_csd_getnextrsrce:  (GETNEXTRSRCE | RESTYPE cics_cvda | RESID cics_data_area | SET cics_ref | (GROUP | ATTRIBUTES | ATTRLEN) cics_data_area | cics_handle_response)+;
+cics_csd_inquiregroup:  (INQUIREGROUP | GROUP cics_data_value | LIST cics_data_value | cics_handle_response)+;
+cics_csd_inquirelist:   (INQUIRELIST | LIST cics_cvda | cics_handle_response)+;
+cics_csd_inquirersrce:  (INQUIRERSRCE | cics_csd_cvda | (RESID | GROUP ) cics_data_value | SET cics_ref | (GROUP | ATTRIBUTES | ATTRLEN) cics_data_area | cics_handle_response)+;
+cics_csd_install:       (INSTALL | cics_csd_cvda | RESID cics_data_area | GROUP cics_data_value | cics_handle_response)+;
+cics_csd_lock:          (LOCK | (LIST | GROUP) cics_data_value | cics_handle_response)+;
+cics_csd_remove:        (REMOVE | (LIST | GROUP) cics_data_value | cics_handle_response)+;
+cics_csd_rename:        (RENAME | cics_csd_cvda | (RESID | GROUP | AS) cics_data_value | cics_handle_response)+;
+cics_csd_startbrgroup:  (STARTBRGROUP | LIST cics_data_value | cics_handle_response)+;
+cics_csd_startbrlist:   (STARTBRLIST | cics_handle_response)+;
+cics_csd_startbrrsrce:  (STARTBRRSRCE | GROUP cics_data_value | cics_handle_response)+;
+cics_csd_unlock:        (UNLOCK | (LIST | GROUP) cics_data_value | cics_handle_response)+;
+cics_csd_userdefine:    (USERDEFINE | cics_csd_cvda | (RESID | GROUP | ATTRIBUTES | ATTRLEN) cics_data_value | NOCOMPAT | COMPAT | COMPATMODE cics_cvda | cics_handle_response)+;
+cics_csd_cvda:           RESTYPE cics_cvda | ATOMSERVICE | BUNDLE | CONNECTION | CORBASERVER | DB2CONN | DB2ENTRY | DB2TRAN | DJAR | DOCTEMPLATE | DUMPCODE |
+                         ENQMODEL | FILE | IPCONN | JOURNALMODEL | JVMSERVER | LIBRARY | LSRPOOL | MAPSET | MQCONN | MQMONITOR | PARTITIONSET | PARTNER | PIPELINE |
+                         PROCESSTYPE | PROFILE | PROGRAM | REQUESTMODEL | SESSIONS | TCPIPSERVICE | TDQUEUE | TERMINAL | TRANCLASS | TRANSACTION | TSMODEL | TYPETERM | URIMAP | WEBSERVICE;
+
 /** BIF DEEDIT / BIF DIGEST */
 cics_bif: BIF (cics_bif_deedit | cics_bif_digest);
 cics_bif_deedit: (DEEDIT | FIELD cics_data_area | LENGTH cics_data_value | cics_handle_response)+;
@@ -242,6 +276,13 @@ cics_check: CHECK (cics_check_activity | cics_check_timer);
 cics_check_activity: (ACQPROCESS | ACTIVITY cics_data_value | ACQACTIVITY | (ABCODE | ABPROGRAM) cics_data_area |
                      (MODE | SUSPSTATUS | COMPSTATUS) cics_cvda | cics_handle_response)+;
 cics_check_timer: (TIMER cics_data_value | STATUS cics_cvda | cics_handle_response)*;
+
+cics_collect_statistics: COLLECT cics_collect_statistics_opts;
+cics_collect_statistics_opts: ((LASTRESET | LASTRESETHRS | LASTRESETMIN | LASTRESETSEC) cics_data_area | SET cics_ref |
+                              (CONNECTION | DB2ENTRY | FILE | JOURNALNAME | JOURNALNUM | JVMPROGRAM | LSRPOOL | POOL | TARGET | SUBPOOL | NODE | TCLASS | TCPIPSERVICE | TERMINAL | TRANCLASS) cics_data_value |
+                               MONITOR cics_data_value? | MVSTCB cics_data_value? | PROGRAM cics_data_value? | STORAGE  cics_data_value? | STREAMNAME cics_data_value? | SYSDUMPCODE cics_data_value? | TDQUEUE cics_data_value? | TRANDUMPCODE cics_data_value? | TRANSACTION cics_data_value? |
+                               STATISTICS | AUTOINSTALL | DB2CONN | DISPATCHER | ENQUEUE | PROGAUTO | RECOVERY | STATS | TABLEMGR | TASKSUBPOOL | TCPIP | TSQUEUE | VTAM |
+                               cics_handle_response)+;
 
 cics_conditions: NORMAL | ERROR | RDATT | WRBRK | EOF_TOKEN | EODS | EOC | INBFMH | ENDINPT | NONVAL | NOSTART | TERMIDERR | FILENOTFOUND | NOTFND | DUPREC | DUPKEY |
                 INVREQ | IOERR | NOSPACE | NOTOPEN | ENDFILE | ILLOGIC | LENGERR | QZERO | SIGNAL | QBUSY | ITEMERR | PGMIDERR | TRANSIDERR | ENDDATA | INVTSREQ |
@@ -669,6 +710,28 @@ cics_move: MOVE cics_move_body;
 cics_move_body: ((CONTAINER | FROMACTIVITY | TOACTIVITY | AS | CHANNEL | TOCHANNEL) cics_data_value | FROMPROCESS |
            TOPROCESS | cics_handle_response)+;
 
+/** PERFORM System Commands */
+cics_perform:PERFORM (cics_perform_deletshipped | cics_perform_dump | cics_perform_endaffinity | cics_perform_jvmserver | cics_perform_pipeline |
+                      cics_perform_resettime | cics_perform_secdiscovery | cics_perform_security | cics_perform_shutdown | cics_perform_ssl | cics_perform_statistics);
+
+cics_perform_deletshipped:(DELETSHIPPED | cics_handle_response)+;
+cics_perform_dump:(DUMP | (DUMPCODE | TITLELENGTH | CALLER | CALLERLENGTH) cics_data_value | (TITLE | DUMPID) cics_data_area | cics_handle_response)+;
+cics_perform_endaffinity:(ENDAFFINITY | (NETNAME | NETID) cics_data_value | cics_handle_response)+;
+cics_perform_jvmserver:(JVMSERVER cics_data_area | JVMTYPE cics_cvda | JVM | JVMACTION cics_cvda | DUMP | DUMPTYPE cics_cvda | ALL | JAVACORE | HEAP | SNAPTRACE | GATHER | GATHERTYPE cics_cvda |
+                        DIAGNOSTICS | STACKTRACE | TASKID cics_data_value | LIBERTY | LIBRTYACTION cics_cvda | REFRESH | RESOURCETYPE cics_cvda | APPLICATION | APPID cics_data_area | APPIDLEN cics_data_area |
+                        CONFIG | SERVERDUMP | OSGI | OSGIACTION cics_cvda | REFRESHPKGS | cics_handle_response)+;
+cics_perform_pipeline:(PIPELINE cics_data_value | ACTION cics_cvda | SCAN | cics_handle_response)+;
+cics_perform_resettime:(RESETTIME | cics_handle_response)+;
+cics_perform_secdiscovery:(SECDISCOVERY | ACTION cics_cvda | WRITE | cics_handle_response)+;
+cics_perform_security:(SECURITY | REBUILD | ESMRESP cics_data_area | cics_handle_response)+;
+cics_perform_shutdown:(SHUTDOWN | IMMEDIATE | TAKEOVER | DUMP | PLT cics_data_value | PLTNAME cics_data_value | RESTART | NORESTART | SDTRAN cics_data_value | NOSDTRAN |
+                       XLT cics_data_value | cics_handle_response)+;
+cics_perform_ssl:(SSL | REBUILD | GSKRESP cics_data_area |cics_handle_response)+;
+cics_perform_statistics:(STATISTICS | RECORD | ALL | RESETNOW | ASYNCSERVICE | ATOMSERVICE | AUTOINSTALL | BUNDLE | CAPTURESPEC | CIPHER | CONNECTION | DB2 | DISPATCHER | DOCTEMPLATE | ENQUEUE | EPADAPTER |
+                        EVENTBINDING | EVENTPROCESS | FEPI | FILE | IPCONN | JOURNALNAME | JOURNALNUM | JVMPROGRAM | JVMSERVER | LIBRARY | LSRPOOL | MONITOR | MQCONN | MQMONITOR | NODEJSAPP |
+                        PIPELINE | POLICY | PROGAUTO | PROGRAM | PROGRAMDEF | RECOVERY | SECURITY | STATS | STORAGE | STREAMNAME | SYSDUMP | TABLEMGR | TCPIP | TCPIPSERVICE | TDQUEUE |
+                        TERMINAL | TRANCLASS | TCLASS | TRANDUMP | TRANSACTION | TSQUEUE | URIMAP | USER | VTAM | WEBSERVICE | XMLTRANSFORM | cics_handle_response)+;
+
 /** POINT */
 cics_point: POINT cics_point_options;
 cics_point_options: ((CONVID | SESSION) cics_name | cics_handle_response)*;
@@ -722,6 +785,10 @@ cics_readq_ts_td: (TS | TD | (QUEUE | QNAME) cics_name | cics_into_set | NEXT | 
 /** RELEASE */
 cics_release: RELEASE cics_release_option;
 cics_release_option: (PROGRAM cics_name | cics_handle_response)+;
+
+/** RESYNC ENTRYNAME System Command */
+cics_resync_entryname: RESYNC cics_resync_entryname_opts;
+cics_resync_entryname_opts: ((ENTRYNAME| QUALIFIER | IDLIST | IDLISTLENGTH) cics_data_value | PARTIAL | cics_handle_response)+;
 
 /** REMOVE SUBEVENT */
 cics_remove: REMOVE cics_remove_option;
@@ -1345,6 +1412,8 @@ ABCODE
   | APLTEXT
   | APLTEXTST
   | APPENDCRLF
+  | APPID
+  | APPIDLEN
   | APPLDATA
   | APPLICATION
   | APPLID
@@ -1420,6 +1489,7 @@ ABCODE
   | BASEDSNAME
   | BASESCOPE
   | BASICAUTH
+  | BEFORE
   | BELOW
   | BIF
   | BINDFILE
@@ -1451,6 +1521,8 @@ ABCODE
   | BUSY
   | CACHESIZE
   | CADDRLENGTH
+  | CALLER
+  | CALLERLENGTH
   | CAPTUREPOINT
   | CAPTUREPTYPE
   | CAPTURESPEC
@@ -1488,6 +1560,7 @@ ABCODE
   | CICSTABLE
   | CICSTSLEVEL
   | CIDDOMAIN
+  | CIPHER
   | CIPHERS
   | CLEAR
   | CLICONVERT
@@ -1516,6 +1589,7 @@ ABCODE
   | CODEPAGEERR
   | COLDACQ
   | COLDSTATUS
+  | COLLECT
   | COLOR
   | COLORST
   | COMAUTHID
@@ -1526,6 +1600,8 @@ ABCODE
   | COMMONNAMLEN
   | COMPAREMAX
   | COMPAREMIN
+  | COMPAT
+  | COMPATMODE
   | COMPID
   | COMPLETE
   | COMPOSITE
@@ -1536,6 +1612,7 @@ ABCODE
   | COMTHREADS
   | CONCURRENCY
   | CONCURRENTST
+  | CONFIG
   | CONFIGDATA1
   | CONFIGFILE
   | CONFIRM
@@ -1566,6 +1643,7 @@ ABCODE
   | COPID
   | COPY
   | COPYST
+  | CORBASERVER
   | CORRELID
   | COUNTER
   | COUNTRY
@@ -1578,6 +1656,7 @@ ABCODE
   | CRITICAL
   | CRITICALST
   | CRLPROFILE
+  | CSD
   | CSDERR
   | CSIGN
   | CTERM
@@ -1669,6 +1748,7 @@ ABCODE
   | DFHVALUE
   | DFLTUSER
   | DH
+  | DIAGNOSTICS
   | DIGEST
   | DIGESTTYPE
   | DIRMGR
@@ -1681,6 +1761,7 @@ ABCODE
   | DISCREQ
   | DISCREQST
   | DISPOSITION
+  | DJAR
   | DM
   | DNAME
   | DNAMELEN
@@ -1732,8 +1813,13 @@ ABCODE
   | DUMPID
   | DUMPING
   | DUMPSCOPE
+  | DUMPTYPE
+  | DUPACTION
+  | DUPERROR
   | DUPKEY
+  | DUPNOREPLACE
   | DUPREC
+  | DUPREPLACE
   | DUPRES
   | DURATION
   | DYNAMSTATUS
@@ -1765,7 +1851,10 @@ ABCODE
   | ENDACTIVITY
   | ENDAFFINITY
   | ENDBR
+  | ENDBRGROUP
+  | ENDBRLIST
   | ENDBROWSE
+  | ENDBRRSRCE
   | ENDDATA
   | ENDFILE
   | ENDINPT
@@ -1924,6 +2013,8 @@ ABCODE
   | GALOCATION
   | GARBAGEINT
   | GASET
+  | GATHER
+  | GATHERTYPE
   | GAUSECOUNT
   | GC
   | GCDSASIZE
@@ -1938,6 +2029,9 @@ ABCODE
   | GETMAIN
   | GETMAIN64
   | GETNEXT
+  | GETNEXTGROUP
+  | GETNEXTLIST
+  | GETNEXTRSRCE
   | GLOBALCATLG
   | GMEXITOPT
   | GMMI
@@ -1945,10 +2039,12 @@ ABCODE
   | GMMTEXT
   | GMMTRANID
   | GRNAME
+  | GROUP
   | GROUPID
   | GROUPRESYNC
   | GRSTATUS
   | GSDSASIZE
+  | GSKRESP
   | GTEQ
   | GTFSTART
   | GTFSTATUS
@@ -1961,6 +2057,7 @@ ABCODE
   | HEALTH
   | HEALTHABSTIM
   | HEALTHCHECK
+  | HEAP
   | HEX
   | HFORMST
   | HFS
@@ -1989,6 +2086,8 @@ ABCODE
   | IDLEHRS
   | IDLEMINS
   | IDLESECS
+  | IDLIST
+  | IDLISTLENGTH
   | IDNTY
   | IDNTYCLASS
   | IDPROP
@@ -2022,7 +2121,11 @@ ABCODE
   | INPUTMSG
   | INPUTMSGLEN
   | INQUIRE
+  | INQUIREGROUP
+  | INQUIRELIST
+  | INQUIRERSRCE
   | INSERVICE
+  | INSTALL
   | INSTALLAGENT
   | INSTALLTIME
   | INSTALLUSRID
@@ -2069,6 +2172,7 @@ ABCODE
   | ITEMERR
   | ITEMNAME
   | IUTYPE
+  | JAVACORE
   | JAVAHOME
   | JCT
   | JIDERR
@@ -2083,10 +2187,13 @@ ABCODE
   | JUSFIRST
   | JUSLAST
   | JUSTIFY
+  | JVM
+  | JVMACTION
   | JVMCLASS
   | JVMPROFILE
   | JVMPROGRAM
   | JVMSERVER
+  | JVMTYPE
   | JWT
   | KATAKANA
   | KATAKANAST
@@ -2133,8 +2240,10 @@ ABCODE
   | LERUNOPTS
   | LEVEL
   | LG
+  | LIBERTY
   | LIBRARY
   | LIBRARYDSN
+  | LIBRTYACTION
   | LIGHTPEN
   | LIGHTPENST
   | LINAGE_COUNTER
@@ -2148,6 +2257,7 @@ ABCODE
   | LINKSYSNET
   | LINKSYSTEM
   | LIST
+  | LISTACTION
   | LISTLENGTH
   | LISTSIZE
   | LLID
@@ -2163,6 +2273,7 @@ ABCODE
   | LOCALITY
   | LOCALITYLEN
   | LOCATION
+  | LOCK
   | LOCKED
   | LOCKING
   | LOCKMGR
@@ -2311,6 +2422,7 @@ ABCODE
   | NOCHECK
   | NOCLICONVERT
   | NOCLOSE
+  | NOCOMPAT
   | NOCOMPRESS
   | NOCONNECT
   | NOCONVERSE
@@ -2354,8 +2466,10 @@ ABCODE
   | NORELREQ
   | NOREPLICATOR
   | NORESRCE
+  | NORESTART
   | NORESYNC
   | NORMAL
+  | NOSDTRAN
   | NOSHUTDOWN
   | NOSPACE
   | NOSPOOL
@@ -2461,6 +2575,8 @@ ABCODE
   | ORGANIZATLEN
   | ORGUNIT
   | ORGUNITLEN
+  | OSGI
+  | OSGIACTION
   | OSGIBUNDLE
   | OSGIBUNDLEID
   | OSGISTATUS
@@ -2497,6 +2613,7 @@ ABCODE
   | PARSE
   | PARTCLASS
   | PARTCOUNT
+  | PARTIAL
   | PARTITIONSET
   | PARTITIONSST
   | PARTN
@@ -2519,6 +2636,7 @@ ABCODE
   | PENDSTATUS
   | PERF
   | PERFCLASS
+  | PERFORM
   | PERMANENT
   | PF1
   | PF2
@@ -2567,6 +2685,8 @@ ABCODE
   | PLAN
   | PLANEXITNAME
   | PLATFORM
+  | PLT
+  | PLTNAME
   | PLTPIUSR
   | POINT
   | POLICY
@@ -2708,6 +2828,7 @@ ABCODE
   | REFPARMS
   | REFPARMSLEN
   | REFRESH
+  | REFRESHPKGS
   | REGIONSTAT
   | REGIONUSERID
   | RELATED
@@ -2726,6 +2847,7 @@ ABCODE
   | REMOTESYSTEM
   | REMOTETABLE
   | REMOVE
+  | RENAME
   | REPEATABLE
   | REPETABLE
   | REPLICATION
@@ -2734,6 +2856,7 @@ ABCODE
   | REPLYLENGTH
   | REQID
   | REQTYPE
+  | REQUESTMODEL
   | REQUESTSTRM
   | REQUESTTYPE
   | REQUIRED
@@ -2743,6 +2866,7 @@ ABCODE
   | RESETBR
   | RESETLOCKS
   | RESETNOW
+  | RESETTIME
   | RESID
   | RESIDENCY
   | RESIDERR
@@ -2821,6 +2945,7 @@ ABCODE
   | RZ
   | SADDRLENGTH
   | SC
+  | SCAN
   | SCANDELAY
   | SCHEDULER
   | SCHEMALEVEL
@@ -2854,6 +2979,7 @@ ABCODE
   | SERVERADDR
   | SERVERADDRNU
   | SERVERCONV
+  | SERVERDUMP
   | SERVERIPADDR
   | SERVERNAME
   | SERVERPORT
@@ -2893,6 +3019,7 @@ ABCODE
   | SJVM
   | SM
   | SNAMELENGTH
+  | SNAPTRACE
   | SO
   | SOAPFAULT
   | SOAPLEVEL
@@ -2928,13 +3055,18 @@ ABCODE
   | SRVCSTATUS
   | SRVRADDR6NU
   | SRVRIPFAMILY
+  | SSL
   | SSLCACHE
   | SSLTYPE
   | ST
+  | STACKTRACE
   | STANDBYMODE
   | STANTRACE
   | STARTBR
+  | STARTBRGROUP
+  | STARTBRLIST
   | STARTBROWSE
+  | STARTBRRSRCE
   | STARTCODE
   | STARTED
   | STARTSCRIPT
@@ -3001,6 +3133,7 @@ ABCODE
   | SYNCPOINT
   | SYNCPOINTST
   | SYSBUSY
+  | SYSDUMP
   | SYSDUMPING
   | SYSID
   | SYSIDERR
@@ -3011,13 +3144,16 @@ ABCODE
   | SYSTEMSTATUS
   | SZ
   | TABLE
+  | TABLEMGR
   | TABLENAME
   | TABLEONLY
   | TABLES
   | TABLESIZE
   | TAEXECUTABLE
   | TAGS
+  | TAKEOVER
   | TALENGTH
+  | TARGET
   | TARGETCOUNT
   | TASK
   | TASKDATAKEY
@@ -3085,6 +3221,7 @@ ABCODE
   | TIMER
   | TIMERERR
   | TIMESEP
+  | TITLELENGTH
   | TNADDR
   | TNIPFAMILY
   | TNPORT
@@ -3185,6 +3322,7 @@ ABCODE
   | USERDATA
   | USERDATAKEY
   | USERDATALEN
+  | USERDEFINE
   | USERID
   | USERIDERR
   | USERNAME
@@ -3240,6 +3378,7 @@ ABCODE
   | XCTL
   | XID
   | XLNSTATUS
+  | XLT
   | XM
   | XMLCONTAINER
   | XMLSCHEMA
