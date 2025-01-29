@@ -846,8 +846,8 @@ cics_set_secrecording: ((ADD | MODIFY | REMOVE) | MAXIMUM cics_data_area | ACTIO
                                     (SECRECORDING | ODADPTRID | ODADPTRDATA1 | ODADPTRDATA2 | ODADPTRDATA3 | ODAPPLID | ODCLNTIPADDR | ODCLNTPORT | ODFACILNAME |
                                       ODFACILTYPE | ODIPFAMILY | ODLUNAME | ODNETID | ODNETWORKID | ODSERVERPORT | ODTCPIPS | ODTRANSID | ODUSERID) cics_data_value | cics_handle_response)+;
 cics_set_statistics: ((STATISTICS | ON | OFF | RECORDNOW | RESETNOW) |
-                            (ENDOFDAY | ENDOFDAYHRS | ENDOFDAYMINS | ENDOFDAYSECS | ENDOFDAYHRS | INTERVAL | INTERVALHRS | INTERVALMINS | INTERVALSECS | INTERVALHRS) cics_data_value |
-                            (RECORDING | RECORDING) cics_cvda | cics_handle_response)+;
+                            (ENDOFDAY | ENDOFDAYHRS | ENDOFDAYMINS | ENDOFDAYSECS | INTERVAL | INTERVALHRS | INTERVALMINS | INTERVALSECS) cics_data_value |
+                            (RECORDING) cics_cvda | cics_handle_response)+;
 cics_set_sysdumpcode: ((ADD | REMOVE | RESET | DAE | NODAE | LOCAL | RELATED | NOSHUTDOWN | SHUTDOWN | NOSYSDUMP | SYSDUMP) | (SYSDUMPCODE | DSPLIST | JOBLIST | MAXIMUM) cics_data_value | (ACTION | DAEOPTION | DUMPSCOPE | SHUTOPTION | SYSDUMPING) cics_cvda | cics_handle_response)+;
 cics_set_system: ((SYSTEM | DEBUG | NODEBUG | NOSYSDUMP | TABLEONLY | SYSDUMP | FORCE | NOFORCE | CTLGALL | CTLGMODIFY | CTLGNONE | AUTOACTIVE | AUTOINACTIVE) |
                         (AKP | DSALIMIT | DSRTPROGRAM | DTRPROGRAM | EDSALIMIT | GMMTEXT | GMMLENGTH | GMMTEXT | MAXTASKS | MAXTASKS | MROBATCH | PROGAUTOEXIT | PRTYAGING | RUNAWAY | SCANDELAY | SDTMEMLIMIT | TIME | AKP) cics_data_value |
