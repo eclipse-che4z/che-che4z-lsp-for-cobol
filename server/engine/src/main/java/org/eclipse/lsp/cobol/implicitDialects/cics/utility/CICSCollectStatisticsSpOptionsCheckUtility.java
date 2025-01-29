@@ -114,9 +114,8 @@ public class CICSCollectStatisticsSpOptionsCheckUtility extends CICSOptionsCheck
                 ctx.SUBPOOL(), ctx.SYSDUMPCODE(), ctx.TABLEMGR(), ctx.NODE(), ctx.TASKSUBPOOL(),
                 ctx.TCLASS(), ctx.TCPIP(), ctx.TCPIPSERVICE(), ctx.TDQUEUE(), ctx.TERMINAL(), ctx.TRANCLASS(),
                 ctx.TRANDUMPCODE(), ctx.TRANSACTION(), ctx.TSQUEUE(), ctx.VTAM());
-        if (ctx.POOL().isEmpty() && (!ctx.NODE().isEmpty() || !ctx.TARGET().isEmpty())) {
-            checkHasMandatoryOptions(ctx.NODE(), ctx, "NODE");
-            checkHasMandatoryOptions(ctx.TARGET(), ctx, "TARGET");
+        if (ctx.POOL().isEmpty()) {
+            checkAllOptionsArePresentOrAbsent("NODE and TARGET", ctx, ctx.NODE(), ctx.TARGET());
         }
     }
 }
