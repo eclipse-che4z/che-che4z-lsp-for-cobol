@@ -298,6 +298,9 @@ public class CICSOptionsCheckUtility {
         CICSRouteOptionsCheckUtility.RULE_INDEX,
         new CICSRouteOptionsCheckUtility(context, errors));
     optionsMap.put(
+        CICSWSAContextOptionsCheckUtility.RULE_INDEX,
+        new CICSWSAContextOptionsCheckUtility(context, errors));
+    optionsMap.put(
         CICSResetbrOptionsCheckUtility.RULE_INDEX,
         new CICSResetbrOptionsCheckUtility(context, errors));
     optionsMap.put(
@@ -324,6 +327,12 @@ public class CICSOptionsCheckUtility {
     spOptionsMap.put(
         CICSExtractSPOptionsCheckUtility.RULE_INDEX,
         new CICSExtractSPOptionsCheckUtility(context, errors));
+    spOptionsMap.put(
+    CICSResyncEntrynameOptionsCheckUtility.RULE_INDEX,
+        new CICSResyncEntrynameOptionsCheckUtility(context, errors));
+    spOptionsMap.put(
+        CICSPerformSPOptionsCheckUtility.RULE_INDEX,
+        new CICSPerformSPOptionsCheckUtility(context, errors));
   }
     /**
      * Entrypoint to check CICS rule options

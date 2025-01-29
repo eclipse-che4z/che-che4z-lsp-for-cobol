@@ -38,15 +38,15 @@ class TestSqlLabelStatement {
       TEXT
           + "           EXEC SQL\n"
           + "             LABEL ON COLUMN DSN8C10.DEPT.DEPTNO \n"
-          + "             IS 'DEPARTMENT NUMBER' \n"
+          + "             IS \"DEPARTMENT NUMBER\" \n"
           + "           END-EXEC.\n";
 
   private static final String LABEL2 =
       TEXT
           + "           EXEC SQL\n"
           + "             LABEL ON DSN8C10.DEPT \n"
-          + "             (MGRNO IS 'EMPLOYEE NUMBER FOR THE MANAGER',\n"
-          + "             ADMRDEPT IS 'ADMINISTERING DEPARTMENT') \n"
+          + "             (MGRNO IS \"EMPLOYEE NUMBER FOR THE MANAGER\",\n"
+          + "             ADMRDEPT IS \"ADMINISTERING DEPARTMENT\") \n"
           + "           END-EXEC.\n";
 
   private static Stream<String> textsToTest() {

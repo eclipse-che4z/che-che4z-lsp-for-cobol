@@ -92,7 +92,7 @@ class TestSqlAllAlterStatements {
           + "            NO EXTERNAL ACTION\n"
           + "            CONTAINS SQL\n"
           + "            \tBEGIN\n"
-          + "            \tDECLARE REVSTR, RESTSTR VARCHAR(4000) DEFAULT '';\n"
+          + "            \tDECLARE REVSTR, RESTSTR VARCHAR(4000) DEFAULT \"\";\n"
           + "            \tDECLARE LEN INT;\n"
           + "            \tIF INSTR IS NULL THEN\n"
           + "            \t\tRETURN NULL;\n"
@@ -115,7 +115,7 @@ class TestSqlAllAlterStatements {
           + "            NO EXTERNAL ACTION\n"
           + "            CONTAINS SQL\n"
           + "            BEGIN\n"
-          + "            DECLARE REVSTR, RESTSTR VARCHAR(4000) DEFAULT '';\n"
+          + "            DECLARE REVSTR, RESTSTR VARCHAR(4000) DEFAULT \"\";\n"
           + "            IF INSTR IS NULL THEN\n"
           + "             RETURN NULL;\n"
           + "            END IF;\n"
@@ -459,8 +459,8 @@ class TestSqlAllAlterStatements {
       TEXT
           + "            EXEC SQL\n"
           + "            ALTER TRUSTED CONTEXT REMOTECTX\n"
-          + "             ALTER ATTRIBUTES (ADDRESS '9.12.155.200',\n"
-          + "             ENCRYPTION 'LOW');\n"
+          + "             ALTER ATTRIBUTES (ADDRESS \"9.12.155.200\",\n"
+          + "             ENCRYPTION \"LOW\");\n"
           + "            END-EXEC.";
 
   // ALTER VIEW
@@ -474,8 +474,8 @@ class TestSqlAllAlterStatements {
       TEXT
           + "            EXEC SQL\n"
           + "             ALTER TRUSTED CONTEXT REMOTECTX\n"
-          + "             ALTER ATTRIBUTES (ADDRESS '9.12.155.200',\n"
-          + "             ENCRYPTION 'LOW');\n"
+          + "             ALTER ATTRIBUTES (ADDRESS \"9.12.155.200\",\n"
+          + "             ENCRYPTION \"LOW\");\n"
           + "            END-EXEC.";
 
   private static Stream<String> textsToTest() {
