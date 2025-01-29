@@ -107,18 +107,20 @@ public class CICSCollectStatisticsSpOptionsCheckUtility extends CICSOptionsCheck
         }
         checkHasMutuallyExclusiveOptions("AUTOINSTALL or  CONNECTION or  DB2CONN or "
                         + "DB2ENTRY or  DISPATCHER or  ENQUEUE or  FILE or  JOURNALNAME or  JOURNALNUM or "
-                        + "JVMPROGRAM or  LSRPOOL or  MONITOR or  MVSTCB or "
+                        + "JVMPROGRAM or  LSRPOOL or  MONITOR or  MVSTCB or POOL or "
                         + "PROGAUTO or  PROGRAM or  RECOVERY or  STATS or  STORAGE or  STREAMNAME or "
-                        + "SUBPOOL or  SYSDUMPCODE or  TABLEMGR or  TARGET or  TASKSUBPOOL or "
+                        + "SUBPOOL or  SYSDUMPCODE or  TABLEMGR or NODE or TASKSUBPOOL or "
                         + "TCLASS or  TCPIP or  TCPIPSERVICE or  TDQUEUE or  TERMINAL or  TRANCLASS or "
                         + "TRANDUMPCODE or  TRANSACTION or  TSQUEUE or  VTAM", ctx.AUTOINSTALL(), ctx.CONNECTION(), ctx.DB2CONN(),
                 ctx.DB2ENTRY(), ctx.DISPATCHER(), ctx.ENQUEUE(), ctx.FILE(), ctx.JOURNALNAME(), ctx.JOURNALNUM(),
-                ctx.JVMPROGRAM(), ctx.LSRPOOL(), ctx.MONITOR(), ctx.MVSTCB(),
+                ctx.JVMPROGRAM(), ctx.LSRPOOL(), ctx.MONITOR(), ctx.MVSTCB(), ctx.POOL(),
                 ctx.PROGAUTO(), ctx.PROGRAM(), ctx.RECOVERY(), ctx.STATS(), ctx.STORAGE(), ctx.STREAMNAME(),
-                ctx.SUBPOOL(), ctx.SYSDUMPCODE(), ctx.TABLEMGR(), ctx.TARGET(), ctx.TASKSUBPOOL(),
+                ctx.SUBPOOL(), ctx.SYSDUMPCODE(), ctx.TABLEMGR(), ctx.NODE(), ctx.TASKSUBPOOL(),
                 ctx.TCLASS(), ctx.TCPIP(), ctx.TCPIPSERVICE(), ctx.TDQUEUE(), ctx.TERMINAL(), ctx.TRANCLASS(),
                 ctx.TRANDUMPCODE(), ctx.TRANSACTION(), ctx.TSQUEUE(), ctx.VTAM());
-        if (ctx.NODE().isEmpty()) checkPrerequisiteIsMet(ctx.POOL(), ctx.TARGET(), ctx, "TARGET without POOL");
-        if (ctx.POOL().isEmpty()) checkPrerequisiteIsMet(ctx.TARGET(), ctx.NODE(), ctx, "NODE without TARGET");
+        if (ctx.POOL().isEmpty() && (!ctx.NODE().isEmpty() || !ctx.TARGET().isEmpty())) {
+            checkHasMandatoryOptions(ctx.NODE(), ctx, "NODE");
+            checkHasMandatoryOptions(ctx.TARGET(), ctx, "TARGET");
+        }
     }
 }
