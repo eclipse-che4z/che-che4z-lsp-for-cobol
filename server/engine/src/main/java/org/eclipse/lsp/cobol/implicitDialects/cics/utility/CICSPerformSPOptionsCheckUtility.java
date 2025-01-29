@@ -24,7 +24,6 @@ package org.eclipse.lsp.cobol.implicitDialects.cics.utility;
         import org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser;
 
         import java.util.*;
-        import java.util.stream.Collectors;
 
         import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.*;
 
