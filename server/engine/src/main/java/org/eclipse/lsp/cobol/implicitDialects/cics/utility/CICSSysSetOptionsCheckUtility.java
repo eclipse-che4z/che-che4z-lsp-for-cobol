@@ -42,6 +42,7 @@ public class CICSSysSetOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
                     put(CICSLexer.ADD, ErrorSeverity.ERROR);
                     put(CICSLexer.ADDABLE, ErrorSeverity.ERROR);
                     put(CICSLexer.ADJUSTMENT, ErrorSeverity.ERROR);
+                    put(CICSLexer.ADVANCE, ErrorSeverity.ERROR);
                     put(CICSLexer.AFFINITY, ErrorSeverity.ERROR);
                     put(CICSLexer.AIBRIDGE, ErrorSeverity.ERROR);
                     put(CICSLexer.AKP, ErrorSeverity.ERROR);
@@ -93,6 +94,7 @@ public class CICSSysSetOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
                     put(CICSLexer.CGROUP, ErrorSeverity.ERROR);
                     put(CICSLexer.CICSTABLE, ErrorSeverity.ERROR);
                     put(CICSLexer.CLOSED, ErrorSeverity.ERROR);
+                    put(CICSLexer.CLOSELEAVE, ErrorSeverity.ERROR);
                     put(CICSLexer.CMD, ErrorSeverity.ERROR);
                     put(CICSLexer.COLDACQ, ErrorSeverity.ERROR);
                     put(CICSLexer.COMAUTHID, ErrorSeverity.ERROR);
@@ -405,6 +407,7 @@ public class CICSSysSetOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
                     put(CICSLexer.OLD, ErrorSeverity.ERROR);
                     put(CICSLexer.ON, ErrorSeverity.ERROR);
                     put(CICSLexer.OPEN, ErrorSeverity.ERROR);
+                    put(CICSLexer.OPENOUTPUT, ErrorSeverity.ERROR);
                     put(CICSLexer.OPENSTATUS, ErrorSeverity.ERROR);
                     put(CICSLexer.OPERATION, ErrorSeverity.ERROR);
                     put(CICSLexer.OPERID, ErrorSeverity.ERROR);
@@ -989,7 +992,7 @@ public class CICSSysSetOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     private void checkDoctemplate(CICSParser.Cics_set_doctemplateContext ctx) {
         checkHasMandatoryOptions(ctx.DOCTEMPLATE(), ctx, "DOCTEMPLATE");
 
-        checkForExactlyOne("COPY or NEWCOPY", ctx, ctx.COPY(), ctx.NEWCOPY());
+        checkHasExactlyOneOption("COPY or NEWCOPY", ctx, ctx.COPY(), ctx.NEWCOPY());
     }
 
     private void checkDsname(CICSParser.Cics_set_dsnameContext ctx) {
@@ -1012,7 +1015,7 @@ public class CICSSysSetOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     private void checkEnqmodel(CICSParser.Cics_set_enqmodelContext ctx) {
         checkHasMandatoryOptions(ctx.ENQMODEL(), ctx, "ENQMODEL");
 
-        checkForExactlyOne("STATUS, ENABLED or DISABLED", ctx, ctx.STATUS(), ctx.ENABLED(), ctx.DISABLED());
+        checkHasExactlyOneOption("STATUS, ENABLED or DISABLED", ctx, ctx.STATUS(), ctx.ENABLED(), ctx.DISABLED());
     }
 
     private void checkEpadapter(CICSParser.Cics_set_epadapterContext ctx) {
@@ -1034,7 +1037,7 @@ public class CICSSysSetOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     private void checkEventprocess(CICSParser.Cics_set_eventprocessContext ctx) {
         checkHasMandatoryOptions(ctx.EVENTPROCESS(), ctx, "EVENTPROCESS");
 
-        checkForExactlyOne("EPSTATUS, STARTED, DRAIN or STOPPED", ctx, ctx.EPSTATUS(), ctx.STARTED(), ctx.DRAIN(), ctx.STOPPED());
+        checkHasExactlyOneOption("EPSTATUS, STARTED, DRAIN or STOPPED", ctx, ctx.EPSTATUS(), ctx.STARTED(), ctx.DRAIN(), ctx.STOPPED());
     }
 
     private void checkFile(CICSParser.Cics_set_fileContext ctx) {
@@ -1084,23 +1087,31 @@ public class CICSSysSetOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     private void checkJournalname(CICSParser.Cics_set_journalnameContext ctx) {
         checkHasMandatoryOptions(ctx.JOURNALNAME(), ctx, "JOURNALNAME");
 
-        checkForExactlyOne("ACTION, FLUSH or RESET", ctx, ctx.ACTION(), ctx.FLUSH(), ctx.RESET());
-        checkForExactlyOne("STATUS, DISABLED or ENABLED", ctx, ctx.STATUS(), ctx.DISABLED(), ctx.ENABLED());
+        checkHasExactlyOneOption("ACTION, FLUSH or RESET", ctx, ctx.ACTION(), ctx.FLUSH(), ctx.RESET());
+        checkHasExactlyOneOption("STATUS, DISABLED or ENABLED", ctx, ctx.STATUS(), ctx.DISABLED(), ctx.ENABLED());
     }
 
     private void checkJournalnum(CICSParser.Cics_set_journalnumContext ctx) {
         checkHasMandatoryOptions(ctx.JOURNALNUM(), ctx, "JOURNALNUM");
 
         checkHasObsoleteOptions(ctx.JOURNALNUM(), ctx, "JOURNALNUM. Replace with JOURNALNAME.");
-        checkForExactlyOne("ACTION, FLUSH or RESET", ctx, ctx.ACTION(), ctx.FLUSH(), ctx.RESET());
-        checkForExactlyOne("STATUS, DISABLED or ENABLED", ctx, ctx.STATUS(), ctx.DISABLED(), ctx.ENABLED());
+        checkHasExactlyOneOption("ACTION, FLUSH or RESET", ctx, ctx.ACTION(), ctx.FLUSH(), ctx.RESET());
+        checkHasExactlyOneOption("STATUS, DISABLED or ENABLED", ctx, ctx.STATUS(), ctx.DISABLED(), ctx.ENABLED());
+
+        checkMutuallyExclusiveOptions("OPENSTATUS, ADVANCE, CLOSED, CLOSELEAVE or OPENOUTPUT", ctx.OPENSTATUS(), ctx.ADVANCE(), ctx.CLOSED(), ctx.CLOSELEAVE(), ctx.OPENOUTPUT());
+
+        checkHasObsoleteOptions(ctx.OPENSTATUS(), ctx, "OPENSTATUS");
+        checkHasObsoleteOptions(ctx.ADVANCE(), ctx, "ADVANCE");
+        checkHasObsoleteOptions(ctx.CLOSED(), ctx, "CLOSED");
+        checkHasObsoleteOptions(ctx.CLOSELEAVE(), ctx, "CLOSELEAVE");
+        checkHasObsoleteOptions(ctx.OPENOUTPUT(), ctx, "OPENOUTPUT");
     }
 
     private void checkJvmendpoint(CICSParser.Cics_set_jvmendpointContext ctx) {
         // Only enforce the requirements if JVMENDPOINT is provided. Stops collision with SET JVMSERVER.
         if (!ctx.JVMENDPOINT().isEmpty()) {
             checkHasMandatoryOptions(ctx.JVMSERVER(), ctx, "JVMSERVER");
-            checkForExactlyOne("ENABLESTATUS, ENABLED or DISABLED", ctx, ctx.ENABLESTATUS(), ctx.DISABLED(), ctx.ENABLED());
+            checkHasExactlyOneOption("ENABLESTATUS, ENABLED or DISABLED", ctx, ctx.ENABLESTATUS(), ctx.DISABLED(), ctx.ENABLED());
         }
     }
 
@@ -1108,7 +1119,7 @@ public class CICSSysSetOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
         checkHasMandatoryOptions(ctx.JVMSERVER(), ctx, "JVMSERVER");
 
         checkMutuallyExclusiveOptions("PHASEOUT, PURGETYPE, PURGE, FORCEPURGE or KILL", ctx.PHASEOUT(), ctx.PURGETYPE(), ctx.PURGE(), ctx.FORCEPURGE(), ctx.KILL());
-        checkForExactlyOne("ENABLESTATUS, ENABLED or DISABLED", ctx, ctx.ENABLESTATUS(), ctx.DISABLED(), ctx.ENABLED());
+        checkHasExactlyOneOption("ENABLESTATUS, ENABLED or DISABLED", ctx, ctx.ENABLESTATUS(), ctx.DISABLED(), ctx.ENABLED());
     }
 
     private void checkLibrary(CICSParser.Cics_set_libraryContext ctx) {
@@ -1147,7 +1158,7 @@ public class CICSSysSetOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
         checkHasMandatoryOptions(ctx.MQCONN(), ctx, "MQCONN");
 
         if (!ctx.WAIT().isEmpty() || !ctx.BUSY().isEmpty() || !ctx.NOWAIT().isEmpty() || !ctx.FORCE().isEmpty())
-            checkForExactlyOne("CONNECTST, CONNECTED or NOTCONNECTED", ctx, ctx.CONNECTST(), ctx.CONNECTED(), ctx.NOTCONNECTED());
+            checkHasExactlyOneOption("CONNECTST, CONNECTED or NOTCONNECTED", ctx, ctx.CONNECTST(), ctx.CONNECTED(), ctx.NOTCONNECTED());
 
         checkMutuallyExclusiveOptions("WAIT, BUSY, NOWAIT or FORCE", ctx.WAIT(), ctx.BUSY(), ctx.NOWAIT(), ctx.FORCE());
         checkMutuallyExclusiveOptions("CONNECTST, CONNECTED or NOTCONNECTED", ctx.CONNECTST(), ctx.CONNECTED(), ctx.NOTCONNECTED());
@@ -1161,9 +1172,9 @@ public class CICSSysSetOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
 
         if (!ctx.AUTOSTATUS().isEmpty() || !ctx.AUTOSTART().isEmpty() || !ctx.NOAUTOSTART().isEmpty() || !ctx.ENABLESTATUS().isEmpty() || !ctx.ENABLED().isEmpty()
                 || !ctx.DISABLED().isEmpty() || !ctx.MONSTATUS().isEmpty() || !ctx.STARTED().isEmpty() || !ctx.STOPPED().isEmpty()) {
-            checkForExactlyOne("AUTOSTATUS, AUTOSTART or NOAUTOSTART", ctx, ctx.AUTOSTATUS(), ctx.AUTOSTART(), ctx.NOAUTOSTART());
-            checkForExactlyOne("ENABLESTATUS, ENABLED or DISABLED", ctx, ctx.ENABLESTATUS(), ctx.ENABLED(), ctx.DISABLED());
-            checkForExactlyOne("MONSTATUS, STARTED or STOPPED", ctx, ctx.MONSTATUS(), ctx.STARTED(), ctx.STOPPED());
+            checkHasExactlyOneOption("AUTOSTATUS, AUTOSTART or NOAUTOSTART", ctx, ctx.AUTOSTATUS(), ctx.AUTOSTART(), ctx.NOAUTOSTART());
+            checkHasExactlyOneOption("ENABLESTATUS, ENABLED or DISABLED", ctx, ctx.ENABLESTATUS(), ctx.ENABLED(), ctx.DISABLED());
+            checkHasExactlyOneOption("MONSTATUS, STARTED or STOPPED", ctx, ctx.MONSTATUS(), ctx.STARTED(), ctx.STOPPED());
         }
     }
 
@@ -1245,7 +1256,7 @@ public class CICSSysSetOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
 
         checkMutuallyExclusiveOptions("RECORDING, ON or OFF", ctx.RECORDING(), ctx.ON(), ctx.OFF());
         if (!ctx.RECORDNOW().isEmpty() || !ctx.RESETNOW().isEmpty()) {
-            checkForExactlyOne("RECORDING, ON or OFF", ctx, ctx.RECORDING(), ctx.ON(), ctx.OFF());
+            checkHasExactlyOneOption("RECORDING, ON or OFF", ctx, ctx.RECORDING(), ctx.ON(), ctx.OFF());
         }
     }
 
@@ -1362,7 +1373,7 @@ public class CICSSysSetOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     private void checkTracetype(CICSParser.Cics_set_tracetypeContext ctx) {
         checkHasMandatoryOptions(ctx.TRACETYPE(), ctx, "TRACETYPE");
 
-        checkForExactlyOne("FLAGSET, SPECIAL or STANDARD", ctx, ctx.FLAGSET(), ctx.SPECIAL(), ctx.STANDARD());
+        checkHasExactlyOneOption("FLAGSET, SPECIAL or STANDARD", ctx, ctx.FLAGSET(), ctx.SPECIAL(), ctx.STANDARD());
 
         checkMutuallyExclusiveOptions("AP or APPLICATION", ctx.AP(), ctx.APPLICATION());
         checkMutuallyExclusiveOptions("AS or ASYNCSERVICE", ctx.AS(), ctx.ASYNCSERVICE());
@@ -1448,7 +1459,7 @@ public class CICSSysSetOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     }
 
     private void checkTsqueue(CICSParser.Cics_set_tsqueueContext ctx) {
-        checkForExactlyOne("TSQUEUE or TSQNAME", ctx, ctx.TSQUEUE(), ctx.TSQNAME());
+        checkHasExactlyOneOption("TSQUEUE or TSQNAME", ctx, ctx.TSQUEUE(), ctx.TSQNAME());
 
         checkMutuallyExclusiveOptions("SYSID or POOLNAME", ctx.SYSID(), ctx.POOLNAME());
         checkPrerequisiteIsMet(ctx.ACTION(), ctx.LASTUSEDINT(), ctx, "LASTUSEDINT without ACTION");
@@ -1457,7 +1468,7 @@ public class CICSSysSetOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     private void checkUow(CICSParser.Cics_set_uowContext ctx) {
         checkHasMandatoryOptions(ctx.UOW(), ctx, "UOW");
 
-        checkForExactlyOne("UOWSTATE, COMMIT, BACKOUT or FORCE", ctx, ctx.UOWSTATE(), ctx.COMMIT(), ctx.BACKOUT(), ctx.FORCE());
+        checkHasExactlyOneOption("UOWSTATE, COMMIT, BACKOUT or FORCE", ctx, ctx.UOWSTATE(), ctx.COMMIT(), ctx.BACKOUT(), ctx.FORCE());
     }
 
     private void checkUowlink(CICSParser.Cics_set_uowlinkContext ctx) {

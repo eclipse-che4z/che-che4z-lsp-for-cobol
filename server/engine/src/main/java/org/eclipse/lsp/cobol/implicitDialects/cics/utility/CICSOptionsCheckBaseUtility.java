@@ -447,7 +447,8 @@ public abstract class CICSOptionsCheckBaseUtility {
      * @param rules   Lists of TerminalNode to iterate through
      * @return Number of TerminalNode instances found
      */
-    protected int checkHasMutuallyExclusiveOptions(String options, List<TerminalNode>... rules) {
+    @SafeVarargs
+    protected final int checkHasMutuallyExclusiveOptions(String options, List<TerminalNode>... rules) {
         List<TerminalNode> nodes =
                 Stream.of(rules)
                         .filter(rule -> !rule.isEmpty())
@@ -491,9 +492,9 @@ public abstract class CICSOptionsCheckBaseUtility {
     }
   }
 
-
-  protected <E extends ParseTree> void checkHasExactlyOneOption(
-      String options, ParserRuleContext parentCtx, List<E>... rules) {
+  @SafeVarargs
+  protected final <E extends ParseTree> void checkHasExactlyOneOption(
+          String options, ParserRuleContext parentCtx, List<E>... rules) {
 
         List<TerminalNode> children = new ArrayList<>();
 

@@ -182,28 +182,28 @@ public class TestCicsSysSetStatement {
     private static final String DELETSHIPPED_INVALID_1 = "SET DELETSHIPPED IDLE({$varOne}) {IDLEHRS|errorOne}({$varOne})";
     private static final String DELETSHIPPED_INVALID_2 = "SET DELETSHIPPED INTERVAL({$varOne}) {INTERVALHRS|errorOne}({$varOne})";
     private static final String DISPATCHER_INVALID_1 = "SET DISPATCHER TIME({$varOne}) {TIME|errorOne}({$varOne})";
-    private static final String DOCTEMPLATE_INVALID_1 = "SET {_DOCTEMPLATE({$varOne}) NEWCOPY COPY({$varOne} )|errorOne_}";
+    private static final String DOCTEMPLATE_INVALID_1 = "SET DOCTEMPLATE({$varOne}) {_NEWCOPY|errorOne_} {_COPY|errorOne_}({$varOne})";
     private static final String DSNAME_INVALID_1 = "SET DSNAME({$varOne}) REMOVE {RECOVERED|errorOne}";
     private static final String DSNAME_INVALID_2 = "SET DSNAME({$varOne}) QUIESCED {UNQUIESCED|errorOne}";
     private static final String DUMPDS_INVALID_1 = "SET DUMPDS {OPEN|errorOne} CLOSED";
     private static final String DUMPDS_INVALID_2 = "SET DUMPDS NOSWITCH {SWITCHNEXT|errorOne}";
-    private static final String ENQMODEL_INVALID_1 = "SET {_ENQMODEL({$varOne}) STATUS({$varOne}) DISABLED|errorOne_}";
+    private static final String ENQMODEL_INVALID_1 = "SET ENQMODEL({$varOne}) {_STATUS|errorOne_}({$varOne}) {DISABLED|errorOne}";
     private static final String EPADAPTER_INVALID_1 = "SET EPADAPTER({$varOne}) ENABLESTATUS({$varOne}) {ENABLED|errorOne}";
     //private static final String EPADAPTERSET_INVALID_1 = "SET EPADAPTERSET ";
     private static final String EVENTBINDING_INVALID_1 = "SET EVENTBINDING({$varOne}) ENABLESTATUS({$varOne}) {DISABLED|errorOne}";
-    private static final String EVENTPROCESS_INVALID_1 = "SET {_EVENTPROCESS STARTED STOPPED|errorOne_}";
+    private static final String EVENTPROCESS_INVALID_1 = "SET EVENTPROCESS {STARTED|errorOne} {STOPPED|errorOne}";
     private static final String FILE_INVALID_1 = "SET FILE({$varOne}) ADDABLE {NOTADDABLE|errorOne}";
     private static final String FILE_INVALID_2 = "SET FILE({$varOne}) CICSTABLE {NOTTABLE|errorOne}";
     //private static final String HOST_INVALID_1 = "SET HOST ";
     private static final String IPCONN_INVALID_1 = "SET IPCONN({$varOne}) ACQUIRED {RELEASED|errorOne}";
     private static final String IPCONN_INVALID_2 = "SET IPCONN({$varOne}) CANCEL {FORCECANCEL|errorOne}";
     private static final String IRC_INVALID_1 = "SET IRC CLOSED {OPEN|errorOne}";
-    private static final String JOURNALNAME_INVALID_1 = "SET {_JOURNALNAME({$varOne}) FLUSH RESET ENABLED|errorOne_}";
+    private static final String JOURNALNAME_INVALID_1 = "SET JOURNALNAME({$varOne}) {FLUSH|errorOne} {RESET|errorOne} ENABLED";
     private static final String JOURNALNAME_INVALID_2 = "SET {_JOURNALNAME({$varOne}) FLUSH|errorOne_}";
     //private static final String JOURNALNUM_INVALID_1 = "SET JOURNALNUM ";
     private static final String JVMENDPOINT_INVALID_1 = "SET {_JVMENDPOINT({$varOne}) ENABLED|errorOne_}";
     private static final String JVMENDPOINT_INVALID_2 = "SET {_JVMENDPOINT({$varOne}) JVMSERVER({$varOne} )|errorOne_}";
-    private static final String JVMSERVER_INVALID_1 = "SET {_JVMSERVER({$varOne}) ENABLED DISABLED PHASEOUT|errorOne_}";
+    private static final String JVMSERVER_INVALID_1 = "SET JVMSERVER({$varOne}) {ENABLED|errorOne} {DISABLED|errorOne} PHASEOUT";
     private static final String JVMSERVER_INVALID_2 = "SET JVMSERVER({$varOne}) ENABLED PHASEOUT {PURGE|errorOne} ";
     private static final String LIBRARY_INVALID_1 = "SET LIBRARY({$varOne}) CRITICAL {NONCRITICAL|errorOne}";
     private static final String LIBRARY_INVALID_2 = "SET LIBRARY({$varOne}) ENABLED {DISABLED|errorOne}";
@@ -257,9 +257,9 @@ public class TestCicsSysSetStatement {
     private static final String TRANDUMPCODE_INVALID_2 = "SET TRANDUMPCODE({$varOne}) NOSHUTDOWN {SHUTDOWN|errorOne}";
     private static final String TRANSACTION_INVALID_1 = "SET TRANSACTION({$varOne}) TRANDUMP {NOTRANDUMP|errorOne}";
     private static final String TRANSACTION_INVALID_2 = "SET TRANSACTION({$varOne}) SPECTRACE {SPRSTRACE|errorOne}";
-    private static final String TSQUEUE_INVALID_1 = "SET {_TSQUEUE({$varOne}) TSQNAME({$varOne}) SYSID({$varOne} )|errorOne_}";
+    private static final String TSQUEUE_INVALID_1 = "SET {TSQUEUE|errorOne}({$varOne}) {TSQNAME|errorOne}({$varOne}) SYSID({$varOne})";
     private static final String TSQUEUE_INVALID_2 = "SET {_TSQUEUE({$varOne}) LASTUSEDINT({$varOne} )|errorOne_}";
-    private static final String UOW_INVALID_1 = "SET {_UOW({$varOne}) COMMIT FORCE|errorOne_}";
+    private static final String UOW_INVALID_1 = "SET UOW({$varOne}) {COMMIT|errorOne} {FORCE|errorOne}";
     private static final String UOWLINK_INVALID_1 = "SET UOWLINK({$varOne}) ACTION({$varOne}) {DELETE|errorOne}";
     private static final String URIMAP_INVALID_1 = "SET URIMAP({$varOne}) DISABLED {ENABLED|errorOne}";
     private static final String URIMAP_INVALID_2 = "SET URIMAP({$varOne}) PERMANENT {TEMPORARY|errorOne}";
@@ -738,7 +738,7 @@ public class TestCicsSysSetStatement {
 
     @Test
     void testCicsDoctemplateInvalid() {
-        testSingleError(DOCTEMPLATE_INVALID_1, "Must use exactly one of the following: COPY or NEWCOPY");
+        testSingleError(DOCTEMPLATE_INVALID_1, "Exactly one option required, options are mutually exclusive: COPY or NEWCOPY");
     }
 
     @Test
@@ -755,7 +755,7 @@ public class TestCicsSysSetStatement {
 
     @Test
     void testCicsEnqmodelInvalid() {
-        testSingleError(ENQMODEL_INVALID_1, "Must use exactly one of the following: STATUS, ENABLED or DISABLED");
+        testSingleError(ENQMODEL_INVALID_1, "Exactly one option required, options are mutually exclusive: STATUS, ENABLED or DISABLED");
     }
 
     @Test
@@ -772,7 +772,7 @@ public class TestCicsSysSetStatement {
 
     @Test
     void testCicsEventprocessInvalid() {
-        testSingleError(EVENTPROCESS_INVALID_1, "Must use exactly one of the following: EPSTATUS, STARTED, DRAIN or STOPPED");
+        testSingleError(EVENTPROCESS_INVALID_1, "Exactly one option required, options are mutually exclusive: EPSTATUS, STARTED, DRAIN or STOPPED");
     }
 
     @Test
@@ -797,8 +797,8 @@ public class TestCicsSysSetStatement {
 
     @Test
     void testCicsJournalnameInvalid() {
-        testSingleError(JOURNALNAME_INVALID_1, "Must use exactly one of the following: ACTION, FLUSH or RESET");
-        testSingleError(JOURNALNAME_INVALID_2, "Must use exactly one of the following: STATUS, DISABLED or ENABLED");
+        testSingleError(JOURNALNAME_INVALID_1, "Exactly one option required, options are mutually exclusive: ACTION, FLUSH or RESET");
+        testSingleError(JOURNALNAME_INVALID_2, "Exactly one option required, none provided: STATUS, DISABLED or ENABLED");
     }
 
     // See JOURNALNUM for JOURNALNAME tests due to NAME being obsolete.
@@ -806,12 +806,12 @@ public class TestCicsSysSetStatement {
     @Test
     void testCicsJvmendpointInvalid() {
         testSingleError(JVMENDPOINT_INVALID_1, "Missing required option: JVMSERVER");
-        testSingleError(JVMENDPOINT_INVALID_2, "Must use exactly one of the following: ENABLESTATUS, ENABLED or DISABLED");
+        testSingleError(JVMENDPOINT_INVALID_2, "Exactly one option required, none provided: ENABLESTATUS, ENABLED or DISABLED");
     }
 
     @Test
     void testCicsJvmserverInvalid() {
-        testSingleError(JVMSERVER_INVALID_1, "Must use exactly one of the following: ENABLESTATUS, ENABLED or DISABLED");
+        testSingleError(JVMSERVER_INVALID_1, "Exactly one option required, options are mutually exclusive: ENABLESTATUS, ENABLED or DISABLED");
         testSingleError(JVMSERVER_INVALID_2, "Options \"PHASEOUT, PURGETYPE, PURGE, FORCEPURGE or KILL\" are mutually exclusive.");
     }
 
@@ -835,14 +835,14 @@ public class TestCicsSysSetStatement {
 
     @Test
     void testCicsMqconnInvalid() {
-        testSingleError(MQCONN_INVALID_1, "Must use exactly one of the following: CONNECTST, CONNECTED or NOTCONNECTED");
+        testSingleError(MQCONN_INVALID_1, "Exactly one option required, none provided: CONNECTST, CONNECTED or NOTCONNECTED");
         testSingleError(MQCONN_INVALID_2, "Options \"RESYNCMEMBER, RESYNC, NORESYNC or GROUPRESYNC\" are mutually exclusive.");
     }
 
     @Test
     void testCicsMqmonitorInvalid() {
-        testSingleError(MQMONITOR_INVALID_1, "Must use exactly one of the following: ENABLESTATUS, ENABLED or DISABLED");
-        testSingleError(MQMONITOR_INVALID_2, "Must use exactly one of the following: AUTOSTATUS, AUTOSTART or NOAUTOSTART");
+        testSingleError(MQMONITOR_INVALID_1, "Exactly one option required, none provided: ENABLESTATUS, ENABLED or DISABLED");
+        testSingleError(MQMONITOR_INVALID_2, "Exactly one option required, none provided: AUTOSTATUS, AUTOSTART or NOAUTOSTART");
     }
 
     @Test
@@ -887,7 +887,7 @@ public class TestCicsSysSetStatement {
     @Test
     void testCicsStatisticsInvalid() {
         testSingleError(STATISTICS_INVALID_1, "Options \"ENDOFDAY or ENDOFDAYHRS\" are mutually exclusive.");
-        testSingleError(STATISTICS_INVALID_2, "Must use exactly one of the following: RECORDING, ON or OFF");
+        testSingleError(STATISTICS_INVALID_2, "Exactly one option required, none provided: RECORDING, ON or OFF");
     }
 
     @Test
@@ -960,7 +960,7 @@ public class TestCicsSysSetStatement {
 
     @Test
     void testCicsTracetypeInvalid() {
-        testTwoErrors(TRACETYPE_INVALID_1, "Must use exactly one of the following: FLAGSET, SPECIAL or STANDARD", "Extraneous input NORESP");
+        testTwoErrors(TRACETYPE_INVALID_1, "Exactly one option required, none provided: FLAGSET, SPECIAL or STANDARD", "Extraneous input NORESP");
         testSingleError(TRACETYPE_INVALID_2, "Options \"AP or APPLICATION\" are mutually exclusive.");
     }
 
@@ -983,13 +983,13 @@ public class TestCicsSysSetStatement {
 
     @Test
     void testCicsTsqueueInvalid() {
-        testSingleError(TSQUEUE_INVALID_1, "Must use exactly one of the following: TSQUEUE or TSQNAME");
+        testSingleError(TSQUEUE_INVALID_1, "Exactly one option required, options are mutually exclusive: TSQUEUE or TSQNAME");
         testSingleError(TSQUEUE_INVALID_2, "Missing required option for: LASTUSEDINT without ACTION");
     }
 
     @Test
     void testCicsUowInvalid() {
-        testSingleError(UOW_INVALID_1, "Must use exactly one of the following: UOWSTATE, COMMIT, BACKOUT or FORCE");
+        testSingleError(UOW_INVALID_1, "Exactly one option required, options are mutually exclusive: UOWSTATE, COMMIT, BACKOUT or FORCE");
     }
 
     @Test

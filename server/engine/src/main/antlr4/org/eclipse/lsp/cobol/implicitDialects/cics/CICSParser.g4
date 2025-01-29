@@ -825,7 +825,7 @@ cics_set_ipconn: (IPCONN cics_data_value | (ACQUIRED | RELEASED | NOTPENDING | C
                                         (CONNSTATUS | PENDSTATUS | PURGETYPE | RECOVSTATUS | SERVSTATUS | UOWACTION) cics_cvda | cics_handle_response)+;
 cics_set_irc: ((IRC | CLOSED | IMMCLOSE | OPEN) | OPENSTATUS cics_cvda | cics_handle_response)+;
 cics_set_journalname: (JOURNALNAME cics_data_value | (FLUSH | RESET | DISABLED | ENABLED) | (ACTION | STATUS) cics_cvda | cics_handle_response)+;
-cics_set_journalnum: (JOURNALNUM cics_data_value | (FLUSH | RESET | DISABLED | ENABLED) | (ACTION | STATUS) cics_cvda | cics_handle_response)+;
+cics_set_journalnum: (JOURNALNUM cics_data_value | (FLUSH | RESET | DISABLED | ENABLED | ADVANCE | CLOSED | CLOSELEAVE | OPENOUTPUT) | (ACTION | STATUS | OPENSTATUS) cics_cvda | cics_handle_response)+;
 cics_set_jvmendpoint: ((ENABLED | DISABLED) | (JVMENDPOINT | JVMSERVER) cics_data_value | ENABLESTATUS cics_cvda | cics_handle_response)+;
 cics_set_jvmserver: ((ENABLED | DISABLED | PHASEOUT | PURGE | FORCEPURGE | KILL) | (JVMSERVER | THREADLIMIT) cics_data_value | (ENABLESTATUS | PURGETYPE) cics_cvda | cics_handle_response)+;
 cics_set_library: ((CRITICAL | NONCRITICAL | ENABLED | DISABLED) | (LIBRARY | RANKING) cics_data_value | (CRITICALST | ENABLESTATUS) cics_cvda | cics_handle_response)+;
@@ -1318,6 +1318,7 @@ ABCODE
   | ADDRESS
   | ADJUSTMENT
   | ADRESS64
+  | ADVANCE
   | AFFINITY
   | AGE
   | AIBRIDGE
