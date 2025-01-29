@@ -194,9 +194,7 @@ public class CICSPerformSPOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
         checkHasMandatoryOptions(ctx.DUMPCODE(), ctx, "DUMPCODE");
         checkAllOptionsArePresentOrAbsent("TITLE, TITLELENGTH", ctx, ctx.TITLE(), ctx.TITLELENGTH());
         checkAllOptionsArePresentOrAbsent("CALLER, CALLERLENGTH", ctx, ctx.CALLER(), ctx.CALLERLENGTH());
-        List<TerminalNode> filteredNodes = ctx.children.stream().filter(TerminalNode.class::isInstance).map(element -> (TerminalNode) element)
-                .filter(node -> node.getSymbol().getType() == CICSLexer.DUMP).collect(Collectors.toList());
-        checkDumpDuplicates(filteredNodes, ErrorSeverity.WARNING);
+        checkDumpDuplicates(ctx.DUMP(), ErrorSeverity.WARNING);
     }
     private void checkEndAffinity(CICSParser.Cics_perform_endaffinityContext ctx) {
         checkHasMandatoryOptions(ctx.ENDAFFINITY(), ctx, "ENDAFFINITY");
