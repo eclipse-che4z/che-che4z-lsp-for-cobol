@@ -321,9 +321,11 @@ public class CICSCsdSpOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
 
     }
     private void checkStartbrRsrce(CICSParser.Cics_csd_startbrrsrceContext ctx) {
+        checkHasMandatoryOptions(ctx.STARTBRRSRCE(), ctx, "STARTBRRSRCE");
         checkHasMandatoryOptions(ctx.GROUP(), ctx, "GROUP");
     }
     private void checkUnlock(CICSParser.Cics_csd_unlockContext ctx) {
+        checkHasMandatoryOptions(ctx.UNLOCK(), ctx, "UNLOCK");
         checkHasExactlyOneOption("LIST or GROUP", ctx, ctx.LIST(), ctx.GROUP());
     }
     private void checkUserDefine(CICSParser.Cics_csd_userdefineContext ctx) {
