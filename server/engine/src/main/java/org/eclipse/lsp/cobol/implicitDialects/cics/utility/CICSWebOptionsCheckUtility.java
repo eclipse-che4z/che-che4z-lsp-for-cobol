@@ -415,9 +415,9 @@ public class CICSWebOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
             checkHasExactlyOneOption("GET, HEAD, PATCH, POST, PUT, TRACE, OPTIONS, DELETE or METHOD", ctx, ctx.GET(), ctx.HEAD(), ctx.PATCH(), ctx.POST(), ctx.PUT(), ctx.TRACE(), ctx.OPTIONS(), ctx.DELETE(), ctx.METHOD());
 
             checkMutuallyExclusiveOptions("PATH or URIMAP", ctx.PATH(), ctx.URIMAP());
-            checkPrerequisiteIsMet(ctx.PATH(), ctx.PATHLENGTH(), ctx, "PATHLENGTH without PATH");
+            checkAllOptionsArePresentOrAbsent("PATH and PATHLENGTH", ctx, ctx.PATH(), ctx.PATHLENGTH());
 
-            checkPrerequisiteIsMet(ctx.QUERYSTRING(), ctx.QUERYSTRLEN(), ctx, "QUERYSTRLEN without QUERYSTRING");
+            checkAllOptionsArePresentOrAbsent("QUERYSTRING and QUERYSTRLEN", ctx, ctx.QUERYSTRING(), ctx.QUERYSTRLEN());
 
             // Body subsection
             if (!ctx.MEDIATYPE().isEmpty() || !ctx.DOCTOKEN().isEmpty() || !ctx.FROM().isEmpty() || !ctx.CONTAINER().isEmpty()) {
@@ -429,9 +429,7 @@ public class CICSWebOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
                 checkPrerequisiteIsMet(ctx.DOCTOKEN(), ctx.DOCSTATUS(), ctx, "DOCSTATUS without DOCTOKEN");
                 checkMutuallyExclusiveOptions("NODOCDELETE, DOCDELETE or DOCSTATUS", ctx.NODOCDELETE(), ctx.DOCDELETE(), ctx.DOCSTATUS());
 
-                checkPrerequisiteIsMet(ctx.FROM(), ctx.FROMLENGTH(), ctx, "FROMLENGTH without FROM");
-                if (!ctx.FROM().isEmpty())
-                    checkHasMandatoryOptions(ctx.FROMLENGTH(), ctx, "FROMLENGTH");
+                checkAllOptionsArePresentOrAbsent("FROM and FROMLENGTH", ctx, ctx.FROM(), ctx.FROMLENGTH());
 
                 checkPrerequisiteIsMet(ctx.CONTAINER(), ctx.CHANNEL(), ctx, "CHANNEL without CONTAINER");
             }
@@ -445,6 +443,11 @@ public class CICSWebOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
             checkPrerequisiteIsMet(ctx.USERNAME(), ctx.USERNAMELEN(), ctx, "USERNAMELEN without USERNAME");
             checkPrerequisiteIsMet(ctx.USERNAME(), ctx.PASSWORD(), ctx, "PASSWORD without USERNAME");
             checkPrerequisiteIsMet(ctx.PASSWORD(), ctx.PASSWORDLEN(), ctx, "PASSWORDLEN without PASSWORD");
+
+            if (!ctx.USERNAME().isEmpty() || !ctx.USERNAMELEN().isEmpty() || !ctx.PASSWORD().isEmpty() || !ctx.PASSWORDLEN().isEmpty()) {
+                checkHasMandatoryOptions(ctx.USERNAME(), ctx, "USERNAME");
+                checkHasMandatoryOptions(ctx.PASSWORD(), ctx, "PASSWORD");
+            }
 
             checkPrerequisiteIsMet(ctx.CONTAINER(), ctx.CHANNEL(), ctx, "CHANNEL without CONTAINER");
 
@@ -466,9 +469,7 @@ public class CICSWebOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
 
             checkPrerequisiteIsMet(ctx.FROM(), ctx.HOSTCODEPAGE(), ctx, "HOSTCODEPAGE without FROM");
 
-            checkPrerequisiteIsMet(ctx.FROM(), ctx.FROMLENGTH(), ctx, "FROMLENGTH without FROM");
-            if (!ctx.FROM().isEmpty())
-                checkHasMandatoryOptions(ctx.FROMLENGTH(), ctx, "FROMLENGTH");
+            checkAllOptionsArePresentOrAbsent("FROM and FROMLENGTH", ctx, ctx.FROM(), ctx.FROMLENGTH());
 
             checkPrerequisiteIsMet(ctx.CONTAINER(), ctx.CHANNEL(), ctx, "CHANNEL without CONTAINER");
 
