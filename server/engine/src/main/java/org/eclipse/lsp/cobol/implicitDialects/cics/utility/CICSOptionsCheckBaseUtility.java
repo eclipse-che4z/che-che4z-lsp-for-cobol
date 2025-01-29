@@ -232,8 +232,10 @@ public abstract class CICSOptionsCheckBaseUtility {
     * @param options Options checked to insert into error message
     */
     protected void checkHasObsoleteOptions(TerminalNode rule, String options) {
-        if (!rule.getText().trim().isEmpty()) {
-          throwException(ErrorSeverity.ERROR, getLocality(rule), "Obsolete option provided: ", options);
+        if (rule != null) {
+            if (!rule.getText().trim().isEmpty()) {
+                throwException(ErrorSeverity.ERROR, getLocality(rule), "Obsolete option provided: ", options);
+            }
         }
     }
 
