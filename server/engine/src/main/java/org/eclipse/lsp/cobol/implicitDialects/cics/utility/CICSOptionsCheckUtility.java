@@ -328,7 +328,7 @@ public class CICSOptionsCheckUtility {
         CICSExtractSPOptionsCheckUtility.RULE_INDEX,
         new CICSExtractSPOptionsCheckUtility(context, errors));
     spOptionsMap.put(
-    CICSResyncEntrynameOptionsCheckUtility.RULE_INDEX,
+        CICSResyncEntrynameOptionsCheckUtility.RULE_INDEX,
         new CICSResyncEntrynameOptionsCheckUtility(context, errors));
     spOptionsMap.put(
         CICSPerformSPOptionsCheckUtility.RULE_INDEX,
@@ -336,6 +336,9 @@ public class CICSOptionsCheckUtility {
     spOptionsMap.put(
         CICSCollectStatisticsSpOptionsCheckUtility.RULE_INDEX,
         new CICSCollectStatisticsSpOptionsCheckUtility(context, errors));
+    spOptionsMap.put(
+        CICSCsdSpOptionsCheckUtility.RULE_INDEX,
+        new CICSCsdSpOptionsCheckUtility(context, errors));
   }
     /**
      * Entrypoint to check CICS rule options
