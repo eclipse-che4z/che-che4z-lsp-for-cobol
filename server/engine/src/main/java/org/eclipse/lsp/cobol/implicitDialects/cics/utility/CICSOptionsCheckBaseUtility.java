@@ -302,41 +302,6 @@ public abstract class CICSOptionsCheckBaseUtility {
     }
 
     /**
-     * Helper function to check and see if more than one rule was visited out of a set provided.
-     *
-     * @param options Options checked to insert into error message
-     * @param rules Generic list of rules to check. Will be a collection of ParserRuleContext and/or TerminalNode objects.
-     * @param <E> Generic type to allow cross-rule context collection.
-     */
-    @SafeVarargs
-    protected final <E> void checkForExactlyOne(String options, ParserRuleContext ctx, E... rules) {
-      if (rules.length <= 1) {
-        return;
-      }
-
-      int rulesSeen = 0;
-
-      for (E rule : rules) {
-        if (rule == null) {
-          continue;
-        }
-
-        if (ParserRuleContext.class.isAssignableFrom(rule.getClass()) || TerminalNode.class.isAssignableFrom(rule.getClass())) {
-          rulesSeen++;
-        } else if (List.class.isAssignableFrom(rule.getClass())) {
-          if (((List<?>) rule).isEmpty()) {
-            continue;
-          }
-          rulesSeen++;
-        }
-      }
-
-      if (rulesSeen != 1) {
-        throwException(ErrorSeverity.ERROR, getLocality(ctx), "Must use exactly one of the following: " + options, "");
-      }
-    }
-
-    /**
      * Gets the locality of an element passed as a generic type. Only supports ParserRuleContext and
      * TerminalNode.
      *
