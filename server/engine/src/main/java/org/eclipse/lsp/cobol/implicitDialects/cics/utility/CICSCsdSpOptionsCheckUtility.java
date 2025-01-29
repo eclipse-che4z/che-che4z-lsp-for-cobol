@@ -252,9 +252,8 @@ public class CICSCsdSpOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
         checkHasMandatoryOptions(ctx.DELETE(), ctx, "DELETE");
         checkHasMandatoryOptions(ctx.GROUP(), ctx, "GROUP");
         checkHasMutuallyExclusiveOptions("LISTACTION or REMOVE", ctx.LISTACTION(), ctx.REMOVE());
-        if (!ctx.cics_csd_cvda().isEmpty()) {
+        if (!ctx.cics_csd_cvda().isEmpty() || !ctx.RESID().isEmpty()) {
             checkHasMandatoryOptions(ctx.RESID(), ctx, "RESID");
-        } else if (!ctx.RESID().isEmpty()) {
             checkHasMandatoryOptions(ctx.cics_csd_cvda(), ctx, CVDA_OPTS);
         }
     }
@@ -301,6 +300,7 @@ public class CICSCsdSpOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
         checkHasMandatoryOptions(ctx.GROUP(), ctx, "GROUP");
         if (!ctx.cics_csd_cvda().isEmpty() || !ctx.RESID().isEmpty()) {
             checkHasMandatoryOptions(ctx.RESID(), ctx, "RESID");
+            checkHasMandatoryOptions(ctx.cics_csd_cvda(), ctx, CVDA_OPTS);
         }
     }
     private void checkLock(CICSParser.Cics_csd_lockContext ctx) {
