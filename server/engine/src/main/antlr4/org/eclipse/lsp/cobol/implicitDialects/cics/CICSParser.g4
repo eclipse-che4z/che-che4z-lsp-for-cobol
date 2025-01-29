@@ -686,7 +686,8 @@ cics_perform_security:(SECURITY | REBUILD | ESMRESP cics_data_area | cics_handle
 cics_perform_shutdown:(SHUTDOWN | IMMEDIATE | TAKEOVER | DUMP | PLT cics_data_value | PLTNAME cics_data_value | RESTART | NORESTART | SDTRAN cics_data_value | NOSDTRAN |
                        XLT cics_data_value | cics_handle_response)+;
 cics_perform_ssl:(SSL | REBUILD | GSKRESP cics_data_area |cics_handle_response)+;
-cics_perform_statistics:(STATISTICS | RECORD | ALL | RESETNOW | ASYNCSERVICE | ATOMSERVICE | AUTOINSTALL | BUNDLE | CAPTURESPEC | CIPHER | CONNECTION | DB2 | DISPATCHER | DOCTEMPLATE | ENQUEUE | EPADAPTER |
+cics_perform_statistics:(STATISTICS | RECORD | ALL | RESETNOW | cics_handle_response)+ |
+                        (STATISTICS | RECORD | ASYNCSERVICE | ATOMSERVICE | AUTOINSTALL | BUNDLE | CAPTURESPEC | CIPHER | CONNECTION | DB2 | DISPATCHER | DOCTEMPLATE | ENQUEUE | EPADAPTER |
                         EVENTBINDING | EVENTPROCESS | FEPI | FILE | IPCONN | JOURNALNAME | JOURNALNUM | JVMPROGRAM | JVMSERVER | LIBRARY | LSRPOOL | MONITOR | MQCONN | MQMONITOR | NODEJSAPP |
                         PIPELINE | POLICY | PROGAUTO | PROGRAM | PROGRAMDEF | RECOVERY | SECURITY | STATS | STORAGE | STREAMNAME | SYSDUMP | TABLEMGR | TCPIP | TCPIPSERVICE | TDQUEUE |
                         TERMINAL | TRANCLASS | TCLASS | TRANDUMP | TRANSACTION | TSQUEUE | URIMAP | USER | VTAM | WEBSERVICE | XMLTRANSFORM | cics_handle_response)+;
