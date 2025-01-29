@@ -333,6 +333,9 @@ public class CICSOptionsCheckUtility {
     spOptionsMap.put(
         CICSPerformSPOptionsCheckUtility.RULE_INDEX,
         new CICSPerformSPOptionsCheckUtility(context, errors));
+    spOptionsMap.put(
+        CICSCollectStatisticsSpOptionsCheckUtility.RULE_INDEX,
+        new CICSCollectStatisticsSpOptionsCheckUtility(context, errors));
   }
     /**
      * Entrypoint to check CICS rule options

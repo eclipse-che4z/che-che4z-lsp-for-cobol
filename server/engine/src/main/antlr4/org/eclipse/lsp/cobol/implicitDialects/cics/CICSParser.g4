@@ -38,7 +38,7 @@ allExciRules: cics_exci_link | cics_exci_delete | cics_exci_delete_container | c
               cics_exci_get_container | cics_exci_get_next_container | cics_exci_move_container |
               cics_exci_put_container | cics_exci_query_channel | cics_exci_startbrowse_container ;
 
-allSPRules: cics_acquire_terminal | cics_disable | cics_discard | cics_enable | cics_extract_system_programming | cics_inquire_system_programming | cics_create | cics_perform | cics_resync_entryname;
+allSPRules: cics_acquire_terminal | cics_disable | cics_discard | cics_enable | cics_extract_system_programming | cics_inquire_system_programming | cics_create | cics_perform | cics_resync_entryname | cics_collect_statistics;
 
 // compiler options
 compilerOpts
@@ -242,6 +242,13 @@ cics_check: CHECK (cics_check_activity | cics_check_timer);
 cics_check_activity: (ACQPROCESS | ACTIVITY cics_data_value | ACQACTIVITY | (ABCODE | ABPROGRAM) cics_data_area |
                      (MODE | SUSPSTATUS | COMPSTATUS) cics_cvda | cics_handle_response)+;
 cics_check_timer: (TIMER cics_data_value | STATUS cics_cvda | cics_handle_response)*;
+
+cics_collect_statistics: COLLECT cics_collect_statistics_opts;
+cics_collect_statistics_opts: ((LASTRESET | LASTRESETHRS | LASTRESETMIN | LASTRESETSEC) cics_data_area | SET cics_ref |
+                              (CONNECTION | DB2ENTRY | FILE | JOURNALNAME | JOURNALNUM | JVMPROGRAM | LSRPOOL | POOL | TARGET | SUBPOOL | NODE | TCLASS | TCPIPSERVICE | TERMINAL | TRANCLASS) cics_data_value |
+                               MONITOR cics_data_value? | MVSTCB cics_data_value? | PROGRAM cics_data_value? | STORAGE  cics_data_value? | STREAMNAME cics_data_value? | SYSDUMPCODE cics_data_value? | TDQUEUE cics_data_value? | TRANDUMPCODE cics_data_value? | TRANSACTION cics_data_value? |
+                               STATISTICS | AUTOINSTALL | DB2CONN | DISPATCHER | ENQUEUE | PROGAUTO | RECOVERY | STATS | TABLEMGR | TASKSUBPOOL | TCPIP | TSQUEUE | VTAM |
+                               cics_handle_response)+;
 
 cics_conditions: NORMAL | ERROR | RDATT | WRBRK | EOF_TOKEN | EODS | EOC | INBFMH | ENDINPT | NONVAL | NOSTART | TERMIDERR | FILENOTFOUND | NOTFND | DUPREC | DUPKEY |
                 INVREQ | IOERR | NOSPACE | NOTOPEN | ENDFILE | ILLOGIC | LENGERR | QZERO | SIGNAL | QBUSY | ITEMERR | PGMIDERR | TRANSIDERR | ENDDATA | INVTSREQ |
@@ -1419,6 +1426,7 @@ ABCODE
   | COBOLTYPE
   | CODEPAGE
   | CODEPAGEERR
+  | COLLECT
   | COLDSTATUS
   | COLOR
   | COLORST
@@ -2790,6 +2798,7 @@ ABCODE
   | TABLESIZE
   | TAEXECUTABLE
   | TALENGTH
+  | TARGET
   | TARGETCOUNT
   | TASK
   | TASKDATAKEY
