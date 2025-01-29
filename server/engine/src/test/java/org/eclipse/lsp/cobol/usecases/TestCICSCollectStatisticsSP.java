@@ -163,7 +163,7 @@ public class TestCICSCollectStatisticsSP {
                                         + "DISPATCHER or  ENQUEUE or  FILE or  JOURNALNAME or  JOURNALNUM or JVMPROGRAM or  LSRPOOL or  MONITOR or  MVSTCB or "
                                         + "PROGAUTO or  PROGRAM or  RECOVERY or  STATS or  STORAGE or  STREAMNAME or SUBPOOL or  SYSDUMPCODE or  TABLEMGR or  "
                                         + "TARGET or  TASKSUBPOOL or TCLASS or  TCPIP or  TCPIPSERVICE or  TDQUEUE or  TERMINAL or  TRANCLASS or TRANDUMPCODE or  "
-                                        +"TRANSACTION or  TSQUEUE or  VTAM",
+                                        + "TRANSACTION or  TSQUEUE or  VTAM",
                                 DiagnosticSeverity.Error,
                                 ErrorSource.PARSING.getText()),
                         "error2",
@@ -173,7 +173,7 @@ public class TestCICSCollectStatisticsSP {
                                         + "DISPATCHER or  ENQUEUE or  FILE or  JOURNALNAME or  JOURNALNUM or JVMPROGRAM or  LSRPOOL or  MONITOR or  MVSTCB or "
                                         + "PROGAUTO or  PROGRAM or  RECOVERY or  STATS or  STORAGE or  STREAMNAME or SUBPOOL or  SYSDUMPCODE or  TABLEMGR or  "
                                         + "TARGET or  TASKSUBPOOL or TCLASS or  TCPIP or  TCPIPSERVICE or  TDQUEUE or  TERMINAL or  TRANCLASS or TRANDUMPCODE or  "
-                                        +"TRANSACTION or  TSQUEUE or  VTAM",
+                                        + "TRANSACTION or  TSQUEUE or  VTAM",
                                 DiagnosticSeverity.Error,
                                 ErrorSource.PARSING.getText()));
         CICSTestUtils.errorTest(COLLECT_STATISTICS_MUTUALEX_INVALID, expectedDiagnostic, "SP");
@@ -189,7 +189,7 @@ public class TestCICSCollectStatisticsSP {
                                         + "DISPATCHER or  ENQUEUE or  FILE or  JOURNALNAME or  JOURNALNUM or JVMPROGRAM or  LSRPOOL or  MONITOR or  MVSTCB or "
                                         + "PROGAUTO or  PROGRAM or  RECOVERY or  STATS or  STORAGE or  STREAMNAME or SUBPOOL or  SYSDUMPCODE or  TABLEMGR or  "
                                         + "TARGET or  TASKSUBPOOL or TCLASS or  TCPIP or  TCPIPSERVICE or  TDQUEUE or  TERMINAL or  TRANCLASS or TRANDUMPCODE or  "
-                                        +"TRANSACTION or  TSQUEUE or  VTAM",
+                                        + "TRANSACTION or  TSQUEUE or  VTAM",
                                 DiagnosticSeverity.Error,
                                 ErrorSource.PARSING.getText()),
                         "error2",
@@ -199,7 +199,7 @@ public class TestCICSCollectStatisticsSP {
                                         + "DISPATCHER or  ENQUEUE or  FILE or  JOURNALNAME or  JOURNALNUM or JVMPROGRAM or  LSRPOOL or  MONITOR or  MVSTCB or "
                                         + "PROGAUTO or  PROGRAM or  RECOVERY or  STATS or  STORAGE or  STREAMNAME or SUBPOOL or  SYSDUMPCODE or  TABLEMGR or  "
                                         + "TARGET or  TASKSUBPOOL or TCLASS or  TCPIP or  TCPIPSERVICE or  TDQUEUE or  TERMINAL or  TRANCLASS or TRANDUMPCODE or  "
-                                        +"TRANSACTION or  TSQUEUE or  VTAM",
+                                        + "TRANSACTION or  TSQUEUE or  VTAM",
                                 DiagnosticSeverity.Error,
                                 ErrorSource.PARSING.getText()));
         CICSTestUtils.errorTest(COLLECT_STATISTICS_MUTUALEX2_INVALID, expectedDiagnostic, "SP");
