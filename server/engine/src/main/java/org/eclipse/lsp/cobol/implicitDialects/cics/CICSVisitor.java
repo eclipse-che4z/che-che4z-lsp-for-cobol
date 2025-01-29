@@ -342,7 +342,7 @@ class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
     private Locality getTokenLocality(Token token) {
         return Locality.builder()
                 .uri(context.getProgramDocumentUri())
-                .range(buildTokenRange(token))
+                .range(VisitorHelper.buildTokenRange(token))
                 .build();
     }
 
@@ -373,19 +373,6 @@ class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
         if (!errors.contains(error)) {
             errors.add(error);
         }
-    }
-
-    /**
-     * Builds context name locality based on the name and uri of the document
-     *
-     * @param token is a token
-     * @return range object
-     */
-    private Range buildTokenRange(Token token) {
-        return new Range(
-                new Position(token.getLine() - 1, token.getCharPositionInLine()),
-                new Position(
-                        token.getLine() - 1, token.getCharPositionInLine() + token.getText().length()));
     }
 
     private Range buildTokenEndRange(Token token) {

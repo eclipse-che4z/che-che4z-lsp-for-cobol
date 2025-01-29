@@ -38,7 +38,7 @@ public class CICSDiscardOptionsUtility extends CICSOptionsCheckBaseUtility {
                     put(CICSLexer.AUTINSTMODEL, ErrorSeverity.ERROR);
                     put(CICSLexer.BUNDLE, ErrorSeverity.ERROR);
                     put(CICSLexer.CONNECTION, ErrorSeverity.ERROR);
-                    put(CICSLexer.DB2CONN, ErrorSeverity.ERROR);
+                    put(CICSLexer.DB2CONN, ErrorSeverity.WARNING);
                     put(CICSLexer.DB2ENTRY, ErrorSeverity.ERROR);
                     put(CICSLexer.DB2TRAN, ErrorSeverity.ERROR);
                     put(CICSLexer.DOCTEMPLATE, ErrorSeverity.ERROR);
@@ -49,7 +49,7 @@ public class CICSDiscardOptionsUtility extends CICSOptionsCheckBaseUtility {
                     put(CICSLexer.JOURNALNAME, ErrorSeverity.ERROR);
                     put(CICSLexer.JVMSERVER, ErrorSeverity.ERROR);
                     put(CICSLexer.LIBRARY, ErrorSeverity.ERROR);
-                    put(CICSLexer.MQCONN, ErrorSeverity.ERROR);
+                    put(CICSLexer.MQCONN, ErrorSeverity.WARNING);
                     put(CICSLexer.MQMONITOR, ErrorSeverity.ERROR);
                     put(CICSLexer.PARTNER, ErrorSeverity.ERROR);
                     put(CICSLexer.PIPELINE, ErrorSeverity.ERROR);

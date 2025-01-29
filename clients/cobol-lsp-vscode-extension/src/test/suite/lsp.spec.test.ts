@@ -346,7 +346,7 @@ suite("Integration Test Suite", function () {
     assert.strictEqual(diagnostics.length, 3);
     assert.ok(
       diagnostics[2].message.includes(
-        "The following token must start in Area A: Mov",
+        "A misspelled word, maybe you want to put MOD",
       ),
     );
   })

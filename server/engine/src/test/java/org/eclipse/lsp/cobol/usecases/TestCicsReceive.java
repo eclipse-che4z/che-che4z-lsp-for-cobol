@@ -176,28 +176,43 @@ public class TestCicsReceive {
   };
 
   private static final String[] GROUP_ONE_INVALID_ONE = {
-    "RECEIVE", "{SET(100)", "MAXLENGTH(10)", "NOTRUNCATE|error1}"
+    "RECEIVE", "{_SET({$def})", "MAXLENGTH({$def})", "NOTRUNCATE|error1_}"
   };
 
   private static final String[] GROUP_ONE_INVALID_TWO = {
     "RECEIVE",
-    "SESSION(100)",
-    "LENGTH(10)",
-    "{MAXLENGTH|errorOne}(1000)",
-    "{MAXFLENGTH|errorTwo}(100)",
-    "STATE(101)"
+    "SESSION({$def})",
+    "LENGTH({$def})",
+    "{MAXLENGTH|errorOne}({$def})",
+    "{MAXFLENGTH|errorTwo}({$def})",
+    "STATE({$def})"
   };
 
   private static final String[] GROUP_ONE_DUPLICATE_INVALID = {
-    "RECEIVE", "InTO(100)", "{INTO|error1}(1000)", "LENGTH(100)", "MAXLENGTH(10)", "NOTRUNCATE"
+    "RECEIVE",
+    "InTO({$def})",
+    "{INTO|error1}({$def})",
+    "LENGTH({$def})",
+    "MAXLENGTH({$def})",
+    "NOTRUNCATE"
   };
 
   private static final String[] GROUP_ONE_DUPLICATE_INVALID_TWO = {
-    "RECEIVE", "INTO(100)", "{INTO|error1}(1000)", "LENGTH(100)", "MAXLENGTH(10)", "NOTRUNCATE"
+    "RECEIVE",
+    "INTO({$def})",
+    "{INTO|error1}({$def})",
+    "LENGTH({$def})",
+    "MAXLENGTH({$def})",
+    "NOTRUNCATE"
   };
 
   private static final String[] GROUP_ONE_RESP_INVALID = {
-    "RECEIVE", "INTO(100)", "LENGTH(100)", "MAXLENGTH(10)", "{RESP2|errorOne}(100)", "NOHANDLE"
+    "RECEIVE",
+    "INTO({$def})",
+    "LENGTH({$def})",
+    "MAXLENGTH({$def})",
+    "{RESP2|errorOne}({$def})",
+    "NOHANDLE"
   };
 
   private static final String[] R2980_FULL_OPTIONS_VALID_ONE = {
@@ -209,11 +224,11 @@ public class TestCicsReceive {
   };
 
   private static final String[] R2980_INVALID_ONE = {
-    "RECEIVE", "{SET(100)", "MAXLENGTH(1000)", "NOTRUNCATE|error1}"
+    "RECEIVE", "{_SET({$def})", "MAXLENGTH({$def})", "NOTRUNCATE|error1_}"
   };
 
   private static final String[] NON_Z_FULL_OPTIONS_VALID_ONE = {
-    "RECEIVE", "INTO({$abc})", "LENGTH({$def})", "MAXLENGTH(1000)", "NOTRUNCATE"
+    "RECEIVE", "INTO({$abc})", "LENGTH({$def})", "MAXLENGTH({$def})", "NOTRUNCATE"
   };
 
   private static final String[] NON_Z_PARTIAL_OPTIONS_VALID_ONE = {
@@ -229,15 +244,15 @@ public class TestCicsReceive {
   };
 
   private static final String[] PARTN_INVALID_ONE = {
-    "RECEIVE", "{PARTN(100)", "SET(100)", "ASIS|error1}"
+    "RECEIVE", "{_PARTN({$def})", "SET({$def})", "ASIS|error1_}"
   };
 
   private static final String[] PARTN_DUPLICATE_INVALID = {
-    "RECEIVE", "PARTN(100)", "INTO(100)", "LENGTH(101)", "ASIS", "{ASIS|error1}"
+    "RECEIVE", "PARTN({$def})", "INTO({$def})", "LENGTH({$def})", "ASIS", "{ASIS|error1}"
   };
 
   private static final String[] PARTN_DUPLICATE_INVALID_TWO = {
-    "RECEIVE", "PARTN(100)", "INTO(100)", "{INTO|errorOne}(100)", "LENGTH(101)"
+    "RECEIVE", "PARTN({$def})", "INTO({$def})", "{INTO|errorOne}({$def})", "LENGTH({$def})"
   };
 
   private static final String[] MAP_FULL_OPTIONS_VALID_ONE = {
@@ -255,7 +270,7 @@ public class TestCicsReceive {
   };
 
   private static final String[] MAP_INVALID_ONE = {
-    "RECEIVE", "MAP(100)", "INTO(100)", "{LENGTH|error1}(100)"
+    "RECEIVE", "MAP({$def})", "INTO({$def})", "{LENGTH|error1}({$def})"
   };
 
   private static final String[] MAP_MAPPINGDEV_FULL_OPTIONS_VALID_ONE = {
@@ -273,16 +288,116 @@ public class TestCicsReceive {
   };
 
   private static final String[] MAP_MAPPINGDEV_INVALID_ONE = {
-    "RECEIVE", "{MAP(1)", "INTO(100)", "MAPPINGDEV(100)", "MAPSET(1)|error1}"
+    "RECEIVE", "{_MAP({$def})", "INTO({$def})", "MAPPINGDEV({$def})", "MAPSET({$def})|error1_}"
   };
 
   private static final String[] MAP_RESPONSE_HANDLER_DUPLICATE_INVALID = {
-    "RECEIVE", "MAP(1)", "INTO(100)", "RESP(100)", "{RESP|errorOne}(100)"
+    "RECEIVE", "MAP({$def})", "INTO({$def})", "RESP({$def})", "{RESP|errorOne}({$def})"
   };
 
   private static final String[] MAP_RESPONSE_HANDLER_DUPLICATE_INVALID_TWO = {
-    "RECEIVE", "MAP(1)", "INTO(100)", "NOHANDLE", "{NOHANDLE|errorOne}"
+    "RECEIVE", "MAP({$def})", "INTO({$def})", "NOHANDLE", "{NOHANDLE|errorOne}"
   };
+
+  private static final String[] RECEIVE_VALID_ONE = {"RECEIVE"};
+
+  private static final String[] RECEIVE_INVALID_ONE = {
+    "RECEIVE", "{FLENGTH|errorOne}({$def})", "{LENGTH|errorOne}({$def})"
+  };
+
+  private static final String[] RECEIVE_INVALID_TWO = {"RECEIVE", "{_MAP({$def})|errorOne_}"};
+
+  private static final String[] RECEIVE_MAP_VALID = {"RECEIVE", "MAP('abc')", "MAPSET({$def})"};
+
+  private static final String[] RECEIVE_INVALID_THREE = {
+    "RECEIVE", "MAP({$def})", "INTO({$def})", "{TERMINAL|errorOne}", "{FROM|errorTwo}({$def})"
+  };
+
+  private static final String[] RECEIVE_INVALID_FOUR = {
+    "RECEIVE", "{_MAP({$def})", "MAPPINGDEV({$def})", "FROM({$def})|errorOne_}"
+  };
+
+  @Test
+  void testReceiveInvalidOne() {
+    UseCaseEngine.runTest(
+        getTestString(RECEIVE_INVALID_ONE),
+        ImmutableList.of(),
+        ImmutableMap.of(
+            "errorOne",
+            new Diagnostic(
+                new Range(),
+                "Exactly one option required, options are mutually exclusive: LENGTH or FLENGTH",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()),
+            "errorTwo",
+            new Diagnostic(
+                new Range(),
+                "Exactly one option required, options are mutually exclusive: LENGTH or FLENGTH",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())),
+        ImmutableList.of());
+  }
+
+  @Test
+  void testReceiveInvalidTwo() {
+    UseCaseEngine.runTest(
+        getTestString(RECEIVE_INVALID_TWO),
+        ImmutableList.of(),
+        ImmutableMap.of(
+            "errorOne",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: INTO when specifying MAP param without literal",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())),
+        ImmutableList.of());
+  }
+
+  @Test
+  void testReceiveInvalidThree() {
+    UseCaseEngine.runTest(
+        getTestString(RECEIVE_INVALID_THREE),
+        ImmutableList.of(),
+        ImmutableMap.of(
+            "errorOne",
+            new Diagnostic(
+                new Range(),
+                "Exactly one option required, options are mutually exclusive: TERMINAL or FROM",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()),
+            "errorTwo",
+            new Diagnostic(
+                new Range(),
+                "Exactly one option required, options are mutually exclusive: TERMINAL or FROM",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())),
+        ImmutableList.of());
+  }
+
+  @Test
+  void testReceiveInvalidFour() {
+    UseCaseEngine.runTest(
+        getTestString(RECEIVE_INVALID_FOUR),
+        ImmutableList.of(),
+        ImmutableMap.of(
+            "errorOne",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: INTO when specifying MAP param without literal",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())),
+        ImmutableList.of());
+  }
+
+  @Test
+  void testReceiveValidOne() {
+    UseCaseEngine.runTest(getTestString(RECEIVE_VALID_ONE), ImmutableList.of(), ImmutableMap.of());
+  }
+
+  @Test
+  void testReveiveMapValidOne() {
+    UseCaseEngine.runTest(getTestString(RECEIVE_MAP_VALID), ImmutableList.of(), ImmutableMap.of());
+  }
 
   private static String getTestString(String[] components) {
     List<String> instances = Arrays.asList(components);
