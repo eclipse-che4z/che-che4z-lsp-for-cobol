@@ -207,10 +207,9 @@ public class CICSPerformSPOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
             checkOptsLibertyPresent(ctx);
             checkOptsOsgiPresent(ctx);
             checkHasExactlyOneOption("JVMACTION or DUMP or GATHER or STACKTRACE", ctx, ctx.JVMACTION(), ctx.DUMP(), ctx.GATHER(), ctx.STACKTRACE());
-            if (!ctx.DUMP().isEmpty()) {
-                List<TerminalNode> filteredNodes = ctx.children.stream().filter(TerminalNode.class::isInstance).map(element -> (TerminalNode) element)
-                        .filter(node -> node.getSymbol().getType() == CICSLexer.DUMP).collect(Collectors.toList());
-                checkDumpDuplicates(filteredNodes, ErrorSeverity.ERROR);
+            final List<TerminalNode> dumps = ctx.DUMP();
+            if (!dumps.isEmpty()) {
+                checkDumpDuplicates(dumps, ErrorSeverity.ERROR);
                 checkHasExactlyOneOption("DUMPTYPE or ALL or JAVACORE or HEAP or SNAPTRACE", ctx, ctx.DUMPTYPE(), ctx.ALL(), ctx.JAVACORE(), ctx.HEAP(), ctx.SNAPTRACE());
             } else if (!ctx.GATHER().isEmpty()) {
                 checkHasExactlyOneOption("GATHERTYPE or DIAGNOSTICS", ctx, ctx.GATHERTYPE(), ctx.DIAGNOSTICS());
