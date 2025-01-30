@@ -209,25 +209,25 @@ public class CICSPerformSPOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
             final List<TerminalNode> dumps = ctx.DUMP();
             if (!dumps.isEmpty()) {
                 checkDumpDuplicates(dumps, ErrorSeverity.ERROR);
-                checkHasExactlyOneOption("DUMPTYPE or ALL or JAVACORE or HEAP or SNAPTRACE", ctx, ctx.DUMPTYPE(), ctx.ALL(), ctx.JAVACORE(), ctx.HEAP(), ctx.SNAPTRACE());
+                checkHasMutuallyExclusiveOptions("DUMPTYPE or ALL or JAVACORE or HEAP or SNAPTRACE", ctx.DUMPTYPE(), ctx.ALL(), ctx.JAVACORE(), ctx.HEAP(), ctx.SNAPTRACE());
             } else if (!ctx.GATHER().isEmpty()) {
-                checkHasExactlyOneOption("GATHERTYPE or DIAGNOSTICS", ctx, ctx.GATHERTYPE(), ctx.DIAGNOSTICS());
+                checkHasMutuallyExclusiveOptions("GATHERTYPE or DIAGNOSTICS", ctx.GATHERTYPE(), ctx.DIAGNOSTICS());
             } else if (!ctx.STACKTRACE().isEmpty()) {
                 checkHasMandatoryOptions(ctx.TASKID(), ctx, "TASKID");
             }
         } else if (!ctx.LIBERTY().isEmpty()) {
             checkOptsOsgiPresent(ctx);
             checkOptsJvmPresent(ctx);
-            checkHasExactlyOneOption("LIBRTYACTION or REFRESH or SERVERDUMP", ctx, ctx.LIBRTYACTION(), ctx.REFRESH(), ctx.SERVERDUMP());
+            checkHasMutuallyExclusiveOptions("LIBRTYACTION or REFRESH or SERVERDUMP", ctx.LIBRTYACTION(), ctx.REFRESH(), ctx.SERVERDUMP());
             if (!ctx.REFRESH().isEmpty()) {
                 checkPrerequisiteIsMet(ctx.APPLICATION(), ctx.APPID(), ctx, "APPID without APPLICATION");
                 checkPrerequisiteIsMet(ctx.APPID(), ctx.APPIDLEN(), ctx, "APPIDLEN without APPID");
-                checkHasExactlyOneOption("RESOURCETYPE or APPLICATION or CONFIG", ctx, ctx.RESOURCETYPE(), ctx.APPLICATION(), ctx.CONFIG());
+                checkHasMutuallyExclusiveOptions("RESOURCETYPE or APPLICATION or CONFIG", ctx.RESOURCETYPE(), ctx.APPLICATION(), ctx.CONFIG());
             }
         } else if (!ctx.OSGI().isEmpty()) {
             checkOptsJvmPresent(ctx);
             checkOptsLibertyPresent(ctx);
-            checkHasExactlyOneOption("OSGIACTION or REFRESHPKGS", ctx, ctx.OSGIACTION(), ctx.REFRESHPKGS());
+            checkHasMutuallyExclusiveOptions("OSGIACTION or REFRESHPKGS", ctx.OSGIACTION(), ctx.REFRESHPKGS());
             }
     }
     private void checkOptsLibertyPresent(CICSParser.Cics_perform_jvmserverContext ctx) {
