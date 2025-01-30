@@ -204,7 +204,7 @@ public class CICSSendOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
       checkHasMandatoryOptions(ctx.FROM(), ctx, "FROM");
     }
     if (!checkMapHasLiteral(ctx)) {
-      checkHasMandatoryOptions(ctx.FROM(), ctx, "FROM when specifying MAP/MAPSET param without literal");
+      checkHasMandatoryOptions(ctx.FROM(), ctx, "FROM when specifying MAP or MAPSET parameter without literal");
     }
   }
 
