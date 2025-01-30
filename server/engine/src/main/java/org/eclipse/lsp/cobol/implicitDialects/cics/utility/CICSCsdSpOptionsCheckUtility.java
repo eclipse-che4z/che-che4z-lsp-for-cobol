@@ -272,6 +272,7 @@ public class CICSCsdSpOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
             throwException(
                     ErrorSeverity.ERROR, getLocality(ctx), MISSING_ATTRBUTES_OR_SET, "");
         }
+        if (ctx.ATTRIBUTES().isEmpty()) checkAllOptionsArePresentOrAbsent("SET, ATTRLEN", ctx, ctx.SET(), ctx.ATTRLEN());
     }
     private void checkInquireGroup(CICSParser.Cics_csd_inquiregroupContext ctx) {
         checkHasMandatoryOptions(ctx.INQUIREGROUP(), ctx, "INQUIREGROUP");
@@ -291,6 +292,7 @@ public class CICSCsdSpOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
             throwException(
                     ErrorSeverity.ERROR, getLocality(ctx), MISSING_ATTRBUTES_OR_SET, "");
         }
+        if (ctx.ATTRIBUTES().isEmpty()) checkAllOptionsArePresentOrAbsent("SET, ATTRLEN", ctx, ctx.SET(), ctx.ATTRLEN());
     }
     private void  checkInstall(CICSParser.Cics_csd_installContext ctx) {
         checkHasMandatoryOptions(ctx.INSTALL(), ctx, "INSTALL");

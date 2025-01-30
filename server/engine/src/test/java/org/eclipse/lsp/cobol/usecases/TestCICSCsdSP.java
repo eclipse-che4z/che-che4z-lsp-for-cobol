@@ -167,6 +167,10 @@ public class TestCICSCsdSP {
             "CSD {UNLOCK|error}";
     private static final String CDS_USERDEFINE_INVALID =
             "CSD {USERDEFINE|error|error2|error3|error4}";
+    private static final String GETNEXTRSRCE_SET_INVALID =
+            "CSD {_GETNEXTRSRCE RESTYPE({$varFour}) RESID({$varFour}) GROUP({$varFour}) SET({$varFour})|error_}";
+    private static final String INQUIRERSRCE_SET_INVALID =
+            "CSD {_INQUIRERSRCE RESTYPE({$varFour}) RESID({$varFour}) GROUP({$varFour}) SET({$varFour})|error_}";
 
     @ParameterizedTest
     @MethodSource("getValidOptions")
@@ -648,5 +652,29 @@ public class TestCICSCsdSP {
                                 DiagnosticSeverity.Error,
                                 ErrorSource.PARSING.getText()));
         CICSTestUtils.errorTest(CDS_USERDEFINE_INVALID, expectedDiagnostic, "SP");
+    }
+    @Test
+    void testCdsGetNextRsrceSetAttrlenSpInvalid() {
+        Map<String, Diagnostic> expectedDiagnostic =
+                ImmutableMap.of(
+                        "error",
+                        new Diagnostic(
+                                new Range(),
+                                "If one option is specified, all options must be present: SET, ATTRLEN",
+                                DiagnosticSeverity.Error,
+                                ErrorSource.PARSING.getText()));
+        CICSTestUtils.errorTest(GETNEXTRSRCE_SET_INVALID, expectedDiagnostic, "SP");
+    }
+    @Test
+    void testCdsInquireRsrceSetAttrlenSpInvalid() {
+        Map<String, Diagnostic> expectedDiagnostic =
+                ImmutableMap.of(
+                        "error",
+                        new Diagnostic(
+                                new Range(),
+                                "If one option is specified, all options must be present: SET, ATTRLEN",
+                                DiagnosticSeverity.Error,
+                                ErrorSource.PARSING.getText()));
+        CICSTestUtils.errorTest(INQUIRERSRCE_SET_INVALID, expectedDiagnostic, "SP");
     }
 }
