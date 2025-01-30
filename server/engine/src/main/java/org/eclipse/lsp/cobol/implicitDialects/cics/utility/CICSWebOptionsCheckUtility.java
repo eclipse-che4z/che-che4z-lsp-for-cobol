@@ -229,9 +229,8 @@ public class CICSWebOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
 
         checkMutuallyExclusiveOptions("NONE, BASICAUTH, AUTHENTICATE", ctx.NONE(), ctx.BASICAUTH(), ctx.AUTHENTICATE());
         if (!ctx.NONE().isEmpty() || !ctx.BASICAUTH().isEmpty() || !ctx.AUTHENTICATE().isEmpty()) {
-            checkHasMandatoryOptions(ctx.USERNAME(), ctx, "USERNAME");
+            checkAllOptionsArePresentOrAbsent("USERNAME and PASSWORD", ctx, ctx.USERNAME(), ctx.PASSWORD());
             checkPrerequisiteIsMet(ctx.USERNAME(), ctx.USERNAMELEN(), ctx, "USERNAMELEN without USERNAME");
-            checkHasMandatoryOptions(ctx.PASSWORD(), ctx, "PASSWORD");
         } else {
             checkHasIllegalOptions(ctx.USERNAME(), "USERNAME without NONE, BASICAUTH or AUTHENTICATE");
             checkHasIllegalOptions(ctx.USERNAMELEN(), "USERNAMELEN without NONE, BASICAUTH or AUTHENTICATE");
