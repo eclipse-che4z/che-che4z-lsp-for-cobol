@@ -37,6 +37,7 @@ public enum CFASTNodeType {
   END_MERGE("endmerge"),
   STOP("stop"),
   EXEC_CICS("execcics"),
+  EXEC_CICS_RETURN("execcicsreturn"),
   EXEC_CICS_HANDLE("execcicshandle"),
   EXEC_SQL("execsql"),
   EXEC_SQL_WHENEVER("execwhenever"),
