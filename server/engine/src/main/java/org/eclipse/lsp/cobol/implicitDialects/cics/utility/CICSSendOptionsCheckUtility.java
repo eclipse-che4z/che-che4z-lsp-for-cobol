@@ -165,6 +165,7 @@ public class CICSSendOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     checkHasMutuallyExclusiveOptions("CNOTCOMPL or DEFRESP", ctx.CNOTCOMPL(), ctx.DEFRESP());
     checkHasMutuallyExclusiveOptions("LDC or FMH", ctx.LDC(), ctx.FMH());
     checkHasMutuallyExclusiveOptions("PASSBK or CBUFF or CNOTCOMPL ", ctx.PASSBK(), ctx.CBUFF(), ctx.CNOTCOMPL());
+    checkHasMutuallyExclusiveOptions("INVITE or CNOTCOMPL ", ctx.INVITE(), ctx.CNOTCOMPL());
   }
 
   @SuppressWarnings("unchecked")
