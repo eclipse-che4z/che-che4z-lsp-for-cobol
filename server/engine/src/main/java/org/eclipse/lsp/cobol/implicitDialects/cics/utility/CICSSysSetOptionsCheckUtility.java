@@ -1026,6 +1026,8 @@ public class CICSSysSetOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
 
     private void checkEpadapterset(CICSParser.Cics_set_epadaptersetContext ctx) {
         checkHasMandatoryOptions(ctx.EPADAPTERSET(), ctx, "EPADAPTERSET");
+
+        checkMutuallyExclusiveOptions("ENABLESTATUS, ENABLED or DISABLED", ctx.ENABLESTATUS(), ctx.ENABLED(), ctx.DISABLED());
     }
 
     private void checkEventbinding(CICSParser.Cics_set_eventbindingContext ctx) {
