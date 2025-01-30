@@ -905,7 +905,7 @@ cics_set_mqmonitor: (MQMONITOR cics_data_value | (AUTOSTART | NOAUTOSTART | ENAB
 cics_set_netname: (NETNAME cics_data_value | (EXITTRACE | NOEXITTRACE) | EXITTRACING cics_cvda | cics_handle_response)+;
 cics_set_otel: (OTEL | TRACE cics_cvda | cics_handle_response)+;
 cics_set_pipeline: (PIPELINE cics_data_value | (ENABLED | DISABLED) | RESPWAIT cics_data_area | ENABLESTATUS cics_cvda | cics_handle_response)+;
-cics_set_processtype: (PROCESSTYPE cics_data_value | (SET | DISABLED | ENABLED | ACTIVITY | FULL | OFF | PROCESS) | (STATUS | AUDITLEVEL) cics_cvda | cics_handle_response)+;
+cics_set_processtype: (PROCESSTYPE cics_data_value | (DISABLED | ENABLED | ACTIVITY | FULL | OFF | PROCESS) | (STATUS | AUDITLEVEL) cics_cvda | cics_handle_response)+;
 cics_set_program: ((CEDF | NOCEDF | NEWCOPY | PHASEIN | DPLSUBSET | FULLAPI | REPLICATOR | NOREPLICATOR | JVM | NOJVM | PRIVATE | SHARED | DISABLED | ENABLED) |
                                           (PROGRAM | JVMCLASS | JVMPROFILE | OPERATION) cics_data_value | (CEDFSTATUS | COPY | EXECUTIONSET | REPLICATION | RUNTIME | SHARESTATUS | STATUS | VERSION) cics_cvda | cics_handle_response)+;
 cics_set_secdiscovery: ((SECDISCOVERY | ON | OFF | DISCOVERALL) | (STATUS | CMD | DB2 | DCT | FCT | HFS | JCT | PCT | PPT | PSB | RES | TST | USER) cics_cvda | cics_handle_response)+;
