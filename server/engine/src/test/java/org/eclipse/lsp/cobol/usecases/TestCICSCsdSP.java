@@ -167,7 +167,14 @@ public class TestCICSCsdSP {
             "CSD {UNLOCK|error}";
     private static final String CDS_USERDEFINE_INVALID =
             "CSD {USERDEFINE|error|error2|error3|error4}";
-
+    private static final String GETNEXTRSRCE_SET_INVALID =
+            "CSD {_GETNEXTRSRCE RESTYPE({$varFour}) RESID({$varFour}) GROUP({$varFour}) SET({$varFour})|error_}";
+    private static final String INQUIRERSRCE_SET_INVALID =
+            "CSD {_INQUIRERSRCE RESTYPE({$varFour}) RESID({$varFour}) GROUP({$varFour}) SET({$varFour})|error_}";
+    private static final String REMOVE_PRIOR_INVALID =
+            "CSD {_REMOVE GROUP({$varFour})|error_}";
+    private static final String DELETE_LIST_INVALID =
+            "CSD INSTALL LIST({$varFour}) {RESID|error}({$varFour}) {ATOMSERVICE|error2}";
     @ParameterizedTest
     @MethodSource("getValidOptions")
     void testPerformSpAllValid(String valid) {
@@ -524,7 +531,7 @@ public class TestCICSCsdSP {
                         "error",
                         new Diagnostic(
                                 new Range(),
-                                "Missing required option: GROUP",
+                                "Exactly one option required, none provided: LIST or GROUP",
                                 DiagnosticSeverity.Error,
                                 ErrorSource.PARSING.getText()));
         CICSTestUtils.errorTest(CDS_INSTALL_INVALID, expectedDiagnostic, "SP");
@@ -648,5 +655,66 @@ public class TestCICSCsdSP {
                                 DiagnosticSeverity.Error,
                                 ErrorSource.PARSING.getText()));
         CICSTestUtils.errorTest(CDS_USERDEFINE_INVALID, expectedDiagnostic, "SP");
+    }
+    @Test
+    void testCdsGetNextRsrceSetAttrlenSpInvalid() {
+        Map<String, Diagnostic> expectedDiagnostic =
+                ImmutableMap.of(
+                        "error",
+                        new Diagnostic(
+                                new Range(),
+                                "If one option is specified, all options must be present: SET, ATTRLEN",
+                                DiagnosticSeverity.Error,
+                                ErrorSource.PARSING.getText()));
+        CICSTestUtils.errorTest(GETNEXTRSRCE_SET_INVALID, expectedDiagnostic, "SP");
+    }
+    @Test
+    void testCdsInquireRsrceSetAttrlenSpInvalid() {
+        Map<String, Diagnostic> expectedDiagnostic =
+                ImmutableMap.of(
+                        "error",
+                        new Diagnostic(
+                                new Range(),
+                                "If one option is specified, all options must be present: SET, ATTRLEN",
+                                DiagnosticSeverity.Error,
+                                ErrorSource.PARSING.getText()));
+        CICSTestUtils.errorTest(INQUIRERSRCE_SET_INVALID, expectedDiagnostic, "SP");
+    }
+    @Test
+    void testRemovePriorSpInvalid() {
+        Map<String, Diagnostic> expectedDiagnostic =
+                ImmutableMap.of(
+                        "error",
+                        new Diagnostic(
+                                new Range(),
+                                "Missing required option: LIST",
+                                DiagnosticSeverity.Error,
+                                ErrorSource.PARSING.getText()));
+        CICSTestUtils.errorTest(REMOVE_PRIOR_INVALID, expectedDiagnostic, "SP");
+    }
+    @Test
+    void testCdsDeleteListSPInvalid() {
+        Map<String, Diagnostic> expectedDiagnostic =
+                ImmutableMap.of(
+                        "error",
+                        new Diagnostic(
+                                new Range(),
+                                "Invalid option provided: RESID",
+                                DiagnosticSeverity.Error,
+                                ErrorSource.PARSING.getText()),
+                        "error2",
+                        new Diagnostic(
+                                new Range(),
+                                "Invalid option provided: RESTYPE or ATOMSERVICE or BUNDLE or "
+                                        + "CONNECTION or CORBASERVER or DB2CONN or DB2ENTRY or DB2TRAN or "
+                                        + "DJAR or DOCTEMPLATE or DUMPCODE or ENQMODEL or FILE or IPCONN or "
+                                        + "JOURNALMODEL or JVMSERVER or LIBRARY or LSRPOOL or MAPSET or MQCONN or "
+                                        + "MQMONITOR or PARTITIONSET or PARTNER or PIPELINE or PROCESSTYPE or "
+                                        + "PROFILE or PROGRAM or REQUESTMODEL or SESSIONS or TCPIPSERVICE or "
+                                        + "TDQUEUE or TERMINAL or TRANCLASS or TRANSACTION or TSMODEL or "
+                                        + "TYPETERM or URIMAP or WEBSERVICE",
+                                DiagnosticSeverity.Error,
+                                ErrorSource.PARSING.getText()));
+        CICSTestUtils.errorTest(DELETE_LIST_INVALID, expectedDiagnostic, "SP");
     }
 }

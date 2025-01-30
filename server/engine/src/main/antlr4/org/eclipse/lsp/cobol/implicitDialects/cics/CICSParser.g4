@@ -213,9 +213,9 @@ cics_assign_parameter2: MAPLINE cics_data_area | MAPWIDTH cics_data_area | MICRO
              USERNAME cics_data_area | USERPRIORITY cics_data_area | VALIDATION cics_data_area | cics_handle_response;
 
 /** CSD System Commands */
-cics_csd: CSD (cics_csd_add | cics_csd_alter | cics_csd_append | cics_csd_copy | cics_csd_define | cics_csd_delete | cics_csd_disconnect | cics_csd_endbrgroup |
+cics_csd: CSD (cics_csd_add | cics_csd_alter | cics_csd_append | cics_csd_copy | cics_csd_define | cics_csd_remove | cics_csd_delete | cics_csd_disconnect | cics_csd_endbrgroup |
                cics_csd_endbrlist | cics_csd_endbrrsrce | cics_csd_getnextgroup | cics_csd_getnextlist | cics_csd_getnextrsrce | cics_csd_inquiregroup | cics_csd_inquirelist |
-               cics_csd_inquirersrce | cics_csd_install | cics_csd_lock | cics_csd_remove | cics_csd_rename | cics_csd_startbrgroup | cics_csd_startbrlist | cics_csd_startbrrsrce |
+               cics_csd_inquirersrce | cics_csd_install | cics_csd_lock | cics_csd_rename | cics_csd_startbrgroup | cics_csd_startbrlist | cics_csd_startbrrsrce |
                cics_csd_unlock | cics_csd_userdefine);
 cics_csd_add:           (ADD | (GROUP | LIST | BEFORE | AFTER) cics_data_value | cics_handle_response)+;
 cics_csd_alter:         (ALTER | cics_csd_cvda | NOCOMPAT | COMPAT | COMPATMODE cics_cvda | (RESID | GROUP | ATTRIBUTES | ATTRLEN) cics_data_value | cics_handle_response)+;
@@ -233,7 +233,7 @@ cics_csd_getnextrsrce:  (GETNEXTRSRCE | RESTYPE cics_cvda | RESID cics_data_area
 cics_csd_inquiregroup:  (INQUIREGROUP | GROUP cics_data_value | LIST cics_data_value | cics_handle_response)+;
 cics_csd_inquirelist:   (INQUIRELIST | LIST cics_cvda | cics_handle_response)+;
 cics_csd_inquirersrce:  (INQUIRERSRCE | cics_csd_cvda | (RESID | GROUP ) cics_data_value | SET cics_ref | (GROUP | ATTRIBUTES | ATTRLEN) cics_data_area | cics_handle_response)+;
-cics_csd_install:       (INSTALL | cics_csd_cvda | RESID cics_data_area | GROUP cics_data_value | cics_handle_response)+;
+cics_csd_install:       (INSTALL | cics_csd_cvda | RESID cics_data_area | (GROUP | LIST) cics_data_value | cics_handle_response)+;
 cics_csd_lock:          (LOCK | (LIST | GROUP) cics_data_value | cics_handle_response)+;
 cics_csd_remove:        (REMOVE | (LIST | GROUP) cics_data_value | cics_handle_response)+;
 cics_csd_rename:        (RENAME | cics_csd_cvda | (RESID | GROUP | AS) cics_data_value | cics_handle_response)+;
@@ -442,7 +442,8 @@ cics_formattime_opts: ((ABSTIME  | DATE  | FULLDATE  | DATEFORM | DAYCOUNT | DAY
                     | cics_handle_response)+;
 
 /** FREE (all of them) */
-cics_free: FREE (CONVID cics_name | SESSION cics_name | STATE cics_cvda | cics_handle_response)*;
+cics_free: FREE cics_free_body?;
+cics_free_body: ((CONVID | SESSION) cics_name | STATE cics_cvda | CHILD cics_data_value | cics_handle_response)+;
 
 /** FREEMAIN */
 cics_freemain: (FREEMAIN | FREEMAIN64) cics_freemain_opts;
@@ -727,7 +728,7 @@ cics_perform_security:(SECURITY | REBUILD | ESMRESP cics_data_area | cics_handle
 cics_perform_shutdown:(SHUTDOWN | IMMEDIATE | TAKEOVER | DUMP | PLT cics_data_value | PLTNAME cics_data_value | RESTART | NORESTART | SDTRAN cics_data_value | NOSDTRAN |
                        XLT cics_data_value | cics_handle_response)+;
 cics_perform_ssl:(SSL | REBUILD | GSKRESP cics_data_area |cics_handle_response)+;
-cics_perform_statistics:(STATISTICS | RECORD | ALL | RESETNOW | ASYNCSERVICE | ATOMSERVICE | AUTOINSTALL | BUNDLE | CAPTURESPEC | CIPHER | CONNECTION | DB2 | DISPATCHER | DOCTEMPLATE | ENQUEUE | EPADAPTER |
+cics_perform_statistics:(STATISTICS | ALL | RESETNOW | RECORD | ASYNCSERVICE | ATOMSERVICE | AUTOINSTALL | BUNDLE | CAPTURESPEC | CIPHER | CONNECTION | DB2 | DISPATCHER | DOCTEMPLATE | ENQUEUE | EPADAPTER |
                         EVENTBINDING | EVENTPROCESS | FEPI | FILE | IPCONN | JOURNALNAME | JOURNALNUM | JVMPROGRAM | JVMSERVER | LIBRARY | LSRPOOL | MONITOR | MQCONN | MQMONITOR | NODEJSAPP |
                         PIPELINE | POLICY | PROGAUTO | PROGRAM | PROGRAMDEF | RECOVERY | SECURITY | STATS | STORAGE | STREAMNAME | SYSDUMP | TABLEMGR | TCPIP | TCPIPSERVICE | TDQUEUE |
                         TERMINAL | TRANCLASS | TCLASS | TRANDUMP | TRANSACTION | TSQUEUE | URIMAP | USER | VTAM | WEBSERVICE | XMLTRANSFORM | cics_handle_response)+;
