@@ -296,7 +296,7 @@ public class CICSCsdSpOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     }
     private void  checkInstall(CICSParser.Cics_csd_installContext ctx) {
         checkHasMandatoryOptions(ctx.INSTALL(), ctx, "INSTALL");
-        checkHasMandatoryOptions(ctx.GROUP(), ctx, "GROUP");
+        checkHasExactlyOneOption("LIST or GROUP", ctx, ctx.LIST(), ctx.GROUP());
         checkAllOptionsArePresentOrAbsent("RESID and any of " + CVDA_OPTS, ctx, ctx.RESID(), ctx.cics_csd_cvda());
     }
     private void checkLock(CICSParser.Cics_csd_lockContext ctx) {

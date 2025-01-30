@@ -528,7 +528,7 @@ public class TestCICSCsdSP {
                         "error",
                         new Diagnostic(
                                 new Range(),
-                                "Missing required option: GROUP",
+                                "Exactly one option required, none provided: LIST or GROUP",
                                 DiagnosticSeverity.Error,
                                 ErrorSource.PARSING.getText()));
         CICSTestUtils.errorTest(CDS_INSTALL_INVALID, expectedDiagnostic, "SP");
