@@ -442,7 +442,8 @@ cics_formattime_opts: ((ABSTIME  | DATE  | FULLDATE  | DATEFORM | DAYCOUNT | DAY
                     | cics_handle_response)+;
 
 /** FREE (all of them) */
-cics_free: FREE (CONVID cics_name | SESSION cics_name | STATE cics_cvda | cics_handle_response)*;
+cics_free: FREE cics_free_body?;
+cics_free_body: ((CONVID | SESSION) cics_name | STATE cics_cvda | CHILD cics_data_value | cics_handle_response)+;
 
 /** FREEMAIN */
 cics_freemain: (FREEMAIN | FREEMAIN64) cics_freemain_opts;
