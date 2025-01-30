@@ -301,7 +301,7 @@ public class CICSPerformSPOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
         checkPrerequisiteIsMet(ctx.ALL(), ctx.RESETNOW(), ctx, "RESETNOW without ALL");
         checkHasMutuallyExclusiveOptions("JOURNALNAME or JOURNALNUM", ctx.JOURNALNAME(), ctx.JOURNALNUM());
         checkHasMutuallyExclusiveOptions("TRANCLASS or TCLASS", ctx.TRANCLASS(), ctx.TCLASS());
-        checkAll(ctx.children);
+        checkAll(ctx);
     }
     private void checkDumpDuplicates(List<TerminalNode> rules, ErrorSeverity severity) {
         if (rules.size() <= 1) return;
@@ -313,11 +313,11 @@ public class CICSPerformSPOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
                                 "DUMP");
                 });
     }
-    private void checkAll(List<ParseTree> children) {
-        if (children == null || children.isEmpty()) return;
+    private void checkAll(CICSParser.Cics_perform_statisticsContext ctx) {
+        if (ctx.children == null || ctx.children.isEmpty()) return;
         boolean isAll = false;
         boolean isResource = false;
-        for (ParseTree child : children) {
+        for (ParseTree child : ctx.children) {
             if (!TerminalNode.class.isAssignableFrom(child.getClass())) continue;
             int token = ((TerminalNode) child).getSymbol().getType();
             if (token == CICSLexer.ALL) isAll = true;
