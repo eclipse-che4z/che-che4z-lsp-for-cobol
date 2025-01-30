@@ -314,7 +314,7 @@ public class CICSPerformSPOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
                 });
     }
     private void checkAll(List<ParseTree> children) {
-        if (children.isEmpty()) return;
+        if (children == null || children.isEmpty()) return;
         boolean isAll = false;
         boolean isResource = false;
         for (ParseTree child : children) {
