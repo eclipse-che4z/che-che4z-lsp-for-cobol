@@ -171,6 +171,8 @@ public class TestCICSCsdSP {
             "CSD {_GETNEXTRSRCE RESTYPE({$varFour}) RESID({$varFour}) GROUP({$varFour}) SET({$varFour})|error_}";
     private static final String INQUIRERSRCE_SET_INVALID =
             "CSD {_INQUIRERSRCE RESTYPE({$varFour}) RESID({$varFour}) GROUP({$varFour}) SET({$varFour})|error_}";
+    private static final String REMOVE_PRIOR_INVALID =
+            "CSD {_REMOVE GROUP({$varFour})|error_}";
 
     @ParameterizedTest
     @MethodSource("getValidOptions")
@@ -676,5 +678,17 @@ public class TestCICSCsdSP {
                                 DiagnosticSeverity.Error,
                                 ErrorSource.PARSING.getText()));
         CICSTestUtils.errorTest(INQUIRERSRCE_SET_INVALID, expectedDiagnostic, "SP");
+    }
+    @Test
+    void testRemovePriorSpInvalid() {
+        Map<String, Diagnostic> expectedDiagnostic =
+                ImmutableMap.of(
+                        "error",
+                        new Diagnostic(
+                                new Range(),
+                                "Missing required option: LIST",
+                                DiagnosticSeverity.Error,
+                                ErrorSource.PARSING.getText()));
+        CICSTestUtils.errorTest(REMOVE_PRIOR_INVALID, expectedDiagnostic, "SP");
     }
 }
