@@ -226,20 +226,6 @@ public abstract class CICSOptionsCheckBaseUtility {
     }
 
     /**
-    * Helper method to collect analysis errors if the rule context contains obsolete options
-    *
-    * @param rule TerminalNode to check.
-    * @param options Options checked to insert into error message
-    */
-    protected void checkHasObsoleteOptions(TerminalNode rule, String options) {
-        if (rule != null) {
-            if (!rule.getText().trim().isEmpty()) {
-                throwException(ErrorSeverity.ERROR, getLocality(rule), "Obsolete option provided: ", options);
-            }
-        }
-    }
-
-    /**
      * Helper method to collect analysis errors if the rule context contains obsolete options
      *
      * @param rule TerminalNode to check.
