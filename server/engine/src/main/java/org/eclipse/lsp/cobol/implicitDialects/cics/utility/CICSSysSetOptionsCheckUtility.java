@@ -1046,6 +1046,8 @@ public class CICSSysSetOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
         if (!ctx.DATASET().isEmpty())
             checkHasMandatoryOptions(ctx.FILE(), ctx, "FILE");
 
+        checkHasExactlyOneOption("FILE or DATASET", ctx, ctx.FILE(), ctx.DATASET());
+
         checkMutuallyExclusiveOptions("ADD, ADDABLE or NOTADDABLE", ctx.ADD(), ctx.ADDABLE(), ctx.NOTADDABLE());
         checkMutuallyExclusiveOptions("BROWSE, BROWSABLE or NOTBROWSABLE", ctx.BROWSE(), ctx.BROWSABLE(), ctx.NOTBROWSABLE());
         checkMutuallyExclusiveOptions("BUSY, WAIT, FORCE or NOWAIT", ctx.BUSY(), ctx.WAIT(), ctx.FORCE(), ctx.NOWAIT());
