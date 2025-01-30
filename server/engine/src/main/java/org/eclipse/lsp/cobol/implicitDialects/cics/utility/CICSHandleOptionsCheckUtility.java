@@ -257,22 +257,15 @@ public class CICSHandleOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     }
   }
 
-  private boolean checkHasNormalCondition(ParserRuleContext ctx) {
-    return ctx.children.stream()
-            .filter(child -> child instanceof CICSParser.Cics_conditionsContext)
-            .flatMap(condition -> ((CICSParser.Cics_conditionsContext) condition).children.stream())
-            .filter(node -> node instanceof TerminalNode)
-            .map(node -> (TerminalNode) node)
-            .anyMatch(terminalNode -> {
-              if (terminalNode.getSymbol().getType() == CICSLexer.NORMAL) {
-                throwException(
+  private void checkHasNormalCondition(ParserRuleContext ctx) {
+    ctx.cics_conditions().stream()
+            .map(Cics_conditionsContext::NORMAL)
+            .filter(Objects::notNull)
+            .forEach(terminalNode -> throwException(
                         ErrorSeverity.ERROR,
                         getLocality(terminalNode),
                         "Invalid option provided: ",
-                        terminalNode.getSymbol().getText());
-                return true;
-              }
-              return false;
-            });
+                        "NORMAL")
+            );
   }
 }
