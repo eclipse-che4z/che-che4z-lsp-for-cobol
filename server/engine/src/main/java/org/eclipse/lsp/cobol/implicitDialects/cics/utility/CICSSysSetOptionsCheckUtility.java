@@ -1095,8 +1095,6 @@ public class CICSSysSetOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
         checkHasMandatoryOptions(ctx.JOURNALNUM(), ctx, "JOURNALNUM");
 
         checkHasObsoleteOptions(ctx.JOURNALNUM(), ctx, "JOURNALNUM. Replace with JOURNALNAME.");
-        checkHasExactlyOneOption("ACTION, FLUSH or RESET", ctx, ctx.ACTION(), ctx.FLUSH(), ctx.RESET());
-        checkHasExactlyOneOption("STATUS, DISABLED or ENABLED", ctx, ctx.STATUS(), ctx.DISABLED(), ctx.ENABLED());
 
         checkMutuallyExclusiveOptions("OPENSTATUS, ADVANCE, CLOSED, CLOSELEAVE or OPENOUTPUT", ctx.OPENSTATUS(), ctx.ADVANCE(), ctx.CLOSED(), ctx.CLOSELEAVE(), ctx.OPENOUTPUT());
 
