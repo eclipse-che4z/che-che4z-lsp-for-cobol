@@ -65,7 +65,7 @@ public class TestCicsSysSetStatement {
     private static final String ENQMODEL_VALID_2 = "SET ENQMODEL({$varOne}) DISABLED";
     private static final String EPADAPTER_VALID_1 = "SET EPADAPTER({$varOne}) ENABLESTATUS({$varOne})";
     private static final String EPADAPTER_VALID_2 = "SET EPADAPTER({$varOne}) ENABLED";
-    private static final String EPADAPTERSET_VALID_1 = "SET EPADAPTERSET({$varOne}) ENABLESTATUS({$varOne}) ENABLED";
+    private static final String EPADAPTERSET_VALID_1 = "SET EPADAPTERSET({$varOne}) ENABLED";
     private static final String EVENTBINDING_VALID_1 = "SET EVENTBINDING({$varOne}) ENABLESTATUS({$varOne})";
     private static final String EVENTBINDING_VALID_2 = "SET EVENTBINDING({$varOne}) ENABLED";
     private static final String EVENTPROCESS_VALID_1 = "SET EVENTPROCESS STARTED";
