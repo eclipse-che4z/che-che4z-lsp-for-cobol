@@ -241,6 +241,7 @@ public class CICSHandleOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
 
   private void checkHandleCondition(CICSParser.Cics_handle_conditionContext ctx) {
     checkHasMandatoryOptions(ctx.CONDITION(), ctx, "CONDITION");
+    checkHasNormalCondition(ctx);
   }
 
   private void checkHasTooManyOptions(ParserRuleContext parentCtx) {
@@ -254,5 +255,24 @@ public class CICSHandleOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     if (commandOptionsCount > 16) {
       throwException(ErrorSeverity.ERROR, getLocality(parentCtx), "Too many options provided for: ", "HANDLE AID");
     }
+  }
+
+  private boolean checkHasNormalCondition(ParserRuleContext ctx) {
+    return ctx.children.stream()
+            .filter(child -> child instanceof CICSParser.Cics_conditionsContext)
+            .flatMap(condition -> ((CICSParser.Cics_conditionsContext) condition).children.stream())
+            .filter(node -> node instanceof TerminalNode)
+            .map(node -> (TerminalNode) node)
+            .anyMatch(terminalNode -> {
+              if (terminalNode.getSymbol().getType() == CICSLexer.NORMAL) {
+                throwException(
+                        ErrorSeverity.ERROR,
+                        getLocality(terminalNode),
+                        "Invalid option provided: ",
+                        terminalNode.getSymbol().getText());
+                return true;
+              }
+              return false;
+            });
   }
 }

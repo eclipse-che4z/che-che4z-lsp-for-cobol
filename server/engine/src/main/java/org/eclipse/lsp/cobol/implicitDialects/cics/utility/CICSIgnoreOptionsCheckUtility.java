@@ -15,6 +15,7 @@
 package org.eclipse.lsp.cobol.implicitDialects.cics.utility;
 
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.tree.TerminalNode;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
@@ -178,5 +179,25 @@ public class CICSIgnoreOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
 
     private void checkIgnoreCondition(CICSParser.Cics_ignore_optionsContext ctx) {
         checkHasMandatoryOptions(ctx.CONDITION(), ctx, "CONDITION");
+        checkHasNormalCondition(ctx);
+    }
+
+    private boolean checkHasNormalCondition(ParserRuleContext ctx) {
+        return ctx.children.stream()
+                .filter(child -> child instanceof CICSParser.Cics_conditionsContext)
+                .flatMap(condition -> ((CICSParser.Cics_conditionsContext) condition).children.stream())
+                .filter(node -> node instanceof TerminalNode)
+                .map(node -> (TerminalNode) node)
+                .anyMatch(terminalNode -> {
+                    if (terminalNode.getSymbol().getType() == CICSLexer.NORMAL) {
+                        throwException(
+                                ErrorSeverity.ERROR,
+                                getLocality(terminalNode),
+                                "Invalid option provided: ",
+                                terminalNode.getSymbol().getText());
+                        return true;
+                    }
+                    return false;
+                });
     }
 }
