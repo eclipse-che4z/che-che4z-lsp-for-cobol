@@ -978,7 +978,7 @@ cics_web_extract: (EXTRACT | HOSTLENGTH cics_data_value |
             (SCHEME | HOSTTYPE | REQUESTTYPE) cics_cvda | cics_handle_response)+;
 cics_web_open: (OPEN | (URIMAP | CIPHERS | NUMCIPHERS | CERTIFICATE | CODEPAGE | HOST | HOSTLENGTH | PORTNUMBER) cics_data_value | (SESSTOKEN | HTTPVNUM | HTTPRNUM) cics_data_area | SCHEME cics_cvda | cics_handle_response)+;
 cics_web_parse: (PARSE | (URL | URLLENGTH) cics_data_value | (SCHEMENAME | HOST | HOSTLENGTH | PORTNUMBER | PATH | PATHLENGTH | QUERYSTRING | QUERYSTRLEN) cics_data_area | HOSTTYPE cics_cvda | cics_handle_response)+;
-cics_web_read: (READ | (QUERYPARM | NAMELENGTH | CHARACTERSET | HOSTCODEPAGE) cics_data_value | (FORMFIELD | HTTPHEADER | SESSTOKEN | VALUE | VALUELENGTH) cics_data_area | SET ptr_ref | cics_handle_response)+;
+cics_web_read: (READ | (QUERYPARM | NAMELENGTH | CHARACTERSET | HOSTCODEPAGE) cics_data_value | (FORMFIELD | HTTPHEADER | SESSTOKEN | VALUE | VALUELENGTH) cics_data_area | SET cics_ref | cics_handle_response)+;
 cics_web_readnext: (READNEXT | (FORMFIELD | QUERYPARM | HTTPHEADER | VALUE | VALUELENGTH) cics_data_area | (SESSTOKEN | NAMELENGTH) cics_data_value | cics_handle_response)+;
 cics_web_receive: ((RECEIVE | NOTRUNCATE | SRVCONVERT | NOSRVCONVERT | CLICONVERT | NOCLICONVERT) | (MAXLENGTH | CHARACTERSET | HOSTCODEPAGE | MEDIATYPE | TOCONTAINER | TOCHANNEL | SESSTOKEN | STATUSCODE | STATUSLEN) cics_data_value |
             (INTO | LENGTH | BODYCHARSET | STATUSTEXT) cics_data_area | SET cics_ref | (SERVERCONV | TYPE | CLIENTCONV) cics_cvda | cics_handle_response)+;
