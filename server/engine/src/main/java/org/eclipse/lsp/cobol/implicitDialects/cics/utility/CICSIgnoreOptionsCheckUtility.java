@@ -15,7 +15,6 @@
 package org.eclipse.lsp.cobol.implicitDialects.cics.utility;
 
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.tree.TerminalNode;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
@@ -25,6 +24,7 @@ import org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_ignore;
 
@@ -182,22 +182,15 @@ public class CICSIgnoreOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
         checkHasNormalCondition(ctx);
     }
 
-    private boolean checkHasNormalCondition(ParserRuleContext ctx) {
-        return ctx.children.stream()
-                .filter(child -> child instanceof CICSParser.Cics_conditionsContext)
-                .flatMap(condition -> ((CICSParser.Cics_conditionsContext) condition).children.stream())
-                .filter(node -> node instanceof TerminalNode)
-                .map(node -> (TerminalNode) node)
-                .anyMatch(terminalNode -> {
-                    if (terminalNode.getSymbol().getType() == CICSLexer.NORMAL) {
-                        throwException(
-                                ErrorSeverity.ERROR,
-                                getLocality(terminalNode),
-                                "Invalid option provided: ",
-                                terminalNode.getSymbol().getText());
-                        return true;
-                    }
-                    return false;
-                });
+    private void checkHasNormalCondition(CICSParser.Cics_ignore_optionsContext ctx) {
+        ctx.cics_conditions().stream()
+                .map(CICSParser.Cics_conditionsContext::NORMAL)
+                .filter(Objects::nonNull)
+                .forEach(terminalNode -> throwException(
+                        ErrorSeverity.ERROR,
+                        getLocality(terminalNode),
+                        "Invalid option provided: ",
+                        "NORMAL")
+                );
     }
 }

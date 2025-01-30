@@ -26,6 +26,7 @@ import org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_handle;
 
@@ -257,10 +258,10 @@ public class CICSHandleOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     }
   }
 
-  private void checkHasNormalCondition(ParserRuleContext ctx) {
+  private void checkHasNormalCondition(CICSParser.Cics_handle_conditionContext ctx) {
     ctx.cics_conditions().stream()
-            .map(Cics_conditionsContext::NORMAL)
-            .filter(Objects::notNull)
+            .map(CICSParser.Cics_conditionsContext::NORMAL)
+            .filter(Objects::nonNull)
             .forEach(terminalNode -> throwException(
                         ErrorSeverity.ERROR,
                         getLocality(terminalNode),
