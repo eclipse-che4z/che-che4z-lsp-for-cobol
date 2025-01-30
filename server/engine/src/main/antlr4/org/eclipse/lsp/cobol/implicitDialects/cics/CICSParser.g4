@@ -872,8 +872,8 @@ cics_set_db2conn: ((DB2CONN | UOW | TASK | TXID | NONE | GROUP | SIGN | TERM | T
 cics_set_db2entry: (DB2ENTRY cics_data_area? | (UOW | TASK | TXID | NONE | GROUP | SIGN | TERM | TX | OPID | USERID | WAIT | NOWAIT | FORCE | ABEND | SQLCODE | POOL | ENABLED | DISABLED | HIGH | EQUAL | LOW | YES | NO | TWAIT | NOTWAIT | TPOOL) |
                             (AUTHID | PLAN | PLANEXITNAME | PROTECTNUM | THREADLIMIT) cics_data_area | (ACCOUNTREC | AUTHTYPE | BUSY | DISABLEDACT | ENABLESTATUS | PRIORITY | SHARELOCKS | THREADWAIT) cics_cvda | cics_handle_response)+;
 cics_set_db2tran: (DB2TRAN | (DB2ENTRY | TRANSID) cics_data_area | cics_handle_response)+;
-cics_set_deletshipped: (DELETSHIPPED | (IDLE | IDLEHRS | IDLEMINS | IDLESECS | IDLEHRS | INTERVAL | INTERVALHRS | INTERVALMINS | INTERVALSECS | INTERVALHRS) cics_data_value | cics_handle_response)+;
-cics_set_dispatcher: (DISPATCHER | (MAXOPENTCBS | MAXSSLTCBS | MAXXPTCBS | MROBATCH | PRTYAGING | RUNAWAY | SCANDELAY | TIME | MAXOPENTCBS) cics_data_value | cics_handle_response)+;
+cics_set_deletshipped: (DELETSHIPPED | (IDLE | IDLEHRS | IDLEMINS | IDLESECS | INTERVAL | INTERVALHRS | INTERVALMINS | INTERVALSECS) cics_data_value | cics_handle_response)+;
+cics_set_dispatcher: (DISPATCHER | (MAXOPENTCBS | MAXSSLTCBS | MAXXPTCBS | MROBATCH | PRTYAGING | RUNAWAY | SCANDELAY | TIME) cics_data_value | cics_handle_response)+;
 cics_set_doctemplate: (DOCTEMPLATE cics_data_value | NEWCOPY | COPY cics_cvda | cics_handle_response)+;
 cics_set_dsname: (DSNAME cics_data_value | (REMOVE | RECOVERED | RESETLOCKS | RETRY | AVAILABLE | RREPL | UNAVAILABLE | QUIESCED | IMMQUIESCED | UNQUIESCED | WAIT | NOWAIT | BACKOUT | COMMIT | FORCE) |
                             (ACTION | AVAILABILITY | QUESCESTATE | BUSY | UOWACTION) cics_cvda | cics_handle_response)+;
@@ -898,17 +898,17 @@ cics_set_jvmserver: ((ENABLED | DISABLED | PHASEOUT | PURGE | FORCEPURGE | KILL)
 cics_set_library: ((CRITICAL | NONCRITICAL | ENABLED | DISABLED) | (LIBRARY | RANKING) cics_data_value | (CRITICALST | ENABLESTATUS) cics_cvda | cics_handle_response)+;
 cics_set_modename: ((ACQUIRED | CLOSED) | (MODENAME | AVAILABLE | CONNECTION) cics_data_value | ACQSTATUS cics_cvda | cics_handle_response)+;
 cics_set_monitor:  ((MONITOR | COMPRESS | NOCOMPRESS | CONVERSE | NOCONVERSE | EXCEPT | NOEXCEPT | IDNTY | NOIDNTY | PERF | NOPERF | RESRCE | NORESRCE | ON | OFF | SYNCPOINT | NOSYNCPOINT) |
-                            (DPLLIMIT | FILELIMIT | FREQUENCY | FREQUENCYHRS | FREQUENCYMIN | FREQUENCYSEC | FREQUENCYHRS | TSQUEUELIMIT | URIMAPLIMIT | WEBSERVLIMIT) cics_data_value |
+                            (DPLLIMIT | FILELIMIT | FREQUENCY | FREQUENCYHRS | FREQUENCYMIN | FREQUENCYSEC | TSQUEUELIMIT | URIMAPLIMIT | WEBSERVLIMIT) cics_data_value |
                             (COMPRESSST | CONVERSEST | EXCEPTCLASS | IDNTYCLASS | PERFCLASS | RESRCECLASS | STATUS | SYNCPOINTST) cics_cvda | cics_handle_response)+;
 cics_set_mqconn: ((MQCONN| WAIT | NOWAIT | FORCE | CONNECTED | NOTCONNECTED | RESYNC | NORESYNC | GROUPRESYNC) | MQNAME cics_data_area | (BUSY | CONNECTST | RESYNCMEMBER) cics_cvda | cics_handle_response)+;
-cics_set_mqmonitor: (MQMONITOR cics_data_value | (AUTOSTART | NOAUTOSTART | ENABLED | DISABLED | STARTED | STOPPED) | (AUTOSTATUS | ENABLESTATUS | MONSTATUS | AUTOSTATUS) cics_cvda | cics_handle_response)+;
+cics_set_mqmonitor: (MQMONITOR cics_data_value | (AUTOSTART | NOAUTOSTART | ENABLED | DISABLED | STARTED | STOPPED) | (AUTOSTATUS | ENABLESTATUS | MONSTATUS) cics_cvda | cics_handle_response)+;
 cics_set_netname: (NETNAME cics_data_value | (EXITTRACE | NOEXITTRACE) | EXITTRACING cics_cvda | cics_handle_response)+;
 cics_set_otel: (OTEL | TRACE cics_cvda | cics_handle_response)+;
 cics_set_pipeline: (PIPELINE cics_data_value | (ENABLED | DISABLED) | RESPWAIT cics_data_area | ENABLESTATUS cics_cvda | cics_handle_response)+;
 cics_set_processtype: (PROCESSTYPE cics_data_value | (SET | DISABLED | ENABLED | ACTIVITY | FULL | OFF | PROCESS) | (STATUS | AUDITLEVEL) cics_cvda | cics_handle_response)+;
 cics_set_program: ((CEDF | NOCEDF | NEWCOPY | PHASEIN | DPLSUBSET | FULLAPI | REPLICATOR | NOREPLICATOR | JVM | NOJVM | PRIVATE | SHARED | DISABLED | ENABLED) |
                                           (PROGRAM | JVMCLASS | JVMPROFILE | OPERATION) cics_data_value | (CEDFSTATUS | COPY | EXECUTIONSET | REPLICATION | RUNTIME | SHARESTATUS | STATUS | VERSION) cics_cvda | cics_handle_response)+;
-cics_set_secdiscovery: ((SECDISCOVERY | ON | OFF | DISCOVERALL | DISCOVERALL) | (STATUS | CMD | DB2 | DCT | FCT | HFS | JCT | PCT | PPT | PSB | RES | TST | USER | CMD) cics_cvda | cics_handle_response)+;
+cics_set_secdiscovery: ((SECDISCOVERY | ON | OFF | DISCOVERALL) | (STATUS | CMD | DB2 | DCT | FCT | HFS | JCT | PCT | PPT | PSB | RES | TST | USER) cics_cvda | cics_handle_response)+;
 cics_set_secrecording: ((ADD | MODIFY | REMOVE) | MAXIMUM cics_data_area | ACTION cics_cvda |
                                     (SECRECORDING | ODADPTRID | ODADPTRDATA1 | ODADPTRDATA2 | ODADPTRDATA3 | ODAPPLID | ODCLNTIPADDR | ODCLNTPORT | ODFACILNAME |
                                       ODFACILTYPE | ODIPFAMILY | ODLUNAME | ODNETID | ODNETWORKID | ODSERVERPORT | ODTCPIPS | ODTRANSID | ODUSERID) cics_data_value | cics_handle_response)+;
@@ -917,7 +917,7 @@ cics_set_statistics: ((STATISTICS | ON | OFF | RECORDNOW | RESETNOW) |
                             (RECORDING) cics_cvda | cics_handle_response)+;
 cics_set_sysdumpcode: ((ADD | REMOVE | RESET | DAE | NODAE | LOCAL | RELATED | NOSHUTDOWN | SHUTDOWN | NOSYSDUMP | SYSDUMP) | (SYSDUMPCODE | DSPLIST | JOBLIST | MAXIMUM) cics_data_value | (ACTION | DAEOPTION | DUMPSCOPE | SHUTOPTION | SYSDUMPING) cics_cvda | cics_handle_response)+;
 cics_set_system: ((SYSTEM | DEBUG | NODEBUG | NOSYSDUMP | TABLEONLY | SYSDUMP | FORCE | NOFORCE | CTLGALL | CTLGMODIFY | CTLGNONE | AUTOACTIVE | AUTOINACTIVE) |
-                        (AKP | DSALIMIT | DSRTPROGRAM | DTRPROGRAM | EDSALIMIT | GMMTEXT | GMMLENGTH | GMMTEXT | MAXTASKS | MAXTASKS | MROBATCH | PROGAUTOEXIT | PRTYAGING | RUNAWAY | SCANDELAY | SDTMEMLIMIT | TIME | AKP) cics_data_value |
+                        (AKP | DSALIMIT | DSRTPROGRAM | DTRPROGRAM | EDSALIMIT | GMMTEXT | GMMLENGTH | MAXTASKS | MROBATCH | PROGAUTOEXIT | PRTYAGING | RUNAWAY | SCANDELAY | SDTMEMLIMIT | TIME) cics_data_value |
                          (LOGDEFER | NEWMAXTASKS) cics_data_area | (DEBUGTOOL | DUMPING | FORCEQR | PROGAUTOCTLG | PROGAUTOINST) cics_cvda | cics_handle_response)+;
 cics_set_tags_refresh: (TAGS | REFRESH | cics_handle_response)+;
 cics_set_task: ((FORCEPURGE | KILL | PURGE | SRRACTIVE | SRRINACTIVE) | (TASK | PRIORITY) cics_data_value | (PURGETYPE | SRRSTATUS) cics_cvda | cics_handle_response)+;
