@@ -553,7 +553,7 @@ public class TestCicsSendStatement {
                     "error1",
                     new Diagnostic(
                             new Range(),
-                            "Missing required option: FROM when specifying MAP/MAPSET param without literal",
+                            "Missing required option: FROM when specifying MAP or MAPSET parameter without literal",
                             DiagnosticSeverity.Error,
                             ErrorSource.PARSING.getText())));
   }
