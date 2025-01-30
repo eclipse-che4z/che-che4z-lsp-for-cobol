@@ -324,14 +324,14 @@ public class CICSPerformSPOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
             else if (token != CICSLexer.STATISTICS && token != CICSLexer.RECORD && token != CICSLexer.RESETNOW)
                 isResource = true;
 
-            if (isAll && isResource) {
-                throwException(
-                        ErrorSeverity.ERROR,
-                        getLocality(child),
-                        "Invalid options provided: ",
-                        child.getText());
-                isResource = false;
-            }
+            if (isAll && isResource) break;
+        }
+        if (isAll && isResource) {
+            throwException(
+                    ErrorSeverity.ERROR,
+                    getLocality(ctx),
+                    "Option ALL cannot be combined with individual resource types",
+                    "");
         }
     }
 }
