@@ -1043,9 +1043,6 @@ public class CICSSysSetOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     }
 
     private void checkFile(CICSParser.Cics_set_fileContext ctx) {
-        if (!ctx.DATASET().isEmpty())
-            checkHasMandatoryOptions(ctx.FILE(), ctx, "FILE");
-
         checkHasExactlyOneOption("FILE or DATASET", ctx, ctx.FILE(), ctx.DATASET());
 
         checkMutuallyExclusiveOptions("ADD, ADDABLE or NOTADDABLE", ctx.ADD(), ctx.ADDABLE(), ctx.NOTADDABLE());
@@ -1110,11 +1107,9 @@ public class CICSSysSetOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     }
 
     private void checkJvmendpoint(CICSParser.Cics_set_jvmendpointContext ctx) {
-        // Only enforce the requirements if JVMENDPOINT is provided. Stops collision with SET JVMSERVER.
-        if (!ctx.JVMENDPOINT().isEmpty()) {
-            checkHasMandatoryOptions(ctx.JVMSERVER(), ctx, "JVMSERVER");
-            checkHasExactlyOneOption("ENABLESTATUS, ENABLED or DISABLED", ctx, ctx.ENABLESTATUS(), ctx.DISABLED(), ctx.ENABLED());
-        }
+        checkHasMandatoryOptions(ctx.JVMENDPOINT(), ctx, "JVMENDPOINT");
+        checkHasMandatoryOptions(ctx.JVMSERVER(), ctx, "JVMSERVER");
+        checkHasExactlyOneOption("ENABLESTATUS, ENABLED or DISABLED", ctx, ctx.ENABLESTATUS(), ctx.DISABLED(), ctx.ENABLED());
     }
 
     private void checkJvmserver(CICSParser.Cics_set_jvmserverContext ctx) {

@@ -853,7 +853,7 @@ cics_run_transid: (TRANSID cics_name | CHANNEL cics_name | CHILD cics_data_area 
 cics_set: SET (cics_set_association_usercorrdata | cics_set_atomservice | cics_set_brfacility | cics_set_bundle | cics_set_connection |
         cics_set_db2conn | cics_set_db2entry | cics_set_db2tran | cics_set_deletshipped | cics_set_dispatcher | cics_set_doctemplate | cics_set_dsname | cics_set_dumpds |
         cics_set_enqmodel | cics_set_epadapter | cics_set_epadapterset | cics_set_eventbinding | cics_set_eventprocess |
-        cics_set_file | cics_set_host | cics_set_ipconn | cics_set_irc | cics_set_journalname | cics_set_journalnum | cics_set_jvmendpoint | cics_set_jvmserver |
+        cics_set_file | cics_set_host | cics_set_ipconn | cics_set_irc | cics_set_journalname | cics_set_journalnum | cics_set_jvmserver | cics_set_jvmendpoint |
         cics_set_library | cics_set_modename | cics_set_monitor | cics_set_mqconn | cics_set_mqmonitor | cics_set_netname | cics_set_otel | cics_set_pipeline | cics_set_processtype | cics_set_program |
         cics_set_secdiscovery | cics_set_secrecording | cics_set_statistics | cics_set_sysdumpcode | cics_set_system | cics_set_tags_refresh | cics_set_task |
         cics_set_tclass | cics_set_tcpip | cics_set_tcpipservice | cics_set_tdqueue | cics_set_tempstorage | cics_set_terminal | cics_set_tracedest | cics_set_traceflag |
@@ -1344,7 +1344,7 @@ ABORT
 
 cicsLexerDefinedVariableUsageTokens:
 ABCODE
-    | ABDUMP
+  | ABDUMP
   | ABEND
   | ABENDCODE
   | ABOFFSET
@@ -2603,12 +2603,12 @@ ABCODE
   | PA1
   | PA2
   | PA3
-  | PAGE_COUNTER
   | PAGEABLE
   | PAGEHT
   | PAGENUM
   | PAGESTATUS
   | PAGEWD
+  | PAGE_COUNTER
   | PAGING
   | PARAMGR
   | PARSE
@@ -2640,14 +2640,6 @@ ABCODE
   | PERFORM
   | PERMANENT
   | PF1
-  | PF2
-  | PF3
-  | PF4
-  | PF5
-  | PF6
-  | PF7
-  | PF8
-  | PF9
   | PF10
   | PF11
   | PF12
@@ -2658,11 +2650,19 @@ ABCODE
   | PF17
   | PF18
   | PF19
+  | PF2
   | PF20
   | PF21
   | PF22
   | PF23
   | PF24
+  | PF3
+  | PF4
+  | PF5
+  | PF6
+  | PF7
+  | PF8
+  | PF9
   | PFXLENG
   | PG
   | PGMIDERR
