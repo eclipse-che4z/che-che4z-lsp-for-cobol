@@ -94,7 +94,6 @@ public class CICSStartOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
         checkHasMandatoryOptions(ctx.TRANSID(), ctx, "TRANSID");
 
         checkMutuallyExclusiveOptions("INTERVAL, AFTER, AT or TIME", ctx.INTERVAL(), ctx.AFTER(), ctx.AT(), ctx.TIME());
-        checkMutuallyExclusiveOptions("HOURS, MINUTES or SECONDS", ctx.HOURS(), ctx.MINUTES(), ctx.SECONDS());
         checkMutuallyExclusiveOptions("TERMID or USERID", ctx.TERMID(), ctx.USERID());
 
         checkPrerequisiteIsMet(ctx.FROM(), ctx.LENGTH(), ctx, "LENGTH without FROM");
