@@ -35,11 +35,11 @@ public class CICSStartOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
             {
                 put(CICSLexer.AFTER, ErrorSeverity.WARNING);
                 put(CICSLexer.AT, ErrorSeverity.WARNING);
-                put(CICSLexer.ATTACH, ErrorSeverity.ERROR);
+                put(CICSLexer.ATTACH, ErrorSeverity.WARNING);
                 put(CICSLexer.BRDATA, ErrorSeverity.ERROR);
                 put(CICSLexer.BRDATALENGTH, ErrorSeverity.ERROR);
-                put(CICSLexer.BREXIT, ErrorSeverity.ERROR);
-                put(CICSLexer.CHANNEL, ErrorSeverity.ERROR);
+                put(CICSLexer.BREXIT, ErrorSeverity.WARNING);
+                put(CICSLexer.CHANNEL, ErrorSeverity.WARNING);
                 put(CICSLexer.FMH, ErrorSeverity.WARNING);
                 put(CICSLexer.FROM, ErrorSeverity.ERROR);
                 put(CICSLexer.HOURS, ErrorSeverity.ERROR);
