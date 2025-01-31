@@ -242,8 +242,7 @@ public class CICSWebOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
 
         checkHasMandatoryOptions(ctx.TOLENGTH(), ctx, "TOLENGTH");
 
-        checkPrerequisiteIsMet(ctx.STATUSCODE(), ctx.STATUSTEXT(), ctx, "STATUSTEXT without STATUSCODE");
-        checkPrerequisiteIsMet(ctx.STATUSCODE(), ctx.STATUSLEN(), ctx, "STATUSLEN without STATUSCODE");
+        checkAllOptionsArePresentOrAbsent("STATUSCODE, STATUSTEXT, STATUSLEN", ctx, ctx.STATUSCODE(), ctx.STATUSTEXT(), ctx.STATUSLEN());
 
         checkMutuallyExclusiveOptions("CLICONVERT, NOINCONVERT, NOOUTCONVERT, NOCLICONVERT, CLIENTCONV", ctx.CLICONVERT(), ctx.NOINCONVERT(), ctx.NOOUTCONVERT(), ctx.NOCLICONVERT(), ctx.CLIENTCONV());
 
@@ -293,15 +292,8 @@ public class CICSWebOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     private void checkOpen(CICSParser.Cics_web_openContext ctx) {
         checkHasMandatoryOptions(ctx.OPEN(), ctx, "OPEN");
         checkMutuallyExclusiveOptions("URIMAP or HOST", ctx.URIMAP(), ctx.HOST());
-        checkPrerequisiteIsMet(ctx.HOST(), ctx.HOSTLENGTH(), ctx, "HOSTLENGTH without HOST");
-        checkPrerequisiteIsMet(ctx.HOST(), ctx.PORTNUMBER(), ctx, "PORTNUMBER without HOST");
-        checkPrerequisiteIsMet(ctx.HOST(), ctx.SCHEME(), ctx, "SCHEME without HOST");
 
-        if (!ctx.HOST().isEmpty()) {
-            checkHasMandatoryOptions(ctx.HOSTLENGTH(), ctx, "HOSTLENGTH");
-            checkHasMandatoryOptions(ctx.PORTNUMBER(), ctx, "PORTNUMBER");
-            checkHasMandatoryOptions(ctx.SCHEME(), ctx, "SCHEME");
-        }
+        checkAllOptionsArePresentOrAbsent("HOST, HOSTLENGTH, PORTNUMBER, SCHEME", ctx, ctx.HOST(), ctx.HOSTLENGTH(), ctx.PORTNUMBER(), ctx.SCHEME());
 
         checkHasMandatoryOptions(ctx.SESSTOKEN(), ctx, "SESSTOKEN");
         checkPrerequisiteIsMet(ctx.HTTPVNUM(), ctx.HTTPRNUM(), ctx, "HTTPVNUM");
@@ -340,7 +332,9 @@ public class CICSWebOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
             checkHasMandatoryOptions(ctx.VALUE(), ctx, "VALUE");
             checkHasMandatoryOptions(ctx.VALUELENGTH(), ctx, "VALUELENGTH");
 
+            checkHasIllegalOptions(ctx.SET(), "SET");
             checkHasIllegalOptions(ctx.CHARACTERSET(), "CHARACTERSET");
+            checkHasIllegalOptions(ctx.HOSTCODEPAGE(), "HOSTCODEPAGE");
         }
 
         if (!ctx.QUERYPARM().isEmpty()) {
