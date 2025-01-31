@@ -226,6 +226,18 @@ public abstract class CICSOptionsCheckBaseUtility {
     }
 
     /**
+     * Helper method to collect analysis errors if the rule context contains obsolete options
+     *
+     * @param rule TerminalNode to check.
+     * @param options Options checked to insert into error message
+     */
+    protected void checkHasObsoleteOptions(List<TerminalNode> rule, ParserRuleContext ctx, String options) {
+        if (!rule.isEmpty()) {
+            throwException(ErrorSeverity.ERROR, getLocality(ctx), "Obsolete option provided: ", options);
+        }
+    }
+
+    /**
      * Helper function to check and see if more than one rule was visited out of a set provided.
      *
      * @param options Options checked to insert into error message
@@ -386,7 +398,8 @@ public abstract class CICSOptionsCheckBaseUtility {
      * @param rules   Lists of TerminalNode to iterate through
      * @return Number of TerminalNode instances found
      */
-    protected int checkHasMutuallyExclusiveOptions(String options, List<TerminalNode>... rules) {
+    @SafeVarargs
+    protected final int checkHasMutuallyExclusiveOptions(String options, List<TerminalNode>... rules) {
         List<TerminalNode> nodes =
                 Stream.of(rules)
                         .filter(rule -> !rule.isEmpty())
@@ -416,7 +429,7 @@ public abstract class CICSOptionsCheckBaseUtility {
    * @param ctx ParserRuleContext
    * @param rules Lists of rules to iterate through
    */
-  protected <E extends ParseTree> void checkAllOptionsArePresentOrAbsent(String options, ParserRuleContext ctx, List<E>... rules) {
+  protected <E extends ParseTree> void checkAllOptionsArePresentOrAbsent(String options, ParserRuleContext ctx, List<?>... rules) {
     boolean noOptions = Arrays.stream(rules).allMatch(List::isEmpty);
     if (!noOptions) {
         boolean allOptions = Arrays.stream(rules).noneMatch(List::isEmpty);
@@ -430,9 +443,9 @@ public abstract class CICSOptionsCheckBaseUtility {
     }
   }
 
-
-  protected <E extends ParseTree> void checkHasExactlyOneOption(
-      String options, ParserRuleContext parentCtx, List<E>... rules) {
+  @SafeVarargs
+  protected final <E extends ParseTree> void checkHasExactlyOneOption(
+          String options, ParserRuleContext parentCtx, List<E>... rules) {
 
         List<TerminalNode> children = new ArrayList<>();
 

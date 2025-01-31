@@ -181,6 +181,9 @@ public class CICSOptionsCheckUtility {
         CICSWSAEPRUtility.RULE_INDEX,
         new CICSWSAEPRUtility(context, errors));
     optionsMap.put(
+        CICSSysSetOptionsCheckUtility.RULE_INDEX,
+        new CICSSysSetOptionsCheckUtility(context, errors));
+    optionsMap.put(
         CICSWaitCicsOptionsUtility.RULE_INDEX,
         new CICSWaitCicsOptionsUtility(context, errors));
     optionsMap.put(
@@ -309,6 +312,9 @@ public class CICSOptionsCheckUtility {
     optionsMap.put(
         CICSStartOptionsCheckUtility.RULE_INDEX,
         new CICSStartOptionsCheckUtility(context, errors));
+    optionsMap.put(
+        CICSFreeOptionsCheckUtility.RULE_INDEX,
+        new CICSFreeOptionsCheckUtility(context, errors));
     spOptionsMap.put(
         CICSInquireSPOptionsCheckUtility.RULE_INDEX,
         new CICSInquireSPOptionsCheckUtility(context, errors));
@@ -330,6 +336,18 @@ public class CICSOptionsCheckUtility {
     spOptionsMap.put(
         CICSExtractSPOptionsCheckUtility.RULE_INDEX,
         new CICSExtractSPOptionsCheckUtility(context, errors));
+    spOptionsMap.put(
+        CICSResyncEntrynameOptionsCheckUtility.RULE_INDEX,
+        new CICSResyncEntrynameOptionsCheckUtility(context, errors));
+    spOptionsMap.put(
+        CICSPerformSPOptionsCheckUtility.RULE_INDEX,
+        new CICSPerformSPOptionsCheckUtility(context, errors));
+    spOptionsMap.put(
+        CICSCollectStatisticsSpOptionsCheckUtility.RULE_INDEX,
+        new CICSCollectStatisticsSpOptionsCheckUtility(context, errors));
+    spOptionsMap.put(
+        CICSCsdSpOptionsCheckUtility.RULE_INDEX,
+        new CICSCsdSpOptionsCheckUtility(context, errors));
   }
     /**
      * Entrypoint to check CICS rule options
