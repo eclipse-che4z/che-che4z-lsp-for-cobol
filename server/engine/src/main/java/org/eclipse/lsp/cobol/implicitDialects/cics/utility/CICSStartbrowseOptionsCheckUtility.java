@@ -38,13 +38,12 @@ public class CICSStartbrowseOptionsCheckUtility extends CICSOptionsCheckBaseUtil
             put(CICSLexer.ACTIVITYID, ErrorSeverity.ERROR);
             put(CICSLexer.PROCESS, ErrorSeverity.ERROR);
             put(CICSLexer.PROCESSTYPE, ErrorSeverity.ERROR);
-            put(CICSLexer.ACTIVITY, ErrorSeverity.WARNING);
+            put(CICSLexer.ACTIVITY, ErrorSeverity.ERROR);
             put(CICSLexer.BROWSETOKEN, ErrorSeverity.ERROR);
-            put(CICSLexer.CONTAINER, ErrorSeverity.WARNING);
-            put(CICSLexer.CHANNEL, ErrorSeverity.WARNING);
-            put(CICSLexer.EVENT, ErrorSeverity.WARNING);
-            put(CICSLexer.TIMER, ErrorSeverity.WARNING);
-            put(CICSLexer.RETCODE, ErrorSeverity.ERROR);
+            put(CICSLexer.CONTAINER, ErrorSeverity.ERROR);
+            put(CICSLexer.CHANNEL, ErrorSeverity.ERROR);
+            put(CICSLexer.EVENT, ErrorSeverity.ERROR);
+            put(CICSLexer.TIMER, ErrorSeverity.ERROR);
         }
     };
 
@@ -75,8 +74,12 @@ public class CICSStartbrowseOptionsCheckUtility extends CICSOptionsCheckBaseUtil
         if (!ctx.ACTIVITY().isEmpty()) {
             checkPrerequisiteIsMet(ctx.cics_startbrowse_processWithValue_subrule(), ctx.PROCESSTYPE(), ctx, "PROCESSTYPE without PROCESS");
             checkHasIllegalOptions(ctx.PROCESS(), "PROCESS, in this context, requires a value");
-            checkMutuallyExclusiveOptions("ACTIVITYID or PROCESS", ctx.ACTIVITYID(), ctx.PROCESS());
+            checkMutuallyExclusiveOptions("ACTIVITYID or PROCESS", ctx.ACTIVITYID(), ctx.cics_startbrowse_processWithValue_subrule());
         } else if (!ctx.CONTAINER().isEmpty()) {
+            if (!ctx.CHANNEL().isEmpty()) {
+                checkHasIllegalOptions(ctx.PROCESS(), "PROCESS");
+                checkHasIllegalOptions(ctx.PROCESSTYPE(), "PROCESSTYPE");
+            }
             checkPrerequisiteIsMet(ctx.cics_startbrowse_processWithValue_subrule(), ctx.PROCESSTYPE(), ctx, "PROCESSTYPE without PROCESS");
             checkHasIllegalOptions(ctx.PROCESS(), "PROCESS, in this context, requires a value");
             checkMutuallyExclusiveOptions("ACTIVITYID, PROCESS or CHANNEL", ctx.ACTIVITYID(), ctx.PROCESS(), ctx.cics_startbrowse_processWithValue_subrule(), ctx.CHANNEL());
