@@ -265,7 +265,6 @@ public class CICSWebOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
             checkPrerequisiteIsMet(ctx.QUERYSTRING(), ctx.QUERYSTRLEN(), ctx, "QUERYSTRLEN without QUERYSTRING");
 
             checkAllOptionsArePresentOrAbsent("HTTPMETHOD and METHODLENGTH", ctx, ctx.HTTPMETHOD(), ctx.METHODLENGTH());
-            checkAllOptionsArePresentOrAbsent("HTTPVERSION and VERSIONLEN", ctx, ctx.HTTPVERSION(), ctx.VERSIONLEN());
 
             checkHasIllegalOptions(ctx.SESSTOKEN(), "SESSTOKEN");
             checkHasIllegalOptions(ctx.REALM(), "REALM");
@@ -287,6 +286,7 @@ public class CICSWebOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
         checkAllOptionsArePresentOrAbsent("HOST and HOSTLENGTH", ctx, ctx.HOST(), ctx.HOSTLENGTH());
         checkPrerequisiteIsMet(ctx.HOST(), ctx.HOSTTYPE(), ctx, "HOSTTYPE without HOST");
         checkAllOptionsArePresentOrAbsent("PATH and PATHLENGTH", ctx, ctx.PATH(), ctx.PATHLENGTH());
+        checkAllOptionsArePresentOrAbsent("HTTPVERSION and VERSIONLEN", ctx, ctx.HTTPVERSION(), ctx.VERSIONLEN());
     }
 
     private void checkOpen(CICSParser.Cics_web_openContext ctx) {
