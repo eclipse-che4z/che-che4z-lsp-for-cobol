@@ -36,7 +36,7 @@ public class CICSStartbrowseOptionsCheckUtility extends CICSOptionsCheckBaseUtil
     private static final Map<Integer, ErrorSeverity> DUPLICATE_CHECK_OPTIONS = new HashMap<Integer, ErrorSeverity>() {
         {
             put(CICSLexer.ACTIVITYID, ErrorSeverity.ERROR);
-            put(CICSLexer.PROCESS, ErrorSeverity.ERROR);
+            put(CICSLexer.PROCESS, ErrorSeverity.WARNING);
             put(CICSLexer.PROCESSTYPE, ErrorSeverity.ERROR);
             put(CICSLexer.ACTIVITY, ErrorSeverity.WARNING);
             put(CICSLexer.BROWSETOKEN, ErrorSeverity.WARNING);
