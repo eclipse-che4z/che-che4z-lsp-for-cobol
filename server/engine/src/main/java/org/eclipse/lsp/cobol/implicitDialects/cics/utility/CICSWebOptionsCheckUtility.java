@@ -397,8 +397,9 @@ public class CICSWebOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
 
         if (!ctx.SESSTOKEN().isEmpty() || !ctx.STATUSCODE().isEmpty() || !ctx.STATUSTEXT().isEmpty() || !ctx.STATUSLEN().isEmpty()) {
             checkHasMandatoryOptions(ctx.SESSTOKEN(), ctx, "SESSTOKEN");
-            checkPrerequisiteIsMet(ctx.STATUSCODE(), ctx.STATUSTEXT(), ctx, "STATUSTEXT without STATUSCODE");
+            checkAllOptionsArePresentOrAbsent("STATUSCODE and STATUSTEXT", ctx, ctx.STATUSCODE(), ctx.STATUSTEXT());
             checkPrerequisiteIsMet(ctx.STATUSCODE(), ctx.STATUSLEN(), ctx, "STATUSLEN without STATUSCODE");
+            checkPrerequisiteIsMet(ctx.STATUSCODE(), ctx.LENGTH(), ctx, "LENGTH without STATUSCODE");
         }
     }
 
