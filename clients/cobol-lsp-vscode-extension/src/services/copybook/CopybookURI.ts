@@ -101,14 +101,18 @@ export class CopybookURI {
     return result;
   }
 
+  private static sanitizeEndevorString(s: string): string {
+      return s.replace(/\*/g, '__star__');
+  }
+
   public static getEnviromentPath(type: EndevorType, profile: ResolvedProfile) {
     return path.join(
       Utils.profileAsString(profile),
-      type.environment,
-      type.stage,
-      type.system,
-      type.subsystem,
-      type.type,
+      this.sanitizeEndevorString(type.environment),
+      this.sanitizeEndevorString(type.stage),
+      this.sanitizeEndevorString(type.system),
+      this.sanitizeEndevorString(type.subsystem),
+      this.sanitizeEndevorString(type.type),
     );
   }
 }
