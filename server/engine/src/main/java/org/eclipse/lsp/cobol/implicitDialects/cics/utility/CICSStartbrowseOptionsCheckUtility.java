@@ -36,14 +36,14 @@ public class CICSStartbrowseOptionsCheckUtility extends CICSOptionsCheckBaseUtil
     private static final Map<Integer, ErrorSeverity> DUPLICATE_CHECK_OPTIONS = new HashMap<Integer, ErrorSeverity>() {
         {
             put(CICSLexer.ACTIVITYID, ErrorSeverity.ERROR);
-            put(CICSLexer.PROCESS, ErrorSeverity.ERROR);
+            put(CICSLexer.PROCESS, ErrorSeverity.WARNING);
             put(CICSLexer.PROCESSTYPE, ErrorSeverity.ERROR);
-            put(CICSLexer.ACTIVITY, ErrorSeverity.ERROR);
-            put(CICSLexer.BROWSETOKEN, ErrorSeverity.ERROR);
-            put(CICSLexer.CONTAINER, ErrorSeverity.ERROR);
-            put(CICSLexer.CHANNEL, ErrorSeverity.ERROR);
+            put(CICSLexer.ACTIVITY, ErrorSeverity.WARNING);
+            put(CICSLexer.BROWSETOKEN, ErrorSeverity.WARNING);
+            put(CICSLexer.CONTAINER, ErrorSeverity.WARNING);
+            put(CICSLexer.CHANNEL, ErrorSeverity.WARNING);
             put(CICSLexer.EVENT, ErrorSeverity.ERROR);
-            put(CICSLexer.TIMER, ErrorSeverity.ERROR);
+            put(CICSLexer.TIMER, ErrorSeverity.WARNING);
         }
     };
 
@@ -72,10 +72,7 @@ public class CICSStartbrowseOptionsCheckUtility extends CICSOptionsCheckBaseUtil
 
     private void checkBody(CICSParser.Cics_startbrowse_bodyContext ctx) {
         if (!ctx.ACTIVITY().isEmpty()) {
-            if (!ctx.cics_startbrowse_processWithValue_subrule().isEmpty() || !ctx.PROCESSTYPE().isEmpty()) {
-                checkHasMandatoryOptions(ctx.cics_startbrowse_processWithValue_subrule(), ctx, "PROCESS");
-                checkHasMandatoryOptions(ctx.PROCESSTYPE(), ctx, "PROCESSTYPE");
-            }
+            checkAllOptionsArePresentOrAbsent("PROCESS and PROCESSTYPE", ctx, ctx.cics_startbrowse_processWithValue_subrule(), ctx.PROCESSTYPE());
 
             checkHasIllegalOptions(ctx.PROCESS(), "PROCESS, in this context, requires a value");
             checkMutuallyExclusiveOptions("ACTIVITYID or PROCESS", ctx.ACTIVITYID(), ctx.cics_startbrowse_processWithValue_subrule());
