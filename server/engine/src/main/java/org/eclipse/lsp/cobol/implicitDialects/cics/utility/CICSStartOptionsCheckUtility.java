@@ -96,6 +96,10 @@ public class CICSStartOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
         checkMutuallyExclusiveOptions("INTERVAL, AFTER, AT or TIME", ctx.INTERVAL(), ctx.AFTER(), ctx.AT(), ctx.TIME());
         checkMutuallyExclusiveOptions("TERMID or USERID", ctx.TERMID(), ctx.USERID());
 
+        if (!ctx.HOURS().isEmpty() || !ctx.MINUTES().isEmpty() || !ctx.SECONDS().isEmpty()) {
+            checkHasExactlyOneOption("AFTER or AT", ctx, ctx.AFTER(), ctx.AT());
+        }
+
         checkPrerequisiteIsMet(ctx.FROM(), ctx.LENGTH(), ctx, "LENGTH without FROM");
         checkPrerequisiteIsMet(ctx.FROM(), ctx.FMH(), ctx, "FMH without FROM");
     }
