@@ -387,6 +387,9 @@ public class CICSWebOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
             checkHasIllegalOptions(ctx.SRVCONVERT(), "SRVCONVERT");
             checkHasIllegalOptions(ctx.NOSRVCONVERT(), "NOSRVCONVERT");
             checkHasIllegalOptions(ctx.SERVERCONV(), "SERVERCONV");
+            checkHasIllegalOptions(ctx.CLICONVERT(), "CLICONVERT");
+            checkHasIllegalOptions(ctx.NOCLICONVERT(), "NOCLICONVERT");
+            checkHasIllegalOptions(ctx.CLIENTCONV(), "CLIENTCONV");
             checkHasIllegalOptions(ctx.HOSTCODEPAGE(), "HOSTCODEPAGE");
 
             checkHasMandatoryOptions(ctx.TOCONTAINER(), ctx, "TOCONTAINER");
