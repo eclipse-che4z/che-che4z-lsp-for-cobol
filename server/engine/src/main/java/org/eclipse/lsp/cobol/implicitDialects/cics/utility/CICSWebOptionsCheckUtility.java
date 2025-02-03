@@ -400,7 +400,6 @@ public class CICSWebOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
             checkHasMandatoryOptions(ctx.SESSTOKEN(), ctx, "SESSTOKEN");
             checkAllOptionsArePresentOrAbsent("STATUSCODE and STATUSTEXT", ctx, ctx.STATUSCODE(), ctx.STATUSTEXT());
             checkPrerequisiteIsMet(ctx.STATUSCODE(), ctx.STATUSLEN(), ctx, "STATUSLEN without STATUSCODE");
-            checkPrerequisiteIsMet(ctx.STATUSCODE(), ctx.LENGTH(), ctx, "LENGTH without STATUSCODE");
         }
     }
 
