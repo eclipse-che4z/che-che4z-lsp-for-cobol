@@ -59,7 +59,7 @@ public class TestCicsExciStartBrowseStatement {
   private static final String STARTBROWSE_TIMER_VALID = "STARTBROWSE TIMER({$varOne}) BROWSETOKEN({$varOne})";
 
   private static final String STARTBROWSE_INVALID_CONTAINER = "STARTBROWSE CONTAINER PROCESS({$varOne}) {PROCESSTYPE|errorOne}({$varOne}) {CHANNEL|errorTwo}({$varOne}) BROWSETOKEN({$varOne})";
-  private static final String STARTBROWSE_INVALID_CONTAINER_2 = "STARTBROWSE CONTAINER {PROCESS|errorOne} PROCESSTYPE({$varOne}) BROWSETOKEN({$varOne})";
+  private static final String STARTBROWSE_INVALID_CONTAINER_2 = "STARTBROWSE {_CONTAINER|errorTwo_} {_{_PROCESS|errorOne_}|errorTwo_} PROCESSTYPE({$varOne}) BROWSETOKEN({$varOne})";
   private static final String STARTBROWSE_INVALID_ACTIVITY = "STARTBROWSE {_ACTIVITY ACTIVITYID({$varOne} )|errorOne_}";
   private static final String STARTBROWSE_INVALID_EVENT = "STARTBROWSE {_EVENT ACTIVITYID({$varOne} )|errorOne_}";
   private static final String STARTBROWSE_INVALID_PROCESS = "STARTBROWSE {_PROCESS BROWSETOKEN({$varOne} )|errorOne_}";
@@ -123,6 +123,12 @@ public class TestCicsExciStartBrowseStatement {
             new Diagnostic(
                     new Range(),
                     "Invalid option provided: PROCESS, in this context, requires a value",
+                    DiagnosticSeverity.Error,
+                    ErrorSource.PARSING.getText()));
+    tempDiagnostic.put("errorTwo",
+            new Diagnostic(
+                    new Range(),
+                    "Exactly one option required, options are mutually exclusive: ACTIVITY, CONTAINER, PROCESS, EVENT or TIMER",
                     DiagnosticSeverity.Error,
                     ErrorSource.PARSING.getText()));
 

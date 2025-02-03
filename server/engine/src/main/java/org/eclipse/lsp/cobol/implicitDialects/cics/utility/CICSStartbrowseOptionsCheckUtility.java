@@ -72,7 +72,11 @@ public class CICSStartbrowseOptionsCheckUtility extends CICSOptionsCheckBaseUtil
 
     private void checkBody(CICSParser.Cics_startbrowse_bodyContext ctx) {
         if (!ctx.ACTIVITY().isEmpty()) {
-            checkPrerequisiteIsMet(ctx.cics_startbrowse_processWithValue_subrule(), ctx.PROCESSTYPE(), ctx, "PROCESSTYPE without PROCESS");
+            if (!ctx.cics_startbrowse_processWithValue_subrule().isEmpty() || !ctx.PROCESSTYPE().isEmpty()) {
+                checkHasMandatoryOptions(ctx.cics_startbrowse_processWithValue_subrule(), ctx, "PROCESS");
+                checkHasMandatoryOptions(ctx.PROCESSTYPE(), ctx, "PROCESSTYPE");
+            }
+
             checkHasIllegalOptions(ctx.PROCESS(), "PROCESS, in this context, requires a value");
             checkMutuallyExclusiveOptions("ACTIVITYID or PROCESS", ctx.ACTIVITYID(), ctx.cics_startbrowse_processWithValue_subrule());
         } else if (!ctx.CONTAINER().isEmpty() || !ctx.CHANNEL().isEmpty()) {
@@ -109,10 +113,7 @@ public class CICSStartbrowseOptionsCheckUtility extends CICSOptionsCheckBaseUtil
         checkPrerequisiteIsMet(ctx.CONTAINER(), ctx.CHANNEL(), ctx, "CHANNEL without CONTAINER");
         checkHasMandatoryOptions(ctx.BROWSETOKEN(), ctx, "BROWSETOKEN");
 
-        if (ctx.PROCESS().isEmpty()) {
-            // PROCESS can be its own command outside the context of CONTAINER or as part of that one.
-            checkHasExactlyOneOption("ACTIVITY, CONTAINER, EVENT or TIMER", ctx, ctx.ACTIVITY(), ctx.CONTAINER(), ctx.EVENT(), ctx.TIMER());
-        }
+        checkHasExactlyOneOption("ACTIVITY, CONTAINER, PROCESS, EVENT or TIMER", ctx, ctx.ACTIVITY(), ctx.CONTAINER(), ctx.PROCESS(), ctx.EVENT(), ctx.TIMER());
 
     }
 
