@@ -304,8 +304,6 @@ public class CICSWebOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
         checkHasMandatoryOptions(ctx.URL(), ctx, "URL");
         checkHasMandatoryOptions(ctx.URLLENGTH(), ctx, "URLLENGTH");
 
-        checkPrerequisiteIsMet(ctx.URL(), ctx.URLLENGTH(), ctx, "URL");
-
         checkPrerequisiteIsMet(ctx.HOST(), ctx.HOSTLENGTH(), ctx, "HOSTLENGTH without HOST");
         checkPrerequisiteIsMet(ctx.HOST(), ctx.HOSTTYPE(), ctx, "HOSTTYPE without HOST");
 
