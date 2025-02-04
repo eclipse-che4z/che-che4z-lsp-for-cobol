@@ -101,7 +101,7 @@ public class CICSStartOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
             checkHasAtLeastOneOption("HOURS, MINUTES or SECONDS", ctx, ctx.HOURS(), ctx.MINUTES(), ctx.SECONDS());
         }
 
-        checkAllOptionsArePresentOrAbsent("FROM and LENGTH", ctx, ctx.FROM(), ctx.LENGTH());
+        checkPrerequisiteIsMet(ctx.FROM(), ctx.LENGTH(), ctx, "LENGTH without FROM");
         checkPrerequisiteIsMet(ctx.LENGTH(), ctx.FMH(), ctx, "FMH without LENGTH");
     }
 
