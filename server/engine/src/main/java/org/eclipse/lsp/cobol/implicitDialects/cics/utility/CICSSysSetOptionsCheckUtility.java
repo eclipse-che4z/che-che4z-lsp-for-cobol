@@ -1088,8 +1088,7 @@ public class CICSSysSetOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     private void checkJournalname(CICSParser.Cics_set_journalnameContext ctx) {
         checkHasMandatoryOptions(ctx.JOURNALNAME(), ctx, "JOURNALNAME");
 
-        checkHasExactlyOneOption("ACTION, FLUSH or RESET", ctx, ctx.ACTION(), ctx.FLUSH(), ctx.RESET());
-        checkHasExactlyOneOption("STATUS, DISABLED or ENABLED", ctx, ctx.STATUS(), ctx.DISABLED(), ctx.ENABLED());
+        checkMutuallyExclusiveOptions("ACTION, FLUSH, RESET, STATUS, DISABLED or ENABLED", ctx.ACTION(), ctx.FLUSH(), ctx.RESET(), ctx.STATUS(), ctx.DISABLED(), ctx.ENABLED());
     }
 
     private void checkJournalnum(CICSParser.Cics_set_journalnumContext ctx) {

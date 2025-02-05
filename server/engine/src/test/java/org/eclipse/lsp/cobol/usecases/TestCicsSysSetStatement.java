@@ -198,8 +198,8 @@ public class TestCicsSysSetStatement {
     private static final String IPCONN_INVALID_1 = "SET IPCONN({$varOne}) ACQUIRED {RELEASED|errorOne}";
     private static final String IPCONN_INVALID_2 = "SET IPCONN({$varOne}) CANCEL {FORCECANCEL|errorOne}";
     private static final String IRC_INVALID_1 = "SET IRC CLOSED {OPEN|errorOne}";
-    private static final String JOURNALNAME_INVALID_1 = "SET JOURNALNAME({$varOne}) {FLUSH|errorOne} {RESET|errorOne} ENABLED";
-    private static final String JOURNALNAME_INVALID_2 = "SET {_JOURNALNAME({$varOne}) FLUSH|errorOne_}";
+    private static final String JOURNALNAME_INVALID_1 = "SET JOURNALNAME({$varOne}) FLUSH {RESET|errorOne} ENABLED";
+    private static final String JOURNALNAME_INVALID_2 = "SET JOURNALNAME({$varOne}) FLUSH {STATUS|errorOne}({$varOne})";
     //private static final String JOURNALNUM_INVALID_1 = "SET JOURNALNUM ";
     private static final String JVMENDPOINT_INVALID_1 = "SET {_JVMENDPOINT({$varOne}) ENABLED|errorOne_}";
     private static final String JVMENDPOINT_INVALID_2 = "SET {_JVMENDPOINT({$varOne}) JVMSERVER({$varOne} )|errorOne_}";
@@ -797,8 +797,8 @@ public class TestCicsSysSetStatement {
 
     @Test
     void testCicsJournalnameInvalid() {
-        testSingleError(JOURNALNAME_INVALID_1, "Exactly one option required, options are mutually exclusive: ACTION, FLUSH or RESET");
-        testSingleError(JOURNALNAME_INVALID_2, "Exactly one option required, none provided: STATUS, DISABLED or ENABLED");
+        testSingleError(JOURNALNAME_INVALID_1, "Options \"ACTION, FLUSH, RESET, STATUS, DISABLED or ENABLED\" are mutually exclusive.");
+        testSingleError(JOURNALNAME_INVALID_2, "Options \"ACTION, FLUSH, RESET, STATUS, DISABLED or ENABLED\" are mutually exclusive.");
     }
 
     // See JOURNALNUM for JOURNALNAME tests due to NAME being obsolete.
