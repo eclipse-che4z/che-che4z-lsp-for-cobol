@@ -772,7 +772,7 @@ public class TestCicsSysSetStatement {
 
     @Test
     void testCicsEventprocessInvalid() {
-        testSingleError(EVENTPROCESS_INVALID_1, "Exactly one option required, options are mutually exclusive: EPSTATUS, STARTED, DRAIN or STOPPED");
+        testSingleError(EVENTPROCESS_INVALID_1, "Options \"EPSTATUS, STARTED, DRAIN or STOPPED\" are mutually exclusive.");
     }
 
     @Test

@@ -1039,7 +1039,7 @@ public class CICSSysSetOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     private void checkEventprocess(CICSParser.Cics_set_eventprocessContext ctx) {
         checkHasMandatoryOptions(ctx.EVENTPROCESS(), ctx, "EVENTPROCESS");
 
-        checkHasExactlyOneOption("EPSTATUS, STARTED, DRAIN or STOPPED", ctx, ctx.EPSTATUS(), ctx.STARTED(), ctx.DRAIN(), ctx.STOPPED());
+        checkMutuallyExclusiveOptions("EPSTATUS, STARTED, DRAIN or STOPPED", ctx.EPSTATUS(), ctx.STARTED(), ctx.DRAIN(), ctx.STOPPED());
     }
 
     private void checkFile(CICSParser.Cics_set_fileContext ctx) {
