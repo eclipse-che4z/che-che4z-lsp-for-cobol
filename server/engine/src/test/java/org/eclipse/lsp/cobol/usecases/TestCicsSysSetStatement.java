@@ -202,7 +202,7 @@ public class TestCicsSysSetStatement {
     private static final String JOURNALNAME_INVALID_2 = "SET JOURNALNAME({$varOne}) FLUSH {STATUS|errorOne}({$varOne})";
     //private static final String JOURNALNUM_INVALID_1 = "SET JOURNALNUM ";
     private static final String JVMENDPOINT_INVALID_1 = "SET {_JVMENDPOINT({$varOne}) ENABLED|errorOne_}";
-    private static final String JVMENDPOINT_INVALID_2 = "SET {_JVMENDPOINT({$varOne}) JVMSERVER({$varOne} )|errorOne_}";
+    private static final String JVMENDPOINT_INVALID_2 = "SET JVMENDPOINT({$varOne}) JVMSERVER({$varOne}) {ENABLED|errorOne} DISABLED";
     private static final String JVMSERVER_INVALID_1 = "SET JVMSERVER({$varOne}) {ENABLED|errorOne} {DISABLED|errorOne} PHASEOUT";
     private static final String JVMSERVER_INVALID_2 = "SET JVMSERVER({$varOne}) ENABLED PHASEOUT {PURGE|errorOne} ";
     private static final String LIBRARY_INVALID_1 = "SET LIBRARY({$varOne}) CRITICAL {NONCRITICAL|errorOne}";
@@ -806,7 +806,7 @@ public class TestCicsSysSetStatement {
     @Test
     void testCicsJvmendpointInvalid() {
         testSingleError(JVMENDPOINT_INVALID_1, "Missing required option: JVMSERVER");
-        testSingleError(JVMENDPOINT_INVALID_2, "Exactly one option required, none provided: ENABLESTATUS, ENABLED or DISABLED");
+        testSingleError(JVMENDPOINT_INVALID_2, "Options \"ENABLESTATUS, ENABLED or DISABLED\" are mutually exclusive.");
     }
 
     @Test
