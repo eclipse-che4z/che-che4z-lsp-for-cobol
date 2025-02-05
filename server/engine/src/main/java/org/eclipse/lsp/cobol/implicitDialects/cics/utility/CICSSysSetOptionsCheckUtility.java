@@ -1108,7 +1108,7 @@ public class CICSSysSetOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     private void checkJvmendpoint(CICSParser.Cics_set_jvmendpointContext ctx) {
         checkHasMandatoryOptions(ctx.JVMENDPOINT(), ctx, "JVMENDPOINT");
         checkHasMandatoryOptions(ctx.JVMSERVER(), ctx, "JVMSERVER");
-        checkHasExactlyOneOption("ENABLESTATUS, ENABLED or DISABLED", ctx, ctx.ENABLESTATUS(), ctx.DISABLED(), ctx.ENABLED());
+        checkMutuallyExclusiveOptions("ENABLESTATUS, ENABLED or DISABLED", ctx.ENABLESTATUS(), ctx.DISABLED(), ctx.ENABLED());
     }
 
     private void checkJvmserver(CICSParser.Cics_set_jvmserverContext ctx) {
