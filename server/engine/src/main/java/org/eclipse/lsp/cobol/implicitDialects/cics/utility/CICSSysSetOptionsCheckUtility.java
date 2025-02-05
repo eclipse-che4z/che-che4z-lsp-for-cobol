@@ -1015,7 +1015,7 @@ public class CICSSysSetOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     private void checkEnqmodel(CICSParser.Cics_set_enqmodelContext ctx) {
         checkHasMandatoryOptions(ctx.ENQMODEL(), ctx, "ENQMODEL");
 
-        checkHasExactlyOneOption("STATUS, ENABLED or DISABLED", ctx, ctx.STATUS(), ctx.ENABLED(), ctx.DISABLED());
+        checkMutuallyExclusiveOptions("STATUS, ENABLED or DISABLED", ctx.STATUS(), ctx.ENABLED(), ctx.DISABLED());
     }
 
     private void checkEpadapter(CICSParser.Cics_set_epadapterContext ctx) {

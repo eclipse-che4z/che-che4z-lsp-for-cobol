@@ -187,7 +187,7 @@ public class TestCicsSysSetStatement {
     private static final String DSNAME_INVALID_2 = "SET DSNAME({$varOne}) QUIESCED {UNQUIESCED|errorOne}";
     private static final String DUMPDS_INVALID_1 = "SET DUMPDS {OPEN|errorOne} CLOSED";
     private static final String DUMPDS_INVALID_2 = "SET DUMPDS NOSWITCH {SWITCHNEXT|errorOne}";
-    private static final String ENQMODEL_INVALID_1 = "SET ENQMODEL({$varOne}) {_STATUS|errorOne_}({$varOne}) {DISABLED|errorOne}";
+    private static final String ENQMODEL_INVALID_1 = "SET ENQMODEL({$varOne}) STATUS({$varOne}) {DISABLED|errorOne}";
     private static final String EPADAPTER_INVALID_1 = "SET EPADAPTER({$varOne}) ENABLESTATUS({$varOne}) {ENABLED|errorOne}";
     //private static final String EPADAPTERSET_INVALID_1 = "SET EPADAPTERSET ";
     private static final String EVENTBINDING_INVALID_1 = "SET EVENTBINDING({$varOne}) ENABLESTATUS({$varOne}) {DISABLED|errorOne}";
@@ -755,7 +755,7 @@ public class TestCicsSysSetStatement {
 
     @Test
     void testCicsEnqmodelInvalid() {
-        testSingleError(ENQMODEL_INVALID_1, "Exactly one option required, options are mutually exclusive: STATUS, ENABLED or DISABLED");
+        testSingleError(ENQMODEL_INVALID_1, "Options \"STATUS, ENABLED or DISABLED\" are mutually exclusive.");
     }
 
     @Test
