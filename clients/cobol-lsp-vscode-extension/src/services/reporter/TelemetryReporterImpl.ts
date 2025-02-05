@@ -80,7 +80,7 @@ export class TelemetryReporterImpl implements TelemetryReport {
   }
 
   public async dispose(): Promise<void> {
-    this.reporter && (await this.reporter.dispose());
+    if (this.reporter) await this.reporter.dispose();
   }
 
   private isValidTelemetryKey(): boolean {
