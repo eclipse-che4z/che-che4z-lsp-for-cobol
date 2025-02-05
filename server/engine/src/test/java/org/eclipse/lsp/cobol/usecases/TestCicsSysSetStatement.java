@@ -191,7 +191,7 @@ public class TestCicsSysSetStatement {
     private static final String EPADAPTER_INVALID_1 = "SET EPADAPTER({$varOne}) ENABLESTATUS({$varOne}) {ENABLED|errorOne}";
     //private static final String EPADAPTERSET_INVALID_1 = "SET EPADAPTERSET ";
     private static final String EVENTBINDING_INVALID_1 = "SET EVENTBINDING({$varOne}) ENABLESTATUS({$varOne}) {DISABLED|errorOne}";
-    private static final String EVENTPROCESS_INVALID_1 = "SET EVENTPROCESS {STARTED|errorOne} {STOPPED|errorOne}";
+    private static final String EVENTPROCESS_INVALID_1 = "SET EVENTPROCESS STARTED {STOPPED|errorOne}";
     private static final String FILE_INVALID_1 = "SET FILE({$varOne}) ADDABLE {NOTADDABLE|errorOne}";
     private static final String FILE_INVALID_2 = "SET FILE({$varOne}) CICSTABLE {NOTTABLE|errorOne}";
     //private static final String HOST_INVALID_1 = "SET HOST ";
