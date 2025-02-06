@@ -262,7 +262,7 @@ public class CICSWebOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
         // HTTP Server
         if (!ctx.REQUESTTYPE().isEmpty() || !ctx.HTTPMETHOD().isEmpty() || !ctx.METHODLENGTH().isEmpty() || !ctx.QUERYSTRING().isEmpty() || !ctx.QUERYSTRLEN().isEmpty()) {
             checkPrerequisiteIsMet(ctx.HTTPMETHOD(), ctx.METHODLENGTH(), ctx, "METHODLENGTH without HTTPMETHOD");
-            checkPrerequisiteIsMet(ctx.QUERYSTRING(), ctx.QUERYSTRLEN(), ctx, "QUERYSTRLEN without QUERYSTRING");
+            checkAllOptionsArePresentOrAbsent("QUERYSTRING and QUERYSTRLEN", ctx, ctx.QUERYSTRING(), ctx.QUERYSTRLEN() );
 
             checkAllOptionsArePresentOrAbsent("HTTPMETHOD and METHODLENGTH", ctx, ctx.HTTPMETHOD(), ctx.METHODLENGTH());
 
@@ -274,7 +274,7 @@ public class CICSWebOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
         // HTTP Client
         if (!ctx.SESSTOKEN().isEmpty() || !ctx.REALM().isEmpty() || !ctx.REALMLEN().isEmpty()) {
             checkHasMandatoryOptions(ctx.SESSTOKEN(), ctx, "SESSTOKEN");
-            checkPrerequisiteIsMet(ctx.REALM(), ctx.REALMLEN(), ctx, "REALMLEN without REALM");
+            checkAllOptionsArePresentOrAbsent("REALM and REALMLEN", ctx, ctx.REALM(), ctx.REALMLEN());
 
             checkHasIllegalOptions(ctx.REQUESTTYPE(), "REQUESTTYPE");
             checkHasIllegalOptions(ctx.HTTPMETHOD(), "HTTPMETHOD");
