@@ -60,6 +60,8 @@ public class CICSFreeMainOptionsCheckUtility extends CICSOptionsCheckBaseUtility
         checkDuplicates(ctx);
     }
     private void checkOpts(CICSParser.Cics_freemain_optsContext ctx) {
+        CICSParser.Cics_freemainContext parentCtx = (CICSParser.Cics_freemainContext) ctx.getParent();
+        checkHasIllegalOptions(parentCtx.FREEMAIN64(), "FREEMAIN64 is only available in Assembly");
         checkHasExactlyOneOption("DATA or DATAPOINTER", ctx, ctx.DATA(), ctx.DATAPOINTER());
     }
 
