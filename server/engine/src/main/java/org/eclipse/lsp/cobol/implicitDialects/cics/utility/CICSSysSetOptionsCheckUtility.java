@@ -1154,7 +1154,7 @@ public class CICSSysSetOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
         checkHasMandatoryOptions(ctx.MQCONN(), ctx, "MQCONN");
 
         if (!ctx.WAIT().isEmpty() || !ctx.BUSY().isEmpty() || !ctx.NOWAIT().isEmpty() || !ctx.FORCE().isEmpty())
-            checkHasExactlyOneOption("CONNECTST, CONNECTED or NOTCONNECTED", ctx, ctx.CONNECTST(), ctx.CONNECTED(), ctx.NOTCONNECTED());
+            checkMutuallyExclusiveOptions("CONNECTST, CONNECTED or NOTCONNECTED", ctx.CONNECTST(), ctx.CONNECTED(), ctx.NOTCONNECTED());
 
         checkMutuallyExclusiveOptions("WAIT, BUSY, NOWAIT or FORCE", ctx.WAIT(), ctx.BUSY(), ctx.NOWAIT(), ctx.FORCE());
         checkMutuallyExclusiveOptions("CONNECTST, CONNECTED or NOTCONNECTED", ctx.CONNECTST(), ctx.CONNECTED(), ctx.NOTCONNECTED());

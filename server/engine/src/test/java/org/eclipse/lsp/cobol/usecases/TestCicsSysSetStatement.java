@@ -211,7 +211,7 @@ public class TestCicsSysSetStatement {
     private static final String MODENAME_INVALID_2 = "SET {_MODENAME({$varOne}) CONNECTION({$varOne}) CLOSED ACQUIRED|errorOne_}";
     private static final String MONITOR_INVALID_1 = "SET MONITOR ON {OFF|errorOne}";
     private static final String MONITOR_INVALID_2 = "SET MONITOR FREQUENCY({$varOne}) {FREQUENCYMIN|errorOne}({$varOne})";
-    private static final String MQCONN_INVALID_1 = "SET {_MQCONN WAIT RESYNC|errorOne_}";
+    private static final String MQCONN_INVALID_1 = "SET MQCONN WAIT CONNECTST({$varOne}) {CONNECTED|errorOne}";
     private static final String MQCONN_INVALID_2 = "SET MQCONN RESYNC {NORESYNC|errorOne}";
     private static final String MQMONITOR_INVALID_1 = "SET {_MQMONITOR({$varOne}) AUTOSTATUS({$varOne}) STOPPED|errorOne_}";
     private static final String MQMONITOR_INVALID_2 = "SET {_MQMONITOR({$varOne}) ENABLED MONSTATUS({$varOne} )|errorOne_}";
@@ -835,7 +835,7 @@ public class TestCicsSysSetStatement {
 
     @Test
     void testCicsMqconnInvalid() {
-        testSingleError(MQCONN_INVALID_1, "Exactly one option required, none provided: CONNECTST, CONNECTED or NOTCONNECTED");
+        testSingleError(MQCONN_INVALID_1, "Options \"CONNECTST, CONNECTED or NOTCONNECTED\" are mutually exclusive.");
         testSingleError(MQCONN_INVALID_2, "Options \"RESYNCMEMBER, RESYNC, NORESYNC or GROUPRESYNC\" are mutually exclusive.");
     }
 
