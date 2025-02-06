@@ -1226,12 +1226,9 @@ public class CICSSysSetOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     private void checkSecrecording(CICSParser.Cics_set_secrecordingContext ctx) {
         checkHasMandatoryOptions(ctx.SECRECORDING(), ctx, "SECRECORDING");
 
-        checkPrerequisiteIsMet(ctx.ADD(), ctx.MAXIMUM(), ctx, "MAXIMUM without ADD");
+        checkAllOptionsArePresentOrAbsent("ADD and MAXIMUM", ctx, ctx.ADD(), ctx.MAXIMUM());
 
-        checkMutuallyExclusiveOptions("ACTION, ADD MAXIMUM, MODIFY or REMOVE", ctx.ACTION(), ctx.ADD(), ctx.MODIFY(), ctx.REMOVE());
-        checkMutuallyExclusiveOptions("ODADPTRID, ODADPTRDATA1, ODADPTRDATA2, ODADPTRDATA3, ODAPPLID, ODCLNTIPADDR, ODCLNTPORT, ODFACILNAME, ODFACILTYPE, ODIPFAMILY, ODLUNAME, ODNETID, ODNETWORKID, ODSERVERPORT, ODTCPIPS, ODTRANSID or ODUSERID",
-                ctx.ODADPTRID(), ctx.ODADPTRDATA1(), ctx.ODADPTRDATA2(), ctx.ODADPTRDATA3(), ctx.ODAPPLID(), ctx.ODCLNTIPADDR(), ctx.ODCLNTPORT(), ctx.ODFACILNAME(), ctx.ODFACILTYPE(), ctx.ODIPFAMILY(), ctx.ODLUNAME(), ctx.ODNETID(),
-                ctx.ODNETWORKID(), ctx.ODSERVERPORT(), ctx.ODTCPIPS(), ctx.ODTRANSID(), ctx.ODUSERID());
+        checkHasExactlyOneOption("ACTION, ADD MAXIMUM, MODIFY or REMOVE", ctx, ctx.ACTION(), ctx.ADD(), ctx.MODIFY(), ctx.REMOVE());
     }
 
     private void checkStatistics(CICSParser.Cics_set_statisticsContext ctx) {

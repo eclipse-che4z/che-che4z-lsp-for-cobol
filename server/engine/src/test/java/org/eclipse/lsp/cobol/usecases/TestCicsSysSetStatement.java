@@ -83,8 +83,8 @@ public class TestCicsSysSetStatement {
     private static final String IPCONN_VALID_2 = "SET IPCONN({$varOne}) CONNSTATUS({$varOne}) PENDSTATUS({$varOne}) CANCEL NORECOVDATA INSERVICE BACKOUT";
     private static final String IRC_VALID_1 = "SET IRC";
     private static final String IRC_VALID_2 = "SET IRC OPENSTATUS({$varOne})";
-    private static final String JOURNALNAME_VALID_1 = "SET JOURNALNAME({$varOne}) ACTION({$varOne}) STATUS({$varOne})";
-    private static final String JOURNALNAME_VALID_2 = "SET JOURNALNAME({$varOne}) FLUSH ENABLED";
+    private static final String JOURNALNAME_VALID_1 = "SET JOURNALNAME({$varOne}) ACTION({$varOne})";
+    private static final String JOURNALNAME_VALID_2 = "SET JOURNALNAME({$varOne}) FLUSH";
     //private static final String JOURNALNUM_VALID_1 = "SET JOURNALNUM ";
     private static final String JVMENDPOINT_VALID_1 = "SET JVMENDPOINT({$varOne}) JVMSERVER({$varOne}) DISABLED";
     private static final String JVMENDPOINT_VALID_2 = "SET JVMENDPOINT({$varOne}) JVMSERVER({$varOne}) ENABLED";
@@ -112,7 +112,7 @@ public class TestCicsSysSetStatement {
     private static final String PROGRAM_VALID_2 = "SET PROGRAM({$varOne}) CEDF NEWCOPY DPLSUBSET JVMCLASS({$varOne}) JVMPROFILE({$varOne}) OPERATION({$varOne}) REPLICATOR JVM SHARESTATUS({$varOne}) STATUS({$varOne}) VERSION({$varOne})";
     private static final String SECDISCOVERY_VALID_1 = "SET SECDISCOVERY";
     private static final String SECDISCOVERY_VALID_2 = "SET SECDISCOVERY STATUS({$varOne}) CMD({$varOne}) DB2({$varOne}) DCT({$varOne}) FCT({$varOne}) HFS({$varOne}) JCT({$varOne}) PCT({$varOne}) PPT({$varOne}) PSB({$varOne}) RES({$varOne}) TST({$varOne}) USER({$varOne})";
-    private static final String SECRECORDING_VALID_1 = "SET SECRECORDING({$varOne})";
+    private static final String SECRECORDING_VALID_1 = "SET SECRECORDING({$varOne}) REMOVE";
     private static final String SECRECORDING_VALID_2 = "SET SECRECORDING({$varOne}) ADD MAXIMUM({$varOne}) ODTCPIPS({$varOne})";
     private static final String STATISTICS_VALID_1 = "SET STATISTICS";
     private static final String STATISTICS_VALID_2 = "SET STATISTICS ENDOFDAY({$varOne}) INTERVAL({$varOne}) RECORDING({$varOne}) RECORDNOW RESETNOW";
@@ -224,8 +224,8 @@ public class TestCicsSysSetStatement {
     private static final String PROGRAM_INVALID_2 = "SET PROGRAM({$varOne}) JVM {NOJVM|errorOne}";
     private static final String SECDISCOVERY_INVALID_1 = "SET SECDISCOVERY ON {OFF|errorOne}";
     private static final String SECDISCOVERY_INVALID_2 = "SET SECDISCOVERY CMD({$varOne}) {DISCOVERALL|errorOne}";
-    private static final String SECRECORDING_INVALID_1 = "SET {_SECRECORDING({$varOne}) MAXIMUM({$varOne} )|errorOne_}";
-    private static final String SECRECORDING_INVALID_2 = "SET SECRECORDING({$varOne}) ODADPTRID({$varOne}) {ODADPTRDATA1|errorOne}({$varOne})";
+    private static final String SECRECORDING_INVALID_1 = "SET {_SECRECORDING({$varOne}) MAXIMUM({$varOne})|errorOne|errorTwo_}";
+    private static final String SECRECORDING_INVALID_2 = "SET SECRECORDING({$varOne}) {ACTION|errorOne}({$varOne}) {ADD|errorOne} MAXIMUM({$varOne})";
     private static final String STATISTICS_INVALID_1 = "SET STATISTICS ENDOFDAY({$varOne}) {ENDOFDAYHRS|errorOne}({$varOne})";
     private static final String STATISTICS_INVALID_2 = "SET {_STATISTICS RECORDNOW|errorOne_}";
     private static final String SYSDUMPCODE_INVALID_1 = "SET SYSDUMPCODE({$varOne}) ADD {REMOVE|errorOne}";
@@ -880,8 +880,8 @@ public class TestCicsSysSetStatement {
 
     @Test
     void testCicsSecrecordingInvalid() {
-        testSingleError(SECRECORDING_INVALID_1, "Missing required option for: MAXIMUM without ADD");
-        testSingleError(SECRECORDING_INVALID_2, "Options \"ODADPTRID, ODADPTRDATA1, ODADPTRDATA2, ODADPTRDATA3, ODAPPLID, ODCLNTIPADDR, ODCLNTPORT, ODFACILNAME, ODFACILTYPE, ODIPFAMILY, ODLUNAME, ODNETID, ODNETWORKID, ODSERVERPORT, ODTCPIPS, ODTRANSID or ODUSERID\" are mutually exclusive.");
+        testTwoErrors(SECRECORDING_INVALID_1, "Exactly one option required, none provided: ACTION, ADD MAXIMUM, MODIFY or REMOVE", "If one option is specified, all options must be present: ADD and MAXIMUM");
+        testSingleError(SECRECORDING_INVALID_2, "Exactly one option required, options are mutually exclusive: ACTION, ADD MAXIMUM, MODIFY or REMOVE");
     }
 
     @Test
