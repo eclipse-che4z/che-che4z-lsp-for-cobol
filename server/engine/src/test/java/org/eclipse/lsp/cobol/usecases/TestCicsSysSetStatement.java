@@ -203,7 +203,7 @@ public class TestCicsSysSetStatement {
     //private static final String JOURNALNUM_INVALID_1 = "SET JOURNALNUM ";
     private static final String JVMENDPOINT_INVALID_1 = "SET {_JVMENDPOINT({$varOne}) ENABLED|errorOne_}";
     private static final String JVMENDPOINT_INVALID_2 = "SET JVMENDPOINT({$varOne}) JVMSERVER({$varOne}) {ENABLED|errorOne} DISABLED";
-    private static final String JVMSERVER_INVALID_1 = "SET JVMSERVER({$varOne}) {ENABLED|errorOne} {DISABLED|errorOne} PHASEOUT";
+    private static final String JVMSERVER_INVALID_1 = "SET JVMSERVER({$varOne}) ENABLED {DISABLED|errorOne} PHASEOUT";
     private static final String JVMSERVER_INVALID_2 = "SET JVMSERVER({$varOne}) ENABLED PHASEOUT {PURGE|errorOne} ";
     private static final String LIBRARY_INVALID_1 = "SET LIBRARY({$varOne}) CRITICAL {NONCRITICAL|errorOne}";
     private static final String LIBRARY_INVALID_2 = "SET LIBRARY({$varOne}) ENABLED {DISABLED|errorOne}";
@@ -811,7 +811,7 @@ public class TestCicsSysSetStatement {
 
     @Test
     void testCicsJvmserverInvalid() {
-        testSingleError(JVMSERVER_INVALID_1, "Exactly one option required, options are mutually exclusive: ENABLESTATUS, ENABLED or DISABLED");
+        testSingleError(JVMSERVER_INVALID_1, "Options \"ENABLESTATUS, ENABLED or DISABLED\" are mutually exclusive.");
         testSingleError(JVMSERVER_INVALID_2, "Options \"PHASEOUT, PURGETYPE, PURGE, FORCEPURGE or KILL\" are mutually exclusive.");
     }
 

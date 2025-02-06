@@ -1115,7 +1115,7 @@ public class CICSSysSetOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
         checkHasMandatoryOptions(ctx.JVMSERVER(), ctx, "JVMSERVER");
 
         checkMutuallyExclusiveOptions("PHASEOUT, PURGETYPE, PURGE, FORCEPURGE or KILL", ctx.PHASEOUT(), ctx.PURGETYPE(), ctx.PURGE(), ctx.FORCEPURGE(), ctx.KILL());
-        checkHasExactlyOneOption("ENABLESTATUS, ENABLED or DISABLED", ctx, ctx.ENABLESTATUS(), ctx.DISABLED(), ctx.ENABLED());
+        checkMutuallyExclusiveOptions("ENABLESTATUS, ENABLED or DISABLED", ctx.ENABLESTATUS(), ctx.ENABLED(), ctx.DISABLED());
     }
 
     private void checkLibrary(CICSParser.Cics_set_libraryContext ctx) {
