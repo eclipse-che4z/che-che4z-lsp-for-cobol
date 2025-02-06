@@ -252,7 +252,7 @@ public class CICSWebOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
         checkHasMandatoryOptions(ctx.ENDBROWSE(), ctx, "ENDBROWSE");
         checkHasExactlyOneOption("FORMFIELD, HTTPHEADER, QUERYPARM", ctx, ctx.FORMFIELD(), ctx.HTTPHEADER(), ctx.QUERYPARM());
         checkPrerequisiteIsMet(ctx.HTTPHEADER(), ctx.SESSTOKEN(), ctx, "HTTPHEADER");
-        if (!ctx.FORMFIELD().isEmpty() || !ctx.HTTPHEADER().isEmpty()) {
+        if (!ctx.FORMFIELD().isEmpty() || !ctx.QUERYPARM().isEmpty()) {
             checkHasIllegalOptions(ctx.SESSTOKEN(), "SESSTOKEN");
         }
     }
@@ -452,7 +452,7 @@ public class CICSWebOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
             checkPrerequisiteIsMet(ctx.DOCTOKEN(), ctx.DOCDELETE(), ctx, "DOCDELETE without DOCTOKEN");
             checkPrerequisiteIsMet(ctx.DOCTOKEN(), ctx.DOCSTATUS(), ctx, "DOCSTATUS without DOCTOKEN");
             checkMutuallyExclusiveOptions("NODOCDELETE, DOCDELETE or DOCSTATUS", ctx.NODOCDELETE(), ctx.DOCDELETE(), ctx.DOCSTATUS());
-            
+
             checkMutuallyExclusiveOptions("CHUNKNO, CHUNKYES, CHUNKEND or CHUNKING", ctx.CHUNKNO(), ctx.CHUNKYES(), ctx.CHUNKEND(), ctx.CHUNKING());
 
             checkPrerequisiteIsMet(ctx.FROM(), ctx.HOSTCODEPAGE(), ctx, "HOSTCODEPAGE without FROM");
