@@ -300,14 +300,10 @@ public class CICSWebOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     private void checkParse(CICSParser.Cics_web_parseContext ctx) {
         checkHasMandatoryOptions(ctx.PARSE(), ctx, "PARSE");
         checkHasMandatoryOptions(ctx.URL(), ctx, "URL");
-        checkHasMandatoryOptions(ctx.URLLENGTH(), ctx, "URLLENGTH");
+        checkPrerequisiteIsMet(ctx.URL(), ctx.URLLENGTH(), ctx, "URLLENGTH without URL");
 
         checkPrerequisiteIsMet(ctx.HOST(), ctx.HOSTLENGTH(), ctx, "HOSTLENGTH without HOST");
         checkPrerequisiteIsMet(ctx.HOST(), ctx.HOSTTYPE(), ctx, "HOSTTYPE without HOST");
-
-        if (!ctx.HOST().isEmpty()) {
-            checkHasMandatoryOptions(ctx.HOSTLENGTH(), ctx, "HOSTLENGTH");
-        }
 
         checkPrerequisiteIsMet(ctx.PATH(), ctx.PATHLENGTH(), ctx, "PATHLENGTH without PATH");
         checkPrerequisiteIsMet(ctx.QUERYSTRING(), ctx.QUERYSTRLEN(), ctx, "QUERYSTRLEN without QUERYSTRING");
