@@ -257,7 +257,7 @@ public class TestCicsSysSetStatement {
     private static final String TRANSACTION_INVALID_2 = "SET TRANSACTION({$varOne}) SPECTRACE {SPRSTRACE|errorOne}";
     private static final String TSQUEUE_INVALID_1 = "SET {TSQUEUE|errorOne}({$varOne}) {TSQNAME|errorOne}({$varOne}) SYSID({$varOne})";
     private static final String TSQUEUE_INVALID_2 = "SET {_TSQUEUE({$varOne}) LASTUSEDINT({$varOne} )|errorOne_}";
-    private static final String UOW_INVALID_1 = "SET UOW({$varOne}) {COMMIT|errorOne} {FORCE|errorOne}";
+    private static final String UOW_INVALID_1 = "SET UOW({$varOne}) COMMIT {FORCE|errorOne}";
     private static final String UOWLINK_INVALID_1 = "SET UOWLINK({$varOne}) ACTION({$varOne}) {DELETE|errorOne}";
     private static final String URIMAP_INVALID_1 = "SET URIMAP({$varOne}) DISABLED {ENABLED|errorOne}";
     private static final String URIMAP_INVALID_2 = "SET URIMAP({$varOne}) PERMANENT {TEMPORARY|errorOne}";
@@ -985,7 +985,7 @@ public class TestCicsSysSetStatement {
 
     @Test
     void testCicsUowInvalid() {
-        testSingleError(UOW_INVALID_1, "Exactly one option required, options are mutually exclusive: UOWSTATE, COMMIT, BACKOUT or FORCE");
+        testSingleError(UOW_INVALID_1, "Options \"UOWSTATE, COMMIT, BACKOUT or FORCE\" are mutually exclusive.");
     }
 
     @Test

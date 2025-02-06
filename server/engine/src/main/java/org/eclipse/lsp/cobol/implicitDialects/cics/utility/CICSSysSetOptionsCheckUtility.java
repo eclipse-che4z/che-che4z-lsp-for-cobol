@@ -1450,7 +1450,7 @@ public class CICSSysSetOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     private void checkUow(CICSParser.Cics_set_uowContext ctx) {
         checkHasMandatoryOptions(ctx.UOW(), ctx, "UOW");
 
-        checkHasExactlyOneOption("UOWSTATE, COMMIT, BACKOUT or FORCE", ctx, ctx.UOWSTATE(), ctx.COMMIT(), ctx.BACKOUT(), ctx.FORCE());
+        checkMutuallyExclusiveOptions("UOWSTATE, COMMIT, BACKOUT or FORCE", ctx.UOWSTATE(), ctx.COMMIT(), ctx.BACKOUT(), ctx.FORCE());
     }
 
     private void checkUowlink(CICSParser.Cics_set_uowlinkContext ctx) {
