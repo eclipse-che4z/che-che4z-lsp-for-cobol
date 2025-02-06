@@ -291,12 +291,10 @@ public class CICSWebOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
 
     private void checkOpen(CICSParser.Cics_web_openContext ctx) {
         checkHasMandatoryOptions(ctx.OPEN(), ctx, "OPEN");
-        checkMutuallyExclusiveOptions("URIMAP or HOST", ctx.URIMAP(), ctx.HOST());
-
-        checkAllOptionsArePresentOrAbsent("HOST, HOSTLENGTH, PORTNUMBER, SCHEME", ctx, ctx.HOST(), ctx.HOSTLENGTH(), ctx.PORTNUMBER(), ctx.SCHEME());
+        checkHasExactlyOneOption("URIMAP or HOST", ctx, ctx.URIMAP(), ctx.HOST());
 
         checkHasMandatoryOptions(ctx.SESSTOKEN(), ctx, "SESSTOKEN");
-        checkPrerequisiteIsMet(ctx.HTTPVNUM(), ctx.HTTPRNUM(), ctx, "HTTPVNUM");
+        checkAllOptionsArePresentOrAbsent("HTTPVNUM and HTTPRNUM", ctx, ctx.HTTPVNUM(), ctx.HTTPRNUM());
     }
 
     private void checkParse(CICSParser.Cics_web_parseContext ctx) {
