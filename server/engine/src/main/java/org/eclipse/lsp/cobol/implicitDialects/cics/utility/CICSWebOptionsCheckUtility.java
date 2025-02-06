@@ -262,7 +262,7 @@ public class CICSWebOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
         // HTTP Server
         if (!ctx.REQUESTTYPE().isEmpty() || !ctx.HTTPMETHOD().isEmpty() || !ctx.METHODLENGTH().isEmpty() || !ctx.QUERYSTRING().isEmpty() || !ctx.QUERYSTRLEN().isEmpty()) {
             checkPrerequisiteIsMet(ctx.HTTPMETHOD(), ctx.METHODLENGTH(), ctx, "METHODLENGTH without HTTPMETHOD");
-            checkAllOptionsArePresentOrAbsent("QUERYSTRING and QUERYSTRLEN", ctx, ctx.QUERYSTRING(), ctx.QUERYSTRLEN() );
+            checkAllOptionsArePresentOrAbsent("QUERYSTRING and QUERYSTRLEN", ctx, ctx.QUERYSTRING(), ctx.QUERYSTRLEN());
 
             checkAllOptionsArePresentOrAbsent("HTTPMETHOD and METHODLENGTH", ctx, ctx.HTTPMETHOD(), ctx.METHODLENGTH());
 
@@ -355,7 +355,7 @@ public class CICSWebOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
 
     private void checkReceive(CICSParser.Cics_web_receiveContext ctx) {
         checkHasMandatoryOptions(ctx.RECEIVE(), ctx, "RECEIVE");
-        
+
         boolean isBuffer = false;
         boolean isContainer = false;
 
