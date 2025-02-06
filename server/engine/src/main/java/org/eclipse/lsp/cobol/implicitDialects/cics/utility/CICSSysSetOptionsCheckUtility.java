@@ -1165,13 +1165,8 @@ public class CICSSysSetOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
         checkHasMandatoryOptions(ctx.MQMONITOR(), ctx, "MQMONITOR");
 
         checkMutuallyExclusiveOptions("AUTOSTATUS, AUTOSTART or NOAUTOSTART", ctx.AUTOSTATUS(), ctx.AUTOSTART(), ctx.NOAUTOSTART());
-
-        if (!ctx.AUTOSTATUS().isEmpty() || !ctx.AUTOSTART().isEmpty() || !ctx.NOAUTOSTART().isEmpty() || !ctx.ENABLESTATUS().isEmpty() || !ctx.ENABLED().isEmpty()
-                || !ctx.DISABLED().isEmpty() || !ctx.MONSTATUS().isEmpty() || !ctx.STARTED().isEmpty() || !ctx.STOPPED().isEmpty()) {
-            checkHasExactlyOneOption("AUTOSTATUS, AUTOSTART or NOAUTOSTART", ctx, ctx.AUTOSTATUS(), ctx.AUTOSTART(), ctx.NOAUTOSTART());
-            checkHasExactlyOneOption("ENABLESTATUS, ENABLED or DISABLED", ctx, ctx.ENABLESTATUS(), ctx.ENABLED(), ctx.DISABLED());
-            checkHasExactlyOneOption("MONSTATUS, STARTED or STOPPED", ctx, ctx.MONSTATUS(), ctx.STARTED(), ctx.STOPPED());
-        }
+        checkMutuallyExclusiveOptions("ENABLESTATUS, ENABLED or DISABLED", ctx.ENABLESTATUS(), ctx.ENABLED(), ctx.DISABLED());
+        checkMutuallyExclusiveOptions("MONSTATUS, STARTED or STOPPED", ctx.MONSTATUS(), ctx.STARTED(), ctx.STOPPED());
     }
 
     private void checkNetname(CICSParser.Cics_set_netnameContext ctx) {

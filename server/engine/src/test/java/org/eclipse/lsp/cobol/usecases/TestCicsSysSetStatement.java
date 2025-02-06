@@ -213,8 +213,8 @@ public class TestCicsSysSetStatement {
     private static final String MONITOR_INVALID_2 = "SET MONITOR FREQUENCY({$varOne}) {FREQUENCYMIN|errorOne}({$varOne})";
     private static final String MQCONN_INVALID_1 = "SET MQCONN WAIT CONNECTST({$varOne}) {CONNECTED|errorOne}";
     private static final String MQCONN_INVALID_2 = "SET MQCONN RESYNC {NORESYNC|errorOne}";
-    private static final String MQMONITOR_INVALID_1 = "SET {_MQMONITOR({$varOne}) AUTOSTATUS({$varOne}) STOPPED|errorOne_}";
-    private static final String MQMONITOR_INVALID_2 = "SET {_MQMONITOR({$varOne}) ENABLED MONSTATUS({$varOne} )|errorOne_}";
+    private static final String MQMONITOR_INVALID_1 = "SET MQMONITOR({$varOne}) AUTOSTATUS({$varOne}) {AUTOSTART|errorOne}";
+    private static final String MQMONITOR_INVALID_2 = "SET MQMONITOR({$varOne}) ENABLED MONSTATUS({$varOne}) {STOPPED|errorOne}";
     private static final String NETNAME_INVALID_1 = "SET NETNAME({$varOne}) EXITTRACE {NOEXITTRACE|errorOne}";
     private static final String OTEL_INVALID_1 = "SET OTEL {OTEL|errorOne}";
     private static final String PIPELINE_INVALID_1 = "SET PIPELINE({$varOne}) ENABLED {DISABLED|errorOne}";
@@ -841,8 +841,8 @@ public class TestCicsSysSetStatement {
 
     @Test
     void testCicsMqmonitorInvalid() {
-        testSingleError(MQMONITOR_INVALID_1, "Exactly one option required, none provided: ENABLESTATUS, ENABLED or DISABLED");
-        testSingleError(MQMONITOR_INVALID_2, "Exactly one option required, none provided: AUTOSTATUS, AUTOSTART or NOAUTOSTART");
+        testSingleError(MQMONITOR_INVALID_1, "Options \"AUTOSTATUS, AUTOSTART or NOAUTOSTART\" are mutually exclusive.");
+        testSingleError(MQMONITOR_INVALID_2, "Options \"MONSTATUS, STARTED or STOPPED\" are mutually exclusive.");
     }
 
     @Test
