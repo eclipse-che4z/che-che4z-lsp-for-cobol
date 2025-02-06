@@ -446,17 +446,13 @@ public class CICSWebOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
             checkMutuallyExclusiveOptions("CLICONVERT, NOCLICONVERT, CLIENTCONV", ctx.CLICONVERT(), ctx.NOCLICONVERT(), ctx.CLIENTCONV());
         } else {
             // Server
-            checkHasExactlyOneOption("DOCTOKEN, FROM or CONTAINER", ctx, ctx.DOCTOKEN(), ctx.FROM(), ctx.CONTAINER());
+            checkMutuallyExclusiveOptions("DOCTOKEN, FROM or CONTAINER", ctx.DOCTOKEN(), ctx.FROM(), ctx.CONTAINER());
 
             checkPrerequisiteIsMet(ctx.DOCTOKEN(), ctx.NODOCDELETE(), ctx, "NODOCDELETE without DOCTOKEN");
             checkPrerequisiteIsMet(ctx.DOCTOKEN(), ctx.DOCDELETE(), ctx, "DOCDELETE without DOCTOKEN");
             checkPrerequisiteIsMet(ctx.DOCTOKEN(), ctx.DOCSTATUS(), ctx, "DOCSTATUS without DOCTOKEN");
             checkMutuallyExclusiveOptions("NODOCDELETE, DOCDELETE or DOCSTATUS", ctx.NODOCDELETE(), ctx.DOCDELETE(), ctx.DOCSTATUS());
-
-            checkPrerequisiteIsMet(ctx.FROM(), ctx.CHUNKNO(), ctx, "CHUNKNO without FROM");
-            checkPrerequisiteIsMet(ctx.FROM(), ctx.CHUNKYES(), ctx, "CHUNKYES without FROM");
-            checkPrerequisiteIsMet(ctx.FROM(), ctx.CHUNKEND(), ctx, "CHUNKEND without FROM");
-            checkPrerequisiteIsMet(ctx.FROM(), ctx.CHUNKING(), ctx, "CHUNKING without FROM");
+            
             checkMutuallyExclusiveOptions("CHUNKNO, CHUNKYES, CHUNKEND or CHUNKING", ctx.CHUNKNO(), ctx.CHUNKYES(), ctx.CHUNKEND(), ctx.CHUNKING());
 
             checkPrerequisiteIsMet(ctx.FROM(), ctx.HOSTCODEPAGE(), ctx, "HOSTCODEPAGE without FROM");
