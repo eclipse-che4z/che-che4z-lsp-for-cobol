@@ -1296,8 +1296,6 @@ public class CICSSysSetOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     private void checkTcpipservice(CICSParser.Cics_set_tcpipserviceContext ctx) {
         checkHasMandatoryOptions(ctx.TCPIPSERVICE(), ctx, "TCPIPSERVICE");
 
-        checkHasMandatoryOptions(ctx.BACKLOG(), ctx, "BACKLOG");
-        checkHasMandatoryOptions(ctx.MAXDATALEN(), ctx, "MAXDATALEN");
         checkMutuallyExclusiveOptions("OPENSTATUS, CLOSED, IMMCLOSE or OPEN", ctx.OPENSTATUS(), ctx.CLOSED(), ctx.IMMCLOSE(), ctx.OPEN());
     }
 

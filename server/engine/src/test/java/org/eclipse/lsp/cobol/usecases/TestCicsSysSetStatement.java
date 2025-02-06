@@ -238,8 +238,7 @@ public class TestCicsSysSetStatement {
     //private static final String TCLASS_INVALID_1 = "SET TCLASS ";
     //private static final String TCLASS_INVALID_2 = "SET TCLASS ";
     private static final String TCPIP_INVALID_1 = "SET TCPIP MAXSOCKETS({$varOne}) NEWMAXSOCKET({$varOne}) CLOSED {OPEN|errorOne} ";
-    private static final String TCPIPSERVICE_INVALID_1 = "SET {_TCPIPSERVICE({$varOne}) MAXDATALEN({$varOne} )|errorOne_}";
-    private static final String TCPIPSERVICE_INVALID_2 = "SET TCPIPSERVICE({$varOne}) BACKLOG({$varOne}) MAXDATALEN({$varOne}) CLOSED {OPEN|errorOne}";
+    private static final String TCPIPSERVICE_INVALID_1 = "SET TCPIPSERVICE({$varOne}) BACKLOG({$varOne}) MAXDATALEN({$varOne}) CLOSED {OPEN|errorOne}";
     private static final String TDQUEUE_INVALID_1 = "SET TDQUEUE({$varOne}) TERMINAL {NOTERMINAL|errorOne}";
     private static final String TDQUEUE_INVALID_2 = "SET TDQUEUE({$varOne}) {DISABLED|errorOne} ENABLED";
     private static final String TEMPSTORAGE_INVALID_1 = "SET {TEMPSTORAGE|errorOne} {NORESP|errorTwo}";
@@ -923,8 +922,7 @@ public class TestCicsSysSetStatement {
 
     @Test
     void testCicsTcpipserviceInvalid() {
-        testSingleError(TCPIPSERVICE_INVALID_1, "Missing required option: BACKLOG");
-        testSingleError(TCPIPSERVICE_INVALID_2, "Options \"OPENSTATUS, CLOSED, IMMCLOSE or OPEN\" are mutually exclusive.");
+        testSingleError(TCPIPSERVICE_INVALID_1, "Options \"OPENSTATUS, CLOSED, IMMCLOSE or OPEN\" are mutually exclusive.");
     }
 
     @Test
