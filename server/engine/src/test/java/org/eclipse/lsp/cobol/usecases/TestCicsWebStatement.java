@@ -95,7 +95,7 @@ public class TestCicsWebStatement {
     private static final String CLOSE_INVALID = WEB + "{CLOSE|errorOne}";
     private static final String READ_QUERYPARM_INVALID = WEB_READ + "QUERYPARM({$varOne}) NAMELENGTH({$varOne}) {SESSTOKEN|errorOne}({$varOne}) VALUE({$varOne}) VALUELENGTH({$varOne})";
     private static final String READNEXT_QUERYPARM_INVALID = WEB_READNEXT + "QUERYPARM({$varOne}) NAMELENGTH({$varOne}) {SESSTOKEN|errorOne}({$varOne}) VALUE({$varOne}) VALUELENGTH({$varOne})";
-    private static final String SEND_SERVER_INVALID = WEB + "SEND {DOCTOKEN|errorOne}({$varOne}) {FROM|errorOne}({$varOne}) FROMLENGTH({$varOne}) NODOCDELETE MEDIATYPE({$varOne}) SRVCONVERT CHARACTERSET({$varOne}) STATUSCODE({$varOne}) STATUSTEXT({$varOne}) STATUSLEN({$varOne}) IMMEDIATE NOCLOSE";
+    private static final String SEND_SERVER_INVALID = WEB + "SEND DOCTOKEN({$varOne}) {FROM|errorOne}({$varOne}) FROMLENGTH({$varOne}) NODOCDELETE MEDIATYPE({$varOne}) SRVCONVERT CHARACTERSET({$varOne}) STATUSCODE({$varOne}) STATUSTEXT({$varOne}) STATUSLEN({$varOne}) IMMEDIATE NOCLOSE";
 
 
 
@@ -198,7 +198,7 @@ public class TestCicsWebStatement {
     @Test
     void testSendServerInvalid() {
         HashMap<String, Diagnostic> expectedDiagnostics = new HashMap<>();
-        expectedDiagnostics.put("errorOne", new Diagnostic(new Range(), "Exactly one option required, options are mutually exclusive: DOCTOKEN, FROM or CONTAINER", DiagnosticSeverity.Error, ErrorSource.PARSING.getText()));
+        expectedDiagnostics.put("errorOne", new Diagnostic(new Range(), "Options \"DOCTOKEN, FROM or CONTAINER\" are mutually exclusive.", DiagnosticSeverity.Error, ErrorSource.PARSING.getText()));
         CICSTestUtils.errorTest(SEND_SERVER_INVALID, expectedDiagnostics);
     }
 
