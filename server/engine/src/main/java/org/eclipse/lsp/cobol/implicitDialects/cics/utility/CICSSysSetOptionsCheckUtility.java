@@ -1309,8 +1309,6 @@ public class CICSSysSetOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
 
     private void checkTempstorage(CICSParser.Cics_set_tempstorageContext ctx) {
         checkHasMandatoryOptions(ctx.TEMPSTORAGE(), ctx, "TEMPSTORAGE");
-
-        checkHasMandatoryOptions(ctx.TSMAINLIMIT(), ctx, "TSMAINLIMIT");
     }
 
     private void checkTerminal(CICSParser.Cics_set_terminalContext ctx) {

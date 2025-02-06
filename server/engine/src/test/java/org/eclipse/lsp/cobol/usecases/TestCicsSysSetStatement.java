@@ -241,7 +241,7 @@ public class TestCicsSysSetStatement {
     private static final String TCPIPSERVICE_INVALID_1 = "SET TCPIPSERVICE({$varOne}) BACKLOG({$varOne}) MAXDATALEN({$varOne}) CLOSED {OPEN|errorOne}";
     private static final String TDQUEUE_INVALID_1 = "SET TDQUEUE({$varOne}) TERMINAL {NOTERMINAL|errorOne}";
     private static final String TDQUEUE_INVALID_2 = "SET TDQUEUE({$varOne}) {DISABLED|errorOne} ENABLED";
-    private static final String TEMPSTORAGE_INVALID_1 = "SET {TEMPSTORAGE|errorOne} {NORESP|errorTwo}";
+    //private static final String TEMPSTORAGE_INVALID_1 = "SET TEMPSTORAGE ";
     private static final String TERMINAL_INVALID_1 = "SET TERMINAL({$varOne}) NOTTI {TTI|errorOne}";
     private static final String TERMINAL_INVALID_2 = "SET {_TERMINAL({$varOne}) FORCE|errorOne_}";
     private static final String TRACEDEST_INVALID_1 = "SET TRACEDEST INTSTART {INTSTOP|errorOne}";
@@ -933,7 +933,7 @@ public class TestCicsSysSetStatement {
 
     @Test
     void testCicsTempstorageInvalid() {
-        testTwoErrors(TEMPSTORAGE_INVALID_1, "Missing required option: TSMAINLIMIT", "Extraneous input NORESP");
+        // No checks other than duplicates
     }
 
     @Test
