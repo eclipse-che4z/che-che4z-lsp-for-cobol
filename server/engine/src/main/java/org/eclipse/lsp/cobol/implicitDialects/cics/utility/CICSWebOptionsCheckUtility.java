@@ -409,7 +409,7 @@ public class CICSWebOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
         checkHasMandatoryOptions(ctx.SEND(), ctx, "SEND");
         if (!ctx.SESSTOKEN().isEmpty()) {
             // Client
-            checkHasExactlyOneOption("GET, HEAD, PATCH, POST, PUT, TRACE, OPTIONS, DELETE or METHOD", ctx, ctx.GET(), ctx.HEAD(), ctx.PATCH(), ctx.POST(), ctx.PUT(), ctx.TRACE(), ctx.OPTIONS(), ctx.DELETE(), ctx.METHOD());
+            checkMutuallyExclusiveOptions("GET, HEAD, PATCH, POST, PUT, TRACE, OPTIONS, DELETE or METHOD", ctx.GET(), ctx.HEAD(), ctx.PATCH(), ctx.POST(), ctx.PUT(), ctx.TRACE(), ctx.OPTIONS(), ctx.DELETE(), ctx.METHOD());
 
             checkMutuallyExclusiveOptions("PATH or URIMAP", ctx.PATH(), ctx.URIMAP());
             checkAllOptionsArePresentOrAbsent("PATH and PATHLENGTH", ctx, ctx.PATH(), ctx.PATHLENGTH());
