@@ -355,10 +355,14 @@ public class CICSWebOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
 
     private void checkReceive(CICSParser.Cics_web_receiveContext ctx) {
         checkHasMandatoryOptions(ctx.RECEIVE(), ctx, "RECEIVE");
+        
+        boolean isBuffer = false;
+        boolean isContainer = false;
 
         if (!ctx.INTO().isEmpty() || !ctx.SET().isEmpty() || !ctx.LENGTH().isEmpty() || !ctx.MAXLENGTH().isEmpty() || !ctx.NOTRUNCATE().isEmpty() || !ctx.SRVCONVERT().isEmpty() || !ctx.NOSRVCONVERT().isEmpty() || !ctx.SERVERCONV().isEmpty()
                 || !ctx.CLICONVERT().isEmpty() || !ctx.NOCLICONVERT().isEmpty() || !ctx.CLIENTCONV().isEmpty() || !ctx.HOSTCODEPAGE().isEmpty()) {
             // Buffer
+            isBuffer = true;
             checkHasIllegalOptions(ctx.TOCONTAINER(), "TOCONTAINER");
             checkHasIllegalOptions(ctx.TOCHANNEL(), "TOCHANNEL");
 
@@ -367,11 +371,12 @@ public class CICSWebOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
             checkMutuallyExclusiveOptions("CLICONVERT, NOCLICONVERT, CLIENTCONV", ctx.CLICONVERT(), ctx.NOCLICONVERT(), ctx.CLIENTCONV());
 
             checkHasMandatoryOptions(ctx.LENGTH(), ctx, "LENGTH");
-
         }
 
         if (!ctx.TOCONTAINER().isEmpty() || !ctx.TOCHANNEL().isEmpty()) {
             // Container
+            isContainer = true;
+
             checkHasIllegalOptions(ctx.INTO(), "INTO");
             checkHasIllegalOptions(ctx.SET(), "SET");
             checkHasIllegalOptions(ctx.LENGTH(), "LENGTH");
@@ -393,6 +398,10 @@ public class CICSWebOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
             checkHasMandatoryOptions(ctx.SESSTOKEN(), ctx, "SESSTOKEN");
             checkAllOptionsArePresentOrAbsent("STATUSCODE and STATUSTEXT", ctx, ctx.STATUSCODE(), ctx.STATUSTEXT());
             checkPrerequisiteIsMet(ctx.STATUSCODE(), ctx.STATUSLEN(), ctx, "STATUSLEN without STATUSCODE");
+        }
+
+        if (!isBuffer && !isContainer) {
+            checkHasExactlyOneOption("INTO, SET, LENGTH or TOCONTAINER", ctx, ctx.INTO(), ctx.SET(), ctx.LENGTH(), ctx.TOCONTAINER());
         }
     }
 
