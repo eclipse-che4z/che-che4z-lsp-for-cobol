@@ -1290,8 +1290,6 @@ public class CICSSysSetOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     private void checkTcpip(CICSParser.Cics_set_tcpipContext ctx) {
         checkHasMandatoryOptions(ctx.TCPIP(), ctx, "TCPIP");
 
-        checkHasMandatoryOptions(ctx.MAXSOCKETS(), ctx, "MAXSOCKETS");
-        checkHasMandatoryOptions(ctx.NEWMAXSOCKET(), ctx, "NEWMAXSOCKET");
         checkMutuallyExclusiveOptions("OPENSTATUS, CLOSED, IMMCLOSE or OPEN", ctx.OPENSTATUS(), ctx.CLOSED(), ctx.IMMCLOSE(), ctx.OPEN());
     }
 

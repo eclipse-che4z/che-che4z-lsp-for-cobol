@@ -237,8 +237,7 @@ public class TestCicsSysSetStatement {
     private static final String TASK_INVALID_2 = "SET TASK({$varOne}) SRRACTIVE {SRRINACTIVE|errorOne}";
     //private static final String TCLASS_INVALID_1 = "SET TCLASS ";
     //private static final String TCLASS_INVALID_2 = "SET TCLASS ";
-    private static final String TCPIP_INVALID_1 = "SET {_TCPIP NEWMAXSOCKET({$varOne}) CLOSED|errorOne_}";
-    private static final String TCPIP_INVALID_2 = "SET TCPIP MAXSOCKETS({$varOne}) NEWMAXSOCKET({$varOne}) CLOSED {OPEN|errorOne} ";
+    private static final String TCPIP_INVALID_1 = "SET TCPIP MAXSOCKETS({$varOne}) NEWMAXSOCKET({$varOne}) CLOSED {OPEN|errorOne} ";
     private static final String TCPIPSERVICE_INVALID_1 = "SET {_TCPIPSERVICE({$varOne}) MAXDATALEN({$varOne} )|errorOne_}";
     private static final String TCPIPSERVICE_INVALID_2 = "SET TCPIPSERVICE({$varOne}) BACKLOG({$varOne}) MAXDATALEN({$varOne}) CLOSED {OPEN|errorOne}";
     private static final String TDQUEUE_INVALID_1 = "SET TDQUEUE({$varOne}) TERMINAL {NOTERMINAL|errorOne}";
@@ -919,8 +918,7 @@ public class TestCicsSysSetStatement {
 
     @Test
     void testCicsTcpipInvalid() {
-        testSingleError(TCPIP_INVALID_1, "Missing required option: MAXSOCKETS");
-        testSingleError(TCPIP_INVALID_2, "Options \"OPENSTATUS, CLOSED, IMMCLOSE or OPEN\" are mutually exclusive.");
+        testSingleError(TCPIP_INVALID_1, "Options \"OPENSTATUS, CLOSED, IMMCLOSE or OPEN\" are mutually exclusive.");
     }
 
     @Test
