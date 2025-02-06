@@ -324,7 +324,6 @@ public class CICSWebOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
         }
 
         if (!ctx.HTTPHEADER().isEmpty()) {
-            checkHasMandatoryOptions(ctx.NAMELENGTH(), ctx, "NAMELENGTH");
             checkHasMandatoryOptions(ctx.VALUE(), ctx, "VALUE");
             checkHasMandatoryOptions(ctx.VALUELENGTH(), ctx, "VALUELENGTH");
 
