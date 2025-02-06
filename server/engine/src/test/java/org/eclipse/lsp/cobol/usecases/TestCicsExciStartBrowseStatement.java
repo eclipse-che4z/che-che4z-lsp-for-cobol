@@ -56,10 +56,10 @@ public class TestCicsExciStartBrowseStatement {
   private static final String STARTBROWSE_CONTAINER_VALID = "STARTBROWSE CONTAINER PROCESS({$varOne}) PROCESSTYPE({$varOne}) BROWSETOKEN({$varOne})";
   private static final String STARTBROWSE_EVENT_VALID = "STARTBROWSE EVENT ACTIVITYID({$varOne}) BROWSETOKEN({$varOne})";
   private static final String STARTBROWSE_PROCESS_VALID = "STARTBROWSE PROCESS PROCESSTYPE({$varOne}) BROWSETOKEN({$varOne})";
-  private static final String STARTBROWSE_TIMER_VALID = "STARTBROWSE TIMER({$varOne}) BROWSETOKEN({$varOne})";
+  private static final String STARTBROWSE_TIMER_VALID = "STARTBROWSE TIMER BROWSETOKEN({$varOne})";
 
   private static final String STARTBROWSE_INVALID_CONTAINER = "STARTBROWSE CONTAINER PROCESS({$varOne}) {PROCESSTYPE|errorOne}({$varOne}) {CHANNEL|errorTwo}({$varOne}) BROWSETOKEN({$varOne})";
-  private static final String STARTBROWSE_INVALID_CONTAINER_2 = "STARTBROWSE {_CONTAINER|errorTwo_} {_{_PROCESS|errorOne_}|errorTwo_} PROCESSTYPE({$varOne}) BROWSETOKEN({$varOne})";
+  private static final String STARTBROWSE_INVALID_CONTAINER_2 = "STARTBROWSE {_{_CONTAINER|errorTwo_} {_PROCESS|errorOne|errorTwo_} PROCESSTYPE({$varOne}) BROWSETOKEN({$varOne})|errorThree_}";
   private static final String STARTBROWSE_INVALID_ACTIVITY = "STARTBROWSE {_ACTIVITY ACTIVITYID({$varOne} )|errorOne_}";
   private static final String STARTBROWSE_INVALID_EVENT = "STARTBROWSE {_EVENT ACTIVITYID({$varOne} )|errorOne_}";
   private static final String STARTBROWSE_INVALID_PROCESS = "STARTBROWSE {_PROCESS BROWSETOKEN({$varOne} )|errorOne_}";
@@ -129,6 +129,12 @@ public class TestCicsExciStartBrowseStatement {
             new Diagnostic(
                     new Range(),
                     "Exactly one option required, options are mutually exclusive: ACTIVITY, CONTAINER, PROCESS, EVENT or TIMER",
+                    DiagnosticSeverity.Error,
+                    ErrorSource.PARSING.getText()));
+    tempDiagnostic.put("errorThree",
+            new Diagnostic(
+                    new Range(),
+                    "If one option is specified, all options must be present: PROCESS and PROCESSTYPE",
                     DiagnosticSeverity.Error,
                     ErrorSource.PARSING.getText()));
 

@@ -1009,7 +1009,7 @@ cics_startbr_options: ((FILE | DATASET) cics_name | (RIDFLD | SYSID) cics_data_a
 
 /** STARTBROWSE ACTIVITY / CONTAINER / EVENT / PROCESS / TIMER */
 cics_startbrowse: STARTBROWSE (cics_startbrowse_body);
-cics_startbrowse_body: ((ACTIVITY | CONTAINER | EVENT | PROCESS) | (ACTIVITYID | PROCESSTYPE | CHANNEL | TIMER) cics_data_value | cics_startbrowse_processWithValue_subrule | BROWSETOKEN cics_data_area | cics_handle_response)+;
+cics_startbrowse_body: ((ACTIVITY | CONTAINER | EVENT | PROCESS | TIMER) | (ACTIVITYID | PROCESSTYPE | CHANNEL) cics_data_value | cics_startbrowse_processWithValue_subrule | BROWSETOKEN cics_data_area | cics_handle_response)+;
 cics_startbrowse_processWithValue_subrule: PROCESS cics_data_value;
 
 /** SUSPEND (both) */
