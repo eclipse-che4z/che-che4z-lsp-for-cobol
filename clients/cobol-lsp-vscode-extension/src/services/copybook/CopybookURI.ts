@@ -94,34 +94,20 @@ export class CopybookURI {
       documentUri,
       zoweExplorerApi,
     );
-
-    const result: string[] = [];
-    const datasets: string[] = SettingsService.getDsnPath(
-      documentUri,
-      dialectType,
-    );
-    if (profile && datasets) {
-      datasets.map((dataset) => {
-        result.push(
-          vscode.Uri.joinPath(vscode.Uri.file(downloadFolder), profile, dataset)
-            .fsPath,
-        );
-      });
+    if (!profile) {
+      return [];
     }
 
-    const ussPaths: string[] = SettingsService.getUssPath(
-      documentUri,
-      dialectType,
+    const remotePaths = [
+      ...SettingsService.getDsnPath(documentUri, dialectType),
+      ...SettingsService.getUssPath(documentUri, dialectType),
+    ];
+
+    return remotePaths.map(
+      (remote) =>
+        vscode.Uri.joinPath(vscode.Uri.file(downloadFolder), profile, remote)
+          .fsPath,
     );
-    if (profile && ussPaths) {
-      ussPaths.map((ussPath) => {
-        result.push(
-          vscode.Uri.joinPath(vscode.Uri.file(downloadFolder), profile, ussPath)
-            .fsPath,
-        );
-      });
-    }
-    return result;
   }
 
   public static getEnviromentPath(type: EndevorType, profile: ResolvedProfile) {
