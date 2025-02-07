@@ -295,6 +295,10 @@ public class CICSWebOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
 
         if (!ctx.HOST().isEmpty()) {
             checkHasExactlyOneOption("SCHEME, HTTP or HTTPS", ctx, ctx.SCHEME(), ctx.HTTP(), ctx.HTTPS());
+        } else {
+            checkHasIllegalOptions(ctx.SCHEME(), "SCHEME");
+            checkHasIllegalOptions(ctx.HTTP(), "HTTP");
+            checkHasIllegalOptions(ctx.HTTPS(), "HTTPS");
         }
 
         checkHasMandatoryOptions(ctx.SESSTOKEN(), ctx, "SESSTOKEN");
