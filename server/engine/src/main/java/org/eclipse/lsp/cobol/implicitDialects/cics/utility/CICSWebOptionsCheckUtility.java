@@ -293,6 +293,10 @@ public class CICSWebOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
         checkHasMandatoryOptions(ctx.OPEN(), ctx, "OPEN");
         checkHasExactlyOneOption("URIMAP or HOST", ctx, ctx.URIMAP(), ctx.HOST());
 
+        if (!ctx.HOST().isEmpty()) {
+            checkHasExactlyOneOption("SCHEME, HTTP or HTTPS", ctx, ctx.SCHEME(), ctx.HTTP(), ctx.HTTPS());
+        }
+
         checkHasMandatoryOptions(ctx.SESSTOKEN(), ctx, "SESSTOKEN");
         checkAllOptionsArePresentOrAbsent("HTTPVNUM and HTTPRNUM", ctx, ctx.HTTPVNUM(), ctx.HTTPRNUM());
     }
@@ -458,7 +462,7 @@ public class CICSWebOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
             checkPrerequisiteIsMet(ctx.DOCTOKEN(), ctx.DOCSTATUS(), ctx, "DOCSTATUS without DOCTOKEN");
             checkMutuallyExclusiveOptions("NODOCDELETE, DOCDELETE or DOCSTATUS", ctx.NODOCDELETE(), ctx.DOCDELETE(), ctx.DOCSTATUS());
 
-            checkMutuallyExclusiveOptions("CHUNKNO, CHUNKYES, CHUNKEND or CHUNKING", ctx.CHUNKNO(), ctx.CHUNKYES(), ctx.CHUNKEND(), ctx.CHUNKING());
+            checkMutuallyExclusiveOptions("DOCTOKEN, FROM, CHUNKNO, CHUNKYES, CHUNKEND or CHUNKING", ctx.DOCTOKEN(), ctx.FROM(), ctx.CHUNKNO(), ctx.CHUNKYES(), ctx.CHUNKEND(), ctx.CHUNKING());
 
             checkPrerequisiteIsMet(ctx.FROM(), ctx.HOSTCODEPAGE(), ctx, "HOSTCODEPAGE without FROM");
 
