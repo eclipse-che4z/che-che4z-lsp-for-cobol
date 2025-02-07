@@ -462,7 +462,7 @@ public class CICSWebOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
             checkPrerequisiteIsMet(ctx.DOCTOKEN(), ctx.DOCSTATUS(), ctx, "DOCSTATUS without DOCTOKEN");
             checkMutuallyExclusiveOptions("NODOCDELETE, DOCDELETE or DOCSTATUS", ctx.NODOCDELETE(), ctx.DOCDELETE(), ctx.DOCSTATUS());
 
-            checkMutuallyExclusiveOptions("DOCTOKEN, FROM, CHUNKNO, CHUNKYES, CHUNKEND or CHUNKING", ctx.DOCTOKEN(), ctx.FROM(), ctx.CHUNKNO(), ctx.CHUNKYES(), ctx.CHUNKEND(), ctx.CHUNKING());
+            checkMutuallyExclusiveOptions("DOCTOKEN, CONTAINER, CHUNKNO, CHUNKYES, CHUNKEND or CHUNKING", ctx.DOCTOKEN(), ctx.CONTAINER(), ctx.CHUNKNO(), ctx.CHUNKYES(), ctx.CHUNKEND(), ctx.CHUNKING());
 
             checkPrerequisiteIsMet(ctx.FROM(), ctx.HOSTCODEPAGE(), ctx, "HOSTCODEPAGE without FROM");
 
