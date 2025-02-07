@@ -6,9 +6,7 @@
     ],
     "after:bump": [
       "git add ../../CHANGELOG.md",
-      "sed -i \"s/const TELEMETRY_KEY_ENCODED: string = TELEMETRY_DEFAULT_CONTENT/const TELEMETRY_KEY_ENCODED: string = '$THE_KEY'/\" src/services/reporter/TelemetryReporterImpl.ts",
-      "npx vsce package",
-      "git checkout -- src/services/reporter/TelemetryReporterImpl.ts"
+      "npx vsce package"
     ]
   },
   "github": {

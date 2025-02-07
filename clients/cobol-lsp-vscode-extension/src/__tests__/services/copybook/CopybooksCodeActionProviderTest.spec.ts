@@ -12,10 +12,14 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
+jest.mock("../../../services/reporter", () => ({
+  registerEvent: jest.fn(),
+}));
+
 import * as vscode from "vscode";
 import { CopybooksCodeActionProvider } from "../../../services/copybook/CopybooksCodeActionProvider";
-import { TelemetryService } from "../../../services/reporter/TelemetryService";
 import { Utils } from "../../../services/util/Utils";
+import { registerEvent } from "../../../services/reporter";
 
 describe("Test Copybook code action provider", () => {
   const copybooksCodeAction = new CopybooksCodeActionProvider();
@@ -33,7 +37,6 @@ describe("Test Copybook code action provider", () => {
   };
 
   beforeAll(() => {
-    TelemetryService.registerEvent = jest.fn();
     Utils.getZoweExplorerAPI = jest.fn();
   });
 
@@ -88,7 +91,7 @@ describe("Test Copybook code action provider", () => {
     expect(
       copybooksCodeAction.provideCodeActions(doc, range, context, token).length,
     ).toBe(1);
-    expect(TelemetryService.registerEvent).toHaveBeenCalledWith(
+    expect(registerEvent).toHaveBeenCalledWith(
       "QuickFix for copybook activation",
       ["COBOL", "hover", "copybook", "quickfix"],
       "User try to understand the syntax error for a missing copybook",

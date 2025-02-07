@@ -30,7 +30,7 @@ import { SettingsService } from "../../../services/Settings";
 import { E4E } from "../../../type/e4eApi";
 import { e4eMock } from "../../../__mocks__/getE4EMock.utility";
 
-jest.mock("../../../services/reporter/TelemetryService");
+jest.mock("../../../services/reporter");
 Utils.getZoweExplorerAPI = jest.fn().mockReturnValue({ api: zoweExplorerMock });
 
 describe("Tests copybook download service", () => {

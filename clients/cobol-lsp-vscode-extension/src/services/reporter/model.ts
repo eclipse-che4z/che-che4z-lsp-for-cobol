@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Broadcom.
+ * Copyright (c) 2025 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -23,4 +23,8 @@ export interface TelemetryEvent {
   notes: string;
   rootCause?: string;
   measurements?: TelemetryEventMeasurements;
+}
+
+export interface TelemetryMeasurement {
+  [key: string]: number;
 }

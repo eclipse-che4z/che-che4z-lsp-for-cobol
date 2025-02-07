@@ -28,8 +28,8 @@ import {
 import { HP_LANGUAGE_ID, EXP_LANGUAGE_ID, LANGUAGE_ID } from "../constants";
 import { JavaCheck } from "./JavaCheck";
 import { NativeExecutableService } from "./nativeLanguageClient/nativeExecutableService";
-import { TelemetryService } from "./reporter/TelemetryService";
 import { SettingsService } from "./Settings";
+import { registerEvent } from "./reporter";
 
 const extensionId = "BroadcomMFD.cobol-language-support";
 
@@ -60,7 +60,7 @@ export class LanguageClientService {
 
   public enableNativeBuild() {
     this.isNativeBuildEnabled = true;
-    TelemetryService.registerEvent(
+    registerEvent(
       "Native Build enabled",
       ["COBOL", "native build enabled", "settings"],
       "Native build enabled",

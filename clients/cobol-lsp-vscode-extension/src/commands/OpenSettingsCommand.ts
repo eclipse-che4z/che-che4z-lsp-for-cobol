@@ -12,10 +12,10 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 import * as vscode from "vscode";
-import { TelemetryService } from "../services/reporter/TelemetryService";
+import { registerEvent } from "../services/reporter";
 
 export function gotoCopybookSettings(): void {
-  TelemetryService.registerEvent(
+  registerEvent(
     "Open copybook settings",
     ["COBOL", "copybook", "settings"],
     "The user invokes the open settings quick fix to see the copybook locations stored in the settings file",
