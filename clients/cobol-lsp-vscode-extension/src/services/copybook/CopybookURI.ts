@@ -22,6 +22,10 @@ import * as vscode from "vscode";
  * This class is responsible to identify from which source resolve copybooks required by the server.
  */
 export class CopybookURI {
+  /**
+   * Returns full copybook path
+   * {downloadFolder}/{zowe/e4e}/copybooks/{profile}/{dataset}/{copybook}
+   */
   public static createCopybookPath(
     profileName: string,
     dataset: string,
@@ -29,15 +33,22 @@ export class CopybookURI {
     downloadFolder: string,
   ): string {
     return vscode.Uri.joinPath(
-      vscode.Uri.file(downloadFolder),
-      ZOWE_FOLDER,
-      COPYBOOKS_FOLDER,
-      profileName,
-      dataset,
+      vscode.Uri.file(
+        this.createDatasetPath(
+          profileName,
+          dataset,
+          downloadFolder,
+          ZOWE_FOLDER,
+        ),
+      ),
       copybook,
     ).fsPath;
   }
 
+  /**
+   * Return copybooks dataset path including download folder
+   * {downloadFolder}/{zowe/e4e}/copybooks/{profile}/{dataset}
+   */
   public static createDatasetPath(
     profileName: string,
     dataset: string,
@@ -46,7 +57,21 @@ export class CopybookURI {
   ): string {
     return vscode.Uri.joinPath(
       vscode.Uri.file(downloadFolder),
-      source,
+      this.createDatasetDirectoriesPath(profileName, source, dataset),
+    ).fsPath;
+  }
+
+  /**
+   * Returns part of the path to copybooks
+   * in format {source}/copybooks/{profile}/{dataset}
+   */
+  public static createDatasetDirectoriesPath(
+    profileName: string,
+    source: string,
+    dataset: string,
+  ) {
+    return vscode.Uri.joinPath(
+      vscode.Uri.file(source),
       COPYBOOKS_FOLDER,
       profileName,
       dataset,
@@ -70,37 +95,31 @@ export class CopybookURI {
       zoweExplorerApi,
     );
 
-    let result: string[] = [];
+    const result: string[] = [];
     const datasets: string[] = SettingsService.getDsnPath(
       documentUri,
       dialectType,
     );
     if (profile && datasets) {
-      result = Object.assign([], datasets);
-      result.forEach(
-        (value, index) =>
-          (result[index] = vscode.Uri.joinPath(
-            vscode.Uri.file(downloadFolder),
-            profile,
-            value,
-          ).fsPath),
-      );
+      datasets.map((dataset) => {
+        result.push(
+          vscode.Uri.joinPath(vscode.Uri.file(downloadFolder), profile, dataset)
+            .fsPath,
+        );
+      });
     }
 
     const ussPaths: string[] = SettingsService.getUssPath(
       documentUri,
       dialectType,
     );
-    const baseIndex = result.length;
     if (profile && ussPaths) {
-      Object.assign([], ussPaths).forEach(
-        (value, index) =>
-          (result[index + baseIndex] = vscode.Uri.joinPath(
-            vscode.Uri.file(downloadFolder),
-            profile,
-            value,
-          ).fsPath),
-      );
+      ussPaths.map((ussPath) => {
+        result.push(
+          vscode.Uri.joinPath(vscode.Uri.file(downloadFolder), profile, ussPath)
+            .fsPath,
+        );
+      });
     }
     return result;
   }

@@ -36,7 +36,7 @@ import { hasMember, Utils } from "../../util/Utils";
 import { searchCopybookInExtensionFolder } from "../../util/FSUtils";
 import { getErrorMessage } from "../../util/ErrorsUtils";
 import { SettingsService } from "../../Settings";
-import path = require("node:path");
+import * as path from "path";
 import { getChannel } from "../../../extension";
 
 const defaultConfigs: ExternalConfigurationOptions = {
@@ -278,7 +278,11 @@ export class CopybookDownloaderForE4E {
      * As a workaround, the path is splitted into individual subfolders
      * are they are created incrementally one by one.
      */
-    const subfoldersPath = folder.replace(`${downloadFolder}${path.sep}`, "");
+    const subfoldersPath = CopybookURI.createDatasetDirectoriesPath(
+      instance,
+      E4E_FOLDER,
+      mapped,
+    );
     const subfolders = subfoldersPath.split(path.sep);
     let finishedPath = downloadFolder;
     for (const subfolder of subfolders) {

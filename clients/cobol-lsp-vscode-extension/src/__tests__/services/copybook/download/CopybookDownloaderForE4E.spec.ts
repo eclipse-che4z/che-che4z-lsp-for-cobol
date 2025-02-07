@@ -20,7 +20,6 @@ import {
 } from "../../../../__mocks__/getE4EMock.utility";
 import * as extension from "../../../../extension";
 import * as vscode from "vscode";
-import { asMutable } from "../../../../test/suite/testHelper";
 
 describe("e4e copybook downloader tests", () => {
   let e4e: E4E;
@@ -39,18 +38,13 @@ describe("e4e copybook downloader tests", () => {
     });
 
     describe("windows", () => {
-      const separator = path.sep;
       beforeEach(() => {
-        asMutable(path).sep = "\\";
+        jest.replaceProperty(path, "sep", "\\");
         jest
           .spyOn(vscode.Uri, "joinPath")
           .mockImplementation((base, ...args) =>
             vscode.Uri.parse(base.fsPath + "\\" + args.join("\\")),
           );
-      });
-
-      afterAll(() => {
-        asMutable(path).sep = separator;
       });
 
       it("allocates the copybook path incrementally", async () => {
@@ -80,14 +74,10 @@ describe("e4e copybook downloader tests", () => {
     });
 
     describe("unix", () => {
-      const separator = path.sep;
       beforeAll(() => {
-        asMutable(path).sep = "/";
+        jest.replaceProperty(path, "sep", "/");
       });
 
-      afterAll(() => {
-        asMutable(path).sep = separator;
-      });
       it("allocates the copybook path incrementally", async () => {
         expect(
           await CopybookDownloaderForE4E["getCopybookPath"](
@@ -202,13 +192,8 @@ describe("e4e copybook downloader tests", () => {
   });
 
   describe("check downloadDatasetE4E nominal performs writeFile with correct path and content", () => {
-    const separator = path.sep;
     beforeAll(() => {
-      asMutable(path).sep = "/";
-    });
-
-    afterAll(() => {
-      asMutable(path).sep = separator;
+      jest.replaceProperty(path, "sep", "/");
     });
 
     it("writes to correct path and content", async () => {
