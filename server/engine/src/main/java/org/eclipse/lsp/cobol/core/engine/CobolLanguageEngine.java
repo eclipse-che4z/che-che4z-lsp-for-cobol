@@ -162,6 +162,7 @@ public class CobolLanguageEngine {
     session.attr("size", String.valueOf(ctx.getExtendedDocument().toString().length()));
     session.attr("result", result.stopProcessing() ? "stopped" : "done");
     benchmarkService.logTiming();
+    benchmarkService.endSession(documentUri);
     if (result.stopProcessing() || !(result.getData() instanceof ProcessingResult)) {
       return toAnalysisResult(
           new ResultWithErrors<>(

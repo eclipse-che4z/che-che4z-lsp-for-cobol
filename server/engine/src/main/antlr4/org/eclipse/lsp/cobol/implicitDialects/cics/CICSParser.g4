@@ -842,7 +842,7 @@ cics_rewrite_body: (NOSUSPEND | (FILE | DATASET | SYSID) cics_name | LENGTH cics
 
 /** ROUTE */
 cics_route: ROUTE cics_route_body?;
-cics_route_body: ((TIME | AFTER | AT | NLEOM) | (REQID | LDC) cics_name | INTERVAL (cics_hhmmss | cics_zero_digit) |  ERRTERM cics_name? | (HOURS | MINUTES | SECONDS) cics_data_value | (TITLE | LIST | OPCLASS) cics_data_area | cics_handle_response)+;
+cics_route_body: ((AFTER | AT | NLEOM) | (REQID | LDC) cics_name | TIME cics_hhmmss | INTERVAL (cics_hhmmss | cics_zero_digit) |  ERRTERM cics_name? | (HOURS | MINUTES | SECONDS) cics_data_value | (TITLE | LIST | OPCLASS) cics_data_area | cics_handle_response)+;
 
 /** RUN */
 cics_run: RUN (cics_run_default | cics_run_transid);
@@ -1009,7 +1009,7 @@ cics_startbr_options: ((FILE | DATASET) cics_name | (RIDFLD | SYSID) cics_data_a
 
 /** STARTBROWSE ACTIVITY / CONTAINER / EVENT / PROCESS / TIMER */
 cics_startbrowse: STARTBROWSE (cics_startbrowse_body);
-cics_startbrowse_body: ((ACTIVITY | CONTAINER | EVENT | PROCESS) | (ACTIVITYID | PROCESSTYPE | CHANNEL | TIMER) cics_data_value | cics_startbrowse_processWithValue_subrule | BROWSETOKEN cics_data_area | cics_handle_response)+;
+cics_startbrowse_body: ((ACTIVITY | CONTAINER | EVENT | PROCESS | TIMER) | (ACTIVITYID | PROCESSTYPE | CHANNEL) cics_data_value | cics_startbrowse_processWithValue_subrule | BROWSETOKEN cics_data_area | cics_handle_response)+;
 cics_startbrowse_processWithValue_subrule: PROCESS cics_data_value;
 
 /** SUSPEND (both) */
