@@ -96,12 +96,13 @@ public class CICSStartOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
         checkMutuallyExclusiveOptions("INTERVAL, AFTER, AT or TIME", ctx.INTERVAL(), ctx.AFTER(), ctx.AT(), ctx.TIME());
         checkMutuallyExclusiveOptions("TERMID or USERID", ctx.TERMID(), ctx.USERID());
 
-        if (!ctx.HOURS().isEmpty() || !ctx.MINUTES().isEmpty() || !ctx.SECONDS().isEmpty()) {
+        if (!ctx.HOURS().isEmpty() || !ctx.MINUTES().isEmpty() || !ctx.SECONDS().isEmpty() || !ctx.AFTER().isEmpty() || !ctx.AT().isEmpty()) {
             checkHasExactlyOneOption("AFTER or AT", ctx, ctx.AFTER(), ctx.AT());
+            checkHasAtLeastOneOption("HOURS, MINUTES or SECONDS", ctx, ctx.HOURS(), ctx.MINUTES(), ctx.SECONDS());
         }
 
         checkPrerequisiteIsMet(ctx.FROM(), ctx.LENGTH(), ctx, "LENGTH without FROM");
-        checkPrerequisiteIsMet(ctx.FROM(), ctx.FMH(), ctx, "FMH without FROM");
+        checkPrerequisiteIsMet(ctx.LENGTH(), ctx.FMH(), ctx, "FMH without LENGTH");
     }
 
     private void checkStartAttach(CICSParser.Cics_start_attachContext ctx) {

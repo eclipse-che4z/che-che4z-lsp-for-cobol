@@ -47,10 +47,10 @@ public class TestCicsSysSetStatement {
     private static final String CONNECTION_VALID_2 = "SET CONNECTION({$varOne}) ACQSTATUS({$varOne}) AFFINITY({$varOne}) EXITTRACING({$varOne}) PENDSTATUS({$varOne}) CANCEL NORECOVDATA INSERVICE UOWACTION({$varOne}) ZCPTRACE";
     private static final String DB2CONN_VALID_1 = "SET DB2CONN";
     private static final String DB2CONN_VALID_2 = "SET DB2CONN ACCOUNTREC({$varOne}) AUTHID({$varOne}) AUTHTYPE({$varOne}) BUSY({$varOne}) COMAUTHID({$varOne}) COMAUTHTYPE({$varOne}) COMTHREADLIM({$varOne}) CONNECTERROR({$varOne}) CONNECTST({$varOne}) DB2GROUPID({$varOne}) DB2ID({$varOne}) MSGQUEUE1({$varOne}) MSGQUEUE2({$varOne}) MSGQUEUE3({$varOne}) NONTERMREL({$varOne}) PLAN({$varOne}) PLANEXITNAME({$varOne}) PRIORITY({$varOne}) PURGECYCLEM({$varOne}) PURGECYCLES({$varOne}) RESYNCMEMBER({$varOne}) REUSELIMIT({$varOne}) SECURITY(REBUILD) SIGNID({$varOne}) STANDBYMODE({$varOne}) STATSQUEUE({$varOne}) TCBLIMIT({$varOne}) THREADLIMIT({$varOne}) THREADWAIT({$varOne})";
-    private static final String DB2ENTRY_VALID_1 = "SET DB2ENTRY ";
+    private static final String DB2ENTRY_VALID_1 = "SET DB2ENTRY({$varOne})";
     private static final String DB2ENTRY_VALID_2 = "SET DB2ENTRY({$varOne}) ACCOUNTREC({$varOne}) AUTHID({$varOne}) AUTHTYPE({$varOne}) BUSY({$varOne}) DISABLEDACT({$varOne}) ENABLESTATUS({$varOne}) PLAN({$varOne}) PLANEXITNAME({$varOne}) PRIORITY({$varOne}) SHARELOCKS({$varOne}) THREADLIMIT({$varOne}) THREADWAIT({$varOne})";
-    private static final String DB2TRAN_VALID_1 = "SET DB2TRAN";
-    private static final String DB2TRAN_VALID_2 = "SET DB2TRAN DB2ENTRY({$varOne}) TRANSID({$varOne})";
+    private static final String DB2TRAN_VALID_1 = "SET DB2TRAN({$varOne})";
+    private static final String DB2TRAN_VALID_2 = "SET DB2TRAN({$varOne}) DB2ENTRY({$varOne}) TRANSID({$varOne})";
     private static final String DELETSHIPPED_VALID_1 = "SET DELETSHIPPED";
     private static final String DELETSHIPPED_VALID_2 = "SET DELETSHIPPED IDLE({$varOne}) INTERVALHRS({$varOne}) INTERVALMINS({$varOne}) INTERVALSECS({$varOne})";
     private static final String DISPATCHER_VALID_1 = "SET DISPATCHER";
@@ -83,8 +83,8 @@ public class TestCicsSysSetStatement {
     private static final String IPCONN_VALID_2 = "SET IPCONN({$varOne}) CONNSTATUS({$varOne}) PENDSTATUS({$varOne}) CANCEL NORECOVDATA INSERVICE BACKOUT";
     private static final String IRC_VALID_1 = "SET IRC";
     private static final String IRC_VALID_2 = "SET IRC OPENSTATUS({$varOne})";
-    private static final String JOURNALNAME_VALID_1 = "SET JOURNALNAME({$varOne}) ACTION({$varOne}) STATUS({$varOne})";
-    private static final String JOURNALNAME_VALID_2 = "SET JOURNALNAME({$varOne}) FLUSH ENABLED";
+    private static final String JOURNALNAME_VALID_1 = "SET JOURNALNAME({$varOne}) ACTION({$varOne})";
+    private static final String JOURNALNAME_VALID_2 = "SET JOURNALNAME({$varOne}) FLUSH";
     //private static final String JOURNALNUM_VALID_1 = "SET JOURNALNUM ";
     private static final String JVMENDPOINT_VALID_1 = "SET JVMENDPOINT({$varOne}) JVMSERVER({$varOne}) DISABLED";
     private static final String JVMENDPOINT_VALID_2 = "SET JVMENDPOINT({$varOne}) JVMSERVER({$varOne}) ENABLED";
@@ -112,7 +112,7 @@ public class TestCicsSysSetStatement {
     private static final String PROGRAM_VALID_2 = "SET PROGRAM({$varOne}) CEDF NEWCOPY DPLSUBSET JVMCLASS({$varOne}) JVMPROFILE({$varOne}) OPERATION({$varOne}) REPLICATOR JVM SHARESTATUS({$varOne}) STATUS({$varOne}) VERSION({$varOne})";
     private static final String SECDISCOVERY_VALID_1 = "SET SECDISCOVERY";
     private static final String SECDISCOVERY_VALID_2 = "SET SECDISCOVERY STATUS({$varOne}) CMD({$varOne}) DB2({$varOne}) DCT({$varOne}) FCT({$varOne}) HFS({$varOne}) JCT({$varOne}) PCT({$varOne}) PPT({$varOne}) PSB({$varOne}) RES({$varOne}) TST({$varOne}) USER({$varOne})";
-    private static final String SECRECORDING_VALID_1 = "SET SECRECORDING({$varOne})";
+    private static final String SECRECORDING_VALID_1 = "SET SECRECORDING({$varOne}) REMOVE";
     private static final String SECRECORDING_VALID_2 = "SET SECRECORDING({$varOne}) ADD MAXIMUM({$varOne}) ODTCPIPS({$varOne})";
     private static final String STATISTICS_VALID_1 = "SET STATISTICS";
     private static final String STATISTICS_VALID_2 = "SET STATISTICS ENDOFDAY({$varOne}) INTERVAL({$varOne}) RECORDING({$varOne}) RECORDNOW RESETNOW";
@@ -176,9 +176,9 @@ public class TestCicsSysSetStatement {
     private static final String CONNECTION_INVALID_2 = "SET CONNECTION({$varOne}) BACKOUT {COMMIT|errorOne}";
     private static final String DB2CONN_INVALID_1 = "SET DB2CONN TASK {NONE|errorOne}";
     private static final String DB2CONN_INVALID_2 = "SET DB2CONN TWAIT {NOTWAIT|errorOne}";
-    private static final String DB2ENTRY_INVALID_1 = "SET DB2ENTRY ABEND {SQLCODE|errorOne}";
+    private static final String DB2ENTRY_INVALID_1 = "SET DB2ENTRY({$varOne}) ABEND {SQLCODE|errorOne}";
     private static final String DB2ENTRY_INVALID_2 = "SET DB2ENTRY({$varOne}) YES {NO|errorOne}";
-    private static final String DB2TRAN_INVALID_1 = "SET DB2TRAN DB2ENTRY({$varOne}) {DB2ENTRY|errorOne}({$varOne})";
+    private static final String DB2TRAN_INVALID_1 = "SET DB2TRAN({$varOne}) DB2ENTRY({$varOne}) {DB2ENTRY|errorOne}({$varOne})";
     private static final String DELETSHIPPED_INVALID_1 = "SET DELETSHIPPED IDLE({$varOne}) {IDLEHRS|errorOne}({$varOne})";
     private static final String DELETSHIPPED_INVALID_2 = "SET DELETSHIPPED INTERVAL({$varOne}) {INTERVALHRS|errorOne}({$varOne})";
     private static final String DISPATCHER_INVALID_1 = "SET DISPATCHER TIME({$varOne}) {TIME|errorOne}({$varOne})";
@@ -187,23 +187,23 @@ public class TestCicsSysSetStatement {
     private static final String DSNAME_INVALID_2 = "SET DSNAME({$varOne}) QUIESCED {UNQUIESCED|errorOne}";
     private static final String DUMPDS_INVALID_1 = "SET DUMPDS {OPEN|errorOne} CLOSED";
     private static final String DUMPDS_INVALID_2 = "SET DUMPDS NOSWITCH {SWITCHNEXT|errorOne}";
-    private static final String ENQMODEL_INVALID_1 = "SET ENQMODEL({$varOne}) {_STATUS|errorOne_}({$varOne}) {DISABLED|errorOne}";
+    private static final String ENQMODEL_INVALID_1 = "SET ENQMODEL({$varOne}) STATUS({$varOne}) {DISABLED|errorOne}";
     private static final String EPADAPTER_INVALID_1 = "SET EPADAPTER({$varOne}) ENABLESTATUS({$varOne}) {ENABLED|errorOne}";
     //private static final String EPADAPTERSET_INVALID_1 = "SET EPADAPTERSET ";
     private static final String EVENTBINDING_INVALID_1 = "SET EVENTBINDING({$varOne}) ENABLESTATUS({$varOne}) {DISABLED|errorOne}";
-    private static final String EVENTPROCESS_INVALID_1 = "SET EVENTPROCESS {STARTED|errorOne} {STOPPED|errorOne}";
+    private static final String EVENTPROCESS_INVALID_1 = "SET EVENTPROCESS STARTED {STOPPED|errorOne}";
     private static final String FILE_INVALID_1 = "SET FILE({$varOne}) ADDABLE {NOTADDABLE|errorOne}";
     private static final String FILE_INVALID_2 = "SET FILE({$varOne}) CICSTABLE {NOTTABLE|errorOne}";
     //private static final String HOST_INVALID_1 = "SET HOST ";
     private static final String IPCONN_INVALID_1 = "SET IPCONN({$varOne}) ACQUIRED {RELEASED|errorOne}";
     private static final String IPCONN_INVALID_2 = "SET IPCONN({$varOne}) CANCEL {FORCECANCEL|errorOne}";
     private static final String IRC_INVALID_1 = "SET IRC CLOSED {OPEN|errorOne}";
-    private static final String JOURNALNAME_INVALID_1 = "SET JOURNALNAME({$varOne}) {FLUSH|errorOne} {RESET|errorOne} ENABLED";
-    private static final String JOURNALNAME_INVALID_2 = "SET {_JOURNALNAME({$varOne}) FLUSH|errorOne_}";
+    private static final String JOURNALNAME_INVALID_1 = "SET JOURNALNAME({$varOne}) FLUSH {RESET|errorOne} ENABLED";
+    private static final String JOURNALNAME_INVALID_2 = "SET JOURNALNAME({$varOne}) FLUSH {STATUS|errorOne}({$varOne})";
     //private static final String JOURNALNUM_INVALID_1 = "SET JOURNALNUM ";
     private static final String JVMENDPOINT_INVALID_1 = "SET {_JVMENDPOINT({$varOne}) ENABLED|errorOne_}";
-    private static final String JVMENDPOINT_INVALID_2 = "SET {_JVMENDPOINT({$varOne}) JVMSERVER({$varOne} )|errorOne_}";
-    private static final String JVMSERVER_INVALID_1 = "SET JVMSERVER({$varOne}) {ENABLED|errorOne} {DISABLED|errorOne} PHASEOUT";
+    private static final String JVMENDPOINT_INVALID_2 = "SET JVMENDPOINT({$varOne}) JVMSERVER({$varOne}) {ENABLED|errorOne} DISABLED";
+    private static final String JVMSERVER_INVALID_1 = "SET JVMSERVER({$varOne}) ENABLED {DISABLED|errorOne} PHASEOUT";
     private static final String JVMSERVER_INVALID_2 = "SET JVMSERVER({$varOne}) ENABLED PHASEOUT {PURGE|errorOne} ";
     private static final String LIBRARY_INVALID_1 = "SET LIBRARY({$varOne}) CRITICAL {NONCRITICAL|errorOne}";
     private static final String LIBRARY_INVALID_2 = "SET LIBRARY({$varOne}) ENABLED {DISABLED|errorOne}";
@@ -211,10 +211,10 @@ public class TestCicsSysSetStatement {
     private static final String MODENAME_INVALID_2 = "SET {_MODENAME({$varOne}) CONNECTION({$varOne}) CLOSED ACQUIRED|errorOne_}";
     private static final String MONITOR_INVALID_1 = "SET MONITOR ON {OFF|errorOne}";
     private static final String MONITOR_INVALID_2 = "SET MONITOR FREQUENCY({$varOne}) {FREQUENCYMIN|errorOne}({$varOne})";
-    private static final String MQCONN_INVALID_1 = "SET {_MQCONN WAIT RESYNC|errorOne_}";
+    private static final String MQCONN_INVALID_1 = "SET MQCONN WAIT CONNECTST({$varOne}) {CONNECTED|errorOne}";
     private static final String MQCONN_INVALID_2 = "SET MQCONN RESYNC {NORESYNC|errorOne}";
-    private static final String MQMONITOR_INVALID_1 = "SET {_MQMONITOR({$varOne}) AUTOSTATUS({$varOne}) STOPPED|errorOne_}";
-    private static final String MQMONITOR_INVALID_2 = "SET {_MQMONITOR({$varOne}) ENABLED MONSTATUS({$varOne} )|errorOne_}";
+    private static final String MQMONITOR_INVALID_1 = "SET MQMONITOR({$varOne}) AUTOSTATUS({$varOne}) {AUTOSTART|errorOne}";
+    private static final String MQMONITOR_INVALID_2 = "SET MQMONITOR({$varOne}) ENABLED MONSTATUS({$varOne}) {STOPPED|errorOne}";
     private static final String NETNAME_INVALID_1 = "SET NETNAME({$varOne}) EXITTRACE {NOEXITTRACE|errorOne}";
     private static final String OTEL_INVALID_1 = "SET OTEL {OTEL|errorOne}";
     private static final String PIPELINE_INVALID_1 = "SET PIPELINE({$varOne}) ENABLED {DISABLED|errorOne}";
@@ -224,8 +224,8 @@ public class TestCicsSysSetStatement {
     private static final String PROGRAM_INVALID_2 = "SET PROGRAM({$varOne}) JVM {NOJVM|errorOne}";
     private static final String SECDISCOVERY_INVALID_1 = "SET SECDISCOVERY ON {OFF|errorOne}";
     private static final String SECDISCOVERY_INVALID_2 = "SET SECDISCOVERY CMD({$varOne}) {DISCOVERALL|errorOne}";
-    private static final String SECRECORDING_INVALID_1 = "SET {_SECRECORDING({$varOne}) MAXIMUM({$varOne} )|errorOne_}";
-    private static final String SECRECORDING_INVALID_2 = "SET SECRECORDING({$varOne}) ODADPTRID({$varOne}) {ODADPTRDATA1|errorOne}({$varOne})";
+    private static final String SECRECORDING_INVALID_1 = "SET {_SECRECORDING({$varOne}) MAXIMUM({$varOne})|errorOne|errorTwo_}";
+    private static final String SECRECORDING_INVALID_2 = "SET SECRECORDING({$varOne}) {ACTION|errorOne}({$varOne}) {ADD|errorOne} MAXIMUM({$varOne})";
     private static final String STATISTICS_INVALID_1 = "SET STATISTICS ENDOFDAY({$varOne}) {ENDOFDAYHRS|errorOne}({$varOne})";
     private static final String STATISTICS_INVALID_2 = "SET {_STATISTICS RECORDNOW|errorOne_}";
     private static final String SYSDUMPCODE_INVALID_1 = "SET SYSDUMPCODE({$varOne}) ADD {REMOVE|errorOne}";
@@ -237,13 +237,11 @@ public class TestCicsSysSetStatement {
     private static final String TASK_INVALID_2 = "SET TASK({$varOne}) SRRACTIVE {SRRINACTIVE|errorOne}";
     //private static final String TCLASS_INVALID_1 = "SET TCLASS ";
     //private static final String TCLASS_INVALID_2 = "SET TCLASS ";
-    private static final String TCPIP_INVALID_1 = "SET {_TCPIP NEWMAXSOCKET({$varOne}) CLOSED|errorOne_}";
-    private static final String TCPIP_INVALID_2 = "SET TCPIP MAXSOCKETS({$varOne}) NEWMAXSOCKET({$varOne}) CLOSED {OPEN|errorOne} ";
-    private static final String TCPIPSERVICE_INVALID_1 = "SET {_TCPIPSERVICE({$varOne}) MAXDATALEN({$varOne} )|errorOne_}";
-    private static final String TCPIPSERVICE_INVALID_2 = "SET TCPIPSERVICE({$varOne}) BACKLOG({$varOne}) MAXDATALEN({$varOne}) CLOSED {OPEN|errorOne}";
+    private static final String TCPIP_INVALID_1 = "SET TCPIP MAXSOCKETS({$varOne}) NEWMAXSOCKET({$varOne}) CLOSED {OPEN|errorOne} ";
+    private static final String TCPIPSERVICE_INVALID_1 = "SET TCPIPSERVICE({$varOne}) BACKLOG({$varOne}) MAXDATALEN({$varOne}) CLOSED {OPEN|errorOne}";
     private static final String TDQUEUE_INVALID_1 = "SET TDQUEUE({$varOne}) TERMINAL {NOTERMINAL|errorOne}";
     private static final String TDQUEUE_INVALID_2 = "SET TDQUEUE({$varOne}) {DISABLED|errorOne} ENABLED";
-    private static final String TEMPSTORAGE_INVALID_1 = "SET {TEMPSTORAGE|errorOne} {NORESP|errorTwo}";
+    //private static final String TEMPSTORAGE_INVALID_1 = "SET TEMPSTORAGE ";
     private static final String TERMINAL_INVALID_1 = "SET TERMINAL({$varOne}) NOTTI {TTI|errorOne}";
     private static final String TERMINAL_INVALID_2 = "SET {_TERMINAL({$varOne}) FORCE|errorOne_}";
     private static final String TRACEDEST_INVALID_1 = "SET TRACEDEST INTSTART {INTSTOP|errorOne}";
@@ -259,7 +257,7 @@ public class TestCicsSysSetStatement {
     private static final String TRANSACTION_INVALID_2 = "SET TRANSACTION({$varOne}) SPECTRACE {SPRSTRACE|errorOne}";
     private static final String TSQUEUE_INVALID_1 = "SET {TSQUEUE|errorOne}({$varOne}) {TSQNAME|errorOne}({$varOne}) SYSID({$varOne})";
     private static final String TSQUEUE_INVALID_2 = "SET {_TSQUEUE({$varOne}) LASTUSEDINT({$varOne} )|errorOne_}";
-    private static final String UOW_INVALID_1 = "SET UOW({$varOne}) {COMMIT|errorOne} {FORCE|errorOne}";
+    private static final String UOW_INVALID_1 = "SET UOW({$varOne}) COMMIT {FORCE|errorOne}";
     private static final String UOWLINK_INVALID_1 = "SET UOWLINK({$varOne}) ACTION({$varOne}) {DELETE|errorOne}";
     private static final String URIMAP_INVALID_1 = "SET URIMAP({$varOne}) DISABLED {ENABLED|errorOne}";
     private static final String URIMAP_INVALID_2 = "SET URIMAP({$varOne}) PERMANENT {TEMPORARY|errorOne}";
@@ -755,7 +753,7 @@ public class TestCicsSysSetStatement {
 
     @Test
     void testCicsEnqmodelInvalid() {
-        testSingleError(ENQMODEL_INVALID_1, "Exactly one option required, options are mutually exclusive: STATUS, ENABLED or DISABLED");
+        testSingleError(ENQMODEL_INVALID_1, "Options \"STATUS, ENABLED or DISABLED\" are mutually exclusive.");
     }
 
     @Test
@@ -772,7 +770,7 @@ public class TestCicsSysSetStatement {
 
     @Test
     void testCicsEventprocessInvalid() {
-        testSingleError(EVENTPROCESS_INVALID_1, "Exactly one option required, options are mutually exclusive: EPSTATUS, STARTED, DRAIN or STOPPED");
+        testSingleError(EVENTPROCESS_INVALID_1, "Options \"EPSTATUS, STARTED, DRAIN or STOPPED\" are mutually exclusive.");
     }
 
     @Test
@@ -797,8 +795,8 @@ public class TestCicsSysSetStatement {
 
     @Test
     void testCicsJournalnameInvalid() {
-        testSingleError(JOURNALNAME_INVALID_1, "Exactly one option required, options are mutually exclusive: ACTION, FLUSH or RESET");
-        testSingleError(JOURNALNAME_INVALID_2, "Exactly one option required, none provided: STATUS, DISABLED or ENABLED");
+        testSingleError(JOURNALNAME_INVALID_1, "Options \"ACTION, FLUSH, RESET, STATUS, DISABLED or ENABLED\" are mutually exclusive.");
+        testSingleError(JOURNALNAME_INVALID_2, "Options \"ACTION, FLUSH, RESET, STATUS, DISABLED or ENABLED\" are mutually exclusive.");
     }
 
     // See JOURNALNUM for JOURNALNAME tests due to NAME being obsolete.
@@ -806,12 +804,12 @@ public class TestCicsSysSetStatement {
     @Test
     void testCicsJvmendpointInvalid() {
         testSingleError(JVMENDPOINT_INVALID_1, "Missing required option: JVMSERVER");
-        testSingleError(JVMENDPOINT_INVALID_2, "Exactly one option required, none provided: ENABLESTATUS, ENABLED or DISABLED");
+        testSingleError(JVMENDPOINT_INVALID_2, "Options \"ENABLESTATUS, ENABLED or DISABLED\" are mutually exclusive.");
     }
 
     @Test
     void testCicsJvmserverInvalid() {
-        testSingleError(JVMSERVER_INVALID_1, "Exactly one option required, options are mutually exclusive: ENABLESTATUS, ENABLED or DISABLED");
+        testSingleError(JVMSERVER_INVALID_1, "Options \"ENABLESTATUS, ENABLED or DISABLED\" are mutually exclusive.");
         testSingleError(JVMSERVER_INVALID_2, "Options \"PHASEOUT, PURGETYPE, PURGE, FORCEPURGE or KILL\" are mutually exclusive.");
     }
 
@@ -835,14 +833,14 @@ public class TestCicsSysSetStatement {
 
     @Test
     void testCicsMqconnInvalid() {
-        testSingleError(MQCONN_INVALID_1, "Exactly one option required, none provided: CONNECTST, CONNECTED or NOTCONNECTED");
+        testSingleError(MQCONN_INVALID_1, "Options \"CONNECTST, CONNECTED or NOTCONNECTED\" are mutually exclusive.");
         testSingleError(MQCONN_INVALID_2, "Options \"RESYNCMEMBER, RESYNC, NORESYNC or GROUPRESYNC\" are mutually exclusive.");
     }
 
     @Test
     void testCicsMqmonitorInvalid() {
-        testSingleError(MQMONITOR_INVALID_1, "Exactly one option required, none provided: ENABLESTATUS, ENABLED or DISABLED");
-        testSingleError(MQMONITOR_INVALID_2, "Exactly one option required, none provided: AUTOSTATUS, AUTOSTART or NOAUTOSTART");
+        testSingleError(MQMONITOR_INVALID_1, "Options \"AUTOSTATUS, AUTOSTART or NOAUTOSTART\" are mutually exclusive.");
+        testSingleError(MQMONITOR_INVALID_2, "Options \"MONSTATUS, STARTED or STOPPED\" are mutually exclusive.");
     }
 
     @Test
@@ -880,8 +878,8 @@ public class TestCicsSysSetStatement {
 
     @Test
     void testCicsSecrecordingInvalid() {
-        testSingleError(SECRECORDING_INVALID_1, "Missing required option for: MAXIMUM without ADD");
-        testSingleError(SECRECORDING_INVALID_2, "Options \"ODADPTRID, ODADPTRDATA1, ODADPTRDATA2, ODADPTRDATA3, ODAPPLID, ODCLNTIPADDR, ODCLNTPORT, ODFACILNAME, ODFACILTYPE, ODIPFAMILY, ODLUNAME, ODNETID, ODNETWORKID, ODSERVERPORT, ODTCPIPS, ODTRANSID or ODUSERID\" are mutually exclusive.");
+        testTwoErrors(SECRECORDING_INVALID_1, "Exactly one option required, none provided: ACTION, ADD MAXIMUM, MODIFY or REMOVE", "If one option is specified, all options must be present: ADD and MAXIMUM");
+        testSingleError(SECRECORDING_INVALID_2, "Exactly one option required, options are mutually exclusive: ACTION, ADD MAXIMUM, MODIFY or REMOVE");
     }
 
     @Test
@@ -919,14 +917,12 @@ public class TestCicsSysSetStatement {
 
     @Test
     void testCicsTcpipInvalid() {
-        testSingleError(TCPIP_INVALID_1, "Missing required option: MAXSOCKETS");
-        testSingleError(TCPIP_INVALID_2, "Options \"OPENSTATUS, CLOSED, IMMCLOSE or OPEN\" are mutually exclusive.");
+        testSingleError(TCPIP_INVALID_1, "Options \"OPENSTATUS, CLOSED, IMMCLOSE or OPEN\" are mutually exclusive.");
     }
 
     @Test
     void testCicsTcpipserviceInvalid() {
-        testSingleError(TCPIPSERVICE_INVALID_1, "Missing required option: BACKLOG");
-        testSingleError(TCPIPSERVICE_INVALID_2, "Options \"OPENSTATUS, CLOSED, IMMCLOSE or OPEN\" are mutually exclusive.");
+        testSingleError(TCPIPSERVICE_INVALID_1, "Options \"OPENSTATUS, CLOSED, IMMCLOSE or OPEN\" are mutually exclusive.");
     }
 
     @Test
@@ -937,7 +933,7 @@ public class TestCicsSysSetStatement {
 
     @Test
     void testCicsTempstorageInvalid() {
-        testTwoErrors(TEMPSTORAGE_INVALID_1, "Missing required option: TSMAINLIMIT", "Extraneous input NORESP");
+        // No checks other than duplicates
     }
 
     @Test
@@ -989,7 +985,7 @@ public class TestCicsSysSetStatement {
 
     @Test
     void testCicsUowInvalid() {
-        testSingleError(UOW_INVALID_1, "Exactly one option required, options are mutually exclusive: UOWSTATE, COMMIT, BACKOUT or FORCE");
+        testSingleError(UOW_INVALID_1, "Options \"UOWSTATE, COMMIT, BACKOUT or FORCE\" are mutually exclusive.");
     }
 
     @Test
