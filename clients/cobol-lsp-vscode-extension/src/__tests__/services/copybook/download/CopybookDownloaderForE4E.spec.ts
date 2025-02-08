@@ -21,6 +21,11 @@ import {
 import * as extension from "../../../../extension";
 import * as vscode from "vscode";
 
+jest.mock("path", () => ({
+  ...jest.requireActual<typeof path>("path"),
+  sep: "/",
+}));
+
 describe("e4e copybook downloader tests", () => {
   let e4e: E4E;
 
