@@ -49,8 +49,8 @@ public class TestCicsSysSetStatement {
     private static final String DB2CONN_VALID_2 = "SET DB2CONN ACCOUNTREC({$varOne}) AUTHID({$varOne}) AUTHTYPE({$varOne}) BUSY({$varOne}) COMAUTHID({$varOne}) COMAUTHTYPE({$varOne}) COMTHREADLIM({$varOne}) CONNECTERROR({$varOne}) CONNECTST({$varOne}) DB2GROUPID({$varOne}) DB2ID({$varOne}) MSGQUEUE1({$varOne}) MSGQUEUE2({$varOne}) MSGQUEUE3({$varOne}) NONTERMREL({$varOne}) PLAN({$varOne}) PLANEXITNAME({$varOne}) PRIORITY({$varOne}) PURGECYCLEM({$varOne}) PURGECYCLES({$varOne}) RESYNCMEMBER({$varOne}) REUSELIMIT({$varOne}) SECURITY(REBUILD) SIGNID({$varOne}) STANDBYMODE({$varOne}) STATSQUEUE({$varOne}) TCBLIMIT({$varOne}) THREADLIMIT({$varOne}) THREADWAIT({$varOne})";
     private static final String DB2ENTRY_VALID_1 = "SET DB2ENTRY({$varOne})";
     private static final String DB2ENTRY_VALID_2 = "SET DB2ENTRY({$varOne}) ACCOUNTREC({$varOne}) AUTHID({$varOne}) AUTHTYPE({$varOne}) BUSY({$varOne}) DISABLEDACT({$varOne}) ENABLESTATUS({$varOne}) PLAN({$varOne}) PLANEXITNAME({$varOne}) PRIORITY({$varOne}) SHARELOCKS({$varOne}) THREADLIMIT({$varOne}) THREADWAIT({$varOne})";
-    private static final String DB2TRAN_VALID_1 = "SET DB2TRAN({$varOne})";
-    private static final String DB2TRAN_VALID_2 = "SET DB2TRAN({$varOne}) DB2ENTRY({$varOne}) TRANSID({$varOne})";
+    private static final String DB2TRAN_VALID_1 = "SET DB2TRAN";
+    private static final String DB2TRAN_VALID_2 = "SET DB2TRAN DB2ENTRY({$varOne}) TRANSID({$varOne})";
     private static final String DELETSHIPPED_VALID_1 = "SET DELETSHIPPED";
     private static final String DELETSHIPPED_VALID_2 = "SET DELETSHIPPED IDLE({$varOne}) INTERVALHRS({$varOne}) INTERVALMINS({$varOne}) INTERVALSECS({$varOne})";
     private static final String DISPATCHER_VALID_1 = "SET DISPATCHER";
@@ -178,7 +178,7 @@ public class TestCicsSysSetStatement {
     private static final String DB2CONN_INVALID_2 = "SET DB2CONN TWAIT {NOTWAIT|errorOne}";
     private static final String DB2ENTRY_INVALID_1 = "SET DB2ENTRY({$varOne}) ABEND {SQLCODE|errorOne}";
     private static final String DB2ENTRY_INVALID_2 = "SET DB2ENTRY({$varOne}) YES {NO|errorOne}";
-    private static final String DB2TRAN_INVALID_1 = "SET DB2TRAN({$varOne}) DB2ENTRY({$varOne}) {DB2ENTRY|errorOne}({$varOne})";
+    private static final String DB2TRAN_INVALID_1 = "SET DB2TRAN DB2ENTRY({$varOne}) {DB2ENTRY|errorOne}({$varOne})";
     private static final String DELETSHIPPED_INVALID_1 = "SET DELETSHIPPED IDLE({$varOne}) {IDLEHRS|errorOne}({$varOne})";
     private static final String DELETSHIPPED_INVALID_2 = "SET DELETSHIPPED INTERVAL({$varOne}) {INTERVALHRS|errorOne}({$varOne})";
     private static final String DISPATCHER_INVALID_1 = "SET DISPATCHER TIME({$varOne}) {TIME|errorOne}({$varOne})";
