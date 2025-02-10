@@ -45,8 +45,10 @@ export abstract class ZoweExplorerDownloader {
     loadedProfile: IProfileLoaded,
   ) {
     const copybookEncoding = SettingsService.getCopybookFileEncoding();
-    const baseUri = vscode.Uri.file(
-      CopybookURI.createDatasetPath([profileName], dataset, this.storagePath),
+    const baseUri = CopybookURI.createDatasetPath(
+      [profileName],
+      dataset,
+      this.storagePath,
     );
     const fileUri = vscode.Uri.joinPath(baseUri, member);
     return {

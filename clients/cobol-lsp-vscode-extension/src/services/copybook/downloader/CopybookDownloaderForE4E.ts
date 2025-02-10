@@ -304,7 +304,7 @@ export class CopybookDownloaderForE4E {
     }
 
     return vscode.Uri.joinPath(
-      vscode.Uri.file(folder),
+      folder,
       copybook.substring(
         0,
         copybook.indexOf(".") !== -1 ? copybook.indexOf(".") : copybook.length,
@@ -337,7 +337,7 @@ export class CopybookDownloaderForE4E {
         use_map,
         this.storagePath,
         E4E_FOLDER,
-      ),
+      ).fsPath,
     ];
 
     return searchCopybookInExtensionFolder(

@@ -18,7 +18,7 @@ import { EndevorType, ResolvedProfile } from "../../type/e4eApi.d";
 import { Utils } from "../util/Utils";
 import * as vscode from "vscode";
 
-// Source can be only a single level directory, no subdirectories
+// Source can be only a single level directory, with no subdirectories
 type CopybooksSource = typeof ZOWE_FOLDER | typeof E4E_FOLDER;
 
 /**
@@ -51,11 +51,11 @@ export class CopybookURI {
     dataset: string,
     downloadFolder: string,
     source: CopybooksSource = ZOWE_FOLDER,
-  ): string {
+  ) {
     return vscode.Uri.joinPath(
       vscode.Uri.file(downloadFolder),
       ...this.createDatasetSubdirectories(profileName, source, dataset),
-    ).fsPath;
+    );
   }
 
   public static createDatasetSubdirectories(
