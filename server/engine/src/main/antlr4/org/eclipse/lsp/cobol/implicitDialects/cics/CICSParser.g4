@@ -451,7 +451,7 @@ cics_freemain_opts:(DATA cics_data_area | DATAPOINTER cics_value | cics_handle_r
 
 /** GDS */
 cics_gds: GDS cics_gds_opts;
-cics_gds_opts: ~(END_EXEC|EOF)*;
+cics_gds_opts: ~(END_EXEC|EOF|DOT)*;
 
 /** GET CONTAINER / GET COUNTER / GET DCOUNTER */
 cics_get: (GET (cics_get_container_bts | cics_get_counter_dcounter)) | (GET|GET64) cics_get_container_channel;
