@@ -17,7 +17,6 @@ import { ProfileUtils } from "../util/ProfileUtils";
 import { EndevorType, ResolvedProfile } from "../../type/e4eApi.d";
 import { Utils } from "../util/Utils";
 import * as vscode from "vscode";
-import * as path from "path";
 
 /**
  * This class is responsible to identify from which source resolve copybooks required by the server.
@@ -28,20 +27,14 @@ export class CopybookURI {
    * {downloadFolder}/{zowe/e4e}/copybooks/{profile}/{dataset}/{copybook}
    */
   public static createCopybookPath(
-    profileName: string,
+    profileName: string[],
     dataset: string,
     copybook: string,
     downloadFolder: string,
   ): string {
     return vscode.Uri.joinPath(
-      vscode.Uri.file(
-        this.createDatasetPath(
-          profileName,
-          dataset,
-          downloadFolder,
-          ZOWE_FOLDER,
-        ),
-      ),
+      vscode.Uri.file(downloadFolder),
+      ...this.createDatasetSubdirectories(profileName, ZOWE_FOLDER, dataset),
       copybook,
     ).fsPath;
   }
@@ -51,44 +44,23 @@ export class CopybookURI {
    * {downloadFolder}/{zowe/e4e}/copybooks/{profile}/{dataset}
    */
   public static createDatasetPath(
-    profileName: string,
+    profileName: string[],
     dataset: string,
     downloadFolder: string,
     source: string = ZOWE_FOLDER,
   ): string {
     return vscode.Uri.joinPath(
       vscode.Uri.file(downloadFolder),
-      this.createDatasetSubdirectoriesPath(profileName, source, dataset),
-    ).fsPath;
-  }
-
-  /**
-   * Returns part of the path to copybooks
-   * in format {source}/copybooks/{profile}/{dataset}
-   */
-  public static createDatasetSubdirectoriesPath(
-    profileName: string,
-    source: string,
-    dataset: string,
-  ) {
-    return vscode.Uri.joinPath(
-      vscode.Uri.file(source),
-      COPYBOOKS_FOLDER,
-      profileName,
-      dataset,
+      ...this.createDatasetSubdirectories(profileName, source, dataset),
     ).fsPath;
   }
 
   public static createDatasetSubdirectories(
-    profileName: string,
+    profileName: string[],
     source: string,
     dataset: string,
   ): string[] {
-    return this.createDatasetSubdirectoriesPath(
-      profileName,
-      source,
-      dataset,
-    ).split(path.sep);
+    return [source, COPYBOOKS_FOLDER, ...profileName, dataset];
   }
   /**
    * This method produce an array with element that following the schema
@@ -123,14 +95,17 @@ export class CopybookURI {
     );
   }
 
-  public static getEnviromentPath(type: EndevorType, profile: ResolvedProfile) {
-    return vscode.Uri.joinPath(
-      vscode.Uri.file(Utils.profileAsString(profile)),
+  public static getEnviromentPath(
+    type: EndevorType,
+    profile: ResolvedProfile,
+  ): string[] {
+    return [
+      Utils.profileAsString(profile),
       type.environment,
       type.stage,
       type.system,
       type.subsystem,
       type.type,
-    ).fsPath;
+    ];
   }
 }

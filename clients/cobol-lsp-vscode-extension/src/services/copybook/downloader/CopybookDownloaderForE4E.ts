@@ -227,7 +227,7 @@ export class CopybookDownloaderForE4E {
     member: EndevorMember,
   ): Promise<boolean> {
     try {
-      const instance = Utils.profileAsString(endevorApi.profile);
+      const instance = [Utils.profileAsString(endevorApi.profile)];
       const filePath: string = await CopybookDownloaderForE4E.getCopybookPath(
         instance,
         member.dataset,
@@ -256,7 +256,7 @@ export class CopybookDownloaderForE4E {
   }
 
   private static async getCopybookPath(
-    instance: string,
+    instance: string[],
     mapped: string,
     downloadFolder: string,
     copybook: string,
@@ -331,7 +331,7 @@ export class CopybookDownloaderForE4E {
     let use_map;
     let instance;
     if (DATASET in first) {
-      instance = Utils.profileAsString(config.profile);
+      instance = [Utils.profileAsString(config.profile)];
       use_map = first.dataset;
     } else if (ENVIRONMENT in first) {
       use_map = first.use_map ? USE_MAP : "";

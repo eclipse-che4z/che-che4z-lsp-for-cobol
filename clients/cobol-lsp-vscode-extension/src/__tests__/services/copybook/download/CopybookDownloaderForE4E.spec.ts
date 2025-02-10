@@ -55,7 +55,7 @@ describe("e4e copybook downloader tests", () => {
       it("allocates the copybook path incrementally", async () => {
         expect(
           await CopybookDownloaderForE4E["getCopybookPath"](
-            "Instance.Instance",
+            ["Instance.Instance"],
             "pgm",
             "C:\\Users\\Developer\\globalStorage",
             "Copy.cpy",
@@ -86,7 +86,7 @@ describe("e4e copybook downloader tests", () => {
       it("allocates the copybook path incrementally", async () => {
         expect(
           await CopybookDownloaderForE4E["getCopybookPath"](
-            "Instance.Instance",
+            ["Instance.Instance"],
             "pgm",
             "/home/developer/globalStorage",
             "Copy.cpy",
