@@ -22,8 +22,8 @@ allCicsRule: cics_send | cics_receive | cics_add | cics_address | cics_allocate 
                        cics_build | cics_cancel | cics_change | cics_check | cics_connect | cics_converttime |
                        cics_define | cics_delay | cics_delete | cics_deleteq | cics_deq | cics_document | cics_dump | cics_endbr |
                        cics_endbrowse | cics_enq | cics_enter | cics_extract | cics_fetch | cics_force | cics_formattime | cics_free |
-                       cics_freemain | cics_get | cics_getmain | cics_getmain64 | cics_getnext | cics_handle | cics_ignore | cics_inquire |
-                       cics_invoke | cics_issue | cics_link | cics_load | cics_monitor | cics_move | cics_point | cics_pop |
+                       cics_freemain | cics_gds | cics_get | cics_getmain | cics_getmain64 | cics_getnext | cics_handle | cics_ignore |
+                       cics_inquire | cics_invoke | cics_issue | cics_link | cics_load | cics_monitor | cics_move | cics_point | cics_pop |
                        cics_post | cics_purge | cics_push | cics_put_container | cics_query | cics_read | cics_readnext_readprev |
                        cics_readq | cics_release | cics_remove | cics_request | cics_reset | cics_resetbr | cics_resume | cics_retrieve |
                        cics_return | cics_rewind | cics_rewrite | cics_route | cics_run | cics_set | cics_signal | cics_signoff | cics_signon |
@@ -448,6 +448,10 @@ cics_free_body: ((CONVID | SESSION) cics_name | STATE cics_cvda | CHILD cics_dat
 /** FREEMAIN */
 cics_freemain: (FREEMAIN | FREEMAIN64) cics_freemain_opts;
 cics_freemain_opts:(DATA cics_data_area | DATAPOINTER cics_value | cics_handle_response)+;
+
+/** GDS */
+cics_gds: GDS cics_gds_opts;
+cics_gds_opts: ~(END_EXEC|EOF)*;
 
 /** GET CONTAINER / GET COUNTER / GET DCOUNTER */
 cics_get: (GET (cics_get_container_bts | cics_get_counter_dcounter)) | (GET|GET64) cics_get_container_channel;
