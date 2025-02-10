@@ -60,9 +60,9 @@ describe("e4e copybook downloader tests", () => {
             "C:\\Users\\Developer\\globalStorage",
             "Copy.cpy",
           ),
-        ).toEqual(
-          "C:\\Users\\Developer\\globalStorage\\e4e\\copybooks\\Instance.Instance\\pgm\\Copy",
-        );
+        ).toEqual({
+          path: "C:\\Users\\Developer\\globalStorage\\e4e\\copybooks\\Instance.Instance\\pgm\\Copy",
+        });
         expect(vscode.workspace.fs.createDirectory).toHaveBeenCalledWith({
           path: "C:\\Users\\Developer\\globalStorage\\e4e",
         });
@@ -91,9 +91,9 @@ describe("e4e copybook downloader tests", () => {
             "/home/developer/globalStorage",
             "Copy.cpy",
           ),
-        ).toEqual(
-          "/home/developer/globalStorage/e4e/copybooks/Instance.Instance/pgm/Copy",
-        );
+        ).toEqual({
+          path: "/home/developer/globalStorage/e4e/copybooks/Instance.Instance/pgm/Copy",
+        });
         expect(vscode.workspace.fs.createDirectory).toHaveBeenCalledWith({
           path: "/home/developer/globalStorage/e4e",
         });

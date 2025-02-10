@@ -196,7 +196,7 @@ export class CopybookDownloaderForE4E {
         element,
         endevorApi.profile,
       );
-      const filePath: string = await CopybookDownloaderForE4E.getCopybookPath(
+      const filePath = await CopybookDownloaderForE4E.getCopybookPath(
         instance,
         use_map,
         this.storagePath,
@@ -211,7 +211,7 @@ export class CopybookDownloaderForE4E {
         this.outputChannel?.appendLine(resultElement.message);
       } else {
         await vscode.workspace.fs.writeFile(
-          vscode.Uri.file(filePath),
+          filePath,
           Buffer.from(resultElement[0]),
         );
         return true;
@@ -228,7 +228,7 @@ export class CopybookDownloaderForE4E {
   ): Promise<boolean> {
     try {
       const instance = [Utils.profileAsString(endevorApi.profile)];
-      const filePath: string = await CopybookDownloaderForE4E.getCopybookPath(
+      const filePath = await CopybookDownloaderForE4E.getCopybookPath(
         instance,
         member.dataset,
         this.storagePath,
@@ -244,7 +244,7 @@ export class CopybookDownloaderForE4E {
         this.outputChannel?.appendLine(memberContent.message);
       } else {
         await vscode.workspace.fs.writeFile(
-          vscode.Uri.file(filePath),
+          filePath,
           Buffer.from(memberContent),
         );
         return true;
@@ -260,8 +260,8 @@ export class CopybookDownloaderForE4E {
     mapped: string,
     downloadFolder: string,
     copybook: string,
-  ): Promise<string> {
-    let folder = CopybookURI.createDatasetPath(
+  ): Promise<vscode.Uri> {
+    const folder = CopybookURI.createDatasetPath(
       instance,
       mapped,
       downloadFolder,
@@ -303,14 +303,13 @@ export class CopybookDownloaderForE4E {
       }
     }
 
-    folder = vscode.Uri.joinPath(
+    return vscode.Uri.joinPath(
       vscode.Uri.file(folder),
       copybook.substring(
         0,
         copybook.indexOf(".") !== -1 ? copybook.indexOf(".") : copybook.length,
       ),
-    ).fsPath;
-    return folder;
+    );
   }
 
   public async getE4ECopyBookLocation(
