@@ -17,6 +17,7 @@ import { ProfileUtils } from "../util/ProfileUtils";
 import { EndevorType, ResolvedProfile } from "../../type/e4eApi.d";
 import { Utils } from "../util/Utils";
 import * as vscode from "vscode";
+import * as path from "path";
 
 /**
  * This class is responsible to identify from which source resolve copybooks required by the server.
@@ -57,7 +58,7 @@ export class CopybookURI {
   ): string {
     return vscode.Uri.joinPath(
       vscode.Uri.file(downloadFolder),
-      this.createDatasetDirectoriesPath(profileName, source, dataset),
+      this.createDatasetSubdirectoriesPath(profileName, source, dataset),
     ).fsPath;
   }
 
@@ -65,7 +66,7 @@ export class CopybookURI {
    * Returns part of the path to copybooks
    * in format {source}/copybooks/{profile}/{dataset}
    */
-  public static createDatasetDirectoriesPath(
+  public static createDatasetSubdirectoriesPath(
     profileName: string,
     source: string,
     dataset: string,
@@ -76,6 +77,18 @@ export class CopybookURI {
       profileName,
       dataset,
     ).fsPath;
+  }
+
+  public static createDatasetSubdirectories(
+    profileName: string,
+    source: string,
+    dataset: string,
+  ): string[] {
+    return this.createDatasetSubdirectoriesPath(
+      profileName,
+      source,
+      dataset,
+    ).split(path.sep);
   }
   /**
    * This method produce an array with element that following the schema

@@ -36,7 +36,6 @@ import { hasMember, Utils } from "../../util/Utils";
 import { searchCopybookInExtensionFolder } from "../../util/FSUtils";
 import { getErrorMessage } from "../../util/ErrorsUtils";
 import { SettingsService } from "../../Settings";
-import * as path from "path";
 import { getChannel } from "../../../extension";
 
 const defaultConfigs: ExternalConfigurationOptions = {
@@ -278,17 +277,16 @@ export class CopybookDownloaderForE4E {
      * As a workaround, the path is splitted into individual subfolders
      * are they are created incrementally one by one.
      */
-    const subfoldersPath = CopybookURI.createDatasetDirectoriesPath(
+    const subdirectories = CopybookURI.createDatasetSubdirectories(
       instance,
       E4E_FOLDER,
       mapped,
     );
-    const subfolders = subfoldersPath.split(path.sep);
     let finishedPath = downloadFolder;
-    for (const subfolder of subfolders) {
+    for (const subdirectory of subdirectories) {
       finishedPath = vscode.Uri.joinPath(
         vscode.Uri.file(finishedPath),
-        subfolder,
+        subdirectory,
       ).fsPath;
 
       try {
