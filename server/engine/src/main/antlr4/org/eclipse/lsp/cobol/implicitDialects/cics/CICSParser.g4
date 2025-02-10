@@ -872,7 +872,7 @@ cics_set_db2conn: ((DB2CONN | UOW | TASK | TXID | NONE | GROUP | SIGN | TERM | T
                             (ACCOUNTREC | AUTHTYPE | BUSY | COMAUTHTYPE | CONNECTERROR | CONNECTST | NONTERMREL | PRIORITY | RESYNCMEMBER | STANDBYMODE | THREADWAIT) cics_cvda | cics_handle_response)+;
 cics_set_db2entry: ((UOW | TASK | TXID | NONE | GROUP | SIGN | TERM | TX | OPID | USERID | WAIT | NOWAIT | FORCE | ABEND | SQLCODE | POOL | ENABLED | DISABLED | HIGH | EQUAL | LOW | YES | NO | TWAIT | NOTWAIT | TPOOL) |
                             (DB2ENTRY | AUTHID | PLAN | PLANEXITNAME | PROTECTNUM | THREADLIMIT) cics_data_area | (ACCOUNTREC | AUTHTYPE | BUSY | DISABLEDACT | ENABLESTATUS | PRIORITY | SHARELOCKS | THREADWAIT) cics_cvda | cics_handle_response)+;
-cics_set_db2tran: (DB2TRAN | (DB2ENTRY | TRANSID) cics_data_area | cics_handle_response)+;
+cics_set_db2tran: ((DB2ENTRY | DB2TRAN | TRANSID) cics_data_area | cics_handle_response)+;
 cics_set_deletshipped: (DELETSHIPPED | (IDLE | IDLEHRS | IDLEMINS | IDLESECS | INTERVAL | INTERVALHRS | INTERVALMINS | INTERVALSECS) cics_data_value | cics_handle_response)+;
 cics_set_dispatcher: (DISPATCHER | (MAXOPENTCBS | MAXSSLTCBS | MAXXPTCBS | MROBATCH | PRTYAGING | RUNAWAY | SCANDELAY | TIME) cics_data_value | cics_handle_response)+;
 cics_set_doctemplate: (DOCTEMPLATE cics_data_value | NEWCOPY | COPY cics_cvda | cics_handle_response)+;
