@@ -11,12 +11,15 @@
  * Contributors:
  *   Broadcom, Inc. - initial API and implementation
  */
-import { COPYBOOKS_FOLDER, ZOWE_FOLDER } from "../../constants";
+import { COPYBOOKS_FOLDER, E4E_FOLDER, ZOWE_FOLDER } from "../../constants";
 import { SettingsService } from "../Settings";
 import { ProfileUtils } from "../util/ProfileUtils";
 import { EndevorType, ResolvedProfile } from "../../type/e4eApi.d";
 import { Utils } from "../util/Utils";
 import * as vscode from "vscode";
+
+// Source can be only a single level directory, no subdirectories
+type CopybooksSource = typeof ZOWE_FOLDER | typeof E4E_FOLDER;
 
 /**
  * This class is responsible to identify from which source resolve copybooks required by the server.
@@ -47,7 +50,7 @@ export class CopybookURI {
     profileName: string[],
     dataset: string,
     downloadFolder: string,
-    source: string = ZOWE_FOLDER,
+    source: CopybooksSource = ZOWE_FOLDER,
   ): string {
     return vscode.Uri.joinPath(
       vscode.Uri.file(downloadFolder),
@@ -57,7 +60,7 @@ export class CopybookURI {
 
   public static createDatasetSubdirectories(
     profileName: string[],
-    source: string,
+    source: CopybooksSource,
     dataset: string,
   ): string[] {
     return [source, COPYBOOKS_FOLDER, ...profileName, dataset];

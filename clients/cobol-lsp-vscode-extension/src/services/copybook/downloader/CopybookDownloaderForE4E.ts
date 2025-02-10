@@ -282,26 +282,21 @@ export class CopybookDownloaderForE4E {
       E4E_FOLDER,
       mapped,
     );
-    let finishedPath = downloadFolder;
+    let finishedPath = vscode.Uri.file(downloadFolder);
     for (const subdirectory of subdirectories) {
-      finishedPath = vscode.Uri.joinPath(
-        vscode.Uri.file(finishedPath),
-        subdirectory,
-      ).fsPath;
+      finishedPath = vscode.Uri.joinPath(finishedPath, subdirectory);
 
       try {
-        await vscode.workspace.fs.createDirectory(
-          vscode.Uri.file(finishedPath),
-        );
+        await vscode.workspace.fs.createDirectory(finishedPath);
       } catch (err) {
         if (err instanceof vscode.FileSystemError.FileExists) {
           // ok - directory already exists, nothing to do
           getChannel().appendLine(
-            `FileExists error while allocating '${finishedPath}' directory for copybooks: ${JSON.stringify(err)}`,
+            `FileExists error while allocating '${finishedPath.toString()}' directory for copybooks: ${JSON.stringify(err)}`,
           );
         } else {
           getChannel().appendLine(
-            `Unable to allocate ${finishedPath} - ${hasMember(err, "msg") && typeof err.msg === "string" && err.msg} ${JSON.stringify(err)}`,
+            `Unable to allocate ${finishedPath.toString()} - ${hasMember(err, "msg") && typeof err.msg === "string" && err.msg} ${JSON.stringify(err)}`,
           );
           break;
         }
