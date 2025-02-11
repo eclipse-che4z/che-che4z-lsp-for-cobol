@@ -19,6 +19,7 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
+import org.eclipse.lsp.cobol.implicitDialects.cics.CICSLexer;
 import org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser;
 
 import java.util.HashMap;
@@ -33,7 +34,18 @@ public class CICSGetMain64OptionsUtility extends CICSOptionsCheckBaseUtility {
   public static final int RULE_INDEX = RULE_cics_getmain64;
 
   private static final Map<Integer, ErrorSeverity> DUPLICATE_CHECK_OPTIONS =
-      new HashMap<Integer, ErrorSeverity>() {};
+      new HashMap<Integer, ErrorSeverity>() {
+        {
+          put(CICSLexer.SET, ErrorSeverity.ERROR);
+          put(CICSLexer.FLENGTH, ErrorSeverity.ERROR);
+          put(CICSLexer.LOCATION, ErrorSeverity.ERROR);
+          put(CICSLexer.EXECUTABLE, ErrorSeverity.WARNING);
+          put(CICSLexer.SHARED, ErrorSeverity.WARNING);
+          put(CICSLexer.NOSUSPEND, ErrorSeverity.WARNING);
+          put(CICSLexer.USERDATAKEY, ErrorSeverity.WARNING);
+          put(CICSLexer.CICSDATAKEY, ErrorSeverity.WARNING);
+        }
+      };
 
   public CICSGetMain64OptionsUtility(DialectProcessingContext context, List<SyntaxError> errors) {
     super(context, errors, DUPLICATE_CHECK_OPTIONS);
@@ -49,10 +61,16 @@ public class CICSGetMain64OptionsUtility extends CICSOptionsCheckBaseUtility {
     if (ctx.getRuleIndex() == CICSParser.RULE_cics_getmain64_body) {
       checkGetMain((CICSParser.Cics_getmain64_bodyContext) ctx);
     }
+    checkDuplicates(ctx);
   }
 
+  @SuppressWarnings("unchecked")
   private void checkGetMain(CICSParser.Cics_getmain64_bodyContext ctx) {
     CICSParser.Cics_getmain64Context parentCtx = (CICSParser.Cics_getmain64Context) ctx.getParent();
     checkHasIllegalOptions(parentCtx.GETMAIN64(), "GETMAIN64 is only available in Assembly");
+    checkHasMandatoryOptions(ctx.SET(), ctx, "SET");
+    checkHasMandatoryOptions(ctx.FLENGTH(), ctx, "FLENGTH");
+    if (ctx.LOCATION().isEmpty()) checkHasIllegalOptions(ctx.EXECUTABLE(), "EXECUTABLE without LOCATION");
+    checkHasMutuallyExclusiveOptions("USERDATAKEY or CICSDATAKEY", ctx.USERDATAKEY(), ctx.CICSDATAKEY());
   }
 }
