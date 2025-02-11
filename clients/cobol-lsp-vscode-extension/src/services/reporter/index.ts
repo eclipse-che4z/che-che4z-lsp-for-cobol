@@ -12,8 +12,6 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
-import { userInfo } from "node:os";
-import { sep } from "node:path";
 import * as vscode from "vscode";
 import { TelemetryEvent, TelemetryEventMeasurements } from "./model";
 import TelemetryReporter from "@vscode/extension-telemetry";
@@ -139,10 +137,17 @@ function createTelemetryEvent(
  * @param content stack trace
  */
 export function anonymizeContent(content: string): string {
-  return content.replace(
-    new RegExp("\\" + sep + userInfo().username, "g"),
-    sep + "anonymous",
-  );
+  if (typeof process !== "undefined" && process.release.name === "node") {
+    const { userInfo } = require("node:os"); // eslint-disable-line
+    const { sep } = require("node:path"); // eslint-disable-line
+
+    return content.replace(
+      new RegExp("\\" + sep + userInfo().username, "g"), // eslint-disable-line
+      sep + "anonymous",
+    );
+  } else {
+    return content;
+  }
 }
 
 function resolveCategories(categories: string[]): string[] {
