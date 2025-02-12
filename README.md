@@ -39,7 +39,7 @@ Integrating COBOL Language Support with the Zowe Explorer and Explorer for Endev
 
 Both Zowe Explorer and Explorer for Endevor are available as part of the [Code4z extension pack](https://marketplace.visualstudio.com/items?itemName=broadcomMFD.code4z-extension-pack). A Zowe Explorer `zosmf` or `zftp` profile with credentials and a connection URL is also required to retrieve copybooks from mainframe data sets.
 
-<a href="https://www.openmainframeproject.org/all-projects/zowe/conformance"><img alt="This extension is Zowe v2 conformant" src="https://artwork.openmainframeproject.org/other/zowe-conformant/zowev2/explorer/color/zowe-conformant-zowev2-explorer-color.png" width=20% height=20% /></a>
+<a href="https://www.openmainframeproject.org/all-projects/zowe/conformance"><img alt="This extension is Zowe v3 conformant" src="https://artwork.openmainframeproject.org/other/zowe-conformant/zowev3/explorer-vs-code/color/zowe-conformant-zowev3-explorer-vs-code-color.png" width=20% height=20% /></a>
 
 ## Features
 COBOL Language Support provides the following COBOL syntax awareness features:
