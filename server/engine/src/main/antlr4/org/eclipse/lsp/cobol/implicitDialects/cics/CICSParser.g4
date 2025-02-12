@@ -750,7 +750,6 @@ cics_post: POST cics_post_options;
 cics_post_options: (INTERVAL (cics_zero_digit | cics_hhmmss) | TIME cics_hhmmss | AFTER | (HOURS | MINUTES | SECONDS) cics_data_value |
                  AT | SET cics_ref | REQID cics_name | cics_handle_response)+;
 
-cics_post_after: (AFTER | AT | HOURS cics_data_value | MINUTES cics_data_value | SECONDS cics_data_value | cics_handle_response)+;
 
 /** PURGE MESSAGE */
 cics_purge: PURGE cics_handle_response? MESSAGE cics_handle_response?;
@@ -1145,7 +1144,6 @@ cics_rebuild: LPARENCHAR REBUILD RPARENCHAR;
 cics_hhmmss: LPARENCHAR hhmmss RPARENCHAR;
 cics_label: LPARENCHAR paragraphNameUsage RPARENCHAR;
 cics_value: LPARENCHAR ptr_value RPARENCHAR;
-empty_parens: LPARENCHAR RPARENCHAR;
 
 cicsWord
     : WORD_IDENTIFIER | cicsWords
@@ -1850,7 +1848,6 @@ ABCODE
   | ENVDEFERR
   | EOC
   | EODS
-  | EOF
   | EOF_TOKEN
   | EP
   | EPADAPTER
@@ -3477,7 +3474,8 @@ ABCODE
   | ZCPTRACING
   | ZERO
   | ZEROES
-  | ZEROS;
+  | ZEROS
+;
 
 name: variableNameUsage+;
 data_value: variableNameUsage+;
