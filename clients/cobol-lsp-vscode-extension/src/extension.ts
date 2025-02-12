@@ -113,12 +113,11 @@ export function getChannel(): vscode.OutputChannel {
 export async function activate(
   context: vscode.ExtensionContext,
 ): Promise<__ExtensionApi & __AnalysisApi> {
+  await initTelemetry(context);
   DialectRegistry.clear();
   const { copyBooksDownloader, configurationWatcher } =
     await initialize(context);
   initSmartTab(context);
-
-  await initTelemetry(context);
   registerEvent(
     "log",
     ["bootstrap", "experiment-tag"],

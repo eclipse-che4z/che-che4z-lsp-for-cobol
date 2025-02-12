@@ -12,9 +12,7 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
-jest.mock("../../../services/reporter", () => ({
-  registerEvent: jest.fn(),
-}));
+jest.mock("../../../services/reporter");
 
 import * as vscode from "vscode";
 import { CopybooksCodeActionProvider } from "../../../services/copybook/CopybooksCodeActionProvider";

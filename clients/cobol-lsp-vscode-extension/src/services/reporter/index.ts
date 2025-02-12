@@ -56,7 +56,7 @@ export function registerEvent(
       createTelemetryEvent(
         eventName,
         categories!,
-        notes!,
+        notes,
         undefined,
         telemetryMeasurement,
       ),
@@ -90,7 +90,7 @@ export function registerExceptionEvent(
       createTelemetryEvent(
         eventName,
         categories!,
-        notes!,
+        notes,
         anonymizeContent(rootCause),
         telemetryMeasurement,
       ),
@@ -110,7 +110,8 @@ async function getTelemetryKey(
       return undefined;
     }
     return key;
-  } catch (_error) {
+  } catch (error) {
+    console.warn(error);
     return undefined;
   }
 }
@@ -118,7 +119,7 @@ async function getTelemetryKey(
 function createTelemetryEvent(
   eventName: string,
   categories: string[],
-  notes: string,
+  notes?: string,
   rootCause?: string,
   telemetryMeasurement?: TelemetryEventMeasurements,
 ): TelemetryEvent {
@@ -126,7 +127,7 @@ function createTelemetryEvent(
     timestamp: new Date().toISOString(),
     eventName,
     categories: resolveCategories(categories),
-    notes,
+    notes: notes || "",
     rootCause,
     measurements: telemetryMeasurement,
   };
