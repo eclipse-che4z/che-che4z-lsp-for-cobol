@@ -87,7 +87,7 @@ ALGORITHM=
 ALIAS=
 ALIGNED=
 ALL=
-ALLOCATE=
+ALLOCATE=ALLOCATE is used to obtain memory dynamically at run-time (typically for inline tables that might otherwise cause S0C4 errors). <br>[Read more](https://www.ibm.com/docs/en/cobol-zos/6.3?topic=statements-allocate-statement)<br>\u00A9 Copyright IBM Corporation 1994, 2019.<br>U.S. Government Users Restricted Rights - Use, duplication or disclosure restricted by GSA ADP Schedule Contract with IBM Corp.
 ALLOCERR=
 ALLOW=
 ALPHABET=The ALPHABET clause provides a means of relating an alphabet-name to a specified character code set or collating sequence.<br>[Read more](https://www.ibm.com/support/knowledgecenter/en/SS6SG3_6.2.0/com.ibm.cobol62.ent.doc/PGandLR/ref/rlconalp.html)<br>\u00A9 Copyright IBM Corporation 1994, 2019.<br>U.S. Government Users Restricted Rights - Use, duplication or disclosure restricted by GSA ADP Schedule Contract with IBM Corp.
