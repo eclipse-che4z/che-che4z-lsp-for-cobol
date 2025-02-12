@@ -34,11 +34,11 @@ export class CopybookDownloaderForUss extends ZoweExplorerDownloader {
     _copybookName: CopybookName,
     documentUri: string,
     ussPath: string | undefined,
+    profile?: string,
   ): boolean {
-    const providedProfile = ProfileUtils.getProfileNameForCopybook(
-      documentUri,
-      this.explorerAPI,
-    );
+    const providedProfile = profile
+      ? profile
+      : ProfileUtils.getProfileNameForCopybook(documentUri, this.explorerAPI);
     return !!(ussPath && providedProfile);
   }
 
@@ -53,11 +53,11 @@ export class CopybookDownloaderForUss extends ZoweExplorerDownloader {
     copybookName: CopybookName,
     documentUri: string,
     ussPath: string,
+    profile?: string,
   ): Promise<boolean> {
-    const providedProfile = ProfileUtils.getProfileNameForCopybook(
-      documentUri,
-      this.explorerAPI,
-    );
+    const providedProfile = profile
+      ? profile
+      : ProfileUtils.getProfileNameForCopybook(documentUri, this.explorerAPI);
     if (this.isEligibleForDownload(copybookName, documentUri, ussPath)) {
       const memberList = await this.getAllMembers(providedProfile!, ussPath);
       const remoteCopybook = DownloadUtil.getRemoteCopybookName(

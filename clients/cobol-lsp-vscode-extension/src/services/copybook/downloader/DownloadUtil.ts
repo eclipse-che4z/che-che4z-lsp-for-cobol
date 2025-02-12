@@ -23,6 +23,7 @@ import { ZoweExplorerDownloader } from "./ZoweExplorerDownloader";
 import { CopybookName } from "../CopybookDownloadService";
 import { SettingsService } from "../../Settings";
 import { hasMember } from "../../util/Utils";
+import { loadProcessorGroupCopybookPaths } from "../../ProcessorGroups";
 
 /**
  * Utility class for downloading copybooks
@@ -150,10 +151,10 @@ export class DownloadUtil {
    * @param copybookNames
    * @returns true if if copybook download configurations are present, false otherwise
    */
-  public static areCopybookDownloadConfigurationsPresent(
+  public static async areCopybookDownloadConfigurationsPresent(
     documentUri: string,
     copybookNames: CopybookName[],
-  ): boolean {
+  ): Promise<boolean> {
     const dialects = new Set(
       copybookNames.map((n) => n.dialect?.toLocaleUpperCase()).filter(Boolean),
     );
@@ -161,7 +162,15 @@ export class DownloadUtil {
     for (const dialect of dialects) {
       const dsnPath = SettingsService.getDsnPath(documentUri, dialect);
       const ussPath = SettingsService.getUssPath(documentUri, dialect);
-      if ((dsnPath?.length ?? 0) > 0 || (ussPath?.length ?? 0) > 0) {
+      const procGroupPath = await loadProcessorGroupCopybookPaths(
+        documentUri,
+        dialect,
+      );
+      if (
+        procGroupPath ||
+        (dsnPath?.length ?? 0) > 0 ||
+        (ussPath?.length ?? 0) > 0
+      ) {
         return true;
       }
     }

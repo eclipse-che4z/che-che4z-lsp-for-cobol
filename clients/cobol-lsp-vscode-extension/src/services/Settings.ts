@@ -233,6 +233,7 @@ export class SettingsService {
       documentUri,
       dialectType,
     );
+    if (typeof pgPaths === "object") return []; //kutluo
     const vars = getVariablesFromUri(documentUri);
     const paths: string[] = [
       ...SettingsService.evaluateVariables(pgPaths, vars),

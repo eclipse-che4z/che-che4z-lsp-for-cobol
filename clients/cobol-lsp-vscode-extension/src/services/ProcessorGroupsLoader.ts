@@ -30,7 +30,32 @@ const ProgramsConfigModel = t.type({
   ),
 });
 
+const EndevorConfigModel = t.intersection([
+  t.type({
+    environment: t.string,
+    stage: t.string,
+    system: t.string,
+    subsystem: t.string,
+    type: t.string,
+    profile: t.string,
+  }),
+  t.partial({ use_map: t.boolean }),
+]);
+
+const ZoweDatasetConfigModel = t.intersection([
+  t.type({ dataset: t.string }),
+  t.partial({ profile: t.string }),
+]);
+
+const ZoweUssConfigModel = t.intersection([
+  t.type({ ussFile: t.string }),
+  t.partial({ profile: t.string }),
+]);
+
 export type ProgramsConfig = t.TypeOf<typeof ProgramsConfigModel>;
+export type EndevorConfigModel = t.TypeOf<typeof EndevorConfigModel>;
+export type ZoweDatasetConfigModel = t.TypeOf<typeof ZoweDatasetConfigModel>;
+export type ZoweUssConfigModel = t.TypeOf<typeof ZoweUssConfigModel>;
 
 const PreprocessorModel = t.union([
   t.string,
@@ -54,7 +79,12 @@ const ProcessorGroupModel = t.intersection([
   }),
   t.partial({
     preprocessor: t.union([PreprocessorModel, t.array(PreprocessorModel)]),
-    libs: t.array(t.string),
+    libs: t.union([
+      t.array(t.string),
+      EndevorConfigModel,
+      ZoweDatasetConfigModel,
+      ZoweUssConfigModel,
+    ]),
     "copybook-extensions": t.array(t.string),
     "compiler-options": t.array(t.string),
     "copybook-file-encoding": t.string,

@@ -12,11 +12,22 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 import * as path from "node:path";
-import { COPYBOOKS_FOLDER, ZOWE_FOLDER } from "../../constants";
+import {
+  COPYBOOKS_FOLDER,
+  DATASET,
+  ENVIRONMENT,
+  USSFILE,
+  ZOWE_FOLDER,
+} from "../../constants";
 import { SettingsService } from "../Settings";
 import { ProfileUtils } from "../util/ProfileUtils";
 import { EndevorType, ResolvedProfile } from "../../type/e4eApi.d";
 import { Utils } from "../util/Utils";
+import {
+  ZoweDatasetConfigModel,
+  ZoweUssConfigModel,
+  EndevorConfigModel,
+} from "../ProcessorGroupsLoader";
 
 /**
  * This class is responsible to identify from which source resolve copybooks required by the server.
@@ -110,5 +121,29 @@ export class CopybookURI {
       type.subsystem,
       type.type,
     );
+  }
+  public static createProcessorGroupCopybookPaths(
+    pgConfigs: [
+      ZoweDatasetConfigModel | ZoweUssConfigModel | EndevorConfigModel,
+    ],
+    storagePath: string,
+    defaultProfile: string,
+  ) {
+    const paths: string[] = [];
+    pgConfigs = Array.isArray(pgConfigs) ? pgConfigs : [pgConfigs];
+    pgConfigs.forEach((config) => {
+      if (DATASET in config || USSFILE in config) {
+        paths.push(
+          CopybookURI.createDatasetPath(
+            config.profile ? config.profile : defaultProfile,
+            DATASET in config ? config.dataset : config.ussFile,
+            storagePath,
+          ),
+        );
+      } else if (ENVIRONMENT in config) {
+        //endevor kutluo
+      }
+    });
+    return paths;
   }
 }

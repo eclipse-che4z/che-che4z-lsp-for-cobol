@@ -181,32 +181,26 @@ export class CopybookDownloaderForE4E {
         `Failed to find ${copybookName.name} in Endevor`,
       );
     } else if (DATASET in first)
-      return await this.downloadDatasetE4E(response, first);
+      return await this.downloadDatasetE4E(response.profile, first);
     else if (ENVIRONMENT in first)
-      return await this.downloadElementE4E(response, first);
+      return await this.downloadElementE4E(response.profile, first);
     return false;
   }
 
   public async downloadElementE4E(
-    endevorApi: e4eResponse,
+    profile: ResolvedProfile,
     element: EndevorElement,
   ): Promise<boolean> {
     try {
       const use_map = element.use_map ? USE_MAP : "";
-      const instance = CopybookURI.getEnviromentPath(
-        element,
-        endevorApi.profile,
-      );
+      const instance = CopybookURI.getEnviromentPath(element, profile);
       const filePath: string = CopybookDownloaderForE4E.getCopybookPath(
         instance,
         use_map,
         this.storagePath,
         element.element,
       );
-      const resultElement = await this.e4e.getElement(
-        endevorApi.profile,
-        element,
-      );
+      const resultElement = await this.e4e.getElement(profile, element);
 
       if (resultElement instanceof Error) {
         this.outputChannel?.appendLine(resultElement.message);
@@ -221,11 +215,11 @@ export class CopybookDownloaderForE4E {
   }
 
   public async downloadDatasetE4E(
-    endevorApi: e4eResponse,
+    endevorApi: ResolvedProfile,
     member: EndevorMember,
   ): Promise<boolean> {
     try {
-      const instance = Utils.profileAsString(endevorApi.profile);
+      const instance = Utils.profileAsString(endevorApi);
       const filePath: string = CopybookDownloaderForE4E.getCopybookPath(
         instance,
         member.dataset,
@@ -233,7 +227,7 @@ export class CopybookDownloaderForE4E {
         member.member,
       );
 
-      const memberContent = await this.e4e.getMember(endevorApi.profile, {
+      const memberContent = await this.e4e.getMember(endevorApi, {
         dataset: member.dataset,
         member: member.member,
       });
@@ -310,5 +304,8 @@ export class CopybookDownloaderForE4E {
       [""],
       this.storagePath,
     );
+  }
+  public async getProfileInfo(uri: string | Partial<ResolvedProfile>) {
+    return await this.e4e.getProfileInfo(uri);
   }
 }

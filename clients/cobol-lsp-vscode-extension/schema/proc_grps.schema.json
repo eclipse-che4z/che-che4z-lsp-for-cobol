@@ -26,11 +26,84 @@
             ]
           },
           "libs": {
-            "type": "array",
-            "description": "List of folders that contain copybooks.",
-            "items": {
-              "type": "string"
-            }
+            "anyOf": [
+              {
+                "type": "array",
+                "description": "List of folders that contain copybooks.",
+                "items": {
+                  "type": "string"
+                }
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "dataset": {
+                    "type": "string",
+                    "description": "Name of a data set located on the mainframe."
+                  },
+                  "profile": {
+                    "type": "string",
+                    "description": "Profile name to be used by the Zowe Explorer extension"
+                  }
+                },
+                "required": ["dataset"]
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "ussFile": {
+                    "type": "string",
+                    "description": "USS directory/file on the mainframe."
+                  },
+                  "profile": {
+                    "type": "string",
+                    "description": "Profile name to be used by the Zowe Explorer extension"
+                  }
+                },
+                "required": ["ussFile"]
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "environment": {
+                    "type": "string",
+                    "description": "Endevor environment"
+                  },
+                  "stage": {
+                    "type": "string",
+                    "description": "Endevor stage"
+                  },
+                  "system": {
+                    "type": "string",
+                    "description": "Endevor system"
+                  },
+                  "subsystem": {
+                    "type": "string",
+                    "description": "Endevor subsystem"
+                  },
+                  "type": {
+                    "type": "string",
+                    "description": "Endevor type"
+                  },
+                  "use_map": {
+                    "type": "boolean",
+                    "description": "Build using map",
+                    "default": true
+                  },
+                  "profile": {
+                    "type": "string",
+                    "description": "(Internal) Profile name to be used by the E4E extension"
+                  }
+                },
+                "required": [
+                  "environment",
+                  "stage",
+                  "system",
+                  "subsystem",
+                  "type"
+                ]
+              }
+            ]
           },
           "copybook-extensions": {
             "type": "array",
@@ -48,7 +121,7 @@
           }
         }
       },
-      "required": ["name"]
+      "required": ["name", "libs"]
     }
   },
   "required": ["pgroups"]

@@ -15,13 +15,18 @@
 import * as vscode from "vscode";
 import {
   COPYBOOKS_FOLDER,
+  DATASET,
+  E4E_FOLDER,
   ENDEVOR_PROCESSOR,
+  ENVIRONMENT,
   PROVIDE_PROFILE_MSG,
+  USE_MAP,
+  USSFILE,
   ZOWE_FOLDER,
 } from "../../constants";
 import { ProfileUtils } from "../util/ProfileUtils";
 import { DownloadUtil } from "./downloader/DownloadUtil";
-import { E4E } from "../../type/e4eApi";
+import { E4E, EndevorElement, ResolvedProfile } from "../../type/e4eApi";
 import { CopybookDownloaderForE4E } from "./downloader/CopybookDownloaderForE4E";
 import { CopybookDownloaderForUss } from "./downloader/CopybookDownloaderForUss";
 import { CopybookDownloaderForDsn } from "./downloader/CopybookDownloaderForDsn";
@@ -31,6 +36,10 @@ import { searchCopybookInExtensionFolder } from "../util/FSUtils";
 import { CopybookURI } from "./CopybookURI";
 import path = require("path");
 import { getErrorMessage } from "../util/ErrorsUtils";
+import {
+  loadProcessorGroupCopybookPathsConfig,
+  prepareProcessorGroupConfigPaths,
+} from "../ProcessorGroups";
 
 export class CopybookName {
   constructor(
@@ -57,6 +66,12 @@ export class CopybookDownloadService {
     copybookName: CopybookName,
     documentUri: string,
   ): Promise<boolean> {
+    const pgConfigs = await loadProcessorGroupCopybookPathsConfig(
+      { scopeUri: documentUri },
+      [],
+      copybookName.dialect,
+    );
+
     if (
       this.handleAsEndevorElement(documentUri) &&
       (await this.e4eDownloader?.downloadCopybookE4E(documentUri, copybookName))
@@ -64,12 +79,41 @@ export class CopybookDownloadService {
       return true;
     }
 
+    if (ENVIRONMENT in pgConfigs) {
+      const arr = pgConfigs.profile.split(".");
+      let profile: Partial<ResolvedProfile>;
+      if (!arr) {
+        profile = { profile: "", instance: "" };
+      } else if (arr.length == 1) {
+        profile = {
+          profile: pgConfigs.profile,
+        };
+      } else if (arr.length > 1) {
+        profile = {
+          profile: arr[1],
+          instance: arr[0],
+        };
+      } else {
+        profile = { profile: "", instance: "" };
+      }
+      const resolvedProfile = await this.e4eDownloader?.getProfileInfo(profile);
+      if (!resolvedProfile || resolvedProfile instanceof Error) return false;
+      const element = pgConfigs as unknown as EndevorElement;
+      element.element = copybookName.name;
+      if (
+        await this.e4eDownloader?.downloadElementE4E(resolvedProfile, element)
+      )
+        return true;
+    }
+
     if (this.dsnDownloader) {
       const dsnSuccess = await this.downloadFromPaths(
         this.dsnDownloader,
         copybookName,
         documentUri,
-        SettingsService.getDsnPath(documentUri, copybookName.dialect),
+        DATASET in pgConfigs
+          ? prepareProcessorGroupConfigPaths(pgConfigs)
+          : SettingsService.getDsnPath(documentUri, copybookName.dialect),
       );
       if (dsnSuccess) return true;
     }
@@ -79,7 +123,9 @@ export class CopybookDownloadService {
         this.ussDownloader,
         copybookName,
         documentUri,
-        SettingsService.getUssPath(documentUri, copybookName.dialect),
+        USSFILE in pgConfigs
+          ? prepareProcessorGroupConfigPaths(pgConfigs)
+          : SettingsService.getUssPath(documentUri, copybookName.dialect),
       );
     }
 
@@ -101,7 +147,7 @@ export class CopybookDownloadService {
     downloader: CopybookDownloaderForDsn | CopybookDownloaderForUss,
     copybook: CopybookName,
     documentUri: string,
-    paths: string[] | undefined,
+    paths: string[] | { path: string; profile?: string }[] | undefined,
   ): Promise<boolean> {
     if (!paths) return false;
 
@@ -109,7 +155,8 @@ export class CopybookDownloadService {
       const success = await downloader.downloadCopybook(
         copybook,
         documentUri,
-        path,
+        typeof path === "object" ? path.path : path,
+        typeof path === "object" ? path.profile : "",
       );
       if (success) return true;
     }
@@ -143,12 +190,58 @@ export class CopybookDownloadService {
     copybookName: string,
     dialectType: string,
   ): Promise<string | undefined> {
+    const pgConfigs = await loadProcessorGroupCopybookPathsConfig(
+      { scopeUri: documentUri },
+      [],
+      dialectType,
+    );
+
     if (this.handleAsEndevorElement(documentUri)) {
       const copybookUri = await this.e4eDownloader?.getE4ECopyBookLocation(
         copybookName,
         documentUri,
       );
       return copybookUri?.toString();
+    }
+    if (ENVIRONMENT in pgConfigs) {
+      const arr = pgConfigs.profile.split(".");
+      let profile: Partial<ResolvedProfile>;
+      if (!arr) {
+        profile = { profile: "", instance: "" };
+      } else if (arr.length == 1) {
+        profile = {
+          profile: pgConfigs.profile,
+        };
+      } else if (arr.length > 1) {
+        profile = {
+          profile: arr[1],
+          instance: arr[0],
+        };
+      } else {
+        profile = { profile: "", instance: "" };
+      }
+      const resolvedProfile = await this.e4eDownloader?.getProfileInfo(profile);
+      if (!resolvedProfile || resolvedProfile instanceof Error) return;
+
+      const path = prepareProcessorGroupConfigPaths(pgConfigs, resolvedProfile);
+      if (
+        Array.isArray(path) &&
+        path.every((config) => typeof config === "string")
+      ) {
+        const targetFolder = CopybookURI.createDatasetPath(
+          path[0],
+          pgConfigs.use_map ? USE_MAP : "",
+          this.storagePath,
+          E4E_FOLDER,
+        );
+
+        return searchCopybookInExtensionFolder(
+          copybookName,
+          [targetFolder],
+          [""],
+          this.storagePath,
+        )?.toString();
+      }
     }
 
     const result = await searchCopybook(
@@ -214,6 +307,11 @@ export class CopybookDownloadService {
       !(await this.isPrerequisiteForDownloadSatisfied(
         documentUri,
         copybookNames,
+      )) &&
+      !(await loadProcessorGroupCopybookPathsConfig(
+        { scopeUri: documentUri },
+        [],
+        copybookNames[0].dialect,
       ))
     ) {
       return;
@@ -269,13 +367,14 @@ export class CopybookDownloadService {
       return !!(await this.e4eDownloader?.getE4EConfig(documentUri));
     }
     if (
-      !DownloadUtil.areCopybookDownloadConfigurationsPresent(
+      !(await DownloadUtil.areCopybookDownloadConfigurationsPresent(
         documentUri,
         copybookNames,
-      )
+      ))
     )
       return false;
     if (!this.explorerApi) return false;
+
     const profile = ProfileUtils.getProfileNameForCopybook(
       documentUri,
       this.explorerApi,

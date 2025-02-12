@@ -29,12 +29,18 @@ import {
   loadBridgeJsonContent,
 } from "./BridgeForGitLoader";
 import {
+  EndevorConfigModel,
   Preprocessor,
   ProcessorGroup,
   ProgramsConfig,
   readProcessorGroupsFileContent,
   readProgramConfigFileContent,
+  ZoweDatasetConfigModel,
+  ZoweUssConfigModel,
 } from "./ProcessorGroupsLoader";
+import { DATASET, ENVIRONMENT, PREPROCESSOR, USSFILE } from "../constants";
+import { CopybookURI } from "./copybook/CopybookURI";
+import { EndevorType, ResolvedProfile } from "../type/e4eApi";
 
 export async function loadProcessorGroupCopybookPaths(
   documentUri: string,
@@ -51,12 +57,20 @@ export async function loadProcessorGroupCopybookPaths(
 export async function loadProcessorGroupCopybookPathsConfig(
   item: { scopeUri: string },
   configObject: string[],
-): Promise<string[]> {
+  dialect?: string,
+): Promise<
+  string[] | ZoweDatasetConfigModel | ZoweUssConfigModel | EndevorConfigModel
+> {
   const cfg = await loadProcessorGroupSettings(
     item.scopeUri,
     "libs",
     [] as string[],
+    dialect,
   );
+
+  if (DATASET in cfg || ENVIRONMENT in cfg || USSFILE in cfg) {
+    return cfg;
+  }
   const config = SettingsService.evaluateVariables(
     [...cfg, ...configObject],
     getVariablesFromUri(item.scopeUri, false),
@@ -263,7 +277,7 @@ async function loadProcessorGroupSettings<T extends string | string[]>(
     return configObject;
   }
   try {
-    if (dialect && dialect !== "COBOL") {
+    if (dialect && dialect !== "COBOL" && PREPROCESSOR in pgCfg) {
       for (const pp of pgCfg.preprocessor as Preprocessor[]) {
         if (
           pp &&
@@ -285,4 +299,28 @@ async function loadProcessorGroupSettings<T extends string | string[]>(
     console.error(JSON.stringify(e));
     return configObject;
   }
+}
+export function prepareProcessorGroupConfigPaths(
+  pgConfigs:
+    | string[]
+    | ZoweDatasetConfigModel
+    | ZoweUssConfigModel
+    | EndevorConfigModel,
+  profile?: ResolvedProfile,
+): string[] | { path: string; profile?: string }[] | undefined {
+  if (
+    Array.isArray(pgConfigs) &&
+    pgConfigs.every((config) => typeof config === "string")
+  ) {
+    return pgConfigs;
+  }
+
+  if (ENVIRONMENT in pgConfigs && profile) {
+    return [CopybookURI.getEnviromentPath(pgConfigs as EndevorType, profile)];
+  } else if (DATASET in pgConfigs)
+    return [{ path: pgConfigs.dataset, profile: pgConfigs.profile }];
+  else if (USSFILE in pgConfigs)
+    return [{ path: pgConfigs.ussFile, profile: pgConfigs.profile }];
+
+  return;
 }
