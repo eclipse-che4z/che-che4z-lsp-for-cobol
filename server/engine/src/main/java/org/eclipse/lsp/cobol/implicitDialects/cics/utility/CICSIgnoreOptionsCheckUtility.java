@@ -24,6 +24,7 @@ import org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_ignore;
 
@@ -178,5 +179,18 @@ public class CICSIgnoreOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
 
     private void checkIgnoreCondition(CICSParser.Cics_ignore_optionsContext ctx) {
         checkHasMandatoryOptions(ctx.CONDITION(), ctx, "CONDITION");
+        checkHasNormalCondition(ctx);
+    }
+
+    private void checkHasNormalCondition(CICSParser.Cics_ignore_optionsContext ctx) {
+        ctx.cics_conditions().stream()
+                .map(CICSParser.Cics_conditionsContext::NORMAL)
+                .filter(Objects::nonNull)
+                .forEach(terminalNode -> throwException(
+                        ErrorSeverity.ERROR,
+                        getLocality(terminalNode),
+                        "Invalid option provided: ",
+                        "NORMAL")
+                );
     }
 }

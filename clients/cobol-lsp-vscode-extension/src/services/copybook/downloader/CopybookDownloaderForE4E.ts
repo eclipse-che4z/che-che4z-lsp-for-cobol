@@ -12,8 +12,6 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 import * as vscode from "vscode";
-import * as fs from "node:fs";
-import * as Path from "node:path";
 import {
   EndevorElement,
   EndevorMember,
@@ -34,10 +32,11 @@ import {
   USE_MAP,
 } from "../../../constants";
 import { CopybookName } from "../CopybookDownloadService";
-import { Utils } from "../../util/Utils";
+import { hasMember, Utils } from "../../util/Utils";
 import { searchCopybookInExtensionFolder } from "../../util/FSUtils";
 import { getErrorMessage } from "../../util/ErrorsUtils";
 import { SettingsService } from "../../Settings";
+import { getChannel } from "../../../extension";
 
 const defaultConfigs: ExternalConfigurationOptions = {
   compiler: "IGYCRCTL",
@@ -194,7 +193,7 @@ export class CopybookDownloaderForE4E {
     try {
       const use_map = element.use_map ? USE_MAP : "";
       const instance = CopybookURI.getEnviromentPath(element, profile);
-      const filePath: string = CopybookDownloaderForE4E.getCopybookPath(
+      const filePath = await CopybookDownloaderForE4E.getCopybookPath(
         instance,
         use_map,
         this.storagePath,
@@ -205,7 +204,10 @@ export class CopybookDownloaderForE4E {
       if (resultElement instanceof Error) {
         this.outputChannel?.appendLine(resultElement.message);
       } else {
-        await fs.promises.writeFile(filePath, resultElement[0]);
+        await vscode.workspace.fs.writeFile(
+          filePath,
+          Buffer.from(resultElement[0]),
+        );
         return true;
       }
     } catch (err) {
@@ -219,8 +221,8 @@ export class CopybookDownloaderForE4E {
     member: EndevorMember,
   ): Promise<boolean> {
     try {
-      const instance = Utils.profileAsString(endevorApi);
-      const filePath: string = CopybookDownloaderForE4E.getCopybookPath(
+      const instance = [Utils.profileAsString(endevorApi)];
+      const filePath = await CopybookDownloaderForE4E.getCopybookPath(
         instance,
         member.dataset,
         this.storagePath,
@@ -235,7 +237,10 @@ export class CopybookDownloaderForE4E {
       if (memberContent instanceof Error) {
         this.outputChannel?.appendLine(memberContent.message);
       } else {
-        await fs.promises.writeFile(filePath, memberContent);
+        await vscode.workspace.fs.writeFile(
+          filePath,
+          Buffer.from(memberContent),
+        );
         return true;
       }
     } catch (err) {
@@ -244,30 +249,61 @@ export class CopybookDownloaderForE4E {
     return false;
   }
 
-  private static getCopybookPath(
-    instance: string,
+  private static async getCopybookPath(
+    instance: string[],
     mapped: string,
     downloadFolder: string,
     copybook: string,
-  ): string {
-    let folder = CopybookURI.createDatasetPath(
+  ): Promise<vscode.Uri> {
+    const folder = CopybookURI.createDatasetPath(
       instance,
       mapped,
       downloadFolder,
       E4E_FOLDER,
     );
 
-    if (!fs.existsSync(folder)) fs.mkdirSync(folder, { recursive: true });
+    /**
+     * There is an issue with VSCode File Watcher on Linux where it
+     * fails to watch subfolders changes when more subfolders are created
+     * all at once.
+     * https://github.com/microsoft/vscode/issues/142694
+     *
+     * As a workaround, the path is splitted into individual subfolders
+     * are they are created incrementally one by one.
+     */
+    const subdirectories = CopybookURI.createDatasetSubdirectories(
+      instance,
+      E4E_FOLDER,
+      mapped,
+    );
+    let finishedPath = vscode.Uri.file(downloadFolder);
+    for (const subdirectory of subdirectories) {
+      finishedPath = vscode.Uri.joinPath(finishedPath, subdirectory);
 
-    folder = Path.join(
+      try {
+        await vscode.workspace.fs.createDirectory(finishedPath);
+      } catch (err) {
+        if (err instanceof vscode.FileSystemError.FileExists) {
+          // ok - directory already exists, nothing to do
+          getChannel().appendLine(
+            `FileExists error while allocating '${finishedPath.toString()}' directory for copybooks: ${JSON.stringify(err)}`,
+          );
+        } else {
+          getChannel().appendLine(
+            `Unable to allocate ${finishedPath.toString()} - ${hasMember(err, "msg") && typeof err.msg === "string" && err.msg} ${JSON.stringify(err)}`,
+          );
+          break;
+        }
+      }
+    }
+
+    return vscode.Uri.joinPath(
       folder,
       copybook.substring(
         0,
         copybook.indexOf(".") !== -1 ? copybook.indexOf(".") : copybook.length,
       ),
     );
-
-    return folder;
   }
 
   public async getE4ECopyBookLocation(
@@ -283,7 +319,7 @@ export class CopybookDownloaderForE4E {
     let use_map;
     let instance;
     if (DATASET in first) {
-      instance = Utils.profileAsString(config.profile);
+      instance = [Utils.profileAsString(config.profile)];
       use_map = first.dataset;
     } else if (ENVIRONMENT in first) {
       use_map = first.use_map ? USE_MAP : "";
@@ -295,7 +331,7 @@ export class CopybookDownloaderForE4E {
         use_map,
         this.storagePath,
         E4E_FOLDER,
-      ),
+      ).fsPath,
     ];
 
     return searchCopybookInExtensionFolder(

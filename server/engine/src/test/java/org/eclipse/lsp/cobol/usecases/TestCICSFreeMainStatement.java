@@ -26,13 +26,15 @@ package org.eclipse.lsp.cobol.usecases;
 
 /**
  * Test CICS Freemain & Freemain64 commands. Documentation link:
- *<a https://www.ibm.com/docs/en/cics-ts/6.x?topic=summary-freemain"> Freemain Command</a>
- *<a https://www.ibm.com/docs/en/cics-ts/6.x?topic=summary-freemain64"> Freemain64 Command</a>
+ *<a href="https://www.ibm.com/docs/en/cics-ts/6.x?topic=summary-freemain"> Freemain Command</a>
+ *<a href="https://www.ibm.com/docs/en/cics-ts/6.x?topic=summary-freemain64"> Freemain64 Command</a>
  * <p>This class tests all variations of the Freemain commands found in the links above.
  */
 public class TestCICSFreeMainStatement {
     private static final String FREEMAIN_DATA_VALID =
             "FREEMAIN DATA({$varFour})";
+    private static final String FREEMAIN64_DATA_INVALID =
+            "{FREEMAIN64|errorOne} DATA({$varFour})";
     private static final String FREEMAIN_DATAPOINTER_VALID =
             "FREEMAIN DATAPOINTER({$varFour})";
     private static final String FREEMAIN_DATA_MISSING_INVALID =
@@ -44,6 +46,21 @@ public class TestCICSFreeMainStatement {
     void testFreeMainDataValid() {
         CICSTestUtils.noErrorTest(FREEMAIN_DATA_VALID);
     }
+
+    @Test
+    void testFreeMain64Invalid() {
+        Map<String, Diagnostic> expectedDiagnostic =
+                ImmutableMap.of(
+                        "errorOne",
+                        new Diagnostic(
+                                new Range(),
+                                "Invalid option provided: FREEMAIN64 is only available in Assembly",
+                                DiagnosticSeverity.Error,
+                                ErrorSource.PARSING.getText())
+                );
+        CICSTestUtils.errorTest(FREEMAIN64_DATA_INVALID, expectedDiagnostic);
+    }
+
     @Test
     void testFreeMainDataPointerValid() {
         CICSTestUtils.noErrorTest(FREEMAIN_DATAPOINTER_VALID);

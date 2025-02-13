@@ -42,7 +42,10 @@ public class TestCICSIgnore {
           "IGNORE CONDITION {CONDITION|errorOne} ERROR";
 
   private static final String IGNORE_CONDITION_INVALID_THREE =
-          "IGNORE CONDITION NORMAL {NORMAL|errorOne}";
+          "IGNORE CONDITION ERROR {ERROR|errorOne}";
+
+  private static final String IGNORE_CONDITION_INVALID_FOUR =
+          "IGNORE CONDITION {NORMAL|errorOne} ERROR";
 
   private static final String IGNORE_CONDITION_INVALID_WRBRK =
           "IGNORE CONDITION WRBRK {WRBRK|errorOne}";
@@ -121,7 +124,20 @@ public class TestCICSIgnore {
                     "errorOne",
                     new Diagnostic(
                             new Range(),
-                            "Excessive options provided for: NORMAL",
+                            "Excessive options provided for: ERROR",
+                            DiagnosticSeverity.Error,
+                            ErrorSource.PARSING.getText())));
+  }
+
+  @Test
+  void testIgnoreConditionInvalidFour() {
+    CICSTestUtils.errorTest(
+            IGNORE_CONDITION_INVALID_FOUR,
+            ImmutableMap.of(
+                    "errorOne",
+                    new Diagnostic(
+                            new Range(),
+                            "Invalid option provided: NORMAL",
                             DiagnosticSeverity.Error,
                             ErrorSource.PARSING.getText())));
   }

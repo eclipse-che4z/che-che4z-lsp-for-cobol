@@ -446,7 +446,7 @@ public class TestCicsAllowedVariableUsage {
             "NOHANDLE",
             "NOINCONVERT",
             "NONE",
-            "NOOUTCONERT",
+            "NOOUTCONVERT",
             "NOQUEUE",
             "NOQUIESCE",
             "NOSRVCONVERT",

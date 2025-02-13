@@ -15,10 +15,7 @@
 
 package org.eclipse.lsp.cobol.usecases;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
-import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.eclipse.lsp.cobol.usecases.common.CICSTestUtils;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
@@ -36,155 +33,121 @@ import java.util.*;
  */
 
 public class TestCicsWebStatement {
-    // Main Building Blocks
-    private static final String BASE_TEXT =
-            "       IDENTIFICATION DIVISION.\n"
-                    + "       PROGRAM-ID. ABCDEF.\n"
-                    + "       DATA DIVISION.\n"
-                    + "       WORKING-STORAGE SECTION.\n"
-                    + "       01 {$*fromVar} PIC S9 VALUE +100.\n"
-                    + "       01 {$*fromLen} PIC S9 VALUE +10.\n"
-                    + "       01 {$*maxLen} PIC S9 VALUE +10.\n"
-                    + "       01 {$*toLen} PIC S9 VALUE +10.\n"
-                    + "       01 {$*intoVar} PIC S9 VALUE +1000.\n"
-                    + "       01 {$*sessVar} PIC S9 VALUE +1000.\n"
-                    + "       01 {$*mediaType} PIC S9 VALUE +1000.\n"
-                    + "       01 {$*queryStr} PIC S9 VALUE +1000.\n"
-                    + "       01 {$*ctlCharVar} PIC S9 VALUE +1000.\n"
-                    + "       01 {$*ldcVar} PIC S9 VALUE +1000.\n"
-                    + "       01 {$*lineAddrVar} PIC S9 VALUE +1000.\n"
-                    + "       PROCEDURE DIVISION.\n"
-                    + "            EXEC CICS \n"
-                    + "            END-EXEC.";
 
     private static final String WEB = "WEB ";
 
-    private static final String WEB_AUTH = "BASICAUTH USERNAME(123) USERNAMELEN(3) PASSWORD(1234) PASSWORDLEN(4) ";
-    private static final String HOST_LEN_TYPE = "HOST(123) HOSTLENGTH(123) HOSTTYPE(1) ";
+    private static final String WEB_AUTH = "BASICAUTH USERNAME({$varOne}) USERNAMELEN({$varOne}) PASSWORD({$varOne}) PASSWORDLEN({$varOne}) ";
+    private static final String HOST_LEN_TYPE = "HOST({$varOne}) HOSTLENGTH({$varOne}) HOSTTYPE({$varOne}) ";
 
     // Test Strings
-    private static final String CLOSE_VALID = WEB + "CLOSE SESSTOKEN({$sessVar})";
+    private static final String CLOSE_VALID = WEB + "CLOSE SESSTOKEN({$varOne})";
 
-    private static final String CONVERSE_VALID_1 = WEB + "CONVERSE SESSTOKEN({$sessVar}) PATH(123) PATHLENGTH(123) GET MEDIATYPE({$mediaType}) QUERYSTRING({$queryStr}) QUERYSTRLEN(10) "
-            + "DOCTOKEN(123) DOCDELETE EXPECT CLOSE " + WEB_AUTH + "INTO({$intoVar}) TOLENGTH({$toLen}) MAXLENGTH({$maxLen}) "
-            + "NOTRUNCATE STATUSCODE(123) STATUSTEXT(123) STATUSLEN(123) CHARACTERSET(1) NOINCONVERT BODYCHARSET(123)";
-    private static final String CONVERSE_VALID_2 = WEB + "CONVERSE SESSTOKEN({$sessVar}) GET TOLENGTH({$toLen})";
+    private static final String CONVERSE_VALID_1 = WEB + "CONVERSE SESSTOKEN({$varOne}) PATH({$varOne}) PATHLENGTH({$varOne}) GET MEDIATYPE({$varOne}) QUERYSTRING({$varOne}) QUERYSTRLEN({$varOne}) "
+            + "DOCTOKEN({$varOne}) DOCDELETE EXPECT CLOSE " + WEB_AUTH + "INTO({$varOne}) TOLENGTH({$varOne}) MAXLENGTH({$varOne}) "
+            + "NOTRUNCATE STATUSCODE({$varOne}) STATUSTEXT({$varOne}) STATUSLEN({$varOne}) CHARACTERSET({$varOne}) NOINCONVERT BODYCHARSET({$varOne})";
+    private static final String CONVERSE_VALID_2 = WEB + "CONVERSE SESSTOKEN({$varOne}) GET TOLENGTH({$varOne})";
 
     private static final String ENDBROWSE_VALID = WEB + "ENDBROWSE FORMFIELD";
 
-    private static final String EXTRACT_SERVER_VALID = WEB + "EXTRACT SCHEME(123) HOST(123) HOSTLENGTH(123) HOSTTYPE(1) HTTPMETHOD(1) METHODLENGTH(123) "
-            + "HTTPVERSION(2) VERSIONLEN(1) PATH(123) PATHLENGTH(123) PORTNUMBER(80) QUERYSTRING(123) QUERYSTRLEN(10) REQUESTTYPE(123) URIMAP(1)";
-    private static final String EXTRACT_CLIENT_VALID = WEB + "EXTRACT SESSTOKEN({$sessVar}) SCHEME(123) " + HOST_LEN_TYPE + "HTTPVERSION(2) VERSIONLEN(1) PATH(123) PATHLENGTH(123) PORTNUMBER(80)";
+    private static final String EXTRACT_SERVER_VALID = WEB + "EXTRACT SCHEME({$varOne}) HOST({$varOne}) HOSTLENGTH({$varOne}) HOSTTYPE({$varOne}) HTTPMETHOD({$varOne}) METHODLENGTH({$varOne}) "
+            + "HTTPVERSION({$varOne}) VERSIONLEN({$varOne}) PATH({$varOne}) PATHLENGTH({$varOne}) PORTNUMBER({$varOne}) QUERYSTRING({$varOne}) QUERYSTRLEN({$varOne}) REQUESTTYPE({$varOne}) URIMAP({$varOne})";
+    private static final String EXTRACT_CLIENT_VALID = WEB + "EXTRACT SESSTOKEN({$varOne}) SCHEME({$varOne}) " + HOST_LEN_TYPE + " HTTPVERSION({$varOne}) VERSIONLEN({$varOne}) PATH({$varOne}) PATHLENGTH({$varOne}) PORTNUMBER({$varOne})";
 
-    private static final String OPEN_VALID = WEB + "OPEN HOST(123) HOSTLENGTH(123) PORTNUMBER(80) SCHEME(123) CERTIFICATE(123) CODEPAGE(12) "
-            + "SESSTOKEN({$sessVar}) HTTPVNUM(123) HTTPRNUM(123) CIPHERS(123) NUMCIPHERS(123)";
+    private static final String OPEN_VALID = WEB + "OPEN HOST({$varOne}) HOSTLENGTH({$varOne}) PORTNUMBER({$varOne}) SCHEME({$varOne}) CERTIFICATE({$varOne}) CODEPAGE({$varOne}) "
+            + "SESSTOKEN({$varOne}) HTTPVNUM({$varOne}) HTTPRNUM({$varOne}) CIPHERS({$varOne}) NUMCIPHERS({$varOne})";
 
-    private static final String PARSE_URL_VALID = WEB + "PARSE URL(123) URLLENGTH(123) SCHEMENAME(123) " + HOST_LEN_TYPE + " PORTNUMBER(80) PATH(123) PATHLENGTH(123) QUERYSTRING(123) QUERYSTRLEN(10)";
+    private static final String PARSE_URL_VALID = WEB + "PARSE URL({$varOne}) URLLENGTH({$varOne}) SCHEMENAME({$varOne}) " + HOST_LEN_TYPE + " PORTNUMBER({$varOne}) PATH({$varOne}) PATHLENGTH({$varOne}) QUERYSTRING({$varOne}) QUERYSTRLEN({$varOne})";
 
     private static final String WEB_READ = WEB + "READ ";
-    private static final String READ_FORMFIELD_VALID = WEB_READ + "FORMFIELD(123) NAMELENGTH(123) VALUE(123) VALUELENGTH(123) CHARACTERSET(1) HOSTCODEPAGE(1) ";
-    private static final String READ_QUERYPARM_VALID = WEB_READ + "QUERYPARM(123) NAMELENGTH(123) VALUE(123) VALUELENGTH(123) HOSTCODEPAGE(1) ";
-    private static final String READ_HTTPHEADER_VALID = WEB_READ + "HTTPHEADER(123) NAMELENGTH(123) VALUE(123) VALUELENGTH(123)";
+    private static final String READ_FORMFIELD_VALID = WEB_READ + "FORMFIELD({$varOne}) NAMELENGTH({$varOne}) VALUE({$varOne}) VALUELENGTH({$varOne}) CHARACTERSET({$varOne}) HOSTCODEPAGE({$varOne}) ";
+    private static final String READ_QUERYPARM_VALID = WEB_READ + "QUERYPARM({$varOne}) NAMELENGTH({$varOne}) VALUE({$varOne}) VALUELENGTH({$varOne}) HOSTCODEPAGE({$varOne}) ";
+    private static final String READ_HTTPHEADER_VALID = WEB_READ + "HTTPHEADER({$varOne}) NAMELENGTH({$varOne}) VALUE({$varOne}) VALUELENGTH({$varOne})";
 
     private static final String WEB_READNEXT = WEB + "READNEXT ";
-    private static final String READNEXT_FORMFIELD_VALID = WEB_READNEXT + "FORMFIELD(123) NAMELENGTH(123) VALUE(123) VALUELENGTH(123)";
-    private static final String READNEXT_QUERYPARM_VALID = WEB_READNEXT + "QUERYPARM(123) NAMELENGTH(123) VALUE(123) VALUELENGTH(123)";
-    private static final String READNEXT_HTTPHEADER_VALID = WEB_READNEXT + "HTTPHEADER(123) NAMELENGTH(123) SESSTOKEN({$sessVar}) VALUE(123) VALUELENGTH(123)";
+    private static final String READNEXT_FORMFIELD_VALID = WEB_READNEXT + "FORMFIELD({$varOne}) NAMELENGTH({$varOne}) VALUE({$varOne}) VALUELENGTH({$varOne})";
+    private static final String READNEXT_QUERYPARM_VALID = WEB_READNEXT + "QUERYPARM({$varOne}) NAMELENGTH({$varOne}) VALUE({$varOne}) VALUELENGTH({$varOne})";
+    private static final String READNEXT_HTTPHEADER_VALID = WEB_READNEXT + "HTTPHEADER({$varOne}) NAMELENGTH({$varOne}) SESSTOKEN({$varOne}) VALUE({$varOne}) VALUELENGTH({$varOne})";
 
-    private static final String RECEIVE_SERVER_BUFFER_VALID = WEB + "RECEIVE INTO(123) LENGTH(123) MAXLENGTH(123) NOTRUNCATE TYPE(1) SRVCONVERT CHARACTERSET(1) HOSTCODEPAGE(123) BODYCHARSET(123) MEDIATYPE(123)";
-    private static final String RECEIVE_SERVER_CONTAINER_VALID = WEB + "RECEIVE TOCONTAINER(123) TOCHANNEL(3) TYPE(1) CHARACTERSET(1) BODYCHARSET(123) MEDIATYPE(123)";
+    private static final String RECEIVE_SERVER_BUFFER_VALID = WEB + "RECEIVE INTO({$varOne}) LENGTH({$varOne}) MAXLENGTH({$varOne}) NOTRUNCATE TYPE({$varOne}) SRVCONVERT CHARACTERSET({$varOne}) HOSTCODEPAGE({$varOne}) BODYCHARSET({$varOne}) MEDIATYPE({$varOne})";
+    private static final String RECEIVE_SERVER_CONTAINER_VALID = WEB + "RECEIVE TOCONTAINER({$varOne}) TOCHANNEL({$varOne}) TYPE({$varOne}) CHARACTERSET({$varOne}) BODYCHARSET({$varOne}) MEDIATYPE({$varOne})";
 
-    private static final String RECEIVE_BODY = WEB + "RECEIVE SESSTOKEN({$sessVar}) MEDIATYPE(123) STATUSCODE(1) STATUSTEXT(1) STATUSLEN(123) ";
-    private static final String RECEIVE_CLIENT_BUFFER_VALID = RECEIVE_BODY + "INTO(123) LENGTH(123) MAXLENGTH(123) NOTRUNCATE CLICONVERT BODYCHARSET(1)";
-    private static final String RECEIVE_CLIENT_CONTAINER_VALID = RECEIVE_BODY + "TOCONTAINER(1) TOCHANNEL(3) BODYCHARSET(1)";
+    private static final String RECEIVE_BODY = WEB + "RECEIVE SESSTOKEN({$varOne}) MEDIATYPE({$varOne}) STATUSCODE({$varOne}) STATUSTEXT({$varOne}) STATUSLEN({$varOne}) ";
+    private static final String RECEIVE_CLIENT_BUFFER_VALID = RECEIVE_BODY + "INTO({$varOne}) LENGTH({$varOne}) MAXLENGTH({$varOne}) NOTRUNCATE CLICONVERT BODYCHARSET({$varOne})";
+    private static final String RECEIVE_CLIENT_CONTAINER_VALID = RECEIVE_BODY + "TOCONTAINER({$varOne}) TOCHANNEL({$varOne}) BODYCHARSET({$varOne})";
 
-    private static final String RETRIEVE_VALID = WEB + "RETRIEVE DOCTOKEN(123)";
+    private static final String RETRIEVE_VALID = WEB + "RETRIEVE DOCTOKEN({$varOne})";
 
-    private static final String SEND_SERVER_VALID_1 = WEB + "SEND DOCTOKEN(123) NODOCDELETE MEDIATYPE(123) SRVCONVERT CHARACTERSET(1) STATUSCODE(123) STATUSTEXT(123) STATUSLEN(123) IMMEDIATE NOCLOSE";
-    private static final String SEND_SERVER_VALID_2 = WEB + "SEND FROM(123) FROMLENGTH(123) CHUNKNO HOSTCODEPAGE(123) MEDIATYPE(123) SRVCONVERT CHARACTERSET(1) STATUSCODE(123) STATUSTEXT(123) STATUSLEN(123) IMMEDIATE NOCLOSE";
-    private static final String SEND_SERVER_VALID_3 = WEB + "SEND CONTAINER(1) CHANNEL(3) MEDIATYPE(123) SRVCONVERT CHARACTERSET(1) STATUSCODE(123) STATUSTEXT(123) STATUSLEN(123) EVENTUAL CLOSE";
+    private static final String SEND_SERVER_VALID_1 = WEB + "SEND DOCTOKEN({$varOne}) NODOCDELETE MEDIATYPE({$varOne}) SRVCONVERT CHARACTERSET({$varOne}) STATUSCODE({$varOne}) STATUSTEXT({$varOne}) STATUSLEN({$varOne}) IMMEDIATE NOCLOSE";
+    private static final String SEND_SERVER_VALID_2 = WEB + "SEND FROM({$varOne}) FROMLENGTH({$varOne}) CHUNKNO HOSTCODEPAGE({$varOne}) MEDIATYPE({$varOne}) SRVCONVERT CHARACTERSET({$varOne}) STATUSCODE({$varOne}) STATUSTEXT({$varOne}) STATUSLEN({$varOne}) IMMEDIATE NOCLOSE";
+    private static final String SEND_SERVER_VALID_3 = WEB + "SEND CONTAINER({$varOne}) CHANNEL({$varOne}) MEDIATYPE({$varOne}) SRVCONVERT CHARACTERSET({$varOne}) STATUSCODE({$varOne}) STATUSTEXT({$varOne}) STATUSLEN({$varOne}) EVENTUAL CLOSE";
 
-    private static final String SEND_CLIENT_VALID_1 = WEB + "SEND SESSTOKEN({$sessVar}) GET PATH(123) PATHLENGTH(123) QUERYSTRING(123) QUERYSTRLEN(123) DOCTOKEN(123) DOCDELETE CLICONVERT CHARACTERSET(1)"
-            + " EXPECT NOCLOSE BASICAUTH USERNAME(123) USERNAMELEN(3) PASSWORD(1234) PASSWORDLEN(4)";
-    private static final String SEND_CLIENT_VALID_2 = WEB + "SEND SESSTOKEN({$sessVar}) FROM(123) FROMLENGTH(3) CHUNKYES GET PATH(123) PATHLENGTH(123) QUERYSTRING(123) QUERYSTRLEN(123) CLICONVERT CHARACTERSET(1) EXPECT NOCLOSE BASICAUTH USERNAME(123) USERNAMELEN(3) PASSWORD(1234) PASSWORDLEN(4)";
+    private static final String SEND_CLIENT_VALID_1 = WEB + "SEND SESSTOKEN({$varOne}) GET PATH({$varOne}) PATHLENGTH({$varOne}) QUERYSTRING({$varOne}) MEDIATYPE({$varOne}) QUERYSTRLEN({$varOne}) DOCTOKEN({$varOne}) DOCDELETE CLICONVERT CHARACTERSET({$varOne})"
+            + " EXPECT NOCLOSE BASICAUTH USERNAME({$varOne}) USERNAMELEN({$varOne}) PASSWORD({$varOne}) PASSWORDLEN({$varOne})";
+    private static final String SEND_CLIENT_VALID_2 = WEB + "SEND SESSTOKEN({$varOne}) CHUNKYES GET PATH({$varOne}) PATHLENGTH({$varOne}) QUERYSTRING({$varOne}) QUERYSTRLEN({$varOne}) CLICONVERT CHARACTERSET({$varOne}) EXPECT NOCLOSE BASICAUTH USERNAME({$varOne}) USERNAMELEN({$varOne}) PASSWORD({$varOne}) PASSWORDLEN({$varOne})";
 
-    private static final String STARTBROWSE_FORMFIELD_VALID = WEB + "STARTBROWSE FORMFIELD(123) NAMELENGTH(123) CHARACTERSET(123) HOSTCODEPAGE(123)";
-    private static final String STARTBROWSE_HTTPHEADER_VALID = WEB + "STARTBROWSE HTTPHEADER SESSTOKEN({$sessVar})";
-    private static final String STARTBROWSE_QUERYPARM_VALID = WEB + "STARTBROWSE QUERYPARM(123) NAMELENGTH(123) HOSTCODEPAGE(123)";
+    private static final String STARTBROWSE_FORMFIELD_VALID = WEB + "STARTBROWSE FORMFIELD({$varOne}) NAMELENGTH({$varOne}) CHARACTERSET({$varOne}) HOSTCODEPAGE({$varOne})";
+    private static final String STARTBROWSE_HTTPHEADER_VALID = WEB + "STARTBROWSE HTTPHEADER SESSTOKEN({$varOne})";
+    private static final String STARTBROWSE_QUERYPARM_VALID = WEB + "STARTBROWSE QUERYPARM({$varOne}) NAMELENGTH({$varOne}) HOSTCODEPAGE({$varOne})";
 
-    private static final String WRITE_HTTPHEADER_VALID = WEB + "WRITE HTTPHEADER(123) NAMELENGTH(123) SESSTOKEN({$sessVar}) VALUE(123) VALUELENGTH(123)";
+    private static final String WRITE_HTTPHEADER_VALID = WEB + "WRITE HTTPHEADER({$varOne}) NAMELENGTH({$varOne}) SESSTOKEN({$varOne}) VALUE({$varOne}) VALUELENGTH({$varOne})";
 
     // Invalid use cases
-    private static final String CLOSE_INVALID = WEB + "{CLOSE|errorOne} {FROM|errorTwo}(123) SESSTOKEN(123)";
-    private static final String READ_QUERYPARM_INVALID = WEB_READ + "QUERYPARM(123) NAMELENGTH(123) {SESSTOKEN|errorOne}(123) VALUE(123) VALUELENGTH(123)";
-    private static final String READNEXT_QUERYPARM_INVALID = WEB_READNEXT + "QUERYPARM(123) NAMELENGTH(123) {SESSTOKEN|errorOne}(123) VALUE(123) VALUELENGTH(123)";
-    private static final String SEND_SERVER_INVALID = WEB + "SEND DOCTOKEN(123) {FROM(123)|errorOne} NODOCDELETE MEDIATYPE(123) SRVCONVERT CHARACTERSET(1) STATUSCODE(123) STATUSTEXT(123) STATUSLEN(123) IMMEDIATE NOCLOSE";
+    private static final String CLOSE_INVALID = WEB + "{CLOSE|errorOne}";
+    private static final String READ_QUERYPARM_INVALID = WEB_READ + "QUERYPARM({$varOne}) NAMELENGTH({$varOne}) {SESSTOKEN|errorOne}({$varOne}) VALUE({$varOne}) VALUELENGTH({$varOne})";
+    private static final String READNEXT_QUERYPARM_INVALID = WEB_READNEXT + "QUERYPARM({$varOne}) NAMELENGTH({$varOne}) {SESSTOKEN|errorOne}({$varOne}) VALUE({$varOne}) VALUELENGTH({$varOne})";
+    private static final String SEND_SERVER_INVALID = WEB + "SEND DOCTOKEN({$varOne}) {FROM|errorOne}({$varOne}) FROMLENGTH({$varOne}) NODOCDELETE MEDIATYPE({$varOne}) SRVCONVERT CHARACTERSET({$varOne}) STATUSCODE({$varOne}) STATUSTEXT({$varOne}) STATUSLEN({$varOne}) IMMEDIATE NOCLOSE";
 
 
-
-    // Utility Functions
-    private static void noErrorTest(String newCommand) {
-        UseCaseEngine.runTest(getTestString(newCommand), ImmutableList.of(), ImmutableMap.of());
-    }
-
-    private static String getTestString(String newCommand) {
-        List<String> instances = Arrays.asList(newCommand.split("\\s"));
-        instances.replaceAll(String.join("", Collections.nCopies(12, " "))::concat);
-        ArrayList<String> base = new ArrayList<String>(Arrays.asList(BASE_TEXT.split("\n")));
-        base.addAll(base.size() - 1, instances);
-        return String.join("\n", base);
-    }
 
     // Test Functions
     @Test
     void testCloseValid() {
-        noErrorTest(CLOSE_VALID);
+        CICSTestUtils.noErrorTest(CLOSE_VALID);
     }
 
     @Test
     void testCloseInvalid() {
         HashMap<String, Diagnostic> expectedDiagnostics = new HashMap<>();
         expectedDiagnostics.put("errorOne", new Diagnostic(new Range(), "Missing required option: SESSTOKEN", DiagnosticSeverity.Error, ErrorSource.PARSING.getText()));
-        expectedDiagnostics.put("errorTwo", new Diagnostic(new Range(), "Syntax error on 'FROM'", DiagnosticSeverity.Error, ErrorSource.PARSING.getText()));
         CICSTestUtils.errorTest(CLOSE_INVALID, expectedDiagnostics);
     }
 
     @Test
     void testConverseValid() {
-        noErrorTest(CONVERSE_VALID_1);
-        noErrorTest(CONVERSE_VALID_2);
+        CICSTestUtils.noErrorTest(CONVERSE_VALID_1);
+        CICSTestUtils.noErrorTest(CONVERSE_VALID_2);
     }
 
     @Test
     void testEndbrowseValid() {
-        noErrorTest(ENDBROWSE_VALID);
+        CICSTestUtils.noErrorTest(ENDBROWSE_VALID);
     }
 
     @Test
     void testExtractServer() {
-        noErrorTest(EXTRACT_SERVER_VALID);
+        CICSTestUtils.noErrorTest(EXTRACT_SERVER_VALID);
     }
 
     @Test
     void testExtractClient() {
-        noErrorTest(EXTRACT_CLIENT_VALID);
+        CICSTestUtils.noErrorTest(EXTRACT_CLIENT_VALID);
     }
 
     @Test
     void testOpenValid() {
-        noErrorTest(OPEN_VALID);
+        CICSTestUtils.noErrorTest(OPEN_VALID);
     }
 
     @Test
     void testParseUrlValid() {
-        noErrorTest(PARSE_URL_VALID);
+        CICSTestUtils.noErrorTest(PARSE_URL_VALID);
     }
 
     @Test
     void testReadValid() {
-        noErrorTest(READ_FORMFIELD_VALID);
-        noErrorTest(READ_QUERYPARM_VALID);
-        noErrorTest(READ_HTTPHEADER_VALID);
+        CICSTestUtils.noErrorTest(READ_FORMFIELD_VALID);
+        CICSTestUtils.noErrorTest(READ_QUERYPARM_VALID);
+        CICSTestUtils.noErrorTest(READ_HTTPHEADER_VALID);
     }
 
     @Test
@@ -196,40 +159,40 @@ public class TestCicsWebStatement {
 
     @Test
     void testReadnextValid() {
-        noErrorTest(READNEXT_FORMFIELD_VALID);
-        noErrorTest(READNEXT_QUERYPARM_VALID);
-        noErrorTest(READNEXT_HTTPHEADER_VALID);
+        CICSTestUtils.noErrorTest(READNEXT_FORMFIELD_VALID);
+        CICSTestUtils.noErrorTest(READNEXT_QUERYPARM_VALID);
+        CICSTestUtils.noErrorTest(READNEXT_HTTPHEADER_VALID);
     }
 
     @Test
     void testReadNextInvalid() {
         HashMap<String, Diagnostic> expectedDiagnostics = new HashMap<>();
-        expectedDiagnostics.put("errorOne", new Diagnostic(new Range(), "Extraneous input SESSTOKEN", DiagnosticSeverity.Error, ErrorSource.PARSING.getText()));
+        expectedDiagnostics.put("errorOne", new Diagnostic(new Range(), "Invalid option provided: SESSTOKEN", DiagnosticSeverity.Error, ErrorSource.PARSING.getText()));
         CICSTestUtils.errorTest(READNEXT_QUERYPARM_INVALID, expectedDiagnostics);
     }
 
     @Test
     void testReceiveServerValid() {
-        noErrorTest(RECEIVE_SERVER_BUFFER_VALID);
-        noErrorTest(RECEIVE_SERVER_CONTAINER_VALID);
+        CICSTestUtils.noErrorTest(RECEIVE_SERVER_BUFFER_VALID);
+        CICSTestUtils.noErrorTest(RECEIVE_SERVER_CONTAINER_VALID);
     }
 
     @Test
     void testReceiveClientValid() {
-        noErrorTest(RECEIVE_CLIENT_BUFFER_VALID);
-        noErrorTest(RECEIVE_CLIENT_CONTAINER_VALID);
+        CICSTestUtils.noErrorTest(RECEIVE_CLIENT_BUFFER_VALID);
+        CICSTestUtils.noErrorTest(RECEIVE_CLIENT_CONTAINER_VALID);
     }
 
     @Test
     void testRetrieveValid() {
-        noErrorTest(RETRIEVE_VALID);
+        CICSTestUtils.noErrorTest(RETRIEVE_VALID);
     }
 
     @Test
     void testSendServerValid() {
-        noErrorTest(SEND_SERVER_VALID_1);
-        noErrorTest(SEND_SERVER_VALID_2);
-        noErrorTest(SEND_SERVER_VALID_3);
+        CICSTestUtils.noErrorTest(SEND_SERVER_VALID_1);
+        CICSTestUtils.noErrorTest(SEND_SERVER_VALID_2);
+        CICSTestUtils.noErrorTest(SEND_SERVER_VALID_3);
     }
 
     @Test
@@ -241,19 +204,19 @@ public class TestCicsWebStatement {
 
     @Test
     void testSendClientValid() {
-        noErrorTest(SEND_CLIENT_VALID_1);
-        noErrorTest(SEND_CLIENT_VALID_2);
+        CICSTestUtils.noErrorTest(SEND_CLIENT_VALID_1);
+        CICSTestUtils.noErrorTest(SEND_CLIENT_VALID_2);
     }
 
     @Test
     void testStartBrowseValid() {
-        noErrorTest(STARTBROWSE_FORMFIELD_VALID);
-        noErrorTest(STARTBROWSE_HTTPHEADER_VALID);
-        noErrorTest(STARTBROWSE_QUERYPARM_VALID);
+        CICSTestUtils.noErrorTest(STARTBROWSE_FORMFIELD_VALID);
+        CICSTestUtils.noErrorTest(STARTBROWSE_HTTPHEADER_VALID);
+        CICSTestUtils.noErrorTest(STARTBROWSE_QUERYPARM_VALID);
     }
 
     @Test
     void testWriteHTTPHeaderValid() {
-        noErrorTest(WRITE_HTTPHEADER_VALID);
+        CICSTestUtils.noErrorTest(WRITE_HTTPHEADER_VALID);
     }
 }

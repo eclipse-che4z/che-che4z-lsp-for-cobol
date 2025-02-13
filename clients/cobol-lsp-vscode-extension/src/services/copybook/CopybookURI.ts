@@ -11,9 +11,9 @@
  * Contributors:
  *   Broadcom, Inc. - initial API and implementation
  */
-import * as path from "node:path";
 import {
   COPYBOOKS_FOLDER,
+  E4E_FOLDER,
   DATASET,
   ENVIRONMENT,
   USSFILE,
@@ -23,6 +23,10 @@ import { SettingsService } from "../Settings";
 import { ProfileUtils } from "../util/ProfileUtils";
 import { EndevorType, ResolvedProfile } from "../../type/e4eApi.d";
 import { Utils } from "../util/Utils";
+import * as vscode from "vscode";
+
+// Source can be only a single level directory, with no subdirectories
+type CopybooksSource = typeof ZOWE_FOLDER | typeof E4E_FOLDER;
 import {
   ZoweDatasetConfigModel,
   ZoweUssConfigModel,
@@ -33,35 +37,45 @@ import {
  * This class is responsible to identify from which source resolve copybooks required by the server.
  */
 export class CopybookURI {
+  /**
+   * Returns full copybook path
+   * {downloadFolder}/{zowe/e4e}/copybooks/{profile}/{dataset}/{copybook}
+   */
   public static createCopybookPath(
-    profileName: string,
+    profileName: string[],
     dataset: string,
     copybook: string,
     downloadFolder: string,
   ): string {
-    const copybookDirPath = path.join(
-      downloadFolder,
-      ZOWE_FOLDER,
-      COPYBOOKS_FOLDER,
-      profileName,
-      dataset,
-    );
-    return path.join(copybookDirPath, copybook);
+    return vscode.Uri.joinPath(
+      vscode.Uri.file(downloadFolder),
+      ...this.createDatasetSubdirectories(profileName, ZOWE_FOLDER, dataset),
+      copybook,
+    ).fsPath;
   }
 
+  /**
+   * Return copybooks dataset path including download folder
+   * {downloadFolder}/{zowe/e4e}/copybooks/{profile}/{dataset}
+   */
   public static createDatasetPath(
-    profileName: string,
+    profileName: string[],
     dataset: string,
     downloadFolder: string,
-    source: string = ZOWE_FOLDER,
-  ): string {
-    return path.join(
-      downloadFolder,
-      source,
-      COPYBOOKS_FOLDER,
-      profileName,
-      dataset,
+    source: CopybooksSource = ZOWE_FOLDER,
+  ) {
+    return vscode.Uri.joinPath(
+      vscode.Uri.file(downloadFolder),
+      ...this.createDatasetSubdirectories(profileName, source, dataset),
     );
+  }
+
+  public static createDatasetSubdirectories(
+    profileName: string[],
+    source: CopybooksSource,
+    dataset: string,
+  ): string[] {
+    return [source, COPYBOOKS_FOLDER, ...profileName, dataset];
   }
   /**
    * This method produce an array with element that following the schema
@@ -80,47 +94,58 @@ export class CopybookURI {
       documentUri,
       zoweExplorerApi,
     );
-
-    let result: string[] = [];
-    const datasets: string[] = SettingsService.getDsnPath(
-      documentUri,
-      dialectType,
-    );
-    if (profile && datasets) {
-      result = Object.assign([], datasets);
-      result.forEach(
-        (value, index) =>
-          (result[index] = path.join(downloadFolder, profile, value)),
-      );
+    if (!profile) {
+      return [];
     }
 
-    const ussPaths: string[] = SettingsService.getUssPath(
-      documentUri,
-      dialectType,
+    const remotePaths = [
+      ...SettingsService.getDsnPath(documentUri, dialectType),
+      ...SettingsService.getUssPath(documentUri, dialectType),
+    ];
+
+    return remotePaths.map(
+      (remote) =>
+        vscode.Uri.joinPath(vscode.Uri.file(downloadFolder), profile, remote)
+          .fsPath,
     );
-    const baseIndex = result.length;
-    if (profile && ussPaths) {
-      Object.assign([], ussPaths).forEach(
-        (value, index) =>
-          (result[index + baseIndex] = path.join(
-            downloadFolder,
-            profile,
-            value,
-          )),
-      );
-    }
-    return result;
   }
 
-  public static getEnviromentPath(type: EndevorType, profile: ResolvedProfile) {
-    return path.join(
+  public static getEnviromentPath(
+    type: EndevorType,
+    profile: ResolvedProfile,
+  ): string[] {
+    return [
       Utils.profileAsString(profile),
       type.environment,
       type.stage,
       type.system,
       type.subsystem,
       type.type,
-    );
+    ];
+  }
+  public static createProcessorGroupCopybookPaths(
+    pgConfigs: [
+      ZoweDatasetConfigModel | ZoweUssConfigModel | EndevorConfigModel,
+    ],
+    storagePath: string,
+    defaultProfile: string,
+  ) {
+    const paths: string[] = [];
+    pgConfigs = Array.isArray(pgConfigs) ? pgConfigs : [pgConfigs];
+    pgConfigs.forEach((config) => {
+      if (DATASET in config || USSFILE in config) {
+        paths.push(
+          CopybookURI.createDatasetPath(
+            config.profile ? config.profile : defaultProfile,
+            DATASET in config ? config.dataset : config.ussFile,
+            storagePath,
+          ),
+        );
+      } else if (ENVIRONMENT in config) {
+        //endevor kutluo
+      }
+    });
+    return paths;
   }
   public static createProcessorGroupCopybookPaths(
     pgConfigs: [

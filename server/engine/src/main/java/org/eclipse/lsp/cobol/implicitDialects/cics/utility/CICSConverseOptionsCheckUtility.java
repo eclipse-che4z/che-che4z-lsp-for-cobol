@@ -108,8 +108,6 @@ public class CICSConverseOptionsCheckUtility extends CICSOptionsCheckBaseUtility
             checkHasIllegalOptions(ctx.cics_converse_erase(), "ERASE");
         }
 
-        checkHasMandatoryOptions(ctx.cics_into(), ctx, "INTO or SET");
-
         if (!ctx.cics_maxlength().isEmpty())
             checkHasMandatoryOptions(ctx.cics_converse_tolength(), ctx, "TOLENGTH OR TOFLENGTH");
 

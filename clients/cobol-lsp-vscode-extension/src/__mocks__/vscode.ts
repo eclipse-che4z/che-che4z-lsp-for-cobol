@@ -11,7 +11,7 @@
  * Contributors:
  *   Broadcom, Inc. - initial API and implementation
  */
-import path = require("path");
+import * as path from "path";
 import type {
   OutputChannel as OutputChannelType,
   Position as PositionType,

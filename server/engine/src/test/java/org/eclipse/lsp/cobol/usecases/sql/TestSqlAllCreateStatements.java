@@ -181,6 +181,31 @@ class TestSqlAllCreateStatements {
           + "               NO SQL;\n"
           + "           END-EXEC.";
 
+  /**
+   * This compiles even though <a href="https://www.ibm.com/docs/en/db2-for-zos/13?topic=statements-create-function-external-scalar">doc</a> says it otherwise.
+   * <pre>CARDINALITY is not supported for external scalar functions.</pre>
+   */
+  public static final String CREATE_FUNCTION_EXT5 =
+      TEXT
+          + "               CREATE FUNCTION CENTER (INTEGER, FLOAT)\n"
+          + "               RETURNS FLOAT\n"
+          + "               EXTERNAL NAME 'MIDDLE'\n"
+          + "               LANGUAGE C\n"
+          + "               PARAMETER STYLE SQL\n"
+          + "               WLM ENVIRONMENT (env, *)\n"
+           + "           END-EXEC.";
+
+  public static final String CREATE_FUNCTION_EXT6 =
+      TEXT
+          + "               CREATE FUNCTION CENTER (INTEGER, FLOAT)\n"
+          + "               RETURNS FLOAT\n"
+          + "               EXTERNAL NAME 'MIDDLE'\n"
+          + "               LANGUAGE C\n"
+          + "               PARAMETER STYLE SQL\n"
+          + "               WLM ENVIRONMENT env\n"
+          + "               CARDINALITY 3\n"
+          + "           END-EXEC.";
+
   // CREATE FUNCTION external table
   private static final String CREATE_FUNCTION_EXT_TABLE =
       TEXT
@@ -1036,6 +1061,8 @@ class TestSqlAllCreateStatements {
         CREATE_FUNCTION_EXT2,
         CREATE_FUNCTION_EXT3,
         CREATE_FUNCTION_EXT4,
+        CREATE_FUNCTION_EXT5,
+        CREATE_FUNCTION_EXT6,
         CREATE_FUNCTION_EXT_TABLE,
         CREATE_FUNCTION_EXT_TABLE2,
         CREATE_FUNCTION_INLINED,

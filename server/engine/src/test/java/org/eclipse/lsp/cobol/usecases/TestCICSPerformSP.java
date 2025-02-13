@@ -128,6 +128,10 @@ public class TestCICSPerformSP {
             "PERFORM STATISTICS RECORD {JOURNALNAME|error} {JOURNALNUM|error2}";
     private static final String PERFORM_STATISTICS_MUTUALEX2_INVALID =
             "PERFORM STATISTICS RECORD {TRANCLASS|error} {TCLASS|error2}";
+    private static final String PERFORM_STATISTICS_ALL_WITH_OTHERS_INVALID =
+            "PERFORM {_STATISTICS ALL RECORD DB2|error_}";
+    private static final String PERFORM_STATISTICS_ALL_WITH_OTHERS2_INVALID =
+            "PERFORM {_STATISTICS ALL RECORD DB2 CONNECTION FILE FEPI|error_}";
 
     @ParameterizedTest
     @MethodSource("getValidOptions")
@@ -501,6 +505,30 @@ public class TestCICSPerformSP {
                                 DiagnosticSeverity.Error,
                                 ErrorSource.PARSING.getText()));
         CICSTestUtils.errorTest(PERFORM_STATISTICS_MUTUALEX2_INVALID, expectedDiagnostic, "SP");
+    }
+    @Test
+    void testPerformStatisticsAllWithOthersSpInvalid() {
+        Map<String, Diagnostic> expectedDiagnostic =
+                ImmutableMap.of(
+                        "error",
+                        new Diagnostic(
+                                new Range(),
+                                "Option ALL cannot be combined with individual resource types",
+                                DiagnosticSeverity.Error,
+                                ErrorSource.PARSING.getText()));
+        CICSTestUtils.errorTest(PERFORM_STATISTICS_ALL_WITH_OTHERS_INVALID, expectedDiagnostic, "SP");
+    }
+    @Test
+    void testPerformStatisticsAllWith2OthersSpInvalid() {
+        Map<String, Diagnostic> expectedDiagnostic =
+                ImmutableMap.of(
+                        "error",
+                        new Diagnostic(
+                                new Range(),
+                                "Option ALL cannot be combined with individual resource types",
+                                DiagnosticSeverity.Error,
+                                ErrorSource.PARSING.getText()));
+        CICSTestUtils.errorTest(PERFORM_STATISTICS_ALL_WITH_OTHERS2_INVALID, expectedDiagnostic, "SP");
     }
 }
 

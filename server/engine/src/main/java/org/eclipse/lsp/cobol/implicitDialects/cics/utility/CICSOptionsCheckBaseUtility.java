@@ -120,27 +120,27 @@ public abstract class CICSOptionsCheckBaseUtility {
      * @param ctx             - The overall context.
      * @param options         - String of the element that is required.
      */
-    protected <E extends ParseTree> void checkPrerequisiteIsMet(List<E> requiredContext, List<E> optionalContext, ParserRuleContext ctx, String options) {
+    protected <E> void checkPrerequisiteIsMet(List<E> requiredContext, List<E> optionalContext, ParserRuleContext ctx, String options) {
         checkPrerequisiteIsMet(isNodePresent(requiredContext), isNodePresent(optionalContext), ctx, options);
     }
 
-    protected <E extends ParseTree> void checkPrerequisiteIsMet(E requiredContext, List<E> optionalContext, ParserRuleContext ctx, String options) {
+    protected <E> void checkPrerequisiteIsMet(E requiredContext, List<E> optionalContext, ParserRuleContext ctx, String options) {
         checkPrerequisiteIsMet(isNodePresent(requiredContext), isNodePresent(optionalContext), ctx, options);
     }
 
-    protected <E extends ParseTree> void checkPrerequisiteIsMet(List<E> requiredContext, E optionalContext, ParserRuleContext ctx, String options) {
+    protected <E> void checkPrerequisiteIsMet(List<E> requiredContext, E optionalContext, ParserRuleContext ctx, String options) {
         checkPrerequisiteIsMet(isNodePresent(requiredContext), isNodePresent(optionalContext), ctx, options);
     }
 
-    protected <E extends ParseTree> void checkPrerequisiteIsMet(E requiredContext, E optionalContext, ParserRuleContext ctx, String options) {
+    protected <E> void checkPrerequisiteIsMet(E requiredContext, E optionalContext, ParserRuleContext ctx, String options) {
         checkPrerequisiteIsMet(isNodePresent(requiredContext), isNodePresent(optionalContext), ctx, options);
     }
 
-    private <E extends ParseTree> Boolean isNodePresent(E node) {
+    private <E> Boolean isNodePresent(E node) {
         return node != null;
     }
 
-    private <E extends ParseTree> boolean isNodePresent(List<E> node) {
+    private <E> boolean isNodePresent(List<E> node) {
         if (node == null || node.isEmpty()) {
             return false;
         }
@@ -222,6 +222,18 @@ public abstract class CICSOptionsCheckBaseUtility {
                 throwException(ErrorSeverity.ERROR, getLocality(isRuleList ? ((List<?>) rule).get(0) : rule), "Options \"" + options + "\" are mutually exclusive.", "");
                 break;
             }
+        }
+    }
+
+    /**
+     * Helper method to collect analysis errors if the rule context contains obsolete options
+     *
+     * @param rule TerminalNode to check.
+     * @param options Options checked to insert into error message
+     */
+    protected void checkHasObsoleteOptions(List<TerminalNode> rule, ParserRuleContext ctx, String options) {
+        if (!rule.isEmpty()) {
+            throwException(ErrorSeverity.ERROR, getLocality(ctx), "Obsolete option provided: ", options);
         }
     }
 
@@ -386,7 +398,8 @@ public abstract class CICSOptionsCheckBaseUtility {
      * @param rules   Lists of TerminalNode to iterate through
      * @return Number of TerminalNode instances found
      */
-    protected int checkHasMutuallyExclusiveOptions(String options, List<TerminalNode>... rules) {
+    @SafeVarargs
+    protected final int checkHasMutuallyExclusiveOptions(String options, List<TerminalNode>... rules) {
         List<TerminalNode> nodes =
                 Stream.of(rules)
                         .filter(rule -> !rule.isEmpty())
@@ -416,7 +429,8 @@ public abstract class CICSOptionsCheckBaseUtility {
    * @param ctx ParserRuleContext
    * @param rules Lists of rules to iterate through
    */
-  protected <E extends ParseTree> void checkAllOptionsArePresentOrAbsent(String options, ParserRuleContext ctx, List<E>... rules) {
+  @SafeVarargs
+  protected final <E extends ParseTree> void checkAllOptionsArePresentOrAbsent(String options, ParserRuleContext ctx, List<?>... rules) {
     boolean noOptions = Arrays.stream(rules).allMatch(List::isEmpty);
     if (!noOptions) {
         boolean allOptions = Arrays.stream(rules).noneMatch(List::isEmpty);
@@ -430,9 +444,9 @@ public abstract class CICSOptionsCheckBaseUtility {
     }
   }
 
-
-  protected <E extends ParseTree> void checkHasExactlyOneOption(
-      String options, ParserRuleContext parentCtx, List<E>... rules) {
+  @SafeVarargs
+  protected final <E extends ParseTree> void checkHasExactlyOneOption(
+          String options, ParserRuleContext parentCtx, List<E>... rules) {
 
         List<TerminalNode> children = new ArrayList<>();
 

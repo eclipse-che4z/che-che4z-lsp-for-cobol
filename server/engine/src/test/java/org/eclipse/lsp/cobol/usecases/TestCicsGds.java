@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Broadcom.
+ * Copyright (c) 2025 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -25,23 +25,23 @@ import org.junit.jupiter.api.Test;
 import java.util.Map;
 
 /**
- * Test CICS GETMAIN64 command. Documentation link: <a
- * href="https://www.ibm.com/docs/en/cics-ts/6.x?topic=summary-getmain64">GETMAIN64
+ * Test CICS GDS command. Documentation link: <a
+ * href="https://www.ibm.com/docs/en/cics-ts/6.x?topic=summary-gds-allocate">GDS
  * Command</a>
  *
- * <p>This class tests all variations of the GETMAIN64 command found in the link above.
+ * <p>This class tests all variations of the GDS command found in the link above.
  */
-public class TestCicsGetMain64 {
-    private static final String INVALID_ONE = "{GETMAIN64|errorOne} SET({$varTwo}) FLENGTH({$varThree}) SHARED";
+public class TestCicsGds {
+    private static final String INVALID_ONE = "{GDS|error1} ALLOCATE SYSID(varFour) CONVID(varTwo) RETCODE(varThree)";
 
     @Test
     void testInvalidOne() {
         Map<String, Diagnostic> expectedDiagnostic =
                 ImmutableMap.of(
-                        "errorOne",
+                        "error1",
                         new Diagnostic(
                                 new Range(),
-                                "Invalid option provided: GETMAIN64 is only available in Assembly",
+                                "Invalid option provided: GDS is only available in Assembly",
                                 DiagnosticSeverity.Error,
                                 ErrorSource.PARSING.getText()));
         CICSTestUtils.errorTest(INVALID_ONE, expectedDiagnostic);
