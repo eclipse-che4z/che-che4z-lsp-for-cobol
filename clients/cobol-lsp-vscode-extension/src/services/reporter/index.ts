@@ -55,7 +55,7 @@ export function registerEvent(
     convertData(
       createTelemetryEvent(
         eventName,
-        categories!,
+        categories || ["N.D"],
         notes,
         undefined,
         telemetryMeasurement,
