@@ -89,7 +89,7 @@ export function registerExceptionEvent(
     convertData(
       createTelemetryEvent(
         eventName,
-        categories!,
+        categories || ["N.D"],
         notes,
         anonymizeContent(rootCause),
         telemetryMeasurement,
@@ -126,7 +126,7 @@ function createTelemetryEvent(
   return {
     timestamp: new Date().toISOString(),
     eventName,
-    categories: resolveCategories(categories),
+    categories: categories || ["N.D"],
     notes: notes || "",
     rootCause,
     measurements: telemetryMeasurement,
@@ -149,10 +149,6 @@ export function anonymizeContent(content: string): string {
   } else {
     return content;
   }
-}
-
-function resolveCategories(categories: string[]): string[] {
-  return categories ? categories : ["N.D"];
 }
 
 function convertData(content: TelemetryEvent) {
