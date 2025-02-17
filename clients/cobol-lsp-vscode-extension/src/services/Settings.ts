@@ -244,18 +244,6 @@ export class SettingsService {
     ];
     const wsFolders = SettingsUtils.getWorkspaceFoldersPath(true);
 
-    // if no configuration for local or remote copybook paths is provided
-    // use pattern for workspace folder and subfolders as a default value
-    if (
-      paths.length === 0 &&
-      this.getCopybookConfigValues(PATHS_DSN, documentUri, dialectType)
-        .length === 0 &&
-      this.getCopybookConfigValues(PATHS_USS, documentUri, dialectType)
-        .length === 0
-    ) {
-      paths.push("**");
-    }
-
     return SettingsService.prepareLocalSearchFolders(paths, wsFolders);
   }
 

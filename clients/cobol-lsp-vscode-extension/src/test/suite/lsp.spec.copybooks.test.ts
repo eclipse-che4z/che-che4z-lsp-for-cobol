@@ -173,38 +173,6 @@ suite("Integration Test Suite: Copybooks", function () {
     .slow(1000);
 
   suite("Default local copybooks paths configuration", () => {
-    suite("local or remote copybook paths not set", () => {
-      suiteSetup(async () => {
-        await helper.updateConfig("default.json");
-        await helper.activate();
-      });
-
-      test("Local copybooks are resolved from workspace subfolders if no configuration is provided", async () => {
-        const editor = await helper.showDocument("USERC1N1.cbl");
-
-        let diagnostics: vscode.Diagnostic[] = [];
-        await helper.waitFor(() => {
-          diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
-
-          return (
-            diagnostics.length > 0 &&
-            diagnostics.some(
-              (d) => d.message === "Errors inside the copybook",
-            ) &&
-            diagnostics.filter(
-              (d) => d.message === "BOOK1N: Copybook not found",
-            ).length === 0
-          );
-        });
-
-        assert.strictEqual(
-          diagnostics.filter((d) => d.message === "BOOK1N: Copybook not found")
-            .length,
-          0,
-        );
-      });
-    });
-
     suite("local copybook path is configured", () => {
       suiteSetup(async () => {
         await helper.updateConfig("testing.json");
