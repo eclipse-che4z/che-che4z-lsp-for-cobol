@@ -135,7 +135,7 @@ APPLMICROVER=
 APPLMINORVER=
 APPLNAME=
 APPLNAMEST=
-APPLY=
+APPLY=The APPLY WRITE ONLY clause is part of the INPUT-OUTPUT SECTION of the ENVIRONMENT DIVISION. It optimizes I/O buffering for variable length, blocked QSAM record writing. <br>[Search IBM documentation](https://www.ibm.com/docs/en/cobol-zos/6.2?topic=section-apply-write-only-clause)<br>\u00A9 Copyright IBM Corporation 1994, 2019.<br>U.S. Government Users Restricted Rights - Use, duplication or disclosure restricted by GSA ADP Schedule Contract with IBM Corp.
 APPNOTFOUND=
 AR=
 ARCHIVE=
