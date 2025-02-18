@@ -133,6 +133,31 @@
     "body": ["BEFORE ${1:id}"],
     "description": "BEFORE literal"
   },
+  "BINARY": {
+    "prefix": "BINARY",
+    "body": ["BINARY ${1:id}"],
+    "description": "BINARY literal"
+  },
+  "BIT TO CHAR": {
+    "prefix": "BIT-TO-CHAR",
+    "body": ["77 ${1:BIT-FLD} PIC X(16).", "    MOVE '${2:0000000000000000}' TO ${1:BIT-FLD}.", "    FUNCTION BIT-TO-CHAR(${1:BIT-FLD})."],
+    "description": "Function used to populate an PIC X/PIC A field with binary data."
+  },
+  "BLANK WHEN ZERO": {
+    "prefix": "BLANK",
+    "body": ["77 ${1:variableName} PIC S9(5)V99 BLANK WHEN ZERO."],
+    "description": "BLANK WHEN ZERO specifies that an elementary field will contains spaces when its value is zero."
+  },
+  "BLOCK": {
+    "prefix": "BLOCK",
+    "body": ["BLOCK CONTAINS 0 RECORDS"],
+    "description": "BLOCK CONTAINS clause (in the DATA DIVISION, file FD) dictates the size of the physical (I/O) records. By coding BLOCK CONTAINS 0  z/os will choose the optimal \"blocking factor\" for most efficient file I/O - taking into account channels, and DASD along with the file specifics."
+  },
+  "BOOLEAN" : {
+    "prefix": "BOOLEAN",
+    "body": ["JSON GENERATE ${1:fileJSON} FROM ${2:cobol-record}", "CONVERTING ${3:data-in-variable} TO BOOLEAN USING \"X\"."],
+    "description": "BOOLEAN as a reserved word is typically used to convert COBOL data to non-JSON data format."
+  },
   "BY": {
     "prefix": "BY",
     "body": ["BY ${1:item}"],
@@ -164,43 +189,133 @@
     "body": ["CANCEL ${1:id}", "$0"],
     "description": "CANCEL literal"
   },
+  "CHARACTERS": {
+    "prefix": "CHARACTERS",
+    "body": ["SYMBOLIC ${1|CHARACTER,CHARACTERS|} ${2:symbolic-character}"],
+    "description": "SYMBOLIC CHARACTER"
+  },
   "CLOSE": {
     "prefix": "CLOSE",
     "body": ["CLOSE $(1:fileName}"],
     "description": "CLOSE filename"
+  },
+  "COLLATING": {
+    "prefix": "COLLATING",
+    "body": ["PROGRAM COLLATING SEQUENCE IS ${1|EBDIC,ASCII|}"],
+    "description": "Part of the IDENTIFICATION DIVISION. Note that the default option is EBCDIC"
+  },
+  "COMP": {
+    "prefix": "COMP",
+    "body": ["${1:77} ${2:VAR-BIN} PIC S9(4) ${3|COMP,COMPUTATIONAL|}."],
+    "description": "BINARY data and synonyms COMP and COMP-4 are the two's complement data representation in COBOL. Two's complement Hex data (EBCDIC) representation of numeric values in fields within the DATA DIVISION."
+  },
+  "COMP-1": {
+    "prefix": "COMP-1",
+    "body": ["${1:77} ${2:VAR-FLOAT-SINGLE-PREC} PIC S9(4) ${3|COMP,COMPUTATIONAL|}-1."],
+    "description": "A four-byte single-precision floating-point number declared in the DATA DIVISION. https://www.ibm.com/docs/en/cobol-zos/6.4?topic=arithmetic-formats-numeric-data"
+  },
+  "COMP-2": {
+    "prefix": "COMP-2",
+    "body": ["${1:77} ${2:VAR-FLOAT-DOUBLE-PREC} PIC S9(4) ${3|COMP,COMPUTATIONAL|}-2."],
+    "description": "A four-byte double-precision floating-point number declared in the DATA DIVISION. https://www.ibm.com/docs/en/cobol-zos/6.4?topic=arithmetic-formats-numeric-data"
+  },
+  "COMP-3": {
+    "prefix": "COMP-3",
+    "body": ["${1:77} ${2:VAR-PACKED-NUM-DATA} PIC S9(4) ${3|COMP,COMPUTATIONAL|}-3."],
+    "description": "Internally-packed (efficient) number declared in the DATA DIVISION. https://www.ibm.com/docs/en/cobol-zos/6.4?topic=6-packed-decimal-comp-3"
+  },
+  "COMP-4": {
+    "prefix": "COMP-4",
+    "body": ["${1:77} ${2:VAR-BIN} PIC S9(4) ${3|COMP,COMPUTATIONAL|}-4."],
+    "description": "BINARY data and synonyms COMP and COMP-4 are the two's complement data representation in COBOL. Two's complement Hex data (EBCDIC) representation of numeric values in fields within the DATA DIVISION."
+  },
+  "COMP-5": {
+    "prefix": "COMP-5",
+    "body": ["${1:77} ${2:VAR-BIN} PIC S9(4) ${3|COMP,COMPUTATIONAL|}-5."],
+    "description": "Typically used to communicate between Java/C/C++/Python/etc. and COBOL, with COMP-5, data, the size of the variable is defined by the field's PIC size. When numeric data is moved into a COMP-5 item, truncation occurs at the binary field size rather than at the COBOL picture clause declaration. https://www.ibm.com/docs/en/cobol-zos/6.4?topic=arithmetic-formats-numeric-data"
+  },
+  "COMPUTE": {
+    "prefix": "COMPUTE",
+    "body": ["COMPUTE ${1:NUM-VAR} OF ${2:DFHCOMMAREA} = ${3:WS-NUMVAR1} ${4|+,-,*,/,**|} ${5:WS-NUMVAR2}", "    ON SIZE ERROR GO TO ${6:TRAP-OVERFLOW}", "    NOT ON SIZE ERROR GO TO ${7:PROGRAM-FINAL-ACTION}", "END-COMPUTE", "$0"],
+    "description": "COMPUTE provides an alebraic-style keyword for the speficiation of complex arithemetic expressions: + (add), - (subtract), * (multiply), / (divide), ** (power of) and any intrinsic functions that return numeric results. ON SIZE ERROR allows you to trap situcations such as divide by zero and result overflow. https://www.ibm.com/docs/en/cobol-zos/6.4?topic=statements-compute-statement"
   },
   "COMPUTE EQUAL": {
     "prefix": "COMPUTE EQUAL",
     "body": ["COMPUTE ${1:id} EQUAL ${2:arithExp}"],
     "description": "COMPUTE id EQUAL arithexp"
   },
+  "CONFIGURATION": {
+    "prefix": "CONFIGURATION",
+    "body": ["ENVIRONMENT DIVISION.", "       CONFIGURATION SECTION."],
+    "description": "The CONFIGURATION SECTION describes the z/OS environment on which the program is compiled and executed. It is an optional section for programs, functions, prototypes, and classes. https://www.ibm.com/docs/en/cobol-zos/6.4?topic=division-configuration-section"
+  },
+  "CONTAINS": {
+    "prefix": "CONTAINS",
+    "body": ["FD ${2:inputFile}", "    RECORD CONTAINS ${1:numLiteral} CHARACTERS", "    BLOCK CONTAINS 0 RECORDS", "    DATA RECORD IS ${3:inputFileRec}."],
+    "description": "A fixed-block file. Note that BLOCK CONTAINS 0 leaves the blocking-optimization up to z/OS - and is the preferred way to specify most QSAM file FDs. https://www.ibm.com/docs/en/cobol-zos/6.4?topic=entries-block-contains-clause"
+  },
   "CONTENT": {
     "prefix": "CONTENT",
     "body": ["CONTENT ${1:id}"],
     "description": "CONTENT id"
   },
+  "CONTENT-OF": {
+    "prefix": "CONTENT-OF",
+    "body": ["COMPUTE ${1:resultNum} = CALC2(CONTENT-OF(${2:arg-1}),${3:arg-2},${4:arg-3})", "END-COMPUTE"],
+    "description": "The CONTENT-OF intrinsic function produces a temporary copy of the input argument. https://www.ibm.com/docs/en/cobol-zos/6.4?topic=functions-content"
+  },
+  "CONTROL": {
+    "prefix": "CONTROL",
+    "body": ["*CONTROL ${1|MAP,NOMAP|)"],
+    "description": "*CONTROL is a Compiler option - that allows the user to limit (or not limit) the MAP output of a program compile.  https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdf "
+  },
   "CONVERTING": {
     "prefix": "CONVERTING",
-    "body": ["CONVERTING ${1:item}"],
-    "description": "CONVERTING item"
-  },
-  "CORR": {
-    "prefix": "CORR",
-    "body": ["CORR ${1:id}"],
-    "description": "CORR id"
-  },
-  "COUNT IN": {
-    "prefix": "COUNT IN",
-    "body": ["COUNT IN ${1:id}"],
-    "description": "COUNT IN id"
+    "body": ["INSPECT DATA-4 CONVERTING", "\"${1:abc}\" TO \"${2:123}\"", "AFTER INITIAL \"|\" BEFORE INITIAL \"/\"", "END-INSPECT", "$0"],
+    "description": "CONVERTING is a parameter of the INSPECT keyword - used to replace character values. https://www.ibm.com/docs/en/cobol-zos/6.4?topic=inspect-examples-statement"
   },
   "COPY": {
+    "prefix": "COPY",
+    "body": ["COPY ${1:copybookName}"],
+    "description": "COPY is used to insert source code - stored in a PDS or SCM into COBOL lines. Note that the JCL or Source Management System (Endevor, etc.) must be available and specified correctly. https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdf"
+  },
+  "COPY REPLACING": {
     "prefix": "COPY",
     "body": [
       "COPY \"${1:SUBPROG.CPY}\"",
       "    REPLACING ==${2:()}== BY ==${3:lnk-}==."
     ],
     "description": "COPY REPLACING"
+  },
+  "CORR": {
+    "prefix": "CORR",
+    "body": ["CORR ${1:id}"],
+    "description": "CORR id"
+  },
+  "COUNT": {
+    "prefix": "COUNT",
+    "body": ["UNSTRING ${2:var-1} DELIMITED BY \"${3:*}\" INTO ${4:var-2}", "COUNT IN ${1:var-3}", "END-UNSTRING", "$0"],
+    "description": "Part of the UNSTRING verb, COUNT places the number of characters in a numeric variable (VAR-3 in the above example). https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdf"
+  },
+  "COUNT IN": {
+    "prefix": "COUNT IN",
+    "body": ["COUNT IN ${1:id}"],
+    "description": "COUNT IN id"
+  },
+  "CRT": {
+    "prefix": "CRT",
+    "body": ["CRT STATUS IS ${1:statusVar}"],
+    "description": "Part of the SPECIAL-NAMES paragraph/CONFIGURATION SECTION in the ENVIRONMENT DIVISION. CRT STATUS returns data regarding the status of a screen-based COBOL ACCEPT statement when an ON EXCEPTION statement is included in the ACCEPT statement."
+  },
+  "CURRENCY": {
+    "prefix": "CURRENCY",
+    "body": ["CURRENCY SIGN IS \"${1:\\$USD}\" WITH PICTURE SYMBOL \"${2:\\$}\"."],
+    "description": "CURRENCY SIGN clause is defined in the SPECIAL-NAMES paragraph in the CONFIGURATION SECTION/ENVIRONMENT DIVISION. In the given example, the PIC character $ indicates that the currency sign $USD is to be substitued. Note that you may declare multiple curency signs for multiple currencies. https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdf"
+  },
+  "CURSOR": {
+    "prefix": "CURSOR",
+    "body": ["CURSOR IS ${1:num-var-cursor-position}."],
+    "description": "CURSOR IS is the name of a numeric data item described in the WORKING-STORAGE SECTION - that contains a value for placement of the cursor on a CRT. CURSOR IS is defined in the SPECIAL-NAMES paragraph."
   },
   "DATA DIVISION": {
     "prefix": "DATA DIVISION",
@@ -888,13 +1003,8 @@
   },
   "MOVE CORR": {
     "prefix": "MOVE CORR",
-    "body": ["MOVE CORR ${1:id}"],
-    "description": "MOVE CORR"
-  },
-  "MOVE CORR TO": {
-    "prefix": "MOVE CORR TO",
-    "body": ["MOVE CORR ${1:id} TO ${2:id}"],
-    "description": "MOVE CORR"
+    "body": ["MOVE ${1|CORR,CORRESPONDING|} ${2:group-1} TO ${3:group-2"],
+    "description": "After the above MOVE CORRESPONDING statement, all values in like-named-variables will be copied from GROUP-1 to GROUP-2. https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdf"
   },
   "MOVE": {
     "prefix": "MOVE",
