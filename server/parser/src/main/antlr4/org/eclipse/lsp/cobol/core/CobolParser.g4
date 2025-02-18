@@ -576,7 +576,8 @@ dataDescriptionEntryForWorkingStorageSection
    ;
 
 dataDescriptionEntryForWorkingStorageAndLinkageSection
-   : dataDescriptionEntry
+   : dataDescriptionEntryWithCompilerDirective
+   | dataDescriptionEntry
    ;
 
 dataDescriptionEntry
@@ -585,6 +586,10 @@ dataDescriptionEntry
    | dataDescriptionEntryFormat1Level77
    | dataDescriptionEntryFormat3
    | dialectDescriptionEntry
+   ;
+
+dataDescriptionEntryWithCompilerDirective
+   : JAVA_SHAREABLE_ON dataDescriptionEntry* JAVA_SHAREABLE_OFF
    ;
 
 dataDescriptionEntryFormat1
@@ -766,7 +771,11 @@ thruToken
 // --- procedure division --------------------------------------------------------------------
 
 procedureDivision
-   : PROCEDURE DIVISION procedureDivisionUsingClause? procedureDivisionGivingClause? dot_fs procedureDeclaratives? procedureDivisionBody
+   : procedureDivisionCompilerDirectives? PROCEDURE DIVISION procedureDivisionUsingClause? procedureDivisionGivingClause? dot_fs procedureDeclaratives? procedureDivisionBody
+   ;
+
+procedureDivisionCompilerDirectives
+   : JAVA_CALLABLE
    ;
 
 procedureDivisionUsingClause
