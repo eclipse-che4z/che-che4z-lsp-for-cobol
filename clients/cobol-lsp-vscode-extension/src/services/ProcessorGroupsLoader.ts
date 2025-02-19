@@ -37,9 +37,9 @@ const EndevorConfigModel = t.intersection([
     system: t.string,
     subsystem: t.string,
     type: t.string,
-    profile: t.string,
   }),
   t.partial({ use_map: t.boolean }),
+  t.partial({ profile: t.string }),
 ]);
 
 const ZoweDatasetConfigModel = t.intersection([
@@ -79,12 +79,14 @@ const ProcessorGroupModel = t.intersection([
   }),
   t.partial({
     preprocessor: t.union([PreprocessorModel, t.array(PreprocessorModel)]),
-    libs: t.union([
-      t.array(t.string),
-      EndevorConfigModel,
-      ZoweDatasetConfigModel,
-      ZoweUssConfigModel,
-    ]),
+    libs: t.array(
+      t.union([
+        t.string,
+        EndevorConfigModel,
+        ZoweDatasetConfigModel,
+        ZoweUssConfigModel,
+      ]),
+    ),
     "copybook-extensions": t.array(t.string),
     "compiler-options": t.array(t.string),
     "copybook-file-encoding": t.string,
@@ -138,14 +140,14 @@ export async function readProcessorGroupsFileContent(
 
   const procCfgPath = Uri.joinPath(ws.uri, PG_FOLDER, PG_PROC_FILE);
   try {
-    const ProcessorGrpupsModel = t.type({
+    const ProcessorGroupsModel = t.type({
       pgroups: t.array(ProcessorGroupModel),
     });
     const json: unknown = JSON.parse(
       new TextDecoder().decode(await workspace.fs.readFile(procCfgPath)),
     );
 
-    const decoded = ProcessorGrpupsModel.decode(json);
+    const decoded = ProcessorGroupsModel.decode(json);
     if (isLeft(decoded)) {
       throw Error(
         `Could not validate data: ${PathReporter.report(decoded).join("\n")}`,

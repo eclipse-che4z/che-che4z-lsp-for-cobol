@@ -71,9 +71,9 @@ async function getTargetFolderForCopybook(
     dialectType,
   );
 
-  if (pgConfigs) {
+  if (pgConfigs && folderKind != CopybookFolderKind[CopybookFolderKind.local]) {
     return CopybookURI.createProcessorGroupCopybookPaths(
-      pgConfigs as never,
+      pgConfigs.filter((config) => typeof config != "string"),
       storagePath,
       profile,
     );

@@ -23,23 +23,6 @@ export class CopybookDownloaderForDsn extends ZoweExplorerDownloader {
   constructor(storagePath: string, explorerAPI: IApiRegisterClient) {
     super(storagePath, explorerAPI);
   }
-  /**
-   * Checks if the file could be downloaded using the Zowe explorer from MVS
-   * @param copybookName Copybook to be downloaded.
-   * @param documentUri cobol programs which needs copybook
-   * @param dsnPath dsnpath in mainframe.
-   */
-  isEligibleForDownload(
-    _copybookName: CopybookName,
-    documentUri: string,
-    dsnPath: string | undefined,
-    profile?: string,
-  ): boolean {
-    const providedProfile = profile
-      ? profile
-      : ProfileUtils.getProfileNameForCopybook(documentUri, this.explorerAPI);
-    return !!(dsnPath && providedProfile);
-  }
 
   /**
    * Downloads a file from the passed dns based on Zowe explorer
@@ -58,10 +41,8 @@ export class CopybookDownloaderForDsn extends ZoweExplorerDownloader {
       ? profile
       : ProfileUtils.getProfileNameForCopybook(documentUri, this.explorerAPI);
 
-    if (
-      this.isEligibleForDownload(copybookName, documentUri, dsnPath, profile)
-    ) {
-      const memberList = await this.getAllMembers(providedProfile!, dsnPath);
+    if (dsnPath && providedProfile) {
+      const memberList = await this.getAllMembers(providedProfile, dsnPath);
       const remoteCopybook = DownloadUtil.getRemoteCopybookName(
         memberList,
         copybookName.name,
@@ -71,7 +52,7 @@ export class CopybookDownloaderForDsn extends ZoweExplorerDownloader {
         (await this.downloadCopybookFromMFUsingZowe(
           dsnPath,
           remoteCopybook,
-          providedProfile!,
+          providedProfile,
         ))
       );
     }

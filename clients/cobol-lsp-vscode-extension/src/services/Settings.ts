@@ -229,11 +229,10 @@ export class SettingsService {
     documentUri: string,
     dialectType: string,
   ): Promise<string[]> {
-    const pgPaths = await loadProcessorGroupCopybookPaths(
-      documentUri,
-      dialectType,
-    );
-    if (typeof pgPaths === "object") return []; //kutluo
+    const pgPaths = (
+      await loadProcessorGroupCopybookPaths(documentUri, dialectType)
+    ).filter((element) => typeof element == "string");
+
     const vars = getVariablesFromUri(documentUri);
     const paths: string[] = [
       ...SettingsService.evaluateVariables(pgPaths, vars),
