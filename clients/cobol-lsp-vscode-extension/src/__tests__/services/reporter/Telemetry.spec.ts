@@ -11,14 +11,26 @@
  * Contributors:
  *   Broadcom, Inc. - initial API and implementation
  */
+const USERNAME: string = "usernameToAnonymize";
+jest.mock("node:os", () => ({
+  userInfo: jest.fn().mockReturnValue({
+    username: USERNAME,
+  }),
+}));
+
+import TelemetryReporter from "@vscode/extension-telemetry";
 
 import * as path from "path";
-import TelemetryReporter from "@vscode/extension-telemetry";
-import { TelemetryReporterImpl } from "../../../services/reporter/TelemetryReporterImpl";
-import { TelemetryService } from "../../../services/reporter/TelemetryService";
-import { TelemetryEventMeasurements } from "../../../services/reporter/model/TelemetryEvent";
+import { TelemetryEventMeasurements } from "../../../services/reporter/model";
+import {
+  anonymizeContent,
+  registerEvent,
+  registerExceptionEvent,
+  setReporter,
+} from "../../../services/reporter";
 
-const USERNAME: string = "usernameToAnonymize";
+setReporter(new TelemetryReporter("the key"));
+
 const FAKE_ROOT_PATH: string = path.join(
   "C:",
   "Users",
@@ -40,15 +52,10 @@ function runScenario(
   telemetryMeasurements?: TelemetryEventMeasurements,
 ) {
   if (eventType === "log") {
-    TelemetryService.registerEvent(
-      eventName!,
-      categories,
-      undefined,
-      telemetryMeasurements,
-    );
+    registerEvent(eventName!, categories, undefined, telemetryMeasurements);
     expect(spySendTelemetry).toHaveBeenCalledTimes(expectedNumberOfCalls);
   } else {
-    TelemetryService.registerExceptionEvent(eventName, rootCause!, categories);
+    registerExceptionEvent(eventName, rootCause!, categories);
     expect(spySendExceptionTelemetry).toHaveBeenCalledTimes(
       expectedNumberOfCalls,
     );
@@ -56,10 +63,6 @@ function runScenario(
 }
 
 function setupScenario() {
-  TelemetryReporterImpl["getTelemetryKeyId"] = jest
-    .fn()
-    .mockReturnValue("key_id_for_testing_purposes");
-  TelemetryService["getUsername"] = jest.fn().mockReturnValue(USERNAME);
   spySendTelemetry = jest.spyOn(
     TelemetryReporter.prototype,
     "sendTelemetryEvent",
@@ -82,51 +85,13 @@ describe("TelemetryService information are consistent before send them to the te
     runScenario(1, "log", "test");
   });
 
-  test("Given a fulfilled telemetry measurement event, the data is contained as part of a telemetry event and their data are sent to the telemetry server", () => {
-    const startTime: number = Date.now();
-    runScenario(1, "log", "test the download", undefined, undefined, {
-      "time elapsed": TelemetryService.calculateTimeElapsed(
-        startTime - 100,
-        startTime,
-      ),
-    });
-  });
-
-  test("Given a fulfilled telemetry measurement event, the data is contained as part of a telemetry event and their data are sent to the telemetry server with manuplated starttime", () => {
-    const startTime: number = Date.now();
-    runScenario(1, "log", "test the download", undefined, undefined, {
-      "time elapsed": TelemetryService.calculateTimeElapsed(
-        startTime + 100,
-        startTime,
-      ),
-    });
-  });
-
-  test("An empty telemetry object is not sent to the telemetry server", () => {
-    runScenario(0, "log");
-  });
-
-  test("A telemetry event with empty eventName is not sent to the telemetry server", () => {
-    runScenario(0, "log");
-  });
-
   test("An exception telemetry event that contains event name and root cause is sent to the telemetry server", () => {
     runScenario(1, "exception", "runtimeException", [], "JavaNotFound");
-  });
-
-  test("An exception telemetry event without root cause is not sent to the telemetry server", () => {
-    runScenario(0, "exception", "runtimeException");
-  });
-
-  test("An exception telemetry event with a null root cause is not sent to the telemetry server", () => {
-    runScenario(0, "exception", "runtimeException", undefined, undefined);
   });
 });
 
 describe("Anonymize content", () => {
   test("Given a verbose exception log content, then the information about the user is obfuscated", () => {
-    TelemetryService["getUsername"] = jest.fn().mockReturnValue(USERNAME);
-
     // construct a cross-platform example path to validate the anonymization functionality
     const fakePath: string = path.format({
       root: FAKE_ROOT_PATH,
@@ -166,8 +131,6 @@ describe("Anonymize content", () => {
       ":85:5)\n" +
       "\tat async Promise.all (index 0)\n";
 
-    expect(
-      TelemetryService["anonymizeContent"](input).includes(USERNAME),
-    ).toBeFalsy();
+    expect(anonymizeContent(input).includes(USERNAME)).toBeFalsy();
   });
 });

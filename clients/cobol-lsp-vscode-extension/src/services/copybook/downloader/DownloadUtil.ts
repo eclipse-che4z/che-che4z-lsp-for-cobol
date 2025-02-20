@@ -12,7 +12,6 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 import * as vscode from "vscode";
-import { TelemetryService } from "../../reporter/TelemetryService";
 import {
   DOWNLOAD_QUEUE_LOCKED_ERROR_MSG,
   INVALID_CREDENTIALS_ERROR_MSG,
@@ -23,6 +22,7 @@ import { ZoweExplorerDownloader } from "./ZoweExplorerDownloader";
 import { CopybookName } from "../CopybookDownloadService";
 import { SettingsService } from "../../Settings";
 import { hasMember } from "../../util/Utils";
+import { registerExceptionEvent } from "../../reporter";
 import { loadProcessorGroupCopybookPaths } from "../../ProcessorGroups";
 
 /**
@@ -118,7 +118,7 @@ export class DownloadUtil {
       vscode.window.showErrorMessage(errorMessage);
     }
 
-    TelemetryService.registerExceptionEvent(
+    registerExceptionEvent(
       undefined,
       JSON.stringify(e),
       ["copybook", "COBOL", "experiment-tag"],

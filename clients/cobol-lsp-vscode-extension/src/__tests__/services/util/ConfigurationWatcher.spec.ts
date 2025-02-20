@@ -15,7 +15,7 @@
 import * as vscode from "vscode";
 import { SettingsService } from "../../../services/Settings";
 import { ConfigurationWatcher } from "../../../services/util/ConfigurationWatcher";
-jest.mock("../../../services/reporter/TelemetryService");
+jest.mock("../../../services/reporter");
 
 jest.mock("vscode", () => ({
   commands: {

@@ -35,7 +35,6 @@ import { CommentAction, commentCommand } from "./commands/CommentCommand";
 import { initSmartTab, RangeTabShiftStore } from "./commands/SmartTabCommand";
 import { DialectRegistry } from "./services/DialectRegistry";
 import { LanguageClientService } from "./services/LanguageClientService";
-import { TelemetryService } from "./services/reporter/TelemetryService";
 import { lspConfigHandler, SettingsService } from "./services/Settings";
 import {
   pickSnippet,
@@ -48,6 +47,11 @@ import * as path from "node:path";
 import { Utils } from "./services/util/Utils";
 import { getE4EAPI } from "./services/copybook/E4ECopybookService";
 import { getErrorMessage } from "./services/util/ErrorsUtils";
+import {
+  initTelemetry,
+  registerEvent,
+  registerExceptionEvent,
+} from "./services/reporter";
 
 interface __AnalysisApi {
   analysis(uri: string, text: string, pos?: vscode.Position): Promise<unknown>;
@@ -109,12 +113,12 @@ export function getChannel(): vscode.OutputChannel {
 export async function activate(
   context: vscode.ExtensionContext,
 ): Promise<__ExtensionApi & __AnalysisApi> {
+  await initTelemetry(context);
   DialectRegistry.clear();
   const { copyBooksDownloader, configurationWatcher } =
     await initialize(context);
   initSmartTab(context);
-
-  TelemetryService.registerEvent(
+  registerEvent(
     "log",
     ["bootstrap", "experiment-tag"],
     "Extension activation event was triggered",
@@ -144,7 +148,7 @@ export async function activate(
     if (err instanceof Error) {
       outputChannel.appendLine(err.toString());
       languageClientService.enableNativeBuild();
-      TelemetryService.registerExceptionEvent(
+      registerExceptionEvent(
         "RuntimeException",
         err.toString(),
         ["bootstrap", "experiment-tag"],

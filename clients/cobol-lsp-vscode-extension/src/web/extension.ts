@@ -20,10 +20,18 @@ import {
 } from "../services/snippetcompletion/SnippetCompletionProvider";
 import { LANGUAGE_ID } from "../constants";
 import { initSmartTab, RangeTabShiftStore } from "../commands/SmartTabCommand";
+import { initTelemetry, registerEvent } from "../services/reporter";
 
 let outputChannel: vscode.OutputChannel;
 
-export function activate(context: ExtensionContext) {
+export async function activate(context: ExtensionContext) {
+  await initTelemetry(context);
+  registerEvent(
+    "log",
+    ["bootstrap", "experiment-tag"],
+    "Web extension activation event was triggered",
+  );
+
   outputChannel = vscode.window.createOutputChannel("COBOL Language Support");
   outputChannel.appendLine("Activating COBOL Language Support Web Extension");
 

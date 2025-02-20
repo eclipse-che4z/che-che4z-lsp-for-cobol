@@ -15,7 +15,7 @@
 import { JavaCheck } from "../../services/JavaCheck";
 import { mockSpawnProcess } from "../../__mocks__/child_process.utility";
 
-jest.mock("../../services/reporter/TelemetryService");
+jest.mock("../../services/reporter");
 describe("Checks Java version", () => {
   it("If Java version is supported", () => {
     expect(

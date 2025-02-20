@@ -20,13 +20,13 @@ import { LanguageClient } from "vscode-languageclient/node";
 import { JavaCheck } from "../../services/JavaCheck";
 import { LanguageClientService } from "../../services/LanguageClientService";
 import { NativeExecutableService } from "../../services/nativeLanguageClient/nativeExecutableService";
-import { TelemetryService } from "../../services/reporter/TelemetryService";
 import { Utils } from "../../services/util/Utils";
 import { EXP_LANGUAGE_ID, HP_LANGUAGE_ID } from "../../constants";
 import { mockSpawnProcess } from "../../__mocks__/child_process.utility";
 import { getErrorMessage } from "../../services/util/ErrorsUtils";
+import { registerEvent } from "../../services/reporter";
 
-jest.mock("../../services/reporter/TelemetryService");
+jest.mock("../../services/reporter");
 jest.mock("../../services/copybook/CopybookURI");
 
 jest.mock("vscode", () => ({
@@ -83,7 +83,7 @@ describe("LanguageClientService positive scenario", () => {
     jest.spyOn(fs, "existsSync").mockReturnValue(true);
     languageClientService.enableNativeBuild();
 
-    expect(TelemetryService.registerEvent).toHaveBeenCalledWith(
+    expect(registerEvent).toHaveBeenCalledWith(
       "Native Build enabled",
       ["COBOL", "native build enabled", "settings"],
       "Native build enabled",

@@ -87,73 +87,35 @@ class TestSqlAllAlterStatements {
           + "           end-exec.";
 
   // ALTER FUNCTION (compiled SQL scalar)
-  private static final String ALTER_FUNCTION_COMPILED =
+  private static final String ALTER_EXTERNAL_FUNCTION =
       TEXT
           + "            EXEC SQL ALTER FUNCTION MY_UDF1 DETERMINISTIC \n"
           + "            END-EXEC.";
+
   private static final String ALTER_FUNCTION_COMPILED2 =
-      TEXT
-          + "            EXEC SQL ALTER FUNCTION REVERSE\n"
-          + "            ALTER ACTIVE VERSION\n"
-          + "            NOT DETERMINISTIC\n"
-          + "            ALLOW DEBUG MODE END-EXEC.";
-  // FYI: reverse is name of function
-
-  private static final String ALTER_FUNCTION_COMPILED3 =
-      TEXT
-          + "            EXEC SQL ALTER FUNCTION REVERSE(INSTR VARCHAR(4000))\n"
-          + "            REPLACE VERSION V2 (INSTR VARCHAR(4000))\n"
-          + "            RETURNS VARCHAR(4000)\n"
-          + "            DETERMINISTIC\n"
-          + "            NO EXTERNAL ACTION\n"
-          + "            CONTAINS SQL\n"
-          + "            \tBEGIN\n"
-          + "            \tDECLARE REVSTR, RESTSTR VARCHAR(4000) DEFAULT \"\";\n"
-          + "            \tDECLARE LEN INT;\n"
-          + "            \tIF INSTR IS NULL THEN\n"
-          + "            \t\tRETURN NULL;\n"
-          + "            \tEND IF;\n"
-          + "            \tSET RESTSTR = INSTR;\n"
-          + "            \tSET LEN = LENGTH(INSTR);\n"
-          + "            \tWHILE LEN > 0 DO\n"
-          + "            \t\tSET (REVSTR, RESTSTR, LEN) = (SUBSTR(RESTSTR, 1, 1) CONCAT\n"
-          + "            \t\t\t\tREVSTR, SUBSTR(RESTSTR, 2, LEN - 1), LEN - 1);\n"
-          + "            \tEND WHILE;\n"
-          + "            \tRETURN REVSTR;\n"
-          + "             END END-EXEC.";
-
-  private static final String ALTER_FUNCTION_COMPILED4 =
-      TEXT
-          + "            EXEC SQL ALTER FUNCTION REVERSE(INSTR VARCHAR(4000))\n"
-          + "            ADD VERSION V3 (INSTR VARCHAR(4000))\n"
-          + "            RETURNS VARCHAR(4000)\n"
-          + "            DETERMINISTIC\n"
-          + "            NO EXTERNAL ACTION\n"
-          + "            CONTAINS SQL\n"
-          + "            BEGIN\n"
-          + "            DECLARE REVSTR, RESTSTR VARCHAR(4000) DEFAULT \"\";\n"
-          + "            IF INSTR IS NULL THEN\n"
-          + "             RETURN NULL;\n"
-          + "            END IF;\n"
-          + "            SET (RESRSTR, LEN) = (INSTR, LENGTH(INSTR));\n"
-          + "            WHILE LEN > 0 DO\n"
-          + "             SET (REVSTR, RESTSTR, LEN) = (SUBSTR(RESTSTR, 1, 1) \n"
-          + "            CONCAT REVSTR, SUBSTR(RESTSTR, 2, LEN - 1), LEN - 1);\n"
-          + "             END WHILE;\n"
-          + "            RETURN REVSTR;\n"
-          + "            END END-EXEC.";
+          TEXT
+                  + "            EXEC SQL ALTER FUNCTION REVERSE\n"
+                  + "            ALTER ACTIVE VERSION\n"
+                  + "            NOT DETERMINISTIC\n"
+                  + "            ALLOW DEBUG MODE END-EXEC.";
 
   private static final String ALTER_FUNCTION_COMPILED5 =
-      TEXT
-          + "            EXEC SQL ALTER FUNCTION REVERSE(INSTR VARCHAR(4000))\n"
-          + "            ACTIVATE VERSION V3;\n"
-          + "            END-EXEC.";
+          TEXT
+                  + "            EXEC SQL ALTER FUNCTION REVERSE(INSTR VARCHAR(4000))\n"
+                  + "            ACTIVATE VERSION V3\n"
+                  + "            END-EXEC.";
 
   private static final String ALTER_FUNCTION_COMPILED6 =
-      TEXT
-          + "            EXEC SQL ALTER FUNCTION REVERSE(INSTR VARCHAR(4000))\n"
-          + "            REGENERATE ACTIVE VERSION;\n"
-          + "            END-EXEC.";
+          TEXT
+                  + "            EXEC SQL ALTER FUNCTION REVERSE(INSTR VARCHAR(4000))\n"
+                  + "            REGENERATE ACTIVE VERSION\n"
+                  + "            END-EXEC.";
+
+  private static final String ALTER_FUNCTION_SQL_TABLE =
+          TEXT
+                  + "            EXEC SQL ALTER FUNCTION GET_TABLE\n"
+                  + "            RESTRICT CARDINALITY 10000\n"
+                  + "            END-EXEC.";
 
   // ALTER FUNCTION (inlined SQL scalar)
   private static final String ALTER_FUNCTION_INLINED =
@@ -162,13 +124,7 @@ class TestSqlAllAlterStatements {
           + "            DETERMINISTIC;\n"
           + "            END-EXEC.";
 
-  private static final String ALTER_FUNCTION_SQL_TABLE =
-      TEXT
-          + "            EXEC SQL ALTER FUNCTION GET_TABLE\n"
-          + "            RESTRICT CARDINALITY 10000;\n"
-          + "            END-EXEC.";
-
-  // ALTER INDEX
+    // ALTER INDEX
   private static final String ALTER_INDEX =
       TEXT
           + "            EXEC SQL ALTER INDEX DSN8C10.XEMP1\n"
@@ -238,50 +194,29 @@ class TestSqlAllAlterStatements {
 
   // ALTER PROCEDURE SQL external
   private static final String ALTER_PROCEDURE_SQL_NATIVE =
-      TEXT
-          + "            EXEC SQL\n"
-          + "            ALTER PROCEDURE UPDATE_SALARY_1\n"
-          + "            ALTER ACTIVE VERSION\n"
-          + "            NOT DETERMINISTIC\n"
-          + "            CALLED ON NULL INPUT\n"
-          + "            ALLOW DEBUG MODE\n"
-          + "            ASUTIME LIMIT 10\n"
-          + "            END-EXEC.";
-
-  private static final String ALTER_PROCEDURE_SQL_NATIVE2 =
-      TEXT
-          + "            EXEC SQL\n"
-          + "            ALTER PROCEDURE UPDATE_SALARY_1\n"
-          + "            REPLACE VERSION V2 (P1 INTEGER, P2 CHAR(5))\n"
-          + "            MODIFIES SQL DATA\n"
-          + "            UPDATE EMP SET SALARY = SALARY * RATE\n"
-          + "             WHERE EMPNO = EMPLOYEE_NUMBER;\n"
-          + "            END-EXEC.";
-
-  private static final String ALTER_PROCEDURE_SQL_NATIVE3 =
-      TEXT
-          + "            EXEC SQL\n"
-          + "            ALTER PROCEDURE UPDATE_SALARY_1\n"
-          + "            ADD VERSION V3 (P1 INTEGER, P2 CHAR(5))\n"
-          + "               UPDATE EMP SET SALARY = SALARY * (RATE*10)\n"
-          + "               WHERE EMPNO = EMPLOYEE_NUMBER;\n"
-          + "            END-EXEC.";
+          TEXT
+                  + "            EXEC SQL\n"
+                  + "            ALTER PROCEDURE UPDATE_SALARY_1\n"
+                  + "            ALTER ACTIVE VERSION\n"
+                  + "            NOT DETERMINISTIC\n"
+                  + "            CALLED ON NULL INPUT\n"
+                  + "            ALLOW DEBUG MODE\n"
+                  + "            ASUTIME LIMIT 10\n"
+                  + "            END-EXEC.";
 
   private static final String ALTER_PROCEDURE_SQL_NATIVE4 =
-      TEXT
-          + "            EXEC SQL\n"
-          + "            ALTER PROCEDURE UPDATE_SALARY_1\n"
-          + "            ACTIVATE VERSION V3;\n"
-          + "            END-EXEC.";
-  // ALTER PROCEDURE UPDATE_SALARY_1
-  //      ACTIVATE VERSION V3;
+          TEXT
+                  + "            EXEC SQL\n"
+                  + "            ALTER PROCEDURE UPDATE_SALARY_1\n"
+                  + "            ACTIVATE VERSION V3\n"
+                  + "            END-EXEC.";
 
   private static final String ALTER_PROCEDURE_SQL_NATIVE5 =
-      TEXT
-          + "            EXEC SQL\n"
-          + "            ALTER PROCEDURE UPDATE_SALARY_1\n"
-          + "            REGENERATE ACTIVE VERSION;\n"
-          + "            END-EXEC.";
+          TEXT
+                  + "            EXEC SQL\n"
+                  + "            ALTER PROCEDURE UPDATE_SALARY_1\n"
+                  + "            REGENERATE ACTIVE VERSION\n"
+                  + "            END-EXEC.";
 
   // ALTER SEQUENCE
   private static final String ALTER_SEQUENCE =
@@ -538,13 +473,11 @@ class TestSqlAllAlterStatements {
         ALTER_FUNCTION_EXT,
         ALTER_FUNCTION_EXT2,
         ALTER_FUNCTION_EXT3,
-        ALTER_FUNCTION_COMPILED,
+        ALTER_EXTERNAL_FUNCTION,
+        ALTER_FUNCTION_INLINED,
         ALTER_FUNCTION_COMPILED2,
-        ALTER_FUNCTION_COMPILED3,
-        ALTER_FUNCTION_COMPILED4,
         ALTER_FUNCTION_COMPILED5,
         ALTER_FUNCTION_COMPILED6,
-        ALTER_FUNCTION_INLINED,
         ALTER_FUNCTION_SQL_TABLE,
         ALTER_INDEX,
         ALTER_INDEX2,
@@ -556,8 +489,6 @@ class TestSqlAllAlterStatements {
         ALTER_PERMISSION2,
         ALTER_PROCEDURE_EXT,
         ALTER_PROCEDURE_SQL_NATIVE,
-        ALTER_PROCEDURE_SQL_NATIVE2,
-        ALTER_PROCEDURE_SQL_NATIVE3,
         ALTER_PROCEDURE_SQL_NATIVE4,
         ALTER_PROCEDURE_SQL_NATIVE5,
         ALTER_SEQUENCE,

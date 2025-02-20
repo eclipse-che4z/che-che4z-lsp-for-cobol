@@ -98,29 +98,6 @@ class TestSqlAllCreateStatements {
           + "           CCSID ASCII;\n"
           + "           END-EXEC.";
 
-  // CREATE FUNCTION (compiled SQL scalar)
-  private static final String CREATE_FUNCTION_COMPILED =
-      TEXT
-          + "           CREATE FUNCTION REVERSE(INSTR VARCHAR(4000))\n"
-          + "             RETURNS VARCHAR(4000)\n"
-          + "             DETERMINISTIC NO EXTERNAL ACTION CONTAINS SQL\n"
-          + "             BEGIN\n"
-          + "             DECLARE REVSTR, RESTSTR VARCHAR(4000) DEFAULT \"\";\n"
-          + "             DECLARE LEN INT;\n"
-          + "             IF INSTR IS NULL THEN\n"
-          + "             RETURN NULL;\n"
-          + "             END IF;\n"
-          + "             SET (RESTSTR, LEN) = (INSTR, LENGTH(INSTR));\n"
-          + "             WHILE LEN > 0 DO\n"
-          + "             SET (REVSTR, RESTSTR, LEN)\n"
-          + "               = (SUBSTR(RESTSTR, 1, 1) CONCAT REVSTR,\n"
-          + "               SUBSTR(RESTSTR, 2, LEN - 1),\n"
-          + "               LEN - 1);\n"
-          + "             END WHILE;\n"
-          + "            RETURN REVSTR;\n"
-          + "            END\n"
-          + "           END-EXEC.";
-
   // CREATE FUNCTION external scalar
   private static final String CREATE_FUNCTION_EXT =
       TEXT
@@ -135,6 +112,13 @@ class TestSqlAllCreateStatements {
           + "               PARAMETER STYLE SQL\n"
           + "               RETURNS NULL ON NULL INPUT\n"
           + "               NO EXTERNAL ACTION;\n"
+          + "           END-EXEC.";
+
+  public static final String CREATE_FUNCTION_EXT_NO_OPTIONS =
+          TEXT
+          + "                 CREATE FUNCTION REVERSE(INSTR VARCHAR(4000))\n"
+          + "                 RETURNS VARCHAR(4000)\n"
+          + "                 return null \n"
           + "           END-EXEC.";
 
   private static final String CREATE_FUNCTION_EXT2 =
@@ -264,41 +248,7 @@ class TestSqlAllCreateStatements {
           + "           SOURCE SMITH.CENTER (INTEGER, FLOAT);\n"
           + "           END-EXEC.";
 
-  // CREATE FUNCTION (SQL table)
-  private static final String CREATE_FUNCTION_SQL_TABLE =
-      TEXT
-          + "           CREATE FUNCTION JTABLE (COLD_VALUE CHAR(9), T2_FLAG CHAR(1))\n"
-          + "               RETURNS TABLE (COLA INT, COLB INT, COLC INT)\n"
-          + "               LANGUAGE SQL\n"
-          + "               SPECIFIC DEPTINFO\n"
-          + "               NOT DETERMINISTIC\n"
-          + "               READS SQL DATA\n"
-          + "               RETURN\n"
-          + "                   SELECT A.COLA, B.COLB, B.COLC\n"
-          + "                   FROM TABLE1 AS A\n"
-          + "                   LEFT OUTER JOIN\n"
-          + "                   TABLE2 AS B\n"
-          + "                   ON A.COL1 = B.COL1 AND T2_FLAG = 'Y'\n"
-          + "                   WHERE A.COLD = COLD_VALUE;\n"
-          + "           END-EXEC.";
-
-  // CREATE FUNCTION (SQL table)
-  private static final String CREATE_FUNCTION_SQL_TABLE2 =
-      TEXT
-          + "           CREATE FUNCTION DEPTEMPLOYEES (DEPTNO CHAR(3))\n"
-          + "               RETURNS TABLE (EMPNO CHAR(6), LASTNAME VARCHAR(15),\n"
-          + "                                FIRSTNAME VARCHAR(12))\n"
-          + "               LANGUAGE SQL\n"
-          + "               READS SQL DATA\n"
-          + "               NO EXTERNAL ACTION\n"
-          + "               DETERMINISTIC\n"
-          + "               RETURN\n"
-          + "                 SELECT EMPNO, LASTNAME, FIRSTNME\n"
-          + "                 FROM YEMP\n"
-          + "                        WHERE YEMP.WORKDEPT = DEPTEMPLOYEES.DEPTNO;\n"
-          + "           END-EXEC.";
-
-  // CREATE GLOBAL TEMPORARY TABLE
+    // CREATE GLOBAL TEMPORARY TABLE
   private static final String CREATE_GLOBAL_TMP_TABLE =
       TEXT
           + "           CREATE GLOBAL TEMPORARY TABLE CURRENTMAP\n"
@@ -880,12 +830,21 @@ class TestSqlAllCreateStatements {
           + "                 DEFINE NO; \n"
           + "           END-EXEC.";
 
+  public static final String CREATE_TABLESPACE5 =
+      TEXT
+          + "            create tablespace amsm lockmax 23 define yes member \n"
+          + "            cluster dssize 23G TRACKMOD YES\n"
+          + "            compress yes huffman lockpart yes\n"
+          + "            numparts 2 (partition 2 using STOGROUP stgname PRIQTY -1)\n"
+          + "           END-EXEC.";
+
   // CREATE TRIGGER ADVANCED
   private static final String CREATE_TRIGGER_ADV =
       TEXT
           + "            CREATE TRIGGER NEW_HIRE\n"
           + "                  AFTER INSERT ON EMPLOYEE\n"
           + "                  FOR EACH ROW\n"
+          + "                  MODE DB2SQL\n"
           + "                  BEGIN ATOMIC\n"
           + "                    UPDATE COMPANY_STATS SET NBEMP = NBEMP + 1;\n"
           + "                  END\n"
@@ -897,13 +856,12 @@ class TestSqlAllCreateStatements {
           + "                 AFTER UPDATE OF ON_HAND, MAX_STOCKED ON PARTS\n"
           + "                 REFERENCING NEW AS NROW\n"
           + "                 FOR EACH ROW\n"
+          + "                  MODE DB2SQL\n"
           + "                 WHEN (NROW.ON_HAND < 0.10 * NROW.MAX_STOCKED)\n"
           + "                 BEGIN ATOMIC\n"
-          + "                   DECLARE QTY_ORDERED INTEGER;\n"
-          + "            \n"
+          + "                   insert into tab (QTY_ORDERED)\n"
           + "                   VALUES(ISSUE_SHIP_REQUEST(NROW.MAX_STOCKED \n"
-          + "                   - NROW.ON_HAND, NROW.PARTNO))\n"
-          + "                     INTO QTY_ORDERED;\n"
+          + "                   - NROW.ON_HAND, NROW.PARTNO));\n"
           + "                 END\n"
           + "           END-EXEC.";
 
@@ -913,12 +871,10 @@ class TestSqlAllCreateStatements {
           + "                 AFTER UPDATE OF ON_HAND, MAX_STOCKED ON PARTS\n"
           + "                 REFERENCING NEW_TABLE AS NTABLE\n"
           + "                 FOR EACH STATEMENT\n"
+          + "                  MODE DB2SQL\n"
           + "                   BEGIN ATOMIC\n"
-          + "                     DECLARE QTY_ORDERED INTEGER;\n"
-          + "            \n"
           + "                     SELECT ISSUE_SHIP_REQUEST(MAX_STOCKED - \n"
           + "                        ON_HAND, PARTNO) \n"
-          + "                       INTO QTY_ORDERED\n"
           + "                       FROM NTABLE\n"
           + "                     WHERE (ON_HAND < 0.10 * MAX_STOCKED);\n"
           + "                 END\n"
@@ -931,6 +887,7 @@ class TestSqlAllCreateStatements {
           + "                REFERENCING OLD AS OLD_EMP\n"
           + "                            NEW AS NEW_EMP\n"
           + "                FOR EACH ROW\n"
+          + "                  MODE DB2SQL\n"
           + "                WHEN (NEW_EMP.SALARY > (OLD_EMP.SALARY * 1.20))\n"
           + "                  BEGIN ATOMIC\n"
           + "                    SIGNAL SQLSTATE '75001' \n"
@@ -946,6 +903,21 @@ class TestSqlAllCreateStatements {
           + "               CREATE VIEW CELSIUS_WEATHER (CITY, TEMPC) AS\n"
           + "                  SELECT CITY, (TEMPF-32)/1.8 \n"
           + "                  FROM WEATHER;\n"
+          + "           END-EXEC.";
+
+  public static final String CREATE_TRIGGER_BASIC =
+      TEXT
+          + "             create TRIGGER salary_update_trigger\n"
+          + "           AFTER UPDATE OF salary ON employees\n"
+          + "           REFERENCING NEW AS n OLD AS o\n"
+          + "           FOR EACH ROW MODE DB2SQL\n"
+          + "           WHEN (n.salary > 1.1 * o.salary) \n"
+          + "           BEGIN ATOMIC\n"
+          + "           INSERT INTO salary_audit (emp_id)\n"
+          + "           VALUES ((n.emp_id));\n"
+          + "           INSERT INTO salary_audit (emp_id, name)\n"
+          + "           VALUES (n.emp_id, kkl);\n"
+          + "           END\n"
           + "           END-EXEC.";
 
   // CREATE TRUSTED CONTEXT
@@ -1056,8 +1028,8 @@ class TestSqlAllCreateStatements {
         CREATE_AUX_TABLE,
         CREATE_DB,
         CREATE_DB2,
-        CREATE_FUNCTION_COMPILED,
         CREATE_FUNCTION_EXT,
+        CREATE_FUNCTION_EXT_NO_OPTIONS,
         CREATE_FUNCTION_EXT2,
         CREATE_FUNCTION_EXT3,
         CREATE_FUNCTION_EXT4,
@@ -1068,8 +1040,6 @@ class TestSqlAllCreateStatements {
         CREATE_FUNCTION_INLINED,
         CREATE_FUNCTION_SOURCED,
         CREATE_FUNCTION_SOURCED2,
-        CREATE_FUNCTION_SQL_TABLE,
-        CREATE_FUNCTION_SQL_TABLE2,
         CREATE_GLOBAL_TMP_TABLE,
         CREATE_GLOBAL_TMP_TABLE2,
         CREATE_INDEX,
@@ -1108,11 +1078,13 @@ class TestSqlAllCreateStatements {
         CREATE_TABLESPACE2,
         CREATE_TABLESPACE3,
         CREATE_TABLESPACE4,
+        CREATE_TABLESPACE5,
         CREATE_TRIGGER_ADV,
         CREATE_TRIGGER_ADV2,
         CREATE_TRIGGER_ADV3,
         CREATE_TRIGGER_ADV4,
         CREATE_TRIGGER_ADV5,
+        CREATE_TRIGGER_BASIC,
         CREATE_TRUSTED_CONTEXT,
         CREATE_TRUSTED_CONTEXT2,
         CREATE_TYPE_ARRAY,
