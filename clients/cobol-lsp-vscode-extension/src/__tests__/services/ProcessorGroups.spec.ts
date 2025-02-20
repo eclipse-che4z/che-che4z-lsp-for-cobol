@@ -32,6 +32,7 @@ import {
 import { CopybookDownloaderForE4E } from "../../services/copybook/downloader/CopybookDownloaderForE4E";
 import { E4E } from "../../type/e4eApi";
 import { CopybookName } from "../../services/copybook/CopybookDownloadService";
+import { SettingsService } from "../../services/Settings";
 
 const WORKSPACE_URI = "file:///my/workspace";
 
@@ -116,6 +117,9 @@ jest.mock("vscode", () => {
           ? { uri: WORKSPACE_URI_OBJ_WIN32 }
           : { uri: WORKSPACE_URI_OBJ },
       workspaceFolders: [{ uri: WORKSPACE_URI_OBJ }],
+      getConfiguration: jest.fn().mockReturnValue({
+        get: jest.fn().mockReturnValue(undefined),
+      }),
     },
   };
 });
@@ -378,5 +382,12 @@ describe("Processor groups configurations prepared for download services", () =>
         },
       },
     ]);
+  });
+  it("getCopybookLocalPath returns local paths only if processor group has remote lib definitions", async () => {
+    const paths = await SettingsService.getCopybookLocalPath(
+      WORKSPACE_URI + "/TEST.cob",
+      "COBOL",
+    );
+    expect(paths).toStrictEqual(["/copy"]);
   });
 });
