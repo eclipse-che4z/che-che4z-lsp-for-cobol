@@ -58,10 +58,8 @@ export class CopybookDownloaderForDsn extends ZoweExplorerDownloader {
       ? profile
       : ProfileUtils.getProfileNameForCopybook(documentUri, this.explorerAPI);
 
-    if (
-      this.isEligibleForDownload(copybookName, documentUri, dsnPath, profile)
-    ) {
-      const memberList = await this.getAllMembers(providedProfile!, dsnPath);
+    if (dsnPath && providedProfile) {
+      const memberList = await this.getAllMembers(providedProfile, dsnPath);
       const remoteCopybook = DownloadUtil.getRemoteCopybookName(
         memberList,
         copybookName.name,
@@ -71,7 +69,7 @@ export class CopybookDownloaderForDsn extends ZoweExplorerDownloader {
         (await this.downloadCopybookFromMFUsingZowe(
           dsnPath,
           remoteCopybook,
-          providedProfile!,
+          providedProfile,
         ))
       );
     }
