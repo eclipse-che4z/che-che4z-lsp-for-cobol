@@ -44,7 +44,7 @@ describe("Tests copybook download service", () => {
     downloadService["processDownloadError"] = jest.fn();
     jest
       .spyOn(DownloadUtil, "areCopybookDownloadConfigurationsPresent")
-      .mockReturnValue(true);
+      .mockResolvedValue(true);
     jest
       .spyOn(ProfileUtils, "getAvailableProfiles")
       .mockReturnValue(["profile"]);
@@ -232,6 +232,7 @@ describe("Tests copybook download service", () => {
         { name: "copybook", dialect: "COBOL" },
         "document-uri",
         "dsn",
+        undefined,
       );
       expect(
         downloader["ussDownloader"]!.downloadCopybook,
@@ -239,6 +240,7 @@ describe("Tests copybook download service", () => {
         { name: "copybook", dialect: "COBOL" },
         "document-uri",
         "uss",
+        undefined,
       );
     });
 
@@ -264,6 +266,7 @@ describe("Tests copybook download service", () => {
         { name: "copybook", dialect: "COBOL" },
         "document-uri",
         "dsn",
+        undefined,
       );
       expect(
         downloader["ussDownloader"]!.downloadCopybook,
@@ -329,11 +332,13 @@ describe("Tests copybook download service", () => {
       { name: "copybook", dialect: "COBOL" },
       "document-uri",
       "dsn",
+      undefined,
     );
     expect(downloader["dsnDownloader"]!.downloadCopybook).toHaveBeenCalledWith(
       { name: "copybook", dialect: "COBOL" },
       "document-uri",
       "dsn-2",
+      undefined,
     );
   });
 

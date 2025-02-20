@@ -16,17 +16,16 @@ import * as vscode from "vscode";
 import {
   COPYBOOKS_FOLDER,
   DATASET,
-  E4E_FOLDER,
   ENDEVOR_PROCESSOR,
   ENVIRONMENT,
   PROVIDE_PROFILE_MSG,
-  USE_MAP,
+  PROVIDE_PROFILE_MSG_PROC_GRUOPS,
   USSFILE,
   ZOWE_FOLDER,
 } from "../../constants";
 import { ProfileUtils } from "../util/ProfileUtils";
 import { DownloadUtil } from "./downloader/DownloadUtil";
-import { E4E, EndevorElement, ResolvedProfile } from "../../type/e4eApi";
+import { E4E } from "../../type/e4eApi";
 import { CopybookDownloaderForE4E } from "./downloader/CopybookDownloaderForE4E";
 import { CopybookDownloaderForUss } from "./downloader/CopybookDownloaderForUss";
 import { CopybookDownloaderForDsn } from "./downloader/CopybookDownloaderForDsn";
@@ -38,8 +37,15 @@ import path = require("path");
 import { getErrorMessage } from "../util/ErrorsUtils";
 import {
   loadProcessorGroupCopybookPathsConfig,
-  prepareProcessorGroupConfigPaths,
+  loadProcessorGroupSettings,
+  prepareProcessorGroupConfigPathsForDsnAndUss,
+  prepareProcessorGroupConfigPathsForEndevor,
 } from "../ProcessorGroups";
+import {
+  EndevorConfigModel,
+  ZoweDatasetConfigModel,
+  ZoweUssConfigModel,
+} from "../ProcessorGroupsLoader";
 
 export class CopybookName {
   constructor(
@@ -66,12 +72,6 @@ export class CopybookDownloadService {
     copybookName: CopybookName,
     documentUri: string,
   ): Promise<boolean> {
-    const pgConfigs = await loadProcessorGroupCopybookPathsConfig(
-      { scopeUri: documentUri },
-      [],
-      copybookName.dialect,
-    );
-
     if (
       this.handleAsEndevorElement(documentUri) &&
       (await this.e4eDownloader?.downloadCopybookE4E(documentUri, copybookName))
@@ -79,31 +79,48 @@ export class CopybookDownloadService {
       return true;
     }
 
-    if (ENVIRONMENT in pgConfigs) {
-      const arr = pgConfigs.profile.split(".");
-      let profile: Partial<ResolvedProfile>;
-      if (!arr) {
-        profile = { profile: "", instance: "" };
-      } else if (arr.length == 1) {
-        profile = {
-          profile: pgConfigs.profile,
-        };
-      } else if (arr.length > 1) {
-        profile = {
-          profile: arr[1],
-          instance: arr[0],
-        };
-      } else {
-        profile = { profile: "", instance: "" };
+    const pgConfigs = (await loadProcessorGroupSettings(
+      documentUri,
+      "libs",
+      [] as string[],
+      copybookName.dialect,
+    )) as (
+      | string
+      | EndevorConfigModel
+      | ZoweUssConfigModel
+      | ZoweDatasetConfigModel
+    )[];
+
+    const onlyDsn = pgConfigs.filter(
+      (config): config is ZoweDatasetConfigModel =>
+        typeof config != "string" && DATASET in config,
+    );
+    const onlyUss = pgConfigs.filter(
+      (config): config is ZoweUssConfigModel =>
+        typeof config != "string" && USSFILE in config,
+    );
+    const onlyEndevor = pgConfigs.filter(
+      (config): config is EndevorConfigModel =>
+        typeof config != "string" && ENVIRONMENT in config,
+    );
+
+    if (onlyEndevor && this.e4eDownloader) {
+      const endevorLocations = await prepareProcessorGroupConfigPathsForEndevor(
+        onlyEndevor,
+        this.e4eDownloader,
+        copybookName,
+      );
+      if (endevorLocations) {
+        for (const loc of endevorLocations) {
+          if (
+            await this.e4eDownloader?.downloadElementE4E(
+              loc.profile,
+              loc.element,
+            )
+          )
+            return true;
+        }
       }
-      const resolvedProfile = await this.e4eDownloader?.getProfileInfo(profile);
-      if (!resolvedProfile || resolvedProfile instanceof Error) return false;
-      const element = pgConfigs as unknown as EndevorElement;
-      element.element = copybookName.name;
-      if (
-        await this.e4eDownloader?.downloadElementE4E(resolvedProfile, element)
-      )
-        return true;
     }
 
     if (this.dsnDownloader) {
@@ -111,8 +128,8 @@ export class CopybookDownloadService {
         this.dsnDownloader,
         copybookName,
         documentUri,
-        DATASET in pgConfigs
-          ? prepareProcessorGroupConfigPaths(pgConfigs)
+        onlyDsn.length > 0
+          ? prepareProcessorGroupConfigPathsForDsnAndUss(onlyDsn)
           : SettingsService.getDsnPath(documentUri, copybookName.dialect),
       );
       if (dsnSuccess) return true;
@@ -123,8 +140,8 @@ export class CopybookDownloadService {
         this.ussDownloader,
         copybookName,
         documentUri,
-        USSFILE in pgConfigs
-          ? prepareProcessorGroupConfigPaths(pgConfigs)
+        onlyUss.length > 0
+          ? prepareProcessorGroupConfigPathsForDsnAndUss(onlyUss)
           : SettingsService.getUssPath(documentUri, copybookName.dialect),
       );
     }
@@ -156,7 +173,7 @@ export class CopybookDownloadService {
         copybook,
         documentUri,
         typeof path === "object" ? path.path : path,
-        typeof path === "object" ? path.profile : "",
+        typeof path === "object" ? path.profile : undefined,
       );
       if (success) return true;
     }
@@ -190,12 +207,6 @@ export class CopybookDownloadService {
     copybookName: string,
     dialectType: string,
   ): Promise<string | undefined> {
-    const pgConfigs = await loadProcessorGroupCopybookPathsConfig(
-      { scopeUri: documentUri },
-      [],
-      dialectType,
-    );
-
     if (this.handleAsEndevorElement(documentUri)) {
       const copybookUri = await this.e4eDownloader?.getE4ECopyBookLocation(
         copybookName,
@@ -203,47 +214,6 @@ export class CopybookDownloadService {
       );
       return copybookUri?.toString();
     }
-    if (ENVIRONMENT in pgConfigs) {
-      const arr = pgConfigs.profile.split(".");
-      let profile: Partial<ResolvedProfile>;
-      if (!arr) {
-        profile = { profile: "", instance: "" };
-      } else if (arr.length == 1) {
-        profile = {
-          profile: pgConfigs.profile,
-        };
-      } else if (arr.length > 1) {
-        profile = {
-          profile: arr[1],
-          instance: arr[0],
-        };
-      } else {
-        profile = { profile: "", instance: "" };
-      }
-      const resolvedProfile = await this.e4eDownloader?.getProfileInfo(profile);
-      if (!resolvedProfile || resolvedProfile instanceof Error) return;
-
-      const path = prepareProcessorGroupConfigPaths(pgConfigs, resolvedProfile);
-      if (
-        Array.isArray(path) &&
-        path.every((config) => typeof config === "string")
-      ) {
-        const targetFolder = CopybookURI.createDatasetPath(
-          path[0],
-          pgConfigs.use_map ? USE_MAP : "",
-          this.storagePath,
-          E4E_FOLDER,
-        );
-
-        return searchCopybookInExtensionFolder(
-          copybookName,
-          [targetFolder],
-          [""],
-          this.storagePath,
-        )?.toString();
-      }
-    }
-
     const result = await searchCopybook(
       documentUri,
       copybookName,
@@ -307,11 +277,6 @@ export class CopybookDownloadService {
       !(await this.isPrerequisiteForDownloadSatisfied(
         documentUri,
         copybookNames,
-      )) &&
-      !(await loadProcessorGroupCopybookPathsConfig(
-        { scopeUri: documentUri },
-        [],
-        copybookNames[0].dialect,
       ))
     ) {
       return;
@@ -375,6 +340,19 @@ export class CopybookDownloadService {
       return false;
     if (!this.explorerApi) return false;
 
+    const configs = await loadProcessorGroupCopybookPathsConfig(
+      { scopeUri: documentUri },
+      [],
+    );
+
+    const procGroupZoweProfiles = configs
+      .filter(
+        (config): config is ZoweUssConfigModel | ZoweDatasetConfigModel =>
+          typeof config != "string" && (DATASET in config || USSFILE in config),
+      )
+      .map((dsn) => dsn.profile)
+      .filter((x) => typeof x == "string");
+
     const profile = ProfileUtils.getProfileNameForCopybook(
       documentUri,
       this.explorerApi,
@@ -382,6 +360,24 @@ export class CopybookDownloadService {
     const availableProfiles = ProfileUtils.getAvailableProfiles(
       this.explorerApi,
     );
+
+    if (procGroupZoweProfiles && procGroupZoweProfiles.length > 0) {
+      const promises: Promise<boolean>[] = [];
+      for (const profile of procGroupZoweProfiles) {
+        if (!availableProfiles.includes(profile)) {
+          const msg = `${PROVIDE_PROFILE_MSG_PROC_GRUOPS} Provided invalid profile name: ${profile}`;
+          vscode.window.showErrorMessage(msg);
+        }
+
+        promises.push(DownloadUtil.isProfileLocked(profile));
+        promises.push(
+          DownloadUtil.checkForInvalidCredProfile(profile, this.explorerApi),
+        );
+      }
+      const checks = await Promise.all(promises);
+      return checks.every((v) => v === false);
+    }
+
     if (!profile || !availableProfiles.includes(profile)) {
       const message = profile
         ? `${PROVIDE_PROFILE_MSG} Provided invalid profile name: ${profile}`

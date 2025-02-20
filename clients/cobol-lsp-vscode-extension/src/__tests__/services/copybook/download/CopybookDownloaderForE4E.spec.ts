@@ -132,16 +132,19 @@ describe("e4e copybook downloader tests", () => {
       name: "copybook",
       dialect: "COBOL",
     });
-    expect(spyDownloadElement).toHaveBeenCalledWith(e4eResponseEndevorFirst, {
-      use_map: false,
-      environment: "environment",
-      stage: "stage",
-      system: "system",
-      subsystem: "subsystem",
-      type: "type",
-      element: "copybook",
-      fingerprint: "fingerprint",
-    });
+    expect(spyDownloadElement).toHaveBeenCalledWith(
+      e4eResponseEndevorFirst.profile,
+      {
+        use_map: false,
+        environment: "environment",
+        stage: "stage",
+        system: "system",
+        subsystem: "subsystem",
+        type: "type",
+        element: "copybook",
+        fingerprint: "fingerprint",
+      },
+    );
     expect(spyDownloadDataset).not.toHaveBeenCalled();
   });
   it("check download performed only for element when no member matches", async () => {
@@ -154,16 +157,19 @@ describe("e4e copybook downloader tests", () => {
       name: "copybook",
       dialect: "COBOL",
     });
-    expect(spyDownloadElement).toHaveBeenCalledWith(e4eResponseEndevorFirst, {
-      use_map: false,
-      environment: "environment",
-      stage: "stage",
-      system: "system",
-      subsystem: "subsystem",
-      type: "type",
-      element: "copybook",
-      fingerprint: "fingerprint",
-    });
+    expect(spyDownloadElement).toHaveBeenCalledWith(
+      e4eResponseEndevorFirst.profile,
+      {
+        use_map: false,
+        environment: "environment",
+        stage: "stage",
+        system: "system",
+        subsystem: "subsystem",
+        type: "type",
+        element: "copybook",
+        fingerprint: "fingerprint",
+      },
+    );
     expect(spyDownloadDataset).not.toHaveBeenCalled();
   });
   it("check downloadDatasetE4E does not perform IO in case of Error", async () => {

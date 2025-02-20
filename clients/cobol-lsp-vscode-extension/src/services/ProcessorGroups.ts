@@ -38,9 +38,11 @@ import {
   ZoweDatasetConfigModel,
   ZoweUssConfigModel,
 } from "./ProcessorGroupsLoader";
-import { DATASET, ENVIRONMENT, PREPROCESSOR, USSFILE } from "../constants";
-import { CopybookURI } from "./copybook/CopybookURI";
-import { EndevorType, ResolvedProfile } from "../type/e4eApi";
+import { DATASET, PREPROCESSOR, USSFILE } from "../constants";
+import { EndevorElement, ResolvedProfile } from "../type/e4eApi";
+import { CopybookDownloaderForE4E } from "./copybook/downloader/CopybookDownloaderForE4E";
+
+import { CopybookName } from "./copybook/CopybookDownloadService";
 
 export async function loadProcessorGroupCopybookPaths(
   documentUri: string,
@@ -59,7 +61,7 @@ export async function loadProcessorGroupCopybookPathsConfig(
   configObject: string[],
   dialect?: string,
 ): Promise<
-  string[] | ZoweDatasetConfigModel | ZoweUssConfigModel | EndevorConfigModel
+  (string | ZoweDatasetConfigModel | ZoweUssConfigModel | EndevorConfigModel)[]
 > {
   const cfg = await loadProcessorGroupSettings(
     item.scopeUri,
@@ -67,24 +69,32 @@ export async function loadProcessorGroupCopybookPathsConfig(
     [] as string[],
     dialect,
   );
+  const configs: (
+    | string
+    | ZoweDatasetConfigModel
+    | ZoweUssConfigModel
+    | EndevorConfigModel
+  )[] = [];
+  const remotes = cfg.filter((cfg) => typeof cfg == "object");
+  const locals = cfg.filter((cfg) => typeof cfg === "string");
 
-  if (DATASET in cfg || ENVIRONMENT in cfg || USSFILE in cfg) {
-    return cfg;
-  }
   const config = SettingsService.evaluateVariables(
-    [...cfg, ...configObject],
+    [...locals, ...configObject],
     getVariablesFromUri(item.scopeUri, false),
   );
 
   const wsUri = workspace.getWorkspaceFolder(Uri.parse(item.scopeUri))?.uri;
   if (wsUri === undefined) {
-    return configObject;
+    configs.push(...configObject);
+  } else {
+    const globs = globSync(
+      config.map((ele) => ele.replace(backwardSlashRegex, "/")),
+      { cwd: cleanWorkspaceFolderName(wsUri.fsPath), absolute: true },
+    ).map((s) => normalizePath(s));
+    configs.push(...globs);
   }
-  const globs = globSync(
-    config.map((ele) => ele.replace(backwardSlashRegex, "/")),
-    { cwd: cleanWorkspaceFolderName(wsUri.fsPath), absolute: true },
-  ).map((s) => normalizePath(s));
-  return globs;
+  configs.push(...remotes);
+  return configs;
 }
 
 export async function loadProcessorGroupCopybookExtensionsConfig(
@@ -255,7 +265,7 @@ function selectProcessorGroup(
     : b4g.elements[selectedElement].processorGroup;
 }
 
-async function loadProcessorGroupSettings<T extends string | string[]>(
+export async function loadProcessorGroupSettings<T extends string | string[]>(
   documentUri: string,
   atrtibute:
     | "libs"
@@ -300,27 +310,55 @@ async function loadProcessorGroupSettings<T extends string | string[]>(
     return configObject;
   }
 }
-export function prepareProcessorGroupConfigPaths(
-  pgConfigs:
-    | string[]
-    | ZoweDatasetConfigModel
-    | ZoweUssConfigModel
-    | EndevorConfigModel,
-  profile?: ResolvedProfile,
-): string[] | { path: string; profile?: string }[] | undefined {
-  if (
-    Array.isArray(pgConfigs) &&
-    pgConfigs.every((config) => typeof config === "string")
-  ) {
-    return pgConfigs;
+
+export function prepareProcessorGroupConfigPathsForDsnAndUss(
+  pgConfigs: (ZoweDatasetConfigModel | ZoweUssConfigModel)[],
+): { path: string; profile?: string }[] {
+  const paths: { path: string; profile?: string }[] = [];
+  for (const config of pgConfigs) {
+    if (DATASET in config)
+      paths.push({
+        path: config.dataset,
+        profile: config.profile ? config.profile : undefined,
+      });
+    else if (USSFILE in config)
+      paths.push({
+        path: config.ussFile,
+        profile: config.profile ? config.profile : undefined,
+      });
   }
+  return paths;
+}
 
-  if (ENVIRONMENT in pgConfigs && profile) {
-    return [CopybookURI.getEnviromentPath(pgConfigs as EndevorType, profile)];
-  } else if (DATASET in pgConfigs)
-    return [{ path: pgConfigs.dataset, profile: pgConfigs.profile }];
-  else if (USSFILE in pgConfigs)
-    return [{ path: pgConfigs.ussFile, profile: pgConfigs.profile }];
+export async function prepareProcessorGroupConfigPathsForEndevor(
+  pgConfigs: EndevorConfigModel[],
+  e4eDownloader: CopybookDownloaderForE4E,
+  copybook: CopybookName,
+): Promise<
+  { element: EndevorElement; profile: ResolvedProfile }[] | undefined
+> {
+  const paths: { element: EndevorElement; profile: ResolvedProfile }[] = [];
 
-  return;
+  for (const config of pgConfigs) {
+    let profile: Partial<ResolvedProfile>;
+    if (!config.profile) {
+      profile = { profile: undefined, instance: undefined };
+    } else {
+      profile = {
+        profile: config.profile.split(".")[1],
+        instance: config.profile.split(".")[0],
+      };
+    }
+    const resolvedProfile = await e4eDownloader.getProfileInfo(profile);
+
+    if (!resolvedProfile || resolvedProfile instanceof Error) break;
+    const element = config as EndevorElement;
+    element.use_map = element.use_map ? element.use_map : true;
+    element.element = copybook.name;
+
+    if (resolvedProfile && !(resolvedProfile instanceof Error)) {
+      paths.push({ element: element, profile: resolvedProfile });
+    }
+    return paths;
+  }
 }

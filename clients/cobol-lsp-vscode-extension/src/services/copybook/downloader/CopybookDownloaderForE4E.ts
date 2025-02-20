@@ -217,11 +217,11 @@ export class CopybookDownloaderForE4E {
   }
 
   public async downloadDatasetE4E(
-    endevorApi: ResolvedProfile,
+    profile: ResolvedProfile,
     member: EndevorMember,
   ): Promise<boolean> {
     try {
-      const instance = [Utils.profileAsString(endevorApi)];
+      const instance = [Utils.profileAsString(profile)];
       const filePath = await CopybookDownloaderForE4E.getCopybookPath(
         instance,
         member.dataset,
@@ -229,7 +229,7 @@ export class CopybookDownloaderForE4E {
         member.member,
       );
 
-      const memberContent = await this.e4e.getMember(endevorApi, {
+      const memberContent = await this.e4e.getMember(profile, {
         dataset: member.dataset,
         member: member.member,
       });

@@ -23,6 +23,7 @@ export class CopybookDownloaderForDsn extends ZoweExplorerDownloader {
   constructor(storagePath: string, explorerAPI: IApiRegisterClient) {
     super(storagePath, explorerAPI);
   }
+
   /**
    * Checks if the file could be downloaded using the Zowe explorer from MVS
    * @param copybookName Copybook to be downloaded.
@@ -40,7 +41,6 @@ export class CopybookDownloaderForDsn extends ZoweExplorerDownloader {
       : ProfileUtils.getProfileNameForCopybook(documentUri, this.explorerAPI);
     return !!(dsnPath && providedProfile);
   }
-
   /**
    * Downloads a file from the passed dns based on Zowe explorer
    *

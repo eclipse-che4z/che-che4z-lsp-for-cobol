@@ -18,6 +18,7 @@ import {
   ENVIRONMENT,
   USSFILE,
   ZOWE_FOLDER,
+  USE_MAP,
 } from "../../constants";
 import { SettingsService } from "../Settings";
 import { ProfileUtils } from "../util/ProfileUtils";
@@ -124,49 +125,43 @@ export class CopybookURI {
     ];
   }
   public static createProcessorGroupCopybookPaths(
-    pgConfigs: [
-      ZoweDatasetConfigModel | ZoweUssConfigModel | EndevorConfigModel,
-    ],
+    pgConfigs: (
+      | ZoweDatasetConfigModel
+      | ZoweUssConfigModel
+      | EndevorConfigModel
+    )[],
     storagePath: string,
     defaultProfile: string,
-  ) {
+  ): string[] {
     const paths: string[] = [];
-    pgConfigs = Array.isArray(pgConfigs) ? pgConfigs : [pgConfigs];
     pgConfigs.forEach((config) => {
-      if (DATASET in config || USSFILE in config) {
+      if (ENVIRONMENT in config) {
+        const profile = config.profile
+          ? {
+              profile: `internal.${config.profile.split(".")[1]}`,
+              instance: config.profile.split(".")[0],
+            }
+          : {
+              profile: "",
+              instance: "",
+            };
+        config.use_map = config.use_map ? config.use_map : true;
         paths.push(
           CopybookURI.createDatasetPath(
-            config.profile ? config.profile : defaultProfile,
-            DATASET in config ? config.dataset : config.ussFile,
+            this.getEnviromentPath(config as EndevorType, profile),
+            config.use_map ? USE_MAP : "",
             storagePath,
-          ),
+            E4E_FOLDER,
+          ).fsPath,
         );
-      } else if (ENVIRONMENT in config) {
-        //endevor kutluo
-      }
-    });
-    return paths;
-  }
-  public static createProcessorGroupCopybookPaths(
-    pgConfigs: [
-      ZoweDatasetConfigModel | ZoweUssConfigModel | EndevorConfigModel,
-    ],
-    storagePath: string,
-    defaultProfile: string,
-  ) {
-    const paths: string[] = [];
-    pgConfigs = Array.isArray(pgConfigs) ? pgConfigs : [pgConfigs];
-    pgConfigs.forEach((config) => {
-      if (DATASET in config || USSFILE in config) {
+      } else if (DATASET in config || USSFILE in config) {
         paths.push(
           CopybookURI.createDatasetPath(
-            config.profile ? config.profile : defaultProfile,
+            config.profile ? [config.profile] : [defaultProfile],
             DATASET in config ? config.dataset : config.ussFile,
             storagePath,
-          ),
+          ).fsPath,
         );
-      } else if (ENVIRONMENT in config) {
-        //endevor kutluo
       }
     });
     return paths;
