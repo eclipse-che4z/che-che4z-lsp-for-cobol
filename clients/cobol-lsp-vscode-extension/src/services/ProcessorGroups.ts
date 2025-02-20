@@ -359,6 +359,6 @@ export async function prepareProcessorGroupConfigPathsForEndevor(
     if (resolvedProfile && !(resolvedProfile instanceof Error)) {
       paths.push({ element: element, profile: resolvedProfile });
     }
-    return paths;
   }
+  return paths;
 }

@@ -20,8 +20,18 @@ import {
   loadProcessorGroupCopybookPathsConfig,
   loadProcessorGroupDialectConfig,
   loadProcessorGroupSqlBackendConfig,
+  prepareProcessorGroupConfigPathsForDsnAndUss,
+  prepareProcessorGroupConfigPathsForEndevor,
 } from "../../services/ProcessorGroups";
 import * as glob from "glob";
+import {
+  EndevorConfigModel,
+  ZoweDatasetConfigModel,
+  ZoweUssConfigModel,
+} from "../../services/ProcessorGroupsLoader";
+import { CopybookDownloaderForE4E } from "../../services/copybook/downloader/CopybookDownloaderForE4E";
+import { E4E } from "../../type/e4eApi";
+import { CopybookName } from "../../services/copybook/CopybookDownloadService";
 
 const WORKSPACE_URI = "file:///my/workspace";
 
@@ -66,9 +76,21 @@ jest.mock("vscode", () => {
                               "name": "IDMSPG",
                               "preprocessor": [ "IDMS" ]
                           },
-                          {
+                         {
                               "name": "ABS",
-                              "libs": ["/abs"]
+                              "libs": [
+                                "/abs",
+                                { "dataset": "remote.dataset.location" },
+                                { "ussFile": "remote.ussFile.location" },
+                                {
+                                  "environment": "ENV",
+                                  "stage": "1",
+                                  "system": "SYSTEM",
+                                  "subsystem": "SUBSYTEM",
+                                  "type": "COPY",
+                                  "profile": "instance.internal.connection"
+                                }
+                              ]
                           }
                       ]
                   }`);
@@ -151,7 +173,19 @@ describe("Processor groups configuration understand absolute paths", () => {
       section: "cobol-lsp.cpy-manager.paths-local",
     };
     const result = await loadProcessorGroupCopybookPathsConfig(item, []);
-    expect(result).toStrictEqual(["/copy-resolved-from-glob"]);
+    expect(result).toStrictEqual([
+      "/copy-resolved-from-glob",
+      { dataset: "remote.dataset.location" },
+      { ussFile: "remote.ussFile.location" },
+      {
+        environment: "ENV",
+        stage: "1",
+        system: "SYSTEM",
+        subsystem: "SUBSYTEM",
+        type: "COPY",
+        profile: "instance.internal.connection",
+      },
+    ]);
   });
 });
 
@@ -258,5 +292,91 @@ describe("Processor groups configuration provides lib path in Windows", () => {
     };
     const result = await loadProcessorGroupCopybookPathsConfig(item, []);
     expect(result).toStrictEqual(["copy-resolved-from-glob"]);
+  });
+});
+describe("Processor groups configurations prepared for download services", () => {
+  it("prepareProcessorGroupConfigPathsForDsnAndUss prepares Dsn and Uss paths", () => {
+    const pgConfigs: (ZoweDatasetConfigModel | ZoweUssConfigModel)[] = [
+      {
+        dataset: "dataset",
+      },
+      { dataset: "dataset2", profile: "profile" },
+      { ussFile: "ussFile", profile: undefined },
+      { ussFile: "ussFile2", profile: "profile" },
+    ];
+
+    const result = prepareProcessorGroupConfigPathsForDsnAndUss(pgConfigs);
+    expect(result).toStrictEqual([
+      { path: "dataset", profile: undefined },
+      { path: "dataset2", profile: "profile" },
+      { path: "ussFile", profile: undefined },
+      { path: "ussFile2", profile: "profile" },
+    ]);
+  });
+
+  it("prepareProcessorGroupConfigPathsForEndevor prepares Endevor locations", async () => {
+    const e4e = {} as E4E;
+    const e4eDownloader = new CopybookDownloaderForE4E("/storagePath", e4e);
+    const copybook: CopybookName = { name: "copybook", dialect: "COBOL" };
+    e4eDownloader.getProfileInfo = async () =>
+      Promise.resolve({ profile: "profile", instance: "instance" });
+    const pgConfigs: EndevorConfigModel[] = [
+      {
+        environment: "ENV",
+        stage: "1",
+        system: "SYSTEM",
+        subsystem: "SUBSYTEM",
+        type: "COPY",
+        profile: "instance.internal.connection",
+      },
+      {
+        environment: "ENV2",
+        stage: "1",
+        system: "SYSTEM2",
+        subsystem: "SUBSYTEM2",
+        type: "COPY2",
+        profile: "instance.internal.connection",
+      },
+    ];
+
+    const result = await prepareProcessorGroupConfigPathsForEndevor(
+      pgConfigs,
+      e4eDownloader,
+      copybook,
+    );
+    expect(result).toStrictEqual([
+      {
+        element: {
+          environment: "ENV",
+          stage: "1",
+          system: "SYSTEM",
+          subsystem: "SUBSYTEM",
+          type: "COPY",
+          profile: "instance.internal.connection",
+          use_map: true,
+          element: "copybook",
+        },
+        profile: {
+          profile: "profile",
+          instance: "instance",
+        },
+      },
+      {
+        element: {
+          environment: "ENV2",
+          stage: "1",
+          system: "SYSTEM2",
+          subsystem: "SUBSYTEM2",
+          type: "COPY2",
+          profile: "instance.internal.connection",
+          use_map: true,
+          element: "copybook",
+        },
+        profile: {
+          profile: "profile",
+          instance: "instance",
+        },
+      },
+    ]);
   });
 });
