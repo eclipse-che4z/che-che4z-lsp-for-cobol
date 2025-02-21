@@ -259,7 +259,7 @@ cics_build_attach: (ATTACH | (ATTACHID  | PROCESS  | RESOURCE  | RPROCESS  |
             RECFM) cics_data_value | cics_handle_response)+;
 
 /** CANCEL (both of them) */
-cics_cancel: CANCEL (cics_cancel_bts | cics_cancel_reqid);
+cics_cancel: CANCEL (cics_cancel_reqid | cics_cancel_bts)?;
 cics_cancel_bts: (ACTIVITY cics_data_value | ACQACTIVITY | ACQPROCESS | cics_handle_response)+;
 cics_cancel_reqid: ((REQID | TRANSID) cics_name | SYSID cics_data_area | cics_handle_response)+;
 
