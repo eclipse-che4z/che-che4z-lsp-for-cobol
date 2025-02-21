@@ -569,15 +569,40 @@
     "body": ["SELECT ${1:VSAMFILE}", "ASSIGN TO ${2:JCLDDNAME}", "ORGANIZATION IS INDEXED", "ACCESS MODE IS DYNAMIC", "RECORD KEY IS ${3:VSAMFILE-KEY}", "FILE STATUS IS ${4:WS-VSAMFILE-FIELD}"],
     "description": "Allows the specific READ/WRITE statement to determine the access mode. Records can be processed sequentially or randomly or both. https://www.ibm.com/docs/en/cobol-zos/6.4?topic=files-vsam-dynamic-access-optional-logic-path"
   },
+  "EGCS": {
+    "prefix": "EGCS",
+    "body": ["INITIALIZE ${1:VAR1} REPLACING EGCS DATA BY ${2|literal,VAR-2|}", "END-INITIALIZE.", "$0"],
+    "description": "EGCS => Extended Graphic Character Set. https://www.ibm.com/docs/en/cobol-zos/6.4?topic=statements-initialize-statement"
+  },
+  "IF-ELSE": {
+    "prefix": "ELSE",
+    "body": ["IF ${1:XisTrue}", "\t${2:codeHere}", "ELSE", "\t${3:codeHere}", "END-IF.", "$0"],
+    "description": "`IF ... ELSE` codes a choice between two COBOL processing actions. https://www.ibm.com/docs/en/cobol-zos/6.4?topic=actions-coding-choice"
+  },
+  "END": {
+    "prefix": "END",
+    "body": ["END-${1|ACCEPT,ADD,CALL,COMPUTE,DELETE,DISPLAY,DIVIDE,EVALUATE,EXEC,IF,INVOKE,JSON,MULTIPLY,OF-PAGE,PERFORM,READ,RECEIVE,RETURN,REWRITE,SEARCH,START,STRING,SUBTRACT,UNSTRING,WRITE,XML|}."],
+    "description": "Scope terminator - common with many verbs https://www.ibm.com/docs/en/cobol-zos/6.4?topic=appendixes-reserved-words"
+  },
+  "ENTER": {
+    "prefix": "ENTER",
+    "body": ["ENTER ${1:literal}."],
+    "description": "The statement is treated as a comment. https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdf"
+  },
+  "ENTRY": {
+    "prefix": "ENTRY",
+    "body": ["ENTRY ${1:literal}."],
+    "description": "The ENTRY statement establishes an alternate entry point into a COBOL called subprogram. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
+  "ENTRY USING": {
+    "prefix": "ENTRY USING",
+    "body": ["ENTRY ${1:literal} USING${2| , BY REFERENCE , BY VALUE |}${3:LINKAGE-DATA-ITEM}."],
+    "description": "description"
+  },
   "ENVIRONMENT DIVISION": {
     "prefix": "ENVIRONMENT DIVISION",
     "body": ["ENVIRONMENT DIVISION.", "$0"],
     "description": "ENVIRONMENT DIVISION"
-  },
-  "ENTRY": {
-    "prefix": "ENTRY",
-    "body": ["$1-EP SECTON.", "ENTRY \"$1\".", "    $0\t", "    GOBACK.", ""],
-    "description": "ENTRY statement"
   },
   "ENCODING": {
     "prefix": "ENCODING item",
@@ -591,27 +616,77 @@
   },
   "EQUAL": {
     "prefix": "EQUAL",
-    "body": ["EQUAL ${1:item} ${2:item}"],
+    "body": ["${1:var-1} EQUAL ${2:var-2}"],
     "description": "EQUAL two items"
   },
-  "EXTEND": {
-    "prefix": "EXTEND",
-    "body": ["EXTEND ${1:fileName}"],
-    "description": "EXTEND fileName"
+  "ERROR #1": {
+    "prefix": "ERROR",
+    "body": ["DIVIDE ${2:NUMVAR-1} INTO ${3:NUMVAR-2}", "GIVING ${4:NUMVAR-3}", "ON SIZE ERROR ${1:imperative_statement}", "END-DIVIDE."],
+    "description": "NUMVAR-1 is divided into NUMVAR-2. If `NUMVAR-1 = 0` or if the quotient is larger than NUMVAR-3 the `ON SIZE ERROR` statement is executed. If `ON SIZE ERROR` isn't coded the program ABENDS. https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdf"
+  },
+  "ERROR #2": {
+    "prefix": "ERROR",
+    "body": ["MOVE CORRESPONDING ${2:GROUP-FIELDS-1} TO ${3:GROUP-FIELDS-2}", "ON SIZE ERROR ${1:imperative_statement}"],
+    "description": "Tthe like-named variables in the COBOL group field GROUP-FIELDS-1 are moved to GROUP-FIELDS-2. If there are any variables in GROUP-FIELDS-1 that are larger than the same named variable in GROUP-FIELDS-2 the `ON SIZE ERROR` statement is executed. If `ON SIZE ERROR` isn't coded the program ABENDS. https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdf"
+  },
+  "ERROR #3": {
+    "prefix": "ERROR",
+    "body": ["USE AFTER ERROR PROCEDURE ON", "\t${1:file-name-1}", "\tINPUT OUTPUT", "\tI-O EXTEND"],
+    "description": "The EXCEPTION/ERROR declarative specifies procedures for input/output exception or error handling that are to be executed in addition to the standard z/OS procedures. https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdf"
+  },
+  "EVERY": {
+    "prefix": "EVERY",
+    "body": ["XML GENERATE DOC FROM ${3:VAR-1}", "SUPPRESS SENSITIVEINFO", "\tEVERY ${1:NONNUMERIC ELEMENT WHEN SPACE}", "\tEVERY ${2:NUMERIC ELEMENT WHEN ZERO}", "END-XML."],
+    "description": "Part of the COBOL XML statement. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
   },
   "EXCEPTION": {
     "prefix": "EXCEPTION",
     "body": ["EXCEPTION ${1:impStat}"],
     "description": "EXCEPTION impStat"
   },
-  "EXIT PROGRAM": {
+  "EXCEPTION #1": {
+    "prefix": "EXCEPTION",
+    "body": ["CALL \"${2:SUBPROG}\" ON EXCEPTION ${1:impStatement}"],
+    "description": "description"
+  },
+  "EXCEPTION #2": {
+    "prefix": "EXCEPTION",
+    "body": ["01 ${2:DOCUMENT-VARIABLE} PIC X(500).", "\tXML GENERATE ${2:DOCUMENT-VARIABLE} FROM ${3:MSG-VARIABLE}", "\t\tWITH ATTRIBUTES ${4:attribuesHere}", "\t\tON EXCEPTION ${1:impStatement}", "\tEND-XML.", "$0"],
+    "description": "An EXCEPTION condition occurs when the XML document cannot be generated. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
+  "EXCEPTION #3": {
+    "prefix": "EXCEPTION",
+    "body": ["CLOSE ${2:fileName}", "\tON EXCEPTION ${1:impStatement}", "END-CLOSE", "$0"],
+    "description": "An EXCEPTION condition occurs when there is a problem closing a QSAM, VSAM or Line Sequential. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
+  "EXIT": {
     "prefix": "EXIT",
-    "body": ["EXIT PROGRAM RETURNING ${1:item}"],
-    "description": "EXIT PROGRAM"
+    "body": ["EXIT."],
+    "description": "EXIT statements close the PERFORM CHAIN (internal COBOL iterative control structure). Control is returned to the NSI (Next Sequential Instruction) following the PERFORM statement. https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdf"
+  },
+  "EXIT PROGRAM": {
+    "prefix": "EXIT PROGRAM",
+    "body": ["EXIT PROGRAM."],
+    "description": "EXIT PROGRAM transfers control outside the COBOL program. https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdf"
+  },
+  "EXIT PROGRAM RETURNING": {
+    "prefix": "EXIT PROGRAM",
+    "body": ["EXIT PROGRAM RETURNING ${1:item}."],
+    "description": "EXIT PROGRAM transfers control outside the COBOL program. https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdf"
+  },
+  "EXIT METHOD": {
+    "prefix": "EXIT METHOD",
+    "body": ["EXIT METHOD."],
+    "description": "EXIT METHOD transfers control outside the Object COBOL program. https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdf"
+  },
+  "EXTEND": {
+    "prefix": "EXTEND",
+    "body": ["EXTEND ${1:fileName}"],
+    "description": "EXTEND fileName"
   },
   "EXEC SQL": {
     "prefix": "EXEC SQL",
-    "body": ["EXEC SQL ${1:SQL-STATEMENT} END-EXEC."],
+    "body": ["EXEC SQL", "\t${1:SQL-STATEMENT}", "END-EXEC."],
     "description": "EXEC SQL STATEMENT"
   },
   "EXEC SQL INCLUDE": {
@@ -621,8 +696,13 @@
   },
   "EXEC CICS": {
     "prefix": "EXEC CICS",
-    "body": ["EXEC CICS ${1:cics-statement} END-EXEC."],
+    "body": ["EXEC CICS", "\t${1:cics-statement}", "END-EXEC."],
     "description": "EXEC CICS STATEMENT"
+  },
+  "EXTERNAL": {
+    "prefix": "EXTERNAL",
+    "body": ["01 ${1:DATA-NAME} EXTERNAL PIC X(${2:numberLiteral})."],
+    "description": "The EXTERNAL clause specifies that the main storage associated with a data item is associated with the run unit rather than with any particular program. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
   },
   "EVALUATE": {
     "prefix": "EVALUATE ",
@@ -635,27 +715,97 @@
       "END-EVALUATE",
       ""
     ],
-    "description": "EVALUATE"
+    "description": "Use the EVALUATE verb in place of a set of IF/ELSE constructs. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
+  "EVALUATE FALSE": {
+    "prefix": "EVALUATE FALSE",
+    "body": ["EVALUATE FALSE", "\tWHEN ${1:VAR-A} = ${2:VAR-B}", "\t\tMOVE \"${1:VAR-A} - ${2:VAR-B} NOT EQUAL\" TO DISP-OUT.", "\tWHEN ${3:VAR-C} = ${4:VAR-D}", "\t\tMOVE \"${3:VAR-C} - ${4:VAR-D} NOT EQUAL\" TO DISP-OUT.", "END-EVALUATE.", "$0"],
+    "description": "Use EVALUATE instead of a series of nested IF statements to test multiple conditions and specify distinct actions for each. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
   },
   "FILE": {
     "prefix": "FILE",
     "body": ["FILE ${1:item}"],
     "description": "FILE item"
   },
-  "FIRST": {
+  "FILE SECTION": {
+    "prefix": "FILE SECTION",
+    "body": ["DATA DIVISION.", "FILE SECTION.", "FD  ${1:MSTR-FILE}", "\tRECORD CONTAINS ${2:numLiteral} CHARACTERS", "\tDATA RECORD IS ${3:PATIENT-MASTER}."],
+    "description": "The FILE SECTION is where you define specifics of each input/output file. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
+  "FILE STATUS": {
+    "prefix": "FILE STATUS",
+    "body": ["ENVIRONMENT DIVISION.", "SELECT ${2:rptfile}", "\tASSIGN TO ${1:PATVSAM}", "\tORGANIZATION IS ${3|INDEXED,RELATIVE,SEQUENTIAL,LINE-SEQUENTIAL|}", "\tACCESS MODE IS ${4|SEQUENTIAL,RANDOM,DYNAMIC|}", "\tRECORD KEY IS ${5:PATIENT-REC-KEY}", "\tFILE STATUS IS ${1:PATVSAM}-FS."],
+    "description": "`FILE STATUS` defines a two-byte (PIC XX) field that recieves a code from z/OS based on the disposition of the I/O operation. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
+  "MULTIPLE FILE TAPE": {
+    "prefix": "MULTIPLE FILE TAPE",
+    "body": ["DATA DIVISION.", "FD ${1:QSAM-FILE}", "\tLABEL RECORDS ARE STANDARD", "\tMULTIPLE FILE TAPE.", "\t${3:RPT-OUT-REC} PIC X(${4:132})."],
+    "description": "The `MULTIPLE FILE TAPE` clause specifies that 2 or mote data files share the same physical VOL=SER of tape. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
+  "FILE CONTROL": {
+    "prefix": "FILE CONTROL",
+    "body": ["ENVIRONMENT DIVISION.", "INPUT-OUTPUT SECTION.", "FILE-CONTROL.", "\tSELECT ${1:FILE-1} ASSIGN TO ${2:EXTFILE1}", "\tORGANIZATION IS ${3|INDEXED,RELATIVE,SEQUENTIAL,LINE-SEQUENTIAL|}", "\tACCESS MODE IS ${4|SEQUENTIAL,RANDOM,DYNAMIC|}", "\tFILE STATUS IS ${5:WS-FILE-STATUS-VAR}."],
+    "description": "The `FILE-CONTROL` paragraph associates every file in your COBOL program with an external data set. It optionally defines file organization, access mode, etc. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
+  "FILLER": {
+    "prefix": "FILLER",
+    "body": ["01 ${2:GROUP-ITEM}.", "\t05 ${3:ELEMENTARY-LINE}", "\t\t10 ${4:FIELD-1} PIC S9(${5:5}) COMP-3.", "\t\t10 FILLER PIC X(${1:20}) VALUE SPACE.", "\t\t$0"],
+    "description": "A placeholder variable that is not explicitly referred to in a program. FILLER is used to line up variable names with byte-offsets in the physical data record. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
+  "FIRST #1": {
     "prefix": "FIRST",
     "body": ["FIRST ${1:id} BY ${2:id}"],
     "description": "FIRST ideral BY ideral"
+  },
+  "FIRST #2": {
+    "prefix": "FIRST",
+    "body": ["INSPECT ${4:VAR-1}", "TALLYING ${5:VAR-CTR} FOR LEADING \"${6:A}\"", "REPLACING FIRST \"${1:A1}\" BY \"${2:2}\" AFTER INITIAL \"${3:T}\""],
+    "description": "When FIRST is specified and not BEFORE / AFTER - the replacement field changes the left/first occurrence of the inspected field (VAR-1 in this example). https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
+  "FOOTING": {
+    "prefix": "FOOTING",
+    "body": ["WITH FOOTING AT ${1:literal}"],
+    "description": "Part of an FD's \"LINAGE\" (logical page size) clause - available for QSAM and LINE-SEQUENTIAL files only). `WITH FOOTING` specifies a line # in an output file or printer. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
   },
   "FOR": {
     "prefix": "FOR",
     "body": ["FOR ${1:item}"],
     "description": "FOR item"
   },
+  "FOR CHARACTERS AFTER": {
+    "prefix": "FOR CHARACTERS AFTER",
+    "body": ["INSPECT ${2:variable-field} TALLYING ${3:num-field)", "FOR CHARACTERS AFTER ${1:X\"40\"}"],
+    "description": "Specifies search characters - in INSPECT verb. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
+  "USE FOR DEBUGGING": {
+    "prefix": "USE FOR DEBUGGING",
+    "body": ["PRODECURE DIVISION.", "DECLARATIVES.", "${2:Debug-Declaratives} SECTION.", "\tUSE FOR DEBUGGING ON ${1:paragraph-section-name}."],
+    "description": "Specifies debugging to begin on (specified) routine. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
+  "CLOSE x FOR REMOVAL": {
+    "prefix": "CLOSE x FOR REMOVAL",
+    "body": ["CLOSE ${1:tape-file} FOR REMOVAL"],
+    "description": "This phrase applies only to TAPE/REEL data sets and is treated as a comment. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
   "FROM": {
     "prefix": "FROM",
     "body": ["FROM ${1:item}"],
     "description": "FROM item"
+  },
+  "FROM #1": {
+    "prefix": "FROM",
+    "body": ["PERFORM ${1:B-100PARAGRAPH} VARYING ${2:IDX-1} FROM 1 BY 1 UNTIL ${2:IDX-1} > TABLE-MAX-ROWS"],
+    "description": "The \"FROM\" in a `PERFORM VARYING` clause sets the initial value and the incremental/iterative value(s) for a table subscript or index. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
+  "FROM #2": {
+    "prefix": "FROM",
+    "body": ["${1|WRITE,REWRITE,RELEASE|} ${2:OUTPUT-REC} FROM ${3:WS-OUTPUT-REC}."],
+    "description": "The FROM phrase is equivalent to: `MOVE REC-1 to OUTPUT-REC WRITE OUTPUT-REC.` https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
+  "FROM #3": {
+    "prefix": "FROM",
+    "body": ["ACCEPT ${1:ws-receiving-field} FROM ${2|DATE,DAY,DAY-OF-WEEK|}."],
+    "description": "This statement values the receiving-field with one of the system date registers. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
   },
   "FREE": {
     "prefix": "FREE",
@@ -1009,6 +1159,11 @@
       "FUNCTION YEAR-TO-YYYY(${1:YY},${2:[YY-CUTOFF, DEFAULT: 50},${3:YY-EXECUTION-TIME, DEFAULT: NOW})$0"
     ],
     "description": "CONVERT YY TO YYYY WITH OPTIONAL YY-CUTOFF TO DELINEATE CENTURIES"
+  },
+  "FUNCTION-POINTER": {
+    "prefix": "FUNCTION-POINTER",
+    "body": ["77 ${1:DATA-FUNCTION-PTR} USAGE FUNCTION-POINTER."],
+    "description": "A `FUNCTION-POINTER` is a 4-byte elementary item which can contain the address of a procedure (typically a program) entry point. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
   },
   "GENERATE": {
     "prefix": "GENERATE",
