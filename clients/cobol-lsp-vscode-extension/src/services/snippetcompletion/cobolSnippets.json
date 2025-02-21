@@ -417,14 +417,74 @@
     "body": ["DATE ${1:yyyymmdd}"],
     "description": "DATE yyyymmdd"
   },
+  "AT DATE": {
+    "prefix": "AT DATE",
+    "body": ["AT DATE * PERFORM", "    QUERY LOCATION;", "    LIST DATE-FIELD", "    GO;", "END-PERFORM;"],
+    "description": "AT DATE is used with the IBM COBOL Debugger. It gives the Debugger control for each date processing statement within the specified block. https://www.ibm.com/docs/en/developer-for-zos/14.2?topic=command-date-cobol In the above example: Each time a date processing statement is encountered in the compile unit; 1. Display the location of the statement 2. List a specific variable, and 3. Resume running the program."
+  },
+  "DATE COMPILED YYYY/MM/DD": {
+    "prefix": "DATE COMPILED",
+    "body": ["DATE-COMPILED. $CURRENT_YEAR/$CURRENT_MONTH/$CURRENT_DATE."],
+    "description": "DATE-COMPILED is an optional statement that describes the specific date of program compilation. https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdf"
+  },
+  "DATE COMPILED MM/DD/YYYY": {
+    "prefix": "DATE COMPILED",
+    "body": ["DATE-COMPILED. $CURRENT_MONTH/$CURRENT_DATE/$CURRENT_YEAR."],
+    "description": "DATE-COMPILED is an optional statement that describes the specific date of program compilation. https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdf"
+  },
+  "DATE WRITTEN YYYY/MM/DD": {
+    "prefix": "DATE WRITTEN",
+    "body": ["DATE-WRITTEN. $CURRENT_YEAR/$CURRENT_MONTH/$CURRENT_DATE."],
+    "description": "DATE-WRITTEN is an optional statement that describes the specific date of program compilation. https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdf"
+  },
+  "DATE WRITTEN MM/DD/YYYY": {
+    "prefix": "DATE WRITTEN",
+    "body": ["DATE-WRITTEN. $CURRENT_MONTH/$CURRENT_DATE/$CURRENT_YEAR."],
+    "description": "DATE-WRITTEN is an optional statement that describes the specific date of program compilation. https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdf"
+  },
   "DAY": {
     "prefix": "DAY",
-    "body": ["DAY ${1:yyyyddd}"],
-    "description": "DAY yyyyddd"
+    "body": ["ACCEPT DATE-VAR-RECV FROM DAY (DATE-VAR-SEND)"],
+    "description": "The above is an example of utilizing a Julian Date receiving field (PiC 9(5) variable - YY NNN) - from z/OS. https://www.ibm.com/docs/en/cobol-zos/6.4?topic=as-date-date-yyyymmdd-day-day-yyyyddd-day-week-time"
+  },
+  "DAY OF WEEK": {
+    "prefix": "DAY OF WEEK",
+    "body": ["ACCEPT DATE-VAR-RECV FROM DAY-OF-WEEK (DATE-VAR-SEND)"],
+    "description": "The above is an example of utilizing a one-byte(PiC 9(1)receiving variable - (1-7) from z/OS. Note that 1 = Monday, 2 = Tuesday, 3 = Wednesday, etc. https://www.ibm.com/docs/en/cobol-zos/6.4?topic=as-date-date-yyyymmdd-day-day-yyyyddd-day-week-time"
+  },
+  "DBCS": {
+    "prefix": "DBCS",
+    "body": ["IF ${1:VAR-1} IS DBCS"],
+    "description": "A class-condition, allowing you to test whether the data in a field is in valid DBCS format. https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdf"
+  },
+  "DEBUG": {
+    "prefix": "DEBUG",
+    "body": ["01 DEBUG-ITEM.", "\t05 DEBUG-${1|CONTENTS,NAME,SUB1,SUB2,SUB3|} PIC X(${2:nn})."],
+    "description": "description"
+  },
+  "DECIMAL-POINT": {
+    "prefix": "DECIMAL-POINT",
+    "body": ["DECIMAL-POINT IS COMMA."],
+    "description": "Part of the SPECIAL-NAMES paragraph, the `DECIMAL-POINT IS COMMA` clause exchanges the functions of the period and the comma in PIC character-strings and in numeric literals. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
+  "DECLARATIVES 1": {
+    "prefix": "DECLARATIVES",
+    "body": ["DECLARATIVES.", "${1:paragraph-name} SECTION.", "USE FOR DEBUGGING ON ${2:OtherParagraphName}.", "${3:Debug-Declaratives-Paragraph}.", "\tDisplay ${4:VAR1}, ${5:VAR2}, ${6:VAR3}.", "END-DECLARATIVES."],
+    "description": "Declaratives provide one or more special-purpose sections that are executed when an exception occurs. https://www.ibm.com/docs/sl/cobol-zos/6.2?topic=procedures-example-use-debugging"
+  },
+  "DECLARATIVES 2": {
+    "prefix": "DECLARATIVES",
+    "body": ["DECLARATIVES.", "${1:Debug-Declaratives} SECTION.", "USE FOR DEBUGGING ALL PROCEDURES.", "${2:Debug-Declaratives-Paragraph}.", "\tDisplay ${3:VAR1}, ${4:VAR2}, ${5:VAR3}.", "END-DECLARATIVES."],
+    "description": "Declaratives provide one or more special-purpose sections that are executed when an exception occurs. https://www.ibm.com/docs/sl/cobol-zos/6.2?topic=procedures-example-use-debugging"
+  },
+  "DEFAULT": {
+    "prefix": "DEFAULT",
+    "body": ["QSAMBUFFINITCHAR={1|DEFAULT,SPACE,BINZERO|}"],
+    "description": "A COBOL Runtime directive to initialize the buffers for QSAM (\"flat\" files). Note that your Systems Programmer will most likely utilize this keyword."
   },
   "DELETE": {
     "prefix": "DELETE fileName",
-    "body": ["DELETE ${1:fileName}"],
+    "body": ["DELETE ${1:fileName}", "END-DELETE."],
     "description": "DELETE fileName"
   },
   "DELIMITED BY": {
@@ -434,13 +494,28 @@
   },
   "DELIMITER": {
     "prefix": "DELIMITER",
-    "body": ["DELIMITER ${1:item}"],
-    "description": "DELIMITED BY"
+    "body": ["RECORD DELIMITER IS ${1:STANDARD-1}"],
+    "description": "DELIMITER IS"
+  },
+  "DEPENDING": {
+    "prefix": "DEPENDING",
+    "body": ["01 GROUP-VAR.", "\t05 ${1:CTR-1} PIC S9(4) COMP.", "\t05 ${2:VAR-TBL} DEPENDING ON ${1:CTR-1}.", "\t\t10 ${4:TBL-FLD1} PIC X(3).", "\t\t$0"],
+    "description": "OCCURS DEPENDING ON (ODO) specifies variable-length internal COBOL tables.  https://www.ibm.com/docs/en/SS6SG3_6.4.0/pdf/pgmvs.pdf"
   },
   "DESCENDING": {
     "prefix": "DESCENDING item",
     "body": ["DESCENDING ${1:item}"],
     "description": "DESCENDING item"
+  },
+  "DISPLAY": {
+    "prefix": "DISPLAY",
+    "body": ["DISPLAY ${1:id}"],
+    "description": "DISPLAY literal"
+  },
+  "DISPLAY-1": {
+    "prefix": "DISPLAY-1",
+    "body": ["77 DBCS-FLD PIC N(10) USAGE DISPLAY-1."],
+    "description": "The DISPLAY-1 phrase defines an item as DBCS. The data item is stored in character form, with each character occupying 2 bytes of storage. https://www.informatik.uni-leipzig.de/cs/Literature/Textbooks/Cobol/LangRefzOS.pdf"
   },
   "DIVIDE": {
     "prefix": "DIVIDE",
@@ -469,15 +544,30 @@
     ],
     "description": "DIVIDE INTO GIVING REMAINDER"
   },
-  "DISPLAY": {
-    "prefix": "DISPLAY",
-    "body": ["DISPLAY ${1:id}"],
-    "description": "DISPLAY literal"
+  "DIVISION": {
+    "prefix": "DIVISION",
+    "body": ["${1|IDENTIFICATION,ENVIRONMENT,DATA,PROCEDURE|} DIVISION."],
+    "description": "Required Headers for COBOL programs. https://www.ibm.com/docs/en/SS6SG3_6.4.0/pdf/pgmvs.pdf"
   },
-  "DOWN BY": {
+  "SET x DOWN BY y": {
     "prefix": "DOWN BY",
-    "body": ["DOWN BY ${1:item}"],
+    "body": ["SET ${1:indexName} DOWN BY ${2:numVarLiteral}"],
     "description": "DOWN BY item"
+  },
+  "DUPLICATES #1": {
+    "prefix": "DUPLICATES",
+    "body": ["ALTERNATE RECORD KEY IS ${1:FLD-1}", "WITH DUPLICATES."],
+    "description": "DUPLICATES allows an indexed VSAM file to be defined with duplicate values declared in a defined variable within the record in the FD. https://www.ibm.com/docs/en/cobol-zos/6.4?topic=files-using-alternate-keys"
+  },
+  "DUPLICATES #2": {
+    "prefix": "DUPLICATES",
+    "body": ["SORT FILENAME ON ${1|ASCENDING,DESCENDING|} ${2:KEY-FLD}", "WITH DUPLICATES${3|., IN ORDER.|}"],
+    "description": "`IN ORDER` forces the z/OS SORT utility to retain the original order of the input file, if duplicate key-field values are found. Note that `IN ORDER` is an optional clause of `WITH DUPLICATES`. https://www.ibm.com/docs/en/cobol-zos/6.4?topic=merge-preserving-original-sequence-records-equal-keys"
+  },
+  "DYNAMIC": {
+    "prefix": "DYNAMIC",
+    "body": ["SELECT ${1:VSAMFILE}", "ASSIGN TO ${2:JCLDDNAME}", "ORGANIZATION IS INDEXED", "ACCESS MODE IS DYNAMIC", "RECORD KEY IS ${3:VSAMFILE-KEY}", "FILE STATUS IS ${4:WS-VSAMFILE-FIELD}"],
+    "description": "Allows the specific READ/WRITE statement to determine the access mode. Records can be processed sequentially or randomly or both. https://www.ibm.com/docs/en/cobol-zos/6.4?topic=files-vsam-dynamic-access-optional-logic-path"
   },
   "ENVIRONMENT DIVISION": {
     "prefix": "ENVIRONMENT DIVISION",
