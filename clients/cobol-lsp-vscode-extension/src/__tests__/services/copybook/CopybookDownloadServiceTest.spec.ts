@@ -29,6 +29,7 @@ import { DownloadUtil } from "../../../services/copybook/downloader/DownloadUtil
 import { SettingsService } from "../../../services/Settings";
 import { E4E } from "../../../type/e4eApi";
 import { e4eMock } from "../../../__mocks__/getE4EMock.utility";
+import * as ProcessorGroups from "../../../services/ProcessorGroups";
 
 jest.mock("../../../services/reporter");
 Utils.getZoweExplorerAPI = jest.fn().mockReturnValue({ api: zoweExplorerMock });
@@ -149,6 +150,34 @@ describe("Tests copybook download service", () => {
           { name: "copybook-name", dialect: DEFAULT_DIALECT },
         ]),
       ).toBe(undefined);
+    });
+    it("checks invalid zowe profile is provided in proc groups", async () => {
+      const mocked = jest.spyOn(
+        ProcessorGroups,
+        "loadProcessorGroupCopybookPathsConfig",
+      );
+
+      mocked.mockResolvedValue([
+        "/libs",
+        { dataset: "dataset", profile: "invalidProfile" },
+      ]);
+      vscode.window.showErrorMessage = jest.fn();
+      const downloadService = new CopybookDownloadService(
+        "storage-path",
+        zoweExplorerErrorMock,
+      );
+
+      downloadService["processDownloadError"] = jest.fn();
+
+      expect(
+        await downloadService.downloadCopybooks("document-uri", [
+          { name: "copybook-name", dialect: DEFAULT_DIALECT },
+        ]),
+      ).toBe(undefined);
+      expect(vscode.window.showErrorMessage).toHaveBeenCalledWith(
+        "Please specify a valid Zowe Explorer profile in processor groups to download copybooks from the mainframe. Provided invalid profile name: invalidProfile",
+      );
+      mocked.mockResolvedValue([]);
     });
   });
 
@@ -375,4 +404,36 @@ describe("Tests copybook download service", () => {
     resolver.clearCache();
     expect(clearConfigs).toHaveBeenCalled();
   });
+  // it("checks processor group locations performed when provided", async () => {
+  //   const spyConfig = jest.spyOn(
+  //     ProcessorGroups,
+  //     "loadProcessorGroupCopybookPathsConfig",
+  //   );
+  //   spyConfig.mockResolvedValue([
+  //     "/libs",
+  //     { dataset: "dataset", profile: "profile" },
+  //   ]);
+  //   DownloadUtil.checkForInvalidCredProfile = jest.fn().mockReturnValue(false);
+
+  //   vscode.window.showErrorMessage = jest.fn();
+  //   const downloadService = new CopybookDownloadService(
+  //     "storage-path",
+  //     zoweExplorerErrorMock,
+  //   );
+  //   let downloadCopybookDsn =
+  //     downloadService["dsnDownloader"]!.downloadCopybook;
+  //   downloadCopybookDsn = jest.fn().mockImplementation();
+  //   await downloadService.downloadCopybook(
+  //     { name: "copybook-name", dialect: DEFAULT_DIALECT },
+  //     "document-uri",
+  //   );
+
+  //   // expect(downloadCopybookDsn).toHaveBeenCalledWith(
+  //   //   [{ name: "copybook-name", dialect: DEFAULT_DIALECT }, "document-uri"],
+  //   //   { paths: "dataset", profile: "profile" },
+  //   // );
+  //   expect(downloadCopybookDsn).toHaveBeenCalled();
+
+  //   spyConfig.mockResolvedValue([]);
+  // });
 });

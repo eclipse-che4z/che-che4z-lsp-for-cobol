@@ -37,7 +37,6 @@ import path = require("path");
 import { getErrorMessage } from "../util/ErrorsUtils";
 import {
   loadProcessorGroupCopybookPathsConfig,
-  loadProcessorGroupSettings,
   prepareProcessorGroupConfigPathsForDsnAndUss,
   prepareProcessorGroupConfigPathsForEndevor,
 } from "../ProcessorGroups";
@@ -79,17 +78,10 @@ export class CopybookDownloadService {
       return true;
     }
 
-    const pgConfigs = (await loadProcessorGroupSettings(
-      documentUri,
-      "libs",
-      [] as string[],
-      copybookName.dialect,
-    )) as (
-      | string
-      | EndevorConfigModel
-      | ZoweUssConfigModel
-      | ZoweDatasetConfigModel
-    )[];
+    const pgConfigs = await loadProcessorGroupCopybookPathsConfig(
+      { scopeUri: documentUri },
+      [],
+    );
 
     const onlyDsn = pgConfigs.filter(
       (config): config is ZoweDatasetConfigModel =>
@@ -365,14 +357,15 @@ export class CopybookDownloadService {
       const promises: Promise<boolean>[] = [];
       for (const profile of procGroupZoweProfiles) {
         if (!availableProfiles.includes(profile)) {
+          promises.push(Promise.resolve(true));
           const msg = `${PROVIDE_PROFILE_MSG_PROC_GRUOPS} Provided invalid profile name: ${profile}`;
           vscode.window.showErrorMessage(msg);
+        } else {
+          promises.push(DownloadUtil.isProfileLocked(profile));
+          promises.push(
+            DownloadUtil.checkForInvalidCredProfile(profile, this.explorerApi),
+          );
         }
-
-        promises.push(DownloadUtil.isProfileLocked(profile));
-        promises.push(
-          DownloadUtil.checkForInvalidCredProfile(profile, this.explorerApi),
-        );
       }
       const checks = await Promise.all(promises);
       return checks.every((v) => v === false);
