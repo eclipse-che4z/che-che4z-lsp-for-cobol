@@ -63,7 +63,7 @@ describe("CopybooksPathGenerator tests", () => {
         environment: "ENV",
         system: "SYSTEM",
         subsystem: "SUBSYSTEM",
-        profile: "instance.connection",
+        profile: "instance@connection",
         stage: "1",
         type: "COPY",
       },
