@@ -97,7 +97,10 @@ suite(
       await helper.sleep(1000);
       await editor.edit((edit) => edit.replace(editor.selection, "str"));
       await helper.waitFor(
-        () => editor.document.getText().includes("ADD 1 TO str"),
+        () =>
+          editor.document
+            .getText()
+            .includes("ADD 1 TO str ON OVERFLOW error-catch-logic"),
         3000,
       );
       const text = editor.document.getText();
