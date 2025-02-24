@@ -104,7 +104,7 @@ suite(
       const acceptedLine = text.split("\n")[39];
       assert.strictEqual(
         acceptedLine.trim(),
-        "ADD 1 TO str",
+        "ADD CORR 1 TO str",
         "Checks auto complete functionality, also with navigation by snippets",
       );
     });
