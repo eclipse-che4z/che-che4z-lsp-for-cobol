@@ -85,7 +85,7 @@ suite(
         3000,
       );
       await helper.triggerCompletionsAndWaitForResults();
-      await helper.executeCommandMultipleTimes("selectNextSuggestion", 5);
+      await helper.executeCommandMultipleTimes("selectNextSuggestion", 7);
       await helper.sleep(500);
       await vscode.commands.executeCommand("acceptSelectedSuggestion");
       await helper.waitFor(
