@@ -23,7 +23,7 @@ import { CopybookName } from "../CopybookDownloadService";
 import { SettingsService } from "../../Settings";
 import { hasMember } from "../../util/Utils";
 import { registerExceptionEvent } from "../../reporter";
-import { loadProcessorGroupCopybookPaths } from "../../ProcessorGroups";
+import { loadProcessorGroupCopybookPathsConfig } from "../../ProcessorGroups";
 
 /**
  * Utility class for downloading copybooks
@@ -162,12 +162,13 @@ export class DownloadUtil {
     for (const dialect of dialects) {
       const dsnPath = SettingsService.getDsnPath(documentUri, dialect);
       const ussPath = SettingsService.getUssPath(documentUri, dialect);
-      const procGroupPath = await loadProcessorGroupCopybookPaths(
-        documentUri,
+      const procGroupPath = await loadProcessorGroupCopybookPathsConfig(
+        { scopeUri: documentUri },
+        [],
         dialect,
       );
       if (
-        procGroupPath ||
+        (procGroupPath && procGroupPath.length > 0) ||
         (dsnPath?.length ?? 0) > 0 ||
         (ussPath?.length ?? 0) > 0
       ) {

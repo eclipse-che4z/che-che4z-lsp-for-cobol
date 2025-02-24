@@ -522,3 +522,34 @@ describe("Tests copybook download service", () => {
     );
   });
 });
+
+describe("Tests copybook download util", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it("checks proccesor groups configs resolves prerequiste", async () => {
+    SettingsService.getDsnPath = jest.fn().mockReturnValue([]);
+    SettingsService.getUssPath = jest.fn().mockReturnValue([]);
+    const spyConfig = jest.spyOn(
+      ProcessorGroups,
+      "loadProcessorGroupCopybookPathsConfig",
+    );
+    spyConfig.mockResolvedValue([
+      "/libs",
+      { dataset: "procGroupDataset", profile: "procGroupProfile" },
+      { ussFile: "ussFile", profile: "profile" },
+    ]);
+    expect(
+      await DownloadUtil.areCopybookDownloadConfigurationsPresent(
+        "documentUri",
+        [
+          {
+            name: "copybook",
+            dialect: "COBOL",
+          },
+        ],
+      ),
+    ).toBeTruthy();
+  });
+});

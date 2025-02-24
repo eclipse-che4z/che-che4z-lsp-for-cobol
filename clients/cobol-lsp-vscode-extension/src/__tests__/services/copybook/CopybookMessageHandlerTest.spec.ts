@@ -18,6 +18,8 @@ import { Utils } from "../../../services/util/Utils";
 import * as fs from "fs";
 import { CopybookDownloadService } from "../../../services/copybook/CopybookDownloadService";
 import path = require("path");
+import * as ProcessorGroups from "../../../services/ProcessorGroups";
+import * as fsUtils from "../../../services/util/FSUtils";
 
 vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
   get: jest.fn().mockReturnValue("testProfile"),
@@ -320,5 +322,93 @@ describe("Test the copybook message handler", () => {
       "dialectType",
     );
     expect(unreachable).not.toHaveBeenCalled();
+  });
+
+  it("checks downloaded copybooks are resolved wrt processor group definitions", async () => {
+    SettingsService.getCopybookExtension = jest
+      .fn()
+      .mockReturnValue(Promise.resolve([".cpy"]));
+    SettingsService.getCopybookLocalPath = jest
+      .fn()
+      .mockReturnValue(Promise.resolve([]));
+    SettingsService.getDsnPath = jest
+      .fn()
+      .mockReturnValue(["/configured/path"]);
+
+    const spyConfig = jest.spyOn(
+      ProcessorGroups,
+      "loadProcessorGroupCopybookPathsConfig",
+    );
+    spyConfig.mockResolvedValue([
+      "/libs",
+      { dataset: "procGroupDataset", profile: "procGroupProfile" },
+      { ussFile: "ussFile", profile: "profile" },
+    ]);
+
+    expect(
+      await downloaderNoApi.resolveCopybookHandler(
+        "cobolFileName",
+        "copybookName",
+        "dialectType",
+      ),
+    ).toBe(
+      "file://" +
+        path.resolve(
+          "/storagePath",
+          "zowe",
+          "copybooks",
+          "procGroupProfile",
+          "procGroupDataset",
+          "copybookName",
+        ),
+    );
+  });
+  it("checks downloaded copybooks searched wrt processor group definitions respecting order in configurations", async () => {
+    SettingsService.getCopybookExtension = jest
+      .fn()
+      .mockReturnValue(Promise.resolve([".cpy"]));
+    SettingsService.getCopybookLocalPath = jest
+      .fn()
+      .mockReturnValue(Promise.resolve([]));
+    SettingsService.getDsnPath = jest
+      .fn()
+      .mockReturnValue(["/configured/path"]);
+
+    const searchSpy = jest.spyOn(fsUtils, "searchCopybookInExtensionFolder");
+    searchSpy.mockReturnValue(undefined);
+
+    const spyConfig = jest.spyOn(
+      ProcessorGroups,
+      "loadProcessorGroupCopybookPathsConfig",
+    );
+    spyConfig.mockResolvedValue([
+      "/libs",
+      { dataset: "procGroupDataset", profile: "procGroupProfile" },
+      {
+        environment: "environment",
+        system: "system",
+        subsystem: "subsystem",
+        stage: "1",
+        type: "copy",
+      },
+      { ussFile: "ussFile", profile: "profile" },
+    ]);
+
+    await downloaderNoApi.resolveCopybookHandler(
+      "cobolFileName",
+      "copybookName",
+      "dialectType",
+    );
+
+    expect(searchSpy).toHaveBeenCalledWith(
+      "copybookName",
+      [
+        "/storagePath/zowe/copybooks/procGroupProfile/procGroupDataset",
+        "/storagePath/e4e/copybooks/./environment/1/system/subsystem/copy/MAP",
+        "/storagePath/zowe/copybooks/profile/ussFile",
+      ],
+      [""],
+      "/storagePath",
+    );
   });
 });
