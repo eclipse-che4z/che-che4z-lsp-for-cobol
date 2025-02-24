@@ -1180,10 +1180,35 @@
     "body": ["GO ${1:procName} DEPENDING ${2:id}"],
     "description": "GO procName DEPENDING id"
   },
+  "GREATER": {
+    "prefix": "GREATER",
+    "body": ["IF ${1:VAR1} GREATER ${2:VAR2} THEN", "\t${3:ifTrue}", "END-IF.", "$0"],
+    "description": "GREATER is a general comparison operator - treated like the algebraic \">\" operator. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
+  "GROUP-USAGE": {
+    "prefix": "GROUP-USAGE",
+    "body": ["01 ${1:NAT-GROUP-1} GROUP-USAGE NATIONAL.", "\t02 ${2:GROUP-1}.", "\t\t04 ${3:groupVar} PIC ${5:99}."],
+    "description": "A group item that is described with an explicit or implicit `GROUP-USAGE NATIONAL` clause is a national group item. Note that NATIONAL data items are represented as `UTF-16` characters.  https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
+  "HIGH-VALUE": {
+    "prefix": "HIGH-VALUES",
+    "body": ["READ ${1:IN-FILE} AT ${2|END,BEGINNING|} MOVE ${3|HIGH-VALUE,HIGH-VALUES|} TO ${4:INPUT-REC}."],
+    "description": "HIGH-VALUE equates to binary (Hex) `FF` - the highest EBCDIC collating sequence value. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
   "I-O": {
     "prefix": "I-O",
-    "body": ["I-O ${1:fileName}"],
-    "description": "I-O fileName"
+    "body": ["OPEN I-O ${1:fileName}"],
+    "description": "Use the I-O (OPEN) file mode to rewrite QSAM and VSAM file records in place. https://www.ibm.com/docs/en/cobol-aix/5.1?topic=files-opening-file"
+  },
+  "I-O-CONTROL": {
+    "prefix": "I-O-CONTROL",
+    "body": ["I-O-CONTROL."],
+    "description": "The I-O-CONTROL paragraph defines specific data input-output protocols that are applicable for certain files. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
+  "ID DIVISION": {
+    "prefix": "ID DIVISION",
+    "body": ["ID DIVISION.", "PROGRAM-ID. ${1:${TM_FILENAME/(.*)\\..+$/${1:/UPCASE}/}}.", "DATE-COMPILED. $CURRENT_YEAR/$CURRENT_MONTH/$CURRENT_DATE.", "ENVIRONMENT DIVISION.", "$0"],
+    "description": "The ID DIVISION contains paragraphs definining the: PROGRAM-ID, AUTHOR, INSTALLATION, DATE-WRITTEN, and SECURITY paragraphs. Note that ID is an abbreviation of IDENTIFICATION. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
   },
   "INPUT": {
     "prefix": "INPUT",
@@ -1218,18 +1243,58 @@
   },
   "IF": {
     "prefix": "IF",
-    "body": ["IF ${1:CONDITION}", "   $0", "END-IF"],
+    "body": ["IF ${1:CONDITION}", "\t${2:ifTrue}", "END-IF"],
     "description": "IF"
   },
   "IF ELSE": {
     "prefix": "IF",
-    "body": ["IF ${1:CONDITION}", "   $0", "ELSE", "   ", "END-IF"],
+    "body": ["IF ${1:CONDITION}", "\t${2:ifTrue}", "ELSE", "\t${4:ifFalse}", "END-IF"],
     "description": "IF ELSE"
+  },
+  "IN #1": {
+    "prefix": "IN",
+    "body": ["UNSTRING ${2:CUST-TRANS} DELIMITED BY \"${3:|}\"", "\tINTO ${4:CUST-REC-IN}", "COUNT IN ${1:CTR-1}", "END UNSTRING."],
+    "description": "`COUNT IN` references an integer field that contains the number of characters placed in the current receiving field. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
+  "IN #2": {
+    "prefix": "IN",
+    "body": ["UNSTRING ${2:CUST-FIELD-IN} DELIMITED BY ALL \"${3:|}\" OR \"${4:/}\"", "\tINTO ${5:CUST-NAME} COUNT IN ${1:CTR-1} DELIMITER IN ${6:DLM-CHAR}", "END-UNSTRING.", "$0"],
+    "description": "`DELIMITER IN` references a PIC X field that contains the DELIMITER character placed found in the UNSTRING field. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
+  "IN #3": {
+    "prefix": "IN #3",
+    "body": ["UNSTRING ${2:CUST-FIELD-IN} DELIMITED BY ALL  \"|\" OR \"/\"", "\t${3:INTO CUST-NAME} COUNT IN ${1:CTR-1}", "\t${4:CUST-ADDR} DELIMITER IN ${5:DLM-CHR}", "TALLYING IN ${6:TOT-FIELDS-FOUND}", "END-UNSTRING."],
+    "description": "`TALLYING IN` references a numeric field that contains a total of the number of fields that are acted on during the UNSTRING. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
+  "INDEX": {
+    "prefix": "INDEX",
+    "body": ["77 ${1:TBL-IDX} USAGE IS INDEX."],
+    "description": "`USAGE IS INDEX` creates an index data item, which can used as an index variable into any COBOL internal table (OCCURS clause). https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
+  "OCCURS x INDEXED BY": {
+    "prefix": "INDEXED",
+    "body": ["01 ${3:GROUP-FIELD}", "\t05 ${4:TABLE-ITEM} PIC X(1)", "\t\tOCCURS ${1:100} INDEXED BT ${2:IDX-BTYE}"],
+    "description": "`INDEXED BY` defines an internal COBOL index data item and associates it with a given COBOL table. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
+  "ORGANIZATION IS INDEXED": {
+    "prefix": "INDEXED",
+    "body": ["SELECT ${1:VSAM-FILE} ASSIGN TO ${2:VSMKSDS}", "\tORGANIZATION IS INDEXED", "\tACCESS IS DYNAMIC", "\tRECORD KEY IS ${3:VSAM-RECORD-KEY}"],
+    "description": "`IS INDEXED` defines a file entry as a VSAM KSDS (Indexed) Data Set in the `ENVIRONMENT DIVISION`'S `SELECT`/`ASSIGN` paragraph. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
   },
   "INTO": {
     "prefix": "INTO",
     "body": ["INTO ${1:item}"],
     "description": "INSPECT CONVERTING"
+  },
+  "READ INTO": {
+    "prefix": "INTO",
+    "body": ["READ ${1:MY-CUSTOMER-FILE} INTO ${2:WE-CUSTOMER-REC}", "END-READ"],
+    "description": "`READ INTO` reads then copies records from FD buffers into `WORKING-STORAGE` data items. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
+  "RETURN INTO": {
+    "prefix": "RETURN INTO",
+    "body": ["RETURN ${1:fileName} INTO TAB-ENTRY(${2:TAB-INDX}", "AT END MOVE \"${3:Y}\" TO ${4:WS-EOF-SORT}", "END-RETURN"],
+    "description": "`RETURN INTO` accesses a sorted file record and copies it into a `WORKING-STORAGE` data item. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
   },
   "INSPECT TALLYING": {
     "prefix": "INSPECT",
@@ -1244,10 +1309,35 @@
     "body": ["INVALID ${1:impStat}"],
     "description": "INVALID"
   },
+  "INVALID KEY (VSAM)": {
+    "prefix": "INVALID KEY",
+    "body": ["${2|READ,START,WRITE,REWRITE,DELETE|} ${3:VSAM-FILE}", "\tINVALID KEY GO TO ${1:999-VSAM-FILE-ERROR}", "END-READ"],
+    "description": "`INVALID KEY` can be used in `VSAM KSDS` and `RRDS` files for: `READ`, `START`, `WRITE`, `REWRITE`, and `DELETE` statements. The `INVALID KEY` imperative statement is given control if an I/O error occurs due to a defective `VSAM` file index key. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
+  "INVALID KEY (QSAM)": {
+    "prefix": "INVALID KEY",
+    "body": ["WRITE ${2:QSAM-FILE}", "\tINVALID KEY GO TO ${1:999-DISK-FULL-ERROR}", "END-WRITE."],
+    "description": "For `QSAM` files, the `INVALID KEY` phrase can be used in `WRITE` requests. It is executed if you attempt to write to a I/O disk (VOL=SER) that is full. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
   "INVOKE": {
     "prefix": "INVOKE",
     "body": ["INVOKE ${1:id|CLASS|SELF|SUPER} ${2:LIT|ID|NEW}"],
     "description": "INVOKE"
+  },
+  "ACCESS IS": {
+    "prefix": "IS",
+    "body": ["ACCESS IS ${1|SEQUENTIAL,RANDOM,DYNAMIC|}"],
+    "description": "File specifics with `IS`. Note that `IS` is optional. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
+  "USAGE IS": {
+    "prefix": "USAGE IS",
+    "body": ["77 ${2:VAR1} PIC ${3:X} USAGE IS ${1|DISPLAY,ALPHANUMERIC,SEPARATE,INDEX|}"],
+    "description": "Variable declarations with `IS`. Note that `IS` is optional. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
+  "IF x IS": {
+    "prefix": "IF x IS",
+    "body": ["IF ${2:VAR1} IS ${1|NUMERIC,ALPHABETIC,ALPHABETIC-LOWER,ALPHABETIC-UPPER,DBCS,KANJI,POSITIVE,NEGATIVE,ZERO|} THEN"],
+    "description": "Class conditional tests with `IS`. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
   },
   "JSON GENERATE FROM": {
     "prefix": "JSON GENERATE FROM",
