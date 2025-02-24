@@ -404,36 +404,121 @@ describe("Tests copybook download service", () => {
     resolver.clearCache();
     expect(clearConfigs).toHaveBeenCalled();
   });
-  // it("checks processor group locations performed when provided", async () => {
-  //   const spyConfig = jest.spyOn(
-  //     ProcessorGroups,
-  //     "loadProcessorGroupCopybookPathsConfig",
-  //   );
-  //   spyConfig.mockResolvedValue([
-  //     "/libs",
-  //     { dataset: "dataset", profile: "profile" },
-  //   ]);
-  //   DownloadUtil.checkForInvalidCredProfile = jest.fn().mockReturnValue(false);
 
-  //   vscode.window.showErrorMessage = jest.fn();
-  //   const downloadService = new CopybookDownloadService(
-  //     "storage-path",
-  //     zoweExplorerErrorMock,
-  //   );
-  //   let downloadCopybookDsn =
-  //     downloadService["dsnDownloader"]!.downloadCopybook;
-  //   downloadCopybookDsn = jest.fn().mockImplementation();
-  //   await downloadService.downloadCopybook(
-  //     { name: "copybook-name", dialect: DEFAULT_DIALECT },
-  //     "document-uri",
-  //   );
+  it("checks provided settings performed when processor groups settings not provided", async () => {
+    const spyConfig = jest.spyOn(
+      ProcessorGroups,
+      "loadProcessorGroupCopybookPathsConfig",
+    );
+    spyConfig.mockResolvedValue([]);
+    SettingsService.getDsnPath = jest.fn().mockReturnValue(["dsn"]);
 
-  //   // expect(downloadCopybookDsn).toHaveBeenCalledWith(
-  //   //   [{ name: "copybook-name", dialect: DEFAULT_DIALECT }, "document-uri"],
-  //   //   { paths: "dataset", profile: "profile" },
-  //   // );
-  //   expect(downloadCopybookDsn).toHaveBeenCalled();
+    const downloader = new CopybookDownloadService(
+      "storage-path",
+      zoweExplorerMock,
+      undefined,
+    );
+    downloader["dsnDownloader"]!.downloadCopybook = jest
+      .fn()
+      .mockReturnValue(true);
+    downloader["ussDownloader"]!.downloadCopybook = jest.fn();
 
-  //   spyConfig.mockResolvedValue([]);
-  // });
+    await downloader.downloadCopybook(
+      { name: "copybook", dialect: "COBOL" },
+      "document-uri",
+    );
+    expect(downloader["dsnDownloader"]!.downloadCopybook).toHaveBeenCalledWith(
+      { name: "copybook", dialect: "COBOL" },
+      "document-uri",
+      "dsn",
+      undefined,
+    );
+  });
+
+  it("checks processor group locations performed when provided", async () => {
+    const spyConfig = jest.spyOn(
+      ProcessorGroups,
+      "loadProcessorGroupCopybookPathsConfig",
+    );
+    spyConfig.mockResolvedValue([
+      "/libs",
+      { dataset: "procGroupDataset", profile: "procGroupProfile" },
+      { ussFile: "ussFile", profile: "profile" },
+    ]);
+
+    const downloader = new CopybookDownloadService(
+      "storage-path",
+      zoweExplorerMock,
+      undefined,
+    );
+    downloader["dsnDownloader"]!.downloadCopybook = jest
+      .fn()
+      .mockReturnValue(true);
+
+    await downloader.downloadCopybook(
+      { name: "copybook", dialect: "COBOL" },
+      "document-uri",
+    );
+    expect(downloader["dsnDownloader"]!.downloadCopybook).toHaveBeenCalledWith(
+      { name: "copybook", dialect: "COBOL" },
+      "document-uri",
+      "procGroupDataset",
+      "procGroupProfile",
+    );
+  });
+  it("checks endevor locations have the highest priority when processor group configs have e4e location and copybook found", async () => {
+    const spyConfig = jest.spyOn(
+      ProcessorGroups,
+      "loadProcessorGroupCopybookPathsConfig",
+    );
+    spyConfig.mockResolvedValue([
+      "/libs",
+      { dataset: "procGroupDataset", profile: "procGroupProfile" },
+      { ussFile: "procGroupUssFile" },
+      {
+        environment: "environment",
+        system: "system",
+        subsystem: "subsystem",
+        stage: "1",
+        type: "copy",
+      },
+    ]);
+
+    const downloader = new CopybookDownloadService(
+      "storage-path",
+      zoweExplorerMock,
+      e4eMock,
+    );
+    downloader["handleAsEndevorElement"] = jest.fn().mockReturnValue(false);
+    downloader["e4eDownloader"]!.downloadElementE4E = jest
+      .fn()
+      .mockReturnValue(true);
+    downloader["dsnDownloader"]!.downloadCopybook = jest.fn();
+    downloader["ussDownloader"]!.downloadCopybook = jest.fn();
+
+    await downloader.downloadCopybook(
+      { name: "copybook", dialect: "COBOL" },
+      "document-uri",
+    );
+    expect(
+      downloader["e4eDownloader"]!.downloadElementE4E,
+    ).toHaveBeenCalledWith(
+      { profile: "profile", instance: "instance" },
+      {
+        element: "copybook",
+        environment: "environment",
+        system: "system",
+        subsystem: "subsystem",
+        stage: "1",
+        type: "copy",
+        use_map: true,
+      },
+    );
+    expect(downloader["dsnDownloader"]!.downloadCopybook).toHaveBeenCalledTimes(
+      0,
+    );
+    expect(downloader["ussDownloader"]!.downloadCopybook).toHaveBeenCalledTimes(
+      0,
+    );
+  });
 });
