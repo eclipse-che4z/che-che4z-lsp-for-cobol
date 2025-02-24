@@ -138,8 +138,8 @@ export class CopybookURI {
       if (ENVIRONMENT in config) {
         const profile = config.profile
           ? {
-              profile: `internal.${config.profile.split(".")[1]}`,
-              instance: config.profile.split(".")[0],
+              profile: `internal.${config.profile.split("@")[1]}`,
+              instance: config.profile.split("@")[0],
             }
           : {
               profile: "",

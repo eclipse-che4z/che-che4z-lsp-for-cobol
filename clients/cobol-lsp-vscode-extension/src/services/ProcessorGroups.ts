@@ -345,8 +345,8 @@ export async function prepareProcessorGroupConfigPathsForEndevor(
       profile = { profile: undefined, instance: undefined };
     } else {
       profile = {
-        profile: config.profile.split(".")[1],
-        instance: config.profile.split(".")[0],
+        profile: config.profile.split("@")[1],
+        instance: config.profile.split("@")[0],
       };
     }
     const resolvedProfile = await e4eDownloader.getProfileInfo(profile);

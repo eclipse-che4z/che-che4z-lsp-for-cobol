@@ -344,6 +344,10 @@ export class CopybookDownloadService {
       )
       .map((dsn) => dsn.profile)
       .filter((x) => typeof x == "string");
+    const endevorProfiles = configs.filter(
+      (config): config is EndevorConfigModel =>
+        typeof config != "string" && ENVIRONMENT in config,
+    );
 
     const profile = ProfileUtils.getProfileNameForCopybook(
       documentUri,
@@ -370,6 +374,8 @@ export class CopybookDownloadService {
       const checks = await Promise.all(promises);
       return checks.every((v) => v === false);
     }
+    if (Array.isArray(endevorProfiles) && endevorProfiles.length > 0)
+      return true;
 
     if (!profile || !availableProfiles.includes(profile)) {
       const message = profile
