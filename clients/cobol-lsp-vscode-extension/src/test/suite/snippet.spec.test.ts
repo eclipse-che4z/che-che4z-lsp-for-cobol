@@ -107,7 +107,7 @@ suite(
       const acceptedLine = text.split("\n")[39];
       assert.strictEqual(
         acceptedLine.trim(),
-        "ADD CORR 1 TO str",
+        "ADD 1 TO str ON OVERFLOW error-catch-logic",
         "Checks auto complete functionality, also with navigation by snippets",
       );
     });
