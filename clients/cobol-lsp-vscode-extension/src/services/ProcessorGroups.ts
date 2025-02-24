@@ -356,9 +356,7 @@ export async function prepareProcessorGroupConfigPathsForEndevor(
     element.use_map = element.use_map ? element.use_map : true;
     element.element = copybook.name;
 
-    if (resolvedProfile && !(resolvedProfile instanceof Error)) {
-      paths.push({ element: element, profile: resolvedProfile });
-    }
+    paths.push({ element: element, profile: resolvedProfile });
   }
   return paths;
 }
