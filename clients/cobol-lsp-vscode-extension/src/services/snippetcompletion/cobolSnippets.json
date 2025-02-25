@@ -1516,35 +1516,50 @@
     "body": ["MOVE CORR ${1:id}"],
     "description": "MERGE USING"
   },
-  "MOVE CORR": {
-    "prefix": "MOVE CORR",
-    "body": ["MOVE ${1|CORR,CORRESPONDING|} ${2:group-1} TO ${3:group-2"],
+  "RECORDING MODE": {
+    "prefix": "RECORDING MODE",
+    "body": ["FILE SECTION.", "FD ${2:FILENAME}", "LABEL RECORDS ARE STANDARD", "BLOCK CONTAINS 0", "RECORDING MODE IS ${1|F,V,U,S|}", "\tRECORD CONTAINS ${2:numLiteral} CHARACTERS"],
+    "description": "RECORDING MODE specifies the physical format of records in a QSAM file: F (fixed), V (variable), U (fixed or variable), S (spanned) https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
+  "DEBUGGING MODE": {
+    "prefix": "DEBUGGING MODE",
+    "body": ["SOURCE-COMPUTER WITH DEBUGGING MODE."],
+    "description": "`WITH DEBUGGING MODE` activates a compile-switch for debugging lines in the program. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
+  "MORE-LABELS": {
+    "prefix": "MORE-LABELS",
+    "body": ["GO TO MORE-LABELS"],
+    "description": "`GO TO MORE-LABELS` statement is specified only in a `COBOL LABEL DECLARATIVE` statement. https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdf"
+  },
+  "MOVE CORRESPONDING": {
+    "prefix": "MOVE CORRESPONDING",
+    "body": ["MOVE ${1|CORR,CORRESPONDING|} ${2:group-1} TO ${3:group-2}"],
     "description": "After the above MOVE CORRESPONDING statement, all values in like-named-variables will be copied from GROUP-1 to GROUP-2. https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdf"
   },
   "MOVE": {
     "prefix": "MOVE",
-    "body": ["MOVE ${1:id}"],
-    "description": "MOVE"
+    "body": ["MOVE ${1:VAR1} TO ${2:VAR2}"],
+    "description": "`MOVE` copies data from one variable to one or more other variables. Note that storage data and Figurative Constants (`SPACES`, `HIGH-VALUES`, `LOW-VALUES`, etc.) can be moved into variables. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
   },
   "MOVE TO": {
     "prefix": "MOVE TO",
     "body": ["MOVE ${1:id} TO ${2:id}"],
     "description": "MOVE"
   },
-  "MULTIPLY": {
-    "prefix": "MULTIPLY",
-    "body": ["MULTIPLY ${1:A} BY ${2:B} GIVING ${3:C}"],
-    "description": "MULTIPLY A BY Y GIVING Z"
-  },
   "MULTIPLY BY": {
     "prefix": "MULTIPLY BY",
     "body": ["MULTIPLY ${1:id} BY ${2:id}"],
     "description": "MULTIPLY"
   },
-  "MULTIPLY BY GIVING": {
-    "prefix": "MULTIPLY BY GIVING",
-    "body": ["MULTIPLY ${1:id} BY ${2:id} GIVING ${3:id}"],
-    "description": "MULTIPLY BY GIVING"
+  "MULTIPLY a BY b GIVING c": {
+    "prefix": "MULTIPLY",
+    "body": ["MULTIPLY ${1:A} BY ${2:B} GIVING ${3:C}"],
+    "description": "MULTIPLY a BY b GIVING c"
+  },
+  "MULTIPLY a BY b GIVING c ON SIZE ERROR": {
+    "prefix": "MULTIPLY",
+    "body": ["MULTIPLY ${1:A} BY ${2:B} GIVING ${3:C}", "ON SIZE ERROR ${4:imperative_statement}", "END-MULTIPLY."],
+    "description": "If ON SIZE ERROR is specified and a size error condition occurs (typically truncation in the product) the error result is not placed in the product and the imperative statement in the ON SIZE ERROR phrase is executed. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
   },
   "NAME IS": {
     "prefix": "NAME IS",
@@ -1561,10 +1576,74 @@
     "body": ["NAMESPACE ${1:item}"],
     "description": "NAMESPACE-prefix ITEM"
   },
+  "NATIONAL-EDITED #1": {
+    "prefix": "NATIONAL-EDITED",
+    "body": ["WORKING-STORAGE SECTION.", "01 ${2:ORIG-CUSTOMER-NAME} GROUP-USAGE ${1|NATIONAL,NATIONAL-EDITED|}", "\t05 ${3:SURNAME} PIC N(${4:17})."],
+    "description": "`NATIONAL`/`NATIONAL-EDITED` data items are variables whose content is represented in UTF-16 (often referred to as Unicode). https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
+  "NATIONAL-EDITED #2": {
+    "prefix": "NATIONAL-EDITED",
+    "body": ["PROCEDURE DIVISION.", "\tINITIALIZE ${2:VAR1} REPLACING ${1|NATIONAL,NATIONAL-EDITED|} DATA BY ${3:VAR2}"],
+    "description": "`NATIONAL`/`NATIONAL-EDITED` data (or data items within a group field) are replaced by the same-named variables in VAR-2 in the given example. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
+  "NATIVE": {
+    "prefix": "NATIVE",
+    "body": ["77 ${1:VAR-BIN} PIC S9(4) ${2|COMP,COMPUTATIONAL|} USAGE NATIVE."],
+    "description": "`NATIVE` is syntax checked, but has no effect on program execution. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
+  "NEXT SENTENCE": {
+    "prefix": "NEXT SENTENCE",
+    "body": ["IF ${1:statement}", "\t$0", "ELSE", "\tNEXT SENTENCE", "END-IF."],
+    "description": "`NEXT SENTENCE` transfers control to the next sequential instruction following the closest period (separator). https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
+  "NEXT RECORD": {
+    "prefix": "NEXT RECORD",
+    "body": ["READ ${1:CUSTOEMR-FILE} NEXT RECORD INTO ${2:WS-CUSTOMER-REC}", "\tAT END MOVE \"Y\" TO ${3:WS-NO-MORE-CUST-RECS}", "END-IF."],
+    "description": "`NEXT RECORD` is a phrase that reads the next record from an input file. `NEXT` is optional for QSAM files, but you must specify `NEXT RECORD` to retrieve records sequentially from a VSAM file. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
+  "NO ADVANCING": {
+    "prefix": "NO ADVANCING",
+    "body": ["DISPLAY \"${1:ERROR IN OPENING FILE}\" WITH NO ADVANCING."],
+    "description": "When used, the positioning of the output device will not be changed. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
+  "NO REWIND": {
+    "prefix": "NO REWIND",
+    "body": ["${1|OPEN INPUT,CLOSE|} ${2:filename} WITH NO REWIND."],
+    "description": "`NO REWIND` applies only to `LINE-SEQUENTIAL` and `QSAM` tape files.  Specifically, with `NO REWIND`, `OPEN` filename must be positioned at its beginning record. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
+  "IF var NOT x": {
+    "prefix": "NOT",
+    "body": [
+      "IF ${1:variable-1} IS NOT ${2:statement} THEN",
+      "\t$0",
+      "END-IF."
+    ],
+    "description": "NOT is a true/false test - testing true if the comparison fails. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
+  "NOT ON EXCEPTION": {
+    "prefix": "NOT ON EXCEPTION",
+    "body": ["SUBTRACT ${2:VAR-2} FROM ${3:VAR-1} GIVING ${4:VAR-3}", "NOT ON EXCEPTION ${1:MOVE ZEROS TO VAR-4}"],
+    "description": "NOT is a true/false test - testing true if the comparison fails. In the snippet, if there is no numeric exception in the subtract, zeros are moved to VAR-4. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
   "NOT INVALID": {
     "prefix": "NAMESPACE-prefix",
     "body": ["NOT INVALID ${1:impStat}"],
     "description": "NOT INVALID ITEM"
+  },
+  "NULL": {
+    "prefix": "NULL",
+    "body": ["IF ${2:PTR-VAR} IS ${1|NULL,NULLS|}", "\tSET ${2:PTR-VAR} TO ${1|NULL,NULLS|}", "END-IF."],
+    "description": "`NULL` which has the value of zero, is a data type used with datatypes of: `POINTER`, `PROCEDURE-POINTER`, `FUNCTION-POINTER`, `OBJECT REFERENCE`, or the `ADDRESS OF` a special register. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
+  "NUMERIC": {
+    "prefix": "NUMERIC",
+    "body": ["IF ${1:VAR-COMP-3} IS NUMERIC", "\t$0", "END-IF."],
+    "description": "`IF NUMERIC` is a conditional class test which can be applied to variable types: `DISPLAY`, `NATIONAL`, `COMPUTATIONAL-3`, or `PACKED-DECIMAL`. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
+  "NUMERIC-EDITED": {
+    "prefix": "NUMERIC-EDITED",
+    "body": ["INITIALIZE ${1:VAR1} REPLACING NUMERIC-EDITED DATA BY ${2:literal or variable}", "END-INITIALIZE."],
+    "description": "`NUMERIC-EDITED` => Numeric data items with insertion characters. https://www.ibm.com/docs/en/cobol-zos/6.4?topic=statements-initialize-statement"
   },
   "OPEN EXTEND": {
     "prefix": "OPEN EXTEND",
