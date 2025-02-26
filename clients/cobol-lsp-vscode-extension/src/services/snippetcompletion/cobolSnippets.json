@@ -1645,6 +1645,71 @@
     "body": ["INITIALIZE ${1:VAR1} REPLACING NUMERIC-EDITED DATA BY ${2:literal or variable}", "END-INITIALIZE."],
     "description": "`NUMERIC-EDITED` => Numeric data items with insertion characters. https://www.ibm.com/docs/en/cobol-zos/6.4?topic=statements-initialize-statement"
   },
+  "OBJECT": {
+    "prefix": "OBJECT",
+    "body": ["IDENTIFICATION DIVISION.", "OBJECT.", "DATA DIVISION."],
+    "description": "`OBJECT` (after `IDENTIFICATION DIVISION`) introduces an object definition, part of a class definition that defined instance objects. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
+  "OBJECT-COMPUTER": {
+    "prefix": "OBJECT-COMPUTER",
+    "body": ["ENVIRONMENT DIVISION.", "OBJECT-COMPUTER ${1:COMPUTER-NAME}."],
+    "description": "The `OBJECT-COMPUTER` paragraph details the mainframe for which the compiled object program is run on. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
+  "OBJECT-REFERENCE": {
+    "prefix": "OBJECT-REFERENCE",
+    "body": ["77 ${1:VAR-OBJ-REF} PIC X(36) USAGE OBJECT-REFERENCE."],
+    "description": "An `OBJECT-REFERENCE` data item is a 4 or 8 byte (depending on your z/OS system) that references valid objects. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
+  "OCCURS": {
+    "prefix": "OCCURS",
+    "body": ["01 ${2:TABLE-GROUP-NAME}.", "\t05 ${3:TABLE-ROW-NAME} OCCURS ${1:5} TIMES."],
+    "description": "`OCCURS` is used to code a table by defining a number (N) of repeated subordinate rows. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
+  "OCCURS DEPENDING ON": {
+    "prefix": "OCCURS DEPENDING ON",
+    "body": ["01 ${4:TABLE-GROUP-NAME}.", "\t05 ${5:TABLE-ROW-SIZE} PIC 9(4).", "\t05 ${1:FIELD-2} OCCURS ${2:1} TO ${3:5} TIMES", "\t\tDEPENDING ON ${5:TABLE-ROW-SIZE} ${6:arrayEntryCountDefinition}"],
+    "description": "`OCCURS DEPENDING ON` is used to code a table where you do not know how many rows are in the table. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
+  "MOVE x OF y TO": {
+    "prefix": "OF",
+    "body": ["MOVE ${1:CUSTOMER-NO} OF ${2:CUST-IN} TO ${3:CUSTOMER-NO} OF ${4:CUST-OUT}."],
+    "description": "OF (qualification) allows you to uniquely specify a variable by referencing higher-level variable-names in a struction. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
+  "SET ADDRESS OF": {
+    "prefix": "OF",
+    "body": ["SET ADDRESS OF ${1:VAR-POINTER-1} TO ${2:VAR-POINTER-2}."],
+    "description": "`ADDRESS OF` is a COBOL special register that can be used to reference the address of a data item in the `LINKAGE SECTION`, `LOCAL-STORAGE SECTION`, or `WORKING-STORAGE SECTION`. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
+  "INLINE OFF": {
+    "prefix": "OFF",
+    "body": ["INLINE OFF"],
+    "description": "This COBOL directive OFF prevents the compiler from inlining procedures referenced by PERFORM statements. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
+  "ALL31 OFF": {
+    "prefix": "OFF",
+    "body": ["ALL31(OFF)"],
+    "description": "Another COBOL directive - specific to external files and DFSMS buffer allocations. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
+  "RECORDS ARE OMITTED": {
+    "prefix": "OMITTED",
+    "body": ["SELECT ${1:TAPE-FILE} ASSIGN TO ${2:TAPEFLXT}", "LABEL RECORDS ARE OMITTED"],
+    "description": "Used for Tape files without z/OS data set LABELS. Note that the same OMITTED phrase can be used in SORT/MERGE processing. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
+  "DEPENDING ON": {
+    "prefix": "ON",
+    "body": ["01 ${2:DATA-TAB}.", "\t05 ${3:MSG} OCCURS ${4:0} TO ${5:5} DEPENDING ON ${1:TBL-ROW-SIZE}.", "\t\t10 ${6:MSG-VERSION} USAGE COMP-1.", "\t\t10 ${7:USER-ID-IN} PIC 9999 USAGE DISPLAY.", "\t\t10 ${8:TBL-ROW-SIZE} PIC 9(4) COMP.", "\t\t10 ${9:MSG-TXT} PIC X(32)."],
+    "description": "`ON` is used as part of a dynamic table declaration. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pd"
+  },
+  "SET ptr ON": {
+    "prefix": "ON",
+    "body": ["SET ${1:WS-FILE-PTR} ON."],
+    "description": "ON is used to set a pointer or 88-conditional to True. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pd"
+  },
+  "ON SIZE ERROR": {
+    "prefix": "ON SIZE ERROR",
+    "body": ["MULTIPLY ${2:VAR-1} BY ${3:VAR-2} GIVING ${4:VAR-3}", "\tONE SIZE ERROR GO TO ${1:ARITH-PROBLEM}", "END-MULTIPLY."],
+    "description": "`ON` is used to code: `ON SIZE ERROR`, `ON OVERFLOW` and `ON EXCEPTION` error and exception trapping phrases. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pd"
+  },
   "OPEN EXTEND": {
     "prefix": "OPEN EXTEND",
     "body": ["OPEN EXTEND ${1:fileName}"],
@@ -1653,32 +1718,82 @@
   "OPEN I-O": {
     "prefix": "OPEN I-O",
     "body": ["OPEN I-O ${1:fileName}"],
-    "description": "OPEN I-O FILENAME"
+    "description": "OPEN I-O FILENAME. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
   },
   "OPEN INPUT": {
     "prefix": "OPEN INPUT",
-    "body": ["OPEN INPUT ${1:fileName}"],
-    "description": "OPEN INPUT FILENAME"
+    "body": ["OPEN INPUT ${1:fileName}${2|., REVERSED., WITH NO REWIND.|}"],
+    "description": "`OPEN INPUT` initiates the process of reading files. Note that `REVERSED` and `WITH NO REWIND` are optional clauses. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
   },
   "OPEN OUTPUT": {
     "prefix": "OPEN OUTPUT",
-    "body": ["OPEN OUTPUT ${1:fileName}"],
-    "description": "OPEN OUTPUT FILENAME"
+    "body": ["OPEN OUTPUT ${1:fileName}${2|., WITH NO REWIND.|}"],
+    "description": "`OPEN OUTPUT` initiates the process of writing files. Note that `NO REWIND` is optional. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
+  "OPTIONAL": {
+    "prefix": "OPTIONAL",
+    "body": ["SELECT OPTIONAL ${1:filename}", "ASSIGN TO ${2:EXTFILE}"],
+    "description": "If `SELECT OPTIONAL` is specified in the file-control entry for this file, and the file is not available at runtime, execution of the first READ statement causes an at-end condition - and not an ABEND. Note that this is the case for QSAM and VSAM opened for INPUT, I-O, or EXTEND. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
+  "If x OR y": {
+    "prefix": "OR",
+    "body": ["IF ${1:statement-1} OR ${2:statement-2} THEN", "\t${3:ifEitherIsTrue}", "END-IF."],
+    "description": "A logical comparison operator. The truth value of OR is true when either or both conditions are met. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
+  "WHEN x OR y": {
+    "prefix": "WHEN x OR y",
+    "body": ["EVALUATE ${1:PATIENT-CODE}", "\tWHEN = \"${2:I}\" OR \"${3:E}\"", "\t\t${4:statementWhenIsTrue}", "END-IF."],
+    "description": "A logical comparison operator that is part of an EVALUATE statement. The truth value of OR is true when either or both conditions are met. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
+  "DUPLICATES IN ORDER": {
+    "prefix": "ORDER",
+    "body": ["SORT ${1:varOrTable} ON ${2|ASCENDING,DESCENDING|} ${3:sort-var-key}", "DUPLICATES IN ORDER."],
+    "description": "If duplicate records are found, by coding `DUPLICATES IN ORDER` z/OS will maintain the physical order. Without this phrase, the sorting of duplicate records is undefined. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
+  "ORGANIZATION (QSAM)": {
+    "prefix": "ORGANIZATION",
+    "body": ["SELECT ${1:rptfil} ASSIGN TO ${2:rptfilDD}",
+      "\tORGANIZATION IS SEQUENTIAL.",
+      "$0"],
+    "description": "QSAM file accessed sequentially (one record after the next). https://www.ibm.com/docs/en/SS6SG3_6.4.0/pdf/pgmvs.pdf"
+  },
+  "ORGANIZATION (VSAM)": {
+    "prefix": "ORGANIZATION",
+    "body": ["SELECT ${2:rptfil} ASSIGN TO ${3:rptfilDD}",
+    "\tORGANIZATION IS ${1|INDEXED,RELATIVE,SEQUENTIAL|}.",
+    "\tACCESS MODE IS ${4|SEQUENTIAL,RANDOM,DYNAMIC|} RECORD KEY IS ${5:key1}",
+    "$0"],
+    "description": "VSAM file `ORGANIZATION` clause for a VSAM file accessed thru the file's index (key1).  https://www.ibm.com/docs/en/SS6SG3_6.4.0/pdf/pgmvs.pdf"
+  },
+  "OTHER": {
+    "prefix": "OTHER",
+    "body": ["EVALUATE ${1:VAR-1}", "\tWHEN ${2:statement}", "\t\t${3:doThisWhenTrue}", "\tWHEN OTHER", "\t\t${4:defaultToThis}", "END-EVALUATE."],
+    "description": "In an `EVALUATE` statement if no `WHEN` phrase is selected and `WHEN OTHER` is specified, execution continues with the `OTHER` statement. https://www.ibm.com/docs/en/SS6SG3_6.4.0/pdf/pgmvs.pdf"
   },
   "OUTPUT": {
     "prefix": "OUTPUT",
     "body": ["OUTPUT ${1:fileName}"],
     "description": "OUTPUT FILENAME"
   },
-  "OVERFLOW": {
-    "prefix": "OVERFLOW",
-    "body": ["OVERFLOW ${1:impStat}"],
-    "description": "OVERFLOW IMPSTAT"
-  },
   "OUTPUT PROCEDURE": {
     "prefix": "OUTPUT PROCEDURE",
-    "body": ["OUTPUT PROCEDURE ${1:procName}"],
-    "description": "OUTPUT PROCEDURE FILENAME"
+    "body": ["PROCEDURE DIVISION.", "${2:000-MAIN}.", "SORT ${3:IN-FILE} ON ${4|ASCENDING|DESCENDING} KEY ${5:IN-SORT-KEY}", "\t\tINPUT PROCEDURE IS ${6:PATIENT-EDIT-INPUT}, ", "OUTPUT PROCEDURE IS ${1:procName}."],
+    "description": "In a `SORT` or `MERGE` statement `OUTPUT PROCEDURE` specifies the name of a COBOL SECTION or paragraph that selects and/or modies output records from the `SORT`/`MERGE` operation. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
+  "ON OVERFLOW GO TO (Unstring Statement)": {
+    "prefix": "OVERFLOW",
+    "body": ["UNSTRING ${2:PATIENT-RCD}", "\tDELIMITED BY ${3:statement}", "\tINTO ${4:PATIENT-NAME}", "\tON OVERFLOW GO TO ${1:UNSTRING-OVERFLOW}", "END-UNSTRING."],
+    "description": "`ON OVERFLOW` with `UNSTRING` allows you to trap text-parsing errors during runtime.  Note that after `ON OVERFLOW` you can code any imperative statement. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
+  "ON OVERFLOW GO TO (String Statement)": {
+    "prefix": "OVERFLOW",
+    "body": ["STRING ${2:PATIENT-NO SPACE PATIENT-NAME INV-NO SPACE DATE-PROCESS SPACE}", "\tDELIMITED BY ${3:SIZE}", "\tINTO ${4:WS-PATIENT-RPT-LINE}", "\tON OVERFLOW GO TO ${1:STRING-OVERFLOW}", "END-STRING."],
+    "description": "`ON OVERFLOW` with `STRING` allows you to trap text-parsing errors during runtime.  Note that after `ON OVERFLOW` you can code any imperative statement. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
+  "ON OVERFLOW GO TO (Call Statement)": {
+    "prefix": "ON OVERFLOW",
+    "body": ["CALL \"${1:progName}\"", "\tON OVERFLOW GO TO ${1:CALL-PGM-OVERFLOW}", "END-CALL."],
+    "description": "description"
   },
   "PARSE": {
     "prefix": "PARSE",
