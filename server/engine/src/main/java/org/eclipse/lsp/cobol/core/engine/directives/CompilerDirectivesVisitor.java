@@ -15,7 +15,10 @@
 package org.eclipse.lsp.cobol.core.engine.directives;
 
 import com.google.common.collect.ImmutableList;
+import lombok.Getter;
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.tree.RuleNode;
 import org.eclipse.lsp.cobol.AntlrRangeUtils;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
@@ -24,19 +27,21 @@ import org.eclipse.lsp.cobol.common.mapping.OriginalLocation;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
+import org.eclipse.lsp.cobol.common.utils.ThreadInterruptionUtil;
+import org.eclipse.lsp.cobol.core.CompilerDirectivesLexer;
 import org.eclipse.lsp.cobol.core.CompilerDirectivesParser;
 import org.eclipse.lsp.cobol.core.CompilerDirectivesParserBaseVisitor;
 import org.eclipse.lsp.cobol.core.engine.analysis.AnalysisContext;
-import org.eclipse.lsp.cobol.core.engine.directives.node.JavaShareableWorkingSectionNode;
+import org.eclipse.lsp.cobol.core.engine.directives.node.JavaShareableOnOffNode;
 import org.eclipse.lsp.cobol.core.visitor.VisitorHelper;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Function;
 
-import static org.eclipse.lsp.cobol.AntlrRangeUtils.constructRange;
 
 /**
  * Visitor
@@ -51,6 +56,9 @@ public class CompilerDirectivesVisitor extends CompilerDirectivesParserBaseVisit
     this.messageService = messageService;
     this.startPosition = startPosition;
   }
+
+  @Getter
+  private final List<SyntaxError> errors = new LinkedList<>();
 
   @Override
   public List<Node> visitCompilerOption(CompilerDirectivesParser.CompilerOptionContext ctx) {
@@ -108,15 +116,33 @@ public class CompilerDirectivesVisitor extends CompilerDirectivesParserBaseVisit
 
   @Override
   public List<Node> visitJavaShareableOnOff(CompilerDirectivesParser.JavaShareableOnOffContext ctx) {
-    Locality statementLocality = getLocality(this.analysisContext.getExtendedDocument().mapLocation(constructRange(ctx)));
-
-    JavaShareableWorkingSectionNode semanticsNode = new JavaShareableWorkingSectionNode(statementLocality);
-    return addTreeNode(ctx, (location) -> semanticsNode);
+//    areaBWarning(ctx);
+//    changeContextToDialectStatement(ctx);
+    if (ctx.stop.getType() != CompilerDirectivesLexer.JAVA_SHAREABLE_OFF) {
+      SyntaxError error = SyntaxError.syntaxError()
+              .errorSource(ErrorSource.PARSING)
+              .location(getTokenEndLocality(ctx.stop).toOriginalLocation())
+              .suggestion(messageService.getMessage("compilerDirective.missingJavaShareableOff"))
+              .severity(ErrorSeverity.ERROR)
+              .build();
+      errors.add(error);
+    }
+//    Locality statementLocality = getLocality(this.analysisContext.getExtendedDocument().mapLocation(constructRange(ctx)));
+//
+//    JavaShareableWorkingSectionNode semanticsNode = new JavaShareableWorkingSectionNode(statementLocality);
+//    return addTreeNode(ctx, (location) -> semanticsNode);
+    return addTreeNode(ctx, JavaShareableOnOffNode::new);
   }
 
   @Override
   protected List<Node> defaultResult() {
     return ImmutableList.of();
+  }
+
+  @Override
+  public List<Node> visitChildren(RuleNode node) {
+    ThreadInterruptionUtil.checkThreadInterrupted();
+    return super.visitChildren(node);
   }
 
   private List<Node> addTreeNode(ParserRuleContext ctx, Function<Locality, Node> nodeConstructor) {
@@ -134,5 +160,17 @@ public class CompilerDirectivesVisitor extends CompilerDirectivesParserBaseVisit
     Locality.LocalityBuilder builder =
             Locality.builder().uri(location.getUri()).range(location.getRange());
     return builder.build();
+  }
+
+  private Locality getTokenEndLocality(Token token) {
+    return Locality.builder()
+            .uri(analysisContext.getDocumentUri())
+            .range(buildTokenEndRange(token))
+            .build();
+  }
+
+  private Range buildTokenEndRange(Token token) {
+    Position p = new Position(token.getLine() - 1, token.getCharPositionInLine() + token.getStopIndex() - token.getStartIndex() + 1);
+    return new Range(p, p);
   }
 }

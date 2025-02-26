@@ -307,5 +307,5 @@ dataSetName
 compilerDirectives: cobolJavaInteroperabilityCompilerDirectives;
 cobolJavaInteroperabilityCompilerDirectives: javaCallable | (javaShareableOnOff | ~JAVA_SHAREABLE_ON)* EOF;
 javaCallable: JAVA_CALLABLE;
-javaShareableOnOff: JAVA_SHAREABLE_ON shareableData JAVA_SHAREABLE_OFF;
-shareableData: .*?;
+javaShareableOnOff: JAVA_SHAREABLE_ON shareableData* JAVA_SHAREABLE_OFF;
+shareableData: .*?DOT;
