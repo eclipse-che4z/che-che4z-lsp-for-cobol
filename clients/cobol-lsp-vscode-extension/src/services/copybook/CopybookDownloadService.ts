@@ -81,6 +81,7 @@ export class CopybookDownloadService {
     const pgConfigs = await loadProcessorGroupCopybookPathsConfig(
       { scopeUri: documentUri },
       [],
+      copybookName.dialect,
     );
 
     const onlyDsn = pgConfigs.filter(
@@ -332,10 +333,21 @@ export class CopybookDownloadService {
       return false;
     if (!this.explorerApi) return false;
 
-    const configs = await loadProcessorGroupCopybookPathsConfig(
-      { scopeUri: documentUri },
-      [],
-    );
+    const configs: (
+      | string
+      | ZoweDatasetConfigModel
+      | ZoweUssConfigModel
+      | EndevorConfigModel
+    )[] = [];
+    for (const copybook of copybookNames) {
+      configs.push(
+        ...(await loadProcessorGroupCopybookPathsConfig(
+          { scopeUri: documentUri },
+          [],
+          copybook.dialect,
+        )),
+      );
+    }
 
     const procGroupZoweProfiles = configs
       .filter(

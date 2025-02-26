@@ -292,7 +292,7 @@ export async function loadProcessorGroupSettings<T extends string | string[]>(
         if (
           pp &&
           typeof pp === "object" &&
-          pp["name"] === dialect &&
+          pp["name"]?.toLocaleUpperCase() === dialect.toLocaleUpperCase() &&
           pp[atrtibute] !== undefined
         ) {
           return pp[atrtibute] as T;
