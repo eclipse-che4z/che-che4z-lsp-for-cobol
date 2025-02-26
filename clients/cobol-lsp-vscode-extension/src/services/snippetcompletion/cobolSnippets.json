@@ -1793,7 +1793,7 @@
   "ON OVERFLOW GO TO (Call Statement)": {
     "prefix": "ON OVERFLOW",
     "body": ["CALL \"${1:progName}\"", "\tON OVERFLOW GO TO ${1:CALL-PGM-OVERFLOW}", "END-CALL."],
-    "description": "description"
+    "description": "`ON OVERFLOW` with `CALL` statements allows you to trap runtime called program name errors. Without `ON OVERFLOW` the program will `ABEND`.  Note that after `ON OVERFLOW` you can code any imperative statement. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
   },
   "PARSE": {
     "prefix": "PARSE",
