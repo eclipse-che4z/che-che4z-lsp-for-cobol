@@ -14,23 +14,34 @@
  */
 package org.eclipse.lsp.cobol.core.engine.directives;
 
+import com.google.common.collect.ImmutableList;
+import org.antlr.v4.runtime.ParserRuleContext;
+import org.eclipse.lsp.cobol.AntlrRangeUtils;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.mapping.OriginalLocation;
 import org.eclipse.lsp.cobol.common.message.MessageService;
+import org.eclipse.lsp.cobol.common.model.Locality;
+import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.core.CompilerDirectivesParser;
 import org.eclipse.lsp.cobol.core.CompilerDirectivesParserBaseVisitor;
 import org.eclipse.lsp.cobol.core.engine.analysis.AnalysisContext;
+import org.eclipse.lsp.cobol.core.engine.directives.node.JavaShareableWorkingSectionNode;
 import org.eclipse.lsp.cobol.core.visitor.VisitorHelper;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
+import java.util.List;
+import java.util.function.Function;
+
+import static org.eclipse.lsp.cobol.AntlrRangeUtils.constructRange;
+
 /**
  * Visitor
  */
-public class CompilerDirectivesVisitor extends CompilerDirectivesParserBaseVisitor<Object> {
+public class CompilerDirectivesVisitor extends CompilerDirectivesParserBaseVisitor<List<Node>> {
   private final AnalysisContext analysisContext;
   private final MessageService messageService;
   private final Position startPosition;
@@ -42,13 +53,13 @@ public class CompilerDirectivesVisitor extends CompilerDirectivesParserBaseVisit
   }
 
   @Override
-  public Object visitCompilerOption(CompilerDirectivesParser.CompilerOptionContext ctx) {
+  public List<Node> visitCompilerOption(CompilerDirectivesParser.CompilerOptionContext ctx) {
     analysisContext.getConfig().getCompilerOptions().add(ctx.getText().trim());
     return super.visitCompilerOption(ctx);
   }
 
   @Override
-  public Object visitUnSupportedDeprecatedCompilerDirectives(CompilerDirectivesParser.UnSupportedDeprecatedCompilerDirectivesContext ctx) {
+  public List<Node> visitUnSupportedDeprecatedCompilerDirectives(CompilerDirectivesParser.UnSupportedDeprecatedCompilerDirectivesContext ctx) {
     VisitorHelper.retrieveRangeLocality(ctx).ifPresent(r -> {
       Range range = CompilerDirectivesUtils.shiftRange(r, startPosition);
       Location location = new Location(analysisContext.getExtendedDocument().getUri(), range);
@@ -64,7 +75,7 @@ public class CompilerDirectivesVisitor extends CompilerDirectivesParserBaseVisit
   }
 
   @Override
-  public Object visitOptionalDeprecatedCompilerDirectives(CompilerDirectivesParser.OptionalDeprecatedCompilerDirectivesContext ctx) {
+  public List<Node> visitOptionalDeprecatedCompilerDirectives(CompilerDirectivesParser.OptionalDeprecatedCompilerDirectivesContext ctx) {
     VisitorHelper.retrieveRangeLocality(ctx).ifPresent(r -> {
       Range range = CompilerDirectivesUtils.shiftRange(r, startPosition);
       Location location = new Location(analysisContext.getExtendedDocument().getUri(), range);
@@ -80,7 +91,7 @@ public class CompilerDirectivesVisitor extends CompilerDirectivesParserBaseVisit
   }
 
   @Override
-  public Object visitCompilableSupportedDeprecatedCompilerDirectives(CompilerDirectivesParser.CompilableSupportedDeprecatedCompilerDirectivesContext ctx) {
+  public List<Node> visitCompilableSupportedDeprecatedCompilerDirectives(CompilerDirectivesParser.CompilableSupportedDeprecatedCompilerDirectivesContext ctx) {
     VisitorHelper.retrieveRangeLocality(ctx).ifPresent(r -> {
       Range range = CompilerDirectivesUtils.shiftRange(r, startPosition);
       Location location = new Location(analysisContext.getExtendedDocument().getUri(), range);
@@ -93,5 +104,35 @@ public class CompilerDirectivesVisitor extends CompilerDirectivesParserBaseVisit
               .build());
     });
     return super.visitCompilableSupportedDeprecatedCompilerDirectives(ctx);
+  }
+
+  @Override
+  public List<Node> visitJavaShareableOnOff(CompilerDirectivesParser.JavaShareableOnOffContext ctx) {
+    Locality statementLocality = getLocality(this.analysisContext.getExtendedDocument().mapLocation(constructRange(ctx)));
+
+    JavaShareableWorkingSectionNode semanticsNode = new JavaShareableWorkingSectionNode(statementLocality);
+    return addTreeNode(ctx, (location) -> semanticsNode);
+  }
+
+  @Override
+  protected List<Node> defaultResult() {
+    return ImmutableList.of();
+  }
+
+  private List<Node> addTreeNode(ParserRuleContext ctx, Function<Locality, Node> nodeConstructor) {
+    Node node = nodeConstructor.apply(getOriginalLocality(ctx));
+    visitChildren(ctx).forEach(node::addChild);
+    return ImmutableList.of(node);
+  }
+
+  private Locality getOriginalLocality(ParserRuleContext ctx) {
+    Location location = analysisContext.getExtendedDocument().mapLocation(AntlrRangeUtils.constructRange(ctx));
+    return Locality.builder().uri(location.getUri()).range(location.getRange()).build();
+  }
+
+  private Locality getLocality(Location location) {
+    Locality.LocalityBuilder builder =
+            Locality.builder().uri(location.getUri()).range(location.getRange());
+    return builder.build();
   }
 }

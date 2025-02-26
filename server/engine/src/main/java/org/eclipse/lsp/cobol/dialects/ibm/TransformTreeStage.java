@@ -40,6 +40,8 @@ import org.eclipse.lsp.cobol.common.utils.RangeUtils;
 import org.eclipse.lsp.cobol.core.CobolParser;
 import org.eclipse.lsp.cobol.core.engine.analysis.AnalysisContext;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectService;
+import org.eclipse.lsp.cobol.core.engine.directives.node.JavaShareableWorkingSectionNode;
+import org.eclipse.lsp.cobol.core.engine.directives.processor.JavaShareableWorkingSectionProcessor;
 import org.eclipse.lsp.cobol.core.engine.processor.AstProcessor;
 import org.eclipse.lsp.cobol.core.engine.processors.*;
 import org.eclipse.lsp.cobol.core.engine.processors.implicit.ImplicitVariablesProcessor;
@@ -318,6 +320,8 @@ public class TransformTreeStage implements Stage<AnalysisContext, ProcessingResu
 
     ctx.register(v, ProcedureDivisionUsingNode.class, new LinkageArgumentsOriginCheck());
     ctx.register(v, ProcedureDivisionReturningNode.class, new LinkageArgumentsOriginCheck());
+
+    ctx.register(v, JavaShareableWorkingSectionNode.class, new JavaShareableWorkingSectionProcessor(messageService));
     // Implicit Dialects
     dialectService.getActiveImplicitDialects(analysisConfig)
             .stream().map(CobolDialect::getProcessors)

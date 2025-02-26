@@ -248,6 +248,9 @@ LANG: L A N G;
 ENGLISH: E N G L I S H;
 JAPANESE: J A P A N E S E;
 JA: J A;
+JAVA_CALLABLE        : J A V A MINUSCHAR C A L L A B L E;
+JAVA_SHAREABLE_OFF   :J A V A MINUSCHAR S H A R E A B L E [ \t\f\r\n]+ O F F;
+JAVA_SHAREABLE_ON    :J A V A MINUSCHAR S H A R E A B L E [ \t\f\r\n]+ O N;
 JP: J P;
 UENGLISH: U E N G L I S H;
 UE: U E;
@@ -451,6 +454,7 @@ DOT: '.';
 
 IDENTIFIER : [a-zA-Z0-9][-_a-zA-Z0-9]*;
 FILENAME : IDENTIFIER+ '.' IDENTIFIER+;
+NEWLINE : '\r'? '\n' -> channel(HIDDEN);
 
 fragment STRINGLITERAL:
 	'"' (~["\n\r] | '""' | '\'')* '"'
