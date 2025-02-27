@@ -2306,8 +2306,8 @@
   },
   "XML PARSE": {
     "prefix": "XML PARSE",
-    "body": ["XML PARSE ${1:item}"],
-    "description": "XML PARSE item"
+    "body": ["PROCEDURE DIVISION USING ${1:LS-XML-INPAT-DOC}.", "\tXML PARSE ${1:LS-XML-INPAT-DOC} ", "\t\tPROCESSING PROCEDURE COUNTELEMENTS", "\t\tMOVE LENGTH OF ${2:XML-DOCUMENT} TO ${3:WS-DOC-SIZE}."],
+    "description": "The `XML` reserved word which invokes IBM's XML parser is followed by a number of options for parsing or generating XML documents. Note that the detailed IBM documentation contains complete generating information. https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdfs"
   },
   "XML-CODE": {
     "prefix": "XML-CODE",
