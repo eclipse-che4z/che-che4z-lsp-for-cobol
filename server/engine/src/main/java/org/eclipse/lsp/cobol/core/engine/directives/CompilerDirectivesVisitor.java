@@ -16,10 +16,12 @@ package org.eclipse.lsp.cobol.core.engine.directives;
 
 import com.google.common.collect.ImmutableList;
 import lombok.Getter;
+import lombok.NonNull;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.RuleNode;
 import org.eclipse.lsp.cobol.AntlrRangeUtils;
+import org.eclipse.lsp.cobol.common.dialects.CobolDialect;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
@@ -41,6 +43,9 @@ import org.eclipse.lsp4j.Range;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Function;
+import java.util.regex.Pattern;
+
+import static org.eclipse.lsp.cobol.core.visitor.VisitorHelper.buildTokenRange;
 
 
 /**
@@ -114,10 +119,50 @@ public class CompilerDirectivesVisitor extends CompilerDirectivesParserBaseVisit
     return super.visitCompilableSupportedDeprecatedCompilerDirectives(ctx);
   }
 
+//  @Override
+//  public List<Node> visitDoubleMoreThanChar(CompilerDirectivesParser.DoubleMoreThanCharContext ctx) {
+//    return super.visitDoubleMoreThanChar(ctx);
+//  }
+
+
+  @Override
+  public List<Node> visitCobolJavaInteroperabilityCompilerDirectives(CompilerDirectivesParser.CobolJavaInteroperabilityCompilerDirectivesContext ctx) {
+    if (Pattern.compile("(?i).*JAVA-CALLABLE*").matcher(ctx.getStart().getText()).matches()) {
+      String text = analysisContext.getExtendedDocument().getCurrentText().toString();
+      String line = Pattern.compile("\n\r?").split(text)[startPosition.getLine()];
+      if (!Pattern.compile("(?i).*>>\\s?JAVA-CALLABLE*").matcher(line).matches()) {
+        VisitorHelper.retrieveRangeLocality(ctx).ifPresent(r -> {
+          r.getStart().setLine(startPosition.getLine());
+          r.getEnd().setLine(startPosition.getLine());
+          Location location = new Location(analysisContext.getExtendedDocument().getUri(), r);
+          analysisContext.getAccumulatedErrors().add(SyntaxError.syntaxError()
+                  .errorSource(ErrorSource.PARSING)
+                  .location(new OriginalLocation(location, null))
+                  .suggestion(messageService.getMessage("compilerDirective.invalid") + ctx.getStart().getText())
+                  .severity(ErrorSeverity.ERROR)
+                  .build());
+        });
+      }
+    }
+    return super.visitCobolJavaInteroperabilityCompilerDirectives(ctx);
+  }
+
+  @Override
+  public List<Node> visitJavaCallable(CompilerDirectivesParser.JavaCallableContext ctx) {
+    String text = analysisContext.getExtendedDocument().getCurrentText().toString();
+    String startLine = Pattern.compile("\n\r?").split(text)[ctx.getStart().getLine() - 1];
+    if (!Pattern.compile("(?i).*>>\\s?JAVA-CALLABLE*").matcher(startLine).matches()) {
+      throwException(
+              ctx.getStop().getText(),
+              locationToLocality(getLocation(ctx.getStart())),
+              messageService.getMessage("compilerDirective.invalid"));
+    }
+    return super.visitJavaCallable(ctx);
+  }
+
   @Override
   public List<Node> visitJavaShareableOnOff(CompilerDirectivesParser.JavaShareableOnOffContext ctx) {
-//    areaBWarning(ctx);
-//    changeContextToDialectStatement(ctx);
+    String text = analysisContext.getExtendedDocument().getCurrentText().toString();
     if (ctx.stop.getType() != CompilerDirectivesLexer.JAVA_SHAREABLE_OFF) {
       SyntaxError error = SyntaxError.syntaxError()
               .errorSource(ErrorSource.PARSING)
@@ -126,6 +171,22 @@ public class CompilerDirectivesVisitor extends CompilerDirectivesParserBaseVisit
               .severity(ErrorSeverity.ERROR)
               .build();
       errors.add(error);
+    }
+
+    String startLine = Pattern.compile("\n\r?").split(text)[ctx.getStart().getLine() - 1];
+    if (!Pattern.compile("(?i).*>>\\s?JAVA-SHAREABLE\\s+ON.*").matcher(startLine).matches()) {
+      throwException(
+              ctx.getStop().getText(),
+              locationToLocality(getLocation(ctx.getStart())),
+              messageService.getMessage("compilerDirective.invalid"));
+    }
+
+    String endLine = Pattern.compile("\n\r?").split(text)[ctx.getStop().getLine() - 1];
+    if (!Pattern.compile("(?i).*>>\\s?JAVA-SHAREABLE\\s+OFF.*").matcher(endLine).matches()) {
+      throwException(
+              ctx.getStop().getText(),
+              locationToLocality(getLocation(ctx.getStop())),
+              messageService.getMessage("compilerDirective.invalid"));
     }
 //    Locality statementLocality = getLocality(this.analysisContext.getExtendedDocument().mapLocation(constructRange(ctx)));
 //
@@ -172,5 +233,30 @@ public class CompilerDirectivesVisitor extends CompilerDirectivesParserBaseVisit
   private Range buildTokenEndRange(Token token) {
     Position p = new Position(token.getLine() - 1, token.getCharPositionInLine() + token.getStopIndex() - token.getStartIndex() + 1);
     return new Range(p, p);
+  }
+
+  private void throwException(String wrongToken, @NonNull Locality locality, String message) {
+    SyntaxError error =
+            SyntaxError.syntaxError()
+                    .errorSource(ErrorSource.PARSING)
+                    .location(locality.toOriginalLocation())
+                    .suggestion(message + wrongToken)
+                    .severity(ErrorSeverity.ERROR)
+                    .build();
+
+    if (!errors.contains(error) && !wrongToken.contains(CobolDialect.FILLER)) {
+      errors.add(error);
+    }
+  }
+
+  private Location getLocation(Token childToken) {
+    return analysisContext.getExtendedDocument().mapLocation(buildTokenRange(childToken));
+  }
+
+  private Locality locationToLocality(Location location) {
+    return Locality.builder()
+            .range(location.getRange())
+            .uri(location.getUri())
+            .build();
   }
 }

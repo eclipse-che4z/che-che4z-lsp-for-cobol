@@ -21,7 +21,7 @@ import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.NodeType;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 
-/** JavaShareableOnOff block node */
+/** JavaShareable block node */
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 public class JavaShareableOnOffNode extends Node {
