@@ -20,6 +20,8 @@ import {
   ZoweDatasetConfigModel,
   ZoweUssConfigModel,
 } from "../../../services/ProcessorGroupsLoader";
+import { E4E } from "../../../type/e4eApi";
+import { CopybookDownloaderForE4E } from "../../../services/copybook/downloader/CopybookDownloaderForE4E";
 
 Utils.getZoweExplorerAPI = jest.fn();
 
@@ -49,7 +51,15 @@ describe("CopybooksPathGenerator tests", () => {
       CopybookURI.createDatasetPath([profile], dataset, "downloadFolder"),
     ).toEqual({ path: "downloadFolder/zowe/copybooks/profile/dataset" });
   });
-  it("create paths for copybooks of processsor groups definitions", () => {
+  it("create paths for copybooks of processsor groups definitions", async () => {
+    const e4e = {} as E4E;
+    const e4eDownloader = new CopybookDownloaderForE4E("/storagePath", e4e);
+    e4eDownloader.getProfileInfo = jest
+      .fn()
+      .mockResolvedValue({
+        profile: "internal.connection",
+        instance: "instance",
+      });
     const pgConfigs: (
       | ZoweDatasetConfigModel
       | ZoweUssConfigModel
@@ -70,10 +80,11 @@ describe("CopybooksPathGenerator tests", () => {
     ];
 
     expect(
-      CopybookURI.createProcessorGroupCopybookPaths(
+      await CopybookURI.createProcessorGroupCopybookPaths(
         pgConfigs,
         "/storagePath",
         "defaultProfile",
+        e4eDownloader,
       ),
     ).toStrictEqual([
       "/storagePath/zowe/copybooks/defaultProfile/dataset",

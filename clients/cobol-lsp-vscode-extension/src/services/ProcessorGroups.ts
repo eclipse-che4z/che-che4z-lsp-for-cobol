@@ -43,6 +43,7 @@ import { EndevorElement, ResolvedProfile } from "../type/e4eApi";
 import { CopybookDownloaderForE4E } from "./copybook/downloader/CopybookDownloaderForE4E";
 
 import { CopybookName } from "./copybook/CopybookDownloadService";
+import { asPartialProfile } from "./util/Utils";
 
 export async function loadProcessorGroupCopybookPaths(
   documentUri: string,
@@ -344,10 +345,7 @@ export async function prepareProcessorGroupConfigPathsForEndevor(
     if (!config.profile) {
       profile = { profile: undefined, instance: undefined };
     } else {
-      profile = {
-        profile: config.profile.split("@")[1],
-        instance: config.profile.split("@")[0],
-      };
+      profile = asPartialProfile(config.profile);
     }
     const resolvedProfile = await e4eDownloader.getProfileInfo(profile);
 

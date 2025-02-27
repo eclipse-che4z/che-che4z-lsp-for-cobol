@@ -366,7 +366,7 @@ describe("Test the copybook message handler", () => {
   it("checks downloaded copybooks searched wrt processor group definitions respecting order in configurations", async () => {
     SettingsService.getCopybookExtension = jest
       .fn()
-      .mockReturnValue(Promise.resolve([".cpy"]));
+      .mockReturnValue(Promise.resolve([""]));
     SettingsService.getCopybookLocalPath = jest
       .fn()
       .mockReturnValue(Promise.resolve([]));
@@ -374,6 +374,23 @@ describe("Test the copybook message handler", () => {
       .fn()
       .mockReturnValue(["/configured/path"]);
 
+    const downloader = new CopybookDownloadService("/storagePath", undefined, {
+      isEndevorElement(_uri: string) {
+        return false;
+      },
+      onDidChangeElement: unreachable,
+      listMembers,
+      listElements,
+      getMember: unreachable,
+      getElement: unreachable,
+      async getProfileInfo(_uri) {
+        return Promise.resolve({
+          instance: "instance",
+          profile: "profile",
+        });
+      },
+      getConfiguration: unreachable,
+    });
     const searchSpy = jest.spyOn(fsUtils, "searchCopybookInExtensionFolder");
     searchSpy.mockReturnValue(undefined);
 
@@ -390,11 +407,12 @@ describe("Test the copybook message handler", () => {
         subsystem: "subsystem",
         stage: "1",
         type: "copy",
+        profile: "instance@profile",
       },
       { ussFile: "ussFile", profile: "profile" },
     ]);
 
-    await downloaderNoApi.resolveCopybookHandler(
+    await downloader.resolveCopybookHandler(
       "cobolFileName",
       "copybookName",
       "dialectType",
@@ -404,7 +422,7 @@ describe("Test the copybook message handler", () => {
       "copybookName",
       [
         "/storagePath/zowe/copybooks/procGroupProfile/procGroupDataset",
-        "/storagePath/e4e/copybooks/./environment/1/system/subsystem/copy/MAP",
+        "/storagePath/e4e/copybooks/instance.profile/environment/1/system/subsystem/copy/MAP",
         "/storagePath/zowe/copybooks/profile/ussFile",
       ],
       [""],

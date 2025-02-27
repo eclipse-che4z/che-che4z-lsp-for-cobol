@@ -211,6 +211,7 @@ export class CopybookDownloadService {
       copybookName,
       dialectType,
       this.storagePath,
+      this.e4eDownloader,
     );
     if (result) {
       return result.toString();

@@ -23,7 +23,7 @@ import {
 import { SettingsService } from "../Settings";
 import { ProfileUtils } from "../util/ProfileUtils";
 import { EndevorType, ResolvedProfile } from "../../type/e4eApi.d";
-import { Utils } from "../util/Utils";
+import { asPartialProfile, Utils } from "../util/Utils";
 import * as vscode from "vscode";
 
 // Source can be only a single level directory, with no subdirectories
@@ -33,6 +33,7 @@ import {
   ZoweUssConfigModel,
   EndevorConfigModel,
 } from "../ProcessorGroupsLoader";
+import { CopybookDownloaderForE4E } from "./downloader/CopybookDownloaderForE4E";
 
 /**
  * This class is responsible to identify from which source resolve copybooks required by the server.
@@ -124,7 +125,7 @@ export class CopybookURI {
       type.type,
     ];
   }
-  public static createProcessorGroupCopybookPaths(
+  public static async createProcessorGroupCopybookPaths(
     pgConfigs: (
       | ZoweDatasetConfigModel
       | ZoweUssConfigModel
@@ -132,28 +133,25 @@ export class CopybookURI {
     )[],
     storagePath: string,
     defaultProfile: string,
-  ): string[] {
+    e4eDownloader?: CopybookDownloaderForE4E,
+  ): Promise<string[]> {
     const paths: string[] = [];
-    pgConfigs.forEach((config) => {
-      if (ENVIRONMENT in config) {
-        const profile = config.profile
-          ? {
-              profile: `internal.${config.profile.split("@")[1]}`,
-              instance: config.profile.split("@")[0],
-            }
-          : {
-              profile: "",
-              instance: "",
-            };
-        config.use_map = config.use_map ? config.use_map : true;
-        paths.push(
-          CopybookURI.createDatasetPath(
-            this.getEnviromentPath(config as EndevorType, profile),
-            config.use_map ? USE_MAP : "",
-            storagePath,
-            E4E_FOLDER,
-          ).fsPath,
+    for (const config of pgConfigs) {
+      if (ENVIRONMENT in config && e4eDownloader) {
+        const profile = await e4eDownloader.getProfileInfo(
+          asPartialProfile(config.profile ? config.profile : ""),
         );
+        config.use_map = config.use_map ? config.use_map : true;
+        if (!(profile instanceof Error)) {
+          paths.push(
+            CopybookURI.createDatasetPath(
+              this.getEnviromentPath(config as EndevorType, profile),
+              config.use_map ? USE_MAP : "",
+              storagePath,
+              E4E_FOLDER,
+            ).fsPath,
+          );
+        }
       } else if (DATASET in config || USSFILE in config) {
         paths.push(
           CopybookURI.createDatasetPath(
@@ -163,7 +161,7 @@ export class CopybookURI {
           ).fsPath,
         );
       }
-    });
+    }
     return paths;
   }
 }

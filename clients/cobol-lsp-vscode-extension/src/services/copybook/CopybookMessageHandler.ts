@@ -17,6 +17,7 @@ import { SettingsService } from "../Settings";
 import { searchCopybookInExtensionFolder } from "../util/FSUtils";
 import { CopybookURI } from "./CopybookURI";
 import { Uri } from "vscode";
+import { CopybookDownloaderForE4E } from "./downloader/CopybookDownloaderForE4E";
 
 enum CopybookFolderKind {
   "local",
@@ -29,6 +30,7 @@ export async function searchCopybook(
   copybookName: string,
   dialectType: string,
   storagePath: string,
+  e4eDownloader?: CopybookDownloaderForE4E,
 ): Promise<Uri | undefined> {
   let result: Uri | undefined;
 
@@ -39,6 +41,7 @@ export async function searchCopybook(
       documentUri,
       dialectType,
       storagePath,
+      e4eDownloader,
     );
     const allowedExtensions = await resolveAllowedExtensions(
       folderKind,
@@ -62,6 +65,7 @@ async function getTargetFolderForCopybook(
   documentUri: string,
   dialectType: string,
   storagePath: string,
+  e4eDownloader?: CopybookDownloaderForE4E,
 ): Promise<string[]> {
   let result: string[] = [];
   const profile = SettingsService.getProfileName()!;
@@ -80,6 +84,7 @@ async function getTargetFolderForCopybook(
       pgConfigs.filter((config) => typeof config != "string"),
       storagePath,
       profile,
+      e4eDownloader,
     );
   }
 

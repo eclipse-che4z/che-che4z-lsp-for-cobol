@@ -108,3 +108,19 @@ export function hasMember<
 >(e: unknown, m: M): e is T {
   return typeof e === "object" && e !== null && m in e;
 }
+
+export function asPartialProfile(s: string): Partial<ResolvedProfile> {
+  const idx = s.indexOf("@");
+  if (idx === -1)
+    return { instance: whitespaceAsUndefined(s), profile: undefined };
+  else
+    return {
+      instance: whitespaceAsUndefined(s.substring(0, idx)),
+      profile: whitespaceAsUndefined(s.substring(idx + 1)),
+    };
+}
+
+function whitespaceAsUndefined(s: string) {
+  for (const c of s) if (c !== " ") return s;
+  return undefined;
+}
