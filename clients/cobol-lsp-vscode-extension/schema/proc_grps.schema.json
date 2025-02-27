@@ -91,7 +91,7 @@
                     },
                     "profile": {
                       "type": "string",
-                      "description": "(Internal) Profile name to be used by the E4E extension"
+                      "description": "Profile name to be used by the E4E extension"
                     }
                   },
                   "required": [
