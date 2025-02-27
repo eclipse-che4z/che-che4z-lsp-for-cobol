@@ -85,7 +85,6 @@ export const SETTINGS_CPY_NDVR_DEPENDENCIES = "endevor-dependencies";
 export const ENDEVOR_PROCESSOR = "ENDEVOR_PROCESSOR";
 export const E4E_INCOMPATIBLE = "E4E interface is not compatible";
 export const USSFILE = "ussFile";
-export const PREPROCESSOR = "preprocessor";
 export const PROVIDE_PROFILE_MSG_PROC_GRUOPS =
   "Please specify a valid Zowe Explorer profile in processor groups to download copybooks from the mainframe.";
 

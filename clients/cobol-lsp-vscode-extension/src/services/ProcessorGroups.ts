@@ -38,7 +38,7 @@ import {
   ZoweDatasetConfigModel,
   ZoweUssConfigModel,
 } from "./ProcessorGroupsLoader";
-import { DATASET, PREPROCESSOR, USSFILE } from "../constants";
+import { DATASET, USSFILE } from "../constants";
 import { EndevorElement, ResolvedProfile } from "../type/e4eApi";
 import { CopybookDownloaderForE4E } from "./copybook/downloader/CopybookDownloaderForE4E";
 
@@ -287,7 +287,7 @@ export async function loadProcessorGroupSettings<T extends string | string[]>(
     return configObject;
   }
   try {
-    if (dialect && dialect !== "COBOL" && PREPROCESSOR in pgCfg) {
+    if (dialect && dialect !== "COBOL" && "preprocessor" in pgCfg) {
       for (const pp of pgCfg.preprocessor as Preprocessor[]) {
         if (
           pp &&
