@@ -1795,20 +1795,42 @@
     "body": ["CALL \"${1:progName}\"", "\tON OVERFLOW GO TO ${1:CALL-PGM-OVERFLOW}", "END-CALL."],
     "description": "`ON OVERFLOW` with `CALL` statements allows you to trap runtime called program name errors. Without `ON OVERFLOW` the program will `ABEND`.  Note that after `ON OVERFLOW` you can code any imperative statement. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
   },
+  "PACKED-DECIMAL": {
+    "prefix": "PACKED-DECIMAL",
+    "body": [
+      "77 ${1:VAR-PACKED-NUM-DATA} PIC S9(4) PACKED-DECIMAL."
+    ],
+    "description": "`PACKED-DECIMAL` variables (internally) are stroed with two digits for each character position, except for the trailing character position, which is occupied by the low-order digit and the variable's sign. Note that `PACKED-DECIMAL` is identical to: `COMP-3`/`COMPUTATIONAL-3`. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
+  "PADDING CHARACTER IS": {
+    "prefix": "PADDING CHARACTER IS",
+    "body": ["SELECT ${2:INTERNAL-FILENAME} ASSIGN ${3:EXTFILE}", "BLOCK CONTAINS ${4:170}", "PADDING CHARACTER IS \"${1:B}\"."],
+    "description": "`PADDING CHARACTER` specifies a character (variable, defined in `WORKING-STORAGE`) to be used for record-blocking-factor padding on sequential files. (ie. Filling out a `BLOCK` of records - BLOCK being the unit of file I/O between DFSMS and your program's `DATA DIVISION`.) https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
+  "PASSWORD": {
+    "prefix": "PASSWORD",
+    "body": ["SELECT ${2:PATIENT-VSAM-FILE} ASSIGN TO ${3:VSMIDXD}", "\tORGANIZATION IS ${4|INDEXED,RELATIVE,SEQUENTIAL|}.", "\tFILE STATUS IS ${5:WS-VSM-FILE-STATUS}", "\tPASSWORD IS ${1:BASE-PASS}."],
+    "description": "`PASSWORD` names a `PIC X` or `PIC A` field in `WORKING-STORAGE`. The first 8 characters are assumed to be the `VSAM` file password. Note that VSAM ESDS, KSDS and RRDS filetypes can all be password protected. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
   "PARSE": {
     "prefix": "PARSE",
     "body": ["PARSE ${1:item}"],
     "description": "PARSE ITEM"
   },
   "PERFORM": {
-    "prefix": "PERFORM",
-    "body": ["PERFORM ${1:PARAGRAPH-NAME} ${2:VALUE-1} TIMES"],
+    "prefix": "PERFORM UNTIL",
+    "body": ["MOVE ${2:1} TO SUB.", "PERFORM UNTIL SUB <= ${3:100}", "\t${4:codeHere}", "ADD +1 TO SUB", "END-PERFORM."],
     "description": "PERFORM PARAGRAPH X TIMES"
   },
   "PERFORM TIMES": {
     "prefix": "PERFORM TIMES",
     "body": ["PERFORM ${1:procName} ${2:id|int} TIMES"],
     "description": "PERFORM TIMES PROCEDURE NAME X TIMES"
+  },
+  "PERFORM THRU": {
+    "prefix": "PERFORM THRU",
+    "body": ["PERFORM ${1:100-OPEN-FILES}", "\tTHRU ${2:100-FILES-EXIT}", "END-PERFORM."],
+    "description": "`PERFORM THRU` transfers control to one or more paragraphs or SECTIONS and returns control to the next sequential executable statement after the the `THRU` paragraph or `SECTION` finishes. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
   },
   "PERFORM-END-PERFORM": {
     "prefix": "PERFORM",
@@ -1825,19 +1847,79 @@
     ],
     "description": "INLINE PERFORM VARYING"
   },
+  "PICTURE": {
+    "prefix": "PICTURE",
+    "body": ["77 ${2:VAR-NAME} ${1|PIC,PICTURE|} ${3:X(111) VALUE SPACE}."],
+    "description": "The reserved word `PICTURE` or `PIC` describes a data variable to the COBOL compiler (and program). https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
   "POINTER": {
     "prefix": "POINTER",
     "body": ["POINTER ${1:item}"],
     "description": "POINTER item"
+  },
+  "POSITION": {
+    "prefix": "POSITION",
+    "body": ["ENVIRONMENT DIVISION.", "INPUT-OUTPUT SECTION.", "I-O-CONTROL.", "\t\tMULTIPLE FILE TAPE CONTAINS ${1:file-name-5} POSITION ${2:n}."],
+    "description": "`POSITION` is used to specify a given (integer) file on TAPE reel. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
+  "POSITIVE": {
+    "prefix": "POSITIVE",
+    "body": ["IF ${1:CONDITION} IS POSITIVE", "\t$0", "END-IF."],
+    "description": "`POSITIVE` is a \"sign condition\" used to determines whether the algebraic value of a numeric variable is greater than zero. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
+  "PRESENT WHEN": {
+    "prefix": "PRESENT WHEN",
+    "body": ["PRESENT WHEN ${1:x}"],
+    "description": "The `PRESENT WHEN` clauses allows lines and printable items, or groups of them, to be printed or not, depending on the truth value of a condition. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
+  "SUPPRESS PRINTING": {
+    "prefix": "PRINTING",
+    "body": ["COPY ${1:copyfile} SUPPRESS PRINTING."],
+    "description": "`SUPPRESS PRINTING` suppresses the text of the copied file in the program compilation listing. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
   },
   "PROCEDURE DIVISION": {
     "prefix": "PROCEDURE-DIVISION",
     "body": ["PROCEDURE DIVISION.", "$0"],
     "description": "PROCEDURE DIVISION"
   },
+  "PROCEDURE DIVISION USING": {
+    "prefix": "PROCEDURE DIVISION USING",
+    "body": ["DATA DIVISION.", "LINKAGE SECTION.", "01 ${1:EXTERNAL-DATA} ${2:PIC X(872)}.", "PROCEDURE DIVISION USING ${1:EXTERNAL-DATA}/"],
+    "description": "`PROCEDURE DIVISION USING` allows you reference-ability to data being passed from a calling module to your program through the `LINKAGE SECTION`. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
+  "PROCEDURE IS": {
+    "prefix": "PROCEDURE IS",
+    "body": ["PROCEDURE DIVISION.", "SORT ${2:fileName}", "${1|INPUT,OUTPUT|} PROCEDURE IS ${2:100-RECORD-SEL} SECTION"],
+    "description": "The `INPUT` and `OUTPUT PROCEDURE`s are used to select specific records that will be released to a `SORT` - and process records returned from a `SORT`. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
+  "PROCEDURE-POINTER": {
+    "prefix": "PROCEDURE-POINTER",
+    "body": ["77 ${1:LE-UTILITY} USAGE IS PROCEDURE-POINTER."],
+    "description": "A `PROCEDURE-POINTER` is a variable which contains the address of a procedure \"entry point\". `PROCEDURE-POINTER` variables are often used to CALL z/OS LE (Language Environment) utilities. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
+  "USE FOR DEBUGGING ON ALL PROCEDURES": {
+    "prefix": "PROCEDURES",
+    "body": ["USE FOR DEBUGGING ON ALL PROCEDURES"],
+    "description": "A `USE FOR DEBUGGING` keyword, which you can specify as `ALL PROCEDURES` once in a program. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
+  "PROCEED": {
+    "prefix": "PROCEED",
+    "body": ["ALTER ${1:oldSectionOrParagraph} TO PROCEED TO ${2:newSectionOrParagraph"],
+    "description": "The `ALTER` statement changes the code at run-time, transferring to other paragraphs like a `GO TO` statement. Note that `ALTER` is frowned upon - as it creates \"spaghetti code\" which can be extremely difficult to understand. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
+  "PROCESSING": {
+    "prefix": "PROCESSING",
+    "body": ["XML PARSE ${2:intentifier-1} RETURNING NATIONAL", "VALIDATING WITH ${3:indentifier-2} FILE ${4:xml-schema-name-1}", "PROCESSING PROCEDURE IS ${1:procedure-name-1}."],
+    "description": "`XML PARSE` translates an XML document into individual pieces, then passes each piece to a user-written COBOL paragraph. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
+  "END PROGRAM": {
+    "prefix": "END PROGRAM",
+    "body": ["${1|END,EXIT|} PROGRAM ${2:programName}."],
+    "description": "`END PROGRAM` designates the end of a called module and returns control to the calling module. Note that the programName must be identical to its `PROGRAM-ID`. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
   "PROGRAM-ID": {
     "prefix": "PROGRAM-ID.",
-    "body": ["PROGRAM-ID. ${1:${TM_FILENAME/(.*)\\..+$/${1:/UPCASE}/}}.", "$0"],
+    "body": ["IDENTIFICATION DIVISION.", "PROGRAM-ID. ${1:${TM_FILENAME/(.*)\\..+$/${1:/UPCASE}/}}.", "$0"],
     "description": "PROGRAM-ID"
   },
   "PROPERTY": {
@@ -1855,6 +1937,16 @@
       ""
     ],
     "description": "SET/GET PROPERTY"
+  },
+  "QUEUE": {
+    "prefix": "QUEUE",
+    "body": ["COMMUNICATION SECTION.", "CD ${2:CD-1} FOR INPUT", "\tSYMBOLIC QUEUE IS ${1:SQ1}", "\tMESSAGE DATE IS ${3:MD1}", "\tMESSAGE TIME IS ${4:MT2}", "\tSYMBOLIC SOURCE IS ${5:SS2}", "\tTEXT LENGTH IS ${6:TL2}", "\tEND KEY IS ${7:EK2}", "\tSTATUS KEY IS ${8:SK2}", "\tMESSAGE COUNT IS ${9:MC3}."],
+    "description": "The `QUEUE` runtime option can used only in an OS/VS (or Bull) COBOL program with a `RECEIVE` statement in a `COMMUNICATION DESCRIPTION`."
+  },
+  "QUOTE": {
+    "prefix": "QUOTE",
+    "body": ["77 ${2:WS-QUOTE-FIELD} PIC ${3:X(01)} VALUE ${1|QUOTE,QUOTES|}."],
+    "description": "`QUOTE`/`QUOTES` is a figurative constant. It can be used in a comparison or `MOVE` statement. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
   },
   "READ": {
     "prefix": "READ",
