@@ -1948,35 +1948,165 @@
     "body": ["77 ${2:WS-QUOTE-FIELD} PIC ${3:X(01)} VALUE ${1|QUOTE,QUOTES|}."],
     "description": "`QUOTE`/`QUOTES` is a figurative constant. It can be used in a comparison or `MOVE` statement. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
   },
-  "READ": {
+  "RD": {
+    "prefix": "RD",
+    "body": ["REPORT WRITER.", "RD ${1:reportName}."],
+    "description": "`RD` is the IBM Report Writer equivalent of a COBOL program's `ID` (`Identification Division`). https://publibfp.dhe.ibm.com/epubs/pdf/c2643014.pdf"
+  },
+  "READ (QSAM)": {
     "prefix": "READ",
-    "body": ["READ ${1:fileName}"],
-    "description": "READ FILENAME"
+    "body": ["READ ${1:QSAM-File} INTO ${2:WS-Record-Layout}", "AT END MOVE \"${3:Y}\" TO ${4:WS-EOF-Switch}"],
+    "description": "For QSAM file access, the READ statement makes the next record from a sequential file available to the program. In the given example, READ includes the INTO modifier - which moves the record from the I-O buffer into program `WORKING-STORAGE`, and the AT END modifier which forces z/OS to signal the program that the last record in the file has been read. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
+  "READ (VSAM)": {
+    "prefix": "READ",
+    "body": ["READ ${1:VSAM-File} INTO ${2:WS-Record-Layout}", "KEY IS ${2:Key-field}", "INVALID KEY ${3:imperative-statement}"],
+    "description": "For VSAM (keyed) file access, the READ statement makes a specific record from an indexed file available to the program. In the above example, READ includes the INTO modifier - which moves the record from the I-O buffer into program `WORKING-STORAGE`, and the `INVALID KEY` modifier which forces z/OS to signal the program that no record was found in the VSAM file that matches the data in the key field. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
+  "READY": {
+    "prefix": "READY",
+    "body": ["READY TRACE."],
+    "description": "`READY TRACE` was (in older compiler releases) designed to trace the execution of your program's paragraphs and SECTIONs. It is ignored and has been replaced with `USE FOR DEBUGGING` code patterns. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
+  "RECORD": {
+    "prefix": "RECORD",
+    "body": ["DATA DIVISION.", "FILE SECTION.", "FD ${2:CARPOOL}", "\tLABEL RECORDS STANDARD", "\tRECORD CONTAINS ${1:80} CHARACTERS."],
+    "description": "As part of a COBOL `FD`, `RECORD` (singular) is used with the `RECORD CONTAINS` clause - which defines the size (in bytes) of each logical record in the file. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
+  "RECORDING": {
+    "prefix": "RECORDING",
+    "body": ["DATA DIVISION.", "FILE SECTION.", "FD ${3:CARPOOL}", "\tLABEL RECORDS STANDARD", "RECORDING MODE IS ${1|F,FB,V,U,S|}", "\tRECORD CONTAINS ${2:80} CHARACTERS."],
+    "description": "As part of a COBOL FD, `RECORDING MODE` is used with `QSAM` files to describe the file/record data: `F`-Fixed (one record per/block), `FB`-Fixed/Blocked, `V`-Variable, `U`-Undefined (use for Load Modules) and `S`-Spanned records (extremely long records: I.E. larger than a Block). https://www.ibm.com/docs/en/cobol-zos/6.3?topic=entries-recording-mode-clause"
+  },
+  "RECORDS": {
+    "prefix": "RECORDS",
+    "body": ["DATA DIVISION.", "FILE SECTION.", "FD ${2:CARPOOL}", "\tLABEL RECORDS STANDARD", "\tRECORD CONTAINS ${1:80} CHARACTERS."],
+    "description": "As part of a COBOL FD, `RECORDS` (plural) is used with the `LABEL RECORDS` clause - which describes the I/O access mode (Sequential/Standard, Varying, etc.) for this file. Note that this is typically used with QSAM files. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
+  "RECURSIVE": {
+    "prefix": "RECURSIVE",
+    "body": ["IDENTIFICATION DIVISION.", "PROGRAM-ID. ${1:${TM_FILENAME/(.*)\\..+$/${1:/UPCASE}/}} RECURSIVE."],
+    "description": "An optional language element that allows programs to be reentered recursively. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
+  "REDEFINES": {
+    "prefix": "REDEFINES",
+    "body": ["WORKING-STORAGE SECTION.", "01 ${2:LAB-REC}.", "\t05 ${3:M-UNITS} PIC 9(6).", "\t05 ${4:SERUM} PIC 9(6).", "\t05 ${1:SERUM-PRICE} REDEFINES FIELD-A PIC 9999V99.", "\t05 ${5:SERUM-CLASS} PIC X(3)."],
+    "description": "`REDEFINES` allows one variable to share the same storage as another. It is a way to declare multiple fields for a single storage area in files and `WORKING-STORAGE`. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
+  "USING BY REFERENCE": {
+    "prefix": "REFERENCE",
+    "body": ["PROCEDURE DIVISION USING BY REFERENCE ${1:COMMAREA}"],
+    "description": "`BY REFERENCE` receives an argument/address that was passed by reference (the default). You must define \"COMMAREA\" in the `LINKAGE SECTION`. https://www.ibm.com/docs/en/SS6SG3_6.3.0/pdf/cg.pdf"
+  },
+  "RELATIVE": {
+    "prefix": "RELATIVE",
+    "body": ["SELECT ${1:rptfil} ASSIGN TO ${2:rptfilDD}",
+    "\tORGANIZATION IS RELATIVE.",
+    "\tACCESS MODE IS ${3|SEQUENTIAL,RANDOM,DYNAMIC|}", 
+    "\tRELATIVE KEY IS ${5:key1}",
+    "\tFILE STATUS IS ${6:WS-FILE-STATUS-VAR}.",
+    "$0"],
+    "description": "Identify VSAM RRDS files in your program by using `ORGANIZATION IS RELATIVE`. `RELATIVE KEY IS` associates a logical record with its relative record number. https://www.ibm.com/docs/en/SS6SG3_6.3.0/pdf/cg.pdf"
   },
   "RELEASE": {
     "prefix": "RELEASE",
-    "body": ["RELEASE ${1:recordName}"],
-    "description": "RELEASE recordName"
+    "body": ["MOVE ${2:SORT-EXT-RECORD} TO ${1:SORT-RECORD}", "PERFORM ${3:RELEASE-SORT-RECORD}", "\t", "RELEASE ${1:SORT-RECORD}"],
+    "description": "`RELEASE` transfers records from an input/output area to the initial phase of a SORT. NOTE: `RELEASE` can only be used in an `INPUT PROCEDURE` `SECTION`. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
+  "RELEASE FROM": {
+    "prefix": "RELEASE FROM",
+    "body": ["MOVE ${3:SORT-EXT-RECORD} TO ${1:SORT-RECORD}", "PERFORM ${4:RELEASE-SORT-RECORD}", "\t", "RELEASE ${1:SORT-RECORD} FROM ${2:SORT-FILE-IN}"],
+    "description": "`RELEASE FROM` moves data from one group field to the SORT field, then transfers records from an input/output area to the initial phase of a SORT. NOTE: `RELEASE FROM` can only be used in an `INPUT PROCEDURE` `SECTION`. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
+  "SERVICE RELOAD": {
+    "prefix": "RELOAD",
+    "body": ["SERVICE RELOAD."],
+    "description": "`SERVICE RELOAD`, a compiler directive. Is syntax checked, but has no effect on the execution of the program. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
+  "REMAINDER": {
+    "prefix": "REMAINDER",
+    "body": ["DIVIDE ${1:A} INTO ${2:B} GIVING ${3:C} REMAINER ${4:D}."],
+    "description": "`DIVIDE` with `REMAINDER` allows you to specify a numeric data item that you can process as a remainder from the math. NOTE: `REMAINDER` is available from all formats of the COBOL `DIVIDE` statement. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
+  "REMOVAL": {
+    "prefix": "REMOVAL",
+    "body": ["CLOSE $(1:fileName} FOR REMOVAL."],
+    "description": "`FOR REMOVAL` applies only to QSAM tape files. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
+  "RENAMES": {
+    "prefix": "RENAMES",
+    "body": ["66 ${1:DATA-ITEM5} RENAMES ${2:DATA-ITEM1}."],
+    "description": "`RENAMES` allows you to rename a data-item. The only level-number allowed for `RENAMES` is 66. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
+  "RENAMES THRU": {
+    "prefix": "RENAMES THRU",
+    "body": ["66 ${1:DATA-ITEMX} RENAMES ${2:DATA-ITEM5} THRU ${3:DATA-ITEM1}"],
+    "description": "`RENAMES THRU` allows you to rename data-items (actually the storage behind said data-items) as a single field. The only level-number allowed for `RENAMES` is 66. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
+  "REPLACE": {
+    "prefix": "REPLACE",
+    "body": ["REPLACE ==${1::TAG:}== BY ==${2:EMP-PAY}==.", "\t01 ${1::TAG:}.", "\t\t02 ${1::TAG:}-WEEK PIC S99.", "\t\t02 ${1::TAG:}-GROSS-PAY PIC S9(5)V99.", "\t\t02 ${1::TAG:}-HOURS PIC S999 OCCURS 1 TO 52 TIMES", "DEPENDING ON ${1::TAG:}-WEEK OF ${1::TAG:}."],
+    "description": "`REPLACE` allows you to rename a source text within a program file. This is typically used when the same physical record layout can assume multiple logical business terms within a program. Note that this is a Compilation (not run-time) level statement is similar to REPLACING except that it replaces text across an entire file - not simply a copybook. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
   },
   "REPLACING": {
     "prefix": "REPLACING",
-    "body": ["RELEASE ${1:item}"],
-    "description": "REPLACING item "
+    "body": ["COPY ${1:PAYLIB} REPLACING ==${2::TAG:}== BY ==${3:EMP-PAY}==."],
+    "description": "`REPLACING` allows you to rename source text within a COBOL Copybook. This is typically used when the same physical record layout can assume multiple logical business terms within a program. Note that this is a Compilation (not run-time) level statement. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
+  "RESERVE": {
+    "prefix": "RESERVE",
+    "body": ["SELECT ${2:TESTDATA}", "ASSIGN TO ${3:UT-S-TESTDATA}", "\tRESERVE ${1:4} AREAS."],
+    "description": "`RESERVE` allows you to specify the number of I/O buffers to be allocated at run time for QSAM and VSAM files. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
+  "RESET TRACE": {
+    "prefix": "RESET TRACE",
+    "body": ["RESET TRACE."],
+    "description": "Deprecated but could still be syntax checked depending on your compiler release. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
   },
   "RETURN": {
     "prefix": "RETURN",
-    "body": ["RETURN ${1:fileName}"],
-    "description": "REPLACING fileName"
+    "body": ["RETURN ${1:SORT-FILE-NAME}", "\tAT END MOVE \"${2:YES}\" TO ${3:WS-EOF-SRT-OUTPUT-SW}", "\tGO TO ${4:RETURN-SRTD-REC-EXIT}."],
+    "description": "The `RETURN` statement in the `OUTPUT PROCEDURE` of a COBOL `SORT` program is a request for the next sorted record. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
+  "RETURN-CODE": {
+    "prefix": "RETURN-CODE",
+    "body": ["IF ${1:WS-SWITCH-NO-ERRORS = \"Y\"", "\tMOVE 0 to RETURN-CODE."],
+    "description": "`RETURN-CODE` is a COBOL special register that can be used to pass a return code to the calling program or to z/OS when the program ends. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
   },
   "RETURNING": {
     "prefix": "RETURNING",
-    "body": ["RETURNING ${1:dataname}"],
-    "description": "RETURNING dataName"
+    "body": ["INVOKE ${1:OO-CLASS-NAME} USING ${2:SENDING-FLD}", "\tRETURNING ${3:RECEIVING-FLD}."],
+    "description": "The RETURNING phrase specifies a data item that will contain the value returned from the invoked method. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
+  "REVERSED": {
+    "prefix": "REVERSED",
+    "body": ["OPEN ${1:QSAM-FILE} REVERSED."],
+    "description": "`REVERSED` positions a QSAM file at its end. Successive READ statements make the file records available in reversed order, starting with the last record. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
+  "WITH NO REWIND": {
+    "prefix": "REWIND",
+    "body": ["CLOSE ${1:QSAM-FILE} WITH NO REWIND"],
+    "description": "`REWIND` is typically used after `WITH NO` - an option that positions a QSAM file at its end. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
   },
   "REWRITE": {
     "prefix": "REWRITE",
-    "body": ["REWRITE ${1:recordName}"],
-    "description": "REWRITE recordName"
+    "body": ["REWRITE ${1:recordName}."],
+    "description": "`REWRITE` Can be used with any DASD (non-Tape) file. It replaces the contents of the current record with the program's `FILE SECTION` values for that record. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
+  "REWRITE FROM": {
+    "prefix": "REWRITE FROM",
+    "body": ["REWRITE ${1:recordName} FROM ${2:WS-RECORD}."],
+    "description": "`REWRITE FROM` can be used with any DASD (non-Tape) file. It moves data from (in the above example) `WS-RECORD` to the program's `FILE SECTION` declaration and replaces the record. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
+  "RIGHT": {
+    "prefix": "RIGHT",
+    "body": ["01 ${3:GROUP-FLD}.", "\t05 ${1:ACCTG-CODE} ${2:PIC X(999)} JUSTIFIED RIGHT."],
+    "description": "`JUSTIFIED` overrides COBOL's standard byte-movement rules for receiving data of type: `PIC A`, `PIC X`, `DBCS`, `NATIONAL`. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
+  "ROUNDED": {
+    "prefix": "ROUNDED",
+    "body": ["77 ${1:TEMP-RESULT} PIC 9(5)V99 VALUE ZERO.", "COMPUTE ${1:TEMP-RESULT} ROUNDED = ${2:mathExpression}."],
+    "description": "After decimal point alignment, the number of places in the fraction result of an math statement is compared with the number of places provided for the fraction in the PIC clause. When the size of the fractional result is greater than fraction provided in the PIC clause, truncation occurs unless ROUNDED is specified. The right-most digit of the resultant is increased by 1 whenever the most significant digit of the excess is >= 5. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
   },
   "SEARCH ALL WHEN": {
     "prefix": "SEARCH ALL WHEN",
