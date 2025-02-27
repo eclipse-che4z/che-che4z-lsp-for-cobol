@@ -54,12 +54,10 @@ describe("CopybooksPathGenerator tests", () => {
   it("create paths for copybooks of processsor groups definitions", async () => {
     const e4e = {} as E4E;
     const e4eDownloader = new CopybookDownloaderForE4E("/storagePath", e4e);
-    e4eDownloader.getProfileInfo = jest
-      .fn()
-      .mockResolvedValue({
-        profile: "internal.connection",
-        instance: "instance",
-      });
+    e4eDownloader.getProfileInfo = jest.fn().mockResolvedValue({
+      profile: "internal.connection",
+      instance: "instance",
+    });
     const pgConfigs: (
       | ZoweDatasetConfigModel
       | ZoweUssConfigModel
