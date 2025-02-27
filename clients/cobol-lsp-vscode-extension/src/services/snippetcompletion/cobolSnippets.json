@@ -2108,6 +2108,21 @@
     "body": ["77 ${1:TEMP-RESULT} PIC 9(5)V99 VALUE ZERO.", "COMPUTE ${1:TEMP-RESULT} ROUNDED = ${2:mathExpression}."],
     "description": "After decimal point alignment, the number of places in the fraction result of an math statement is compared with the number of places provided for the fraction in the PIC clause. When the size of the fractional result is greater than fraction provided in the PIC clause, truncation occurs unless ROUNDED is specified. The right-most digit of the resultant is increased by 1 whenever the most significant digit of the excess is >= 5. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
   },
+  "SAME AREA": {
+    "prefix": "SAME",
+    "body": ["ENVIRONMENT DIVISION.", "INPUT-OUTPUT SECTION.", "I-O-CONTROL.", "SAME ${1|AREA,SORT,SORT-MERGE|} FOR ${2:filename}."],
+    "description": "The `SAME AREA` clause is syntax checked but not executable. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
+  "SAME RECORD AREA": {
+    "prefix": "SAME RECORD AREA",
+    "body": ["ENVIRONMENT DIVISION.", "INPUT-OUTPUT SECTION.", "I-O-CONTROL.", "SAME RECORD AREA FOR ${1:filename}."],
+    "description": "The `SAME RECORD AREA` clause specifies that the same main storage be used for two or more files. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
+  "SD": {
+    "prefix": "SD",
+    "body": ["DATA DIVISION.", "SD ${3:SORT-FILE}", "\t\tLABEL RECORDS ARE STANDARD", "\t\tBLOCK CONTAINS 0", "\t\tDATA RECORD IS ${1:SORT-RECORD}.", "01 ${1:SORT-RECORD} ${2:PIC X(1324)}."],
+    "description": "The `SD` (`SORT DESCRIPTION`) defines files that are to be sorted and that are referred to in your `PROCEDURE DIVISION`'s `SORT` statement. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
   "SEARCH ALL WHEN": {
     "prefix": "SEARCH ALL WHEN",
     "body": [
@@ -2294,9 +2309,59 @@
     "body": ["XML PARSE ${1:item}"],
     "description": "XML PARSE item"
   },
+  "XML-CODE": {
+    "prefix": "XML-CODE",
+    "body": ["01 ${1:XML-CODE} PIC S9(9) USAGE BINARY VALUE 0."],
+    "description": "The special register `XML-CODE` communicates the status between the IBM XML parser and the XML  procedure invoked in an XML PARSE statement. It indicates either that an XML GENERATE was successful or not. https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdfs"
+  },
+  "XML-EVENT": {
+      "prefix": "XML-EVENT",
+      "body": ["01 ${1:XML-EVENT} PIC S9(9) USAGE BINARY VALUE 0."],
+      "description": "`XML-EVENT` is a special register that passes run-time event information from the XML parser to the processing procedure identified in the XML PARSE statement. https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdfs"
+  },
+  "XML-INFORMATION": {
+      "prefix": "XML-INFORMATION",
+      "body": ["01 ${1:XML-INFORMATION} PIC S9(9) USAGE BINARY VALUE 0."],
+      "description": "The `XML-INFORMATION` special register is used to provide additional information to an XML PARSE processing procedure about the status of the executing code. parse.https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdfs"
+  },
+  "XML-NAMESPACE": {
+      "prefix": "XML-NAMESPACE",
+      "body": ["01 ${1:XML-NAMESPACE} PIC S9(9) USAGE BINARY VALUE 0."],
+      "description": "`XML-NAMESPACE` special register passes event information from the XML parser to the processing procedure identified in the XML PARSE statement. https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdfs"
+  },
+  "XML-NAMESPACE-PREFIX": {
+      "prefix": "XML-NAMESPACE-PREFIX",
+      "body": ["01 ${1:XML-NAMESPACE-PREFIX} PIC S9(9) USAGE BINARY VALUE 0."],
+      "description": "`XML-NAMESPACE-PREFIX` contains the identifier of the namespace, if any, associated with the name in XML-TEXT for XML events. https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdfs"
+  },
+  "XML-NTEXT": {
+      "prefix": "XML-NTEXT",
+      "body": ["01 ${1:XML-NTEXT} PIC S9(9) USAGE BINARY VALUE 0."],
+      "description": "`XML-NTEXT` contains document fragments that are represented in usage NATIONAL. https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdfs"
+  },
+  "XML-SCHEMA": {
+      "prefix": "XML-SCHEMA",
+      "body": ["01 ${1:XML-SCHEMA} PIC S9(9) USAGE BINARY VALUE 0."],
+      "description": "`XML-SCHEMA` relates <xml-schema-name-1> to an external file identifier such as a  ddname or environment variable which identifies the actual external file that contains the optimized XML schema. https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdfs"
+  },
+  "XML-TEXT": {
+      "prefix": "XML-TEXT",
+      "body": ["01 ${1:XML-TEXT} PIC S9(9) USAGE BINARY VALUE 0."],
+      "description": "`XML-TEXT` contains document fragments that are represented in usage DISPLAY (PIC A, or PIC X). https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdfs"
+  },
   "WORKING-STORAGE SECTION": {
     "prefix": "WORKING-STORAGE SECTION",
     "body": ["WORKING-STORAGE SECTION.", "$0"],
     "description": "WORKING-STORAGE SECTION"
+  },
+  "MOVE ZERO": {
+    "prefix": "ZERO",
+    "body": ["MOVE ${1|ZERO,ZEROS,ZEROES|} TO ${2:WS-NUM-ITEM1}."],
+    "description": "`ZERO` and its synonyms represent the numeric value zero (0) or one or more occurrences of the character zero (in EBCDIC: xF0). https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdfs"
+  },
+  "VALUE ZERO": {
+    "prefix": "ZERO",
+    "body": ["77 ${1:VAR-BIN} PIC S9(4)V99 COMP-3 VALUE ${2|ZERO,ZEROS,ZEROES|}."],
+    "description": "`VALUE ZERO` when used in a variable declaration initiaizes the field to the numeric value zero (0). https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdfs"
   }
 }
