@@ -1387,7 +1387,7 @@
   "RECORD KEY": {
     "prefix": "KEY",
     "body": ["ENVIRONMENT DIVISION.", "FILE-CONTROL.", "SELECT ${1:VSAM-FILE} ASSIGN TO ${2:VSMKSDS}", "RECORD KEY IS ${3:VSAMFILE-KEY}"],
-    "description": "A clause in the `ENVIRONMENT DIVISION`, `FILE-CONTROL` paragraph - `RECORD KEY` declares a field that you define in the `FILE SECTION` to be used to search the indexed/VSAM data thru.  Note that the same technique can be used for SORT Files. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+    "description": "A clause in the `ENVIRONMENT DIVISION`, `FILE-CONTROL` paragraph - `RECORD KEY` declares a field that you define in the `FILE SECTION` to be used to search the indexed/VSAM data through.  Note that the same technique can be used for SORT Files. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
   },
   "KEY IS": {
     "prefix": "KEY IS",
@@ -1763,7 +1763,7 @@
     "\tORGANIZATION IS ${1|INDEXED,RELATIVE,SEQUENTIAL|}.",
     "\tACCESS MODE IS ${4|SEQUENTIAL,RANDOM,DYNAMIC|} RECORD KEY IS ${5:key1}",
     "$0"],
-    "description": "VSAM file `ORGANIZATION` clause for a VSAM file accessed thru the file's index (key1).  https://www.ibm.com/docs/en/SS6SG3_6.4.0/pdf/pgmvs.pdf"
+    "description": "VSAM file `ORGANIZATION` clause for a VSAM file accessed through the file's index (key1).  https://www.ibm.com/docs/en/SS6SG3_6.4.0/pdf/pgmvs.pdf"
   },
   "OTHER": {
     "prefix": "OTHER",
@@ -2241,7 +2241,7 @@
   "EXEC SQLIMS": {
     "prefix": "EXEC SQLIMS",
     "body": ["EXEC SQLIMS INCLUDE ${1:SQLSTATEMENT.CPY} END-EXEC."],
-    "description": "The `EXEC SQLIMS` statements invoke a Compiler option, which allows you to access IMS Databases thru SQL relational statements. There is a wide variety of `SQLIMS` options and the setup for this functionality must be installed and configured.  https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdfs"
+    "description": "The `EXEC SQLIMS` statements invoke a Compiler option, which allows you to access IMS Databases through SQL relational statements. There is a wide variety of `SQLIMS` options and the setup for this functionality must be installed and configured.  https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdfs"
   },
   "STANDARD": {
     "prefix": "STANDARD",
@@ -2346,20 +2346,60 @@
     "body": ["01 ${3:GROUP-VAR}", "\t05 ${2:IDX-VAR} PIC S9(4) COMP ${1|SYNC,SYNCHRONIZED|}."],
     "description": "The `SYNC`/`SYNCHRONIZED` clause specifies the alignment of an elementary item on a natural boundary in Z/OS main storage. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
   },
-  "TALLYING": {
+  "TALLY": {
+    "prefix": "TALLY",
+    "body": ["01 TALLY GLOBAL PICTURE 9(5) COMP VALUE ZERO."],
+    "description": "`TALLY` is a special register named as a binary (COMP) data item. When used in nested programs, this special register is implicitly declared with this global variable in the outermost program. You can refer to or modify the contents of `TALLY` throughout the nested program. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
+  "TALLYING (Inspect)": {
     "prefix": "TALLYING",
-    "body": ["TALLYING ${1:item}"],
-    "description": "TALLYING item"
+    "body": ["INSPECT ${2:INPAT-ADDRESS}", "\tTALLYING ${1:INPAT-COUNTR} FOR LEADING \" \"", "\tREPLACING FIRST \" \" BY \"|\"."],
+    "description": "`TALLYING` counts the occurrences of a specific character or special character in the `INSPECT`, `STRING` or `UNSTRING` data item. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
   },
-  "THROUGH": {
-    "prefix": "THROUGH",
-    "body": ["THROUGH ${1:item}"],
-    "description": "THROUGH item"
+  "TALLYING (UNSTRING)": {
+    "prefix": "TALLYING",
+    "body": ["UNSTRING ${2:INPAT-FLDS}", "\tDELIMITED BY SPACES ", "\tINTO ${3:WS-INPAT}", "\tTALLYING IN ${1:INPAT-FLDS-FILLED}", "END-UNSTRING."],
+    "description": "`TALLYING` counts the occurrences of a specific character or special character in the `INSPECT`, `STRING` or `UNSTRING` data item. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
   },
-  "THRU": {
-    "prefix": "THRU",
-    "body": ["THRU ${1:item}"],
-    "description": "THRU item"
+  "If x THEN": {
+    "prefix": "THEN",
+    "body": ["IF ${1:statement-1} THEN", "\t${2:ifTrue}", "ELSE", "\t${3:ifNotTrue}", "END-IF."],
+    "description": "Use `THEN` in an `IF ... ELSE` statement to code a formal (English-language) choice between processing actions. Note that the word `THEN` is optional. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
+  "PERFORM x THRU y": {
+    "prefix": "PERFORM THRU",
+    "body": ["PERFORM ${1:PROCESS-PATIENT} ${2|THRU,THROUGH|} ${3:PROCESS-PATIENT-EXIT}"],
+    "description": "`THROUGH` (or `THRU`) in a `PERFORM` statement tells the runtime to execute all paragraphs and statements from the named-paragraph THRU the EXIT paragraph. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
+  "VALUE x THRU y": {
+    "prefix": "VALUE THRU",
+    "body": ["01 WS-YEAR-VALUES.", "\t05 WS-INIT-YEAR PIC 9(4).", "\t\t88 VALID-YEAR   VALUE 1960 ${1|THRU,THROUGH|} 2022.", "\t\t88 INVALID-YEAR VALUE 0001 ${1|THRU,THROUGH|} 1959", "\t\t                      2023 ${1|THRU,THROUGH|} 9999."],
+    "description": "`THROUGH` (or `THRU`) in an 88-declaration tells the compiler that all sequential values after `VALUE` to the `THRU` value are assigned to the 88. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
+  "TIME": {
+    "prefix": "TIME",
+    "body": ["ACCEPT ${1:WS-TIME-ITEM} FROM TIME.", "DISPLAY \"CURRENT TIME IS: \"${1:WS-TIME-ITEM}."],
+    "description": "The reserved word `TIME` is a special register that returns the current time in your system-format. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
+  "OCCURS x TIMES": {
+    "prefix": "TIMES",
+    "body": ["01 {3:WS-PATIENT-TBL}.", "\t05 ${2:WS-PATIENT-DATA} OCCURS ${1:99} TIMES."],
+    "description": "`TIMES` when used in a table declaration defines the number of instances a variable occurs within a table. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
+  "PERFORM x THRU y num TIMES": {
+    "prefix": "TIMES",
+    "body": ["PERFORM ${2:PROCESS-PAT-EDIT} THRU ${3:PAT-EDIT-EXT} ${1:99} TIMES."],
+    "description": "`TIMES` when used in a COBOL loop construct declares the number of iterations the logic should be looped through. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
+  "SELECT x ASSIGN TO y": {
+    "prefix": "TO",
+    "body": ["FILE-CONTROL.", "\tSELECT ${1:FILE-1} ASSIGN TO ${2:EXTFILE1}", "ORGANIZATION IS INDEXED"],
+    "description": "`TO` as part of a `SELECT`/`ASSIGN` statement associates the internal COBOL filename (after `SELECT`) to an external (JCL) DDNAME. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
+  "IF x GREATER/LESS THAN OR EQUAL TO y": {
+    "prefix": "TO",
+    "body": ["IF ${1:statement-1} ${2|GREATER,LESS|} THAN OR EQUAL TO ${3:statement-2} THEN", "\t${4:ifTrue}", "ELSE", "\t${5:ifNotTrue}", "END-IF."],
+    "description": "TO as part of an IF statement directs the runtime to evaluate the value after the word IF to the value after TO and take appropriate action. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
   },
   "TO": {
     "prefix": "TO",
@@ -2371,10 +2411,25 @@
     "body": ["TO ${1:item} ${2:item}"],
     "description": "TO item1 item2"
   },
-  "TYPE": {
-    "prefix": "TYPE ITEM1 ITEM2",
-    "body": ["TYPE ${1:item} ${2:SNIP}"],
-    "description": "TYPE item1 item2"
+  "TRAILING": {
+    "prefix": "TRAILING",
+    "body": ["77 ${1:VAR-1} PIC ${2:S9(4)} SIGN TRAILING."],
+    "description": "`SIGN TRAILING` declares the position of the operational sign (plus or minus) for a numeric variable. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
+  "EVALUATE TRUE": {
+    "prefix": "EVALUATE TRUE",
+    "body": ["EVALUATE TRUE", "\tWHEN ${1:VAR-A} = ${2:VAR-B}", "\t\tMOVE \"${1:VAR-A} - ${2:VAR-B} EQUAL\" TO DISP-OUT.", "\tWHEN ${3:VAR-C} = ${4:VAR-D}", "\t\tMOVE \"${3:VAR-C} - ${4:VAR-D} EQUAL\" TO DISP-OUT.", "END-EVALUATE."],
+    "description": "Use `EVALUATE TRUE` instead of a series of nested IF statements to test multiple conditions and specify distinct actions for each. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
+  "SET x TRUE": {
+    "prefix": "SET TRUE",
+    "body": ["IF NO-MORE-RECORDS", "\tSET EOF-CONDITION TRUE"],
+    "description": "When a `SET` statement is executed, the value associated with a condition-name is placed in its 88-Level according to the rules of the VALUE clause. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
+  "JSON GENERATE TYPE": {
+    "prefix": "TYPE",
+    "body": ["JSON GENERATE ${3:JASON-STMT} FROM ${4:IN-FILE-TEXT} COUNT IN ${5:JSON-CHAR-CTR}", "\tTYPE OF ${1:VAR-MSG} IS ${2:attribute}", "\tON EXCEPTION DISPLAY \"JSON GENERATE ERROR: \" ${6:WS-JS-CODE}", "END-JSON"],
+    "description": "The TYPE phrase allows you to control attribute and element generation. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
   },
   "UNSTRING": {
     "prefix": "UNSTRING ITEM",
