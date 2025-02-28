@@ -2053,6 +2053,11 @@
     "body": ["COPY ${1:PAYLIB} REPLACING ==${2::TAG:}== BY ==${3:EMP-PAY}==."],
     "description": "`REPLACING` allows you to rename source text within a COBOL Copybook. This is typically used when the same physical record layout can assume multiple logical business terms within a program. Note that this is a Compilation (not run-time) level statement. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
   },
+  "RERUN": {
+    "prefix": "RERUN",
+    "body": ["RERUN ON ${1:ddName} EVERY ${2:20000} RECORDS OF ${3:filename}."],
+    "description": "`RERUN` specifies what checkpoints (for rerunning a program) are to be taken at specified intervals. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
   "RESERVE": {
     "prefix": "RESERVE",
     "body": ["SELECT ${2:TESTDATA}", "ASSIGN TO ${3:UT-S-TESTDATA}", "\tRESERVE ${1:4} AREAS."],
