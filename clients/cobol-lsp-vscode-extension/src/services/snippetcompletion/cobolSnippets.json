@@ -2123,48 +2123,150 @@
     "body": ["DATA DIVISION.", "SD ${3:SORT-FILE}", "\t\tLABEL RECORDS ARE STANDARD", "\t\tBLOCK CONTAINS 0", "\t\tDATA RECORD IS ${1:SORT-RECORD}.", "01 ${1:SORT-RECORD} ${2:PIC X(1324)}."],
     "description": "The `SD` (`SORT DESCRIPTION`) defines files that are to be sorted and that are referred to in your `PROCEDURE DIVISION`'s `SORT` statement. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
   },
-  "SEARCH ALL WHEN": {
-    "prefix": "SEARCH ALL WHEN",
-    "body": [
-      "SEARCH ALL ${1:item} WHEN ${2:item1} EQUAL ${3:item3} ${4:item4}"
-    ],
-    "description": "SEARCH ALL item1 WHEN item2 EQUAL item3 item4 "
+  "SEARCH": {
+    "prefix": "SEARCH",
+    "body": ["SET SUB TO 1.", "\tSEARCH ${1:WS-TABLE}", "\tAT END DISPLAY \"${2:ELEMENT NOT FOUND IN TABLE}\"", "\tWHEN ${1:WS-TABLE}(SUB) = ${3:WS-SRCH-ELEMENT}", "\tDISPLAY \"FOUND IN TABLE\"", "END-SEARCH."],
+    "description": "`SEARCH` searches a table SEQUENTIALLY (top to bottom) - for an element that satisfies a condition. The `SEARCH` statement automatically increments the table subscript. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
+  "SEARCH ALL": {
+    "prefix": "SEARCH ALL",
+    "body": ["SEARCH ALL ${1:WS-TABLE}", "\tAT END DISPLAY \"${2:ELEMENT NOT FOUND IN TABLE}\"", "\tWHEN ${1:WS-TABLE}(IDX) = ${3:WS-SRCH-ELEMENT}", "\tDISPLAY \"FOUND IN TABLE\"", "END-SEARCH."],
+    "description": "`SEARCH` searches a table SEQUENTIALLY (top to bottom) - for an element that satisfies a condition. The `SEARCH` statement automatically increments the table subscript. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
   },
   "SEARCH WHEN": {
     "prefix": "SEARCH WHEN",
     "body": ["SEARCH ${1:item} WHEN ${2:condition} ${3:item}"],
     "description": "SEARCH WHEN condition item"
   },
+  "SEGMENT-LIMIT IS": {
+    "prefix": "SEGMENT-LIMIT IS",
+    "body": ["SEGMENT-LIMIT IS ${1:...}"],
+    "description": "A reserved word used in  early IBM compilers. `SEGMENT-LIMIT` is syntax checked, but not operational. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
+  "SELECT": {
+    "prefix": "SELECT",
+    "body": ["SELECT ${1:PATIENT-TRAN-FILE} ASSIGN TO ${2:PATTRAN}", "\tORGANIZATION IS ${3|INDEXED,RELATIVE,SEQUENTIAL|}.", "\tACCESS MODE IS ${4|SEQUENTIAL,RANDOM,DYNAMIC|}", "\tFILE STATUS IS ${5:PAT-TRAN-STATUS}."],
+    "description": "`SELECT MODE` defines the internal COBOL `FD` (`DATA DIVISION` `FILE DESCRIPTOR`) that is assigned to (associated with) an external QSAM, VSAM or Line Sequential file. https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdf"
+  },
+  "SEPARATE": {
+    "prefix": "SEPARATE",
+    "body": ["77 ${1:VAR-1} PIC S9999 DISPLAY SIGN ${2|LEADING,TRAILING|} SEPARATE."],
+    "description": "If `SIGN LEADING` (or `TRAILING`) and `SEPARATE` is specified, the internal representation of the sign is a full byte, not 1/2-byte as would be for COMP-3 field declarations. https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdf"
+  },
   "SEQUENCE": {
     "prefix": "SEQUENCE",
     "body": ["SEQUENCE ${1:item}"],
     "description": "SEQUENCE"
   },
+  "SEQUENTIAL": {
+    "prefix": "SEQUENTIAL",
+    "body": ["FILE-CONTROL.", "SELECT ${2:COMMUTER-FILE} ASSIGN TO ${3:COMMUTR}", "ORGANIZATION IS ${1|SEQUENTIAL,LINE-SEQUENTIAL|}", "ACCESS MODE IS SEQUENTIAL."],
+    "description": "`SEQUENTIAL` determines the previous/next relationship among the records in the file as established by file creation. https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdf"
+  },
   "SET": {
     "prefix": "SET",
-    "body": ["SET ${1:item}"],
-    "description": "SET"
+    "body": ["SET ${1:item} TO ${2:value}."],
+    "description": "Use the `SET` statement to assign a value to a: COBOL Table index, `POINTER`, `PROCEDURE POINTER`, `FUNCTION POINTER` and `OBJECT REFERENCE`. https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdf"
   },
-  "SORT": {
+  "SHIFT": {
+    "prefix": "SHIFT",
+    "body": ["01 ${1|SHIFT-IN,SHIFT-OUT|} GLOBAL PICTURE X(1) USAGE DISPLAY VALUE X\"0F\"."],
+    "description": "`SHIFT-IN`/`SHIFT-OUT` is a special register that represents EBCDIC shift-in/shift-out control characters. Note that these control characters are unprintable. https://www.ibm.com/docs/en/cobol-zos/6.3?topic=registers-shift-out-shift-in"
+  },
+  "SIGN": {
+    "prefix": "SIGN",
+    "body": ["77 ${1:VAR-1} PIC ${2:S9(4)} SIGN ${3|LEADING,TRAILING|}."],
+    "description": "The `SIGN` clause specifies the position and character of the operational sign for signed numeric variables. https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdf"
+  },
+  "SKIP1/SKIP2/SKIP3": {
+    "prefix": "SKIP",
+    "body": ["SKIP${1|1,2,3|}.", "$0"],
+    "description": "SKIP `n` number of lines in a source listing."
+  },
+  "SORT x on y": {
     "prefix": "SORT",
-    "body": ["SORT ${1:fileName} ${2:snipordering} ${3:snip} ${4:snip}"],
-    "description": "SORT"
+    "body": ["SORT ${1:fileName} ON ${2:VAR1}${2:, DESCENDING VAR2}"],
+    "description": "`SORT` causes a set of records in an external sequential file to be arranged in a user-specified sequence. https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdf"
+  },
+  "SORT TABLE": {
+    "prefix": "SORT",
+    "body": ["SORT ${1:varOrTable} ON ${2|ASCENDING,DESCENDING|} ${3:sort-var-key}."],
+    "description": "`SORT` sorts internal COBOL table rows according to the specified COBOL table key fields. It is especially useful for tables used with `SEARCH ALL` - which is more efficient than default SEARCH. https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdf"
+  },
+  "SORT-CONTROL": {
+    "prefix": "SORT-CONTROL",
+    "body": ["01 SORT-CONTROL GLOBAL PICTURE X(8) USAGE DISPLAY", "\t\tVALUE \"IGZSRTCD\"."],
+    "description": "The register `SORT-CONTROL` contains the JCL ddname of the data set that holds control statements used to improve the performance of a sort or merge operation. https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdf"
+  },
+  "SORT-CORE SIZE": {
+    "prefix": "SORT-CORE SIZE",
+    "body": ["01 SORT-CORE-SIZE GLOBAL PICTURE S9(8) USAGE BINARY", "\t\tVALUE ZERO."],
+    "description": "`SORT-CORE-SIZE` is the name of a COMP (binary) variable that you can use to declare the number of storage bytes available to the sort utility. https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdfs"
+  },
+  "SORT-FILE-SIZE": {
+    "prefix": "SORT-FILE-SIZE",
+    "body": ["01 SORT-FILE-SIZE GLOBAL PICTURE S9(8) USAGE BINARY", "\t\tVALUE ZERO."],
+    "description": "`SORT-FILE-SIZE` is the name of a COMP (binary) variable that you can use to declare the number of input records to a SORT. https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdfs"
+  },
+  "SORT-MESSAGE": {
+    "prefix": "SORT-MESSAGE",
+    "body": ["01 SORT-MESSAGE GLOBAL PICTURE X(8) USAGE DISPLAY", "\t\tVALUE \"SYSOUT\"."],
+    "description": "The register `SORT-MESSAGE` contains the JCL ddname of the data set that holds output messages of a sort operation at run-time - in place of the `MSGDDN=` sort control statement. https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdf"
+  },
+  "SORT-MODE-SIZE": {
+    "prefix": "SORT-MODE-SIZE",
+    "body": ["01 SORT-MODE-SIZE GLOBAL PICTURE S9(8) USAGE BINARY", "\t\tVALUE ZERO."],
+    "description": "`SORT-MODE-SIZE` is the name of a COMP (binary) variable that you can use to declare the length of variable-length records that occur most frequently. https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdfs"
+  },
+  "SORT-RETURN": {
+    "prefix": "SORT-RETURN",
+    "body": ["01 SORT-RETURN GLOBAL PICTURE S9(8) USAGE BINARY", "\t\tVALUE ZERO."],
+    "description": "SORT-RETURN` is the name of a COMP (binary) variable that you can declare that will contain a return-code from the sort function. https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdfs"
+  },
+  "SOURCE-COMPUTER": {
+    "prefix": "SOURCE-COMPUTER",
+    "body": ["SOURCE-COMPUTER. ${1:COMPUTER-NAME}${2|., WITH DEBUGGING MODE.|}"],
+    "description": "The `SOURCE-COMPUTER` paragraph is syntax checked - only - unless it contains a `WITH DEBUGGING` clause which then sets a compile-time switch for debugging. https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdfs"
+  },
+  "SPACE": {
+    "prefix": "SPACE",
+    "body": ["01 DEBUG-ITEM.", "\t02 DEBUG-FIELD PICTURE IS X(6).", "\t02 FILLER PICTURE IS X VALUE ${1|SPACE,SPACES|}"],
+    "description": "The figurative constant `SPACE` or `SPACES` identify a character field the (EBCDIC) Hex value of \"40\". https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdfs"
+  },
+  "SPECIAL-NAMES": {
+    "prefix": "SPECIAL-NAMES",
+    "body": ["ENVIRONMENT DIVISION.", "CONFIGURATION SECTION.", "SOURCE-COMPUTER. ${1:COMPUTER-NAME}. OBJECT-COMPUTER. ${1:COMPUTER-NAME}", "SPECIAL-NAMES.", "\tALPHABET SPECIAL-SEQUENCE IS", "\t\t\"A\" Also \"a\"", "\t\t\"B\" Also \"b\"", "\t\t${2:...}"],
+    "description": "The `SPECIAL-NAMES` paragraph is the name of an `ENVIRONMENT DIVISION`, `CONFIGURTION SECTION` paragraph in which user-specified mnemonic-names are releated to environment-names. https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdfs"
+  },
+  "EXEC SQLIMS": {
+    "prefix": "EXEC SQLIMS",
+    "body": ["EXEC SQLIMS INCLUDE ${1:SQLSTATEMENT.CPY} END-EXEC."],
+    "description": "The `EXEC SQLIMS` statements invoke a Compiler option, which allows you to access IMS Databases thru SQL relational statements. There is a wide variety of `SQLIMS` options and the setup for this functionality must be installed and configured.  https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdfs"
+  },
+  "STANDARD": {
+    "prefix": "STANDARD",
+    "body": ["DATA DIVISION.", "FILE SECTION.", "FD ${1:INPATIENT-REC}", "\tLABEL RECORD STANDARD", "\tBLOCK CONTAINS ${2:0} CHARACTERS", "\tRECORD CONTAINS ${3:80} CHARACTERS."],
+    "description": "`LABEL RECORDS` documents the presence or absence of labels. `STANDARD LABELS` conform to system specifications. https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdfs"
+  },
+  "STANDARD-1": {
+    "prefix": "STANDARD-1",
+    "body": ["OBJECT-COMPUTER. ${2:COMPUTER-NAME}.", "\tPROGRAM COLLATING SEQUENCE IS ASCII-SEQUENCE.", "\tSPECIAL-NAMES. ALPHABET ASCII-SEQUENCE IS STANDARD-1."],
+    "description": "`STANDARD-1` specifies that the ASCII collating sequence is used for all alphanumeric comparisons. https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdfs"
+  },
+  "STANDARD-2": {
+    "prefix": "STANDARD-2",
+    "body": ["OBJECT-COMPUTER. ${2:COMPUTER-NAME}.", "\tPROGRAM COLLATING SEQUENCE IS ASCII-SEQUENCE.", "\tSPECIAL-NAMES. ALPHABET ASCII-SEQUENCE IS STANDARD-2."],
+    "description": "`STANDARD-2` specifies that the ISO/IEC 646, 7-bit coded character set collating sequence is used for all alphanumeric comparisons. https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdfs"
   },
   "START": {
     "prefix": "START",
-    "body": ["START ${1:fileName}"],
-    "description": "START"
+    "body": ["START ${1:fileName} ${2:key-var}", "END-START."],
+    "description": "`START` positions record retrieval within an indexed or relative file for subsequent sequential retrieval. Note that `START` does not `READ` a record. https://www.ibm.com/docs/en/cobol-zos/6.2?topic=statements-start-statement"
   },
-  "SUPPRESS": {
-    "prefix": "SUPPRESS",
-    "body": ["SUPPRESS ${1:id}"],
-    "description": "SUPPRESS"
-  },
-
   "STOP": {
     "prefix": "STOP",
-    "body": ["STOP ${1:RUN}"],
-    "description": "STOP"
+    "body": ["STOP RUN."],
+    "description": "`STOP RUN` terminates all COBOL routines. Control is returned immediately to Z/OS. Note that `GOBACK` is a safer or better approach to ending a program. https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdfs"
   },
   "SIZE ERROR": {
     "prefix": "SIZE ERROR",
@@ -2193,11 +2295,6 @@
     ],
     "description": "TEMPLATE PROGRAM"
   },
-  "SUBTRACT": {
-    "prefix": "SUBTRACT",
-    "body": ["SUBTRACT ${1:A} FROM ${2:B} GIVING ${3:C}"],
-    "description": "SUBTRACT A FROM B GIVING C"
-  },
   "STRING": {
     "prefix": "STRING",
     "body": [
@@ -2207,7 +2304,47 @@
       "END-STRING",
       "$0"
     ],
-    "description": "STRING DELIMITED BY SIZE"
+    "description": "`STRING` selects and formats information from data source(s) into a receiving field. https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdfs"
+  },
+  "SUBTRACT": {
+    "prefix": "SUBTRACT",
+    "body": ["SUBTRACT ${1:A} FROM ${2:B} GIVING ${3:C}"],
+    "description": "`SUBTRACT` subtracts one numeric variable, or the sum of two or more numeric variables, from one or more numeric variables, and stores the result. https://www.ibm.com/docs/en/cobol-zos/6.2?topic=statements-subtract-statement"
+  },
+  "SUBTRACT CORRESPONDING": {
+    "prefix": "SUBTRACT CORRESPONDING",
+    "body": ["SUBTRACT CORRESPONDING ${1:A} FROM ${2:B} GIVING ${3:C}"],
+    "description": "`SUBTRACT CORRESPONDING` subtracts variables of the same name between two Group variable and stores the result. https://www.ibm.com/docs/en/cobol-zos/6.2?topic=statements-subtract-statement"
+  },
+  "COMPUTE SUM (Values)": {
+    "prefix": "SUM",
+    "body": ["COMPUTE ${1:resultNum} = FUNCTION SUM(${2:arg-1}),${3:arg-2},${4:arg-3})"],
+    "description": "The `SUM` function returns a value that is the sum of the arguments. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
+  "COMPUTE SUM (Table)": {
+    "prefix": "SUM",
+    "body": ["01 ${3:EMP-TAB-WS}.", "\t05 ${4:EMPLOYEE-REC} OCCURS ${5:1000} TIMES", "\t\t10 ${1:EMPLOYEE-SAL} PIC S9(7)V99 COMP-3.", "COMPUTE ${2:TOT-EMPLOYEE-PAYROLL} = FUNCTION SUM(${1:EMPLYOYEE-SAL}(ALL))"],
+    "description": "The `SUM` function returns a value that is the sum of all rows in an internal COBOL table. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
+  "SUPPRESS (XML)": {
+    "prefix": "SUPPRESS",
+    "body": ["XML GENERATE ${2:DOC} FROM ${3:GOOD-DOC}", "\tSUPPRESS ${1:PATIENT-INFO}", "\t\tEVERY NONNUMERIC ELEMENT WHEN SPACE", "\t\tEVERY NUMERIC ELEMENT WHEN ZERO", "END-XML."],
+    "description": "`SUPPRESS` specifies whether individual data items are generated during an `XML GENERATE`. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
+  "SUPPRESS (Copy)": {
+    "prefix": "SUPPRESS",
+    "body": ["COPY ${1:ABC-COPY-BOOK} SUPPRESS."],
+    "description": "`SUPPRESS` specifies whether individual data items are generated during into the Compiler Listing.  https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
+  "SYMBOLIC CHARACTERS": {
+    "prefix": "SYMBOLIC CHARACTERS",
+    "body": ["SYMBOLIC CHARACTERS ${1:BACKSPACE IS 23}"],
+    "description": "The `SYMBOLIC CHARACTERS` clause provides a means of specifying one or more single-byte, symbolic characters assigned to an `EBCIDIC`/`ASCII` hex value. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
+  "SYNCHRONIZED": {
+    "prefix": "SYNCHRONIZED",
+    "body": ["01 ${3:GROUP-VAR}", "\t05 ${2:IDX-VAR} PIC S9(4) COMP ${1|SYNC,SYNCHRONIZED|}."],
+    "description": "The `SYNC`/`SYNCHRONIZED` clause specifies the alignment of an elementary item on a natural boundary in Z/OS main storage. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
   },
   "TALLYING": {
     "prefix": "TALLYING",
