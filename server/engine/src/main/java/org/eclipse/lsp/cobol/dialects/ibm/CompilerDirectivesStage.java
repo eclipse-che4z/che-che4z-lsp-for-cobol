@@ -69,9 +69,9 @@ public class CompilerDirectivesStage implements Stage<AnalysisContext, List<Node
         process(compilerOptions, ctx, new Position(i, directivesLine.start("compilerOptions")), "compilerOptions");
       }
       if (Pattern.compile("(?i).*JAVA-SHAREABLE\\s+ON.*").matcher(lines[i]).matches()) {
-        nodes = process(text, ctx, new Position(i, directivesLine.start()), "compilerDirectives");
+        nodes.addAll(process(text, ctx, new Position(i, directivesLine.start()), "compilerDirectives"));
       } else if (Pattern.compile("(?i).*JAVA-CALLABLE.*").matcher(lines[i]).matches()) {
-        nodes = process(lines[i], ctx, new Position(i, directivesLine.start()), "compilerDirectives");
+        nodes.addAll(process(lines[i], ctx, new Position(i, directivesLine.start()), "compilerDirectives"));
       }
 
       String newText = new String(new char[lines[i].length()]).replace('\0', ' ');

@@ -19,8 +19,6 @@ import lombok.Getter;
 import lombok.NonNull;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
-import org.antlr.v4.runtime.tree.RuleNode;
-import org.eclipse.lsp.cobol.AntlrRangeUtils;
 import org.eclipse.lsp.cobol.common.dialects.CobolDialect;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
@@ -29,22 +27,25 @@ import org.eclipse.lsp.cobol.common.mapping.OriginalLocation;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
-import org.eclipse.lsp.cobol.common.utils.ThreadInterruptionUtil;
 import org.eclipse.lsp.cobol.core.CompilerDirectivesLexer;
 import org.eclipse.lsp.cobol.core.CompilerDirectivesParser;
 import org.eclipse.lsp.cobol.core.CompilerDirectivesParserBaseVisitor;
 import org.eclipse.lsp.cobol.core.engine.analysis.AnalysisContext;
-import org.eclipse.lsp.cobol.core.engine.directives.node.JavaShareableOnOffNode;
+import org.eclipse.lsp.cobol.core.engine.directives.node.JavaShareableWorkingSectionNode;
 import org.eclipse.lsp.cobol.core.visitor.VisitorHelper;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Function;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
+import static java.util.stream.Collectors.toList;
+import static org.eclipse.lsp.cobol.AntlrRangeUtils.constructRange;
 import static org.eclipse.lsp.cobol.core.visitor.VisitorHelper.buildTokenRange;
 
 
@@ -138,7 +139,7 @@ public class CompilerDirectivesVisitor extends CompilerDirectivesParserBaseVisit
           analysisContext.getAccumulatedErrors().add(SyntaxError.syntaxError()
                   .errorSource(ErrorSource.PARSING)
                   .location(new OriginalLocation(location, null))
-                  .suggestion(messageService.getMessage("compilerDirective.invalid") + ctx.getStart().getText())
+                  .suggestion(String.format("%s %s", messageService.getMessage("compilerDirective.invalid"), ctx.getStart().getText()))
                   .severity(ErrorSeverity.ERROR)
                   .build());
         });
@@ -188,22 +189,21 @@ public class CompilerDirectivesVisitor extends CompilerDirectivesParserBaseVisit
               locationToLocality(getLocation(ctx.getStop())),
               messageService.getMessage("compilerDirective.invalid"));
     }
-//    Locality statementLocality = getLocality(this.analysisContext.getExtendedDocument().mapLocation(constructRange(ctx)));
-//
-//    JavaShareableWorkingSectionNode semanticsNode = new JavaShareableWorkingSectionNode(statementLocality);
-//    return addTreeNode(ctx, (location) -> semanticsNode);
-    return addTreeNode(ctx, JavaShareableOnOffNode::new);
+    Locality statementLocality = getLocality(this.analysisContext.getExtendedDocument().mapLocation(constructRange(ctx)));
+
+    JavaShareableWorkingSectionNode semanticsNode = new JavaShareableWorkingSectionNode(statementLocality);
+    return addTreeNode(ctx, (location) -> semanticsNode);
+//    return addTreeNode(ctx, JavaShareableOnOffNode::new);
   }
 
   @Override
   protected List<Node> defaultResult() {
-    return ImmutableList.of();
+    return new ArrayList<>();
   }
 
   @Override
-  public List<Node> visitChildren(RuleNode node) {
-    ThreadInterruptionUtil.checkThreadInterrupted();
-    return super.visitChildren(node);
+  protected List<Node> aggregateResult(List<Node> aggregate, List<Node> nextResult) {
+    return Stream.concat(aggregate.stream(), nextResult.stream()).collect(toList());
   }
 
   private List<Node> addTreeNode(ParserRuleContext ctx, Function<Locality, Node> nodeConstructor) {
@@ -213,7 +213,7 @@ public class CompilerDirectivesVisitor extends CompilerDirectivesParserBaseVisit
   }
 
   private Locality getOriginalLocality(ParserRuleContext ctx) {
-    Location location = analysisContext.getExtendedDocument().mapLocation(AntlrRangeUtils.constructRange(ctx));
+    Location location = analysisContext.getExtendedDocument().mapLocation(constructRange(ctx));
     return Locality.builder().uri(location.getUri()).range(location.getRange()).build();
   }
 
@@ -240,7 +240,7 @@ public class CompilerDirectivesVisitor extends CompilerDirectivesParserBaseVisit
             SyntaxError.syntaxError()
                     .errorSource(ErrorSource.PARSING)
                     .location(locality.toOriginalLocation())
-                    .suggestion(message + wrongToken)
+                    .suggestion(String.format("%s %s", message, wrongToken))
                     .severity(ErrorSeverity.ERROR)
                     .build();
 

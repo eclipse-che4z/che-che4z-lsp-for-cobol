@@ -14,11 +14,11 @@
  */
 package org.eclipse.lsp.cobol.common.dialects;
 
-import com.google.common.collect.ImmutableList;
 import lombok.AllArgsConstructor;
 import lombok.Value;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -33,7 +33,7 @@ public class DialectOutcome {
 
   public DialectOutcome(DialectProcessingContext context) {
     this.context = context;
-    this.dialectNodes = ImmutableList.of();
+    this.dialectNodes = new ArrayList<>();
     this.dialectMissed = false;
   }
 
@@ -45,7 +45,7 @@ public class DialectOutcome {
 
   public DialectOutcome(DialectProcessingContext context, boolean hasMissedDialect) {
     this.context = context;
-    this.dialectNodes = ImmutableList.of();
+    this.dialectNodes = new ArrayList<>();
     this.dialectMissed = hasMissedDialect;
   }
 

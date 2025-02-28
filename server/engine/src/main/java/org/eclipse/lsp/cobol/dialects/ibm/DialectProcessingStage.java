@@ -68,6 +68,7 @@ public class DialectProcessingStage implements Stage<AnalysisContext, DialectOut
     Set<SyntaxError> errors = new HashSet<>(ctx.getAccumulatedErrors());
     ctx.getAccumulatedErrors().clear();
     ctx.getAccumulatedErrors().addAll(errors);
+    dialectOutcome.getDialectNodes().addAll(ctx.getDialectNodes());
     return dialectOutcome;
   }
 
