@@ -2432,34 +2432,54 @@
     "description": "The TYPE phrase allows you to control attribute and element generation. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
   },
   "UNSTRING": {
-    "prefix": "UNSTRING ITEM",
-    "body": ["UNSTRING ${1:item}"],
-    "description": "UNSTRING item"
+    "prefix": "UNSTRING",
+    "body": ["UNSTRING ${1:PAT-DETAILS-IN-REC}", "\t${2:LNAME, FNAME, MID-INIT, DETAILS} DELIMITED BY SIZE", "END-UNSTRING."],
+    "description": "`UNSTRING` selects and formats information from data source(s) into a receiving field. https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdfs"
   },
-  "UNTIL": {
+  "PERFORM UNTIL": {
     "prefix": "UNTIL",
-    "body": ["UNTIL ${1:item}"],
-    "description": "UNTIL item"
+    "body": ["PERFORM ${1:PAT-IN-REC-EDITS} THRU ${2:PAT-IN-REC-EDITS-EXIT}", "\tUNTIL ${3:NO-MORE-PAT-IN-RECS}", "END-PERFORM."],
+    "description": "`UNTIL` tells the runtime to execute procedures referred to until a specified condition tests true, or if an `UNTIL EXIT` is reached. https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdfs"
   },
   "UP BY": {
     "prefix": "UP BY",
-    "body": ["UP BY ${1:item}"],
-    "description": "UP BY item1"
+    "body": ["SET ${1:indexName} UP BY ${2:numVarLiteral}"],
+    "description": "`SET x UP` is equivalent to a `ADD` statement, except referring to a COBOL table index or a COBOL pointer variable. https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdfs"
   },
   "UPON": {
     "prefix": "UPON",
     "body": ["UPON ${1:mnemName|envName}"],
     "description": "UPON mnemName|envName"
   },
-  "USING": {
+  "UPON CONSOLE": {
+    "prefix": "UPON CONSOLE",
+    "body": ["DISPLAY \"SERIOUS DB2 ERROR\"", "\tUPON CONSOLE."],
+    "description": "`UPON CONSOLE` (or environment-name) or the environment name associated with an output device copies what is to be displayed to an output device defined in the `ENVIRONMENT DIVISION`. https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdfs"
+  },
+  "USAGE": {
+    "prefix": "USAGE",
+    "body": ["77 ${1:VAR1} ${2:PIC X(8)} USAGE IS DISPLAY"],
+    "description": "USAGE https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdfs"
+  },
+  "CALL x USING y": {
     "prefix": "USING",
-    "body": ["USING ${1:fileName} ${2:fileName}"],
-    "description": "USING fileName"
+    "body": ["CALL \"${1:PATEDITS}\" USING ${2:WS-PAT-DETAILS, WS-PAT-RETC}."],
+    "description": "The `WORKING-STORAGE` SECTION parameters referenced by the `USING` phrase are made available to the called subprogram at the time the CALL is executed. https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdfs"
+  },
+  "JSON PARSE USING": {
+    "prefix": "USING",
+    "body": ["JSON PARSE ${1:id} INTO ${2:id}", "\tCONVERTING ${3:id} FROM BOOLEAN USING ${4:data-flag-b}"],
+    "description": "`USING` provides various methods of specifying the values that are moved after the `JSON PARSE` conversion. https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdfs"
   },
   "USING VALUE": {
     "prefix": "USING",
     "body": ["USING VALUE ${1:id}"],
     "description": "USING VALUE"
+  },
+  "UTF-8": {
+    "prefix": "UTF-8",
+    "body": ["77 ${1:UTF-8-VAR} PIC X(8) USAGE UTF-8."],
+    "description": "Literals identified by the opening delimiter `U\"` or `U'` are UTF-8 literals. They can contain any single-byte or double-byte characters. https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdfs"
   },
   "VALIDATING": {
     "prefix": "VALIDATING",
