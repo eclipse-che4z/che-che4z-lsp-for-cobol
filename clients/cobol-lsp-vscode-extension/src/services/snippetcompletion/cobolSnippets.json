@@ -2488,13 +2488,23 @@
   },
   "VALUE": {
     "prefix": "VALUE",
-    "body": ["VALUE ${1:id}"],
-    "description": "VALUE ID"
+    "body": ["WORKING-STORAGE SECTION.", "01 ${1:WS-VAR} PIC X(20) ${2|VALUE,VALUES|} \"${3:textHere}\".", "\t88 ${4:WS-SUBVAR} ${2|VALUE,VALUES|} \"${5:textHere}\". "],
+    "description": "`VALUE`/`VALUES` specifies the initial contents of a variable or the value(s) associated with an 88-level condition name. https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdfs"
   },
-  "VARYING FROM": {
-    "prefix": "VARYING FROM",
-    "body": ["VARYING ${1:item} FROM ${2:item} ${3:snipByUntil}"],
-    "description": "VARYING FROM"
+  "VALUE OF": {
+    "prefix": "VALUE OF",
+    "body": ["FD ${3:QSAM-FILE}", "\t\tLABEL RECORDS ARE STANDARD", "\t\tRECORDING MODE IS FBA", "\t\tBLOCK CONTAINS 0", "\t\tVALUE OF ${1:system-name} IS ${2:working-storage-field}", "\t\tDATA RECORD IS ${4:RPT-OUT-REC}."],
+    "description": "The `VALUE OF` clause describes a `WORKING-STORAGE` item in the label records associated with the file. https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdfs"
+  },
+  "VARYING": {
+    "prefix": "VARYING",
+    "body": ["PROCEDURE DIVISION.", "\tPERFORM ${2:TBL-EDIT-RTN} THRU ${3:TBL-EDIT-EXIT}", "\t\tVARYING ${1:TBL-IDX} FROM 1 BY 1 ", "\t\tUNTIL ${1:TBL-IDX} >= ${4:WS-TBL-MAX}."],
+    "description": "`VARYING` increases or decreases the value of one or more variable subscripts or table indexes. Note that the `PERFORM` statement could be an inline `PERFORM` that varies a variable from low-to-high. https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdfs"
+  },
+  "VOLATILE": {
+    "prefix": "VOLATILE",
+    "body": ["01 ${1:ONLINE-DATA-COLLECTION-VARS}.", "\t03 ${2:SCREEN-ITEMS-A-SECTION} VOLATILE.", "\t\t05 ${3:SCREEN-A1} PIC S9(3)V99 COMP SYNC.", "\t\t05 ${4:SCREEN-A2} PIC S9(5)V99 COMP SYNC.", "\t03 ${5:SCREEN-ITEMS-B-SECTION}.", "\t\t05 ${6:SCREEN-B1} PIC S9(9).", "\t\t05 ${7:SCREEN-B2} PIC S9(9) VOLATILE."],
+    "description": "`VOLATILE` indicates that a variable's value can be modified or referenced in ways that the COBOL compiler cannot detect; I.E. a Language Environment (LE) condition handler, etc. https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdfs"
   },
   "WHEN (EVALUATE)": {
     "prefix": "WHEN",
