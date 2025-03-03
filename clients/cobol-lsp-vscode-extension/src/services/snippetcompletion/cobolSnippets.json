@@ -1460,8 +1460,8 @@
     "description": "For Alphanumeric fields - `LOW-VALUE` equates to binary (Hex) `00` - the lowest EBCDIC collating sequence value. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
   },
   "IF LOW-VALUE": {
-    "prefix": "LOW VALUE",
-    "body": ["IF ${1:VAR1} = ${1|LOW-VALUE,LOW-VALUES|}", "\t${2:MOVE SPACES TO ${3:VAR1}}", "END-IF."],
+    "prefix": "LOW-VALUE",
+    "body": ["IF ${1:VAR1} = ${2|LOW-VALUE,LOW-VALUES|}", "\t${3:MOVE SPACES TO ${1:VAR}}", "END-IF."],
     "description": "For Alphanumeric fields - `LOW-VALUE` equates to binary (Hex) `00` - the lowest EBCDIC collating sequence value. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
   },
   "LINKAGE SECTION ": {
