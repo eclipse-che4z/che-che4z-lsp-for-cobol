@@ -86,6 +86,11 @@
         "title": "Run Analysis in CLI"
       },
       {
+        "command": "cobol-lsp.debug.openOutputWindow",
+        "category": "COBOL",
+        "title": "Open Debug Output Window"
+      },
+      {
         "command": "cobol-lsp.snippets.insertSnippets",
         "title": "Insert COBOL Snippet",
         "category": "Snippets"
@@ -142,6 +147,11 @@
           "command": "cobol-lsp.analysis.runAnalysis",
           "category": "COBOL",
           "title": "Run Analysis in CLI"
+        },
+        {
+          "command": "cobol-lsp.debug.openOutputWindow",
+          "category": "COBOL",
+          "title": "Open Debug Output Window"
         },
         {
           "command": "cobol-lsp.snippets.insertSnippets",

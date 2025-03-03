@@ -46,6 +46,7 @@ import { ConfigurationWatcher } from "./services/util/ConfigurationWatcher";
 import * as path from "node:path";
 import { Utils } from "./services/util/Utils";
 import { getE4EAPI } from "./services/copybook/E4ECopybookService";
+import { openOutputWindow } from "./commands/OpenOutputWIndow";
 import { getErrorMessage } from "./services/util/ErrorsUtils";
 import {
   initTelemetry,
@@ -372,6 +373,15 @@ function registerCommands(
             `${FAIL_CREATE_COPYBOOK_FOLDER_MSG} : ${getErrorMessage(error)}`,
           );
         }
+      },
+    ),
+  );
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand(
+      "cobol-lsp.debug.openOutputWindow",
+      async () => {
+        openOutputWindow(outputChannel);
       },
     ),
   );
