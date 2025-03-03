@@ -381,7 +381,7 @@ function registerCommands(
     vscode.commands.registerCommand(
       "cobol-lsp.debug.openOutputWindow",
       async () => {
-        openOutputWindow(outputChannel);
+        await openOutputWindow(outputChannel);
       },
     ),
   );
