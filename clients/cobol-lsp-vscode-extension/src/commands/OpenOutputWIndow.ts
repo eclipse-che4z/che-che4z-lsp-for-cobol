@@ -14,6 +14,6 @@
 
 import * as vscode from "vscode";
 
-export async function openOutputWindow(outputChannel: vscode.OutputChannel) {
-  await outputChannel.show();
+export function openOutputWindow(outputChannel: vscode.OutputChannel) {
+  outputChannel.show();
 }
