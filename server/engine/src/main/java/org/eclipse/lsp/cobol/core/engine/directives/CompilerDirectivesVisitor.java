@@ -31,6 +31,7 @@ import org.eclipse.lsp.cobol.core.CompilerDirectivesLexer;
 import org.eclipse.lsp.cobol.core.CompilerDirectivesParser;
 import org.eclipse.lsp.cobol.core.CompilerDirectivesParserBaseVisitor;
 import org.eclipse.lsp.cobol.core.engine.analysis.AnalysisContext;
+import org.eclipse.lsp.cobol.core.engine.directives.node.JavaCallablePrecedureSectionNode;
 import org.eclipse.lsp.cobol.core.engine.directives.node.JavaShareableWorkingSectionNode;
 import org.eclipse.lsp.cobol.core.visitor.VisitorHelper;
 import org.eclipse.lsp4j.Location;
@@ -122,10 +123,11 @@ public class CompilerDirectivesVisitor extends CompilerDirectivesParserBaseVisit
 
   @Override
   public List<Node> visitCobolJavaInteroperabilityCompilerDirectives(CompilerDirectivesParser.CobolJavaInteroperabilityCompilerDirectivesContext ctx) {
-    if (Pattern.compile("(?i).*JAVA-CALLABLE*").matcher(ctx.getStart().getText()).matches()) {
+    if (Pattern.compile("(?i).*JAVA-CALLABLE.*").matcher(ctx.getStart().getText()).matches()) {
       String text = analysisContext.getExtendedDocument().getCurrentText().toString();
-      String line = Pattern.compile("\n\r?").split(text)[startPosition.getLine()];
-      if (!Pattern.compile("(?i).*>>\\s?JAVA-CALLABLE*").matcher(line).matches()) {
+      String[] lines = Pattern.compile("\n\r?").split(text);
+      String line = lines[startPosition.getLine()];
+      if (!Pattern.compile("(?i).*>>\\s?JAVA-CALLABLE.*").matcher(line).matches()) {
         VisitorHelper.retrieveRangeLocality(ctx).ifPresent(r -> {
           r.getStart().setLine(startPosition.getLine());
           r.getEnd().setLine(startPosition.getLine());
@@ -138,7 +140,14 @@ public class CompilerDirectivesVisitor extends CompilerDirectivesParserBaseVisit
                   .build());
         });
       }
+      Locality statementLocality = getLocality(this.analysisContext.getExtendedDocument().mapLocation(constructRange(ctx)));
+      statementLocality.getRange().getStart().setLine(startPosition.getLine());
+      statementLocality.getRange().getEnd().setLine(startPosition.getLine());
+      boolean isProcedureDivisionLine = Pattern.compile("(?i).*PROCEDURE\\s+DIVISION.*").matcher(lines[startPosition.getLine() + 1]).matches();
+      JavaCallablePrecedureSectionNode semanticsNode = new JavaCallablePrecedureSectionNode(statementLocality, isProcedureDivisionLine);
+      return addTreeNode(ctx, (location) -> semanticsNode);
     }
+
     return super.visitCobolJavaInteroperabilityCompilerDirectives(ctx);
   }
 

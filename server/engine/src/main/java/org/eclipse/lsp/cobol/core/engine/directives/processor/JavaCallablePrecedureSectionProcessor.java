@@ -19,45 +19,33 @@ import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.message.MessageService;
-import org.eclipse.lsp.cobol.common.model.NodeType;
-import org.eclipse.lsp.cobol.common.model.SectionType;
-import org.eclipse.lsp.cobol.common.model.tree.Node;
-import org.eclipse.lsp.cobol.common.model.tree.SectionNode;
 import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.Processor;
-import org.eclipse.lsp.cobol.core.engine.directives.node.JavaShareableWorkingSectionNode;
+import org.eclipse.lsp.cobol.core.engine.directives.node.JavaCallablePrecedureSectionNode;
 
-import java.util.Optional;
-
-/** Validate JavaShareableWorkingSectionNode position */
+/** Validate JavaCallablePrecedureSectionNode position */
 @AllArgsConstructor
-public class JavaShareableWorkingSectionProcessor
-    implements Processor<JavaShareableWorkingSectionNode> {
+public class JavaCallablePrecedureSectionProcessor
+    implements Processor<JavaCallablePrecedureSectionNode> {
   final MessageService messageService;
 
   @Override
-  public void accept(JavaShareableWorkingSectionNode node, ProcessingContext processingContext) {
-    Optional<Node> nearestParentByType = node.getNearestParentByType(NodeType.SECTION);
-    if (nearestParentByType.isPresent()) {
-      SectionNode sectionNode = (SectionNode) nearestParentByType.get();
-      if (sectionNode.getSectionType() != SectionType.WORKING_STORAGE) {
+  public void accept(JavaCallablePrecedureSectionNode node, ProcessingContext processingContext) {
+    if (!node.isProcedureDivisionLine()) {
         throwError(node, processingContext);
-      }
-    } else {
-      throwError(node, processingContext);
     }
   }
 
   private void throwError(
-          JavaShareableWorkingSectionNode node, ProcessingContext processingContext) {
+          JavaCallablePrecedureSectionNode node, ProcessingContext processingContext) {
     processingContext
         .getErrors()
         .add(
             SyntaxError.syntaxError()
-                .location(node.getStartLocality().toOriginalLocation())
+                .location(node.getLocality().toOriginalLocation())
                 .severity(ErrorSeverity.ERROR)
                 .errorSource(ErrorSource.DIALECT)
-                .suggestion(messageService.getMessage("compilerDirective.validation.workingSection"))
+                .suggestion(messageService.getMessage("compilerDirective.validation.procedureSection"))
                 .build());
   }
 }

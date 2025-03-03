@@ -16,17 +16,22 @@
 package org.eclipse.lsp.cobol.core.engine.directives.node;
 
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.ToString;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.NodeType;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 
-/** JavaShareable block node */
+/**
+ * Represents a Java-Callable which are only allowed before procedure section.
+ */
+@Getter
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-public class JavaShareableOnOffNode extends Node {
-
-  public JavaShareableOnOffNode(Locality location) {
-    super(location, NodeType.STATEMENT);
-  }
+public class JavaCallablePrecedureSectionNode extends Node {
+    private final boolean isProcedureDivisionLine;
+    public JavaCallablePrecedureSectionNode(Locality location, boolean isProcedureDivisionLine) {
+    super(location, NodeType.CUSTOM);
+        this.isProcedureDivisionLine = isProcedureDivisionLine;
+    }
 }
