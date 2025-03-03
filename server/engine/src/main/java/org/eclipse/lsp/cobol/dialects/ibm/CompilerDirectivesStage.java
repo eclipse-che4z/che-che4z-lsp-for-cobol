@@ -99,7 +99,6 @@ public class CompilerDirectivesStage implements Stage<AnalysisContext, List<Node
       if (parserRule.equals("compilerOptions")) {
         visitor.visitCompilerOptions(parser.compilerOptions());
       } else if (parserRule.equals("compilerDirectives")) {
-//        visitor.visit(parser.compilerDirectives());
         List<Node> nodes = new ArrayList<>(visitor.visitCompilerDirectives(parser.compilerDirectives()));
         List<SyntaxError> parseError = new ArrayList<>(visitor.getErrors());
         parseError.forEach(error -> error.getLocation().getLocation().setRange(

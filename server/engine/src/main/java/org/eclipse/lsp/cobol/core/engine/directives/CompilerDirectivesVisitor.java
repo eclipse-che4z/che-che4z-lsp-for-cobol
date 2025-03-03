@@ -120,12 +120,6 @@ public class CompilerDirectivesVisitor extends CompilerDirectivesParserBaseVisit
     return super.visitCompilableSupportedDeprecatedCompilerDirectives(ctx);
   }
 
-//  @Override
-//  public List<Node> visitDoubleMoreThanChar(CompilerDirectivesParser.DoubleMoreThanCharContext ctx) {
-//    return super.visitDoubleMoreThanChar(ctx);
-//  }
-
-
   @Override
   public List<Node> visitCobolJavaInteroperabilityCompilerDirectives(CompilerDirectivesParser.CobolJavaInteroperabilityCompilerDirectivesContext ctx) {
     if (Pattern.compile("(?i).*JAVA-CALLABLE*").matcher(ctx.getStart().getText()).matches()) {
@@ -167,7 +161,7 @@ public class CompilerDirectivesVisitor extends CompilerDirectivesParserBaseVisit
     if (ctx.stop.getType() != CompilerDirectivesLexer.JAVA_SHAREABLE_OFF) {
       SyntaxError error = SyntaxError.syntaxError()
               .errorSource(ErrorSource.PARSING)
-              .location(getTokenEndLocality(ctx.stop).toOriginalLocation())
+              .location(getTokenEndLocality(ctx.start).toOriginalLocation())
               .suggestion(messageService.getMessage("compilerDirective.missingJavaShareableOff"))
               .severity(ErrorSeverity.ERROR)
               .build();
@@ -175,7 +169,7 @@ public class CompilerDirectivesVisitor extends CompilerDirectivesParserBaseVisit
     }
 
     String startLine = Pattern.compile("\n\r?").split(text)[ctx.getStart().getLine() - 1];
-    if (!Pattern.compile("(?i).*>>\\s?JAVA-SHAREABLE\\s+ON.*").matcher(startLine).matches()) {
+    if (!startLine.trim().isEmpty() && !Pattern.compile("(?i).*>>\\s?JAVA-SHAREABLE\\s+ON.*").matcher(startLine).matches()) {
       throwException(
               ctx.getStop().getText(),
               locationToLocality(getLocation(ctx.getStart())),
@@ -183,17 +177,18 @@ public class CompilerDirectivesVisitor extends CompilerDirectivesParserBaseVisit
     }
 
     String endLine = Pattern.compile("\n\r?").split(text)[ctx.getStop().getLine() - 1];
-    if (!Pattern.compile("(?i).*>>\\s?JAVA-SHAREABLE\\s+OFF.*").matcher(endLine).matches()) {
+    if (!endLine.trim().isEmpty() && Pattern.compile("(?i).*JAVA-SHAREABLE\\s+OFF.*").matcher(ctx.getStop().getText()).matches()
+            && !Pattern.compile("(?i).*>>\\s?JAVA-SHAREABLE\\s+OFF.*").matcher(endLine).matches()) {
       throwException(
               ctx.getStop().getText(),
               locationToLocality(getLocation(ctx.getStop())),
               messageService.getMessage("compilerDirective.invalid"));
     }
     Locality statementLocality = getLocality(this.analysisContext.getExtendedDocument().mapLocation(constructRange(ctx)));
-
-    JavaShareableWorkingSectionNode semanticsNode = new JavaShareableWorkingSectionNode(statementLocality);
+    Locality startLocality = getLocality(getLocation(ctx.getStart()));
+    Locality stopLocality = getLocality(getLocation(ctx.getStop()));
+    JavaShareableWorkingSectionNode semanticsNode = new JavaShareableWorkingSectionNode(statementLocality, startLocality, stopLocality);
     return addTreeNode(ctx, (location) -> semanticsNode);
-//    return addTreeNode(ctx, JavaShareableOnOffNode::new);
   }
 
   @Override

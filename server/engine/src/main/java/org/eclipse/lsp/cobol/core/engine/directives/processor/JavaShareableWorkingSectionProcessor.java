@@ -29,7 +29,7 @@ import org.eclipse.lsp.cobol.core.engine.directives.node.JavaShareableWorkingSec
 
 import java.util.Optional;
 
-/** Validate Db2WorkingAndLinkageSectionNode position */
+/** Validate JavaShareableWorkingSectionNode position */
 @AllArgsConstructor
 public class JavaShareableWorkingSectionProcessor
     implements Processor<JavaShareableWorkingSectionNode> {
@@ -40,9 +40,7 @@ public class JavaShareableWorkingSectionProcessor
     Optional<Node> nearestParentByType = node.getNearestParentByType(NodeType.SECTION);
     if (nearestParentByType.isPresent()) {
       SectionNode sectionNode = (SectionNode) nearestParentByType.get();
-      if (sectionNode.getSectionType() != SectionType.LINKAGE
-          && sectionNode.getSectionType() != SectionType.WORKING_STORAGE
-          && sectionNode.getSectionType() != SectionType.LOCAL_STORAGE) {
+      if (sectionNode.getSectionType() != SectionType.WORKING_STORAGE) {
         throwError(node, processingContext);
       }
     } else {
@@ -56,7 +54,7 @@ public class JavaShareableWorkingSectionProcessor
         .getErrors()
         .add(
             SyntaxError.syntaxError()
-                .location(node.getLocality().toOriginalLocation())
+                .location(node.getStartLocality().toOriginalLocation())
                 .severity(ErrorSeverity.ERROR)
                 .errorSource(ErrorSource.DIALECT)
                 .suggestion(messageService.getMessage("compilerDirective.validation.workingSection"))
