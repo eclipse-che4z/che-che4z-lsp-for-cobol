@@ -143,38 +143,21 @@ public class CompilerDirectivesVisitor extends CompilerDirectivesParserBaseVisit
       Locality statementLocality = getLocality(this.analysisContext.getExtendedDocument().mapLocation(constructRange(ctx)));
       statementLocality.getRange().getStart().setLine(startPosition.getLine());
       statementLocality.getRange().getEnd().setLine(startPosition.getLine());
-      boolean isProcedureDivisionLine = Pattern.compile("(?i).*PROCEDURE\\s+DIVISION.*").matcher(lines[startPosition.getLine() + 1]).matches();
-      JavaCallablePrecedureSectionNode semanticsNode = new JavaCallablePrecedureSectionNode(statementLocality, isProcedureDivisionLine);
-      return addTreeNode(ctx, (location) -> semanticsNode);
+      return addTreeNode(ctx, (location) ->
+              new JavaCallablePrecedureSectionNode(statementLocality, isProcedureDivisionNextLine(lines)));
     }
 
     return super.visitCobolJavaInteroperabilityCompilerDirectives(ctx);
   }
 
   @Override
-  public List<Node> visitJavaCallable(CompilerDirectivesParser.JavaCallableContext ctx) {
-    String text = analysisContext.getExtendedDocument().getCurrentText().toString();
-    String startLine = Pattern.compile("\n\r?").split(text)[ctx.getStart().getLine() - 1];
-    if (!Pattern.compile("(?i).*>>\\s?JAVA-CALLABLE*").matcher(startLine).matches()) {
-      throwException(
-              ctx.getStop().getText(),
-              locationToLocality(getLocation(ctx.getStart())),
-              messageService.getMessage("compilerDirective.invalid"));
-    }
-    return super.visitJavaCallable(ctx);
-  }
-
-  @Override
   public List<Node> visitJavaShareableOnOff(CompilerDirectivesParser.JavaShareableOnOffContext ctx) {
     String text = analysisContext.getExtendedDocument().getCurrentText().toString();
     if (ctx.stop.getType() != CompilerDirectivesLexer.JAVA_SHAREABLE_OFF) {
-      SyntaxError error = SyntaxError.syntaxError()
-              .errorSource(ErrorSource.PARSING)
-              .location(getTokenEndLocality(ctx.start).toOriginalLocation())
-              .suggestion(messageService.getMessage("compilerDirective.missingJavaShareableOff"))
-              .severity(ErrorSeverity.ERROR)
-              .build();
-      errors.add(error);
+      throwException(
+              ctx.getStop().getText(),
+              locationToLocality(getLocation(ctx.getStart())),
+              messageService.getMessage("compilerDirective.missingJavaShareableOff"));
     }
 
     String startLine = Pattern.compile("\n\r?").split(text)[ctx.getStart().getLine() - 1];
@@ -210,6 +193,10 @@ public class CompilerDirectivesVisitor extends CompilerDirectivesParserBaseVisit
     return Stream.concat(aggregate.stream(), nextResult.stream()).collect(toList());
   }
 
+  private boolean isProcedureDivisionNextLine(String[] lines) {
+    return Pattern.compile("(?i).*PROCEDURE\\s+DIVISION.*").matcher(lines[startPosition.getLine() + 1]).matches();
+  }
+
   private List<Node> addTreeNode(ParserRuleContext ctx, Function<Locality, Node> nodeConstructor) {
     Node node = nodeConstructor.apply(getOriginalLocality(ctx));
     visitChildren(ctx).forEach(node::addChild);
@@ -225,18 +212,6 @@ public class CompilerDirectivesVisitor extends CompilerDirectivesParserBaseVisit
     Locality.LocalityBuilder builder =
             Locality.builder().uri(location.getUri()).range(location.getRange());
     return builder.build();
-  }
-
-  private Locality getTokenEndLocality(Token token) {
-    return Locality.builder()
-            .uri(analysisContext.getDocumentUri())
-            .range(buildTokenEndRange(token))
-            .build();
-  }
-
-  private Range buildTokenEndRange(Token token) {
-    Position p = new Position(token.getLine() - 1, token.getCharPositionInLine() + token.getStopIndex() - token.getStartIndex() + 1);
-    return new Range(p, p);
   }
 
   private void throwException(String wrongToken, @NonNull Locality locality, String message) {

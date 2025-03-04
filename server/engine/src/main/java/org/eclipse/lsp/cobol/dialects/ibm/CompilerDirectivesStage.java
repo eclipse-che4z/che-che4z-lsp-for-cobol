@@ -92,7 +92,7 @@ public class CompilerDirectivesStage implements Stage<AnalysisContext, List<Node
       CompilerDirectivesParser parser = new CompilerDirectivesParser(new CommonTokenStream(lexer));
       parser.removeErrorListeners();
       parser.setErrorHandler(new CobolErrorStrategy(messageService));
-      parser.addErrorListener(new CompilerDirectivesErrorListener(ctx, startPosition));
+      parser.addErrorListener(new CompilerDirectivesErrorListener(ctx, startPosition, messageService));
 
       CompilerDirectivesVisitor visitor = new CompilerDirectivesVisitor(ctx, messageService, startPosition);
 
