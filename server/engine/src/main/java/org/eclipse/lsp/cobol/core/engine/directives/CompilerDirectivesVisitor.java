@@ -155,7 +155,7 @@ public class CompilerDirectivesVisitor extends CompilerDirectivesParserBaseVisit
     String text = analysisContext.getExtendedDocument().getCurrentText().toString();
     if (ctx.stop.getType() != CompilerDirectivesLexer.JAVA_SHAREABLE_OFF) {
       throwException(
-              ctx.getStop().getText(),
+               "",
               locationToLocality(getLocation(ctx.getStart())),
               messageService.getMessage("compilerDirective.missingJavaShareableOff"));
     }

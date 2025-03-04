@@ -31,10 +31,10 @@ import org.eclipse.lsp.cobol.core.CompilerDirectivesLexer;
 import org.eclipse.lsp.cobol.core.CompilerDirectivesParser;
 import org.eclipse.lsp.cobol.core.engine.analysis.AnalysisContext;
 import org.eclipse.lsp.cobol.core.engine.directives.CompilerDirectivesErrorListener;
+import org.eclipse.lsp.cobol.core.engine.directives.CompilerDirectivesErrorStrategy;
 import org.eclipse.lsp.cobol.core.engine.directives.CompilerDirectivesVisitor;
 import org.eclipse.lsp.cobol.common.pipeline.Stage;
 import org.eclipse.lsp.cobol.common.pipeline.StageResult;
-import org.eclipse.lsp.cobol.core.strategy.CobolErrorStrategy;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
@@ -91,7 +91,7 @@ public class CompilerDirectivesStage implements Stage<AnalysisContext, List<Node
 
       CompilerDirectivesParser parser = new CompilerDirectivesParser(new CommonTokenStream(lexer));
       parser.removeErrorListeners();
-      parser.setErrorHandler(new CobolErrorStrategy(messageService));
+      parser.setErrorHandler(new CompilerDirectivesErrorStrategy(messageService));
       parser.addErrorListener(new CompilerDirectivesErrorListener(ctx, startPosition, messageService));
 
       CompilerDirectivesVisitor visitor = new CompilerDirectivesVisitor(ctx, messageService, startPosition);

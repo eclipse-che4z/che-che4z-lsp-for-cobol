@@ -41,7 +41,7 @@ public class ErrorMessageHelper {
   private static final String MSG_PREFIX = "{";
   private static final String MSG_SUFFIX = "}";
 
-  ErrorMessageHelper(MessageService messageService) {
+  public ErrorMessageHelper(MessageService messageService) {
     this.messageService = messageService;
   }
 
