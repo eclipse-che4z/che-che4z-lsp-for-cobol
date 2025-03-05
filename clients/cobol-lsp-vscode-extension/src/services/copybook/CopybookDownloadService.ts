@@ -242,10 +242,13 @@ export class CopybookDownloadService {
   ): Promise<void> {
     const totalCopybooksToDownload = copybookNames.length;
     let processedCopybooks = 0;
-
+    const downloadRequestStartTime = performance.now();
     await Promise.all(
       copybookNames.map(async (copybookName) => {
         await this.downloadCopybook(copybookName, documentUri).finally(() => {
+          this.outputChannel?.appendLine(
+            `==> Copybook ${copybookName.name}(dialect:${copybookName.dialect}) download completed in : ${performance.now() - downloadRequestStartTime} milliseconds`,
+          );
           processedCopybooks++;
           this.updateDownloadProgress(
             progress,
