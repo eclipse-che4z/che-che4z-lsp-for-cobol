@@ -1627,20 +1627,6 @@ public final class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
     return addTreeNode(ctx, StatementNode::new);
   }
 
-  @Override
-  public java.util.List<Node> visitDataDescriptionEntryWithCompilerDirective(DataDescriptionEntryWithCompilerDirectiveContext ctx) {
-    if (ctx.stop.getType() != CobolLexer.JAVA_SHAREABLE_OFF) {
-      SyntaxError error = SyntaxError.syntaxError()
-              .errorSource(ErrorSource.PARSING)
-              .location(getTokenEndLocality(ctx.stop).toOriginalLocation())
-              .suggestion(messageService.getMessage("CompilerDirectives.missingJavaShareableOff"))
-              .severity(ErrorSeverity.ERROR)
-              .build();
-      errors.add(error);
-    }
-    return addTreeNode(ctx, StatementNode::new);
-  }
-
   private ProcedureName parseProcedureName(CobolParser.ProcedureNameContext procedureNameContext) {
     if (procedureNameContext == null) {
       return null;
@@ -1759,18 +1745,6 @@ public final class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
           locationToLocality(l),
           messageService.getMessage("CobolVisitor.AreaBWarningMsg"));
     }
-  }
-
-  private Locality getTokenEndLocality(Token token) {
-    return Locality.builder()
-            .uri(extendedDocument.getUri())
-            .range(buildTokenEndRange(token))
-            .build();
-  }
-
-  private Range buildTokenEndRange(Token token) {
-    Position p = new Position(token.getLine() - 1, token.getCharPositionInLine() + token.getStopIndex() - token.getStartIndex() + 1);
-    return new Range(p, p);
   }
 
   private boolean startsInAreaA(Range r) {
