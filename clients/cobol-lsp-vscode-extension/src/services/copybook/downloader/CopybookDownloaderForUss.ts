@@ -128,4 +128,29 @@ export class CopybookDownloaderForUss extends ZoweExplorerDownloader {
 
     return true;
   }
+
+  public async hasMember(
+    profileName: string,
+    ussFile: string,
+    copybookName: string,
+  ) {
+    const id = this.createId(profileName, ussFile);
+
+    if (this.memberListCache.has(id)) {
+      return this.memberListCache
+        .get(id)
+        ?.find((member) => member === copybookName);
+    }
+
+    const profile = DownloadUtil.loadProfile(profileName, this.explorerAPI);
+    const response = await this.explorerAPI
+      .getUssApi(profile)
+      .fileList(ussFile);
+    const members = response.apiResponse.items.map((el) => el.name);
+
+    this.memberListCache.set(id, members);
+    if (this.memberListCache.get(id)?.find((member) => member === copybookName))
+      return true;
+    return false;
+  }
 }

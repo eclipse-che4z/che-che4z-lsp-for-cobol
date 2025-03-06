@@ -15,11 +15,6 @@ import * as vscode from "vscode";
 import { CopybookURI } from "../../../services/copybook/CopybookURI";
 import { Utils } from "../../../services/util/Utils";
 import { asMutable } from "../../../test/suite/testHelper";
-import {
-  EndevorConfigModel,
-  ZoweDatasetConfigModel,
-  ZoweUssConfigModel,
-} from "../../../services/ProcessorGroupsLoader";
 
 Utils.getZoweExplorerAPI = jest.fn();
 
@@ -48,39 +43,5 @@ describe("CopybooksPathGenerator tests", () => {
     expect(
       CopybookURI.createDatasetPath([profile], dataset, "downloadFolder"),
     ).toEqual({ path: "downloadFolder/zowe/copybooks/profile/dataset" });
-  });
-  it("create paths for copybooks of processsor groups definitions", () => {
-    const pgConfigs: (
-      | ZoweDatasetConfigModel
-      | ZoweUssConfigModel
-      | EndevorConfigModel
-    )[] = [
-      { dataset: "dataset" },
-      { dataset: "dataset2", profile: "profile" },
-      { ussFile: "ussFile" },
-      { ussFile: "ussFile2", profile: "profile" },
-      {
-        environment: "ENV",
-        system: "SYSTEM",
-        subsystem: "SUBSYSTEM",
-        profile: "instance@connection",
-        stage: "1",
-        type: "COPY",
-      },
-    ];
-
-    expect(
-      CopybookURI.createProcessorGroupCopybookPaths(
-        pgConfigs,
-        "/storagePath",
-        "defaultProfile",
-      ),
-    ).toStrictEqual([
-      "/storagePath/zowe/copybooks/defaultProfile/dataset",
-      "/storagePath/zowe/copybooks/profile/dataset2",
-      "/storagePath/zowe/copybooks/defaultProfile/ussFile",
-      "/storagePath/zowe/copybooks/profile/ussFile2",
-      "/storagePath/e4e/copybooks/instance.internal.connection/ENV/1/SYSTEM/SUBSYSTEM/COPY/MAP",
-    ]);
   });
 });

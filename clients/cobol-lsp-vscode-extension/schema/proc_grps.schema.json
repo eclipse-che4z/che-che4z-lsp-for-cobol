@@ -52,7 +52,7 @@
                   "properties": {
                     "ussFile": {
                       "type": "string",
-                      "description": "USS directory/file on the mainframe."
+                      "description": "USS directory on the mainframe."
                     },
                     "profile": {
                       "type": "string",
@@ -91,7 +91,7 @@
                     },
                     "profile": {
                       "type": "string",
-                      "description": "(Internal) Profile name to be used by the E4E extension"
+                      "description": "Profile name to be used by the E4E extension"
                     }
                   },
                   "required": [

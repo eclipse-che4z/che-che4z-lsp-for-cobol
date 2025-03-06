@@ -73,6 +73,8 @@ export class DownloadUtil {
   public static async checkForInvalidCredProfile(
     profileName: string,
     explorerAPI: IApiRegisterClient,
+    documentUri: string,
+    copybookNames: CopybookName[],
   ): Promise<boolean> {
     if (
       ZoweExplorerDownloader.profileStore.get(profileName) === "valid-profile"
@@ -80,12 +82,28 @@ export class DownloadUtil {
       return false;
     }
 
+    const copybookLocation =
+      await this.areCopybookDownloadConfigurationsPresent(
+        documentUri,
+        copybookNames,
+      );
+
+    if (!copybookLocation) {
+      return true;
+    }
+    if (typeof copybookLocation == "boolean") return false;
+
     try {
       const profile = this.loadProfile(profileName, explorerAPI);
-      await explorerAPI.getUssApi(profile).fileList("/");
+      if (copybookLocation.uss) {
+        await explorerAPI.getUssApi(profile).fileList(copybookLocation.uss);
+      } else if (copybookLocation.dsn) {
+        await explorerAPI.getMvsApi(profile).allMembers(copybookLocation.dsn);
+      }
     } catch (error) {
-      this.checkForInvalidCredentials(error, profileName);
-      return true;
+      if (this.checkForInvalidCredentials(error, profileName)) {
+        return true;
+      }
     }
 
     ZoweExplorerDownloader.profileStore.set(profileName, "valid-profile");
@@ -108,7 +126,15 @@ export class DownloadUtil {
       .loadNamedProfile(profileName);
   }
 
-  private static checkForInvalidCredentials(e: unknown, profileName: string) {
+  private static checkForInvalidCredentials(
+    e: unknown,
+    profileName: string,
+  ): boolean {
+    if (this.isNotFoundError(e) || this.isPermissionError(e)) {
+      // Cannot access the dataset, but credentials are working fine
+      return false;
+    }
+
     if (this.isInvalidCredentials(e)) {
       ZoweExplorerDownloader.profileStore.set(profileName, "locked-profile");
       const errorMessage = INVALID_CREDENTIALS_ERROR_MSG.replace(
@@ -116,14 +142,16 @@ export class DownloadUtil {
         profileName,
       );
       vscode.window.showErrorMessage(errorMessage);
+      return true;
     }
 
     registerExceptionEvent(
-      undefined,
+      "InvalidCredentialsException",
       JSON.stringify(e),
-      ["copybook", "COBOL", "experiment-tag"],
+      ["copybook", "COBOL", "invalid-credentials-check"],
       "There is an issue with zowe api layer",
     );
+    return true;
   }
 
   /**
@@ -149,12 +177,12 @@ export class DownloadUtil {
    * checks if copybook download configurations are present
    * @param documentUri
    * @param copybookNames
-   * @returns true if if copybook download configurations are present, false otherwise
+   * @returns copybook location if if copybook download configurations are present, null otherwise
    */
   public static async areCopybookDownloadConfigurationsPresent(
     documentUri: string,
     copybookNames: CopybookName[],
-  ): Promise<boolean> {
+  ) {
     const dialects = new Set(
       copybookNames.map((n) => n.dialect?.toLocaleUpperCase()).filter(Boolean),
     );
@@ -162,21 +190,23 @@ export class DownloadUtil {
     for (const dialect of dialects) {
       const dsnPath = SettingsService.getDsnPath(documentUri, dialect);
       const ussPath = SettingsService.getUssPath(documentUri, dialect);
+
       const procGroupPath = await loadProcessorGroupCopybookPathsConfig(
         { scopeUri: documentUri },
         [],
         dialect,
       );
-      if (
-        (procGroupPath && procGroupPath.length > 0) ||
-        (dsnPath?.length ?? 0) > 0 ||
-        (ussPath?.length ?? 0) > 0
-      ) {
+      if ((dsnPath?.length ?? 0) > 0) {
+        return { dsn: dsnPath[0] };
+      }
+      if ((ussPath?.length ?? 0) > 0) {
+        return { uss: ussPath[0] };
+      }
+      if (procGroupPath && procGroupPath.length > 0) {
         return true;
       }
+      return null;
     }
-
-    return false;
   }
 
   private static async showQueueLockedDialog(
@@ -193,11 +223,45 @@ export class DownloadUtil {
     return action === UNLOCK_DOWNLOAD_QUEUE_MSG;
   }
 
+  /**
+   * Checks if the error returned by Zowe Explorer is caused
+   * by invalid credentials. Error with status code 401 is returned
+   * in that case.
+   */
   private static isInvalidCredentials(e: unknown) {
     return (
       hasMember(e, "mDetails") &&
       hasMember(e.mDetails, "errorCode") &&
       e.mDetails.errorCode === 401
+    );
+  }
+
+  /**
+   * Returns true if provided credentials are correct but user doesn't
+   * have permission to access selected dataset (ISRZ002)
+   * or uss directory (EDC5111I).
+   */
+  private static isPermissionError(e: unknown) {
+    return (
+      hasMember(e, "mDetails") &&
+      hasMember(e.mDetails, "errorCode") &&
+      e.mDetails.errorCode === 500 &&
+      hasMember(e, "message") &&
+      typeof e.message === "string" &&
+      (e.message.includes("EDC5111I Permission denied") ||
+        e.message.includes("ISRZ002 Authorization failed"))
+    );
+  }
+
+  /**
+   * Returns true if provided credentials are correct but
+   * selected dataset or uss folder doesn't exist.
+   */
+  private static isNotFoundError(e: unknown) {
+    return (
+      hasMember(e, "mDetails") &&
+      hasMember(e.mDetails, "errorCode") &&
+      e.mDetails.errorCode === 404
     );
   }
 }

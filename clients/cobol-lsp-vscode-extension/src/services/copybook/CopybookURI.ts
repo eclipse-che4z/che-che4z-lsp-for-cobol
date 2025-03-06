@@ -11,28 +11,15 @@
  * Contributors:
  *   Broadcom, Inc. - initial API and implementation
  */
-import {
-  COPYBOOKS_FOLDER,
-  E4E_FOLDER,
-  DATASET,
-  ENVIRONMENT,
-  USSFILE,
-  ZOWE_FOLDER,
-  USE_MAP,
-} from "../../constants";
+import { COPYBOOKS_FOLDER, E4E_FOLDER, ZOWE_FOLDER } from "../../constants";
 import { SettingsService } from "../Settings";
 import { ProfileUtils } from "../util/ProfileUtils";
 import { EndevorType, ResolvedProfile } from "../../type/e4eApi.d";
-import { Utils } from "../util/Utils";
 import * as vscode from "vscode";
 
 // Source can be only a single level directory, with no subdirectories
 type CopybooksSource = typeof ZOWE_FOLDER | typeof E4E_FOLDER;
-import {
-  ZoweDatasetConfigModel,
-  ZoweUssConfigModel,
-  EndevorConfigModel,
-} from "../ProcessorGroupsLoader";
+import { Utils } from "../util/Utils";
 
 /**
  * This class is responsible to identify from which source resolve copybooks required by the server.
@@ -123,47 +110,5 @@ export class CopybookURI {
       type.subsystem,
       type.type,
     ];
-  }
-  public static createProcessorGroupCopybookPaths(
-    pgConfigs: (
-      | ZoweDatasetConfigModel
-      | ZoweUssConfigModel
-      | EndevorConfigModel
-    )[],
-    storagePath: string,
-    defaultProfile: string,
-  ): string[] {
-    const paths: string[] = [];
-    pgConfigs.forEach((config) => {
-      if (ENVIRONMENT in config) {
-        const profile = config.profile
-          ? {
-              profile: `internal.${config.profile.split("@")[1]}`,
-              instance: config.profile.split("@")[0],
-            }
-          : {
-              profile: "",
-              instance: "",
-            };
-        config.use_map = config.use_map ? config.use_map : true;
-        paths.push(
-          CopybookURI.createDatasetPath(
-            this.getEnviromentPath(config as EndevorType, profile),
-            config.use_map ? USE_MAP : "",
-            storagePath,
-            E4E_FOLDER,
-          ).fsPath,
-        );
-      } else if (DATASET in config || USSFILE in config) {
-        paths.push(
-          CopybookURI.createDatasetPath(
-            config.profile ? [config.profile] : [defaultProfile],
-            DATASET in config ? config.dataset : config.ussFile,
-            storagePath,
-          ).fsPath,
-        );
-      }
-    });
-    return paths;
   }
 }

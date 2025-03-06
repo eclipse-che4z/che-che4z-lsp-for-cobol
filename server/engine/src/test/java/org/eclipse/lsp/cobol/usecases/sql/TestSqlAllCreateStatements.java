@@ -316,6 +316,30 @@ class TestSqlAllCreateStatements {
           + "               COPY YES;\n"
           + "           END-EXEC.";
 
+  public static final String CREATE_INDEX5 =
+      TEXT
+          + "           create index inxnm on  tabnam (col1 ASC) \n"
+          + "           cluster\n"
+          + "           partition by \n"
+          + "           (partition 2 ending (MAXVALUE) inclusive dssize 3G)\n"
+          + "           not padded\n"
+          + "           END-EXEC.";;
+
+  public static final String CREATE_INDEX6 =
+      TEXT
+          + "           CREATE INDEX idx_customer ON customers(info)\n"
+          + "                GENERATE KEY USING XMLPATTERN\n"
+          + "           \"/cust:customer/cust:name\" AS SQL VARCHAR(50)\n"
+          + "            END-EXEC.";
+
+  public static final String CREATE_INDEX7 =
+      TEXT
+          + "           CREATE INDEX CSTPHNX2 ON CUST(XMLCUST)\n"
+          + "           GENERATE KEY USING XMLPATTERN\n"
+          + "           \"declare namespace s='http://example.com/ns';\n"
+          + "      -    \"/s:customer/s:phone/@s:type\"\n"
+          + "           AS SQL VARCHAR(12)\n"
+          + "            END-EXEC.";
   // CREATE LOB TABLESPACE
   private static final String CREATE_LOB_TABLESPACE =
       TEXT
@@ -640,6 +664,20 @@ class TestSqlAllCreateStatements {
           + "                 KEY LABEL STG01KLABEL;\n"
           + "           END-EXEC.";
 
+  public static final String CREATE_STOGROUP3 =
+      TEXT
+          + "               create STOGROUP DSNCG100\n"
+          + "                 VOLUMES ('*','*') VCAT DSNCAT\n"
+          + "                 DATACLAS taco\n"
+          + "           END-EXEC.";
+
+  public static final String CREATE_STOGROUP4 =
+      TEXT
+          + "             create STOGROUP DSNCG100\n"
+          + "                 VOLUMES ('*','*') VCAT DSNCAT\n"
+          + "                 NO KEY LABEL\n"
+          + "                 DATACLAS taco\n"
+          + "           END-EXEC.";
   // CREATE TABLE
   private static final String CREATE_TABLE =
       TEXT
@@ -943,39 +981,52 @@ class TestSqlAllCreateStatements {
           + "                WITH USE FOR SALLY\n"
           + "           END-EXEC.";
 
+  public static final String CREATE_TRUSTED_CONTEXT3 =
+      TEXT
+          + "             CREATE TRUSTED CONTEXT CTX1\n"
+          + "                 BASED UPON CONNECTION USING SYSTEM AUTHID ADMF001\n"
+          + "                 ATTRIBUTES (\n"
+          + "                 address \"2 . 4 . 5 . 62\",\n"
+          + "                 ENCRYPTION \"LOW\",\n"
+          + "                 SERVAUTH \"23\"\n"
+          + "                 )\n"
+          + "                 ENABLE NO DEFAULT SECURITY LABEL\n"
+          + "                 with use for autnm security label sclbl\n"
+          + "           END-EXEC.";
   // CREATE TYPE array
   private static final String CREATE_TYPE_ARRAY =
       TEXT
-          + "            CREATE TYPE PHONENUMBERS AS DECIMAL(10,0) ARRAY[50];\n"
+          + "            CREATE TYPE PHONENUMBERS AS DECIMAL(10,0) ARRAY[50]\n"
           + "           END-EXEC.";
 
   private static final String CREATE_TYPE_ARRAY2 =
       TEXT
-          + "            CREATE TYPE GENERIC.NUMBERS AS DECFLOAT(34) ARRAY[];\n"
+          + "            CREATE TYPE GENERIC.NUMBERS AS DECFLOAT(34) ARRAY??(??)\n"
           + "           END-EXEC.";
 
   private static final String CREATE_TYPE_ARRAY3 =
       TEXT
           + "            CREATE TYPE PERSONAL_PHONENUMBERS AS DECIMAL(16,0) \n"
-          + "                     ARRAY[VARCHAR(8)];\n"
+          + "                     ARRAY??(VARCHAR(8)??)\n"
           + "           END-EXEC.";
 
   private static final String CREATE_TYPE_ARRAY4 =
       TEXT
-          + "            CREATE TYPE CAPITALSARRAY AS VARCHAR(30) ARRAY[VARCHAR(20)];\n"
+          + "                       CREATE TYPE CAPITALSARRAY AS VARCHAR(30) \n"
+          + "                       ARRAY[VARCHAR(20)]\n"
           + "           END-EXEC.";
 
   private static final String CREATE_TYPE_ARRAY5 =
       TEXT
-          + "            CREATE TYPE PRODUCTS AS VARCHAR(40) ARRAY[INTEGER];\n"
+          + "            CREATE TYPE PRODUCTS AS VARCHAR(40) ARRAY??(INTEGER??)\n"
           + "           END-EXEC.";
 
   // CREATE TYPE distinct
   private static final String CREATE_TYPE_DISTINCT =
-      TEXT + "            CREATE TYPE SHOESIZE AS INTEGER;\n" + "           END-EXEC.";
+      TEXT + "            CREATE TYPE SHOESIZE AS INTEGER\n" + "           END-EXEC.";
 
   private static final String CREATE_TYPE_DISTINCT2 =
-      TEXT + "            CREATE TYPE MILES AS DOUBLE;\n" + "           END-EXEC.";
+      TEXT + "            CREATE TYPE MILES AS DOUBLE\n" + "           END-EXEC.";
 
   // CREATE VARIABLE
   private static final String CREATE_VARIABLE =
@@ -1019,6 +1070,28 @@ class TestSqlAllCreateStatements {
           + "              WHERE DATE BETWEEN '03/01/2000' and '03/31/2000';  \n"
           + "           END-EXEC.";
 
+  public static final String CREATE_VIEW3 =
+      TEXT
+          + "           create VIEW top_publishers AS\n"
+          + "           WITH publisher_ratings (col) AS (\n"
+          + "           SELECT \n"
+          + "                       p.name AS publisher_name,\n"
+          + "                       AVG(b.rating) AS avg_rating\n"
+          + "           FROM \n"
+          + "               publishers p\n"
+          + "               INNER JOIN books b ON p.publisher_id = b.publisher_id\n"
+          + "           GROUP BY \n"
+          + "                       p.name\n"
+          + "           )\n"
+          + "           SELECT \n"
+          + "           publisher_name,\n"
+          + "           avg_rating\n"
+          + "           FROM \n"
+          + "           publisher_ratings\n"
+          + "           WHERE \n"
+          + "           avg_rating = (SELECT MAX(avg_rating) FROM publisher_ratings)\n"
+          + "           END-EXEC.";
+
   private static final String CREATE_TABLE1 =
       TEXT + "            create table all (all integer, avg integer); \n" + "           END-EXEC.";
 
@@ -1046,6 +1119,9 @@ class TestSqlAllCreateStatements {
         CREATE_INDEX2,
         CREATE_INDEX3,
         CREATE_INDEX4,
+        CREATE_INDEX5,
+        CREATE_INDEX6,
+        CREATE_INDEX7,
         CREATE_LOB_TABLESPACE,
         CREATE_MASK,
         CREATE_MASK2,
@@ -1064,6 +1140,8 @@ class TestSqlAllCreateStatements {
         CREATE_SEQUENCE2,
         CREATE_STOGROUP,
         CREATE_STOGROUP2,
+        CREATE_STOGROUP3,
+        CREATE_STOGROUP4,
         CREATE_TABLE,
         CREATE_TABLE2,
         CREATE_TABLE3,
@@ -1087,6 +1165,7 @@ class TestSqlAllCreateStatements {
         CREATE_TRIGGER_BASIC,
         CREATE_TRUSTED_CONTEXT,
         CREATE_TRUSTED_CONTEXT2,
+        CREATE_TRUSTED_CONTEXT3,
         CREATE_TYPE_ARRAY,
         CREATE_TYPE_ARRAY2,
         CREATE_TYPE_ARRAY3,
@@ -1098,6 +1177,7 @@ class TestSqlAllCreateStatements {
         CREATE_VARIABLE2,
         CREATE_VIEW,
         CREATE_VIEW2,
+        CREATE_VIEW3,
         CREATE_TABLE1);
   }
 

@@ -37,7 +37,6 @@ import path = require("path");
 import { getErrorMessage } from "../util/ErrorsUtils";
 import {
   loadProcessorGroupCopybookPathsConfig,
-  prepareProcessorGroupConfigPathsForDsnAndUss,
   prepareProcessorGroupConfigPathsForEndevor,
 } from "../ProcessorGroups";
 import {
@@ -78,52 +77,18 @@ export class CopybookDownloadService {
       return true;
     }
 
-    const pgConfigs = await loadProcessorGroupCopybookPathsConfig(
-      { scopeUri: documentUri },
-      [],
-      copybookName.dialect,
+    const res = await this.downloadCopybooksinProcessorGroups(
+      copybookName,
+      documentUri,
     );
-
-    const onlyDsn = pgConfigs.filter(
-      (config): config is ZoweDatasetConfigModel =>
-        typeof config != "string" && DATASET in config,
-    );
-    const onlyUss = pgConfigs.filter(
-      (config): config is ZoweUssConfigModel =>
-        typeof config != "string" && USSFILE in config,
-    );
-    const onlyEndevor = pgConfigs.filter(
-      (config): config is EndevorConfigModel =>
-        typeof config != "string" && ENVIRONMENT in config,
-    );
-
-    if (onlyEndevor && this.e4eDownloader) {
-      const endevorLocations = await prepareProcessorGroupConfigPathsForEndevor(
-        onlyEndevor,
-        this.e4eDownloader,
-        copybookName,
-      );
-      if (endevorLocations) {
-        for (const loc of endevorLocations) {
-          if (
-            await this.e4eDownloader?.downloadElementE4E(
-              loc.profile,
-              loc.element,
-            )
-          )
-            return true;
-        }
-      }
-    }
+    if (res) return true;
 
     if (this.dsnDownloader) {
       const dsnSuccess = await this.downloadFromPaths(
         this.dsnDownloader,
         copybookName,
         documentUri,
-        onlyDsn.length > 0
-          ? prepareProcessorGroupConfigPathsForDsnAndUss(onlyDsn)
-          : SettingsService.getDsnPath(documentUri, copybookName.dialect),
+        SettingsService.getDsnPath(documentUri, copybookName.dialect),
       );
       if (dsnSuccess) return true;
     }
@@ -133,9 +98,7 @@ export class CopybookDownloadService {
         this.ussDownloader,
         copybookName,
         documentUri,
-        onlyUss.length > 0
-          ? prepareProcessorGroupConfigPathsForDsnAndUss(onlyUss)
-          : SettingsService.getUssPath(documentUri, copybookName.dialect),
+        SettingsService.getUssPath(documentUri, copybookName.dialect),
       );
     }
 
@@ -149,6 +112,7 @@ export class CopybookDownloadService {
     this.dsnDownloader?.clearMemberListCache();
     this.ussDownloader?.clearMemberListCache();
     this.e4eDownloader?.clearConfigs();
+    this.e4eDownloader?.clearProfiles();
     this.dsnDownloader?.clearZoweDownloadQueue();
     this.ussDownloader?.clearZoweDownloadQueue();
   }
@@ -212,6 +176,9 @@ export class CopybookDownloadService {
       copybookName,
       dialectType,
       this.storagePath,
+      this.e4eDownloader,
+      this.dsnDownloader,
+      this.ussDownloader,
     );
     if (result) {
       return result.toString();
@@ -298,17 +265,34 @@ export class CopybookDownloadService {
   ): Promise<void> {
     const totalCopybooksToDownload = copybookNames.length;
     let processedCopybooks = 0;
-
+    const downloadRequestStartTime = performance.now();
     await Promise.all(
       copybookNames.map(async (copybookName) => {
-        await this.downloadCopybook(copybookName, documentUri).finally(() => {
-          processedCopybooks++;
-          this.updateDownloadProgress(
-            progress,
-            totalCopybooksToDownload,
-            processedCopybooks,
-          );
-        });
+        await this.downloadCopybook(copybookName, documentUri)
+          .then((isDownloaded) => {
+            if (isDownloaded) {
+              this.outputChannel?.appendLine(
+                `==> Copybook ${copybookName.name}(dialect:${copybookName.dialect}) download completed in : ${performance.now() - downloadRequestStartTime} milliseconds`,
+              );
+            } else {
+              this.outputChannel?.appendLine(
+                `==> Copybook ${copybookName.name}(dialect:${copybookName.dialect}) failed in ${performance.now() - downloadRequestStartTime} milliseconds`,
+              );
+            }
+          })
+          .catch((err) => {
+            this.outputChannel?.appendLine(
+              `==> Copybook ${copybookName.name}(dialect:${copybookName.dialect}) couldn't be downloaded. Time: ${performance.now() - downloadRequestStartTime} milliseconds , Error: ${err}`,
+            );
+          })
+          .finally(() => {
+            processedCopybooks++;
+            this.updateDownloadProgress(
+              progress,
+              totalCopybooksToDownload,
+              processedCopybooks,
+            );
+          });
       }),
     ).catch((err) => {
       this.outputChannel?.appendLine(
@@ -331,78 +315,83 @@ export class CopybookDownloadService {
       ))
     )
       return false;
-    if (!this.explorerApi) return false;
+    if (!this.explorerApi && !this.e4eApi) return false;
 
-    const configs: (
-      | string
-      | ZoweDatasetConfigModel
-      | ZoweUssConfigModel
-      | EndevorConfigModel
-    )[] = [];
-    for (const copybook of copybookNames) {
-      configs.push(
-        ...(await loadProcessorGroupCopybookPathsConfig(
-          { scopeUri: documentUri },
-          [],
-          copybook.dialect,
-        )),
-      );
-    }
-
-    const procGroupZoweProfiles = configs
-      .filter(
-        (config): config is ZoweUssConfigModel | ZoweDatasetConfigModel =>
-          typeof config != "string" && (DATASET in config || USSFILE in config),
-      )
-      .map((dsn) => dsn.profile)
-      .filter((x) => typeof x == "string");
-    const endevorProfiles = configs.filter(
-      (config): config is EndevorConfigModel =>
-        typeof config != "string" && ENVIRONMENT in config,
+    const configs = await loadProcessorGroupCopybookPathsConfig(
+      { scopeUri: documentUri },
+      [],
+    );
+    new Set(
+      copybookNames.map((n) => n.dialect?.toLocaleUpperCase()).filter(Boolean),
+    );
+    const procGroupZoweProfiles = new Set(
+      configs
+        .filter(
+          (config): config is ZoweUssConfigModel | ZoweDatasetConfigModel =>
+            typeof config != "string" &&
+            (DATASET in config || USSFILE in config),
+        )
+        .map((dsn) => dsn.profile)
+        .filter((x) => typeof x == "string"),
+    );
+    const endevorProfiles = new Set(
+      configs.filter(
+        (config): config is EndevorConfigModel =>
+          typeof config != "string" && ENVIRONMENT in config,
+      ),
     );
 
     const profile = ProfileUtils.getProfileNameForCopybook(
       documentUri,
       this.explorerApi,
     );
-    const availableProfiles = ProfileUtils.getAvailableProfiles(
-      this.explorerApi,
-    );
+    if (this.explorerApi) {
+      const availableProfiles = ProfileUtils.getAvailableProfiles(
+        this.explorerApi,
+      );
 
-    if (procGroupZoweProfiles && procGroupZoweProfiles.length > 0) {
-      const promises: Promise<boolean>[] = [];
-      for (const profile of procGroupZoweProfiles) {
-        if (!availableProfiles.includes(profile)) {
-          promises.push(Promise.resolve(true));
-          const msg = `${PROVIDE_PROFILE_MSG_PROC_GRUOPS} Provided invalid profile name: ${profile}`;
-          vscode.window.showErrorMessage(msg);
-        } else {
-          promises.push(DownloadUtil.isProfileLocked(profile));
-          promises.push(
-            DownloadUtil.checkForInvalidCredProfile(profile, this.explorerApi),
-          );
+      if (procGroupZoweProfiles && procGroupZoweProfiles.size > 0) {
+        const promises: Promise<boolean>[] = [];
+        for (const profile of procGroupZoweProfiles) {
+          if (!availableProfiles.includes(profile)) {
+            promises.push(Promise.resolve(true));
+            const msg = `${PROVIDE_PROFILE_MSG_PROC_GRUOPS} Provided invalid profile name: ${profile}`;
+            vscode.window.showErrorMessage(msg);
+          } else {
+            promises.push(DownloadUtil.isProfileLocked(profile));
+            promises.push(
+              DownloadUtil.checkForInvalidCredProfile(
+                profile,
+                this.explorerApi,
+                documentUri,
+                copybookNames,
+              ),
+            );
+          }
         }
+        const checks = await Promise.all(promises);
+        return checks.every((v) => v === false);
       }
-      const checks = await Promise.all(promises);
-      return checks.every((v) => v === false);
+      if (!profile || !availableProfiles.includes(profile)) {
+        const message = profile
+          ? `${PROVIDE_PROFILE_MSG} Provided invalid profile name: ${profile}`
+          : `${PROVIDE_PROFILE_MSG}`;
+        this.processDownloadError(message);
+        return false;
+      }
+      return (
+        !(await DownloadUtil.isProfileLocked(profile)) &&
+        !(await DownloadUtil.checkForInvalidCredProfile(
+          profile,
+          this.explorerApi,
+          documentUri,
+          copybookNames,
+        ))
+      );
     }
     if (Array.isArray(endevorProfiles) && endevorProfiles.length > 0)
       return true;
-
-    if (!profile || !availableProfiles.includes(profile)) {
-      const message = profile
-        ? `${PROVIDE_PROFILE_MSG} Provided invalid profile name: ${profile}`
-        : `${PROVIDE_PROFILE_MSG}`;
-      this.processDownloadError(message);
-      return false;
-    }
-    return (
-      !(await DownloadUtil.isProfileLocked(profile)) &&
-      !(await DownloadUtil.checkForInvalidCredProfile(
-        profile,
-        this.explorerApi,
-      ))
-    );
+    return false;
   }
 
   private processDownloadError(title: string): void {
@@ -426,5 +415,61 @@ export class CopybookDownloadService {
       increment: downloadPercent,
       message: downloadPercent + "%",
     });
+  }
+  async downloadCopybooksinProcessorGroups(
+    copybookName: CopybookName,
+    documentUri: string,
+  ): Promise<boolean> {
+    const pgConfigs = (
+      await loadProcessorGroupCopybookPathsConfig({ scopeUri: documentUri }, [])
+    ).filter((config) => typeof config != "string");
+    if (!(Array.isArray(pgConfigs) && pgConfigs.length > 0)) {
+      return false;
+    }
+    for (const config of pgConfigs) {
+      if (DATASET in config && this.dsnDownloader) {
+        const dsnSuccess = await this.downloadFromPaths(
+          this.dsnDownloader,
+          copybookName,
+          documentUri,
+          [
+            {
+              path: config.dataset,
+              profile: config.profile ? config.profile : undefined,
+            },
+          ],
+        );
+        if (dsnSuccess) return true;
+      } else if (USSFILE in config && this.ussDownloader) {
+        const ussSuccess = await this.downloadFromPaths(
+          this.ussDownloader,
+          copybookName,
+          documentUri,
+          [
+            {
+              path: config.ussFile,
+              profile: config.profile ? config.profile : undefined,
+            },
+          ],
+        );
+        if (ussSuccess) return true;
+      } else if (ENVIRONMENT in config && this.e4eDownloader) {
+        const endevorLocation =
+          await prepareProcessorGroupConfigPathsForEndevor(
+            config,
+            this.e4eDownloader,
+            copybookName,
+          );
+        if (
+          endevorLocation &&
+          (await this.e4eDownloader?.downloadElementE4E(
+            endevorLocation.profile,
+            endevorLocation.element,
+          ))
+        )
+          return true;
+      }
+    }
+    return false;
   }
 }

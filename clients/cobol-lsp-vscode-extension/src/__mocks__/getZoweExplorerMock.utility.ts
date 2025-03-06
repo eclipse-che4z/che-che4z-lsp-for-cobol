@@ -29,25 +29,43 @@ class MemberError extends Error {
     errorCode: number;
   };
 
-  constructor(message: string) {
+  constructor(message: string, errorCode: number) {
     super(message);
     this.mDetails = {
-      errorCode: 401,
+      errorCode,
     };
   }
 }
-const error = new MemberError("Error");
 
-export const allMemberErrorMock = jest.fn().mockRejectedValue(error);
-export const mvsApiMock = jest.fn().mockReturnValue({
-  allMembers: allMemberMock,
-  getContents: getContentMock,
-});
+export const unauthorizedErrorMock = jest
+  .fn()
+  .mockRejectedValue(
+    new MemberError(
+      "Rest API failure with HTTP(S) status 401\nThis operation requires authentication.\nToken is not valid or expired.",
+      401,
+    ),
+  );
+export const notFoundErrorMock = jest
+  .fn()
+  .mockRejectedValue(
+    new MemberError(
+      "Rest API failure with HTTP(S) status 404\nISRZ002 Data set not cataloged",
+      404,
+    ),
+  );
+export const permissionsErrorMock = jest.fn().mockRejectedValue(
+  new MemberError(
+    `Rest API failure with HTTP(S) status 500
+ISRZ002 Authorization failed - You may not use this protected data set. Open 913 abend.`,
+    500,
+  ),
+);
 
-export const mvsApiMockWithError = jest.fn().mockReturnValue({
-  allMembers: allMemberErrorMock,
-  getContents: getContentMock,
-});
+export const mvsApiMock = (allMembers = allMemberMock) =>
+  jest.fn().mockReturnValue({
+    allMembers,
+    getContents: getContentMock,
+  });
 
 export const allUSSFilemembers = jest.fn().mockReturnValue({
   apiResponse: {
@@ -58,28 +76,17 @@ export const allUSSFilemembers = jest.fn().mockReturnValue({
     ],
   },
 });
-export const ussApiMock = jest.fn().mockReturnValue({
-  fileList: allUSSFilemembers,
-  getContents: getUSSContentsMock,
-});
-const ussApiMockWithError = jest.fn().mockReturnValue({
-  fileList: allMemberErrorMock,
-  getContents: getUSSContentsMock,
-});
-export const zoweExplorerMock: IApiRegisterClient = {
-  getExplorerExtenderApi: jest.fn().mockReturnValue({
-    getProfilesCache: jest.fn().mockReturnValue({
-      loadNamedProfile: jest.fn().mockReturnValue({
-        profile: { encoding: undefined, name: "profile" },
-      }),
-    }),
-  }),
-  getMvsApi: mvsApiMock,
-  getUssApi: ussApiMock,
-  registeredApiTypes: jest.fn().mockReturnValue([]),
-};
 
-export const zoweExplorerErrorMock = {
+export const ussApiMock = (fileList = allUSSFilemembers) =>
+  jest.fn().mockReturnValue({
+    fileList,
+    getContents: getUSSContentsMock,
+  });
+
+export const createZoweExplorerMock = (
+  allMembers = allMemberMock,
+  fileList = allUSSFilemembers,
+): IApiRegisterClient => ({
   getExplorerExtenderApi: jest.fn().mockReturnValue({
     getProfilesCache: jest.fn().mockReturnValue({
       loadNamedProfile: jest.fn().mockReturnValue({
@@ -87,7 +94,7 @@ export const zoweExplorerErrorMock = {
       }),
     }),
   }),
-  getMvsApi: mvsApiMockWithError,
-  getUssApi: ussApiMockWithError,
+  getMvsApi: mvsApiMock(allMembers),
+  getUssApi: ussApiMock(fileList),
   registeredApiTypes: jest.fn().mockReturnValue([]),
-};
+});
