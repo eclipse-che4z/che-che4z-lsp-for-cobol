@@ -429,12 +429,7 @@ describe("Test the copybook message handler", () => {
       expect(
         await DownloadUtil.areCopybookDownloadConfigurationsPresent(
           "documentUri",
-          [
-            {
-              name: "copybook",
-              dialect: "COBOL",
-            },
-          ],
+          ["COBOL"],
         ),
       ).toBeTruthy();
     });

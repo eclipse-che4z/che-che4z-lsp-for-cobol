@@ -407,6 +407,7 @@ describe("Tests copybook download service", () => {
           { name: "copybook", dialect: "COBOL" },
           "document-uri",
           "dsn",
+          undefined,
         );
         expect(
           downloader["ussDownloader"]!.downloadCopybook,
@@ -414,6 +415,7 @@ describe("Tests copybook download service", () => {
           { name: "copybook", dialect: "COBOL" },
           "document-uri",
           "uss",
+          undefined,
         );
       });
     });
@@ -446,6 +448,7 @@ describe("Tests copybook download service", () => {
           { name: "copybook", dialect: "COBOL" },
           "document-uri",
           "dsn",
+          undefined,
         );
         expect(
           downloader["ussDownloader"]!.downloadCopybook,
@@ -526,6 +529,7 @@ describe("Tests copybook download service", () => {
         { name: "copybook", dialect: "COBOL" },
         "document-uri",
         "dsn",
+        undefined,
       );
       expect(
         downloader["dsnDownloader"]!.downloadCopybook,
@@ -533,6 +537,7 @@ describe("Tests copybook download service", () => {
         { name: "copybook", dialect: "COBOL" },
         "document-uri",
         "dsn-2",
+        undefined,
       );
     });
   });

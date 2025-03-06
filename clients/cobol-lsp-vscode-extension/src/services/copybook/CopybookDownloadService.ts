@@ -378,7 +378,7 @@ export class CopybookDownloadService {
     if (
       !(await DownloadUtil.areCopybookDownloadConfigurationsPresent(
         documentUri,
-        copybookNames,
+        dialects,
       ))
     )
       return false;
@@ -388,9 +388,7 @@ export class CopybookDownloadService {
       { scopeUri: documentUri },
       [],
     );
-    new Set(
-      copybookNames.map((n) => n.dialect?.toLocaleUpperCase()).filter(Boolean),
-    );
+
     const procGroupZoweProfiles = new Set(
       configs
         .filter(
