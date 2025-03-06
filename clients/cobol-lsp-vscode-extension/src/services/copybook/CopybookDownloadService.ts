@@ -375,13 +375,6 @@ export class CopybookDownloadService {
     if (this.handleAsEndevorElement(documentUri)) {
       return !!(await this.e4eDownloader?.getE4EConfig(documentUri));
     }
-    if (
-      !(await DownloadUtil.areCopybookDownloadConfigurationsPresent(
-        documentUri,
-        dialects,
-      ))
-    )
-      return false;
     if (!this.explorerApi && !this.e4eApi) return false;
 
     const configs = await loadProcessorGroupCopybookPathsConfig(
