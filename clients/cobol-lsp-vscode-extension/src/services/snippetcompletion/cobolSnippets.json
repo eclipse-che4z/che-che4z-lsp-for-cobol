@@ -1,9 +1,7 @@
 {
   "SELECT with ACCESS MODE": {
     "prefix": "ACCESS MODE",
-    "body": [
-      "SELECT ${1:customerFile} ASSIGN TO ${2:custFile}", "\tORGANIZATION IS ${3|INDEXED,RELATIVE,SEQUENTIAL,LINE-SEQUENTIAL|}", "\tACCESS MODE IS ${4|SEQUENTIAL,RANDOM,DYNAMIC|}", "\tFILE STATUS IS ${5:statusVariable}.", "$0"
-    ],
+    "body": ["SELECT ${1:customerFile} ASSIGN TO ${2:custFile}", "\tORGANIZATION IS ${3|INDEXED,RELATIVE,SEQUENTIAL,LINE-SEQUENTIAL|}", "\tACCESS MODE IS ${4|SEQUENTIAL,RANDOM,DYNAMIC|}", "\tFILE STATUS IS ${5:statusVariable}.", "$0"],
     "description": "ACCESS MODE defines how records of the file are made available for processing for processing  your program. The example is for QSAM access - and if ACCESS MODE is not specified Sequential (QSAM) is the default. https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdf"
   },
   "ACCEPT": {
