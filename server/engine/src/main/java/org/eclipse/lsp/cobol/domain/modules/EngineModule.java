@@ -20,6 +20,8 @@ import static com.google.inject.name.Names.named;
 import com.google.inject.AbstractModule;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
+import org.eclipse.lsp.cobol.cfg.CFASTBuilder;
+import org.eclipse.lsp.cobol.cfg.CFASTBuilderImpl;
 import org.eclipse.lsp.cobol.common.benchmark.BenchmarkService;
 import org.eclipse.lsp.cobol.common.benchmark.BenchmarkServiceImpl;
 import org.eclipse.lsp.cobol.common.dialects.TrueDialectService;
@@ -65,6 +67,7 @@ public class EngineModule extends AbstractModule {
     bind(ConfigurationService.class).to(CachingConfigurationService.class);
     bind(CopybookNameService.class).to(CopybookNameServiceImpl.class);
     bind(LspEventConsumer.class).to(CobolWorkspaceServiceImpl.class);
+    bind(CFASTBuilder.class).to(CFASTBuilderImpl.class);
 
     bind(String.class)
         .annotatedWith(named("resourceFileLocation"))

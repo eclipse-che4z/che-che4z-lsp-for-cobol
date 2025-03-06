@@ -1,0 +1,8 @@
+digraph A {
+rankdir=LR;
+<PROG>-><A>;
+<A>-><B>;
+<B>-><D>;
+<D>-><E>;
+<E>-><C>;
+}

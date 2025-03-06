@@ -1,0 +1,82 @@
+[
+  {
+    "name": "CFGPSQE",
+    "type": "program",
+    "location": {
+      "uri": "/case13.cbl",
+      "start": {
+        "line": 3,
+        "character": 8
+      },
+      "end": {
+        "line": 7,
+        "character": 29
+      }
+    },
+    "children": [
+      {
+        "type": "statement",
+        "location": {
+          "uri": "/case13.cbl",
+          "start": {
+            "line": 4,
+            "character": 12
+          },
+          "end": {
+            "line": 4,
+            "character": 25
+          }
+        }
+      },
+      {
+        "targetName": [
+          "PARAG2"
+        ],
+        "type": "goto",
+        "location": {
+          "uri": "/case13.cbl",
+          "start": {
+            "line": 5,
+            "character": 12
+          },
+          "end": {
+            "line": 5,
+            "character": 24
+          }
+        }
+      },
+      {
+        "snippet": "       PARAG1.\r\n           DISPLAY \u0027PARAG1\u0027.",
+        "name": "PARAG1",
+        "type": "paragraph",
+        "location": {
+          "uri": "/case13.cbl",
+          "start": {
+            "line": 6,
+            "character": 8
+          },
+          "end": {
+            "line": 7,
+            "character": 29
+          }
+        },
+        "children": [
+          {
+            "type": "statement",
+            "location": {
+              "uri": "/case13.cbl",
+              "start": {
+                "line": 7,
+                "character": 12
+              },
+              "end": {
+                "line": 7,
+                "character": 28
+              }
+            }
+          }
+        ]
+      }
+    ]
+  }
+]

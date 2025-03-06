@@ -1,0 +1,158 @@
+[
+  {
+    "name": "PROG",
+    "type": "program",
+    "location": {
+      "uri": "case119.cbl",
+      "start": {
+        "line": 3,
+        "character": 8
+      },
+      "end": {
+        "line": 13,
+        "character": 19
+      }
+    },
+    "children": [
+      {
+        "handleType": "LABEL",
+        "value": "HANDLE-ABEND",
+        "type": "execcicshandle",
+        "location": {
+          "uri": "case119.cbl",
+          "start": {
+            "line": 4,
+            "character": 12
+          },
+          "end": {
+            "line": 4,
+            "character": 63
+          }
+        }
+      },
+      {
+        "type": "endexec",
+        "location": {
+          "uri": "case119.cbl",
+          "start": {
+            "line": 4,
+            "character": 12
+          },
+          "end": {
+            "line": 4,
+            "character": 63
+          }
+        }
+      },
+      {
+        "targetName": [
+          "CALCULATION"
+        ],
+        "type": "goto",
+        "location": {
+          "uri": "case119.cbl",
+          "start": {
+            "line": 5,
+            "character": 12
+          },
+          "end": {
+            "line": 5,
+            "character": 29
+          }
+        }
+      },
+      {
+        "snippet": "       CALCULATION.\r\n           EXEC CICS RETURN END-EXEC.\r\n           GOBACK.",
+        "name": "CALCULATION",
+        "type": "paragraph",
+        "location": {
+          "uri": "case119.cbl",
+          "start": {
+            "line": 7,
+            "character": 8
+          },
+          "end": {
+            "line": 9,
+            "character": 19
+          }
+        },
+        "children": [
+          {
+            "type": "execcicsreturn",
+            "location": {
+              "uri": "case119.cbl",
+              "start": {
+                "line": 8,
+                "character": 12
+              },
+              "end": {
+                "line": 8,
+                "character": 37
+              }
+            }
+          },
+          {
+            "type": "goback",
+            "location": {
+              "uri": "case119.cbl",
+              "start": {
+                "line": 9,
+                "character": 12
+              },
+              "end": {
+                "line": 9,
+                "character": 18
+              }
+            }
+          }
+        ]
+      },
+      {
+        "snippet": "       HANDLE-ABEND.\r\n           DISPLAY \"HANDLE ABEND\".\r\n           GOBACK.",
+        "name": "HANDLE-ABEND",
+        "type": "paragraph",
+        "location": {
+          "uri": "case119.cbl",
+          "start": {
+            "line": 11,
+            "character": 8
+          },
+          "end": {
+            "line": 13,
+            "character": 19
+          }
+        },
+        "children": [
+          {
+            "type": "statement",
+            "location": {
+              "uri": "case119.cbl",
+              "start": {
+                "line": 12,
+                "character": 12
+              },
+              "end": {
+                "line": 12,
+                "character": 34
+              }
+            }
+          },
+          {
+            "type": "goback",
+            "location": {
+              "uri": "case119.cbl",
+              "start": {
+                "line": 13,
+                "character": 12
+              },
+              "end": {
+                "line": 13,
+                "character": 18
+              }
+            }
+          }
+        ]
+      }
+    ]
+  }
+]

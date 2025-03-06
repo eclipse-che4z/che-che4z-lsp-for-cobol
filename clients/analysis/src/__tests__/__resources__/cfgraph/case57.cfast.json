@@ -1,0 +1,194 @@
+[
+  {
+    "name": "HLLOWRLD",
+    "type": "program",
+    "location": {
+      "uri": "/case57.cbl",
+      "start": {
+        "line": 3,
+        "character": 8
+      },
+      "end": {
+        "line": 15,
+        "character": 24
+      }
+    },
+    "children": [
+      {
+        "targetName": "B",
+        "thruName": "D",
+        "type": "perform",
+        "location": {
+          "uri": "/case57.cbl",
+          "start": {
+            "line": 4,
+            "character": 12
+          },
+          "end": {
+            "line": 4,
+            "character": 28
+          }
+        }
+      },
+      {
+        "type": "stop",
+        "location": {
+          "uri": "/case57.cbl",
+          "start": {
+            "line": 5,
+            "character": 12
+          },
+          "end": {
+            "line": 5,
+            "character": 20
+          }
+        }
+      },
+      {
+        "snippet": "       A.",
+        "name": "A",
+        "type": "paragraph",
+        "location": {
+          "uri": "/case57.cbl",
+          "start": {
+            "line": 6,
+            "character": 8
+          },
+          "end": {
+            "line": 6,
+            "character": 10
+          }
+        }
+      },
+      {
+        "snippet": "       B.",
+        "name": "B",
+        "type": "paragraph",
+        "location": {
+          "uri": "/case57.cbl",
+          "start": {
+            "line": 7,
+            "character": 8
+          },
+          "end": {
+            "line": 7,
+            "character": 10
+          }
+        }
+      },
+      {
+        "snippet": "       C.\r\n           PERFORM X.",
+        "name": "C",
+        "type": "paragraph",
+        "location": {
+          "uri": "/case57.cbl",
+          "start": {
+            "line": 8,
+            "character": 8
+          },
+          "end": {
+            "line": 9,
+            "character": 22
+          }
+        },
+        "children": [
+          {
+            "targetName": "X",
+            "type": "perform",
+            "location": {
+              "uri": "/case57.cbl",
+              "start": {
+                "line": 9,
+                "character": 12
+              },
+              "end": {
+                "line": 9,
+                "character": 21
+              }
+            }
+          }
+        ]
+      },
+      {
+        "snippet": "       D.",
+        "name": "D",
+        "type": "paragraph",
+        "location": {
+          "uri": "/case57.cbl",
+          "start": {
+            "line": 10,
+            "character": 8
+          },
+          "end": {
+            "line": 10,
+            "character": 10
+          }
+        }
+      },
+      {
+        "snippet": "       E.\r\n           DISPLAY \"E\".",
+        "name": "E",
+        "type": "paragraph",
+        "location": {
+          "uri": "/case57.cbl",
+          "start": {
+            "line": 11,
+            "character": 8
+          },
+          "end": {
+            "line": 12,
+            "character": 24
+          }
+        },
+        "children": [
+          {
+            "type": "statement",
+            "location": {
+              "uri": "/case57.cbl",
+              "start": {
+                "line": 12,
+                "character": 12
+              },
+              "end": {
+                "line": 12,
+                "character": 23
+              }
+            }
+          }
+        ]
+      },
+      {
+        "snippet": "       X.\r\n           DISPLAY \"X\".",
+        "name": "X",
+        "type": "paragraph",
+        "location": {
+          "uri": "/case57.cbl",
+          "start": {
+            "line": 14,
+            "character": 8
+          },
+          "end": {
+            "line": 15,
+            "character": 24
+          }
+        },
+        "children": [
+          {
+            "type": "statement",
+            "location": {
+              "uri": "/case57.cbl",
+              "start": {
+                "line": 15,
+                "character": 12
+              },
+              "end": {
+                "line": 15,
+                "character": 23
+              }
+            }
+          }
+        ]
+      }
+    ]
+  }
+]

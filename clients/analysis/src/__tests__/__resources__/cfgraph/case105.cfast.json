@@ -1,0 +1,408 @@
+[
+  {
+    "name": "HLLOWRLD",
+    "type": "program",
+    "location": {
+      "uri": "/case105.cbl",
+      "start": {
+        "line": 8,
+        "character": 8
+      },
+      "end": {
+        "line": 39,
+        "character": 19
+      }
+    },
+    "children": [
+      {
+        "name": "0000-MAIN",
+        "snippet": "       0000-MAIN SECTION.\r\n           MOVE 1 TO VAR.\r\n           MOVE 1 TO S-3-VAR.\r\n\r\n           DISPLAY \u0027START\u0027.\r\n           PERFORM 2-S\r\n           DISPLAY \u0027MIDDLE\u0027.\r\n           MOVE 0 TO S-3-VAR.\r\n           GO TO 3-S.\r\n",
+        "type": "section",
+        "location": {
+          "uri": "/case105.cbl",
+          "start": {
+            "line": 9,
+            "character": 8
+          },
+          "end": {
+            "line": 20,
+            "character": 19
+          }
+        },
+        "children": [
+          {
+            "type": "statement",
+            "location": {
+              "uri": "/case105.cbl",
+              "start": {
+                "line": 10,
+                "character": 12
+              },
+              "end": {
+                "line": 10,
+                "character": 25
+              }
+            }
+          },
+          {
+            "type": "statement",
+            "location": {
+              "uri": "/case105.cbl",
+              "start": {
+                "line": 11,
+                "character": 12
+              },
+              "end": {
+                "line": 11,
+                "character": 29
+              }
+            }
+          },
+          {
+            "type": "statement",
+            "location": {
+              "uri": "/case105.cbl",
+              "start": {
+                "line": 13,
+                "character": 12
+              },
+              "end": {
+                "line": 13,
+                "character": 27
+              }
+            }
+          },
+          {
+            "targetName": "2-S",
+            "type": "perform",
+            "location": {
+              "uri": "/case105.cbl",
+              "start": {
+                "line": 14,
+                "character": 12
+              },
+              "end": {
+                "line": 14,
+                "character": 23
+              }
+            }
+          },
+          {
+            "type": "statement",
+            "location": {
+              "uri": "/case105.cbl",
+              "start": {
+                "line": 15,
+                "character": 12
+              },
+              "end": {
+                "line": 15,
+                "character": 28
+              }
+            }
+          },
+          {
+            "type": "statement",
+            "location": {
+              "uri": "/case105.cbl",
+              "start": {
+                "line": 16,
+                "character": 12
+              },
+              "end": {
+                "line": 16,
+                "character": 29
+              }
+            }
+          },
+          {
+            "targetName": [
+              "3-S"
+            ],
+            "type": "goto",
+            "location": {
+              "uri": "/case105.cbl",
+              "start": {
+                "line": 17,
+                "character": 12
+              },
+              "end": {
+                "line": 17,
+                "character": 21
+              }
+            }
+          },
+          {
+            "type": "statement",
+            "location": {
+              "uri": "/case105.cbl",
+              "start": {
+                "line": 19,
+                "character": 12
+              },
+              "end": {
+                "line": 19,
+                "character": 25
+              }
+            }
+          },
+          {
+            "type": "goback",
+            "location": {
+              "uri": "/case105.cbl",
+              "start": {
+                "line": 20,
+                "character": 12
+              },
+              "end": {
+                "line": 20,
+                "character": 18
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "2-S",
+        "snippet": "       2-S SECTION.\r\n           DISPLAY \u00272-S\u0027.\r\n           PERFORM 2-EXIT.\r\n           DISPLAY \u00272-S-END\u0027.\r\n\r\n       2-EXIT.\r\n           DISPLAY \u00272-EXIT\u0027.\r\n           IF VAR EQUAL TO 1 THEN\r\n               PERFORM 3-S\r\n           END-IF.",
+        "type": "section",
+        "location": {
+          "uri": "/case105.cbl",
+          "start": {
+            "line": 22,
+            "character": 8
+          },
+          "end": {
+            "line": 32,
+            "character": 33
+          }
+        },
+        "children": [
+          {
+            "type": "statement",
+            "location": {
+              "uri": "/case105.cbl",
+              "start": {
+                "line": 23,
+                "character": 12
+              },
+              "end": {
+                "line": 23,
+                "character": 25
+              }
+            }
+          },
+          {
+            "targetName": "2-EXIT",
+            "type": "perform",
+            "location": {
+              "uri": "/case105.cbl",
+              "start": {
+                "line": 24,
+                "character": 12
+              },
+              "end": {
+                "line": 24,
+                "character": 26
+              }
+            }
+          },
+          {
+            "type": "statement",
+            "location": {
+              "uri": "/case105.cbl",
+              "start": {
+                "line": 25,
+                "character": 12
+              },
+              "end": {
+                "line": 25,
+                "character": 29
+              }
+            }
+          },
+          {
+            "snippet": "       2-EXIT.\r\n           DISPLAY \u00272-EXIT\u0027.\r\n           IF VAR EQUAL TO 1 THEN\r\n               PERFORM 3-S\r\n           END-IF.\r\n           DISPLAY \u00272-EXIT-END\u0027.",
+            "name": "2-EXIT",
+            "type": "paragraph",
+            "location": {
+              "uri": "/case105.cbl",
+              "start": {
+                "line": 27,
+                "character": 8
+              },
+              "end": {
+                "line": 32,
+                "character": 33
+              }
+            },
+            "children": [
+              {
+                "type": "statement",
+                "location": {
+                  "uri": "/case105.cbl",
+                  "start": {
+                    "line": 28,
+                    "character": 12
+                  },
+                  "end": {
+                    "line": 28,
+                    "character": 28
+                  }
+                }
+              },
+              {
+                "type": "if",
+                "location": {
+                  "uri": "/case105.cbl",
+                  "start": {
+                    "line": 29,
+                    "character": 12
+                  },
+                  "end": {
+                    "line": 31,
+                    "character": 18
+                  }
+                }
+              },
+              {
+                "targetName": "3-S",
+                "type": "perform",
+                "location": {
+                  "uri": "/case105.cbl",
+                  "start": {
+                    "line": 30,
+                    "character": 16
+                  },
+                  "end": {
+                    "line": 30,
+                    "character": 27
+                  }
+                }
+              },
+              {
+                "type": "endif",
+                "location": {
+                  "uri": "/case105.cbl",
+                  "start": {
+                    "line": 29,
+                    "character": 12
+                  },
+                  "end": {
+                    "line": 31,
+                    "character": 18
+                  }
+                }
+              },
+              {
+                "type": "statement",
+                "location": {
+                  "uri": "/case105.cbl",
+                  "start": {
+                    "line": 32,
+                    "character": 12
+                  },
+                  "end": {
+                    "line": 32,
+                    "character": 32
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "3-S",
+        "snippet": "       3-S SECTION.\r\n           DISPLAY \u00273-S\u0027.\r\n           MOVE 0 TO VAR.\r\n           IF S-3-VAR EQUAL TO 1 THEN\r\n               GO TO 2-EXIT\r\n           END-IF.",
+        "type": "section",
+        "location": {
+          "uri": "/case105.cbl",
+          "start": {
+            "line": 34,
+            "character": 8
+          },
+          "end": {
+            "line": 39,
+            "character": 19
+          }
+        },
+        "children": [
+          {
+            "type": "statement",
+            "location": {
+              "uri": "/case105.cbl",
+              "start": {
+                "line": 35,
+                "character": 12
+              },
+              "end": {
+                "line": 35,
+                "character": 25
+              }
+            }
+          },
+          {
+            "type": "statement",
+            "location": {
+              "uri": "/case105.cbl",
+              "start": {
+                "line": 36,
+                "character": 12
+              },
+              "end": {
+                "line": 36,
+                "character": 25
+              }
+            }
+          },
+          {
+            "type": "if",
+            "location": {
+              "uri": "/case105.cbl",
+              "start": {
+                "line": 37,
+                "character": 12
+              },
+              "end": {
+                "line": 39,
+                "character": 18
+              }
+            }
+          },
+          {
+            "targetName": [
+              "2-EXIT"
+            ],
+            "type": "goto",
+            "location": {
+              "uri": "/case105.cbl",
+              "start": {
+                "line": 38,
+                "character": 16
+              },
+              "end": {
+                "line": 38,
+                "character": 28
+              }
+            }
+          },
+          {
+            "type": "endif",
+            "location": {
+              "uri": "/case105.cbl",
+              "start": {
+                "line": 37,
+                "character": 12
+              },
+              "end": {
+                "line": 39,
+                "character": 18
+              }
+            }
+          }
+        ]
+      }
+    ]
+  }
+]

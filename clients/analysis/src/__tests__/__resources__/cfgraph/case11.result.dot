@@ -1,0 +1,7 @@
+digraph A {
+rankdir=LR;
+<ST>-><MY1-P2>;
+<ST>-><P>;
+<P>-><MY1>;
+<MY1>-><MY1-P2>;
+}

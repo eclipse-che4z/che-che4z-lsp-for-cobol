@@ -623,6 +623,7 @@
   },
   "dependencies": {
     "@code4z/cobol-dialect-api": "file:../cobol-dialect-api",
+    "@code4z/analysis": "file:../analysis",
     "@vscode/extension-telemetry": "^0.9.8",
     "glob": "11.0.0",
     "iconv-lite": "^0.6.3",

@@ -1,0 +1,38 @@
+[
+  {
+    "range": {
+      "start": {
+        "line": 11,
+        "character": 11
+      },
+      "end": {
+        "line": 11,
+        "character": 24
+      }
+    },
+    "message": "Unreachable code detected",
+    "severity": 1,
+    "tags": [
+      1
+    ],
+    "source": "COBOL Control Flow"
+  },
+  {
+    "range": {
+      "start": {
+        "line": 21,
+        "character": 7
+      },
+      "end": {
+        "line": 29,
+        "character": 23
+      }
+    },
+    "message": "Unreachable code detected",
+    "severity": 1,
+    "tags": [
+      1
+    ],
+    "source": "COBOL Control Flow"
+  }
+]

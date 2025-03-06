@@ -1,0 +1,287 @@
+[
+  {
+    "name": "HELLO",
+    "type": "program",
+    "location": {
+      "uri": "/case12.cbl",
+      "start": {
+        "line": 3,
+        "character": 8
+      },
+      "end": {
+        "line": 19,
+        "character": 15
+      }
+    },
+    "children": [
+      {
+        "snippet": "       A-PARA.\r\n           PERFORM DISPLAY \u0027IN A-PARA\u0027\r\n           END-PERFORM.\r\n           PERFORM C-PARA THRU D-PARA.\r\n           GO TO D-PARA.",
+        "name": "A-PARA",
+        "type": "paragraph",
+        "location": {
+          "uri": "/case12.cbl",
+          "start": {
+            "line": 4,
+            "character": 8
+          },
+          "end": {
+            "line": 8,
+            "character": 25
+          }
+        },
+        "children": [
+          {
+            "type": "inlineperform",
+            "location": {
+              "uri": "/case12.cbl",
+              "start": {
+                "line": 5,
+                "character": 20
+              },
+              "end": {
+                "line": 6,
+                "character": 23
+              }
+            }
+          },
+          {
+            "type": "statement",
+            "location": {
+              "uri": "/case12.cbl",
+              "start": {
+                "line": 5,
+                "character": 20
+              },
+              "end": {
+                "line": 5,
+                "character": 39
+              }
+            }
+          },
+          {
+            "type": "endinlineperform",
+            "location": {
+              "uri": "/case12.cbl",
+              "start": {
+                "line": 5,
+                "character": 20
+              },
+              "end": {
+                "line": 6,
+                "character": 23
+              }
+            }
+          },
+          {
+            "targetName": "C-PARA",
+            "thruName": "D-PARA",
+            "type": "perform",
+            "location": {
+              "uri": "/case12.cbl",
+              "start": {
+                "line": 7,
+                "character": 12
+              },
+              "end": {
+                "line": 7,
+                "character": 38
+              }
+            }
+          },
+          {
+            "targetName": [
+              "D-PARA"
+            ],
+            "type": "goto",
+            "location": {
+              "uri": "/case12.cbl",
+              "start": {
+                "line": 8,
+                "character": 12
+              },
+              "end": {
+                "line": 8,
+                "character": 24
+              }
+            }
+          }
+        ]
+      },
+      {
+        "snippet": "       B-PARA.\r\n           DISPLAY \u0027IN B-PARA\u0027.\r\n           STOP RUN.",
+        "name": "B-PARA",
+        "type": "paragraph",
+        "location": {
+          "uri": "/case12.cbl",
+          "start": {
+            "line": 9,
+            "character": 8
+          },
+          "end": {
+            "line": 11,
+            "character": 21
+          }
+        },
+        "children": [
+          {
+            "type": "statement",
+            "location": {
+              "uri": "/case12.cbl",
+              "start": {
+                "line": 10,
+                "character": 12
+              },
+              "end": {
+                "line": 10,
+                "character": 31
+              }
+            }
+          },
+          {
+            "type": "stop",
+            "location": {
+              "uri": "/case12.cbl",
+              "start": {
+                "line": 11,
+                "character": 12
+              },
+              "end": {
+                "line": 11,
+                "character": 20
+              }
+            }
+          }
+        ]
+      },
+      {
+        "snippet": "       C-PARA.\r\n           DISPLAY \u0027IN C-PARA\u0027.",
+        "name": "C-PARA",
+        "type": "paragraph",
+        "location": {
+          "uri": "/case12.cbl",
+          "start": {
+            "line": 12,
+            "character": 8
+          },
+          "end": {
+            "line": 13,
+            "character": 32
+          }
+        },
+        "children": [
+          {
+            "type": "statement",
+            "location": {
+              "uri": "/case12.cbl",
+              "start": {
+                "line": 13,
+                "character": 12
+              },
+              "end": {
+                "line": 13,
+                "character": 31
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "MY1",
+        "snippet": "       MY1 SECTION.\r\n       D-PARA.\r\n           DISPLAY \u0027---------\u0027.\r\n           DISPLAY \u0027IN D-PARA\u0027.\r\n           GO TO A-PARA.\r\n       E-PARA.",
+        "type": "section",
+        "location": {
+          "uri": "/case12.cbl",
+          "start": {
+            "line": 14,
+            "character": 8
+          },
+          "end": {
+            "line": 19,
+            "character": 15
+          }
+        },
+        "children": [
+          {
+            "snippet": "       D-PARA.\r\n           DISPLAY \u0027---------\u0027.\r\n           DISPLAY \u0027IN D-PARA\u0027.\r\n           GO TO A-PARA.",
+            "name": "D-PARA",
+            "type": "paragraph",
+            "location": {
+              "uri": "/case12.cbl",
+              "start": {
+                "line": 15,
+                "character": 8
+              },
+              "end": {
+                "line": 18,
+                "character": 25
+              }
+            },
+            "children": [
+              {
+                "type": "statement",
+                "location": {
+                  "uri": "/case12.cbl",
+                  "start": {
+                    "line": 16,
+                    "character": 12
+                  },
+                  "end": {
+                    "line": 16,
+                    "character": 31
+                  }
+                }
+              },
+              {
+                "type": "statement",
+                "location": {
+                  "uri": "/case12.cbl",
+                  "start": {
+                    "line": 17,
+                    "character": 12
+                  },
+                  "end": {
+                    "line": 17,
+                    "character": 31
+                  }
+                }
+              },
+              {
+                "targetName": [
+                  "A-PARA"
+                ],
+                "type": "goto",
+                "location": {
+                  "uri": "/case12.cbl",
+                  "start": {
+                    "line": 18,
+                    "character": 12
+                  },
+                  "end": {
+                    "line": 18,
+                    "character": 24
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "snippet": "       E-PARA.",
+            "name": "E-PARA",
+            "type": "paragraph",
+            "location": {
+              "uri": "/case12.cbl",
+              "start": {
+                "line": 19,
+                "character": 8
+              },
+              "end": {
+                "line": 19,
+                "character": 15
+              }
+            }
+          }
+        ]
+      }
+    ]
+  }
+]

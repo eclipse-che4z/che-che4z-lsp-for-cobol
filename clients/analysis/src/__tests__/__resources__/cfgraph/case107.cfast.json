@@ -1,0 +1,703 @@
+[
+  {
+    "name": "PROG",
+    "type": "program",
+    "location": {
+      "uri": "/case107.cbl",
+      "start": {
+        "line": 40,
+        "character": 8
+      },
+      "end": {
+        "line": 82,
+        "character": 35
+      }
+    },
+    "children": [
+      {
+        "snippet": "       PAR1.\r\n           SORT FILE2 ON ASCENDING NAMEWF\r\n               INPUT PROCEDURE IS PAR2\r\n               OUTPUT PROCEDURE IS PAR3.\r\n           STOP RUN.",
+        "name": "PAR1",
+        "type": "paragraph",
+        "location": {
+          "uri": "/case107.cbl",
+          "start": {
+            "line": 41,
+            "character": 8
+          },
+          "end": {
+            "line": 45,
+            "character": 21
+          }
+        },
+        "children": [
+          {
+            "type": "sort",
+            "location": {
+              "uri": "/case107.cbl",
+              "start": {
+                "line": 42,
+                "character": 12
+              },
+              "end": {
+                "line": 44,
+                "character": 40
+              }
+            }
+          },
+          {
+            "target": {
+              "name": "PAR2"
+            },
+            "type": "input",
+            "location": {
+              "uri": "/case107.cbl",
+              "start": {
+                "line": 43,
+                "character": 16
+              },
+              "end": {
+                "line": 43,
+                "character": 39
+              }
+            }
+          },
+          {
+            "target": {
+              "name": "PAR3"
+            },
+            "type": "output",
+            "location": {
+              "uri": "/case107.cbl",
+              "start": {
+                "line": 44,
+                "character": 16
+              },
+              "end": {
+                "line": 44,
+                "character": 40
+              }
+            }
+          },
+          {
+            "type": "endsort",
+            "location": {
+              "uri": "/case107.cbl",
+              "start": {
+                "line": 42,
+                "character": 12
+              },
+              "end": {
+                "line": 44,
+                "character": 40
+              }
+            }
+          },
+          {
+            "type": "stop",
+            "location": {
+              "uri": "/case107.cbl",
+              "start": {
+                "line": 45,
+                "character": 12
+              },
+              "end": {
+                "line": 45,
+                "character": 20
+              }
+            }
+          }
+        ]
+      },
+      {
+        "snippet": "       PAR2.\r\n           OPEN INPUT FILE1.\r\n             READ FILE1\r\n           AT END SET ENDREC1 TO TRUE\r\n           END-READ\r\n           PERFORM UNTIL ENDREC1\r\n               IF NOT ISI\r\n                   MOVE NAMEGF TO NAMEWF\r\n                   RELEASE REC3\r\n               END-IF",
+        "name": "PAR2",
+        "type": "paragraph",
+        "location": {
+          "uri": "/case107.cbl",
+          "start": {
+            "line": 47,
+            "character": 8
+          },
+          "end": {
+            "line": 61,
+            "character": 24
+          }
+        },
+        "children": [
+          {
+            "type": "statement",
+            "location": {
+              "uri": "/case107.cbl",
+              "start": {
+                "line": 48,
+                "character": 12
+              },
+              "end": {
+                "line": 48,
+                "character": 28
+              }
+            }
+          },
+          {
+            "type": "statement",
+            "location": {
+              "uri": "/case107.cbl",
+              "start": {
+                "line": 48,
+                "character": 17
+              },
+              "end": {
+                "line": 48,
+                "character": 28
+              }
+            }
+          },
+          {
+            "type": "statement",
+            "location": {
+              "uri": "/case107.cbl",
+              "start": {
+                "line": 49,
+                "character": 14
+              },
+              "end": {
+                "line": 51,
+                "character": 20
+              }
+            }
+          },
+          {
+            "type": "atEnd",
+            "location": {
+              "uri": "/case107.cbl",
+              "start": {
+                "line": 50,
+                "character": 12
+              },
+              "end": {
+                "line": 50,
+                "character": 38
+              }
+            }
+          },
+          {
+            "type": "statement",
+            "location": {
+              "uri": "/case107.cbl",
+              "start": {
+                "line": 50,
+                "character": 19
+              },
+              "end": {
+                "line": 50,
+                "character": 38
+              }
+            }
+          },
+          {
+            "type": "statement",
+            "location": {
+              "uri": "/case107.cbl",
+              "start": {
+                "line": 50,
+                "character": 23
+              },
+              "end": {
+                "line": 50,
+                "character": 38
+              }
+            }
+          },
+          {
+            "type": "atEndExit",
+            "location": {
+              "uri": "/case107.cbl",
+              "start": {
+                "line": 50,
+                "character": 12
+              },
+              "end": {
+                "line": 50,
+                "character": 38
+              }
+            }
+          },
+          {
+            "performUntilType": "UNTIL_CONDITION",
+            "type": "inlineperform",
+            "location": {
+              "uri": "/case107.cbl",
+              "start": {
+                "line": 52,
+                "character": 20
+              },
+              "end": {
+                "line": 60,
+                "character": 23
+              }
+            }
+          },
+          {
+            "type": "if",
+            "location": {
+              "uri": "/case107.cbl",
+              "start": {
+                "line": 53,
+                "character": 16
+              },
+              "end": {
+                "line": 56,
+                "character": 22
+              }
+            }
+          },
+          {
+            "type": "statement",
+            "location": {
+              "uri": "/case107.cbl",
+              "start": {
+                "line": 54,
+                "character": 20
+              },
+              "end": {
+                "line": 54,
+                "character": 41
+              }
+            }
+          },
+          {
+            "type": "statement",
+            "location": {
+              "uri": "/case107.cbl",
+              "start": {
+                "line": 55,
+                "character": 20
+              },
+              "end": {
+                "line": 55,
+                "character": 32
+              }
+            }
+          },
+          {
+            "type": "endif",
+            "location": {
+              "uri": "/case107.cbl",
+              "start": {
+                "line": 53,
+                "character": 16
+              },
+              "end": {
+                "line": 56,
+                "character": 22
+              }
+            }
+          },
+          {
+            "type": "statement",
+            "location": {
+              "uri": "/case107.cbl",
+              "start": {
+                "line": 57,
+                "character": 12
+              },
+              "end": {
+                "line": 59,
+                "character": 20
+              }
+            }
+          },
+          {
+            "type": "atEnd",
+            "location": {
+              "uri": "/case107.cbl",
+              "start": {
+                "line": 58,
+                "character": 16
+              },
+              "end": {
+                "line": 58,
+                "character": 42
+              }
+            }
+          },
+          {
+            "type": "statement",
+            "location": {
+              "uri": "/case107.cbl",
+              "start": {
+                "line": 58,
+                "character": 23
+              },
+              "end": {
+                "line": 58,
+                "character": 42
+              }
+            }
+          },
+          {
+            "type": "statement",
+            "location": {
+              "uri": "/case107.cbl",
+              "start": {
+                "line": 58,
+                "character": 27
+              },
+              "end": {
+                "line": 58,
+                "character": 42
+              }
+            }
+          },
+          {
+            "type": "atEndExit",
+            "location": {
+              "uri": "/case107.cbl",
+              "start": {
+                "line": 58,
+                "character": 16
+              },
+              "end": {
+                "line": 58,
+                "character": 42
+              }
+            }
+          },
+          {
+            "type": "endinlineperform",
+            "location": {
+              "uri": "/case107.cbl",
+              "start": {
+                "line": 52,
+                "character": 20
+              },
+              "end": {
+                "line": 60,
+                "character": 23
+              }
+            }
+          },
+          {
+            "type": "statement",
+            "location": {
+              "uri": "/case107.cbl",
+              "start": {
+                "line": 61,
+                "character": 12
+              },
+              "end": {
+                "line": 61,
+                "character": 23
+              }
+            }
+          }
+        ]
+      },
+      {
+        "snippet": "       PAR3.\r\n           OPEN OUTPUT FILE3\r\n           WRITE FIELD1 FROM REC3\r\n               AFTER ADVANCING 2 LINES\r\n           RETURN FILE2\r\n           AT END SET ENDREC2 TO TRUE\r\n           END-RETURN\r\n           PERFORM PAR4 UNTIL ENDREC2.",
+        "name": "PAR3",
+        "type": "paragraph",
+        "location": {
+          "uri": "/case107.cbl",
+          "start": {
+            "line": 64,
+            "character": 8
+          },
+          "end": {
+            "line": 71,
+            "character": 39
+          }
+        },
+        "children": [
+          {
+            "type": "statement",
+            "location": {
+              "uri": "/case107.cbl",
+              "start": {
+                "line": 65,
+                "character": 12
+              },
+              "end": {
+                "line": 65,
+                "character": 29
+              }
+            }
+          },
+          {
+            "type": "statement",
+            "location": {
+              "uri": "/case107.cbl",
+              "start": {
+                "line": 65,
+                "character": 24
+              },
+              "end": {
+                "line": 65,
+                "character": 29
+              }
+            }
+          },
+          {
+            "type": "statement",
+            "location": {
+              "uri": "/case107.cbl",
+              "start": {
+                "line": 66,
+                "character": 12
+              },
+              "end": {
+                "line": 67,
+                "character": 39
+              }
+            }
+          },
+          {
+            "type": "statement",
+            "location": {
+              "uri": "/case107.cbl",
+              "start": {
+                "line": 68,
+                "character": 12
+              },
+              "end": {
+                "line": 70,
+                "character": 22
+              }
+            }
+          },
+          {
+            "type": "atEnd",
+            "location": {
+              "uri": "/case107.cbl",
+              "start": {
+                "line": 69,
+                "character": 12
+              },
+              "end": {
+                "line": 69,
+                "character": 38
+              }
+            }
+          },
+          {
+            "type": "statement",
+            "location": {
+              "uri": "/case107.cbl",
+              "start": {
+                "line": 69,
+                "character": 19
+              },
+              "end": {
+                "line": 69,
+                "character": 38
+              }
+            }
+          },
+          {
+            "type": "statement",
+            "location": {
+              "uri": "/case107.cbl",
+              "start": {
+                "line": 69,
+                "character": 23
+              },
+              "end": {
+                "line": 69,
+                "character": 38
+              }
+            }
+          },
+          {
+            "type": "atEndExit",
+            "location": {
+              "uri": "/case107.cbl",
+              "start": {
+                "line": 69,
+                "character": 12
+              },
+              "end": {
+                "line": 69,
+                "character": 38
+              }
+            }
+          },
+          {
+            "targetName": "PAR4",
+            "performUntilType": "UNTIL_CONDITION",
+            "type": "perform",
+            "location": {
+              "uri": "/case107.cbl",
+              "start": {
+                "line": 71,
+                "character": 12
+              },
+              "end": {
+                "line": 71,
+                "character": 38
+              }
+            }
+          }
+        ]
+      },
+      {
+        "snippet": "       PAR4.\r\n           MOVE ZEROS TO VCOUNT\r\n           PERFORM UNTIL NAMEWF NOT EQUAL TO CNAME\r\n                         OR ENDREC2\r\n           ADD 1 TO VCOUNT\r\n           RETURN FILE2\r\n               AT END SET ENDREC2 TO TRUE\r\n           END-RETURN\r\n           END-PERFORM\r\n           MOVE VCOUNT TO PVCOUNT.",
+        "name": "PAR4",
+        "type": "paragraph",
+        "location": {
+          "uri": "/case107.cbl",
+          "start": {
+            "line": 73,
+            "character": 8
+          },
+          "end": {
+            "line": 82,
+            "character": 35
+          }
+        },
+        "children": [
+          {
+            "type": "statement",
+            "location": {
+              "uri": "/case107.cbl",
+              "start": {
+                "line": 74,
+                "character": 12
+              },
+              "end": {
+                "line": 74,
+                "character": 32
+              }
+            }
+          },
+          {
+            "performUntilType": "UNTIL_CONDITION",
+            "type": "inlineperform",
+            "location": {
+              "uri": "/case107.cbl",
+              "start": {
+                "line": 75,
+                "character": 20
+              },
+              "end": {
+                "line": 81,
+                "character": 23
+              }
+            }
+          },
+          {
+            "type": "statement",
+            "location": {
+              "uri": "/case107.cbl",
+              "start": {
+                "line": 77,
+                "character": 12
+              },
+              "end": {
+                "line": 77,
+                "character": 27
+              }
+            }
+          },
+          {
+            "type": "statement",
+            "location": {
+              "uri": "/case107.cbl",
+              "start": {
+                "line": 78,
+                "character": 12
+              },
+              "end": {
+                "line": 80,
+                "character": 22
+              }
+            }
+          },
+          {
+            "type": "atEnd",
+            "location": {
+              "uri": "/case107.cbl",
+              "start": {
+                "line": 79,
+                "character": 16
+              },
+              "end": {
+                "line": 79,
+                "character": 42
+              }
+            }
+          },
+          {
+            "type": "statement",
+            "location": {
+              "uri": "/case107.cbl",
+              "start": {
+                "line": 79,
+                "character": 23
+              },
+              "end": {
+                "line": 79,
+                "character": 42
+              }
+            }
+          },
+          {
+            "type": "statement",
+            "location": {
+              "uri": "/case107.cbl",
+              "start": {
+                "line": 79,
+                "character": 27
+              },
+              "end": {
+                "line": 79,
+                "character": 42
+              }
+            }
+          },
+          {
+            "type": "atEndExit",
+            "location": {
+              "uri": "/case107.cbl",
+              "start": {
+                "line": 79,
+                "character": 16
+              },
+              "end": {
+                "line": 79,
+                "character": 42
+              }
+            }
+          },
+          {
+            "type": "endinlineperform",
+            "location": {
+              "uri": "/case107.cbl",
+              "start": {
+                "line": 75,
+                "character": 20
+              },
+              "end": {
+                "line": 81,
+                "character": 23
+              }
+            }
+          },
+          {
+            "type": "statement",
+            "location": {
+              "uri": "/case107.cbl",
+              "start": {
+                "line": 82,
+                "character": 12
+              },
+              "end": {
+                "line": 82,
+                "character": 34
+              }
+            }
+          }
+        ]
+      }
+    ]
+  }
+]

@@ -1,0 +1,7 @@
+digraph A {
+rankdir=LR;
+<HLLOWRLD>-><B>;
+<B>-><C>;
+<C>-><X>;
+<C>-><D>;
+}

@@ -503,3 +503,41 @@ describe("SettingService lspConfigHandler", () => {
     });
   });
 });
+
+describe("SettingsService for analysis", () => {
+  test("returns severity for defined ERROR setting", () => {
+    vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
+      get: jest.fn().mockReturnValue("ERROR"),
+    });
+
+    const severity = SettingsService.getUnreachableCodeSeverity();
+    expect(severity).toBe(vscode.DiagnosticSeverity.Error);
+  });
+
+  test("returns undefined severity for undefined setting", () => {
+    vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
+      get: jest.fn().mockReturnValue(undefined),
+    });
+
+    const severity = SettingsService.getUnreachableCodeSeverity();
+    expect(severity).toBeUndefined();
+  });
+
+  test("returns default Max VM Count for undefined setting", () => {
+    vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
+      get: jest.fn().mockReturnValue(undefined),
+    });
+
+    const count = SettingsService.getMaxVMCount();
+    expect(count).toBe(50000);
+  });
+
+  test("returns Max VM Count", () => {
+    vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
+      get: jest.fn().mockReturnValue(25000),
+    });
+
+    const count = SettingsService.getMaxVMCount();
+    expect(count).toBe(25000);
+  });
+});

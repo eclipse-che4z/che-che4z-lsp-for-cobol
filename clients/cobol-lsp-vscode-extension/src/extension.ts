@@ -15,6 +15,7 @@
 import * as vscode from "vscode";
 import { __ExtensionApi } from "@code4z/cobol-dialect-api";
 import { isV1RuntimeDialectDetail } from "./dialect/utils";
+import { Logger } from "@code4z/analysis/lib/vm/logger";
 
 import { fetchCopybookCommand } from "./commands/FetchCopybookCommand";
 import { gotoCopybookSettings } from "./commands/OpenSettingsCommand";
@@ -59,6 +60,7 @@ import {
 } from "./services/reporter";
 import { CopybooksCompletionProvider } from "./services/copybook/CopybooksCompletionProvider";
 import { SubroutinesCompletionsProvider } from "./services/subroutines/SubroutinesCompletionsProvider";
+import { controlFlowAstHandler } from "./services/ControlFlowService";
 
 interface __AnalysisApi {
   analysis(uri: string, text: string, pos?: vscode.Position): Promise<unknown>;
@@ -66,11 +68,16 @@ interface __AnalysisApi {
 
 let languageClientService: LanguageClientService;
 let outputChannel: vscode.OutputChannel;
+let controlFlowChannel: vscode.LogOutputChannel;
 const API_VERSION: string = "1.0.0";
 
 async function initialize(context: vscode.ExtensionContext) {
   // We need lazy initialization to be able to mock this for unit testing
   outputChannel = vscode.window.createOutputChannel("COBOL Language Support");
+  controlFlowChannel = vscode.window.createOutputChannel(
+    "COBOL Language Support Control Flow",
+    { log: true },
+  );
   try {
     await vscode.workspace.fs.createDirectory(context.globalStorageUri);
   } catch (error) {
@@ -195,6 +202,10 @@ export async function activate(
   languageClientService.addRequestHandler(
     "workspace/configuration",
     lspConfigHandler,
+  );
+  languageClientService.addNotificationHandler(
+    "cfast/ready",
+    controlFlowAstHandler,
   );
 
   await languageClientService.start();
@@ -422,6 +433,14 @@ function registerCommands(
       },
     ),
   );
+
+  Logger.initialize({
+    trace: (message: string) => controlFlowChannel.trace(message),
+    debug: (message: string) => controlFlowChannel.debug(message),
+    info: (message: string) => controlFlowChannel.info(message),
+    warn: (message: string) => controlFlowChannel.warn(message),
+    error: (message: string) => controlFlowChannel.error(message),
+  });
 }
 
 function registerCodeActions(context: vscode.ExtensionContext) {

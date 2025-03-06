@@ -62,6 +62,7 @@ class CFASTBuilderTest {
                 .text(src)
                 .build());
     DocumentModelService documentModelService = new DocumentModelService();
+
     documentModelService.openDocument("fake/path", src, "COBOL");
     CFASTBuilder builder = new CFASTBuilderImpl(documentModelService);
     MessageJsonHandler handler = new MessageJsonHandler(ImmutableMap.of());

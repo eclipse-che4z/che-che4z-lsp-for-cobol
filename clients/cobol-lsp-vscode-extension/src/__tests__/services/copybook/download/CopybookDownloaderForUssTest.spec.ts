@@ -26,6 +26,7 @@ import { CopybookDownloaderForUss } from "../../../../services/copybook/download
 describe("Tests Copybook download from USS", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    SettingsService.getUnreachableCodeSeverity = jest.fn().mockReturnValue(1);
     jest
       .spyOn(vscode.workspace.fs, "readFile")
       .mockReturnValue(
