@@ -109,11 +109,6 @@
     "body": ["ALTER ${1:procName-1} TO ${2:procName-2}"],
     "description": "ALTER TO"
   },
-  "ANYCASE": {
-    "prefix": "ANYCASE",
-    "body": ["COMPUTE ${1:statement} ANYCASE."],
-    "description": "ANYCASE is used in conjunction with intrinsic functions to make string manipulation case-insensitive."
-  },
   "AREA": {
     "prefix": "AREA",
     "body": ["${1|SAME,SAME SORT,SAME RECORD|} ${2|AREA,AREAS|}"],
