@@ -366,7 +366,7 @@
   },
   "COPY REPLACING": {
     "prefix": "COPY",
-    "body": ["COPY \"${1:SUBPROG.CPY}\"", "\t ==${2:()}== BY ==${3:lnk-}==."],
+    "body": ["COPY \"${1:SUBPROG.CPY}\" REPLCAING", "\t ==${2:()}== BY ==${3:lnk-}==."],
     "description": "COPY REPLACING"
   },
   "CORR": {
