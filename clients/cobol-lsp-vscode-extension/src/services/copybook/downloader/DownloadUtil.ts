@@ -204,8 +204,8 @@ export class DownloadUtil {
       if (procGroupPath && procGroupPath.length > 0) {
         return true;
       }
-      return null;
     }
+    return null;
   }
 
   private static async showQueueLockedDialog(
