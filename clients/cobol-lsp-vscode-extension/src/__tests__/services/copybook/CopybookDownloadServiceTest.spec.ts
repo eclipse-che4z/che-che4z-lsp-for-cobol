@@ -299,7 +299,7 @@ describe("Tests copybook download service", () => {
       vscode.window.showErrorMessage = jest.fn();
       const downloadService = new CopybookDownloadService(
         "storage-path",
-        zoweExplorerErrorMock,
+        zoweExplorerMock,
       );
 
       downloadService["processDownloadError"] = jest.fn();
