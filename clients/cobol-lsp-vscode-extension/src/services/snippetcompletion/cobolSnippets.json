@@ -2,13 +2,9 @@
   "ACCESS MODE": {
     "prefix": "ACCESS MODE",
     "body": [
-      "SELECT ${3:customerFile} ASSIGN TO ${4:custFile}",
-      "    ORGANIZATION IS ${2|INDEXED,RELATIVE,SEQUENTIAL,LINE-SEQUENTIAL|}",
-      "    ACCESS MODE IS ${1|SEQUENTIAL,RANDOM,DYNAMIC|}",
-      "    FILE STATUS IS ${5:statusVariable}.",
-      "$0"
+      "SELECT ${3:customerFile} ASSIGN TO ${4:custFile}", "\tORGANIZATION IS ${2|INDEXED,RELATIVE,SEQUENTIAL,LINE-SEQUENTIAL|}", "\tACCESS MODE IS ${1|SEQUENTIAL,RANDOM,DYNAMIC|}", "\tFILE STATUS IS ${5:statusVariable}.", "$0"
     ],
-    "description": "ACCESS MODE IS value"
+    "description": "ACCESS MODE defines how records of the file are made available for processing for processing  your program. The example is for QSAM access - and if ACCESS MODE is not specified Sequential (QSAM) is the default. https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdf"
   },
   "ACCEPT": {
     "prefix": "ACCEPT variable",
@@ -21,7 +17,7 @@
       "ACCEPT ${1:variable} ${2|FROM DATE,FROM DAY,FROM DAY-OF-WEEK,TIME|}",
       "$0"
     ],
-    "description": "ACCEPT FROM DATE/DAY/WEEK/TIME"
+    "description": "ACCEPT is typically used to extract the current date/time from z/OS. The other primary use case is ACCEPT from the JOB Step's SYSIN. Each line in SYSIN is tied to an individual ACCEPT statement. There are numerous options for date/time formatting: https://www.ibm.com/docs/en/cobol-zos/6.4?topic=as-date-date-yyyymmdd-day-day-yyyyddd-day-week-time / https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdf"
   },
   "ACCEPT id": {
     "prefix": "ACCEPT id",
@@ -92,7 +88,7 @@
     "prefix": "ALPHABETIC",
     "body": [
       "IF ${1:variable-1} IS ${2|ALPHABETIC,ALPHABETIC-LOWER,ALPHABETIC-UPPER|} THEN",
-      "    $0",
+      "\t$0",
       "END-IF."
     ],
     "description": "IF variable-1 IS ALPHABETIC"
@@ -101,7 +97,7 @@
     "prefix": "ALPHANUMERIC",
     "body": [
       "IF ${1:variable-1} IS ${2|ALPHANUMERIC,ALPHANUMERIC-EDITED|} THEN",
-      "    $0",
+      "\t$0",
       "END-IF."
     ],
     "description": "IF variable-1 IS ALPHANUMERIC"
@@ -130,8 +126,8 @@
     "prefix": "ASCENDING",
     "body": [
       "01 ${3:coboltbl}",
-      "    05 TBL-ROW OCCURS ${4:numLiteral} TIMES",
-      "        ASCENDING ${1:field-1} ${2:field-2}.",
+      "\t05 TBL-ROW OCCURS ${4:numLiteral} TIMES",
+      "\t    ASCENDING ${1:field-1} ${2:field-2}.",
       "$0"
     ],
     "description": "ASCENDING item"
@@ -140,11 +136,11 @@
     "prefix": "ASSIGN",
     "body": [
       "FILE-CONTROL",
-      "    SELECT ${2:rptfile}",
-      "        ASSIGN TO ${1:rptfile-DD}",
-      "        ORGANIZATION IS ${3|INDEXED,RELATIVE,SEQUENTIAL,LINE-SEQUENTIAL|}",
-      "        ACCESS MODE IS ${4|SEQUENTIAL,RANDOM,DYNAMIC|}",
-      "        FILE STATUS IS ${5:statusVariable}.",
+      "\tSELECT ${2:rptfile}",
+      "\t\tASSIGN TO ${1:rptfile-DD}",
+      "\t\tORGANIZATION IS ${3|INDEXED,RELATIVE,SEQUENTIAL,LINE-SEQUENTIAL|}",
+      "\t\tACCESS MODE IS ${4|SEQUENTIAL,RANDOM,DYNAMIC|}",
+      "\t\tFILE STATUS IS ${5:statusVariable}.",
       "$0"
     ],
     "description": "ASSIGN item"
@@ -168,8 +164,8 @@
     "prefix": "BIT-TO-CHAR",
     "body": [
       "77 ${1:BIT-FLD} PIC X(16).",
-      "    MOVE '${2:0000000000000000}' TO ${1:BIT-FLD}.",
-      "    FUNCTION BIT-TO-CHAR(${1:BIT-FLD})."
+      "\tMOVE '${2:0000000000000000}' TO ${1:BIT-FLD}.",
+      "\tFUNCTION BIT-TO-CHAR(${1:BIT-FLD})."
     ],
     "description": "Function used to populate an PIC X/PIC A field with binary data."
   },
@@ -215,8 +211,8 @@
     "prefix": "CALL",
     "body": [
       "CALL \"$1\" USING",
-      "    BY ${2|value,reference,content|} ${3:identifier}",
-      "    RETURNING ${4:return-code}",
+      "\tBY ${2|value,reference,content|} ${3:identifier}",
+      "\tRETURNING ${4:return-code}",
       "END-CALL",
       "$0"
     ],
@@ -301,8 +297,8 @@
     "prefix": "COMPUTE",
     "body": [
       "COMPUTE ${1:NUM-VAR} OF ${2:DFHCOMMAREA} = ${3:WS-NUMVAR1} ${4|+,-,*,/,**|} ${5:WS-NUMVAR2}",
-      "    ON SIZE ERROR GO TO ${6:TRAP-OVERFLOW}",
-      "    NOT ON SIZE ERROR GO TO ${7:PROGRAM-FINAL-ACTION}",
+      "\tON SIZE ERROR GO TO ${6:TRAP-OVERFLOW}",
+      "\tNOT ON SIZE ERROR GO TO ${7:PROGRAM-FINAL-ACTION}",
       "END-COMPUTE",
       "$0"
     ],
@@ -322,9 +318,9 @@
     "prefix": "CONTAINS",
     "body": [
       "FD ${2:inputFile}",
-      "    RECORD CONTAINS ${1:numLiteral} CHARACTERS",
-      "    BLOCK CONTAINS 0 RECORDS",
-      "    DATA RECORD IS ${3:inputFileRec}."
+      "\tRECORD CONTAINS ${1:numLiteral} CHARACTERS",
+      "\tBLOCK CONTAINS 0 RECORDS",
+      "\tDATA RECORD IS ${3:inputFileRec}."
     ],
     "description": "A fixed-block file. Note that BLOCK CONTAINS 0 leaves the blocking-optimization up to z/OS - and is the preferred way to specify most QSAM file FDs. https://www.ibm.com/docs/en/cobol-zos/6.4?topic=entries-block-contains-clause"
   },
@@ -366,7 +362,7 @@
     "prefix": "COPY",
     "body": [
       "COPY \"${1:SUBPROG.CPY}\"",
-      "    REPLACING ==${2:()}== BY ==${3:lnk-}==."
+      "\t ==${2:()}== BY ==${3:lnk-}==."
     ],
     "description": "COPY REPLACING"
   },
