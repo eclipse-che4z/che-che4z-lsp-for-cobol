@@ -99,15 +99,6 @@
     ],
     "description": "IF variable-1 IS ALPHABETIC"
   },
-  "ALPHANUMERIC": {
-    "prefix": "ALPHANUMERIC",
-    "body": [
-      "IF ${1:variable-1} IS ${2|ALPHANUMERIC,ALPHANUMERIC-EDITED|} THEN",
-      "\t$0",
-      "END-IF."
-    ],
-    "description": "IF variable-1 IS ALPHANUMERIC"
-  },
   "ALSO": {
     "prefix": "ALSO item",
     "body": ["ALSO ${1:id|exp|TRUE|FALSE}"],
