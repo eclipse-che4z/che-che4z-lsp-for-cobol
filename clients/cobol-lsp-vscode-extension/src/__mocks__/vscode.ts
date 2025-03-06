@@ -109,6 +109,11 @@ export namespace window {
     find: jest.fn(),
   };
   export const visibleTextEditors = [];
+  export const withProgress = jest
+    .fn()
+    .mockImplementation((_options, task: () => void) => {
+      task();
+    });
 }
 export enum StatusBarAlignment {
   Right,

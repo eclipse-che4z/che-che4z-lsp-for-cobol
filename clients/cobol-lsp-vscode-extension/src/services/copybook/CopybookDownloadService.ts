@@ -265,17 +265,34 @@ export class CopybookDownloadService {
   ): Promise<void> {
     const totalCopybooksToDownload = copybookNames.length;
     let processedCopybooks = 0;
-
+    const downloadRequestStartTime = performance.now();
     await Promise.all(
       copybookNames.map(async (copybookName) => {
-        await this.downloadCopybook(copybookName, documentUri).finally(() => {
-          processedCopybooks++;
-          this.updateDownloadProgress(
-            progress,
-            totalCopybooksToDownload,
-            processedCopybooks,
-          );
-        });
+        await this.downloadCopybook(copybookName, documentUri)
+          .then((isDownloaded) => {
+            if (isDownloaded) {
+              this.outputChannel?.appendLine(
+                `==> Copybook ${copybookName.name}(dialect:${copybookName.dialect}) download completed in : ${performance.now() - downloadRequestStartTime} milliseconds`,
+              );
+            } else {
+              this.outputChannel?.appendLine(
+                `==> Copybook ${copybookName.name}(dialect:${copybookName.dialect}) failed in ${performance.now() - downloadRequestStartTime} milliseconds`,
+              );
+            }
+          })
+          .catch((err) => {
+            this.outputChannel?.appendLine(
+              `==> Copybook ${copybookName.name}(dialect:${copybookName.dialect}) couldn't be downloaded. Time: ${performance.now() - downloadRequestStartTime} milliseconds , Error: ${err}`,
+            );
+          })
+          .finally(() => {
+            processedCopybooks++;
+            this.updateDownloadProgress(
+              progress,
+              totalCopybooksToDownload,
+              processedCopybooks,
+            );
+          });
       }),
     ).catch((err) => {
       this.outputChannel?.appendLine(
@@ -346,6 +363,8 @@ export class CopybookDownloadService {
               DownloadUtil.checkForInvalidCredProfile(
                 profile,
                 this.explorerApi,
+                documentUri,
+                copybookNames,
               ),
             );
           }
@@ -365,6 +384,8 @@ export class CopybookDownloadService {
         !(await DownloadUtil.checkForInvalidCredProfile(
           profile,
           this.explorerApi,
+          documentUri,
+          copybookNames,
         ))
       );
     }

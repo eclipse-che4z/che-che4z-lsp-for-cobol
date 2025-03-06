@@ -168,6 +168,16 @@ class TestSqlAllAlterStatements {
           + "            PCTFREE 25;\n"
           + "            END-EXEC.";
 
+  public static final String ALTER_INDEX5 =
+      TEXT
+          + "           EXEC SQL\n"
+          + "           alter index inxnm \n"
+          + "           bufferpool sdjks\n"
+          + "           add column (col1 ASC)\n"
+          + "           alter partition 2 ending (MAXVALUE) inclusive dssize 3G,\n"
+          + "           alter partition 4 ending (MINVALUE) inclusive dssize 3G\n"
+          + "           END-EXEC.";
+
   // ALTER MASK
   private static final String ALTER_MASK =
       TEXT + "            EXEC SQL ALTER MASK M1 ENABLE\n" + "            END-EXEC.";
@@ -431,7 +441,7 @@ class TestSqlAllAlterStatements {
       TEXT
           + "            EXEC SQL\n"
           + "            ALTER TRUSTED CONTEXT CTX3\n"
-          + "             DISABLE\n"
+          + "             ALTER DISABLE\n"
           + "             ADD USE FOR BILL;\n"
           + "            END-EXEC.";
 
@@ -452,6 +462,27 @@ class TestSqlAllAlterStatements {
           + "             ENCRYPTION \"LOW\");\n"
           + "            END-EXEC.";
 
+  public static final String ALTER_TRUSTED_CONTEXT5 =
+      TEXT
+          + "            EXEC SQL\n"
+          + "             ALTER TRUSTED CONTEXT CTX1\n"
+          + "                drop\n"
+          + "                 ATTRIBUTES (\n"
+          + "                  ADDRESS \"huu\",\n"
+          + "                 SERVAUTH \"JOB989L\"\n"
+          + "                 )\n"
+          + "           END-EXEC.";
+
+  public static final String ALTER_TRUSTED_CONTEXT6 =
+      TEXT
+          + "            EXEC SQL\n"
+          + "             alter TRUSTED CONTEXT CTX1\n"
+          + "                add\n"
+          + "                 ATTRIBUTES (\n"
+          + "                 address \"2 . 4 . 5 . 62\",\n"
+          + "                 SERVAUTH \"23\"\n"
+          + "                 )\n"
+          + "           END-EXEC.";
   // ALTER VIEW
   private static final String ALTER_VIEW =
       TEXT
@@ -483,6 +514,7 @@ class TestSqlAllAlterStatements {
         ALTER_INDEX2,
         ALTER_INDEX3,
         ALTER_INDEX4,
+        ALTER_INDEX5,
         ALTER_MASK,
         ALTER_MASK2,
         ALTER_PERMISSION,
@@ -522,6 +554,8 @@ class TestSqlAllAlterStatements {
         ALTER_TRUSTED_CONTEXT2,
         ALTER_TRUSTED_CONTEXT3,
         ALTER_TRUSTED_CONTEXT4,
+        ALTER_TRUSTED_CONTEXT5,
+        ALTER_TRUSTED_CONTEXT6,
         ALTER_VIEW,
         ALTER_VIEW2);
   }

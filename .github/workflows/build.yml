@@ -141,6 +141,13 @@ jobs:
         run: |
           npm ci
           npm run test
+      - name: Package default COBOL LS vsix
+        working-directory: clients/cobol-lsp-vscode-extension
+        run: |
+          npm ci
+          cp ../../server/engine/target/server.jar ./server/jar
+          npm run package
+          cp *.vsix ../../.
       - name: Package IDMS vsix
         working-directory: clients/idms-dialect-support
         run: |
@@ -167,6 +174,14 @@ jobs:
           if-no-files-found: warn
           name: vsix-daco-dialect
           path: 'cobol-language-support-for-daco*.vsix'
+      - name: Upload COBOL LS default vsix
+        uses: actions/upload-artifact@v4
+        with:
+          if-no-files-found: warn
+          name: vsix-cobol-ls-default
+          path: |
+            cobol-language-support-*.vsix
+            !cobol-language-support-for-*.vsix
       - name: Run COBOL LS extension integration tests
         working-directory: clients/cobol-lsp-vscode-extension
         run: |

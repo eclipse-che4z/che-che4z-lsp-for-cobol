@@ -266,7 +266,7 @@
           "items": {
             "type": "string"
           },
-          "description": "Default list of local paths to search for copybooks",
+          "description": "Default list of local paths to search for copybooks. Folders are searched in the order they are listed.",
           "uniqueItems": true
         },
         "cobol-lsp.cpy-manager.paths-dsn": {
@@ -274,7 +274,7 @@
           "items": {
             "type": "string"
           },
-          "description": "Default list of datasets to search for copybooks\nZowe Explorer version 1.15.0 or higher is required to download copybooks from the mainframe",
+          "description": "Default list of datasets to search for copybooks. Datasets are searched in the order they are listed.\nZowe Explorer version 1.15.0 or higher is required to download copybooks from the mainframe",
           "uniqueItems": true
         },
         "cobol-lsp.cpy-manager.paths-uss": {
@@ -282,7 +282,7 @@
           "items": {
             "type": "string"
           },
-          "description": "Default list of USS paths to search for copybooks\nZowe Explorer version 1.15.0 or higher is required to download copybooks from the mainframe",
+          "description": "Default list of USS paths to search for copybooks. USS paths are searched in the order they are listed.\nZowe Explorer version 1.15.0 or higher is required to download copybooks from the mainframe",
           "uniqueItems": true
         },
         "cobol-lsp.cpy-manager.copybook-extensions": {
