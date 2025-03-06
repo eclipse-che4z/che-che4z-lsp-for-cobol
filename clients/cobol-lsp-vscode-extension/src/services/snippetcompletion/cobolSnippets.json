@@ -132,8 +132,8 @@
     "prefix": "ASCENDING",
     "body": [
       "01 ${3:coboltbl}",
-      "\t05 TBL-ROW OCCURS ${4:numLiteral} TIMES",
-      "\t    ASCENDING ${1:field-1} ${2:field-2}.",
+      "\t05 ${4:TBL-ROW} OCCURS ${5:numLiteral} TIMES",
+      "\t\tASCENDING ${1:field-1} ${2:field-2}.",
       "$0"
     ],
     "description": "ASCENDING item"
