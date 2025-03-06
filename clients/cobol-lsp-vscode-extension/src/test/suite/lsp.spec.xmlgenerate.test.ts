@@ -35,31 +35,26 @@ suite("TF48417: XML GENERATE", function () {
   );
 
   test("TC369351: Identifier1 must be alphanumeric", async () => {
-    const extSrcPath = path.join("TEST2.CBL");
-    const diagPromise = helper.waitForDiagnosticsChange(extSrcPath);
+    const extSrcPath = path.join("TEST21.CBL");
     await helper.showDocument(extSrcPath);
-    const editor = helper.getEditor("TEST2.CBL");
-    let diagnostics = await diagPromise;
+    const editor = helper.getEditor("TEST21.CBL");
     await helper.insertString(
       editor,
       pos(19, 0),
       "       01 XML-DOC123 PIC X(5000) USAGE NATIONAL.\n",
     );
-    await helper.deleteLine(editor, 23);
     await helper.waitFor(
       () => vscode.languages.getDiagnostics(editor.document.uri).length === 0,
     );
-    diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
+    const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
     assert.strictEqual(diagnostics.length, 0);
     await helper.sleep(5000);
   });
 
   test("TC369351: identifier1 must be category national, national group", async () => {
-    const extSrcPath = path.join("TEST2.CBL");
-    const diagPromise = helper.waitForDiagnosticsChange(extSrcPath);
+    const extSrcPath = path.join("TEST21.CBL");
     await helper.showDocument(extSrcPath);
-    const editor = helper.getEditor("TEST2.CBL");
-    let diagnostics = await diagPromise;
+    const editor = helper.getEditor("TEST21.CBL");
     await helper.insertString(
       editor,
       pos(19, 0),
@@ -69,22 +64,18 @@ suite("TF48417: XML GENERATE", function () {
         "            11 NAME PIC X(030).\n" +
         "            11 VERSION PIC 9(004).\n",
     );
-    await helper.deleteLine(editor, 27);
     await helper.waitFor(
       () => vscode.languages.getDiagnostics(editor.document.uri).length === 0,
     );
-    diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
+    const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
     assert.strictEqual(diagnostics.length, 0);
     await helper.sleep(5000);
   });
 
   test("TC369351: Identifier1 must not overlap identifier2, identifier3, identifier4, identifier5.", async () => {
-    const extSrcPath = path.join("TEST2.CBL");
-    const diagPromise = helper.waitForDiagnosticsChange(extSrcPath);
+    const extSrcPath = path.join("TEST21.CBL");
     await helper.showDocument(extSrcPath);
-    const editor = helper.getEditor("TEST2.CBL");
-    let diagnostics = await diagPromise;
-    await helper.deleteLine(editor, 22);
+    const editor = helper.getEditor("TEST21.CBL");
     await helper.insertString(
       editor,
       pos(19, 0),
@@ -99,7 +90,7 @@ suite("TF48417: XML GENERATE", function () {
     await helper.waitFor(
       () => vscode.languages.getDiagnostics(editor.document.uri).length === 1,
     );
-    diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
+    let diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
     assert.strictEqual(diagnostics.length, 1);
     const message = diagnostics[0].message;
     assert.match(
@@ -124,10 +115,8 @@ suite("TF48417: XML GENERATE", function () {
 
   test("TC369352: identifier2 references a national group item", async () => {
     const extSrcPath = path.join("TEST14.CBL");
-    const diagPromise = helper.waitForDiagnosticsChange(extSrcPath);
     await helper.showDocument(extSrcPath);
     const editor = helper.getEditor("TEST14.CBL");
-    let diagnostics = await diagPromise;
     await helper.insertString(
       editor,
       pos(10, 0),
@@ -138,26 +127,22 @@ suite("TF48417: XML GENERATE", function () {
         "           05  WS-ORDER OCCURS 2.\n" +
         "               10  WS-DATA USAGE NATIONAL   PIC X(4096).\n",
     );
-    await helper.deleteLine(editor, 22);
     await helper.waitFor(
       () => vscode.languages.getDiagnostics(editor.document.uri).length === 0,
     );
-    diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
+    const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
     assert.strictEqual(diagnostics.length, 0);
     await helper.sleep(5000);
   });
 
   test("TC369352: identifier2 must not overlap identifier1,or identifier3", async () => {
     const extSrcPath = path.join("TEST14.CBL");
-    const diagPromise = helper.waitForDiagnosticsChange(extSrcPath);
     await helper.showDocument(extSrcPath);
     const editor = helper.getEditor("TEST14.CBL");
-    let diagnostics = await diagPromise;
-    await helper.deleteLine(editor, 16);
     await helper.waitFor(
       () => vscode.languages.getDiagnostics(editor.document.uri).length === 0,
     );
-    diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
+    let diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
     assert.strictEqual(diagnostics.length, 0);
     await helper.deleteLine(editor, 8);
     await helper.deleteLine(editor, 6);
@@ -178,15 +163,12 @@ suite("TF48417: XML GENERATE", function () {
 
   test("TC369354: must not overlap identifier1, identifier2,  identifier4, or identifier5", async () => {
     const extSrcPath = path.join("TEST14.CBL");
-    const diagPromise = helper.waitForDiagnosticsChange(extSrcPath);
     await helper.showDocument(extSrcPath);
     const editor = helper.getEditor("TEST14.CBL");
-    let diagnostics = await diagPromise;
-    await helper.deleteLine(editor, 16);
     await helper.waitFor(
       () => vscode.languages.getDiagnostics(editor.document.uri).length === 0,
     );
-    diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
+    let diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
     assert.strictEqual(diagnostics.length, 0);
     await helper.deleteLine(editor, 9);
     await helper.deleteLine(editor, 7);
@@ -210,15 +192,12 @@ suite("TF48417: XML GENERATE", function () {
       "TC369360: NAMESPACE and NAMESPACE-PREFIX phrases",
     async () => {
       const extSrcPath = path.join("TEST14.CBL");
-      const diagPromise = helper.waitForDiagnosticsChange(extSrcPath);
       await helper.showDocument(extSrcPath);
       const editor = helper.getEditor("TEST14.CBL");
-      let diagnostics = await diagPromise;
-      await helper.deleteLine(editor, 16);
       await helper.waitFor(
         () => vscode.languages.getDiagnostics(editor.document.uri).length === 0,
       );
-      diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
+      const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
       assert.strictEqual(diagnostics.length, 0);
       await helper.sleep(5000);
     },
@@ -226,32 +205,28 @@ suite("TF48417: XML GENERATE", function () {
 
   test("TC369356: ENCODING phrase without codepage", async () => {
     const extSrcPath = path.join("TEST61.CBL");
-    const diagPromise = helper.waitForDiagnosticsChange(extSrcPath);
     await helper.showDocument(extSrcPath);
     const editor = helper.getEditor("TEST61.CBL");
     await helper.deleteLine(editor, 11);
     await helper.insertString(editor, pos(11, 0), "           WITH ENCODING");
-    let diagnostics = await diagPromise;
     await helper.waitFor(
       () => vscode.languages.getDiagnostics(editor.document.uri).length === 1,
     );
-    diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
+    const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
     assert.strictEqual(diagnostics.length, 1);
     await helper.sleep(5000);
   });
 
   test("TC369358: XML-DECLARATION phrase", async () => {
     const extSrcPath = path.join("TEST61.CBL");
-    const diagPromise = helper.waitForDiagnosticsChange(extSrcPath);
     await helper.showDocument(extSrcPath);
     const editor = helper.getEditor("TEST61.CBL");
     await helper.deleteLine(editor, 11);
     await helper.deleteLine(editor, 12);
-    let diagnostics = await diagPromise;
     await helper.waitFor(
       () => vscode.languages.getDiagnostics(editor.document.uri).length === 1,
     );
-    diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
+    let diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
     assert.strictEqual(diagnostics.length, 1);
     await helper.insertString(
       editor,
@@ -268,15 +243,13 @@ suite("TF48417: XML GENERATE", function () {
 
   test("TC369359: ATTRIBUTES phrase", async () => {
     const extSrcPath = path.join("TEST51.CBL");
-    const diagPromise = helper.waitForDiagnosticsChange(extSrcPath);
     await helper.showDocument(extSrcPath);
     const editor = helper.getEditor("TEST51.CBL");
     await helper.deleteLine(editor, 12);
-    let diagnostics = await diagPromise;
     await helper.waitFor(
       () => vscode.languages.getDiagnostics(editor.document.uri).length === 1,
     );
-    diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
+    let diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
     assert.strictEqual(diagnostics.length, 1);
     await helper.insertString(
       editor,
@@ -293,15 +266,13 @@ suite("TF48417: XML GENERATE", function () {
 
   test("TC369361: NAME phrase", async () => {
     const extSrcPath = path.join("TEST15.CBL");
-    const diagPromise = helper.waitForDiagnosticsChange(extSrcPath);
     await helper.showDocument(extSrcPath);
     const editor = helper.getEditor("TEST15.CBL");
     await helper.deleteLine(editor, 10);
-    let diagnostics = await diagPromise;
     await helper.waitFor(
       () => vscode.languages.getDiagnostics(editor.document.uri).length === 2,
     );
-    diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
+    let diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
     assert.strictEqual(diagnostics.length, 2);
     await helper.insertString(
       editor,
@@ -318,15 +289,13 @@ suite("TF48417: XML GENERATE", function () {
 
   test("TC369362: TYPE phrase", async () => {
     const extSrcPath = path.join("TEST16.CBL");
-    const diagPromise = helper.waitForDiagnosticsChange(extSrcPath);
     await helper.showDocument(extSrcPath);
     const editor = helper.getEditor("TEST16.CBL");
     await helper.deleteLine(editor, 8);
-    let diagnostics = await diagPromise;
     await helper.waitFor(
       () => vscode.languages.getDiagnostics(editor.document.uri).length === 1,
     );
-    diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
+    let diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
     assert.strictEqual(diagnostics.length, 1);
     await helper.insertString(editor, pos(8, 0), "       01 Doc pic X(500).");
     await helper.waitFor(
@@ -339,15 +308,13 @@ suite("TF48417: XML GENERATE", function () {
 
   test("TC369363: SUPPRESS, generic-suppression-phrase, ON EXCEPTION, NOT ON EXCEPTION phrase", async () => {
     const extSrcPath = path.join("TEST10.CBL");
-    const diagPromise = helper.waitForDiagnosticsChange(extSrcPath);
     await helper.showDocument(extSrcPath);
     const editor = helper.getEditor("TEST10.CBL");
     await helper.deleteLine(editor, 16);
-    let diagnostics = await diagPromise;
     await helper.waitFor(
       () => vscode.languages.getDiagnostics(editor.document.uri).length === 3,
     );
-    diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
+    let diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
     assert.strictEqual(diagnostics.length, 3);
     await helper.insertString(
       editor,
