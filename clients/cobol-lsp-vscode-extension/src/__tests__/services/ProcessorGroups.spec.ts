@@ -20,15 +20,10 @@ import {
   loadProcessorGroupCopybookPathsConfig,
   loadProcessorGroupDialectConfig,
   loadProcessorGroupSqlBackendConfig,
-  prepareProcessorGroupConfigPathsForDsnAndUss,
   prepareProcessorGroupConfigPathsForEndevor,
 } from "../../services/ProcessorGroups";
 import * as glob from "glob";
-import {
-  EndevorConfigModel,
-  ZoweDatasetConfigModel,
-  ZoweUssConfigModel,
-} from "../../services/ProcessorGroupsLoader";
+import { EndevorConfigModel } from "../../services/ProcessorGroupsLoader";
 import { CopybookDownloaderForE4E } from "../../services/copybook/downloader/CopybookDownloaderForE4E";
 import { E4E } from "../../type/e4eApi";
 import { CopybookName } from "../../services/copybook/CopybookDownloadService";
@@ -299,25 +294,6 @@ describe("Processor groups configuration provides lib path in Windows", () => {
   });
 });
 describe("Processor groups configurations prepared for download services", () => {
-  it("prepareProcessorGroupConfigPathsForDsnAndUss prepares Dsn and Uss paths", () => {
-    const pgConfigs: (ZoweDatasetConfigModel | ZoweUssConfigModel)[] = [
-      {
-        dataset: "dataset",
-      },
-      { dataset: "dataset2", profile: "profile" },
-      { ussFile: "ussFile", profile: undefined },
-      { ussFile: "ussFile2", profile: "profile" },
-    ];
-
-    const result = prepareProcessorGroupConfigPathsForDsnAndUss(pgConfigs);
-    expect(result).toStrictEqual([
-      { path: "dataset", profile: undefined },
-      { path: "dataset2", profile: "profile" },
-      { path: "ussFile", profile: undefined },
-      { path: "ussFile2", profile: "profile" },
-    ]);
-  });
-
   it("prepareProcessorGroupConfigPathsForEndevor prepares Endevor locations", async () => {
     const e4e = {} as E4E;
     const e4eDownloader = new CopybookDownloaderForE4E("/storagePath", e4e);
@@ -333,55 +309,29 @@ describe("Processor groups configurations prepared for download services", () =>
         type: "COPY",
         profile: "instance.internal.connection",
       },
-      {
-        environment: "ENV2",
-        stage: "1",
-        system: "SYSTEM2",
-        subsystem: "SUBSYTEM2",
-        type: "COPY2",
-        profile: "instance.internal.connection",
-      },
     ];
 
     const result = await prepareProcessorGroupConfigPathsForEndevor(
-      pgConfigs,
+      pgConfigs[0],
       e4eDownloader,
       copybook,
     );
-    expect(result).toStrictEqual([
-      {
-        element: {
-          environment: "ENV",
-          stage: "1",
-          system: "SYSTEM",
-          subsystem: "SUBSYTEM",
-          type: "COPY",
-          profile: "instance.internal.connection",
-          use_map: true,
-          element: "copybook",
-        },
-        profile: {
-          profile: "profile",
-          instance: "instance",
-        },
+    expect(result).toStrictEqual({
+      element: {
+        environment: "ENV",
+        stage: "1",
+        system: "SYSTEM",
+        subsystem: "SUBSYTEM",
+        type: "COPY",
+        profile: "instance.internal.connection",
+        use_map: true,
+        element: "copybook",
       },
-      {
-        element: {
-          environment: "ENV2",
-          stage: "1",
-          system: "SYSTEM2",
-          subsystem: "SUBSYTEM2",
-          type: "COPY2",
-          profile: "instance.internal.connection",
-          use_map: true,
-          element: "copybook",
-        },
-        profile: {
-          profile: "profile",
-          instance: "instance",
-        },
+      profile: {
+        profile: "profile",
+        instance: "instance",
       },
-    ]);
+    });
   });
   it("getCopybookLocalPath returns local paths only if processor group has remote lib definitions", async () => {
     const paths = await SettingsService.getCopybookLocalPath(

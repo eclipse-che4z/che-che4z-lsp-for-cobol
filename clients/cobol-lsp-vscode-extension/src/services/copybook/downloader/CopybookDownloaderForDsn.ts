@@ -132,4 +132,29 @@ export class CopybookDownloaderForDsn extends ZoweExplorerDownloader {
 
     return true;
   }
+
+  public async hasMember(
+    profileName: string,
+    dataset: string,
+    copybookName: string,
+  ) {
+    const id = this.createId(profileName, dataset);
+
+    if (this.memberListCache.has(id)) {
+      return this.memberListCache
+        .get(id)
+        ?.find((member) => member === copybookName);
+    }
+
+    const profile = DownloadUtil.loadProfile(profileName, this.explorerAPI);
+    const response = await this.explorerAPI
+      .getMvsApi(profile)
+      .allMembers(dataset);
+    const members = response.apiResponse.items.map((item) => item.member);
+
+    this.memberListCache.set(id, members);
+    if (this.memberListCache.get(id)?.find((member) => member === copybookName))
+      return true;
+    return false;
+  }
 }

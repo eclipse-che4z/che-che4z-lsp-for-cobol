@@ -38,12 +38,10 @@ import {
   ZoweDatasetConfigModel,
   ZoweUssConfigModel,
 } from "./ProcessorGroupsLoader";
-import { DATASET, USSFILE } from "../constants";
 import { EndevorElement, ResolvedProfile } from "../type/e4eApi";
 import { CopybookDownloaderForE4E } from "./copybook/downloader/CopybookDownloaderForE4E";
 
 import { CopybookName } from "./copybook/CopybookDownloadService";
-import { asPartialProfile } from "./util/Utils";
 
 export async function loadProcessorGroupCopybookPaths(
   documentUri: string,
@@ -64,37 +62,44 @@ export async function loadProcessorGroupCopybookPathsConfig(
 ): Promise<
   (string | ZoweDatasetConfigModel | ZoweUssConfigModel | EndevorConfigModel)[]
 > {
-  const cfg = await loadProcessorGroupSettings(
-    item.scopeUri,
-    "libs",
-    [] as string[],
-    dialect,
-  );
+  const allConfigs = [
+    ...(await loadProcessorGroupSettings(
+      item.scopeUri,
+      "libs",
+      [] as string[],
+      dialect,
+    )),
+    ...configObject,
+  ];
+
   const configs: (
     | string
     | ZoweDatasetConfigModel
     | ZoweUssConfigModel
     | EndevorConfigModel
   )[] = [];
-  const remotes = cfg.filter((cfg) => typeof cfg == "object");
-  const locals = cfg.filter((cfg) => typeof cfg === "string");
 
-  const config = SettingsService.evaluateVariables(
-    [...locals, ...configObject],
-    getVariablesFromUri(item.scopeUri, false),
-  );
+  for (const config of allConfigs) {
+    if (typeof config === "string") {
+      const tempConfig = SettingsService.evaluateVariables(
+        [config],
+        getVariablesFromUri(item.scopeUri, false),
+      );
 
-  const wsUri = workspace.getWorkspaceFolder(Uri.parse(item.scopeUri))?.uri;
-  if (wsUri === undefined) {
-    configs.push(...configObject);
-  } else {
-    const globs = globSync(
-      config.map((ele) => ele.replace(backwardSlashRegex, "/")),
-      { cwd: cleanWorkspaceFolderName(wsUri.fsPath), absolute: true },
-    ).map((s) => normalizePath(s));
-    configs.push(...globs);
+      const wsUri = workspace.getWorkspaceFolder(Uri.parse(item.scopeUri))?.uri;
+      if (wsUri === undefined) {
+        configs.push(config);
+      } else {
+        const globs = globSync(
+          tempConfig.map((ele) => ele.replace(backwardSlashRegex, "/")),
+          { cwd: cleanWorkspaceFolderName(wsUri.fsPath), absolute: true },
+        ).map((s) => normalizePath(s));
+        configs.push(...globs);
+      }
+    } else {
+      configs.push(config);
+    }
   }
-  configs.push(...remotes);
   return configs;
 }
 
@@ -312,49 +317,17 @@ export async function loadProcessorGroupSettings<T extends string | string[]>(
   }
 }
 
-export function prepareProcessorGroupConfigPathsForDsnAndUss(
-  pgConfigs: (ZoweDatasetConfigModel | ZoweUssConfigModel)[],
-): { path: string; profile?: string }[] {
-  const paths: { path: string; profile?: string }[] = [];
-  for (const config of pgConfigs) {
-    if (DATASET in config)
-      paths.push({
-        path: config.dataset,
-        profile: config.profile ? config.profile : undefined,
-      });
-    else if (USSFILE in config)
-      paths.push({
-        path: config.ussFile,
-        profile: config.profile ? config.profile : undefined,
-      });
-  }
-  return paths;
-}
-
 export async function prepareProcessorGroupConfigPathsForEndevor(
-  pgConfigs: EndevorConfigModel[],
+  config: EndevorConfigModel,
   e4eDownloader: CopybookDownloaderForE4E,
   copybook: CopybookName,
-): Promise<
-  { element: EndevorElement; profile: ResolvedProfile }[] | undefined
-> {
-  const paths: { element: EndevorElement; profile: ResolvedProfile }[] = [];
+): Promise<{ element: EndevorElement; profile: ResolvedProfile } | undefined> {
+  const resolvedProfile = await e4eDownloader.getProfileInfo(config.profile);
 
-  for (const config of pgConfigs) {
-    let profile: Partial<ResolvedProfile>;
-    if (!config.profile) {
-      profile = { profile: undefined, instance: undefined };
-    } else {
-      profile = asPartialProfile(config.profile);
-    }
-    const resolvedProfile = await e4eDownloader.getProfileInfo(profile);
+  if (!resolvedProfile) return;
+  const element = config as EndevorElement;
+  element.use_map = element.use_map ? element.use_map : true;
+  element.element = copybook.name;
 
-    if (!resolvedProfile || resolvedProfile instanceof Error) break;
-    const element = config as EndevorElement;
-    element.use_map = element.use_map ? element.use_map : true;
-    element.element = copybook.name;
-
-    paths.push({ element: element, profile: resolvedProfile });
-  }
-  return paths;
+  return { element: element, profile: resolvedProfile };
 }

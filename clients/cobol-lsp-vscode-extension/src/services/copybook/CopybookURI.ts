@@ -11,29 +11,15 @@
  * Contributors:
  *   Broadcom, Inc. - initial API and implementation
  */
-import {
-  COPYBOOKS_FOLDER,
-  E4E_FOLDER,
-  DATASET,
-  ENVIRONMENT,
-  USSFILE,
-  ZOWE_FOLDER,
-  USE_MAP,
-} from "../../constants";
+import { COPYBOOKS_FOLDER, E4E_FOLDER, ZOWE_FOLDER } from "../../constants";
 import { SettingsService } from "../Settings";
 import { ProfileUtils } from "../util/ProfileUtils";
 import { EndevorType, ResolvedProfile } from "../../type/e4eApi.d";
-import { asPartialProfile, Utils } from "../util/Utils";
 import * as vscode from "vscode";
 
 // Source can be only a single level directory, with no subdirectories
 type CopybooksSource = typeof ZOWE_FOLDER | typeof E4E_FOLDER;
-import {
-  ZoweDatasetConfigModel,
-  ZoweUssConfigModel,
-  EndevorConfigModel,
-} from "../ProcessorGroupsLoader";
-import { CopybookDownloaderForE4E } from "./downloader/CopybookDownloaderForE4E";
+import { Utils } from "../util/Utils";
 
 /**
  * This class is responsible to identify from which source resolve copybooks required by the server.
@@ -124,44 +110,5 @@ export class CopybookURI {
       type.subsystem,
       type.type,
     ];
-  }
-  public static async createProcessorGroupCopybookPaths(
-    pgConfigs: (
-      | ZoweDatasetConfigModel
-      | ZoweUssConfigModel
-      | EndevorConfigModel
-    )[],
-    storagePath: string,
-    defaultProfile: string,
-    e4eDownloader?: CopybookDownloaderForE4E,
-  ): Promise<string[]> {
-    const paths: string[] = [];
-    for (const config of pgConfigs) {
-      if (ENVIRONMENT in config && e4eDownloader) {
-        const profile = await e4eDownloader.getProfileInfo(
-          asPartialProfile(config.profile ? config.profile : ""),
-        );
-        config.use_map = config.use_map ? config.use_map : true;
-        if (!(profile instanceof Error)) {
-          paths.push(
-            CopybookURI.createDatasetPath(
-              this.getEnviromentPath(config as EndevorType, profile),
-              config.use_map ? USE_MAP : "",
-              storagePath,
-              E4E_FOLDER,
-            ).fsPath,
-          );
-        }
-      } else if (DATASET in config || USSFILE in config) {
-        paths.push(
-          CopybookURI.createDatasetPath(
-            config.profile ? [config.profile] : [defaultProfile],
-            DATASET in config ? config.dataset : config.ussFile,
-            storagePath,
-          ).fsPath,
-        );
-      }
-    }
-    return paths;
   }
 }

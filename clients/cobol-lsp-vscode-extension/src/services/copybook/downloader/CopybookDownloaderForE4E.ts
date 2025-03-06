@@ -32,7 +32,7 @@ import {
   USE_MAP,
 } from "../../../constants";
 import { CopybookName } from "../CopybookDownloadService";
-import { hasMember, Utils } from "../../util/Utils";
+import { asPartialProfile, hasMember, Utils } from "../../util/Utils";
 import { searchCopybookInExtensionFolder } from "../../util/FSUtils";
 import { getErrorMessage } from "../../util/ErrorsUtils";
 import { SettingsService } from "../../Settings";
@@ -52,6 +52,7 @@ export class CopybookDownloaderForE4E {
   ) {}
 
   private E4EConfigs = new Map<string, Promise<e4eResponse | undefined>>();
+  private E4EProfiles = new Map<string, ResolvedProfile>();
 
   public clearConfigs() {
     this.E4EConfigs.clear();
@@ -341,7 +342,33 @@ export class CopybookDownloaderForE4E {
       this.storagePath,
     );
   }
-  public async getProfileInfo(uri: string | Partial<ResolvedProfile>) {
-    return await this.e4e.getProfileInfo(uri);
+  public async getProfileInfo(profile: string = "") {
+    const partialProfile = asPartialProfile(profile);
+    if (this.E4EProfiles.has(profile)) {
+      return this.E4EProfiles.get(profile);
+    }
+    const resolvedProfile = await this.e4e.getProfileInfo(partialProfile);
+    if (!(resolvedProfile instanceof Error)) {
+      this.E4EProfiles.set(profile, resolvedProfile);
+      return this.E4EProfiles.get(profile);
+    }
+  }
+  public async hasElement(
+    profile: ResolvedProfile,
+    endevorType: EndevorType,
+    elementName: string,
+  ) {
+    const members = await this.getElements(profile, endevorType);
+    if (
+      !(members instanceof Error) &&
+      members.length > 0 &&
+      members.find((x) => x.element == elementName)
+    )
+      return true;
+
+    return false;
+  }
+  public clearProfiles() {
+    this.E4EProfiles.clear();
   }
 }
