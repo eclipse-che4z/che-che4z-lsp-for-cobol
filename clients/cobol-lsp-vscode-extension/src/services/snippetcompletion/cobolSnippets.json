@@ -44,12 +44,12 @@
     "body": ["ADD CORR ${1:id} TO ${2:id}"],
     "description": "ADD CORRESPONDING is used to add the corresponding variables or fields in two identical group variables"
   },
-  "ADD OVERFLOW": {
-    "prefix": "ADD OVERFLOW",
+  "ADD ON SIZE ERROR": {
+    "prefix": "ADD SIZE ERROR",
     "body": [
-      "ADD ${1:num-literal} TO ${2:num-var} ON OVERFLOW ${3:error-catch-logic}"
+      "ADD ${1:num-literal} TO ${2:num-var} ON SIZE ERROR ${3:error-catch-logic}"
     ],
-    "description": "ADD literal TO var ON OVERFLOW error-logic"
+    "description": "ADD is an alternative to the COMPUTE statement for simple math operations. ON SIZE ERROR checks for truncation in the sum. https://www.ibm.com/docs/en/cobol-zos/6.3?topic=statements-add-statement"
   },
   "ADVANCING": {
     "prefix": "WRITE AFTER ADVANCING",
