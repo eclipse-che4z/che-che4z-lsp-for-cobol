@@ -108,16 +108,21 @@ describe("Tests Copybook download from USS", () => {
     });
 
     describe("checks eligible copybook invoke appropriate ZE Api's", () => {
-      ProfileUtils.getProfileNameForCopybook = jest
-        .fn()
-        .mockReturnValue("test-profile");
-      downloader.isEligibleForDownload = jest.fn().mockReturnValue(true);
-      SettingsService.getCopybookFileEncoding = jest
-        .fn()
-        .mockReturnValue("utf8");
-      vscode.Uri.joinPath = jest
-        .fn()
-        .mockReturnValue({ fsPath: "profile/uss/path/copybook" });
+      beforeEach(() => {
+        jest
+          .spyOn(ProfileUtils, "getProfileNameForCopybook")
+          .mockReturnValue("test-profile");
+        downloader.isEligibleForDownload = jest.fn().mockReturnValue(true);
+        jest
+          .spyOn(SettingsService, "getCopybookFileEncoding")
+          .mockReturnValue("utf8");
+        jest
+          .spyOn(SettingsService, "getCopybookExtension")
+          .mockResolvedValue([".cpy", ""]);
+        jest.spyOn(vscode.Uri, "joinPath").mockReturnValue({
+          fsPath: "profile/uss/path/copybook",
+        } as unknown as vscode.Uri);
+      });
 
       it("checks appropriate invokation of ZE API's", async () => {
         downloader.clearMemberListCache();

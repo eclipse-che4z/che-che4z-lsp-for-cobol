@@ -21,6 +21,8 @@ import {
 import { LANGUAGE_ID } from "../constants";
 import { initSmartTab, RangeTabShiftStore } from "../commands/SmartTabCommand";
 import { initTelemetry, registerEvent } from "../services/reporter";
+import { SubroutinesCompletionsProvider } from "../services/subroutines/SubroutinesCompletionsProvider";
+import { CopybooksCompletionProvider } from "../services/copybook/CopybooksCompletionProvider";
 
 let outputChannel: vscode.OutputChannel;
 
@@ -57,6 +59,20 @@ export async function activate(context: ExtensionContext) {
   context.subscriptions.push(
     vscode.window.onDidChangeActiveTextEditor((_e) =>
       RangeTabShiftStore.reset(),
+    ),
+  );
+
+  context.subscriptions.push(
+    vscode.languages.registerCompletionItemProvider(
+      { language: LANGUAGE_ID },
+      new SubroutinesCompletionsProvider(),
+    ),
+  );
+
+  context.subscriptions.push(
+    vscode.languages.registerCompletionItemProvider(
+      { language: LANGUAGE_ID },
+      new CopybooksCompletionProvider(),
     ),
   );
 }

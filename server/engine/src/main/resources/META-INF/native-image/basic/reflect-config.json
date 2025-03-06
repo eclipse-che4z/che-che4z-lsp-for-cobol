@@ -1317,20 +1317,6 @@
     ]
   },
   {
-    "name": "org.eclipse.lsp.cobol.service.delegates.completions.CopybookNameCompletion",
-    "allDeclaredFields": true,
-    "queryAllDeclaredMethods": true,
-    "queryAllDeclaredConstructors": true,
-    "methods": [
-      {
-        "name": "<init>",
-        "parameterTypes": [
-          "org.eclipse.lsp.cobol.service.copybooks.CopybookNameService"
-        ]
-      }
-    ]
-  },
-  {
     "name": "org.eclipse.lsp.cobol.service.delegates.completions.KeywordCompletion",
     "allDeclaredFields": true,
     "queryAllDeclaredMethods": true,
@@ -1383,20 +1369,6 @@
         "name": "<init>",
         "parameterTypes": [
           "org.eclipse.lsp.cobol.core.engine.symbols.SymbolsRepository"
-        ]
-      }
-    ]
-  },
-  {
-    "name": "org.eclipse.lsp.cobol.service.delegates.completions.SubroutineCompletion",
-    "allDeclaredFields": true,
-    "queryAllDeclaredMethods": true,
-    "queryAllDeclaredConstructors": true,
-    "methods": [
-      {
-        "name": "<init>",
-        "parameterTypes": [
-          "org.eclipse.lsp.cobol.common.SubroutineService"
         ]
       }
     ]
