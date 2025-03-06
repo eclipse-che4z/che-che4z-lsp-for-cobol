@@ -1374,20 +1374,6 @@
     ]
   },
   {
-    "name": "org.eclipse.lsp.cobol.service.delegates.completions.SubroutineCompletion",
-    "allDeclaredFields": true,
-    "queryAllDeclaredMethods": true,
-    "queryAllDeclaredConstructors": true,
-    "methods": [
-      {
-        "name": "<init>",
-        "parameterTypes": [
-          "org.eclipse.lsp.cobol.common.SubroutineService"
-        ]
-      }
-    ]
-  },
-  {
     "name": "org.eclipse.lsp.cobol.service.delegates.completions.VariableCompletion",
     "allDeclaredFields": true,
     "queryAllDeclaredMethods": true,

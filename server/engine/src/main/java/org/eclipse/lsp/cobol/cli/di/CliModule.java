@@ -146,7 +146,6 @@ public class CliModule extends AbstractModule {
     completionBinding.addBinding().to(SectionCompletion.class);
     completionBinding.addBinding().to(KeywordCompletion.class);
     completionBinding.addBinding().to(CopybookCompletion.class);
-    completionBinding.addBinding().to(SubroutineCompletion.class);
 
     bind(CompletionStorage.class).annotatedWith(named("Keywords")).to(Keywords.class);
   }
