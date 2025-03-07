@@ -159,7 +159,7 @@
       "\tMOVE '${2:0000000000000000}' TO ${1:BIT-FLD}.",
       "\tFUNCTION BIT-TO-CHAR(${1:BIT-FLD})."
     ],
-    "description": "Function used to populate an PIC X/PIC A field with a string that corresponds to the bit pattern."
+    "description": "Calls BIT-TO-CHAR to obtain a string that corresponds to the bit pattern stored in the PIC X field."
   },
   "BLANK WHEN ZERO": {
     "prefix": "BLANK",
