@@ -16,6 +16,7 @@ import * as vscode from "vscode";
 import {
   COPYBOOKS_FOLDER,
   DATASET,
+  DEFAULT_DIALECT,
   ENDEVOR_PROCESSOR,
   ENVIRONMENT,
   PROVIDE_PROFILE_MSG,
@@ -35,6 +36,8 @@ import { searchCopybookInExtensionFolder } from "../util/FSUtils";
 import { CopybookURI } from "./CopybookURI";
 import path = require("path");
 import { getErrorMessage } from "../util/ErrorsUtils";
+import { DialectRegistry } from "../DialectRegistry";
+import { getChannel } from "../../extension";
 import {
   loadProcessorGroupCopybookPathsConfig,
   prepareProcessorGroupConfigPathsForEndevor,
@@ -236,7 +239,7 @@ export class CopybookDownloadService {
     if (
       !(await this.isPrerequisiteForDownloadSatisfied(
         documentUri,
-        copybookNames,
+        copybookNames.map((copybook) => copybook.dialect),
       ))
     ) {
       return;
@@ -256,6 +259,70 @@ export class CopybookDownloadService {
         );
       },
     );
+  }
+
+  public async listRemoteCopybooks(
+    documentUri: string,
+    dialect: string,
+  ): Promise<string[]> {
+    // is document is endevor element - return list of copybooks from endevor
+    if (this.handleAsEndevorElement(documentUri)) {
+      return this.e4eDownloader?.listRemoteCopybooksE4E(documentUri) ?? [];
+    }
+
+    const dialects = [
+      DEFAULT_DIALECT,
+      ...DialectRegistry.getActiveDialects().map((di) => di.name),
+    ];
+
+    if (
+      !(await this.isPrerequisiteForDownloadSatisfied(documentUri, dialects))
+    ) {
+      return [];
+    }
+
+    const profile = ProfileUtils.getProfileNameForCopybook(
+      documentUri,
+      this.explorerApi,
+    );
+    if (!profile) {
+      return [];
+    }
+
+    const copybooks: string[] = [];
+
+    const dsnPaths: string[] = SettingsService.getDsnPath(documentUri, dialect);
+    const ussPaths: string[] = SettingsService.getUssPath(documentUri, dialect);
+
+    const results = await Promise.allSettled([
+      ...dsnPaths.map(async (dsn) => {
+        const dsnMembers = await this.dsnDownloader?.getAllMembers(
+          profile,
+          dsn,
+        );
+        return dsnMembers ?? [];
+      }),
+      ...ussPaths.map(async (uss) => {
+        const ussFiles = await this.ussDownloader?.getAllMembers(
+          profile,
+          uss,
+          false,
+        );
+        return ussFiles ?? [];
+      }),
+    ]);
+
+    results.forEach((result) => {
+      if (result.status === "fulfilled") {
+        result.value.forEach((c) => copybooks.push(c));
+      } else {
+        getChannel().appendLine(
+          `Unable to load copybooks completions. ${result.reason}`,
+        );
+      }
+    });
+
+    return copybooks;
   }
 
   private async processCopybookDownload(
@@ -303,27 +370,18 @@ export class CopybookDownloadService {
 
   private async isPrerequisiteForDownloadSatisfied(
     documentUri: string,
-    copybookNames: CopybookName[],
+    dialects: string[],
   ): Promise<boolean> {
     if (this.handleAsEndevorElement(documentUri)) {
       return !!(await this.e4eDownloader?.getE4EConfig(documentUri));
     }
-    if (
-      !(await DownloadUtil.areCopybookDownloadConfigurationsPresent(
-        documentUri,
-        copybookNames,
-      ))
-    )
-      return false;
     if (!this.explorerApi && !this.e4eApi) return false;
 
     const configs = await loadProcessorGroupCopybookPathsConfig(
       { scopeUri: documentUri },
       [],
     );
-    new Set(
-      copybookNames.map((n) => n.dialect?.toLocaleUpperCase()).filter(Boolean),
-    );
+
     const procGroupZoweProfiles = new Set(
       configs
         .filter(
@@ -364,7 +422,7 @@ export class CopybookDownloadService {
                 profile,
                 this.explorerApi,
                 documentUri,
-                copybookNames,
+                dialects,
               ),
             );
           }
@@ -385,7 +443,7 @@ export class CopybookDownloadService {
           profile,
           this.explorerApi,
           documentUri,
-          copybookNames,
+          dialects,
         ))
       );
     }
@@ -471,5 +529,10 @@ export class CopybookDownloadService {
       }
     }
     return false;
+  }
+
+  public reenableFailedRequests() {
+    this.dsnDownloader?.reenableFailedRequests();
+    this.ussDownloader?.reenableFailedRequests();
   }
 }

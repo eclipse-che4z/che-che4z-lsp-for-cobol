@@ -187,6 +187,15 @@ export class CopybookDownloaderForE4E {
     return false;
   }
 
+  public async listRemoteCopybooksE4E(documentUri: string) {
+    const response = await this.getE4EConfig(documentUri);
+    if (!response) {
+      return [];
+    }
+
+    return Object.keys(response.elements);
+  }
+
   public async downloadElementE4E(
     profile: ResolvedProfile,
     element: EndevorElement,

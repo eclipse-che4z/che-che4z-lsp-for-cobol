@@ -94,6 +94,11 @@
         "command": "cobol-lsp.open.copybook.internalfolder",
         "title": "Open Copybooks Internal Folder",
         "category": "COBOL"
+      },
+      {
+        "command": "cobol-lsp.cpy-manager.reenable.failed.zowe.requests",
+        "title": "Reenable failed Zowe requests",
+        "category": "COBOL"
       }
     ],
     "menus": {
