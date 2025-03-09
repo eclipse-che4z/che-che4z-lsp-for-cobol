@@ -20,36 +20,34 @@ import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.model.NodeType;
-import org.eclipse.lsp.cobol.common.model.SectionType;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
-import org.eclipse.lsp.cobol.common.model.tree.SectionNode;
 import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.Processor;
-import org.eclipse.lsp.cobol.core.engine.directives.node.JavaShareableWorkingSectionNode;
+import org.eclipse.lsp.cobol.core.engine.directives.node.JavaShareableOffWorkingSectionNode;
 
 import java.util.Optional;
 
 /** Validate JavaShareableWorkingSectionNode position */
 @AllArgsConstructor
-public class JavaShareableWorkingSectionProcessor
-    implements Processor<JavaShareableWorkingSectionNode> {
+public class JavaShareableOffWorkingSectionProcessor
+    implements Processor<JavaShareableOffWorkingSectionNode> {
   final MessageService messageService;
 
   @Override
-  public void accept(JavaShareableWorkingSectionNode node, ProcessingContext processingContext) {
+  public void accept(JavaShareableOffWorkingSectionNode node, ProcessingContext processingContext) {
     Optional<Node> nearestParentByType = node.getNearestParentByType(NodeType.SECTION);
-    if (nearestParentByType.isPresent()) {
-      SectionNode sectionNode = (SectionNode) nearestParentByType.get();
-      if (sectionNode.getSectionType() != SectionType.WORKING_STORAGE) {
-        throwError(node, processingContext);
-      }
-    } else {
-      throwError(node, processingContext);
-    }
+//    if (nearestParentByType.isPresent()) {
+//      SectionNode sectionNode = (SectionNode) nearestParentByType.get();
+//      if (sectionNode.getSectionType() != SectionType.WORKING_STORAGE) {
+//        throwError(node, processingContext);
+//      }
+//    } else {
+//      throwError(node, processingContext);
+//    }
   }
 
   private void throwError(
-          JavaShareableWorkingSectionNode node, ProcessingContext processingContext) {
+          JavaShareableOffWorkingSectionNode node, ProcessingContext processingContext) {
     processingContext
         .getErrors()
         .add(

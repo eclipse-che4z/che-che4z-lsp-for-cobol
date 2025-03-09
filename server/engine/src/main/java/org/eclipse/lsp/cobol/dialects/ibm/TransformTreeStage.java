@@ -41,9 +41,11 @@ import org.eclipse.lsp.cobol.core.CobolParser;
 import org.eclipse.lsp.cobol.core.engine.analysis.AnalysisContext;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectService;
 import org.eclipse.lsp.cobol.core.engine.directives.node.JavaCallablePrecedureSectionNode;
-import org.eclipse.lsp.cobol.core.engine.directives.node.JavaShareableWorkingSectionNode;
+import org.eclipse.lsp.cobol.core.engine.directives.node.JavaShareableOffWorkingSectionNode;
+import org.eclipse.lsp.cobol.core.engine.directives.node.JavaShareableOnWorkingSectionNode;
 import org.eclipse.lsp.cobol.core.engine.directives.processor.JavaCallablePrecedureSectionProcessor;
-import org.eclipse.lsp.cobol.core.engine.directives.processor.JavaShareableWorkingSectionProcessor;
+import org.eclipse.lsp.cobol.core.engine.directives.processor.JavaShareableOffWorkingSectionProcessor;
+import org.eclipse.lsp.cobol.core.engine.directives.processor.JavaShareableOnWorkingSectionProcessor;
 import org.eclipse.lsp.cobol.core.engine.processor.AstProcessor;
 import org.eclipse.lsp.cobol.core.engine.processors.*;
 import org.eclipse.lsp.cobol.core.engine.processors.implicit.ImplicitVariablesProcessor;
@@ -323,7 +325,8 @@ public class TransformTreeStage implements Stage<AnalysisContext, ProcessingResu
     ctx.register(v, ProcedureDivisionUsingNode.class, new LinkageArgumentsOriginCheck());
     ctx.register(v, ProcedureDivisionReturningNode.class, new LinkageArgumentsOriginCheck());
 
-    ctx.register(v, JavaShareableWorkingSectionNode.class, new JavaShareableWorkingSectionProcessor(messageService));
+    ctx.register(v, JavaShareableOnWorkingSectionNode.class, new JavaShareableOnWorkingSectionProcessor(messageService));
+    ctx.register(v, JavaShareableOffWorkingSectionNode.class, new JavaShareableOffWorkingSectionProcessor(messageService));
     ctx.register(v, JavaCallablePrecedureSectionNode.class, new JavaCallablePrecedureSectionProcessor(messageService));
     // Implicit Dialects
     dialectService.getActiveImplicitDialects(analysisConfig)

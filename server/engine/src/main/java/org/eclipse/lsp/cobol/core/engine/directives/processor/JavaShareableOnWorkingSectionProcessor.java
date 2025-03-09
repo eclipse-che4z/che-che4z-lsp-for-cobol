@@ -23,18 +23,18 @@ import org.eclipse.lsp.cobol.common.model.NodeType;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.Processor;
-import org.eclipse.lsp.cobol.core.engine.directives.node.JavaCallablePrecedureSectionNode;
+import org.eclipse.lsp.cobol.core.engine.directives.node.JavaShareableOnWorkingSectionNode;
 
 import java.util.Optional;
 
-/** Validate JavaCallablePrecedureSectionNode position */
+/** Validate JavaShareableWorkingSectionNode position */
 @AllArgsConstructor
-public class JavaCallablePrecedureSectionProcessor
-    implements Processor<JavaCallablePrecedureSectionNode> {
+public class JavaShareableOnWorkingSectionProcessor
+    implements Processor<JavaShareableOnWorkingSectionNode> {
   final MessageService messageService;
 
   @Override
-  public void accept(JavaCallablePrecedureSectionNode node, ProcessingContext processingContext) {
+  public void accept(JavaShareableOnWorkingSectionNode node, ProcessingContext processingContext) {
     Optional<Node> nearestParentByType = node.getNearestParentByType(NodeType.SECTION);
 //    if (nearestParentByType.isPresent()) {
 //      SectionNode sectionNode = (SectionNode) nearestParentByType.get();
@@ -47,15 +47,15 @@ public class JavaCallablePrecedureSectionProcessor
   }
 
   private void throwError(
-          JavaCallablePrecedureSectionNode node, ProcessingContext processingContext) {
+          JavaShareableOnWorkingSectionNode node, ProcessingContext processingContext) {
     processingContext
         .getErrors()
         .add(
             SyntaxError.syntaxError()
-                .location(node.getLocality().toOriginalLocation())
+                .location(node.getStartLocality().toOriginalLocation())
                 .severity(ErrorSeverity.ERROR)
                 .errorSource(ErrorSource.DIALECT)
-                .suggestion(messageService.getMessage("compilerDirective.validation.dataSection"))
+                .suggestion(messageService.getMessage("compilerDirective.validation.workingSection"))
                 .build());
   }
 }

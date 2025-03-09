@@ -27,10 +27,10 @@ import org.eclipse.lsp.cobol.common.model.tree.Node;
 @Getter
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-public class JavaShareableWorkingSectionNode extends Node {
+public class JavaShareableOnWorkingSectionNode extends Node {
   Locality startLocality;
   Locality stopLocality;
-  public JavaShareableWorkingSectionNode(Locality location, Locality start, Locality stop) {
+  public JavaShareableOnWorkingSectionNode(Locality location, Locality start, Locality stop) {
     super(location, NodeType.CUSTOM);
     this.startLocality = start;
     this.stopLocality = stop;

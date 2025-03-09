@@ -43,7 +43,7 @@ import org.eclipse.lsp4j.Range;
  */
 public class CompilerDirectivesStage implements Stage<AnalysisContext, List<Node>, List<CompilerDirectiveNode>> {
   private static final Pattern COMPILER_DIRECTIVE_LINE =
-          Pattern.compile("(?i)(\\d.{5}.*|\\s*+)\\*?(CBL|PROCESS)\\s+(?<compilerOptions>.+)|JAVA-CALLABLE|JAVA-SHAREABLE\\s+(ON|OFF)\\s*");
+          Pattern.compile("(?i)(\\d.{5}.*|\\s*+)\\*?(CBL|PROCESS)\\s+(?<compilerOptions>.+)|>>\\s*(?<compilerDirectives>.+)");
   private static final Pattern NEW_LINE_PATTERN = Pattern.compile("\n\r?");
   private static final Pattern DIALECT_FILLER_PATTERN = Pattern.compile(String.format("^[%s%s]*$", "\\s", CobolDialect.FILLER));
   private final MessageService messageService;
@@ -68,10 +68,9 @@ public class CompilerDirectivesStage implements Stage<AnalysisContext, List<Node
       if (compilerOptions != null) {
         process(compilerOptions, ctx, new Position(i, directivesLine.start("compilerOptions")), "compilerOptions");
       }
-      if (Pattern.compile("(?i).*JAVA-SHAREABLE\\s+ON.*").matcher(lines[i]).matches()) {
-        nodes.addAll(process(text, ctx, new Position(i, directivesLine.start()), "compilerDirectives"));
-      } else if (Pattern.compile("(?i).*JAVA-CALLABLE.*").matcher(lines[i]).matches()) {
-        nodes.addAll(process(lines[i], ctx, new Position(i, directivesLine.start()), "compilerDirectives"));
+      String compilerDirectives = directivesLine.group("compilerDirectives");
+      if (compilerDirectives != null) {
+        nodes.addAll(process(compilerDirectives, ctx, new Position(i, directivesLine.start("compilerDirectives")), "compilerDirectives"));
       }
 
       String newText = new String(new char[lines[i].length()]).replace('\0', ' ');
@@ -92,7 +91,7 @@ public class CompilerDirectivesStage implements Stage<AnalysisContext, List<Node
       CompilerDirectivesParser parser = new CompilerDirectivesParser(new CommonTokenStream(lexer));
       parser.removeErrorListeners();
       parser.setErrorHandler(new CompilerDirectivesErrorStrategy(messageService));
-      parser.addErrorListener(new CompilerDirectivesErrorListener(ctx, startPosition, messageService));
+      parser.addErrorListener(new CompilerDirectivesErrorListener(ctx, startPosition));
 
       CompilerDirectivesVisitor visitor = new CompilerDirectivesVisitor(ctx, messageService, startPosition);
 
