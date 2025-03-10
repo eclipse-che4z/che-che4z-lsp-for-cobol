@@ -23,7 +23,7 @@ import {
 } from "@code4z/analysis/lib/model/external";
 import { SettingsService } from "./Settings";
 import { OutputChannelHolder } from "../OutputChannelHolder";
-import { WorkerMessage } from "../Worker";
+import { WorkerMessage } from "./worker/WorkerMessage";
 
 /**
  * Control Flow Analysis callback

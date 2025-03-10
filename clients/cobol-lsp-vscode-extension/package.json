@@ -607,7 +607,7 @@
     "vscode:prepublish": "npm run -S build -- --minify && npm run -S build:web -- --production -- --minify",
     "postinstall": "node -e \"if (process.env.NODE_ENV === 'production'){process.exit(1)} \" && patch-package || echo skip patching",
     "build": "esbuild src/extension.ts --bundle --sourcemap --platform=node --target=node18 --outdir=dist --external:vscode --format=cjs",
-    "build:worker": "esbuild src/Worker.ts --bundle --sourcemap --platform=node --target=node18 --outdir=dist --external:vscode --format=cjs",
+    "build:worker": "esbuild src/services/worker/Worker.ts --bundle --sourcemap --platform=node --target=node18 --outdir=dist --external:vscode --format=cjs",
     "build:web": "node build.web.js",
     "build:watch": "npm run build -- --watch",
     "test:integration": "npm run compile && node ./out/test/runTest.js",
