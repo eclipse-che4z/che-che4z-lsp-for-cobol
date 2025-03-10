@@ -203,7 +203,7 @@
     "prefix": "CALL",
     "body": [
       "CALL \"$1\" USING",
-      "\tBY ${2|value,reference,content|} ${3:identifier}",
+      "\tBY ${2|VALUE,REFERENCE,CONTENT|} ${3:identifier}",
       "\tRETURNING ${4:return-code}",
       "END-CALL",
       "$0"
