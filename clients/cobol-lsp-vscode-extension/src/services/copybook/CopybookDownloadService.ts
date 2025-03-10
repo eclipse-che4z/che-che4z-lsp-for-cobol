@@ -256,7 +256,7 @@ export class CopybookDownloadService {
 
     const dsnPaths: string[] = SettingsService.getDsnPath(documentUri, dialect);
     const ussPaths: string[] = SettingsService.getUssPath(documentUri, dialect);
-    
+
     if (dsnPaths.length === 0 && ussPaths.length === 0) {
       return [];
     }
