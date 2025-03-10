@@ -1305,18 +1305,6 @@
     ]
   },
   {
-    "name": "org.eclipse.lsp.cobol.service.delegates.completions.CopybookCompletion",
-    "allDeclaredFields": true,
-    "queryAllDeclaredMethods": true,
-    "queryAllDeclaredConstructors": true,
-    "methods": [
-      {
-        "name": "<init>",
-        "parameterTypes": []
-      }
-    ]
-  },
-  {
     "name": "org.eclipse.lsp.cobol.service.delegates.completions.KeywordCompletion",
     "allDeclaredFields": true,
     "queryAllDeclaredMethods": true,
