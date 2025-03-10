@@ -28,7 +28,7 @@ import org.junit.jupiter.api.Test;
  * Test for compiler directives
  */
 class TestCobolJavaInteroperabilityCompilerDirectives {
-  private static final String TEXT =
+  private static final String TEXT_VALID1 =
           "       IDENTIFICATION DIVISION.\n"
                   + "       PROGRAM-ID. TEST1.\n"
                   + "       DATA DIVISION.\n"
@@ -45,7 +45,7 @@ class TestCobolJavaInteroperabilityCompilerDirectives {
                   + "           DISPLAY {$TESTW}.\n"
                   + "           GOBACK.\n";
 
-  private static final String TEXT1 =
+  private static final String TEXT_VALID2 =
           "       IDENTIFICATION DIVISION.\n"
                   + "       PROGRAM-ID. TEST1.\n"
                   + "       DATA DIVISION.\n"
@@ -62,7 +62,7 @@ class TestCobolJavaInteroperabilityCompilerDirectives {
                   + "           DISPLAY {$TESTW}.\n"
                   + "           GOBACK.\n";
 
-  private static final String TEXT_ERROR2 =
+  private static final String TEXT_ERROR_TOO_MANY_SPACES =
           "       IDENTIFICATION DIVISION.\n"
                   + "       PROGRAM-ID. TEST1.\n"
                   + "       DATA DIVISION.\n"
@@ -79,7 +79,7 @@ class TestCobolJavaInteroperabilityCompilerDirectives {
                   + "           DISPLAY {$TESTW}.\n"
                   + "           GOBACK.\n";
 
-  private static final String TEXT_ERROR3 =
+  private static final String TEXT_ERROR_TEXT_AFTER_DIRECTIVE =
           "       IDENTIFICATION DIVISION.\n"
                   + "       PROGRAM-ID. TEST1.\n"
                   + "       DATA DIVISION.\n"
@@ -96,15 +96,17 @@ class TestCobolJavaInteroperabilityCompilerDirectives {
                   + "           DISPLAY {$TESTW}.\n"
                   + "           GOBACK.\n";
 
-  private static final String TEXT_ERROR =
+  private static final String TEXT_ERROR_WRONG_SECTION =
           "       IDENTIFICATION DIVISION.\n"
                   + "       PROGRAM-ID. TEST1.\n"
                   + "       DATA DIVISION.\n"
                   + "       WORKING-STORAGE SECTION.\n"
-                  + "       >>{_JAVA-SHAREABLE ON|error1_}\n"
                   + "       01 {$*N1} PIC S9(9) COMP-5.\n"
                   + "       PROCEDURE DIVISION.\n"
-                  + "           GOBACK{.|error2}\n";
+                  + "       >>{_JAVA-CALLABLE|error1_}\n"
+                  + "       >>{_JAVA-SHAREABLE ON|error2_}\n"
+                  + "       >>{_JAVA-SHAREABLE OFF|error3_}\n"
+                  + "           GOBACK.\n";
 
   private static final String TEXT_ERROR1 =
           "       IDENTIFICATION DIVISION.\n"
@@ -113,21 +115,21 @@ class TestCobolJavaInteroperabilityCompilerDirectives {
                   + "       WORKING-STORAGE SECTION.\n"
                   + "       PROCEDURE DIVISION.\n"
                   + "       >>{_JAVA-SHAREABLE ON|error1_}\n"
-                  + "           GOBACK{.|error2}\n";
+                  + "           GOBACK.\n";
   @Test
-  void test() {
-    UseCaseEngine.runTest(TEXT, ImmutableList.of(), ImmutableMap.of());
+  void testValid1() {
+    UseCaseEngine.runTest(TEXT_VALID1, ImmutableList.of(), ImmutableMap.of());
   }
 
   @Test
-  void test1() {
-    UseCaseEngine.runTest(TEXT1, ImmutableList.of(), ImmutableMap.of());
+  void testValid2() {
+    UseCaseEngine.runTest(TEXT_VALID2, ImmutableList.of(), ImmutableMap.of());
   }
 
   @Test
-  void testError2() {
+  void testTooManySpacesError() {
     UseCaseEngine.runTest(
-            TEXT_ERROR2,
+            TEXT_ERROR_TOO_MANY_SPACES,
             ImmutableList.of(),
             ImmutableMap.of(
                     "error1",
@@ -153,9 +155,9 @@ class TestCobolJavaInteroperabilityCompilerDirectives {
 
 
   @Test
-  void testError3() {
+  void testTextAfterDirectiveError() {
     UseCaseEngine.runTest(
-            TEXT_ERROR3,
+            TEXT_ERROR_TEXT_AFTER_DIRECTIVE,
             ImmutableList.of(),
             ImmutableMap.of(
                     "error1",
@@ -178,26 +180,33 @@ class TestCobolJavaInteroperabilityCompilerDirectives {
                             ErrorSource.PARSING.getText())),
             ImmutableList.of());
   }
-//  @Test
-//  void testError() {
-//    UseCaseEngine.runTest(
-//            TEXT_ERROR,
-//            ImmutableList.of(),
-//            ImmutableMap.of(
-//                    "error1",
-//                    new Diagnostic(
-//                            new Range(),
-//                            "Missing token JAVA-SHAREABLE OFF for the JAVA-SHAREABLE block ",
-//                            DiagnosticSeverity.Error,
-//                            ErrorSource.PARSING.getText()),
-//                    "error2",
-//                    new Diagnostic(
-//                            new Range(),
-//                            "Unexpected end of file .",
-//                            DiagnosticSeverity.Error,
-//                            ErrorSource.PARSING.getText())),
-//            ImmutableList.of());
-//  }
+
+  @Test
+  void testWrongPositionError() {
+    UseCaseEngine.runTest(
+            TEXT_ERROR_WRONG_SECTION,
+            ImmutableList.of(),
+            ImmutableMap.of(
+                    "error1",
+                    new Diagnostic(
+                            new Range(),
+                            "The JAVA-CALLABLE directive can only be specified in the DATA DIVISION.",
+                            DiagnosticSeverity.Error,
+                            ErrorSource.PARSING.getText()),
+                    "error2",
+                    new Diagnostic(
+                            new Range(),
+                            "The JAVA-SHAREABLE ON directive can only be specified in the WORKING-STORAGE SECTION.",
+                            DiagnosticSeverity.Error,
+                            ErrorSource.PARSING.getText()),
+                    "error3",
+                    new Diagnostic(
+                            new Range(),
+                            "The JAVA-SHAREABLE OFF directive can only be specified in the WORKING-STORAGE SECTION.",
+                            DiagnosticSeverity.Error,
+                            ErrorSource.PARSING.getText())),
+            ImmutableList.of());
+  }
 //
 //  @Test
 //  void testError1() {

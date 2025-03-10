@@ -20,25 +20,27 @@ import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.message.MessageTemplate;
 import org.eclipse.lsp.cobol.common.model.SectionType;
+import org.eclipse.lsp.cobol.common.model.variables.DivisionType;
 import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.Processor;
-import org.eclipse.lsp.cobol.core.engine.directives.node.JavaShareableOffWorkingSectionNode;
+import org.eclipse.lsp.cobol.core.engine.directives.node.JavaCallableDataWorkingSectionNode;
 
-/** Validate JavaShareableWorkingSectionNode position */
+/** Validate JavaCallableDataWorkingSectionNode position */
 @AllArgsConstructor
-public class JavaShareableOffWorkingSectionProcessor
-    implements Processor<JavaShareableOffWorkingSectionNode> {
+public class JavaCallableDataWorkingSectionProcessor
+    implements Processor<JavaCallableDataWorkingSectionNode> {
 
   @Override
-  public void accept(JavaShareableOffWorkingSectionNode node, ProcessingContext processingContext) {
-    if (node.getSection().contains(SectionType.WORKING_STORAGE.getType())) {
+  public void accept(JavaCallableDataWorkingSectionNode node, ProcessingContext processingContext) {
+    if (node.getSection().contains(SectionType.WORKING_STORAGE.getType())
+            || node.getSection().contains(DivisionType.DATA_DIVISION.getDivName())) {
       return;
     }
     throwError(node, processingContext);
   }
 
   private void throwError(
-          JavaShareableOffWorkingSectionNode node, ProcessingContext processingContext) {
+          JavaCallableDataWorkingSectionNode node, ProcessingContext processingContext) {
     processingContext
         .getErrors()
         .add(
@@ -46,7 +48,7 @@ public class JavaShareableOffWorkingSectionProcessor
                 .location(node.getLocality().toOriginalLocation())
                 .severity(ErrorSeverity.ERROR)
                 .errorSource(ErrorSource.PARSING)
-                .messageTemplate(MessageTemplate.of("compilerDirective.validation.workingSection", node.getText()))
+                .messageTemplate(MessageTemplate.of("compilerDirective.validation.dataSection", node.getText()))
                 .build());
   }
 }

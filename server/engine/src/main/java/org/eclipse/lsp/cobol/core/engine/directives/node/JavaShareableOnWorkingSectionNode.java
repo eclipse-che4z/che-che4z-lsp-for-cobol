@@ -22,17 +22,17 @@ import org.eclipse.lsp.cobol.common.model.NodeType;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 
 /**
- * Represents a Java-Shareable On Off block which are only allowed under working storage section.
+ * Represents a Java-Shareable On which is only allowed in the working storage section.
  */
 @Getter
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 public class JavaShareableOnWorkingSectionNode extends Node {
-  Locality startLocality;
-  Locality stopLocality;
-  public JavaShareableOnWorkingSectionNode(Locality location, Locality start, Locality stop) {
+  private final String section;
+  private final String text;
+  public JavaShareableOnWorkingSectionNode(Locality location, String text, String section) {
     super(location, NodeType.CUSTOM);
-    this.startLocality = start;
-    this.stopLocality = stop;
+    this.section = section;
+    this.text = text;
   }
 }

@@ -18,7 +18,6 @@ import com.google.common.collect.ImmutableList;
 import lombok.Getter;
 import lombok.NonNull;
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.Token;
 import org.eclipse.lsp.cobol.common.dialects.CobolDialect;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
@@ -31,7 +30,7 @@ import org.eclipse.lsp.cobol.core.CompilerDirectivesLexer;
 import org.eclipse.lsp.cobol.core.CompilerDirectivesParser;
 import org.eclipse.lsp.cobol.core.CompilerDirectivesParserBaseVisitor;
 import org.eclipse.lsp.cobol.core.engine.analysis.AnalysisContext;
-import org.eclipse.lsp.cobol.core.engine.directives.node.JavaCallablePrecedureSectionNode;
+import org.eclipse.lsp.cobol.core.engine.directives.node.JavaCallableDataWorkingSectionNode;
 import org.eclipse.lsp.cobol.core.engine.directives.node.JavaShareableOffWorkingSectionNode;
 import org.eclipse.lsp.cobol.core.engine.directives.node.JavaShareableOnWorkingSectionNode;
 import org.eclipse.lsp.cobol.core.visitor.VisitorHelper;
@@ -49,7 +48,6 @@ import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
 import static org.eclipse.lsp.cobol.AntlrRangeUtils.constructRange;
-import static org.eclipse.lsp.cobol.core.visitor.VisitorHelper.buildTokenRange;
 
 
 /**
@@ -59,11 +57,13 @@ public class CompilerDirectivesVisitor extends CompilerDirectivesParserBaseVisit
   private final AnalysisContext analysisContext;
   private final MessageService messageService;
   private final Position startPosition;
+  private final String section;
 
-  public CompilerDirectivesVisitor(AnalysisContext ctx, MessageService messageService, Position startPosition) {
+  public CompilerDirectivesVisitor(AnalysisContext ctx, MessageService messageService, Position startPosition, String section) {
     this.analysisContext = ctx;
     this.messageService = messageService;
     this.startPosition = startPosition;
+    this.section = section;
   }
 
   @Getter
@@ -148,55 +148,29 @@ public class CompilerDirectivesVisitor extends CompilerDirectivesParserBaseVisit
   }
 
   private List<Node> processJavaCallable(CompilerDirectivesParser.CobolJavaInteroperabilityCompilerDirectivesContext ctx) {
-    String[] lines = getCurrentDocumentLines();
-    String currentLine = lines[startPosition.getLine()];
+    String currentLine = getCurrentDocumentLines()[startPosition.getLine()];
     Matcher directiveLine = Pattern.compile("(?i).*>>\\s?JAVA-CALLABLE\\s*(?<extraText>.*)").matcher(currentLine);
-
     validateDirective(ctx, directiveLine);
-
     Locality statementLocality = createStatementLocality(ctx);
-    statementLocality.getRange().getStart().setLine(startPosition.getLine());
-    statementLocality.getRange().getEnd().setLine(startPosition.getLine());
-
-    return addTreeNode(ctx, (location) ->
-            new JavaCallablePrecedureSectionNode(statementLocality, isProcedureDivisionNextLine(lines)));
+    return addTreeNode(ctx, (location) -> new JavaCallableDataWorkingSectionNode(statementLocality, ctx.getText(), section));
   }
 
   private List<Node> processJavaShareableOn(CompilerDirectivesParser.CobolJavaInteroperabilityCompilerDirectivesContext ctx) {
-    String[] lines = getCurrentDocumentLines();
-    String currentLine = lines[startPosition.getLine()];
+    String currentLine = getCurrentDocumentLines()[startPosition.getLine()];
     Matcher directiveLine = Pattern.compile("(?i).*>>\\s?JAVA-SHAREABLE\\s+ON\\s*(?<extraText>.*)").matcher(currentLine);
-
     validateDirective(ctx, directiveLine);
-
-    Locality statementLocality = createStatementLocality(ctx);
-    Locality startLocality = getLocality(getLocation(ctx.getStart()));
-    Locality stopLocality = getLocality(getLocation(ctx.getStop()));
-
-    return addTreeNode(ctx, (location) ->
-            new JavaShareableOnWorkingSectionNode(statementLocality, startLocality, stopLocality));
+    return addTreeNode(ctx, (location) -> new JavaShareableOnWorkingSectionNode(createStatementLocality(ctx), ctx.getText(), section));
   }
 
   private List<Node> processJavaShareableOff(CompilerDirectivesParser.CobolJavaInteroperabilityCompilerDirectivesContext ctx) {
-    String[] lines = getCurrentDocumentLines();
-    String currentLine = lines[startPosition.getLine()];
+    String currentLine = getCurrentDocumentLines()[startPosition.getLine()];
     Matcher directiveLine = Pattern.compile("(?i).*>>\\s?JAVA-SHAREABLE\\s+OFF\\s*(?<extraText>.*)").matcher(currentLine);
-
     validateDirective(ctx, directiveLine);
-
-    Locality statementLocality = createStatementLocality(ctx);
-    statementLocality.getRange().getStart().setLine(startPosition.getLine());
-    statementLocality.getRange().getEnd().setLine(startPosition.getLine());
-    Locality startLocality = getLocality(getLocation(ctx.getStart()));
-    Locality stopLocality = getLocality(getLocation(ctx.getStop()));
-
-    return addTreeNode(ctx, (location) ->
-            new JavaShareableOffWorkingSectionNode(statementLocality, startLocality, stopLocality));
+    return addTreeNode(ctx, (location) -> new JavaShareableOffWorkingSectionNode(createStatementLocality(ctx), ctx.getText(), section));
   }
 
   private String[] getCurrentDocumentLines() {
-    String text = analysisContext.getExtendedDocument().getCurrentText().toString();
-    return Pattern.compile("\n\r?").split(text);
+    return Pattern.compile("\n\r?").split(analysisContext.getExtendedDocument().getCurrentText().toString());
   }
 
   private void validateDirective(CompilerDirectivesParser.CobolJavaInteroperabilityCompilerDirectivesContext ctx, Matcher directiveLine) {
@@ -221,7 +195,10 @@ public class CompilerDirectivesVisitor extends CompilerDirectivesParserBaseVisit
   }
 
   private Locality createStatementLocality(CompilerDirectivesParser.CobolJavaInteroperabilityCompilerDirectivesContext ctx) {
-    return getLocality(this.analysisContext.getExtendedDocument().mapLocation(constructRange(ctx)));
+    return getLocality(this.analysisContext.getExtendedDocument().mapLocation(constructRange(ctx))).toBuilder()
+            .range(new Range(new Position(startPosition.getLine(), startPosition.getCharacter()),
+                    new Position(startPosition.getLine(), startPosition.getCharacter() + ctx.start.getStopIndex() + 1)))
+            .build();
   }
 
   private static boolean isTextAfterDirective(Matcher directiveLine) {
@@ -236,10 +213,6 @@ public class CompilerDirectivesVisitor extends CompilerDirectivesParserBaseVisit
   @Override
   protected List<Node> aggregateResult(List<Node> aggregate, List<Node> nextResult) {
     return Stream.concat(aggregate.stream(), nextResult.stream()).collect(toList());
-  }
-
-  private boolean isProcedureDivisionNextLine(String[] lines) {
-    return Pattern.compile("(?i).*PROCEDURE\\s+DIVISION.*").matcher(lines[startPosition.getLine() + 1]).matches();
   }
 
   private List<Node> addTreeNode(ParserRuleContext ctx, Function<Locality, Node> nodeConstructor) {
@@ -271,10 +244,6 @@ public class CompilerDirectivesVisitor extends CompilerDirectivesParserBaseVisit
     if (!errors.contains(error) && !wrongToken.contains(CobolDialect.FILLER)) {
       errors.add(error);
     }
-  }
-
-  private Location getLocation(Token childToken) {
-    return analysisContext.getExtendedDocument().mapLocation(buildTokenRange(childToken));
   }
 
   private Locality locationToLocality(Location location) {

@@ -46,6 +46,7 @@ public class CompilerDirectivesStage implements Stage<AnalysisContext, List<Node
           Pattern.compile("(?i)(\\d.{5}.*|\\s*+)\\*?(CBL|PROCESS)\\s+(?<compilerOptions>.+)|>>\\s*(?<compilerDirectives>.+)");
   private static final Pattern NEW_LINE_PATTERN = Pattern.compile("\n\r?");
   private static final Pattern DIALECT_FILLER_PATTERN = Pattern.compile(String.format("^[%s%s]*$", "\\s", CobolDialect.FILLER));
+  private static final Pattern SECTION_PATTERN = Pattern.compile("(?i)\\s*DATA\\s+DIVISION.*|\\s*WORKING-STORAGE.*|\\s*PROCEDURE\\s+DIVISION.*");
   private final MessageService messageService;
 
   public CompilerDirectivesStage(MessageService messageService) {
@@ -57,8 +58,13 @@ public class CompilerDirectivesStage implements Stage<AnalysisContext, List<Node
     String text = ctx.getExtendedDocument().getCurrentText().toString();
     List<Node> nodes = new ArrayList<>();
     String[] lines = NEW_LINE_PATTERN.split(text);
+    String section = "";
     for (int i = 0; i < lines.length; i++) {
       Matcher directivesLine = COMPILER_DIRECTIVE_LINE.matcher(lines[i]);
+      Matcher sectionLine = SECTION_PATTERN.matcher(lines[i]);
+      if (sectionLine.find()) {
+        section = sectionLine.group().trim();
+      }
       if (!directivesLine.find()) {
         // we could stop on "IDENTIFICATION DIVISION"
         continue;
@@ -66,11 +72,13 @@ public class CompilerDirectivesStage implements Stage<AnalysisContext, List<Node
 
       String compilerOptions = directivesLine.group("compilerOptions");
       if (compilerOptions != null) {
-        process(compilerOptions, ctx, new Position(i, directivesLine.start("compilerOptions")), "compilerOptions");
+        process(compilerOptions, ctx, new Position(i, directivesLine.start("compilerOptions")),
+                "compilerOptions", "");
       }
       String compilerDirectives = directivesLine.group("compilerDirectives");
       if (compilerDirectives != null) {
-        nodes.addAll(process(compilerDirectives, ctx, new Position(i, directivesLine.start("compilerDirectives")), "compilerDirectives"));
+        nodes.addAll(process(compilerDirectives, ctx, new Position(i, directivesLine.start("compilerDirectives")),
+                "compilerDirectives", section));
       }
 
       String newText = new String(new char[lines[i].length()]).replace('\0', ' ');
@@ -83,7 +91,7 @@ public class CompilerDirectivesStage implements Stage<AnalysisContext, List<Node
     return new StageResult<>(nodes);
   }
 
-  private List<Node> process(String directiveText, AnalysisContext ctx, Position startPosition, String parserRule) {
+  private List<Node> process(String directiveText, AnalysisContext ctx, Position startPosition, String parserRule, String section) {
     if (!DIALECT_FILLER_PATTERN.matcher(directiveText).matches()) {
       CompilerDirectivesLexer lexer = new CompilerDirectivesLexer(CharStreams.fromString(directiveText));
       lexer.removeErrorListeners();
@@ -93,7 +101,7 @@ public class CompilerDirectivesStage implements Stage<AnalysisContext, List<Node
       parser.setErrorHandler(new CompilerDirectivesErrorStrategy(messageService));
       parser.addErrorListener(new CompilerDirectivesErrorListener(ctx, startPosition));
 
-      CompilerDirectivesVisitor visitor = new CompilerDirectivesVisitor(ctx, messageService, startPosition);
+      CompilerDirectivesVisitor visitor = new CompilerDirectivesVisitor(ctx, messageService, startPosition, section);
 
       if (parserRule.equals("compilerOptions")) {
         visitor.visitCompilerOptions(parser.compilerOptions());

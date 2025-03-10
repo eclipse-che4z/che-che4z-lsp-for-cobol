@@ -16,18 +16,14 @@ package org.eclipse.lsp.cobol.core.engine.directives;
 
 import lombok.NonNull;
 import org.antlr.v4.runtime.*;
-import org.eclipse.lsp.cobol.common.dialects.CobolDialect;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
-import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.core.engine.analysis.AnalysisContext;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
-
-import static org.eclipse.lsp.cobol.core.visitor.VisitorHelper.buildTokenRange;
 
 /**
  * Error listener for Compiler Directives parser

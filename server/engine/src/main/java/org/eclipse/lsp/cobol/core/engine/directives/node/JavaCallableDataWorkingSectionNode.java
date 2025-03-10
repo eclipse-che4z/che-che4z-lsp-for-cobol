@@ -23,15 +23,17 @@ import org.eclipse.lsp.cobol.common.model.NodeType;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 
 /**
- * Represents a Java-Callable which are only allowed before procedure section.
+ * Represents a Java-Callable which are only allowed in the data or working-storage section.
  */
 @Getter
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-public class JavaCallablePrecedureSectionNode extends Node {
-    private final boolean isProcedureDivisionLine;
-    public JavaCallablePrecedureSectionNode(Locality location, boolean isProcedureDivisionLine) {
+public class JavaCallableDataWorkingSectionNode extends Node {
+    private final String section;
+    private final String text;
+    public JavaCallableDataWorkingSectionNode(Locality location, String text, String section) {
     super(location, NodeType.CUSTOM);
-        this.isProcedureDivisionLine = isProcedureDivisionLine;
+        this.section = section;
+        this.text = text;
     }
 }

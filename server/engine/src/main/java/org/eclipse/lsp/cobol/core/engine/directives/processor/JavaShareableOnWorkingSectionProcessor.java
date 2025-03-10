@@ -18,32 +18,23 @@ import lombok.AllArgsConstructor;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
-import org.eclipse.lsp.cobol.common.message.MessageService;
-import org.eclipse.lsp.cobol.common.model.NodeType;
-import org.eclipse.lsp.cobol.common.model.tree.Node;
+import org.eclipse.lsp.cobol.common.message.MessageTemplate;
+import org.eclipse.lsp.cobol.common.model.SectionType;
 import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.Processor;
 import org.eclipse.lsp.cobol.core.engine.directives.node.JavaShareableOnWorkingSectionNode;
-
-import java.util.Optional;
 
 /** Validate JavaShareableWorkingSectionNode position */
 @AllArgsConstructor
 public class JavaShareableOnWorkingSectionProcessor
     implements Processor<JavaShareableOnWorkingSectionNode> {
-  final MessageService messageService;
 
   @Override
   public void accept(JavaShareableOnWorkingSectionNode node, ProcessingContext processingContext) {
-    Optional<Node> nearestParentByType = node.getNearestParentByType(NodeType.SECTION);
-//    if (nearestParentByType.isPresent()) {
-//      SectionNode sectionNode = (SectionNode) nearestParentByType.get();
-//      if (sectionNode.getSectionType() != SectionType.WORKING_STORAGE) {
-//        throwError(node, processingContext);
-//      }
-//    } else {
-//      throwError(node, processingContext);
-//    }
+    if (node.getSection().contains(SectionType.WORKING_STORAGE.getType())) {
+      return;
+    }
+    throwError(node, processingContext);
   }
 
   private void throwError(
@@ -52,10 +43,10 @@ public class JavaShareableOnWorkingSectionProcessor
         .getErrors()
         .add(
             SyntaxError.syntaxError()
-                .location(node.getStartLocality().toOriginalLocation())
+                .location(node.getLocality().toOriginalLocation())
                 .severity(ErrorSeverity.ERROR)
-                .errorSource(ErrorSource.DIALECT)
-                .suggestion(messageService.getMessage("compilerDirective.validation.workingSection"))
+                .errorSource(ErrorSource.PARSING)
+                .messageTemplate(MessageTemplate.of("compilerDirective.validation.workingSection", node.getText()))
                 .build());
   }
 }
