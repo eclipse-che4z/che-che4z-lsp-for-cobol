@@ -293,7 +293,7 @@ describe("Tests copybook download service", () => {
         ]),
       ).toBe(undefined);
     });
-    it("checks invalid zowe profile is provided in proc groups", async () => {
+    it("checks an invalid zowe profile in a proc group is reported to the user", async () => {
       const mocked = jest.spyOn(
         ProcessorGroups,
         "loadProcessorGroupCopybookPathsConfig",
@@ -405,17 +405,15 @@ describe("Tests copybook download service", () => {
           downloader["dsnDownloader"]!.downloadCopybook,
         ).toHaveBeenCalledWith(
           { name: "copybook", dialect: "COBOL" },
-          "document-uri",
           "dsn",
-          undefined,
+          "profile",
         );
         expect(
           downloader["ussDownloader"]!.downloadCopybook,
         ).toHaveBeenCalledWith(
           { name: "copybook", dialect: "COBOL" },
-          "document-uri",
           "uss",
-          undefined,
+          "profile",
         );
       });
     });
@@ -446,9 +444,8 @@ describe("Tests copybook download service", () => {
           downloader["dsnDownloader"]!.downloadCopybook,
         ).toHaveBeenCalledWith(
           { name: "copybook", dialect: "COBOL" },
-          "document-uri",
           "dsn",
-          undefined,
+          "profile",
         );
         expect(
           downloader["ussDownloader"]!.downloadCopybook,
@@ -527,17 +524,15 @@ describe("Tests copybook download service", () => {
         downloader["dsnDownloader"]!.downloadCopybook,
       ).toHaveBeenCalledWith(
         { name: "copybook", dialect: "COBOL" },
-        "document-uri",
         "dsn",
-        undefined,
+        "profile",
       );
       expect(
         downloader["dsnDownloader"]!.downloadCopybook,
       ).toHaveBeenCalledWith(
         { name: "copybook", dialect: "COBOL" },
-        "document-uri",
         "dsn-2",
-        undefined,
+        "profile",
       );
     });
   });
@@ -850,9 +845,8 @@ describe("Tests copybook download service", () => {
     );
     expect(downloader["dsnDownloader"]!.downloadCopybook).toHaveBeenCalledWith(
       { name: "copybook", dialect: "COBOL" },
-      "document-uri",
       "dsn",
-      undefined,
+      "profile",
     );
   });
 
@@ -882,7 +876,6 @@ describe("Tests copybook download service", () => {
     );
     expect(downloader["dsnDownloader"]!.downloadCopybook).toHaveBeenCalledWith(
       { name: "copybook", dialect: "COBOL" },
-      "document-uri",
       "procGroupDataset",
       "procGroupProfile",
     );
@@ -917,7 +910,6 @@ describe("Tests copybook download service", () => {
     );
     expect(downloader["ussDownloader"]!.downloadCopybook).toHaveBeenCalledWith(
       { name: "copybook", dialect: "COBOL" },
-      "document-uri",
       "ussFile",
       "profile",
     );

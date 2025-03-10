@@ -53,6 +53,7 @@ export class CopybookDownloaderForE4E {
 
   private E4EConfigs = new Map<string, Promise<e4eResponse | undefined>>();
   private E4EProfiles = new Map<string, ResolvedProfile>();
+  private E4EElements = new Map<string, EndevorElement[] | undefined>();
 
   public clearConfigs() {
     this.E4EConfigs.clear();
@@ -359,7 +360,7 @@ export class CopybookDownloaderForE4E {
     const resolvedProfile = await this.e4e.getProfileInfo(partialProfile);
     if (!(resolvedProfile instanceof Error)) {
       this.E4EProfiles.set(profile, resolvedProfile);
-      return this.E4EProfiles.get(profile);
+      return resolvedProfile;
     }
   }
   public async hasElement(
@@ -367,17 +368,28 @@ export class CopybookDownloaderForE4E {
     endevorType: EndevorType,
     elementName: string,
   ) {
-    const members = await this.getElements(profile, endevorType);
-    if (
-      !(members instanceof Error) &&
-      members.length > 0 &&
-      members.find((x) => x.element == elementName)
-    )
-      return true;
-
-    return false;
+    const id = this.createProfileEndevorTypeId(profile, endevorType);
+    if (this.E4EElements.has(id)) {
+      const element = this.E4EElements.get(id)?.find(
+        (x) => x.element == elementName,
+      );
+      return element ? true : false;
+    } else {
+      const members = await this.getElements(profile, endevorType);
+      if (members instanceof Error) this.E4EElements.set(id, undefined);
+      else {
+        this.E4EElements.set(id, members);
+        return members.find((x) => x.element == elementName) ? true : false;
+      }
+    }
   }
   public clearProfiles() {
     this.E4EProfiles.clear();
+  }
+  private createProfileEndevorTypeId(
+    profile: ResolvedProfile,
+    endevorType: EndevorType,
+  ) {
+    return `${profile.instance}-${profile.profile}-${endevorType.environment}-${endevorType.stage}-${endevorType.system}-${endevorType.subsystem}-${endevorType.type}-${endevorType.use_map}`;
   }
 }

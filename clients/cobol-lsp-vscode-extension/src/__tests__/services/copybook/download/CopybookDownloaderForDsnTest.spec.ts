@@ -123,8 +123,8 @@ describe("Tests Copybook download from DNS", () => {
         downloader.clearMemberListCache();
         const isDowloaded = await downloader.downloadCopybook(
           { name: "copybook", dialect: "COBOL" },
-          "document-uri",
           "DNS.PATH",
+          "profile",
         );
         expect(allMemberMock).toHaveBeenCalledWith("DNS.PATH");
         expect(getContentMock).toHaveBeenCalledWith("DNS.PATH(copybook)", {
@@ -139,8 +139,8 @@ describe("Tests Copybook download from DNS", () => {
         // trigger download again and check cache impl
         const isDowloaded = await downloader.downloadCopybook(
           { name: "copybook", dialect: "COBOL" },
-          "document-uri",
           "DNS.PATH",
+          "profile",
         );
         // cache resolves the members
         expect(allMemberMock).not.toHaveBeenCalled();

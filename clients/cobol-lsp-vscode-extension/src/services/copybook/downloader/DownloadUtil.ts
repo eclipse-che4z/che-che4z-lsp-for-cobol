@@ -23,6 +23,8 @@ import { SettingsService } from "../../Settings";
 import { hasMember } from "../../util/Utils";
 import { registerExceptionEvent } from "../../reporter";
 import { loadProcessorGroupCopybookPathsConfig } from "../../ProcessorGroups";
+import { EndevorType } from "../../../type/e4eApi";
+import { EndevorConfigModel } from "../../ProcessorGroupsLoader";
 
 /**
  * Utility class for downloading copybooks
@@ -185,24 +187,23 @@ export class DownloadUtil {
     const uniqueDialects = new Set(
       dialects.map((dialect) => dialect?.toUpperCase()).filter(Boolean),
     );
+    const procGroupPath = await loadProcessorGroupCopybookPathsConfig(
+      { scopeUri: documentUri },
+      [],
+    );
+    if (procGroupPath.length > 0) {
+      return true;
+    }
 
     for (const dialect of uniqueDialects) {
       const dsnPath = SettingsService.getDsnPath(documentUri, dialect);
       const ussPath = SettingsService.getUssPath(documentUri, dialect);
 
-      const procGroupPath = await loadProcessorGroupCopybookPathsConfig(
-        { scopeUri: documentUri },
-        [],
-        dialect,
-      );
       if ((dsnPath?.length ?? 0) > 0) {
         return { dsn: dsnPath[0] };
       }
       if ((ussPath?.length ?? 0) > 0) {
         return { uss: ussPath[0] };
-      }
-      if (procGroupPath && procGroupPath.length > 0) {
-        return true;
       }
     }
     return null;
@@ -262,5 +263,15 @@ export class DownloadUtil {
       hasMember(e.mDetails, "errorCode") &&
       e.mDetails.errorCode === 404
     );
+  }
+  public static endevorConfigToType(config: EndevorConfigModel): EndevorType {
+    return {
+      use_map: config.use_map ? config.use_map : true,
+      environment: config.environment,
+      stage: config.stage,
+      system: config.system,
+      subsystem: config.subsystem,
+      type: config.type,
+    };
   }
 }

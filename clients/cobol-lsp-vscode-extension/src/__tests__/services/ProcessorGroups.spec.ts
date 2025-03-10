@@ -323,9 +323,9 @@ describe("Processor groups configurations prepared for download services", () =>
         system: "SYSTEM",
         subsystem: "SUBSYTEM",
         type: "COPY",
-        profile: "instance.internal.connection",
         use_map: true,
         element: "copybook",
+        fingerprint: "",
       },
       profile: {
         profile: "profile",
@@ -333,11 +333,11 @@ describe("Processor groups configurations prepared for download services", () =>
       },
     });
   });
-  it("getCopybookLocalPath returns local paths only if processor group has remote lib definitions", async () => {
+  it("getCopybookLocalPath returns local paths only when remote locations provided in processor group definitions", async () => {
     const paths = await SettingsService.getCopybookLocalPath(
-      WORKSPACE_URI + "/TEST.cob",
+      WORKSPACE_URI + "/abs/TEST.cob",
       "COBOL",
     );
-    expect(paths).toStrictEqual(["/copy"]);
+    expect(paths).toStrictEqual(["/abs"]);
   });
 });

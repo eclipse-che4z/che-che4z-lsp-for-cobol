@@ -45,35 +45,27 @@ export class CopybookDownloaderForDsn extends ZoweExplorerDownloader {
    * Downloads a file from the passed dns based on Zowe explorer
    *
    * @param copybookName Copybook to be downloaded.
-   * @param documentUri cobol programs which needs copybook
    * @param dsnPath dsnpath in mainframe.
+   * @param profile zowe profile name
    */
   async downloadCopybook(
     copybookName: CopybookName,
-    documentUri: string,
     dsnPath: string,
-    profile?: string,
+    profile: string,
   ): Promise<boolean> {
-    const providedProfile = profile
-      ? profile
-      : ProfileUtils.getProfileNameForCopybook(documentUri, this.explorerAPI);
-
-    if (dsnPath && providedProfile) {
-      const memberList = await this.getAllMembers(providedProfile, dsnPath);
-      const remoteCopybook = DownloadUtil.getRemoteCopybookName(
-        memberList,
-        copybookName.name,
-      );
-      return !!(
-        remoteCopybook &&
-        (await this.downloadCopybookFromMFUsingZowe(
-          dsnPath,
-          remoteCopybook,
-          providedProfile,
-        ))
-      );
-    }
-    return false;
+    const memberList = await this.getAllMembers(profile, dsnPath);
+    const remoteCopybook = DownloadUtil.getRemoteCopybookName(
+      memberList,
+      copybookName.name,
+    );
+    return !!(
+      remoteCopybook &&
+      (await this.downloadCopybookFromMFUsingZowe(
+        dsnPath,
+        remoteCopybook,
+        profile,
+      ))
+    );
   }
 
   public async getAllMembers(profileName: string, dataset: string) {
@@ -153,14 +145,19 @@ export class CopybookDownloaderForDsn extends ZoweExplorerDownloader {
         .get(id)
         ?.find((member) => member === copybookName);
     }
-
     const profile = DownloadUtil.loadProfile(profileName, this.explorerAPI);
-    const response = await this.explorerAPI
-      .getMvsApi(profile)
-      .allMembers(dataset);
-    const members = response.apiResponse.items.map((item) => item.member);
+    await this.limitFailedRequests(
+      `list dataset members ${profileName}/${dataset}`,
+      async () => {
+        const response = await this.explorerAPI
+          .getMvsApi(profile)
+          .allMembers(dataset);
+        const members = response.apiResponse.items.map((item) => item.member);
 
-    this.memberListCache.set(id, members);
+        this.memberListCache.set(id, members);
+      },
+    );
+
     if (this.memberListCache.get(id)?.find((member) => member === copybookName))
       return true;
     return false;
