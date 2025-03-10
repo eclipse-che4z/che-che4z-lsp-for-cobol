@@ -821,7 +821,7 @@ describe("Tests copybook download service", () => {
     });
   });
 
-  it("checks dsn settings performed when no settings provided in processor group definitions", async () => {
+  it("checks dsn settings used when no settings provided in processor group definitions", async () => {
     const spyConfig = jest.spyOn(
       ProcessorGroups,
       "loadProcessorGroupCopybookPathsConfig",
@@ -850,7 +850,7 @@ describe("Tests copybook download service", () => {
     );
   });
 
-  it("checks settings in processor groups performed first", async () => {
+  it("checks settings in processor groups used first", async () => {
     const spyConfig = jest.spyOn(
       ProcessorGroups,
       "loadProcessorGroupCopybookPathsConfig",
@@ -885,7 +885,7 @@ describe("Tests copybook download service", () => {
     expect(settingsMockUss).toHaveBeenCalledTimes(0);
   });
 
-  it("checks settings in processor group definitions performed in order ", async () => {
+  it("checks settings in processor group definitions used in order ", async () => {
     const spyConfig = jest.spyOn(
       ProcessorGroups,
       "loadProcessorGroupCopybookPathsConfig",
