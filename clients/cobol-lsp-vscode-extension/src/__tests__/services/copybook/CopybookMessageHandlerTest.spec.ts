@@ -325,7 +325,7 @@ describe("Test the copybook message handler", () => {
     expect(unreachable).not.toHaveBeenCalled();
   });
 
-  it("checks downloaded copybooks searched wrt processor group definitions respecting order in configurations", async () => {
+  it("checks copybooks search respects processor group definitions order", async () => {
     SettingsService.getCopybookExtension = jest
       .fn()
       .mockReturnValue(Promise.resolve([""]));

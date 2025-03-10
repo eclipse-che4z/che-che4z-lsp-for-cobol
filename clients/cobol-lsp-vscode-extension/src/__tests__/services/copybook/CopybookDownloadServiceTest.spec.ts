@@ -821,7 +821,7 @@ describe("Tests copybook download service", () => {
     });
   });
 
-  it("checks provided settings performed when processor groups settings not provided", async () => {
+  it("checks dsn settings performed when no settings provided in processor group definitions", async () => {
     const spyConfig = jest.spyOn(
       ProcessorGroups,
       "loadProcessorGroupCopybookPathsConfig",
@@ -850,7 +850,7 @@ describe("Tests copybook download service", () => {
     );
   });
 
-  it("checks processor group locations performed when provided", async () => {
+  it("checks settings in processor groups performed first", async () => {
     const spyConfig = jest.spyOn(
       ProcessorGroups,
       "loadProcessorGroupCopybookPathsConfig",
@@ -879,9 +879,13 @@ describe("Tests copybook download service", () => {
       "procGroupDataset",
       "procGroupProfile",
     );
+    const settingsMockDsn = (SettingsService.getDsnPath = jest.fn());
+    const settingsMockUss = (SettingsService.getDsnPath = jest.fn());
+    expect(settingsMockDsn).toHaveBeenCalledTimes(0);
+    expect(settingsMockUss).toHaveBeenCalledTimes(0);
   });
 
-  it("checks processor group locations performed in order of processor group definitions", async () => {
+  it("checks settings in processor group definitions performed in order ", async () => {
     const spyConfig = jest.spyOn(
       ProcessorGroups,
       "loadProcessorGroupCopybookPathsConfig",
@@ -915,7 +919,7 @@ describe("Tests copybook download service", () => {
     );
   });
 
-  it("checks download does not perform when processor group endevor location has invalid profile", async () => {
+  it("checks download does not perform when endevor location settings in processor group has invalid profile", async () => {
     const spyConfig = jest.spyOn(
       ProcessorGroups,
       "loadProcessorGroupCopybookPathsConfig",

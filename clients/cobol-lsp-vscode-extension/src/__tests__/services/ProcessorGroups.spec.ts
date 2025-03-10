@@ -25,9 +25,9 @@ import {
 import * as glob from "glob";
 import { EndevorConfigModel } from "../../services/ProcessorGroupsLoader";
 import { CopybookDownloaderForE4E } from "../../services/copybook/downloader/CopybookDownloaderForE4E";
-import { E4E } from "../../type/e4eApi";
 import { CopybookName } from "../../services/copybook/CopybookDownloadService";
 import { SettingsService } from "../../services/Settings";
+import { e4eMock } from "../../__mocks__/getE4EMock.utility";
 
 const WORKSPACE_URI = "file:///my/workspace";
 
@@ -294,9 +294,8 @@ describe("Processor groups configuration provides lib path in Windows", () => {
   });
 });
 describe("Processor groups configurations prepared for download services", () => {
-  it("prepareProcessorGroupConfigPathsForEndevor prepares Endevor locations", async () => {
-    const e4e = {} as E4E;
-    const e4eDownloader = new CopybookDownloaderForE4E("/storagePath", e4e);
+  it("check prepareProcessorGroupConfigPathsForEndevor returns valid Endevor Element ", async () => {
+    const e4eDownloader = new CopybookDownloaderForE4E("/storagePath", e4eMock);
     const copybook: CopybookName = { name: "copybook", dialect: "COBOL" };
     e4eDownloader.getProfileInfo = async () =>
       Promise.resolve({ profile: "profile", instance: "instance" });
