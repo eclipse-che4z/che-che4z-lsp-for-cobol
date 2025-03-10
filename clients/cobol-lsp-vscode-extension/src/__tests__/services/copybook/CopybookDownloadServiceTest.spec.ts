@@ -302,7 +302,6 @@ describe("Tests copybook download service", () => {
         "/libs",
         { dataset: "dataset", profile: "invalidProfile" },
       ]);
-      vscode.window.showErrorMessage = jest.fn();
       const downloadService = new CopybookDownloadService(
         "storage-path",
         zoweExplorerMock,
