@@ -152,7 +152,7 @@ export class ControlFlowAnalysisService implements AnalysisServiceDelegate {
     graphs: Graph[],
     diagnostics: Map<string, vscode.Diagnostic[]>,
   ): void {
-    this.diagnosticService.showAllDiagnostics(diagnostics);
+    this.diagnosticService.showAllDiagnostics(documentUri, diagnostics);
 
     const callback = this.callbacks.get(documentUri);
     if (callback) {
@@ -178,7 +178,11 @@ class DiagnosticService {
     this.diagnosticCollection.set(documentUri, diagnostics);
   }
 
-  public showAllDiagnostics(diagnostics: Map<string, vscode.Diagnostic[]>) {
+  public showAllDiagnostics(
+    documentUri: string,
+    diagnostics: Map<string, vscode.Diagnostic[]>,
+  ) {
+    this.diagnosticCollection.delete(vscode.Uri.parse(documentUri));
     diagnostics.forEach((v, k) =>
       this.diagnosticCollection.set(vscode.Uri.parse(k), v),
     );

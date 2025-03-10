@@ -69,9 +69,9 @@ export class VirtualProcessor {
   }
 
   private step(vm: VirtualMachine): boolean {
-    // Logger.debug(
-    //   `${vm.getInfo()}: ${cfastNodeInfo(vm.currentInstruction()?.getInitialNode())}, CPU: ${vm.getCurrentProgramUnit()?.id}`,
-    // );
+    Logger.debug(
+      `${vm.getInfo()}: ${cfastNodeInfo(vm.currentInstruction()?.getInitialNode())}, CPU: ${vm.getCurrentProgramUnit()?.id}`,
+    );
     vm.updateProgramUnit();
 
     if (this.optimizer && this.optimizer.apply(vm)) {
@@ -92,7 +92,7 @@ export class VirtualProcessor {
     if (index < 0) {
       return;
     }
-    // Logger.debug(`Remove vm ${vm.getId()}`);
+    Logger.debug(`Remove vm ${vm.getId()}`);
     this.vms.splice(index, 1);
   }
 }
