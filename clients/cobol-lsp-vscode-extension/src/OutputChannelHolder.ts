@@ -12,7 +12,15 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 import * as vscode from "vscode";
-export interface SelectionObject {
-  selection: vscode.Range;
-  text: string;
+
+export class OutputChannelHolder {
+  private static outputChannel?: vscode.OutputChannel;
+
+  public static init(outputChannel: vscode.OutputChannel) {
+    OutputChannelHolder.outputChannel = outputChannel;
+  }
+
+  public static getOutputChannel(): vscode.OutputChannel | undefined {
+    return OutputChannelHolder.outputChannel;
+  }
 }

@@ -15,13 +15,15 @@ import * as vscode from "vscode";
 import { Program } from "@code4z/analysis/lib/model/cfast";
 import { EngineProcessingResult } from "@code4z/analysis/lib/graphbuilder";
 import { Graph } from "@code4z/analysis/lib/model/Graph";
-import { Worker } from "node:worker_threads";
-import { join } from "node:path";
+import { Worker } from "worker_threads";
+import { join } from "path";
 import {
   DiagnosticDto,
   DiagnosticTagDto,
 } from "@code4z/analysis/lib/model/external";
 import { SettingsService } from "./Settings";
+import { OutputChannelHolder } from "../OutputChannelHolder";
+import { WorkerMessage } from "../Worker";
 
 /**
  * Control Flow Analysis callback
@@ -45,9 +47,11 @@ export function addControlFlowAnalysisCallback(
 /**
  * Handle AST and starts analysis it
  */
-export function controlFlowAstHandler(result: ApiResult): void {
+export async function controlFlowAstHandler(result: ApiResult) {
   if (result.documentUri) {
-    ControlFlowAnalysisService.instance().cancelAnalysis(result.documentUri);
+    await ControlFlowAnalysisService.instance().cancelAnalysis(
+      result.documentUri,
+    );
     if (result.controlFlowAST.length > 0) {
       ControlFlowAnalysisService.instance().queueAnalysis(
         result.controlFlowAST,
@@ -71,9 +75,7 @@ interface AnalysisServiceDelegate {
 }
 
 class AnalysisTask {
-  private worker: Worker = new Worker(
-    join(__dirname, "../src/services/Worker.js"),
-  );
+  private worker: Worker = new Worker(join(__dirname, "./Worker.js"));
 
   constructor(
     private documentUri: string,
@@ -87,20 +89,23 @@ class AnalysisTask {
         convertDiagnostics(data.diagnostics),
       );
     });
-    this.worker.on(
-      "error",
-      (code) => new Error(`Worker error with exit code ${code}`),
-    );
-
-    this.worker.postMessage({
-      vmCount: SettingsService.getMaxVMCount(),
-      severity: SettingsService.getUnreachableCodeSeverity(),
-      programs: programs,
+    this.worker.on("error", (code) => {
+      OutputChannelHolder.getOutputChannel()?.appendLine(
+        `Error starting Control Flow Analysis: ${code}`,
+      );
     });
+
+    this.worker.postMessage(
+      new WorkerMessage(
+        SettingsService.getMaxVMCount(),
+        SettingsService.getUnreachableCodeSeverity()?.valueOf() || 0,
+        programs,
+      ),
+    );
   }
 
-  public abort() {
-    this.worker.postMessage("abort");
+  public async abort() {
+    await this.worker.terminate();
   }
 }
 
@@ -128,10 +133,10 @@ export class ControlFlowAnalysisService implements AnalysisServiceDelegate {
     this.tasks.set(documentUri, task);
   }
 
-  public cancelAnalysis(documentUri: string) {
+  public async cancelAnalysis(documentUri: string) {
     const exitsing = this.tasks.get(documentUri);
     if (exitsing) {
-      exitsing.abort();
+      await exitsing.abort();
     }
   }
 
@@ -166,20 +171,17 @@ class DiagnosticService {
       vscode.languages.createDiagnosticCollection("Control Flow");
   }
 
-  public showDiagnostics(uri: vscode.Uri, diagnostics: vscode.Diagnostic[]) {
-    this.clearDiagnostics();
-    this.diagnosticCollection.set(uri, diagnostics);
+  public showDiagnostics(
+    documentUri: vscode.Uri,
+    diagnostics: vscode.Diagnostic[],
+  ) {
+    this.diagnosticCollection.set(documentUri, diagnostics);
   }
 
   public showAllDiagnostics(diagnostics: Map<string, vscode.Diagnostic[]>) {
-    this.clearDiagnostics();
     diagnostics.forEach((v, k) =>
       this.diagnosticCollection.set(vscode.Uri.parse(k), v),
     );
-  }
-
-  public clearDiagnostics() {
-    this.diagnosticCollection.clear();
   }
 }
 

@@ -55,8 +55,8 @@ public class MockCobolClientProvider implements Provider<CobolLanguageClient> {
       }
 
       @Override
-      public void cfastReady(ExtendedApiResult result) {
-
+      public CompletableFuture<Void> cfastReady(ExtendedApiResult result) {
+        return null;
       }
     };
   }

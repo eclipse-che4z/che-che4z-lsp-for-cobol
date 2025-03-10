@@ -28,7 +28,7 @@ import {
   SETTINGS_CPY_LOCAL_PATH,
   SETTINGS_DIALECT,
 } from "../../constants";
-import * as extension from "../../extension";
+import { OutputChannelHolder } from "../../OutputChannelHolder";
 
 function makefsPath(p: string): string {
   return path.join(process.platform == "win32" ? "a:" : "", p);
@@ -474,19 +474,20 @@ describe("SettingService lspConfigHandler", () => {
   });
 
   describe("Invalid configuration provided", () => {
-    let outputChannelMock: jest.SpyInstance;
+    const outputChannelMock = {
+      appendLine: jest.fn(),
+    };
     beforeAll(() => {
       jest.spyOn(vscode.workspace, "getConfiguration").mockReturnValue({
         get: () => ["correct-path", 2, false],
       } as unknown as vscode.WorkspaceConfiguration);
-
-      outputChannelMock = jest.fn();
-      jest.spyOn(extension, "getChannel").mockReturnValue({
-        appendLine: outputChannelMock,
-      } as unknown as vscode.OutputChannel);
     });
 
     test("returns empty setting instead of wrong configuration", async () => {
+      OutputChannelHolder.init(
+        outputChannelMock as unknown as vscode.OutputChannel,
+      );
+
       const result = await lspConfigHandler({
         items: [
           {
@@ -497,7 +498,7 @@ describe("SettingService lspConfigHandler", () => {
       });
 
       expect(result).toEqual(expect.arrayContaining([]));
-      expect(outputChannelMock).toHaveBeenCalledWith(
+      expect(outputChannelMock.appendLine).toHaveBeenCalledWith(
         "Invalid settings: cobol-lsp.cpy-manager.paths-local - Invalid value 2 supplied to : Array<string>/1: string\nInvalid value false supplied to : Array<string>/2: string",
       );
     });

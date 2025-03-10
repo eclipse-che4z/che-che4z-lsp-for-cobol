@@ -33,7 +33,6 @@ import { CopybookURI } from "./CopybookURI";
 import path = require("path");
 import { getErrorMessage } from "../util/ErrorsUtils";
 import { DialectRegistry } from "../DialectRegistry";
-import { getChannel } from "../../extension";
 
 export class CopybookName {
   constructor(
@@ -297,7 +296,7 @@ export class CopybookDownloadService {
       if (result.status === "fulfilled") {
         result.value.forEach((c) => copybooks.push(c));
       } else {
-        getChannel().appendLine(
+        this.outputChannel?.appendLine(
           `Unable to load copybooks completions. ${result.reason}`,
         );
       }

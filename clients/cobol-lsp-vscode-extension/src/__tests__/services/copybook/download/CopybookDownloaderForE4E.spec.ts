@@ -18,7 +18,6 @@ import {
   e4eResponseDatasetFirst,
   e4eResponseEndevorFirst,
 } from "../../../../__mocks__/getE4EMock.utility";
-import * as extension from "../../../../extension";
 import * as vscode from "vscode";
 
 jest.mock("path", () => ({
@@ -36,12 +35,6 @@ describe("e4e copybook downloader tests", () => {
   });
 
   describe("checks copybook downloaded into correct path", () => {
-    beforeEach(() => {
-      jest.spyOn(extension, "getChannel").mockReturnValue({
-        appendLine: jest.fn(),
-      } as unknown as vscode.OutputChannel);
-    });
-
     describe("windows", () => {
       beforeEach(() => {
         jest.replaceProperty(path, "sep", "\\");

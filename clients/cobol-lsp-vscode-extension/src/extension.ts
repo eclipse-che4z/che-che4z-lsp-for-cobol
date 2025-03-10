@@ -61,6 +61,7 @@ import {
 import { CopybooksCompletionProvider } from "./services/copybook/CopybooksCompletionProvider";
 import { SubroutinesCompletionsProvider } from "./services/subroutines/SubroutinesCompletionsProvider";
 import { controlFlowAstHandler } from "./services/ControlFlowService";
+import { OutputChannelHolder } from "./OutputChannelHolder";
 
 interface __AnalysisApi {
   analysis(uri: string, text: string, pos?: vscode.Position): Promise<unknown>;
@@ -78,6 +79,8 @@ async function initialize(context: vscode.ExtensionContext) {
     "COBOL Language Support Control Flow",
     { log: true },
   );
+  OutputChannelHolder.init(outputChannel);
+
   try {
     await vscode.workspace.fs.createDirectory(context.globalStorageUri);
   } catch (error) {
@@ -121,10 +124,6 @@ async function initialize(context: vscode.ExtensionContext) {
   };
 }
 
-export function getChannel(): vscode.OutputChannel {
-  return outputChannel;
-}
-
 export async function activate(
   context: vscode.ExtensionContext,
 ): Promise<__ExtensionApi & __AnalysisApi> {
@@ -154,7 +153,7 @@ export async function activate(
   context.subscriptions.push(
     vscode.languages.registerCompletionItemProvider(
       [LANGUAGE_ID, EXP_LANGUAGE_ID, HP_LANGUAGE_ID],
-      new CopybooksCompletionProvider(copyBooksDownloader),
+      new CopybooksCompletionProvider(outputChannel, copyBooksDownloader),
     ),
   );
 
@@ -203,10 +202,7 @@ export async function activate(
     "workspace/configuration",
     lspConfigHandler,
   );
-  languageClientService.addNotificationHandler(
-    "cfast/ready",
-    controlFlowAstHandler,
-  );
+  languageClientService.addRequestHandler("cfast/ready", controlFlowAstHandler);
 
   await languageClientService.start();
 

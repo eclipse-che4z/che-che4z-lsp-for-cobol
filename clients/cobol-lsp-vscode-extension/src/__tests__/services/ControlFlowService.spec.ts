@@ -19,7 +19,7 @@ import {
   ControlFlowAnalysisService,
 } from "../../services/ControlFlowService";
 
-jest.mock("node:worker_threads", () => ({
+jest.mock("worker_threads", () => ({
   Worker: class {
     constructor(private path: string) {}
     public on(_message: string, _listener: (value: unknown) => void) {}
@@ -68,12 +68,12 @@ describe("ControlFlowService tests", () => {
     documentUri: "documentUri",
   };
 
-  test("Build queued for analysis", () => {
+  test("Build queued for analysis", async () => {
     const queueAnalysis = jest.spyOn(
       ControlFlowAnalysisService.instance(),
       "queueAnalysis",
     );
-    controlFlowAstHandler(apiResult);
+    await controlFlowAstHandler(apiResult);
     expect(queueAnalysis).toHaveBeenCalled();
   });
 });
