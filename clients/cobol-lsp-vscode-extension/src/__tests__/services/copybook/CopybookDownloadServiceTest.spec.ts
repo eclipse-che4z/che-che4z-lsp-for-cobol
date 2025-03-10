@@ -543,8 +543,8 @@ describe("Tests copybook download service", () => {
     let zoweExplorerApiMock: IApiRegisterClient;
     let getAllMembersMock: jest.SpyInstance<IZosFilesResponseMemberList>;
     let fileListMock: jest.SpyInstance<IZosFilesResponseFileList>;
-    let datasetMembers: string[];
-    let ussFiles: { name: string; mode?: string }[];
+    let datasetMembers: string[] = [];
+    let ussFiles: { name: string; mode?: string }[] = [];
 
     beforeEach(() => {
       getAllMembersMock = jest.fn().mockResolvedValue({
@@ -785,6 +785,30 @@ describe("Tests copybook download service", () => {
             FAILED_REQUESTS_LIMIT * 2,
           );
         });
+      });
+    });
+
+    describe("Do not require Zowe profile configuration if no remote location is configured", () => {
+      beforeEach(() => {
+        workspaceConfigurationMock = {
+          "paths-dsn": [],
+          "paths-uss": [],
+          "copybook-extensions": [".CPY", ".cpy", ""],
+        };
+        profileName = "";
+      });
+
+      test("no error popup is shown", async () => {
+        const cds = new CopybookDownloadService(
+          "/globalStorage",
+          zoweExplorerApiMock,
+        );
+        await cds.listRemoteCopybooks(
+          Uri.file("/test.cbl").toString(),
+          DEFAULT_DIALECT,
+        );
+
+        expect(vscode.window.showErrorMessage).not.toHaveBeenCalled();
       });
     });
   });
