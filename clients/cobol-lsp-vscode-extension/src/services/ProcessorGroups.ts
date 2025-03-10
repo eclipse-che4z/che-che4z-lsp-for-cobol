@@ -42,6 +42,7 @@ import { EndevorElement, ResolvedProfile } from "../type/e4eApi";
 import { CopybookDownloaderForE4E } from "./copybook/downloader/CopybookDownloaderForE4E";
 
 import { CopybookName } from "./copybook/CopybookDownloadService";
+import { USSFILE } from "../constants";
 
 export async function loadProcessorGroupCopybookPaths(
   documentUri: string,
@@ -61,7 +62,12 @@ export async function loadProcessorGroupCopybookPathsConfig(
 ): Promise<
   (string | ZoweDatasetConfigModel | ZoweUssConfigModel | EndevorConfigModel)[]
 > {
-  const allConfigs = [
+  const allConfigs: (
+    | string
+    | ZoweDatasetConfigModel
+    | ZoweUssConfigModel
+    | EndevorConfigModel
+  )[] = [
     ...(await loadProcessorGroupSettings(
       item.scopeUri,
       "libs",
@@ -95,6 +101,12 @@ export async function loadProcessorGroupCopybookPathsConfig(
         configs.push(...globs);
       }
     } else {
+      if (USSFILE in config) {
+        config.ussFile = SettingsService.evaluateVariables(
+          [config.ussFile],
+          variables,
+        )[0];
+      }
       configs.push(config);
     }
   }
