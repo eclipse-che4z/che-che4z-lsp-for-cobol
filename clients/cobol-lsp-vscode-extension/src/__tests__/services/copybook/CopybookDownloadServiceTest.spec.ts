@@ -256,7 +256,6 @@ describe("Tests copybook download service", () => {
     });
 
     it("checks no profile checks are done when download configurations are not configured", async () => {
-      vscode.window.showErrorMessage = jest.fn();
       const downloadService = new CopybookDownloadService(
         "storage-path",
         zoweExplorerMock,
@@ -809,6 +808,33 @@ describe("Tests copybook download service", () => {
         );
 
         expect(vscode.window.showErrorMessage).not.toHaveBeenCalled();
+      });
+    });
+
+    describe("Check Zowe profile configuration if remote location is configured", () => {
+      beforeEach(() => {
+        workspaceConfigurationMock = {
+          "paths-dsn": ["DATASET.WITH.COPYBOOKS"],
+          "paths-uss": [],
+          "copybook-extensions": [".CPY", ".cpy", ""],
+        };
+        profileName = "";
+      });
+
+      test("error popup is shown", async () => {
+        const cds = new CopybookDownloadService(
+          "/globalStorage",
+          zoweExplorerApiMock,
+        );
+        await cds.listRemoteCopybooks(
+          Uri.file("/test.cbl").toString(),
+          DEFAULT_DIALECT,
+        );
+
+        expect(vscode.window.showErrorMessage).toHaveBeenCalledWith(
+          "Please specify a valid Zowe Explorer profile to download copybooks from the mainframe.",
+          "Change settings",
+        );
       });
     });
   });

@@ -252,14 +252,6 @@ export class CopybookDownloadService {
       ...DialectRegistry.getActiveDialects().map((di) => di.name),
     ];
 
-    const profile = ProfileUtils.getProfileNameForCopybook(
-      documentUri,
-      this.explorerApi,
-    );
-    if (!profile) {
-      return [];
-    }
-
     const copybooks: string[] = [];
 
     const dsnPaths: string[] = SettingsService.getDsnPath(documentUri, dialect);
@@ -269,6 +261,14 @@ export class CopybookDownloadService {
       (dsnPaths.length > 0 || ussPaths.length > 0) &&
       !(await this.isPrerequisiteForDownloadSatisfied(documentUri, dialects))
     ) {
+      return [];
+    }
+
+    const profile = ProfileUtils.getProfileNameForCopybook(
+      documentUri,
+      this.explorerApi,
+    );
+    if (!profile) {
       return [];
     }
 
