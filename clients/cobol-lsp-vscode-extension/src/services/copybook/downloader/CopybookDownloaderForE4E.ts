@@ -358,7 +358,9 @@ export class CopybookDownloaderForE4E {
       return this.E4EProfiles.get(profile);
     }
     const resolvedProfile = await this.e4e.getProfileInfo(partialProfile);
-    if (!(resolvedProfile instanceof Error)) {
+    if (resolvedProfile instanceof Error) {
+      vscode.window.showErrorMessage(resolvedProfile.message);
+    } else {
       this.E4EProfiles.set(profile, resolvedProfile);
       return resolvedProfile;
     }
