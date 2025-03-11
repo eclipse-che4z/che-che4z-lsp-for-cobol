@@ -900,6 +900,8 @@ describe("Tests copybook download service", () => {
   });
 
   it("checks settings in processor groups used first", async () => {
+    const settingsMockDsn = (SettingsService.getDsnPath = jest.fn());
+    const settingsMockUss = (SettingsService.getDsnPath = jest.fn());
     const spyConfig = jest.spyOn(
       ProcessorGroups,
       "loadProcessorGroupCopybookPathsConfig",
@@ -928,8 +930,6 @@ describe("Tests copybook download service", () => {
       "procGroupDataset",
       "procGroupProfile",
     );
-    const settingsMockDsn = (SettingsService.getDsnPath = jest.fn());
-    const settingsMockUss = (SettingsService.getDsnPath = jest.fn());
     expect(settingsMockDsn).toHaveBeenCalledTimes(0);
     expect(settingsMockUss).toHaveBeenCalledTimes(0);
   });
