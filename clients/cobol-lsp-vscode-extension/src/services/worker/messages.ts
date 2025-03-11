@@ -13,6 +13,8 @@
  */
 import { Program } from "@code4z/analysis/lib/model/cfast";
 
+export type MessageType = "result" | "log";
+
 export class WorkerMessage {
   public constructor(
     public vmCount: number,
@@ -21,13 +23,16 @@ export class WorkerMessage {
   ) {}
 }
 
+export class WorkerResultMessage<T> {
+  constructor(
+    public type: MessageType,
+    public payload: T,
+  ) {}
+}
+
 export class LoggerItem {
   public constructor(
     public severity: number,
     public message: string,
   ) {}
-}
-
-export class WorkerLoggerMessage {
-  public constructor(public items: LoggerItem[]) {}
 }

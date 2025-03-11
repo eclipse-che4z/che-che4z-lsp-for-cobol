@@ -25,7 +25,11 @@ import {
 } from "@code4z/analysis/lib/model/external";
 import { SettingsService } from "./Settings";
 import { OutputChannelHolder } from "../OutputChannelHolder";
-import { WorkerLoggerMessage, WorkerMessage } from "./worker/messages";
+import {
+  LoggerItem,
+  WorkerMessage,
+  WorkerResultMessage,
+} from "./worker/messages";
 
 /**
  * Control Flow Analysis callback
@@ -86,17 +90,18 @@ class AnalysisTask {
   ) {
     this.worker.on(
       "message",
-      (data: EngineProcessingResult | WorkerLoggerMessage) => {
-        if (data instanceof EngineProcessingResult) {
+      (data: WorkerResultMessage<EngineProcessingResult | LoggerItem[]>) => {
+        if (data.type === "result") {
+          const payload = data.payload as EngineProcessingResult;
           this.delegate.finishTask(
             this.documentUri,
-            data.enters,
-            convertDiagnostics(data.diagnostics),
+            payload.enters,
+            convertDiagnostics(payload.diagnostics),
           );
-        }
+        } else if (data.type === "log") {
+          const items = data.payload as LoggerItem[];
 
-        if (data instanceof WorkerLoggerMessage) {
-          for (const message of data.items) {
+          for (const message of items) {
             if (
               message.severity === vscode.DiagnosticSeverity.Error.valueOf()
             ) {

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
 /*
  * Copyright (c) 2025 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
@@ -15,7 +16,7 @@ import { parentPort } from "worker_threads";
 import { ControlFlowGraphBuilder } from "@code4z/analysis/lib/graphbuilder";
 import { DiagnosticSeverityDto } from "@code4z/analysis/lib/model/external";
 import { Channel } from "@code4z/analysis/lib/vm/logger";
-import { LoggerItem, WorkerLoggerMessage, WorkerMessage } from "./messages";
+import { LoggerItem, WorkerMessage, WorkerResultMessage } from "./messages";
 
 const MESSAGE_BULK_SIZE: number = 1000;
 
@@ -56,14 +57,19 @@ export class Logger implements Channel {
 
 function processMessage(message: WorkerMessage): void {
   const channel = new Logger();
-  const cfgBuilder = new ControlFlowGraphBuilder(
-    message.vmCount,
-    message.severity,
-    channel,
-  );
-  const result = cfgBuilder.build(message.programs);
-  parentPort?.postMessage(new WorkerLoggerMessage(channel.messages));
-  parentPort?.postMessage(result);
+  try {
+    const cfgBuilder = new ControlFlowGraphBuilder(
+      message.vmCount,
+      message.severity,
+      channel,
+    );
+    const result = cfgBuilder.build(message.programs);
+    parentPort?.postMessage(new WorkerResultMessage("result", result));
+  } catch (error) {
+    channel.error(`${error}`);
+  } finally {
+    parentPort?.postMessage(new WorkerResultMessage("log", channel.messages));
+  }
 }
 
 parentPort?.on("message", (message: WorkerMessage) => {

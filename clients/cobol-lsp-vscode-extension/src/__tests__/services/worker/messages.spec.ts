@@ -14,7 +14,7 @@
 
 import {
   LoggerItem,
-  WorkerLoggerMessage,
+  WorkerResultMessage,
 } from "../../../services/worker/messages";
 
 describe("messages module tests", () => {
@@ -27,10 +27,10 @@ describe("messages module tests", () => {
 
   test("WorkerLoggerMessage test", () => {
     const item = new LoggerItem(2, "message");
-    const workerMessage = new WorkerLoggerMessage([item]);
+    const workerMessage = new WorkerResultMessage("log", [item]);
 
-    expect(workerMessage.items.length).toBe(1);
-    expect(workerMessage.items[0].severity).toBe(2);
-    expect(workerMessage.items[0].message).toBe("message");
+    expect(workerMessage.payload.length).toBe(1);
+    expect(workerMessage.payload[0].severity).toBe(2);
+    expect(workerMessage.payload[0].message).toBe("message");
   });
 });
