@@ -72,6 +72,13 @@ export class CopybooksCompletionProvider implements CompletionItemProvider {
         isCopyStatement: isDefaultCopyStatement,
       },
       {
+        /**
+         * SQL preprocessor is supposed to use `SQL` as a name, but because
+         * the server is sending `COBOL` as a dialect name in the
+         * `copybook/resolve` requests for `EXEC SQL INCLUDE` statements,
+         * we need to use it for auto-completions as well, so copybook
+         * downloading works correctly.
+         */
         name: DEFAULT_DIALECT,
         isCopyStatement: isSQLCopyStatement,
       },
