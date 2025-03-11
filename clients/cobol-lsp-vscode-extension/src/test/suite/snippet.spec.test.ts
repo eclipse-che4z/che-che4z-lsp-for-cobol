@@ -100,14 +100,14 @@ suite(
         () =>
           editor.document
             .getText()
-            .includes("ADD 1 TO str ON OVERFLOW error-catch-logic"),
+            .includes("ADD 1 TO str ON SIZE ERROR error-catch-logic"),
         3000,
       );
       const text = editor.document.getText();
       const acceptedLine = text.split("\n")[39];
       assert.strictEqual(
         acceptedLine.trim(),
-        "ADD 1 TO str ON OVERFLOW error-catch-logic",
+        "ADD 1 TO str ON SIZE ERROR error-catch-logic",
         "Checks auto complete functionality, also with navigation by snippets",
       );
     });
