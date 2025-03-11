@@ -256,14 +256,15 @@ The Find All References and Go To Definition functionalities are extended to wor
 
 ## Processor Groups
 
-Use processor groups to link programs with specific dialects, SQL backend settings, copybook extensions, compiler options, and local folders containing copybooks. You define processor groups in a `proc_grps.json` file and associate processor groups with programs in a `pgm_conf.json` file. Create both of these files in a `/.cobolplugin` folder in your workspace root.
+Use processor groups to link programs with specific dialects, SQL backend settings, copybook extensions, compiler options, and local and remote locations that contain copybooks. You define processor groups in a `proc_grps.json` file and associate processor groups with programs in a `pgm_conf.json` file. Create both of these files in a `/.cobolplugin` folder in your workspace root.
 
 The `proc_grps.json` file is formatted as an array of JSON elements, with one JSON per processor group. Each processor group can contain the following elements:
 
 - **"name":** (string)  
     - Specify a name for the processor group.
 - (Optional) **"libs":** (array)  
-    - Specify libraries that contain copybooks as either absolute or relative local paths. These libraries are used to search for copybooks in programs linked with this processor group, and take priority over the local copybook libraries that you specify in the extension settings.
+    - Specify local folders, mainframe data sets and USS files that contain copybooks. Specify local folders as either absolute or relative local paths. These libraries are used to search for copybooks in programs linked with this processor group, and take priority over the copybook libraries that you specify in the extension settings.
+    - To retrieve copybooks from mainframe data sets and USS files, ensure that you also specify the **"zoweProfile"** parameter.
 - (Optional) **"copybook-extensions":** (array)  
     - Specify copybook extensions that you use for the programs linked with this processor groups. These copybook extensions take priority over extensions that you specify in the extension settings.
 - (Optional) **"compiler-options":** (array)  
@@ -272,7 +273,9 @@ The `proc_grps.json` file is formatted as an array of JSON elements, with one JS
 		- XMLPARSE(*XMLSS|COMPAT*)
 	- For more information on COBOL compiler options, see the [IBM Enterprise COBOL documentation](https://www.ibm.com/docs/en/cobol-zos/6.3?topic=guide-enterprise-cobol-compiler-options).
 - (Optional) **"preprocessor":** (array)
-	- Specify dialect and SQL preprocessors that you want to apply to the programs linked with this processor group. See the [Preprocessors](#preprocessors) section below for further information.
+    - Specify dialect and SQL preprocessors that you want to apply to the programs linked with this processor group. See the [Preprocessors](#preprocessors) section below for further information.
+- (Optional) **"zoweProfile":** (string)
+    - Specify the name of a Zowe profile. Specify this parameter if you want to use a processor group to retrieve copybooks from mainframe data sets and USS files. 
 
 ### Preprocessors
 
