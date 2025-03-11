@@ -53,8 +53,8 @@ const isSQLCopyStatement: CopyStatementParser = (statement: string) => {
 
 export class CopybooksCompletionProvider implements CompletionItemProvider {
   constructor(
-    private outputChannel?: OutputChannel,
     private cds?: CopybookDownloadService,
+    private outputChannel?: OutputChannel,
   ) {}
 
   async provideCompletionItems(
