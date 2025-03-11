@@ -279,7 +279,7 @@ describe("CopybooksCompletionProvider", () => {
     });
 
     test("returns all completions for copybooks (SQL dialect is resolved as default COBOL dialect)", async () => {
-      const provider = new CopybooksCompletionProvider(cdsMock);
+      const provider = new CopybooksCompletionProvider(undefined, cdsMock);
       await provider.provideCompletionItems(
         documentMock,
         positionMock,
