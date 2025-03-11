@@ -158,7 +158,7 @@ describe("Test CompletionProvider", () => {
           context,
         )
       ).length,
-    ).toBe(395);
+    ).toBe(391);
   });
 
   test(" Test number of suggestions for COPY when no dialect is selected", async () => {
