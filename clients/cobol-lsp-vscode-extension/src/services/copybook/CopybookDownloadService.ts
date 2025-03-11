@@ -17,10 +17,12 @@ import {
   COPYBOOKS_FOLDER,
   DATASET,
   DEFAULT_DIALECT,
+  E4E_FOLDER,
   ENDEVOR_PROCESSOR,
   ENVIRONMENT,
   PROVIDE_PROFILE_MSG,
   PROVIDE_PROFILE_MSG_PROC_GRUOPS,
+  USE_MAP,
   USSFILE,
   ZOWE_FOLDER,
 } from "../../constants";
@@ -129,13 +131,18 @@ export class CopybookDownloadService {
     if (!paths) return false;
 
     for (const path of paths) {
-      const success = await downloader.downloadCopybook(
-        copybook,
-        documentUri,
-        typeof path === "object" ? path.path : path,
-        typeof path === "object" ? path.profile : undefined,
-      );
-      if (success) return true;
+      const p = typeof path === "object" ? path.path : path;
+      const profile =
+        typeof path === "object"
+          ? path.profile
+          : ProfileUtils.getProfileNameForCopybook(
+              documentUri,
+              this.explorerApi,
+            );
+      if (profile) {
+        const success = await downloader.downloadCopybook(copybook, p, profile);
+        if (success) return true;
+      }
     }
 
     return false;
@@ -174,14 +181,23 @@ export class CopybookDownloadService {
       );
       return copybookUri?.toString();
     }
+    const procGroupResult = await searchCopybookinProcessorGroups(
+      documentUri,
+      copybookName,
+      this.storagePath,
+      this.e4eDownloader,
+      this.dsnDownloader,
+      this.ussDownloader,
+    );
+    if (procGroupResult && typeof procGroupResult != "boolean")
+      return procGroupResult.toString();
+    else if (procGroupResult) return;
+
     const result = await searchCopybook(
       documentUri,
       copybookName,
       dialectType,
       this.storagePath,
-      this.e4eDownloader,
-      this.dsnDownloader,
-      this.ussDownloader,
     );
     if (result) {
       return result.toString();
@@ -275,6 +291,15 @@ export class CopybookDownloadService {
       ...DialectRegistry.getActiveDialects().map((di) => di.name),
     ];
 
+    const copybooks: string[] = [];
+
+    const dsnPaths: string[] = SettingsService.getDsnPath(documentUri, dialect);
+    const ussPaths: string[] = SettingsService.getUssPath(documentUri, dialect);
+
+    if (dsnPaths.length === 0 && ussPaths.length === 0) {
+      return [];
+    }
+
     if (
       !(await this.isPrerequisiteForDownloadSatisfied(documentUri, dialects))
     ) {
@@ -288,11 +313,6 @@ export class CopybookDownloadService {
     if (!profile) {
       return [];
     }
-
-    const copybooks: string[] = [];
-
-    const dsnPaths: string[] = SettingsService.getDsnPath(documentUri, dialect);
-    const ussPaths: string[] = SettingsService.getUssPath(documentUri, dialect);
 
     const results = await Promise.allSettled([
       ...dsnPaths.map(async (dsn) => {
@@ -535,4 +555,86 @@ export class CopybookDownloadService {
     this.dsnDownloader?.reenableFailedRequests();
     this.ussDownloader?.reenableFailedRequests();
   }
+}
+async function searchCopybookinProcessorGroups(
+  documentUri: string,
+  copybookName: string,
+  storagePath: string,
+  e4eDownloader?: CopybookDownloaderForE4E,
+  dsnDownloader?: CopybookDownloaderForDsn,
+  ussDownloader?: CopybookDownloaderForUss,
+): Promise<boolean | vscode.Uri> {
+  let result: vscode.Uri | undefined;
+  const pgConfigs = await loadProcessorGroupCopybookPathsConfig(
+    { scopeUri: documentUri },
+    [],
+  );
+  let shouldFound = false;
+
+  for (const config of pgConfigs) {
+    let folders: string = "";
+    if (typeof config === "string") {
+      folders = config;
+    } else if (
+      typeof config === "object" &&
+      ENVIRONMENT in config &&
+      e4eDownloader
+    ) {
+      const endevorType = DownloadUtil.endevorConfigToType(config);
+      const profile = await e4eDownloader.getProfileInfo(config.profile);
+      if (!profile) continue;
+      const has = await e4eDownloader.hasElement(
+        profile,
+        endevorType,
+        copybookName,
+      );
+      if (!has) continue;
+      folders = CopybookURI.createDatasetPath(
+        CopybookURI.getEnviromentPath(endevorType, profile),
+        endevorType.use_map ? USE_MAP : "",
+        storagePath,
+        E4E_FOLDER,
+      ).fsPath;
+      shouldFound = true;
+    } else if (typeof config === "object" && DATASET in config) {
+      const has = await dsnDownloader?.hasMember(
+        config.profile ? config.profile : SettingsService.getProfileName()!,
+        config.dataset,
+        copybookName,
+      );
+      if (!has) continue;
+      folders = CopybookURI.createDatasetPath(
+        config.profile ? [config.profile] : [SettingsService.getProfileName()!],
+        config.dataset,
+        storagePath,
+      ).fsPath;
+      shouldFound = true;
+    } else if (typeof config === "object" && USSFILE in config) {
+      const has = await ussDownloader?.hasMember(
+        config.profile ? config.profile : SettingsService.getProfileName()!,
+        config.ussFile,
+        copybookName,
+      );
+      if (!has) continue;
+      folders = CopybookURI.createDatasetPath(
+        config.profile ? [config.profile] : [SettingsService.getProfileName()!],
+        config.ussFile,
+        storagePath,
+      ).fsPath;
+      shouldFound = true;
+    }
+
+    result = searchCopybookInExtensionFolder(
+      copybookName,
+      folders ? [folders] : [],
+      await SettingsService.getCopybookExtension(documentUri),
+      storagePath,
+    );
+    if (typeof config === "string" && !result) continue;
+
+    if (result) return result;
+    if (shouldFound) return true;
+  }
+
+  return false;
 }

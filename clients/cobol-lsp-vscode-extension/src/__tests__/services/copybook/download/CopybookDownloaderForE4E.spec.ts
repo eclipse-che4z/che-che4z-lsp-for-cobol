@@ -246,7 +246,7 @@ describe("e4e copybook downloader tests", () => {
     expect(res2).toBeTruthy();
   });
 
-  it("getProfileInfo uses cache for same partialProfile", async () => {
+  it("checks getProfileInfo uses cache for same partialProfile", async () => {
     const e4eMock: E4E = {
       isEndevorElement: jest.fn().mockResolvedValue(false),
       getProfileInfo: jest.fn().mockResolvedValue("profile"),

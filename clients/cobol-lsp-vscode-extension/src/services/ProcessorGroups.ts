@@ -42,6 +42,7 @@ import { EndevorElement, ResolvedProfile } from "../type/e4eApi";
 import { CopybookDownloaderForE4E } from "./copybook/downloader/CopybookDownloaderForE4E";
 
 import { CopybookName } from "./copybook/CopybookDownloadService";
+import { USSFILE } from "../constants";
 
 export async function loadProcessorGroupCopybookPaths(
   documentUri: string,
@@ -58,16 +59,19 @@ export async function loadProcessorGroupCopybookPaths(
 export async function loadProcessorGroupCopybookPathsConfig(
   item: { scopeUri: string },
   configObject: string[],
-  dialect?: string,
 ): Promise<
   (string | ZoweDatasetConfigModel | ZoweUssConfigModel | EndevorConfigModel)[]
 > {
-  const allConfigs = [
+  const allConfigs: (
+    | string
+    | ZoweDatasetConfigModel
+    | ZoweUssConfigModel
+    | EndevorConfigModel
+  )[] = [
     ...(await loadProcessorGroupSettings(
       item.scopeUri,
       "libs",
       [] as string[],
-      dialect,
     )),
     ...configObject,
   ];
@@ -78,25 +82,31 @@ export async function loadProcessorGroupCopybookPathsConfig(
     | ZoweUssConfigModel
     | EndevorConfigModel
   )[] = [];
+  const variables = getVariablesFromUri(item.scopeUri, false);
+  const wsUri = workspace.getWorkspaceFolder(Uri.parse(item.scopeUri))?.uri;
+  let cleanWsFolder: string | undefined;
+  if (wsUri) cleanWsFolder = cleanWorkspaceFolderName(wsUri.fsPath);
 
   for (const config of allConfigs) {
     if (typeof config === "string") {
-      const tempConfig = SettingsService.evaluateVariables(
-        [config],
-        getVariablesFromUri(item.scopeUri, false),
-      );
+      const tempConfig = SettingsService.evaluateVariables([config], variables);
 
-      const wsUri = workspace.getWorkspaceFolder(Uri.parse(item.scopeUri))?.uri;
-      if (wsUri === undefined) {
+      if (cleanWsFolder === undefined) {
         configs.push(config);
       } else {
         const globs = globSync(
           tempConfig.map((ele) => ele.replace(backwardSlashRegex, "/")),
-          { cwd: cleanWorkspaceFolderName(wsUri.fsPath), absolute: true },
+          { cwd: cleanWsFolder, absolute: true },
         ).map((s) => normalizePath(s));
         configs.push(...globs);
       }
     } else {
+      if (USSFILE in config) {
+        config.ussFile = SettingsService.evaluateVariables(
+          [config.ussFile],
+          variables,
+        )[0];
+      }
       configs.push(config);
     }
   }
@@ -271,7 +281,7 @@ function selectProcessorGroup(
     : b4g.elements[selectedElement].processorGroup;
 }
 
-export async function loadProcessorGroupSettings<T extends string | string[]>(
+async function loadProcessorGroupSettings<T extends string | string[]>(
   documentUri: string,
   atrtibute:
     | "libs"
@@ -325,9 +335,17 @@ export async function prepareProcessorGroupConfigPathsForEndevor(
   const resolvedProfile = await e4eDownloader.getProfileInfo(config.profile);
 
   if (!resolvedProfile) return;
-  const element = config as EndevorElement;
-  element.use_map = element.use_map ? element.use_map : true;
-  element.element = copybook.name;
+
+  const element: EndevorElement = {
+    use_map: config.use_map ? config.use_map : true,
+    environment: config.environment,
+    stage: config.stage,
+    system: config.system,
+    subsystem: config.subsystem,
+    type: config.type,
+    element: copybook.name,
+    fingerprint: "",
+  };
 
   return { element: element, profile: resolvedProfile };
 }

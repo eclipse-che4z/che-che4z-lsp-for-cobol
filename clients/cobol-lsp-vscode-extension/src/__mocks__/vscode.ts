@@ -82,7 +82,7 @@ export namespace extensions {
 
 // eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace window {
-  export const showErrorMessage = jest.fn();
+  export const showErrorMessage = jest.fn().mockResolvedValue(undefined);
   export const showInformationMessage = jest.fn();
   export const createStatusBarItem = () => {
     return { show: () => {} };

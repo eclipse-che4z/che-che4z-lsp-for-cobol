@@ -91,8 +91,8 @@ describe("Tests Copybook download from USS", () => {
       downloader.isEligibleForDownload = jest.fn().mockReturnValue(false);
       const isDowloaded = await downloader.downloadCopybook(
         { name: "copybook-name", dialect: "COBOL" },
-        "document-uri",
         "/uss/path",
+        "profile",
       );
       expect(isDowloaded).toBeFalsy();
     });
@@ -101,8 +101,8 @@ describe("Tests Copybook download from USS", () => {
       downloader.isEligibleForDownload = jest.fn().mockReturnValue(true);
       const isDowloaded = await downloader.downloadCopybook(
         { name: "copybook-name", dialect: "COBOL" },
-        "document-uri",
         "/uss/path",
+        "profile",
       );
       expect(isDowloaded).toBeFalsy();
     });
@@ -128,8 +128,8 @@ describe("Tests Copybook download from USS", () => {
         downloader.clearMemberListCache();
         const isDowloaded = await downloader.downloadCopybook(
           { name: "uss_copybook", dialect: "COBOL" },
-          "document-uri",
           "/uss/path",
+          "profile",
         );
         expect(allUSSFilemembers).toHaveBeenCalledWith("/uss/path");
         expect(getUSSContentsMock).toHaveBeenCalledWith(
@@ -146,8 +146,8 @@ describe("Tests Copybook download from USS", () => {
       it("checks cache is used if download is trigged again for same profile and uss path", async () => {
         const isDowloaded = await downloader.downloadCopybook(
           { name: "uss_copybook", dialect: "COBOL" },
-          "document-uri",
           "/uss/path",
+          "profile",
         );
         // cache resolves the members
         expect(allUSSFilemembers).not.toHaveBeenCalled();
