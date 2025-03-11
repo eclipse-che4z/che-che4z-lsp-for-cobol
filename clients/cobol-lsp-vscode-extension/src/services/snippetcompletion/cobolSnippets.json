@@ -252,7 +252,7 @@
   "COMP": {
     "prefix": "COMP",
     "body": ["77 ${1:VAR-BIN} PIC S9(4) ${2|COMP,COMPUTATIONAL|}."],
-    "description": "BINARY data and synonyms COMP and COMP-4 are the two's complement data representation in COBOL. Two's complement Hex data (EBCDIC) representation of numeric values in fields within the DATA DIVISION."
+    "description": "BINARY, and its synonyms COMP and COMP-4, are used next to numeric fields in the DATA DIVISION to specify that the data is represented in two's complement hex (EBCDIC) format."
   },
   "COMP-1": {
     "prefix": "COMP-1",
