@@ -151,18 +151,16 @@ describe("Tests Copybook download from DNS", () => {
         });
         expect(isDowloaded).toBeTruthy();
       });
-      it("checks hasMember adds fetched list to cache when cache doesn't have the member", async () => {
+      it("checks hasMember adds fetched list to cache when cache doesn't have the member and hasMember uses cache when have member is cached", async () => {
         await downloader.hasMember("profile", "dataset", "copybook");
         expect(allMemberMock).toHaveBeenCalledTimes(1);
-      });
-      it("checks hasMember uses cache when have member is cached", async () => {
         const res = await downloader.hasMember(
           "profile",
           "dataset",
           "copybook",
         );
-        expect(allMemberMock).toHaveBeenCalledTimes(0);
-        expect(res).toBeTruthy();
+        expect(allMemberMock).toHaveBeenCalledTimes(1);
+        expect(res).toStrictEqual("copybook");
       });
     });
   });

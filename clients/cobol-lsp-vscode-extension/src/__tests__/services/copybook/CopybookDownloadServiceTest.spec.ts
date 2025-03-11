@@ -940,9 +940,9 @@ describe("Tests copybook download service", () => {
       "loadProcessorGroupCopybookPathsConfig",
     );
     spyConfig.mockResolvedValue([
-      "/libs",
-      { dataset: "procGroupDataset", profile: "procGroupProfile" },
       { ussFile: "ussFile", profile: "profile" },
+      { dataset: "procGroupDataset", profile: "procGroupProfile" },
+      "/libs",
     ]);
 
     const downloader = new CopybookDownloadService(
@@ -952,7 +952,7 @@ describe("Tests copybook download service", () => {
     );
     downloader["dsnDownloader"]!.downloadCopybook = jest
       .fn()
-      .mockReturnValue(false);
+      .mockReturnValue(true);
     downloader["ussDownloader"]!.downloadCopybook = jest
       .fn()
       .mockReturnValue(true);

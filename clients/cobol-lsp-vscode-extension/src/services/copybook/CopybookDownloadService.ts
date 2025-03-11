@@ -81,12 +81,15 @@ export class CopybookDownloadService {
     ) {
       return true;
     }
-
-    const res = await this.downloadCopybooksinProcessorGroups(
-      copybookName,
-      documentUri,
-    );
-    if (res) return true;
+    try {
+      const res = await this.downloadCopybooksinProcessorGroups(
+        copybookName,
+        documentUri,
+      );
+      if (res) return res;
+    } catch (_error) {
+      return false;
+    }
 
     if (this.dsnDownloader) {
       const dsnSuccess = await this.downloadFromPaths(
@@ -429,16 +432,16 @@ export class CopybookDownloadService {
       );
 
       if (procGroupZoweProfiles && procGroupZoweProfiles.size > 0) {
-        const promises: Promise<boolean>[] = [];
+        const checks: boolean[] = [];
         for (const profile of procGroupZoweProfiles) {
           if (!availableProfiles.includes(profile)) {
-            promises.push(Promise.resolve(true));
+            checks.push(true);
             const msg = `${PROVIDE_PROFILE_MSG_PROC_GRUOPS} Provided invalid profile name: ${profile}`;
             vscode.window.showErrorMessage(msg);
           } else {
-            promises.push(DownloadUtil.isProfileLocked(profile));
-            promises.push(
-              DownloadUtil.checkForInvalidCredProfile(
+            checks.push(await DownloadUtil.isProfileLocked(profile));
+            checks.push(
+              await DownloadUtil.checkForInvalidCredProfile(
                 profile,
                 this.explorerApi,
                 documentUri,
@@ -447,7 +450,6 @@ export class CopybookDownloadService {
             );
           }
         }
-        const checks = await Promise.all(promises);
         return checks.every((v) => v === false);
       }
       if (!profile || !availableProfiles.includes(profile)) {
