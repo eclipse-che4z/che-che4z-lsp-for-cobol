@@ -47,6 +47,7 @@ public class CompilerDirectivesStage implements Stage<AnalysisContext, List<Node
   private static final Pattern NEW_LINE_PATTERN = Pattern.compile("\n\r?");
   private static final Pattern DIALECT_FILLER_PATTERN = Pattern.compile(String.format("^[%s%s]*$", "\\s", CobolDialect.FILLER));
   private static final Pattern SECTION_PATTERN = Pattern.compile("(?i)\\s*DATA\\s+DIVISION.*|\\s*WORKING-STORAGE.*|\\s*PROCEDURE\\s+DIVISION.*");
+  private static final Pattern JAVA_SHAREABLE_ON_PATTERN = Pattern.compile("(?i)\\s*>>\\s?JAVA-SHAREABLE\\s+ON\\s*");
   private final MessageService messageService;
 
   public CompilerDirectivesStage(MessageService messageService) {
@@ -59,9 +60,13 @@ public class CompilerDirectivesStage implements Stage<AnalysisContext, List<Node
     List<Node> nodes = new ArrayList<>();
     String[] lines = NEW_LINE_PATTERN.split(text);
     String section = "";
+    boolean isJavaShareableOn = false;
     for (int i = 0; i < lines.length; i++) {
       Matcher directivesLine = COMPILER_DIRECTIVE_LINE.matcher(lines[i]);
       Matcher sectionLine = SECTION_PATTERN.matcher(lines[i]);
+      if (!isJavaShareableOn && JAVA_SHAREABLE_ON_PATTERN.matcher(lines[i]).matches()) {
+       isJavaShareableOn = true;
+      }
       if (sectionLine.find()) {
         section = sectionLine.group().trim();
       }
@@ -73,12 +78,12 @@ public class CompilerDirectivesStage implements Stage<AnalysisContext, List<Node
       String compilerOptions = directivesLine.group("compilerOptions");
       if (compilerOptions != null) {
         process(compilerOptions, ctx, new Position(i, directivesLine.start("compilerOptions")),
-                "compilerOptions", "");
+                "compilerOptions", "", false);
       }
       String compilerDirectives = directivesLine.group("compilerDirectives");
       if (compilerDirectives != null) {
         nodes.addAll(process(compilerDirectives, ctx, new Position(i, directivesLine.start("compilerDirectives")),
-                "compilerDirectives", section));
+                "compilerDirectives", section, isJavaShareableOn));
       }
 
       String newText = new String(new char[lines[i].length()]).replace('\0', ' ');
@@ -91,7 +96,8 @@ public class CompilerDirectivesStage implements Stage<AnalysisContext, List<Node
     return new StageResult<>(nodes);
   }
 
-  private List<Node> process(String directiveText, AnalysisContext ctx, Position startPosition, String parserRule, String section) {
+  private List<Node> process(String directiveText, AnalysisContext ctx, Position startPosition, String parserRule, String section,
+                             boolean isJavaShareableOn) {
     if (!DIALECT_FILLER_PATTERN.matcher(directiveText).matches()) {
       CompilerDirectivesLexer lexer = new CompilerDirectivesLexer(CharStreams.fromString(directiveText));
       lexer.removeErrorListeners();
@@ -101,7 +107,7 @@ public class CompilerDirectivesStage implements Stage<AnalysisContext, List<Node
       parser.setErrorHandler(new CompilerDirectivesErrorStrategy(messageService));
       parser.addErrorListener(new CompilerDirectivesErrorListener(ctx, startPosition));
 
-      CompilerDirectivesVisitor visitor = new CompilerDirectivesVisitor(ctx, messageService, startPosition, section);
+      CompilerDirectivesVisitor visitor = new CompilerDirectivesVisitor(ctx, messageService, startPosition, section, isJavaShareableOn);
 
       if (parserRule.equals("compilerOptions")) {
         visitor.visitCompilerOptions(parser.compilerOptions());

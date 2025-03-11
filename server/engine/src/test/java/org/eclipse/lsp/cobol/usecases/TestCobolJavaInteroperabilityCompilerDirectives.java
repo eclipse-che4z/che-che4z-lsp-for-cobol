@@ -62,7 +62,7 @@ class TestCobolJavaInteroperabilityCompilerDirectives {
                   + "           DISPLAY {$TESTW}.\n"
                   + "           GOBACK.\n";
 
-  private static final String TEXT_ERROR_TOO_MANY_SPACES =
+  private static final String TEXT_TOO_MANY_SPACES_ERROR =
           "       IDENTIFICATION DIVISION.\n"
                   + "       PROGRAM-ID. TEST1.\n"
                   + "       DATA DIVISION.\n"
@@ -79,7 +79,7 @@ class TestCobolJavaInteroperabilityCompilerDirectives {
                   + "           DISPLAY {$TESTW}.\n"
                   + "           GOBACK.\n";
 
-  private static final String TEXT_ERROR_TEXT_AFTER_DIRECTIVE =
+  private static final String TEXT_TEXT_AFTER_DIRECTIVE_ERROR =
           "       IDENTIFICATION DIVISION.\n"
                   + "       PROGRAM-ID. TEST1.\n"
                   + "       DATA DIVISION.\n"
@@ -96,7 +96,7 @@ class TestCobolJavaInteroperabilityCompilerDirectives {
                   + "           DISPLAY {$TESTW}.\n"
                   + "           GOBACK.\n";
 
-  private static final String TEXT_ERROR_WRONG_SECTION =
+  private static final String TEXT_WRONG_SECTION_ERROR =
           "       IDENTIFICATION DIVISION.\n"
                   + "       PROGRAM-ID. TEST1.\n"
                   + "       DATA DIVISION.\n"
@@ -108,13 +108,14 @@ class TestCobolJavaInteroperabilityCompilerDirectives {
                   + "       >>{_JAVA-SHAREABLE OFF|error3_}\n"
                   + "           GOBACK.\n";
 
-  private static final String TEXT_ERROR1 =
+  private static final String TEXT_SHAREABLE_OFF_ERROR =
           "       IDENTIFICATION DIVISION.\n"
                   + "       PROGRAM-ID. TEST1.\n"
                   + "       DATA DIVISION.\n"
                   + "       WORKING-STORAGE SECTION.\n"
+                  + "       >>{_JAVA-SHAREABLE OFF|error1_}\n"
+                  + "       01 {$*N1} PIC S9(9) COMP-5.\n"
                   + "       PROCEDURE DIVISION.\n"
-                  + "       >>{_JAVA-SHAREABLE ON|error1_}\n"
                   + "           GOBACK.\n";
   @Test
   void testValid1() {
@@ -129,7 +130,7 @@ class TestCobolJavaInteroperabilityCompilerDirectives {
   @Test
   void testTooManySpacesError() {
     UseCaseEngine.runTest(
-            TEXT_ERROR_TOO_MANY_SPACES,
+            TEXT_TOO_MANY_SPACES_ERROR,
             ImmutableList.of(),
             ImmutableMap.of(
                     "error1",
@@ -157,7 +158,7 @@ class TestCobolJavaInteroperabilityCompilerDirectives {
   @Test
   void testTextAfterDirectiveError() {
     UseCaseEngine.runTest(
-            TEXT_ERROR_TEXT_AFTER_DIRECTIVE,
+            TEXT_TEXT_AFTER_DIRECTIVE_ERROR,
             ImmutableList.of(),
             ImmutableMap.of(
                     "error1",
@@ -184,7 +185,7 @@ class TestCobolJavaInteroperabilityCompilerDirectives {
   @Test
   void testWrongPositionError() {
     UseCaseEngine.runTest(
-            TEXT_ERROR_WRONG_SECTION,
+            TEXT_WRONG_SECTION_ERROR,
             ImmutableList.of(),
             ImmutableMap.of(
                     "error1",
@@ -207,25 +208,19 @@ class TestCobolJavaInteroperabilityCompilerDirectives {
                             ErrorSource.PARSING.getText())),
             ImmutableList.of());
   }
-//
-//  @Test
-//  void testError1() {
-//    UseCaseEngine.runTest(
-//            TEXT_ERROR1,
-//            ImmutableList.of(),
-//            ImmutableMap.of(
-//                    "error1",
-//                    new Diagnostic(
-//                            new Range(new Position(6, 21), new Position(6, 21)),
-//                            "This compiler directive statement is allowed only in WORKING-STORAGE SECTION",
-//                            DiagnosticSeverity.Error,
-//                            ErrorSource.PARSING.getText()),
-//                    "error2",
-//                    new Diagnostic(
-//                            new Range(),
-//                            "Unexpected end of file .",
-//                            DiagnosticSeverity.Error,
-//                            ErrorSource.PARSING.getText())),
-//            ImmutableList.of());
-//  }
+
+  @Test
+  void testShareableOffError() {
+    UseCaseEngine.runTest(
+            TEXT_SHAREABLE_OFF_ERROR,
+            ImmutableList.of(),
+            ImmutableMap.of(
+                    "error1",
+                    new Diagnostic(
+                            new Range(),
+                            "The JAVA-SHAREABLE OFF directive was found but JAVA-SHAREABLE was already in the OFF state.",
+                            DiagnosticSeverity.Error,
+                            ErrorSource.PARSING.getText())),
+            ImmutableList.of());
+  }
 }
