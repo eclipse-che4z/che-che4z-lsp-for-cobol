@@ -28,7 +28,7 @@ import {
 } from "../../constants";
 import { ProfileUtils } from "../util/ProfileUtils";
 import { DownloadUtil } from "./downloader/DownloadUtil";
-import { E4E } from "../../type/e4eApi";
+import { E4E, EndevorElement } from "../../type/e4eApi";
 import { CopybookDownloaderForE4E } from "./downloader/CopybookDownloaderForE4E";
 import { CopybookDownloaderForUss } from "./downloader/CopybookDownloaderForUss";
 import { CopybookDownloaderForDsn } from "./downloader/CopybookDownloaderForDsn";
@@ -40,10 +40,7 @@ import path = require("path");
 import { getErrorMessage } from "../util/ErrorsUtils";
 import { DialectRegistry } from "../DialectRegistry";
 import { getChannel } from "../../extension";
-import {
-  loadProcessorGroupCopybookPathsConfig,
-  prepareProcessorGroupConfigPathsForEndevor,
-} from "../ProcessorGroups";
+import { loadProcessorGroupCopybookPathsConfig } from "../ProcessorGroups";
 import {
   EndevorConfigModel,
   ZoweDatasetConfigModel,
@@ -534,17 +531,24 @@ export class CopybookDownloadService {
         );
         if (ussSuccess) return true;
       } else if (ENVIRONMENT in config && this.e4eDownloader) {
-        const endevorLocation =
-          await prepareProcessorGroupConfigPathsForEndevor(
-            config,
-            this.e4eDownloader,
-            copybookName,
-          );
+        const resolvedProfile = await this.e4eDownloader.getProfileInfo(
+          config.profile,
+        );
+        const element: EndevorElement = {
+          use_map: config.use_map ? config.use_map : true,
+          environment: config.environment,
+          stage: config.stage,
+          system: config.system,
+          subsystem: config.subsystem,
+          type: config.type,
+          element: copybookName.name,
+          fingerprint: "",
+        };
         if (
-          endevorLocation &&
+          resolvedProfile &&
           (await this.e4eDownloader?.downloadElementE4E(
-            endevorLocation.profile,
-            endevorLocation.element,
+            resolvedProfile,
+            element,
           ))
         )
           return true;

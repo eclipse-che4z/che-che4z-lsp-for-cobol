@@ -38,10 +38,6 @@ import {
   ZoweDatasetConfigModel,
   ZoweUssConfigModel,
 } from "./ProcessorGroupsLoader";
-import { EndevorElement, ResolvedProfile } from "../type/e4eApi";
-import { CopybookDownloaderForE4E } from "./copybook/downloader/CopybookDownloaderForE4E";
-
-import { CopybookName } from "./copybook/CopybookDownloadService";
 import { USSFILE } from "../constants";
 
 export async function loadProcessorGroupCopybookPaths(
@@ -325,27 +321,4 @@ async function loadProcessorGroupSettings<T extends string | string[]>(
     console.error(JSON.stringify(e));
     return configObject;
   }
-}
-
-export async function prepareProcessorGroupConfigPathsForEndevor(
-  config: EndevorConfigModel,
-  e4eDownloader: CopybookDownloaderForE4E,
-  copybook: CopybookName,
-): Promise<{ element: EndevorElement; profile: ResolvedProfile } | undefined> {
-  const resolvedProfile = await e4eDownloader.getProfileInfo(config.profile);
-
-  if (!resolvedProfile) return;
-
-  const element: EndevorElement = {
-    use_map: config.use_map ? config.use_map : true,
-    environment: config.environment,
-    stage: config.stage,
-    system: config.system,
-    subsystem: config.subsystem,
-    type: config.type,
-    element: copybook.name,
-    fingerprint: "",
-  };
-
-  return { element: element, profile: resolvedProfile };
 }
