@@ -72,7 +72,7 @@ export class CopybooksCompletionProvider implements CompletionItemProvider {
         isCopyStatement: isDefaultCopyStatement,
       },
       {
-        name: "SQL",
+        name: DEFAULT_DIALECT,
         isCopyStatement: isSQLCopyStatement,
       },
       ...DialectRegistry.getActiveDialects().map((di) => ({
