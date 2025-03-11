@@ -635,7 +635,7 @@
   "EXCEPTION #1": {
     "prefix": "EXCEPTION",
     "body": ["CALL \"${2:SUBPROG}\" ON EXCEPTION ${1:impStatement}"],
-    "description": "description"
+    "description": "CALL x ON EXCEPTION y"
   },
   "EXCEPTION #2": {
     "prefix": "EXCEPTION",
