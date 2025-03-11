@@ -453,7 +453,7 @@
   "DECIMAL-POINT": {
     "prefix": "DECIMAL-POINT",
     "body": ["DECIMAL-POINT IS COMMA."],
-    "description": "Part of the SPECIAL-NAMES paragraph, the `DECIMAL-POINT IS COMMA` clause exchanges the functions of the period and the comma in PIC character-strings and in numeric literals. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+    "description": "Part of the SPECIAL-NAMES paragraph, the DECIMAL-POINT IS COMMA clause exchanges the functions of the period and the comma in PIC character-strings and in numeric literals. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
   },
   "DECLARATIVES 1": {
     "prefix": "DECLARATIVES",
@@ -550,7 +550,7 @@
   "DUPLICATES #2": {
     "prefix": "DUPLICATES",
     "body": ["SORT FILENAME ON ${1|ASCENDING,DESCENDING|} ${2:KEY-FLD}", "WITH DUPLICATES${3|., IN ORDER.|}"],
-    "description": "`IN ORDER` forces the z/OS SORT utility to retain the original order of the input file, if duplicate key-field values are found. Note that `IN ORDER` is an optional clause of `WITH DUPLICATES`. https://www.ibm.com/docs/en/cobol-zos/6.4?topic=merge-preserving-original-sequence-records-equal-keys"
+    "description": "IN ORDER forces the z/OS SORT utility to retain the original order of the input file, if duplicate key-field values are found. Note that IN ORDER is an optional clause of WITH DUPLICATES. https://www.ibm.com/docs/en/cobol-zos/6.4?topic=merge-preserving-original-sequence-records-equal-keys"
   },
   "DYNAMIC": {
     "prefix": "DYNAMIC",
@@ -565,7 +565,7 @@
   "IF-ELSE": {
     "prefix": "ELSE",
     "body": ["IF ${1:XisTrue}", "\t${2:codeHere}", "ELSE", "\t${3:codeHere}", "END-IF.", "$0"],
-    "description": "`IF ... ELSE` codes a choice between two COBOL processing actions. https://www.ibm.com/docs/en/cobol-zos/6.4?topic=actions-coding-choice"
+    "description": "IF ... ELSE codes a choice between two COBOL processing actions. https://www.ibm.com/docs/en/cobol-zos/6.4?topic=actions-coding-choice"
   },
   "END": {
     "prefix": "END",
@@ -610,12 +610,12 @@
   "ERROR #1": {
     "prefix": "ERROR",
     "body": ["DIVIDE ${2:NUMVAR-1} INTO ${3:NUMVAR-2}", "GIVING ${4:NUMVAR-3}", "ON SIZE ERROR ${1:imperative_statement}", "END-DIVIDE."],
-    "description": "NUMVAR-1 is divided into NUMVAR-2. If `NUMVAR-1 = 0` or if the quotient is larger than NUMVAR-3 the `ON SIZE ERROR` statement is executed. If `ON SIZE ERROR` isn't coded the program ABENDS. https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdf"
+    "description": "NUMVAR-1 is divided into NUMVAR-2. If NUMVAR-1 = 0 or if the quotient is larger than NUMVAR-3 the ON SIZE ERROR statement is executed. If ON SIZE ERROR isn't coded the program ABENDS. https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdf"
   },
   "ERROR #2": {
     "prefix": "ERROR",
     "body": ["MOVE CORRESPONDING ${2:GROUP-FIELDS-1} TO ${3:GROUP-FIELDS-2}", "ON SIZE ERROR ${1:imperative_statement}"],
-    "description": "Tthe like-named variables in the COBOL group field GROUP-FIELDS-1 are moved to GROUP-FIELDS-2. If there are any variables in GROUP-FIELDS-1 that are larger than the same named variable in GROUP-FIELDS-2 the `ON SIZE ERROR` statement is executed. If `ON SIZE ERROR` isn't coded the program ABENDS. https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdf"
+    "description": "Tthe like-named variables in the COBOL group field GROUP-FIELDS-1 are moved to GROUP-FIELDS-2. If there are any variables in GROUP-FIELDS-1 that are larger than the same named variable in GROUP-FIELDS-2 the ON SIZE ERROR statement is executed. If ON SIZE ERROR isn't coded the program ABENDS. https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdf"
   },
   "ERROR #3": {
     "prefix": "ERROR",
@@ -723,17 +723,17 @@
   "FILE STATUS": {
     "prefix": "FILE STATUS",
     "body": ["ENVIRONMENT DIVISION.", "SELECT ${2:rptfile}", "\tASSIGN TO ${1:PATVSAM}", "\tORGANIZATION IS ${3|INDEXED,RELATIVE,SEQUENTIAL,LINE-SEQUENTIAL|}", "\tACCESS MODE IS ${4|SEQUENTIAL,RANDOM,DYNAMIC|}", "\tRECORD KEY IS ${5:PATIENT-REC-KEY}", "\tFILE STATUS IS ${1:PATVSAM}-FS."],
-    "description": "`FILE STATUS` defines a two-byte (PIC XX) field that recieves a code from z/OS based on the disposition of the I/O operation. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+    "description": "FILE STATUS defines a two-byte (PIC XX) field that recieves a code from z/OS based on the disposition of the I/O operation. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
   },
   "MULTIPLE FILE TAPE": {
     "prefix": "MULTIPLE FILE TAPE",
     "body": ["DATA DIVISION.", "FD ${1:QSAM-FILE}", "\tLABEL RECORDS ARE STANDARD", "\tMULTIPLE FILE TAPE.", "\t${3:RPT-OUT-REC} PIC X(${4:132})."],
-    "description": "The `MULTIPLE FILE TAPE` clause specifies that 2 or mote data files share the same physical VOL=SER of tape. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+    "description": "The MULTIPLE FILE TAPE clause specifies that 2 or mote data files share the same physical VOL=SER of tape. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
   },
   "FILE CONTROL": {
     "prefix": "FILE CONTROL",
     "body": ["ENVIRONMENT DIVISION.", "INPUT-OUTPUT SECTION.", "FILE-CONTROL.", "\tSELECT ${1:FILE-1} ASSIGN TO ${2:EXTFILE1}", "\tORGANIZATION IS ${3|INDEXED,RELATIVE,SEQUENTIAL,LINE-SEQUENTIAL|}", "\tACCESS MODE IS ${4|SEQUENTIAL,RANDOM,DYNAMIC|}", "\tFILE STATUS IS ${5:WS-FILE-STATUS-VAR}."],
-    "description": "The `FILE-CONTROL` paragraph associates every file in your COBOL program with an external data set. It optionally defines file organization, access mode, etc. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+    "description": "The FILE-CONTROL paragraph associates every file in your COBOL program with an external data set. It optionally defines file organization, access mode, etc. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
   },
   "FILLER": {
     "prefix": "FILLER",
@@ -753,7 +753,7 @@
   "FOOTING": {
     "prefix": "FOOTING",
     "body": ["WITH FOOTING AT ${1:literal}"],
-    "description": "Part of an FD's \"LINAGE\" (logical page size) clause - available for QSAM and LINE-SEQUENTIAL files only). `WITH FOOTING` specifies a line # in an output file or printer. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+    "description": "Part of an FD's \"LINAGE\" (logical page size) clause - available for QSAM and LINE-SEQUENTIAL files only). WITH FOOTING specifies a line # in an output file or printer. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
   },
   "FOR": {
     "prefix": "FOR",
@@ -783,12 +783,12 @@
   "FROM #1": {
     "prefix": "FROM",
     "body": ["PERFORM ${1:B-100PARAGRAPH} VARYING ${2:IDX-1} FROM 1 BY 1 UNTIL ${2:IDX-1} > TABLE-MAX-ROWS"],
-    "description": "The \"FROM\" in a `PERFORM VARYING` clause sets the initial value and the incremental/iterative value(s) for a table subscript or index. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+    "description": "The \"FROM\" in a PERFORM VARYING clause sets the initial value and the incremental/iterative value(s) for a table subscript or index. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
   },
   "FROM #2": {
     "prefix": "FROM",
     "body": ["${1|WRITE,REWRITE,RELEASE|} ${2:OUTPUT-REC} FROM ${3:WS-OUTPUT-REC}."],
-    "description": "The FROM phrase is equivalent to: `MOVE REC-1 to OUTPUT-REC WRITE OUTPUT-REC.` https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+    "description": "The FROM phrase is equivalent to: MOVE REC-1 to OUTPUT-REC WRITE OUTPUT-REC. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
   },
   "FROM #3": {
     "prefix": "FROM",
@@ -1151,7 +1151,7 @@
   "FUNCTION-POINTER": {
     "prefix": "FUNCTION-POINTER",
     "body": ["77 ${1:DATA-FUNCTION-PTR} USAGE FUNCTION-POINTER."],
-    "description": "A `FUNCTION-POINTER` is a 4-byte elementary item which can contain the address of a procedure (typically a program) entry point. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+    "description": "A FUNCTION-POINTER is a 4-byte elementary item which can contain the address of a procedure (typically a program) entry point. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
   },
   "GENERATE": {
     "prefix": "GENERATE",
