@@ -88,7 +88,7 @@ export const ENDEVOR_PROCESSOR = "ENDEVOR_PROCESSOR";
 export const E4E_INCOMPATIBLE = "E4E interface is not compatible";
 export const USSFILE = "ussFile";
 export const PROVIDE_PROFILE_MSG_PROC_GRUOPS =
-  "Please specify a valid Zowe Explorer profile in processor groups to download copybooks from the mainframe.";
+  "Please specify a valid Zowe Explorer profile in proc_grps.json to download copybooks from the mainframe.";
 export const FAILED_REQUESTS_LIMIT = 3;
 
 export enum PUNCH_CARD {
