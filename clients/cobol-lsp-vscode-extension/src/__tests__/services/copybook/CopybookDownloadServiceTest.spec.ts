@@ -315,7 +315,7 @@ describe("Tests copybook download service", () => {
         ]),
       ).toBe(undefined);
       expect(vscode.window.showErrorMessage).toHaveBeenCalledWith(
-        "Please specify a valid Zowe Explorer profile in processor groups to download copybooks from the mainframe. Provided invalid profile name: invalidProfile",
+        "Please specify a valid Zowe Explorer profile in proc_grps.json to download copybooks from the mainframe. Provided invalid profile name: invalidProfile",
       );
       mocked.mockResolvedValue([]);
     });
