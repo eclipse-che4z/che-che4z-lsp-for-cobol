@@ -304,5 +304,5 @@ dataSetName
    : word | FILENAME (DOT word)*
    ;
 
-compilerDirectives: CALLINTERFACE | DEFINE | cobolJavaInteroperabilityCompilerDirectives;
-cobolJavaInteroperabilityCompilerDirectives: JAVA_CALLABLE | JAVA_SHAREABLE_ON | JAVA_SHAREABLE_OFF;
+compilerDirectives: CALLINTERFACE | DEFINE | cobolJavaInteroperability;
+cobolJavaInteroperability: JAVA_CALLABLE | JAVA_SHAREABLE_ON | JAVA_SHAREABLE_OFF;
