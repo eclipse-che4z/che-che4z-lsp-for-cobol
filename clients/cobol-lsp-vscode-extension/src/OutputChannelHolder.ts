@@ -14,13 +14,22 @@
 import * as vscode from "vscode";
 
 export class OutputChannelHolder {
-  private static outputChannel?: vscode.OutputChannel;
+  private static mainChannel?: vscode.OutputChannel;
+  private static analysisChannel?: vscode.LogOutputChannel;
 
-  public static init(outputChannel: vscode.OutputChannel) {
-    OutputChannelHolder.outputChannel = outputChannel;
+  public static init(
+    mainChannel: vscode.OutputChannel,
+    analysisChannel: vscode.LogOutputChannel,
+  ) {
+    OutputChannelHolder.mainChannel = mainChannel;
+    OutputChannelHolder.analysisChannel = analysisChannel;
   }
 
-  public static getOutputChannel(): vscode.OutputChannel | undefined {
-    return OutputChannelHolder.outputChannel;
+  public static getMainChannel(): vscode.OutputChannel | undefined {
+    return OutputChannelHolder.mainChannel;
+  }
+
+  public static getAnalysisChannel(): vscode.LogOutputChannel | undefined {
+    return OutputChannelHolder.analysisChannel;
   }
 }

@@ -2,7 +2,6 @@ import { Program } from "../model/cfast";
 import fs from "fs";
 import path from "path";
 import { ControlFlowGraphBuilder } from "../graphbuilder";
-import { Logger } from "../vm/logger";
 import { Graph } from "../model/Graph";
 import { Node } from "../model/Node";
 import vscode from "../__mocks__/vscode";
@@ -60,14 +59,6 @@ describe("Control Flow Graph builder case tests", () => {
     .forEach((fname) => {
       it(`should work for ${fname}`, async () => {
         console.log(`\r\n\r\n\r\n******** Tesing ${fname}`);
-
-        Logger.initialize({
-          trace: console.trace,
-          debug: () => {}, // too slow
-          info: console.info,
-          warn: console.warn,
-          error: console.error,
-        });
 
         const cfastJson = fs.readFileSync(path.join(testsPath, fname));
         const forest: Program[] = JSON.parse(cfastJson.toString());

@@ -15,7 +15,7 @@ import { VirtualProcessorListener } from "./listener";
 import { ProgramListing } from "./listing";
 import { IbmOptimizer } from "./optimizer";
 import { VirtualMachine, VmContext } from "./vm";
-import { cfastNodeInfo, Logger } from "./logger";
+import { cfastNodeInfo, Channel } from "./logger";
 
 export class VirtualProcessor {
   private vms: VirtualMachine[] = [];
@@ -25,6 +25,7 @@ export class VirtualProcessor {
     private listener: VirtualProcessorListener,
     private optimizer: IbmOptimizer,
     private maxVmCount: number,
+    private logger?: Channel,
   ) {
     this.vms.push(new VirtualMachine(new VmContext(programListing, listener)));
   }
@@ -69,7 +70,7 @@ export class VirtualProcessor {
   }
 
   private step(vm: VirtualMachine): boolean {
-    Logger.debug(
+    this.logger?.debug(
       `${vm.getInfo()}: ${cfastNodeInfo(vm.currentInstruction()?.getInitialNode())}, CPU: ${vm.getCurrentProgramUnit()?.id}`,
     );
     vm.updateProgramUnit();
@@ -92,7 +93,7 @@ export class VirtualProcessor {
     if (index < 0) {
       return;
     }
-    Logger.debug(`Remove vm ${vm.getId()}`);
+    this.logger?.debug(`Remove vm ${vm.getId()}`);
     this.vms.splice(index, 1);
   }
 }

@@ -15,8 +15,6 @@
 import * as vscode from "vscode";
 import { __ExtensionApi } from "@code4z/cobol-dialect-api";
 import { isV1RuntimeDialectDetail } from "./dialect/utils";
-import { Logger } from "@code4z/analysis/lib/vm/logger";
-
 import { fetchCopybookCommand } from "./commands/FetchCopybookCommand";
 import { gotoCopybookSettings } from "./commands/OpenSettingsCommand";
 import {
@@ -79,7 +77,7 @@ async function initialize(context: vscode.ExtensionContext) {
     "COBOL Language Support Control Flow",
     { log: true },
   );
-  OutputChannelHolder.init(outputChannel);
+  OutputChannelHolder.init(outputChannel, controlFlowChannel);
 
   try {
     await vscode.workspace.fs.createDirectory(context.globalStorageUri);
@@ -429,14 +427,6 @@ function registerCommands(
       },
     ),
   );
-
-  Logger.initialize({
-    trace: (message: string) => controlFlowChannel.trace(message),
-    debug: (message: string) => controlFlowChannel.debug(message),
-    info: (message: string) => controlFlowChannel.info(message),
-    warn: (message: string) => controlFlowChannel.warn(message),
-    error: (message: string) => controlFlowChannel.error(message),
-  });
 }
 
 function registerCodeActions(context: vscode.ExtensionContext) {

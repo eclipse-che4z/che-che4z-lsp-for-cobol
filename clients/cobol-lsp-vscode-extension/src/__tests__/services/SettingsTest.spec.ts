@@ -486,6 +486,7 @@ describe("SettingService lspConfigHandler", () => {
     test("returns empty setting instead of wrong configuration", async () => {
       OutputChannelHolder.init(
         outputChannelMock as unknown as vscode.OutputChannel,
+        outputChannelMock as unknown as vscode.LogOutputChannel,
       );
 
       const result = await lspConfigHandler({

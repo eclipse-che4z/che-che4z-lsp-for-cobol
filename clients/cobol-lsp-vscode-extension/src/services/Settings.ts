@@ -106,7 +106,7 @@ async function handleProcessorGroupConfigurationRequest<Type, Output, R>(
       }
     } catch (err) {
       if (err instanceof DecodingError) {
-        OutputChannelHolder.getOutputChannel()?.appendLine(
+        OutputChannelHolder.getMainChannel()?.appendLine(
           `Invalid settings: ${item.section} - ${err.message}`,
         );
       }

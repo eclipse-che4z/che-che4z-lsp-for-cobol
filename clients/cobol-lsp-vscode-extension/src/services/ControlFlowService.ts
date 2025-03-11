@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-enum-comparison */
 /*
  * Copyright (c) 2025 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
@@ -19,11 +20,12 @@ import { Worker } from "worker_threads";
 import { join } from "path";
 import {
   DiagnosticDto,
+  DiagnosticSeverityDto,
   DiagnosticTagDto,
 } from "@code4z/analysis/lib/model/external";
 import { SettingsService } from "./Settings";
 import { OutputChannelHolder } from "../OutputChannelHolder";
-import { WorkerMessage } from "./worker/WorkerMessage";
+import { WorkerLoggerMessage, WorkerMessage } from "./worker/messages";
 
 /**
  * Control Flow Analysis callback
@@ -82,15 +84,41 @@ class AnalysisTask {
     public programs: Program[],
     private delegate: AnalysisServiceDelegate,
   ) {
-    this.worker.on("message", (data: EngineProcessingResult) => {
-      this.delegate.finishTask(
-        this.documentUri,
-        data.enters,
-        convertDiagnostics(data.diagnostics),
-      );
-    });
+    this.worker.on(
+      "message",
+      (data: EngineProcessingResult | WorkerLoggerMessage) => {
+        if (data instanceof EngineProcessingResult) {
+          this.delegate.finishTask(
+            this.documentUri,
+            data.enters,
+            convertDiagnostics(data.diagnostics),
+          );
+        }
+
+        if (data instanceof WorkerLoggerMessage) {
+          for (const message of data.items) {
+            if (
+              message.severity === vscode.DiagnosticSeverity.Error.valueOf()
+            ) {
+              OutputChannelHolder.getAnalysisChannel()?.error(message.message);
+            } else if (
+              message.severity === vscode.DiagnosticSeverity.Warning.valueOf()
+            ) {
+              OutputChannelHolder.getAnalysisChannel()?.warn(message.message);
+            } else if (
+              message.severity ===
+              vscode.DiagnosticSeverity.Information.valueOf()
+            ) {
+              OutputChannelHolder.getAnalysisChannel()?.info(message.message);
+            } else {
+              OutputChannelHolder.getAnalysisChannel()?.debug(message.message);
+            }
+          }
+        }
+      },
+    );
     this.worker.on("error", (code) => {
-      OutputChannelHolder.getOutputChannel()?.appendLine(
+      OutputChannelHolder.getMainChannel()?.appendLine(
         `Error starting Control Flow Analysis: ${code}`,
       );
     });
@@ -209,7 +237,33 @@ function convertDiagnostics(
 
       let severity: vscode.DiagnosticSeverity | undefined = undefined;
       if (diagnosticDTO.severity) {
-        severity = vscode.DiagnosticSeverity.Warning;
+        if (
+          diagnosticDTO.severity.valueOf() ===
+          DiagnosticSeverityDto.Error.valueOf()
+        ) {
+          severity = vscode.DiagnosticSeverity.Error;
+        }
+
+        if (
+          diagnosticDTO.severity.valueOf() ===
+          DiagnosticSeverityDto.Warning.valueOf()
+        ) {
+          severity = vscode.DiagnosticSeverity.Warning;
+        }
+
+        if (
+          diagnosticDTO.severity.valueOf() ===
+          DiagnosticSeverityDto.Information.valueOf()
+        ) {
+          severity = vscode.DiagnosticSeverity.Information;
+        }
+
+        if (
+          diagnosticDTO.severity.valueOf() ===
+          DiagnosticSeverityDto.Hint.valueOf()
+        ) {
+          severity = vscode.DiagnosticSeverity.Hint;
+        }
       }
       const diagnostic = new vscode.Diagnostic(
         range,

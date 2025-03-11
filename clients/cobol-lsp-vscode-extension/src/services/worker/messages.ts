@@ -20,3 +20,14 @@ export class WorkerMessage {
     public programs: Program[],
   ) {}
 }
+
+export class LoggerItem {
+  public constructor(
+    public severity: number,
+    public message: string,
+  ) {}
+}
+
+export class WorkerLoggerMessage {
+  public constructor(public items: LoggerItem[]) {}
+}

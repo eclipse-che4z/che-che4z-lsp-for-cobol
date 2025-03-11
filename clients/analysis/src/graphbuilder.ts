@@ -48,6 +48,7 @@ import {
   PositionDto,
   RangeDto,
 } from "./model/external";
+import { Channel } from "./vm/logger";
 
 export class EngineProcessingResult {
   enters: Graph[] = [];
@@ -106,6 +107,7 @@ export class ControlFlowGraphBuilder {
   public constructor(
     private maxVMCount: number,
     private deadCodeSeverity: DiagnosticSeverityDto | undefined,
+    private channel?: Channel,
   ) {}
 
   /**
@@ -129,6 +131,7 @@ export class ControlFlowGraphBuilder {
         listener,
         optimizer,
         this.maxVMCount,
+        this.channel
       );
       processor.run();
 

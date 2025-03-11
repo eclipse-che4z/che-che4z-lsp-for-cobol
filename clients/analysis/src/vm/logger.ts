@@ -22,59 +22,6 @@ export interface Channel {
 }
 
 /**
- * Provides logging to console functionality
- */
-export class Logger {
-  private static channel: Channel;
-
-  public constructor() {}
-
-  public static initialize(channel: Channel) {
-    Logger.channel = channel;
-  }
-
-  /**
-   * Log given message
-   * @param message to log
-   */
-  public static error(message: string) {
-    Logger.channel.error(message);
-  }
-
-  /**
-   * Log given message
-   * @param message to log
-   */
-  public static warn(message: string) {
-    Logger.channel.warn(message);
-  }
-
-  /**
-   * Log given message
-   * @param message to log
-   */
-  public static info(message: string) {
-    Logger.channel.info(message);
-  }
-
-  /**
-   * Log given message
-   * @param message to log
-   */
-  public static debug(message: string) {
-    Logger.channel.debug(message);
-  }
-
-  /**
-   * Log given message
-   * @param message to log
-   */
-  public static trace(message: string) {
-    Logger.channel.trace(message);
-  }
-}
-
-/**
  * Generates label for CFAST node
  * @param treeNode is a CFAST node
  * @returns generated label
