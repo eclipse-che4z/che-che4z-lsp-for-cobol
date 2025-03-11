@@ -54,6 +54,7 @@ import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.model.tree.StopNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.QualifiedReferenceNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableUsageNode;
+import org.eclipse.lsp.cobol.common.symbols.ProcedureId;
 import org.eclipse.lsp.cobol.common.utils.ThreadInterruptionUtil;
 import org.eclipse.lsp.cobol.core.visitor.VisitorHelper;
 import org.eclipse.lsp.cobol.implicitDialects.cics.nodes.ExecCicsHandleNode;
@@ -227,7 +228,7 @@ class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
 
         Node node =
                 new CodeBlockUsageNode(
-                        Locality.builder().range(location.getRange()).uri(location.getUri()).build(), name);
+                        Locality.builder().range(location.getRange()).uri(location.getUri()).build(), name, null);
         visitChildren(ctx).forEach(node::addChild);
         return ImmutableList.of(node);
     }

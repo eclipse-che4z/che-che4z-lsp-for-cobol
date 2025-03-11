@@ -158,20 +158,18 @@ class AnnotatedDocumentCleaning {
       mergeMaps(accumulator.getCopybookDefinitions(), copybookTestData.getCopybookDefinitions());
       mergeMaps(accumulator.getCopybookUsages(), copybookTestData.getCopybookUsages());
       mergeMaps(accumulator.getParagraphDefinitions(), copybookTestData.getParagraphDefinitions());
-      mergeMaps(accumulator.getParagraphUsages(), copybookTestData.getParagraphUsages());
       mergeMaps(accumulator.getSectionDefinitions(), copybookTestData.getSectionDefinitions());
-      mergeMaps(accumulator.getSectionUsages(), copybookTestData.getSectionUsages());
-      mergeMaps(
-          accumulator.getSubroutineDefinitions(), copybookTestData.getSubroutineDefinitions());
+      mergeMaps(accumulator.getSubroutineDefinitions(), copybookTestData.getSubroutineDefinitions());
       mergeMaps(accumulator.getSubroutineUsages(), copybookTestData.getSubroutineUsages());
       mergeMaps(accumulator.getVariableDefinitions(), copybookTestData.getVariableDefinitions());
       mergeMaps(accumulator.getVariableUsages(), copybookTestData.getVariableUsages());
       mergeMaps(accumulator.getDiagnostics(), copybookTestData.getDiagnostics());
+      mergeMaps(accumulator.getProcedureUsages(), copybookTestData.getProcedureUsages());
       return copybookTestData;
     };
   }
 
-  private <T> void mergeMaps(Map<String, List<T>> to, Map<String, List<T>> from) {
+  private <K, T> void mergeMaps(Map<K, List<T>> to, Map<K, List<T>> from) {
     from.forEach(
         (key, value) -> {
           if (to.containsKey(key)) {

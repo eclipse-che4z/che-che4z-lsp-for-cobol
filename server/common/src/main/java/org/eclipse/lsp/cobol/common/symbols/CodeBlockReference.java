@@ -26,8 +26,13 @@ import java.util.List;
  */
 @Getter
 public class CodeBlockReference {
-  List<Location> definitions = new ArrayList<>();
-  List<Location> usage = new ArrayList<>();
+  private final ProcedureId procedureId;
+  private final List<Location> definitions = new ArrayList<>();
+  private final List<Location> usage = new ArrayList<>();
+
+  public CodeBlockReference(String sectionName, String paragraphName) {
+    this.procedureId = new ProcedureId(sectionName, paragraphName);
+  }
 
   /**
    * Add a location of code block usage

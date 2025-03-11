@@ -18,8 +18,11 @@ import lombok.AllArgsConstructor;
 import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.Processor;
 import org.eclipse.lsp.cobol.common.symbols.CodeBlockReference;
+import org.eclipse.lsp.cobol.common.symbols.SymbolTable;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulator;
 import org.eclipse.lsp.cobol.common.model.tree.SectionNameNode;
+
+import java.util.List;
 
 /**
  * Enrich section name node with necessary data
@@ -29,8 +32,21 @@ public class SectionNameNodeEnricher implements Processor<SectionNameNode> {
   private final SymbolAccumulator symbolAccumulator;
 
   @Override
-  public void accept(SectionNameNode sectionNameNode, ProcessingContext processingContext) {
-    sectionNameNode.setDefinitions(symbolAccumulator.getSectionLocations(sectionNameNode, CodeBlockReference::getDefinitions));
-    sectionNameNode.setUsages(symbolAccumulator.getSectionLocations(sectionNameNode, CodeBlockReference::getUsage));
+  public void accept(SectionNameNode sectionNameNode, ProcessingContext ctx) {
+    if (ctx.getCurrentProgramNode() == null) {
+      return;
+    }
+    SymbolTable symTable = symbolAccumulator.getSymbolTable(ctx.getCurrentProgramNode());
+    if (symTable == null) {
+      return;
+    }
+    List<CodeBlockReference> sections = symTable.resolveProcedures(sectionNameNode.getName(), null);
+    if (sections.isEmpty()) {
+      return;
+    }
+    sections.forEach(s -> {
+      sectionNameNode.getDefinitions().addAll(s.getDefinitions());
+      sectionNameNode.getUsages().addAll(s.getUsage());
+    });
   }
 }

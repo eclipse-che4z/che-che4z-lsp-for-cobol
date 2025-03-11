@@ -14,7 +14,6 @@
  */
 package org.eclipse.lsp.cobol.core.engine.symbols;
 
-import com.google.common.collect.ImmutableList;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
@@ -37,7 +36,6 @@ import org.eclipse.lsp.cobol.common.model.tree.CodeBlockUsageNode;
 import org.eclipse.lsp.cobol.common.model.tree.FunctionReference;
 import org.eclipse.lsp.cobol.common.model.tree.ParagraphNameNode;
 import org.eclipse.lsp.cobol.common.model.tree.SectionNameNode;
-import org.eclipse.lsp4j.Location;
 
 import java.util.*;
 import java.util.function.Function;
@@ -88,8 +86,7 @@ public class SymbolAccumulator implements VariableAccumulator {
    * @param node - the paragraph node
    */
   public void registerCodeBlock(ProgramNode program, CodeBlockDefinitionNode node) {
-    SymbolTable symbolTable = createOrGetSymbolTable(program);
-    symbolTable.getCodeBlocks().add(node);
+      createOrGetSymbolTable(program).register(node);
   }
 
   /**
@@ -97,35 +94,41 @@ public class SymbolAccumulator implements VariableAccumulator {
    * paragraph is not defined.
    *
    * @param program the program to register block usage in
-   * @param node the usage node to register
+   * @param codeBlockUsageNode the usage node to register
    * @return Optional error if the paragraph or section with the given name is not defined
    */
   public Optional<SyntaxError> registerCodeBlockUsage(
-      ProgramNode program, CodeBlockUsageNode node) {
+      ProgramNode program, CodeBlockUsageNode codeBlockUsageNode) {
     SymbolTable symbolTable = createOrGetSymbolTable(program);
 
-      List<CodeBlockDefinitionNode> definitions = new ArrayList<>();
-      for (CodeBlockDefinitionNode codeBlockDefinitionNode : symbolTable.getCodeBlocks()) {
-          if (filterNodes(codeBlockDefinitionNode, node)) {
-              definitions.add(codeBlockDefinitionNode);
-          }
-      }
+    if (codeBlockUsageNode.getProcedureId() != null) {
+      symbolTable.getProcedures().get(codeBlockUsageNode.getProcedureId())
+              .forEach(p -> p.addUsage(codeBlockUsageNode.getLocality().toLocation()));
+      return Optional.empty();
+    }
 
-      if (definitions.isEmpty()) {
-        return Optional.of(
+    List<CodeBlockDefinitionNode> definitions = new ArrayList<>();
+    for (CodeBlockDefinitionNode codeBlockDefinitionNode : symbolTable.getCodeBlockDefinitions()) {
+      if (filterNodes(codeBlockDefinitionNode, codeBlockUsageNode)) {
+        definitions.add(codeBlockDefinitionNode);
+      }
+    }
+
+    if (definitions.isEmpty()) {
+      return Optional.of(
           SyntaxError.syntaxError()
               .errorSource(ErrorSource.PARSING)
               .messageTemplate(
-                  MessageTemplate.of("semantics.paragraphNotDefined", node.getName()))
+                  MessageTemplate.of("semantics.paragraphNotDefined", codeBlockUsageNode.getName()))
               .severity(ErrorSeverity.ERROR)
-              .location(node.getLocality().toOriginalLocation())
+              .location(codeBlockUsageNode.getLocality().toOriginalLocation())
               .build());
     }
 
     if (definitions.size() > 1) {
       // Try to resolve ambiguous reference.
       // If GO TO is in the same section as a paragraph - no errors
-      String usageSectionName = getSectionName(node);
+      String usageSectionName = getSectionName(codeBlockUsageNode);
 
       List<CodeBlockDefinitionNode> inTheSameSection = definitions.stream()
               .filter(d -> getSectionName(d).equalsIgnoreCase(usageSectionName))
@@ -137,22 +140,39 @@ public class SymbolAccumulator implements VariableAccumulator {
                 SyntaxError.syntaxError()
                         .errorSource(ErrorSource.PARSING)
                         .messageTemplate(
-                                MessageTemplate.of("semantics.ambiguous", node.getName()))
+                                MessageTemplate.of("semantics.ambiguous", codeBlockUsageNode.getName()))
                         .severity(ErrorSeverity.ERROR)
-                        .location(node.getLocality().toOriginalLocation())
+                        .location(codeBlockUsageNode.getLocality().toOriginalLocation())
                         .build());
       }
     }
 
     CodeBlockDefinitionNode definition = definitions.get(0);
-    definition.addUsage(node.getLocality());
+    definition.addUsage(codeBlockUsageNode.getLocality());
 
-    Optional.ofNullable(symbolTable.getParagraphMap().get(node.getName()))
-        .ifPresent(it -> it.addUsage(node.getLocality().toLocation()));
-    Optional.ofNullable(symbolTable.getSectionMap().get(node.getName()))
-        .ifPresent(it -> it.addUsage(node.getLocality().toLocation()));
+    SectionNameNode sectionNameNode = getChildByType(definition, SectionNameNode.class);
+    if (sectionNameNode != null) {
+      symbolTable.resolveProcedures(sectionNameNode.getName(), null)
+              .forEach(p -> p.addUsage(codeBlockUsageNode.getLocality().toLocation()));
+    } else {
+      ParagraphNameNode paragraphNameNode = getChildByType(definition, ParagraphNameNode.class);
+      String sectionName = definition.getNearestParentByType(NodeType.PROCEDURE_SECTION)
+              .map(ProcedureSectionNode.class::cast).map(CodeBlockDefinitionNode::getName)
+              .orElse(null);
+      symbolTable.resolveProcedures(sectionName, paragraphNameNode == null ? null : paragraphNameNode.getName())
+              .forEach(p -> p.addUsage(codeBlockUsageNode.getLocality().toLocation()));
+    }
 
     return Optional.empty();
+  }
+
+  private static <T extends Node> T getChildByType(Node definition, Class<T> type) {
+    for(Node n: definition.getChildren()) {
+      if (type.isInstance(n)) {
+        return type.cast(n);
+      }
+    }
+    return null;
   }
 
   private boolean filterNodes(CodeBlockDefinitionNode definition, CodeBlockUsageNode usage) {
@@ -216,10 +236,8 @@ public class SymbolAccumulator implements VariableAccumulator {
    * @return syntax error if the code block duplicates
    */
   public Optional<SyntaxError> registerSectionNameNode(ProgramNode program, SectionNameNode node) {
-    createOrGetSymbolTable(program)
-        .getSectionMap()
-        .computeIfAbsent(node.getName(), n -> new CodeBlockReference())
-        .addDefinition(node.getLocality().toLocation());
+    SymbolTable symbolTable = createOrGetSymbolTable(program);
+    symbolTable.register(node);
     return Optional.empty();
   }
 
@@ -366,12 +384,9 @@ public class SymbolAccumulator implements VariableAccumulator {
    * @param node - the section definition node
    * @return syntax error if the code block duplicates
    */
-  public Optional<SyntaxError> registerParagraphNameNode(
-      ProgramNode programNode, ParagraphNameNode node) {
-    createOrGetSymbolTable(programNode)
-        .getParagraphMap()
-        .computeIfAbsent(node.getName(), n -> new CodeBlockReference())
-        .addDefinition(node.getLocality().toLocation());
+  public Optional<SyntaxError> registerParagraphNameNode(ProgramNode programNode, ParagraphNameNode node) {
+    // FIXME: @return syntax error if the code block duplicates - not implemented, should it be implemented here?
+    createOrGetSymbolTable(programNode).register(node);
     return Optional.empty();
   }
 
@@ -384,41 +399,12 @@ public class SymbolAccumulator implements VariableAccumulator {
    */
   public CodeBlockReference getCodeBlockReference(ProgramNode programNode, String name) {
     SymbolTable symbolTable = createOrGetSymbolTable(programNode);
-    return symbolTable.getParagraphMap().computeIfAbsent(name, symbolTable.getSectionMap()::get);
-  }
-
-  /**
-   * Get Section locations
-   *
-   * @param node the section node
-   * @param retrieveLocations location extract function
-   * @return a list of locations
-   */
-  public List<Location> getSectionLocations(
-      SectionNameNode node, Function<CodeBlockReference, List<Location>> retrieveLocations) {
-    return node.getProgram()
-        .map(this::createOrGetSymbolTable)
-        .map(SymbolTable::getSectionMap)
-        .map(it -> it.get(node.getName()))
-        .map(retrieveLocations)
-        .orElse(ImmutableList.of());
-  }
-
-  /**
-   * Get Paragraph locations
-   *
-   * @param node the paragraph node
-   * @param retrieveLocations location extract function
-   * @return a list of locations
-   */
-  public List<Location> getParagraphLocations(
-      ParagraphNameNode node, Function<CodeBlockReference, List<Location>> retrieveLocations) {
-    return node.getProgram()
-        .map(this::createOrGetSymbolTable)
-        .map(SymbolTable::getParagraphMap)
-        .map(it -> it.get(node.getName()))
-        .map(retrieveLocations)
-        .orElse(ImmutableList.of());
+    List<CodeBlockReference> procedures = symbolTable.resolveProcedures(name);
+    if (!procedures.isEmpty()) {
+      // FIXME only 1 paragraph expected
+      return procedures.get(0);
+    }
+    return null;
   }
 
   /**

@@ -16,7 +16,7 @@
 grammar UseCasePreprocessor;
 
 startRule
-   : .*? ((copybookStatement | functionDefinition | variableStatement | functionUsage | paragraphStatement | sectionStatement | subroutineStatement
+   : .*? ((copybookStatement | functionDefinition | variableStatement | functionUsage | procedureStatement | subroutineStatement
    | constantStatement | errorStatement | multiTokenError | linkageSection | NEWLINE)+ .*?)+ EOF
    ;
 
@@ -25,7 +25,7 @@ multiTokenError
    ;
 
 multiToken
-   : (word | copybookStatement | variableStatement | functionUsage | paragraphStatement | sectionStatement | subroutineStatement
+   : (word | copybookStatement | variableStatement | functionUsage | procedureStatement | subroutineStatement
    | constantStatement | errorStatement | multiTokenError | TEXT)+
    ;
 
@@ -77,24 +77,16 @@ constantUsage
    : CONSTANTUSAGE word
    ;
 
-paragraphStatement
-   : (paragraphUsage | paragraphDefinition) diagnostic* STOP
+procedureStatement
+   : (procedureUsage | paragraphDefinition | sectionDefinition) diagnostic* STOP
    ;
 
-sectionStatement
-   : (sectionUsage | sectionDefinition) diagnostic* STOP
-   ;
-
-paragraphUsage
-   : PARAGRPHUSAGE word
+procedureUsage
+   : PROCEDUREUSAGE word? (SECTIONUSAGE word)?
    ;
 
 paragraphDefinition
    : PARAGRPHDEFINITION word
-   ;
-
-sectionUsage
-   : SECTIONUSAGE word
    ;
 
 sectionDefinition
@@ -147,9 +139,9 @@ VARIABLEDEFINITION : START '$*';
 VARIABLEUSAGE : START '$';
 CONSTANTUSAGE : START '&';
 PARAGRPHDEFINITION : START '#*';
-PARAGRPHUSAGE : START '#';
+PROCEDUREUSAGE : START '#';
+SECTIONUSAGE : '@' ;
 SECTIONDEFINITION : START '@*';
-SECTIONUSAGE : START '@';
 COPYBOOKDEFINITION : START '~*';
 COPYBOOKUSAGE : START '~';
 SUBROUTINEUSAGE : START '%';

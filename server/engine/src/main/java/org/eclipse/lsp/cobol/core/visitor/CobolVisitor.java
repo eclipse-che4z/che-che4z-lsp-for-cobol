@@ -36,6 +36,7 @@ import org.eclipse.lsp.cobol.common.model.tree.statements.*;
 import org.eclipse.lsp.cobol.common.model.tree.variable.*;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableDefinitionNode.Builder;
 import org.eclipse.lsp.cobol.common.model.variables.DivisionType;
+import org.eclipse.lsp.cobol.common.symbols.ProcedureId;
 import org.eclipse.lsp.cobol.common.utils.ImplicitCodeUtils;
 import org.eclipse.lsp.cobol.common.utils.StringUtils;
 import org.eclipse.lsp.cobol.core.*;
@@ -937,9 +938,11 @@ public final class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   }
 
   @Override
-  public List<Node> visitParagraphName(ParagraphNameContext ctx) {
-    return addTreeNode(
-            ctx, locality -> new CodeBlockUsageNode(locality, VisitorHelper.getName(ctx)));
+  public List<Node> visitProcedureName(ProcedureNameContext ctx) {
+    String paragraphOrSectionName = getName(ctx.paragraphName());
+    String sectionName = ofNullable(ctx.inSection()).map(InSectionContext::sectionName).map(VisitorHelper::getName)
+            .orElse(null);
+    return addTreeNode(ctx, locality -> new CodeBlockUsageNode(locality, paragraphOrSectionName, sectionName));
   }
 
   @Override

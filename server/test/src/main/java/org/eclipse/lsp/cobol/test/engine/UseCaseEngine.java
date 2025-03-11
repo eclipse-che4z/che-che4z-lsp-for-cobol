@@ -45,6 +45,8 @@ import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.common.model.tree.FunctionReference;
 import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNode;
+import org.eclipse.lsp.cobol.common.symbols.CodeBlockReference;
+import org.eclipse.lsp.cobol.common.symbols.ProcedureId;
 import org.eclipse.lsp.cobol.common.symbols.SymbolTable;
 import org.eclipse.lsp.cobol.common.utils.ImplicitCodeUtils;
 import org.eclipse.lsp.cobol.test.CobolText;
@@ -384,17 +386,13 @@ public class UseCaseEngine {
         expected.getParagraphDefinitions(),
         extractDefinitions(actual, PARAGRAPH_NAME_NODE));
     assertResult(
-        "Paragraph usages:",
-        expected.getParagraphUsages(),
-        extractUsages(actual, PARAGRAPH_NAME_NODE));
-
-    assertResult(
         "Section definition:",
         expected.getSectionDefinitions(),
         extractDefinitions(actual, SECTION_NAME_NODE));
-    assertResult(
-        "Section usages:", expected.getSectionUsages(), extractUsages(actual, SECTION_NAME_NODE));
-
+    assertUsageResult(
+            "Procedure usages:",
+            expected.getProcedureUsages(),
+            extractProcedureUsages(actual, PARAGRAPH_NAME_NODE));
     assertResult(
         "Subroutine definitions: ",
         expected.getSubroutineDefinitions(),
@@ -489,10 +487,19 @@ public class UseCaseEngine {
 
   private Map<String, List<Location>> extractUsages(AnalysisResult result, NodeType nodeType) {
     return extract(
-        result,
-        nodeType,
-        DefinedAndUsedStructure::getUsages,
-        context -> !context.getUsages().isEmpty());
+            result,
+            nodeType,
+            DefinedAndUsedStructure::getUsages,
+            context -> !context.getUsages().isEmpty());
+  }
+
+  private Map<ProcedureId, List<Location>> extractProcedureUsages(AnalysisResult analysisResult, NodeType nodeType) {
+    Map<ProcedureId, List<Location>> result = new HashMap<>();
+    SymbolTable symbolTable = analysisResult.getSymbolTableMap().get(SymbolTable.generateKey(analysisResult.getRootNode().findFirstProgramNode()));
+    for (Map.Entry<ProcedureId, CodeBlockReference> referenceEntry: symbolTable.getProcedures().entries()) {
+      result.put(referenceEntry.getKey(), referenceEntry.getValue().getUsage());
+    }
+    return result;
   }
 
   private Map<String, List<Location>> extract(
@@ -537,14 +544,25 @@ public class UseCaseEngine {
   }
 
   private void assertResult(
-      String message, Map<String, List<Location>> expected, Map<String, List<Location>> actual) {
+          String message, Map<String, List<Location>> expected, Map<String, List<Location>> actual) {
     assertEquals(expected.keySet(), actual.keySet(), message);
     expected.forEach(
-        (key, value) ->
-            assertEquals(
-                value.stream().sorted(getLocationComparator()).collect(toList()),
-                actual.get(key).stream().sorted(getLocationComparator()).collect(toList()),
-                message + " for " + key));
+            (key, value) ->
+                    assertEquals(
+                            value.stream().sorted(getLocationComparator()).collect(toList()),
+                            actual.get(key).stream().sorted(getLocationComparator()).collect(toList()),
+                            message + " for " + key));
+  }
+
+  private void assertUsageResult(
+          String message, Map<ProcedureId, List<Location>> expected, Map<ProcedureId, List<Location>> actual) {
+    assertEquals(expected.keySet(), actual.keySet(), message);
+    expected.forEach(
+            (key, value) ->
+                    assertEquals(
+                            value.stream().sorted(getLocationComparator()).collect(toList()),
+                            actual.get(key).stream().sorted(getLocationComparator()).collect(toList()),
+                            message + " for " + key));
   }
 
   private Comparator<Location> getLocationComparator() {

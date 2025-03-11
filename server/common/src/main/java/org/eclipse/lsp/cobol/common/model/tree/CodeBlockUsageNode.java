@@ -22,6 +22,7 @@ import lombok.ToString;
 import org.eclipse.lsp.cobol.common.model.DefinedAndUsedStructure;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.NodeType;
+import org.eclipse.lsp.cobol.common.symbols.ProcedureId;
 import org.eclipse.lsp4j.Location;
 
 import com.google.common.collect.ImmutableList;
@@ -38,10 +39,24 @@ public class CodeBlockUsageNode extends Node implements DefinedAndUsedStructure 
   private List<Location> definitions = ImmutableList.of();
   @Setter
   private List<Location> usages = ImmutableList.of();
+  @Getter
+  private final ProcedureId procedureId;
 
-  public CodeBlockUsageNode(Locality location, String name) {
+  /**
+   * Creates a new instance of CodeBlockUsageNode.
+   * @param location - locality
+   * @param name - code block name
+   * @param sectionName - section name, null if section is not provided, so we will resolve usage leter.
+   */
+  public CodeBlockUsageNode(Locality location, String name, String sectionName) {
     super(location, NodeType.CODE_BLOCK_USAGE);
-    this.name = name;
+    if(sectionName != null) {
+      this.procedureId = new ProcedureId(sectionName, name);
+      this.name = sectionName + "." + name;
+    } else {
+      this.procedureId = null;
+      this.name = name;
+    }
   }
 
   @Override

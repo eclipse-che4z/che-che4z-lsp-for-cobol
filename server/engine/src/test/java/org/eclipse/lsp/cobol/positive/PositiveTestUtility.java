@@ -380,21 +380,30 @@ public class PositiveTestUtility {
         .getDepthFirstStream()
         .filter(node -> node.getNodeType() == NodeType.PROGRAM)
         .map(ProgramNode.class::cast)
-        .forEach(
-            programNode -> {
-              Stream.of(repo.getParagraphMap(programNode), repo.getSectionMap(programNode))
-                  .flatMap(entry -> entry.entrySet().stream())
-                  .forEach(
-                      entry -> paragraphDefFromLSPEngine.put(entry.getKey(), entry.getValue()));
-
-              repo.getVariables(programNode).values().stream()
-                  .flatMap(Node::getDepthFirstStream)
-                  .filter(VariableNode.class::isInstance)
-                  .map(VariableNode.class::cast)
-                  .distinct()
-                  .forEach(entry -> variableDefinitionFromLSPEngine.put(entry.getName(), entry));
-              programDefinitionFromLSPEngine.put(
-                  programNode.getProgramName().toUpperCase(Locale.ROOT), programNode);
-            });
+        .forEach(programNode -> fetchProgramReferences(variableDefinitionFromLSPEngine,
+                paragraphDefFromLSPEngine,
+                programDefinitionFromLSPEngine,
+                programNode,
+                repo));
   }
+
+    private static void fetchProgramReferences(Multimap<String, Node> variableDefinitionFromLSPEngine, Multimap<String, CodeBlockReference> paragraphDefFromLSPEngine, Multimap<String, Node> programDefinitionFromLSPEngine, ProgramNode programNode, SymbolsRepository repo) {
+        SymbolTable symbolTable = repo.getSymbolTable(programNode);
+        for (CodeBlockReference cb : symbolTable.getProcedures().values()) {
+            String name = cb.getProcedureId().isSection()
+                    ? cb.getProcedureId().getSectionName()
+                    : cb.getProcedureId().getParagraphName();
+
+            paragraphDefFromLSPEngine.put(name, cb);
+        }
+
+        repo.getVariables(programNode).values().stream()
+            .flatMap(Node::getDepthFirstStream)
+            .filter(VariableNode.class::isInstance)
+            .map(VariableNode.class::cast)
+            .distinct()
+            .forEach(entry -> variableDefinitionFromLSPEngine.put(entry.getName(), entry));
+        programDefinitionFromLSPEngine.put(
+            programNode.getProgramName().toUpperCase(Locale.ROOT), programNode);
+    }
 }

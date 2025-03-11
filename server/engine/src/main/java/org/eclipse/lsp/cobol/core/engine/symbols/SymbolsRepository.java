@@ -84,25 +84,6 @@ public class SymbolsRepository {
   }
 
   /**
-   * Get paragraphs data
-   *
-   * @param program the program node
-   * @return map of paragraphs
-   */
-  public Map<String, CodeBlockReference> getParagraphMap(ProgramNode program) {
-    return getSymbolTable(program).getParagraphMap();
-  }
-  /**
-   * Get section data
-   *
-   * @param program the program node
-   * @return map of sections
-   */
-  public Map<String, CodeBlockReference> getSectionMap(ProgramNode program) {
-    return getSymbolTable(program).getSectionMap();
-  }
-
-  /**
    * Find element using a position
    *
    * @param uri the document uri
@@ -134,7 +115,7 @@ public class SymbolsRepository {
   }
 
   @Synchronized
-  private SymbolTable getSymbolTable(ProgramNode program) {
+  public SymbolTable getSymbolTable(ProgramNode program) {
     return programSymbols.getOrDefault(SymbolTable.generateKey(program), EMPTY_SYM_TABLE);
   }
 

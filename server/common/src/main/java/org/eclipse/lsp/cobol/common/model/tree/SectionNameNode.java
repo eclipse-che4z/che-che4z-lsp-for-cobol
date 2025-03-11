@@ -23,6 +23,7 @@ import org.eclipse.lsp4j.Location;
 
 import com.google.common.collect.ImmutableList;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /** The class represents section name node in COBOL grammar. */
@@ -30,10 +31,8 @@ import java.util.List;
 public class SectionNameNode extends Node implements DefinedAndUsedStructure {
   private final String name;
 
-  @Setter
-  private List<Location> definitions = ImmutableList.of();
-  @Setter
-  private List<Location> usages = ImmutableList.of();
+  private final List<Location> definitions = new ArrayList<>();
+  private final List<Location> usages = new ArrayList<>();
 
   public SectionNameNode(
       Locality location, String name) {

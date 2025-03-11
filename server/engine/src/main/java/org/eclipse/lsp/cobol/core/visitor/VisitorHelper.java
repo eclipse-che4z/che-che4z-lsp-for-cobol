@@ -36,6 +36,7 @@ import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.model.tree.variable.UsageFormat;
 import org.eclipse.lsp.cobol.common.model.tree.variable.ValueInterval;
+import org.eclipse.lsp.cobol.common.symbols.ProcedureId;
 import org.eclipse.lsp.cobol.core.CobolParser;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;

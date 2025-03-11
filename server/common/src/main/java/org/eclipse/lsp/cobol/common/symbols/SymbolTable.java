@@ -19,13 +19,12 @@ import com.google.common.collect.Multimap;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.eclipse.lsp.cobol.common.model.NodeType;
-import org.eclipse.lsp.cobol.common.model.tree.CodeBlockDefinitionNode;
-import org.eclipse.lsp.cobol.common.model.tree.Node;
-import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
+import org.eclipse.lsp.cobol.common.model.tree.*;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNode;
 import org.eclipse.lsp4j.Range;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.eclipse.lsp.cobol.common.model.tree.Node.hasType;
 
@@ -33,11 +32,9 @@ import static org.eclipse.lsp.cobol.common.model.tree.Node.hasType;
 @RequiredArgsConstructor
 public class SymbolTable {
   @Getter
-  private final List<CodeBlockDefinitionNode> codeBlocks = new ArrayList<>();
+  private final List<CodeBlockDefinitionNode> codeBlockDefinitions = new ArrayList<>();
   @Getter
-  private final Map<String, CodeBlockReference> paragraphMap = new HashMap<>();
-  @Getter
-  private final Map<String, CodeBlockReference> sectionMap = new HashMap<>();
+  private final Multimap<ProcedureId, CodeBlockReference> procedures = ArrayListMultimap.create();
   @Getter
   private final Multimap<String, VariableNode> variablesMap = ArrayListMultimap.create();
   @Getter
@@ -59,8 +56,46 @@ public class SymbolTable {
     return result;
   }
 
+  public List<String> listSectionNames() {
+    return procedures.keySet().stream()
+            .map(ProcedureId::getSectionName)
+            .distinct()
+            .filter(Objects::nonNull)
+            .collect(Collectors.toList());
+  }
+
+  public List<String> listParagraphNames() {
+    return procedures.keySet().stream()
+            .map(ProcedureId::getParagraphName)
+            .distinct()
+            .filter(Objects::nonNull)
+            .collect(Collectors.toList());
+  }
+
+  public List<CodeBlockReference> resolveProcedures(String sectionName, String paragraphName) {
+    ProcedureId procedureId = new ProcedureId(sectionName, paragraphName);
+    if (procedures.containsKey(procedureId)) {
+      return new ArrayList<>(procedures.get(procedureId));
+    }
+    return Collections.emptyList();
+  }
+
+  public List<CodeBlockReference> resolveProcedures(String name) {
+    if (name == null) {
+      return Collections.emptyList();
+    }
+
+    ArrayList<CodeBlockReference> result = new ArrayList<>();
+    for (Map.Entry<ProcedureId, CodeBlockReference> v: procedures.entries()) {
+      if (name.equals(v.getKey().getSectionName()) || name.equals(v.getKey().getParagraphName())) {
+        result.add(v.getValue());
+      }
+    }
+    return result;
+  }
+
   /**
-   * Generates unique key for the prorgam
+   * Generates unique key for the program
    * @param program node
    * @return string value of a generated key
    */
@@ -77,6 +112,24 @@ public class SymbolTable {
   public void register(VariableNode node) {
     Multimap<String, VariableNode> targetMap = isGlobal(node) ? variablesGlobalsMap : variablesMap;
     targetMap.put(node.getName().toUpperCase(Locale.ROOT), node);
+  }
+
+  public void register(ParagraphNameNode node) {
+    String sectionName = node.getNearestParentByType(NodeType.PROCEDURE_SECTION)
+            .map(ProcedureSectionNode.class::cast).map(CodeBlockDefinitionNode::getName)
+            .orElse(null);
+    CodeBlockReference codeBlockReference = new CodeBlockReference(sectionName, node.getName());
+    codeBlockReference.addDefinition(node.getLocality().toLocation());
+    this.procedures.put(new ProcedureId(sectionName, node.getName()), codeBlockReference);
+  }
+  public void register(SectionNameNode node) {
+    CodeBlockReference codeBlockReference = new CodeBlockReference(node.getName(), null);
+    codeBlockReference.addDefinition(node.getLocality().toLocation());
+    this.procedures.put(new ProcedureId(node.getName(), null), codeBlockReference);
+  }
+
+  public void register(CodeBlockDefinitionNode node) {
+    codeBlockDefinitions.add(node);
   }
 
   private static boolean isGlobal(VariableNode node) {

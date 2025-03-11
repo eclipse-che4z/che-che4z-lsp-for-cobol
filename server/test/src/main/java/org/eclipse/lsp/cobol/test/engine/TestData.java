@@ -17,6 +17,7 @@ package org.eclipse.lsp.cobol.test.engine;
 
 import lombok.Builder;
 import lombok.Value;
+import org.eclipse.lsp.cobol.common.symbols.ProcedureId;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.Location;
 
@@ -34,9 +35,7 @@ public class TestData {
   Map<String, List<Location>> variableDefinitions;
   Map<String, List<Location>> variableUsages;
   Map<String, List<Location>> paragraphDefinitions;
-  Map<String, List<Location>> paragraphUsages;
   Map<String, List<Location>> sectionDefinitions;
-  Map<String, List<Location>> sectionUsages;
   Map<String, List<Location>> constantUsages;
   Map<String, List<Location>> copybookDefinitions;
   Map<String, List<Location>> copybookUsages;
@@ -44,4 +43,5 @@ public class TestData {
   Map<String, List<Location>> subroutineUsages;
   Map<String, List<Location>> functionDefinitions;
   Map<String, List<Location>> functionUsages;
+  Map<ProcedureId, List<Location>> procedureUsages;
 }

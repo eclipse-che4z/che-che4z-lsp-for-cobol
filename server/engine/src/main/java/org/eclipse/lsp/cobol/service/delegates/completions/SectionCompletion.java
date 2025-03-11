@@ -18,6 +18,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.NonNull;
 import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
+import org.eclipse.lsp.cobol.common.symbols.SymbolTable;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolsRepository;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp4j.CompletionItem;
@@ -25,6 +26,7 @@ import org.eclipse.lsp4j.CompletionItemKind;
 
 import javax.annotation.Nullable;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 import static java.util.Collections.emptyList;
@@ -54,9 +56,9 @@ public class SectionCompletion implements Completion {
         .getDepthFirstStream()
         .filter(hasType(PROGRAM))
         .map(ProgramNode.class::cast)
-        .map(symbolsRepository::getSectionMap)
-        .map(Map::keySet)
-        .flatMap(Collection::stream)
+        .map(symbolsRepository::getSymbolTable)
+        .map(SymbolTable::listSectionNames)
+        .flatMap(List::stream)
         .filter(DocumentationUtils.startsWithIgnoreCase(token))
         .map(this::toSectionCompletion)
         .collect(toList());

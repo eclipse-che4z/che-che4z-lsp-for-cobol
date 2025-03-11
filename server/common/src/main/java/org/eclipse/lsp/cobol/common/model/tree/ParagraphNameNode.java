@@ -23,16 +23,16 @@ import org.eclipse.lsp4j.Location;
 
 import com.google.common.collect.ImmutableList;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /** The class represents paragraphs or section name node in COBOL grammar. */
-@Getter
 public class ParagraphNameNode extends Node implements DefinedAndUsedStructure {
+  @Getter
   private final String name;
-  @Setter
-  private List<Location> definitions = ImmutableList.of();
-  @Setter
-  private List<Location> usages = ImmutableList.of();
+  private final List<Location> definitions = new ArrayList<>();
+  private final List<Location> usages = new ArrayList<>();
 
   public ParagraphNameNode(Locality location, String paragraphName) {
     super(location, NodeType.PARAGRAPH_NAME_NODE);
@@ -41,11 +41,19 @@ public class ParagraphNameNode extends Node implements DefinedAndUsedStructure {
 
   @Override
   public List<Location> getDefinitions() {
-    return definitions;
+    return Collections.unmodifiableList(definitions);
   }
 
   @Override
   public List<Location> getUsages() {
-    return usages;
+    return Collections.unmodifiableList(usages);
+  }
+
+  public void addUsages(List<Location> usages) {
+    this.usages.addAll(usages);
+  }
+
+  public void addDefinitions(List<Location> definitions) {
+    this.definitions.addAll(definitions);
   }
 }

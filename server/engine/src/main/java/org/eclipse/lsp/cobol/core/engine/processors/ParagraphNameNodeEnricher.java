@@ -15,11 +15,15 @@
 package org.eclipse.lsp.cobol.core.engine.processors;
 
 import lombok.AllArgsConstructor;
+import org.eclipse.lsp.cobol.common.model.NodeType;
+import org.eclipse.lsp.cobol.common.model.tree.*;
 import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.Processor;
-import org.eclipse.lsp.cobol.common.symbols.CodeBlockReference;
+import org.eclipse.lsp.cobol.common.symbols.SymbolTable;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulator;
-import org.eclipse.lsp.cobol.common.model.tree.ParagraphNameNode;
+import org.eclipse.lsp4j.Location;
+
+import java.util.List;
 
 /**
  * Enrich paragraph name node with necessary data
@@ -30,7 +34,20 @@ public class ParagraphNameNodeEnricher implements Processor<ParagraphNameNode> {
 
   @Override
   public void accept(ParagraphNameNode paragraphNameNode, ProcessingContext processingContext) {
-    paragraphNameNode.setDefinitions(symbolAccumulator.getParagraphLocations(paragraphNameNode, CodeBlockReference::getDefinitions));
-    paragraphNameNode.setUsages(symbolAccumulator.getParagraphLocations(paragraphNameNode, CodeBlockReference::getUsage));
+    ProgramNode programNode = processingContext.getCurrentProgramNode();
+    if (programNode == null) {
+      return;
+    }
+    SymbolTable symbolTable = symbolAccumulator.getSymbolTable(programNode);
+    if (symbolTable == null) {
+      return;
+    }
+    String paragraphName = paragraphNameNode.getName();
+    String sectionName = paragraphNameNode.getNearestParentByType(NodeType.PROCEDURE_SECTION)
+            .map(ProcedureSectionNode.class::cast).map(CodeBlockDefinitionNode::getName).orElse(null);
+    symbolTable.resolveProcedures(sectionName, paragraphName).forEach(p -> {
+      paragraphNameNode.addDefinitions(p.getDefinitions());
+      paragraphNameNode.addUsages(p.getUsage());
+    });
   }
 }

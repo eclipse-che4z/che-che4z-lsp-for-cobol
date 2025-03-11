@@ -125,7 +125,7 @@ class TestDuplicatedDefinition {
       "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID. AMB10.\n"
           + "       PROCEDURE DIVISION.\n"
-          + "           GO TO {#PARAG1} OF SECTION-1.\n"
+          + "           GO TO {#PARAG1 OF SECTION-1}.\n"
           + "       {#*PARAG1}.\n"
           + "       {@*SECTION-1} SECTION.\n"
           + "       {#*PARAG1}.";

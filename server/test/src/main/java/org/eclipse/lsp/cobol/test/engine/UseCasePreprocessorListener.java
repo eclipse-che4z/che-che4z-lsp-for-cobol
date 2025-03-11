@@ -23,6 +23,7 @@ import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
+import org.eclipse.lsp.cobol.common.symbols.ProcedureId;
 import org.eclipse.lsp.cobol.common.utils.StringUtils;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.Location;
@@ -56,13 +57,12 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
   private final Map<String, List<Location>> functionUsages = new HashMap<>();
   private final Map<String, List<Location>> paragraphDefinitions = new HashMap<>();
   private final Map<String, List<Location>> functionDefinitions = new HashMap<>();
-  private final Map<String, List<Location>> paragraphUsages = new HashMap<>();
   private final Map<String, List<Location>> sectionDefinitions = new HashMap<>();
-  private final Map<String, List<Location>> sectionUsages = new HashMap<>();
   private final Map<String, List<Location>> constantUsages = new HashMap<>();
   private final Map<String, List<Location>> copybookDefinitions = new HashMap<>();
   private final Map<String, List<Location>> copybookUsages = new HashMap<>();
   private final Map<String, List<Location>> subroutineUsages = new HashMap<>();
+  private final Map<ProcedureId, List<Location>> procedureUsages = new HashMap<>();
 
   private final Deque<StringBuilder> contexts = new ArrayDeque<>();
 
@@ -111,16 +111,15 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
             variableDefinitions,
             variableUsages,
             paragraphDefinitions,
-            paragraphUsages,
             sectionDefinitions,
-            sectionUsages,
             constantUsages,
             copybookDefinitions,
             copybookUsages,
             makeSubroutinesDefinitions(subroutineNames),
             subroutineUsages,
             functionDefinitions,
-            functionUsages);
+            functionUsages,
+            procedureUsages);
   }
 
   @Override
@@ -221,7 +220,7 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
                                     it.identifier().getText(),
                                     ctx,
                                     it.replacement(),
-                                    paragraphUsages,
+                                    procedureUsages,
                                     ctx.diagnostic()));
     ofNullable(ctx.paragraphDefinition())
             .map(ParagraphDefinitionContext::word)
