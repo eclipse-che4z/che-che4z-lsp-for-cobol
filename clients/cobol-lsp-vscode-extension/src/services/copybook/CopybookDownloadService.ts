@@ -15,6 +15,7 @@
 import * as vscode from "vscode";
 import {
   COPYBOOKS_FOLDER,
+  DEFAULT_DIALECT,
   ENDEVOR_PROCESSOR,
   PROVIDE_PROFILE_MSG,
   ZOWE_FOLDER,
@@ -31,6 +32,8 @@ import { searchCopybookInExtensionFolder } from "../util/FSUtils";
 import { CopybookURI } from "./CopybookURI";
 import path = require("path");
 import { getErrorMessage } from "../util/ErrorsUtils";
+import { DialectRegistry } from "../DialectRegistry";
+import { getChannel } from "../../extension";
 
 export class CopybookName {
   constructor(
@@ -213,7 +216,7 @@ export class CopybookDownloadService {
     if (
       !(await this.isPrerequisiteForDownloadSatisfied(
         documentUri,
-        copybookNames,
+        copybookNames.map((copybook) => copybook.dialect),
       ))
     ) {
       return;
@@ -235,6 +238,74 @@ export class CopybookDownloadService {
     );
   }
 
+  public async listRemoteCopybooks(
+    documentUri: string,
+    dialect: string,
+  ): Promise<string[]> {
+    // is document is endevor element - return list of copybooks from endevor
+    if (this.handleAsEndevorElement(documentUri)) {
+      return this.e4eDownloader?.listRemoteCopybooksE4E(documentUri) ?? [];
+    }
+
+    const dialects = [
+      DEFAULT_DIALECT,
+      ...DialectRegistry.getActiveDialects().map((di) => di.name),
+    ];
+
+    const copybooks: string[] = [];
+
+    const dsnPaths: string[] = SettingsService.getDsnPath(documentUri, dialect);
+    const ussPaths: string[] = SettingsService.getUssPath(documentUri, dialect);
+
+    if (dsnPaths.length === 0 && ussPaths.length === 0) {
+      return [];
+    }
+
+    if (
+      !(await this.isPrerequisiteForDownloadSatisfied(documentUri, dialects))
+    ) {
+      return [];
+    }
+
+    const profile = ProfileUtils.getProfileNameForCopybook(
+      documentUri,
+      this.explorerApi,
+    );
+    if (!profile) {
+      return [];
+    }
+
+    const results = await Promise.allSettled([
+      ...dsnPaths.map(async (dsn) => {
+        const dsnMembers = await this.dsnDownloader?.getAllMembers(
+          profile,
+          dsn,
+        );
+        return dsnMembers ?? [];
+      }),
+      ...ussPaths.map(async (uss) => {
+        const ussFiles = await this.ussDownloader?.getAllMembers(
+          profile,
+          uss,
+          false,
+        );
+        return ussFiles ?? [];
+      }),
+    ]);
+
+    results.forEach((result) => {
+      if (result.status === "fulfilled") {
+        result.value.forEach((c) => copybooks.push(c));
+      } else {
+        getChannel().appendLine(
+          `Unable to load copybooks completions. ${result.reason}`,
+        );
+      }
+    });
+
+    return copybooks;
+  }
+
   private async processCopybookDownload(
     progress: vscode.Progress<{ message?: string; increment?: number }>,
     documentUri: string,
@@ -242,17 +313,34 @@ export class CopybookDownloadService {
   ): Promise<void> {
     const totalCopybooksToDownload = copybookNames.length;
     let processedCopybooks = 0;
-
+    const downloadRequestStartTime = performance.now();
     await Promise.all(
       copybookNames.map(async (copybookName) => {
-        await this.downloadCopybook(copybookName, documentUri).finally(() => {
-          processedCopybooks++;
-          this.updateDownloadProgress(
-            progress,
-            totalCopybooksToDownload,
-            processedCopybooks,
-          );
-        });
+        await this.downloadCopybook(copybookName, documentUri)
+          .then((isDownloaded) => {
+            if (isDownloaded) {
+              this.outputChannel?.appendLine(
+                `==> Copybook ${copybookName.name}(dialect:${copybookName.dialect}) download completed in : ${performance.now() - downloadRequestStartTime} milliseconds`,
+              );
+            } else {
+              this.outputChannel?.appendLine(
+                `==> Copybook ${copybookName.name}(dialect:${copybookName.dialect}) failed in ${performance.now() - downloadRequestStartTime} milliseconds`,
+              );
+            }
+          })
+          .catch((err) => {
+            this.outputChannel?.appendLine(
+              `==> Copybook ${copybookName.name}(dialect:${copybookName.dialect}) couldn't be downloaded. Time: ${performance.now() - downloadRequestStartTime} milliseconds , Error: ${err}`,
+            );
+          })
+          .finally(() => {
+            processedCopybooks++;
+            this.updateDownloadProgress(
+              progress,
+              totalCopybooksToDownload,
+              processedCopybooks,
+            );
+          });
       }),
     ).catch((err) => {
       this.outputChannel?.appendLine(
@@ -263,7 +351,7 @@ export class CopybookDownloadService {
 
   private async isPrerequisiteForDownloadSatisfied(
     documentUri: string,
-    copybookNames: CopybookName[],
+    dialects: string[],
   ): Promise<boolean> {
     if (this.handleAsEndevorElement(documentUri)) {
       return !!(await this.e4eDownloader?.getE4EConfig(documentUri));
@@ -289,7 +377,7 @@ export class CopybookDownloadService {
         profile,
         this.explorerApi,
         documentUri,
-        copybookNames,
+        dialects,
       ))
     );
   }
@@ -315,5 +403,10 @@ export class CopybookDownloadService {
       increment: downloadPercent,
       message: downloadPercent + "%",
     });
+  }
+
+  public reenableFailedRequests() {
+    this.dsnDownloader?.reenableFailedRequests();
+    this.ussDownloader?.reenableFailedRequests();
   }
 }

@@ -79,7 +79,7 @@ The extension enables outline view and the breadcrumbs navigation bar at the top
 Before you write your COBOL code from scratch, search the snippet library for useful templates.
 
 1. Press **F1** to open the command palette.
-2. Type **Insert Snippet** and press enter.
+2. Run the command **Snippets: Insert COBOL Snippet**.
 3. Select the snippet that you want to insert.
 
 ![Code snippets](/docs/images/Snippet.gif)

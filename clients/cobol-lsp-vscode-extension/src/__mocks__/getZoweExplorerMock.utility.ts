@@ -70,9 +70,9 @@ export const mvsApiMock = (allMembers = allMemberMock) =>
 export const allUSSFilemembers = jest.fn().mockReturnValue({
   apiResponse: {
     items: [
-      { name: "uss_copybook" },
-      { name: "uss_withExt.cpy" },
-      { name: "USS_DATASET2" },
+      { name: "uss_copybook", mode: "-rwxr-xr-x" },
+      { name: "uss_withExt.cpy", mode: "-rwxr-xr-x" },
+      { name: "USS_DATASET2", mode: "-rwxr-xr-x" },
     ],
   },
 });

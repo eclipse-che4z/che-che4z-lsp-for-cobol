@@ -20,8 +20,10 @@ import { fetchCopybookCommand } from "./commands/FetchCopybookCommand";
 import { gotoCopybookSettings } from "./commands/OpenSettingsCommand";
 import {
   E4E_INCOMPATIBLE,
+  EXP_LANGUAGE_ID,
   FAIL_CREATE_COPYBOOK_FOLDER_MSG,
   FAIL_CREATE_GLOBAL_STORAGE_MSG,
+  HP_LANGUAGE_ID,
   LANGUAGE_ID,
   ZOWE_FOLDER,
 } from "./constants";
@@ -33,7 +35,10 @@ import { RunAnalysis } from "./commands/RunAnalysisCLI";
 import { clearCache } from "./commands/ClearCopybookCacheCommand";
 import { CommentAction, commentCommand } from "./commands/CommentCommand";
 import { initSmartTab, RangeTabShiftStore } from "./commands/SmartTabCommand";
-import { DialectRegistry } from "./services/DialectRegistry";
+import {
+  CopyStatementParser,
+  DialectRegistry,
+} from "./services/DialectRegistry";
 import { LanguageClientService } from "./services/LanguageClientService";
 import { lspConfigHandler, SettingsService } from "./services/Settings";
 import {
@@ -52,6 +57,8 @@ import {
   registerEvent,
   registerExceptionEvent,
 } from "./services/reporter";
+import { CopybooksCompletionProvider } from "./services/copybook/CopybooksCompletionProvider";
+import { SubroutinesCompletionsProvider } from "./services/subroutines/SubroutinesCompletionsProvider";
 
 interface __AnalysisApi {
   analysis(uri: string, text: string, pos?: vscode.Position): Promise<unknown>;
@@ -81,6 +88,7 @@ async function initialize(context: vscode.ExtensionContext) {
     maybeE4E && "api" in maybeE4E ? maybeE4E.api : undefined,
     outputChannel,
   );
+
   if (maybeZowe && "futureApi" in maybeZowe) {
     void maybeZowe.futureApi.then((api) => {
       if (api) copyBooksDownloader.explorerAppeared(api.api);
@@ -133,6 +141,20 @@ export async function activate(
     vscode.languages.registerCompletionItemProvider(
       { language: LANGUAGE_ID },
       new SnippetCompletionProvider(context),
+    ),
+  );
+
+  context.subscriptions.push(
+    vscode.languages.registerCompletionItemProvider(
+      [LANGUAGE_ID, EXP_LANGUAGE_ID, HP_LANGUAGE_ID],
+      new CopybooksCompletionProvider(copyBooksDownloader),
+    ),
+  );
+
+  context.subscriptions.push(
+    vscode.languages.registerCompletionItemProvider(
+      [LANGUAGE_ID, EXP_LANGUAGE_ID, HP_LANGUAGE_ID],
+      new SubroutinesCompletionsProvider(),
     ),
   );
 
@@ -192,6 +214,7 @@ export async function activate(
           description: dialect.description,
           jar: vscode.Uri.parse(dialect.jar, true),
           snippets: vscode.Uri.parse(dialect.snippets, true),
+          isCopyStatement: dialect.isCopyStatement,
         });
       },
     },
@@ -226,6 +249,7 @@ export interface DialectDetail {
   description: string;
   jar: vscode.Uri;
   snippets: vscode.Uri;
+  isCopyStatement?: CopyStatementParser;
 }
 
 const registerNewDialect = async (
@@ -254,6 +278,7 @@ const registerNewDialect = async (
     dialect.jar,
     dialect.description,
     dialect.snippets.fsPath,
+    dialect.isCopyStatement,
   );
   outputChannel.appendLine("Restart analysis");
   await languageClientService.invalidateConfiguration();
@@ -385,6 +410,15 @@ function registerCommands(
           context.extensionUri,
         );
         await tempAnalysis.runCobolAnalysisCommand();
+      },
+    ),
+  );
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand(
+      "cobol-lsp.cpy-manager.reenable.failed.zowe.requests",
+      () => {
+        copyBooksDownloader.reenableFailedRequests();
       },
     ),
   );
