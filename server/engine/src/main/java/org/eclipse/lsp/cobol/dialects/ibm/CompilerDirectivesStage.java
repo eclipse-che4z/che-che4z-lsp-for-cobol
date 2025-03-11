@@ -43,10 +43,11 @@ import org.eclipse.lsp4j.Range;
  */
 public class CompilerDirectivesStage implements Stage<AnalysisContext, List<Node>, List<CompilerDirectiveNode>> {
   private static final Pattern COMPILER_DIRECTIVE_LINE =
-          Pattern.compile("(?i)(\\d.{5}.*|\\s*+)\\*?(CBL|PROCESS)\\s+(?<compilerOptions>.+)|>>\\s*(?<compilerDirectives>.+)");
+          Pattern.compile("(?i)(?:\\d.{5}.*|\\s*)(?:\\*?(CBL|PROCESS)\\s+(?<compilerOptions>.+)|>>\\s*(?<compilerDirectives>.+))");
   private static final Pattern NEW_LINE_PATTERN = Pattern.compile("\n\r?");
   private static final Pattern DIALECT_FILLER_PATTERN = Pattern.compile(String.format("^[%s%s]*$", "\\s", CobolDialect.FILLER));
-  private static final Pattern SECTION_PATTERN = Pattern.compile("(?i)\\s*DATA\\s+DIVISION.*|\\s*WORKING-STORAGE.*|\\s*PROCEDURE\\s+DIVISION.*");
+  private static final Pattern SECTION_PATTERN =
+          Pattern.compile("(?i)\\s*DATA\\s+DIVISION.*|\\s*WORKING-STORAGE.*|\\s*PROCEDURE\\s+DIVISION.*");
   private static final Pattern JAVA_SHAREABLE_ON_PATTERN = Pattern.compile("(?i)\\s*>>\\s?JAVA-SHAREABLE\\s+ON\\s*");
   private final MessageService messageService;
 
@@ -67,10 +68,10 @@ public class CompilerDirectivesStage implements Stage<AnalysisContext, List<Node
       if (!isJavaShareableOn && JAVA_SHAREABLE_ON_PATTERN.matcher(lines[i]).matches()) {
        isJavaShareableOn = true;
       }
-      if (sectionLine.find()) {
+      if (sectionLine.matches()) {
         section = sectionLine.group().trim();
       }
-      if (!directivesLine.find()) {
+      if (!directivesLine.matches()) {
         // we could stop on "IDENTIFICATION DIVISION"
         continue;
       }
