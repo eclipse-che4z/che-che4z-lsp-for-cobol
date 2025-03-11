@@ -151,7 +151,7 @@ export async function activate(
   context.subscriptions.push(
     vscode.languages.registerCompletionItemProvider(
       [LANGUAGE_ID, EXP_LANGUAGE_ID, HP_LANGUAGE_ID],
-      new CopybooksCompletionProvider(outputChannel, copyBooksDownloader),
+      new CopybooksCompletionProvider(copyBooksDownloader, outputChannel),
     ),
   );
 

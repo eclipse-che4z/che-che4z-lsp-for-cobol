@@ -71,7 +71,7 @@ describe("CopybooksCompletionProvider", () => {
       });
 
       test("returns all remote completions", async () => {
-        const provider = new CopybooksCompletionProvider(undefined, cdsMock);
+        const provider = new CopybooksCompletionProvider(cdsMock);
         const completions = await provider.provideCompletionItems(
           documentMock,
           positionMock,
@@ -92,7 +92,7 @@ describe("CopybooksCompletionProvider", () => {
       });
 
       test("no remote copybooks completions returned", async () => {
-        const provider = new CopybooksCompletionProvider(undefined, cdsMock);
+        const provider = new CopybooksCompletionProvider(cdsMock);
         const completions = await provider.provideCompletionItems(
           documentMock,
           positionMock,
@@ -111,7 +111,7 @@ describe("CopybooksCompletionProvider", () => {
       });
 
       test("no remote copybooks completions returned", async () => {
-        const provider = new CopybooksCompletionProvider(undefined, cdsMock);
+        const provider = new CopybooksCompletionProvider(cdsMock);
         const completions = await provider.provideCompletionItems(
           documentMock,
           positionMock,
@@ -130,7 +130,7 @@ describe("CopybooksCompletionProvider", () => {
       });
 
       test("returns all completions for copybook starting AB", async () => {
-        const provider = new CopybooksCompletionProvider(undefined, cdsMock);
+        const provider = new CopybooksCompletionProvider(cdsMock);
         const completions = await provider.provideCompletionItems(
           documentMock,
           positionMock,
@@ -149,7 +149,7 @@ describe("CopybooksCompletionProvider", () => {
       });
 
       test("returns all completions for copybook starting AB", async () => {
-        const provider = new CopybooksCompletionProvider(undefined, cdsMock);
+        const provider = new CopybooksCompletionProvider(cdsMock);
         const completions = await provider.provideCompletionItems(
           documentMock,
           positionMock,
@@ -168,7 +168,7 @@ describe("CopybooksCompletionProvider", () => {
       });
 
       test("returns all completions for copybook starting AB", async () => {
-        const provider = new CopybooksCompletionProvider(undefined, cdsMock);
+        const provider = new CopybooksCompletionProvider(cdsMock);
         const completions = await provider.provideCompletionItems(
           documentMock,
           positionMock,
@@ -187,7 +187,7 @@ describe("CopybooksCompletionProvider", () => {
       });
 
       test("returns all completions", async () => {
-        const provider = new CopybooksCompletionProvider(undefined, cdsMock);
+        const provider = new CopybooksCompletionProvider(cdsMock);
         const completions = await provider.provideCompletionItems(
           documentMock,
           positionMock,
@@ -229,7 +229,7 @@ describe("CopybooksCompletionProvider", () => {
         });
 
         test("returns all completions for copybook starting AB", async () => {
-          const provider = new CopybooksCompletionProvider(undefined, cdsMock);
+          const provider = new CopybooksCompletionProvider(cdsMock);
           const completions = await provider.provideCompletionItems(
             documentMock,
             positionMock,
@@ -253,7 +253,7 @@ describe("CopybooksCompletionProvider", () => {
         });
 
         test("returns all completions for copybook starting AB", async () => {
-          const provider = new CopybooksCompletionProvider(undefined, cdsMock);
+          const provider = new CopybooksCompletionProvider(cdsMock);
           const completions = await provider.provideCompletionItems(
             documentMock,
             positionMock,
@@ -279,7 +279,7 @@ describe("CopybooksCompletionProvider", () => {
     });
 
     test("returns all completions for copybooks (SQL dialect is resolved as default COBOL dialect)", async () => {
-      const provider = new CopybooksCompletionProvider(undefined, cdsMock);
+      const provider = new CopybooksCompletionProvider(cdsMock);
       await provider.provideCompletionItems(
         documentMock,
         positionMock,

@@ -72,7 +72,7 @@ export async function activate(context: ExtensionContext) {
   context.subscriptions.push(
     vscode.languages.registerCompletionItemProvider(
       { language: LANGUAGE_ID },
-      new CopybooksCompletionProvider(outputChannel),
+      new CopybooksCompletionProvider(undefined, outputChannel),
     ),
   );
 }
