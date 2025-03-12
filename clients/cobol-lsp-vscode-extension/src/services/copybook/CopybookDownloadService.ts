@@ -356,6 +356,17 @@ export class CopybookDownloadService {
       return !!(await this.e4eDownloader?.getE4EConfig(documentUri));
     }
     if (!this.explorerApi) return false;
+
+    const copybookLocation =
+      DownloadUtil.areCopybookDownloadConfigurationsPresent(
+        documentUri,
+        dialects,
+      );
+
+    if (!copybookLocation) {
+      return false;
+    }
+
     const profile = ProfileUtils.getProfileNameForCopybook(
       documentUri,
       this.explorerApi,
@@ -375,8 +386,7 @@ export class CopybookDownloadService {
       !(await DownloadUtil.checkForInvalidCredProfile(
         profile,
         this.explorerApi,
-        documentUri,
-        dialects,
+        copybookLocation,
       ))
     );
   }

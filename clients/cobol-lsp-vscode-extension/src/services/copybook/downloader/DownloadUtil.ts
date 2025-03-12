@@ -71,22 +71,12 @@ export class DownloadUtil {
   public static async checkForInvalidCredProfile(
     profileName: string,
     explorerAPI: IApiRegisterClient,
-    documentUri: string,
-    dialects: string[],
+    copybookLocation: CopybookRemoteLocation,
   ): Promise<boolean> {
     if (
       ZoweExplorerDownloader.profileStore.get(profileName) === "valid-profile"
     ) {
       return false;
-    }
-
-    const copybookLocation = this.areCopybookDownloadConfigurationsPresent(
-      documentUri,
-      dialects,
-    );
-
-    if (!copybookLocation) {
-      return true;
     }
 
     try {
@@ -173,12 +163,13 @@ export class DownloadUtil {
    * checks if copybook download configurations are present
    * @param documentUri
    * @param dialects
-   * @returns true if if copybook download configurations are present, false otherwise
+   * @returns first configured remote location if if copybook download
+   * configurations are present, null otherwise
    */
   public static areCopybookDownloadConfigurationsPresent(
     documentUri: string,
     dialects: string[],
-  ) {
+  ): CopybookRemoteLocation | null {
     const uniqueDialects = new Set(
       dialects.map((dialect) => dialect?.toUpperCase()).filter(Boolean),
     );
@@ -253,3 +244,13 @@ export class DownloadUtil {
     );
   }
 }
+
+export type CopybookRemoteLocation =
+  | {
+      dsn: string;
+      uss?: never;
+    }
+  | {
+      uss: string;
+      dsn?: never;
+    };
