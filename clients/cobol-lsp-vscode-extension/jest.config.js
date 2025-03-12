@@ -20,7 +20,6 @@ module.exports = {
     "!src/test/suite/**",
     "!src/__tests__/*.ts",
     "!src/__mocks__/*.ts",
-    "!src/type/*.ts",
     "!src/*.ts",
   ],
   testRunner: "jasmine2",
