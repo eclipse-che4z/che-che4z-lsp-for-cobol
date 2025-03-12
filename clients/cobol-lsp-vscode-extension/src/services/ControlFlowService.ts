@@ -14,7 +14,6 @@
 import * as vscode from "vscode";
 import { Program } from "@code4z/analysis/lib/model/cfast";
 import { Worker } from "worker_threads";
-import { join } from "path";
 import {
   DiagnosticDto,
   DiagnosticSeverityDto,
@@ -24,6 +23,7 @@ import { SettingsService } from "./Settings";
 import { OutputChannelHolder } from "../OutputChannelHolder";
 import { WorkerResultMessage } from "./worker/messages";
 import { GraphDTO } from "@code4z/analysis/lib/model/GraphDTO";
+import path = require("path");
 
 /**
  * Control Flow Analysis callback
@@ -75,7 +75,7 @@ interface AnalysisServiceDelegate {
 }
 
 class AnalysisTask {
-  private worker: Worker = new Worker("./dist/Worker.js");
+  private worker: Worker = new Worker(path.join(__dirname, "./Worker.js"));
 
   constructor(
     private documentUri: string,
