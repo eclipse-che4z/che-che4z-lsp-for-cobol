@@ -19,6 +19,7 @@ import java.util.concurrent.CompletableFuture;
 
 import org.eclipse.lsp.cobol.common.copybook.CopyBookDTO;
 import org.eclipse.lsp.cobol.core.model.extendedapi.ExtendedApiResult;
+import org.eclipse.lsp4j.jsonrpc.services.JsonNotification;
 import org.eclipse.lsp4j.jsonrpc.services.JsonRequest;
 import org.eclipse.lsp4j.services.LanguageClient;
 
@@ -75,10 +76,9 @@ public interface CobolLanguageClient extends LanguageClient {
   /**
    * Notifies language client that CFAST is ready
    * @param result is a result with CFAST data
-   * @return void object
    */
-  @JsonRequest("cfast/ready")
-  default CompletableFuture<Void> cfastReady(ExtendedApiResult result) {
+  @JsonNotification("cfast/ready")
+  default void cfastReady(ExtendedApiResult result) {
     throw new UnsupportedOperationException();
   }
 }
