@@ -92,7 +92,7 @@ parentPort?.on("message", (message: WorkerMessage) => {
 
 function sendMessagesIfNeeded(messages: LoggerItem[]): LoggerItem[] {
   if (messages.length === MESSAGE_BULK_SIZE) {
-    parentPort?.postMessage(messages);
+    postMessage({ type: "log", payload: messages });
     messages = [];
   }
   return messages;
