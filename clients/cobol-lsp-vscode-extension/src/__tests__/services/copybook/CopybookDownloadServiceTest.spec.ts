@@ -307,8 +307,6 @@ describe("Tests copybook download service", () => {
         zoweExplorerMock,
       );
 
-      downloadService["processDownloadError"] = jest.fn();
-
       expect(
         await downloadService.downloadCopybooks("document-uri", [
           { name: "copybook-name", dialect: DEFAULT_DIALECT },
