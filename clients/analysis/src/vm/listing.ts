@@ -313,7 +313,7 @@ class SymbolTable {
   }
 
   popCurrentInlinePerformInfo(): PerformInfo {
-    var result = this.inlinePerformPositionStack.pop();
+    const result = this.inlinePerformPositionStack.pop();
     if (result === undefined) {
       throw new Error("Inline perform position stack is empty");
     }

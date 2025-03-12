@@ -131,7 +131,7 @@ export class ControlFlowGraphBuilder {
         listener,
         optimizer,
         this.maxVMCount,
-        this.channel
+        this.channel,
       );
       processor.run();
 
@@ -211,11 +211,17 @@ class BuildGraphListener implements VirtualProcessorListener {
   }
 
   protected static toVscodeLocation(location: Location): LocationDto {
-    const range = new RangeDto(
-      new PositionDto(location.start.line - 1, location.start.character - 1),
-      new PositionDto(location.end.line - 1, location.end.character - 1),
-    );
-    return new LocationDto(location.uri, range);
+    const range: RangeDto = {
+      start: {
+        line: location.start.line - 1,
+        character: location.start.character - 1,
+      },
+      end: {
+        line: location.end.line - 1,
+        character: location.end.character - 1,
+      },
+    };
+    return { uri: location.uri, range };
   }
 
   protected static report(
@@ -228,7 +234,14 @@ class BuildGraphListener implements VirtualProcessorListener {
     const arr = diagnostics.get(location.uri) || [];
     const range = BuildGraphListener.toVscodeLocation(location).range;
 
-    const diagnostic = new DiagnosticDto(range, message, severity);
+    const diagnostic: DiagnosticDto = {
+      range,
+      message,
+      severity,
+      tags: undefined,
+      source: undefined,
+      relatedInformation: undefined,
+    };
     diagnostic.source = SOURCE;
 
     if (stack) {
@@ -241,9 +254,10 @@ class BuildGraphListener implements VirtualProcessorListener {
           );
           const label = BuildGraphListener.getLabel(stack[i]);
           if (label) {
-            diagnostic.relatedInformation.push(
-              new DiagnosticRelatedInformationDto(vscodeLocation, label),
-            );
+            diagnostic.relatedInformation.push({
+              location: vscodeLocation,
+              message: label,
+            });
           }
         }
       }
@@ -326,7 +340,7 @@ export class DeadCodeCollector {
       }
     }
 
-    var items: CFASTNode[] = [];
+    let items: CFASTNode[] = [];
 
     for (const instruction of instructions) {
       const node = instruction.getInitialNode();
@@ -368,9 +382,16 @@ export class DeadCodeCollector {
       return;
     }
 
-    var uri = items[0].location?.uri;
-    var docDiagnostics = diagnostics.get(uri) ?? [];
-    var diagnostic = new DiagnosticDto(createRange(items), DEAD_CODE, severity);
+    const uri = items[0].location?.uri;
+    const docDiagnostics = diagnostics.get(uri) ?? [];
+    const diagnostic: DiagnosticDto = {
+      range: createRange(items),
+      message: DEAD_CODE,
+      severity,
+      tags: undefined,
+      source: undefined,
+      relatedInformation: undefined,
+    };
     diagnostic.tags = [DiagnosticTagDto.Unnecessary];
     diagnostic.source = SOURCE;
 
@@ -380,8 +401,8 @@ export class DeadCodeCollector {
 
   private static isValidDiagnostic(items: CFASTNode[]): boolean {
     if (items.length > 0) {
-      var uri = items[0].location?.uri;
-      var result: boolean =
+      const uri = items[0].location?.uri;
+      const result: boolean =
         uri !== undefined &&
         items[items.length - 1].location?.end !== undefined;
       return result;

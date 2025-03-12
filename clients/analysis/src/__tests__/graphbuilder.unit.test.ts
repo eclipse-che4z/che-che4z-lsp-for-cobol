@@ -7,8 +7,8 @@ import { DiagnosticDto, DiagnosticSeverityDto } from "../model/external";
 
 describe("Test dead code diagnostic", () => {
   it("should not show diagnostic for empty list", () => {
-    var list: CobolInstruction[] = [];
-    var diagnostics = new Map<string, DiagnosticDto[]>();
+    const list: CobolInstruction[] = [];
+    const diagnostics = new Map<string, DiagnosticDto[]>();
 
     new DeadCodeCollector(
       DiagnosticSeverityDto.Warning,
@@ -17,7 +17,7 @@ describe("Test dead code diagnostic", () => {
   });
 
   it("should not show diagnostic if every node was processed", () => {
-    var list: CobolInstruction[] = [];
+    const list: CobolInstruction[] = [];
     list.push(createNode(1, "uri", true));
     list.push(createNode(2, "uri", true));
     list.push(createNode(3, "uri", true));
@@ -25,7 +25,7 @@ describe("Test dead code diagnostic", () => {
     list.push(createNode(5, "uri", true));
     list.push(createNode(6, "uri", true));
 
-    var diagnostics = new Map<string, DiagnosticDto[]>();
+    const diagnostics = new Map<string, DiagnosticDto[]>();
 
     new DeadCodeCollector(
       DiagnosticSeverityDto.Warning,
@@ -34,7 +34,7 @@ describe("Test dead code diagnostic", () => {
   });
 
   it("should show 1 diagnostic if first node was not proceseed", () => {
-    var list: CobolInstruction[] = [];
+    const list: CobolInstruction[] = [];
     list.push(createNode(1, "uri", false));
     list.push(createNode(2, "uri", true));
     list.push(createNode(3, "uri", true));
@@ -42,7 +42,7 @@ describe("Test dead code diagnostic", () => {
     list.push(createNode(5, "uri", true));
     list.push(createNode(6, "uri", true));
 
-    var diagnostics = new Map<string, DiagnosticDto[]>();
+    const diagnostics = new Map<string, DiagnosticDto[]>();
 
     new DeadCodeCollector(
       DiagnosticSeverityDto.Warning,
@@ -51,7 +51,7 @@ describe("Test dead code diagnostic", () => {
   });
 
   it("should show 1 diagnostic if the last node was not processed", () => {
-    var list: CobolInstruction[] = [];
+    const list: CobolInstruction[] = [];
     list.push(createNode(1, "uri", true));
     list.push(createNode(2, "uri", true));
     list.push(createNode(3, "uri", true));
@@ -59,7 +59,7 @@ describe("Test dead code diagnostic", () => {
     list.push(createNode(5, "uri", true));
     list.push(createNode(6, "uri", false));
 
-    var diagnostics = new Map<string, DiagnosticDto[]>();
+    const diagnostics = new Map<string, DiagnosticDto[]>();
 
     new DeadCodeCollector(
       DiagnosticSeverityDto.Warning,
@@ -68,7 +68,7 @@ describe("Test dead code diagnostic", () => {
   });
 
   it("should show 2 diagnostic for 2 blocks", () => {
-    var list: CobolInstruction[] = [];
+    const list: CobolInstruction[] = [];
     list.push(createNode(1, "uri", true));
     list.push(createNode(2, "uri", false));
     list.push(createNode(3, "uri", false));
@@ -77,7 +77,7 @@ describe("Test dead code diagnostic", () => {
     list.push(createNode(6, "uri", false));
     list.push(createNode(7, "uri", true));
 
-    var diagnostics = new Map<string, DiagnosticDto[]>();
+    const diagnostics = new Map<string, DiagnosticDto[]>();
 
     new DeadCodeCollector(
       DiagnosticSeverityDto.Warning,
@@ -86,13 +86,13 @@ describe("Test dead code diagnostic", () => {
   });
 
   it("should show 2 diagnostic for 2 uris (scenario 1)", () => {
-    var list: CobolInstruction[] = [];
+    const list: CobolInstruction[] = [];
     list.push(createNode(1, "uri", true));
     list.push(createNode(2, "uri1", false));
     list.push(createNode(3, "uri2", false));
     list.push(createNode(4, "uri", true));
 
-    var diagnostics = new Map<string, DiagnosticDto[]>();
+    const diagnostics = new Map<string, DiagnosticDto[]>();
 
     new DeadCodeCollector(
       DiagnosticSeverityDto.Warning,
@@ -102,14 +102,14 @@ describe("Test dead code diagnostic", () => {
   });
 
   it("should show 2 diagnostic for 2 uris (scenario 2)", () => {
-    var list: CobolInstruction[] = [];
+    const list: CobolInstruction[] = [];
     list.push(createNode(1, "uri", true));
     list.push(createNode(2, "uri1", false));
     list.push(createNode(3, "uri", true));
     list.push(createNode(4, "uri2", false));
     list.push(createNode(5, "uri", true));
 
-    var diagnostics = new Map<string, DiagnosticDto[]>();
+    const diagnostics = new Map<string, DiagnosticDto[]>();
 
     new DeadCodeCollector(
       DiagnosticSeverityDto.Warning,
@@ -119,9 +119,9 @@ describe("Test dead code diagnostic", () => {
   });
 
   it("should not show diagnostic for the section if paragraph was processed", () => {
-    var list = [];
+    const list = [];
 
-    var par: CFASTNode = {
+    const par: CFASTNode = {
       id: 2,
       children: [],
       type: "paragraph",
@@ -131,7 +131,7 @@ describe("Test dead code diagnostic", () => {
     const parInst = new SimpleCobolInstruction(par);
     parInst.execute({ ic: 0 } as VmContext);
 
-    var sec: CFASTNode = {
+    const sec: CFASTNode = {
       id: 1,
       children: [par],
       type: "section",
@@ -147,7 +147,7 @@ describe("Test dead code diagnostic", () => {
     list.push(secInst);
     list.push(parInst);
 
-    var diagnostics = new Map<string, DiagnosticDto[]>();
+    const diagnostics = new Map<string, DiagnosticDto[]>();
 
     new DeadCodeCollector(
       DiagnosticSeverityDto.Warning,

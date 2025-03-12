@@ -12,57 +12,46 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
-export class DiagnosticDto {
-  public source: string | undefined;
-  public relatedInformation: DiagnosticRelatedInformationDto[] | undefined;
-  public tags: DiagnosticTagDto[] | undefined;
-
-  constructor(
-    public range: RangeDto,
-    public message: string,
-    public severity: DiagnosticSeverityDto | undefined,
-  ) {}
-}
+export type DiagnosticDto = {
+  range: RangeDto;
+  message: string;
+  severity: DiagnosticSeverityDto | undefined;
+  tags: DiagnosticTagDto[] | undefined;
+  source: string | undefined;
+  relatedInformation: DiagnosticRelatedInformationDto[] | undefined;
+};
 
 /**
  * Represents the severity of diagnostics.
  */
-export enum DiagnosticSeverityDto {
+export const enum DiagnosticSeverityDto {
   Error = 0,
   Warning = 1,
   Information = 2,
   Hint = 3,
 }
 
-export class RangeDto {
-  constructor(
-    public start: PositionDto,
-    public end: PositionDto,
-  ) {}
-}
+export type RangeDto = {
+  start: PositionDto;
+  end: PositionDto;
+};
 
-export class PositionDto {
-  constructor(
-    public line: number,
-    public character: number,
-  ) {}
-}
+export type PositionDto = {
+  line: number;
+  character: number;
+};
 
-export class LocationDto {
-  constructor(
-    public uri: string,
-    public range: RangeDto,
-  ) {}
-}
+export type LocationDto = {
+  uri: string;
+  range: RangeDto;
+};
 
-export class DiagnosticRelatedInformationDto {
-  constructor(
-    public location: LocationDto,
-    public message: string,
-  ) {}
-}
+export type DiagnosticRelatedInformationDto = {
+  location: LocationDto;
+  message: string;
+};
 
-export enum DiagnosticTagDto {
+export const enum DiagnosticTagDto {
   Unnecessary = 1,
   Deprecated = 2,
 }

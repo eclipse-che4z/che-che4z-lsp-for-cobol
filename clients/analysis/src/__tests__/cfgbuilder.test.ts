@@ -58,7 +58,7 @@ describe("Control Flow Graph builder case tests", () => {
     .filter((fname) => fname.endsWith("cfast.json"))
     .forEach((fname) => {
       it(`should work for ${fname}`, async () => {
-        console.log(`\r\n\r\n\r\n******** Tesing ${fname}`);
+        console.log(`\r\n\r\n\r\n******** Testing ${fname}`);
 
         const cfastJson = fs.readFileSync(path.join(testsPath, fname));
         const forest: Program[] = JSON.parse(cfastJson.toString());
@@ -91,12 +91,12 @@ describe("Control Flow Graph builder case tests", () => {
         compareDots(resultDots[0], expectedDot.toString());
 
         // Check diagnostics
-        var diagnosticsFile = path.join(
+        const diagnosticsFile = path.join(
           testsPath,
           fname.replace(".cfast.json", ".diagnostics.json"),
         );
         if (diagnostics.length > 0) {
-          var diagnosticsStr = JSON.stringify(diagnostics, null, 2);
+          const diagnosticsStr = JSON.stringify(diagnostics, null, 2);
 
           const expectedDiagnostics = fs.readFileSync(diagnosticsFile);
           expect(diagnosticsStr).toBe(expectedDiagnostics.toString());

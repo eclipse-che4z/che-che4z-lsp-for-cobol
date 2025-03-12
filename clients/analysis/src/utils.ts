@@ -12,16 +12,16 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 import { CFASTNode } from "./model/cfast";
-import { PositionDto, RangeDto } from "./model/external";
+import { RangeDto } from "./model/external";
 
 export function createRange(items: CFASTNode[]): RangeDto {
-  var startLine = (items[0].location?.start?.line ?? 1) - 1;
-  var startChar = (items[0].location?.start?.character ?? 1) - 1;
+  const startLine = (items[0].location?.start?.line ?? 1) - 1;
+  const startChar = (items[0].location?.start?.character ?? 1) - 1;
 
-  var endLine = (items[items.length - 1].location?.end?.line ?? 1) - 1;
-  var endChar = (items[items.length - 1].location?.end?.character ?? 1) - 1;
-  return new RangeDto(
-    new PositionDto(startLine, startChar),
-    new PositionDto(endLine, endChar),
-  );
+  const endLine = (items[items.length - 1].location?.end?.line ?? 1) - 1;
+  const endChar = (items[items.length - 1].location?.end?.character ?? 1) - 1;
+  return {
+    start: { line: startLine, character: startChar },
+    end: { line: endLine, character: endChar },
+  };
 }

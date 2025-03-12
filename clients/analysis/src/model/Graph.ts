@@ -77,13 +77,13 @@ export class Graph {
   }
 
   private createGraphDTO(): GraphDTO {
-    return new GraphDTO(
-      this.head.id ?? 0,
-      this.programName,
-      this.location,
-      Array.from(this.nodes?.entries()),
-      this.getEdges(),
-    );
+    return {
+      id: this.head.id ?? 0,
+      programName: this.programName,
+      location: this.location,
+      nodes: Array.from(this.nodes?.entries()),
+      edges: this.getEdges(),
+    };
   }
 
   private getEdges(): [number, number[]][] {

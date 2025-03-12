@@ -14,24 +14,10 @@
 import { Location } from "./cfast";
 import { Node } from "./Node";
 
-export class GraphDTO {
+export type GraphDTO = {
   id: number;
   programName: string;
   location: Location;
   nodes: [number, Node][];
   edges: [number, number[]][];
-
-  constructor(
-    id: number,
-    programName: string,
-    location: Location,
-    nodes: [number, Node][],
-    edges: [number, number[]][],
-  ) {
-    this.id = id;
-    this.programName = programName;
-    this.location = location;
-    this.nodes = nodes;
-    this.edges = edges;
-  }
-}
+};
