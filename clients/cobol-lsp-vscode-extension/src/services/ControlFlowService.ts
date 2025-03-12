@@ -72,6 +72,7 @@ class AnalysisTask {
               break;
             case DiagnosticSeverityDto.Information:
               this.logChannel?.info(message.message);
+              break;
             default:
               this.logChannel?.debug(message.message);
               break;
