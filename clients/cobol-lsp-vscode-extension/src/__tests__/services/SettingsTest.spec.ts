@@ -28,7 +28,6 @@ import {
   SETTINGS_CPY_LOCAL_PATH,
   SETTINGS_DIALECT,
 } from "../../constants";
-import { OutputChannelHolder } from "../../OutputChannelHolder";
 
 function makefsPath(p: string): string {
   return path.join(process.platform == "win32" ? "a:" : "", p);
@@ -476,7 +475,7 @@ describe("SettingService lspConfigHandler", () => {
   describe("Invalid configuration provided", () => {
     const outputChannelMock = {
       appendLine: jest.fn(),
-    };
+    } as unknown as vscode.OutputChannel;
     beforeAll(() => {
       jest.spyOn(vscode.workspace, "getConfiguration").mockReturnValue({
         get: () => ["correct-path", 2, false],
@@ -484,19 +483,17 @@ describe("SettingService lspConfigHandler", () => {
     });
 
     test("returns empty setting instead of wrong configuration", async () => {
-      OutputChannelHolder.init(
-        outputChannelMock as unknown as vscode.OutputChannel,
-        outputChannelMock as unknown as vscode.LogOutputChannel,
+      const result = await lspConfigHandler(
+        {
+          items: [
+            {
+              section: SETTINGS_CPY_LOCAL_PATH,
+              scopeUri: "file:///workspace/program.cob",
+            },
+          ],
+        },
+        outputChannelMock,
       );
-
-      const result = await lspConfigHandler({
-        items: [
-          {
-            section: SETTINGS_CPY_LOCAL_PATH,
-            scopeUri: "file:///workspace/program.cob",
-          },
-        ],
-      });
 
       expect(result).toEqual(expect.arrayContaining([]));
       expect(outputChannelMock.appendLine).toHaveBeenCalledWith(

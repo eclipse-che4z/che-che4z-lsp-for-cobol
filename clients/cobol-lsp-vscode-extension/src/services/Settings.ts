@@ -50,7 +50,6 @@ import { getVariablesFromUri, SupportedVariables } from "./util/FSUtils";
 import { SettingsUtils } from "./util/SettingsUtils";
 import { decodeUnknown, DecodingError } from "./util/decoder";
 import * as t from "io-ts";
-import { OutputChannelHolder } from "../OutputChannelHolder";
 
 const NONE: string = "NONE";
 const MAX_VM_COUNT = 50000;
@@ -84,6 +83,7 @@ async function handleProcessorGroupConfigurationRequest<Type, Output, R>(
   ) => Promise<R>,
   item: Item,
   result: (R | undefined)[],
+  outputChannel?: vscode.OutputChannel,
 ) {
   if (item.scopeUri) {
     try {
@@ -106,7 +106,7 @@ async function handleProcessorGroupConfigurationRequest<Type, Output, R>(
       }
     } catch (err) {
       if (err instanceof DecodingError) {
-        OutputChannelHolder.getMainChannel()?.appendLine(
+        outputChannel?.appendLine(
           `Invalid settings: ${item.section} - ${err.message}`,
         );
       }
@@ -116,7 +116,10 @@ async function handleProcessorGroupConfigurationRequest<Type, Output, R>(
   }
 }
 
-export async function lspConfigHandler(request: Request) {
+export async function lspConfigHandler(
+  request: Request,
+  outputChannel?: vscode.OutputChannel,
+) {
   const result: unknown[] = [];
   for (const item of request.items) {
     try {
@@ -133,6 +136,7 @@ export async function lspConfigHandler(request: Request) {
             loadProcessorGroupDialectConfig,
             item,
             result,
+            outputChannel,
           );
           break;
         case SETTINGS_CPY_LOCAL_PATH:
@@ -142,6 +146,7 @@ export async function lspConfigHandler(request: Request) {
               loadProcessorGroupCopybookPathsConfig,
               item,
               result,
+              outputChannel,
             );
           } else {
             // if no configuration for local or remote copybook paths is provided
@@ -164,6 +169,7 @@ export async function lspConfigHandler(request: Request) {
             loadProcessorGroupCopybookExtensionsConfig,
             item,
             result,
+            outputChannel,
           );
           break;
         case SETTINGS_SQL_BACKEND:
@@ -172,6 +178,7 @@ export async function lspConfigHandler(request: Request) {
             loadProcessorGroupSqlBackendConfig,
             item,
             result,
+            outputChannel,
           );
           break;
         case SETTINGS_CPY_FILE_ENCODING:
@@ -180,6 +187,7 @@ export async function lspConfigHandler(request: Request) {
             loadProcessorGroupCopybookEncodingConfig,
             item,
             result,
+            outputChannel,
           );
           break;
         case SETTINGS_COMPILE_OPTIONS:
@@ -188,6 +196,7 @@ export async function lspConfigHandler(request: Request) {
             loadProcessorGroupCompileOptionsConfig,
             item,
             result,
+            outputChannel,
           );
           break;
         case DIALECT_LIBS:

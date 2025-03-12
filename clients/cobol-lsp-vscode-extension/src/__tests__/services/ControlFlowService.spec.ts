@@ -14,7 +14,6 @@
 
 import { Program } from "@code4z/analysis/lib/model/cfast";
 import {
-  controlFlowAstHandler,
   ApiResult,
   ControlFlowAnalysisService,
 } from "../../services/ControlFlowService";
@@ -69,11 +68,9 @@ describe("ControlFlowService tests", () => {
   };
 
   test("Build queued for analysis", async () => {
-    const queueAnalysis = jest.spyOn(
-      ControlFlowAnalysisService.instance(),
-      "queueAnalysis",
-    );
-    await controlFlowAstHandler(apiResult);
+    const service = new ControlFlowAnalysisService();
+    const queueAnalysis = jest.spyOn(service, "queueAnalysis");
+    await service.handleControlFlowAst(apiResult);
     expect(queueAnalysis).toHaveBeenCalled();
   });
 });

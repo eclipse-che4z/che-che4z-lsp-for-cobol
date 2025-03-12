@@ -58,8 +58,7 @@ import {
 } from "./services/reporter";
 import { CopybooksCompletionProvider } from "./services/copybook/CopybooksCompletionProvider";
 import { SubroutinesCompletionsProvider } from "./services/subroutines/SubroutinesCompletionsProvider";
-import { controlFlowAstHandler } from "./services/ControlFlowService";
-import { OutputChannelHolder } from "./OutputChannelHolder";
+import { ControlFlowAnalysisService } from "./services/ControlFlowService";
 
 interface __AnalysisApi {
   analysis(uri: string, text: string, pos?: vscode.Position): Promise<unknown>;
@@ -77,7 +76,6 @@ async function initialize(context: vscode.ExtensionContext) {
     "COBOL Language Support Control Flow",
     { log: true },
   );
-  OutputChannelHolder.init(outputChannel, controlFlowChannel);
 
   try {
     await vscode.workspace.fs.createDirectory(context.globalStorageUri);
@@ -196,11 +194,19 @@ export async function activate(
     "copybook/download",
     copyBooksDownloader.makeCopybookDownloadHandler(),
   );
-  languageClientService.addRequestHandler(
+  languageClientService.addNotificationHandler(
     "workspace/configuration",
-    lspConfigHandler,
+    (r: Parameters<typeof lspConfigHandler>[0]) => {
+      lspConfigHandler(r, outputChannel).catch(() => {});
+    },
   );
-  languageClientService.addRequestHandler("cfast/ready", controlFlowAstHandler);
+  languageClientService.addNotificationHandler(
+    "cfast/ready",
+    ControlFlowAnalysisService.makeControlFlowAstNotificationHandler(
+      outputChannel,
+      controlFlowChannel,
+    ),
+  );
 
   await languageClientService.start();
 
