@@ -37,10 +37,6 @@
   ],
   "icon": "resources/logo.png",
   "main": "./dist/extension.js",
-  "exports": {
-    "types": "./dist/Worker.d.ts",
-    "import": "./dist/Worker.js"
-  },
   "browser": "./dist/web/extension.js",
   "contributes": {
     "commands": [
