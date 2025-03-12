@@ -63,18 +63,18 @@ class AnalysisTask {
         );
       } else if (data.type === "log") {
         for (const message of data.payload) {
-          if (message.severity === vscode.DiagnosticSeverity.Error.valueOf()) {
-            this.logChannel?.error(message.message);
-          } else if (
-            message.severity === vscode.DiagnosticSeverity.Warning.valueOf()
-          ) {
-            this.logChannel?.warn(message.message);
-          } else if (
-            message.severity === vscode.DiagnosticSeverity.Information.valueOf()
-          ) {
-            this.logChannel?.info(message.message);
-          } else {
-            this.logChannel?.debug(message.message);
+          switch (message.severity) {
+            case DiagnosticSeverityDto.Error:
+              this.logChannel?.error(message.message);
+              break;
+            case DiagnosticSeverityDto.Warning:
+              this.logChannel?.warn(message.message);
+              break;
+            case DiagnosticSeverityDto.Information:
+              this.logChannel?.info(message.message);
+            default:
+              this.logChannel?.debug(message.message);
+              break;
           }
         }
       }
@@ -197,6 +197,13 @@ class DiagnosticService {
   }
 }
 
+const severityTranslation: vscode.DiagnosticSeverity[] = [
+  vscode.DiagnosticSeverity.Error,
+  vscode.DiagnosticSeverity.Warning,
+  vscode.DiagnosticSeverity.Information,
+  vscode.DiagnosticSeverity.Hint,
+];
+
 function convertDiagnostics(
   diagnostics: Map<string, DiagnosticDto[]>,
 ): Map<string, vscode.Diagnostic[]> {
@@ -215,40 +222,10 @@ function convertDiagnostics(
         ),
       );
 
-      let severity: vscode.DiagnosticSeverity | undefined = undefined;
-      if (diagnosticDTO.severity) {
-        if (
-          diagnosticDTO.severity.valueOf() ===
-          DiagnosticSeverityDto.Error.valueOf()
-        ) {
-          severity = vscode.DiagnosticSeverity.Error;
-        }
-
-        if (
-          diagnosticDTO.severity.valueOf() ===
-          DiagnosticSeverityDto.Warning.valueOf()
-        ) {
-          severity = vscode.DiagnosticSeverity.Warning;
-        }
-
-        if (
-          diagnosticDTO.severity.valueOf() ===
-          DiagnosticSeverityDto.Information.valueOf()
-        ) {
-          severity = vscode.DiagnosticSeverity.Information;
-        }
-
-        if (
-          diagnosticDTO.severity.valueOf() ===
-          DiagnosticSeverityDto.Hint.valueOf()
-        ) {
-          severity = vscode.DiagnosticSeverity.Hint;
-        }
-      }
       const diagnostic = new vscode.Diagnostic(
         range,
         diagnosticDTO.message,
-        severity,
+        severityTranslation[diagnosticDTO.severity ?? -1],
       );
 
       if (diagnosticDTO.tags) {

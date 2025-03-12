@@ -12,7 +12,7 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 import { Program } from "@code4z/analysis/lib/model/cfast";
-import { DiagnosticDto } from "@code4z/analysis/lib/model/external";
+import { DiagnosticDto, DiagnosticSeverityDto } from "@code4z/analysis/lib/model/external";
 import { GraphDTO } from "@code4z/analysis/lib/model/GraphDTO";
 
 export type WorkerMessage = {
@@ -22,7 +22,7 @@ export type WorkerMessage = {
 };
 
 export type LoggerItem = {
-  severity: number;
+  severity: DiagnosticSeverityDto;
   message: string;
 };
 

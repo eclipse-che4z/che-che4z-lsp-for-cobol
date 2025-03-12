@@ -25,35 +25,35 @@ export class Logger implements Channel {
 
   debug(message: string): void {
     this.messages.push({
-      severity: DiagnosticSeverityDto.Hint.valueOf(),
+      severity: DiagnosticSeverityDto.Hint,
       message: message,
     });
     this.messages = sendMessagesIfNeeded(this.messages);
   }
   trace(message: string): void {
     this.messages.push({
-      severity: DiagnosticSeverityDto.Hint.valueOf(),
+      severity: DiagnosticSeverityDto.Hint,
       message: message,
     });
     this.messages = sendMessagesIfNeeded(this.messages);
   }
   info(message: string): void {
     this.messages.push({
-      severity: DiagnosticSeverityDto.Information.valueOf(),
+      severity: DiagnosticSeverityDto.Information,
       message: message,
     });
     this.messages = sendMessagesIfNeeded(this.messages);
   }
   warn(message: string): void {
     this.messages.push({
-      severity: DiagnosticSeverityDto.Warning.valueOf(),
+      severity: DiagnosticSeverityDto.Warning,
       message: message,
     });
     this.messages = sendMessagesIfNeeded(this.messages);
   }
   error(message: string): void {
     this.messages.push({
-      severity: DiagnosticSeverityDto.Error.valueOf(),
+      severity: DiagnosticSeverityDto.Error,
       message: message,
     });
     this.messages = sendMessagesIfNeeded(this.messages);
