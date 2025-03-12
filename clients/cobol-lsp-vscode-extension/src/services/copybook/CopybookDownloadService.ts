@@ -15,7 +15,6 @@
 import * as vscode from "vscode";
 import {
   COPYBOOKS_FOLDER,
-  DEFAULT_DIALECT,
   ENDEVOR_PROCESSOR,
   PROVIDE_PROFILE_MSG,
   ZOWE_FOLDER,
@@ -32,7 +31,6 @@ import { searchCopybookInExtensionFolder } from "../util/FSUtils";
 import { CopybookURI } from "./CopybookURI";
 import path = require("path");
 import { getErrorMessage } from "../util/ErrorsUtils";
-import { DialectRegistry } from "../DialectRegistry";
 
 export class CopybookName {
   constructor(
