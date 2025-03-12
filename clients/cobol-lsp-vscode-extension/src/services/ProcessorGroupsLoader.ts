@@ -48,7 +48,7 @@ const ZoweDatasetConfigModel = t.intersection([
 ]);
 
 const ZoweUssConfigModel = t.intersection([
-  t.type({ ussFile: t.string }),
+  t.type({ uss: t.string }),
   t.partial({ profile: t.string }),
 ]);
 

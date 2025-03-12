@@ -72,7 +72,7 @@ jest.mock("vscode", () => {
                               "libs": [
                                 "/abs",
                                 { "dataset": "remote.dataset.location" },
-                                { "ussFile": "remote.ussFile.location" },
+                                { "uss": "remote.uss.location" },
                                 {
                                   "environment": "ENV",
                                   "stage": "1",
@@ -170,7 +170,7 @@ describe("Processor groups configuration understand absolute paths", () => {
     expect(result).toStrictEqual([
       "/copy-resolved-from-glob",
       { dataset: "remote.dataset.location" },
-      { ussFile: "remote.ussFile.location" },
+      { uss: "remote.uss.location" },
       {
         environment: "ENV",
         stage: "1",
