@@ -17,8 +17,11 @@ import { Worker } from "worker_threads";
 import { join } from "path";
 import {
   DiagnosticDto,
+  DiagnosticRelatedInformationDto,
   DiagnosticSeverityDto,
   DiagnosticTagDto,
+  LocationDto,
+  RangeDto,
 } from "@code4z/analysis/lib/model/external";
 import { SettingsService } from "./Settings";
 import { WorkerResultMessage } from "./worker/messages";
@@ -205,65 +208,52 @@ const severityTranslation: vscode.DiagnosticSeverity[] = [
   vscode.DiagnosticSeverity.Hint,
 ];
 
+function asRange(r: RangeDto): vscode.Range {
+  return new vscode.Range(
+    new vscode.Position(r.start.line, r.start.character),
+    new vscode.Position(r.end.line, r.end.character),
+  );
+}
+
+function asLocation(r: LocationDto): vscode.Location {
+  return new vscode.Location(vscode.Uri.parse(r.uri), asRange(r.range));
+}
+
+function asTag(t: DiagnosticTagDto): vscode.DiagnosticTag {
+  switch (t) {
+    case DiagnosticTagDto.Deprecated:
+      return vscode.DiagnosticTag.Deprecated;
+    case DiagnosticTagDto.Unnecessary:
+      return vscode.DiagnosticTag.Unnecessary;
+  }
+}
+
+function asRelatedInfo(
+  ri: DiagnosticRelatedInformationDto,
+): vscode.DiagnosticRelatedInformation {
+  return new vscode.DiagnosticRelatedInformation(
+    asLocation(ri.location),
+    ri.message,
+  );
+}
+
+function asDiagnostic(d: DiagnosticDto): vscode.Diagnostic {
+  const r = new vscode.Diagnostic(
+    asRange(d.range),
+    d.message,
+    severityTranslation[d.severity ?? -1],
+  );
+  r.tags = d.tags?.map(asTag);
+  r.relatedInformation = d.relatedInformation?.map(asRelatedInfo);
+  return r;
+}
+
 function convertDiagnostics(
   diagnostics: Map<string, DiagnosticDto[]>,
 ): Map<string, vscode.Diagnostic[]> {
   const diagnosticsMap = new Map<string, vscode.Diagnostic[]>();
   for (const [key, value] of diagnostics) {
-    const diagnostics = [];
-    for (const diagnosticDTO of value) {
-      const range = new vscode.Range(
-        new vscode.Position(
-          diagnosticDTO.range.start.line,
-          diagnosticDTO.range.start.character,
-        ),
-        new vscode.Position(
-          diagnosticDTO.range.end.line,
-          diagnosticDTO.range.end.character,
-        ),
-      );
-
-      const diagnostic = new vscode.Diagnostic(
-        range,
-        diagnosticDTO.message,
-        severityTranslation[diagnosticDTO.severity ?? -1],
-      );
-
-      if (diagnosticDTO.tags) {
-        diagnostic.tags = [
-          ...diagnosticDTO.tags.map((t) => {
-            return t == DiagnosticTagDto.Deprecated
-              ? vscode.DiagnosticTag.Deprecated
-              : vscode.DiagnosticTag.Unnecessary;
-          }),
-        ];
-      }
-      if (diagnosticDTO.relatedInformation) {
-        const riArray: vscode.DiagnosticRelatedInformation[] = [];
-        for (const ri of diagnosticDTO.relatedInformation) {
-          const riRange = new vscode.Range(
-            new vscode.Position(
-              ri.location.range.start.line,
-              diagnosticDTO.range.start.character,
-            ),
-            new vscode.Position(
-              ri.location.range.end.line,
-              ri.location.range.end.character,
-            ),
-          );
-          const location: vscode.Location = new vscode.Location(
-            vscode.Uri.parse(ri.location.uri),
-            riRange,
-          );
-          riArray.push(
-            new vscode.DiagnosticRelatedInformation(location, ri.message),
-          );
-        }
-        diagnostic.relatedInformation = riArray;
-      }
-      diagnostics.push(diagnostic);
-    }
-    diagnosticsMap.set(key, diagnostics);
+    diagnosticsMap.set(key, value.map(asDiagnostic));
   }
   return diagnosticsMap;
 }
