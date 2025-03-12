@@ -13,11 +13,11 @@
  */
 import { Location } from "./cfast";
 
-export class Node {
-  id: number = 0;
+export type Node = {
+  id: number;
   parentId: number | undefined;
-  name: string = "";
-  type: "paragraph" | "program" | "section" = "paragraph";
-  details: string = "";
+  name: string;
+  type: "paragraph" | "program" | "section";
+  details: string;
   location: Location | undefined;
-}
+};
