@@ -13,26 +13,25 @@
  */
 import { Program } from "@code4z/analysis/lib/model/cfast";
 
-export type MessageType = "result" | "log";
-
-export class WorkerMessage {
-  public constructor(
-    public vmCount: number,
-    public severity: number,
-    public programs: Program[],
-  ) {}
+export type WorkerMessage = {
+    vmCount: number,
+    severity: number,
+    programs: Program[],
 }
 
-export class WorkerResultMessage<T> {
-  constructor(
-    public type: MessageType,
-    public payload: T,
-  ) {}
+export type LoggerItem = {
+    severity: number,
+    message: string,
 }
 
-export class LoggerItem {
-  public constructor(
-    public severity: number,
-    public message: string,
-  ) {}
+export type SomethingResemblingEngineProcessingResult = {
+... // Graph won't survive the cloning process as Graph
+}
+
+export type WorkerResultMessage = {
+    type: "result",
+    payload: SomethingResemblingEngineProcessingResult,
+} | {
+    type: "log",
+    payload: LoggerItem[],
 }
