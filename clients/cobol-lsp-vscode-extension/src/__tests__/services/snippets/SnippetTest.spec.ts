@@ -78,7 +78,7 @@ describe("Test CompletionProvider", () => {
           context,
         )
       ).length,
-    ).toBe(301);
+    ).toBe(333);
   });
   test("Suggest all IDMS Snippets", async () => {
     const doc = {
@@ -104,7 +104,7 @@ describe("Test CompletionProvider", () => {
           context,
         )
       ).length,
-    ).toBe(232);
+    ).toBe(264);
   });
 
   test("Suggest all Cobol only Snippets", async () => {
@@ -131,7 +131,7 @@ describe("Test CompletionProvider", () => {
           context,
         )
       ).length,
-    ).toBe(222);
+    ).toBe(254);
   });
 
   test("Suggest Snippets when both IDMS and DaCo is set", async () => {
@@ -158,7 +158,7 @@ describe("Test CompletionProvider", () => {
           context,
         )
       ).length,
-    ).toBe(311);
+    ).toBe(343);
   });
 
   test(" Test number of suggestions for COPY when no dialect is selected", async () => {
@@ -185,7 +185,7 @@ describe("Test CompletionProvider", () => {
           context,
         )
       ).length,
-    ).toBe(1);
+    ).toBe(2);
   });
 
   test(" Test number of suggestions for COPY when dialect is IDMS", async () => {
@@ -208,7 +208,7 @@ describe("Test CompletionProvider", () => {
       token,
       context,
     );
-    expect(completions.length).toBe(7);
+    expect(completions.length).toBe(8);
   });
 
   test(" Test number of suggestions for WRITE when dialect is IDMS", async () => {
@@ -235,7 +235,7 @@ describe("Test CompletionProvider", () => {
           context,
         )
       ).length,
-    ).toBe(1);
+    ).toBe(2);
   });
 
   test(" Test number of suggestions for WRITE when dialect is Daco", async () => {
@@ -258,6 +258,6 @@ describe("Test CompletionProvider", () => {
       token,
       context,
     );
-    expect(completions.length).toBe(10);
+    expect(completions.length).toBe(11);
   });
 });

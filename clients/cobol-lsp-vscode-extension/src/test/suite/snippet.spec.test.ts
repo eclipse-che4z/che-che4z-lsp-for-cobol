@@ -85,7 +85,7 @@ suite(
         3000,
       );
       await helper.triggerCompletionsAndWaitForResults();
-      await helper.executeCommandMultipleTimes("selectNextSuggestion", 5);
+      await helper.executeCommandMultipleTimes("selectNextSuggestion", 7);
       await helper.sleep(500);
       await vscode.commands.executeCommand("acceptSelectedSuggestion");
       await helper.waitFor(
@@ -97,14 +97,17 @@ suite(
       await helper.sleep(1000);
       await editor.edit((edit) => edit.replace(editor.selection, "str"));
       await helper.waitFor(
-        () => editor.document.getText().includes("ADD 1 TO str"),
+        () =>
+          editor.document
+            .getText()
+            .includes("ADD 1 TO str ON SIZE ERROR error-catch-logic"),
         3000,
       );
       const text = editor.document.getText();
       const acceptedLine = text.split("\n")[39];
       assert.strictEqual(
         acceptedLine.trim(),
-        "ADD 1 TO str",
+        "ADD 1 TO str ON SIZE ERROR error-catch-logic",
         "Checks auto complete functionality, also with navigation by snippets",
       );
     });
