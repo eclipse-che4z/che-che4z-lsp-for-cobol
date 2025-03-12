@@ -45,7 +45,7 @@ interface AnalysisServiceDelegate {
 }
 
 class AnalysisTask {
-  private worker: Worker = new Worker(join(__dirname, "./dist/Worker.js"));
+  private worker: Worker = new Worker(join(__dirname, "./Worker.js"));
 
   constructor(
     private documentUri: string,
