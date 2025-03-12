@@ -45,7 +45,4 @@ export default [
       "@typescript-eslint/unbound-method": "off",
     },
   },
-  {
-    ignores: ["**/Worker.js"],
-  },
 ];
