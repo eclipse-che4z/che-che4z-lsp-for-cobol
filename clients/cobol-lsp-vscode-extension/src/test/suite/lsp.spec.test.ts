@@ -179,22 +179,20 @@ suite("Integration Test Suite", function () {
     const editor = helper.getEditor("ADSORT.cbl");
     await helper.waitFor(async () => {
       await helper.sleep(100);
-      const result =
-        (await vscode.commands.executeCommand<vscode.Location[]>(
-          "vscode.executeDefinitionProvider",
-          editor.document.uri,
-          pos(58, 36),
-        )) ?? [];
-      return result?.length > 0;
-    });
-    const result =
-      (await vscode.commands.executeCommand<vscode.Location[]>(
+      const result = await vscode.commands.executeCommand<vscode.Location[]>(
         "vscode.executeDefinitionProvider",
         editor.document.uri,
         pos(58, 36),
-      )) ?? [];
+      );
+      return result?.length > 0;
+    });
+    const result = await vscode.commands.executeCommand<vscode.Location[]>(
+      "vscode.executeDefinitionProvider",
+      editor.document.uri,
+      pos(58, 36),
+    );
     assert.strictEqual(
-      result.length,
+      result?.length,
       1,
       "Checks behavior of go to definition action (size)",
     );
