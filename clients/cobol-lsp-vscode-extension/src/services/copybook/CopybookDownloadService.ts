@@ -23,7 +23,7 @@ import {
   PROVIDE_PROFILE_MSG,
   PROVIDE_PROFILE_MSG_PROC_GRUOPS,
   USE_MAP,
-  USSFILE,
+  USS,
   ZOWE_FOLDER,
 } from "../../constants";
 import { ProfileUtils } from "../util/ProfileUtils";
@@ -406,8 +406,7 @@ export class CopybookDownloadService {
       configs
         .filter(
           (config): config is ZoweUssConfigModel | ZoweDatasetConfigModel =>
-            typeof config != "string" &&
-            (DATASET in config || USSFILE in config),
+            typeof config != "string" && (DATASET in config || USS in config),
         )
         .map((dsn) => dsn.profile)
         .filter((x) => typeof x == "string"),
@@ -517,14 +516,14 @@ export class CopybookDownloadService {
           ],
         );
         if (dsnSuccess) return true;
-      } else if (USSFILE in config && this.ussDownloader) {
+      } else if (USS in config && this.ussDownloader) {
         const ussSuccess = await this.downloadFromPaths(
           this.ussDownloader,
           copybookName,
           documentUri,
           [
             {
-              path: config.ussFile,
+              path: config.uss,
               profile: config.profile ? config.profile : undefined,
             },
           ],
@@ -615,16 +614,16 @@ async function searchCopybookinProcessorGroups(
         storagePath,
       ).fsPath;
       shouldFound = true;
-    } else if (typeof config === "object" && USSFILE in config) {
+    } else if (typeof config === "object" && USS in config) {
       const has = await ussDownloader?.hasMember(
         config.profile ? config.profile : SettingsService.getProfileName()!,
-        config.ussFile,
+        config.uss,
         copybookName,
       );
       if (!has) continue;
       folders = CopybookURI.createDatasetPath(
         config.profile ? [config.profile] : [SettingsService.getProfileName()!],
-        config.ussFile,
+        config.uss,
         storagePath,
       ).fsPath;
       shouldFound = true;

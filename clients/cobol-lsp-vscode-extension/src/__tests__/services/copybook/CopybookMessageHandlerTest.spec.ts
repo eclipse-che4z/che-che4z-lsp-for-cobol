@@ -383,7 +383,7 @@ describe("Test the copybook message handler", () => {
         type: "copy",
         profile: "instance@profile",
       },
-      { ussFile: "ussFile", profile: "profile" },
+      { uss: "ussFile", profile: "profile" },
     ]);
 
     await downloader.resolveCopybookHandler(
@@ -424,7 +424,7 @@ describe("Test the copybook message handler", () => {
       spyConfig.mockResolvedValue([
         "/libs",
         { dataset: "procGroupDataset", profile: "procGroupProfile" },
-        { ussFile: "ussFile", profile: "profile" },
+        { uss: "ussFile", profile: "profile" },
       ]);
       expect(
         await DownloadUtil.areCopybookDownloadConfigurationsPresent(

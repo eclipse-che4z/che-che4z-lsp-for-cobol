@@ -50,7 +50,7 @@
                 {
                   "type": "object",
                   "properties": {
-                    "ussFile": {
+                    "uss": {
                       "type": "string",
                       "description": "USS directory on the mainframe."
                     },
@@ -59,7 +59,7 @@
                       "description": "Profile name to be used by the Zowe Explorer extension"
                     }
                   },
-                  "required": ["ussFile"]
+                  "required": ["uss"]
                 },
                 {
                   "type": "object",

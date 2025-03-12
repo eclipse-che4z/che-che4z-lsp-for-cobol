@@ -155,10 +155,10 @@ export class CopybookDownloaderForUss extends ZoweExplorerDownloader {
 
   public async hasMember(
     profileName: string,
-    ussFile: string,
+    uss: string,
     copybookName: string,
   ) {
-    const id = this.createId(profileName, ussFile);
+    const id = this.createId(profileName, uss);
 
     if (this.memberListCache.has(id)) {
       return this.memberListCache
@@ -167,11 +167,11 @@ export class CopybookDownloaderForUss extends ZoweExplorerDownloader {
     }
     const profile = DownloadUtil.loadProfile(profileName, this.explorerAPI);
     await this.limitFailedRequests(
-      `list USS directory ${profileName}/${ussFile}`,
+      `list USS directory ${profileName}/${uss}`,
       async () => {
         const response = await this.explorerAPI
           .getUssApi(profile)
-          .fileList(ussFile);
+          .fileList(uss);
 
         const members = response.apiResponse.items.map((el) => el.name);
         this.memberListCache.set(id, members);

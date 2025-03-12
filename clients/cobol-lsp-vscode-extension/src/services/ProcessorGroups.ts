@@ -38,7 +38,7 @@ import {
   ZoweDatasetConfigModel,
   ZoweUssConfigModel,
 } from "./ProcessorGroupsLoader";
-import { USSFILE } from "../constants";
+import { USS } from "../constants";
 
 export async function loadProcessorGroupCopybookPaths(
   documentUri: string,
@@ -97,9 +97,9 @@ export async function loadProcessorGroupCopybookPathsConfig(
         configs.push(...globs);
       }
     } else {
-      if (USSFILE in config) {
-        config.ussFile = SettingsService.evaluateVariables(
-          [config.ussFile],
+      if (USS in config) {
+        config.uss = SettingsService.evaluateVariables(
+          [config.uss],
           variables,
         )[0];
       }

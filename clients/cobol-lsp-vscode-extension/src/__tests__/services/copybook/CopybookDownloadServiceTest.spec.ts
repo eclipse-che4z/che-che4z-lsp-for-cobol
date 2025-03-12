@@ -307,8 +307,6 @@ describe("Tests copybook download service", () => {
         zoweExplorerMock,
       );
 
-      downloadService["processDownloadError"] = jest.fn();
-
       expect(
         await downloadService.downloadCopybooks("document-uri", [
           { name: "copybook-name", dialect: DEFAULT_DIALECT },
@@ -909,7 +907,7 @@ describe("Tests copybook download service", () => {
     spyConfig.mockResolvedValue([
       "/libs",
       { dataset: "procGroupDataset", profile: "procGroupProfile" },
-      { ussFile: "ussFile", profile: "profile" },
+      { uss: "uss", profile: "profile" },
     ]);
 
     const downloader = new CopybookDownloadService(
@@ -940,7 +938,7 @@ describe("Tests copybook download service", () => {
       "loadProcessorGroupCopybookPathsConfig",
     );
     spyConfig.mockResolvedValue([
-      { ussFile: "ussFile", profile: "profile" },
+      { uss: "ussFile", profile: "profile" },
       { dataset: "procGroupDataset", profile: "procGroupProfile" },
       "/libs",
     ]);
