@@ -194,11 +194,10 @@ export async function activate(
     "copybook/download",
     copyBooksDownloader.makeCopybookDownloadHandler(),
   );
-  languageClientService.addNotificationHandler(
+  languageClientService.addRequestHandler(
     "workspace/configuration",
-    (r: Parameters<typeof lspConfigHandler>[0]) => {
-      lspConfigHandler(r, outputChannel).catch(() => {});
-    },
+    (r: Parameters<typeof lspConfigHandler>[0]) =>
+      lspConfigHandler(r, outputChannel),
   );
   languageClientService.addNotificationHandler(
     "cfast/ready",
