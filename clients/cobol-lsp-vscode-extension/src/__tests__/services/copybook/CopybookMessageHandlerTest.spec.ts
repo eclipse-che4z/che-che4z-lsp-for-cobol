@@ -363,7 +363,7 @@ describe("Test the copybook message handler", () => {
     SettingsService.getUssPath = jest.fn().mockReturnValue(["uss/path"]);
     SettingsService.getDsnPath = jest.fn().mockReturnValue(["dsn/path"]);
     downloader["dsnDownloader"]!.hasMember = jest.fn().mockResolvedValue(false);
-    downloader["ussDownloader"]!.hasMember = jest.fn().mockResolvedValue(false);
+    downloader["ussDownloader"]!.hasMember = jest.fn().mockResolvedValue(true);
     downloader["e4eDownloader"]!.hasElement = jest.fn().mockResolvedValue(true);
     const searchSpy = jest.spyOn(fsUtils, "searchCopybookInExtensionFolder");
     searchSpy.mockReturnValue(undefined);
@@ -431,7 +431,7 @@ describe("Test the copybook message handler", () => {
           "documentUri",
           ["COBOL"],
         ),
-      ).toBeTruthy();
+      ).toStrictEqual(true);
     });
   });
 });

@@ -165,14 +165,18 @@ export class CopybookDownloaderForUss extends ZoweExplorerDownloader {
         .get(id)
         ?.find((member) => member === copybookName);
     }
-
     const profile = DownloadUtil.loadProfile(profileName, this.explorerAPI);
-    const response = await this.explorerAPI
-      .getUssApi(profile)
-      .fileList(ussFile);
-    const members = response.apiResponse.items.map((el) => el.name);
+    await this.limitFailedRequests(
+      `list USS directory ${profileName}/${ussFile}`,
+      async () => {
+        const response = await this.explorerAPI
+          .getUssApi(profile)
+          .fileList(ussFile);
 
-    this.memberListCache.set(id, members);
+        const members = response.apiResponse.items.map((el) => el.name);
+        this.memberListCache.set(id, members);
+      },
+    );
     if (this.memberListCache.get(id)?.find((member) => member === copybookName))
       return true;
     return false;

@@ -278,7 +278,7 @@ describe("CopybooksCompletionProvider", () => {
       positionChar = lineText.length;
     });
 
-    test("returns all completions for copybooks using SQL dialect", async () => {
+    test("returns all completions for copybooks (SQL dialect is resolved as default COBOL dialect)", async () => {
       const provider = new CopybooksCompletionProvider(cdsMock);
       await provider.provideCompletionItems(
         documentMock,
@@ -289,7 +289,7 @@ describe("CopybooksCompletionProvider", () => {
 
       expect(cdsMock.listRemoteCopybooks).toHaveBeenCalledWith(
         "file://PROGRAM.cbl",
-        "SQL",
+        "COBOL",
       );
     });
   });

@@ -20,14 +20,9 @@ import {
   loadProcessorGroupCopybookPathsConfig,
   loadProcessorGroupDialectConfig,
   loadProcessorGroupSqlBackendConfig,
-  prepareProcessorGroupConfigPathsForEndevor,
 } from "../../services/ProcessorGroups";
 import * as glob from "glob";
-import { EndevorConfigModel } from "../../services/ProcessorGroupsLoader";
-import { CopybookDownloaderForE4E } from "../../services/copybook/downloader/CopybookDownloaderForE4E";
-import { CopybookName } from "../../services/copybook/CopybookDownloadService";
 import { SettingsService } from "../../services/Settings";
-import { e4eMock } from "../../__mocks__/getE4EMock.utility";
 
 const WORKSPACE_URI = "file:///my/workspace";
 
@@ -294,44 +289,6 @@ describe("Processor groups configuration provides lib path in Windows", () => {
   });
 });
 describe("Processor groups configurations prepared for download services", () => {
-  it("check prepareProcessorGroupConfigPathsForEndevor returns valid Endevor Element ", async () => {
-    const e4eDownloader = new CopybookDownloaderForE4E("/storagePath", e4eMock);
-    const copybook: CopybookName = { name: "copybook", dialect: "COBOL" };
-    e4eDownloader.getProfileInfo = async () =>
-      Promise.resolve({ profile: "profile", instance: "instance" });
-    const pgConfigs: EndevorConfigModel[] = [
-      {
-        environment: "ENV",
-        stage: "1",
-        system: "SYSTEM",
-        subsystem: "SUBSYTEM",
-        type: "COPY",
-        profile: "instance.internal.connection",
-      },
-    ];
-
-    const result = await prepareProcessorGroupConfigPathsForEndevor(
-      pgConfigs[0],
-      e4eDownloader,
-      copybook,
-    );
-    expect(result).toStrictEqual({
-      element: {
-        environment: "ENV",
-        stage: "1",
-        system: "SYSTEM",
-        subsystem: "SUBSYTEM",
-        type: "COPY",
-        use_map: true,
-        element: "copybook",
-        fingerprint: "",
-      },
-      profile: {
-        profile: "profile",
-        instance: "instance",
-      },
-    });
-  });
   it("getCopybookLocalPath returns local paths only when remote locations provided in processor group definitions", async () => {
     const paths = await SettingsService.getCopybookLocalPath(
       WORKSPACE_URI + "/abs/TEST.cob",

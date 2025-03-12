@@ -315,7 +315,7 @@ describe("Tests copybook download service", () => {
         ]),
       ).toBe(undefined);
       expect(vscode.window.showErrorMessage).toHaveBeenCalledWith(
-        "Please specify a valid Zowe Explorer profile in processor groups to download copybooks from the mainframe. Provided invalid profile name: invalidProfile",
+        "Please specify a valid Zowe Explorer profile in proc_grps.json to download copybooks from the mainframe. Provided invalid profile name: invalidProfile",
       );
       mocked.mockResolvedValue([]);
     });
@@ -900,6 +900,8 @@ describe("Tests copybook download service", () => {
   });
 
   it("checks settings in processor groups used first", async () => {
+    const settingsMockDsn = (SettingsService.getDsnPath = jest.fn());
+    const settingsMockUss = (SettingsService.getDsnPath = jest.fn());
     const spyConfig = jest.spyOn(
       ProcessorGroups,
       "loadProcessorGroupCopybookPathsConfig",
@@ -928,8 +930,6 @@ describe("Tests copybook download service", () => {
       "procGroupDataset",
       "procGroupProfile",
     );
-    const settingsMockDsn = (SettingsService.getDsnPath = jest.fn());
-    const settingsMockUss = (SettingsService.getDsnPath = jest.fn());
     expect(settingsMockDsn).toHaveBeenCalledTimes(0);
     expect(settingsMockUss).toHaveBeenCalledTimes(0);
   });
@@ -940,9 +940,9 @@ describe("Tests copybook download service", () => {
       "loadProcessorGroupCopybookPathsConfig",
     );
     spyConfig.mockResolvedValue([
-      "/libs",
-      { dataset: "procGroupDataset", profile: "procGroupProfile" },
       { ussFile: "ussFile", profile: "profile" },
+      { dataset: "procGroupDataset", profile: "procGroupProfile" },
+      "/libs",
     ]);
 
     const downloader = new CopybookDownloadService(
@@ -952,7 +952,7 @@ describe("Tests copybook download service", () => {
     );
     downloader["dsnDownloader"]!.downloadCopybook = jest
       .fn()
-      .mockReturnValue(false);
+      .mockReturnValue(true);
     downloader["ussDownloader"]!.downloadCopybook = jest
       .fn()
       .mockReturnValue(true);

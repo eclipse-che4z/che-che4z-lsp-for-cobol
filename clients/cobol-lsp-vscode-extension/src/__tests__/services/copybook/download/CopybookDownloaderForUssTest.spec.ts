@@ -161,13 +161,15 @@ describe("Tests Copybook download from USS", () => {
         );
         expect(isDowloaded).toBeTruthy();
       });
-      it("checks hasMember adds fetched list to cache when cache doesn't have the member", async () => {
-        await downloader.hasMember("profile", "ussFile", "copybook");
+      it("checks hasMember adds fetched list to cache when cache doesn't have the member and checks hasMember uses cache when have member is cached", async () => {
+        await downloader.hasMember("profile", "ussFile", "uss_copybook");
+        const res = await downloader.hasMember(
+          "profile",
+          "ussFile",
+          "uss_copybook",
+        );
         expect(allUSSFilemembers).toHaveBeenCalledTimes(1);
-      });
-      it("checks hasMember uses cache when have member is cached", async () => {
-        await downloader.hasMember("profile", "ussFile", "copybook");
-        expect(allUSSFilemembers).toHaveBeenCalledTimes(0);
+        expect(res).toStrictEqual("uss_copybook");
       });
     });
   });
