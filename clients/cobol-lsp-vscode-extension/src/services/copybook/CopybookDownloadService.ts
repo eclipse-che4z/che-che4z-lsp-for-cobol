@@ -246,22 +246,13 @@ export class CopybookDownloadService {
       return this.e4eDownloader?.listRemoteCopybooksE4E(documentUri) ?? [];
     }
 
-    const dialects = [
-      DEFAULT_DIALECT,
-      ...DialectRegistry.getActiveDialects().map((di) => di.name),
-    ];
-
     const copybooks: string[] = [];
 
     const dsnPaths: string[] = SettingsService.getDsnPath(documentUri, dialect);
     const ussPaths: string[] = SettingsService.getUssPath(documentUri, dialect);
 
-    if (dsnPaths.length === 0 && ussPaths.length === 0) {
-      return [];
-    }
-
     if (
-      !(await this.isPrerequisiteForDownloadSatisfied(documentUri, dialects))
+      !(await this.isPrerequisiteForDownloadSatisfied(documentUri, [dialect]))
     ) {
       return [];
     }
