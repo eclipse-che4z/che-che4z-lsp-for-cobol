@@ -12,22 +12,17 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
-import {
-  LoggerItem,
-  WorkerResultMessage,
-} from "../../../services/worker/messages";
-
 describe("messages module tests", () => {
   test("LoggerItem test", () => {
-    const item = new LoggerItem(2, "message");
+    const item = { severity: 2, message: "message" };
 
     expect(item.severity).toBe(2);
     expect(item.message).toBe("message");
   });
 
   test("WorkerLoggerMessage test", () => {
-    const item = new LoggerItem(2, "message");
-    const workerMessage = new WorkerResultMessage("log", [item]);
+    const item = { severity: 2, message: "message" };
+    const workerMessage = { type: "log", payload: [item] };
 
     expect(workerMessage.payload.length).toBe(1);
     expect(workerMessage.payload[0].severity).toBe(2);

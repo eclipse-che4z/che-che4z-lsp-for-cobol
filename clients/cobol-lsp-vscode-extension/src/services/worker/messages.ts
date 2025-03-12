@@ -12,26 +12,32 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 import { Program } from "@code4z/analysis/lib/model/cfast";
+import { DiagnosticDto } from "@code4z/analysis/lib/model/external";
+import { GraphDTO } from "@code4z/analysis/lib/model/GraphDTO";
 
 export type WorkerMessage = {
-    vmCount: number,
-    severity: number,
-    programs: Program[],
-}
+  vmCount: number;
+  severity: number;
+  programs: Program[];
+};
 
 export type LoggerItem = {
-    severity: number,
-    message: string,
-}
+  severity: number;
+  message: string;
+};
 
-export type SomethingResemblingEngineProcessingResult = {
-... // Graph won't survive the cloning process as Graph
-}
+export type WorkerProcessingResult = {
+  graphs: GraphDTO[];
+  locations: string[];
+  diagnostics: Map<string, DiagnosticDto[]>;
+};
 
-export type WorkerResultMessage = {
-    type: "result",
-    payload: SomethingResemblingEngineProcessingResult,
-} | {
-    type: "log",
-    payload: LoggerItem[],
-}
+export type WorkerResultMessage =
+  | {
+      type: "result";
+      payload: WorkerProcessingResult;
+    }
+  | {
+      type: "log";
+      payload: LoggerItem[];
+    };

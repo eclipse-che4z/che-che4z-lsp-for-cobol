@@ -24,33 +24,38 @@ export class Logger implements Channel {
   public messages: LoggerItem[] = [];
 
   debug(message: string): void {
-    this.messages.push(
-      new LoggerItem(DiagnosticSeverityDto.Hint.valueOf(), message),
-    );
+    this.messages.push({
+      severity: DiagnosticSeverityDto.Hint.valueOf(),
+      message: message,
+    });
     this.messages = sendMessagesIfNeeded(this.messages);
   }
   trace(message: string): void {
-    this.messages.push(
-      new LoggerItem(DiagnosticSeverityDto.Hint.valueOf(), message),
-    );
+    this.messages.push({
+      severity: DiagnosticSeverityDto.Hint.valueOf(),
+      message: message,
+    });
     this.messages = sendMessagesIfNeeded(this.messages);
   }
   info(message: string): void {
-    this.messages.push(
-      new LoggerItem(DiagnosticSeverityDto.Information.valueOf(), message),
-    );
+    this.messages.push({
+      severity: DiagnosticSeverityDto.Information.valueOf(),
+      message: message,
+    });
     this.messages = sendMessagesIfNeeded(this.messages);
   }
   warn(message: string): void {
-    this.messages.push(
-      new LoggerItem(DiagnosticSeverityDto.Warning.valueOf(), message),
-    );
+    this.messages.push({
+      severity: DiagnosticSeverityDto.Warning.valueOf(),
+      message: message,
+    });
     this.messages = sendMessagesIfNeeded(this.messages);
   }
   error(message: string): void {
-    this.messages.push(
-      new LoggerItem(DiagnosticSeverityDto.Error.valueOf(), message),
-    );
+    this.messages.push({
+      severity: DiagnosticSeverityDto.Error.valueOf(),
+      message: message,
+    });
     this.messages = sendMessagesIfNeeded(this.messages);
   }
 }
@@ -64,11 +69,20 @@ function processMessage(message: WorkerMessage): void {
       channel,
     );
     const result = cfgBuilder.build(message.programs);
-    parentPort?.postMessage(new WorkerResultMessage("result", result));
+    const graphs = result.enters.map((e) => e.normalize());
+
+    postMessage({
+      type: "result",
+      payload: {
+        graphs: graphs,
+        locations: result.locations,
+        diagnostics: result.diagnostics,
+      },
+    });
   } catch (error) {
     channel.error(`${error}`);
   } finally {
-    parentPort?.postMessage(new WorkerResultMessage("log", channel.messages));
+    postMessage({ type: "log", payload: channel.messages });
   }
 }
 
@@ -82,4 +96,8 @@ function sendMessagesIfNeeded(messages: LoggerItem[]): LoggerItem[] {
     messages = [];
   }
   return messages;
+}
+
+function postMessage(message: WorkerResultMessage) {
+  parentPort?.postMessage(message);
 }

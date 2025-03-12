@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-enum-comparison */
 /*
  * Copyright (c) 2025 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
@@ -14,8 +13,6 @@
  */
 import * as vscode from "vscode";
 import { Program } from "@code4z/analysis/lib/model/cfast";
-import { EngineProcessingResult } from "@code4z/analysis/lib/graphbuilder";
-import { Graph } from "@code4z/analysis/lib/model/Graph";
 import { Worker } from "worker_threads";
 import { join } from "path";
 import {
@@ -25,17 +22,14 @@ import {
 } from "@code4z/analysis/lib/model/external";
 import { SettingsService } from "./Settings";
 import { OutputChannelHolder } from "../OutputChannelHolder";
-import {
-  LoggerItem,
-  WorkerMessage,
-  WorkerResultMessage,
-} from "./worker/messages";
+import { WorkerResultMessage } from "./worker/messages";
+import { GraphDTO } from "@code4z/analysis/lib/model/GraphDTO";
 
 /**
  * Control Flow Analysis callback
  */
 export interface ControlFlowAnalysisCallback {
-  (graphs: Graph[]): void;
+  (graphs: GraphDTO[]): void;
 }
 
 /**
@@ -75,7 +69,7 @@ export class ApiResult {
 interface AnalysisServiceDelegate {
   finishTask(
     documentUri: string,
-    graphs: Graph[],
+    graphs: GraphDTO[],
     diagnostics: Map<string, vscode.Diagnostic[]>,
   ): void;
 }
@@ -88,53 +82,42 @@ class AnalysisTask {
     public programs: Program[],
     private delegate: AnalysisServiceDelegate,
   ) {
-    this.worker.on(
-      "message",
-      (data: WorkerResultMessage<EngineProcessingResult | LoggerItem[]>) => {
-        if (data.type === "result") {
-          const payload = data.payload as EngineProcessingResult;
-          this.delegate.finishTask(
-            this.documentUri,
-            payload.enters,
-            convertDiagnostics(payload.diagnostics),
-          );
-        } else if (data.type === "log") {
-          const items = data.payload as LoggerItem[];
-
-          for (const message of items) {
-            if (
-              message.severity === vscode.DiagnosticSeverity.Error.valueOf()
-            ) {
-              OutputChannelHolder.getAnalysisChannel()?.error(message.message);
-            } else if (
-              message.severity === vscode.DiagnosticSeverity.Warning.valueOf()
-            ) {
-              OutputChannelHolder.getAnalysisChannel()?.warn(message.message);
-            } else if (
-              message.severity ===
-              vscode.DiagnosticSeverity.Information.valueOf()
-            ) {
-              OutputChannelHolder.getAnalysisChannel()?.info(message.message);
-            } else {
-              OutputChannelHolder.getAnalysisChannel()?.debug(message.message);
-            }
+    this.worker.on("message", (data: WorkerResultMessage) => {
+      if (data.type === "result") {
+        this.delegate.finishTask(
+          this.documentUri,
+          data.payload.graphs,
+          convertDiagnostics(data.payload.diagnostics),
+        );
+      } else if (data.type === "log") {
+        for (const message of data.payload) {
+          if (message.severity === vscode.DiagnosticSeverity.Error.valueOf()) {
+            OutputChannelHolder.getAnalysisChannel()?.error(message.message);
+          } else if (
+            message.severity === vscode.DiagnosticSeverity.Warning.valueOf()
+          ) {
+            OutputChannelHolder.getAnalysisChannel()?.warn(message.message);
+          } else if (
+            message.severity === vscode.DiagnosticSeverity.Information.valueOf()
+          ) {
+            OutputChannelHolder.getAnalysisChannel()?.info(message.message);
+          } else {
+            OutputChannelHolder.getAnalysisChannel()?.debug(message.message);
           }
         }
-      },
-    );
+      }
+    });
     this.worker.on("error", (code) => {
       OutputChannelHolder.getMainChannel()?.appendLine(
         `Error starting Control Flow Analysis: ${code}`,
       );
     });
 
-    this.worker.postMessage(
-      new WorkerMessage(
-        SettingsService.getMaxVMCount(),
-        SettingsService.getUnreachableCodeSeverity()?.valueOf() || 0,
-        programs,
-      ),
-    );
+    this.worker.postMessage({
+      vmCount: SettingsService.getMaxVMCount(),
+      severity: SettingsService.getUnreachableCodeSeverity()?.valueOf() || 0,
+      programs: programs,
+    });
   }
 
   public async abort() {
@@ -182,7 +165,7 @@ export class ControlFlowAnalysisService implements AnalysisServiceDelegate {
 
   finishTask(
     documentUri: string,
-    graphs: Graph[],
+    graphs: GraphDTO[],
     diagnostics: Map<string, vscode.Diagnostic[]>,
   ): void {
     this.diagnosticService.showAllDiagnostics(documentUri, diagnostics);
