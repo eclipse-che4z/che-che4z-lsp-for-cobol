@@ -1,0 +1,266 @@
+[
+  {
+    "name": "HLLOWRLD",
+    "type": "program",
+    "location": {
+      "uri": "/case63.cbl",
+      "start": {
+        "line": 5,
+        "character": 8
+      },
+      "end": {
+        "line": 21,
+        "character": 19
+      }
+    },
+    "children": [
+      {
+        "targetName": "B",
+        "type": "perform",
+        "location": {
+          "uri": "/case63.cbl",
+          "start": {
+            "line": 6,
+            "character": 12
+          },
+          "end": {
+            "line": 6,
+            "character": 21
+          }
+        }
+      },
+      {
+        "type": "statement",
+        "location": {
+          "uri": "/case63.cbl",
+          "start": {
+            "line": 7,
+            "character": 12
+          },
+          "end": {
+            "line": 7,
+            "character": 25
+          }
+        }
+      },
+      {
+        "type": "stop",
+        "location": {
+          "uri": "/case63.cbl",
+          "start": {
+            "line": 8,
+            "character": 12
+          },
+          "end": {
+            "line": 8,
+            "character": 20
+          }
+        }
+      },
+      {
+        "name": "A",
+        "snippet": "       A SECTION.\r\n           DISPLAY \u0027A\u0027.",
+        "type": "section",
+        "location": {
+          "uri": "/case63.cbl",
+          "start": {
+            "line": 9,
+            "character": 8
+          },
+          "end": {
+            "line": 10,
+            "character": 24
+          }
+        },
+        "children": [
+          {
+            "type": "statement",
+            "location": {
+              "uri": "/case63.cbl",
+              "start": {
+                "line": 10,
+                "character": 12
+              },
+              "end": {
+                "line": 10,
+                "character": 23
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "B",
+        "snippet": "       B SECTION.\r\n           DISPLAY \u0027B\u0027.\r\n           PERFORM C.\r\n       C.\r\n           DISPLAY \u0027C\u0027.\r\n           PERFORM D.\r\n       D.\r\n           DISPLAY \u0027D\u0027.",
+        "type": "section",
+        "location": {
+          "uri": "/case63.cbl",
+          "start": {
+            "line": 11,
+            "character": 8
+          },
+          "end": {
+            "line": 18,
+            "character": 24
+          }
+        },
+        "children": [
+          {
+            "type": "statement",
+            "location": {
+              "uri": "/case63.cbl",
+              "start": {
+                "line": 12,
+                "character": 12
+              },
+              "end": {
+                "line": 12,
+                "character": 23
+              }
+            }
+          },
+          {
+            "targetName": "C",
+            "type": "perform",
+            "location": {
+              "uri": "/case63.cbl",
+              "start": {
+                "line": 13,
+                "character": 12
+              },
+              "end": {
+                "line": 13,
+                "character": 21
+              }
+            }
+          },
+          {
+            "snippet": "       C.\r\n           DISPLAY \u0027C\u0027.\r\n           PERFORM D.",
+            "name": "C",
+            "type": "paragraph",
+            "location": {
+              "uri": "/case63.cbl",
+              "start": {
+                "line": 14,
+                "character": 8
+              },
+              "end": {
+                "line": 16,
+                "character": 22
+              }
+            },
+            "children": [
+              {
+                "type": "statement",
+                "location": {
+                  "uri": "/case63.cbl",
+                  "start": {
+                    "line": 15,
+                    "character": 12
+                  },
+                  "end": {
+                    "line": 15,
+                    "character": 23
+                  }
+                }
+              },
+              {
+                "targetName": "D",
+                "type": "perform",
+                "location": {
+                  "uri": "/case63.cbl",
+                  "start": {
+                    "line": 16,
+                    "character": 12
+                  },
+                  "end": {
+                    "line": 16,
+                    "character": 21
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "snippet": "       D.\r\n           DISPLAY \u0027D\u0027.",
+            "name": "D",
+            "type": "paragraph",
+            "location": {
+              "uri": "/case63.cbl",
+              "start": {
+                "line": 17,
+                "character": 8
+              },
+              "end": {
+                "line": 18,
+                "character": 24
+              }
+            },
+            "children": [
+              {
+                "type": "statement",
+                "location": {
+                  "uri": "/case63.cbl",
+                  "start": {
+                    "line": 18,
+                    "character": 12
+                  },
+                  "end": {
+                    "line": 18,
+                    "character": 23
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "E",
+        "snippet": "       E SECTION.\r\n           DISPLAY \u0027E\u0027.\r\n           GOBACK.",
+        "type": "section",
+        "location": {
+          "uri": "/case63.cbl",
+          "start": {
+            "line": 19,
+            "character": 8
+          },
+          "end": {
+            "line": 21,
+            "character": 19
+          }
+        },
+        "children": [
+          {
+            "type": "statement",
+            "location": {
+              "uri": "/case63.cbl",
+              "start": {
+                "line": 20,
+                "character": 12
+              },
+              "end": {
+                "line": 20,
+                "character": 23
+              }
+            }
+          },
+          {
+            "type": "goback",
+            "location": {
+              "uri": "/case63.cbl",
+              "start": {
+                "line": 21,
+                "character": 12
+              },
+              "end": {
+                "line": 21,
+                "character": 18
+              }
+            }
+          }
+        ]
+      }
+    ]
+  }
+]

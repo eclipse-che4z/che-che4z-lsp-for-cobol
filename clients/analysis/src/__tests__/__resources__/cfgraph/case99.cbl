@@ -1,0 +1,54 @@
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. SRT.
+
+001000 ENVIRONMENT DIVISION.
+001100 CONFIGURATION SECTION.
+001200 SOURCE-COMPUTER. IBM-3090.
+001300 OBJECT-COMPUTER. IBM-3090.
+001400 INPUT-OUTPUT SECTION.
+001500 FILE-CONTROL.
+001900     SELECT SORT-WORK-FILE    ASSIGN TO UT-S-SORTFILE.
+
+       DATA DIVISION.
+
+       FILE SECTION.
+       SD  SORT-WORK-FILE
+           RECORD CONTAINS 80 CHARACTERS
+           DATA RECORD IS SORT-WORK-REC.
+       01  SORT-WORK-REC.
+           05  SWF-PARTNO                      PIC  X(21).
+           05  SWF-REST-OF-REC                 PIC  X(43).
+           05  SWF-MODEL                       PIC  X(3).
+           05  FILLER                          PIC  X(12).
+           05  SWF-REC-PAY-CODE                PIC  X.
+
+       WORKING-STORAGE SECTION.
+       01 WS-NUM1 PIC 9(9).
+       PROCEDURE DIVISION.
+           SORT SORT-WORK-FILE
+               ASCENDING KEY SWF-PARTNO
+                   INPUT  PROCEDURE INPUT-PAR1 THRU INPUT-PAR2
+                   OUTPUT PROCEDURE OUTPUT-PROCEDURE OF SEC1.
+           STOP RUN.
+
+       PAR1.
+           DISPLAY "PAR1".
+
+       PAR2.
+           DISPLAY "PAR2".
+
+       PAR3.
+           DISPLAY "PAR3".
+
+       INPUT-PAR1.
+           PERFORM PAR1.
+
+       INPUT-PAR2.
+           PERFORM PAR2.
+
+       SEC1 SECTION.
+
+       OUTPUT-PROCEDURE.
+           DISPLAY "OUTPUT-PROCEDURE".
+
+

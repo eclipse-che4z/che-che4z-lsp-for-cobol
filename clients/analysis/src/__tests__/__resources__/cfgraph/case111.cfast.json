@@ -1,0 +1,156 @@
+[
+  {
+    "name": "PROG",
+    "type": "program",
+    "location": {
+      "uri": "/case111.cbl",
+      "start": {
+        "line": 6,
+        "character": 8
+      },
+      "end": {
+        "line": 17,
+        "character": 27
+      }
+    },
+    "children": [
+      {
+        "performUntilType": "UNTIL_CONDITION",
+        "type": "inlineperform",
+        "location": {
+          "uri": "/case111.cbl",
+          "start": {
+            "line": 7,
+            "character": 20
+          },
+          "end": {
+            "line": 9,
+            "character": 23
+          }
+        }
+      },
+      {
+        "targetName": "PAR1",
+        "type": "perform",
+        "location": {
+          "uri": "/case111.cbl",
+          "start": {
+            "line": 8,
+            "character": 16
+          },
+          "end": {
+            "line": 8,
+            "character": 28
+          }
+        }
+      },
+      {
+        "type": "endinlineperform",
+        "location": {
+          "uri": "/case111.cbl",
+          "start": {
+            "line": 7,
+            "character": 20
+          },
+          "end": {
+            "line": 9,
+            "character": 23
+          }
+        }
+      },
+      {
+        "targetName": "PAR2",
+        "type": "perform",
+        "location": {
+          "uri": "/case111.cbl",
+          "start": {
+            "line": 10,
+            "character": 12
+          },
+          "end": {
+            "line": 10,
+            "character": 24
+          }
+        }
+      },
+      {
+        "snippet": "       PAR1.\r\n           DISPLAY \"PAR1\".\r\n           STOP RUN.",
+        "name": "PAR1",
+        "type": "paragraph",
+        "location": {
+          "uri": "/case111.cbl",
+          "start": {
+            "line": 12,
+            "character": 8
+          },
+          "end": {
+            "line": 14,
+            "character": 21
+          }
+        },
+        "children": [
+          {
+            "type": "statement",
+            "location": {
+              "uri": "/case111.cbl",
+              "start": {
+                "line": 13,
+                "character": 12
+              },
+              "end": {
+                "line": 13,
+                "character": 26
+              }
+            }
+          },
+          {
+            "type": "stop",
+            "location": {
+              "uri": "/case111.cbl",
+              "start": {
+                "line": 14,
+                "character": 12
+              },
+              "end": {
+                "line": 14,
+                "character": 20
+              }
+            }
+          }
+        ]
+      },
+      {
+        "snippet": "       PAR2.\r\n           DISPLAY \"PAR1\".                     ",
+        "name": "PAR2",
+        "type": "paragraph",
+        "location": {
+          "uri": "/case111.cbl",
+          "start": {
+            "line": 16,
+            "character": 8
+          },
+          "end": {
+            "line": 17,
+            "character": 27
+          }
+        },
+        "children": [
+          {
+            "type": "statement",
+            "location": {
+              "uri": "/case111.cbl",
+              "start": {
+                "line": 17,
+                "character": 12
+              },
+              "end": {
+                "line": 17,
+                "character": 26
+              }
+            }
+          }
+        ]
+      }
+    ]
+  }
+]

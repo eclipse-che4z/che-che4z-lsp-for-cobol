@@ -27,6 +27,9 @@ import com.google.inject.Injector;
 import com.google.inject.multibindings.Multibinder;
 import com.google.inject.name.Names;
 import java.util.concurrent.CompletableFuture;
+
+import org.eclipse.lsp.cobol.cfg.CFASTBuilder;
+import org.eclipse.lsp.cobol.cfg.CFASTBuilderImpl;
 import org.eclipse.lsp.cobol.common.LanguageEngineFacade;
 import org.eclipse.lsp.cobol.common.SubroutineService;
 import org.eclipse.lsp.cobol.common.action.CodeActionProvider;
@@ -85,6 +88,7 @@ public class UseCaseInitializerService implements UseCaseInitializer {
                 bind(CobolLanguageClient.class).toInstance(languageClient);
                 bind(SubroutineService.class).to(SubroutineServiceImpl.class);
                 bind(WatcherService.class).to(WatcherServiceImpl.class);
+                bind(CFASTBuilder.class).to(CFASTBuilderImpl.class);
                 bind(DialectDiscoveryService.class).to(DialectDiscoveryFolderService.class);
                 bind(CodeActions.class);
                 bind(SourceUnitGraph.class);

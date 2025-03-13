@@ -1,0 +1,23 @@
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. HLLOWRLD
+       DATA DIVISION. 
+
+       WORKING-STORAGE SECTION. 
+       01  USRNAME           PIC X(10).
+
+       PROCEDURE DIVISION.
+       0000-MAIN SECTION.
+           PERFORM 1000-GET-NAME
+           PERFORM 2000-TEST
+           DISPLAY 'HELLO 'USRNAME
+           GOBACK
+           .
+       1000-GET-NAME SECTION.
+           ACCEPT USRNAME.
+           PERFORM 1000-EXIT.
+       1000-EXIT.
+           EXIT SECTION.
+       2000-TEST SECTION.
+           PERFORM 2000-EXIT.
+       2000-EXIT.
+           EXIT SECTION.

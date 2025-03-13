@@ -40,6 +40,7 @@
 !dist/extension.js.map
 !dist/web/extension.js
 !dist/web/extension.js.map
+!dist/Worker.js
 # ** server implementation 
 !server/native/*
 !server/jar/server.jar

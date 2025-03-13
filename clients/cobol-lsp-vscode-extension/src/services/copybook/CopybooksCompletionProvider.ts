@@ -18,6 +18,7 @@ import {
   CompletionItem,
   CompletionItemKind,
   CompletionItemProvider,
+  OutputChannel,
   Position,
   Progress,
   ProgressLocation,
@@ -51,7 +52,10 @@ const isSQLCopyStatement: CopyStatementParser = (statement: string) => {
 };
 
 export class CopybooksCompletionProvider implements CompletionItemProvider {
-  constructor(private cds?: CopybookDownloadService) {}
+  constructor(
+    private cds?: CopybookDownloadService,
+    private outputChannel?: OutputChannel,
+  ) {}
 
   async provideCompletionItems(
     document: TextDocument,
@@ -115,6 +119,7 @@ export class CopybooksCompletionProvider implements CompletionItemProvider {
               const list = await listLocalCopybooks(
                 document.uri.toString(),
                 dialect.name,
+                this.outputChannel,
               );
               list?.forEach((copybook) => {
                 if (!prefix || copybook.startsWith(prefix)) {

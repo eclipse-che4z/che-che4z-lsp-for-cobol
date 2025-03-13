@@ -1,0 +1,207 @@
+[
+  {
+    "name": "HLLOWRLD",
+    "type": "program",
+    "location": {
+      "uri": "/case59.cbl",
+      "start": {
+        "line": 3,
+        "character": 8
+      },
+      "end": {
+        "line": 15,
+        "character": 24
+      }
+    },
+    "children": [
+      {
+        "snippet": "       A.\r\n           DISPLAY \"A\".\r\n           PERFORM C.",
+        "name": "A",
+        "type": "paragraph",
+        "location": {
+          "uri": "/case59.cbl",
+          "start": {
+            "line": 4,
+            "character": 8
+          },
+          "end": {
+            "line": 6,
+            "character": 22
+          }
+        },
+        "children": [
+          {
+            "type": "statement",
+            "location": {
+              "uri": "/case59.cbl",
+              "start": {
+                "line": 5,
+                "character": 12
+              },
+              "end": {
+                "line": 5,
+                "character": 23
+              }
+            }
+          },
+          {
+            "targetName": "C",
+            "type": "perform",
+            "location": {
+              "uri": "/case59.cbl",
+              "start": {
+                "line": 6,
+                "character": 12
+              },
+              "end": {
+                "line": 6,
+                "character": 21
+              }
+            }
+          }
+        ]
+      },
+      {
+        "snippet": "       B.\r\n           DISPLAY \"B\".\r\n           STOP RUN.",
+        "name": "B",
+        "type": "paragraph",
+        "location": {
+          "uri": "/case59.cbl",
+          "start": {
+            "line": 7,
+            "character": 8
+          },
+          "end": {
+            "line": 9,
+            "character": 21
+          }
+        },
+        "children": [
+          {
+            "type": "statement",
+            "location": {
+              "uri": "/case59.cbl",
+              "start": {
+                "line": 8,
+                "character": 12
+              },
+              "end": {
+                "line": 8,
+                "character": 23
+              }
+            }
+          },
+          {
+            "type": "stop",
+            "location": {
+              "uri": "/case59.cbl",
+              "start": {
+                "line": 9,
+                "character": 12
+              },
+              "end": {
+                "line": 9,
+                "character": 20
+              }
+            }
+          }
+        ]
+      },
+      {
+        "snippet": "       C.\r\n           DISPLAY \"C\".\r\n           EXIT PARAGRAPH.\r\n           GO TO D.",
+        "name": "C",
+        "type": "paragraph",
+        "location": {
+          "uri": "/case59.cbl",
+          "start": {
+            "line": 10,
+            "character": 8
+          },
+          "end": {
+            "line": 13,
+            "character": 20
+          }
+        },
+        "children": [
+          {
+            "type": "statement",
+            "location": {
+              "uri": "/case59.cbl",
+              "start": {
+                "line": 11,
+                "character": 12
+              },
+              "end": {
+                "line": 11,
+                "character": 23
+              }
+            }
+          },
+          {
+            "type": "exitparagraph",
+            "location": {
+              "uri": "/case59.cbl",
+              "start": {
+                "line": 12,
+                "character": 12
+              },
+              "end": {
+                "line": 12,
+                "character": 26
+              }
+            }
+          },
+          {
+            "targetName": [
+              "D"
+            ],
+            "type": "goto",
+            "location": {
+              "uri": "/case59.cbl",
+              "start": {
+                "line": 13,
+                "character": 12
+              },
+              "end": {
+                "line": 13,
+                "character": 19
+              }
+            }
+          }
+        ]
+      },
+      {
+        "snippet": "       D.\r\n           DISPLAY \"D\".",
+        "name": "D",
+        "type": "paragraph",
+        "location": {
+          "uri": "/case59.cbl",
+          "start": {
+            "line": 14,
+            "character": 8
+          },
+          "end": {
+            "line": 15,
+            "character": 24
+          }
+        },
+        "children": [
+          {
+            "type": "statement",
+            "location": {
+              "uri": "/case59.cbl",
+              "start": {
+                "line": 15,
+                "character": 12
+              },
+              "end": {
+                "line": 15,
+                "character": 23
+              }
+            }
+          }
+        ]
+      }
+    ]
+  }
+]

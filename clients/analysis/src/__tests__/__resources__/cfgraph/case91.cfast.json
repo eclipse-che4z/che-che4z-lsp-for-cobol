@@ -1,0 +1,233 @@
+[
+  {
+    "name": "PROG",
+    "type": "program",
+    "location": {
+      "uri": "/case91.cbl",
+      "start": {
+        "line": 5,
+        "character": 8
+      },
+      "end": {
+        "line": 23,
+        "character": 19
+      }
+    },
+    "children": [
+      {
+        "targetName": [
+          "PAR1"
+        ],
+        "type": "goto",
+        "location": {
+          "uri": "/case91.cbl",
+          "start": {
+            "line": 7,
+            "character": 12
+          },
+          "end": {
+            "line": 7,
+            "character": 22
+          }
+        }
+      },
+      {
+        "snippet": "       PAR1.\r\n           PERFORM PAR2.",
+        "name": "PAR1",
+        "type": "paragraph",
+        "location": {
+          "uri": "/case91.cbl",
+          "start": {
+            "line": 9,
+            "character": 8
+          },
+          "end": {
+            "line": 10,
+            "character": 25
+          }
+        },
+        "children": [
+          {
+            "targetName": "PAR2",
+            "type": "perform",
+            "location": {
+              "uri": "/case91.cbl",
+              "start": {
+                "line": 10,
+                "character": 12
+              },
+              "end": {
+                "line": 10,
+                "character": 24
+              }
+            }
+          }
+        ]
+      },
+      {
+        "snippet": "       PAR2.\r\n           DISPLAY \"PAR1\".\r\n           GO TO PAR3.",
+        "name": "PAR2",
+        "type": "paragraph",
+        "location": {
+          "uri": "/case91.cbl",
+          "start": {
+            "line": 12,
+            "character": 8
+          },
+          "end": {
+            "line": 14,
+            "character": 23
+          }
+        },
+        "children": [
+          {
+            "type": "statement",
+            "location": {
+              "uri": "/case91.cbl",
+              "start": {
+                "line": 13,
+                "character": 12
+              },
+              "end": {
+                "line": 13,
+                "character": 26
+              }
+            }
+          },
+          {
+            "targetName": [
+              "PAR3"
+            ],
+            "type": "goto",
+            "location": {
+              "uri": "/case91.cbl",
+              "start": {
+                "line": 14,
+                "character": 12
+              },
+              "end": {
+                "line": 14,
+                "character": 22
+              }
+            }
+          }
+        ]
+      },
+      {
+        "snippet": "       PAR3.\r\n           DISPLAY \"PAR3\".\r\n           ALTER PAR3 TO PROCEED TO PAR-EXIT\r\n           GO TO PAR1.",
+        "name": "PAR3",
+        "type": "paragraph",
+        "location": {
+          "uri": "/case91.cbl",
+          "start": {
+            "line": 16,
+            "character": 8
+          },
+          "end": {
+            "line": 19,
+            "character": 23
+          }
+        },
+        "children": [
+          {
+            "type": "statement",
+            "location": {
+              "uri": "/case91.cbl",
+              "start": {
+                "line": 17,
+                "character": 12
+              },
+              "end": {
+                "line": 17,
+                "character": 26
+              }
+            }
+          },
+          {
+            "from": {
+              "name": "PAR3"
+            },
+            "to": {
+              "name": "PAR-EXIT"
+            },
+            "type": "alter",
+            "location": {
+              "uri": "/case91.cbl",
+              "start": {
+                "line": 18,
+                "character": 12
+              },
+              "end": {
+                "line": 18,
+                "character": 45
+              }
+            }
+          },
+          {
+            "targetName": [
+              "PAR1"
+            ],
+            "type": "goto",
+            "location": {
+              "uri": "/case91.cbl",
+              "start": {
+                "line": 19,
+                "character": 12
+              },
+              "end": {
+                "line": 19,
+                "character": 22
+              }
+            }
+          }
+        ]
+      },
+      {
+        "snippet": "       PAR-EXIT.\r\n           DISPLAY \"PAR-EXIT\".\r\n           GOBACK.",
+        "name": "PAR-EXIT",
+        "type": "paragraph",
+        "location": {
+          "uri": "/case91.cbl",
+          "start": {
+            "line": 21,
+            "character": 8
+          },
+          "end": {
+            "line": 23,
+            "character": 19
+          }
+        },
+        "children": [
+          {
+            "type": "statement",
+            "location": {
+              "uri": "/case91.cbl",
+              "start": {
+                "line": 22,
+                "character": 12
+              },
+              "end": {
+                "line": 22,
+                "character": 30
+              }
+            }
+          },
+          {
+            "type": "goback",
+            "location": {
+              "uri": "/case91.cbl",
+              "start": {
+                "line": 23,
+                "character": 12
+              },
+              "end": {
+                "line": 23,
+                "character": 18
+              }
+            }
+          }
+        ]
+      }
+    ]
+  }
+]

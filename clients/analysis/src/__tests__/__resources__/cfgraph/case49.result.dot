@@ -1,0 +1,6 @@
+digraph A {
+rankdir=LR;
+<HLLOWRLD>-><0000-MAIN>;
+<0000-MAIN>-><1-S>;
+<1-S>-><1-EXIT>;
+}

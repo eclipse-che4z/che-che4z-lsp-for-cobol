@@ -1,0 +1,6 @@
+digraph A {
+rankdir=LR;
+<PROG>-><CALCULATION>;
+<PROG>-><HANDLE-SQL-ERROR>;
+<CALCULATION>-><CALCULATION-END>;
+}

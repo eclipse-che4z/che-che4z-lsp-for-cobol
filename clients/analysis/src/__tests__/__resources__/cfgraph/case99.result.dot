@@ -1,0 +1,8 @@
+digraph A {
+rankdir=LR;
+<SRT>-><INPUT-PAR1>;
+<SRT>-><OUTPUT-PROCEDURE>;
+<INPUT-PAR1>-><PAR1>;
+<INPUT-PAR1>-><INPUT-PAR2>;
+<INPUT-PAR2>-><PAR2>;
+}

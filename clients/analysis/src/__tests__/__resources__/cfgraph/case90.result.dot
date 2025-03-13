@@ -1,0 +1,7 @@
+digraph A {
+rankdir=LR;
+<OPTSEC>-><BIG_SEC>;
+<BIG_SEC>-><BIG_SEC_EXIT>;
+<BIG_SEC>-><PAR1>;
+<PAR1>-><BIG_SEC_EXIT>;
+}

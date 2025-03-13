@@ -1,0 +1,20 @@
+[
+  {
+    "range": {
+      "start": {
+        "line": 22,
+        "character": 11
+      },
+      "end": {
+        "line": 22,
+        "character": 31
+      }
+    },
+    "message": "Unreachable code detected",
+    "severity": 1,
+    "tags": [
+      1
+    ],
+    "source": "COBOL Control Flow"
+  }
+]

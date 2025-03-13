@@ -1,0 +1,191 @@
+[
+  {
+    "name": "PROG",
+    "type": "program",
+    "location": {
+      "uri": "/case96.cbl",
+      "start": {
+        "line": 3,
+        "character": 8
+      },
+      "end": {
+        "line": 15,
+        "character": 39
+      }
+    },
+    "children": [
+      {
+        "targetName": [
+          "CALCULATION"
+        ],
+        "type": "goto",
+        "location": {
+          "uri": "/case96.cbl",
+          "start": {
+            "line": 4,
+            "character": 12
+          },
+          "end": {
+            "line": 4,
+            "character": 29
+          }
+        }
+      },
+      {
+        "type": "goback",
+        "location": {
+          "uri": "/case96.cbl",
+          "start": {
+            "line": 5,
+            "character": 12
+          },
+          "end": {
+            "line": 5,
+            "character": 18
+          }
+        }
+      },
+      {
+        "name": "CALCULATION",
+        "snippet": "       CALCULATION SECTION.\r\n           EXEC SQL ROLLBACK WORK END-EXEC.\r\n\r\n       CALCULATION-END.\r\n           EXEC SQL WHENEVER SQLERROR GOTO HANDLE-SQL-ERROR  END-EXEC.\r\n           GOBACK.\r\n\r\n       HANDLE-SQL-ERROR.\r\n           DISPLAY \"HANDLE SQL ERROR\".",
+        "type": "section",
+        "location": {
+          "uri": "/case96.cbl",
+          "start": {
+            "line": 7,
+            "character": 8
+          },
+          "end": {
+            "line": 15,
+            "character": 39
+          }
+        },
+        "children": [
+          {
+            "type": "execsql",
+            "location": {
+              "uri": "/case96.cbl",
+              "start": {
+                "line": 8,
+                "character": 12
+              },
+              "end": {
+                "line": 8,
+                "character": 43
+              }
+            }
+          },
+          {
+            "type": "endexec",
+            "location": {
+              "uri": "/case96.cbl",
+              "start": {
+                "line": 8,
+                "character": 12
+              },
+              "end": {
+                "line": 8,
+                "character": 43
+              }
+            }
+          },
+          {
+            "snippet": "       CALCULATION-END.\r\n           EXEC SQL WHENEVER SQLERROR GOTO HANDLE-SQL-ERROR  END-EXEC.\r\n           GOBACK.",
+            "name": "CALCULATION-END",
+            "type": "paragraph",
+            "location": {
+              "uri": "/case96.cbl",
+              "start": {
+                "line": 10,
+                "character": 8
+              },
+              "end": {
+                "line": 12,
+                "character": 19
+              }
+            },
+            "children": [
+              {
+                "wheneverCondition": "SQLERROR",
+                "wheneverType": "GOTO",
+                "value": "HANDLE-SQL-ERROR",
+                "type": "execwhenever",
+                "location": {
+                  "uri": "/case96.cbl",
+                  "start": {
+                    "line": 11,
+                    "character": 21
+                  },
+                  "end": {
+                    "line": 11,
+                    "character": 60
+                  }
+                }
+              },
+              {
+                "type": "endexec",
+                "location": {
+                  "uri": "/case96.cbl",
+                  "start": {
+                    "line": 11,
+                    "character": 12
+                  },
+                  "end": {
+                    "line": 11,
+                    "character": 70
+                  }
+                }
+              },
+              {
+                "type": "goback",
+                "location": {
+                  "uri": "/case96.cbl",
+                  "start": {
+                    "line": 12,
+                    "character": 12
+                  },
+                  "end": {
+                    "line": 12,
+                    "character": 18
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "snippet": "       HANDLE-SQL-ERROR.\r\n           DISPLAY \"HANDLE SQL ERROR\".",
+            "name": "HANDLE-SQL-ERROR",
+            "type": "paragraph",
+            "location": {
+              "uri": "/case96.cbl",
+              "start": {
+                "line": 14,
+                "character": 8
+              },
+              "end": {
+                "line": 15,
+                "character": 39
+              }
+            },
+            "children": [
+              {
+                "type": "statement",
+                "location": {
+                  "uri": "/case96.cbl",
+                  "start": {
+                    "line": 15,
+                    "character": 12
+                  },
+                  "end": {
+                    "line": 15,
+                    "character": 38
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]

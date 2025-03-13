@@ -1,0 +1,4112 @@
+[
+  {
+    "name": "PROG",
+    "type": "program",
+    "location": {
+      "uri": "/case118.cbl",
+      "start": {
+        "line": 6,
+        "character": 8
+      },
+      "end": {
+        "line": 380,
+        "character": 19
+      }
+    },
+    "children": [
+      {
+        "snippet": "       PAR0.\r\n           IF (WS-NUM1 \u003e 1) THEN\r\n               PERFORM PAR1\r\n           END-IF.\r\n\r\n           IF (WS-NUM1 \u003e 1) THEN\r\n               PERFORM PAR2\r\n           END-IF.\r\n\r\n           IF (WS-NUM1 \u003e 1) THEN",
+        "name": "PAR0",
+        "type": "paragraph",
+        "location": {
+          "uri": "/case118.cbl",
+          "start": {
+            "line": 8,
+            "character": 8
+          },
+          "end": {
+            "line": 43,
+            "character": 19
+          }
+        },
+        "children": [
+          {
+            "type": "if",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 9,
+                "character": 12
+              },
+              "end": {
+                "line": 11,
+                "character": 18
+              }
+            }
+          },
+          {
+            "targetName": "PAR1",
+            "type": "perform",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 10,
+                "character": 16
+              },
+              "end": {
+                "line": 10,
+                "character": 28
+              }
+            }
+          },
+          {
+            "type": "endif",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 9,
+                "character": 12
+              },
+              "end": {
+                "line": 11,
+                "character": 18
+              }
+            }
+          },
+          {
+            "type": "if",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 13,
+                "character": 12
+              },
+              "end": {
+                "line": 15,
+                "character": 18
+              }
+            }
+          },
+          {
+            "targetName": "PAR2",
+            "type": "perform",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 14,
+                "character": 16
+              },
+              "end": {
+                "line": 14,
+                "character": 28
+              }
+            }
+          },
+          {
+            "type": "endif",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 13,
+                "character": 12
+              },
+              "end": {
+                "line": 15,
+                "character": 18
+              }
+            }
+          },
+          {
+            "type": "if",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 17,
+                "character": 12
+              },
+              "end": {
+                "line": 19,
+                "character": 18
+              }
+            }
+          },
+          {
+            "targetName": "PAR3",
+            "type": "perform",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 18,
+                "character": 16
+              },
+              "end": {
+                "line": 18,
+                "character": 28
+              }
+            }
+          },
+          {
+            "type": "endif",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 17,
+                "character": 12
+              },
+              "end": {
+                "line": 19,
+                "character": 18
+              }
+            }
+          },
+          {
+            "type": "if",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 21,
+                "character": 12
+              },
+              "end": {
+                "line": 23,
+                "character": 18
+              }
+            }
+          },
+          {
+            "targetName": "PAR4",
+            "type": "perform",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 22,
+                "character": 16
+              },
+              "end": {
+                "line": 22,
+                "character": 28
+              }
+            }
+          },
+          {
+            "type": "endif",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 21,
+                "character": 12
+              },
+              "end": {
+                "line": 23,
+                "character": 18
+              }
+            }
+          },
+          {
+            "type": "if",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 25,
+                "character": 12
+              },
+              "end": {
+                "line": 27,
+                "character": 18
+              }
+            }
+          },
+          {
+            "targetName": "PAR5",
+            "type": "perform",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 26,
+                "character": 16
+              },
+              "end": {
+                "line": 26,
+                "character": 28
+              }
+            }
+          },
+          {
+            "type": "endif",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 25,
+                "character": 12
+              },
+              "end": {
+                "line": 27,
+                "character": 18
+              }
+            }
+          },
+          {
+            "type": "if",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 29,
+                "character": 12
+              },
+              "end": {
+                "line": 31,
+                "character": 18
+              }
+            }
+          },
+          {
+            "targetName": "PAR6",
+            "type": "perform",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 30,
+                "character": 16
+              },
+              "end": {
+                "line": 30,
+                "character": 28
+              }
+            }
+          },
+          {
+            "type": "endif",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 29,
+                "character": 12
+              },
+              "end": {
+                "line": 31,
+                "character": 18
+              }
+            }
+          },
+          {
+            "type": "if",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 33,
+                "character": 12
+              },
+              "end": {
+                "line": 35,
+                "character": 18
+              }
+            }
+          },
+          {
+            "targetName": "PAR7",
+            "type": "perform",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 34,
+                "character": 16
+              },
+              "end": {
+                "line": 34,
+                "character": 28
+              }
+            }
+          },
+          {
+            "type": "endif",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 33,
+                "character": 12
+              },
+              "end": {
+                "line": 35,
+                "character": 18
+              }
+            }
+          },
+          {
+            "type": "if",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 37,
+                "character": 12
+              },
+              "end": {
+                "line": 39,
+                "character": 18
+              }
+            }
+          },
+          {
+            "targetName": "PAR8",
+            "type": "perform",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 38,
+                "character": 16
+              },
+              "end": {
+                "line": 38,
+                "character": 28
+              }
+            }
+          },
+          {
+            "type": "endif",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 37,
+                "character": 12
+              },
+              "end": {
+                "line": 39,
+                "character": 18
+              }
+            }
+          },
+          {
+            "type": "if",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 41,
+                "character": 12
+              },
+              "end": {
+                "line": 43,
+                "character": 18
+              }
+            }
+          },
+          {
+            "targetName": "PAR9",
+            "type": "perform",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 42,
+                "character": 16
+              },
+              "end": {
+                "line": 42,
+                "character": 28
+              }
+            }
+          },
+          {
+            "type": "endif",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 41,
+                "character": 12
+              },
+              "end": {
+                "line": 43,
+                "character": 18
+              }
+            }
+          }
+        ]
+      },
+      {
+        "snippet": "       PAR1.\r\n           IF (WS-NUM1 \u003e 1) THEN\r\n               PERFORM PAR0\r\n           END-IF.\r\n\r\n           IF (WS-NUM1 \u003e 1) THEN\r\n               PERFORM PAR2\r\n           END-IF.\r\n\r\n           IF (WS-NUM1 \u003e 1) THEN",
+        "name": "PAR1",
+        "type": "paragraph",
+        "location": {
+          "uri": "/case118.cbl",
+          "start": {
+            "line": 45,
+            "character": 8
+          },
+          "end": {
+            "line": 80,
+            "character": 19
+          }
+        },
+        "children": [
+          {
+            "type": "if",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 46,
+                "character": 12
+              },
+              "end": {
+                "line": 48,
+                "character": 18
+              }
+            }
+          },
+          {
+            "targetName": "PAR0",
+            "type": "perform",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 47,
+                "character": 16
+              },
+              "end": {
+                "line": 47,
+                "character": 28
+              }
+            }
+          },
+          {
+            "type": "endif",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 46,
+                "character": 12
+              },
+              "end": {
+                "line": 48,
+                "character": 18
+              }
+            }
+          },
+          {
+            "type": "if",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 50,
+                "character": 12
+              },
+              "end": {
+                "line": 52,
+                "character": 18
+              }
+            }
+          },
+          {
+            "targetName": "PAR2",
+            "type": "perform",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 51,
+                "character": 16
+              },
+              "end": {
+                "line": 51,
+                "character": 28
+              }
+            }
+          },
+          {
+            "type": "endif",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 50,
+                "character": 12
+              },
+              "end": {
+                "line": 52,
+                "character": 18
+              }
+            }
+          },
+          {
+            "type": "if",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 54,
+                "character": 12
+              },
+              "end": {
+                "line": 56,
+                "character": 18
+              }
+            }
+          },
+          {
+            "targetName": "PAR3",
+            "type": "perform",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 55,
+                "character": 16
+              },
+              "end": {
+                "line": 55,
+                "character": 28
+              }
+            }
+          },
+          {
+            "type": "endif",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 54,
+                "character": 12
+              },
+              "end": {
+                "line": 56,
+                "character": 18
+              }
+            }
+          },
+          {
+            "type": "if",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 58,
+                "character": 12
+              },
+              "end": {
+                "line": 60,
+                "character": 18
+              }
+            }
+          },
+          {
+            "targetName": "PAR4",
+            "type": "perform",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 59,
+                "character": 16
+              },
+              "end": {
+                "line": 59,
+                "character": 28
+              }
+            }
+          },
+          {
+            "type": "endif",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 58,
+                "character": 12
+              },
+              "end": {
+                "line": 60,
+                "character": 18
+              }
+            }
+          },
+          {
+            "type": "if",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 62,
+                "character": 12
+              },
+              "end": {
+                "line": 64,
+                "character": 18
+              }
+            }
+          },
+          {
+            "targetName": "PAR5",
+            "type": "perform",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 63,
+                "character": 16
+              },
+              "end": {
+                "line": 63,
+                "character": 28
+              }
+            }
+          },
+          {
+            "type": "endif",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 62,
+                "character": 12
+              },
+              "end": {
+                "line": 64,
+                "character": 18
+              }
+            }
+          },
+          {
+            "type": "if",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 66,
+                "character": 12
+              },
+              "end": {
+                "line": 68,
+                "character": 18
+              }
+            }
+          },
+          {
+            "targetName": "PAR6",
+            "type": "perform",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 67,
+                "character": 16
+              },
+              "end": {
+                "line": 67,
+                "character": 28
+              }
+            }
+          },
+          {
+            "type": "endif",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 66,
+                "character": 12
+              },
+              "end": {
+                "line": 68,
+                "character": 18
+              }
+            }
+          },
+          {
+            "type": "if",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 70,
+                "character": 12
+              },
+              "end": {
+                "line": 72,
+                "character": 18
+              }
+            }
+          },
+          {
+            "targetName": "PAR7",
+            "type": "perform",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 71,
+                "character": 16
+              },
+              "end": {
+                "line": 71,
+                "character": 28
+              }
+            }
+          },
+          {
+            "type": "endif",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 70,
+                "character": 12
+              },
+              "end": {
+                "line": 72,
+                "character": 18
+              }
+            }
+          },
+          {
+            "type": "if",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 74,
+                "character": 12
+              },
+              "end": {
+                "line": 76,
+                "character": 18
+              }
+            }
+          },
+          {
+            "targetName": "PAR8",
+            "type": "perform",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 75,
+                "character": 16
+              },
+              "end": {
+                "line": 75,
+                "character": 28
+              }
+            }
+          },
+          {
+            "type": "endif",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 74,
+                "character": 12
+              },
+              "end": {
+                "line": 76,
+                "character": 18
+              }
+            }
+          },
+          {
+            "type": "if",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 78,
+                "character": 12
+              },
+              "end": {
+                "line": 80,
+                "character": 18
+              }
+            }
+          },
+          {
+            "targetName": "PAR9",
+            "type": "perform",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 79,
+                "character": 16
+              },
+              "end": {
+                "line": 79,
+                "character": 28
+              }
+            }
+          },
+          {
+            "type": "endif",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 78,
+                "character": 12
+              },
+              "end": {
+                "line": 80,
+                "character": 18
+              }
+            }
+          }
+        ]
+      },
+      {
+        "snippet": "       PAR2.\r\n           IF (WS-NUM1 \u003e 1) THEN\r\n               PERFORM PAR0\r\n           END-IF.\r\n\r\n           IF (WS-NUM1 \u003e 1) THEN\r\n               PERFORM PAR1\r\n           END-IF.\r\n\r\n           IF (WS-NUM1 \u003e 1) THEN",
+        "name": "PAR2",
+        "type": "paragraph",
+        "location": {
+          "uri": "/case118.cbl",
+          "start": {
+            "line": 82,
+            "character": 8
+          },
+          "end": {
+            "line": 117,
+            "character": 19
+          }
+        },
+        "children": [
+          {
+            "type": "if",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 83,
+                "character": 12
+              },
+              "end": {
+                "line": 85,
+                "character": 18
+              }
+            }
+          },
+          {
+            "targetName": "PAR0",
+            "type": "perform",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 84,
+                "character": 16
+              },
+              "end": {
+                "line": 84,
+                "character": 28
+              }
+            }
+          },
+          {
+            "type": "endif",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 83,
+                "character": 12
+              },
+              "end": {
+                "line": 85,
+                "character": 18
+              }
+            }
+          },
+          {
+            "type": "if",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 87,
+                "character": 12
+              },
+              "end": {
+                "line": 89,
+                "character": 18
+              }
+            }
+          },
+          {
+            "targetName": "PAR1",
+            "type": "perform",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 88,
+                "character": 16
+              },
+              "end": {
+                "line": 88,
+                "character": 28
+              }
+            }
+          },
+          {
+            "type": "endif",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 87,
+                "character": 12
+              },
+              "end": {
+                "line": 89,
+                "character": 18
+              }
+            }
+          },
+          {
+            "type": "if",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 91,
+                "character": 12
+              },
+              "end": {
+                "line": 93,
+                "character": 18
+              }
+            }
+          },
+          {
+            "targetName": "PAR3",
+            "type": "perform",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 92,
+                "character": 16
+              },
+              "end": {
+                "line": 92,
+                "character": 28
+              }
+            }
+          },
+          {
+            "type": "endif",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 91,
+                "character": 12
+              },
+              "end": {
+                "line": 93,
+                "character": 18
+              }
+            }
+          },
+          {
+            "type": "if",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 95,
+                "character": 12
+              },
+              "end": {
+                "line": 97,
+                "character": 18
+              }
+            }
+          },
+          {
+            "targetName": "PAR4",
+            "type": "perform",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 96,
+                "character": 16
+              },
+              "end": {
+                "line": 96,
+                "character": 28
+              }
+            }
+          },
+          {
+            "type": "endif",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 95,
+                "character": 12
+              },
+              "end": {
+                "line": 97,
+                "character": 18
+              }
+            }
+          },
+          {
+            "type": "if",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 99,
+                "character": 12
+              },
+              "end": {
+                "line": 101,
+                "character": 18
+              }
+            }
+          },
+          {
+            "targetName": "PAR5",
+            "type": "perform",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 100,
+                "character": 16
+              },
+              "end": {
+                "line": 100,
+                "character": 28
+              }
+            }
+          },
+          {
+            "type": "endif",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 99,
+                "character": 12
+              },
+              "end": {
+                "line": 101,
+                "character": 18
+              }
+            }
+          },
+          {
+            "type": "if",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 103,
+                "character": 12
+              },
+              "end": {
+                "line": 105,
+                "character": 18
+              }
+            }
+          },
+          {
+            "targetName": "PAR6",
+            "type": "perform",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 104,
+                "character": 16
+              },
+              "end": {
+                "line": 104,
+                "character": 28
+              }
+            }
+          },
+          {
+            "type": "endif",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 103,
+                "character": 12
+              },
+              "end": {
+                "line": 105,
+                "character": 18
+              }
+            }
+          },
+          {
+            "type": "if",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 107,
+                "character": 12
+              },
+              "end": {
+                "line": 109,
+                "character": 18
+              }
+            }
+          },
+          {
+            "targetName": "PAR7",
+            "type": "perform",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 108,
+                "character": 16
+              },
+              "end": {
+                "line": 108,
+                "character": 28
+              }
+            }
+          },
+          {
+            "type": "endif",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 107,
+                "character": 12
+              },
+              "end": {
+                "line": 109,
+                "character": 18
+              }
+            }
+          },
+          {
+            "type": "if",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 111,
+                "character": 12
+              },
+              "end": {
+                "line": 113,
+                "character": 18
+              }
+            }
+          },
+          {
+            "targetName": "PAR8",
+            "type": "perform",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 112,
+                "character": 16
+              },
+              "end": {
+                "line": 112,
+                "character": 28
+              }
+            }
+          },
+          {
+            "type": "endif",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 111,
+                "character": 12
+              },
+              "end": {
+                "line": 113,
+                "character": 18
+              }
+            }
+          },
+          {
+            "type": "if",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 115,
+                "character": 12
+              },
+              "end": {
+                "line": 117,
+                "character": 18
+              }
+            }
+          },
+          {
+            "targetName": "PAR9",
+            "type": "perform",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 116,
+                "character": 16
+              },
+              "end": {
+                "line": 116,
+                "character": 28
+              }
+            }
+          },
+          {
+            "type": "endif",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 115,
+                "character": 12
+              },
+              "end": {
+                "line": 117,
+                "character": 18
+              }
+            }
+          }
+        ]
+      },
+      {
+        "snippet": "       PAR3.\r\n           IF (WS-NUM1 \u003e 1) THEN\r\n               PERFORM PAR0\r\n           END-IF.\r\n\r\n           IF (WS-NUM1 \u003e 1) THEN\r\n               PERFORM PAR1\r\n           END-IF.\r\n\r\n           IF (WS-NUM1 \u003e 1) THEN",
+        "name": "PAR3",
+        "type": "paragraph",
+        "location": {
+          "uri": "/case118.cbl",
+          "start": {
+            "line": 119,
+            "character": 8
+          },
+          "end": {
+            "line": 158,
+            "character": 19
+          }
+        },
+        "children": [
+          {
+            "type": "if",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 120,
+                "character": 12
+              },
+              "end": {
+                "line": 122,
+                "character": 18
+              }
+            }
+          },
+          {
+            "targetName": "PAR0",
+            "type": "perform",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 121,
+                "character": 16
+              },
+              "end": {
+                "line": 121,
+                "character": 28
+              }
+            }
+          },
+          {
+            "type": "endif",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 120,
+                "character": 12
+              },
+              "end": {
+                "line": 122,
+                "character": 18
+              }
+            }
+          },
+          {
+            "type": "if",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 124,
+                "character": 12
+              },
+              "end": {
+                "line": 126,
+                "character": 18
+              }
+            }
+          },
+          {
+            "targetName": "PAR1",
+            "type": "perform",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 125,
+                "character": 16
+              },
+              "end": {
+                "line": 125,
+                "character": 28
+              }
+            }
+          },
+          {
+            "type": "endif",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 124,
+                "character": 12
+              },
+              "end": {
+                "line": 126,
+                "character": 18
+              }
+            }
+          },
+          {
+            "type": "if",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 128,
+                "character": 12
+              },
+              "end": {
+                "line": 130,
+                "character": 18
+              }
+            }
+          },
+          {
+            "targetName": "PAR2",
+            "type": "perform",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 129,
+                "character": 16
+              },
+              "end": {
+                "line": 129,
+                "character": 28
+              }
+            }
+          },
+          {
+            "type": "endif",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 128,
+                "character": 12
+              },
+              "end": {
+                "line": 130,
+                "character": 18
+              }
+            }
+          },
+          {
+            "type": "if",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 132,
+                "character": 12
+              },
+              "end": {
+                "line": 134,
+                "character": 18
+              }
+            }
+          },
+          {
+            "targetName": "PAR4",
+            "type": "perform",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 133,
+                "character": 16
+              },
+              "end": {
+                "line": 133,
+                "character": 28
+              }
+            }
+          },
+          {
+            "type": "endif",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 132,
+                "character": 12
+              },
+              "end": {
+                "line": 134,
+                "character": 18
+              }
+            }
+          },
+          {
+            "type": "if",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 136,
+                "character": 12
+              },
+              "end": {
+                "line": 138,
+                "character": 18
+              }
+            }
+          },
+          {
+            "targetName": "PAR5",
+            "type": "perform",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 137,
+                "character": 16
+              },
+              "end": {
+                "line": 137,
+                "character": 28
+              }
+            }
+          },
+          {
+            "type": "endif",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 136,
+                "character": 12
+              },
+              "end": {
+                "line": 138,
+                "character": 18
+              }
+            }
+          },
+          {
+            "type": "if",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 140,
+                "character": 12
+              },
+              "end": {
+                "line": 142,
+                "character": 18
+              }
+            }
+          },
+          {
+            "targetName": "PAR6",
+            "type": "perform",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 141,
+                "character": 16
+              },
+              "end": {
+                "line": 141,
+                "character": 28
+              }
+            }
+          },
+          {
+            "type": "endif",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 140,
+                "character": 12
+              },
+              "end": {
+                "line": 142,
+                "character": 18
+              }
+            }
+          },
+          {
+            "type": "if",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 144,
+                "character": 12
+              },
+              "end": {
+                "line": 146,
+                "character": 18
+              }
+            }
+          },
+          {
+            "targetName": "PAR7",
+            "type": "perform",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 145,
+                "character": 16
+              },
+              "end": {
+                "line": 145,
+                "character": 28
+              }
+            }
+          },
+          {
+            "type": "endif",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 144,
+                "character": 12
+              },
+              "end": {
+                "line": 146,
+                "character": 18
+              }
+            }
+          },
+          {
+            "type": "if",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 148,
+                "character": 12
+              },
+              "end": {
+                "line": 150,
+                "character": 18
+              }
+            }
+          },
+          {
+            "targetName": "PAR8",
+            "type": "perform",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 149,
+                "character": 16
+              },
+              "end": {
+                "line": 149,
+                "character": 28
+              }
+            }
+          },
+          {
+            "type": "endif",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 148,
+                "character": 12
+              },
+              "end": {
+                "line": 150,
+                "character": 18
+              }
+            }
+          },
+          {
+            "type": "if",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 152,
+                "character": 12
+              },
+              "end": {
+                "line": 154,
+                "character": 18
+              }
+            }
+          },
+          {
+            "targetName": "PAR8",
+            "type": "perform",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 153,
+                "character": 16
+              },
+              "end": {
+                "line": 153,
+                "character": 28
+              }
+            }
+          },
+          {
+            "type": "endif",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 152,
+                "character": 12
+              },
+              "end": {
+                "line": 154,
+                "character": 18
+              }
+            }
+          },
+          {
+            "type": "if",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 156,
+                "character": 12
+              },
+              "end": {
+                "line": 158,
+                "character": 18
+              }
+            }
+          },
+          {
+            "targetName": "PAR9",
+            "type": "perform",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 157,
+                "character": 16
+              },
+              "end": {
+                "line": 157,
+                "character": 28
+              }
+            }
+          },
+          {
+            "type": "endif",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 156,
+                "character": 12
+              },
+              "end": {
+                "line": 158,
+                "character": 18
+              }
+            }
+          }
+        ]
+      },
+      {
+        "snippet": "       PAR4.\r\n           IF (WS-NUM1 \u003e 1) THEN\r\n               PERFORM PAR0\r\n           END-IF.\r\n\r\n           IF (WS-NUM1 \u003e 1) THEN\r\n               PERFORM PAR1\r\n           END-IF.\r\n\r\n           IF (WS-NUM1 \u003e 1) THEN",
+        "name": "PAR4",
+        "type": "paragraph",
+        "location": {
+          "uri": "/case118.cbl",
+          "start": {
+            "line": 160,
+            "character": 8
+          },
+          "end": {
+            "line": 195,
+            "character": 19
+          }
+        },
+        "children": [
+          {
+            "type": "if",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 161,
+                "character": 12
+              },
+              "end": {
+                "line": 163,
+                "character": 18
+              }
+            }
+          },
+          {
+            "targetName": "PAR0",
+            "type": "perform",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 162,
+                "character": 16
+              },
+              "end": {
+                "line": 162,
+                "character": 28
+              }
+            }
+          },
+          {
+            "type": "endif",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 161,
+                "character": 12
+              },
+              "end": {
+                "line": 163,
+                "character": 18
+              }
+            }
+          },
+          {
+            "type": "if",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 165,
+                "character": 12
+              },
+              "end": {
+                "line": 167,
+                "character": 18
+              }
+            }
+          },
+          {
+            "targetName": "PAR1",
+            "type": "perform",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 166,
+                "character": 16
+              },
+              "end": {
+                "line": 166,
+                "character": 28
+              }
+            }
+          },
+          {
+            "type": "endif",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 165,
+                "character": 12
+              },
+              "end": {
+                "line": 167,
+                "character": 18
+              }
+            }
+          },
+          {
+            "type": "if",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 169,
+                "character": 12
+              },
+              "end": {
+                "line": 171,
+                "character": 18
+              }
+            }
+          },
+          {
+            "targetName": "PAR2",
+            "type": "perform",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 170,
+                "character": 16
+              },
+              "end": {
+                "line": 170,
+                "character": 28
+              }
+            }
+          },
+          {
+            "type": "endif",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 169,
+                "character": 12
+              },
+              "end": {
+                "line": 171,
+                "character": 18
+              }
+            }
+          },
+          {
+            "type": "if",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 173,
+                "character": 12
+              },
+              "end": {
+                "line": 175,
+                "character": 18
+              }
+            }
+          },
+          {
+            "targetName": "PAR3",
+            "type": "perform",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 174,
+                "character": 16
+              },
+              "end": {
+                "line": 174,
+                "character": 28
+              }
+            }
+          },
+          {
+            "type": "endif",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 173,
+                "character": 12
+              },
+              "end": {
+                "line": 175,
+                "character": 18
+              }
+            }
+          },
+          {
+            "type": "if",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 177,
+                "character": 12
+              },
+              "end": {
+                "line": 179,
+                "character": 18
+              }
+            }
+          },
+          {
+            "targetName": "PAR5",
+            "type": "perform",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 178,
+                "character": 16
+              },
+              "end": {
+                "line": 178,
+                "character": 28
+              }
+            }
+          },
+          {
+            "type": "endif",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 177,
+                "character": 12
+              },
+              "end": {
+                "line": 179,
+                "character": 18
+              }
+            }
+          },
+          {
+            "type": "if",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 181,
+                "character": 12
+              },
+              "end": {
+                "line": 183,
+                "character": 18
+              }
+            }
+          },
+          {
+            "targetName": "PAR6",
+            "type": "perform",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 182,
+                "character": 16
+              },
+              "end": {
+                "line": 182,
+                "character": 28
+              }
+            }
+          },
+          {
+            "type": "endif",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 181,
+                "character": 12
+              },
+              "end": {
+                "line": 183,
+                "character": 18
+              }
+            }
+          },
+          {
+            "type": "if",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 185,
+                "character": 12
+              },
+              "end": {
+                "line": 187,
+                "character": 18
+              }
+            }
+          },
+          {
+            "targetName": "PAR7",
+            "type": "perform",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 186,
+                "character": 16
+              },
+              "end": {
+                "line": 186,
+                "character": 28
+              }
+            }
+          },
+          {
+            "type": "endif",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 185,
+                "character": 12
+              },
+              "end": {
+                "line": 187,
+                "character": 18
+              }
+            }
+          },
+          {
+            "type": "if",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 189,
+                "character": 12
+              },
+              "end": {
+                "line": 191,
+                "character": 18
+              }
+            }
+          },
+          {
+            "targetName": "PAR8",
+            "type": "perform",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 190,
+                "character": 16
+              },
+              "end": {
+                "line": 190,
+                "character": 28
+              }
+            }
+          },
+          {
+            "type": "endif",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 189,
+                "character": 12
+              },
+              "end": {
+                "line": 191,
+                "character": 18
+              }
+            }
+          },
+          {
+            "type": "if",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 193,
+                "character": 12
+              },
+              "end": {
+                "line": 195,
+                "character": 18
+              }
+            }
+          },
+          {
+            "targetName": "PAR9",
+            "type": "perform",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 194,
+                "character": 16
+              },
+              "end": {
+                "line": 194,
+                "character": 28
+              }
+            }
+          },
+          {
+            "type": "endif",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 193,
+                "character": 12
+              },
+              "end": {
+                "line": 195,
+                "character": 18
+              }
+            }
+          }
+        ]
+      },
+      {
+        "snippet": "       PAR5.\r\n           IF (WS-NUM1 \u003e 1) THEN\r\n               PERFORM PAR0\r\n           END-IF.\r\n\r\n           IF (WS-NUM1 \u003e 1) THEN\r\n               PERFORM PAR1\r\n           END-IF.\r\n\r\n           IF (WS-NUM1 \u003e 1) THEN",
+        "name": "PAR5",
+        "type": "paragraph",
+        "location": {
+          "uri": "/case118.cbl",
+          "start": {
+            "line": 197,
+            "character": 8
+          },
+          "end": {
+            "line": 232,
+            "character": 19
+          }
+        },
+        "children": [
+          {
+            "type": "if",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 198,
+                "character": 12
+              },
+              "end": {
+                "line": 200,
+                "character": 18
+              }
+            }
+          },
+          {
+            "targetName": "PAR0",
+            "type": "perform",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 199,
+                "character": 16
+              },
+              "end": {
+                "line": 199,
+                "character": 28
+              }
+            }
+          },
+          {
+            "type": "endif",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 198,
+                "character": 12
+              },
+              "end": {
+                "line": 200,
+                "character": 18
+              }
+            }
+          },
+          {
+            "type": "if",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 202,
+                "character": 12
+              },
+              "end": {
+                "line": 204,
+                "character": 18
+              }
+            }
+          },
+          {
+            "targetName": "PAR1",
+            "type": "perform",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 203,
+                "character": 16
+              },
+              "end": {
+                "line": 203,
+                "character": 28
+              }
+            }
+          },
+          {
+            "type": "endif",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 202,
+                "character": 12
+              },
+              "end": {
+                "line": 204,
+                "character": 18
+              }
+            }
+          },
+          {
+            "type": "if",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 206,
+                "character": 12
+              },
+              "end": {
+                "line": 208,
+                "character": 18
+              }
+            }
+          },
+          {
+            "targetName": "PAR2",
+            "type": "perform",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 207,
+                "character": 16
+              },
+              "end": {
+                "line": 207,
+                "character": 28
+              }
+            }
+          },
+          {
+            "type": "endif",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 206,
+                "character": 12
+              },
+              "end": {
+                "line": 208,
+                "character": 18
+              }
+            }
+          },
+          {
+            "type": "if",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 210,
+                "character": 12
+              },
+              "end": {
+                "line": 212,
+                "character": 18
+              }
+            }
+          },
+          {
+            "targetName": "PAR3",
+            "type": "perform",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 211,
+                "character": 16
+              },
+              "end": {
+                "line": 211,
+                "character": 28
+              }
+            }
+          },
+          {
+            "type": "endif",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 210,
+                "character": 12
+              },
+              "end": {
+                "line": 212,
+                "character": 18
+              }
+            }
+          },
+          {
+            "type": "if",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 214,
+                "character": 12
+              },
+              "end": {
+                "line": 216,
+                "character": 18
+              }
+            }
+          },
+          {
+            "targetName": "PAR4",
+            "type": "perform",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 215,
+                "character": 16
+              },
+              "end": {
+                "line": 215,
+                "character": 28
+              }
+            }
+          },
+          {
+            "type": "endif",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 214,
+                "character": 12
+              },
+              "end": {
+                "line": 216,
+                "character": 18
+              }
+            }
+          },
+          {
+            "type": "if",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 218,
+                "character": 12
+              },
+              "end": {
+                "line": 220,
+                "character": 18
+              }
+            }
+          },
+          {
+            "targetName": "PAR6",
+            "type": "perform",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 219,
+                "character": 16
+              },
+              "end": {
+                "line": 219,
+                "character": 28
+              }
+            }
+          },
+          {
+            "type": "endif",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 218,
+                "character": 12
+              },
+              "end": {
+                "line": 220,
+                "character": 18
+              }
+            }
+          },
+          {
+            "type": "if",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 222,
+                "character": 12
+              },
+              "end": {
+                "line": 224,
+                "character": 18
+              }
+            }
+          },
+          {
+            "targetName": "PAR7",
+            "type": "perform",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 223,
+                "character": 16
+              },
+              "end": {
+                "line": 223,
+                "character": 28
+              }
+            }
+          },
+          {
+            "type": "endif",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 222,
+                "character": 12
+              },
+              "end": {
+                "line": 224,
+                "character": 18
+              }
+            }
+          },
+          {
+            "type": "if",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 226,
+                "character": 12
+              },
+              "end": {
+                "line": 228,
+                "character": 18
+              }
+            }
+          },
+          {
+            "targetName": "PAR8",
+            "type": "perform",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 227,
+                "character": 16
+              },
+              "end": {
+                "line": 227,
+                "character": 28
+              }
+            }
+          },
+          {
+            "type": "endif",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 226,
+                "character": 12
+              },
+              "end": {
+                "line": 228,
+                "character": 18
+              }
+            }
+          },
+          {
+            "type": "if",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 230,
+                "character": 12
+              },
+              "end": {
+                "line": 232,
+                "character": 18
+              }
+            }
+          },
+          {
+            "targetName": "PAR9",
+            "type": "perform",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 231,
+                "character": 16
+              },
+              "end": {
+                "line": 231,
+                "character": 28
+              }
+            }
+          },
+          {
+            "type": "endif",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 230,
+                "character": 12
+              },
+              "end": {
+                "line": 232,
+                "character": 18
+              }
+            }
+          }
+        ]
+      },
+      {
+        "snippet": "       PAR6.\r\n           IF (WS-NUM1 \u003e 1) THEN\r\n               PERFORM PAR0\r\n           END-IF.\r\n\r\n           IF (WS-NUM1 \u003e 1) THEN\r\n               PERFORM PAR1\r\n           END-IF.\r\n\r\n           IF (WS-NUM1 \u003e 1) THEN",
+        "name": "PAR6",
+        "type": "paragraph",
+        "location": {
+          "uri": "/case118.cbl",
+          "start": {
+            "line": 234,
+            "character": 8
+          },
+          "end": {
+            "line": 269,
+            "character": 19
+          }
+        },
+        "children": [
+          {
+            "type": "if",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 235,
+                "character": 12
+              },
+              "end": {
+                "line": 237,
+                "character": 18
+              }
+            }
+          },
+          {
+            "targetName": "PAR0",
+            "type": "perform",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 236,
+                "character": 16
+              },
+              "end": {
+                "line": 236,
+                "character": 28
+              }
+            }
+          },
+          {
+            "type": "endif",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 235,
+                "character": 12
+              },
+              "end": {
+                "line": 237,
+                "character": 18
+              }
+            }
+          },
+          {
+            "type": "if",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 239,
+                "character": 12
+              },
+              "end": {
+                "line": 241,
+                "character": 18
+              }
+            }
+          },
+          {
+            "targetName": "PAR1",
+            "type": "perform",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 240,
+                "character": 16
+              },
+              "end": {
+                "line": 240,
+                "character": 28
+              }
+            }
+          },
+          {
+            "type": "endif",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 239,
+                "character": 12
+              },
+              "end": {
+                "line": 241,
+                "character": 18
+              }
+            }
+          },
+          {
+            "type": "if",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 243,
+                "character": 12
+              },
+              "end": {
+                "line": 245,
+                "character": 18
+              }
+            }
+          },
+          {
+            "targetName": "PAR2",
+            "type": "perform",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 244,
+                "character": 16
+              },
+              "end": {
+                "line": 244,
+                "character": 28
+              }
+            }
+          },
+          {
+            "type": "endif",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 243,
+                "character": 12
+              },
+              "end": {
+                "line": 245,
+                "character": 18
+              }
+            }
+          },
+          {
+            "type": "if",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 247,
+                "character": 12
+              },
+              "end": {
+                "line": 249,
+                "character": 18
+              }
+            }
+          },
+          {
+            "targetName": "PAR3",
+            "type": "perform",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 248,
+                "character": 16
+              },
+              "end": {
+                "line": 248,
+                "character": 28
+              }
+            }
+          },
+          {
+            "type": "endif",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 247,
+                "character": 12
+              },
+              "end": {
+                "line": 249,
+                "character": 18
+              }
+            }
+          },
+          {
+            "type": "if",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 251,
+                "character": 12
+              },
+              "end": {
+                "line": 253,
+                "character": 18
+              }
+            }
+          },
+          {
+            "targetName": "PAR4",
+            "type": "perform",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 252,
+                "character": 16
+              },
+              "end": {
+                "line": 252,
+                "character": 28
+              }
+            }
+          },
+          {
+            "type": "endif",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 251,
+                "character": 12
+              },
+              "end": {
+                "line": 253,
+                "character": 18
+              }
+            }
+          },
+          {
+            "type": "if",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 255,
+                "character": 12
+              },
+              "end": {
+                "line": 257,
+                "character": 18
+              }
+            }
+          },
+          {
+            "targetName": "PAR5",
+            "type": "perform",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 256,
+                "character": 16
+              },
+              "end": {
+                "line": 256,
+                "character": 28
+              }
+            }
+          },
+          {
+            "type": "endif",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 255,
+                "character": 12
+              },
+              "end": {
+                "line": 257,
+                "character": 18
+              }
+            }
+          },
+          {
+            "type": "if",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 259,
+                "character": 12
+              },
+              "end": {
+                "line": 261,
+                "character": 18
+              }
+            }
+          },
+          {
+            "targetName": "PAR7",
+            "type": "perform",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 260,
+                "character": 16
+              },
+              "end": {
+                "line": 260,
+                "character": 28
+              }
+            }
+          },
+          {
+            "type": "endif",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 259,
+                "character": 12
+              },
+              "end": {
+                "line": 261,
+                "character": 18
+              }
+            }
+          },
+          {
+            "type": "if",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 263,
+                "character": 12
+              },
+              "end": {
+                "line": 265,
+                "character": 18
+              }
+            }
+          },
+          {
+            "targetName": "PAR8",
+            "type": "perform",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 264,
+                "character": 16
+              },
+              "end": {
+                "line": 264,
+                "character": 28
+              }
+            }
+          },
+          {
+            "type": "endif",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 263,
+                "character": 12
+              },
+              "end": {
+                "line": 265,
+                "character": 18
+              }
+            }
+          },
+          {
+            "type": "if",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 267,
+                "character": 12
+              },
+              "end": {
+                "line": 269,
+                "character": 18
+              }
+            }
+          },
+          {
+            "targetName": "PAR9",
+            "type": "perform",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 268,
+                "character": 16
+              },
+              "end": {
+                "line": 268,
+                "character": 28
+              }
+            }
+          },
+          {
+            "type": "endif",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 267,
+                "character": 12
+              },
+              "end": {
+                "line": 269,
+                "character": 18
+              }
+            }
+          }
+        ]
+      },
+      {
+        "snippet": "       PAR7.\r\n           IF (WS-NUM1 \u003e 1) THEN\r\n               PERFORM PAR0\r\n           END-IF.\r\n\r\n           IF (WS-NUM1 \u003e 1) THEN\r\n               PERFORM PAR1\r\n           END-IF.\r\n\r\n           IF (WS-NUM1 \u003e 1) THEN",
+        "name": "PAR7",
+        "type": "paragraph",
+        "location": {
+          "uri": "/case118.cbl",
+          "start": {
+            "line": 271,
+            "character": 8
+          },
+          "end": {
+            "line": 306,
+            "character": 19
+          }
+        },
+        "children": [
+          {
+            "type": "if",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 272,
+                "character": 12
+              },
+              "end": {
+                "line": 274,
+                "character": 18
+              }
+            }
+          },
+          {
+            "targetName": "PAR0",
+            "type": "perform",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 273,
+                "character": 16
+              },
+              "end": {
+                "line": 273,
+                "character": 28
+              }
+            }
+          },
+          {
+            "type": "endif",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 272,
+                "character": 12
+              },
+              "end": {
+                "line": 274,
+                "character": 18
+              }
+            }
+          },
+          {
+            "type": "if",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 276,
+                "character": 12
+              },
+              "end": {
+                "line": 278,
+                "character": 18
+              }
+            }
+          },
+          {
+            "targetName": "PAR1",
+            "type": "perform",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 277,
+                "character": 16
+              },
+              "end": {
+                "line": 277,
+                "character": 28
+              }
+            }
+          },
+          {
+            "type": "endif",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 276,
+                "character": 12
+              },
+              "end": {
+                "line": 278,
+                "character": 18
+              }
+            }
+          },
+          {
+            "type": "if",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 280,
+                "character": 12
+              },
+              "end": {
+                "line": 282,
+                "character": 18
+              }
+            }
+          },
+          {
+            "targetName": "PAR2",
+            "type": "perform",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 281,
+                "character": 16
+              },
+              "end": {
+                "line": 281,
+                "character": 28
+              }
+            }
+          },
+          {
+            "type": "endif",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 280,
+                "character": 12
+              },
+              "end": {
+                "line": 282,
+                "character": 18
+              }
+            }
+          },
+          {
+            "type": "if",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 284,
+                "character": 12
+              },
+              "end": {
+                "line": 286,
+                "character": 18
+              }
+            }
+          },
+          {
+            "targetName": "PAR3",
+            "type": "perform",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 285,
+                "character": 16
+              },
+              "end": {
+                "line": 285,
+                "character": 28
+              }
+            }
+          },
+          {
+            "type": "endif",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 284,
+                "character": 12
+              },
+              "end": {
+                "line": 286,
+                "character": 18
+              }
+            }
+          },
+          {
+            "type": "if",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 288,
+                "character": 12
+              },
+              "end": {
+                "line": 290,
+                "character": 18
+              }
+            }
+          },
+          {
+            "targetName": "PAR4",
+            "type": "perform",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 289,
+                "character": 16
+              },
+              "end": {
+                "line": 289,
+                "character": 28
+              }
+            }
+          },
+          {
+            "type": "endif",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 288,
+                "character": 12
+              },
+              "end": {
+                "line": 290,
+                "character": 18
+              }
+            }
+          },
+          {
+            "type": "if",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 292,
+                "character": 12
+              },
+              "end": {
+                "line": 294,
+                "character": 18
+              }
+            }
+          },
+          {
+            "targetName": "PAR5",
+            "type": "perform",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 293,
+                "character": 16
+              },
+              "end": {
+                "line": 293,
+                "character": 28
+              }
+            }
+          },
+          {
+            "type": "endif",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 292,
+                "character": 12
+              },
+              "end": {
+                "line": 294,
+                "character": 18
+              }
+            }
+          },
+          {
+            "type": "if",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 296,
+                "character": 12
+              },
+              "end": {
+                "line": 298,
+                "character": 18
+              }
+            }
+          },
+          {
+            "targetName": "PAR6",
+            "type": "perform",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 297,
+                "character": 16
+              },
+              "end": {
+                "line": 297,
+                "character": 28
+              }
+            }
+          },
+          {
+            "type": "endif",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 296,
+                "character": 12
+              },
+              "end": {
+                "line": 298,
+                "character": 18
+              }
+            }
+          },
+          {
+            "type": "if",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 300,
+                "character": 12
+              },
+              "end": {
+                "line": 302,
+                "character": 18
+              }
+            }
+          },
+          {
+            "targetName": "PAR8",
+            "type": "perform",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 301,
+                "character": 16
+              },
+              "end": {
+                "line": 301,
+                "character": 28
+              }
+            }
+          },
+          {
+            "type": "endif",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 300,
+                "character": 12
+              },
+              "end": {
+                "line": 302,
+                "character": 18
+              }
+            }
+          },
+          {
+            "type": "if",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 304,
+                "character": 12
+              },
+              "end": {
+                "line": 306,
+                "character": 18
+              }
+            }
+          },
+          {
+            "targetName": "PAR9",
+            "type": "perform",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 305,
+                "character": 16
+              },
+              "end": {
+                "line": 305,
+                "character": 28
+              }
+            }
+          },
+          {
+            "type": "endif",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 304,
+                "character": 12
+              },
+              "end": {
+                "line": 306,
+                "character": 18
+              }
+            }
+          }
+        ]
+      },
+      {
+        "snippet": "       PAR8.\r\n           IF (WS-NUM1 \u003e 1) THEN\r\n               PERFORM PAR0\r\n           END-IF.\r\n\r\n           IF (WS-NUM1 \u003e 1) THEN\r\n               PERFORM PAR1\r\n           END-IF.\r\n\r\n           IF (WS-NUM1 \u003e 1) THEN",
+        "name": "PAR8",
+        "type": "paragraph",
+        "location": {
+          "uri": "/case118.cbl",
+          "start": {
+            "line": 308,
+            "character": 8
+          },
+          "end": {
+            "line": 343,
+            "character": 19
+          }
+        },
+        "children": [
+          {
+            "type": "if",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 309,
+                "character": 12
+              },
+              "end": {
+                "line": 311,
+                "character": 18
+              }
+            }
+          },
+          {
+            "targetName": "PAR0",
+            "type": "perform",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 310,
+                "character": 16
+              },
+              "end": {
+                "line": 310,
+                "character": 28
+              }
+            }
+          },
+          {
+            "type": "endif",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 309,
+                "character": 12
+              },
+              "end": {
+                "line": 311,
+                "character": 18
+              }
+            }
+          },
+          {
+            "type": "if",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 313,
+                "character": 12
+              },
+              "end": {
+                "line": 315,
+                "character": 18
+              }
+            }
+          },
+          {
+            "targetName": "PAR1",
+            "type": "perform",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 314,
+                "character": 16
+              },
+              "end": {
+                "line": 314,
+                "character": 28
+              }
+            }
+          },
+          {
+            "type": "endif",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 313,
+                "character": 12
+              },
+              "end": {
+                "line": 315,
+                "character": 18
+              }
+            }
+          },
+          {
+            "type": "if",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 317,
+                "character": 12
+              },
+              "end": {
+                "line": 319,
+                "character": 18
+              }
+            }
+          },
+          {
+            "targetName": "PAR2",
+            "type": "perform",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 318,
+                "character": 16
+              },
+              "end": {
+                "line": 318,
+                "character": 28
+              }
+            }
+          },
+          {
+            "type": "endif",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 317,
+                "character": 12
+              },
+              "end": {
+                "line": 319,
+                "character": 18
+              }
+            }
+          },
+          {
+            "type": "if",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 321,
+                "character": 12
+              },
+              "end": {
+                "line": 323,
+                "character": 18
+              }
+            }
+          },
+          {
+            "targetName": "PAR3",
+            "type": "perform",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 322,
+                "character": 16
+              },
+              "end": {
+                "line": 322,
+                "character": 28
+              }
+            }
+          },
+          {
+            "type": "endif",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 321,
+                "character": 12
+              },
+              "end": {
+                "line": 323,
+                "character": 18
+              }
+            }
+          },
+          {
+            "type": "if",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 325,
+                "character": 12
+              },
+              "end": {
+                "line": 327,
+                "character": 18
+              }
+            }
+          },
+          {
+            "targetName": "PAR4",
+            "type": "perform",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 326,
+                "character": 16
+              },
+              "end": {
+                "line": 326,
+                "character": 28
+              }
+            }
+          },
+          {
+            "type": "endif",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 325,
+                "character": 12
+              },
+              "end": {
+                "line": 327,
+                "character": 18
+              }
+            }
+          },
+          {
+            "type": "if",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 329,
+                "character": 12
+              },
+              "end": {
+                "line": 331,
+                "character": 18
+              }
+            }
+          },
+          {
+            "targetName": "PAR5",
+            "type": "perform",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 330,
+                "character": 16
+              },
+              "end": {
+                "line": 330,
+                "character": 28
+              }
+            }
+          },
+          {
+            "type": "endif",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 329,
+                "character": 12
+              },
+              "end": {
+                "line": 331,
+                "character": 18
+              }
+            }
+          },
+          {
+            "type": "if",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 333,
+                "character": 12
+              },
+              "end": {
+                "line": 335,
+                "character": 18
+              }
+            }
+          },
+          {
+            "targetName": "PAR6",
+            "type": "perform",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 334,
+                "character": 16
+              },
+              "end": {
+                "line": 334,
+                "character": 28
+              }
+            }
+          },
+          {
+            "type": "endif",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 333,
+                "character": 12
+              },
+              "end": {
+                "line": 335,
+                "character": 18
+              }
+            }
+          },
+          {
+            "type": "if",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 337,
+                "character": 12
+              },
+              "end": {
+                "line": 339,
+                "character": 18
+              }
+            }
+          },
+          {
+            "targetName": "PAR7",
+            "type": "perform",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 338,
+                "character": 16
+              },
+              "end": {
+                "line": 338,
+                "character": 28
+              }
+            }
+          },
+          {
+            "type": "endif",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 337,
+                "character": 12
+              },
+              "end": {
+                "line": 339,
+                "character": 18
+              }
+            }
+          },
+          {
+            "type": "if",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 341,
+                "character": 12
+              },
+              "end": {
+                "line": 343,
+                "character": 18
+              }
+            }
+          },
+          {
+            "targetName": "PAR9",
+            "type": "perform",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 342,
+                "character": 16
+              },
+              "end": {
+                "line": 342,
+                "character": 28
+              }
+            }
+          },
+          {
+            "type": "endif",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 341,
+                "character": 12
+              },
+              "end": {
+                "line": 343,
+                "character": 18
+              }
+            }
+          }
+        ]
+      },
+      {
+        "snippet": "       PAR9.\r\n           IF (WS-NUM1 \u003e 1) THEN\r\n               PERFORM PAR0\r\n           END-IF.\r\n\r\n           IF (WS-NUM1 \u003e 1) THEN\r\n               PERFORM PAR1\r\n           END-IF.\r\n\r\n           IF (WS-NUM1 \u003e 1) THEN",
+        "name": "PAR9",
+        "type": "paragraph",
+        "location": {
+          "uri": "/case118.cbl",
+          "start": {
+            "line": 345,
+            "character": 8
+          },
+          "end": {
+            "line": 380,
+            "character": 19
+          }
+        },
+        "children": [
+          {
+            "type": "if",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 346,
+                "character": 12
+              },
+              "end": {
+                "line": 348,
+                "character": 18
+              }
+            }
+          },
+          {
+            "targetName": "PAR0",
+            "type": "perform",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 347,
+                "character": 16
+              },
+              "end": {
+                "line": 347,
+                "character": 28
+              }
+            }
+          },
+          {
+            "type": "endif",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 346,
+                "character": 12
+              },
+              "end": {
+                "line": 348,
+                "character": 18
+              }
+            }
+          },
+          {
+            "type": "if",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 350,
+                "character": 12
+              },
+              "end": {
+                "line": 352,
+                "character": 18
+              }
+            }
+          },
+          {
+            "targetName": "PAR1",
+            "type": "perform",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 351,
+                "character": 16
+              },
+              "end": {
+                "line": 351,
+                "character": 28
+              }
+            }
+          },
+          {
+            "type": "endif",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 350,
+                "character": 12
+              },
+              "end": {
+                "line": 352,
+                "character": 18
+              }
+            }
+          },
+          {
+            "type": "if",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 354,
+                "character": 12
+              },
+              "end": {
+                "line": 356,
+                "character": 18
+              }
+            }
+          },
+          {
+            "targetName": "PAR2",
+            "type": "perform",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 355,
+                "character": 16
+              },
+              "end": {
+                "line": 355,
+                "character": 28
+              }
+            }
+          },
+          {
+            "type": "endif",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 354,
+                "character": 12
+              },
+              "end": {
+                "line": 356,
+                "character": 18
+              }
+            }
+          },
+          {
+            "type": "if",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 358,
+                "character": 12
+              },
+              "end": {
+                "line": 360,
+                "character": 18
+              }
+            }
+          },
+          {
+            "targetName": "PAR3",
+            "type": "perform",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 359,
+                "character": 16
+              },
+              "end": {
+                "line": 359,
+                "character": 28
+              }
+            }
+          },
+          {
+            "type": "endif",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 358,
+                "character": 12
+              },
+              "end": {
+                "line": 360,
+                "character": 18
+              }
+            }
+          },
+          {
+            "type": "if",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 362,
+                "character": 12
+              },
+              "end": {
+                "line": 364,
+                "character": 18
+              }
+            }
+          },
+          {
+            "targetName": "PAR4",
+            "type": "perform",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 363,
+                "character": 16
+              },
+              "end": {
+                "line": 363,
+                "character": 28
+              }
+            }
+          },
+          {
+            "type": "endif",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 362,
+                "character": 12
+              },
+              "end": {
+                "line": 364,
+                "character": 18
+              }
+            }
+          },
+          {
+            "type": "if",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 366,
+                "character": 12
+              },
+              "end": {
+                "line": 368,
+                "character": 18
+              }
+            }
+          },
+          {
+            "targetName": "PAR5",
+            "type": "perform",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 367,
+                "character": 16
+              },
+              "end": {
+                "line": 367,
+                "character": 28
+              }
+            }
+          },
+          {
+            "type": "endif",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 366,
+                "character": 12
+              },
+              "end": {
+                "line": 368,
+                "character": 18
+              }
+            }
+          },
+          {
+            "type": "if",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 370,
+                "character": 12
+              },
+              "end": {
+                "line": 372,
+                "character": 18
+              }
+            }
+          },
+          {
+            "targetName": "PAR6",
+            "type": "perform",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 371,
+                "character": 16
+              },
+              "end": {
+                "line": 371,
+                "character": 28
+              }
+            }
+          },
+          {
+            "type": "endif",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 370,
+                "character": 12
+              },
+              "end": {
+                "line": 372,
+                "character": 18
+              }
+            }
+          },
+          {
+            "type": "if",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 374,
+                "character": 12
+              },
+              "end": {
+                "line": 376,
+                "character": 18
+              }
+            }
+          },
+          {
+            "targetName": "PAR7",
+            "type": "perform",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 375,
+                "character": 16
+              },
+              "end": {
+                "line": 375,
+                "character": 28
+              }
+            }
+          },
+          {
+            "type": "endif",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 374,
+                "character": 12
+              },
+              "end": {
+                "line": 376,
+                "character": 18
+              }
+            }
+          },
+          {
+            "type": "if",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 378,
+                "character": 12
+              },
+              "end": {
+                "line": 380,
+                "character": 18
+              }
+            }
+          },
+          {
+            "targetName": "PAR8",
+            "type": "perform",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 379,
+                "character": 16
+              },
+              "end": {
+                "line": 379,
+                "character": 28
+              }
+            }
+          },
+          {
+            "type": "endif",
+            "location": {
+              "uri": "/case118.cbl",
+              "start": {
+                "line": 378,
+                "character": 12
+              },
+              "end": {
+                "line": 380,
+                "character": 18
+              }
+            }
+          }
+        ]
+      }
+    ]
+  }
+]

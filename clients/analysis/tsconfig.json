@@ -1,0 +1,31 @@
+{
+  "compilerOptions": {
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "target": "ES6",
+    "allowJs": true,
+    "resolveJsonModule": true,
+    //"moduleDetection": "force",
+    "isolatedModules": true,
+
+    "strict": true,
+    "noUncheckedIndexedAccess": false,
+    "noImplicitOverride": true,
+
+    "module": "commonjs",
+    "outDir": "lib",
+    "rootDir": "src",
+    "sourceMap": true,
+
+    "declaration": true,
+    "declarationMap": true,
+    "lib": ["esnext"],
+
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true,
+    "moduleResolution": "node"
+    //"noEmit": true,
+  },
+  "exclude": ["node_modules/", "lib/", "coverage/", "src/__mock__/"],
+  "include": ["src/"]
+}
