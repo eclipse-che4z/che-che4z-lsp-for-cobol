@@ -244,11 +244,6 @@ export class CopybookDownloadService {
       return this.e4eDownloader?.listRemoteCopybooksE4E(documentUri) ?? [];
     }
 
-    const copybooks: string[] = [];
-
-    const dsnPaths: string[] = SettingsService.getDsnPath(documentUri, dialect);
-    const ussPaths: string[] = SettingsService.getUssPath(documentUri, dialect);
-
     if (
       !(await this.isPrerequisiteForDownloadSatisfied(documentUri, [dialect]))
     ) {
@@ -262,6 +257,10 @@ export class CopybookDownloadService {
     if (!profile) {
       return [];
     }
+
+    const copybooks: string[] = [];
+    const dsnPaths: string[] = SettingsService.getDsnPath(documentUri, dialect);
+    const ussPaths: string[] = SettingsService.getUssPath(documentUri, dialect);
 
     const results = await Promise.allSettled([
       ...dsnPaths.map(async (dsn) => {
