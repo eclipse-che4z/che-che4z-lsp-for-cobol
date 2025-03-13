@@ -59,14 +59,17 @@ public class CompilerDirectivesVisitor extends CompilerDirectivesParserBaseVisit
   private final MessageService messageService;
   private final Position startPosition;
   private final String section;
+  private final String directiveLineText;
   private final boolean isJavaShareableOn;
 
-  public CompilerDirectivesVisitor(AnalysisContext ctx, MessageService messageService, Position startPosition, String section, boolean isJavaShareableOn) {
+  public CompilerDirectivesVisitor(AnalysisContext ctx, MessageService messageService, Position startPosition,
+                                   String section, String directiveLineText, boolean isJavaShareableOn) {
     this.analysisContext = ctx;
     this.messageService = messageService;
     this.startPosition = startPosition;
     this.section = section;
-      this.isJavaShareableOn = isJavaShareableOn;
+    this.directiveLineText = directiveLineText;
+    this.isJavaShareableOn = isJavaShareableOn;
   }
 
   @Getter
@@ -151,23 +154,20 @@ public class CompilerDirectivesVisitor extends CompilerDirectivesParserBaseVisit
   }
 
   private List<Node> processJavaCallable(CompilerDirectivesParser.CobolJavaInteroperabilityContext ctx) {
-    String currentLine = getCurrentDocumentLines()[startPosition.getLine()];
-    Matcher directiveLine = Pattern.compile("(?i).*>>\\s?JAVA-CALLABLE\\s*(?<extraText>.*)").matcher(currentLine);
+    Matcher directiveLine = Pattern.compile("(?i).*>>\\s?JAVA-CALLABLE\\s*(?<extraText>.*)").matcher(this.directiveLineText);
     validateDirective(ctx, directiveLine);
     Locality statementLocality = createStatementLocality(ctx);
     return addTreeNode(ctx, (location) -> new JavaCallableDataWorkingSectionNode(statementLocality, ctx.getText(), section));
   }
 
   private List<Node> processJavaShareableOn(CompilerDirectivesParser.CobolJavaInteroperabilityContext ctx) {
-    String currentLine = getCurrentDocumentLines()[startPosition.getLine()];
-    Matcher directiveLine = Pattern.compile("(?i).*>>\\s?JAVA-SHAREABLE\\s+ON\\s*(?<extraText>.*)").matcher(currentLine);
+    Matcher directiveLine = Pattern.compile("(?i).*>>\\s?JAVA-SHAREABLE\\s+ON\\s*(?<extraText>.*)").matcher(this.directiveLineText);
     validateDirective(ctx, directiveLine);
     return addTreeNode(ctx, (location) -> new JavaShareableOnWorkingSectionNode(createStatementLocality(ctx), ctx.getText(), section));
   }
 
   private List<Node> processJavaShareableOff(CompilerDirectivesParser.CobolJavaInteroperabilityContext ctx) {
-    String currentLine = getCurrentDocumentLines()[startPosition.getLine()];
-    Matcher directiveLine = Pattern.compile("(?i).*>>\\s?JAVA-SHAREABLE\\s+OFF\\s*(?<extraText>.*)").matcher(currentLine);
+    Matcher directiveLine = Pattern.compile("(?i).*>>\\s?JAVA-SHAREABLE\\s+OFF\\s*(?<extraText>.*)").matcher(this.directiveLineText);
     boolean isValid =  validateDirective(ctx, directiveLine);
     List<Node> nodes = new ArrayList<>(addTreeNode(ctx, (location) ->
             new JavaShareableOffWorkingSectionNode(createStatementLocality(ctx), ctx.getText(), section)));
@@ -176,10 +176,6 @@ public class CompilerDirectivesVisitor extends CompilerDirectivesParserBaseVisit
               new JavaShareableOffWithoutOnNode(createStatementLocality(ctx), ctx.getText(), isJavaShareableOn)));
     }
     return nodes;
-  }
-
-  private String[] getCurrentDocumentLines() {
-    return Pattern.compile("\n\r?").split(analysisContext.getExtendedDocument().getCurrentText().toString());
   }
 
   private boolean validateDirective(CompilerDirectivesParser.CobolJavaInteroperabilityContext ctx, Matcher directiveLine) {

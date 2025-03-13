@@ -79,12 +79,12 @@ public class CompilerDirectivesStage implements Stage<AnalysisContext, List<Node
       String compilerOptions = directivesLine.group("compilerOptions");
       if (compilerOptions != null) {
         process(compilerOptions, ctx, new Position(i, directivesLine.start("compilerOptions")),
-                "compilerOptions", "", false);
+                "compilerOptions", "", "", false);
       }
       String compilerDirectives = directivesLine.group("compilerDirectives");
       if (compilerDirectives != null) {
         nodes.addAll(process(compilerDirectives, ctx, new Position(i, directivesLine.start("compilerDirectives")),
-                "compilerDirectives", section, isJavaShareableOn));
+                "compilerDirectives", section, directivesLine.group(), isJavaShareableOn));
       }
 
       String newText = new String(new char[lines[i].length()]).replace('\0', ' ');
@@ -98,7 +98,7 @@ public class CompilerDirectivesStage implements Stage<AnalysisContext, List<Node
   }
 
   private List<Node> process(String directiveText, AnalysisContext ctx, Position startPosition, String parserRule, String section,
-                             boolean isJavaShareableOn) {
+                             String directiveLineText, boolean isJavaShareableOn) {
     if (!DIALECT_FILLER_PATTERN.matcher(directiveText).matches()) {
       CompilerDirectivesLexer lexer = new CompilerDirectivesLexer(CharStreams.fromString(directiveText));
       lexer.removeErrorListeners();
@@ -108,7 +108,8 @@ public class CompilerDirectivesStage implements Stage<AnalysisContext, List<Node
       parser.setErrorHandler(new CompilerDirectivesErrorStrategy(messageService));
       parser.addErrorListener(new CompilerDirectivesErrorListener(ctx, startPosition));
 
-      CompilerDirectivesVisitor visitor = new CompilerDirectivesVisitor(ctx, messageService, startPosition, section, isJavaShareableOn);
+      CompilerDirectivesVisitor visitor = new CompilerDirectivesVisitor(ctx, messageService, startPosition, section,
+              directiveLineText, isJavaShareableOn);
 
       if (parserRule.equals("compilerOptions")) {
         visitor.visitCompilerOptions(parser.compilerOptions());
