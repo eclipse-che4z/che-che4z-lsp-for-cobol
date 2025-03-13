@@ -66,12 +66,13 @@ export class DownloadUtil {
    * returns true if the passed profile has invalid credentials, false otherwise
    * @param profileName
    * @param explorerAPI
+   * @param remoteLocation DSN or USS that is used to test mainframe access
    * @returns true if the passed profile has invalid credentials, false otherwise
    */
   public static async checkForInvalidCredProfile(
     profileName: string,
     explorerAPI: IApiRegisterClient,
-    copybookLocation: CopybookRemoteLocation,
+    remoteLocation: MainframeRemoteLocation,
   ): Promise<boolean> {
     if (
       ZoweExplorerDownloader.profileStore.get(profileName) === "valid-profile"
@@ -81,10 +82,10 @@ export class DownloadUtil {
 
     try {
       const profile = this.loadProfile(profileName, explorerAPI);
-      if (copybookLocation.uss) {
-        await explorerAPI.getUssApi(profile).fileList(copybookLocation.uss);
-      } else if (copybookLocation.dsn) {
-        await explorerAPI.getMvsApi(profile).allMembers(copybookLocation.dsn);
+      if (remoteLocation.uss) {
+        await explorerAPI.getUssApi(profile).fileList(remoteLocation.uss);
+      } else if (remoteLocation.dsn) {
+        await explorerAPI.getMvsApi(profile).allMembers(remoteLocation.dsn);
       }
     } catch (error) {
       if (this.checkForInvalidCredentials(error, profileName)) {
@@ -169,7 +170,7 @@ export class DownloadUtil {
   public static areCopybookDownloadConfigurationsPresent(
     documentUri: string,
     dialects: string[],
-  ): CopybookRemoteLocation | null {
+  ): MainframeRemoteLocation | null {
     const uniqueDialects = new Set(
       dialects.map((dialect) => dialect?.toUpperCase()).filter(Boolean),
     );
@@ -245,7 +246,7 @@ export class DownloadUtil {
   }
 }
 
-export type CopybookRemoteLocation =
+export type MainframeRemoteLocation =
   | {
       dsn: string;
       uss?: never;

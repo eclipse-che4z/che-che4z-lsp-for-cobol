@@ -346,13 +346,13 @@ export class CopybookDownloadService {
     }
     if (!this.explorerApi) return false;
 
-    const copybookLocation =
+    const copybooksLocation =
       DownloadUtil.areCopybookDownloadConfigurationsPresent(
         documentUri,
         dialects,
       );
 
-    if (!copybookLocation) {
+    if (!copybooksLocation) {
       return false;
     }
 
@@ -375,7 +375,7 @@ export class CopybookDownloadService {
       !(await DownloadUtil.checkForInvalidCredProfile(
         profile,
         this.explorerApi,
-        copybookLocation,
+        copybooksLocation,
       ))
     );
   }
