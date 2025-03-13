@@ -1,0 +1,7 @@
+digraph A {
+rankdir=LR;
+<M285552A>-><P8000-READ-TABLE>;
+<P8000-READ-TABLE>-><P8000-EXIT>;
+<P8000-READ-TABLE>-><X1>;
+<X1>-><P8000-EXIT>;
+}

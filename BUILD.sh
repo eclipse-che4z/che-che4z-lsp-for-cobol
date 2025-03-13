@@ -35,6 +35,12 @@ npm ci
 npm run compile
 cd -
 
+# Compile analysis package
+cd clients/analysis
+npm ci
+npm run compile
+cd -
+
 # Build COBOL LS extension
 cd clients/cobol-lsp-vscode-extension
 npm ci

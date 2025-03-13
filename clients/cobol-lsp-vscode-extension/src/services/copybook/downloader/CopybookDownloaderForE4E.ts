@@ -36,7 +36,6 @@ import { asPartialProfile, hasMember, Utils } from "../../util/Utils";
 import { searchCopybookInExtensionFolder } from "../../util/FSUtils";
 import { getErrorMessage } from "../../util/ErrorsUtils";
 import { SettingsService } from "../../Settings";
-import { getChannel } from "../../../extension";
 
 const defaultConfigs: ExternalConfigurationOptions = {
   compiler: "IGYCRCTL",
@@ -209,6 +208,7 @@ export class CopybookDownloaderForE4E {
         use_map,
         this.storagePath,
         element.element,
+        this.outputChannel,
       );
       const resultElement = await this.e4e.getElement(profile, element);
 
@@ -238,6 +238,7 @@ export class CopybookDownloaderForE4E {
         member.dataset,
         this.storagePath,
         member.member,
+        this.outputChannel,
       );
 
       const memberContent = await this.e4e.getMember(profile, {
@@ -265,6 +266,7 @@ export class CopybookDownloaderForE4E {
     mapped: string,
     downloadFolder: string,
     copybook: string,
+    outputChannel?: vscode.OutputChannel,
   ): Promise<vscode.Uri> {
     const folder = CopybookURI.createDatasetPath(
       instance,
@@ -296,11 +298,11 @@ export class CopybookDownloaderForE4E {
       } catch (err) {
         if (err instanceof vscode.FileSystemError.FileExists) {
           // ok - directory already exists, nothing to do
-          getChannel().appendLine(
+          outputChannel?.appendLine(
             `FileExists error while allocating '${finishedPath.toString()}' directory for copybooks: ${JSON.stringify(err)}`,
           );
         } else {
-          getChannel().appendLine(
+          outputChannel?.appendLine(
             `Unable to allocate ${finishedPath.toString()} - ${hasMember(err, "msg") && typeof err.msg === "string" && err.msg} ${JSON.stringify(err)}`,
           );
           break;

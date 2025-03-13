@@ -1,0 +1,8 @@
+digraph A {
+rankdir=LR;
+<CASE25>-><PARAG2>;
+<CASE25>-><PARAG1>;
+<PARAG2>-><PARAG1>;
+<PARAG2>-><PARAG3>;
+<PARAG1>-><PARAG2>;
+}

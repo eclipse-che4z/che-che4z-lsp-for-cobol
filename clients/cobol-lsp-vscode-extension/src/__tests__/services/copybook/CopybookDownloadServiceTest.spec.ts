@@ -40,7 +40,6 @@ import {
 import * as ProcessorGroups from "../../../services/ProcessorGroups";
 import { Uri } from "../../../__mocks__/UriMock";
 import { SettingsService } from "../../../services/Settings";
-import * as extension from "../../../extension";
 
 jest.mock("../../../services/reporter");
 Utils.getZoweExplorerAPI = jest
@@ -686,7 +685,6 @@ describe("Tests copybook download service", () => {
     });
 
     describe("Error handling ", () => {
-      let outputChannelMock: jest.SpyInstance;
       const errorMessage =
         "Rest API failure with HTTP(S) status 404 ISRZ002 Data set not cataloged - 'DATASET.WITH.COPYBOOK' was not found in catalog.";
 
@@ -699,15 +697,10 @@ describe("Tests copybook download service", () => {
         };
       });
 
-      beforeEach(() => {
-        outputChannelMock = jest.fn();
-        jest.spyOn(extension, "getChannel").mockReturnValue({
-          appendLine: outputChannelMock,
-        } as unknown as vscode.OutputChannel);
-      });
-
       describe("Error in listing one directory should not affect listing other directories", () => {
         test("return list of all members of the uss, and logs error listing of the dataset", async () => {
+          const outputChannelMock = { appendLine: jest.fn() };
+
           getAllMembersMock = jest
             .fn()
             .mockRejectedValue(new Error(errorMessage));
@@ -715,6 +708,8 @@ describe("Tests copybook download service", () => {
           const cds = new CopybookDownloadService(
             "/globalStorage",
             zoweExplorerApiMock,
+            undefined,
+            outputChannelMock as unknown as vscode.OutputChannel,
           );
 
           const results = await cds.listRemoteCopybooks(
@@ -727,7 +722,7 @@ describe("Tests copybook download service", () => {
             expect.arrayContaining(ussFiles.map((n) => n.name)),
           );
 
-          expect(outputChannelMock).toHaveBeenCalledWith(
+          expect(outputChannelMock.appendLine).toHaveBeenCalledWith(
             expect.stringContaining(errorMessage),
           );
         });

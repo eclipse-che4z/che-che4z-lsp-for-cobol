@@ -1,0 +1,67 @@
+[
+  {
+    "range": {
+      "start": {
+        "line": 24,
+        "character": 0
+      },
+      "end": {
+        "line": 24,
+        "character": 16
+      }
+    },
+    "message": "Implicit EXIT PROGRAM statement executed",
+    "severity": 1,
+    "source": "COBOL Control Flow",
+    "relatedInformation": [
+      {
+        "location": {
+          "uri": "/case46.cbl",
+          "range": {
+            "start": {
+              "line": 23,
+              "character": 7
+            },
+            "end": {
+              "line": 24,
+              "character": 16
+            }
+          }
+        },
+        "message": "PARAGRAPH P8000-EXIT"
+      },
+      {
+        "location": {
+          "uri": "/case46.cbl",
+          "range": {
+            "start": {
+              "line": 20,
+              "character": 8
+            },
+            "end": {
+              "line": 21,
+              "character": 27
+            }
+          }
+        },
+        "message": "PARAGRAPH X1"
+      },
+      {
+        "location": {
+          "uri": "/case46.cbl",
+          "range": {
+            "start": {
+              "line": 15,
+              "character": 7
+            },
+            "end": {
+              "line": 19,
+              "character": 24
+            }
+          }
+        },
+        "message": "PARAGRAPH P8000-READ-TABLE"
+      }
+    ]
+  }
+]

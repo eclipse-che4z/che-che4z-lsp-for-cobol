@@ -118,12 +118,14 @@ suite("TF35623: Support for Replacing and Mapping statement", function () {
       "       IDENTIFICATION DIVISIO.",
     );
     await helper.waitFor(
-      () => vscode.languages.getDiagnostics(editor.document.uri).length === 1,
+      () => vscode.languages.getDiagnostics(editor.document.uri).length === 2,
     );
     const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
-    assert.strictEqual(diagnostics.length, 1);
-    const message = diagnostics[0].message;
-    assert.match(message, /^Syntax error on 'DIVISIO' expected DIVISION/);
+    assert.strictEqual(diagnostics.length, 2);
+    helper.hasDiagnosticMatches(
+      editor.document.uri,
+      (d) => d.message === "Syntax error on 'DIVISIO' expected DIVISION",
+    );
   });
 
   test("TC250951: Show Syntax and Semantic Errors from Copybooks", async () => {
@@ -146,27 +148,39 @@ suite("TF35623: Support for Replacing and Mapping statement", function () {
     await helper.waitFor(
       () => vscode.languages.getDiagnostics(editor.document.uri).length > 0,
     );
-    const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
-    diagnostics.sort((a, b) => a.severity - b.severity);
-    let message = diagnostics[0].message;
-    assert.match(message, /^Syntax error on 'NEW' expected SECTION/);
-    message = diagnostics[1].message;
-    assert.match(message, /^Syntax error on 'REPLACING' expected SECTION/);
+    helper.hasDiagnosticMatches(
+      editor.document.uri,
+      (d) => d.message === "Syntax error on 'NEW' expected SECTION",
+    );
+    helper.hasDiagnosticMatches(
+      editor.document.uri,
+      (d) => d.message === "Syntax error on 'REPLACING' expected SECTION",
+    );
   });
 
   test(
-    "TC250946: Support building of the extended document - Replace by arithmetic operations" +
+    "TC250946: Support building of the extended document - Replace by arithmetic operations\r\n" +
       "TC314935: Copybook with Name in Quotes is Recognized",
     async () => {
-      let editor = await helper.showDocument(path.join("TEST7.CBL"));
-      const extSrcPath = path.join("testing", "NEW.CPY");
-      editor = await helper.showDocument(extSrcPath);
-      await helper.waitFor(
-        () => vscode.languages.getDiagnostics(editor.document.uri).length > 0,
+      const documentPath = path.join("TEST7.CBL");
+      const documentUri = await helper.getUri(documentPath);
+      await helper.showDocument(documentPath);
+
+      const documentDiagnostics = await helper.waitForDiagnostics(documentUri);
+
+      const message = documentDiagnostics[1].message;
+      assert.strictEqual(message, "Errors inside the copybook");
+
+      const copybookPath = path.join("testing", "NEW.CPY");
+      const copybookUri = await helper.getUri(copybookPath);
+      await helper.showDocument(copybookPath);
+
+      const copybookDiagnostics = await helper.waitForDiagnostics(copybookUri);
+      assert.strictEqual(copybookDiagnostics.length, 1);
+      assert.match(
+        copybookDiagnostics[0].message,
+        /^A period was assumed before "\+3"./,
       );
-      const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
-      const message = diagnostics[0].message;
-      assert.match(message, /^A period was assumed before "\+3"./);
     },
   );
 });

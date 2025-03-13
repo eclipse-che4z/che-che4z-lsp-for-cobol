@@ -42,6 +42,11 @@ jobs:
       - name: Install dependencies for COBOL LS
         working-directory: clients/cobol-lsp-vscode-extension
         run: npm ci
+      - name: Install & Build Analysis Package
+        working-directory: clients/analysis
+        run: |
+          npm ci
+          npm run compile     
       - name: Install & Build VS Code extension dialect API
         working-directory: clients/cobol-dialect-api
         run: |
@@ -57,6 +62,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Install dependencies for COBOL LS Analysis module
+        working-directory: clients/analysis
+        run: NODE_ENV=production npm ci
       - name: Install dependencies for COBOL LS API
         working-directory: clients/cobol-dialect-api
         run: NODE_ENV=production npm ci
@@ -126,6 +134,16 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
+      - name: Build Cobol Analysis Package Library
+        working-directory: clients/analysis
+        run: |
+          npm ci
+          npm run compile
+      - name: Upload Cobol Analysis Package Library
+        uses: actions/upload-artifact@v4
+        with:
+          name: analysis_lib
+          path: clients/analysis/*
       - name: Build VS Code extension dialect API
         working-directory: clients/cobol-dialect-api
         run: |
@@ -136,6 +154,11 @@ jobs:
         with:
           name: lib
           path: clients/cobol-dialect-api/lib/*    
+      - name: Unit Test COBOL LS Analysis package
+        working-directory: clients/analysis
+        run: |
+          npm ci
+          npm run test
       - name: Unit Test COBOL LS extension
         working-directory: clients/cobol-lsp-vscode-extension
         run: |
@@ -198,6 +221,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Compile COBOL LS Analysis package
+        working-directory: clients/analysis
+        run: |
+          npm ci
+          npm run compile           
       - name: Unit Test COBOL LS Web extension
         working-directory: clients/cobol-lsp-vscode-extension
         run: |
@@ -382,6 +410,11 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
+      - name: Download VS Code Analysis package
+        uses: actions/download-artifact@v4
+        with:
+          name: analysis_lib
+          path: clients/analysis
       - name: Download VS Code extension dialect API
         uses: actions/download-artifact@v4
         with:

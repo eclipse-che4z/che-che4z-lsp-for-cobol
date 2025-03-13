@@ -39,7 +39,6 @@ import { CopybookURI } from "./CopybookURI";
 import path = require("path");
 import { getErrorMessage } from "../util/ErrorsUtils";
 import { DialectRegistry } from "../DialectRegistry";
-import { getChannel } from "../../extension";
 import { loadProcessorGroupCopybookPathsConfig } from "../ProcessorGroups";
 import {
   EndevorConfigModel,
@@ -336,7 +335,7 @@ export class CopybookDownloadService {
       if (result.status === "fulfilled") {
         result.value.forEach((c) => copybooks.push(c));
       } else {
-        getChannel().appendLine(
+        this.outputChannel?.appendLine(
           `Unable to load copybooks completions. ${result.reason}`,
         );
       }
@@ -574,9 +573,12 @@ async function searchCopybookinProcessorGroups(
     { scopeUri: documentUri },
     [],
   );
-  let shouldFound = false;
+  if (pgConfigs.length < 1) {
+    return false;
+  }
 
   for (const config of pgConfigs) {
+    let shouldFound = false;
     let folders: string = "";
     if (typeof config === "string") {
       folders = config;
@@ -641,5 +643,5 @@ async function searchCopybookinProcessorGroups(
     if (shouldFound) return true;
   }
 
-  return false;
+  return true;
 }

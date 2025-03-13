@@ -1,0 +1,265 @@
+[
+  {
+    "name": "PROG",
+    "type": "program",
+    "location": {
+      "uri": "/case77.cbl",
+      "start": {
+        "line": 5,
+        "character": 8
+      },
+      "end": {
+        "line": 21,
+        "character": 24
+      }
+    },
+    "children": [
+      {
+        "type": "statement",
+        "location": {
+          "uri": "/case77.cbl",
+          "start": {
+            "line": 6,
+            "character": 12
+          },
+          "end": {
+            "line": 6,
+            "character": 27
+          }
+        }
+      },
+      {
+        "targetName": "A",
+        "thruName": "C",
+        "type": "perform",
+        "location": {
+          "uri": "/case77.cbl",
+          "start": {
+            "line": 7,
+            "character": 12
+          },
+          "end": {
+            "line": 7,
+            "character": 28
+          }
+        }
+      },
+      {
+        "type": "statement",
+        "location": {
+          "uri": "/case77.cbl",
+          "start": {
+            "line": 8,
+            "character": 12
+          },
+          "end": {
+            "line": 8,
+            "character": 25
+          }
+        }
+      },
+      {
+        "type": "stop",
+        "location": {
+          "uri": "/case77.cbl",
+          "start": {
+            "line": 9,
+            "character": 12
+          },
+          "end": {
+            "line": 9,
+            "character": 20
+          }
+        }
+      },
+      {
+        "snippet": "       A.\r\n           DISPLAY \"A\".\r\n           PERFORM B.",
+        "name": "A",
+        "type": "paragraph",
+        "location": {
+          "uri": "/case77.cbl",
+          "start": {
+            "line": 10,
+            "character": 8
+          },
+          "end": {
+            "line": 12,
+            "character": 22
+          }
+        },
+        "children": [
+          {
+            "type": "statement",
+            "location": {
+              "uri": "/case77.cbl",
+              "start": {
+                "line": 11,
+                "character": 12
+              },
+              "end": {
+                "line": 11,
+                "character": 23
+              }
+            }
+          },
+          {
+            "targetName": "B",
+            "type": "perform",
+            "location": {
+              "uri": "/case77.cbl",
+              "start": {
+                "line": 12,
+                "character": 12
+              },
+              "end": {
+                "line": 12,
+                "character": 21
+              }
+            }
+          }
+        ]
+      },
+      {
+        "snippet": "       B.\r\n           DISPLAY \"B\".\r\n           GO TO C. ",
+        "name": "B",
+        "type": "paragraph",
+        "location": {
+          "uri": "/case77.cbl",
+          "start": {
+            "line": 13,
+            "character": 8
+          },
+          "end": {
+            "line": 15,
+            "character": 20
+          }
+        },
+        "children": [
+          {
+            "type": "statement",
+            "location": {
+              "uri": "/case77.cbl",
+              "start": {
+                "line": 14,
+                "character": 12
+              },
+              "end": {
+                "line": 14,
+                "character": 23
+              }
+            }
+          },
+          {
+            "targetName": [
+              "C"
+            ],
+            "type": "goto",
+            "location": {
+              "uri": "/case77.cbl",
+              "start": {
+                "line": 15,
+                "character": 12
+              },
+              "end": {
+                "line": 15,
+                "character": 19
+              }
+            }
+          }
+        ]
+      },
+      {
+        "snippet": "       C.\r\n           DISPLAY \"C1\".\r\n           EXIT.\r\n           DISPLAY \"C2\".",
+        "name": "C",
+        "type": "paragraph",
+        "location": {
+          "uri": "/case77.cbl",
+          "start": {
+            "line": 16,
+            "character": 8
+          },
+          "end": {
+            "line": 19,
+            "character": 25
+          }
+        },
+        "children": [
+          {
+            "type": "statement",
+            "location": {
+              "uri": "/case77.cbl",
+              "start": {
+                "line": 17,
+                "character": 12
+              },
+              "end": {
+                "line": 17,
+                "character": 24
+              }
+            }
+          },
+          {
+            "type": "exit",
+            "location": {
+              "uri": "/case77.cbl",
+              "start": {
+                "line": 18,
+                "character": 12
+              },
+              "end": {
+                "line": 18,
+                "character": 16
+              }
+            }
+          },
+          {
+            "type": "statement",
+            "location": {
+              "uri": "/case77.cbl",
+              "start": {
+                "line": 19,
+                "character": 12
+              },
+              "end": {
+                "line": 19,
+                "character": 24
+              }
+            }
+          }
+        ]
+      },
+      {
+        "snippet": "       D.\r\n           DISPLAY \"D\".",
+        "name": "D",
+        "type": "paragraph",
+        "location": {
+          "uri": "/case77.cbl",
+          "start": {
+            "line": 20,
+            "character": 8
+          },
+          "end": {
+            "line": 21,
+            "character": 24
+          }
+        },
+        "children": [
+          {
+            "type": "statement",
+            "location": {
+              "uri": "/case77.cbl",
+              "start": {
+                "line": 21,
+                "character": 12
+              },
+              "end": {
+                "line": 21,
+                "character": 23
+              }
+            }
+          }
+        ]
+      }
+    ]
+  }
+]
