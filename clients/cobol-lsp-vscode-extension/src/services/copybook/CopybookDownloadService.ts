@@ -16,7 +16,6 @@ import * as vscode from "vscode";
 import {
   COPYBOOKS_FOLDER,
   DATASET,
-  DEFAULT_DIALECT,
   E4E_FOLDER,
   ENDEVOR_PROCESSOR,
   ENVIRONMENT,
@@ -38,7 +37,6 @@ import { searchCopybookInExtensionFolder } from "../util/FSUtils";
 import { CopybookURI } from "./CopybookURI";
 import path = require("path");
 import { getErrorMessage } from "../util/ErrorsUtils";
-import { DialectRegistry } from "../DialectRegistry";
 import { loadProcessorGroupCopybookPathsConfig } from "../ProcessorGroups";
 import {
   EndevorConfigModel,
@@ -285,22 +283,8 @@ export class CopybookDownloadService {
       return this.e4eDownloader?.listRemoteCopybooksE4E(documentUri) ?? [];
     }
 
-    const dialects = [
-      DEFAULT_DIALECT,
-      ...DialectRegistry.getActiveDialects().map((di) => di.name),
-    ];
-
-    const copybooks: string[] = [];
-
-    const dsnPaths: string[] = SettingsService.getDsnPath(documentUri, dialect);
-    const ussPaths: string[] = SettingsService.getUssPath(documentUri, dialect);
-
-    if (dsnPaths.length === 0 && ussPaths.length === 0) {
-      return [];
-    }
-
     if (
-      !(await this.isPrerequisiteForDownloadSatisfied(documentUri, dialects))
+      !(await this.isPrerequisiteForDownloadSatisfied(documentUri, [dialect]))
     ) {
       return [];
     }
@@ -312,6 +296,10 @@ export class CopybookDownloadService {
     if (!profile) {
       return [];
     }
+
+    const copybooks: string[] = [];
+    const dsnPaths: string[] = SettingsService.getDsnPath(documentUri, dialect);
+    const ussPaths: string[] = SettingsService.getUssPath(documentUri, dialect);
 
     const results = await Promise.allSettled([
       ...dsnPaths.map(async (dsn) => {
@@ -396,6 +384,16 @@ export class CopybookDownloadService {
     }
     if (!this.explorerApi && !this.e4eApi) return false;
 
+    const copybooksLocation =
+      DownloadUtil.areCopybookDownloadConfigurationsPresent(
+        documentUri,
+        dialects,
+      );
+
+    if (!copybooksLocation) {
+      return false;
+    }
+
     const configs = await loadProcessorGroupCopybookPathsConfig(
       { scopeUri: documentUri },
       [],
@@ -439,8 +437,7 @@ export class CopybookDownloadService {
               await DownloadUtil.checkForInvalidCredProfile(
                 profile,
                 this.explorerApi,
-                documentUri,
-                dialects,
+                copybooksLocation,
               ),
             );
           }
@@ -459,8 +456,7 @@ export class CopybookDownloadService {
         !(await DownloadUtil.checkForInvalidCredProfile(
           profile,
           this.explorerApi,
-          documentUri,
-          dialects,
+          copybooksLocation,
         ))
       );
     }

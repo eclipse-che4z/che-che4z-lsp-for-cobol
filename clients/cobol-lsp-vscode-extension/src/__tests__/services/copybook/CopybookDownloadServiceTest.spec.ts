@@ -104,6 +104,7 @@ describe("Tests copybook download service", () => {
   describe("checks the prerequisites are checked before invoking download", () => {
     describe("unknown-profile", () => {
       beforeEach(() => {
+        workspaceConfigurationMock[PATHS_DSN] = ["TEST.COBOL.COPYBOOK"];
         profileName = "unknown-profile";
       });
 
@@ -117,8 +118,9 @@ describe("Tests copybook download service", () => {
       });
     });
 
-    describe("profile not profiled", () => {
+    describe("profile not provided", () => {
       beforeEach(() => {
+        workspaceConfigurationMock[PATHS_DSN] = ["TEST.COBOL.COPYBOOK"];
         profileName = "";
       });
 
@@ -127,8 +129,23 @@ describe("Tests copybook download service", () => {
           { name: "copybook-name", dialect: DEFAULT_DIALECT },
         ]);
         expect(downloadService["processDownloadError"]).toHaveBeenCalledWith(
-          `${PROVIDE_PROFILE_MSG}`,
+          PROVIDE_PROFILE_MSG,
         );
+      });
+    });
+
+    describe("no profile and no remote location configured", () => {
+      beforeEach(() => {
+        workspaceConfigurationMock[PATHS_DSN] = [];
+        workspaceConfigurationMock[PATHS_USS] = [];
+        profileName = "";
+      });
+
+      it("should not show the missing zowe profile message", async () => {
+        await downloadService.downloadCopybooks("document-uri", [
+          { name: "copybook-name", dialect: DEFAULT_DIALECT },
+        ]);
+        expect(downloadService["processDownloadError"]).not.toHaveBeenCalled();
       });
     });
 
@@ -322,9 +339,9 @@ describe("Tests copybook download service", () => {
     ProfileUtils.getAvailableProfiles = jest.fn().mockReturnValue("profile");
     DownloadUtil.isProfileLocked = jest.fn().mockReturnValue(false);
     DownloadUtil.checkForInvalidCredProfile = jest.fn().mockReturnValue(false);
-    DownloadUtil.areCopybookDownloadConfigurationsPresent = jest
-      .fn()
-      .mockReturnValue(true);
+    jest
+      .spyOn(DownloadUtil, "areCopybookDownloadConfigurationsPresent")
+      .mockReturnValue({ dsn: "DATASET.WITH.COPYBOOK" });
     const downloadService = new CopybookDownloadService(
       "storage-path",
       {} as unknown as IApiRegisterClient,
