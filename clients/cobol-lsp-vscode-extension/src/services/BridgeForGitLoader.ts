@@ -14,7 +14,7 @@
 import * as t from "io-ts";
 import { isLeft } from "fp-ts/Either";
 import { PathReporter } from "io-ts/PathReporter";
-import { workspace, Uri } from "vscode";
+import { workspace, Uri, FileSystemWatcher } from "vscode";
 import { TextDecoder } from "util";
 
 const ElementMetadata = t.type({
@@ -33,9 +33,12 @@ const B4GTypeMetadataModel = t.type({
   fileExtension: t.string,
 });
 
+const bridge4GitCacheMap: Map<string, B4GTypeMetadata | undefined> = new Map();
 export type B4GTypeMetadata = t.TypeOf<typeof B4GTypeMetadataModel>;
 
-export function decodeBridgeJson(json: unknown): B4GTypeMetadata | undefined {
+const BRIDGE4GIT_CONFIG_FILE = "**/.bridge.json";
+
+function decodeBridgeJson(json: unknown): B4GTypeMetadata | undefined {
   if (json === undefined) {
     return undefined;
   }
@@ -55,13 +58,43 @@ export function decodeBridgeJson(json: unknown): B4GTypeMetadata | undefined {
 
 export async function loadBridgeJsonContent(
   documentUri: Uri,
-): Promise<unknown> {
+): Promise<B4GTypeMetadata | undefined> {
   const b4gPath = Uri.joinPath(documentUri, "../.bridge.json");
+  if (bridge4GitCacheMap.has(b4gPath.toString())) {
+    return bridge4GitCacheMap.get(b4gPath.toString());
+  }
+  return reloadBridgeJsonContent(b4gPath);
+}
+
+const watcherChangeEventHandler = (uri: Uri) => {
+  bridge4GitCacheMap.delete(uri.toString());
+};
+
+async function readBridge4GitJson(b4gPath: Uri) {
+  const bridge4GitDataString = new TextDecoder().decode(
+    await workspace.fs.readFile(b4gPath),
+  );
+  const bridge4GitDataJson: unknown = JSON.parse(bridge4GitDataString);
+  return decodeBridgeJson(bridge4GitDataJson);
+}
+
+export function setupBridge4GitWatcher(): FileSystemWatcher {
+  const bridge4GitWatcher = workspace.createFileSystemWatcher(
+    BRIDGE4GIT_CONFIG_FILE,
+  );
+  bridge4GitWatcher.onDidChange(watcherChangeEventHandler);
+  bridge4GitWatcher.onDidCreate(watcherChangeEventHandler);
+  bridge4GitWatcher.onDidDelete(watcherChangeEventHandler);
+  return bridge4GitWatcher;
+}
+
+async function reloadBridgeJsonContent(b4gPath: Uri) {
   try {
-    return JSON.parse(
-      new TextDecoder().decode(await workspace.fs.readFile(b4gPath)),
-    );
+    const bridge4GitDataJson = await readBridge4GitJson(b4gPath);
+    bridge4GitCacheMap.set(b4gPath.toString(), bridge4GitDataJson);
+    return bridge4GitDataJson;
   } catch (e) {
+    bridge4GitCacheMap.set(b4gPath.toString(), undefined);
     if (
       e &&
       typeof e === "object" &&
