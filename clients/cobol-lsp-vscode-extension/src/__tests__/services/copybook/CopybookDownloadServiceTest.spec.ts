@@ -114,8 +114,9 @@ describe("Tests copybook download service", () => {
       });
     });
 
-    describe("profile not profiled", () => {
+    describe("profile not provided", () => {
       beforeEach(() => {
+        workspaceConfigurationMock[PATHS_DSN] = ["TEST.COBOL.COPYBOOK"];
         profileName = "";
       });
 
@@ -124,8 +125,23 @@ describe("Tests copybook download service", () => {
           { name: "copybook-name", dialect: DEFAULT_DIALECT },
         ]);
         expect(downloadService["processDownloadError"]).toHaveBeenCalledWith(
-          `${PROVIDE_PROFILE_MSG}`,
+          PROVIDE_PROFILE_MSG,
         );
+      });
+    });
+
+    describe("no profile and no remote location configured", () => {
+      beforeEach(() => {
+        workspaceConfigurationMock[PATHS_DSN] = [];
+        workspaceConfigurationMock[PATHS_USS] = [];
+        profileName = "";
+      });
+
+      it("should not show the missing zowe profile message", async () => {
+        await downloadService.downloadCopybooks("document-uri", [
+          { name: "copybook-name", dialect: DEFAULT_DIALECT },
+        ]);
+        expect(downloadService["processDownloadError"]).not.toHaveBeenCalled();
       });
     });
 
