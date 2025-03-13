@@ -1010,4 +1010,46 @@ describe("Tests copybook download service", () => {
     );
     expect(spyDownloadElement).toHaveBeenCalledTimes(0);
   });
+  it("checks endevor locations in proccesor groups definitions resolves prerequiste", async () => {
+    SettingsService.getDsnPath = jest.fn().mockReturnValue([]);
+    SettingsService.getUssPath = jest.fn().mockReturnValue([]);
+    const service = new CopybookDownloadService(
+      "storage-path",
+      zoweExplorerMock,
+      e4eMock,
+    );
+    const spyConfig = jest.spyOn(
+      ProcessorGroups,
+      "loadProcessorGroupCopybookPathsConfig",
+    );
+    spyConfig.mockResolvedValue([
+      {
+        environment: "environment",
+        stage: "1",
+        system: "system",
+        subsystem: "subsystem",
+        type: "type",
+      },
+    ]);
+    const downloadSpy = jest.spyOn(
+      service["e4eDownloader"]!,
+      "downloadElementE4E",
+    );
+    await service.downloadCopybooks("document-uri", [
+      { name: "copybook-name", dialect: DEFAULT_DIALECT },
+    ]);
+    expect(downloadSpy).toHaveBeenCalledWith(
+      { instance: "instance", profile: "profile" },
+      {
+        element: "copybook-name",
+        environment: "environment",
+        fingerprint: "",
+        stage: "1",
+        subsystem: "subsystem",
+        system: "system",
+        type: "type",
+        use_map: true,
+      },
+    );
+  });
 });

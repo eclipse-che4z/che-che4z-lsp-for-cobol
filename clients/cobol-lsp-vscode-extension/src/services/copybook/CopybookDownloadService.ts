@@ -403,17 +403,18 @@ export class CopybookDownloadService {
         uss: USS in config ? config.uss : undefined,
       }));
 
-    const endevorConfigs = new Set(
-      configs.filter(
-        (config): config is EndevorConfigModel =>
-          typeof config != "string" && ENVIRONMENT in config,
-      ),
+    const endevorConfigs = configs.filter(
+      (config): config is EndevorConfigModel =>
+        typeof config != "string" && ENVIRONMENT in config,
     );
 
     const profile = ProfileUtils.getProfileNameForCopybook(
       documentUri,
       this.explorerApi,
     );
+
+    if (endevorConfigs.length > 0 && !this.e4eApi) return false;
+
     if (this.explorerApi) {
       const availableProfiles = ProfileUtils.getAvailableProfiles(
         this.explorerApi,
@@ -450,35 +451,35 @@ export class CopybookDownloadService {
           }
         }
         return checks.every((v) => v === false);
-      }
+      } else if (configs.length == 0) {
+        const copybooksLocation =
+          DownloadUtil.areCopybookDownloadConfigurationsPresent(
+            documentUri,
+            dialects,
+          );
 
-      const copybooksLocation =
-        DownloadUtil.areCopybookDownloadConfigurationsPresent(
-          documentUri,
-          dialects,
+        if (!copybooksLocation) {
+          return false;
+        }
+
+        if (!profile || !availableProfiles.includes(profile)) {
+          const message = profile
+            ? `${PROVIDE_PROFILE_MSG} Provided invalid profile name: ${profile}`
+            : `${PROVIDE_PROFILE_MSG}`;
+          this.processDownloadError(message);
+          return false;
+        }
+        return (
+          !(await DownloadUtil.isProfileLocked(profile)) &&
+          !(await DownloadUtil.checkForInvalidCredProfile(
+            profile,
+            this.explorerApi,
+            copybooksLocation,
+          ))
         );
-
-      if (!copybooksLocation) {
-        return false;
       }
-
-      if (!profile || !availableProfiles.includes(profile)) {
-        const message = profile
-          ? `${PROVIDE_PROFILE_MSG} Provided invalid profile name: ${profile}`
-          : `${PROVIDE_PROFILE_MSG}`;
-        this.processDownloadError(message);
-        return false;
-      }
-      return (
-        !(await DownloadUtil.isProfileLocked(profile)) &&
-        !(await DownloadUtil.checkForInvalidCredProfile(
-          profile,
-          this.explorerApi,
-          copybooksLocation,
-        ))
-      );
     }
-    if (Array.isArray(endevorConfigs) && endevorConfigs.length > 0) return true;
+    if (endevorConfigs.length > 0) return true;
     return false;
   }
 
