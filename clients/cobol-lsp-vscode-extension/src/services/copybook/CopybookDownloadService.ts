@@ -26,7 +26,10 @@ import {
   ZOWE_FOLDER,
 } from "../../constants";
 import { ProfileUtils } from "../util/ProfileUtils";
-import { DownloadUtil } from "./downloader/DownloadUtil";
+import {
+  DownloadUtil,
+  MainframeRemoteLocation,
+} from "./downloader/DownloadUtil";
 import { E4E, EndevorElement } from "../../type/e4eApi";
 import { CopybookDownloaderForE4E } from "./downloader/CopybookDownloaderForE4E";
 import { CopybookDownloaderForUss } from "./downloader/CopybookDownloaderForUss";
@@ -130,7 +133,7 @@ export class CopybookDownloadService {
     for (const path of paths) {
       const p = typeof path === "object" ? path.path : path;
       const profile =
-        typeof path === "object"
+        typeof path === "object" && path.profile
           ? path.profile
           : ProfileUtils.getProfileNameForCopybook(
               documentUri,
@@ -384,31 +387,23 @@ export class CopybookDownloadService {
     }
     if (!this.explorerApi && !this.e4eApi) return false;
 
-    const copybooksLocation =
-      DownloadUtil.areCopybookDownloadConfigurationsPresent(
-        documentUri,
-        dialects,
-      );
-
-    if (!copybooksLocation) {
-      return false;
-    }
-
     const configs = await loadProcessorGroupCopybookPathsConfig(
       { scopeUri: documentUri },
       [],
     );
 
-    const procGroupZoweProfiles = new Set(
-      configs
-        .filter(
-          (config): config is ZoweUssConfigModel | ZoweDatasetConfigModel =>
-            typeof config != "string" && (DATASET in config || USS in config),
-        )
-        .map((dsn) => dsn.profile)
-        .filter((x) => typeof x == "string"),
-    );
-    const endevorProfiles = new Set(
+    const procGroupZoweConfigs = configs
+      .filter(
+        (config): config is ZoweUssConfigModel | ZoweDatasetConfigModel =>
+          typeof config != "string" && (DATASET in config || USS in config),
+      )
+      .map((config) => ({
+        profile: config.profile,
+        dataset: DATASET in config ? config.dataset : undefined,
+        uss: USS in config ? config.uss : undefined,
+      }));
+
+    const endevorConfigs = new Set(
       configs.filter(
         (config): config is EndevorConfigModel =>
           typeof config != "string" && ENVIRONMENT in config,
@@ -424,26 +419,49 @@ export class CopybookDownloadService {
         this.explorerApi,
       );
 
-      if (procGroupZoweProfiles && procGroupZoweProfiles.size > 0) {
+      if (procGroupZoweConfigs && procGroupZoweConfigs.length > 0) {
         const checks: boolean[] = [];
-        for (const profile of procGroupZoweProfiles) {
-          if (!availableProfiles.includes(profile)) {
+        for (const zoweConfig of procGroupZoweConfigs) {
+          const tempProfile = zoweConfig.profile ? zoweConfig.profile : profile;
+
+          if (!tempProfile || !availableProfiles.includes(tempProfile)) {
             checks.push(true);
-            const msg = `${PROVIDE_PROFILE_MSG_PROC_GRUOPS} Provided invalid profile name: ${profile}`;
+            const msg = `${PROVIDE_PROFILE_MSG_PROC_GRUOPS} Provided invalid profile name: ${zoweConfig.profile}`;
             vscode.window.showErrorMessage(msg);
           } else {
-            checks.push(await DownloadUtil.isProfileLocked(profile));
+            let location: MainframeRemoteLocation;
+            if (zoweConfig.dataset)
+              location = {
+                dsn: zoweConfig.dataset,
+              };
+            else
+              location = {
+                uss: zoweConfig.uss!,
+              };
+
+            checks.push(await DownloadUtil.isProfileLocked(tempProfile));
             checks.push(
               await DownloadUtil.checkForInvalidCredProfile(
-                profile,
+                tempProfile,
                 this.explorerApi,
-                copybooksLocation,
+                location,
               ),
             );
           }
         }
         return checks.every((v) => v === false);
       }
+
+      const copybooksLocation =
+        DownloadUtil.areCopybookDownloadConfigurationsPresent(
+          documentUri,
+          dialects,
+        );
+
+      if (!copybooksLocation) {
+        return false;
+      }
+
       if (!profile || !availableProfiles.includes(profile)) {
         const message = profile
           ? `${PROVIDE_PROFILE_MSG} Provided invalid profile name: ${profile}`
@@ -460,8 +478,7 @@ export class CopybookDownloadService {
         ))
       );
     }
-    if (Array.isArray(endevorProfiles) && endevorProfiles.length > 0)
-      return true;
+    if (Array.isArray(endevorConfigs) && endevorConfigs.length > 0) return true;
     return false;
   }
 

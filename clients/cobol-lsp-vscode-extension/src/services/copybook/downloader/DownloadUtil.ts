@@ -22,7 +22,6 @@ import { ZoweExplorerDownloader } from "./ZoweExplorerDownloader";
 import { SettingsService } from "../../Settings";
 import { hasMember } from "../../util/Utils";
 import { registerExceptionEvent } from "../../reporter";
-import { loadProcessorGroupCopybookPathsConfig } from "../../ProcessorGroups";
 import { EndevorType } from "../../../type/e4eApi";
 import { EndevorConfigModel } from "../../ProcessorGroupsLoader";
 
@@ -170,20 +169,13 @@ export class DownloadUtil {
    * @returns first configured remote location if if copybook download
    * configurations are present, null otherwise
    */
-  public static async areCopybookDownloadConfigurationsPresent(
+  public static areCopybookDownloadConfigurationsPresent(
     documentUri: string,
     dialects: string[],
   ): MainframeRemoteLocation | null {
     const uniqueDialects = new Set(
       dialects.map((dialect) => dialect?.toUpperCase()).filter(Boolean),
     );
-    const procGroupPath = await loadProcessorGroupCopybookPathsConfig(
-      { scopeUri: documentUri },
-      [],
-    );
-    if (procGroupPath.length > 0) {
-      return true;
-    }
 
     for (const dialect of uniqueDialects) {
       const dsnPath = SettingsService.getDsnPath(documentUri, dialect);
