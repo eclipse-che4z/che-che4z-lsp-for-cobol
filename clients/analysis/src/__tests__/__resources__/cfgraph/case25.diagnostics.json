@@ -1,0 +1,99 @@
+[
+  {
+    "range": {
+      "start": {
+        "line": 13,
+        "character": 0
+      },
+      "end": {
+        "line": 13,
+        "character": 28
+      }
+    },
+    "message": "Implicit EXIT PROGRAM statement executed",
+    "severity": 1,
+    "source": "COBOL Control Flow",
+    "relatedInformation": [
+      {
+        "location": {
+          "uri": "/case25.cbl",
+          "range": {
+            "start": {
+              "line": 12,
+              "character": 7
+            },
+            "end": {
+              "line": 13,
+              "character": 28
+            }
+          }
+        },
+        "message": "PARAGRAPH PARAG3"
+      },
+      {
+        "location": {
+          "uri": "/case25.cbl",
+          "range": {
+            "start": {
+              "line": 7,
+              "character": 7
+            },
+            "end": {
+              "line": 11,
+              "character": 18
+            }
+          }
+        },
+        "message": "PARAGRAPH PARAG2"
+      },
+      {
+        "location": {
+          "uri": "/case25.cbl",
+          "range": {
+            "start": {
+              "line": 5,
+              "character": 7
+            },
+            "end": {
+              "line": 6,
+              "character": 28
+            }
+          }
+        },
+        "message": "PARAGRAPH PARAG1"
+      },
+      {
+        "location": {
+          "uri": "/case25.cbl",
+          "range": {
+            "start": {
+              "line": 7,
+              "character": 7
+            },
+            "end": {
+              "line": 11,
+              "character": 18
+            }
+          }
+        },
+        "message": "PARAGRAPH PARAG2"
+      },
+      {
+        "location": {
+          "uri": "/case25.cbl",
+          "range": {
+            "start": {
+              "line": 4,
+              "character": 11
+            },
+            "end": {
+              "line": 4,
+              "character": 25
+            }
+          }
+        },
+        "message": "PERFORM PARAG2"
+      }
+    ]
+  }
+]

@@ -15,13 +15,13 @@
 import * as vscode from "vscode";
 import { SettingsService } from "../Settings";
 import { LocalFilesystemResourceService } from "../LocalFilesystemResourceService";
-import { getChannel } from "../../extension";
 
 const localCopybooks = new LocalFilesystemResourceService();
 
 export async function listLocalCopybooks(
   documentUri: string,
   dialect: string,
+  outputChannel?: vscode.OutputChannel,
 ): Promise<string[]> {
   const directoryPaths = await SettingsService.getCopybookLocalPath(
     documentUri,
@@ -49,7 +49,7 @@ export async function listLocalCopybooks(
     if (result.status === "fulfilled") {
       result.value.forEach((copybook) => copybooks.push(copybook));
     } else {
-      getChannel().appendLine(
+      outputChannel?.appendLine(
         `Unable to load copybooks completions: ${result.reason}`,
       );
     }

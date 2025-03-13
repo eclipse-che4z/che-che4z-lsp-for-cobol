@@ -1,0 +1,187 @@
+[
+  {
+    "name": "PROG",
+    "type": "program",
+    "location": {
+      "uri": "/case75.cbl",
+      "start": {
+        "line": 3,
+        "character": 8
+      },
+      "end": {
+        "line": 14,
+        "character": 27
+      }
+    },
+    "children": [
+      {
+        "snippet": "       MAIN.\r\n           PERFORM PAR1.\r\n           PERFORM PAR2.\r\n           GOBACK.",
+        "name": "MAIN",
+        "type": "paragraph",
+        "location": {
+          "uri": "/case75.cbl",
+          "start": {
+            "line": 4,
+            "character": 8
+          },
+          "end": {
+            "line": 7,
+            "character": 19
+          }
+        },
+        "children": [
+          {
+            "targetName": "PAR1",
+            "type": "perform",
+            "location": {
+              "uri": "/case75.cbl",
+              "start": {
+                "line": 5,
+                "character": 12
+              },
+              "end": {
+                "line": 5,
+                "character": 24
+              }
+            }
+          },
+          {
+            "targetName": "PAR2",
+            "type": "perform",
+            "location": {
+              "uri": "/case75.cbl",
+              "start": {
+                "line": 6,
+                "character": 12
+              },
+              "end": {
+                "line": 6,
+                "character": 24
+              }
+            }
+          },
+          {
+            "type": "goback",
+            "location": {
+              "uri": "/case75.cbl",
+              "start": {
+                "line": 7,
+                "character": 12
+              },
+              "end": {
+                "line": 7,
+                "character": 18
+              }
+            }
+          }
+        ]
+      },
+      {
+        "snippet": "       PAR1.\r\n           READ PROD-LINE-FILE-IN\r\n               INTO WS-PROD-LINE-REC\r\n                   AT END MOVE \u0027Y\u0027 TO SW-EOF-PROD.",
+        "name": "PAR1",
+        "type": "paragraph",
+        "location": {
+          "uri": "/case75.cbl",
+          "start": {
+            "line": 9,
+            "character": 8
+          },
+          "end": {
+            "line": 12,
+            "character": 51
+          }
+        },
+        "children": [
+          {
+            "type": "statement",
+            "location": {
+              "uri": "/case75.cbl",
+              "start": {
+                "line": 10,
+                "character": 12
+              },
+              "end": {
+                "line": 12,
+                "character": 50
+              }
+            }
+          },
+          {
+            "type": "atEnd",
+            "location": {
+              "uri": "/case75.cbl",
+              "start": {
+                "line": 12,
+                "character": 20
+              },
+              "end": {
+                "line": 12,
+                "character": 50
+              }
+            }
+          },
+          {
+            "type": "statement",
+            "location": {
+              "uri": "/case75.cbl",
+              "start": {
+                "line": 12,
+                "character": 27
+              },
+              "end": {
+                "line": 12,
+                "character": 50
+              }
+            }
+          },
+          {
+            "type": "atEndExit",
+            "location": {
+              "uri": "/case75.cbl",
+              "start": {
+                "line": 12,
+                "character": 20
+              },
+              "end": {
+                "line": 12,
+                "character": 50
+              }
+            }
+          }
+        ]
+      },
+      {
+        "snippet": "       PAR2.\r\n           DISPLAY \"PAR2\".",
+        "name": "PAR2",
+        "type": "paragraph",
+        "location": {
+          "uri": "/case75.cbl",
+          "start": {
+            "line": 13,
+            "character": 8
+          },
+          "end": {
+            "line": 14,
+            "character": 27
+          }
+        },
+        "children": [
+          {
+            "type": "statement",
+            "location": {
+              "uri": "/case75.cbl",
+              "start": {
+                "line": 14,
+                "character": 12
+              },
+              "end": {
+                "line": 14,
+                "character": 26
+              }
+            }
+          }
+        ]
+      }
+    ]
+  }
+]

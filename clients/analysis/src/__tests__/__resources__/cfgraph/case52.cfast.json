@@ -1,0 +1,287 @@
+[
+  {
+    "name": "HLLOWRLD",
+    "type": "program",
+    "location": {
+      "uri": "/case52.cbl",
+      "start": {
+        "line": 5,
+        "character": 8
+      },
+      "end": {
+        "line": 22,
+        "character": 24
+      }
+    },
+    "children": [
+      {
+        "targetName": "B",
+        "thruName": "P",
+        "type": "perform",
+        "location": {
+          "uri": "/case52.cbl",
+          "start": {
+            "line": 6,
+            "character": 12
+          },
+          "end": {
+            "line": 6,
+            "character": 28
+          }
+        }
+      },
+      {
+        "type": "stop",
+        "location": {
+          "uri": "/case52.cbl",
+          "start": {
+            "line": 7,
+            "character": 12
+          },
+          "end": {
+            "line": 7,
+            "character": 20
+          }
+        }
+      },
+      {
+        "name": "A",
+        "snippet": "       A SECTION.\r\n           DISPLAY \u0027A\u0027.",
+        "type": "section",
+        "location": {
+          "uri": "/case52.cbl",
+          "start": {
+            "line": 8,
+            "character": 8
+          },
+          "end": {
+            "line": 9,
+            "character": 24
+          }
+        },
+        "children": [
+          {
+            "type": "statement",
+            "location": {
+              "uri": "/case52.cbl",
+              "start": {
+                "line": 9,
+                "character": 12
+              },
+              "end": {
+                "line": 9,
+                "character": 23
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "B",
+        "snippet": "       B SECTION.\r\n           DISPLAY \u0027B\u0027.\r\n           EXIT SECTION.\r\n       C.\r\n           DISPLAY \u0027C\u0027.\r\n       D.\r\n           DISPLAY \u0027D\u0027.",
+        "type": "section",
+        "location": {
+          "uri": "/case52.cbl",
+          "start": {
+            "line": 10,
+            "character": 8
+          },
+          "end": {
+            "line": 16,
+            "character": 24
+          }
+        },
+        "children": [
+          {
+            "type": "statement",
+            "location": {
+              "uri": "/case52.cbl",
+              "start": {
+                "line": 11,
+                "character": 12
+              },
+              "end": {
+                "line": 11,
+                "character": 23
+              }
+            }
+          },
+          {
+            "type": "exitsection",
+            "location": {
+              "uri": "/case52.cbl",
+              "start": {
+                "line": 12,
+                "character": 12
+              },
+              "end": {
+                "line": 12,
+                "character": 24
+              }
+            }
+          },
+          {
+            "snippet": "       C.\r\n           DISPLAY \u0027C\u0027.",
+            "name": "C",
+            "type": "paragraph",
+            "location": {
+              "uri": "/case52.cbl",
+              "start": {
+                "line": 13,
+                "character": 8
+              },
+              "end": {
+                "line": 14,
+                "character": 24
+              }
+            },
+            "children": [
+              {
+                "type": "statement",
+                "location": {
+                  "uri": "/case52.cbl",
+                  "start": {
+                    "line": 14,
+                    "character": 12
+                  },
+                  "end": {
+                    "line": 14,
+                    "character": 23
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "snippet": "       D.\r\n           DISPLAY \u0027D\u0027.",
+            "name": "D",
+            "type": "paragraph",
+            "location": {
+              "uri": "/case52.cbl",
+              "start": {
+                "line": 15,
+                "character": 8
+              },
+              "end": {
+                "line": 16,
+                "character": 24
+              }
+            },
+            "children": [
+              {
+                "type": "statement",
+                "location": {
+                  "uri": "/case52.cbl",
+                  "start": {
+                    "line": 16,
+                    "character": 12
+                  },
+                  "end": {
+                    "line": 16,
+                    "character": 23
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "E",
+        "snippet": "       E SECTION.\r\n           DISPLAY \u0027E\u0027.\r\n       P.\r\n           DISPLAY \u0027P\u0027.\r\n       X.\r\n           DISPLAY \u0027X\u0027.",
+        "type": "section",
+        "location": {
+          "uri": "/case52.cbl",
+          "start": {
+            "line": 17,
+            "character": 8
+          },
+          "end": {
+            "line": 22,
+            "character": 24
+          }
+        },
+        "children": [
+          {
+            "type": "statement",
+            "location": {
+              "uri": "/case52.cbl",
+              "start": {
+                "line": 18,
+                "character": 12
+              },
+              "end": {
+                "line": 18,
+                "character": 23
+              }
+            }
+          },
+          {
+            "snippet": "       P.\r\n           DISPLAY \u0027P\u0027.",
+            "name": "P",
+            "type": "paragraph",
+            "location": {
+              "uri": "/case52.cbl",
+              "start": {
+                "line": 19,
+                "character": 8
+              },
+              "end": {
+                "line": 20,
+                "character": 24
+              }
+            },
+            "children": [
+              {
+                "type": "statement",
+                "location": {
+                  "uri": "/case52.cbl",
+                  "start": {
+                    "line": 20,
+                    "character": 12
+                  },
+                  "end": {
+                    "line": 20,
+                    "character": 23
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "snippet": "       X.\r\n           DISPLAY \u0027X\u0027.",
+            "name": "X",
+            "type": "paragraph",
+            "location": {
+              "uri": "/case52.cbl",
+              "start": {
+                "line": 21,
+                "character": 8
+              },
+              "end": {
+                "line": 22,
+                "character": 24
+              }
+            },
+            "children": [
+              {
+                "type": "statement",
+                "location": {
+                  "uri": "/case52.cbl",
+                  "start": {
+                    "line": 22,
+                    "character": 12
+                  },
+                  "end": {
+                    "line": 22,
+                    "character": 23
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]

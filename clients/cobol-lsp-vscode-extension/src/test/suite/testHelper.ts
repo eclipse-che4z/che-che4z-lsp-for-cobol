@@ -17,6 +17,7 @@ import * as path from "path";
 import { LANGUAGE_ID } from "../../constants";
 import * as t from "io-ts";
 import { isRight } from "fp-ts/Either";
+import { Predicate } from "fp-ts/lib/Predicate";
 
 export const TEST_TIMEOUT = 150000;
 
@@ -396,6 +397,14 @@ export async function triggerCompletionsAndWaitForResults() {
     }
     await sleep(100);
   }
+}
+
+export function hasDiagnosticMatches(
+  uri: vscode.Uri,
+  predicate: Predicate<vscode.Diagnostic>,
+) {
+  const diagnostics = vscode.languages.getDiagnostics(uri);
+  assert.ok(diagnostics.some(predicate));
 }
 
 export type Mutable<T> = { -readonly [P in keyof T]: T[P] };

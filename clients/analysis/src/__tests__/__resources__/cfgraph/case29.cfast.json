@@ -1,0 +1,129 @@
+[
+  {
+    "name": "EVAL",
+    "type": "program",
+    "location": {
+      "uri": "/case29.cbl",
+      "start": {
+        "line": 6,
+        "character": 8
+      },
+      "end": {
+        "line": 13,
+        "character": 21
+      }
+    },
+    "children": [
+      {
+        "performUntilType": "UNTIL_CONDITION",
+        "type": "inlineperform",
+        "location": {
+          "uri": "/case29.cbl",
+          "start": {
+            "line": 7,
+            "character": 20
+          },
+          "end": {
+            "line": 9,
+            "character": 23
+          }
+        }
+      },
+      {
+        "targetName": [
+          "PARAG2"
+        ],
+        "type": "goto",
+        "location": {
+          "uri": "/case29.cbl",
+          "start": {
+            "line": 8,
+            "character": 16
+          },
+          "end": {
+            "line": 8,
+            "character": 28
+          }
+        }
+      },
+      {
+        "type": "endinlineperform",
+        "location": {
+          "uri": "/case29.cbl",
+          "start": {
+            "line": 7,
+            "character": 20
+          },
+          "end": {
+            "line": 9,
+            "character": 23
+          }
+        }
+      },
+      {
+        "snippet": "       PARAG1.\r\n           STOP RUN.",
+        "name": "PARAG1",
+        "type": "paragraph",
+        "location": {
+          "uri": "/case29.cbl",
+          "start": {
+            "line": 10,
+            "character": 8
+          },
+          "end": {
+            "line": 11,
+            "character": 21
+          }
+        },
+        "children": [
+          {
+            "type": "stop",
+            "location": {
+              "uri": "/case29.cbl",
+              "start": {
+                "line": 11,
+                "character": 12
+              },
+              "end": {
+                "line": 11,
+                "character": 20
+              }
+            }
+          }
+        ]
+      },
+      {
+        "snippet": "       PARAG2.\r\n           CONTINUE.",
+        "name": "PARAG2",
+        "type": "paragraph",
+        "location": {
+          "uri": "/case29.cbl",
+          "start": {
+            "line": 12,
+            "character": 8
+          },
+          "end": {
+            "line": 13,
+            "character": 21
+          }
+        },
+        "children": [
+          {
+            "type": "statement",
+            "location": {
+              "uri": "/case29.cbl",
+              "start": {
+                "line": 13,
+                "character": 12
+              },
+              "end": {
+                "line": 13,
+                "character": 20
+              }
+            }
+          }
+        ]
+      }
+    ]
+  }
+]

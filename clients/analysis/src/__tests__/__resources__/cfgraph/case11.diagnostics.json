@@ -1,0 +1,99 @@
+[
+  {
+    "range": {
+      "start": {
+        "line": 12,
+        "character": 0
+      },
+      "end": {
+        "line": 12,
+        "character": 23
+      }
+    },
+    "message": "Implicit EXIT PROGRAM statement executed",
+    "severity": 1,
+    "source": "COBOL Control Flow",
+    "relatedInformation": [
+      {
+        "location": {
+          "uri": "/case11.cbl",
+          "range": {
+            "start": {
+              "line": 11,
+              "character": 7
+            },
+            "end": {
+              "line": 12,
+              "character": 23
+            }
+          }
+        },
+        "message": "PARAGRAPH MY1-P2"
+      },
+      {
+        "location": {
+          "uri": "/case11.cbl",
+          "range": {
+            "start": {
+              "line": 9,
+              "character": 7
+            },
+            "end": {
+              "line": 12,
+              "character": 23
+            }
+          }
+        },
+        "message": "SECTION MY1"
+      },
+      {
+        "location": {
+          "uri": "/case11.cbl",
+          "range": {
+            "start": {
+              "line": 7,
+              "character": 7
+            },
+            "end": {
+              "line": 8,
+              "character": 20
+            }
+          }
+        },
+        "message": "PARAGRAPH P"
+      },
+      {
+        "location": {
+          "uri": "/case11.cbl",
+          "range": {
+            "start": {
+              "line": 11,
+              "character": 7
+            },
+            "end": {
+              "line": 12,
+              "character": 23
+            }
+          }
+        },
+        "message": "PARAGRAPH MY1-P2"
+      },
+      {
+        "location": {
+          "uri": "/case11.cbl",
+          "range": {
+            "start": {
+              "line": 6,
+              "character": 11
+            },
+            "end": {
+              "line": 6,
+              "character": 25
+            }
+          }
+        },
+        "message": "PERFORM MY1-P2"
+      }
+    ]
+  }
+]

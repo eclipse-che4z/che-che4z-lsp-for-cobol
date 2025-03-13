@@ -1,0 +1,373 @@
+[
+  {
+    "name": "PROG",
+    "type": "program",
+    "location": {
+      "uri": "/case70.cbl",
+      "start": {
+        "line": 4,
+        "character": 8
+      },
+      "end": {
+        "line": 46,
+        "character": 21
+      }
+    },
+    "children": [
+      {
+        "name": "MAIN",
+        "snippet": "       MAIN SECTION.\r\n\r\n           EVALUATE A\r\n\r\n               WHEN \u00270\u0027\r\n                   IF B\r\n                       IF C\r\n                           PERFORM SEC1\r\n                       ELSE\r\n                           PERFORM SEC0",
+        "type": "section",
+        "location": {
+          "uri": "/case70.cbl",
+          "start": {
+            "line": 6,
+            "character": 8
+          },
+          "end": {
+            "line": 25,
+            "character": 19
+          }
+        },
+        "children": [
+          {
+            "type": "evaluate",
+            "location": {
+              "uri": "/case70.cbl",
+              "start": {
+                "line": 8,
+                "character": 12
+              },
+              "end": {
+                "line": 24,
+                "character": 24
+              }
+            }
+          },
+          {
+            "type": "when",
+            "location": {
+              "uri": "/case70.cbl",
+              "start": {
+                "line": 10,
+                "character": 16
+              },
+              "end": {
+                "line": 10,
+                "character": 24
+              }
+            }
+          },
+          {
+            "type": "if",
+            "location": {
+              "uri": "/case70.cbl",
+              "start": {
+                "line": 11,
+                "character": 20
+              },
+              "end": {
+                "line": 18,
+                "character": 26
+              }
+            }
+          },
+          {
+            "type": "if",
+            "location": {
+              "uri": "/case70.cbl",
+              "start": {
+                "line": 12,
+                "character": 24
+              },
+              "end": {
+                "line": 16,
+                "character": 30
+              }
+            }
+          },
+          {
+            "targetName": "SEC1",
+            "type": "perform",
+            "location": {
+              "uri": "/case70.cbl",
+              "start": {
+                "line": 13,
+                "character": 28
+              },
+              "end": {
+                "line": 13,
+                "character": 40
+              }
+            }
+          },
+          {
+            "type": "else",
+            "location": {
+              "uri": "/case70.cbl",
+              "start": {
+                "line": 14,
+                "character": 24
+              },
+              "end": {
+                "line": 15,
+                "character": 40
+              }
+            }
+          },
+          {
+            "targetName": "SEC0",
+            "type": "perform",
+            "location": {
+              "uri": "/case70.cbl",
+              "start": {
+                "line": 15,
+                "character": 28
+              },
+              "end": {
+                "line": 15,
+                "character": 40
+              }
+            }
+          },
+          {
+            "type": "endif",
+            "location": {
+              "uri": "/case70.cbl",
+              "start": {
+                "line": 12,
+                "character": 24
+              },
+              "end": {
+                "line": 16,
+                "character": 30
+              }
+            }
+          },
+          {
+            "type": "endif",
+            "location": {
+              "uri": "/case70.cbl",
+              "start": {
+                "line": 11,
+                "character": 20
+              },
+              "end": {
+                "line": 18,
+                "character": 26
+              }
+            }
+          },
+          {
+            "type": "whenother",
+            "location": {
+              "uri": "/case70.cbl",
+              "start": {
+                "line": 20,
+                "character": 16
+              },
+              "end": {
+                "line": 22,
+                "character": 31
+              }
+            }
+          },
+          {
+            "type": "statement",
+            "location": {
+              "uri": "/case70.cbl",
+              "start": {
+                "line": 22,
+                "character": 20
+              },
+              "end": {
+                "line": 22,
+                "character": 31
+              }
+            }
+          },
+          {
+            "type": "endevaluate",
+            "location": {
+              "uri": "/case70.cbl",
+              "start": {
+                "line": 8,
+                "character": 12
+              },
+              "end": {
+                "line": 24,
+                "character": 24
+              }
+            }
+          },
+          {
+            "type": "goback",
+            "location": {
+              "uri": "/case70.cbl",
+              "start": {
+                "line": 25,
+                "character": 12
+              },
+              "end": {
+                "line": 25,
+                "character": 18
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "SEC0",
+        "snippet": "       SEC0 SECTION.\r\n      \r\n           PERFORM UNTIL A EQUAL 100\r\n\r\n               IF  B EQUAL ZEROES\r\n      \r\n                   PERFORM VARYING L FROM D BY -1\r\n                       UNTIL F\r\n                       NOT EQUAL SPACES OR W LESS 1\r\n                   END-PERFORM",
+        "type": "section",
+        "location": {
+          "uri": "/case70.cbl",
+          "start": {
+            "line": 27,
+            "character": 8
+          },
+          "end": {
+            "line": 43,
+            "character": 17
+          }
+        },
+        "children": [
+          {
+            "performUntilType": "UNTIL_CONDITION",
+            "type": "inlineperform",
+            "location": {
+              "uri": "/case70.cbl",
+              "start": {
+                "line": 29,
+                "character": 20
+              },
+              "end": {
+                "line": 40,
+                "character": 23
+              }
+            }
+          },
+          {
+            "type": "if",
+            "location": {
+              "uri": "/case70.cbl",
+              "start": {
+                "line": 31,
+                "character": 16
+              },
+              "end": {
+                "line": 38,
+                "character": 22
+              }
+            }
+          },
+          {
+            "performUntilType": "UNTIL_CONDITION",
+            "type": "inlineperform",
+            "location": {
+              "uri": "/case70.cbl",
+              "start": {
+                "line": 33,
+                "character": 28
+              },
+              "end": {
+                "line": 36,
+                "character": 31
+              }
+            }
+          },
+          {
+            "type": "endinlineperform",
+            "location": {
+              "uri": "/case70.cbl",
+              "start": {
+                "line": 33,
+                "character": 28
+              },
+              "end": {
+                "line": 36,
+                "character": 31
+              }
+            }
+          },
+          {
+            "type": "endif",
+            "location": {
+              "uri": "/case70.cbl",
+              "start": {
+                "line": 31,
+                "character": 16
+              },
+              "end": {
+                "line": 38,
+                "character": 22
+              }
+            }
+          },
+          {
+            "type": "endinlineperform",
+            "location": {
+              "uri": "/case70.cbl",
+              "start": {
+                "line": 29,
+                "character": 20
+              },
+              "end": {
+                "line": 40,
+                "character": 23
+              }
+            }
+          },
+          {
+            "snippet": "       SEC0-EXIT.\r\n           EXIT.",
+            "name": "SEC0-EXIT",
+            "type": "paragraph",
+            "location": {
+              "uri": "/case70.cbl",
+              "start": {
+                "line": 42,
+                "character": 8
+              },
+              "end": {
+                "line": 43,
+                "character": 17
+              }
+            },
+            "children": [
+              {
+                "type": "exit",
+                "location": {
+                  "uri": "/case70.cbl",
+                  "start": {
+                    "line": 43,
+                    "character": 12
+                  },
+                  "end": {
+                    "line": 43,
+                    "character": 16
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "SEC1",
+        "snippet": "       SEC1 SECTION.",
+        "type": "section",
+        "location": {
+          "uri": "/case70.cbl",
+          "start": {
+            "line": 46,
+            "character": 8
+          },
+          "end": {
+            "line": 46,
+            "character": 21
+          }
+        }
+      }
+    ]
+  }
+]

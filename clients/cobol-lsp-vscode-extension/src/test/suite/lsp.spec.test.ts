@@ -154,7 +154,10 @@ suite("Integration Test Suite", function () {
       diagnostics[0].range,
       range(pos(58, 21), pos(58, 28)),
     );
-    assert.ok(diagnostics[0].message.includes("Syntax error on 'XCTL123'"));
+    helper.hasDiagnosticMatches(editor.document.uri, (d) =>
+      d.message.includes("Syntax error on 'XCTL123'"),
+    );
+
     await helper.deleteLine(editor, 58);
     await helper.insertString(
       editor,
@@ -181,7 +184,7 @@ suite("Integration Test Suite", function () {
         editor.document.uri,
         pos(58, 36),
       );
-      return result.length > 0;
+      return result?.length > 0;
     });
     const result = await vscode.commands.executeCommand<vscode.Location[]>(
       "vscode.executeDefinitionProvider",
@@ -189,7 +192,7 @@ suite("Integration Test Suite", function () {
       pos(58, 36),
     );
     assert.strictEqual(
-      result.length,
+      result?.length,
       1,
       "Checks behavior of go to definition action (size)",
     );
@@ -344,10 +347,9 @@ suite("Integration Test Suite", function () {
     );
     diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
     assert.strictEqual(diagnostics.length, 3);
-    assert.ok(
-      diagnostics[2].message.includes(
-        "A misspelled word, maybe you want to put MOD",
-      ),
+
+    helper.hasDiagnosticMatches(editor.document.uri, (d) =>
+      d.message.includes("A misspelled word, maybe you want to put MOD"),
     );
   })
     ?.timeout(helper.TEST_TIMEOUT)
@@ -387,9 +389,9 @@ suite("Integration Test Suite", function () {
     );
     diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
     assert.strictEqual(diagnostics.length, 2);
-    assert.strictEqual(
-      diagnostics[1].message,
-      "The following token must start in Area B: Display",
+    helper.hasDiagnosticMatches(
+      editor.document.uri,
+      (d) => d.message === "The following token must start in Area B: Display",
     );
   })
     ?.timeout(helper.TEST_TIMEOUT)
@@ -419,6 +421,7 @@ suite("Integration Test Suite", function () {
       2,
       "got: " + JSON.stringify(diagnostics),
     );
+
     assert.ok(
       () =>
         vscode.languages
@@ -449,27 +452,33 @@ suite("Integration Test Suite", function () {
     );
     diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
     assert.strictEqual(diagnostics.length, 2);
-    assert.strictEqual(
-      diagnostics[1].message,
-      "The following token must start in Area A: Data",
+
+    helper.hasDiagnosticMatches(
+      editor.document.uri,
+      (d) => d.message === "The following token must start in Area A: Data",
     );
 
     await helper.insertString(editor, pos(26, 0), "      ");
     await helper.waitForDiagnostics(editor.document.uri);
     diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
     assert.strictEqual(diagnostics.length, 3);
-    assert.strictEqual(
-      diagnostics[2].message,
-      "The following token must start in Area A: Procedure",
+
+    helper.hasDiagnosticMatches(
+      editor.document.uri,
+      (d) =>
+        d.message === "The following token must start in Area A: Procedure",
     );
 
     await helper.insertString(editor, pos(31, 0), "      ");
     await helper.waitForDiagnostics(editor.document.uri);
     diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
     assert.strictEqual(diagnostics.length, 4);
-    assert.strictEqual(
-      diagnostics[3].message,
-      "The following token must start in Area A: 100-Print-User",
+
+    helper.hasDiagnosticMatches(
+      editor.document.uri,
+      (d) =>
+        d.message ===
+        "The following token must start in Area A: 100-Print-User",
     );
   })
     .timeout(helper.TEST_TIMEOUT)
@@ -530,15 +539,22 @@ suite("Integration Test Suite", function () {
     const copybookUri = await helper.getUri(copybookPath);
 
     await helper.waitFor(
-      () => vscode.languages.getDiagnostics(progUri).length === 1,
+      () => vscode.languages.getDiagnostics(progUri).length === 2,
     );
     const diagnostics = vscode.languages.getDiagnostics(progUri);
     assert.strictEqual(
       diagnostics.length,
-      1,
+      2,
       "got: " + JSON.stringify(diagnostics),
     );
-    assert.strictEqual(diagnostics[0].message, "Errors inside the copybook");
+    helper.hasDiagnosticMatches(
+      progUri,
+      (d) => d.message === "Errors inside the copybook",
+    );
+    helper.hasDiagnosticMatches(
+      progUri,
+      (d) => d.message === "Implicit EXIT PROGRAM statement executed",
+    );
 
     // No diagnostic for copybook so far
     let copyDiagnostics = vscode.languages.getDiagnostics(copybookUri);
@@ -580,7 +596,11 @@ suite("Integration Test Suite", function () {
       1,
       "got: " + JSON.stringify(diagnostic),
     );
-    assert.strictEqual(diagnostic[0].message, "Errors inside the copybook");
+    assert.strictEqual(
+      diagnostic[0].message,
+      "Errors inside the copybook",
+      "Test: Show transition copybook errors",
+    );
   })
     .timeout(helper.TEST_TIMEOUT)
     .slow(1000);
@@ -591,11 +611,11 @@ suite("Integration Test Suite", function () {
     const prog2Uri = await helper.getUri("DIAGNOSTIC_TEST_B.CBL");
 
     await helper.waitFor(
-      () => vscode.languages.getDiagnostics(prog2Uri).length === 1,
+      () => vscode.languages.getDiagnostics(prog2Uri).length === 2,
     );
-    assert.strictEqual(
-      vscode.languages.getDiagnostics(prog2Uri)[0].message,
-      "Errors inside the copybook",
+    helper.hasDiagnosticMatches(
+      prog2Uri,
+      (d) => d.message === "Errors inside the copybook",
     );
 
     //open copybook
@@ -624,9 +644,10 @@ suite("Integration Test Suite", function () {
       vscode.languages.getDiagnostics(copybookUri)[0].message,
       "Extraneous input 'D'",
     );
-    assert.strictEqual(
-      vscode.languages.getDiagnostics(prog2Uri)[0].message,
-      "Errors inside the copybook",
+
+    helper.hasDiagnosticMatches(
+      prog2Uri,
+      (d) => d.message === "Errors inside the copybook",
     );
 
     // close the DIAGNOSTIC_TEST_B, which is source of all errors
@@ -698,8 +719,9 @@ suite("Integration Test Suite", function () {
     await helper.waitFor(
       () => vscode.languages.getDiagnostics(editor.document.uri).length > 1,
     );
-    const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
-    const message = diagnostics[0].message;
-    assert.match(message, /^BOOK3: Copybook not found/);
+    helper.hasDiagnosticMatches(
+      editor.document.uri,
+      (d) => d.message === "BOOK3: Copybook not found",
+    );
   });
 });

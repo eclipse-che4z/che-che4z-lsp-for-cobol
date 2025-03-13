@@ -1,0 +1,170 @@
+[
+  {
+    "name": "EVAL",
+    "type": "program",
+    "location": {
+      "uri": "/case26.cbl",
+      "start": {
+        "line": 6,
+        "character": 8
+      },
+      "end": {
+        "line": 16,
+        "character": 21
+      }
+    },
+    "children": [
+      {
+        "type": "evaluate",
+        "location": {
+          "uri": "/case26.cbl",
+          "start": {
+            "line": 7,
+            "character": 12
+          },
+          "end": {
+            "line": 12,
+            "character": 24
+          }
+        }
+      },
+      {
+        "type": "when",
+        "location": {
+          "uri": "/case26.cbl",
+          "start": {
+            "line": 8,
+            "character": 16
+          },
+          "end": {
+            "line": 8,
+            "character": 24
+          }
+        }
+      },
+      {
+        "targetName": [
+          "PARAG2"
+        ],
+        "type": "goto",
+        "location": {
+          "uri": "/case26.cbl",
+          "start": {
+            "line": 9,
+            "character": 20
+          },
+          "end": {
+            "line": 9,
+            "character": 32
+          }
+        }
+      },
+      {
+        "type": "when",
+        "location": {
+          "uri": "/case26.cbl",
+          "start": {
+            "line": 10,
+            "character": 16
+          },
+          "end": {
+            "line": 10,
+            "character": 33
+          }
+        }
+      },
+      {
+        "type": "statement",
+        "location": {
+          "uri": "/case26.cbl",
+          "start": {
+            "line": 11,
+            "character": 20
+          },
+          "end": {
+            "line": 11,
+            "character": 28
+          }
+        }
+      },
+      {
+        "type": "endevaluate",
+        "location": {
+          "uri": "/case26.cbl",
+          "start": {
+            "line": 7,
+            "character": 12
+          },
+          "end": {
+            "line": 12,
+            "character": 24
+          }
+        }
+      },
+      {
+        "snippet": "       PARAG1.\r\n           STOP RUN.",
+        "name": "PARAG1",
+        "type": "paragraph",
+        "location": {
+          "uri": "/case26.cbl",
+          "start": {
+            "line": 13,
+            "character": 8
+          },
+          "end": {
+            "line": 14,
+            "character": 21
+          }
+        },
+        "children": [
+          {
+            "type": "stop",
+            "location": {
+              "uri": "/case26.cbl",
+              "start": {
+                "line": 14,
+                "character": 12
+              },
+              "end": {
+                "line": 14,
+                "character": 20
+              }
+            }
+          }
+        ]
+      },
+      {
+        "snippet": "       PARAG2.\r\n           CONTINUE.           ",
+        "name": "PARAG2",
+        "type": "paragraph",
+        "location": {
+          "uri": "/case26.cbl",
+          "start": {
+            "line": 15,
+            "character": 8
+          },
+          "end": {
+            "line": 16,
+            "character": 21
+          }
+        },
+        "children": [
+          {
+            "type": "statement",
+            "location": {
+              "uri": "/case26.cbl",
+              "start": {
+                "line": 16,
+                "character": 12
+              },
+              "end": {
+                "line": 16,
+                "character": 20
+              }
+            }
+          }
+        ]
+      }
+    ]
+  }
+]

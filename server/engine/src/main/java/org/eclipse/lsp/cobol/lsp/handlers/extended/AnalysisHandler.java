@@ -78,7 +78,7 @@ public class AnalysisHandler {
         CobolDocumentModel doc = documentModelService.get(uri);
         if (analysisService.isCopybook(uri, analysisResultEvent.getText())) {
             communications.notifyGeneralMessage(MessageType.Info, "Cannot retrieve outline tree because file was treated as a copybook");
-            return new ExtendedApiResult(ImmutableList.of());
+            return new ExtendedApiResult(ImmutableList.of(), "");
         }
         RootNode rootNode = doc.getLastAnalysisResult().getRootNode();
         int line = analysisResultEvent.getLine();

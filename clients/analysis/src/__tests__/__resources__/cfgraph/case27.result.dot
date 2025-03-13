@@ -1,0 +1,6 @@
+digraph A {
+rankdir=LR;
+<EVAL>-><PARAG2>;
+<EVAL>-><PARAG3>;
+<EVAL>-><PARAG1>;
+}
