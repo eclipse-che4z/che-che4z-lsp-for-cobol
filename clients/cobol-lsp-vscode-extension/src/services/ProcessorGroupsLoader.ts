@@ -152,7 +152,7 @@ async function readProcessorGroupsFileAndCache(
       pgroups: t.array(ProcessorGroupModel),
     });
     const json: unknown = JSON.parse(fileContent);
-    const decoded = ProcessorGrpupsModel.decode(json);
+    const decoded = ProcessorGroupsModel.decode(json);
     if (isLeft(decoded)) {
       throw Error(
         `Could not validate data: ${PathReporter.report(decoded).join("\n")}`,
