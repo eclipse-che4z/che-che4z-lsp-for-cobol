@@ -12,7 +12,7 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
-import { decodeBridgeJson } from "../../services/BridgeForGitLoader";
+import { B4GTypeMetadata } from "../../services/BridgeForGitLoader";
 import { loadProcessorsConfigForDocument } from "../../services/ProcessorGroups";
 
 jest.mock("vscode", () => {
@@ -28,7 +28,7 @@ jest.mock("vscode", () => {
   };
 });
 
-const b4gJson = {
+const b4gJson: B4GTypeMetadata = {
   elements: {
     main: {
       processorGroup: "pg2",
@@ -72,22 +72,13 @@ const pgJson = [{ name: "pg1" }, { name: "pg2" }];
 const pgMapJson = { pgms: [{ program: "main.cob", pgroup: "pg1" }] };
 
 describe("Bridge for Git group tests", () => {
-  test("Decode b4f json", () => {
-    const result = decodeBridgeJson(b4gJson);
-    expect(result).toBeDefined();
-    expect(result!.elements["main"].processorGroup).toBe("pg2");
-    expect(Object.keys(result!.elements)[0] + "." + result!.fileExtension).toBe(
-      "main.cob",
-    );
-  });
-
   test("Map file into processor group", () => {
     const scopeUri = "file:///home/main.cob";
     const cfg = loadProcessorsConfigForDocument(
       scopeUri,
       pgJson,
       pgMapJson,
-      decodeBridgeJson(b4gJson),
+      b4gJson,
     );
     expect(cfg?.name).toBe("pg2");
   });
@@ -98,7 +89,7 @@ describe("Bridge for Git group tests", () => {
       scopeUri,
       pgJson,
       pgMapJson,
-      decodeBridgeJson(b4gJsonNoExt),
+      b4gJsonNoExt,
     );
     expect(cfg?.name).toBe("pg2");
   });
