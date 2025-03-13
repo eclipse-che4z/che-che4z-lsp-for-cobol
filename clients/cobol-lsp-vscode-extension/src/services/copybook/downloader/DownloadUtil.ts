@@ -66,13 +66,13 @@ export class DownloadUtil {
    * returns true if the passed profile has invalid credentials, false otherwise
    * @param profileName
    * @param explorerAPI
+   * @param remoteLocation DSN or USS that is used to test mainframe access
    * @returns true if the passed profile has invalid credentials, false otherwise
    */
   public static async checkForInvalidCredProfile(
     profileName: string,
     explorerAPI: IApiRegisterClient,
-    documentUri: string,
-    dialects: string[],
+    remoteLocation: MainframeRemoteLocation,
   ): Promise<boolean> {
     if (
       ZoweExplorerDownloader.profileStore.get(profileName) === "valid-profile"
@@ -80,21 +80,12 @@ export class DownloadUtil {
       return false;
     }
 
-    const copybookLocation = this.areCopybookDownloadConfigurationsPresent(
-      documentUri,
-      dialects,
-    );
-
-    if (!copybookLocation) {
-      return true;
-    }
-
     try {
       const profile = this.loadProfile(profileName, explorerAPI);
-      if (copybookLocation.uss) {
-        await explorerAPI.getUssApi(profile).fileList(copybookLocation.uss);
-      } else if (copybookLocation.dsn) {
-        await explorerAPI.getMvsApi(profile).allMembers(copybookLocation.dsn);
+      if (remoteLocation.uss) {
+        await explorerAPI.getUssApi(profile).fileList(remoteLocation.uss);
+      } else if (remoteLocation.dsn) {
+        await explorerAPI.getMvsApi(profile).allMembers(remoteLocation.dsn);
       }
     } catch (error) {
       if (this.checkForInvalidCredentials(error, profileName)) {
@@ -173,12 +164,13 @@ export class DownloadUtil {
    * checks if copybook download configurations are present
    * @param documentUri
    * @param dialects
-   * @returns true if if copybook download configurations are present, false otherwise
+   * @returns first configured remote location if if copybook download
+   * configurations are present, null otherwise
    */
   public static areCopybookDownloadConfigurationsPresent(
     documentUri: string,
     dialects: string[],
-  ) {
+  ): MainframeRemoteLocation | null {
     const uniqueDialects = new Set(
       dialects.map((dialect) => dialect?.toUpperCase()).filter(Boolean),
     );
@@ -253,3 +245,13 @@ export class DownloadUtil {
     );
   }
 }
+
+export type MainframeRemoteLocation =
+  | {
+      dsn: string;
+      uss?: never;
+    }
+  | {
+      uss: string;
+      dsn?: never;
+    };
