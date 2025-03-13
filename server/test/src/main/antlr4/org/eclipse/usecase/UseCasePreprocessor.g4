@@ -16,7 +16,7 @@
 grammar UseCasePreprocessor;
 
 startRule
-   : .*? ((copybookStatement | functionDefinition | variableStatement | functionUsage | paragraphStatement | sectionStatement | subroutineStatement
+   : .*? ((copybookStatement | functionDefinition | variableStatement | functionUsage | procedureStatement | subroutineStatement
    | constantStatement | errorStatement | multiTokenError | linkageSection | NEWLINE)+ .*?)+ EOF
    ;
 
@@ -25,7 +25,7 @@ multiTokenError
    ;
 
 multiToken
-   : (word | copybookStatement | variableStatement | functionUsage | paragraphStatement | sectionStatement | subroutineStatement
+   : (identifiers | copybookStatement | variableStatement | functionUsage | procedureStatement | subroutineStatement
    | constantStatement | errorStatement | multiTokenError | TEXT)+
    ;
 
@@ -34,7 +34,7 @@ linkageSection
    ;
 
 errorStatement
-   : START (STRINGLITERAL | word | TEXT | NUMBERLITERAL)? diagnostic* STOP
+   : START (STRINGLITERAL | words | TEXT | NUMBERLITERAL)? diagnostic* STOP
    ;
 
 copybookStatement
@@ -54,7 +54,7 @@ variableStatement
    ;
 
 variableUsage
-   : VARIABLEUSAGE word
+   : VARIABLEUSAGE name = word (INOF word)*
    ;
 
 functionUsage
@@ -77,24 +77,17 @@ constantUsage
    : CONSTANTUSAGE word
    ;
 
-paragraphStatement
-   : (paragraphUsage | paragraphDefinition) diagnostic* STOP
+procedureStatement
+   : (procedureUsage | paragraphDefinition | sectionDefinition) diagnostic* STOP
    ;
 
-sectionStatement
-   : (sectionUsage | sectionDefinition) diagnostic* STOP
-   ;
-
-paragraphUsage
-   : PARAGRPHUSAGE word
+procedureUsage
+   : PROCEDUREUSAGE paragraph=word (INOF section=word)?
+   | SECTIONUSAGE section=word
    ;
 
 paragraphDefinition
    : PARAGRPHDEFINITION word
-   ;
-
-sectionUsage
-   : SECTIONUSAGE word
    ;
 
 sectionDefinition
@@ -110,11 +103,15 @@ subroutineUsage
    ;
 
 diagnostic
-   : DIAGNOSTICSTART identifier
+   : DIAGNOSTICSTART identifiers
    ;
 
 word
    : identifier replacement?
+   ;
+
+words
+   : identifiers replacement?
    ;
 
 replacement
@@ -122,8 +119,9 @@ replacement
    | (PRODUCE_REPLACEMENT identifier (PRODUCE_REPLACEMENT identifier)*)
    ;
 
+identifiers: identifier+;
 identifier
-   : (IDENTIFIER | NUMBERLITERAL | LINKAGE | SECTION | DOT | STRINGLITERAL | TEXT)+
+   : (IDENTIFIER | NUMBERLITERAL | LINKAGE | SECTION | INOF | DOT | STRINGLITERAL | TEXT)
    ;
 
 cpyIdentifier
@@ -147,7 +145,8 @@ VARIABLEDEFINITION : START '$*';
 VARIABLEUSAGE : START '$';
 CONSTANTUSAGE : START '&';
 PARAGRPHDEFINITION : START '#*';
-PARAGRPHUSAGE : START '#';
+PROCEDUREUSAGE : START '#';
+INOF : 'IN' | 'OF';
 SECTIONDEFINITION : START '@*';
 SECTIONUSAGE : START '@';
 COPYBOOKDEFINITION : START '~*';
@@ -167,7 +166,7 @@ DOT : '.';
 
 NUMBERLITERAL : [\-+0-9.,]+;
 STRINGLITERAL : ['"] .*? ['"\n];
-IDENTIFIER : [a-zA-Z0-9:]+ ([-_]+ [a-zA-Z0-9:]+)*;
+IDENTIFIER : [a-zA-Z0-9'":]+ ([-_]+ [a-zA-Z0-9'":]+)*;
 
 COPYBOOKNAME : [a-zA-Z0-9#@$]+ ([-_]+ [a-zA-Z0-9#@$]+)*;
 QUOTED_COPYBOOKNAME : '\'' COPYBOOKNAME '\'';
