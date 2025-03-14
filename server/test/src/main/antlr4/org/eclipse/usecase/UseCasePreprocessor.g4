@@ -82,7 +82,7 @@ procedureStatement
    ;
 
 procedureUsage
-   : PROCEDUREUSAGE paragraph=word (INOF section=word)?
+   : PARAGRPHUSAGE paragraph=word (INOF section=word)?
    | SECTIONUSAGE section=word
    ;
 
@@ -145,7 +145,7 @@ VARIABLEDEFINITION : START '$*';
 VARIABLEUSAGE : START '$';
 CONSTANTUSAGE : START '&';
 PARAGRPHDEFINITION : START '#*';
-PROCEDUREUSAGE : START '#';
+PARAGRPHUSAGE : START '#';
 INOF : 'IN' | 'OF';
 SECTIONDEFINITION : START '@*';
 SECTIONUSAGE : START '@';
