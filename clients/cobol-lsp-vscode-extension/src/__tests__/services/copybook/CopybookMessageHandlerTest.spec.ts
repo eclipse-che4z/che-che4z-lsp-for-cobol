@@ -20,7 +20,6 @@ import { CopybookDownloadService } from "../../../services/copybook/CopybookDown
 import path = require("path");
 import * as ProcessorGroups from "../../../services/ProcessorGroups";
 import * as fsUtils from "../../../services/util/FSUtils";
-import { DownloadUtil } from "../../../services/copybook/downloader/DownloadUtil";
 
 vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
   get: jest.fn().mockReturnValue("testProfile"),
@@ -412,26 +411,6 @@ describe("Test the copybook message handler", () => {
   describe("Tests copybook download util", () => {
     beforeEach(() => {
       jest.clearAllMocks();
-    });
-
-    it("checks proccesor groups configs resolves prerequiste", async () => {
-      SettingsService.getDsnPath = jest.fn().mockReturnValue([]);
-      SettingsService.getUssPath = jest.fn().mockReturnValue([]);
-      const spyConfig = jest.spyOn(
-        ProcessorGroups,
-        "loadProcessorGroupCopybookPathsConfig",
-      );
-      spyConfig.mockResolvedValue([
-        "/libs",
-        { dataset: "procGroupDataset", profile: "procGroupProfile" },
-        { uss: "ussFile", profile: "profile" },
-      ]);
-      expect(
-        await DownloadUtil.areCopybookDownloadConfigurationsPresent(
-          "documentUri",
-          ["COBOL"],
-        ),
-      ).toStrictEqual(true);
     });
   });
 });

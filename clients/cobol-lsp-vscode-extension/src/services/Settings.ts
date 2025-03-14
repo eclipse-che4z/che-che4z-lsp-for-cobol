@@ -255,9 +255,10 @@ export class SettingsService {
     dialectType: string,
     convertToAbsolutePaths = true,
   ): Promise<string[]> {
-    const pgPaths = (
-      await loadProcessorGroupCopybookPaths(documentUri, dialectType)
-    ).filter((element) => typeof element == "string");
+    const pgPaths = await loadProcessorGroupCopybookPaths(
+      documentUri,
+      dialectType,
+    );
 
     const vars = getVariablesFromUri(documentUri);
     const paths: string[] = [
