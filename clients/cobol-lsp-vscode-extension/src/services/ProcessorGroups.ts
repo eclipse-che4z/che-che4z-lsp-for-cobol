@@ -42,12 +42,14 @@ export async function loadProcessorGroupCopybookPaths(
   documentUri: string,
   dialectType: string,
 ): Promise<string[]> {
-  return loadProcessorGroupSettings(
-    documentUri,
-    "libs",
-    [] as string[],
-    dialectType,
-  );
+  return (
+    await loadProcessorGroupSettings(
+      documentUri,
+      "libs",
+      [] as string[],
+      dialectType,
+    )
+  ).filter((element) => typeof element == "string");
 }
 
 export async function loadProcessorGroupCopybookPathsConfig(
