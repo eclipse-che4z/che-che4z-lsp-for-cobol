@@ -25,7 +25,7 @@ multiTokenError
    ;
 
 multiToken
-   : (identifiers | copybookStatement | variableStatement | functionUsage | procedureStatement | subroutineStatement
+   : (words | copybookStatement | variableStatement | functionUsage | procedureStatement | subroutineStatement
    | constantStatement | errorStatement | multiTokenError | TEXT)+
    ;
 
