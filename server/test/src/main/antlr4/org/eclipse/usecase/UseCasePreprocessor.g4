@@ -86,7 +86,7 @@ sectionStatement
    ;
 
 paragraphUsage
-   : PARAGRPHUSAGE word
+   : PARAGRPHUSAGE (paragraph=word INOF section=word | paragraph=word)
    ;
 
 paragraphDefinition
@@ -123,7 +123,7 @@ replacement
    ;
 
 identifier
-   : (IDENTIFIER | NUMBERLITERAL | LINKAGE | SECTION | DOT | STRINGLITERAL | TEXT)+
+   : (IDENTIFIER | NUMBERLITERAL | LINKAGE | SECTION | DOT | INOF |STRINGLITERAL | TEXT)+
    ;
 
 cpyIdentifier
@@ -148,6 +148,7 @@ VARIABLEUSAGE : START '$';
 CONSTANTUSAGE : START '&';
 PARAGRPHDEFINITION : START '#*';
 PARAGRPHUSAGE : START '#';
+INOF: 'IN' | 'OF';
 SECTIONDEFINITION : START '@*';
 SECTIONUSAGE : START '@';
 COPYBOOKDEFINITION : START '~*';
