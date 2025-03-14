@@ -31,21 +31,33 @@ import { GraphDTO } from "@code4z/analysis/lib/model/GraphDTO";
  * Control Flow Analysis callback
  */
 export interface ControlFlowAnalysisCallback {
-  (graphs: GraphDTO[]): void;
+  (graphs: GraphDTO[], locations: string[]): void;
 }
 
-export class ApiResult {
-  public controlFlowAST: Program[] = [];
-  public documentUri: string | undefined;
-}
+export type ApiResult = {
+  controlFlowAST: Program[];
+  documentUri: string;
+};
+
+export type AnalysisResult = {
+  documentUri: string;
+  graphs: GraphDTO[];
+  locations: string[];
+};
 
 interface AnalysisServiceDelegate {
   finishTask(
     documentUri: string,
     graphs: GraphDTO[],
+    locations: string[],
     diagnostics: Map<string, vscode.Diagnostic[]>,
   ): void;
 }
+
+type PromiseWithResolver = {
+  resolve: (value: AnalysisResult | PromiseLike<AnalysisResult>) => void;
+  promise: Promise<AnalysisResult>;
+};
 
 class AnalysisTask {
   private worker: Worker = new Worker(join(__dirname, "./Worker.js"));
@@ -62,6 +74,7 @@ class AnalysisTask {
         this.delegate.finishTask(
           this.documentUri,
           data.payload.graphs,
+          data.payload.locations,
           convertDiagnostics(data.payload.diagnostics),
         );
       } else if (data.type === "log") {
@@ -87,6 +100,7 @@ class AnalysisTask {
       this.mainChannel?.appendLine(
         `Error starting Control Flow Analysis: ${code}`,
       );
+      this.delegate.finishTask(this.documentUri, [], [], new Map());
     });
 
     this.worker.postMessage({
@@ -103,7 +117,7 @@ class AnalysisTask {
 
 export class ControlFlowAnalysisService implements AnalysisServiceDelegate {
   private tasks: Map<string, AnalysisTask>;
-  private callbacks: Map<string, ControlFlowAnalysisCallback>;
+  private latestResults: Map<string, PromiseWithResolver>;
   private diagnosticService: DiagnosticService;
 
   public constructor(
@@ -111,11 +125,15 @@ export class ControlFlowAnalysisService implements AnalysisServiceDelegate {
     private logChannel?: vscode.LogOutputChannel,
   ) {
     this.tasks = new Map<string, AnalysisTask>();
-    this.callbacks = new Map<string, ControlFlowAnalysisCallback>();
     this.diagnosticService = new DiagnosticService();
+    this.latestResults = new Map<string, PromiseWithResolver>();
   }
 
   public queueAnalysis(programs: Program[], documentUri: string) {
+    if (!this.latestResults.has(documentUri)) {
+      void this.createLatestResultPromise(documentUri);
+    }
+
     const task = new AnalysisTask(
       documentUri,
       programs,
@@ -133,26 +151,13 @@ export class ControlFlowAnalysisService implements AnalysisServiceDelegate {
     }
   }
 
-  public addCallback(
-    documentUri: string,
-    listener: ControlFlowAnalysisCallback,
-  ) {
-    this.callbacks.set(documentUri, listener);
-  }
-
-  finishTask(
-    documentUri: string,
-    graphs: GraphDTO[],
-    diagnostics: Map<string, vscode.Diagnostic[]>,
-  ): void {
-    this.diagnosticService.showAllDiagnostics(documentUri, diagnostics);
-
-    const callback = this.callbacks.get(documentUri);
-    if (callback) {
-      this.callbacks.delete(documentUri);
-      callback(graphs);
+  public getAnalysis(documentUri: string): Promise<AnalysisResult> {
+    const promiseWithResolver = this.latestResults.get(documentUri);
+    if (promiseWithResolver) {
+      return promiseWithResolver.promise;
+    } else {
+      return this.createLatestResultPromise(documentUri);
     }
-    this.tasks.delete(documentUri);
   }
 
   public async handleControlFlowAst(result: ApiResult) {
@@ -164,14 +169,44 @@ export class ControlFlowAnalysisService implements AnalysisServiceDelegate {
     }
   }
 
-  public static makeControlFlowAstNotificationHandler(
-    mainChannel?: vscode.OutputChannel,
-    logChannel?: vscode.LogOutputChannel,
-  ) {
-    const service = new ControlFlowAnalysisService(mainChannel, logChannel);
+  public makeControlFlowAstNotificationHandler() {
     return (result: ApiResult) => {
-      service.handleControlFlowAst(result).catch(() => {});
+      this.handleControlFlowAst(result).catch(() => {});
     };
+  }
+
+  finishTask(
+    documentUri: string,
+    graphs: GraphDTO[],
+    locations: string[],
+    diagnostics: Map<string, vscode.Diagnostic[]>,
+  ): void {
+    const result = this.latestResults.get(documentUri);
+    if (result) {
+      result.resolve({
+        documentUri: documentUri,
+        graphs: graphs,
+        locations: locations,
+      });
+    }
+
+    this.diagnosticService.showAllDiagnostics(documentUri, diagnostics);
+    this.tasks.delete(documentUri);
+  }
+
+  private createLatestResultPromise(
+    documentUri: string,
+  ): Promise<AnalysisResult> {
+    let res: (
+      value: AnalysisResult | PromiseLike<AnalysisResult>,
+    ) => void = () => {};
+    const prom = new Promise<AnalysisResult>((r, __e) => {
+      res = r;
+    });
+
+    const promiseWithResolver = { resolve: res, promise: prom };
+    this.latestResults.set(documentUri, promiseWithResolver);
+    return prom;
   }
 }
 
