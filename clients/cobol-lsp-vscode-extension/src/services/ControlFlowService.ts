@@ -147,6 +147,10 @@ export class ControlFlowAnalysisService implements AnalysisServiceDelegate {
   }
 
   public invalidate(documentUri: string) {
+    const task = this.tasks.get(documentUri);
+    if (task) {
+      task.abort().catch(() => {});
+    }
     this.latestResults.delete(documentUri);
   }
 
