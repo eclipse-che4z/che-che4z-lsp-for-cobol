@@ -156,7 +156,7 @@ export class ControlFlowAnalysisService implements AnalysisServiceDelegate {
     }
   }
 
-  private queueAnalysis(programs: Program[], documentUri: string) {
+  queueAnalysis(programs: Program[], documentUri: string) {
     const latestResult = this.latestResults.get(documentUri);
     if (latestResult?.resolved || !latestResult) {
       void this.createLatestResultPromise(documentUri);
