@@ -17,11 +17,13 @@ package org.eclipse.lsp.cobol.test.engine;
 
 import lombok.Builder;
 import lombok.Value;
+import org.eclipse.lsp.cobol.common.symbols.ProcedureId;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.Location;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /** This data class defines output of use-case text preprocessor */
 @Value
@@ -33,10 +35,8 @@ public class TestData {
   Map<String, List<Diagnostic>> diagnostics;
   Map<String, List<Location>> variableDefinitions;
   Map<String, List<Location>> variableUsages;
-  Map<String, List<Location>> paragraphDefinitions;
-  Map<String, List<Location>> paragraphUsages;
-  Map<String, List<Location>> sectionDefinitions;
-  Map<String, List<Location>> sectionUsages;
+  Map<ProcedureId, List<Location>> procedureDefinitions;
+  Map<ProcedureId, List<Location>> procedureUsages;
   Map<String, List<Location>> constantUsages;
   Map<String, List<Location>> copybookDefinitions;
   Map<String, List<Location>> copybookUsages;
@@ -44,4 +44,26 @@ public class TestData {
   Map<String, List<Location>> subroutineUsages;
   Map<String, List<Location>> functionDefinitions;
   Map<String, List<Location>> functionUsages;
+
+  Map<String, List<Location>> getParagraphDefinitions() {
+    return procedureDefinitions.entrySet().stream()
+            .filter(en -> !en.getKey().isSection()).collect(
+                    Collectors.toMap(en -> en.getKey().getParagraphName(), Map.Entry::getValue));
+  }
+  Map<String, List<Location>> getParagraphUsages() {
+    return procedureUsages.entrySet().stream()
+            .filter(en -> !en.getKey().isSection()).collect(
+                    Collectors.toMap(en -> en.getKey().getParagraphName(), Map.Entry::getValue));
+  }
+  public Map<String, List<Location>> getSectionUsages() {
+    return procedureUsages.entrySet().stream()
+            .filter(en -> en.getKey().isSection()).collect(
+                    Collectors.toMap(en -> en.getKey().getSectionName(), Map.Entry::getValue));
+  }
+
+  public Map<String, List<Location>> getSectionDefinitions() {
+    return procedureDefinitions.entrySet().stream()
+            .filter(en -> en.getKey().isSection()).collect(
+                    Collectors.toMap(en -> en.getKey().getSectionName(), Map.Entry::getValue));
+  }
 }
