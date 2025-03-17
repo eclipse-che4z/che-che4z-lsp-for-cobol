@@ -130,34 +130,11 @@ export class ControlFlowAnalysisService implements AnalysisServiceDelegate {
     this.latestResults = new Map<string, LatestResultData>();
   }
 
-  public queueAnalysis(programs: Program[], documentUri: string) {
-    const latestResult = this.latestResults.get(documentUri);
-    if (latestResult?.resolved || !latestResult) {
-      void this.createLatestResultPromise(documentUri);
-    }
-
-    const task = new AnalysisTask(
-      documentUri,
-      programs,
-      this,
-      this.mainChannel,
-      this.logChannel,
-    );
-    this.tasks.set(documentUri, task);
-  }
-
   public async invalidate(documentUri: string) {
     const task = this.tasks.get(documentUri);
+    this.latestResults.delete(documentUri);
     if (task) {
       await task.abort();
-    }
-    this.latestResults.delete(documentUri);
-  }
-
-  public async cancelAnalysis(documentUri: string) {
-    const exitsing = this.tasks.get(documentUri);
-    if (exitsing) {
-      await exitsing.abort();
     }
   }
 
@@ -172,11 +149,27 @@ export class ControlFlowAnalysisService implements AnalysisServiceDelegate {
 
   public async handleControlFlowAst(result: ApiResult) {
     if (result.documentUri) {
-      await this.cancelAnalysis(result.documentUri);
+      await this.invalidate(result.documentUri);
       if (result.controlFlowAST.length > 0) {
         this.queueAnalysis(result.controlFlowAST, result.documentUri);
       }
     }
+  }
+
+  private queueAnalysis(programs: Program[], documentUri: string) {
+    const latestResult = this.latestResults.get(documentUri);
+    if (latestResult?.resolved || !latestResult) {
+      void this.createLatestResultPromise(documentUri);
+    }
+
+    const task = new AnalysisTask(
+      documentUri,
+      programs,
+      this,
+      this.mainChannel,
+      this.logChannel,
+    );
+    this.tasks.set(documentUri, task);
   }
 
   public makeControlFlowAstNotificationHandler() {
