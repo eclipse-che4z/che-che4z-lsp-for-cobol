@@ -36,7 +36,6 @@ import org.eclipse.usecase.UseCasePreprocessorParser.*;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.function.Supplier;
 import java.util.regex.Pattern;
 
 import static java.util.Collections.singletonList;
@@ -224,7 +223,7 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
               ctx, p.paragraph.replacement(),
               procedureUsages,
               ctx.diagnostic(),
-              () -> new ProcedureId(section,
+              new ProcedureId(section,
                       getReplacementText(p.paragraph.getText(), p.paragraph.replacement()).get(0).toUpperCase()));
     }
     ParagraphDefinitionContext value = ctx.paragraphDefinition();
@@ -235,7 +234,7 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
               ctx, it.replacement(),
               procedureDefinitions,
               ctx.diagnostic(),
-              () -> new ProcedureId(null,
+              new ProcedureId(null,
                       getReplacementText(it.identifier().getText(), it.replacement()).get(0).toUpperCase()));
     }
 }
@@ -293,13 +292,13 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
     if (sectionUsage != null && sectionUsage.word() != null) {
       WordContext word = sectionUsage.word();
       processProcedureToken(word.identifier().getText(), ctx, word.replacement(), procedureUsages, ctx.diagnostic(),
-              () -> new ProcedureId(getReplacementText(word.getText(), word.replacement()).get(0).toUpperCase(), null));
+              new ProcedureId(getReplacementText(word.getText(), word.replacement()).get(0).toUpperCase(), null));
     }
     SectionDefinitionContext sectionDefinition = ctx.sectionDefinition();
     if (sectionDefinition != null && sectionDefinition.word() != null) {
       WordContext word = sectionDefinition.word();
       processProcedureToken(word.identifier().getText(), ctx, word.replacement(), procedureDefinitions, ctx.diagnostic(),
-              () -> new ProcedureId(getReplacementText(word.getText(), word.replacement()).get(0).toUpperCase(), null));
+              new ProcedureId(getReplacementText(word.getText(), word.replacement()).get(0).toUpperCase(), null));
     }
   }
 
@@ -472,9 +471,9 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
           ReplacementContext replacement,
           Map<ProcedureId, List<Location>> storage,
           List<DiagnosticContext> diagnosticIds,
-          Supplier<ProcedureId> idSupplier) {
+          ProcedureId id) {
     Range range = retrieveRange(ctx, text.length());
-    storage.computeIfAbsent(idSupplier.get(), it -> new ArrayList<>())
+    storage.computeIfAbsent(id, it -> new ArrayList<>())
             .add(new Location(documentUri, range));
     updateOutputDocument(text, ctx, replacement, diagnosticIds, range);
   }
