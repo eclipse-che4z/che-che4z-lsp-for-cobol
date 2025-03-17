@@ -170,19 +170,19 @@ export async function activate(
   );
 
   context.subscriptions.push(
-    vscode.workspace.onDidChangeTextDocument((event) => {
+    vscode.workspace.onDidChangeTextDocument(async (event) => {
       const documentUri = event.document.uri.toString();
       if (documentUri) {
-        analysisService.invalidate(documentUri);
+        await analysisService.invalidate(documentUri);
       }
     }),
   );
 
   context.subscriptions.push(
-    vscode.workspace.onDidCloseTextDocument((document) => {
+    vscode.workspace.onDidCloseTextDocument(async (document) => {
       const documentUri = document.uri.toString();
       if (documentUri) {
-        analysisService.invalidate(documentUri);
+        await analysisService.invalidate(documentUri);
       }
     }),
   );
