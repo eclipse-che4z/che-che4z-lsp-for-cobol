@@ -156,6 +156,12 @@ export class ControlFlowAnalysisService implements AnalysisServiceDelegate {
     }
   }
 
+  public makeControlFlowAstNotificationHandler() {
+    return (result: ApiResult) => {
+      this.handleControlFlowAst(result).catch(() => {});
+    };
+  }
+
   queueAnalysis(programs: Program[], documentUri: string) {
     const latestResult = this.latestResults.get(documentUri);
     if (latestResult?.resolved || !latestResult) {
@@ -170,12 +176,6 @@ export class ControlFlowAnalysisService implements AnalysisServiceDelegate {
       this.logChannel,
     );
     this.tasks.set(documentUri, task);
-  }
-
-  public makeControlFlowAstNotificationHandler() {
-    return (result: ApiResult) => {
-      this.handleControlFlowAst(result).catch(() => {});
-    };
   }
 
   finishTask(
