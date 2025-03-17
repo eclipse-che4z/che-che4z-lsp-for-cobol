@@ -170,9 +170,17 @@ export async function activate(
   );
 
   context.subscriptions.push(
-    vscode.window.onDidChangeActiveTextEditor(() => {
-      const documentUri =
-        vscode.window.activeTextEditor?.document.uri.toString();
+    vscode.workspace.onDidChangeTextDocument((event) => {
+      const documentUri = event.document.uri.toString();
+      if (documentUri) {
+        analysisService.invalidate(documentUri);
+      }
+    }),
+  );
+
+  context.subscriptions.push(
+    vscode.workspace.onDidCloseTextDocument((document) => {
+      const documentUri = document.uri.toString();
       if (documentUri) {
         analysisService.invalidate(documentUri);
       }
