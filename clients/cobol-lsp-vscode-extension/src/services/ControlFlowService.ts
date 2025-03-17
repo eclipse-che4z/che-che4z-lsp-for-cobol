@@ -139,9 +139,9 @@ export class ControlFlowAnalysisService implements AnalysisServiceDelegate {
   }
 
   public getAnalysis(documentUri: string): Promise<AnalysisResult> {
-    const promiseWithResolver = this.latestResults.get(documentUri);
-    if (promiseWithResolver) {
-      return promiseWithResolver.promise;
+    const latestResult = this.latestResults.get(documentUri);
+    if (latestResult) {
+      return latestResult.promise;
     } else {
       return this.createLatestResultPromise(documentUri);
     }
