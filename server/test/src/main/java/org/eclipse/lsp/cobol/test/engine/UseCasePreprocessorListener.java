@@ -214,7 +214,7 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
   public void exitParagraphStatement(ParagraphStatementContext ctx) {
     pop();
     ofNullable(ctx.paragraphUsage())
-            .map(ParagraphUsageContext::word)
+            .map(p -> p.paragraph)
             .ifPresent(
                     it ->
                             processToken(
