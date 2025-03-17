@@ -14,7 +14,6 @@
  */
 package org.eclipse.lsp.cobol.common.symbols;
 
-import lombok.NonNull;
 import lombok.ToString;
 import lombok.Value;
 
