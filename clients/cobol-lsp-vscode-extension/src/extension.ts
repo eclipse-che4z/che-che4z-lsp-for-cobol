@@ -170,21 +170,15 @@ export async function activate(
   );
 
   context.subscriptions.push(
-    vscode.workspace.onDidChangeTextDocument(async (event) => {
-      const documentUri = event.document.uri.toString();
-      if (documentUri) {
-        await analysisService.invalidate(documentUri);
-      }
-    }),
+    vscode.workspace.onDidChangeTextDocument((document) =>
+      analysisService.invalidate(event.document.uri.toString())
+    ),
   );
 
   context.subscriptions.push(
-    vscode.workspace.onDidCloseTextDocument(async (document) => {
-      const documentUri = document.uri.toString();
-      if (documentUri) {
-        await analysisService.invalidate(documentUri);
-      }
-    }),
+    vscode.workspace.onDidCloseTextDocument((document) =>
+      analysisService.invalidate(document.uri.toString())
+    ),
   );
 
   configurationWatcher.watchConfigurationChanges();
