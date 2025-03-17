@@ -185,6 +185,7 @@ export class CopybookDownloadService {
       documentUri,
       copybookName,
       this.storagePath,
+      dialectType,
       this.e4eDownloader,
       this.dsnDownloader,
       this.ussDownloader,
@@ -386,11 +387,21 @@ export class CopybookDownloadService {
       return !!(await this.e4eDownloader?.getE4EConfig(documentUri));
     }
     if (!this.explorerApi && !this.e4eApi) return false;
+    const configs: (
+      | string
+      | ZoweDatasetConfigModel
+      | ZoweUssConfigModel
+      | EndevorConfigModel
+    )[] = [];
 
-    const configs = await loadProcessorGroupCopybookPathsConfig(
-      { scopeUri: documentUri },
-      [],
-    );
+    for (const dialect of dialects) {
+      const tempConfig = await loadProcessorGroupCopybookPathsConfig(
+        { scopeUri: documentUri },
+        [],
+        dialect,
+      );
+      configs.push(...tempConfig);
+    }
 
     const procGroupZoweConfigs = configs
       .filter(
@@ -510,7 +521,11 @@ export class CopybookDownloadService {
     documentUri: string,
   ): Promise<boolean> {
     const pgConfigs = (
-      await loadProcessorGroupCopybookPathsConfig({ scopeUri: documentUri }, [])
+      await loadProcessorGroupCopybookPathsConfig(
+        { scopeUri: documentUri },
+        [],
+        copybookName.dialect,
+      )
     ).filter((config) => typeof config != "string");
     if (!(Array.isArray(pgConfigs) && pgConfigs.length > 0)) {
       return false;
@@ -578,6 +593,7 @@ async function searchCopybookinProcessorGroups(
   documentUri: string,
   copybookName: string,
   storagePath: string,
+  dialectType: string = "COBOL",
   e4eDownloader?: CopybookDownloaderForE4E,
   dsnDownloader?: CopybookDownloaderForDsn,
   ussDownloader?: CopybookDownloaderForUss,
@@ -586,6 +602,7 @@ async function searchCopybookinProcessorGroups(
   const pgConfigs = await loadProcessorGroupCopybookPathsConfig(
     { scopeUri: documentUri },
     [],
+    dialectType,
   );
   if (pgConfigs.length < 1) {
     return false;

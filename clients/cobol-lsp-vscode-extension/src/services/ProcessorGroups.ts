@@ -55,22 +55,22 @@ export async function loadProcessorGroupCopybookPaths(
 export async function loadProcessorGroupCopybookPathsConfig(
   item: { scopeUri: string },
   configObject: string[],
+  dialect?: string,
 ): Promise<
   (string | ZoweDatasetConfigModel | ZoweUssConfigModel | EndevorConfigModel)[]
 > {
+  const remotes = await loadProcessorGroupSettings(
+    item.scopeUri,
+    "libs",
+    [] as string[],
+    dialect,
+  );
   const allConfigs: (
     | string
     | ZoweDatasetConfigModel
     | ZoweUssConfigModel
     | EndevorConfigModel
-  )[] = [
-    ...(await loadProcessorGroupSettings(
-      item.scopeUri,
-      "libs",
-      [] as string[],
-    )),
-    ...configObject,
-  ];
+  )[] = [...remotes, ...configObject];
 
   const configs: (
     | string
@@ -279,7 +279,7 @@ function selectProcessorGroup(
 
 async function loadProcessorGroupSettings<T extends string | string[]>(
   documentUri: string,
-  atrtibute:
+  attribute:
     | "libs"
     | "name"
     | "target-sql-backend"
@@ -306,14 +306,14 @@ async function loadProcessorGroupSettings<T extends string | string[]>(
           pp &&
           typeof pp === "object" &&
           pp["name"]?.toLocaleUpperCase() === dialect.toLocaleUpperCase() &&
-          pp[atrtibute] !== undefined
+          pp[attribute] !== undefined
         ) {
-          return pp[atrtibute] as T;
+          return pp[attribute] as T;
         }
       }
     } else {
-      if (pgCfg[atrtibute] !== undefined) {
-        return pgCfg[atrtibute] as T;
+      if (pgCfg[attribute] !== undefined) {
+        return pgCfg[attribute] as T;
       }
     }
 
