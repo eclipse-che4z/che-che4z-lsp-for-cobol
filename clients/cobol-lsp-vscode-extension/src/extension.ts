@@ -169,6 +169,16 @@ export async function activate(
     ),
   );
 
+  context.subscriptions.push(
+    vscode.window.onDidChangeActiveTextEditor(() => {
+      const documentUri =
+        vscode.window.activeTextEditor?.document.uri.toString();
+      if (documentUri) {
+        analysisService.invalidate(documentUri);
+      }
+    }),
+  );
+
   configurationWatcher.watchConfigurationChanges();
 
   try {
