@@ -54,9 +54,10 @@ interface AnalysisServiceDelegate {
   ): void;
 }
 
-type PromiseWithResolver = {
+type LatestResultData = {
   resolve: (value: AnalysisResult | PromiseLike<AnalysisResult>) => void;
   promise: Promise<AnalysisResult>;
+  resolved: boolean;
 };
 
 class AnalysisTask {
@@ -117,7 +118,7 @@ class AnalysisTask {
 
 export class ControlFlowAnalysisService implements AnalysisServiceDelegate {
   private tasks: Map<string, AnalysisTask>;
-  private latestResults: Map<string, PromiseWithResolver>;
+  private latestResults: Map<string, LatestResultData>;
   private diagnosticService: DiagnosticService;
 
   public constructor(
@@ -126,11 +127,12 @@ export class ControlFlowAnalysisService implements AnalysisServiceDelegate {
   ) {
     this.tasks = new Map<string, AnalysisTask>();
     this.diagnosticService = new DiagnosticService();
-    this.latestResults = new Map<string, PromiseWithResolver>();
+    this.latestResults = new Map<string, LatestResultData>();
   }
 
   public queueAnalysis(programs: Program[], documentUri: string) {
-    if (!this.latestResults.has(documentUri)) {
+    const latestResult = this.latestResults.get(documentUri);
+    if (latestResult?.resolved || !latestResult) {
       void this.createLatestResultPromise(documentUri);
     }
 
@@ -142,6 +144,10 @@ export class ControlFlowAnalysisService implements AnalysisServiceDelegate {
       this.logChannel,
     );
     this.tasks.set(documentUri, task);
+  }
+
+  public invalidate(documentUri: string) {
+    this.latestResults.delete(documentUri);
   }
 
   public async cancelAnalysis(documentUri: string) {
@@ -183,6 +189,7 @@ export class ControlFlowAnalysisService implements AnalysisServiceDelegate {
   ): void {
     const result = this.latestResults.get(documentUri);
     if (result) {
+      result.resolved = true;
       result.resolve({
         documentUri: documentUri,
         graphs: graphs,
@@ -204,7 +211,11 @@ export class ControlFlowAnalysisService implements AnalysisServiceDelegate {
       res = r;
     });
 
-    const promiseWithResolver = { resolve: res, promise: prom };
+    const promiseWithResolver = {
+      resolve: res,
+      promise: prom,
+      resolved: false,
+    };
     this.latestResults.set(documentUri, promiseWithResolver);
     return prom;
   }
