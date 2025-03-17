@@ -58,7 +58,16 @@ jest.mock("vscode", () => {
                                   "IDMS",
                                   {
                                       "name": "DaCo",
-                                      "libs": ["/daco"]
+                                      "libs": ["/daco",
+                                      {
+                                  "environment": "ENV",
+                                  "stage": "1",
+                                  "system": "SYSTEM",
+                                  "subsystem": "SUBSYTEM",
+                                  "type": "COPY",
+                                  "profile": "instance.internal.connection"
+                                }
+                                  ]
                                   },
                                   {
                                       "name": "SQL",
@@ -238,6 +247,24 @@ it("Processor groups configuration matches program relative to workspace", async
   };
   const result = await loadProcessorGroupDialectConfig(item, []);
   expect(result).toStrictEqual(["IDMS"]);
+});
+it("Checks settings in preprocessor group overrides processor group libraries", async () => {
+  jest.spyOn(glob, "globSync").mockReturnValue(["daco-resolved-from-glob"]);
+  const scope = {
+    scopeUri: WORKSPACE_URI + "/progDaF.cob",
+  };
+  const result = await loadProcessorGroupCopybookPathsConfig(scope, [], "DaCo");
+  expect(result).toStrictEqual([
+    "daco-resolved-from-glob",
+    {
+      environment: "ENV",
+      profile: "instance.internal.connection",
+      stage: "1",
+      subsystem: "SUBSYTEM",
+      system: "SYSTEM",
+      type: "COPY",
+    },
+  ]);
 });
 
 it("Processor groups configuration matches program with *", async () => {
