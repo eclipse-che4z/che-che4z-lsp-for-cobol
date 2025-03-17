@@ -33,62 +33,12 @@ describe("Tests Copybook download from DNS", () => {
       );
   });
 
-  describe("checks if the copybook is eligible to dowload passed on user settings", () => {
-    const downloader = new CopybookDownloaderForDsn(
-      "storage-path",
-      createZoweExplorerMock(),
-    );
-    beforeEach(() => {
-      jest.clearAllMocks();
-    });
-
-    it("checks eligibility based on profile settings", () => {
-      ProfileUtils.getProfileNameForCopybook = jest
-        .fn()
-        .mockReturnValue(undefined);
-      let isEligible = downloader.isEligibleForDownload(
-        { name: "copybook-name", dialect: "COBOL" },
-        "document-uri",
-        "DNS.PATH",
-      );
-      expect(isEligible).toBeFalsy();
-      ProfileUtils.getProfileNameForCopybook = jest
-        .fn()
-        .mockReturnValue("test-profile");
-      isEligible = downloader.isEligibleForDownload(
-        { name: "copybook-name", dialect: "COBOL" },
-        "document-uri",
-        "DNS.PATH",
-      );
-      expect(isEligible).toBeTruthy();
-    });
-
-    it("checks eligibility based on DSN settings", () => {
-      ProfileUtils.getProfileNameForCopybook = jest
-        .fn()
-        .mockReturnValue("test-profile");
-      let isEligible = downloader.isEligibleForDownload(
-        { name: "copybook-name", dialect: "COBOL" },
-        "document-uri",
-        undefined,
-      );
-      expect(isEligible).toBeFalsy();
-      isEligible = downloader.isEligibleForDownload(
-        { name: "copybook-name", dialect: "COBOL" },
-        "document-uri",
-        "DNS.PATH",
-      );
-      expect(isEligible).toBeTruthy();
-    });
-  });
-
   describe("checks the copybook download using ZE DSN API's", () => {
     const downloader = new CopybookDownloaderForDsn(
       "storage-path",
       createZoweExplorerMock(),
     );
     it("checks not eligible copybook are not downloaded", async () => {
-      downloader.isEligibleForDownload = jest.fn().mockReturnValue(false);
       const isDowloaded = await downloader.downloadCopybook(
         { name: "copybook-name", dialect: "COBOL" },
         "document-uri",
@@ -98,7 +48,6 @@ describe("Tests Copybook download from DNS", () => {
     });
 
     it("checks eligible copybook which are not present in the DSN provided do not invoke ZE Api's", async () => {
-      downloader.isEligibleForDownload = jest.fn().mockReturnValue(true);
       const isDowloaded = await downloader.downloadCopybook(
         { name: "copybook-name", dialect: "COBOL" },
         "document-uri",
@@ -111,7 +60,6 @@ describe("Tests Copybook download from DNS", () => {
       ProfileUtils.getProfileNameForCopybook = jest
         .fn()
         .mockReturnValue("test-profile");
-      downloader.isEligibleForDownload = jest.fn().mockReturnValue(true);
       SettingsService.getCopybookFileEncoding = jest
         .fn()
         .mockReturnValue("utf8");

@@ -13,7 +13,6 @@
  */
 import { SettingsService } from "../../Settings";
 import { splitFilename } from "../../util/FSUtils";
-import { ProfileUtils } from "../../util/ProfileUtils";
 import { CopybookName } from "../CopybookDownloadService";
 import { DownloadUtil } from "./DownloadUtil";
 import { ZoweExplorerDownloader } from "./ZoweExplorerDownloader";
@@ -24,24 +23,6 @@ import { ZoweExplorerDownloader } from "./ZoweExplorerDownloader";
 export class CopybookDownloaderForUss extends ZoweExplorerDownloader {
   constructor(storagePath: string, explorerAPI: IApiRegisterClient) {
     super(storagePath, explorerAPI);
-  }
-
-  /**
-   * Checks if the file could be downloaded using the Zowe explorer from USS
-   * @param copybookName Copybook to be downloaded.
-   * @param documentUri cobol programs which needs copybook
-   * @param dsnPath dsnpath in mainframe.
-   */
-  isEligibleForDownload(
-    _copybookName: CopybookName,
-    documentUri: string,
-    ussPath: string | undefined,
-    profile?: string,
-  ): boolean {
-    const providedProfile = profile
-      ? profile
-      : ProfileUtils.getProfileNameForCopybook(documentUri, this.explorerAPI);
-    return !!(ussPath && providedProfile);
   }
 
   /**

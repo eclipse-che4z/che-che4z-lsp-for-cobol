@@ -11,7 +11,6 @@
  * Contributors:
  *   Broadcom, Inc. - initial API and implementation
  */
-import { ProfileUtils } from "../../util/ProfileUtils";
 import { CopybookName } from "../CopybookDownloadService";
 import { DownloadUtil } from "./DownloadUtil";
 import { ZoweExplorerDownloader } from "./ZoweExplorerDownloader";
@@ -22,24 +21,6 @@ import { ZoweExplorerDownloader } from "./ZoweExplorerDownloader";
 export class CopybookDownloaderForDsn extends ZoweExplorerDownloader {
   constructor(storagePath: string, explorerAPI: IApiRegisterClient) {
     super(storagePath, explorerAPI);
-  }
-
-  /**
-   * Checks if the file could be downloaded using the Zowe explorer from MVS
-   * @param copybookName Copybook to be downloaded.
-   * @param documentUri cobol programs which needs copybook
-   * @param dsnPath dsnpath in mainframe.
-   */
-  isEligibleForDownload(
-    _copybookName: CopybookName,
-    documentUri: string,
-    dsnPath: string | undefined,
-    profile?: string,
-  ): boolean {
-    const providedProfile = profile
-      ? profile
-      : ProfileUtils.getProfileNameForCopybook(documentUri, this.explorerAPI);
-    return !!(dsnPath && providedProfile);
   }
   /**
    * Downloads a file from the passed dns based on Zowe explorer
