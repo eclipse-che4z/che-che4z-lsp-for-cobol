@@ -23,6 +23,7 @@ import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
+import org.eclipse.lsp.cobol.common.symbols.ProcedureId;
 import org.eclipse.lsp.cobol.common.utils.StringUtils;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.Location;
@@ -35,6 +36,7 @@ import org.eclipse.usecase.UseCasePreprocessorParser.*;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.regex.Pattern;
 
 import static java.util.Collections.singletonList;
@@ -54,15 +56,15 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
   private final Map<String, List<Location>> variableDefinitions = new HashMap<>();
   private final Map<String, List<Location>> variableUsages = new HashMap<>();
   private final Map<String, List<Location>> functionUsages = new HashMap<>();
-  private final Map<String, List<Location>> paragraphDefinitions = new HashMap<>();
   private final Map<String, List<Location>> functionDefinitions = new HashMap<>();
-  private final Map<String, List<Location>> paragraphUsages = new HashMap<>();
-  private final Map<String, List<Location>> sectionDefinitions = new HashMap<>();
-  private final Map<String, List<Location>> sectionUsages = new HashMap<>();
   private final Map<String, List<Location>> constantUsages = new HashMap<>();
   private final Map<String, List<Location>> copybookDefinitions = new HashMap<>();
   private final Map<String, List<Location>> copybookUsages = new HashMap<>();
   private final Map<String, List<Location>> subroutineUsages = new HashMap<>();
+
+  private final Map<ProcedureId, List<Location>> procedureDefinitions = new HashMap<>();
+  private final Map<ProcedureId, List<Location>> procedureUsages = new HashMap<>();
+
 
   private final Deque<StringBuilder> contexts = new ArrayDeque<>();
 
@@ -110,10 +112,8 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
             diagnostics,
             variableDefinitions,
             variableUsages,
-            paragraphDefinitions,
-            paragraphUsages,
-            sectionDefinitions,
-            sectionUsages,
+            procedureDefinitions,
+            procedureUsages,
             constantUsages,
             copybookDefinitions,
             copybookUsages,
@@ -213,27 +213,32 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
   @Override
   public void exitParagraphStatement(ParagraphStatementContext ctx) {
     pop();
-    ofNullable(ctx.paragraphUsage())
-            .map(p -> p.paragraph)
-            .ifPresent(
-                    it ->
-                            processToken(
-                                    it.identifier().getText(),
-                                    ctx,
-                                    it.replacement(),
-                                    paragraphUsages,
-                                    ctx.diagnostic()));
-    ofNullable(ctx.paragraphDefinition())
-            .map(ParagraphDefinitionContext::word)
-            .ifPresent(
-                    it ->
-                            processToken(
-                                    it.identifier().getText(),
-                                    ctx,
-                                    it.replacement(),
-                                    paragraphDefinitions,
-                                    ctx.diagnostic()));
-  }
+    ParagraphUsageContext p = ctx.paragraphUsage();
+    if (p != null && p.paragraph != null) {
+      String section = p.section == null
+              ? null
+              : getReplacementText(p.section.identifier().getText(), p.section.replacement()).get(0);
+
+      processProcedureToken(
+              p.paragraph.identifier().getText(),
+              ctx, p.paragraph.replacement(),
+              procedureUsages,
+              ctx.diagnostic(),
+              () -> new ProcedureId(section,
+                      getReplacementText(p.paragraph.getText(), p.paragraph.replacement()).get(0).toUpperCase()));
+    }
+    ParagraphDefinitionContext value = ctx.paragraphDefinition();
+    if (value != null && value.word() != null) {
+      WordContext it = value.word();
+      processProcedureToken(
+              it.identifier().getText(),
+              ctx, it.replacement(),
+              procedureDefinitions,
+              ctx.diagnostic(),
+              () -> new ProcedureId(null,
+                      getReplacementText(it.identifier().getText(), it.replacement()).get(0).toUpperCase()));
+    }
+}
 
   @Override
   public void enterFunctionDefinition(FunctionDefinitionContext ctx) {
@@ -284,26 +289,18 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
   @Override
   public void exitSectionStatement(SectionStatementContext ctx) {
     pop();
-    ofNullable(ctx.sectionUsage())
-            .map(SectionUsageContext::word)
-            .ifPresent(
-                    it ->
-                            processToken(
-                                    it.identifier().getText(),
-                                    ctx,
-                                    it.replacement(),
-                                    sectionUsages,
-                                    ctx.diagnostic()));
-    ofNullable(ctx.sectionDefinition())
-            .map(SectionDefinitionContext::word)
-            .ifPresent(
-                    it ->
-                            processToken(
-                                    it.identifier().getText(),
-                                    ctx,
-                                    it.replacement(),
-                                    sectionDefinitions,
-                                    ctx.diagnostic()));
+    SectionUsageContext sectionUsage = ctx.sectionUsage();
+    if (sectionUsage != null && sectionUsage.word() != null) {
+      WordContext word = sectionUsage.word();
+      processProcedureToken(word.identifier().getText(), ctx, word.replacement(), procedureUsages, ctx.diagnostic(),
+              () -> new ProcedureId(getReplacementText(word.getText(), word.replacement()).get(0).toUpperCase(), null));
+    }
+    SectionDefinitionContext sectionDefinition = ctx.sectionDefinition();
+    if (sectionDefinition != null && sectionDefinition.word() != null) {
+      WordContext word = sectionDefinition.word();
+      processProcedureToken(word.identifier().getText(), ctx, word.replacement(), procedureDefinitions, ctx.diagnostic(),
+              () -> new ProcedureId(getReplacementText(word.getText(), word.replacement()).get(0).toUpperCase(), null));
+    }
   }
 
   @Override
@@ -469,6 +466,19 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
     processToken(text, ctx, replacement, storage, diagnosticIds, false);
   }
 
+  private void processProcedureToken(
+          String text,
+          ParserRuleContext ctx,
+          ReplacementContext replacement,
+          Map<ProcedureId, List<Location>> storage,
+          List<DiagnosticContext> diagnosticIds,
+          Supplier<ProcedureId> idSupplier) {
+    Range range = retrieveRange(ctx, text.length());
+    storage.computeIfAbsent(idSupplier.get(), it -> new ArrayList<>())
+            .add(new Location(documentUri, range));
+    updateOutputDocument(text, ctx, replacement, diagnosticIds, range);
+  }
+
   private void processToken(
           String text,
           ParserRuleContext ctx,
@@ -501,6 +511,14 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
       }
     }
 
+    updateOutputDocument(text, ctx, replacement, diagnosticIds, range);
+  }
+
+  private void updateOutputDocument(String text,
+                                    ParserRuleContext ctx,
+                                    ReplacementContext replacement,
+                                    List<DiagnosticContext> diagnosticIds,
+                                    Range range) {
     if (replacement != null) {
       addPositionShift().accept(replacement);
     }
@@ -513,7 +531,6 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
       if (replacement == null) {
           return Collections.singletonList(text);
       }
-
       List<String> replacementTexts = new ArrayList<>();
       List<IdentifierContext> ids = replacement.identifier();
       for (IdentifierContext id: ids) {
@@ -522,14 +539,15 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
       return replacementTexts;
   }
 
-  private void addTokenLocation(Map<String, List<Location>> storage, String text, Range range) {
+
+  private void addTokenLocation(Map<String, List<Location>> storage, String key, Range range) {
     Location location = new Location(documentUri, range);
-    if (storage.containsKey(text)) {
-      storage.get(text).add(location);
+    if (storage.containsKey(key)) {
+      storage.get(key).add(location);
     } else {
       List<Location> list = new ArrayList<>();
       list.add(location);
-      storage.put(text, list);
+      storage.put(key, list);
     }
   }
 

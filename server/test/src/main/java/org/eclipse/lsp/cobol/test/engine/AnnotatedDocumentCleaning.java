@@ -157,12 +157,9 @@ class AnnotatedDocumentCleaning {
     return copybookTestData -> {
       mergeMaps(accumulator.getCopybookDefinitions(), copybookTestData.getCopybookDefinitions());
       mergeMaps(accumulator.getCopybookUsages(), copybookTestData.getCopybookUsages());
-      mergeMaps(accumulator.getParagraphDefinitions(), copybookTestData.getParagraphDefinitions());
-      mergeMaps(accumulator.getParagraphUsages(), copybookTestData.getParagraphUsages());
-      mergeMaps(accumulator.getSectionDefinitions(), copybookTestData.getSectionDefinitions());
-      mergeMaps(accumulator.getSectionUsages(), copybookTestData.getSectionUsages());
-      mergeMaps(
-          accumulator.getSubroutineDefinitions(), copybookTestData.getSubroutineDefinitions());
+      mergeMaps(accumulator.getProcedureDefinitions(), copybookTestData.getProcedureDefinitions());
+      mergeMaps(accumulator.getProcedureUsages(), copybookTestData.getProcedureUsages());
+      mergeMaps(accumulator.getSubroutineDefinitions(), copybookTestData.getSubroutineDefinitions());
       mergeMaps(accumulator.getSubroutineUsages(), copybookTestData.getSubroutineUsages());
       mergeMaps(accumulator.getVariableDefinitions(), copybookTestData.getVariableDefinitions());
       mergeMaps(accumulator.getVariableUsages(), copybookTestData.getVariableUsages());
@@ -171,11 +168,11 @@ class AnnotatedDocumentCleaning {
     };
   }
 
-  private <T> void mergeMaps(Map<String, List<T>> to, Map<String, List<T>> from) {
+  private <K, V> void mergeMaps(Map<K, List<V>> to, Map<K, List<V>> from) {
     from.forEach(
         (key, value) -> {
           if (to.containsKey(key)) {
-            List<T> list = new LinkedList<>(to.get(key));
+            List<V> list = new LinkedList<>(to.get(key));
             list.addAll(value);
             to.put(key, list);
           } else to.put(key, value);
