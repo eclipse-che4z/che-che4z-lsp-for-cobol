@@ -54,7 +54,7 @@ public class CICSErrorListener extends BaseErrorListener {
 
     SyntaxError error =
         SyntaxError.syntaxError()
-            .errorSource(ErrorSource.PREPROCESSING.updateLevel(ErrorLevel.ERROR))
+            .errorSource(ErrorSource.PARSING.updateLevel(ErrorLevel.ERROR))
             .location(
                 Locality.builder()
                     .uri(uri)

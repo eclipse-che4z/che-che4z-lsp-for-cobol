@@ -364,7 +364,7 @@ class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
     private void throwException(String wrongToken, @NonNull Locality locality, String message) {
         SyntaxError error =
                 SyntaxError.syntaxError()
-                        .errorSource(ErrorSource.PREPROCESSING.updateLevel(ErrorLevel.SEMANTICS))
+                        .errorSource(ErrorSource.PARSING.updateLevel(ErrorLevel.SEMANTICS))
                         .location(locality.toOriginalLocation())
                         .suggestion(message + wrongToken)
                         .severity(ErrorSeverity.WARNING)

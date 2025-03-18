@@ -55,7 +55,7 @@ public class CICSExecBlockProcessor implements Processor<ExecCicsNode> {
                     SyntaxError.syntaxError()
                             .location(execCicsNode.getLocality().toOriginalLocation())
                             .severity(ErrorSeverity.ERROR)
-                            .errorSource(ErrorSource.PREPROCESSING.updateLevel(ErrorLevel.SEMANTICS))
+                            .errorSource(ErrorSource.PARSING.updateLevel(ErrorLevel.SEMANTICS))
                             .suggestion(messageService.getMessage("cics.invalidExecBlock"))
                             .build());
   }
