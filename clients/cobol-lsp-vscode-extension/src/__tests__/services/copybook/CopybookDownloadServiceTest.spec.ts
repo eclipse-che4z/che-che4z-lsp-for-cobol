@@ -1036,12 +1036,12 @@ describe("Tests copybook download service", () => {
       "downloadElementE4E",
     );
     await service.downloadCopybooks("document-uri", [
-      { name: "copybook-name", dialect: DEFAULT_DIALECT },
+      { name: "copybook", dialect: DEFAULT_DIALECT },
     ]);
     expect(downloadSpy).toHaveBeenCalledWith(
       { instance: "instance", profile: "profile" },
       {
-        element: "copybook-name",
+        element: "copybook",
         environment: "environment",
         fingerprint: "",
         stage: "1",

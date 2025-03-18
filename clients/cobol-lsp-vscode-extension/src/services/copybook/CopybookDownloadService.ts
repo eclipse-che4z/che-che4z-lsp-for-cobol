@@ -78,14 +78,17 @@ export class CopybookDownloadService {
     ) {
       return true;
     }
-    try {
-      const res = await this.downloadCopybooksinProcessorGroups(
+
+    const pgConfigs = (
+      await loadProcessorGroupCopybookPathsConfig({ scopeUri: documentUri }, [])
+    ).filter((config) => typeof config != "string");
+
+    if (pgConfigs.length > 0) {
+      return await this.downloadCopybooksinProcessorGroups(
         copybookName,
         documentUri,
+        pgConfigs,
       );
-      if (res) return res;
-    } catch (_error) {
-      return false;
     }
 
     if (this.dsnDownloader) {
@@ -508,63 +511,74 @@ export class CopybookDownloadService {
   async downloadCopybooksinProcessorGroups(
     copybookName: CopybookName,
     documentUri: string,
+    pgConfigs: (
+      | ZoweDatasetConfigModel
+      | ZoweUssConfigModel
+      | EndevorConfigModel
+    )[],
   ): Promise<boolean> {
-    const pgConfigs = (
-      await loadProcessorGroupCopybookPathsConfig({ scopeUri: documentUri }, [])
-    ).filter((config) => typeof config != "string");
-    if (pgConfigs.length < 1) return false;
-    for (const config of pgConfigs) {
-      if (DATASET in config && this.dsnDownloader) {
-        const dsnSuccess = await this.downloadFromPaths(
-          this.dsnDownloader,
-          copybookName,
-          documentUri,
-          [
-            {
-              path: config.dataset,
-              profile: config.profile ? config.profile : undefined,
-            },
-          ],
-        );
-        if (dsnSuccess) return true;
-      } else if (USS in config && this.ussDownloader) {
-        const ussSuccess = await this.downloadFromPaths(
-          this.ussDownloader,
-          copybookName,
-          documentUri,
-          [
-            {
-              path: config.uss,
-              profile: config.profile ? config.profile : undefined,
-            },
-          ],
-        );
-        if (ussSuccess) return true;
-      } else if (ENVIRONMENT in config && this.e4eDownloader) {
-        const resolvedProfile = await this.e4eDownloader.getProfileInfo(
-          config.profile,
-        );
-        const element: EndevorElement = {
-          use_map: config.use_map ? config.use_map : true,
-          environment: config.environment,
-          stage: config.stage,
-          system: config.system,
-          subsystem: config.subsystem,
-          type: config.type,
-          element: copybookName.name,
-          fingerprint: "",
-        };
-        if (
-          resolvedProfile &&
-          (await this.e4eDownloader?.downloadElementE4E(
-            resolvedProfile,
-            element,
-          ))
-        )
-          return true;
+    try {
+      for (const config of pgConfigs) {
+        if (DATASET in config && this.dsnDownloader) {
+          const dsnSuccess = await this.downloadFromPaths(
+            this.dsnDownloader,
+            copybookName,
+            documentUri,
+            [
+              {
+                path: config.dataset,
+                profile: config.profile ? config.profile : undefined,
+              },
+            ],
+          );
+          if (dsnSuccess) return true;
+        } else if (USS in config && this.ussDownloader) {
+          const ussSuccess = await this.downloadFromPaths(
+            this.ussDownloader,
+            copybookName,
+            documentUri,
+            [
+              {
+                path: config.uss,
+                profile: config.profile ? config.profile : undefined,
+              },
+            ],
+          );
+          if (ussSuccess) return true;
+        } else if (ENVIRONMENT in config && this.e4eDownloader) {
+          const resolvedProfile = await this.e4eDownloader.getProfileInfo(
+            config.profile,
+          );
+
+          const element: EndevorElement = {
+            use_map: config.use_map ? config.use_map : true,
+            environment: config.environment,
+            stage: config.stage,
+            system: config.system,
+            subsystem: config.subsystem,
+            type: config.type,
+            element: copybookName.name,
+            fingerprint: "",
+          };
+          if (
+            resolvedProfile &&
+            (await this.e4eDownloader.hasElement(
+              resolvedProfile,
+              element,
+              copybookName.name,
+            )) &&
+            (await this.e4eDownloader?.downloadElementE4E(
+              resolvedProfile,
+              element,
+            ))
+          )
+            return true;
+        }
       }
+    } catch (_error) {
+      return false;
     }
-    return true;
+    return false;
   }
 
   public reenableFailedRequests() {
