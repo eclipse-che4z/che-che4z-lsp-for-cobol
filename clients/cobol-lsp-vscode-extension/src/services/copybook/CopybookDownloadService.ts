@@ -512,9 +512,7 @@ export class CopybookDownloadService {
     const pgConfigs = (
       await loadProcessorGroupCopybookPathsConfig({ scopeUri: documentUri }, [])
     ).filter((config) => typeof config != "string");
-    if (!(Array.isArray(pgConfigs) && pgConfigs.length > 0)) {
-      return false;
-    }
+    if (pgConfigs.length < 1) return false;
     for (const config of pgConfigs) {
       if (DATASET in config && this.dsnDownloader) {
         const dsnSuccess = await this.downloadFromPaths(
@@ -566,7 +564,7 @@ export class CopybookDownloadService {
           return true;
       }
     }
-    return false;
+    return true;
   }
 
   public reenableFailedRequests() {
