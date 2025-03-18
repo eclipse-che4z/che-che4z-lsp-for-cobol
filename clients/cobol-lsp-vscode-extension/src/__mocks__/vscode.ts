@@ -228,6 +228,7 @@ export const languages = {
   registerCompletionItemProvider: jest.fn(),
   createDiagnosticCollection: jest.fn().mockReturnValue({
     clear: jest.fn(),
+    delete: jest.fn(),
   }),
 };
 

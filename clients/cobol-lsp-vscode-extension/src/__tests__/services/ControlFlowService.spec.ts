@@ -21,7 +21,16 @@ import {
 jest.mock("worker_threads", () => ({
   Worker: class {
     constructor(private path: string) {}
-    public on(_message: string, _listener: (value: unknown) => void) {}
+    public on(_message: string, listener: (value: unknown) => void) {
+      listener({
+        type: "result",
+        payload: {
+          graphs: [],
+          locations: [],
+          diagnostics: new Map(),
+        },
+      });
+    }
     public postMessage(_message: unknown) {}
   },
 }));
@@ -72,5 +81,9 @@ describe("ControlFlowService tests", () => {
     const queueAnalysis = jest.spyOn(service, "queueAnalysis");
     await service.handleControlFlowAst(apiResult);
     expect(queueAnalysis).toHaveBeenCalled();
+  });
+
+  test("Build queued for analysis", async () => {
+    const service = new ControlFlowAnalysisService();
   });
 });
