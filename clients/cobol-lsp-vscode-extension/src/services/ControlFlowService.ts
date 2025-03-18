@@ -57,6 +57,7 @@ interface AnalysisServiceDelegate {
 
 type LatestResultData = {
   resolve: (value: AnalysisResult | PromiseLike<AnalysisResult>) => void;
+  reject: () => void;
   promise: Promise<AnalysisResult>;
   resolved: boolean;
   requestVersion: number;
@@ -137,9 +138,14 @@ export class ControlFlowAnalysisService implements AnalysisServiceDelegate {
   }
 
   public async invalidate(documentUri: string) {
+    const latestResult = this.latestResults.get(documentUri);
+    if (latestResult) {
+      this.latestResults.delete(documentUri);
+      latestResult.reject();
+    }
     const task = this.tasks.get(documentUri);
-    this.latestResults.delete(documentUri);
     if (task) {
+      this.tasks.delete(documentUri);
       await task.abort();
     }
   }
@@ -220,12 +226,16 @@ export class ControlFlowAnalysisService implements AnalysisServiceDelegate {
     let res: (
       value: AnalysisResult | PromiseLike<AnalysisResult>,
     ) => void = () => {};
-    const prom = new Promise<AnalysisResult>((r, __e) => {
+    let reject: (reason?: unknown) => void = () => {};
+
+    const prom = new Promise<AnalysisResult>((r, e) => {
       res = r;
+      reject = e;
     });
 
     const promiseWithResolver: LatestResultData = {
       resolve: res,
+      reject: reject,
       promise: prom,
       resolved: false,
       requestVersion: requestVersion,
