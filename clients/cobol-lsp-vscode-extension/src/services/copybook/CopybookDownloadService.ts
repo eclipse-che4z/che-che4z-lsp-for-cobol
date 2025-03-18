@@ -184,17 +184,23 @@ export class CopybookDownloadService {
       );
       return copybookUri?.toString();
     }
-    const procGroupResult = await searchCopybookinProcessorGroups(
-      documentUri,
-      copybookName,
-      this.storagePath,
-      this.e4eDownloader,
-      this.dsnDownloader,
-      this.ussDownloader,
+    const pgConfigs = await loadProcessorGroupCopybookPathsConfig(
+      { scopeUri: documentUri },
+      [],
     );
-    if (procGroupResult && typeof procGroupResult != "boolean")
-      return procGroupResult.toString();
-    else if (procGroupResult) return;
+    if (pgConfigs.length > 0) {
+      return (
+        await searchCopybookinProcessorGroups(
+          documentUri,
+          copybookName,
+          this.storagePath,
+          pgConfigs,
+          this.e4eDownloader,
+          this.dsnDownloader,
+          this.ussDownloader,
+        )
+      )?.toString();
+    }
 
     const result = await searchCopybook(
       documentUri,
@@ -590,18 +596,17 @@ async function searchCopybookinProcessorGroups(
   documentUri: string,
   copybookName: string,
   storagePath: string,
+  pgConfigs: (
+    | string
+    | ZoweDatasetConfigModel
+    | ZoweUssConfigModel
+    | EndevorConfigModel
+  )[],
   e4eDownloader?: CopybookDownloaderForE4E,
   dsnDownloader?: CopybookDownloaderForDsn,
   ussDownloader?: CopybookDownloaderForUss,
-): Promise<boolean | vscode.Uri> {
+): Promise<vscode.Uri | undefined> {
   let result: vscode.Uri | undefined;
-  const pgConfigs = await loadProcessorGroupCopybookPathsConfig(
-    { scopeUri: documentUri },
-    [],
-  );
-  if (pgConfigs.length < 1) {
-    return false;
-  }
 
   for (const config of pgConfigs) {
     let shouldFound = false;
@@ -665,9 +670,6 @@ async function searchCopybookinProcessorGroups(
     );
     if (typeof config === "string" && !result) continue;
 
-    if (result) return result;
-    if (shouldFound) return true;
+    if (result || shouldFound) return result;
   }
-
-  return true;
 }
