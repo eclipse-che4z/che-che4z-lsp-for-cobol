@@ -277,18 +277,26 @@ function selectProcessorGroup(
     : b4g.elements[selectedElement].processorGroup;
 }
 
-async function loadProcessorGroupSettings<T extends string | string[]>(
+type AttributeTypes = {
+  libs: (
+    | string
+    | ZoweDatasetConfigModel
+    | ZoweUssConfigModel
+    | EndevorConfigModel
+  )[];
+  name: string;
+  "target-sql-backend": string;
+  "compiler-options": string;
+  "copybook-file-encoding": string;
+  "copybook-extensions": string[];
+};
+
+async function loadProcessorGroupSettings<A extends keyof AttributeTypes>(
   documentUri: string,
-  atrtibute:
-    | "libs"
-    | "name"
-    | "target-sql-backend"
-    | "compiler-options"
-    | "copybook-file-encoding"
-    | "copybook-extensions",
-  configObject: T,
+  attribute: A,
+  configObject: AttributeTypes[A],
   dialect: string = "COBOL",
-): Promise<T> {
+): Promise<AttributeTypes[A]> {
   const docURI = Uri.parse(documentUri);
   const pgCfg: ProcessorGroup | undefined = loadProcessorsConfigForDocument(
     documentUri,
@@ -306,14 +314,14 @@ async function loadProcessorGroupSettings<T extends string | string[]>(
           pp &&
           typeof pp === "object" &&
           pp["name"] === dialect &&
-          pp[atrtibute] !== undefined
+          pp[attribute] !== undefined
         ) {
-          return pp[atrtibute] as T;
+          return pp[attribute] as AttributeTypes[A];
         }
       }
     } else {
-      if (pgCfg[atrtibute] !== undefined) {
-        return pgCfg[atrtibute] as T;
+      if (pgCfg[attribute] !== undefined) {
+        return pgCfg[attribute] as AttributeTypes[A];
       }
     }
 
