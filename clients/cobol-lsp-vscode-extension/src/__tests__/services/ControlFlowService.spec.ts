@@ -82,8 +82,4 @@ describe("ControlFlowService tests", () => {
     await service.handleControlFlowAst(apiResult);
     expect(queueAnalysis).toHaveBeenCalled();
   });
-
-  test("Build queued for analysis", async () => {
-    const service = new ControlFlowAnalysisService();
-  });
 });
