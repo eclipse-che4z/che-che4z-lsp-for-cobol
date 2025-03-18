@@ -57,7 +57,7 @@ interface AnalysisServiceDelegate {
 
 type LatestResultData = {
   resolve: (value: AnalysisResult | PromiseLike<AnalysisResult>) => void;
-  reject: () => void;
+  reject: (reason: string) => void;
   promise: Promise<AnalysisResult>;
   resolved: boolean;
   requestVersion: number;
@@ -74,6 +74,10 @@ class AnalysisTask {
     private mainChannel?: vscode.OutputChannel,
     private logChannel?: vscode.LogOutputChannel,
   ) {
+    this.logChannel?.debug(
+      `Create new task with request version: ${requestVersion}`,
+    );
+
     this.worker.on("message", (data: WorkerResultMessage) => {
       if (data.type === "result") {
         this.delegate.finishTask(
@@ -141,7 +145,7 @@ export class ControlFlowAnalysisService implements AnalysisServiceDelegate {
     const latestResult = this.latestResults.get(documentUri);
     if (latestResult) {
       this.latestResults.delete(documentUri);
-      latestResult.reject();
+      latestResult.reject("invalidate");
     }
     const task = this.tasks.get(documentUri);
     if (task) {
@@ -175,6 +179,8 @@ export class ControlFlowAnalysisService implements AnalysisServiceDelegate {
   }
 
   queueAnalysis(programs: Program[], documentUri: string) {
+    this.logChannel?.debug("Queue Analysis");
+
     ControlFlowAnalysisService.requestVersion++;
 
     const latestResult = this.latestResults.get(documentUri);
@@ -205,7 +211,15 @@ export class ControlFlowAnalysisService implements AnalysisServiceDelegate {
     diagnostics: Map<string, vscode.Diagnostic[]>,
     requestVersion: number,
   ): void {
+    this.logChannel?.debug(
+      `Finish task for request version: ${requestVersion}`,
+    );
+
     const result = this.latestResults.get(documentUri);
+    this.logChannel?.debug(
+      `Latest result request version: ${result?.requestVersion}`,
+    );
+
     if (requestVersion === result?.requestVersion) {
       result.resolved = true;
       result.resolve({
@@ -223,6 +237,10 @@ export class ControlFlowAnalysisService implements AnalysisServiceDelegate {
     documentUri: string,
     requestVersion: number,
   ): Promise<AnalysisResult> {
+    this.logChannel?.debug(
+      `Create a promise with request version: ${requestVersion}`,
+    );
+
     let res: (
       value: AnalysisResult | PromiseLike<AnalysisResult>,
     ) => void = () => {};
