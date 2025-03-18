@@ -51,6 +51,7 @@ interface AnalysisServiceDelegate {
     graphs: GraphDTO[],
     locations: string[],
     diagnostics: Map<string, vscode.Diagnostic[]>,
+    requestVersion: number,
   ): void;
 }
 
@@ -58,6 +59,7 @@ type LatestResultData = {
   resolve: (value: AnalysisResult | PromiseLike<AnalysisResult>) => void;
   promise: Promise<AnalysisResult>;
   resolved: boolean;
+  requestVersion: number;
 };
 
 class AnalysisTask {
@@ -66,6 +68,7 @@ class AnalysisTask {
   constructor(
     private documentUri: string,
     public programs: Program[],
+    public requestVersion: number,
     private delegate: AnalysisServiceDelegate,
     private mainChannel?: vscode.OutputChannel,
     private logChannel?: vscode.LogOutputChannel,
@@ -77,6 +80,7 @@ class AnalysisTask {
           data.payload.graphs,
           data.payload.locations,
           convertDiagnostics(data.payload.diagnostics),
+          this.requestVersion,
         );
       } else if (data.type === "log") {
         for (const message of data.payload) {
@@ -101,7 +105,7 @@ class AnalysisTask {
       this.mainChannel?.appendLine(
         `Error starting Control Flow Analysis: ${code}`,
       );
-      this.delegate.finishTask(this.documentUri, [], [], new Map());
+      this.delegate.finishTask(this.documentUri, [], [], new Map(), 0);
     });
 
     this.worker.postMessage({
@@ -120,6 +124,7 @@ export class ControlFlowAnalysisService implements AnalysisServiceDelegate {
   private tasks: Map<string, AnalysisTask>;
   private latestResults: Map<string, LatestResultData>;
   private diagnosticService: DiagnosticService;
+  private static requestVersion: number;
 
   public constructor(
     private mainChannel?: vscode.OutputChannel,
@@ -128,6 +133,7 @@ export class ControlFlowAnalysisService implements AnalysisServiceDelegate {
     this.tasks = new Map<string, AnalysisTask>();
     this.diagnosticService = new DiagnosticService();
     this.latestResults = new Map<string, LatestResultData>();
+    ControlFlowAnalysisService.requestVersion = 1;
   }
 
   public async invalidate(documentUri: string) {
@@ -143,7 +149,7 @@ export class ControlFlowAnalysisService implements AnalysisServiceDelegate {
     if (latestResult) {
       return latestResult.promise;
     } else {
-      return this.createLatestResultPromise(documentUri);
+      return this.createLatestResultPromise(documentUri, 0);
     }
   }
 
@@ -163,14 +169,22 @@ export class ControlFlowAnalysisService implements AnalysisServiceDelegate {
   }
 
   queueAnalysis(programs: Program[], documentUri: string) {
+    ControlFlowAnalysisService.requestVersion++;
+
     const latestResult = this.latestResults.get(documentUri);
     if (latestResult?.resolved || !latestResult) {
-      void this.createLatestResultPromise(documentUri);
+      void this.createLatestResultPromise(
+        documentUri,
+        ControlFlowAnalysisService.requestVersion,
+      );
+    } else {
+      latestResult.requestVersion = ControlFlowAnalysisService.requestVersion;
     }
 
     const task = new AnalysisTask(
       documentUri,
       programs,
+      ControlFlowAnalysisService.requestVersion,
       this,
       this.mainChannel,
       this.logChannel,
@@ -183,9 +197,10 @@ export class ControlFlowAnalysisService implements AnalysisServiceDelegate {
     graphs: GraphDTO[],
     locations: string[],
     diagnostics: Map<string, vscode.Diagnostic[]>,
+    requestVersion: number,
   ): void {
     const result = this.latestResults.get(documentUri);
-    if (result) {
+    if (requestVersion === result?.requestVersion) {
       result.resolved = true;
       result.resolve({
         documentUri: documentUri,
@@ -200,6 +215,7 @@ export class ControlFlowAnalysisService implements AnalysisServiceDelegate {
 
   private createLatestResultPromise(
     documentUri: string,
+    requestVersion: number,
   ): Promise<AnalysisResult> {
     let res: (
       value: AnalysisResult | PromiseLike<AnalysisResult>,
@@ -208,10 +224,11 @@ export class ControlFlowAnalysisService implements AnalysisServiceDelegate {
       res = r;
     });
 
-    const promiseWithResolver = {
+    const promiseWithResolver: LatestResultData = {
       resolve: res,
       promise: prom,
       resolved: false,
+      requestVersion: requestVersion,
     };
     this.latestResults.set(documentUri, promiseWithResolver);
     return prom;
