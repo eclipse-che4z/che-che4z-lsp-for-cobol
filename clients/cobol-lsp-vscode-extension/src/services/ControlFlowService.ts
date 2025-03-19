@@ -144,21 +144,8 @@ export class ControlFlowAnalysisService implements AnalysisServiceDelegate {
   public async invalidate(documentUri: string, rejectPromise: boolean) {
     this.logChannel?.debug(`Invalidate document: ${documentUri}`);
 
-    const latestResult = this.latestResults.get(documentUri);
-    if (latestResult) {
-      if (rejectPromise) {
-        this.latestResults.delete(documentUri);
-        latestResult.reject("invalidate");
-      } else {
-        latestResult.requestVersion = 0;
-      }
-    }
-    const task = this.tasks.get(documentUri);
-    if (task) {
-      this.logChannel?.debug(`Stop task for the document: ${documentUri}`);
-      this.tasks.delete(documentUri);
-      await task.abort();
-    }
+    this.invalidatePromise(documentUri, rejectPromise);
+    await this.removeTask(documentUri);
   }
 
   public async getAnalysis(documentUri: string): Promise<AnalysisResult> {
@@ -183,10 +170,11 @@ export class ControlFlowAnalysisService implements AnalysisServiceDelegate {
   async handleControlFlowAst(result: ApiResult) {
     this.logChannel?.debug("Handle AST from backend");
     if (result.documentUri) {
-      await this.invalidate(result.documentUri, false);
+      this.invalidatePromise(result.documentUri, false);
       if (result.controlFlowAST.length > 0) {
         this.queueAnalysis(result.controlFlowAST, result.documentUri);
       }
+      await this.removeTask(result.documentUri);
     }
   }
 
@@ -273,6 +261,27 @@ export class ControlFlowAnalysisService implements AnalysisServiceDelegate {
     };
     this.latestResults.set(documentUri, promiseWithResolver);
     return prom;
+  }
+
+  private invalidatePromise(documentUri: string, rejectPromise: boolean) {
+    const latestResult = this.latestResults.get(documentUri);
+    if (latestResult) {
+      if (rejectPromise) {
+        this.latestResults.delete(documentUri);
+        latestResult.reject("invalidate");
+      } else {
+        latestResult.requestVersion = 0;
+      }
+    }
+  }
+
+  private async removeTask(documentUri: string) {
+    const task = this.tasks.get(documentUri);
+    if (task) {
+      this.logChannel?.debug(`Stop task for the document: ${documentUri}`);
+      this.tasks.delete(documentUri);
+      await task.abort();
+    }
   }
 }
 
