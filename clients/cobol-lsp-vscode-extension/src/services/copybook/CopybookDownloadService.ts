@@ -557,7 +557,7 @@ export class CopybookDownloadService {
           );
 
           const element: EndevorElement = {
-            use_map: config.use_map ? config.use_map : true,
+            use_map: config.use_map === false ? false : true,
             environment: config.environment,
             stage: config.stage,
             system: config.system,
@@ -614,11 +614,7 @@ async function searchCopybookinProcessorGroups(
     let folders: string = "";
     if (typeof config === "string") {
       folders = config;
-    } else if (
-      typeof config === "object" &&
-      ENVIRONMENT in config &&
-      e4eDownloader
-    ) {
+    } else if (ENVIRONMENT in config && e4eDownloader) {
       const endevorType = DownloadUtil.endevorConfigToType(config);
       const profile = await e4eDownloader.getProfileInfo(config.profile);
       if (!profile) continue;
@@ -635,7 +631,7 @@ async function searchCopybookinProcessorGroups(
         E4E_FOLDER,
       ).fsPath;
       shouldFound = true;
-    } else if (typeof config === "object" && DATASET in config) {
+    } else if (DATASET in config) {
       const has = await dsnDownloader?.hasMember(
         config.profile ? config.profile : SettingsService.getProfileName()!,
         config.dataset,
@@ -648,7 +644,7 @@ async function searchCopybookinProcessorGroups(
         storagePath,
       ).fsPath;
       shouldFound = true;
-    } else if (typeof config === "object" && USS in config) {
+    } else if (USS in config) {
       const has = await ussDownloader?.hasMember(
         config.profile ? config.profile : SettingsService.getProfileName()!,
         config.uss,

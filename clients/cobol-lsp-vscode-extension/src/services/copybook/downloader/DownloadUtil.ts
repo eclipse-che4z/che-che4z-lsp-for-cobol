@@ -248,7 +248,7 @@ export class DownloadUtil {
   }
   public static endevorConfigToType(config: EndevorConfigModel): EndevorType {
     return {
-      use_map: config.use_map ? config.use_map : true,
+      use_map: config.use_map === false ? false : true,
       environment: config.environment,
       stage: config.stage,
       system: config.system,
