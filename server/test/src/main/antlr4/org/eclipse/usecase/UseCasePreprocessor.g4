@@ -17,7 +17,7 @@ grammar UseCasePreprocessor;
 
 startRule
    : .*? ((copybookStatement | functionDefinition | variableStatement | functionUsage | paragraphStatement | sectionStatement | subroutineStatement
-   | constantStatement | errorStatement | multiTokenError | linkageSection | linkageSection | endDeclaratives | procedureDivision | NEWLINE)+ .*?)+ EOF
+   | constantStatement | errorStatement | multiTokenError | linkageSection | endDeclaratives | procedureDivision | NEWLINE)+ .*?)+ EOF
    ;
 
 procedureDivision
@@ -84,7 +84,8 @@ constantUsage
    ;
 
 paragraphStatement
-   : (paragraphUsage (INOF sectionUsage)?| paragraphDefinition) diagnostic* STOP
+   : (paragraphUsage (INOF sectionUsage STOP)?
+   | paragraphDefinition) diagnostic* STOP
    ;
 
 sectionStatement
@@ -139,7 +140,6 @@ cpyIdentifier
 
 cpyName
    : IDENTIFIER | COPYBOOKNAME | QUOTED_COPYBOOKNAME | STRINGLITERAL | NUMBERLITERAL | LINKAGE | SECTION
-   | LINKAGE
    ;
 
 cpyDialect
@@ -171,8 +171,8 @@ MULTITOKENSTART : START '_';
 MULTITOKENSTOP : '_' STOP;
 FUNCTIONDEFINITION : START '$$*';
 FUNCTIONUSAGE : START '$$';
-END_DECLARATIVES : E N D (WS | NEWLINE) D E C L A R A T I V E S;
-PROCEDURE_DIVISION: P R O C E D U R E (WS | NEWLINE) D I V I S I O N;
+END_DECLARATIVES : E N D (WS | NEWLINE)+ D E C L A R A T I V E S;
+PROCEDURE_DIVISION: P R O C E D U R E (WS | NEWLINE)+ D I V I S I O N;
 DOT : '.';
 
 NUMBERLITERAL : [\-+0-9.,]+;
