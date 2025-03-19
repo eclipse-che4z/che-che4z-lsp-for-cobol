@@ -581,7 +581,8 @@ export class CopybookDownloadService {
             return true;
         }
       }
-    } catch (_error) {
+    } catch (error) {
+      this.outputChannel?.appendLine(getErrorMessage(error));
       return false;
     }
     return false;
