@@ -129,7 +129,7 @@ export class ControlFlowAnalysisService implements AnalysisServiceDelegate {
   private tasks: Map<string, AnalysisTask>;
   private latestResults: Map<string, LatestResultData>;
   private diagnosticService: DiagnosticService;
-  private requestVersion: number;
+  private requestVersion: number = 0;
 
   public constructor(
     private mainChannel?: vscode.OutputChannel,
@@ -138,7 +138,7 @@ export class ControlFlowAnalysisService implements AnalysisServiceDelegate {
     this.tasks = new Map<string, AnalysisTask>();
     this.diagnosticService = new DiagnosticService();
     this.latestResults = new Map<string, LatestResultData>();
-    ControlFlowAnalysisService.requestVersion = 1;
+    this.requestVersion = 1;
   }
 
   public async invalidate(documentUri: string, rejectPromise: boolean) {
@@ -193,22 +193,22 @@ export class ControlFlowAnalysisService implements AnalysisServiceDelegate {
   queueAnalysis(programs: Program[], documentUri: string) {
     this.logChannel?.debug("Queue Analysis");
 
-    ControlFlowAnalysisService.requestVersion++;
+    this.requestVersion++;
 
     const latestResult = this.latestResults.get(documentUri);
     if (latestResult?.resolved || !latestResult) {
       void this.createLatestResultPromise(
         documentUri,
-        ControlFlowAnalysisService.requestVersion,
+        this.requestVersion,
       );
     } else {
-      latestResult.requestVersion = ControlFlowAnalysisService.requestVersion;
+      latestResult.requestVersion = this.requestVersion;
     }
 
     const task = new AnalysisTask(
       documentUri,
       programs,
-      ControlFlowAnalysisService.requestVersion,
+      this.requestVersion,
       this,
       this.mainChannel,
       this.logChannel,
