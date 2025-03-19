@@ -213,18 +213,19 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
   public void exitParagraphStatement(ParagraphStatementContext ctx) {
     pop();
     ParagraphUsageContext p = ctx.paragraphUsage();
-    if (p != null && p.paragraph != null) {
-      String section = p.section == null
+    if (p != null) {
+      String section = ctx.sectionUsage() == null
               ? null
-              : getReplacementText(p.section.identifier().getText(), p.section.replacement()).get(0);
+              : getReplacementText(ctx.sectionUsage().word().identifier().getText(),
+                      ctx.sectionUsage().word().replacement()).get(0);
 
       processProcedureToken(
-              p.paragraph.identifier().getText(),
-              ctx, p.paragraph.replacement(),
+              p.word().identifier().getText(),
+              ctx, p.word().replacement(),
               procedureUsages,
               ctx.diagnostic(),
               new ProcedureId(section,
-                      getReplacementText(p.paragraph.getText(), p.paragraph.replacement()).get(0).toUpperCase()));
+                      getReplacementText(p.word().getText(), p.word().replacement()).get(0).toUpperCase()));
     }
     ParagraphDefinitionContext value = ctx.paragraphDefinition();
     if (value != null && value.word() != null) {
