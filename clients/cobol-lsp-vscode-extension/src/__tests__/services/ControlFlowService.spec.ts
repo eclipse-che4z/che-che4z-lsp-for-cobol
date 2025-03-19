@@ -76,6 +76,7 @@ jest.mock("worker_threads", () => ({
       });
     }
     public postMessage(_message: unknown) {}
+    public terminate() {}
   },
 }));
 
@@ -85,6 +86,16 @@ describe("ControlFlowService tests", () => {
     const queueAnalysis = jest.spyOn(service, "queueAnalysis");
     await service.handleControlFlowAst(apiResult);
     expect(queueAnalysis).toHaveBeenCalled();
+  });
+
+  test("Test invalidate", async () => {
+    const service = new ControlFlowAnalysisService();
+    await service.handleControlFlowAst(apiResult);
+
+    const latestResults = service["latestResults"];
+    expect(latestResults.size).toBe(1);
+
+    await service.invalidate("documentUri", true);
   });
 });
 

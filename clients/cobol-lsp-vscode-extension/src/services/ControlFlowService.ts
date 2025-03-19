@@ -197,10 +197,7 @@ export class ControlFlowAnalysisService implements AnalysisServiceDelegate {
 
     const latestResult = this.latestResults.get(documentUri);
     if (latestResult?.resolved || !latestResult) {
-      void this.createLatestResultPromise(
-        documentUri,
-        this.requestVersion,
-      );
+      void this.createLatestResultPromise(documentUri, this.requestVersion);
     } else {
       latestResult.requestVersion = this.requestVersion;
     }
