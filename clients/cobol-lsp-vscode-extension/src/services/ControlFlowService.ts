@@ -129,7 +129,7 @@ export class ControlFlowAnalysisService implements AnalysisServiceDelegate {
   private tasks: Map<string, AnalysisTask>;
   private latestResults: Map<string, LatestResultData>;
   private diagnosticService: DiagnosticService;
-  private static requestVersion: number;
+  private requestVersion: number;
 
   public constructor(
     private mainChannel?: vscode.OutputChannel,
