@@ -171,10 +171,11 @@ export class ControlFlowAnalysisService implements AnalysisServiceDelegate {
     this.logChannel?.debug("Handle AST from backend");
     if (result.documentUri) {
       this.invalidatePromise(result.documentUri, false);
+      const removal = this.removeTask(result.documentUri);
       if (result.controlFlowAST.length > 0) {
         this.queueAnalysis(result.controlFlowAST, result.documentUri);
       }
-      await this.removeTask(result.documentUri);
+      await removal;
     }
   }
 
