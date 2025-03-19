@@ -17,9 +17,15 @@ grammar UseCasePreprocessor;
 
 startRule
    : .*? ((copybookStatement | functionDefinition | variableStatement | functionUsage | paragraphStatement | sectionStatement | subroutineStatement
-   | constantStatement | errorStatement | multiTokenError | linkageSection | NEWLINE)+ .*?)+ EOF
+   | constantStatement | errorStatement | multiTokenError | linkageSection | linkageSection | endDeclaratives | procedureDivision | NEWLINE)+ .*?)+ EOF
    ;
 
+procedureDivision
+   : PROCEDURE_DIVISION
+   ;
+endDeclaratives
+   : END_DECLARATIVES DOT
+   ;
 multiTokenError
    : MULTITOKENSTART multiToken diagnostic* MULTITOKENSTOP
    ;
@@ -78,7 +84,7 @@ constantUsage
    ;
 
 paragraphStatement
-   : (paragraphUsage | paragraphDefinition) diagnostic* STOP
+   : (paragraphUsage (INOF sectionUsage)?| paragraphDefinition) diagnostic* STOP
    ;
 
 sectionStatement
@@ -86,7 +92,7 @@ sectionStatement
    ;
 
 paragraphUsage
-   : PARAGRPHUSAGE (paragraph=word INOF section=word | paragraph=word)
+   : PARAGRPHUSAGE word
    ;
 
 paragraphDefinition
@@ -123,7 +129,8 @@ replacement
    ;
 
 identifier
-   : (IDENTIFIER | NUMBERLITERAL | LINKAGE | SECTION | DOT | INOF |STRINGLITERAL | TEXT)+
+   : (IDENTIFIER | NUMBERLITERAL | LINKAGE | SECTION | DOT | INOF | STRINGLITERAL | PROCEDURE_DIVISION
+     | END_DECLARATIVES | TEXT)+
    ;
 
 cpyIdentifier
@@ -164,6 +171,8 @@ MULTITOKENSTART : START '_';
 MULTITOKENSTOP : '_' STOP;
 FUNCTIONDEFINITION : START '$$*';
 FUNCTIONUSAGE : START '$$';
+END_DECLARATIVES : E N D (WS | NEWLINE) D E C L A R A T I V E S;
+PROCEDURE_DIVISION: P R O C E D U R E (WS | NEWLINE) D I V I S I O N;
 DOT : '.';
 
 NUMBERLITERAL : [\-+0-9.,]+;
