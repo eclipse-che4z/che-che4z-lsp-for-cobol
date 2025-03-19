@@ -138,7 +138,6 @@ export class ControlFlowAnalysisService implements AnalysisServiceDelegate {
     this.tasks = new Map<string, AnalysisTask>();
     this.diagnosticService = new DiagnosticService();
     this.latestResults = new Map<string, LatestResultData>();
-    this.requestVersion = 1;
   }
 
   public async invalidate(documentUri: string, rejectPromise: boolean) {
