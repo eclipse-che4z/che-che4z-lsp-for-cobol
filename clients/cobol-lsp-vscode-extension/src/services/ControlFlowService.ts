@@ -63,7 +63,7 @@ type LatestResultData = {
   requestVersion: number;
 };
 
-class AnalysisTask {
+export class AnalysisTask {
   private worker: Worker = new Worker(join(__dirname, "./Worker.js"));
 
   constructor(
@@ -141,20 +141,31 @@ export class ControlFlowAnalysisService implements AnalysisServiceDelegate {
     ControlFlowAnalysisService.requestVersion = 1;
   }
 
-  public async invalidate(documentUri: string) {
+  public async invalidate(documentUri: string, rejectPromise: boolean) {
+    this.logChannel?.debug(`Invalidate document: ${documentUri}`);
+
     const latestResult = this.latestResults.get(documentUri);
     if (latestResult) {
-      this.latestResults.delete(documentUri);
-      latestResult.reject("invalidate");
+      if (rejectPromise) {
+        this.latestResults.delete(documentUri);
+        latestResult.reject("invalidate");
+      } else {
+        latestResult.requestVersion = 0;
+      }
     }
     const task = this.tasks.get(documentUri);
     if (task) {
+      this.logChannel?.debug(`Stop task for the document: ${documentUri}`);
       this.tasks.delete(documentUri);
       await task.abort();
     }
   }
 
-  public getAnalysis(documentUri: string): Promise<AnalysisResult> {
+  public async getAnalysis(documentUri: string): Promise<AnalysisResult> {
+    this.logChannel?.debug(
+      `Get analysis request for the document: ${documentUri}`,
+    );
+
     const latestResult = this.latestResults.get(documentUri);
     if (latestResult) {
       return latestResult.promise;
@@ -163,19 +174,20 @@ export class ControlFlowAnalysisService implements AnalysisServiceDelegate {
     }
   }
 
-  public async handleControlFlowAst(result: ApiResult) {
-    if (result.documentUri) {
-      await this.invalidate(result.documentUri);
-      if (result.controlFlowAST.length > 0) {
-        this.queueAnalysis(result.controlFlowAST, result.documentUri);
-      }
-    }
-  }
-
   public makeControlFlowAstNotificationHandler() {
     return (result: ApiResult) => {
       this.handleControlFlowAst(result).catch(() => {});
     };
+  }
+
+  async handleControlFlowAst(result: ApiResult) {
+    this.logChannel?.debug("Handle AST from backend");
+    if (result.documentUri) {
+      await this.invalidate(result.documentUri, false);
+      if (result.controlFlowAST.length > 0) {
+        this.queueAnalysis(result.controlFlowAST, result.documentUri);
+      }
+    }
   }
 
   queueAnalysis(programs: Program[], documentUri: string) {
@@ -221,6 +233,10 @@ export class ControlFlowAnalysisService implements AnalysisServiceDelegate {
     );
 
     if (requestVersion === result?.requestVersion) {
+      this.logChannel?.debug(
+        `Resolve promise for request version: ${result?.requestVersion}`,
+      );
+
       result.resolved = true;
       result.resolve({
         documentUri: documentUri,

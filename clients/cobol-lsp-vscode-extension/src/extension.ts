@@ -171,13 +171,13 @@ export async function activate(
 
   context.subscriptions.push(
     vscode.workspace.onDidChangeTextDocument((event) =>
-      analysisService.invalidate(event.document.uri.toString()),
+      analysisService.invalidate(event.document.uri.toString(), false),
     ),
   );
 
   context.subscriptions.push(
     vscode.workspace.onDidCloseTextDocument((document) =>
-      analysisService.invalidate(document.uri.toString()),
+      analysisService.invalidate(document.uri.toString(), true),
     ),
   );
 
