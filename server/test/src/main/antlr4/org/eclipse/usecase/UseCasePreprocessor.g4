@@ -31,8 +31,9 @@ multiTokenError
    ;
 
 multiToken
-   : (word | copybookStatement | variableStatement | functionUsage | paragraphStatement | sectionStatement | subroutineStatement
-   | constantStatement | errorStatement | multiTokenError | TEXT)+
+   : (word | copybookStatement | variableStatement | functionUsage | paragraphStatement | sectionStatement
+   | subroutineStatement | procedureDivision | endDeclaratives | constantStatement | errorStatement | multiTokenError
+   | TEXT)+
    ;
 
 linkageSection
@@ -130,8 +131,8 @@ replacement
    ;
 
 identifier
-   : (IDENTIFIER | NUMBERLITERAL | LINKAGE | SECTION | DOT | INOF | STRINGLITERAL | PROCEDURE_DIVISION
-     | END_DECLARATIVES | TEXT)+
+   : (IDENTIFIER | NUMBERLITERAL | LINKAGE | SECTION | DOT | INOF | STRINGLITERAL
+     | TEXT)+
    ;
 
 cpyIdentifier
