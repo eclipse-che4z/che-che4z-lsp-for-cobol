@@ -62,6 +62,18 @@ export class Logger implements Channel {
 
 function processMessage(message: WorkerMessage): void {
   const channel = new Logger();
+  if (message.vmCount === -1) {
+    postMessage({
+      type: "result",
+      payload: {
+        graphs: [],
+        locations: [],
+        diagnostics: new Map(),
+      },
+    });
+    return;
+  }
+
   try {
     const cfgBuilder = new ControlFlowGraphBuilder(
       message.vmCount,

@@ -29,7 +29,7 @@ suite("Integration Test Suite: Subroutines resolving", () => {
     const editor = helper.getEditor("CALL.cbl");
 
     await helper.waitFor(
-      () => vscode.languages.getDiagnostics(editor.document.uri).length === 2,
+      () => vscode.languages.getDiagnostics(editor.document.uri).length === 1,
     );
     helper.hasDiagnosticMatches(
       editor.document.uri,

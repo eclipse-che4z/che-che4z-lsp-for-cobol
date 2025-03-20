@@ -447,8 +447,7 @@ export class SettingsService {
   public static getMaxVMCount(): number {
     let maxCount: number =
       vscode.workspace.getConfiguration().get(SETTINGS_MAXIMUM_VM_COUNT) ?? 0;
-
-    if (maxCount <= 0) {
+    if (maxCount === 0) {
       maxCount = MAX_VM_COUNT;
     }
     return maxCount;

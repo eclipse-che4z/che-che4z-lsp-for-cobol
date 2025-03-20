@@ -118,10 +118,10 @@ suite("TF35623: Support for Replacing and Mapping statement", function () {
       "       IDENTIFICATION DIVISIO.",
     );
     await helper.waitFor(
-      () => vscode.languages.getDiagnostics(editor.document.uri).length === 2,
+      () => vscode.languages.getDiagnostics(editor.document.uri).length === 1,
     );
     const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
-    assert.strictEqual(diagnostics.length, 2);
+    assert.strictEqual(diagnostics.length, 1);
     helper.hasDiagnosticMatches(
       editor.document.uri,
       (d) => d.message === "Syntax error on 'DIVISIO' expected DIVISION",
