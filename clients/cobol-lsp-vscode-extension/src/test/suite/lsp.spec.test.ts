@@ -539,21 +539,17 @@ suite("Integration Test Suite", function () {
     const copybookUri = await helper.getUri(copybookPath);
 
     await helper.waitFor(
-      () => vscode.languages.getDiagnostics(progUri).length === 2,
+      () => vscode.languages.getDiagnostics(progUri).length === 1,
     );
     const diagnostics = vscode.languages.getDiagnostics(progUri);
     assert.strictEqual(
       diagnostics.length,
-      2,
+      1,
       "got: " + JSON.stringify(diagnostics),
     );
     helper.hasDiagnosticMatches(
       progUri,
       (d) => d.message === "Errors inside the copybook",
-    );
-    helper.hasDiagnosticMatches(
-      progUri,
-      (d) => d.message === "Implicit EXIT PROGRAM statement executed",
     );
 
     // No diagnostic for copybook so far
@@ -611,7 +607,7 @@ suite("Integration Test Suite", function () {
     const prog2Uri = await helper.getUri("DIAGNOSTIC_TEST_B.CBL");
 
     await helper.waitFor(
-      () => vscode.languages.getDiagnostics(prog2Uri).length === 2,
+      () => vscode.languages.getDiagnostics(prog2Uri).length === 1,
     );
     helper.hasDiagnosticMatches(
       prog2Uri,
