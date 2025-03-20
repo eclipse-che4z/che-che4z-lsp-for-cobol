@@ -31,38 +31,61 @@ import { GraphDTO } from "@code4z/analysis/lib/model/GraphDTO";
  * Control Flow Analysis callback
  */
 export interface ControlFlowAnalysisCallback {
-  (graphs: GraphDTO[]): void;
+  (graphs: GraphDTO[], locations: string[]): void;
 }
 
-export class ApiResult {
-  public controlFlowAST: Program[] = [];
-  public documentUri: string | undefined;
-}
+export type ApiResult = {
+  controlFlowAST: Program[];
+  documentUri: string;
+};
+
+export type AnalysisResult = {
+  documentUri: string;
+  graphs: GraphDTO[];
+  locations: string[];
+};
 
 interface AnalysisServiceDelegate {
   finishTask(
     documentUri: string,
     graphs: GraphDTO[],
+    locations: string[],
     diagnostics: Map<string, vscode.Diagnostic[]>,
+    requestVersion: number,
   ): void;
 }
 
-class AnalysisTask {
+type LatestResultData = {
+  resolve: (value: AnalysisResult | PromiseLike<AnalysisResult>) => void;
+  reject: (reason: string) => void;
+  promise: Promise<AnalysisResult>;
+  resolved: boolean;
+  requestVersion: number;
+};
+
+export class AnalysisTask {
   private worker: Worker = new Worker(join(__dirname, "./Worker.js"));
 
   constructor(
     private documentUri: string,
     public programs: Program[],
+    public requestVersion: number,
     private delegate: AnalysisServiceDelegate,
     private mainChannel?: vscode.OutputChannel,
     private logChannel?: vscode.LogOutputChannel,
   ) {
+    this.logChannel?.debug(
+      `Create new task with request version: ${requestVersion}`,
+    );
+
     this.worker.on("message", (data: WorkerResultMessage) => {
       if (data.type === "result") {
         this.delegate.finishTask(
           this.documentUri,
           data.payload.graphs,
+          data.payload.locations,
           convertDiagnostics(data.payload.diagnostics),
+          this.requestVersion,
         );
       } else if (data.type === "log") {
         for (const message of data.payload) {
@@ -87,6 +110,7 @@ class AnalysisTask {
       this.mainChannel?.appendLine(
         `Error starting Control Flow Analysis: ${code}`,
       );
+      this.delegate.finishTask(this.documentUri, [], [], new Map(), 0);
     });
 
     this.worker.postMessage({
@@ -103,22 +127,73 @@ class AnalysisTask {
 
 export class ControlFlowAnalysisService implements AnalysisServiceDelegate {
   private tasks: Map<string, AnalysisTask>;
-  private callbacks: Map<string, ControlFlowAnalysisCallback>;
+  private latestResults: Map<string, LatestResultData>;
   private diagnosticService: DiagnosticService;
+  private requestVersion: number = 1;
 
   public constructor(
     private mainChannel?: vscode.OutputChannel,
     private logChannel?: vscode.LogOutputChannel,
   ) {
     this.tasks = new Map<string, AnalysisTask>();
-    this.callbacks = new Map<string, ControlFlowAnalysisCallback>();
     this.diagnosticService = new DiagnosticService();
+    this.latestResults = new Map<string, LatestResultData>();
   }
 
-  public queueAnalysis(programs: Program[], documentUri: string) {
+  public async invalidate(documentUri: string, rejectPromise: boolean) {
+    this.logChannel?.debug(`Invalidate document: ${documentUri}`);
+
+    this.invalidatePromise(documentUri, rejectPromise);
+    await this.removeTask(documentUri);
+  }
+
+  public async getAnalysis(documentUri: string): Promise<AnalysisResult> {
+    this.logChannel?.debug(
+      `Get analysis request for the document: ${documentUri}`,
+    );
+
+    const latestResult = this.latestResults.get(documentUri);
+    if (latestResult) {
+      return latestResult.promise;
+    } else {
+      return this.createLatestResultPromise(documentUri, 0);
+    }
+  }
+
+  public makeControlFlowAstNotificationHandler() {
+    return (result: ApiResult) => {
+      this.handleControlFlowAst(result).catch(() => {});
+    };
+  }
+
+  async handleControlFlowAst(result: ApiResult) {
+    this.logChannel?.debug("Handle AST from backend");
+    if (result.documentUri) {
+      this.invalidatePromise(result.documentUri, false);
+      const removal = this.removeTask(result.documentUri);
+      if (result.controlFlowAST.length > 0) {
+        this.queueAnalysis(result.controlFlowAST, result.documentUri);
+      }
+      await removal;
+    }
+  }
+
+  queueAnalysis(programs: Program[], documentUri: string) {
+    this.logChannel?.debug("Queue Analysis");
+
+    this.requestVersion++;
+
+    const latestResult = this.latestResults.get(documentUri);
+    if (latestResult?.resolved || !latestResult) {
+      void this.createLatestResultPromise(documentUri, this.requestVersion);
+    } else {
+      latestResult.requestVersion = this.requestVersion;
+    }
+
     const task = new AnalysisTask(
       documentUri,
       programs,
+      this.requestVersion,
       this,
       this.mainChannel,
       this.logChannel,
@@ -126,52 +201,87 @@ export class ControlFlowAnalysisService implements AnalysisServiceDelegate {
     this.tasks.set(documentUri, task);
   }
 
-  public async cancelAnalysis(documentUri: string) {
-    const exitsing = this.tasks.get(documentUri);
-    if (exitsing) {
-      await exitsing.abort();
-    }
-  }
-
-  public addCallback(
-    documentUri: string,
-    listener: ControlFlowAnalysisCallback,
-  ) {
-    this.callbacks.set(documentUri, listener);
-  }
-
   finishTask(
     documentUri: string,
     graphs: GraphDTO[],
+    locations: string[],
     diagnostics: Map<string, vscode.Diagnostic[]>,
+    requestVersion: number,
   ): void {
-    this.diagnosticService.showAllDiagnostics(documentUri, diagnostics);
+    this.logChannel?.debug(
+      `Finish task for request version: ${requestVersion}`,
+    );
 
-    const callback = this.callbacks.get(documentUri);
-    if (callback) {
-      this.callbacks.delete(documentUri);
-      callback(graphs);
+    const result = this.latestResults.get(documentUri);
+    this.logChannel?.debug(
+      `Latest result request version: ${result?.requestVersion}`,
+    );
+
+    if (requestVersion === result?.requestVersion) {
+      this.logChannel?.debug(
+        `Resolve promise for request version: ${result?.requestVersion}`,
+      );
+
+      result.resolved = true;
+      result.resolve({
+        documentUri: documentUri,
+        graphs: graphs,
+        locations: locations,
+      });
     }
+
+    this.diagnosticService.showAllDiagnostics(documentUri, diagnostics);
     this.tasks.delete(documentUri);
   }
 
-  public async handleControlFlowAst(result: ApiResult) {
-    if (result.documentUri) {
-      await this.cancelAnalysis(result.documentUri);
-      if (result.controlFlowAST.length > 0) {
-        this.queueAnalysis(result.controlFlowAST, result.documentUri);
+  private createLatestResultPromise(
+    documentUri: string,
+    requestVersion: number,
+  ): Promise<AnalysisResult> {
+    this.logChannel?.debug(
+      `Create a promise with request version: ${requestVersion}`,
+    );
+
+    let res: (
+      value: AnalysisResult | PromiseLike<AnalysisResult>,
+    ) => void = () => {};
+    let reject: (reason?: unknown) => void = () => {};
+
+    const prom = new Promise<AnalysisResult>((r, e) => {
+      res = r;
+      reject = e;
+    });
+
+    const promiseWithResolver: LatestResultData = {
+      resolve: res,
+      reject: reject,
+      promise: prom,
+      resolved: false,
+      requestVersion: requestVersion,
+    };
+    this.latestResults.set(documentUri, promiseWithResolver);
+    return prom;
+  }
+
+  private invalidatePromise(documentUri: string, rejectPromise: boolean) {
+    const latestResult = this.latestResults.get(documentUri);
+    if (latestResult) {
+      if (rejectPromise) {
+        this.latestResults.delete(documentUri);
+        latestResult.reject("invalidate");
+      } else {
+        latestResult.requestVersion = 0;
       }
     }
   }
 
-  public static makeControlFlowAstNotificationHandler(
-    mainChannel?: vscode.OutputChannel,
-    logChannel?: vscode.LogOutputChannel,
-  ) {
-    const service = new ControlFlowAnalysisService(mainChannel, logChannel);
-    return (result: ApiResult) => {
-      service.handleControlFlowAst(result).catch(() => {});
-    };
+  private async removeTask(documentUri: string) {
+    const task = this.tasks.get(documentUri);
+    if (task) {
+      this.logChannel?.debug(`Stop task for the document: ${documentUri}`);
+      this.tasks.delete(documentUri);
+      await task.abort();
+    }
   }
 }
 

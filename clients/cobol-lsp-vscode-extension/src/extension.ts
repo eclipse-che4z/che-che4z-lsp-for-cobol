@@ -58,16 +58,21 @@ import {
 } from "./services/reporter";
 import { CopybooksCompletionProvider } from "./services/copybook/CopybooksCompletionProvider";
 import { SubroutinesCompletionsProvider } from "./services/subroutines/SubroutinesCompletionsProvider";
-import { ControlFlowAnalysisService } from "./services/ControlFlowService";
+import {
+  AnalysisResult,
+  ControlFlowAnalysisService,
+} from "./services/ControlFlowService";
 
 interface __AnalysisApi {
   analysis(uri: string, text: string, pos?: vscode.Position): Promise<unknown>;
+  getControlFlowAnalysis(documentUri: string): Promise<AnalysisResult>;
 }
 
 let languageClientService: LanguageClientService;
 let outputChannel: vscode.OutputChannel;
 let controlFlowChannel: vscode.LogOutputChannel;
-const API_VERSION: string = "1.0.0";
+let analysisService: ControlFlowAnalysisService;
+const API_VERSION: string = "1.0.1";
 
 async function initialize(context: vscode.ExtensionContext) {
   // We need lazy initialization to be able to mock this for unit testing
@@ -77,6 +82,10 @@ async function initialize(context: vscode.ExtensionContext) {
     { log: true },
   );
 
+  analysisService = new ControlFlowAnalysisService(
+    outputChannel,
+    controlFlowChannel,
+  );
   try {
     await vscode.workspace.fs.createDirectory(context.globalStorageUri);
   } catch (error) {
@@ -160,6 +169,18 @@ export async function activate(
     ),
   );
 
+  context.subscriptions.push(
+    vscode.workspace.onDidChangeTextDocument((event) =>
+      analysisService.invalidate(event.document.uri.toString(), false),
+    ),
+  );
+
+  context.subscriptions.push(
+    vscode.workspace.onDidCloseTextDocument((document) =>
+      analysisService.invalidate(document.uri.toString(), true),
+    ),
+  );
+
   configurationWatcher.watchConfigurationChanges();
 
   try {
@@ -201,10 +222,7 @@ export async function activate(
   );
   languageClientService.addNotificationHandler(
     "cfast/ready",
-    ControlFlowAnalysisService.makeControlFlowAstNotificationHandler(
-      outputChannel,
-      controlFlowChannel,
-    ),
+    analysisService.makeControlFlowAstNotificationHandler(),
   );
 
   await languageClientService.start();
@@ -235,6 +253,9 @@ export async function activate(
         text,
         pos || findPosition(uri),
       );
+    },
+    getControlFlowAnalysis(documentUri: string) {
+      return analysisService.getAnalysis(documentUri);
     },
   };
 }
