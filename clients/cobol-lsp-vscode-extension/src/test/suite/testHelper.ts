@@ -19,6 +19,7 @@ import * as t from "io-ts";
 import { isRight } from "fp-ts/Either";
 import { Predicate } from "fp-ts/lib/Predicate";
 import { listLocalCopybooks } from "../../services/copybook/LocalCopybooksService";
+import { listLocalSubroutines } from "../../services/subroutines/LocalSubroutinesService";
 
 export const TEST_TIMEOUT = 150000;
 
@@ -379,6 +380,7 @@ export async function triggerCompletionsAndWaitForResults() {
 
     // list copybooks to prefill copybooks cache
     await listLocalCopybooks(editor.document.uri.toString(), "COBOL");
+    await listLocalSubroutines();
 
     await vscode.commands.executeCommand(
       "editor.action.triggerSuggest",
