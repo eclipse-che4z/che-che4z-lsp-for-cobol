@@ -51,7 +51,7 @@ export class CopybookDownloaderForE4E {
   ) {}
 
   private E4EConfigs = new Map<string, Promise<e4eResponse | undefined>>();
-  private E4EProfiles = new Map<string, ResolvedProfile>();
+  private E4EProfiles = new Map<string, ResolvedProfile | undefined>();
   private E4EElements = new Map<string, EndevorElement[] | undefined>();
 
   public clearConfigs() {
@@ -362,10 +362,11 @@ export class CopybookDownloaderForE4E {
     const resolvedProfile = await this.e4e.getProfileInfo(partialProfile);
     if (resolvedProfile instanceof Error) {
       vscode.window.showErrorMessage(resolvedProfile.message);
-    } else {
-      this.E4EProfiles.set(profile, resolvedProfile);
-      return resolvedProfile;
+      this.E4EProfiles.set(profile, undefined);
+      return;
     }
+    this.E4EProfiles.set(profile, resolvedProfile);
+    return resolvedProfile;
   }
   public async hasElement(
     profile: ResolvedProfile,
