@@ -18,6 +18,7 @@ import { LANGUAGE_ID } from "../../constants";
 import * as t from "io-ts";
 import { isRight } from "fp-ts/Either";
 import { Predicate } from "fp-ts/lib/Predicate";
+import { listLocalCopybooks } from "../../services/copybook/LocalCopybooksService";
 
 export const TEST_TIMEOUT = 150000;
 
@@ -375,6 +376,9 @@ export async function triggerCompletionsAndWaitForResults() {
     if (!editor) {
       throw new Error("No active editor found");
     }
+
+    // list copybooks to prefill copybooks cache
+    await listLocalCopybooks(editor.document.uri.toString(), "COBOL");
 
     await vscode.commands.executeCommand(
       "editor.action.triggerSuggest",
