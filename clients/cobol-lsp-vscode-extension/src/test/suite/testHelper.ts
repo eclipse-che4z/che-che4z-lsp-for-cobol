@@ -395,7 +395,7 @@ export async function triggerCompletionsAndWaitForResults() {
     if (completions && completions.items.length > 0) {
       return completions;
     }
-    await sleep(100);
+    await sleep(1000);
   }
 }
 
