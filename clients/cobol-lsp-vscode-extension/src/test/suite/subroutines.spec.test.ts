@@ -49,6 +49,7 @@ suite("Integration Test Suite: Subroutines resolving", () => {
     const position = completions.items.findIndex((ci) => ci.label === "SUB1");
     await helper.executeCommandMultipleTimes("selectNextSuggestion", position);
     await vscode.commands.executeCommand("acceptSelectedSuggestion");
+    await helper.sleep(1000);
     const line = editor.document.lineAt(23).text.trim();
     assert.strictEqual(line, "CALL 'SUB1'.");
   });
