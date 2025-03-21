@@ -75,6 +75,8 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
   private final Map<String, Diagnostic> expectedDiagnostics;
   private final String dialectType;
 
+  private String currentSectionName = null;
+
   UseCasePreprocessorListener(
           CommonTokenStream tokens,
           String documentName,
@@ -210,6 +212,18 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
   }
 
   @Override
+  public void exitEndDeclaratives(EndDeclarativesContext ctx) {
+    super.exitEndDeclaratives(ctx);
+    currentSectionName = null;
+  }
+
+  @Override
+  public void exitProcedureDivision(ProcedureDivisionContext ctx) {
+    super.exitProcedureDivision(ctx);
+    currentSectionName = null;
+  }
+
+  @Override
   public void exitParagraphStatement(ParagraphStatementContext ctx) {
     pop();
     ParagraphUsageContext p = ctx.paragraphUsage();
@@ -235,7 +249,7 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
               ctx, it.replacement(),
               procedureDefinitions,
               ctx.diagnostic(),
-              new ProcedureId(null,
+              new ProcedureId(currentSectionName,
                       getReplacementText(it.identifier().getText(), it.replacement()).get(0).toUpperCase()));
     }
 }
@@ -298,8 +312,10 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
     SectionDefinitionContext sectionDefinition = ctx.sectionDefinition();
     if (sectionDefinition != null && sectionDefinition.word() != null) {
       WordContext word = sectionDefinition.word();
+      String sectionName = getReplacementText(word.getText(), word.replacement()).get(0).toUpperCase();
+      currentSectionName = sectionName;
       processProcedureToken(word.identifier().getText(), ctx, word.replacement(), procedureDefinitions, ctx.diagnostic(),
-              new ProcedureId(getReplacementText(word.getText(), word.replacement()).get(0).toUpperCase(), null));
+              new ProcedureId(sectionName, null));
     }
   }
 

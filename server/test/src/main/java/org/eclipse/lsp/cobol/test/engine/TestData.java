@@ -21,6 +21,8 @@ import org.eclipse.lsp.cobol.common.symbols.ProcedureId;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.Location;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -46,9 +48,13 @@ public class TestData {
   Map<String, List<Location>> functionUsages;
 
   Map<String, List<Location>> getParagraphDefinitions() {
-    return procedureDefinitions.entrySet().stream()
-            .filter(en -> !en.getKey().isSection()).collect(
-                    Collectors.toMap(en -> en.getKey().getParagraphName(), Map.Entry::getValue));
+      Map<String, List<Location>> result = new HashMap<>();
+      for (Map.Entry<ProcedureId, List<Location>> en : procedureDefinitions.entrySet()) {
+        if (!en.getKey().isSection()) {
+          result.computeIfAbsent(en.getKey().getParagraphName(), it -> new ArrayList<>()).addAll(en.getValue());
+        }
+      }
+      return result;
   }
   Map<String, List<Location>> getParagraphUsages() {
     return procedureUsages.entrySet().stream()
