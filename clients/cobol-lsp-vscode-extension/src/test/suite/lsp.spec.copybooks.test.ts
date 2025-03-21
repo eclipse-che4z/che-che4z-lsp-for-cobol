@@ -191,6 +191,8 @@ suite("Integration Test Suite: Copybooks", function () {
           );
         });
 
+        console.log(diagnostics);
+
         assert.strictEqual(
           diagnostics.filter((d) => d.message === "BOOK1N: Copybook not found")
             .length,
@@ -242,6 +244,9 @@ suite("Integration Test Suite: Copybooks", function () {
       const completions = await helper.triggerCompletionsAndWaitForResults();
       const position = completions.items.findIndex(
         (ci) => ci.label === "PAYLIB",
+      );
+      console.log(
+        `Position: ${position}, Completions: ${JSON.stringify(completions.items.slice(0, 10))}`,
       );
       await helper.executeCommandMultipleTimes(
         "selectNextSuggestion",
