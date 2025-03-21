@@ -239,10 +239,16 @@ suite("Integration Test Suite: Copybooks", function () {
       const editor = await helper.showDocument("USERC1N1.cbl");
       await helper.insertString(editor, helper.pos(19, 0), "       COPY PAY\n");
       helper.moveCursor(editor, helper.pos(19, 18));
-      await helper.triggerCompletionsAndWaitForResults();
-      await vscode.commands.executeCommand("acceptSelectedSuggestion");
+      const completions = await helper.triggerCompletionsAndWaitForResults();
+      const position = completions.items.findIndex(
+        (ci) => ci.label === "PAYLIB",
+      );
+      await helper.executeCommandMultipleTimes(
+        "selectNextSuggestion",
+        position,
+      );
 
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      await vscode.commands.executeCommand("acceptSelectedSuggestion");
       assert.strictEqual(editor.document.lineAt(19).text.trim(), "COPY PAYLIB");
     });
   });

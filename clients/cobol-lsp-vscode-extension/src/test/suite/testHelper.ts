@@ -152,7 +152,7 @@ export async function insertString(
     lines == 1 ? position.character + str.length : str_split[lines - 1].length,
   );
   editor.selection = new vscode.Selection(movePosition, movePosition);
-  await sleep(1000);
+  await sleep(300);
   return movePosition;
 }
 
@@ -399,6 +399,10 @@ export async function triggerCompletionsAndWaitForResults() {
       );
 
     if (completions && completions.items.length > 0) {
+      await vscode.commands.executeCommand(
+        "editor.action.triggerSuggest",
+        editor.document.uri,
+      );
       return completions;
     }
     await sleep(100);
