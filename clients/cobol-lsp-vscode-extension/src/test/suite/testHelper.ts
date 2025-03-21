@@ -152,7 +152,7 @@ export async function insertString(
     lines == 1 ? position.character + str.length : str_split[lines - 1].length,
   );
   editor.selection = new vscode.Selection(movePosition, movePosition);
-  await sleep(300);
+  await sleep(1000);
   return movePosition;
 }
 
