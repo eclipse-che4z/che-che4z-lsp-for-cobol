@@ -117,17 +117,18 @@ async function initialize(context: vscode.ExtensionContext) {
       if (api) copyBooksDownloader.e4eAppeared(api.api);
       else outputChannel.appendLine(E4E_INCOMPATIBLE);
     });
-  const middleware: Middleware = {};
-  middleware.executeCommand = (command, args, next) => {
-    if (command == "missing copybook") {
-      copyBooksDownloader.clearProfiles();
-    }
-    next(command, args);
-  };
+
   languageClientService = new LanguageClientService(
     outputChannel,
     context.globalStorageUri,
-    middleware,
+    {
+      executeCommand: (command, args, next) => {
+        if (command == "missing copybook") {
+          copyBooksDownloader.clearProfiles();
+        }
+        next(command, args);
+      },
+    },
   );
   const configurationWatcher = new ConfigurationWatcher();
 
