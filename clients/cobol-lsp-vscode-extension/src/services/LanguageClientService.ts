@@ -19,6 +19,7 @@ import * as vscode from "vscode";
 
 import {
   DidChangeConfigurationNotification,
+  ExecuteCommandMiddleware,
   GenericNotificationHandler,
   GenericRequestHandler,
   LanguageClient,
@@ -49,6 +50,7 @@ export class LanguageClientService {
   constructor(
     private outputChannel: vscode.OutputChannel,
     private storagePath: vscode.Uri,
+    private executeCommandMiddleware: ExecuteCommandMiddleware,
   ) {
     const ext = vscode.extensions.getExtension(extensionId)!;
     this.executablePath = join(
@@ -151,16 +153,7 @@ export class LanguageClientService {
 
   private createClientOptions(): LanguageClientOptions {
     return {
-      middleware: {
-        executeCommand: async (command, args, next) => {
-          if (command == "missing copybook") {
-            await vscode.commands.executeCommand(
-              "cobol-lsp.clear.profiles.copybooks",
-            );
-          }
-          next(command, args);
-        },
-      },
+      middleware: this.executeCommandMiddleware,
       documentSelector: [LANGUAGE_ID, EXP_LANGUAGE_ID, HP_LANGUAGE_ID],
       outputChannel: this.outputChannel,
       synchronize: {

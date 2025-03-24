@@ -16,7 +16,10 @@ import * as fs from "fs";
 import * as os from "os";
 import { join } from "path";
 import * as vscode from "vscode";
-import { LanguageClient } from "vscode-languageclient/node";
+import {
+  ExecuteCommandMiddleware,
+  LanguageClient,
+} from "vscode-languageclient/node";
 import { JavaCheck } from "../../services/JavaCheck";
 import { LanguageClientService } from "../../services/LanguageClientService";
 import { NativeExecutableService } from "../../services/nativeLanguageClient/nativeExecutableService";
@@ -47,6 +50,7 @@ jest.mock("vscode-languageclient/node", () => ({
 
 Utils.getZoweExplorerAPI = jest.fn();
 let languageClientService: LanguageClientService;
+let executeCommandMiddleware: ExecuteCommandMiddleware;
 
 const SERVER_DESC = "LSP extension for COBOL language";
 const SERVER_ID = "cobol";
@@ -59,9 +63,11 @@ beforeEach(() => {
 const SERVER_STOPPED_MSG = "server stopped";
 describe("LanguageClientService positive scenario", () => {
   beforeEach(() => {
+    executeCommandMiddleware = {};
     languageClientService = new LanguageClientService(
       vscode.window.createOutputChannel("test"),
       vscode.Uri.file("/storagePath"),
+      executeCommandMiddleware,
     );
     new JavaCheck().isJavaInstalled = jest.fn().mockResolvedValue(true);
   });
@@ -184,9 +190,10 @@ describe("LanguageClientService positive scenario", () => {
       },
       {
         documentSelector: [SERVER_ID, EXP_LANGUAGE_ID, HP_LANGUAGE_ID],
+        middleware: {},
         outputChannel: expect.objectContaining({ name: "test" }) as object,
         synchronize: {
-          fileEvents: [undefined, undefined, undefined],
+          fileEvents: [undefined, undefined, undefined, undefined],
         },
       },
     );
@@ -205,10 +212,10 @@ describe("LanguageClientService positive scenario", () => {
       expect.any(Object),
       {
         documentSelector: [SERVER_ID, EXP_LANGUAGE_ID, HP_LANGUAGE_ID],
-
+        middleware: {},
         outputChannel: expect.objectContaining({ name: "test" }) as object,
         synchronize: {
-          fileEvents: [undefined, undefined, undefined],
+          fileEvents: [undefined, undefined, undefined, undefined],
         },
       },
     );
@@ -284,6 +291,7 @@ describe("LanguageClientService negative scenario.", () => {
       await new LanguageClientService(
         vscode.window.createOutputChannel("test"),
         vscode.Uri.file("/storagePath"),
+        executeCommandMiddleware,
       ).checkPrerequisites();
     } catch (error) {
       expect(error).toStrictEqual(new Error("LSP server for cobol not found"));

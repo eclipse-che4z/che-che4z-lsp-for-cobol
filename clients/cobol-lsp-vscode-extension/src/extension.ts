@@ -62,6 +62,7 @@ import {
   AnalysisResult,
   ControlFlowAnalysisService,
 } from "./services/ControlFlowService";
+import { ExecuteCommandMiddleware } from "vscode-languageclient";
 
 interface __AnalysisApi {
   analysis(uri: string, text: string, pos?: vscode.Position): Promise<unknown>;
@@ -116,10 +117,19 @@ async function initialize(context: vscode.ExtensionContext) {
       if (api) copyBooksDownloader.e4eAppeared(api.api);
       else outputChannel.appendLine(E4E_INCOMPATIBLE);
     });
-
+  const executeCommandMiddleware: ExecuteCommandMiddleware = {};
+  executeCommandMiddleware.executeCommand = async (command, args, next) => {
+    if (command == "missing copybook") {
+      await vscode.commands.executeCommand(
+        "cobol-lsp.clear.profiles.copybooks",
+      );
+    }
+    next(command, args);
+  };
   languageClientService = new LanguageClientService(
     outputChannel,
     context.globalStorageUri,
+    executeCommandMiddleware,
   );
   const configurationWatcher = new ConfigurationWatcher();
 
