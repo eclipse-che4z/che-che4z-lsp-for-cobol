@@ -18,7 +18,7 @@ import * as vscode from "vscode";
 import { getWorkspacePath, pos, range } from "./testHelper";
 import * as path from "path";
 
-suite("Integration Test Suite: Copybooks", function () {
+suite.only("Integration Test Suite: Copybooks", function () {
   suiteSetup(async function () {
     this.timeout(0);
     await helper.updateConfig("basic.json");
@@ -243,6 +243,7 @@ suite("Integration Test Suite: Copybooks", function () {
       const position = completions.items.findIndex(
         (ci) => ci.label === "PAYLIB",
       );
+      assert.notEqual(position, -1, "PAYLIB completion not found");
 
       await helper.executeCommandMultipleTimes(
         "selectNextSuggestion",
