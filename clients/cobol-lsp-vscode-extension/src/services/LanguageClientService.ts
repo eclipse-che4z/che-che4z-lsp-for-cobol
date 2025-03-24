@@ -19,11 +19,11 @@ import * as vscode from "vscode";
 
 import {
   DidChangeConfigurationNotification,
-  ExecuteCommandMiddleware,
   GenericNotificationHandler,
   GenericRequestHandler,
   LanguageClient,
   LanguageClientOptions,
+  Middleware,
   StreamInfo,
 } from "vscode-languageclient/node";
 import { HP_LANGUAGE_ID, EXP_LANGUAGE_ID, LANGUAGE_ID } from "../constants";
@@ -50,7 +50,7 @@ export class LanguageClientService {
   constructor(
     private outputChannel: vscode.OutputChannel,
     private storagePath: vscode.Uri,
-    private executeCommandMiddleware: ExecuteCommandMiddleware,
+    private middleware: Middleware,
   ) {
     const ext = vscode.extensions.getExtension(extensionId)!;
     this.executablePath = join(
@@ -153,7 +153,7 @@ export class LanguageClientService {
 
   private createClientOptions(): LanguageClientOptions {
     return {
-      middleware: this.executeCommandMiddleware,
+      middleware: this.middleware,
       documentSelector: [LANGUAGE_ID, EXP_LANGUAGE_ID, HP_LANGUAGE_ID],
       outputChannel: this.outputChannel,
       synchronize: {
