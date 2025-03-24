@@ -18,7 +18,7 @@ import * as vscode from "vscode";
 import { getWorkspacePath, pos, range } from "./testHelper";
 import * as path from "path";
 
-suite.only("Integration Test Suite: Copybooks", function () {
+suite("Integration Test Suite: Copybooks", function () {
   suiteSetup(async function () {
     this.timeout(0);
     await helper.updateConfig("basic.json");
@@ -237,6 +237,14 @@ suite.only("Integration Test Suite: Copybooks", function () {
 
     test("Copybooks auto completions are provided", async function () {
       const editor = await helper.showDocument("USERC1N1.cbl");
+
+      const diagnostics = await helper.waitForDiagnostics(editor.document.uri);
+      assert.strictEqual(
+        diagnostics[0].severity,
+        vscode.DiagnosticSeverity.Error,
+        "No syntax errors detected in USERC1N1.cbl",
+      );
+
       await helper.insertString(editor, helper.pos(19, 0), "       COPY PAY\n");
       helper.moveCursor(editor, helper.pos(19, 18));
       const completions = await helper.triggerCompletionsAndWaitForResults();
