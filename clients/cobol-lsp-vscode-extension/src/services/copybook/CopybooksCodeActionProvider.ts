@@ -41,6 +41,9 @@ export class CopybooksCodeActionProvider implements vscode.CodeActionProvider {
       command: "cobol-lsp.cpy-manager.goto-settings",
       title: QUICKFIX_GOTOSETTINGS,
     };
+
+    vscode.commands.executeCommand("cobol-lsp.clear.copybooks.profiles");
+
     return [goToSettings];
   }
 

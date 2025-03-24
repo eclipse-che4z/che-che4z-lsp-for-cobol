@@ -358,6 +358,14 @@ function registerCommands(
       },
     ),
   );
+  context.subscriptions.push(
+    vscode.commands.registerCommand(
+      "cobol-lsp.clear.copybooks.profiles",
+      () => {
+        copyBooksDownloader.clearProfiles();
+      },
+    ),
+  );
 
   context.subscriptions.push(
     vscode.commands.registerCommand("cobol-lsp.commentLine.toggle", () => {

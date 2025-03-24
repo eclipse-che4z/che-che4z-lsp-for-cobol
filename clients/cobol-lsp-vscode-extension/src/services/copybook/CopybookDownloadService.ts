@@ -124,6 +124,9 @@ export class CopybookDownloadService {
     this.dsnDownloader?.clearZoweDownloadQueue();
     this.ussDownloader?.clearZoweDownloadQueue();
   }
+  clearProfiles() {
+    this.e4eDownloader?.clearProfiles();
+  }
 
   private async downloadFromPaths(
     downloader: CopybookDownloaderForDsn | CopybookDownloaderForUss,
