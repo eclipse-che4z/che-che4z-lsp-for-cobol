@@ -18,8 +18,6 @@ import { LANGUAGE_ID } from "../../constants";
 import * as t from "io-ts";
 import { isRight } from "fp-ts/Either";
 import { Predicate } from "fp-ts/lib/Predicate";
-import { listLocalCopybooks } from "../../services/copybook/LocalCopybooksService";
-import { listLocalSubroutines } from "../../services/subroutines/LocalSubroutinesService";
 
 export const TEST_TIMEOUT = 150000;
 
