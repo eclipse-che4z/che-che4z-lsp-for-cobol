@@ -41,17 +41,20 @@ import org.eclipse.usecase.UseCasePreprocessorParser;
  * semantic context
  */
 @UtilityClass
-class AnnotatedDocumentCleaning {
+public class AnnotatedDocumentCleaning {
   /**
    * Clean up and extract the semantic context from the annotated text. The implicit copybooks
    * should not present in the list of explicit ones
    *
    * @param text text to clean up
    * @param explicitCopybooks list of explicitly defined copybooks
+   * @param subroutineNames list of subroutine names
    * @param expectedDiagnostics diagnostics that should present in the document after the analysis
+   * @param sqlBackend sql backend for the analysis
+   * @param compilerOptions compiler options
    * @return PreprocessedDocument for the further analysis
    */
-  PreprocessedDocument prepareDocument(
+  public PreprocessedDocument prepareDocument(
       String text,
       List<CobolText> explicitCopybooks,
       List<String> subroutineNames,
