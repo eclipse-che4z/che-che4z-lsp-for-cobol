@@ -56,12 +56,25 @@ interface AnalysisServiceDelegate {
 }
 
 type LatestResultData = {
-  resolve: (value: AnalysisResult | PromiseLike<AnalysisResult>) => void;
-  reject: (reason: string) => void;
-  promise: Promise<AnalysisResult>;
   resolved: boolean;
   requestVersion: number;
-};
+} & (
+  | {
+      resolve: undefined;
+      reject: undefined;
+      promise: undefined;
+    }
+  | {
+      resolve: (value: AnalysisResult | PromiseLike<AnalysisResult>) => void;
+      reject: (reason: string) => void;
+      promise: Promise<AnalysisResult>;
+    }
+  | {
+      resolve: undefined;
+      reject: undefined;
+      promise: Promise<AnalysisResult>;
+    }
+);
 
 export class AnalysisTask {
   private worker: Worker = new Worker(join(__dirname, "./Worker.js"));
@@ -153,10 +166,14 @@ export class ControlFlowAnalysisService implements AnalysisServiceDelegate {
     );
 
     const latestResult = this.latestResults.get(documentUri);
-    if (latestResult) {
+    if (latestResult?.promise) {
       return latestResult.promise;
+    } else if (latestResult) {
+      return this.fillLatestResultPromise(latestResult);
     } else {
-      return this.createLatestResultPromise(documentUri, 0);
+      return this.fillLatestResultPromise(
+        this.createLatestResultEntry(documentUri, 0),
+      );
     }
   }
 
@@ -185,7 +202,7 @@ export class ControlFlowAnalysisService implements AnalysisServiceDelegate {
 
     const latestResult = this.latestResults.get(documentUri);
     if (latestResult?.resolved || !latestResult) {
-      void this.createLatestResultPromise(documentUri, this.requestVersion);
+      void this.createLatestResultEntry(documentUri, this.requestVersion);
     } else {
       latestResult.requestVersion = this.requestVersion;
     }
@@ -223,44 +240,43 @@ export class ControlFlowAnalysisService implements AnalysisServiceDelegate {
       );
 
       result.resolved = true;
-      result.resolve({
+      const resultObject = {
         documentUri: documentUri,
         graphs: graphs,
         locations: locations,
-      });
+      };
+      if (result.resolve) result.resolve(resultObject);
+      else result.promise = Promise.resolve(resultObject);
     }
 
     this.diagnosticService.showAllDiagnostics(documentUri, diagnostics);
     this.tasks.delete(documentUri);
   }
 
-  private createLatestResultPromise(
+  private createLatestResultEntry(
     documentUri: string,
     requestVersion: number,
-  ): Promise<AnalysisResult> {
+  ): LatestResultData {
     this.logChannel?.debug(
-      `Create a promise with request version: ${requestVersion}`,
+      `Creating a result entry with request version: ${requestVersion}`,
     );
-
-    let res: (
-      value: AnalysisResult | PromiseLike<AnalysisResult>,
-    ) => void = () => {};
-    let reject: (reason?: unknown) => void = () => {};
-
-    const prom = new Promise<AnalysisResult>((r, e) => {
-      res = r;
-      reject = e;
-    });
-
-    const promiseWithResolver: LatestResultData = {
-      resolve: res,
-      reject: reject,
-      promise: prom,
+    const latestResultEntry: LatestResultData = {
+      resolve: undefined,
+      reject: undefined,
+      promise: undefined,
       resolved: false,
       requestVersion: requestVersion,
     };
-    this.latestResults.set(documentUri, promiseWithResolver);
-    return prom;
+    this.latestResults.set(documentUri, latestResultEntry);
+    return latestResultEntry;
+  }
+
+  private fillLatestResultPromise(lrd: LatestResultData) {
+    lrd.promise = new Promise<AnalysisResult>((r, e) => {
+      lrd.resolve = r;
+      lrd.reject = e;
+    });
+    return lrd.promise;
   }
 
   private invalidatePromise(documentUri: string, rejectPromise: boolean) {
@@ -268,7 +284,7 @@ export class ControlFlowAnalysisService implements AnalysisServiceDelegate {
     if (latestResult) {
       if (rejectPromise) {
         this.latestResults.delete(documentUri);
-        latestResult.reject("invalidate");
+        latestResult.reject?.("invalidate");
       } else {
         latestResult.requestVersion = 0;
       }
