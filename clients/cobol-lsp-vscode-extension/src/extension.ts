@@ -360,7 +360,7 @@ function registerCommands(
   );
   context.subscriptions.push(
     vscode.commands.registerCommand(
-      "cobol-lsp.clear.copybooks.profiles",
+      "cobol-lsp.clear.profiles.copybooks",
       () => {
         copyBooksDownloader.clearProfiles();
       },

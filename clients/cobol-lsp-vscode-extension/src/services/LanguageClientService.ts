@@ -151,6 +151,16 @@ export class LanguageClientService {
 
   private createClientOptions(): LanguageClientOptions {
     return {
+      middleware: {
+        executeCommand: async (command, args, next) => {
+          if (command == "missing copybook") {
+            await vscode.commands.executeCommand(
+              "cobol-lsp.clear.profiles.copybooks",
+            );
+          }
+          next(command, args);
+        },
+      },
       documentSelector: [LANGUAGE_ID, EXP_LANGUAGE_ID, HP_LANGUAGE_ID],
       outputChannel: this.outputChannel,
       synchronize: {
