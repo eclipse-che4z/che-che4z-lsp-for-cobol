@@ -378,10 +378,6 @@ export async function triggerCompletionsAndWaitForResults() {
       throw new Error("No active editor found");
     }
 
-    // list copybooks to prefill copybooks cache
-    await listLocalCopybooks(editor.document.uri.toString(), "COBOL");
-    await listLocalSubroutines();
-
     await vscode.commands.executeCommand(
       "editor.action.triggerSuggest",
       editor.document.uri,
@@ -399,10 +395,6 @@ export async function triggerCompletionsAndWaitForResults() {
       );
 
     if (completions && completions.items.length > 0) {
-      await vscode.commands.executeCommand(
-        "editor.action.triggerSuggest",
-        editor.document.uri,
-      );
       return completions;
     }
     await sleep(100);
