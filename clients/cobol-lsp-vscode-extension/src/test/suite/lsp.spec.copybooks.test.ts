@@ -241,17 +241,9 @@ suite("Integration Test Suite: Copybooks", function () {
       // this test to fail.
       // Even Microsoft is using retries when testing suggestions: https://github.com/microsoft/vscode/blob/d8da0ea5ed7501459d68c074e512bbfcd208cfd4/extensions/typescript-language-features/src/test/suggestTestHelpers.ts#L10
       // this.retries(3);
-      const editor = await helper.showDocument("USERC1N1.cbl");
+      const editor = await helper.showDocument("COMPLETIONS.cbl");
 
-      const diagnostics = await helper.waitForDiagnostics(editor.document.uri);
-      assert.strictEqual(
-        diagnostics[0].severity,
-        vscode.DiagnosticSeverity.Error,
-        "No syntax errors detected in USERC1N1.cbl",
-      );
-
-      await helper.insertString(editor, helper.pos(19, 0), "       COPY PAY\n");
-      helper.moveCursor(editor, helper.pos(19, 18));
+      helper.moveCursor(editor, helper.pos(25, 15));
       const completions = await helper.triggerCompletionsAndWaitForResults();
       const position = completions.items.findIndex(
         (ci) => ci.label === "PAYLIB",
@@ -265,9 +257,12 @@ suite("Integration Test Suite: Copybooks", function () {
 
       await vscode.commands.executeCommand("acceptSelectedSuggestion");
       await helper.waitFor(() => {
-        return editor.document.lineAt(19).text.trim() === "COPY PAYLIB";
+        return editor.document.lineAt(25).text.trim() === "COPY PAYLIB.";
       });
-      assert.strictEqual(editor.document.lineAt(19).text.trim(), "COPY PAYLIB");
+      assert.strictEqual(
+        editor.document.lineAt(25).text.trim(),
+        "COPY PAYLIB.",
+      );
     });
   });
 });
