@@ -27,9 +27,10 @@ public class ProcedureId {
     String paragraphName;
 
     public ProcedureId(String sectionName, String paragraphName) {
-        this.sectionName = sectionName !=null ? sectionName.toUpperCase() : null;
-        this.paragraphName = paragraphName !=null ? paragraphName.toUpperCase() : null;
+        this.sectionName = sectionName != null ? sectionName.toUpperCase() : null;
+        this.paragraphName = paragraphName != null ? paragraphName.toUpperCase() : null;
     }
+
     /**
      * Check if the code block is a procedure section.
      *
@@ -37,5 +38,14 @@ public class ProcedureId {
      */
     public boolean isSection() {
         return sectionName != null && paragraphName == null;
+    }
+
+    /**
+     * Check if the code block is a procedure paragraph.
+     *
+     * @return true the code block is a procedure paragraph
+     */
+    public boolean isParagraph() {
+        return paragraphName != null;
     }
 }

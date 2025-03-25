@@ -18,7 +18,6 @@ import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.Processor;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulator;
 import org.eclipse.lsp.cobol.common.model.tree.DeclarativeProcedureSectionNode;
-import org.eclipse.lsp.cobol.common.model.tree.ParagraphNameNode;
 
 /** DeclarativeProcedureSectionNode processor */
 public class DeclarativeProcedureSectionRegister
@@ -38,7 +37,5 @@ public class DeclarativeProcedureSectionRegister
       return;
     }
     symbolAccumulator.registerCodeBlock(ctx.getCurrentProgramNode(), node);
-    symbolAccumulator.registerParagraphNameNode(ctx.getCurrentProgramNode(),
-            new ParagraphNameNode(node.getLocality(), node.getName()));
   }
 }

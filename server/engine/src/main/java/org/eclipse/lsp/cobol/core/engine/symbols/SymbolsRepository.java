@@ -26,6 +26,7 @@ import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNode;
 import org.eclipse.lsp.cobol.common.symbols.CodeBlockReference;
+import org.eclipse.lsp.cobol.common.symbols.ProcedureId;
 import org.eclipse.lsp.cobol.common.symbols.SymbolTable;
 import org.eclipse.lsp.cobol.common.utils.ImplicitCodeUtils;
 import org.eclipse.lsp.cobol.common.AnalysisResult;
@@ -82,6 +83,17 @@ public class SymbolsRepository {
     result.putAll(symbolTable.getVariablesGlobalsMap());
     return result;
   }
+
+  /**
+   * Get procedures data
+   *
+   * @param program the program node
+   * @return map of procedures
+   */
+  public Map<ProcedureId, CodeBlockReference> getProceduresMap(ProgramNode program) {
+    return getSymbolTable(program).getProcedures();
+  }
+
 
   /**
    * Get paragraphs data

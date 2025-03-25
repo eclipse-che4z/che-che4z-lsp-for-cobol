@@ -46,12 +46,13 @@ public class TestData {
   Map<String, List<Location>> subroutineUsages;
   Map<String, List<Location>> functionDefinitions;
   Map<String, List<Location>> functionUsages;
+  Map<String, String> copybookEnterSectionNames;
 
-  Map<String, List<Location>> getParagraphDefinitions() {
-      Map<String, List<Location>> result = new HashMap<>();
+  Map<ProcedureId, List<Location>> getParagraphDefinitions() {
+      Map<ProcedureId, List<Location>> result = new HashMap<>();
       for (Map.Entry<ProcedureId, List<Location>> en : procedureDefinitions.entrySet()) {
         if (!en.getKey().isSection()) {
-          result.computeIfAbsent(en.getKey().getParagraphName(), it -> new ArrayList<>()).addAll(en.getValue());
+          result.computeIfAbsent(en.getKey(), it -> new ArrayList<>()).addAll(en.getValue());
         }
       }
       return result;
@@ -67,9 +68,9 @@ public class TestData {
                     Collectors.toMap(en -> en.getKey().getSectionName(), Map.Entry::getValue));
   }
 
-  public Map<String, List<Location>> getSectionDefinitions() {
+  public Map<ProcedureId, List<Location>> getSectionDefinitions() {
     return procedureDefinitions.entrySet().stream()
             .filter(en -> en.getKey().isSection()).collect(
-                    Collectors.toMap(en -> en.getKey().getSectionName(), Map.Entry::getValue));
+                    Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
   }
 }

@@ -18,6 +18,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.NonNull;
 import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
+import org.eclipse.lsp.cobol.common.symbols.ProcedureId;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolsRepository;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp4j.CompletionItem;
@@ -54,9 +55,11 @@ public class ParagraphCompletion implements Completion {
         .getDepthFirstStream()
         .filter(hasType(PROGRAM))
         .map(ProgramNode.class::cast)
-        .map(symbolsRepository::getParagraphMap)
+        .map(symbolsRepository::getProceduresMap)
         .map(Map::keySet)
         .flatMap(Collection::stream)
+        .filter(ProcedureId::isParagraph)
+        .map(ProcedureId::getParagraphName)
         .filter(DocumentationUtils.startsWithIgnoreCase(token))
         .map(this::toParagraphCompletion)
         .collect(toList());

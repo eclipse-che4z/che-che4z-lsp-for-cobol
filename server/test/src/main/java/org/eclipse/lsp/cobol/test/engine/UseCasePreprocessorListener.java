@@ -61,6 +61,8 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
   private final Map<String, List<Location>> copybookUsages = new HashMap<>();
   private final Map<String, List<Location>> subroutineUsages = new HashMap<>();
 
+  private final Map<String, String> copybookEnterSectionNames = new HashMap<>();
+
   private final Map<ProcedureId, List<Location>> procedureDefinitions = new HashMap<>();
   private final Map<ProcedureId, List<Location>> procedureUsages = new HashMap<>();
 
@@ -84,13 +86,14 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
           int numberOfLines,
           List<String> subroutineNames,
           Map<String, Diagnostic> expectedDiagnostics,
-          String dialectType) {
+          String dialectType, String sectionName) {
     this.tokens = tokens;
     this.documentUri = documentUri;
     this.copybookName = documentName;
     this.subroutineNames = subroutineNames;
     this.expectedDiagnostics = expectedDiagnostics;
     this.dialectType = dialectType;
+    this.currentSectionName = sectionName;
     lineShifts = new int[numberOfLines];
     contexts.push(new StringBuilder());
     diagnostics.put(documentUri, new ArrayList<>());
@@ -121,7 +124,8 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
             makeSubroutinesDefinitions(subroutineNames),
             subroutineUsages,
             functionDefinitions,
-            functionUsages);
+            functionUsages,
+            copybookEnterSectionNames);
   }
 
   @Override
@@ -166,13 +170,14 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
           CopybookStatementContext ctx, Map<String, List<Location>> copybookUsages) {
     return it -> {
       String dialect = it.cpyDialect() == null ? "" : it.cpyDialect().getText();
-      processCopybookToken(
+      String finalName = processCopybookToken(
               StringUtils.trimQuotes(it.cpyName().getText().toUpperCase()),
               dialect,
               ctx,
               it.replacement(),
               copybookUsages,
               ctx.diagnostic());
+      copybookEnterSectionNames.put(finalName, currentSectionName);
     };
   }
 
@@ -449,7 +454,7 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
                     singletonList(new Location(uri, new Range(new Position(), new Position()))));
   }
 
-  private void processCopybookToken(
+  private String processCopybookToken(
           String text,
           String dialect,
           ParserRuleContext ctx,
@@ -471,6 +476,7 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
     registerDiagnostics(range, diagnosticIds);
     write(getHiddenText(tokens.getHiddenTokensToLeft(ctx.start.getTokenIndex())));
     write(text);
+    return text;
   }
 
   private void processToken(

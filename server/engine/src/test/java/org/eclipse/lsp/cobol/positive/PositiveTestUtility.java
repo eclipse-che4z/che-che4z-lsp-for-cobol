@@ -24,6 +24,7 @@ import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNode;
 import org.eclipse.lsp.cobol.common.symbols.CodeBlockReference;
+import org.eclipse.lsp.cobol.common.symbols.ProcedureId;
 import org.eclipse.lsp.cobol.common.symbols.SymbolTable;
 import org.eclipse.lsp.cobol.common.utils.ImplicitCodeUtils;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolsRepository;
@@ -91,22 +92,23 @@ public class PositiveTestUtility {
       String fileName) {
     if (blacklistedTestFiles.contains(fileName)) return;
     Multimap<String, Node> variableDefinitionFromLSPEngine = ArrayListMultimap.create();
-    Multimap<String, CodeBlockReference> paragraphDefFromLSPEngine = ArrayListMultimap.create();
+    Multimap<ProcedureId, CodeBlockReference> procedureDefinitionsFromLSPEngine = ArrayListMultimap.create();
     Multimap<String, Node> programDefinitionFromLSPEngine = ArrayListMultimap.create();
 
     fetchReferencesFromLSPEngine(
         rootNode,
         symbolTableMap,
         variableDefinitionFromLSPEngine,
-        paragraphDefFromLSPEngine,
+        procedureDefinitionsFromLSPEngine,
         programDefinitionFromLSPEngine);
+
     assertDataName(
         dataNameRefs.getOrDefault(ReportSection.DATA_NAMES, Collections.emptyList()),
         variableDefinitionFromLSPEngine,
         fileName);
     assertProcedures(
         dataNameRefs.getOrDefault(ReportSection.PROCEDURES, Collections.emptyList()),
-        paragraphDefFromLSPEngine,
+        procedureDefinitionsFromLSPEngine,
         fileName);
     assertPrograms(
         dataNameRefs.getOrDefault(ReportSection.PROGRAMS, emptyList()),
@@ -134,13 +136,15 @@ public class PositiveTestUtility {
 
   private void assertProcedures(
       List<SysprintSnap> sysprintSnaps,
-      Multimap<String, CodeBlockReference> paragraphDefFromLSPEngine,
+      Multimap<ProcedureId, CodeBlockReference> paragraphDefFromLSPEngine,
       String fileName) {
     sysprintSnaps.forEach(
         snap -> {
           String dataName = snap.getDataName();
+          // TODO: SysprintSnap is to be updated to ProcedureIds
+          ProcedureId pId = new ProcedureId(null, dataName);
           Optional<Map.Entry<List<Location>, List<Location>>> foundElementFromLSPEngine =
-              paragraphDefFromLSPEngine.get(dataName).stream()
+                  paragraphDefFromLSPEngine.get(pId).stream()
                   .map(node -> Collections.singletonMap(node.getDefinitions(), node.getUsage()))
                   .map(Map::entrySet)
                   .flatMap(Collection::stream)
@@ -372,7 +376,7 @@ public class PositiveTestUtility {
       Node rootNode,
       Map<String, SymbolTable> symbolTableMap,
       Multimap<String, Node> variableDefinitionFromLSPEngine,
-      Multimap<String, CodeBlockReference> paragraphDefFromLSPEngine,
+      Multimap<ProcedureId, CodeBlockReference> procedureDefFromLSPEngine,
       Multimap<String, Node> programDefinitionFromLSPEngine) {
     SymbolsRepository repo = new SymbolsRepository();
     repo.updateSymbols(symbolTableMap);
@@ -382,10 +386,14 @@ public class PositiveTestUtility {
         .map(ProgramNode.class::cast)
         .forEach(
             programNode -> {
-              Stream.of(repo.getParagraphMap(programNode), repo.getSectionMap(programNode))
+
+                Map<String, CodeBlockReference> paragraphMap = repo.getParagraphMap(programNode);
+                Map<String, CodeBlockReference> sectionMap = repo.getSectionMap(programNode);
+
+                Stream.of(paragraphMap, sectionMap)
                   .flatMap(entry -> entry.entrySet().stream())
                   .forEach(
-                      entry -> paragraphDefFromLSPEngine.put(entry.getKey(), entry.getValue()));
+                      entry -> procedureDefFromLSPEngine.put(new ProcedureId(null, entry.getKey()), entry.getValue()));
 
               repo.getVariables(programNode).values().stream()
                   .flatMap(Node::getDepthFirstStream)

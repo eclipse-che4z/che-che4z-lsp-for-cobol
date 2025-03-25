@@ -30,6 +30,7 @@ import org.eclipse.lsp.cobol.common.model.tree.ProgramSubtype;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableUsageNode;
 import org.eclipse.lsp.cobol.common.symbols.CodeBlockReference;
+import org.eclipse.lsp.cobol.common.symbols.ProcedureId;
 import org.eclipse.lsp.cobol.common.symbols.SymbolTable;
 import org.eclipse.lsp.cobol.common.symbols.VariableAccumulator;
 import org.eclipse.lsp.cobol.core.model.VariableUsageUtils;
@@ -147,11 +148,35 @@ public class SymbolAccumulator implements VariableAccumulator {
     CodeBlockDefinitionNode definition = definitions.get(0);
     definition.addUsage(node.getLocality());
 
-    Optional.ofNullable(symbolTable.getParagraphMap().get(node.getName()))
-        .ifPresent(it -> it.addUsage(node.getLocality().toLocation()));
-    Optional.ofNullable(symbolTable.getSectionMap().get(node.getName()))
-        .ifPresent(it -> it.addUsage(node.getLocality().toLocation()));
+    Location location = node.getLocality().toLocation();
+    String definitionName = definition.getName();
 
+    // Try to resolve exact procedure identification
+    // 1. check if we are in a section
+    String trySameSection = definition.getNearestParentByType(NodeType.PROCEDURE_SECTION)
+            .map(n -> ((ProcedureSectionNode) n).getName())
+            .orElse(null);
+    // If there is paragraph with the same name - call it
+    if (trySameSection != null) {
+      ProcedureId defProcId = new ProcedureId(trySameSection, definitionName);
+      if (symbolTable.getProcedures().containsKey(defProcId)) {
+        symbolTable.getProcedures().get(defProcId).addUsage(location);
+        return Optional.empty();
+      }
+    }
+
+    // FIXME: if else.. go to paragraph/section whatever needs to be clarified
+    ProcedureId trySection = new ProcedureId(definitionName, null);
+    if (symbolTable.getProcedures().containsKey(trySection)) {
+      symbolTable.getProcedures().get(trySection).addUsage(location);
+      return Optional.empty();
+    }
+    for (Map.Entry<ProcedureId, CodeBlockReference> en: symbolTable.getProcedures().entrySet()) {
+      if (Objects.equals(definitionName, en.getKey().getParagraphName())) {
+        en.getValue().addUsage(location);
+        return Optional.empty();
+      }
+    }
     return Optional.empty();
   }
 
@@ -216,9 +241,8 @@ public class SymbolAccumulator implements VariableAccumulator {
    * @return syntax error if the code block duplicates
    */
   public Optional<SyntaxError> registerSectionNameNode(ProgramNode program, SectionNameNode node) {
-    createOrGetSymbolTable(program)
-        .getSectionMap()
-        .computeIfAbsent(node.getName(), n -> new CodeBlockReference())
+    createOrGetSymbolTable(program).getProcedures()
+        .computeIfAbsent(new ProcedureId(node.getName(), null), n -> new CodeBlockReference())
         .addDefinition(node.getLocality().toLocation());
     return Optional.empty();
   }
@@ -368,9 +392,11 @@ public class SymbolAccumulator implements VariableAccumulator {
    */
   public Optional<SyntaxError> registerParagraphNameNode(
       ProgramNode programNode, ParagraphNameNode node) {
+    String sectionName = node.getNearestParentByType(NodeType.PROCEDURE_SECTION)
+            .map(n -> ((ProcedureSectionNode) n).getName()).orElse(null);
     createOrGetSymbolTable(programNode)
-        .getParagraphMap()
-        .computeIfAbsent(node.getName(), n -> new CodeBlockReference())
+        .getProcedures()
+        .computeIfAbsent(new ProcedureId(sectionName, node.getName()), n -> new CodeBlockReference())
         .addDefinition(node.getLocality().toLocation());
     return Optional.empty();
   }
@@ -384,7 +410,11 @@ public class SymbolAccumulator implements VariableAccumulator {
    */
   public CodeBlockReference getCodeBlockReference(ProgramNode programNode, String name) {
     SymbolTable symbolTable = createOrGetSymbolTable(programNode);
-    return symbolTable.getParagraphMap().computeIfAbsent(name, symbolTable.getSectionMap()::get);
+    Map<String, CodeBlockReference> paragraphMap = symbolTable.getParagraphMap();
+    if (paragraphMap.containsKey(name)) {
+      return paragraphMap.get(name);
+    }
+    return symbolTable.getSectionMap().get(name);
   }
 
   /**

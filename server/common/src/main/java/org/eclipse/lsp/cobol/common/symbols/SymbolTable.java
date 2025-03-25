@@ -18,7 +18,6 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.eclipse.lsp.cobol.common.model.NodeType;
 import org.eclipse.lsp.cobol.common.model.tree.CodeBlockDefinitionNode;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
@@ -26,23 +25,16 @@ import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNode;
 import org.eclipse.lsp4j.Range;
 
 import java.util.*;
-
-import static org.eclipse.lsp.cobol.common.model.tree.Node.hasType;
+import java.util.stream.Collectors;
 
 /** A container for symbol information */
+@Getter
 @RequiredArgsConstructor
 public class SymbolTable {
-  @Getter
   private final List<CodeBlockDefinitionNode> codeBlocks = new ArrayList<>();
-  @Getter
-  private final Map<String, CodeBlockReference> paragraphMap = new HashMap<>();
-  @Getter
-  private final Map<String, CodeBlockReference> sectionMap = new HashMap<>();
-  @Getter
+  private final Map<ProcedureId, CodeBlockReference> procedures = new HashMap<>();
   private final Multimap<String, VariableNode> variablesMap = ArrayListMultimap.create();
-  @Getter
   private final Multimap<String, VariableNode> variablesGlobalsMap = ArrayListMultimap.create();
-  @Getter
   private final SymbolTable parent;
 
   public Collection<VariableNode> getVariables() {
@@ -91,5 +83,25 @@ public class SymbolTable {
       parent = parent.getParent();
     }
     return false;
+  }
+
+  public Map<String, CodeBlockReference> getParagraphMap() {
+      Map<String, CodeBlockReference> result = new HashMap<>();
+      for (Map.Entry<ProcedureId, CodeBlockReference> en : procedures.entrySet()) {
+          if (en.getKey().isParagraph()) {
+            String paragraphName = en.getKey().getParagraphName();
+            if (!result.containsKey(paragraphName)) {
+              result.put(paragraphName, new CodeBlockReference());
+            }
+            en.getValue().getUsage().forEach(result.get(paragraphName)::addUsage);
+            en.getValue().getDefinitions().forEach(result.get(paragraphName)::addDefinition);
+          }
+      }
+      return result;
+  }
+
+  public Map<String, CodeBlockReference> getSectionMap() {
+    return procedures.entrySet().stream().filter(en -> en.getKey().isSection()).collect(
+            Collectors.toMap(en -> en.getKey().getSectionName(), Map.Entry::getValue));
   }
 }
