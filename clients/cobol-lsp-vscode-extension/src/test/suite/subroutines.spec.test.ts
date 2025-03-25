@@ -38,6 +38,11 @@ suite("Integration Test Suite: Subroutines resolving", () => {
   });
 
   test("Subroutines auto completions are provided", async function () {
+    // It seems like acceptSelectedSuggestion sometimes doesn't modify the
+    // document even the correct suggestion is returned and selected, causing
+    // this test to fail.
+    // Even Microsoft is using retries when testing suggestions: https://github.com/microsoft/vscode/blob/d8da0ea5ed7501459d68c074e512bbfcd208cfd4/extensions/typescript-language-features/src/test/suggestTestHelpers.ts#L10
+    this.retries(3);
     this.timeout(helper.TEST_TIMEOUT);
     const editor = await helper.showDocument("CALL.cbl");
     await helper.insertString(
