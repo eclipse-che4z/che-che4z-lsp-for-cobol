@@ -466,7 +466,19 @@ jobs:
       - name: Run integration tests
         if: github.event.inputs.skip_ui_tests != 'true'
         run: ${{ matrix.os == 'ubuntu-latest' && 'xvfb-run' || '' }} npm run test:integration -- --native
-        working-directory: clients/cobol-lsp-vscode-extension          
+        working-directory: clients/cobol-lsp-vscode-extension    
+      - name: Run integration tests 2
+        if: github.event.inputs.skip_ui_tests != 'true'
+        run: ${{ matrix.os == 'ubuntu-latest' && 'xvfb-run' || '' }} npm run test:integration -- --native
+      - name: Run integration tests 3
+        if: github.event.inputs.skip_ui_tests != 'true'
+        run: ${{ matrix.os == 'ubuntu-latest' && 'xvfb-run' || '' }} npm run test:integration -- --native
+      - name: Run integration tests 4
+        if: github.event.inputs.skip_ui_tests != 'true'
+        run: ${{ matrix.os == 'ubuntu-latest' && 'xvfb-run' || '' }} npm run test:integration -- --native
+      - name: Run integration tests 5
+        if: github.event.inputs.skip_ui_tests != 'true'
+        run: ${{ matrix.os == 'ubuntu-latest' && 'xvfb-run' || '' }} npm run test:integration -- --native
       - name: Run native executable test code
         working-directory: tests/native-executable-tests
         run: |
