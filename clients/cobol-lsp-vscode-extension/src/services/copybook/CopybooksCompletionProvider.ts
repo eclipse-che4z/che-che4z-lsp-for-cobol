@@ -22,6 +22,7 @@ import {
   Position,
   Progress,
   ProgressLocation,
+  ProviderResult,
   TextDocument,
   window,
 } from "vscode";
@@ -172,5 +173,13 @@ export class CopybooksCompletionProvider implements CompletionItemProvider {
     });
 
     return completions;
+  }
+
+  resolveCompletionItem(
+    item: CompletionItem,
+    _token: CancellationToken,
+  ): ProviderResult<CompletionItem> {
+    item.detail = "Resolved function called";
+    return item;
   }
 }

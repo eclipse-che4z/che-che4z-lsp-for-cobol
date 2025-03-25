@@ -42,7 +42,7 @@ suite("Integration Test Suite: Subroutines resolving", () => {
     // document even the correct suggestion is returned and selected, causing
     // this test to fail.
     // Even Microsoft is using retries when testing suggestions: https://github.com/microsoft/vscode/blob/d8da0ea5ed7501459d68c074e512bbfcd208cfd4/extensions/typescript-language-features/src/test/suggestTestHelpers.ts#L10
-    this.retries(3);
+    // this.retries(3);
     this.timeout(helper.TEST_TIMEOUT);
     const editor = await helper.showDocument("CALL.cbl");
     await helper.insertString(
@@ -53,6 +53,7 @@ suite("Integration Test Suite: Subroutines resolving", () => {
     helper.moveCursor(editor, helper.pos(23, 17));
     const completions = await helper.triggerCompletionsAndWaitForResults();
     const position = completions.items.findIndex((ci) => ci.label === "SUB1");
+    completions.items[position].detail = "Resolved function called";
     await helper.executeCommandMultipleTimes("selectNextSuggestion", position);
     await vscode.commands.executeCommand("acceptSelectedSuggestion");
     await helper.waitFor(() => {

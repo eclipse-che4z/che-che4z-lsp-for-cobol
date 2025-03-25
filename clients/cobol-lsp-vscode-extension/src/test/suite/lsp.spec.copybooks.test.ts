@@ -240,7 +240,7 @@ suite("Integration Test Suite: Copybooks", function () {
       // document even the correct suggestion is returned and selected, causing
       // this test to fail.
       // Even Microsoft is using retries when testing suggestions: https://github.com/microsoft/vscode/blob/d8da0ea5ed7501459d68c074e512bbfcd208cfd4/extensions/typescript-language-features/src/test/suggestTestHelpers.ts#L10
-      this.retries(3);
+      // this.retries(3);
       const editor = await helper.showDocument("USERC1N1.cbl");
 
       const diagnostics = await helper.waitForDiagnostics(editor.document.uri);
