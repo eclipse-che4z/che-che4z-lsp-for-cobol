@@ -7,6 +7,7 @@ import {
   Position,
   Progress,
   ProgressLocation,
+  ProviderResult,
   TextDocument,
   window,
 } from "vscode";
@@ -83,5 +84,13 @@ export class SubroutinesCompletionsProvider implements CompletionItemProvider {
     });
 
     return completions;
+  }
+
+  resolveCompletionItem(
+    item: CompletionItem,
+    _token: CancellationToken,
+  ): ProviderResult<CompletionItem> {
+    item.detail = "resolveCompletionItem";
+    return item;
   }
 }
