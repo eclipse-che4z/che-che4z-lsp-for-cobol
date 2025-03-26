@@ -243,12 +243,20 @@ suite("Integration Test Suite: Copybooks", function () {
       // this.retries(3);
       const editor = await helper.showDocument("COMPLETIONS.cbl");
 
+      const diagnostics = await helper.waitForDiagnostics(editor.document.uri);
+      assert.strictEqual(diagnostics[0].code, "missing copybook");
+      await helper.waitFor(() => editor.document.languageId === "cobol");
+
       helper.moveCursor(editor, helper.pos(25, 15));
       const completions = await helper.triggerCompletionsAndWaitForResults();
       const position = completions.items.findIndex(
         (ci) => ci.label === "PAYLIB",
       );
-      assert.notEqual(position, -1, "PAYLIB completion not found");
+      assert.notEqual(
+        position,
+        -1,
+        `PAYLIB completion not found, ${JSON.stringify(completions.items.slice(0, 10))}`,
+      );
 
       await helper.executeCommandMultipleTimes(
         "selectNextSuggestion",
@@ -263,6 +271,7 @@ suite("Integration Test Suite: Copybooks", function () {
         editor.document.lineAt(25).text.trim(),
         "COPY PAYLIB.",
       );
+      await helper.sleep(5000);
     });
   });
 });
