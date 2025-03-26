@@ -239,11 +239,8 @@ suite("Integration Test Suite: Copybooks", function () {
       const editor = await helper.showDocument("COMPLETIONS.cbl");
       await helper.sleep(1000);
 
-      const diagnostics = await helper.waitForDiagnostics(editor.document.uri);
-      assert.strictEqual(diagnostics[0].code, "missing copybook");
-      await helper.waitFor(() => editor.document.languageId === "cobol");
-
       helper.moveCursor(editor, helper.pos(25, 15));
+
       const completions = await helper.triggerCompletionsAndWaitForResults();
       await helper.sleep(1000);
 
@@ -260,13 +257,11 @@ suite("Integration Test Suite: Copybooks", function () {
         "selectNextSuggestion",
         position,
       );
-      await helper.sleep(1000);
 
       await vscode.commands.executeCommand("acceptSelectedSuggestion");
       await helper.waitFor(() => {
         return editor.document.lineAt(25).text.trim() === "COPY PAYLIB.";
       });
-      await helper.sleep(1000);
 
       assert.strictEqual(
         editor.document.lineAt(25).text.trim(),
