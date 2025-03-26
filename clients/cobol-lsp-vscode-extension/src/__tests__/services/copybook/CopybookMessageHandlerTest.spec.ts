@@ -20,11 +20,12 @@ import { CopybookDownloadService } from "../../../services/copybook/CopybookDown
 import path = require("path");
 import * as ProcessorGroups from "../../../services/ProcessorGroups";
 import * as fsUtils from "../../../services/util/FSUtils";
+import { DiagnosticsService } from "../../../services/DiagnosticsService";
 
 vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
   get: jest.fn().mockReturnValue("testProfile"),
 });
-
+const diagnosticsService = new DiagnosticsService();
 Utils.getZoweExplorerAPI = jest.fn();
 
 jest
@@ -35,7 +36,10 @@ describe("Test the copybook message handler", () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
-  const downloaderNoApi = new CopybookDownloadService("/storagePath");
+  const downloaderNoApi = new CopybookDownloadService(
+    "/storagePath",
+    diagnosticsService,
+  );
   it("checks local present copybooks are resolved", async () => {
     SettingsService.getCopybookExtension = jest
       .fn()
@@ -196,26 +200,31 @@ describe("Test the copybook message handler", () => {
         return "ENDEVOR_PROCESSOR";
       },
     });
-    const downloader = new CopybookDownloadService("/storagePath", undefined, {
-      isEndevorElement(uri: string) {
-        return uri === filename;
+    const downloader = new CopybookDownloadService(
+      "/storagePath",
+      diagnosticsService,
+      undefined,
+      {
+        isEndevorElement(uri: string) {
+          return uri === filename;
+        },
+        onDidChangeElement: unreachable,
+        listMembers,
+        listElements,
+        getMember: unreachable,
+        getElement: unreachable,
+        async getProfileInfo(uri) {
+          return uri === filename
+            ? Promise.resolve(profile)
+            : Promise.reject(Error("fail"));
+        },
+        async getConfiguration(uri, options) {
+          return uri === filename && options.type === "COBOL"
+            ? Promise.resolve(datasetFirst)
+            : Promise.reject(Error("fail"));
+        },
       },
-      onDidChangeElement: unreachable,
-      listMembers,
-      listElements,
-      getMember: unreachable,
-      getElement: unreachable,
-      async getProfileInfo(uri) {
-        return uri === filename
-          ? Promise.resolve(profile)
-          : Promise.reject(Error("fail"));
-      },
-      async getConfiguration(uri, options) {
-        return uri === filename && options.type === "COBOL"
-          ? Promise.resolve(datasetFirst)
-          : Promise.reject(Error("fail"));
-      },
-    });
+    );
     const target = await downloader.resolveCopybookHandler(
       "cobolFileName",
       "copybook",
@@ -251,26 +260,31 @@ describe("Test the copybook message handler", () => {
         return "ENDEVOR_PROCESSOR";
       },
     });
-    const downloader = new CopybookDownloadService("/storagePath", undefined, {
-      isEndevorElement(uri: string) {
-        return uri === filename;
+    const downloader = new CopybookDownloadService(
+      "/storagePath",
+      diagnosticsService,
+      undefined,
+      {
+        isEndevorElement(uri: string) {
+          return uri === filename;
+        },
+        onDidChangeElement: unreachable,
+        listMembers,
+        listElements,
+        getMember: unreachable,
+        getElement: unreachable,
+        async getProfileInfo(uri) {
+          return uri === filename
+            ? Promise.resolve(profile)
+            : Promise.reject(Error("fail"));
+        },
+        async getConfiguration(uri, options) {
+          return uri === filename && options.type === "COBOL"
+            ? Promise.resolve(endevorFirst)
+            : Promise.reject(Error("fail"));
+        },
       },
-      onDidChangeElement: unreachable,
-      listMembers,
-      listElements,
-      getMember: unreachable,
-      getElement: unreachable,
-      async getProfileInfo(uri) {
-        return uri === filename
-          ? Promise.resolve(profile)
-          : Promise.reject(Error("fail"));
-      },
-      async getConfiguration(uri, options) {
-        return uri === filename && options.type === "COBOL"
-          ? Promise.resolve(endevorFirst)
-          : Promise.reject(Error("fail"));
-      },
-    });
+    );
     const target = await downloader.resolveCopybookHandler(
       "cobolFileName",
       "copybook",
@@ -306,16 +320,21 @@ describe("Test the copybook message handler", () => {
     vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
       get: jest.fn().mockReturnValue("ZOWE"),
     });
-    const downloader = new CopybookDownloadService("/storagePath", undefined, {
-      isEndevorElement: unreachable,
-      onDidChangeElement: unreachable,
-      listMembers: unreachable,
-      listElements: unreachable,
-      getMember: unreachable,
-      getElement: unreachable,
-      getProfileInfo: unreachable,
-      getConfiguration: unreachable,
-    });
+    const downloader = new CopybookDownloadService(
+      "/storagePath",
+      diagnosticsService,
+      undefined,
+      {
+        isEndevorElement: unreachable,
+        onDidChangeElement: unreachable,
+        listMembers: unreachable,
+        listElements: unreachable,
+        getMember: unreachable,
+        getElement: unreachable,
+        getProfileInfo: unreachable,
+        getConfiguration: unreachable,
+      },
+    );
     await downloader.resolveCopybookHandler(
       "cobolFileName",
       "copybook",
@@ -342,23 +361,28 @@ describe("Test the copybook message handler", () => {
       registeredApiTypes: unreachable,
     };
 
-    const downloader = new CopybookDownloadService("/storagePath", zoweApi, {
-      isEndevorElement(_uri: string) {
-        return false;
+    const downloader = new CopybookDownloadService(
+      "/storagePath",
+      diagnosticsService,
+      zoweApi,
+      {
+        isEndevorElement(_uri: string) {
+          return false;
+        },
+        onDidChangeElement: unreachable,
+        listMembers,
+        listElements,
+        getMember: unreachable,
+        getElement: unreachable,
+        async getProfileInfo(_uri) {
+          return Promise.resolve({
+            instance: "instance",
+            profile: "profile",
+          });
+        },
+        getConfiguration: unreachable,
       },
-      onDidChangeElement: unreachable,
-      listMembers,
-      listElements,
-      getMember: unreachable,
-      getElement: unreachable,
-      async getProfileInfo(_uri) {
-        return Promise.resolve({
-          instance: "instance",
-          profile: "profile",
-        });
-      },
-      getConfiguration: unreachable,
-    });
+    );
     SettingsService.getUssPath = jest.fn().mockReturnValue(["uss/path"]);
     SettingsService.getDsnPath = jest.fn().mockReturnValue(["dsn/path"]);
     downloader["dsnDownloader"]!.hasMember = jest.fn().mockResolvedValue(false);

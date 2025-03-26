@@ -22,12 +22,14 @@ import * as fsUtils from "../../../services/util/FSUtils";
 import { ProfileUtils } from "../../../services/util/ProfileUtils";
 import { SettingsUtils } from "../../../services/util/SettingsUtils";
 import { CopybookDownloadService } from "../../../services/copybook/CopybookDownloadService";
+import { DiagnosticsService } from "../../../services/DiagnosticsService";
 
 const copybookName: string = "NSTCOPY1";
 const copybookNameWithExtension: string = "NSTCOPY2.CPY";
 const CPY_FOLDER_NAME = ".cobcopy";
 const RELATIVE_CPY_FOLDER_NAME = "../relativeCobcopy";
 const folderPath = path.join(__dirname, CPY_FOLDER_NAME);
+const diagnosticsService = new DiagnosticsService();
 
 SettingsUtils.getWorkspaceFoldersPath = jest.fn().mockReturnValue([__dirname]);
 vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
@@ -235,7 +237,10 @@ describe("Prioritize search criteria for copybooks test suite", () => {
     };
     globSyncMockResult = [copybookName];
 
-    const downloader = new CopybookDownloadService("/storagePath");
+    const downloader = new CopybookDownloadService(
+      "/storagePath",
+      diagnosticsService,
+    );
     const uri: string | undefined = await downloader.resolveCopybookHandler(
       copybookName,
       "PRGNAME",
@@ -254,6 +259,7 @@ describe("Prioritize search criteria for copybooks test suite", () => {
       .mockReturnValue(undefined);
     const downloader = new CopybookDownloadService(
       "/storagePath",
+      diagnosticsService,
       undefined,
       undefined,
     );
@@ -275,7 +281,10 @@ describe("Prioritize search criteria for copybooks test suite", () => {
       profiles: "zosmf",
       "copybook-extensions": [""],
     };
-    const downloader = new CopybookDownloadService("/storagePath");
+    const downloader = new CopybookDownloadService(
+      "/storagePath",
+      diagnosticsService,
+    );
 
     const uri: string | undefined = await downloader.resolveCopybookHandler(
       copybookName,
@@ -303,7 +312,10 @@ describe("Prioritize search criteria for copybooks test suite", () => {
     };
     globSyncMockResult = [copybookName];
 
-    const downloader = new CopybookDownloadService("/storagePath");
+    const downloader = new CopybookDownloadService(
+      "/storagePath",
+      diagnosticsService,
+    );
     const uri: string | undefined = await downloader.resolveCopybookHandler(
       copybookName,
       "PRGNAME",

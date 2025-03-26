@@ -46,6 +46,7 @@ import {
   ZoweDatasetConfigModel,
   ZoweUssConfigModel,
 } from "../ProcessorGroupsLoader";
+import { DiagnosticsService } from "../DiagnosticsService";
 
 export class CopybookName {
   constructor(
@@ -241,6 +242,7 @@ export class CopybookDownloadService {
 
   constructor(
     private storagePath: string,
+    private diagnosticsService: DiagnosticsService,
     explorer?: IApiRegisterClient,
     e4e?: E4E,
     private outputChannel?: vscode.OutputChannel,
@@ -407,7 +409,6 @@ export class CopybookDownloadService {
     if (this.handleAsEndevorElement(documentUri)) {
       return !!(await this.e4eDownloader?.getE4EConfig(documentUri));
     }
-    if (!this.explorerApi && !this.e4eApi) return false;
 
     const configs = await loadProcessorGroupCopybookPathsConfig(
       { scopeUri: documentUri },
@@ -435,8 +436,32 @@ export class CopybookDownloadService {
       this.explorerApi,
     );
 
-    if (endevorConfigs.length > 0 && !this.e4eApi) return false;
-
+    if (endevorConfigs.length > 0 && !this.e4eApi) {
+      this.diagnosticsService.showDiagnostics(vscode.Uri.parse(documentUri), [
+        {
+          range: new vscode.Range(
+            new vscode.Position(0, 0),
+            new vscode.Position(1, 0),
+          ),
+          message: "Explorer for Endevor is not installed",
+          severity: vscode.DiagnosticSeverity.Warning,
+        },
+      ]);
+      return false;
+    }
+    if (!this.explorerApi && procGroupZoweConfigs.length > 0) {
+      this.diagnosticsService.showDiagnostics(vscode.Uri.parse(documentUri), [
+        {
+          range: new vscode.Range(
+            new vscode.Position(0, 0),
+            new vscode.Position(1, 0),
+          ),
+          message: "Zowe Explorer is not installed",
+          severity: vscode.DiagnosticSeverity.Warning,
+        },
+      ]);
+      return false;
+    }
     if (this.explorerApi) {
       const availableProfiles = ProfileUtils.getAvailableProfiles(
         this.explorerApi,
@@ -568,7 +593,6 @@ export class CopybookDownloadService {
           const resolvedProfile = await this.e4eDownloader.getProfileInfo(
             config.profile,
           );
-
           const element: EndevorElement = {
             use_map: config.use_map === false ? false : true,
             environment: config.environment,
