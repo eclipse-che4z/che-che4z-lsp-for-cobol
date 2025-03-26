@@ -236,13 +236,7 @@ suite("Integration Test Suite: Copybooks", function () {
     });
 
     test("Copybooks auto completions are provided", async function () {
-      // It seems like acceptSelectedSuggestion sometimes doesn't modify the
-      // document even the correct suggestion is returned and selected, causing
-      // this test to fail.
-      // Even Microsoft is using retries when testing suggestions: https://github.com/microsoft/vscode/blob/d8da0ea5ed7501459d68c074e512bbfcd208cfd4/extensions/typescript-language-features/src/test/suggestTestHelpers.ts#L10
-      // this.retries(3);
       const editor = await helper.showDocument("COMPLETIONS.cbl");
-
       await helper.sleep(1000);
 
       const diagnostics = await helper.waitForDiagnostics(editor.document.uri);
@@ -278,7 +272,6 @@ suite("Integration Test Suite: Copybooks", function () {
         editor.document.lineAt(25).text.trim(),
         "COPY PAYLIB.",
       );
-      await helper.sleep(5000);
     });
   });
 });

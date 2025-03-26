@@ -12,18 +12,18 @@
 
 name: build
 env:
-  graalvm-version: "21"
+  graalvm-version: '21'
 on:
   workflow_dispatch:
     inputs:
       skip_ui_tests:
         description: "Skip UI tests"
         required: true
-        default: "false"
+        default: 'false'
       include_build_number:
         description: "Include build number"
         required: false
-        default: "true"
+        default: 'true'
   pull_request:
     branches:
       - development
@@ -46,12 +46,12 @@ jobs:
         working-directory: clients/analysis
         run: |
           npm ci
-          npm run compile
+          npm run compile     
       - name: Install & Build VS Code extension dialect API
         working-directory: clients/cobol-dialect-api
         run: |
           npm ci
-          npm run compile
+          npm run compile     
       - name: Check code formatting for COBOL LS
         working-directory: clients/cobol-lsp-vscode-extension
         run: npm run lint-format
@@ -90,12 +90,12 @@ jobs:
       - uses: graalvm/setup-graalvm@v1
         with:
           java-version: ${{ env.graalvm-version }}
-          components: "native-image"
-          distribution: "graalvm-community"
+          components: 'native-image'
+          distribution: 'graalvm-community'
           github-token: ${{ secrets.GITHUB_TOKEN }}
           ## uncomment me if you need native image job reports
           # native-image-job-reports: 'true'
-          cache: "maven"
+          cache: 'maven'
       - name: Generate assisted configuration for GraalVM native build
         working-directory: server
         run: mvn -e -B -Pnative -DskipNativeTests -Dagent=true -Dtest=\!PositiveTest -Dsurefire.failIfNoSpecifiedTests=false test
@@ -114,9 +114,9 @@ jobs:
           fetch-depth: 0
       - uses: actions/setup-java@v4
         with:
-          distribution: "temurin"
-          java-version: "11"
-          cache: "maven"
+          distribution: 'temurin'
+          java-version: '11'
+          cache: 'maven'
       - name: Build Server and Dialects Jars
         working-directory: server
         run: mvn clean verify --no-transfer-progress
@@ -153,7 +153,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: lib
-          path: clients/cobol-dialect-api/lib/*
+          path: clients/cobol-dialect-api/lib/*    
       - name: Unit Test COBOL LS Analysis package
         working-directory: clients/analysis
         run: |
@@ -190,13 +190,13 @@ jobs:
         with:
           if-no-files-found: warn
           name: vsix-idms-dialect
-          path: "cobol-language-support-for-idms*.vsix"
+          path: 'cobol-language-support-for-idms*.vsix'
       - name: Upload DaCo vsix
         uses: actions/upload-artifact@v4
         with:
           if-no-files-found: warn
           name: vsix-daco-dialect
-          path: "cobol-language-support-for-daco*.vsix"
+          path: 'cobol-language-support-for-daco*.vsix'
       - name: Upload COBOL LS default vsix
         uses: actions/upload-artifact@v4
         with:
@@ -225,7 +225,7 @@ jobs:
         working-directory: clients/analysis
         run: |
           npm ci
-          npm run compile
+          npm run compile           
       - name: Unit Test COBOL LS Web extension
         working-directory: clients/cobol-lsp-vscode-extension
         run: |
@@ -242,7 +242,7 @@ jobs:
         with:
           if-no-files-found: warn
           name: vsix-cobol-language-support-web
-          path: "cobol-language-support-web*.vsix"
+          path: 'cobol-language-support-web*.vsix'
 
   buildNative:
     strategy:
@@ -273,11 +273,11 @@ jobs:
         run: echo "target=linux-${{ matrix.arch }}" >> $GITHUB_ENV
 
       # Setup envierment
-      #      - name: switch xcode to 12.5.1
-      #        if: matrix.os == 'macos-11'
-      #        run: |
-      #          sudo xcode-select -s /Applications/Xcode_12.5.1.app/Contents/Developer
-      #          xcodebuild -version
+#      - name: switch xcode to 12.5.1
+#        if: matrix.os == 'macos-11'
+#        run: |
+#          sudo xcode-select -s /Applications/Xcode_12.5.1.app/Contents/Developer
+#          xcodebuild -version
       - uses: al-cheb/configure-pagefile-action@v1.4
         if: matrix.os == 'windows-latest'
         with:
@@ -289,21 +289,21 @@ jobs:
         if: matrix.os == 'ubuntu-latest' && matrix.arch == 'x64'
         with:
           java-version: ${{ env.graalvm-version }}
-          distribution: "graalvm-community"
-          native-image-musl: "true"
+          distribution: 'graalvm-community'
+          native-image-musl: 'true'
           github-token: ${{ secrets.GITHUB_TOKEN }}
           ## uncomment me if you need native image job reports
           # native-image-job-reports: 'true'
-          cache: "maven"
+          cache: 'maven'
       - uses: graalvm/setup-graalvm@v1
         if: matrix.os != 'ubuntu-latest' || matrix.arch != 'x64'
         with:
           java-version: ${{ env.graalvm-version }}
-          distribution: "graalvm-community"
+          distribution: 'graalvm-community'
           github-token: ${{ secrets.GITHUB_TOKEN }}
           ## uncomment me if you need native image job reports
           # native-image-job-reports: 'true'
-          cache: "maven"
+          cache: 'maven'
       - uses: ilammy/msvc-dev-cmd@v1
         if: matrix.os == 'windows-latest'
       - name: Retrieve native build configurations
@@ -361,7 +361,7 @@ jobs:
           - os: macos-14
             arch: arm64
     runs-on: ${{ matrix.os }}
-    needs: [buildNative, buildPlatformIndependedPart]
+    needs: [buildNative,buildPlatformIndependedPart]
     steps:
       # Generate environment variable
       - shell: pwsh
@@ -427,7 +427,7 @@ jobs:
           BUILD_ID: ${{github.event_name == 'pull_request' && format('pr-{0}', github.event.pull_request.number) || github.run_number }}
         run: |
           node -e "const fs=require('fs');const fileName='./package.json';var content=require(fileName);content.version=content.version+'\+'+'${{ env.BUILD_ID }}';fs.writeFileSync(fileName,JSON.stringify(content,null,2));"
-      - name: Build COBOL LS extension
+      - name: Build COBOL LS extension 
         run: npm ci
         working-directory: clients/cobol-lsp-vscode-extension
       - name: Package COBOL LS vsix for ${{ env.target }}
@@ -439,7 +439,7 @@ jobs:
         with:
           if-no-files-found: warn
           name: vsix-cobol-language-support-${{ env.target }}
-          path: "cobol-language-support*.vsix"
+          path: 'cobol-language-support*.vsix'
       - name: Retrieve idms dialect
         uses: actions/download-artifact@v4
         with:
@@ -466,23 +466,7 @@ jobs:
       - name: Run integration tests
         if: github.event.inputs.skip_ui_tests != 'true'
         run: ${{ matrix.os == 'ubuntu-latest' && 'xvfb-run' || '' }} npm run test:integration -- --native
-        working-directory: clients/cobol-lsp-vscode-extension
-      - name: Run integration tests 2
-        if: github.event.inputs.skip_ui_tests != 'true'
-        run: ${{ matrix.os == 'ubuntu-latest' && 'xvfb-run' || '' }} npm run test:integration -- --native
-        working-directory: clients/cobol-lsp-vscode-extension
-      - name: Run integration tests 3
-        if: github.event.inputs.skip_ui_tests != 'true'
-        run: ${{ matrix.os == 'ubuntu-latest' && 'xvfb-run' || '' }} npm run test:integration -- --native
-        working-directory: clients/cobol-lsp-vscode-extension
-      - name: Run integration tests 4
-        if: github.event.inputs.skip_ui_tests != 'true'
-        run: ${{ matrix.os == 'ubuntu-latest' && 'xvfb-run' || '' }} npm run test:integration -- --native
-        working-directory: clients/cobol-lsp-vscode-extension
-      - name: Run integration tests 5
-        if: github.event.inputs.skip_ui_tests != 'true'
-        run: ${{ matrix.os == 'ubuntu-latest' && 'xvfb-run' || '' }} npm run test:integration -- --native
-        working-directory: clients/cobol-lsp-vscode-extension
+        working-directory: clients/cobol-lsp-vscode-extension          
       - name: Run native executable test code
         working-directory: tests/native-executable-tests
         run: |
