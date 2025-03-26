@@ -242,10 +242,10 @@ export class CopybookDownloadService {
 
   constructor(
     private storagePath: string,
-    private diagnosticsService: DiagnosticsService,
     explorer?: IApiRegisterClient,
     e4e?: E4E,
     private outputChannel?: vscode.OutputChannel,
+    private diagnosticsService?: DiagnosticsService,
   ) {
     if (e4e) this.e4eAppeared(e4e);
     if (explorer) this.explorerAppeared(explorer);
@@ -437,7 +437,7 @@ export class CopybookDownloadService {
     );
 
     if (endevorConfigs.length > 0 && !this.e4eApi) {
-      this.diagnosticsService.showDiagnostics(vscode.Uri.parse(documentUri), [
+      this.diagnosticsService?.showDiagnostics(vscode.Uri.parse(documentUri), [
         {
           range: new vscode.Range(
             new vscode.Position(0, 0),
@@ -450,7 +450,7 @@ export class CopybookDownloadService {
       return false;
     }
     if (!this.explorerApi && procGroupZoweConfigs.length > 0) {
-      this.diagnosticsService.showDiagnostics(vscode.Uri.parse(documentUri), [
+      this.diagnosticsService?.showDiagnostics(vscode.Uri.parse(documentUri), [
         {
           range: new vscode.Range(
             new vscode.Position(0, 0),

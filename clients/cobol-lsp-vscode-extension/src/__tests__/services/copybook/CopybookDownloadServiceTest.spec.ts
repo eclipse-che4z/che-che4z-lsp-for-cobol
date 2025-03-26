@@ -40,7 +40,6 @@ import {
 import * as ProcessorGroups from "../../../services/ProcessorGroups";
 import { Uri } from "../../../__mocks__/UriMock";
 import { SettingsService } from "../../../services/Settings";
-import { DiagnosticsService } from "../../../services/DiagnosticsService";
 
 jest.mock("../../../services/reporter");
 Utils.getZoweExplorerAPI = jest
@@ -75,7 +74,6 @@ describe("Tests copybook download service", () => {
   beforeEach(() => {
     downloadService = new CopybookDownloadService(
       "storage-path",
-      new DiagnosticsService(),
       {} as unknown as IApiRegisterClient,
     );
     downloadService["processDownloadError"] = jest.fn();
@@ -156,7 +154,6 @@ describe("Tests copybook download service", () => {
         beforeEach(() => {
           downloadService = new CopybookDownloadService(
             "storage-path",
-            new DiagnosticsService(),
             zoweMockUnauthorizedError,
           );
           downloadService["processDownloadError"] = jest.fn();
@@ -213,7 +210,6 @@ describe("Tests copybook download service", () => {
         beforeEach(() => {
           downloadService = new CopybookDownloadService(
             "storage-path",
-            new DiagnosticsService(),
             zoweMockNotFoundError,
           );
           workspaceConfigurationMock[PATHS_DSN] = ["TEST.COBOL.COPYBOOK"];
@@ -239,7 +235,6 @@ describe("Tests copybook download service", () => {
         beforeEach(() => {
           downloadService = new CopybookDownloadService(
             "storage-path",
-            new DiagnosticsService(),
             createZoweExplorerMock(permissionsErrorMock),
           );
           workspaceConfigurationMock[PATHS_DSN] = ["TEST.COBOL.COPYBOOK"];
@@ -265,7 +260,6 @@ describe("Tests copybook download service", () => {
       beforeEach(() => {
         downloadService = new CopybookDownloadService(
           "storage-path",
-          new DiagnosticsService(),
           zoweExplorerMock,
         );
       });
@@ -284,7 +278,6 @@ describe("Tests copybook download service", () => {
     it("checks no profile checks are done when download configurations are not configured", async () => {
       const downloadService = new CopybookDownloadService(
         "storage-path",
-        new DiagnosticsService(),
         zoweExplorerMock,
       );
       ProfileUtils.getAvailableProfiles = jest.fn().mockReturnValue("profile");
@@ -304,7 +297,6 @@ describe("Tests copybook download service", () => {
     it("checks locked profile do not trigger download", async () => {
       const downloadService = new CopybookDownloadService(
         "storage-path",
-        new DiagnosticsService(),
         zoweExplorerMock,
       );
       ProfileUtils.getAvailableProfiles = jest.fn().mockReturnValue("profile");
@@ -328,7 +320,6 @@ describe("Tests copybook download service", () => {
       ]);
       const downloadService = new CopybookDownloadService(
         "storage-path",
-        new DiagnosticsService(),
         zoweExplorerMock,
       );
 
@@ -353,7 +344,6 @@ describe("Tests copybook download service", () => {
       .mockReturnValue({ dsn: "DATASET.WITH.COPYBOOK" });
     const downloadService = new CopybookDownloadService(
       "storage-path",
-      new DiagnosticsService(),
       {} as unknown as IApiRegisterClient,
     );
     DownloadUtil.checkForInvalidCredProfile = jest.fn().mockReturnValue(false);
@@ -384,7 +374,6 @@ describe("Tests copybook download service", () => {
   it("checks vscode progress notification is updated on callback", () => {
     const downloadService = new CopybookDownloadService(
       "storage-path",
-      new DiagnosticsService(),
       {} as unknown as IApiRegisterClient,
     );
     const mockProgress = {
@@ -413,7 +402,6 @@ describe("Tests copybook download service", () => {
       it("checks the order of copybook resolution - DSN followed by USS)", async () => {
         const downloader = new CopybookDownloadService(
           "storage-path",
-          new DiagnosticsService(),
           zoweExplorerMock,
           undefined,
         );
@@ -454,7 +442,6 @@ describe("Tests copybook download service", () => {
       it("checks the order of copybook resolution - USS is not called when DSN resolves)", async () => {
         const downloader = new CopybookDownloadService(
           "storage-path",
-          new DiagnosticsService(),
           zoweExplorerMock,
           undefined,
         );
@@ -490,7 +477,6 @@ describe("Tests copybook download service", () => {
     it("checks the order of copybook resolution - USS and DSN is not called when E4E resolves)", async () => {
       const downloader = new CopybookDownloadService(
         "storage-path",
-        new DiagnosticsService(),
         zoweExplorerMock,
         e4eMock,
       );
@@ -534,7 +520,6 @@ describe("Tests copybook download service", () => {
     it("checks the order of resolution is same as the one provided in user settings", async () => {
       const downloader = new CopybookDownloadService(
         "storage-path",
-        new DiagnosticsService(),
         zoweExplorerMock,
         undefined,
       );
@@ -568,7 +553,6 @@ describe("Tests copybook download service", () => {
   it("checks download fails if ZE apis are missing", async () => {
     const resolver = new CopybookDownloadService(
       "storage-path",
-      new DiagnosticsService(),
       undefined,
       undefined,
     );
@@ -582,7 +566,6 @@ describe("Tests copybook download service", () => {
   it("checks clear cache do not throw error when ZE apis are missing", () => {
     const resolver = new CopybookDownloadService(
       "storage-path",
-      new DiagnosticsService(),
       undefined,
       undefined,
     );
@@ -592,7 +575,6 @@ describe("Tests copybook download service", () => {
   it("checks clear cache calls e4e clear config", () => {
     const resolver = new CopybookDownloadService(
       "storage-path",
-      new DiagnosticsService(),
       undefined,
       {} as unknown as E4E,
     );
@@ -660,7 +642,6 @@ describe("Tests copybook download service", () => {
       test("return list of all members of the dataset", async () => {
         const cds = new CopybookDownloadService(
           "/globalStorage",
-          new DiagnosticsService(),
           zoweExplorerApiMock,
         );
 
@@ -709,7 +690,6 @@ describe("Tests copybook download service", () => {
       test("return list of all members of the dataset", async () => {
         const cds = new CopybookDownloadService(
           "/globalStorage",
-          new DiagnosticsService(),
           zoweExplorerApiMock,
         );
 
@@ -745,7 +725,6 @@ describe("Tests copybook download service", () => {
 
           const cds = new CopybookDownloadService(
             "/globalStorage",
-            new DiagnosticsService(),
             zoweExplorerApiMock,
             undefined,
             outputChannelMock as unknown as vscode.OutputChannel,
@@ -771,7 +750,6 @@ describe("Tests copybook download service", () => {
         test("Successful requests are unlimited", async () => {
           const cds = new CopybookDownloadService(
             "/globalStorage",
-            new DiagnosticsService(),
             zoweExplorerApiMock,
           );
 
@@ -793,7 +771,6 @@ describe("Tests copybook download service", () => {
 
           const cds = new CopybookDownloadService(
             "/globalStorage",
-            new DiagnosticsService(),
             zoweExplorerApiMock,
           );
 
@@ -822,7 +799,6 @@ describe("Tests copybook download service", () => {
 
           const cds = new CopybookDownloadService(
             "/globalStorage",
-            new DiagnosticsService(),
             zoweExplorerApiMock,
           );
 
@@ -866,7 +842,6 @@ describe("Tests copybook download service", () => {
       test("no error popup is shown", async () => {
         const cds = new CopybookDownloadService(
           "/globalStorage",
-          new DiagnosticsService(),
           zoweExplorerApiMock,
         );
         await cds.listRemoteCopybooks(
@@ -891,7 +866,6 @@ describe("Tests copybook download service", () => {
       test("error popup is shown", async () => {
         const cds = new CopybookDownloadService(
           "/globalStorage",
-          new DiagnosticsService(),
           zoweExplorerApiMock,
         );
         await cds.listRemoteCopybooks(
@@ -917,7 +891,6 @@ describe("Tests copybook download service", () => {
 
     const downloader = new CopybookDownloadService(
       "storage-path",
-      new DiagnosticsService(),
       zoweExplorerMock,
       undefined,
     );
@@ -952,7 +925,6 @@ describe("Tests copybook download service", () => {
 
     const downloader = new CopybookDownloadService(
       "storage-path",
-      new DiagnosticsService(),
       zoweExplorerMock,
       undefined,
     );
@@ -986,7 +958,6 @@ describe("Tests copybook download service", () => {
 
     const downloader = new CopybookDownloadService(
       "storage-path",
-      new DiagnosticsService(),
       zoweExplorerMock,
       undefined,
     );
@@ -1027,7 +998,6 @@ describe("Tests copybook download service", () => {
 
     const downloader = new CopybookDownloadService(
       "storage-path",
-      new DiagnosticsService(),
       undefined,
       e4eMockInvalidProfile,
     );
@@ -1047,7 +1017,6 @@ describe("Tests copybook download service", () => {
     SettingsService.getUssPath = jest.fn().mockReturnValue([]);
     const service = new CopybookDownloadService(
       "storage-path",
-      new DiagnosticsService(),
       zoweExplorerMock,
       e4eMock,
     );

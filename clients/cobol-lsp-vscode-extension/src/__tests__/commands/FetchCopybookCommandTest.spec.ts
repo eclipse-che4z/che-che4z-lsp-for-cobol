@@ -17,7 +17,6 @@ import {
   CopybookDownloadService,
   CopybookName,
 } from "../../services/copybook/CopybookDownloadService";
-import { DiagnosticsService } from "../../services/DiagnosticsService";
 import { registerEvent } from "../../services/reporter";
 import { Utils } from "../../services/util/Utils";
 
@@ -31,7 +30,6 @@ test("Test fetchCopybookCommand calls telementry services and copybook download 
   const copybookDownloadService: CopybookDownloadService =
     new CopybookDownloadService(
       "./storage-path",
-      new DiagnosticsService(),
       {} as unknown as IApiRegisterClient,
     );
   copybookDownloadService.downloadCopybooks = jest.fn();
