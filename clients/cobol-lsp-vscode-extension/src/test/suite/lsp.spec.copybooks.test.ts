@@ -236,10 +236,12 @@ suite("Integration Test Suite: Copybooks", function () {
     });
 
     test("Copybooks auto completions are provided", async function () {
-      const editor = await helper.showDocument("COMPLETIONS.cbl");
+      const editor = await helper.showDocument("SNIPPET.cbl");
+      await helper.insertString(editor, pos(0, 0), "      COPY PAY.");
+
       await helper.sleep(1000);
 
-      helper.moveCursor(editor, helper.pos(25, 15));
+      helper.moveCursor(editor, helper.pos(0, 14));
 
       const completions = await helper.triggerCompletionsAndWaitForResults();
       await helper.sleep(1000);
@@ -260,13 +262,10 @@ suite("Integration Test Suite: Copybooks", function () {
 
       await vscode.commands.executeCommand("acceptSelectedSuggestion");
       await helper.waitFor(() => {
-        return editor.document.lineAt(25).text.trim() === "COPY PAYLIB.";
+        return editor.document.lineAt(0).text.trim() === "COPY PAYLIB.";
       });
 
-      assert.strictEqual(
-        editor.document.lineAt(25).text.trim(),
-        "COPY PAYLIB.",
-      );
+      assert.strictEqual(editor.document.lineAt(0).text.trim(), "COPY PAYLIB.");
     });
   });
 });
