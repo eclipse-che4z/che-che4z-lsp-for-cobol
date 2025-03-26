@@ -1,10 +1,10 @@
 import * as vscode from "vscode";
-export class DiagnosticsService {
+export class DownloadDiagnosticsService {
   private diagnosticCollection: vscode.DiagnosticCollection;
 
   public constructor() {
     this.diagnosticCollection = vscode.languages.createDiagnosticCollection(
-      "COBOL Language Support",
+      "Download Diagnostics",
     );
   }
 
@@ -13,5 +13,8 @@ export class DiagnosticsService {
     diagnostics: vscode.Diagnostic[],
   ) {
     this.diagnosticCollection.set(documentUri, diagnostics);
+  }
+  public clearDiagnostics() {
+    this.diagnosticCollection.clear();
   }
 }

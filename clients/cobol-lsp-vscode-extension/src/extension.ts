@@ -62,7 +62,7 @@ import {
   AnalysisResult,
   ControlFlowAnalysisService,
 } from "./services/ControlFlowService";
-import { DiagnosticsService } from "./services/DiagnosticsService";
+import { DownloadDiagnosticsService } from "./services/DiagnosticsService";
 
 interface __AnalysisApi {
   analysis(uri: string, text: string, pos?: vscode.Position): Promise<unknown>;
@@ -103,7 +103,7 @@ async function initialize(context: vscode.ExtensionContext) {
     maybeZowe && "api" in maybeZowe ? maybeZowe.api : undefined,
     maybeE4E && "api" in maybeE4E ? maybeE4E.api : undefined,
     outputChannel,
-    new DiagnosticsService(),
+    new DownloadDiagnosticsService(),
   );
 
   if (maybeZowe && "futureApi" in maybeZowe) {

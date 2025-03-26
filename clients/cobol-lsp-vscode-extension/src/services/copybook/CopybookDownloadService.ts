@@ -46,7 +46,7 @@ import {
   ZoweDatasetConfigModel,
   ZoweUssConfigModel,
 } from "../ProcessorGroupsLoader";
-import { DiagnosticsService } from "../DiagnosticsService";
+import { DownloadDiagnosticsService } from "../DiagnosticsService";
 
 export class CopybookName {
   constructor(
@@ -245,7 +245,7 @@ export class CopybookDownloadService {
     explorer?: IApiRegisterClient,
     e4e?: E4E,
     private outputChannel?: vscode.OutputChannel,
-    private diagnosticsService?: DiagnosticsService,
+    private diagnosticsService?: DownloadDiagnosticsService,
   ) {
     if (e4e) this.e4eAppeared(e4e);
     if (explorer) this.explorerAppeared(explorer);
@@ -258,6 +258,7 @@ export class CopybookDownloadService {
       this.e4eApi,
       this.outputChannel,
     );
+    this.diagnosticsService?.clearDiagnostics();
   }
 
   public explorerAppeared(api: IApiRegisterClient) {
@@ -270,6 +271,7 @@ export class CopybookDownloadService {
       this.storagePath,
       this.explorerApi,
     );
+    this.diagnosticsService?.clearDiagnostics();
   }
 
   public async downloadCopybooks(
