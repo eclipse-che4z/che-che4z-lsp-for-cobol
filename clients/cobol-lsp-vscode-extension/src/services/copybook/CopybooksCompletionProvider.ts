@@ -22,7 +22,6 @@ import {
   Position,
   Progress,
   ProgressLocation,
-  ProviderResult,
   TextDocument,
   window,
 } from "vscode";
