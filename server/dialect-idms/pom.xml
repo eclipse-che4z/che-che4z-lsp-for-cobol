@@ -35,7 +35,7 @@
         <lombok.version>1.18.36</lombok.version>
         <maven.resources.plugin.version>3.0.2</maven.resources.plugin.version>
         <maven.checkstyle.plugin.version>3.1.1</maven.checkstyle.plugin.version>
-        <junit-jupiter.version>5.11.0-M2</junit-jupiter.version>
+        <junit-jupiter.version>5.11.2</junit-jupiter.version>
         <junit.platform.version>1.6.0</junit.platform.version>
         <mockito.core.version>5.14.2</mockito.core.version>
         <maven.compiler.plugin.version>3.13.0</maven.compiler.plugin.version>
