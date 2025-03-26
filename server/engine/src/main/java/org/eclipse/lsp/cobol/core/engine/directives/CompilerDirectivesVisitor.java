@@ -130,6 +130,24 @@ public class CompilerDirectivesVisitor extends CompilerDirectivesParserBaseVisit
   }
 
   @Override
+  public List<Node> visitCobolJavaInteroperabilityOptions(CompilerDirectivesParser.CobolJavaInteroperabilityOptionsContext ctx) {
+    return super.visitCobolJavaInteroperabilityOptions(ctx);
+  }
+
+  @Override
+  public List<Node> visitExtraneousInput(CompilerDirectivesParser.ExtraneousInputContext ctx) {
+    VisitorHelper.retrieveRangeLocality(ctx).ifPresent(r -> {
+      Range range = CompilerDirectivesUtils.shiftRange(r, startPosition);
+      Location location = new Location(analysisContext.getExtendedDocument().getUri(), range);
+      throwException(
+              ctx.getText(),
+              locationToLocality(location),
+              messageService.getMessage("compilerOption.invalid"));
+    });
+    return super.visitExtraneousInput(ctx);
+  }
+
+  @Override
   public List<Node> visitCompilerDirectives(CompilerDirectivesParser.CompilerDirectivesContext ctx) {
     analysisContext.getConfig().getCompilerOptions().add(ctx.getText().trim());
     return super.visitCompilerDirectives(ctx);

@@ -117,6 +117,117 @@ class TestCobolJavaInteroperabilityCompilerDirectives {
                   + "       01 {$*N1} PIC S9(9) COMP-5.\n"
                   + "       PROCEDURE DIVISION.\n"
                   + "           GOBACK.\n";
+
+  private static final String TEXT_SETTING_OUTPATH =
+          "       CBL JAVAIOP(OP('/a/folder'))\n"
+                  + "       IDENTIFICATION DIVISION.\n"
+                  + "       PROGRAM-ID. TEST1.\n"
+                  + "       DATA DIVISION.\n"
+                  + "       WORKING-STORAGE SECTION.\n"
+                  + "       >>JAVA-SHAREABLE ON\n"
+                  + "       01 {$*N1} PIC S9(9) COMP-5.\n"
+                  + "       PROCEDURE DIVISION.\n"
+                  + "           GOBACK.\n";
+
+  private static final String TEXT_SETTING_OUTPATH_INVALID =
+          "       CBL JAVAIOP(OP(/{a|error1}/folder{|error2}'))\n"
+                  + "       IDENTIFICATION DIVISION.\n"
+                  + "       PROGRAM-ID. TEST1.\n"
+                  + "       DATA DIVISION.\n"
+                  + "       WORKING-STORAGE SECTION.\n"
+                  + "       >>JAVA-SHAREABLE ON\n"
+                  + "       01 {$*N1} PIC S9(9) COMP-5.\n"
+                  + "       PROCEDURE DIVISION.\n"
+                  + "           GOBACK.\n";
+
+  private static final String TEXT_SETTING_JVMI =
+          "       CBL JAVAIOP(JVMI('/a/folder/compdir'))\n"
+                  + "       IDENTIFICATION DIVISION.\n"
+                  + "       PROGRAM-ID. TEST1.\n"
+                  + "       DATA DIVISION.\n"
+                  + "       WORKING-STORAGE SECTION.\n"
+                  + "       >>JAVA-SHAREABLE ON\n"
+                  + "       01 {$*N1} PIC S9(9) COMP-5.\n"
+                  + "       PROCEDURE DIVISION.\n"
+                  + "           GOBACK.\n";
+
+  private static final String TEXT_SETTING_NOJAVA64 =
+          "       CBL JAVAIOP(NOJAVA64)\n"
+                  + "       IDENTIFICATION DIVISION.\n"
+                  + "       PROGRAM-ID. TEST1.\n"
+                  + "       DATA DIVISION.\n"
+                  + "       WORKING-STORAGE SECTION.\n"
+                  + "       >>JAVA-SHAREABLE ON\n"
+                  + "       01 {$*N1} PIC S9(9) COMP-5.\n"
+                  + "       PROCEDURE DIVISION.\n"
+                  + "           GOBACK.\n";
+
+  private static final String TEXT_SETTING_JAVA64 =
+          "       CBL JAVAIOP(JAVA64)\n"
+                  + "       IDENTIFICATION DIVISION.\n"
+                  + "       PROGRAM-ID. TEST1.\n"
+                  + "       DATA DIVISION.\n"
+                  + "       WORKING-STORAGE SECTION.\n"
+                  + "       >>JAVA-SHAREABLE ON\n"
+                  + "       01 {$*N1} PIC S9(9) COMP-5.\n"
+                  + "       PROCEDURE DIVISION.\n"
+                  + "           GOBACK.\n";
+
+  private static final String TEXT_SETTING_NOJAVA64_JAVA64_INVALID =
+          "       CBL JAVAIOP(NOJAVA64 {JAVA64|error1})\n"
+                  + "       IDENTIFICATION DIVISION.\n"
+                  + "       PROGRAM-ID. TEST1.\n"
+                  + "       DATA DIVISION.\n"
+                  + "       WORKING-STORAGE SECTION.\n"
+                  + "       >>JAVA-SHAREABLE ON\n"
+                  + "       01 {$*N1} PIC S9(9) COMP-5.\n"
+                  + "       PROCEDURE DIVISION.\n"
+                  + "           GOBACK.\n";
+
+  private static final String TEXT_SETTING_JVMI_INVALID =
+          "       CBL JAVAIOP(JVMI('/a/folder/compdir') {NOJVMI|error1})\n"
+                  + "       IDENTIFICATION DIVISION.\n"
+                  + "       PROGRAM-ID. TEST1.\n"
+                  + "       DATA DIVISION.\n"
+                  + "       WORKING-STORAGE SECTION.\n"
+                  + "       >>JAVA-SHAREABLE ON\n"
+                  + "       01 {$*N1} PIC S9(9) COMP-5.\n"
+                  + "       PROCEDURE DIVISION.\n"
+                  + "           GOBACK.\n";
+
+  private static final String TEXT_SETTING_OUTPATH_JVMI_INVALID =
+          "       CBL JAVAIOP(OUTPATH('/a/folder/compdir') {JVMI|error1}('/a/folder/compdir'))\n"
+                  + "       IDENTIFICATION DIVISION.\n"
+                  + "       PROGRAM-ID. TEST1.\n"
+                  + "       DATA DIVISION.\n"
+                  + "       WORKING-STORAGE SECTION.\n"
+                  + "       >>JAVA-SHAREABLE ON\n"
+                  + "       01 {$*N1} PIC S9(9) COMP-5.\n"
+                  + "       PROCEDURE DIVISION.\n"
+                  + "           GOBACK.\n";
+
+  private static final String TEXT_SETTING_NOJAVAIOP =
+          "       CBL NOJAVAIOP\n"
+                  + "       IDENTIFICATION DIVISION.\n"
+                  + "       PROGRAM-ID. TEST1.\n"
+                  + "       DATA DIVISION.\n"
+                  + "       WORKING-STORAGE SECTION.\n"
+                  + "       >>JAVA-SHAREABLE ON\n"
+                  + "       01 {$*N1} PIC S9(9) COMP-5.\n"
+                  + "       PROCEDURE DIVISION.\n"
+                  + "           GOBACK.\n";
+
+  private static final String TEXT_SETTING_JAVAIOP_NOJAVAIOP_INVALID =
+          "       CBL JAVAIOP(JAVA64) {NOJAVAIOP|error1}\n"
+                  + "       IDENTIFICATION DIVISION.\n"
+                  + "       PROGRAM-ID. TEST1.\n"
+                  + "       DATA DIVISION.\n"
+                  + "       WORKING-STORAGE SECTION.\n"
+                  + "       >>JAVA-SHAREABLE ON\n"
+                  + "       01 {$*N1} PIC S9(9) COMP-5.\n"
+                  + "       PROCEDURE DIVISION.\n"
+                  + "           GOBACK.\n";
+
   @Test
   void testValid1() {
     UseCaseEngine.runTest(TEXT_VALID1, ImmutableList.of(), ImmutableMap.of());
@@ -219,6 +330,112 @@ class TestCobolJavaInteroperabilityCompilerDirectives {
                     new Diagnostic(
                             new Range(),
                             "The JAVA-SHAREABLE OFF directive was found but JAVA-SHAREABLE was already in the OFF state.",
+                            DiagnosticSeverity.Error,
+                            ErrorSource.PARSING.getText())),
+            ImmutableList.of());
+  }
+
+  @Test
+  void testSettingOutPath() {
+    UseCaseEngine.runTest(TEXT_SETTING_OUTPATH, ImmutableList.of(), ImmutableMap.of());
+  }
+
+  @Test
+  void testSettingOutPathInvalid() {
+    UseCaseEngine.runTest(
+            TEXT_SETTING_OUTPATH_INVALID,
+            ImmutableList.of(),
+            ImmutableMap.of(
+                    "error1",
+                    new Diagnostic(
+                            new Range(),
+                            "No viable alternative at input JAVAIOP(OP(a",
+                            DiagnosticSeverity.Error,
+                            ErrorSource.PARSING.getText()),
+                    "error2",
+                    new Diagnostic(
+                            new Range(),
+                            "IGYDS1082-E A period was required.",
+                            DiagnosticSeverity.Error,
+                            ErrorSource.PREPROCESSING.getText())),
+            ImmutableList.of());
+  }
+
+  @Test
+  void testSettingJvmi() {
+    UseCaseEngine.runTest(TEXT_SETTING_JVMI, ImmutableList.of(), ImmutableMap.of());
+  }
+
+  @Test
+  void testSettingNoJava64() {
+    UseCaseEngine.runTest(TEXT_SETTING_NOJAVA64, ImmutableList.of(), ImmutableMap.of());
+  }
+
+  @Test
+  void testSettingJava64() {
+    UseCaseEngine.runTest(TEXT_SETTING_JAVA64, ImmutableList.of(), ImmutableMap.of());
+  }
+
+  @Test
+  void testSettingNoJava64Java64Invalid() {
+    UseCaseEngine.runTest(
+            TEXT_SETTING_NOJAVA64_JAVA64_INVALID,
+            ImmutableList.of(),
+            ImmutableMap.of(
+                    "error1",
+                    new Diagnostic(
+                            new Range(),
+                            "No viable alternative at input JAVAIOP(NOJAVA64 JAVA64",
+                            DiagnosticSeverity.Error,
+                            ErrorSource.PARSING.getText())),
+            ImmutableList.of());
+  }
+
+  @Test
+  void testSettingJvmiInvalid() {
+    UseCaseEngine.runTest(
+            TEXT_SETTING_JVMI_INVALID,
+            ImmutableList.of(),
+            ImmutableMap.of(
+                    "error1",
+                    new Diagnostic(
+                            new Range(),
+                            "No viable alternative at input JAVAIOP(JVMI('/a/folder/compdir') NOJVMI",
+                            DiagnosticSeverity.Error,
+                            ErrorSource.PARSING.getText())),
+            ImmutableList.of());
+  }
+
+  @Test
+  void testSettingOutPathJvmiInvalid() {
+    UseCaseEngine.runTest(
+            TEXT_SETTING_OUTPATH_JVMI_INVALID,
+            ImmutableList.of(),
+            ImmutableMap.of(
+                    "error1",
+                    new Diagnostic(
+                            new Range(),
+                            "No viable alternative at input JAVAIOP(OUTPATH('/a/folder/compdir') JVMI",
+                            DiagnosticSeverity.Error,
+                            ErrorSource.PARSING.getText())),
+            ImmutableList.of());
+  }
+
+  @Test
+  void testSettingNoJavaIOP() {
+    UseCaseEngine.runTest(TEXT_SETTING_NOJAVAIOP, ImmutableList.of(), ImmutableMap.of());
+  }
+
+  @Test
+  void testSettingJavaIopNoJavaIopInvalid() {
+    UseCaseEngine.runTest(
+            TEXT_SETTING_JAVAIOP_NOJAVAIOP_INVALID,
+            ImmutableList.of(),
+            ImmutableMap.of(
+                    "error1",
+                    new Diagnostic(
+                            new Range(),
+                            "An invalid option was found: NOJAVAIOP",
                             DiagnosticSeverity.Error,
                             ErrorSource.PARSING.getText())),
             ImmutableList.of());

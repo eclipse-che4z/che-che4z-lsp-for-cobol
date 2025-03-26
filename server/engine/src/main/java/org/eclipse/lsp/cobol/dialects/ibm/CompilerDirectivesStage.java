@@ -111,11 +111,16 @@ public class CompilerDirectivesStage implements Stage<AnalysisContext, List<Node
       CompilerDirectivesVisitor visitor = new CompilerDirectivesVisitor(ctx, messageService, startPosition, section,
               directiveLineText, isJavaShareableOn);
 
+      List<SyntaxError> parseError = new ArrayList<>();
       if (parserRule.equals("compilerOptions")) {
         visitor.visitCompilerOptions(parser.compilerOptions());
+        parseError.addAll(visitor.getErrors());
+        parseError.forEach(error -> error.getLocation().getLocation().setRange(
+                ctx.getExtendedDocument().mapLocation(error.getLocation().getLocation().getRange()).getRange()));
+        ctx.getAccumulatedErrors().addAll(parseError);
       } else if (parserRule.equals("compilerDirectives")) {
         List<Node> nodes = new ArrayList<>(visitor.visitCompilerDirectives(parser.compilerDirectives()));
-        List<SyntaxError> parseError = new ArrayList<>(visitor.getErrors());
+        parseError.addAll(visitor.getErrors());
         parseError.forEach(error -> error.getLocation().getLocation().setRange(
                 ctx.getExtendedDocument().mapLocation(error.getLocation().getLocation().getRange()).getRange()));
 
