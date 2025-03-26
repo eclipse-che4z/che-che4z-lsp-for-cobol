@@ -426,6 +426,7 @@ describe("Tests copybook download service", () => {
           { name: "copybook", dialect: "COBOL" },
           "uss",
           "profile",
+          [""],
         );
       });
     });
@@ -975,6 +976,7 @@ describe("Tests copybook download service", () => {
       { name: "copybook", dialect: "COBOL" },
       "ussFile",
       "profile",
+      [".CPY", ".cpy", ""],
     );
   });
 
@@ -1041,7 +1043,7 @@ describe("Tests copybook download service", () => {
     expect(downloadSpy).toHaveBeenCalledWith(
       { instance: "instance", profile: "profile" },
       {
-        element: "copybook",
+        element: "COPYBOOK",
         environment: "environment",
         fingerprint: "",
         stage: "1",

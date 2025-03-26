@@ -36,7 +36,14 @@ export class CopybookDownloaderForUss extends ZoweExplorerDownloader {
     copybookName: CopybookName,
     ussPath: string,
     profile: string,
+    extensions: string[],
   ): Promise<boolean> {
+    const has = await this.hasMember(
+      profile,
+      ussPath,
+      copybookName.name,
+      extensions,
+    );
     const memberList = await this.getAllMembers(profile, ussPath);
     const remoteCopybook = DownloadUtil.getRemoteCopybookName(
       memberList,
@@ -44,6 +51,7 @@ export class CopybookDownloaderForUss extends ZoweExplorerDownloader {
     );
     return !!(
       remoteCopybook &&
+      has &&
       (await this.downloadCopybookFromMFUsingZowe(
         ussPath,
         remoteCopybook,
@@ -138,13 +146,21 @@ export class CopybookDownloaderForUss extends ZoweExplorerDownloader {
     profileName: string,
     uss: string,
     copybookName: string,
-  ) {
+    extensions: string[] = [""],
+  ): Promise<string | undefined> {
     const id = this.createId(profileName, uss);
-
     if (this.memberListCache.has(id)) {
-      return this.memberListCache
-        .get(id)
-        ?.find((member) => member === copybookName.toUpperCase());
+      let member: string | undefined;
+      for (const ext of extensions) {
+        member = this.memberListCache
+          .get(id)
+          ?.find(
+            (member) =>
+              member.toUpperCase() ===
+              `${copybookName.concat(ext).toUpperCase()}`,
+          );
+      }
+      return member;
     }
     const profile = DownloadUtil.loadProfile(profileName, this.explorerAPI);
     await this.limitFailedRequests(
@@ -158,12 +174,18 @@ export class CopybookDownloaderForUss extends ZoweExplorerDownloader {
         this.memberListCache.set(id, members);
       },
     );
-    if (
-      this.memberListCache
-        .get(id)
-        ?.find((member) => member === copybookName.toUpperCase())
-    )
-      return true;
-    return false;
+    if (this.memberListCache.has(id)) {
+      let member: string | undefined;
+      for (const ext of extensions) {
+        member = this.memberListCache
+          .get(id)
+          ?.find(
+            (member) =>
+              member.toUpperCase() ===
+              `${copybookName.concat(ext).toUpperCase()}`,
+          );
+      }
+      return member;
+    }
   }
 }

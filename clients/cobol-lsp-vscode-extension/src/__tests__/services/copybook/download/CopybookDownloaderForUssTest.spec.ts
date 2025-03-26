@@ -61,6 +61,7 @@ describe("Tests Copybook download from USS", () => {
         { name: "copybook-name", dialect: "COBOL" },
         "/uss/path",
         "profile",
+        [""],
       );
       expect(isDowloaded).toBeFalsy();
     });
@@ -70,6 +71,7 @@ describe("Tests Copybook download from USS", () => {
         { name: "copybook-name", dialect: "COBOL" },
         "/uss/path",
         "profile",
+        [""],
       );
       expect(isDowloaded).toBeFalsy();
     });
@@ -97,6 +99,7 @@ describe("Tests Copybook download from USS", () => {
           { name: "uss_copybook", dialect: "COBOL" },
           "/uss/path",
           "profile",
+          [""],
         );
         expect(allUSSFilemembers).toHaveBeenCalledWith("/uss/path");
         expect(getUSSContentsMock).toHaveBeenCalledWith(
@@ -115,6 +118,7 @@ describe("Tests Copybook download from USS", () => {
           { name: "uss_copybook", dialect: "COBOL" },
           "/uss/path",
           "profile",
+          [""],
         );
         // cache resolves the members
         expect(allUSSFilemembers).not.toHaveBeenCalled();

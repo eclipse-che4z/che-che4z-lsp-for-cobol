@@ -376,7 +376,7 @@ export class CopybookDownloaderForE4E {
     const id = this.createProfileEndevorTypeId(profile, endevorType);
     if (this.E4EElements.has(id)) {
       const element = this.E4EElements.get(id)?.find(
-        (x) => x.element == elementName.toUpperCase(),
+        (x) => x.element.toUpperCase() == elementName.toUpperCase(),
       );
       return element ? true : false;
     } else {
@@ -384,7 +384,9 @@ export class CopybookDownloaderForE4E {
       if (members instanceof Error) this.E4EElements.set(id, undefined);
       else {
         this.E4EElements.set(id, members);
-        return members.find((x) => x.element == elementName.toUpperCase())
+        return members.find(
+          (x) => x.element.toUpperCase() == elementName.toUpperCase(),
+        )
           ? true
           : false;
       }

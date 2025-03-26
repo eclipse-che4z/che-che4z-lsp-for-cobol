@@ -146,7 +146,17 @@ export class CopybookDownloadService {
               this.explorerApi,
             );
       if (profile) {
-        const success = await downloader.downloadCopybook(copybook, p, profile);
+        const extensions =
+          await SettingsService.getCopybookExtension(documentUri);
+        const success =
+          downloader instanceof CopybookDownloaderForDsn
+            ? await downloader.downloadCopybook(copybook, p, profile)
+            : await downloader.downloadCopybook(
+                copybook,
+                p,
+                profile,
+                extensions ? extensions : [""],
+              );
         if (success) return true;
       }
     }
@@ -566,7 +576,7 @@ export class CopybookDownloadService {
             system: config.system,
             subsystem: config.subsystem,
             type: config.type,
-            element: copybookName.name,
+            element: copybookName.name.toUpperCase(),
             fingerprint: "",
           };
           if (
@@ -615,8 +625,10 @@ async function searchCopybookinProcessorGroups(
   for (const config of pgConfigs) {
     let shouldFound = false;
     let folders: string = "";
+    let extensions: string[] | undefined;
     if (typeof config === "string") {
       folders = config;
+      extensions = await SettingsService.getCopybookExtension(documentUri);
     } else if (ENVIRONMENT in config && e4eDownloader) {
       const endevorType = DownloadUtil.endevorConfigToType(config);
       const profile = await e4eDownloader.getProfileInfo(config.profile);
@@ -634,6 +646,7 @@ async function searchCopybookinProcessorGroups(
         E4E_FOLDER,
       ).fsPath;
       shouldFound = true;
+      extensions = [""];
     } else if (DATASET in config) {
       const has = await dsnDownloader?.hasMember(
         config.profile ? config.profile : SettingsService.getProfileName()!,
@@ -647,11 +660,14 @@ async function searchCopybookinProcessorGroups(
         storagePath,
       ).fsPath;
       shouldFound = true;
+      extensions = [""];
     } else if (USS in config) {
+      extensions = await SettingsService.getCopybookExtension(documentUri);
       const has = await ussDownloader?.hasMember(
         config.profile ? config.profile : SettingsService.getProfileName()!,
         config.uss,
         copybookName,
+        extensions,
       );
       if (!has) continue;
       folders = CopybookURI.createDatasetPath(
@@ -665,7 +681,7 @@ async function searchCopybookinProcessorGroups(
     result = searchCopybookInExtensionFolder(
       copybookName,
       folders ? [folders] : [],
-      await SettingsService.getCopybookExtension(documentUri),
+      extensions,
       storagePath,
     );
     if (typeof config === "string" && !result) continue;
