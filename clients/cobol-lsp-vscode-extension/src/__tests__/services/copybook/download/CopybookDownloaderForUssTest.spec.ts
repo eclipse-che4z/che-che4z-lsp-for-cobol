@@ -83,6 +83,12 @@ describe("Tests Copybook download from USS", () => {
   });
 
   describe("checks the copybook download using ZE USS API's", () => {
+    beforeEach(() => {
+      jest
+        .spyOn(SettingsService, "getCopybookExtension")
+        .mockResolvedValue([".cpy", ""]);
+    });
+
     const downloader = new CopybookDownloaderForUss(
       "storage-path",
       createZoweExplorerMock(),

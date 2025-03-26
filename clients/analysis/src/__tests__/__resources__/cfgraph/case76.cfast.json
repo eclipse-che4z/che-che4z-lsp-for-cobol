@@ -1,0 +1,162 @@
+[
+  {
+    "name": "PROG",
+    "type": "program",
+    "location": {
+      "uri": "/case76.cbl",
+      "start": {
+        "line": 3,
+        "character": 8
+      },
+      "end": {
+        "line": 17,
+        "character": 19
+      }
+    },
+    "children": [
+      {
+        "targetName": "PROC",
+        "type": "perform",
+        "location": {
+          "uri": "/case76.cbl",
+          "start": {
+            "line": 5,
+            "character": 12
+          },
+          "end": {
+            "line": 5,
+            "character": 24
+          }
+        }
+      },
+      {
+        "targetName": [
+          "PAR-EXIT"
+        ],
+        "type": "goto",
+        "location": {
+          "uri": "/case76.cbl",
+          "start": {
+            "line": 7,
+            "character": 12
+          },
+          "end": {
+            "line": 7,
+            "character": 26
+          }
+        }
+      },
+      {
+        "snippet": "       PROC.\r\n           DISPLAY \"PROC\".           \r\n           PERFORM PAR1.",
+        "name": "PROC",
+        "type": "paragraph",
+        "location": {
+          "uri": "/case76.cbl",
+          "start": {
+            "line": 9,
+            "character": 8
+          },
+          "end": {
+            "line": 11,
+            "character": 25
+          }
+        },
+        "children": [
+          {
+            "type": "statement",
+            "location": {
+              "uri": "/case76.cbl",
+              "start": {
+                "line": 10,
+                "character": 12
+              },
+              "end": {
+                "line": 10,
+                "character": 26
+              }
+            }
+          },
+          {
+            "targetName": "PAR1",
+            "type": "perform",
+            "location": {
+              "uri": "/case76.cbl",
+              "start": {
+                "line": 11,
+                "character": 12
+              },
+              "end": {
+                "line": 11,
+                "character": 24
+              }
+            }
+          }
+        ]
+      },
+      {
+        "snippet": "       PAR1.\r\n           DISPLAY \"PAR1\".           ",
+        "name": "PAR1",
+        "type": "paragraph",
+        "location": {
+          "uri": "/case76.cbl",
+          "start": {
+            "line": 13,
+            "character": 8
+          },
+          "end": {
+            "line": 14,
+            "character": 27
+          }
+        },
+        "children": [
+          {
+            "type": "statement",
+            "location": {
+              "uri": "/case76.cbl",
+              "start": {
+                "line": 14,
+                "character": 12
+              },
+              "end": {
+                "line": 14,
+                "character": 26
+              }
+            }
+          }
+        ]
+      },
+      {
+        "snippet": "       PAR-EXIT.\r\n           GOBACK.",
+        "name": "PAR-EXIT",
+        "type": "paragraph",
+        "location": {
+          "uri": "/case76.cbl",
+          "start": {
+            "line": 16,
+            "character": 8
+          },
+          "end": {
+            "line": 17,
+            "character": 19
+          }
+        },
+        "children": [
+          {
+            "type": "goback",
+            "location": {
+              "uri": "/case76.cbl",
+              "start": {
+                "line": 17,
+                "character": 12
+              },
+              "end": {
+                "line": 17,
+                "character": 18
+              }
+            }
+          }
+        ]
+      }
+    ]
+  }
+]

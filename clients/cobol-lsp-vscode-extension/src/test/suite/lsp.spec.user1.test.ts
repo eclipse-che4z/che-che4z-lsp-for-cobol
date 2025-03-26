@@ -73,14 +73,16 @@ suite("Tests with USER1.cbl", function () {
     line: number,
     char: number,
   ) {
-    let locations: vscode.Location[] = [];
+    let locations: vscode.Location[] | undefined = [];
     await helper.waitFor(async () => {
       locations = await vscode.commands.executeCommand(
         provider,
         editor.document.uri,
         pos(line, char),
       );
-
+      if (locations === undefined) {
+        return false;
+      }
       return locations.length > 0;
     });
     return locations;
@@ -170,6 +172,7 @@ suite("Tests with USER1.cbl", function () {
       editor.document.uri,
       { tabSize: 4, insertSpaces: true },
     );
+    assert.ok(result);
     assert.strictEqual(result.length, 1);
 
     helper.assertRangeIsEqual(

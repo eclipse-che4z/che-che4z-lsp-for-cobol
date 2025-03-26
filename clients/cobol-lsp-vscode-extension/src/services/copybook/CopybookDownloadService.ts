@@ -15,7 +15,6 @@
 import * as vscode from "vscode";
 import {
   COPYBOOKS_FOLDER,
-  DEFAULT_DIALECT,
   ENDEVOR_PROCESSOR,
   PROVIDE_PROFILE_MSG,
   ZOWE_FOLDER,
@@ -32,8 +31,6 @@ import { searchCopybookInExtensionFolder } from "../util/FSUtils";
 import { CopybookURI } from "./CopybookURI";
 import path = require("path");
 import { getErrorMessage } from "../util/ErrorsUtils";
-import { DialectRegistry } from "../DialectRegistry";
-import { getChannel } from "../../extension";
 
 export class CopybookName {
   constructor(
@@ -247,22 +244,8 @@ export class CopybookDownloadService {
       return this.e4eDownloader?.listRemoteCopybooksE4E(documentUri) ?? [];
     }
 
-    const dialects = [
-      DEFAULT_DIALECT,
-      ...DialectRegistry.getActiveDialects().map((di) => di.name),
-    ];
-
-    const copybooks: string[] = [];
-
-    const dsnPaths: string[] = SettingsService.getDsnPath(documentUri, dialect);
-    const ussPaths: string[] = SettingsService.getUssPath(documentUri, dialect);
-
-    if (dsnPaths.length === 0 && ussPaths.length === 0) {
-      return [];
-    }
-
     if (
-      !(await this.isPrerequisiteForDownloadSatisfied(documentUri, dialects))
+      !(await this.isPrerequisiteForDownloadSatisfied(documentUri, [dialect]))
     ) {
       return [];
     }
@@ -274,6 +257,10 @@ export class CopybookDownloadService {
     if (!profile) {
       return [];
     }
+
+    const copybooks: string[] = [];
+    const dsnPaths: string[] = SettingsService.getDsnPath(documentUri, dialect);
+    const ussPaths: string[] = SettingsService.getUssPath(documentUri, dialect);
 
     const results = await Promise.allSettled([
       ...dsnPaths.map(async (dsn) => {
@@ -297,7 +284,7 @@ export class CopybookDownloadService {
       if (result.status === "fulfilled") {
         result.value.forEach((c) => copybooks.push(c));
       } else {
-        getChannel().appendLine(
+        this.outputChannel?.appendLine(
           `Unable to load copybooks completions. ${result.reason}`,
         );
       }
@@ -357,6 +344,17 @@ export class CopybookDownloadService {
       return !!(await this.e4eDownloader?.getE4EConfig(documentUri));
     }
     if (!this.explorerApi) return false;
+
+    const copybooksLocation =
+      DownloadUtil.areCopybookDownloadConfigurationsPresent(
+        documentUri,
+        dialects,
+      );
+
+    if (!copybooksLocation) {
+      return false;
+    }
+
     const profile = ProfileUtils.getProfileNameForCopybook(
       documentUri,
       this.explorerApi,
@@ -376,8 +374,7 @@ export class CopybookDownloadService {
       !(await DownloadUtil.checkForInvalidCredProfile(
         profile,
         this.explorerApi,
-        documentUri,
-        dialects,
+        copybooksLocation,
       ))
     );
   }

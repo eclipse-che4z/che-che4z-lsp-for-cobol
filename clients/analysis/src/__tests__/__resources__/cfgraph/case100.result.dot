@@ -1,0 +1,7 @@
+digraph A {
+rankdir=LR;
+<PROG>-><MAINLINE>;
+<MAINLINE>-><XML-HANDLER>;
+<MAINLINE>-><ABEND>;
+<MAINLINE>-><OK>;
+}

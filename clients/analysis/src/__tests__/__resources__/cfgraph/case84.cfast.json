@@ -1,0 +1,210 @@
+[
+  {
+    "name": "PROG",
+    "type": "program",
+    "location": {
+      "uri": "/case84.cbl",
+      "start": {
+        "line": 4,
+        "character": 8
+      },
+      "end": {
+        "line": 19,
+        "character": 17
+      }
+    },
+    "children": [
+      {
+        "targetName": "100-MAINLINE",
+        "thruName": "100-EXIT",
+        "type": "perform",
+        "location": {
+          "uri": "/case84.cbl",
+          "start": {
+            "line": 5,
+            "character": 12
+          },
+          "end": {
+            "line": 5,
+            "character": 46
+          }
+        }
+      },
+      {
+        "type": "goback",
+        "location": {
+          "uri": "/case84.cbl",
+          "start": {
+            "line": 6,
+            "character": 12
+          },
+          "end": {
+            "line": 6,
+            "character": 18
+          }
+        }
+      },
+      {
+        "snippet": "       100-MAINLINE.\r\n           PERFORM 300-FIELD-EDITS THRU 300-EXIT.",
+        "name": "100-MAINLINE",
+        "type": "paragraph",
+        "location": {
+          "uri": "/case84.cbl",
+          "start": {
+            "line": 8,
+            "character": 8
+          },
+          "end": {
+            "line": 9,
+            "character": 50
+          }
+        },
+        "children": [
+          {
+            "targetName": "300-FIELD-EDITS",
+            "thruName": "300-EXIT",
+            "type": "perform",
+            "location": {
+              "uri": "/case84.cbl",
+              "start": {
+                "line": 9,
+                "character": 12
+              },
+              "end": {
+                "line": 9,
+                "character": 49
+              }
+            }
+          }
+        ]
+      },
+      {
+        "snippet": "       100-EXIT.\r\n           EXIT.",
+        "name": "100-EXIT",
+        "type": "paragraph",
+        "location": {
+          "uri": "/case84.cbl",
+          "start": {
+            "line": 11,
+            "character": 8
+          },
+          "end": {
+            "line": 12,
+            "character": 17
+          }
+        },
+        "children": [
+          {
+            "type": "exit",
+            "location": {
+              "uri": "/case84.cbl",
+              "start": {
+                "line": 12,
+                "character": 12
+              },
+              "end": {
+                "line": 12,
+                "character": 16
+              }
+            }
+          }
+        ]
+      },
+      {
+        "snippet": "       300-FIELD-EDITS.\r\n           IF A \u003e B\r\n              GO TO 300-EXIT.",
+        "name": "300-FIELD-EDITS",
+        "type": "paragraph",
+        "location": {
+          "uri": "/case84.cbl",
+          "start": {
+            "line": 14,
+            "character": 8
+          },
+          "end": {
+            "line": 16,
+            "character": 30
+          }
+        },
+        "children": [
+          {
+            "type": "if",
+            "location": {
+              "uri": "/case84.cbl",
+              "start": {
+                "line": 15,
+                "character": 12
+              },
+              "end": {
+                "line": 16,
+                "character": 29
+              }
+            }
+          },
+          {
+            "targetName": [
+              "300-EXIT"
+            ],
+            "type": "goto",
+            "location": {
+              "uri": "/case84.cbl",
+              "start": {
+                "line": 16,
+                "character": 15
+              },
+              "end": {
+                "line": 16,
+                "character": 29
+              }
+            }
+          },
+          {
+            "type": "endif",
+            "location": {
+              "uri": "/case84.cbl",
+              "start": {
+                "line": 15,
+                "character": 12
+              },
+              "end": {
+                "line": 16,
+                "character": 29
+              }
+            }
+          }
+        ]
+      },
+      {
+        "snippet": "       300-EXIT.\r\n           EXIT.",
+        "name": "300-EXIT",
+        "type": "paragraph",
+        "location": {
+          "uri": "/case84.cbl",
+          "start": {
+            "line": 18,
+            "character": 8
+          },
+          "end": {
+            "line": 19,
+            "character": 17
+          }
+        },
+        "children": [
+          {
+            "type": "exit",
+            "location": {
+              "uri": "/case84.cbl",
+              "start": {
+                "line": 19,
+                "character": 12
+              },
+              "end": {
+                "line": 19,
+                "character": 16
+              }
+            }
+          }
+        ]
+      }
+    ]
+  }
+]

@@ -1,0 +1,144 @@
+[
+  {
+    "name": "CFGPSQE",
+    "type": "program",
+    "location": {
+      "uri": "/case08.cbl",
+      "start": {
+        "line": 3,
+        "character": 8
+      },
+      "end": {
+        "line": 11,
+        "character": 29
+      }
+    },
+    "children": [
+      {
+        "type": "statement",
+        "location": {
+          "uri": "/case08.cbl",
+          "start": {
+            "line": 4,
+            "character": 12
+          },
+          "end": {
+            "line": 4,
+            "character": 25
+          }
+        }
+      },
+      {
+        "targetName": "PARAG2",
+        "type": "perform",
+        "location": {
+          "uri": "/case08.cbl",
+          "start": {
+            "line": 5,
+            "character": 12
+          },
+          "end": {
+            "line": 5,
+            "character": 26
+          }
+        }
+      },
+      {
+        "snippet": "       PARAG1.\r\n           DISPLAY \u0027PARAG1\u0027.",
+        "name": "PARAG1",
+        "type": "paragraph",
+        "location": {
+          "uri": "/case08.cbl",
+          "start": {
+            "line": 6,
+            "character": 8
+          },
+          "end": {
+            "line": 7,
+            "character": 29
+          }
+        },
+        "children": [
+          {
+            "type": "statement",
+            "location": {
+              "uri": "/case08.cbl",
+              "start": {
+                "line": 7,
+                "character": 12
+              },
+              "end": {
+                "line": 7,
+                "character": 28
+              }
+            }
+          }
+        ]
+      },
+      {
+        "snippet": "       PARAG2.\r\n           DISPLAY \u0027PARAG2\u0027.",
+        "name": "PARAG2",
+        "type": "paragraph",
+        "location": {
+          "uri": "/case08.cbl",
+          "start": {
+            "line": 8,
+            "character": 8
+          },
+          "end": {
+            "line": 9,
+            "character": 29
+          }
+        },
+        "children": [
+          {
+            "type": "statement",
+            "location": {
+              "uri": "/case08.cbl",
+              "start": {
+                "line": 9,
+                "character": 12
+              },
+              "end": {
+                "line": 9,
+                "character": 28
+              }
+            }
+          }
+        ]
+      },
+      {
+        "snippet": "       PARAG3.\r\n           DISPLAY \u0027PARAG3\u0027.",
+        "name": "PARAG3",
+        "type": "paragraph",
+        "location": {
+          "uri": "/case08.cbl",
+          "start": {
+            "line": 10,
+            "character": 8
+          },
+          "end": {
+            "line": 11,
+            "character": 29
+          }
+        },
+        "children": [
+          {
+            "type": "statement",
+            "location": {
+              "uri": "/case08.cbl",
+              "start": {
+                "line": 11,
+                "character": 12
+              },
+              "end": {
+                "line": 11,
+                "character": 28
+              }
+            }
+          }
+        ]
+      }
+    ]
+  }
+]

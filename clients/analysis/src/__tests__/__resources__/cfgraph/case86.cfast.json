@@ -1,0 +1,249 @@
+[
+  {
+    "name": "PROG",
+    "type": "program",
+    "location": {
+      "uri": "/case86.cbl",
+      "start": {
+        "line": 4,
+        "character": 8
+      },
+      "end": {
+        "line": 23,
+        "character": 27
+      }
+    },
+    "children": [
+      {
+        "targetName": "MAIN",
+        "type": "perform",
+        "location": {
+          "uri": "/case86.cbl",
+          "start": {
+            "line": 6,
+            "character": 12
+          },
+          "end": {
+            "line": 6,
+            "character": 24
+          }
+        }
+      },
+      {
+        "type": "goback",
+        "location": {
+          "uri": "/case86.cbl",
+          "start": {
+            "line": 7,
+            "character": 12
+          },
+          "end": {
+            "line": 7,
+            "character": 18
+          }
+        }
+      },
+      {
+        "name": "MAIN",
+        "snippet": "       MAIN SECTION.\r\n           IF A \u003e B\r\n             GO TO MAIN-EXIT.\r\n\r\n           IF A \u003e B\r\n             GO TO MAIN-EXIT.\r\n\r\n           PERFORM SEC1.\r\n\r\n       MAIN-EXIT.",
+        "type": "section",
+        "location": {
+          "uri": "/case86.cbl",
+          "start": {
+            "line": 9,
+            "character": 8
+          },
+          "end": {
+            "line": 20,
+            "character": 17
+          }
+        },
+        "children": [
+          {
+            "type": "if",
+            "location": {
+              "uri": "/case86.cbl",
+              "start": {
+                "line": 10,
+                "character": 12
+              },
+              "end": {
+                "line": 11,
+                "character": 29
+              }
+            }
+          },
+          {
+            "targetName": [
+              "MAIN-EXIT"
+            ],
+            "type": "goto",
+            "location": {
+              "uri": "/case86.cbl",
+              "start": {
+                "line": 11,
+                "character": 14
+              },
+              "end": {
+                "line": 11,
+                "character": 29
+              }
+            }
+          },
+          {
+            "type": "endif",
+            "location": {
+              "uri": "/case86.cbl",
+              "start": {
+                "line": 10,
+                "character": 12
+              },
+              "end": {
+                "line": 11,
+                "character": 29
+              }
+            }
+          },
+          {
+            "type": "if",
+            "location": {
+              "uri": "/case86.cbl",
+              "start": {
+                "line": 13,
+                "character": 12
+              },
+              "end": {
+                "line": 14,
+                "character": 29
+              }
+            }
+          },
+          {
+            "targetName": [
+              "MAIN-EXIT"
+            ],
+            "type": "goto",
+            "location": {
+              "uri": "/case86.cbl",
+              "start": {
+                "line": 14,
+                "character": 14
+              },
+              "end": {
+                "line": 14,
+                "character": 29
+              }
+            }
+          },
+          {
+            "type": "endif",
+            "location": {
+              "uri": "/case86.cbl",
+              "start": {
+                "line": 13,
+                "character": 12
+              },
+              "end": {
+                "line": 14,
+                "character": 29
+              }
+            }
+          },
+          {
+            "targetName": "SEC1",
+            "type": "perform",
+            "location": {
+              "uri": "/case86.cbl",
+              "start": {
+                "line": 16,
+                "character": 12
+              },
+              "end": {
+                "line": 16,
+                "character": 24
+              }
+            }
+          },
+          {
+            "snippet": "       MAIN-EXIT.\r\n           DISPLAY \"MAIN-EXIT\".\r\n           EXIT.",
+            "name": "MAIN-EXIT",
+            "type": "paragraph",
+            "location": {
+              "uri": "/case86.cbl",
+              "start": {
+                "line": 18,
+                "character": 8
+              },
+              "end": {
+                "line": 20,
+                "character": 17
+              }
+            },
+            "children": [
+              {
+                "type": "statement",
+                "location": {
+                  "uri": "/case86.cbl",
+                  "start": {
+                    "line": 19,
+                    "character": 12
+                  },
+                  "end": {
+                    "line": 19,
+                    "character": 31
+                  }
+                }
+              },
+              {
+                "type": "exit",
+                "location": {
+                  "uri": "/case86.cbl",
+                  "start": {
+                    "line": 20,
+                    "character": 12
+                  },
+                  "end": {
+                    "line": 20,
+                    "character": 16
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "SEC1",
+        "snippet": "       SEC1 SECTION.\r\n           DISPLAY \"SEC1\".",
+        "type": "section",
+        "location": {
+          "uri": "/case86.cbl",
+          "start": {
+            "line": 22,
+            "character": 8
+          },
+          "end": {
+            "line": 23,
+            "character": 27
+          }
+        },
+        "children": [
+          {
+            "type": "statement",
+            "location": {
+              "uri": "/case86.cbl",
+              "start": {
+                "line": 23,
+                "character": 12
+              },
+              "end": {
+                "line": 23,
+                "character": 26
+              }
+            }
+          }
+        ]
+      }
+    ]
+  }
+]

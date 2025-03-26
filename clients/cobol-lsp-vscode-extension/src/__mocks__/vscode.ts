@@ -35,6 +35,7 @@ export namespace workspace {
         if ("cobol-lsp.smart-tab" === key) {
           return undefined;
         }
+        return jest.fn();
       },
     };
   }
@@ -59,12 +60,17 @@ export namespace workspace {
     readDirectory: jest.fn().mockResolvedValue([["fileName", 2]]),
     createDirectory: jest.fn(),
   };
-  export function onDidChangeConfiguration() {}
+
+  export const onDidChangeConfiguration = jest
+    .fn()
+    .mockReturnValue("onDidChangeConfiguration");
   export const textDocuments = [];
   export function getWorkspaceFolder() {}
   export async function findFiles() {
     return Promise.resolve([]);
   }
+  export const onDidChangeTextDocument = jest.fn();
+  export const onDidCloseTextDocument = jest.fn();
 }
 
 // eslint-disable-next-line @typescript-eslint/no-namespace
@@ -82,8 +88,10 @@ export namespace extensions {
 
 // eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace window {
-  export const showErrorMessage = jest.fn().mockResolvedValue(undefined);
-  export const showInformationMessage = jest.fn();
+  export const showErrorMessage = jest
+    .fn()
+    .mockImplementation(() => Promise.resolve());
+  export const showInformationMessage = jest.fn().mockReturnValue("Ok");
   export const createStatusBarItem = () => {
     return { show: () => {} };
   };
@@ -91,7 +99,6 @@ export namespace window {
     show: jest.fn(),
     onDidChangeSelection: jest.fn(),
   });
-
   export const setStatusBarMessage = jest.fn().mockResolvedValue(true);
   export const createOutputChannel = (name: string): OutputChannelType => ({
     name,
@@ -219,6 +226,10 @@ export const TextEditorEdit = {
 export const languages = {
   registerCodeActionsProvider: jest.fn(),
   registerCompletionItemProvider: jest.fn(),
+  createDiagnosticCollection: jest.fn().mockReturnValue({
+    clear: jest.fn(),
+    delete: jest.fn(),
+  }),
 };
 
 class FileNotFound extends Error {
@@ -250,3 +261,10 @@ export const CompletionList = jest
       isIncomplete,
     }),
   );
+
+export enum DiagnosticSeverity {
+  Error = 0,
+  Warning = 1,
+  Information = 2,
+  Hint = 3,
+}

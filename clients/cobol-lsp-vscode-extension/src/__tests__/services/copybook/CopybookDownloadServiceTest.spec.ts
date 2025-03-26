@@ -36,7 +36,6 @@ import { E4E } from "../../../type/e4eApi";
 import { e4eMock } from "../../../__mocks__/getE4EMock.utility";
 import { Uri } from "../../../__mocks__/UriMock";
 import { SettingsService } from "../../../services/Settings";
-import * as extension from "../../../extension";
 
 jest.mock("../../../services/reporter");
 Utils.getZoweExplorerAPI = jest
@@ -101,6 +100,7 @@ describe("Tests copybook download service", () => {
   describe("checks the prerequisites are checked before invoking download", () => {
     describe("unknown-profile", () => {
       beforeEach(() => {
+        workspaceConfigurationMock[PATHS_DSN] = ["TEST.COBOL.COPYBOOK"];
         profileName = "unknown-profile";
       });
 
@@ -114,8 +114,9 @@ describe("Tests copybook download service", () => {
       });
     });
 
-    describe("profile not profiled", () => {
+    describe("profile not provided", () => {
       beforeEach(() => {
+        workspaceConfigurationMock[PATHS_DSN] = ["TEST.COBOL.COPYBOOK"];
         profileName = "";
       });
 
@@ -124,8 +125,23 @@ describe("Tests copybook download service", () => {
           { name: "copybook-name", dialect: DEFAULT_DIALECT },
         ]);
         expect(downloadService["processDownloadError"]).toHaveBeenCalledWith(
-          `${PROVIDE_PROFILE_MSG}`,
+          PROVIDE_PROFILE_MSG,
         );
+      });
+    });
+
+    describe("no profile and no remote location configured", () => {
+      beforeEach(() => {
+        workspaceConfigurationMock[PATHS_DSN] = [];
+        workspaceConfigurationMock[PATHS_USS] = [];
+        profileName = "";
+      });
+
+      it("should not show the missing zowe profile message", async () => {
+        await downloadService.downloadCopybooks("document-uri", [
+          { name: "copybook-name", dialect: DEFAULT_DIALECT },
+        ]);
+        expect(downloadService["processDownloadError"]).not.toHaveBeenCalled();
       });
     });
 
@@ -294,9 +310,9 @@ describe("Tests copybook download service", () => {
     ProfileUtils.getAvailableProfiles = jest.fn().mockReturnValue("profile");
     DownloadUtil.isProfileLocked = jest.fn().mockReturnValue(false);
     DownloadUtil.checkForInvalidCredProfile = jest.fn().mockReturnValue(false);
-    DownloadUtil.areCopybookDownloadConfigurationsPresent = jest
-      .fn()
-      .mockReturnValue(true);
+    jest
+      .spyOn(DownloadUtil, "areCopybookDownloadConfigurationsPresent")
+      .mockReturnValue({ dsn: "DATASET.WITH.COPYBOOK" });
     const downloadService = new CopybookDownloadService(
       "storage-path",
       {} as unknown as IApiRegisterClient,
@@ -657,7 +673,6 @@ describe("Tests copybook download service", () => {
     });
 
     describe("Error handling ", () => {
-      let outputChannelMock: jest.SpyInstance;
       const errorMessage =
         "Rest API failure with HTTP(S) status 404 ISRZ002 Data set not cataloged - 'DATASET.WITH.COPYBOOK' was not found in catalog.";
 
@@ -670,15 +685,10 @@ describe("Tests copybook download service", () => {
         };
       });
 
-      beforeEach(() => {
-        outputChannelMock = jest.fn();
-        jest.spyOn(extension, "getChannel").mockReturnValue({
-          appendLine: outputChannelMock,
-        } as unknown as vscode.OutputChannel);
-      });
-
       describe("Error in listing one directory should not affect listing other directories", () => {
         test("return list of all members of the uss, and logs error listing of the dataset", async () => {
+          const outputChannelMock = { appendLine: jest.fn() };
+
           getAllMembersMock = jest
             .fn()
             .mockRejectedValue(new Error(errorMessage));
@@ -686,6 +696,8 @@ describe("Tests copybook download service", () => {
           const cds = new CopybookDownloadService(
             "/globalStorage",
             zoweExplorerApiMock,
+            undefined,
+            outputChannelMock as unknown as vscode.OutputChannel,
           );
 
           const results = await cds.listRemoteCopybooks(
@@ -698,7 +710,7 @@ describe("Tests copybook download service", () => {
             expect.arrayContaining(ussFiles.map((n) => n.name)),
           );
 
-          expect(outputChannelMock).toHaveBeenCalledWith(
+          expect(outputChannelMock.appendLine).toHaveBeenCalledWith(
             expect.stringContaining(errorMessage),
           );
         });

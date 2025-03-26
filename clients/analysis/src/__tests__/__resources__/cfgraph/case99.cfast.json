@@ -1,0 +1,311 @@
+[
+  {
+    "name": "SRT",
+    "type": "program",
+    "location": {
+      "uri": "/case99.cbl",
+      "start": {
+        "line": 27,
+        "character": 8
+      },
+      "end": {
+        "line": 52,
+        "character": 39
+      }
+    },
+    "children": [
+      {
+        "type": "sort",
+        "location": {
+          "uri": "/case99.cbl",
+          "start": {
+            "line": 28,
+            "character": 12
+          },
+          "end": {
+            "line": 31,
+            "character": 61
+          }
+        }
+      },
+      {
+        "target": {
+          "name": "INPUT-PAR1"
+        },
+        "thru": {
+          "name": "INPUT-PAR2"
+        },
+        "type": "input",
+        "location": {
+          "uri": "/case99.cbl",
+          "start": {
+            "line": 30,
+            "character": 20
+          },
+          "end": {
+            "line": 30,
+            "character": 63
+          }
+        }
+      },
+      {
+        "target": {
+          "name": "OUTPUT-PROCEDURE",
+          "inSection": "SEC1"
+        },
+        "type": "output",
+        "location": {
+          "uri": "/case99.cbl",
+          "start": {
+            "line": 31,
+            "character": 20
+          },
+          "end": {
+            "line": 31,
+            "character": 61
+          }
+        }
+      },
+      {
+        "type": "endsort",
+        "location": {
+          "uri": "/case99.cbl",
+          "start": {
+            "line": 28,
+            "character": 12
+          },
+          "end": {
+            "line": 31,
+            "character": 61
+          }
+        }
+      },
+      {
+        "type": "stop",
+        "location": {
+          "uri": "/case99.cbl",
+          "start": {
+            "line": 32,
+            "character": 12
+          },
+          "end": {
+            "line": 32,
+            "character": 20
+          }
+        }
+      },
+      {
+        "snippet": "       PAR1.\r\n           DISPLAY \"PAR1\".",
+        "name": "PAR1",
+        "type": "paragraph",
+        "location": {
+          "uri": "/case99.cbl",
+          "start": {
+            "line": 34,
+            "character": 8
+          },
+          "end": {
+            "line": 35,
+            "character": 27
+          }
+        },
+        "children": [
+          {
+            "type": "statement",
+            "location": {
+              "uri": "/case99.cbl",
+              "start": {
+                "line": 35,
+                "character": 12
+              },
+              "end": {
+                "line": 35,
+                "character": 26
+              }
+            }
+          }
+        ]
+      },
+      {
+        "snippet": "       PAR2.\r\n           DISPLAY \"PAR2\".",
+        "name": "PAR2",
+        "type": "paragraph",
+        "location": {
+          "uri": "/case99.cbl",
+          "start": {
+            "line": 37,
+            "character": 8
+          },
+          "end": {
+            "line": 38,
+            "character": 27
+          }
+        },
+        "children": [
+          {
+            "type": "statement",
+            "location": {
+              "uri": "/case99.cbl",
+              "start": {
+                "line": 38,
+                "character": 12
+              },
+              "end": {
+                "line": 38,
+                "character": 26
+              }
+            }
+          }
+        ]
+      },
+      {
+        "snippet": "       PAR3.\r\n           DISPLAY \"PAR3\".",
+        "name": "PAR3",
+        "type": "paragraph",
+        "location": {
+          "uri": "/case99.cbl",
+          "start": {
+            "line": 40,
+            "character": 8
+          },
+          "end": {
+            "line": 41,
+            "character": 27
+          }
+        },
+        "children": [
+          {
+            "type": "statement",
+            "location": {
+              "uri": "/case99.cbl",
+              "start": {
+                "line": 41,
+                "character": 12
+              },
+              "end": {
+                "line": 41,
+                "character": 26
+              }
+            }
+          }
+        ]
+      },
+      {
+        "snippet": "       INPUT-PAR1.\r\n           PERFORM PAR1.",
+        "name": "INPUT-PAR1",
+        "type": "paragraph",
+        "location": {
+          "uri": "/case99.cbl",
+          "start": {
+            "line": 43,
+            "character": 8
+          },
+          "end": {
+            "line": 44,
+            "character": 25
+          }
+        },
+        "children": [
+          {
+            "targetName": "PAR1",
+            "type": "perform",
+            "location": {
+              "uri": "/case99.cbl",
+              "start": {
+                "line": 44,
+                "character": 12
+              },
+              "end": {
+                "line": 44,
+                "character": 24
+              }
+            }
+          }
+        ]
+      },
+      {
+        "snippet": "       INPUT-PAR2.\r\n           PERFORM PAR2.",
+        "name": "INPUT-PAR2",
+        "type": "paragraph",
+        "location": {
+          "uri": "/case99.cbl",
+          "start": {
+            "line": 46,
+            "character": 8
+          },
+          "end": {
+            "line": 47,
+            "character": 25
+          }
+        },
+        "children": [
+          {
+            "targetName": "PAR2",
+            "type": "perform",
+            "location": {
+              "uri": "/case99.cbl",
+              "start": {
+                "line": 47,
+                "character": 12
+              },
+              "end": {
+                "line": 47,
+                "character": 24
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "SEC1",
+        "snippet": "       SEC1 SECTION.\r\n\r\n       OUTPUT-PROCEDURE.\r\n           DISPLAY \"OUTPUT-PROCEDURE\".",
+        "type": "section",
+        "location": {
+          "uri": "/case99.cbl",
+          "start": {
+            "line": 49,
+            "character": 8
+          },
+          "end": {
+            "line": 52,
+            "character": 39
+          }
+        },
+        "children": [
+          {
+            "snippet": "       OUTPUT-PROCEDURE.\r\n           DISPLAY \"OUTPUT-PROCEDURE\".",
+            "name": "OUTPUT-PROCEDURE",
+            "type": "paragraph",
+            "location": {
+              "uri": "/case99.cbl",
+              "start": {
+                "line": 51,
+                "character": 8
+              },
+              "end": {
+                "line": 52,
+                "character": 39
+              }
+            },
+            "children": [
+              {
+                "type": "statement",
+                "location": {
+                  "uri": "/case99.cbl",
+                  "start": {
+                    "line": 52,
+                    "character": 12
+                  },
+                  "end": {
+                    "line": 52,
+                    "character": 38
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]

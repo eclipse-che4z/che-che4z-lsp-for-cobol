@@ -1,0 +1,150 @@
+[
+  {
+    "name": "CFGPSQE",
+    "type": "program",
+    "location": {
+      "uri": "/case35.cbl",
+      "start": {
+        "line": 4,
+        "character": 8
+      },
+      "end": {
+        "line": 13,
+        "character": 21
+      }
+    },
+    "children": [
+      {
+        "type": "if",
+        "location": {
+          "uri": "/case35.cbl",
+          "start": {
+            "line": 5,
+            "character": 12
+          },
+          "end": {
+            "line": 9,
+            "character": 18
+          }
+        }
+      },
+      {
+        "type": "stop",
+        "location": {
+          "uri": "/case35.cbl",
+          "start": {
+            "line": 6,
+            "character": 14
+          },
+          "end": {
+            "line": 6,
+            "character": 22
+          }
+        }
+      },
+      {
+        "type": "else",
+        "location": {
+          "uri": "/case35.cbl",
+          "start": {
+            "line": 7,
+            "character": 12
+          },
+          "end": {
+            "line": 8,
+            "character": 22
+          }
+        }
+      },
+      {
+        "type": "stop",
+        "location": {
+          "uri": "/case35.cbl",
+          "start": {
+            "line": 8,
+            "character": 14
+          },
+          "end": {
+            "line": 8,
+            "character": 22
+          }
+        }
+      },
+      {
+        "type": "endif",
+        "location": {
+          "uri": "/case35.cbl",
+          "start": {
+            "line": 5,
+            "character": 12
+          },
+          "end": {
+            "line": 9,
+            "character": 18
+          }
+        }
+      },
+      {
+        "targetName": "A",
+        "type": "perform",
+        "location": {
+          "uri": "/case35.cbl",
+          "start": {
+            "line": 10,
+            "character": 12
+          },
+          "end": {
+            "line": 10,
+            "character": 21
+          }
+        }
+      },
+      {
+        "snippet": "       A.\r\n           DISPLAY \u0027ERROR\u0027.\r\n           STOP RUN.",
+        "name": "A",
+        "type": "paragraph",
+        "location": {
+          "uri": "/case35.cbl",
+          "start": {
+            "line": 11,
+            "character": 8
+          },
+          "end": {
+            "line": 13,
+            "character": 21
+          }
+        },
+        "children": [
+          {
+            "type": "statement",
+            "location": {
+              "uri": "/case35.cbl",
+              "start": {
+                "line": 12,
+                "character": 12
+              },
+              "end": {
+                "line": 12,
+                "character": 27
+              }
+            }
+          },
+          {
+            "type": "stop",
+            "location": {
+              "uri": "/case35.cbl",
+              "start": {
+                "line": 13,
+                "character": 12
+              },
+              "end": {
+                "line": 13,
+                "character": 20
+              }
+            }
+          }
+        ]
+      }
+    ]
+  }
+]

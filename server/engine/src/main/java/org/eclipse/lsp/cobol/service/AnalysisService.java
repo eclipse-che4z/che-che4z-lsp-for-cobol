@@ -17,21 +17,31 @@ package org.eclipse.lsp.cobol.service;
 import static java.lang.String.format;
 
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
+import java.util.stream.Collectors;
+
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.lsp.cobol.cfg.CFASTBuilder;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
 import org.eclipse.lsp.cobol.common.AnalysisResult;
 import org.eclipse.lsp.cobol.common.LanguageEngineFacade;
 import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
 import org.eclipse.lsp.cobol.common.copybook.CopybookService;
 import org.eclipse.lsp.cobol.common.utils.ThreadInterruptionUtil;
+import org.eclipse.lsp.cobol.core.model.extendedapi.ExtendedApiResult;
+import org.eclipse.lsp.cobol.core.model.extendedapi.Program;
+import org.eclipse.lsp.cobol.lsp.jrpc.CobolLanguageClient;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookIdentificationService;
 import org.eclipse.lsp.cobol.service.settings.ConfigurationService;
+
+import javax.annotation.Nullable;
 
 /** Provides async document analysis functionality */
 @Slf4j
@@ -45,6 +55,8 @@ public class AnalysisService {
   private List<String> copybookExtensions;
 
   private final DocumentModelService documentService;
+  private final Optional<CFASTBuilder> cfastBuilder;
+  private final Provider<CobolLanguageClient> clientProvider;
 
   @Inject
   AnalysisService(
@@ -52,12 +64,16 @@ public class AnalysisService {
       ConfigurationService configurationService,
       @Named("combinedStrategy") CopybookIdentificationService copybookIdentificationService,
       CopybookService copybookService,
-      DocumentModelService documentService) {
+      DocumentModelService documentService,
+      @Nullable CFASTBuilder cfastBuilder,
+      Provider<CobolLanguageClient> clientProvider) {
     this.engine = engine;
     this.configurationService = configurationService;
     this.copybookIdentificationService = copybookIdentificationService;
     this.copybookService = copybookService;
     this.documentService = documentService;
+    this.cfastBuilder = Optional.ofNullable(cfastBuilder);
+    this.clientProvider = clientProvider;
   }
 
   /**
@@ -119,7 +135,17 @@ public class AnalysisService {
       ThreadInterruptionUtil.checkThreadInterrupted();
       copybookService.sendCopybookDownloadRequest(
               uri, DocumentServiceHelper.extractCopybookUris(result), copybookProcessingMode);
+
+      cfastBuilder.ifPresent(b -> {
+        List<Program> astList = result.getRootNode().findPrograms().stream()
+            .map(b::build)
+            .flatMap(m -> m.getControlFlowAST().stream())
+            .collect(Collectors.toList());
+        this.clientProvider.get().cfastReady(new ExtendedApiResult(astList, uri));
+      });
+
       LOG.debug("[doAnalysis] Document " + uri + " analyzed: " + result.getDiagnostics());
+
     } catch (Exception e) {
       documentService.processAnalysisResult(uri, AnalysisResult.EMPTY, text);
       LOG.debug(format("An exception thrown while applying %s for %s:", "analysis", uri));
