@@ -144,7 +144,7 @@ export class CopybookDownloaderForUss extends ZoweExplorerDownloader {
     if (this.memberListCache.has(id)) {
       return this.memberListCache
         .get(id)
-        ?.find((member) => member === copybookName.toLocaleUpperCase());
+        ?.find((member) => member === copybookName.toUpperCase());
     }
     const profile = DownloadUtil.loadProfile(profileName, this.explorerAPI);
     await this.limitFailedRequests(
@@ -161,7 +161,7 @@ export class CopybookDownloaderForUss extends ZoweExplorerDownloader {
     if (
       this.memberListCache
         .get(id)
-        ?.find((member) => member === copybookName.toLocaleUpperCase())
+        ?.find((member) => member === copybookName.toUpperCase())
     )
       return true;
     return false;
