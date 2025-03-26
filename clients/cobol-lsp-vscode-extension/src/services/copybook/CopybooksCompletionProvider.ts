@@ -174,12 +174,4 @@ export class CopybooksCompletionProvider implements CompletionItemProvider {
 
     return completions;
   }
-
-  resolveCompletionItem(
-    item: CompletionItem,
-    _token: CancellationToken,
-  ): ProviderResult<CompletionItem> {
-    item.detail = "Resolve function called";
-    return item;
-  }
 }

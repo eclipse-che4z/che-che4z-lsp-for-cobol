@@ -40,6 +40,7 @@ suite("Integration Test Suite: Subroutines resolving", () => {
   test("Subroutines auto completions are provided", async function () {
     this.timeout(helper.TEST_TIMEOUT);
     const editor = await helper.showDocument("CALL.cbl");
+    await helper.sleep(1000);
     await helper.insertString(
       editor,
       helper.pos(23, 0),
@@ -47,6 +48,7 @@ suite("Integration Test Suite: Subroutines resolving", () => {
     );
     helper.moveCursor(editor, helper.pos(23, 17));
     const completions = await helper.triggerCompletionsAndWaitForResults();
+    await helper.sleep(1000);
     const position = completions.items.findIndex((ci) => ci.label === "SUB1");
     completions.items[position].detail = "Resolved function called";
     await helper.executeCommandMultipleTimes("selectNextSuggestion", position);
