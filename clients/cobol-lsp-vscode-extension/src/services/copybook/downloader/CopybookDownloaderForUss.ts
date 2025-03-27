@@ -150,17 +150,7 @@ export class CopybookDownloaderForUss extends ZoweExplorerDownloader {
   ): Promise<boolean> {
     const id = this.createId(profileName, uss);
     if (this.memberListCache.has(id)) {
-      let member: string | undefined;
-      for (const ext of extensions) {
-        member = this.memberListCache
-          .get(id)
-          ?.find(
-            (member) =>
-              member.toUpperCase() ===
-              `${copybookName.concat(ext).toUpperCase()}`,
-          );
-      }
-      return member ? true : false;
+      return this.isCachedMembersHaveCopybook(extensions, id, copybookName);
     }
     const profile = DownloadUtil.loadProfile(profileName, this.explorerAPI);
     await this.limitFailedRequests(
@@ -175,17 +165,26 @@ export class CopybookDownloaderForUss extends ZoweExplorerDownloader {
       },
     );
     if (this.memberListCache.has(id)) {
-      let member: string | undefined;
-      for (const ext of extensions) {
-        member = this.memberListCache
+      return this.isCachedMembersHaveCopybook(extensions, id, copybookName);
+    }
+    return false;
+  }
+  private isCachedMembersHaveCopybook(
+    extensions: string[],
+    id: string,
+    copybook: string,
+  ): boolean {
+    for (const extension of extensions) {
+      if (
+        this.memberListCache
           .get(id)
           ?.find(
             (member) =>
               member.toUpperCase() ===
-              `${copybookName.concat(ext).toUpperCase()}`,
-          );
-      }
-      return member ? true : false;
+              `${copybook.concat(extension).toUpperCase()}`,
+          )
+      )
+        return true;
     }
     return false;
   }
