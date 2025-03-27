@@ -528,8 +528,7 @@ export class CopybookDownloadService {
         );
       }
     }
-    if (endevorConfigs.length > 0) return true;
-    return false;
+    return endevorConfigs.length > 0;
   }
 
   private processDownloadError(title: string): void {
