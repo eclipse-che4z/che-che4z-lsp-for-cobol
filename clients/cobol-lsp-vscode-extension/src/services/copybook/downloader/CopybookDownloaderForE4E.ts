@@ -384,11 +384,9 @@ export class CopybookDownloaderForE4E {
       if (members instanceof Error) this.E4EElements.set(id, undefined);
       else {
         this.E4EElements.set(id, members);
-        return members.find(
+        return members.some(
           (x) => x.element.toUpperCase() == elementName.toUpperCase(),
-        )
-          ? true
-          : false;
+        );
       }
       return false;
     }
