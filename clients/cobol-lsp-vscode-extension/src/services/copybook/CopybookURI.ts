@@ -15,11 +15,11 @@ import { COPYBOOKS_FOLDER, E4E_FOLDER, ZOWE_FOLDER } from "../../constants";
 import { SettingsService } from "../Settings";
 import { ProfileUtils } from "../util/ProfileUtils";
 import { EndevorType, ResolvedProfile } from "../../type/e4eApi.d";
+import { Utils } from "../util/Utils";
 import * as vscode from "vscode";
 
 // Source can be only a single level directory, with no subdirectories
 type CopybooksSource = typeof ZOWE_FOLDER | typeof E4E_FOLDER;
-import { Utils } from "../util/Utils";
 
 /**
  * This class is responsible to identify from which source resolve copybooks required by the server.

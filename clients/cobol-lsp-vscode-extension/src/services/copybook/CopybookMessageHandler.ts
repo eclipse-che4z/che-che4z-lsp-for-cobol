@@ -64,7 +64,6 @@ async function getTargetFolderForCopybook(
 ): Promise<string[]> {
   let result: string[] = [];
   const profile = SettingsService.getProfileName()!;
-
   switch (folderKind) {
     case CopybookFolderKind[CopybookFolderKind.local]:
       result = await SettingsService.getCopybookLocalPath(
@@ -72,13 +71,12 @@ async function getTargetFolderForCopybook(
         dialectType,
       );
       break;
-    case CopybookFolderKind[CopybookFolderKind["downloaded-dsn"]]: {
+    case CopybookFolderKind[CopybookFolderKind["downloaded-dsn"]]:
       result = SettingsService.getDsnPath(documentUri, dialectType).map(
         (dnsPath) =>
           CopybookURI.createDatasetPath([profile], dnsPath, storagePath).fsPath,
       );
       break;
-    }
     case CopybookFolderKind[CopybookFolderKind["downloaded-uss"]]:
       result = SettingsService.getUssPath(documentUri, dialectType).map(
         (dnsPath) =>
