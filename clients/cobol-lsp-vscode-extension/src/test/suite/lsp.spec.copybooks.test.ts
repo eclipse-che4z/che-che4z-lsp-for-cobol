@@ -236,10 +236,13 @@ suite("Integration Test Suite: Copybooks", function () {
     });
 
     test("Copybooks auto completions are provided", async function () {
-      const editor = await helper.showDocument("SNIPPET.cbl");
+      const editor = await helper.openUntitledDocument();
       await helper.insertString(editor, pos(0, 0), "      COPY PAY.");
 
       await helper.sleep(1000);
+
+      const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
+      assert.strictEqual(diagnostics.length, 0);
 
       helper.moveCursor(editor, helper.pos(0, 14));
 

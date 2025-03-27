@@ -41,13 +41,23 @@ suite("Integration Test Suite: Subroutines resolving", () => {
 
   test("Subroutines auto completions are provided", async function () {
     this.timeout(helper.TEST_TIMEOUT);
-    const editor = await helper.showDocument("SNIPPET.cbl");
+    const editor = await helper.openUntitledDocument();
+
     await helper.insertString(editor, helper.pos(0, 0), "           CALL ''.");
     await helper.sleep(1000);
+
+    const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
+    assert.strictEqual(diagnostics.length, 0);
+
     helper.moveCursor(editor, helper.pos(0, 17));
     const completions = await helper.triggerCompletionsAndWaitForResults();
     await helper.sleep(1000);
     const position = completions.items.findIndex((ci) => ci.label === "SUB1");
+    assert.notEqual(
+      position,
+      -1,
+      `SUB1 completion not found, ${JSON.stringify(completions.items.slice(0, 10))}`,
+    );
     await helper.executeCommandMultipleTimes("selectNextSuggestion", position);
     await vscode.commands.executeCommand("acceptSelectedSuggestion");
     await helper.waitFor(() => {
