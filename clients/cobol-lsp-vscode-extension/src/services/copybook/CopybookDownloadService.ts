@@ -479,22 +479,15 @@ export class CopybookDownloadService {
             const msg = `${PROVIDE_PROFILE_MSG_PROC_GRUOPS} Provided invalid profile name: ${zoweConfig.profile}`;
             vscode.window.showErrorMessage(msg);
           } else {
-            let location: MainframeRemoteLocation;
-            if (zoweConfig.dataset)
-              location = {
-                dsn: zoweConfig.dataset,
-              };
-            else
-              location = {
-                uss: zoweConfig.uss!,
-              };
-
             checks.push(await DownloadUtil.isProfileLocked(tempProfile));
             checks.push(
               await DownloadUtil.checkForInvalidCredProfile(
                 tempProfile,
                 this.explorerApi,
-                location,
+                DATASET in zoweConfig
+                  ? { dsn: zoweConfig.dataset }
+                  : { uss: zoweConfig.uss },
+
               ),
             );
           }
