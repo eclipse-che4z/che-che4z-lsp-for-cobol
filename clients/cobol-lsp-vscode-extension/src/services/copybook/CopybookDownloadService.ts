@@ -430,20 +430,14 @@ export class CopybookDownloadService {
     );
 
     if (endevorConfigs.length > 0 && !this.e4eApi) {
-      this.missingExtension(documentUri, "Explorer for Endevor is not installed");
+      this.missingExtension(
+        documentUri,
+        "Explorer for Endevor is not installed",
+      );
       return false;
     }
     if (!this.explorerApi && procGroupZoweConfigs.length > 0) {
-      this.diagnosticsService?.showDiagnostics(vscode.Uri.parse(documentUri), [
-        {
-          range: new vscode.Range(
-            new vscode.Position(0, 0),
-            new vscode.Position(1, 0),
-          ),
-          message: "Zowe Explorer is not installed",
-          severity: vscode.DiagnosticSeverity.Warning,
-        },
-      ]);
+      this.missingExtension(documentUri, "Zowe Explorer is not installed");
       return false;
     }
     if (this.explorerApi) {
@@ -516,6 +510,18 @@ export class CopybookDownloadService {
       }
     }
     return endevorConfigs.length > 0;
+  }
+  private missingExtension(documentUri: string, message: string) {
+    this.diagnosticsService?.showDiagnostics(vscode.Uri.parse(documentUri), [
+      {
+        range: new vscode.Range(
+          new vscode.Position(0, 0),
+          new vscode.Position(1, 0),
+        ),
+        message: message,
+        severity: vscode.DiagnosticSeverity.Warning,
+      },
+    ]);
   }
 
   private processDownloadError(title: string): void {
