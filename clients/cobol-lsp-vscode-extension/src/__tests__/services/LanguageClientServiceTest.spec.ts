@@ -16,10 +16,7 @@ import * as fs from "fs";
 import * as os from "os";
 import { join } from "path";
 import * as vscode from "vscode";
-import {
-  ExecuteCommandMiddleware,
-  LanguageClient,
-} from "vscode-languageclient/node";
+import { Middleware, LanguageClient } from "vscode-languageclient/node";
 import { JavaCheck } from "../../services/JavaCheck";
 import { LanguageClientService } from "../../services/LanguageClientService";
 import { NativeExecutableService } from "../../services/nativeLanguageClient/nativeExecutableService";
@@ -50,7 +47,7 @@ jest.mock("vscode-languageclient/node", () => ({
 
 Utils.getZoweExplorerAPI = jest.fn();
 let languageClientService: LanguageClientService;
-let executeCommandMiddleware: ExecuteCommandMiddleware;
+let middleware: Middleware;
 
 const SERVER_DESC = "LSP extension for COBOL language";
 const SERVER_ID = "cobol";
@@ -63,11 +60,11 @@ beforeEach(() => {
 const SERVER_STOPPED_MSG = "server stopped";
 describe("LanguageClientService positive scenario", () => {
   beforeEach(() => {
-    executeCommandMiddleware = {};
+    middleware = {};
     languageClientService = new LanguageClientService(
       vscode.window.createOutputChannel("test"),
       vscode.Uri.file("/storagePath"),
-      executeCommandMiddleware,
+      middleware,
     );
     new JavaCheck().isJavaInstalled = jest.fn().mockResolvedValue(true);
   });
@@ -291,7 +288,7 @@ describe("LanguageClientService negative scenario.", () => {
       await new LanguageClientService(
         vscode.window.createOutputChannel("test"),
         vscode.Uri.file("/storagePath"),
-        executeCommandMiddleware,
+        middleware,
       ).checkPrerequisites();
     } catch (error) {
       expect(error).toStrictEqual(new Error("LSP server for cobol not found"));
