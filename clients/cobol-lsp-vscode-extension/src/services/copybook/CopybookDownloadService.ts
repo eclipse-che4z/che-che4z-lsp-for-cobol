@@ -495,6 +495,7 @@ export class CopybookDownloadService {
               return false;
           }
         }
+        return true;
       } else if (configs.length == 0) {
         const copybooksLocation =
           DownloadUtil.areCopybookDownloadConfigurationsPresent(
