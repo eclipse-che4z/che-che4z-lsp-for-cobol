@@ -700,7 +700,7 @@ async function searchCopybookinProcessorGroups(
       );
       if (!has) continue;
       folders = CopybookURI.createDatasetPath(
-        config.profile ? [config.profile] : [SettingsService.getProfileName()!],
+        [profile],
         config.uss,
         storagePath,
       ).fsPath;
