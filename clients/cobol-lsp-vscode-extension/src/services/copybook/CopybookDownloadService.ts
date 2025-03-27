@@ -461,28 +461,40 @@ export class CopybookDownloadService {
       );
 
       if (procGroupZoweConfigs && procGroupZoweConfigs.length > 0) {
-        const checks: boolean[] = [];
+        const uniqueProfiles = Array.from(
+          new Set(
+            procGroupZoweConfigs
+              .map((item) => item.profile)
+              .filter((element) => element != undefined),
+          ),
+        );
+        if (profile && !uniqueProfiles.find((x) => x === profile))
+          uniqueProfiles.push(profile);
+
+        for (const profileCheck of uniqueProfiles) {
+          if (await DownloadUtil.isProfileLocked(profileCheck)) return false;
+        }
+
         for (const zoweConfig of procGroupZoweConfigs) {
           const tempProfile = zoweConfig.profile ? zoweConfig.profile : profile;
 
           if (!tempProfile || !availableProfiles.includes(tempProfile)) {
-            checks.push(true);
             const msg = `${PROVIDE_PROFILE_MSG_PROC_GRUOPS} Provided invalid profile name: ${zoweConfig.profile}`;
             vscode.window.showErrorMessage(msg);
+            return false;
           } else {
-            checks.push(await DownloadUtil.isProfileLocked(tempProfile));
-            checks.push(
+            if (
               await DownloadUtil.checkForInvalidCredProfile(
                 tempProfile,
                 this.explorerApi,
                 DATASET in zoweConfig
                   ? { dsn: zoweConfig.dataset }
                   : { uss: zoweConfig.uss },
-              ),
-            );
+              )
+            )
+              return false;
           }
         }
-        return checks.every((v) => v === false);
       } else if (configs.length == 0) {
         const copybooksLocation =
           DownloadUtil.areCopybookDownloadConfigurationsPresent(
