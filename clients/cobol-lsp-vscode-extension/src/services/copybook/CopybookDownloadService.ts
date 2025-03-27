@@ -657,23 +657,31 @@ async function searchCopybookinProcessorGroups(
       shouldFound = true;
       extensions = [""];
     } else if (DATASET in config) {
+      const profile = config.profile
+        ? config.profile
+        : SettingsService.getProfileName();
+      if (!profile) continue;
       const has = await dsnDownloader?.hasMember(
-        config.profile ? config.profile : SettingsService.getProfileName()!,
+        profile,
         config.dataset,
         copybookName,
       );
       if (!has) continue;
       folders = CopybookURI.createDatasetPath(
-        config.profile ? [config.profile] : [SettingsService.getProfileName()!],
+        [profile],
         config.dataset,
         storagePath,
       ).fsPath;
       shouldFound = true;
       extensions = [""];
     } else if (USS in config) {
+      const profile = config.profile
+        ? config.profile
+        : SettingsService.getProfileName();
+      if (!profile) continue;
       extensions = await SettingsService.getCopybookExtension(documentUri);
       const has = await ussDownloader?.hasMember(
-        config.profile ? config.profile : SettingsService.getProfileName()!,
+        profile,
         config.uss,
         copybookName,
         extensions,
