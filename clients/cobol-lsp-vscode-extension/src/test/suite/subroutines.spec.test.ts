@@ -48,7 +48,6 @@ suite("Integration Test Suite: Subroutines resolving", () => {
     const completions = await helper.triggerCompletionsAndWaitForResults();
     await helper.sleep(1000);
     const position = completions.items.findIndex((ci) => ci.label === "SUB1");
-    completions.items[position].detail = "Resolved function called";
     await helper.executeCommandMultipleTimes("selectNextSuggestion", position);
     await vscode.commands.executeCommand("acceptSelectedSuggestion");
     await helper.waitFor(() => {
