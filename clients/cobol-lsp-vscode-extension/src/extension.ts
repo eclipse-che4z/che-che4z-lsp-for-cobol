@@ -62,6 +62,7 @@ import {
   AnalysisResult,
   ControlFlowAnalysisService,
 } from "./services/ControlFlowService";
+import { DownloadDiagnosticsService } from "./services/DiagnosticsService";
 
 interface __AnalysisApi {
   analysis(uri: string, text: string, pos?: vscode.Position): Promise<unknown>;
@@ -102,6 +103,7 @@ async function initialize(context: vscode.ExtensionContext) {
     maybeZowe && "api" in maybeZowe ? maybeZowe.api : undefined,
     maybeE4E && "api" in maybeE4E ? maybeE4E.api : undefined,
     outputChannel,
+    new DownloadDiagnosticsService(),
   );
 
   if (maybeZowe && "futureApi" in maybeZowe) {
@@ -120,6 +122,14 @@ async function initialize(context: vscode.ExtensionContext) {
   languageClientService = new LanguageClientService(
     outputChannel,
     context.globalStorageUri,
+    {
+      executeCommand: (command, args, next) => {
+        if (command == "missing copybook") {
+          copyBooksDownloader.clearProfiles();
+        }
+        next(command, args);
+      },
+    },
   );
   const configurationWatcher = new ConfigurationWatcher();
 

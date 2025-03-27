@@ -34,51 +34,14 @@ describe("Tests Copybook download from USS", () => {
   });
 
   describe("checks if the copybook is eligible to dowload passed on user settings", () => {
-    const downloader = new CopybookDownloaderForUss(
-      "storage-path",
-      createZoweExplorerMock(),
-    );
     beforeEach(() => {
       jest.clearAllMocks();
-    });
-
-    it("checks eligibility based on profile settings", () => {
-      ProfileUtils.getProfileNameForCopybook = jest
-        .fn()
-        .mockReturnValue(undefined);
-      let isEligible = downloader.isEligibleForDownload(
-        { name: "copybook-name", dialect: "COBOL" },
-        "document-uri",
-        "DNS.PATH",
-      );
-      expect(isEligible).toBeFalsy();
-      ProfileUtils.getProfileNameForCopybook = jest
-        .fn()
-        .mockReturnValue("test-profile");
-      isEligible = downloader.isEligibleForDownload(
-        { name: "copybook-name", dialect: "COBOL" },
-        "document-uri",
-        "DNS.PATH",
-      );
-      expect(isEligible).toBeTruthy();
     });
 
     it("checks eligibility based on DSN settings", () => {
       ProfileUtils.getProfileNameForCopybook = jest
         .fn()
         .mockReturnValue("test-profile");
-      let isEligible = downloader.isEligibleForDownload(
-        { name: "copybook-name", dialect: "COBOL" },
-        "document-uri",
-        undefined,
-      );
-      expect(isEligible).toBeFalsy();
-      isEligible = downloader.isEligibleForDownload(
-        { name: "copybook-name", dialect: "COBOL" },
-        "document-uri",
-        "DNS.PATH",
-      );
-      expect(isEligible).toBeTruthy();
     });
   });
 
@@ -94,21 +57,21 @@ describe("Tests Copybook download from USS", () => {
       createZoweExplorerMock(),
     );
     it("checks not eligible copybook are not downloaded", async () => {
-      downloader.isEligibleForDownload = jest.fn().mockReturnValue(false);
       const isDowloaded = await downloader.downloadCopybook(
         { name: "copybook-name", dialect: "COBOL" },
-        "document-uri",
         "/uss/path",
+        "profile",
+        [""],
       );
       expect(isDowloaded).toBeFalsy();
     });
 
     it("checks eligible copybook which are not present in the DSN provided do not invoke ZE Api's", async () => {
-      downloader.isEligibleForDownload = jest.fn().mockReturnValue(true);
       const isDowloaded = await downloader.downloadCopybook(
         { name: "copybook-name", dialect: "COBOL" },
-        "document-uri",
         "/uss/path",
+        "profile",
+        [""],
       );
       expect(isDowloaded).toBeFalsy();
     });
@@ -118,7 +81,7 @@ describe("Tests Copybook download from USS", () => {
         jest
           .spyOn(ProfileUtils, "getProfileNameForCopybook")
           .mockReturnValue("test-profile");
-        downloader.isEligibleForDownload = jest.fn().mockReturnValue(true);
+
         jest
           .spyOn(SettingsService, "getCopybookFileEncoding")
           .mockReturnValue("utf8");
@@ -134,8 +97,9 @@ describe("Tests Copybook download from USS", () => {
         downloader.clearMemberListCache();
         const isDowloaded = await downloader.downloadCopybook(
           { name: "uss_copybook", dialect: "COBOL" },
-          "document-uri",
           "/uss/path",
+          "profile",
+          [""],
         );
         expect(allUSSFilemembers).toHaveBeenCalledWith("/uss/path");
         expect(getUSSContentsMock).toHaveBeenCalledWith(
@@ -152,8 +116,9 @@ describe("Tests Copybook download from USS", () => {
       it("checks cache is used if download is trigged again for same profile and uss path", async () => {
         const isDowloaded = await downloader.downloadCopybook(
           { name: "uss_copybook", dialect: "COBOL" },
-          "document-uri",
           "/uss/path",
+          "profile",
+          [""],
         );
         // cache resolves the members
         expect(allUSSFilemembers).not.toHaveBeenCalled();
@@ -166,6 +131,16 @@ describe("Tests Copybook download from USS", () => {
           },
         );
         expect(isDowloaded).toBeTruthy();
+      });
+      it("checks hasMember adds fetched list to cache when cache doesn't have the member and checks hasMember uses cache when have member is cached", async () => {
+        await downloader.hasMember("profile", "ussFile", "uss_copybook");
+        const res = await downloader.hasMember(
+          "profile",
+          "ussFile",
+          "uss_copybook",
+        );
+        expect(allUSSFilemembers).toHaveBeenCalledTimes(1);
+        expect(res).toStrictEqual(true);
       });
     });
   });

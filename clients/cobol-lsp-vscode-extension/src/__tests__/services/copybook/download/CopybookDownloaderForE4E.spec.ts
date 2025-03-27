@@ -125,16 +125,19 @@ describe("e4e copybook downloader tests", () => {
       name: "copybook",
       dialect: "COBOL",
     });
-    expect(spyDownloadElement).toHaveBeenCalledWith(e4eResponseEndevorFirst, {
-      use_map: false,
-      environment: "environment",
-      stage: "stage",
-      system: "system",
-      subsystem: "subsystem",
-      type: "type",
-      element: "copybook",
-      fingerprint: "fingerprint",
-    });
+    expect(spyDownloadElement).toHaveBeenCalledWith(
+      e4eResponseEndevorFirst.profile,
+      {
+        use_map: false,
+        environment: "environment",
+        stage: "stage",
+        system: "system",
+        subsystem: "subsystem",
+        type: "type",
+        element: "copybook",
+        fingerprint: "fingerprint",
+      },
+    );
     expect(spyDownloadDataset).not.toHaveBeenCalled();
   });
   it("check download performed only for element when no member matches", async () => {
@@ -147,16 +150,19 @@ describe("e4e copybook downloader tests", () => {
       name: "copybook",
       dialect: "COBOL",
     });
-    expect(spyDownloadElement).toHaveBeenCalledWith(e4eResponseEndevorFirst, {
-      use_map: false,
-      environment: "environment",
-      stage: "stage",
-      system: "system",
-      subsystem: "subsystem",
-      type: "type",
-      element: "copybook",
-      fingerprint: "fingerprint",
-    });
+    expect(spyDownloadElement).toHaveBeenCalledWith(
+      e4eResponseEndevorFirst.profile,
+      {
+        use_map: false,
+        environment: "environment",
+        stage: "stage",
+        system: "system",
+        subsystem: "subsystem",
+        type: "type",
+        element: "copybook",
+        fingerprint: "fingerprint",
+      },
+    );
     expect(spyDownloadDataset).not.toHaveBeenCalled();
   });
   it("check downloadDatasetE4E does not perform IO in case of Error", async () => {
@@ -187,6 +193,70 @@ describe("e4e copybook downloader tests", () => {
     });
     expect(getElement).toHaveBeenCalled();
     expect(vscode.workspace.fs.writeFile).not.toHaveBeenCalled();
+  });
+
+  it("check hasElement returns correct value when element is in the list", async () => {
+    const e4eMock: E4E = {
+      isEndevorElement: jest.fn().mockResolvedValue(false),
+      getProfileInfo: jest.fn(),
+      listElements: jest.fn().mockResolvedValue([
+        ["element", "fingerprint"],
+        ["element2", "fingerprint2"],
+      ]),
+      getElement: jest.fn(),
+      listMembers: jest.fn(),
+      getMember: jest.fn(),
+      getConfiguration: jest.fn(),
+      onDidChangeElement: jest.fn(),
+    };
+    const e4eDownloader = new CopybookDownloaderForE4E("/storagePath", e4eMock);
+
+    const res = await e4eDownloader.hasElement(
+      { profile: "profile", instance: "instance" },
+      {
+        environment: "environment",
+        system: "system",
+        subsystem: "subsystem",
+        type: "type",
+        stage: "1",
+        use_map: false,
+      },
+      "copybook",
+    );
+    const res2 = await e4eDownloader.hasElement(
+      { profile: "profile", instance: "instance" },
+      {
+        environment: "environment",
+        system: "system",
+        subsystem: "subsystem",
+        type: "type",
+        stage: "1",
+        use_map: false,
+      },
+      "element",
+    );
+    expect(res).toBeFalsy();
+    expect(res2).toBeTruthy();
+  });
+
+  it("checks getProfileInfo uses cache for same partialProfile", async () => {
+    const e4eMock: E4E = {
+      isEndevorElement: jest.fn().mockResolvedValue(false),
+      getProfileInfo: jest.fn().mockResolvedValue("profile"),
+      listElements: jest.fn().mockResolvedValue([
+        ["element", "fingerprint"],
+        ["element2", "fingerprint2"],
+      ]),
+      getElement: jest.fn(),
+      listMembers: jest.fn(),
+      getMember: jest.fn(),
+      getConfiguration: jest.fn(),
+      onDidChangeElement: jest.fn(),
+    };
+    const e4eDownloader = new CopybookDownloaderForE4E("/storagePath", e4eMock);
+    await e4eDownloader.getProfileInfo("instance@connection");
+    await e4eDownloader.getProfileInfo("instance@connection");
+    expect(e4eMock.getProfileInfo).toHaveBeenCalledTimes(1);
   });
 
   describe("check downloadDatasetE4E nominal performs writeFile with correct path and content", () => {

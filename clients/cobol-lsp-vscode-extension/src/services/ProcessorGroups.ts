@@ -26,49 +26,87 @@ import { DialectsConfiguration, SettingsService } from "./Settings";
 import { B4GTypeMetadata, loadBridgeJsonContent } from "./BridgeForGitLoader";
 import {
   clearWorkspaceConfigCache,
+  EndevorConfigModel,
   Preprocessor,
   ProcessorGroup,
   ProcessorIndex,
   ProgramsConfig,
   readProcessorGroupsFileContent,
   readProgramConfigFileContent,
+  ZoweDatasetConfigModel,
+  ZoweUssConfigModel,
 } from "./ProcessorGroupsLoader";
+import { USS } from "../constants";
 
 export async function loadProcessorGroupCopybookPaths(
   documentUri: string,
   dialectType: string,
 ): Promise<string[]> {
-  return loadProcessorGroupSettings(
-    documentUri,
-    "libs",
-    [] as string[],
-    dialectType,
-  );
+  return (
+    await loadProcessorGroupSettings(
+      documentUri,
+      "libs",
+      [] as string[],
+      dialectType,
+    )
+  ).filter((element) => typeof element == "string");
 }
 
 export async function loadProcessorGroupCopybookPathsConfig(
   item: { scopeUri: string },
   configObject: string[],
-): Promise<string[]> {
-  const cfg = await loadProcessorGroupSettings(
-    item.scopeUri,
-    "libs",
-    [] as string[],
-  );
-  const config = SettingsService.evaluateVariables(
-    [...cfg, ...configObject],
-    getVariablesFromUri(item.scopeUri, false),
-  );
+): Promise<
+  (string | ZoweDatasetConfigModel | ZoweUssConfigModel | EndevorConfigModel)[]
+> {
+  const allConfigs: (
+    | string
+    | ZoweDatasetConfigModel
+    | ZoweUssConfigModel
+    | EndevorConfigModel
+  )[] = [
+    ...(await loadProcessorGroupSettings(
+      item.scopeUri,
+      "libs",
+      [] as string[],
+    )),
+    ...configObject,
+  ];
 
+  const configs: (
+    | string
+    | ZoweDatasetConfigModel
+    | ZoweUssConfigModel
+    | EndevorConfigModel
+  )[] = [];
+  const variables = getVariablesFromUri(item.scopeUri, false);
   const wsUri = workspace.getWorkspaceFolder(Uri.parse(item.scopeUri))?.uri;
-  if (wsUri === undefined) {
-    return configObject;
+  let cleanWsFolder: string | undefined;
+  if (wsUri) cleanWsFolder = cleanWorkspaceFolderName(wsUri.fsPath);
+
+  for (const config of allConfigs) {
+    if (typeof config === "string") {
+      const tempConfig = SettingsService.evaluateVariables([config], variables);
+
+      if (cleanWsFolder === undefined) {
+        configs.push(config);
+      } else {
+        const globs = globSync(
+          tempConfig.map((ele) => ele.replace(backwardSlashRegex, "/")),
+          { cwd: cleanWsFolder, absolute: true },
+        ).map((s) => normalizePath(s));
+        configs.push(...globs);
+      }
+    } else {
+      if (USS in config) {
+        config.uss = SettingsService.evaluateVariables(
+          [config.uss],
+          variables,
+        )[0];
+      }
+      configs.push(config);
+    }
   }
-  const globs = globSync(
-    config.map((ele) => ele.replace(backwardSlashRegex, "/")),
-    { cwd: cleanWorkspaceFolderName(wsUri.fsPath), absolute: true },
-  ).map((s) => normalizePath(s));
-  return globs;
+  return configs;
 }
 
 export async function loadProcessorGroupCopybookExtensionsConfig(
@@ -239,18 +277,26 @@ function selectProcessorGroup(
     : b4g.elements[selectedElement].processorGroup;
 }
 
-async function loadProcessorGroupSettings<T extends string | string[]>(
+type AttributeTypes = {
+  libs: (
+    | string
+    | ZoweDatasetConfigModel
+    | ZoweUssConfigModel
+    | EndevorConfigModel
+  )[];
+  name: string;
+  "target-sql-backend": string;
+  "compiler-options": string;
+  "copybook-file-encoding": string;
+  "copybook-extensions": string[];
+};
+
+async function loadProcessorGroupSettings<A extends keyof AttributeTypes>(
   documentUri: string,
-  atrtibute:
-    | "libs"
-    | "name"
-    | "target-sql-backend"
-    | "compiler-options"
-    | "copybook-file-encoding"
-    | "copybook-extensions",
-  configObject: T,
+  attribute: A,
+  configObject: AttributeTypes[A],
   dialect: string = "COBOL",
-): Promise<T> {
+): Promise<AttributeTypes[A]> {
   const docURI = Uri.parse(documentUri);
   const pgCfg: ProcessorGroup | undefined = loadProcessorsConfigForDocument(
     documentUri,
@@ -262,20 +308,20 @@ async function loadProcessorGroupSettings<T extends string | string[]>(
     return configObject;
   }
   try {
-    if (dialect && dialect !== "COBOL") {
+    if (dialect && dialect !== "COBOL" && "preprocessor" in pgCfg) {
       for (const pp of pgCfg.preprocessor as Preprocessor[]) {
         if (
           pp &&
           typeof pp === "object" &&
           pp["name"] === dialect &&
-          pp[atrtibute] !== undefined
+          pp[attribute] !== undefined
         ) {
-          return pp[atrtibute] as T;
+          return pp[attribute] as AttributeTypes[A];
         }
       }
     } else {
-      if (pgCfg[atrtibute] !== undefined) {
-        return pgCfg[atrtibute] as T;
+      if (pgCfg[attribute] !== undefined) {
+        return pgCfg[attribute] as AttributeTypes[A];
       }
     }
 

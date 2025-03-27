@@ -32,7 +32,7 @@ import {
   USE_MAP,
 } from "../../../constants";
 import { CopybookName } from "../CopybookDownloadService";
-import { hasMember, Utils } from "../../util/Utils";
+import { asPartialProfile, hasMember, Utils } from "../../util/Utils";
 import { searchCopybookInExtensionFolder } from "../../util/FSUtils";
 import { getErrorMessage } from "../../util/ErrorsUtils";
 import { SettingsService } from "../../Settings";
@@ -51,6 +51,8 @@ export class CopybookDownloaderForE4E {
   ) {}
 
   private E4EConfigs = new Map<string, Promise<e4eResponse | undefined>>();
+  private E4EProfiles = new Map<string, ResolvedProfile | undefined>();
+  private E4EElements = new Map<string, EndevorElement[] | undefined>();
 
   public clearConfigs() {
     this.E4EConfigs.clear();
@@ -179,9 +181,9 @@ export class CopybookDownloaderForE4E {
         `Failed to find ${copybookName.name} in Endevor`,
       );
     } else if (DATASET in first)
-      return await this.downloadDatasetE4E(response, first);
+      return await this.downloadDatasetE4E(response.profile, first);
     else if (ENVIRONMENT in first)
-      return await this.downloadElementE4E(response, first);
+      return await this.downloadElementE4E(response.profile, first);
     return false;
   }
 
@@ -195,15 +197,12 @@ export class CopybookDownloaderForE4E {
   }
 
   public async downloadElementE4E(
-    endevorApi: e4eResponse,
+    profile: ResolvedProfile,
     element: EndevorElement,
   ): Promise<boolean> {
     try {
       const use_map = element.use_map ? USE_MAP : "";
-      const instance = CopybookURI.getEnviromentPath(
-        element,
-        endevorApi.profile,
-      );
+      const instance = CopybookURI.getEnviromentPath(element, profile);
       const filePath = await CopybookDownloaderForE4E.getCopybookPath(
         instance,
         use_map,
@@ -211,10 +210,7 @@ export class CopybookDownloaderForE4E {
         element.element,
         this.outputChannel,
       );
-      const resultElement = await this.e4e.getElement(
-        endevorApi.profile,
-        element,
-      );
+      const resultElement = await this.e4e.getElement(profile, element);
 
       if (resultElement instanceof Error) {
         this.outputChannel?.appendLine(resultElement.message);
@@ -232,11 +228,11 @@ export class CopybookDownloaderForE4E {
   }
 
   public async downloadDatasetE4E(
-    endevorApi: e4eResponse,
+    profile: ResolvedProfile,
     member: EndevorMember,
   ): Promise<boolean> {
     try {
-      const instance = [Utils.profileAsString(endevorApi.profile)];
+      const instance = [Utils.profileAsString(profile)];
       const filePath = await CopybookDownloaderForE4E.getCopybookPath(
         instance,
         member.dataset,
@@ -245,7 +241,7 @@ export class CopybookDownloaderForE4E {
         this.outputChannel,
       );
 
-      const memberContent = await this.e4e.getMember(endevorApi.profile, {
+      const memberContent = await this.e4e.getMember(profile, {
         dataset: member.dataset,
         member: member.member,
       });
@@ -357,5 +353,50 @@ export class CopybookDownloaderForE4E {
       [""],
       this.storagePath,
     );
+  }
+  public async getProfileInfo(profile: string = "") {
+    const partialProfile = asPartialProfile(profile);
+    if (this.E4EProfiles.has(profile)) {
+      return this.E4EProfiles.get(profile);
+    }
+    const resolvedProfile = await this.e4e.getProfileInfo(partialProfile);
+    if (resolvedProfile instanceof Error) {
+      vscode.window.showErrorMessage(resolvedProfile.message);
+      this.E4EProfiles.set(profile, undefined);
+      return;
+    }
+    this.E4EProfiles.set(profile, resolvedProfile);
+    return resolvedProfile;
+  }
+  public async hasElement(
+    profile: ResolvedProfile,
+    endevorType: EndevorType,
+    elementName: string,
+  ): Promise<boolean> {
+    const id = this.createProfileEndevorTypeId(profile, endevorType);
+    elementName = elementName.toUpperCase();
+    if (this.E4EElements.has(id)) {
+      return (
+        this.E4EElements.get(id)?.some(
+          (x) => x.element.toUpperCase() == elementName,
+        ) ?? false
+      );
+    }
+    const members = await this.getElements(profile, endevorType);
+    if (members instanceof Error) {
+      this.E4EElements.set(id, undefined);
+      return false;
+    }
+    this.E4EElements.set(id, members);
+    return members.some((x) => x.element.toUpperCase() == elementName);
+  }
+  public clearProfiles() {
+    this.E4EProfiles.clear();
+  }
+  private createProfileEndevorTypeId(
+    profile: ResolvedProfile,
+    endevorType: EndevorType,
+  ) {
+    return `${profile.instance}-${profile.profile}-${endevorType.environment}-${endevorType.stage}-${endevorType.system}-${endevorType.subsystem}-${endevorType.type}-${endevorType.use_map}`;
   }
 }
