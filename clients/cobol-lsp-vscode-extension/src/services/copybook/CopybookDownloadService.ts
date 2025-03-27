@@ -622,6 +622,8 @@ export class CopybookDownloadService {
       )
         return true;
     }
+
+    return endevorConfigs.length > 0;
   }
   private async isZoweProfilesValid(
     procGroupZoweConfigs: (ZoweDatasetConfigModel | ZoweUssConfigModel)[],
