@@ -314,7 +314,7 @@ describe("Tests copybook download service", () => {
         ProcessorGroups,
         "loadProcessorGroupCopybookPathsConfig",
       );
-
+      DownloadUtil.isProfileLocked = jest.fn().mockReturnValue(false);
       mocked.mockResolvedValue([
         "/libs",
         { dataset: "dataset", profile: "invalidProfile" },
