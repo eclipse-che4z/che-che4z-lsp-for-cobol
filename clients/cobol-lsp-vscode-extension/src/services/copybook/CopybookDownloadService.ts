@@ -642,7 +642,8 @@ async function searchCopybookinProcessorGroups(
     if (typeof config === "string") {
       folders = config;
       extensions = await SettingsService.getCopybookExtension(documentUri);
-    } else if (ENVIRONMENT in config && e4eDownloader) {
+    } else if (ENVIRONMENT in config) {
+      if (!e4eDownloader) continue;
       const endevorType = DownloadUtil.endevorConfigToType(config);
       const profile = await e4eDownloader.getProfileInfo(config.profile);
       if (!profile) continue;
