@@ -147,7 +147,7 @@ export class CopybookDownloaderForUss extends ZoweExplorerDownloader {
     uss: string,
     copybookName: string,
     extensions: string[] = [""],
-  ): Promise<string | undefined> {
+  ): Promise<boolean> {
     const id = this.createId(profileName, uss);
     if (this.memberListCache.has(id)) {
       let member: string | undefined;
