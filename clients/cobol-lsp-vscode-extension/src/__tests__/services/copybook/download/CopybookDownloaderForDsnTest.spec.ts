@@ -107,7 +107,7 @@ describe("Tests Copybook download from DNS", () => {
           "copybook",
         );
         expect(allMemberMock).toHaveBeenCalledTimes(1);
-        expect(res).toStrictEqual("copybook");
+        expect(res).toStrictEqual(true);
       });
     });
   });

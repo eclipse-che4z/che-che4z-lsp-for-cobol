@@ -160,7 +160,7 @@ export class CopybookDownloaderForUss extends ZoweExplorerDownloader {
               `${copybookName.concat(ext).toUpperCase()}`,
           );
       }
-      return member;
+      return member ? true : false;
     }
     const profile = DownloadUtil.loadProfile(profileName, this.explorerAPI);
     await this.limitFailedRequests(
@@ -185,7 +185,8 @@ export class CopybookDownloaderForUss extends ZoweExplorerDownloader {
               `${copybookName.concat(ext).toUpperCase()}`,
           );
       }
-      return member;
+      return member ? true : false;
     }
+    return false;
   }
 }

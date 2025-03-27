@@ -124,7 +124,9 @@ export class CopybookDownloaderForDsn extends ZoweExplorerDownloader {
     if (this.memberListCache.has(id)) {
       return this.memberListCache
         .get(id)
-        ?.find((member) => member.toUpperCase() === copybookName.toUpperCase());
+        ?.find((member) => member.toUpperCase() === copybookName.toUpperCase())
+        ? true
+        : false;
     }
     const profile = DownloadUtil.loadProfile(profileName, this.explorerAPI);
     await this.limitFailedRequests(

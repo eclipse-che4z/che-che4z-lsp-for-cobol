@@ -390,6 +390,7 @@ export class CopybookDownloaderForE4E {
           ? true
           : false;
       }
+      return false;
     }
   }
   public clearProfiles() {

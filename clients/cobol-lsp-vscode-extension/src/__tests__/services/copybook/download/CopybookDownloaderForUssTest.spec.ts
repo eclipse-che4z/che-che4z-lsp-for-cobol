@@ -140,7 +140,7 @@ describe("Tests Copybook download from USS", () => {
           "uss_copybook",
         );
         expect(allUSSFilemembers).toHaveBeenCalledTimes(1);
-        expect(res).toStrictEqual("uss_copybook");
+        expect(res).toStrictEqual(true);
       });
     });
   });
