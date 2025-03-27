@@ -409,107 +409,57 @@ export class CopybookDownloadService {
       return !!(await this.e4eDownloader?.getE4EConfig(documentUri));
     }
 
-    const configs = await loadProcessorGroupCopybookPathsConfig(
-      { scopeUri: documentUri },
-      [],
-    );
-
-    const procGroupZoweConfigs = configs.filter(
-      (config): config is ZoweUssConfigModel | ZoweDatasetConfigModel =>
-        typeof config != "string" && (DATASET in config || USS in config),
-    );
-
-    const endevorConfigs = configs.filter(
-      (config): config is EndevorConfigModel =>
-        typeof config != "string" && ENVIRONMENT in config,
-    );
-
     const profile = ProfileUtils.getProfileNameForCopybook(
       documentUri,
       this.explorerApi,
     );
-
-    if (endevorConfigs.length > 0 && !this.e4eApi) {
-      this.missingExtension(
+    const configs = await loadProcessorGroupCopybookPathsConfig(
+      { scopeUri: documentUri },
+      [],
+    );
+    if (
+      await this.isProcessorGroupConfigsSatisfiesDownload(
         documentUri,
-        "Explorer for Endevor is not installed",
+        profile,
+        configs,
+      )
+    )
+      return true;
+
+    if (configs.length > 0) return false;
+
+    if (!this.explorerApi) {
+      return false;
+    }
+    const availableProfiles = ProfileUtils.getAvailableProfiles(
+      this.explorerApi,
+    );
+
+    const copybooksLocation =
+      DownloadUtil.areCopybookDownloadConfigurationsPresent(
+        documentUri,
+        dialects,
       );
+
+    if (!copybooksLocation) {
       return false;
     }
-    if (!this.explorerApi && procGroupZoweConfigs.length > 0) {
-      this.missingExtension(documentUri, "Zowe Explorer is not installed");
+
+    if (!profile || !availableProfiles.includes(profile)) {
+      const message = profile
+        ? `${PROVIDE_PROFILE_MSG} Provided invalid profile name: ${profile}`
+        : `${PROVIDE_PROFILE_MSG}`;
+      this.processDownloadError(message);
       return false;
     }
-    if (this.explorerApi) {
-      const availableProfiles = ProfileUtils.getAvailableProfiles(
+    return (
+      !(await DownloadUtil.isProfileLocked(profile)) &&
+      !(await DownloadUtil.checkForInvalidCredProfile(
+        profile,
         this.explorerApi,
-      );
-
-      if (procGroupZoweConfigs && procGroupZoweConfigs.length > 0) {
-        const uniqueProfiles = Array.from(
-          new Set(
-            procGroupZoweConfigs
-              .map((item) => item.profile)
-              .filter((element) => element != undefined),
-          ),
-        );
-        if (profile && !uniqueProfiles.find((x) => x === profile))
-          uniqueProfiles.push(profile);
-
-        for (const profileCheck of uniqueProfiles) {
-          if (await DownloadUtil.isProfileLocked(profileCheck)) return false;
-        }
-
-        for (const zoweConfig of procGroupZoweConfigs) {
-          const tempProfile = zoweConfig.profile ? zoweConfig.profile : profile;
-
-          if (!tempProfile || !availableProfiles.includes(tempProfile)) {
-            const msg = `${PROVIDE_PROFILE_MSG_PROC_GRUOPS} Provided invalid profile name: ${zoweConfig.profile}`;
-            vscode.window.showErrorMessage(msg);
-            return false;
-          } else {
-            if (
-              await DownloadUtil.checkForInvalidCredProfile(
-                tempProfile,
-                this.explorerApi,
-                DATASET in zoweConfig
-                  ? { dsn: zoweConfig.dataset }
-                  : { uss: zoweConfig.uss },
-              )
-            )
-              return false;
-          }
-        }
-        return true;
-      } else if (configs.length == 0) {
-        const copybooksLocation =
-          DownloadUtil.areCopybookDownloadConfigurationsPresent(
-            documentUri,
-            dialects,
-          );
-
-        if (!copybooksLocation) {
-          return false;
-        }
-
-        if (!profile || !availableProfiles.includes(profile)) {
-          const message = profile
-            ? `${PROVIDE_PROFILE_MSG} Provided invalid profile name: ${profile}`
-            : `${PROVIDE_PROFILE_MSG}`;
-          this.processDownloadError(message);
-          return false;
-        }
-        return (
-          !(await DownloadUtil.isProfileLocked(profile)) &&
-          !(await DownloadUtil.checkForInvalidCredProfile(
-            profile,
-            this.explorerApi,
-            copybooksLocation,
-          ))
-        );
-      }
-    }
-    return endevorConfigs.length > 0;
+        copybooksLocation,
+      ))
+    );
   }
   private missingExtension(documentUri: string, message: string) {
     this.diagnosticsService?.showDiagnostics(vscode.Uri.parse(documentUri), [
@@ -622,6 +572,107 @@ export class CopybookDownloadService {
   public reenableFailedRequests() {
     this.dsnDownloader?.reenableFailedRequests();
     this.ussDownloader?.reenableFailedRequests();
+  }
+  private async isProcessorGroupConfigsSatisfiesDownload(
+    documentUri: string,
+    defaultProfile: string | undefined,
+    configs: (
+      | string
+      | ZoweDatasetConfigModel
+      | ZoweUssConfigModel
+      | EndevorConfigModel
+    )[],
+  ) {
+    const procGroupZoweConfigs = configs.filter(
+      (config): config is ZoweUssConfigModel | ZoweDatasetConfigModel =>
+        typeof config != "string" && (DATASET in config || USS in config),
+    );
+
+    const endevorConfigs = configs.filter(
+      (config): config is EndevorConfigModel =>
+        typeof config != "string" && ENVIRONMENT in config,
+    );
+
+    if (configs.length == 0) return false;
+
+    if (endevorConfigs.length > 0 && !this.e4eApi) {
+      this.missingExtension(
+        documentUri,
+        "Explorer for Endevor is not installed",
+      );
+      return false;
+    }
+    if (!this.explorerApi && procGroupZoweConfigs.length > 0) {
+      this.missingExtension(documentUri, "Zowe Explorer is not installed");
+      return false;
+    }
+    if (!this.explorerApi) return false;
+    const availableProfiles = ProfileUtils.getAvailableProfiles(
+      this.explorerApi,
+    );
+    if (procGroupZoweConfigs && procGroupZoweConfigs.length > 0) {
+      if (await this.isZoweProfilesLocked(procGroupZoweConfigs, defaultProfile))
+        return false;
+      if (
+        await this.isZoweProfilesValid(
+          procGroupZoweConfigs,
+          defaultProfile,
+          availableProfiles,
+        )
+      )
+        return true;
+    }
+
+    return endevorConfigs.length > 0;
+  }
+  private async isZoweProfilesValid(
+    procGroupZoweConfigs: (ZoweDatasetConfigModel | ZoweUssConfigModel)[],
+    defaultProfile: string | undefined,
+    availableProfiles: string[],
+  ): Promise<boolean> {
+    if (!this.explorerApi) return false;
+    for (const zoweConfig of procGroupZoweConfigs) {
+      const tempProfile = zoweConfig.profile
+        ? zoweConfig.profile
+        : defaultProfile;
+
+      if (!tempProfile || !availableProfiles.includes(tempProfile)) {
+        const msg = `${PROVIDE_PROFILE_MSG_PROC_GRUOPS} Provided invalid profile name: ${zoweConfig.profile}`;
+        vscode.window.showErrorMessage(msg);
+        return false;
+      } else {
+        if (
+          await DownloadUtil.checkForInvalidCredProfile(
+            tempProfile,
+            this.explorerApi,
+            DATASET in zoweConfig
+              ? { dsn: zoweConfig.dataset }
+              : { uss: zoweConfig.uss },
+          )
+        )
+          return false;
+      }
+    }
+    return true;
+  }
+  private async isZoweProfilesLocked(
+    procGroupZoweConfigs: (ZoweDatasetConfigModel | ZoweUssConfigModel)[],
+    defaultProfile: string | undefined,
+  ): Promise<boolean> {
+    const uniqueProfiles = Array.from(
+      new Set(
+        procGroupZoweConfigs
+          .map((item) => item.profile)
+          .filter((element) => element != undefined),
+      ),
+    );
+    if (defaultProfile && !uniqueProfiles.find((x) => x === defaultProfile))
+      uniqueProfiles.push(defaultProfile);
+
+    for (const profileCheck of uniqueProfiles) {
+      if (await DownloadUtil.isProfileLocked(profileCheck)) return true;
+    }
+    return false;
   }
 }
 async function searchCopybookinProcessorGroups(
