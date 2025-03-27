@@ -26,10 +26,7 @@ import {
   ZOWE_FOLDER,
 } from "../../constants";
 import { ProfileUtils } from "../util/ProfileUtils";
-import {
-  DownloadUtil,
-  MainframeRemoteLocation,
-} from "./downloader/DownloadUtil";
+import { DownloadUtil } from "./downloader/DownloadUtil";
 import { E4E, EndevorElement } from "../../type/e4eApi";
 import { CopybookDownloaderForE4E } from "./downloader/CopybookDownloaderForE4E";
 import { CopybookDownloaderForUss } from "./downloader/CopybookDownloaderForUss";
