@@ -372,7 +372,7 @@ export class CopybookDownloaderForE4E {
     profile: ResolvedProfile,
     endevorType: EndevorType,
     elementName: string,
-  ) {
+  ): Promise<boolean> {
     const id = this.createProfileEndevorTypeId(profile, endevorType);
     if (this.E4EElements.has(id)) {
       const element = this.E4EElements.get(id)?.find(
