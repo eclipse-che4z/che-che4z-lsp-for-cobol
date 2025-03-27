@@ -417,11 +417,10 @@ export class CopybookDownloadService {
       [],
     );
 
-    const procGroupZoweConfigs = configs
-      .filter(
-        (config): config is ZoweUssConfigModel | ZoweDatasetConfigModel =>
-          typeof config != "string" && (DATASET in config || USS in config),
-      );
+    const procGroupZoweConfigs = configs.filter(
+      (config): config is ZoweUssConfigModel | ZoweDatasetConfigModel =>
+        typeof config != "string" && (DATASET in config || USS in config),
+    );
 
     const endevorConfigs = configs.filter(
       (config): config is EndevorConfigModel =>
@@ -482,7 +481,6 @@ export class CopybookDownloadService {
                 DATASET in zoweConfig
                   ? { dsn: zoweConfig.dataset }
                   : { uss: zoweConfig.uss },
-
               ),
             );
           }
