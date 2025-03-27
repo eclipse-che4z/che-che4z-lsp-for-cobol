@@ -606,7 +606,7 @@ export class CopybookDownloadService {
       this.missingExtension(documentUri, "Zowe Explorer is not installed");
       return false;
     }
-    if (!this.explorerApi) return false;
+    if (!this.explorerApi) return endevorConfigs.length > 0;
     const availableProfiles = ProfileUtils.getAvailableProfiles(
       this.explorerApi,
     );
