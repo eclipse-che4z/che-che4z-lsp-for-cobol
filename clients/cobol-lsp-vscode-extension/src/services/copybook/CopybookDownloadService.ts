@@ -698,7 +698,6 @@ async function searchCopybookinProcessorGroups(
       extensions,
       storagePath,
     );
-    if (typeof config === "string" && !result) continue;
 
     if (result || shouldFound) return result;
   }
