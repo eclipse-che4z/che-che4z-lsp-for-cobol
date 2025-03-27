@@ -374,22 +374,19 @@ export class CopybookDownloaderForE4E {
     elementName: string,
   ): Promise<boolean> {
     const id = this.createProfileEndevorTypeId(profile, endevorType);
+    elementName = elementName.toUpperCase();
     if (this.E4EElements.has(id)) {
-      const element = this.E4EElements.get(id)?.find(
-        (x) => x.element.toUpperCase() == elementName.toUpperCase(),
-      );
-      return element ? true : false;
-    } else {
-      const members = await this.getElements(profile, endevorType);
-      if (members instanceof Error) this.E4EElements.set(id, undefined);
-      else {
-        this.E4EElements.set(id, members);
-        return members.some(
-          (x) => x.element.toUpperCase() == elementName.toUpperCase(),
-        );
-      }
+      return this.E4EElements.get(id)?.some(
+        (x) => x.element.toUpperCase() == elementName,
+      ) ?? false;
+    }
+    const members = await this.getElements(profile, endevorType);
+    if (members instanceof Error) {
+      this.E4EElements.set(id, undefined);
       return false;
     }
+    this.E4EElements.set(id, members);
+    return members.some((x) => x.element.toUpperCase() == elementName);
   }
   public clearProfiles() {
     this.E4EProfiles.clear();
