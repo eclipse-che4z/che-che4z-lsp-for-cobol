@@ -174,16 +174,11 @@ export class CopybookDownloaderForUss extends ZoweExplorerDownloader {
     id: string,
     copybook: string,
   ): boolean {
+    const list = this.memberListCache.get(id);
+    if (!list) return false;
     for (const extension of extensions) {
-      if (
-        this.memberListCache
-          .get(id)
-          ?.find(
-            (member) =>
-              member.toUpperCase() ===
-              `${copybook.concat(extension).toUpperCase()}`,
-          )
-      )
+      const copyWithExt = copybook.concat(extension).toUpperCase();
+      if (list.some((member) => member.toUpperCase() === copyWithExt))
         return true;
     }
     return false;
