@@ -430,16 +430,7 @@ export class CopybookDownloadService {
     );
 
     if (endevorConfigs.length > 0 && !this.e4eApi) {
-      this.diagnosticsService?.showDiagnostics(vscode.Uri.parse(documentUri), [
-        {
-          range: new vscode.Range(
-            new vscode.Position(0, 0),
-            new vscode.Position(1, 0),
-          ),
-          message: "Explorer for Endevor is not installed",
-          severity: vscode.DiagnosticSeverity.Warning,
-        },
-      ]);
+      this.missingExtension(documentUri, "Explorer for Endevor is not installed");
       return false;
     }
     if (!this.explorerApi && procGroupZoweConfigs.length > 0) {
