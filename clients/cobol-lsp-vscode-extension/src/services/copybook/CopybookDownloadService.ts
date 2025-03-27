@@ -421,12 +421,7 @@ export class CopybookDownloadService {
       .filter(
         (config): config is ZoweUssConfigModel | ZoweDatasetConfigModel =>
           typeof config != "string" && (DATASET in config || USS in config),
-      )
-      .map((config) => ({
-        profile: config.profile,
-        dataset: DATASET in config ? config.dataset : undefined,
-        uss: USS in config ? config.uss : undefined,
-      }));
+      );
 
     const endevorConfigs = configs.filter(
       (config): config is EndevorConfigModel =>
