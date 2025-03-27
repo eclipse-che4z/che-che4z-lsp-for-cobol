@@ -376,9 +376,11 @@ export class CopybookDownloaderForE4E {
     const id = this.createProfileEndevorTypeId(profile, endevorType);
     elementName = elementName.toUpperCase();
     if (this.E4EElements.has(id)) {
-      return this.E4EElements.get(id)?.some(
-        (x) => x.element.toUpperCase() == elementName,
-      ) ?? false;
+      return (
+        this.E4EElements.get(id)?.some(
+          (x) => x.element.toUpperCase() == elementName,
+        ) ?? false
+      );
     }
     const members = await this.getElements(profile, endevorType);
     if (members instanceof Error) {
