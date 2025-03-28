@@ -22,7 +22,6 @@ export class CopybookDownloaderForDsn extends ZoweExplorerDownloader {
   constructor(storagePath: string, explorerAPI: IApiRegisterClient) {
     super(storagePath, explorerAPI);
   }
-
   /**
    * Downloads a file from the passed dns based on Zowe explorer
    *

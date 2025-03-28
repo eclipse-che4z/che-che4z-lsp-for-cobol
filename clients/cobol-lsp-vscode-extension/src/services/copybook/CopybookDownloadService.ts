@@ -408,6 +408,7 @@ export class CopybookDownloadService {
     if (this.handleAsEndevorElement(documentUri)) {
       return !!(await this.e4eDownloader?.getE4EConfig(documentUri));
     }
+
     const profile = ProfileUtils.getProfileNameForCopybook(
       documentUri,
       this.explorerApi,
