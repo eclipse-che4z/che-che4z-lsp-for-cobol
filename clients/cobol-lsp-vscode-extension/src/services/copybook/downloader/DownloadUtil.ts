@@ -22,6 +22,8 @@ import { ZoweExplorerDownloader } from "./ZoweExplorerDownloader";
 import { SettingsService } from "../../Settings";
 import { hasMember } from "../../util/Utils";
 import { registerExceptionEvent } from "../../reporter";
+import { EndevorType } from "../../../type/e4eApi";
+import { EndevorConfigModel } from "../../ProcessorGroupsLoader";
 
 /**
  * Utility class for downloading copybooks
@@ -178,6 +180,7 @@ export class DownloadUtil {
     for (const dialect of uniqueDialects) {
       const dsnPath = SettingsService.getDsnPath(documentUri, dialect);
       const ussPath = SettingsService.getUssPath(documentUri, dialect);
+
       if ((dsnPath?.length ?? 0) > 0) {
         return { dsn: dsnPath[0] };
       }
@@ -185,7 +188,6 @@ export class DownloadUtil {
         return { uss: ussPath[0] };
       }
     }
-
     return null;
   }
 
@@ -243,6 +245,16 @@ export class DownloadUtil {
       hasMember(e.mDetails, "errorCode") &&
       e.mDetails.errorCode === 404
     );
+  }
+  public static endevorConfigToType(config: EndevorConfigModel): EndevorType {
+    return {
+      use_map: config.use_map === false ? false : true,
+      environment: config.environment,
+      stage: config.stage,
+      system: config.system,
+      subsystem: config.subsystem,
+      type: config.type,
+    };
   }
 }
 

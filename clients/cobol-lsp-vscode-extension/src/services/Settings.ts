@@ -259,6 +259,7 @@ export class SettingsService {
       documentUri,
       dialectType,
     );
+
     const vars = getVariablesFromUri(documentUri);
     const paths: string[] = [
       ...SettingsService.evaluateVariables(pgPaths, vars),

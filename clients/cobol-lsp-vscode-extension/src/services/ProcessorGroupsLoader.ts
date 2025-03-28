@@ -39,7 +39,32 @@ const ProgramsConfigModel = t.type({
   ),
 });
 
+const EndevorConfigModel = t.intersection([
+  t.type({
+    environment: t.string,
+    stage: t.string,
+    system: t.string,
+    subsystem: t.string,
+    type: t.string,
+  }),
+  t.partial({ use_map: t.boolean }),
+  t.partial({ profile: t.string }),
+]);
+
+const ZoweDatasetConfigModel = t.intersection([
+  t.type({ dataset: t.string }),
+  t.partial({ profile: t.string }),
+]);
+
+const ZoweUssConfigModel = t.intersection([
+  t.type({ uss: t.string }),
+  t.partial({ profile: t.string }),
+]);
+
 export type ProgramsConfig = t.TypeOf<typeof ProgramsConfigModel>;
+export type EndevorConfigModel = t.TypeOf<typeof EndevorConfigModel>;
+export type ZoweDatasetConfigModel = t.TypeOf<typeof ZoweDatasetConfigModel>;
+export type ZoweUssConfigModel = t.TypeOf<typeof ZoweUssConfigModel>;
 
 const PreprocessorModel = t.union([
   t.string,
@@ -63,7 +88,14 @@ const ProcessorGroupModel = t.intersection([
   }),
   t.partial({
     preprocessor: t.union([PreprocessorModel, t.array(PreprocessorModel)]),
-    libs: t.array(t.string),
+    libs: t.array(
+      t.union([
+        t.string,
+        EndevorConfigModel,
+        ZoweDatasetConfigModel,
+        ZoweUssConfigModel,
+      ]),
+    ),
     "copybook-extensions": t.array(t.string),
     "compiler-options": t.array(t.string),
     "copybook-file-encoding": t.string,
@@ -116,11 +148,11 @@ async function readProcessorGroupsFileAndCache(
       await workspace.fs.readFile(procCfgPath),
     );
     // update new cache
-    const ProcessorGrpupsModel = t.type({
+    const ProcessorGroupsModel = t.type({
       pgroups: t.array(ProcessorGroupModel),
     });
     const json: unknown = JSON.parse(fileContent);
-    const decoded = ProcessorGrpupsModel.decode(json);
+    const decoded = ProcessorGroupsModel.decode(json);
     if (isLeft(decoded)) {
       throw Error(
         `Could not validate data: ${PathReporter.report(decoded).join("\n")}`,
