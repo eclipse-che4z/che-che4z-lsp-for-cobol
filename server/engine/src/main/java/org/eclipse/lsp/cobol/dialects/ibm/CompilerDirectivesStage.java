@@ -23,7 +23,6 @@ import com.google.common.collect.ImmutableList;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.eclipse.lsp.cobol.common.dialects.CobolDialect;
-import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.model.tree.CompilerDirectiveNode;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
@@ -111,22 +110,10 @@ public class CompilerDirectivesStage implements Stage<AnalysisContext, List<Node
       CompilerDirectivesVisitor visitor = new CompilerDirectivesVisitor(ctx, messageService, startPosition, section,
               directiveLineText, isJavaShareableOn);
 
-      List<SyntaxError> parseError = new ArrayList<>();
       if (parserRule.equals("compilerOptions")) {
         visitor.visitCompilerOptions(parser.compilerOptions());
-        parseError.addAll(visitor.getErrors());
-        parseError.forEach(error -> error.getLocation().getLocation().setRange(
-                ctx.getExtendedDocument().mapLocation(error.getLocation().getLocation().getRange()).getRange()));
-        ctx.getAccumulatedErrors().addAll(parseError);
       } else if (parserRule.equals("compilerDirectives")) {
-        List<Node> nodes = new ArrayList<>(visitor.visitCompilerDirectives(parser.compilerDirectives()));
-        parseError.addAll(visitor.getErrors());
-        parseError.forEach(error -> error.getLocation().getLocation().setRange(
-                ctx.getExtendedDocument().mapLocation(error.getLocation().getLocation().getRange()).getRange()));
-
-        ctx.getAccumulatedErrors().addAll(parseError);
-        return nodes;
-
+        return visitor.visitCompilerDirectives(parser.compilerDirectives());
       }
     }
     return ImmutableList.of();

@@ -15,7 +15,6 @@
 package org.eclipse.lsp.cobol.core.engine.directives;
 
 import com.google.common.collect.ImmutableList;
-import lombok.Getter;
 import lombok.NonNull;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.eclipse.lsp.cobol.common.dialects.CobolDialect;
@@ -40,7 +39,6 @@ import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Function;
 import java.util.regex.Matcher;
@@ -71,9 +69,6 @@ public class CompilerDirectivesVisitor extends CompilerDirectivesParserBaseVisit
     this.directiveLineText = directiveLineText;
     this.isJavaShareableOn = isJavaShareableOn;
   }
-
-  @Getter
-  private final List<SyntaxError> errors = new LinkedList<>();
 
   @Override
   public List<Node> visitCompilerOption(CompilerDirectivesParser.CompilerOptionContext ctx) {
@@ -267,8 +262,8 @@ public class CompilerDirectivesVisitor extends CompilerDirectivesParserBaseVisit
                     .severity(ErrorSeverity.ERROR)
                     .build();
 
-    if (!errors.contains(error) && !wrongToken.contains(CobolDialect.FILLER)) {
-      errors.add(error);
+    if (!analysisContext.getAccumulatedErrors().contains(error) && !wrongToken.contains(CobolDialect.FILLER)) {
+      analysisContext.getAccumulatedErrors().add(error);
     }
   }
 
