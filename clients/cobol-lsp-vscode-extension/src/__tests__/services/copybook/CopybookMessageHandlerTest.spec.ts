@@ -24,7 +24,6 @@ import * as fsUtils from "../../../services/util/FSUtils";
 vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
   get: jest.fn().mockReturnValue("testProfile"),
 });
-
 Utils.getZoweExplorerAPI = jest.fn();
 
 jest

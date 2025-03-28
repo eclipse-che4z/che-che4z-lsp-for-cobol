@@ -11,7 +11,6 @@
  * Contributors:
  *   Broadcom, Inc. - initial API and implementation
  */
-import { ProfileUtils } from "../../util/ProfileUtils";
 import { CopybookName } from "../CopybookDownloadService";
 import { DownloadUtil } from "./DownloadUtil";
 import { ZoweExplorerDownloader } from "./ZoweExplorerDownloader";
@@ -24,23 +23,6 @@ export class CopybookDownloaderForDsn extends ZoweExplorerDownloader {
     super(storagePath, explorerAPI);
   }
 
-  /**
-   * Checks if the file could be downloaded using the Zowe explorer from MVS
-   * @param copybookName Copybook to be downloaded.
-   * @param documentUri cobol programs which needs copybook
-   * @param dsnPath dsnpath in mainframe.
-   */
-  isEligibleForDownload(
-    _copybookName: CopybookName,
-    documentUri: string,
-    dsnPath: string | undefined,
-    profile?: string,
-  ): boolean {
-    const providedProfile = profile
-      ? profile
-      : ProfileUtils.getProfileNameForCopybook(documentUri, this.explorerAPI);
-    return !!(dsnPath && providedProfile);
-  }
   /**
    * Downloads a file from the passed dns based on Zowe explorer
    *
@@ -137,13 +119,15 @@ export class CopybookDownloaderForDsn extends ZoweExplorerDownloader {
     profileName: string,
     dataset: string,
     copybookName: string,
-  ) {
+  ): Promise<boolean> {
     const id = this.createId(profileName, dataset);
 
     if (this.memberListCache.has(id)) {
       return this.memberListCache
         .get(id)
-        ?.find((member) => member === copybookName);
+        ?.find((member) => member.toUpperCase() === copybookName.toUpperCase())
+        ? true
+        : false;
     }
     const profile = DownloadUtil.loadProfile(profileName, this.explorerAPI);
     await this.limitFailedRequests(
@@ -158,7 +142,11 @@ export class CopybookDownloaderForDsn extends ZoweExplorerDownloader {
       },
     );
 
-    if (this.memberListCache.get(id)?.find((member) => member === copybookName))
+    if (
+      this.memberListCache
+        .get(id)
+        ?.find((member) => member.toUpperCase() === copybookName.toUpperCase())
+    )
       return true;
     return false;
   }

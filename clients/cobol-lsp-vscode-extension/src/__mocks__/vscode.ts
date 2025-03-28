@@ -69,6 +69,8 @@ export namespace workspace {
   export async function findFiles() {
     return Promise.resolve([]);
   }
+  export const onDidChangeTextDocument = jest.fn();
+  export const onDidCloseTextDocument = jest.fn();
 }
 
 // eslint-disable-next-line @typescript-eslint/no-namespace
@@ -226,6 +228,7 @@ export const languages = {
   registerCompletionItemProvider: jest.fn(),
   createDiagnosticCollection: jest.fn().mockReturnValue({
     clear: jest.fn(),
+    delete: jest.fn(),
   }),
 };
 

@@ -55,22 +55,22 @@ export async function loadProcessorGroupCopybookPaths(
 export async function loadProcessorGroupCopybookPathsConfig(
   item: { scopeUri: string },
   configObject: string[],
-  dialect?: string,
 ): Promise<
   (string | ZoweDatasetConfigModel | ZoweUssConfigModel | EndevorConfigModel)[]
 > {
-  const remotes = await loadProcessorGroupSettings(
-    item.scopeUri,
-    "libs",
-    [] as string[],
-    dialect,
-  );
   const allConfigs: (
     | string
     | ZoweDatasetConfigModel
     | ZoweUssConfigModel
     | EndevorConfigModel
-  )[] = [...remotes, ...configObject];
+  )[] = [
+    ...(await loadProcessorGroupSettings(
+      item.scopeUri,
+      "libs",
+      [] as string[],
+    )),
+    ...configObject,
+  ];
 
   const configs: (
     | string
@@ -277,18 +277,26 @@ function selectProcessorGroup(
     : b4g.elements[selectedElement].processorGroup;
 }
 
-async function loadProcessorGroupSettings<T extends string | string[]>(
+type AttributeTypes = {
+  libs: (
+    | string
+    | ZoweDatasetConfigModel
+    | ZoweUssConfigModel
+    | EndevorConfigModel
+  )[];
+  name: string;
+  "target-sql-backend": string;
+  "compiler-options": string;
+  "copybook-file-encoding": string;
+  "copybook-extensions": string[];
+};
+
+async function loadProcessorGroupSettings<A extends keyof AttributeTypes>(
   documentUri: string,
-  attribute:
-    | "libs"
-    | "name"
-    | "target-sql-backend"
-    | "compiler-options"
-    | "copybook-file-encoding"
-    | "copybook-extensions",
-  configObject: T,
+  attribute: A,
+  configObject: AttributeTypes[A],
   dialect: string = "COBOL",
-): Promise<T> {
+): Promise<AttributeTypes[A]> {
   const docURI = Uri.parse(documentUri);
   const pgCfg: ProcessorGroup | undefined = loadProcessorsConfigForDocument(
     documentUri,
@@ -305,15 +313,15 @@ async function loadProcessorGroupSettings<T extends string | string[]>(
         if (
           pp &&
           typeof pp === "object" &&
-          pp["name"]?.toLocaleUpperCase() === dialect.toLocaleUpperCase() &&
+          pp["name"] === dialect &&
           pp[attribute] !== undefined
         ) {
-          return pp[attribute] as T;
+          return pp[attribute] as AttributeTypes[A];
         }
       }
     } else {
       if (pgCfg[attribute] !== undefined) {
-        return pgCfg[attribute] as T;
+        return pgCfg[attribute] as AttributeTypes[A];
       }
     }
 

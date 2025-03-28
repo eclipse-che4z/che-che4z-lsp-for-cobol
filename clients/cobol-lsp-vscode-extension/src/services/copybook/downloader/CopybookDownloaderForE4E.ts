@@ -51,7 +51,7 @@ export class CopybookDownloaderForE4E {
   ) {}
 
   private E4EConfigs = new Map<string, Promise<e4eResponse | undefined>>();
-  private E4EProfiles = new Map<string, ResolvedProfile>();
+  private E4EProfiles = new Map<string, ResolvedProfile | undefined>();
   private E4EElements = new Map<string, EndevorElement[] | undefined>();
 
   public clearConfigs() {
@@ -362,30 +362,33 @@ export class CopybookDownloaderForE4E {
     const resolvedProfile = await this.e4e.getProfileInfo(partialProfile);
     if (resolvedProfile instanceof Error) {
       vscode.window.showErrorMessage(resolvedProfile.message);
-    } else {
-      this.E4EProfiles.set(profile, resolvedProfile);
-      return resolvedProfile;
+      this.E4EProfiles.set(profile, undefined);
+      return;
     }
+    this.E4EProfiles.set(profile, resolvedProfile);
+    return resolvedProfile;
   }
   public async hasElement(
     profile: ResolvedProfile,
     endevorType: EndevorType,
     elementName: string,
-  ) {
+  ): Promise<boolean> {
     const id = this.createProfileEndevorTypeId(profile, endevorType);
+    elementName = elementName.toUpperCase();
     if (this.E4EElements.has(id)) {
-      const element = this.E4EElements.get(id)?.find(
-        (x) => x.element == elementName,
+      return (
+        this.E4EElements.get(id)?.some(
+          (x) => x.element.toUpperCase() == elementName,
+        ) ?? false
       );
-      return element ? true : false;
-    } else {
-      const members = await this.getElements(profile, endevorType);
-      if (members instanceof Error) this.E4EElements.set(id, undefined);
-      else {
-        this.E4EElements.set(id, members);
-        return members.find((x) => x.element == elementName) ? true : false;
-      }
     }
+    const members = await this.getElements(profile, endevorType);
+    if (members instanceof Error) {
+      this.E4EElements.set(id, undefined);
+      return false;
+    }
+    this.E4EElements.set(id, members);
+    return members.some((x) => x.element.toUpperCase() == elementName);
   }
   public clearProfiles() {
     this.E4EProfiles.clear();

@@ -13,7 +13,6 @@
  */
 import { SettingsService } from "../../Settings";
 import { splitFilename } from "../../util/FSUtils";
-import { ProfileUtils } from "../../util/ProfileUtils";
 import { CopybookName } from "../CopybookDownloadService";
 import { DownloadUtil } from "./DownloadUtil";
 import { ZoweExplorerDownloader } from "./ZoweExplorerDownloader";
@@ -27,24 +26,6 @@ export class CopybookDownloaderForUss extends ZoweExplorerDownloader {
   }
 
   /**
-   * Checks if the file could be downloaded using the Zowe explorer from USS
-   * @param copybookName Copybook to be downloaded.
-   * @param documentUri cobol programs which needs copybook
-   * @param dsnPath dsnpath in mainframe.
-   */
-  isEligibleForDownload(
-    _copybookName: CopybookName,
-    documentUri: string,
-    ussPath: string | undefined,
-    profile?: string,
-  ): boolean {
-    const providedProfile = profile
-      ? profile
-      : ProfileUtils.getProfileNameForCopybook(documentUri, this.explorerAPI);
-    return !!(ussPath && providedProfile);
-  }
-
-  /**
    * Downloads a file from USS using Zowe explorer
    *
    * @param copybookName Copybook to be downloaded.
@@ -55,7 +36,14 @@ export class CopybookDownloaderForUss extends ZoweExplorerDownloader {
     copybookName: CopybookName,
     ussPath: string,
     profile: string,
+    extensions: string[],
   ): Promise<boolean> {
+    const has = await this.hasMember(
+      profile,
+      ussPath,
+      copybookName.name,
+      extensions,
+    );
     const memberList = await this.getAllMembers(profile, ussPath);
     const remoteCopybook = DownloadUtil.getRemoteCopybookName(
       memberList,
@@ -63,6 +51,7 @@ export class CopybookDownloaderForUss extends ZoweExplorerDownloader {
     );
     return !!(
       remoteCopybook &&
+      has &&
       (await this.downloadCopybookFromMFUsingZowe(
         ussPath,
         remoteCopybook,
@@ -157,13 +146,11 @@ export class CopybookDownloaderForUss extends ZoweExplorerDownloader {
     profileName: string,
     uss: string,
     copybookName: string,
-  ) {
+    extensions: string[] = [""],
+  ): Promise<boolean> {
     const id = this.createId(profileName, uss);
-
     if (this.memberListCache.has(id)) {
-      return this.memberListCache
-        .get(id)
-        ?.find((member) => member === copybookName);
+      return this.isCachedMembersHaveCopybook(extensions, id, copybookName);
     }
     const profile = DownloadUtil.loadProfile(profileName, this.explorerAPI);
     await this.limitFailedRequests(
@@ -177,8 +164,23 @@ export class CopybookDownloaderForUss extends ZoweExplorerDownloader {
         this.memberListCache.set(id, members);
       },
     );
-    if (this.memberListCache.get(id)?.find((member) => member === copybookName))
-      return true;
+    if (this.memberListCache.has(id)) {
+      return this.isCachedMembersHaveCopybook(extensions, id, copybookName);
+    }
+    return false;
+  }
+  private isCachedMembersHaveCopybook(
+    extensions: string[],
+    id: string,
+    copybook: string,
+  ): boolean {
+    const list = this.memberListCache.get(id);
+    if (!list) return false;
+    for (const extension of extensions) {
+      const copyWithExt = copybook.concat(extension).toUpperCase();
+      if (list.some((member) => member.toUpperCase() === copyWithExt))
+        return true;
+    }
     return false;
   }
 }
