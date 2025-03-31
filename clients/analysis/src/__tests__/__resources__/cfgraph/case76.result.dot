@@ -1,0 +1,6 @@
+digraph A {
+rankdir=LR;
+<PROG>-><PROC>;
+<PROG>-><PAR-EXIT>;
+<PROC>-><PAR1>;
+}

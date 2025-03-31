@@ -15,7 +15,6 @@
 import * as vscode from "vscode";
 import { __ExtensionApi } from "@code4z/cobol-dialect-api";
 import { isV1RuntimeDialectDetail } from "./dialect/utils";
-
 import { fetchCopybookCommand } from "./commands/FetchCopybookCommand";
 import { gotoCopybookSettings } from "./commands/OpenSettingsCommand";
 import {
@@ -59,18 +58,35 @@ import {
 } from "./services/reporter";
 import { CopybooksCompletionProvider } from "./services/copybook/CopybooksCompletionProvider";
 import { SubroutinesCompletionsProvider } from "./services/subroutines/SubroutinesCompletionsProvider";
+import {
+  AnalysisResult,
+  ControlFlowAnalysisService,
+} from "./services/ControlFlowService";
+import { DownloadDiagnosticsService } from "./services/DiagnosticsService";
 
 interface __AnalysisApi {
   analysis(uri: string, text: string, pos?: vscode.Position): Promise<unknown>;
+  getControlFlowAnalysis(documentUri: string): Promise<AnalysisResult>;
 }
 
 let languageClientService: LanguageClientService;
 let outputChannel: vscode.OutputChannel;
-const API_VERSION: string = "1.0.0";
+let controlFlowChannel: vscode.LogOutputChannel;
+let analysisService: ControlFlowAnalysisService;
+const API_VERSION: string = "1.0.1";
 
 async function initialize(context: vscode.ExtensionContext) {
   // We need lazy initialization to be able to mock this for unit testing
   outputChannel = vscode.window.createOutputChannel("COBOL Language Support");
+  controlFlowChannel = vscode.window.createOutputChannel(
+    "COBOL Language Support Control Flow",
+    { log: true },
+  );
+
+  analysisService = new ControlFlowAnalysisService(
+    outputChannel,
+    controlFlowChannel,
+  );
   try {
     await vscode.workspace.fs.createDirectory(context.globalStorageUri);
   } catch (error) {
@@ -87,6 +103,7 @@ async function initialize(context: vscode.ExtensionContext) {
     maybeZowe && "api" in maybeZowe ? maybeZowe.api : undefined,
     maybeE4E && "api" in maybeE4E ? maybeE4E.api : undefined,
     outputChannel,
+    new DownloadDiagnosticsService(),
   );
 
   if (maybeZowe && "futureApi" in maybeZowe) {
@@ -105,6 +122,14 @@ async function initialize(context: vscode.ExtensionContext) {
   languageClientService = new LanguageClientService(
     outputChannel,
     context.globalStorageUri,
+    {
+      executeCommand: (command, args, next) => {
+        if (command == "missing copybook") {
+          copyBooksDownloader.clearProfiles();
+        }
+        next(command, args);
+      },
+    },
   );
   const configurationWatcher = new ConfigurationWatcher();
 
@@ -112,10 +137,6 @@ async function initialize(context: vscode.ExtensionContext) {
     copyBooksDownloader,
     configurationWatcher,
   };
-}
-
-export function getChannel(): vscode.OutputChannel {
-  return outputChannel;
 }
 
 export async function activate(
@@ -147,7 +168,7 @@ export async function activate(
   context.subscriptions.push(
     vscode.languages.registerCompletionItemProvider(
       [LANGUAGE_ID, EXP_LANGUAGE_ID, HP_LANGUAGE_ID],
-      new CopybooksCompletionProvider(copyBooksDownloader),
+      new CopybooksCompletionProvider(copyBooksDownloader, outputChannel),
     ),
   );
 
@@ -155,6 +176,18 @@ export async function activate(
     vscode.languages.registerCompletionItemProvider(
       [LANGUAGE_ID, EXP_LANGUAGE_ID, HP_LANGUAGE_ID],
       new SubroutinesCompletionsProvider(),
+    ),
+  );
+
+  context.subscriptions.push(
+    vscode.workspace.onDidChangeTextDocument((event) =>
+      analysisService.invalidate(event.document.uri.toString(), false),
+    ),
+  );
+
+  context.subscriptions.push(
+    vscode.workspace.onDidCloseTextDocument((document) =>
+      analysisService.invalidate(document.uri.toString(), true),
     ),
   );
 
@@ -194,7 +227,12 @@ export async function activate(
   );
   languageClientService.addRequestHandler(
     "workspace/configuration",
-    lspConfigHandler,
+    (r: Parameters<typeof lspConfigHandler>[0]) =>
+      lspConfigHandler(r, outputChannel),
+  );
+  languageClientService.addNotificationHandler(
+    "cfast/ready",
+    analysisService.makeControlFlowAstNotificationHandler(),
   );
 
   await languageClientService.start();
@@ -225,6 +263,9 @@ export async function activate(
         text,
         pos || findPosition(uri),
       );
+    },
+    getControlFlowAnalysis(documentUri: string) {
+      return analysisService.getAnalysis(documentUri);
     },
   };
 }

@@ -2,5 +2,6 @@
     "cobol-lsp.subroutine-manager.paths-local": [
         "nonexisting/subroutines/folder",
         "subroutines"
-    ]
+    ],
+    "cobol-lsp.maxVmCount": -1
 }

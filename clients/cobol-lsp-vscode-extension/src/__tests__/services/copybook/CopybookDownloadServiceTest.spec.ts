@@ -33,10 +33,14 @@ import {
 } from "../../../__mocks__/getZoweExplorerMock.utility";
 import { DownloadUtil } from "../../../services/copybook/downloader/DownloadUtil";
 import { E4E } from "../../../type/e4eApi";
-import { e4eMock } from "../../../__mocks__/getE4EMock.utility";
+import {
+  e4eMock,
+  e4eMockInvalidProfile,
+} from "../../../__mocks__/getE4EMock.utility";
+import * as ProcessorGroups from "../../../services/ProcessorGroups";
 import { Uri } from "../../../__mocks__/UriMock";
 import { SettingsService } from "../../../services/Settings";
-import * as extension from "../../../extension";
+import { DownloadDiagnosticsService } from "../../../services/DiagnosticsService";
 
 jest.mock("../../../services/reporter");
 Utils.getZoweExplorerAPI = jest
@@ -101,6 +105,7 @@ describe("Tests copybook download service", () => {
   describe("checks the prerequisites are checked before invoking download", () => {
     describe("unknown-profile", () => {
       beforeEach(() => {
+        workspaceConfigurationMock[PATHS_DSN] = ["TEST.COBOL.COPYBOOK"];
         profileName = "unknown-profile";
       });
 
@@ -114,8 +119,9 @@ describe("Tests copybook download service", () => {
       });
     });
 
-    describe("profile not profiled", () => {
+    describe("profile not provided", () => {
       beforeEach(() => {
+        workspaceConfigurationMock[PATHS_DSN] = ["TEST.COBOL.COPYBOOK"];
         profileName = "";
       });
 
@@ -124,8 +130,23 @@ describe("Tests copybook download service", () => {
           { name: "copybook-name", dialect: DEFAULT_DIALECT },
         ]);
         expect(downloadService["processDownloadError"]).toHaveBeenCalledWith(
-          `${PROVIDE_PROFILE_MSG}`,
+          PROVIDE_PROFILE_MSG,
         );
+      });
+    });
+
+    describe("no profile and no remote location configured", () => {
+      beforeEach(() => {
+        workspaceConfigurationMock[PATHS_DSN] = [];
+        workspaceConfigurationMock[PATHS_USS] = [];
+        profileName = "";
+      });
+
+      it("should not show the missing zowe profile message", async () => {
+        await downloadService.downloadCopybooks("document-uri", [
+          { name: "copybook-name", dialect: DEFAULT_DIALECT },
+        ]);
+        expect(downloadService["processDownloadError"]).not.toHaveBeenCalled();
       });
     });
 
@@ -288,15 +309,40 @@ describe("Tests copybook download service", () => {
         ]),
       ).toBe(undefined);
     });
+    it("checks an invalid zowe profile in a proc group is reported to the user", async () => {
+      const mocked = jest.spyOn(
+        ProcessorGroups,
+        "loadProcessorGroupCopybookPathsConfig",
+      );
+      DownloadUtil.isProfileLocked = jest.fn().mockReturnValue(false);
+      mocked.mockResolvedValue([
+        "/libs",
+        { dataset: "dataset", profile: "invalidProfile" },
+      ]);
+      const downloadService = new CopybookDownloadService(
+        "storage-path",
+        zoweExplorerMock,
+      );
+
+      expect(
+        await downloadService.downloadCopybooks("document-uri", [
+          { name: "copybook-name", dialect: DEFAULT_DIALECT },
+        ]),
+      ).toBe(undefined);
+      expect(vscode.window.showErrorMessage).toHaveBeenCalledWith(
+        "Please specify a valid Zowe Explorer profile in proc_grps.json to download copybooks from the mainframe. Provided invalid profile name: invalidProfile",
+      );
+      mocked.mockResolvedValue([]);
+    });
   });
 
   it("checks download resolver is invoked with right parameters", async () => {
     ProfileUtils.getAvailableProfiles = jest.fn().mockReturnValue("profile");
     DownloadUtil.isProfileLocked = jest.fn().mockReturnValue(false);
     DownloadUtil.checkForInvalidCredProfile = jest.fn().mockReturnValue(false);
-    DownloadUtil.areCopybookDownloadConfigurationsPresent = jest
-      .fn()
-      .mockReturnValue(true);
+    jest
+      .spyOn(DownloadUtil, "areCopybookDownloadConfigurationsPresent")
+      .mockReturnValue({ dsn: "DATASET.WITH.COPYBOOK" });
     const downloadService = new CopybookDownloadService(
       "storage-path",
       {} as unknown as IApiRegisterClient,
@@ -372,15 +418,16 @@ describe("Tests copybook download service", () => {
           downloader["dsnDownloader"]!.downloadCopybook,
         ).toHaveBeenCalledWith(
           { name: "copybook", dialect: "COBOL" },
-          "document-uri",
           "dsn",
+          "profile",
         );
         expect(
           downloader["ussDownloader"]!.downloadCopybook,
         ).toHaveBeenCalledWith(
           { name: "copybook", dialect: "COBOL" },
-          "document-uri",
           "uss",
+          "profile",
+          [""],
         );
       });
     });
@@ -411,8 +458,8 @@ describe("Tests copybook download service", () => {
           downloader["dsnDownloader"]!.downloadCopybook,
         ).toHaveBeenCalledWith(
           { name: "copybook", dialect: "COBOL" },
-          "document-uri",
           "dsn",
+          "profile",
         );
         expect(
           downloader["ussDownloader"]!.downloadCopybook,
@@ -491,15 +538,15 @@ describe("Tests copybook download service", () => {
         downloader["dsnDownloader"]!.downloadCopybook,
       ).toHaveBeenCalledWith(
         { name: "copybook", dialect: "COBOL" },
-        "document-uri",
         "dsn",
+        "profile",
       );
       expect(
         downloader["dsnDownloader"]!.downloadCopybook,
       ).toHaveBeenCalledWith(
         { name: "copybook", dialect: "COBOL" },
-        "document-uri",
         "dsn-2",
+        "profile",
       );
     });
   });
@@ -657,7 +704,6 @@ describe("Tests copybook download service", () => {
     });
 
     describe("Error handling ", () => {
-      let outputChannelMock: jest.SpyInstance;
       const errorMessage =
         "Rest API failure with HTTP(S) status 404 ISRZ002 Data set not cataloged - 'DATASET.WITH.COPYBOOK' was not found in catalog.";
 
@@ -670,15 +716,10 @@ describe("Tests copybook download service", () => {
         };
       });
 
-      beforeEach(() => {
-        outputChannelMock = jest.fn();
-        jest.spyOn(extension, "getChannel").mockReturnValue({
-          appendLine: outputChannelMock,
-        } as unknown as vscode.OutputChannel);
-      });
-
       describe("Error in listing one directory should not affect listing other directories", () => {
         test("return list of all members of the uss, and logs error listing of the dataset", async () => {
+          const outputChannelMock = { appendLine: jest.fn() };
+
           getAllMembersMock = jest
             .fn()
             .mockRejectedValue(new Error(errorMessage));
@@ -686,6 +727,8 @@ describe("Tests copybook download service", () => {
           const cds = new CopybookDownloadService(
             "/globalStorage",
             zoweExplorerApiMock,
+            undefined,
+            outputChannelMock as unknown as vscode.OutputChannel,
           );
 
           const results = await cds.listRemoteCopybooks(
@@ -698,7 +741,7 @@ describe("Tests copybook download service", () => {
             expect.arrayContaining(ussFiles.map((n) => n.name)),
           );
 
-          expect(outputChannelMock).toHaveBeenCalledWith(
+          expect(outputChannelMock.appendLine).toHaveBeenCalledWith(
             expect.stringContaining(errorMessage),
           );
         });
@@ -837,5 +880,303 @@ describe("Tests copybook download service", () => {
         );
       });
     });
+  });
+
+  it("checks dsn settings used when no settings provided in processor group definitions", async () => {
+    const spyConfig = jest.spyOn(
+      ProcessorGroups,
+      "loadProcessorGroupCopybookPathsConfig",
+    );
+    spyConfig.mockResolvedValue([]);
+    SettingsService.getDsnPath = jest.fn().mockReturnValue(["dsn"]);
+
+    const downloader = new CopybookDownloadService(
+      "storage-path",
+      zoweExplorerMock,
+      undefined,
+    );
+    downloader["dsnDownloader"]!.downloadCopybook = jest
+      .fn()
+      .mockReturnValue(true);
+    downloader["ussDownloader"]!.downloadCopybook = jest.fn();
+
+    await downloader.downloadCopybook(
+      { name: "copybook", dialect: "COBOL" },
+      "document-uri",
+    );
+    expect(downloader["dsnDownloader"]!.downloadCopybook).toHaveBeenCalledWith(
+      { name: "copybook", dialect: "COBOL" },
+      "dsn",
+      "profile",
+    );
+  });
+
+  it("checks settings in processor groups used first", async () => {
+    const settingsMockDsn = (SettingsService.getDsnPath = jest.fn());
+    const settingsMockUss = (SettingsService.getDsnPath = jest.fn());
+    const spyConfig = jest.spyOn(
+      ProcessorGroups,
+      "loadProcessorGroupCopybookPathsConfig",
+    );
+    spyConfig.mockResolvedValue([
+      "/libs",
+      { dataset: "procGroupDataset", profile: "procGroupProfile" },
+      { uss: "uss", profile: "profile" },
+    ]);
+
+    const downloader = new CopybookDownloadService(
+      "storage-path",
+      zoweExplorerMock,
+      undefined,
+    );
+    downloader["dsnDownloader"]!.downloadCopybook = jest
+      .fn()
+      .mockReturnValue(true);
+
+    await downloader.downloadCopybook(
+      { name: "copybook", dialect: "COBOL" },
+      "document-uri",
+    );
+    expect(downloader["dsnDownloader"]!.downloadCopybook).toHaveBeenCalledWith(
+      { name: "copybook", dialect: "COBOL" },
+      "procGroupDataset",
+      "procGroupProfile",
+    );
+    expect(settingsMockDsn).toHaveBeenCalledTimes(0);
+    expect(settingsMockUss).toHaveBeenCalledTimes(0);
+  });
+
+  it("checks settings in processor group definitions used in order ", async () => {
+    const spyConfig = jest.spyOn(
+      ProcessorGroups,
+      "loadProcessorGroupCopybookPathsConfig",
+    );
+    spyConfig.mockResolvedValue([
+      { uss: "ussFile", profile: "profile" },
+      { dataset: "procGroupDataset", profile: "procGroupProfile" },
+      "/libs",
+    ]);
+
+    const downloader = new CopybookDownloadService(
+      "storage-path",
+      zoweExplorerMock,
+      undefined,
+    );
+    downloader["dsnDownloader"]!.downloadCopybook = jest
+      .fn()
+      .mockReturnValue(true);
+    downloader["ussDownloader"]!.downloadCopybook = jest
+      .fn()
+      .mockReturnValue(true);
+
+    await downloader.downloadCopybook(
+      { name: "copybook", dialect: "COBOL" },
+      "document-uri",
+    );
+    expect(downloader["ussDownloader"]!.downloadCopybook).toHaveBeenCalledWith(
+      { name: "copybook", dialect: "COBOL" },
+      "ussFile",
+      "profile",
+      [".CPY", ".cpy", ""],
+    );
+  });
+
+  it("checks download does not perform when endevor location settings in processor group has invalid profile", async () => {
+    const spyConfig = jest.spyOn(
+      ProcessorGroups,
+      "loadProcessorGroupCopybookPathsConfig",
+    );
+    spyConfig.mockResolvedValue([
+      {
+        environment: "environment",
+        system: "system",
+        subsystem: "subsystem",
+        stage: "stage",
+        type: "type",
+        profile: "invalid@invalid",
+      },
+    ]);
+
+    const downloader = new CopybookDownloadService(
+      "storage-path",
+      undefined,
+      e4eMockInvalidProfile,
+    );
+
+    const spyDownloadElement = (downloader[
+      "e4eDownloader"
+    ]!.downloadElementE4E = jest.fn().mockResolvedValue(false));
+
+    await downloader.downloadCopybook(
+      { name: "copybook", dialect: "COBOL" },
+      "document-uri",
+    );
+    expect(spyDownloadElement).toHaveBeenCalledTimes(0);
+  });
+  it("checks endevor locations in proccesor groups definitions resolves prerequiste", async () => {
+    SettingsService.getDsnPath = jest.fn().mockReturnValue([]);
+    SettingsService.getUssPath = jest.fn().mockReturnValue([]);
+    const service = new CopybookDownloadService(
+      "storage-path",
+      zoweExplorerMock,
+      e4eMock,
+    );
+    const spyConfig = jest.spyOn(
+      ProcessorGroups,
+      "loadProcessorGroupCopybookPathsConfig",
+    );
+    spyConfig.mockResolvedValue([
+      {
+        environment: "environment",
+        stage: "1",
+        system: "system",
+        subsystem: "subsystem",
+        type: "type",
+      },
+    ]);
+    const downloadSpy = jest.spyOn(
+      service["e4eDownloader"]!,
+      "downloadElementE4E",
+    );
+    await service.downloadCopybooks("document-uri", [
+      { name: "copybook", dialect: DEFAULT_DIALECT },
+    ]);
+    expect(downloadSpy).toHaveBeenCalledWith(
+      { instance: "instance", profile: "profile" },
+      {
+        element: "COPYBOOK",
+        environment: "environment",
+        fingerprint: "",
+        stage: "1",
+        subsystem: "subsystem",
+        system: "system",
+        type: "type",
+        use_map: true,
+      },
+    );
+  });
+  it("checks missing e4e api produces diagnostics when processor groups have endevor config", async () => {
+    const diagnosticsService = new DownloadDiagnosticsService();
+    const service = new CopybookDownloadService(
+      "storage-path",
+      zoweExplorerMock,
+      undefined,
+      undefined,
+      diagnosticsService,
+    );
+    const diagnosticsSpy = jest
+      .spyOn(diagnosticsService, "showDiagnostics")
+      .mockImplementation();
+
+    const spyConfig = jest.spyOn(
+      ProcessorGroups,
+      "loadProcessorGroupCopybookPathsConfig",
+    );
+    spyConfig.mockResolvedValue([
+      {
+        environment: "environment",
+        stage: "1",
+        system: "system",
+        subsystem: "subsystem",
+        type: "type",
+      },
+    ]);
+    await service.downloadCopybooks("document-uri", [
+      { name: "copybook", dialect: DEFAULT_DIALECT },
+    ]);
+    expect(diagnosticsSpy).toHaveBeenCalledWith({ path: "document-uri" }, [
+      {
+        message: "Explorer for Endevor is not installed",
+        range: {
+          end: { character: 0, line: 1 },
+          start: { character: 0, line: 0 },
+        },
+        severity: 1,
+      },
+    ]);
+  });
+  it("checks missing explorer api produces diagnostics when processor groups have dsn or uss config", async () => {
+    const diagnosticsService = new DownloadDiagnosticsService();
+    const service = new CopybookDownloadService(
+      "storage-path",
+      undefined,
+      e4eMock,
+      undefined,
+      diagnosticsService,
+    );
+    const diagnosticsSpy = jest
+      .spyOn(diagnosticsService, "showDiagnostics")
+      .mockImplementation();
+
+    const spyConfig = jest.spyOn(
+      ProcessorGroups,
+      "loadProcessorGroupCopybookPathsConfig",
+    );
+    spyConfig.mockResolvedValue([
+      {
+        dataset: "dataset",
+        uss: "uss",
+      },
+    ]);
+    await service.downloadCopybooks("document-uri", [
+      { name: "copybook", dialect: DEFAULT_DIALECT },
+    ]);
+    expect(diagnosticsSpy).toHaveBeenCalledWith({ path: "document-uri" }, [
+      {
+        message: "Zowe Explorer is not installed",
+        range: {
+          end: { character: 0, line: 1 },
+          start: { character: 0, line: 0 },
+        },
+        severity: 1,
+      },
+    ]);
+  });
+  it("checks installing e4e or zowe api removes download diagnostics", async () => {
+    const diagnosticsService = new DownloadDiagnosticsService();
+    const service = new CopybookDownloadService(
+      "storage-path",
+      undefined,
+      undefined,
+      undefined,
+      diagnosticsService,
+    );
+    const showDiagnosticsSpy = jest
+      .spyOn(diagnosticsService, "showDiagnostics")
+      .mockImplementation();
+
+    const clearDiagnosticsSpy = jest
+      .spyOn(diagnosticsService, "clearDiagnostics")
+      .mockImplementation();
+
+    const spyConfig = jest.spyOn(
+      ProcessorGroups,
+      "loadProcessorGroupCopybookPathsConfig",
+    );
+    spyConfig.mockResolvedValue([
+      {
+        dataset: "dataset",
+        uss: "uss",
+      },
+    ]);
+    await service.downloadCopybooks("document-uri", [
+      { name: "copybook", dialect: DEFAULT_DIALECT },
+    ]);
+
+    service.explorerAppeared(zoweExplorerMock);
+    service.e4eAppeared(e4eMock);
+
+    expect(showDiagnosticsSpy).toHaveBeenCalledWith({ path: "document-uri" }, [
+      {
+        message: "Zowe Explorer is not installed",
+        range: {
+          end: { character: 0, line: 1 },
+          start: { character: 0, line: 0 },
+        },
+        severity: 1,
+      },
+    ]);
+
+    expect(clearDiagnosticsSpy).toHaveBeenCalledTimes(2);
   });
 });

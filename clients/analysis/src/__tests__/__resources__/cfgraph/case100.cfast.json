@@ -1,0 +1,294 @@
+[
+  {
+    "name": "PROG",
+    "type": "program",
+    "location": {
+      "uri": "/case100.cbl",
+      "start": {
+        "line": 10,
+        "character": 8
+      },
+      "end": {
+        "line": 30,
+        "character": 55
+      }
+    },
+    "children": [
+      {
+        "snippet": "          MAINLINE.\r\n             DISPLAY \u0027XML-DOCUMENT\u003d\u0027 XML-STRING(EZ-PTR)\r\n             XML PARSE XML-STRING(EZ-PTR) RETURNING NATIONAL\r\n                                PROCESSING PROCEDURE XML-HANDLER\r\n               ON EXCEPTION\r\n                 GO TO ABEND\r\n               NOT ON EXCEPTION\r\n                 PERFORM OK\r\n              END-XML.\r\n              STOP RUN.",
+        "name": "MAINLINE",
+        "type": "paragraph",
+        "location": {
+          "uri": "/case100.cbl",
+          "start": {
+            "line": 11,
+            "character": 11
+          },
+          "end": {
+            "line": 20,
+            "character": 24
+          }
+        },
+        "children": [
+          {
+            "type": "statement",
+            "location": {
+              "uri": "/case100.cbl",
+              "start": {
+                "line": 12,
+                "character": 14
+              },
+              "end": {
+                "line": 12,
+                "character": 56
+              }
+            }
+          },
+          {
+            "target": {
+              "name": "XML-HANDLER"
+            },
+            "type": "xmlparse",
+            "location": {
+              "uri": "/case100.cbl",
+              "start": {
+                "line": 13,
+                "character": 14
+              },
+              "end": {
+                "line": 19,
+                "character": 22
+              }
+            }
+          },
+          {
+            "type": "onexception",
+            "location": {
+              "uri": "/case100.cbl",
+              "start": {
+                "line": 15,
+                "character": 16
+              },
+              "end": {
+                "line": 16,
+                "character": 29
+              }
+            }
+          },
+          {
+            "targetName": [
+              "ABEND"
+            ],
+            "type": "goto",
+            "location": {
+              "uri": "/case100.cbl",
+              "start": {
+                "line": 16,
+                "character": 18
+              },
+              "end": {
+                "line": 16,
+                "character": 29
+              }
+            }
+          },
+          {
+            "type": "endon",
+            "location": {
+              "uri": "/case100.cbl",
+              "start": {
+                "line": 15,
+                "character": 16
+              },
+              "end": {
+                "line": 16,
+                "character": 29
+              }
+            }
+          },
+          {
+            "type": "onnotexception",
+            "location": {
+              "uri": "/case100.cbl",
+              "start": {
+                "line": 17,
+                "character": 16
+              },
+              "end": {
+                "line": 18,
+                "character": 28
+              }
+            }
+          },
+          {
+            "targetName": "OK",
+            "type": "perform",
+            "location": {
+              "uri": "/case100.cbl",
+              "start": {
+                "line": 18,
+                "character": 18
+              },
+              "end": {
+                "line": 18,
+                "character": 28
+              }
+            }
+          },
+          {
+            "type": "endon",
+            "location": {
+              "uri": "/case100.cbl",
+              "start": {
+                "line": 17,
+                "character": 16
+              },
+              "end": {
+                "line": 18,
+                "character": 28
+              }
+            }
+          },
+          {
+            "type": "endxml",
+            "location": {
+              "uri": "/case100.cbl",
+              "start": {
+                "line": 13,
+                "character": 14
+              },
+              "end": {
+                "line": 19,
+                "character": 22
+              }
+            }
+          },
+          {
+            "type": "stop",
+            "location": {
+              "uri": "/case100.cbl",
+              "start": {
+                "line": 20,
+                "character": 15
+              },
+              "end": {
+                "line": 20,
+                "character": 23
+              }
+            }
+          }
+        ]
+      },
+      {
+        "snippet": "       XML-HANDLER.\r\n           DISPLAY \u0027XML-EVENT\u003d\u0027 XML-EVENT.",
+        "name": "XML-HANDLER",
+        "type": "paragraph",
+        "location": {
+          "uri": "/case100.cbl",
+          "start": {
+            "line": 22,
+            "character": 8
+          },
+          "end": {
+            "line": 23,
+            "character": 43
+          }
+        },
+        "children": [
+          {
+            "type": "statement",
+            "location": {
+              "uri": "/case100.cbl",
+              "start": {
+                "line": 23,
+                "character": 12
+              },
+              "end": {
+                "line": 23,
+                "character": 42
+              }
+            }
+          }
+        ]
+      },
+      {
+        "snippet": "       ABEND.\r\n           DISPLAY \u0027ABEND\u0027.\r\n           STOP RUN.",
+        "name": "ABEND",
+        "type": "paragraph",
+        "location": {
+          "uri": "/case100.cbl",
+          "start": {
+            "line": 25,
+            "character": 8
+          },
+          "end": {
+            "line": 27,
+            "character": 21
+          }
+        },
+        "children": [
+          {
+            "type": "statement",
+            "location": {
+              "uri": "/case100.cbl",
+              "start": {
+                "line": 26,
+                "character": 12
+              },
+              "end": {
+                "line": 26,
+                "character": 27
+              }
+            }
+          },
+          {
+            "type": "stop",
+            "location": {
+              "uri": "/case100.cbl",
+              "start": {
+                "line": 27,
+                "character": 12
+              },
+              "end": {
+                "line": 27,
+                "character": 20
+              }
+            }
+          }
+        ]
+      },
+      {
+        "snippet": "       OK.\r\n           DISPLAY \u0027XML DOCUMENT SUCCESSFULLY PARSED\u0027.",
+        "name": "OK",
+        "type": "paragraph",
+        "location": {
+          "uri": "/case100.cbl",
+          "start": {
+            "line": 29,
+            "character": 8
+          },
+          "end": {
+            "line": 30,
+            "character": 55
+          }
+        },
+        "children": [
+          {
+            "type": "statement",
+            "location": {
+              "uri": "/case100.cbl",
+              "start": {
+                "line": 30,
+                "character": 12
+              },
+              "end": {
+                "line": 30,
+                "character": 54
+              }
+            }
+          }
+        ]
+      }
+    ]
+  }
+]

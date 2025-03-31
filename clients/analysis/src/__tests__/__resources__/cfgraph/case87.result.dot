@@ -1,0 +1,5 @@
+digraph A {
+rankdir=LR;
+<PROG>-><PAR3>;
+<PAR3>-><ALTER_PAR3>;
+}

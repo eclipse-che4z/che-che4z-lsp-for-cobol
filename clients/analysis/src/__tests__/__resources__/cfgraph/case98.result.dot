@@ -1,0 +1,4 @@
+digraph A {
+rankdir=LR;
+<MRG>-><OUTPUT-PROCEDURE>;
+}

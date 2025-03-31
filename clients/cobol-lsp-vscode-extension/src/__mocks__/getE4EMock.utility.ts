@@ -104,3 +104,14 @@ export const e4eResponseDatasetFirst: e4eResponse = {
     },
   } as { [key: string]: EndevorElement | EndevorMember },
 };
+
+export const e4eMockInvalidProfile: E4E = {
+  getConfiguration: jest.fn(),
+  getProfileInfo: jest.fn().mockReturnValue(undefined),
+  isEndevorElement: jest.fn().mockReturnValue(false),
+  listElements: jest.fn(),
+  listMembers: jest.fn(),
+  onDidChangeElement: jest.fn(),
+  getElement: jest.fn(),
+  getMember: jest.fn(),
+};

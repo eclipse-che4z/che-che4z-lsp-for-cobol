@@ -11,7 +11,6 @@
  * Contributors:
  *   Broadcom, Inc. - initial API and implementation
  */
-import { ProfileUtils } from "../../util/ProfileUtils";
 import { CopybookName } from "../CopybookDownloadService";
 import { DownloadUtil } from "./DownloadUtil";
 import { ZoweExplorerDownloader } from "./ZoweExplorerDownloader";
@@ -24,56 +23,30 @@ export class CopybookDownloaderForDsn extends ZoweExplorerDownloader {
     super(storagePath, explorerAPI);
   }
   /**
-   * Checks if the file could be downloaded using the Zowe explorer from MVS
-   * @param copybookName Copybook to be downloaded.
-   * @param documentUri cobol programs which needs copybook
-   * @param dsnPath dsnpath in mainframe.
-   */
-  isEligibleForDownload(
-    _copybookName: CopybookName,
-    documentUri: string,
-    dsnPath: string | undefined,
-  ): boolean {
-    const providedProfile = ProfileUtils.getProfileNameForCopybook(
-      documentUri,
-      this.explorerAPI,
-    );
-    return !!(dsnPath && providedProfile);
-  }
-
-  /**
    * Downloads a file from the passed dns based on Zowe explorer
    *
    * @param copybookName Copybook to be downloaded.
-   * @param documentUri cobol programs which needs copybook
    * @param dsnPath dsnpath in mainframe.
+   * @param profile zowe profile name
    */
   async downloadCopybook(
     copybookName: CopybookName,
-    documentUri: string,
     dsnPath: string,
+    profile: string,
   ): Promise<boolean> {
-    const providedProfile = ProfileUtils.getProfileNameForCopybook(
-      documentUri,
-      this.explorerAPI,
+    const memberList = await this.getAllMembers(profile, dsnPath);
+    const remoteCopybook = DownloadUtil.getRemoteCopybookName(
+      memberList,
+      copybookName.name,
     );
-
-    if (this.isEligibleForDownload(copybookName, documentUri, dsnPath)) {
-      const memberList = await this.getAllMembers(providedProfile!, dsnPath);
-      const remoteCopybook = DownloadUtil.getRemoteCopybookName(
-        memberList,
-        copybookName.name,
-      );
-      return !!(
-        remoteCopybook &&
-        (await this.downloadCopybookFromMFUsingZowe(
-          dsnPath,
-          remoteCopybook,
-          providedProfile!,
-        ))
-      );
-    }
-    return false;
+    return !!(
+      remoteCopybook &&
+      (await this.downloadCopybookFromMFUsingZowe(
+        dsnPath,
+        remoteCopybook,
+        profile,
+      ))
+    );
   }
 
   public async getAllMembers(profileName: string, dataset: string) {
@@ -139,5 +112,41 @@ export class CopybookDownloaderForDsn extends ZoweExplorerDownloader {
     }
 
     return true;
+  }
+
+  public async hasMember(
+    profileName: string,
+    dataset: string,
+    copybookName: string,
+  ): Promise<boolean> {
+    const id = this.createId(profileName, dataset);
+
+    if (this.memberListCache.has(id)) {
+      return this.memberListCache
+        .get(id)
+        ?.find((member) => member.toUpperCase() === copybookName.toUpperCase())
+        ? true
+        : false;
+    }
+    const profile = DownloadUtil.loadProfile(profileName, this.explorerAPI);
+    await this.limitFailedRequests(
+      `list dataset members ${profileName}/${dataset}`,
+      async () => {
+        const response = await this.explorerAPI
+          .getMvsApi(profile)
+          .allMembers(dataset);
+        const members = response.apiResponse.items.map((item) => item.member);
+
+        this.memberListCache.set(id, members);
+      },
+    );
+
+    if (
+      this.memberListCache
+        .get(id)
+        ?.find((member) => member.toUpperCase() === copybookName.toUpperCase())
+    )
+      return true;
+    return false;
   }
 }

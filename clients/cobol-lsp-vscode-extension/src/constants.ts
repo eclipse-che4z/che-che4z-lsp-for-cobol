@@ -25,6 +25,9 @@ export const SETTINGS_SUBROUTINE_LOCAL_KEY =
   "cobol-lsp.subroutine-manager.paths-local";
 export const SETTINGS_TAB_CONFIG: string = "cobol-lsp.smart-tab";
 export const SETTINGS_LSPCONFIG_SECTION: string = "cobol-lsp.lspconfig";
+export const SETTINGS_UNREACHABLE_CODE_SEVERITY: string =
+  "cobol-lsp.unreachable-code-severity";
+export const SETTINGS_MAXIMUM_VM_COUNT: string = "cobol-lsp.maxVmCount";
 
 export const SERVER_PORT = "cobol-lsp.server.port";
 export const SERVER_RUNTIME = "cobol-lsp.serverRuntime";
@@ -86,6 +89,9 @@ export const USE_MAP = "MAP";
 export const SETTINGS_CPY_NDVR_DEPENDENCIES = "endevor-dependencies";
 export const ENDEVOR_PROCESSOR = "ENDEVOR_PROCESSOR";
 export const E4E_INCOMPATIBLE = "E4E interface is not compatible";
+export const USS = "uss";
+export const PROVIDE_PROFILE_MSG_PROC_GRUOPS =
+  "Please specify a valid Zowe Explorer profile in proc_grps.json to download copybooks from the mainframe.";
 export const FAILED_REQUESTS_LIMIT = 3;
 
 export enum PUNCH_CARD {

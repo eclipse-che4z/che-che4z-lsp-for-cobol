@@ -18,6 +18,7 @@ import {
   CompletionItem,
   CompletionItemKind,
   CompletionItemProvider,
+  OutputChannel,
   Position,
   Progress,
   ProgressLocation,
@@ -51,7 +52,10 @@ const isSQLCopyStatement: CopyStatementParser = (statement: string) => {
 };
 
 export class CopybooksCompletionProvider implements CompletionItemProvider {
-  constructor(private cds?: CopybookDownloadService) {}
+  constructor(
+    private cds?: CopybookDownloadService,
+    private outputChannel?: OutputChannel,
+  ) {}
 
   async provideCompletionItems(
     document: TextDocument,
@@ -72,7 +76,14 @@ export class CopybooksCompletionProvider implements CompletionItemProvider {
         isCopyStatement: isDefaultCopyStatement,
       },
       {
-        name: "SQL",
+        /**
+         * SQL preprocessor is supposed to use `SQL` as a name, but because
+         * the server is sending `COBOL` as a dialect name in the
+         * `copybook/resolve` requests for `EXEC SQL INCLUDE` statements,
+         * we need to use it for auto-completions as well, so copybook
+         * downloading works correctly.
+         */
+        name: DEFAULT_DIALECT,
         isCopyStatement: isSQLCopyStatement,
       },
       ...DialectRegistry.getActiveDialects().map((di) => ({
@@ -108,6 +119,7 @@ export class CopybooksCompletionProvider implements CompletionItemProvider {
               const list = await listLocalCopybooks(
                 document.uri.toString(),
                 dialect.name,
+                this.outputChannel,
               );
               list?.forEach((copybook) => {
                 if (!prefix || copybook.startsWith(prefix)) {

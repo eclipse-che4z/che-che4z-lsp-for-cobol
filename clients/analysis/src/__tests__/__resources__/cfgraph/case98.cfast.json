@@ -1,0 +1,129 @@
+[
+  {
+    "name": "MRG",
+    "type": "program",
+    "location": {
+      "uri": "/case98.cbl",
+      "start": {
+        "line": 27,
+        "character": 8
+      },
+      "end": {
+        "line": 36,
+        "character": 39
+      }
+    },
+    "children": [
+      {
+        "type": "merge",
+        "location": {
+          "uri": "/case98.cbl",
+          "start": {
+            "line": 28,
+            "character": 12
+          },
+          "end": {
+            "line": 31,
+            "character": 62
+          }
+        }
+      },
+      {
+        "target": {
+          "name": "OUTPUT-PROCEDURE",
+          "inSection": "SECT1"
+        },
+        "type": "output",
+        "location": {
+          "uri": "/case98.cbl",
+          "start": {
+            "line": 31,
+            "character": 20
+          },
+          "end": {
+            "line": 31,
+            "character": 62
+          }
+        }
+      },
+      {
+        "type": "endmerge",
+        "location": {
+          "uri": "/case98.cbl",
+          "start": {
+            "line": 28,
+            "character": 12
+          },
+          "end": {
+            "line": 31,
+            "character": 62
+          }
+        }
+      },
+      {
+        "type": "stop",
+        "location": {
+          "uri": "/case98.cbl",
+          "start": {
+            "line": 32,
+            "character": 12
+          },
+          "end": {
+            "line": 32,
+            "character": 20
+          }
+        }
+      },
+      {
+        "name": "SECT1",
+        "snippet": "       SECT1 SECTION.\r\n       OUTPUT-PROCEDURE.\r\n           DISPLAY \"OUTPUT-PROCEDURE\".",
+        "type": "section",
+        "location": {
+          "uri": "/case98.cbl",
+          "start": {
+            "line": 34,
+            "character": 8
+          },
+          "end": {
+            "line": 36,
+            "character": 39
+          }
+        },
+        "children": [
+          {
+            "snippet": "       OUTPUT-PROCEDURE.\r\n           DISPLAY \"OUTPUT-PROCEDURE\".",
+            "name": "OUTPUT-PROCEDURE",
+            "type": "paragraph",
+            "location": {
+              "uri": "/case98.cbl",
+              "start": {
+                "line": 35,
+                "character": 8
+              },
+              "end": {
+                "line": 36,
+                "character": 39
+              }
+            },
+            "children": [
+              {
+                "type": "statement",
+                "location": {
+                  "uri": "/case98.cbl",
+                  "start": {
+                    "line": 36,
+                    "character": 12
+                  },
+                  "end": {
+                    "line": 36,
+                    "character": 38
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]

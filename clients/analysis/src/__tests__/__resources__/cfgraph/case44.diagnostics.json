@@ -1,0 +1,85 @@
+[
+  {
+    "range": {
+      "start": {
+        "line": 12,
+        "character": 0
+      },
+      "end": {
+        "line": 12,
+        "character": 26
+      }
+    },
+    "message": "Implicit EXIT PROGRAM statement executed",
+    "severity": 1,
+    "source": "COBOL Control Flow",
+    "relatedInformation": [
+      {
+        "location": {
+          "uri": "/case44.cbl",
+          "range": {
+            "start": {
+              "line": 11,
+              "character": 7
+            },
+            "end": {
+              "line": 12,
+              "character": 26
+            }
+          }
+        },
+        "message": "PARAGRAPH PAR2"
+      },
+      {
+        "location": {
+          "uri": "/case44.cbl",
+          "range": {
+            "start": {
+              "line": 6,
+              "character": 7
+            },
+            "end": {
+              "line": 10,
+              "character": 18
+            }
+          }
+        },
+        "message": "PARAGRAPH PAR1"
+      },
+      {
+        "location": {
+          "uri": "/case44.cbl",
+          "range": {
+            "start": {
+              "line": 3,
+              "character": 11
+            },
+            "end": {
+              "line": 3,
+              "character": 21
+            }
+          }
+        },
+        "message": "GO TO PAR1"
+      }
+    ]
+  },
+  {
+    "range": {
+      "start": {
+        "line": 4,
+        "character": 7
+      },
+      "end": {
+        "line": 5,
+        "character": 25
+      }
+    },
+    "message": "Unreachable code detected",
+    "severity": 1,
+    "tags": [
+      1
+    ],
+    "source": "COBOL Control Flow"
+  }
+]

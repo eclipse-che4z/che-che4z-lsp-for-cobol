@@ -20,6 +20,8 @@ import static org.mockito.Mockito.*;
 import com.google.common.collect.ImmutableList;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+
+import org.eclipse.lsp.cobol.cfg.CFASTBuilder;
 import org.eclipse.lsp.cobol.common.AnalysisResult;
 import org.eclipse.lsp.cobol.common.LanguageEngineFacade;
 import org.eclipse.lsp.cobol.common.copybook.CopybookService;
@@ -27,6 +29,7 @@ import org.eclipse.lsp.cobol.common.model.tree.RootNode;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookIdentificationService;
 import org.eclipse.lsp.cobol.service.delegates.communications.Communications;
 import org.eclipse.lsp.cobol.service.settings.ConfigurationService;
+import org.eclipse.lsp.cobol.utils.MockCobolClientProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -51,6 +54,8 @@ class AnalysisServiceTest {
   private DocumentModelService documentService;
   @Mock
   private CopybookService copybookService;
+  @Mock
+  private CFASTBuilder cfastBuilder;
 
   @BeforeEach
   void init() {
@@ -58,7 +63,7 @@ class AnalysisServiceTest {
             new AnalysisService(engine,
                     configurationService,
                     copybookIdentificationService,
-                    copybookService, documentService
+                    copybookService, documentService, cfastBuilder, new MockCobolClientProvider()
             );
     service.setExtensionConfig(ImmutableList.of());
   }
@@ -69,7 +74,7 @@ class AnalysisServiceTest {
             new AnalysisService(engine,
                     configurationService,
                     copybookIdentificationService,
-                    copybookService, documentService
+                    copybookService, documentService, cfastBuilder, new MockCobolClientProvider()
             );
 
     CompletableFuture<Boolean> booleanCompletableFuture = CompletableFuture.supplyAsync(() -> service.isCopybook("", ""));
