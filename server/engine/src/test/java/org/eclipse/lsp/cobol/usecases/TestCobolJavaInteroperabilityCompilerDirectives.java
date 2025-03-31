@@ -141,7 +141,7 @@ class TestCobolJavaInteroperabilityCompilerDirectives {
                   + "           GOBACK.\n";
 
   private static final String TEXT_SETTING_JVMI =
-          "       CBL JAVAIOP(JVMI('/a/folder/compdir'))\n"
+          "       CBL JAVAIOP(JVMI('-Djava.library.path=.'))\n"
                   + "       IDENTIFICATION DIVISION.\n"
                   + "       PROGRAM-ID. TEST1.\n"
                   + "       DATA DIVISION.\n"
@@ -185,7 +185,7 @@ class TestCobolJavaInteroperabilityCompilerDirectives {
                   + "           GOBACK.\n";
 
   private static final String TEXT_SETTING_JVMI_INVALID =
-          "       CBL JAVAIOP(JVMI('/a/folder/compdir') {NOJVMI|error1})\n"
+          "       CBL JAVAIOP(JVMI('-Djava.library.path=.') {NOJVMI|error1})\n"
                   + "       IDENTIFICATION DIVISION.\n"
                   + "       PROGRAM-ID. TEST1.\n"
                   + "       DATA DIVISION.\n"
@@ -196,7 +196,7 @@ class TestCobolJavaInteroperabilityCompilerDirectives {
                   + "           GOBACK.\n";
 
   private static final String TEXT_SETTING_OUTPATH_JVMI_INVALID =
-          "       CBL JAVAIOP(OUTPATH('/a/folder/compdir') {JVMI|error1}('/a/folder/compdir'))\n"
+          "       CBL JAVAIOP(OUTPATH('/a/folder/compdir') {JVMI|error1}('-Djava.library.path=.'))\n"
                   + "       IDENTIFICATION DIVISION.\n"
                   + "       PROGRAM-ID. TEST1.\n"
                   + "       DATA DIVISION.\n"
@@ -400,7 +400,7 @@ class TestCobolJavaInteroperabilityCompilerDirectives {
                     "error1",
                     new Diagnostic(
                             new Range(),
-                            "No viable alternative at input JAVAIOP(JVMI('/a/folder/compdir') NOJVMI",
+                            "No viable alternative at input JAVAIOP(JVMI('-Djava.library.path=.') NOJVMI",
                             DiagnosticSeverity.Error,
                             ErrorSource.PARSING.getText())),
             ImmutableList.of());
