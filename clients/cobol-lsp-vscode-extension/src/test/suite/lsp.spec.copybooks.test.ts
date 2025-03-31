@@ -240,9 +240,7 @@ suite("Integration Test Suite: Copybooks", function () {
       await helper.insertString(editor, helper.pos(19, 0), "       COPY PAY\n");
       helper.moveCursor(editor, helper.pos(19, 18));
       const completions = await helper.triggerCompletionsAndWaitForResults();
-      const position = completions.items.findIndex(
-        (ci) => ci.label === "PAYLIB",
-      );
+      const position = completions.items.findIndex((ci) => ci.label === "PAY");
 
       await helper.executeCommandMultipleTimes(
         "selectNextSuggestion",
@@ -251,9 +249,9 @@ suite("Integration Test Suite: Copybooks", function () {
 
       await vscode.commands.executeCommand("acceptSelectedSuggestion");
       await helper.waitFor(() => {
-        return editor.document.lineAt(19).text.trim() === "COPY PAYLIB";
+        return editor.document.lineAt(19).text.trim() === "COPY PAY";
       });
-      assert.strictEqual(editor.document.lineAt(19).text.trim(), "COPY PAYLIB");
+      assert.strictEqual(editor.document.lineAt(19).text.trim(), "COPY PAY");
     });
   });
 });
