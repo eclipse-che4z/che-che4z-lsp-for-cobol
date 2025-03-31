@@ -1,0 +1,8 @@
+digraph A {
+rankdir=LR;
+<HELLO>-><A-PARA>;
+<A-PARA>-><C-PARA>;
+<C-PARA>-><MY1>;
+<MY1>-><D-PARA>;
+<D-PARA>-><A-PARA>;
+}

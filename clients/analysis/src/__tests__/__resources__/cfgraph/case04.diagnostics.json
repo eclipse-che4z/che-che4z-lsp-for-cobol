@@ -1,0 +1,67 @@
+[
+  {
+    "range": {
+      "start": {
+        "line": 8,
+        "character": 0
+      },
+      "end": {
+        "line": 8,
+        "character": 28
+      }
+    },
+    "message": "Implicit EXIT PROGRAM statement executed",
+    "severity": 1,
+    "source": "COBOL Control Flow",
+    "relatedInformation": [
+      {
+        "location": {
+          "uri": "/case04.cbl",
+          "range": {
+            "start": {
+              "line": 7,
+              "character": 7
+            },
+            "end": {
+              "line": 8,
+              "character": 28
+            }
+          }
+        },
+        "message": "PARAGRAPH PARAG2"
+      },
+      {
+        "location": {
+          "uri": "/case04.cbl",
+          "range": {
+            "start": {
+              "line": 5,
+              "character": 7
+            },
+            "end": {
+              "line": 6,
+              "character": 28
+            }
+          }
+        },
+        "message": "PARAGRAPH PARAG1"
+      },
+      {
+        "location": {
+          "uri": "/case04.cbl",
+          "range": {
+            "start": {
+              "line": 4,
+              "character": 11
+            },
+            "end": {
+              "line": 4,
+              "character": 23
+            }
+          }
+        },
+        "message": "GO TO PARAG1"
+      }
+    ]
+  }
+]

@@ -1,0 +1,12 @@
+digraph A {
+rankdir=LR;
+<PROG>-><PAR1>;
+<PAR1>-><PAR2>;
+<PAR1>-><PAR-ERROR1>;
+<PAR1>-><PAR-ERROR2>;
+<PAR2>-><PAR3>;
+<PAR3>-><PAR4>;
+<PAR4>-><PAR4>;
+<PAR-ERROR1>-><PAR-END>;
+<PAR-ERROR2>-><PAR-END>;
+}

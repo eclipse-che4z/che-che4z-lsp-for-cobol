@@ -16,7 +16,7 @@ import * as fs from "fs";
 import * as os from "os";
 import { join } from "path";
 import * as vscode from "vscode";
-import { LanguageClient } from "vscode-languageclient/node";
+import { Middleware, LanguageClient } from "vscode-languageclient/node";
 import { JavaCheck } from "../../services/JavaCheck";
 import { LanguageClientService } from "../../services/LanguageClientService";
 import { NativeExecutableService } from "../../services/nativeLanguageClient/nativeExecutableService";
@@ -28,38 +28,26 @@ import { registerEvent } from "../../services/reporter";
 
 jest.mock("../../services/reporter");
 jest.mock("../../services/copybook/CopybookURI");
+jest.mock("../../services/BridgeForGitLoader");
+jest.mock("../../services/ProcessorGroups");
 
-jest.mock("vscode", () => ({
-  extensions: {
-    getExtension: jest.fn().mockReturnValue({ extensionPath: "/test" }),
-  },
-  workspace: {
-    getConfiguration: jest.fn().mockReturnValue({
-      get: jest.fn().mockReturnValue(0),
-    }),
-  },
-  window: {
-    createOutputChannel: jest.fn(),
-  },
-  Uri: {
-    file: jest.fn().mockReturnValue({
-      fsPath: "/storagePath",
-    }),
-  },
-  Position: class {
-    constructor(
-      private line: number,
-      private character: number,
-    ) {}
-  },
-  RelativePattern: jest.fn().mockReturnValue(undefined),
-}));
+jest.mock("vscode", () => {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+  return {
+    ...jest.requireActual("../../__mocks__/vscode"),
+    extensions: {
+      getExtension: jest.fn().mockReturnValue({ extensionPath: "/test" }),
+    },
+  };
+});
+
 jest.mock("vscode-languageclient/node", () => ({
   LanguageClient: jest.fn(),
 }));
 
 Utils.getZoweExplorerAPI = jest.fn();
 let languageClientService: LanguageClientService;
+let middleware: Middleware;
 
 const SERVER_DESC = "LSP extension for COBOL language";
 const SERVER_ID = "cobol";
@@ -72,9 +60,11 @@ beforeEach(() => {
 const SERVER_STOPPED_MSG = "server stopped";
 describe("LanguageClientService positive scenario", () => {
   beforeEach(() => {
+    middleware = {};
     languageClientService = new LanguageClientService(
       vscode.window.createOutputChannel("test"),
       vscode.Uri.file("/storagePath"),
+      middleware,
     );
     new JavaCheck().isJavaInstalled = jest.fn().mockResolvedValue(true);
   });
@@ -197,9 +187,10 @@ describe("LanguageClientService positive scenario", () => {
       },
       {
         documentSelector: [SERVER_ID, EXP_LANGUAGE_ID, HP_LANGUAGE_ID],
-        outputChannel: vscode.window.createOutputChannel("test"),
+        middleware: {},
+        outputChannel: expect.objectContaining({ name: "test" }) as object,
         synchronize: {
-          fileEvents: [undefined, undefined],
+          fileEvents: [undefined, undefined, undefined, undefined],
         },
       },
     );
@@ -215,13 +206,13 @@ describe("LanguageClientService positive scenario", () => {
     expect(LanguageClient).toHaveBeenLastCalledWith(
       SERVER_ID,
       SERVER_DESC,
-      expect.any(Function),
+      expect.any(Object),
       {
         documentSelector: [SERVER_ID, EXP_LANGUAGE_ID, HP_LANGUAGE_ID],
-
-        outputChannel: vscode.window.createOutputChannel("test"),
+        middleware: {},
+        outputChannel: expect.objectContaining({ name: "test" }) as object,
         synchronize: {
-          fileEvents: [undefined, undefined, undefined],
+          fileEvents: [undefined, undefined, undefined, undefined],
         },
       },
     );
@@ -297,6 +288,7 @@ describe("LanguageClientService negative scenario.", () => {
       await new LanguageClientService(
         vscode.window.createOutputChannel("test"),
         vscode.Uri.file("/storagePath"),
+        middleware,
       ).checkPrerequisites();
     } catch (error) {
       expect(error).toStrictEqual(new Error("LSP server for cobol not found"));

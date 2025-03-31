@@ -1,0 +1,8 @@
+digraph A {
+rankdir=LR;
+<HLLOWRLD>-><0000-MAIN>;
+<0000-MAIN>-><1000-GET-NAME>;
+<0000-MAIN>-><2000-TEST>;
+<1000-GET-NAME>-><1000-EXIT>;
+<2000-TEST>-><2000-EXIT>;
+}

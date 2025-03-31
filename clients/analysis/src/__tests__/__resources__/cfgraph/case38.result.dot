@@ -1,0 +1,7 @@
+digraph A {
+rankdir=LR;
+<PROG>-><MAIN-PROCEDURE>;
+<MAIN-PROCEDURE>-><STOP-RUN>;
+<MAIN-PROCEDURE>-><NEXT-PROC>;
+<NEXT-PROC>-><STOP-RUN>;
+}

@@ -1,0 +1,194 @@
+[
+  {
+    "range": {
+      "start": {
+        "line": 379,
+        "character": 0
+      },
+      "end": {
+        "line": 379,
+        "character": 18
+      }
+    },
+    "message": "Implicit EXIT PROGRAM statement executed",
+    "severity": 1,
+    "source": "COBOL Control Flow",
+    "relatedInformation": [
+      {
+        "location": {
+          "uri": "/case118.cbl",
+          "range": {
+            "start": {
+              "line": 344,
+              "character": 7
+            },
+            "end": {
+              "line": 379,
+              "character": 18
+            }
+          }
+        },
+        "message": "PARAGRAPH PAR9"
+      },
+      {
+        "location": {
+          "uri": "/case118.cbl",
+          "range": {
+            "start": {
+              "line": 307,
+              "character": 7
+            },
+            "end": {
+              "line": 342,
+              "character": 18
+            }
+          }
+        },
+        "message": "PARAGRAPH PAR8"
+      },
+      {
+        "location": {
+          "uri": "/case118.cbl",
+          "range": {
+            "start": {
+              "line": 270,
+              "character": 7
+            },
+            "end": {
+              "line": 305,
+              "character": 18
+            }
+          }
+        },
+        "message": "PARAGRAPH PAR7"
+      },
+      {
+        "location": {
+          "uri": "/case118.cbl",
+          "range": {
+            "start": {
+              "line": 233,
+              "character": 7
+            },
+            "end": {
+              "line": 268,
+              "character": 18
+            }
+          }
+        },
+        "message": "PARAGRAPH PAR6"
+      },
+      {
+        "location": {
+          "uri": "/case118.cbl",
+          "range": {
+            "start": {
+              "line": 196,
+              "character": 7
+            },
+            "end": {
+              "line": 231,
+              "character": 18
+            }
+          }
+        },
+        "message": "PARAGRAPH PAR5"
+      },
+      {
+        "location": {
+          "uri": "/case118.cbl",
+          "range": {
+            "start": {
+              "line": 159,
+              "character": 7
+            },
+            "end": {
+              "line": 194,
+              "character": 18
+            }
+          }
+        },
+        "message": "PARAGRAPH PAR4"
+      },
+      {
+        "location": {
+          "uri": "/case118.cbl",
+          "range": {
+            "start": {
+              "line": 118,
+              "character": 7
+            },
+            "end": {
+              "line": 157,
+              "character": 18
+            }
+          }
+        },
+        "message": "PARAGRAPH PAR3"
+      },
+      {
+        "location": {
+          "uri": "/case118.cbl",
+          "range": {
+            "start": {
+              "line": 81,
+              "character": 7
+            },
+            "end": {
+              "line": 116,
+              "character": 18
+            }
+          }
+        },
+        "message": "PARAGRAPH PAR2"
+      },
+      {
+        "location": {
+          "uri": "/case118.cbl",
+          "range": {
+            "start": {
+              "line": 44,
+              "character": 7
+            },
+            "end": {
+              "line": 79,
+              "character": 18
+            }
+          }
+        },
+        "message": "PARAGRAPH PAR1"
+      },
+      {
+        "location": {
+          "uri": "/case118.cbl",
+          "range": {
+            "start": {
+              "line": 7,
+              "character": 7
+            },
+            "end": {
+              "line": 42,
+              "character": 18
+            }
+          }
+        },
+        "message": "PARAGRAPH PAR0"
+      }
+    ]
+  },
+  {
+    "range": {
+      "start": {
+        "line": 0,
+        "character": 0
+      },
+      "end": {
+        "line": 0,
+        "character": 1
+      }
+    },
+    "message": "Graph generation incomplete due to complexity of the program",
+    "severity": 1,
+    "source": "COBOL Control Flow"
+  }
+]

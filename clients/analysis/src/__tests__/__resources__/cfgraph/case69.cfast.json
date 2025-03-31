@@ -1,0 +1,140 @@
+[
+  {
+    "name": "PROG",
+    "type": "program",
+    "location": {
+      "uri": "/case69.cbl",
+      "start": {
+        "line": 4,
+        "character": 8
+      },
+      "end": {
+        "line": 13,
+        "character": 13
+      }
+    },
+    "children": [
+      {
+        "type": "if",
+        "location": {
+          "uri": "/case69.cbl",
+          "start": {
+            "line": 5,
+            "character": 12
+          },
+          "end": {
+            "line": 8,
+            "character": 26
+          }
+        }
+      },
+      {
+        "type": "statement",
+        "location": {
+          "uri": "/case69.cbl",
+          "start": {
+            "line": 6,
+            "character": 16
+          },
+          "end": {
+            "line": 6,
+            "character": 31
+          }
+        }
+      },
+      {
+        "type": "else",
+        "location": {
+          "uri": "/case69.cbl",
+          "start": {
+            "line": 7,
+            "character": 12
+          },
+          "end": {
+            "line": 8,
+            "character": 26
+          }
+        }
+      },
+      {
+        "targetName": [
+          "PAR2"
+        ],
+        "type": "goto",
+        "location": {
+          "uri": "/case69.cbl",
+          "start": {
+            "line": 8,
+            "character": 16
+          },
+          "end": {
+            "line": 8,
+            "character": 26
+          }
+        }
+      },
+      {
+        "type": "endif",
+        "location": {
+          "uri": "/case69.cbl",
+          "start": {
+            "line": 5,
+            "character": 12
+          },
+          "end": {
+            "line": 8,
+            "character": 26
+          }
+        }
+      },
+      {
+        "snippet": "       PAR1.\r\n           GOBACK.",
+        "name": "PAR1",
+        "type": "paragraph",
+        "location": {
+          "uri": "/case69.cbl",
+          "start": {
+            "line": 10,
+            "character": 8
+          },
+          "end": {
+            "line": 11,
+            "character": 19
+          }
+        },
+        "children": [
+          {
+            "type": "goback",
+            "location": {
+              "uri": "/case69.cbl",
+              "start": {
+                "line": 11,
+                "character": 12
+              },
+              "end": {
+                "line": 11,
+                "character": 18
+              }
+            }
+          }
+        ]
+      },
+      {
+        "snippet": "       PAR2.",
+        "name": "PAR2",
+        "type": "paragraph",
+        "location": {
+          "uri": "/case69.cbl",
+          "start": {
+            "line": 13,
+            "character": 8
+          },
+          "end": {
+            "line": 13,
+            "character": 13
+          }
+        }
+      }
+    ]
+  }
+]

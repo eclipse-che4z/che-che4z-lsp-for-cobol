@@ -16,11 +16,12 @@ import * as vscode from "vscode";
 import { SettingsService } from "../Settings";
 import { COBOL_EXT_ARRAY_CASE_INSENSITIVE } from "../../constants";
 import { LocalFilesystemResourceService } from "../LocalFilesystemResourceService";
-import { getChannel } from "../../extension";
 
 const localSubroutines = new LocalFilesystemResourceService();
 
-export async function listLocalSubroutines(): Promise<string[]> {
+export async function listLocalSubroutines(
+  outputChannel?: vscode.OutputChannel,
+): Promise<string[]> {
   const directoryPaths = SettingsService.getSubroutineLocalPath() ?? [];
   const workspaceFolders = vscode.workspace.workspaceFolders ?? [];
   const absoluteDirectoryPaths = SettingsService.prepareLocalSearchUris(
@@ -43,7 +44,7 @@ export async function listLocalSubroutines(): Promise<string[]> {
     if (result.status === "fulfilled") {
       result.value.forEach((subroutine) => subroutines.push(subroutine));
     } else {
-      getChannel().appendLine(
+      outputChannel?.appendLine(
         `Unable to load subroutines completions: ${result.reason}`,
       );
     }

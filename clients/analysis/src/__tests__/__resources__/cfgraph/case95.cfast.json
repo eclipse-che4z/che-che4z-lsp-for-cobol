@@ -1,0 +1,275 @@
+[
+  {
+    "name": "PROG",
+    "type": "program",
+    "location": {
+      "uri": "/case95.cbl",
+      "start": {
+        "line": 3,
+        "character": 8
+      },
+      "end": {
+        "line": 20,
+        "character": 35
+      }
+    },
+    "children": [
+      {
+        "type": "if",
+        "location": {
+          "uri": "/case95.cbl",
+          "start": {
+            "line": 4,
+            "character": 12
+          },
+          "end": {
+            "line": 7,
+            "character": 18
+          }
+        }
+      },
+      {
+        "handleType": "LABEL",
+        "value": "HANDLE-ABEND",
+        "type": "execcicshandle",
+        "location": {
+          "uri": "/case95.cbl",
+          "start": {
+            "line": 5,
+            "character": 21
+          },
+          "end": {
+            "line": 5,
+            "character": 72
+          }
+        }
+      },
+      {
+        "type": "endexec",
+        "location": {
+          "uri": "/case95.cbl",
+          "start": {
+            "line": 5,
+            "character": 21
+          },
+          "end": {
+            "line": 5,
+            "character": 72
+          }
+        }
+      },
+      {
+        "targetName": [
+          "CALCULATION"
+        ],
+        "type": "goto",
+        "location": {
+          "uri": "/case95.cbl",
+          "start": {
+            "line": 6,
+            "character": 21
+          },
+          "end": {
+            "line": 6,
+            "character": 38
+          }
+        }
+      },
+      {
+        "type": "endif",
+        "location": {
+          "uri": "/case95.cbl",
+          "start": {
+            "line": 4,
+            "character": 12
+          },
+          "end": {
+            "line": 7,
+            "character": 18
+          }
+        }
+      },
+      {
+        "type": "execcics",
+        "location": {
+          "uri": "/case95.cbl",
+          "start": {
+            "line": 9,
+            "character": 12
+          },
+          "end": {
+            "line": 9,
+            "character": 68
+          }
+        }
+      },
+      {
+        "type": "endexec",
+        "location": {
+          "uri": "/case95.cbl",
+          "start": {
+            "line": 9,
+            "character": 12
+          },
+          "end": {
+            "line": 9,
+            "character": 68
+          }
+        }
+      },
+      {
+        "type": "goback",
+        "location": {
+          "uri": "/case95.cbl",
+          "start": {
+            "line": 10,
+            "character": 12
+          },
+          "end": {
+            "line": 10,
+            "character": 18
+          }
+        }
+      },
+      {
+        "name": "CALCULATION",
+        "snippet": "       CALCULATION SECTION.\r\n           EXEC CICS HANDLE ABEND RESET END-EXEC\r\n           EXEC CICS DELAY FOR MILLISECS(500) REQID(CHECK) END-EXEC.\r\n\r\n       CALCULATION-END.\r\n           GOBACK.\r\n\r\n       HANDLE-ABEND.\r\n           DISPLAY \"HANDLE ABEND\".",
+        "type": "section",
+        "location": {
+          "uri": "/case95.cbl",
+          "start": {
+            "line": 12,
+            "character": 8
+          },
+          "end": {
+            "line": 20,
+            "character": 35
+          }
+        },
+        "children": [
+          {
+            "handleType": "RESET",
+            "type": "execcicshandle",
+            "location": {
+              "uri": "/case95.cbl",
+              "start": {
+                "line": 13,
+                "character": 12
+              },
+              "end": {
+                "line": 13,
+                "character": 49
+              }
+            }
+          },
+          {
+            "type": "endexec",
+            "location": {
+              "uri": "/case95.cbl",
+              "start": {
+                "line": 13,
+                "character": 12
+              },
+              "end": {
+                "line": 13,
+                "character": 49
+              }
+            }
+          },
+          {
+            "type": "execcics",
+            "location": {
+              "uri": "/case95.cbl",
+              "start": {
+                "line": 14,
+                "character": 12
+              },
+              "end": {
+                "line": 14,
+                "character": 68
+              }
+            }
+          },
+          {
+            "type": "endexec",
+            "location": {
+              "uri": "/case95.cbl",
+              "start": {
+                "line": 14,
+                "character": 12
+              },
+              "end": {
+                "line": 14,
+                "character": 68
+              }
+            }
+          },
+          {
+            "snippet": "       CALCULATION-END.\r\n           GOBACK.",
+            "name": "CALCULATION-END",
+            "type": "paragraph",
+            "location": {
+              "uri": "/case95.cbl",
+              "start": {
+                "line": 16,
+                "character": 8
+              },
+              "end": {
+                "line": 17,
+                "character": 19
+              }
+            },
+            "children": [
+              {
+                "type": "goback",
+                "location": {
+                  "uri": "/case95.cbl",
+                  "start": {
+                    "line": 17,
+                    "character": 12
+                  },
+                  "end": {
+                    "line": 17,
+                    "character": 18
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "snippet": "       HANDLE-ABEND.\r\n           DISPLAY \"HANDLE ABEND\".",
+            "name": "HANDLE-ABEND",
+            "type": "paragraph",
+            "location": {
+              "uri": "/case95.cbl",
+              "start": {
+                "line": 19,
+                "character": 8
+              },
+              "end": {
+                "line": 20,
+                "character": 35
+              }
+            },
+            "children": [
+              {
+                "type": "statement",
+                "location": {
+                  "uri": "/case95.cbl",
+                  "start": {
+                    "line": 20,
+                    "character": 12
+                  },
+                  "end": {
+                    "line": 20,
+                    "character": 34
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]

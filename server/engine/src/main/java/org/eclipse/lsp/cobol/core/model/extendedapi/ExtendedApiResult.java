@@ -25,4 +25,5 @@ import java.util.List;
 @Value
 public class ExtendedApiResult {
   List<Program> controlFlowAST;
+  String documentUri;
 }

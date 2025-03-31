@@ -1,0 +1,130 @@
+[
+  {
+    "name": "ST",
+    "type": "program",
+    "location": {
+      "uri": "/case11.cbl",
+      "start": {
+        "line": 6,
+        "character": 8
+      },
+      "end": {
+        "line": 13,
+        "character": 24
+      }
+    },
+    "children": [
+      {
+        "targetName": "MY1-P2",
+        "type": "perform",
+        "location": {
+          "uri": "/case11.cbl",
+          "start": {
+            "line": 7,
+            "character": 12
+          },
+          "end": {
+            "line": 7,
+            "character": 26
+          }
+        }
+      },
+      {
+        "snippet": "       P.\r\n           CONTINUE.",
+        "name": "P",
+        "type": "paragraph",
+        "location": {
+          "uri": "/case11.cbl",
+          "start": {
+            "line": 8,
+            "character": 8
+          },
+          "end": {
+            "line": 9,
+            "character": 21
+          }
+        },
+        "children": [
+          {
+            "type": "statement",
+            "location": {
+              "uri": "/case11.cbl",
+              "start": {
+                "line": 9,
+                "character": 12
+              },
+              "end": {
+                "line": 9,
+                "character": 20
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "MY1",
+        "snippet": "       MY1 SECTION.\r\n           DISPLAY \u0027A\u0027.\r\n       MY1-P2.\r\n           DISPLAY \u0027A\u0027.",
+        "type": "section",
+        "location": {
+          "uri": "/case11.cbl",
+          "start": {
+            "line": 10,
+            "character": 8
+          },
+          "end": {
+            "line": 13,
+            "character": 24
+          }
+        },
+        "children": [
+          {
+            "type": "statement",
+            "location": {
+              "uri": "/case11.cbl",
+              "start": {
+                "line": 11,
+                "character": 12
+              },
+              "end": {
+                "line": 11,
+                "character": 23
+              }
+            }
+          },
+          {
+            "snippet": "       MY1-P2.\r\n           DISPLAY \u0027A\u0027.",
+            "name": "MY1-P2",
+            "type": "paragraph",
+            "location": {
+              "uri": "/case11.cbl",
+              "start": {
+                "line": 12,
+                "character": 8
+              },
+              "end": {
+                "line": 13,
+                "character": 24
+              }
+            },
+            "children": [
+              {
+                "type": "statement",
+                "location": {
+                  "uri": "/case11.cbl",
+                  "start": {
+                    "line": 13,
+                    "character": 12
+                  },
+                  "end": {
+                    "line": 13,
+                    "character": 23
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]

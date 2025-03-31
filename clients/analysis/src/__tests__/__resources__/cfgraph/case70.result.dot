@@ -1,0 +1,7 @@
+digraph A {
+rankdir=LR;
+<PROG>-><MAIN>;
+<MAIN>-><SEC1>;
+<MAIN>-><SEC0>;
+<SEC0>-><SEC0-EXIT>;
+}
