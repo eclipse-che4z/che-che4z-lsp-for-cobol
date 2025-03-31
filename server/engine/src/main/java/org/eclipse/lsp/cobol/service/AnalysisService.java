@@ -21,6 +21,7 @@ import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
@@ -113,10 +114,12 @@ public class AnalysisService {
     String logPrefix = isNew ? "[analyzeDocument] Document " : "[reanalyzeDocument] Document ";
     LOG.debug(logPrefix + uri + " opened");
 
+    List<Program> astList = new LinkedList<>();
     if (!isCopybook(uri, text)) {
       LOG.debug(logPrefix + uri + " treated as a program, start analyzing");
-      analyzeDocumentWithCopybooks(uri, text);
+      astList = analyzeDocumentWithCopybooks(uri, text);
     }
+    this.clientProvider.get().cfastReady(new ExtendedApiResult(astList, uri));
   }
 
   /**
@@ -124,8 +127,10 @@ public class AnalysisService {
    *
    * @param uri - document uri
    * @param text - document text
+   * @return a list of program nodes
    */
-  private void analyzeDocumentWithCopybooks(String uri, String text) {
+  private List<Program> analyzeDocumentWithCopybooks(String uri, String text) {
+    List<Program> astList = new LinkedList<>();
     try {
       CopybookProcessingMode copybookProcessingMode = CopybookProcessingMode.getCopybookProcessingMode(uri, CopybookProcessingMode.ENABLED);
       AnalysisConfig config = configurationService.getConfig(uri, copybookProcessingMode);
@@ -136,13 +141,10 @@ public class AnalysisService {
       copybookService.sendCopybookDownloadRequest(
               uri, DocumentServiceHelper.extractCopybookUris(result), copybookProcessingMode);
 
-      cfastBuilder.ifPresent(b -> {
-        List<Program> astList = result.getRootNode().findPrograms().stream()
-            .map(b::build)
-            .flatMap(m -> m.getControlFlowAST().stream())
-            .collect(Collectors.toList());
-        this.clientProvider.get().cfastReady(new ExtendedApiResult(astList, uri));
-      });
+      cfastBuilder.ifPresent(builder -> astList.addAll(result.getRootNode().findPrograms().stream()
+          .map(builder::build)
+          .flatMap(m -> m.getControlFlowAST().stream())
+          .collect(Collectors.toList())));
 
       LOG.debug("[doAnalysis] Document " + uri + " analyzed: " + result.getDiagnostics());
 
@@ -152,5 +154,7 @@ public class AnalysisService {
       LOG.error(format("An exception thrown while applying %s for %s:", "analysis", uri), e);
       throw e;
     }
+    return astList;
   }
 }
+
