@@ -240,7 +240,9 @@ suite("Integration Test Suite: Copybooks", function () {
       await helper.insertString(editor, helper.pos(19, 0), "       COPY PAY\n");
       helper.moveCursor(editor, helper.pos(19, 18));
       const completions = await helper.triggerCompletionsAndWaitForResults();
-      const position = completions.items.findIndex((ci) => ci.label === "PAY");
+      const position = completions.items.findIndex(
+        (ci) => ci.label === "PAYLIB",
+      );
 
       await helper.executeCommandMultipleTimes(
         "selectNextSuggestion",
