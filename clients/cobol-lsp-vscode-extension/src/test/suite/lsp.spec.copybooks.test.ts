@@ -251,9 +251,9 @@ suite("Integration Test Suite: Copybooks", function () {
 
       await vscode.commands.executeCommand("acceptSelectedSuggestion");
       await helper.waitFor(() => {
-        return editor.document.lineAt(19).text.trim() === "COPY PAY";
+        return editor.document.lineAt(19).text.trim() === "COPY PAYLIB";
       });
-      assert.strictEqual(editor.document.lineAt(19).text.trim(), "COPY PAY");
+      assert.strictEqual(editor.document.lineAt(19).text.trim(), "COPY PAYLIB");
     });
   });
 });
