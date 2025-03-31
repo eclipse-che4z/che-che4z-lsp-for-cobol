@@ -55,6 +55,7 @@ export async function loadProcessorGroupCopybookPaths(
 export async function loadProcessorGroupCopybookPathsConfig(
   item: { scopeUri: string },
   configObject: string[],
+  dialect?: string,
 ): Promise<
   (string | ZoweDatasetConfigModel | ZoweUssConfigModel | EndevorConfigModel)[]
 > {
@@ -68,6 +69,7 @@ export async function loadProcessorGroupCopybookPathsConfig(
       item.scopeUri,
       "libs",
       [] as string[],
+      dialect,
     )),
     ...configObject,
   ];
