@@ -42,7 +42,6 @@ import static org.eclipse.lsp.cobol.common.model.NodeType.*;
 @Slf4j
 public class CFASTBuilderImpl implements CFASTBuilder {
   private static final int SNIPPET_LENGTH = 10;
-
   private final DocumentModelService documentModelService;
 
   @Inject
@@ -52,7 +51,7 @@ public class CFASTBuilderImpl implements CFASTBuilder {
 
   @Override
   public ExtendedApiResult build(ProgramNode programNode) {
-    ExtendedApiResult result = new ExtendedApiResult(new ArrayList<>());
+    ExtendedApiResult result = new ExtendedApiResult(new ArrayList<>(), programNode.getLocality().getUri());
     if (programNode == null) {
       return result;
     }
@@ -138,7 +137,7 @@ public class CFASTBuilderImpl implements CFASTBuilder {
       node.getChildren().forEach(child -> traverse(parent, child));
       addChild(parent, new CFASTNode(CFASTNodeType.END_EXEC.getValue(), convertLocation(node)));
     } else if (node instanceof ExecCicsReturnNode) {
-      addChild(parent, new CFASTNode(CFASTNodeType.GOBACK.getValue(), convertLocation(node)));
+      addChild(parent, new CFASTNode(CFASTNodeType.EXEC_CICS_RETURN.getValue(), convertLocation(node)));
     } else if (node instanceof UseNode) {
       addChild(parent, new CFASTNode(CFASTNodeType.USE.getValue(), convertLocation(node)));
     } else if (node instanceof UseForDebuggingNode) {

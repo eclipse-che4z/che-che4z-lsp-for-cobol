@@ -29,6 +29,16 @@ export class Uri {
     return pathSegments.length > 0 ? this.joinPath(uri, ...pathSegments) : uri;
   }
 
+  static from(components: {
+    scheme: string;
+    authority?: string;
+    path: string;
+    query?: string;
+    fragment?: string;
+  }): Uri {
+    return new Uri(components.path);
+  }
+
   get fsPath(): string {
     let value = this.path;
     if (this.path[2] === ":") {

@@ -23,13 +23,19 @@ import {
   GenericRequestHandler,
   LanguageClient,
   LanguageClientOptions,
+  Middleware,
   StreamInfo,
 } from "vscode-languageclient/node";
 import { HP_LANGUAGE_ID, EXP_LANGUAGE_ID, LANGUAGE_ID } from "../constants";
 import { JavaCheck } from "./JavaCheck";
 import { NativeExecutableService } from "./nativeLanguageClient/nativeExecutableService";
-import { TelemetryService } from "./reporter/TelemetryService";
 import { SettingsService } from "./Settings";
+import { registerEvent } from "./reporter";
+import { setupBridge4GitWatcher } from "./BridgeForGitLoader";
+import {
+  setUpProcessorGroupConfigWatcher,
+  setUpProgramConfigWatcher,
+} from "./ProcessorGroups";
 
 const extensionId = "BroadcomMFD.cobol-language-support";
 
@@ -44,6 +50,7 @@ export class LanguageClientService {
   constructor(
     private outputChannel: vscode.OutputChannel,
     private storagePath: vscode.Uri,
+    private middleware: Middleware,
   ) {
     const ext = vscode.extensions.getExtension(extensionId)!;
     this.executablePath = join(
@@ -60,7 +67,7 @@ export class LanguageClientService {
 
   public enableNativeBuild() {
     this.isNativeBuildEnabled = true;
-    TelemetryService.registerEvent(
+    registerEvent(
       "Native Build enabled",
       ["COBOL", "native build enabled", "settings"],
       "Native build enabled",
@@ -146,15 +153,17 @@ export class LanguageClientService {
 
   private createClientOptions(): LanguageClientOptions {
     return {
+      middleware: this.middleware,
       documentSelector: [LANGUAGE_ID, EXP_LANGUAGE_ID, HP_LANGUAGE_ID],
       outputChannel: this.outputChannel,
       synchronize: {
         fileEvents: [
-          vscode.workspace.createFileSystemWatcher("**/pgm_conf.json"),
-          vscode.workspace.createFileSystemWatcher("**/proc_grps.json"),
+          setUpProgramConfigWatcher(),
+          setUpProcessorGroupConfigWatcher(),
           vscode.workspace.createFileSystemWatcher(
             new vscode.RelativePattern(this.storagePath, "**/*"),
           ),
+          setupBridge4GitWatcher(),
         ],
       },
     };

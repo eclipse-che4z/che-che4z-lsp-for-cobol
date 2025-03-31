@@ -14,8 +14,8 @@
 
 import * as vscode from "vscode";
 import { SERVER_RUNTIME } from "../../constants";
-import { TelemetryService } from "../reporter/TelemetryService";
 import { SettingsService } from "../Settings";
+import { registerEvent } from "../reporter";
 
 export class ConfigurationWatcher {
   private static async restartVsCode() {
@@ -28,7 +28,7 @@ export class ConfigurationWatcher {
       return;
     }
     if (selection === "Ok") {
-      TelemetryService.registerEvent(
+      registerEvent(
         "serverRuntime modified by user",
         ["COBOL", "serverRuntime", "settings"],
         `Server type modified by user to ${this.getServerRuntime()}`,

@@ -86,6 +86,10 @@ public class CICSReadOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
 
         checkMutuallyExclusiveOptions("DEBKEY, DEBREC, RBA, RRN or XRBA", ctx.DEBKEY(), ctx.DEBREC(), ctx.RBA(), ctx.RRN(), ctx.XRBA());
 
+        if (!ctx.SYSID().isEmpty()) {
+            checkHasExactlyOneOption("KEYLENGTH, RBA, XRBA or RRN", ctx, ctx.KEYLENGTH(), ctx.RBA(), ctx.XRBA(), ctx.RRN());
+        }
+
         checkMutuallyExclusiveOptions("EQUAL or GTEQ", ctx.EQUAL(), ctx.GTEQ());
 
         checkDuplicates(ctx);

@@ -11,5 +11,6 @@
       ],
     "cobol-lsp.cpy-manager.paths-dsn": [],
     "editor.snippetSuggestions": "top",
-    "cobol-lsp.dialects": ["IDMS"]
+    "cobol-lsp.dialects": ["IDMS"],
+    "cobol-lsp.maxVmCount": -1
 }

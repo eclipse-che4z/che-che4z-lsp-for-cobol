@@ -61,6 +61,14 @@ public class BenchmarkServiceImpl implements BenchmarkService {
     benchmarkSessions.forEach(this::logTiming);
   }
 
+  @Override
+  public void endSession(String programUri) {
+      benchmarkSessions.removeIf(benchmarkSession -> {
+          String benchmarkUri = benchmarkSession.attr("uri");
+          return Objects.nonNull(benchmarkUri) && benchmarkUri.equals(programUri);
+      });
+  }
+
   public void logTiming(BenchmarkSession benchmarkSession) {
     LOG.debug("---- Benchmark for uri : {}", benchmarkSession.attr("uri"));
     Collection<Measurement> measurements = benchmarkSession

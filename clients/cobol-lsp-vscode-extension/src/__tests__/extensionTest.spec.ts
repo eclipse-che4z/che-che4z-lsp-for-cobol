@@ -19,9 +19,9 @@ import { initSmartTab } from "../commands/SmartTabCommand";
 import { activate } from "../extension";
 import { CopybooksCodeActionProvider } from "../services/copybook/CopybooksCodeActionProvider";
 import { LanguageClientService } from "../services/LanguageClientService";
-import { TelemetryService } from "../services/reporter/TelemetryService";
 import { SnippetCompletionProvider } from "../services/snippetcompletion/SnippetCompletionProvider";
 import { Utils } from "../services/util/Utils";
+import { registerEvent } from "../services/reporter";
 
 jest.mock("../commands/SmartTabCommand");
 jest.mock("../commands/FetchCopybookCommand");
@@ -39,6 +39,7 @@ jest.mock("../services/Settings", () => ({
       .mockReturnValue("JAVA"),
     getSnippetsForCobol: jest.fn().mockReturnValue(Promise.resolve([])),
     getDialects: jest.fn().mockReturnValue([]),
+    getMaxVMCount: jest.fn().mockReturnValue(-1),
   },
 }));
 
@@ -47,7 +48,7 @@ jest.mock("../services/copybook/E4ECopybookService", () => ({
   getE4EAPI: jest.fn(),
 }));
 
-jest.mock("../services/reporter/TelemetryService");
+jest.mock("../services/reporter");
 
 const context = {
   subscriptions: [],
@@ -62,13 +63,13 @@ beforeEach(() => {
 describe("Check plugin extension for cobol starts successfully.", () => {
   test("start extension", async () => {
     await activate(context);
-    expect(TelemetryService.registerEvent).toHaveBeenCalledWith(
+    expect(registerEvent).toHaveBeenCalledWith(
       "log",
       ["bootstrap", "experiment-tag"],
       "Extension activation event was triggered",
     );
 
-    expect(vscode.commands.registerCommand).toHaveBeenCalledTimes(11);
+    expect(vscode.commands.registerCommand).toHaveBeenCalledTimes(12);
 
     expect(fetchCopybookCommand).toHaveBeenCalled();
     expect(gotoCopybookSettings).toHaveBeenCalled();
@@ -117,7 +118,7 @@ describe("Check plugin extension for cobol fails.", () => {
 
   test("start fails.", async () => {
     await activate(context);
-    expect(TelemetryService.registerEvent).toHaveBeenCalledWith(
+    expect(registerEvent).toHaveBeenCalledWith(
       "log",
       ["bootstrap", "experiment-tag"],
       "Extension activation event was triggered",

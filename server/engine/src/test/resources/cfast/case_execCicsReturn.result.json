@@ -15,7 +15,7 @@
     },
     "children": [
       {
-        "type": "goback",
+        "type": "execcicsreturn",
         "location": {
           "uri": "fake/path",
           "start": {

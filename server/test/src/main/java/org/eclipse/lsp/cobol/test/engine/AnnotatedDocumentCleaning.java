@@ -41,17 +41,20 @@ import org.eclipse.usecase.UseCasePreprocessorParser;
  * semantic context
  */
 @UtilityClass
-class AnnotatedDocumentCleaning {
+public class AnnotatedDocumentCleaning {
   /**
    * Clean up and extract the semantic context from the annotated text. The implicit copybooks
    * should not present in the list of explicit ones
    *
    * @param text text to clean up
    * @param explicitCopybooks list of explicitly defined copybooks
+   * @param subroutineNames list of subroutine names
    * @param expectedDiagnostics diagnostics that should present in the document after the analysis
+   * @param sqlBackend sql backend for the analysis
+   * @param compilerOptions compiler options
    * @return PreprocessedDocument for the further analysis
    */
-  PreprocessedDocument prepareDocument(
+  public PreprocessedDocument prepareDocument(
       String text,
       List<CobolText> explicitCopybooks,
       List<String> subroutineNames,
@@ -157,12 +160,9 @@ class AnnotatedDocumentCleaning {
     return copybookTestData -> {
       mergeMaps(accumulator.getCopybookDefinitions(), copybookTestData.getCopybookDefinitions());
       mergeMaps(accumulator.getCopybookUsages(), copybookTestData.getCopybookUsages());
-      mergeMaps(accumulator.getParagraphDefinitions(), copybookTestData.getParagraphDefinitions());
-      mergeMaps(accumulator.getParagraphUsages(), copybookTestData.getParagraphUsages());
-      mergeMaps(accumulator.getSectionDefinitions(), copybookTestData.getSectionDefinitions());
-      mergeMaps(accumulator.getSectionUsages(), copybookTestData.getSectionUsages());
-      mergeMaps(
-          accumulator.getSubroutineDefinitions(), copybookTestData.getSubroutineDefinitions());
+      mergeMaps(accumulator.getProcedureDefinitions(), copybookTestData.getProcedureDefinitions());
+      mergeMaps(accumulator.getProcedureUsages(), copybookTestData.getProcedureUsages());
+      mergeMaps(accumulator.getSubroutineDefinitions(), copybookTestData.getSubroutineDefinitions());
       mergeMaps(accumulator.getSubroutineUsages(), copybookTestData.getSubroutineUsages());
       mergeMaps(accumulator.getVariableDefinitions(), copybookTestData.getVariableDefinitions());
       mergeMaps(accumulator.getVariableUsages(), copybookTestData.getVariableUsages());
@@ -171,11 +171,11 @@ class AnnotatedDocumentCleaning {
     };
   }
 
-  private <T> void mergeMaps(Map<String, List<T>> to, Map<String, List<T>> from) {
+  private <K, V> void mergeMaps(Map<K, List<V>> to, Map<K, List<V>> from) {
     from.forEach(
         (key, value) -> {
           if (to.containsKey(key)) {
-            List<T> list = new LinkedList<>(to.get(key));
+            List<V> list = new LinkedList<>(to.get(key));
             list.addAll(value);
             to.put(key, list);
           } else to.put(key, value);

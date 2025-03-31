@@ -1,0 +1,171 @@
+[
+  {
+    "name": "PROG",
+    "type": "program",
+    "location": {
+      "uri": "/case38.cbl",
+      "start": {
+        "line": 4,
+        "character": 8
+      },
+      "end": {
+        "line": 19,
+        "character": 22
+      }
+    },
+    "children": [
+      {
+        "snippet": "       MAIN-PROCEDURE.\r\n\r\n            IF WS-OUT-STAT NOT EQUAL ZEROES\r\n               PERFORM STOP-RUN\r\n            END-IF\r\n\r\n            IF WS-OUT-STAT NOT EQUAL ZEROES\r\n               PERFORM STOP-RUN\r\n            END-IF\r\n            .",
+        "name": "MAIN-PROCEDURE",
+        "type": "paragraph",
+        "location": {
+          "uri": "/case38.cbl",
+          "start": {
+            "line": 5,
+            "character": 8
+          },
+          "end": {
+            "line": 14,
+            "character": 14
+          }
+        },
+        "children": [
+          {
+            "type": "if",
+            "location": {
+              "uri": "/case38.cbl",
+              "start": {
+                "line": 7,
+                "character": 13
+              },
+              "end": {
+                "line": 9,
+                "character": 19
+              }
+            }
+          },
+          {
+            "targetName": "STOP-RUN",
+            "type": "perform",
+            "location": {
+              "uri": "/case38.cbl",
+              "start": {
+                "line": 8,
+                "character": 16
+              },
+              "end": {
+                "line": 8,
+                "character": 32
+              }
+            }
+          },
+          {
+            "type": "endif",
+            "location": {
+              "uri": "/case38.cbl",
+              "start": {
+                "line": 7,
+                "character": 13
+              },
+              "end": {
+                "line": 9,
+                "character": 19
+              }
+            }
+          },
+          {
+            "type": "if",
+            "location": {
+              "uri": "/case38.cbl",
+              "start": {
+                "line": 11,
+                "character": 13
+              },
+              "end": {
+                "line": 13,
+                "character": 19
+              }
+            }
+          },
+          {
+            "targetName": "STOP-RUN",
+            "type": "perform",
+            "location": {
+              "uri": "/case38.cbl",
+              "start": {
+                "line": 12,
+                "character": 16
+              },
+              "end": {
+                "line": 12,
+                "character": 32
+              }
+            }
+          },
+          {
+            "type": "endif",
+            "location": {
+              "uri": "/case38.cbl",
+              "start": {
+                "line": 11,
+                "character": 13
+              },
+              "end": {
+                "line": 13,
+                "character": 19
+              }
+            }
+          }
+        ]
+      },
+      {
+        "snippet": "       NEXT-PROC.",
+        "name": "NEXT-PROC",
+        "type": "paragraph",
+        "location": {
+          "uri": "/case38.cbl",
+          "start": {
+            "line": 16,
+            "character": 8
+          },
+          "end": {
+            "line": 16,
+            "character": 18
+          }
+        }
+      },
+      {
+        "snippet": "       STOP-RUN.\r\n            STOP RUN.",
+        "name": "STOP-RUN",
+        "type": "paragraph",
+        "location": {
+          "uri": "/case38.cbl",
+          "start": {
+            "line": 18,
+            "character": 8
+          },
+          "end": {
+            "line": 19,
+            "character": 22
+          }
+        },
+        "children": [
+          {
+            "type": "stop",
+            "location": {
+              "uri": "/case38.cbl",
+              "start": {
+                "line": 19,
+                "character": 13
+              },
+              "end": {
+                "line": 19,
+                "character": 21
+              }
+            }
+          }
+        ]
+      }
+    ]
+  }
+]

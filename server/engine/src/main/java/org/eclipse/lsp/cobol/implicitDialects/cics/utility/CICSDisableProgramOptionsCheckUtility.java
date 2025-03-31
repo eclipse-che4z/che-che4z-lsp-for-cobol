@@ -68,6 +68,15 @@ public class CICSDisableProgramOptionsCheckUtility extends CICSOptionsCheckBaseU
 
     private void checkDisableProgram(CICSParser.Cics_disable_programContext ctx) {
         checkHasMandatoryOptions(ctx.PROGRAM(), ctx, "PROGRAM");
-        checkHasMutuallyExclusiveOptions("EXIT or EXITALL", ctx.EXIT(), ctx.EXITALL());
+        checkHasAtLeastOneOption("EXIT or EXITALL or FORMATEDF or PURGEABLE or SHUTDOWN or SPI or STOP or TASKSTART", ctx, ctx.EXIT(), ctx.EXITALL(), ctx.FORMATEDF(), ctx.PURGEABLE(), ctx.SHUTDOWN(), ctx.SPI(), ctx.STOP(), ctx.TASKSTART());
+        if (ctx.EXIT() != null) {
+            checkHasMutuallyExclusiveOptions("EXIT or EXITALL", ctx.EXIT(), ctx.EXITALL());
+            checkHasMutuallyExclusiveOptions("EXIT or FORMATEDF", ctx.EXIT(), ctx.FORMATEDF());
+            checkHasMutuallyExclusiveOptions("EXIT or PURGEABLE", ctx.EXIT(), ctx.PURGEABLE());
+            checkHasMutuallyExclusiveOptions("EXIT or SHUTDOWN", ctx.EXIT(), ctx.SHUTDOWN());
+            checkHasMutuallyExclusiveOptions("EXIT or SPI", ctx.EXIT(), ctx.SPI());
+            checkHasMutuallyExclusiveOptions("EXIT or STOP", ctx.EXIT(), ctx.STOP());
+            checkHasMutuallyExclusiveOptions("EXIT or TASKSTART", ctx.EXIT(), ctx.TASKSTART());
+        }
     }
 }

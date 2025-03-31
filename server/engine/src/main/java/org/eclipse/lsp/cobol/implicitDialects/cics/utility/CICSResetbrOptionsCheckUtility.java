@@ -70,7 +70,7 @@ public class CICSResetbrOptionsCheckUtility extends CICSOptionsCheckBaseUtility 
   private void checkResetbr(CICSParser.Cics_resetbr_optionsContext ctx) {
     checkHasExactlyOneOption("FILE or DATASET", ctx, ctx.FILE(), ctx.DATASET());
     checkHasMandatoryOptions(ctx.RIDFLD(), ctx, "RIDFLD");
-    checkHasMutuallyExclusiveOptions("RBA, RRN, or XRBA", ctx.RBA(), ctx.RRN(), ctx.XRBA());
+    checkHasMutuallyExclusiveOptions("RBA, RRN, XRBA or KEYLENGTH", ctx.RBA(), ctx.RRN(), ctx.XRBA(), ctx.KEYLENGTH());
     checkHasMutuallyExclusiveOptions("GTEQ or EQUAL", ctx.GTEQ(), ctx.EQUAL());
     checkPrerequisiteIsMet(ctx.KEYLENGTH(), ctx.GENERIC(), ctx, "GENERIC");
   }

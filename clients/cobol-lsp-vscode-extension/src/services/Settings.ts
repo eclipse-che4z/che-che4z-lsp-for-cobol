@@ -33,6 +33,8 @@ import {
   COBOL_PRGM_LAYOUT,
   SETTINGS_CPY_NDVR_DEPENDENCIES,
   SETTINGS_LSPCONFIG_SECTION,
+  SETTINGS_UNREACHABLE_CODE_SEVERITY,
+  SETTINGS_MAXIMUM_VM_COUNT,
 } from "../constants";
 import { DialectRegistry, DIALECT_REGISTRY_SECTION } from "./DialectRegistry";
 import {
@@ -48,7 +50,9 @@ import { getVariablesFromUri, SupportedVariables } from "./util/FSUtils";
 import { SettingsUtils } from "./util/SettingsUtils";
 import { decodeUnknown, DecodingError } from "./util/decoder";
 import * as t from "io-ts";
-import { getChannel } from "../extension";
+
+const NONE: string = "NONE";
+const MAX_VM_COUNT = 50000;
 
 interface Request {
   items: Item[];
@@ -79,6 +83,7 @@ async function handleProcessorGroupConfigurationRequest<Type, Output, R>(
   ) => Promise<R>,
   item: Item,
   result: (R | undefined)[],
+  outputChannel?: vscode.OutputChannel,
 ) {
   if (item.scopeUri) {
     try {
@@ -101,7 +106,7 @@ async function handleProcessorGroupConfigurationRequest<Type, Output, R>(
       }
     } catch (err) {
       if (err instanceof DecodingError) {
-        getChannel().appendLine(
+        outputChannel?.appendLine(
           `Invalid settings: ${item.section} - ${err.message}`,
         );
       }
@@ -111,7 +116,10 @@ async function handleProcessorGroupConfigurationRequest<Type, Output, R>(
   }
 }
 
-export async function lspConfigHandler(request: Request) {
+export async function lspConfigHandler(
+  request: Request,
+  outputChannel?: vscode.OutputChannel,
+) {
   const result: unknown[] = [];
   for (const item of request.items) {
     try {
@@ -128,6 +136,7 @@ export async function lspConfigHandler(request: Request) {
             loadProcessorGroupDialectConfig,
             item,
             result,
+            outputChannel,
           );
           break;
         case SETTINGS_CPY_LOCAL_PATH:
@@ -137,6 +146,7 @@ export async function lspConfigHandler(request: Request) {
               loadProcessorGroupCopybookPathsConfig,
               item,
               result,
+              outputChannel,
             );
           } else {
             // if no configuration for local or remote copybook paths is provided
@@ -159,6 +169,7 @@ export async function lspConfigHandler(request: Request) {
             loadProcessorGroupCopybookExtensionsConfig,
             item,
             result,
+            outputChannel,
           );
           break;
         case SETTINGS_SQL_BACKEND:
@@ -167,6 +178,7 @@ export async function lspConfigHandler(request: Request) {
             loadProcessorGroupSqlBackendConfig,
             item,
             result,
+            outputChannel,
           );
           break;
         case SETTINGS_CPY_FILE_ENCODING:
@@ -175,6 +187,7 @@ export async function lspConfigHandler(request: Request) {
             loadProcessorGroupCopybookEncodingConfig,
             item,
             result,
+            outputChannel,
           );
           break;
         case SETTINGS_COMPILE_OPTIONS:
@@ -183,6 +196,7 @@ export async function lspConfigHandler(request: Request) {
             loadProcessorGroupCompileOptionsConfig,
             item,
             result,
+            outputChannel,
           );
           break;
         case DIALECT_LIBS:
@@ -208,6 +222,17 @@ export async function lspConfigHandler(request: Request) {
  * SettingsService provides read/write configuration settings functionality
  */
 export class SettingsService {
+  private static readonly severityMap = new Map<
+    string,
+    vscode.DiagnosticSeverity | undefined
+  >([
+    [NONE, undefined],
+    ["ERROR", vscode.DiagnosticSeverity.Error],
+    ["WARN", vscode.DiagnosticSeverity.Warning],
+    ["INFO", vscode.DiagnosticSeverity.Information],
+    ["HINT", vscode.DiagnosticSeverity.Hint],
+  ]);
+
   public static readonly DEFAULT_DIALECT = "COBOL";
   /**
    * Get list of local subroutine path
@@ -228,11 +253,13 @@ export class SettingsService {
   public static async getCopybookLocalPath(
     documentUri: string,
     dialectType: string,
+    convertToAbsolutePaths = true,
   ): Promise<string[]> {
     const pgPaths = await loadProcessorGroupCopybookPaths(
       documentUri,
       dialectType,
     );
+
     const vars = getVariablesFromUri(documentUri);
     const paths: string[] = [
       ...SettingsService.evaluateVariables(pgPaths, vars),
@@ -244,23 +271,14 @@ export class SettingsService {
     ];
     const wsFolders = SettingsUtils.getWorkspaceFoldersPath(true);
 
-    // if no configuration for local or remote copybook paths is provided
-    // use pattern for workspace folder and subfolders as a default value
-    if (
-      paths.length === 0 &&
-      this.getCopybookConfigValues(PATHS_DSN, documentUri, dialectType)
-        .length === 0 &&
-      this.getCopybookConfigValues(PATHS_USS, documentUri, dialectType)
-        .length === 0
-    ) {
-      paths.push("**");
+    if (convertToAbsolutePaths) {
+      return SettingsService.prepareLocalSearchFolders(paths, wsFolders);
     }
-
-    return SettingsService.prepareLocalSearchFolders(paths, wsFolders);
+    return paths;
   }
 
   public static async getCopybookExtension(
-    documentUri: string,
+    documentUri?: string,
   ): Promise<string[] | undefined> {
     const global: string[] | undefined = vscode.workspace
       .getConfiguration(SETTINGS_CPY_SECTION)
@@ -406,6 +424,36 @@ export class SettingsService {
       .get(section);
     return SettingsService.evaluateVariables(pathList, vars);
   }
+
+  /**
+   * Gets unreachable code diagnostics severity
+   * @returns Error, Warning, Information for ERROR, WARN, INFO, HINT or undefined for all other cases
+   */
+  public static getUnreachableCodeSeverity():
+    | vscode.DiagnosticSeverity
+    | undefined {
+    const value: string =
+      vscode.workspace
+        .getConfiguration()
+        .get(SETTINGS_UNREACHABLE_CODE_SEVERITY) ?? NONE;
+
+    const severity = SettingsService.severityMap.get(value);
+    return severity;
+  }
+
+  /**
+   * Gets maximum VM count
+   * @returns maximum VM count
+   */
+  public static getMaxVMCount(): number {
+    let maxCount: number =
+      vscode.workspace.getConfiguration().get(SETTINGS_MAXIMUM_VM_COUNT) ?? 0;
+    if (maxCount === 0) {
+      maxCount = MAX_VM_COUNT;
+    }
+    return maxCount;
+  }
+
   public static prepareLocalSearchFolders(
     paths: string[],
     wsFolders: string[],
@@ -416,6 +464,21 @@ export class SettingsService {
       else
         wsFolders.forEach((wsFolder) => {
           result.push(path.join(wsFolder, p));
+        });
+    }
+    return result;
+  }
+
+  public static prepareLocalSearchUris(
+    paths: string[],
+    wsFolders: readonly vscode.WorkspaceFolder[],
+  ): vscode.Uri[] {
+    const result: vscode.Uri[] = [];
+    for (const p of paths) {
+      if (path.isAbsolute(p)) result.push(vscode.Uri.file(p));
+      else
+        wsFolders.forEach((wsFolder) => {
+          result.push(vscode.Uri.joinPath(wsFolder.uri, p));
         });
     }
     return result;

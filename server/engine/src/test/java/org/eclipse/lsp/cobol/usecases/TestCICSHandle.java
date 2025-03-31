@@ -69,7 +69,10 @@ public class TestCICSHandle {
           "HANDLE CONDITION {CONDITION|errorOne} ERROR";
 
   private static final String HANDLE_CONDITION_INVALID_THREE =
-          "HANDLE CONDITION NORMAL {NORMAL|errorOne}";
+          "HANDLE CONDITION ERROR {ERROR|errorOne}";
+
+  private static final String HANDLE_CONDITION_INVALID_FOUR =
+          "HANDLE CONDITION {NORMAL|errorOne} ERROR";
 
   private static final String HANDLE_CONDITION_INVALID_WRBRK =
           "HANDLE CONDITION WRBRK {WRBRK|errorOne}";
@@ -212,7 +215,20 @@ public class TestCICSHandle {
                     "errorOne",
                     new Diagnostic(
                             new Range(),
-                            "Excessive options provided for: NORMAL",
+                            "Excessive options provided for: ERROR",
+                            DiagnosticSeverity.Error,
+                            ErrorSource.PARSING.getText())));
+  }
+
+  @Test
+  void testHandleConditionInvalidFour() {
+    CICSTestUtils.errorTest(
+            HANDLE_CONDITION_INVALID_FOUR,
+            ImmutableMap.of(
+                    "errorOne",
+                    new Diagnostic(
+                            new Range(),
+                            "Invalid option provided: NORMAL",
                             DiagnosticSeverity.Error,
                             ErrorSource.PARSING.getText())));
   }

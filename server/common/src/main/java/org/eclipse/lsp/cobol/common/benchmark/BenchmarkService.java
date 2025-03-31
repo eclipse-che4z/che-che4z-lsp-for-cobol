@@ -46,4 +46,10 @@ public interface BenchmarkService {
    * Log accumulated timing information.
    */
   void logTiming();
+
+  /**
+   * Ends a benchmark session for an uri
+   * @param programUri document uri
+   */
+  void endSession(String programUri);
 }

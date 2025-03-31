@@ -104,7 +104,7 @@ public class CICSTransformOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
             }
         } else if (!ctx.XMLTODATA().isEmpty()) {
             checkHasMandatoryOptions(ctx.CHANNEL(), ctx, "CHANNEL");
-            checkHasMandatoryOptions(ctx.XMLTRANSFORM(), ctx, "XMLTRANSFORM");
+            checkHasMandatoryOptions(ctx.XMLCONTAINER(), ctx, "XMLCONTAINER");
         }
 
         checkHasExactlyOneOption("DATATOXML or XMLTODATA", ctx, ctx.DATATOXML(), ctx.XMLTODATA());

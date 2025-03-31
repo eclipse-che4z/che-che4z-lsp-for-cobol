@@ -80,18 +80,19 @@ public class TestCicsSendStatement {
   private static final String SEND_MAP_FREEKB_ALARM_VALID = "SEND MAP({$varOne}) FREEKB ALARM";
   private static final String SEND_MAP_FORMFEED_PRINT_VALID = "SEND MAP({$varOne}) FORMFEED PRINT";
 
-  private static final String SEND_MAP_MAPPINGDEV_INVALID = "SEND {MAP(123) MAPPINGDEV(123)|error1}";
-  private static final String SEND_MAP_MAPPINGDEV_SET_VALID = "SEND MAP({$varFour}) MAPPINGDEV({$varTwo}) SET({$varThree})";
-  private static final String SEND_MAP_MAPPINGDEV_MAPSET_VALID = "SEND MAP({$varFour}) MAPPINGDEV({$varTwo}) SET({$varThree}) MAPSET({$varFour})";
+  private static final String SEND_MAP_MAPPINGDEV_INVALID = "SEND {_MAP({$varThree}) FROM({$varFive}) MAPPINGDEV({$varFour})|error1_}";
+  private static final String SEND_MAP_MAPPINGDEV_SET_VALID = "SEND MAP({$varFour}) MAPPINGDEV({$varTwo}) SET({$varThree}) FROM({$varFive})";
+  private static final String SEND_MAP_MAPPINGDEV_MAPSET_VALID = "SEND MAP({$varFour}) MAPPINGDEV({$varTwo}) SET({$varThree}) MAPSET({$varFour}) FROM({$varFive})";
   private static final String SEND_MAP_MAPPINGDEV_FROM_LENGTH_VALID = "SEND MAP({$varFour}) MAPPINGDEV({$varTwo}) SET({$varThree}) FROM({$varFour}) LENGTH({$varFive})";
-  private static final String SEND_MAP_MAPPINGDEV_DATAONLY_MAPONLY_VALID = "SEND MAP({$varFour}) MAPPINGDEV({$varTwo}) SET({$varThree}) {DATAONLY|error1} {MAPONLY|error2}";
-  private static final String SEND_MAP_MAPPINGDEV_MAPONLY_VALID = "SEND MAP({$varFour}) MAPPINGDEV({$varTwo}) SET({$varThree}) MAPONLY";
-  private static final String SEND_MAP_MAPPINGDEV_CURSOR_VALID = "SEND MAP({$varFour}) MAPPINGDEV({$varTwo}) SET({$varThree}) CURSOR({$varFour})";
-  private static final String SEND_MAP_MAPPINGDEV_ERASE_VALID = "SEND MAP({$varFour}) MAPPINGDEV({$varTwo}) SET({$varThree}) ERASE";
-  private static final String SEND_MAP_MAPPINGDEV_ERASEAUP_INVALID = "SEND MAP({$varFour}) MAPPINGDEV({$varTwo}) SET({$varThree}) {ERASE|error1} {ERASEAUP|error2}";
-  private static final String SEND_MAP_MAPPINGDEV_FREEKB_ALARM_VALID = "SEND MAP({$varFour}) MAPPINGDEV({$varTwo}) SET({$varThree}) FREEKB ALARM";
-  private static final String SEND_MAP_MAPPINGDEV_FORMFEED_PRINT_VALID = "SEND MAP({$varFour}) MAPPINGDEV({$varTwo}) SET({$varThree}) FORMFEED PRINT";
-  private static final String SEND_MAP_MAPPINGDEV_FRSET_VALID = "SEND MAP({$varFour}) MAPPINGDEV({$varTwo}) SET({$varThree}) FRSET";
+  private static final String SEND_MAP_MAPPINGDEV_DATAONLY_MAPONLY_VALID = "SEND MAP({$varFour}) MAPPINGDEV({$varTwo}) SET({$varThree}) {MAPONLY|error1} {FROM|error2}({$varFive})";
+  private static final String SEND_MAP_MAPPINGDEV_MAPONLY_VALID = "SEND MAP({$varFour}) MAPPINGDEV({$varTwo}) SET({$varThree}) FROM({$varFive})";
+  private static final String SEND_MAP_MAPPINGDEV_CURSOR_VALID = "SEND MAP({$varFour}) MAPPINGDEV({$varTwo}) SET({$varThree}) CURSOR({$varFour}) FROM({$varFive})";
+  private static final String SEND_MAP_MAPPINGDEV_ERASE_VALID = "SEND MAP({$varFour}) MAPPINGDEV({$varTwo}) SET({$varThree}) ERASE FROM({$varFive})";
+  private static final String SEND_MAP_MAPPINGDEV_ERASEAUP_INVALID = "SEND MAP({$varFour}) MAPPINGDEV({$varTwo}) SET({$varThree}) {ERASE|error1} {ERASEAUP|error2} FROM({$varFive})";
+  private static final String SEND_MAP_MAPPINGDEV_FREEKB_ALARM_VALID = "SEND MAP({$varFour}) MAPPINGDEV({$varTwo}) SET({$varThree}) FREEKB ALARM FROM({$varFive})";
+  private static final String SEND_MAP_MAPPINGDEV_FORMFEED_PRINT_VALID = "SEND MAP({$varFour}) MAPPINGDEV({$varTwo}) SET({$varThree}) FORMFEED PRINT FROM({$varFive})";
+  private static final String SEND_MAP_MAPPINGDEV_FORMFEED_PRINT_INVALID = "SEND {_MAP({$varFour}) MAPPINGDEV({$varTwo}) SET({$varThree}) FORMFEED PRINT|error1_}";
+  private static final String SEND_MAP_MAPPINGDEV_FRSET_VALID = "SEND MAP({$varFour}) MAPPINGDEV({$varTwo}) SET({$varThree}) FRSET FROM({$varFive})";
   private static final String SEND_MAP_MAPPINGDEV_COMPLEX_VALID = "SEND MAP({$varFour}) MAPPINGDEV({$varTwo}) SET({$varThree}) MAPSET({$varFour}) FROM({$varFive}) LENGTH({$varSix}) CURSOR({$varSix}) ERASE FREEKB ALARM";
 
   private static final String SEND_PAGE_RELEASE_VALID = "SEND PAGE RELEASE";
@@ -489,13 +490,13 @@ public class TestCicsSendStatement {
                     "error1",
                     new Diagnostic(
                             new Range(),
-                            "Exactly one option required, options are mutually exclusive: DATAONLY or MAPONLY",
+                            "Exactly one option required, options are mutually exclusive: FROM or MAPONLY",
                             DiagnosticSeverity.Error,
                             ErrorSource.PARSING.getText()),
                     "error2",
                     new Diagnostic(
                             new Range(),
-                            "Exactly one option required, options are mutually exclusive: DATAONLY or MAPONLY",
+                            "Exactly one option required, options are mutually exclusive: FROM or MAPONLY",
                             DiagnosticSeverity.Error,
                             ErrorSource.PARSING.getText())));
   }
@@ -542,6 +543,19 @@ public class TestCicsSendStatement {
   @Test
   void testSendMapMappingdevFormfeedPrintValid() {
     CICSTestUtils.noErrorTest(SEND_MAP_MAPPINGDEV_FORMFEED_PRINT_VALID);
+  }
+
+  @Test
+  void testSendMapMappingdevFormfeedPrintInvalid() {
+    CICSTestUtils.errorTest(
+            SEND_MAP_MAPPINGDEV_FORMFEED_PRINT_INVALID,
+            ImmutableMap.of(
+                    "error1",
+                    new Diagnostic(
+                            new Range(),
+                            "Missing required option: FROM when specifying MAP or MAPSET parameter without literal",
+                            DiagnosticSeverity.Error,
+                            ErrorSource.PARSING.getText())));
   }
 
   @Test

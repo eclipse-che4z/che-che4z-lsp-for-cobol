@@ -14,9 +14,9 @@
 
 import * as vscode from "vscode";
 import { gotoCopybookSettings } from "../../commands/OpenSettingsCommand";
-import { TelemetryService } from "../../services/reporter/TelemetryService";
+import { registerEvent } from "../../services/reporter";
 
-jest.mock("../../services/reporter/TelemetryService");
+jest.mock("../../services/reporter");
 jest.mock("vscode", () => ({
   commands: {
     executeCommand: jest.fn(),
@@ -27,7 +27,7 @@ test("check gotoCopybookSettings calls telemetry services and vscode execute com
   expect(gotoCopybookSettings).toBeTruthy();
   gotoCopybookSettings();
 
-  expect(TelemetryService.registerEvent).toHaveBeenCalledWith(
+  expect(registerEvent).toHaveBeenCalledWith(
     "Open copybook settings",
     ["COBOL", "copybook", "settings"],
     "The user invokes the open settings quick fix to see the copybook locations stored in the settings file",

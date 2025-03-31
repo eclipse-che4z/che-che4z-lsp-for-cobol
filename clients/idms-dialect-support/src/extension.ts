@@ -37,6 +37,14 @@ export async function activate(context: vscode.ExtensionContext) {
     description: "IDMS dialect support",
     snippets,
     jar,
+    isCopyStatement: (statement: string) => {
+      const regex = /^.*\bCOPY\s+IDMS(?:\s+"?'?)(\S+)?$/i;
+      const match = statement.match(regex);
+      if (!match) {
+        return { isCopy: false };
+      }
+      return { isCopy: true, prefix: match[1] };
+    },
   });
   if (unregister instanceof Error) {
     vscode.window.showErrorMessage(unregister.toString());

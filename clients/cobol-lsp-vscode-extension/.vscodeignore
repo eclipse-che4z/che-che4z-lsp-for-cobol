@@ -21,6 +21,7 @@
 !LICENSE
 !README.md
 !CHANGELOG.md
+!telemetry.key
 !resources/logo.png
 !resources/TELEMETRY_KEY
 !package.json
@@ -39,6 +40,7 @@
 !dist/extension.js.map
 !dist/web/extension.js
 !dist/web/extension.js.map
+!dist/Worker.js
 # ** server implementation 
 !server/native/*
 !server/jar/server.jar

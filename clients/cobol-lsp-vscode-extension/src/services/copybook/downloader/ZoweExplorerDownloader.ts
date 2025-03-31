@@ -16,11 +16,14 @@ import * as iconv from "iconv-lite";
 import { SettingsService } from "../../Settings";
 import { CopybookURI } from "../CopybookURI";
 import { getErrorMessage } from "../../util/ErrorsUtils";
+import { FAILED_REQUESTS_LIMIT } from "../../../constants";
+import { hasMember } from "../../util/Utils";
 
 export abstract class ZoweExplorerDownloader {
   public static profileStore: Map<string, "locked-profile" | "valid-profile"> =
     new Map();
   protected memberListCache: Map<string, string[]> = new Map();
+  protected failedRequests: Map<string, number> = new Map();
   private ZoweDownloadQueue = new Map<string, Promise<boolean>>();
 
   public clearZoweDownloadQueue() {
@@ -45,8 +48,10 @@ export abstract class ZoweExplorerDownloader {
     loadedProfile: IProfileLoaded,
   ) {
     const copybookEncoding = SettingsService.getCopybookFileEncoding();
-    const baseUri = vscode.Uri.file(
-      CopybookURI.createDatasetPath(profileName, dataset, this.storagePath),
+    const baseUri = CopybookURI.createDatasetPath(
+      [profileName],
+      dataset,
+      this.storagePath,
     );
     const fileUri = vscode.Uri.joinPath(baseUri, member);
     return {
@@ -85,7 +90,7 @@ export abstract class ZoweExplorerDownloader {
     profileName: string,
   ): Promise<boolean> {
     const copybookPath = CopybookURI.createCopybookPath(
-      profileName,
+      [profileName],
       dataset,
       member,
       this.storagePath,
@@ -117,5 +122,41 @@ export abstract class ZoweExplorerDownloader {
    */
   public clearMemberListCache() {
     this.memberListCache.clear();
+  }
+
+  public reenableFailedRequests() {
+    this.failedRequests.clear();
+  }
+
+  public async limitFailedRequests(
+    requestId: string,
+    request: () => Promise<void>,
+  ) {
+    const attempt = this.failedRequests.get(requestId) ?? 1;
+    if (attempt <= FAILED_REQUESTS_LIMIT) {
+      try {
+        return await request();
+      } catch (err) {
+        this.failedRequests.set(requestId, attempt + 1);
+        if (attempt === FAILED_REQUESTS_LIMIT) {
+          void (async () => {
+            const errorMessage =
+              hasMember(err, "message") && typeof err.message === "string"
+                ? err.message
+                : "";
+            const selection = await vscode.window.showErrorMessage(
+              `Request to ${requestId} keeps failing repeatedly. Disabling future requests. ${errorMessage}`,
+              "Keep disabled",
+              "Reenable",
+            );
+            if (selection === "Reenable") {
+              this.failedRequests.set(requestId, 0);
+            }
+          })();
+        }
+
+        throw err;
+      }
+    }
   }
 }

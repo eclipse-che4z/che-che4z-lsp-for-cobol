@@ -18,6 +18,11 @@ import { SETTINGS_DIALECT } from "../constants";
 
 export const DIALECT_REGISTRY_SECTION = "cobol-lsp.dialect.registry";
 
+export type CopyStatementParser = (statement: string) => {
+  isCopy: boolean;
+  prefix?: string;
+};
+
 /**
  * Holds information about registered dialect
  */
@@ -27,6 +32,7 @@ export type DialectInfo = {
   description: string;
   extensionId: string;
   snippetPath: string;
+  isCopyStatement?: CopyStatementParser;
 };
 
 const dialectInfoes: Map<string, DialectInfo> = new Map();
@@ -70,7 +76,8 @@ export class DialectRegistry {
    * @param path to jar file
    * @param description of a dialect
    * @param extensionId is an extension id
-   * @param snippets is a spippet map for a dialect
+   * @param snippets is a snippet map for a dialect
+   * @param isCopyStatement function to identify and parse COPY statement of a dialect
    */
   public static register(
     extensionId: string,
@@ -78,6 +85,7 @@ export class DialectRegistry {
     uri: Uri,
     description: string,
     snippetPath: string,
+    isCopyStatement?: CopyStatementParser,
   ) {
     const dialectInfo: DialectInfo = {
       name: name,
@@ -85,6 +93,7 @@ export class DialectRegistry {
       description: description,
       extensionId: extensionId,
       snippetPath: snippetPath,
+      isCopyStatement: isCopyStatement,
     };
     dialectInfoes.set(dialectInfo.name, dialectInfo);
   }

@@ -38,6 +38,9 @@ public class TestCICSDocument {
   private static final String DOCUMENT_CREATE_INVALID_MULTIPLE_SOURCES =
           "DOCUMENT CREATE DOCTOKEN({$varOne}) {FROM|errorOne}({$varTwo}) {TEXT|errorTwo}({$varThree}) LENGTH({$varFour})";
 
+  private static final String DOCUMENT_CREATE_INVALID_NO_LENGTH =
+          "DOCUMENT {_CREATE DOCTOKEN({$varOne}) FROM({$varTwo})|errorOne_}";
+
   private static final String DOCUMENT_DELETE_VALID =
           "DOCUMENT DELETE DOCTOKEN({$varOne})";
 
@@ -46,6 +49,9 @@ public class TestCICSDocument {
 
   private static final String DOCUMENT_INSERT_VALID =
           "DOCUMENT INSERT DOCTOKEN({$varOne}) TEXT({$varTwo}) LENGTH({$varThree})";
+
+  private static final String DOCUMENT_INSERT_INVALID =
+          "DOCUMENT {_INSERT DOCTOKEN({$varOne}) LENGTH({$varTwo})|errorOne_}";
 
   private static final String DOCUMENT_INSERT_INVALID_NO_DOCTOKEN =
           "DOCUMENT {_INSERT TEXT({$varTwo}) LENGTH(123)|errorOne_}";
@@ -109,6 +115,19 @@ public class TestCICSDocument {
   }
 
   @Test
+  void testDocumentCreateInvalidNoLength() {
+    CICSTestUtils.errorTest(
+            DOCUMENT_CREATE_INVALID_NO_LENGTH,
+            ImmutableMap.of(
+                    "errorOne",
+                    new Diagnostic(
+                            new Range(),
+                            "Missing required option: LENGTH",
+                            DiagnosticSeverity.Error,
+                            ErrorSource.PARSING.getText())));
+  }
+
+  @Test
   void testDocumentDeleteValid() {
     CICSTestUtils.noErrorTest(DOCUMENT_DELETE_VALID);
   }
@@ -129,6 +148,19 @@ public class TestCICSDocument {
   @Test
   void testDocumentInsertValid() {
     CICSTestUtils.noErrorTest(DOCUMENT_INSERT_VALID);
+  }
+
+  @Test
+  void testDocumentInsertInvalid() {
+    CICSTestUtils.errorTest(
+            DOCUMENT_INSERT_INVALID,
+            ImmutableMap.of(
+                    "errorOne",
+                    new Diagnostic(
+                            new Range(),
+                            "Exactly one option required, none provided: FROM, TEXT or BINARY",
+                            DiagnosticSeverity.Error,
+                            ErrorSource.PARSING.getText())));
   }
 
   @Test

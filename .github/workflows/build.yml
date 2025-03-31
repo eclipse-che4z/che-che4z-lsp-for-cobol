@@ -16,10 +16,6 @@ env:
 on:
   workflow_dispatch:
     inputs:
-      with_telemetry:
-        description: "Build with telemetry"
-        required: true
-        default: 'false'
       skip_ui_tests:
         description: "Skip UI tests"
         required: true
@@ -46,6 +42,11 @@ jobs:
       - name: Install dependencies for COBOL LS
         working-directory: clients/cobol-lsp-vscode-extension
         run: npm ci
+      - name: Install & Build Analysis Package
+        working-directory: clients/analysis
+        run: |
+          npm ci
+          npm run compile     
       - name: Install & Build VS Code extension dialect API
         working-directory: clients/cobol-dialect-api
         run: |
@@ -61,6 +62,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Install dependencies for COBOL LS Analysis module
+        working-directory: clients/analysis
+        run: NODE_ENV=production npm ci
       - name: Install dependencies for COBOL LS API
         working-directory: clients/cobol-dialect-api
         run: NODE_ENV=production npm ci
@@ -130,6 +134,16 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
+      - name: Build Cobol Analysis Package Library
+        working-directory: clients/analysis
+        run: |
+          npm ci
+          npm run compile
+      - name: Upload Cobol Analysis Package Library
+        uses: actions/upload-artifact@v4
+        with:
+          name: analysis_lib
+          path: clients/analysis/*
       - name: Build VS Code extension dialect API
         working-directory: clients/cobol-dialect-api
         run: |
@@ -140,11 +154,23 @@ jobs:
         with:
           name: lib
           path: clients/cobol-dialect-api/lib/*    
+      - name: Unit Test COBOL LS Analysis package
+        working-directory: clients/analysis
+        run: |
+          npm ci
+          npm run test
       - name: Unit Test COBOL LS extension
         working-directory: clients/cobol-lsp-vscode-extension
         run: |
           npm ci
           npm run test
+      - name: Package default COBOL LS vsix
+        working-directory: clients/cobol-lsp-vscode-extension
+        run: |
+          npm ci
+          cp ../../server/engine/target/server.jar ./server/jar
+          npm run package
+          cp *.vsix ../../.
       - name: Package IDMS vsix
         working-directory: clients/idms-dialect-support
         run: |
@@ -171,6 +197,20 @@ jobs:
           if-no-files-found: warn
           name: vsix-daco-dialect
           path: 'cobol-language-support-for-daco*.vsix'
+      - name: Upload COBOL LS default vsix
+        uses: actions/upload-artifact@v4
+        with:
+          if-no-files-found: warn
+          name: vsix-cobol-ls-default
+          path: |
+            cobol-language-support-*.vsix
+            !cobol-language-support-for-*.vsix
+      - name: Run COBOL LS extension integration tests
+        working-directory: clients/cobol-lsp-vscode-extension
+        run: |
+          cp ../../server/engine/target/server.jar ./server/jar
+          npm run build
+          xvfb-run -a npm exec c8 -- --reporter=lcovonly --allowExternal --exclude="**/test/**" --exclude=".vscode-test/**" --exclude=".vscode-test-web/**" -- npm run test:integration
       - name: SonarCloud Scan
         if: github.ref == 'refs/heads/development'
         uses: sonarsource/sonarcloud-github-action@49e6cd3b187936a73b8280d59ffd9da69df63ec9
@@ -181,6 +221,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Compile COBOL LS Analysis package
+        working-directory: clients/analysis
+        run: |
+          npm ci
+          npm run compile           
       - name: Unit Test COBOL LS Web extension
         working-directory: clients/cobol-lsp-vscode-extension
         run: |
@@ -244,7 +289,6 @@ jobs:
         if: matrix.os == 'ubuntu-latest' && matrix.arch == 'x64'
         with:
           java-version: ${{ env.graalvm-version }}
-          components: 'native-image'
           distribution: 'graalvm-community'
           native-image-musl: 'true'
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -255,7 +299,6 @@ jobs:
         if: matrix.os != 'ubuntu-latest' || matrix.arch != 'x64'
         with:
           java-version: ${{ env.graalvm-version }}
-          components: 'native-image'
           distribution: 'graalvm-community'
           github-token: ${{ secrets.GITHUB_TOKEN }}
           ## uncomment me if you need native image job reports
@@ -367,6 +410,11 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
+      - name: Download VS Code Analysis package
+        uses: actions/download-artifact@v4
+        with:
+          name: analysis_lib
+          path: clients/analysis
       - name: Download VS Code extension dialect API
         uses: actions/download-artifact@v4
         with:
@@ -382,12 +430,6 @@ jobs:
       - name: Build COBOL LS extension 
         run: npm ci
         working-directory: clients/cobol-lsp-vscode-extension
-      - name: Inject telemetry key to COBOL LS extension
-        if: github.event.inputs.with_telemetry == 'true'
-        shell: bash
-        run: |
-          sed -i ${{ startsWith( matrix.os, 'macos') && '""' || '' }} "s/const TELEMETRY_KEY_ENCODED: string = TELEMETRY_DEFAULT_CONTENT/const TELEMETRY_KEY_ENCODED: string = '${{ secrets.TELEMETRY_INSTRUMENTATION_KEY }}'/" src/services/reporter/TelemetryReporterImpl.ts
-        working-directory: clients/cobol-lsp-vscode-extension         
       - name: Package COBOL LS vsix for ${{ env.target }}
         working-directory: clients/cobol-lsp-vscode-extension
         run: |
@@ -423,7 +465,7 @@ jobs:
         working-directory: clients/cobol-lsp-vscode-extension
       - name: Run integration tests
         if: github.event.inputs.skip_ui_tests != 'true'
-        run: ${{ matrix.os == 'ubuntu-latest' && 'xvfb-run' || '' }} npm run test:integration
+        run: ${{ matrix.os == 'ubuntu-latest' && 'xvfb-run' || '' }} npm run test:integration -- --native
         working-directory: clients/cobol-lsp-vscode-extension          
       - name: Run native executable test code
         working-directory: tests/native-executable-tests

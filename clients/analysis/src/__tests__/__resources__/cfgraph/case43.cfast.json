@@ -1,0 +1,146 @@
+[
+  {
+    "name": "PROG",
+    "type": "program",
+    "location": {
+      "uri": "/case43.cbl",
+      "start": {
+        "line": 3,
+        "character": 8
+      },
+      "end": {
+        "line": 11,
+        "character": 27
+      }
+    },
+    "children": [
+      {
+        "targetName": [
+          "PAR1"
+        ],
+        "type": "goto",
+        "location": {
+          "uri": "/case43.cbl",
+          "start": {
+            "line": 4,
+            "character": 12
+          },
+          "end": {
+            "line": 4,
+            "character": 22
+          }
+        }
+      },
+      {
+        "snippet": "       SEC1.\r\n           DISPLAY \"SEC1\".",
+        "name": "SEC1",
+        "type": "paragraph",
+        "location": {
+          "uri": "/case43.cbl",
+          "start": {
+            "line": 5,
+            "character": 8
+          },
+          "end": {
+            "line": 6,
+            "character": 27
+          }
+        },
+        "children": [
+          {
+            "type": "statement",
+            "location": {
+              "uri": "/case43.cbl",
+              "start": {
+                "line": 6,
+                "character": 12
+              },
+              "end": {
+                "line": 6,
+                "character": 26
+              }
+            }
+          }
+        ]
+      },
+      {
+        "snippet": "       PAR1.\r\n           DISPLAY \"PAR1\".\r\n           EXIT SECTION.",
+        "name": "PAR1",
+        "type": "paragraph",
+        "location": {
+          "uri": "/case43.cbl",
+          "start": {
+            "line": 7,
+            "character": 8
+          },
+          "end": {
+            "line": 9,
+            "character": 25
+          }
+        },
+        "children": [
+          {
+            "type": "statement",
+            "location": {
+              "uri": "/case43.cbl",
+              "start": {
+                "line": 8,
+                "character": 12
+              },
+              "end": {
+                "line": 8,
+                "character": 26
+              }
+            }
+          },
+          {
+            "type": "exitsection",
+            "location": {
+              "uri": "/case43.cbl",
+              "start": {
+                "line": 9,
+                "character": 12
+              },
+              "end": {
+                "line": 9,
+                "character": 24
+              }
+            }
+          }
+        ]
+      },
+      {
+        "snippet": "       PAR2.\r\n           DISPLAY \"PAR2\".",
+        "name": "PAR2",
+        "type": "paragraph",
+        "location": {
+          "uri": "/case43.cbl",
+          "start": {
+            "line": 10,
+            "character": 8
+          },
+          "end": {
+            "line": 11,
+            "character": 27
+          }
+        },
+        "children": [
+          {
+            "type": "statement",
+            "location": {
+              "uri": "/case43.cbl",
+              "start": {
+                "line": 11,
+                "character": 12
+              },
+              "end": {
+                "line": 11,
+                "character": 26
+              }
+            }
+          }
+        ]
+      }
+    ]
+  }
+]

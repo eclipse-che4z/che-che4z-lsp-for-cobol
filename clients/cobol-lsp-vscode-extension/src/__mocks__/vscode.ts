@@ -11,8 +11,9 @@
  * Contributors:
  *   Broadcom, Inc. - initial API and implementation
  */
-import path = require("path");
+import * as path from "path";
 import type {
+  CompletionItem as VSCodeCompletionItem,
   OutputChannel as OutputChannelType,
   Position as PositionType,
   Uri as UriType,
@@ -23,17 +24,28 @@ import { readFile } from "fs/promises";
 
 // eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace workspace {
-  export const workspaceFolders = [{}];
+  export const workspaceFolders = [
+    {
+      uri: UriMock.parse("/"),
+    },
+  ];
   export function getConfiguration() {
     return {
       get: (key: string) => {
         if ("cobol-lsp.smart-tab" === key) {
           return undefined;
         }
+        return jest.fn();
       },
     };
   }
-  export function createFileSystemWatcher() {}
+  export function createFileSystemWatcher() {
+    return {
+      onDidCreate: jest.fn(),
+      onDidDelete: jest.fn(),
+      onDidChange: jest.fn(),
+    };
+  }
   export const fs = {
     readFile: async (uri: UriType): Promise<Uint8Array | undefined> => {
       const path = uri.fsPath;
@@ -48,10 +60,17 @@ export namespace workspace {
     readDirectory: jest.fn().mockResolvedValue([["fileName", 2]]),
     createDirectory: jest.fn(),
   };
-  export function onDidChangeConfiguration() {}
+
+  export const onDidChangeConfiguration = jest
+    .fn()
+    .mockReturnValue("onDidChangeConfiguration");
   export const textDocuments = [];
   export function getWorkspaceFolder() {}
-  export async function findFiles() {}
+  export async function findFiles() {
+    return Promise.resolve([]);
+  }
+  export const onDidChangeTextDocument = jest.fn();
+  export const onDidCloseTextDocument = jest.fn();
 }
 
 // eslint-disable-next-line @typescript-eslint/no-namespace
@@ -69,8 +88,10 @@ export namespace extensions {
 
 // eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace window {
-  export const showErrorMessage = jest.fn();
-  export const showInformationMessage = jest.fn();
+  export const showErrorMessage = jest
+    .fn()
+    .mockImplementation(() => Promise.resolve());
+  export const showInformationMessage = jest.fn().mockReturnValue("Ok");
   export const createStatusBarItem = () => {
     return { show: () => {} };
   };
@@ -78,7 +99,6 @@ export namespace window {
     show: jest.fn(),
     onDidChangeSelection: jest.fn(),
   });
-
   export const setStatusBarMessage = jest.fn().mockResolvedValue(true);
   export const createOutputChannel = (name: string): OutputChannelType => ({
     name,
@@ -109,6 +129,11 @@ export namespace window {
     find: jest.fn(),
   };
   export const visibleTextEditors = [];
+  export const withProgress = jest
+    .fn()
+    .mockImplementation((_options, task: () => void) => {
+      task();
+    });
 }
 export enum StatusBarAlignment {
   Right,
@@ -201,6 +226,10 @@ export const TextEditorEdit = {
 export const languages = {
   registerCodeActionsProvider: jest.fn(),
   registerCompletionItemProvider: jest.fn(),
+  createDiagnosticCollection: jest.fn().mockReturnValue({
+    clear: jest.fn(),
+    delete: jest.fn(),
+  }),
 };
 
 class FileNotFound extends Error {
@@ -219,4 +248,23 @@ export const FileSystemError = {
 
 export const RelativePattern = jest
   .fn()
-  .mockImplementation((base: string, pattern: string) => ({ base, pattern }));
+  .mockImplementation((base: string, pattern: string) => ({
+    base,
+    pattern,
+  }));
+
+export const CompletionList = jest
+  .fn()
+  .mockImplementation(
+    (items?: VSCodeCompletionItem[], isIncomplete?: boolean) => ({
+      items,
+      isIncomplete,
+    }),
+  );
+
+export enum DiagnosticSeverity {
+  Error = 0,
+  Warning = 1,
+  Information = 2,
+  Hint = 3,
+}

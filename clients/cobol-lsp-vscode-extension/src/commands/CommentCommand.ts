@@ -65,13 +65,22 @@ export class ToggleComments {
    */
   public doIt() {
     const replacingList: SelectionObject[] = [];
-    for (const selection of this.textEditor.selections)
-      replacingList.push(this.handleSelection(selection));
+    for (const selection of this.textEditor.selections) {
+      replacingList.push(this.handleSelection(this.adjustSelection(selection)));
+    }
     if (replacingList.length === 0) return;
     this.textEditor.edit((editBuilder) => {
       for (const replacing of replacingList)
         editBuilder.replace(replacing.selection, replacing.text);
     });
+  }
+
+  private adjustSelection(s: vscode.Selection) {
+    if (s.isSingleLine || s.end.character !== 0) return s;
+    return new vscode.Selection(
+      s.start,
+      this.textEditor.document.lineAt(s.end.line - 1).range.end,
+    );
   }
 
   private handleSelection(selection: vscode.Selection): SelectionObject {

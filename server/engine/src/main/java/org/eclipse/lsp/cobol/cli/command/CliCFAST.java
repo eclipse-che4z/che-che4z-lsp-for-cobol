@@ -61,12 +61,13 @@ public class CliCFAST  implements Callable<Integer> {
         if (paths == null) {
           throw new Exception("Cannot find folder: " + workspace.toFile().getAbsolutePath());
         }
-
-        MessageJsonHandler handler = new MessageJsonHandler(ImmutableMap.of());
+        Gson gson = new MessageJsonHandler(ImmutableMap.of()).getGson().newBuilder()
+            .setPrettyPrinting()
+            .create();
 
         Arrays.stream(paths)
             .filter(CliCFAST::isCobolFile)
-            .forEach(file -> generateCFAST(file, builder, handler.getGson(), diCtx));
+            .forEach(file -> generateCFAST(file, builder, gson, diCtx));
       }
     } catch (Exception e) {
       System.out.println("Failed to generate CFAST: " + e.getMessage());

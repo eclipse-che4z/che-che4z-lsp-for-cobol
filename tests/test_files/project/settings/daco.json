@@ -8,5 +8,6 @@
       ],
     "cobol-lsp.cpy-manager.paths-dsn": [],
     "editor.snippetSuggestions": "top",
-     "cobol-lsp.dialects": ["DaCo"]
+     "cobol-lsp.dialects": ["DaCo"],
+     "cobol-lsp.maxVmCount": -1
 }

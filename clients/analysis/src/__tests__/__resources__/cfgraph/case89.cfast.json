@@ -1,0 +1,345 @@
+[
+  {
+    "name": "PROG",
+    "type": "program",
+    "location": {
+      "uri": "/case89.cbl",
+      "start": {
+        "line": 3,
+        "character": 8
+      },
+      "end": {
+        "line": 27,
+        "character": 21
+      }
+    },
+    "children": [
+      {
+        "type": "if",
+        "location": {
+          "uri": "/case89.cbl",
+          "start": {
+            "line": 4,
+            "character": 12
+          },
+          "end": {
+            "line": 6,
+            "character": 18
+          }
+        }
+      },
+      {
+        "from": {
+          "name": "PAR1"
+        },
+        "to": {
+          "name": "PAR2"
+        },
+        "type": "alter",
+        "location": {
+          "uri": "/case89.cbl",
+          "start": {
+            "line": 5,
+            "character": 16
+          },
+          "end": {
+            "line": 5,
+            "character": 45
+          }
+        }
+      },
+      {
+        "type": "endif",
+        "location": {
+          "uri": "/case89.cbl",
+          "start": {
+            "line": 4,
+            "character": 12
+          },
+          "end": {
+            "line": 6,
+            "character": 18
+          }
+        }
+      },
+      {
+        "targetName": [
+          "PAR1"
+        ],
+        "type": "goto",
+        "location": {
+          "uri": "/case89.cbl",
+          "start": {
+            "line": 7,
+            "character": 12
+          },
+          "end": {
+            "line": 7,
+            "character": 22
+          }
+        }
+      },
+      {
+        "name": "SEC1",
+        "snippet": "       SEC1 SECTION.\r\n\r\n       PAR1.\r\n           GO TO ALTER_PAR1.\r\n       PAR2.\r\n           GO TO ALTER_PAR2.\r\n       PAR3.\r\n           GO TO ALTER_PAR3.\r\n\r\n       ALTER_PAR1.",
+        "type": "section",
+        "location": {
+          "uri": "/case89.cbl",
+          "start": {
+            "line": 8,
+            "character": 8
+          },
+          "end": {
+            "line": 27,
+            "character": 21
+          }
+        },
+        "children": [
+          {
+            "snippet": "       PAR1.\r\n           GO TO ALTER_PAR1.",
+            "name": "PAR1",
+            "type": "paragraph",
+            "location": {
+              "uri": "/case89.cbl",
+              "start": {
+                "line": 10,
+                "character": 8
+              },
+              "end": {
+                "line": 11,
+                "character": 29
+              }
+            },
+            "children": [
+              {
+                "targetName": [
+                  "ALTER_PAR1"
+                ],
+                "type": "goto",
+                "location": {
+                  "uri": "/case89.cbl",
+                  "start": {
+                    "line": 11,
+                    "character": 12
+                  },
+                  "end": {
+                    "line": 11,
+                    "character": 28
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "snippet": "       PAR2.\r\n           GO TO ALTER_PAR2.",
+            "name": "PAR2",
+            "type": "paragraph",
+            "location": {
+              "uri": "/case89.cbl",
+              "start": {
+                "line": 12,
+                "character": 8
+              },
+              "end": {
+                "line": 13,
+                "character": 29
+              }
+            },
+            "children": [
+              {
+                "targetName": [
+                  "ALTER_PAR2"
+                ],
+                "type": "goto",
+                "location": {
+                  "uri": "/case89.cbl",
+                  "start": {
+                    "line": 13,
+                    "character": 12
+                  },
+                  "end": {
+                    "line": 13,
+                    "character": 28
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "snippet": "       PAR3.\r\n           GO TO ALTER_PAR3.",
+            "name": "PAR3",
+            "type": "paragraph",
+            "location": {
+              "uri": "/case89.cbl",
+              "start": {
+                "line": 14,
+                "character": 8
+              },
+              "end": {
+                "line": 15,
+                "character": 29
+              }
+            },
+            "children": [
+              {
+                "targetName": [
+                  "ALTER_PAR3"
+                ],
+                "type": "goto",
+                "location": {
+                  "uri": "/case89.cbl",
+                  "start": {
+                    "line": 15,
+                    "character": 12
+                  },
+                  "end": {
+                    "line": 15,
+                    "character": 28
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "snippet": "       ALTER_PAR1.\r\n           DISPLAY \"ALTER_PAR1\".\r\n           STOP RUN.",
+            "name": "ALTER_PAR1",
+            "type": "paragraph",
+            "location": {
+              "uri": "/case89.cbl",
+              "start": {
+                "line": 17,
+                "character": 8
+              },
+              "end": {
+                "line": 19,
+                "character": 21
+              }
+            },
+            "children": [
+              {
+                "type": "statement",
+                "location": {
+                  "uri": "/case89.cbl",
+                  "start": {
+                    "line": 18,
+                    "character": 12
+                  },
+                  "end": {
+                    "line": 18,
+                    "character": 32
+                  }
+                }
+              },
+              {
+                "type": "stop",
+                "location": {
+                  "uri": "/case89.cbl",
+                  "start": {
+                    "line": 19,
+                    "character": 12
+                  },
+                  "end": {
+                    "line": 19,
+                    "character": 20
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "snippet": "       ALTER_PAR2.\r\n           DISPLAY \"ALTER_PAR2\".\r\n           STOP RUN.",
+            "name": "ALTER_PAR2",
+            "type": "paragraph",
+            "location": {
+              "uri": "/case89.cbl",
+              "start": {
+                "line": 21,
+                "character": 8
+              },
+              "end": {
+                "line": 23,
+                "character": 21
+              }
+            },
+            "children": [
+              {
+                "type": "statement",
+                "location": {
+                  "uri": "/case89.cbl",
+                  "start": {
+                    "line": 22,
+                    "character": 12
+                  },
+                  "end": {
+                    "line": 22,
+                    "character": 32
+                  }
+                }
+              },
+              {
+                "type": "stop",
+                "location": {
+                  "uri": "/case89.cbl",
+                  "start": {
+                    "line": 23,
+                    "character": 12
+                  },
+                  "end": {
+                    "line": 23,
+                    "character": 20
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "snippet": "       ALTER_PAR3.\r\n           DISPLAY \"ALTER_PAR3\".\r\n           STOP RUN.",
+            "name": "ALTER_PAR3",
+            "type": "paragraph",
+            "location": {
+              "uri": "/case89.cbl",
+              "start": {
+                "line": 25,
+                "character": 8
+              },
+              "end": {
+                "line": 27,
+                "character": 21
+              }
+            },
+            "children": [
+              {
+                "type": "statement",
+                "location": {
+                  "uri": "/case89.cbl",
+                  "start": {
+                    "line": 26,
+                    "character": 12
+                  },
+                  "end": {
+                    "line": 26,
+                    "character": 32
+                  }
+                }
+              },
+              {
+                "type": "stop",
+                "location": {
+                  "uri": "/case89.cbl",
+                  "start": {
+                    "line": 27,
+                    "character": 12
+                  },
+                  "end": {
+                    "line": 27,
+                    "character": 20
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]

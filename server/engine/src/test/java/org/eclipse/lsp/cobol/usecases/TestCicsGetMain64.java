@@ -32,71 +32,18 @@ import java.util.Map;
  * <p>This class tests all variations of the GETMAIN64 command found in the link above.
  */
 public class TestCicsGetMain64 {
-    private static final String ALL_VALID_ONE = "GETMAIN64 SET({$varOne}) FLENGTH({$varTwo})  LOCATION({$varThree}) EXECUTABLE SHARED NOSUSPEND USERDATAKEY";
-    private static final String ALL_VALID_TWO = "GETMAIN64 FLENGTH({$varTwo}) SHARED EXECUTABLE LOCATION({$varTwo}) NOSUSPEND CICSDATAKEY SET({$varOne})";
-
-    private static final String SOME_VALID_ONE = "GETMAIN64 FLENGTH({$varThree}) SHARED CICSDATAKEY SET({$varOne}) LOCATION({$varTwo})";
-    private static final String SOME_VALID_TWO = "GETMAIN64 NOSUSPEND FLENGTH({$varThree}) SET({$varOne}) LOCATION({$varTwo}) EXECUTABLE";
-    private static final String SOME_VALID_THREE = "GETMAIN64 SET({$varOne}) NOSUSPEND FLENGTH({$varTwo}) USERDATAKEY";
-
-    private static final String BARE_VALID = "GETMAIN64 FLENGTH({$varTwo}) SET({$varOne})";
-
-    private static final String INVALID_ONE = "GETMAIN64 SET({$varTwo}) FLENGTH({$varThree}) {EXECUTABLE|error1} SHARED";
-    private static final String INVALID_TWO = "GETMAIN64 {USERDATAKEY|error1} FLENGTH({$varTwo}) SET({$varOne}) {CICSDATAKEY|error1}";
-
-    @Test
-    void testAllValidOne() {
-        CICSTestUtils.noErrorTest(ALL_VALID_ONE);
-    }
-
-    @Test
-    void testAllValidTwo() {
-        CICSTestUtils.noErrorTest(ALL_VALID_TWO);
-    }
-
-    @Test
-    void testSomeValidOne() {
-        CICSTestUtils.noErrorTest(SOME_VALID_ONE);
-    }
-
-    @Test
-    void testSomeValidTwo() {
-        CICSTestUtils.noErrorTest(SOME_VALID_TWO);
-    }
-
-    @Test
-    void testSomeValidThree() {
-        CICSTestUtils.noErrorTest(SOME_VALID_THREE);
-    }
-
-    @Test
-    void testBareValidOne() {
-        CICSTestUtils.noErrorTest(BARE_VALID);
-    }
+    private static final String INVALID_ONE = "{GETMAIN64|errorOne} SET({$varTwo}) FLENGTH({$varThree}) SHARED";
 
     @Test
     void testInvalidOne() {
         Map<String, Diagnostic> expectedDiagnostic =
                 ImmutableMap.of(
-                        "error1",
+                        "errorOne",
                         new Diagnostic(
                                 new Range(),
-                                "Invalid option provided: EXECUTABLE without LOCATION",
+                                "Invalid option provided: GETMAIN64 is only available in Assembly",
                                 DiagnosticSeverity.Error,
                                 ErrorSource.PARSING.getText()));
         CICSTestUtils.errorTest(INVALID_ONE, expectedDiagnostic);
-    }
-
-    @Test
-    void testInvalidTwo() {
-        Map<String, Diagnostic> expectedDiagnostic =
-                ImmutableMap.of(
-                        "error1",
-                        new Diagnostic(
-                                new Range(),
-                                "Exactly one option required, options are mutually exclusive: USERDATAKEY or CICSDATAKEY",
-                                DiagnosticSeverity.Error,
-                                ErrorSource.PARSING.getText()));
-        CICSTestUtils.errorTest(INVALID_TWO, expectedDiagnostic);
     }
 }

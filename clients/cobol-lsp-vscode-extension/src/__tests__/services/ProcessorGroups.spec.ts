@@ -22,6 +22,7 @@ import {
   loadProcessorGroupSqlBackendConfig,
 } from "../../services/ProcessorGroups";
 import * as glob from "glob";
+import { SettingsService } from "../../services/Settings";
 
 const WORKSPACE_URI = "file:///my/workspace";
 
@@ -31,9 +32,13 @@ jest.mock("fs", () => ({
 }));
 
 jest.mock("vscode", () => {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  const vscode = jest.requireActual("../../__mocks__/vscode");
   const WORKSPACE_URI_OBJ = new Uri("/my/workspace");
   const WORKSPACE_URI_OBJ_WIN32 = new Uri("/c:/my/workspace");
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
   return {
+    ...vscode,
     Uri,
     workspace: {
       fs: {
@@ -66,9 +71,21 @@ jest.mock("vscode", () => {
                               "name": "IDMSPG",
                               "preprocessor": [ "IDMS" ]
                           },
-                          {
+                         {
                               "name": "ABS",
-                              "libs": ["/abs"]
+                              "libs": [
+                                "/abs",
+                                { "dataset": "remote.dataset.location" },
+                                { "uss": "remote.uss.location" },
+                                {
+                                  "environment": "ENV",
+                                  "stage": "1",
+                                  "system": "SYSTEM",
+                                  "subsystem": "SUBSYTEM",
+                                  "type": "COPY",
+                                  "profile": "instance.internal.connection"
+                                }
+                              ]
                           }
                       ]
                   }`);
@@ -94,6 +111,9 @@ jest.mock("vscode", () => {
           ? { uri: WORKSPACE_URI_OBJ_WIN32 }
           : { uri: WORKSPACE_URI_OBJ },
       workspaceFolders: [{ uri: WORKSPACE_URI_OBJ }],
+      getConfiguration: jest.fn().mockReturnValue({
+        get: jest.fn().mockReturnValue(undefined),
+      }),
     },
   };
 });
@@ -151,7 +171,19 @@ describe("Processor groups configuration understand absolute paths", () => {
       section: "cobol-lsp.cpy-manager.paths-local",
     };
     const result = await loadProcessorGroupCopybookPathsConfig(item, []);
-    expect(result).toStrictEqual(["/copy-resolved-from-glob"]);
+    expect(result).toStrictEqual([
+      "/copy-resolved-from-glob",
+      { dataset: "remote.dataset.location" },
+      { uss: "remote.uss.location" },
+      {
+        environment: "ENV",
+        stage: "1",
+        system: "SYSTEM",
+        subsystem: "SUBSYTEM",
+        type: "COPY",
+        profile: "instance.internal.connection",
+      },
+    ]);
   });
 });
 
@@ -258,5 +290,14 @@ describe("Processor groups configuration provides lib path in Windows", () => {
     };
     const result = await loadProcessorGroupCopybookPathsConfig(item, []);
     expect(result).toStrictEqual(["copy-resolved-from-glob"]);
+  });
+});
+describe("Processor groups configurations prepared for download services", () => {
+  it("getCopybookLocalPath returns local paths only when remote locations provided in processor group definitions", async () => {
+    const paths = await SettingsService.getCopybookLocalPath(
+      WORKSPACE_URI + "/abs/TEST.cob",
+      "COBOL",
+    );
+    expect(paths).toStrictEqual(["/abs"]);
   });
 });

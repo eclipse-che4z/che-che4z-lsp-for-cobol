@@ -42,7 +42,7 @@ interface IUss {
     dataSetName: string,
     options?: unknown,
   ): Promise<IZosFilesResponse>;
-  fileList(ussFilePath: string): Promise<IZosFilesResponse>;
+  fileList(ussFilePath: string): Promise<IZosFilesResponseFileList>;
 }
 
 interface IMvs {
@@ -53,7 +53,7 @@ interface IMvs {
   allMembers(
     dataSetName: string,
     options?: unknown,
-  ): Promise<IZosFilesResponse>;
+  ): Promise<IZosFilesResponseMemberList>;
 }
 
 interface IProfileLoaded {
@@ -63,10 +63,21 @@ interface IProfileLoaded {
   name: string;
 }
 
-interface IZosFilesResponse {
+interface IZosFilesResponseFileList {
   apiResponse: {
     items: Array<{
       name: string;
+      mode: string;
+      size: number;
+      uid: number;
+      user: string;
+    }>;
+  };
+}
+
+interface IZosFilesResponseMemberList {
+  apiResponse: {
+    items: Array<{
       member: string;
     }>;
   };

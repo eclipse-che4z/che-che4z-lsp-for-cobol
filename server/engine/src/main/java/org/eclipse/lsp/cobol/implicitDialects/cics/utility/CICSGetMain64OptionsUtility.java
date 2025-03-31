@@ -66,6 +66,8 @@ public class CICSGetMain64OptionsUtility extends CICSOptionsCheckBaseUtility {
 
   @SuppressWarnings("unchecked")
   private void checkGetMain(CICSParser.Cics_getmain64_bodyContext ctx) {
+    CICSParser.Cics_getmain64Context parentCtx = (CICSParser.Cics_getmain64Context) ctx.getParent();
+    checkHasIllegalOptions(parentCtx.GETMAIN64(), "GETMAIN64 is only available in Assembly");
     checkHasMandatoryOptions(ctx.SET(), ctx, "SET");
     checkHasMandatoryOptions(ctx.FLENGTH(), ctx, "FLENGTH");
     if (ctx.LOCATION().isEmpty()) checkHasIllegalOptions(ctx.EXECUTABLE(), "EXECUTABLE without LOCATION");

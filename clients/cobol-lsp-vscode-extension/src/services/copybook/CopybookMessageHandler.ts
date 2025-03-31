@@ -74,13 +74,13 @@ async function getTargetFolderForCopybook(
     case CopybookFolderKind[CopybookFolderKind["downloaded-dsn"]]:
       result = SettingsService.getDsnPath(documentUri, dialectType).map(
         (dnsPath) =>
-          CopybookURI.createDatasetPath(profile, dnsPath, storagePath),
+          CopybookURI.createDatasetPath([profile], dnsPath, storagePath).fsPath,
       );
       break;
     case CopybookFolderKind[CopybookFolderKind["downloaded-uss"]]:
       result = SettingsService.getUssPath(documentUri, dialectType).map(
         (dnsPath) =>
-          CopybookURI.createDatasetPath(profile, dnsPath, storagePath),
+          CopybookURI.createDatasetPath([profile], dnsPath, storagePath).fsPath,
       );
       break;
   }

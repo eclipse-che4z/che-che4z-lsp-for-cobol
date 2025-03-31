@@ -25,6 +25,9 @@ export const SETTINGS_SUBROUTINE_LOCAL_KEY =
   "cobol-lsp.subroutine-manager.paths-local";
 export const SETTINGS_TAB_CONFIG: string = "cobol-lsp.smart-tab";
 export const SETTINGS_LSPCONFIG_SECTION: string = "cobol-lsp.lspconfig";
+export const SETTINGS_UNREACHABLE_CODE_SEVERITY: string =
+  "cobol-lsp.unreachable-code-severity";
+export const SETTINGS_MAXIMUM_VM_COUNT: string = "cobol-lsp.maxVmCount";
 
 export const SERVER_PORT = "cobol-lsp.server.port";
 export const SERVER_RUNTIME = "cobol-lsp.serverRuntime";
@@ -65,26 +68,31 @@ export const COBOL_EXT_ARRAY_CASE_INSENSITIVE = [
 export const COPYBOOK_CPY_EXT = ".CPY";
 export const COPYBOOK_EXTENSIONS = "copybook-extensions";
 export const COPYBOOK_EXT_ARRAY = [COPYBOOK_CPY_EXT];
+export const COPYBOOK_COMPLETIONS_SORT_PREFIX = 3;
+export const SUBROUTINE_COMPLETIONS_SORT_PREFIX = 4;
 export const EXTENSION_ID = "broadcommfd.cobol-language-support";
-export const TELEMETRY_DEFAULT_CONTENT = "";
 export const ZOWE_EXT_MISSING_MSG =
   "Zowe Explorer version 1.15.0 or higher is required to download copybooks from the mainframe.";
 export const INSTALL_ZOWE = "Install Zowe Explorer";
 export const DEFAULT_DIALECT = "COBOL";
 export const CLEARING_COPYBOOK_CACHE = "Clearing downloaded copybook cache";
 export const COPYBOOK_CACHE_CLEARED_INFO = "Downloaded copybooks removed";
-export const ZOWE_FOLDER: string = "zowe";
+export const ZOWE_FOLDER = "zowe";
 export const FAIL_CREATE_COPYBOOK_FOLDER_MSG = `Failed to create copybook internal folder`;
 export const FAIL_CREATE_GLOBAL_STORAGE_MSG = `Failed to create extension global storage folder`;
 export const E4E_SCHEME: string = "ndvr";
 export const OUTPUT_MSG_SEARCH_LOCATION = "Looking for location => ";
-export const E4E_FOLDER: string = "e4e";
+export const E4E_FOLDER = "e4e";
 export const DATASET = "dataset";
 export const ENVIRONMENT = "environment";
 export const USE_MAP = "MAP";
 export const SETTINGS_CPY_NDVR_DEPENDENCIES = "endevor-dependencies";
 export const ENDEVOR_PROCESSOR = "ENDEVOR_PROCESSOR";
 export const E4E_INCOMPATIBLE = "E4E interface is not compatible";
+export const USS = "uss";
+export const PROVIDE_PROFILE_MSG_PROC_GRUOPS =
+  "Please specify a valid Zowe Explorer profile in proc_grps.json to download copybooks from the mainframe.";
+export const FAILED_REQUESTS_LIMIT = 3;
 
 export enum PUNCH_CARD {
   SEQUENCE_AREA_END_POS = 6,

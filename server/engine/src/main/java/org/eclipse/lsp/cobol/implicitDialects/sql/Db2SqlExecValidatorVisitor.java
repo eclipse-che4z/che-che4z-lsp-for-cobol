@@ -56,6 +56,14 @@ public class Db2SqlExecValidatorVisitor extends Db2SqlExecParserBaseVisitor<List
   }
 
   @Override
+  public List<Node> visitDbs_minus_one(Db2SqlExecParser.Dbs_minus_oneContext ctx) {
+    if (!ctx.INTEGERLITERAL().getText().equals("1")) {
+      addSyntaxError(ctx, "parsers.validValueMsg", ctx.getText(), "-1");
+    }
+    return visitChildren(ctx);
+  }
+
+  @Override
   public List<Node> visitDbs_integer1200(Db2SqlExecParser.Dbs_integer1200Context ctx) {
     validateValue(ctx, "1200");
     return visitChildren(ctx);
@@ -114,28 +122,11 @@ public class Db2SqlExecValidatorVisitor extends Db2SqlExecParserBaseVisitor<List
   }
 
   @Override
-  public List<Node> visitDbs_procedure_language(
-      Db2SqlExecParser.Dbs_procedure_languageContext ctx) {
-    validateTokenWithRegex(
-        ctx,
-        "(?i)\\b(ASSEMBLE|C|COBOL|JAVA|PLI|REXX)\\b",
-        "unknown token. Supported tokens are JAVA, ASSEMBLE, C, COBOL, PLI, REXX");
-    return visitChildren(ctx);
-  }
-
-  @Override
   public List<Node> visitOneof_lang(Db2SqlExecParser.Oneof_langContext ctx) {
     validateTokenWithRegex(
         ctx,
         "(?i)\\b(ASSEMBLE|C|COBOL|JAVA|PLI|REXX|SQL)\\b",
         "unknown token. Supported tokens are JAVA, ASSEMBLE, C, COBOL, PLI, REXX, SQL");
-    return visitChildren(ctx);
-  }
-
-  @Override
-  public List<Node> visitDbs_exact_match_identifier_sql(
-      Db2SqlExecParser.Dbs_exact_match_identifier_sqlContext ctx) {
-    validateValue(ctx, "SQL");
     return visitChildren(ctx);
   }
 
@@ -169,6 +160,12 @@ public class Db2SqlExecValidatorVisitor extends Db2SqlExecParserBaseVisitor<List
   @Override
   public List<Node> visitDbs_smallint(Db2SqlExecParser.Dbs_smallintContext ctx) {
     validateTextInRange(ctx, -2, 100);
+    return visitChildren(ctx);
+  }
+
+  @Override
+  public List<Node> visitDbs_dsize_parameter(Db2SqlExecParser.Dbs_dsize_parameterContext ctx) {
+    validateTokenWithRegex(ctx, "\\d+\\s*[Gg]", "db2SqlParser.size");
     return visitChildren(ctx);
   }
 

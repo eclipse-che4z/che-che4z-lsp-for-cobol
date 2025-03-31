@@ -15,7 +15,7 @@
 import * as vscode from "vscode";
 import { ServerRuntimeCodeActionProvider } from "../../../services/nativeLanguageClient/serverRuntimeCodeActionProvider";
 
-jest.mock("../../../services/reporter/TelemetryService");
+jest.mock("../../../services/reporter");
 describe("Tests the server code actions", () => {
   let range: vscode.Range;
   beforeAll(() => {

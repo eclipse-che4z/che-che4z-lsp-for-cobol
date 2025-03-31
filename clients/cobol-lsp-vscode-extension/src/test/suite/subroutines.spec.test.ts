@@ -12,6 +12,7 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
+import * as vscode from "vscode";
 import * as helper from "./testHelper";
 import * as assert from "assert";
 
@@ -26,8 +27,33 @@ suite("Integration Test Suite: Subroutines resolving", () => {
     this.timeout(helper.TEST_TIMEOUT);
     await helper.showDocument("CALL.cbl");
     const editor = helper.getEditor("CALL.cbl");
-    const diagnostics = await helper.waitForDiagnostics(editor.document.uri);
-    assert.strictEqual(diagnostics.length, 1);
-    assert.strictEqual(diagnostics[0].message, "SUB2: Subroutine not found");
+
+    await helper.waitFor(
+      () => vscode.languages.getDiagnostics(editor.document.uri).length === 1,
+    );
+    helper.hasDiagnosticMatches(
+      editor.document.uri,
+      (d) => d.message === "SUB2: Subroutine not found",
+    );
+  });
+
+  test("Subroutines auto completions are provided", async function () {
+    this.timeout(helper.TEST_TIMEOUT);
+    const editor = await helper.showDocument("CALL.cbl");
+    await helper.insertString(
+      editor,
+      helper.pos(23, 0),
+      "           CALL ''.\n",
+    );
+    helper.moveCursor(editor, helper.pos(23, 17));
+    const completions = await helper.triggerCompletionsAndWaitForResults();
+    const position = completions.items.findIndex((ci) => ci.label === "SUB1");
+    await helper.executeCommandMultipleTimes("selectNextSuggestion", position);
+    await vscode.commands.executeCommand("acceptSelectedSuggestion");
+    await helper.waitFor(() => {
+      return editor.document.lineAt(23).text.trim() === "CALL 'SUB1'.";
+    });
+    const line = editor.document.lineAt(23).text.trim();
+    assert.strictEqual(line, "CALL 'SUB1'.");
   });
 });

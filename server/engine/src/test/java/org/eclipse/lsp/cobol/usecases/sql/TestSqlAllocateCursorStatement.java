@@ -27,7 +27,7 @@ class TestSqlAllocateCursorStatement {
           + "       PROGRAM-ID. HELLO-SQL.\n"
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
-          + "       01 {$*LOC1}  PIC X.\n"
+          + "       01 {$*LOC1}  SQL TYPE IS RESULT-SET-LOCATOR VARYING.\n"
           + "       PROCEDURE DIVISION.\n"
           + "           EXEC SQL\n"
           + "             ALLOCATE C1 CURSOR FOR RESULT SET :{$LOC1};\n"

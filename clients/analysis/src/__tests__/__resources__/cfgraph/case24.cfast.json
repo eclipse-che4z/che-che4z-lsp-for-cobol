@@ -1,0 +1,203 @@
+[
+  {
+    "name": "CFGPSQE",
+    "type": "program",
+    "location": {
+      "uri": "/case24.cbl",
+      "start": {
+        "line": 3,
+        "character": 8
+      },
+      "end": {
+        "line": 15,
+        "character": 29
+      }
+    },
+    "children": [
+      {
+        "type": "statement",
+        "location": {
+          "uri": "/case24.cbl",
+          "start": {
+            "line": 4,
+            "character": 12
+          },
+          "end": {
+            "line": 4,
+            "character": 25
+          }
+        }
+      },
+      {
+        "targetName": "PARAG2",
+        "type": "perform",
+        "location": {
+          "uri": "/case24.cbl",
+          "start": {
+            "line": 5,
+            "character": 12
+          },
+          "end": {
+            "line": 5,
+            "character": 26
+          }
+        }
+      },
+      {
+        "snippet": "       PARAG1.\r\n           DISPLAY \u0027PARAG1\u0027.\r\n           STOP RUN.",
+        "name": "PARAG1",
+        "type": "paragraph",
+        "location": {
+          "uri": "/case24.cbl",
+          "start": {
+            "line": 6,
+            "character": 8
+          },
+          "end": {
+            "line": 8,
+            "character": 21
+          }
+        },
+        "children": [
+          {
+            "type": "statement",
+            "location": {
+              "uri": "/case24.cbl",
+              "start": {
+                "line": 7,
+                "character": 12
+              },
+              "end": {
+                "line": 7,
+                "character": 28
+              }
+            }
+          },
+          {
+            "type": "stop",
+            "location": {
+              "uri": "/case24.cbl",
+              "start": {
+                "line": 8,
+                "character": 12
+              },
+              "end": {
+                "line": 8,
+                "character": 20
+              }
+            }
+          }
+        ]
+      },
+      {
+        "snippet": "       PARAG2.\r\n           DISPLAY \u0027PARAG2\u0027.\r\n           IF 1 \u003c 2 THEN\r\n                GO TO PARAG3\r\n           END-IF.",
+        "name": "PARAG2",
+        "type": "paragraph",
+        "location": {
+          "uri": "/case24.cbl",
+          "start": {
+            "line": 9,
+            "character": 8
+          },
+          "end": {
+            "line": 13,
+            "character": 19
+          }
+        },
+        "children": [
+          {
+            "type": "statement",
+            "location": {
+              "uri": "/case24.cbl",
+              "start": {
+                "line": 10,
+                "character": 12
+              },
+              "end": {
+                "line": 10,
+                "character": 28
+              }
+            }
+          },
+          {
+            "type": "if",
+            "location": {
+              "uri": "/case24.cbl",
+              "start": {
+                "line": 11,
+                "character": 12
+              },
+              "end": {
+                "line": 13,
+                "character": 18
+              }
+            }
+          },
+          {
+            "targetName": [
+              "PARAG3"
+            ],
+            "type": "goto",
+            "location": {
+              "uri": "/case24.cbl",
+              "start": {
+                "line": 12,
+                "character": 17
+              },
+              "end": {
+                "line": 12,
+                "character": 29
+              }
+            }
+          },
+          {
+            "type": "endif",
+            "location": {
+              "uri": "/case24.cbl",
+              "start": {
+                "line": 11,
+                "character": 12
+              },
+              "end": {
+                "line": 13,
+                "character": 18
+              }
+            }
+          }
+        ]
+      },
+      {
+        "snippet": "       PARAG3.\r\n           DISPLAY \u0027PARAG3\u0027.",
+        "name": "PARAG3",
+        "type": "paragraph",
+        "location": {
+          "uri": "/case24.cbl",
+          "start": {
+            "line": 14,
+            "character": 8
+          },
+          "end": {
+            "line": 15,
+            "character": 29
+          }
+        },
+        "children": [
+          {
+            "type": "statement",
+            "location": {
+              "uri": "/case24.cbl",
+              "start": {
+                "line": 15,
+                "character": 12
+              },
+              "end": {
+                "line": 15,
+                "character": 28
+              }
+            }
+          }
+        ]
+      }
+    ]
+  }
+]

@@ -11,6 +11,11 @@ export const isV1RuntimeDialectDetail = (
   if (!("jar" in dialect) || typeof dialect.jar !== "string") return false;
   if (!("snippets" in dialect) || typeof dialect.snippets !== "string")
     return false;
+  if (
+    "isCopyStatement" in dialect &&
+    typeof dialect.isCopyStatement !== "function"
+  )
+    return false;
   try {
     vscode.Uri.parse(dialect.jar, true);
     vscode.Uri.parse(dialect.snippets, true);

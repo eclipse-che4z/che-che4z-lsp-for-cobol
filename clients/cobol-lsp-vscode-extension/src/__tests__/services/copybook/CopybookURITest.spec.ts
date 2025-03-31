@@ -11,7 +11,6 @@
  * Contributors:
  *   Broadcom, Inc. - initial API and implementation
  */
-import * as path from "path";
 import * as vscode from "vscode";
 import { CopybookURI } from "../../../services/copybook/CopybookURI";
 import { Utils } from "../../../services/util/Utils";
@@ -33,27 +32,16 @@ describe("CopybooksPathGenerator tests", () => {
   it("creates copybook path", () => {
     expect(
       CopybookURI.createCopybookPath(
-        profile,
+        [profile],
         dataset,
         "copybook",
         "downloadFolder",
       ),
-    ).toEqual(
-      path.join(
-        "downloadFolder",
-        "zowe",
-        "copybooks",
-        "profile",
-        "dataset",
-        "copybook",
-      ),
-    );
+    ).toEqual("downloadFolder/zowe/copybooks/profile/dataset/copybook");
   });
   it("creates dataset path", () => {
     expect(
-      CopybookURI.createDatasetPath(profile, dataset, "downloadFolder"),
-    ).toEqual(
-      path.join("downloadFolder", "zowe", "copybooks", "profile", "dataset"),
-    );
+      CopybookURI.createDatasetPath([profile], dataset, "downloadFolder"),
+    ).toEqual({ path: "downloadFolder/zowe/copybooks/profile/dataset" });
   });
 });

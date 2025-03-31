@@ -15,7 +15,6 @@
 import * as fs from "fs";
 import * as path from "path";
 import { globSync, hasMagic } from "glob";
-import { Uri } from "vscode";
 import * as vscode from "vscode";
 import { Utils } from "./Utils";
 /**
@@ -30,7 +29,7 @@ export function searchCopybookInExtensionFolder(
   copybookFolders: string[] | undefined,
   extensions: string[] | undefined,
   storagePath: string,
-): Uri | undefined {
+): vscode.Uri | undefined {
   if (!copybookFolders || !extensions) return undefined;
   const extensionFolder = cleanWorkspaceFolderName(storagePath);
   for (const p of copybookFolders) {
@@ -52,6 +51,37 @@ export function cleanWorkspaceFolderName(workspaceFolderPath: string) {
 
 export function normalizePath(folder: string): string {
   return vscode.Uri.file(folder).fsPath;
+}
+
+export function createFileSearchPattern(
+  directoryPath: vscode.Uri,
+  fileName: string,
+): vscode.RelativePattern {
+  const segments = directoryPath.path
+    .split("/")
+    .filter((segment) => segment !== "");
+  const baseSegments: string[] = [];
+  const patternSegments: string[] = [];
+
+  let target = baseSegments;
+  for (const segment of segments) {
+    if (hasMagic(segment)) {
+      target = patternSegments;
+    }
+    target.push(segment);
+  }
+
+  const baseUri = vscode.Uri.from({
+    ...directoryPath,
+    path: "/" + baseSegments.join("/"),
+  });
+
+  let pattern = fileName;
+  if (patternSegments.length > 0) {
+    pattern = `${patternSegments.join("/")}/${pattern}`;
+  }
+
+  return new vscode.RelativePattern(baseUri, pattern);
 }
 
 function globSearch(
@@ -97,14 +127,15 @@ export type SupportedVariables = {
   filename: string;
   dirName: string;
   dirBasename: string;
+  extension: string;
 };
 
 export function getVariablesFromUri(
-  uri: string,
+  uri: string | vscode.Uri,
   includeExt: boolean = false,
 ): SupportedVariables {
-  const u = Uri.parse(uri, true);
-  const p = Uri.joinPath(u, "..");
+  const u = uri instanceof vscode.Uri ? uri : vscode.Uri.parse(uri, true);
+  const p = vscode.Uri.joinPath(u, "..");
   const file = u.path.substring(u.path.lastIndexOf("/") + 1);
   const dot = file.lastIndexOf(".");
 
@@ -112,5 +143,18 @@ export function getVariablesFromUri(
     filename: includeExt || dot <= 0 ? file : file.substring(0, dot),
     dirName: p.fsPath,
     dirBasename: p.path.substring(p.path.lastIndexOf("/") + 1),
+    extension: dot > 0 ? file.substring(dot) : "",
   };
+}
+
+export function splitFilename(filename: string): [string, string | null] {
+  const lastDotIndex = filename.lastIndexOf(".");
+  if (lastDotIndex > 0) {
+    const name = filename.slice(0, lastDotIndex);
+    const extension = filename.slice(lastDotIndex);
+
+    return [name, extension];
+  } else {
+    return [filename, null];
+  }
 }

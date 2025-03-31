@@ -45,6 +45,6 @@ suite("Web Extension Test Suite: Snippets", () => {
     await helper.waitFor(() => editor.document.getText().length > 0);
 
     const text = editor.document.getText();
-    assert.strictEqual(text, "ADD id TO id");
+    assert.strictEqual(text, "ACCEPT variable\n");
   });
 });

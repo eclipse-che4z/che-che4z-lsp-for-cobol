@@ -15,26 +15,7 @@
 import * as vscode from "vscode";
 import { SettingsService } from "../../../services/Settings";
 import { ConfigurationWatcher } from "../../../services/util/ConfigurationWatcher";
-jest.mock("../../../services/reporter/TelemetryService");
-
-jest.mock("vscode", () => ({
-  commands: {
-    executeCommand: jest.fn(),
-  },
-  window: {
-    showInformationMessage: jest.fn(),
-  },
-  workspace: {
-    getConfiguration: jest.fn().mockReturnValue({
-      get: jest.fn().mockReturnValueOnce(undefined).mockReturnValue("JAVA"),
-      update: jest.fn(),
-    }),
-
-    onDidChangeConfiguration: jest
-      .fn()
-      .mockReturnValue("onDidChangeConfiguration"),
-  },
-}));
+jest.mock("../../../services/reporter");
 
 describe("Tests ConfigurationWatcher utility", () => {
   afterEach(() => {
