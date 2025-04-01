@@ -438,13 +438,13 @@
   },
   "DAY": {
     "prefix": "DAY",
-    "body": ["ACCEPT DATE-VAR-RECV FROM DAY (DATE-VAR-SEND)"],
-    "description": "The above is an example of utilizing a Julian Date receiving field (PiC 9(5) variable - YY NNN) - from z/OS. https://www.ibm.com/docs/en/cobol-zos/6.4?topic=as-date-date-yyyymmdd-day-day-yyyyddd-day-week-time"
+    "body": ["ACCEPT ${1:DATE-VAR-RECV} FROM DAY (${2:DATE-VAR-SEND})"],
+    "description": "This is an example of utilizing a Julian Date receiving field (PiC 9(5) variable - YY NNN) - from z/OS. https://www.ibm.com/docs/en/cobol-zos/6.4?topic=as-date-date-yyyymmdd-day-day-yyyyddd-day-week-time"
   },
   "DAY OF WEEK": {
     "prefix": "DAY OF WEEK",
-    "body": ["ACCEPT DATE-VAR-RECV FROM DAY-OF-WEEK (DATE-VAR-SEND)"],
-    "description": "The above is an example of utilizing a one-byte(PiC 9(1)receiving variable - (1-7) from z/OS. Note that 1 = Monday, 2 = Tuesday, 3 = Wednesday, etc. https://www.ibm.com/docs/en/cobol-zos/6.4?topic=as-date-date-yyyymmdd-day-day-yyyyddd-day-week-time"
+    "body": ["ACCEPT ${1:DATE-VAR-RECV} FROM DAY-OF-WEEK (${2:DATE-VAR-SEND})"],
+    "description": "This is an example of utilizing a one-byte(PiC 9(1)receiving variable - (1-7) from z/OS. Note that 1 = Monday, 2 = Tuesday, 3 = Wednesday, etc. https://www.ibm.com/docs/en/cobol-zos/6.4?topic=as-date-date-yyyymmdd-day-day-yyyyddd-day-week-time"
   },
   "DBCS": {
     "prefix": "DBCS",
@@ -468,7 +468,7 @@
     "prefix": "DECLARATIVES",
     "body": [
       "DECLARATIVES.",
-      "${1:paragraph-name} SECTION.",
+      "${1:paragraph-name} SECTION-NAME.",
       "USE FOR DEBUGGING ON ${2:OtherParagraphName}.",
       "${3:Debug-Declaratives-Paragraph}.",
       "\tDisplay ${4:VAR1}, ${5:VAR2}, ${6:VAR3}.",
@@ -480,7 +480,7 @@
     "prefix": "DECLARATIVES",
     "body": [
       "DECLARATIVES.",
-      "${1:Debug-Declaratives} SECTION.",
+      "${1:Debug-Declaratives} SECTION-NAME.",
       "USE FOR DEBUGGING ALL PROCEDURES.",
       "${2:Debug-Declaratives-Paragraph}.",
       "\tDisplay ${3:VAR1}, ${4:VAR2}, ${5:VAR3}.",
@@ -496,7 +496,7 @@
   "DELETE": {
     "prefix": "DELETE fileName",
     "body": ["DELETE ${1:fileName}", "END-DELETE."],
-    "description": "DELETE fileName"
+    "description": "Deletes a record from a file."
   },
   "DELIMITED BY": {
     "prefix": "DELIMITED BY",
@@ -531,7 +531,7 @@
   },
   "DISPLAY-1": {
     "prefix": "DISPLAY-1",
-    "body": ["77 DBCS-FLD PIC N(10) USAGE DISPLAY-1."],
+    "body": ["77 ${1:DBCS-FLD} PIC N(10) USAGE DISPLAY-1."],
     "description": "The DISPLAY-1 phrase defines an item as DBCS. The data item is stored in character form, with each character occupying 2 bytes of storage. https://www.informatik.uni-leipzig.de/cs/Literature/Textbooks/Cobol/LangRefzOS.pdf"
   },
   "DIVIDE": {
@@ -579,8 +579,8 @@
   "DUPLICATES #2": {
     "prefix": "DUPLICATES",
     "body": [
-      "SORT FILENAME ON ${1|ASCENDING,DESCENDING|} ${2:KEY-FLD}",
-      "WITH DUPLICATES${3|., IN ORDER.|}"
+      "SORT ${1:FILENAME} ON ${2|ASCENDING,DESCENDING|} ${3:KEY-FLD}",
+      "WITH DUPLICATES${4|., IN ORDER.|}"
     ],
     "description": "IN ORDER forces the z/OS SORT utility to retain the original order of the input file, if duplicate key-field values are found. Note that IN ORDER is an optional clause of WITH DUPLICATES. https://www.ibm.com/docs/en/cobol-zos/6.4?topic=merge-preserving-original-sequence-records-equal-keys"
   },
@@ -624,11 +624,6 @@
     ],
     "description": "Scope terminator - common with many verbs https://www.ibm.com/docs/en/cobol-zos/6.4?topic=appendixes-reserved-words"
   },
-  "ENTER": {
-    "prefix": "ENTER",
-    "body": ["ENTER ${1:literal}."],
-    "description": "The statement is treated as a comment. https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdf"
-  },
   "ENTRY": {
     "prefix": "ENTRY",
     "body": ["ENTRY ${1:literal}."],
@@ -664,9 +659,9 @@
   "ERROR #1": {
     "prefix": "ERROR",
     "body": [
-      "DIVIDE ${2:NUMVAR-1} INTO ${3:NUMVAR-2}",
-      "GIVING ${4:NUMVAR-3}",
-      "ON SIZE ERROR ${1:imperative_statement}",
+      "DIVIDE ${1:NUMVAR-1} INTO ${2:NUMVAR-2}",
+      "GIVING ${3:NUMVAR-3}",
+      "ON SIZE ERROR ${4:imperative_statement}",
       "END-DIVIDE."
     ],
     "description": "NUMVAR-1 is divided into NUMVAR-2. If NUMVAR-1 = 0 or if the quotient is larger than NUMVAR-3 the ON SIZE ERROR statement is executed. If ON SIZE ERROR isn't coded the program ABENDS. https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdf"
@@ -674,8 +669,8 @@
   "ERROR #2": {
     "prefix": "ERROR",
     "body": [
-      "MOVE CORRESPONDING ${2:GROUP-FIELDS-1} TO ${3:GROUP-FIELDS-2}",
-      "ON SIZE ERROR ${1:imperative_statement}"
+      "MOVE CORRESPONDING ${1:GROUP-FIELDS-1} TO ${2:GROUP-FIELDS-2}",
+      "ON SIZE ERROR ${3:imperative_statement}"
     ],
     "description": "Tthe like-named variables in the COBOL group field GROUP-FIELDS-1 are moved to GROUP-FIELDS-2. If there are any variables in GROUP-FIELDS-1 that are larger than the same named variable in GROUP-FIELDS-2 the ON SIZE ERROR statement is executed. If ON SIZE ERROR isn't coded the program ABENDS. https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdf"
   },
