@@ -474,7 +474,7 @@
       "\tDisplay ${4:VAR1}, ${5:VAR2}, ${6:VAR3}.",
       "END-DECLARATIVES."
     ],
-    "description": "Declaratives provide one or more special-purpose sections that are executed when an exception occurs. https://www.ibm.com/docs/sl/cobol-zos/6.2?topic=procedures-example-use-debugging"
+    "description": "Declaratives provide one or more special-purpose sections that are executed when an exception occurs. https://www.ibm.com/docs/en/cobol-zos/6.4?topic=procedures-example-use-debugging"
   },
   "DECLARATIVES 2": {
     "prefix": "DECLARATIVES",
@@ -486,7 +486,7 @@
       "\tDisplay ${3:VAR1}, ${4:VAR2}, ${5:VAR3}.",
       "END-DECLARATIVES."
     ],
-    "description": "Declaratives provide one or more special-purpose sections that are executed when an exception occurs. https://www.ibm.com/docs/sl/cobol-zos/6.2?topic=procedures-example-use-debugging"
+    "description": "Declaratives provide one or more special-purpose sections that are executed when an exception occurs. https://www.ibm.com/docs/en/cobol-zos/6.4?topic=procedures-example-use-debugging"
   },
   "DEFAULT": {
     "prefix": "DEFAULT",
