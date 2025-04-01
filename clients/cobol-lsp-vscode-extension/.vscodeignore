@@ -35,6 +35,7 @@
 !schema/preprocessor_entry.schema.json
 !schema/proc_grps.schema.json
 !schema/compiler_options.schema.json
+!schema/libs_config.schema.json
 # * bundled extension code
 !dist/extension.js
 !dist/extension.js.map
