@@ -248,13 +248,34 @@ it("Processor groups configuration matches program relative to workspace", async
   const result = await loadProcessorGroupDialectConfig(item, []);
   expect(result).toStrictEqual(["IDMS"]);
 });
-it("Checks settings in preprocessor group overrides processor group libraries", async () => {
-  jest.spyOn(glob, "globSync").mockReturnValue(["daco-resolved-from-glob"]);
+it("Checks library configurations in preprocessor definitions overrides processor group libraries", async () => {
+  jest
+    .spyOn(glob, "globSync")
+    .mockImplementation(
+      (config: string | string[], _options: glob.GlobOptions) => {
+        if (config[0] === "/copy") {
+          return ["copy-resolved-from-glob"];
+        }
+        if (config[0] === "/daco") {
+          return ["daco-resolved-from-glob"];
+        } else {
+          console.trace(config);
+          throw Error("some issue with input param");
+        }
+      },
+    );
   const scope = {
     scopeUri: WORKSPACE_URI + "/progDaF.cob",
   };
-  const result = await loadProcessorGroupCopybookPathsConfig(scope, [], "DaCo");
-  expect(result).toStrictEqual([
+  const resultCobol = await loadProcessorGroupCopybookPathsConfig(scope, []);
+  const resultDaco = await loadProcessorGroupCopybookPathsConfig(
+    scope,
+    [],
+    "DaCo",
+  );
+
+  expect(resultCobol).toStrictEqual(["copy-resolved-from-glob"]);
+  expect(resultDaco).toStrictEqual([
     "daco-resolved-from-glob",
     {
       environment: "ENV",
