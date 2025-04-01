@@ -468,9 +468,9 @@
     "prefix": "DECLARATIVES",
     "body": [
       "DECLARATIVES.",
-      "${1:paragraph-name} SECTION-NAME.",
-      "USE FOR DEBUGGING ON ${2:OtherParagraphName}.",
-      "${3:Debug-Declaratives-Paragraph}.",
+      "${1:section-name} SECTION.",
+      "USE FOR DEBUGGING ON ${2:OtherSectionhName}.",
+      "${3:Debug-Declaratives-Section}.",
       "\tDisplay ${4:VAR1}, ${5:VAR2}, ${6:VAR3}.",
       "END-DECLARATIVES."
     ],
@@ -480,9 +480,9 @@
     "prefix": "DECLARATIVES",
     "body": [
       "DECLARATIVES.",
-      "${1:Debug-Declaratives} SECTION-NAME.",
+      "${1:Debug-Declaratives} SECTION.",
       "USE FOR DEBUGGING ALL PROCEDURES.",
-      "${2:Debug-Declaratives-Paragraph}.",
+      "${2:Debug-Declaratives-section}.",
       "\tDisplay ${3:VAR1}, ${4:VAR2}, ${5:VAR3}.",
       "END-DECLARATIVES."
     ],
