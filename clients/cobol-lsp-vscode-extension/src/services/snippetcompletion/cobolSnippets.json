@@ -127,15 +127,14 @@
   "ASSIGN": {
     "prefix": "ASSIGN",
     "body": [
-      "FILE-CONTROL",
-      "\tSELECT ${2:rptfile}",
-      "\t\tASSIGN TO ${1:rptfile-DD}",
-      "\t\tORGANIZATION IS ${3|INDEXED,RELATIVE,SEQUENTIAL,LINE-SEQUENTIAL|}",
-      "\t\tACCESS MODE IS ${4|SEQUENTIAL,RANDOM,DYNAMIC|}",
-      "\t\tFILE STATUS IS ${5:statusVariable}.",
+      "SELECT ${2:rptfile}",
+      "\tASSIGN TO ${1:rptfile-DD}",
+      "\tORGANIZATION IS ${3|INDEXED,RELATIVE,SEQUENTIAL,LINE-SEQUENTIAL|}",
+      "\tACCESS MODE IS ${4|SEQUENTIAL,RANDOM,DYNAMIC|}",
+      "\tFILE STATUS IS ${5:statusVariable}.",
       "$0"
     ],
-    "description": "ASSIGN item"
+    "description": "FILE-CONTROL - ASSIGN item"
   },
   "BEFORE ADVANCING": {
     "prefix": "BEFORE ADVANCING",
@@ -218,11 +217,9 @@
   "CHARACTERS": {
     "prefix": "CHARACTERS",
     "body": [
-      "ENVIRONMENT DIVISION.",
-      "CONFIGURATION SECTION.",
       "SYMBOLIC ${1|CHARACTER,CHARACTERS|} ${2:symbolic-character}"
     ],
-    "description": "SYMBOLIC CHARACTER"
+    "description": "ENVIRONMENT DIVISION / CONFIGURATION SECTION - SYMBOLIC CHARACTER"
   },
   "CLASS DIGIT IS": {
     "prefix": "CLASS",
@@ -237,12 +234,10 @@
   "CODE SET": {
     "prefix": "CODE-SET",
     "body": [
-      "DATA DIVISION.",
-      "FILE SECTION.",
       "FD CODE-SET IS ${1:ALPHABET-VAR-NM}.",
       "$0"
     ],
-    "description": "CODE-SET is used in the COBOL DATA DIVISION, FILE SECTION, FD entry. https://www.ibm.com/docs/en/SS6SG3_6.4.0/pdf/pgmvs.pdf"
+    "description": "DATA DIVISION / FILE SECTION - CODE-SET is used in the COBOL DATA DIVISION, FILE SECTION, FD entry. https://www.ibm.com/docs/en/SS6SG3_6.4.0/pdf/pgmvs.pdf"
   },
   "COLLATING": {
     "prefix": "COLLATING",
@@ -303,8 +298,8 @@
   },
   "CONFIGURATION": {
     "prefix": "CONFIGURATION",
-    "body": ["ENVIRONMENT DIVISION.", "CONFIGURATION SECTION."],
-    "description": "The CONFIGURATION SECTION describes the z/OS environment on which the program is compiled and executed. It is an optional section for programs, functions, prototypes, and classes. https://www.ibm.com/docs/en/cobol-zos/6.4?topic=division-configuration-section"
+    "body": ["CONFIGURATION SECTION."],
+    "description": "ENVIRONMENT DIVISION - The CONFIGURATION SECTION describes the z/OS environment on which the program is compiled and executed. It is an optional section for programs, functions, prototypes, and classes. https://www.ibm.com/docs/en/cobol-zos/6.4?topic=division-configuration-section"
   },
   "CONTAINS": {
     "prefix": "CONTAINS",
@@ -776,10 +771,10 @@
     "prefix": "EVALUATE ",
     "body": [
       "EVALUATE $1",
-      "    WHEN $2",
-      "       $0",
-      "    WHEN OTHER",
-      "       CONTINUE",
+      "\tWHEN $2",
+      "\t\t$0",
+      "\tWHEN OTHER",
+      "\t\tCONTINUE",
       "END-EVALUATE",
       ""
     ],
@@ -806,18 +801,16 @@
   "FILE SECTION": {
     "prefix": "FILE SECTION",
     "body": [
-      "DATA DIVISION.",
       "FILE SECTION.",
       "FD  ${1:MSTR-FILE}",
       "\tRECORD CONTAINS ${2:numLiteral} CHARACTERS",
       "\tDATA RECORD IS ${3:PATIENT-MASTER}."
     ],
-    "description": "The FILE SECTION is where you define specifics of each input/output file. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+    "description": "DATA DIVISION - The FILE SECTION is where you define specifics of each input/output file. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
   },
   "FILE STATUS": {
     "prefix": "FILE STATUS",
     "body": [
-      "ENVIRONMENT DIVISION.",
       "SELECT ${2:rptfile}",
       "\tASSIGN TO ${1:PATVSAM}",
       "\tORGANIZATION IS ${3|INDEXED,RELATIVE,SEQUENTIAL,LINE-SEQUENTIAL|}",
@@ -825,31 +818,27 @@
       "\tRECORD KEY IS ${5:PATIENT-REC-KEY}",
       "\tFILE STATUS IS ${1:PATVSAM}-FS."
     ],
-    "description": "FILE STATUS defines a two-byte (PIC XX) field that recieves a code from z/OS based on the disposition of the I/O operation. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+    "description": "ENVIRONMENT DIVISION - FILE STATUS defines a two-byte (PIC XX) field that recieves a code from z/OS based on the disposition of the I/O operation. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
   },
   "MULTIPLE FILE TAPE": {
     "prefix": "MULTIPLE FILE TAPE",
     "body": [
-      "DATA DIVISION.",
       "FD ${1:QSAM-FILE}",
       "\tLABEL RECORDS ARE STANDARD",
       "\tMULTIPLE FILE TAPE.",
       "\t${3:RPT-OUT-REC} PIC X(${4:132})."
     ],
-    "description": "The MULTIPLE FILE TAPE clause specifies that 2 or mote data files share the same physical VOL=SER of tape. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+    "description": "DATA DIVISION - The MULTIPLE FILE TAPE clause specifies that 2 or mote data files share the same physical VOL=SER of tape. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
   },
   "FILE CONTROL": {
     "prefix": "FILE CONTROL",
     "body": [
-      "ENVIRONMENT DIVISION.",
-      "INPUT-OUTPUT SECTION.",
-      "FILE-CONTROL.",
-      "\tSELECT ${1:FILE-1} ASSIGN TO ${2:EXTFILE1}",
-      "\tORGANIZATION IS ${3|INDEXED,RELATIVE,SEQUENTIAL,LINE-SEQUENTIAL|}",
-      "\tACCESS MODE IS ${4|SEQUENTIAL,RANDOM,DYNAMIC|}",
-      "\tFILE STATUS IS ${5:WS-FILE-STATUS-VAR}."
+      "SELECT ${1:FILE-1} ASSIGN TO ${2:EXTFILE1}",
+      "ORGANIZATION IS ${3|INDEXED,RELATIVE,SEQUENTIAL,LINE-SEQUENTIAL|}",
+      "ACCESS MODE IS ${4|SEQUENTIAL,RANDOM,DYNAMIC|}",
+      "FILE STATUS IS ${5:WS-FILE-STATUS-VAR}."
     ],
-    "description": "The FILE-CONTROL paragraph associates every file in your COBOL program with an external data set. It optionally defines file organization, access mode, etc. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+    "description": "ENVIRONMENT DIVISION / INPUT-OUTPUT SECTION / FILE-CONTROL - The FILE-CONTROL paragraph associates every file in your COBOL program with an external data set. It optionally defines file organization, access mode, etc. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
   },
   "FILLER": {
     "prefix": "FILLER",
@@ -897,12 +886,11 @@
   "USE FOR DEBUGGING": {
     "prefix": "USE FOR DEBUGGING",
     "body": [
-      "PRODECURE DIVISION.",
       "DECLARATIVES.",
       "${2:Debug-Declaratives} SECTION.",
       "\tUSE FOR DEBUGGING ON ${1:paragraph-section-name}."
     ],
-    "description": "Specifies debugging to begin on (specified) routine. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+    "description": "PRODECURE DIVISION - Specifies debugging to begin on (specified) routine. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
   },
   "CLOSE x FOR REMOVAL": {
     "prefix": "CLOSE x FOR REMOVAL",
