@@ -432,11 +432,7 @@ public class UseCaseEngine {
         if (data.isEmpty()) {
           return;
         }
-        if (!result.containsKey(key)) {
-          result.put(key, data);
-        } else {
-          result.get(key).addAll(data);
-        }
+        result.computeIfAbsent(key, it -> new ArrayList<>()).addAll(data);
       });
     });
     return result;
