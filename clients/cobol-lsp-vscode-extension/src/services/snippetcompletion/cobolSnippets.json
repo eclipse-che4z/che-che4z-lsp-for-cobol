@@ -216,9 +216,7 @@
   },
   "CHARACTERS": {
     "prefix": "CHARACTERS",
-    "body": [
-      "SYMBOLIC ${1|CHARACTER,CHARACTERS|} ${2:symbolic-character}"
-    ],
+    "body": ["SYMBOLIC ${1|CHARACTER,CHARACTERS|} ${2:symbolic-character}"],
     "description": "ENVIRONMENT DIVISION / CONFIGURATION SECTION - SYMBOLIC CHARACTER"
   },
   "CLASS DIGIT IS": {
@@ -233,10 +231,7 @@
   },
   "CODE SET": {
     "prefix": "CODE-SET",
-    "body": [
-      "FD CODE-SET IS ${1:ALPHABET-VAR-NM}.",
-      "$0"
-    ],
+    "body": ["FD CODE-SET IS ${1:ALPHABET-VAR-NM}.", "$0"],
     "description": "DATA DIVISION / FILE SECTION - CODE-SET is used in the COBOL DATA DIVISION, FILE SECTION, FD entry. https://www.ibm.com/docs/en/SS6SG3_6.4.0/pdf/pgmvs.pdf"
   },
   "COLLATING": {
