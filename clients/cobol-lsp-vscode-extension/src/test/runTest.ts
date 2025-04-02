@@ -31,13 +31,11 @@ async function main() {
     const userDir = os.tmpdir();
     if (process.argv.indexOf("--native") != -1) {
       console.log("Running tests with native language server");
-      if (!fs.existsSync(path.join(userDir, "User"))) {
-        fs.mkdirSync(path.join(userDir, "User"));
-        fs.writeFileSync(
-          path.join(userDir, "User", "settings.json"),
-          '{"cobol-lsp.serverRuntime": "NATIVE"}',
-        );
-      }
+      fs.mkdirSync(path.join(userDir, "User"));
+      fs.writeFileSync(
+        path.join(userDir, "User", "settings.json"),
+        '{"cobol-lsp.serverRuntime": "NATIVE"}',
+      );
     }
 
     const launchArgs = [
