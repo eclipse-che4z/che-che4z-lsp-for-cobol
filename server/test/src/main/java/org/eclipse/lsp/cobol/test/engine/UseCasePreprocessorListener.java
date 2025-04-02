@@ -170,14 +170,20 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
           CopybookStatementContext ctx, Map<String, List<Location>> copybookUsages) {
     return it -> {
       String dialect = it.cpyDialect() == null ? "" : it.cpyDialect().getText();
-      String finalName = processCopybookToken(
-              StringUtils.trimQuotes(it.cpyName().getText().toUpperCase()),
+      String name = StringUtils.trimQuotes(it.cpyName().getText().toUpperCase());
+      processCopybookToken(
+              name,
               dialect,
               ctx,
               it.replacement(),
               copybookUsages,
               ctx.diagnostic());
-      copybookEnterSectionNames.put(finalName, currentSectionName);
+      if (copybookEnterSectionNames.containsKey(name)
+              && !Objects.equals(copybookEnterSectionNames.get(name), currentSectionName)) {
+        // this case is not supported yet
+        throw new IllegalStateException("Duplicated copybook name: " + name);
+      }
+      copybookEnterSectionNames.put(name, currentSectionName);
     };
   }
 
@@ -233,18 +239,30 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
     pop();
     ParagraphUsageContext p = ctx.paragraphUsage();
     if (p != null) {
-      String section = ctx.sectionUsage() == null
-              ? null
-              : getReplacementText(ctx.sectionUsage().word().identifier().getText(),
-                      ctx.sectionUsage().word().replacement()).get(0);
+      SectionUsageContext su = ctx.sectionUsage();
+      String section = su != null
+              ? getReplacementText(su.word().identifier().getText(), su.word().replacement()).get(0)
+              : null;
 
+      ProcedureId procedureId = new ProcedureId(section,
+              getReplacementText(p.word().getText(), p.word().replacement()).get(0).toUpperCase());
       processProcedureToken(
               p.word().identifier().getText(),
               ctx, p.word().replacement(),
               procedureUsages,
               ctx.diagnostic(),
-              new ProcedureId(section,
-                      getReplacementText(p.word().getText(), p.word().replacement()).get(0).toUpperCase()));
+              procedureId);
+      if (su != null) {
+        // TODO produce reference to section
+        write(getHiddenText(tokens.getHiddenTokensToLeft(su.start.getTokenIndex(), HIDDEN)));
+        write(ctx.INOF().getText());
+        updateOutputDocument(
+                su.word().identifier().getText(),
+                su,
+                su.word().replacement(),
+                ctx.diagnostic(),
+                retrieveRange(ctx, su.word().identifier().getText().length()));
+      }
     }
     ParagraphDefinitionContext value = ctx.paragraphDefinition();
     if (value != null && value.word() != null) {
@@ -454,7 +472,7 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
                     singletonList(new Location(uri, new Range(new Position(), new Position()))));
   }
 
-  private String processCopybookToken(
+  private void processCopybookToken(
           String text,
           String dialect,
           ParserRuleContext ctx,
@@ -476,7 +494,6 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
     registerDiagnostics(range, diagnosticIds);
     write(getHiddenText(tokens.getHiddenTokensToLeft(ctx.start.getTokenIndex())));
     write(text);
-    return text;
   }
 
   private void processToken(
@@ -549,7 +566,7 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
     write(text);
   }
 
-  private static List<String> getReplacementText(String text, ReplacementContext replacement) {
+  static List<String> getReplacementText(String text, ReplacementContext replacement) {
       if (replacement == null) {
           return Collections.singletonList(text);
       }

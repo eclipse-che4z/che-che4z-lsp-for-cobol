@@ -14,17 +14,15 @@
  */
 package org.eclipse.lsp.cobol.core.engine.processors;
 
-import com.google.common.collect.ImmutableList;
 import lombok.AllArgsConstructor;
+import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
 import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.Processor;
 import org.eclipse.lsp.cobol.common.symbols.CodeBlockReference;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulator;
 import org.eclipse.lsp.cobol.common.model.tree.CodeBlockUsageNode;
-import org.eclipse.lsp4j.Location;
 
-import java.util.List;
-import java.util.function.Function;
+import java.util.Optional;
 
 /**
  * Enrich code block name node with necessary data
@@ -35,15 +33,15 @@ public class CodeBlockUsageNodeEnricher implements Processor<CodeBlockUsageNode>
 
   @Override
   public void accept(CodeBlockUsageNode node, ProcessingContext processingContext) {
-    node.setDefinitions(getLocations(node, CodeBlockReference::getDefinitions));
-    node.setUsages(getLocations(node, CodeBlockReference::getUsage));
+    Optional<ProgramNode> programOpt = node.getProgram();
+    if (!programOpt.isPresent()) {
+      return;
+    }
+    ProgramNode programNode = programOpt.get();
+    CodeBlockReference codeBlockReference = symbolAccumulator.getCodeBlockReference(programNode, node.getName());
+    if (codeBlockReference != null) {
+      node.setDefinitions(codeBlockReference.getDefinitions());
+      node.setUsages(codeBlockReference.getUsage());
+    }
   }
-
-  private List<Location> getLocations(CodeBlockUsageNode node, Function<CodeBlockReference, List<Location>> retriveLocations) {
-    return node.getProgram()
-        .map(p -> symbolAccumulator.getCodeBlockReference(p, node.getName()))
-        .map(retriveLocations)
-        .orElse(ImmutableList.of());
-  }
-
 }

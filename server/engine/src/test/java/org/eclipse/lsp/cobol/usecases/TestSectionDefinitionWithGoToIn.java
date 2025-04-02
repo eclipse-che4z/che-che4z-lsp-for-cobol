@@ -24,7 +24,7 @@ public class TestSectionDefinitionWithGoToIn {
   private static final String TEXT = "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID. PROG.\n"
           + "       PROCEDURE DIVISION.\n"
-          + "           GO TO {#P} IN SECT1.\n"
+          + "           GO TO {#P} IN {@SECT1}.\n"
           + "       {@*SECT1} SECTION.\n"
           + "       {#*P}.\n"
           + "           EXIT.";

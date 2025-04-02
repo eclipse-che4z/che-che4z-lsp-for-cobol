@@ -38,7 +38,7 @@ class TestPerformClose {
   private static final String TEXT_THRU = "       IDENTIFICATION DIVISION.\n"
       + "       PROGRAM-ID. CLOSEPAR.\n"
       + "       PROCEDURE DIVISION.\n"
-      + "           PERFORM {#BP} OF SEC1 THRU {#EP} OF SEC2.\n"
+      + "           PERFORM {#BP} OF {@SEC1} THRU {#EP} OF {@SEC2}.\n"
       + "       {@*SEC1} SECTION.\n"
       + "       {#*BP}.\n"
       + "           DISPLAY 'BP'.\n"

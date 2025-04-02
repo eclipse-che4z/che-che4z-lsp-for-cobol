@@ -150,8 +150,11 @@ public class AnnotatedDocumentCleaning {
             expectedDiagnostics,
             dialectType,
             sectionName);
+
     new ParseTreeWalker().walk(listener, startRule);
-    return listener.getProcessingResult();
+    UseCaseUsageResolver usageResolver = new UseCaseUsageResolver(listener.getProcessingResult());
+    new ParseTreeWalker().walk(usageResolver, startRule);
+    return usageResolver.getProcessingResult();
   }
 
   private <K, V> void mergeMaps(Map<K, List<V>> to, Map<K, List<V>> from) {

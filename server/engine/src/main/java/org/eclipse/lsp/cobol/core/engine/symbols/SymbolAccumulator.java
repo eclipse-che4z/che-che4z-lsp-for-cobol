@@ -98,86 +98,82 @@ public class SymbolAccumulator implements VariableAccumulator {
    * paragraph is not defined.
    *
    * @param program the program to register block usage in
-   * @param node the usage node to register
+   * @param usageNode the usage node to register
    * @return Optional error if the paragraph or section with the given name is not defined
    */
-  public Optional<SyntaxError> registerCodeBlockUsage(
-      ProgramNode program, CodeBlockUsageNode node) {
+  public Optional<SyntaxError> registerCodeBlockUsage(ProgramNode program, CodeBlockUsageNode usageNode) {
     SymbolTable symbolTable = createOrGetSymbolTable(program);
+    List<CodeBlockReference> resolved = resolveProcedureId(usageNode, symbolTable);
 
-      List<CodeBlockDefinitionNode> definitions = new ArrayList<>();
-      for (CodeBlockDefinitionNode codeBlockDefinitionNode : symbolTable.getCodeBlocks()) {
-          if (filterNodes(codeBlockDefinitionNode, node)) {
-              definitions.add(codeBlockDefinitionNode);
-          }
-      }
-
-      if (definitions.isEmpty()) {
-        return Optional.of(
-          SyntaxError.syntaxError()
+    if (resolved.isEmpty()) {
+      return Optional.of(SyntaxError.syntaxError()
               .errorSource(ErrorSource.PARSING)
               .messageTemplate(
-                  MessageTemplate.of("semantics.paragraphNotDefined", node.getName()))
+                      MessageTemplate.of("semantics.paragraphNotDefined", usageNode.getName()))
               .severity(ErrorSeverity.ERROR)
-              .location(node.getLocality().toOriginalLocation())
+              .location(usageNode.getLocality().toOriginalLocation())
               .build());
     }
 
-    if (definitions.size() > 1) {
-      // Try to resolve ambiguous reference.
-      // If GO TO is in the same section as a paragraph - no errors
-      String usageSectionName = getSectionName(node);
-
-      List<CodeBlockDefinitionNode> inTheSameSection = definitions.stream()
-              .filter(d -> getSectionName(d).equalsIgnoreCase(usageSectionName))
-              .collect(Collectors.toList());
-      if (inTheSameSection.size() == 1) {
-        definitions = inTheSameSection;
-      } else {
-        return Optional.of(
-                SyntaxError.syntaxError()
-                        .errorSource(ErrorSource.PARSING)
-                        .messageTemplate(
-                                MessageTemplate.of("semantics.ambiguous", node.getName()))
-                        .severity(ErrorSeverity.ERROR)
-                        .location(node.getLocality().toOriginalLocation())
-                        .build());
+    boolean ambiguous = resolved.size() > 1;
+    for (CodeBlockReference ref: resolved) {
+      ref.getUsage().add(usageNode.getLocality().toLocation());
+      if (ref.getDefinitions().size() > 1) {
+        ambiguous = true;
       }
     }
+    return ambiguous
+            ? Optional.of(
+                  SyntaxError.syntaxError()
+                          .errorSource(ErrorSource.PARSING)
+                          .messageTemplate(
+                                  MessageTemplate.of("semantics.ambiguous", usageNode.getName()))
+                          .severity(ErrorSeverity.ERROR)
+                          .location(usageNode.getLocality().toOriginalLocation())
+                          .build())
+            : Optional.empty();
+  }
 
-    CodeBlockDefinitionNode definition = definitions.get(0);
-    definition.addUsage(node.getLocality());
-
-    Location location = node.getLocality().toLocation();
-    String definitionName = definition.getName();
-
-    // Try to resolve exact procedure identification
-    // 1. check if we are in a section
-    String trySameSection = definition.getNearestParentByType(NodeType.PROCEDURE_SECTION)
-            .map(n -> ((ProcedureSectionNode) n).getName())
-            .orElse(null);
-    // If there is paragraph with the same name - call it
-    if (trySameSection != null) {
-      ProcedureId defProcId = new ProcedureId(trySameSection, definitionName);
-      if (symbolTable.getProcedures().containsKey(defProcId)) {
-        symbolTable.getProcedures().get(defProcId).addUsage(location);
-        return Optional.empty();
-      }
+  private List<CodeBlockReference> resolveProcedureId(CodeBlockUsageNode usageNode, SymbolTable symbolTable) {
+    Map<ProcedureId, CodeBlockReference> procedures = symbolTable.getProcedures();
+    String ofSection = ofSection(usageNode);
+    ProcedureId paragraphId = new ProcedureId(ofSection, usageNode.getName());
+    if (procedures.containsKey(paragraphId)) {
+      return Collections.singletonList(procedures.get(paragraphId));
     }
-
-    // FIXME: if else.. go to paragraph/section whatever needs to be clarified
-    ProcedureId trySection = new ProcedureId(definitionName, null);
-    if (symbolTable.getProcedures().containsKey(trySection)) {
-      symbolTable.getProcedures().get(trySection).addUsage(location);
-      return Optional.empty();
+    if (ofSection != null) {
+        return Collections.emptyList();
     }
+    String section = usageNode.getNearestParentByType(NodeType.PROCEDURE_SECTION)
+            .map(n -> ((ProcedureSectionNode) n).getName()).orElse(null);
+    paragraphId = new ProcedureId(section, usageNode.getName());
+    if (procedures.containsKey(paragraphId)) {
+      return Collections.singletonList(procedures.get(paragraphId));
+    }
+    // try section name
+    ProcedureId sectionId = new ProcedureId(usageNode.getName(), null);
+    if (procedures.containsKey(sectionId)) {
+      return Collections.singletonList(procedures.get(sectionId));
+    }
+    List<CodeBlockReference> resolved = new ArrayList<>();
     for (Map.Entry<ProcedureId, CodeBlockReference> en: symbolTable.getProcedures().entrySet()) {
-      if (Objects.equals(definitionName, en.getKey().getParagraphName())) {
-        en.getValue().addUsage(location);
-        return Optional.empty();
+      if (Objects.equals(usageNode.getName(), en.getKey().getParagraphName())) {
+        resolved.add(en.getValue());
       }
     }
-    return Optional.empty();
+    return resolved;
+  }
+
+  private String ofSection(CodeBlockUsageNode usageNode) {
+      int nextIndex = usageNode.getParent().getChildren().indexOf(usageNode) + 1;
+      // Chech if there is OF/IN section name
+      if (nextIndex < usageNode.getParent().getChildren().size()) {
+        Node c = usageNode.getParent().getChildren().get(nextIndex);
+        if (c instanceof SectionNameNode) {
+          return ((SectionNameNode) c).getName();
+        }
+      }
+      return null;
   }
 
   private boolean filterNodes(CodeBlockDefinitionNode definition, CodeBlockUsageNode usage) {
@@ -189,18 +185,13 @@ public class SymbolAccumulator implements VariableAccumulator {
     if (usage.getParent().getNodeType() == NodeType.PERFORM
         || usage.getParent().getNodeType() == NodeType.GO_TO
         || usage.getParent().getNodeType() == NodeType.SENTENCE) {
-      int index = usage.getParent().getChildren().indexOf(usage);
-
-      Optional<SectionNameNode> sectionNameNode = Optional.empty();
-      if (index + 1 < usage.getParent().getChildren().size()) {
-        sectionNameNode = Optional.ofNullable(usage.getParent().getChildren().get(index + 1))
-            .filter(c -> c instanceof SectionNameNode)
-            .map(SectionNameNode.class::cast);
+      int nextIndex = usage.getParent().getChildren().indexOf(usage) + 1;
+      if (nextIndex < usage.getParent().getChildren().size()) {
+        Node c = usage.getParent().getChildren().get(nextIndex);
+        if (c instanceof SectionNameNode) {
+            return ((SectionNameNode) c).getName().equalsIgnoreCase(getSectionName(definition));
+        }
       }
-      return sectionNameNode
-          .map(SectionNameNode::getName)
-          .map(n -> n.equalsIgnoreCase(getSectionName(definition)))
-          .orElse(true);
     }
     return true;
   }
@@ -225,6 +216,16 @@ public class SymbolAccumulator implements VariableAccumulator {
   public SymbolTable getSymbolTable(ProgramNode program) {
     return programSymbols.get(SymbolTable.generateKey(program));
   }
+
+  @Override
+  public void registerImplicitSection(ProgramNode programNode, CodeBlockDefinitionNode node) {
+    registerCodeBlock(programNode, node);
+    ProcedureId procedureId = new ProcedureId(node.getName(), null);
+    CodeBlockReference codeBlockReference = new CodeBlockReference();
+    codeBlockReference.getUsage().addAll(node.getUsages().stream().map(Locality::toLocation).collect(Collectors.toList()));
+    getSymbolTable(programNode).getProcedures().put(procedureId, codeBlockReference);
+  }
+
   private SymbolTable createOrGetSymbolTable(ProgramNode program) {
     String key = SymbolTable.generateKey(program);
     if (!programSymbols.containsKey(key)) {
@@ -333,8 +334,8 @@ public class SymbolAccumulator implements VariableAccumulator {
    * Null if no reference is found.
    * In case a function is declared within program, try to resolve as per declaration
    * @param functionName the functionName of the function
-   * @param programNode
-   * @param isFunctionPrefixed
+   * @param programNode the program node
+   * @param isFunctionPrefixed true if the function is prefixed
    * @return the block reference or null if not found
    */
   public FunctionInfo getFunctionReference(String functionName, ProgramNode programNode, boolean isFunctionPrefixed) {
@@ -409,12 +410,13 @@ public class SymbolAccumulator implements VariableAccumulator {
    * @return the block reference or null if not found
    */
   public CodeBlockReference getCodeBlockReference(ProgramNode programNode, String name) {
-    SymbolTable symbolTable = createOrGetSymbolTable(programNode);
-    Map<String, CodeBlockReference> paragraphMap = symbolTable.getParagraphMap();
-    if (paragraphMap.containsKey(name)) {
-      return paragraphMap.get(name);
+    Map<ProcedureId, CodeBlockReference> procedures = createOrGetSymbolTable(programNode).getProcedures();
+    for (Map.Entry<ProcedureId, CodeBlockReference> en : procedures.entrySet()) {
+      if (Objects.equals(en.getKey().getParagraphName(), name)) {
+        return en.getValue();
+      }
     }
-    return symbolTable.getSectionMap().get(name);
+    return procedures.get(new ProcedureId(name, null));
   }
 
   /**
@@ -428,8 +430,11 @@ public class SymbolAccumulator implements VariableAccumulator {
       SectionNameNode node, Function<CodeBlockReference, List<Location>> retrieveLocations) {
     return node.getProgram()
         .map(this::createOrGetSymbolTable)
-        .map(SymbolTable::getSectionMap)
-        .map(it -> it.get(node.getName()))
+        .map(symbolTable ->
+                symbolTable.getProcedures().entrySet().stream()
+                        .filter(en -> en.getKey().isSection())
+                        .collect(Collectors.toMap(en -> en.getKey().getSectionName(), Map.Entry::getValue)))
+        .map(map -> map.get(node.getName()))
         .map(retrieveLocations)
         .orElse(ImmutableList.of());
   }
@@ -443,12 +448,17 @@ public class SymbolAccumulator implements VariableAccumulator {
    */
   public List<Location> getParagraphLocations(
       ParagraphNameNode node, Function<CodeBlockReference, List<Location>> retrieveLocations) {
-    return node.getProgram()
-        .map(this::createOrGetSymbolTable)
-        .map(SymbolTable::getParagraphMap)
-        .map(it -> it.get(node.getName()))
-        .map(retrieveLocations)
-        .orElse(ImmutableList.of());
+    Optional<ProgramNode> programOpt = node.getProgram();
+    if (!programOpt.isPresent()) {
+      return ImmutableList.of();
+    }
+    for (Map.Entry<ProcedureId, CodeBlockReference> en : createOrGetSymbolTable(programOpt.get())
+            .getProcedures().entrySet()) {
+      if (en.getKey().isParagraph() && en.getKey().getParagraphName().equals(node.getName())) {
+        return retrieveLocations.apply(en.getValue());
+      }
+    }
+    return Collections.emptyList();
   }
 
   /**

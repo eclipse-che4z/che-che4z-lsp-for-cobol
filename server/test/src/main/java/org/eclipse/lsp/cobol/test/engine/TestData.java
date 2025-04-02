@@ -57,15 +57,15 @@ public class TestData {
       }
       return result;
   }
-  Map<String, List<Location>> getParagraphUsages() {
+  Map<ProcedureId, List<Location>> getParagraphUsages() {
     return procedureUsages.entrySet().stream()
-            .filter(en -> !en.getKey().isSection()).collect(
-                    Collectors.toMap(en -> en.getKey().getParagraphName(), Map.Entry::getValue));
+            .filter(en -> en.getKey().isParagraph()).collect(
+                    Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
   }
-  public Map<String, List<Location>> getSectionUsages() {
+  public Map<ProcedureId, List<Location>> getSectionUsages() {
     return procedureUsages.entrySet().stream()
             .filter(en -> en.getKey().isSection()).collect(
-                    Collectors.toMap(en -> en.getKey().getSectionName(), Map.Entry::getValue));
+                    Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
   }
 
   public Map<ProcedureId, List<Location>> getSectionDefinitions() {

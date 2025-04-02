@@ -143,38 +143,26 @@ public class PositiveTestUtility {
           String dataName = snap.getDataName();
           // TODO: SysprintSnap is to be updated to ProcedureIds
           ProcedureId pId = new ProcedureId(null, dataName);
-          Optional<Map.Entry<List<Location>, List<Location>>> foundElementFromLSPEngine =
-                  paragraphDefFromLSPEngine.get(pId).stream()
-                  .map(node -> Collections.singletonMap(node.getDefinitions(), node.getUsage()))
-                  .map(Map::entrySet)
-                  .flatMap(Collection::stream)
-                  .filter(ref -> matchParagraphDefinition(snap, ref))
-                  .findFirst();
-          Assertions.assertTrue(
-              foundElementFromLSPEngine.isPresent(),
-              "["
-                  + fileName
-                  + "]:"
-                  + "Procedure definition for "
-                  + dataName
-                  + " not found in LSP engine");
-          List<Location> nodes = foundElementFromLSPEngine.get().getValue();
-          assertReferencesByProcedures(snap, nodes, fileName);
+          Collection<CodeBlockReference> codeBlockReferences = paragraphDefFromLSPEngine.get(pId);
+          List<Location> defs = new ArrayList<>();
+          List<Location> usages = new ArrayList<>();
+          codeBlockReferences.forEach(ref -> {
+              defs.addAll(ref.getDefinitions());
+              usages.addAll(ref.getUsage());
+          });
+
+          Assertions.assertFalse(defs.isEmpty(), "["
+                    + fileName
+                    + "]:"
+                    + "Procedure definition for "
+                    + dataName
+                    + " not found in LSP engine");
+          assertReferencesByProcedures(snap, usages, fileName);
 
           // TODO : Update snap object when flag provided
-          snap.setDefinitionLocation(foundElementFromLSPEngine.get().getKey().get(0).getRange());
-          snap.setReferencesLocation(nodes.stream().map(Location::getRange).collect(toList()));
+          snap.setDefinitionLocation(defs.get(0).getRange());
+          snap.setReferencesLocation(usages.stream().map(Location::getRange).collect(toList()));
         });
-  }
-
-  private boolean matchParagraphDefinition(
-      SysprintSnap snap, Map.Entry<List<Location>, List<Location>> ref) {
-    if (snap.getDefinitionLocation() != null) {
-      return ref.getKey().stream()
-          .anyMatch(node -> snap.getDefinitionLocation().equals(node.getRange()));
-    }
-    return ref.getKey().stream()
-        .anyMatch(node -> node.getRange().getStart().getLine() + 1 == snap.getDefinedLineNo());
   }
 
   private void assertReferencesByProcedures(
@@ -185,8 +173,7 @@ public class PositiveTestUtility {
             .collect(Collectors.toList());
     if (snap.getReferencesLocation() != null) {
       snap.getReferencesLocation()
-          .forEach(
-              snapRef -> {
+          .forEach(snapRef -> {
                 boolean match = lspNodes.stream().map(Location::getRange).anyMatch(snapRef::equals);
                 Assertions.assertTrue(
                     match,
@@ -194,7 +181,7 @@ public class PositiveTestUtility {
                         + fileName
                         + "]:"
                         + "Procedure snapReferences for "
-                        + snap.getDataName()
+                        + snap.getDataName() + " at " + snap.getDefinedLineNo()
                         + " not found at line no: "
                         + snapRef);
               });
@@ -386,15 +373,12 @@ public class PositiveTestUtility {
         .map(ProgramNode.class::cast)
         .forEach(
             programNode -> {
-
-                Map<String, CodeBlockReference> paragraphMap = repo.getParagraphMap(programNode);
-                Map<String, CodeBlockReference> sectionMap = repo.getSectionMap(programNode);
-
-                Stream.of(paragraphMap, sectionMap)
-                  .flatMap(entry -> entry.entrySet().stream())
-                  .forEach(
-                      entry -> procedureDefFromLSPEngine.put(new ProcedureId(null, entry.getKey()), entry.getValue()));
-
+              repo.getProceduresMap(programNode).forEach((key, value) -> {
+                  String name = key.isParagraph()
+                          ? key.getParagraphName()
+                          : key.getSectionName();
+                  procedureDefFromLSPEngine.put(new ProcedureId(null, name), value);
+              });
               repo.getVariables(programNode).values().stream()
                   .flatMap(Node::getDepthFirstStream)
                   .filter(VariableNode.class::isInstance)

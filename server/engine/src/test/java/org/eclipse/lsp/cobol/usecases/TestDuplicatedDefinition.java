@@ -93,7 +93,7 @@ class TestDuplicatedDefinition {
       "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID. AMB06.\n"
           + "       PROCEDURE DIVISION.\n"
-          + "           PERFORM {PARAG1|1}.\n"
+          + "           PERFORM {_{#PARAG1}|1_}.\n"
           + "       {#*PARAG1}.\n"
           + "       {#*PARAG1}.";
 
@@ -101,7 +101,7 @@ class TestDuplicatedDefinition {
       "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID. AMB07.\n"
           + "       PROCEDURE DIVISION.\n"
-          + "           PERFORM {SEC1|1}.\n"
+          + "           PERFORM {_{@SEC1}|1_}.\n"
           + "       {@*SEC1} SECTION.\n"
           + "       {@*SEC1} SECTION.";
 
@@ -125,7 +125,7 @@ class TestDuplicatedDefinition {
       "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID. AMB10.\n"
           + "       PROCEDURE DIVISION.\n"
-          + "           GO TO {#PARAG1} OF SECTION-1.\n"
+          + "           GO TO {#PARAG1} OF {@SECTION-1}.\n"
           + "       {#*PARAG1}.\n"
           + "       {@*SECTION-1} SECTION.\n"
           + "       {#*PARAG1}.";
@@ -135,7 +135,7 @@ class TestDuplicatedDefinition {
           + "       PROGRAM-ID. AMB11.\n"
           + "       PROCEDURE DIVISION.\n"
           + "       {@*SECTION-1} SECTION.\n"
-          + "           GO TO {PARAG1|1} OF SECTION-1.\n"
+          + "           GO TO {_{#PARAG1}|1_} OF SECTION-1.\n"
           + "       {#*PARAG1}.\n"
           + "       {#*PARAG1}.";
 

@@ -56,7 +56,7 @@ public class DaCoImplicitCodeProcessor implements Processor<ProgramNode> {
     variables.forEach(node -> processingContext.getVariableAccumulator().addVariableDefinition(programNode, node));
 
     SectionsGenerator.generate(getPredefinedSections(processingContext), getExistingSections(programNode))
-        .forEach(node -> processingContext.getVariableAccumulator().registerCodeBlock(programNode, node));
+        .forEach(node -> processingContext.getVariableAccumulator().registerImplicitSection(programNode, node));
   }
 
   private List<String> getPredefinedSections(ProcessingContext processingContext) {

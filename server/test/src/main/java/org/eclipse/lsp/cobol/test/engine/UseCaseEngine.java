@@ -45,6 +45,7 @@ import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.common.model.tree.FunctionReference;
 import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNode;
+import org.eclipse.lsp.cobol.common.symbols.CodeBlockReference;
 import org.eclipse.lsp.cobol.common.symbols.ProcedureId;
 import org.eclipse.lsp.cobol.common.symbols.SymbolTable;
 import org.eclipse.lsp.cobol.common.utils.ImplicitCodeUtils;
@@ -383,18 +384,19 @@ public class UseCaseEngine {
     assertResult(
         "Paragraph definition:",
         expected.getParagraphDefinitions(),
-        extractProcedureDefinitions(actual, ProcedureId::isParagraph));
+        extractProcedureData(actual, ProcedureId::isParagraph, CodeBlockReference::getDefinitions));
     assertResult(
         "Paragraph usages:",
         expected.getParagraphUsages(),
-        extractUsages(actual, PARAGRAPH_NAME_NODE));
+        extractProcedureData(actual, ProcedureId::isParagraph, CodeBlockReference::getUsage));
 
     assertResult(
         "Section definition:",
         expected.getSectionDefinitions(),
-        extractProcedureDefinitions(actual, ProcedureId::isSection));
+        extractProcedureData(actual, ProcedureId::isSection, CodeBlockReference::getDefinitions));
     assertResult(
-        "Section usages:", expected.getSectionUsages(), extractUsages(actual, SECTION_NAME_NODE));
+        "Section usages:", expected.getSectionUsages(),
+            extractProcedureData(actual, ProcedureId::isSection, CodeBlockReference::getUsage));
 
     assertResult(
         "Subroutine definitions: ",
@@ -416,8 +418,9 @@ public class UseCaseEngine {
             extractDefinitionsUsage(actual));
   }
 
-  private static Map<ProcedureId, List<Location>> extractProcedureDefinitions(AnalysisResult actual,
-                                                                         Predicate<ProcedureId> filter) {
+  private static Map<ProcedureId, List<Location>> extractProcedureData(AnalysisResult actual,
+                                                                       Predicate<ProcedureId> filter,
+                                                                       Function<CodeBlockReference, List<Location>> extractor) {
     Map<ProcedureId, List<Location>> result = new HashMap<>();
     actual.getRootNode().findPrograms().forEach(programNode -> {
       SymbolTable symbolTable = actual.getSymbolTableMap().get(SymbolTable.generateKey(programNode));
@@ -425,10 +428,14 @@ public class UseCaseEngine {
         if (!filter.test(key)) {
           return;
         }
+        List<Location> data = extractor.apply(value);
+        if (data.isEmpty()) {
+          return;
+        }
         if (!result.containsKey(key)) {
-          result.put(key, value.getDefinitions());
+          result.put(key, data);
         } else {
-          result.get(key).addAll(value.getDefinitions());
+          result.get(key).addAll(data);
         }
       });
     });

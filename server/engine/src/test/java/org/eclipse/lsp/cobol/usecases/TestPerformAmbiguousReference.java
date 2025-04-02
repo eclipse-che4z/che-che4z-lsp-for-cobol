@@ -28,7 +28,7 @@ public class TestPerformAmbiguousReference {
                   + "       PROGRAM-ID. TEST1.\n"
                   + "       PROCEDURE DIVISION.\n"
                   + "       {@*SEC1} SECTION.\n"
-                  + "           PERFORM {_PAR|1_}.\n"
+                  + "           PERFORM {_{#PAR}|1_}.\n"
                   + "       {@*SEC2} SECTION.\n"
                   + "       {#*PAR}.\n"
                   + "       {@*SEC3} SECTION.\n"

@@ -52,4 +52,11 @@ public interface VariableAccumulator {
    */
   SymbolTable getSymbolTable(ProgramNode program);
 
-  }
+  /**
+   * Register implicit section
+   * @param programNode the program
+   * @param node the section definition
+   */
+  void registerImplicitSection(ProgramNode programNode, CodeBlockDefinitionNode node);
+
+}

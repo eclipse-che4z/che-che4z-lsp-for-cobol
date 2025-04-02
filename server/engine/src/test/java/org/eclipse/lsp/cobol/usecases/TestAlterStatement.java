@@ -34,7 +34,7 @@ class TestAlterStatement {
           + "       PROCEDURE DIVISION.\r\n";
 
   private static final String ALTER_FROM =
-            "           ALTER {#PAR1} OF SEC1 TO PROCEED TO {#PAR2} OF SEC1.\r\n"
+            "           ALTER {#PAR1} OF {@SEC1} TO PROCEED TO {#PAR2} OF {@SEC1}.\r\n"
           + "       {@*SEC1} SECTION.\r\n"
           + "       {#*PAR1}.\r\n"
           + "       {#*PAR2}.\r\n";

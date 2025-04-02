@@ -30,7 +30,7 @@ class TransformationTreeSectionsAndParagraphsTest {
             + "       PROCEDURE DIVISION.\n"
             + "       {@*SECT1} SECTION.\n"
             + "       {#*PAR}.\n"
-            + "           PERFORM {#PAR} OF SECT2.\n"
+            + "           PERFORM {#PAR} OF {@SECT2}.\n"
             + "       COPY {~AAA}.";
     private static final String TEXT_AAA = "\n\n\n\n       {@*SECT2} SECTION.\n"
             + "       {#*PAR}.\n";
