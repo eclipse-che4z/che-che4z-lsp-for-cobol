@@ -937,9 +937,13 @@ public final class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   }
 
   @Override
-  public List<Node> visitParagraphName(ParagraphNameContext ctx) {
+  public List<Node> visitProcedureName(ProcedureNameContext ctx) {
+    String ofSection = ofNullable(ctx.inSection())
+            .map(InSectionContext::sectionName)
+            .map(VisitorHelper::getName)
+            .orElse(null);
     return addTreeNode(
-            ctx, locality -> new CodeBlockUsageNode(locality, VisitorHelper.getName(ctx)));
+            ctx.paragraphName(), locality -> new CodeBlockUsageNode(locality, VisitorHelper.getName(ctx.paragraphName()), ofSection));
   }
 
   @Override

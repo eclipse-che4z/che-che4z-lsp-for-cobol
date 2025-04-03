@@ -54,14 +54,12 @@ public class UseCaseUsageResolver extends UseCasePreprocessorBaseListener {
         ProcedureId possibleParagraphId = new ProcedureId(currentSectionName, procedureName);
         Map<ProcedureId, List<Location>> definitions = processingResult.getProcedureDefinitions();
         if (definitions.containsKey(possibleParagraphId)) {
-            processingResult.getProcedureUsages().put(possibleParagraphId,
-                    processingResult.getProcedureUsages().remove(procedureId));
+            moveUsageLocation(procedureId, possibleParagraphId);
             return;
         }
         ProcedureId possibleSectionId = new ProcedureId(procedureName, null);
         if (definitions.containsKey(possibleSectionId)) {
-            processingResult.getProcedureUsages().put(possibleSectionId,
-                    processingResult.getProcedureUsages().remove(procedureId));
+            moveUsageLocation(procedureId, possibleSectionId);
             return;
         }
         // Resolve all variants
@@ -78,6 +76,22 @@ public class UseCaseUsageResolver extends UseCasePreprocessorBaseListener {
             List<Location> locations = processingResult.getProcedureUsages().remove(procedureId);
             candidates.forEach(en -> processingResult.getProcedureUsages().put(en, locations));
         }
+    }
+
+    private void moveUsageLocation(ProcedureId from, ProcedureId to) {
+        if (from.equals(to)) {
+            return;
+        }
+        List<Location> fromLocations = processingResult.getProcedureUsages().get(from);
+        List<Location> toLocations = processingResult.getProcedureUsages().computeIfAbsent(to, it -> new ArrayList<>());
+        if (fromLocations == null || fromLocations.isEmpty()) {
+            return;
+        }
+        Location loc = fromLocations.remove(0);
+        if (fromLocations.isEmpty()) {
+            processingResult.getProcedureUsages().remove(from);
+        }
+        toLocations.add(loc);
     }
 
     @Override

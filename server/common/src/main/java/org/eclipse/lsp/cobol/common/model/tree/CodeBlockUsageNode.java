@@ -34,14 +34,16 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 public class CodeBlockUsageNode extends Node implements DefinedAndUsedStructure {
   private final String name;
+  private final String ofSection;
   @Setter
   private List<Location> definitions = ImmutableList.of();
   @Setter
   private List<Location> usages = ImmutableList.of();
 
-  public CodeBlockUsageNode(Locality location, String name) {
+  public CodeBlockUsageNode(Locality location, String name, String ofSection) {
     super(location, NodeType.CODE_BLOCK_USAGE);
     this.name = name;
+    this.ofSection = ofSection;
   }
 
   @Override

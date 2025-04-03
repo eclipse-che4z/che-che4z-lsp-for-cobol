@@ -136,12 +136,11 @@ public class SymbolAccumulator implements VariableAccumulator {
 
   private List<CodeBlockReference> resolveProcedureId(CodeBlockUsageNode usageNode, SymbolTable symbolTable) {
     Map<ProcedureId, CodeBlockReference> procedures = symbolTable.getProcedures();
-    String ofSection = ofSection(usageNode);
-    ProcedureId paragraphId = new ProcedureId(ofSection, usageNode.getName());
+    ProcedureId paragraphId = new ProcedureId(usageNode.getOfSection(), usageNode.getName());
     if (procedures.containsKey(paragraphId)) {
       return Collections.singletonList(procedures.get(paragraphId));
     }
-    if (ofSection != null) {
+    if (usageNode.getOfSection() != null) {
         return Collections.emptyList();
     }
     String section = usageNode.getNearestParentByType(NodeType.PROCEDURE_SECTION)
@@ -162,50 +161,6 @@ public class SymbolAccumulator implements VariableAccumulator {
       }
     }
     return resolved;
-  }
-
-  private String ofSection(CodeBlockUsageNode usageNode) {
-      int nextIndex = usageNode.getParent().getChildren().indexOf(usageNode) + 1;
-      // Chech if there is OF/IN section name
-      if (nextIndex < usageNode.getParent().getChildren().size()) {
-        Node c = usageNode.getParent().getChildren().get(nextIndex);
-        if (c instanceof SectionNameNode) {
-          return ((SectionNameNode) c).getName();
-        }
-      }
-      return null;
-  }
-
-  private boolean filterNodes(CodeBlockDefinitionNode definition, CodeBlockUsageNode usage) {
-    if (!usage.getName().equalsIgnoreCase(definition.getName())) {
-      return false;
-    }
-
-    //Filter nodes in case of section usage in the PERFORM or GO TO statements. i.e. GO TO PARAG1 OF SECTION-1.
-    if (usage.getParent().getNodeType() == NodeType.PERFORM
-        || usage.getParent().getNodeType() == NodeType.GO_TO
-        || usage.getParent().getNodeType() == NodeType.SENTENCE) {
-      int nextIndex = usage.getParent().getChildren().indexOf(usage) + 1;
-      if (nextIndex < usage.getParent().getChildren().size()) {
-        Node c = usage.getParent().getChildren().get(nextIndex);
-        if (c instanceof SectionNameNode) {
-            return ((SectionNameNode) c).getName().equalsIgnoreCase(getSectionName(definition));
-        }
-      }
-    }
-    return true;
-  }
-
-  private String getSectionName(Node node) {
-    Node parent = node.getParent();
-    while (parent != null) {
-      if (parent instanceof ProcedureSectionNode) {
-        return ((ProcedureSectionNode) parent).getName();
-      }
-      node = parent;
-      parent = node.getParent();
-    }
-    return "";
   }
 
   /**
