@@ -361,17 +361,11 @@ public class SymbolAccumulator implements VariableAccumulator {
    * Search for a block reference in a paragraph and then in a section map
    *
    * @param programNode the program to search block references in
-   * @param name the name of the block
+   * @param node        the node of the block
    * @return the block reference or null if not found
    */
-  public CodeBlockReference getCodeBlockReference(ProgramNode programNode, String name) {
-    Map<ProcedureId, CodeBlockReference> procedures = createOrGetSymbolTable(programNode).getProcedures();
-    for (Map.Entry<ProcedureId, CodeBlockReference> en : procedures.entrySet()) {
-      if (Objects.equals(en.getKey().getParagraphName(), name)) {
-        return en.getValue();
-      }
-    }
-    return procedures.get(new ProcedureId(name, null));
+  public List<CodeBlockReference> getCodeBlockReference(ProgramNode programNode, CodeBlockUsageNode node) {
+    return resolveProcedureId(node, createOrGetSymbolTable(programNode));
   }
 
   /**

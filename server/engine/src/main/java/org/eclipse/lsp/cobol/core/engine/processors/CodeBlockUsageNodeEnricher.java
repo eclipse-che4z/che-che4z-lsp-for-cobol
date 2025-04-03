@@ -21,7 +21,10 @@ import org.eclipse.lsp.cobol.common.processor.Processor;
 import org.eclipse.lsp.cobol.common.symbols.CodeBlockReference;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulator;
 import org.eclipse.lsp.cobol.common.model.tree.CodeBlockUsageNode;
+import org.eclipse.lsp4j.Location;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -38,10 +41,14 @@ public class CodeBlockUsageNodeEnricher implements Processor<CodeBlockUsageNode>
       return;
     }
     ProgramNode programNode = programOpt.get();
-    CodeBlockReference codeBlockReference = symbolAccumulator.getCodeBlockReference(programNode, node.getName());
-    if (codeBlockReference != null) {
-      node.setDefinitions(codeBlockReference.getDefinitions());
-      node.setUsages(codeBlockReference.getUsage());
+    List<CodeBlockReference> codeBlockReferences = symbolAccumulator.getCodeBlockReference(programNode, node);
+    List<Location> definitions = new ArrayList<>();
+    List<Location> usage = new ArrayList<>();
+    for (CodeBlockReference codeBlockReference : codeBlockReferences) {
+      definitions.addAll(codeBlockReference.getDefinitions());
+      usage.addAll(codeBlockReference.getUsage());
     }
+    node.setDefinitions(definitions);
+    node.setUsages(usage);
   }
 }

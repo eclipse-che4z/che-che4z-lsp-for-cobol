@@ -22,6 +22,7 @@ import lombok.Synchronized;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.common.model.DefinedAndUsedStructure;
+import org.eclipse.lsp.cobol.common.model.tree.CodeBlockUsageNode;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNode;
@@ -118,7 +119,14 @@ public class SymbolsRepository {
         ctx.getDefinitions().stream().filter(uriNotImplicit()).collect(Collectors.toList());
     List<Location> usages =
         ctx.getUsages().stream().filter(uriNotImplicit()).collect(Collectors.toList());
-    return new SymbolsRepository.Element("", definitions, usages);
+
+    String name = (ctx instanceof CodeBlockUsageNode)
+            ? ctx.getName()
+              + (((CodeBlockUsageNode) ctx).getOfSection() != null
+                      ? " OF " + ((CodeBlockUsageNode) ctx).getOfSection()
+                      : "")
+            : ctx.getName();
+    return new SymbolsRepository.Element(name, definitions, usages);
   }
 
   private static Predicate<Location> uriNotImplicit() {

@@ -48,10 +48,11 @@ public class ElementOccurrences implements Occurrences {
     if (sourceUnitGraph.isUserSuppliedCopybook(uri)) {
       return getCopybookLocation(position, uri);
     }
-    return SymbolsRepository.findElementByPosition(uri,
-                    document.getLastAnalysisResult(),
-                    position.getPosition())
-            .map(DefinedAndUsedStructure::getDefinitions).orElse(Collections.emptyList());
+    Optional<DefinedAndUsedStructure> elementByPosition = SymbolsRepository.findElementByPosition(uri,
+            document.getLastAnalysisResult(),
+            position.getPosition());
+
+    return elementByPosition.map(DefinedAndUsedStructure::getDefinitions).orElse(Collections.emptyList());
   }
 
   private List<Location> getCopybookLocation(TextDocumentPositionParams position, String uri) {
