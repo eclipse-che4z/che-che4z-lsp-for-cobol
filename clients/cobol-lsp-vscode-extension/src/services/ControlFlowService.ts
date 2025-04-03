@@ -157,8 +157,9 @@ export class ControlFlowAnalysisService implements AnalysisServiceDelegate {
     this.logChannel?.debug(`Invalidate document: ${documentUri}`);
 
     this.invalidatePromise(documentUri, rejectPromise);
-    this.diagnosticService.clearDiagnostics(documentUri);
-
+    if (rejectPromise) {
+      this.diagnosticService.clearDiagnostics(documentUri);
+    }
     await this.removeTask(documentUri);
   }
 
