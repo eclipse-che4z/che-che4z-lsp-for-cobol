@@ -57,11 +57,6 @@ public class UseCaseUsageResolver extends UseCasePreprocessorBaseListener {
             moveUsageLocation(procedureId, possibleParagraphId);
             return;
         }
-        ProcedureId possibleSectionId = new ProcedureId(procedureName, null);
-        if (definitions.containsKey(possibleSectionId)) {
-            moveUsageLocation(procedureId, possibleSectionId);
-            return;
-        }
         // Resolve all variants
         List<ProcedureId> candidates = new ArrayList<>();
         for (Map.Entry<ProcedureId, List<Location>> en : definitions.entrySet()) {
