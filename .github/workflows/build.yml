@@ -67,7 +67,7 @@ jobs:
         with:
           args: "--skip-sorting-imports --replace"
           skip-commit: true
-          release-name: 1.25.2
+          release-name: 1.12.0
       - name: Print diffs
         run: git --no-pager diff --exit-code      
   zipSources:
