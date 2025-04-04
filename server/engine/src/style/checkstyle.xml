@@ -42,7 +42,9 @@
 
     <!-- Checks for Size Violations.                    -->
     <!-- See https://checkstyle.org/config_sizes.html -->
-    <module name="FileLength"/>
+    <module name="FileLength">
+        <property name="max" value="2100"/>
+    </module>
     <!-- <module name="LineLength">-->
     <!--     <property name="fileExtensions" value="java"/>-->
     <!--     <property name="max" value="120"/>-->

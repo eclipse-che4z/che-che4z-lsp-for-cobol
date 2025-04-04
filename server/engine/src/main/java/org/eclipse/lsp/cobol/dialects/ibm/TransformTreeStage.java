@@ -15,7 +15,6 @@
 package org.eclipse.lsp.cobol.dialects.ibm;
 
 import java.util.*;
-
 import lombok.RequiredArgsConstructor;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
@@ -65,6 +64,31 @@ public class TransformTreeStage
   protected final DialectService dialectService;
   protected final AstProcessor astProcessor;
   protected final CodeLayoutStore layoutStore;
+
+  private static void handleParagraph(List<Node> siblings, LinkedList<Node> stack, Node node) {
+    if (stack.isEmpty()) {
+      ParagraphsNode paragraphsNode = new ParagraphsNode(node.getLocality());
+      stack.push(paragraphsNode);
+      siblings.add(paragraphsNode);
+      paragraphsNode.addChild(node);
+      stack.push(node);
+      return;
+    }
+    if (stack.peek().getNodeType().equals(NodeType.PROCEDURE_SECTION)) {
+      Node section = stack.peek();
+      ParagraphsNode paragraphsNode = new ParagraphsNode(node.getLocality());
+      stack.push(paragraphsNode);
+      section.addChild(paragraphsNode);
+      paragraphsNode.addChild(node);
+      stack.push(node);
+      return;
+    }
+    if (stack.peek().getNodeType() == NodeType.PARAGRAPH) {
+      stack.pop();
+      stack.peek().addChild(node);
+      stack.push(node);
+    }
+  }
 
   @Override
   public StageResult<ProcessingResult> run(
@@ -120,8 +144,7 @@ public class TransformTreeStage
   }
 
   private void addCopyNodes(AnalysisContext context, Node rootNode) {
-    for (Map.Entry<String, Location> copybook :
-        context.getCopybooksRepository().getUsages().entries()) {
+    for (Map.Entry<String, Location> copybook : context.getCopybooksRepository().getUsages().entries()) {
       String name = copybook.getKey();
       Range range = copybook.getValue().getRange();
       Locality statementLocality =
@@ -202,31 +225,6 @@ public class TransformTreeStage
     if (stack.peek().getNodeType() == NodeType.PARAGRAPH) {
       stack.pop();
       stack.pop();
-      stack.push(node);
-    }
-  }
-
-  private static void handleParagraph(List<Node> siblings, LinkedList<Node> stack, Node node) {
-    if (stack.isEmpty()) {
-      ParagraphsNode paragraphsNode = new ParagraphsNode(node.getLocality());
-      stack.push(paragraphsNode);
-      siblings.add(paragraphsNode);
-      paragraphsNode.addChild(node);
-      stack.push(node);
-      return;
-    }
-    if (stack.peek().getNodeType().equals(NodeType.PROCEDURE_SECTION)) {
-      Node section = stack.peek();
-      ParagraphsNode paragraphsNode = new ParagraphsNode(node.getLocality());
-      stack.push(paragraphsNode);
-      section.addChild(paragraphsNode);
-      paragraphsNode.addChild(node);
-      stack.push(node);
-      return;
-    }
-    if (stack.peek().getNodeType() == NodeType.PARAGRAPH) {
-      stack.pop();
-      stack.peek().addChild(node);
       stack.push(node);
     }
   }
