@@ -42,13 +42,20 @@ public class CodeBlockUsageNodeEnricher implements Processor<CodeBlockUsageNode>
     }
     ProgramNode programNode = programOpt.get();
     List<CodeBlockReference> codeBlockReferences = symbolAccumulator.getCodeBlockReference(programNode, node);
-    List<Location> definitions = new ArrayList<>();
-    List<Location> usage = new ArrayList<>();
-    for (CodeBlockReference codeBlockReference : codeBlockReferences) {
-      definitions.addAll(codeBlockReference.getDefinitions());
-      usage.addAll(codeBlockReference.getUsage());
+    if (codeBlockReferences.size() == 1) {
+      node.setDefinitions(codeBlockReferences.get(0).getDefinitions());
+      node.setUsages(codeBlockReferences.get(0).getUsage());
+    } else if (codeBlockReferences.size() > 1) {
+      // TODO: A lot of ambiguous references will cause performance degradation.
+      // Using symbol table instead of CodeBlockUsageNode can resolve this issue.
+      List<Location> definitions = new ArrayList<>();
+      List<Location> usage = new ArrayList<>();
+      for (CodeBlockReference codeBlockReference : codeBlockReferences) {
+        definitions.addAll(codeBlockReference.getDefinitions());
+        usage.addAll(codeBlockReference.getUsage());
+      }
+      node.setDefinitions(definitions);
+      node.setUsages(usage);
     }
-    node.setDefinitions(definitions);
-    node.setUsages(usage);
   }
 }

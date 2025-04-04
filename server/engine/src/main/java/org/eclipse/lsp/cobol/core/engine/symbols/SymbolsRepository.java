@@ -120,12 +120,13 @@ public class SymbolsRepository {
     List<Location> usages =
         ctx.getUsages().stream().filter(uriNotImplicit()).collect(Collectors.toList());
 
-    String name = (ctx instanceof CodeBlockUsageNode)
-            ? ctx.getName()
-              + (((CodeBlockUsageNode) ctx).getOfSection() != null
-                      ? " OF " + ((CodeBlockUsageNode) ctx).getOfSection()
-                      : "")
-            : ctx.getName();
+    String name = ctx.getName();
+    if (ctx instanceof CodeBlockUsageNode) {
+      final CodeBlockUsageNode node = (CodeBlockUsageNode) ctx;
+      final String section = node.getOfSection();
+      if (section != null)
+        name += " OF " + section;
+    }
     return new SymbolsRepository.Element(name, definitions, usages);
   }
 
