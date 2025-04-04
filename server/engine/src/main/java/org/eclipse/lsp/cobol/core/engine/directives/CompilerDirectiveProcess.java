@@ -38,10 +38,7 @@ public class CompilerDirectiveProcess implements Processor<CompilerDirectiveNode
   public void accept(
       CompilerDirectiveNode compilerDirectiveNode, ProcessingContext processingContext) {
     String directiveText =
-            compilerDirectiveNode
-            .getDirectiveText()
-            .replaceAll("\\s+", "")
-            .toUpperCase(Locale.ROOT);
+        compilerDirectiveNode.getDirectiveText().replaceAll("\\s+", "").toUpperCase(Locale.ROOT);
     List<CompilerDirectiveOption> directiveOptionsList =
         Arrays.stream(CompilerDirectiveName.values())
             .map(val -> val.getDirectiveOption(directiveText))

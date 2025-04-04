@@ -54,10 +54,7 @@ class TestMissingNestedCopybookProducesError {
         ImmutableMap.of(
             "missing",
             new Diagnostic(
-                new Range(),
-                "Errors inside the copybook",
-                Error,
-                ErrorSource.COPYBOOK.getText()),
+                new Range(), "Errors inside the copybook", Error, ErrorSource.COPYBOOK.getText()),
             "missingCpy",
             new Diagnostic(
                 new Range(),

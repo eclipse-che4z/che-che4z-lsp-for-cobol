@@ -19,13 +19,11 @@ import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.junit.jupiter.api.Test;
 
-
-/**
- * Parse FETCH NEXT ROWSET FROM TEST INTO :VAR
- */
+/** Parse FETCH NEXT ROWSET FROM TEST INTO :VAR */
 class TestSqlColonsInFetchStatements {
 
-  private static final String TEXT = "       IDENTIFICATION DIVISION.\n"
+  private static final String TEXT =
+      "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID. CASE1.\n"
           + "       ENVIRONMENT DIVISION.\n"
           + "       DATA DIVISION.\n"

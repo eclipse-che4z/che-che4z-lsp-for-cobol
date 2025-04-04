@@ -27,9 +27,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-/**
- * Test {@link TrimFormation}
- */
+/** Test {@link TrimFormation} */
 class TrimFormationTest {
   private static final String TEXT =
       "A sample text line-0 \r\n"
@@ -41,7 +39,8 @@ class TrimFormationTest {
   @Test
   void WhenFormatIsCalledWithNullParam_thenIllegalArgumentException() {
     TrimFormation trimFormation = new TrimFormation();
-    Assertions.assertThrows(IllegalArgumentException.class, () -> trimFormation.format(null, ImmutableList.of()));
+    Assertions.assertThrows(
+        IllegalArgumentException.class, () -> trimFormation.format(null, ImmutableList.of()));
   }
 
   @Test

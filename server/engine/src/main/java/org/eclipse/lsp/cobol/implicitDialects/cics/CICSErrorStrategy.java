@@ -38,25 +38,105 @@ public class CICSErrorStrategy extends DefaultErrorStrategy implements MessageSe
   @Getter @Setter private MessageService messageService;
   @Getter @Setter private ErrorMessageHelper errorMessageHelper;
 
-  private static final IntervalSet RESTART_OPTIONS = new IntervalSet(
-      CICSLexer.ABEND, CICSLexer.ADD, CICSLexer.ADDRESS, CICSLexer.ALLOCATE, CICSLexer.ASKTIME, CICSLexer.ASSIGN,
-      CICSLexer.BIF, CICSLexer.BUILD, CICSLexer.CANCEL, CICSLexer.CHANGE, CICSLexer.CHECK, CICSLexer.CONNECT,
-      CICSLexer.CONVERSE, CICSLexer.CONVERTTIME, CICSLexer.DEFINE, CICSLexer.DELAY, CICSLexer.DELETE,
-      CICSLexer.DELETEQ, CICSLexer.DEQ, CICSLexer.DOCUMENT, CICSLexer.DUMP, CICSLexer.ENDBR, CICSLexer.ENDBROWSE,
-      CICSLexer.ENQ, CICSLexer.ENTER, CICSLexer.EXTRACT, CICSLexer.FORCE, CICSLexer.FORMATTIME, CICSLexer.FREE,
-      CICSLexer.FREEMAIN, CICSLexer.GDS, CICSLexer.GET, CICSLexer.GETMAIN, CICSLexer.GETNEXT, CICSLexer.HANDLE,
-      CICSLexer.IGNORE, CICSLexer.INQUIRE, CICSLexer.INVOKE, CICSLexer.ISSUE, CICSLexer.LINK, CICSLexer.LOAD,
-      CICSLexer.MONITOR, CICSLexer.MOVE, CICSLexer.POINT, CICSLexer.POP, CICSLexer.POST, CICSLexer.PURGE,
-      CICSLexer.PUSH, CICSLexer.PUT, CICSLexer.QUERY, CICSLexer.READ, CICSLexer.READNEXT, CICSLexer.READQ,
-      CICSLexer.RECEIVE, CICSLexer.RELEASE, CICSLexer.REMOVE, CICSLexer.RESET, CICSLexer.RESETBR, CICSLexer.RESUME,
-      CICSLexer.RETRIEVE, CICSLexer.RETURN, CICSLexer.REWIND, CICSLexer.REWRITE, CICSLexer.ROUTE, CICSLexer.RUN,
-      CICSLexer.SEND, CICSLexer.SET, CICSLexer.SIGNAL, CICSLexer.SIGNOFF, CICSLexer.SIGNON, CICSLexer.SOAPFAULT,
-      CICSLexer.SPOOLCLOSE, CICSLexer.SPOOLOPEN, CICSLexer.SPOOLREAD, CICSLexer.SPOOLWRITE, CICSLexer.START,
-      CICSLexer.STARTBR, CICSLexer.STARTBROWSE, CICSLexer.SUSPEND, CICSLexer.SYNCPOINT, CICSLexer.TEST,
-      CICSLexer.TRANSFORM, CICSLexer.UNLOCK, CICSLexer.UPDATE, CICSLexer.VERIFY, CICSLexer.WAIT,
-      CICSLexer.WAITCICS, CICSLexer.WEB, CICSLexer.WRITE, CICSLexer.WRITEQ, CICSLexer.WSACONTEXT,
-      CICSLexer.WSAEPR, CICSLexer.XCTL, CICSLexer.END_EXEC, CICSLexer.DOT);
-  private static final IntervalSet BLOCK_END_TOKENS = new IntervalSet(CICSLexer.END_EXEC, CICSLexer.DOT);
+  private static final IntervalSet RESTART_OPTIONS =
+      new IntervalSet(
+          CICSLexer.ABEND,
+          CICSLexer.ADD,
+          CICSLexer.ADDRESS,
+          CICSLexer.ALLOCATE,
+          CICSLexer.ASKTIME,
+          CICSLexer.ASSIGN,
+          CICSLexer.BIF,
+          CICSLexer.BUILD,
+          CICSLexer.CANCEL,
+          CICSLexer.CHANGE,
+          CICSLexer.CHECK,
+          CICSLexer.CONNECT,
+          CICSLexer.CONVERSE,
+          CICSLexer.CONVERTTIME,
+          CICSLexer.DEFINE,
+          CICSLexer.DELAY,
+          CICSLexer.DELETE,
+          CICSLexer.DELETEQ,
+          CICSLexer.DEQ,
+          CICSLexer.DOCUMENT,
+          CICSLexer.DUMP,
+          CICSLexer.ENDBR,
+          CICSLexer.ENDBROWSE,
+          CICSLexer.ENQ,
+          CICSLexer.ENTER,
+          CICSLexer.EXTRACT,
+          CICSLexer.FORCE,
+          CICSLexer.FORMATTIME,
+          CICSLexer.FREE,
+          CICSLexer.FREEMAIN,
+          CICSLexer.GDS,
+          CICSLexer.GET,
+          CICSLexer.GETMAIN,
+          CICSLexer.GETNEXT,
+          CICSLexer.HANDLE,
+          CICSLexer.IGNORE,
+          CICSLexer.INQUIRE,
+          CICSLexer.INVOKE,
+          CICSLexer.ISSUE,
+          CICSLexer.LINK,
+          CICSLexer.LOAD,
+          CICSLexer.MONITOR,
+          CICSLexer.MOVE,
+          CICSLexer.POINT,
+          CICSLexer.POP,
+          CICSLexer.POST,
+          CICSLexer.PURGE,
+          CICSLexer.PUSH,
+          CICSLexer.PUT,
+          CICSLexer.QUERY,
+          CICSLexer.READ,
+          CICSLexer.READNEXT,
+          CICSLexer.READQ,
+          CICSLexer.RECEIVE,
+          CICSLexer.RELEASE,
+          CICSLexer.REMOVE,
+          CICSLexer.RESET,
+          CICSLexer.RESETBR,
+          CICSLexer.RESUME,
+          CICSLexer.RETRIEVE,
+          CICSLexer.RETURN,
+          CICSLexer.REWIND,
+          CICSLexer.REWRITE,
+          CICSLexer.ROUTE,
+          CICSLexer.RUN,
+          CICSLexer.SEND,
+          CICSLexer.SET,
+          CICSLexer.SIGNAL,
+          CICSLexer.SIGNOFF,
+          CICSLexer.SIGNON,
+          CICSLexer.SOAPFAULT,
+          CICSLexer.SPOOLCLOSE,
+          CICSLexer.SPOOLOPEN,
+          CICSLexer.SPOOLREAD,
+          CICSLexer.SPOOLWRITE,
+          CICSLexer.START,
+          CICSLexer.STARTBR,
+          CICSLexer.STARTBROWSE,
+          CICSLexer.SUSPEND,
+          CICSLexer.SYNCPOINT,
+          CICSLexer.TEST,
+          CICSLexer.TRANSFORM,
+          CICSLexer.UNLOCK,
+          CICSLexer.UPDATE,
+          CICSLexer.VERIFY,
+          CICSLexer.WAIT,
+          CICSLexer.WAITCICS,
+          CICSLexer.WEB,
+          CICSLexer.WRITE,
+          CICSLexer.WRITEQ,
+          CICSLexer.WSACONTEXT,
+          CICSLexer.WSAEPR,
+          CICSLexer.XCTL,
+          CICSLexer.END_EXEC,
+          CICSLexer.DOT);
+  private static final IntervalSet BLOCK_END_TOKENS =
+      new IntervalSet(CICSLexer.END_EXEC, CICSLexer.DOT);
   private static final IntervalSet END_EXEC_ONLY = new IntervalSet(CICSLexer.END_EXEC);
 
   CICSErrorStrategy(MessageService messageService) {
@@ -104,8 +184,7 @@ public class CICSErrorStrategy extends DefaultErrorStrategy implements MessageSe
       TokenStream input = recognizer.getInputStream();
       int m = input.mark();
       int index = input.index();
-      if (index == ctx.start.getTokenIndex())
-        input.consume();
+      if (index == ctx.start.getTokenIndex()) input.consume();
       consumeUntil(recognizer, RESTART_OPTIONS);
       int next = input.LA(1);
       if (next == CICSLexer.DOT || next == CICSLexer.EOF) {
@@ -117,8 +196,7 @@ public class CICSErrorStrategy extends DefaultErrorStrategy implements MessageSe
       TokenStream input = recognizer.getInputStream();
       int m = input.mark();
       int index = input.index();
-      if (index == ctx.start.getTokenIndex())
-        input.consume();
+      if (index == ctx.start.getTokenIndex()) input.consume();
       consumeUntil(recognizer, BLOCK_END_TOKENS);
       Token next = input.LT(1);
       if (next != null && next.getType() == CICSLexer.END_EXEC) {

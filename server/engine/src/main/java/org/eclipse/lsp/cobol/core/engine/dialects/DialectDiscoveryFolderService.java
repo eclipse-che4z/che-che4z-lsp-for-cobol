@@ -36,9 +36,7 @@ import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-/**
- * Discover cobol jar files with dialects
- */
+/** Discover cobol jar files with dialects */
 @Slf4j
 @Singleton
 public class DialectDiscoveryFolderService implements DialectDiscoveryService {
@@ -49,7 +47,10 @@ public class DialectDiscoveryFolderService implements DialectDiscoveryService {
   private final CodeActions actions;
 
   @Inject
-  public DialectDiscoveryFolderService(WorkingFolderService workingFolderService, Communications communications, CodeActions actions) {
+  public DialectDiscoveryFolderService(
+      WorkingFolderService workingFolderService,
+      Communications communications,
+      CodeActions actions) {
     this.workingFolderService = workingFolderService;
     this.communications = communications;
     this.actions = actions;
@@ -57,11 +58,13 @@ public class DialectDiscoveryFolderService implements DialectDiscoveryService {
 
   /**
    * Load cobol dialects
+   *
    * @param copybookService a copybook service
    * @param messageService a message service
    * @return a list of loaded dialects
    */
-  public List<CobolDialect> loadDialects(CopybookService copybookService, MessageService messageService) {
+  public List<CobolDialect> loadDialects(
+      CopybookService copybookService, MessageService messageService) {
     try {
       URI workdir = workingFolderService.getWorkingFolder();
       return loadDialectFromWorkingFolder(workdir, copybookService, messageService);
@@ -73,13 +76,15 @@ public class DialectDiscoveryFolderService implements DialectDiscoveryService {
 
   /**
    * Load cobol dialects from the given path
+   *
    * @param uri is a URI to the dialect's jar file
    * @param copybookService a copybook service
    * @param messageService a message service
    * @return a list of loaded dialects
    */
   @Override
-  public List<CobolDialect> loadDialects(URI uri, CopybookService copybookService, MessageService messageService) {
+  public List<CobolDialect> loadDialects(
+      URI uri, CopybookService copybookService, MessageService messageService) {
     try {
       return createDialectsFromJar(uri, copybookService, messageService);
     } catch (Exception e) {
@@ -88,12 +93,15 @@ public class DialectDiscoveryFolderService implements DialectDiscoveryService {
     return ImmutableList.of();
   }
 
-  private List<CobolDialect> loadDialectFromWorkingFolder(URI workdir, CopybookService copybookService, MessageService messageService) {
+  private List<CobolDialect> loadDialectFromWorkingFolder(
+      URI workdir, CopybookService copybookService, MessageService messageService) {
     try {
       return workingFolderService.getFilenames(workdir).stream()
           .filter(filename -> filename.startsWith("dialect-"))
           .filter(filename -> filename.endsWith(".jar"))
-          .flatMap(filename -> createDialects(workdir, filename, copybookService, messageService).stream())
+          .flatMap(
+              filename ->
+                  createDialects(workdir, filename, copybookService, messageService).stream())
           .collect(Collectors.toList());
     } catch (Exception e) {
       warningCannotLoadDialects(e.getMessage());
@@ -105,7 +113,11 @@ public class DialectDiscoveryFolderService implements DialectDiscoveryService {
     LOG.warn("Cannot load dialects: {}", message);
   }
 
-  private List<CobolDialect> createDialects(URI currentUri, String filename, CopybookService copybookService, MessageService messageService) {
+  private List<CobolDialect> createDialects(
+      URI currentUri,
+      String filename,
+      CopybookService copybookService,
+      MessageService messageService) {
     URI uri;
     try {
       uri = new URI(currentUri + filename);
@@ -116,24 +128,28 @@ public class DialectDiscoveryFolderService implements DialectDiscoveryService {
     return createDialectsFromJar(uri, copybookService, messageService);
   }
 
-  private List<CobolDialect> createDialectsFromJar(URI jarUri, CopybookService copybookService, MessageService messageService) {
+  private List<CobolDialect> createDialectsFromJar(
+      URI jarUri, CopybookService copybookService, MessageService messageService) {
     List<CobolDialect> dialects = new LinkedList<>();
     try {
       URLClassLoader classLoader = createClassLoader(jarUri);
       classLoaderHolder.add(classLoader);
 
-      List<String> classnames = getClassNames(jarUri.getPath()).stream()
-          .filter(c -> !c.equals(CobolDialect.class.getName()))
-          .filter(c -> c.endsWith("Dialect"))
-          .collect(Collectors.toList());
+      List<String> classnames =
+          getClassNames(jarUri.getPath()).stream()
+              .filter(c -> !c.equals(CobolDialect.class.getName()))
+              .filter(c -> c.endsWith("Dialect"))
+              .collect(Collectors.toList());
 
       if (classnames.isEmpty()) {
         throw new Exception("Cannot find dialect class in the jar file " + jarUri);
       }
 
       for (String classname : classnames) {
-        Class<CobolDialect> clazz = (Class<CobolDialect>) Class.forName(classname, true, classLoader);
-        Constructor<CobolDialect> constructor = clazz.getConstructor(CopybookService.class, MessageService.class);
+        Class<CobolDialect> clazz =
+            (Class<CobolDialect>) Class.forName(classname, true, classLoader);
+        Constructor<CobolDialect> constructor =
+            clazz.getConstructor(CopybookService.class, MessageService.class);
         dialects.add(constructor.newInstance(copybookService, messageService));
       }
     } catch (Exception e) {
@@ -143,12 +159,7 @@ public class DialectDiscoveryFolderService implements DialectDiscoveryService {
   }
 
   private URLClassLoader createClassLoader(URI uriToJar) throws MalformedURLException {
-    return new URLClassLoader(
-        new URL[] {
-            uriToJar.toURL()
-        },
-        this.getClass().getClassLoader()
-    );
+    return new URLClassLoader(new URL[] {uriToJar.toURL()}, this.getClass().getClassLoader());
   }
 
   private List<String> getClassNames(String filename) throws IOException {
@@ -186,6 +197,6 @@ public class DialectDiscoveryFolderService implements DialectDiscoveryService {
 
   @Override
   public void registerDialectCodeActionProviders(List<CodeActionProvider> providers) {
-      actions.registerNewProviders(providers);
+    actions.registerNewProviders(providers);
   }
 }

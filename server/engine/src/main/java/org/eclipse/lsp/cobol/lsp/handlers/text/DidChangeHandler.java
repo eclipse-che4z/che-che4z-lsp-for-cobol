@@ -22,9 +22,7 @@ import org.eclipse.lsp.cobol.lsp.analysis.AsyncAnalysisService;
 import org.eclipse.lsp.cobol.lsp.handlers.HandlerUtility;
 import org.eclipse.lsp4j.DidChangeTextDocumentParams;
 
-/**
- * LSP DidChange Handler
- */
+/** LSP DidChange Handler */
 @Slf4j
 public class DidChangeHandler {
   private final AsyncAnalysisService asyncAnalysisService;
@@ -32,7 +30,7 @@ public class DidChangeHandler {
 
   @Inject
   public DidChangeHandler(
-          AsyncAnalysisService asyncAnalysisService, SourceUnitGraph sourceUnitGraph) {
+      AsyncAnalysisService asyncAnalysisService, SourceUnitGraph sourceUnitGraph) {
     this.asyncAnalysisService = asyncAnalysisService;
     this.sourceUnitGraph = sourceUnitGraph;
   }
@@ -52,8 +50,10 @@ public class DidChangeHandler {
     String text = params.getContentChanges().get(0).getText();
     if (sourceUnitGraph.isUserSuppliedCopybook(uri)) {
       sourceUnitGraph.updateContent(uri, text);
-      List<String> allAssociatedFilesForACopybook = sourceUnitGraph.getAllAssociatedFilesForACopybook(uri);
-      asyncAnalysisService.reanalyseCopybooksAssociatedPrograms(allAssociatedFilesForACopybook, uri, text, SourceUnitGraph.EventSource.IDE);
+      List<String> allAssociatedFilesForACopybook =
+          sourceUnitGraph.getAllAssociatedFilesForACopybook(uri);
+      asyncAnalysisService.reanalyseCopybooksAssociatedPrograms(
+          allAssociatedFilesForACopybook, uri, text, SourceUnitGraph.EventSource.IDE);
       return;
     }
     asyncAnalysisService.scheduleAnalysis(

@@ -47,25 +47,29 @@ public class GrammarPreprocessorImpl implements GrammarPreprocessor {
 
   @Inject
   public GrammarPreprocessorImpl(
-          GrammarPreprocessorListenerFactory listenerFactory,
-          ReplacePreprocessorFactory replacingFactory) {
+      GrammarPreprocessorListenerFactory listenerFactory,
+      ReplacePreprocessorFactory replacingFactory) {
     this.listenerFactory = listenerFactory;
     this.replacingFactory = replacingFactory;
   }
 
   @NonNull
   @Override
-  public ResultWithErrors<CopybooksRepository> preprocess(@NonNull PreprocessorContext context, @NonNull CleanerPreprocessor preprocessor) {
+  public ResultWithErrors<CopybooksRepository> preprocess(
+      @NonNull PreprocessorContext context, @NonNull CleanerPreprocessor preprocessor) {
     List<SyntaxError> errors = new ArrayList<>();
 
-    String replacedCode = replace(context.getCurrentDocument(), context.getHierarchy()).unwrap(errors::addAll);
+    String replacedCode =
+        replace(context.getCurrentDocument(), context.getHierarchy()).unwrap(errors::addAll);
 
     return preprocess(context, preprocessor, replacedCode).accumulateErrors(errors);
   }
 
-  private ResultWithErrors<String> replace(ExtendedDocument extendedDocument, CopybookHierarchy hierarchy) {
+  private ResultWithErrors<String> replace(
+      ExtendedDocument extendedDocument, CopybookHierarchy hierarchy) {
     ThreadInterruptionUtil.checkThreadInterrupted();
-    CobolPreprocessor preprocessorParser = new CobolPreprocessor(makeTokens(extendedDocument.toString()));
+    CobolPreprocessor preprocessorParser =
+        new CobolPreprocessor(makeTokens(extendedDocument.toString()));
     preprocessorParser.removeErrorListeners();
 
     ReplacePreProcessorListener listener = replacingFactory.create(extendedDocument, hierarchy);
@@ -75,13 +79,12 @@ public class GrammarPreprocessorImpl implements GrammarPreprocessor {
   }
 
   private ResultWithErrors<CopybooksRepository> preprocess(
-          PreprocessorContext context,
-          CleanerPreprocessor preprocessor,
-          String code) {
+      PreprocessorContext context, CleanerPreprocessor preprocessor, String code) {
     ThreadInterruptionUtil.checkThreadInterrupted();
     BufferedTokenStream tokens = makeTokens(code);
 
-    GrammarPreprocessorListener<CopybooksRepository> listener = listenerFactory.create(context, preprocessor);
+    GrammarPreprocessorListener<CopybooksRepository> listener =
+        listenerFactory.create(context, preprocessor);
 
     ThreadInterruptionUtil.checkThreadInterrupted();
     CobolPreprocessor parser = new CobolPreprocessor(tokens);

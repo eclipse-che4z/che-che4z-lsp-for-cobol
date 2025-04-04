@@ -31,48 +31,48 @@ import java.util.Map;
  * <p>This class tests all variations of the ACQUIRE command found in the link above.
  */
 public class TestCICSAcquire {
-    private static final String ACQUIRE_ACTIVITYID_VALID =
-            "ACQUIRE ACTIVITYID({$varFour})";
-    private static final String ACQUIRE_PROCESS_PROCESSTYPE_VALID =
-            "ACQUIRE PROCESS({$varFour}) PROCESSTYPE({$varFour})";
-    private static final String ACQUIRE_ACTIVITYID_INVALID =
-            "ACQUIRE ACTIVITYID (100) {PROCESS | error}";
-    private static final String ACQUIRE_PROCESS_INVALID =
-            "ACQUIRE PROCESS(100) PROCESSTYPE(100) {ACTIVITYID | error }";
+  private static final String ACQUIRE_ACTIVITYID_VALID = "ACQUIRE ACTIVITYID({$varFour})";
+  private static final String ACQUIRE_PROCESS_PROCESSTYPE_VALID =
+      "ACQUIRE PROCESS({$varFour}) PROCESSTYPE({$varFour})";
+  private static final String ACQUIRE_ACTIVITYID_INVALID =
+      "ACQUIRE ACTIVITYID (100) {PROCESS | error}";
+  private static final String ACQUIRE_PROCESS_INVALID =
+      "ACQUIRE PROCESS(100) PROCESSTYPE(100) {ACTIVITYID | error }";
 
-    @Test
-    void testAcquireActivityIdValid() {
-        CICSTestUtils.noErrorTest(ACQUIRE_ACTIVITYID_VALID);
-    }
+  @Test
+  void testAcquireActivityIdValid() {
+    CICSTestUtils.noErrorTest(ACQUIRE_ACTIVITYID_VALID);
+  }
 
-    @Test
-    void testAcquireProcessProcesstypeValid() {
-        CICSTestUtils.noErrorTest(ACQUIRE_PROCESS_PROCESSTYPE_VALID);
-    }
+  @Test
+  void testAcquireProcessProcesstypeValid() {
+    CICSTestUtils.noErrorTest(ACQUIRE_PROCESS_PROCESSTYPE_VALID);
+  }
 
-    @Test
-    void testAcquireActivityIdInvalid() {
-        Map<String, Diagnostic> expectedDiagnostic =
-                ImmutableMap.of(
-                        "error",
-                        new Diagnostic(
-                                new Range(),
-                                "Extraneous input PROCESS",
-                                DiagnosticSeverity.Error,
-                                ErrorSource.PARSING.getText()));
-        CICSTestUtils.errorTest(ACQUIRE_ACTIVITYID_INVALID, expectedDiagnostic);
-    }
-    @Test
-    void testAcquireProcessInvalid() {
-        Map<String, Diagnostic> expectedDiagnostic =
-                ImmutableMap.of(
-                        "error",
-                        new Diagnostic(
-                                new Range(),
-                                "Extraneous input ACTIVITYID",
-                                DiagnosticSeverity.Error,
-                                ErrorSource.PARSING.getText()));
+  @Test
+  void testAcquireActivityIdInvalid() {
+    Map<String, Diagnostic> expectedDiagnostic =
+        ImmutableMap.of(
+            "error",
+            new Diagnostic(
+                new Range(),
+                "Extraneous input PROCESS",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()));
+    CICSTestUtils.errorTest(ACQUIRE_ACTIVITYID_INVALID, expectedDiagnostic);
+  }
 
-        CICSTestUtils.errorTest(ACQUIRE_PROCESS_INVALID, expectedDiagnostic);
-    }
+  @Test
+  void testAcquireProcessInvalid() {
+    Map<String, Diagnostic> expectedDiagnostic =
+        ImmutableMap.of(
+            "error",
+            new Diagnostic(
+                new Range(),
+                "Extraneous input ACTIVITYID",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()));
+
+    CICSTestUtils.errorTest(ACQUIRE_PROCESS_INVALID, expectedDiagnostic);
+  }
 }

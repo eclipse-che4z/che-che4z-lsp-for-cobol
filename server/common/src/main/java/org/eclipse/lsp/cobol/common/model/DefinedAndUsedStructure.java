@@ -18,12 +18,11 @@ import org.eclipse.lsp4j.Location;
 
 import java.util.List;
 
-/**
- * The interface represents structure that can be defined and used.
- */
+/** The interface represents structure that can be defined and used. */
 public interface DefinedAndUsedStructure {
   /**
    * Get the name of the Context Object
+   *
    * @return name of the node
    */
   String getName();

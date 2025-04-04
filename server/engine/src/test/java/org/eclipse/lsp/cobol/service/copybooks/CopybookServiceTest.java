@@ -531,8 +531,7 @@ class CopybookServiceTest {
   private CopybookServiceImpl createCopybookService() {
     ClientProvider provider = new ClientProvider();
     provider.setClient(client);
-    return new CopybookServiceImpl(
-        provider, files, new CopybookCache(3, 3, "HOURS"));
+    return new CopybookServiceImpl(provider, files, new CopybookCache(3, 3, "HOURS"));
   }
 
   private CopybookName createCopybook(String displayName) {
@@ -569,8 +568,8 @@ class CopybookServiceTest {
             .resolve(
                 CopybookId.fromString(copybookName.getDisplayName()),
                 copybookName,
-                    DOCUMENT_URI,
-                    DOCUMENT_URI,
+                DOCUMENT_URI,
+                DOCUMENT_URI,
                 null)
             .getResult();
     assertEquals(CONTENT, resolve.getContent());

@@ -36,8 +36,8 @@ import org.eclipse.lsp4j.services.TextDocumentService;
 /**
  * This class is a set of end-points to apply text operations for COBOL documents. All the requests
  * that start with "textDocument" go here. The current implementation contains only supported
- * language features. For more details, please, see the specification:
- * <a href="https://microsoft.github.io//language-server-protocol/specifications/specification-3-14/">...</a>
+ * language features. For more details, please, see the specification: <a
+ * href="https://microsoft.github.io//language-server-protocol/specifications/specification-3-14/">...</a>
  *
  * <p>For the maintainers: Please, add logging for exceptions if you run any asynchronous operation.
  * Also, you perform any communication with the client, do it a using {@link Communications}
@@ -63,20 +63,20 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
 
   @Inject
   public CobolTextDocumentService(
-          LspMessageBroker lspMessageBroker,
-          CompletionHandler completionHandler,
-          CodeActionHandler codeActionHandler,
-          AnalysisHandler analysisHandler,
-          FormattingHandler formattingHandler,
-          DidOpenHandler didOpenHandler,
-          DidCloseHandler didCloseHandler,
-          DidChangeHandler didChangeHandler,
-          DefinitionHandler definitionHandler,
-          DocumentSymbolHandler documentSymbolHandler,
-          DocumentHighlightHandler documentHighlightHandler,
-          ReferencesHandler referencesHandler,
-          HoverHandler hoverHandler,
-          FoldingRangeHandler foldingRangeHandler) {
+      LspMessageBroker lspMessageBroker,
+      CompletionHandler completionHandler,
+      CodeActionHandler codeActionHandler,
+      AnalysisHandler analysisHandler,
+      FormattingHandler formattingHandler,
+      DidOpenHandler didOpenHandler,
+      DidCloseHandler didCloseHandler,
+      DidChangeHandler didChangeHandler,
+      DefinitionHandler definitionHandler,
+      DocumentSymbolHandler documentSymbolHandler,
+      DocumentHighlightHandler documentHighlightHandler,
+      ReferencesHandler referencesHandler,
+      HoverHandler hoverHandler,
+      FoldingRangeHandler foldingRangeHandler) {
     this.lspMessageBroker = lspMessageBroker;
     this.completionHandler = completionHandler;
     this.codeActionHandler = codeActionHandler;
@@ -95,13 +95,13 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
 
   @Override
   public CompletableFuture<Either<List<CompletionItem>, CompletionList>> completion(
-          CompletionParams params) {
+      CompletionParams params) {
     return lspMessageBroker.query(completionHandler.createEvent(params));
   }
 
   @Override
   public CompletableFuture<Either<List<? extends Location>, List<? extends LocationLink>>>
-  definition(DefinitionParams params) {
+      definition(DefinitionParams params) {
     return lspMessageBroker.query(definitionHandler.createEvent(params));
   }
 
@@ -112,9 +112,8 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
 
   @Override
   public CompletableFuture<List<? extends DocumentHighlight>> documentHighlight(
-          DocumentHighlightParams params) {
+      DocumentHighlightParams params) {
     return lspMessageBroker.query(documentHighlightHandler.createEvent(params));
-
   }
 
   @Override
@@ -159,7 +158,7 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
 
   @Override
   public CompletableFuture<List<Either<SymbolInformation, DocumentSymbol>>> documentSymbol(
-          DocumentSymbolParams params) {
+      DocumentSymbolParams params) {
     return lspMessageBroker.query(documentSymbolHandler.createEvent(params));
   }
 

@@ -37,22 +37,25 @@ public class RootNodeUpdateCopyNodesByPositionInTree implements Processor<RootNo
   }
 
   private void updateCopyNodes(RootNode root) {
-    List<Node> cpyNodes = root.getChildren().stream().filter(Node.hasType(NodeType.COPY)).collect(toList());
+    List<Node> cpyNodes =
+        root.getChildren().stream().filter(Node.hasType(NodeType.COPY)).collect(toList());
     root.getChildren().removeAll(cpyNodes);
     for (Node cpyNode : cpyNodes) {
       Locality l = cpyNode.getLocality();
-      Node parentNode = RangeUtils.findNodeByPosition(root, l.getUri(), l.getRange().getStart()).orElse(root);
+      Node parentNode =
+          RangeUtils.findNodeByPosition(root, l.getUri(), l.getRange().getStart()).orElse(root);
       parentNode.addChildAt(getNodeInsertionIndex(parentNode.getChildren(), cpyNode), cpyNode);
     }
 
-    List<Node> copyNodes = root.getDepthFirstList(n ->
-            n.getNodeType() == NodeType.COPY && ((CopyNode) n).getUri() != null);
+    List<Node> copyNodes =
+        root.getDepthFirstList(
+            n -> n.getNodeType() == NodeType.COPY && ((CopyNode) n).getUri() != null);
     for (Node c : copyNodes) {
       for (Node n : copyNodes) {
         CopyNode cn1 = (CopyNode) c;
         CopyNode cn2 = (CopyNode) n;
         if (!Objects.equals(cn2.getNameLocation(), cn1.getNameLocation())
-                && Objects.equals(cn2.getUri(), cn1.getUri())) {
+            && Objects.equals(cn2.getUri(), cn1.getUri())) {
           cn2.addUsage(cn1.getNameLocation());
         }
       }
@@ -84,5 +87,4 @@ public class RootNodeUpdateCopyNodesByPositionInTree implements Processor<RootNo
     }
     return nodeSize;
   }
-
 }

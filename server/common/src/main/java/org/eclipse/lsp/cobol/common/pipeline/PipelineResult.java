@@ -17,9 +17,7 @@ package org.eclipse.lsp.cobol.common.pipeline;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
 
-/**
- * A class to store the pipeline execution results
- */
+/** A class to store the pipeline execution results */
 @Value
 @RequiredArgsConstructor
 public class PipelineResult {

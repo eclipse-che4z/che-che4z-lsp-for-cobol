@@ -26,9 +26,7 @@ import org.eclipse.lsp4j.Location;
 import java.util.List;
 import java.util.function.Function;
 
-/**
- * Enrich code block name node with necessary data
- */
+/** Enrich code block name node with necessary data */
 @AllArgsConstructor
 public class CodeBlockUsageNodeEnricher implements Processor<CodeBlockUsageNode> {
   private final SymbolAccumulator symbolAccumulator;
@@ -39,11 +37,11 @@ public class CodeBlockUsageNodeEnricher implements Processor<CodeBlockUsageNode>
     node.setUsages(getLocations(node, CodeBlockReference::getUsage));
   }
 
-  private List<Location> getLocations(CodeBlockUsageNode node, Function<CodeBlockReference, List<Location>> retriveLocations) {
+  private List<Location> getLocations(
+      CodeBlockUsageNode node, Function<CodeBlockReference, List<Location>> retriveLocations) {
     return node.getProgram()
         .map(p -> symbolAccumulator.getCodeBlockReference(p, node.getName()))
         .map(retriveLocations)
         .orElse(ImmutableList.of());
   }
-
 }

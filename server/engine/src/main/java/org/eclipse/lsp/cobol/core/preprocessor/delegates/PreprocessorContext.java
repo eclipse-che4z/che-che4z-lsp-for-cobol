@@ -21,9 +21,7 @@ import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
 import org.eclipse.lsp.cobol.core.preprocessor.CopybookHierarchy;
 import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
 
-/**
- * Preprocessor context
- */
+/** Preprocessor context */
 @Value
 public class PreprocessorContext {
   @NonNull String programDocumentUri;

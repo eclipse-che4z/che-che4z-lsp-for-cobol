@@ -35,7 +35,8 @@ public class CopyNode extends Node implements DefinedAndUsedStructure {
   private final String uri;
   private final List<Location> usages = new LinkedList<>();
 
-  public CopyNode(Locality statementLocality, Location nameLocation, String copyBookName, String uri) {
+  public CopyNode(
+      Locality statementLocality, Location nameLocation, String copyBookName, String uri) {
     super(statementLocality, NodeType.COPY);
     this.name = copyBookName;
     this.nameLocation = nameLocation;
@@ -43,7 +44,12 @@ public class CopyNode extends Node implements DefinedAndUsedStructure {
     usages.add(nameLocation);
   }
 
-  public CopyNode(Locality statementLocality, Location nameLocation, String copyBookName, String dialect, String uri) {
+  public CopyNode(
+      Locality statementLocality,
+      Location nameLocation,
+      String copyBookName,
+      String dialect,
+      String uri) {
     super(statementLocality, NodeType.COPY, dialect);
     this.name = copyBookName;
     this.nameLocation = nameLocation;
@@ -70,6 +76,7 @@ public class CopyNode extends Node implements DefinedAndUsedStructure {
 
   /**
    * Add a copybook usage
+   *
    * @param nameLocation is the copybook name location
    */
   public void addUsage(Location nameLocation) {

@@ -30,21 +30,18 @@ import org.junit.jupiter.api.Test;
  * <p>This class tests all variations of the RESET command: ACQPROCESS and ACTIVITY.
  */
 public class TestCICSReset {
-  private static final String RESET_ACQPROCESS_VALID =
-          "RESET ACQPROCESS";
+  private static final String RESET_ACQPROCESS_VALID = "RESET ACQPROCESS";
 
-  private static final String RESET_ACTIVITY_VALID =
-          "RESET ACTIVITY({$varOne})";
+  private static final String RESET_ACTIVITY_VALID = "RESET ACTIVITY({$varOne})";
 
-  private static final String RESET_INVALID =
-          "RESET ";
+  private static final String RESET_INVALID = "RESET ";
 
   @Test
   void testResetAcqprocessValid() {
     CICSTestUtils.noErrorTest(RESET_ACQPROCESS_VALID);
   }
 
-   @Test
+  @Test
   void testResetActivityValid() {
     CICSTestUtils.noErrorTest(RESET_ACTIVITY_VALID);
   }
@@ -52,14 +49,14 @@ public class TestCICSReset {
   @Test
   void testResetInvalid() {
     CICSTestUtils.errorTestWithEndExecError(
-            RESET_INVALID,
-            ImmutableList.of(),
-            ImmutableMap.of(
-                    "end-exec-error",
-                    new Diagnostic(
-                            new Range(),
-                            "Syntax error on 'END-EXEC'",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText())));
+        RESET_INVALID,
+        ImmutableList.of(),
+        ImmutableMap.of(
+            "end-exec-error",
+            new Diagnostic(
+                new Range(),
+                "Syntax error on 'END-EXEC'",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
   }
 }

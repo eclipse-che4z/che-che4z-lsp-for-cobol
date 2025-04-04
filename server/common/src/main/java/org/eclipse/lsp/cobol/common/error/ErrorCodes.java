@@ -22,13 +22,13 @@ import lombok.AllArgsConstructor;
  */
 @AllArgsConstructor
 public enum ErrorCodes implements ErrorCode {
-    /** This copybook does not present in the copybook folder */
-    MISSING_COPYBOOK("missing copybook"),
-    INCOMPATIBLE_SERVER_TYPE("incompatible server type");
+  /** This copybook does not present in the copybook folder */
+  MISSING_COPYBOOK("missing copybook"),
+  INCOMPATIBLE_SERVER_TYPE("incompatible server type");
 
-    private String label;
+  private String label;
 
-    public String getLabel() {
-        return label;
-    }
+  public String getLabel() {
+    return label;
+  }
 }

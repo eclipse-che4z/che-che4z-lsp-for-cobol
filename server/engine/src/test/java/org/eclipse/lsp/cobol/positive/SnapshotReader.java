@@ -29,9 +29,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-/**
- * Utility class for reading listing snapshot.
- */
+/** Utility class for reading listing snapshot. */
 @UtilityClass
 @Slf4j
 public class SnapshotReader {
@@ -46,12 +44,13 @@ public class SnapshotReader {
 
   /**
    * Read all the listing snapshot present in a folder location.
+   *
    * @param snapShotLocation folder location of compiler listing snapshots
    * @return filename mapped to {@link SysprintSnap} object segregated by {@link ReportSection}
    * @throws IOException
    */
-  public static Map<String, TreeMap<ReportSection, List<SysprintSnap>>> read(String snapShotLocation)
-      throws IOException {
+  public static Map<String, TreeMap<ReportSection, List<SysprintSnap>>> read(
+      String snapShotLocation) throws IOException {
     Map<String, TreeMap<ReportSection, List<SysprintSnap>>> result = new HashMap<>();
     Files.walk(Paths.get(snapShotLocation))
         .filter(Files::isRegularFile)
@@ -63,7 +62,7 @@ public class SnapshotReader {
                     path.getFileName().toString(),
                     parseRecord(FileUtils.readFileToString(path.toFile(), StandardCharsets.UTF_8)));
               } catch (IOException e) {
-               LOG.error("Error while reading snapshots");
+                LOG.error("Error while reading snapshots");
               }
             });
     return result;

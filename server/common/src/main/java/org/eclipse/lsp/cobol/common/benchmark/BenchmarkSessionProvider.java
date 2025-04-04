@@ -14,9 +14,7 @@
  */
 package org.eclipse.lsp.cobol.common.benchmark;
 
-/**
- * Provides BenchmarkSession object
- */
+/** Provides BenchmarkSession object */
 public interface BenchmarkSessionProvider {
   BenchmarkSession getBenchmarkSession();
 }

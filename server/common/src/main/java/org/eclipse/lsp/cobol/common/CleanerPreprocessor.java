@@ -16,9 +16,7 @@ package org.eclipse.lsp.cobol.common;
 
 import org.eclipse.lsp.cobol.common.mapping.ExtendedText;
 
-/**
- * Preprocessor that provides cleaning code functionality
- */
+/** Preprocessor that provides cleaning code functionality */
 public interface CleanerPreprocessor {
   /**
    * Check and clean of the code as per cobol program structure.

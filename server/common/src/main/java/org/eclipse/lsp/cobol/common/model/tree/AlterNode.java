@@ -21,15 +21,14 @@ import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.NodeType;
 import org.eclipse.lsp.cobol.common.model.ProcedureName;
 
-/**
- * Represents ALTER statement
- */
+/** Represents ALTER statement */
 @Getter
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 public class AlterNode extends Node {
   private final ProcedureName from;
   private final ProcedureName to;
+
   public AlterNode(Locality location, ProcedureName from, ProcedureName to) {
     super(location, NodeType.ALTER);
     this.from = from;

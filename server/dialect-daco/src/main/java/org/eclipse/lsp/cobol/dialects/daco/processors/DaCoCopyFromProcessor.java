@@ -36,10 +36,12 @@ public class DaCoCopyFromProcessor implements Processor<DaCoCopyFromNode> {
 
   @Override
   public void accept(DaCoCopyFromNode copyFromNode, ProcessingContext processingContext) {
-    astPostprocessing(processingContext.getVariableAccumulator(), copyFromNode, processingContext.getErrors());
+    astPostprocessing(
+        processingContext.getVariableAccumulator(), copyFromNode, processingContext.getErrors());
   }
 
-  private void astPostprocessing(VariableAccumulator variableAccumulator, DaCoCopyFromNode node, List<SyntaxError> errors) {
+  private void astPostprocessing(
+      VariableAccumulator variableAccumulator, DaCoCopyFromNode node, List<SyntaxError> errors) {
 
     List<GroupItemNode> protoCandidates =
         node.getNearestParentByType(NodeType.PROGRAM)

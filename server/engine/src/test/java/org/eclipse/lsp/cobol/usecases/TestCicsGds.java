@@ -26,24 +26,24 @@ import java.util.Map;
 
 /**
  * Test CICS GDS command. Documentation link: <a
- * href="https://www.ibm.com/docs/en/cics-ts/6.x?topic=summary-gds-allocate">GDS
- * Command</a>
+ * href="https://www.ibm.com/docs/en/cics-ts/6.x?topic=summary-gds-allocate">GDS Command</a>
  *
  * <p>This class tests all variations of the GDS command found in the link above.
  */
 public class TestCicsGds {
-    private static final String INVALID_ONE = "{GDS|error1} ALLOCATE SYSID(varFour) CONVID(varTwo) RETCODE(varThree)";
+  private static final String INVALID_ONE =
+      "{GDS|error1} ALLOCATE SYSID(varFour) CONVID(varTwo) RETCODE(varThree)";
 
-    @Test
-    void testInvalidOne() {
-        Map<String, Diagnostic> expectedDiagnostic =
-                ImmutableMap.of(
-                        "error1",
-                        new Diagnostic(
-                                new Range(),
-                                "Invalid option provided: GDS is only available in Assembly",
-                                DiagnosticSeverity.Error,
-                                ErrorSource.PARSING.getText()));
-        CICSTestUtils.errorTest(INVALID_ONE, expectedDiagnostic);
-    }
+  @Test
+  void testInvalidOne() {
+    Map<String, Diagnostic> expectedDiagnostic =
+        ImmutableMap.of(
+            "error1",
+            new Diagnostic(
+                new Range(),
+                "Invalid option provided: GDS is only available in Assembly",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()));
+    CICSTestUtils.errorTest(INVALID_ONE, expectedDiagnostic);
+  }
 }

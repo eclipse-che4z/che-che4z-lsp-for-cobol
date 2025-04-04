@@ -151,7 +151,8 @@ public class CobolErrorStrategy extends BasicCobolErrorHandler {
     return skipToTokenList;
   }
 
-  private static boolean shouldSkipToSync(IntervalSet nextTokens, int la, Optional<Integer> lastToken) {
+  private static boolean shouldSkipToSync(
+      IntervalSet nextTokens, int la, Optional<Integer> lastToken) {
     if (!nextTokens.contains(CobolLexer.DOT_FS) && !nextTokens.contains(CobolLexer.DOT_FS2)) {
       return false;
     }
@@ -195,7 +196,7 @@ public class CobolErrorStrategy extends BasicCobolErrorHandler {
     nextTokensState = recognizer.getState();
   }
 
-    @Override
+  @Override
   public Token recoverInline(Parser recognizer) throws RecognitionException {
     // SINGLE TOKEN INSERTION
     if (singleTokenInsertion(recognizer)) {

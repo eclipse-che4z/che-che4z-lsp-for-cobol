@@ -16,9 +16,7 @@
  */
 package org.eclipse.lsp.cobol.codegen;
 
-/**
- * Types of id that was used in the program.
- */
+/** Types of id that was used in the program. */
 public enum IdentifierType {
   PROGRAM_NAME,
   SECTION_NAME,

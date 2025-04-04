@@ -21,17 +21,15 @@ import lombok.NoArgsConstructor;
 import org.eclipse.lsp4j.jsonrpc.validation.NonNull;
 
 /**
- * This class represents a client event object that client sends to the server
- * to retrieve analysis result
+ * This class represents a client event object that client sends to the server to retrieve analysis
+ * result
  */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class AnalysisResultEvent {
-  @NonNull
-  private String uri;
-  @NonNull
-  private String text;
+  @NonNull private String uri;
+  @NonNull private String text;
   private int line;
   private int character;
 }

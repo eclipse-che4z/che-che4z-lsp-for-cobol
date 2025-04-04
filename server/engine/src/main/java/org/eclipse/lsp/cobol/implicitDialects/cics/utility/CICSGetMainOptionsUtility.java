@@ -70,6 +70,7 @@ public class CICSGetMainOptionsUtility extends CICSOptionsCheckBaseUtility {
     checkHasMandatoryOptions(ctx.SET(), ctx, "SET");
     checkHasExactlyOneOption("FLENGTH or LENGTH", ctx, ctx.FLENGTH(), ctx.LENGTH());
     if (ctx.FLENGTH().isEmpty()) checkHasIllegalOptions(ctx.BELOW(), "BELOW without FLENGTH");
-    checkHasMutuallyExclusiveOptions("USERDATAKEY or CICSDATAKEY", ctx.USERDATAKEY(), ctx.CICSDATAKEY());
+    checkHasMutuallyExclusiveOptions(
+        "USERDATAKEY or CICSDATAKEY", ctx.USERDATAKEY(), ctx.CICSDATAKEY());
   }
 }

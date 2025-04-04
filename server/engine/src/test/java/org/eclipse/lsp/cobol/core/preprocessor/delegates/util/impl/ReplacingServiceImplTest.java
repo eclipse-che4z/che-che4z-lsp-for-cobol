@@ -48,14 +48,19 @@ class ReplacingServiceImplTest {
   void testApplyReplacing() {
     ReplacingService replacingService = new ReplacingServiceImpl(messageService);
     ExtendedDocument dm1 = new ExtendedDocument("   01\n.   .CHILD101\n.", "");
-    replacingService.applyReplacing(dm1, new ReplaceData(ImmutableList.of(
-            Pair.of("(?<=[\\.\\s\\r\\n])01(?=[\\.\\s\\r\\n])", "05"), // .
-            Pair.of("CHILD1", "CHILD2")), "", new Range()));
+    replacingService.applyReplacing(
+        dm1,
+        new ReplaceData(
+            ImmutableList.of(
+                Pair.of("(?<=[\\.\\s\\r\\n])01(?=[\\.\\s\\r\\n])", "05"), // .
+                Pair.of("CHILD1", "CHILD2")),
+            "",
+            new Range()));
     assertEquals("   05\n.   .CHILD201\n.", dm1.toString());
 
     ExtendedDocument dm2 = new ExtendedDocument("01 ABC.", "");
-    replacingService.applyReplacing(dm2,
-            new ReplaceData(ImmutableList.of(Pair.of("", "")), "", new Range()));
+    replacingService.applyReplacing(
+        dm2, new ReplaceData(ImmutableList.of(Pair.of("", "")), "", new Range()));
     assertEquals("01 ABC.", dm2.toString());
   }
 

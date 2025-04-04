@@ -24,20 +24,21 @@ import org.junit.jupiter.api.Test;
 
 /** Idms copybook after line concationation */
 class TestIdmsCopyAfterConcat {
-  private static final String TEXT = "       IDENTIFICATION DIVISION.\n"
-      + "       PROGRAM-ID.    PROG1.\n"
-      + "       ENVIRONMENT  DIVISION.\n"
-      + "       IDMS-CONTROL SECTION.\n"
-      + "       PROTOCOL.    MODE IS IDMS-DC-NONAUTO DEBUG\n"
-      + "                    IDMS-RECORDS MANUAL.\n"
-      + "       DATA   DIVISION.\n"
-      + "       WORKING-STORAGE SECTION.\n"
-      + "       01  {$*VAR1}.\n"
-      + "             03 {$*VAR3}                      VALUE\n"
-      + "           ' SOME TEXT SOME TEXT SOME TEXT SOME TEXT SOME TEXT SOME TEXT\n"
-      + "      -    'SOME TEXT SOME TEXT'.\n"
-      + "               05 {$*VAR5}           PIC X(2)    OCCURS 42.\n"
-      + "       01  COPY IDMS {~COPY1!IDMS}.\n";
+  private static final String TEXT =
+      "       IDENTIFICATION DIVISION.\n"
+          + "       PROGRAM-ID.    PROG1.\n"
+          + "       ENVIRONMENT  DIVISION.\n"
+          + "       IDMS-CONTROL SECTION.\n"
+          + "       PROTOCOL.    MODE IS IDMS-DC-NONAUTO DEBUG\n"
+          + "                    IDMS-RECORDS MANUAL.\n"
+          + "       DATA   DIVISION.\n"
+          + "       WORKING-STORAGE SECTION.\n"
+          + "       01  {$*VAR1}.\n"
+          + "             03 {$*VAR3}                      VALUE\n"
+          + "           ' SOME TEXT SOME TEXT SOME TEXT SOME TEXT SOME TEXT SOME TEXT\n"
+          + "      -    'SOME TEXT SOME TEXT'.\n"
+          + "               05 {$*VAR5}           PIC X(2)    OCCURS 42.\n"
+          + "       01  COPY IDMS {~COPY1!IDMS}.\n";
 
   private static final String COPY1 = "";
 

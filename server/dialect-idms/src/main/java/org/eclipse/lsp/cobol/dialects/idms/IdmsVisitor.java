@@ -101,8 +101,7 @@ class IdmsVisitor extends IdmsParserBaseVisitor<List<Node>> {
 
   @Override
   public List<Node> visitVariableUsageName(VariableUsageNameContext ctx) {
-    return addTreeNode(
-        ctx, locality -> new VariableUsageNode(getName(ctx), locality));
+    return addTreeNode(ctx, locality -> new VariableUsageNode(getName(ctx), locality));
   }
 
   @Override
@@ -174,8 +173,7 @@ class IdmsVisitor extends IdmsParserBaseVisitor<List<Node>> {
   }
 
   private Locality constructLocality(ParserRuleContext ctx) {
-    Location location =
-        context.getExtendedDocument().mapLocation(DialectUtils.constructRange(ctx));
+    Location location = context.getExtendedDocument().mapLocation(DialectUtils.constructRange(ctx));
     return Locality.builder().uri(location.getUri()).range(location.getRange()).build();
   }
 

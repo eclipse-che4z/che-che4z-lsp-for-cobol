@@ -30,14 +30,15 @@ public class FunctionReferenceEnricher implements Processor<FunctionReference> {
 
   @Override
   public void accept(FunctionReference node, ProcessingContext ctx) {
-      Optional.ofNullable(ctx.getCurrentProgramNode())
-          .map(
-              programNode ->
-                  symbolAccumulator.getFunctionReference(node.getName(), programNode, node.isFunctionPrefixed()))
-          .ifPresent(
-              fi -> {
-                node.setDefinitions(fi.getDefinition());
-                node.setUsages(fi.getReferences());
-              });
-    }
+    Optional.ofNullable(ctx.getCurrentProgramNode())
+        .map(
+            programNode ->
+                symbolAccumulator.getFunctionReference(
+                    node.getName(), programNode, node.isFunctionPrefixed()))
+        .ifPresent(
+            fi -> {
+              node.setDefinitions(fi.getDefinition());
+              node.setUsages(fi.getReferences());
+            });
+  }
 }

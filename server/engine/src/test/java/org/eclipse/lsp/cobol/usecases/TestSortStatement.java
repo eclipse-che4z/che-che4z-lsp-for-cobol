@@ -30,9 +30,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-/**
- * Test for SORT statement
- */
+/** Test for SORT statement */
 class TestSortStatement {
   private static final String TEXT =
       "       IDENTIFICATION DIVISION.\r\n"
@@ -58,7 +56,7 @@ class TestSortStatement {
           + "       PROCEDURE DIVISION.\r\n";
 
   private static final String SORT_INPUT =
-            "       {#*MAIN-LINE}.\r\n"
+      "       {#*MAIN-LINE}.\r\n"
           + "           SORT {$SORT-WORK-FILE} ASCENDING KEY {$SWF-PARTNO}\r\n"
           + "           INPUT  PROCEDURE {#PAR-INPUT} OF SORT-SEC \r\n"
           + "                       THRU {#PAR-OUTPUT} OF SORT-SEC\r\n"
@@ -83,22 +81,28 @@ class TestSortStatement {
 
   @Test
   void testInputNode() {
-    AnalysisResult result = UseCaseEngine.runTest(TEXT + SORT_INPUT, ImmutableList.of(), ImmutableMap.of());
+    AnalysisResult result =
+        UseCaseEngine.runTest(TEXT + SORT_INPUT, ImmutableList.of(), ImmutableMap.of());
 
-    SortNode sortNode = result.getRootNode().getDepthFirstStream()
-        .filter(n -> n.getNodeType() == NodeType.SORT)
-        .map(SortNode.class::cast)
-        .findFirst()
-        .orElse(null);
+    SortNode sortNode =
+        result
+            .getRootNode()
+            .getDepthFirstStream()
+            .filter(n -> n.getNodeType() == NodeType.SORT)
+            .map(SortNode.class::cast)
+            .findFirst()
+            .orElse(null);
 
     assertNotNull(sortNode);
     assertTrue(sortNode.isAscending());
 
-    InputNode inputNode = sortNode.getDepthFirstStream()
-        .filter(s -> s instanceof InputNode)
-        .map(InputNode.class::cast)
-        .findFirst()
-        .orElse(null);
+    InputNode inputNode =
+        sortNode
+            .getDepthFirstStream()
+            .filter(s -> s instanceof InputNode)
+            .map(InputNode.class::cast)
+            .findFirst()
+            .orElse(null);
 
     assertNotNull(inputNode);
     assertEquals("PAR-INPUT", inputNode.getTarget().getName());
@@ -107,47 +111,58 @@ class TestSortStatement {
     assertEquals("PAR-OUTPUT", inputNode.getThru().getName());
     assertEquals("SORT-SEC", inputNode.getThru().getInSection());
 
-    OutputNode outputNode = sortNode.getDepthFirstStream()
-        .filter(s -> s instanceof OutputNode)
-        .map(OutputNode.class::cast)
-        .findFirst()
-        .orElse(null);
+    OutputNode outputNode =
+        sortNode
+            .getDepthFirstStream()
+            .filter(s -> s instanceof OutputNode)
+            .map(OutputNode.class::cast)
+            .findFirst()
+            .orElse(null);
 
     assertNull(outputNode);
 
     DocumentModelService documentModelService = new DocumentModelService();
     CFASTBuilder builder = new CFASTBuilderImpl(documentModelService);
-    ExtendedApiResult extendedApiResult = builder.build(result.getRootNode().findFirstProgramNode());
+    ExtendedApiResult extendedApiResult =
+        builder.build(result.getRootNode().findFirstProgramNode());
 
     assertEquals(1, extendedApiResult.getControlFlowAST().size());
   }
 
   @Test
   void testOutputNode() {
-    AnalysisResult result = UseCaseEngine.runTest(TEXT + SORT_OUTPUT, ImmutableList.of(), ImmutableMap.of());
+    AnalysisResult result =
+        UseCaseEngine.runTest(TEXT + SORT_OUTPUT, ImmutableList.of(), ImmutableMap.of());
 
-    SortNode sortNode = result.getRootNode().getDepthFirstStream()
-        .filter(n -> n.getNodeType() == NodeType.SORT)
-        .map(SortNode.class::cast)
-        .findFirst()
-        .orElse(null);
+    SortNode sortNode =
+        result
+            .getRootNode()
+            .getDepthFirstStream()
+            .filter(n -> n.getNodeType() == NodeType.SORT)
+            .map(SortNode.class::cast)
+            .findFirst()
+            .orElse(null);
 
     assertNotNull(sortNode);
     assertTrue(sortNode.isAscending());
 
-    InputNode inputNode = sortNode.getDepthFirstStream()
-        .filter(s -> s instanceof InputNode)
-        .map(InputNode.class::cast)
-        .findFirst()
-        .orElse(null);
+    InputNode inputNode =
+        sortNode
+            .getDepthFirstStream()
+            .filter(s -> s instanceof InputNode)
+            .map(InputNode.class::cast)
+            .findFirst()
+            .orElse(null);
 
     assertNull(inputNode);
 
-    OutputNode outputNode = sortNode.getDepthFirstStream()
-        .filter(s -> s instanceof OutputNode)
-        .map(OutputNode.class::cast)
-        .findFirst()
-        .orElse(null);
+    OutputNode outputNode =
+        sortNode
+            .getDepthFirstStream()
+            .filter(s -> s instanceof OutputNode)
+            .map(OutputNode.class::cast)
+            .findFirst()
+            .orElse(null);
 
     assertNotNull(outputNode);
     assertEquals("PAR-INPUT", outputNode.getTarget().getName());
@@ -156,5 +171,4 @@ class TestSortStatement {
     assertEquals("PAR-OUTPUT", outputNode.getThru().getName());
     assertEquals("SORT-SEC", outputNode.getThru().getInSection());
   }
-
 }

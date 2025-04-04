@@ -33,14 +33,14 @@ import org.eclipse.lsp.cobol.core.strategy.CobolErrorStrategy;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
-/**
- * Process compiler options statements in the source file and substitute them with empty lines.
- */
-public class CompilerDirectivesStage implements Stage<AnalysisContext, Void, List<CompilerDirectiveNode>> {
+/** Process compiler options statements in the source file and substitute them with empty lines. */
+public class CompilerDirectivesStage
+    implements Stage<AnalysisContext, Void, List<CompilerDirectiveNode>> {
   private static final Pattern COMPILER_DIRECTIVE_LINE =
-          Pattern.compile("(?i)(\\d.{5}.*|\\s*+)\\*?(CBL|PROCESS)\\s+(?<directives>.+)");
+      Pattern.compile("(?i)(\\d.{5}.*|\\s*+)\\*?(CBL|PROCESS)\\s+(?<directives>.+)");
   private static final Pattern NEW_LINE_PATTERN = Pattern.compile("\n\r?");
-  private static final Pattern DIALECT_FILLER_PATTERN = Pattern.compile(String.format("^[%s%s]*$", "\\s", CobolDialect.FILLER));
+  private static final Pattern DIALECT_FILLER_PATTERN =
+      Pattern.compile(String.format("^[%s%s]*$", "\\s", CobolDialect.FILLER));
   private final MessageService messageService;
 
   public CompilerDirectivesStage(MessageService messageService) {
@@ -48,7 +48,8 @@ public class CompilerDirectivesStage implements Stage<AnalysisContext, Void, Lis
   }
 
   @Override
-  public StageResult<Void> run(AnalysisContext ctx, StageResult<List<CompilerDirectiveNode>> prevStageResult) {
+  public StageResult<Void> run(
+      AnalysisContext ctx, StageResult<List<CompilerDirectiveNode>> prevStageResult) {
     String text = ctx.getExtendedDocument().getCurrentText().toString();
 
     String[] lines = NEW_LINE_PATTERN.split(text);
@@ -58,11 +59,12 @@ public class CompilerDirectivesStage implements Stage<AnalysisContext, Void, Lis
         // we could stop on "IDENTIFICATION DIVISION"
         continue;
       }
-      process(directivesLine.group("directives"), ctx, new Position(i, directivesLine.start("directives")));
+      process(
+          directivesLine.group("directives"),
+          ctx,
+          new Position(i, directivesLine.start("directives")));
       String newText = new String(new char[lines[i].length()]).replace('\0', ' ');
-      Range range = new Range(
-              new Position(i, 0),
-              new Position(i, lines[i].length()));
+      Range range = new Range(new Position(i, 0), new Position(i, lines[i].length()));
       ctx.getExtendedDocument().replace(range, newText);
     }
 

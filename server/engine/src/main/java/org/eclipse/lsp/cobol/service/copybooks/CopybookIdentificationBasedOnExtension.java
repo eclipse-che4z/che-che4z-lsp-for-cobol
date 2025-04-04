@@ -38,12 +38,9 @@ public class CopybookIdentificationBasedOnExtension implements CopybookIdentific
     String fileNameWithExtension = uriAsArray[uriAsArray.length - 1];
     String[] split = fileNameWithExtension.split("\\.");
     String extension = split.length > 1 ? "." + split[split.length - 1] : "";
-    if (Objects.isNull(config)
-        || config.size() == 0
-        || StringUtils.isBlank(extension)) {
+    if (Objects.isNull(config) || config.size() == 0 || StringUtils.isBlank(extension)) {
       return false;
     }
-    return config.size() > 0
-        && config.contains(extension);
+    return config.size() > 0 && config.contains(extension);
   }
 }

@@ -30,7 +30,8 @@ public class SetToStatement extends StatementNode {
   List<Node> receivingFields;
   Node sendingField;
 
-  public SetToStatement(boolean address, Locality locality, List<Node> receivingFields, Node sendingField) {
+  public SetToStatement(
+      boolean address, Locality locality, List<Node> receivingFields, Node sendingField) {
     super(locality);
     this.address = address;
     this.receivingFields = receivingFields;

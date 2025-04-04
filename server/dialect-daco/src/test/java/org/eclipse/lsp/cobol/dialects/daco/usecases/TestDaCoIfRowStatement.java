@@ -44,6 +44,8 @@ class TestDaCoIfRowStatement {
     UseCaseEngine.runTest(
         TEXT,
         ImmutableList.of(),
-        ImmutableMap.of(), ImmutableList.of(), DialectConfigs.getDaCoAnalysisConfig());
+        ImmutableMap.of(),
+        ImmutableList.of(),
+        DialectConfigs.getDaCoAnalysisConfig());
   }
 }

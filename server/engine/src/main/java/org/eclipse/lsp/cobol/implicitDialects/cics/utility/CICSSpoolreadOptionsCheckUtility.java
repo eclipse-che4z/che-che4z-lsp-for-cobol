@@ -32,16 +32,17 @@ public class CICSSpoolreadOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
   public static final int RULE_INDEX = RULE_cics_spoolread;
 
   private static final Map<Integer, ErrorSeverity> DUPLICATE_CHECK_OPTIONS =
-          new HashMap<Integer, ErrorSeverity>() {
-            {
-              put(CICSLexer.TOKEN, ErrorSeverity.ERROR);
-              put(CICSLexer.INTO, ErrorSeverity.ERROR);
-              put(CICSLexer.MAXFLENGTH, ErrorSeverity.ERROR);
-              put(CICSLexer.TOFLENGTH, ErrorSeverity.ERROR);
-            }
-          };
+      new HashMap<Integer, ErrorSeverity>() {
+        {
+          put(CICSLexer.TOKEN, ErrorSeverity.ERROR);
+          put(CICSLexer.INTO, ErrorSeverity.ERROR);
+          put(CICSLexer.MAXFLENGTH, ErrorSeverity.ERROR);
+          put(CICSLexer.TOFLENGTH, ErrorSeverity.ERROR);
+        }
+      };
 
-  public CICSSpoolreadOptionsCheckUtility(DialectProcessingContext context, List<SyntaxError> errors) {
+  public CICSSpoolreadOptionsCheckUtility(
+      DialectProcessingContext context, List<SyntaxError> errors) {
     super(context, errors, DUPLICATE_CHECK_OPTIONS);
   }
 

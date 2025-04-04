@@ -40,7 +40,7 @@ class TestDaCoReadTransaction {
           + "            READ TRANSACTION OSD2. \r\n"
           + "            READ TRANSACTION 3167. \r\n"
           + "            READ TRANSACTION. \r\n"
-      // Negative tests
+          // Negative tests
           + "            READ TRANSACTION {R-DS|1}. \r\n"
           + "            READ TRANSACTION {RD|2}. \r\n"
           + "            READ TRANSACTION {RDERW|2}. \r\n";

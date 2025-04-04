@@ -23,9 +23,7 @@ import org.eclipse.lsp.cobol.lsp.handlers.text.FoldingRangeHandler;
 import org.eclipse.lsp4j.FoldingRange;
 import org.eclipse.lsp4j.FoldingRangeRequestParams;
 
-/**
- * `textDocument/foldingRange` language server event
- */
+/** `textDocument/foldingRange` language server event */
 public class FoldingQuery implements LspQuery<List<FoldingRange>> {
   final CompletableFuture<List<FoldingRange>> result;
   private final String uri;

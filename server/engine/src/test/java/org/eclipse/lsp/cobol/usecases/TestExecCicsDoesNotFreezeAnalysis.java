@@ -29,7 +29,8 @@ import org.junit.jupiter.api.Test;
 /** Typing EXEC CICS should not freeze the server */
 class TestExecCicsDoesNotFreezeAnalysis {
 
-  private static final String TEXT = ""
+  private static final String TEXT =
+      ""
           + "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID. HELLO-CICS.\n"
           + "       DATA DIVISION.\n"

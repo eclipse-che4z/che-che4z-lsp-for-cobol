@@ -58,7 +58,6 @@ class CobolLineIndicatorProcessorImplTest {
         actual.getIndicatorArea() + actual.getContentArea());
   }
 
-
   /** Testing normal lines pre-formatting for Token analysis */
   @Test
   void normalLineTest() {
@@ -68,8 +67,7 @@ class CobolLineIndicatorProcessorImplTest {
     normalLine.setContentAreaA("    ");
     normalLine.setContentAreaB("         RANDOM TEXT ,  ");
 
-    LineIndicatorProcessor processor =
-        new IbmCobolLineIndicatorProcessor(store);
+    LineIndicatorProcessor processor = new IbmCobolLineIndicatorProcessor(store);
 
     List<CobolLine> outcome = processor.processLines(ImmutableList.of(normalLine));
     CobolLine actual = outcome.get(0);
@@ -105,8 +103,7 @@ class CobolLineIndicatorProcessorImplTest {
     compilerDirectiveLine.setContentAreaA("    ");
     compilerDirectiveLine.setContentAreaB("DEFINE");
 
-    LineIndicatorProcessor processor =
-        new IbmCobolLineIndicatorProcessor(store);
+    LineIndicatorProcessor processor = new IbmCobolLineIndicatorProcessor(store);
     List<CobolLine> outcome = processor.processLines(ImmutableList.of(compilerDirectiveLine));
     CobolLine actual = outcome.get(0);
 
@@ -123,8 +120,7 @@ class CobolLineIndicatorProcessorImplTest {
     commentLine.setContentAreaA("    ");
     commentLine.setContentAreaB("THIS IS A COMMENT        ");
 
-    LineIndicatorProcessor processor =
-        new IbmCobolLineIndicatorProcessor(null);
+    LineIndicatorProcessor processor = new IbmCobolLineIndicatorProcessor(null);
 
     List<CobolLine> outcome = processor.processLines(ImmutableList.of(commentLine));
     CobolLine actual = outcome.get(0);
@@ -142,8 +138,7 @@ class CobolLineIndicatorProcessorImplTest {
     commentLine.setContentAreaA("PROGRAM-ID. comments  *> Floating");
     commentLine.setContentAreaB(" comment");
 
-    LineIndicatorProcessor processor =
-        new IbmCobolLineIndicatorProcessor(null);
+    LineIndicatorProcessor processor = new IbmCobolLineIndicatorProcessor(null);
 
     List<CobolLine> outcome = processor.processLines(ImmutableList.of(commentLine));
     CobolLine actual = outcome.get(0);
@@ -179,8 +174,7 @@ class CobolLineIndicatorProcessorImplTest {
 
     List<CobolLine> listOfLines =
         ImmutableList.of(startContinuationLine, middleContinuationLine, lastContinuationLine);
-    LineIndicatorProcessor processor =
-        new IbmCobolLineIndicatorProcessor(null);
+    LineIndicatorProcessor processor = new IbmCobolLineIndicatorProcessor(null);
     List<CobolLine> outcomeList = processor.processLines(listOfLines);
 
     assertEquals(
@@ -208,8 +202,7 @@ class CobolLineIndicatorProcessorImplTest {
     continuationLine.setSuccessor(emptyContinuationLine);
 
     final List<CobolLine> listOfLines = ImmutableList.of(continuationLine, emptyContinuationLine);
-    LineIndicatorProcessor processor =
-        new IbmCobolLineIndicatorProcessor(null);
+    LineIndicatorProcessor processor = new IbmCobolLineIndicatorProcessor(null);
     List<CobolLine> outcomeList = processor.processLines(listOfLines);
 
     assertEquals(
@@ -240,8 +233,7 @@ class CobolLineIndicatorProcessorImplTest {
 
     List<CobolLine> listOfLines =
         ImmutableList.of(startContinuationLine, trailingCommaContinuationLine);
-    LineIndicatorProcessor processor =
-        new IbmCobolLineIndicatorProcessor(null);
+    LineIndicatorProcessor processor = new IbmCobolLineIndicatorProcessor(null);
     List<CobolLine> outcomeList = processor.processLines(listOfLines);
 
     assertEquals(
@@ -278,8 +270,7 @@ class CobolLineIndicatorProcessorImplTest {
     startContinuationLine.setSuccessor(quoteContinuationLine);
     quoteContinuationLine.setSuccessor(lastContinuationLine);
 
-    LineIndicatorProcessor processor =
-        new IbmCobolLineIndicatorProcessor(null);
+    LineIndicatorProcessor processor = new IbmCobolLineIndicatorProcessor(null);
 
     List<CobolLine> outcome = processor.processLines(ImmutableList.of(lastContinuationLine));
     CobolLine actual = outcome.get(0);
@@ -315,8 +306,7 @@ class CobolLineIndicatorProcessorImplTest {
     startContinuationLine.setSuccessor(quoteContinuationLine);
     quoteContinuationLine.setSuccessor(lastContinuationLine);
 
-    LineIndicatorProcessor processor =
-        new IbmCobolLineIndicatorProcessor(null);
+    LineIndicatorProcessor processor = new IbmCobolLineIndicatorProcessor(null);
 
     List<CobolLine> outcome = processor.processLines(ImmutableList.of(lastContinuationLine));
     CobolLine actual = outcome.get(0);
@@ -338,8 +328,7 @@ class CobolLineIndicatorProcessorImplTest {
     notFormattedLine.setSequenceArea(" P-ADD");
     notFormattedLine.setType(CONTINUATION);
 
-    LineIndicatorProcessor processor =
-        new IbmCobolLineIndicatorProcessor(null);
+    LineIndicatorProcessor processor = new IbmCobolLineIndicatorProcessor(null);
     List<CobolLine> outcome = processor.processLines(ImmutableList.of(notFormattedLine));
     CobolLine actual = outcome.get(0);
 

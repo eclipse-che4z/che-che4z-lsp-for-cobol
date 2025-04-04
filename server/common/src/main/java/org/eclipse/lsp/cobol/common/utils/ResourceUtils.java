@@ -19,13 +19,12 @@ import lombok.experimental.UtilityClass;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 
-/**
- * Resource utils
- */
+/** Resource utils */
 @UtilityClass
 public class ResourceUtils {
   /**
    * Get input stream of resource file
+   *
    * @param filename is a name if a file
    * @return input stream
    * @throws FileNotFoundException otherwise

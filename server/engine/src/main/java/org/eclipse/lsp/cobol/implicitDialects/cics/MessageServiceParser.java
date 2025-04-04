@@ -27,9 +27,7 @@ import org.eclipse.lsp.cobol.common.message.MessageServiceProvider;
  */
 public abstract class MessageServiceParser extends Parser {
 
-  /**
-   * @param input {@link TokenStream}
-   */
+  /** @param input {@link TokenStream} */
   MessageServiceParser(TokenStream input) {
     super(input);
   }

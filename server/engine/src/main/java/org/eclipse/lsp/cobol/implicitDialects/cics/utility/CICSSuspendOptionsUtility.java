@@ -62,7 +62,10 @@ public class CICSSuspendOptionsUtility extends CICSOptionsCheckBaseUtility {
 
   @SuppressWarnings("unchecked")
   private void checkSuspend(CICSParser.Cics_suspend_bodyContext ctx) {
-    checkHasMutuallyExclusiveOptions("ACQACTIVITY or ACQPROCESS or ACTIVITY",
-            ctx.ACQACTIVITY(), ctx.ACQPROCESS(), ctx.ACTIVITY());
+    checkHasMutuallyExclusiveOptions(
+        "ACQACTIVITY or ACQPROCESS or ACTIVITY",
+        ctx.ACQACTIVITY(),
+        ctx.ACQPROCESS(),
+        ctx.ACTIVITY());
   }
 }

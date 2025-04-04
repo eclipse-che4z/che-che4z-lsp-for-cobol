@@ -21,9 +21,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/**
- * Code generator tests.
- */
+/** Code generator tests. */
 class GenProgramTest {
   @Test
   void test() {

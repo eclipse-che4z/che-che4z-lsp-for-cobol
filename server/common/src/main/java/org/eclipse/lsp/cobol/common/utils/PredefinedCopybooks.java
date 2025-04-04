@@ -35,8 +35,7 @@ public class PredefinedCopybooks {
    * @return Copybook for this name or null
    */
   public Copybook forName(String name) {
-    return Arrays.stream(values()).filter(c ->  c.name().equals(name))
-        .findFirst().orElse(null);
+    return Arrays.stream(values()).filter(c -> c.name().equals(name)).findFirst().orElse(null);
   }
 
   /**
@@ -53,9 +52,7 @@ public class PredefinedCopybooks {
     SQLCA {
       @Override
       public String nameForBackend(SQLBackend backend) {
-        return backend == SQLBackend.DATACOM_SERVER
-            ? "SQLCA_DATACOM"
-            : "SQLCA_DB2";
+        return backend == SQLBackend.DATACOM_SERVER ? "SQLCA_DATACOM" : "SQLCA_DB2";
       }
     },
     SQLDA {

@@ -82,10 +82,7 @@ class TypingTest extends FileBasedTest {
 
     MessageService messageService = mock(MessageService.class);
 
-    CleanerPreprocessor preprocessor =
-        new IbmTextPreprocessor(
-            messageService,
-            layoutStore);
+    CleanerPreprocessor preprocessor = new IbmTextPreprocessor(messageService, layoutStore);
     ResultWithErrors<ExtendedText> cleanTextResult =
         preprocessor.cleanUpCode(cobolText.getFileName(), cobolText.getFullText());
     for (SyntaxError error : cleanTextResult.getErrors()) LOG.error(error.toString());

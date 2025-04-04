@@ -42,6 +42,7 @@ public interface SettingsService {
 
   /**
    * Fetch the required text configuration section from the client.
+   *
    * @param scopeUri the required section
    * @param section the required section.
    * @return a list of string of one configuration object.
@@ -50,12 +51,14 @@ public interface SettingsService {
 
   /**
    * Fetch the required dialect specific text configuration section from the client.
+   *
    * @param scopeUri the required section
    * @param section the required section.
    * @param dialect
    * @return a list of string of one configuration object.
    */
-  CompletableFuture<List<String>> fetchTextConfigurationWithScope(String scopeUri, String section, String dialect);
+  CompletableFuture<List<String>> fetchTextConfigurationWithScope(
+      String scopeUri, String section, String dialect);
 
   /**
    * Fetch the required configuration sections from the client. Note that Scope URI is null. The
@@ -67,13 +70,12 @@ public interface SettingsService {
   CompletableFuture<List<Object>> fetchConfigurations(List<String> sections);
 
   /**
-   * Fetch the required configuration sections from the client.The {@link SettingsParametersEnum#LSP_PREFIX LSP prefix}
-   * will be added to each specified section.
+   * Fetch the required configuration sections from the client.The {@link
+   * SettingsParametersEnum#LSP_PREFIX LSP prefix} will be added to each specified section.
    *
    * @param documentUri We use document Uri as configuration scope URI.
    * @param sections the required sections.
    * @return a list of configuration objects.
    */
   CompletableFuture<List<Object>> fetchConfigurations(String documentUri, List<String> sections);
-
 }

@@ -32,30 +32,29 @@ public class CICSLinkOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
   public static final int RULE_INDEX = RULE_cics_link;
 
   private static final Map<Integer, ErrorSeverity> DUPLICATE_CHECK_OPTIONS =
-          new HashMap<Integer, ErrorSeverity>() {
-            {
-              put(CICSLexer.LINK, ErrorSeverity.ERROR);
-              put(CICSLexer.PROGRAM, ErrorSeverity.ERROR);
-              put(CICSLexer.COMMAREA, ErrorSeverity.ERROR);
-              put(CICSLexer.LENGTH, ErrorSeverity.ERROR);
-              put(CICSLexer.DATALENGTH, ErrorSeverity.ERROR);
-              put(CICSLexer.CHANNEL, ErrorSeverity.ERROR);
-              put(CICSLexer.INPUTMSG, ErrorSeverity.ERROR);
-              put(CICSLexer.INPUTMSGLEN, ErrorSeverity.ERROR);
-              put(CICSLexer.SYSID, ErrorSeverity.ERROR);
-              put(CICSLexer.SYNCONRETURN, ErrorSeverity.WARNING);
-              put(CICSLexer.TRANSID, ErrorSeverity.ERROR);
-              put(CICSLexer.ACQPROCESS, ErrorSeverity.ERROR);
-              put(CICSLexer.INPUTEVENT, ErrorSeverity.ERROR);
-              put(CICSLexer.ACTIVITY, ErrorSeverity.ERROR);
-              put(CICSLexer.ACQACTIVITY, ErrorSeverity.WARNING);
-            }
-          };
+      new HashMap<Integer, ErrorSeverity>() {
+        {
+          put(CICSLexer.LINK, ErrorSeverity.ERROR);
+          put(CICSLexer.PROGRAM, ErrorSeverity.ERROR);
+          put(CICSLexer.COMMAREA, ErrorSeverity.ERROR);
+          put(CICSLexer.LENGTH, ErrorSeverity.ERROR);
+          put(CICSLexer.DATALENGTH, ErrorSeverity.ERROR);
+          put(CICSLexer.CHANNEL, ErrorSeverity.ERROR);
+          put(CICSLexer.INPUTMSG, ErrorSeverity.ERROR);
+          put(CICSLexer.INPUTMSGLEN, ErrorSeverity.ERROR);
+          put(CICSLexer.SYSID, ErrorSeverity.ERROR);
+          put(CICSLexer.SYNCONRETURN, ErrorSeverity.WARNING);
+          put(CICSLexer.TRANSID, ErrorSeverity.ERROR);
+          put(CICSLexer.ACQPROCESS, ErrorSeverity.ERROR);
+          put(CICSLexer.INPUTEVENT, ErrorSeverity.ERROR);
+          put(CICSLexer.ACTIVITY, ErrorSeverity.ERROR);
+          put(CICSLexer.ACQACTIVITY, ErrorSeverity.WARNING);
+        }
+      };
 
   public CICSLinkOptionsCheckUtility(DialectProcessingContext context, List<SyntaxError> errors) {
     super(context, errors, DUPLICATE_CHECK_OPTIONS);
   }
-
 
   /**
    * Entrypoint to check CICS Link rule options
@@ -91,7 +90,8 @@ public class CICSLinkOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
       checkHasMandatoryOptions(ctx.INPUTMSG(), ctx, "INPUTMSG");
     }
     checkHasMutuallyExclusiveOptions("INPUTMSG or SYSID", ctx.INPUTMSG(), ctx.SYSID());
-    checkHasMutuallyExclusiveOptions("INPUTMSG or SYNCONRETURN", ctx.INPUTMSG(), ctx.SYNCONRETURN());
+    checkHasMutuallyExclusiveOptions(
+        "INPUTMSG or SYNCONRETURN", ctx.INPUTMSG(), ctx.SYNCONRETURN());
     checkHasMutuallyExclusiveOptions("INPUTMSG or TRANSID", ctx.INPUTMSG(), ctx.TRANSID());
   }
 
@@ -104,4 +104,3 @@ public class CICSLinkOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     checkHasExactlyOneOption("ACTIVITY or ACQACTIVITY", ctx, ctx.ACTIVITY(), ctx.ACQACTIVITY());
   }
 }
-

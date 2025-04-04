@@ -56,8 +56,17 @@ class TestReplacingForSeveralTokensInOneLine {
         DOCUMENT,
         ImmutableList.of(new CobolText(REPL_NAME, REPL)),
         ImmutableMap.of(
-            "invalid", new Diagnostic(new Range(), "Errors inside the copybook", DiagnosticSeverity.Error,  ErrorSource.COPYBOOK.getText()),
-            "invalidS", new Diagnostic(new Range(), MESSAGE, DiagnosticSeverity.Error,  ErrorSource.PARSING.getText())
-                ));
+            "invalid",
+                new Diagnostic(
+                    new Range(),
+                    "Errors inside the copybook",
+                    DiagnosticSeverity.Error,
+                    ErrorSource.COPYBOOK.getText()),
+            "invalidS",
+                new Diagnostic(
+                    new Range(),
+                    MESSAGE,
+                    DiagnosticSeverity.Error,
+                    ErrorSource.PARSING.getText())));
   }
 }

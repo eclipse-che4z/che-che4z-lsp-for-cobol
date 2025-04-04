@@ -29,10 +29,8 @@ import java.util.List;
 @Getter
 public class ParagraphNameNode extends Node implements DefinedAndUsedStructure {
   private final String name;
-  @Setter
-  private List<Location> definitions = ImmutableList.of();
-  @Setter
-  private List<Location> usages = ImmutableList.of();
+  @Setter private List<Location> definitions = ImmutableList.of();
+  @Setter private List<Location> usages = ImmutableList.of();
 
   public ParagraphNameNode(Locality location, String paragraphName) {
     super(location, NodeType.PARAGRAPH_NAME_NODE);

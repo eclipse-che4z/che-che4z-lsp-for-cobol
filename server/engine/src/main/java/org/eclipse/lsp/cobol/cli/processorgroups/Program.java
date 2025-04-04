@@ -22,5 +22,6 @@ import lombok.Getter;
 public class Program {
   @SerializedName("pgroup")
   String processorGroup;
+
   String program;
 }

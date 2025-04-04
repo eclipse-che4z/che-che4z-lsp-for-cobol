@@ -50,6 +50,7 @@ public class CodeLayoutUtil {
 
   /**
    * Gives a merged {@link CobolProgramLayout} based on the user configuration and languageID
+   *
    * @param defaultLangId language id send bt the LSP client
    * @param layoutStore {@link CodeLayoutStore}
    * @return {@link CobolProgramLayout}

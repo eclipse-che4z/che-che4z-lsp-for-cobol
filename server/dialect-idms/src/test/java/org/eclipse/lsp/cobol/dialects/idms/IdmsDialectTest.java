@@ -23,9 +23,7 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 
-/**
- * Test for IdmsDialect class
- */
+/** Test for IdmsDialect class */
 class IdmsDialectTest {
   @Test
   void testKeywords() {

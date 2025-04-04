@@ -30,6 +30,5 @@ public interface ReplacePreprocessorFactory {
    * @return a new listener
    */
   ReplacePreProcessorListener create(
-          @NonNull ExtendedDocument extendedDocument,
-          @NonNull CopybookHierarchy hierarchy);
+      @NonNull ExtendedDocument extendedDocument, @NonNull CopybookHierarchy hierarchy);
 }

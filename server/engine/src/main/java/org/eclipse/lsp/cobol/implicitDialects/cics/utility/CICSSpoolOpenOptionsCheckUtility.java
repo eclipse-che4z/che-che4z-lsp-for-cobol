@@ -32,26 +32,27 @@ public class CICSSpoolOpenOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
   public static final int RULE_INDEX = RULE_cics_spoolopen;
 
   private static final Map<Integer, ErrorSeverity> DUPLICATE_CHECK_OPTIONS =
-          new HashMap<Integer, ErrorSeverity>() {
-            {
-              put(CICSLexer.INPUT, ErrorSeverity.ERROR);
-              put(CICSLexer.OUTPUT, ErrorSeverity.ERROR);
-              put(CICSLexer.TOKEN, ErrorSeverity.ERROR);
-              put(CICSLexer.USERID, ErrorSeverity.ERROR);
-              put(CICSLexer.CLASS, ErrorSeverity.ERROR);
-              put(CICSLexer.NOHANDLE, ErrorSeverity.WARNING);
-              put(CICSLexer.NODE, ErrorSeverity.ERROR);
-              put(CICSLexer.OUTDESCR, ErrorSeverity.ERROR);
-              put(CICSLexer.NOCC, ErrorSeverity.WARNING);
-              put(CICSLexer.ASA, ErrorSeverity.WARNING);
-              put(CICSLexer.MCC, ErrorSeverity.WARNING);
-              put(CICSLexer.PRINT, ErrorSeverity.WARNING);
-              put(CICSLexer.PUNCH, ErrorSeverity.WARNING);
-              put(CICSLexer.RECORDLENGTH, ErrorSeverity.ERROR);
-            }
-          };
+      new HashMap<Integer, ErrorSeverity>() {
+        {
+          put(CICSLexer.INPUT, ErrorSeverity.ERROR);
+          put(CICSLexer.OUTPUT, ErrorSeverity.ERROR);
+          put(CICSLexer.TOKEN, ErrorSeverity.ERROR);
+          put(CICSLexer.USERID, ErrorSeverity.ERROR);
+          put(CICSLexer.CLASS, ErrorSeverity.ERROR);
+          put(CICSLexer.NOHANDLE, ErrorSeverity.WARNING);
+          put(CICSLexer.NODE, ErrorSeverity.ERROR);
+          put(CICSLexer.OUTDESCR, ErrorSeverity.ERROR);
+          put(CICSLexer.NOCC, ErrorSeverity.WARNING);
+          put(CICSLexer.ASA, ErrorSeverity.WARNING);
+          put(CICSLexer.MCC, ErrorSeverity.WARNING);
+          put(CICSLexer.PRINT, ErrorSeverity.WARNING);
+          put(CICSLexer.PUNCH, ErrorSeverity.WARNING);
+          put(CICSLexer.RECORDLENGTH, ErrorSeverity.ERROR);
+        }
+      };
 
-  public CICSSpoolOpenOptionsCheckUtility(DialectProcessingContext context, List<SyntaxError> errors) {
+  public CICSSpoolOpenOptionsCheckUtility(
+      DialectProcessingContext context, List<SyntaxError> errors) {
     super(context, errors, DUPLICATE_CHECK_OPTIONS);
   }
 

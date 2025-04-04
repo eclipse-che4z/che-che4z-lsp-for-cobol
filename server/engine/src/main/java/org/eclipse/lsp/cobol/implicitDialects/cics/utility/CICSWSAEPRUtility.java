@@ -74,12 +74,16 @@ public class CICSWSAEPRUtility extends CICSOptionsCheckBaseUtility {
     checkHasExactlyOneOption("EPRINTO or EPRSET", ctx, ctx.EPRINTO(), ctx.EPRSET());
     checkHasMandatoryOptions(ctx.EPRLENGTH(), ctx, "EPRLENGTH");
 
-    List<TerminalNode> options = Stream.of(ctx.ADDRESS(), ctx.REFPARMS(), ctx.METADATA())
+    List<TerminalNode> options =
+        Stream.of(ctx.ADDRESS(), ctx.REFPARMS(), ctx.METADATA())
             .flatMap(List::stream)
             .collect(Collectors.toList());
     checkHasMandatoryOptions(options, ctx, "ADDRESS or REFPARMS or METADATA");
-    if (ctx.REFPARMS().isEmpty()) checkHasIllegalOptions(ctx.REFPARMSLEN(), "REFPARMSLEN without REFPARMS");
-    if (ctx.METADATA().isEmpty()) checkHasIllegalOptions(ctx.METADATALEN(), "METADATALEN without METADATA");
-    checkHasMutuallyExclusiveOptions("FROMCCSID or FROMCODEPAGE", ctx.FROMCCSID(), ctx.FROMCODEPAGE());
+    if (ctx.REFPARMS().isEmpty())
+      checkHasIllegalOptions(ctx.REFPARMSLEN(), "REFPARMSLEN without REFPARMS");
+    if (ctx.METADATA().isEmpty())
+      checkHasIllegalOptions(ctx.METADATALEN(), "METADATALEN without METADATA");
+    checkHasMutuallyExclusiveOptions(
+        "FROMCCSID or FROMCODEPAGE", ctx.FROMCCSID(), ctx.FROMCODEPAGE());
   }
 }

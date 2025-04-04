@@ -27,23 +27,23 @@ import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
-/**
- * Test for IDMS copybook error that should be propagated upper
- */
+/** Test for IDMS copybook error that should be propagated upper */
 class TestCopyIdmsError {
 
-  private static final String TEXT = "        IDENTIFICATION DIVISION. \n"
-      + "        PROGRAM-ID. test1.\n"
-      + "        ENVIRONMENT DIVISION.\n"
-      + "        IDMS-CONTROL SECTION.\n"
-      + "            PROTOCOL. MODE ABC.\n"
-      + "            IDMS-RECORDS MANUAL\n"
-      + "        DATA DIVISION.\n"
-      + "       WORKING-STORAGE SECTION.\n"
-      + "       {_01 COPY IDMS {~COPY1!IDMS}|1_}.\n"
-      + "       PROCEDURE DIVISION.\n";
+  private static final String TEXT =
+      "        IDENTIFICATION DIVISION. \n"
+          + "        PROGRAM-ID. test1.\n"
+          + "        ENVIRONMENT DIVISION.\n"
+          + "        IDMS-CONTROL SECTION.\n"
+          + "            PROTOCOL. MODE ABC.\n"
+          + "            IDMS-RECORDS MANUAL\n"
+          + "        DATA DIVISION.\n"
+          + "       WORKING-STORAGE SECTION.\n"
+          + "       {_01 COPY IDMS {~COPY1!IDMS}|1_}.\n"
+          + "       PROCEDURE DIVISION.\n";
 
   private static final String COPYBOOK = "       01  {$*LDQLAB|2}.\r\n";
+
   @Test
   void test() {
     UseCaseEngine.runTest(
@@ -61,10 +61,8 @@ class TestCopyIdmsError {
                 new Range(),
                 "semantics.emptyStructure",
                 DiagnosticSeverity.Error,
-                ErrorSource.PARSING.getText())
-        ),
+                ErrorSource.PARSING.getText())),
         ImmutableList.of(),
         DialectConfigs.getIDMSAnalysisConfig());
   }
-
 }

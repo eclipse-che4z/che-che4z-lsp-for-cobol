@@ -73,7 +73,6 @@ class ServerCommunicationsTest {
     assertDocumentAnalysedNotification("", "");
   }
 
-
   /**
    * Method {@link ServerCommunications#notifyThatDocumentAnalysed(String)} should asynchronously
    * call logging on the client for a specific message with an URI
@@ -117,7 +116,8 @@ class ServerCommunicationsTest {
     String uri = UUID.randomUUID().toString();
     when(files.getNameFromURI(uri)).thenReturn(uri);
     when(files.decodeURI(uri)).thenReturn(uri);
-    when(messageService.getMessage("Communications.syntaxAnalysisInProgressTitle", uri)).thenReturn("TITLE");
+    when(messageService.getMessage("Communications.syntaxAnalysisInProgressTitle", uri))
+        .thenReturn("TITLE");
     setUpProgressDataStructure(uri);
     ProgressParams expectedNotifyBeginParams = new ProgressParams();
     expectedNotifyBeginParams.setToken(uri);
@@ -130,7 +130,9 @@ class ServerCommunicationsTest {
     verify(client).notifyProgress(expectedNotifyBeginParams);
     WorkDoneProgressReport expectedProgressReport = new WorkDoneProgressReport();
     expectedProgressReport.setCancellable(true);
-    verify(client).notifyProgress(new ProgressParams(Either.forLeft(uri), Either.forLeft(expectedProgressReport)));
+    verify(client)
+        .notifyProgress(
+            new ProgressParams(Either.forLeft(uri), Either.forLeft(expectedProgressReport)));
   }
 
   @Test
@@ -138,14 +140,18 @@ class ServerCommunicationsTest {
     String uri = UUID.randomUUID().toString();
     setUpProgressDataStructure(uri);
     communications.notifyProgressEnd(uri);
-    verify(client).notifyProgress(new ProgressParams(Either.forLeft(uri), Either.forLeft(new WorkDoneProgressEnd())));
+    verify(client)
+        .notifyProgress(
+            new ProgressParams(Either.forLeft(uri), Either.forLeft(new WorkDoneProgressEnd())));
   }
 
   @Test
   void testNotifyProgressReport() {
     String uri = UUID.randomUUID().toString();
     communications.notifyProgressReport(uri);
-    verify(client).notifyProgress(new ProgressParams(Either.forLeft(uri), Either.forLeft(new WorkDoneProgressReport())));
+    verify(client)
+        .notifyProgress(
+            new ProgressParams(Either.forLeft(uri), Either.forLeft(new WorkDoneProgressReport())));
   }
 
   @Test
@@ -153,7 +159,10 @@ class ServerCommunicationsTest {
     String capabilityID = "test";
     communications.registerExecuteCommandCapability(Collections.emptyList(), capabilityID);
     Registration registrations =
-            new Registration(capabilityID, "workspace/executeCommand", new ExecuteCommandOptions(Collections.emptyList()));
+        new Registration(
+            capabilityID,
+            "workspace/executeCommand",
+            new ExecuteCommandOptions(Collections.emptyList()));
     RegistrationParams params = new RegistrationParams(ImmutableList.of(registrations));
     verify(client).registerCapability(params);
   }
@@ -162,8 +171,8 @@ class ServerCommunicationsTest {
   void testUnregisterExecuteCommandCapability() {
     String capabilityID = "test";
     UnregistrationParams unregistrationParams =
-            new UnregistrationParams(
-                    ImmutableList.of(new Unregistration(capabilityID, "workspace/executeCommand")));
+        new UnregistrationParams(
+            ImmutableList.of(new Unregistration(capabilityID, "workspace/executeCommand")));
     communications.unregisterExecuteCommandCapability(capabilityID);
     verify(client).unregisterCapability(unregistrationParams);
   }

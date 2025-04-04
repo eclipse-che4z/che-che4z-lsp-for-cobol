@@ -61,6 +61,8 @@ class TestCopyMaidWithWrkAppendsSuffixToVariablesWithoutDash {
         TEXT,
         ImmutableList.of(
             new CobolText("BHTRGL-XBG", DaCoDialect.NAME, COPYBOOK_CONTENT, "WRK", false)),
-        ImmutableMap.of(), ImmutableList.of(), DialectConfigs.getDaCoAnalysisConfig());
+        ImmutableMap.of(),
+        ImmutableList.of(),
+        DialectConfigs.getDaCoAnalysisConfig());
   }
 }

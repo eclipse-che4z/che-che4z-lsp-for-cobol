@@ -65,7 +65,8 @@ class TestLinesConcatenation {
     when(store.getCodeLayout()).thenReturn(Optional.empty());
 
     CleanerPreprocessor textPreprocessor = new IbmTextPreprocessor(messageService, store);
-    ExtendedText extendedText = textPreprocessor.cleanUpCode(DOCUMENT_URI, TEXT).unwrap(accumulatedErrors::addAll);
+    ExtendedText extendedText =
+        textPreprocessor.cleanUpCode(DOCUMENT_URI, TEXT).unwrap(accumulatedErrors::addAll);
     assertEquals(EXPECTED, extendedText.toString());
     assertTrue(accumulatedErrors.isEmpty());
   }

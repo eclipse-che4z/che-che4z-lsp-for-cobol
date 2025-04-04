@@ -27,9 +27,7 @@ import static java.lang.Boolean.TRUE;
 import static java.util.Collections.emptyList;
 import static org.eclipse.lsp4j.TextDocumentSyncKind.Full;
 
-/**
- * LSP Initialize Handler
- */
+/** LSP Initialize Handler */
 public class InitializeHandler {
   private final WatcherService watchingService;
 
@@ -46,7 +44,7 @@ public class InitializeHandler {
    */
   public InitializeResult initialize(@NonNull InitializeParams params) {
     Optional.ofNullable(params.getWorkspaceFolders())
-            .ifPresent(workspace -> watchingService.getWorkspaceFolders().addAll(workspace));
+        .ifPresent(workspace -> watchingService.getWorkspaceFolders().addAll(workspace));
 
     ServerCapabilities capabilities = new ServerCapabilities();
 
@@ -66,7 +64,7 @@ public class InitializeHandler {
     WorkspaceFoldersOptions workspaceFoldersOptions = new WorkspaceFoldersOptions();
     workspaceFoldersOptions.setSupported(TRUE);
     WorkspaceServerCapabilities workspaceServiceCapabilities =
-            new WorkspaceServerCapabilities(workspaceFoldersOptions);
+        new WorkspaceServerCapabilities(workspaceFoldersOptions);
     capabilities.setWorkspace(workspaceServiceCapabilities);
 
     return new InitializeResult(capabilities);
@@ -76,5 +74,4 @@ public class InitializeHandler {
   private ExecuteCommandOptions collectExecuteCommandList() {
     return new ExecuteCommandOptions(ImmutableList.of(ErrorCodes.MISSING_COPYBOOK.getLabel()));
   }
-
 }

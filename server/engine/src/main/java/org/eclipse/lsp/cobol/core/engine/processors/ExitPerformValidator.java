@@ -22,20 +22,20 @@ import org.eclipse.lsp.cobol.common.model.tree.ExitPerformNode;
 import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.Processor;
 
-/**
- * Checks if EXIT PERFORM statement situated inside the inline perform block
- */
+/** Checks if EXIT PERFORM statement situated inside the inline perform block */
 public class ExitPerformValidator implements Processor<ExitPerformNode> {
   @Override
   public void accept(ExitPerformNode exitPerformNode, ProcessingContext processingContext) {
-      if (!exitPerformNode.isInsideInlinePerform()) {
-          processingContext.getErrors()
-                  .add(SyntaxError.syntaxError()
-                          .errorSource(ErrorSource.PARSING)
-                          .location(exitPerformNode.getLocality().toOriginalLocation())
-                          .severity(ErrorSeverity.WARNING)
-                          .messageTemplate(MessageTemplate.of("semantic.exitPerformIsIgnored"))
-                          .build());
-      }
+    if (!exitPerformNode.isInsideInlinePerform()) {
+      processingContext
+          .getErrors()
+          .add(
+              SyntaxError.syntaxError()
+                  .errorSource(ErrorSource.PARSING)
+                  .location(exitPerformNode.getLocality().toOriginalLocation())
+                  .severity(ErrorSeverity.WARNING)
+                  .messageTemplate(MessageTemplate.of("semantic.exitPerformIsIgnored"))
+                  .build());
+    }
   }
 }

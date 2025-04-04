@@ -61,45 +61,59 @@ class IdmsCopybookVisitor extends IdmsCopyParserBaseVisitor<List<Node>> {
 
   private int firstCopybookLevel = 0;
 
-  IdmsCopybookVisitor(CopybookService copybookService,
-                      CleanerPreprocessor preprocessor,
-                      CopybookProcessingMode copybookProcessingMode,
-                      ParseTreeListener treeListener,
-                      MessageService messageService,
-                      String programDocumentUri,
-                      String documentUri,
-                      int parentLevel,
-                      Set<CopybookName> processedCopybooks) {
+  IdmsCopybookVisitor(
+      CopybookService copybookService,
+      CleanerPreprocessor preprocessor,
+      CopybookProcessingMode copybookProcessingMode,
+      ParseTreeListener treeListener,
+      MessageService messageService,
+      String programDocumentUri,
+      String documentUri,
+      int parentLevel,
+      Set<CopybookName> processedCopybooks) {
     this.copybookService = copybookService;
     this.preprocessor = preprocessor;
     this.programDocumentUri = programDocumentUri;
     this.documentUri = documentUri;
     this.parentLevel = parentLevel;
-    idmsCopybookService = new IdmsCopybookService(programDocumentUri, copybookService, preprocessor,
-            copybookProcessingMode, treeListener, messageService, processedCopybooks);
+    idmsCopybookService =
+        new IdmsCopybookService(
+            programDocumentUri,
+            copybookService,
+            preprocessor,
+            copybookProcessingMode,
+            treeListener,
+            messageService,
+            processedCopybooks);
   }
 
   @Override
   public List<Node> visitCopyIdmsStatement(IdmsCopyParser.CopyIdmsStatementContext ctx) {
     IdmsCopyParser.CopyIdmsSourceContext optionsContext = ctx.copyIdmsOptions().copyIdmsSource();
     String nameToken = optionsContext.getText().toUpperCase();
-    CopybookName copybookName = new CopybookName(StringUtils.trimQuotes(nameToken), IdmsDialect.NAME);
+    CopybookName copybookName =
+        new CopybookName(StringUtils.trimQuotes(nameToken), IdmsDialect.NAME);
 
-    ResultWithErrors<CopybookModel> resolvedCopybook = copybookService.resolve(
+    ResultWithErrors<CopybookModel> resolvedCopybook =
+        copybookService.resolve(
             copybookName.toCopybookId(programDocumentUri),
             copybookName,
             programDocumentUri,
             documentUri,
             preprocessor);
     CopybookModel copybookModel = resolvedCopybook.getResult();
-    Locality locality = IdmsParserHelper.buildNameRangeLocality(optionsContext, copybookName.getDisplayName(), documentUri);
+    Locality locality =
+        IdmsParserHelper.buildNameRangeLocality(
+            optionsContext, copybookName.getDisplayName(), documentUri);
     errors.addAll(resolvedCopybook.getErrors());
-    return idmsCopybookService.processCopybook(copybookModel, calculateLevel(getLevel(ctx)), locality)
+    return idmsCopybookService
+        .processCopybook(copybookModel, calculateLevel(getLevel(ctx)), locality)
         .unwrap(errors::addAll);
   }
 
   @Override
-  public List<Node> visitDataDescriptionEntryFormat1(IdmsCopyParser.DataDescriptionEntryFormat1Context ctx) {
+  public List<Node> visitDataDescriptionEntryFormat1(
+      IdmsCopyParser.DataDescriptionEntryFormat1Context ctx) {
     return addTreeNode(
         VariableDefinitionNode.builder()
             .level(calculateLevel(VisitorHelper.getLevel(ctx.levelNumber().LEVEL_NUMBER())))
@@ -125,7 +139,8 @@ class IdmsCopybookVisitor extends IdmsCopyParserBaseVisitor<List<Node>> {
   }
 
   @Override
-  public List<Node> visitDataDescriptionEntryFormat2(IdmsCopyParser.DataDescriptionEntryFormat2Context ctx) {
+  public List<Node> visitDataDescriptionEntryFormat2(
+      IdmsCopyParser.DataDescriptionEntryFormat2Context ctx) {
     VariableDefinitionNode.Builder builder =
         VariableDefinitionNode.builder()
             .level(LEVEL_66)
@@ -133,18 +148,21 @@ class IdmsCopybookVisitor extends IdmsCopyParserBaseVisitor<List<Node>> {
             .variableNameAndLocality(extractNameAndLocality(ctx.entryName()))
             .statementLocality(retrieveRangeLocality(ctx));
     ofNullable(ctx.dataRenamesClause())
-            .map(dataRenamesClauseContext -> dataRenamesClauseContext.qualifiedVariableDataName()
-                    .dataName()
-                    .stream()
-                    .map(IdmsCopyParser.DataNameContext.class::cast)
-                    .map(this::extractNameAndLocality).collect(toList()))
-            .ifPresent(builder::renamesClause);
-    ofNullable(ctx.dataRenamesClause())
-            .map(thruDataNameContext -> thruDataNameContext.qualifiedVariableDataName().dataName().stream()
+        .map(
+            dataRenamesClauseContext ->
+                dataRenamesClauseContext.qualifiedVariableDataName().dataName().stream()
                     .map(IdmsCopyParser.DataNameContext.class::cast)
                     .map(this::extractNameAndLocality)
                     .collect(toList()))
-            .ifPresent(builder::renamesThruClause);
+        .ifPresent(builder::renamesClause);
+    ofNullable(ctx.dataRenamesClause())
+        .map(
+            thruDataNameContext ->
+                thruDataNameContext.qualifiedVariableDataName().dataName().stream()
+                    .map(IdmsCopyParser.DataNameContext.class::cast)
+                    .map(this::extractNameAndLocality)
+                    .collect(toList()))
+        .ifPresent(builder::renamesThruClause);
     return addTreeNode(builder.build(), visitChildren(ctx));
   }
 
@@ -176,7 +194,8 @@ class IdmsCopybookVisitor extends IdmsCopyParserBaseVisitor<List<Node>> {
   }
 
   @Override
-  public List<Node> visitDataDescriptionEntryFormat3(IdmsCopyParser.DataDescriptionEntryFormat3Context ctx) {
+  public List<Node> visitDataDescriptionEntryFormat3(
+      IdmsCopyParser.DataDescriptionEntryFormat3Context ctx) {
     return ofNullable(ctx.dataValueClause())
         .map(IdmsCopyParser.DataValueClauseContext::valueIsToken)
         .map(
@@ -196,7 +215,8 @@ class IdmsCopybookVisitor extends IdmsCopyParserBaseVisitor<List<Node>> {
 
   @Override
   public List<Node> visitFileDescriptionEntry(IdmsCopyParser.FileDescriptionEntryContext ctx) {
-    if (ctx.fileDescriptionEntryClauses() == null || ctx.fileDescriptionEntryClauses().cobolWord() == null) {
+    if (ctx.fileDescriptionEntryClauses() == null
+        || ctx.fileDescriptionEntryClauses().cobolWord() == null) {
       return ImmutableList.of();
     }
     String fileControlClause = "";
@@ -252,21 +272,24 @@ class IdmsCopybookVisitor extends IdmsCopyParserBaseVisitor<List<Node>> {
   }
 
   private Locality retrieveRangeLocality(ParserRuleContext ctx) {
-    Range range = new Range(
-        new Position(ctx.start.getLine() - 1, ctx.start.getCharPositionInLine()),
-        new Position(ctx.stop.getLine() - 1, ctx.stop.getCharPositionInLine()));
+    Range range =
+        new Range(
+            new Position(ctx.start.getLine() - 1, ctx.start.getCharPositionInLine()),
+            new Position(ctx.stop.getLine() - 1, ctx.stop.getCharPositionInLine()));
 
-    return Locality.builder()
-        .uri(documentUri)
-        .range(range)
-        .build();
+    return Locality.builder().uri(documentUri).range(range).build();
   }
 
   private Locality getLevelLocality(TerminalNode terminalNode) {
     return Locality.builder()
-        .range(new Range(
-            new Position(terminalNode.getSymbol().getLine(), terminalNode.getSymbol().getCharPositionInLine()),
-            new Position(terminalNode.getSymbol().getLine(), terminalNode.getSymbol().getCharPositionInLine())))
+        .range(
+            new Range(
+                new Position(
+                    terminalNode.getSymbol().getLine(),
+                    terminalNode.getSymbol().getCharPositionInLine()),
+                new Position(
+                    terminalNode.getSymbol().getLine(),
+                    terminalNode.getSymbol().getCharPositionInLine())))
         .build();
   }
 
@@ -290,10 +313,12 @@ class IdmsCopybookVisitor extends IdmsCopyParserBaseVisitor<List<Node>> {
 
   private ValueClause retrieveValue(IdmsCopyParser.DataValueClauseContext context) {
     return new ValueClause(
-        retrieveValueIntervals(context.dataValueClauseLiteral().dataValueInterval()), retrieveRangeLocality(context));
+        retrieveValueIntervals(context.dataValueClauseLiteral().dataValueInterval()),
+        retrieveRangeLocality(context));
   }
 
-  private List<OccursClause> retrieveOccursValues(List<IdmsCopyParser.DataOccursClauseContext> contexts) {
+  private List<OccursClause> retrieveOccursValues(
+      List<IdmsCopyParser.DataOccursClauseContext> contexts) {
     // TODO: Process OCCURS DEPENDING ON
     return contexts.stream()
         .map(this::toOccursClause)
@@ -306,7 +331,11 @@ class IdmsCopybookVisitor extends IdmsCopyParserBaseVisitor<List<Node>> {
     return ofNullable(getInteger(ctx.integerLiteral()))
         .map(
             intLit ->
-                new OccursClause(intLit, retrieveOccursToValue(ctx).orElse(null), false, retrieveIndexNames(ctx)));
+                new OccursClause(
+                    intLit,
+                    retrieveOccursToValue(ctx).orElse(null),
+                    false,
+                    retrieveIndexNames(ctx)));
   }
 
   private Integer getInteger(IdmsCopyParser.IntegerLiteralContext context) {
@@ -317,11 +346,11 @@ class IdmsCopybookVisitor extends IdmsCopyParserBaseVisitor<List<Node>> {
         .orElse(null);
   }
 
-  private List<VariableNameAndLocality> retrieveIndexNames(IdmsCopyParser.DataOccursClauseContext ctx) {
+  private List<VariableNameAndLocality> retrieveIndexNames(
+      IdmsCopyParser.DataOccursClauseContext ctx) {
     return ofNullable(ctx.indexName()).orElseGet(ImmutableList::of).stream()
         .map(IdmsCopyParser.IndexNameContext::cobolWord)
         .map(this::extractNameAndLocality)
         .collect(toList());
   }
-
 }

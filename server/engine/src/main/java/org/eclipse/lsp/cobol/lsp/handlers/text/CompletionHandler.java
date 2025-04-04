@@ -30,9 +30,7 @@ import org.eclipse.lsp4j.CompletionList;
 import org.eclipse.lsp4j.CompletionParams;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 
-/**
- * LSP Completion Handler
- */
+/** LSP Completion Handler */
 @Slf4j
 public class CompletionHandler {
   private final Completions completions;
@@ -40,7 +38,10 @@ public class CompletionHandler {
   private final DocumentModelService documentModelService;
 
   @Inject
-  public CompletionHandler(AsyncAnalysisService asyncAnalysisService, Completions completions, DocumentModelService documentModelService) {
+  public CompletionHandler(
+      AsyncAnalysisService asyncAnalysisService,
+      Completions completions,
+      DocumentModelService documentModelService) {
     this.completions = completions;
     this.asyncAnalysisService = asyncAnalysisService;
     this.documentModelService = documentModelService;
@@ -51,30 +52,34 @@ public class CompletionHandler {
    *
    * @param params CompletionParams.
    * @return Either List of CompletionItem, either CompletionList.
-   * @throws ExecutionException   forward exception.
+   * @throws ExecutionException forward exception.
    * @throws InterruptedException forward exception.
    */
-  public Either<List<CompletionItem>, CompletionList> completion(CompletionParams params) throws ExecutionException, InterruptedException {
+  public Either<List<CompletionItem>, CompletionList> completion(CompletionParams params)
+      throws ExecutionException, InterruptedException {
     String uri = params.getTextDocument().getUri();
     return Either.forRight(completions.collectFor(documentModelService.get(uri), params));
   }
 
   /**
    * Handle completion LSP request.
+   *
    * @param params CompletionParams.
    * @return LspNotification.
    */
-  public LspQuery<Either<List<CompletionItem>, CompletionList>> createEvent(CompletionParams params) {
+  public LspQuery<Either<List<CompletionItem>, CompletionList>> createEvent(
+      CompletionParams params) {
     return new CompletionQuery(params, this);
   }
 
   /**
    * Document highlight dependency
+   *
    * @param params
    * @return List of {@link LspEventDependency}
    */
   public List<LspEventDependency> getDocumentHighlightDependency(CompletionParams params) {
     return ImmutableList.of(
-            asyncAnalysisService.createDependencyOn(params.getTextDocument().getUri()));
+        asyncAnalysisService.createDependencyOn(params.getTextDocument().getUri()));
   }
 }

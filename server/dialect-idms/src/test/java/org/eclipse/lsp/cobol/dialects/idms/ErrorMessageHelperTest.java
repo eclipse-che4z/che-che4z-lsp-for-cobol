@@ -25,9 +25,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-/**
- * Test for {@link ErrorMessageHelper}
- */
+/** Test for {@link ErrorMessageHelper} */
 class ErrorMessageHelperTest {
 
   @Test
@@ -41,7 +39,8 @@ class ErrorMessageHelperTest {
     MessageService messageService = mock(MessageService.class);
     ErrorMessageHelper helper = new ErrorMessageHelper(messageService);
 
-    String result = helper.retrieveInputForNoViableException(recognizer, mock(NoViableAltException.class));
+    String result =
+        helper.retrieveInputForNoViableException(recognizer, mock(NoViableAltException.class));
     assertEquals("message", result);
   }
 
@@ -102,7 +101,6 @@ class ErrorMessageHelperTest {
     when(messageService.getMessage(any())).thenReturn("EOF message");
 
     checkMessage(messageService, token, "EOF message");
-
   }
 
   private void checkMessage(MessageService messageService, Token token, String message) {
@@ -121,5 +119,4 @@ class ErrorMessageHelperTest {
     String result = helper.getInputMismatchMessage(recognizer, exception, token, offendingTokens);
     assertEquals(message, result);
   }
-
 }

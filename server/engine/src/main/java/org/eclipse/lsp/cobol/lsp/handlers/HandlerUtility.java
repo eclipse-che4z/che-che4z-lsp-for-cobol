@@ -26,9 +26,7 @@ import java.util.*;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.*;
 
-/**
- * Utility class for LSP handlers
- */
+/** Utility class for LSP handlers */
 @UtilityClass
 @Slf4j
 public class HandlerUtility {
@@ -38,6 +36,7 @@ public class HandlerUtility {
 
   /**
    * Check if we are interested in the document with provided uri.
+   *
    * @param uri - document uri.
    * @return true if we should continue the analysis of the document.
    */
@@ -52,17 +51,25 @@ public class HandlerUtility {
 
   /**
    * Converts a list of SyntaxError to LSP Diagnostic map structure
+   *
    * @param errors a list of error object
    * @return a converted diagnostic map
    */
   public static Map<String, List<Diagnostic>> convertErrors(List<SyntaxError> errors) {
-    Map<String, List<Diagnostic>> result = errors.stream()
-        .filter(Objects::nonNull)
-        .filter(e -> Objects.nonNull(e.getLocation()))
-        .collect(groupingBy(err -> err.getLocation().getLocation().getUri(), mapping(HandlerUtility::toDiagnostic, toList())));
-    result.values().forEach(l -> l.sort(Comparator.comparingInt(a -> a.getRange().getStart().getLine())));
+    Map<String, List<Diagnostic>> result =
+        errors.stream()
+            .filter(Objects::nonNull)
+            .filter(e -> Objects.nonNull(e.getLocation()))
+            .collect(
+                groupingBy(
+                    err -> err.getLocation().getLocation().getUri(),
+                    mapping(HandlerUtility::toDiagnostic, toList())));
+    result
+        .values()
+        .forEach(l -> l.sort(Comparator.comparingInt(a -> a.getRange().getStart().getLine())));
     return result;
   }
+
   private static Diagnostic toDiagnostic(SyntaxError err) {
     Diagnostic diagnostic = new Diagnostic();
     diagnostic.setSeverity(DiagnosticSeverity.forValue(err.getSeverity().ordinal() + 1));
@@ -70,8 +77,8 @@ public class HandlerUtility {
     diagnostic.setMessage(err.getSuggestion());
     diagnostic.setRange(err.getLocation().getLocation().getRange());
     diagnostic.setCode(ofNullable(err.getErrorCode()).map(ErrorCode::getLabel).orElse(null));
-    diagnostic.setRelatedInformation(ofNullable(err.getRelatedInformation()).map(Collections::singletonList).orElse(null));
+    diagnostic.setRelatedInformation(
+        ofNullable(err.getRelatedInformation()).map(Collections::singletonList).orElse(null));
     return diagnostic;
   }
-
 }

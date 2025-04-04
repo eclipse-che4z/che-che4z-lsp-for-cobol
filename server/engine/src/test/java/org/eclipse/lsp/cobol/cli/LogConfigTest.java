@@ -27,23 +27,21 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.verify;
 
-/**
- * Test for {@link LogConfig}
- */
+/** Test for {@link LogConfig} */
 class LogConfigTest {
-    @Test
-    void testConfigure() {
-        LoggerContext loggerContext = mock(LoggerContext.class);
-        Logger rootLogger = mock(Logger.class);
-        LangServerBootstrap.cliMode = true;
-        when(loggerContext.getLogger(Logger.ROOT_LOGGER_NAME)).thenReturn(rootLogger);
-        LogConfig logConfig = new LogConfig();
-        ExecutionStatus result = logConfig.configure(loggerContext);
+  @Test
+  void testConfigure() {
+    LoggerContext loggerContext = mock(LoggerContext.class);
+    Logger rootLogger = mock(Logger.class);
+    LangServerBootstrap.cliMode = true;
+    when(loggerContext.getLogger(Logger.ROOT_LOGGER_NAME)).thenReturn(rootLogger);
+    LogConfig logConfig = new LogConfig();
+    ExecutionStatus result = logConfig.configure(loggerContext);
 
-        verify(loggerContext).getLogger(Logger.ROOT_LOGGER_NAME);
-        verify(rootLogger).addAppender(any(ConsoleAppender.class));
-        verify(rootLogger).setLevel(Level.INFO);
+    verify(loggerContext).getLogger(Logger.ROOT_LOGGER_NAME);
+    verify(rootLogger).addAppender(any(ConsoleAppender.class));
+    verify(rootLogger).setLevel(Level.INFO);
 
-        assertEquals(ExecutionStatus.DO_NOT_INVOKE_NEXT_IF_ANY, result);
-    }
+    assertEquals(ExecutionStatus.DO_NOT_INVOKE_NEXT_IF_ANY, result);
+  }
 }

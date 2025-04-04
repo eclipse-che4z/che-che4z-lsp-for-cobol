@@ -18,18 +18,18 @@ import org.eclipse.lsp.cobol.common.CleanerPreprocessor;
 import org.eclipse.lsp.cobol.common.pipeline.Pipeline;
 import org.eclipse.lsp.cobol.core.engine.analysis.AnalysisContext;
 
-/**
- * Cobol Dialect Interface
- */
+/** Cobol Dialect Interface */
 public interface TrueCobolDialect {
   /**
    * Returns the pipeline for current dialect
+   *
    * @return the pipeline for a dialect
    */
   Pipeline<AnalysisContext> getPipeline();
 
   /**
    * Returns the cleanup preprocessor for current dialect
+   *
    * @return the cleanup preprocessor
    */
   CleanerPreprocessor getPreprocessor();

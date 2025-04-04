@@ -126,18 +126,21 @@ public class CobolLanguageEngine {
   /**
    * Perform syntax and semantic analysis for the given text document
    *
-   * @param documentUri    unique resource identifier of the processed document
-   * @param text           the content of the document that should be processed
+   * @param documentUri unique resource identifier of the processed document
+   * @param text the content of the document that should be processed
    * @param analysisConfig contains analysis processing features info and copybook config with
-   *                       following information: target backend sql server, copybook processing mode which reflect
-   *                       the sync status of the document (DID_OPEN|DID_CHANGE)
-   * @param languageId     language identifier
+   *     following information: target backend sql server, copybook processing mode which reflect
+   *     the sync status of the document (DID_OPEN|DID_CHANGE)
+   * @param languageId language identifier
    * @return Semantic information wrapper object and list of syntax error that might send back to
-   * the client
+   *     the client
    */
   @NonNull
   public AnalysisResult run(
-          @NonNull String documentUri, @NonNull String text, @NonNull AnalysisConfig analysisConfig, CobolLanguageId languageId) {
+      @NonNull String documentUri,
+      @NonNull String text,
+      @NonNull AnalysisConfig analysisConfig,
+      CobolLanguageId languageId) {
     ThreadInterruptionUtil.checkThreadInterrupted();
     if (shouldNotAnalyse(text, languageId)) {
       return AnalysisResult.builder().build();
@@ -149,7 +152,8 @@ public class CobolLanguageEngine {
     }
 
     BenchmarkSession session = benchmarkService.startSession();
-    AnalysisContext ctx = new AnalysisContext(analysisConfig, session, documentUri, text, languageId);
+    AnalysisContext ctx =
+        new AnalysisContext(analysisConfig, session, documentUri, text, languageId);
 
     Pipeline pipeline = trueDialectService.getPipeline(languageId);
 

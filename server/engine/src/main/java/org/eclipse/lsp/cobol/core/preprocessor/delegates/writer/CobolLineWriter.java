@@ -42,7 +42,7 @@ public abstract class CobolLineWriter {
   /**
    * Convert a list of COBOL lines into one string
    *
-   * @param lines       - list of lines
+   * @param lines - list of lines
    * @param documentUri - uri of the document
    * @return a string representation of the COBOL program
    */
@@ -59,7 +59,7 @@ public abstract class CobolLineWriter {
       if (!isContinuationLine) {
         if (start != null) {
           Position stop =
-                  new Position(line.getNumber() - 1, sb.length() - sb.lastIndexOf("\n") - 1);
+              new Position(line.getNumber() - 1, sb.length() - sb.lastIndexOf("\n") - 1);
           Range range = new Range(start, stop);
           acc.put(range, clSb);
           clSb = null;
@@ -81,9 +81,11 @@ public abstract class CobolLineWriter {
         }
         process(sb, line, layout);
         String unquotedContinuedLine = removeStartingQuote(line);
-        Position unquotedExtendedLinePOsition = new Position(line.getNumber(), line.toString().indexOf(unquotedContinuedLine));
-        ExtendedTextLine extendedTextLine = new ExtendedTextLine(unquotedContinuedLine, unquotedExtendedLinePOsition, documentUri);
-        if (Objects.nonNull(clSb))  {
+        Position unquotedExtendedLinePOsition =
+            new Position(line.getNumber(), line.toString().indexOf(unquotedContinuedLine));
+        ExtendedTextLine extendedTextLine =
+            new ExtendedTextLine(unquotedContinuedLine, unquotedExtendedLinePOsition, documentUri);
+        if (Objects.nonNull(clSb)) {
           clSb.append(extendedTextLine);
         } else {
           clSb = extendedTextLine;
@@ -128,7 +130,7 @@ public abstract class CobolLineWriter {
   private String removeStartingQuote(CobolLine line) {
     String continuation = StringUtils.stripStart(line.getContentArea(), null);
     if (CobolLineReWriter.checkStringStartsWithQuoteMark(continuation)
-            && !isContinuedLineQuoted(line)) {
+        && !isContinuedLineQuoted(line)) {
       continuation = continuation.substring(1);
     }
     return continuation;

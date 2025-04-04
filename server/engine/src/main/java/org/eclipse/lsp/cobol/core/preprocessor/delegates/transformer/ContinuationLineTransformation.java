@@ -65,14 +65,14 @@ public abstract class ContinuationLineTransformation implements CobolLinesTransf
       String documentURI, List<CobolLine> lines) {
     List<CobolLine> result = new ArrayList<>();
     List<SyntaxError> errors = new ArrayList<>();
-      for (int i = 0; i < lines.size(); i++) {
+    for (int i = 0; i < lines.size(); i++) {
       CobolLine cobolLine = lines.get(i);
 
       ofNullable(checkContinuationLine(documentURI, i, cobolLine)).ifPresent(errors::add);
       ofNullable(checkInvalidIndexOfInlineComment(documentURI, i + 1, cobolLine))
           .ifPresent(errors::add);
 
-        result.add(cobolLine);
+      result.add(cobolLine);
     }
     return new ResultWithErrors<>(result, errors);
   }

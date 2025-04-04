@@ -42,7 +42,8 @@ public class CodeActions {
 
   /**
    * Registers a new provider for code Actions
-   * @param providers  list of {@link CodeActionProvider}
+   *
+   * @param providers list of {@link CodeActionProvider}
    */
   public void registerNewProviders(List<CodeActionProvider> providers) {
     this.providers.addAll(providers);

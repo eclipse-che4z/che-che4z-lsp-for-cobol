@@ -18,9 +18,7 @@ import com.google.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.lsp.DisposableLSPStateService;
 
-/**
- * LSP Exit Handler
- */
+/** LSP Exit Handler */
 @Slf4j
 public class ExitHandler {
   private final DisposableLSPStateService disposableLSPStateService;
@@ -30,9 +28,7 @@ public class ExitHandler {
     this.disposableLSPStateService = disposableLSPStateService;
   }
 
-  /**
-   * Handle exit LSP request.
-   */
+  /** Handle exit LSP request. */
   public void exit() {
     int exitCode = disposableLSPStateService.getExitCode();
     LOG.info("COBOL LS server exits with code: " + exitCode);

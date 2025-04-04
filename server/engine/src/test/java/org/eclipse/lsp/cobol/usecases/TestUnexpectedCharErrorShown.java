@@ -28,7 +28,7 @@ import org.junit.jupiter.api.Test;
 class TestUnexpectedCharErrorShown {
 
   private static final String TEXT =
-            "        IDENTIFICATION DIVISION{?|typo}.\r\n"
+      "        IDENTIFICATION DIVISION{?|typo}.\r\n"
           + "        PROGRAM-ID. test1.\r\n"
           + "        DATA DIVISION.\r\n"
           + "        PROCEDURE DIVISION.\r\n"
@@ -45,8 +45,7 @@ class TestUnexpectedCharErrorShown {
                 new Range(),
                 "Extraneous input '?'",
                 DiagnosticSeverity.Error,
-                ErrorSource.PARSING.getText())
-            ),
+                ErrorSource.PARSING.getText())),
         CobolLanguageId.COBOL);
   }
 }

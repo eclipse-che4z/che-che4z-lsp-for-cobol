@@ -36,10 +36,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /** Test {@link SectionNodeProcessorHelper} */
 class SectionNodeProcessorHelperTest {
-  private static final Locality LOCALITY = Locality.builder()
-      .uri("")
-      .range(new Range(new Position(1, 1), new Position(2, 2)))
-      .build();
+  private static final Locality LOCALITY =
+      Locality.builder().uri("").range(new Range(new Position(1, 1), new Position(2, 2))).build();
 
   @Test
   void simpleStructureTest() {

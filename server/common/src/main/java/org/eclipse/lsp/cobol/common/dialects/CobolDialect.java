@@ -31,6 +31,7 @@ public interface CobolDialect {
   String FILLER = "\u200B";
   /**
    * Gets the name of the dialect
+   *
    * @return the name of the dialect
    */
   String getName();
@@ -126,6 +127,7 @@ public interface CobolDialect {
   /**
    * Returns a list of predefined dialect specific copybook model. These predefined copybooks could
    * be used like a regular copybook
+   *
    * @param ctx is a {@link AnalysisConfig} class with all configurations
    * @return a list of {@link CopybookModel}
    */
@@ -135,6 +137,7 @@ public interface CobolDialect {
 
   /**
    * Returns the list of {@link CompilerDirectiveNode} specific to the dialect
+   *
    * @param context is a DialectProcessingContext class with all needed data for dialect processing
    * @return a list of {@link CompilerDirectiveNode}
    */

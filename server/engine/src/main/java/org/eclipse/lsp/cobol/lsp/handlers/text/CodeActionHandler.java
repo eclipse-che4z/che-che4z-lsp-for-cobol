@@ -24,9 +24,7 @@ import org.eclipse.lsp4j.jsonrpc.messages.Either;
 
 import java.util.List;
 
-/**
- * LSP CodeAction Handler
- */
+/** LSP CodeAction Handler */
 @Slf4j
 public class CodeActionHandler {
   private final CodeActions actions;
@@ -38,6 +36,7 @@ public class CodeActionHandler {
 
   /**
    * Handle codeAction request.
+   *
    * @param params CodeActionParams.
    * @return List of either commands or code actions.
    */

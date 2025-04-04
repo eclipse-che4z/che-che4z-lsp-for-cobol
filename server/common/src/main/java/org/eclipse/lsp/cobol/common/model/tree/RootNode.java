@@ -41,6 +41,7 @@ public class RootNode extends Node {
 
   /**
    * Search for the first program in CU.
+   *
    * @return the first program node or null if there is no programs defined
    */
   public ProgramNode findFirstProgramNode() {
@@ -49,12 +50,13 @@ public class RootNode extends Node {
 
   /**
    * Search for the program nodes in CU.
+   *
    * @return the list of program nodes, can be empty.
    */
   public List<ProgramNode> findPrograms() {
-    return getDepthFirstStream().filter(hasType(PROGRAM))
-            .map(ProgramNode.class::cast)
-            .collect(Collectors.toList());
+    return getDepthFirstStream()
+        .filter(hasType(PROGRAM))
+        .map(ProgramNode.class::cast)
+        .collect(Collectors.toList());
   }
-
 }

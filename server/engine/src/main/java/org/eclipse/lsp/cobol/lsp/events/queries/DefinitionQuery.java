@@ -25,9 +25,7 @@ import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.LocationLink;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 
-/**
- * textDocument/definition Langauge server event
- */
+/** textDocument/definition Langauge server event */
 public class DefinitionQuery
     implements LspQuery<Either<List<? extends Location>, List<? extends LocationLink>>> {
   private final DefinitionParams params;

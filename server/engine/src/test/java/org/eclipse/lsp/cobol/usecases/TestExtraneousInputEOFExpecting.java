@@ -42,8 +42,9 @@ class TestExtraneousInputEOFExpecting {
         ImmutableMap.of(
             "1",
             new Diagnostic(
-                new Range(), "A period was assumed before \"<EOF>\".",
-                    DiagnosticSeverity.Error,
-                    ErrorSource.PARSING.getText())));
+                new Range(),
+                "A period was assumed before \"<EOF>\".",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
   }
 }

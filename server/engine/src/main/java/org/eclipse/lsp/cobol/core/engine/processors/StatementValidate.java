@@ -50,10 +50,9 @@ public class StatementValidate implements Processor<StatementNode> {
     MessageTemplate.of("variables.elementaryWithType", MessageTemplate.of("variables.integer")),
     MessageTemplate.of("variables.nonzeroInteger")
   };
-  private static final Set<UsageFormat> POINTER_USAGE_FORMATS = ImmutableSet.of(
-          UsageFormat.PROCEDURE_POINTER,
-          UsageFormat.POINTER,
-          UsageFormat.FUNCTION_POINTER);
+  private static final Set<UsageFormat> POINTER_USAGE_FORMATS =
+      ImmutableSet.of(
+          UsageFormat.PROCEDURE_POINTER, UsageFormat.POINTER, UsageFormat.FUNCTION_POINTER);
 
   @Override
   public void accept(StatementNode node, ProcessingContext ctx) {
@@ -92,32 +91,41 @@ public class StatementValidate implements Processor<StatementNode> {
     if (node instanceof SetToStatement && !((SetToStatement) node).isAddress()) {
       SetToStatement setToStatementNode = (SetToStatement) node;
       if (!(setToStatementNode.getSendingField() instanceof QualifiedReferenceNode)) {
-        ctx.getErrors().addAll(validateVariableUsageFormat(setToStatementNode.getReceivingFields()));
+        ctx.getErrors()
+            .addAll(validateVariableUsageFormat(setToStatementNode.getReceivingFields()));
       }
     }
   }
 
   private List<SyntaxError> validateVariableUsageFormat(List<Node> fields) {
     return fields.stream()
-            .filter(Node.hasType(QUALIFIED_REFERENCE_NODE))
-            .map(QualifiedReferenceNode.class::cast)
-            .filter(
-                    reference ->
-                            reference
-                                    .getVariableDefinitionNode()
-                                    .map(variableNode -> {
-                                      if (variableNode.getVariableType() != VariableType.INDEX_ITEM
-                                              && variableNode.getVariableType() != VariableType.GROUP_ITEM) {
-                                        return true;
-                                      }
-                                      if (variableNode instanceof GroupItemNode && variableNode.getVariableType() == VariableType.GROUP_ITEM) {
-                                        return !POINTER_USAGE_FORMATS.contains(((GroupItemNode) variableNode).getUsageFormat());
-                                      }
-                                      return false;
-                                    })
-                                    .orElse(false))
-            .map(variableNode -> createError(variableNode.getLocality(), INVALID_RECEIVING_FIELD_TEMPLATE, VariableType.INDEX_ITEM.getTemplate()))
-            .collect(Collectors.toList());
+        .filter(Node.hasType(QUALIFIED_REFERENCE_NODE))
+        .map(QualifiedReferenceNode.class::cast)
+        .filter(
+            reference ->
+                reference
+                    .getVariableDefinitionNode()
+                    .map(
+                        variableNode -> {
+                          if (variableNode.getVariableType() != VariableType.INDEX_ITEM
+                              && variableNode.getVariableType() != VariableType.GROUP_ITEM) {
+                            return true;
+                          }
+                          if (variableNode instanceof GroupItemNode
+                              && variableNode.getVariableType() == VariableType.GROUP_ITEM) {
+                            return !POINTER_USAGE_FORMATS.contains(
+                                ((GroupItemNode) variableNode).getUsageFormat());
+                          }
+                          return false;
+                        })
+                    .orElse(false))
+        .map(
+            variableNode ->
+                createError(
+                    variableNode.getLocality(),
+                    INVALID_RECEIVING_FIELD_TEMPLATE,
+                    VariableType.INDEX_ITEM.getTemplate()))
+        .collect(Collectors.toList());
   }
 
   private List<SyntaxError> validateVariableType(

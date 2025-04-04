@@ -90,19 +90,19 @@ public class WatcherServiceImpl implements WatcherService {
   @Synchronized
   public void addWatchers(@NonNull List<String> paths) {
     register(
-            paths.stream()
-                    .map(
-                            folder -> {
-                              folderWatchers.add(folder);
-                              return new Registration(
-                                      folder,
-                                      WATCH_FILES,
-                                      new DidChangeWatchedFilesRegistrationOptions(
-                                              asList(
-                                                      new FileSystemWatcher(createFileWatcher(folder), WATCH_ALL_KIND),
-                                                      new FileSystemWatcher(createFolderWatcher(folder), WATCH_ALL_KIND))));
-                            })
-                    .collect(toList()));
+        paths.stream()
+            .map(
+                folder -> {
+                  folderWatchers.add(folder);
+                  return new Registration(
+                      folder,
+                      WATCH_FILES,
+                      new DidChangeWatchedFilesRegistrationOptions(
+                          asList(
+                              new FileSystemWatcher(createFileWatcher(folder), WATCH_ALL_KIND),
+                              new FileSystemWatcher(createFolderWatcher(folder), WATCH_ALL_KIND))));
+                })
+            .collect(toList()));
   }
 
   @Override
@@ -111,12 +111,12 @@ public class WatcherServiceImpl implements WatcherService {
     List<String> removedWatchers = paths.stream().filter(folderWatchers::remove).collect(toList());
     if (!removedWatchers.isEmpty()) {
       clientProvider
-              .get()
-              .unregisterCapability(
-                      new UnregistrationParams(
-                              removedWatchers.stream()
-                                      .map(it -> new Unregistration(it, WATCH_FILES))
-                                      .collect(toList())));
+          .get()
+          .unregisterCapability(
+              new UnregistrationParams(
+                  removedWatchers.stream()
+                      .map(it -> new Unregistration(it, WATCH_FILES))
+                      .collect(toList())));
     }
   }
 
@@ -128,16 +128,16 @@ public class WatcherServiceImpl implements WatcherService {
   @Override
   public void removeRuntimeWatchers(@NonNull String documentUri) {
     List<String> removedWatchers =
-            runtimeSpecifiedFolderWatchers.getOrDefault(documentUri, Collections.emptyList());
+        runtimeSpecifiedFolderWatchers.getOrDefault(documentUri, Collections.emptyList());
     runtimeSpecifiedFolderWatchers.remove(documentUri);
     if (!removedWatchers.isEmpty()) {
       clientProvider
-              .get()
-              .unregisterCapability(
-                      new UnregistrationParams(
-                              removedWatchers.stream()
-                                      .map(it -> new Unregistration(it, WATCH_FILES))
-                                      .collect(toList())));
+          .get()
+          .unregisterCapability(
+              new UnregistrationParams(
+                  removedWatchers.stream()
+                      .map(it -> new Unregistration(it, WATCH_FILES))
+                      .collect(toList())));
     }
   }
 
@@ -197,7 +197,7 @@ public class WatcherServiceImpl implements WatcherService {
     watchedFolders.addAll(paths);
     runtimeSpecifiedFolderWatchers.put(documentUri, watchedFolders);
     register(
-            paths.stream()
+        paths.stream()
             .map(
                 folder ->
                     new Registration(

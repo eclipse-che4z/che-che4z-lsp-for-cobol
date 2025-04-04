@@ -25,51 +25,57 @@ import org.junit.jupiter.api.Test;
 import java.util.Map;
 
 /**
- * Test CICS Build commands. Documentation link:
- * <a href="https://www.ibm.com/docs/en/cics-ts/6.x?topic=summary-build-attach-lutype61">BUILD ATTACH(LUTYPE6.1) Command</a>
- * <a href="https://www.ibm.com/docs/en/cics-ts/6.x?topic=summary-build-attach-mro">BUILD ATTACH(MRO) Command</a>
+ * Test CICS Build commands. Documentation link: <a
+ * href="https://www.ibm.com/docs/en/cics-ts/6.x?topic=summary-build-attach-lutype61">BUILD
+ * ATTACH(LUTYPE6.1) Command</a> <a
+ * href="https://www.ibm.com/docs/en/cics-ts/6.x?topic=summary-build-attach-mro">BUILD ATTACH(MRO)
+ * Command</a>
+ *
  * <p>This class tests all variations of the DEFINE command found in the link above.
  */
 public class TestCICSBuild {
-    private static final String BUILD_ATTACH_ATTACHID_ALL_VALID =
-            "BUILD ATTACH ATTACHID({$varFour}) PROCESS({$varFour}) RESOURCE({$varFour}) RPROCESS({$varFour}) "
-                    + "RRESOURCE({$varFour}) QUEUE({$varFour}) IUTYPE({$varFour}) DATASTR({$varFour}) RECFM({$varFour})";
-    private static final String BUILD_ATTACH_ATTACHID_VALID =
-            "BUILD ATTACH ATTACHID({$varFour})";
-    private static final String BUILD_ATTACH_ATTACHID_INVALID =
-            "BUILD {ATTACH | errorMissingAttachId}";
-    private static final String BUILD_ATTACHID_INVALID =
-            "BUILD {ATTACHID(100) | errorMissingAttach }";
-    @Test
-    void testDefineActivityAllOptionsValid() {
-        CICSTestUtils.noErrorTest(BUILD_ATTACH_ATTACHID_ALL_VALID);
-    }
-    @Test
-    void testBuildAttachAttachidValid() {
-        CICSTestUtils.noErrorTest(BUILD_ATTACH_ATTACHID_VALID);
-    }
-    @Test
-    void testBuildAttachAttachidInvalid() {
-        Map<String, Diagnostic> expectedDiagnostics =
-                ImmutableMap.of(
-                        "errorMissingAttachId",
-                        new Diagnostic(
-                                new Range(),
-                                "Missing required option: ATTACHID",
-                                DiagnosticSeverity.Error,
-                                ErrorSource.PARSING.getText()));
-        CICSTestUtils.errorTest(BUILD_ATTACH_ATTACHID_INVALID, expectedDiagnostics);
-    }
-    @Test
-    void testBuildAttachInvalid() {
-        Map<String, Diagnostic> expectedDiagnostics =
-                ImmutableMap.of(
-                        "errorMissingAttach",
-                        new Diagnostic(
-                                new Range(),
-                                "Missing required option: ATTACH",
-                                DiagnosticSeverity.Error,
-                                ErrorSource.PARSING.getText()));
-        CICSTestUtils.errorTest(BUILD_ATTACHID_INVALID, expectedDiagnostics);
-    }
+  private static final String BUILD_ATTACH_ATTACHID_ALL_VALID =
+      "BUILD ATTACH ATTACHID({$varFour}) PROCESS({$varFour}) RESOURCE({$varFour}) RPROCESS({$varFour}) "
+          + "RRESOURCE({$varFour}) QUEUE({$varFour}) IUTYPE({$varFour}) DATASTR({$varFour}) RECFM({$varFour})";
+  private static final String BUILD_ATTACH_ATTACHID_VALID = "BUILD ATTACH ATTACHID({$varFour})";
+  private static final String BUILD_ATTACH_ATTACHID_INVALID =
+      "BUILD {ATTACH | errorMissingAttachId}";
+  private static final String BUILD_ATTACHID_INVALID =
+      "BUILD {ATTACHID(100) | errorMissingAttach }";
+
+  @Test
+  void testDefineActivityAllOptionsValid() {
+    CICSTestUtils.noErrorTest(BUILD_ATTACH_ATTACHID_ALL_VALID);
+  }
+
+  @Test
+  void testBuildAttachAttachidValid() {
+    CICSTestUtils.noErrorTest(BUILD_ATTACH_ATTACHID_VALID);
+  }
+
+  @Test
+  void testBuildAttachAttachidInvalid() {
+    Map<String, Diagnostic> expectedDiagnostics =
+        ImmutableMap.of(
+            "errorMissingAttachId",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: ATTACHID",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()));
+    CICSTestUtils.errorTest(BUILD_ATTACH_ATTACHID_INVALID, expectedDiagnostics);
+  }
+
+  @Test
+  void testBuildAttachInvalid() {
+    Map<String, Diagnostic> expectedDiagnostics =
+        ImmutableMap.of(
+            "errorMissingAttach",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: ATTACH",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()));
+    CICSTestUtils.errorTest(BUILD_ATTACHID_INVALID, expectedDiagnostics);
+  }
 }

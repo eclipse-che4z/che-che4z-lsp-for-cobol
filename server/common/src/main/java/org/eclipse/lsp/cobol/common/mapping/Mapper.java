@@ -16,10 +16,9 @@ package org.eclipse.lsp.cobol.common.mapping;
 
 import org.eclipse.lsp4j.Location;
 
-/**
- * Provides mapping functionality
- */
+/** Provides mapping functionality */
 interface Mapper {
   boolean canApply(MappedCharacter startCharacter, MappedCharacter endCharacter);
+
   Location apply(MappedCharacter startCharacter, MappedCharacter endCharacter);
 }

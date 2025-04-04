@@ -44,7 +44,9 @@ public enum SearchPattern {
     public String apply(String trim) {
       trim = getActualWordToReplace(trim);
       if (isQuotedString(trim)) return Pattern.quote(trim);
-      return SEPARATOR_REGEX_PREFIX + adjustSpaces(escapeSpecialCharacters(trim)) + SEPARATOR_REGEX_SUFFIX;
+      return SEPARATOR_REGEX_PREFIX
+          + adjustSpaces(escapeSpecialCharacters(trim))
+          + SEPARATOR_REGEX_SUFFIX;
     }
 
     private String getActualWordToReplace(String trim) {
@@ -74,12 +76,9 @@ public enum SearchPattern {
   // ) }, Colon { : }  //NOSONAR
   // Ref - https://www.ibm.com/support/knowledgecenter/SS6SG3_6.2.0/lr/ref/rllanrul.html
   private static final String SEPARATOR_REGEX_SUFFIX = "(?=[\\):]|[,;]\\s|\\.\\s*|\\s|$)[\\):,;]?";
-  private static final String SEPARATOR_REGEX_PREFIX =
-      "(\\(|:|[,;]\\s)?(?<=^|[.,;]\\s|\\s|[\\(:])";
-  private static final List<String> COBOL_SEPARATORS_START =
-      ImmutableList.of(";", "(", ":", ",");
-  private static final List<String> COBOL_SEPARATORS_END =
-      ImmutableList.of(";", ")", ":", ",");
+  private static final String SEPARATOR_REGEX_PREFIX = "(\\(|:|[,;]\\s)?(?<=^|[.,;]\\s|\\s|[\\(:])";
+  private static final List<String> COBOL_SEPARATORS_START = ImmutableList.of(";", "(", ":", ",");
+  private static final List<String> COBOL_SEPARATORS_END = ImmutableList.of(";", ")", ":", ",");
   private static final String WORD_BOUNDARY = "\\b";
   private static final List<String> META_CHARACTERS =
       ImmutableList.of(

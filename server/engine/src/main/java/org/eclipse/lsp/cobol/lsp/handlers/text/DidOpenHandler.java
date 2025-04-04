@@ -24,9 +24,7 @@ import org.eclipse.lsp.cobol.lsp.handlers.HandlerUtility;
 import org.eclipse.lsp.cobol.service.WatcherService;
 import org.eclipse.lsp4j.DidOpenTextDocumentParams;
 
-/**
- * LSP DidOpen Handler
- */
+/** LSP DidOpen Handler */
 @Slf4j
 public class DidOpenHandler {
 
@@ -51,8 +49,14 @@ public class DidOpenHandler {
       return;
     }
     watcherService.addRuntimeWatchers(uri);
-    asyncAnalysisService.openDocument(uri, params.getTextDocument().getText(), params.getTextDocument().getLanguageId());
-    asyncAnalysisService.scheduleAnalysis(uri, params.getTextDocument().getText(), params.getTextDocument().getVersion(), true, eventSource);
+    asyncAnalysisService.openDocument(
+        uri, params.getTextDocument().getText(), params.getTextDocument().getLanguageId());
+    asyncAnalysisService.scheduleAnalysis(
+        uri,
+        params.getTextDocument().getText(),
+        params.getTextDocument().getVersion(),
+        true,
+        eventSource);
   }
 
   /**

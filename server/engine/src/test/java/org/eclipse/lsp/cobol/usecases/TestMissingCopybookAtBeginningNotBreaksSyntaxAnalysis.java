@@ -52,6 +52,6 @@ class TestMissingCopybookAtBeginningNotBreaksSyntaxAnalysis {
                 "ASDAW: Copybook not found",
                 DiagnosticSeverity.Error,
                 ErrorSource.COPYBOOK.getText(),
-                    ErrorCodes.MISSING_COPYBOOK.getLabel())));
+                ErrorCodes.MISSING_COPYBOOK.getLabel())));
   }
 }

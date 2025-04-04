@@ -52,7 +52,7 @@ class TestMissingCopybookNotInVariableList {
                 "CPYNAME: Copybook not found",
                 Error,
                 ErrorSource.COPYBOOK.getText(),
-                    ErrorCodes.MISSING_COPYBOOK.getLabel()),
+                ErrorCodes.MISSING_COPYBOOK.getLabel()),
             "nopic",
             new Diagnostic(
                 new Range(),

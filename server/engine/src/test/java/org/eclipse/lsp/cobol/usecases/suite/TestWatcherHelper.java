@@ -28,17 +28,14 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/**
- * Utility class for TestWatchers
- */
+/** Utility class for TestWatchers */
 @UtilityClass
 public class TestWatcherHelper {
   private static final Pattern UNIT_TEST_ID_PATTERN =
       Pattern.compile("\\[.*?\\]/\\[.*?\\]/\\[.*?\\]/\\[.*?:(.*?)\\]");
   static final String ROOT_DIRECTORY_PROPERTY = "usecase.test.repo.dir";
 
-  Path fetchTargetPath(ExtensionContext context, String rootFolder)
-      throws IOException {
+  Path fetchTargetPath(ExtensionContext context, String rootFolder) throws IOException {
     String className = context.getTestClass().get().getSimpleName();
     String methodName = context.getRequiredTestMethod().getName();
     Optional<String> parameterInvocation = getParameterInvocation(context);

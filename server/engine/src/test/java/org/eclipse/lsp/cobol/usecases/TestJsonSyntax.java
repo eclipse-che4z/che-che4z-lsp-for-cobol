@@ -23,38 +23,38 @@ import org.junit.jupiter.api.Test;
 class TestJsonSyntax {
   private static final String TEXT_PARSE =
       "       Identification division.\n"
-      + "       Program-id. jp_ex.\n"
-      + "       Data division.\n"
-      + "        Working-storage section.\n"
-      + "         1 {$*jtxt-1208} pic x(1000) value is all x'20'.\n"
-      + "         77 {$*txnum} pic 999999 usage display value zero.\n"
-      + "         1 {$*client-data}.\n"
-      + "          3 {$*account-num}   pic 999,999,999,999.\n"
-      + "          3 {$*transactions}.\n"
-      + "             5 {$*tx-record} occurs 0 to 100 depending {$txnum}.\n"
-      + "       Procedure division.\n"
-      + "           Json parse {$jtxt-1208} into {$client-data}\n"
-      + "             with detail\n"
-      + "             suppress {$transactions}\n"
-      + "             not on exception\n"
-      + "               display \"Successful JSON Parse\"\n"
-      + "           end-json.";
+          + "       Program-id. jp_ex.\n"
+          + "       Data division.\n"
+          + "        Working-storage section.\n"
+          + "         1 {$*jtxt-1208} pic x(1000) value is all x'20'.\n"
+          + "         77 {$*txnum} pic 999999 usage display value zero.\n"
+          + "         1 {$*client-data}.\n"
+          + "          3 {$*account-num}   pic 999,999,999,999.\n"
+          + "          3 {$*transactions}.\n"
+          + "             5 {$*tx-record} occurs 0 to 100 depending {$txnum}.\n"
+          + "       Procedure division.\n"
+          + "           Json parse {$jtxt-1208} into {$client-data}\n"
+          + "             with detail\n"
+          + "             suppress {$transactions}\n"
+          + "             not on exception\n"
+          + "               display \"Successful JSON Parse\"\n"
+          + "           end-json.";
 
   private static final String TEXT_GENERATE =
       "       Identification division.\n"
-      + "       Program-id. jp_ex.\n"
-      + "       Data division.\n"
-      + "        Working-storage section.\n"
-      + "         01 {$*docx} PIC X.\n"
-      + "         01 {$*myrecord}.\n"
-      + "           02 {$*data-a} PIC X.\n"
-      + "           02 {$*data-b} PIC X.\n"
-      + "             88 {$*data-b-flag} VALUE 'a' THRU 'z'.\n"
-      + "       Procedure division.\n"
-      + "           JSON GENERATE {$docx} FROM {$myrecord}\n"
-      + "             CONVERTING {$data-a} TO BOOLEAN USING 'T'\n"
-      + "                   ALSO {$data-b} TO BOOLEAN USING {$data-b-flag}\n"
-      + "            END-JSON.";
+          + "       Program-id. jp_ex.\n"
+          + "       Data division.\n"
+          + "        Working-storage section.\n"
+          + "         01 {$*docx} PIC X.\n"
+          + "         01 {$*myrecord}.\n"
+          + "           02 {$*data-a} PIC X.\n"
+          + "           02 {$*data-b} PIC X.\n"
+          + "             88 {$*data-b-flag} VALUE 'a' THRU 'z'.\n"
+          + "       Procedure division.\n"
+          + "           JSON GENERATE {$docx} FROM {$myrecord}\n"
+          + "             CONVERTING {$data-a} TO BOOLEAN USING 'T'\n"
+          + "                   ALSO {$data-b} TO BOOLEAN USING {$data-b-flag}\n"
+          + "            END-JSON.";
 
   @Test
   void test_tolerate_json_parse_syntax() {
@@ -65,5 +65,4 @@ class TestJsonSyntax {
   void test_tolerate_json_generate_syntax() {
     UseCaseEngine.runTest(TEXT_GENERATE, ImmutableList.of(), ImmutableMap.of());
   }
-
 }

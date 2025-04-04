@@ -56,7 +56,11 @@ class TestCpyNameWithSpecialChar {
         ImmutableMap.of(
             "1",
             new Diagnostic(
-                new Range(), MESSAGE, DiagnosticSeverity.Error, ErrorSource.COPYBOOK.getText(), CODE)));
+                new Range(),
+                MESSAGE,
+                DiagnosticSeverity.Error,
+                ErrorSource.COPYBOOK.getText(),
+                CODE)));
   }
 
   @Test

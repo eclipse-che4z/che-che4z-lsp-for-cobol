@@ -49,13 +49,13 @@ public class CICSExecBlockProcessor implements Processor<ExecCicsNode> {
 
   private void throwError(ExecCicsNode execCicsNode, ProcessingContext processingContext) {
     processingContext
-            .getErrors()
-            .add(
-                    SyntaxError.syntaxError()
-                            .location(execCicsNode.getLocality().toOriginalLocation())
-                            .severity(ErrorSeverity.ERROR)
-                            .errorSource(ErrorSource.PARSING)
-                            .suggestion(messageService.getMessage("cics.invalidExecBlock"))
-                            .build());
+        .getErrors()
+        .add(
+            SyntaxError.syntaxError()
+                .location(execCicsNode.getLocality().toOriginalLocation())
+                .severity(ErrorSeverity.ERROR)
+                .errorSource(ErrorSource.PARSING)
+                .suggestion(messageService.getMessage("cics.invalidExecBlock"))
+                .build());
   }
 }

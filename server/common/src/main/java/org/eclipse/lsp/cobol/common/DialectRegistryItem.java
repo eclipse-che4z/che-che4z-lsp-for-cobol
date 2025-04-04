@@ -18,9 +18,7 @@ import lombok.Value;
 
 import java.net.URI;
 
-/**
- * Contains dialect registrin info, such as name, path, extensionId, etc.
- */
+/** Contains dialect registrin info, such as name, path, extensionId, etc. */
 @Value
 public class DialectRegistryItem {
   String name;

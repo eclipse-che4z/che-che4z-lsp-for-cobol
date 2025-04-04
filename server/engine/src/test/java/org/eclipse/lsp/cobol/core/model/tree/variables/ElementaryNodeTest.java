@@ -42,14 +42,24 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class ElementaryNodeTest {
   ElementaryItemNode getNode(String picClause, UsageFormat usageClause) {
     return new ElementaryItemNode(
-        Locality.builder().build(), 2, "TEST-NODE", false, picClause, "", usageClause, false, false, false);
+        Locality.builder().build(),
+        2,
+        "TEST-NODE",
+        false,
+        picClause,
+        "",
+        usageClause,
+        false,
+        false,
+        false);
   }
 
   @Test
   void testValidatePicAndUsageClauseWhenPicAndUsageAreInCompatible() {
     ElementaryItemNode node = getNode("PIC 9", UsageFormat.COMPUTATIONAL_1);
     ArrayList<SyntaxError> errors = new ArrayList<>();
-    ProcessingContext ctx = new ProcessingContext(errors, new SymbolAccumulator(), ImmutableMap.of());
+    ProcessingContext ctx =
+        new ProcessingContext(errors, new SymbolAccumulator(), ImmutableMap.of());
     AstProcessor astProcessor = new AstProcessor();
     ctx.register(
         new ProcessorDescription(
@@ -65,7 +75,8 @@ class ElementaryNodeTest {
     ElementaryItemNode node = getNode("PIC X", UsageFormat.COMPUTATIONAL_5);
     ArrayList<SyntaxError> errors = new ArrayList<>();
     AstProcessor astProcessor = new AstProcessor();
-    ProcessingContext ctx = new ProcessingContext(errors, new SymbolAccumulator(), ImmutableMap.of());
+    ProcessingContext ctx =
+        new ProcessingContext(errors, new SymbolAccumulator(), ImmutableMap.of());
     ctx.register(
         new ProcessorDescription(
             ElementaryItemNode.class, ProcessingPhase.TRANSFORMATION, new ElementaryNodeCheck()));
@@ -79,7 +90,11 @@ class ElementaryNodeTest {
   void testValidatePicAndUsageClauseWhenPicAndUsageAreCompatible() {
     ElementaryItemNode node = getNode("PIC 9", UsageFormat.DISPLAY);
     ArrayList<SyntaxError> errors = new ArrayList<>();
-    new AstProcessor().process(ProcessingPhase.TRANSFORMATION, node, new ProcessingContext(errors, new SymbolAccumulator(), ImmutableMap.of()));
+    new AstProcessor()
+        .process(
+            ProcessingPhase.TRANSFORMATION,
+            node,
+            new ProcessingContext(errors, new SymbolAccumulator(), ImmutableMap.of()));
     assertEquals(0, errors.size());
 
     // TODO:
@@ -87,7 +102,10 @@ class ElementaryNodeTest {
     node = getNode("PIC 9", UsageFormat.UTF_8);
     ArrayList<SyntaxError> errors2 = new ArrayList<>();
     new AstProcessor()
-        .process(ProcessingPhase.TRANSFORMATION, node, new ProcessingContext(errors2, new SymbolAccumulator(), ImmutableMap.of()));
+        .process(
+            ProcessingPhase.TRANSFORMATION,
+            node,
+            new ProcessingContext(errors2, new SymbolAccumulator(), ImmutableMap.of()));
     assertEquals(0, errors2.size());
   }
 
@@ -95,9 +113,19 @@ class ElementaryNodeTest {
   void testValidatePicAndUsageClauseWhenUsageInCompatibleWithOtherClauses() {
     ElementaryItemNode elementNode =
         new ElementaryItemNode(
-            Locality.builder().build(), 2, "TEST-NODE", false, "PIC X", "", UsageFormat.UTF_8, false, true, false);
+            Locality.builder().build(),
+            2,
+            "TEST-NODE",
+            false,
+            "PIC X",
+            "",
+            UsageFormat.UTF_8,
+            false,
+            true,
+            false);
     ArrayList<SyntaxError> errors = new ArrayList<>();
-    ProcessingContext ctx = new ProcessingContext(errors, new SymbolAccumulator(), ImmutableMap.of());
+    ProcessingContext ctx =
+        new ProcessingContext(errors, new SymbolAccumulator(), ImmutableMap.of());
     AstProcessor astProcessor = new AstProcessor();
     ctx.register(
         new ProcessorDescription(

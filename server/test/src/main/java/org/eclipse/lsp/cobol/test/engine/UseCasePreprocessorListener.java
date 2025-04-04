@@ -64,7 +64,6 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
   private final Map<ProcedureId, List<Location>> procedureDefinitions = new HashMap<>();
   private final Map<ProcedureId, List<Location>> procedureUsages = new HashMap<>();
 
-
   private final Deque<StringBuilder> contexts = new ArrayDeque<>();
 
   private final int[] lineShifts;
@@ -78,13 +77,13 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
   private String currentSectionName = null;
 
   UseCasePreprocessorListener(
-          CommonTokenStream tokens,
-          String documentName,
-          String documentUri,
-          int numberOfLines,
-          List<String> subroutineNames,
-          Map<String, Diagnostic> expectedDiagnostics,
-          String dialectType) {
+      CommonTokenStream tokens,
+      String documentName,
+      String documentUri,
+      int numberOfLines,
+      List<String> subroutineNames,
+      Map<String, Diagnostic> expectedDiagnostics,
+      String dialectType) {
     this.tokens = tokens;
     this.documentUri = documentUri;
     this.copybookName = documentName;
@@ -95,8 +94,8 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
     contexts.push(new StringBuilder());
     diagnostics.put(documentUri, new ArrayList<>());
     ofNullable(documentName)
-            .map(name -> name + (dialectType == null ? "" : "!" + dialectType))
-            .ifPresent(defineCopybook(documentUri));
+        .map(name -> name + (dialectType == null ? "" : "!" + dialectType))
+        .ifPresent(defineCopybook(documentUri));
   }
 
   /**
@@ -107,21 +106,21 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
   @NonNull
   TestData getProcessingResult() {
     return new TestData(
-            peek().toString(),
-            copybookName,
-            dialectType,
-            diagnostics,
-            variableDefinitions,
-            variableUsages,
-            procedureDefinitions,
-            procedureUsages,
-            constantUsages,
-            copybookDefinitions,
-            copybookUsages,
-            makeSubroutinesDefinitions(subroutineNames),
-            subroutineUsages,
-            functionDefinitions,
-            functionUsages);
+        peek().toString(),
+        copybookName,
+        dialectType,
+        diagnostics,
+        variableDefinitions,
+        variableUsages,
+        procedureDefinitions,
+        procedureUsages,
+        constantUsages,
+        copybookDefinitions,
+        copybookUsages,
+        makeSubroutinesDefinitions(subroutineNames),
+        subroutineUsages,
+        functionDefinitions,
+        functionUsages);
   }
 
   @Override
@@ -133,15 +132,15 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
   public void exitErrorStatement(ErrorStatementContext ctx) {
     pop();
     ReplacementContext replacementContext =
-            ofNullable(ctx.word()).map(WordContext::replacement).orElse(null);
+        ofNullable(ctx.word()).map(WordContext::replacement).orElse(null);
     String text =
-            ofNullable(ctx.word())
-                    .map(WordContext::identifier)
-                    .map(RuleContext::getText)
-                    .orElse(
-                            ofNullable(ctx.STRINGLITERAL())
-                                    .map(ParseTree::getText)
-                                    .orElse(ofNullable(ctx.TEXT()).map(ParseTree::getText).orElse("")));
+        ofNullable(ctx.word())
+            .map(WordContext::identifier)
+            .map(RuleContext::getText)
+            .orElse(
+                ofNullable(ctx.STRINGLITERAL())
+                    .map(ParseTree::getText)
+                    .orElse(ofNullable(ctx.TEXT()).map(ParseTree::getText).orElse("")));
 
     processToken(text, ctx, replacementContext, null, ctx.diagnostic());
   }
@@ -155,24 +154,24 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
   public void exitCopybookStatement(CopybookStatementContext ctx) {
     pop();
     ofNullable(ctx.copybookUsage())
-            .map(CopybookUsageContext::cpyIdentifier)
-            .ifPresent(processCopybook(ctx, copybookUsages));
+        .map(CopybookUsageContext::cpyIdentifier)
+        .ifPresent(processCopybook(ctx, copybookUsages));
     ofNullable(ctx.copybookDefinition())
-            .map(CopybookDefinitionContext::cpyIdentifier)
-            .ifPresent(processCopybook(ctx, copybookDefinitions));
+        .map(CopybookDefinitionContext::cpyIdentifier)
+        .ifPresent(processCopybook(ctx, copybookDefinitions));
   }
 
   private Consumer<CpyIdentifierContext> processCopybook(
-          CopybookStatementContext ctx, Map<String, List<Location>> copybookUsages) {
+      CopybookStatementContext ctx, Map<String, List<Location>> copybookUsages) {
     return it -> {
       String dialect = it.cpyDialect() == null ? "" : it.cpyDialect().getText();
       processCopybookToken(
-              StringUtils.trimQuotes(it.cpyName().getText().toUpperCase()),
-              dialect,
-              ctx,
-              it.replacement(),
-              copybookUsages,
-              ctx.diagnostic());
+          StringUtils.trimQuotes(it.cpyName().getText().toUpperCase()),
+          dialect,
+          ctx,
+          it.replacement(),
+          copybookUsages,
+          ctx.diagnostic());
     };
   }
 
@@ -185,25 +184,25 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
   public void exitVariableStatement(VariableStatementContext ctx) {
     pop();
     ofNullable(ctx.variableUsage())
-            .map(VariableUsageContext::word)
-            .ifPresent(
-                    it ->
-                            processToken(
-                                    it.identifier().getText(),
-                                    ctx,
-                                    it.replacement(),
-                                    variableUsages,
-                                    ctx.diagnostic()));
+        .map(VariableUsageContext::word)
+        .ifPresent(
+            it ->
+                processToken(
+                    it.identifier().getText(),
+                    ctx,
+                    it.replacement(),
+                    variableUsages,
+                    ctx.diagnostic()));
     ofNullable(ctx.variableDefinition())
-            .map(VariableDefinitionContext::word)
-            .ifPresent(
-                    it ->
-                            processToken(
-                                    it.identifier().getText(),
-                                    ctx,
-                                    it.replacement(),
-                                    variableDefinitions,
-                                    ctx.diagnostic()));
+        .map(VariableDefinitionContext::word)
+        .ifPresent(
+            it ->
+                processToken(
+                    it.identifier().getText(),
+                    ctx,
+                    it.replacement(),
+                    variableDefinitions,
+                    ctx.diagnostic()));
   }
 
   @Override
@@ -228,31 +227,40 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
     pop();
     ParagraphUsageContext p = ctx.paragraphUsage();
     if (p != null) {
-      String section = ctx.sectionUsage() == null
+      String section =
+          ctx.sectionUsage() == null
               ? null
-              : getReplacementText(ctx.sectionUsage().word().identifier().getText(),
-                      ctx.sectionUsage().word().replacement()).get(0);
+              : getReplacementText(
+                      ctx.sectionUsage().word().identifier().getText(),
+                      ctx.sectionUsage().word().replacement())
+                  .get(0);
 
       processProcedureToken(
-              p.word().identifier().getText(),
-              ctx, p.word().replacement(),
-              procedureUsages,
-              ctx.diagnostic(),
-              new ProcedureId(section,
-                      getReplacementText(p.word().getText(), p.word().replacement()).get(0).toUpperCase()));
+          p.word().identifier().getText(),
+          ctx,
+          p.word().replacement(),
+          procedureUsages,
+          ctx.diagnostic(),
+          new ProcedureId(
+              section,
+              getReplacementText(p.word().getText(), p.word().replacement()).get(0).toUpperCase()));
     }
     ParagraphDefinitionContext value = ctx.paragraphDefinition();
     if (value != null && value.word() != null) {
       WordContext it = value.word();
       processProcedureToken(
-              it.identifier().getText(),
-              ctx, it.replacement(),
-              procedureDefinitions,
-              ctx.diagnostic(),
-              new ProcedureId(currentSectionName,
-                      getReplacementText(it.identifier().getText(), it.replacement()).get(0).toUpperCase()));
+          it.identifier().getText(),
+          ctx,
+          it.replacement(),
+          procedureDefinitions,
+          ctx.diagnostic(),
+          new ProcedureId(
+              currentSectionName,
+              getReplacementText(it.identifier().getText(), it.replacement())
+                  .get(0)
+                  .toUpperCase()));
     }
-}
+  }
 
   @Override
   public void enterFunctionDefinition(FunctionDefinitionContext ctx) {
@@ -261,7 +269,8 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
 
   @Override
   public void exitFunctionDefinition(FunctionDefinitionContext ctx) {
-    String multiTokenText = peek().toString().replaceAll(Pattern.quote("{$$*"), "").replaceAll("}", "");
+    String multiTokenText =
+        peek().toString().replaceAll(Pattern.quote("{$$*"), "").replaceAll("}", "");
     String affectedTokens = multiTokenText.substring(0, multiTokenText.indexOf('|'));
     String functionID = ctx.diagnostic().identifier().getText();
     addTokenLocation(
@@ -271,7 +280,8 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
             new Position(ctx.getStart().getLine() - 1, ctx.start.getCharPositionInLine()),
             new Position(
                 ctx.diagnostic().start.getLine() - 1,
-                ctx.diagnostic().start.getCharPositionInLine() - lineShifts[getLine(ctx.diagnostic().start)])));
+                ctx.diagnostic().start.getCharPositionInLine()
+                    - lineShifts[getLine(ctx.diagnostic().start)])));
     pop();
     write(affectedTokens);
   }
@@ -285,14 +295,14 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
   public void exitFunctionUsage(FunctionUsageContext ctx) {
     pop();
     ofNullable(ctx.word())
-            .ifPresent(
-                    it ->
-                            processToken(
-                                    it.identifier().getText(),
-                                    ctx,
-                                    it.replacement(),
-                                    functionUsages,
-                                    ctx.diagnostic()));
+        .ifPresent(
+            it ->
+                processToken(
+                    it.identifier().getText(),
+                    ctx,
+                    it.replacement(),
+                    functionUsages,
+                    ctx.diagnostic()));
   }
 
   @Override
@@ -306,16 +316,28 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
     SectionUsageContext sectionUsage = ctx.sectionUsage();
     if (sectionUsage != null && sectionUsage.word() != null) {
       WordContext word = sectionUsage.word();
-      processProcedureToken(word.identifier().getText(), ctx, word.replacement(), procedureUsages, ctx.diagnostic(),
-              new ProcedureId(getReplacementText(word.getText(), word.replacement()).get(0).toUpperCase(), null));
+      processProcedureToken(
+          word.identifier().getText(),
+          ctx,
+          word.replacement(),
+          procedureUsages,
+          ctx.diagnostic(),
+          new ProcedureId(
+              getReplacementText(word.getText(), word.replacement()).get(0).toUpperCase(), null));
     }
     SectionDefinitionContext sectionDefinition = ctx.sectionDefinition();
     if (sectionDefinition != null && sectionDefinition.word() != null) {
       WordContext word = sectionDefinition.word();
-      String sectionName = getReplacementText(word.getText(), word.replacement()).get(0).toUpperCase();
+      String sectionName =
+          getReplacementText(word.getText(), word.replacement()).get(0).toUpperCase();
       currentSectionName = sectionName;
-      processProcedureToken(word.identifier().getText(), ctx, word.replacement(), procedureDefinitions, ctx.diagnostic(),
-              new ProcedureId(sectionName, null));
+      processProcedureToken(
+          word.identifier().getText(),
+          ctx,
+          word.replacement(),
+          procedureDefinitions,
+          ctx.diagnostic(),
+          new ProcedureId(sectionName, null));
     }
   }
 
@@ -328,15 +350,15 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
   public void exitConstantStatement(ConstantStatementContext ctx) {
     pop();
     ofNullable(ctx.constantUsage())
-            .map(ConstantUsageContext::word)
-            .ifPresent(
-                    it ->
-                            processToken(
-                                    it.identifier().getText(),
-                                    ctx,
-                                    it.replacement(),
-                                    variableUsages,
-                                    ctx.diagnostic()));
+        .map(ConstantUsageContext::word)
+        .ifPresent(
+            it ->
+                processToken(
+                    it.identifier().getText(),
+                    ctx,
+                    it.replacement(),
+                    variableUsages,
+                    ctx.diagnostic()));
   }
 
   @Override
@@ -348,15 +370,15 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
   public void exitSubroutineStatement(SubroutineStatementContext ctx) {
     pop();
     ofNullable(ctx.subroutineUsage())
-            .ifPresent(
-                    it ->
-                            processToken(
-                                    it.STRINGLITERAL().getText(),
-                                    ctx,
-                                    it.replacement(),
-                                    subroutineUsages,
-                                    ctx.diagnostic(),
-                                    true));
+        .ifPresent(
+            it ->
+                processToken(
+                    it.STRINGLITERAL().getText(),
+                    ctx,
+                    it.replacement(),
+                    subroutineUsages,
+                    ctx.diagnostic(),
+                    true));
   }
 
   @Override
@@ -392,7 +414,7 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
     lineShifts[startLine] += ctx.getStop().getText().length();
 
     registerDiagnostics(
-            new Range(new Position(startLine, start), new Position(stopLine, stop)), ctx.diagnostic());
+        new Range(new Position(startLine, start), new Position(stopLine, stop)), ctx.diagnostic());
     pop();
     write(affectedTokens);
   }
@@ -400,9 +422,9 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
   @Override
   public void visitTerminal(TerminalNode node) {
     write(
-            ofNullable(tokens.getHiddenTokensToLeft(node.getSourceInterval().a, HIDDEN))
-                    .map(this::getHiddenText)
-                    .orElse(""));
+        ofNullable(tokens.getHiddenTokensToLeft(node.getSourceInterval().a, HIDDEN))
+            .map(this::getHiddenText)
+            .orElse(""));
     if (node.getSymbol().getType() != EOF) {
       write(node.getText());
     }
@@ -411,7 +433,7 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
   @NonNull
   private StringBuilder peek() {
     return ofNullable(contexts.peek())
-            .orElseThrow(() -> new IllegalStateException("Document structure corrupted"));
+        .orElseThrow(() -> new IllegalStateException("Document structure corrupted"));
   }
 
   private void pop() {
@@ -429,10 +451,10 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
   private Map<String, List<Location>> makeSubroutinesDefinitions(List<String> subroutineNames) {
     Range fileStart = new Range(new Position(), new Position());
     return subroutineNames.stream()
-            .collect(
-                    toMap(
-                            Function.identity(),
-                            name -> ImmutableList.of(new Location("URI:" + name, fileStart))));
+        .collect(
+            toMap(
+                Function.identity(),
+                name -> ImmutableList.of(new Location("URI:" + name, fileStart))));
   }
 
   /**
@@ -444,27 +466,27 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
    */
   private Consumer<String> defineCopybook(String uri) {
     return copybookName ->
-            copybookDefinitions.put(
-                    copybookName.toUpperCase(),
-                    singletonList(new Location(uri, new Range(new Position(), new Position()))));
+        copybookDefinitions.put(
+            copybookName.toUpperCase(),
+            singletonList(new Location(uri, new Range(new Position(), new Position()))));
   }
 
   private void processCopybookToken(
-          String text,
-          String dialect,
-          ParserRuleContext ctx,
-          ReplacementContext replacement,
-          Map<String, List<Location>> storage,
-          List<DiagnosticContext> diagnosticIds) {
+      String text,
+      String dialect,
+      ParserRuleContext ctx,
+      ReplacementContext replacement,
+      Map<String, List<Location>> storage,
+      List<DiagnosticContext> diagnosticIds) {
 
-    String replacementText = getReplacementText(text, replacement).get(0); // TODO support '->' multiplexing
+    String replacementText =
+        getReplacementText(text, replacement).get(0); // TODO support '->' multiplexing
 
     int tokenLength = text.length();
 
     Range range = retrieveRange(ctx, tokenLength);
     ofNullable(storage)
-            .ifPresent(
-                    it -> addTokenLocation(it, replacementText + dialect.toUpperCase(), range));
+        .ifPresent(it -> addTokenLocation(it, replacementText + dialect.toUpperCase(), range));
 
     ofNullable(replacement).ifPresent(addPositionShift());
     lineShifts[getLine(ctx.start)] += dialect.length();
@@ -474,52 +496,51 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
   }
 
   private void processToken(
-          String text,
-          ParserRuleContext ctx,
-          ReplacementContext replacement,
-          Map<String, List<Location>> storage,
-          List<DiagnosticContext> diagnosticIds) {
+      String text,
+      ParserRuleContext ctx,
+      ReplacementContext replacement,
+      Map<String, List<Location>> storage,
+      List<DiagnosticContext> diagnosticIds) {
     processToken(text, ctx, replacement, storage, diagnosticIds, false);
   }
 
   private void processProcedureToken(
-          String text,
-          ParserRuleContext ctx,
-          ReplacementContext replacement,
-          Map<ProcedureId, List<Location>> storage,
-          List<DiagnosticContext> diagnosticIds,
-          ProcedureId id) {
+      String text,
+      ParserRuleContext ctx,
+      ReplacementContext replacement,
+      Map<ProcedureId, List<Location>> storage,
+      List<DiagnosticContext> diagnosticIds,
+      ProcedureId id) {
     Range range = retrieveRange(ctx, text.length());
-    storage.computeIfAbsent(id, it -> new ArrayList<>())
-            .add(new Location(documentUri, range));
+    storage.computeIfAbsent(id, it -> new ArrayList<>()).add(new Location(documentUri, range));
     updateOutputDocument(text, ctx, replacement, diagnosticIds, range);
   }
 
   private void processToken(
-          String text,
-          ParserRuleContext ctx,
-          ReplacementContext replacement,
-          Map<String, List<Location>> storage,
-          List<DiagnosticContext> diagnosticIds,
-          boolean stripQuotes) {
+      String text,
+      ParserRuleContext ctx,
+      ReplacementContext replacement,
+      Map<String, List<Location>> storage,
+      List<DiagnosticContext> diagnosticIds,
+      boolean stripQuotes) {
 
     Range range = retrieveRange(ctx, text.length());
 
     if (storage != null) {
       if (replacement != null && !replacement.PRODUCE_REPLACEMENT().isEmpty()) {
         List<String> replacementsText = getReplacementText(text, replacement);
-        for (String rt: replacementsText) {
-            if (stripQuotes) {
-                rt = StringUtils.trimQuotes(rt);
-            }
-            addTokenLocation(storage, rt.toUpperCase(), range);
+        for (String rt : replacementsText) {
+          if (stripQuotes) {
+            rt = StringUtils.trimQuotes(rt);
+          }
+          addTokenLocation(storage, rt.toUpperCase(), range);
         }
       } else {
-          List<String> replacementsText = getReplacementText(text, replacement);
-          String storedText = replacementsText.get(0);
-          if (stripQuotes) {
-              storedText = StringUtils.trimQuotes(storedText);
-          }
+        List<String> replacementsText = getReplacementText(text, replacement);
+        String storedText = replacementsText.get(0);
+        if (stripQuotes) {
+          storedText = StringUtils.trimQuotes(storedText);
+        }
         if (replacement != null && replacement.ORIGINAL_SIZE_COPY_START() != null) {
           addTokenLocation(storage, text.toUpperCase(), range);
         }
@@ -530,11 +551,12 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
     updateOutputDocument(text, ctx, replacement, diagnosticIds, range);
   }
 
-  private void updateOutputDocument(String text,
-                                    ParserRuleContext ctx,
-                                    ReplacementContext replacement,
-                                    List<DiagnosticContext> diagnosticIds,
-                                    Range range) {
+  private void updateOutputDocument(
+      String text,
+      ParserRuleContext ctx,
+      ReplacementContext replacement,
+      List<DiagnosticContext> diagnosticIds,
+      Range range) {
     if (replacement != null) {
       addPositionShift().accept(replacement);
     }
@@ -544,17 +566,16 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
   }
 
   private static List<String> getReplacementText(String text, ReplacementContext replacement) {
-      if (replacement == null) {
-          return Collections.singletonList(text);
-      }
-      List<String> replacementTexts = new ArrayList<>();
-      List<IdentifierContext> ids = replacement.identifier();
-      for (IdentifierContext id: ids) {
-          replacementTexts.add(id.getText());
-      }
-      return replacementTexts;
+    if (replacement == null) {
+      return Collections.singletonList(text);
+    }
+    List<String> replacementTexts = new ArrayList<>();
+    List<IdentifierContext> ids = replacement.identifier();
+    for (IdentifierContext id : ids) {
+      replacementTexts.add(id.getText());
+    }
+    return replacementTexts;
   }
-
 
   private void addTokenLocation(Map<String, List<Location>> storage, String key, Range range) {
     Location location = new Location(documentUri, range);
@@ -569,28 +590,31 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
 
   private String getHiddenText(List<Token> hiddenTokensToLeft) {
     return ofNullable(hiddenTokensToLeft)
-            .map(it -> it.stream().map(Token::getText).collect(joining()))
-            .orElse("");
+        .map(it -> it.stream().map(Token::getText).collect(joining()))
+        .orElse("");
   }
 
   private void registerDiagnostics(Range range, List<DiagnosticContext> diagnostic) {
     diagnostic.stream()
-            .peek(addPositionShift())
-            .map(DiagnosticContext::identifier)
-            .map(RuleContext::getText)
-            .map(expectedDiagnostics::get)
-            .forEach(registerDiagnostic(range));
+        .peek(addPositionShift())
+        .map(DiagnosticContext::identifier)
+        .map(RuleContext::getText)
+        .map(expectedDiagnostics::get)
+        .forEach(registerDiagnostic(range));
   }
 
   private Consumer<ParserRuleContext> addPositionShift() {
     return it ->
-            lineShifts[getLine(it.start)] +=
-                    it.stop.getCharPositionInLine() - it.start.getCharPositionInLine() + it.stop.getText().length();
+        lineShifts[getLine(it.start)] +=
+            it.stop.getCharPositionInLine()
+                - it.start.getCharPositionInLine()
+                + it.stop.getText().length();
   }
 
   private Consumer<Diagnostic> registerDiagnostic(Range range) {
     return it -> {
-      Diagnostic diagnostic = new Diagnostic(
+      Diagnostic diagnostic =
+          new Diagnostic(
               // honour the range provided by tester.
               Objects.nonNull(it.getRange().getStart()) ? it.getRange() : range,
               it.getMessage(),
@@ -598,9 +622,7 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
               it.getSource(),
               ofNullable(it.getCode()).map(Either::getLeft).orElse(null));
       diagnostic.setRelatedInformation(it.getRelatedInformation());
-      diagnostics
-                    .get(documentUri)
-                    .add(diagnostic);
+      diagnostics.get(documentUri).add(diagnostic);
     };
   }
 

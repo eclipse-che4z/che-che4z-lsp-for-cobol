@@ -43,8 +43,7 @@ import org.eclipse.lsp.cobol.common.utils.ImplicitCodeUtils;
  */
 @Slf4j
 public class WorkspaceFileService implements FileSystemService {
-  public WorkspaceFileService() {
-  }
+  public WorkspaceFileService() {}
 
   @Override
   public boolean fileExists(@Nullable Path file) {
@@ -74,8 +73,8 @@ public class WorkspaceFileService implements FileSystemService {
     CharsetDecoder decoder = StandardCharsets.UTF_8.newDecoder();
     decoder.onMalformedInput(CodingErrorAction.REPLACE);
     try (FileInputStream input = new FileInputStream(path.toFile());
-         InputStreamReader reader = new InputStreamReader(input, decoder);
-         BufferedReader bufferedReader = new BufferedReader(reader)) {
+        InputStreamReader reader = new InputStreamReader(input, decoder);
+        BufferedReader bufferedReader = new BufferedReader(reader)) {
       StringBuilder sb = new StringBuilder();
       String line = bufferedReader.readLine();
       while (line != null) {
@@ -121,8 +120,8 @@ public class WorkspaceFileService implements FileSystemService {
   @Override
   @NonNull
   public List<String> listFilesInDirectory(final String path) {
-    final String[] pathSplittedByFirstAsterisk = uriWithReplacedPlaceholdersToAsterisks(
-            path).split("\\*", 2);
+    final String[] pathSplittedByFirstAsterisk =
+        uriWithReplacedPlaceholdersToAsterisks(path).split("\\*", 2);
     final String pathToResolve = pathSplittedByFirstAsterisk[0];
     final boolean isPathContainsAsterisk = pathSplittedByFirstAsterisk.length >= 2;
     int maxDepth = 1;
@@ -130,20 +129,23 @@ public class WorkspaceFileService implements FileSystemService {
       maxDepth = pathSplittedByFirstAsterisk[1].split("/").length + 1;
     }
 
-    BiPredicate<Path, BasicFileAttributes> pathBasicFileAttributesBiPredicate = (a, c) -> {
-      final String uriPath = a.toUri().getPath().replace("\\\\", "/");
-      return !isPathContainsAsterisk || Pattern.compile(pathSplittedByFirstAsterisk[1]).matcher(uriPath).find();
-    };
+    BiPredicate<Path, BasicFileAttributes> pathBasicFileAttributesBiPredicate =
+        (a, c) -> {
+          final String uriPath = a.toUri().getPath().replace("\\\\", "/");
+          return !isPathContainsAsterisk
+              || Pattern.compile(pathSplittedByFirstAsterisk[1]).matcher(uriPath).find();
+        };
     Path start = Paths.get(pathToResolve);
     if (!Files.isDirectory(start)) {
       return ImmutableList.of();
     }
-    try (Stream<Path> streamPath = Files.find(start, maxDepth, pathBasicFileAttributesBiPredicate)) {
+    try (Stream<Path> streamPath =
+        Files.find(start, maxDepth, pathBasicFileAttributesBiPredicate)) {
       return streamPath
-              .map(Path::toFile)
-              .filter(File::isFile)
-              .map(File::getName)
-              .collect(Collectors.toList());
+          .map(Path::toFile)
+          .filter(File::isFile)
+          .map(File::getName)
+          .collect(Collectors.toList());
     } catch (IOException e) {
       LOG.error("An error occurred while reading list of files", e);
     }

@@ -28,9 +28,7 @@ import org.eclipse.lsp.cobol.implicitDialects.cics.CICSDialect;
 @EqualsAndHashCode(callSuper = true)
 public class ExecCicsHandleNode extends Node {
 
-  /**
-   * Handle Abend Type Enum
-   */
+  /** Handle Abend Type Enum */
   public enum HandleAbendType {
     CANCEL,
     PROGRAM,
@@ -38,8 +36,7 @@ public class ExecCicsHandleNode extends Node {
     RESET
   }
 
-  @Getter
-  private final HandleAbendType type;
+  @Getter private final HandleAbendType type;
 
   public ExecCicsHandleNode(Locality location, HandleAbendType type) {
     super(location, NodeType.STATEMENT, CICSDialect.DIALECT_NAME);

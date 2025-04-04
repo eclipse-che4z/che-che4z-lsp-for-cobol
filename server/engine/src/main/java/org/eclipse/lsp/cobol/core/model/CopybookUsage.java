@@ -19,9 +19,9 @@ import org.eclipse.lsp.cobol.common.copybook.CopybookName;
 import org.eclipse.lsp.cobol.common.model.Locality;
 
 /**
- * This value class describes a usage of a copybook inside a COPY statement. Here, name is a copybook
- * name, copybook ID is the unique copy entry identifier, and locality points to this entry position
- * in the document
+ * This value class describes a usage of a copybook inside a COPY statement. Here, name is a
+ * copybook name, copybook ID is the unique copy entry identifier, and locality points to this entry
+ * position in the document
  */
 @Value
 public class CopybookUsage {

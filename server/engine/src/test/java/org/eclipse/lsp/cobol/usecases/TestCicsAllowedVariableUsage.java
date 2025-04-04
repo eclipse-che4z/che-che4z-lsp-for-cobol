@@ -24,7 +24,8 @@ import java.util.stream.Stream;
 
 /** Test the allowed variable usage */
 public class TestCicsAllowedVariableUsage {
-  public static final String TEXT = ""
+  public static final String TEXT =
+      ""
           + "       Identification Division.\n"
           + "       Program-id. HELLOT.\n"
           + "\n"

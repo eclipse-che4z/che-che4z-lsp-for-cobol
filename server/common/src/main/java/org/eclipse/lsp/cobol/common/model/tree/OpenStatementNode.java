@@ -30,7 +30,7 @@ public class OpenStatementNode extends FileOperationStatementNode {
   private FileOperationKind fileOperationKind;
 
   public OpenStatementNode(
-          Locality locality, VariableNameAndLocality filename, FileOperationKind fileOperationKind) {
+      Locality locality, VariableNameAndLocality filename, FileOperationKind fileOperationKind) {
     super(locality, filename, NodeType.OPEN_STATEMENT);
     this.fileOperationKind = fileOperationKind;
   }

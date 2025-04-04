@@ -143,9 +143,7 @@ class TestSqlInsertStatement {
 
   private static Stream<String> textsToTest() {
     return Stream.of(
-        INSERT1, INSERT2, INSERT3, INSERT4, INSERT5,
-             INSERT6,
-            INSERT7, INSERT8, INSERT9, INSERT10);
+        INSERT1, INSERT2, INSERT3, INSERT4, INSERT5, INSERT6, INSERT7, INSERT8, INSERT9, INSERT10);
   }
 
   @ParameterizedTest

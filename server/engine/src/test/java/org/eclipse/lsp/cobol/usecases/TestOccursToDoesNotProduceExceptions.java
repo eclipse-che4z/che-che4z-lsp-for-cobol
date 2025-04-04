@@ -44,7 +44,6 @@ class TestOccursToDoesNotProduceExceptions {
                 new Range(),
                 "Unexpected end of file",
                 DiagnosticSeverity.Error,
-                ErrorSource.PARSING.getText())
-            ));
+                ErrorSource.PARSING.getText())));
   }
 }

@@ -52,7 +52,10 @@ class TestCopybookWithRecursiveDependencyIsDetected {
         ImmutableMap.of(
             "1",
             new Diagnostic(
-                new Range(), "Errors inside the copybook", DiagnosticSeverity.Error, ErrorSource.COPYBOOK.getText()),
+                new Range(),
+                "Errors inside the copybook",
+                DiagnosticSeverity.Error,
+                ErrorSource.COPYBOOK.getText()),
             "2",
             new Diagnostic(
                 new Range(), MESSAGE, DiagnosticSeverity.Error, ErrorSource.COPYBOOK.getText())));

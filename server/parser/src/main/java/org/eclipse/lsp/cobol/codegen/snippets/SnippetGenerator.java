@@ -18,12 +18,11 @@ package org.eclipse.lsp.cobol.codegen.snippets;
 
 import org.eclipse.lsp.cobol.codegen.GeneratorContext;
 
-/**
- * Interface for statements and other generators.
- */
+/** Interface for statements and other generators. */
 public interface SnippetGenerator {
   /**
    * Generate a string representation of the statement
+   *
    * @param ctx generator context.
    * @return a string with the snippet.
    */

@@ -38,8 +38,9 @@ public class DefineCodeBlock implements Processor<Node> {
     }
     for (Node child : node.getChildren()) {
       if (child.getNodeType() == NodeType.PARAGRAPH
-              || child.getNodeType() == NodeType.PROCEDURE_SECTION) {
-        symbolAccumulator.registerCodeBlock(ctx.getCurrentProgramNode(), (CodeBlockDefinitionNode) child);
+          || child.getNodeType() == NodeType.PROCEDURE_SECTION) {
+        symbolAccumulator.registerCodeBlock(
+            ctx.getCurrentProgramNode(), (CodeBlockDefinitionNode) child);
       }
     }
   }

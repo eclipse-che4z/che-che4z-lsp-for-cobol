@@ -46,10 +46,11 @@ class ObsoleteNodeTest {
     RemarksNode remarksNode = new RemarksNode(locality);
     AstProcessor astProcessor = new AstProcessor();
     List<SyntaxError> errors = new ArrayList<>();
-    ProcessingContext ctx = new ProcessingContext(errors, new SymbolAccumulator(), ImmutableMap.of());
+    ProcessingContext ctx =
+        new ProcessingContext(errors, new SymbolAccumulator(), ImmutableMap.of());
     ctx.register(
         new ProcessorDescription(
-                RemarksNode.class, ProcessingPhase.TRANSFORMATION, new ObsoleteNodeCheck()));
+            RemarksNode.class, ProcessingPhase.TRANSFORMATION, new ObsoleteNodeCheck()));
     rootNode.addChild(remarksNode);
     astProcessor.process(ProcessingPhase.TRANSFORMATION, rootNode, ctx);
 

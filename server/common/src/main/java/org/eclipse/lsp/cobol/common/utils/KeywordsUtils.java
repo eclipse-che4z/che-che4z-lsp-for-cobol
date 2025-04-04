@@ -23,15 +23,14 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
-/**
- * Read keywords from a resource stream
- */
+/** Read keywords from a resource stream */
 @Slf4j
 @UtilityClass
 public class KeywordsUtils {
 
   /**
    * Reads keywords from resource file
+   *
    * @param classLoader classLoader to load the resource from
    * @param fileName is a file name
    * @return key/value keywords with descriptions map
@@ -53,12 +52,13 @@ public class KeywordsUtils {
 
   /**
    * Reads keywords from resource file
+   *
    * @param fileName is a file name
    * @return key/value keywords with descriptions map
    */
   public Map<String, String> getKeywords(String fileName) {
     ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-    return getKeywords(classLoader,  fileName);
+    return getKeywords(classLoader, fileName);
   }
 
   /**
@@ -70,5 +70,4 @@ public class KeywordsUtils {
   private String processDescription(String desc) {
     return desc.replace("<br>", "\r\n\r\n");
   }
-
 }

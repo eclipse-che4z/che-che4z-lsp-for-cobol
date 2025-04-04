@@ -32,15 +32,21 @@ public class FileEntryProcess implements Processor<FileEntryNode> {
       // TODO: error?
       return;
     }
-    List<Node> collected = ctx.getCurrentProgramNode().getDepthFirstList(n -> {
-      if (n.getNodeType() != NodeType.VARIABLE_DEFINITION) {
-        return false;
-      }
-      if (((VariableDefinitionNode) n).getLevel() != VariableConstants.LEVEL_FD_SD) {
-        return false;
-      }
-      return ((VariableDefinitionNode) n).getVariableName().getName().equals(node.getFileName());
-    });
+    List<Node> collected =
+        ctx.getCurrentProgramNode()
+            .getDepthFirstList(
+                n -> {
+                  if (n.getNodeType() != NodeType.VARIABLE_DEFINITION) {
+                    return false;
+                  }
+                  if (((VariableDefinitionNode) n).getLevel() != VariableConstants.LEVEL_FD_SD) {
+                    return false;
+                  }
+                  return ((VariableDefinitionNode) n)
+                      .getVariableName()
+                      .getName()
+                      .equals(node.getFileName());
+                });
 
     for (Node n : collected) {
       ((VariableDefinitionNode) n).setFileControlClause(node.getFileControlClause());

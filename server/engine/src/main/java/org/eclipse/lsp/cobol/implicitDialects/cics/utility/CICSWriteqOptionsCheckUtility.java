@@ -32,24 +32,24 @@ public class CICSWriteqOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
   public static final int RULE_INDEX = RULE_cics_writeq;
 
   private static final Map<Integer, ErrorSeverity> DUPLICATE_CHECK_OPTIONS =
-          new HashMap<Integer, ErrorSeverity>() {
-            {
-              put(CICSLexer.WRITEQ, ErrorSeverity.ERROR);
-              put(CICSLexer.TD, ErrorSeverity.ERROR);
-              put(CICSLexer.TS, ErrorSeverity.ERROR);
-              put(CICSLexer.QUEUE, ErrorSeverity.ERROR);
-              put(CICSLexer.FROM, ErrorSeverity.ERROR);
-              put(CICSLexer.LENGTH, ErrorSeverity.ERROR);
-              put(CICSLexer.SYSID, ErrorSeverity.ERROR);
-              put(CICSLexer.QNAME, ErrorSeverity.ERROR);
-              put(CICSLexer.NUMITEMS, ErrorSeverity.ERROR);
-              put(CICSLexer.ITEM, ErrorSeverity.ERROR);
-              put(CICSLexer.REWRITE, ErrorSeverity.WARNING);
-              put(CICSLexer.AUXILIARY, ErrorSeverity.WARNING);
-              put(CICSLexer.MAIN, ErrorSeverity.WARNING);
-              put(CICSLexer.NOSUSPEND, ErrorSeverity.WARNING);
-            }
-          };
+      new HashMap<Integer, ErrorSeverity>() {
+        {
+          put(CICSLexer.WRITEQ, ErrorSeverity.ERROR);
+          put(CICSLexer.TD, ErrorSeverity.ERROR);
+          put(CICSLexer.TS, ErrorSeverity.ERROR);
+          put(CICSLexer.QUEUE, ErrorSeverity.ERROR);
+          put(CICSLexer.FROM, ErrorSeverity.ERROR);
+          put(CICSLexer.LENGTH, ErrorSeverity.ERROR);
+          put(CICSLexer.SYSID, ErrorSeverity.ERROR);
+          put(CICSLexer.QNAME, ErrorSeverity.ERROR);
+          put(CICSLexer.NUMITEMS, ErrorSeverity.ERROR);
+          put(CICSLexer.ITEM, ErrorSeverity.ERROR);
+          put(CICSLexer.REWRITE, ErrorSeverity.WARNING);
+          put(CICSLexer.AUXILIARY, ErrorSeverity.WARNING);
+          put(CICSLexer.MAIN, ErrorSeverity.WARNING);
+          put(CICSLexer.NOSUSPEND, ErrorSeverity.WARNING);
+        }
+      };
 
   public CICSWriteqOptionsCheckUtility(DialectProcessingContext context, List<SyntaxError> errors) {
     super(context, errors, DUPLICATE_CHECK_OPTIONS);

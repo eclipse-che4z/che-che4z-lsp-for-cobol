@@ -52,7 +52,8 @@ class TestUndefinedParentVariableUnderlined {
   void assertCopybookProcessingModeNotChangesLogic() {
     Assertions.assertEquals(
         UseCaseUtils.analyze(UseCase.builder().text(TEXT).copybookProcessingMode(ENABLED).build()),
-        UseCaseUtils.analyze(UseCase.builder().text(TEXT).copybookProcessingMode(DISABLED).build()));
+        UseCaseUtils.analyze(
+            UseCase.builder().text(TEXT).copybookProcessingMode(DISABLED).build()));
   }
 
   @Test
@@ -62,6 +63,10 @@ class TestUndefinedParentVariableUnderlined {
         ImmutableList.of(),
         ImmutableMap.of(
             "1",
-            new Diagnostic(new Range(), "Variable MAMA is not defined", DiagnosticSeverity.Error,  ErrorSource.PARSING.getText())));
+            new Diagnostic(
+                new Range(),
+                "Variable MAMA is not defined",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
   }
 }

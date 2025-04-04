@@ -26,9 +26,7 @@ import org.eclipse.lsp4j.CompletionParams;
 import org.eclipse.lsp4j.TextDocumentIdentifier;
 import org.junit.jupiter.api.Test;
 
-/**
- * Test Completion Handler sequence.
- */
+/** Test Completion Handler sequence. */
 class CompletionHandlerTest {
   @Test
   void test() throws ExecutionException, InterruptedException {
@@ -38,7 +36,8 @@ class CompletionHandlerTest {
     Completions completions = mock(Completions.class);
     DocumentModelService documentModelService = mock((DocumentModelService.class));
     when(documentModelService.get(uri)).thenReturn(document);
-    CompletionHandler completionHandler = new CompletionHandler(asyncAnalysisService, completions, documentModelService);
+    CompletionHandler completionHandler =
+        new CompletionHandler(asyncAnalysisService, completions, documentModelService);
     CompletionParams params = mock(CompletionParams.class);
     TextDocumentIdentifier textDocument = mock(TextDocumentIdentifier.class);
     when(textDocument.getUri()).thenReturn(uri);

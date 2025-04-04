@@ -32,19 +32,19 @@ public class CICSPostOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
   public static final int RULE_INDEX = RULE_cics_post;
 
   private static final Map<Integer, ErrorSeverity> DUPLICATE_CHECK_OPTIONS =
-          new HashMap<Integer, ErrorSeverity>() {
-            {
-              put(CICSLexer.INTERVAL, ErrorSeverity.ERROR);
-              put(CICSLexer.TIME, ErrorSeverity.ERROR);
-              put(CICSLexer.AFTER, ErrorSeverity.WARNING);
-              put(CICSLexer.AT, ErrorSeverity.WARNING);
-              put(CICSLexer.HOURS, ErrorSeverity.ERROR);
-              put(CICSLexer.MINUTES, ErrorSeverity.ERROR);
-              put(CICSLexer.SECONDS, ErrorSeverity.ERROR);
-              put(CICSLexer.SET, ErrorSeverity.ERROR);
-              put(CICSLexer.REQID, ErrorSeverity.ERROR);
-            }
-          };
+      new HashMap<Integer, ErrorSeverity>() {
+        {
+          put(CICSLexer.INTERVAL, ErrorSeverity.ERROR);
+          put(CICSLexer.TIME, ErrorSeverity.ERROR);
+          put(CICSLexer.AFTER, ErrorSeverity.WARNING);
+          put(CICSLexer.AT, ErrorSeverity.WARNING);
+          put(CICSLexer.HOURS, ErrorSeverity.ERROR);
+          put(CICSLexer.MINUTES, ErrorSeverity.ERROR);
+          put(CICSLexer.SECONDS, ErrorSeverity.ERROR);
+          put(CICSLexer.SET, ErrorSeverity.ERROR);
+          put(CICSLexer.REQID, ErrorSeverity.ERROR);
+        }
+      };
 
   public CICSPostOptionsCheckUtility(DialectProcessingContext context, List<SyntaxError> errors) {
     super(context, errors, DUPLICATE_CHECK_OPTIONS);
@@ -66,7 +66,8 @@ public class CICSPostOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
   @SuppressWarnings("unchecked")
   private void checkPost(CICSParser.Cics_post_optionsContext ctx) {
     checkHasMandatoryOptions(ctx.SET(), ctx, "SET");
-    checkHasMutuallyExclusiveOptions("INTERVAL or TIME or AFTER or AT", ctx.INTERVAL(), ctx.TIME(), ctx.AFTER(), ctx.AT());
+    checkHasMutuallyExclusiveOptions(
+        "INTERVAL or TIME or AFTER or AT", ctx.INTERVAL(), ctx.TIME(), ctx.AFTER(), ctx.AT());
     if (!ctx.AFTER().isEmpty() || !ctx.AT().isEmpty()) {
       if (ctx.HOURS().isEmpty() && ctx.MINUTES().isEmpty() && ctx.SECONDS().isEmpty()) {
         checkHasMandatoryOptions(ctx.HOURS(), ctx, "HOURS or MINUTES or SECONDS");

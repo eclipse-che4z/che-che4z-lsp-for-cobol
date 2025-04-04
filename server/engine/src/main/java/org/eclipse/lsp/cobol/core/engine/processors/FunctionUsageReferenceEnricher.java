@@ -51,14 +51,16 @@ public class FunctionUsageReferenceEnricher implements Processor<QualifiedRefere
       return;
     }
 
-    // If definition of a data node is present, this signifies that this dataNode already has a variable definition
+    // If definition of a data node is present, this signifies that this dataNode already has a
+    // variable definition
     // and shouldn't try to enrich it further.
     // in case there is a name collision it would anyway be shown for the definition
     if (!dataNameNode.getDefinitions().isEmpty()) {
       return;
     }
     FunctionInfo functionInfo =
-        symbolAccumulator.getFunctionReference(dataNameNode.getName(), ctx.getCurrentProgramNode(), false);
+        symbolAccumulator.getFunctionReference(
+            dataNameNode.getName(), ctx.getCurrentProgramNode(), false);
 
     if (functionInfo == null) {
       return;
@@ -66,7 +68,8 @@ public class FunctionUsageReferenceEnricher implements Processor<QualifiedRefere
 
     int indexOfQualifiedNode = node.getParent().getChildren().indexOf(node);
     node.getChildren().remove(dataNameNode);
-    FunctionReference functionReference = new FunctionReference(dataNameNode.getLocality(), dataNameNode.getName());
+    FunctionReference functionReference =
+        new FunctionReference(dataNameNode.getLocality(), dataNameNode.getName());
     functionReference.setDefinitions(functionInfo.getDefinition());
     functionInfo.getReferences().add(functionReference.getLocality().toLocation());
     node.getParent().getChildren().add(indexOfQualifiedNode, functionReference);

@@ -57,7 +57,10 @@ public class CobolLineUtils {
    */
   @NonNull
   public CobolLine copyCobolLineWithIndicatorAndContentArea(
-      @NonNull String indicatorArea, @NonNull String contentArea, @NonNull CobolLine line, @NonNull CobolProgramLayout layout) {
+      @NonNull String indicatorArea,
+      @NonNull String contentArea,
+      @NonNull CobolLine line,
+      @NonNull CobolProgramLayout layout) {
     CobolLine cobolLine = copyCobolLine(line);
     cobolLine.setIndicatorArea(extractIndicatorArea(indicatorArea, layout));
     cobolLine.setContentAreaA(extractContentAreaA(contentArea, layout));
@@ -66,8 +69,10 @@ public class CobolLineUtils {
   }
 
   private static String extractIndicatorArea(String indicatorArea, CobolProgramLayout layout) {
-    return indicatorArea.length() > layout.getIndicatorLength() ? indicatorArea.substring(0, layout.getIndicatorLength())
-            : (indicatorArea + StringUtils.repeat(WS, (layout.getIndicatorLength() - indicatorArea.length())));
+    return indicatorArea.length() > layout.getIndicatorLength()
+        ? indicatorArea.substring(0, layout.getIndicatorLength())
+        : (indicatorArea
+            + StringUtils.repeat(WS, (layout.getIndicatorLength() - indicatorArea.length())));
   }
 
   /**
@@ -101,12 +106,16 @@ public class CobolLineUtils {
   }
 
   @NonNull
-  private String extractContentAreaA(@NonNull String contentArea, @NonNull CobolProgramLayout layout) {
-    return contentArea.length() > layout.getAreaALength() ? contentArea.substring(0, layout.getAreaALength()) : contentArea;
+  private String extractContentAreaA(
+      @NonNull String contentArea, @NonNull CobolProgramLayout layout) {
+    return contentArea.length() > layout.getAreaALength()
+        ? contentArea.substring(0, layout.getAreaALength())
+        : contentArea;
   }
 
   @NonNull
-  private String extractContentAreaB(@NonNull String contentArea, @NonNull CobolProgramLayout layout) {
+  private String extractContentAreaB(
+      @NonNull String contentArea, @NonNull CobolProgramLayout layout) {
     return contentArea.length() > layout.getAreaALength()
         ? contentArea.substring(layout.getAreaALength())
         : "";

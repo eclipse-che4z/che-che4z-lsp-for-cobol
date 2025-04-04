@@ -30,13 +30,10 @@ import java.util.List;
 public class SectionNameNode extends Node implements DefinedAndUsedStructure {
   private final String name;
 
-  @Setter
-  private List<Location> definitions = ImmutableList.of();
-  @Setter
-  private List<Location> usages = ImmutableList.of();
+  @Setter private List<Location> definitions = ImmutableList.of();
+  @Setter private List<Location> usages = ImmutableList.of();
 
-  public SectionNameNode(
-      Locality location, String name) {
+  public SectionNameNode(Locality location, String name) {
     super(location, NodeType.SECTION_NAME_NODE);
     this.name = name.toUpperCase();
   }

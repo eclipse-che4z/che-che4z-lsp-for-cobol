@@ -31,13 +31,14 @@ public class CICSSyncPointOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
   public static final int RULE_INDEX = RULE_cics_syncpoint;
 
   private static final Map<Integer, ErrorSeverity> DUPLICATE_CHECK_OPTIONS =
-          new HashMap<Integer, ErrorSeverity>() {
-            {
-              put(CICSLexer.ROLLBACK, ErrorSeverity.WARNING);
-            }
-          };
+      new HashMap<Integer, ErrorSeverity>() {
+        {
+          put(CICSLexer.ROLLBACK, ErrorSeverity.WARNING);
+        }
+      };
 
-  public CICSSyncPointOptionsCheckUtility(DialectProcessingContext context, List<SyntaxError> errors) {
+  public CICSSyncPointOptionsCheckUtility(
+      DialectProcessingContext context, List<SyntaxError> errors) {
     super(context, errors, DUPLICATE_CHECK_OPTIONS);
   }
 

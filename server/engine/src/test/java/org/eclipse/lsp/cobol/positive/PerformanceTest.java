@@ -53,7 +53,11 @@ class PerformanceTest extends FileBasedTest {
       long start = System.currentTimeMillis();
       List<Diagnostic> result =
           UseCaseUtils.analyzeForErrors(
-              UseCase.builder().documentUri(name).text(fullText).copybooks(getCopybooks(cobolTextRegistry)).build());
+              UseCase.builder()
+                  .documentUri(name)
+                  .text(fullText)
+                  .copybooks(getCopybooks(cobolTextRegistry))
+                  .build());
       long stop = System.currentTimeMillis();
 
       assertNoSyntaxErrorsFound(result, name);

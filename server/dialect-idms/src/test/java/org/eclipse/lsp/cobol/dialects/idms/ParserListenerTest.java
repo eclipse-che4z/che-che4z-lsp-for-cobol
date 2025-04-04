@@ -27,15 +27,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.mock;
 
-/**
- * Test for ParserListener
- */
+/** Test for ParserListener */
 class ParserListenerTest {
   @Test
   void test() {
     ParserListener parserListener = new ParserListener();
-    parserListener.syntaxError(mock(Recognizer.class), new Object(), 5, 10, "message",
-        mock(RecognitionException.class));
+    parserListener.syntaxError(
+        mock(Recognizer.class), new Object(), 5, 10, "message", mock(RecognitionException.class));
     List<SyntaxError> errors = parserListener.getErrors();
 
     assertEquals(1, errors.size());

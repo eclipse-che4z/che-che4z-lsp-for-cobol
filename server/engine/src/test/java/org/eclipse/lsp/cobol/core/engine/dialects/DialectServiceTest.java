@@ -32,9 +32,7 @@ import java.util.List;
 
 import static org.mockito.Mockito.*;
 
-/**
- * Test for DialectService
- */
+/** Test for DialectService */
 class DialectServiceTest {
 
   DialectService dialectService;
@@ -74,8 +72,11 @@ class DialectServiceTest {
 
     CobolDialect dialect = configureDialect(context, "dialect");
 
-    when(ddService.loadDialects(URI.create(""), copybookService, messageService)).thenReturn(ImmutableList.of(dialect));
-    List<DialectRegistryItem> dialectRegistry = ImmutableList.of(new DialectRegistryItem(dialect.getName(), URI.create(""), "", "extensionId"));
+    when(ddService.loadDialects(URI.create(""), copybookService, messageService))
+        .thenReturn(ImmutableList.of(dialect));
+    List<DialectRegistryItem> dialectRegistry =
+        ImmutableList.of(
+            new DialectRegistryItem(dialect.getName(), URI.create(""), "", "extensionId"));
     dialectService.updateDialects(dialectRegistry);
 
     dialectService.process(ImmutableList.of("dialect"), context);
@@ -96,12 +97,13 @@ class DialectServiceTest {
 
     CobolDialect dialect1 = configureDialect(context, "1");
     CobolDialect dialect2 = configureDialect(context, "2");
-    when(ddService.loadDialects(URI.create(""), copybookService, messageService)).thenReturn(ImmutableList.of(dialect1, dialect2));
+    when(ddService.loadDialects(URI.create(""), copybookService, messageService))
+        .thenReturn(ImmutableList.of(dialect1, dialect2));
 
-    List<DialectRegistryItem> dialectRegistry = ImmutableList.of(
-        new DialectRegistryItem(dialect1.getName(), URI.create(""), "", "extensionId"),
-        new DialectRegistryItem(dialect2.getName(), URI.create(""), "", "extensionId")
-        );
+    List<DialectRegistryItem> dialectRegistry =
+        ImmutableList.of(
+            new DialectRegistryItem(dialect1.getName(), URI.create(""), "", "extensionId"),
+            new DialectRegistryItem(dialect2.getName(), URI.create(""), "", "extensionId"));
 
     InOrder inOrder = inOrder(dialect1, dialect2);
 

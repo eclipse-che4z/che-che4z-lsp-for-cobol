@@ -69,7 +69,6 @@ public abstract class Node {
     children.add(node);
   }
 
-
   /**
    * Add a child node to this node and updates the child parent link.
    *
@@ -162,7 +161,7 @@ public abstract class Node {
    */
   public Optional<Node> getNearestParent(Predicate<Node> predicate) {
     return Optional.ofNullable(parent)
-            .flatMap(it -> predicate.test(it) ? Optional.of(it) : it.getNearestParent(predicate));
+        .flatMap(it -> predicate.test(it) ? Optional.of(it) : it.getNearestParent(predicate));
   }
 
   /**
@@ -180,7 +179,10 @@ public abstract class Node {
     if (o == null || getClass() != o.getClass()) return false;
 
     Node node = (Node) o;
-    return Objects.equals(locality, node.locality) && Objects.equals(text, node.text) && nodeType == node.nodeType && Objects.equals(dialect, node.dialect);
+    return Objects.equals(locality, node.locality)
+        && Objects.equals(text, node.text)
+        && nodeType == node.nodeType
+        && Objects.equals(dialect, node.dialect);
   }
 
   @Override

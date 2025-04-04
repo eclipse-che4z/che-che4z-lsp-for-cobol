@@ -30,34 +30,25 @@ public class MockCobolClientProvider implements Provider<CobolLanguageClient> {
   public CobolLanguageClient get() {
     return new CobolLanguageClient() {
       @Override
-      public void telemetryEvent(Object o) {
-
-      }
+      public void telemetryEvent(Object o) {}
 
       @Override
-      public void publishDiagnostics(PublishDiagnosticsParams publishDiagnosticsParams) {
-
-      }
+      public void publishDiagnostics(PublishDiagnosticsParams publishDiagnosticsParams) {}
 
       @Override
-      public void showMessage(MessageParams messageParams) {
-
-      }
+      public void showMessage(MessageParams messageParams) {}
 
       @Override
-      public CompletableFuture<MessageActionItem> showMessageRequest(ShowMessageRequestParams showMessageRequestParams) {
+      public CompletableFuture<MessageActionItem> showMessageRequest(
+          ShowMessageRequestParams showMessageRequestParams) {
         return null;
       }
 
       @Override
-      public void logMessage(MessageParams messageParams) {
-
-      }
+      public void logMessage(MessageParams messageParams) {}
 
       @Override
-      public void cfastReady(ExtendedApiResult result) {
-
-      }
+      public void cfastReady(ExtendedApiResult result) {}
     };
   }
 }

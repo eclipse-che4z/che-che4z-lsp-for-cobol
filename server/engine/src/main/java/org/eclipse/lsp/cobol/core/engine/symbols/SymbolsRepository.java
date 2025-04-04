@@ -42,12 +42,13 @@ import static org.eclipse.lsp.cobol.common.utils.RangeUtils.findNodeByPosition;
 @Singleton
 @Slf4j
 public class SymbolsRepository {
-  private static final SymbolTable EMPTY_SYM_TABLE = new SymbolTable(null) {
-    @Override
-    public void register(VariableNode node) {
-      throw new IllegalStateException("Cannot register symbols in temporary symbol table");
-    }
-  };
+  private static final SymbolTable EMPTY_SYM_TABLE =
+      new SymbolTable(null) {
+        @Override
+        public void register(VariableNode node) {
+          throw new IllegalStateException("Cannot register symbols in temporary symbol table");
+        }
+      };
   private final Map<String, SymbolTable> programSymbols;
 
   public SymbolsRepository() {
@@ -110,7 +111,8 @@ public class SymbolsRepository {
    * @param position the position to check
    * @return element at specified position
    */
-  public static Optional<DefinedAndUsedStructure> findElementByPosition(String uri, AnalysisResult result, Position position) {
+  public static Optional<DefinedAndUsedStructure> findElementByPosition(
+      String uri, AnalysisResult result, Position position) {
     if (result == null || result.getRootNode() == null) {
       return Optional.empty();
     }
@@ -121,7 +123,8 @@ public class SymbolsRepository {
         .map(SymbolsRepository::constructElementsExcludingImplicits);
   }
 
-  private static DefinedAndUsedStructure constructElementsExcludingImplicits(DefinedAndUsedStructure ctx) {
+  private static DefinedAndUsedStructure constructElementsExcludingImplicits(
+      DefinedAndUsedStructure ctx) {
     List<Location> definitions =
         ctx.getDefinitions().stream().filter(uriNotImplicit()).collect(Collectors.toList());
     List<Location> usages =

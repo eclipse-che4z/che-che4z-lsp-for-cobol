@@ -18,9 +18,7 @@ import lombok.experimental.UtilityClass;
 
 import java.util.regex.Pattern;
 
-/**
- * File utils
- */
+/** File utils */
 @UtilityClass
 public class FileUtils {
   /**

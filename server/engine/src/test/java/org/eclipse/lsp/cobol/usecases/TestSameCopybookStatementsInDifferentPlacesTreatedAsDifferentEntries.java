@@ -33,33 +33,33 @@ import org.junit.jupiter.api.Test;
  */
 class TestSameCopybookStatementsInDifferentPlacesTreatedAsDifferentEntries {
   private static final String TEXT =
-          "       IDENTIFICATION DIVISION.\n"
-                  + "       PROGRAM-ID. TESTREPL.\n"
-                  + "       {_COPY {~REPL}.|1_}\n"
-                  + "       {_COPY {~REPL}.|1_}\n";
+      "       IDENTIFICATION DIVISION.\n"
+          + "       PROGRAM-ID. TESTREPL.\n"
+          + "       {_COPY {~REPL}.|1_}\n"
+          + "       {_COPY {~REPL}.|1_}\n";
   private static final String REPL = "       {DATA|2} DIVISION.\n";
   private static final String REPL_NAME = "REPL";
 
   @Test
   void test() {
     UseCaseEngine.runTest(
-            TEXT,
-            ImmutableList.of(new CobolText(REPL_NAME, REPL)),
-            ImmutableMap.of(
-                    "1",
-                    new Diagnostic(
-                            new Range(),
-                            "Errors inside the copybook",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.COPYBOOK.getText(),
-                            null),
-                    "2",
-                    new Diagnostic(
-                            new Range(),
-                                    "Syntax error on 'DATA'",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText(),
-                            null)),
+        TEXT,
+        ImmutableList.of(new CobolText(REPL_NAME, REPL)),
+        ImmutableMap.of(
+            "1",
+            new Diagnostic(
+                new Range(),
+                "Errors inside the copybook",
+                DiagnosticSeverity.Error,
+                ErrorSource.COPYBOOK.getText(),
+                null),
+            "2",
+            new Diagnostic(
+                new Range(),
+                "Syntax error on 'DATA'",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText(),
+                null)),
         CobolLanguageId.COBOL);
   }
 }

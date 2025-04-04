@@ -51,6 +51,8 @@ class TestCopyMaidWithQualifier {
     UseCaseEngine.runTest(
         TEXT,
         ImmutableList.of(new CobolText(COPYBOOK_NAME, DaCoDialect.NAME, COPYBOOK)),
-        ImmutableMap.of(), ImmutableList.of(), DialectConfigs.getDaCoAnalysisConfig());
+        ImmutableMap.of(),
+        ImmutableList.of(),
+        DialectConfigs.getDaCoAnalysisConfig());
   }
 }

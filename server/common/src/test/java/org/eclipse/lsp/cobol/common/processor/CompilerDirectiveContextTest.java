@@ -63,9 +63,9 @@ class CompilerDirectiveContextTest {
 
     assertEquals(context.getCompilerDirectiveMap().entrySet().size(), 0);
     context.updateDirectiveOptions(
-            new CompilerDirectiveOption(CompilerDirectiveName.STDSQL, ImmutableList.of(YES)));
+        new CompilerDirectiveOption(CompilerDirectiveName.STDSQL, ImmutableList.of(YES)));
     Optional<CompilerDirectiveOption> result =
-            context.filterDirectiveList(ImmutableList.of(CompilerDirectiveName.STDSQL));
+        context.filterDirectiveList(ImmutableList.of(CompilerDirectiveName.STDSQL));
     assertTrue(result.isPresent());
     Assertions.assertTrue(result.get().getValue().contains(YES));
   }

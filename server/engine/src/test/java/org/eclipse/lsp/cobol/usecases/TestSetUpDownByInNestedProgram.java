@@ -56,6 +56,6 @@ class TestSetUpDownByInNestedProgram {
                 new Range(),
                 "Invalid sending field type. Expected: Elementary integer data item, Non-zero integer",
                 DiagnosticSeverity.Error,
-                 ErrorSource.PARSING.getText())));
+                ErrorSource.PARSING.getText())));
   }
 }

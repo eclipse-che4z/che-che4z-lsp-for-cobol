@@ -25,29 +25,33 @@ import org.eclipse.lsp.cobol.core.engine.dialects.DialectService;
 import org.eclipse.lsp.cobol.common.pipeline.Stage;
 import org.eclipse.lsp.cobol.common.pipeline.StageResult;
 
-/**
- * Stage to process dialect nodes
- */
+/** Stage to process dialect nodes */
 @RequiredArgsConstructor
-public class DialectCompilerDirectiveStage implements Stage<AnalysisContext, List<CompilerDirectiveNode>, Void> {
+public class DialectCompilerDirectiveStage
+    implements Stage<AnalysisContext, List<CompilerDirectiveNode>, Void> {
   private final DialectService dialectService;
 
   @Override
-  public StageResult<List<CompilerDirectiveNode>> run(AnalysisContext context, StageResult<Void> prevStageResult) {
+  public StageResult<List<CompilerDirectiveNode>> run(
+      AnalysisContext context, StageResult<Void> prevStageResult) {
     List<CompilerDirectiveNode> dialectCompilerDirectiveNodes = new ArrayList<>();
     dialectService.updateDialects(context.getConfig().getDialectRegistry());
     DialectProcessingContext dialectProcessingContext =
-            DialectProcessingContext.builder()
-                    .config(context.getConfig())
-                    .programDocumentUri(context.getExtendedDocument().getUri())
-                    .extendedDocument(context.getExtendedDocument())
-                    .build();
-    List<CobolDialect> allAvailableDialect = new ArrayList<>(dialectService.getActiveImplicitDialects(context.getConfig()));
+        DialectProcessingContext.builder()
+            .config(context.getConfig())
+            .programDocumentUri(context.getExtendedDocument().getUri())
+            .extendedDocument(context.getExtendedDocument())
+            .build();
+    List<CobolDialect> allAvailableDialect =
+        new ArrayList<>(dialectService.getActiveImplicitDialects(context.getConfig()));
     context.getConfig().getDialects().stream()
-            .map(dialectService::getDialectByName)
-            .forEach(dia -> dia.ifPresent(allAvailableDialect::add));
+        .map(dialectService::getDialectByName)
+        .forEach(dia -> dia.ifPresent(allAvailableDialect::add));
 
-    allAvailableDialect.forEach(dialect -> dialectCompilerDirectiveNodes.addAll(dialect.getCompilerDirectives(dialectProcessingContext)));
+    allAvailableDialect.forEach(
+        dialect ->
+            dialectCompilerDirectiveNodes.addAll(
+                dialect.getCompilerDirectives(dialectProcessingContext)));
     return new StageResult<>(dialectCompilerDirectiveNodes);
   }
 

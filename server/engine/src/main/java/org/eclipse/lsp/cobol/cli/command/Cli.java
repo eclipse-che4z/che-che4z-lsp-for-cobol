@@ -47,16 +47,12 @@ import picocli.CommandLine;
 
 import static org.eclipse.lsp.cobol.cli.command.CliUtils.setupPipeline;
 
-/**
- * The Cli class represents a Command Line Interface (CLI) for interacting with the application.
- */
-@CommandLine.Command(description = "COBOL Analysis CLI tools.", mixinStandardHelpOptions = true, scope = CommandLine.ScopeType.INHERIT,
-    subcommands = {
-        ListSources.class,
-        ListCopybooks.class,
-        CliAnalysis.class,
-        CliCFAST.class
-    })
+/** The Cli class represents a Command Line Interface (CLI) for interacting with the application. */
+@CommandLine.Command(
+    description = "COBOL Analysis CLI tools.",
+    mixinStandardHelpOptions = true,
+    scope = CommandLine.ScopeType.INHERIT,
+    subcommands = {ListSources.class, ListCopybooks.class, CliAnalysis.class, CliCFAST.class})
 @Slf4j
 public class Cli implements Callable<Integer> {
   static final int SUCCESS = 0;
@@ -75,7 +71,13 @@ public class Cli implements Callable<Integer> {
     return SUCCESS;
   }
 
-  Result runAnalysis(File src, CobolLanguageId dialect, Injector diCtx, boolean isAnalysisRequired, boolean collectAstChanges) throws IOException {
+  Result runAnalysis(
+      File src,
+      CobolLanguageId dialect,
+      Injector diCtx,
+      boolean isAnalysisRequired,
+      boolean collectAstChanges)
+      throws IOException {
     String documentUri = src.toURI().toString();
     Pipeline<AnalysisContext> pipeline = setupPipeline(diCtx, isAnalysisRequired, dialect);
 
@@ -84,14 +86,17 @@ public class Cli implements Callable<Integer> {
     documentModelService.openDocument(documentUri, text, "COBOL");
 
     // Cleaning up
-    CleanerPreprocessor preprocessor = diCtx.getInstance(TrueDialectServiceImpl.class).getPreprocessor(dialect);
+    CleanerPreprocessor preprocessor =
+        diCtx.getInstance(TrueDialectServiceImpl.class).getPreprocessor(dialect);
     BenchmarkService benchmarkService = diCtx.getInstance(BenchmarkService.class);
 
     ResultWithErrors<ExtendedText> resultWithErrors = preprocessor.cleanUpCode(documentUri, text);
-    AnalysisConfig config = AnalysisConfig.defaultConfig(CopybookProcessingMode.ENABLED, collectAstChanges);
+    AnalysisConfig config =
+        AnalysisConfig.defaultConfig(CopybookProcessingMode.ENABLED, collectAstChanges);
     ExtendedDocument extendedDocument = new ExtendedDocument(resultWithErrors.getResult(), text);
     BenchmarkSession benchmarkSession = benchmarkService.startSession();
-    AnalysisContext ctx = new AnalysisContext(extendedDocument, config, benchmarkSession, documentUri, text, dialect);
+    AnalysisContext ctx =
+        new AnalysisContext(extendedDocument, config, benchmarkSession, documentUri, text, dialect);
     ctx.getAccumulatedErrors().addAll(resultWithErrors.getErrors());
     PipelineResult pipelineResult = pipeline.run(ctx);
 
@@ -99,9 +104,7 @@ public class Cli implements Callable<Integer> {
     return new Result(ctx, pipelineResult);
   }
 
-  /**
-   * Result of analysis
-   */
+  /** Result of analysis */
   static class Result {
     final AnalysisContext ctx;
     final PipelineResult pipelineResult;
@@ -120,7 +123,10 @@ public class Cli implements Callable<Integer> {
     Path groupsConfig = workspace.resolve(Paths.get(".cobolplugin", "proc_grps.json"));
     if (Files.exists(programConfig) && Files.exists(groupsConfig)) {
       try {
-        processorGroupsResolver = new ProcessorGroupsResolver(new String(Files.readAllBytes(programConfig)), new String(Files.readAllBytes(groupsConfig)));
+        processorGroupsResolver =
+            new ProcessorGroupsResolver(
+                new String(Files.readAllBytes(programConfig)),
+                new String(Files.readAllBytes(groupsConfig)));
       } catch (IOException e) {
         LOG.error("Processor group configuration read error", e);
         throw e;
@@ -133,8 +139,13 @@ public class Cli implements Callable<Integer> {
 
   void addTiming(JsonObject result, BenchmarkSession benchmarkSession) {
     JsonObject tObj = new JsonObject();
-    benchmarkSession.getMeasurements().forEach(m -> tObj.add(m.getId(), new JsonPrimitive(m.getTime() / 1_000_000_000.0)));
+    benchmarkSession
+        .getMeasurements()
+        .forEach(m -> tObj.add(m.getId(), new JsonPrimitive(m.getTime() / 1_000_000_000.0)));
     result.add("timings", tObj);
-    benchmarkSession.getMeasurements().stream().map(Measurement::getTime).reduce(Long::sum).ifPresent(totalTime -> tObj.add("total", new JsonPrimitive(totalTime / 1_000_000_000.0)));
+    benchmarkSession.getMeasurements().stream()
+        .map(Measurement::getTime)
+        .reduce(Long::sum)
+        .ifPresent(totalTime -> tObj.add("total", new JsonPrimitive(totalTime / 1_000_000_000.0)));
   }
 }

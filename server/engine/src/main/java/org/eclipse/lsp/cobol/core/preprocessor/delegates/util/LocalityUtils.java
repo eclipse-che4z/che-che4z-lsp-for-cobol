@@ -82,6 +82,4 @@ public class LocalityUtils {
         token.getLine() - 1,
         token.getCharPositionInLine() + token.getStopIndex() - token.getStartIndex() + 1);
   }
-
-
 }

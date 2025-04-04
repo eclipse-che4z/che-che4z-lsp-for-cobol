@@ -49,7 +49,8 @@ class MessageServiceParserTest {
     WorkingFolderService workingFolderService = mock(WorkingFolderService.class);
     when(localeMock.getApplicationLocale()).thenReturn(Locale.ENGLISH);
     MessageService messageService =
-        new PropertiesMessageService("resourceBundles/test", localeMock, settingsService, workingFolderService);
+        new PropertiesMessageService(
+            "resourceBundles/test", localeMock, settingsService, workingFolderService);
     CobolErrorStrategy errorStrategy = mock(CobolErrorStrategy.class);
     when(mockParser.getErrorHandler()).thenReturn(errorStrategy);
     when(errorStrategy.getMessageService()).thenReturn(messageService);
@@ -72,27 +73,37 @@ class MessageServiceParserTest {
   void whenInvalidTokenIsPassed_thenExpectErrorNotification() {
     ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
     String value = "value to parse";
-    doCallRealMethod().when((MessageServiceParser) mockParser).validateTokenWithRegex(anyString(), anyString(), anyString());
-    ((MessageServiceParser) mockParser).validateTokenWithRegex(value, "\\d+[Gg]", "db2SqlParser.size");
-    verify((MessageServiceParser) mockParser).notifyError(eq("db2SqlParser.size"), captor.capture());
+    doCallRealMethod()
+        .when((MessageServiceParser) mockParser)
+        .validateTokenWithRegex(anyString(), anyString(), anyString());
+    ((MessageServiceParser) mockParser)
+        .validateTokenWithRegex(value, "\\d+[Gg]", "db2SqlParser.size");
+    verify((MessageServiceParser) mockParser)
+        .notifyError(eq("db2SqlParser.size"), captor.capture());
 
     assertEquals(value, captor.getValue());
   }
 
   @Test
   void whenLessThanMinimumIsPassed_thenExpectErrorNotification() {
-    checkErrorForRealMethod("0", p -> {
-      doCallRealMethod().when(p).validateDb2MaxInt(anyString());
-      ((MessageServiceParser) mockParser).validateDb2MaxInt("0");
-    }, "db2SqlParser.maxIntValue");
+    checkErrorForRealMethod(
+        "0",
+        p -> {
+          doCallRealMethod().when(p).validateDb2MaxInt(anyString());
+          ((MessageServiceParser) mockParser).validateDb2MaxInt("0");
+        },
+        "db2SqlParser.maxIntValue");
   }
 
   @Test
   void whenMoreThanMaximumIsPassed_thenExpectErrorNotification() {
-    checkErrorForRealMethod("32768", p -> {
-      doCallRealMethod().when(p).validateDb2MaxInt(anyString());
-      ((MessageServiceParser) mockParser).validateDb2MaxInt("32768");
-    }, "db2SqlParser.maxIntValue");
+    checkErrorForRealMethod(
+        "32768",
+        p -> {
+          doCallRealMethod().when(p).validateDb2MaxInt(anyString());
+          ((MessageServiceParser) mockParser).validateDb2MaxInt("32768");
+        },
+        "db2SqlParser.maxIntValue");
   }
 
   @Test
@@ -106,15 +117,20 @@ class MessageServiceParserTest {
   @Disabled("Seems issue related to mockito version update")
   void whenValidatedTextIsOutOfRange_thenExpectErrorNotification() {
     ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
-    doCallRealMethod().when((MessageServiceParser) mockParser).validateTextInRange(anyString(), anyInt(), anyInt());
+    doCallRealMethod()
+        .when((MessageServiceParser) mockParser)
+        .validateTextInRange(anyString(), anyInt(), anyInt());
     ((MessageServiceParser) mockParser).validateTextInRange("0", 0, 10);
-    verify((MessageServiceParser) mockParser).notifyError(eq("parsers.validValueMsg"), captor.capture());
+    verify((MessageServiceParser) mockParser)
+        .notifyError(eq("parsers.validValueMsg"), captor.capture());
     assertEquals("in range 1 to 9", captor.getValue());
   }
 
   @Test
   void whenValidatedTextInValidRange_thenExpectNoErrorNotification() {
-    doCallRealMethod().when((MessageServiceParser) mockParser).validateTextInRange(anyString(), anyInt(), anyInt());
+    doCallRealMethod()
+        .when((MessageServiceParser) mockParser)
+        .validateTextInRange(anyString(), anyInt(), anyInt());
     ((MessageServiceParser) mockParser).validateTextInRange("5", 0, 10);
     verify(((MessageServiceParser) mockParser), never()).notifyError(any(), any());
   }
@@ -125,7 +141,8 @@ class MessageServiceParserTest {
     ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
     doCallRealMethod().when((MessageServiceParser) mockParser).validate34or16(anyString());
     ((MessageServiceParser) mockParser).validate34or16("10");
-    verify((MessageServiceParser) mockParser).notifyError(eq("parsers.validValueMsg"), captor.capture());
+    verify((MessageServiceParser) mockParser)
+        .notifyError(eq("parsers.validValueMsg"), captor.capture());
     assertEquals("34 or 16", captor.getValue());
   }
 
@@ -136,7 +153,8 @@ class MessageServiceParserTest {
     verify(((MessageServiceParser) mockParser), never()).notifyError(any(), any());
   }
 
-  private void checkErrorForRealMethod(String value, Consumer<MessageServiceParser> consumer, String errorCode) {
+  private void checkErrorForRealMethod(
+      String value, Consumer<MessageServiceParser> consumer, String errorCode) {
     ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
     consumer.accept((MessageServiceParser) mockParser);
     verify((MessageServiceParser) mockParser).notifyError(eq(errorCode), captor.capture());

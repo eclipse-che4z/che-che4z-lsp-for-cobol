@@ -48,18 +48,19 @@ public class ElementOccurrences implements Occurrences {
     if (sourceUnitGraph.isUserSuppliedCopybook(uri)) {
       return getCopybookLocation(position, uri);
     }
-    return SymbolsRepository.findElementByPosition(uri,
-                    document.getLastAnalysisResult(),
-                    position.getPosition())
-            .map(DefinedAndUsedStructure::getDefinitions).orElse(Collections.emptyList());
+    return SymbolsRepository.findElementByPosition(
+            uri, document.getLastAnalysisResult(), position.getPosition())
+        .map(DefinedAndUsedStructure::getDefinitions)
+        .orElse(Collections.emptyList());
   }
 
   private List<Location> getCopybookLocation(TextDocumentPositionParams position, String uri) {
-    List<Location> result =  new ArrayList<>();
+    List<Location> result = new ArrayList<>();
     List<SourceUnitGraph.NodeV> injectedCopybookNode =
         sourceUnitGraph.getInjectedCopybookNode(uri, position.getPosition());
     for (SourceUnitGraph.NodeV nodeV : injectedCopybookNode) {
-      Location location = new Location(nodeV.getUri(), new Range(new Position(0, 0), new Position(0, 0)));
+      Location location =
+          new Location(nodeV.getUri(), new Range(new Position(0, 0), new Position(0, 0)));
       result.add(location);
     }
     return result;
@@ -70,8 +71,11 @@ public class ElementOccurrences implements Occurrences {
       @NonNull CobolDocumentModel document,
       @NonNull TextDocumentPositionParams position,
       @NonNull ReferenceContext refCtx) {
-    Optional<DefinedAndUsedStructure> element = SymbolsRepository.findElementByPosition(
-            position.getTextDocument().getUri(), document.getAnalysisResult(), position.getPosition());
+    Optional<DefinedAndUsedStructure> element =
+        SymbolsRepository.findElementByPosition(
+            position.getTextDocument().getUri(),
+            document.getAnalysisResult(),
+            position.getPosition());
     if (!element.isPresent()) {
       return Collections.emptyList();
     }
@@ -85,12 +89,17 @@ public class ElementOccurrences implements Occurrences {
   @Override
   public @NonNull List<DocumentHighlight> findHighlights(
       AnalysisResult analysisResult, @NonNull TextDocumentPositionParams position) {
-    Optional<DefinedAndUsedStructure> element = SymbolsRepository.findElementByPosition(position.getTextDocument().getUri(),
-            analysisResult, position.getPosition());
-    return element.map(context -> Streams.concat(context.getUsages().stream(), context.getDefinitions().stream())
-            .filter(byUri(position))
-            .map(toDocumentHighlight())
-            .collect(Collectors.toList())).orElse(Collections.emptyList());
+    Optional<DefinedAndUsedStructure> element =
+        SymbolsRepository.findElementByPosition(
+            position.getTextDocument().getUri(), analysisResult, position.getPosition());
+    return element
+        .map(
+            context ->
+                Streams.concat(context.getUsages().stream(), context.getDefinitions().stream())
+                    .filter(byUri(position))
+                    .map(toDocumentHighlight())
+                    .collect(Collectors.toList()))
+        .orElse(Collections.emptyList());
   }
 
   @NonNull

@@ -28,9 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-/**
- * Test for {@link ErrorHelper}
- */
+/** Test for {@link ErrorHelper} */
 @ExtendWith(MockitoExtension.class)
 class ErrorHelperTest {
   @Test
@@ -63,5 +61,4 @@ class ErrorHelperTest {
     assertEquals(ErrorCodes.MISSING_COPYBOOK.getLabel(), result.getErrorCode().getLabel());
     assertEquals(message, result.getSuggestion());
   }
-
 }

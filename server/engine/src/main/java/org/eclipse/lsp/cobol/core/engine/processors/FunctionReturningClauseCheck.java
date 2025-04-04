@@ -30,7 +30,8 @@ public class FunctionReturningClauseCheck implements Processor<ProcedureDivision
     if (ctx.getCurrentProgramNode() == null) {
       throw new RuntimeException();
     }
-    if (ctx.getCurrentProgramNode().getSubtype() != ProgramSubtype.Function || proc.hasReturningClause) {
+    if (ctx.getCurrentProgramNode().getSubtype() != ProgramSubtype.Function
+        || proc.hasReturningClause) {
       return;
     }
     ctx.getErrors()

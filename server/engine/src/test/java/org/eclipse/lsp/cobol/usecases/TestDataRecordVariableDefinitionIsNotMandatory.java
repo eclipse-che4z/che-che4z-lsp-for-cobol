@@ -55,11 +55,13 @@ public class TestDataRecordVariableDefinitionIsNotMandatory {
 
   @Test
   void testDataRecordVariableNeedNotBeDefined() {
-    UseCaseEngine.runTest(TEXT_DATA_RECORD_VARIABLE_NOT_DEFINED, ImmutableList.of(), ImmutableMap.of());
+    UseCaseEngine.runTest(
+        TEXT_DATA_RECORD_VARIABLE_NOT_DEFINED, ImmutableList.of(), ImmutableMap.of());
   }
 
   @Test
   void testWhenDataRecordVariableIsDefinedUsageIsCorrectlyReflected() {
-    UseCaseEngine.runTest(TEXT_DATA_RECORD_VARIABLE_IS_DEFINED, ImmutableList.of(), ImmutableMap.of());
+    UseCaseEngine.runTest(
+        TEXT_DATA_RECORD_VARIABLE_IS_DEFINED, ImmutableList.of(), ImmutableMap.of());
   }
 }

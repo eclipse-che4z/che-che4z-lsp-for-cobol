@@ -43,8 +43,10 @@ public class ShutdownCheckUtil {
    * @param <U>
    * @return CompletableFuture
    */
-  public <U> CompletableFuture<U> supplyAsyncAndCheckShutdown(DisposableLSPStateService disposableLSPStateService,
-      Supplier<U> supplier, Executor executor) {
+  public <U> CompletableFuture<U> supplyAsyncAndCheckShutdown(
+      DisposableLSPStateService disposableLSPStateService,
+      Supplier<U> supplier,
+      Executor executor) {
     if (disposableLSPStateService.isServerShutdown())
       return (CompletableFuture<U>) CompletableFuture.completedFuture(shutdownResponse);
     return CompletableFuture.<U>supplyAsync(supplier, executor);
@@ -57,7 +59,8 @@ public class ShutdownCheckUtil {
    * @param disposableLSPStateService
    * @return CompletableFuture
    */
-  public static CompletableFuture<Object> checkServerState(DisposableLSPStateService disposableLSPStateService) {
+  public static CompletableFuture<Object> checkServerState(
+      DisposableLSPStateService disposableLSPStateService) {
     if (disposableLSPStateService.isServerShutdown())
       return CompletableFuture.completedFuture(shutdownResponse);
     return CompletableFuture.completedFuture(null);

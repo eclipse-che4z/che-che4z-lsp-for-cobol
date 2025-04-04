@@ -38,9 +38,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-/**
- * Dialect Service provides available dialects pipeline for the given language od
- */
+/** Dialect Service provides available dialects pipeline for the given language od */
 @Singleton
 public class TrueDialectServiceImpl implements TrueDialectService<AnalysisContext> {
 
@@ -48,28 +46,48 @@ public class TrueDialectServiceImpl implements TrueDialectService<AnalysisContex
 
   @Inject
   public TrueDialectServiceImpl(
-                            GrammarPreprocessor grammarPreprocessor,
-                            MessageService messageService,
-                            ParseTreeListener treeListener,
-                            SubroutineService subroutineService,
-                            CachingConfigurationService cachingConfigurationService,
-                            DialectService dialectService,
-                            AstProcessor astProcessor,
-                            SymbolsRepository symbolsRepository,
-                            CodeLayoutStore codeLayoutStore,
-                            CopybookService copybookService) {
+      GrammarPreprocessor grammarPreprocessor,
+      MessageService messageService,
+      ParseTreeListener treeListener,
+      SubroutineService subroutineService,
+      CachingConfigurationService cachingConfigurationService,
+      DialectService dialectService,
+      AstProcessor astProcessor,
+      SymbolsRepository symbolsRepository,
+      CodeLayoutStore codeLayoutStore,
+      CopybookService copybookService) {
     dialects = new HashMap<>();
-    dialects.put(CobolLanguageId.COBOL, new IbmTrueCobolDialect(grammarPreprocessor,
-        messageService, treeListener, subroutineService, cachingConfigurationService, dialectService,
-        astProcessor, symbolsRepository, codeLayoutStore));
+    dialects.put(
+        CobolLanguageId.COBOL,
+        new IbmTrueCobolDialect(
+            grammarPreprocessor,
+            messageService,
+            treeListener,
+            subroutineService,
+            cachingConfigurationService,
+            dialectService,
+            astProcessor,
+            symbolsRepository,
+            codeLayoutStore));
 
-    dialects.put(CobolLanguageId.HP_COBOL, new HpTrueCobolDialect(grammarPreprocessor,
-        messageService, treeListener, subroutineService, cachingConfigurationService, dialectService,
-        astProcessor, symbolsRepository, codeLayoutStore, copybookService));
+    dialects.put(
+        CobolLanguageId.HP_COBOL,
+        new HpTrueCobolDialect(
+            grammarPreprocessor,
+            messageService,
+            treeListener,
+            subroutineService,
+            cachingConfigurationService,
+            dialectService,
+            astProcessor,
+            symbolsRepository,
+            codeLayoutStore,
+            copybookService));
   }
 
   /**
    * Returns the pipeline for a dialect based on a given language id
+   *
    * @param languageId a language id of a dialect
    * @return the pipeline for a dialect
    */
@@ -81,6 +99,7 @@ public class TrueDialectServiceImpl implements TrueDialectService<AnalysisContex
 
   /**
    * Returns the cleanup preprocessor for a dialect, based on a given language id
+   *
    * @param languageId a language id of a dialect
    * @return the cleanup preprocessor
    */

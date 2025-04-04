@@ -27,19 +27,19 @@ import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
 /**
- * This test checks that the asterisk out of indicator area before the COPY statement doesn't
- * break syntax analysis
+ * This test checks that the asterisk out of indicator area before the COPY statement doesn't break
+ * syntax analysis
  */
 class TestAsteriskBeforeCopyDoesntBreakAnalysis {
 
   private static final String TEXT =
-          "        IDENTIFICATION DIVISION.\r\n"
-                  + "        PROGRAM-ID. test1.\r\n"
-                  + "        DATA DIVISION.\r\n"
-                  + "        WORKING-STORAGE SECTION.\r\n"
-                  + "        {*|1} COPY {~CPY}.\n\n"
-                  + "      * COPY CPY.\n\n"
-                  + "        PROCEDURE DIVISION.\n\n";
+      "        IDENTIFICATION DIVISION.\r\n"
+          + "        PROGRAM-ID. test1.\r\n"
+          + "        DATA DIVISION.\r\n"
+          + "        WORKING-STORAGE SECTION.\r\n"
+          + "        {*|1} COPY {~CPY}.\n\n"
+          + "      * COPY CPY.\n\n"
+          + "        PROCEDURE DIVISION.\n\n";
 
   private static final String CPY = "        01 ABC PIC 9.";
   private static final String CPY_NAME = "CPY";
@@ -48,15 +48,15 @@ class TestAsteriskBeforeCopyDoesntBreakAnalysis {
   void test() {
 
     UseCaseEngine.runTest(
-            TEXT,
-            ImmutableList.of(new CobolText(CPY_NAME, CPY)),
-            ImmutableMap.of(
-                    "1",
-                    new Diagnostic(
-                            new Range(), "Syntax error on '*'",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText())),
+        TEXT,
+        ImmutableList.of(new CobolText(CPY_NAME, CPY)),
+        ImmutableMap.of(
+            "1",
+            new Diagnostic(
+                new Range(),
+                "Syntax error on '*'",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())),
         CobolLanguageId.COBOL);
   }
-
 }

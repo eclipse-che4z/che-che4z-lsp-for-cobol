@@ -59,7 +59,8 @@ public class CICSTestUtils {
    * @param compilerOptions Compiler options fo translator specification
    * @return Formatted test string
    */
-  public static String getTestString(String components, List<String> errorTags, String... compilerOptions) {
+  public static String getTestString(
+      String components, List<String> errorTags, String... compilerOptions) {
     List<String> instances = Arrays.asList(components.split("\\s"));
     instances.replaceAll(String.join("", Collections.nCopies(12, " "))::concat);
     List<String> compilerOptionsList =
@@ -70,10 +71,8 @@ public class CICSTestUtils {
     ArrayList<String> base = new ArrayList<String>(Arrays.asList(BASE_TEXT.split("\n")));
     base.addAll(0, compilerOptionsList);
     base.addAll(instances);
-    if (errorTags == null)
-      base.add(END_EXEC);
-    else if (errorTags.isEmpty())
-      base.add(END_EXEC_ERROR);
+    if (errorTags == null) base.add(END_EXEC);
+    else if (errorTags.isEmpty()) base.add(END_EXEC_ERROR);
     else {
       base.add(END_EXEC_ERROR.replace("{", "{|" + String.join("|", errorTags) + "}{"));
     }
@@ -113,7 +112,10 @@ public class CICSTestUtils {
    * @param options Compiler options fo translator specification
    */
   public static void errorTestWithEndExecError(
-      String newCommand, @NonNull List<String> errorTags, Map<String, Diagnostic> expectedDiagnostic, String... options) {
+      String newCommand,
+      @NonNull List<String> errorTags,
+      Map<String, Diagnostic> expectedDiagnostic,
+      String... options) {
     UseCaseEngine.runTest(
         getTestString(newCommand, errorTags, options), ImmutableList.of(), expectedDiagnostic);
   }

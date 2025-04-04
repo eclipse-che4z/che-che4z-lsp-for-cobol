@@ -56,6 +56,6 @@ class TestRenamingIncludesOnlyRequiredVariable {
                 new Range(),
                 "Variable VARNAME5 is not defined",
                 DiagnosticSeverity.Error,
-                 ErrorSource.PARSING.getText())));
+                ErrorSource.PARSING.getText())));
   }
 }

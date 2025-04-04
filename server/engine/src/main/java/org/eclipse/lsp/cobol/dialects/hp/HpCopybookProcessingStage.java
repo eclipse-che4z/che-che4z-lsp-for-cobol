@@ -42,9 +42,7 @@ import org.eclipse.lsp.cobol.common.pipeline.StageResult;
 import org.eclipse.lsp.cobol.core.engine.analysis.AnalysisContext;
 import org.eclipse.lsp4j.Location;
 
-/**
- * Resolving and inserting copybooks into the extended source stage
- */
+/** Resolving and inserting copybooks into the extended source stage */
 @RequiredArgsConstructor
 public class HpCopybookProcessingStage implements Stage<AnalysisContext, DialectOutcome, Void> {
 
@@ -52,7 +50,8 @@ public class HpCopybookProcessingStage implements Stage<AnalysisContext, Dialect
   private final CopybookService copybookService;
 
   @Override
-  public StageResult<DialectOutcome> run(AnalysisContext context, StageResult<Void> prevStageResult) {
+  public StageResult<DialectOutcome> run(
+      AnalysisContext context, StageResult<Void> prevStageResult) {
     List<SyntaxError> errors = new LinkedList<>();
     List<CopybookDescriptor> cbs = CopybookParser.parseAndCleanup(context.getExtendedDocument());
     cbs.forEach(
@@ -79,25 +78,35 @@ public class HpCopybookProcessingStage implements Stage<AnalysisContext, Dialect
     return "Copybook processing";
   }
 
-  private List<CopyNode> insertHpCopybook(String programUri, ExtendedDocument extendedDocument, CopybookDescriptor descriptor, List<SyntaxError> errors) {
+  private List<CopyNode> insertHpCopybook(
+      String programUri,
+      ExtendedDocument extendedDocument,
+      CopybookDescriptor descriptor,
+      List<SyntaxError> errors) {
     CopybookName copybookName = new CopybookName(descriptor.getName());
-    CopybookModel model = copybookService.resolve(copybookName.toCopybookId(extendedDocument.getUri()),
-            copybookName, programUri,
-            extendedDocument.getUri(), null)
-        .unwrap(errors::addAll);
+    CopybookModel model =
+        copybookService
+            .resolve(
+                copybookName.toCopybookId(extendedDocument.getUri()),
+                copybookName,
+                programUri,
+                extendedDocument.getUri(),
+                null)
+            .unwrap(errors::addAll);
 
     Location nameLocation = new Location(extendedDocument.getUri(), descriptor.getNameRange());
     if (model.getUri() == null) {
-      errors.add(SyntaxError.syntaxError()
-          .errorSource(ErrorSource.DIALECT)
-          .suggestion(
-              messageService.getMessage(
-                  "GrammarPreprocessorListener.errorSuggestion",
-                  copybookName.getQualifiedName()))
-          .severity(ERROR)
-          .errorCode(ErrorCodes.MISSING_COPYBOOK)
-          .location(new OriginalLocation(nameLocation, null))
-          .build());
+      errors.add(
+          SyntaxError.syntaxError()
+              .errorSource(ErrorSource.DIALECT)
+              .suggestion(
+                  messageService.getMessage(
+                      "GrammarPreprocessorListener.errorSuggestion",
+                      copybookName.getQualifiedName()))
+              .severity(ERROR)
+              .errorCode(ErrorCodes.MISSING_COPYBOOK)
+              .location(new OriginalLocation(nameLocation, null))
+              .build());
       return ImmutableList.of();
     }
 
@@ -112,19 +121,19 @@ public class HpCopybookProcessingStage implements Stage<AnalysisContext, Dialect
               character.setCharacter(' ');
             }
           }
-        }
-    );
+        });
 
     extendedDocument.insertCopybook(descriptor.getStatementRange(), copybook);
 
-    Locality statementLocality = Locality.builder()
-        .copybookId(copybookName.toCopybookId(programUri).toString())
-        .range(descriptor.getStatementRange())
-        .uri(extendedDocument.getUri())
-        .build();
+    Locality statementLocality =
+        Locality.builder()
+            .copybookId(copybookName.toCopybookId(programUri).toString())
+            .range(descriptor.getStatementRange())
+            .uri(extendedDocument.getUri())
+            .build();
 
-    CopyNode copyNode = new CopyNode(statementLocality, nameLocation, descriptor.getName(), model.getUri());
+    CopyNode copyNode =
+        new CopyNode(statementLocality, nameLocation, descriptor.getName(), model.getUri());
     return ImmutableList.of(copyNode);
   }
-
 }

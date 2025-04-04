@@ -56,8 +56,7 @@ public class MockLanguageClient implements CobolLanguageClient {
   }
 
   @Override
-  public void notifyProgress(ProgressParams params) {
-  }
+  public void notifyProgress(ProgressParams params) {}
 
   @Override
   public void showMessage(MessageParams messageParams) {
@@ -86,12 +85,15 @@ public class MockLanguageClient implements CobolLanguageClient {
    * @return - config value
    */
   public CompletableFuture<List<Object>> configuration(ConfigurationParams configurationParams) {
-      return CompletableFuture.completedFuture(ImmutableList.of("",
-          new JsonObject(),
-          new JsonArray(),
-          new JsonNull(),
-          new JsonNull(),
-          new JsonArray(), ""));
+    return CompletableFuture.completedFuture(
+        ImmutableList.of(
+            "",
+            new JsonObject(),
+            new JsonArray(),
+            new JsonNull(),
+            new JsonNull(),
+            new JsonArray(),
+            ""));
   }
 
   /** Clean the client state. */

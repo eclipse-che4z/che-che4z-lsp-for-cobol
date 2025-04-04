@@ -131,7 +131,7 @@ class TestVariableRedefineSameGroup {
                 new Range(),
                 "REDEFINES line must immediately follow redefined item: WS-DATE1",
                 DiagnosticSeverity.Error,
-                 ErrorSource.PARSING.getText())));
+                ErrorSource.PARSING.getText())));
   }
 
   @Test
@@ -158,13 +158,13 @@ class TestVariableRedefineSameGroup {
                 new Range(),
                 "TEMPORARY-EMPLOYEE: Only 01, 66 and 77 level numbers are allowed at the highest level",
                 DiagnosticSeverity.Error,
-                 ErrorSource.PARSING.getText()),
+                ErrorSource.PARSING.getText()),
             "2",
             new Diagnostic(
                 new Range(),
                 "REDEFINES line must immediately follow redefined item: REGULAR-EMPLOYEE",
                 DiagnosticSeverity.Error,
-                 ErrorSource.PARSING.getText())));
+                ErrorSource.PARSING.getText())));
   }
 
   @Test

@@ -48,14 +48,15 @@ class TestCopyMaidWithWrkShowsErrorAfterFiller {
   void test() {
     UseCaseEngine.runTest(
         TEXT,
-        ImmutableList.of(
-            new CobolText("BHTRGL-XBG", DaCoDialect.NAME, COPYBOOK_CONTENT)),
+        ImmutableList.of(new CobolText("BHTRGL-XBG", DaCoDialect.NAME, COPYBOOK_CONTENT)),
         ImmutableMap.of(
             "1",
             new Diagnostic(
                 new Range(),
                 "Cannot retrieve suffix for WRK usage",
                 DiagnosticSeverity.Error,
-                ErrorSource.DIALECT.getText())), ImmutableList.of(), DialectConfigs.getDaCoAnalysisConfig());
+                ErrorSource.DIALECT.getText())),
+        ImmutableList.of(),
+        DialectConfigs.getDaCoAnalysisConfig());
   }
 }

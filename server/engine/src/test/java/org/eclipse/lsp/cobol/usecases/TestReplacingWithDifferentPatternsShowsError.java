@@ -188,8 +188,7 @@ class TestReplacingWithDifferentPatternsShowsError {
         ImmutableList.of(new CobolText(NEW2_NAME, NEW2)),
         ImmutableMap.of(
             "1",
-            new Diagnostic(
-                null, MESSAGE, DiagnosticSeverity.Error, ErrorSource.PARSING.getText()),
+            new Diagnostic(null, MESSAGE, DiagnosticSeverity.Error, ErrorSource.PARSING.getText()),
             "2",
             new Diagnostic(
                 null, MESSAGE2, DiagnosticSeverity.Error, ErrorSource.PARSING.getText())));

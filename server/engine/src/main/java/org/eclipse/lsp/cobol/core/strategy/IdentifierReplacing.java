@@ -40,7 +40,9 @@ class IdentifierReplacing {
 
   private static final String KEYWORD_PATTERN = "[A-Z0-9_]+";
   private static final Map<Class<? extends Parser>, List<Class<? extends ParserRuleContext>>>
-      PARSER_IDENTIFIER_RULES = ImmutableMap.of(CobolParser.class, ImmutableList.of(CobolParser.AllowedCobolKeywordsContext.class));
+      PARSER_IDENTIFIER_RULES =
+          ImmutableMap.of(
+              CobolParser.class, ImmutableList.of(CobolParser.AllowedCobolKeywordsContext.class));
 
   /**
    * Retrieve all the tokens from the rules that represent identifiers

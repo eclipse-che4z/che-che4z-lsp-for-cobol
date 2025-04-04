@@ -24,7 +24,6 @@ import java.util.function.Consumer;
  * Stores the locale for entire application and is single point of contact for all locale related
  * issues. This class update application locale, notify subscriber in case of locale update and
  * returns currently set locale.
- *
  */
 public interface LocaleStore {
 
@@ -44,6 +43,7 @@ public interface LocaleStore {
 
   /**
    * Update the locale for an application.
+   *
    * @param locale to be updated.
    */
   void updateLocale(LocaleEnum locale);

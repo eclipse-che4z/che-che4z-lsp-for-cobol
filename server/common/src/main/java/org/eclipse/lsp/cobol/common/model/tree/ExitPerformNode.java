@@ -25,8 +25,7 @@ import org.eclipse.lsp.cobol.common.model.NodeType;
 @ToString(callSuper = true)
 public class ExitPerformNode extends Node {
   private final boolean cycle;
-  @Setter
-  private boolean insideInlinePerform;
+  @Setter private boolean insideInlinePerform;
 
   public ExitPerformNode(Locality location, boolean cycle) {
     super(location, NodeType.EXIT_PERFORM);

@@ -32,16 +32,17 @@ public class CICSMonitorOptionsCheckUtility extends CICSOptionsCheckBaseUtility 
   public static final int RULE_INDEX = RULE_cics_monitor;
 
   private static final Map<Integer, ErrorSeverity> DUPLICATE_CHECK_OPTIONS =
-          new HashMap<Integer, ErrorSeverity>() {
-            {
-              put(CICSLexer.POINT, ErrorSeverity.ERROR);
-              put(CICSLexer.DATA1, ErrorSeverity.ERROR);
-              put(CICSLexer.DATA2, ErrorSeverity.ERROR);
-              put(CICSLexer.ENTRYNAME, ErrorSeverity.ERROR);
-            }
-          };
+      new HashMap<Integer, ErrorSeverity>() {
+        {
+          put(CICSLexer.POINT, ErrorSeverity.ERROR);
+          put(CICSLexer.DATA1, ErrorSeverity.ERROR);
+          put(CICSLexer.DATA2, ErrorSeverity.ERROR);
+          put(CICSLexer.ENTRYNAME, ErrorSeverity.ERROR);
+        }
+      };
 
-  public CICSMonitorOptionsCheckUtility(DialectProcessingContext context, List<SyntaxError> errors) {
+  public CICSMonitorOptionsCheckUtility(
+      DialectProcessingContext context, List<SyntaxError> errors) {
     super(context, errors, DUPLICATE_CHECK_OPTIONS);
   }
 

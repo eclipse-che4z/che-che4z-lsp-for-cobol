@@ -26,48 +26,67 @@ import java.util.*;
 
 /**
  * Test RETURN commands. Documentation link: <a
- * href="https://www.ibm.com/docs/en/cics-ts/6.x?topic=summary-return">RETURN
- * Command</a>
+ * href="https://www.ibm.com/docs/en/cics-ts/6.x?topic=summary-return">RETURN Command</a>
  *
  * <p>This class tests all variations of the RETURN command found in the link above.
  */
 public class TestCicsReturnStatement {
 
-    // Test Strings
-    private static final String RETURN_VALID_1 = "RETURN TRANSID({$varOne}) COMMAREA({$varOne}) LENGTH({$varOne}) IMMEDIATE INPUTMSG({$varOne}) INPUTMSGLEN({$varOne})";
-    private static final String RETURN_VALID_2 = "RETURN";
+  // Test Strings
+  private static final String RETURN_VALID_1 =
+      "RETURN TRANSID({$varOne}) COMMAREA({$varOne}) LENGTH({$varOne}) IMMEDIATE INPUTMSG({$varOne}) INPUTMSGLEN({$varOne})";
+  private static final String RETURN_VALID_2 = "RETURN";
 
-    private static final String RETURN_INVALID_1 = "RETURN TRANSID({$varOne}) COMMAREA({$varOne}) {CHANNEL|errorOne}({$varOne})";
-    private static final String RETURN_INVALID_2 = "RETURN {_CHANNEL({$varOne})|errorOne_}";
-    private static final String RETURN_INVALID_3 = "RETURN TRANSID({$varOne}) COMMAREA({$varOne}) LENGTH({$varOne}) IMMEDIATE INPUTMSG({$varOne}) INPUTMSGLEN({$varOne}) {ENDACTIVITY|errorOne}";
+  private static final String RETURN_INVALID_1 =
+      "RETURN TRANSID({$varOne}) COMMAREA({$varOne}) {CHANNEL|errorOne}({$varOne})";
+  private static final String RETURN_INVALID_2 = "RETURN {_CHANNEL({$varOne})|errorOne_}";
+  private static final String RETURN_INVALID_3 =
+      "RETURN TRANSID({$varOne}) COMMAREA({$varOne}) LENGTH({$varOne}) IMMEDIATE INPUTMSG({$varOne}) INPUTMSGLEN({$varOne}) {ENDACTIVITY|errorOne}";
 
-    // Test Functions
-    @Test
-    void testCicsReturnValid() {
-        CICSTestUtils.noErrorTest(RETURN_VALID_1);
-        CICSTestUtils.noErrorTest(RETURN_VALID_2);
-    }
+  // Test Functions
+  @Test
+  void testCicsReturnValid() {
+    CICSTestUtils.noErrorTest(RETURN_VALID_1);
+    CICSTestUtils.noErrorTest(RETURN_VALID_2);
+  }
 
-    // Invalid Tests
-    @Test
-    void testCicsReturnInvalid_1() {
-        HashMap<String, Diagnostic> expectedDiagnostics = new HashMap<>();
-        expectedDiagnostics.put("errorOne", new Diagnostic(new Range(), "Options \"COMMAREA or CHANNEL\" are mutually exclusive.", DiagnosticSeverity.Error, ErrorSource.PARSING.getText()));
-        CICSTestUtils.errorTest(RETURN_INVALID_1, expectedDiagnostics);
-    }
+  // Invalid Tests
+  @Test
+  void testCicsReturnInvalid_1() {
+    HashMap<String, Diagnostic> expectedDiagnostics = new HashMap<>();
+    expectedDiagnostics.put(
+        "errorOne",
+        new Diagnostic(
+            new Range(),
+            "Options \"COMMAREA or CHANNEL\" are mutually exclusive.",
+            DiagnosticSeverity.Error,
+            ErrorSource.PARSING.getText()));
+    CICSTestUtils.errorTest(RETURN_INVALID_1, expectedDiagnostics);
+  }
 
-    @Test
-    void testCicsReturnInvalid_2() {
-        HashMap<String, Diagnostic> expectedDiagnostics = new HashMap<>();
-        expectedDiagnostics.put("errorOne", new Diagnostic(new Range(), "Missing required option for: CHANNEL without TRANSID", DiagnosticSeverity.Error, ErrorSource.PARSING.getText()));
-        CICSTestUtils.errorTest(RETURN_INVALID_2, expectedDiagnostics);
-    }
+  @Test
+  void testCicsReturnInvalid_2() {
+    HashMap<String, Diagnostic> expectedDiagnostics = new HashMap<>();
+    expectedDiagnostics.put(
+        "errorOne",
+        new Diagnostic(
+            new Range(),
+            "Missing required option for: CHANNEL without TRANSID",
+            DiagnosticSeverity.Error,
+            ErrorSource.PARSING.getText()));
+    CICSTestUtils.errorTest(RETURN_INVALID_2, expectedDiagnostics);
+  }
 
-    @Test
-    void testCicsReturnInvalid_3() {
-        HashMap<String, Diagnostic> expectedDiagnostics = new HashMap<>();
-        expectedDiagnostics.put("errorOne", new Diagnostic(new Range(), "Options \"TRANSID or ENDACTIVITY\" are mutually exclusive.", DiagnosticSeverity.Error, ErrorSource.PARSING.getText()));
-        CICSTestUtils.errorTest(RETURN_INVALID_3, expectedDiagnostics);
-    }
-
+  @Test
+  void testCicsReturnInvalid_3() {
+    HashMap<String, Diagnostic> expectedDiagnostics = new HashMap<>();
+    expectedDiagnostics.put(
+        "errorOne",
+        new Diagnostic(
+            new Range(),
+            "Options \"TRANSID or ENDACTIVITY\" are mutually exclusive.",
+            DiagnosticSeverity.Error,
+            ErrorSource.PARSING.getText()));
+    CICSTestUtils.errorTest(RETURN_INVALID_3, expectedDiagnostics);
+  }
 }

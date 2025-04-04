@@ -28,23 +28,22 @@ import org.eclipse.lsp.cobol.dialects.TrueCobolDialect;
 import org.eclipse.lsp.cobol.service.settings.CachingConfigurationService;
 import org.eclipse.lsp.cobol.service.settings.layout.CodeLayoutStore;
 
-/**
- * HP Cobol Dialect
- */
+/** HP Cobol Dialect */
 public class IbmTrueCobolDialect implements TrueCobolDialect {
 
   private final CleanerPreprocessor preprocessor;
   private final Pipeline<AnalysisContext> pipeline;
 
-  public IbmTrueCobolDialect(GrammarPreprocessor grammarPreprocessor,
-                             MessageService messageService,
-                             ParseTreeListener treeListener,
-                             SubroutineService subroutineService,
-                             CachingConfigurationService cachingConfigurationService,
-                             DialectService dialectService,
-                             AstProcessor astProcessor,
-                             SymbolsRepository symbolsRepository,
-                             CodeLayoutStore codeLayoutStore) {
+  public IbmTrueCobolDialect(
+      GrammarPreprocessor grammarPreprocessor,
+      MessageService messageService,
+      ParseTreeListener treeListener,
+      SubroutineService subroutineService,
+      CachingConfigurationService cachingConfigurationService,
+      DialectService dialectService,
+      AstProcessor astProcessor,
+      SymbolsRepository symbolsRepository,
+      CodeLayoutStore codeLayoutStore) {
     preprocessor = new IbmTextPreprocessor(messageService, codeLayoutStore);
 
     pipeline = new Pipeline<>();

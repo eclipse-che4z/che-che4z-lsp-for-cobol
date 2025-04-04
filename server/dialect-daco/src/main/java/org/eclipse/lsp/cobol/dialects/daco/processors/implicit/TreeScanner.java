@@ -23,19 +23,19 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-/**
- * Scans nodes for variable definitions with defined name's pattern
- */
+/** Scans nodes for variable definitions with defined name's pattern */
 @UtilityClass
 class TreeScanner {
 
   /**
    * Scans nodes for variable definitions with defined name's pattern
+   *
    * @param programNode is a program node
    * @return a list of variable name info
    */
   public List<VariableNameInfo> scan(ProgramNode programNode) {
-    return programNode.getDepthFirstStream()
+    return programNode
+        .getDepthFirstStream()
         .filter(n -> n.getNodeType() == NodeType.VARIABLE_DEFINITION_NAME)
         .map(VariableDefinitionNameNode.class::cast)
         .map(VariableDefinitionNameNode::getName)
@@ -47,7 +47,9 @@ class TreeScanner {
 
   private VariableNameInfo getVariableNameInfo(String name) {
     VariableNameInfo result = null;
-    if (name.length() == 10 && (name.startsWith("TBF") || name.startsWith("TBL")) && name.indexOf("-X") == 6) {
+    if (name.length() == 10
+        && (name.startsWith("TBF") || name.startsWith("TBL"))
+        && name.indexOf("-X") == 6) {
       result = new VariableNameInfo(name.substring(3, 6), name.substring(8));
     }
     return result;

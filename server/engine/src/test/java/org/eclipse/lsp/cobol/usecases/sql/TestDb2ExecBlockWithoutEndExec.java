@@ -23,122 +23,121 @@ import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
-/**
- * Tests that a mandatory END-EXEC is required for an exec block
- */
+/** Tests that a mandatory END-EXEC is required for an exec block */
 public class TestDb2ExecBlockWithoutEndExec {
-    public static final String TEXT_EOF =
-            "       IDENTIFICATION DIVISION.\n"
-                    + "       PROGRAM-ID. TEST1.\n"
-                    + "       DATA DIVISION.\n"
-                    + "       WORKING-STORAGE SECTION.\n"
-                    + "       PROCEDURE DIVISION .\n"
-                    + "           EXEC SQL \n"
-                    + "               SELECT DIAG_CODE FROM DIAG_CODES WHERE COPAY > {|1}100";
+  public static final String TEXT_EOF =
+      "       IDENTIFICATION DIVISION.\n"
+          + "       PROGRAM-ID. TEST1.\n"
+          + "       DATA DIVISION.\n"
+          + "       WORKING-STORAGE SECTION.\n"
+          + "       PROCEDURE DIVISION .\n"
+          + "           EXEC SQL \n"
+          + "               SELECT DIAG_CODE FROM DIAG_CODES WHERE COPAY > {|1}100";
 
-    @Test
-    void testEndByEof() {
-        UseCaseEngine.runTest(
-                TEXT_EOF,
-                ImmutableList.of(),
-                ImmutableMap.of(
-                        "1",
-                        new Diagnostic(
-                                new Range(),
-                                "Missing token END-EXEC for the EXEC block",
-                                DiagnosticSeverity.Error,
-                                ErrorSource.PREPROCESSING.getText())));
-    }
+  @Test
+  void testEndByEof() {
+    UseCaseEngine.runTest(
+        TEXT_EOF,
+        ImmutableList.of(),
+        ImmutableMap.of(
+            "1",
+            new Diagnostic(
+                new Range(),
+                "Missing token END-EXEC for the EXEC block",
+                DiagnosticSeverity.Error,
+                ErrorSource.PREPROCESSING.getText())));
+  }
 
-    public static final String TEXT_SEMICOLON =
-            "       IDENTIFICATION DIVISION.\n"
-                    + "       PROGRAM-ID. TEST1.\n"
-                    + "       DATA DIVISION.\n"
-                    + "       WORKING-STORAGE SECTION.\n"
-                    + "       PROCEDURE DIVISION .\n"
-                    + "           EXEC SQL \n"
-                    + "               SELECT DIAG_CODE FROM DIAG_CODES WHERE COPAY > 100;\n"
-                    + "       {|1}{#*A}.\n"
-                    + "               DISPLAY {A|2}.\n";
+  public static final String TEXT_SEMICOLON =
+      "       IDENTIFICATION DIVISION.\n"
+          + "       PROGRAM-ID. TEST1.\n"
+          + "       DATA DIVISION.\n"
+          + "       WORKING-STORAGE SECTION.\n"
+          + "       PROCEDURE DIVISION .\n"
+          + "           EXEC SQL \n"
+          + "               SELECT DIAG_CODE FROM DIAG_CODES WHERE COPAY > 100;\n"
+          + "       {|1}{#*A}.\n"
+          + "               DISPLAY {A|2}.\n";
 
-    @Test
-    void testEndSemicolon() {
-        UseCaseEngine.runTest(
-                TEXT_SEMICOLON,
-                ImmutableList.of(),
-                ImmutableMap.of(
-                        "1",
-                        new Diagnostic(
-                                new Range(),
-                                "Missing token END-EXEC for the EXEC block",
-                                DiagnosticSeverity.Error,
-                                ErrorSource.PREPROCESSING.getText()),
-                        "2",
-                        new Diagnostic(
-                                new Range(),
-                                "Variable A is not defined",
-                                DiagnosticSeverity.Error,
-                                ErrorSource.PARSING.getText())));
-    }
+  @Test
+  void testEndSemicolon() {
+    UseCaseEngine.runTest(
+        TEXT_SEMICOLON,
+        ImmutableList.of(),
+        ImmutableMap.of(
+            "1",
+            new Diagnostic(
+                new Range(),
+                "Missing token END-EXEC for the EXEC block",
+                DiagnosticSeverity.Error,
+                ErrorSource.PREPROCESSING.getText()),
+            "2",
+            new Diagnostic(
+                new Range(),
+                "Variable A is not defined",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
+  }
 
-    public static final String TEXT_DOT =
-            "       IDENTIFICATION DIVISION.\n"
-                    + "       PROGRAM-ID. TEST1.\n"
-                    + "       DATA DIVISION.\n"
-                    + "       WORKING-STORAGE SECTION.\n"
-                    + "       PROCEDURE DIVISION .\n"
-                    + "           EXEC SQL \n"
-                    + "               SELECT DIAG_CODE FROM DIAG_CODES WHERE COPAY > 100{|1}.\n"
-                    + "       {#*A}.\n"
-                    + "               DISPLAY {A|2}.\n";
+  public static final String TEXT_DOT =
+      "       IDENTIFICATION DIVISION.\n"
+          + "       PROGRAM-ID. TEST1.\n"
+          + "       DATA DIVISION.\n"
+          + "       WORKING-STORAGE SECTION.\n"
+          + "       PROCEDURE DIVISION .\n"
+          + "           EXEC SQL \n"
+          + "               SELECT DIAG_CODE FROM DIAG_CODES WHERE COPAY > 100{|1}.\n"
+          + "       {#*A}.\n"
+          + "               DISPLAY {A|2}.\n";
 
-    @Test
-    void testEndByDot() {
-        UseCaseEngine.runTest(
-                TEXT_DOT,
-                ImmutableList.of(),
-                ImmutableMap.of(
-                        "1",
-                        new Diagnostic(
-                                new Range(),
-                                "Missing token END-EXEC for the EXEC block",
-                                DiagnosticSeverity.Error,
-                                ErrorSource.PREPROCESSING.getText()),
-                        "2",
-                        new Diagnostic(
-                                new Range(),
-                                "Variable A is not defined",
-                                DiagnosticSeverity.Error,
-                                ErrorSource.PARSING.getText())));
-    }
+  @Test
+  void testEndByDot() {
+    UseCaseEngine.runTest(
+        TEXT_DOT,
+        ImmutableList.of(),
+        ImmutableMap.of(
+            "1",
+            new Diagnostic(
+                new Range(),
+                "Missing token END-EXEC for the EXEC block",
+                DiagnosticSeverity.Error,
+                ErrorSource.PREPROCESSING.getText()),
+            "2",
+            new Diagnostic(
+                new Range(),
+                "Variable A is not defined",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
+  }
 
-    public static final String TEXT_PARAGRAPH =
-            "       IDENTIFICATION DIVISION.\n"
-                    + "       PROGRAM-ID. TEST1.\n"
-                    + "       DATA DIVISION.\n"
-                    + "       WORKING-STORAGE SECTION.\n"
-                    + "       PROCEDURE DIVISION .\n"
-                    + "           EXEC SQL \n"
-                    + "               SELECT DIAG_CODE FROM DIAG_CODES WHERE COPAY > 100\n"
-                    + "       {|1}{#*A}.\n"
-                    + "               DISPLAY {A|2}.\n";
-    @Test
-    void testEndByParagraph() {
-        UseCaseEngine.runTest(
-                TEXT_PARAGRAPH,
-                ImmutableList.of(),
-                ImmutableMap.of(
-                        "1",
-                        new Diagnostic(
-                                new Range(),
-                                "Missing token END-EXEC for the EXEC block",
-                                DiagnosticSeverity.Error,
-                                ErrorSource.PREPROCESSING.getText()),
-                        "2",
-                        new Diagnostic(
-                                new Range(),
-                                "Variable A is not defined",
-                                DiagnosticSeverity.Error,
-                                ErrorSource.PARSING.getText())));
-    }
+  public static final String TEXT_PARAGRAPH =
+      "       IDENTIFICATION DIVISION.\n"
+          + "       PROGRAM-ID. TEST1.\n"
+          + "       DATA DIVISION.\n"
+          + "       WORKING-STORAGE SECTION.\n"
+          + "       PROCEDURE DIVISION .\n"
+          + "           EXEC SQL \n"
+          + "               SELECT DIAG_CODE FROM DIAG_CODES WHERE COPAY > 100\n"
+          + "       {|1}{#*A}.\n"
+          + "               DISPLAY {A|2}.\n";
+
+  @Test
+  void testEndByParagraph() {
+    UseCaseEngine.runTest(
+        TEXT_PARAGRAPH,
+        ImmutableList.of(),
+        ImmutableMap.of(
+            "1",
+            new Diagnostic(
+                new Range(),
+                "Missing token END-EXEC for the EXEC block",
+                DiagnosticSeverity.Error,
+                ErrorSource.PREPROCESSING.getText()),
+            "2",
+            new Diagnostic(
+                new Range(),
+                "Variable A is not defined",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
+  }
 }

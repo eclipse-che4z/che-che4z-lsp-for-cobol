@@ -53,10 +53,10 @@ class TestLineContinuation2 {
                 null),
             "CBB",
             new Diagnostic(
-                    new Range(),
-                    "The following paragraph is not defined: MISSING-PAR",
-                    Error,
-                    "COBOL Language Support (parsing)",
-                    null)));
+                new Range(),
+                "The following paragraph is not defined: MISSING-PAR",
+                Error,
+                "COBOL Language Support (parsing)",
+                null)));
   }
 }

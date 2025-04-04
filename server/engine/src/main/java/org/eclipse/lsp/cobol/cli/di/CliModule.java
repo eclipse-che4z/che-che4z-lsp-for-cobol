@@ -108,14 +108,14 @@ public class CliModule extends AbstractModule {
     bind(HoverProvider.class).to(VariableHover.class);
     bind(CFASTBuilder.class).to(CFASTBuilderImpl.class);
     bind(CopybookIdentificationService.class)
-            .annotatedWith(Names.named("contentStrategy"))
-            .to(CopybookIdentificationServiceBasedOnContent.class);
+        .annotatedWith(Names.named("contentStrategy"))
+        .to(CopybookIdentificationServiceBasedOnContent.class);
     bind(CopybookIdentificationService.class)
-            .annotatedWith(Names.named("suffixStrategy"))
-            .to(CopybookIdentificationBasedOnExtension.class);
+        .annotatedWith(Names.named("suffixStrategy"))
+        .to(CopybookIdentificationBasedOnExtension.class);
     bind(CopybookIdentificationService.class)
-            .annotatedWith(Names.named("combinedStrategy"))
-            .to(CopybookIdentificationCombinedStrategy.class);
+        .annotatedWith(Names.named("combinedStrategy"))
+        .to(CopybookIdentificationCombinedStrategy.class);
     bind(DialectDiscoveryService.class).to(DialectDiscoveryFolderService.class);
 
     bindConstant().annotatedWith(Names.named("CACHE-MAX-SIZE")).to(1500);
@@ -126,11 +126,11 @@ public class CliModule extends AbstractModule {
     bindConstant().annotatedWith(Names.named("KEEP-ALIVE-TIME-IN-SECONDS")).to(60);
     bindConstant().annotatedWith(Names.named("CORE-POOL-SIZE-FOR-SCHEDULED-POOL")).to(5);
 
-
     bindFormations();
     bindCompletions();
     bindCodeActions();
   }
+
   private void bindFormations() {
     bind(Formations.class);
     Multibinder<Formation> formationBinding = newSetBinder(binder(), Formation.class);
@@ -152,7 +152,7 @@ public class CliModule extends AbstractModule {
   private void bindCodeActions() {
     bind(CodeActions.class);
     Multibinder<CodeActionProvider> codeActionBinding =
-            newSetBinder(binder(), CodeActionProvider.class);
+        newSetBinder(binder(), CodeActionProvider.class);
     codeActionBinding.addBinding().to(FindCopybookCommand.class);
   }
 }

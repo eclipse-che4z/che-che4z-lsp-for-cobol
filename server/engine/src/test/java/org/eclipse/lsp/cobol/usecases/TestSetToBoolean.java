@@ -54,6 +54,6 @@ class TestSetToBoolean {
                 new Range(),
                 "Invalid receiving field type. Expected: Condition name",
                 DiagnosticSeverity.Error,
-                 ErrorSource.PARSING.getText())));
+                ErrorSource.PARSING.getText())));
   }
 }

@@ -41,7 +41,7 @@ class TestIncludeStatement {
   private static final String COPYBOOK1 = "         01 {$*ABC1} PIC 9.";
   private static final String COPYBOOK2 = "         01 {$*ABC2} PIC 9.";
 
-//to check
+  // to check
   @Test
   void test() {
     UseCaseEngine.runTest(

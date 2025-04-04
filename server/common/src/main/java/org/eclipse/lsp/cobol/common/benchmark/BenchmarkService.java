@@ -15,7 +15,6 @@
 package org.eclipse.lsp.cobol.common.benchmark;
 
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 
 import java.util.List;
 
@@ -42,13 +41,12 @@ public interface BenchmarkService {
    */
   List<JsonElement> toJsons();
 
-  /**
-   * Log accumulated timing information.
-   */
+  /** Log accumulated timing information. */
   void logTiming();
 
   /**
    * Ends a benchmark session for an uri
+   *
    * @param programUri document uri
    */
   void endSession(String programUri);

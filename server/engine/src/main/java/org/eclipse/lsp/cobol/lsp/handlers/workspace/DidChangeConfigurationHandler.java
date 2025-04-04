@@ -33,9 +33,7 @@ import org.eclipse.lsp.cobol.service.settings.SettingsService;
 import org.eclipse.lsp.cobol.service.settings.layout.CodeLayoutStore;
 import org.eclipse.lsp4j.DidChangeConfigurationParams;
 
-/**
- * LSP DidChangeConfiguration Handler
- */
+/** LSP DidChangeConfiguration Handler */
 @Slf4j
 public class DidChangeConfigurationHandler {
   private final DisposableLSPStateService disposableLSPStateService;
@@ -50,16 +48,17 @@ public class DidChangeConfigurationHandler {
   private final CopybookService copybookService;
 
   @Inject
-  public DidChangeConfigurationHandler(DisposableLSPStateService disposableLSPStateService,
-                                       SettingsService settingsService,
-                                       CopybookNameService copybookNameService,
-                                       WatcherService watchingService,
-                                       LocaleStore localeStore,
-                                       Keywords keywords,
-                                       MessageService messageService,
-                                       AsyncAnalysisService asyncAnalysisService,
-                                       CodeLayoutStore codeLayoutStore,
-                                       CopybookService copybookService) {
+  public DidChangeConfigurationHandler(
+      DisposableLSPStateService disposableLSPStateService,
+      SettingsService settingsService,
+      CopybookNameService copybookNameService,
+      WatcherService watchingService,
+      LocaleStore localeStore,
+      Keywords keywords,
+      MessageService messageService,
+      AsyncAnalysisService asyncAnalysisService,
+      CodeLayoutStore codeLayoutStore,
+      CopybookService copybookService) {
     this.disposableLSPStateService = disposableLSPStateService;
     this.settingsService = settingsService;
     this.copybookNameService = copybookNameService;
@@ -74,6 +73,7 @@ public class DidChangeConfigurationHandler {
 
   /**
    * Handle didChangeConfiguration LSP event.
+   *
    * @param params DidChangeConfigurationParams
    */
   public void didChangeConfiguration(DidChangeConfigurationParams params) {
@@ -95,8 +95,12 @@ public class DidChangeConfigurationHandler {
             });
 
     settingsService.fetchConfiguration(LOCALE.label).thenAccept(localeStore.notifyLocaleStore());
-    settingsService.fetchConfiguration(LOGGING_LEVEL.label).thenAccept(LogLevelUtils.updateLogLevel());
-    settingsService.fetchConfiguration(COBOL_PROGRAM_LAYOUT.label).thenAccept(codeLayoutStore.updateCodeLayout());
+    settingsService
+        .fetchConfiguration(LOGGING_LEVEL.label)
+        .thenAccept(LogLevelUtils.updateLogLevel());
+    settingsService
+        .fetchConfiguration(COBOL_PROGRAM_LAYOUT.label)
+        .thenAccept(codeLayoutStore.updateCodeLayout());
     copybookNameService.collectLocalCopybookNames();
     keywords.updateStorage();
   }
@@ -110,10 +114,9 @@ public class DidChangeConfigurationHandler {
 
   private void updateWatchers(List<String> newPaths, List<String> existingPaths) {
     watchingService.addWatchers(
-            newPaths.stream().filter(it -> !existingPaths.contains(it)).collect(toList()));
+        newPaths.stream().filter(it -> !existingPaths.contains(it)).collect(toList()));
 
     watchingService.removeWatchers(
-            existingPaths.stream().filter(it -> !newPaths.contains(it)).collect(toList()));
+        existingPaths.stream().filter(it -> !newPaths.contains(it)).collect(toList()));
   }
 }
-

@@ -42,6 +42,9 @@ class TestExtraSymbolsNotCauseErrorOnNextLine {
         ImmutableMap.of(
             "1",
             new Diagnostic(
-                new Range(), MESSAGE, DiagnosticSeverity.Error, ErrorSource.PREPROCESSING.getText())));
+                new Range(),
+                MESSAGE,
+                DiagnosticSeverity.Error,
+                ErrorSource.PREPROCESSING.getText())));
   }
 }

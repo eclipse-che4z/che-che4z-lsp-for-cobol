@@ -21,9 +21,7 @@ import org.eclipse.lsp.cobol.lsp.handlers.server.InitializeHandler;
 import org.eclipse.lsp4j.InitializeParams;
 import org.eclipse.lsp4j.InitializeResult;
 
-/**
- * initialize language server event
- */
+/** initialize language server event */
 public class InitializeQuery implements LspQuery<InitializeResult> {
   private final CompletableFuture<InitializeResult> result;
   private final @NonNull InitializeParams params;

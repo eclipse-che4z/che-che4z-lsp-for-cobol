@@ -68,7 +68,6 @@ public interface WatcherService {
   @NonNull
   List<String> getWatchingFolders();
 
-
   /**
    * Get a list of all workspace associated with this watcher
    *

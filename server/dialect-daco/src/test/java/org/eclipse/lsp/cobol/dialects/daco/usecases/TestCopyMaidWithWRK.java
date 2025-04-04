@@ -68,16 +68,18 @@ class TestCopyMaidWithWRK {
         TEXT,
         ImmutableList.of(
             new CobolText("BHTRGL-XBG", DaCoDialect.NAME, COPYBOOK_CONTENT_PREPROCESSED)),
-        ImmutableMap.of(), ImmutableList.of(), DialectConfigs.getDaCoAnalysisConfig());
+        ImmutableMap.of(),
+        ImmutableList.of(),
+        DialectConfigs.getDaCoAnalysisConfig());
   }
 
   @Test
   void testPureText() {
     UseCaseEngine.runTest(
         TEXT,
-        ImmutableList.of(
-            new CobolText("BHTRGL-XBG", DaCoDialect.NAME, COPYBOOK_CONTENT_PURE)),
-        ImmutableMap.of(), ImmutableList.of(), DialectConfigs.getDaCoAnalysisConfig());
+        ImmutableList.of(new CobolText("BHTRGL-XBG", DaCoDialect.NAME, COPYBOOK_CONTENT_PURE)),
+        ImmutableMap.of(),
+        ImmutableList.of(),
+        DialectConfigs.getDaCoAnalysisConfig());
   }
-
 }

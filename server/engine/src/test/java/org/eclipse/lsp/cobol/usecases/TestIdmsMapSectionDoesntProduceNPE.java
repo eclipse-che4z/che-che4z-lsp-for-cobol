@@ -46,10 +46,7 @@ class TestIdmsMapSectionDoesntProduceNPE {
         ImmutableMap.of(
             "1",
             new Diagnostic(
-                new Range(),
-                "Syntax error on 'MAP'",
-                Error,
-                ErrorSource.PARSING.getText())),
+                new Range(), "Syntax error on 'MAP'", Error, ErrorSource.PARSING.getText())),
         ImmutableList.of(),
         AnalysisConfig.defaultConfig(CopybookProcessingMode.DISABLED));
   }

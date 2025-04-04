@@ -26,11 +26,12 @@ import org.eclipse.lsp.cobol.dialects.daco.utils.Fixtures;
 import org.junit.jupiter.api.Test;
 
 /**
- * IDMS and MAID copybooks should work together. There was an issue with redefine variable for this case.
+ * IDMS and MAID copybooks should work together. There was an issue with redefine variable for this
+ * case.
  */
 public class TestDaCoIdmsMaidRedefineVariable {
   private static final String TEXT =
-            "       IDENTIFICATION DIVISION.\n"
+      "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID. PROGNM.\n"
           + "       DATA   DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
@@ -40,21 +41,22 @@ public class TestDaCoIdmsMaidRedefineVariable {
           + "       PROCEDURE DIVISION.\n"
           + "           EXIT.";
 
-  private static final String IDMSCB = "       01  {$*SUBSCHEMA-CTRL}.\n"
+  private static final String IDMSCB =
+      "       01  {$*SUBSCHEMA-CTRL}.\n"
           + "           03 {$*PROGRAM-NAME} PIC X(8)    VALUE SPACE.\n";
-  private static final String MAIDCB = "       01  {$*L1}.\n"
-                  + "           03 {$*B}.\n"
-                  + "             05 {$*L2} PIC X.\n";
+  private static final String MAIDCB =
+      "       01  {$*L1}.\n" + "           03 {$*B}.\n" + "             05 {$*L2} PIC X.\n";
 
   @Test
   void testDaCoIdmsMaidRedefineVariable() {
     UseCaseEngine.runTestForDiagnostics(
-            TEXT,
-            ImmutableList.of(
-                    new CobolText("IDMSCB", IdmsDialect.NAME, IDMSCB),
-                    new CobolText("MAIDCB", DaCoDialect.NAME, MAIDCB),
-                    Fixtures.subschemaCopy("")
-            ),
-            ImmutableMap.of(), ImmutableList.of(), DialectConfigs.getDaCoAnalysisConfig());
+        TEXT,
+        ImmutableList.of(
+            new CobolText("IDMSCB", IdmsDialect.NAME, IDMSCB),
+            new CobolText("MAIDCB", DaCoDialect.NAME, MAIDCB),
+            Fixtures.subschemaCopy("")),
+        ImmutableMap.of(),
+        ImmutableList.of(),
+        DialectConfigs.getDaCoAnalysisConfig());
   }
 }

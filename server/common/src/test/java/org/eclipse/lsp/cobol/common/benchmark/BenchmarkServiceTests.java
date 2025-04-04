@@ -1,7 +1,6 @@
 package org.eclipse.lsp.cobol.common.benchmark;
 
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;

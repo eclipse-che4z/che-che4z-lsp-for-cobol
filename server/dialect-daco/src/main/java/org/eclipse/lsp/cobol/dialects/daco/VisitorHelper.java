@@ -199,11 +199,10 @@ public class VisitorHelper {
       return Optional.empty();
     }
     return Optional.of(
-            start.toBuilder().range(
-                    new Range(
-                            start.getRange().getStart(),
-                            stop.getRange().getEnd()
-                    )).build());
+        start
+            .toBuilder()
+            .range(new Range(start.getRange().getStart(), stop.getRange().getEnd()))
+            .build());
   }
 
   /**
@@ -254,6 +253,7 @@ public class VisitorHelper {
 
   /**
    * Gets a value from DataOccursClauseContext context
+   *
    * @param ctx a context object
    * @return extracted value
    */
@@ -265,34 +265,34 @@ public class VisitorHelper {
 
   /**
    * Gets value from ValueIsTokenContext context
+   *
    * @param ctx a context object
    * @return extracted value
    */
   public String retrieveValueToken(ValueIsTokenContext ctx) {
     return ctx.valueToken().getText().toUpperCase()
         + Optional.ofNullable(ctx.isAreToken())
-        .map(ParserRuleContext::getText)
-        .map(String::toUpperCase)
-        .map(" "::concat)
-        .orElse("");
+            .map(ParserRuleContext::getText)
+            .map(String::toUpperCase)
+            .map(" "::concat)
+            .orElse("");
   }
 
   /**
    * Builds context name locality based on the name and uri of the document
+   *
    * @param ctx is a parse rule context
    * @param name is a name of the entity
    * @param uri is an uri of the document
    * @return locality object
    */
   public Locality buildNameRangeLocality(ParserRuleContext ctx, String name, String uri) {
-    Range range = new Range(
-        new Position(ctx.start.getLine() - 1, ctx.start.getCharPositionInLine()),
-        new Position(ctx.stop.getLine() - 1, ctx.start.getCharPositionInLine() + name.length()));
+    Range range =
+        new Range(
+            new Position(ctx.start.getLine() - 1, ctx.start.getCharPositionInLine()),
+            new Position(
+                ctx.stop.getLine() - 1, ctx.start.getCharPositionInLine() + name.length()));
 
-    return Locality.builder()
-        .uri(uri)
-        .range(range)
-        .build();
+    return Locality.builder().uri(uri).range(range).build();
   }
-
 }

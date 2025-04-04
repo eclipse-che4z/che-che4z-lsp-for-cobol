@@ -28,7 +28,8 @@ import org.eclipse.lsp.cobol.LangServerBootstrap;
 import static org.slf4j.Logger.ROOT_LOGGER_NAME;
 
 /**
- * The LogConfig class is a {@link Configurator} implementation that configures the logger for different modes (CLI/LSP).
+ * The LogConfig class is a {@link Configurator} implementation that configures the logger for
+ * different modes (CLI/LSP).
  */
 public class LogConfig extends ContextAwareBase implements Configurator {
   @Override
@@ -54,7 +55,8 @@ public class LogConfig extends ContextAwareBase implements Configurator {
     return console;
   }
 
-  private static LayoutWrappingEncoder<ILoggingEvent> createEncoder(LoggerContext loggerContext, TTLLLayout layout) {
+  private static LayoutWrappingEncoder<ILoggingEvent> createEncoder(
+      LoggerContext loggerContext, TTLLLayout layout) {
     LayoutWrappingEncoder<ILoggingEvent> encoder = new LayoutWrappingEncoder<>();
     encoder.setContext(loggerContext);
     encoder.setLayout(layout);

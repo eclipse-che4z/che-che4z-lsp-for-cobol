@@ -24,25 +24,22 @@ import org.junit.jupiter.api.Test;
 
 /**
  * Test CICS UNLOCK command. Documentation link: <a
- * href="https://www.ibm.com/docs/en/cics-ts/6.x?topic=summary-unlock">UNLOCK
- * Command</a>
+ * href="https://www.ibm.com/docs/en/cics-ts/6.x?topic=summary-unlock">UNLOCK Command</a>
  *
  * <p>This class tests all variations of the UNLOCK command found in the link above.
  */
 public class TestCicsUnlock {
   private static final String ALL_OPTIONS =
-          "UNLOCK FILE({$varOne}) TOKEN({$varTwo}) SYSID({$varThree})";
+      "UNLOCK FILE({$varOne}) TOKEN({$varTwo}) SYSID({$varThree})";
 
-  private static final String SOME_OPTIONS_ONE =
-          "UNLOCK TOKEN({$varTwo}) DATASET({$varOne})";
-  private static final String SOME_OPTIONS_TWO =
-          "UNLOCK SYSID({$varThree}) FILE({$varOne})";
+  private static final String SOME_OPTIONS_ONE = "UNLOCK TOKEN({$varTwo}) DATASET({$varOne})";
+  private static final String SOME_OPTIONS_TWO = "UNLOCK SYSID({$varThree}) FILE({$varOne})";
 
-  private static final String BARE_OPTIONS =
-          "UNLOCK DATASET({$varOne})";
+  private static final String BARE_OPTIONS = "UNLOCK DATASET({$varOne})";
 
   private static final String INVALID = "UNLOCK {_SYSID({$varThree})|error_}";
-  private static final String INVALID_FILE = "UNLOCK {FILE|error}({$varOne}) {DATASET|error}({$varOne})";
+  private static final String INVALID_FILE =
+      "UNLOCK {FILE|error}({$varOne}) {DATASET|error}({$varOne})";
 
   @Test
   void testAllOptions() {
@@ -66,23 +63,27 @@ public class TestCicsUnlock {
 
   @Test
   void testInvalid() {
-    CICSTestUtils.errorTest(INVALID, ImmutableMap.of(
+    CICSTestUtils.errorTest(
+        INVALID,
+        ImmutableMap.of(
             "error",
             new Diagnostic(
-                    new Range(),
-                    "Missing required option: FILE",
-                    DiagnosticSeverity.Error,
-                    ErrorSource.PARSING.getText())));
+                new Range(),
+                "Missing required option: FILE",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
   }
 
   @Test
   void testInvalidFile() {
-    CICSTestUtils.errorTest(INVALID_FILE, ImmutableMap.of(
+    CICSTestUtils.errorTest(
+        INVALID_FILE,
+        ImmutableMap.of(
             "error",
             new Diagnostic(
-                    new Range(),
-                    "Exactly one option required, options are mutually exclusive: FILE or DATASET",
-                    DiagnosticSeverity.Error,
-                    ErrorSource.PARSING.getText())));
+                new Range(),
+                "Exactly one option required, options are mutually exclusive: FILE or DATASET",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
   }
 }

@@ -48,40 +48,26 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-/**
- * This test checks the entry points of the {@link TextDocumentService} implementation.
- */
+/** This test checks the entry points of the {@link TextDocumentService} implementation. */
 @ExtendWith(MockitoExtension.class)
 class CobolTextDocumentServiceTest {
 
   public static final String URI = "file://document.cbl";
-  @Mock
-  protected Completions completions;
-  @Mock
-  protected CodeActions actions;
-  @Mock
-  protected CFASTBuilder builder;
-  @Mock
-  protected WatcherService watcherService;
-  @Mock
-  protected AnalysisService analysisService;
-  @Mock
-  protected DocumentModelService documentModelService;
-  @Mock
-  protected Communications communications;
-  @Mock
-  protected Occurrences occurrences;
-  @Mock
-  protected Formations formations;
+  @Mock protected Completions completions;
+  @Mock protected CodeActions actions;
+  @Mock protected CFASTBuilder builder;
+  @Mock protected WatcherService watcherService;
+  @Mock protected AnalysisService analysisService;
+  @Mock protected DocumentModelService documentModelService;
+  @Mock protected Communications communications;
+  @Mock protected Occurrences occurrences;
+  @Mock protected Formations formations;
 
-  @Mock
-  protected Set<HoverProvider> hoverProvider;
+  @Mock protected Set<HoverProvider> hoverProvider;
 
-  @Mock
-  protected SourceUnitGraph documentGraph;
+  @Mock protected SourceUnitGraph documentGraph;
 
-  @Mock
-  LspMessageBroker lspMessageBroker;
+  @Mock LspMessageBroker lspMessageBroker;
 
   private CobolTextDocumentService service;
 
@@ -94,25 +80,50 @@ class CobolTextDocumentServiceTest {
     DisposableLSPStateService disposableLSPStateService = new CobolLSPServerStateService();
     CopybookService copybookService = mock(CopybookService.class);
     SubroutineService subroutineService = mock(SubroutineService.class);
-    AsyncAnalysisService asyncAnalysisService = new AsyncAnalysisService(mock(TrueDialectService.class), documentModelService, analysisService, copybookService, subroutineService, communications);
+    AsyncAnalysisService asyncAnalysisService =
+        new AsyncAnalysisService(
+            mock(TrueDialectService.class),
+            documentModelService,
+            analysisService,
+            copybookService,
+            subroutineService,
+            communications);
 
-    CompletionHandler completionHandler = new CompletionHandler(asyncAnalysisService, completions, documentModelService);
-    FormattingHandler formattingHandler = new FormattingHandler(documentModelService, formations, asyncAnalysisService);
+    CompletionHandler completionHandler =
+        new CompletionHandler(asyncAnalysisService, completions, documentModelService);
+    FormattingHandler formattingHandler =
+        new FormattingHandler(documentModelService, formations, asyncAnalysisService);
 
     CodeActionHandler codeActionHandler = new CodeActionHandler(actions);
-    AnalysisHandler analysisHandler = new AnalysisHandler(asyncAnalysisService, analysisService, builder, communications, documentModelService);
+    AnalysisHandler analysisHandler =
+        new AnalysisHandler(
+            asyncAnalysisService, analysisService, builder, communications, documentModelService);
 
     DidOpenHandler didOpenHandler = new DidOpenHandler(asyncAnalysisService, watcherService);
-    DidCloseHandler didCloseHandler = new DidCloseHandler(disposableLSPStateService, asyncAnalysisService, documentModelService, watcherService, copybookService, documentGraph);
+    DidCloseHandler didCloseHandler =
+        new DidCloseHandler(
+            disposableLSPStateService,
+            asyncAnalysisService,
+            documentModelService,
+            watcherService,
+            copybookService,
+            documentGraph);
     DidChangeHandler didChangeHandler = new DidChangeHandler(asyncAnalysisService, documentGraph);
-    DefinitionHandler definitionHandler = new DefinitionHandler(asyncAnalysisService, documentModelService, occurrences);
-    DocumentSymbolHandler documentSymbolHandler = new DocumentSymbolHandler(asyncAnalysisService, analysisService, documentModelService);
-    DocumentHighlightHandler documentHighlightHandler = new DocumentHighlightHandler(asyncAnalysisService, occurrences, documentModelService);
-    ReferencesHandler referencesHandler = new ReferencesHandler(asyncAnalysisService, occurrences, documentModelService);
-    HoverHandler hoverHandler = new HoverHandler(asyncAnalysisService, hoverProvider, documentModelService, documentGraph);
-    FoldingRangeHandler foldingRangeHandler = new FoldingRangeHandler(documentModelService, asyncAnalysisService, analysisService);
+    DefinitionHandler definitionHandler =
+        new DefinitionHandler(asyncAnalysisService, documentModelService, occurrences);
+    DocumentSymbolHandler documentSymbolHandler =
+        new DocumentSymbolHandler(asyncAnalysisService, analysisService, documentModelService);
+    DocumentHighlightHandler documentHighlightHandler =
+        new DocumentHighlightHandler(asyncAnalysisService, occurrences, documentModelService);
+    ReferencesHandler referencesHandler =
+        new ReferencesHandler(asyncAnalysisService, occurrences, documentModelService);
+    HoverHandler hoverHandler =
+        new HoverHandler(asyncAnalysisService, hoverProvider, documentModelService, documentGraph);
+    FoldingRangeHandler foldingRangeHandler =
+        new FoldingRangeHandler(documentModelService, asyncAnalysisService, analysisService);
 
-    service = new CobolTextDocumentService(
+    service =
+        new CobolTextDocumentService(
             lspMessageBroker,
             completionHandler,
             codeActionHandler,

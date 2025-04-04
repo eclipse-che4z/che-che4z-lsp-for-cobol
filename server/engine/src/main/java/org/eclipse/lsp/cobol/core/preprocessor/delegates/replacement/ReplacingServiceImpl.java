@@ -80,7 +80,8 @@ public class ReplacingServiceImpl implements ReplacingService {
   }
 
   @Override
-  public void applyReplacing(@NonNull ExtendedDocument extendedDocument, @NonNull ReplaceData replaceData) {
+  public void applyReplacing(
+      @NonNull ExtendedDocument extendedDocument, @NonNull ReplaceData replaceData) {
     for (Pair<String, String> replacePattern : replaceData.getReplacePatterns()) {
       replace(extendedDocument, replacePattern, replaceData.getRange(extendedDocument.getUri()));
     }
@@ -121,7 +122,7 @@ public class ReplacingServiceImpl implements ReplacingService {
     return isInvalidLength
         ? Optional.of(
             SyntaxError.syntaxError()
-                    .errorSource(ErrorSource.EXTENDED_DOCUMENT)
+                .errorSource(ErrorSource.EXTENDED_DOCUMENT)
                 .severity(ErrorSeverity.ERROR)
                 .location(locality.toOriginalLocation())
                 .suggestion(
@@ -136,7 +137,7 @@ public class ReplacingServiceImpl implements ReplacingService {
     return isInvalidWordPresent
         ? Optional.of(
             SyntaxError.syntaxError()
-                    .errorSource(ErrorSource.EXTENDED_DOCUMENT)
+                .errorSource(ErrorSource.EXTENDED_DOCUMENT)
                 .severity(ErrorSeverity.ERROR)
                 .suggestion(messageService.getMessage("ReplacingServiceImpl.invalidWord"))
                 .location(locality.toOriginalLocation())
@@ -228,7 +229,10 @@ public class ReplacingServiceImpl implements ReplacingService {
     return trim.replace(", ", " ").replace("; ", " ");
   }
 
-  private void replace(@NonNull ExtendedDocument extendedDocument, @NonNull Pair<String, String> pattern, @NonNull Range scope) {
+  private void replace(
+      @NonNull ExtendedDocument extendedDocument,
+      @NonNull Pair<String, String> pattern,
+      @NonNull Range scope) {
     String text = extendedDocument.toString();
     if (StringUtils.isBlank(text)) {
       return;
@@ -236,9 +240,8 @@ public class ReplacingServiceImpl implements ReplacingService {
     try {
       Matcher matcher = Pattern.compile(pattern.getLeft(), Pattern.CASE_INSENSITIVE).matcher(text);
       while (matcher.find()) {
-        Range range = new Range(
-                getPosition(text, matcher.start()),
-                getPosition(text, matcher.end()));
+        Range range =
+            new Range(getPosition(text, matcher.start()), getPosition(text, matcher.end()));
         if (RangeUtils.isInside(range, scope)) {
           extendedDocument.replace(range, pattern.getRight());
         }

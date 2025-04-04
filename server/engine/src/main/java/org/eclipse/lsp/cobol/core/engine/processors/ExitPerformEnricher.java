@@ -21,21 +21,19 @@ import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
 import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.Processor;
 
-/**
- * Adds an information is EXIT PERFORM statement situated inside or outside inline perform block
- */
+/** Adds an information is EXIT PERFORM statement situated inside or outside inline perform block */
 public class ExitPerformEnricher implements Processor<ExitPerformNode> {
   @Override
   public void accept(ExitPerformNode exitPerformNode, ProcessingContext processingContext) {
-      Node parent = exitPerformNode.getParent();
-      while (!(parent instanceof ProgramNode)) {
-          if (parent instanceof PerformNode) {
-              if (((PerformNode) parent).isInline()) {
-                  exitPerformNode.setInsideInlinePerform(true);
-                  break;
-              }
-          }
-          parent = parent.getParent();
+    Node parent = exitPerformNode.getParent();
+    while (!(parent instanceof ProgramNode)) {
+      if (parent instanceof PerformNode) {
+        if (((PerformNode) parent).isInline()) {
+          exitPerformNode.setInsideInlinePerform(true);
+          break;
+        }
       }
+      parent = parent.getParent();
+    }
   }
 }

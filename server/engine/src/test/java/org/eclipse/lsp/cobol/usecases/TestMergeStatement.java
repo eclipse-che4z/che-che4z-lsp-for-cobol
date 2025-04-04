@@ -25,9 +25,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-/**
- * Test for SORT statement
- */
+/** Test for SORT statement */
 class TestMergeStatement {
   private static final String TEXT =
       "       IDENTIFICATION DIVISION.\r\n"
@@ -66,22 +64,28 @@ class TestMergeStatement {
 
   @Test
   void testOutputNode() {
-    AnalysisResult result = UseCaseEngine.runTest(TEXT + MERGE_OUTPUT, ImmutableList.of(), ImmutableMap.of());
+    AnalysisResult result =
+        UseCaseEngine.runTest(TEXT + MERGE_OUTPUT, ImmutableList.of(), ImmutableMap.of());
 
-    MergeNode mergeNode = result.getRootNode().getDepthFirstStream()
-        .filter(n -> n.getNodeType() == NodeType.MERGE)
-        .map(MergeNode.class::cast)
-        .findFirst()
-        .orElse(null);
+    MergeNode mergeNode =
+        result
+            .getRootNode()
+            .getDepthFirstStream()
+            .filter(n -> n.getNodeType() == NodeType.MERGE)
+            .map(MergeNode.class::cast)
+            .findFirst()
+            .orElse(null);
 
     assertNotNull(mergeNode);
     assertTrue(mergeNode.isAscending());
 
-    OutputNode outputNode = mergeNode.getDepthFirstStream()
-        .filter(s -> s instanceof OutputNode)
-        .map(OutputNode.class::cast)
-        .findFirst()
-        .orElse(null);
+    OutputNode outputNode =
+        mergeNode
+            .getDepthFirstStream()
+            .filter(s -> s instanceof OutputNode)
+            .map(OutputNode.class::cast)
+            .findFirst()
+            .orElse(null);
 
     assertNotNull(outputNode);
     assertEquals("PAR-INPUT", outputNode.getTarget().getName());
@@ -90,5 +94,4 @@ class TestMergeStatement {
     assertEquals("PAR-OUTPUT", outputNode.getThru().getName());
     assertEquals("SORT-SEC", outputNode.getThru().getInSection());
   }
-
 }

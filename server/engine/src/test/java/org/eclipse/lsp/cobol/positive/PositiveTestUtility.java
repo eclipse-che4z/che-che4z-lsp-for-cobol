@@ -353,8 +353,7 @@ public class PositiveTestUtility {
   }
 
   private List<Integer> getCopyBookLineNumber(Node node, Location usage) {
-    return node
-        .getNearestParentByType(NodeType.PROGRAM)
+    return node.getNearestParentByType(NodeType.PROGRAM)
         .map(
             x ->
                 x.getDepthFirstStream()
@@ -362,8 +361,7 @@ public class PositiveTestUtility {
                     .map(CopyNode.class::cast)
                     .filter(n2 -> n2.getUri().equals(usage.getUri()))
                     .collect(toList()))
-        .orElse(emptyList())
-        .stream()
+        .orElse(emptyList()).stream()
         .map(n -> n.getLocality().getRange().getEnd().getLine() + 1)
         .collect(toList());
   }

@@ -21,14 +21,13 @@ import lombok.Value;
 
 import java.util.Optional;
 
-/**
- * Copybook universal identifier
- */
+/** Copybook universal identifier */
 public interface CopybookId {
   String COBOL = "COBOL";
 
   /**
    * Create id from string
+   *
    * @param id a string identifier
    * @return an instance of id
    */
@@ -38,21 +37,20 @@ public interface CopybookId {
 
   /**
    * Create old version of copybook id
+   *
    * @param name name of copybook
    * @param dialect dialect name
    * @param programUri uri of a program that use the copybook
    * @return an instance of id
    */
   static CopybookId create(String name, String dialect, String programUri) {
-    final String id = String.format("%s#%s#%s", name, Optional.ofNullable(dialect)
-            .orElse(COBOL), programUri);
+    final String id =
+        String.format("%s#%s#%s", name, Optional.ofNullable(dialect).orElse(COBOL), programUri);
     return new CopybookIdStringImpl(id);
   }
 }
 
-/**
- * CopybookId implementation with a string id
- */
+/** CopybookId implementation with a string id */
 @Value
 @RequiredArgsConstructor
 @EqualsAndHashCode

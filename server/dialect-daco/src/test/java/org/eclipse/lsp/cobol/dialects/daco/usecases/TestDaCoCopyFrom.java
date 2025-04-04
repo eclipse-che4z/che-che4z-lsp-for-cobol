@@ -24,7 +24,7 @@ import org.junit.jupiter.api.Test;
 /** A test case for COPY FROM statement */
 public class TestDaCoCopyFrom {
   private static final String TEXT =
-            "       IDENTIFICATION DIVISION.\n"
+      "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID.    CPYFROM.\n"
           + "       ENVIRONMENT DIVISION.\n"
           + "       IDMS-CONTROL SECTION.\n"

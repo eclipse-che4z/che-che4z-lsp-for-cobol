@@ -14,15 +14,13 @@
  */
 package org.eclipse.lsp.cobol.common.processor;
 
-/**
- * AST processing phases. The order of them is important.
- */
+/** AST processing phases. The order of them is important. */
 public enum ProcessingPhase {
-    TRANSFORMATION,
-    DEFINITION,
-    POST_DEFINITION,
-    PRE_USAGE,
-    USAGE,
-    ENRICHMENT,
-    VALIDATION
+  TRANSFORMATION,
+  DEFINITION,
+  POST_DEFINITION,
+  PRE_USAGE,
+  USAGE,
+  ENRICHMENT,
+  VALIDATION
 }

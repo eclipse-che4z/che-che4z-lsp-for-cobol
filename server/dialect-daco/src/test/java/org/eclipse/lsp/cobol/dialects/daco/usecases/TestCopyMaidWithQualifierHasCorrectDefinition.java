@@ -52,22 +52,27 @@ class TestCopyMaidWithQualifierHasCorrectDefinition {
   @Test
   void test() {
     CobolText idmsCopybook = Fixtures.subschemaCopy("");
-    ImmutableList<CobolText> copybooks = ImmutableList.of(
+    ImmutableList<CobolText> copybooks =
+        ImmutableList.of(
             new CobolText("BHTRGL", DaCoDialect.NAME, BHTRGL),
             new CobolText("BHTRGL_ABC", DaCoDialect.NAME, BHTRGL_ABC),
-            idmsCopybook
-    );
+            idmsCopybook);
     ImmutableMap<String, Diagnostic> diagnostics = ImmutableMap.of();
     MatcherAssert.assertThat(
-        UseCaseEngine.runTestForDiagnostics(TEXT, copybooks, diagnostics, ImmutableList.of(),
-                        DialectConfigs.getDaCoAnalysisConfig())
+        UseCaseEngine.runTestForDiagnostics(
+                TEXT,
+                copybooks,
+                diagnostics,
+                ImmutableList.of(),
+                DialectConfigs.getDaCoAnalysisConfig())
             .getRootNode()
             .getDepthFirstStream()
             .filter(it -> it.getNodeType() == NodeType.COPY)
             .map(CopyNode.class::cast)
             .map(CopyNode::getUri)
             .collect(toList()),
-        Matchers.containsInAnyOrder(UseCaseUtils.toURI("BHTRGL", "DaCo"),
+        Matchers.containsInAnyOrder(
+            UseCaseUtils.toURI("BHTRGL", "DaCo"),
             UseCaseUtils.toURI("BHTRGL_ABC", "DaCo"),
             UseCaseUtils.toURI(idmsCopybook.getFileName(), IdmsDialect.NAME)));
   }

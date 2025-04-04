@@ -32,37 +32,38 @@ import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_a
 /** Checks CICS Acquire rules for required and invalid options */
 public class CICSAcquireOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
 
-    public static final int RULE_INDEX = RULE_cics_acquire;
+  public static final int RULE_INDEX = RULE_cics_acquire;
 
-    private static final Map<Integer, ErrorSeverity> DUPLICATE_CHECK_OPTIONS =
-            new HashMap<Integer, ErrorSeverity>() {
-                {
-                    put(CICSLexer.ACQUIRE, ErrorSeverity.ERROR);
-                    put(CICSLexer.PROCESS, ErrorSeverity.ERROR);
-                    put(CICSLexer.PROCESSTYPE, ErrorSeverity.ERROR);
-                    put(CICSLexer.ACTIVITYID, ErrorSeverity.ERROR);
-                }
-            };
+  private static final Map<Integer, ErrorSeverity> DUPLICATE_CHECK_OPTIONS =
+      new HashMap<Integer, ErrorSeverity>() {
+        {
+          put(CICSLexer.ACQUIRE, ErrorSeverity.ERROR);
+          put(CICSLexer.PROCESS, ErrorSeverity.ERROR);
+          put(CICSLexer.PROCESSTYPE, ErrorSeverity.ERROR);
+          put(CICSLexer.ACTIVITYID, ErrorSeverity.ERROR);
+        }
+      };
 
-    public CICSAcquireOptionsCheckUtility(
-            DialectProcessingContext context, List<SyntaxError> errors) {
-        super(context, errors, DUPLICATE_CHECK_OPTIONS);
-    }
+  public CICSAcquireOptionsCheckUtility(
+      DialectProcessingContext context, List<SyntaxError> errors) {
+    super(context, errors, DUPLICATE_CHECK_OPTIONS);
+  }
 
-    /**
-     * Entrypoint to check CICS Acquire rule options
-     *
-     * @param ctx ParserRuleContext subclass containing options
-     * @param <E> A subclass of ParserRuleContext
-     */
-    public <E extends ParserRuleContext> void checkOptions(E ctx) {
-        if (ctx.getRuleIndex() == RULE_cics_acquire_process)
-            checkAcquireProcess((CICSParser.Cics_acquire_processContext) ctx);
+  /**
+   * Entrypoint to check CICS Acquire rule options
+   *
+   * @param ctx ParserRuleContext subclass containing options
+   * @param <E> A subclass of ParserRuleContext
+   */
+  public <E extends ParserRuleContext> void checkOptions(E ctx) {
+    if (ctx.getRuleIndex() == RULE_cics_acquire_process)
+      checkAcquireProcess((CICSParser.Cics_acquire_processContext) ctx);
 
-        checkDuplicates(ctx);
-    }
-    private void checkAcquireProcess(CICSParser.Cics_acquire_processContext ctx) {
-        checkHasMandatoryOptions(ctx.PROCESS(), ctx, "PROCESS");
-        checkHasMandatoryOptions(ctx.PROCESSTYPE(), ctx, "PROCESSTYPE");
-    }
+    checkDuplicates(ctx);
+  }
+
+  private void checkAcquireProcess(CICSParser.Cics_acquire_processContext ctx) {
+    checkHasMandatoryOptions(ctx.PROCESS(), ctx, "PROCESS");
+    checkHasMandatoryOptions(ctx.PROCESSTYPE(), ctx, "PROCESSTYPE");
+  }
 }

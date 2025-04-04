@@ -24,9 +24,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 
-/**
- * Test for {@link DialectUtils}
- */
+/** Test for {@link DialectUtils} */
 @ExtendWith(MockitoExtension.class)
 class DialectUtilsTest {
 
@@ -42,5 +40,4 @@ class DialectUtilsTest {
     assertEquals(4, range.getEnd().getLine());
     assertEquals(6, range.getEnd().getCharacter());
   }
-
 }

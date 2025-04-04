@@ -18,7 +18,6 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.eclipse.lsp.cobol.common.model.NodeType;
 import org.eclipse.lsp.cobol.common.model.tree.CodeBlockDefinitionNode;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
@@ -27,23 +26,18 @@ import org.eclipse.lsp4j.Range;
 
 import java.util.*;
 
-import static org.eclipse.lsp.cobol.common.model.tree.Node.hasType;
-
 /** A container for symbol information */
 @RequiredArgsConstructor
 public class SymbolTable {
-  @Getter
-  private final List<CodeBlockDefinitionNode> codeBlocks = new ArrayList<>();
-  @Getter
-  private final Map<String, CodeBlockReference> paragraphMap = new HashMap<>();
-  @Getter
-  private final Map<String, CodeBlockReference> sectionMap = new HashMap<>();
-  @Getter
-  private final Multimap<String, VariableNode> variablesMap = ArrayListMultimap.create();
+  @Getter private final List<CodeBlockDefinitionNode> codeBlocks = new ArrayList<>();
+  @Getter private final Map<String, CodeBlockReference> paragraphMap = new HashMap<>();
+  @Getter private final Map<String, CodeBlockReference> sectionMap = new HashMap<>();
+  @Getter private final Multimap<String, VariableNode> variablesMap = ArrayListMultimap.create();
+
   @Getter
   private final Multimap<String, VariableNode> variablesGlobalsMap = ArrayListMultimap.create();
-  @Getter
-  private final SymbolTable parent;
+
+  @Getter private final SymbolTable parent;
 
   public Collection<VariableNode> getVariables() {
     List<VariableNode> result = new ArrayList<>();
@@ -61,15 +55,21 @@ public class SymbolTable {
 
   /**
    * Generates unique key for the prorgam
+   *
    * @param program node
    * @return string value of a generated key
    */
   public static String generateKey(ProgramNode program) {
     Range range = program.getLocality().getRange();
-    String rangeString = "["
-            + range.getStart().getLine() + ", " + range.getStart().getCharacter()
+    String rangeString =
+        "["
+            + range.getStart().getLine()
+            + ", "
+            + range.getStart().getCharacter()
             + "-"
-            + range.getEnd().getLine() + ", " + range.getEnd().getCharacter()
+            + range.getEnd().getLine()
+            + ", "
+            + range.getEnd().getCharacter()
             + "]";
     return program.getProgramName() + "%" + program.getLocality().getUri() + "%" + rangeString;
   }
@@ -80,12 +80,12 @@ public class SymbolTable {
   }
 
   private static boolean isGlobal(VariableNode node) {
-    if(node.isGlobal()) {
+    if (node.isGlobal()) {
       return true;
     }
     Node parent = node.getParent();
     while (parent != null) {
-      if(parent instanceof VariableNode && ((VariableNode) parent).isGlobal()) {
+      if (parent instanceof VariableNode && ((VariableNode) parent).isGlobal()) {
         return true;
       }
       parent = parent.getParent();

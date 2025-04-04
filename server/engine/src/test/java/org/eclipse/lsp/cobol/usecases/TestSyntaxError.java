@@ -47,7 +47,8 @@ class TestSyntaxError {
         ImmutableList.of(),
         ImmutableMap.of(
             "typo",
-            new Diagnostic(new Range(), DIVISION, DiagnosticSeverity.Error, ErrorSource.PARSING.getText())),
+            new Diagnostic(
+                new Range(), DIVISION, DiagnosticSeverity.Error, ErrorSource.PARSING.getText())),
         CobolLanguageId.COBOL);
   }
 }

@@ -23,43 +23,41 @@ import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
-/**
- * Tests the DaCo ROW Add statement
- */
+/** Tests the DaCo ROW Add statement */
 class TestDaCoTableGetStatement {
 
-    private static final String TEXT =
-            "        IDENTIFICATION DIVISION. \r\n"
-                    + "        PROGRAM-ID. test1. \r\n"
-                    + "        ENVIRONMENT DIVISION.\n"
-                    + "        IDMS-CONTROL SECTION.\n"
-                    + "            PROTOCOL. MODE ABC.\n"
-                    + "            IDMS-RECORDS MANUAL\n"
-                    + "        DATA DIVISION. \r\n"
-                    + "        WORKING-STORAGE SECTION. \r\n"
-                    + "        PROCEDURE DIVISION. \r\n"
-                    + "            GET TABLE ANY GACP. \r\n"
-                    + "            GET TABLE SEQ GACP. \r\n"
-                    // Negative tests
-                    + "            GET TABLE ANY {GA|1}. \r\n"
-                    + "            GET TABLE SEQ {GA|1}. \r\n"
-                    + "            GET TABLE ANY {GAFSD|1}. \r\n"
-                    + "            GET TABLE SEQ {GAFSD|1}. \r\n";
+  private static final String TEXT =
+      "        IDENTIFICATION DIVISION. \r\n"
+          + "        PROGRAM-ID. test1. \r\n"
+          + "        ENVIRONMENT DIVISION.\n"
+          + "        IDMS-CONTROL SECTION.\n"
+          + "            PROTOCOL. MODE ABC.\n"
+          + "            IDMS-RECORDS MANUAL\n"
+          + "        DATA DIVISION. \r\n"
+          + "        WORKING-STORAGE SECTION. \r\n"
+          + "        PROCEDURE DIVISION. \r\n"
+          + "            GET TABLE ANY GACP. \r\n"
+          + "            GET TABLE SEQ GACP. \r\n"
+          // Negative tests
+          + "            GET TABLE ANY {GA|1}. \r\n"
+          + "            GET TABLE SEQ {GA|1}. \r\n"
+          + "            GET TABLE ANY {GAFSD|1}. \r\n"
+          + "            GET TABLE SEQ {GAFSD|1}. \r\n";
 
-    @Test
-    void test() {
+  @Test
+  void test() {
 
-        UseCaseEngine.runTest(
-                TEXT,
-                ImmutableList.of(),
-                ImmutableMap.of(
-                        "1",
-                        new Diagnostic(
-                                new Range(),
-                                "Exact length of table reference must be 4 bytes",
-                                DiagnosticSeverity.Error,
-                                ErrorSource.DIALECT.getText())),
-                ImmutableList.of(),
-                DialectConfigs.getDaCoAnalysisConfig());
-    }
+    UseCaseEngine.runTest(
+        TEXT,
+        ImmutableList.of(),
+        ImmutableMap.of(
+            "1",
+            new Diagnostic(
+                new Range(),
+                "Exact length of table reference must be 4 bytes",
+                DiagnosticSeverity.Error,
+                ErrorSource.DIALECT.getText())),
+        ImmutableList.of(),
+        DialectConfigs.getDaCoAnalysisConfig());
+  }
 }

@@ -31,9 +31,7 @@ import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.processor.ProcessingPhase;
 import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
 
-/**
- * Contains related to analysis state
- */
+/** Contains related to analysis state */
 @Slf4j
 @Getter
 @RequiredArgsConstructor
@@ -50,12 +48,13 @@ public class AnalysisContext implements BenchmarkSessionProvider {
   private @Setter List<Node> dialectNodes = new ArrayList<>();
   private @Setter CopybooksRepository copybooksRepository;
 
-  public AnalysisContext(ExtendedDocument extendedDocument,
-                         AnalysisConfig config,
-                         BenchmarkSession benchmarkSession,
-                         String documentUri,
-                         String text,
-                         CobolLanguageId languageId) {
+  public AnalysisContext(
+      ExtendedDocument extendedDocument,
+      AnalysisConfig config,
+      BenchmarkSession benchmarkSession,
+      String documentUri,
+      String text,
+      CobolLanguageId languageId) {
     this.extendedDocument = extendedDocument;
     this.config = config;
     this.benchmarkSession = benchmarkSession;

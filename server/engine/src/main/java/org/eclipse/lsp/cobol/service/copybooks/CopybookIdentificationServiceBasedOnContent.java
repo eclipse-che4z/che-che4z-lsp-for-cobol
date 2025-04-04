@@ -28,12 +28,16 @@ import java.util.regex.Pattern;
 public class CopybookIdentificationServiceBasedOnContent implements CopybookIdentificationService {
 
   private final List<Pattern> patterns = new LinkedList<>();
+
   public CopybookIdentificationServiceBasedOnContent() {
-    patterns.add(Pattern.compile(
-        "(?i)^(?<sequence>.{0,6})(?<indicator>.?)\\h*(PROGRAM-ID)\\s*\\.?\\s*(?<programName>.{1,30})\\s*\\.?$",
-        Pattern.MULTILINE | Pattern.CASE_INSENSITIVE));
-    patterns.add(Pattern.compile("(?i)^(?<sequence>.{0,6})(?<indicator>.?)\\s*((IDENTIFICATION|ID)\\s+DIVISION)\\s*\\.",
-        Pattern.MULTILINE | Pattern.CASE_INSENSITIVE));
+    patterns.add(
+        Pattern.compile(
+            "(?i)^(?<sequence>.{0,6})(?<indicator>.?)\\h*(PROGRAM-ID)\\s*\\.?\\s*(?<programName>.{1,30})\\s*\\.?$",
+            Pattern.MULTILINE | Pattern.CASE_INSENSITIVE));
+    patterns.add(
+        Pattern.compile(
+            "(?i)^(?<sequence>.{0,6})(?<indicator>.?)\\s*((IDENTIFICATION|ID)\\s+DIVISION)\\s*\\.",
+            Pattern.MULTILINE | Pattern.CASE_INSENSITIVE));
   }
   /**
    * Identifies a copybook based on the content. If the text contains a valid program-id, we detect
@@ -45,7 +49,8 @@ public class CopybookIdentificationServiceBasedOnContent implements CopybookIden
    * @return True if it's a copybook. False otherwise
    */
   @Override
-  public boolean isCopybook(String uri, String text, List<String> config) throws UndeterminedDocumentException {
+  public boolean isCopybook(String uri, String text, List<String> config)
+      throws UndeterminedDocumentException {
     String copybookContent = Optional.ofNullable(text).orElse("");
     for (Pattern pattern : patterns) {
       Matcher matcher = pattern.matcher(copybookContent);

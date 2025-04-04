@@ -23,17 +23,15 @@ import org.eclipse.lsp4j.jsonrpc.services.JsonSegment;
 
 import java.util.concurrent.CompletableFuture;
 
-
-/**
- * This interface describes endpoints for extended API
- */
+/** This interface describes endpoints for extended API */
 @JsonSegment("extended")
 public interface ExtendedApi {
   /**
    * Processes client request
+   *
    * @param json represents the request object in the json format
    * @return Future object with retrieved analysis result
-  */
+   */
   @JsonRequest
   CompletableFuture<ExtendedApiResult> analysis(@NonNull JsonObject json);
 }

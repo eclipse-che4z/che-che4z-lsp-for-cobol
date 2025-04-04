@@ -128,7 +128,7 @@ class TestMarginAB {
 
   /** In TEXT_DECLARATIVES the mistake is on the DECLARATIVE line */
   private static final String TEXT_DECLARATIVES =
-            "       IDENTIFICATION DIVISION.\n"
+      "       IDENTIFICATION DIVISION.\n"
           + "        PROGRAM-ID.    FILETOTEST.\n"
           + "        AUTHOR. SERGIU ILIE.\n"
           + "       DATA DIVISION.\n"
@@ -161,7 +161,8 @@ class TestMarginAB {
 
   @Test
   void checkForAreaB() {
-    AnalysisResult result = UseCaseUtils.analyze(UseCase.builder().text(TEXT_AREA_B).build(), CobolLanguageId.COBOL);
+    AnalysisResult result =
+        UseCaseUtils.analyze(UseCase.builder().text(TEXT_AREA_B).build(), CobolLanguageId.COBOL);
     assertEquals(5, result.getDiagnostics().get(UseCaseUtils.DOCUMENT_URI).size());
   }
 

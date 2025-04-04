@@ -14,12 +14,11 @@
  */
 package org.eclipse.lsp.cobol.common.message;
 
-/**
- * MessageService provider
- */
+/** MessageService provider */
 public interface MessageServiceProvider {
   /**
    * Returns MessageService instance
+   *
    * @return MessageService
    */
   MessageService getMessageService();

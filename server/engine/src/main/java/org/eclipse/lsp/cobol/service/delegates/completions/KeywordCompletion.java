@@ -40,11 +40,11 @@ public class KeywordCompletion implements Completion {
 
   @Override
   public @NonNull Collection<CompletionItem> getCompletionItems(
-          @NonNull String token, @Nullable CobolDocumentModel document) {
+      @NonNull String token, @Nullable CobolDocumentModel document) {
     return keywords.getLabels().stream()
-            .filter(DocumentationUtils.startsWithIgnoreCase(token))
-            .map(this::toKeywordCompletion)
-            .collect(toList());
+        .filter(DocumentationUtils.startsWithIgnoreCase(token))
+        .map(this::toKeywordCompletion)
+        .collect(toList());
   }
 
   private CompletionItem toKeywordCompletion(String name) {

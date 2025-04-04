@@ -30,8 +30,7 @@ public class FunctionNodeProcess implements Processor<ProgramNode> {
 
   @Override
   public void accept(ProgramNode node, ProcessingContext ctx) {
-    if (node.getSubtype() != ProgramSubtype.Function)
-      return;
+    if (node.getSubtype() != ProgramSubtype.Function) return;
     symbolAccumulator.registerFunctionNode(node).ifPresent(e -> ctx.getErrors().add(e));
   }
 }

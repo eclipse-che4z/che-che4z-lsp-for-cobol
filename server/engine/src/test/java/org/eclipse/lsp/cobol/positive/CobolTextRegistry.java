@@ -39,6 +39,7 @@ public interface CobolTextRegistry extends CopybooksMock {
 
   /**
    * Gives the dialect.
+   *
    * @return Dialect string name
    */
   String getDialect();

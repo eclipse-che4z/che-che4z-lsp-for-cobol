@@ -32,14 +32,14 @@ public class CICSSignalOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
   public static final int RULE_INDEX = RULE_cics_signal;
 
   private static final Map<Integer, ErrorSeverity> DUPLICATE_CHECK_OPTIONS =
-          new HashMap<Integer, ErrorSeverity>() {
-            {
-              put(CICSLexer.EVENT, ErrorSeverity.ERROR);
-              put(CICSLexer.FROMCHANNEL, ErrorSeverity.ERROR);
-              put(CICSLexer.FROM, ErrorSeverity.ERROR);
-              put(CICSLexer.FROMLENGTH, ErrorSeverity.ERROR);
-            }
-          };
+      new HashMap<Integer, ErrorSeverity>() {
+        {
+          put(CICSLexer.EVENT, ErrorSeverity.ERROR);
+          put(CICSLexer.FROMCHANNEL, ErrorSeverity.ERROR);
+          put(CICSLexer.FROM, ErrorSeverity.ERROR);
+          put(CICSLexer.FROMLENGTH, ErrorSeverity.ERROR);
+        }
+      };
 
   public CICSSignalOptionsCheckUtility(DialectProcessingContext context, List<SyntaxError> errors) {
     super(context, errors, DUPLICATE_CHECK_OPTIONS);

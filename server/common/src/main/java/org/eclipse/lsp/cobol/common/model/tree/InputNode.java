@@ -22,8 +22,8 @@ import org.eclipse.lsp.cobol.common.model.NodeType;
 import org.eclipse.lsp.cobol.common.model.ProcedureName;
 
 /**
- * The class represents SORT statement in COBOL.
- * <a href="https://www.ibm.com/docs/en/cobol-zos/6.4?topic=statements-sort-statement">...</a>
+ * The class represents SORT statement in COBOL. <a
+ * href="https://www.ibm.com/docs/en/cobol-zos/6.4?topic=statements-sort-statement">...</a>
  */
 @ToString(callSuper = true)
 @Getter
@@ -31,6 +31,7 @@ import org.eclipse.lsp.cobol.common.model.ProcedureName;
 public class InputNode extends Node {
   ProcedureName target;
   ProcedureName thru;
+
   public InputNode(Locality location) {
     super(location, NodeType.SORT_INPUT);
   }

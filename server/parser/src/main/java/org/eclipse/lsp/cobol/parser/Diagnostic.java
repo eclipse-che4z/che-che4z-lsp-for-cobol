@@ -19,11 +19,9 @@ package org.eclipse.lsp.cobol.parser;
 import lombok.Data;
 import org.eclipse.lsp4j.Range;
 
-/**
- * Diagnostic
- */
+/** Diagnostic */
 @Data
 public class Diagnostic {
-    private final Range range;
-    private final String message;
+  private final Range range;
+  private final String message;
 }

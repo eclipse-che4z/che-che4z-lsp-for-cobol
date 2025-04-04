@@ -31,7 +31,6 @@ import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
 import java.util.List;
 
 import static java.util.stream.Collectors.toList;
@@ -129,7 +128,8 @@ public abstract class VariableNode extends Node implements DefinedAndUsedStructu
   public void extendLocality(Position newEndPosition) {
     if (RangeUtils.isBefore(locality.getRange().getEnd(), newEndPosition))
       locality =
-          locality.toBuilder()
+          locality
+              .toBuilder()
               .range(new Range(locality.getRange().getStart(), newEndPosition))
               .build();
   }

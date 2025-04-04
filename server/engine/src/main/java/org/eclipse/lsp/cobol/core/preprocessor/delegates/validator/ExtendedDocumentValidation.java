@@ -20,9 +20,7 @@ import org.eclipse.lsp.cobol.core.preprocessor.CobolLine;
 
 import java.util.List;
 
-/**
- * Performs validation on the transformed cobol lines
- */
+/** Performs validation on the transformed cobol lines */
 public interface ExtendedDocumentValidation {
   /**
    * Perform validation on {@link CobolLine}.

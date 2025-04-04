@@ -115,8 +115,7 @@ class ErrorMessageHelper {
 
   private String getExpectedText(Parser recognizer, IntervalSet interval) {
     final String newMessage =
-        buildErrorMessage(
-            removeIdentifierTokens(collectErrorTokens(recognizer, interval)));
+        buildErrorMessage(removeIdentifierTokens(collectErrorTokens(recognizer, interval)));
     return interval.size() > 1 ? String.format("{%s}", newMessage) : newMessage;
   }
 

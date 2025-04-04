@@ -32,15 +32,11 @@ import java.util.concurrent.CompletableFuture;
 @Singleton
 public class CliClientProvider implements Provider<CobolLanguageClient> {
   private final CliClient client = new CliClient();
-  @Setter
-  private List<File> cpyPaths;
-  @Setter
-  private List<String> cpyExt;
+  @Setter private List<File> cpyPaths;
+  @Setter private List<String> cpyExt;
 
-  /**
-   * The CliClientProvider class is a provider for the CobolLanguageClient interface.
-   */
-  public CliClientProvider() { }
+  /** The CliClientProvider class is a provider for the CobolLanguageClient interface. */
+  public CliClientProvider() {}
 
   @Override
   public CobolLanguageClient get() {
@@ -65,7 +61,8 @@ public class CliClientProvider implements Provider<CobolLanguageClient> {
     }
 
     @Override
-    public CompletableFuture<MessageActionItem> showMessageRequest(ShowMessageRequestParams requestParams) {
+    public CompletableFuture<MessageActionItem> showMessageRequest(
+        ShowMessageRequestParams requestParams) {
       throw new UnsupportedOperationException();
     }
 
@@ -80,11 +77,14 @@ public class CliClientProvider implements Provider<CobolLanguageClient> {
     }
 
     @Override
-    public CompletableFuture<String> resolveCopybook(String cobolFileUri, String copybookName, String dialectType) {
+    public CompletableFuture<String> resolveCopybook(
+        String cobolFileUri, String copybookName, String dialectType) {
       for (File sp : cpyPaths) {
         for (String ext : cpyExt) {
-          String copybookFileName = copybookName + (ext.isEmpty() || ext.startsWith(".") ? ext : "." + ext);
-          Path cpy = sp.isAbsolute()
+          String copybookFileName =
+              copybookName + (ext.isEmpty() || ext.startsWith(".") ? ext : "." + ext);
+          Path cpy =
+              sp.isAbsolute()
                   ? Paths.get(sp.toString(), copybookFileName)
                   : makeRelativePath(cobolFileUri, sp.toString(), copybookFileName);
 

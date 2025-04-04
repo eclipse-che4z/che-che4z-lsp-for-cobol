@@ -39,8 +39,7 @@ class TestReplacingAppliedForCopybookNames {
           + "8          MOVE 0 TO {$ABC-ID}.\n"
           + "9          GOBACK. ";
 
-  private static final String REPL =
-      "       05 {$*ABC-ID}.\n" + "       COPY {~CPYNAME^STRUCT1}.";
+  private static final String REPL = "       05 {$*ABC-ID}.\n" + "       COPY {~CPYNAME^STRUCT1}.";
   private static final String REPL_NAME = "REPL";
 
   private static final String STRUCT1 = "       10 {$*TAG-STRUCT1} PIC 9.";

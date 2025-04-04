@@ -19,12 +19,14 @@ import org.junit.jupiter.api.Test;
 import static org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-/** This test check getCopybookProcessingMode function of the {@link org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode}. */
+/**
+ * This test check getCopybookProcessingMode function of the {@link
+ * org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode}.
+ */
 class CopybookProcessingModeTest {
   private static final String EXT_SRC_DOC_URI = "file:///c:/.c4z/.extsrcs/EXTSRC.cbl";
   private static final String WRONG_EXT_SRC_DOC_URI = "file:///c:/.extsrcs/EXTSRC.cbl";
-  private static final String FAKE_EXT_SRC_DOC_URI =
-      "file:///c:/workspace/c4z.extsrcs.EXTSRC.cbl";
+  private static final String FAKE_EXT_SRC_DOC_URI = "file:///c:/workspace/c4z.extsrcs.EXTSRC.cbl";
   private static final String DOC_URI = "file:///c:/EXTSRC.cbl";
 
   /**

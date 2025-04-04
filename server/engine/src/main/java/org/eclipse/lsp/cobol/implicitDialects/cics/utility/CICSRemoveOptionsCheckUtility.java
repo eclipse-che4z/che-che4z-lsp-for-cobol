@@ -32,12 +32,12 @@ public class CICSRemoveOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
   public static final int RULE_INDEX = RULE_cics_remove;
 
   private static final Map<Integer, ErrorSeverity> DUPLICATE_CHECK_OPTIONS =
-          new HashMap<Integer, ErrorSeverity>() {
-            {
-              put(CICSLexer.SUBEVENT, ErrorSeverity.ERROR);
-              put(CICSLexer.EVENT, ErrorSeverity.ERROR);
-            }
-          };
+      new HashMap<Integer, ErrorSeverity>() {
+        {
+          put(CICSLexer.SUBEVENT, ErrorSeverity.ERROR);
+          put(CICSLexer.EVENT, ErrorSeverity.ERROR);
+        }
+      };
 
   public CICSRemoveOptionsCheckUtility(DialectProcessingContext context, List<SyntaxError> errors) {
     super(context, errors, DUPLICATE_CHECK_OPTIONS);

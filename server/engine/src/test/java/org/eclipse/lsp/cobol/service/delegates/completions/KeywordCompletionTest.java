@@ -104,7 +104,8 @@ class KeywordCompletionTest {
     int baseKeywordsCount = keywords.getDataMap(ImmutableList.of()).size();
     assertEquals(baseKeywordsCount + 1, keywords.getDataMap(ImmutableList.of("IDMS")).size());
     assertEquals(baseKeywordsCount + 2, keywords.getDataMap(ImmutableList.of("DaCo")).size());
-    assertEquals(baseKeywordsCount + 2 + 1, keywords.getDataMap(ImmutableList.of("DaCo", "IDMS")).size());
+    assertEquals(
+        baseKeywordsCount + 2 + 1, keywords.getDataMap(ImmutableList.of("DaCo", "IDMS")).size());
   }
 
   @Test

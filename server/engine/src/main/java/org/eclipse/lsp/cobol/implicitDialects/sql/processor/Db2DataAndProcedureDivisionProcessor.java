@@ -29,9 +29,7 @@ import org.eclipse.lsp.cobol.implicitDialects.sql.node.Db2DataAndProcedureDivisi
 
 import java.util.Optional;
 
-/**
- * Validate Db2DataAndProcedureDivisionNode
- */
+/** Validate Db2DataAndProcedureDivisionNode */
 @AllArgsConstructor
 public class Db2DataAndProcedureDivisionProcessor
     implements Processor<Db2DataAndProcedureDivisionNode> {

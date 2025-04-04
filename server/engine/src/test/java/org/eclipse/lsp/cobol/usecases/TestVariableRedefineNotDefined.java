@@ -24,7 +24,10 @@ import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-/** This test checks that redefined variable for not defined variable causes a "not defined variable" error */
+/**
+ * This test checks that redefined variable for not defined variable causes a "not defined variable"
+ * error
+ */
 class TestVariableRedefineNotDefined {
   private static final String TEXT =
       "       IDENTIFICATION DIVISION.\n"
@@ -47,6 +50,6 @@ class TestVariableRedefineNotDefined {
                 new Range(),
                 "Variable WS-DATA-A is not defined",
                 DiagnosticSeverity.Error,
-                 ErrorSource.PARSING.getText())));
+                ErrorSource.PARSING.getText())));
   }
 }

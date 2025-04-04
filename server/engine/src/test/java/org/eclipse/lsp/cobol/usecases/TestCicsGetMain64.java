@@ -26,24 +26,24 @@ import java.util.Map;
 
 /**
  * Test CICS GETMAIN64 command. Documentation link: <a
- * href="https://www.ibm.com/docs/en/cics-ts/6.x?topic=summary-getmain64">GETMAIN64
- * Command</a>
+ * href="https://www.ibm.com/docs/en/cics-ts/6.x?topic=summary-getmain64">GETMAIN64 Command</a>
  *
  * <p>This class tests all variations of the GETMAIN64 command found in the link above.
  */
 public class TestCicsGetMain64 {
-    private static final String INVALID_ONE = "{GETMAIN64|errorOne} SET({$varTwo}) FLENGTH({$varThree}) SHARED";
+  private static final String INVALID_ONE =
+      "{GETMAIN64|errorOne} SET({$varTwo}) FLENGTH({$varThree}) SHARED";
 
-    @Test
-    void testInvalidOne() {
-        Map<String, Diagnostic> expectedDiagnostic =
-                ImmutableMap.of(
-                        "errorOne",
-                        new Diagnostic(
-                                new Range(),
-                                "Invalid option provided: GETMAIN64 is only available in Assembly",
-                                DiagnosticSeverity.Error,
-                                ErrorSource.PARSING.getText()));
-        CICSTestUtils.errorTest(INVALID_ONE, expectedDiagnostic);
-    }
+  @Test
+  void testInvalidOne() {
+    Map<String, Diagnostic> expectedDiagnostic =
+        ImmutableMap.of(
+            "errorOne",
+            new Diagnostic(
+                new Range(),
+                "Invalid option provided: GETMAIN64 is only available in Assembly",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()));
+    CICSTestUtils.errorTest(INVALID_ONE, expectedDiagnostic);
+  }
 }

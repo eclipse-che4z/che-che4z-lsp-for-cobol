@@ -25,8 +25,8 @@ import java.util.stream.Stream;
 /**
  * Test the usage of intrinsic COBOL function calls.
  *
- * Note: This test just checks the allowed
- * function names and is not intended for actual argument check.
+ * <p>Note: This test just checks the allowed function names and is not intended for actual argument
+ * check.
  */
 public class TestIntrinsicFunctionCall {
   private static final String PREFIX =

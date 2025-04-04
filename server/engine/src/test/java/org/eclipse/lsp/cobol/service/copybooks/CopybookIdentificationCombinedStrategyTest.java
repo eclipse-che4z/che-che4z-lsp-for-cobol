@@ -24,9 +24,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
-/**
- * Test for {@link CopybookIdentificationCombinedStrategy}
- */
+/** Test for {@link CopybookIdentificationCombinedStrategy} */
 class CopybookIdentificationCombinedStrategyTest {
   private CopybookIdentificationService suffixStrategy;
   private CopybookIdentificationService contentStrategy;
@@ -59,5 +57,4 @@ class CopybookIdentificationCombinedStrategyTest {
     verify(contentStrategy, times(0)).isCopybook(anyString(), any(), any());
     verify(suffixStrategy, times(1)).isCopybook(anyString(), any(), any());
   }
-
 }

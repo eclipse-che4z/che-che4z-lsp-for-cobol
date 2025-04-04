@@ -27,8 +27,8 @@ import java.util.Map;
 
 /** A test case for DACO-CONTROL section statements */
 class TestDaCoControlSection {
-    private static final String TEXT =
-    "        IDENTIFICATION DIVISION. \r\n"
+  private static final String TEXT =
+      "        IDENTIFICATION DIVISION. \r\n"
           + "        PROGRAM-ID. test1. \r\n"
           + "        ENVIRONMENT DIVISION.\r\n"
           + "        DACO-CONTROL SECTION.\r\n"
@@ -47,8 +47,8 @@ class TestDaCoControlSection {
           + "        PROCEDURE DIVISION. \r\n"
           + "            DISPLAY {$TBLLAY-XW4}. \r\n";
 
-    @Test
-    void test() {
+  @Test
+  void test() {
 
     Map<String, Diagnostic> diagnosticMap = new HashMap<>();
     diagnosticMap.put(
@@ -59,6 +59,10 @@ class TestDaCoControlSection {
             DiagnosticSeverity.Error,
             ErrorSource.PARSING.getText()));
     UseCaseEngine.runTest(
-        TEXT, ImmutableList.of(), diagnosticMap, ImmutableList.of(), DialectConfigs.getDaCoAnalysisConfig());
-    }
+        TEXT,
+        ImmutableList.of(),
+        diagnosticMap,
+        ImmutableList.of(),
+        DialectConfigs.getDaCoAnalysisConfig());
+  }
 }

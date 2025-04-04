@@ -19,11 +19,10 @@ import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.junit.jupiter.api.Test;
 
-/**
- * CBL + CALL USING parsing issue.
- */
+/** CBL + CALL USING parsing issue. */
 class TestCblParsing {
-  private static final String TEXT = "       CBL TRUNC(BIN)\n"
+  private static final String TEXT =
+      "       CBL TRUNC(BIN)\n"
           + "       ID DIVISION.\n"
           + "       PROGRAM-ID. TESTPROG.\n"
           + "       DATA DIVISION.\n"

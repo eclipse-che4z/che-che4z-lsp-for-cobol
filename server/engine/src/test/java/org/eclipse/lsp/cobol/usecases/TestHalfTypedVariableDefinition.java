@@ -44,18 +44,17 @@ class TestHalfTypedVariableDefinition {
                 "A period was assumed before \"(\".",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()),
-           "2",
+            "2",
             new Diagnostic(
                 new Range(),
-               "No data definition entry found for rename",
+                "No data definition entry found for rename",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()),
             "3",
             new Diagnostic(
                 new Range(),
-               "Unexpected end of file",
+                "Unexpected end of file",
                 DiagnosticSeverity.Error,
-                ErrorSource.PARSING.getText())
-        ));
+                ErrorSource.PARSING.getText())));
   }
 }

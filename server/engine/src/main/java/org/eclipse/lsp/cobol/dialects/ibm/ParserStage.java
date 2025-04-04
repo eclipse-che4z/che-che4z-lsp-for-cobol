@@ -39,25 +39,30 @@ import org.eclipse.lsp4j.Location;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/**
- * Parser stage
- */
+/** Parser stage */
 @RequiredArgsConstructor
 public class ParserStage implements Stage<AnalysisContext, ParserStageResult, DialectOutcome> {
   private final MessageService messageService;
   private final ParseTreeListener treeListener;
 
   @Override
-  public StageResult<ParserStageResult> run(AnalysisContext context, StageResult<DialectOutcome> prevStageResult) {
+  public StageResult<ParserStageResult> run(
+      AnalysisContext context, StageResult<DialectOutcome> prevStageResult) {
     // Run parser;
-    context.setDialectNodes(ImmutableList.<Node>builder()
+    context.setDialectNodes(
+        ImmutableList.<Node>builder()
             .addAll(context.getDialectNodes())
             .addAll(prevStageResult.getData().getDialectNodes())
             .build());
-    ParserListener listener = new ParserListener(context.getExtendedDocument(), context.getCopybooksRepository());
+    ParserListener listener =
+        new ParserListener(context.getExtendedDocument(), context.getCopybooksRepository());
     DefaultErrorStrategy errorStrategy = new CobolErrorStrategy(messageService);
-    AstBuilder parser = new AntlrCobolParser(CharStreams.fromString(context.getExtendedDocument().toString()),
-            listener, errorStrategy, treeListener);
+    AstBuilder parser =
+        new AntlrCobolParser(
+            CharStreams.fromString(context.getExtendedDocument().toString()),
+            listener,
+            errorStrategy,
+            treeListener);
     CobolParser.StartRuleContext tree = parser.runParser();
     context.getAccumulatedErrors().addAll(listener.getErrors());
     context.getAccumulatedErrors().addAll(getParsingError(context, parser));
@@ -65,16 +70,20 @@ public class ParserStage implements Stage<AnalysisContext, ParserStageResult, Di
   }
 
   private List<SyntaxError> getParsingError(AnalysisContext context, AstBuilder parser) {
-    return parser.diagnostics().stream().map(diagnostic -> {
-      Location location = context.getExtendedDocument().mapLocation(diagnostic.getRange());
-      String copybookId = context.getCopybooksRepository().getCopybookIdByUri(location.getUri());
-      return SyntaxError.syntaxError()
-              .errorSource(ErrorSource.PARSING)
-              .severity(ErrorSeverity.ERROR)
-              .location(new OriginalLocation(location, copybookId))
-              .suggestion(diagnostic.getMessage())
-              .build();
-    }).collect(Collectors.toList());
+    return parser.diagnostics().stream()
+        .map(
+            diagnostic -> {
+              Location location = context.getExtendedDocument().mapLocation(diagnostic.getRange());
+              String copybookId =
+                  context.getCopybooksRepository().getCopybookIdByUri(location.getUri());
+              return SyntaxError.syntaxError()
+                  .errorSource(ErrorSource.PARSING)
+                  .severity(ErrorSeverity.ERROR)
+                  .location(new OriginalLocation(location, copybookId))
+                  .suggestion(diagnostic.getMessage())
+                  .build();
+            })
+        .collect(Collectors.toList());
   }
 
   @Override

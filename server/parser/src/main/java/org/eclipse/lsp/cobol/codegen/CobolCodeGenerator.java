@@ -22,9 +22,7 @@ import org.eclipse.lsp.cobol.codegen.snippets.SnippetGenerator;
 
 import java.util.Random;
 
-/**
- * COBOL Code Generator.
- */
+/** COBOL Code Generator. */
 public class CobolCodeGenerator {
   private static final Random RANDOM = new Random();
   private final GeneratorSettings settings;
@@ -60,7 +58,7 @@ public class CobolCodeGenerator {
     StringBuilder sb = new StringBuilder();
     sb.append(generateIdentificationDivision());
     sb.append(generateDataDivision());
-// TODO:    sb.append(generatEenvironmentDivision());
+    // TODO:    sb.append(generatEenvironmentDivision());
     sb.append(generateProcedureDivision());
     return sb.toString();
   }
@@ -82,7 +80,7 @@ public class CobolCodeGenerator {
       sb.append(indent());
       SnippetGenerator snippetGenerator = selectNextStatement();
       if (!(snippetGenerator instanceof SectionGenerator
-              || snippetGenerator instanceof ParagraphGenerator)) {
+          || snippetGenerator instanceof ParagraphGenerator)) {
         sb.append("    ");
       }
       sb.append(snippetGenerator.generate(ctx));
@@ -95,7 +93,6 @@ public class CobolCodeGenerator {
   private static SnippetGenerator selectNextStatement() {
     return GeneratorSettings.pickStatement(RANDOM.nextDouble());
   }
-
 
   private String generateDataDivision() {
     return "";

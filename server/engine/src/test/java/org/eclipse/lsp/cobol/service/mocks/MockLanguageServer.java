@@ -55,5 +55,4 @@ public class MockLanguageServer implements LanguageServer {
   public WorkspaceService getWorkspaceService() {
     return null;
   }
-
 }

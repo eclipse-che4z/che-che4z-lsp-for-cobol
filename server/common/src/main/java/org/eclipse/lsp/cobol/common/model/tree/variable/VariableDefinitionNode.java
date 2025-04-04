@@ -15,7 +15,6 @@
 package org.eclipse.lsp.cobol.common.model.tree.variable;
 
 import com.google.common.collect.ImmutableList;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -115,7 +114,8 @@ public final class VariableDefinitionNode extends Node {
   private static SyntaxError checkClauseIsSingle(
       VariableNode variableNode, Supplier<List<?>> clausesGetter, String clauseName) {
     if (clausesGetter.get().size() > 1)
-      return variableNode.getError(MessageTemplate.of(VariableConstants.TOO_MANY_CLAUSES_MSG, clauseName));
+      return variableNode.getError(
+          MessageTemplate.of(VariableConstants.TOO_MANY_CLAUSES_MSG, clauseName));
     return null;
   }
 
@@ -306,6 +306,7 @@ public final class VariableDefinitionNode extends Node {
 
   /**
    * Returns file Description text for the FD / SD variable
+   *
    * @return String
    */
   public String getFileDescriptor() {
@@ -316,6 +317,7 @@ public final class VariableDefinitionNode extends Node {
 
   /**
    * Returns file control text for a FD / SD variable.
+   *
    * @return String
    */
   public String getFileControlClause() {
@@ -326,6 +328,7 @@ public final class VariableDefinitionNode extends Node {
 
   /**
    * Returns True if variable is SD, false otherwise
+   *
    * @return boolean
    */
   public boolean isSortDescription() {

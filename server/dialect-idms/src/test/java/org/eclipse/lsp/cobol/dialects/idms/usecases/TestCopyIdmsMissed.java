@@ -25,30 +25,35 @@ import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
-/**
- * Test for missed IDMS copybook functionality
- */
+/** Test for missed IDMS copybook functionality */
 class TestCopyIdmsMissed {
 
-  private static final String TEXT = "        IDENTIFICATION DIVISION. \n"
-      + "        PROGRAM-ID. test1.\n"
-      + "        ENVIRONMENT DIVISION.\n"
-      + "        IDMS-CONTROL SECTION.\n"
-      + "            PROTOCOL. MODE ABC.\n"
-      + "            IDMS-RECORDS MANUAL\n"
-      + "        DATA DIVISION.\n"
-      + "       WORKING-STORAGE SECTION.\n"
-      + "       01 COPY IDMS {~COPY1!IDMS|1}.\n"
-      + "       PROCEDURE DIVISION.\n";
-
+  private static final String TEXT =
+      "        IDENTIFICATION DIVISION. \n"
+          + "        PROGRAM-ID. test1.\n"
+          + "        ENVIRONMENT DIVISION.\n"
+          + "        IDMS-CONTROL SECTION.\n"
+          + "            PROTOCOL. MODE ABC.\n"
+          + "            IDMS-RECORDS MANUAL\n"
+          + "        DATA DIVISION.\n"
+          + "       WORKING-STORAGE SECTION.\n"
+          + "       01 COPY IDMS {~COPY1!IDMS|1}.\n"
+          + "       PROCEDURE DIVISION.\n";
 
   @Test
   void test() {
     UseCaseEngine.runTestForDiagnostics(
-        TEXT, ImmutableList.of(),
-        ImmutableMap.of("1", new Diagnostic(new Range(), "COPY1: Copybook not found",
-            DiagnosticSeverity.Error, ErrorSource.DIALECT.getText(), "missing copybook")),
-        ImmutableList.of(), DialectConfigs.getIDMSAnalysisConfig());
+        TEXT,
+        ImmutableList.of(),
+        ImmutableMap.of(
+            "1",
+            new Diagnostic(
+                new Range(),
+                "COPY1: Copybook not found",
+                DiagnosticSeverity.Error,
+                ErrorSource.DIALECT.getText(),
+                "missing copybook")),
+        ImmutableList.of(),
+        DialectConfigs.getIDMSAnalysisConfig());
   }
-
 }

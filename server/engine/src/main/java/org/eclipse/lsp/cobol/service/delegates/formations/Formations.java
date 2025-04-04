@@ -43,16 +43,17 @@ public class Formations {
   public List<TextEdit> format(CobolDocumentModel model) {
     List<String> settings;
     try {
-      settings = settingsService.fetchConfiguration(FORMATTING)
-          .get()
-          .stream()
-          .map(Object::toString)
-          .collect(Collectors.toList());
+      settings =
+          settingsService.fetchConfiguration(FORMATTING).get().stream()
+              .map(Object::toString)
+              .collect(Collectors.toList());
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
 
-    return Optional.ofNullable(model).map(applyFormatting(settings)).orElse(Collections.emptyList());
+    return Optional.ofNullable(model)
+        .map(applyFormatting(settings))
+        .orElse(Collections.emptyList());
   }
 
   private Function<CobolDocumentModel, List<TextEdit>> applyFormatting(List<String> settings) {

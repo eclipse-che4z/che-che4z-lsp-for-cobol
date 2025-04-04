@@ -26,9 +26,7 @@ import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
-/**
- * Test DaCo dialect mapping
- */
+/** Test DaCo dialect mapping */
 public class TestDaCoMapping {
   private static final String TEXT =
       "       IDENTIFICATION DIVISION.\n"
@@ -47,23 +45,25 @@ public class TestDaCoMapping {
           + "       PROCEDURE DIVISION.\n"
           + "           WRITE REPORT TABCD FROM {$VAR} LENGTH {79|1} AFTER PAGE\n";
 
-  private static final String TEXT_MISSING_COPY = "       IDENTIFICATION DIVISION.\n"
-      + "       PROGRAM-ID.    BMVV171M.\n"
-      + "       ENVIRONMENT  DIVISION.\n"
-      + "       IDMS-CONTROL SECTION.\n"
-      + "       PROTOCOL.    MODE IS BATCH DEBUG\n"
-      + "                    IDMS-RECORDS MANUAL.\n"
-      + "       DATA   DIVISION.\n"
-      + "      *     COMMENTED LINE \n"
-      + "      -  \n"
-      + "       WORKING-STORAGE SECTION.\n"
-      + "       01  COPY IDMS {~SUBSCHEMA-NAMES!IDMS}.\n"
-      + "       LINKAGE SECTION.\n"
-      + "       01  COPY MAID {~LDVV171M!DaCo|1} INP.";
+  private static final String TEXT_MISSING_COPY =
+      "       IDENTIFICATION DIVISION.\n"
+          + "       PROGRAM-ID.    BMVV171M.\n"
+          + "       ENVIRONMENT  DIVISION.\n"
+          + "       IDMS-CONTROL SECTION.\n"
+          + "       PROTOCOL.    MODE IS BATCH DEBUG\n"
+          + "                    IDMS-RECORDS MANUAL.\n"
+          + "       DATA   DIVISION.\n"
+          + "      *     COMMENTED LINE \n"
+          + "      -  \n"
+          + "       WORKING-STORAGE SECTION.\n"
+          + "       01  COPY IDMS {~SUBSCHEMA-NAMES!IDMS}.\n"
+          + "       LINKAGE SECTION.\n"
+          + "       01  COPY MAID {~LDVV171M!DaCo|1} INP.";
 
-  private static final String COPY = "      *   * This copybook remains empty,\n"
-      + "      *   * because the content is of no interest while editing COBOL\n"
-      + "       01  FILLER                      PIC X(0).\n";
+  private static final String COPY =
+      "      *   * This copybook remains empty,\n"
+          + "      *   * because the content is of no interest while editing COBOL\n"
+          + "       01  FILLER                      PIC X(0).\n";
 
   @Test
   void test() {
@@ -86,10 +86,15 @@ public class TestDaCoMapping {
     UseCaseEngine.runTestForDiagnostics(
         TEXT_MISSING_COPY,
         ImmutableList.of(new CobolText("SUBSCHEMA-NAMES", IdmsDialect.NAME, COPY, "url", true)),
-        ImmutableMap.of("1", new Diagnostic(new Range(), "LDVV171M_INP: Copybook not found",
-            DiagnosticSeverity.Error, ErrorSource.DIALECT.getText(), "missing copybook")),
+        ImmutableMap.of(
+            "1",
+            new Diagnostic(
+                new Range(),
+                "LDVV171M_INP: Copybook not found",
+                DiagnosticSeverity.Error,
+                ErrorSource.DIALECT.getText(),
+                "missing copybook")),
         ImmutableList.of(),
         DialectConfigs.getDaCoAnalysisConfig());
   }
-
 }

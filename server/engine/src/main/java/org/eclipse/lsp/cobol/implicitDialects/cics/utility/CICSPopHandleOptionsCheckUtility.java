@@ -31,13 +31,14 @@ public class CICSPopHandleOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
   public static final int RULE_INDEX = RULE_cics_pop;
 
   private static final Map<Integer, ErrorSeverity> DUPLICATE_CHECK_OPTIONS =
-          new HashMap<Integer, ErrorSeverity>() {
-            {
-              put(CICSLexer.HANDLE, ErrorSeverity.WARNING);
-            }
-          };
+      new HashMap<Integer, ErrorSeverity>() {
+        {
+          put(CICSLexer.HANDLE, ErrorSeverity.WARNING);
+        }
+      };
 
-  public CICSPopHandleOptionsCheckUtility(DialectProcessingContext context, List<SyntaxError> errors) {
+  public CICSPopHandleOptionsCheckUtility(
+      DialectProcessingContext context, List<SyntaxError> errors) {
     super(context, errors, DUPLICATE_CHECK_OPTIONS);
   }
 

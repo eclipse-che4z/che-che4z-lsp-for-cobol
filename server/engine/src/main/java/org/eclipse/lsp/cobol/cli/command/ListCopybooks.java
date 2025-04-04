@@ -128,10 +128,8 @@ public class ListCopybooks implements Callable<Integer> {
 
   private List<File> createCopybooksPaths() {
     if (args.workspaceConfig != null && parent.processorGroupsResolver != null) {
-      return parent
-          .processorGroupsResolver
-          .resolveCopybooksPaths(src.toPath(), args.workspaceConfig.workspace)
-          .stream()
+      return parent.processorGroupsResolver
+          .resolveCopybooksPaths(src.toPath(), args.workspaceConfig.workspace).stream()
           .map(Path::toFile)
           .collect(Collectors.toList());
     }

@@ -45,199 +45,203 @@ import org.eclipse.lsp4j.DidChangeConfigurationParams;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
-/**
- * Tests {@link DidChangeConfigurationHandler}
- */
+/** Tests {@link DidChangeConfigurationHandler} */
 class DidChangeConfigurationHandlerTest {
-    /** Test no watchers added or removed when the path is empty */
-    @Test
-    void testChangeConfigurationNoPathToRegister() throws InterruptedException {
-        DisposableLSPStateService stateService = new CobolLSPServerStateService();
-        SettingsService settingsService = mock(SettingsService.class);
-        WatcherService watchingService = mock(WatcherService.class);
-        CopybookService copybookService = mock(CopybookService.class);
-        LocaleStore localeStore = mock(LocaleStore.class);
-        CopybookNameService copybookNameService = mock(CopybookNameService.class);
-        Keywords keywords = mock(Keywords.class);
-        MessageService messageService = mock(MessageService.class);
-        AsyncAnalysisService asyncAnalysisService = mock(AsyncAnalysisService.class);
+  /** Test no watchers added or removed when the path is empty */
+  @Test
+  void testChangeConfigurationNoPathToRegister() throws InterruptedException {
+    DisposableLSPStateService stateService = new CobolLSPServerStateService();
+    SettingsService settingsService = mock(SettingsService.class);
+    WatcherService watchingService = mock(WatcherService.class);
+    CopybookService copybookService = mock(CopybookService.class);
+    LocaleStore localeStore = mock(LocaleStore.class);
+    CopybookNameService copybookNameService = mock(CopybookNameService.class);
+    Keywords keywords = mock(Keywords.class);
+    MessageService messageService = mock(MessageService.class);
+    AsyncAnalysisService asyncAnalysisService = mock(AsyncAnalysisService.class);
 
-        DidChangeConfigurationHandler didChangeConfigurationHandler =
-                new DidChangeConfigurationHandler(
-                        stateService,
-                        settingsService,
-                        copybookNameService,
-                        watchingService,
-                        localeStore,
-                        keywords,
-                        messageService,
-                        asyncAnalysisService, getMockLayoutStore(), copybookService);
+    DidChangeConfigurationHandler didChangeConfigurationHandler =
+        new DidChangeConfigurationHandler(
+            stateService,
+            settingsService,
+            copybookNameService,
+            watchingService,
+            localeStore,
+            keywords,
+            messageService,
+            asyncAnalysisService,
+            getMockLayoutStore(),
+            copybookService);
 
+    when(copybookNameService.copybookLocalFolders(null)).thenReturn(completedFuture(emptyList()));
+    when(settingsService.fetchConfiguration(LOCALE.label))
+        .thenReturn(completedFuture(singletonList("LOCALE")));
+    when(settingsService.fetchConfiguration(LOGGING_LEVEL.label))
+        .thenReturn(completedFuture(singletonList("INFO")));
+    when(settingsService.fetchConfiguration(COBOL_PROGRAM_LAYOUT.label))
+        .thenReturn(completedFuture(ImmutableList.of(CobolLanguageId.COBOL.getLayout())));
+    when(watchingService.getWatchingFolders()).thenReturn(emptyList());
+    when(localeStore.notifyLocaleStore()).thenReturn(e -> {});
 
-        when(copybookNameService.copybookLocalFolders(null))
-                .thenReturn(completedFuture(emptyList()));
-        when(settingsService.fetchConfiguration(LOCALE.label))
-                .thenReturn(completedFuture(singletonList("LOCALE")));
-        when(settingsService.fetchConfiguration(LOGGING_LEVEL.label))
-                .thenReturn(completedFuture(singletonList("INFO")));
-        when(settingsService.fetchConfiguration(COBOL_PROGRAM_LAYOUT.label))
-                .thenReturn(completedFuture(ImmutableList.of(CobolLanguageId.COBOL.getLayout())));
-        when(watchingService.getWatchingFolders()).thenReturn(emptyList());
-        when(localeStore.notifyLocaleStore()).thenReturn(e -> {});
+    didChangeConfigurationHandler.didChangeConfiguration(
+        new DidChangeConfigurationParams(new Object()));
+    verify(watchingService).addWatchers(emptyList());
+    verify(watchingService).removeWatchers(emptyList());
+    verify(asyncAnalysisService).reanalyseOpenedPrograms();
+  }
 
-        didChangeConfigurationHandler.didChangeConfiguration(new DidChangeConfigurationParams(new Object()));
-        verify(watchingService).addWatchers(emptyList());
-        verify(watchingService).removeWatchers(emptyList());
-        verify(asyncAnalysisService).reanalyseOpenedPrograms();
-    }
+  /** Test no watchers added or removed when the path list not changed */
+  @Test
+  void testChangeConfigurationNoChangesInPaths() throws InterruptedException {
+    DisposableLSPStateService stateService = new CobolLSPServerStateService();
+    SettingsService settingsService = mock(SettingsService.class);
+    WatcherService watchingService = mock(WatcherService.class);
+    LocaleStore localeStore = mock(LocaleStore.class);
+    CopybookNameService copybookNameService = mock(CopybookNameService.class);
+    Keywords keywords = mock(Keywords.class);
+    MessageService messageService = mock(MessageService.class);
+    AsyncAnalysisService asyncAnalysisService = mock(AsyncAnalysisService.class);
+    CopybookService copybookService = mock(CopybookService.class);
 
-    /** Test no watchers added or removed when the path list not changed */
-    @Test
-    void testChangeConfigurationNoChangesInPaths() throws InterruptedException {
-        DisposableLSPStateService stateService = new CobolLSPServerStateService();
-        SettingsService settingsService = mock(SettingsService.class);
-        WatcherService watchingService = mock(WatcherService.class);
-        LocaleStore localeStore = mock(LocaleStore.class);
-        CopybookNameService copybookNameService = mock(CopybookNameService.class);
-        Keywords keywords = mock(Keywords.class);
-        MessageService messageService = mock(MessageService.class);
-        AsyncAnalysisService asyncAnalysisService = mock(AsyncAnalysisService.class);
-        CopybookService copybookService = mock(CopybookService.class);
+    DidChangeConfigurationHandler didChangeConfigurationHandler =
+        new DidChangeConfigurationHandler(
+            stateService,
+            settingsService,
+            copybookNameService,
+            watchingService,
+            localeStore,
+            keywords,
+            messageService,
+            asyncAnalysisService,
+            getMockLayoutStore(),
+            copybookService);
 
-        DidChangeConfigurationHandler didChangeConfigurationHandler =
-                new DidChangeConfigurationHandler(
-                        stateService,
-                        settingsService,
-                        copybookNameService,
-                        watchingService,
-                        localeStore,
-                        keywords,
-                        messageService,
-                        asyncAnalysisService,
-                        getMockLayoutStore(),
-                        copybookService);
+    String path = "foo/bar";
 
-        String path = "foo/bar";
+    when(copybookNameService.copybookLocalFolders(null))
+        .thenReturn(completedFuture(singletonList(path)));
+    when(settingsService.fetchConfiguration(LOCALE.label))
+        .thenReturn(completedFuture(singletonList("LOCALE")));
+    when(settingsService.fetchConfiguration(LOGGING_LEVEL.label))
+        .thenReturn(completedFuture(singletonList("INFO")));
+    when(settingsService.fetchConfiguration(COBOL_PROGRAM_LAYOUT.label))
+        .thenReturn(completedFuture(ImmutableList.of(CobolLanguageId.COBOL.getLayout())));
+    when(watchingService.getWatchingFolders()).thenReturn(singletonList(path));
+    when(localeStore.notifyLocaleStore()).thenReturn(e -> {});
 
-        when(copybookNameService.copybookLocalFolders(null))
-                .thenReturn(completedFuture(singletonList(path)));
-        when(settingsService.fetchConfiguration(LOCALE.label))
-                .thenReturn(completedFuture(singletonList("LOCALE")));
-        when(settingsService.fetchConfiguration(LOGGING_LEVEL.label))
-                .thenReturn(completedFuture(singletonList("INFO")));
-        when(settingsService.fetchConfiguration(COBOL_PROGRAM_LAYOUT.label))
-                .thenReturn(completedFuture(ImmutableList.of(CobolLanguageId.COBOL.getLayout())));
-        when(watchingService.getWatchingFolders()).thenReturn(singletonList(path));
-        when(localeStore.notifyLocaleStore()).thenReturn(e -> {});
+    didChangeConfigurationHandler.didChangeConfiguration(
+        new DidChangeConfigurationParams(new Object()));
+    verify(watchingService).addWatchers(emptyList());
+    verify(watchingService).removeWatchers(emptyList());
+    verify(asyncAnalysisService).reanalyseOpenedPrograms();
+    verify(localeStore).notifyLocaleStore();
+  }
 
-        didChangeConfigurationHandler.didChangeConfiguration(new DidChangeConfigurationParams(new Object()));
-        verify(watchingService).addWatchers(emptyList());
-        verify(watchingService).removeWatchers(emptyList());
-        verify(asyncAnalysisService).reanalyseOpenedPrograms();
-        verify(localeStore).notifyLocaleStore();
-    }
+  /** Test a new watcher created when a new path add in setting.json */
+  @Test
+  void testChangeConfigurationNewPath() throws InterruptedException {
+    DisposableLSPStateService stateService = new CobolLSPServerStateService();
+    SettingsService settingsService = mock(SettingsServiceImpl.class);
+    WatcherService watchingService = mock(WatcherService.class);
+    LocaleStore localeStore = mock(LocaleStore.class);
+    CopybookNameService copybookNameService = mock(CopybookNameService.class);
+    Keywords keywords = mock(Keywords.class);
+    MessageService messageService = mock(MessageService.class);
+    AsyncAnalysisService asyncAnalysisService = mock(AsyncAnalysisService.class);
+    CopybookService copybookService = mock(CopybookService.class);
 
-    /** Test a new watcher created when a new path add in setting.json */
-    @Test
-    void testChangeConfigurationNewPath() throws InterruptedException {
-        DisposableLSPStateService stateService = new CobolLSPServerStateService();
-        SettingsService settingsService = mock(SettingsServiceImpl.class);
-        WatcherService watchingService = mock(WatcherService.class);
-        LocaleStore localeStore = mock(LocaleStore.class);
-        CopybookNameService copybookNameService = mock(CopybookNameService.class);
-        Keywords keywords = mock(Keywords.class);
-        MessageService messageService = mock(MessageService.class);
-        AsyncAnalysisService asyncAnalysisService = mock(AsyncAnalysisService.class);
-        CopybookService copybookService = mock(CopybookService.class);
+    DidChangeConfigurationHandler didChangeConfigurationHandler =
+        new DidChangeConfigurationHandler(
+            stateService,
+            settingsService,
+            copybookNameService,
+            watchingService,
+            localeStore,
+            keywords,
+            messageService,
+            asyncAnalysisService,
+            getMockLayoutStore(),
+            copybookService);
 
-        DidChangeConfigurationHandler didChangeConfigurationHandler =
-                new DidChangeConfigurationHandler(
-                        stateService,
-                        settingsService,
-                        copybookNameService,
-                        watchingService,
-                        localeStore,
-                        keywords,
-                        messageService,
-                        asyncAnalysisService,
-                        getMockLayoutStore(), copybookService);
+    ArgumentCaptor<List<String>> watcherCaptor = forClass(List.class);
+    String path = "foo/bar";
 
-        ArgumentCaptor<List<String>> watcherCaptor = forClass(List.class);
-        String path = "foo/bar";
+    when(copybookNameService.copybookLocalFolders(null))
+        .thenReturn(completedFuture(singletonList(path)));
+    when(settingsService.fetchConfiguration(LOCALE.label))
+        .thenReturn(completedFuture(singletonList("LOCALE")));
+    when(settingsService.fetchConfiguration(LOGGING_LEVEL.label))
+        .thenReturn(completedFuture(singletonList("INFO")));
+    when(settingsService.fetchConfiguration(COBOL_PROGRAM_LAYOUT.label))
+        .thenReturn(completedFuture(ImmutableList.of(CobolLanguageId.COBOL.getLayout())));
+    when(watchingService.getWatchingFolders()).thenReturn(emptyList());
+    when(localeStore.notifyLocaleStore()).thenReturn(e -> {});
 
-        when(copybookNameService.copybookLocalFolders(null))
-                .thenReturn(completedFuture(singletonList(path)));
-        when(settingsService.fetchConfiguration(LOCALE.label))
-                .thenReturn(completedFuture(singletonList("LOCALE")));
-        when(settingsService.fetchConfiguration(LOGGING_LEVEL.label))
-                .thenReturn(completedFuture(singletonList("INFO")));
-        when(settingsService.fetchConfiguration(COBOL_PROGRAM_LAYOUT.label))
-                .thenReturn(completedFuture(ImmutableList.of(CobolLanguageId.COBOL.getLayout())));
-        when(watchingService.getWatchingFolders()).thenReturn(emptyList());
-        when(localeStore.notifyLocaleStore()).thenReturn(e -> {});
+    didChangeConfigurationHandler.didChangeConfiguration(
+        new DidChangeConfigurationParams(new Object()));
 
-        didChangeConfigurationHandler.didChangeConfiguration(new DidChangeConfigurationParams(new Object()));
+    verify(watchingService).addWatchers(watcherCaptor.capture());
+    verify(watchingService).removeWatchers(emptyList());
+    verify(asyncAnalysisService).reanalyseOpenedPrograms();
+    verify(localeStore).notifyLocaleStore();
 
-        verify(watchingService).addWatchers(watcherCaptor.capture());
-        verify(watchingService).removeWatchers(emptyList());
-        verify(asyncAnalysisService).reanalyseOpenedPrograms();
-        verify(localeStore).notifyLocaleStore();
+    assertEquals(path, watcherCaptor.getValue().get(0));
+  }
 
-        assertEquals(path, watcherCaptor.getValue().get(0));
-    }
+  /** Test an existing watcher removed when its path doesn't exist in setting.json */
+  @Test
+  void testChangeConfigurationPathRemoved() throws InterruptedException {
+    DisposableLSPStateService stateService = new CobolLSPServerStateService();
+    SettingsService settingsService = mock(SettingsService.class);
+    WatcherService watchingService = mock(WatcherService.class);
+    LocaleStore localeStore = mock(LocaleStore.class);
+    CopybookNameService copybookNameService = mock(CopybookNameService.class);
+    Keywords keywords = mock(Keywords.class);
+    MessageService messageService = mock(MessageService.class);
+    AsyncAnalysisService asyncAnalysisService = mock(AsyncAnalysisService.class);
+    CopybookService copybookService = mock(CopybookService.class);
 
-    /** Test an existing watcher removed when its path doesn't exist in setting.json */
-    @Test
-    void testChangeConfigurationPathRemoved() throws InterruptedException {
-        DisposableLSPStateService stateService = new CobolLSPServerStateService();
-        SettingsService settingsService = mock(SettingsService.class);
-        WatcherService watchingService = mock(WatcherService.class);
-        LocaleStore localeStore = mock(LocaleStore.class);
-        CopybookNameService copybookNameService = mock(CopybookNameService.class);
-        Keywords keywords = mock(Keywords.class);
-        MessageService messageService = mock(MessageService.class);
-        AsyncAnalysisService asyncAnalysisService = mock(AsyncAnalysisService.class);
-        CopybookService copybookService = mock(CopybookService.class);
+    DidChangeConfigurationHandler didChangeConfigurationHandler =
+        new DidChangeConfigurationHandler(
+            stateService,
+            settingsService,
+            copybookNameService,
+            watchingService,
+            localeStore,
+            keywords,
+            messageService,
+            asyncAnalysisService,
+            getMockLayoutStore(),
+            copybookService);
+    ArgumentCaptor<List<String>> watcherCaptor = forClass(List.class);
+    JsonArray arr = new JsonArray();
+    String path = "foo/bar";
+    arr.add(new JsonPrimitive(path));
 
-        DidChangeConfigurationHandler didChangeConfigurationHandler =
-                new DidChangeConfigurationHandler(
-                        stateService,
-                        settingsService,
-                        copybookNameService,
-                        watchingService,
-                        localeStore,
-                        keywords,
-                        messageService,
-                        asyncAnalysisService,
-                        getMockLayoutStore(),
-                        copybookService);
-        ArgumentCaptor<List<String>> watcherCaptor = forClass(List.class);
-        JsonArray arr = new JsonArray();
-        String path = "foo/bar";
-        arr.add(new JsonPrimitive(path));
+    CompletableFuture<List<String>> copybookFuture = completedFuture(emptyList());
+    when(copybookNameService.copybookLocalFolders(null)).thenReturn(copybookFuture);
+    when(settingsService.fetchConfiguration(LOCALE.label))
+        .thenReturn(completedFuture(singletonList("LOCALE")));
+    when(settingsService.fetchConfiguration(LOGGING_LEVEL.label))
+        .thenReturn(completedFuture(singletonList("INFO")));
+    when(watchingService.getWatchingFolders()).thenReturn(singletonList(path));
+    when(localeStore.notifyLocaleStore()).thenReturn(e -> {});
+    when(settingsService.fetchConfiguration(COBOL_PROGRAM_LAYOUT.label))
+        .thenReturn(completedFuture(ImmutableList.of(CobolLanguageId.COBOL.getLayout())));
 
-        CompletableFuture<List<String>> copybookFuture = completedFuture(emptyList());
-        when(copybookNameService.copybookLocalFolders(null)).thenReturn(copybookFuture);
-        when(settingsService.fetchConfiguration(LOCALE.label))
-                .thenReturn(completedFuture(singletonList("LOCALE")));
-        when(settingsService.fetchConfiguration(LOGGING_LEVEL.label))
-                .thenReturn(completedFuture(singletonList("INFO")));
-        when(watchingService.getWatchingFolders()).thenReturn(singletonList(path));
-        when(localeStore.notifyLocaleStore()).thenReturn(e -> {});
-        when(settingsService.fetchConfiguration(COBOL_PROGRAM_LAYOUT.label))
-                .thenReturn(completedFuture(ImmutableList.of(CobolLanguageId.COBOL.getLayout())));
+    didChangeConfigurationHandler.didChangeConfiguration(
+        new DidChangeConfigurationParams(localeStore));
+    verify(watchingService).addWatchers(emptyList());
+    verify(watchingService).removeWatchers(watcherCaptor.capture());
+    verify(asyncAnalysisService).reanalyseOpenedPrograms();
+    assertEquals(path, watcherCaptor.getValue().get(0));
+  }
 
-        didChangeConfigurationHandler.didChangeConfiguration(new DidChangeConfigurationParams(localeStore));
-        verify(watchingService).addWatchers(emptyList());
-        verify(watchingService).removeWatchers(watcherCaptor.capture());
-        verify(asyncAnalysisService).reanalyseOpenedPrograms();
-        assertEquals(path, watcherCaptor.getValue().get(0));
-    }
-
-    private CodeLayoutStore getMockLayoutStore() {
-        CodeLayoutStore layoutStore = mock(CodeLayoutStore.class);
-        when(layoutStore.getCodeLayout()).thenReturn(Optional.ofNullable(CobolLanguageId.COBOL.getLayout()));
-        when(layoutStore.updateCodeLayout()).thenReturn(mock -> {});
-        return layoutStore;
-    }
+  private CodeLayoutStore getMockLayoutStore() {
+    CodeLayoutStore layoutStore = mock(CodeLayoutStore.class);
+    when(layoutStore.getCodeLayout())
+        .thenReturn(Optional.ofNullable(CobolLanguageId.COBOL.getLayout()));
+    when(layoutStore.updateCodeLayout()).thenReturn(mock -> {});
+    return layoutStore;
+  }
 }

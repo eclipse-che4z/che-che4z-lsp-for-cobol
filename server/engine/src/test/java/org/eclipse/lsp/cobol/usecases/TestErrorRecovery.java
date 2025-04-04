@@ -28,9 +28,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-/**
- * Test for parser recovery scenarios
- */
+/** Test for parser recovery scenarios */
 class TestErrorRecovery {
   private static final String TEXT =
       "       IDENTIFICATION DIVISION.\n"
@@ -42,25 +40,29 @@ class TestErrorRecovery {
 
   @Test
   void test() {
-    AnalysisResult result = UseCaseEngine.runTest(
-        TEXT,
-        ImmutableList.of(),
-        ImmutableMap.of(
-            "1",
-            new Diagnostic(
-                new Range(), "No viable alternative at input VALUES",
-                DiagnosticSeverity.Error,
-                ErrorSource.PREPROCESSING.getText())));
+    AnalysisResult result =
+        UseCaseEngine.runTest(
+            TEXT,
+            ImmutableList.of(),
+            ImmutableMap.of(
+                "1",
+                new Diagnostic(
+                    new Range(),
+                    "No viable alternative at input VALUES",
+                    DiagnosticSeverity.Error,
+                    ErrorSource.PREPROCESSING.getText())));
 
-    String paragraphName = result.getRootNode().findFirstProgramNode()
-        .getDepthFirstStream()
-        .filter(n -> n instanceof ParagraphNode)
-        .map(ParagraphNode.class::cast)
-        .findFirst()
-        .map(CodeBlockDefinitionNode::getName)
-        .orElse("");
+    String paragraphName =
+        result
+            .getRootNode()
+            .findFirstProgramNode()
+            .getDepthFirstStream()
+            .filter(n -> n instanceof ParagraphNode)
+            .map(ParagraphNode.class::cast)
+            .findFirst()
+            .map(CodeBlockDefinitionNode::getName)
+            .orElse("");
 
     assertEquals("PAR1", paragraphName);
   }
-
 }

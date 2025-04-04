@@ -31,9 +31,7 @@ import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.LocationLink;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 
-/**
- * LSP Definition Handler
- */
+/** LSP Definition Handler */
 @Slf4j
 public class DefinitionHandler {
   private final AsyncAnalysisService asyncAnalysisService;
@@ -41,7 +39,10 @@ public class DefinitionHandler {
   private final Occurrences occurrences;
 
   @Inject
-  public DefinitionHandler(AsyncAnalysisService asyncAnalysisService, DocumentModelService documentModelService, Occurrences occurrences) {
+  public DefinitionHandler(
+      AsyncAnalysisService asyncAnalysisService,
+      DocumentModelService documentModelService,
+      Occurrences occurrences) {
     this.asyncAnalysisService = asyncAnalysisService;
     this.documentModelService = documentModelService;
     this.occurrences = occurrences;
@@ -52,10 +53,11 @@ public class DefinitionHandler {
    *
    * @param params DefinitionParams.
    * @return Either list of locations or list of location links.
-   * @throws ExecutionException   forward exception.
+   * @throws ExecutionException forward exception.
    * @throws InterruptedException forward exception.
    */
-  public Either<List<? extends Location>, List<? extends LocationLink>> definition(DefinitionParams params) throws ExecutionException, InterruptedException {
+  public Either<List<? extends Location>, List<? extends LocationLink>> definition(
+      DefinitionParams params) throws ExecutionException, InterruptedException {
     CobolDocumentModel doc = documentModelService.get(params.getTextDocument().getUri());
     List<Location> definitions = occurrences.findDefinitions(doc, params);
     return Either.forLeft(definitions);
@@ -67,17 +69,19 @@ public class DefinitionHandler {
    * @param params DefinitionParams.
    * @return LspNotification.
    */
-  public LspQuery<Either<List<? extends Location>, List<? extends LocationLink>>> createEvent(DefinitionParams params) {
+  public LspQuery<Either<List<? extends Location>, List<? extends LocationLink>>> createEvent(
+      DefinitionParams params) {
     return new DefinitionQuery(params, this);
   }
 
   /**
    * Definition event dependencies
+   *
    * @param params
    * @return list of {@link LspEventDependency}
    */
   public List<LspEventDependency> getDefinitionEventDependencies(DefinitionParams params) {
     return ImmutableList.of(
-            asyncAnalysisService.createDependencyOn(params.getTextDocument().getUri()));
+        asyncAnalysisService.createDependencyOn(params.getTextDocument().getUri()));
   }
 }

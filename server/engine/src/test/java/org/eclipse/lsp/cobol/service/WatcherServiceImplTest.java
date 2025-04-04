@@ -199,19 +199,13 @@ class WatcherServiceImplTest {
     assertEquals(2, watchers.size());
     FileSystemWatcher fileWatcher = watchers.get(0);
     assertEquals("**/*", fileWatcher.getGlobPattern().getRight().getPattern());
-    assertEquals(WORKSPACE_URI, fileWatcher
-            .getGlobPattern()
-            .getRight()
-            .getBaseUri()
-            .getLeft().getUri());
+    assertEquals(
+        WORKSPACE_URI, fileWatcher.getGlobPattern().getRight().getBaseUri().getLeft().getUri());
     assertEquals(7, fileWatcher.getKind().intValue());
 
     FileSystemWatcher folderWatcher = watchers.get(1);
-    assertEquals(WORKSPACE_URI, folderWatcher
-            .getGlobPattern()
-            .getRight()
-            .getBaseUri()
-            .getLeft().getUri());
+    assertEquals(
+        WORKSPACE_URI, folderWatcher.getGlobPattern().getRight().getBaseUri().getLeft().getUri());
     assertNull(folderWatcher.getGlobPattern().getRight().getPattern());
     assertEquals(7, folderWatcher.getKind().intValue());
   }

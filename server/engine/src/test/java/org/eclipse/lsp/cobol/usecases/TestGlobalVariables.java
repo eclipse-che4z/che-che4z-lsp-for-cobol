@@ -94,7 +94,10 @@ class TestGlobalVariables {
         ImmutableMap.of(
             "1",
             new Diagnostic(
-                new Range(), "Variable FOO is not defined", DiagnosticSeverity.Error,  ErrorSource.PARSING.getText())));
+                new Range(),
+                "Variable FOO is not defined",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
   }
 
   @Test
@@ -113,7 +116,7 @@ class TestGlobalVariables {
                 new Range(),
                 "Global variable must have a unique name",
                 DiagnosticSeverity.Error,
-                 ErrorSource.PARSING.getText())));
+                ErrorSource.PARSING.getText())));
   }
 
   @Test
@@ -127,6 +130,6 @@ class TestGlobalVariables {
                 new Range(),
                 "GLOBAL can only be used on level 01",
                 DiagnosticSeverity.Error,
-                 ErrorSource.PARSING.getText())));
+                ErrorSource.PARSING.getText())));
   }
 }

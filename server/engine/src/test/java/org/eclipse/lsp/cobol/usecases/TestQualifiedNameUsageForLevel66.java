@@ -74,10 +74,15 @@ public class TestQualifiedNameUsageForLevel66 {
 
   @Test
   void test3() {
-    UseCaseEngine.runTest(TEXT3, ImmutableList.of(), ImmutableMap.of("1",
+    UseCaseEngine.runTest(
+        TEXT3,
+        ImmutableList.of(),
+        ImmutableMap.of(
+            "1",
             new Diagnostic(
-                    new Range(), "The data entry with the name TOM not found", DiagnosticSeverity.Error, ErrorSource.PARSING.getText())));
+                new Range(),
+                "The data entry with the name TOM not found",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
   }
-
-
 }

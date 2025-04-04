@@ -79,10 +79,7 @@ class TestAttachTaskCode {
         ImmutableMap.of(
             "1",
             new Diagnostic(
-                new Range(),
-                MESSAGE_1,
-                DiagnosticSeverity.Error,
-                ErrorSource.PARSING.getText())),
+                new Range(), MESSAGE_1, DiagnosticSeverity.Error, ErrorSource.PARSING.getText())),
         ImmutableList.of(),
         DialectConfigs.getIDMSAnalysisConfig());
   }

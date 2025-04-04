@@ -42,8 +42,8 @@ import static org.eclipse.lsp.cobol.service.settings.SettingsParametersEnum.DIAL
 import static org.eclipse.lsp.cobol.service.settings.SettingsParametersEnum.DIALECT_REGISTRY;
 
 /**
- * This class is a properties file implementation of {@link MessageService} . It loads messages
- * from a properties file into memory to be used latter on for logging or messaging.
+ * This class is a properties file implementation of {@link MessageService} . It loads messages from
+ * a properties file into memory to be used latter on for logging or messaging.
  */
 @Singleton
 @Slf4j
@@ -124,15 +124,15 @@ public class PropertiesMessageService implements MessageService {
                         }));
   }
 
-  private void handleRegisteredDialects(List<String> dialects, List<DialectRegistryItem> dialectRegistryItems) {
+  private void handleRegisteredDialects(
+      List<String> dialects, List<DialectRegistryItem> dialectRegistryItems) {
     dialectRegistryItems.stream()
-        .filter(
-            registeredDialects ->
-                dialects.contains(registeredDialects.getName()))
+        .filter(registeredDialects -> dialects.contains(registeredDialects.getName()))
         .forEach(this::updateResourceBundle);
   }
 
-  private void handleImplicitDialects(List<String> dialects, List<DialectRegistryItem> dialectRegistryItems) {
+  private void handleImplicitDialects(
+      List<String> dialects, List<DialectRegistryItem> dialectRegistryItems) {
     if (dialectRegistryItems.isEmpty()) {
       dialects.forEach(this::updateResourceBundle);
     }

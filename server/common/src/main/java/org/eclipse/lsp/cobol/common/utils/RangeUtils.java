@@ -93,9 +93,9 @@ public class RangeUtils {
     return compareTo(after, before) < 0;
   }
 
-
   /**
    * Check if a range is in a scope
+   *
    * @param range range that should be in scope
    * @param scope a scope
    * @return is range in scope
@@ -133,6 +133,7 @@ public class RangeUtils {
 
   /**
    * Shifts range with a given position
+   *
    * @param position a starting position
    * @param range is an original range
    * @return shifted range
@@ -140,19 +141,23 @@ public class RangeUtils {
   public Range shiftRangeWithPosition(Position position, Range range) {
     int shift = range.getStart().getLine() == 0 ? position.getCharacter() : 0;
     return new Range(
-        new Position(position.getLine() + range.getStart().getLine(), range.getStart().getCharacter() + shift),
-        new Position(position.getLine() + range.getEnd().getLine(), range.getEnd().getCharacter() + shift)
-    );
+        new Position(
+            position.getLine() + range.getStart().getLine(),
+            range.getStart().getCharacter() + shift),
+        new Position(
+            position.getLine() + range.getEnd().getLine(), range.getEnd().getCharacter() + shift));
   }
 
   /**
    * Moves the end of the range on defined lines's count
+   *
    * @param range - range to extend
    * @param count - line's count
    * @return a new range
    */
   public Range moveByLine(Range range, int count) {
-    return new Range(new Position(range.getStart().getLine() + count, range.getStart().getCharacter()),
+    return new Range(
+        new Position(range.getStart().getLine() + count, range.getStart().getCharacter()),
         new Position(range.getEnd().getLine() + count, range.getEnd().getCharacter()));
   }
 }

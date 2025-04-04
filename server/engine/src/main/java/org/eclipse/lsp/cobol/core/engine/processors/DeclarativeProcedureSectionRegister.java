@@ -26,8 +26,7 @@ public class DeclarativeProcedureSectionRegister
 
   private final SymbolAccumulator symbolAccumulator;
 
-  public DeclarativeProcedureSectionRegister(
-      SymbolAccumulator symbolAccumulator) {
+  public DeclarativeProcedureSectionRegister(SymbolAccumulator symbolAccumulator) {
     this.symbolAccumulator = symbolAccumulator;
   }
 
@@ -38,7 +37,7 @@ public class DeclarativeProcedureSectionRegister
       return;
     }
     symbolAccumulator.registerCodeBlock(ctx.getCurrentProgramNode(), node);
-    symbolAccumulator.registerParagraphNameNode(ctx.getCurrentProgramNode(),
-            new ParagraphNameNode(node.getLocality(), node.getName()));
+    symbolAccumulator.registerParagraphNameNode(
+        ctx.getCurrentProgramNode(), new ParagraphNameNode(node.getLocality(), node.getName()));
   }
 }

@@ -34,11 +34,14 @@ public class ProgramIdEnricher implements Processor<ProgramIdNode> {
       return;
     }
 
-    FunctionInfo fi = node.getProgram()
-        .map(p -> symbolAccumulator.getUserDefinedFunctionReference(ctx.getCurrentProgramNode().getProgramName()))
-        .orElse(null);
-    if (fi == null)
-      return;
+    FunctionInfo fi =
+        node.getProgram()
+            .map(
+                p ->
+                    symbolAccumulator.getUserDefinedFunctionReference(
+                        ctx.getCurrentProgramNode().getProgramName()))
+            .orElse(null);
+    if (fi == null) return;
     node.setDefinitions(fi.getDefinition());
     node.setUsages(fi.getReferences());
   }

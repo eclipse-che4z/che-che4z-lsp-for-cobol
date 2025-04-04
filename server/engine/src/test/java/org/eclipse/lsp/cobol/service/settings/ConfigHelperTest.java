@@ -22,9 +22,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-/**
- * Test for ConfigHelper
- */
+/** Test for ConfigHelper */
 class ConfigHelperTest {
 
   @Test
@@ -47,9 +45,9 @@ class ConfigHelperTest {
 
   @Test
   void test_json() {
-    Optional<String> result = ConfigHelper.getValueAsString(ImmutableList.of(new JsonPrimitive("test")));
+    Optional<String> result =
+        ConfigHelper.getValueAsString(ImmutableList.of(new JsonPrimitive("test")));
     assertTrue(result.isPresent());
     assertEquals("test", result.get());
   }
-
 }

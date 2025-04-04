@@ -22,9 +22,7 @@ import org.eclipse.lsp.cobol.lsp.handlers.text.FormattingHandler;
 import org.eclipse.lsp4j.DocumentFormattingParams;
 import org.eclipse.lsp4j.TextEdit;
 
-/**
- * `textDocument/formatting`  language server event
- */
+/** `textDocument/formatting` language server event */
 public class FormattingQuery implements LspQuery<List<? extends TextEdit>> {
   final CompletableFuture<List<? extends TextEdit>> result;
   private final DocumentFormattingParams params;

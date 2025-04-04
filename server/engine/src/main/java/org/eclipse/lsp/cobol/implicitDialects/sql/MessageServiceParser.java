@@ -30,9 +30,7 @@ import java.util.Optional;
  */
 public abstract class MessageServiceParser extends Parser {
 
-  /**
-   * @param input {@link TokenStream}
-   */
+  /** @param input {@link TokenStream} */
   MessageServiceParser(TokenStream input) {
     super(input);
   }
@@ -55,10 +53,11 @@ public abstract class MessageServiceParser extends Parser {
 
   /**
    * Extend the functionality of notifyError to include the offending token along with the message.
+   *
    * @param offendingToken Token where the error occurs
    * @param messageId Unique ID for each message in externalized message file.
    * @param parameters Arguments referenced by the format specifiers in the format string in
-   *    externalized message file.
+   *     externalized message file.
    */
   public void notifyError(Token offendingToken, String messageId, String... parameters) {
     String message = getMessageForParser(messageId, parameters);
@@ -130,7 +129,8 @@ public abstract class MessageServiceParser extends Parser {
    * @param minValue allowed integer value
    * @param maxValue allowed integer value
    */
-  protected void validateIntegerRange(Token start, String input, Integer minValue, Integer maxValue) {
+  protected void validateIntegerRange(
+      Token start, String input, Integer minValue, Integer maxValue) {
     Integer intInputValue = tryParseInt(input);
     if (intInputValue != null && !(intInputValue >= minValue && intInputValue <= maxValue)) {
       notifyError(start, "parsers.intRangeValue", minValue.toString(), maxValue.toString());
@@ -263,11 +263,11 @@ public abstract class MessageServiceParser extends Parser {
         .getMessage(messageKey, (Object[]) parameters);
   }
 
- private Integer tryParseInt(String input) {
+  private Integer tryParseInt(String input) {
     try {
-        return Integer.parseInt(input);
+      return Integer.parseInt(input);
     } catch (NumberFormatException ex) {
-        return null;
+      return null;
     }
-}
+  }
 }

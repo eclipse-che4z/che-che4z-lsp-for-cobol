@@ -26,7 +26,8 @@ import org.junit.jupiter.api.Test;
  * Test CICS GET commands. Documentation link: <a
  * href="https://www.ibm.com/docs/en/cics-ts/6.x?topic=summary-get-container-bts">GET Command</a>
  *
- * <p>This class tests all variations of the GET command: CONTAINER BTS, CONTAINER CHANNEL, and COUNTER/DCOUNTER.
+ * <p>This class tests all variations of the GET command: CONTAINER BTS, CONTAINER CHANNEL, and
+ * COUNTER/DCOUNTER.
  */
 public class TestCICSGet {
   private static final String CONTAINER_BTS_VALID_ONE =
@@ -42,16 +43,16 @@ public class TestCICSGet {
       "GET CONTAINER(100)  {ACQACTIVITY|errorOne} {PROCESS|errorTwo} {ACQPROCESS|errorThree} SET({$varTwo}) FLENGTH({$varTwo})";
 
   private static final String CONTAINER_BTS_INVALID_THREE =
-          "GET {_CONTAINER({$varTwo})  ACQACTIVITY SET(100)|errorOne_}";
+      "GET {_CONTAINER({$varTwo})  ACQACTIVITY SET(100)|errorOne_}";
 
   private static final String CONTAINER_BTS_INVALID_FOUR =
-          "GET {_CONTAINER({$varTwo})  ACQPROCESS NODATA|errorOne_}";
+      "GET {_CONTAINER({$varTwo})  ACQPROCESS NODATA|errorOne_}";
 
   private static final String CONTAINER_CHANNEL_VALID_ONE =
       "GET CONTAINER({$varOne}) CHANNEL({$varTwo}) INTO({$varThree}) FLENGTH({$varFour})";
 
   private static final String CONTAINER_CHANNEL_VALID_TWO =
-          "GET CONTAINER({$varOne}) INTO({$varTwo}) INTOCCSID({$varThree})";
+      "GET CONTAINER({$varOne}) INTO({$varTwo}) INTOCCSID({$varThree})";
 
   private static final String CONTAINER_CHANNEL_INVALID_ONE =
       "GET CONTAINER(100) {CONTAINER|errorTwo}(100) INTO({$varFour})";
@@ -60,7 +61,7 @@ public class TestCICSGet {
       "GET CONTAINER(10) INTO({$varFour}) {INTOCCSID|errorOne}(100) {INTOCODEPAGE|errorTwo}(100)";
 
   private static final String CONTAINER_CHANNEL_INVALID_THREE =
-          "{GET64|errorOne} CONTAINER({$varOne}) INTO({$varTwo}) INTOCCSID({$varThree})";
+      "{GET64|errorOne} CONTAINER({$varOne}) INTO({$varTwo}) INTOCCSID({$varThree})";
 
   private static final String COUNTER_VALID_ONE =
       "GET COUNTER({$varOne}) POOL({$varTwo}) VALUE({$varThree}) INCREMENT({$varFour}) WRAP";
@@ -128,27 +129,27 @@ public class TestCICSGet {
   @Test
   void testContainerBTSInvalidThree() {
     CICSTestUtils.errorTest(
-            CONTAINER_BTS_INVALID_THREE,
-            ImmutableMap.of(
-                    "errorOne",
-                    new Diagnostic(
-                            new Range(),
-                            "Missing required option: FLENGTH",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText())));
+        CONTAINER_BTS_INVALID_THREE,
+        ImmutableMap.of(
+            "errorOne",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: FLENGTH",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
   }
 
   @Test
   void testContainerBTSInvalidFour() {
     CICSTestUtils.errorTest(
-            CONTAINER_BTS_INVALID_FOUR,
-            ImmutableMap.of(
-                    "errorOne",
-                    new Diagnostic(
-                            new Range(),
-                            "Missing required option: FLENGTH",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText())));
+        CONTAINER_BTS_INVALID_FOUR,
+        ImmutableMap.of(
+            "errorOne",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: FLENGTH",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
   }
 
   @Test
@@ -202,14 +203,14 @@ public class TestCICSGet {
   @Test
   void testContainerChannelInvalidThree() {
     CICSTestUtils.errorTest(
-            CONTAINER_CHANNEL_INVALID_THREE,
-            ImmutableMap.of(
-                    "errorOne",
-                    new Diagnostic(
-                            new Range(),
-                            "Invalid option provided: GET64 is only available in Assembly",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText())));
+        CONTAINER_CHANNEL_INVALID_THREE,
+        ImmutableMap.of(
+            "errorOne",
+            new Diagnostic(
+                new Range(),
+                "Invalid option provided: GET64 is only available in Assembly",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
   }
 
   @Test

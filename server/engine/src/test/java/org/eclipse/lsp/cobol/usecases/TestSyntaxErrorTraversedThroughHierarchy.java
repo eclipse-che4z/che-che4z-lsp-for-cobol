@@ -72,10 +72,6 @@ class TestSyntaxErrorTraversedThroughHierarchy {
                 null),
             "4",
             new Diagnostic(
-                new Range(),
-                "Syntax error on 'PIC'",
-                Error,
-                ErrorSource.PARSING.getText(),
-                null)));
+                new Range(), "Syntax error on 'PIC'", Error, ErrorSource.PARSING.getText(), null)));
   }
 }

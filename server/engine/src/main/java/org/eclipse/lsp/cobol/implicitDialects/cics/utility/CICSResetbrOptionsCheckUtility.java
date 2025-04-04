@@ -32,24 +32,25 @@ public class CICSResetbrOptionsCheckUtility extends CICSOptionsCheckBaseUtility 
   public static final int RULE_INDEX = RULE_cics_resetbr;
 
   private static final Map<Integer, ErrorSeverity> DUPLICATE_CHECK_OPTIONS =
-          new HashMap<Integer, ErrorSeverity>() {
-            {
-              put(CICSLexer.FILE, ErrorSeverity.ERROR);
-              put(CICSLexer.DATASET, ErrorSeverity.ERROR);
-              put(CICSLexer.RIDFLD, ErrorSeverity.ERROR);
-              put(CICSLexer.KEYLENGTH, ErrorSeverity.ERROR);
-              put(CICSLexer.GENERIC, ErrorSeverity.WARNING);
-              put(CICSLexer.REQID, ErrorSeverity.ERROR);
-              put(CICSLexer.SYSID, ErrorSeverity.ERROR);
-              put(CICSLexer.GTEQ, ErrorSeverity.WARNING);
-              put(CICSLexer.EQUAL, ErrorSeverity.WARNING);
-              put(CICSLexer.RBA, ErrorSeverity.WARNING);
-              put(CICSLexer.RRN, ErrorSeverity.WARNING);
-              put(CICSLexer.XRBA, ErrorSeverity.WARNING);
-            }
-          };
+      new HashMap<Integer, ErrorSeverity>() {
+        {
+          put(CICSLexer.FILE, ErrorSeverity.ERROR);
+          put(CICSLexer.DATASET, ErrorSeverity.ERROR);
+          put(CICSLexer.RIDFLD, ErrorSeverity.ERROR);
+          put(CICSLexer.KEYLENGTH, ErrorSeverity.ERROR);
+          put(CICSLexer.GENERIC, ErrorSeverity.WARNING);
+          put(CICSLexer.REQID, ErrorSeverity.ERROR);
+          put(CICSLexer.SYSID, ErrorSeverity.ERROR);
+          put(CICSLexer.GTEQ, ErrorSeverity.WARNING);
+          put(CICSLexer.EQUAL, ErrorSeverity.WARNING);
+          put(CICSLexer.RBA, ErrorSeverity.WARNING);
+          put(CICSLexer.RRN, ErrorSeverity.WARNING);
+          put(CICSLexer.XRBA, ErrorSeverity.WARNING);
+        }
+      };
 
-  public CICSResetbrOptionsCheckUtility(DialectProcessingContext context, List<SyntaxError> errors) {
+  public CICSResetbrOptionsCheckUtility(
+      DialectProcessingContext context, List<SyntaxError> errors) {
     super(context, errors, DUPLICATE_CHECK_OPTIONS);
   }
 
@@ -70,7 +71,8 @@ public class CICSResetbrOptionsCheckUtility extends CICSOptionsCheckBaseUtility 
   private void checkResetbr(CICSParser.Cics_resetbr_optionsContext ctx) {
     checkHasExactlyOneOption("FILE or DATASET", ctx, ctx.FILE(), ctx.DATASET());
     checkHasMandatoryOptions(ctx.RIDFLD(), ctx, "RIDFLD");
-    checkHasMutuallyExclusiveOptions("RBA, RRN, XRBA or KEYLENGTH", ctx.RBA(), ctx.RRN(), ctx.XRBA(), ctx.KEYLENGTH());
+    checkHasMutuallyExclusiveOptions(
+        "RBA, RRN, XRBA or KEYLENGTH", ctx.RBA(), ctx.RRN(), ctx.XRBA(), ctx.KEYLENGTH());
     checkHasMutuallyExclusiveOptions("GTEQ or EQUAL", ctx.GTEQ(), ctx.EQUAL());
     checkPrerequisiteIsMet(ctx.KEYLENGTH(), ctx.GENERIC(), ctx, "GENERIC");
   }

@@ -90,12 +90,13 @@ public class UsageFormatUtils {
         return Collections.emptyList();
       };
 
-  public Map<EffectiveDataType, Function<ElementaryNode, List<SyntaxError>>> picAndUsageClauseValidator =
-      new EnumMap<>(
-          ImmutableMap.of(
-              STRING, checkStringUsage,
-              REAL, checkNumericUsage,
-              INTEGER, checkNumericUsage));
+  public Map<EffectiveDataType, Function<ElementaryNode, List<SyntaxError>>>
+      picAndUsageClauseValidator =
+          new EnumMap<>(
+              ImmutableMap.of(
+                  STRING, checkStringUsage,
+                  REAL, checkNumericUsage,
+                  INTEGER, checkNumericUsage));
 
   private boolean isStringNode(ElementaryNode variableNode) {
     return !stringUsageFormat.contains(variableNode.getUsageFormat())

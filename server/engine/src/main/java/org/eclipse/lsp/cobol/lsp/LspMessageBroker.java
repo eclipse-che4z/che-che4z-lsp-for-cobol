@@ -18,18 +18,16 @@ import com.google.inject.Singleton;
 import java.util.concurrent.*;
 import lombok.extern.slf4j.Slf4j;
 
-/**
- * Queue LSP messages.
- */
+/** Queue LSP messages. */
 @Slf4j
 @Singleton
 public class LspMessageBroker {
   public static final LspNotification POISON_PILL = () -> {};
   private final BlockingDeque<LspEvent> eventQueue = new LinkedBlockingDeque<>();
 
-
   /**
    * Return queue size
+   *
    * @return queue size
    */
   public int queueSize() {
@@ -38,15 +36,17 @@ public class LspMessageBroker {
 
   /**
    * Return count of an object type in the queue
+   *
    * @param clazz expected Class in the queue
    * @return queue size
    */
   public int queueSizeForType(Class<?> clazz) {
-      return (int) eventQueue.stream().filter(next -> next.getClass().equals(clazz)).count();
+    return (int) eventQueue.stream().filter(next -> next.getClass().equals(clazz)).count();
   }
 
   /**
    * Put backs an event to the end of queue
+   *
    * @param nextEven
    * @param <Q>
    * @throws InterruptedException
@@ -70,18 +70,17 @@ public class LspMessageBroker {
     return eventQueue.take();
   }
 
-
   /**
    * Publish LSP event into event loop
    *
    * @param event the event
-   * @param <R>   type of the event result
+   * @param <R> type of the event result
    * @return future object for the event
    */
   public <R> CompletableFuture<R> query(LspQuery<R> event) {
-      if (!eventQueue.offer(event)) {
-        LOG.warn("Event " + event + " skipped");
-      }
+    if (!eventQueue.offer(event)) {
+      LOG.warn("Event " + event + " skipped");
+    }
     return event.getResult();
   }
 
@@ -91,9 +90,9 @@ public class LspMessageBroker {
    * @param event the event
    */
   public void notify(LspNotification event) {
-      if (!eventQueue.offer(event)) {
-        LOG.warn("Event " + event + " skipped");
-      }
+    if (!eventQueue.offer(event)) {
+      LOG.warn("Event " + event + " skipped");
+    }
   }
 
   /**

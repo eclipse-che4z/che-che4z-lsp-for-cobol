@@ -38,7 +38,8 @@ class FormationsTest {
   private static final Formation FORMATION_1 = mock(Formation.class);
   private static final Formation FORMATION_2 = mock(Formation.class);
   private static final SettingsService SETTINGS_SERVICE = mock(SettingsService.class);
-  private static final Formations FORMATIONS = new Formations(ImmutableSet.of(FORMATION_1, FORMATION_2), SETTINGS_SERVICE);
+  private static final Formations FORMATIONS =
+      new Formations(ImmutableSet.of(FORMATION_1, FORMATION_2), SETTINGS_SERVICE);
 
   @BeforeEach
   void init() {

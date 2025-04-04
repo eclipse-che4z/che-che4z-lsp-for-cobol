@@ -35,10 +35,8 @@ import com.google.common.collect.ImmutableList;
 public class ProgramIdNode extends Node implements DefinedAndUsedStructure {
   String programId;
   final ProgramSubtype subtype;
-  @Setter
-  private List<Location> definitions = ImmutableList.of();
-  @Setter
-  private List<Location> usages = ImmutableList.of();
+  @Setter private List<Location> definitions = ImmutableList.of();
+  @Setter private List<Location> usages = ImmutableList.of();
 
   public ProgramIdNode(Locality locality, String programId, ProgramSubtype subtype) {
     super(locality, NodeType.PROGRAM_ID);

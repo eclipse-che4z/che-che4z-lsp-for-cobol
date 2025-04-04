@@ -24,9 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Replacement data storage
- */
+/** Replacement data storage */
 @Value
 @RequiredArgsConstructor
 public class ReplaceData {

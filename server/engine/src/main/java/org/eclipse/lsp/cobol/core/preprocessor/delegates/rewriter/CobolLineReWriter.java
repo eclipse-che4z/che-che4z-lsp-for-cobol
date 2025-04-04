@@ -33,7 +33,8 @@ public interface CobolLineReWriter {
   List<CobolLine> processLines(List<CobolLine> lines);
 
   /**
-   *  Checks if a string ends with Quote marks
+   * Checks if a string ends with Quote marks
+   *
    * @param stringToCheck {@link String} parameter for test
    * @return True is string ends with quotes and false otherwise
    */
@@ -43,6 +44,7 @@ public interface CobolLineReWriter {
 
   /**
    * Checks if a string starts with Quote marks
+   *
    * @param stringToCheck {@link String} parameter for test
    * @return True is string starts with quotes and false otherwise
    */

@@ -62,6 +62,7 @@ class RangeUtilsTest {
   void isInsideNegative() {
     assertFalse(RangeUtils.isInside(firstRange, secondRange));
   }
+
   @Test
   void isPositionsAreEquals() {
     assertFalse(RangeUtils.isAfter(firstLine, firstLine));

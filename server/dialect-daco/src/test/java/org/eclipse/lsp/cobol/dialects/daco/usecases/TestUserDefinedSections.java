@@ -26,9 +26,7 @@ import org.eclipse.lsp.cobol.dialects.daco.utils.DialectConfigs;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.junit.jupiter.api.Test;
 
-/**
- * If user has user defined labels they should be resolved without errors
- */
+/** If user has user defined labels they should be resolved without errors */
 class TestUserDefinedSections {
   private static final String TEXT_GOTO =
       "       IDENTIFICATION DIVISION.\n"
@@ -65,31 +63,41 @@ class TestUserDefinedSections {
 
   @Test
   void testPerform() {
-    UseCaseEngine.runTestForDiagnostics(TEXT_PERFORM,
+    UseCaseEngine.runTestForDiagnostics(
+        TEXT_PERFORM,
         ImmutableList.of(),
         ImmutableMap.of(),
         ImmutableList.of(),
         DialectConfigs.getDaCoAnalysisConfig(
-                CopybookProcessingMode.DISABLED, ImmutableList.of("USERLABEL")));
+            CopybookProcessingMode.DISABLED, ImmutableList.of("USERLABEL")));
   }
 
   @Test
   void testGoTo() {
-    Map<String, JsonElement> dialectConfig = ImmutableMap.of(DaCoDialect.DACO_PREDEFINED_SECTIONS, new Gson().toJsonTree(ImmutableList.of("USERLABEL")));
-    AnalysisConfig analysisConfig = new AnalysisConfig(CopybookProcessingMode.ENABLED, ImmutableList.of("DaCo", "IDMS"),
-        true, false, ImmutableList.of(), dialectConfig);
-    UseCaseEngine.runTestForDiagnostics(TEXT_GOTO, ImmutableList.of(), ImmutableMap.of(), ImmutableList.of(), analysisConfig);
+    Map<String, JsonElement> dialectConfig =
+        ImmutableMap.of(
+            DaCoDialect.DACO_PREDEFINED_SECTIONS,
+            new Gson().toJsonTree(ImmutableList.of("USERLABEL")));
+    AnalysisConfig analysisConfig =
+        new AnalysisConfig(
+            CopybookProcessingMode.ENABLED,
+            ImmutableList.of("DaCo", "IDMS"),
+            true,
+            false,
+            ImmutableList.of(),
+            dialectConfig);
+    UseCaseEngine.runTestForDiagnostics(
+        TEXT_GOTO, ImmutableList.of(), ImmutableMap.of(), ImmutableList.of(), analysisConfig);
   }
 
   @Test
   void testAlreadyDefined() {
-    UseCaseEngine.runTestForDiagnostics(TEXT_ALREADY_DEFINED,
+    UseCaseEngine.runTestForDiagnostics(
+        TEXT_ALREADY_DEFINED,
         ImmutableList.of(),
         ImmutableMap.of(),
         ImmutableList.of(),
         DialectConfigs.getDaCoAnalysisConfig(
-                CopybookProcessingMode.DISABLED,
-            ImmutableList.of("USERLABEL")));
+            CopybookProcessingMode.DISABLED, ImmutableList.of("USERLABEL")));
   }
-
 }

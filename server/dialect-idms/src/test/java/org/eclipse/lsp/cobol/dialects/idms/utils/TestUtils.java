@@ -21,21 +21,21 @@ import org.antlr.v4.runtime.Token;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-/**
- * Test utility
- */
+/** Test utility */
 @UtilityClass
 public class TestUtils {
 
   /**
    * Add range
+   *
    * @param ctx ctx
    * @param startLine startLine
    * @param startPos startPos
    * @param stopLine stopLine
    * @param stopPos stopPos
    */
-  public void addRange(ParserRuleContext ctx, int startLine, int startPos, int stopLine, int stopPos) {
+  public void addRange(
+      ParserRuleContext ctx, int startLine, int startPos, int stopLine, int stopPos) {
     Token start = mock(Token.class);
     when(start.getLine()).thenReturn(startLine);
     when(start.getCharPositionInLine()).thenReturn(startPos);
@@ -50,6 +50,7 @@ public class TestUtils {
 
   /**
    * Add range
+   *
    * @param ctx ctx
    * @param startLine startLine
    * @param startPos startPos
@@ -66,5 +67,4 @@ public class TestUtils {
     when(ctx.getStart()).thenReturn(start);
     when(ctx.getStop()).thenReturn(stop);
   }
-
 }

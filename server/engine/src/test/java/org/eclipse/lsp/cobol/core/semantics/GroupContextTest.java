@@ -26,16 +26,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
-/**
- * Test for GroupContext class
- */
+/** Test for GroupContext class */
 class GroupContextTest {
 
   @Test
   void testSectionUsages() {
-    Locality locality = Locality.builder()
-        .token("test")
-        .build();
+    Locality locality = Locality.builder().token("test").build();
 
     GroupContext groupContext = prepareGroup(locality);
 
@@ -45,9 +41,7 @@ class GroupContextTest {
 
   @Test
   void testParagraphUsages() {
-    Locality locality = Locality.builder()
-        .token("test")
-        .build();
+    Locality locality = Locality.builder().token("test").build();
 
     GroupContext groupContext = prepareGroup(locality);
 

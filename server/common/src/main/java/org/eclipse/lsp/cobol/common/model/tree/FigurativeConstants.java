@@ -19,8 +19,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * Enumeration of figurative constant type.
- * Ref - https://www.ibm.com/docs/en/cobol-zos/6.3?topic=literals-figurative-constants
+ * Enumeration of figurative constant type. Ref -
+ * https://www.ibm.com/docs/en/cobol-zos/6.3?topic=literals-figurative-constants
  */
 public enum FigurativeConstants {
   ZERO,

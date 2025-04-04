@@ -32,13 +32,13 @@ public class CICSPointOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
   public static final int RULE_INDEX = RULE_cics_point;
 
   private static final Map<Integer, ErrorSeverity> DUPLICATE_CHECK_OPTIONS =
-          new HashMap<Integer, ErrorSeverity>() {
-            {
-              put(CICSLexer.POINT, ErrorSeverity.ERROR);
-              put(CICSLexer.CONVID, ErrorSeverity.ERROR);
-              put(CICSLexer.SESSION, ErrorSeverity.ERROR);
-            }
-          };
+      new HashMap<Integer, ErrorSeverity>() {
+        {
+          put(CICSLexer.POINT, ErrorSeverity.ERROR);
+          put(CICSLexer.CONVID, ErrorSeverity.ERROR);
+          put(CICSLexer.SESSION, ErrorSeverity.ERROR);
+        }
+      };
 
   public CICSPointOptionsCheckUtility(DialectProcessingContext context, List<SyntaxError> errors) {
     super(context, errors, DUPLICATE_CHECK_OPTIONS);

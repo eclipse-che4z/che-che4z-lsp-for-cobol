@@ -55,9 +55,9 @@ public class CICSEndbrOptionsUtility extends CICSOptionsCheckBaseUtility {
    * @param <E> A subclass of ParserRuleContext
    */
   public <E extends ParserRuleContext> void checkOptions(E ctx) {
-      if (ctx.getRuleIndex() == RULE_cics_endbr_opts) {
-          checkEndbr((CICSParser.Cics_endbr_optsContext) ctx);
-      }
+    if (ctx.getRuleIndex() == RULE_cics_endbr_opts) {
+      checkEndbr((CICSParser.Cics_endbr_optsContext) ctx);
+    }
     checkDuplicates(ctx);
   }
 

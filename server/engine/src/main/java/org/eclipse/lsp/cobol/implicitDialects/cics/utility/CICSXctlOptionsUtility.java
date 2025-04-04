@@ -68,6 +68,7 @@ public class CICSXctlOptionsUtility extends CICSOptionsCheckBaseUtility {
     checkHasMutuallyExclusiveOptions("COMMAREA or CHANNEL", ctx.COMMAREA(), ctx.CHANNEL());
 
     if (ctx.COMMAREA().isEmpty()) checkHasIllegalOptions(ctx.LENGTH(), "LENGTH without COMMAREA");
-    if (ctx.INPUTMSG().isEmpty()) checkHasIllegalOptions(ctx.INPUTMSGLEN(), "INPUTMSGLEN without INPUTMSG");
+    if (ctx.INPUTMSG().isEmpty())
+      checkHasIllegalOptions(ctx.INPUTMSGLEN(), "INPUTMSGLEN without INPUTMSG");
   }
 }

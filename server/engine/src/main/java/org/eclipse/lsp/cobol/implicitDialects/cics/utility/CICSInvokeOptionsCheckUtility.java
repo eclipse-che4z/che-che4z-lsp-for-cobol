@@ -33,26 +33,26 @@ public class CICSInvokeOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
   public static final int RULE_INDEX = RULE_cics_invoke;
 
   private static final Map<Integer, ErrorSeverity> DUPLICATE_CHECK_OPTIONS =
-          new HashMap<Integer, ErrorSeverity>() {
-            {
-              put(CICSLexer.APPLICATION, ErrorSeverity.ERROR);
-              put(CICSLexer.OPERATION, ErrorSeverity.ERROR);
-              put(CICSLexer.PLATFORM, ErrorSeverity.ERROR);
-              put(CICSLexer.MAJORVERSION, ErrorSeverity.ERROR);
-              put(CICSLexer.MINORVERSION, ErrorSeverity.ERROR);
-              put(CICSLexer.EXACTMATCH, ErrorSeverity.WARNING);
-              put(CICSLexer.MINIMUM, ErrorSeverity.WARNING);
-              put(CICSLexer.COMMAREA, ErrorSeverity.ERROR);
-              put(CICSLexer.LENGTH, ErrorSeverity.ERROR);
-              put(CICSLexer.CHANNEL, ErrorSeverity.ERROR);
-              put(CICSLexer.SERVICE, ErrorSeverity.ERROR);
-              put(CICSLexer.WEBSERVICE, ErrorSeverity.ERROR);
-              put(CICSLexer.URI, ErrorSeverity.ERROR);
-              put(CICSLexer.URIMAP, ErrorSeverity.ERROR);
-              put(CICSLexer.SCOPE, ErrorSeverity.ERROR);
-              put(CICSLexer.SCOPELEN, ErrorSeverity.ERROR);
-            }
-          };
+      new HashMap<Integer, ErrorSeverity>() {
+        {
+          put(CICSLexer.APPLICATION, ErrorSeverity.ERROR);
+          put(CICSLexer.OPERATION, ErrorSeverity.ERROR);
+          put(CICSLexer.PLATFORM, ErrorSeverity.ERROR);
+          put(CICSLexer.MAJORVERSION, ErrorSeverity.ERROR);
+          put(CICSLexer.MINORVERSION, ErrorSeverity.ERROR);
+          put(CICSLexer.EXACTMATCH, ErrorSeverity.WARNING);
+          put(CICSLexer.MINIMUM, ErrorSeverity.WARNING);
+          put(CICSLexer.COMMAREA, ErrorSeverity.ERROR);
+          put(CICSLexer.LENGTH, ErrorSeverity.ERROR);
+          put(CICSLexer.CHANNEL, ErrorSeverity.ERROR);
+          put(CICSLexer.SERVICE, ErrorSeverity.ERROR);
+          put(CICSLexer.WEBSERVICE, ErrorSeverity.ERROR);
+          put(CICSLexer.URI, ErrorSeverity.ERROR);
+          put(CICSLexer.URIMAP, ErrorSeverity.ERROR);
+          put(CICSLexer.SCOPE, ErrorSeverity.ERROR);
+          put(CICSLexer.SCOPELEN, ErrorSeverity.ERROR);
+        }
+      };
 
   public CICSInvokeOptionsCheckUtility(DialectProcessingContext context, List<SyntaxError> errors) {
     super(context, errors, DUPLICATE_CHECK_OPTIONS);

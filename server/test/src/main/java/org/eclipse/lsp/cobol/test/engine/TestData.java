@@ -48,28 +48,32 @@ public class TestData {
   Map<String, List<Location>> functionUsages;
 
   Map<String, List<Location>> getParagraphDefinitions() {
-      Map<String, List<Location>> result = new HashMap<>();
-      for (Map.Entry<ProcedureId, List<Location>> en : procedureDefinitions.entrySet()) {
-        if (!en.getKey().isSection()) {
-          result.computeIfAbsent(en.getKey().getParagraphName(), it -> new ArrayList<>()).addAll(en.getValue());
-        }
+    Map<String, List<Location>> result = new HashMap<>();
+    for (Map.Entry<ProcedureId, List<Location>> en : procedureDefinitions.entrySet()) {
+      if (!en.getKey().isSection()) {
+        result
+            .computeIfAbsent(en.getKey().getParagraphName(), it -> new ArrayList<>())
+            .addAll(en.getValue());
       }
-      return result;
+    }
+    return result;
   }
+
   Map<String, List<Location>> getParagraphUsages() {
     return procedureUsages.entrySet().stream()
-            .filter(en -> !en.getKey().isSection()).collect(
-                    Collectors.toMap(en -> en.getKey().getParagraphName(), Map.Entry::getValue));
+        .filter(en -> !en.getKey().isSection())
+        .collect(Collectors.toMap(en -> en.getKey().getParagraphName(), Map.Entry::getValue));
   }
+
   public Map<String, List<Location>> getSectionUsages() {
     return procedureUsages.entrySet().stream()
-            .filter(en -> en.getKey().isSection()).collect(
-                    Collectors.toMap(en -> en.getKey().getSectionName(), Map.Entry::getValue));
+        .filter(en -> en.getKey().isSection())
+        .collect(Collectors.toMap(en -> en.getKey().getSectionName(), Map.Entry::getValue));
   }
 
   public Map<String, List<Location>> getSectionDefinitions() {
     return procedureDefinitions.entrySet().stream()
-            .filter(en -> en.getKey().isSection()).collect(
-                    Collectors.toMap(en -> en.getKey().getSectionName(), Map.Entry::getValue));
+        .filter(en -> en.getKey().isSection())
+        .collect(Collectors.toMap(en -> en.getKey().getSectionName(), Map.Entry::getValue));
   }
 }

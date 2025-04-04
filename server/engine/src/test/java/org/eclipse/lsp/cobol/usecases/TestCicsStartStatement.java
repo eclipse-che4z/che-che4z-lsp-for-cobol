@@ -26,94 +26,131 @@ import java.util.*;
 
 /**
  * Test START commands. Documentation link: <a
- * href="https://www.ibm.com/docs/en/cics-ts/6.x?topic=summary-start">START
- * Command</a>
+ * href="https://www.ibm.com/docs/en/cics-ts/6.x?topic=summary-start">START Command</a>
  *
  * <p>This class tests all variations of the START command found in the link above.
  */
 public class TestCicsStartStatement {
 
-    // Test Strings
-    private static final String START_TRANSID_VALID_1 = "START TRANSID({$varOne})";
-    private static final String START_TRANSID_VALID_2 = "START TRANSID({$varOne}) AFTER HOURS({$varOne}) REQID({$varOne}) FROM({$varOne}) LENGTH({$varOne}) FMH TERMID({$varOne}) SYSID({$varOne}) RTRANSID({$varOne}) RTERMID({$varOne}) QUEUE({$varOne}) NOCHECK PROTECT";
+  // Test Strings
+  private static final String START_TRANSID_VALID_1 = "START TRANSID({$varOne})";
+  private static final String START_TRANSID_VALID_2 =
+      "START TRANSID({$varOne}) AFTER HOURS({$varOne}) REQID({$varOne}) FROM({$varOne}) LENGTH({$varOne}) FMH TERMID({$varOne}) SYSID({$varOne}) RTRANSID({$varOne}) RTERMID({$varOne}) QUEUE({$varOne}) NOCHECK PROTECT";
 
-    private static final String START_ATTACH_VALID_1 = "START TRANSID({$varOne}) ATTACH";
-    private static final String START_ATTACH_VALID_2 = "START TRANSID({$varOne}) ATTACH FROM({$varOne}) LENGTH({$varOne})";
+  private static final String START_ATTACH_VALID_1 = "START TRANSID({$varOne}) ATTACH";
+  private static final String START_ATTACH_VALID_2 =
+      "START TRANSID({$varOne}) ATTACH FROM({$varOne}) LENGTH({$varOne})";
 
-    private static final String START_BREXIT_VALID_1 = "START TRANSID({$varOne}) BREXIT";
-    private static final String START_BREXIT_VALID_2 = "START TRANSID({$varOne}) BREXIT({$varOne}) BRDATA({$varOne}) BRDATALENGTH({$varOne}) USERID({$varOne})";
+  private static final String START_BREXIT_VALID_1 = "START TRANSID({$varOne}) BREXIT";
+  private static final String START_BREXIT_VALID_2 =
+      "START TRANSID({$varOne}) BREXIT({$varOne}) BRDATA({$varOne}) BRDATALENGTH({$varOne}) USERID({$varOne})";
 
-    private static final String START_CHANNEL_VALID_1 = "START TRANSID({$varOne}) CHANNEL({$varOne})";
-    private static final String START_CHANNEL_VALID_2 = "START TRANSID({$varOne}) CHANNEL({$varOne}) TERMID({$varOne}) SYSID({$varOne}) NOCHECK PROTECT";
+  private static final String START_CHANNEL_VALID_1 = "START TRANSID({$varOne}) CHANNEL({$varOne})";
+  private static final String START_CHANNEL_VALID_2 =
+      "START TRANSID({$varOne}) CHANNEL({$varOne}) TERMID({$varOne}) SYSID({$varOne}) NOCHECK PROTECT";
 
-    private static final String START_TRANSID_INVALID_1 = "START TRANSID({$varOne}) TERMID({$varOne}) {USERID|errorOne}({$varOne})";
-    private static final String START_TRANSID_INVALID_2 = "START {_TRANSID({$varOne}) LENGTH({$varOne} )|errorOne_}";
+  private static final String START_TRANSID_INVALID_1 =
+      "START TRANSID({$varOne}) TERMID({$varOne}) {USERID|errorOne}({$varOne})";
+  private static final String START_TRANSID_INVALID_2 =
+      "START {_TRANSID({$varOne}) LENGTH({$varOne} )|errorOne_}";
 
-    private static final String START_ATTACH_INVALID_1 = "START {_TRANSID({$varOne}) ATTACH LENGTH({$varOne} )|errorOne_}";
+  private static final String START_ATTACH_INVALID_1 =
+      "START {_TRANSID({$varOne}) ATTACH LENGTH({$varOne} )|errorOne_}";
 
-    private static final String START_BREXIT_INVALID_1 = "START {_TRANSID({$varOne}) BREXIT({$varOne}) BRDATALENGTH({$varOne} )|errorOne_}";
+  private static final String START_BREXIT_INVALID_1 =
+      "START {_TRANSID({$varOne}) BREXIT({$varOne}) BRDATALENGTH({$varOne} )|errorOne_}";
 
-    private static final String START_CHANNEL_INVALID_1 = "START TRANSID({$varOne}) CHANNEL({$varOne}) TERMID({$varOne}) {USERID|errorOne}({$varOne})";
+  private static final String START_CHANNEL_INVALID_1 =
+      "START TRANSID({$varOne}) CHANNEL({$varOne}) TERMID({$varOne}) {USERID|errorOne}({$varOne})";
 
-    // Test Functions
-    @Test
-    void testCicsStartTransidValid() {
-        CICSTestUtils.noErrorTest(START_TRANSID_VALID_1);
-        CICSTestUtils.noErrorTest(START_TRANSID_VALID_2);
-    }
+  // Test Functions
+  @Test
+  void testCicsStartTransidValid() {
+    CICSTestUtils.noErrorTest(START_TRANSID_VALID_1);
+    CICSTestUtils.noErrorTest(START_TRANSID_VALID_2);
+  }
 
-    @Test
-    void testCicsStartAttachValid() {
-        CICSTestUtils.noErrorTest(START_ATTACH_VALID_1);
-        CICSTestUtils.noErrorTest(START_ATTACH_VALID_2);
-    }
+  @Test
+  void testCicsStartAttachValid() {
+    CICSTestUtils.noErrorTest(START_ATTACH_VALID_1);
+    CICSTestUtils.noErrorTest(START_ATTACH_VALID_2);
+  }
 
-    @Test
-    void testCicsStartBrexitValid() {
-        CICSTestUtils.noErrorTest(START_BREXIT_VALID_1);
-        CICSTestUtils.noErrorTest(START_BREXIT_VALID_2);
-    }
+  @Test
+  void testCicsStartBrexitValid() {
+    CICSTestUtils.noErrorTest(START_BREXIT_VALID_1);
+    CICSTestUtils.noErrorTest(START_BREXIT_VALID_2);
+  }
 
-    @Test
-    void testCicsStartChannelValid() {
-        CICSTestUtils.noErrorTest(START_CHANNEL_VALID_1);
-        CICSTestUtils.noErrorTest(START_CHANNEL_VALID_2);
-    }
+  @Test
+  void testCicsStartChannelValid() {
+    CICSTestUtils.noErrorTest(START_CHANNEL_VALID_1);
+    CICSTestUtils.noErrorTest(START_CHANNEL_VALID_2);
+  }
 
-    // Invalid Tests
-    @Test
-    void testCicsStartTransidInvalid_1() {
-        HashMap<String, Diagnostic> expectedDiagnostics = new HashMap<>();
-        expectedDiagnostics.put("errorOne", new Diagnostic(new Range(), "Options \"TERMID or USERID\" are mutually exclusive.", DiagnosticSeverity.Error, ErrorSource.PARSING.getText()));
-        CICSTestUtils.errorTest(START_TRANSID_INVALID_1, expectedDiagnostics);
-    }
+  // Invalid Tests
+  @Test
+  void testCicsStartTransidInvalid_1() {
+    HashMap<String, Diagnostic> expectedDiagnostics = new HashMap<>();
+    expectedDiagnostics.put(
+        "errorOne",
+        new Diagnostic(
+            new Range(),
+            "Options \"TERMID or USERID\" are mutually exclusive.",
+            DiagnosticSeverity.Error,
+            ErrorSource.PARSING.getText()));
+    CICSTestUtils.errorTest(START_TRANSID_INVALID_1, expectedDiagnostics);
+  }
 
-    @Test
-    void testCicsStartTransidInvalid_2() {
-        HashMap<String, Diagnostic> expectedDiagnostics = new HashMap<>();
-        expectedDiagnostics.put("errorOne", new Diagnostic(new Range(), "Missing required option for: LENGTH without FROM", DiagnosticSeverity.Error, ErrorSource.PARSING.getText()));
-        CICSTestUtils.errorTest(START_TRANSID_INVALID_2, expectedDiagnostics);
-    }
+  @Test
+  void testCicsStartTransidInvalid_2() {
+    HashMap<String, Diagnostic> expectedDiagnostics = new HashMap<>();
+    expectedDiagnostics.put(
+        "errorOne",
+        new Diagnostic(
+            new Range(),
+            "Missing required option for: LENGTH without FROM",
+            DiagnosticSeverity.Error,
+            ErrorSource.PARSING.getText()));
+    CICSTestUtils.errorTest(START_TRANSID_INVALID_2, expectedDiagnostics);
+  }
 
-    @Test
-    void testCicsStartAttachInvalid_1() {
-        HashMap<String, Diagnostic> expectedDiagnostics = new HashMap<>();
-        expectedDiagnostics.put("errorOne", new Diagnostic(new Range(), "Missing required option for: LENGTH without FROM", DiagnosticSeverity.Error, ErrorSource.PARSING.getText()));
-        CICSTestUtils.errorTest(START_ATTACH_INVALID_1, expectedDiagnostics);
-    }
+  @Test
+  void testCicsStartAttachInvalid_1() {
+    HashMap<String, Diagnostic> expectedDiagnostics = new HashMap<>();
+    expectedDiagnostics.put(
+        "errorOne",
+        new Diagnostic(
+            new Range(),
+            "Missing required option for: LENGTH without FROM",
+            DiagnosticSeverity.Error,
+            ErrorSource.PARSING.getText()));
+    CICSTestUtils.errorTest(START_ATTACH_INVALID_1, expectedDiagnostics);
+  }
 
-    @Test
-    void testCicsStartBrexitInvalid_1() {
-        HashMap<String, Diagnostic> expectedDiagnostics = new HashMap<>();
-        expectedDiagnostics.put("errorOne", new Diagnostic(new Range(), "Missing required option for: BRDATALENGTH without BRDATA", DiagnosticSeverity.Error, ErrorSource.PARSING.getText()));
-        CICSTestUtils.errorTest(START_BREXIT_INVALID_1, expectedDiagnostics);
-    }
+  @Test
+  void testCicsStartBrexitInvalid_1() {
+    HashMap<String, Diagnostic> expectedDiagnostics = new HashMap<>();
+    expectedDiagnostics.put(
+        "errorOne",
+        new Diagnostic(
+            new Range(),
+            "Missing required option for: BRDATALENGTH without BRDATA",
+            DiagnosticSeverity.Error,
+            ErrorSource.PARSING.getText()));
+    CICSTestUtils.errorTest(START_BREXIT_INVALID_1, expectedDiagnostics);
+  }
 
-    @Test
-    void testCicsStartChannelInvalid_1() {
-        HashMap<String, Diagnostic> expectedDiagnostics = new HashMap<>();
-        expectedDiagnostics.put("errorOne", new Diagnostic(new Range(), "Options \"TERMID or USERID\" are mutually exclusive.", DiagnosticSeverity.Error, ErrorSource.PARSING.getText()));
-        CICSTestUtils.errorTest(START_CHANNEL_INVALID_1, expectedDiagnostics);
-    }
-
+  @Test
+  void testCicsStartChannelInvalid_1() {
+    HashMap<String, Diagnostic> expectedDiagnostics = new HashMap<>();
+    expectedDiagnostics.put(
+        "errorOne",
+        new Diagnostic(
+            new Range(),
+            "Options \"TERMID or USERID\" are mutually exclusive.",
+            DiagnosticSeverity.Error,
+            ErrorSource.PARSING.getText()));
+    CICSTestUtils.errorTest(START_CHANNEL_INVALID_1, expectedDiagnostics);
+  }
 }

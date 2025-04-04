@@ -32,17 +32,17 @@ public class CICSUpdateOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
   public static final int RULE_INDEX = RULE_cics_update;
 
   private static final Map<Integer, ErrorSeverity> DUPLICATE_CHECK_OPTIONS =
-          new HashMap<Integer, ErrorSeverity>() {
-            {
-              put(CICSLexer.COUNTER, ErrorSeverity.ERROR);
-              put(CICSLexer.DCOUNTER, ErrorSeverity.ERROR);
-              put(CICSLexer.POOL, ErrorSeverity.ERROR);
-              put(CICSLexer.VALUE, ErrorSeverity.ERROR);
-              put(CICSLexer.COMPAREMIN, ErrorSeverity.ERROR);
-              put(CICSLexer.COMPAREMAX, ErrorSeverity.ERROR);
-              put(CICSLexer.NOSUSPEND, ErrorSeverity.WARNING);
-            }
-          };
+      new HashMap<Integer, ErrorSeverity>() {
+        {
+          put(CICSLexer.COUNTER, ErrorSeverity.ERROR);
+          put(CICSLexer.DCOUNTER, ErrorSeverity.ERROR);
+          put(CICSLexer.POOL, ErrorSeverity.ERROR);
+          put(CICSLexer.VALUE, ErrorSeverity.ERROR);
+          put(CICSLexer.COMPAREMIN, ErrorSeverity.ERROR);
+          put(CICSLexer.COMPAREMAX, ErrorSeverity.ERROR);
+          put(CICSLexer.NOSUSPEND, ErrorSeverity.WARNING);
+        }
+      };
 
   public CICSUpdateOptionsCheckUtility(DialectProcessingContext context, List<SyntaxError> errors) {
     super(context, errors, DUPLICATE_CHECK_OPTIONS);
@@ -55,9 +55,9 @@ public class CICSUpdateOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
    * @param <E> A subclass of ParserRuleContext
    */
   public <E extends ParserRuleContext> void checkOptions(E ctx) {
-      if (ctx.getRuleIndex() == CICSParser.RULE_cics_update_counter_dcounter) {
-          checkUpdateCounterDcounter((CICSParser.Cics_update_counter_dcounterContext) ctx);
-      }
+    if (ctx.getRuleIndex() == CICSParser.RULE_cics_update_counter_dcounter) {
+      checkUpdateCounterDcounter((CICSParser.Cics_update_counter_dcounterContext) ctx);
+    }
     checkDuplicates(ctx);
   }
 
@@ -66,4 +66,3 @@ public class CICSUpdateOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     checkHasMandatoryOptions(ctx.VALUE(), ctx, "VALUE");
   }
 }
-

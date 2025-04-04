@@ -21,10 +21,10 @@ import org.eclipse.lsp.cobol.dialects.daco.utils.DialectConfigs;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.junit.jupiter.api.Test;
 
-/** A test case for COPY FROM statement with group variables*/
+/** A test case for COPY FROM statement with group variables */
 public class TestDaCoCopyFrom2 {
   private static final String TEXT =
-            "       IDENTIFICATION DIVISION.\n"
+      "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID.    CPYFROM.\n"
           + "       ENVIRONMENT DIVISION.\n"
           + "       IDMS-CONTROL SECTION.\n"

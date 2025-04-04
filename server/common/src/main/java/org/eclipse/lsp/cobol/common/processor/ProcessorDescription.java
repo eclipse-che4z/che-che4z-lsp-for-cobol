@@ -18,13 +18,11 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 
-/**
- * AST Processor descriptor class
- */
+/** AST Processor descriptor class */
 @Data
 @AllArgsConstructor
 public class ProcessorDescription {
-    Class<? extends Node> nodeClass;
-    ProcessingPhase phase;
-    Processor<? extends Node> processor;
+  Class<? extends Node> nodeClass;
+  ProcessingPhase phase;
+  Processor<? extends Node> processor;
 }

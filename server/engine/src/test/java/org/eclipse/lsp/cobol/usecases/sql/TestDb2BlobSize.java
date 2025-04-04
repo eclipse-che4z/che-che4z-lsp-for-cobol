@@ -19,22 +19,20 @@ import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.junit.jupiter.api.Test;
 
-/**
- * Check for 1. decimal case
- */
+/** Check for 1. decimal case */
 class TestDb2BlobSize {
-    public static final String TEXT =
-            "       IDENTIFICATION DIVISION.\n"
-                    + "       PROGRAM-ID. TEST1.\n"
-                    + "       DATA DIVISION.\n"
-                    + "       WORKING-STORAGE SECTION.\n"
-                    + "       PROCEDURE DIVISION.\n"
-                    + "           EXEC SQL DECLARE TEST123 TABLE\n"
-                    + "             (JSON_DATA BLOB(256K) NOT NULL)\n"
-                    + "           END-EXEC.\n";
+  public static final String TEXT =
+      "       IDENTIFICATION DIVISION.\n"
+          + "       PROGRAM-ID. TEST1.\n"
+          + "       DATA DIVISION.\n"
+          + "       WORKING-STORAGE SECTION.\n"
+          + "       PROCEDURE DIVISION.\n"
+          + "           EXEC SQL DECLARE TEST123 TABLE\n"
+          + "             (JSON_DATA BLOB(256K) NOT NULL)\n"
+          + "           END-EXEC.\n";
 
-    @Test
-    void test() {
-        UseCaseEngine.runTest(TEXT, ImmutableList.of(), ImmutableMap.of());
-    }
+  @Test
+  void test() {
+    UseCaseEngine.runTest(TEXT, ImmutableList.of(), ImmutableMap.of());
+  }
 }

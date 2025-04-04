@@ -27,9 +27,7 @@ import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
-/**
- * Error listener for Compiler Directives parser
- */
+/** Error listener for Compiler Directives parser */
 public class CompilerDirectivesErrorListener extends BaseErrorListener {
   private final AnalysisContext analysisContext;
   private final Position startPosition;
@@ -40,12 +38,19 @@ public class CompilerDirectivesErrorListener extends BaseErrorListener {
   }
 
   @Override
-  public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line, int charPositionInLine, String msg, RecognitionException e) {
+  public void syntaxError(
+      Recognizer<?, ?> recognizer,
+      Object offendingSymbol,
+      int line,
+      int charPositionInLine,
+      String msg,
+      RecognitionException e) {
     Position start = new Position(line - 1, charPositionInLine);
     Position end = new Position(line - 1, ((CommonToken) offendingSymbol).getStopIndex() + 1);
     Range range = CompilerDirectivesUtils.shiftRange(new Range(start, end), startPosition);
     Location location = new Location(analysisContext.getExtendedDocument().getUri(), range);
-    SyntaxError error = SyntaxError.syntaxError()
+    SyntaxError error =
+        SyntaxError.syntaxError()
             .errorSource(ErrorSource.PARSING)
             .suggestion(msg)
             .location(new OriginalLocation(location, null))

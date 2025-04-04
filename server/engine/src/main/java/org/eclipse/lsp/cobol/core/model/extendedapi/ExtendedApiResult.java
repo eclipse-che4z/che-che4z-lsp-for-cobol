@@ -19,9 +19,7 @@ import lombok.Value;
 
 import java.util.List;
 
-/**
- * Analysis result for Extended Api call
- */
+/** Analysis result for Extended Api call */
 @Value
 public class ExtendedApiResult {
   List<Program> controlFlowAST;

@@ -22,9 +22,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/**
- * Test for WorkingFolderService class
- */
+/** Test for WorkingFolderService class */
 class WorkingFolderServiceTest {
   @Test
   void testWorkingFolder() {
@@ -47,5 +45,4 @@ class WorkingFolderServiceTest {
     List<String> files = service.getFilenames(service.getWorkingFolder());
     assertTrue(files.size() > 0);
   }
-
 }

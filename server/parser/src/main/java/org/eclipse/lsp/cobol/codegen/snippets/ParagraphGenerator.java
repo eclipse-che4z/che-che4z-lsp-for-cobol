@@ -19,9 +19,7 @@ package org.eclipse.lsp.cobol.codegen.snippets;
 import org.eclipse.lsp.cobol.codegen.GeneratorContext;
 import org.eclipse.lsp.cobol.codegen.IdentifierType;
 
-/**
- * Generates a PARAGRAPH
- */
+/** Generates a PARAGRAPH */
 public class ParagraphGenerator implements SnippetGenerator {
   @Override
   public String generate(GeneratorContext ctx) {

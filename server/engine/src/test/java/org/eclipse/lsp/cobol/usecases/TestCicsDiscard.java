@@ -24,21 +24,23 @@ import org.junit.jupiter.api.Test;
 
 /**
  * Test CICS DISCARD commands. Documentation link: <a
- * href="https://www.ibm.com/docs/en/search/discard?scope=SSJL4D_6.x">DISCARD
- * Command</a>
+ * href="https://www.ibm.com/docs/en/search/discard?scope=SSJL4D_6.x">DISCARD Command</a>
  *
  * <p>This class tests all variations of the DISCARD command .
  */
 public class TestCicsDiscard {
 
   private static final String DISCARD_ATOMSERVICE_VALID = "DISCARD ATOMSERVICE({$varFour})";
-  private static final String DISCARD_AUTINSTMODEL_VALID = "DISCARD AUTINSTMODEL({$varFour}) RESP({$varOne})";
+  private static final String DISCARD_AUTINSTMODEL_VALID =
+      "DISCARD AUTINSTMODEL({$varFour}) RESP({$varOne})";
   private static final String DISCARD_BUNDLE_VALID = "DISCARD BUNDLE({$varFour})";
-  private static final String DISCARD_CONNECTION_VALID = "DISCARD RESP({$varOne}) CONNECTION({$varFour})";
+  private static final String DISCARD_CONNECTION_VALID =
+      "DISCARD RESP({$varOne}) CONNECTION({$varFour})";
   private static final String DISCARD_DB2CONN_VALID = "DISCARD DB2CONN";
   private static final String DISCARD_DB2ENTRY_VALID = "DISCARD DB2ENTRY({$varFour}) NOHANDLE";
   private static final String DISCARD_DB2TRAN_VALID = "DISCARD DB2TRAN({$varFour})";
-  private static final String DISCARD_DOCTEMPLATE_VALID = "DISCARD NOHANDLE DOCTEMPLATE({$varFour}) RESP({$varOne})";
+  private static final String DISCARD_DOCTEMPLATE_VALID =
+      "DISCARD NOHANDLE DOCTEMPLATE({$varFour}) RESP({$varOne})";
   private static final String DISCARD_ENQMODEL_VALID = "DISCARD ENQMODEL({$varFour})";
   private static final String DISCARD_FILE_VALID = "DISCARD FILE({$varFour})";
   private static final String DISCARD_IPCONN_VALID = "DISCARD IPCONN({$varFour})";
@@ -49,20 +51,23 @@ public class TestCicsDiscard {
   private static final String DISCARD_MQCONN_VALID = "DISCARD MQCONN RESP({$varOne})";
   private static final String DISCARD_MQMONITOR_VALID = "DISCARD MQMONITOR({$varFour})";
   private static final String DISCARD_PARTNER_VALID = "DISCARD PARTNER({$varFour})";
-  private static final String DISCARD_PIPELINE_VALID = "DISCARD RESP({$varOne}) PIPELINE({$varFour})";
+  private static final String DISCARD_PIPELINE_VALID =
+      "DISCARD RESP({$varOne}) PIPELINE({$varFour})";
   private static final String DISCARD_PROCESSTYPE_VALID = "DISCARD PROCESSTYPE({$varFour})";
   private static final String DISCARD_PROFILE_VALID = "DISCARD PROFILE({$varFour})";
   private static final String DISCARD_PROGRAM_VALID = "DISCARD PROGRAM({$varFour}) RESP({$varOne})";
   private static final String DISCARD_TCPIPSERVICE_VALID = "DISCARD TCPIPSERVICE({$varFour})";
   private static final String DISCARD_TDQUEUE_VALID = "DISCARD TDQUEUE({$varFour})";
-  private static final String DISCARD_TERMINAL_VALID = "DISCARD RESP({$varOne}) TERMINAL({$varFour})";
+  private static final String DISCARD_TERMINAL_VALID =
+      "DISCARD RESP({$varOne}) TERMINAL({$varFour})";
   private static final String DISCARD_TRANCLASS_VALID = "DISCARD TRANCLASS({$varFour}) NOHANDLE";
   private static final String DISCARD_TRANSACTION_VALID = "DISCARD TRANSACTION({$varFour})";
   private static final String DISCARD_TSMODEL_VALID = "DISCARD TSMODEL({$varFour})";
   private static final String DISCARD_URIMAP_VALID = "DISCARD URIMAP({$varFour})";
   private static final String DISCARD_WEBSERVICE_VALID = "DISCARD WEBSERVICE({$varFour})";
 
-  private static final String DISCARD_DUPLICATE_INVALID = "DISCARD ATOMSERVICE({$varFour}) {ATOMSERVICE|error}(ignored)";
+  private static final String DISCARD_DUPLICATE_INVALID =
+      "DISCARD ATOMSERVICE({$varFour}) {ATOMSERVICE|error}(ignored)";
 
   @Test
   void testDiscardAtomService() {
@@ -216,15 +221,15 @@ public class TestCicsDiscard {
 
   @Test
   void testDiscardDuplicate() {
-    CICSTestUtils.errorTest(DISCARD_DUPLICATE_INVALID, ImmutableMap.of(
-        "error",
+    CICSTestUtils.errorTest(
+        DISCARD_DUPLICATE_INVALID,
+        ImmutableMap.of(
+            "error",
             new Diagnostic(
-                    new Range(),
-                    "Extraneous input ATOMSERVICE",
-                    DiagnosticSeverity.Error,
-                    ErrorSource.PARSING.getText()
-            )
-    ),  "SP");
+                new Range(),
+                "Extraneous input ATOMSERVICE",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())),
+        "SP");
   }
-
 }

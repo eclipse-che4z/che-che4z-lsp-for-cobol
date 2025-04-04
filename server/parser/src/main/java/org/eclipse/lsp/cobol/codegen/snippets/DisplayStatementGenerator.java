@@ -19,9 +19,7 @@ package org.eclipse.lsp.cobol.codegen.snippets;
 import org.eclipse.lsp.cobol.codegen.GeneratorContext;
 import org.eclipse.lsp.cobol.codegen.CobolCodeGenerator;
 
-/**
- * Display statement generator
- */
+/** Display statement generator */
 public class DisplayStatementGenerator implements SnippetGenerator {
   @Override
   public String generate(GeneratorContext ctx) {

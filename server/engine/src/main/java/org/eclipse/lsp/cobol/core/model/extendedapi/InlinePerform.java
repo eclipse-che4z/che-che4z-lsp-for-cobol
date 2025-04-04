@@ -27,8 +27,7 @@ public class InlinePerform extends CFASTNode {
 
   public InlinePerform(Location location, PerformUntilType performUntilType) {
     super(CFASTNodeType.INLINE_PERFORM.getValue(), location);
-    this.performUntilType = Optional.ofNullable(performUntilType)
-        .map(PerformUntilType::name)
-        .orElse(null);
+    this.performUntilType =
+        Optional.ofNullable(performUntilType).map(PerformUntilType::name).orElse(null);
   }
 }

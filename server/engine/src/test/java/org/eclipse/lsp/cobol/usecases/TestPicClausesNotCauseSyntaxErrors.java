@@ -66,12 +66,9 @@ class TestPicClausesNotCauseSyntaxErrors {
         TEXT, ImmutableList.of(new CobolText(REPL_NAME, REPL)), ImmutableMap.of());
   }
 
-  /**
-   * Ref - https://www.ibm.com/docs/en/cobol-zos/6.2?topic=entry-picture-clause
-   */
+  /** Ref - https://www.ibm.com/docs/en/cobol-zos/6.2?topic=entry-picture-clause */
   @Test
   void testWhenPictureClauseSucceededByIS_thenNoError() {
-    UseCaseEngine.runTest(
-            TEXT2, ImmutableList.of(), ImmutableMap.of());
+    UseCaseEngine.runTest(TEXT2, ImmutableList.of(), ImmutableMap.of());
   }
 }

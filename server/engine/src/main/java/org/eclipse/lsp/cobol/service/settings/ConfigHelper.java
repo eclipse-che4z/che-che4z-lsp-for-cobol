@@ -28,9 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.common.DialectRegistryItem;
 import org.eclipse.lsp.cobol.common.copybook.SQLBackend;
 
-/**
- * Config helper class
- */
+/** Config helper class */
 @Slf4j
 @UtilityClass
 public class ConfigHelper {
@@ -51,6 +49,7 @@ public class ConfigHelper {
 
   /**
    * Parse dialect registry client configurations to {@link List<DialectRegistryItem>}
+   *
    * @param jsonArray client dialect registry configuration
    * @return {@link List<DialectRegistryItem>}
    */
@@ -58,7 +57,8 @@ public class ConfigHelper {
     return Streams.stream(jsonArray)
         .map(JsonElement::getAsJsonObject)
         .filter(Objects::nonNull)
-        .map(o -> {
+        .map(
+            o -> {
               URI uri;
               try {
                 JsonObject jsonUri = o.get("uri").getAsJsonObject();
@@ -76,8 +76,7 @@ public class ConfigHelper {
                   uri,
                   o.get("description").getAsString(),
                   o.get("extensionId").getAsString());
-            }
-        )
+            })
         .filter(Objects::nonNull)
         .collect(toList());
   }
@@ -88,17 +87,19 @@ public class ConfigHelper {
 
   /**
    * Parse SQL Backend client configurations to {@link SQLBackend}
+   *
    * @param objects client SQL Backend configuration
    * @return {@link SQLBackend}
    */
   public SQLBackend parseSQLBackend(List<Object> objects) {
     return ConfigHelper.getValueAsString(objects)
-            .map(SQLBackend::valueOf)
-            .orElse(SQLBackend.DB2_SERVER);
+        .map(SQLBackend::valueOf)
+        .orElse(SQLBackend.DB2_SERVER);
   }
 
   /**
    * Parse CICS translator client configurations to {@link Boolean}
+   *
    * @param options CICS translator client configuration
    * @return True if checked or false
    */
@@ -112,18 +113,20 @@ public class ConfigHelper {
 
   /**
    * Parse dialect client configurations to {@link String}
+   *
    * @param dialects dialects client configuration
    * @return List of configured dialects
    */
   public List<String> parseDialects(JsonArray dialects) {
     return Streams.stream(dialects)
-            .filter(ele -> !(ele instanceof JsonNull))
-            .map(JsonElement::getAsString)
-            .collect(toList());
+        .filter(ele -> !(ele instanceof JsonNull))
+        .map(JsonElement::getAsString)
+        .collect(toList());
   }
 
   /**
    * Parse subroutine client configurations
+   *
    * @param subroutine configured subroutine
    * @return List of configured subroutines
    */
@@ -136,10 +139,11 @@ public class ConfigHelper {
 
   /**
    * Parse compiler options client configurations
+   *
    * @param jsonElements configured compiler options
    * @return List of configured compiler options
    */
-    public static List<String> parseCompilerOptions(Object jsonElements) {
+  public static List<String> parseCompilerOptions(Object jsonElements) {
     if (jsonElements instanceof JsonArray) {
       return Streams.stream((JsonArray) jsonElements)
           .map(JsonElement::getAsString)

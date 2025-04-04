@@ -26,62 +26,69 @@ import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
-/** Test resolving copybooks inside EXEC SQL section **/
+/** Test resolving copybooks inside EXEC SQL section * */
 class TestCopyWithinSQL {
-  private static final String TEXT1 = "       IDENTIFICATION DIVISION.\n"
-      + "       PROGRAM-ID.    VFB150.\n"
-      + "       DATA DIVISION.\n"
-      + "       WORKING-STORAGE SECTION.\n"
-      + "           EXEC SQL\n"
-      + "               INCLUDE {~COPY1|1}\n"
-      + "           END-EXEC.\n"
-      + "           EXEC SQL\n"
-      + "                INCLUDE {~SQLCA} \n"
-      + "           END-EXEC.\n";
+  private static final String TEXT1 =
+      "       IDENTIFICATION DIVISION.\n"
+          + "       PROGRAM-ID.    VFB150.\n"
+          + "       DATA DIVISION.\n"
+          + "       WORKING-STORAGE SECTION.\n"
+          + "           EXEC SQL\n"
+          + "               INCLUDE {~COPY1|1}\n"
+          + "           END-EXEC.\n"
+          + "           EXEC SQL\n"
+          + "                INCLUDE {~SQLCA} \n"
+          + "           END-EXEC.\n";
 
-  private static final String TEXT2 = "       IDENTIFICATION DIVISION.\n"
-      + "       PROGRAM-ID.    VFB150.\n"
-      + "       DATA DIVISION.\n"
-      + "       WORKING-STORAGE SECTION.\n"
-      + "           EXEC SQL\n"
-      + "                INCLUDE {~SQLCPY}\n"
-      + "           END-EXEC.\n"
-      + "           EXEC SQL\n"
-      + "                INCLUDE {~COPY1|1}\n"
-      + "           END-EXEC.\n";
+  private static final String TEXT2 =
+      "       IDENTIFICATION DIVISION.\n"
+          + "       PROGRAM-ID.    VFB150.\n"
+          + "       DATA DIVISION.\n"
+          + "       WORKING-STORAGE SECTION.\n"
+          + "           EXEC SQL\n"
+          + "                INCLUDE {~SQLCPY}\n"
+          + "           END-EXEC.\n"
+          + "           EXEC SQL\n"
+          + "                INCLUDE {~COPY1|1}\n"
+          + "           END-EXEC.\n";
 
-  private static final String SQLCPY = "\n"
-      + "\n"
-      + "\n"
-      + "\n"
-      + "\n"
-      + "\n"
-      + "        01 {$*SQLCA}.\n"
-      + "                05 {$*SQLCAID}      PIC X(8).\n";
+  private static final String SQLCPY =
+      "\n"
+          + "\n"
+          + "\n"
+          + "\n"
+          + "\n"
+          + "\n"
+          + "        01 {$*SQLCA}.\n"
+          + "                05 {$*SQLCAID}      PIC X(8).\n";
 
   @Test
   void testMissedCopyBefore() {
-    UseCaseEngine.runTest(TEXT1, ImmutableList.of(),
+    UseCaseEngine.runTest(
+        TEXT1,
+        ImmutableList.of(),
         ImmutableMap.of(
             "1",
-            new Diagnostic(new Range(),
+            new Diagnostic(
+                new Range(),
                 "COPY1: Copybook not found",
-                DiagnosticSeverity.Error, ErrorSource.COPYBOOK.getText(),
-                MISSING_COPYBOOK.getLabel()))
-    );
+                DiagnosticSeverity.Error,
+                ErrorSource.COPYBOOK.getText(),
+                MISSING_COPYBOOK.getLabel())));
   }
 
   @Test
   void testMissedCopyAfter() {
-    UseCaseEngine.runTest(TEXT2,
+    UseCaseEngine.runTest(
+        TEXT2,
         ImmutableList.of(new CobolText("SQLCPY", SQLCPY)),
         ImmutableMap.of(
             "1",
-            new Diagnostic(new Range(),
+            new Diagnostic(
+                new Range(),
                 "COPY1: Copybook not found",
-                DiagnosticSeverity.Error, ErrorSource.COPYBOOK.getText(),
-                MISSING_COPYBOOK.getLabel()))
-    );
+                DiagnosticSeverity.Error,
+                ErrorSource.COPYBOOK.getText(),
+                MISSING_COPYBOOK.getLabel())));
   }
-
 }

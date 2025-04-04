@@ -70,7 +70,8 @@ class PositiveTestOld extends FileBasedTest {
               .dialectsSettings(analysisConfig.getDialectsSettings())
               .build();
       AnalysisResult analyze = UseCaseUtils.analyze(useCase);
-      PositiveTestUtility.assetDefinitionsNReferencesFromSnap(analyze.getSymbolTableMap(), dataNameRefs, analyze.getRootNode(), fileName);
+      PositiveTestUtility.assetDefinitionsNReferencesFromSnap(
+          analyze.getSymbolTableMap(), dataNameRefs, analyze.getRootNode(), fileName);
       assertNoError(fileName, analyze);
     }
   }

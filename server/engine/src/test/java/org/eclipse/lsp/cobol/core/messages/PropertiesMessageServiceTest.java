@@ -73,7 +73,9 @@ class PropertiesMessageServiceTest {
   void whenInValidMessageTemplatePathProvide_getException() {
     Assertions.assertThrows(
         MissingResourceException.class,
-        () -> new PropertiesMessageService("dummy", localeMock, settingsService, workingFolderService));
+        () ->
+            new PropertiesMessageService(
+                "dummy", localeMock, settingsService, workingFolderService));
   }
 
   @Test
@@ -82,9 +84,8 @@ class PropertiesMessageServiceTest {
         new PropertiesMessageService(
             "resourceBundles/Test_messageServiceEmptyFile",
             localeMock,
-                settingsService,
-                workingFolderService
-        );
+            settingsService,
+            workingFolderService);
     assertEquals("1", messageServiceLocal.getMessage("1"));
   }
 

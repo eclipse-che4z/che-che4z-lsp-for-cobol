@@ -44,7 +44,11 @@ public class AstProcessor {
    * @param rootNode the root node of AST
    * @return a list of errors
    */
-  public List<SyntaxError> processSyntaxTree(AnalysisConfig analysisConfig, ProcessingContext ctx, AnalysisContext analysisContext, Node rootNode) {
+  public List<SyntaxError> processSyntaxTree(
+      AnalysisConfig analysisConfig,
+      ProcessingContext ctx,
+      AnalysisContext analysisContext,
+      Node rootNode) {
     if (analysisConfig.isCollectAstChanges()) {
       analysisContext.logAst(null, CliUtils.GSON.toJsonTree(rootNode));
     }
@@ -59,7 +63,7 @@ public class AstProcessor {
     return ctx.getErrors();
   }
 
-    /**
+  /**
    * Process tree node and its children after tree construction.
    *
    * @param phase processing phase
@@ -67,9 +71,9 @@ public class AstProcessor {
    * @param ctx processing context
    */
   public void process(ProcessingPhase phase, Node node, ProcessingContext ctx) {
-    List<Map.Entry<Class<? extends Node>, List<Processor<? extends Node>>>> processors = ctx.getProcessors().get(phase);
-    if (processors != null)
-      process(processors, node, ctx);
+    List<Map.Entry<Class<? extends Node>, List<Processor<? extends Node>>>> processors =
+        ctx.getProcessors().get(phase);
+    if (processors != null) process(processors, node, ctx);
   }
 
   /**
@@ -79,15 +83,17 @@ public class AstProcessor {
    * @param node a node to process
    * @param ctx processing context
    */
-  private void process(List<Map.Entry<Class<? extends Node>, List<Processor<? extends Node>>>> processors,
-                       Node node, ProcessingContext ctx) {
+  private void process(
+      List<Map.Entry<Class<? extends Node>, List<Processor<? extends Node>>>> processors,
+      Node node,
+      ProcessingContext ctx) {
     ThreadInterruptionUtil.checkThreadInterrupted();
     final Class<? extends Node> nodeClass = node.getClass();
     if (nodeClass == ProgramNode.class) {
       ctx.getCurrentProgramNodeStack().push((ProgramNode) node);
     }
     try {
-      for (Map.Entry<Class<? extends Node>, List<Processor<? extends Node>>> proc: processors) {
+      for (Map.Entry<Class<? extends Node>, List<Processor<? extends Node>>> proc : processors) {
         if (proc.getKey().isAssignableFrom(nodeClass)) {
           for (Processor<? extends Node> processor : proc.getValue()) {
             ((Processor<Node>) processor).accept(node, ctx);

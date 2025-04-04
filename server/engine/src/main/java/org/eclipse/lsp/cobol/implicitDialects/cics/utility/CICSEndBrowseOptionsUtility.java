@@ -58,21 +58,28 @@ public class CICSEndBrowseOptionsUtility extends CICSOptionsCheckBaseUtility {
    * @param <E> A subclass of ParserRuleContext
    */
   public <E extends ParserRuleContext> void checkOptions(E ctx) {
-      if (ctx.getRuleIndex() == RULE_cics_endbrowse_opts) {
-          checkEndBrowse((CICSParser.Cics_endbrowse_optsContext) ctx);
-      }
+    if (ctx.getRuleIndex() == RULE_cics_endbrowse_opts) {
+      checkEndBrowse((CICSParser.Cics_endbrowse_optsContext) ctx);
+    }
     checkDuplicates(ctx);
   }
 
   @SuppressWarnings("unchecked")
   private void checkEndBrowse(CICSParser.Cics_endbrowse_optsContext ctx) {
-    checkHasExactlyOneOption("ACTIVITY or CONTAINER or EVENT or PROCESS or TIMER", ctx,
-            ctx.ACTIVITY(), ctx.CONTAINER(), ctx.EVENT(), ctx.PROCESS(), ctx.TIMER());
+    checkHasExactlyOneOption(
+        "ACTIVITY or CONTAINER or EVENT or PROCESS or TIMER",
+        ctx,
+        ctx.ACTIVITY(),
+        ctx.CONTAINER(),
+        ctx.EVENT(),
+        ctx.PROCESS(),
+        ctx.TIMER());
 
     checkHasMandatoryOptions(ctx.BROWSETOKEN(), ctx, "BROWSETOKEN");
-//    TODO: https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/pull/2596 (RETCODE is only mandatory in the EXCI mode.)
-//    if (!ctx.CONTAINER().isEmpty()) {
-//      checkHasMandatoryOptions(ctx.RETCODE(), ctx, "RETCODE");
-//    }
+    //    TODO: https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/pull/2596 (RETCODE is only
+    // mandatory in the EXCI mode.)
+    //    if (!ctx.CONTAINER().isEmpty()) {
+    //      checkHasMandatoryOptions(ctx.RETCODE(), ctx, "RETCODE");
+    //    }
   }
 }

@@ -19,15 +19,14 @@ package org.eclipse.lsp.cobol.codegen;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * COBOL Code Generator state.
- */
+/** COBOL Code Generator state. */
 public class GeneratorContext {
   private final Map<String, IdentifierType> idTypes = new HashMap<>();
   private int index = 0;
 
   /**
    * Generates a ne uniq identifier
+   *
    * @param type type of ID
    * @return the id
    */

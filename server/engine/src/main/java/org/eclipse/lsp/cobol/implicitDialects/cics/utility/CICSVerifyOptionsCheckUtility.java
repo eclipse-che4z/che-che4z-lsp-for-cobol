@@ -32,35 +32,36 @@ public class CICSVerifyOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
   public static final int RULE_INDEX = RULE_cics_verify;
 
   private static final Map<Integer, ErrorSeverity> DUPLICATE_CHECK_OPTIONS =
-          new HashMap<Integer, ErrorSeverity>() {
-            {
-              put(CICSLexer.PASSWORD, ErrorSeverity.ERROR);
-              put(CICSLexer.USERID, ErrorSeverity.ERROR);
-              put(CICSLexer.GROUPID, ErrorSeverity.ERROR);
-              put(CICSLexer.CHANGETIME, ErrorSeverity.ERROR);
-              put(CICSLexer.DAYSLEFT, ErrorSeverity.ERROR);
-              put(CICSLexer.ESMREASON, ErrorSeverity.ERROR);
-              put(CICSLexer.ESMRESP, ErrorSeverity.ERROR);
-              put(CICSLexer.EXPIRYTIME, ErrorSeverity.ERROR);
-              put(CICSLexer.INVALIDCOUNT, ErrorSeverity.ERROR);
-              put(CICSLexer.LASTUSETIME, ErrorSeverity.ERROR);
-              put(CICSLexer.PHRASE, ErrorSeverity.ERROR);
-              put(CICSLexer.PHRASELEN, ErrorSeverity.ERROR);
-              put(CICSLexer.TOKEN, ErrorSeverity.ERROR);
-              put(CICSLexer.TOKENLEN, ErrorSeverity.ERROR);
-              put(CICSLexer.TOKENTYPE, ErrorSeverity.ERROR);
-              put(CICSLexer.ISUSERID, ErrorSeverity.ERROR);
-              put(CICSLexer.DATATYPE, ErrorSeverity.ERROR);
-              put(CICSLexer.ENCRYPTKEY, ErrorSeverity.ERROR);
-              put(CICSLexer.OUTTOKEN, ErrorSeverity.ERROR);
-              put(CICSLexer.OUTTOKENLEN, ErrorSeverity.ERROR);
-              put(CICSLexer.BASICAUTH, ErrorSeverity.WARNING);
-              put(CICSLexer.JWT, ErrorSeverity.WARNING);
-              put(CICSLexer.KERBEROS, ErrorSeverity.WARNING);
-              put(CICSLexer.BIT, ErrorSeverity.WARNING);
-              put(CICSLexer.BASE64, ErrorSeverity.WARNING);
-            }
-          };
+      new HashMap<Integer, ErrorSeverity>() {
+        {
+          put(CICSLexer.PASSWORD, ErrorSeverity.ERROR);
+          put(CICSLexer.USERID, ErrorSeverity.ERROR);
+          put(CICSLexer.GROUPID, ErrorSeverity.ERROR);
+          put(CICSLexer.CHANGETIME, ErrorSeverity.ERROR);
+          put(CICSLexer.DAYSLEFT, ErrorSeverity.ERROR);
+          put(CICSLexer.ESMREASON, ErrorSeverity.ERROR);
+          put(CICSLexer.ESMRESP, ErrorSeverity.ERROR);
+          put(CICSLexer.EXPIRYTIME, ErrorSeverity.ERROR);
+          put(CICSLexer.INVALIDCOUNT, ErrorSeverity.ERROR);
+          put(CICSLexer.LASTUSETIME, ErrorSeverity.ERROR);
+          put(CICSLexer.PHRASE, ErrorSeverity.ERROR);
+          put(CICSLexer.PHRASELEN, ErrorSeverity.ERROR);
+          put(CICSLexer.TOKEN, ErrorSeverity.ERROR);
+          put(CICSLexer.TOKENLEN, ErrorSeverity.ERROR);
+          put(CICSLexer.TOKENTYPE, ErrorSeverity.ERROR);
+          put(CICSLexer.ISUSERID, ErrorSeverity.ERROR);
+          put(CICSLexer.DATATYPE, ErrorSeverity.ERROR);
+          put(CICSLexer.ENCRYPTKEY, ErrorSeverity.ERROR);
+          put(CICSLexer.OUTTOKEN, ErrorSeverity.ERROR);
+          put(CICSLexer.OUTTOKENLEN, ErrorSeverity.ERROR);
+          put(CICSLexer.BASICAUTH, ErrorSeverity.WARNING);
+          put(CICSLexer.JWT, ErrorSeverity.WARNING);
+          put(CICSLexer.KERBEROS, ErrorSeverity.WARNING);
+          put(CICSLexer.BIT, ErrorSeverity.WARNING);
+          put(CICSLexer.BASE64, ErrorSeverity.WARNING);
+        }
+      };
+
   public CICSVerifyOptionsCheckUtility(DialectProcessingContext context, List<SyntaxError> errors) {
     super(context, errors, DUPLICATE_CHECK_OPTIONS);
   }
@@ -103,8 +104,15 @@ public class CICSVerifyOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
   private void checkVerifyToken(CICSParser.Cics_verify_tokenContext ctx) {
     checkHasMandatoryOptions(ctx.TOKEN(), ctx, "TOKEN");
     checkHasMandatoryOptions(ctx.TOKENLEN(), ctx, "TOKENLEN");
-    checkHasExactlyOneOption("TOKENTYPE or BASICAUTH or JWT or KERBEROS", ctx, ctx.TOKENTYPE(), ctx.BASICAUTH(), ctx.JWT(), ctx.KERBEROS());
-    checkHasMutuallyExclusiveOptions("BIT or DATATYPE or BASE64", ctx.BIT(), ctx.DATATYPE(), ctx.BASE64());
+    checkHasExactlyOneOption(
+        "TOKENTYPE or BASICAUTH or JWT or KERBEROS",
+        ctx,
+        ctx.TOKENTYPE(),
+        ctx.BASICAUTH(),
+        ctx.JWT(),
+        ctx.KERBEROS());
+    checkHasMutuallyExclusiveOptions(
+        "BIT or DATATYPE or BASE64", ctx.BIT(), ctx.DATATYPE(), ctx.BASE64());
     if (!ctx.OUTTOKENLEN().isEmpty()) {
       checkHasMandatoryOptions(ctx.OUTTOKEN(), ctx, "OUTTOKEN");
     }

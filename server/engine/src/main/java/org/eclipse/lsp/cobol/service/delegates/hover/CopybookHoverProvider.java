@@ -27,31 +27,33 @@ import org.eclipse.lsp4j.Hover;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.TextDocumentPositionParams;
 
-/**
- * Hover provider for the copybook content
- */
+/** Hover provider for the copybook content */
 public class CopybookHoverProvider implements HoverProvider {
 
   @Nullable
   @Override
-  public Hover getHover(@Nullable CobolDocumentModel document, @NonNull TextDocumentPositionParams position, SourceUnitGraph documentGraph) {
+  public Hover getHover(
+      @Nullable CobolDocumentModel document,
+      @NonNull TextDocumentPositionParams position,
+      SourceUnitGraph documentGraph) {
     String uri = position.getTextDocument().getUri();
     Position hoverPosition = position.getPosition();
     if (documentGraph.isUserSuppliedCopybook(uri)) {
-      List<SourceUnitGraph.NodeV> containedCopybookNode = documentGraph.getInjectedCopybookNode(uri, hoverPosition);
+      List<SourceUnitGraph.NodeV> containedCopybookNode =
+          documentGraph.getInjectedCopybookNode(uri, hoverPosition);
       if (!containedCopybookNode.isEmpty()) {
         return getHover(containedCopybookNode.get(0).getContent());
       }
     }
     return Optional.ofNullable(document)
-            .map(CobolDocumentModel::getAnalysisResult)
-            .map(AnalysisResult::getRootNode)
-            .flatMap(root -> RangeUtils.findNodeByPosition(root, uri, hoverPosition))
-            .filter(CopyNode.class::isInstance)
-            .map(CopyNode.class::cast)
-            .filter(node -> node.getUri() != null)
-            .map(documentGraph::getCopyNodeContent)
-            .map(this::getHover)
-            .orElse(null);
+        .map(CobolDocumentModel::getAnalysisResult)
+        .map(AnalysisResult::getRootNode)
+        .flatMap(root -> RangeUtils.findNodeByPosition(root, uri, hoverPosition))
+        .filter(CopyNode.class::isInstance)
+        .map(CopyNode.class::cast)
+        .filter(node -> node.getUri() != null)
+        .map(documentGraph::getCopyNodeContent)
+        .map(this::getHover)
+        .orElse(null);
   }
 }

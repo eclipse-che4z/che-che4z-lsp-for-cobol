@@ -18,8 +18,7 @@ import org.eclipse.lsp.cobol.common.ResultWithErrors;
 import org.eclipse.lsp.cobol.core.CobolPreprocessorListener;
 
 /** A listener that processes the text of the COBOL document */
-public interface GrammarPreprocessorListener<T>
-    extends CobolPreprocessorListener {
+public interface GrammarPreprocessorListener<T> extends CobolPreprocessorListener {
 
   /**
    * Get the result of the processing

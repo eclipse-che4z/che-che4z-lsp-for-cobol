@@ -51,7 +51,8 @@ class VariableCompletionTest {
   void testCompletionEmptyResult() {
     CobolDocumentModel model = getModel(HEADER);
     Completion completion =
-        new VariableCompletion(new SymbolsRepository(model.getAnalysisResult().getSymbolTableMap()));
+        new VariableCompletion(
+            new SymbolsRepository(model.getAnalysisResult().getSymbolTableMap()));
     assertThat(completion.getCompletionItems("smth", model), is(empty()));
   }
 
@@ -65,7 +66,8 @@ class VariableCompletionTest {
   void testCompletionMock() {
     CobolDocumentModel model = getModel(FULL_TEXT);
     Completion completion =
-        new VariableCompletion(new SymbolsRepository(model.getAnalysisResult().getSymbolTableMap()));
+        new VariableCompletion(
+            new SymbolsRepository(model.getAnalysisResult().getSymbolTableMap()));
     assertEquals(createExpected(), completion.getCompletionItems("va", model));
   }
 
@@ -85,7 +87,7 @@ class VariableCompletionTest {
   }
 
   private CobolDocumentModel getModel(String text) {
-    return new CobolDocumentModel("",
-        text, UseCaseEngine.runTest(text, ImmutableList.of(), ImmutableMap.of()));
+    return new CobolDocumentModel(
+        "", text, UseCaseEngine.runTest(text, ImmutableList.of(), ImmutableMap.of()));
   }
 }

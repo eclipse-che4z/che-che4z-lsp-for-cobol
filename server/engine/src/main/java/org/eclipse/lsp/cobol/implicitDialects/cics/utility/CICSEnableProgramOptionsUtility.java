@@ -29,7 +29,6 @@ import java.util.Map;
 import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_enable;
 import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_enable_program;
 
-
 /** Checks CICS ENABLE PROGRAM rules for required and invalid options */
 public class CICSEnableProgramOptionsUtility extends CICSOptionsCheckBaseUtility {
 
@@ -63,7 +62,8 @@ public class CICSEnableProgramOptionsUtility extends CICSOptionsCheckBaseUtility
         }
       };
 
-  public CICSEnableProgramOptionsUtility(DialectProcessingContext context, List<SyntaxError> errors) {
+  public CICSEnableProgramOptionsUtility(
+      DialectProcessingContext context, List<SyntaxError> errors) {
     super(context, errors, DUPLICATE_CHECK_OPTIONS);
   }
 
@@ -87,7 +87,8 @@ public class CICSEnableProgramOptionsUtility extends CICSOptionsCheckBaseUtility
       checkHasIllegalOptions(ctx.GAEXECUTABLE(), "GAEXECUTABLE without GALENGTH");
       checkHasIllegalOptions(ctx.GALOCATION(), "GALOCATION without GALENGTH");
     }
-    checkHasMutuallyExclusiveOptions("QUASIRENT or THREADSAFE or REQUIRED", ctx.QUASIRENT(), ctx.THREADSAFE(), ctx.REQUIRED());
+    checkHasMutuallyExclusiveOptions(
+        "QUASIRENT or THREADSAFE or REQUIRED", ctx.QUASIRENT(), ctx.THREADSAFE(), ctx.REQUIRED());
     checkHasMutuallyExclusiveOptions("QUASIRENT or OPENAPI", ctx.QUASIRENT(), ctx.OPENAPI());
     if (ctx.TALENGTH().isEmpty()) {
       checkHasIllegalOptions(ctx.TAEXECUTABLE(), "TAEXECUTABLE without TALENGTH");

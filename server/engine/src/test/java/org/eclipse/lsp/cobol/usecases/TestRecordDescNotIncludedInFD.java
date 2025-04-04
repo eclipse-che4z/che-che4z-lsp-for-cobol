@@ -188,7 +188,7 @@ public class TestRecordDescNotIncludedInFD {
         UseCaseEngine.runTest(
             PGM, ImmutableList.of(new CobolText("ACCFILE1", COPYBOOK)), ImmutableMap.of());
 
-      SymbolsRepository repo = new SymbolsRepository(result.getSymbolTableMap());
+    SymbolsRepository repo = new SymbolsRepository(result.getSymbolTableMap());
     ProgramNode programNode =
         result
             .getRootNode()

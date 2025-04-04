@@ -20,9 +20,7 @@ import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import java.util.Optional;
 
-/**
- * BeforeEachCallback for Use case test
- */
+/** BeforeEachCallback for Use case test */
 public class ExtensionContextProvider implements BeforeEachCallback, AfterEachCallback {
 
   private static final ThreadLocal<ExtensionContext> CONTEXT_HOLDER = new ThreadLocal<>();
@@ -41,17 +39,12 @@ public class ExtensionContextProvider implements BeforeEachCallback, AfterEachCa
     return Optional.ofNullable(CONTEXT_HOLDER.get());
   }
 
-  /**
-   * clear context
-   */
+  /** clear context */
   public static void clearExtensionContext() {
     CONTEXT_HOLDER.remove();
   }
 
-  /**
-   *
-   * @param context
-   */
+  /** @param context */
   @Override
   public void afterEach(ExtensionContext context) {
     ExtensionContextProvider.clearExtensionContext();

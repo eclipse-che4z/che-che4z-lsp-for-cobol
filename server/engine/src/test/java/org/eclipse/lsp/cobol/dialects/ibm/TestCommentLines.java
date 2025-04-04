@@ -60,10 +60,12 @@ class TestCommentLines {
     CodeLayoutStore store = mock(CodeLayoutStore.class);
     when(store.getCodeLayout()).thenReturn(Optional.empty());
 
-    CleanerPreprocessor textPreprocessor =
-        new IbmTextPreprocessor(messageService, store);
+    CleanerPreprocessor textPreprocessor = new IbmTextPreprocessor(messageService, store);
     String actual =
-        textPreprocessor.cleanUpCode(DOCUMENT_URI, TEXT).unwrap(accumulatedErrors::addAll).toString();
+        textPreprocessor
+            .cleanUpCode(DOCUMENT_URI, TEXT)
+            .unwrap(accumulatedErrors::addAll)
+            .toString();
     assertEquals(EXPECTED, actual);
     assertTrue(accumulatedErrors.isEmpty());
   }

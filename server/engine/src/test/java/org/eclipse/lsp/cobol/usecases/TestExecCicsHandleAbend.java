@@ -71,10 +71,13 @@ class TestExecCicsHandleAbend {
           + "           END-EXEC.\n";
 
   private void checkNode(AnalysisResult result, ExecCicsHandleNode.HandleAbendType type) {
-    Optional<ExecCicsHandleNode> node = result.getRootNode().getDepthFirstStream()
-        .filter(n -> n instanceof ExecCicsHandleNode)
-        .map(ExecCicsHandleNode.class::cast)
-        .findFirst();
+    Optional<ExecCicsHandleNode> node =
+        result
+            .getRootNode()
+            .getDepthFirstStream()
+            .filter(n -> n instanceof ExecCicsHandleNode)
+            .map(ExecCicsHandleNode.class::cast)
+            .findFirst();
 
     assertTrue(node.isPresent());
     assertEquals(type, node.get().getType());
@@ -109,5 +112,4 @@ class TestExecCicsHandleAbend {
     AnalysisResult result = UseCaseEngine.runTest(TEXT4, ImmutableList.of(), ImmutableMap.of());
     checkNode(result, ExecCicsHandleNode.HandleAbendType.RESET);
   }
-
 }

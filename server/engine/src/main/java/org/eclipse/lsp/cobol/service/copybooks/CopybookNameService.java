@@ -25,24 +25,26 @@ import java.util.concurrent.CompletableFuture;
 public interface CopybookNameService {
 
   /**
-   * Get resolved copybook names across the open workspace and copybook paths defined in
-   * settings
-   * @param documentUri the URI to the current document in case we will have a program name variable in path list.
+   * Get resolved copybook names across the open workspace and copybook paths defined in settings
    *
+   * @param documentUri the URI to the current document in case we will have a program name variable
+   *     in path list.
    * @return List of resolved copybook names
    */
   List<CopybookName> getNames(@Nullable String documentUri);
 
   /**
    * Get copybook folders paths based on local settings (paths, dialects etc)
-   * @param documentUri URI of main program file. If it's null the method will return no file specific settings
+   *
+   * @param documentUri URI of main program file. If it's null the method will return no file
+   *     specific settings
    * @return List of copybook folders
    */
   CompletableFuture<List<String>> copybookLocalFolders(@Nullable String documentUri);
 
   /**
-   * Find copybook in the list of unique copybookNames
-   * in the open workspace that match displayName
+   * Find copybook in the list of unique copybookNames in the open workspace that match displayName
+   *
    * @param documentUri URI of main program file
    * @param displayName an attribute to find by
    * @return optional CopybookName

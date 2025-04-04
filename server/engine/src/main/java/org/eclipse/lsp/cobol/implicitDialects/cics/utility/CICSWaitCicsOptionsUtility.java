@@ -67,6 +67,10 @@ public class CICSWaitCicsOptionsUtility extends CICSOptionsCheckBaseUtility {
   private void checkWaitCics(CICSParser.Cics_waitcics_bodyContext ctx) {
     checkHasMandatoryOptions(ctx.ECBLIST(), ctx, "ECBLIST");
     checkHasMandatoryOptions(ctx.NUMEVENTS(), ctx, "NUMEVENTS");
-    checkHasMutuallyExclusiveOptions("PURGEABLE or NOTPURGEABLE or PURGEABILITY", ctx.PURGEABLE(), ctx.NOTPURGEABLE(), ctx.PURGEABILITY());
+    checkHasMutuallyExclusiveOptions(
+        "PURGEABLE or NOTPURGEABLE or PURGEABILITY",
+        ctx.PURGEABLE(),
+        ctx.NOTPURGEABLE(),
+        ctx.PURGEABILITY());
   }
 }

@@ -31,11 +31,13 @@ public class SectionNameRegister implements Processor<SectionNameNode> {
 
   @Override
   public void accept(SectionNameNode node, ProcessingContext ctx) {
-    if (node.getParent().getNodeType() != PROCEDURE_SECTION || ctx.getCurrentProgramNode() == null) {
+    if (node.getParent().getNodeType() != PROCEDURE_SECTION
+        || ctx.getCurrentProgramNode() == null) {
       // TODO: register usage
       return;
     }
-    symbolAccumulator.registerSectionNameNode(ctx.getCurrentProgramNode(), node)
-            .ifPresent(ctx.getErrors()::add);
+    symbolAccumulator
+        .registerSectionNameNode(ctx.getCurrentProgramNode(), node)
+        .ifPresent(ctx.getErrors()::add);
   }
 }

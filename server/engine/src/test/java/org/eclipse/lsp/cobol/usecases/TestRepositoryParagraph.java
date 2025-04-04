@@ -26,38 +26,40 @@ import org.junit.jupiter.api.Test;
 
 /** Test repository paragraph statements */
 public class TestRepositoryParagraph {
-  private static final String TEXT = "       Identification division.\n"
-      + "       Program-id. \"SNDKAFKA\" is recursive.\n"
-      + "       Environment division.\n"
-      + "       Configuration section.\n"
-      + "       Special-Names.\n"
-      + "            Decimal-Point is comma.\n"
-      + "       Repository.\n"
-      + "           Class ZUtil         is \"com.ibm.jzos.ZUtil\"\n"
-      + "           Class JavaException is \"java.lang.Exception\"\n"
-      + "           Class jdbb          is \"java.nio.ByteBuffer\"\n"
-      + "           Class ToKafka       is \"CobolToKafka.ToKafka\"\n"
-      + "           Function {FOO1|1}\n"
-      + "           Function {FOO2|2}.\n"
-      + "       Input-output section.\n"
-      + "       Data Division.";
+  private static final String TEXT =
+      "       Identification division.\n"
+          + "       Program-id. \"SNDKAFKA\" is recursive.\n"
+          + "       Environment division.\n"
+          + "       Configuration section.\n"
+          + "       Special-Names.\n"
+          + "            Decimal-Point is comma.\n"
+          + "       Repository.\n"
+          + "           Class ZUtil         is \"com.ibm.jzos.ZUtil\"\n"
+          + "           Class JavaException is \"java.lang.Exception\"\n"
+          + "           Class jdbb          is \"java.nio.ByteBuffer\"\n"
+          + "           Class ToKafka       is \"CobolToKafka.ToKafka\"\n"
+          + "           Function {FOO1|1}\n"
+          + "           Function {FOO2|2}.\n"
+          + "       Input-output section.\n"
+          + "       Data Division.";
 
   @Test
   void test() {
-    UseCaseEngine.runTest(TEXT, ImmutableList.of(), ImmutableMap.of(
-        "1",
-        new Diagnostic(
-            new Range(),
-            "Expected a function name, but found 'FOO1'",
-            DiagnosticSeverity.Error,
-            ErrorSource.PARSING.getText()),
-        "2",
-        new Diagnostic(
-            new Range(),
-            "Expected a function name, but found 'FOO2'",
-            DiagnosticSeverity.Error,
-            ErrorSource.PARSING.getText())));
-
+    UseCaseEngine.runTest(
+        TEXT,
+        ImmutableList.of(),
+        ImmutableMap.of(
+            "1",
+            new Diagnostic(
+                new Range(),
+                "Expected a function name, but found 'FOO1'",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()),
+            "2",
+            new Diagnostic(
+                new Range(),
+                "Expected a function name, but found 'FOO2'",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
   }
-
 }

@@ -104,19 +104,18 @@ public class SymbolAccumulator implements VariableAccumulator {
       ProgramNode program, CodeBlockUsageNode node) {
     SymbolTable symbolTable = createOrGetSymbolTable(program);
 
-      List<CodeBlockDefinitionNode> definitions = new ArrayList<>();
-      for (CodeBlockDefinitionNode codeBlockDefinitionNode : symbolTable.getCodeBlocks()) {
-          if (filterNodes(codeBlockDefinitionNode, node)) {
-              definitions.add(codeBlockDefinitionNode);
-          }
+    List<CodeBlockDefinitionNode> definitions = new ArrayList<>();
+    for (CodeBlockDefinitionNode codeBlockDefinitionNode : symbolTable.getCodeBlocks()) {
+      if (filterNodes(codeBlockDefinitionNode, node)) {
+        definitions.add(codeBlockDefinitionNode);
       }
+    }
 
-      if (definitions.isEmpty()) {
-        return Optional.of(
+    if (definitions.isEmpty()) {
+      return Optional.of(
           SyntaxError.syntaxError()
               .errorSource(ErrorSource.PARSING)
-              .messageTemplate(
-                  MessageTemplate.of("semantics.paragraphNotDefined", node.getName()))
+              .messageTemplate(MessageTemplate.of("semantics.paragraphNotDefined", node.getName()))
               .severity(ErrorSeverity.ERROR)
               .location(node.getLocality().toOriginalLocation())
               .build());
@@ -127,20 +126,20 @@ public class SymbolAccumulator implements VariableAccumulator {
       // If GO TO is in the same section as a paragraph - no errors
       String usageSectionName = getSectionName(node);
 
-      List<CodeBlockDefinitionNode> inTheSameSection = definitions.stream()
+      List<CodeBlockDefinitionNode> inTheSameSection =
+          definitions.stream()
               .filter(d -> getSectionName(d).equalsIgnoreCase(usageSectionName))
               .collect(Collectors.toList());
       if (inTheSameSection.size() == 1) {
         definitions = inTheSameSection;
       } else {
         return Optional.of(
-                SyntaxError.syntaxError()
-                        .errorSource(ErrorSource.PARSING)
-                        .messageTemplate(
-                                MessageTemplate.of("semantics.ambiguous", node.getName()))
-                        .severity(ErrorSeverity.ERROR)
-                        .location(node.getLocality().toOriginalLocation())
-                        .build());
+            SyntaxError.syntaxError()
+                .errorSource(ErrorSource.PARSING)
+                .messageTemplate(MessageTemplate.of("semantics.ambiguous", node.getName()))
+                .severity(ErrorSeverity.ERROR)
+                .location(node.getLocality().toOriginalLocation())
+                .build());
       }
     }
 
@@ -160,7 +159,8 @@ public class SymbolAccumulator implements VariableAccumulator {
       return false;
     }
 
-    //Filter nodes in case of section usage in the PERFORM or GO TO statements. i.e. GO TO PARAG1 OF SECTION-1.
+    // Filter nodes in case of section usage in the PERFORM or GO TO statements. i.e. GO TO PARAG1
+    // OF SECTION-1.
     if (usage.getParent().getNodeType() == NodeType.PERFORM
         || usage.getParent().getNodeType() == NodeType.GO_TO
         || usage.getParent().getNodeType() == NodeType.SENTENCE) {
@@ -168,9 +168,10 @@ public class SymbolAccumulator implements VariableAccumulator {
 
       Optional<SectionNameNode> sectionNameNode = Optional.empty();
       if (index + 1 < usage.getParent().getChildren().size()) {
-        sectionNameNode = Optional.ofNullable(usage.getParent().getChildren().get(index + 1))
-            .filter(c -> c instanceof SectionNameNode)
-            .map(SectionNameNode.class::cast);
+        sectionNameNode =
+            Optional.ofNullable(usage.getParent().getChildren().get(index + 1))
+                .filter(c -> c instanceof SectionNameNode)
+                .map(SectionNameNode.class::cast);
       }
       return sectionNameNode
           .map(SectionNameNode::getName)
@@ -194,16 +195,20 @@ public class SymbolAccumulator implements VariableAccumulator {
 
   /**
    * Get the symbol table for the given program
+   *
    * @param program the program
    * @return the symbol table
    */
   public SymbolTable getSymbolTable(ProgramNode program) {
     return programSymbols.get(SymbolTable.generateKey(program));
   }
+
   private SymbolTable createOrGetSymbolTable(ProgramNode program) {
     String key = SymbolTable.generateKey(program);
     if (!programSymbols.containsKey(key)) {
-      programSymbols.put(key, new SymbolTable(program.getProgram().map(this::createOrGetSymbolTable).orElse(null)));
+      programSymbols.put(
+          key,
+          new SymbolTable(program.getProgram().map(this::createOrGetSymbolTable).orElse(null)));
     }
     return programSymbols.get(key);
   }
@@ -224,48 +229,121 @@ public class SymbolAccumulator implements VariableAccumulator {
   }
 
   private Map<String, FunctionInfo> getImplicitFunctions() {
-    return getAllImplicitFunctionNames().
-            collect(Collectors.toMap(Function.identity(), this::createImplicitFunctionInfo));
+    return getAllImplicitFunctionNames()
+        .collect(Collectors.toMap(Function.identity(), this::createImplicitFunctionInfo));
   }
 
   public Stream<String> getAllImplicitFunctionNames() {
     return Stream.of(
-            "ABS", "ACOS", "ANNUITY", "ASIN", "ATAN", "BIT-OF", "BIT-TO-CHAR", "BYTE-LENGTH",
-            "CHAR", "COMBINED-DATETIME", "CONTENT-OF", "COS", "CURRENT-DATE", "DATE-OF-INTEGER",
-            "DATE-TO-YYYYMMDD", "DAY-OF-INTEGER", "DAY-TO-YYYYDDD", "DISPLAY-OF", "E", "EXP", "EXP10",
-            "FACTORIAL", "FORMATTED-CURRENT-DATE", "FORMATTED-DATE", "FORMATTED-DATETIME", "FORMATTED-TIME",
-            "HEX-OF", "HEX-TO-CHAR", "INTEGER", "INTEGER-OF-DATE", "INTEGER-OF-DAY", "INTEGER-OF-FORMATTED-DATE",
-            "INTEGER-PART", "LENGTH", "LOG", "LOG10", "LOWER-CASE", "MAX", "MEAN", "MEDIAN", "MIDRANGE", "MIN",
-            "MOD", "NATIONAL-OF", "NUMVAL", "NUMVAL-C", "NUMVAL-F", "ORD", "ORD-MAX", "ORD-MIN", "PI",
-            "PRESENT-VALUE", "RANDOM", "RANGE", "REM", "REVERSE", "SECONDS-FROM-FORMATTED-TIME",
-            "SECONDS-PAST-MIDNIGHT", "SIGN", "SIN", "SQRT", "STANDARD-DEVIATION", "SUM", "TAN",
-            "TEST-DATE-YYYYMMDD", "TEST-DAY-YYYYDDD", "TEST-FORMATTED-DATETIME", "TEST-NUMVAL", "TEST-NUMVAL-C",
-            "TEST-NUMVAL-F", "TRIM", "ULENGTH", "UPOS", "UPPER-CASE", "USUBSTR", "USUPPLEMENTARY",
-            "UUID4", "UVALID", "UWIDTH", "VARIANCE", "WHEN-COMPILED", "YEAR-TO-YYYY");
+        "ABS",
+        "ACOS",
+        "ANNUITY",
+        "ASIN",
+        "ATAN",
+        "BIT-OF",
+        "BIT-TO-CHAR",
+        "BYTE-LENGTH",
+        "CHAR",
+        "COMBINED-DATETIME",
+        "CONTENT-OF",
+        "COS",
+        "CURRENT-DATE",
+        "DATE-OF-INTEGER",
+        "DATE-TO-YYYYMMDD",
+        "DAY-OF-INTEGER",
+        "DAY-TO-YYYYDDD",
+        "DISPLAY-OF",
+        "E",
+        "EXP",
+        "EXP10",
+        "FACTORIAL",
+        "FORMATTED-CURRENT-DATE",
+        "FORMATTED-DATE",
+        "FORMATTED-DATETIME",
+        "FORMATTED-TIME",
+        "HEX-OF",
+        "HEX-TO-CHAR",
+        "INTEGER",
+        "INTEGER-OF-DATE",
+        "INTEGER-OF-DAY",
+        "INTEGER-OF-FORMATTED-DATE",
+        "INTEGER-PART",
+        "LENGTH",
+        "LOG",
+        "LOG10",
+        "LOWER-CASE",
+        "MAX",
+        "MEAN",
+        "MEDIAN",
+        "MIDRANGE",
+        "MIN",
+        "MOD",
+        "NATIONAL-OF",
+        "NUMVAL",
+        "NUMVAL-C",
+        "NUMVAL-F",
+        "ORD",
+        "ORD-MAX",
+        "ORD-MIN",
+        "PI",
+        "PRESENT-VALUE",
+        "RANDOM",
+        "RANGE",
+        "REM",
+        "REVERSE",
+        "SECONDS-FROM-FORMATTED-TIME",
+        "SECONDS-PAST-MIDNIGHT",
+        "SIGN",
+        "SIN",
+        "SQRT",
+        "STANDARD-DEVIATION",
+        "SUM",
+        "TAN",
+        "TEST-DATE-YYYYMMDD",
+        "TEST-DAY-YYYYDDD",
+        "TEST-FORMATTED-DATETIME",
+        "TEST-NUMVAL",
+        "TEST-NUMVAL-C",
+        "TEST-NUMVAL-F",
+        "TRIM",
+        "ULENGTH",
+        "UPOS",
+        "UPPER-CASE",
+        "USUBSTR",
+        "USUPPLEMENTARY",
+        "UUID4",
+        "UVALID",
+        "UWIDTH",
+        "VARIANCE",
+        "WHEN-COMPILED",
+        "YEAR-TO-YYYY");
   }
 
   /**
    * Add function usage or definition to a program
    *
-   * @param callingProgram  the program to register section in
+   * @param callingProgram the program to register section in
    * @param function - the function reference node
    * @return syntax error if the function is not available
    */
-  public Optional<SyntaxError> registerFunctionReferenceNode(ProgramNode callingProgram, FunctionReference function) {
+  public Optional<SyntaxError> registerFunctionReferenceNode(
+      ProgramNode callingProgram, FunctionReference function) {
     String functionName = function.getName().toUpperCase();
-    Boolean isImplicit = getProgramContainingFunctionDeclaration(functionName, callingProgram)
+    Boolean isImplicit =
+        getProgramContainingFunctionDeclaration(functionName, callingProgram)
             .map(ProgramNode::getRepository)
             .map(repo -> repo.get(functionName))
             .orElse(null);
-    FunctionInfo fi = getFunctionInfo(functionName, isImplicit != null, isImplicit != null && isImplicit);
+    FunctionInfo fi =
+        getFunctionInfo(functionName, isImplicit != null, isImplicit != null && isImplicit);
     fi.getReferences().add(function.getLocality().toLocation());
     function.setDefinitions(fi.getDefinition());
-    if (fi.getProgramNode() == null || fi.getProgramNode().getOrdinal() > callingProgram.getOrdinal()) {
+    if (fi.getProgramNode() == null
+        || fi.getProgramNode().getOrdinal() > callingProgram.getOrdinal()) {
       return Optional.of(
           SyntaxError.syntaxError()
               .errorSource(ErrorSource.PARSING)
-              .messageTemplate(
-                  MessageTemplate.of("semantics.functionExpected", functionName))
+              .messageTemplate(MessageTemplate.of("semantics.functionExpected", functionName))
               .severity(ErrorSeverity.ERROR)
               .location(function.getLocality().toOriginalLocation())
               .build());
@@ -282,20 +360,23 @@ public class SymbolAccumulator implements VariableAccumulator {
   public Optional<SyntaxError> registerFunctionNode(ProgramNode function) {
     assert function.getSubtype() == ProgramSubtype.Function;
     String functionName = function.getProgramName().toUpperCase();
-    FunctionInfo fi = userDefinedFunctions.computeIfAbsent(functionName, (String) -> new FunctionInfo(function));
+    FunctionInfo fi =
+        userDefinedFunctions.computeIfAbsent(functionName, (String) -> new FunctionInfo(function));
     if (fi.getProgramNode() != function) {
       return Optional.of(
           SyntaxError.syntaxError()
               .errorSource(ErrorSource.PARSING)
-              .messageTemplate(
-                  MessageTemplate.of("semantics.functionRedefined", functionName))
+              .messageTemplate(MessageTemplate.of("semantics.functionRedefined", functionName))
               .severity(ErrorSeverity.WARNING)
-              .location(function.getDepthFirstStream()
-                  .filter(n -> n instanceof ProgramIdNode)
-                  .filter(n -> ((ProgramIdNode) n).getSubtype() == ProgramSubtype.Function)
-                  .findFirst()
-                  .orElse(function)
-                  .getLocality().toOriginalLocation())
+              .location(
+                  function
+                      .getDepthFirstStream()
+                      .filter(n -> n instanceof ProgramIdNode)
+                      .filter(n -> ((ProgramIdNode) n).getSubtype() == ProgramSubtype.Function)
+                      .findFirst()
+                      .orElse(function)
+                      .getLocality()
+                      .toOriginalLocation())
               .build());
     }
 
@@ -303,25 +384,27 @@ public class SymbolAccumulator implements VariableAccumulator {
   }
 
   /**
-   * Search for a function reference
-   * If a function is prefixed and not declared we try to look for user defined function
-   * If not found, try to resolve as intrinsic function
-   * Null if no reference is found.
-   * In case a function is declared within program, try to resolve as per declaration
+   * Search for a function reference If a function is prefixed and not declared we try to look for
+   * user defined function If not found, try to resolve as intrinsic function Null if no reference
+   * is found. In case a function is declared within program, try to resolve as per declaration
+   *
    * @param functionName the functionName of the function
    * @param programNode
    * @param isFunctionPrefixed
    * @return the block reference or null if not found
    */
-  public FunctionInfo getFunctionReference(String functionName, ProgramNode programNode, boolean isFunctionPrefixed) {
-    Optional<ProgramNode> programContainingFunction = getProgramContainingFunctionDeclaration(functionName, programNode);
+  public FunctionInfo getFunctionReference(
+      String functionName, ProgramNode programNode, boolean isFunctionPrefixed) {
+    Optional<ProgramNode> programContainingFunction =
+        getProgramContainingFunctionDeclaration(functionName, programNode);
 
     if (!programContainingFunction.isPresent() && !isFunctionPrefixed) {
       return null;
     }
 
     String upperCaseFunctionName = functionName.toUpperCase(Locale.ROOT);
-    boolean isDeclaredIntrinsic = programContainingFunction
+    boolean isDeclaredIntrinsic =
+        programContainingFunction
             .map(ProgramNode::getRepository)
             .map(repo -> repo.get(upperCaseFunctionName))
             .orElse(false);
@@ -334,7 +417,8 @@ public class SymbolAccumulator implements VariableAccumulator {
       return userDefinedFunctions.get(upperCaseFunctionName);
     }
 
-    return userDefinedFunctions.getOrDefault(upperCaseFunctionName, implicitFunctions.get(upperCaseFunctionName));
+    return userDefinedFunctions.getOrDefault(
+        upperCaseFunctionName, implicitFunctions.get(upperCaseFunctionName));
   }
 
   /**
@@ -347,7 +431,8 @@ public class SymbolAccumulator implements VariableAccumulator {
     return userDefinedFunctions.get(functionName.toUpperCase());
   }
 
-  private static Optional<ProgramNode> getProgramContainingFunctionDeclaration(String functionName, ProgramNode programNode) {
+  private static Optional<ProgramNode> getProgramContainingFunctionDeclaration(
+      String functionName, ProgramNode programNode) {
     while (!programNode.getRepository().containsKey(functionName.toUpperCase(Locale.ROOT))) {
       Optional<ProgramNode> nearestProgram = programNode.getProgram();
       if (nearestProgram.isPresent()) {
@@ -440,7 +525,8 @@ public class SymbolAccumulator implements VariableAccumulator {
   public List<VariableNode> getVariableDefinition(
       ProgramNode programNode, List<VariableUsageNode> usagePath) {
     SymbolTable symbolTable = createOrGetSymbolTable(programNode);
-    List<VariableNode> foundDefinitions = VariableUsageUtils.findVariablesForUsage(symbolTable.getVariablesMap(), usagePath);
+    List<VariableNode> foundDefinitions =
+        VariableUsageUtils.findVariablesForUsage(symbolTable.getVariablesMap(), usagePath);
     if (!foundDefinitions.isEmpty()) {
       return foundDefinitions;
     }
@@ -448,8 +534,10 @@ public class SymbolAccumulator implements VariableAccumulator {
     return globalVariableSearch(symbolTable, usagePath);
   }
 
-  private List<VariableNode> globalVariableSearch(SymbolTable symbolTable, List<VariableUsageNode> usagePath) {
-    List<VariableNode> result = VariableUsageUtils.findVariablesForUsage(symbolTable.getVariablesGlobalsMap(), usagePath);
+  private List<VariableNode> globalVariableSearch(
+      SymbolTable symbolTable, List<VariableUsageNode> usagePath) {
+    List<VariableNode> result =
+        VariableUsageUtils.findVariablesForUsage(symbolTable.getVariablesGlobalsMap(), usagePath);
     if (!result.isEmpty() || symbolTable.getParent() == null) {
       return result;
     }
@@ -457,12 +545,17 @@ public class SymbolAccumulator implements VariableAccumulator {
   }
 
   private FunctionInfo createImplicitFunctionInfo(String implicitFunctionName) {
-    ProgramNode implicitProgramName = new ProgramNode(Locality.builder().uri("implicit://" + implicitFunctionName).build(), ProgramSubtype.Function, 0);
+    ProgramNode implicitProgramName =
+        new ProgramNode(
+            Locality.builder().uri("implicit://" + implicitFunctionName).build(),
+            ProgramSubtype.Function,
+            0);
     implicitProgramName.setProgramName(implicitFunctionName.toUpperCase());
     return new FunctionInfo(implicitProgramName, true);
   }
 
-  private FunctionInfo getFunctionInfo(String functionName, boolean isDeclared, boolean isImplicit) {
+  private FunctionInfo getFunctionInfo(
+      String functionName, boolean isDeclared, boolean isImplicit) {
     if (isDeclared) {
       return getDeclaredFunctionInfo(functionName, isImplicit);
     } else {

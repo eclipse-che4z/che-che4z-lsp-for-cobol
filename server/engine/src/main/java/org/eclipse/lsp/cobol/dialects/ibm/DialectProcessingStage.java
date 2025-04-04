@@ -26,9 +26,7 @@ import org.eclipse.lsp.cobol.core.engine.dialects.DialectService;
 import org.eclipse.lsp.cobol.common.pipeline.Stage;
 import org.eclipse.lsp.cobol.common.pipeline.StageResult;
 
-/**
- * Dialect Processing Stage
- */
+/** Dialect Processing Stage */
 @RequiredArgsConstructor
 public class DialectProcessingStage implements Stage<AnalysisContext, DialectOutcome, Void> {
 
@@ -36,7 +34,8 @@ public class DialectProcessingStage implements Stage<AnalysisContext, DialectOut
   private final CleanerPreprocessor preprocessor;
 
   @Override
-  public StageResult<DialectOutcome> run(AnalysisContext context, StageResult<Void> prevStageResult) {
+  public StageResult<DialectOutcome> run(
+      AnalysisContext context, StageResult<Void> prevStageResult) {
     // Dialect processing
     dialectService.updateDialects(context.getConfig().getDialectRegistry());
     DialectOutcome dialectOutcome = processDialects(context);
@@ -59,13 +58,13 @@ public class DialectProcessingStage implements Stage<AnalysisContext, DialectOut
             .build();
     dialectProcessingContext.getExtendedDocument().commitTransformations();
 
-    DialectOutcome dialectOutcome = dialectService
-        .process(ctx.getConfig().getDialects(), dialectProcessingContext)
-        .unwrap(ctx.getAccumulatedErrors()::addAll);
+    DialectOutcome dialectOutcome =
+        dialectService
+            .process(ctx.getConfig().getDialects(), dialectProcessingContext)
+            .unwrap(ctx.getAccumulatedErrors()::addAll);
     Set<SyntaxError> errors = new HashSet<>(ctx.getAccumulatedErrors());
     ctx.getAccumulatedErrors().clear();
     ctx.getAccumulatedErrors().addAll(errors);
     return dialectOutcome;
   }
-
 }

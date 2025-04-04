@@ -28,9 +28,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 
-/**
- * Test for {@link DialectParserListener}
- */
+/** Test for {@link DialectParserListener} */
 @ExtendWith(MockitoExtension.class)
 class DialectParserListenerTest {
 
@@ -51,5 +49,4 @@ class DialectParserListenerTest {
     List<SyntaxError> result = service.getErrors();
     assertEquals(1, result.size());
   }
-
 }

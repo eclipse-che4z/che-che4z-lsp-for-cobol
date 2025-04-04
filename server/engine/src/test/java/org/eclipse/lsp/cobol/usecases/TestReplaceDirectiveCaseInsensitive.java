@@ -22,14 +22,14 @@ import org.junit.jupiter.api.Test;
 /** Test the REPLACE compiler directive. */
 class TestReplaceDirectiveCaseInsensitive {
   private static final String TEXT =
-        "       IDENTIFICATION DIVISION.         \n"
-      + "       PROGRAM-ID. HELLO.\n"
-      + "       REPLACE ==END-DISPLAY== BY ====.\n"
-      + "       PROCEDURE DIVISION.\n"
-      + "       {#*MAIN-PARAGRAPH}.\n"
-      + "              display \"hello world\"\n"
-      + "              end-display\n"
-      + "              goback.";
+      "       IDENTIFICATION DIVISION.         \n"
+          + "       PROGRAM-ID. HELLO.\n"
+          + "       REPLACE ==END-DISPLAY== BY ====.\n"
+          + "       PROCEDURE DIVISION.\n"
+          + "       {#*MAIN-PARAGRAPH}.\n"
+          + "              display \"hello world\"\n"
+          + "              end-display\n"
+          + "              goback.";
 
   @Test
   void test() {

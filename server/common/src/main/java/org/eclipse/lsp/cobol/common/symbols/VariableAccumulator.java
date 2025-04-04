@@ -47,9 +47,9 @@ public interface VariableAccumulator {
 
   /**
    * Get the symbol table for the given program
+   *
    * @param program the program
    * @return the symbol table
    */
   SymbolTable getSymbolTable(ProgramNode program);
-
-  }
+}

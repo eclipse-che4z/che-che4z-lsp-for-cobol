@@ -21,12 +21,11 @@ import org.eclipse.lsp.cobol.common.message.MessageService;
 import java.net.URI;
 import java.util.List;
 
-/**
- * Discover cobol dialects registered in the system
- */
+/** Discover cobol dialects registered in the system */
 public interface DialectDiscoveryService extends DialectExecuteCommandCapabilityService {
   /**
    * Load cobol dialects
+   *
    * @param copybookService a copybook service
    * @param messageService a message service
    * @return a list of loaded dialects
@@ -35,10 +34,12 @@ public interface DialectDiscoveryService extends DialectExecuteCommandCapability
 
   /**
    * Load cobol dialects from the given path
+   *
    * @param uri is a URI to the dialect's jar file
    * @param copybookService a copybook service
    * @param messageService a message service
    * @return a list of loaded dialects
    */
-  List<CobolDialect> loadDialects(URI uri, CopybookService copybookService, MessageService messageService);
+  List<CobolDialect> loadDialects(
+      URI uri, CopybookService copybookService, MessageService messageService);
 }

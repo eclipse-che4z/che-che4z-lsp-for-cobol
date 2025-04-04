@@ -34,22 +34,22 @@ public class CICSDeleteqDeqOptionsCheckUtility extends CICSOptionsCheckBaseUtili
   public static final int RULE_INDEX_DEQ = RULE_cics_deq;
 
   private static final Map<Integer, ErrorSeverity> DUPLICATE_CHECK_OPTIONS =
-          new HashMap<Integer, ErrorSeverity>() {
-            {
-              put(CICSLexer.DELETEQ, ErrorSeverity.ERROR);
-              put(CICSLexer.QUEUE, ErrorSeverity.ERROR);
-              put(CICSLexer.SYSID, ErrorSeverity.ERROR);
-              put(CICSLexer.QNAME, ErrorSeverity.ERROR);
-              put(CICSLexer.TD, ErrorSeverity.WARNING);
-              put(CICSLexer.TS, ErrorSeverity.WARNING);
-              put(CICSLexer.DEQ, ErrorSeverity.ERROR);
-              put(CICSLexer.RESOURCE, ErrorSeverity.ERROR);
-              put(CICSLexer.LENGTH, ErrorSeverity.ERROR);
-              put(CICSLexer.MAXLIFETIME, ErrorSeverity.ERROR);
-              put(CICSLexer.UOW, ErrorSeverity.WARNING);
-              put(CICSLexer.TASK, ErrorSeverity.WARNING);
-            }
-          };
+      new HashMap<Integer, ErrorSeverity>() {
+        {
+          put(CICSLexer.DELETEQ, ErrorSeverity.ERROR);
+          put(CICSLexer.QUEUE, ErrorSeverity.ERROR);
+          put(CICSLexer.SYSID, ErrorSeverity.ERROR);
+          put(CICSLexer.QNAME, ErrorSeverity.ERROR);
+          put(CICSLexer.TD, ErrorSeverity.WARNING);
+          put(CICSLexer.TS, ErrorSeverity.WARNING);
+          put(CICSLexer.DEQ, ErrorSeverity.ERROR);
+          put(CICSLexer.RESOURCE, ErrorSeverity.ERROR);
+          put(CICSLexer.LENGTH, ErrorSeverity.ERROR);
+          put(CICSLexer.MAXLIFETIME, ErrorSeverity.ERROR);
+          put(CICSLexer.UOW, ErrorSeverity.WARNING);
+          put(CICSLexer.TASK, ErrorSeverity.WARNING);
+        }
+      };
 
   public CICSDeleteqDeqOptionsCheckUtility(
       DialectProcessingContext context, List<SyntaxError> errors) {
@@ -79,7 +79,7 @@ public class CICSDeleteqDeqOptionsCheckUtility extends CICSOptionsCheckBaseUtili
     checkDuplicates(ctx);
   }
 
-   private void checkDeleteqTd(CICSParser.Cics_deleteq_tdContext ctx) {
+  private void checkDeleteqTd(CICSParser.Cics_deleteq_tdContext ctx) {
     checkHasMandatoryOptions(ctx.QUEUE(), ctx, "QUEUE");
   }
 
@@ -91,6 +91,7 @@ public class CICSDeleteqDeqOptionsCheckUtility extends CICSOptionsCheckBaseUtili
   @SuppressWarnings("unchecked")
   private void checkDeqCmds(CICSParser.Cics_deq_cmdsContext ctx) {
     checkHasMandatoryOptions(ctx.RESOURCE(), ctx, "RESOURCE");
-    checkHasMutuallyExclusiveOptions("UOW or MAXLIFETIME or TASK", ctx.UOW(), ctx.MAXLIFETIME(), ctx.TASK());
+    checkHasMutuallyExclusiveOptions(
+        "UOW or MAXLIFETIME or TASK", ctx.UOW(), ctx.MAXLIFETIME(), ctx.TASK());
   }
 }

@@ -23,7 +23,8 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
- * Service class exposing functions related to extracting the @{@link SysprintSnap} from a SYSPRINT files.
+ * Service class exposing functions related to extracting the @{@link SysprintSnap} from a SYSPRINT
+ * files.
  */
 @Getter
 public class SysprintSnapProcessService {
@@ -31,7 +32,8 @@ public class SysprintSnapProcessService {
   private final Map<String, String> renamedReferences;
   private static final String CROSS_REFERENCE_REPORT_START =
       "Defined   Cross-reference of data names   References";
-  private static final String CROSS_REFERENCE_REPORT_END = "LineID  Message code  Message text|End of compilation";
+  private static final String CROSS_REFERENCE_REPORT_END =
+      "LineID  Message code  Message text|End of compilation";
 
   static Pattern getPatternForCuttingReport(String start, String end) {
     return Pattern.compile(String.format("(%s).*?(%s)", start, end), Pattern.DOTALL);
@@ -60,7 +62,8 @@ public class SysprintSnapProcessService {
   }
 
   private String getMemoryReferencesReport() {
-    Pattern crossReferenceReportPattern = getPatternForCuttingReport(CROSS_REFERENCE_REPORT_START, CROSS_REFERENCE_REPORT_END);
+    Pattern crossReferenceReportPattern =
+        getPatternForCuttingReport(CROSS_REFERENCE_REPORT_START, CROSS_REFERENCE_REPORT_END);
     String result = extractReportBasedOnCuttingPattern(crossReferenceReportPattern);
     result =
         Pattern.compile(
@@ -85,7 +88,8 @@ public class SysprintSnapProcessService {
   }
 
   /**
-   * @return a mapping between report section and List of @{@link SysprintSnap} parsed from a SYSPRINT file.
+   * @return a mapping between report section and List of @{@link SysprintSnap} parsed from a
+   *     SYSPRINT file.
    */
   public Map<ReportSection, List<SysprintSnap>> getVariableReferenceReport() {
     String memoryReferencesReport = getMemoryReferencesReport();

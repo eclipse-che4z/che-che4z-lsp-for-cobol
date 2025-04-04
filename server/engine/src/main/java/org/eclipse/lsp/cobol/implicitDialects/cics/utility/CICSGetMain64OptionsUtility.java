@@ -70,7 +70,9 @@ public class CICSGetMain64OptionsUtility extends CICSOptionsCheckBaseUtility {
     checkHasIllegalOptions(parentCtx.GETMAIN64(), "GETMAIN64 is only available in Assembly");
     checkHasMandatoryOptions(ctx.SET(), ctx, "SET");
     checkHasMandatoryOptions(ctx.FLENGTH(), ctx, "FLENGTH");
-    if (ctx.LOCATION().isEmpty()) checkHasIllegalOptions(ctx.EXECUTABLE(), "EXECUTABLE without LOCATION");
-    checkHasMutuallyExclusiveOptions("USERDATAKEY or CICSDATAKEY", ctx.USERDATAKEY(), ctx.CICSDATAKEY());
+    if (ctx.LOCATION().isEmpty())
+      checkHasIllegalOptions(ctx.EXECUTABLE(), "EXECUTABLE without LOCATION");
+    checkHasMutuallyExclusiveOptions(
+        "USERDATAKEY or CICSDATAKEY", ctx.USERDATAKEY(), ctx.CICSDATAKEY());
   }
 }

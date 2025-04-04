@@ -18,12 +18,11 @@ import org.eclipse.lsp.cobol.common.CleanerPreprocessor;
 import org.eclipse.lsp.cobol.common.benchmark.BenchmarkSessionProvider;
 import org.eclipse.lsp.cobol.common.pipeline.Pipeline;
 
-/**
- * True Dialects Service, based on different language ids
- */
+/** True Dialects Service, based on different language ids */
 public interface TrueDialectService<T extends BenchmarkSessionProvider> {
   /**
    * Returns the pipeline for a dialect based on a given language id
+   *
    * @param languageId a language id of a dialect
    * @return the pipeline for a dialect
    */
@@ -31,9 +30,9 @@ public interface TrueDialectService<T extends BenchmarkSessionProvider> {
 
   /**
    * Returns the cleanup preprocessor for a dialect, based on a given language id
+   *
    * @param languageId a language id of a dialect
    * @return the cleanup preprocessor
    */
   CleanerPreprocessor getPreprocessor(CobolLanguageId languageId);
-
 }

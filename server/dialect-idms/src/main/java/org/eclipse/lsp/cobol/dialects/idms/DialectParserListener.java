@@ -64,7 +64,8 @@ class DialectParserListener extends BaseErrorListener {
                             new Position(
                                 errorLine,
                                 charPositionInLine + getOffendingSymbolSize(offendingSymbol))))
-                    .build().toOriginalLocation())
+                    .build()
+                    .toOriginalLocation())
             .severity(getSeverity(msg))
             .build();
     LOG.debug("Syntax error by DialectParserListener " + error.toString());

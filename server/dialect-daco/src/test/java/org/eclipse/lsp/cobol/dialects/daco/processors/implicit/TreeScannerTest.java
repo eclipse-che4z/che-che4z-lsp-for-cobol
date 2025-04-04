@@ -24,9 +24,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-/**
- * Test for {@link TreeScanner}
- */
+/** Test for {@link TreeScanner} */
 public class TreeScannerTest {
   @Test
   void testScan() {

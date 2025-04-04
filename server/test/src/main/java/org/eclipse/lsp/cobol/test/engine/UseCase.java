@@ -75,7 +75,12 @@ public class UseCase {
   public AnalysisConfig getAnalysisConfig() {
     AnalysisConfig analysisConfig =
         new AnalysisConfig(
-            copybookProcessingMode, dialects, cicsTranslator, false, ImmutableList.of(), dialectsSettings);
+            copybookProcessingMode,
+            dialects,
+            cicsTranslator,
+            false,
+            ImmutableList.of(),
+            dialectsSettings);
     analysisConfig.getCompilerOptions().addAll(compilerOptions);
     return analysisConfig;
   }

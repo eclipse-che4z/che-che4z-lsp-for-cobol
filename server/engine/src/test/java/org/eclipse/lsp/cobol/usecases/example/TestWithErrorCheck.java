@@ -43,7 +43,7 @@ class TestWithErrorCheck {
             "1",
             new Diagnostic(
                 new Range(),
-                    "A period was assumed before \"<EOF>\".",
+                "A period was assumed before \"<EOF>\".",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())),
         CobolLanguageId.COBOL);

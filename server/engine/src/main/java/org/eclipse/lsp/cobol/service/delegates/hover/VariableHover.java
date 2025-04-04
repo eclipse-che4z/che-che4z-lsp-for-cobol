@@ -36,7 +36,9 @@ public class VariableHover implements HoverProvider {
   @Nullable
   @Override
   public Hover getHover(
-      @Nullable CobolDocumentModel document, @NonNull TextDocumentPositionParams position, SourceUnitGraph documentGraph) {
+      @Nullable CobolDocumentModel document,
+      @NonNull TextDocumentPositionParams position,
+      SourceUnitGraph documentGraph) {
     return Optional.ofNullable(document)
         .map(CobolDocumentModel::getAnalysisResult)
         .map(AnalysisResult::getRootNode)

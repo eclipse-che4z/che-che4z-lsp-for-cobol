@@ -25,12 +25,10 @@ import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
-/**
- * Test that missed dialect stops processing
- */
+/** Test that missed dialect stops processing */
 class TestMissedDialect {
   private static final String TEXT =
-       "{|1}        IDENTIFICATION DIVISION.\n"
+      "{|1}        IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID. MIN.\n"
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
@@ -44,9 +42,18 @@ class TestMissedDialect {
         ImmutableList.of(),
         ImmutableMap.of(
             "1",
-            new Diagnostic(new Range(), "TESTDIALECT dialect is missing (required for file:c:/workspace/document.cbl)", DiagnosticSeverity.Error, ErrorSource.DIALECT.getText())),
+            new Diagnostic(
+                new Range(),
+                "TESTDIALECT dialect is missing (required for file:c:/workspace/document.cbl)",
+                DiagnosticSeverity.Error,
+                ErrorSource.DIALECT.getText())),
         ImmutableList.of(),
-        new AnalysisConfig(CopybookProcessingMode.ENABLED,
-            ImmutableList.of("TESTDIALECT"), false, false, ImmutableList.of(), ImmutableMap.of()));
+        new AnalysisConfig(
+            CopybookProcessingMode.ENABLED,
+            ImmutableList.of("TESTDIALECT"),
+            false,
+            false,
+            ImmutableList.of(),
+            ImmutableMap.of()));
   }
 }

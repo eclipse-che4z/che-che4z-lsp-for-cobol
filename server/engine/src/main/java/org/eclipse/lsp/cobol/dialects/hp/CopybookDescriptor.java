@@ -18,9 +18,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.eclipse.lsp4j.Range;
 
-/**
- * HP Copybook descriptor
- */
+/** HP Copybook descriptor */
 @Data
 @AllArgsConstructor
 class CopybookDescriptor {

@@ -77,6 +77,6 @@ class TestXmlQueryNotTerminatesSemanticAnalysis {
             new Range(new Position(19, 21), new Position(19, 29)),
             "Invalid definition for: VARNAME1",
             DiagnosticSeverity.Error,
-             ErrorSource.PARSING.getText()));
+            ErrorSource.PARSING.getText()));
   }
 }

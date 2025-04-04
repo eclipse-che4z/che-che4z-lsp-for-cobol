@@ -20,9 +20,10 @@ import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.junit.jupiter.api.Test;
 
-/** Tests variable length tables supports UNBOUNDED
- *  Ref - https://www.ibm.com/docs/en/cobol-zos/6.3?topic=clause-variable-length-tables
- * */
+/**
+ * Tests variable length tables supports UNBOUNDED Ref -
+ * https://www.ibm.com/docs/en/cobol-zos/6.3?topic=clause-variable-length-tables
+ */
 public class TestVariableLengthTableSyntax {
   public static final String TEXT =
       "       IDENTIFICATION DIVISION.\n"

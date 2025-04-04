@@ -32,17 +32,18 @@ public class CICSSpoolWriteOptionsCheckUtility extends CICSOptionsCheckBaseUtili
   public static final int RULE_INDEX = RULE_cics_spoolwrite;
 
   private static final Map<Integer, ErrorSeverity> DUPLICATE_CHECK_OPTIONS =
-          new HashMap<Integer, ErrorSeverity>() {
-            {
-              put(CICSLexer.TOKEN, ErrorSeverity.ERROR);
-              put(CICSLexer.FROM, ErrorSeverity.ERROR);
-              put(CICSLexer.FLENGTH, ErrorSeverity.ERROR);
-              put(CICSLexer.LINE, ErrorSeverity.WARNING);
-              put(CICSLexer.PAGE, ErrorSeverity.WARNING);
-            }
-          };
+      new HashMap<Integer, ErrorSeverity>() {
+        {
+          put(CICSLexer.TOKEN, ErrorSeverity.ERROR);
+          put(CICSLexer.FROM, ErrorSeverity.ERROR);
+          put(CICSLexer.FLENGTH, ErrorSeverity.ERROR);
+          put(CICSLexer.LINE, ErrorSeverity.WARNING);
+          put(CICSLexer.PAGE, ErrorSeverity.WARNING);
+        }
+      };
 
-  public CICSSpoolWriteOptionsCheckUtility(DialectProcessingContext context, List<SyntaxError> errors) {
+  public CICSSpoolWriteOptionsCheckUtility(
+      DialectProcessingContext context, List<SyntaxError> errors) {
     super(context, errors, DUPLICATE_CHECK_OPTIONS);
   }
 

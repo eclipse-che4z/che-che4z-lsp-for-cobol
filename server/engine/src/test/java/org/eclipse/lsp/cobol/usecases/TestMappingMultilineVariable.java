@@ -56,11 +56,7 @@ class TestMappingMultilineVariable {
                 ErrorSource.PARSING.getText()),
             "2",
             new Diagnostic(
-              new Range(),
-              "Syntax error on 'PICTUREQ'",
-              Error,
-              ErrorSource.PARSING.getText())
-            ),
+                new Range(), "Syntax error on 'PICTUREQ'", Error, ErrorSource.PARSING.getText())),
         ImmutableList.of(),
         AnalysisConfig.defaultConfig(CopybookProcessingMode.DISABLED));
   }

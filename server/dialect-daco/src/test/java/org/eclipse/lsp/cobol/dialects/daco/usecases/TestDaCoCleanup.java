@@ -38,7 +38,11 @@ class TestDaCoCleanup {
 
   @Test
   void test() {
-    UseCaseEngine.runTestForDiagnostics(TEXT, ImmutableList.of(Fixtures.subschemaCopy("")),
-        ImmutableMap.of(), ImmutableList.of(), DialectConfigs.getDaCoAnalysisConfig());
+    UseCaseEngine.runTestForDiagnostics(
+        TEXT,
+        ImmutableList.of(Fixtures.subschemaCopy("")),
+        ImmutableMap.of(),
+        ImmutableList.of(),
+        DialectConfigs.getDaCoAnalysisConfig());
   }
 }

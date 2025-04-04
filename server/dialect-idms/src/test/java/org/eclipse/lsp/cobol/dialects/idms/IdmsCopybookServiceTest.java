@@ -35,20 +35,14 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-/**
- * Test for {@link IdmsCopybookService}
- */
+/** Test for {@link IdmsCopybookService} */
 @ExtendWith(MockitoExtension.class)
 class IdmsCopybookServiceTest {
 
-  @Mock
-  private CopybookService copybookService;
-  @Mock
-  private ParseTreeListener treeListener;
-  @Mock
-  private MessageService messageService;
-  @Mock
-  private CleanerPreprocessor preprocessor;
+  @Mock private CopybookService copybookService;
+  @Mock private ParseTreeListener treeListener;
+  @Mock private MessageService messageService;
+  @Mock private CleanerPreprocessor preprocessor;
 
   private Set<CopybookName> processedCopybooks;
   private IdmsCopybookService service;
@@ -56,15 +50,22 @@ class IdmsCopybookServiceTest {
   @BeforeEach
   void init() {
     processedCopybooks = new HashSet<>();
-    service = new IdmsCopybookService("uri", copybookService, preprocessor,
-        CopybookProcessingMode.ENABLED,
-        treeListener, messageService, processedCopybooks);
+    service =
+        new IdmsCopybookService(
+            "uri",
+            copybookService,
+            preprocessor,
+            CopybookProcessingMode.ENABLED,
+            treeListener,
+            messageService,
+            processedCopybooks);
   }
 
   @Test
   void testNullContent() {
     CopybookName copybookName = new CopybookName("copybook");
-    CopybookModel copybookModel = new CopybookModel(copybookName.toCopybookId(""), copybookName, "copybookUri", null);
+    CopybookModel copybookModel =
+        new CopybookModel(copybookName.toCopybookId(""), copybookName, "copybookUri", null);
     Locality locality = Locality.builder().build();
     List<SyntaxError> errors = new LinkedList<>();
 
@@ -77,7 +78,8 @@ class IdmsCopybookServiceTest {
   @Test
   void testCircularDependency() {
     CopybookName copybookName = new CopybookName("copybook");
-    CopybookModel copybookModel = new CopybookModel(copybookName.toCopybookId(""), copybookName, "copybookUri", "content");
+    CopybookModel copybookModel =
+        new CopybookModel(copybookName.toCopybookId(""), copybookName, "copybookUri", "content");
     Locality locality = Locality.builder().build();
     List<SyntaxError> errors = new LinkedList<>();
 
@@ -91,7 +93,8 @@ class IdmsCopybookServiceTest {
   @Test
   void testCreateNode() {
     CopybookName copybookName = new CopybookName("copybook");
-    CopybookModel copybookModel = new CopybookModel(copybookName.toCopybookId(""), copybookName, "copybookUri", "content");
+    CopybookModel copybookModel =
+        new CopybookModel(copybookName.toCopybookId(""), copybookName, "copybookUri", "content");
     Locality locality = Locality.builder().build();
     List<SyntaxError> errors = new LinkedList<>();
 
@@ -102,5 +105,4 @@ class IdmsCopybookServiceTest {
     assertEquals(1, result.getResult().size());
     assertTrue(processedCopybooks.contains(copybookModel.getCopybookName()));
   }
-
 }

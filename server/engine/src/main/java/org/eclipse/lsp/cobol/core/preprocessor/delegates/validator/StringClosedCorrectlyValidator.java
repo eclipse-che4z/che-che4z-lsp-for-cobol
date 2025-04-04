@@ -44,10 +44,9 @@ public class StringClosedCorrectlyValidator implements ExtendedDocumentValidatio
   private static final Pattern QUOTED_STRING_PATTERN = Pattern.compile("('([^'])*'|\"([^\"])*\")");
   private final MessageService messageService;
 
-    public StringClosedCorrectlyValidator(
-      MessageService messageService) {
+  public StringClosedCorrectlyValidator(MessageService messageService) {
     this.messageService = messageService;
-    }
+  }
 
   @Override
   public List<SyntaxError> validateLines(ExtendedDocument extendedDocument) {

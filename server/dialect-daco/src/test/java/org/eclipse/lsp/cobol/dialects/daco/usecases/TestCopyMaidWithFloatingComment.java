@@ -24,7 +24,7 @@ import com.google.common.collect.ImmutableMap;
 
 /** This test checks that COPY MAID statement is parsed correctly with a floating comment */
 public class TestCopyMaidWithFloatingComment {
-    private static final String TEXT =
+  private static final String TEXT =
       "        IDENTIFICATION DIVISION.\n"
           + "          PROGRAM-ID. PARTEST.\n"
           + "        ENVIRONMENT DIVISION.\n"
@@ -44,6 +44,8 @@ public class TestCopyMaidWithFloatingComment {
     UseCaseEngine.runTest(
         TEXT,
         ImmutableList.of(new CobolText("NAME", DaCoDialect.NAME, COPYBOOK)),
-        ImmutableMap.of(), ImmutableList.of(), DialectConfigs.getDaCoAnalysisConfig());
+        ImmutableMap.of(),
+        ImmutableList.of(),
+        DialectConfigs.getDaCoAnalysisConfig());
   }
 }

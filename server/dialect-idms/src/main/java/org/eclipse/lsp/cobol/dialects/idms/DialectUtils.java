@@ -19,9 +19,7 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
-/**
- * Dialect utils class
- */
+/** Dialect utils class */
 @UtilityClass
 class DialectUtils {
   /**
@@ -32,12 +30,12 @@ class DialectUtils {
    */
   public Range constructRange(ParserRuleContext ctx) {
     return new Range(
-            new Position(
-                    ctx.getStart().getLine() - 1,
-                    ctx.getStart().getCharPositionInLine()),
-            new Position(
-                    ctx.getStop().getLine() - 1,
-                    ctx.getStop().getCharPositionInLine() + ctx.getStop().getStopIndex() - ctx.getStop().getStartIndex() + 1)
-    );
+        new Position(ctx.getStart().getLine() - 1, ctx.getStart().getCharPositionInLine()),
+        new Position(
+            ctx.getStop().getLine() - 1,
+            ctx.getStop().getCharPositionInLine()
+                + ctx.getStop().getStopIndex()
+                - ctx.getStop().getStartIndex()
+                + 1));
   }
 }

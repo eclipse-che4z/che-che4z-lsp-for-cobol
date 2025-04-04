@@ -116,10 +116,7 @@ public class TestMappingMaintainedForEmbeddedCode {
         ImmutableMap.of(
             "1",
             new Diagnostic(
-                new Range(),
-                "Extraneous input DUMMY-CMD",
-                Error,
-                ErrorSource.PARSING.getText())));
+                new Range(), "Extraneous input DUMMY-CMD", Error, ErrorSource.PARSING.getText())));
   }
 
   @Test
@@ -130,6 +127,9 @@ public class TestMappingMaintainedForEmbeddedCode {
         ImmutableMap.of(
             "1",
             new Diagnostic(
-                new Range(), "Syntax error on 'PERFORM'", Error, ErrorSource.PREPROCESSING.getText())));
+                new Range(),
+                "Syntax error on 'PERFORM'",
+                Error,
+                ErrorSource.PREPROCESSING.getText())));
   }
 }

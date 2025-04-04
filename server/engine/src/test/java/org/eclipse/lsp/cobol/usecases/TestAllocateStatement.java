@@ -20,9 +20,10 @@ import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.junit.jupiter.api.Test;
 
-/** Tests the allocate statements
- *  Ref - https://www.ibm.com/docs/en/cobol-zos/6.3?topic=statements-allocate-statement
- * */
+/**
+ * Tests the allocate statements Ref -
+ * https://www.ibm.com/docs/en/cobol-zos/6.3?topic=statements-allocate-statement
+ */
 public class TestAllocateStatement {
   public static final String TEXT =
       "       IDENTIFICATION DIVISION.\n"
@@ -43,6 +44,5 @@ public class TestAllocateStatement {
   @Test
   void test() {
     UseCaseEngine.runTest(TEXT, ImmutableList.of(), ImmutableMap.of());
-
   }
 }

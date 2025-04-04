@@ -100,35 +100,40 @@ public class TestModule extends AbstractModule {
     bind(Occurrences.class).to(ElementOccurrences.class);
     bind(CFASTBuilder.class).to(CFASTBuilderImpl.class);
     bind(CopybookIdentificationService.class)
-            .annotatedWith(Names.named("contentStrategy"))
-            .to(CopybookIdentificationServiceBasedOnContent.class);
+        .annotatedWith(Names.named("contentStrategy"))
+        .to(CopybookIdentificationServiceBasedOnContent.class);
     bind(CopybookIdentificationService.class)
-            .annotatedWith(Names.named("suffixStrategy"))
-            .to(CopybookIdentificationBasedOnExtension.class);
+        .annotatedWith(Names.named("suffixStrategy"))
+        .to(CopybookIdentificationBasedOnExtension.class);
     bind(CopybookIdentificationService.class)
-            .annotatedWith(Names.named("combinedStrategy"))
-            .to(CopybookIdentificationCombinedStrategy.class);
+        .annotatedWith(Names.named("combinedStrategy"))
+        .to(CopybookIdentificationCombinedStrategy.class);
     bind(LspEventConsumer.class).to(CobolWorkspaceServiceImpl.class);
-    bind(DialectDiscoveryService.class).toInstance(new DialectDiscoveryService() {
-      @Override
-      public void registerExecuteCommandCapabilities(List<String> capabilities, String id) {}
+    bind(DialectDiscoveryService.class)
+        .toInstance(
+            new DialectDiscoveryService() {
+              @Override
+              public void registerExecuteCommandCapabilities(
+                  List<String> capabilities, String id) {}
 
-      @Override
-      public void unregisterExecuteCommandCapabilities(String id) {}
+              @Override
+              public void unregisterExecuteCommandCapabilities(String id) {}
 
-      @Override
-      public void registerDialectCodeActionProviders(List<CodeActionProvider> providers) {}
+              @Override
+              public void registerDialectCodeActionProviders(List<CodeActionProvider> providers) {}
 
-      @Override
-      public List<CobolDialect> loadDialects(CopybookService copybookService, MessageService messageService) {
-        return ImmutableList.of();
-      }
+              @Override
+              public List<CobolDialect> loadDialects(
+                  CopybookService copybookService, MessageService messageService) {
+                return ImmutableList.of();
+              }
 
-      @Override
-      public List<CobolDialect> loadDialects(URI uri, CopybookService copybookService, MessageService messageService) {
-        return ImmutableList.of();
-      }
-    });
+              @Override
+              public List<CobolDialect> loadDialects(
+                  URI uri, CopybookService copybookService, MessageService messageService) {
+                return ImmutableList.of();
+              }
+            });
 
     bindFormations();
     bindCompletions();
@@ -137,7 +142,8 @@ public class TestModule extends AbstractModule {
   }
 
   private void bindHoverActions() {
-    Multibinder<HoverProvider> hoverProviderMultibinder = newSetBinder(binder(), HoverProvider.class);
+    Multibinder<HoverProvider> hoverProviderMultibinder =
+        newSetBinder(binder(), HoverProvider.class);
     hoverProviderMultibinder.addBinding().to(VariableHover.class);
     hoverProviderMultibinder.addBinding().to(CopybookHoverProvider.class);
   }

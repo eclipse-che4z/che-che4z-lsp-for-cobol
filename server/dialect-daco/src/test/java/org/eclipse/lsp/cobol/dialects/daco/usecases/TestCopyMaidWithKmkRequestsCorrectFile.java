@@ -47,18 +47,20 @@ class TestCopyMaidWithKmkRequestsCorrectFile {
           + "           DISPLAY {$BHTRGL-XW8} OF {$BHTTAB-XW7}.";
 
   private static final String COPYBOOK_CONTENT =
-            "1           09 {$*BHTRGL-XB4`BHTRGL-XW8}.\n"
+      "1           09 {$*BHTRGL-XB4`BHTRGL-XW8}.\n"
           + "2             11 {$*BHTRGLVLG-XB4`BHTRGLVLG-XW8}.\n"
           + "3               13 {$*FABLYN-XB4`FABLYN-XW8}.\n"
           + "4                 15 {$*FABLYNPOSEEN-XB4`FABLYNPOSEEN-XW8} PIC X.\n"
           + "5                 15 {$*LYNKOD-XB4`LYNKOD-XW8} PIC X(2).\n"
           + "6               13 {$*BHTORSKOD-XB4`BHTORSKOD-XW8} PIC X(2).";
+
   @Test
   void test() {
     UseCaseEngine.runTest(
         TEXT,
-        ImmutableList.of(
-            new CobolText("BHTRGL-XBG", DaCoDialect.NAME, COPYBOOK_CONTENT)),
-        ImmutableMap.of(), ImmutableList.of(), DialectConfigs.getDaCoAnalysisConfig());
+        ImmutableList.of(new CobolText("BHTRGL-XBG", DaCoDialect.NAME, COPYBOOK_CONTENT)),
+        ImmutableMap.of(),
+        ImmutableList.of(),
+        DialectConfigs.getDaCoAnalysisConfig());
   }
 }

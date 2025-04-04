@@ -22,9 +22,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-/**
- * Test for SRImplicitVariablesGenerator
- */
+/** Test for SRImplicitVariablesGenerator */
 class CICSSRImplicitVariablesGeneratorTest {
   @Test
   void test() {

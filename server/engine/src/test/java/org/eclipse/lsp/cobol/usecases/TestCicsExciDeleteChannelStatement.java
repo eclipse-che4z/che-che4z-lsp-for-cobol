@@ -36,8 +36,8 @@ public class TestCicsExciDeleteChannelStatement {
           + "               DELETE CHANNEL({$EVALUATE-VAR}) \n"
           + "           END-EXEC.";
 
-    @Test
-    void test() {
-        UseCaseEngine.runTest(TEXT, ImmutableList.of(), ImmutableMap.of());
-    }
+  @Test
+  void test() {
+    UseCaseEngine.runTest(TEXT, ImmutableList.of(), ImmutableMap.of());
+  }
 }

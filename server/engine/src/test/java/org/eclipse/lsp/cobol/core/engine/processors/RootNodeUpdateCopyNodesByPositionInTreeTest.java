@@ -32,9 +32,7 @@ import java.util.stream.Collectors;
 
 import static org.mockito.Mockito.mock;
 
-/**
- * Tests {@link RootNodeUpdateCopyNodesByPositionInTreeTest}
- */
+/** Tests {@link RootNodeUpdateCopyNodesByPositionInTreeTest} */
 class RootNodeUpdateCopyNodesByPositionInTreeTest {
 
   public static final String DOC_URI = "uri";
@@ -83,7 +81,9 @@ class RootNodeUpdateCopyNodesByPositionInTreeTest {
             Locality.builder()
                 .uri(DOC_URI)
                 .range(new Range(new Position(1, 0), new Position(5, 7)))
-                .build(), ProgramSubtype.Program, 0);
+                .build(),
+            ProgramSubtype.Program,
+            0);
     SectionNode sectionNode =
         new SectionNode(
             Locality.builder()
@@ -111,7 +111,9 @@ class RootNodeUpdateCopyNodesByPositionInTreeTest {
             Locality.builder()
                 .uri(DOC_URI)
                 .range(new Range(new Position(1, 0), new Position(5, 7)))
-                .build(), ProgramSubtype.Program, 0);
+                .build(),
+            ProgramSubtype.Program,
+            0);
     SectionNode sectionNode =
         new SectionNode(
             Locality.builder()

@@ -16,15 +16,14 @@ package org.eclipse.lsp.cobol.common.mapping;
 
 import lombok.experimental.UtilityClass;
 
-/**
- * Maping helper class
- */
+/** Maping helper class */
 @UtilityClass
 public class MappingHelper {
   public static final String SEPARATOR = "\\r?\\n";
 
   /**
    * Splits text into string array
+   *
    * @param text - text to split
    * @return an array of string objects
    */

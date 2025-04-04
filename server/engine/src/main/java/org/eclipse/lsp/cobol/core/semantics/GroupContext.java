@@ -27,9 +27,7 @@ import org.eclipse.lsp4j.Location;
 import java.util.*;
 import java.util.stream.Collectors;
 
-/**
- * This class represents a semantic context for paragraphs and sections
- */
+/** This class represents a semantic context for paragraphs and sections */
 @NoArgsConstructor
 public class GroupContext {
   private final Multimap<String, Location> sections = HashMultimap.create();
@@ -42,6 +40,7 @@ public class GroupContext {
 
   /**
    * Adds a section definition to the context
+   *
    * @param name is a section name
    * @param locality is a section locality
    */
@@ -51,6 +50,7 @@ public class GroupContext {
 
   /**
    * Adds a section range
+   *
    * @param name is a section name
    * @param location is a section location where it's range is a range of a section
    */
@@ -60,6 +60,7 @@ public class GroupContext {
 
   /**
    * Adds a paragraph definition to the context
+   *
    * @param name is a paragraph name
    * @param locality is a paragraph locality
    */
@@ -69,6 +70,7 @@ public class GroupContext {
 
   /**
    * Adds a paragraph range
+   *
    * @param name is a paragraph name
    * @param location is a paragraph location when it's range is a range of a paragraph
    */
@@ -78,6 +80,7 @@ public class GroupContext {
 
   /**
    * Adds a statement usage (it can be paragraph or section usage)
+   *
    * @param name is a statement name
    * @param locality is a statement locality
    */
@@ -87,6 +90,7 @@ public class GroupContext {
 
   /**
    * Prepares and returns paragraphs definition structure
+   *
    * @return a map with a token and a collection of token locations
    */
   public Map<String, Collection<Location>> getParagraphDefinitions() {
@@ -95,6 +99,7 @@ public class GroupContext {
 
   /**
    * Prepares and returns sections definition structure
+   *
    * @return a map with a token and a collection of token locations
    */
   public Map<String, Collection<Location>> getSectionDefinitions() {
@@ -103,6 +108,7 @@ public class GroupContext {
 
   /**
    * Prepares and returns paragraphs usages structure
+   *
    * @return a map with a token and a collection of token locations
    */
   public Map<String, Collection<Location>> getParagraphUsages() {
@@ -111,6 +117,7 @@ public class GroupContext {
 
   /**
    * Prepares and returns paragraphs ranges structure
+   *
    * @return a map with a token and a collection of token locations
    */
   public Map<String, Collection<Location>> getParagraphRanges() {
@@ -119,6 +126,7 @@ public class GroupContext {
 
   /**
    * Prepares and returns sections usages structure
+   *
    * @return a map with a token and a collection of token locations
    */
   public Map<String, Collection<Location>> getSectionUsages() {
@@ -127,6 +135,7 @@ public class GroupContext {
 
   /**
    * Prepares and returns sections ranges structure
+   *
    * @return a map with a token and a collection of token locations
    */
   public Map<String, Collection<Location>> getSectionRanges() {
@@ -135,6 +144,7 @@ public class GroupContext {
 
   /**
    * Generates errors in case of not defined paragraphs
+   *
    * @param messageService is a message service to generate exact message
    * @return a list of SyntaxError objects
    */
@@ -165,10 +175,11 @@ public class GroupContext {
   }
 
   private Map<String, Collection<Location>> prepareUsages(Set<String> definitions) {
-    return candidateUsageLocalities.asMap().entrySet()
-        .stream()
+    return candidateUsageLocalities.asMap().entrySet().stream()
         .filter(e -> definitions.contains(e.getKey()))
-        .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().stream()
-            .map(Locality::toLocation).collect(Collectors.toList())));
+        .collect(
+            Collectors.toMap(
+                Map.Entry::getKey,
+                e -> e.getValue().stream().map(Locality::toLocation).collect(Collectors.toList())));
   }
 }

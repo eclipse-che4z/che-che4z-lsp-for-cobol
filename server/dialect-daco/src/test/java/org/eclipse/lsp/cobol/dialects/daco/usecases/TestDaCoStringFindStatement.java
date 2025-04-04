@@ -23,45 +23,44 @@ import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
-/**
- * Tests the DaCo STRING FIND statement
- */
+/** Tests the DaCo STRING FIND statement */
 class TestDaCoStringFindStatement {
 
-    private static final String TEXT =
-            "        IDENTIFICATION DIVISION. \r\n"
-                    + "        PROGRAM-ID. test1. \r\n"
-                    + "        ENVIRONMENT DIVISION.\n"
-                    + "        IDMS-CONTROL SECTION.\n"
-                    + "            PROTOCOL. MODE ABC.\n"
-                    + "            IDMS-RECORDS MANUAL\n"
-                    + "        DATA DIVISION. \r\n"
-                    + "        WORKING-STORAGE SECTION. \r\n"
-                    + "        01 {$*WS-AREA}. \r\n"
-                    + "           03 {$*AREA-XW1}. \r\n"
-                    + "             05 {$*DSAPRO-XL1}. \r\n"
-                    + "               07 FILLER               PIC X(5)    VALUE 'REMBD'. \r\n"
-                    + "        PROCEDURE DIVISION. \r\n"
-                    + "            STRING FIND {$DSAPRO-XL1} {$DSAPRO-XL1}. \r\n"
-                    + "            STRING FIND {$DSAPRO-XL1} 'MB'. \r\n"
-                    + "            STRING FIND {$DSAPRO-XL1} SPACE. \r\n"
-                    // Negative tests
-                    + "            STRING FIND {GBR4|1} {$DSAPRO-XL1}. \r\n"
-                    + "            STRING FIND {$DSAPRO-XL1} {GBR4|1}. \r\n";
+  private static final String TEXT =
+      "        IDENTIFICATION DIVISION. \r\n"
+          + "        PROGRAM-ID. test1. \r\n"
+          + "        ENVIRONMENT DIVISION.\n"
+          + "        IDMS-CONTROL SECTION.\n"
+          + "            PROTOCOL. MODE ABC.\n"
+          + "            IDMS-RECORDS MANUAL\n"
+          + "        DATA DIVISION. \r\n"
+          + "        WORKING-STORAGE SECTION. \r\n"
+          + "        01 {$*WS-AREA}. \r\n"
+          + "           03 {$*AREA-XW1}. \r\n"
+          + "             05 {$*DSAPRO-XL1}. \r\n"
+          + "               07 FILLER               PIC X(5)    VALUE 'REMBD'. \r\n"
+          + "        PROCEDURE DIVISION. \r\n"
+          + "            STRING FIND {$DSAPRO-XL1} {$DSAPRO-XL1}. \r\n"
+          + "            STRING FIND {$DSAPRO-XL1} 'MB'. \r\n"
+          + "            STRING FIND {$DSAPRO-XL1} SPACE. \r\n"
+          // Negative tests
+          + "            STRING FIND {GBR4|1} {$DSAPRO-XL1}. \r\n"
+          + "            STRING FIND {$DSAPRO-XL1} {GBR4|1}. \r\n";
 
-    @Test
-    void test() {
+  @Test
+  void test() {
 
-        UseCaseEngine.runTest(
-                TEXT,
-                ImmutableList.of(),
-                ImmutableMap.of(
-                        "1",
-                        new Diagnostic(
-                                new Range(),
-                                "Variable GBR4 is not defined",
-                                DiagnosticSeverity.Error,
-                                ErrorSource.PARSING.getText())),
-                ImmutableList.of(), DialectConfigs.getDaCoAnalysisConfig());
-    }
+    UseCaseEngine.runTest(
+        TEXT,
+        ImmutableList.of(),
+        ImmutableMap.of(
+            "1",
+            new Diagnostic(
+                new Range(),
+                "Variable GBR4 is not defined",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())),
+        ImmutableList.of(),
+        DialectConfigs.getDaCoAnalysisConfig());
+  }
 }

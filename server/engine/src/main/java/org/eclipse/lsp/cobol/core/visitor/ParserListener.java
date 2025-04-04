@@ -53,9 +53,10 @@ public class ParserListener extends BaseErrorListener {
       String msg,
       RecognitionException e) {
 
-    Range range = new Range(
-        new Position(line - 1, charPositionInLine), new Position(line - 1,
-        charPositionInLine + getOffendingSymbolSize(offendingSymbol)));
+    Range range =
+        new Range(
+            new Position(line - 1, charPositionInLine),
+            new Position(line - 1, charPositionInLine + getOffendingSymbolSize(offendingSymbol)));
 
     if ("token recognition error at: '\\n'".equals(msg)) {
       return;
@@ -70,7 +71,8 @@ public class ParserListener extends BaseErrorListener {
                     .uri(location.getUri())
                     .range(location.getRange())
                     .copybookId(copybooksRepository.getCopybookIdByUri(location.getUri()))
-                    .build().toOriginalLocation())
+                    .build()
+                    .toOriginalLocation())
             .suggestion(msg)
             .severity(getErrorSeverity(e))
             .build();

@@ -41,7 +41,8 @@ class TestCopyMaidWithWrkShowsErrorAfter77 {
           + "       PROCEDURE DIVISION.\n"
           + "           DISPLAY {$BHTRGL-XWD}.";
 
-  private static final String COPYBOOK_CONTENT = "1           09 {$*BHTRGL-X^BHTRGL-XWD|2} PIC X.\n";
+  private static final String COPYBOOK_CONTENT =
+      "1           09 {$*BHTRGL-X^BHTRGL-XWD|2} PIC X.\n";
 
   @Test
   @Disabled("An error is produced, but is shown in copybook file. Not sure if it's wrong.")
@@ -56,6 +57,8 @@ class TestCopyMaidWithWrkShowsErrorAfter77 {
                 null,
                 "BHTRGL-XWD: Only 01, 66 and 77 level numbers are allowed at the highest level",
                 DiagnosticSeverity.Error,
-                ErrorSource.DIALECT.getText())), ImmutableList.of(), DialectConfigs.getDaCoAnalysisConfig());
+                ErrorSource.DIALECT.getText())),
+        ImmutableList.of(),
+        DialectConfigs.getDaCoAnalysisConfig());
   }
 }

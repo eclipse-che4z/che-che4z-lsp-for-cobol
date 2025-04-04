@@ -31,14 +31,12 @@ import org.junit.jupiter.api.Test;
  */
 public class TestCICSRelease {
   // RELEASE tests
-  private static final String RELEASE_VALID =
-          "RELEASE PROGRAM({$varOne})";
+  private static final String RELEASE_VALID = "RELEASE PROGRAM({$varOne})";
 
-  private static final String RELEASE_INVALID_NO_PROGRAM =
-          "RELEASE";
+  private static final String RELEASE_INVALID_NO_PROGRAM = "RELEASE";
 
   private static final String RELEASE_INVALID_EXTRA_OPTION =
-          "RELEASE PROGRAM({$varOne}) {PROGRAM|errorOne}({$varOne})";
+      "RELEASE PROGRAM({$varOne}) {PROGRAM|errorOne}({$varOne})";
 
   @Test
   void testReleaseValid() {
@@ -48,33 +46,33 @@ public class TestCICSRelease {
   @Test
   void testReleaseInvalidNoProgram() {
     CICSTestUtils.errorTestWithEndExecError(
-            RELEASE_INVALID_NO_PROGRAM,
-            ImmutableList.of("errorOne"),
-            ImmutableMap.of(
-                    "errorOne",
-                    new Diagnostic(
-                            new Range(),
-                            "Missing required option: PROGRAM",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText()),
-                    "end-exec-error",
-                    new Diagnostic(
-                            new Range(),
-                            "Syntax error on 'END-EXEC'",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText())));
+        RELEASE_INVALID_NO_PROGRAM,
+        ImmutableList.of("errorOne"),
+        ImmutableMap.of(
+            "errorOne",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: PROGRAM",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()),
+            "end-exec-error",
+            new Diagnostic(
+                new Range(),
+                "Syntax error on 'END-EXEC'",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
   }
 
   @Test
   void testReleaseInvalidExtraOption() {
     CICSTestUtils.errorTest(
-            RELEASE_INVALID_EXTRA_OPTION,
-            ImmutableMap.of(
-                    "errorOne",
-                    new Diagnostic(
-                            new Range(),
-                            "Excessive options provided for: PROGRAM",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText())));
+        RELEASE_INVALID_EXTRA_OPTION,
+        ImmutableMap.of(
+            "errorOne",
+            new Diagnostic(
+                new Range(),
+                "Excessive options provided for: PROGRAM",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
   }
 }

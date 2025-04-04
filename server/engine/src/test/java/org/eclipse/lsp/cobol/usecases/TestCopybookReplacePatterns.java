@@ -178,12 +178,12 @@ class TestCopybookReplacePatterns {
                 "Variable name cannot exceed 30 characters",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()),
-                "2",
-                new Diagnostic(
-                        new Range(),
-                        "Errors inside the copybook",
-                        DiagnosticSeverity.Error,
-                        ErrorSource.COPYBOOK.getText())));
+            "2",
+            new Diagnostic(
+                new Range(),
+                "Errors inside the copybook",
+                DiagnosticSeverity.Error,
+                ErrorSource.COPYBOOK.getText())));
   }
 
   @Test
@@ -204,12 +204,12 @@ class TestCopybookReplacePatterns {
                 "Variable name cannot exceed 30 characters",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()),
-                "2",
-                new Diagnostic(
-                        new Range(),
-                        "Errors inside the copybook",
-                        DiagnosticSeverity.Error,
-                        ErrorSource.COPYBOOK.getText())));
+            "2",
+            new Diagnostic(
+                new Range(),
+                "Errors inside the copybook",
+                DiagnosticSeverity.Error,
+                ErrorSource.COPYBOOK.getText())));
   }
 
   @Test

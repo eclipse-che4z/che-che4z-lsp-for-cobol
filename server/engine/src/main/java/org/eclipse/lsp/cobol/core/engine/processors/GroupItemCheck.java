@@ -47,25 +47,22 @@ public class GroupItemCheck implements Processor<GroupItemNode> {
     final List<Node> children = node.getChildren();
     for (int nodeIndex = 0; nodeIndex < children.size() - 1; ++nodeIndex) {
       final Node child = children.get(nodeIndex);
-      if (!(child instanceof ElementaryNode))
-        continue;
+      if (!(child instanceof ElementaryNode)) continue;
       final ElementaryNode childE = (ElementaryNode) child;
-      if (Strings.isNullOrEmpty(childE.getPicClause()))
-        continue;
+      if (Strings.isNullOrEmpty(childE.getPicClause())) continue;
       final Node nextNode = children.get(nodeIndex + 1);
       if (nextNode.getNodeType() != NodeType.VARIABLE
           || !(nextNode instanceof VariableWithLevelNode)
-          || nextNode instanceof MultiTableDataNameNode)
-        continue;
+          || nextNode instanceof MultiTableDataNameNode) continue;
 
       int nextVariableLevel = VariableWithLevelNode.class.cast(nextNode).getLevel();
       if (nextVariableLevel == VariableConstants.LEVEL_66
           || nextVariableLevel == VariableConstants.LEVEL_77
           || nextVariableLevel == VariableConstants.LEVEL_88
-          || childE.getLevel() >= nextVariableLevel)
-        continue;
+          || childE.getLevel() >= nextVariableLevel) continue;
 
-      ctx.getErrors().add(childE.getError(MessageTemplate.of(PICTURE_NOT_ALLOWED, childE.getName())));
+      ctx.getErrors()
+          .add(childE.getError(MessageTemplate.of(PICTURE_NOT_ALLOWED, childE.getName())));
     }
   }
 }

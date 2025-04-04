@@ -79,7 +79,8 @@ public class TestSymbolVariableName {
         ImmutablePair.of("extend", ""),
         ImmutablePair.of("first", ""),
         ImmutablePair.of("initial", ""),
-//        ImmutablePair.of("national", ""), TODO: The "PICTURE" clause in the data definition was not compatible with the specified "USAGE NATIONAL"
+        //        ImmutablePair.of("national", ""), TODO: The "PICTURE" clause in the data
+        // definition was not compatible with the specified "USAGE NATIONAL"
         ImmutablePair.of("object", "Missing token REFERENCE at usageFormat"),
         ImmutablePair.of("off", ""),
         ImmutablePair.of("quote", ""),
@@ -112,34 +113,34 @@ public class TestSymbolVariableName {
     } else {
       expectedDiagnostics =
           ImmutableMap.of(
-                  "1",
-                  new Diagnostic(
-                          new Range(),
-                          String.format("A period was assumed before \"%s\".", keyword.getLeft()),
-                          DiagnosticSeverity.Error,
-                          ErrorSource.PARSING.getText()));
-
-/* TODO:
               "1",
-              new Diagnostic(
-                  new Range(),
-                  "A \"PICTURE\" or \"USAGE INDEX\" clause was not found for elementary item FILLER",
-                  DiagnosticSeverity.Error,
-                  ErrorSource.PARSING.getText()),
-              "2",
               new Diagnostic(
                   new Range(),
                   String.format("A period was assumed before \"%s\".", keyword.getLeft()),
                   DiagnosticSeverity.Error,
-                  ErrorSource.PARSING.getText()),
-              "3",
-              new Diagnostic(
-                  new Range(),
-                  String.format("Syntax error on '%s'", keyword.getLeft()),
-                  DiagnosticSeverity.Error,
                   ErrorSource.PARSING.getText()));
 
- */
+      /* TODO:
+                   "1",
+                   new Diagnostic(
+                       new Range(),
+                       "A \"PICTURE\" or \"USAGE INDEX\" clause was not found for elementary item FILLER",
+                       DiagnosticSeverity.Error,
+                       ErrorSource.PARSING.getText()),
+                   "2",
+                   new Diagnostic(
+                       new Range(),
+                       String.format("A period was assumed before \"%s\".", keyword.getLeft()),
+                       DiagnosticSeverity.Error,
+                       ErrorSource.PARSING.getText()),
+                   "3",
+                   new Diagnostic(
+                       new Range(),
+                       String.format("Syntax error on '%s'", keyword.getLeft()),
+                       DiagnosticSeverity.Error,
+                       ErrorSource.PARSING.getText()));
+
+      */
     }
 
     UseCaseEngine.runTest(code, ImmutableList.of(), expectedDiagnostics);

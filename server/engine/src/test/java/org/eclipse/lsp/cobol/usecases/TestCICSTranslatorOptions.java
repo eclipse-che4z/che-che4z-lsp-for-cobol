@@ -133,7 +133,6 @@ public class TestCICSTranslatorOptions {
     Map<String, List<Diagnostic>> diagnostics = analyze.getDiagnostics();
     Assertions.assertEquals(1, diagnostics.get(UseCaseUtils.DOCUMENT_URI).size());
     Assertions.assertEquals(
-        "Syntax error on 'XOPTS'",
-        diagnostics.get(UseCaseUtils.DOCUMENT_URI).get(0).getMessage());
+        "Syntax error on 'XOPTS'", diagnostics.get(UseCaseUtils.DOCUMENT_URI).get(0).getMessage());
   }
 }

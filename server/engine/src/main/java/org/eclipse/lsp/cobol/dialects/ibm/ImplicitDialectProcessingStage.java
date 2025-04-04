@@ -38,7 +38,8 @@ import org.eclipse.lsp4j.Location;
 
 /** Implicit dialects processing stage */
 @RequiredArgsConstructor
-public class ImplicitDialectProcessingStage implements Stage<AnalysisContext, DialectOutcome, CopybooksRepository> {
+public class ImplicitDialectProcessingStage
+    implements Stage<AnalysisContext, DialectOutcome, CopybooksRepository> {
   private final DialectService dialectService;
 
   @Override

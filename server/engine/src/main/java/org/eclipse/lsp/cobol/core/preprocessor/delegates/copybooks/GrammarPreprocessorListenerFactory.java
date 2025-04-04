@@ -29,5 +29,6 @@ public interface GrammarPreprocessorListenerFactory {
    * @param preprocessor - dialect specific preprocessor
    * @return a new listener
    */
-  GrammarPreprocessorListenerImpl create(@NonNull PreprocessorContext context, CleanerPreprocessor preprocessor);
+  GrammarPreprocessorListenerImpl create(
+      @NonNull PreprocessorContext context, CleanerPreprocessor preprocessor);
 }

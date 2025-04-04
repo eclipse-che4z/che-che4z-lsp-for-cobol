@@ -24,15 +24,15 @@ import org.eclipse.lsp.cobol.dialects.daco.nodes.SortTableNode;
 
 /** ObsoleteNode processor */
 public class DaCoObsoleteNodeCheck implements Processor<SortTableNode> {
-    @Override
-    public void accept(SortTableNode node, ProcessingContext ctx) {
-        ctx.getErrors()
-                .add(
-                        SyntaxError.syntaxError()
-                                .errorSource(ErrorSource.PARSING)
-                                .severity(ErrorSeverity.WARNING)
-                                .location(node.getLocality().toOriginalLocation())
-                                .messageTemplate(MessageTemplate.of("cobolParser.ObsoleteCode"))
-                                .build());
-    }
+  @Override
+  public void accept(SortTableNode node, ProcessingContext ctx) {
+    ctx.getErrors()
+        .add(
+            SyntaxError.syntaxError()
+                .errorSource(ErrorSource.PARSING)
+                .severity(ErrorSeverity.WARNING)
+                .location(node.getLocality().toOriginalLocation())
+                .messageTemplate(MessageTemplate.of("cobolParser.ObsoleteCode"))
+                .build());
+  }
 }

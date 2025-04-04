@@ -25,17 +25,16 @@ import org.eclipse.lsp4j.DocumentSymbolParams;
 import org.eclipse.lsp4j.SymbolInformation;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 
-/**
- * `textDocument/documentSymbol` language server event
- */
-public class DocumentSymbolQuery implements LspQuery<List<Either<SymbolInformation, DocumentSymbol>>> {
+/** `textDocument/documentSymbol` language server event */
+public class DocumentSymbolQuery
+    implements LspQuery<List<Either<SymbolInformation, DocumentSymbol>>> {
   final String uri;
   private final DocumentSymbolHandler documentSymbolHandler;
   final CompletableFuture<List<Either<SymbolInformation, DocumentSymbol>>> result;
   private final DocumentSymbolParams params;
 
   public DocumentSymbolQuery(
-          DocumentSymbolParams params, DocumentSymbolHandler documentSymbolHandler) {
+      DocumentSymbolParams params, DocumentSymbolHandler documentSymbolHandler) {
     this.params = params;
     uri = params.getTextDocument().getUri();
     this.documentSymbolHandler = documentSymbolHandler;

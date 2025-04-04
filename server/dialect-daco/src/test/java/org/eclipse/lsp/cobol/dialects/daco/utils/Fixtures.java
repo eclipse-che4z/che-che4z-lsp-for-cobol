@@ -18,14 +18,13 @@ import lombok.experimental.UtilityClass;
 import org.eclipse.lsp.cobol.dialects.idms.IdmsDialect;
 import org.eclipse.lsp.cobol.test.CobolText;
 
-/**
- * Class with test fixtures
- */
+/** Class with test fixtures */
 @UtilityClass
 public class Fixtures {
 
   /**
    * Creates a default SUBSCHEMA-DESCRIPTION IDMS copybook with a body
+   *
    * @param body of an IDMS copybook
    * @return a copybook definition for test
    */
@@ -35,6 +34,7 @@ public class Fixtures {
 
   /**
    * Creates a MAPS IDMS copybook with a body
+   *
    * @param body of an IDMS copybook
    * @return a copybook definition for test
    */

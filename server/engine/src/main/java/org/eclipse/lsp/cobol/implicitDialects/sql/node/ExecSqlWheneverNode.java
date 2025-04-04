@@ -33,23 +33,24 @@ public class ExecSqlWheneverNode extends Node {
   private final WheneverType wheneverType;
   private final String value;
 
-  /** Represents a condition clause type of the EXEC SQL WHENEVER statement **/
+  /** Represents a condition clause type of the EXEC SQL WHENEVER statement * */
   public enum WheneverConditionType {
     NOT_FOUND,
     SQLERROR,
     SQLWARNING
   }
 
-  /** Represents a verb clause type of the EXEC SQL WHENEVER statement **/
+  /** Represents a verb clause type of the EXEC SQL WHENEVER statement * */
   public enum WheneverType {
     CONTINUE,
     GOTO,
   }
 
-  public ExecSqlWheneverNode(Locality location,
-                             WheneverConditionType wheneverConditionType,
-                             WheneverType wheneverType,
-                             String value) {
+  public ExecSqlWheneverNode(
+      Locality location,
+      WheneverConditionType wheneverConditionType,
+      WheneverType wheneverType,
+      String value) {
     super(location, NodeType.STATEMENT, Db2SqlDialect.DIALECT_NAME);
     this.wheneverConditionType = wheneverConditionType;
     this.wheneverType = wheneverType;

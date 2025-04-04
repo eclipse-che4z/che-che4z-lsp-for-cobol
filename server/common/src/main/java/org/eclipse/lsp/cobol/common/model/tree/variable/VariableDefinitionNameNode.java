@@ -51,7 +51,8 @@ import java.util.List;
 @Getter
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-public class VariableDefinitionNameNode extends Node implements DefinedAndUsedStructure, Describable {
+public class VariableDefinitionNameNode extends Node
+    implements DefinedAndUsedStructure, Describable {
   private final String name;
 
   public VariableDefinitionNameNode(Locality locality, String name) {

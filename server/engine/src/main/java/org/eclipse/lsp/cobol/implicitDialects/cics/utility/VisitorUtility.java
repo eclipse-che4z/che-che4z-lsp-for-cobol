@@ -23,9 +23,7 @@ import org.eclipse.lsp4j.Location;
 
 import static org.eclipse.lsp.cobol.AntlrRangeUtils.constructRange;
 
-/***
- * Utility class for CICS antlr visitor
- */
+/** * Utility class for CICS antlr visitor */
 @UtilityClass
 public class VisitorUtility {
   /**
@@ -36,7 +34,10 @@ public class VisitorUtility {
    * @return locality
    */
   public Locality constructLocality(ParserRuleContext ctx, DialectProcessingContext context) {
-    return Locality.builder().uri(context.getExtendedDocument().getUri()).range(constructRange(ctx)).build();
+    return Locality.builder()
+        .uri(context.getExtendedDocument().getUri())
+        .range(constructRange(ctx))
+        .build();
   }
 
   /**

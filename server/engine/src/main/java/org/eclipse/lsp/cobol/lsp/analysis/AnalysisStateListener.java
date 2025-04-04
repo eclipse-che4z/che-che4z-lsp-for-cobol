@@ -17,15 +17,15 @@ package org.eclipse.lsp.cobol.lsp.analysis;
 import org.eclipse.lsp.cobol.lsp.SourceUnitGraph;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 
-/**
- * Contract for the listeners which would register to {@link AnalysisStateNotifier} .
- */
+/** Contract for the listeners which would register to {@link AnalysisStateNotifier} . */
 public interface AnalysisStateListener {
-    /**
-     * Notify the analysis state to all registered {@link AnalysisStateNotifier} listeners
-     * @param state
-     * @param model
-     * @param eventSource
-     */
-    void notifyState(AnalysisState state, CobolDocumentModel model, SourceUnitGraph.EventSource eventSource);
+  /**
+   * Notify the analysis state to all registered {@link AnalysisStateNotifier} listeners
+   *
+   * @param state
+   * @param model
+   * @param eventSource
+   */
+  void notifyState(
+      AnalysisState state, CobolDocumentModel model, SourceUnitGraph.EventSource eventSource);
 }

@@ -19,28 +19,28 @@ import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.junit.jupiter.api.Test;
 
-/** Test that special words are not treated as a variable **/
+/** Test that special words are not treated as a variable * */
 class TestSqlSpecialNames {
-  private static final String TEXT = "       IDENTIFICATION DIVISION.\n"
-      + "       PROGRAM-ID.    VVB002.\n"
-      + "       DATA DIVISION.\n"
-      + "       WORKING-STORAGE SECTION.\n"
-      + "       01  {$*WS-F900-JOUR-TRAIT} PIC X(9).\n"
-      + "       PROCEDURE DIVISION.\n"
-      + "           EXEC SQL DECLARE CUR-550 CURSOR FOR\n"
-      + "               SELECT C_ISIN\n"
-      + "               FROM   VVA550\n"
-      + "               WHERE  D_EFF_DEB >= :{$WS-F900-JOUR-TRAIT}\n"
-      + "               UNION\n"
-      + "               SELECT C_ISIN\n"
-      + "               FROM   VVA550\n"
-      + "               WHERE  D_EFF_FIN >= :{$WS-F900-JOUR-TRAIT}\n"
-      + "               FOR FETCH ONLY\n"
-      + "           END-EXEC.\n";
+  private static final String TEXT =
+      "       IDENTIFICATION DIVISION.\n"
+          + "       PROGRAM-ID.    VVB002.\n"
+          + "       DATA DIVISION.\n"
+          + "       WORKING-STORAGE SECTION.\n"
+          + "       01  {$*WS-F900-JOUR-TRAIT} PIC X(9).\n"
+          + "       PROCEDURE DIVISION.\n"
+          + "           EXEC SQL DECLARE CUR-550 CURSOR FOR\n"
+          + "               SELECT C_ISIN\n"
+          + "               FROM   VVA550\n"
+          + "               WHERE  D_EFF_DEB >= :{$WS-F900-JOUR-TRAIT}\n"
+          + "               UNION\n"
+          + "               SELECT C_ISIN\n"
+          + "               FROM   VVA550\n"
+          + "               WHERE  D_EFF_FIN >= :{$WS-F900-JOUR-TRAIT}\n"
+          + "               FOR FETCH ONLY\n"
+          + "           END-EXEC.\n";
 
   @Test
   void test() {
     UseCaseEngine.runTest(TEXT, ImmutableList.of(), ImmutableMap.of());
   }
-
 }

@@ -21,9 +21,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-/**
- * Test for {@link WorkingSectionStaticGenerator}
- */
+/** Test for {@link WorkingSectionStaticGenerator} */
 public class WorkingSectionStaticGeneratorTest {
   @Test
   void testGenerate() {

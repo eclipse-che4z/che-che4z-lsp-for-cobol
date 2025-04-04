@@ -46,6 +46,8 @@ class TestCopyMaidIsNotResolvedInProcedureDivision {
     UseCaseEngine.runTest(
         TEXT,
         ImmutableList.of(new CobolText("PMOREC", DaCoDialect.NAME, COPYBOOK_CONTENT)),
-        ImmutableMap.of(), ImmutableList.of(), DialectConfigs.getDaCoAnalysisConfig());
+        ImmutableMap.of(),
+        ImmutableList.of(),
+        DialectConfigs.getDaCoAnalysisConfig());
   }
 }

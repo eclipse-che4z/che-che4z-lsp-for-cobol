@@ -62,6 +62,10 @@ class TestDaCoAutoWriteReport {
             DiagnosticSeverity.Error,
             ErrorSource.PARSING.getText()));
     UseCaseEngine.runTest(
-        TEXT, ImmutableList.of(), diagnosticMap, ImmutableList.of(), DialectConfigs.getDaCoAnalysisConfig());
+        TEXT,
+        ImmutableList.of(),
+        diagnosticMap,
+        ImmutableList.of(),
+        DialectConfigs.getDaCoAnalysisConfig());
   }
 }

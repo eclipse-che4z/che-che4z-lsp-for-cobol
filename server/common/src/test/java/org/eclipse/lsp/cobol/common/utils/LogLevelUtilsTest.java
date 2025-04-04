@@ -24,10 +24,7 @@ import org.slf4j.LoggerFactory;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-/**
- * This test checks the runtime root log level update provided by {@link
- * LogLevelUtils}
- */
+/** This test checks the runtime root log level update provided by {@link LogLevelUtils} */
 class LogLevelUtilsTest {
 
   /** Test the runtime root log level update provided by {@link LogLevelUtils#updateLogLevel()} */

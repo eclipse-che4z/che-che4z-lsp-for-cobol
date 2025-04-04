@@ -60,7 +60,10 @@ class TestCopybookWithIndirectRecursiveDependencyIsDetected {
         ImmutableMap.of(
             "1",
             new Diagnostic(
-                new Range(), MESSAGE_RECURSION + INDIRECT_NAME, Error, ErrorSource.COPYBOOK.getText()),
+                new Range(),
+                MESSAGE_RECURSION + INDIRECT_NAME,
+                Error,
+                ErrorSource.COPYBOOK.getText()),
             "2",
             new Diagnostic(
                 new Range(), "Errors inside the copybook", Error, ErrorSource.COPYBOOK.getText()),

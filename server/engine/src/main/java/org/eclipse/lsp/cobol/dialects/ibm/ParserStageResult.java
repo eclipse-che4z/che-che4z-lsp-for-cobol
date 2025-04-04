@@ -18,9 +18,7 @@ import lombok.Value;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.eclipse.lsp.cobol.core.CobolParser;
 
-/**
- * Parser stage result
- */
+/** Parser stage result */
 @Value
 public class ParserStageResult {
   CommonTokenStream tokens;

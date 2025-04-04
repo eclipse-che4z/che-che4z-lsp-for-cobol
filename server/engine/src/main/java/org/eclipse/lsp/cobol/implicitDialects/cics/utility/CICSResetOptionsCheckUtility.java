@@ -32,12 +32,12 @@ public class CICSResetOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
   public static final int RULE_INDEX = RULE_cics_reset;
 
   private static final Map<Integer, ErrorSeverity> DUPLICATE_CHECK_OPTIONS =
-          new HashMap<Integer, ErrorSeverity>() {
-            {
-              put(CICSLexer.ACQPROCESS, ErrorSeverity.ERROR);
-              put(CICSLexer.ACTIVITY, ErrorSeverity.ERROR);
-            }
-          };
+      new HashMap<Integer, ErrorSeverity>() {
+        {
+          put(CICSLexer.ACQPROCESS, ErrorSeverity.ERROR);
+          put(CICSLexer.ACTIVITY, ErrorSeverity.ERROR);
+        }
+      };
 
   public CICSResetOptionsCheckUtility(DialectProcessingContext context, List<SyntaxError> errors) {
     super(context, errors, DUPLICATE_CHECK_OPTIONS);

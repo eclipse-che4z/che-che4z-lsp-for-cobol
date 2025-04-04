@@ -63,8 +63,7 @@ public class ErrorMessageHelper {
       Parser recognizer, InputMismatchException e, Token token, String offendingTokens) {
     return token.getType() == EOF
         ? messageService.getMessage(END_OF_FILE_MESSAGE)
-        : messageService.getMessage(
-            REPORT_INPUT_MISMATCH, offendingTokens);
+        : messageService.getMessage(REPORT_INPUT_MISMATCH, offendingTokens);
   }
 
   /**

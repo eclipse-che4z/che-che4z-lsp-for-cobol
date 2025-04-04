@@ -23,54 +23,52 @@ import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
-/**
- * Tests the DaCo READ FILE statement
- */
+/** Tests the DaCo READ FILE statement */
 class TestDaCoFileReadStatement {
 
-    private static final String TEXT =
-            "        IDENTIFICATION DIVISION. \r\n"
-                    + "        PROGRAM-ID. test1. \r\n"
-                    + "        ENVIRONMENT DIVISION.\n"
-                    + "        IDMS-CONTROL SECTION.\n"
-                    + "            PROTOCOL. MODE ABC.\n"
-                    + "            IDMS-RECORDS MANUAL\n"
-                    + "        DATA DIVISION. \r\n"
-                    + "        WORKING-STORAGE SECTION. \r\n"
-                    + "        01 {$*WS-AREA}. \r\n"
-                    + "           03 {$*AREA-XW1}. \r\n"
-                    + "             05 {$*DET001-XW1}. \r\n"
-                    + "               07 FILLER               PIC X(5)    VALUE 'REMBD'. \r\n"
-                    + "        PROCEDURE DIVISION. \r\n"
-                    + "            READ FILE 0123. \r\n"
-                    + "            READ FILE 0123 MAX LENGTH 2. \r\n"
-                    + "            READ FILE 0123 MAX LENGTH {$DET001-XW1}. \r\n"
-                    + "            READ FILE 0123 MAX LENGTH LAYOUT. \r\n"
-                    // Negative Tests
-                    + "            READ FILE {01|1}. \r\n"
-                    + "            READ FILE {01234|1}. \r\n"
-                    + "            READ FILE 0123 MAX LENGTH {ABCD|2}. \r\n";
+  private static final String TEXT =
+      "        IDENTIFICATION DIVISION. \r\n"
+          + "        PROGRAM-ID. test1. \r\n"
+          + "        ENVIRONMENT DIVISION.\n"
+          + "        IDMS-CONTROL SECTION.\n"
+          + "            PROTOCOL. MODE ABC.\n"
+          + "            IDMS-RECORDS MANUAL\n"
+          + "        DATA DIVISION. \r\n"
+          + "        WORKING-STORAGE SECTION. \r\n"
+          + "        01 {$*WS-AREA}. \r\n"
+          + "           03 {$*AREA-XW1}. \r\n"
+          + "             05 {$*DET001-XW1}. \r\n"
+          + "               07 FILLER               PIC X(5)    VALUE 'REMBD'. \r\n"
+          + "        PROCEDURE DIVISION. \r\n"
+          + "            READ FILE 0123. \r\n"
+          + "            READ FILE 0123 MAX LENGTH 2. \r\n"
+          + "            READ FILE 0123 MAX LENGTH {$DET001-XW1}. \r\n"
+          + "            READ FILE 0123 MAX LENGTH LAYOUT. \r\n"
+          // Negative Tests
+          + "            READ FILE {01|1}. \r\n"
+          + "            READ FILE {01234|1}. \r\n"
+          + "            READ FILE 0123 MAX LENGTH {ABCD|2}. \r\n";
 
-    @Test
-    void test() {
+  @Test
+  void test() {
 
-        UseCaseEngine.runTest(
-                TEXT,
-                ImmutableList.of(),
-                ImmutableMap.of(
-                        "1",
-                        new Diagnostic(
-                                new Range(),
-                                "Exact length of file reference must be 4 bytes",
-                                DiagnosticSeverity.Error,
-                                ErrorSource.DIALECT.getText()),
-                        "2",
-                        new Diagnostic(
-                                new Range(),
-                                "Variable ABCD is not defined",
-                                DiagnosticSeverity.Error,
-                                ErrorSource.PARSING.getText())),
-                ImmutableList.of(),
-                DialectConfigs.getDaCoAnalysisConfig());
-    }
+    UseCaseEngine.runTest(
+        TEXT,
+        ImmutableList.of(),
+        ImmutableMap.of(
+            "1",
+            new Diagnostic(
+                new Range(),
+                "Exact length of file reference must be 4 bytes",
+                DiagnosticSeverity.Error,
+                ErrorSource.DIALECT.getText()),
+            "2",
+            new Diagnostic(
+                new Range(),
+                "Variable ABCD is not defined",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())),
+        ImmutableList.of(),
+        DialectConfigs.getDaCoAnalysisConfig());
+  }
 }

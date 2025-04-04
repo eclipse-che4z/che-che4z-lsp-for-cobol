@@ -21,14 +21,11 @@ import org.eclipse.lsp.cobol.core.preprocessor.delegates.transformer.Continuatio
 import org.eclipse.lsp.cobol.service.settings.layout.CodeLayoutStore;
 import org.eclipse.lsp.cobol.service.settings.layout.CodeLayoutUtil;
 
-/**
- * {@link ContinuationLineTransformation} for "hpcobol"
- */
+/** {@link ContinuationLineTransformation} for "hpcobol" */
 class HPContinuationLineTransformation extends ContinuationLineTransformation {
   private final CodeLayoutStore layoutStore;
 
-  HPContinuationLineTransformation(
-      MessageService messageService, CodeLayoutStore layoutStore) {
+  HPContinuationLineTransformation(MessageService messageService, CodeLayoutStore layoutStore) {
     super(messageService);
     this.layoutStore = layoutStore;
   }

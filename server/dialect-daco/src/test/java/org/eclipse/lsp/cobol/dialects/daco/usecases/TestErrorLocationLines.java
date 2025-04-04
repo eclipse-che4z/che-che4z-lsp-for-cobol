@@ -27,11 +27,10 @@ import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
-/**
- * Test for empty lines shift in copybooks
- */
+/** Test for empty lines shift in copybooks */
 class TestErrorLocationLines {
-  private static final String TEXT = "       IDENTIFICATION DIVISION.\n"
+  private static final String TEXT =
+      "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID. SMP.\n"
           + "        ENVIRONMENT DIVISION.\n"
           + "        IDMS-CONTROL SECTION.\n"
@@ -47,22 +46,22 @@ class TestErrorLocationLines {
   @Test
   void test() {
     UseCaseEngine.runTest(
-            TEXT,
-            ImmutableList.of(new CobolText("CB", IdmsDialect.NAME, CB)),
-            ImmutableMap.of(
-                    "A",
-                    new Diagnostic(
-                            new Range(new Position(10, 24), new Position(10, 25)),
-                            "Variable A is not defined",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText()),
-                    "B",
-                    new Diagnostic(
-                            new Range(new Position(10, 33), new Position(10, 34)),
-                            "Variable B is not defined",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText())),
-            ImmutableList.of(),
-            DialectConfigs.getDaCoAnalysisConfig());
+        TEXT,
+        ImmutableList.of(new CobolText("CB", IdmsDialect.NAME, CB)),
+        ImmutableMap.of(
+            "A",
+            new Diagnostic(
+                new Range(new Position(10, 24), new Position(10, 25)),
+                "Variable A is not defined",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()),
+            "B",
+            new Diagnostic(
+                new Range(new Position(10, 33), new Position(10, 34)),
+                "Variable B is not defined",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())),
+        ImmutableList.of(),
+        DialectConfigs.getDaCoAnalysisConfig());
   }
 }

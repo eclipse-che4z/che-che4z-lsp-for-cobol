@@ -18,8 +18,8 @@ import java.util.Collection;
 import java.util.Optional;
 
 /**
- * Provide API definition to search for subroutine files. The service also caches subroutine file URI to reduce
- * filesystem load.
+ * Provide API definition to search for subroutine files. The service also caches subroutine file
+ * URI to reduce filesystem load.
  */
 public interface SubroutineService {
 

@@ -44,7 +44,11 @@ class FindCopybookCommandTest {
       new Diagnostic(RANGE, "Syntax error", Error, null, null);
   private static final Diagnostic COPYBOOK_ERROR =
       new Diagnostic(
-          RANGE, COPYBOOK_NAME + ": Copybook not found", Error, null, ErrorCodes.MISSING_COPYBOOK.getLabel());
+          RANGE,
+          COPYBOOK_NAME + ": Copybook not found",
+          Error,
+          null,
+          ErrorCodes.MISSING_COPYBOOK.getLabel());
 
   /** Test a code action to resolve the required copybook created for the missing copybook error. */
   @Test

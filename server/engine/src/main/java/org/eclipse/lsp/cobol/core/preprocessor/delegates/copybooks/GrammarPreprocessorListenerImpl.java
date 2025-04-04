@@ -70,16 +70,18 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
       ReplacingService replacingService) {
     this.copybookConfig = context.getCopybookProcessingMode();
     this.messageService = messageService;
-    this.preprocessorService = new CopybookPreprocessorService(context.getProgramDocumentUri(),
-        grammarPreprocessor,
-        context.getCurrentDocument(),
-        copybookService,
-        copybookConfig,
-        context.getCopybooksRepository(),
-        context.getHierarchy(),
-        messageService,
-        replacingService,
-        preprocessor);
+    this.preprocessorService =
+        new CopybookPreprocessorService(
+            context.getProgramDocumentUri(),
+            grammarPreprocessor,
+            context.getCurrentDocument(),
+            copybookService,
+            copybookConfig,
+            context.getCopybooksRepository(),
+            context.getHierarchy(),
+            messageService,
+            replacingService,
+            preprocessor);
     this.replacingService = replacingService;
   }
 
@@ -142,30 +144,28 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   @Override
   public void exitPlusplusIncludeStatement(PlusplusIncludeStatementContext ctx) {
     if (requiresEarlyReturn(ctx)) return;
-    preprocessorService.addCopybook(ctx, ctx.copySource(), MAX_COPYBOOK_NAME_LENGTH_10, replacementContext);
+    preprocessorService.addCopybook(
+        ctx, ctx.copySource(), MAX_COPYBOOK_NAME_LENGTH_10, replacementContext);
   }
 
   @Override
-  public void enterCopyStatement(@NonNull CopyStatementContext ctx) {
-
-  }
+  public void enterCopyStatement(@NonNull CopyStatementContext ctx) {}
 
   @Override
   public void exitCopyStatement(@NonNull CopyStatementContext ctx) {
     if (requiresEarlyReturn(ctx)) return;
-    preprocessorService.addCopybook(ctx, ctx.copySource(), MAX_COPYBOOK_NAME_LENGTH_8, replacementContext);
+    preprocessorService.addCopybook(
+        ctx, ctx.copySource(), MAX_COPYBOOK_NAME_LENGTH_8, replacementContext);
   }
-
 
   @Override
-  public void enterIncludeStatement(@NonNull IncludeStatementContext ctx) {
-
-  }
+  public void enterIncludeStatement(@NonNull IncludeStatementContext ctx) {}
 
   @Override
   public void exitIncludeStatement(@NonNull IncludeStatementContext ctx) {
     if (requiresEarlyReturn(ctx)) return;
-    preprocessorService.addCopybook(ctx, ctx.copySource(), MAX_COPYBOOK_NAME_LENGTH_8, replacementContext);
+    preprocessorService.addCopybook(
+        ctx, ctx.copySource(), MAX_COPYBOOK_NAME_LENGTH_8, replacementContext);
   }
 
   private boolean requiresEarlyReturn(ParserRuleContext ctx) {
@@ -186,7 +186,8 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   public void enterReplaceAreaStartOrOffStatement(ReplaceAreaStartOrOffStatementContext ctx) {
     Locality locality = preprocessorService.retrieveLocality(ctx);
     if (!ctx.replacePseudoText().isEmpty()) {
-      replacementContext = ctx.replacePseudoText().stream()
+      replacementContext =
+          ctx.replacePseudoText().stream()
               .map(ReplacementHelper::createClause)
               .map(c -> replacingService.retrievePseudoTextReplacingPattern(c, locality))
               .map(r -> r.unwrap(errors::addAll))

@@ -47,15 +47,17 @@ public class SubroutineServiceImpl implements SubroutineService {
       @Named("CACHE-MAX-SIZE") int cacheSize,
       @Named("CACHE-DURATION") int duration,
       @Named("CACHE-TIME-UNIT") String timeUnitName) {
-    cache = CacheBuilder.newBuilder()
-        .expireAfterWrite(duration, TimeUnit.valueOf(timeUnitName))
-        .maximumSize(cacheSize)
-        .build(new CacheLoader<String, Optional<String>>() {
-          @Override
-          public Optional<String> load(String key) throws Exception {
-            return Optional.ofNullable(clientProvider.get().resolveSubroutine(key).get());
-          }
-        });
+    cache =
+        CacheBuilder.newBuilder()
+            .expireAfterWrite(duration, TimeUnit.valueOf(timeUnitName))
+            .maximumSize(cacheSize)
+            .build(
+                new CacheLoader<String, Optional<String>>() {
+                  @Override
+                  public Optional<String> load(String key) throws Exception {
+                    return Optional.ofNullable(clientProvider.get().resolveSubroutine(key).get());
+                  }
+                });
   }
 
   @Override

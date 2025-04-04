@@ -65,7 +65,9 @@ class TestMapDefinition {
             ImmutableList.of(),
             new AnalysisConfig(
                 CopybookProcessingMode.ENABLED,
-                ImmutableList.of(IdmsDialect.NAME), true, false,
+                ImmutableList.of(IdmsDialect.NAME),
+                true,
+                false,
                 ImmutableList.of(),
                 ImmutableMap.of()));
     SourceUnitGraph documentGraph = mock(SourceUnitGraph.class);
@@ -75,7 +77,8 @@ class TestMapDefinition {
             .getHover(
                 new CobolDocumentModel(UseCaseUtils.DOCUMENT_URI, TEXT, result),
                 new TextDocumentPositionParams(
-                    new TextDocumentIdentifier(UseCaseUtils.DOCUMENT_URI), new Position(5, 19)), documentGraph);
+                    new TextDocumentIdentifier(UseCaseUtils.DOCUMENT_URI), new Position(5, 19)),
+                documentGraph);
     assertEquals(
         new Hover(ImmutableList.of(Either.forRight(new MarkedString("cobol", "MAP ABCDE.")))),
         mapHover);

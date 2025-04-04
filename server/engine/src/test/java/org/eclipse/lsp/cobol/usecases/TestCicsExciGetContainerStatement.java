@@ -63,8 +63,8 @@ public class TestCicsExciGetContainerStatement {
           + "\n"
           + "           STOP RUN.\n";
 
-    @Test
-    void test() {
-        UseCaseEngine.runTest(TEXT, ImmutableList.of(), ImmutableMap.of());
-    }
+  @Test
+  void test() {
+    UseCaseEngine.runTest(TEXT, ImmutableList.of(), ImmutableMap.of());
+  }
 }

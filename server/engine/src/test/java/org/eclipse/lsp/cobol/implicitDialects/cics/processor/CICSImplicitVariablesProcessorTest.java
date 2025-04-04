@@ -35,9 +35,7 @@ import static org.mockito.Mockito.*;
 import java.util.HashMap;
 import java.util.LinkedList;
 
-/**
- * Test for CICSImplicitVariablesProcessor
- */
+/** Test for CICSImplicitVariablesProcessor */
 @ExtendWith(MockitoExtension.class)
 class CICSImplicitVariablesProcessorTest {
   private static final int CICS_INTRODUCED_REGISTERS_COUNT = 72;
@@ -48,8 +46,11 @@ class CICSImplicitVariablesProcessorTest {
   @BeforeEach
   void init() {
     processor = new CICSImplicitVariablesProcessor();
-    processingContext = new ProcessingContext(new LinkedList<>(), variableAccumulator, new HashMap<>());
-    processingContext.getCurrentProgramNodeStack().push(new ProgramNode(null, ProgramSubtype.Program, 0));
+    processingContext =
+        new ProcessingContext(new LinkedList<>(), variableAccumulator, new HashMap<>());
+    processingContext
+        .getCurrentProgramNodeStack()
+        .push(new ProgramNode(null, ProgramSubtype.Program, 0));
   }
 
   @Test
@@ -65,13 +66,13 @@ class CICSImplicitVariablesProcessorTest {
   @Test
   void testWorkingSectionWhenCicsTranslateEnabled() {
     SectionNode sectionNode =
-            new SectionNode(Locality.builder().build(), SectionType.WORKING_STORAGE);
+        new SectionNode(Locality.builder().build(), SectionType.WORKING_STORAGE);
     sectionNode.setParent(new ProgramNode(Locality.builder().build(), ProgramSubtype.Program, 0));
 
     assertNotNull(processingContext.getVariableAccumulator());
     assertEquals(variableAccumulator, processingContext.getVariableAccumulator());
     processor.accept(sectionNode, processingContext);
     verify(variableAccumulator, times(CICS_INTRODUCED_REGISTERS_COUNT))
-            .addVariableDefinition(any(), any());
+        .addVariableDefinition(any(), any());
   }
 }

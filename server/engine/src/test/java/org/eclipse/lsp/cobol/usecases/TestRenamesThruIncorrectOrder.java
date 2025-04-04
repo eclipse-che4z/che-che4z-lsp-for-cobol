@@ -51,18 +51,18 @@ class TestRenamesThruIncorrectOrder {
                 new Range(),
                 "The data entries to rename are specified in an incorrect order",
                 DiagnosticSeverity.Error,
-                 ErrorSource.PARSING.getText()),
+                ErrorSource.PARSING.getText()),
             "2",
             new Diagnostic(
                 new Range(),
                 "Variable VARNAME2 is not defined",
                 DiagnosticSeverity.Error,
-                 ErrorSource.PARSING.getText()),
+                ErrorSource.PARSING.getText()),
             "3",
             new Diagnostic(
                 new Range(),
                 "Variable VARNAME3 is not defined",
                 DiagnosticSeverity.Error,
-                 ErrorSource.PARSING.getText())));
+                ErrorSource.PARSING.getText())));
   }
 }

@@ -14,18 +14,17 @@
  */
 package org.eclipse.lsp.cobol.common.message;
 
-/**
- * Enum list of supported locale by application.
- */
+/** Enum list of supported locale by application. */
 public enum LocaleEnum {
-    EN("en");
+  EN("en");
 
-    private String label;
-    LocaleEnum(String label) {
-        this.label = label;
-    }
+  private String label;
 
-    public String getLabel() {
-        return label.toLowerCase();
-    }
+  LocaleEnum(String label) {
+    this.label = label;
+  }
+
+  public String getLabel() {
+    return label.toLowerCase();
+  }
 }

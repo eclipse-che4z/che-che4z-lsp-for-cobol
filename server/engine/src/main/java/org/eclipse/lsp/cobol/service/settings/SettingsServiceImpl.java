@@ -54,34 +54,46 @@ public class SettingsServiceImpl implements SettingsService {
 
   @Override
   public CompletableFuture<List<String>> fetchTextConfiguration(@NonNull String... section) {
-    return fetchConfiguration(section).thenApply(objects -> objects.stream()
-            .filter(JsonArray.class::isInstance)
-            .map(JsonArray.class::cast)
-            .flatMap(Streams::stream)
-            .filter(ele -> !(ele instanceof JsonNull))
-            .map(JsonElement::getAsString)
-            .collect(toList()));
+    return fetchConfiguration(section)
+        .thenApply(
+            objects ->
+                objects.stream()
+                    .filter(JsonArray.class::isInstance)
+                    .map(JsonArray.class::cast)
+                    .flatMap(Streams::stream)
+                    .filter(ele -> !(ele instanceof JsonNull))
+                    .map(JsonElement::getAsString)
+                    .collect(toList()));
   }
 
   @Override
-  public CompletableFuture<List<String>> fetchTextConfigurationWithScope(String scopeUri, String section) {
-    return fetchConfigurations(scopeUri, singletonList(section)).thenApply(objects -> objects.stream()
-            .filter(JsonArray.class::isInstance)
-            .map(JsonArray.class::cast)
-            .flatMap(Streams::stream)
-            .filter(ele -> !(ele instanceof JsonNull))
-            .map(JsonElement::getAsString)
-            .collect(toList()));
+  public CompletableFuture<List<String>> fetchTextConfigurationWithScope(
+      String scopeUri, String section) {
+    return fetchConfigurations(scopeUri, singletonList(section))
+        .thenApply(
+            objects ->
+                objects.stream()
+                    .filter(JsonArray.class::isInstance)
+                    .map(JsonArray.class::cast)
+                    .flatMap(Streams::stream)
+                    .filter(ele -> !(ele instanceof JsonNull))
+                    .map(JsonElement::getAsString)
+                    .collect(toList()));
   }
 
   @Override
-  public CompletableFuture<List<String>> fetchTextConfigurationWithScope(String scopeUri, String section, String dialect) {
+  public CompletableFuture<List<String>> fetchTextConfigurationWithScope(
+      String scopeUri, String section, String dialect) {
     CobolConfigItem item = new CobolConfigItem();
     item.setSection(section);
     item.setDialect(dialect);
     item.setScopeUri(scopeUri);
-    return clientProvider.get().configuration(new ConfigurationParams(singletonList(item)))
-            .thenApply(objects -> objects.stream()
+    return clientProvider
+        .get()
+        .configuration(new ConfigurationParams(singletonList(item)))
+        .thenApply(
+            objects ->
+                objects.stream()
                     .filter(JsonArray.class::isInstance)
                     .map(JsonArray.class::cast)
                     .flatMap(Streams::stream)
@@ -98,8 +110,10 @@ public class SettingsServiceImpl implements SettingsService {
 
   @NonNull
   @Override
-  public CompletableFuture<List<Object>> fetchConfigurations(String documentUri, List<String> sections) {
-    List<ConfigurationItem> configurationItems = sections.stream()
+  public CompletableFuture<List<Object>> fetchConfigurations(
+      String documentUri, List<String> sections) {
+    List<ConfigurationItem> configurationItems =
+        sections.stream()
             .map(section -> LSP_PREFIX.label + "." + section)
             .map(SettingsServiceImpl::buildConfigurationItem)
             .collect(toList());

@@ -83,10 +83,15 @@ public class TestInlineComments {
 
   @Test
   void testFloatingCommentFlagsErrorWhenCommentIsNotPrecededBySpace() {
-    UseCaseEngine.runTest(TEXT4, ImmutableList.of(), ImmutableMap.of("1", new Diagnostic(
-            new Range(),
-            "Missing blank before inline comment",
-            Warning,
-            ErrorSource.PREPROCESSING.getText())));
+    UseCaseEngine.runTest(
+        TEXT4,
+        ImmutableList.of(),
+        ImmutableMap.of(
+            "1",
+            new Diagnostic(
+                new Range(),
+                "Missing blank before inline comment",
+                Warning,
+                ErrorSource.PREPROCESSING.getText())));
   }
 }

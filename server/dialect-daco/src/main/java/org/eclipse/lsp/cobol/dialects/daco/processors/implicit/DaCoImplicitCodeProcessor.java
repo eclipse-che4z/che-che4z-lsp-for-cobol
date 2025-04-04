@@ -35,9 +35,7 @@ import java.util.stream.Collectors;
 import static java.util.stream.Collectors.toList;
 import static org.eclipse.lsp.cobol.dialects.daco.DaCoDialect.DACO_PREDEFINED_SECTIONS;
 
-/**
- * Adds necessary variables that corresponds to the DaCo implicit code
- */
+/** Adds necessary variables that corresponds to the DaCo implicit code */
 @RequiredArgsConstructor
 public class DaCoImplicitCodeProcessor implements Processor<ProgramNode> {
 
@@ -47,16 +45,23 @@ public class DaCoImplicitCodeProcessor implements Processor<ProgramNode> {
     variables.addAll(LinkageSectionStaticGenerator.generate());
     variables.addAll(WorkingSectionDynamicGenerator.generate(programNode));
 
-    List<VariableNode> children = variables.stream().flatMap(Node::getDepthFirstStream)
-        .filter(n -> n instanceof VariableNode)
-        .map(VariableNode.class::cast)
-        .collect(toList());
+    List<VariableNode> children =
+        variables.stream()
+            .flatMap(Node::getDepthFirstStream)
+            .filter(n -> n instanceof VariableNode)
+            .map(VariableNode.class::cast)
+            .collect(toList());
     variables.addAll(children);
 
-    variables.forEach(node -> processingContext.getVariableAccumulator().addVariableDefinition(programNode, node));
+    variables.forEach(
+        node ->
+            processingContext.getVariableAccumulator().addVariableDefinition(programNode, node));
 
-    SectionsGenerator.generate(getPredefinedSections(processingContext), getExistingSections(programNode))
-        .forEach(node -> processingContext.getVariableAccumulator().registerCodeBlock(programNode, node));
+    SectionsGenerator.generate(
+            getPredefinedSections(processingContext), getExistingSections(programNode))
+        .forEach(
+            node ->
+                processingContext.getVariableAccumulator().registerCodeBlock(programNode, node));
   }
 
   private List<String> getPredefinedSections(ProcessingContext processingContext) {
@@ -70,7 +75,8 @@ public class DaCoImplicitCodeProcessor implements Processor<ProgramNode> {
   }
 
   private Set<String> getExistingSections(ProgramNode programNode) {
-    return programNode.getDepthFirstStream()
+    return programNode
+        .getDepthFirstStream()
         .filter(n -> n instanceof ProcedureSectionNode)
         .map(ProcedureSectionNode.class::cast)
         .map(ProcedureSectionNode::getName)

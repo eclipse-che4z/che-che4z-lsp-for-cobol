@@ -32,21 +32,22 @@ public class CICSAddressOptionsCheckUtility extends CICSOptionsCheckBaseUtility 
   public static final int RULE_INDEX = RULE_cics_address;
 
   private static final Map<Integer, ErrorSeverity> DUPLICATE_CHECK_OPTIONS =
-          new HashMap<Integer, ErrorSeverity>() {
-            {
-              put(CICSLexer.ADDRESS, ErrorSeverity.ERROR);
-              put(CICSLexer.ACEE, ErrorSeverity.ERROR);
-              put(CICSLexer.COMMAREA, ErrorSeverity.ERROR);
-              put(CICSLexer.CWA, ErrorSeverity.ERROR);
-              put(CICSLexer.EIB, ErrorSeverity.ERROR);
-              put(CICSLexer.TCTUA, ErrorSeverity.ERROR);
-              put(CICSLexer.TWA, ErrorSeverity.ERROR);
-              put(CICSLexer.SET, ErrorSeverity.ERROR);
-              put(CICSLexer.USING, ErrorSeverity.ERROR);
-            }
-          };
+      new HashMap<Integer, ErrorSeverity>() {
+        {
+          put(CICSLexer.ADDRESS, ErrorSeverity.ERROR);
+          put(CICSLexer.ACEE, ErrorSeverity.ERROR);
+          put(CICSLexer.COMMAREA, ErrorSeverity.ERROR);
+          put(CICSLexer.CWA, ErrorSeverity.ERROR);
+          put(CICSLexer.EIB, ErrorSeverity.ERROR);
+          put(CICSLexer.TCTUA, ErrorSeverity.ERROR);
+          put(CICSLexer.TWA, ErrorSeverity.ERROR);
+          put(CICSLexer.SET, ErrorSeverity.ERROR);
+          put(CICSLexer.USING, ErrorSeverity.ERROR);
+        }
+      };
 
-  public CICSAddressOptionsCheckUtility(DialectProcessingContext context, List<SyntaxError> errors) {
+  public CICSAddressOptionsCheckUtility(
+      DialectProcessingContext context, List<SyntaxError> errors) {
     super(context, errors, DUPLICATE_CHECK_OPTIONS);
   }
 

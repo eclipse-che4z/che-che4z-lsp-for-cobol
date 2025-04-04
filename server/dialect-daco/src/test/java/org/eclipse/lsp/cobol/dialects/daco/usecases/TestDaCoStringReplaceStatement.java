@@ -24,46 +24,45 @@ import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
-/**
- * Tests the DaCo STRING REPLACE statement
- */
+/** Tests the DaCo STRING REPLACE statement */
 class TestDaCoStringReplaceStatement {
 
-    private static final String TEXT =
-            "        IDENTIFICATION DIVISION. \r\n"
-                    + "        PROGRAM-ID. test1. \r\n"
-                    + "        DATA DIVISION. \r\n"
-                    + "        WORKING-STORAGE SECTION. \r\n"
-                    + "        01 {$*WS-AREA}. \r\n"
-                    + "           03 {$*AREA-XW1}. \r\n"
-                    + "             05 {$*DSAPRO-XL1}. \r\n"
-                    + "               07 FILLER               PIC X(5)    VALUE 'REMBD'. \r\n"
-                    + "        PROCEDURE DIVISION. \r\n"
-                    + "            STRING REPLACE ALL {$DSAPRO-XL1} {$DSAPRO-XL1} BY {$DSAPRO-XL1}. \r\n"
-                    + "            STRING REPLACE {$DSAPRO-XL1} {$DSAPRO-XL1} BY {$DSAPRO-XL1}. \r\n"
-                    + "            STRING REPLACE ALL {$DSAPRO-XL1} 'SFSDFER' BY 'FERE'. \r\n"
-                    + "            STRING REPLACE {$DSAPRO-XL1} 'DFDERE' BY 'FD'. \r\n"
-                    // Negative tests
-                    + "            STRING REPLACE {GBR4|1} {$DSAPRO-XL1} BY {$DSAPRO-XL1}. \r\n"
-                    + "            STRING REPLACE ALL {GBR4|1} {$DSAPRO-XL1} BY {$DSAPRO-XL1}. \r\n"
-                    + "            STRING REPLACE {$DSAPRO-XL1} {GBR4|1} BY {$DSAPRO-XL1}. \r\n"
-                    + "            STRING REPLACE ALL {$DSAPRO-XL1} {GBR4|1} BY {$DSAPRO-XL1}. \r\n"
-                    + "            STRING REPLACE {$DSAPRO-XL1} {$DSAPRO-XL1} BY {GBR4|1}. \r\n"
-                    + "            STRING REPLACE ALL {$DSAPRO-XL1} {$DSAPRO-XL1} BY {GBR4|1}. \r\n";
+  private static final String TEXT =
+      "        IDENTIFICATION DIVISION. \r\n"
+          + "        PROGRAM-ID. test1. \r\n"
+          + "        DATA DIVISION. \r\n"
+          + "        WORKING-STORAGE SECTION. \r\n"
+          + "        01 {$*WS-AREA}. \r\n"
+          + "           03 {$*AREA-XW1}. \r\n"
+          + "             05 {$*DSAPRO-XL1}. \r\n"
+          + "               07 FILLER               PIC X(5)    VALUE 'REMBD'. \r\n"
+          + "        PROCEDURE DIVISION. \r\n"
+          + "            STRING REPLACE ALL {$DSAPRO-XL1} {$DSAPRO-XL1} BY {$DSAPRO-XL1}. \r\n"
+          + "            STRING REPLACE {$DSAPRO-XL1} {$DSAPRO-XL1} BY {$DSAPRO-XL1}. \r\n"
+          + "            STRING REPLACE ALL {$DSAPRO-XL1} 'SFSDFER' BY 'FERE'. \r\n"
+          + "            STRING REPLACE {$DSAPRO-XL1} 'DFDERE' BY 'FD'. \r\n"
+          // Negative tests
+          + "            STRING REPLACE {GBR4|1} {$DSAPRO-XL1} BY {$DSAPRO-XL1}. \r\n"
+          + "            STRING REPLACE ALL {GBR4|1} {$DSAPRO-XL1} BY {$DSAPRO-XL1}. \r\n"
+          + "            STRING REPLACE {$DSAPRO-XL1} {GBR4|1} BY {$DSAPRO-XL1}. \r\n"
+          + "            STRING REPLACE ALL {$DSAPRO-XL1} {GBR4|1} BY {$DSAPRO-XL1}. \r\n"
+          + "            STRING REPLACE {$DSAPRO-XL1} {$DSAPRO-XL1} BY {GBR4|1}. \r\n"
+          + "            STRING REPLACE ALL {$DSAPRO-XL1} {$DSAPRO-XL1} BY {GBR4|1}. \r\n";
 
-    @Test
-    void test() {
+  @Test
+  void test() {
 
-        UseCaseEngine.runTestForDiagnostics(
-                TEXT,
-                ImmutableList.of(Fixtures.subschemaCopy("")),
-                ImmutableMap.of(
-                        "1",
-                        new Diagnostic(
-                                new Range(),
-                                "Variable GBR4 is not defined",
-                                DiagnosticSeverity.Error,
-                                ErrorSource.PARSING.getText())),
-                ImmutableList.of(), DialectConfigs.getDaCoAnalysisConfig());
-    }
+    UseCaseEngine.runTestForDiagnostics(
+        TEXT,
+        ImmutableList.of(Fixtures.subschemaCopy("")),
+        ImmutableMap.of(
+            "1",
+            new Diagnostic(
+                new Range(),
+                "Variable GBR4 is not defined",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())),
+        ImmutableList.of(),
+        DialectConfigs.getDaCoAnalysisConfig());
+  }
 }

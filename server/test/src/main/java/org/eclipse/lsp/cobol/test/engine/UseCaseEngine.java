@@ -145,10 +145,10 @@ public class UseCaseEngine {
   }
 
   /**
-   * Check if the language engine applies required syntax and semantic checks for "cobol"
-   * language id. All the semantic elements in the given text, as well as
-   * syntax errors, should be wrapped with according tags. The same extraction operation applied
-   * also for the given copybooks. Copybooks processing enabled.
+   * Check if the language engine applies required syntax and semantic checks for "cobol" language
+   * id. All the semantic elements in the given text, as well as syntax errors, should be wrapped
+   * with according tags. The same extraction operation applied also for the given copybooks.
+   * Copybooks processing enabled.
    *
    * <p>Expected diagnostics should contain the full of list of syntax and semantic
    * errors/warnings/info messages for the document and copybooks. Existing positions, if they are,
@@ -262,7 +262,12 @@ public class UseCaseEngine {
             .orElse(SQLBackend.DB2_SERVER);
     PreprocessedDocument document =
         AnnotatedDocumentCleaning.prepareDocument(
-            text, copybooks, subroutineNames, expectedDiagnostics, sqlBackendSetting, analysisConfig.getCompilerOptions());
+            text,
+            copybooks,
+            subroutineNames,
+            expectedDiagnostics,
+            sqlBackendSetting,
+            analysisConfig.getCompilerOptions());
 
     AnalysisResult actual =
         analyze(
@@ -280,7 +285,8 @@ public class UseCaseEngine {
                 .build(),
             languageId);
     assertResultEquals(actual, document.getTestData());
-    UseCaseUtils.storeDocumentToUnitTextExtensionContext(document.getText(), document.getCopybooks(), document.getTestData());
+    UseCaseUtils.storeDocumentToUnitTextExtensionContext(
+        document.getText(), document.getCopybooks(), document.getTestData());
     return actual;
   }
 
@@ -346,7 +352,12 @@ public class UseCaseEngine {
 
     PreprocessedDocument document =
         AnnotatedDocumentCleaning.prepareDocument(
-            text, copybooks, subroutineNames, expectedDiagnostics, sqlBackendSetting, analysisConfig.getCompilerOptions());
+            text,
+            copybooks,
+            subroutineNames,
+            expectedDiagnostics,
+            sqlBackendSetting,
+            analysisConfig.getCompilerOptions());
     AnalysisResult actual =
         analyze(
             UseCase.builder()
@@ -405,14 +416,11 @@ public class UseCaseEngine {
         extractUsages(actual, SUBROUTINE_NAME_NODE));
 
     assertResult(
-            "Function definition:",
-            expected.getFunctionDefinitions(),
-            extractFunctionDefinitions(actual));
+        "Function definition:",
+        expected.getFunctionDefinitions(),
+        extractFunctionDefinitions(actual));
 
-    assertResult(
-            "Function usage:",
-            expected.getFunctionUsages(),
-            extractDefinitionsUsage(actual));
+    assertResult("Function usage:", expected.getFunctionUsages(), extractDefinitionsUsage(actual));
   }
 
   private Map<String, List<Location>> extractVariableDefinitions(AnalysisResult result) {

@@ -25,17 +25,19 @@ import org.eclipse.lsp.cobol.dialects.idms.IdmsDialect;
 import java.net.URI;
 import java.util.List;
 
-/**
- * Explicit dialect discovery service
- */
+/** Explicit dialect discovery service */
 public class ExplicitDialectDiscoveryService implements DialectDiscoveryService {
   @Override
-  public List<CobolDialect> loadDialects(CopybookService copybookService, MessageService messageService) {
-    return ImmutableList.of(new IdmsDialect(copybookService, messageService), new DaCoDialect(copybookService, messageService));
+  public List<CobolDialect> loadDialects(
+      CopybookService copybookService, MessageService messageService) {
+    return ImmutableList.of(
+        new IdmsDialect(copybookService, messageService),
+        new DaCoDialect(copybookService, messageService));
   }
 
   @Override
-  public List<CobolDialect> loadDialects(URI uri, CopybookService copybookService, MessageService messageService) {
+  public List<CobolDialect> loadDialects(
+      URI uri, CopybookService copybookService, MessageService messageService) {
     return ImmutableList.of();
   }
 

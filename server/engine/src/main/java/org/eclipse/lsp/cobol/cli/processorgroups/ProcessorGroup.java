@@ -27,5 +27,4 @@ class ProcessorGroup {
 
   @SerializedName("copybook-extensions")
   List<String> copybookExtensions;
-
 }

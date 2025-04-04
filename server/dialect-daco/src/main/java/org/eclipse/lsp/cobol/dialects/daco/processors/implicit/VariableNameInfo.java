@@ -16,9 +16,7 @@ package org.eclipse.lsp.cobol.dialects.daco.processors.implicit;
 
 import lombok.Value;
 
-/**
- * Holds variable table name and a suffix
- */
+/** Holds variable table name and a suffix */
 @Value
 class VariableNameInfo {
   String name;

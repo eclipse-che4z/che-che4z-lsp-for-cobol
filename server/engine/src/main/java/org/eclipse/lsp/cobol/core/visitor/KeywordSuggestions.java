@@ -33,10 +33,10 @@ public class KeywordSuggestions {
   KeywordSuggestions() {
     Properties props = new Properties();
     try (InputStream keywords =
-        KeywordSuggestions.class.getResourceAsStream(
-            "/LanguageKeywords.txt")) {
+        KeywordSuggestions.class.getResourceAsStream("/LanguageKeywords.txt")) {
       props.load(keywords);
-      suggestions = props.stringPropertyNames().stream().map(String::toUpperCase).collect(Collectors.toSet());
+      suggestions =
+          props.stringPropertyNames().stream().map(String::toUpperCase).collect(Collectors.toSet());
     } catch (IOException e) {
       LOG.error("Cannot load list of the suggested keywords", e);
     }
