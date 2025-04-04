@@ -117,8 +117,16 @@ class TestIdmsAcceptDbStatements {
 
   private static Stream<String> textsToTest() {
     return Stream.of(
-        TST1, TST2, TST3, TST4, TST5, TST6, TST7, TST8, TST9, TST10, TST20, TST30, TST40, TST50,
-        TST60, TST70, TST80, TST90);
+        TST1, TST2, TST3, TST4, TST5, TST6, TST7, TST8, TST9,
+            TST10 + Fixtures.idmsStatus(),
+            TST20 + Fixtures.idmsStatus(),
+            TST30 + Fixtures.idmsStatus(),
+            TST40 + Fixtures.idmsStatus(),
+            TST50 + Fixtures.idmsStatus(),
+            TST60 + Fixtures.idmsStatus(),
+            TST70 + Fixtures.idmsStatus(),
+            TST80 + Fixtures.idmsStatus(),
+            TST90 + Fixtures.idmsStatus());
   }
 
   @ParameterizedTest

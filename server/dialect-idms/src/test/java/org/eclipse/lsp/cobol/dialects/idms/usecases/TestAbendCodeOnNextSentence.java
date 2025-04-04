@@ -36,11 +36,12 @@ class TestAbendCodeOnNextSentence {
           + "            05 {$*ANY-STATUS} PIC X.\n"
           + "        PROCEDURE DIVISION.\n"
           + "            ABEND CODE {$SSC-ERRSTAT-SAVE} ON \n"
-          + "               {$ANY-STATUS} NEXT SENTENCE.\n";
+          + "               {$ANY-STATUS} NEXT SENTENCE.\n"
+          + "            {@*IDMS-STATUS} SECTION.";
 
   @Test
   void test() {
-    UseCaseEngine.runTest(
+    UseCaseEngine.runTestForDiagnostics(
         TEXT,
         ImmutableList.of(),
         ImmutableMap.of(),

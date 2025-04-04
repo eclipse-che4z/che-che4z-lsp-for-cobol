@@ -41,4 +41,12 @@ public class Fixtures {
   public CobolText mapsCopy(String body) {
     return new CobolText("MAPS", IdmsDialect.NAME, body);
   }
+
+  /**
+   * Creates empty IDMS-STATUS section
+   * @return string value
+   */
+  public String idmsStatus() {
+    return "           IDMS-STATUS SECTION.\r\n";
+  }
 }

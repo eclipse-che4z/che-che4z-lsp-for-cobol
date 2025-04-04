@@ -21,6 +21,7 @@ import org.antlr.v4.runtime.RuleContext;
 import org.eclipse.lsp.cobol.common.dialects.CobolDialect;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
+import org.eclipse.lsp.cobol.common.mapping.ExtendedText;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.dialects.idms.IdmsParser.*;
@@ -31,10 +32,12 @@ import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNameAndLocality;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableUsageNode;
 import org.eclipse.lsp.cobol.common.model.SectionType;
 import org.eclipse.lsp4j.Location;
+import org.eclipse.lsp4j.Range;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 
 import static java.util.Optional.ofNullable;
@@ -57,26 +60,37 @@ class IdmsVisitor extends IdmsParserBaseVisitor<List<Node>> {
 
   @Override
   public List<Node> visitIdmsStatements(IdmsStatementsContext ctx) {
+    List<Node> result = visitChildren(ctx);
     addReplacementContext(ctx);
-    return visitChildren(ctx);
+    return result;
   }
 
   @Override
   public List<Node> visitIdmsSections(IdmsSectionsContext ctx) {
+    List<Node> result = visitChildren(ctx);
     addReplacementContext(ctx);
-    return visitChildren(ctx);
+    return result;
   }
 
   @Override
   public List<Node> visitIdmsIfStatement(IdmsIfStatementContext ctx) {
+    List<Node> result = visitChildren(ctx);
     addReplacementContext(ctx, IF);
-    return visitChildren(ctx);
+    return result;
+  }
+
+  @Override
+  public List<Node> visitIfStatement(IfStatementContext ctx) {
+    List<Node> result = visitChildren(ctx);
+    addReplacementContext(ctx, IF);
+    return result;
   }
 
   @Override
   public List<Node> visitIdmsIfCondition(IdmsIfConditionContext ctx) {
+    List<Node> result = visitChildren(ctx);
     addReplacementContext(ctx);
-    return visitChildren(ctx);
+    return result;
   }
 
   @Override
@@ -138,6 +152,23 @@ class IdmsVisitor extends IdmsParserBaseVisitor<List<Node>> {
   }
 
   @Override
+  public List<Node> visitIdmsOnClause(IdmsParser.IdmsOnClauseContext ctx) {
+    Optional.ofNullable(ctx)
+            .map(IdmsParser.IdmsOnClauseContext::generalIdentifier)
+            .map(VisitorHelper::getName)
+            .ifPresent(identifier -> {
+              Range range = DialectUtils.constructRange(ctx.generalIdentifier());
+              String generatedText = generateIfStatement(range.getStart().getCharacter(), identifier);
+              Range replaceRange = new Range(range.getEnd(), range.getEnd());
+
+              context.getExtendedDocument().replace(replaceRange, "        ");
+              context.getExtendedDocument().insertCopybook(replaceRange, new ExtendedText(generatedText, context.getExtendedDocument().getUri()));
+            });
+
+    return visitChildren(ctx);
+  }
+
+  @Override
   protected List<Node> defaultResult() {
     return ImmutableList.of();
   }
@@ -148,6 +179,22 @@ class IdmsVisitor extends IdmsParserBaseVisitor<List<Node>> {
     result.addAll(aggregate);
     result.addAll(nextResult);
     return result;
+  }
+
+  private String generateIfStatement(int character, String identifier) {
+    final StringBuilder builder = new StringBuilder();
+    builder.append(" ");
+    for (int i = 0; i < character; i++) {
+      builder.append(" ");
+    }
+    builder.append("IF NOT ");
+    builder.append(identifier);
+    builder.append(" PERFORM IDMS-STATUS; \n");
+    for (int i = 0; i < character; i++) {
+      builder.append(" ");
+    }
+    builder.append("ELSE ");
+    return builder.toString();
   }
 
   private String getName(ParserRuleContext context) {

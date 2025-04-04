@@ -51,7 +51,7 @@ class TestIdmsConDisconnectStatement {
       DEFS + "           CONNECT {$EMPLOYEE} TO {$OFFICE-EMPLOYEE}.\n";
 
   private static Stream<String> textsToTest() {
-    return Stream.of(DISC1, DISC2, CONN1);
+    return Stream.of(DISC1, DISC2 + Fixtures.idmsStatus(), CONN1);
   }
 
   @ParameterizedTest

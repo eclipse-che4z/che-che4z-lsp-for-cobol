@@ -187,8 +187,8 @@ class TestIdmsWriteClause {
         BOILERPLATE + WRITE_THEN_READ_1,
         BOILERPLATE + WRITE_THEN_READ_2,
         BOILERPLATE + WRITE_THEN_READ_3,
-        BOILERPLATE + WRITE_JOURNAL_ON_1,
-        BOILERPLATE + WRITE_THEN_READ_ON_1);
+        BOILERPLATE + WRITE_JOURNAL_ON_1 + Fixtures.idmsStatus(),
+        BOILERPLATE + WRITE_THEN_READ_ON_1 + Fixtures.idmsStatus());
   }
 
   @ParameterizedTest

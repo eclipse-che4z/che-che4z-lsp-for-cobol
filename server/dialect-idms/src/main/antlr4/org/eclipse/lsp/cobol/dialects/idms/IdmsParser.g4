@@ -148,20 +148,20 @@ idmsIfStatement
     ;
 
 idmsStatements
-    : idmsStmtsOptTermOn endClause? idmsOnClause? | idmsStmtsMandTermOn (SEMICOLON_FS idmsOnClause? | DOT_FS)
+    : idmsStmtsOptTermOn endClause? idmsOnClause? | idmsStmts endClause?
     ;
 
+idmsStmts
+    : abendCodeStatement | attachTaskCodeStatement | changePriorityStatement | checkTerminalStatement |
+     connectStatement | dcStatement | dequeueStatement | disconnectStatement | endStatement | endpageStatement | enqueueStatement | eraseStatement |
+     freeStatement | inquireMapMoveStatement | loadStatement | mapStatement | modifyStatement |
+     postStatement | putStatement | snapStatement | startpageStatement | storeStatement | waitStatement | writeIdmsStatement |
+     readStatement | returnStatement | sendStatement | setStatement | deleteStatement | transferStatement
+    ;
 
 idmsStmtsOptTermOn
-    : abendCodeStatement | attachTaskCodeStatement | bindStatement | changePriorityStatement | checkTerminalStatement | commitStatement |
-     connectStatement | dcStatement | dequeueStatement | disconnectStatement | endStatement | endpageStatement | enqueueStatement | eraseStatement | findStatement |
-     finishStatement | freeStatement | getStatement | inquireMapMoveStatement | keepStatement | loadStatement | mapStatement | modifyStatement | obtainStatement |
-     postStatement | putStatement | readyStatement |rollbackStatement | snapStatement | startpageStatement | storeStatement | waitStatement | writeIdmsStatement |
-     readStatement | acceptStatement | deleteStatement | returnStatement | sendStatement | setStatement
-    ;
-
-idmsStmtsMandTermOn
-    : transferStatement
+    : acceptStatement | bindStatement | commitStatement | obtainStatement | findStatement | finishStatement | getStatement |
+     keepStatement | readyStatement | rollbackStatement
     ;
 
 idmsOnClause
@@ -315,7 +315,7 @@ dequeueStatement
     ;
 
 dequeueNameStatement
-    : NAME generalIdentifier LENGTH (generalIdentifier | integerLiteral)
+    : NAME? generalIdentifier LENGTH (generalIdentifier | integerLiteral)
     ;
 
 // disconnect statement
@@ -565,7 +565,7 @@ keepLongtermTestClause
 // load Statement
 
 loadStatement
-    : LOAD TABLE (generalIdentifier | idms_table_name) INTO generalIdentifier loadLocationClause idmsDictnodeClause? idmsDictnameClause? loadLoadlibClause? idmsWaitNowaitClause
+    : LOAD TABLE (generalIdentifier | idms_table_name) INTO generalIdentifier loadLocationClause idmsDictnodeClause? idmsDictnameClause? loadLoadlibClause? idmsWaitNowaitClause?
     ;
 
 loadLocationClause
@@ -717,7 +717,7 @@ putRetentionClause
    ;
 
 putScratchClause
-   : SCRATCH putAreaIdClause? idmsDmlFromClause putRecordClause? putReturnClause
+   : SCRATCH putAreaIdClause? idmsDmlFromClause putRecordClause? putReturnClause?
    ;
 
 putAreaIdClause
@@ -781,7 +781,7 @@ waitEventListClause
 // write IDMS
 writeIdmsStatement
    : WRITE (writeJournalClause | writeLineClause | writeLogClause | writePrinterClause | writeTerminalClause |
-            writeThenReadClause) idmsOnClause?
+            writeThenReadClause)
    ;
 
 writeJournalClause
@@ -844,7 +844,7 @@ writeThenReadClause
 
 // read statement
 readStatement
-   : READ (readLineFromTerminalClause | readTerminalClause) idmsOnClause?
+   : READ (readLineFromTerminalClause | readTerminalClause)
    ;
 
 readTerminalClause
@@ -860,7 +860,7 @@ readLineFromTerminalClause
 
 // accept statement
 acceptStatement
-    : ACCEPT (acceptIdmsDcClause idmsOnClause? | acceptIdmsDbClause idmsOnClause?)
+    : ACCEPT (acceptIdmsDcClause | acceptIdmsDbClause)
     ;
 
 acceptIdmsDcClause
@@ -903,7 +903,7 @@ currencyPageInfo
 // delete statement
 
 deleteStatement
-    : DELETE deleteIdmsDCStatement idmsOnClause?
+    : DELETE deleteIdmsDCStatement
     ;
 
 deleteIdmsDCStatement
@@ -933,7 +933,7 @@ deleteTableClause
 // return statment
 
 returnStatement
-    : RETURN idmsReturn idmsOnClause?
+    : RETURN idmsReturn
     ;
 
 idmsReturn
@@ -958,7 +958,7 @@ sendIdmsToClause
 // set statement
 
 setStatement
-    : SET setIdmsDcStatement idmsOnClause?
+    : SET setIdmsDcStatement
     ;
 
 setIdmsDcStatement

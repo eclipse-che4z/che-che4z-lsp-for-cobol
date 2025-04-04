@@ -106,9 +106,9 @@ class TestIdmsSetStatement {
         SET_TIMER_START_LIT,
         SET_TIMER_START_LIT_NO_PRIORITY,
         SET_TIMER_START_VARIABLE_NO_PRIORITY,
-        SET_ABEND_ON,
-        SET_ABEND_ON_1,
-        SET_TIMER_ON);
+        SET_ABEND_ON + Fixtures.idmsStatus(),
+        SET_ABEND_ON_1 + Fixtures.idmsStatus(),
+        SET_TIMER_ON + Fixtures.idmsStatus());
   }
 
   @ParameterizedTest

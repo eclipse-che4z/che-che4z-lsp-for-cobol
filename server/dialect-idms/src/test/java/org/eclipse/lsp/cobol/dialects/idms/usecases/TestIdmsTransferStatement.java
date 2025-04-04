@@ -74,8 +74,8 @@ class TestIdmsTransferStatement {
         BOILERPLATE + TRANSFER_PARMS2,
         BOILERPLATE + TRANSFER_USING_PARMS,
         BOILERPLATE + TRANSFER_ALL,
-        BOILERPLATE + TRANSFER_ON,
-        BOILERPLATE + TRANSFER_PGM_TOO_LONG_ERROR);
+        BOILERPLATE + TRANSFER_ON + Fixtures.idmsStatus(),
+        BOILERPLATE + TRANSFER_PGM_TOO_LONG_ERROR + Fixtures.idmsStatus());
   }
 
   @ParameterizedTest

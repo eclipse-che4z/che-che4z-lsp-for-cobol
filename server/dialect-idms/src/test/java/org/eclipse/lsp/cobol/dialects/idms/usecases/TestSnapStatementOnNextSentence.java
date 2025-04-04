@@ -37,11 +37,12 @@ class TestSnapStatementOnNextSentence {
           + "            05 {$*ANY-STATUS} PIC X.\n"
           + "        PROCEDURE DIVISION.\n"
           + "            SNAP FROM {$SUBSCHEMA-CTRL} TO {$SUBSCHEMA-CTRL-END} ON \n"
-          + "               {$ANY-STATUS} NEXT SENTENCE.\n";
+          + "               {$ANY-STATUS} NEXT SENTENCE.\n"
+          + "        IDMS-STATUS SECTION.\n";
 
   @Test
   void test() {
-    UseCaseEngine.runTest(
+    UseCaseEngine.runTestForDiagnostics(
         TEXT,
         ImmutableList.of(),
         ImmutableMap.of(),

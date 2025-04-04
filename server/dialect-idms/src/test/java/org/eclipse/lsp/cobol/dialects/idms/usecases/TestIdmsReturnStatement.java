@@ -71,7 +71,7 @@ class TestIdmsReturnStatement {
           + "           ON {$DB-REC-NOT-FOUND} DISPLAY 'NOT FOUND'.\n";
 
   private static Stream<String> textsToTest() {
-    return Stream.of(TST1, TST2, TST3, TST4, TST5, TST6, TST7);
+    return Stream.of(TST1, TST2, TST3, TST4, TST5, TST6 + Fixtures.idmsStatus(), TST7 + Fixtures.idmsStatus());
   }
 
   @ParameterizedTest
