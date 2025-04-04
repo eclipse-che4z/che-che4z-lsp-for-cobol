@@ -23,6 +23,7 @@ import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
+import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.eclipse.lsp.cobol.common.symbols.ProcedureId;
 import org.eclipse.lsp.cobol.common.utils.StringUtils;
 import org.eclipse.lsp4j.Diagnostic;
@@ -66,6 +67,7 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
   private final Map<ProcedureId, List<Location>> procedureDefinitions = new HashMap<>();
   private final Map<ProcedureId, List<Location>> procedureUsages = new HashMap<>();
 
+  private final List<ImmutablePair<ProcedureId, Location>> pendingParagraphUsagesAccumulator;
 
   private final Deque<StringBuilder> contexts = new ArrayDeque<>();
 
@@ -86,7 +88,9 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
           int numberOfLines,
           List<String> subroutineNames,
           Map<String, Diagnostic> expectedDiagnostics,
-          String dialectType, String sectionName) {
+          String dialectType,
+          String sectionName,
+          List<ImmutablePair<ProcedureId, Location>> pendingParagraphUsages) {
     this.tokens = tokens;
     this.documentUri = documentUri;
     this.copybookName = documentName;
@@ -94,6 +98,7 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
     this.expectedDiagnostics = expectedDiagnostics;
     this.dialectType = dialectType;
     this.currentSectionName = sectionName;
+    this.pendingParagraphUsagesAccumulator = pendingParagraphUsages;
     lineShifts = new int[numberOfLines];
     contexts.push(new StringBuilder());
     diagnostics.put(documentUri, new ArrayList<>());
@@ -242,16 +247,20 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
       SectionUsageContext su = ctx.sectionUsage();
       String section = su != null
               ? getReplacementText(su.word().identifier().getText(), su.word().replacement()).get(0)
-              : null;
+              : currentSectionName;
 
       ProcedureId procedureId = new ProcedureId(section,
               getReplacementText(p.word().getText(), p.word().replacement()).get(0).toUpperCase());
-      processProcedureToken(
-              p.word().identifier().getText(),
-              ctx, p.word().replacement(),
-              procedureUsages,
-              ctx.diagnostic(),
-              procedureId);
+      String text = p.word().identifier().getText();
+      Range range = retrieveRange(ctx, text.length());
+      updateOutputDocument(text, ctx, p.word().replacement(), ctx.diagnostic(), range);
+      Location loc = new Location(documentUri, range);
+
+      if (su != null)
+        procedureUsages.computeIfAbsent(procedureId, it -> new ArrayList<>()).add(loc);
+      else
+        pendingParagraphUsagesAccumulator.add(new ImmutablePair<ProcedureId, Location>(procedureId, loc));
+
       if (su != null) {
         // TODO produce reference to section
         write(getHiddenText(tokens.getHiddenTokensToLeft(su.start.getTokenIndex(), HIDDEN)));

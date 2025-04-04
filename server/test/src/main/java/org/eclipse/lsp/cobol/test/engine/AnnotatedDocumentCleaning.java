@@ -27,7 +27,9 @@ import java.util.stream.Stream;
 import lombok.experimental.UtilityClass;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
+import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.eclipse.lsp.cobol.common.copybook.SQLBackend;
+import org.eclipse.lsp.cobol.common.symbols.ProcedureId;
 import org.eclipse.lsp.cobol.common.utils.PredefinedCopybooks;
 import org.eclipse.lsp.cobol.test.CobolText;
 import org.eclipse.lsp4j.Diagnostic;
@@ -60,6 +62,7 @@ public class AnnotatedDocumentCleaning {
       Map<String, Diagnostic> expectedDiagnostics,
       SQLBackend sqlBackend,
       List<String> compilerOptions) {
+    final List<ImmutablePair<ProcedureId, Location>> pendingParagraphUsages = new ArrayList<>();
     TestData testData =
         processDocument(
             text,
@@ -70,7 +73,7 @@ public class AnnotatedDocumentCleaning {
             explicitCopybooks.stream()
                 .findFirst()
                 .map(CobolText::getDialectType)
-                .orElse(null), null);
+                .orElse(null), null, pendingParagraphUsages);
 
       List<CobolText> copybooks = collectCopybooks(explicitCopybooks, testData.getCopybookUsages(), sqlBackend, compilerOptions)
               .map(c -> {
@@ -81,10 +84,21 @@ public class AnnotatedDocumentCleaning {
                           ImmutableList.of(),
                           expectedDiagnostics,
                           c.getDialectType(),
-                          testData.getCopybookEnterSectionNames().get(c.getFileName()));
+                          testData.getCopybookEnterSectionNames().get(c.getFileName()),
+                          pendingParagraphUsages);
                   mergeTestData(testData, test);
                   return new CobolText(test.getCopybookName(), test.getDialectType(), test.getText(), c.getUrl(), c.isPreprocess());
               }).collect(toList());
+      pendingParagraphUsages.forEach(p -> {
+        if (testData.getProcedureDefinitions().containsKey(p.getKey())) {
+          testData.getProcedureUsages().computeIfAbsent(p.getKey(), it -> new ArrayList<>()).add(p.getValue());
+        } else {
+          testData.getProcedureDefinitions().keySet().stream()
+                    .filter(locations -> locations.isParagraph() && locations.getParagraphName().equals(p.getKey().getParagraphName()))
+                    .forEach(k -> testData.getProcedureUsages().computeIfAbsent(k, it -> new ArrayList<>()).add(p.getValue()));
+        }
+      });
+      pendingParagraphUsages.clear();
       return new PreprocessedDocument(testData.getText(), copybooks, testData);
   }
 
@@ -128,7 +142,8 @@ public class AnnotatedDocumentCleaning {
           List<String> subroutineNames,
           Map<String, Diagnostic> expectedDiagnostics,
           String dialectType,
-          String sectionName) {
+          String sectionName,
+          List<ImmutablePair<ProcedureId, Location>> pendingParagraphUsages) {
     int numberOfLines = text.split("\\R").length;
 
     UseCasePreprocessorLexer lexer = new UseCasePreprocessorLexer(fromString(text));
@@ -149,12 +164,11 @@ public class AnnotatedDocumentCleaning {
             subroutineNames,
             expectedDiagnostics,
             dialectType,
-            sectionName);
+            sectionName,
+            pendingParagraphUsages);
 
     new ParseTreeWalker().walk(listener, startRule);
-    UseCaseUsageResolver usageResolver = new UseCaseUsageResolver(listener.getProcessingResult());
-    new ParseTreeWalker().walk(usageResolver, startRule);
-    return usageResolver.getProcessingResult();
+    return listener.getProcessingResult();
   }
 
   private <K, V> void mergeMaps(Map<K, List<V>> to, Map<K, List<V>> from) {
