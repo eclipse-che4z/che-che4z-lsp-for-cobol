@@ -30,7 +30,6 @@ import java.util.*;
 @Getter
 @RequiredArgsConstructor
 public class SymbolTable {
-  private final List<CodeBlockDefinitionNode> codeBlocks = new ArrayList<>();
   private final Map<ProcedureId, CodeBlockReference> procedures = new HashMap<>();
   private final Multimap<String, VariableNode> variablesMap = ArrayListMultimap.create();
   private final Multimap<String, VariableNode> variablesGlobalsMap = ArrayListMultimap.create();
@@ -51,7 +50,7 @@ public class SymbolTable {
   }
 
   /**
-   * Generates unique key for the prorgam
+   * Generates unique key for the program
    * @param program node
    * @return string value of a generated key
    */

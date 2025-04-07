@@ -245,17 +245,14 @@ public class TransformTreeStage implements Stage<AnalysisContext, ProcessingResu
     ctx.register(t, SectionNode.class, new SectionNodeProcessor(symbolAccumulator));
     ctx.register(t, FileEntryNode.class, new FileEntryProcess());
     ctx.register(t, FileDescriptionNode.class, new FileDescriptionProcess(symbolAccumulator));
-    ctx.register(t, DeclarativeProcedureSectionNode.class, new DeclarativeProcedureSectionRegister(symbolAccumulator));
     ctx.register(t, RootNode.class, new RootNodeUpdateCopyNodesByPositionInTree());
     ctx.register(t, ProcedureDivisionReturningNode.class, new ProcedureDivisionReturningProcess());
 
     // Phase DEFINITION
     ProcessingPhase d = ProcessingPhase.DEFINITION;
     ctx.register(d, ProgramNode.class, new FunctionNodeProcess(symbolAccumulator));
-    ctx.register(d, ParagraphsNode.class, new DefineCodeBlock(symbolAccumulator));
     ctx.register(d, SectionNameNode.class, new SectionNameRegister(symbolAccumulator));
     ctx.register(d, ParagraphNameNode.class, new ParagraphNameRegister(symbolAccumulator));
-    ctx.register(d, ProcedureDivisionBodyNode.class, new DefineCodeBlock(symbolAccumulator));
 
     // Phase POST DEFINITION
     ctx.register(ProcessingPhase.POST_DEFINITION, SectionNode.class, new ImplicitVariablesProcessor());

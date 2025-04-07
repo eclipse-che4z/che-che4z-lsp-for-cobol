@@ -83,17 +83,6 @@ public class SymbolAccumulator implements VariableAccumulator {
   }
 
   /**
-   * Add a paragraph defined in the program context.
-   *
-   * @param program - the program to register code block in
-   * @param node - the paragraph node
-   */
-  public void registerCodeBlock(ProgramNode program, CodeBlockDefinitionNode node) {
-    SymbolTable symbolTable = createOrGetSymbolTable(program);
-    symbolTable.getCodeBlocks().add(node);
-  }
-
-  /**
    * Add the usage of a code block defined in this program. Returns an optional syntax error if the
    * paragraph is not defined.
    *
@@ -174,7 +163,6 @@ public class SymbolAccumulator implements VariableAccumulator {
 
   @Override
   public void registerImplicitSection(ProgramNode programNode, CodeBlockDefinitionNode node) {
-    registerCodeBlock(programNode, node);
     ProcedureId procedureId = new ProcedureId(node.getName(), null);
     CodeBlockReference codeBlockReference = new CodeBlockReference();
     codeBlockReference.getUsage().addAll(node.getUsages().stream().map(Locality::toLocation).collect(Collectors.toList()));
