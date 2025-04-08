@@ -187,6 +187,21 @@ export async function loadProcessorGroupDialectConfig(
 
     // "SQL" is not a real dialect, we will use it only to set up sql backend for now
     const result = dialects.filter((name) => name != "SQL");
+
+    if (
+      result.find((x) =>
+        typeof x === "object"
+          ? x.name.toUpperCase() === "DACO"
+          : x.toUpperCase() === "DACO",
+      ) &&
+      !result.find((x) =>
+        typeof x === "object"
+          ? x.name.toUpperCase() === "IDMS"
+          : x.toUpperCase() === "IDMS",
+      )
+    )
+      result.push("IDMS");
+
     return result.length > 0 ? result : dialectConfig;
   } catch (e) {
     console.error(JSON.stringify(e));
