@@ -78,7 +78,7 @@ describe("Test CompletionProvider", () => {
           context,
         )
       ).length,
-    ).toBe(380);
+    ).toBe(382);
   });
   test("Suggest all IDMS Snippets", async () => {
     const doc = {
