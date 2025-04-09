@@ -278,6 +278,17 @@
   "COMPUTE": {
     "prefix": "COMPUTE",
     "body": [
+      "COMPUTE ${1:NUM-VAR} = ${2:WS-NUMVAR1} ${3|+,-,*,/,**|} ${4:WS-NUMVAR2}",
+      "\tON SIZE ERROR GO TO ${5:TRAP-OVERFLOW}",
+      "\tNOT ON SIZE ERROR GO TO ${6:PROGRAM-FINAL-ACTION}",
+      "END-COMPUTE",
+      "$0"
+    ],
+    "description": "COMPUTE provides an algebraic-style keyword for the specification of complex arithmetic expressions: + (add), - (subtract), * (multiply), / (divide), ** (power of) and any intrinsic functions that return numeric results. ON SIZE ERROR allows you to trap situations such as divide by zero and result overflow. https://www.ibm.com/docs/en/cobol-zos/6.4?topic=statements-compute-statement"
+  },
+  "COMPUTE (CICS)": {
+    "prefix": "COMPUTE",
+    "body": [
       "COMPUTE ${1:NUM-VAR} OF ${2:DFHCOMMAREA} = ${3:WS-NUMVAR1} ${4|+,-,*,/,**|} ${5:WS-NUMVAR2}",
       "\tON SIZE ERROR GO TO ${6:TRAP-OVERFLOW}",
       "\tNOT ON SIZE ERROR GO TO ${7:PROGRAM-FINAL-ACTION}",
@@ -654,7 +665,7 @@
       "ON SIZE ERROR ${4:imperative_statement}",
       "END-DIVIDE."
     ],
-    "description": "NUMVAR-1 is divided into NUMVAR-2. If NUMVAR-1 = 0 or if the quotient is larger than NUMVAR-3 the ON SIZE ERROR statement is executed. If ON SIZE ERROR isn not coded the program abends. https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdf"
+    "description": "NUMVAR-1 is divided into NUMVAR-2. If NUMVAR-1 = 0 or if the quotient is larger than NUMVAR-3 the ON SIZE ERROR statement is executed. If ON SIZE ERROR is not coded, the program abends. https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdf"
   },
   "ERROR #2": {
     "prefix": "ERROR",
@@ -662,7 +673,7 @@
       "MOVE CORRESPONDING ${1:GROUP-FIELDS-1} TO ${2:GROUP-FIELDS-2}",
       "ON SIZE ERROR ${3:imperative_statement}"
     ],
-    "description": "The like-named variables in the COBOL group field GROUP-FIELDS-1 are moved to GROUP-FIELDS-2. If there are any variables in GROUP-FIELDS-1 that are larger than the same named variable in GROUP-FIELDS-2 the ON SIZE ERROR statement is executed. If ON SIZE ERROR is not coded the program abends. https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdf"
+    "description": "The like-named variables in the COBOL group field GROUP-FIELDS-1 are moved to GROUP-FIELDS-2. If there are any variables in GROUP-FIELDS-1 that are larger than the same named variable in GROUP-FIELDS-2 the ON SIZE ERROR statement is executed. If ON SIZE ERROR is not coded, the program abends. https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdf"
   },
   "ERROR #3": {
     "prefix": "ERROR",
@@ -823,7 +834,7 @@
       "\tMULTIPLE FILE TAPE.",
       "\t${3:RPT-OUT-REC} PIC X(${4:132})."
     ],
-    "description": "DATA DIVISION - The MULTIPLE FILE TAPE clause specifies that 2 or mote data files share the same physical VOL=SER of tape. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+    "description": "DATA DIVISION - The MULTIPLE FILE TAPE clause specifies that 2 or mote data files share the same physical volume serial of tape. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
   },
   "FILE CONTROL": {
     "prefix": "FILE CONTROL",
@@ -873,10 +884,10 @@
   "FOR CHARACTERS AFTER": {
     "prefix": "FOR CHARACTERS AFTER",
     "body": [
-      "INSPECT ${2:variable-field} TALLYING ${3:num-field)",
+      "INSPECT ${2:variable-field} TALLYING ${3:num-field}",
       "FOR CHARACTERS AFTER ${1:X\"40\"}"
     ],
-    "description": "Specifies search characters - in INSPECT verb. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+    "description": "Counts the number of characters after the first occurrence of a specified string. Part of the TALLYING keyword in the INSPECT statement. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
   },
   "USE FOR DEBUGGING": {
     "prefix": "USE FOR DEBUGGING",
