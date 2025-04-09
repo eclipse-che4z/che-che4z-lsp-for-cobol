@@ -409,22 +409,22 @@
   "DATE COMPILED YYYY/MM/DD": {
     "prefix": "DATE COMPILED",
     "body": ["DATE-COMPILED. $CURRENT_YEAR/$CURRENT_MONTH/$CURRENT_DATE."],
-    "description": "DATE-COMPILED is an optional statement that describes the specific date of program compilation. https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdf"
+    "description": "DATE-COMPILED is an optional statement in the IDENTIFICATION DIVISION that describes the specific date of program compilation. https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdf"
   },
   "DATE COMPILED MM/DD/YYYY": {
     "prefix": "DATE COMPILED",
     "body": ["DATE-COMPILED. $CURRENT_MONTH/$CURRENT_DATE/$CURRENT_YEAR."],
-    "description": "DATE-COMPILED is an optional statement that describes the specific date of program compilation. https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdf"
+    "description": "DATE-COMPILED is an optional statement in the IDENTIFICATION DIVISION that describes the specific date of program compilation. https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdf"
   },
   "DATE WRITTEN YYYY/MM/DD": {
     "prefix": "DATE WRITTEN",
     "body": ["DATE-WRITTEN. $CURRENT_YEAR/$CURRENT_MONTH/$CURRENT_DATE."],
-    "description": "DATE-WRITTEN is an optional statement that describes the specific date of program compilation. https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdf"
+    "description": "DATE-WRITTEN is an optional statement in the IDENTIFICATION DIVISION that describes the specific date of program compilation. https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdf"
   },
   "DATE WRITTEN MM/DD/YYYY": {
     "prefix": "DATE WRITTEN",
     "body": ["DATE-WRITTEN. $CURRENT_MONTH/$CURRENT_DATE/$CURRENT_YEAR."],
-    "description": "DATE-WRITTEN is an optional statement that describes the specific date of program compilation. https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdf"
+    "description": "DATE-WRITTEN is an optional statement in the IDENTIFICATION DIVISION that describes the specific date of program compilation. https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdf"
   },
   "DAY": {
     "prefix": "DAY",
@@ -434,20 +434,20 @@
   "DAY OF WEEK": {
     "prefix": "DAY OF WEEK",
     "body": ["ACCEPT ${1:DATE-VAR-RECV} FROM DAY-OF-WEEK (${2:DATE-VAR-SEND})"],
-    "description": "This is an example of utilizing a one-byte(PiC 9(1)receiving variable - (1-7) from z/OS. Note that 1 = Monday, 2 = Tuesday, 3 = Wednesday, etc. https://www.ibm.com/docs/en/cobol-zos/6.4?topic=as-date-date-yyyymmdd-day-day-yyyyddd-day-week-time"
+    "description": "This is an example of utilizing a one-byte (ie. PIC 9(1)) receiving variable - (1-7) from z/OS. Note that 1 = Monday, 2 = Tuesday, 3 = Wednesday, etc. https://www.ibm.com/docs/en/cobol-zos/6.4?topic=as-date-date-yyyymmdd-day-day-yyyyddd-day-week-time"
   },
   "DBCS": {
     "prefix": "DBCS",
     "body": ["IF ${1:VAR-1} IS DBCS"],
     "description": "A class-condition, allowing you to test whether the data in a field is in valid DBCS format. https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdf"
   },
-  "DEBUG": {
+  "DEBUG-ITEM": {
     "prefix": "DEBUG",
     "body": [
       "01 DEBUG-ITEM.",
       "\t05 DEBUG-${1|CONTENTS,NAME,SUB1,SUB2,SUB3|} PIC X(${2:nn})."
     ],
-    "description": "description"
+    "description": "The DEBUG-ITEM special register provides information for a debugging declarative procedure about the conditions that cause debugging section execution. https://publibfp.boulder.ibm.com/epubs/pdf/igy3lr31.pdf"
   },
   "DECIMAL-POINT": {
     "prefix": "DECIMAL-POINT",
@@ -654,7 +654,7 @@
       "ON SIZE ERROR ${4:imperative_statement}",
       "END-DIVIDE."
     ],
-    "description": "NUMVAR-1 is divided into NUMVAR-2. If NUMVAR-1 = 0 or if the quotient is larger than NUMVAR-3 the ON SIZE ERROR statement is executed. If ON SIZE ERROR isn't coded the program ABENDS. https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdf"
+    "description": "NUMVAR-1 is divided into NUMVAR-2. If NUMVAR-1 = 0 or if the quotient is larger than NUMVAR-3 the ON SIZE ERROR statement is executed. If ON SIZE ERROR isn not coded the program abends. https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdf"
   },
   "ERROR #2": {
     "prefix": "ERROR",
@@ -662,7 +662,7 @@
       "MOVE CORRESPONDING ${1:GROUP-FIELDS-1} TO ${2:GROUP-FIELDS-2}",
       "ON SIZE ERROR ${3:imperative_statement}"
     ],
-    "description": "Tthe like-named variables in the COBOL group field GROUP-FIELDS-1 are moved to GROUP-FIELDS-2. If there are any variables in GROUP-FIELDS-1 that are larger than the same named variable in GROUP-FIELDS-2 the ON SIZE ERROR statement is executed. If ON SIZE ERROR isn't coded the program ABENDS. https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdf"
+    "description": "The like-named variables in the COBOL group field GROUP-FIELDS-1 are moved to GROUP-FIELDS-2. If there are any variables in GROUP-FIELDS-1 that are larger than the same named variable in GROUP-FIELDS-2 the ON SIZE ERROR statement is executed. If ON SIZE ERROR is not coded the program abends. https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdf"
   },
   "ERROR #3": {
     "prefix": "ERROR",
