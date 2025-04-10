@@ -604,7 +604,7 @@
       "END-INITIALIZE.",
       "$0"
     ],
-    "description": "EGCS => Extended Graphic Character Set. https://www.ibm.com/docs/en/cobol-zos/6.4?topic=statements-initialize-statement"
+    "description": "Initializes a variable while replacing the EGCS (Extended Graphic Character Set) information by a value or variable. https://www.ibm.com/docs/en/cobol-zos/6.4?topic=statements-initialize-statement"
   },
   "IF-ELSE": {
     "prefix": "ELSE",
@@ -784,7 +784,7 @@
       "END-EVALUATE",
       ""
     ],
-    "description": "Use the EVALUATE verb in place of a set of IF/ELSE constructs. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+    "description": "Use EVALUATE instead of a series of nested IF statements to test multiple conditions and specify distinct actions for each. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
   },
   "EVALUATE FALSE": {
     "prefix": "EVALUATE FALSE",
@@ -869,12 +869,12 @@
       "TALLYING ${5:VAR-CTR} FOR LEADING \"${6:A}\"",
       "REPLACING FIRST \"${1:A1}\" BY \"${2:2}\" AFTER INITIAL \"${3:T}\""
     ],
-    "description": "When FIRST is specified and not BEFORE / AFTER - the replacement field changes the left/first occurrence of the inspected field (VAR-1 in this example). https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+    "description": "REPLACING FIRST changes the first (leftmost) occurrence of the inspected field (VAR-1 in this example)."
   },
   "FOOTING": {
     "prefix": "FOOTING",
     "body": ["WITH FOOTING AT ${1:literal}"],
-    "description": "Part of an FD's \"LINAGE\" (logical page size) clause - available for QSAM and LINE-SEQUENTIAL files only). WITH FOOTING specifies a line # in an output file or printer. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+    "description": "Part of the FD LINAGE (logical page size) clause - available for QSAM and LINE-SEQUENTIAL files only. WITH FOOTING specifies a line number in an output file or printer. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
   },
   "FOR": {
     "prefix": "FOR",
