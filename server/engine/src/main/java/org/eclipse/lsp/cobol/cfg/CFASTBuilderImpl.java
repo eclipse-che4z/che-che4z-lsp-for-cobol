@@ -41,10 +41,6 @@ import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.eclipse.lsp.cobol.common.model.NodeType.*;
 
 /** CF tree builder implementation */
 @Slf4j
