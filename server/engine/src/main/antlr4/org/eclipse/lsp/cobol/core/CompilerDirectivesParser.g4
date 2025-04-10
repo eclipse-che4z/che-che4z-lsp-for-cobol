@@ -24,7 +24,7 @@ compilerOption
     ;
 
 // compiler translator options
-cicsTranslatorOptions:  CICS LPARENCHAR (cicsTranslatorCompileDirectivedKeywords)  RPARENCHAR;
+cicsTranslatorOptions: CICS LPARENCHAR (cicsTranslatorCompileDirectivedKeywords | NONNUMERICLITERAL) RPARENCHAR;
 
 // compiler options
 compilerXOpts
