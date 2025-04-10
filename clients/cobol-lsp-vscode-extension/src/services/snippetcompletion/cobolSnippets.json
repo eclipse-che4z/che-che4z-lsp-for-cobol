@@ -411,7 +411,7 @@
     "body": [
       "AT DATE * PERFORM",
       "    QUERY LOCATION;",
-      "    LIST DATE-FIELD",
+      "    LIST ${1:DATE-FIELD}",
       "    GO;",
       "END-PERFORM;"
     ],
