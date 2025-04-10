@@ -18,6 +18,8 @@ import static org.eclipse.lsp.cobol.common.model.NodeType.*;
 
 import com.google.gson.Gson;
 import com.google.inject.Inject;
+
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
@@ -37,7 +39,6 @@ import org.eclipse.lsp.cobol.service.DocumentModelService;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
-import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -293,21 +294,11 @@ public class CFASTBuilderImpl implements CFASTBuilder {
     CobolDocumentModel doc = documentModelService.get(node.getLocality().getUri());
     if (doc == null) {
       try {
-        String documentUri = node.getLocality().getUri();
+        URI documentUri = new URI(node.getLocality().getUri());
         Path tempPath = Paths.get(documentUri);
-        File newFile = new File(documentUri);
-
-        LOG.error("Exists: " + newFile.exists());
-        LOG.error("isDirectory: " + newFile.isDirectory());
-        LOG.error("canRead:: " + newFile.canRead());
 
         String text = new String(Files.readAllBytes(tempPath));
-        documentModelService.openDocument(documentUri, text, "COBOL");
-        doc = documentModelService.get(node.getLocality().getUri());
-        if (doc == null) {
-          LOG.error("cutSnippet failed: " + node.getLocality().getUri() + " not found.");
-          return "<snippet creation error>";
-        }
+        doc = new CobolDocumentModel(documentUri.toString(), text);
       } catch (Exception e) {
         LOG.error("cutSnippet failed: " + node.getLocality().getUri() + " not found.");
         return "<snippet creation error>";
