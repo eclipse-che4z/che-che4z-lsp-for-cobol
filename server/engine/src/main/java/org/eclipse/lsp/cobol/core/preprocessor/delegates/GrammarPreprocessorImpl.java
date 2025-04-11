@@ -25,15 +25,17 @@ import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.eclipse.lsp.cobol.common.CleanerPreprocessor;
 import org.eclipse.lsp.cobol.common.ResultWithErrors;
+import org.eclipse.lsp.cobol.common.copybook.CopybookService;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
+import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.utils.ThreadInterruptionUtil;
 import org.eclipse.lsp.cobol.core.CobolPreprocessor;
 import org.eclipse.lsp.cobol.core.CobolPreprocessorLexer;
 import org.eclipse.lsp.cobol.core.preprocessor.CopybookHierarchy;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.*;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.replacement.ReplacePreProcessorListener;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.replacement.ReplacePreprocessorFactory;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.replacement.ReplacingService;
 import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
 
 /**
@@ -42,15 +44,21 @@ import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
  * and usages specified, as well as related errors.
  */
 public class GrammarPreprocessorImpl implements GrammarPreprocessor {
-  private final GrammarPreprocessorListenerFactory listenerFactory;
-  private final ReplacePreprocessorFactory replacingFactory;
+  private final ReplacingService replacingService;
+  private final GrammarPreprocessor grammarPreprocessor;
+  private final CopybookService copybookService;
+  private final MessageService messageService;
 
   @Inject
   public GrammarPreprocessorImpl(
-      GrammarPreprocessorListenerFactory listenerFactory,
-      ReplacePreprocessorFactory replacingFactory) {
-    this.listenerFactory = listenerFactory;
-    this.replacingFactory = replacingFactory;
+      ReplacingService replacingService,
+      GrammarPreprocessor grammarPreprocessor,
+      CopybookService copybookService,
+      MessageService messageService) {
+    this.replacingService = replacingService;
+    this.grammarPreprocessor = grammarPreprocessor;
+    this.copybookService = copybookService;
+    this.messageService = messageService;
   }
 
   @NonNull
@@ -72,7 +80,8 @@ public class GrammarPreprocessorImpl implements GrammarPreprocessor {
         new CobolPreprocessor(makeTokens(extendedDocument.toString()));
     preprocessorParser.removeErrorListeners();
 
-    ReplacePreProcessorListener listener = replacingFactory.create(extendedDocument, hierarchy);
+    ReplacePreProcessorListener listener =
+        new ReplacePreProcessorListener(extendedDocument, hierarchy, replacingService);
     new ParseTreeWalker().walk(listener, preprocessorParser.startRule());
     listener.applyReplacing();
     return new ResultWithErrors<>(extendedDocument.toString(), listener.getErrors());
@@ -84,7 +93,13 @@ public class GrammarPreprocessorImpl implements GrammarPreprocessor {
     BufferedTokenStream tokens = makeTokens(code);
 
     GrammarPreprocessorListener<CopybooksRepository> listener =
-        listenerFactory.create(context, preprocessor);
+        new GrammarPreprocessorListenerImpl(
+            context,
+            preprocessor,
+            grammarPreprocessor,
+            copybookService,
+            messageService,
+            replacingService);
 
     ThreadInterruptionUtil.checkThreadInterrupted();
     CobolPreprocessor parser = new CobolPreprocessor(tokens);

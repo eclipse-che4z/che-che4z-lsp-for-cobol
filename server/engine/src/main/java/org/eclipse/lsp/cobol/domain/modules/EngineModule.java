@@ -18,7 +18,6 @@ package org.eclipse.lsp.cobol.domain.modules;
 import static com.google.inject.name.Names.named;
 
 import com.google.inject.AbstractModule;
-import com.google.inject.assistedinject.FactoryModuleBuilder;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.eclipse.lsp.cobol.cfg.CFASTBuilder;
 import org.eclipse.lsp.cobol.cfg.CFASTBuilderImpl;
@@ -32,8 +31,6 @@ import org.eclipse.lsp.cobol.core.messages.LocaleStoreImpl;
 import org.eclipse.lsp.cobol.core.messages.PropertiesMessageService;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.GrammarPreprocessor;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.GrammarPreprocessorImpl;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.GrammarPreprocessorListenerFactory;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.replacement.ReplacePreprocessorFactory;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.replacement.ReplacingService;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.replacement.ReplacingServiceImpl;
 import org.eclipse.lsp.cobol.core.visitor.InterruptingTreeListener;
@@ -56,8 +53,6 @@ public class EngineModule extends AbstractModule {
     bind(TrueDialectService.class).to(TrueDialectServiceImpl.class);
 
     bind(GrammarPreprocessor.class).to(GrammarPreprocessorImpl.class);
-    install(new FactoryModuleBuilder().build(GrammarPreprocessorListenerFactory.class));
-    install(new FactoryModuleBuilder().build(ReplacePreprocessorFactory.class));
     bind(ReplacingService.class).to(ReplacingServiceImpl.class);
 
     bind(MessageService.class).to(PropertiesMessageService.class);

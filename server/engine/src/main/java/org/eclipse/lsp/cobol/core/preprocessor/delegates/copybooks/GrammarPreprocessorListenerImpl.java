@@ -61,13 +61,13 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   private List<ReplacementContext> replacementContext;
 
   @Inject
-  GrammarPreprocessorListenerImpl(
-      @Assisted PreprocessorContext context,
-      @Assisted CleanerPreprocessor preprocessor,
-      GrammarPreprocessor grammarPreprocessor,
-      CopybookService copybookService,
-      MessageService messageService,
-      ReplacingService replacingService) {
+  public GrammarPreprocessorListenerImpl(
+          @Assisted PreprocessorContext context,
+          @Assisted CleanerPreprocessor preprocessor,
+          GrammarPreprocessor grammarPreprocessor,
+          CopybookService copybookService,
+          MessageService messageService,
+          ReplacingService replacingService) {
     this.copybookConfig = context.getCopybookProcessingMode();
     this.messageService = messageService;
     this.preprocessorService =
