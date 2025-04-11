@@ -375,7 +375,11 @@ class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
   private CICSCheckUtilityParameters getCheckParams() {
     CICSCheckUtilityParameters cicsCheckUtilityParameters = new CICSCheckUtilityParameters();
     final List<String> opts = context.getPreprocessorsDirectives().get("CICS");
-    if (opts == null) return cicsCheckUtilityParameters;
+    if (opts == null || opts.isEmpty()) {
+      // This is a special case to reduce false positives until we have CICS configuration
+      cicsCheckUtilityParameters.spEnabled = true;
+      return cicsCheckUtilityParameters;
+    }
     for (String opt : opts) {
       switch (opt.toUpperCase()) {
         case "LENGTH":
