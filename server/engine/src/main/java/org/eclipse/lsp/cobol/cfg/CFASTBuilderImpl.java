@@ -295,9 +295,8 @@ public class CFASTBuilderImpl implements CFASTBuilder {
     if (doc == null) {
       try {
         URI documentUri = new URI(node.getLocality().getUri());
-        Path tempPath = Paths.get(documentUri);
 
-        String text = new String(Files.readAllBytes(tempPath));
+        String text = new String(Files.readAllBytes(Paths.get(documentUri)));
         doc = new CobolDocumentModel(documentUri.toString(), text);
       } catch (Exception e) {
         LOG.error("cutSnippet failed: " + node.getLocality().getUri() + " not found.");
