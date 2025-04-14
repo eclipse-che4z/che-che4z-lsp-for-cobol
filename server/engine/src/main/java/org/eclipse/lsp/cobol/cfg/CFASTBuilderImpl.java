@@ -40,7 +40,6 @@ import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 
 /** CF tree builder implementation */
