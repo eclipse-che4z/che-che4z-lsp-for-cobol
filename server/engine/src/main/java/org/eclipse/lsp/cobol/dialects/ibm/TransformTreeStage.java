@@ -99,23 +99,28 @@ public class TransformTreeStage
               rootNode,
               dialectNode.getLocality().getUri(),
               dialectNode.getLocality().getRange().getStart());
-
       addChild(nodeByPosition.orElse(rootNode), dialectNode);
     }
   }
 
   private void addChild(Node node, Node dialectNode) {
-    int index = 0;
-    for (Node child : node.getChildren()) {
-      if (child.getLocality().getUri().equals(dialectNode.getLocality().getUri())
-          && (child.getLocality().getRange().getStart().getLine()
-              >= dialectNode.getLocality().getRange().getStart().getLine())) {
-        break;
+    int targetIndex = -1;
+    for (int i = 0; i < node.getChildren().size(); i++) {
+      Node child = node.getChildren().get(i);
+      String childUri = child.getLocality().getUri();
+      if (childUri.equals(dialectNode.getLocality().getUri())) {
+        int childLine = child.getLocality().getRange().getStart().getLine();
+        if (childLine < dialectNode.getLocality().getRange().getStart().getLine()) {
+          targetIndex = i + 1;
+        } else {
+          targetIndex = i;
+          break;
+        }
       }
-      index++;
     }
+    targetIndex = targetIndex == -1 ? node.getChildren().size() : targetIndex;
     dialectNode.setParent(node);
-    node.getChildren().add(index, dialectNode);
+    node.getChildren().add(targetIndex, dialectNode);
   }
 
   private void addCopyNodes(AnalysisContext context, Node rootNode) {
