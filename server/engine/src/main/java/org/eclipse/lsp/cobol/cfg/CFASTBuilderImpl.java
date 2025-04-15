@@ -290,10 +290,9 @@ public class CFASTBuilderImpl implements CFASTBuilder {
   }
 
   private String cutSnippet(Node node) {
-    //String rootURIString = node.getNearestParentByType(ROOT).map(this::getRootNodeURI).orElse("");'
-
     CobolDocumentModel doc = documentModelService.get(node.getLocality().getUri());
     List<?> resultText = new ArrayList<>();
+
     if (doc == null) {
       String rootURIString = node.getNearestParentByType(ROOT).map(this::getRootNodeURI).orElse("");
       String nodeURIString = node.getLocality().getUri();
@@ -336,10 +335,6 @@ public class CFASTBuilderImpl implements CFASTBuilder {
 
   private String getRootNodeURI(Node node) {
     return node.getLocality().getUri();
-  }
-
-  private ProgramNode getProgramNode(ProgramNode node) {
-    return node;
   }
 
   private PerformUntilType getPerformUntilType(PerformNode performNode) {
