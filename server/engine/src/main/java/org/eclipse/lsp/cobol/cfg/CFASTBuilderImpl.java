@@ -19,10 +19,10 @@ import static org.eclipse.lsp.cobol.common.model.NodeType.*;
 import com.google.gson.Gson;
 import com.google.inject.Inject;
 
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.lsp.cobol.common.copybook.CopybookModel;
 import org.eclipse.lsp.cobol.common.model.tree.*;
 import org.eclipse.lsp.cobol.common.model.tree.statements.StatementNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableUsageNode;
@@ -36,21 +36,21 @@ import org.eclipse.lsp.cobol.implicitDialects.sql.node.ExecSqlNode;
 import org.eclipse.lsp.cobol.implicitDialects.sql.node.ExecSqlWheneverNode;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp.cobol.service.DocumentModelService;
+import org.eclipse.lsp.cobol.service.copybooks.CopybookServiceImpl;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
-
-import java.nio.file.Files;
-import java.nio.file.Paths;
 
 /** CF tree builder implementation */
 @Slf4j
 public class CFASTBuilderImpl implements CFASTBuilder {
   private static final int SNIPPET_LENGTH = 10;
   private final DocumentModelService documentModelService;
+  private final CopybookServiceImpl copybookService;
 
   @Inject
-  public CFASTBuilderImpl(DocumentModelService documentModelService) {
+  public CFASTBuilderImpl(DocumentModelService documentModelService, CopybookServiceImpl copybookService) {
     this.documentModelService = documentModelService;
+    this.copybookService = copybookService;
   }
 
   @Override
@@ -290,33 +290,56 @@ public class CFASTBuilderImpl implements CFASTBuilder {
   }
 
   private String cutSnippet(Node node) {
-    CobolDocumentModel doc = documentModelService.get(node.getLocality().getUri());
-    if (doc == null) {
-      try {
-        URI documentUri = new URI(node.getLocality().getUri());
+    //String rootURIString = node.getNearestParentByType(ROOT).map(this::getRootNodeURI).orElse("");'
 
-        String text = new String(Files.readAllBytes(Paths.get(documentUri)));
-        doc = new CobolDocumentModel(documentUri.toString(), text);
-      } catch (Exception e) {
+    CobolDocumentModel doc = documentModelService.get(node.getLocality().getUri());
+    List<?> resultText = new ArrayList<>();
+    if (doc == null) {
+      String rootURIString = node.getNearestParentByType(ROOT).map(this::getRootNodeURI).orElse("");
+      String nodeURIString = node.getLocality().getUri();
+
+      if (rootURIString.isEmpty()) {
         LOG.error("cutSnippet failed: " + node.getLocality().getUri() + " not found.");
         return "<snippet creation error>";
       }
+
+      Set<CopybookModel> copybookSet = copybookService.getCopybookUsage(rootURIString);
+      for (CopybookModel copybook : copybookSet) {
+        if (nodeURIString.equals(copybook.getUri())) {
+          resultText = new ArrayList<>(Arrays.asList(copybook.getContent().split("\\r?\\n", -1)));
+        }
+      }
     }
-    List<CobolDocumentModel.Line> lines = doc.getLines();
+
+    if (resultText.isEmpty() && doc != null) {
+        resultText = doc.getLines();
+    } else {
+      LOG.error("cutSnippet failed: " + node.getLocality().getUri() + " not found.");
+      return "<snippet creation error>";
+    }
+
     StringBuilder sb = new StringBuilder();
     int startLine = node.getLocality().getRange().getStart().getLine();
     int stopLine =
         Math.min(startLine + SNIPPET_LENGTH, node.getLocality().getRange().getEnd().getLine() + 1);
-    lines
+    resultText
         .subList(startLine, stopLine)
         .forEach(
             line -> {
               if (sb.length() > 0) {
                 sb.append("\r\n");
               }
-              sb.append(line.getText());
+              sb.append(line);
             });
     return sb.toString();
+  }
+
+  private String getRootNodeURI(Node node) {
+    return node.getLocality().getUri();
+  }
+
+  private ProgramNode getProgramNode(ProgramNode node) {
+    return node;
   }
 
   private PerformUntilType getPerformUntilType(PerformNode performNode) {
